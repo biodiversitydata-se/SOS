@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Exceptions;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
+using SOS.Lib.JsonConverters;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
@@ -23,7 +25,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Result = CSharpFunctionalExtensions.Result;
 
@@ -41,8 +46,24 @@ namespace SOS.Observations.Api.Controllers
         private readonly ISearchFilterUtility _searchFilterUtility;
         private readonly IInputValidator _inputValidator;
         private readonly ObservationApiConfiguration _observationApiConfiguration;
+        private readonly IClassCache<Dictionary<string, GeoGridResultDto>> _geogridAggregationCache;
+        private static readonly SHA256 _sha256 = SHA256.Create();        
         private readonly ILogger<ObservationsController> _logger;
 
+        private JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions
+        {
+            AllowTrailingCommas = true,
+            DefaultIgnoreCondition = JsonIgnoreCondition.Never,
+            PropertyNameCaseInsensitive = true,
+            ReadCommentHandling = JsonCommentHandling.Skip,
+            Converters =
+            {
+                new JsonStringEnumConverter(),
+                new GeoShapeConverter(),
+                new NetTopologySuite.IO.Converters.GeoJsonConverterFactory()
+            }
+        };
+  
         /// <summary>
         /// Constructor
         /// </summary>
@@ -51,6 +72,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="searchFilterUtility"></param>
         /// <param name="inputValidator"></param>
         /// <param name="observationApiConfiguration"></param>
+        /// <param name="geogridAggregationCache"></param>
         /// <param name="logger"></param>
         /// <exception cref="ArgumentNullException"></exception>
         public ObservationsController(
@@ -59,6 +81,7 @@ namespace SOS.Observations.Api.Controllers
             ISearchFilterUtility searchFilterUtility,
             IInputValidator inputValidator,
             ObservationApiConfiguration observationApiConfiguration,
+            IClassCache<Dictionary<string, GeoGridResultDto>> geogridAggregationCache,
             ILogger<ObservationsController> logger) 
         {
             _observationManager = observationManager ?? throw new ArgumentNullException(nameof(observationManager));
@@ -66,6 +89,7 @@ namespace SOS.Observations.Api.Controllers
             _inputValidator = inputValidator ?? throw new ArgumentNullException(nameof(inputValidator));
             _searchFilterUtility = searchFilterUtility ?? throw new ArgumentNullException(nameof(searchFilterUtility));
             _observationApiConfiguration = observationApiConfiguration ?? throw new ArgumentNullException(nameof(observationApiConfiguration));
+            _geogridAggregationCache = geogridAggregationCache ?? throw new ArgumentNullException(nameof(geogridAggregationCache));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -257,6 +281,18 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                Dictionary<string, GeoGridResultDto> geogridAggregationByCacheKey = _geogridAggregationCache.Get();
+                if (geogridAggregationByCacheKey == null)
+                {
+                    geogridAggregationByCacheKey = new Dictionary<string, GeoGridResultDto>();
+                    _geogridAggregationCache.Set(geogridAggregationByCacheKey);
+                }
+                string cacheKey = GenerateGeogridAggregationCacheKey(Request.Path, Request.QueryString.ToString(), filter);                
+                if (cacheKey != null && geogridAggregationByCacheKey.TryGetValue(cacheKey, out GeoGridResultDto cachedResponse))
+                {
+                    return new OkObjectResult(cachedResponse);                    
+                }
+
                 // SearchFilterDto don't support protection filter, declare it localy
                 var protectionFilter = sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public;
                 this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, protectionFilter);
@@ -284,6 +320,10 @@ namespace SOS.Observations.Api.Controllers
                     authorizationApplicationIdentifier, searchFilter, zoom);
 
                 var dto = result.ToGeoGridResultDto(boundingBox.CalculateNumberOfTiles(zoom));
+                if (cacheKey != null && !geogridAggregationByCacheKey.ContainsKey(cacheKey))
+                {
+                    geogridAggregationByCacheKey.Add(cacheKey, dto);
+                }
                 return new OkObjectResult(dto);
             }
             catch (ArgumentOutOfRangeException e)
@@ -306,6 +346,42 @@ namespace SOS.Observations.Api.Controllers
             {
                 _logger.LogError(e, "GeoGridAggregation error.");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        private string GenerateGeogridAggregationCacheKey(string path, string queryString, SearchFilterAggregationDto request)
+        {
+            try
+            {
+                StringBuilder keyBuilder = new StringBuilder();
+                keyBuilder.Append(path);
+                keyBuilder.Append(queryString);
+
+                if (request != null)
+                {
+                    string requestBody = JsonSerializer.Serialize(request, _jsonSerializerOptions);
+
+                    if (requestBody.Length <= 1000)
+                    {
+                        keyBuilder.Append(requestBody);
+                    }
+                    else
+                    {
+                        return null; // don't cache large requests.
+                    }
+                }
+
+                string key = keyBuilder.ToString();
+                byte[] keyBytes = Encoding.UTF8.GetBytes(key);
+
+                // Skapa en hash för att få en kortare och unik nyckel
+                byte[] hashBytes = _sha256.ComputeHash(keyBytes);
+                return BitConverter.ToString(hashBytes).Replace("-", "").ToLowerInvariant();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error when creating GeoAggregation cache key");
+                return null;
             }
         }
 

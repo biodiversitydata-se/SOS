@@ -74,6 +74,7 @@ using SOS.Observations.Api.Repositories;
 using SOS.Observations.Api.Repositories.Interfaces;
 using SOS.Observations.Api.Services.Interfaces;
 using SOS.Shared.Api.Configuration;
+using SOS.Shared.Api.Dtos;
 using SOS.Shared.Api.Utilities.Objects;
 using SOS.Shared.Api.Utilities.Objects.Interfaces;
 using SOS.Shared.Api.Validators;
@@ -493,6 +494,8 @@ namespace SOS.Observations.Api
             services.AddSingleton<IClassCache<TaxonListSetsById>, ClassCache<TaxonListSetsById>>();
             var taxonSumAggregationCache = new ClassCache<Dictionary<int, TaxonSumAggregationItem>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<Dictionary<int, TaxonSumAggregationItem>>>()) { CacheDuration = TimeSpan.FromHours(24) };
             services.AddSingleton<IClassCache<Dictionary<int, TaxonSumAggregationItem>>>(taxonSumAggregationCache);
+            var geoGridAggregationCache = new ClassCache<Dictionary<string, GeoGridResultDto>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<Dictionary<string, GeoGridResultDto>>>()) { CacheDuration = TimeSpan.FromHours(24) };
+            services.AddSingleton<IClassCache<Dictionary<string, GeoGridResultDto>>>(geoGridAggregationCache);
             services.AddSingleton<IClassCache<HealthCheckResult>, ClassCache<HealthCheckResult>>();
 
             // Add managers
