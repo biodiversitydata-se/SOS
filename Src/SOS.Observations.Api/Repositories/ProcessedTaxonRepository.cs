@@ -460,6 +460,9 @@ namespace SOS.Observations.Api.Repositories
                 .Size(0)
                 .Source(s => s.ExcludeAll())
                 .TrackTotalHits(false)
+                .RequestConfiguration(r => r
+                    .RequestTimeout(TimeSpan.FromMinutes(5)) // 5 minutes timeout
+                )
             );
 
             searchResponse.ThrowIfInvalid();
