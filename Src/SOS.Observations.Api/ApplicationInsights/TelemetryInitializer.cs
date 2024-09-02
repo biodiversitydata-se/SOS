@@ -59,9 +59,12 @@ namespace SOS.Observations.Api.ApplicationInsights
                     requestTelemetry.Context.GlobalProperties.Add("Request-length", platformContext.Request.ContentLength.ToString());
                 }
 
-                if (platformContext.Request.ContentLength != null && !telemetry.Context.GlobalProperties.ContainsKey("CacheKey"))
+                if (platformContext.Items.TryGetValue("CacheKey", out object cacheKey))
                 {
-                    telemetry.Context.GlobalProperties.Add("CacheKey", platformContext.Request.ContentLength.ToString());
+                    if (cacheKey != null && !telemetry.Context.GlobalProperties.ContainsKey("CacheKey"))
+                    {
+                        telemetry.Context.GlobalProperties.Add("CacheKey", cacheKey.ToString());
+                    }
                 }
             }
 

@@ -493,7 +493,7 @@ namespace SOS.Observations.Api
             services.AddSingleton<ICache<string, ProcessedConfiguration>, ProcessedConfigurationCache>();
             services.AddSingleton<IClassCache<TaxonTree<IBasicTaxon>>, ClassCache<TaxonTree<IBasicTaxon>>>();
             services.AddSingleton<IClassCache<TaxonListSetsById>, ClassCache<TaxonListSetsById>>();
-            var taxonSumAggregationCache = new ClassCache<Dictionary<int, TaxonSumAggregationItem>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<Dictionary<int, TaxonSumAggregationItem>>>()) { CacheDuration = TimeSpan.FromHours(24) };
+            var taxonSumAggregationCache = new ClassCache<Dictionary<int, TaxonSumAggregationItem>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<Dictionary<int, TaxonSumAggregationItem>>>()) { CacheDuration = TimeSpan.FromHours(48) };
             services.AddSingleton<IClassCache<Dictionary<int, TaxonSumAggregationItem>>>(taxonSumAggregationCache);
             var geoGridAggregationCache = new ClassCache<Dictionary<string, CacheEntry<GeoGridResultDto>>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<Dictionary<string, CacheEntry<GeoGridResultDto>>>>()) { CacheDuration = TimeSpan.FromHours(48) };
             services.AddSingleton<IClassCache<Dictionary<string, CacheEntry<GeoGridResultDto>>>>(geoGridAggregationCache);
