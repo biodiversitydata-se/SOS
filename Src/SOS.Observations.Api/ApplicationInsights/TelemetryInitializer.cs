@@ -58,6 +58,11 @@ namespace SOS.Observations.Api.ApplicationInsights
                 {
                     requestTelemetry.Context.GlobalProperties.Add("Request-length", platformContext.Request.ContentLength.ToString());
                 }
+
+                if (platformContext.Request.ContentLength != null && !telemetry.Context.GlobalProperties.ContainsKey("CacheKey"))
+                {
+                    telemetry.Context.GlobalProperties.Add("CacheKey", platformContext.Request.ContentLength.ToString());
+                }
             }
 
             var nameidentifier = platformContext.User?.Claims?.FirstOrDefault(c => c.Type.Contains("nameidentifier", StringComparison.CurrentCultureIgnoreCase))?.Value;

@@ -1,4 +1,7 @@
-﻿using System;
+﻿using SOS.Lib.Models.Cache;
+using System;
+using System.Collections.Generic;
+using System.IO;
 
 namespace SOS.Lib.Cache.Interfaces
 {
@@ -24,5 +27,9 @@ namespace SOS.Lib.Cache.Interfaces
         /// </summary>
         /// <param name="entity"></param>
         void Set(TClass entity);
+
+        CacheEntry<T> CreateCacheEntry<T>(T item);
+        T GetCacheEntryValue<T>(CacheEntry<T> entry);
+        void CheckCacheSize<T>(Dictionary<string, CacheEntry<T>> dictionary);
     }
 }

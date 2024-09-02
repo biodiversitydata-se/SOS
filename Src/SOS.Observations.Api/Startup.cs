@@ -47,6 +47,7 @@ using SOS.Lib.JsonConverters;
 using SOS.Lib.Managers;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Middleware;
+using SOS.Lib.Models.Cache;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Processed.Observation;
@@ -494,8 +495,8 @@ namespace SOS.Observations.Api
             services.AddSingleton<IClassCache<TaxonListSetsById>, ClassCache<TaxonListSetsById>>();
             var taxonSumAggregationCache = new ClassCache<Dictionary<int, TaxonSumAggregationItem>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<Dictionary<int, TaxonSumAggregationItem>>>()) { CacheDuration = TimeSpan.FromHours(24) };
             services.AddSingleton<IClassCache<Dictionary<int, TaxonSumAggregationItem>>>(taxonSumAggregationCache);
-            var geoGridAggregationCache = new ClassCache<Dictionary<string, GeoGridResultDto>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<Dictionary<string, GeoGridResultDto>>>()) { CacheDuration = TimeSpan.FromHours(24) };
-            services.AddSingleton<IClassCache<Dictionary<string, GeoGridResultDto>>>(geoGridAggregationCache);
+            var geoGridAggregationCache = new ClassCache<Dictionary<string, CacheEntry<GeoGridResultDto>>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<Dictionary<string, CacheEntry<GeoGridResultDto>>>>()) { CacheDuration = TimeSpan.FromHours(48) };
+            services.AddSingleton<IClassCache<Dictionary<string, CacheEntry<GeoGridResultDto>>>>(geoGridAggregationCache);
             services.AddSingleton<IClassCache<HealthCheckResult>, ClassCache<HealthCheckResult>>();
 
             // Add managers

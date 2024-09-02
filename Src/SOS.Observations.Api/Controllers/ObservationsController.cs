@@ -6,6 +6,7 @@ using SOS.Lib.Exceptions;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.JsonConverters;
+using SOS.Lib.Models.Cache;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
@@ -46,7 +47,7 @@ namespace SOS.Observations.Api.Controllers
         private readonly ISearchFilterUtility _searchFilterUtility;
         private readonly IInputValidator _inputValidator;
         private readonly ObservationApiConfiguration _observationApiConfiguration;
-        private readonly IClassCache<Dictionary<string, GeoGridResultDto>> _geogridAggregationCache;
+        private readonly IClassCache<Dictionary<string, CacheEntry<GeoGridResultDto>>> _geogridAggregationCache;
         private static readonly SHA256 _sha256 = SHA256.Create();        
         private readonly ILogger<ObservationsController> _logger;
 
@@ -81,7 +82,7 @@ namespace SOS.Observations.Api.Controllers
             ISearchFilterUtility searchFilterUtility,
             IInputValidator inputValidator,
             ObservationApiConfiguration observationApiConfiguration,
-            IClassCache<Dictionary<string, GeoGridResultDto>> geogridAggregationCache,
+            IClassCache<Dictionary<string, CacheEntry<GeoGridResultDto>>> geogridAggregationCache,
             ILogger<ObservationsController> logger) 
         {
             _observationManager = observationManager ?? throw new ArgumentNullException(nameof(observationManager));
@@ -262,6 +263,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
         /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
         /// <param name="sensitiveObservations">If true, only sensitive (protected) observations will be searched (this requires authentication and authorization). If false, public available observations will be searched.</param>
+        /// <param name="skipCache">If true, skip using cached result.</param>
         /// <returns></returns>
         [HttpPost("GeoGridAggregation")]
         [ProducesResponseType(typeof(GeoGridResultDto), (int)HttpStatusCode.OK)]
@@ -277,21 +279,30 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] int zoom = 1,
             [FromQuery] bool validateSearchFilter = false,
             [FromQuery] string translationCultureCode = "sv-SE",
-            [FromQuery] bool sensitiveObservations = false)
+            [FromQuery] bool sensitiveObservations = false,
+            [FromQuery] bool? skipCache = false)
         {
             try
             {
-                Dictionary<string, GeoGridResultDto> geogridAggregationByCacheKey = _geogridAggregationCache.Get();
+                Dictionary<string, CacheEntry<GeoGridResultDto>> geogridAggregationByCacheKey = _geogridAggregationCache.Get();
                 if (geogridAggregationByCacheKey == null)
                 {
-                    geogridAggregationByCacheKey = new Dictionary<string, GeoGridResultDto>();
+                    geogridAggregationByCacheKey = new Dictionary<string, CacheEntry<GeoGridResultDto>>();
                     _geogridAggregationCache.Set(geogridAggregationByCacheKey);
                 }
-                string cacheKey = GenerateGeogridAggregationCacheKey(Request.Path, Request.QueryString.ToString(), filter);                
-                if (cacheKey != null && geogridAggregationByCacheKey.TryGetValue(cacheKey, out GeoGridResultDto cachedResponse))
+
+                var parameters = new[]
                 {
-                    _logger.LogInformation("GeoGridAggregation result found in cache and is returned as result");
-                    return new OkObjectResult(cachedResponse);                    
+                    $"zoom={zoom}",
+                    $"sensitiveObservations={sensitiveObservations}"
+                };
+                string cacheKey = GenerateGeogridAggregationCacheKey(string.Join("&", parameters), filter);
+                if (!skipCache.GetValueOrDefault(false) && cacheKey != null && geogridAggregationByCacheKey.TryGetValue(cacheKey, out CacheEntry<GeoGridResultDto> cacheEntry))
+                {
+                    HttpContext.Items.TryAdd("CacheKey", cacheKey);
+                    var val = _geogridAggregationCache.GetCacheEntryValue(cacheEntry);
+                    _logger.LogInformation($"GeoGridAggregation result found in cache and is returned as result. Number of requests={cacheEntry.Count}");
+                    return new OkObjectResult(val);
                 }
 
                 // SearchFilterDto don't support protection filter, declare it localy
@@ -323,12 +334,8 @@ namespace SOS.Observations.Api.Controllers
                 var dto = result.ToGeoGridResultDto(boundingBox.CalculateNumberOfTiles(zoom));
                 if (cacheKey != null && !geogridAggregationByCacheKey.ContainsKey(cacheKey))
                 {
-                    if (geogridAggregationByCacheKey.Count >= 20000) // prevent too large cache
-                    {
-                        geogridAggregationByCacheKey.Clear();
-                    }
-
-                    geogridAggregationByCacheKey.Add(cacheKey, dto);
+                    _geogridAggregationCache.CheckCacheSize(geogridAggregationByCacheKey);                    
+                    geogridAggregationByCacheKey.Add(cacheKey, _geogridAggregationCache.CreateCacheEntry(dto));
                 }
                 return new OkObjectResult(dto);
             }
@@ -355,19 +362,18 @@ namespace SOS.Observations.Api.Controllers
             }
         }
 
-        private string GenerateGeogridAggregationCacheKey(string path, string queryString, SearchFilterAggregationDto request)
+        private string GenerateGeogridAggregationCacheKey(string queryString, SearchFilterAggregationDto request)
         {
             try
             {
                 StringBuilder keyBuilder = new StringBuilder();
-                keyBuilder.Append(path);
                 keyBuilder.Append(queryString);
 
                 if (request != null)
                 {
                     string requestBody = JsonSerializer.Serialize(request, _jsonSerializerOptions);
 
-                    if (requestBody.Length <= 1000)
+                    if (requestBody.Length <= 10000)
                     {
                         keyBuilder.Append(requestBody);
                     }
