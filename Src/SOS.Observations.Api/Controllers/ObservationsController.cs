@@ -297,9 +297,9 @@ namespace SOS.Observations.Api.Controllers
                     $"sensitiveObservations={sensitiveObservations}"
                 };
                 string cacheKey = GenerateGeogridAggregationCacheKey(string.Join("&", parameters), filter);
+                HttpContext.Items.TryAdd("CacheKey", cacheKey);
                 if (!skipCache.GetValueOrDefault(false) && cacheKey != null && geogridAggregationByCacheKey.TryGetValue(cacheKey, out CacheEntry<GeoGridResultDto> cacheEntry))
                 {
-                    HttpContext.Items.TryAdd("CacheKey", cacheKey);
                     var val = _geogridAggregationCache.GetCacheEntryValue(cacheEntry);
                     _logger.LogInformation($"GeoGridAggregation result found in cache and is returned as result. Number of requests={cacheEntry.Count}");
                     return new OkObjectResult(val);
