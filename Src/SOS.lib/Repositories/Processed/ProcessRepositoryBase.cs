@@ -22,6 +22,7 @@ namespace SOS.Lib.Repositories.Processed
     {
         private readonly IElasticClientManager _elasticClientManager;
         private readonly ICache<string, ProcessedConfiguration> _processedConfigurationCache;
+        protected readonly IClassCache<Dictionary<string, ClusterHealthResponse>> _clusterHealthCache;
         private readonly ElasticSearchConfiguration _elasticConfiguration;
         private readonly ElasticSearchIndexConfiguration _elasticSearchIndexConfiguration;
         private readonly bool _toggleable;
@@ -127,6 +128,7 @@ namespace SOS.Lib.Repositories.Processed
         /// <param name="elasticClientManager"></param>
         /// <param name="processedConfigurationCache"></param>
         /// <param name="elasticConfiguration"></param>
+        /// <param name="clusterHealthCache"></param>
         /// <param name="logger"></param>
         /// <exception cref="ArgumentNullException"></exception>
         protected ProcessRepositoryBase(
@@ -134,6 +136,7 @@ namespace SOS.Lib.Repositories.Processed
             IElasticClientManager elasticClientManager,
             ICache<string, ProcessedConfiguration> processedConfigurationCache,
             ElasticSearchConfiguration elasticConfiguration,
+            IClassCache<Dictionary<string, ClusterHealthResponse>> clusterHealthCache,
             ILogger<ProcessRepositoryBase<TEntity, TKey>> logger
         )
         {
@@ -141,6 +144,7 @@ namespace SOS.Lib.Repositories.Processed
             _elasticClientManager = elasticClientManager ?? throw new ArgumentNullException(nameof(elasticClientManager));
             _processedConfigurationCache = processedConfigurationCache ?? throw new ArgumentNullException(nameof(processedConfigurationCache));
             _elasticConfiguration = elasticConfiguration ?? throw new ArgumentNullException(nameof(elasticConfiguration));
+            _clusterHealthCache = clusterHealthCache;
             _elasticSearchIndexConfiguration = elasticConfiguration.IndexSettings?.FirstOrDefault(i => i.Name.Equals(IndexHelper.GetInstanceName<TEntity>(), StringComparison.CurrentCultureIgnoreCase));
             if (_elasticSearchIndexConfiguration == null)
             {

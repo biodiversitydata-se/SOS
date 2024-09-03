@@ -30,6 +30,27 @@ namespace SOS.ElasticSearch.Proxy.ApplicationInsights
                 }
                 telemetry.Context.GlobalProperties.Add("Requesting-System", requestingSystem.ToString());
             }
+
+            if (platformContext.Items.TryGetValue("Observation-count", out var observationCount))
+            {
+                if (int.TryParse(observationCount?.ToString(), out var obsCount) && !requestTelemetry.Context.GlobalProperties.ContainsKey("Observation-count"))
+                {
+                    requestTelemetry.Context.GlobalProperties.Add("Observation-count", obsCount.ToString());
+                }
+            }
+
+            if (platformContext.Request.ContentLength != null && !requestTelemetry.Context.GlobalProperties.ContainsKey("Request-length"))
+            {
+                requestTelemetry.Context.GlobalProperties.Add("Request-length", platformContext.Request.ContentLength.ToString());
+            }
+
+            if (platformContext.Items.TryGetValue("CacheKey", out object? cacheKey))
+            {
+                if (cacheKey != null && !telemetry.Context.GlobalProperties.ContainsKey("CacheKey"))
+                {
+                    telemetry.Context.GlobalProperties.Add("CacheKey", cacheKey.ToString());
+                }
+            }
         }
 
         /// <summary>

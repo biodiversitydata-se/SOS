@@ -1,9 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Exceptions;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
+using SOS.Lib.JsonConverters;
+using SOS.Lib.Models.Cache;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
@@ -23,7 +26,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Result = CSharpFunctionalExtensions.Result;
 
@@ -41,8 +47,24 @@ namespace SOS.Observations.Api.Controllers
         private readonly ISearchFilterUtility _searchFilterUtility;
         private readonly IInputValidator _inputValidator;
         private readonly ObservationApiConfiguration _observationApiConfiguration;
+        private readonly IClassCache<Dictionary<string, CacheEntry<GeoGridResultDto>>> _geogridAggregationCache;
+        private static readonly SHA256 _sha256 = SHA256.Create();        
         private readonly ILogger<ObservationsController> _logger;
 
+        private JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions
+        {
+            AllowTrailingCommas = true,
+            DefaultIgnoreCondition = JsonIgnoreCondition.Never,
+            PropertyNameCaseInsensitive = true,
+            ReadCommentHandling = JsonCommentHandling.Skip,
+            Converters =
+            {
+                new JsonStringEnumConverter(),
+                new GeoShapeConverter(),
+                new NetTopologySuite.IO.Converters.GeoJsonConverterFactory()
+            }
+        };
+  
         /// <summary>
         /// Constructor
         /// </summary>
@@ -51,6 +73,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="searchFilterUtility"></param>
         /// <param name="inputValidator"></param>
         /// <param name="observationApiConfiguration"></param>
+        /// <param name="geogridAggregationCache"></param>
         /// <param name="logger"></param>
         /// <exception cref="ArgumentNullException"></exception>
         public ObservationsController(
@@ -59,6 +82,7 @@ namespace SOS.Observations.Api.Controllers
             ISearchFilterUtility searchFilterUtility,
             IInputValidator inputValidator,
             ObservationApiConfiguration observationApiConfiguration,
+            IClassCache<Dictionary<string, CacheEntry<GeoGridResultDto>>> geogridAggregationCache,
             ILogger<ObservationsController> logger) 
         {
             _observationManager = observationManager ?? throw new ArgumentNullException(nameof(observationManager));
@@ -66,6 +90,7 @@ namespace SOS.Observations.Api.Controllers
             _inputValidator = inputValidator ?? throw new ArgumentNullException(nameof(inputValidator));
             _searchFilterUtility = searchFilterUtility ?? throw new ArgumentNullException(nameof(searchFilterUtility));
             _observationApiConfiguration = observationApiConfiguration ?? throw new ArgumentNullException(nameof(observationApiConfiguration));
+            _geogridAggregationCache = geogridAggregationCache ?? throw new ArgumentNullException(nameof(geogridAggregationCache));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -238,6 +263,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
         /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
         /// <param name="sensitiveObservations">If true, only sensitive (protected) observations will be searched (this requires authentication and authorization). If false, public available observations will be searched.</param>
+        /// <param name="skipCache">If true, skip using cached result.</param>
         /// <returns></returns>
         [HttpPost("GeoGridAggregation")]
         [ProducesResponseType(typeof(GeoGridResultDto), (int)HttpStatusCode.OK)]
@@ -253,10 +279,32 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] int zoom = 1,
             [FromQuery] bool validateSearchFilter = false,
             [FromQuery] string translationCultureCode = "sv-SE",
-            [FromQuery] bool sensitiveObservations = false)
+            [FromQuery] bool sensitiveObservations = false,
+            [FromQuery] bool? skipCache = false)
         {
             try
             {
+                Dictionary<string, CacheEntry<GeoGridResultDto>> geogridAggregationByCacheKey = _geogridAggregationCache.Get();
+                if (geogridAggregationByCacheKey == null)
+                {
+                    geogridAggregationByCacheKey = new Dictionary<string, CacheEntry<GeoGridResultDto>>();
+                    _geogridAggregationCache.Set(geogridAggregationByCacheKey);
+                }
+
+                var parameters = new[]
+                {
+                    $"zoom={zoom}",
+                    $"sensitiveObservations={sensitiveObservations}"
+                };
+                string cacheKey = CreateCacheKey(string.Join("&", parameters), filter);
+                HttpContext.Items.TryAdd("CacheKey", cacheKey);
+                if (!skipCache.GetValueOrDefault(false) && cacheKey != null && geogridAggregationByCacheKey.TryGetValue(cacheKey, out CacheEntry<GeoGridResultDto> cacheEntry))
+                {
+                    var val = _geogridAggregationCache.GetCacheEntryValue(cacheEntry);
+                    _logger.LogInformation($"GeoGridAggregation result found in cache and is returned as result. Number of requests={cacheEntry.Count}");
+                    return new OkObjectResult(val);
+                }
+
                 // SearchFilterDto don't support protection filter, declare it localy
                 var protectionFilter = sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public;
                 this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, protectionFilter);
@@ -284,6 +332,11 @@ namespace SOS.Observations.Api.Controllers
                     authorizationApplicationIdentifier, searchFilter, zoom);
 
                 var dto = result.ToGeoGridResultDto(boundingBox.CalculateNumberOfTiles(zoom));
+                if (cacheKey != null && !geogridAggregationByCacheKey.ContainsKey(cacheKey))
+                {
+                    _geogridAggregationCache.CheckCacheSize(geogridAggregationByCacheKey);                    
+                    geogridAggregationByCacheKey.Add(cacheKey, _geogridAggregationCache.CreateCacheEntry(dto));
+                }
                 return new OkObjectResult(dto);
             }
             catch (ArgumentOutOfRangeException e)
@@ -306,6 +359,41 @@ namespace SOS.Observations.Api.Controllers
             {
                 _logger.LogError(e, "GeoGridAggregation error.");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        private string CreateCacheKey(string queryString, object request)
+        {
+            try
+            {
+                StringBuilder keyBuilder = new StringBuilder();
+                keyBuilder.Append(queryString);
+
+                if (request != null)
+                {
+                    string requestBody = JsonSerializer.Serialize(request, _jsonSerializerOptions);
+
+                    if (requestBody.Length <= 10000)
+                    {
+                        keyBuilder.Append(requestBody);
+                    }
+                    else
+                    {
+                        return null; // don't cache large requests.
+                    }
+                }
+
+                string key = keyBuilder.ToString();
+                byte[] keyBytes = Encoding.UTF8.GetBytes(key);
+
+                // Skapa en hash för att få en kortare och unik nyckel
+                byte[] hashBytes = _sha256.ComputeHash(keyBytes);
+                return BitConverter.ToString(hashBytes).Replace("-", "").ToLowerInvariant();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error when creating GeoAggregation cache key");
+                return null;
             }
         }
 
@@ -716,6 +804,15 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                var parameters = new[]
+                {
+                    $"skip={skip}",
+                    $"take={take}",
+                    $"sensitiveObservations={sensitiveObservations}"
+                };
+                string cacheKey = CreateCacheKey(string.Join("&", parameters), filter);
+                HttpContext.Items.TryAdd("CacheKey", cacheKey);
+
                 // SearchFilterDto don't support protection filter, declare it localy
                 var protectionFilter = sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public;
                 this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, protectionFilter);
@@ -1017,6 +1114,14 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                var parameters = new[]
+                {
+                    $"zoom={zoom}",
+                    $"sensitiveObservations={sensitiveObservations}"
+                };
+                string cacheKey = CreateCacheKey(string.Join("&", parameters), filter);
+                HttpContext.Items.TryAdd("CacheKey", cacheKey);
+
                 // sensitiveObservations is preserved for backward compability
                 filter.ProtectionFilter ??= (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
                 this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, filter.ProtectionFilter);
@@ -1758,6 +1863,15 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                var parameters = new[]
+                {
+                    $"skip={skip}",
+                    $"take={take}",
+                    $"sensitiveObservations={sensitiveObservations}"
+                };
+                string cacheKey = CreateCacheKey(string.Join("&", parameters), filter);
+                HttpContext.Items.TryAdd("CacheKey", cacheKey);
+
                 // sensitiveObservations is preserved for backward compability
                 filter.ProtectionFilter ??= (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
                 this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, filter.ProtectionFilter);

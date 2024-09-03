@@ -7,8 +7,9 @@ public class UserStatisticsProcessedObservationRepository : ProcessedObservation
         ElasticSearchConfiguration elasticConfiguration,
         ICache<string, ProcessedConfiguration> processedConfigurationCache,
         ITaxonManager taxonManager,
+        IClassCache<Dictionary<string, ClusterHealthResponse>> clusterHealthCache,
         ILogger<ProcessedObservationCoreRepository> logger
-    ) : base(elasticClientManager, elasticConfiguration, processedConfigurationCache, taxonManager, logger)
+    ) : base(elasticClientManager, elasticConfiguration, processedConfigurationCache, taxonManager, clusterHealthCache, logger)
     {
 
     }

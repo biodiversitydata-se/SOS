@@ -1,5 +1,8 @@
 ﻿using DwC_A;
+using FluentAssertions.Common;
 using Microsoft.ApplicationInsights;
+using Microsoft.Extensions.Caching.Memory;
+using Nest;
 using SOS.Harvest.DarwinCore;
 using SOS.Harvest.DarwinCore.Interfaces;
 using SOS.Harvest.Managers;
@@ -122,6 +125,8 @@ public class ProcessFixture : IProcessFixture
         serviceCollection.AddSingleton<IEventRepository, EventRepository>();
         serviceCollection.AddSingleton<IClassCache<TaxonTree<IBasicTaxon>>, ClassCache<TaxonTree<IBasicTaxon>>>();
         serviceCollection.AddSingleton<IClassCache<TaxonListSetsById>, ClassCache<TaxonListSetsById>>();
+        var clusterHealthCache = new ClassCache<Dictionary<string, ClusterHealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<Dictionary<string, ClusterHealthResponse>>>()) { CacheDuration = TimeSpan.FromMinutes(2) };
+        serviceCollection.AddSingleton<IClassCache<Dictionary<string, ClusterHealthResponse>>>(clusterHealthCache);
         serviceCollection.AddSingleton<ITaxonListRepository, TaxonListRepository>();
         serviceCollection.AddSingleton<ITaxonManager, TaxonManager>();
         serviceCollection.AddSingleton<IProcessedTaxonRepository, ProcessedTaxonRepository>();

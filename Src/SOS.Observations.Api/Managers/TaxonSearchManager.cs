@@ -36,9 +36,9 @@ namespace SOS.Observations.Api.Managers
             var taxonAggregation = _taxonSumAggregationCache.Get();
             if (taxonAggregation == null)
             {
+                await _taxonSumAggregationSemaphore.WaitAsync();
                 try
                 {
-                    await _taxonSumAggregationSemaphore.WaitAsync();
                     taxonAggregation = _taxonSumAggregationCache.Get();
                     if (taxonAggregation == null)
                     {
@@ -48,7 +48,7 @@ namespace SOS.Observations.Api.Managers
                         searchFilter.NotPresentFilter = SightingNotPresentFilter.DontIncludeNotPresent;
                         searchFilter.DeterminationFilter = SightingDeterminationFilter.NotUnsureDetermination;
 
-                        _filterManager.PrepareFilterAsync(null, null, searchFilter).Wait();
+                        await _filterManager.PrepareFilterAsync(null, null, searchFilter);
                         Stopwatch sp = Stopwatch.StartNew();
                         taxonAggregation = await _processedTaxonRepository.GetTaxonSumAggregationAsync(searchFilter);
                         sp.Stop();

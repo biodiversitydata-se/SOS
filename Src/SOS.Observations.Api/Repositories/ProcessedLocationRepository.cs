@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Nest;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Extensions;
@@ -29,12 +30,14 @@ namespace SOS.Observations.Api.Repositories
         /// <param name="elasticClientManager"></param>
         /// <param name="elasticConfiguration"></param>
         /// <param name="processedConfigurationCache"></param>
+        /// <param name="clusterHealthCache"></param>
         /// <param name="logger"></param>
         public ProcessedLocationRepository(
             IElasticClientManager elasticClientManager,
             ElasticSearchConfiguration elasticConfiguration,
             ICache<string, ProcessedConfiguration> processedConfigurationCache,
-            ILogger<ProcessedLocationRepository> logger) : base(true, elasticClientManager, processedConfigurationCache, elasticConfiguration, logger)
+            IClassCache<Dictionary<string, ClusterHealthResponse>> clusterHealthCache,
+            ILogger<ProcessedLocationRepository> logger) : base(true, elasticClientManager, processedConfigurationCache, elasticConfiguration, clusterHealthCache, logger)
         {
 
         }

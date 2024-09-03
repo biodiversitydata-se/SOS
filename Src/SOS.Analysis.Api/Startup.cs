@@ -49,6 +49,8 @@ using SOS.Shared.Api.Validators.Interfaces;
 using SOS.Shared.Api.Validators;
 using System.Reflection;
 using System.Text.Json.Serialization;
+using Microsoft.Extensions.Logging.Abstractions;
+using Nest;
 
 namespace SOS.Analysis.Api
 {
@@ -325,6 +327,8 @@ namespace SOS.Analysis.Api
             services.AddSingleton<ICache<string, ProcessedConfiguration>, ProcessedConfigurationCache>();
             services.AddSingleton<IClassCache<TaxonListSetsById>, ClassCache<TaxonListSetsById>>();
             services.AddSingleton<IClassCache<TaxonTree<IBasicTaxon>>, ClassCache<TaxonTree<IBasicTaxon>>>();
+            var clusterHealthCache = new ClassCache<Dictionary<string, ClusterHealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<Dictionary<string, ClusterHealthResponse>>>()) { CacheDuration = TimeSpan.FromMinutes(2) };
+            services.AddSingleton<IClassCache<Dictionary<string, ClusterHealthResponse>>>(clusterHealthCache);
 
             // Add managers
             services.AddScoped<IAnalysisManager, AnalysisManager>();

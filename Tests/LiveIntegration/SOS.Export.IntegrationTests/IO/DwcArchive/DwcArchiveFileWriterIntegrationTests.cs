@@ -4,8 +4,10 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
+using Nest;
 using SOS.Export.LiveIntegrationTests.TestHelpers.Factories;
 using SOS.Lib.Cache;
+using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
@@ -18,6 +20,7 @@ using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Resource;
 using SOS.Lib.Services;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Xunit;
@@ -67,6 +70,7 @@ namespace SOS.Export.LiveIntegrationTests.IO.DwcArchive
                 elasticConfiguration,
                 new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>()), new MemoryCache(new MemoryCacheOptions()), new NullLogger<ProcessedConfigurationCache>()),
                 new Mock<ITaxonManager>().Object,
+                new ClassCache<Dictionary<string, ClusterHealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<Dictionary<string, ClusterHealthResponse>>>()),
                 new Mock<ILogger<ProcessedObservationCoreRepository>>().Object);
             return processedObservationRepository;
 

@@ -2,6 +2,7 @@
 using Elasticsearch.Net;
 using Microsoft.Extensions.Logging;
 using Nest;
+using SOS.Lib.Cache;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Enums;
@@ -9,6 +10,7 @@ using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Managers.Interfaces;
+using SOS.Lib.Models.Cache;
 using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.DataQuality;
 using SOS.Lib.Models.Gis;
@@ -391,7 +393,24 @@ namespace SOS.Lib.Repositories.Processed
         /// <exception cref="Exception"></exception>
         private void CheckNode(string indexName, int minClusterCount)
         {
-            var health = Client.Cluster.Health(indexName);
+            var clusterHealthDictionary = _clusterHealthCache.Get();
+            if (clusterHealthDictionary == null)
+            {
+                clusterHealthDictionary = new Dictionary<string, ClusterHealthResponse>();
+                _clusterHealthCache.Set(clusterHealthDictionary);
+            }
+
+            ClusterHealthResponse health;
+            if (clusterHealthDictionary.TryGetValue(indexName, out var clusterHealth))
+            {
+                health = clusterHealth;
+            }
+            else
+            {
+                health = Client.Cluster.Health(indexName);
+                clusterHealthDictionary.TryAdd(indexName, health);
+            }
+
             if (health.NumberOfDataNodes < minClusterCount)
             {
                 throw new Exception($"Expected at least {minClusterCount} nodes, found {health.NumberOfDataNodes}.");
@@ -727,13 +746,15 @@ namespace SOS.Lib.Repositories.Processed
         /// <param name="elasticConfiguration"></param>
         /// <param name="processedConfigurationCache"></param>
         /// <param name="taxonManager"></param>
+        /// <param name="clusterHealthCache"></param>
         /// <param name="logger"></param>
         public ProcessedObservationCoreRepository(
             IElasticClientManager elasticClientManager,
             ElasticSearchConfiguration elasticConfiguration,
             ICache<string, ProcessedConfiguration> processedConfigurationCache,
             ITaxonManager taxonManager,
-            ILogger<ProcessedObservationCoreRepository> logger) : base(true, elasticClientManager, processedConfigurationCache, elasticConfiguration, logger)
+            IClassCache<Dictionary<string, ClusterHealthResponse>> clusterHealthCache,
+            ILogger<ProcessedObservationCoreRepository> logger) : base(true, elasticClientManager, processedConfigurationCache, elasticConfiguration, clusterHealthCache, logger)
         {
             if (elasticConfiguration.Clusters != null)
             {

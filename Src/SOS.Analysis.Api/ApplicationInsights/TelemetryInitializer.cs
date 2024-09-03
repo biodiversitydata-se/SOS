@@ -45,6 +45,14 @@ public class TelemetryInitializer : TelemetryInitializerBase
             {
                 telemetry.Context.GlobalProperties.Add("Request-length", platformContext.Request.ContentLength.ToString());
             }
+
+            if (platformContext.Items.TryGetValue("CacheKey", out object cacheKey))
+            {
+                if (cacheKey != null && !telemetry.Context.GlobalProperties.ContainsKey("CacheKey"))
+                {
+                    telemetry.Context.GlobalProperties.Add("CacheKey", cacheKey.ToString());
+                }
+            }
         }
 
         var nameidentifier = platformContext.User?.Claims?.FirstOrDefault(c => c.Type.Contains("nameidentifier", StringComparison.CurrentCultureIgnoreCase))?.Value;
