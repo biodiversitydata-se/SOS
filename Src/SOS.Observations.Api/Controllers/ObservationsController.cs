@@ -296,7 +296,7 @@ namespace SOS.Observations.Api.Controllers
                     $"zoom={zoom}",
                     $"sensitiveObservations={sensitiveObservations}"
                 };
-                string cacheKey = GenerateGeogridAggregationCacheKey(string.Join("&", parameters), filter);
+                string cacheKey = CreateCacheKey(string.Join("&", parameters), filter);
                 HttpContext.Items.TryAdd("CacheKey", cacheKey);
                 if (!skipCache.GetValueOrDefault(false) && cacheKey != null && geogridAggregationByCacheKey.TryGetValue(cacheKey, out CacheEntry<GeoGridResultDto> cacheEntry))
                 {
@@ -362,7 +362,7 @@ namespace SOS.Observations.Api.Controllers
             }
         }
 
-        private string GenerateGeogridAggregationCacheKey(string queryString, SearchFilterAggregationDto request)
+        private string CreateCacheKey(string queryString, object request)
         {
             try
             {
@@ -804,6 +804,15 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                var parameters = new[]
+                {
+                    $"skip={skip}",
+                    $"take={take}",
+                    $"sensitiveObservations={sensitiveObservations}"
+                };
+                string cacheKey = CreateCacheKey(string.Join("&", parameters), filter);
+                HttpContext.Items.TryAdd("CacheKey", cacheKey);
+
                 // SearchFilterDto don't support protection filter, declare it localy
                 var protectionFilter = sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public;
                 this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, protectionFilter);
@@ -1105,6 +1114,14 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                var parameters = new[]
+                {
+                    $"zoom={zoom}",
+                    $"sensitiveObservations={sensitiveObservations}"
+                };
+                string cacheKey = CreateCacheKey(string.Join("&", parameters), filter);
+                HttpContext.Items.TryAdd("CacheKey", cacheKey);
+
                 // sensitiveObservations is preserved for backward compability
                 filter.ProtectionFilter ??= (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
                 this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, filter.ProtectionFilter);
@@ -1846,6 +1863,15 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                var parameters = new[]
+                {
+                    $"skip={skip}",
+                    $"take={take}",
+                    $"sensitiveObservations={sensitiveObservations}"
+                };
+                string cacheKey = CreateCacheKey(string.Join("&", parameters), filter);
+                HttpContext.Items.TryAdd("CacheKey", cacheKey);
+
                 // sensitiveObservations is preserved for backward compability
                 filter.ProtectionFilter ??= (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
                 this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, filter.ProtectionFilter);
