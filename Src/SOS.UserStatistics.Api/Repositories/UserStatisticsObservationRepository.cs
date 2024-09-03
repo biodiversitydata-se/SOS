@@ -6,8 +6,9 @@ public class UserStatisticsObservationRepository : UserObservationRepository, IU
         IElasticClientManager elasticClientManager,
         ElasticSearchConfiguration elasticConfiguration,
         ICache<string, ProcessedConfiguration> processedConfigurationCache,
+        IClassCache<Dictionary<string, ClusterHealthResponse>> clusterHealthCache,
         ILogger<UserObservationRepository> logger) 
-        : base(elasticClientManager, elasticConfiguration, processedConfigurationCache, logger)
+        : base(elasticClientManager, elasticConfiguration, processedConfigurationCache, clusterHealthCache, logger)
     {
     }
 
