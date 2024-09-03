@@ -534,7 +534,8 @@ namespace SOS.Observations.Api.Repositories
             ElasticSearchConfiguration elasticConfiguration,
             ICache<string, ProcessedConfiguration> processedConfigurationCache,
             ITaxonManager taxonManager,
-            ILogger<ProcessedTaxonRepository> logger) : base(true, elasticClientManager, processedConfigurationCache, elasticConfiguration, logger)
+            IClassCache<Dictionary<string, ClusterHealthResponse>> clusterHealthCache,
+            ILogger<ProcessedTaxonRepository> logger) : base(true, elasticClientManager, processedConfigurationCache, elasticConfiguration, clusterHealthCache, logger)
         {
             _taxonManager = taxonManager ?? throw new ArgumentNullException(nameof(taxonManager));
         }

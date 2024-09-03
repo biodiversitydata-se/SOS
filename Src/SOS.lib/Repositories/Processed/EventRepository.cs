@@ -245,12 +245,14 @@ namespace SOS.Lib.Repositories.Processed
         /// <param name="elasticClientManager"></param>
         /// <param name="elasticConfiguration"></param>
         /// <param name="processedConfigurationCache"></param>
+        /// <param name="clusterHealthCache"></param>
         /// <param name="logger"></param>
         public EventRepository(
             IElasticClientManager elasticClientManager,
             ElasticSearchConfiguration elasticConfiguration,
             ICache<string, ProcessedConfiguration> processedConfigurationCache,
-            ILogger<EventRepository> logger) : base(true, elasticClientManager, processedConfigurationCache, elasticConfiguration, logger)
+            IClassCache<Dictionary<string, ClusterHealthResponse>> clusterHealthCache,
+            ILogger<EventRepository> logger) : base(true, elasticClientManager, processedConfigurationCache, elasticConfiguration, clusterHealthCache, logger)
         {
             LiveMode = true;
             _id = nameof(Observation); // The active instance should be the same as the ProcessedObservationRepository which uses the Observation type.

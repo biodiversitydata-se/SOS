@@ -25,6 +25,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
+using Nest;
 using Newtonsoft.Json.Converters;
 using SOS.Lib.ActionFilters;
 using SOS.Lib.ApplicationInsights;
@@ -498,6 +499,8 @@ namespace SOS.Observations.Api
             var geoGridAggregationCache = new ClassCache<Dictionary<string, CacheEntry<GeoGridResultDto>>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<Dictionary<string, CacheEntry<GeoGridResultDto>>>>()) { CacheDuration = TimeSpan.FromHours(48) };
             services.AddSingleton<IClassCache<Dictionary<string, CacheEntry<GeoGridResultDto>>>>(geoGridAggregationCache);
             services.AddSingleton<IClassCache<HealthCheckResult>, ClassCache<HealthCheckResult>>();
+            var clusterHealthCache = new ClassCache<Dictionary<string, ClusterHealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<Dictionary<string, ClusterHealthResponse>>>()) { CacheDuration = TimeSpan.FromMinutes(2) };
+            services.AddSingleton<IClassCache<Dictionary<string, ClusterHealthResponse>>>(clusterHealthCache);
 
             // Add managers
             services.AddScoped<IAreaManager, AreaManager>();

@@ -3,6 +3,7 @@ using Hangfire;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
+using Nest;
 using SOS.Harvest.Managers;
 using SOS.Harvest.Processors.Artportalen;
 using SOS.Harvest.Repositories.Source.Artportalen;
@@ -107,6 +108,7 @@ namespace SOS.Process.LiveIntegrationTests.Processors.Artportalen
                     new ElasticSearchConfiguration(),
                     new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>()), new MemoryCache(new MemoryCacheOptions()), new NullLogger<ProcessedConfigurationCache>()),
                     new Mock<ITaxonManager>().Object,
+                    new ClassCache<Dictionary<string, ClusterHealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<Dictionary<string, ClusterHealthResponse>>>()),
                     new NullLogger<ProcessedObservationCoreRepository>());
             }
             else

@@ -28,7 +28,8 @@ namespace SOS.Observations.Api.Repositories
             ICache<string, ProcessedConfiguration> processedConfigurationCache,
             ElasticSearchConfiguration elasticConfiguration,
             ITaxonManager taxonManager,
-            ILogger<ProcessedObservationRepository> logger) : base(elasticClientManager, elasticConfiguration, processedConfigurationCache, taxonManager, logger)
+            IClassCache<Dictionary<string, ClusterHealthResponse>> clusterHealthCache,
+            ILogger<ProcessedObservationRepository> logger) : base(elasticClientManager, elasticConfiguration, processedConfigurationCache, taxonManager, clusterHealthCache, logger)
         {
         }
 

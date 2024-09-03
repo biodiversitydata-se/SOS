@@ -121,13 +121,15 @@ namespace SOS.Lib.Repositories.Processed
         /// <param name="elasticClientManager"></param>
         /// <param name="processedConfigurationCache"></param>
         /// <param name="elasticConfiguration"></param>
+        /// <param name="clusterHealthCache"></param>
         /// <param name="logger"></param>
         public ProcessedObservationBaseRepository(
             bool liveMode,
             IElasticClientManager elasticClientManager,
             ICache<string, ProcessedConfiguration> processedConfigurationCache,
             ElasticSearchConfiguration elasticConfiguration,
-            ILogger<ProcessedObservationBaseRepository> logger) : base(true, elasticClientManager, processedConfigurationCache, elasticConfiguration, logger)
+            IClassCache<Dictionary<string, ClusterHealthResponse>> clusterHealthCache,
+            ILogger<ProcessedObservationBaseRepository> logger) : base(true, elasticClientManager, processedConfigurationCache, elasticConfiguration, clusterHealthCache, logger)
         {
             LiveMode = liveMode;
         }
