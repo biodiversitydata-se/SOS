@@ -197,7 +197,16 @@ namespace SOS.ElasticSearch.Proxy.Middleware
                     if (match?.Value?.ToLower()?.Equals("_search") ?? false && !context.Items.ContainsKey("Observation-count"))
                     {
                         // Estimate number of observations returned 
-                        var observationCount = 0; // Math.Ceiling(context.Response.Body.Length / (double)_proxyConfiguration.AverageObservationSize);
+                        var observationCount = 0;
+                        try
+                        {
+                            observationCount = Convert.ToInt32(Math.Ceiling(context.Response.Body.Length / (double)_proxyConfiguration.AverageObservationSize));
+                        }
+                        catch 
+                        {
+                            observationCount = 0;
+                        }
+                        
                         context.Items.Add("Observation-count", observationCount);
                     }
 

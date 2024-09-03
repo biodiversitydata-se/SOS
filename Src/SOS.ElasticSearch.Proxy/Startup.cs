@@ -1,4 +1,7 @@
 ﻿using Microsoft.ApplicationInsights.Extensibility;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging.Abstractions;
+using Nest;
 using SOS.ElasticSearch.Proxy.ApplicationInsights;
 using SOS.ElasticSearch.Proxy.Configuration;
 using SOS.ElasticSearch.Proxy.Middleware;
@@ -121,6 +124,8 @@ namespace SOS.ElasticSearch.Proxy
 
             // Add Caches
             services.AddSingleton<ICache<string, ProcessedConfiguration>, ProcessedConfigurationCache>();
+            var clusterHealthCache = new ClassCache<Dictionary<string, ClusterHealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<Dictionary<string, ClusterHealthResponse>>>()) { CacheDuration = TimeSpan.FromMinutes(2) };
+            services.AddSingleton<IClassCache<Dictionary<string, ClusterHealthResponse>>>(clusterHealthCache);
 
             // Add repositories
             services.AddScoped<IProcessedConfigurationRepository, ProcessedConfigurationRepository>();
