@@ -20,6 +20,7 @@ using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Managers;
 using SOS.Lib.Managers.Interfaces;
+using SOS.Lib.Models.Cache;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.Checklist;
 using SOS.Lib.Models.Processed.Configuration;
@@ -41,6 +42,7 @@ using SOS.Observations.Api.IntegrationTests.Setup.Stubs;
 using SOS.Observations.Api.IntegrationTests.TestData;
 using SOS.Observations.Api.Repositories;
 using SOS.Observations.Api.Repositories.Interfaces;
+using SOS.Shared.Api.Dtos;
 using System.Collections.Concurrent;
 
 namespace SOS.Observations.Api.IntegrationTests.Setup.ContainerDbFixtures;
@@ -127,6 +129,10 @@ public class ProcessFixture : IProcessFixture
         serviceCollection.AddSingleton<IClassCache<TaxonListSetsById>, ClassCache<TaxonListSetsById>>();
         var clusterHealthCache = new ClassCache<Dictionary<string, ClusterHealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<Dictionary<string, ClusterHealthResponse>>>()) { CacheDuration = TimeSpan.FromMinutes(2) };
         serviceCollection.AddSingleton<IClassCache<Dictionary<string, ClusterHealthResponse>>>(clusterHealthCache);
+        var geoGridAggregationCache = new ClassCache<Dictionary<string, CacheEntry<GeoGridResultDto>>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<Dictionary<string, CacheEntry<GeoGridResultDto>>>>()) { CacheDuration = TimeSpan.FromHours(48) };
+        serviceCollection.AddSingleton<IClassCache<Dictionary<string, CacheEntry<GeoGridResultDto>>>>(geoGridAggregationCache);
+        var taxonAggregationInternalCache = new ClassCache<Dictionary<string, CacheEntry<PagedResultDto<TaxonAggregationItemDto>>>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<Dictionary<string, CacheEntry<PagedResultDto<TaxonAggregationItemDto>>>>>()) { CacheDuration = TimeSpan.FromHours(1) };
+        serviceCollection.AddSingleton<IClassCache<Dictionary<string, CacheEntry<PagedResultDto<TaxonAggregationItemDto>>>>>(taxonAggregationInternalCache);
         serviceCollection.AddSingleton<ITaxonListRepository, TaxonListRepository>();
         serviceCollection.AddSingleton<ITaxonManager, TaxonManager>();
         serviceCollection.AddSingleton<IProcessedTaxonRepository, ProcessedTaxonRepository>();

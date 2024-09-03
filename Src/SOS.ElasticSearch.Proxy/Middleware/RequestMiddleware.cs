@@ -198,14 +198,14 @@ namespace SOS.ElasticSearch.Proxy.Middleware
                     {
                         // Estimate number of observations returned 
                         var observationCount = 0;
-                        try
-                        {
-                            observationCount = Convert.ToInt32(Math.Ceiling(context.Response.Body.Length / (double)_proxyConfiguration.AverageObservationSize));
-                        }
-                        catch 
-                        {
-                            observationCount = 0;
-                        }
+                        //try // todo - this gives exception
+                        //{
+                        //    observationCount = Convert.ToInt32(Math.Ceiling(context.Response.Body.Length / (double)_proxyConfiguration.AverageObservationSize));
+                        //}
+                        //catch 
+                        //{
+                        //    observationCount = 0;
+                        //}
                         
                         context.Items.Add("Observation-count", observationCount);
                     }

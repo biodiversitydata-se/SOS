@@ -48,6 +48,7 @@ namespace SOS.Observations.Api.Controllers
         private readonly IInputValidator _inputValidator;
         private readonly ObservationApiConfiguration _observationApiConfiguration;
         private readonly IClassCache<Dictionary<string, CacheEntry<GeoGridResultDto>>> _geogridAggregationCache;
+        private readonly IClassCache<Dictionary<string, CacheEntry<PagedResultDto<TaxonAggregationItemDto>>>> _taxonAggregationInternalCache;
         private static readonly SHA256 _sha256 = SHA256.Create();        
         private readonly ILogger<ObservationsController> _logger;
 
@@ -64,7 +65,7 @@ namespace SOS.Observations.Api.Controllers
                 new NetTopologySuite.IO.Converters.GeoJsonConverterFactory()
             }
         };
-  
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -74,6 +75,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="inputValidator"></param>
         /// <param name="observationApiConfiguration"></param>
         /// <param name="geogridAggregationCache"></param>
+        /// <param name="taxonAggregationInternalCache"></param>
         /// <param name="logger"></param>
         /// <exception cref="ArgumentNullException"></exception>
         public ObservationsController(
@@ -83,6 +85,7 @@ namespace SOS.Observations.Api.Controllers
             IInputValidator inputValidator,
             ObservationApiConfiguration observationApiConfiguration,
             IClassCache<Dictionary<string, CacheEntry<GeoGridResultDto>>> geogridAggregationCache,
+            IClassCache<Dictionary<string, CacheEntry<PagedResultDto<TaxonAggregationItemDto>>>> taxonAggregationInternalCache,
             ILogger<ObservationsController> logger) 
         {
             _observationManager = observationManager ?? throw new ArgumentNullException(nameof(observationManager));
@@ -91,6 +94,7 @@ namespace SOS.Observations.Api.Controllers
             _searchFilterUtility = searchFilterUtility ?? throw new ArgumentNullException(nameof(searchFilterUtility));
             _observationApiConfiguration = observationApiConfiguration ?? throw new ArgumentNullException(nameof(observationApiConfiguration));
             _geogridAggregationCache = geogridAggregationCache ?? throw new ArgumentNullException(nameof(geogridAggregationCache));
+            _taxonAggregationInternalCache = taxonAggregationInternalCache ?? throw new ArgumentNullException(nameof(taxonAggregationInternalCache));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -1841,7 +1845,8 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
         /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
         /// <param name="sensitiveObservations">If true, only sensitive (protected) observations will be searched (this requires authentication and authorization). If false, public available observations will be searched.</param>
-        /// <param name="sumUnderlyingTaxa">If true, the observation count will be the sum of all underlying taxa observation count, otherwise it will be the count for the specific taxon.</param>        
+        /// <param name="sumUnderlyingTaxa">If true, the observation count will be the sum of all underlying taxa observation count, otherwise it will be the count for the specific taxon.</param>
+        /// <param name="skipCache">If true, skip using cached result.</param>   
         /// <returns></returns>
         [HttpPost("Internal/TaxonAggregation")]
         [ProducesResponseType(typeof(PagedResultDto<TaxonAggregationItemDto>), (int)HttpStatusCode.OK)]
@@ -1859,18 +1864,33 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] bool validateSearchFilter = false,
             [FromQuery] string translationCultureCode = "sv-SE",
             [FromQuery] bool sensitiveObservations = false,
-            [FromQuery] bool sumUnderlyingTaxa = false)
+            [FromQuery] bool sumUnderlyingTaxa = false,
+            [FromQuery] bool? skipCache = false)
         {
             try
             {
+                // Cache
                 var parameters = new[]
                 {
                     $"skip={skip}",
                     $"take={take}",
-                    $"sensitiveObservations={sensitiveObservations}"
+                    $"sensitiveObservations={sensitiveObservations}",
+                    $"sumUnderlyingTaxa={sumUnderlyingTaxa}"
                 };
                 string cacheKey = CreateCacheKey(string.Join("&", parameters), filter);
                 HttpContext.Items.TryAdd("CacheKey", cacheKey);
+                Dictionary<string, CacheEntry<PagedResultDto<TaxonAggregationItemDto>>> resultByCacheKey = _taxonAggregationInternalCache.Get();
+                if (resultByCacheKey == null)
+                {
+                    resultByCacheKey = new Dictionary<string, CacheEntry<PagedResultDto<TaxonAggregationItemDto>>>();
+                    _taxonAggregationInternalCache.Set(resultByCacheKey);
+                }
+                if (!skipCache.GetValueOrDefault(false) && cacheKey != null && resultByCacheKey.TryGetValue(cacheKey, out var cacheEntry))
+                {
+                    var val = _taxonAggregationInternalCache.GetCacheEntryValue(cacheEntry);
+                    _logger.LogInformation($"TaxonAggregationInternal result found in cache and is returned as result. Number of requests={cacheEntry.Count}");
+                    return new OkObjectResult(val);
+                }
 
                 // sensitiveObservations is preserved for backward compability
                 filter.ProtectionFilter ??= (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
@@ -1909,6 +1929,14 @@ namespace SOS.Observations.Api.Controllers
                 }
 
                 PagedResultDto<TaxonAggregationItemDto> dto = result.Value.ToPagedResultDto(result.Value.Records.ToTaxonAggregationItemDtos());
+
+                // Cache
+                if (cacheKey != null && !resultByCacheKey.ContainsKey(cacheKey))
+                {
+                    _taxonAggregationInternalCache.CheckCacheSize(resultByCacheKey);
+                    resultByCacheKey.Add(cacheKey, _taxonAggregationInternalCache.CreateCacheEntry(dto));
+                }
+
                 return new OkObjectResult(dto);
             }
             catch (AuthenticationRequiredException e)
