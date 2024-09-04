@@ -337,7 +337,7 @@
             },
             {
                 "CultureCode": "sv-SE",
-                "Value": "Svensk Elfiskeregistret SERS"
+                "Value": "Svenskt Elfiskeregister SERS"
             }
         ],
         "Organizations": [
@@ -709,7 +709,7 @@
             },
             {
                 "CultureCode": "sv-SE",
-                "Value": "Svenska Malaisefälle projektet (SMTP) syftar till att artbestämma 80 miljoner insektsexemplar som erhållits från malaisefälleprovtagning kontinuerligt under en treårsperiod (2003-2006). Mer än 500 obeskrivna arter har upptäckts i dessa prover, och nytt rekord har nåtts för arter som inte tidigare varit kända i Sverige. Prover i denna samling är nålade eller lagras i 96% etanol. Insamlingen beräknas utgöra 50-60% av den svenska insektsfaunan och är särskilt rik på arter av Diptera och Hymenoptera. SLU Artdatabanken i samarbete med Svensk Biodiversitetsdatainfrastruktur SBDI tillhandahåller georefererade artfynd, som hämtas via webbtjänst  vid GBIF.org."
+                "Value": "Svenska Malaisefälleprojektet (SMTP) syftar till att artbestämma 80 miljoner insektsexemplar som erhållits från malaisefälleprovtagning kontinuerligt under en treårsperiod (2003-2006). Mer än 500 obeskrivna arter har upptäckts i dessa prover, och nytt rekord har nåtts för arter som inte tidigare varit kända i Sverige. Prover i denna samling är nålade eller lagras i 96% etanol. Insamlingen beräknas utgöra 50-60% av den svenska insektsfaunan och är särskilt rik på arter av Diptera och Hymenoptera. SLU Artdatabanken i samarbete med Svensk Biodiversitetsdatainfrastruktur SBDI tillhandahåller georefererade artfynd, som hämtas via webbtjänst  vid GBIF.org."
             }
         ],
         "HarvestFailPreventProcessing": false,
