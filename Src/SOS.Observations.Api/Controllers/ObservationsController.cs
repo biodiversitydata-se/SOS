@@ -288,13 +288,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
-                Dictionary<string, CacheEntry<GeoGridResultDto>> geogridAggregationByCacheKey = _geogridAggregationCache.Get();
-                if (geogridAggregationByCacheKey == null)
-                {
-                    geogridAggregationByCacheKey = new Dictionary<string, CacheEntry<GeoGridResultDto>>();
-                    _geogridAggregationCache.Set(geogridAggregationByCacheKey);
-                }
-
+                // Cache
                 var parameters = new[]
                 {
                     $"zoom={zoom}",
@@ -302,6 +296,12 @@ namespace SOS.Observations.Api.Controllers
                 };
                 string cacheKey = CreateCacheKey(string.Join("&", parameters), filter);
                 HttpContext.Items.TryAdd("CacheKey", cacheKey);
+                Dictionary<string, CacheEntry<GeoGridResultDto>> geogridAggregationByCacheKey = _geogridAggregationCache.Get();
+                if (geogridAggregationByCacheKey == null)
+                {
+                    geogridAggregationByCacheKey = new Dictionary<string, CacheEntry<GeoGridResultDto>>();
+                    _geogridAggregationCache.Set(geogridAggregationByCacheKey);
+                }                
                 if (!skipCache.GetValueOrDefault(false) && cacheKey != null && geogridAggregationByCacheKey.TryGetValue(cacheKey, out CacheEntry<GeoGridResultDto> cacheEntry))
                 {
                     var val = _geogridAggregationCache.GetCacheEntryValue(cacheEntry);
@@ -336,11 +336,14 @@ namespace SOS.Observations.Api.Controllers
                     authorizationApplicationIdentifier, searchFilter, zoom);
 
                 var dto = result.ToGeoGridResultDto(boundingBox.CalculateNumberOfTiles(zoom));
+                
+                // Cache
                 if (cacheKey != null && !geogridAggregationByCacheKey.ContainsKey(cacheKey))
                 {
                     _geogridAggregationCache.CheckCacheSize(geogridAggregationByCacheKey);                    
-                    geogridAggregationByCacheKey.Add(cacheKey, _geogridAggregationCache.CreateCacheEntry(dto));
+                    geogridAggregationByCacheKey.TryAdd(cacheKey, _geogridAggregationCache.CreateCacheEntry(dto));
                 }
+
                 return new OkObjectResult(dto);
             }
             catch (ArgumentOutOfRangeException e)
@@ -1934,7 +1937,7 @@ namespace SOS.Observations.Api.Controllers
                 if (cacheKey != null && !resultByCacheKey.ContainsKey(cacheKey))
                 {
                     _taxonAggregationInternalCache.CheckCacheSize(resultByCacheKey);
-                    resultByCacheKey.Add(cacheKey, _taxonAggregationInternalCache.CreateCacheEntry(dto));
+                    resultByCacheKey.TryAdd(cacheKey, _taxonAggregationInternalCache.CreateCacheEntry(dto));
                 }
 
                 return new OkObjectResult(dto);
