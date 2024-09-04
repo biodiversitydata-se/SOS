@@ -291,7 +291,8 @@ namespace SOS.Observations.Api.Controllers
                 // Cache
                 string cacheKey = null;
                 Dictionary<string, CacheEntry<GeoGridResultDto>> geogridAggregationByCacheKey = null;
-                if (!sensitiveObservations)
+                bool useCache = !sensitiveObservations && Request.ContentLength < 10000;
+                if (useCache)
                 {
                     var parameters = new[]
                     {
@@ -309,7 +310,7 @@ namespace SOS.Observations.Api.Controllers
                     if (!skipCache.GetValueOrDefault(false) && cacheKey != null && geogridAggregationByCacheKey.TryGetValue(cacheKey, out CacheEntry<GeoGridResultDto> cacheEntry))
                     {
                         var val = _geogridAggregationCache.GetCacheEntryValue(cacheEntry);
-                        _logger.LogInformation($"GeoGridAggregation result found in cache and is returned as result. Number of requests={cacheEntry.Count}");
+                        _logger.LogDebug($"GeoGridAggregation result found in cache and is returned as result. Number of requests={cacheEntry.Count}");
                         return new OkObjectResult(val);
                     }
                 }
@@ -343,7 +344,7 @@ namespace SOS.Observations.Api.Controllers
                 var dto = result.ToGeoGridResultDto(boundingBox.CalculateNumberOfTiles(zoom));
 
                 // Cache
-                if (!sensitiveObservations)
+                if (useCache)
                 {
                     if (cacheKey != null && !geogridAggregationByCacheKey.ContainsKey(cacheKey))
                     {
@@ -387,15 +388,7 @@ namespace SOS.Observations.Api.Controllers
                 if (request != null)
                 {
                     string requestBody = JsonSerializer.Serialize(request, _jsonSerializerOptions);
-
-                    if (requestBody.Length <= 10000)
-                    {
-                        keyBuilder.Append(requestBody);
-                    }
-                    else
-                    {
-                        return null; // don't cache large requests.
-                    }
+                    keyBuilder.Append(requestBody);
                 }
 
                 string key = keyBuilder.ToString();
@@ -407,7 +400,7 @@ namespace SOS.Observations.Api.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error when creating GeoAggregation cache key");
+                _logger.LogError(ex, "Error when creating cache key");
                 return null;
             }
         }
@@ -1883,7 +1876,8 @@ namespace SOS.Observations.Api.Controllers
                 // Cache
                 string cacheKey = null;
                 Dictionary<string, CacheEntry<PagedResultDto<TaxonAggregationItemDto>>> resultByCacheKey = null;
-                if (!sensitiveObservations)
+                bool useCache = !sensitiveObservations && Request.ContentLength < 10000;
+                if (useCache)
                 {
                     var parameters = new[]
                     {
@@ -1903,7 +1897,7 @@ namespace SOS.Observations.Api.Controllers
                     if (!skipCache.GetValueOrDefault(false) && cacheKey != null && resultByCacheKey.TryGetValue(cacheKey, out var cacheEntry))
                     {
                         var val = _taxonAggregationInternalCache.GetCacheEntryValue(cacheEntry);
-                        _logger.LogInformation($"TaxonAggregationInternal result found in cache and is returned as result. Number of requests={cacheEntry.Count}");
+                        _logger.LogDebug($"TaxonAggregationInternal result found in cache and is returned as result. Number of requests={cacheEntry.Count}");
                         return new OkObjectResult(val);
                     }
                 }
@@ -1947,7 +1941,7 @@ namespace SOS.Observations.Api.Controllers
                 PagedResultDto<TaxonAggregationItemDto> dto = result.Value.ToPagedResultDto(result.Value.Records.ToTaxonAggregationItemDtos());
 
                 // Cache
-                if (!sensitiveObservations)
+                if (useCache)
                 {
                     if (cacheKey != null && !resultByCacheKey.ContainsKey(cacheKey))
                     {
