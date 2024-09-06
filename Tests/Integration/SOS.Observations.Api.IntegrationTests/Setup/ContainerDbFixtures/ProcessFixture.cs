@@ -140,6 +140,7 @@ public class ProcessFixture : IProcessFixture
         serviceCollection.AddSingleton<IProcessedObservationCoreRepository, ProcessedObservationCoreRepository>();
         var elasticConfiguration = CreateElasticSearchConfiguration();
         serviceCollection.AddSingleton(elasticConfiguration);
+        serviceCollection.AddSingleton(new AreaConfiguration());
         serviceCollection.AddSingleton<ICache<string, ProcessedConfiguration>, ProcessedConfigurationCache>();
         serviceCollection.AddSingleton<IProcessedConfigurationRepository, ProcessedConfigurationRepository>();
         serviceCollection.AddSingleton<IVocabularyValueResolver, VocabularyValueResolver>();
