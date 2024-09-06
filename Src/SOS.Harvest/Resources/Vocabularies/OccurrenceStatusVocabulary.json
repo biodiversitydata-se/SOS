@@ -24,14 +24,18 @@
                     "Key": "occurrenceStatus",
                     "Description": "The occurrenceStatus term (http://rs.tdwg.org/dwc/terms/occurrenceStatus)",
                     "Values": [
-                        {
-                            "Value": "present",
-                            "SosId": 0
-                        },
-                        {
-                            "Value": "absent",
-                            "SosId": 1
-                        }
+                      {
+                        "Value": "present",
+                        "SosId": 0
+                      },
+                      {
+                          "Value": "observerad",
+                          "SosId": 0
+                      },
+                      {
+                          "Value": "absent",
+                          "SosId": 1
+                      }
                     ]
                 }
             ]

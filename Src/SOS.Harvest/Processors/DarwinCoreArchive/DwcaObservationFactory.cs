@@ -149,7 +149,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                 if (wktGeometry.GeometryType != "Polygon")
                 {
                     var sweref99TmGeom = wktGeometry.Transform(coordinateSystem, CoordinateSys.SWEREF99_TM, true);
-                    sweref99TmGeom = sweref99TmGeom.Buffer(coordinateUncertaintyInMeters);
+                    sweref99TmGeom = sweref99TmGeom.Buffer(coordinateUncertaintyInMeters, NetTopologySuite.Operation.Buffer.EndCapStyle.Flat);
                     wktGeometry = sweref99TmGeom.Transform(CoordinateSys.SWEREF99_TM, coordinateSystem, true);
                 }
 
@@ -426,7 +426,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             processedLocation.VerbatimCoordinateSystem = verbatim.VerbatimCoordinateSystem;
             processedLocation.VerbatimDepth = verbatim.VerbatimDepth;
             processedLocation.VerbatimElevation = verbatim.VerbatimElevation;
-            processedLocation.VerbatimLocality = processedLocation.Locality;
+            processedLocation.VerbatimLocality = processedLocation.VerbatimLocality;
             processedLocation.WaterBody = verbatim.WaterBody;
 
             return processedLocation;

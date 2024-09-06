@@ -251,10 +251,11 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             //-----------------------------------------------------------------------------------------------------------
             var builder = new DwcObservationVerbatimBuilder();
             var dwcaObservation = builder                
-                .WithGeodeticDatum("WGS 84")                
+                .WithGeodeticDatum("WGS 84")   
+                .WithCoordinateUncertaintyInMeters(2000)
                 .Build();
             //dwcaObservation.FootprintWKT = "POLYGON((17.5289 59.7905, 17.5289 59.9258, 17.7683 59.9258, 17.7683 59.7905, 17.5289 59.7905))";
-            dwcaObservation.FootprintWKT = "LINESTRING(17.6444 59.8586, 17.6310 59.8580, 17.6285 59.8557)";
+            dwcaObservation.FootprintWKT = "LINESTRING(17.6444 59.8586, 17.6310 59.8580, 17.6285 59.8557)";            
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
