@@ -8,6 +8,8 @@ using SOS.Lib.Services;
 using SOS.DataStewardship.Api.Application.Infrastructure.ApplicationInsights;
 using SOS.DataStewardship.Api.Application.Managers.Interfaces;
 using SOS.DataStewardship.Api.Application.Managers;
+using Autofac.Core;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace SOS.DataStewardship.Api.Extensions;
 
@@ -32,7 +34,9 @@ internal static class DependencyInjectionExtensions
         webApplicationBuilder.Services.AddSingleton<ICache<string, ProcessedConfiguration>, ProcessedConfigurationCache>();
         webApplicationBuilder.Services.AddSingleton<IClassCache<TaxonListSetsById>, ClassCache<TaxonListSetsById>>();
         webApplicationBuilder.Services.AddSingleton<IAreaCache, AreaCache>();
-        webApplicationBuilder.Services.AddSingleton<IDataProviderCache, DataProviderCache>();        
+        webApplicationBuilder.Services.AddSingleton<IDataProviderCache, DataProviderCache>();
+        var clusterHealthCache = new ClassCache<Dictionary<string, ClusterHealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<Dictionary<string, ClusterHealthResponse>>>()) { CacheDuration = TimeSpan.FromMinutes(2) };
+        webApplicationBuilder.Services.AddSingleton<IClassCache<Dictionary<string, ClusterHealthResponse>>>(clusterHealthCache);
 
         // Security
         webApplicationBuilder.Services.AddSingleton<IAuthorizationProvider, CurrentUserAuthorization>();
