@@ -25,6 +25,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
         private const int DefaultCoordinateUncertaintyInMeters = 5000;
         private readonly IAreaHelper _areaHelper;
         private readonly IDictionary<VocabularyId, IDictionary<object, int>> _vocabularyById;
+        private readonly NetTopologySuite.IO.WKTReader _wktReader = new NetTopologySuite.IO.WKTReader();
 
         private string _englishDataproviderName;
 
@@ -141,12 +142,41 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             {
                 coordinateSystem = CoordinateSys.WGS84;
             }
-            AddPositionData(obs.Location,
-                verbatim.DecimalLongitude.ParseDouble() ?? verbatim.VerbatimLongitude.ParseDouble(),
-                verbatim.DecimalLatitude.ParseDouble() ?? verbatim.VerbatimLatitude.ParseDouble(),
-                coordinateSystem,
-                verbatim.CoordinateUncertaintyInMeters?.ParseDoubleConvertToInt() ?? DefaultCoordinateUncertaintyInMeters,
-                obs.Taxon?.Attributes?.DisturbanceRadius);
+
+            var coordinateUncertaintyInMeters = verbatim.CoordinateUncertaintyInMeters?.ParseDoubleConvertToInt() ?? DefaultCoordinateUncertaintyInMeters;
+            if (TryGetGeometryFromWkt(obs.Location.FootprintWKT, out NetTopologySuite.Geometries.Geometry? wktGeometry))
+            {
+                if (wktGeometry.GeometryType != "Polygon")
+                {
+                    var sweref99TmGeom = wktGeometry.Transform(coordinateSystem, CoordinateSys.SWEREF99_TM, true);
+                    sweref99TmGeom = sweref99TmGeom.Buffer(coordinateUncertaintyInMeters);
+                    wktGeometry = sweref99TmGeom.Transform(CoordinateSys.SWEREF99_TM, coordinateSystem, true);
+                }
+
+                double? decimalLongitude = verbatim.DecimalLongitude.ParseDouble() ?? verbatim.VerbatimLongitude.ParseDouble() ?? wktGeometry.Centroid.X;
+                double? decimalLatitude = verbatim.DecimalLatitude.ParseDouble() ?? verbatim.VerbatimLatitude.ParseDouble() ?? wktGeometry.Centroid.Y;
+                var geoShape = wktGeometry.ToGeoShape();
+                AddPositionData(
+                    obs.Location,
+                    decimalLongitude,
+                    decimalLatitude,
+                    coordinateSystem,
+                    wktGeometry!.Centroid,
+                    geoShape,
+                    coordinateUncertaintyInMeters,
+                    obs.Taxon?.Attributes?.DisturbanceRadius
+                );
+            }
+            else
+            {
+                AddPositionData(
+                    obs.Location,
+                    verbatim.DecimalLongitude.ParseDouble() ?? verbatim.VerbatimLongitude.ParseDouble(),
+                    verbatim.DecimalLatitude.ParseDouble() ?? verbatim.VerbatimLatitude.ParseDouble(),
+                    coordinateSystem,
+                    coordinateUncertaintyInMeters,
+                    obs.Taxon?.Attributes?.DisturbanceRadius);
+            }
 
             // MaterialSample
             obs.MaterialSample = CreateProcessedMaterialSample(verbatim);
@@ -175,6 +205,22 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
 
             obs.Occurrence.BirdNestActivityId = GetBirdNestActivityId(obs.Occurrence.Activity, obs.Taxon);
             return obs;
+        }
+
+        private bool TryGetGeometryFromWkt(string wkt, out NetTopologySuite.Geometries.Geometry? geometry)
+        {
+            geometry = null;
+            if (string.IsNullOrEmpty(wkt)) return false;            
+            
+            try
+            {                
+                geometry = _wktReader.Read(wkt);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
         }
 
         private static void AddVerbatimObservationAsJson(Observation obs,
