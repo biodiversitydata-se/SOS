@@ -17,6 +17,9 @@ using SOS.Lib.Managers;
 using SOS.Lib.Models.TaxonListService;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.TaxonTree;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup
 {
@@ -64,6 +67,7 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup
             serviceCollection.AddLogging();            
             serviceCollection.AddMemoryCache();
             serviceCollection.AddSingleton<IAreaHelper, AreaHelper>();
+            serviceCollection.AddSingleton(new AreaConfiguration());
             serviceCollection.AddSingleton<IAreaRepository, AreaRepository>();
             serviceCollection.AddSingleton<ProcessFixture>();
             serviceCollection.AddSingleton<IVocabularyRepository, VocabularyRepository>();
@@ -85,6 +89,8 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup
             serviceCollection.AddSingleton<IClassCache<TaxonListSetsById>, ClassCache<TaxonListSetsById>>();
             serviceCollection.AddSingleton<IClassCache<TaxonTree<IBasicTaxon>>, ClassCache<TaxonTree<IBasicTaxon>>>();
             serviceCollection.AddSingleton<IProcessedConfigurationRepository, ProcessedConfigurationRepository>();
+            var clusterHealthCache = new ClassCache<Dictionary<string, ClusterHealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<Dictionary<string, ClusterHealthResponse>>>());
+            serviceCollection.AddSingleton<IClassCache<Dictionary<string, ClusterHealthResponse>>>(clusterHealthCache);
 
             return serviceCollection;
         }
