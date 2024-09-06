@@ -284,7 +284,7 @@ public class ProcessFixture : IProcessFixture
         if (_darwinCoreFactory == null)
         {
             var dataProvider = new DataProvider() { Id = 1, Identifier = "Artportalen" };
-            _areaHelper = new AreaHelper(new AreaRepository(_processClient, new NullLogger<AreaRepository>()));
+            _areaHelper = new AreaHelper(new AreaConfiguration(), new AreaRepository(_processClient, new NullLogger<AreaRepository>()));
             _darwinCoreFactory = CreateDarwinCoreFactoryAsync(dataProvider).Result;
         }
 

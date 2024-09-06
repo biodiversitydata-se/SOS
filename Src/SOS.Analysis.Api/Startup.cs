@@ -317,6 +317,7 @@ namespace SOS.Analysis.Api
             services.AddSingleton(elasticConfiguration!);
             services.AddSingleton(Configuration.GetSection("InputValaidationConfiguration").Get<InputValaidationConfiguration>()!);
             services.AddSingleton(Configuration.GetSection("UserServiceConfiguration").Get<UserServiceConfiguration>()!);
+            services.AddSingleton(Configuration.GetSection("AreaConfiguration").Get<AreaConfiguration>()!);
 
             // Add security
             services.AddScoped<IAuthorizationProvider, CurrentUserAuthorization>();
@@ -348,7 +349,7 @@ namespace SOS.Analysis.Api
             services.AddScoped<IUserService, UserService>();
 
             // Add Utilites
-            services.AddScoped<ISearchFilterUtility, SearchFilterUtility>();
+            services.AddSingleton<ISearchFilterUtility, SearchFilterUtility>();
 
             // Add Validators
             services.AddScoped<IInputValidator, InputValidator>();

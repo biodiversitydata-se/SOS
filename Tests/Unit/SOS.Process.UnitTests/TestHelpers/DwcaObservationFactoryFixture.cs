@@ -1,6 +1,7 @@
 ﻿using SOS.Harvest.Managers;
 using SOS.Harvest.Processors.DarwinCoreArchive;
 using SOS.Lib.Configuration.Process;
+using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.Processed.Observation;
@@ -44,7 +45,7 @@ namespace SOS.Process.UnitTests.TestHelpers
             var processedAreaRepositoryStub =
                 ProcessedAreaRepositoryStubFactory.Create(AreaType.County, AreaType.Province);
             var vocabularyRepository = VocabularyRepositoryStubFactory.Create();
-            var areaHelper = new AreaHelper(processedAreaRepositoryStub.Object);
+            var areaHelper = new AreaHelper(new AreaConfiguration(), processedAreaRepositoryStub.Object);
             var processConfiguration = new ProcessConfiguration();
             var factory = DwcaObservationFactory.CreateAsync(
                 dataProviderDummy,

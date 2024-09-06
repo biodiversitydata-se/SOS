@@ -1,4 +1,5 @@
 ﻿using Autofac;
+using Autofac.Core;
 using Microsoft.ApplicationInsights;
 using SOS.Harvest.Containers;
 using SOS.Harvest.Containers.Interfaces;
@@ -111,7 +112,8 @@ namespace SOS.Harvest.IoC.Modules
             MongoDbConfiguration ProcessDbConfiguration,
             ApplicationInsightsConfiguration ApplicationInsightsConfiguration,
             SosApiConfiguration SosApiConfiguration,
-            UserServiceConfiguration UserServiceConfiguration) Configurations
+            UserServiceConfiguration UserServiceConfiguration,
+            AreaConfiguration AreaConfiguration) Configurations
         { get; set; }
 
         protected override void Load(ContainerBuilder builder)
@@ -175,6 +177,9 @@ namespace SOS.Harvest.IoC.Modules
                     .SingleInstance();
             if (Configurations.UserServiceConfiguration != null)
                 builder.RegisterInstance(Configurations.UserServiceConfiguration).As<UserServiceConfiguration>()
+                    .SingleInstance();
+            if (Configurations.AreaConfiguration != null)
+                builder.RegisterInstance(Configurations.AreaConfiguration).As<AreaConfiguration>()
                     .SingleInstance();
             if (Configurations.ProcessConfiguration.VocabularyConfiguration != null)
             {

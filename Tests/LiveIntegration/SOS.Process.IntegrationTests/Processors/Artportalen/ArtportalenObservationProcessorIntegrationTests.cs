@@ -124,6 +124,7 @@ namespace SOS.Process.LiveIntegrationTests.Processors.Artportalen
 
 
             var areaHelper = new AreaHelper(
+                new AreaConfiguration(),
                 new AreaRepository(processClient, new NullLogger<AreaRepository>()));
             var diffusionManager = new DiffusionManager(areaHelper, new NullLogger<DiffusionManager>());
             var processManager = new ProcessManager(processConfiguration);

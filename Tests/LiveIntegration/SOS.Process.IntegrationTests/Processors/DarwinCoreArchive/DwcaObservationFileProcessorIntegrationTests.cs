@@ -89,7 +89,7 @@ namespace SOS.Process.LiveIntegrationTests.Processors.DarwinCoreArchive
                 new InvalidEventRepository(processClient, new NullLogger<InvalidEventRepository>());
             var processManager = new ProcessManager(processConfiguration);
             var validationManager = new ValidationManager(invalidObservationRepository, invalidEventRepository, new NullLogger<ValidationManager>());
-            var areaHelper = new AreaHelper(new AreaRepository(processClient, new NullLogger<AreaRepository>()));
+            var areaHelper = new AreaHelper(new AreaConfiguration(), new AreaRepository(processClient, new NullLogger<AreaRepository>()));
             var diffusionManager = new DiffusionManager(areaHelper, new NullLogger<DiffusionManager>());
             IProcessedObservationCoreRepository processedObservationRepository;
             var processTimeManager = new ProcessTimeManager(processConfiguration);

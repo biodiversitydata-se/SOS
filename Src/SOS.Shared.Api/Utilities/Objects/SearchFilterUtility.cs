@@ -1,5 +1,6 @@
 ﻿using NetTopologySuite.Geometries;
 using SOS.Lib.Cache.Interfaces;
+using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Shared.Api.Dtos.Filter;
@@ -10,6 +11,8 @@ namespace SOS.Shared.Api.Utilities.Objects
     public class SearchFilterUtility : ISearchFilterUtility
     {
         private readonly IAreaCache _areaCache;
+        private readonly AreaConfiguration _areaConfiguration;
+        private Envelope _swedenExtentBoundingBox;
 
         /// <summary>
         /// Get bounding box
@@ -20,12 +23,8 @@ namespace SOS.Shared.Api.Utilities.Objects
         private async Task<LatLonBoundingBoxDto?> GetBoundingBoxAsync(
             GeographicsFilterDto filter,
             bool autoAdjustBoundingBox = true)
-        {
-            // Get geometry of sweden economic zone
-            var swedenGeometry = await _areaCache.GetGeometryAsync(AreaType.EconomicZoneOfSweden, "1");
-
-            // Get bounding box of swedish economic zone
-            var swedenBoundingBox = swedenGeometry.ToGeometry().EnvelopeInternal;
+        {            
+            Envelope swedenBoundingBox = _swedenExtentBoundingBox;
             var userBoundingBox = new Envelope(new[]
             {
                 new Coordinate(filter?.BoundingBox?.TopLeft?.Longitude ?? 0, filter?.BoundingBox?.TopLeft?.Latitude ?? 90),
@@ -75,12 +74,30 @@ namespace SOS.Shared.Api.Utilities.Objects
         /// <summary>
         /// Constructor
         /// </summary>
+        /// <param name="areaConfiguration"></param>
         /// <param name="areaCache"></param>
         public SearchFilterUtility(
+            AreaConfiguration areaConfiguration,
             IAreaCache areaCache
         )
         {
+            _areaConfiguration = areaConfiguration ?? throw new ArgumentNullException(nameof(areaConfiguration));
             _areaCache = areaCache ?? throw new ArgumentNullException(nameof(areaCache));
+            Initialize().Wait();
+        }
+
+        private async Task Initialize()
+        {
+            // Get geometry of sweden economic zone
+            var swedenGeometry = (await _areaCache.GetGeometryAsync(AreaType.EconomicZoneOfSweden, "1")).ToGeometry();
+            if (_areaConfiguration.SwedenExtentBufferKm.GetValueOrDefault(0) > 0)
+            {
+                var sweref99TmGeom = swedenGeometry.Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM, false);
+                sweref99TmGeom = sweref99TmGeom.Buffer(_areaConfiguration.SwedenExtentBufferKm.Value * 1000);
+                swedenGeometry = sweref99TmGeom.Transform(CoordinateSys.SWEREF99_TM, CoordinateSys.WGS84, false);
+            }
+            
+            _swedenExtentBoundingBox = swedenGeometry.EnvelopeInternal;            
         }
 
         /// <inheritdoc/>

@@ -442,6 +442,7 @@ namespace SOS.Observations.Api
             services.AddSingleton(healthCheckConfiguration);
             services.AddSingleton(Configuration.GetSection("VocabularyConfiguration").Get<VocabularyConfiguration>());
             services.AddSingleton(Configuration);
+            services.AddSingleton(Configuration.GetSection("AreaConfiguration").Get<AreaConfiguration>());
 
 
 #if !DEBUG
@@ -554,7 +555,7 @@ namespace SOS.Observations.Api
             services.AddSingleton<IArtportalenApiService, ArtportalenApiService>();
 
             // Add Utilites
-            services.AddScoped<ISearchFilterUtility, SearchFilterUtility>();
+            services.AddSingleton<ISearchFilterUtility, SearchFilterUtility>();
             services.AddScoped<IGeneralizationResolver, GeneralizationResolver>();
 
             // Add Validators

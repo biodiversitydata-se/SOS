@@ -63,6 +63,7 @@ namespace SOS.Hangfire.JobServer
         private static ApplicationInsightsConfiguration _applicationInsightsConfiguration;
         private static SosApiConfiguration _sosApiConfiguration;
         private static UserServiceConfiguration _userServiceConfiguration;
+        private static AreaConfiguration _areaConfiguration;
 
         /// <summary>
         ///     Application entry point
@@ -203,6 +204,8 @@ namespace SOS.Hangfire.JobServer
                         .Get<SosApiConfiguration>();
                     _userServiceConfiguration = hostContext.Configuration.GetSection(nameof(UserServiceConfiguration))
                         .Get<UserServiceConfiguration>();
+                    _areaConfiguration = hostContext.Configuration.GetSection(nameof(AreaConfiguration))
+                        .Get<AreaConfiguration>();
 
                     services.AddSingleton(_searchDbConfiguration);
                     services.AddSingleton<IElasticClientManager, ElasticClientManager>(p => new ElasticClientManager(_searchDbConfiguration));
@@ -230,8 +233,8 @@ namespace SOS.Hangfire.JobServer
                     {
                         return new AutofacServiceProviderFactory(builder =>
                             builder
-                                .RegisterModule(new HarvestModule { Configurations = (_importConfiguration, _apiManagementServiceConfiguration, _verbatimDbConfiguration, _processConfiguration, _processDbConfiguration, _applicationInsightsConfiguration, _sosApiConfiguration, _userServiceConfiguration) })
-                                .RegisterModule(new ExportModule { Configurations = (_exportConfiguration, _processDbConfiguration, _blobStorageConfiguration, _cryptoConfiguration, _dataCiteServiceConfiguration, _userServiceConfiguration) })
+                                .RegisterModule(new HarvestModule { Configurations = (_importConfiguration, _apiManagementServiceConfiguration, _verbatimDbConfiguration, _processConfiguration, _processDbConfiguration, _applicationInsightsConfiguration, _sosApiConfiguration, _userServiceConfiguration, _areaConfiguration) })
+                                .RegisterModule(new ExportModule { Configurations = (_exportConfiguration, _processDbConfiguration, _blobStorageConfiguration, _cryptoConfiguration, _dataCiteServiceConfiguration, _userServiceConfiguration, _areaConfiguration) })
                         );
                     }
                 )

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
+using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
 using SOS.Lib.Helpers;
 using SOS.Lib.Repositories.Resource;
@@ -37,6 +38,7 @@ namespace SOS.Process.LiveIntegrationTests.Helpers
                 processClient,
                 new NullLogger<VocabularyRepository>());
             var areaHelper = new AreaHelper(
+                new AreaConfiguration(),
                 processedAreaRepository);
 
             return areaHelper;

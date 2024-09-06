@@ -27,7 +27,7 @@ namespace SOS.Administration.Api
         private static MongoDbConfiguration _processDbConfiguration;
         private static ApplicationInsightsConfiguration _applicationInsightsConfiguration;
         private static SosApiConfiguration _sosApiConfiguration;
-        private static UserServiceConfiguration _userServiceConfiguration;
+        private static UserServiceConfiguration _userServiceConfiguration;        
 
         /// <summary>
         ///     Main
@@ -105,7 +105,7 @@ namespace SOS.Administration.Api
 
                     return new AutofacServiceProviderFactory(builder =>
                         builder
-                            .RegisterModule(new HarvestModule { Configurations = (_importConfiguration, null, _verbatimDbConfiguration, _processConfiguration, _processDbConfiguration, _applicationInsightsConfiguration, _sosApiConfiguration, _userServiceConfiguration) })
+                            .RegisterModule(new HarvestModule { Configurations = (_importConfiguration, null, _verbatimDbConfiguration, _processConfiguration, _processDbConfiguration, _applicationInsightsConfiguration, _sosApiConfiguration, _userServiceConfiguration, null) })
                             .RegisterModule<AdministrationModule>()
                     );
                 }

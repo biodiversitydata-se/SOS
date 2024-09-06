@@ -1,6 +1,7 @@
 ﻿using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.Index.Strtree;
+using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Enums;
 using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Extensions;
@@ -33,6 +34,7 @@ namespace SOS.Lib.Helpers
         };
 
         private IDictionary<string, PositionLocation> _featureCache;
+        private readonly AreaConfiguration _areaConfiguration;
         private readonly IAreaRepository _processedAreaRepository;
         private STRtree<IFeature> _strTree;
         private SemaphoreSlim _initializeSemaphoreSlim = new SemaphoreSlim(1, 1);
@@ -167,13 +169,16 @@ namespace SOS.Lib.Helpers
         /// <summary>
         ///     Constructor
         /// </summary>
+        /// <param name="areaConfiguration"></param>
         /// <param name="processedAreaRepository"></param>
         public AreaHelper(
+            AreaConfiguration areaConfiguration,
             IAreaRepository processedAreaRepository)
         {
             _processedAreaRepository = processedAreaRepository ??
                                        throw new ArgumentNullException(nameof(processedAreaRepository));
-
+            _areaConfiguration = areaConfiguration ??
+                                       throw new ArgumentNullException(nameof(areaConfiguration));
             ClearCache();
         }
 
@@ -257,6 +262,13 @@ namespace SOS.Lib.Helpers
                         attributes.Add("name", area.Name);
                         attributes.Add("areaType", area.AreaType);
                         attributes.Add("featureId", area.FeatureId);
+
+                        if (area.AreaType == AreaType.EconomicZoneOfSweden && _areaConfiguration.SwedenExtentBufferKm.GetValueOrDefault(0) > 0)
+                        {
+                            var sweref99TmGeom = geometry.Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM, false);
+                            sweref99TmGeom = sweref99TmGeom.Buffer(_areaConfiguration.SwedenExtentBufferKm.Value * 1000);
+                            geometry = sweref99TmGeom.Transform(CoordinateSys.SWEREF99_TM, CoordinateSys.WGS84, false);
+                        }
 
                         var feature = geometry.ToFeature(attributes);
                         _strTree.Insert(feature.Geometry.EnvelopeInternal, feature);

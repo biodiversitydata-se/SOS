@@ -49,7 +49,8 @@ namespace SOS.Export.IoC.Modules
             BlobStorageConfiguration BlobStorageConfiguration,
             CryptoConfiguration CryptoConfiguration,
             DataCiteServiceConfiguration DataCiteServiceConfiguration,
-            UserServiceConfiguration UserServiceConfiguration) Configurations
+            UserServiceConfiguration UserServiceConfiguration,
+            AreaConfiguration AreaConfiguration) Configurations
         { get; set; }
 
         /// <summary>
@@ -72,7 +73,8 @@ namespace SOS.Export.IoC.Modules
             builder.RegisterInstance(Configurations.ExportConfiguration.ZendToConfiguration).As<ZendToConfiguration>().SingleInstance();
             builder.RegisterInstance(Configurations.ExportConfiguration.VocabularyConfiguration).As<VocabularyConfiguration>().SingleInstance();
             builder.RegisterInstance(Configurations.UserServiceConfiguration).As<UserServiceConfiguration>().SingleInstance();
-
+            builder.RegisterInstance(Configurations.AreaConfiguration).As<AreaConfiguration>().SingleInstance();
+            
             // Processed Mongo Db
             var processedSettings = Configurations.ProcessDbConfiguration.GetMongoDbSettings();
             builder.RegisterInstance<IProcessClient>(new ProcessClient(processedSettings, Configurations.ProcessDbConfiguration.DatabaseName,

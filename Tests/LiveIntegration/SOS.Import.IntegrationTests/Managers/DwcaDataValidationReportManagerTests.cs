@@ -154,7 +154,7 @@ namespace SOS.Import.LiveIntegrationTests.Managers
             var processClient = CreateProcessClient(GetProcessDbConfiguration());
             var vocabularyRepository =
                 new VocabularyRepository(processClient, new NullLogger<VocabularyRepository>());
-            var areaHelper = new AreaHelper(new AreaRepository(processClient, new NullLogger<AreaRepository>()));
+            var areaHelper = new AreaHelper(new AreaConfiguration(), new AreaRepository(processClient, new NullLogger<AreaRepository>()));
             var vocabularyValueResolver = new VocabularyValueResolver(vocabularyRepository,
                 new VocabularyConfiguration { LocalizationCultureCode = "sv-SE", ResolveValues = true });
             var processedTaxonRepository = new TaxonRepository(

@@ -9,6 +9,7 @@ using SOS.Harvest.Harvesters.Artportalen;
 using SOS.Harvest.Repositories.Source.Artportalen;
 using SOS.Harvest.Repositories.Source.Artportalen.Interfaces;
 using SOS.Harvest.Services;
+using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers;
@@ -67,7 +68,7 @@ namespace SOS.Import.LiveIntegrationTests.Harvesters.Observations
             var processedDbConfiguration = GetProcessDbConfiguration();
             var processedClient = new ProcessClient(processedDbConfiguration.GetMongoDbSettings(), processedDbConfiguration.DatabaseName, processedDbConfiguration.ReadBatchSize, processedDbConfiguration.WriteBatchSize);
             var areaRepository = new Lib.Repositories.Resource.AreaRepository(processedClient, new Mock<ILogger<Lib.Repositories.Resource.AreaRepository>>().Object);
-            var areaHelper = new AreaHelper(areaRepository);
+            var areaHelper = new AreaHelper(new AreaConfiguration(), areaRepository);
 
 
             var observationHarvester = new ArtportalenObservationHarvester(
@@ -131,7 +132,7 @@ namespace SOS.Import.LiveIntegrationTests.Harvesters.Observations
             var processedDbConfiguration = GetProcessDbConfiguration();
             var processedClient = new ProcessClient(processedDbConfiguration.GetMongoDbSettings(), processedDbConfiguration.DatabaseName, processedDbConfiguration.ReadBatchSize, processedDbConfiguration.WriteBatchSize);
             var areaRepository = new Lib.Repositories.Resource.AreaRepository(processedClient, new Mock<ILogger<Lib.Repositories.Resource.AreaRepository>>().Object);
-            var areaHelper = new AreaHelper(areaRepository);
+            var areaHelper = new AreaHelper(new AreaConfiguration(), areaRepository);
 
             var observationHarvester = new ArtportalenObservationHarvester(
                 importConfiguration.ArtportalenConfiguration,

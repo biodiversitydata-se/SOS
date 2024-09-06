@@ -3,6 +3,7 @@ using Moq;
 using SOS.Harvest.Managers;
 using SOS.Harvest.Processors.DarwinCoreArchive;
 using SOS.Lib.Configuration.Process;
+using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
 using SOS.Lib.Helpers;
 using SOS.Lib.Managers;
@@ -56,7 +57,7 @@ namespace SOS.Process.LiveIntegrationTests.TestHelpers
             var vocabularyRepository =
                 new VocabularyRepository(processClient, new NullLogger<VocabularyRepository>());
             var areaHelper =
-                new AreaHelper(new AreaRepository(processClient, new NullLogger<AreaRepository>()));
+                new AreaHelper(new AreaConfiguration(), new AreaRepository(processClient, new NullLogger<AreaRepository>()));
             var processConfiguration = new ProcessConfiguration();
             var dwcaObservationFactory = await DwcaObservationFactory.CreateAsync(
                 dataProviderDummy,
