@@ -34,6 +34,7 @@ internal static class DependencyInjectionExtensions
         webApplicationBuilder.Services.AddSingleton<ICache<string, ProcessedConfiguration>, ProcessedConfigurationCache>();
         webApplicationBuilder.Services.AddSingleton<IClassCache<TaxonListSetsById>, ClassCache<TaxonListSetsById>>();
         webApplicationBuilder.Services.AddSingleton<IAreaCache, AreaCache>();
+        webApplicationBuilder.Services.AddSingleton(new AreaConfiguration());
         webApplicationBuilder.Services.AddSingleton<IDataProviderCache, DataProviderCache>();
         var clusterHealthCache = new ClassCache<Dictionary<string, ClusterHealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<Dictionary<string, ClusterHealthResponse>>>()) { CacheDuration = TimeSpan.FromMinutes(2) };
         webApplicationBuilder.Services.AddSingleton<IClassCache<Dictionary<string, ClusterHealthResponse>>>(clusterHealthCache);
