@@ -420,7 +420,7 @@ namespace SOS.Lib.IO.DwcArchive
                 // If less than 99% of expected observations where fetched, something is wrong
                 if (nrObservations < expectedNoOfObservations * 0.99)
                 {
-                    throw new Exception($"Csv export expected {expectedNoOfObservations} but only got {nrObservations}");
+                    throw new Exception($"Dwc export expected {expectedNoOfObservations} but only got {nrObservations}");
                 }
 
                 // Create ExtendedMeasurementOrFact.txt

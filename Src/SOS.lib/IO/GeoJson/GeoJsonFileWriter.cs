@@ -334,7 +334,7 @@ namespace SOS.Lib.IO.GeoJson
                 // If less tha 99% of expected observations where fetched, something is wrong
                 if (nrObservations < expectedNoOfObservations * 0.99)
                 {
-                    throw new Exception($"Csv export expected {expectedNoOfObservations} but only got {nrObservations}");
+                    throw new Exception($"GeoJSON export expected {expectedNoOfObservations} but only got {nrObservations}");
                 }
 
                 if (gzip)
