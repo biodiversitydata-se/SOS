@@ -15,8 +15,6 @@ using SOS.Analysis.Api.Configuration;
 using SOS.Analysis.Api.Managers;
 using SOS.Analysis.Api.Managers.Interfaces;
 using SOS.Analysis.Api.Middleware;
-using SOS.Analysis.Api.Repositories;
-using SOS.Analysis.Api.Repositories.Interfaces;
 using SOS.Lib.ActionFilters;
 using SOS.Lib.ApplicationInsights;
 using SOS.Lib.Cache;
@@ -51,6 +49,13 @@ using System.Reflection;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Logging.Abstractions;
 using Nest;
+using SOS.Lib.Repositories.Processed.Interfaces;
+using SOS.Lib.Repositories.Processed;
+using Hangfire;
+using Newtonsoft.Json.Converters;
+using Hangfire.Mongo;
+using Hangfire.Mongo.Migration.Strategies;
+using Hangfire.Mongo.Migration.Strategies.Backup;
 
 namespace SOS.Analysis.Api
 {
@@ -318,6 +323,7 @@ namespace SOS.Analysis.Api
             services.AddSingleton(Configuration.GetSection("InputValaidationConfiguration").Get<InputValaidationConfiguration>()!);
             services.AddSingleton(Configuration.GetSection("UserServiceConfiguration").Get<UserServiceConfiguration>()!);
             services.AddSingleton(Configuration.GetSection("AreaConfiguration").Get<AreaConfiguration>()!);
+            services.AddSingleton(Configuration.GetSection("CryptoConfiguration").Get<CryptoConfiguration>()!);
 
             // Add security
             services.AddScoped<IAuthorizationProvider, CurrentUserAuthorization>();
@@ -332,27 +338,53 @@ namespace SOS.Analysis.Api
             services.AddSingleton<IClassCache<Dictionary<string, ClusterHealthResponse>>>(clusterHealthCache);
 
             // Add managers
-            services.AddScoped<IAnalysisManager, AnalysisManager>();
+            services.AddScoped<Managers.Interfaces.IAnalysisManager, Managers.AnalysisManager>();
             services.AddScoped<IFilterManager, FilterManager>();
             services.AddSingleton<ITaxonManager, TaxonManager>();
 
             // Add repositories
             services.AddScoped<IAreaRepository, AreaRepository>();
             services.AddScoped<IDataProviderRepository, DataProviderRepository>();
-            services.AddScoped<IProcessedConfigurationRepository, ProcessedConfigurationRepository>();
-            services.AddScoped<IProcessedObservationRepository, ProcessedObservationRepository>();
+            services.AddScoped<IProcessedConfigurationRepository, ProcessedConfigurationRepository>();            
+            services.AddScoped<IProcessedObservationCoreRepository, ProcessedObservationCoreRepository>();            
             services.AddScoped<ITaxonRepository, TaxonRepository>();
             services.AddScoped<ITaxonListRepository, TaxonListRepository>();
 
             // Add services
             services.AddSingleton<IHttpClientService, HttpClientService>();
             services.AddScoped<IUserService, UserService>();
+            services.AddSingleton<ICryptoService, CryptoService>();
 
             // Add Utilites
             services.AddSingleton<ISearchFilterUtility, SearchFilterUtility>();
 
             // Add Validators
             services.AddScoped<IInputValidator, InputValidator>();
+
+            // Hangfire
+            var mongoConfiguration = Configuration.GetSection("HangfireDbConfiguration").Get<HangfireDbConfiguration>();
+            services.AddHangfire(configuration =>
+                configuration
+                    .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+                    .UseSimpleAssemblyNameTypeSerializer()
+                    .UseRecommendedSerializerSettings(m =>
+                    {
+                        m.Converters.Add(new NewtonsoftGeoShapeConverter());
+                        m.Converters.Add(new StringEnumConverter());
+                    })
+                    .UseMongoStorage(new MongoClient(mongoConfiguration.GetMongoDbSettings()),
+                        mongoConfiguration.DatabaseName,
+                        new MongoStorageOptions
+                        {
+                            MigrationOptions = new MongoMigrationOptions
+                            {
+                                MigrationStrategy = new MigrateMongoMigrationStrategy(),
+                                BackupStrategy = new CollectionMongoBackupStrategy()
+                            },
+                            Prefix = "hangfire",
+                            CheckConnection = true
+                        })
+            );
         }
 
         /// <summary>
@@ -370,6 +402,7 @@ namespace SOS.Analysis.Api
             Lib.Configuration.Shared.ApplicationInsights applicationInsightsConfiguration,
             AnalysisConfiguration statisticsConfiguration)
         {
+            app.UseHangfireDashboard();
 
             if (statisticsConfiguration.EnableResponseCompression)
             {

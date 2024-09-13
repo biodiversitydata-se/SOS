@@ -113,6 +113,7 @@ namespace SOS.Export.LiveIntegrationTests.Managers
                 zendToService.Object,
                 new FileDestination { Path = exportConfiguration.FileDestination.Path },
                 filterManager.Object,
+                new Mock<IAnalysisManager>().Object,
                 new Mock<ILogger<ObservationManager>>().Object);
 
             return observationManager;

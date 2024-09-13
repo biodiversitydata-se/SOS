@@ -3,7 +3,6 @@ using Nest;
 using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
 using SOS.Analysis.Api.Managers.Interfaces;
-using SOS.Analysis.Api.Repositories.Interfaces;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
@@ -12,15 +11,16 @@ using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Search.Enums;
 using SOS.Lib.Models.Search.Filters;
+using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Shared.Api.Dtos.Enum;
 using SOS.Shared.Api.Dtos.Search;
 using System.Globalization;
 
 namespace SOS.Analysis.Api.Managers
 {
-    public class AnalysisManager : IAnalysisManager
+    public class AnalysisManager : Interfaces.IAnalysisManager
     {
-        private readonly IProcessedObservationRepository _processedObservationRepository;
+        private readonly IProcessedObservationCoreRepository _processedObservationRepository;
         private readonly IFilterManager _filterManager;
         private readonly IAreaCache _areaCache;
         private readonly ILogger<AnalysisManager> _logger;
@@ -96,7 +96,7 @@ namespace SOS.Analysis.Api.Managers
         /// <exception cref="ArgumentNullException"></exception>
         public AnalysisManager(
             IFilterManager filterManager,
-            IProcessedObservationRepository processedObservationRepository,
+            IProcessedObservationCoreRepository processedObservationRepository,
             IAreaCache areaCache,
             ILogger<AnalysisManager> logger)
         {

@@ -9,22 +9,34 @@
   },
   "profiles": {
     "SOS.Analysis.Api": {
-        "commandName": "Project",
-        "dotnetRunMessages": true,
-        "launchBrowser": true,
-        "launchUrl": "swagger",
-        "applicationUrl": "https://localhost:7089;http://localhost:5089",
-        "environmentVariables": {
-            "ASPNETCORE_ENVIRONMENT": "local"
-        }
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "launchBrowser": true,
+      "launchUrl": "swagger",
+      "applicationUrl": "https://localhost:7089;http://localhost:5089",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "local"
+      }
+    },
+    "SOS.Analysis.Api (ST)": {
+      "commandName": "IISExpress",
+      "launchBrowser": true,
+      "launchUrl": "swagger",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "ST",
+        "DISABLE_HANGFIRE_INIT": "true",
+        "DISABLE_HEALTHCHECK_INIT": "true",
+        "DISABLE_CACHED_TAXON_SUM_INIT": "true"
+      },
+      "applicationUrl": "https://localhost:7089;http://localhost:5089"
     },
     "IIS Express": {
-        "commandName": "IISExpress",
-        "launchBrowser": true,
-        "launchUrl": "swagger",
-        "environmentVariables": {
-            "ASPNETCORE_ENVIRONMENT": "local"
-        }
+      "commandName": "IISExpress",
+      "launchBrowser": true,
+      "launchUrl": "swagger",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "local"
+      }
     }
   }
 }

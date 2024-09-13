@@ -116,6 +116,7 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// <param name="skipAuthorizationFilters"></param>
         /// <param name="maxBuckets"></param>
         /// <param name="afterKey"></param>
+        /// <param name="timeout"></param>
         /// <returns></returns>
         Task<GeoGridMetricResult> GetMetricGridAggregationAsync(
             SearchFilter filter,
@@ -123,7 +124,8 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
             MetricCoordinateSys metricCoordinateSys,
             bool skipAuthorizationFilters = false,
             int? maxBuckets = null,
-            CompositeKey afterKey = null);
+            CompositeKey afterKey = null,
+            TimeSpan? timeout = null);
 
         /// <summary>
         /// Get index health status
@@ -352,5 +354,16 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// <param name="protectedIndex"></param>
         /// <returns></returns>
         Task WaitForPublicIndexCreationAsync(long expectedRecordsCount, TimeSpan? timeout = null, bool protectedIndex = false);
+
+        /// <summary>
+        /// Aggregate by user passed field
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="aggregationField"></param>
+        /// <param name="precisionThreshold"></param>
+        /// <param name="afterKey"></param>
+        /// <param name="take"></param>
+        /// <returns></returns>
+        Task<SearchAfterResult<dynamic>> AggregateByUserFieldAsync(SearchFilter filter, string aggregationField, int? precisionThreshold, string? afterKey = null, int? take = 10);
     }
 }

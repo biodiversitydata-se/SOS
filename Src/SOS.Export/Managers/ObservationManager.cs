@@ -17,6 +17,7 @@ using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Services.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -39,6 +40,7 @@ namespace SOS.Export.Managers
         private readonly ILogger<ObservationManager> _logger;
         private readonly IProcessedObservationCoreRepository _processedObservationRepository;
         private readonly IProcessInfoRepository _processInfoRepository;
+        private readonly IAnalysisManager _analysisManager;
         private readonly IZendToService _zendToService;
 
         /// <summary>
@@ -264,6 +266,7 @@ namespace SOS.Export.Managers
             IZendToService zendToService,
             FileDestination fileDestination,
             IFilterManager filterManager,
+            IAnalysisManager analysisManager,
             ILogger<ObservationManager> logger)
         {
             _dwcArchiveFileWriter =
@@ -285,7 +288,7 @@ namespace SOS.Export.Managers
             _zendToService = zendToService ?? throw new ArgumentNullException(nameof(zendToService));
             _filterManager = filterManager ?? throw new ArgumentNullException(nameof(filterManager));
             _exportPath = fileDestination?.Path ?? throw new ArgumentNullException(nameof(fileDestination));
-
+            _analysisManager = analysisManager ?? throw new ArgumentNullException(nameof(analysisManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             // Make sure we are working with live data
@@ -392,6 +395,126 @@ namespace SOS.Export.Managers
             {
                 _logger.LogError(e, "Failed to export and store sightings");
                 return false;
+            }
+            finally
+            {
+                _fileService.DeleteDirectory(exportPath);
+            }
+        }
+
+        public async Task<ZendToResponse> ExportAooEooAndSendAsync(
+            int? roleId,
+            string authorizationApplicationIdentifier,
+            SearchFilter filter,
+            int gridCellsInMeters,
+            bool useCenterPoint,
+            IEnumerable<double> alphaValues,
+            bool useEdgeLengthRatio,
+            bool allowHoles,
+            bool returnGridCells,
+            bool includeEmptyCells,
+            MetricCoordinateSys metricCoordinateSys,
+            CoordinateSys coordinateSystem,                        
+            string emailAddress,
+            string description,
+            ExportFormat exportFormat,            
+            bool sendMailFromZendTo,
+            string encryptPassword,
+            IJobCancellationToken cancellationToken)
+        {
+            FileExportResult fileExportResult = null;
+            var exportPath = Path.Combine(_exportPath, Guid.NewGuid().ToString());
+            try
+            {
+                await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
+                var fileName = $"AOO EOO {DateTime.Now.ToString("yyyy-MM-dd HH.mm")}";
+                fileExportResult = await _analysisManager.CreateAooEooExportAsync(
+                    roleId,
+                    authorizationApplicationIdentifier,
+                    filter,
+                    gridCellsInMeters,
+                    useCenterPoint,
+                    alphaValues,
+                    useEdgeLengthRatio,
+                    allowHoles,
+                    returnGridCells,
+                    includeEmptyCells,
+                    metricCoordinateSys,
+                    coordinateSystem,
+                    exportPath,
+                    fileName,                    
+                    cancellationToken);                             
+
+                // zend file to user
+                return await _zendToService.SendFile(
+                    emailAddress,
+                    description,
+                    fileExportResult.FilePath,
+                    exportFormat,
+                    sendMailFromZendTo,
+                    true, 
+                    !string.IsNullOrEmpty(encryptPassword), // Encrypt file if password is passed
+                    encryptPassword);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to export and send AOO EOO");
+                return new ZendToResponse();
+            }
+            finally
+            {
+                _fileService.DeleteDirectory(exportPath);
+            }
+        }
+
+        public async Task<ZendToResponse> ExportAooAndEooArticle17AndSendAsync(
+            int? roleId,
+            string authorizationApplicationIdentifier,
+            SearchFilter filter,
+            int gridCellsInMeters,
+            int maxDistance,
+            MetricCoordinateSys metricCoordinateSys,
+            CoordinateSys coordinateSystem,
+            string emailAddress,
+            string description,
+            ExportFormat exportFormat,            
+            bool sendMailFromZendTo,
+            string encryptPassword,
+            IJobCancellationToken cancellationToken)
+        {
+            FileExportResult fileExportResult = null;
+            var exportPath = Path.Combine(_exportPath, Guid.NewGuid().ToString());
+            try
+            {
+                await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
+                var fileName = $"AOO EOO Article 17 {DateTime.Now.ToString("yyyy-MM-dd HH.mm")}";
+                fileExportResult = await _analysisManager.CreateAooAndEooArticle17ExportAsync(
+                    roleId,
+                    authorizationApplicationIdentifier,
+                    filter,
+                    gridCellsInMeters,
+                    maxDistance,
+                    metricCoordinateSys,                    
+                    coordinateSystem,
+                    exportPath,
+                    fileName,
+                    cancellationToken);
+
+                // zend file to user
+                return await _zendToService.SendFile(
+                    emailAddress,
+                    description,
+                    fileExportResult.FilePath,
+                    exportFormat,
+                    sendMailFromZendTo,
+                    true,
+                    !string.IsNullOrEmpty(encryptPassword), // Encrypt if password is passed
+                    encryptPassword);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to export and send AOO EOO Article 17");
+                return new ZendToResponse();
             }
             finally
             {

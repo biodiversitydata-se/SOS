@@ -75,6 +75,7 @@ namespace SOS.Export.UnitTests.Managers
             _zendToServiceMock.Object,
             new FileDestination { Path = "test" },
             _filterManagerMock.Object,
+            new Mock<IAnalysisManager>().Object,
             _loggerMock.Object);
 
         /// <summary>
