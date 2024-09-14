@@ -2,7 +2,7 @@
 using Nest;
 using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
-using SOS.Analysis.Api.Managers.Interfaces;
+using SOS.Analysis.Api.Repositories.Interfaces;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
@@ -20,7 +20,7 @@ namespace SOS.Analysis.Api.Managers
 {
     public class AnalysisManager : Interfaces.IAnalysisManager
     {
-        private readonly IProcessedObservationCoreRepository _processedObservationRepository;
+        private readonly IProcessedObservationCoreRepository _processedObservationRepository;        
         private readonly IFilterManager _filterManager;
         private readonly IAreaCache _areaCache;
         private readonly ILogger<AnalysisManager> _logger;
@@ -96,7 +96,7 @@ namespace SOS.Analysis.Api.Managers
         /// <exception cref="ArgumentNullException"></exception>
         public AnalysisManager(
             IFilterManager filterManager,
-            IProcessedObservationCoreRepository processedObservationRepository,
+            IProcessedObservationRepository processedObservationRepository,
             IAreaCache areaCache,
             ILogger<AnalysisManager> logger)
         {
@@ -119,7 +119,7 @@ namespace SOS.Analysis.Api.Managers
             await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
             var result = await _processedObservationRepository.AggregateByUserFieldAsync(filter, aggregationField, precisionThreshold, afterKey, take);
 
-            
+
             return new PagedAggregationResultDto<UserAggregationResponseDto>
             {
                 AfterKey = result.SearchAfter,
@@ -310,7 +310,7 @@ namespace SOS.Analysis.Api.Managers
                 }
 
                 var metaData = CalculateMetadata(gridCellsMetric);
-                
+
                 // We need features to return later so we create them now and don't need to create the polygon more than once
                 var gridCellFeaturesMetric = gridCellsMetric.Select(gc => gc.MetricBoundingBox
                     .ToPolygon()
@@ -321,17 +321,17 @@ namespace SOS.Analysis.Api.Managers
                         {  "taxaCount", gc.TaxaCount! }
                     })
                 ).ToDictionary(f => (string)f.Attributes["id"], f => f);
-                
+
                 var futureCollection = new FeatureCollection
                 {
                     BoundingBox = new Envelope(new Coordinate(metaData.MinX, metaData.MaxY), new Coordinate(metaData.MaxX, metaData.MinY)).Transform((CoordinateSys)metricCoordinateSys, coordinateSystem)
                 };
-                
+
                 var triangels = gridCellsMetric
-                    .Select(gc => new XYBoundingBox() { 
+                    .Select(gc => new XYBoundingBox() {
                         BottomRight = new XYCoordinate(gc.MetricBoundingBox.BottomRight.X, gc.MetricBoundingBox.BottomRight.Y),
                         TopLeft = new XYCoordinate(gc.MetricBoundingBox.TopLeft.X, gc.MetricBoundingBox.TopLeft.Y)
-                    } 
+                    }
                     .ToPolygon())
                         .ToArray()
                             .CalculateTraiangels(true);
@@ -381,8 +381,8 @@ namespace SOS.Analysis.Api.Managers
                );
 
                 // Add all intersections gridcells to feature collection. Add nagative buffer when intersect to prevent gridcell touching corner match
-                var eooGridCellFeaturesMetric = gridCellFeaturesMetric.Where(gc => 
-                    long.Parse(gc.Value?.Attributes["observationsCount"]?.ToString() ?? "0") > 0 || 
+                var eooGridCellFeaturesMetric = gridCellFeaturesMetric.Where(gc =>
+                    long.Parse(gc.Value?.Attributes["observationsCount"]?.ToString() ?? "0") > 0 ||
                     gc.Value!.Geometry.Intersects(inRangeGeometry)).Select(f => f.Value);
                 var eooGeometry = new MultiPolygon(eooGridCellFeaturesMetric.Select(f => f.Geometry as Polygon).ToArray());
 
@@ -413,7 +413,7 @@ namespace SOS.Analysis.Api.Managers
                 {
                     feature.Geometry = feature.Geometry.Transform((CoordinateSys)metricCoordinateSys, coordinateSystem);
                 }
-   
+
                 return futureCollection;
             }
             catch (ArgumentOutOfRangeException e)

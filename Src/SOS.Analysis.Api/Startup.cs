@@ -53,6 +53,8 @@ using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Processed;
 using Hangfire;
 using Newtonsoft.Json.Converters;
+using SOS.Analysis.Api.Repositories.Interfaces;
+using SOS.Analysis.Api.Repositories;
 using Hangfire.Mongo;
 using Hangfire.Mongo.Migration.Strategies;
 using Hangfire.Mongo.Migration.Strategies.Backup;
@@ -337,7 +339,7 @@ namespace SOS.Analysis.Api
             var clusterHealthCache = new ClassCache<Dictionary<string, ClusterHealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<Dictionary<string, ClusterHealthResponse>>>()) { CacheDuration = TimeSpan.FromMinutes(2) };
             services.AddSingleton<IClassCache<Dictionary<string, ClusterHealthResponse>>>(clusterHealthCache);
 
-            // Add managers
+            // Add managers            
             services.AddScoped<Managers.Interfaces.IAnalysisManager, Managers.AnalysisManager>();
             services.AddScoped<IFilterManager, FilterManager>();
             services.AddSingleton<ITaxonManager, TaxonManager>();
@@ -345,7 +347,8 @@ namespace SOS.Analysis.Api
             // Add repositories
             services.AddScoped<IAreaRepository, AreaRepository>();
             services.AddScoped<IDataProviderRepository, DataProviderRepository>();
-            services.AddScoped<IProcessedConfigurationRepository, ProcessedConfigurationRepository>();            
+            services.AddScoped<IProcessedConfigurationRepository, ProcessedConfigurationRepository>();
+            services.AddScoped<IProcessedObservationRepository, ProcessedObservationRepository>(); // Denna rad gör att det fungerar tillsammans med ProcessedObservationRepository
             services.AddScoped<IProcessedObservationCoreRepository, ProcessedObservationCoreRepository>();            
             services.AddScoped<ITaxonRepository, TaxonRepository>();
             services.AddScoped<ITaxonListRepository, TaxonListRepository>();
