@@ -56,7 +56,7 @@ namespace SOS.Lib.Jobs.Export
             PerformContext context,
             IJobCancellationToken cancellationToken);               
 
-        [JobDisplayName("Export AOO EOO. Email={13}, Description={14}, ExportFormat={15}")]
+        [JobDisplayName("Export AOO EOO. Email={12}, Description={13}")]
         [AutomaticRetry(Attempts = 2, LogEvents = false, OnAttemptsExceeded = AttemptsExceededAction.Fail)]
         [Queue("low")]
         [PreserveOriginalQueue]
@@ -84,7 +84,7 @@ namespace SOS.Lib.Jobs.Export
            IJobCancellationToken cancellationToken);
 
 
-        [JobDisplayName("Export AOO EOO Article 17. Email={13}, Description={14}, ExportFormat={15}")]
+        [JobDisplayName("Export AOO EOO Article 17. Email={7}, Description={8}")]
         [AutomaticRetry(Attempts = 2, LogEvents = false, OnAttemptsExceeded = AttemptsExceededAction.Fail)]
         [Queue("low")]
         [PreserveOriginalQueue]

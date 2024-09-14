@@ -165,6 +165,7 @@ namespace SOS.Export.Jobs
             }
         }
 
+        /// <inheritdoc />
         public async Task<bool> RunAooEooAsync(
             int? roleId,
             string authorizationApplicationIdentifier,
@@ -231,6 +232,7 @@ namespace SOS.Export.Jobs
             }
         }
 
+        /// <inheritdoc />
         public async Task<bool> RunAooEooArticle17Async(
             int? roleId,
             string authorizationApplicationIdentifier,
