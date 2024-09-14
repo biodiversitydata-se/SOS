@@ -432,7 +432,7 @@ namespace SOS.Analysis.Api.Controllers
                         description,
                         ExportFormat.AooEoo,
                         sendMailFromZendTo,
-                        encryptPassword,
+                        encryptedPassword,
                         null, // performContext
                         JobCancellationToken.Null));
 
@@ -606,7 +606,7 @@ namespace SOS.Analysis.Api.Controllers
                         description,
                         ExportFormat.AooEoo,
                         sendMailFromZendTo,
-                        encryptPassword,
+                        encryptedPassword,
                         null, // performContext
                         JobCancellationToken.Null));                
 
