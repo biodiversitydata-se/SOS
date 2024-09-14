@@ -194,7 +194,6 @@ namespace SOS.Export.Jobs
                 Thread.Sleep(TimeSpan.FromSeconds(1)); // wait for job info to be inserted in MongoDb.
                 await UpdateJobInfoStartProcessing(userId, context?.BackgroundJob?.Id);
                 var password = await _cryptoService.DecryptAsync(encryptedPassword);
-                //var password = "abc";
                 var response = await _observationManager.ExportAooEooAndSendAsync(
                     roleId, 
                     authorizationApplicationIdentifier, 
@@ -212,7 +211,7 @@ namespace SOS.Export.Jobs
                     description,
                     exportFormat,
                     sendMailFromZendTo,
-                    encryptedPassword,
+                    password,
                     cancellationToken);
                 _logger.LogInformation($"End AOO EOO export and send job. Success: {response.Success}");
                 await UpdateJobInfoEndProcessing(userId, context?.BackgroundJob?.Id, response);
@@ -256,7 +255,6 @@ namespace SOS.Export.Jobs
                 Thread.Sleep(TimeSpan.FromSeconds(1)); // wait for job info to be inserted in MongoDb.
                 await UpdateJobInfoStartProcessing(userId, context?.BackgroundJob?.Id);
                 var password = await _cryptoService.DecryptAsync(encryptedPassword);
-                //var password = "abc";
                 var response = await _observationManager.ExportAooAndEooArticle17AndSendAsync(
                     roleId,
                     authorizationApplicationIdentifier,
@@ -269,7 +267,7 @@ namespace SOS.Export.Jobs
                     description,
                     exportFormat,
                     sendMailFromZendTo,
-                    encryptedPassword,
+                    password,
                     cancellationToken);
                 _logger.LogInformation($"End AOO EOO Article 17 export and send job. Success: {response.Success}");
                 await UpdateJobInfoEndProcessing(userId, context?.BackgroundJob?.Id, response);
