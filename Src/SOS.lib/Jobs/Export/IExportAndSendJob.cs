@@ -54,8 +54,31 @@ namespace SOS.Lib.Jobs.Export
             string encryptedPassword,
             bool dynamicProjectDataFields,
             PerformContext context,
-            IJobCancellationToken cancellationToken);               
+            IJobCancellationToken cancellationToken);
 
+        /// <summary>
+        /// Export AOO EOO.
+        /// </summary>
+        /// <param name="roleId"></param>
+        /// <param name="authorizationApplicationIdentifier"></param>
+        /// <param name="filter"></param>
+        /// <param name="gridCellsInMeters"></param>
+        /// <param name="useCenterPoint"></param>
+        /// <param name="alphaValues"></param>
+        /// <param name="useEdgeLengthRatio"></param>
+        /// <param name="allowHoles"></param>
+        /// <param name="returnGridCells"></param>
+        /// <param name="includeEmptyCells"></param>
+        /// <param name="metricCoordinateSys"></param>
+        /// <param name="coordinateSystem"></param>
+        /// <param name="emailAddress"></param>
+        /// <param name="description"></param>
+        /// <param name="exportFormat"></param>
+        /// <param name="sendMailFromZendTo"></param>
+        /// <param name="encryptedPassword"></param>
+        /// <param name="context"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         [JobDisplayName("Export AOO EOO. Email={12}, Description={13}")]
         [AutomaticRetry(Attempts = 2, LogEvents = false, OnAttemptsExceeded = AttemptsExceededAction.Fail)]
         [Queue("low")]
@@ -83,7 +106,24 @@ namespace SOS.Lib.Jobs.Export
            PerformContext context,
            IJobCancellationToken cancellationToken);
 
-
+        /// <summary>
+        /// Export AOO EOO Article 17.
+        /// </summary>
+        /// <param name="roleId"></param>
+        /// <param name="authorizationApplicationIdentifier"></param>
+        /// <param name="filter"></param>
+        /// <param name="gridCellsInMeters"></param>
+        /// <param name="maxDistance"></param>
+        /// <param name="metricCoordinateSys"></param>
+        /// <param name="coordinateSystem"></param>
+        /// <param name="emailAddress"></param>
+        /// <param name="description"></param>
+        /// <param name="exportFormat"></param>
+        /// <param name="sendMailFromZendTo"></param>
+        /// <param name="encryptedPassword"></param>
+        /// <param name="context"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         [JobDisplayName("Export AOO EOO Article 17. Email={7}, Description={8}")]
         [AutomaticRetry(Attempts = 2, LogEvents = false, OnAttemptsExceeded = AttemptsExceededAction.Fail)]
         [Queue("low")]
