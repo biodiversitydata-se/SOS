@@ -1,26 +1,21 @@
 ﻿using AgileObjects.AgileMapper.Extensions;
 using Hangfire;
-using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using Nest;
 using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
 using NReco.Csv;
 using SOS.Lib.Cache.Interfaces;
-using SOS.Lib.Configuration.Export;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
-using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Export;
 using SOS.Lib.Models.Gis;
-using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Models.Search.Enums;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Repositories.Processed.Interfaces;
-using SOS.Lib.Services;
 using SOS.Lib.Services.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -33,9 +28,9 @@ using System.Text;
 using System.Threading.Tasks;
 using NetTopologySuite.IO;
 using SOS.Lib.Models.Analysis;
-using Amazon.Runtime.Internal;
-using Org.BouncyCastle.Utilities.Zlib;
 using System.Diagnostics;
+using System.Text.Encodings.Web;
+using System.Text.Unicode;
 
 namespace SOS.Lib.Managers
 {
@@ -522,6 +517,19 @@ namespace SOS.Lib.Managers
                 var aooEooItems = new List<AooEooItem>();
                 _fileService.CreateDirectory(temporaryZipExportFolderPath);
                 await StoreFilterAsync(temporaryZipExportFolderPath, filter);
+                await StoreSettingsAsync(temporaryZipExportFolderPath, new
+                {
+                    GridcellsInMeters = gridCellsInMeters,
+                    UseCenterPoint = useCenterPoint,
+                    AlphaValues = alphaValues,
+                    UseEdgeLengthRatio = useEdgeLengthRatio,
+                    AllowHoles = allowHoles,
+                    IncludeEmptyCells = includeEmptyCells,
+                    MetricCoordinateSys = metricCoordinateSys,
+                    CoordinateSystem = coordinateSystem,
+                    RoleId = roleId,
+                    AuthorizationApplicationIdentifier = authorizationApplicationIdentifier,
+                });
                 var totalFilePath = Path.Combine(temporaryZipExportFolderPath, "Total.geojson");
 
                 var aooEooResult = await CalculateAooAndEooAsync(
@@ -658,6 +666,15 @@ namespace SOS.Lib.Managers
                 var aooEooItems = new List<AooEooItem>();
                 _fileService.CreateDirectory(temporaryZipExportFolderPath);
                 await StoreFilterAsync(temporaryZipExportFolderPath, filter);
+                await StoreSettingsAsync(temporaryZipExportFolderPath, new
+                {
+                    GridcellsInMeters = gridCellsInMeters,
+                    MaxDistance = maxDistance,                    
+                    MetricCoordinateSys = metricCoordinateSys,
+                    CoordinateSystem = coordinateSystem,
+                    RoleId = roleId,
+                    AuthorizationApplicationIdentifier = authorizationApplicationIdentifier,
+                });
                 var totalFilePath = Path.Combine(temporaryZipExportFolderPath, "Total.geojson");
 
                 var aooEooResult = await CalculateAooAndEooArticle17Async(
@@ -754,8 +771,8 @@ namespace SOS.Lib.Managers
         }
 
         private async Task CreateAooEooCsvFile(string filePath, IEnumerable<AooEooItem> aooEooItems, bool writeAlphaValue)
-        {            
-            using var streamWriter = new StreamWriter(filePath);
+        {
+            using var streamWriter = new StreamWriter(filePath, false, new UTF8Encoding(true));
             var csvWriter = new CsvWriter(streamWriter, ";");
 
             // Header
@@ -794,11 +811,46 @@ namespace SOS.Lib.Managers
             {
                 await using var fileStream = File.Create(Path.Combine(temporaryZipExportFolderPath, "filter.json"));
                 await using var streamWriter = new StreamWriter(fileStream, Encoding.UTF8);
-                var serializeOptions = new JsonSerializerOptions { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull };
+                var serializeOptions = new JsonSerializerOptions {
+                    WriteIndented = true,
+                    Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.Latin1Supplement), // Display å,ä,ö e.t.c. properly
+                    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull 
+                };
                 serializeOptions.Converters.Add(new JsonStringEnumConverter());
 
                 var filterString = JsonSerializer.Serialize(filter, serializeOptions);
                 await streamWriter.WriteAsync(filterString);
+                streamWriter.Close();
+                fileStream.Close();
+            }
+            catch
+            {
+                return;
+            }
+        }
+
+        /// <summary>
+        /// Store settings in folder o zip
+        /// </summary>
+        /// <param name="temporaryZipExportFolderPath"></param>
+        /// <param name="settings"></param>
+        /// <returns></returns>
+        protected async Task StoreSettingsAsync(string temporaryZipExportFolderPath, object settings)
+        {
+            try
+            {
+                await using var fileStream = File.Create(Path.Combine(temporaryZipExportFolderPath, "settings.json"));
+                await using var streamWriter = new StreamWriter(fileStream, Encoding.UTF8);                
+                var serializeOptions = new JsonSerializerOptions
+                {
+                    WriteIndented = true,
+                    Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.Latin1Supplement), // Display å,ä,ö e.t.c. properly
+                    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+                };
+                serializeOptions.Converters.Add(new JsonStringEnumConverter());
+
+                var settingsString = JsonSerializer.Serialize(settings, serializeOptions);
+                await streamWriter.WriteAsync(settingsString);
                 streamWriter.Close();
                 fileStream.Close();
             }
