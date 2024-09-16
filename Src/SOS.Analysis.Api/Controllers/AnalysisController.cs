@@ -405,7 +405,8 @@ namespace SOS.Analysis.Api.Controllers
                         searchFilter!.Geographics!.BoundingBox!.ToEnvelope().Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM),
                         gridCellSizeInMeters.Value,
                         _analysisManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, filter),
-                        true
+                        true,
+                        4.0 // allow 4 times more tiles in file order.
                     ));
 
                 if (validationResult.IsFailure)
@@ -584,7 +585,8 @@ namespace SOS.Analysis.Api.Controllers
                         searchFilter!.Geographics!.BoundingBox!.ToEnvelope().Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM),
                         gridCellSizeInMeters.Value,
                         _analysisManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, filter),
-                        true
+                        true,
+                        4.0 // allow 4 times more tiles in file order.
                     ));
 
                 if (validationResult.IsFailure)

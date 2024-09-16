@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 
 namespace SOS.Lib.Helpers
 {
@@ -16,6 +17,22 @@ namespace SOS.Lib.Helpers
         public static string CreateFilenameWithDate(string name, string fileExtension)
         {
             return CreateFilenameWithDate(name, fileExtension, DateTime.Now);
+        }
+
+        /// <summary>
+        /// Remove illegal characters from filename
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <param name="replaceChar"></param>
+        /// <returns></returns>
+        public static string GetSafeFileName(string fileName, char replaceChar)
+        {            
+            foreach (char c in Path.GetInvalidFileNameChars())
+            {
+                fileName = fileName.Replace(c, replaceChar);
+            }
+
+            return fileName;
         }
 
         /// <summary>

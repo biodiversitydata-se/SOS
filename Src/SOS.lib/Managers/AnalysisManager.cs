@@ -575,7 +575,8 @@ namespace SOS.Lib.Managers
                         filter.Taxa.Ids = new List<int>() { taxonId };
                         Models.Interfaces.IBasicTaxon taxon = _taxonManager.TaxonTree.GetTreeNode(taxonId).Data;
                         string taxonName = !string.IsNullOrEmpty(taxon.VernacularName) ? $"{taxon.ScientificName} ({taxon.VernacularName})" : taxon.ScientificName;
-                        var taxonFilePath = Path.Combine(temporaryZipExportFolderPath, $"{taxon.Id}-{taxonName}.geojson");
+                        string taxonFileName = FilenameHelper.GetSafeFileName(taxonName, '-');
+                        var taxonFilePath = Path.Combine(temporaryZipExportFolderPath, $"{taxon.Id}-{taxonFileName}.geojson");
 
                         aooEooResult = await CalculateAooAndEooAsync(
                             roleId,
@@ -711,7 +712,8 @@ namespace SOS.Lib.Managers
                         filter.Taxa.Ids = new List<int>() { taxonId };
                         Models.Interfaces.IBasicTaxon taxon = _taxonManager.TaxonTree.GetTreeNode(taxonId).Data;
                         string taxonName = !string.IsNullOrEmpty(taxon.VernacularName) ? $"{taxon.ScientificName} ({taxon.VernacularName})" : taxon.ScientificName;
-                        var taxonFilePath = Path.Combine(temporaryZipExportFolderPath, $"{taxon.Id}-{taxonName}.geojson");
+                        string taxonFileName = FilenameHelper.GetSafeFileName(taxonName, '-');
+                        var taxonFilePath = Path.Combine(temporaryZipExportFolderPath, $"{taxon.Id}-{taxonFileName}.geojson");
                         aooEooResult = await CalculateAooAndEooArticle17Async(
                             roleId,
                             authorizationApplicationIdentifier,

@@ -529,7 +529,8 @@ namespace SOS.Shared.Api.Validators
             Envelope envelope,
             int gridCellSizeInMeters,
             Task<long> countTask,
-            bool internalLimit = false)
+            bool internalLimit = false,
+            double internalLimitFactor = 1.0)
         {
             if (envelope == null)
             {
@@ -539,7 +540,7 @@ namespace SOS.Shared.Api.Validators
             var maxLonTiles = Math.Ceiling((envelope.MaxX - envelope.MinX) / gridCellSizeInMeters);
             var maxLatTiles = Math.Ceiling((envelope.MaxY - envelope.MinY) / gridCellSizeInMeters);
             var maxTilesTot = maxLonTiles * maxLatTiles;
-            var tilesLimit = internalLimit ? _tilesLimitInternal : _tilesLimitPublic;
+            var tilesLimit = internalLimit ? (int)(_tilesLimitInternal*internalLimitFactor) : _tilesLimitPublic;
 
             return await TryValidateTilesLimitAsync(tilesLimit, maxTilesTot, countTask);
         }

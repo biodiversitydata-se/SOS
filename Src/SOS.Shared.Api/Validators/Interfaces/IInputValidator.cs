@@ -188,12 +188,14 @@ namespace SOS.Shared.Api.Validators.Interfaces
         /// <param name="gridCellSizeInMeters"></param>
         /// <param name="countTask"></param>
         /// <param name="internalLimit"></param>
+        /// <param name="internalLimitFactor"></param>
         /// <returns></returns>
         Task<Result> ValidateTilesLimitMetricAsync(
             Envelope envelope,
             int gridCellSizeInMeters,
             Task<long> countTask,
-            bool internalLimit = false);
+            bool internalLimit = false,
+            double internalLimitFactor = 1.0);
 
         /// <summary>
         /// Validate translation culture code
