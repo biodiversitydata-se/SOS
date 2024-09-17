@@ -12,7 +12,6 @@ using SOS.Lib.Helpers;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Export;
 using SOS.Lib.Models.Gis;
-using SOS.Lib.Models.Search;
 using SOS.Lib.Models.Search.Enums;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Repositories.Processed.Interfaces;

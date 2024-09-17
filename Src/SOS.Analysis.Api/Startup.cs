@@ -12,8 +12,6 @@ using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
 using SOS.Analysis.Api.ApplicationInsights;
 using SOS.Analysis.Api.Configuration;
-using SOS.Analysis.Api.Managers;
-using SOS.Analysis.Api.Managers.Interfaces;
 using SOS.Analysis.Api.Middleware;
 using SOS.Lib.ActionFilters;
 using SOS.Lib.ApplicationInsights;
@@ -69,7 +67,7 @@ namespace SOS.Analysis.Api
         private const string InternalApiName = "InternalSosAnalysis";
         private const string PublicApiName = "PublicSosAnalysis";
         private const string InternalApiPrefix = "Internal";
-
+        private bool _disableHangfireInit = false;
         private bool _isDevelopment;
         private IWebHostEnvironment CurrentEnvironment { get; set; }
 
@@ -142,6 +140,7 @@ namespace SOS.Analysis.Api
                 // In production you should store the secret values as environment variables.
                 builder.AddUserSecrets<Startup>();
             }
+            _disableHangfireInit = GetDisableFeature(environmentVariable: "DISABLE_HANGFIRE_INIT");
 
             Configuration = builder.Build();
         }
@@ -340,7 +339,7 @@ namespace SOS.Analysis.Api
             services.AddSingleton<IClassCache<Dictionary<string, ClusterHealthResponse>>>(clusterHealthCache);
             
             // Add managers            
-            services.AddScoped<Managers.Interfaces.IAnalysisManager, Managers.AnalysisManager>();
+            services.AddScoped<IAnalysisManager, AnalysisManager>();
             services.AddScoped<IFilterManager, FilterManager>();
             services.AddSingleton<ITaxonManager, TaxonManager>();
 
@@ -358,6 +357,7 @@ namespace SOS.Analysis.Api
             services.AddSingleton<IHttpClientService, HttpClientService>();
             services.AddScoped<IUserService, UserService>();
             services.AddSingleton<ICryptoService, CryptoService>();
+            services.AddSingleton<IFileService, FileService>();
 
             // Add Utilites
             services.AddSingleton<ISearchFilterUtility, SearchFilterUtility>();
@@ -366,29 +366,32 @@ namespace SOS.Analysis.Api
             services.AddScoped<IInputValidator, InputValidator>();
 
             // Hangfire
-            var mongoConfiguration = Configuration.GetSection("HangfireDbConfiguration").Get<HangfireDbConfiguration>();
-            services.AddHangfire(configuration =>
-                configuration
-                    .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
-                    .UseSimpleAssemblyNameTypeSerializer()
-                    .UseRecommendedSerializerSettings(m =>
-                    {
-                        m.Converters.Add(new NewtonsoftGeoShapeConverter());
-                        m.Converters.Add(new StringEnumConverter());
-                    })
-                    .UseMongoStorage(new MongoClient(mongoConfiguration.GetMongoDbSettings()),
-                        mongoConfiguration.DatabaseName,
-                        new MongoStorageOptions
+            if (!_disableHangfireInit)
+            {
+                var mongoConfiguration = Configuration.GetSection("HangfireDbConfiguration").Get<HangfireDbConfiguration>();
+                services.AddHangfire(configuration =>
+                    configuration
+                        .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+                        .UseSimpleAssemblyNameTypeSerializer()
+                        .UseRecommendedSerializerSettings(m =>
                         {
-                            MigrationOptions = new MongoMigrationOptions
-                            {
-                                MigrationStrategy = new MigrateMongoMigrationStrategy(),
-                                BackupStrategy = new CollectionMongoBackupStrategy()
-                            },
-                            Prefix = "hangfire",
-                            CheckConnection = true
+                            m.Converters.Add(new NewtonsoftGeoShapeConverter());
+                            m.Converters.Add(new StringEnumConverter());
                         })
-            );
+                        .UseMongoStorage(new MongoClient(mongoConfiguration.GetMongoDbSettings()),
+                            mongoConfiguration.DatabaseName,
+                            new MongoStorageOptions
+                            {
+                                MigrationOptions = new MongoMigrationOptions
+                                {
+                                    MigrationStrategy = new MigrateMongoMigrationStrategy(),
+                                    BackupStrategy = new CollectionMongoBackupStrategy()
+                                },
+                                Prefix = "hangfire",
+                                CheckConnection = true
+                            })
+                );
+            }
         }
 
         /// <summary>
@@ -406,8 +409,11 @@ namespace SOS.Analysis.Api
             Lib.Configuration.Shared.ApplicationInsights applicationInsightsConfiguration,
             AnalysisConfiguration statisticsConfiguration)
         {
-            app.UseHangfireDashboard();
-
+            if (!_disableHangfireInit)
+            {
+                app.UseHangfireDashboard();
+            }
+            
             if (statisticsConfiguration.EnableResponseCompression)
             {
                 app.UseResponseCompression();
@@ -476,6 +482,25 @@ namespace SOS.Analysis.Api
                 ? actionApiVersionModel.DeclaredApiVersions
                 : actionApiVersionModel.ImplementedApiVersions;
             return apiVersions;
+        }
+
+        private static bool GetDisableFeature(string environmentVariable)
+        {
+            string value = Environment.GetEnvironmentVariable(environmentVariable);
+
+            if (value != null)
+            {
+                if (bool.TryParse(value, out var val))
+                {
+                    return val;
+                }
+
+                return false;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }

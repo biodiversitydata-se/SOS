@@ -1,4 +1,4 @@
-﻿namespace SOS.Lib.Models.Search
+﻿namespace SOS.Lib.Models.Analysis
 {
     public class UserAggregationResponse
     {

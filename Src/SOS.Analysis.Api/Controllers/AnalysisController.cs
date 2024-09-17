@@ -3,11 +3,12 @@ using Microsoft.AspNetCore.Mvc;
 using NetTopologySuite.Features;
 using SOS.Analysis.Api.Configuration;
 using SOS.Analysis.Api.Controllers.Interfaces;
-using SOS.Analysis.Api.Managers.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Exceptions;
 using SOS.Lib.Extensions;
 using SOS.Lib.Jobs.Export;
+using SOS.Lib.Managers.Interfaces;
+using SOS.Lib.Models.Analysis;
 using SOS.Lib.Models.Export;
 using SOS.Lib.Models.Search.Enums;
 using SOS.Lib.Repositories.Processed.Interfaces;
@@ -115,7 +116,8 @@ namespace SOS.Analysis.Api.Controllers
                     take
                 );
 
-                return new OkObjectResult(result!);
+                PagedAggregationResultDto<UserAggregationResponseDto> dto = result.ToDto();
+                return new OkObjectResult(dto);
             }
             catch (AuthenticationRequiredException)
             {
@@ -161,7 +163,7 @@ namespace SOS.Analysis.Api.Controllers
 
                 var filter = searchFilter?.ToSearchFilter(this.GetUserId(), searchFilter?.ProtectionFilter, "sv-SE")!;
 
-                var result = await _analysisManager.AggregateByUserFieldAsync(
+                IEnumerable<AggregationItem> result = await _analysisManager.AggregateByUserFieldAsync(
                     roleId,
                     authorizationApplicationIdentifier,
                     filter,
@@ -171,7 +173,8 @@ namespace SOS.Analysis.Api.Controllers
                     sortOrder
                 );
 
-                return new OkObjectResult(result!);
+                var dto = result.ToDto();
+                return new OkObjectResult(dto);
             }
             catch (AuthenticationRequiredException)
             {
@@ -185,7 +188,7 @@ namespace SOS.Analysis.Api.Controllers
         }
 
         [HttpPost("/internal/atlas")]
-        [ProducesResponseType(typeof(PagedAggregationResultDto<UserAggregationResponseDto>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(FeatureCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
@@ -209,12 +212,12 @@ namespace SOS.Analysis.Api.Controllers
                 }
 
                 var filter = searchFilter?.ToSearchFilter(this.GetUserId(), searchFilter?.ProtectionFilter, "sv-SE")!;
-               
-                var result = await _analysisManager.AtlasAggregateAsync(
+
+                FeatureCollection result = await _analysisManager.AtlasAggregateAsync(
                     roleId,
                     authorizationApplicationIdentifier,
                     filter,
-                    atlasSize
+                    (AtlasAreaSize)atlasSize
                 );
 
                 return new OkObjectResult(result!);
@@ -308,7 +311,7 @@ namespace SOS.Analysis.Api.Controllers
                     return BadRequest(validationResult.Error);
                 }
 
-                var result = await _analysisManager.CalculateAooAndEooAsync(
+                (FeatureCollection FeatureCollection, List<Lib.Models.Analysis.AooEooItem> AooEooItems)? result = await _analysisManager.CalculateAooAndEooAsync(
                     roleId,
                     authorizationApplicationIdentifier,
                     filter,
@@ -322,7 +325,10 @@ namespace SOS.Analysis.Api.Controllers
                     metricCoordinateSys!.Value,
                     coordinateSystem!.Value
                 );
-                return new OkObjectResult(result!);
+                if (result == null)
+                    return new OkObjectResult(null);
+
+                return new OkObjectResult(result!.Value.FeatureCollection);
             }
             catch (AuthenticationRequiredException)
             {
@@ -525,7 +531,7 @@ namespace SOS.Analysis.Api.Controllers
                     return BadRequest(validationResult.Error);
                 }
 
-                var result = await _analysisManager.CalculateAooAndEooArticle17Async(
+                (FeatureCollection FeatureCollection, Lib.Models.Analysis.AooEooItem AooEooItem)? result = await _analysisManager.CalculateAooAndEooArticle17Async(
                     roleId,
                     authorizationApplicationIdentifier,
                     filter,
@@ -534,7 +540,11 @@ namespace SOS.Analysis.Api.Controllers
                     metricCoordinateSys!.Value,
                     coordinateSystem!.Value
                 );
-                return new OkObjectResult(result!);
+
+                if (result == null)
+                    return new OkObjectResult(null!);
+
+                return new OkObjectResult(result!.Value.FeatureCollection);
             }
             catch (AuthenticationRequiredException)
             {
