@@ -338,7 +338,7 @@ namespace SOS.Analysis.Api
             services.AddSingleton<IClassCache<TaxonTree<IBasicTaxon>>, ClassCache<TaxonTree<IBasicTaxon>>>();
             var clusterHealthCache = new ClassCache<Dictionary<string, ClusterHealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<Dictionary<string, ClusterHealthResponse>>>()) { CacheDuration = TimeSpan.FromMinutes(2) };
             services.AddSingleton<IClassCache<Dictionary<string, ClusterHealthResponse>>>(clusterHealthCache);
-
+            
             // Add managers            
             services.AddScoped<Managers.Interfaces.IAnalysisManager, Managers.AnalysisManager>();
             services.AddScoped<IFilterManager, FilterManager>();
@@ -352,6 +352,7 @@ namespace SOS.Analysis.Api
             services.AddScoped<IProcessedObservationCoreRepository, ProcessedObservationCoreRepository>();            
             services.AddScoped<ITaxonRepository, TaxonRepository>();
             services.AddScoped<ITaxonListRepository, TaxonListRepository>();
+            services.AddScoped<IUserExportRepository, UserExportRepository>();
 
             // Add services
             services.AddSingleton<IHttpClientService, HttpClientService>();
