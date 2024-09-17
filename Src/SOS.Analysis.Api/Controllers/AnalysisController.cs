@@ -410,6 +410,7 @@ namespace SOS.Analysis.Api.Controllers
                     validateFilter ?? false ? _inputValidator.ValidateSearchFilter(searchFilter!) : Result.Success(),
                     alphaValues?.Any() ?? false ? Result.Success() : Result.Failure("You must state at least one alpha value"),
                     _inputValidator.ValidateInt(gridCellSizeInMeters!.Value, minLimit: 1000, maxLimit: 100000, "Grid cell size in meters"),
+                    ValidateUserExport(userExports),
                     await _inputValidator.ValidateTilesLimitMetricAsync(
                         searchFilter!.Geographics!.BoundingBox!.ToEnvelope().Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM),
                         gridCellSizeInMeters.Value,
@@ -422,7 +423,8 @@ namespace SOS.Analysis.Api.Controllers
                 {
                     return BadRequest(validationResult.Error);
                 }
-     
+
+                var matchCount = await _analysisManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, filter);
                 var encryptedPassword = await _cryptoService.EncryptAsync(encryptPassword);
                 var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
                     job.RunAooEooAsync(
@@ -451,7 +453,7 @@ namespace SOS.Analysis.Api.Controllers
                     Id = jobId,
                     Status = ExportJobStatus.Queued,
                     CreatedDate = DateTime.UtcNow,
-                    NumberOfObservations = 0,
+                    NumberOfObservations = (int)matchCount,
                     Format = ExportFormat.AooEoo,
                     Description = description,
                     OutputFieldSet = null
@@ -592,6 +594,7 @@ namespace SOS.Analysis.Api.Controllers
                     _inputValidator.ValidateInt(maxDistance.Value, minLimit: 1000, maxLimit: 50000, "Max distance in meters"),
                     validateFilter ?? false ? _inputValidator.ValidateSearchFilter(searchFilter!) : Result.Success(),
                     _inputValidator.ValidateInt(gridCellSizeInMeters!.Value, minLimit: 1000, maxLimit: 100000, "Grid cell size in meters"),
+                    ValidateUserExport(userExports),
                     await _inputValidator.ValidateTilesLimitMetricAsync(
                         searchFilter!.Geographics!.BoundingBox!.ToEnvelope().Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM),
                         gridCellSizeInMeters.Value,
@@ -600,6 +603,7 @@ namespace SOS.Analysis.Api.Controllers
                         4.0 // allow 4 times more tiles in file order.
                     ));
 
+                var matchCount = await _analysisManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, filter);
                 if (validationResult.IsFailure)
                 {
                     return BadRequest(validationResult.Error);
@@ -628,7 +632,7 @@ namespace SOS.Analysis.Api.Controllers
                     Id = jobId,
                     Status = ExportJobStatus.Queued,
                     CreatedDate = DateTime.UtcNow,
-                    NumberOfObservations = 0,
+                    NumberOfObservations = (int)matchCount,
                     Format = ExportFormat.AooEooArticle17,
                     Description = description,
                     OutputFieldSet = null
@@ -667,6 +671,22 @@ namespace SOS.Analysis.Api.Controllers
         private async Task UpdateUserExportsAsync(UserExport userExport)
         {
             await _userExportRepository.AddOrUpdateAsync(userExport);
+        }
+
+        /// <summary>
+        /// Validate user export
+        /// </summary>
+        /// <param name="userExport"></param>
+        /// <returns></returns>
+        private Result ValidateUserExport(UserExport userExport)
+        {
+            var onGoingJobCount = userExport?.Jobs?.Where(j => new[] { ExportJobStatus.Queued, ExportJobStatus.Processing }.Contains(j.Status))?.Count() ?? 0;
+            if (onGoingJobCount > (userExport?.Limit ?? 1))
+            {
+                return Result.Failure($"User already has {onGoingJobCount} on going exports.");
+            }
+
+            return Result.Success();
         }
     }
 }
