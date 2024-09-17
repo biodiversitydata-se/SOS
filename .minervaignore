@@ -1,0 +1,5 @@
+Src/SOS.DOI #Digital Object Identifier. Har aldrig driftsatts. Kan eventuellt bli aktuellt i framtiden. 
+Src/SOS.UserStatistics.Api #Artportalens topplistor. Har aldrig driftsatts. Kan eventuellt bli aktuellt i framtiden. 
+Src/Blazor #Artportalens topplistor. Har aldrig driftsatts. Kan eventuellt bli aktuellt i framtiden. 
+Tests/Integration/SOS.UserStatistics.Api.AutomaticIntegrationTests #Artportalens topplistor. Har aldrig driftsatts. Kan eventuellt bli aktuellt i framtiden.
+Tests/LiveIntegration/SOS.UserStatistics.Api.IntegrationTests #Artportalens topplistor. Har aldrig driftsatts. Kan eventuellt bli aktuellt i framtiden.
