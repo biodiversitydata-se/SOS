@@ -10,6 +10,7 @@ using SOS.Lib.Extensions;
 using SOS.Lib.Jobs.Export;
 using SOS.Lib.Models.Export;
 using SOS.Lib.Models.Search.Enums;
+using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Services.Interfaces;
 using SOS.Lib.Swagger;
 using SOS.Shared.Api.Dtos.Enum;
@@ -38,6 +39,8 @@ namespace SOS.Analysis.Api.Controllers
         private readonly IInputValidator _inputValidator;
         private readonly AnalysisConfiguration _analysisConfiguration;
         private readonly ICryptoService _cryptoService;
+        private readonly IUserExportRepository _userExportRepository;
+        private readonly int _defaultUserExportLimit;
         private readonly ILogger<AnalysisController> _logger;
 
         /// <summary>
@@ -48,6 +51,7 @@ namespace SOS.Analysis.Api.Controllers
         /// <param name="inputValidator"></param>
         /// <param name="analysisConfiguration"></param>
         /// <param name="cryptoService"></param>
+        /// <param name="userExportRepository"></param>
         /// <param name="logger"></param>
         /// <exception cref="ArgumentNullException"></exception>
         public AnalysisController(
@@ -56,6 +60,7 @@ namespace SOS.Analysis.Api.Controllers
             IInputValidator inputValidator,
             AnalysisConfiguration analysisConfiguration,
             ICryptoService cryptoService,
+            IUserExportRepository userExportRepository,
             ILogger<AnalysisController> logger) 
         {
             _analysisManager = analysisManager ?? throw new ArgumentNullException(nameof(analysisManager));
@@ -63,6 +68,9 @@ namespace SOS.Analysis.Api.Controllers
             _searchFilterUtility = searchFilterUtility ?? throw new ArgumentNullException(nameof(searchFilterUtility));
             _analysisConfiguration = analysisConfiguration ?? throw new ArgumentNullException(nameof(analysisConfiguration));
             _cryptoService = cryptoService ?? throw new ArgumentNullException(nameof(cryptoService));
+            _userExportRepository =
+                userExportRepository ?? throw new ArgumentNullException(nameof(userExportRepository));
+            _defaultUserExportLimit = analysisConfiguration?.DefaultUserExportLimit ?? throw new ArgumentNullException(nameof(analysisConfiguration));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -381,6 +389,7 @@ namespace SOS.Analysis.Api.Controllers
             {
                 this.User.CheckAuthorization(_analysisConfiguration.ProtectedScope!, searchFilter.ProtectionFilter);
                 searchFilter = await _searchFilterUtility.InitializeSearchFilterAsync(searchFilter);
+                var userExports = await GetUserExportsAsync();
                 var edgeLengthValidation = Result.Success();
                 if ((useEdgeLengthRatio ?? false) && (alphaValues?.Any() ?? false))
                 {
@@ -413,7 +422,7 @@ namespace SOS.Analysis.Api.Controllers
                 {
                     return BadRequest(validationResult.Error);
                 }
-                
+     
                 var encryptedPassword = await _cryptoService.EncryptAsync(encryptPassword);
                 var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
                     job.RunAooEooAsync(
@@ -448,6 +457,8 @@ namespace SOS.Analysis.Api.Controllers
                     OutputFieldSet = null
                 };
 
+                userExports.Jobs.Add(exportJobInfo);
+                await UpdateUserExportsAsync(userExports);
                 return new OkObjectResult(jobId);                
             }
             catch (AuthenticationRequiredException)
@@ -575,7 +586,7 @@ namespace SOS.Analysis.Api.Controllers
                 this.User.CheckAuthorization(_analysisConfiguration.ProtectedScope!, searchFilter.ProtectionFilter);
                 searchFilter = await _searchFilterUtility.InitializeSearchFilterAsync(searchFilter);
                 var filter = searchFilter?.ToSearchFilter(this.GetUserId(), searchFilter?.ProtectionFilter, "sv-SE")!;
-
+                var userExports = await GetUserExportsAsync();
                 var validationResult = Result.Combine(
                     maxDistance > 0 ? Result.Success() : Result.Failure("You must state max distance"),
                     _inputValidator.ValidateInt(maxDistance.Value, minLimit: 1000, maxLimit: 50000, "Max distance in meters"),
@@ -623,6 +634,8 @@ namespace SOS.Analysis.Api.Controllers
                     OutputFieldSet = null
                 };
 
+                userExports.Jobs.Add(exportJobInfo);
+                await UpdateUserExportsAsync(userExports);
                 return new OkObjectResult(jobId);
             }
             catch (AuthenticationRequiredException)
@@ -634,6 +647,26 @@ namespace SOS.Analysis.Api.Controllers
                 _logger.LogError(e, "Order AooAndEoo Article 17 error.");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
+        }
+
+        /// <summary>
+        /// Get user export info
+        /// </summary>
+        /// <returns></returns>
+        private async Task<UserExport> GetUserExportsAsync()
+        {
+            var userExport = await _userExportRepository.GetAsync(this.GetUserId());
+            return userExport ?? new UserExport { Id = this.GetUserId(), Limit = _defaultUserExportLimit };
+        }
+
+        /// <summary>
+        /// Update user exports
+        /// </summary>
+        /// <param name="userExport"></param>
+        /// <returns></returns>
+        private async Task UpdateUserExportsAsync(UserExport userExport)
+        {
+            await _userExportRepository.AddOrUpdateAsync(userExport);
         }
     }
 }
