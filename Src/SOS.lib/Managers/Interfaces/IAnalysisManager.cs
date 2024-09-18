@@ -129,7 +129,9 @@ namespace SOS.Lib.Managers.Interfaces
         /// <param name="filter"></param>
         /// <returns></returns>
         Task<long> GetMatchCountAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilterBase filter);
-        
+
+        Task<int> GetNumberOfTaxaInFilterAsync(SearchFilterBase filter);
+
         Task<FileExportResult> CreateAooEooExportAsync(
             int? roleId,
             string authorizationApplicationIdentifier,

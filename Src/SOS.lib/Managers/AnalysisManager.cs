@@ -489,6 +489,12 @@ namespace SOS.Lib.Managers
             return await _processedObservationRepository.GetMatchCountAsync(filter);
         }
 
+        public async Task<int> GetNumberOfTaxaInFilterAsync(SearchFilterBase filter)
+        {
+            await _filterManager.PrepareFilterAsync(null, null, filter);
+            return filter?.Taxa?.Ids != null ? filter.Taxa.Ids.Count() : 0;
+        }
+
         public async Task<FileExportResult> CreateAooEooExportAsync(
             int? roleId,
             string authorizationApplicationIdentifier,

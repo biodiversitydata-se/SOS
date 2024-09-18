@@ -430,7 +430,7 @@ namespace SOS.Analysis.Api.Controllers
                     return BadRequest(validationResult.Error);
                 }
 
-                var matchCount = await _analysisManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, filter);
+                int numberOfTaxa = await _analysisManager.GetNumberOfTaxaInFilterAsync(filter);
                 var encryptedPassword = await _cryptoService.EncryptAsync(encryptPassword);
                 var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
                     job.RunAooEooAsync(
@@ -459,7 +459,7 @@ namespace SOS.Analysis.Api.Controllers
                     Id = jobId,
                     Status = ExportJobStatus.Queued,
                     CreatedDate = DateTime.UtcNow,
-                    NumberOfObservations = (int)matchCount,
+                    NumberOfObservations = numberOfTaxa,
                     Format = ExportFormat.AooEoo,
                     Description = description,
                     OutputFieldSet = null
@@ -612,8 +612,8 @@ namespace SOS.Analysis.Api.Controllers
                         true,
                         4.0 // allow 4 times more tiles in file order.
                     ));
-
-                var matchCount = await _analysisManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, filter);
+                
+                int numberOfTaxa = await _analysisManager.GetNumberOfTaxaInFilterAsync(filter);
                 if (validationResult.IsFailure)
                 {
                     return BadRequest(validationResult.Error);
@@ -642,7 +642,7 @@ namespace SOS.Analysis.Api.Controllers
                     Id = jobId,
                     Status = ExportJobStatus.Queued,
                     CreatedDate = DateTime.UtcNow,
-                    NumberOfObservations = (int)matchCount,
+                    NumberOfObservations = numberOfTaxa,
                     Format = ExportFormat.AooEooArticle17,
                     Description = description,
                     OutputFieldSet = null
