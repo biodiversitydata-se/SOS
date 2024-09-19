@@ -1,6 +1,7 @@
 ﻿using Hangfire;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Enums;
+using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.IO.Excel.Interfaces;
@@ -61,6 +62,7 @@ namespace SOS.Lib.IO.Excel
             bool gzip,
             IJobCancellationToken cancellationToken)
         {
+            const int fastSearchLimit = 10000;
             var temporaryZipExportFolderPath = Path.Combine(exportPath, "zip");
 
             try
@@ -77,16 +79,31 @@ namespace SOS.Lib.IO.Excel
                 csvFileHelper.WriteRow(propertyFields.Select(pf => ObservationPropertyFieldDescriptionHelper.GetPropertyLabel(pf, propertyLabelType)));
 
                 var expectedNoOfObservations = await _processedObservationRepository.GetMatchCountAsync(filter);
-                var searchResult = await _processedObservationRepository.GetObservationsBySearchAfterAsync<Observation>(filter);
+                bool usePointInTimeSearch = expectedNoOfObservations > fastSearchLimit;
+                Models.Search.Result.PagedResult<dynamic> fastSearchResult = null;
+                Models.Search.Result.SearchAfterResult<Observation> searchResult = null;                
+                if (!usePointInTimeSearch)
+                {
+                    fastSearchResult = await _processedObservationRepository.GetChunkAsync(filter, 0, 10000);
+                }
+                else
+                {
+                    searchResult = await _processedObservationRepository.GetObservationsBySearchAfterAsync<Observation>(filter);
+                }
 
-                while (searchResult?.Records?.Any() ?? false)
+                while ((!usePointInTimeSearch && (fastSearchResult?.Records?.Any() ?? false)) || (usePointInTimeSearch && (searchResult?.Records?.Any() ?? false)))
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
-                    // Start fetching next batch of observations.
-                    var searchResultTask = _processedObservationRepository.GetObservationsBySearchAfterAsync<Observation>(filter, searchResult.PointInTimeId, searchResult.SearchAfter);
-
+                    Observation[] processedObservations = null;
                     // Fetch observations from ElasticSearch.
-                    var processedObservations = searchResult.Records.ToArray();
+                    if (usePointInTimeSearch)
+                    {
+                        processedObservations = searchResult.Records.ToArray();
+                    }
+                    else
+                    {
+                        processedObservations = fastSearchResult.Records.ToObservations().ToArray();
+                    }
 
                     // Resolve vocabulary values.
                     _vocabularyValueResolver.ResolveVocabularyMappedValues(processedObservations, culture);
@@ -109,7 +126,15 @@ namespace SOS.Lib.IO.Excel
                     nrObservations += processedObservations.Length;
 
                     // Get next batch of observations.
-                    searchResult = await searchResultTask;
+                    if (usePointInTimeSearch)
+                    {
+                        // Start fetching next batch of observations.
+                        searchResult = await _processedObservationRepository.GetObservationsBySearchAfterAsync<Observation>(filter, searchResult.PointInTimeId, searchResult.SearchAfter);
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
 
                 csvFileHelper.FinishWrite();

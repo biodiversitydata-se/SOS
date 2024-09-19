@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
 using SOS.Lib.Enums;
+using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.IO.GeoJson.Interfaces;
@@ -10,6 +11,7 @@ using SOS.Lib.Models;
 using SOS.Lib.Models.Export;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Filters;
+using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Services.Interfaces;
 using System;
@@ -258,12 +260,14 @@ namespace SOS.Lib.IO.GeoJson
             bool gzip,
             IJobCancellationToken cancellationToken)
         {
+            const int fastSearchLimit = 10000;
             var temporaryZipExportFolderPath = Path.Combine(exportPath, "zip");
 
             try
             {
                 var nrObservations = 0;
                 var expectedNoOfObservations = await _processedObservationRepository.GetMatchCountAsync(filter);
+                bool usePointInTimeSearch = expectedNoOfObservations > fastSearchLimit;
                 var propertyFields =
                     ObservationPropertyFieldDescriptionHelper.GetExportFieldsFromOutputFields(filter.Output?.Fields, true);
                 EnsureCoordinatesAreRetrievedFromDb(filter.Output);
@@ -285,18 +289,34 @@ namespace SOS.Lib.IO.GeoJson
                 jsonWriter.WritePropertyName("features");
                 jsonWriter.WriteStartArray();
 
-                var searchAfterResult = await _processedObservationRepository.GetObservationsBySearchAfterAsync<dynamic>(filter);
+                PagedResult<dynamic> fastSearchResult = null;
+                SearchAfterResult<dynamic> searchResult = null;
+                if (!usePointInTimeSearch)
+                {
+                    fastSearchResult = await _processedObservationRepository.GetChunkAsync(filter, 0, 10000);
+                }
+                else
+                {                    
+                    searchResult = await _processedObservationRepository.GetObservationsBySearchAfterAsync<dynamic>(filter);                    
+                }
 
-                while (searchAfterResult?.Records?.Any() ?? false)
+                while ((!usePointInTimeSearch && (fastSearchResult?.Records?.Any() ?? false)) || (usePointInTimeSearch && (searchResult?.Records?.Any() ?? false)))
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
-                    nrObservations += searchAfterResult.Records.Count();
-                    // Start fetching next batch of observations.
-                    var searchAfterResultTask = _processedObservationRepository.GetObservationsBySearchAfterAsync<dynamic>(filter, searchAfterResult.PointInTimeId, searchAfterResult.SearchAfter);
-
+                    
                     if (flatOut)
                     {
-                        var processedObservations = CastDynamicsToObservations(searchAfterResult.Records);
+                        Observation[] processedObservations = null;
+                        
+                        if (usePointInTimeSearch)
+                        {
+                            processedObservations = searchResult.Records.ToObservations().ToArray();
+                        }
+                        else
+                        {
+                            processedObservations = fastSearchResult.Records.ToObservations().ToArray();
+                        }
+                        nrObservations += processedObservations.Length;
 
                         _vocabularyValueResolver.ResolveVocabularyMappedValues(processedObservations, culture, true);
                         await _generalizationResolver.ResolveGeneralizedObservationsAsync(filter, processedObservations);
@@ -309,8 +329,17 @@ namespace SOS.Lib.IO.GeoJson
                     }
                     else
                     {
-                        var processedRecords = searchAfterResult.Records.Cast<IDictionary<string, object>>();
+                        IEnumerable<IDictionary<string, object>> processedRecords;
+                        if (usePointInTimeSearch)
+                        {
+                            processedRecords = searchResult.Records.Cast<IDictionary<string, object>>();
+                        }
+                        else
+                        {
+                            processedRecords = fastSearchResult.Records.Cast<IDictionary<string, object>>();
+                        }
 
+                        nrObservations += processedRecords.Count();
                         _vocabularyValueResolver.ResolveVocabularyMappedValues(processedRecords, culture, true);
                         await _generalizationResolver.ResolveGeneralizedObservationsAsync(filter, processedRecords);
 
@@ -322,7 +351,14 @@ namespace SOS.Lib.IO.GeoJson
                     }
 
                     // Get next batch of observations.
-                    searchAfterResult = await searchAfterResultTask;
+                    if (usePointInTimeSearch)
+                    {                        
+                        searchResult = await _processedObservationRepository.GetObservationsBySearchAfterAsync<dynamic>(filter, searchResult.PointInTimeId, searchResult.SearchAfter);                        
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
 
                 jsonWriter.WriteEndArray();

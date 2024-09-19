@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using SOS.Lib.Enums;
+using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.IO.Excel.Interfaces;
@@ -138,6 +139,7 @@ namespace SOS.Lib.IO.Excel
             bool gzip,
             IJobCancellationToken cancellationToken)
         {
+            const int fastSearchLimit = 10000;
             var temporaryZipExportFolderPath = Path.Combine(exportPath, "zip");
 
             try
@@ -155,11 +157,18 @@ namespace SOS.Lib.IO.Excel
                 _fileService.CreateDirectory(temporaryZipExportFolderPath);
 
                 var expectedNoOfObservations = await _processedObservationRepository.GetMatchCountAsync(filter);
-                var stopwatch = Stopwatch.StartNew();
-                _logger.LogDebug($"Excel export. Begin ES Scroll call for file: {fileName}");
-                var searchResult = await _processedObservationRepository.GetObservationsBySearchAfterAsync<Observation>(filter);
-                stopwatch.Stop();
-                _logger.LogDebug($"Excel export. End ES Scroll call for file: {fileName}. Elapsed: {stopwatch.ElapsedMilliseconds / 1000}s");
+                bool usePointInTimeSearch = expectedNoOfObservations > fastSearchLimit;
+                Models.Search.Result.PagedResult<dynamic> fastSearchResult = null;
+                Models.Search.Result.SearchAfterResult<Observation> searchResult = null;
+                if (!usePointInTimeSearch)
+                {
+                    fastSearchResult = await _processedObservationRepository.GetChunkAsync(filter, 0, 10000);
+                }
+                else
+                {
+                    searchResult = await _processedObservationRepository.GetObservationsBySearchAfterAsync<Observation>(filter);
+                }
+
                 var fileCount = 0;
                 var rowIndex = 0;
                 ExcelPackage package = null;
@@ -167,14 +176,20 @@ namespace SOS.Lib.IO.Excel
                 ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
                 var packageSaveTasks = new List<Task>();
 
-                while (searchResult?.Records?.Any() ?? false)
+                while ((!usePointInTimeSearch && (fastSearchResult?.Records?.Any() ?? false)) || (usePointInTimeSearch && (searchResult?.Records?.Any() ?? false)))
                 {
-                    cancellationToken?.ThrowIfCancellationRequested();
-                    // Start fetching next batch of observations.
-                    var searchResultTask = _processedObservationRepository.GetObservationsBySearchAfterAsync<Observation>(filter, searchResult.PointInTimeId, searchResult.SearchAfter);
+                    cancellationToken?.ThrowIfCancellationRequested();                    
 
                     // Fetch observations from ElasticSearch.
-                    var processedObservations = searchResult.Records.ToArray();
+                    Observation[] processedObservations = null;
+                    if (usePointInTimeSearch)
+                    {
+                        processedObservations = searchResult.Records.ToArray();
+                    }
+                    else
+                    {
+                        processedObservations = fastSearchResult.Records.ToObservations().ToArray();
+                    }
 
                     // Resolve vocabulary values.
                     var debugObs = processedObservations.FirstOrDefault(m => m.Occurrence.OccurrenceId == "urn:lsid:artportalen.se:sighting:75884919");
@@ -228,12 +243,17 @@ namespace SOS.Lib.IO.Excel
                     }
 
                     nrObservations += processedObservations.Length;
+
                     // Get next batch of observations.
-                    stopwatch.Restart();
-                    _logger.LogDebug($"Excel export. Begin ES Scroll call for file: {fileName}");
-                    searchResult = await searchResultTask;
-                    stopwatch.Stop();
-                    _logger.LogDebug($"Excel export. End ES Scroll call for file: {fileName}. Elapsed: {stopwatch.ElapsedMilliseconds / 1000}s");
+                    if (usePointInTimeSearch)
+                    {
+                        // Start fetching next batch of observations.
+                        searchResult = await _processedObservationRepository.GetObservationsBySearchAfterAsync<Observation>(filter, searchResult.PointInTimeId, searchResult.SearchAfter);
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
 
                 // If less tha 99% of expected observations where fetched, something is wrong
