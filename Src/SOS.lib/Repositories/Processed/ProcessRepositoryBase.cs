@@ -23,7 +23,7 @@ namespace SOS.Lib.Repositories.Processed
         private readonly IElasticClientManager _elasticClientManager;
         private readonly ICache<string, ProcessedConfiguration> _processedConfigurationCache;
         protected readonly IClassCache<Dictionary<string, ClusterHealthResponse>> _clusterHealthCache;
-        private readonly ElasticSearchConfiguration _elasticConfiguration;
+        protected readonly ElasticSearchConfiguration _elasticConfiguration;
         private readonly ElasticSearchIndexConfiguration _elasticSearchIndexConfiguration;
         private readonly bool _toggleable;
         protected string _id = typeof(TEntity).Name;

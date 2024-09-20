@@ -137,6 +137,7 @@ namespace SOS.Export.IoC.Modules
             builder.RegisterType<CsvFileWriter>().As<ICsvFileWriter>().InstancePerLifetimeScope();
             builder.RegisterType<ExcelFileWriter>().As<IExcelFileWriter>().InstancePerLifetimeScope();
             builder.RegisterType<GeoJsonFileWriter>().As<IGeoJsonFileWriter>().InstancePerLifetimeScope();
+            builder.RegisterType<AnalysisManager>().As<IAnalysisManager>().InstancePerLifetimeScope();
             builder.RegisterType<GeneralizationResolver>().As<IGeneralizationResolver>().SingleInstance();
 
             // Helpers, static data => single instance 

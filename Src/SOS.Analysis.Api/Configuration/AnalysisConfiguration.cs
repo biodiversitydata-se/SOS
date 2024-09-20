@@ -21,5 +21,10 @@ namespace SOS.Analysis.Api.Configuration
         /// Response compression level.
         /// </summary>
         public CompressionLevel ResponseCompressionLevel { get; set; } = CompressionLevel.Optimal;
+
+        /// <summary>
+        /// Default max ongoing export jobs for a user
+        /// </summary>
+        public int DefaultUserExportLimit { get; set; } = 5;
     }
 }

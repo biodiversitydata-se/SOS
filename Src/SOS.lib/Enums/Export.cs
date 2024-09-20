@@ -24,6 +24,14 @@
         /// <summary>
         /// Export format Excel
         /// </summary>
-        Excel
+        Excel,
+        /// <summary>
+        /// Export format AOO EOO
+        /// </summary>
+        AooEoo,
+        /// <summary>
+        /// Export format AOO EOO Article 17
+        /// </summary>
+        AooEooArticle17
     }
 }

@@ -12,11 +12,7 @@ using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
 using SOS.Analysis.Api.ApplicationInsights;
 using SOS.Analysis.Api.Configuration;
-using SOS.Analysis.Api.Managers;
-using SOS.Analysis.Api.Managers.Interfaces;
 using SOS.Analysis.Api.Middleware;
-using SOS.Analysis.Api.Repositories;
-using SOS.Analysis.Api.Repositories.Interfaces;
 using SOS.Lib.ActionFilters;
 using SOS.Lib.ApplicationInsights;
 using SOS.Lib.Cache;
@@ -51,6 +47,15 @@ using System.Reflection;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Logging.Abstractions;
 using Nest;
+using SOS.Lib.Repositories.Processed.Interfaces;
+using SOS.Lib.Repositories.Processed;
+using Hangfire;
+using Newtonsoft.Json.Converters;
+using SOS.Analysis.Api.Repositories.Interfaces;
+using SOS.Analysis.Api.Repositories;
+using Hangfire.Mongo;
+using Hangfire.Mongo.Migration.Strategies;
+using Hangfire.Mongo.Migration.Strategies.Backup;
 
 namespace SOS.Analysis.Api
 {
@@ -62,7 +67,7 @@ namespace SOS.Analysis.Api
         private const string InternalApiName = "InternalSosAnalysis";
         private const string PublicApiName = "PublicSosAnalysis";
         private const string InternalApiPrefix = "Internal";
-
+        private bool _disableHangfireInit = false;
         private bool _isDevelopment;
         private IWebHostEnvironment CurrentEnvironment { get; set; }
 
@@ -135,6 +140,7 @@ namespace SOS.Analysis.Api
                 // In production you should store the secret values as environment variables.
                 builder.AddUserSecrets<Startup>();
             }
+            _disableHangfireInit = GetDisableFeature(environmentVariable: "DISABLE_HANGFIRE_INIT");
 
             Configuration = builder.Build();
         }
@@ -318,6 +324,7 @@ namespace SOS.Analysis.Api
             services.AddSingleton(Configuration.GetSection("InputValaidationConfiguration").Get<InputValaidationConfiguration>()!);
             services.AddSingleton(Configuration.GetSection("UserServiceConfiguration").Get<UserServiceConfiguration>()!);
             services.AddSingleton(Configuration.GetSection("AreaConfiguration").Get<AreaConfiguration>()!);
+            services.AddSingleton(Configuration.GetSection("CryptoConfiguration").Get<CryptoConfiguration>()!);
 
             // Add security
             services.AddScoped<IAuthorizationProvider, CurrentUserAuthorization>();
@@ -330,8 +337,8 @@ namespace SOS.Analysis.Api
             services.AddSingleton<IClassCache<TaxonTree<IBasicTaxon>>, ClassCache<TaxonTree<IBasicTaxon>>>();
             var clusterHealthCache = new ClassCache<Dictionary<string, ClusterHealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<Dictionary<string, ClusterHealthResponse>>>()) { CacheDuration = TimeSpan.FromMinutes(2) };
             services.AddSingleton<IClassCache<Dictionary<string, ClusterHealthResponse>>>(clusterHealthCache);
-
-            // Add managers
+            
+            // Add managers            
             services.AddScoped<IAnalysisManager, AnalysisManager>();
             services.AddScoped<IFilterManager, FilterManager>();
             services.AddSingleton<ITaxonManager, TaxonManager>();
@@ -340,19 +347,51 @@ namespace SOS.Analysis.Api
             services.AddScoped<IAreaRepository, AreaRepository>();
             services.AddScoped<IDataProviderRepository, DataProviderRepository>();
             services.AddScoped<IProcessedConfigurationRepository, ProcessedConfigurationRepository>();
-            services.AddScoped<IProcessedObservationRepository, ProcessedObservationRepository>();
+            services.AddScoped<IProcessedObservationRepository, ProcessedObservationRepository>(); // Denna rad gör att det fungerar tillsammans med ProcessedObservationRepository
+            services.AddScoped<IProcessedObservationCoreRepository, ProcessedObservationCoreRepository>();            
             services.AddScoped<ITaxonRepository, TaxonRepository>();
             services.AddScoped<ITaxonListRepository, TaxonListRepository>();
+            services.AddScoped<IUserExportRepository, UserExportRepository>();
 
             // Add services
             services.AddSingleton<IHttpClientService, HttpClientService>();
             services.AddScoped<IUserService, UserService>();
+            services.AddSingleton<ICryptoService, CryptoService>();
+            services.AddSingleton<IFileService, FileService>();
 
             // Add Utilites
             services.AddSingleton<ISearchFilterUtility, SearchFilterUtility>();
 
             // Add Validators
             services.AddScoped<IInputValidator, InputValidator>();
+
+            // Hangfire
+            if (!_disableHangfireInit)
+            {
+                var mongoConfiguration = Configuration.GetSection("HangfireDbConfiguration").Get<HangfireDbConfiguration>();
+                services.AddHangfire(configuration =>
+                    configuration
+                        .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+                        .UseSimpleAssemblyNameTypeSerializer()
+                        .UseRecommendedSerializerSettings(m =>
+                        {
+                            m.Converters.Add(new NewtonsoftGeoShapeConverter());
+                            m.Converters.Add(new StringEnumConverter());
+                        })
+                        .UseMongoStorage(new MongoClient(mongoConfiguration.GetMongoDbSettings()),
+                            mongoConfiguration.DatabaseName,
+                            new MongoStorageOptions
+                            {
+                                MigrationOptions = new MongoMigrationOptions
+                                {
+                                    MigrationStrategy = new MigrateMongoMigrationStrategy(),
+                                    BackupStrategy = new CollectionMongoBackupStrategy()
+                                },
+                                Prefix = "hangfire",
+                                CheckConnection = true
+                            })
+                );
+            }
         }
 
         /// <summary>
@@ -370,7 +409,11 @@ namespace SOS.Analysis.Api
             Lib.Configuration.Shared.ApplicationInsights applicationInsightsConfiguration,
             AnalysisConfiguration statisticsConfiguration)
         {
-
+            if (!_disableHangfireInit)
+            {
+                app.UseHangfireDashboard();
+            }
+            
             if (statisticsConfiguration.EnableResponseCompression)
             {
                 app.UseResponseCompression();
@@ -439,6 +482,25 @@ namespace SOS.Analysis.Api
                 ? actionApiVersionModel.DeclaredApiVersions
                 : actionApiVersionModel.ImplementedApiVersions;
             return apiVersions;
+        }
+
+        private static bool GetDisableFeature(string environmentVariable)
+        {
+            string value = Environment.GetEnvironmentVariable(environmentVariable);
+
+            if (value != null)
+            {
+                if (bool.TryParse(value, out var val))
+                {
+                    return val;
+                }
+
+                return false;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }

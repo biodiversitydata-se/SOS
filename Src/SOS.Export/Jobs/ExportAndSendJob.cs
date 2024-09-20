@@ -5,11 +5,13 @@ using SOS.Export.Managers.Interfaces;
 using SOS.Export.Models.ZendTo;
 using SOS.Lib.Enums;
 using SOS.Lib.Jobs.Export;
+using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Export;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Services.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,12 +19,13 @@ using System.Threading.Tasks;
 namespace SOS.Export.Jobs
 {
     /// <summary>
-    ///     Artportalen harvest
+    /// Export and send job.
     /// </summary>
     public class ExportAndSendJob : IExportAndSendJob
     {
         private readonly ICryptoService _cryptoService;
         private readonly IObservationManager _observationManager;
+        private readonly IAnalysisManager _analysisManager;
         private readonly IUserExportRepository _userExportRepository;
         private readonly ILogger<ExportAndSendJob> _logger;
 
@@ -158,6 +161,130 @@ namespace SOS.Export.Jobs
             {
                 await UpdateJobInfoError(userId, context?.BackgroundJob?.Id, ex.Message);
                 _logger.LogError(ex, "Export failure.");
+                throw;
+            }
+        }
+
+        /// <inheritdoc />
+        public async Task<bool> RunAooEooAsync(
+            int? roleId,
+            string authorizationApplicationIdentifier,
+            SearchFilter filter,
+            int gridCellsInMeters,
+            bool useCenterPoint,
+            IEnumerable<double> alphaValues,
+            bool useEdgeLengthRatio,
+            bool allowHoles,
+            bool returnGridCells,
+            bool includeEmptyCells,
+            MetricCoordinateSys metricCoordinateSys,
+            CoordinateSys coordinateSystem,            
+            string emailAddress,
+            string description,
+            ExportFormat exportFormat,
+            bool sendMailFromZendTo,
+            string encryptedPassword,
+            PerformContext context,
+            IJobCancellationToken cancellationToken)
+        {
+            var userId = filter?.ExtendedAuthorization?.UserId ?? 0;
+
+            try
+            {
+                _logger.LogInformation("Start AOO EOO export and send job");
+                Thread.Sleep(TimeSpan.FromSeconds(1)); // wait for job info to be inserted in MongoDb.
+                await UpdateJobInfoStartProcessing(userId, context?.BackgroundJob?.Id);
+                var password = await _cryptoService.DecryptAsync(encryptedPassword);
+                var response = await _observationManager.ExportAooEooAndSendAsync(
+                    roleId, 
+                    authorizationApplicationIdentifier, 
+                    filter,
+                    gridCellsInMeters,
+                    useCenterPoint,
+                    alphaValues,
+                    useEdgeLengthRatio,
+                    allowHoles,
+                    returnGridCells,
+                    includeEmptyCells,
+                    metricCoordinateSys,
+                    coordinateSystem,                    
+                    emailAddress,
+                    description,
+                    exportFormat,
+                    sendMailFromZendTo,
+                    password,
+                    cancellationToken);
+                _logger.LogInformation($"End AOO EOO export and send job. Success: {response.Success}");
+                await UpdateJobInfoEndProcessing(userId, context?.BackgroundJob?.Id, response);
+                return response.Success ? true : throw new Exception("AOO EOO export and send job failed");
+            }
+            catch (JobAbortedException)
+            {
+                await UpdateJobInfoError(userId, context?.BackgroundJob?.Id, "AOO EOO export and send job was cancelled.");
+                _logger.LogInformation("AOO EOO export and send job was cancelled.");
+                return false;
+            }
+            catch (Exception ex)
+            {
+                await UpdateJobInfoError(userId, context?.BackgroundJob?.Id, ex.Message);
+                _logger.LogError(ex, "AOO EOO export failure.");
+                throw;
+            }
+        }
+
+        /// <inheritdoc />
+        public async Task<bool> RunAooEooArticle17Async(
+            int? roleId,
+            string authorizationApplicationIdentifier,
+            SearchFilter filter,
+            int gridCellsInMeters,
+            int maxDistance,
+            MetricCoordinateSys metricCoordinateSys,
+            CoordinateSys coordinateSystem,
+            string emailAddress,
+            string description,
+            ExportFormat exportFormat,            
+            bool sendMailFromZendTo,
+            string encryptedPassword,
+            PerformContext context,
+            IJobCancellationToken cancellationToken)
+        {
+            var userId = filter?.ExtendedAuthorization?.UserId ?? 0;
+
+            try
+            {
+                _logger.LogInformation("Start AOO EOO Article 17 export and send job");
+                Thread.Sleep(TimeSpan.FromSeconds(1)); // wait for job info to be inserted in MongoDb.
+                await UpdateJobInfoStartProcessing(userId, context?.BackgroundJob?.Id);
+                var password = await _cryptoService.DecryptAsync(encryptedPassword);
+                var response = await _observationManager.ExportAooAndEooArticle17AndSendAsync(
+                    roleId,
+                    authorizationApplicationIdentifier,
+                    filter,
+                    gridCellsInMeters,
+                    maxDistance,
+                    metricCoordinateSys,
+                    coordinateSystem,
+                    emailAddress,
+                    description,
+                    exportFormat,
+                    sendMailFromZendTo,
+                    password,
+                    cancellationToken);
+                _logger.LogInformation($"End AOO EOO Article 17 export and send job. Success: {response.Success}");
+                await UpdateJobInfoEndProcessing(userId, context?.BackgroundJob?.Id, response);
+                return response.Success ? true : throw new Exception("AOO EOO Article 17 export and send job failed");
+            }
+            catch (JobAbortedException)
+            {
+                await UpdateJobInfoError(userId, context?.BackgroundJob?.Id, "AOO EOO Article 17 export and send job was cancelled.");
+                _logger.LogInformation("AOO EOO Article 17 export and send job was cancelled.");
+                return false;
+            }
+            catch (Exception ex)
+            {
+                await UpdateJobInfoError(userId, context?.BackgroundJob?.Id, ex.Message);
+                _logger.LogError(ex, "AOO EOO Article 17 export failure.");
                 throw;
             }
         }

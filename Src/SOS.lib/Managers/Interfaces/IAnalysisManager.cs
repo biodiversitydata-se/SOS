@@ -1,11 +1,15 @@
-﻿using NetTopologySuite.Features;
+﻿using Hangfire;
+using NetTopologySuite.Features;
 using SOS.Lib.Enums;
+using SOS.Lib.Models.Analysis;
+using SOS.Lib.Models.Export;
 using SOS.Lib.Models.Search.Enums;
 using SOS.Lib.Models.Search.Filters;
-using SOS.Shared.Api.Dtos.Enum;
-using SOS.Shared.Api.Dtos.Search;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
-namespace SOS.Analysis.Api.Managers.Interfaces
+namespace SOS.Lib.Managers.Interfaces
 {
     public interface IAnalysisManager
     {
@@ -20,13 +24,13 @@ namespace SOS.Analysis.Api.Managers.Interfaces
         /// <param name="afterKey"></param>
         /// <param name="take"></param>
         /// <returns></returns>
-        Task<PagedAggregationResultDto<UserAggregationResponseDto>?> AggregateByUserFieldAsync(
+        Task<PagedAggregationResult<UserAggregationResponse>> AggregateByUserFieldAsync(
             int? roleId,
-            string? authorizationApplicationIdentifier,
+            string authorizationApplicationIdentifier,
             SearchFilter filter,
             string aggregationField,
             int? precisionThreshold,
-            string? afterKey,
+            string afterKey,
             int? take);
 
         /// <summary>
@@ -40,9 +44,9 @@ namespace SOS.Analysis.Api.Managers.Interfaces
         /// <param name="take"></param>
         /// <param name="sortOrder"></param>
         /// <returns></returns>
-        Task<IEnumerable<AggregationItemDto>?> AggregateByUserFieldAsync(
+        Task<IEnumerable<AggregationItem>> AggregateByUserFieldAsync(
             int? roleId,
-            string? authorizationApplicationIdentifier,
+            string authorizationApplicationIdentifier,
             SearchFilter filter,
             string aggregationField,
             int? precisionThreshold,
@@ -59,9 +63,9 @@ namespace SOS.Analysis.Api.Managers.Interfaces
         /// <returns></returns>
         Task<FeatureCollection> AtlasAggregateAsync(
         int? roleId,
-        string? authorizationApplicationIdentifier,
+        string authorizationApplicationIdentifier,
         SearchFilter filter,
-        AtlasAreaSizeDto atlasSize);
+        AtlasAreaSize atlasSize);
 
         /// <summary>
         /// Calculate AOO and EOO
@@ -78,10 +82,11 @@ namespace SOS.Analysis.Api.Managers.Interfaces
         /// <param name="includeEmptyCells"></param>
         /// <param name="metricCoordinateSys"></param>
         /// <param name="coordinateSystem"></param>
+        /// <param name="timeout"></param>
         /// <returns></returns>
-        Task<FeatureCollection> CalculateAooAndEooAsync(
+        Task<(FeatureCollection FeatureCollection, List<AooEooItem> AooEooItems)?> CalculateAooAndEooAsync(
             int? roleId,
-            string? authorizationApplicationIdentifier,
+            string authorizationApplicationIdentifier,
             SearchFilter filter,
             int gridCellsInMeters,
             bool useCenterPoint,
@@ -91,7 +96,8 @@ namespace SOS.Analysis.Api.Managers.Interfaces
             bool returnGridCells,
             bool includeEmptyCells,
             MetricCoordinateSys metricCoordinateSys,
-            CoordinateSys coordinateSystem);
+            CoordinateSys coordinateSystem,
+            TimeSpan? timeout = null);
 
         /// <summary>
         /// Calculate AOO EOO for Article 17
@@ -103,16 +109,18 @@ namespace SOS.Analysis.Api.Managers.Interfaces
         /// <param name="maxDistance"></param>
         /// <param name="metricCoordinateSys"></param>
         /// <param name="coordinateSystem"></param>
+        /// <param name="timeout"></param>
         /// <returns></returns>
-        Task<FeatureCollection> CalculateAooAndEooArticle17Async(
+        Task<(FeatureCollection FeatureCollection, AooEooItem AooEooItem)?> CalculateAooAndEooArticle17Async(
            int? roleId,
-           string? authorizationApplicationIdentifier,
+           string authorizationApplicationIdentifier,
            SearchFilter filter,
            int gridCellsInMeters,
            int maxDistance,
            MetricCoordinateSys metricCoordinateSys,
-           CoordinateSys coordinateSystem);
-        
+           CoordinateSys coordinateSystem,
+           TimeSpan? timeout = null);
+
         /// <summary>
         /// Get count of observations matching search criteria
         /// </summary>
@@ -120,6 +128,37 @@ namespace SOS.Analysis.Api.Managers.Interfaces
         /// <param name="authorizationApplicationIdentifier"></param>
         /// <param name="filter"></param>
         /// <returns></returns>
-        Task<long> GetMatchCountAsync(int? roleId, string? authorizationApplicationIdentifier, SearchFilterBase filter);
+        Task<long> GetMatchCountAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilterBase filter);
+
+        Task<int> GetNumberOfTaxaInFilterAsync(SearchFilterBase filter);
+
+        Task<FileExportResult> CreateAooEooExportAsync(
+            int? roleId,
+            string authorizationApplicationIdentifier,
+            SearchFilter filter,
+            int gridCellsInMeters,
+            bool useCenterPoint,
+            IEnumerable<double> alphaValues,
+            bool useEdgeLengthRatio,
+            bool allowHoles,
+            bool returnGridCells,
+            bool includeEmptyCells,
+            MetricCoordinateSys metricCoordinateSys,
+            CoordinateSys coordinateSystem,
+            string exportPath,
+            string fileName,            
+            IJobCancellationToken cancellationToken);
+
+        Task<FileExportResult> CreateAooAndEooArticle17ExportAsync(
+            int? roleId,
+            string authorizationApplicationIdentifier,
+            SearchFilter filter,
+            int gridCellsInMeters,
+            int maxDistance,
+            MetricCoordinateSys metricCoordinateSys,
+            CoordinateSys coordinateSystem,
+            string exportPath,
+            string fileName,
+            IJobCancellationToken cancellationToken);
     }
 }

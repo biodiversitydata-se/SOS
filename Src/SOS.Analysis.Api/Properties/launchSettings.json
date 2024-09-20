@@ -9,22 +9,33 @@
   },
   "profiles": {
     "SOS.Analysis.Api": {
-        "commandName": "Project",
-        "dotnetRunMessages": true,
-        "launchBrowser": true,
-        "launchUrl": "swagger",
-        "applicationUrl": "https://localhost:7089;http://localhost:5089",
-        "environmentVariables": {
-            "ASPNETCORE_ENVIRONMENT": "local"
-        }
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "launchBrowser": true,
+      "launchUrl": "swagger",
+      "applicationUrl": "https://localhost:7089;http://localhost:5089",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "local",
+        "DISABLE_HANGFIRE_INIT": "true"
+      }
+    },
+    "SOS.Analysis.Api (ST)": {
+      "commandName": "IISExpress",
+      "launchBrowser": true,
+      "launchUrl": "swagger",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "ST",
+        "DISABLE_HANGFIRE_INIT": "true"                
+      },
+      "applicationUrl": "https://localhost:7089;http://localhost:5089"
     },
     "IIS Express": {
-        "commandName": "IISExpress",
-        "launchBrowser": true,
-        "launchUrl": "swagger",
-        "environmentVariables": {
-            "ASPNETCORE_ENVIRONMENT": "local"
-        }
+      "commandName": "IISExpress",
+      "launchBrowser": true,
+      "launchUrl": "swagger",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "local"
+      }
     }
   }
 }
