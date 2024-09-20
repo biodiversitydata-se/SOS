@@ -146,11 +146,20 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             var coordinateUncertaintyInMeters = verbatim.CoordinateUncertaintyInMeters?.ParseDoubleConvertToInt() ?? DefaultCoordinateUncertaintyInMeters;
             if (TryGetGeometryFromWkt(obs.Location.FootprintWKT, out NetTopologySuite.Geometries.Geometry? wktGeometry))
             {
-                if (wktGeometry.GeometryType != "Polygon")
+                if (wktGeometry.GeometryType == "MultiPolygon")
+                {
+                    wktGeometry = wktGeometry.ConvexHull();
+                }
+                else if (wktGeometry.GeometryType != "Polygon")
                 {
                     var sweref99TmGeom = wktGeometry.Transform(coordinateSystem, CoordinateSys.SWEREF99_TM, true);
-                    sweref99TmGeom = sweref99TmGeom.Buffer(coordinateUncertaintyInMeters, NetTopologySuite.Operation.Buffer.EndCapStyle.Flat);
+                    NetTopologySuite.Operation.Buffer.EndCapStyle endCapStyle = sweref99TmGeom.Coordinates.Length == 2 ? NetTopologySuite.Operation.Buffer.EndCapStyle.Flat : NetTopologySuite.Operation.Buffer.EndCapStyle.Square;                    
+                    sweref99TmGeom = sweref99TmGeom.Buffer(coordinateUncertaintyInMeters, endCapStyle);
                     wktGeometry = sweref99TmGeom.Transform(CoordinateSys.SWEREF99_TM, coordinateSystem, true);
+                    if (wktGeometry.GeometryType != "Polygon")
+                    {
+                        wktGeometry = wktGeometry.ConvexHull();
+                    }
                 }
 
                 double? decimalLongitude = verbatim.DecimalLongitude.ParseDouble() ?? verbatim.VerbatimLongitude.ParseDouble() ?? wktGeometry.Centroid.X;
