@@ -35,6 +35,7 @@ namespace SOS.Export.Jobs
         /// <param name="userExport"></param>
         private void RemoveExpiredJobs(UserExport userExport)
         {
+            if (userExport == null) return;
             userExport.Jobs = userExport.Jobs.Where(j =>
                 !(
                     (j.Status.Equals(ExportJobStatus.Succeeded) && DateTime.Now.ToUniversalTime() > (j.ProcessEndDate.HasValue ? j.ProcessEndDate.Value.AddDays(j.LifetimeDays) : null)) || // Remove succeded jobs where expire date has passed
