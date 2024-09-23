@@ -578,7 +578,13 @@ namespace SOS.Lib.Managers
                     foreach (var taxonId in originalTaxaList)
                     {
                         filter.Taxa.Ids = new List<int>() { taxonId };
-                        Models.Interfaces.IBasicTaxon taxon = _taxonManager.TaxonTree.GetTreeNode(taxonId).Data;
+                        var treeNode = _taxonManager.TaxonTree.GetTreeNode(taxonId);
+                        if (treeNode == null)
+                        {
+                            _logger.LogWarning($"Can't find taxon tree node with TaxonId={taxonId}");
+                            continue;
+                        }
+                        Models.Interfaces.IBasicTaxon taxon = treeNode.Data;
                         string taxonName = !string.IsNullOrEmpty(taxon.VernacularName) ? $"{taxon.ScientificName} ({taxon.VernacularName})" : taxon.ScientificName;
                         string taxonFileName = FilenameHelper.GetSafeFileName(taxonName, '-');
                         var taxonFilePath = Path.Combine(temporaryZipExportFolderPath, $"{taxon.Id}-{taxonFileName}.geojson");
@@ -715,7 +721,13 @@ namespace SOS.Lib.Managers
                     foreach (var taxonId in originalTaxaList)
                     {
                         filter.Taxa.Ids = new List<int>() { taxonId };
-                        Models.Interfaces.IBasicTaxon taxon = _taxonManager.TaxonTree.GetTreeNode(taxonId).Data;
+                        var treeNode = _taxonManager.TaxonTree.GetTreeNode(taxonId);
+                        if (treeNode == null)
+                        {
+                            _logger.LogWarning($"Can't find taxon tree node with TaxonId={taxonId}");
+                            continue;
+                        }
+                        Models.Interfaces.IBasicTaxon taxon = treeNode.Data;
                         string taxonName = !string.IsNullOrEmpty(taxon.VernacularName) ? $"{taxon.ScientificName} ({taxon.VernacularName})" : taxon.ScientificName;
                         string taxonFileName = FilenameHelper.GetSafeFileName(taxonName, '-');
                         var taxonFilePath = Path.Combine(temporaryZipExportFolderPath, $"{taxon.Id}-{taxonFileName}.geojson");
