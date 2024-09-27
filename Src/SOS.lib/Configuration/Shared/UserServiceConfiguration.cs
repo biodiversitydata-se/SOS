@@ -23,8 +23,18 @@
         public string ClientSecret { get; set; }
 
         /// <summary>
+        /// Scope.
+        /// </summary>
+        public string Scope { get; set; }
+
+        /// <summary>
         /// Token URL.
         /// </summary>
-        public string TokenUrl { get; set; }        
+        public string TokenUrl { get; set; }
+
+        /// <summary>
+        /// Token expiration buffer in seconds.
+        /// </summary>
+        public int TokenExpirationBufferInSeconds { get; set; }
     }
 }

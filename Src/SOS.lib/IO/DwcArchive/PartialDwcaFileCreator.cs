@@ -187,6 +187,68 @@ namespace SOS.Lib.IO.DwcArchive
             return distinctValues;
         }
 
+        public static HashSet<string> GetOccurrenceIdDuplicatesFromDwcaFile(string sourceFilePath, int nrRowsLimit, int startRow)
+        {
+            var dwcaFileComponents = new DwcaFileComponents();
+            HashSet<string> duplicates = new HashSet<string>();
+
+            using (FileStream zipToOpen = new FileStream(sourceFilePath, FileMode.Open))
+            {
+                using (ZipArchive archive = new ZipArchive(zipToOpen, ZipArchiveMode.Read))
+                {
+                    var metaEntry = archive.Entries.Single(m => m.FullName.Equals("meta.xml", StringComparison.InvariantCultureIgnoreCase));
+                    dwcaFileComponents.Meta = ReadZipEntryAsString(metaEntry);
+                    var occurrenceEntry = archive.Entries.FirstOrDefault(m => m.FullName.StartsWith("occurrence", StringComparison.InvariantCultureIgnoreCase)
+                                                                             || m.FullName.StartsWith("observation", StringComparison.InvariantCultureIgnoreCase));
+                    duplicates = GetOccurrenceIdDuplicatesFromDwcaFile(nrRowsLimit, startRow, occurrenceEntry);
+                }
+
+                return duplicates;
+            }
+        }
+
+        private static HashSet<string> GetOccurrenceIdDuplicatesFromDwcaFile(int nrRowsLimit, int startRow, ZipArchiveEntry occurrenceEntry)
+        {
+            string term = "occurrenceID";
+            int nrRowsRead = 0;
+            int nrObservations = 0;
+            Stream stream = occurrenceEntry.Open();
+            StreamReader reader = new StreamReader(stream, Encoding.UTF8);
+            var dwcaOccurrenceComponent = new DwcaOccurrenceComponent() { Filename = occurrenceEntry.Name };
+            string[] headers = null;
+            Dictionary<string, int> headerIndexByHeader = new Dictionary<string, int>();
+            int termIndex = 0;
+            HashSet<string> distinctValues = new HashSet<string>();
+            HashSet<string> duplicates = new HashSet<string>();
+            while (!reader.EndOfStream && nrObservations < nrRowsLimit)
+            {
+                string line = reader.ReadLine();
+                if (nrRowsRead == 0) // Read header
+                {
+                    dwcaOccurrenceComponent.Header = line;
+                    headers = line.Split('\t');
+                    headerIndexByHeader = headers.ToDictionary(h => h, h => Array.IndexOf(headers, h), StringComparer.OrdinalIgnoreCase);
+                    termIndex = headerIndexByHeader[term];
+                    nrRowsRead++;
+                    continue;
+                }
+
+                if (startRow < nrRowsRead)
+                {
+                    string[] values = line.Split('\t');
+                    var value = values[termIndex];
+                    if (distinctValues.Contains(value))
+                        duplicates.Add(value);
+                    distinctValues.Add(value);
+                    nrObservations++;
+                }
+
+                nrRowsRead++;
+            }
+
+            return duplicates;
+        }
+
         private static DwcaExtensionComponent ReadExtensionCsvFile(ZipArchiveEntry zipArchiveEntry, HashSet<string> observationIds)
         {
             int nrRowsRead = 0;

@@ -1,4 +1,5 @@
-﻿using SOS.Lib.Models.UserService;
+﻿using Microsoft.IdentityModel.JsonWebTokens;
+using SOS.Lib.Models.UserService;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -47,5 +48,7 @@ namespace SOS.Lib.Services.Interfaces
         /// <param name="cultureCode"></param>
         /// <returns></returns>
         Task<PersonModel> GetPersonAsync(int personId, string cultureCode = "sv-SE");
+
+        Task<JsonWebToken> GetClientCredentialsAccessTokenAsync();
     }
 }

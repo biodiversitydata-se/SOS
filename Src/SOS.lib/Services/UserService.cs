@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.JsonWebTokens;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.UserService;
@@ -7,6 +8,9 @@ using SOS.Lib.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
+using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SOS.Lib.Services
@@ -19,7 +23,10 @@ namespace SOS.Lib.Services
         private readonly IAuthorizationProvider _authorizationProvider;
         private readonly IHttpClientService _httpClientService;
         private readonly UserServiceConfiguration _userServiceConfiguration;
+        private readonly SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
+        private readonly TimeSpan _tokenExpirationBuffer;
         private readonly ILogger<UserService> _logger;
+        private JsonWebToken _jsonWebToken;
 
         /// <summary>
         /// Constructor
@@ -38,7 +45,8 @@ namespace SOS.Lib.Services
                 authorizationProvider ?? throw new ArgumentNullException(nameof(authorizationProvider));
             _httpClientService = httpClientService ?? throw new ArgumentNullException(nameof(httpClientService));
             _userServiceConfiguration = userServiceConfiguration ??
-                                        throw new ArgumentNullException(nameof(userServiceConfiguration));
+                                        throw new ArgumentNullException(nameof(userServiceConfiguration)); 
+            _tokenExpirationBuffer = TimeSpan.FromSeconds(userServiceConfiguration.TokenExpirationBufferInSeconds);
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -90,7 +98,7 @@ namespace SOS.Lib.Services
 
                 var response = await _httpClientService.GetDataAsync<ResponseModel<UserModel>>(
                     new Uri($"{_userServiceConfiguration.UserAdmin2ApiBaseAddress}/Users/Current?artdataFormat=true"),
-                   new Dictionary<string, string> { { "Authorization", authorizationHeader } });
+                    new Dictionary<string, string> { { "Authorization", authorizationHeader } });
 
                 return response?.Success ?? false
                     ? response.Result
@@ -103,7 +111,6 @@ namespace SOS.Lib.Services
 
             return null;
         }
-
 
         /// <summary>
         /// Get user by id.
@@ -141,8 +148,10 @@ namespace SOS.Lib.Services
         {
             try
             {
+                await InvalidateAccessTokenAsync();
                 var response = await _httpClientService.GetDataAsync<ResponseModel<UserModel>>(
-                    new Uri($"{_userServiceConfiguration.UserAdmin2ApiBaseAddress}/Users/{userId}?artdataFormat=true"));
+                    new Uri($"{_userServiceConfiguration.UserAdmin2ApiBaseAddress}/Users/{userId}?artdataFormat=true"),
+                    new Dictionary<string, string> { { "Authorization", $"Bearer {_jsonWebToken.EncodedToken}" } });
 
                 return response.Success
                     ? response.Result
@@ -189,8 +198,10 @@ namespace SOS.Lib.Services
         {
             try
             {
+                await InvalidateAccessTokenAsync();
                 var response = await _httpClientService.GetDataAsync<ResponseModel<IEnumerable<AuthorityModel>>>(
-                    new Uri($"{_userServiceConfiguration.UserAdmin2ApiBaseAddress}/Users/{userId}/permissions?applicationIdentifier={authorizationApplicationIdentifier ?? "artportalen"}&lang={cultureCode}&artdataFormat=true"));
+                    new Uri($"{_userServiceConfiguration.UserAdmin2ApiBaseAddress}/Users/{userId}/permissions?applicationIdentifier={authorizationApplicationIdentifier ?? "artportalen"}&lang={cultureCode}&artdataFormat=true"),
+                    new Dictionary<string, string> { { "Authorization", $"Bearer {_jsonWebToken.EncodedToken}" } });
 
                 return response.Success
                     ? response.Result
@@ -237,9 +248,11 @@ namespace SOS.Lib.Services
         {
             try
             {
+                await InvalidateAccessTokenAsync();
                 var cultureId = CultureCodeHelper.GetCultureId(cultureCode);
                 var response = await _httpClientService.GetDataAsync<ResponseModel<IEnumerable<RoleModel>>>(
-                    new Uri($"{_userServiceConfiguration.UserAdmin2ApiBaseAddress}/Users/{userId}/roles?applicationIdentifier={authorizationApplicationIdentifier ?? "artportalen"}&localeId={cultureId}&artdataFormat=true"));
+                    new Uri($"{_userServiceConfiguration.UserAdmin2ApiBaseAddress}/Users/{userId}/roles?applicationIdentifier={authorizationApplicationIdentifier ?? "artportalen"}&localeId={cultureId}&artdataFormat=true"),
+                    new Dictionary<string, string> {{ "Authorization", $"Bearer {_jsonWebToken.EncodedToken}" }});
 
                 return response?.Success ?? false
                     ? response.Result
@@ -285,8 +298,10 @@ namespace SOS.Lib.Services
         {
             try
             {
+                await InvalidateAccessTokenAsync();
                 var response = await _httpClientService.GetDataAsync<ResponseModel<PersonModel>>(
-                    new Uri($"{_userServiceConfiguration.BaseAddress}/Person/{personId}?lang={cultureCode}"));
+                    new Uri($"{_userServiceConfiguration.BaseAddress}/Person/{personId}?lang={cultureCode}"),
+                    new Dictionary<string, string> { { "Authorization", $"Bearer {_jsonWebToken.EncodedToken}" } });
 
                 return response?.Success ?? false
                     ? response.Result
@@ -298,6 +313,69 @@ namespace SOS.Lib.Services
             }
 
             return null;
+        }
+
+        public async Task<JsonWebToken> GetClientCredentialsAccessTokenAsync()
+        {
+            using var client = new HttpClient();
+            var requestData = new FormUrlEncodedContent(
+            [
+                new KeyValuePair<string, string>("grant_type", "client_credentials"),
+                new KeyValuePair<string, string>("client_id", _userServiceConfiguration.ClientId),
+                new KeyValuePair<string, string>("client_secret", _userServiceConfiguration.ClientSecret),
+                new KeyValuePair<string, string>("scope", _userServiceConfiguration.Scope)
+            ]);
+
+            var response = await client.PostAsync(_userServiceConfiguration.TokenUrl, requestData);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var jsonResponse = await response.Content.ReadAsStringAsync();
+                TokenResponse tokenResponse = JsonSerializer.Deserialize<TokenResponse>(jsonResponse);
+                var handler = new JsonWebTokenHandler();
+                JsonWebToken token = handler.ReadJsonWebToken(tokenResponse.access_token);   
+                return token;
+            }
+            else
+            {
+                throw new Exception("Failed to get access token: " + response.StatusCode);
+            }
+        }
+
+        private async Task InvalidateAccessTokenAsync()
+        {
+            if (_jsonWebToken == null || TokenExpiringSoon())
+            {
+                await _semaphoreSlim.WaitAsync();
+                try
+                {
+                    if (_jsonWebToken == null || TokenExpiringSoon())
+                    {
+                        _jsonWebToken = await GetClientCredentialsAccessTokenAsync();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Failed to renew User API Access Token");
+                }
+                finally
+                {
+                    _semaphoreSlim.Release();
+                }
+            }
+        }
+
+        private bool TokenExpiringSoon()
+        {
+            if (_jsonWebToken == null) return true;
+            return DateTime.UtcNow.Add(_tokenExpirationBuffer) >= _jsonWebToken.ValidTo;           
+        }
+        
+        public class TokenResponse
+        {
+            public string access_token { get; set; }
+            public string token_type { get; set; }
+            public int expires_in { get; set; }
         }
     }
 }
