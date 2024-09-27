@@ -183,8 +183,10 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 }
             }
 
-            // Get list of id's to Make sure we don't harvest more than #limit 
-            var idBatch = (await _sightingRepository.GetModifiedIdsAsync(harvestFromDate, _artportalenConfiguration.IncrementalChunkSize))?.ToArray();
+            // Get list of id's to Make sure we don't harvest more than #limit
+            var harvestIds = new HashSet<int>();
+            NewAndEditedSightingId[]? idBatch = (await _sightingRepository.GetModifiedIdsAsync(harvestFromDate, _artportalenConfiguration.IncrementalChunkSize))?.ToArray();
+            idBatch = GetDistinctBatch(harvestIds, idBatch);            
             var batchCount = 0;
             var nrSightingsHarvested = 0;
             while ((idBatch?.Length ?? 0) != 0)
@@ -212,13 +214,31 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 
                 var nextHarvestDate = DateTime.SpecifyKind(idBatch!.Last().EditDate, DateTimeKind.Local);
                 idBatch = (await _sightingRepository.GetModifiedIdsAsync(nextHarvestDate, _artportalenConfiguration.IncrementalChunkSize))?.ToArray();
+                idBatch = GetDistinctBatch(harvestIds, idBatch);
             }
 
             Logger.LogDebug($"Finish getting Artportalen sightings ({mode}) (NrSightingsHarvested={nrSightingsHarvested:N0})");
             Logger.LogInformation($"Finish Artportalen HarvestIncrementalAsync(). NrSightingsHarvested={nrSightingsHarvested:N0}");
             return nrSightingsHarvested;
         }
-        #endregion Incremental
+        #endregion Incremental        
+
+        public static NewAndEditedSightingId[]? GetDistinctBatch(HashSet<int> ids, NewAndEditedSightingId[]? idBatch)
+        {
+            var list = new List<NewAndEditedSightingId>();
+            if (idBatch == null) return list.ToArray();
+
+            foreach (var item in idBatch)
+            {
+                if (!ids.Contains(item.Id))
+                {
+                    ids.Add(item.Id);
+                    list.Add(item);
+                }
+            }
+
+            return list.ToArray();
+        }
 
         /// <summary>
         /// Harvest a batch of sightings

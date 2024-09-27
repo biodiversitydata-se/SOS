@@ -90,9 +90,9 @@ namespace SOS.Harvest.Processors.Artportalen
 
             if (mode != JobRunModes.Full)
             {
-                // If mode = IncrementalInactiveInstance, make sure we get all deleted since full harvest started. 24 hours should be more than enought.
-                // Else 1 hour shold do it since we run incremental harvest every 5 min
-                var from = DateTime.Now.AddHours(mode == JobRunModes.IncrementalInactiveInstance ? -24 : -1);
+                // If mode = IncrementalInactiveInstance, make sure we get all deleted since full harvest started. 36 hours should be more than enough.
+                // Else 1 hour should do it since we run incremental harvest every 5 min
+                var from = DateTime.Now.AddHours(mode == JobRunModes.IncrementalInactiveInstance ? -36 : -1);
                 var deletedIds = await _sightingRepository.GetDeletedIdsAsync(from);
                 var rejectedIds = await _sightingRepository.GetRejectedIdsAsync(from);
                 var idsToDelete = deletedIds?.Union(rejectedIds ?? Array.Empty<int>()) ?? rejectedIds;

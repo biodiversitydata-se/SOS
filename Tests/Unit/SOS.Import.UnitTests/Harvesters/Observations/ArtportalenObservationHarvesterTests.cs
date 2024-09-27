@@ -78,6 +78,65 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
             _areaHelperMock.Object,
             _loggerMock.Object);
 
+        [Fact]
+        public void VerifyDistinctBatch()
+        {
+            // Arrange
+            var harvestIds = new HashSet<int>();
+            var batch1 = new List<NewAndEditedSightingId> {
+                new NewAndEditedSightingId {Id = 1, EditDate = new DateTime(2000,1,1)},
+                new NewAndEditedSightingId {Id = 2, EditDate = new DateTime(2001,1,1)},
+                new NewAndEditedSightingId {Id = 3, EditDate = new DateTime(2002,1,1)}
+            };
+
+            var batch2 = new List<NewAndEditedSightingId> {
+                new NewAndEditedSightingId {Id = 4, EditDate = new DateTime(2003,1,1)},
+                new NewAndEditedSightingId {Id = 5, EditDate = new DateTime(2004,1,1)},
+                new NewAndEditedSightingId {Id = 6, EditDate = new DateTime(2005,1,1)}
+            };
+
+            var batch3 = new List<NewAndEditedSightingId> {
+                new NewAndEditedSightingId {Id = 1, EditDate = new DateTime(2003,1,1)},
+                new NewAndEditedSightingId {Id = 4, EditDate = new DateTime(2004,1,1)},
+                new NewAndEditedSightingId {Id = 7, EditDate = new DateTime(2006,1,1)}
+            };
+
+            var batch4 = new List<NewAndEditedSightingId> {
+                new NewAndEditedSightingId {Id = 7, EditDate = new DateTime(2006,1,1)},
+                new NewAndEditedSightingId {Id = 8, EditDate = new DateTime(2007,1,1)},
+                new NewAndEditedSightingId {Id = 9, EditDate = new DateTime(2008,1,1)}
+            };
+
+            // Act
+            var modifiedBatch1 = ArtportalenObservationHarvester.GetDistinctBatch(harvestIds, batch1.ToArray());
+            var modifiedBatch2 = ArtportalenObservationHarvester.GetDistinctBatch(harvestIds, batch2.ToArray());
+            var modifiedBatch3 = ArtportalenObservationHarvester.GetDistinctBatch(harvestIds, batch3.ToArray());
+            var modifiedBatch4 = ArtportalenObservationHarvester.GetDistinctBatch(harvestIds, batch4.ToArray());
+
+            // Assert
+            modifiedBatch1.Should().BeEquivalentTo(new List<NewAndEditedSightingId> {
+                new NewAndEditedSightingId {Id = 1, EditDate = new DateTime(2000,1,1)},
+                new NewAndEditedSightingId {Id = 2, EditDate = new DateTime(2001,1,1)},
+                new NewAndEditedSightingId {Id = 3, EditDate = new DateTime(2002,1,1)}
+            });
+
+            modifiedBatch2.Should().BeEquivalentTo(new List<NewAndEditedSightingId> {
+                new NewAndEditedSightingId {Id = 4, EditDate = new DateTime(2003,1,1)},
+                new NewAndEditedSightingId {Id = 5, EditDate = new DateTime(2004,1,1)},
+                new NewAndEditedSightingId {Id = 6, EditDate = new DateTime(2005,1,1)}
+            });
+
+            modifiedBatch3.Should().BeEquivalentTo(new List<NewAndEditedSightingId> {
+                new NewAndEditedSightingId {Id = 7, EditDate = new DateTime(2006,1,1)}
+            });
+
+            modifiedBatch4.Should().BeEquivalentTo(new List<NewAndEditedSightingId> {                
+                new NewAndEditedSightingId {Id = 8, EditDate = new DateTime(2007,1,1)},
+                new NewAndEditedSightingId {Id = 9, EditDate = new DateTime(2008,1,1)}
+            });
+        }
+
+
         /// <summary>
         ///     Test aggregation fail
         /// </summary>
