@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
 using SOS.Lib.Cache.Interfaces;
+using SOS.Lib.Extensions;
 using SOS.Lib.JsonConverters;
 using SOS.Lib.Models.Cache;
 using System;
@@ -45,10 +46,11 @@ namespace SOS.Lib.Cache
         /// Constructor
         /// </summary>
         /// <param name="memoryCache"></param>
+        /// <param name="logger"></param>
         public ClassCache(IMemoryCache memoryCache, ILogger<ClassCache<TClass>> logger)
         {
             _memoryCache = memoryCache ?? throw new ArgumentNullException(nameof(memoryCache));
-            _cacheKey = typeof(TClass).Name;
+            _cacheKey = typeof(TClass).GetFormattedName();
             Logger = logger;
 
             _cacheKeyJsonSerializerOptions = _cacheDataJsonSerializerOptions = new JsonSerializerOptions

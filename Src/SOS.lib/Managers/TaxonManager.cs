@@ -30,6 +30,7 @@ namespace SOS.Lib.Managers
 
         private void OnTaxonTreeCacheReleased(object sender, EventArgs e)
         {
+            _logger.LogInformation("OnTaxonTreeCacheReleased");
             PopulateTaxonTreeCache();
         }
 
@@ -120,6 +121,7 @@ namespace SOS.Lib.Managers
         {
             try
             {
+                _logger.LogInformation("GetTaxonTreeAsync() - Get all taxa from MongoDB and create taxon tree");
                 var taxa = await GetBasicTaxaAsync();
                 var taxaDictionary = new Dictionary<int, IBasicTaxon>();
                 foreach (var taxon in taxa)
