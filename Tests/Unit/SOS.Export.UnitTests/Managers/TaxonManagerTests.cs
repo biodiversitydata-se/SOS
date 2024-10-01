@@ -12,6 +12,7 @@ using SOS.Lib.Models.TaxonListService;
 using SOS.Lib.Models.TaxonTree;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace SOS.Export.UnitTests.Managers
@@ -51,7 +52,7 @@ namespace SOS.Export.UnitTests.Managers
         /// <returns></returns>
         [Fact]
         [Trait("Category", "Unit")]
-        public void TaxonTreeFail()
+        public async Task TaxonTreeFail()
         {
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -62,7 +63,7 @@ namespace SOS.Export.UnitTests.Managers
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var tree = TestObject.TaxonTree;
+            var tree = await TestObject.GetTaxonTreeAsync();
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -76,7 +77,7 @@ namespace SOS.Export.UnitTests.Managers
         /// <returns></returns>
         [Fact]
         [Trait("Category", "Unit")]
-        public void TaxonTreeSuccess()
+        public async Task TaxonTreeSuccess()
         {
             // -----------------------------------------------------------------------------------------------------------
             // Arrange
@@ -87,7 +88,7 @@ namespace SOS.Export.UnitTests.Managers
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var tree = TestObject.TaxonTree;
+            var tree = await TestObject.GetTaxonTreeAsync();
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------

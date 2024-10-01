@@ -11,6 +11,7 @@ using SOS.Lib.Repositories.Resource.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SOS.Lib.Managers
@@ -19,34 +20,20 @@ namespace SOS.Lib.Managers
     ///     Taxon manager
     /// </summary>
     public class TaxonManager : ITaxonManager
-    {
-        private static readonly object InitTaxonTreeLock = new object();
-        private static readonly object InitTaxonListLock = new object();
+    {        
         private readonly ILogger<TaxonManager> _logger;
         private readonly ITaxonRepository _processedTaxonRepository;
         private readonly ITaxonListRepository _taxonListRepository;
         private readonly IClassCache<TaxonTree<IBasicTaxon>> _taxonTreeCache;
         private readonly IClassCache<TaxonListSetsById> _taxonListSetsByIdCache;
+        private SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
+        private SemaphoreSlim _taxonListSemaphore = new SemaphoreSlim(1, 1);
 
         private void OnTaxonTreeCacheReleased(object sender, EventArgs e)
         {
             _logger.LogInformation("OnTaxonTreeCacheReleased");
-            PopulateTaxonTreeCache();
-        }
-
-        /// <summary>
-        /// Populate taxon tree cache
-        /// </summary>
-        /// <returns></returns>
-        private TaxonTree<IBasicTaxon> PopulateTaxonTreeCache()
-        {
-            lock (InitTaxonTreeLock)
-            {
-                var taxonTree = GetTaxonTreeAsync().Result;
-                _taxonTreeCache.Set(taxonTree);
-                return taxonTree;
-            }
-        }
+            GetTaxonTreeAsync().Wait();
+        }        
 
         /// <summary>
         /// Constructor
@@ -69,37 +56,59 @@ namespace SOS.Lib.Managers
                                    throw new ArgumentNullException(nameof(taxonListRepository));
             _taxonTreeCache = taxonTreeCache ?? throw new ArgumentNullException(nameof(taxonTreeCache));
             _taxonListSetsByIdCache = taxonListSetsByIdCache ?? throw new ArgumentNullException(nameof(taxonListSetsByIdCache));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));            
             _taxonTreeCache.CacheReleased += OnTaxonTreeCacheReleased;
-        }
+        }        
 
-        /// <summary>
-        /// </summary>
-        public TaxonTree<IBasicTaxon> TaxonTree
+        public async Task<TaxonTree<IBasicTaxon>> GetTaxonTreeAsync()
         {
-            get
+            var taxonTree = _taxonTreeCache.Get();
+            if (taxonTree == null)
             {
-                return _taxonTreeCache.Get() ?? PopulateTaxonTreeCache();
-            }
-        }
+                await _semaphore.WaitAsync();
 
-        public Dictionary<int, (HashSet<int> Taxa, HashSet<int> WithUnderlyingTaxa)> TaxonListSetById
-        {
-            get
-            {
-                var taxonListSetsById = _taxonListSetsByIdCache.Get();
-                if (taxonListSetsById == null)
+                try
                 {
-                    lock (InitTaxonListLock)
+                    taxonTree = _taxonTreeCache.Get();
+                    if (taxonTree == null)
                     {
-                        taxonListSetsById = GetTaxonListSetsAsync().Result;
+                        taxonTree = await FetchTaxonTreeAsync();
+                        _taxonTreeCache.Set(taxonTree);
+                    }
+                }
+                finally
+                {
+                    _semaphore.Release();
+                }
+            }
+
+            return taxonTree;
+        }
+
+        public async Task<Dictionary<int, (HashSet<int> Taxa, HashSet<int> WithUnderlyingTaxa)>> GetTaxonListSetByIdAsync()
+        {            
+            var taxonListSetsById = _taxonListSetsByIdCache.Get();
+            if (taxonListSetsById == null)
+            {
+                await _taxonListSemaphore.WaitAsync();
+
+                try
+                {
+                    taxonListSetsById = _taxonListSetsByIdCache.Get();
+                    if (taxonListSetsById == null)
+                    {
+
+                        taxonListSetsById = await GetTaxonListSetsAsync();
                         _taxonListSetsByIdCache.Set(taxonListSetsById);
                     }
                 }
-
-                return taxonListSetsById;
+                finally
+                {
+                    _taxonListSemaphore.Release();
+                }
             }
+
+            return taxonListSetsById;
         }
 
         private async Task<TaxonListSetsById> GetTaxonListSetsAsync()
@@ -110,18 +119,19 @@ namespace SOS.Lib.Managers
             {
                 var tuple = (Taxa: new HashSet<int>(), WithUnderlyingTaxa: new HashSet<int>());
                 tuple.Taxa = taxonList.Taxa.Select(m => m.Id).ToHashSet();
-                tuple.WithUnderlyingTaxa = TaxonTree.GetUnderlyingTaxonIds(tuple.Taxa, true).ToHashSet();
+                var taxonTree = await GetTaxonTreeAsync();
+                tuple.WithUnderlyingTaxa = taxonTree.GetUnderlyingTaxonIds(tuple.Taxa, true).ToHashSet();
                 taxonListSetById.TryAdd(taxonList.Id, tuple);
             }
 
             return taxonListSetById;
         }
 
-        private async Task<TaxonTree<IBasicTaxon>> GetTaxonTreeAsync()
+        private async Task<TaxonTree<IBasicTaxon>> FetchTaxonTreeAsync()
         {
             try
             {
-                _logger.LogInformation("GetTaxonTreeAsync() - Get all taxa from MongoDB and create taxon tree");
+                _logger.LogInformation("FetchTaxonTreeAsync() - Get all taxa from MongoDB and create taxon tree");
                 var taxa = await GetBasicTaxaAsync();
                 var taxaDictionary = new Dictionary<int, IBasicTaxon>();
                 foreach (var taxon in taxa)
@@ -133,7 +143,7 @@ namespace SOS.Lib.Managers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error in GetTaxonTreeAsync()");
+                _logger.LogError(ex, "Error in FetchTaxonTreeAsync()");
                 throw;
             }
         }

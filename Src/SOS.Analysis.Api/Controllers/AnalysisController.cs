@@ -96,7 +96,7 @@ namespace SOS.Analysis.Api.Controllers
                 this.User.CheckAuthorization(_analysisConfiguration.ProtectedScope!, searchFilter.ProtectionFilter);
                 searchFilter = await _searchFilterUtility.InitializeSearchFilterAsync(searchFilter);
                 var validationResult = Result.Combine(
-                    validateFilter ?? false ? _inputValidator.ValidateSearchFilter(searchFilter!) : Result.Success(),
+                    validateFilter ?? false ? (await _inputValidator.ValidateSearchFilterAsync(searchFilter!)) : Result.Success(),
                     _inputValidator.ValidateFields(new[] { aggregationField })
                 );
 
@@ -152,7 +152,7 @@ namespace SOS.Analysis.Api.Controllers
                 searchFilter = await _searchFilterUtility.InitializeSearchFilterAsync(searchFilter);
 
                 var validationResult = Result.Combine(
-                    validateFilter ?? false ? _inputValidator.ValidateSearchFilter(searchFilter!) : Result.Success(),
+                    validateFilter ?? false ? (await _inputValidator.ValidateSearchFilterAsync(searchFilter!)) : Result.Success(),
                     _inputValidator.ValidateFields(new[] { aggregationField }),
                     _inputValidator.ValidateInt(take, 1, 250, "take"));
 
@@ -204,7 +204,7 @@ namespace SOS.Analysis.Api.Controllers
             {
                 this.User.CheckAuthorization(_analysisConfiguration.ProtectedScope!, searchFilter.ProtectionFilter);
                 searchFilter = await _searchFilterUtility.InitializeSearchFilterAsync(searchFilter);
-                var validationResult = validateFilter ?? false ? _inputValidator.ValidateSearchFilter(searchFilter!) : Result.Success();
+                var validationResult = validateFilter ?? false ? (await _inputValidator.ValidateSearchFilterAsync(searchFilter!)) : Result.Success();
 
                 if (validationResult.IsFailure)
                 {
@@ -296,7 +296,7 @@ namespace SOS.Analysis.Api.Controllers
 
                 var validationResult = Result.Combine(
                     edgeLengthValidation,
-                    validateFilter ?? false ? _inputValidator.ValidateSearchFilter(searchFilter!) : Result.Success(),
+                    validateFilter ?? false ? (await _inputValidator.ValidateSearchFilterAsync(searchFilter!)) : Result.Success(),
                     alphaValues?.Any() ?? false ? Result.Success() : Result.Failure("You must state at least one alpha value"),
                     _inputValidator.ValidateInt(gridCellSizeInMeters!.Value, minLimit: 1000, maxLimit: 100000, "Grid cell size in meters"),
                     await _inputValidator.ValidateTilesLimitMetricAsync(
@@ -413,7 +413,7 @@ namespace SOS.Analysis.Api.Controllers
 
                 var validationResult = Result.Combine(
                     edgeLengthValidation,
-                    validateFilter ?? false ? _inputValidator.ValidateSearchFilter(searchFilter!) : Result.Success(),
+                    validateFilter ?? false ? (await _inputValidator.ValidateSearchFilterAsync(searchFilter!)) : Result.Success(),
                     alphaValues?.Any() ?? false ? Result.Success() : Result.Failure("You must state at least one alpha value"),
                     _inputValidator.ValidateInt(gridCellSizeInMeters!.Value, minLimit: 1000, maxLimit: 100000, "Grid cell size in meters"),
                     ValidateUserExport(userExports),
@@ -517,7 +517,7 @@ namespace SOS.Analysis.Api.Controllers
                 var validationResult = Result.Combine(
                     maxDistance > 0 ? Result.Success() : Result.Failure("You must state max distance"),
                     _inputValidator.ValidateInt(maxDistance.Value, minLimit: 1000, maxLimit: 50000, "Max distance in meters"),
-                    validateFilter ?? false ? _inputValidator.ValidateSearchFilter(searchFilter!) : Result.Success(),
+                    validateFilter ?? false ? (await _inputValidator.ValidateSearchFilterAsync(searchFilter!)) : Result.Success(),
                     _inputValidator.ValidateInt(gridCellSizeInMeters!.Value, minLimit: 1000, maxLimit: 100000, "Grid cell size in meters"),
                     await _inputValidator.ValidateTilesLimitMetricAsync(
                         searchFilter!.Geographics!.BoundingBox!.ToEnvelope().Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM),
@@ -602,7 +602,7 @@ namespace SOS.Analysis.Api.Controllers
                 var validationResult = Result.Combine(
                     maxDistance > 0 ? Result.Success() : Result.Failure("You must state max distance"),
                     _inputValidator.ValidateInt(maxDistance.Value, minLimit: 1000, maxLimit: 50000, "Max distance in meters"),
-                    validateFilter ?? false ? _inputValidator.ValidateSearchFilter(searchFilter!) : Result.Success(),
+                    validateFilter ?? false ? (await _inputValidator.ValidateSearchFilterAsync(searchFilter!)) : Result.Success(),
                     _inputValidator.ValidateInt(gridCellSizeInMeters!.Value, minLimit: 1000, maxLimit: 100000, "Grid cell size in meters"),
                     ValidateUserExport(userExports),
                     await _inputValidator.ValidateTilesLimitMetricAsync(

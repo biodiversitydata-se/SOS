@@ -318,7 +318,7 @@ namespace SOS.Shared.Api.Validators
         }
 
         /// <inheritdoc/>
-        public virtual Result ValidateSearchFilter(SearchFilterBaseDto filter, bool allowObjectInOutputFields = true, bool bboxMandatory = false)
+        public virtual async Task<Result> ValidateSearchFilterAsync(SearchFilterBaseDto filter, bool allowObjectInOutputFields = true, bool bboxMandatory = false)
         {
             var errors = new List<string>();
 
@@ -368,7 +368,7 @@ namespace SOS.Shared.Api.Validators
                 errors.Add("When using OnlyEndDate as filter both StartDate and EndDate need to be specified");
             }
 
-            var taxaValidationResult = ValidateTaxa(filter.Taxon?.Ids!);
+            var taxaValidationResult = await ValidateTaxaAsync(filter.Taxon?.Ids!);
             if (taxaValidationResult.IsFailure)
             {
                 errors.Add(taxaValidationResult.Error);
@@ -427,7 +427,7 @@ namespace SOS.Shared.Api.Validators
         /// <param name="validateSearchFilter"></param>
         /// <param name="areaBuffer"></param>
         /// <returns></returns>
-        public Result ValidateSignalSearch(SignalFilterDto filter, bool validateSearchFilter, int areaBuffer)
+        public async Task<Result> ValidateSignalSearchAsync(SignalFilterDto filter, bool validateSearchFilter, int areaBuffer)
         {
             Result validateTaxonLists(TaxonFilterBaseDto filter)
             {
@@ -446,7 +446,7 @@ namespace SOS.Shared.Api.Validators
             }
 
             return Result.Combine(
-                validateSearchFilter ? ValidateTaxa(filter?.Taxon?.Ids) : Result.Success(),
+                validateSearchFilter ? (await ValidateTaxaAsync(filter?.Taxon?.Ids)) : Result.Success(),
                 ValidateGeographicalAreaExists(filter?.Geographics),
                 areaBuffer < 0 || areaBuffer > 100
                     ? Result.Failure("areaBuffer must be between 0 and 100")
@@ -456,10 +456,11 @@ namespace SOS.Shared.Api.Validators
             );
         }
 
-        public Result ValidateTaxa(IEnumerable<int> taxonIds)
+        public async Task<Result> ValidateTaxaAsync(IEnumerable<int> taxonIds)
         {
+            var taxonTree = await _taxonManager.GetTaxonTreeAsync();
             var missingTaxa = taxonIds?
-                .Where(tid => !_taxonManager.TaxonTree.TreeNodeById.ContainsKey(tid))
+                .Where(tid => !taxonTree.TreeNodeById.ContainsKey(tid))
                 .Select(tid => $"TaxonId doesn't exist ({tid})");
 
             return missingTaxa?.Any() ?? false ?

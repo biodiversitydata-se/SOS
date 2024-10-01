@@ -196,7 +196,7 @@ namespace SOS.Observations.Api.Controllers
                 filter = await _searchFilterUtility.InitializeSearchFilterAsync(filter);
                 
                 var validationResult = Result.Combine(
-                    validateSearchFilter ? _inputValidator.ValidateSearchFilter(filter) : Result.Success(),
+                    validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(filter)) : Result.Success(),
                     _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
                     _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries));
                 
@@ -325,7 +325,7 @@ namespace SOS.Observations.Api.Controllers
                 translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
 
                 var validationResult = Result.Combine(
-                    validateSearchFilter ? _inputValidator.ValidateSearchFilter(filter) : Result.Success(),
+                    validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(filter)) : Result.Success(),
                     _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
                     _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries),
                     _inputValidator.ValidateTranslationCultureCode(translationCultureCode),
@@ -442,7 +442,7 @@ namespace SOS.Observations.Api.Controllers
                 var searchFilter = filter.ToSearchFilter(this.GetUserId(), protectionFilter, "en-GB");
 
                 var validationResult = Result.Combine(
-                    validateSearchFilter ? _inputValidator.ValidateSearchFilter(filter) : Result.Success(),
+                    validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(filter)) : Result.Success(),
                     _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
                     _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries),
                     _inputValidator.ValidateGridCellSizeInMetersArgument(gridCellSizeInMeters, minLimit: 100, maxLimit: 100000),
@@ -539,7 +539,7 @@ namespace SOS.Observations.Api.Controllers
                 translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
                 var validationResult = Result.Combine(
                     _inputValidator.ValidateSearchPagingArguments(skip, take),
-                    validateSearchFilter ? _inputValidator.ValidateSearchFilter(filter) : Result.Success(),
+                    validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(filter)) : Result.Success(),
                     _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
                     _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries),
                     _inputValidator.ValidatePropertyExists(nameof(sortBy), sortBy),
@@ -831,7 +831,7 @@ namespace SOS.Observations.Api.Controllers
                 translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
 
                 var validationResult = Result.Combine(
-                    validateSearchFilter ? _inputValidator.ValidateSearchFilter(filter) : Result.Success(),
+                    validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(filter)) : Result.Success(),
                     _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
                     _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries),
                     _inputValidator.ValidateTranslationCultureCode(translationCultureCode),
@@ -974,7 +974,7 @@ namespace SOS.Observations.Api.Controllers
 
                 filter = await _searchFilterUtility.InitializeSearchFilterAsync(filter);
                 var validationResult = Result.Combine(
-                    validateSearchFilter ? _inputValidator.ValidateSearchFilter(filter) : Result.Success(),
+                    validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(filter)) : Result.Success(),
                     _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
                     _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries));
 
@@ -1140,7 +1140,7 @@ namespace SOS.Observations.Api.Controllers
                 translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
 
                 var validationResult = Result.Combine(
-                    validateSearchFilter ? _inputValidator.ValidateSearchFilter(filter) : Result.Success(),
+                    validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(filter)) : Result.Success(),
                     _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
                     _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries),
                     _inputValidator.ValidateTranslationCultureCode(translationCultureCode),
@@ -1220,7 +1220,7 @@ namespace SOS.Observations.Api.Controllers
                 translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
 
                 var validationResult = Result.Combine(
-                    validateSearchFilter ? _inputValidator.ValidateSearchFilter(filter) : Result.Success(),
+                    validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(filter)) : Result.Success(),
                     _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
                     _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries),
                     _inputValidator.ValidateTranslationCultureCode(translationCultureCode),
@@ -1333,7 +1333,7 @@ namespace SOS.Observations.Api.Controllers
                 translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
 
                 var validationResult = Result.Combine(
-                    validateSearchFilter ? _inputValidator.ValidateSearchFilter(filter) : Result.Success(),
+                    validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(filter)) : Result.Success(),
                     _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
                     _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries),
                     _inputValidator.ValidateTranslationCultureCode(translationCultureCode),
@@ -1408,7 +1408,7 @@ namespace SOS.Observations.Api.Controllers
                 var searchFilter = filter.ToSearchFilter(this.GetUserId(), filter.ProtectionFilter, "en-GB");
 
                 var validationResult = Result.Combine(
-                    validateSearchFilter ? _inputValidator.ValidateSearchFilter(filter) : Result.Success(),
+                    validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(filter)) : Result.Success(),
                     _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
                     _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries),
                     _inputValidator.ValidateGridCellSizeInMetersArgument(gridCellSizeInMeters, minLimit: 100, maxLimit: 100000),
@@ -1510,7 +1510,7 @@ namespace SOS.Observations.Api.Controllers
                 filter = await _searchFilterUtility.InitializeSearchFilterAsync(filter);
                 translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
                 var validationResult = Result.Combine(
-                    validateSearchFilter ? _inputValidator.ValidateSearchFilter(filter) : Result.Success(),
+                    validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(filter)) : Result.Success(),
                     _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
                     _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries),
                     _inputValidator.ValidatePropertyExists(nameof(sortBy), sortBy),
@@ -1638,7 +1638,7 @@ namespace SOS.Observations.Api.Controllers
                 filter = await _searchFilterUtility.InitializeSearchFilterAsync(filter);
                 translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
                 var validationResult = Result.Combine(
-                    validateSearchFilter ? _inputValidator.ValidateSearchFilter(filter) : Result.Success(),
+                    validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(filter)) : Result.Success(),
                     _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
                     _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries),
                     _inputValidator.ValidateAggregationPagingArguments(skip, take, true),
@@ -1734,7 +1734,7 @@ namespace SOS.Observations.Api.Controllers
                 translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
                 const int maxTotalCount = 100000;
                 var validationResult = Result.Combine(
-                    validateSearchFilter ? _inputValidator.ValidateSearchFilter(filter) : Result.Success(),
+                    validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(filter)) : Result.Success(),
                     _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
                     _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries),
                     take <= 10000 ? Result.Success() : Result.Failure("You can't take more than 10 000 at a time."),
@@ -1803,7 +1803,7 @@ namespace SOS.Observations.Api.Controllers
                 this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, ProtectionFilterDto.Sensitive);
 
                 var validationResult = Result.Combine(
-                    _inputValidator.ValidateSignalSearch(filter, validateSearchFilter, areaBuffer),
+                    (await _inputValidator.ValidateSignalSearchAsync(filter, validateSearchFilter, areaBuffer)),
                     _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false));
 
                 if (validationResult.IsFailure)
@@ -1912,7 +1912,7 @@ namespace SOS.Observations.Api.Controllers
                 translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
 
                 var validationResult = Result.Combine(
-                    validateSearchFilter ? _inputValidator.ValidateSearchFilter(filter) : Result.Success(),
+                    validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(filter)) : Result.Success(),
                     _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
                     _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries),
                     _inputValidator.ValidateTranslationCultureCode(translationCultureCode),
@@ -2064,7 +2064,7 @@ namespace SOS.Observations.Api.Controllers
                 this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, filter.ProtectionFilter);
                 filter = await _searchFilterUtility.InitializeSearchFilterAsync(filter);
                 var validationResult = Result.Combine(
-                    validateSearchFilter ? _inputValidator.ValidateSearchFilter(filter) : Result.Success(),
+                    validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(filter)) : Result.Success(),
                     _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
                     _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries),
                     _inputValidator.ValidateTaxonExists(filter),
@@ -2124,7 +2124,7 @@ namespace SOS.Observations.Api.Controllers
             {
                 filter.ProtectionFilter = ProtectionFilterDto.Sensitive;
                 var validationResult = Result.Combine(
-                    validateSearchFilter ? _inputValidator.ValidateSearchFilter(filter) : Result.Success(),
+                    validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(filter)) : Result.Success(),
                     _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
                     _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries)
                 );
@@ -2181,7 +2181,7 @@ namespace SOS.Observations.Api.Controllers
             {
                 filter.ProtectionFilter = ProtectionFilterDto.Sensitive;
                 var validationResult = Result.Combine(
-                   validateSearchFilter ? _inputValidator.ValidateSearchFilter(filter) : Result.Success(),
+                   validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(filter)) : Result.Success(),
                    _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
                    _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries)
                 );
@@ -2241,7 +2241,7 @@ namespace SOS.Observations.Api.Controllers
             {
                 filter.ProtectionFilter = ProtectionFilterDto.Sensitive;
                 var validationResult = Result.Combine(
-                  validateSearchFilter ? _inputValidator.ValidateSearchFilter(filter) : Result.Success(),
+                  validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(filter)) : Result.Success(),
                   _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
                   _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries)
                );

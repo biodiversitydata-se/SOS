@@ -101,7 +101,7 @@ namespace SOS.Lib.Managers
                     extendedAuthorizationAreaFilter.GeographicAreas = await PopulateGeographicalFilterAsync(areaFilters, areaBuffer, usePointAccuracy, useDisturbanceRadius);
                 }
 
-                extendedAuthorizationAreaFilter.TaxonIds = GetTaxonIds(authority.TaxonIds, true, null)?.ToList();
+                extendedAuthorizationAreaFilter.TaxonIds = (await GetTaxonIdsAsync(authority.TaxonIds, true, null))?.ToList();
 
                 extendedAuthorizationAreaFilters.Add(extendedAuthorizationAreaFilter);
             }
@@ -126,31 +126,31 @@ namespace SOS.Lib.Managers
         /// </summary>
         /// <param name="filter"></param>
         /// <returns></returns>
-        public void PrepareTaxonFilter(TaxonFilter filter)
+        public async Task PrepareTaxonFilterAsync(TaxonFilter filter)
         {
             if (filter == null)
             {
                 return;
             }
 
-            filter.Ids = GetTaxonIds(filter.Ids,
+            filter.Ids = await GetTaxonIdsAsync(filter.Ids,
                 filter.IncludeUnderlyingTaxa,
                 filter.ListIds,
                 filter.TaxonListOperator,
                 filter.TaxonCategories);
         }
 
-        private List<int> GetTaxonIds(IEnumerable<int> taxonIds,
+        private async Task<List<int>> GetTaxonIdsAsync(IEnumerable<int> taxonIds,
             bool includeUnderlyingTaxa,
             IEnumerable<int> listIds,
             TaxonFilter.TaxonListOp listOperator = TaxonFilter.TaxonListOp.Merge,
             IEnumerable<int> taxonCategories = null,
             bool returnBiotaResultAsNull = true)
         {
-            var taxaIds = GetTaxonFilterIds(taxonIds, includeUnderlyingTaxa, returnBiotaResultAsNull);
+            var taxaIds = await GetTaxonFilterIdsAsync(taxonIds, includeUnderlyingTaxa, returnBiotaResultAsNull);
             if (listIds != null && listIds.Count() > 0)
             {
-                taxaIds = FilterTaxonByTaxonLists(taxaIds, listIds, listOperator, includeUnderlyingTaxa);
+                taxaIds = await FilterTaxonByTaxonListsAsync(taxaIds, listIds, listOperator, includeUnderlyingTaxa);
             }
 
             if (taxonCategories?.Any() ?? false)
@@ -158,10 +158,11 @@ namespace SOS.Lib.Managers
                 if (taxaIds == null || taxaIds.Count() == 0 && includeUnderlyingTaxa)
                 {
                     // If there are no taxaIds we need to add all taxa before taxon category filters are applied.
-                    taxaIds = _taxonManager.TaxonTree.GetUnderlyingTaxonIds(BiotaTaxonId, true);
+                    var taxonTree = await _taxonManager.GetTaxonTreeAsync();
+                    taxaIds = taxonTree.GetUnderlyingTaxonIds(BiotaTaxonId, true);
                 }
 
-                taxaIds = FilterTaxonIdsByTaxonCategories(taxaIds, taxonCategories);
+                taxaIds = await FilterTaxonIdsByTaxonCategoriesAsync(taxaIds, taxonCategories);
                 if (taxaIds == null || taxaIds.Count() == 0)
                 {
                     // If the filter results in no taxa, there should be no matching occurrences.
@@ -172,15 +173,16 @@ namespace SOS.Lib.Managers
             return taxaIds?.Distinct().ToList();
         }
 
-        private List<int> FilterTaxonByTaxonLists(IEnumerable<int> taxaIds,
+        private async Task<List<int>> FilterTaxonByTaxonListsAsync(IEnumerable<int> taxaIds,
             IEnumerable<int> listIds,
             TaxonFilter.TaxonListOp listOperator,
             bool includeUnderlyingTaxa)
         {
             var taxonListIdsSet = new HashSet<int>();
+            var taxonListSetById = await _taxonManager.GetTaxonListSetByIdAsync();
             foreach (var taxonListId in listIds)
             {
-                if (_taxonManager.TaxonListSetById?.TryGetValue(taxonListId, out var taxonListSet) ?? false)
+                if (taxonListSetById?.TryGetValue(taxonListId, out var taxonListSet) ?? false)
                 {
                     if (includeUnderlyingTaxa)
                     {
@@ -229,17 +231,18 @@ namespace SOS.Lib.Managers
         /// <param name="includeUnderlyingTaxa"></param>
         /// <param name="returnBiotaResultAsNull">If true, and the result will be every taxa, returnu null; otherwise return all taxon ids.</param>
         /// <returns></returns>
-        private IEnumerable<int> GetTaxonFilterIds(
+        private async Task<IEnumerable<int>> GetTaxonFilterIdsAsync(
             IEnumerable<int> taxonIds,
             bool includeUnderlyingTaxa,
             bool returnBiotaResultAsNull = true
         )
         {
+            var taxonTree = await _taxonManager.GetTaxonTreeAsync();
             if ((!taxonIds?.Any() ?? true) || !includeUnderlyingTaxa)
             {
                 if (!returnBiotaResultAsNull && includeUnderlyingTaxa)
-                {
-                    return _taxonManager.TaxonTree.GetUnderlyingTaxonIds(new int[] { 0 }, true);
+                {                    
+                    return taxonTree.GetUnderlyingTaxonIds(new int[] { 0 }, true);
                 }
                 else
                 {
@@ -253,7 +256,7 @@ namespace SOS.Lib.Managers
             }
             else
             {
-                return _taxonManager.TaxonTree.GetUnderlyingTaxonIds(taxonIds, true);
+                return taxonTree.GetUnderlyingTaxonIds(taxonIds, true);
             }
         }
 
@@ -263,7 +266,7 @@ namespace SOS.Lib.Managers
         /// <param name="taxonIds"></param>
         /// <param name="taxonCategories"></param>
         /// <returns></returns>
-        private IEnumerable<int> FilterTaxonIdsByTaxonCategories(IEnumerable<int> taxonIds,
+        private async Task<IEnumerable<int>> FilterTaxonIdsByTaxonCategoriesAsync(IEnumerable<int> taxonIds,
             IEnumerable<int> taxonCategories)
         {
             if (taxonCategories == null || !taxonCategories.Any() || taxonIds == null)
@@ -275,7 +278,8 @@ namespace SOS.Lib.Managers
             var filteredIdsByTaxonCategories = new List<int>();
             foreach (var taxonId in taxonIds)
             {
-                var node = _taxonManager.TaxonTree.GetTreeNode(taxonId);
+                var taxonTree = await _taxonManager.GetTaxonTreeAsync();
+                var node = taxonTree.GetTreeNode(taxonId);
                 if (node != null)
                 {
                     int? taxonCategoryId = node?.Data?.Attributes?.TaxonCategory?.Id;
@@ -444,7 +448,7 @@ namespace SOS.Lib.Managers
                 filter.Location.AreaGeographic = await PopulateGeographicalFilterAsync(filter.Location.Areas, areaBuffer ?? 0, filter.Location.Geometries?.UsePointAccuracy ?? false, filter.Location.Geometries?.UseDisturbanceRadius ?? false);
             }
 
-            PrepareTaxonFilter(filter.Taxa);
+            await PrepareTaxonFilterAsync(filter.Taxa);
         }
 
         private static void EnsureIsGeneralizedObservationIsRetrievedFromDb(OutputFilter outputFilter)
@@ -465,7 +469,7 @@ namespace SOS.Lib.Managers
             }
         }
 
-        public HashSet<int> GetTaxonIdsFromFilter(TaxonFilter filter)
+        public async Task<HashSet<int>> GetTaxonIdsFromFilterAsync(TaxonFilter filter)
         {
             if (filter == null)
             {
@@ -473,7 +477,7 @@ namespace SOS.Lib.Managers
             }
 
             // todo - add support for red list categories.
-            var taxonIds = GetTaxonIds(filter.Ids,
+            var taxonIds = await GetTaxonIdsAsync(filter.Ids,
                 filter.IncludeUnderlyingTaxa,
                 filter.ListIds,
                 filter.TaxonListOperator,

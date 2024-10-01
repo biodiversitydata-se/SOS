@@ -578,7 +578,8 @@ namespace SOS.Lib.Managers
                     foreach (var taxonId in originalTaxaList)
                     {
                         filter.Taxa.Ids = new List<int>() { taxonId };
-                        var treeNode = _taxonManager.TaxonTree.GetTreeNode(taxonId);
+                        var taxonTree = await _taxonManager.GetTaxonTreeAsync();
+                        var treeNode = taxonTree.GetTreeNode(taxonId);
                         if (treeNode == null)
                         {
                             _logger.LogWarning($"Can't find taxon tree node with TaxonId={taxonId}");
@@ -721,7 +722,8 @@ namespace SOS.Lib.Managers
                     foreach (var taxonId in originalTaxaList)
                     {
                         filter.Taxa.Ids = new List<int>() { taxonId };
-                        var treeNode = _taxonManager.TaxonTree.GetTreeNode(taxonId);
+                        var taxonTree = await _taxonManager.GetTaxonTreeAsync();
+                        var treeNode = taxonTree.GetTreeNode(taxonId);
                         if (treeNode == null)
                         {
                             _logger.LogWarning($"Can't find taxon tree node with TaxonId={taxonId}");

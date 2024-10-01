@@ -3,6 +3,7 @@ using SOS.Lib.Factories;
 using SOS.Lib.Helpers;
 using SOS.Observations.Api.LiveIntegrationTests.Fixtures;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.TaxonManager
@@ -19,12 +20,12 @@ namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.TaxonManage
 
         [Fact]
         [Trait("Category", "ApiIntegrationTest")]
-        public void Taxon_tree_root_is_biota()
+        public async Task Taxon_tree_root_is_biota()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var taxonTree = _fixture.TaxonManager.TaxonTree;
+            var taxonTree = await _fixture.TaxonManager.GetTaxonTreeAsync();
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -54,12 +55,12 @@ namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.TaxonManage
 
         [Fact]
         [Trait("Category", "ApiIntegrationTest")]
-        public void Taxon_cycle_detection()
+        public async Task Taxon_cycle_detection()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            var taxonTree = _fixture.TaxonManager.TaxonTree;
+            var taxonTree = await _fixture.TaxonManager.GetTaxonTreeAsync();
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
@@ -75,12 +76,12 @@ namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.TaxonManage
 
         [Fact]
         [Trait("Category", "ApiIntegrationTest")]
-        public void Test_QuickGraph_DepthFirstSearch()
+        public async Task Test_QuickGraph_DepthFirstSearch()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            var taxonTree = _fixture.TaxonManager.TaxonTree;
+            var taxonTree = await _fixture.TaxonManager.GetTaxonTreeAsync();
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
@@ -113,12 +114,12 @@ namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.TaxonManage
 
         [Fact]
         [Trait("Category", "ApiIntegrationTest")]
-        public void Create_taxon_Graphviz_diagram()
+        public async Task Create_taxon_Graphviz_diagram()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            var taxonTree = _fixture.TaxonManager.TaxonTree;
+            var taxonTree = await _fixture.TaxonManager.GetTaxonTreeAsync();
             //var taxonIds = new List<int>() { 261815, 261806 };
             var taxonIds = new List<int>() { 222474, 1016470, 221107, 1006157, 2002715 };
 
@@ -139,12 +140,12 @@ namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.TaxonManage
 
         [Fact]
         [Trait("Category", "ApiIntegrationTest")]
-        public void Create_taxon_Mermaid_diagram()
+        public async Task Create_taxon_Mermaid_diagram()
         {
             //-----------------------------------------------------------------------------------------------------------
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
-            var taxonTree = _fixture.TaxonManager.TaxonTree;
+            var taxonTree = await _fixture.TaxonManager.GetTaxonTreeAsync();
             //var taxonIds = new List<int>() { 261815, 261806 };
             var taxonIds = new List<int>() { 222474, 1016470, 221107, 1006157, 2002715 };
 

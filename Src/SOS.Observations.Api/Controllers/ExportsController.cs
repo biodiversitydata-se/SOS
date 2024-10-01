@@ -134,7 +134,7 @@ namespace SOS.Observations.Api.Controllers
             string applicationIdentifier)
         {
             var validationResults = Result.Combine(
-                validateSearchFilter ? _inputValidator.ValidateSearchFilter(filter, allowObjectInOutputFields: false) : Result.Success(),
+                validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(filter, allowObjectInOutputFields: false)) : Result.Success(),
                 _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
                 _inputValidator.ValidateEmail(email),
                 ValidateUserExport(userExport),
@@ -179,7 +179,7 @@ namespace SOS.Observations.Api.Controllers
             string applicationIdentifier)
         {
             var validationResults = Result.Combine(
-                validateSearchFilter ? _inputValidator.ValidateSearchFilter(filter, allowObjectInOutputFields: false) : Result.Success(),
+                validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(filter, allowObjectInOutputFields: false)) : Result.Success(),
                 _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false)
             );
 

@@ -142,7 +142,8 @@ namespace SOS.Observations.Api.Repositories
             
             foreach (var item in result)
             {
-                var treeNode = _taxonManager.TaxonTree.GetTreeNode(item.TaxonId);
+                var taxonTree = await _taxonManager.GetTaxonTreeAsync();
+                var treeNode = taxonTree.GetTreeNode(item.TaxonId);
                 if (treeNode != null)
                 {
                     item.RedlistCategory = treeNode.Data.Attributes.RedlistCategory ?? "";

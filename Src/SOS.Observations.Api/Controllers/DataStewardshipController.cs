@@ -124,7 +124,7 @@ namespace SOS.Observations.Api.Controllers
             {
                 var validationResult = Result.Combine(
                     _inputValidator.ValidateSearchPagingArguments(skip, take),
-                    validateSearchFilter ? _inputValidator.ValidateSearchFilter(filter) : Result.Success(),
+                    validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(filter)) : Result.Success(),
                     _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false));
                 
                 if (validationResult.IsFailure)
@@ -242,7 +242,7 @@ namespace SOS.Observations.Api.Controllers
             {
                 var validationResult = Result.Combine(
                     _inputValidator.ValidateSearchPagingArguments(skip, take),
-                    validateSearchFilter ? _inputValidator.ValidateSearchFilter(filter) : Result.Success(),
+                    validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(filter)) : Result.Success(),
                     _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false));
 
                 if (validationResult.IsFailure)
@@ -354,7 +354,7 @@ namespace SOS.Observations.Api.Controllers
             {
                 var validationResult = Result.Combine(
                     _inputValidator.ValidateSearchPagingArguments(skip, take),
-                    validateSearchFilter ? _inputValidator.ValidateSearchFilter(filter) : Result.Success(),
+                    validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(filter)) : Result.Success(),
                     _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false));
 
                 if (validationResult.IsFailure)

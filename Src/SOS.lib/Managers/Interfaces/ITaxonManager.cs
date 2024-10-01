@@ -1,6 +1,7 @@
 ﻿using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.TaxonTree;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace SOS.Lib.Managers.Interfaces
 {
@@ -8,15 +9,12 @@ namespace SOS.Lib.Managers.Interfaces
     ///     Taxon manager
     /// </summary>
     public interface ITaxonManager
-    {
-        /// <summary>
-        ///     Taxon Tree
-        /// </summary>
-        TaxonTree<IBasicTaxon> TaxonTree { get; }
+    {        
+        Task<TaxonTree<IBasicTaxon>> GetTaxonTreeAsync();
 
         /// <summary>
-        /// Taxon lists taxon ids.
+        /// Get taxon lists taxon ids.
         /// </summary>
-        public Dictionary<int, (HashSet<int> Taxa, HashSet<int> WithUnderlyingTaxa)> TaxonListSetById { get; }
+        public Task<Dictionary<int, (HashSet<int> Taxa, HashSet<int> WithUnderlyingTaxa)>> GetTaxonListSetByIdAsync();
     }
 }

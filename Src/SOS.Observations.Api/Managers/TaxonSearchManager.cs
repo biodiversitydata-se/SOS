@@ -231,7 +231,7 @@ namespace SOS.Observations.Api.Managers
         {
             try
             {
-                var taxonIds = _filterManager.GetTaxonIdsFromFilter(taxonFilter);
+                var taxonIds = await _filterManager.GetTaxonIdsFromFilterAsync(taxonFilter);
                 var cachedTaxonSumAggregation = await GetCachedTaxonSumAggregation(userId);
                 Dictionary<int, TaxonSumAggregationItem> aggregationByTaxonId = null;
                 if (taxonIds == null)

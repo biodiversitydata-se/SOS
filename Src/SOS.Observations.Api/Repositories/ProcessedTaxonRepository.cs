@@ -167,14 +167,15 @@ namespace SOS.Observations.Api.Repositories
         {
             var indexName = GetCurrentIndex(filter);
             Dictionary<int, (int, DateTime?, DateTime?)> observationCountByTaxonId = null;
+            var taxonTree = await _taxonManager.GetTaxonTreeAsync();
 
             // Save requested taxon id's. If biota is requested, id's will be empty then we add all taxon id's to make sure we got all parents for sum calculation
-            var taxonIds = new HashSet<int>((filter.Taxa?.Ids?.Any() ?? false) ? filter.Taxa.Ids : _taxonManager.TaxonTree.GetUnderlyingTaxonIds(0, true));
+            var taxonIds = new HashSet<int>((filter.Taxa?.Ids?.Any() ?? false) ? filter.Taxa.Ids : taxonTree.GetUnderlyingTaxonIds(0, true));
 
             // If IncludeUnderlyingTaxa = true, underlying taxa are allready added. If false we need to add it here to get observations for them to use in calculation
             if ((!filter.Taxa?.IncludeUnderlyingTaxa ?? true) && (filter.Taxa?.Ids?.Any() ?? false))
             {
-                filter.Taxa.Ids = _taxonManager.TaxonTree.GetUnderlyingTaxonIds(filter.Taxa?.Ids, true);
+                filter.Taxa.Ids = taxonTree.GetUnderlyingTaxonIds(filter.Taxa?.Ids, true);
             }
 
             var (query, excludeQuery) = GetCoreQueries(filter);
@@ -193,16 +194,15 @@ namespace SOS.Observations.Api.Repositories
                 }
             }
 
-            var treeNodeSumByTaxonId = new Dictionary<int, TaxonAggregationTreeNodeSum>();
-            var tree = _taxonManager.TaxonTree;
-            foreach (var item in tree.TreeNodeById.Values)
+            var treeNodeSumByTaxonId = new Dictionary<int, TaxonAggregationTreeNodeSum>();                       
+            foreach (var item in taxonTree.TreeNodeById.Values)
             {
                 var (observationCount, firstSighting, lastSighting) = observationCountByTaxonId.GetValueOrDefault(item.TaxonId);
                 var sumNode = new TaxonAggregationTreeNodeSum
                 {
                     FirstSighting = firstSighting,
                     LastSighting = lastSighting,
-                    TopologicalIndex = tree.ReverseTopologicalSortById[item.TaxonId],
+                    TopologicalIndex = taxonTree.ReverseTopologicalSortById[item.TaxonId],
                     TreeNode = item,
                     ObservationCount = observationCount,
                     SumObservationCount = observationCount,
@@ -707,13 +707,13 @@ namespace SOS.Observations.Api.Repositories
                 excludeQueryWithoutTaxaFilter);
 
             var treeNodeSumByTaxonId = new Dictionary<int, TaxonAggregationTreeNodeSum>();
-            var tree = _taxonManager.TaxonTree;
-            foreach (var item in tree.TreeNodeById.Values)
+            var taxonTree = await _taxonManager.GetTaxonTreeAsync();            
+            foreach (var item in taxonTree.TreeNodeById.Values)
             {
                 var taxonProvinceAgg = observationCountByTaxonId.GetValueOrDefault(item.TaxonId);
                 var sumNode = new TaxonAggregationTreeNodeSum
                 {
-                    TopologicalIndex = tree.ReverseTopologicalSortById[item.TaxonId],
+                    TopologicalIndex = taxonTree.ReverseTopologicalSortById[item.TaxonId],
                     TreeNode = item,
                     ObservationCount = taxonProvinceAgg?.ObservationCount ?? 0,
                     SumObservationCount = taxonProvinceAgg?.ObservationCount ?? 0,

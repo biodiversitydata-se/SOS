@@ -27,10 +27,11 @@ namespace SOS.Observations.Api.Controllers
         private readonly ITaxonManager _taxonManager;
         private readonly ILogger<ChecklistsController> _logger;
 
-        private Result ValidateTaxa(IEnumerable<int> taxonIds)
+        private async Task<Result> ValidateTaxaAsync(IEnumerable<int> taxonIds)
         {
+            var taxonTree = await _taxonManager.GetTaxonTreeAsync();
             var missingTaxa = taxonIds?
-                .Where(tid => !_taxonManager.TaxonTree.TreeNodeById.ContainsKey(tid))
+                .Where(tid => !taxonTree.TreeNodeById.ContainsKey(tid))
                 .Select(tid => $"TaxonId doesn't exist ({tid})");
 
             return missingTaxa?.Any() ?? false ?
@@ -68,7 +69,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
-                var taxaValidation = ValidateTaxa(filter?.TaxonId == null ? new int[0] : new[] { filter.TaxonId });
+                var taxaValidation = await ValidateTaxaAsync(filter?.TaxonId == null ? new int[0] : new[] { filter.TaxonId });
 
                 if (taxaValidation.IsFailure)
                 {

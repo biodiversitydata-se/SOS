@@ -118,7 +118,7 @@ namespace SOS.Shared.Api.Validators.Interfaces
         /// <param name="filter"></param>
         /// <param name="bboxMandatory"></param>
         /// <returns></returns>
-        Result ValidateSearchFilter(SearchFilterBaseDto filter, bool allowObjectInOutputFields = true, bool bboxMandatory = false);
+        Task<Result> ValidateSearchFilterAsync(SearchFilterBaseDto filter, bool allowObjectInOutputFields = true, bool bboxMandatory = false);
 
         /// <summary>
         /// Validate Search paging arguments
@@ -143,14 +143,14 @@ namespace SOS.Shared.Api.Validators.Interfaces
         /// <param name="validateSearchFilter"></param>
         /// <param name="areaBuffer"></param>
         /// <returns></returns>
-        Result ValidateSignalSearch(SignalFilterDto filter, bool validateSearchFilter, int areaBuffer);
+        Task<Result> ValidateSignalSearchAsync(SignalFilterDto filter, bool validateSearchFilter, int areaBuffer);
 
         /// <summary>
         /// Validate taxa
         /// </summary>
         /// <param name="taxonIds"></param>
         /// <returns></returns>
-        Result ValidateTaxa(IEnumerable<int> taxonIds);
+        Task<Result> ValidateTaxaAsync(IEnumerable<int> taxonIds);
 
         /// <summary>
         /// Make sure filter contains taxa

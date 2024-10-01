@@ -112,7 +112,7 @@ namespace SOS.Observations.Api.Controllers
 
                 var searchFilter = new SearchFilterBaseDto { Geographics = filter };
                 var validationResult = Result.Combine(
-                    _inputValidator.ValidateSearchFilter(searchFilter),
+                    (await _inputValidator.ValidateSearchFilterAsync(searchFilter)),
                     _inputValidator.ValidateBoundingBox(filter?.BoundingBox, false),
                     _inputValidator.ValidateSearchPagingArguments(skip, take)
                 );

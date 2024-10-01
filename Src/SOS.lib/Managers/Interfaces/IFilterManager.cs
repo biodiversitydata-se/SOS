@@ -48,13 +48,13 @@ namespace SOS.Lib.Managers.Interfaces
         /// Prepare taxon filter
         /// </summary>
         /// <param name="filter"></param>
-        void PrepareTaxonFilter(TaxonFilter filter);
+        Task PrepareTaxonFilterAsync(TaxonFilter filter);
 
         /// <summary>
         /// Get taxon ids from filter.
         /// </summary>
         /// <param name="filter">The taxon filter.</param>
         /// <returns></returns>
-        HashSet<int> GetTaxonIdsFromFilter(TaxonFilter filter);
+        Task<HashSet<int>> GetTaxonIdsFromFilterAsync(TaxonFilter filter);
     }
 }

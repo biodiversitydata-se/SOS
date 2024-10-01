@@ -80,7 +80,7 @@ namespace SOS.Observations.Api.Controllers
             try
             {
                 var validationResults = Result.Combine(
-                    _inputValidator.ValidateSearchFilter(filter),
+                    (await _inputValidator.ValidateSearchFilterAsync(filter)),
                     _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false));
 
                 if (validationResults.IsFailure)
