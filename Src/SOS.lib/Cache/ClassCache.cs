@@ -39,7 +39,7 @@ namespace SOS.Lib.Cache
                 return;
             }
             
-            Logger.LogInformation($"Cache evicted. Key=\"{key}\"");
+            Logger.LogInformation($"Cache evicted. Key=\"{key}\", Reason={reason}");
             if (reason == EvictionReason.Expired)
             {
                 CacheReleased.Invoke(this, EventArgs.Empty);
