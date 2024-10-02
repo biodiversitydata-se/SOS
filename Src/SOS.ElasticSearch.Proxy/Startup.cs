@@ -134,7 +134,7 @@ namespace SOS.ElasticSearch.Proxy
             services.AddScoped<ITaxonListRepository, TaxonListRepository>();
 
             // Add managers
-            services.AddScoped<ITaxonManager, TaxonManager>();
+            services.AddSingleton<ITaxonManager, TaxonManager>();
 
             // Add caches
             services.AddSingleton<IClassCache<TaxonTree<IBasicTaxon>>, ClassCache<TaxonTree<IBasicTaxon>>>();
