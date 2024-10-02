@@ -27,13 +27,14 @@ namespace SOS.Lib.Managers
         private readonly IClassCache<TaxonTree<IBasicTaxon>> _taxonTreeCache;
         private readonly IClassCache<TaxonListSetsById> _taxonListSetsByIdCache;
         private SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
-        private SemaphoreSlim _taxonListSemaphore = new SemaphoreSlim(1, 1);
+        private SemaphoreSlim _taxonListSemaphore = new SemaphoreSlim(1, 1);   
 
-        private void OnTaxonTreeCacheReleased(object sender, EventArgs e)
+        private void OnTaxonTreeCacheExpiresSoon(object sender, EventArgs e)
         {
-            _logger.LogInformation("OnTaxonTreeCacheReleased");
-            GetTaxonTreeAsync().Wait();
-        }        
+            _logger.LogInformation("OnTaxonTreeCacheExpireSoon");
+            var taxonTree = FetchTaxonTreeAsync().Result;
+            _taxonTreeCache.Set(taxonTree);
+        }
 
         /// <summary>
         /// Constructor
@@ -56,8 +57,9 @@ namespace SOS.Lib.Managers
                                    throw new ArgumentNullException(nameof(taxonListRepository));
             _taxonTreeCache = taxonTreeCache ?? throw new ArgumentNullException(nameof(taxonTreeCache));
             _taxonListSetsByIdCache = taxonListSetsByIdCache ?? throw new ArgumentNullException(nameof(taxonListSetsByIdCache));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));            
-            _taxonTreeCache.CacheReleased += OnTaxonTreeCacheReleased;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _taxonTreeCache.CacheExpireSoon += OnTaxonTreeCacheExpiresSoon;
+            _logger.LogInformation("TaxonManager created");
         }        
 
         public async Task<TaxonTree<IBasicTaxon>> GetTaxonTreeAsync()

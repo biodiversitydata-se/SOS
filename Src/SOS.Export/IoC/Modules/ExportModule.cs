@@ -92,7 +92,7 @@ namespace SOS.Export.IoC.Modules
             builder.RegisterType<FilterManager>().As<IFilterManager>().InstancePerLifetimeScope();
             builder.RegisterType<ObservationManager>().As<IObservationManager>().InstancePerLifetimeScope();
             builder.RegisterType<ProjectManager>().As<IProjectManager>().InstancePerLifetimeScope();
-            builder.RegisterType<TaxonManager>().As<ITaxonManager>().InstancePerLifetimeScope();
+            builder.RegisterType<TaxonManager>().As<ITaxonManager>().SingleInstance();
            
             // Repositories elastic
             builder.RegisterType<ProcessedObservationCoreRepository>().As<IProcessedObservationCoreRepository>()

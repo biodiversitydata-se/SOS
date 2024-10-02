@@ -29,6 +29,7 @@ namespace SOS.Lib.Cache
         private JsonSerializerOptions _cacheKeyJsonSerializerOptions;
         private JsonSerializerOptions _cacheDataJsonSerializerOptions;
         private int _maxNumberOfItems = 50000;
+        private Timer _renewalTimer;
 
         private void OnCacheEviction(object key, object value, EvictionReason reason, object state)
         {
@@ -76,9 +77,12 @@ namespace SOS.Lib.Cache
         /// Cache duration.
         /// </summary>
         public TimeSpan CacheDuration { get; set; } = TimeSpan.FromMinutes(10);
+        public TimeSpan CacheExpireSoonTimeSpan { get; set; } = TimeSpan.FromMinutes(1);
 
         /// <inheritdoc />
         public event EventHandler CacheReleased;
+
+        public event EventHandler CacheExpireSoon;
 
         /// <inheritdoc />
         public TClass Get()
@@ -100,7 +104,20 @@ namespace SOS.Lib.Cache
                     .RegisterPostEvictionCallback(callback: OnCacheEviction, state: this);                
                 _memoryCache.Set(_cacheKey, entity, cacheEntryOptions);
                 Logger.LogInformation($"Cache set. Key=\"{_cacheKey}\"");
+                var expirationTime = CacheDuration - CacheExpireSoonTimeSpan;
+                _renewalTimer = new Timer(OnRenewalTimerElapsed, null, expirationTime, Timeout.InfiniteTimeSpan);
             }
+        }
+
+        private void OnRenewalTimerElapsed(object state)
+        {
+            if (CacheExpireSoon == null)
+            {
+                return;
+            }
+
+            Logger.LogInformation($"Cache expiration approaching. Key=\"{_cacheKey}\".");
+            CacheExpireSoon.Invoke(this, EventArgs.Empty);
         }
 
         public void CheckCacheSize<T>(Dictionary<string, CacheEntry<T>> dictionary)

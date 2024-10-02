@@ -17,6 +17,11 @@ namespace SOS.Lib.Cache.Interfaces
         event EventHandler CacheReleased;
 
         /// <summary>
+        /// Event raised when cache soon expires
+        /// </summary>
+        event EventHandler CacheExpireSoon;
+
+        /// <summary>
         /// Get cached entity
         /// </summary>
         /// <returns></returns>
