@@ -38,8 +38,12 @@ namespace SOS.Lib.Cache
             {
                 return;
             }
+            
             Logger.LogInformation($"Cache evicted. Key=\"{key}\"");
-            CacheReleased.Invoke(this, EventArgs.Empty);
+            if (reason == EvictionReason.Expired)
+            {
+                CacheReleased.Invoke(this, EventArgs.Empty);
+            }
         }
 
         /// <summary>
