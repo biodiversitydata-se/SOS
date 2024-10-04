@@ -19,6 +19,10 @@ using SOS.Lib.Configuration.Shared;
 using SOS.Lib.JsonConverters;
 using SOS.Lib.Managers;
 using SOS.Lib.Managers.Interfaces;
+using SOS.Lib.Security.Interfaces;
+using SOS.Lib.Security;
+using SOS.Lib.Services;
+using SOS.Lib.Services.Interfaces;
 using System;
 using System.Globalization;
 using System.IO;
@@ -160,6 +164,12 @@ namespace SOS.Administration.Api
             services.AddSingleton<GeoRegionApiConfiguration>(importConfiguration.GeoRegionApiConfiguration);
 
             services.AddScoped<ICacheManager, CacheManager>();
+
+            services.AddSingleton<IApiUsageStatisticsManager, ApiUsageStatisticsManager>();
+            services.AddSingleton<IApplicationInsightsService, ApplicationInsightsService>();
+            ApiManagementServiceConfiguration apiMgmtServiceConfiguration = new ApiManagementServiceConfiguration();
+            services.AddSingleton(apiMgmtServiceConfiguration);
+            services.AddScoped<IAuthorizationProvider, CurrentUserAuthorization>();
 
             /*       // Add managers
                    services.AddSingleton<IIptManager, IIptManager>();

@@ -146,8 +146,9 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// Get number of matches for query
         /// </summary>
         /// <param name="filter"></param>
+        /// <param name="skipAuthorizationFilters"></param>
         /// <returns></returns>
-        Task<long> GetMatchCountAsync(SearchFilterBase filter);
+        Task<long> GetMatchCountAsync(SearchFilterBase filter, bool skipAuthorizationFilters = false);
 
         /// <summary>
         /// Get observations by their occurrence id's

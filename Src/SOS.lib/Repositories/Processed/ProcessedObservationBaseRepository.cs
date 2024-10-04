@@ -40,8 +40,9 @@ namespace SOS.Lib.Repositories.Processed
         /// Get public index name and also protected index name if user is authorized
         /// </summary>
         /// <param name="filter"></param>
+        /// <param name="skipAuthorizationFilters"></param>
         /// <returns></returns>
-        protected string GetCurrentIndex(SearchFilterBase filter)
+        protected string GetCurrentIndex(SearchFilterBase filter, bool skipAuthorizationFilters = false)
         {
             if (
                 (
@@ -52,7 +53,7 @@ namespace SOS.Lib.Repositories.Processed
                 (filter?.ExtendedAuthorization.UserId ?? 0) == 0
             )
             {
-                throw new AuthenticationRequiredException("Not authenticated");
+                if (!skipAuthorizationFilters) throw new AuthenticationRequiredException("Not authenticated");
             }
 
             return filter.ExtendedAuthorization.ProtectionFilter switch

@@ -75,7 +75,10 @@ namespace SOS.Lib.Services
                                  nameof(apiManagementServiceConfiguration));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-            _requestToken = CreateToken();
+            if (!string.IsNullOrEmpty(_configuration.SigningKey))
+            {
+                _requestToken = CreateToken();
+            }
         }
 
         /// <inheritdoc />

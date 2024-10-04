@@ -5,6 +5,7 @@ using SOS.Shared.Api.Dtos;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using static SOS.Observations.Api.Managers.ObservationManager;
 
 namespace SOS.Observations.Api.Managers.Interfaces
 {
@@ -107,10 +108,13 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <param name="roleId"></param>
         /// <param name="authorizationApplicationIdentifier"></param>
         /// <param name="filter"></param>
+        /// <param name="skipAuthorizationFilters"></param>
         /// <returns></returns>
         Task<long> GetMatchCountAsync(
             int? roleId,
-            string authorizationApplicationIdentifier, SearchFilterBase filter);
+            string authorizationApplicationIdentifier, 
+            SearchFilterBase filter,
+            bool skipAuthorizationFilters = false);
 
         /// <summary>
         /// Get single observation
@@ -181,5 +185,9 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <param name="protectedIndex"></param>
         /// <returns></returns>
         Task<long> IndexCountAsync(bool protectedIndex = false);
+
+        Task<Dictionary<string, ObservationStatistics>> CalculateObservationStatisticsAsync(DateTime fromDate, DateTime toDate);
+
+        Task<byte[]> CreateObservationStatisticsSummaryExcelFileAsync(DateTime fromDate, DateTime toDate);
     }
 }

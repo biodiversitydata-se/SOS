@@ -22,6 +22,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using OfficeOpenXml;
 
 namespace SOS.Observations.Api.Managers
 {
@@ -38,6 +39,7 @@ namespace SOS.Observations.Api.Managers
         private readonly ITaxonObservationCountCache _taxonObservationCountCache;
         private readonly IClassCache<Dictionary<int, TaxonSumAggregationItem>> _taxonSumAggregationCache;
         private readonly IGeneralizationResolver _generalizationResolver;
+        private readonly IDataProviderCache _dataProviderCache;
         private readonly ILogger<ObservationManager> _logger;
 
         private async Task<long> GetProvinceCountAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilterBase filter)
@@ -119,8 +121,8 @@ namespace SOS.Observations.Api.Managers
                 protectedFilter.IncludeSensitiveGeneralizedObservations = true;
                 protectedFilter.IsPublicGeneralizedObservation = false;
                 protectedFilter.OccurrenceIds = generalizedOccurrenceIds;
-                if (protectedFilter.Output.Fields != null) 
-                { 
+                if (protectedFilter.Output.Fields != null)
+                {
                     if (!protectedFilter.Output.Fields.Contains("Occurrence.OccurrenceId"))
                     {
                         protectedFilter.Output.Fields.Add("Occurrence.OccurrenceId");
@@ -130,7 +132,7 @@ namespace SOS.Observations.Api.Managers
                         protectedFilter.Output.Fields.Add("IsGeneralized");
                     }
                 }
-                
+
                 await _filterManager.PrepareFilterAsync(null, null, protectedFilter); // todo - add role and applicationId
                 var dynamicSensitiveObservationsResult = await _processedObservationRepository.GetChunkAsync(protectedFilter, 0, 1000);
 
@@ -178,7 +180,7 @@ namespace SOS.Observations.Api.Managers
         private T? GetValue<T>(IDictionary<string, object> obs, string propertyPath)
         {
             var parts = propertyPath
-                .Split(".")                
+                .Split(".")
                 .Select(m => m.ToCamelCase());
 
             var currentVal = obs;
@@ -193,7 +195,7 @@ namespace SOS.Observations.Api.Managers
                     else
                     {
                         return (T)currentValObject;
-                    }                    
+                    }
                 }
             }
 
@@ -211,7 +213,7 @@ namespace SOS.Observations.Api.Managers
             for (int i = 0; i < parts.Count; i++)
             {
                 string part = parts[i];
-                if (i == parts.Count-1)
+                if (i == parts.Count - 1)
                 {
                     if (currentVal.ContainsKey(part))
                     {
@@ -231,14 +233,14 @@ namespace SOS.Observations.Api.Managers
         }
 
         private void UpdateGeneralizedWithRealValues(IDictionary<string, object> obs, IDictionary<string, object> realObs)
-        {            
+        {
             // isGeneralized
             if (obs.ContainsKey("isGeneralized"))
-            {                               
+            {
                 if (realObs.ContainsKey("isGeneralized"))
                 {
                     obs["isGeneralized"] = realObs["isGeneralized"];
-                }                
+                }
             }
 
             if (obs.ContainsKey("location"))
@@ -296,8 +298,8 @@ namespace SOS.Observations.Api.Managers
                         }
                     }
                 }
-            } 
-            catch(Exception e) 
+            }
+            catch (Exception e)
             {
                 _logger.LogError(e, "Error when getting generalized observations");
             }
@@ -316,6 +318,7 @@ namespace SOS.Observations.Api.Managers
         /// <param name="taxonObservationCountCache"></param>
         /// <param name="taxonSumAggregationCache"></param>
         /// <param name="generalizationResolver"></param>
+        /// <param name="dataProviderCache"></param>
         /// <param name="logger"></param>
         public ObservationManager(
             IProcessedObservationRepository processedObservationRepository,
@@ -326,6 +329,7 @@ namespace SOS.Observations.Api.Managers
             ITaxonObservationCountCache taxonObservationCountCache,
             IClassCache<Dictionary<int, TaxonSumAggregationItem>> taxonSumAggregationCache,
             IGeneralizationResolver generalizationResolver,
+            IDataProviderCache dataProviderCache,
             ILogger<ObservationManager> logger)
         {
             _processedObservationRepository = processedObservationRepository ??
@@ -338,6 +342,7 @@ namespace SOS.Observations.Api.Managers
             _taxonObservationCountCache = taxonObservationCountCache ?? throw new ArgumentNullException(nameof(taxonObservationCountCache));
             _taxonSumAggregationCache = taxonSumAggregationCache ?? throw new ArgumentNullException(nameof(taxonSumAggregationCache));
             _generalizationResolver = generalizationResolver ?? throw new ArgumentNullException(nameof(generalizationResolver));
+            _dataProviderCache = dataProviderCache ?? throw new ArgumentNullException(nameof(dataProviderCache));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             // Make sure we are working with live data
@@ -509,10 +514,10 @@ namespace SOS.Observations.Api.Managers
         }
 
         /// <inheritdoc />
-        public async Task<long> GetMatchCountAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilterBase filter)
+        public async Task<long> GetMatchCountAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilterBase filter, bool skipAuthorizationFilters = false)
         {
             await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
-            return await _processedObservationRepository.GetMatchCountAsync(filter);
+            return await _processedObservationRepository.GetMatchCountAsync(filter, skipAuthorizationFilters);
         }
 
         public async Task<IEnumerable<TaxonObservationCountDto>> GetCachedCountAsync(SearchFilterBase filter, TaxonObservationCountSearch taxonObservationCountSearch)
@@ -723,6 +728,395 @@ namespace SOS.Observations.Api.Managers
         public async Task<long> IndexCountAsync(bool protectedIndex = false)
         {
             return await _processedObservationRepository.IndexCountAsync(protectedIndex);
+        }
+
+        public async Task<Dictionary<string, ObservationStatistics>> CalculateObservationStatisticsAsync(DateTime fromDate, DateTime toDate)
+        {
+            try
+            {
+                var result = new Dictionary<string, ObservationStatistics>();
+                var dataProviders = await _dataProviderCache.GetAllAsync();
+                TimeSpan delay = TimeSpan.FromMilliseconds(100); // delay between calls to Elasticsearch.
+                ObservationStatistics statisticsBefore = null;
+
+                var searchFilter = new SearchFilter()
+                {
+                    DataProviderIds = dataProviders.Select(m => m.Id).ToList(),
+                    Date = new DateFilter
+                    {
+                        DateFilterType = DateFilter.DateRangeFilterType.OverlappingStartDateAndEndDate
+                    },
+                    Taxa = new TaxonFilter
+                    {
+
+                    }
+                };
+
+                toDate = new DateTime(toDate.Year, toDate.Month, DateTime.DaysInMonth(toDate.Year, toDate.Month), 23, 59, 59);
+                DateTime current = new DateTime(fromDate.Year, fromDate.Month, 1);
+                current -= TimeSpan.FromDays(1);
+                current = new DateTime(current.Year, current.Month, DateTime.DaysInMonth(current.Year, current.Month), 23, 59, 59);
+
+                // Loop through each month
+                while (current <= toDate)
+                {
+                    searchFilter.Date.EndDate = current;
+                    string dateKey = $"Until {current:yyyy-MM-dd}";
+                    result.Add(dateKey, new ObservationStatistics());
+
+                    // Total
+                    searchFilter = new SearchFilter()
+                    {
+                        DataProviderIds = dataProviders.Select(m => m.Id).ToList(),
+                        Date = new DateFilter
+                        {
+                            DateFilterType = DateFilter.DateRangeFilterType.OverlappingStartDateAndEndDate,
+                            EndDate = current
+                        },
+                        VerificationStatus = SearchFilterBase.StatusVerification.BothVerifiedAndNotVerified,
+                        ExtendedAuthorization = new ExtendedAuthorizationFilter
+                        {
+                            ProtectionFilter = ProtectionFilter.BothPublicAndSensitive
+                        }
+                    };
+                    result[dateKey].TotalCount = (int)await GetMatchCountAsync(null, null, searchFilter, true);                    
+
+                    // Verified
+                    searchFilter = new SearchFilter()
+                    {
+                        DataProviderIds = dataProviders.Select(m => m.Id).ToList(),
+                        Date = new DateFilter
+                        {
+                            DateFilterType = DateFilter.DateRangeFilterType.OverlappingStartDateAndEndDate,
+                            EndDate = current
+                        },
+                        VerificationStatus = SearchFilterBase.StatusVerification.Verified,
+                        ExtendedAuthorization = new ExtendedAuthorizationFilter
+                        {
+                            ProtectionFilter = ProtectionFilter.BothPublicAndSensitive
+                        }
+                    };
+                    result[dateKey].VerifiedCount = (int)await GetMatchCountAsync(null, null, searchFilter, true);
+
+                    // Redlisted
+                    searchFilter = new SearchFilter()
+                    {
+                        DataProviderIds = dataProviders.Select(m => m.Id).ToList(),
+                        Date = new DateFilter
+                        {
+                            DateFilterType = DateFilter.DateRangeFilterType.OverlappingStartDateAndEndDate,
+                            EndDate = current
+                        },
+                        Taxa = new TaxonFilter
+                        {
+                            RedListCategories = ["CR", "EN", "VU", "NT"]
+                        },
+                        VerificationStatus = SearchFilterBase.StatusVerification.BothVerifiedAndNotVerified,
+                        ExtendedAuthorization = new ExtendedAuthorizationFilter
+                        {
+                            ProtectionFilter = ProtectionFilter.BothPublicAndSensitive
+                        }
+                    };
+                    result[dateKey].RedlistedCount = (int)await GetMatchCountAsync(null, null, searchFilter, true);
+
+                    // Invasive
+                    searchFilter = new SearchFilter()
+                    {
+                        DataProviderIds = dataProviders.Select(m => m.Id).ToList(),
+                        Date = new DateFilter
+                        {
+                            DateFilterType = DateFilter.DateRangeFilterType.OverlappingStartDateAndEndDate,
+                            EndDate = current
+                        },
+                        Taxa = new TaxonFilter
+                        {
+                            ListIds = [3]
+                        },
+                        VerificationStatus = SearchFilterBase.StatusVerification.BothVerifiedAndNotVerified,
+                        ExtendedAuthorization = new ExtendedAuthorizationFilter
+                        {
+                            ProtectionFilter = ProtectionFilter.BothPublicAndSensitive
+                        }
+                    };
+                    result[dateKey].InvasiveCount = (int)await GetMatchCountAsync(null, null, searchFilter, true);
+
+
+                    // Calculate by data provider
+                    foreach (var dataprovider in dataProviders)
+                    {
+                        // Total
+                        searchFilter = new SearchFilter()
+                        {
+                            DataProviderIds = [dataprovider.Id],
+                            Date = new DateFilter
+                            {
+                                DateFilterType = DateFilter.DateRangeFilterType.OverlappingStartDateAndEndDate,
+                                EndDate = current
+                            },
+                            VerificationStatus = SearchFilterBase.StatusVerification.BothVerifiedAndNotVerified,
+                            ExtendedAuthorization = new ExtendedAuthorizationFilter
+                            {
+                                ProtectionFilter = ProtectionFilter.BothPublicAndSensitive
+                            }
+                        };
+                        await Task.Delay(delay);
+                        var totalCountForProvider = await GetMatchCountAsync(null, null, searchFilter, true);
+
+                        // Verified
+                        searchFilter = new SearchFilter()
+                        {
+                            DataProviderIds = [dataprovider.Id],
+                            Date = new DateFilter
+                            {
+                                DateFilterType = DateFilter.DateRangeFilterType.OverlappingStartDateAndEndDate,
+                                EndDate = current
+                            },
+                            VerificationStatus = SearchFilterBase.StatusVerification.Verified,
+                            ExtendedAuthorization = new ExtendedAuthorizationFilter
+                            {
+                                ProtectionFilter = ProtectionFilter.BothPublicAndSensitive
+                            }
+                        };
+                        await Task.Delay(delay);
+                        var verifiedCountForProvider = await GetMatchCountAsync(null, null, searchFilter, true);
+
+                        // Redlisted
+                        searchFilter = new SearchFilter()
+                        {
+                            DataProviderIds = [dataprovider.Id],
+                            Date = new DateFilter
+                            {
+                                DateFilterType = DateFilter.DateRangeFilterType.OverlappingStartDateAndEndDate,
+                                EndDate = current
+                            },
+                            Taxa = new TaxonFilter
+                            {
+                                RedListCategories = ["CR", "EN", "VU", "NT"]
+                            },
+                            VerificationStatus = SearchFilterBase.StatusVerification.BothVerifiedAndNotVerified,
+                            ExtendedAuthorization = new ExtendedAuthorizationFilter
+                            {
+                                ProtectionFilter = ProtectionFilter.BothPublicAndSensitive
+                            }
+                        };
+                        await Task.Delay(delay);
+                        var redlistedCountForProvider = await GetMatchCountAsync(null, null, searchFilter, true);
+
+                        // Invasive
+                        searchFilter = new SearchFilter()
+                        {
+                            DataProviderIds = [dataprovider.Id],
+                            Date = new DateFilter
+                            {
+                                DateFilterType = DateFilter.DateRangeFilterType.OverlappingStartDateAndEndDate,
+                                EndDate = current
+                            },
+                            Taxa = new TaxonFilter
+                            {
+                                ListIds = [3]
+                            },
+                            VerificationStatus = SearchFilterBase.StatusVerification.BothVerifiedAndNotVerified,
+                            ExtendedAuthorization = new ExtendedAuthorizationFilter
+                            {
+                                ProtectionFilter = ProtectionFilter.BothPublicAndSensitive
+                            }
+                        };
+                        await Task.Delay(delay);
+                        var invasiveCountForProvider = await GetMatchCountAsync(null, null, searchFilter, true);
+
+                        result[dateKey].ObservationCountByProvider.Add(dataprovider.Names.First().Value, new ObservationCountTuple()
+                        {
+                            TotalCount = (int)totalCountForProvider,
+                            RedlistedCount = (int)redlistedCountForProvider,
+                            VerifiedCount = (int)verifiedCountForProvider,
+                            InvasiveCount = (int)invasiveCountForProvider
+                        });
+                        await Task.Delay(delay);
+                    }
+                   
+                    if (statisticsBefore != null)
+                    {
+                        var diffStatistics = CreateDiff(statisticsBefore, result[dateKey]);
+                        string betweenDateKey = $"{current:yyyy-MM-01} to {current:yyyy-MM-dd}";
+                        result.Add(betweenDateKey, diffStatistics);
+                    }
+                    
+                    statisticsBefore = result[dateKey];
+
+                    // Move to the last day of the next month
+                    current = current.AddDays(1);
+                    current = new DateTime(current.Year, current.Month, DateTime.DaysInMonth(current.Year, current.Month), 23, 59, 59);
+                }
+                
+                result.Remove(result.First().Key);
+                return result;
+            }
+            catch (TimeoutException e)
+            {
+                _logger.LogError(e, "Get NV statistics timeout");
+                throw;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to get NV statistics");
+                throw;
+            }
+        }
+
+        private ObservationStatistics CreateDiff(ObservationStatistics before, ObservationStatistics after)
+        {
+            ObservationStatistics result = new ObservationStatistics();
+            result.TotalCount = after.TotalCount - before.TotalCount;
+            result.RedlistedCount = after.RedlistedCount - before.RedlistedCount;
+            result.VerifiedCount = after.VerifiedCount - before.VerifiedCount;
+            result.InvasiveCount = after.InvasiveCount - before.InvasiveCount;
+            result.ObservationCountByProvider = CreateDiff(before.ObservationCountByProvider, after.ObservationCountByProvider);
+
+            return result;
+        }
+
+        private Dictionary<string, int> CreateDiff(Dictionary<string, int> before, Dictionary<string, int> after)
+        {
+            Dictionary<string, int> result = new Dictionary<string, int>();
+            foreach (var pair in after)
+            {
+                if (before.TryGetValue(pair.Key, out int beforeValue))
+                {
+                    result.Add(pair.Key, pair.Value - beforeValue);
+                }
+                else
+                {
+                    result.Add(pair.Key, pair.Value);
+                }
+            }
+
+            return result;
+        }
+
+        private Dictionary<string, ObservationCountTuple> CreateDiff(Dictionary<string, ObservationCountTuple> before, Dictionary<string, ObservationCountTuple> after)
+        {
+            Dictionary<string, ObservationCountTuple> result = new Dictionary<string, ObservationCountTuple>();
+            foreach (var pair in after)
+            {
+                if (before.TryGetValue(pair.Key, out ObservationCountTuple beforeValue))
+                {
+                    result.Add(pair.Key, new ObservationCountTuple
+                    {
+                        TotalCount = pair.Value.TotalCount - beforeValue.TotalCount,
+                        VerifiedCount = pair.Value.VerifiedCount - beforeValue.VerifiedCount,
+                        RedlistedCount = pair.Value.RedlistedCount - beforeValue.RedlistedCount,
+                        InvasiveCount = pair.Value.InvasiveCount - beforeValue.InvasiveCount
+                    });
+                }
+                else
+                {
+                    result.Add(pair.Key, pair.Value);
+                }
+            }
+
+            return result;
+        }
+
+        public async Task<byte[]> CreateObservationStatisticsSummaryExcelFileAsync(DateTime fromDate, DateTime toDate)
+        {
+            var statisticsByDate = await CalculateObservationStatisticsAsync(fromDate, toDate);
+            var summaryExcelWriter = new ObservationStatisticsSummaryExcelWriter();
+            byte[] excelFile = await summaryExcelWriter.CreateExcelFileAsync(statisticsByDate);
+            return excelFile;
+        }
+
+        public class ObservationStatistics
+        {
+            public int TotalCount { get; set; }
+            public int RedlistedCount { get; set; }
+            public int VerifiedCount { get; set; }
+            public int InvasiveCount { get; set; }
+            public Dictionary<string, int> TotalCountByProvider { get; set; }
+            public Dictionary<string, int> RedlistedCountByProvider { get; set; }
+            public Dictionary<string, int> VerifiedCountByProvider { get; set; }
+            public Dictionary<string, int> InvasiveCountByProvider { get; set; }
+            public Dictionary<string, ObservationCountTuple> ObservationCountByProvider { get; set; } = new Dictionary<string, ObservationCountTuple>();
+        }
+
+        public class ObservationCountTuple
+        {
+            public int TotalCount { get; set; }
+            public int RedlistedCount { get; set; }
+            public int VerifiedCount { get; set; }
+            public int InvasiveCount { get; set; }
+        }
+
+        public class ObservationStatisticsSummaryExcelWriter
+        {
+            public async Task<byte[]> CreateExcelFileAsync(Dictionary<string, ObservationStatistics> statisticsByDate)
+            {
+                ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+                using var package = new ExcelPackage();
+                foreach (var item in statisticsByDate)
+                {
+                    CreateWorksheet(package, item.Key, item.Value);
+                }
+
+                byte[] excelBytes = await package.GetAsByteArrayAsync();
+                return excelBytes;
+            }
+
+            private ExcelWorksheet CreateWorksheet(ExcelPackage package, string title, ObservationStatistics observationStatistics)
+            {
+                ExcelWorksheet worksheet = package.Workbook.Worksheets.Add(title);
+                worksheet.Cells[1, 1].Value = title;
+                worksheet.Cells[1, 1].Style.Font.Bold = true;
+                worksheet.Cells[1, 1].Style.Font.UnderLine = true;
+
+                worksheet.Cells[2, 1].Value = "# Total observations";
+                worksheet.Cells[2, 1].Style.Font.Bold = true;
+                worksheet.Cells[2, 2].Value = observationStatistics.TotalCount;
+                worksheet.Cells[2, 2].Style.Numberformat.Format = "#,##0";
+
+                worksheet.Cells[3, 1].Value = "# Verified observations";
+                worksheet.Cells[3, 1].Style.Font.Bold = true;
+                worksheet.Cells[3, 2].Value = observationStatistics.VerifiedCount;
+                worksheet.Cells[3, 2].Style.Numberformat.Format = "#,##0";
+
+                worksheet.Cells[4, 1].Value = "# Redlisted observations";
+                worksheet.Cells[4, 1].Style.Font.Bold = true;
+                worksheet.Cells[4, 2].Value = observationStatistics.RedlistedCount;
+                worksheet.Cells[4, 2].Style.Numberformat.Format = "#,##0";
+
+                worksheet.Cells[5, 1].Value = "# Invasive observations";
+                worksheet.Cells[5, 1].Style.Font.Bold = true;
+                worksheet.Cells[5, 2].Value = observationStatistics.InvasiveCount;
+                worksheet.Cells[5, 2].Style.Numberformat.Format = "#,##0";
+
+                worksheet.Cells[7, 1].Value = "Dataprovider";
+                worksheet.Cells[7, 1].Style.Font.Bold = true;
+                worksheet.Cells[7, 2].Value = "# Total";
+                worksheet.Cells[7, 2].Style.Font.Bold = true;
+                worksheet.Cells[7, 3].Value = "# Verified";
+                worksheet.Cells[7, 3].Style.Font.Bold = true;
+                worksheet.Cells[7, 4].Value = "# Redlisted";
+                worksheet.Cells[7, 4].Style.Font.Bold = true;
+                worksheet.Cells[7, 5].Value = "# Invasive";
+                worksheet.Cells[7, 5].Style.Font.Bold = true;
+                int row = 8;
+                foreach (var pair in observationStatistics.ObservationCountByProvider)
+                {
+                    worksheet.Cells[row, 1].Value = pair.Key;
+                    worksheet.Cells[row, 2].Value = pair.Value.TotalCount;
+                    worksheet.Cells[row, 2].Style.Numberformat.Format = "#,##0";
+                    worksheet.Cells[row, 3].Value = pair.Value.VerifiedCount;
+                    worksheet.Cells[row, 3].Style.Numberformat.Format = "#,##0";
+                    worksheet.Cells[row, 4].Value = pair.Value.RedlistedCount;
+                    worksheet.Cells[row, 4].Style.Numberformat.Format = "#,##0";
+                    worksheet.Cells[row, 5].Value = pair.Value.InvasiveCount;
+                    worksheet.Cells[row, 5].Style.Numberformat.Format = "#,##0";
+
+                    row++;
+                }
+
+                worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
+                return worksheet;
+            }
         }
     }
 }

@@ -548,7 +548,7 @@ namespace SOS.Observations.Api.Controllers
                 SearchFilter searchFilter = filter.ToSearchFilter(this.GetUserId(), protectionFilter, translationCultureCode, sortBy, sortOrder);
                 var result = await _observationManager.GetChunkAsync(roleId, authorizationApplicationIdentifier, searchFilter, skip, take);
                 PagedResultDto<dynamic> dto = result?.ToPagedResultDto(result.Records);
-                this.LogObservationCount(dto?.TotalCount ?? 0);
+                this.LogObservationCount(dto?.Records?.Count() ?? 0);
                 return new OkObjectResult(dto);
             }
             catch (AuthenticationRequiredException e)
@@ -1530,7 +1530,7 @@ namespace SOS.Observations.Api.Controllers
                 }
                 var result = await _observationManager.GetChunkAsync(roleId, authorizationApplicationIdentifier, filter.ToSearchFilterInternal(this.GetUserId(), translationCultureCode, sortBy, sortOrder), skip, take);
                 GeoPagedResultDto<dynamic> dto = result.ToGeoPagedResultDto(result.Records, outputFormat);
-                this.LogObservationCount(dto?.TotalCount ?? 0);
+                this.LogObservationCount(dto?.Records?.Count() ?? 0);
                 return new OkObjectResult(dto);
             }
             catch (AuthenticationRequiredException e)
@@ -1751,7 +1751,7 @@ namespace SOS.Observations.Api.Controllers
                 }
 
                 ScrollResultDto<dynamic> dto = result.ToScrollResultDto(result.Records);
-                this.LogObservationCount(dto?.TotalCount ?? 0);
+                this.LogObservationCount(dto?.Records?.Count() ?? 0);
                 return new OkObjectResult(dto);
             }
             catch (AuthenticationRequiredException e)

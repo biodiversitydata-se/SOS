@@ -523,6 +523,7 @@ namespace SOS.Observations.Api
             services.AddScoped<ITaxonSearchManager, TaxonSearchManager>();
             services.AddScoped<IUserManager, UserManager>();
             services.AddScoped<IVocabularyManager, VocabularyManager>();
+            services.AddSingleton<IApiUsageStatisticsManager, ApiUsageStatisticsManager>();
 
             // Add repositories
             services.AddScoped<IApiUsageStatisticsRepository, ApiUsageStatisticsRepository>();

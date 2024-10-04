@@ -1,15 +1,19 @@
 ﻿using Microsoft.Extensions.Logging;
+using MongoDB.Driver.GeoJsonObjectModel;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using SOS.Lib.Enums;
 using SOS.Lib.Factories;
 using SOS.Lib.Managers.Interfaces;
+using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Services.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace SOS.Lib.Managers
@@ -22,6 +26,44 @@ namespace SOS.Lib.Managers
         private IApiManagementUserService _apiManagementUserService;
         private readonly IUserService _userService;
         private readonly ILogger<ApiUsageStatisticsManager> _logger;
+
+        private HashSet<string> _observationDetailEndpoints = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "Observations/ObservationsBySearchInternal",
+            "Observations/ObservationsBySearch",
+            "Observations/ObservationsBySearchDwc",
+            "Observations/GetObservationByIdInternal [id]",
+            "Observations/GetObservationById [id]",
+            "Observations/ObservationByIdDwc [id]",
+            "Exports/DownloadGeoJson",
+            "Exports/DownloadGeoJsonInternal",
+            "Exports/DownloadExcel",
+            "Exports/DownloadExcelInternal",
+            "Exports/DownloadCsv",
+            "Exports/DownloadCsvInternal",
+            "Exports/DownloadDwC",
+            "Exports/DownloadDwCInternal",
+            "Exports/Order/GeoJson",
+            "Exports/Order/GeoJsonInternal",
+            "Exports/Order/Excel",
+            "Exports/Order/ExcelInternal",
+            "Exports/Order/Csv",
+            "Exports/Order/CsvInternal",
+            "Exports/Order/DwC",
+            "Exports/Order/DwCInternal"
+        };
+
+        private HashSet<string> _wfsEndpoints = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "sos-observation/_search"
+        };
+
+        private HashSet<string> _observationEndpointsWithWrongCountBefore20241015 = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "Observations/ObservationsBySearchInternal",
+            "Observations/ObservationsBySearch",
+            "Observations/ObservationsBySearchDwc"            
+        };
 
         /// <summary>
         /// Constructor
@@ -132,6 +174,224 @@ namespace SOS.Lib.Managers
             return DateTime.Now.AddDays(-91).Date;
         }
 
+        public async Task<byte[]> CreateRequestStatisticsSummaryExcelFileAsync(DateTime fromDate, DateTime toDate)
+        {
+            var statisticsByDate = await CalculateRequestStatisticsAsync(fromDate, toDate);
+            var summaryExcelWriter = new ApiUsageStatisticsSummaryExcelWriter();
+            byte[] excelFile = await summaryExcelWriter.CreateExcelFileAsync(statisticsByDate);
+            return excelFile;
+        }
+
+        public async Task<Dictionary<string, RequestStatistics>> CalculateRequestStatisticsAsync(DateTime fromDate, DateTime toDate)
+        {
+            fromDate = new DateTime(fromDate.Year, fromDate.Month, 1);
+            toDate = new DateTime(toDate.Year, toDate.Month, DateTime.DaysInMonth(toDate.Year, toDate.Month), 23, 59, 59);
+            DateTime current = new DateTime(fromDate.Year, fromDate.Month, DateTime.DaysInMonth(fromDate.Year, fromDate.Month), 23, 59, 59);
+            var result = new Dictionary<string, RequestStatistics>();
+            long downloadCount = 0;
+            using var cursor = await _apiUsageStatisticsRepository.GetAllByCursorAsync();
+            while (await cursor.MoveNextAsync())
+            {
+                foreach (ApiUsageStatistics row in cursor.Current)
+                {                    
+                    // Loop through each month
+                    while (current <= toDate)
+                    {
+                        if (row.Date <= current)
+                        {
+                            DateTime startBetweenDate = new DateTime(current.Year, current.Month, 1);
+                            string untilDateKey = $"Until {current:yyyy-MM-dd}";
+                            string betweenDateKey = $"{startBetweenDate:yyyy-MM-dd} to {current:yyyy-MM-dd}";
+                            if (!result.ContainsKey(untilDateKey))
+                                result.Add(untilDateKey, new RequestStatistics());
+                            if (!result.ContainsKey(betweenDateKey))
+                                result.Add(betweenDateKey, new RequestStatistics());
+
+                            // Observations
+                            if (_observationDetailEndpoints.Contains(row.Endpoint))
+                            {                                
+                                downloadCount += row.SumResponseCount;
+
+                                result[untilDateKey].ObsevationsRequestCount += row.RequestCount;
+                                result[untilDateKey].ObservationsDownloadCount += GetObservationCount(row);
+
+                                string domain = GetDomain(row);                  
+                                if (!result[untilDateKey].StatisticsByDomain.ContainsKey(domain))
+                                    result[untilDateKey].StatisticsByDomain.Add(domain, new RequestCountTuple());
+
+                                result[untilDateKey].StatisticsByDomain[domain].RequestCount += row.RequestCount;
+                                result[untilDateKey].StatisticsByDomain[domain].DownloadCount += GetObservationCount(row);
+                            }
+
+                            if (row.Date >= startBetweenDate && _observationDetailEndpoints.Contains(row.Endpoint))
+                            {
+                                result[betweenDateKey].ObsevationsRequestCount += row.RequestCount;
+                                result[betweenDateKey].ObservationsDownloadCount += GetObservationCount(row);
+
+                                string domain = GetDomain(row);
+                                if (!result[betweenDateKey].StatisticsByDomain.ContainsKey(domain))
+                                    result[betweenDateKey].StatisticsByDomain.Add(domain, new RequestCountTuple());
+                               
+                                result[betweenDateKey].StatisticsByDomain[domain].RequestCount += row.RequestCount;
+                                result[betweenDateKey].StatisticsByDomain[domain].DownloadCount += GetObservationCount(row);
+                            }
+
+                            // WFS
+                            if (_wfsEndpoints.Contains(row.Endpoint))
+                            {
+                                result[untilDateKey].WfsRequestCount += row.RequestCount;
+                                result[untilDateKey].WfsDownloadCount += GetObservationCount(row);
+                            }
+
+                            if (row.Date >= startBetweenDate && _wfsEndpoints.Contains(row.Endpoint))
+                            {
+                                result[betweenDateKey].WfsRequestCount += row.RequestCount;
+                                result[betweenDateKey].WfsDownloadCount += GetObservationCount(row);
+                            }
+                        }
+
+                        // Move to the last day of the next month
+                        current = current.AddDays(1);
+                        current = new DateTime(current.Year, current.Month, DateTime.DaysInMonth(current.Year, current.Month), 23, 59, 59);
+                    }
+
+                    current = new DateTime(fromDate.Year, fromDate.Month, DateTime.DaysInMonth(fromDate.Year, fromDate.Month), 23, 59, 59);
+                }
+            }
+            
+            // Sort the domain results
+            foreach (var pair in result)
+            {
+                pair.Value.StatisticsByDomain = pair.Value.StatisticsByDomain.OrderByDescending(x => x.Value.RequestCount).ToDictionary(x => x.Key, x => x.Value);
+            }
+
+            return result;
+        }       
+
+        private string GetDomain(ApiUsageStatistics row)
+        {
+            if (!string.IsNullOrEmpty(row.UserEmailDomain)) return row.UserEmailDomain;
+            if (!string.IsNullOrEmpty(row.ApiManagementUserEmailDomain)) return row.ApiManagementUserEmailDomain;
+            if (!string.IsNullOrEmpty(row.RequestingSystem) && row.RequestingSystem.ToLower() != "na" && row.RequestingSystem.ToLower() != "n/a")
+                return row.RequestingSystem;
+            return "Unknown";
+        }
+
+        private DateTime _wrongCountDate = new DateTime(2024, 10, 15);
+        private long GetObservationCount(ApiUsageStatistics row)
+        {
+            const int wfsAvgDownload = 100; // WFS doesn't log observation count.
+            const int obsAvgDownload = 100; // used when the calculation were wrong in some endpoints before 2024-10-15.
+
+            if (row.Date < _wrongCountDate && _observationEndpointsWithWrongCountBefore20241015.Contains(row.Endpoint))
+            {                
+                return row.RequestCount * obsAvgDownload;
+            }
+
+            if (_observationDetailEndpoints.Contains(row.Endpoint))
+            {                
+                return row.SumResponseCount;
+            }
+
+            if (_wfsEndpoints.Contains(row.Endpoint))
+            {                
+                return row.SumResponseCount == 0 ? row.RequestCount * wfsAvgDownload : row.SumResponseCount;
+            }
+
+            return 0;
+        }
+
+        public class RequestStatistics
+        {
+            public long ObsevationsRequestCount { get; set; }
+            public long ObservationsDownloadCount { get; set; }
+            public long WfsRequestCount { get; set; }
+            public long WfsDownloadCount {get; set; }
+            public long ObsevationsRequestCountIncludingWfsCount => ObsevationsRequestCount + WfsRequestCount;
+            public long ObservationsDownloadCountIncludingWfsCount => ObservationsDownloadCount + WfsDownloadCount;            
+            public Dictionary<string, RequestCountTuple> StatisticsByDomain { get; set; } = new Dictionary<string, RequestCountTuple>();
+        }
+
+        public class RequestCountTuple
+        {
+            public long RequestCount { get; set; }
+            public long DownloadCount { get; set; }
+        }
+
+        public class ApiUsageStatisticsSummaryExcelWriter
+        {
+            public async Task<byte[]> CreateExcelFileAsync(Dictionary<string, RequestStatistics> statisticsByDate)
+            {
+                ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+                using var package = new ExcelPackage();
+                foreach (var item in statisticsByDate)
+                {
+                    CreateWorksheet(package, item.Key, item.Value);
+                }
+                
+                byte[] excelBytes = await package.GetAsByteArrayAsync();
+                return excelBytes;
+            }
+
+            private ExcelWorksheet CreateWorksheet(ExcelPackage package, string title, RequestStatistics requestStatistics)
+            {
+                ExcelWorksheet worksheet = package.Workbook.Worksheets.Add(title);
+                worksheet.Cells[1, 1].Value = title;
+                worksheet.Cells[1, 1].Style.Font.Bold = true;
+                worksheet.Cells[1, 1].Style.Font.UnderLine = true;
+
+                worksheet.Cells[2, 1].Value = "# Download requests";
+                worksheet.Cells[2, 1].Style.Font.Bold = true;
+                worksheet.Cells[2, 2].Value = requestStatistics.ObsevationsRequestCount;
+                worksheet.Cells[2, 2].Style.Numberformat.Format = "#,##0";
+
+                worksheet.Cells[3, 1].Value = "# WFS requests";
+                worksheet.Cells[3, 1].Style.Font.Bold = true;
+                worksheet.Cells[3, 2].Value = requestStatistics.WfsRequestCount;
+                worksheet.Cells[3, 2].Style.Numberformat.Format = "#,##0";
+
+                worksheet.Cells[4, 1].Value = "# Sum requests";
+                worksheet.Cells[4, 1].Style.Font.Bold = true;
+                worksheet.Cells[4, 2].Value = requestStatistics.ObsevationsRequestCountIncludingWfsCount;
+                worksheet.Cells[4, 2].Style.Numberformat.Format = "#,##0";
+
+                worksheet.Cells[5, 1].Value = "# Observations downloaded";
+                worksheet.Cells[5, 1].Style.Font.Bold = true;
+                worksheet.Cells[5, 2].Value = requestStatistics.ObservationsDownloadCount;
+                worksheet.Cells[5, 2].Style.Numberformat.Format = "#,##0";
+
+                worksheet.Cells[6, 1].Value = "# WFS observations downloaded";
+                worksheet.Cells[6, 1].Style.Font.Bold = true;
+                worksheet.Cells[6, 2].Value = requestStatistics.WfsDownloadCount;
+                worksheet.Cells[6, 2].Style.Numberformat.Format = "#,##0";
+
+                worksheet.Cells[7, 1].Value = "# Sum observations downloaded";
+                worksheet.Cells[7, 1].Style.Font.Bold = true;
+                worksheet.Cells[7, 2].Value = requestStatistics.ObservationsDownloadCountIncludingWfsCount;
+                worksheet.Cells[7, 2].Style.Numberformat.Format = "#,##0";
+
+                worksheet.Cells[9, 1].Value = "Domain/Application";
+                worksheet.Cells[9, 1].Style.Font.Bold = true;
+                worksheet.Cells[9, 2].Value = "# Requests";
+                worksheet.Cells[9, 2].Style.Font.Bold = true;
+                worksheet.Cells[9, 3].Value = "# Obs Downloads";
+                worksheet.Cells[9, 3].Style.Font.Bold = true;
+                int row = 10;
+                foreach (var pair in requestStatistics.StatisticsByDomain)
+                {
+                    worksheet.Cells[row, 1].Value = pair.Key;                    
+                    worksheet.Cells[row, 2].Value = pair.Value.RequestCount;
+                    worksheet.Cells[row, 2].Style.Numberformat.Format = "#,##0";
+                    worksheet.Cells[row, 3].Value = pair.Value.DownloadCount;
+                    worksheet.Cells[row, 3].Style.Numberformat.Format = "#,##0";
+
+                    row++;
+                }
+
+                worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
+                return worksheet;
+            }            
+        }
 
         public class ApiUsageStatisticsExcelWriter
         {

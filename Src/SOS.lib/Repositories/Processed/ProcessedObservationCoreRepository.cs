@@ -1351,10 +1351,10 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <inheritdoc />
-        public async Task<long> GetMatchCountAsync(SearchFilterBase filter)
+        public async Task<long> GetMatchCountAsync(SearchFilterBase filter, bool skipAuthorizationFilters = false)
         {
-            var indexNames = GetCurrentIndex(filter);
-            var (query, excludeQuery) = GetCoreQueries(filter);
+            var indexNames = GetCurrentIndex(filter, skipAuthorizationFilters);
+            var (query, excludeQuery) = GetCoreQueries(filter, skipAuthorizationFilters);
 
             var countResponse = await Client.CountAsync<dynamic>(s => s
                 .Index(indexNames)

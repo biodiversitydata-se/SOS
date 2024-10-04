@@ -370,6 +370,7 @@ namespace SOS.Observations.Api.LiveIntegrationTests.Fixtures
                 new TaxonObservationCountCache(),
                 new ClassCache<Dictionary<int, TaxonSumAggregationItem>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<Dictionary<int, TaxonSumAggregationItem>>>()) { CacheDuration = TimeSpan.FromHours(4) },
                 new Mock<IGeneralizationResolver>().Object,
+                new Mock<IDataProviderCache>().Object,
                 new NullLogger<ObservationManager>());
 
             return observationsManager;
