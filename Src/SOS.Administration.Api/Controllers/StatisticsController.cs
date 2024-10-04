@@ -107,7 +107,7 @@ namespace SOS.Administration.Api.Controllers
         /// </summary>
         /// <param name="fromDate"></param>
         /// <param name="toDate"></param>
-        [HttpPost("Internal/RequestStatistics")]
+        [HttpPost("CreateRequestStatisticsExcel")]
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]

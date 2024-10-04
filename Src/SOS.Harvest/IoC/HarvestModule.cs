@@ -170,8 +170,15 @@ namespace SOS.Harvest.IoC.Modules
                 builder.RegisterInstance(Configurations.ApiManagementServiceConfiguration).As<ApiManagementServiceConfiguration>()
                     .SingleInstance();
             if (Configurations.ApplicationInsightsConfiguration != null)
+            {
                 builder.RegisterInstance(Configurations.ApplicationInsightsConfiguration).As<ApplicationInsightsConfiguration>()
                     .SingleInstance();
+            }
+            else
+            {
+                builder.RegisterInstance(new ApplicationInsightsConfiguration()).As<ApplicationInsightsConfiguration>()
+                    .SingleInstance();
+            }
             if (Configurations.SosApiConfiguration != null)
                 builder.RegisterInstance(Configurations.SosApiConfiguration).As<SosApiConfiguration>()
                     .SingleInstance();

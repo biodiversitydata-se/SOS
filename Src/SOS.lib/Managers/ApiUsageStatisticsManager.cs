@@ -324,9 +324,17 @@ namespace SOS.Lib.Managers
             {
                 ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
                 using var package = new ExcelPackage();
-                foreach (var item in statisticsByDate)
+                if (statisticsByDate != null && statisticsByDate.Count > 0)
                 {
-                    CreateWorksheet(package, item.Key, item.Value);
+                    foreach (var item in statisticsByDate)
+                    {
+                        CreateWorksheet(package, item.Key, item.Value);
+                    }
+                }
+                else
+                {
+                    var sheet = package.Workbook.Worksheets.Add("Info");
+                    sheet.Cells[1, 1].Value = "There were no data. You are probably using a Test environment.";
                 }
                 
                 byte[] excelBytes = await package.GetAsByteArrayAsync();
