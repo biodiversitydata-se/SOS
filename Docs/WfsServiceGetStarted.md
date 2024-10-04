@@ -63,6 +63,8 @@ There is limit allowing only max 5000 observations to be returned for one reques
 For example, for Trollhättans municipality there are more than 100 000 observations, therefore you need to add a filter to devide the the number of observations between several separate request. For example, you could separate request before and after a specified date: request 1) municipality = 'Trollhättan' AND startDate < '2016-01-01', request 2) municipality = 'Trollhättan' AND startDate > '2015-12-31'. 
 
 ## Known problems
+Only V1.0.0 of WFS is supported currently. Problem using other versions occurred after an Geoserver update. We are working on a fix, but we do not know when a solution is in place. Specifying version is often made when making the connection to Geoserver.
+
 The WFS is using [GeoServer](https://geoserver.org/) and a plugin to GeoServer that has a [bug](https://github.com/ngageoint/elasticgeo/issues/122) leading to that requests sometimes stop being processed and no observations are returned until the server is restarted. This problem occurs about once a month. Currently we are restarting GeoServer once a day to try avoid that this problem affects users of the WFS.
 
 ## Support
