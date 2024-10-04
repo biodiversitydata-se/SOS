@@ -34,11 +34,11 @@ namespace SOS.Observations.Api.Controllers
         }
 
         /// <summary>
-        /// Calculate observation statistics
+        /// Calculate observation statistics and create Excel file. This takes some time...
         /// </summary>
         /// <param name="fromDate"></param>
         /// <param name="toDate"></param>
-        [HttpPost("Internal/ObservationsStatistics")]
+        [HttpPost("CreateObservationsStatisticsExcel")]
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
