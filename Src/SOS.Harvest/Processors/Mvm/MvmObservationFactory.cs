@@ -9,12 +9,14 @@ using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Mvm;
+using SOS.Lib.Repositories.Resource.Interfaces;
 
 namespace SOS.Harvest.Processors.Mvm
 {
     public class MvmObservationFactory : ObservationFactoryBase, IObservationFactory<MvmObservationVerbatim>
     {
         private readonly IAreaHelper _areaHelper;
+        private readonly IDictionary<VocabularyId, IDictionary<object, int>> _vocabularyById;
 
         /// <summary>
         /// Constructor
@@ -28,9 +30,16 @@ namespace SOS.Harvest.Processors.Mvm
             IDictionary<int, Lib.Models.Processed.Observation.Taxon>? taxa,
             IAreaHelper areaHelper,
             IProcessTimeManager processTimeManager,
+            IVocabularyRepository processedVocabularyRepository,
             ProcessConfiguration processConfiguration) : base(dataProvider, taxa, processTimeManager, processConfiguration)
-        {
+        {            
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
+            if (processedVocabularyRepository == null) throw new ArgumentNullException(nameof(processedVocabularyRepository));
+            var vocabularies = processedVocabularyRepository.GetAllAsync().Result;
+            var vocabularyById = GetVocabulariesDictionary(
+                ExternalSystemId.DarwinCore,
+                vocabularies.ToArray(),
+                true);            
         }
 
         /// <summary>
@@ -96,6 +105,10 @@ namespace SOS.Harvest.Processors.Mvm
                 obs.Occurrence.OrganismQuantityAggregation = quantity;
                 obs.Occurrence.OrganismQuantityInt = quantity;
             }
+
+            string verbatimInstitutionCode = DataProvider.Names.Translate("en-GB");
+            obs.InstitutionCode = GetSosId(verbatimInstitutionCode,
+                _vocabularyById[VocabularyId.Institution]);
 
             obs.AccessRights = GetAccessRightsFromSensitivityCategory(obs.Occurrence.SensitivityCategory);
             AddPositionData(obs.Location, verbatim.DecimalLongitude, verbatim.DecimalLatitude,

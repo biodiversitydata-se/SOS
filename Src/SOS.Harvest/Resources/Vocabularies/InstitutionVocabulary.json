@@ -660,7 +660,7 @@
     },
     {
       "Id": 297,
-      "Value": "Lund-Botaniska/Zoologiska museet",
+      "Value": "Biologiska Museet, Lunds Universitet",
       "Localized": false
     },
     {
@@ -2185,7 +2185,7 @@
     },
     {
       "Id": 603,
-      "Value": "Birdlife Sverige",
+      "Value": "IAS",
       "Localized": false
     },
     {
@@ -2261,6 +2261,376 @@
     {
       "Id": 618,
       "Value": "Oxelösunds kommun",
+      "Localized": false
+    },
+    {
+      "Id": 619,
+      "Value": "Malung-Sälens kommun",
+      "Localized": false
+    },
+    {
+      "Id": 620,
+      "Value": "Melica",
+      "Localized": false
+    },
+    {
+      "Id": 621,
+      "Value": "Test Artporjekt test",
+      "Localized": false
+    },
+    {
+      "Id": 622,
+      "Value": "Nationell valideringsgrupp (NVG) groddjur",
+      "Localized": false
+    },
+    {
+      "Id": 623,
+      "Value": "Faunaväkteri",
+      "Localized": false
+    },
+    {
+      "Id": 624,
+      "Value": "Nationell valideringsgrupp (NVG) marina däggdjur",
+      "Localized": false
+    },
+    {
+      "Id": 625,
+      "Value": "Test AP Project",
+      "Localized": false
+    },
+    {
+      "Id": 626,
+      "Value": "Norrbottens flora",
+      "Localized": false
+    },
+    {
+      "Id": 627,
+      "Value": "Insjöfåglar RMÖ/GDP",
+      "Localized": false
+    },
+    {
+      "Id": 628,
+      "Value": "Kumla kommun",
+      "Localized": false
+    },
+    {
+      "Id": 629,
+      "Value": "Täby kommun",
+      "Localized": false
+    },
+    {
+      "Id": 630,
+      "Value": "Borlänge kommun",
+      "Localized": false
+    },
+    {
+      "Id": 631,
+      "Value": "Berg kommun",
+      "Localized": false
+    },
+    {
+      "Id": 632,
+      "Value": "Härjedalens kommun",
+      "Localized": false
+    },
+    {
+      "Id": 633,
+      "Value": "Tromsö museum",
+      "Localized": false
+    },
+    {
+      "Id": 634,
+      "Value": "Landskrona kommun",
+      "Localized": false
+    },
+    {
+      "Id": 635,
+      "Value": "Upplands ornitologiska förening (UOF)",
+      "Localized": false
+    },
+    {
+      "Id": 636,
+      "Value": "Naturvårdsverket",
+      "Localized": false
+    },
+    {
+      "Id": 637,
+      "Value": "Hofors kommun",
+      "Localized": false
+    },
+    {
+      "Id": 638,
+      "Value": "Hagströms vattenvård & miljörätt AB",
+      "Localized": false
+    },
+    {
+      "Id": 639,
+      "Value": "Rappen (HaV)",
+      "Localized": false
+    },
+    {
+      "Id": 640,
+      "Value": "Hofors kommun",
+      "Localized": false
+    },
+    {
+      "Id": 641,
+      "Value": "Sandvikens kommun",
+      "Localized": false
+    },
+    {
+      "Id": 642,
+      "Value": "Nacka kommun",
+      "Localized": false
+    },
+    {
+      "Id": 643,
+      "Value": "Kinnekulle-floran",
+      "Localized": false
+    },
+    {
+      "Id": 644,
+      "Value": "Örnsköldsviks kommun",
+      "Localized": false
+    },
+    {
+      "Id": 645,
+      "Value": "Lidköpings kommun",
+      "Localized": false
+    },
+    {
+      "Id": 646,
+      "Value": "Västkuststiftelsen",
+      "Localized": false
+    },
+    {
+      "Id": 647,
+      "Value": "Åre kommun",
+      "Localized": false
+    },
+    {
+      "Id": 648,
+      "Value": "Ängelholms kommun",
+      "Localized": false
+    },
+    {
+      "Id": 649,
+      "Value": "Nationell valideringsgrupp (NVG) däggdjur",
+      "Localized": false
+    },
+    {
+      "Id": 650,
+      "Value": "Nationell valideringsgrupp (NVG) svampar",
+      "Localized": false
+    },
+    {
+      "Id": 651,
+      "Value": "Natur- & skogstjänst AB",
+      "Localized": false
+    },
+    {
+      "Id": 652,
+      "Value": "Projekt sydlig kärrsnäppa",
+      "Localized": false
+    },
+    {
+      "Id": 653,
+      "Value": "Nationell valideringsgrupp (NVG) steklar",
+      "Localized": false
+    },
+    {
+      "Id": 654,
+      "Value": "Boxholms Skogar AB",
+      "Localized": false
+    },
+    {
+      "Id": 655,
+      "Value": "Nationell valideringsgrupp (NVG) skinnbaggar",
+      "Localized": false
+    },
+    {
+      "Id": 656,
+      "Value": "Naturskyddsföreningen Gnosjö",
+      "Localized": false
+    },
+    {
+      "Id": 657,
+      "Value": "Öckerö kommun",
+      "Localized": false
+    },
+    {
+      "Id": 658,
+      "Value": "Nationell Valideringsgrupp (NVG) Lavar",
+      "Localized": false
+    },
+    {
+      "Id": 659,
+      "Value": "Fungaväktarna",
+      "Localized": false
+    },
+    {
+      "Id": 660,
+      "Value": "Naturskyddsföreningen Lerum",
+      "Localized": false
+    },
+    {
+      "Id": 661,
+      "Value": "Vellinge kommun",
+      "Localized": false
+    },
+    {
+      "Id": 662,
+      "Value": "Rappen (HaV)",
+      "Localized": false
+    },
+    {
+      "Id": 663,
+      "Value": "Skyddsvärda arter (NV)",
+      "Localized": false
+    },
+    {
+      "Id": 664,
+      "Value": "Nationell valideringsgrupp (NVG) skalbaggar",
+      "Localized": false
+    },
+    {
+      "Id": 665,
+      "Value": "Nationell valideringsgrupp (NVG) kräldjur",
+      "Localized": false
+    },
+    {
+      "Id": 666,
+      "Value": "Pelagia Nature & Environment AB",
+      "Localized": false
+    },
+    {
+      "Id": 667,
+      "Value": "Smålands ornitologiska förening (SmOF)",
+      "Localized": false
+    },
+    {
+      "Id": 668,
+      "Value": "Lunds universitet",
+      "Localized": false
+    },
+    {
+      "Id": 669,
+      "Value": "Ekologigruppen AB",
+      "Localized": false
+    },
+    {
+      "Id": 670,
+      "Value": "Nationell valideringsgrupp (NVG) trollsländor",
+      "Localized": false
+    },
+    {
+      "Id": 671,
+      "Value": "Insamlingsstiftelsen Framtidens Natur & Kulturarv",
+      "Localized": false
+    },
+    {
+      "Id": 672,
+      "Value": "Nationell verifieringsgrupp (NVG) nattsländor",
+      "Localized": false
+    },
+    {
+      "Id": 673,
+      "Value": "Nationell verifieringsgrupp (NVG) alger",
+      "Localized": false
+    },
+    {
+      "Id": 674,
+      "Value": "Mark- och miljödomstolen vid Vänersborgs tingsrätt",
+      "Localized": false
+    },
+    {
+      "Id": 675,
+      "Value": "Skogforsk",
+      "Localized": false
+    },
+    {
+      "Id": 5000,
+      "Value": "SLU Swedish Species Information Centre",
+      "Localized": false
+    },
+    {
+      "Id": 5001,
+      "Value": "Department of Aquatic Resources, SLU",
+      "Localized": false
+    },
+    {
+      "Id": 5002,
+      "Value": "Environmental data MVM, SLU",
+      "Localized": false
+    },
+    {
+      "Id": 5003,
+      "Value": "Umeå University",
+      "Localized": false
+    },
+    {
+      "Id": 5004,
+      "Value": "Swedish Meteorological and Hydrological Institute (SMHI)",
+      "Localized": false
+    },
+    {
+      "Id": 5005,
+      "Value": "Swedish Museum of Natural History",
+      "Localized": false
+    },
+    {
+      "Id": 5006,
+      "Value": "Station Linné",
+      "Localized": false
+    },
+    {
+      "Id": 5007,
+      "Value": "Department of Biology, Lund University",
+      "Localized": false
+    },
+    {
+      "Id": 5008,
+      "Value": "Swedish Meterological and Hydrological Institute (SMHI)",
+      "Localized": false
+    },
+    {
+      "Id": 5009,
+      "Value": "Department of Aquatic Resources (SLU Aqua)",
+      "Localized": false
+    },
+    {
+      "Id": 5010,
+      "Value": "Swedish National Forest Inventory, Department of Forest Resource Management, SLU",
+      "Localized": false
+    },
+    {
+      "Id": 5011,
+      "Value": "Overstellar Solutions AB",
+      "Localized": false
+    },
+    {
+      "Id": 5012,
+      "Value": "iNaturalist.org",
+      "Localized": false
+    },
+    {
+      "Id": 5013,
+      "Value": "Swedish Board of Agriculture",
+      "Localized": false
+    },
+    {
+      "Id": 5014,
+      "Value": "Department of Forest Resource Management, SLU",
+      "Localized": false
+    },
+    {
+      "Id": 5015,
+      "Value": "Gothenburg Natural History Museum",
+      "Localized": false
+    },
+    {
+      "Id": 5016,
+      "Value": "Lund University",
       "Localized": false
     }
   ],
@@ -4080,6 +4450,234 @@
             {
               "Value": 618,
               "SosId": 618
+            },
+            {
+              "Value": 619,
+              "SosId": 619
+            },
+            {
+              "Value": 620,
+              "SosId": 620
+            },
+            {
+              "Value": 621,
+              "SosId": 621
+            },
+            {
+              "Value": 622,
+              "SosId": 622
+            },
+            {
+              "Value": 623,
+              "SosId": 623
+            },
+            {
+              "Value": 624,
+              "SosId": 624
+            },
+            {
+              "Value": 625,
+              "SosId": 625
+            },
+            {
+              "Value": 626,
+              "SosId": 626
+            },
+            {
+              "Value": 627,
+              "SosId": 627
+            },
+            {
+              "Value": 628,
+              "SosId": 628
+            },
+            {
+              "Value": 629,
+              "SosId": 629
+            },
+            {
+              "Value": 630,
+              "SosId": 630
+            },
+            {
+              "Value": 631,
+              "SosId": 631
+            },
+            {
+              "Value": 632,
+              "SosId": 632
+            },
+            {
+              "Value": 633,
+              "SosId": 633
+            },
+            {
+              "Value": 634,
+              "SosId": 634
+            },
+            {
+              "Value": 635,
+              "SosId": 635
+            },
+            {
+              "Value": 636,
+              "SosId": 636
+            },
+            {
+              "Value": 637,
+              "SosId": 637
+            },
+            {
+              "Value": 638,
+              "SosId": 638
+            },
+            {
+              "Value": 639,
+              "SosId": 639
+            },
+            {
+              "Value": 640,
+              "SosId": 640
+            },
+            {
+              "Value": 641,
+              "SosId": 641
+            },
+            {
+              "Value": 642,
+              "SosId": 642
+            },
+            {
+              "Value": 643,
+              "SosId": 643
+            },
+            {
+              "Value": 644,
+              "SosId": 644
+            },
+            {
+              "Value": 645,
+              "SosId": 645
+            },
+            {
+              "Value": 646,
+              "SosId": 646
+            },
+            {
+              "Value": 647,
+              "SosId": 647
+            },
+            {
+              "Value": 648,
+              "SosId": 648
+            },
+            {
+              "Value": 649,
+              "SosId": 649
+            },
+            {
+              "Value": 650,
+              "SosId": 650
+            },
+            {
+              "Value": 651,
+              "SosId": 651
+            },
+            {
+              "Value": 652,
+              "SosId": 652
+            },
+            {
+              "Value": 653,
+              "SosId": 653
+            },
+            {
+              "Value": 654,
+              "SosId": 654
+            },
+            {
+              "Value": 655,
+              "SosId": 655
+            },
+            {
+              "Value": 656,
+              "SosId": 656
+            },
+            {
+              "Value": 657,
+              "SosId": 657
+            },
+            {
+              "Value": 658,
+              "SosId": 658
+            },
+            {
+              "Value": 659,
+              "SosId": 659
+            },
+            {
+              "Value": 660,
+              "SosId": 660
+            },
+            {
+              "Value": 661,
+              "SosId": 661
+            },
+            {
+              "Value": 662,
+              "SosId": 662
+            },
+            {
+              "Value": 663,
+              "SosId": 663
+            },
+            {
+              "Value": 664,
+              "SosId": 664
+            },
+            {
+              "Value": 665,
+              "SosId": 665
+            },
+            {
+              "Value": 666,
+              "SosId": 666
+            },
+            {
+              "Value": 667,
+              "SosId": 667
+            },
+            {
+              "Value": 668,
+              "SosId": 668
+            },
+            {
+              "Value": 669,
+              "SosId": 669
+            },
+            {
+              "Value": 670,
+              "SosId": 670
+            },
+            {
+              "Value": 671,
+              "SosId": 671
+            },
+            {
+              "Value": 672,
+              "SosId": 672
+            },
+            {
+              "Value": 673,
+              "SosId": 673
+            },
+            {
+              "Value": 674,
+              "SosId": 674
+            },
+            {
+              "Value": 675,
+              "SosId": 675
             }
           ]
         }

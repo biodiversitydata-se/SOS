@@ -93,6 +93,7 @@ namespace SOS.Harvest.Factories.Validation
                     _taxonById,
                     _areaHelper,
                     _processTimeManager,
+                    _processedVocabularyRepository,
                     ProcessConfiguration);
             }
 

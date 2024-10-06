@@ -231,6 +231,16 @@ namespace SOS.Harvest.Factories.Vocabularies
             };
         }
 
+        protected VocabularyValueInfo CreateNonLocalizedVocabularyValue(int id, string value)
+        {
+            return new VocabularyValueInfo
+            {
+                Id = id,
+                Value = value,
+                Localized = false                
+            };
+        }
+
         protected VocabularyValueInfo CreateVocabularyValue(int id, string english, string swedish)
         {
             return new VocabularyValueInfo

@@ -106,7 +106,8 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             obs.DynamicProperties = verbatim.DynamicProperties;
             obs.InformationWithheld = verbatim.InformationWithheld;
             obs.InstitutionId = verbatim.InstitutionID;
-            obs.InstitutionCode = GetSosId(verbatim.InstitutionCode,
+            string verbatimInstitutionCode = !string.IsNullOrEmpty(verbatim.InstitutionCode) ? verbatim.InstitutionCode : DataProvider.Names.Translate("en-GB");
+            obs.InstitutionCode = GetSosId(verbatimInstitutionCode,
                 _vocabularyById[VocabularyId.Institution]);
             obs.Language = verbatim.Language;
             obs.License = verbatim.License;
@@ -539,78 +540,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             string withoutParentheses = Regex.Replace(input, @"\s*\([^)]*\)", "");
             string withoutCommaYear = @"\b([\wäöåÄÖÅ]+)( & [\wäöåÄÖÅ]+)?,\s*\d{4}\b";
             return Regex.Replace(withoutParentheses, withoutCommaYear, "").Trim();
-        }
-
-        private VocabularyValue? GetSosId(string val,
-            IDictionary<object, int>? sosIdByValue,
-            int? defaultValue = null,
-            MappingNotFoundLogic mappingNotFoundLogic = MappingNotFoundLogic.UseSourceValue)
-        {
-            if (string.IsNullOrWhiteSpace(val) || sosIdByValue == null)
-            {
-                return defaultValue.HasValue ? new VocabularyValue { Id = defaultValue.Value } : null;
-            }
-
-            var lookupVal = val.ToLower();
-            if (sosIdByValue.TryGetValue(lookupVal, out var sosId))
-            {
-                return new VocabularyValue { Id = sosId };
-            }
-
-            if (mappingNotFoundLogic == MappingNotFoundLogic.UseDefaultValue && defaultValue.HasValue)
-            {
-                return new VocabularyValue { Id = defaultValue.Value };
-            }
-
-            return new VocabularyValue
-            { Id = VocabularyConstants.NoMappingFoundCustomValueIsUsedId, Value = val };
-        }
-
-        /// <summary>
-        ///     Get vocabulary mappings.
-        /// </summary>
-        /// <param name="externalSystemId"></param>
-        /// <param name="allVocabularies"></param>
-        /// <param name="convertValuesToLowercase"></param>
-        /// <returns></returns>
-        public static IDictionary<VocabularyId, IDictionary<object, int>> GetVocabulariesDictionary(
-            ExternalSystemId externalSystemId,
-            ICollection<Vocabulary>? allVocabularies,
-            bool convertValuesToLowercase)
-        {
-            var dic = new Dictionary<VocabularyId, IDictionary<object, int>>();
-
-            if (allVocabularies?.Any() ?? false)
-            {
-                foreach (var vocabulary in allVocabularies)
-                {
-                    var vocabularies = vocabulary.ExternalSystemsMapping.FirstOrDefault(m => m.Id == externalSystemId);
-                    if (vocabularies != null)
-                    {
-                        var mapping = vocabularies.Mappings.Single();
-                        var sosIdByValue = mapping.GetIdByValueDictionary(convertValuesToLowercase);
-                        dic.Add(vocabulary.Id, sosIdByValue);
-                    }
-                }
-            }
-
-            // Add missing entries. Initialize with empty dictionary.
-            foreach (VocabularyId vocabularyId in (VocabularyId[])Enum.GetValues(typeof(VocabularyId)))
-            {
-                if (!dic.ContainsKey(vocabularyId))
-                {
-                    dic.Add(vocabularyId, new Dictionary<object, int>());
-                }
-            }
-
-            return dic;
-        }
-
-        private enum MappingNotFoundLogic
-        {
-            UseSourceValue,
-            UseDefaultValue
-        }
+        }           
 
         public void ValidateVerbatimData(DwcObservationVerbatim verbatim, DwcaValidationRemarksBuilder validationRemarksBuilder)
         {
