@@ -36,7 +36,7 @@ namespace SOS.Harvest.Processors.Mvm
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
             if (processedVocabularyRepository == null) throw new ArgumentNullException(nameof(processedVocabularyRepository));
             var vocabularies = processedVocabularyRepository.GetAllAsync().Result;
-            var vocabularyById = GetVocabulariesDictionary(
+            _vocabularyById = GetVocabulariesDictionary(
                 ExternalSystemId.DarwinCore,
                 vocabularies.ToArray(),
                 true);            
@@ -107,9 +107,7 @@ namespace SOS.Harvest.Processors.Mvm
             }
 
             string verbatimInstitutionCode = DataProvider.Names.Translate("en-GB");
-            obs.InstitutionCode = GetSosId(verbatimInstitutionCode,
-                _vocabularyById[VocabularyId.Institution]);
-
+            obs.InstitutionCode = GetSosId(verbatimInstitutionCode, _vocabularyById[VocabularyId.Institution]);
             obs.AccessRights = GetAccessRightsFromSensitivityCategory(obs.Occurrence.SensitivityCategory);
             AddPositionData(obs.Location, verbatim.DecimalLongitude, verbatim.DecimalLatitude,
                 CoordinateSys.WGS84, verbatim.CoordinateUncertaintyInMeters, taxon?.Attributes?.DisturbanceRadius);
