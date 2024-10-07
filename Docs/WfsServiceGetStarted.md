@@ -63,9 +63,21 @@ There is limit allowing only max 5000 observations to be returned for one reques
 For example, for Trollhättans municipality there are more than 100 000 observations, therefore you need to add a filter to devide the the number of observations between several separate request. For example, you could separate request before and after a specified date: request 1) municipality = 'Trollhättan' AND startDate < '2016-01-01', request 2) municipality = 'Trollhättan' AND startDate > '2015-12-31'. 
 
 ## Known problems
-Only V1.0.0 of WFS is supported currently. Problem using other versions occurred after an Geoserver update. We are working on a fix, but we do not know when a solution is in place. Specifying version is often made when making the connection to Geoserver.
-
 The WFS is using [GeoServer](https://geoserver.org/) and a plugin to GeoServer that has a [bug](https://github.com/ngageoint/elasticgeo/issues/122) leading to that requests sometimes stop being processed and no observations are returned until the server is restarted. This problem occurs about once a month. Currently we are restarting GeoServer once a day to try avoid that this problem affects users of the WFS.
+
+### No observations - namespace 'null' problem:
+Only V 1.0.0 of WFS is supported currently. For security reasons, we upgraded to GeoServer 2.25.2 during summer 2024, but unfortunately GML3 and WFS 2.0.0 stopped working. GeoServer returns a response, but the namespace of the layer becomes null, which means that most applications cannot interpret the data. We have reported the case to GeoServer, but do not currently know when it is planned to be fixed.
+Currently only GML2 and WFS 1.0.0 are working. We therefore recommend changing version in your GIS application as a work-around for the time being. Version can be specified when adding a WFS server connection.
+In ArcGIS Pro version can be changed when adding the WFS connection again:
+
+![modifyConnection_version_ArcGisPRO](Images/wfs_modifyConnection_version_ArcGisPRO.jpg)
+
+
+In QGIS select "Modify WFS connection" and then select 1.0 under "Version":
+
+![modifyConnection_version_QGIS](Images/wfs_modifyConnection_version_QGIS.jpg)
+
+
 
 ## Support
 In case of questions or problems, contact support at SLU Artdatabanken: artdatabanken@slu.se
