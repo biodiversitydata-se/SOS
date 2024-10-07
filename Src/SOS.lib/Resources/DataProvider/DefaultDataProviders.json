@@ -1782,7 +1782,7 @@
             "LastName": "Andersson",
             "Email": "marcus.andersson@slu.se"
         },
-        "CoordinateUncertaintyInMeters": 1131,
+        "CoordinateUncertaintyInMeters": 2000,
         "CreateEventDwC": true,
         "Descriptions": [
             {
