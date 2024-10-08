@@ -74,12 +74,13 @@ namespace SOS.Harvest.Processors.Artportalen
         protected override async Task<(int publicCount, int protectedCount, int failedCount)> ProcessObservationsAsync(
             DataProvider dataProvider,
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
+            IDictionary<VocabularyId, IDictionary<object, int>> dwcaVocabularyById,
             JobRunModes mode,
             IJobCancellationToken cancellationToken)
         {
             var observationFactory =
                 await ArtportalenObservationFactory.CreateAsync(dataProvider,
-                    taxa,
+                    taxa,                    
                     _processedVocabularyRepository,
                     _artportalenDatasetRepository,
                     mode != JobRunModes.Full,
@@ -122,12 +123,13 @@ namespace SOS.Harvest.Processors.Artportalen
         public override DataProviderType Type => DataProviderType.ArtportalenObservations;
 
         /// <inheritdoc />
-        public async Task<bool> ProcessObservationsAsync(DataProvider dataProvider, IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
+        public async Task<bool> ProcessObservationsAsync(DataProvider dataProvider, 
+            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,            
             IEnumerable<ArtportalenObservationVerbatim> verbatimObservations)
         {
             var observationFactory =
                 await ArtportalenObservationFactory.CreateAsync(dataProvider,
-                    taxa,
+                    taxa,                    
                     _processedVocabularyRepository,
                     _artportalenDatasetRepository,
                     true,

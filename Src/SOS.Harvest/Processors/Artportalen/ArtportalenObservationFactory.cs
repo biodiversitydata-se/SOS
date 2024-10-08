@@ -26,7 +26,7 @@ namespace SOS.Harvest.Processors.Artportalen
 {
     public class ArtportalenObservationFactory : ObservationFactoryBase, IObservationFactory<ArtportalenObservationVerbatim>
     {
-        private readonly IDictionary<VocabularyId, IDictionary<object, int>> _vocabularyById;
+        private readonly IDictionary<VocabularyId, IDictionary<object, int>> _artportalenVocabularyById;
         private readonly IDictionary<int, DatasetMapping> _datasetByProjectId;
         private readonly bool _incrementalMode;
         private readonly string _artPortalenUrl;
@@ -187,7 +187,7 @@ namespace SOS.Harvest.Processors.Artportalen
         /// </summary>
         /// <param name="dataProvider"></param>
         /// <param name="taxa"></param>
-        /// <param name="vocabularyById"></param>
+        /// <param name="artportalenVocabularyById"></param>
         /// <param name="incrementalMode"></param>
         /// <param name="artPortalenUrl"></param>
         /// <param name="processTimeManager"></param>
@@ -195,15 +195,15 @@ namespace SOS.Harvest.Processors.Artportalen
         /// <exception cref="ArgumentNullException"></exception>
         public ArtportalenObservationFactory(
             DataProvider dataProvider,
-            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
-            IDictionary<VocabularyId, IDictionary<object, int>> vocabularyById,
+            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,            
+            IDictionary<VocabularyId, IDictionary<object, int>> artportalenVocabularyById,
             IDictionary<int, DatasetMapping> datasetByProjectId,
             bool incrementalMode,
             string artPortalenUrl,
             IProcessTimeManager processTimeManager,
-            ProcessConfiguration processConfiguration) : base(dataProvider, taxa, processTimeManager, processConfiguration)
+            ProcessConfiguration processConfiguration) : base(dataProvider, taxa, artportalenVocabularyById, processTimeManager, processConfiguration)
         {
-            _vocabularyById = vocabularyById ?? throw new ArgumentNullException(nameof(vocabularyById));
+            _artportalenVocabularyById = artportalenVocabularyById ?? throw new ArgumentNullException(nameof(artportalenVocabularyById));
             _incrementalMode = incrementalMode;
             _artPortalenUrl = artPortalenUrl ?? throw new ArgumentNullException(nameof(artPortalenUrl));
             _datasetByProjectId = datasetByProjectId == null ? new Dictionary<int, DatasetMapping>() : datasetByProjectId;
@@ -211,7 +211,7 @@ namespace SOS.Harvest.Processors.Artportalen
 
         public static async Task<ArtportalenObservationFactory> CreateAsync(
             DataProvider dataProvider,
-            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
+            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,            
             IVocabularyRepository processedVocabularyRepository,
             IArtportalenDatasetMetadataRepository datasetRepository,
             bool incrementalMode,
@@ -221,9 +221,9 @@ namespace SOS.Harvest.Processors.Artportalen
         {
             var allVocabularies = await processedVocabularyRepository.GetAllAsync();
             var allDatasets = await datasetRepository.GetAllAsync();
-            var processedVocabularies = GetVocabulariesDictionary(ExternalSystemId.Artportalen, allVocabularies?.ToArray());
+            var artportalenVocabularyById = GetVocabulariesDictionary(ExternalSystemId.Artportalen, allVocabularies?.ToArray());
             var datasetByProjectId = CreateDatasetMappingDictionary(allDatasets);
-            return new ArtportalenObservationFactory(dataProvider, taxa, processedVocabularies, datasetByProjectId, incrementalMode, artPortalenUrl, processTimeManager, processConfiguration);
+            return new ArtportalenObservationFactory(dataProvider, taxa, artportalenVocabularyById, datasetByProjectId, incrementalMode, artPortalenUrl, processTimeManager, processConfiguration);
         }
 
         private static List<DatasetMapping> GetDatasetMappings(List<ArtportalenDatasetMetadata> datasets)
@@ -768,7 +768,7 @@ namespace SOS.Harvest.Processors.Artportalen
             bool setValueToNullIfNoMappingFound = false)
         {
 
-            var sosIdByProviderValue = _vocabularyById!.GetValue(vocabularyId);
+            var sosIdByProviderValue = _artportalenVocabularyById!.GetValue(vocabularyId);
             int? val = metadata?.Id;
             if (!val.HasValue || sosIdByProviderValue == null) return null;
 

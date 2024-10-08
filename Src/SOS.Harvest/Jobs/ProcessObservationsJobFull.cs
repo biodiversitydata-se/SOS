@@ -574,6 +574,7 @@ namespace SOS.Harvest.Jobs
             IHarvestInfoRepository harvestInfoRepository,
             IObservationProcessorManager observationProcessorManager,
             ICache<int, Taxon> taxonCache,
+            ICache<VocabularyId, Vocabulary> vocabularyCache,
             IDataProviderCache dataProviderCache,
             ICacheManager cacheManager,
             IProcessTimeManager processTimeManager,
@@ -591,7 +592,7 @@ namespace SOS.Harvest.Jobs
             IDwcaEventProcessor dwcaEventProcessor,
             IObservationsHarvestJobIncremental observationsIncrementalHarvestJob,
             ILogger<ProcessObservationsJobFull> logger) : base(processedObservationRepository, processInfoRepository, harvestInfoRepository, observationProcessorManager,
-                taxonCache, dataProviderCache, processTimeManager, validationManager, processTaxaJob, areaHelper, processConfiguration,
+                taxonCache, vocabularyCache, dataProviderCache, processTimeManager, validationManager, processTaxaJob, areaHelper, processConfiguration,
             logger)
         {
             _dwcArchiveFileWriterCoordinator = dwcArchiveFileWriterCoordinator ?? throw new ArgumentNullException(nameof(dwcArchiveFileWriterCoordinator));

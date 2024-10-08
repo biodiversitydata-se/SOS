@@ -91,6 +91,7 @@ namespace SOS.Harvest.Factories.Validation
                 _norsObservationFactory = new NorsObservationFactory(
                     dataProvider,
                     _taxonById,
+                    _dwcaVocabularyById,
                     _areaHelper,
                     _processTimeManager,
                     ProcessConfiguration);

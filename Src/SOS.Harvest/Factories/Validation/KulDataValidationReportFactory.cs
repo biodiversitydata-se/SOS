@@ -91,6 +91,7 @@ namespace SOS.Harvest.Factories.Validation
                 _kulObservationFactory = new KulObservationFactory(
                     dataProvider,
                     _taxonById,
+                    _dwcaVocabularyById,
                     _areaHelper,
                     _processTimeManager,
                     ProcessConfiguration);

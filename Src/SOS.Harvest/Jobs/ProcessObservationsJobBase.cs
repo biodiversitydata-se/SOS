@@ -8,6 +8,7 @@ using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
 using SOS.Lib.Factories;
+using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Jobs.Process;
 using SOS.Lib.Managers.Interfaces;
@@ -30,6 +31,7 @@ namespace SOS.Harvest.Jobs
         private readonly IAreaHelper _areaHelper;
         private readonly IValidationManager _validationManager;
         private readonly ICache<int, Taxon> _taxonCache;
+        private readonly ICache<VocabularyId, Vocabulary> _vocabularyCache;
         private readonly IProcessTaxaJob _processTaxaJob;
         private readonly bool _enableTimeManager;
         private static SemaphoreSlim _getTaxaSemaphore = new SemaphoreSlim(1, 1);
@@ -120,6 +122,7 @@ namespace SOS.Harvest.Jobs
             IEnumerable<DataProvider> dataProvidersToProcess,
             JobRunModes mode,
             IDictionary<int, Taxon> taxonById,
+            IDictionary<VocabularyId, IDictionary<object, int>> dwcaVocabularyById,
             IJobCancellationToken cancellationToken)
         {
             var processStart = DateTime.Now;
@@ -135,7 +138,7 @@ namespace SOS.Harvest.Jobs
 
                 var processor = _observationProcessorManager.GetProcessor(dataProvider.Type);
                 processTaskByDataProvider.Add(dataProvider,
-                    processor.ProcessAsync(dataProvider, taxonById, mode, cancellationToken));
+                    processor.ProcessAsync(dataProvider, taxonById, dwcaVocabularyById, mode, cancellationToken));
             }
 
             var success = (await Task.WhenAll(processTaskByDataProvider.Values)).All(t => t.Status == RunStatus.Success);
@@ -328,6 +331,7 @@ namespace SOS.Harvest.Jobs
             IHarvestInfoRepository harvestInfoRepository,
             IObservationProcessorManager observationProcessorManager,
             ICache<int, Taxon> taxonCache,
+            ICache<VocabularyId, Vocabulary> vocabularyCache,
             IDataProviderCache dataProviderCache,
             IProcessTimeManager processTimeManager,
             IValidationManager validationManager,
@@ -340,8 +344,8 @@ namespace SOS.Harvest.Jobs
                                               throw new ArgumentNullException(nameof(processedObservationRepository));
             _observationProcessorManager = observationProcessorManager ?? throw new ArgumentNullException(nameof(observationProcessorManager));
             _dataProviderCache = dataProviderCache ?? throw new ArgumentNullException(nameof(dataProviderCache));
-            _taxonCache = taxonCache ??
-                          throw new ArgumentNullException(nameof(taxonCache));
+            _taxonCache = taxonCache ?? throw new ArgumentNullException(nameof(taxonCache));
+            _vocabularyCache = vocabularyCache ?? throw new ArgumentNullException(nameof(vocabularyCache));
             _processTaxaJob = processTaxaJob ?? throw new ArgumentNullException(nameof(processTaxaJob));
             _processTimeManager = processTimeManager ?? throw new ArgumentNullException(nameof(processTimeManager));
             _validationManager = validationManager ?? throw new ArgumentNullException(nameof(validationManager));
@@ -405,6 +409,23 @@ namespace SOS.Harvest.Jobs
             {
                 _getTaxaSemaphore.Release();
             }
+        }
+
+        /// <summary>
+        /// Get DwC-A vocabulary
+        /// </summary>
+        /// <param name="mode"></param>
+        /// <returns></returns>
+        protected async Task<IDictionary<VocabularyId, IDictionary<object, int>>> GetDwcaVocabularyByIdAsync()
+        {
+            var vocabularies = await _vocabularyCache.GetAllAsync();
+            var dwcaVocabularyById = VocabularyHelper.GetVocabulariesDictionary(
+                ExternalSystemId.DarwinCore,
+                vocabularies.ToArray(),
+                true);
+
+            _logger.LogInformation($"Finish getting vocabularies from cache");
+            return dwcaVocabularyById;
         }
 
         /// <summary>
@@ -474,14 +495,16 @@ namespace SOS.Harvest.Jobs
                 // 3. Initialization of meta data etc
                 //----------------------------------------------------------------------
                 var getTaxaTask = GetTaxaAsync(mode);
-                await Task.WhenAll(getTaxaTask, InitializeAreaHelperAsync(), _validationManager.VerifyCollectionAsync(mode), _validationManager.VerifyEventCollectionAsync(mode));
+                var getVocabulariesTask = GetDwcaVocabularyByIdAsync();
+                await Task.WhenAll(getTaxaTask, GetDwcaVocabularyByIdAsync(), InitializeAreaHelperAsync(), _validationManager.VerifyCollectionAsync(mode), _validationManager.VerifyEventCollectionAsync(mode));
 
                 var taxonById = await getTaxaTask;
-
+                
                 if ((taxonById?.Count ?? 0) == 0)
                 {
                     return false;
                 }
+                var dwcaVocabularyById = await getVocabulariesTask;
 
                 cancellationToken?.ThrowIfCancellationRequested();
 
@@ -494,7 +517,7 @@ namespace SOS.Harvest.Jobs
                 //------------------------------------------------------------------------
                 // 5. Create observation processing tasks, and wait for them to complete
                 //------------------------------------------------------------------------                
-                var result = await ProcessVerbatimObservations(dataProvidersToProcess, mode, taxonById!, cancellationToken!);
+                var result = await ProcessVerbatimObservations(dataProvidersToProcess, mode, taxonById!, dwcaVocabularyById!, cancellationToken!);
                 var success = result.All(t => t.Value.Status == RunStatus.Success);
 
                 //---------------------------------------------------------------

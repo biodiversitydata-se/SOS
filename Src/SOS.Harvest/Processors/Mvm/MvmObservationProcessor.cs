@@ -28,10 +28,11 @@ namespace SOS.Harvest.Processors.Mvm
         protected override async Task<(int publicCount, int protectedCount, int failedCount)> ProcessObservationsAsync(
             DataProvider dataProvider,
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
+            IDictionary<VocabularyId, IDictionary<object, int>> dwcaVocabularyById,
             JobRunModes mode,
             IJobCancellationToken cancellationToken)
         {
-            var observationFactory = new MvmObservationFactory(dataProvider, taxa, _areaHelper, TimeManager, _processedVocabularyRepository, ProcessConfiguration);
+            var observationFactory = new MvmObservationFactory(dataProvider, taxa, dwcaVocabularyById, _areaHelper, TimeManager, _processedVocabularyRepository, ProcessConfiguration);
 
             return await base.ProcessObservationsAsync(
                 dataProvider,

@@ -1,4 +1,5 @@
 ﻿using SOS.Harvest.Processors.DarwinCoreArchive;
+using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Checklist;
 using SOS.Lib.Models.Processed.DataStewardship.Dataset;
 using SOS.Lib.Models.Processed.Observation;
@@ -11,6 +12,7 @@ namespace SOS.Observations.Api.IntegrationTests.Setup;
 public interface IProcessFixture
 {
     List<Taxon> Taxa { get; }
+    IDictionary<VocabularyId, IDictionary<object, int>> DwcaVocabularyById { get; }
     Dictionary<int, Taxon> TaxonById { get; }
     Task AddDatasetsToElasticsearchAsync(IEnumerable<Dataset> datasets, bool clearExistingObservations = true, int delayInMs = 1000);
     Task AddDataToElasticsearchAsync(IEnumerable<Lib.Models.Processed.DataStewardship.Event.Event> events, IEnumerable<Observation> observations, bool clearExistingObservations = true);

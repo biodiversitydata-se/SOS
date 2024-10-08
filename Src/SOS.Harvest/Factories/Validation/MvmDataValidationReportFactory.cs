@@ -91,6 +91,7 @@ namespace SOS.Harvest.Factories.Validation
                 _mvmObservationFactory = new MvmObservationFactory(
                     dataProvider,
                     _taxonById,
+                    _dwcaVocabularyById,
                     _areaHelper,
                     _processTimeManager,
                     _processedVocabularyRepository,

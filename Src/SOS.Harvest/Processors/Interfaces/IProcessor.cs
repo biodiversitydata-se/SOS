@@ -21,6 +21,7 @@ namespace SOS.Harvest.Processors.Interfaces
         Task<ProcessingStatus> ProcessAsync(
             DataProvider dataProvider,
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
+            IDictionary<VocabularyId, IDictionary<object, int>> dwcaVocabularyById,
             JobRunModes mode,
             IJobCancellationToken cancellationToken);
     }

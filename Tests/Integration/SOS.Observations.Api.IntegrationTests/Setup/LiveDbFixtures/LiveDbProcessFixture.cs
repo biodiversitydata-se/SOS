@@ -15,6 +15,7 @@ using SOS.Lib.Configuration.Process;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
 using SOS.Lib.Database.Interfaces;
+using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
@@ -51,6 +52,7 @@ public class LiveDbProcessFixture : IProcessFixture
     private DwcaDatasetFactory? _dwcaDatasetFactory;
     private IVocabularyRepository _vocabularyRepository;
     private Dictionary<int, Taxon>? _taxaById;
+    private IDictionary<VocabularyId, IDictionary<object, int>> _dwcaVocabularyById;
     private ITaxonRepository _taxonRepository;
     private IProcessTimeManager _processTimeManager;
     private ProcessConfiguration _processConfiguration;
@@ -64,11 +66,9 @@ public class LiveDbProcessFixture : IProcessFixture
     private ArtportalenChecklistFactory? _artportalenChecklistFactory;
     private IProcessedChecklistRepository _processedChecklistRepository { get; set; }
     private DataProvider _testDataProvider = new DataProvider { Id = 1, Identifier = "TestDataProvider" };
-
-    public List<Taxon> Taxa
-    {
-        get => _taxa!;
-    }
+   
+    public List<Taxon> Taxa => _taxa!;
+    public IDictionary<VocabularyId, IDictionary<object, int>> DwcaVocabularyById => _dwcaVocabularyById;
 
     public Dictionary<int, Taxon> TaxonById
     {
@@ -224,8 +224,12 @@ public class LiveDbProcessFixture : IProcessFixture
         {
             _taxa = await _taxonRepository.GetAllAsync();
         }
-
         _taxaById = _taxa?.ToDictionary(m => m.Id, m => m);
+        var vocabularies = await _vocabularyRepository.GetAllAsync();
+        _dwcaVocabularyById = VocabularyHelper.GetVocabulariesDictionary(
+                ExternalSystemId.DarwinCore,
+                vocabularies.ToArray(),
+                true);
         _artportalenObservationFactory = await ArtportalenObservationFactory.CreateAsync(
             new DataProvider { Id = 1 },
             _taxaById!,
@@ -320,7 +324,7 @@ public class LiveDbProcessFixture : IProcessFixture
         var factory = await DwcaObservationFactory.CreateAsync(
             dataProvider,
             _taxaById!,
-            _vocabularyRepository,
+            _dwcaVocabularyById,
             _areaHelper,
             _processTimeManager,
             _processConfiguration);
@@ -603,7 +607,7 @@ public class LiveDbProcessFixture : IProcessFixture
         var factory = await DwcaObservationFactory.CreateAsync(
             dataProvider,
             _taxaById!,
-            _vocabularyRepository,
+            _dwcaVocabularyById,
             _areaHelper,
             _processTimeManager,
             _processConfiguration);

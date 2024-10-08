@@ -242,6 +242,7 @@ namespace SOS.Harvest.Processors
         protected abstract Task<(int publicCount, int protectedCount, int failedCount)> ProcessObservationsAsync(
             DataProvider dataProvider,
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
+            IDictionary<VocabularyId, IDictionary<object, int>> dwcaVocabularyById,
             JobRunModes mode,
             IJobCancellationToken cancellationToken);
 
@@ -574,6 +575,7 @@ namespace SOS.Harvest.Processors
         public virtual async Task<ProcessingStatus> ProcessAsync(
             DataProvider dataProvider,
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
+            IDictionary<VocabularyId, IDictionary<object, int>> dwcaVocabularyById,
             JobRunModes mode,
             IJobCancellationToken cancellationToken)
         {
@@ -583,7 +585,7 @@ namespace SOS.Harvest.Processors
             try
             {
                 Logger.LogDebug($"Start processing {dataProvider.Identifier} data");
-                var processCount = await ProcessObservationsAsync(dataProvider, taxa, mode, cancellationToken);
+                var processCount = await ProcessObservationsAsync(dataProvider, taxa, dwcaVocabularyById, mode, cancellationToken);
                 Logger.LogInformation($"Finish processing {dataProvider.Identifier} data. publicCount={processCount.publicCount}, protectedCount={processCount.protectedCount}, failedCount={processCount.failedCount}");
 
                 return ProcessingStatus.Success(dataProvider.Identifier, Type, startTime, DateTime.Now, processCount.publicCount, processCount.protectedCount, processCount.failedCount);

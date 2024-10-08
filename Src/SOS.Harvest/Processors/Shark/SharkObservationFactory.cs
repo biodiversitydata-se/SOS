@@ -27,9 +27,10 @@ namespace SOS.Harvest.Processors.Shark
         /// <exception cref="ArgumentNullException"></exception>
         public SharkObservationFactory(DataProvider dataProvider,
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
+            IDictionary<VocabularyId, IDictionary<object, int>> dwcaVocabularyById,
             IAreaHelper areaHelper,
             IProcessTimeManager processTimeManager,
-            ProcessConfiguration processConfiguration) : base(dataProvider, taxa, processTimeManager, processConfiguration)
+            ProcessConfiguration processConfiguration) : base(dataProvider, taxa, dwcaVocabularyById, processTimeManager, processConfiguration)
         {
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
         }
@@ -91,6 +92,8 @@ namespace SOS.Harvest.Processors.Shark
             };
 
             obs.AccessRights = GetAccessRightsFromSensitivityCategory(obs.Occurrence.SensitivityCategory);
+            string? verbatimInstitutionCode = DataProvider.Organizations?.Translate("en-GB");
+            obs.InstitutionCode = GetSosId(verbatimInstitutionCode, VocabularyById[VocabularyId.Institution]);
             AddPositionData(obs.Location, verbatim.SampleLongitudeDd, verbatim.SampleLatitudeDd,
                 CoordinateSys.WGS84, ProcessConstants.DefaultAccuracyInMeters, taxon?.Attributes?.DisturbanceRadius);
             _areaHelper.AddAreaDataToProcessedLocation(obs.Location);

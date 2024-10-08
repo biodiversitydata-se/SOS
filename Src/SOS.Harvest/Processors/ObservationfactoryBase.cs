@@ -17,6 +17,9 @@ namespace SOS.Harvest.Processors
     /// </summary>
     public class ObservationFactoryBase : FactoryBase
     {
+        protected IDictionary<int, Lib.Models.Processed.Observation.Taxon> Taxa { get; }
+        protected IDictionary<VocabularyId, IDictionary<object, int>> VocabularyById { get; }
+
         private struct ProtectedArea
         {
             /// <summary>
@@ -133,9 +136,7 @@ namespace SOS.Harvest.Processors
                 var taxonProtection = JsonSerializer.DeserializeAsync<IEnumerable<ProtectedTaxon>>(fs, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }).Result;
                 return taxonProtection?.ToDictionary(tp => tp.TaxonId, tp => tp.Areas?.Select(a => GetAreaKey(a.AreaType, a.FeatureId)).ToHashSet() ?? new HashSet<string>()) ?? new Dictionary<int, HashSet<string>>();
             }
-        }
-
-        protected IDictionary<int, Lib.Models.Processed.Observation.Taxon> Taxa { get; }
+        }        
 
         /// <summary>
         /// Constructor
@@ -146,11 +147,12 @@ namespace SOS.Harvest.Processors
         /// <exception cref="ArgumentNullException"></exception>
         protected ObservationFactoryBase(DataProvider dataProvider,
             IDictionary<int, Lib.Models.Processed.Observation.Taxon>? taxa,
+            IDictionary<VocabularyId, IDictionary<object, int>> vocabularyById,
             IProcessTimeManager processTimeManager,
             ProcessConfiguration processConfiguration) : base(dataProvider, processTimeManager, processConfiguration)
         {
             Taxa = taxa ?? throw new ArgumentNullException(nameof(taxa));
-
+            VocabularyById = vocabularyById ?? throw new ArgumentNullException(nameof(vocabularyById));
             _taxonByScientificName = new HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon>();
             _taxonByScientificNameAuthor = new HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon>();
             _taxonBySynonymName = new HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon>();
@@ -272,47 +274,7 @@ namespace SOS.Harvest.Processors
             return 0;
         }
 
-        /// <summary>
-        ///     Get vocabulary mappings.
-        /// </summary>
-        /// <param name="externalSystemId"></param>
-        /// <param name="allVocabularies"></param>
-        /// <param name="convertValuesToLowercase"></param>
-        /// <returns></returns>
-        public static IDictionary<VocabularyId, IDictionary<object, int>> GetVocabulariesDictionary(
-            ExternalSystemId externalSystemId,
-            ICollection<Vocabulary>? allVocabularies,
-            bool convertValuesToLowercase)
-        {
-            var dic = new Dictionary<VocabularyId, IDictionary<object, int>>();
-
-            if (allVocabularies?.Any() ?? false)
-            {
-                foreach (var vocabulary in allVocabularies)
-                {
-                    var vocabularies = vocabulary.ExternalSystemsMapping.FirstOrDefault(m => m.Id == externalSystemId);
-                    if (vocabularies != null)
-                    {
-                        var mapping = vocabularies.Mappings.Single();
-                        var sosIdByValue = mapping.GetIdByValueDictionary(convertValuesToLowercase);
-                        dic.Add(vocabulary.Id, sosIdByValue);
-                    }
-                }
-            }
-
-            // Add missing entries. Initialize with empty dictionary.
-            foreach (VocabularyId vocabularyId in (VocabularyId[])Enum.GetValues(typeof(VocabularyId)))
-            {
-                if (!dic.ContainsKey(vocabularyId))
-                {
-                    dic.Add(vocabularyId, new Dictionary<object, int>());
-                }
-            }
-
-            return dic;
-        }
-
-        protected VocabularyValue? GetSosId(string val,
+        protected VocabularyValue? GetSosId(string? val,
             IDictionary<object, int>? sosIdByValue,
             int? defaultValue = null,
             MappingNotFoundLogic mappingNotFoundLogic = MappingNotFoundLogic.UseSourceValue)
@@ -335,7 +297,7 @@ namespace SOS.Harvest.Processors
 
             return new VocabularyValue
             { Id = VocabularyConstants.NoMappingFoundCustomValueIsUsedId, Value = val };
-        }
+        }        
 
         protected enum MappingNotFoundLogic
         {

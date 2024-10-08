@@ -98,7 +98,7 @@ namespace SOS.Process.UnitTests.Processors
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.ProcessAsync(dataprovider, null, JobRunModes.Full, JobCancellationToken.Null);
+            var result = await TestObject.ProcessAsync(dataprovider, null, null, JobRunModes.Full, JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -144,11 +144,12 @@ namespace SOS.Process.UnitTests.Processors
             {
                 {0, new Taxon {Id = 0, TaxonId = "taxon:0", ScientificName = "Biota"}}
             };
+            var dwcaVocabularyById = new Dictionary<VocabularyId, IDictionary<object, int>>();
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.ProcessAsync(dataProvider, taxa, JobRunModes.Full, JobCancellationToken.Null);
+            var result = await TestObject.ProcessAsync(dataProvider, taxa, dwcaVocabularyById, JobRunModes.Full, JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert

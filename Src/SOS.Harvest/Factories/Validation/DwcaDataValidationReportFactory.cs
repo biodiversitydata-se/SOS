@@ -5,6 +5,7 @@ using SOS.Harvest.Processors.DarwinCoreArchive;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Enums;
+using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.DataValidation;
@@ -119,16 +120,11 @@ namespace SOS.Harvest.Factories.Validation
         private DwcaObservationFactory GetObservationFactory(DataProvider dataProvider)
         {
             if (_dwcaObservationFactory == null)
-            {
-                var dwcaVocabularyById = DwcaObservationFactory.GetVocabulariesDictionary(
-                    ExternalSystemId.DarwinCore,
-                    _vocabularyById!.Values,
-                    true);
-
+            {               
                 _dwcaObservationFactory = new DwcaObservationFactory(
                     dataProvider,
                     _taxonById,
-                    dwcaVocabularyById,
+                    _dwcaVocabularyById,
                     _areaHelper,
                     _processTimeManager,
                     ProcessConfiguration);

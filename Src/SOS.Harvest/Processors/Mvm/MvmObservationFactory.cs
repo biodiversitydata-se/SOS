@@ -15,8 +15,7 @@ namespace SOS.Harvest.Processors.Mvm
 {
     public class MvmObservationFactory : ObservationFactoryBase, IObservationFactory<MvmObservationVerbatim>
     {
-        private readonly IAreaHelper _areaHelper;
-        private readonly IDictionary<VocabularyId, IDictionary<object, int>> _vocabularyById;
+        private readonly IAreaHelper _areaHelper;        
 
         /// <summary>
         /// Constructor
@@ -28,18 +27,13 @@ namespace SOS.Harvest.Processors.Mvm
         /// <exception cref="ArgumentNullException"></exception>
         public MvmObservationFactory(DataProvider dataProvider,
             IDictionary<int, Lib.Models.Processed.Observation.Taxon>? taxa,
+            IDictionary<VocabularyId, IDictionary<object, int>> dwcaVocabularyById,
             IAreaHelper areaHelper,
             IProcessTimeManager processTimeManager,
             IVocabularyRepository processedVocabularyRepository,
-            ProcessConfiguration processConfiguration) : base(dataProvider, taxa, processTimeManager, processConfiguration)
-        {            
-            _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
-            if (processedVocabularyRepository == null) throw new ArgumentNullException(nameof(processedVocabularyRepository));
-            var vocabularies = processedVocabularyRepository.GetAllAsync().Result;
-            _vocabularyById = GetVocabulariesDictionary(
-                ExternalSystemId.DarwinCore,
-                vocabularies.ToArray(),
-                true);            
+            ProcessConfiguration processConfiguration) : base(dataProvider, taxa, dwcaVocabularyById, processTimeManager, processConfiguration)
+        {
+            _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));            
         }
 
         /// <summary>
@@ -86,7 +80,6 @@ namespace SOS.Harvest.Processors.Mvm
                     IsNotRediscoveredObservation = false,
                     IsPositiveObservation = verbatim.IsPositiveObservation,
                     OccurrenceId = verbatim.OccurrenceId,
-                    //ProtectionLevel = CalculateProtectionLevel(taxon),
                     SensitivityCategory = CalculateProtectionLevel(taxon),
                     OrganismQuantity = verbatim.Quantity,
                     OrganismQuantityUnit = string.IsNullOrEmpty(verbatim.QuantityUnit) ? null : new VocabularyValue { Id = -1, Value = verbatim.QuantityUnit },
@@ -106,8 +99,8 @@ namespace SOS.Harvest.Processors.Mvm
                 obs.Occurrence.OrganismQuantityInt = quantity;
             }
 
-            string verbatimInstitutionCode = DataProvider.Names.Translate("en-GB");
-            obs.InstitutionCode = GetSosId(verbatimInstitutionCode, _vocabularyById[VocabularyId.Institution]);
+            string? verbatimInstitutionCode = DataProvider.Organizations?.Translate("en-GB");
+            obs.InstitutionCode = GetSosId(verbatimInstitutionCode, VocabularyById[VocabularyId.Institution]);
             obs.AccessRights = GetAccessRightsFromSensitivityCategory(obs.Occurrence.SensitivityCategory);
             AddPositionData(obs.Location, verbatim.DecimalLongitude, verbatim.DecimalLatitude,
                 CoordinateSys.WGS84, verbatim.CoordinateUncertaintyInMeters, taxon?.Attributes?.DisturbanceRadius);

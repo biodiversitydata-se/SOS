@@ -34,19 +34,19 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
         /// </summary>
         /// <param name="dataProvider"></param>
         /// <param name="taxa"></param>
-        /// <param name="vocabularyById"></param>
+        /// <param name="dwcaVocabularyById"></param>
         /// <param name="areaHelper"></param>
         /// <param name="processTimeManager"></param>
         /// <exception cref="ArgumentNullException"></exception>
         public DwcaObservationFactory(
             DataProvider dataProvider,
             IDictionary<int, Lib.Models.Processed.Observation.Taxon>? taxa,
-            IDictionary<VocabularyId, IDictionary<object, int>>? vocabularyById,
+            IDictionary<VocabularyId, IDictionary<object, int>> dwcaVocabularyById,            
             IAreaHelper areaHelper,
             IProcessTimeManager processTimeManager,
-            ProcessConfiguration processConfiguration) : base(dataProvider, taxa, processTimeManager, processConfiguration)
+            ProcessConfiguration processConfiguration) : base(dataProvider, taxa, dwcaVocabularyById, processTimeManager, processConfiguration)
         {
-            _vocabularyById = vocabularyById ?? throw new ArgumentNullException(nameof(vocabularyById));
+            _vocabularyById = dwcaVocabularyById ?? throw new ArgumentNullException(nameof(dwcaVocabularyById));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
             _englishDataproviderName = dataProvider?.Names?.Translate("en-GB")!;
         }
@@ -54,17 +54,12 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
         public static async Task<DwcaObservationFactory> CreateAsync(
             DataProvider dataProvider,
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
-            IVocabularyRepository processedVocabularyRepository,
+            IDictionary<VocabularyId, IDictionary<object, int>> dwcaVocabularyById,
             IAreaHelper areaHelper,
             IProcessTimeManager processTimeManager,
             ProcessConfiguration processConfiguration)
-        {
-            var vocabularies = await processedVocabularyRepository.GetAllAsync();
-            var vocabularyById = GetVocabulariesDictionary(
-                ExternalSystemId.DarwinCore,
-                vocabularies.ToArray(),
-                true);
-            return new DwcaObservationFactory(dataProvider, taxa, vocabularyById, areaHelper, processTimeManager, processConfiguration);
+        {            
+            return new DwcaObservationFactory(dataProvider, taxa, dwcaVocabularyById, areaHelper, processTimeManager, processConfiguration);
         }
 
         /// <summary>
@@ -106,7 +101,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             obs.DynamicProperties = verbatim.DynamicProperties;
             obs.InformationWithheld = verbatim.InformationWithheld;
             obs.InstitutionId = verbatim.InstitutionID;
-            string verbatimInstitutionCode = !string.IsNullOrEmpty(verbatim.InstitutionCode) ? verbatim.InstitutionCode : DataProvider.Names.Translate("en-GB");
+            string? verbatimInstitutionCode = !string.IsNullOrEmpty(verbatim.InstitutionCode) ? verbatim.InstitutionCode : DataProvider.Organizations?.Translate("en-GB");
             obs.InstitutionCode = GetSosId(verbatimInstitutionCode,
                 _vocabularyById[VocabularyId.Institution]);
             obs.Language = verbatim.Language;
