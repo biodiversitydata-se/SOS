@@ -2549,88 +2549,108 @@
       "Localized": false
     },
     {
-      "Id": 5000,
+      "Id": 5001,
       "Value": "SLU Swedish Species Information Centre",
       "Localized": false
     },
     {
-      "Id": 5001,
-      "Value": "Department of Aquatic Resources, SLU",
-      "Localized": false
-    },
-    {
       "Id": 5002,
-      "Value": "Environmental data MVM, SLU",
-      "Localized": false
-    },
-    {
-      "Id": 5003,
-      "Value": "Umeå University",
-      "Localized": false
-    },
-    {
-      "Id": 5004,
-      "Value": "Swedish Meteorological and Hydrological Institute (SMHI)",
-      "Localized": false
-    },
-    {
-      "Id": 5005,
-      "Value": "Swedish Museum of Natural History",
-      "Localized": false
-    },
-    {
-      "Id": 5006,
-      "Value": "Station Linné",
-      "Localized": false
-    },
-    {
-      "Id": 5007,
-      "Value": "Department of Biology, Lund University",
-      "Localized": false
-    },
-    {
-      "Id": 5008,
-      "Value": "Swedish Meterological and Hydrological Institute (SMHI)",
-      "Localized": false
-    },
-    {
-      "Id": 5009,
       "Value": "Department of Aquatic Resources (SLU Aqua)",
       "Localized": false
     },
     {
-      "Id": 5010,
-      "Value": "Swedish National Forest Inventory, Department of Forest Resource Management, SLU",
+      "Id": 5003,
+      "Value": "Environmental data MVM, SLU",
       "Localized": false
     },
     {
-      "Id": 5011,
+      "Id": 5004,
+      "Value": "Umeå University",
+      "Localized": false
+    },
+    {
+      "Id": 5005,
+      "Value": "Swedish Meteorological and Hydrological Institute (SMHI)",
+      "Localized": false
+    },
+    {
+      "Id": 5006,
+      "Value": "Swedish Museum of Natural History",
+      "Localized": false
+    },
+    {
+      "Id": 5007,
+      "Value": "Station Linné",
+      "Localized": false
+    },
+    {
+      "Id": 5008,
+      "Value": "Department of Biology, Lund University",
+      "Localized": false
+    },
+    {
+      "Id": 5009,
       "Value": "Overstellar Solutions AB",
       "Localized": false
     },
     {
-      "Id": 5012,
+      "Id": 5010,
       "Value": "iNaturalist.org",
       "Localized": false
     },
     {
-      "Id": 5013,
+      "Id": 5011,
       "Value": "Swedish Board of Agriculture",
       "Localized": false
     },
     {
-      "Id": 5014,
+      "Id": 5012,
       "Value": "Department of Forest Resource Management, SLU",
       "Localized": false
     },
     {
-      "Id": 5015,
+      "Id": 5013,
       "Value": "Gothenburg Natural History Museum",
       "Localized": false
     },
     {
-      "Id": 5016,
+      "Id": 5014,
       "Value": "Lund University",
+      "Localized": false
+    },
+    {
+      "Id": 5015,
+      "Value": "Biologg",
+      "Localized": false
+    },
+    {
+      "Id": 5016,
+      "Value": "NRM",
+      "Localized": false
+    },
+    {
+      "Id": 5017,
+      "Value": "MZLU",
+      "Localized": false
+    },
+    {
+      "Id": 5018,
+      "Value": "SJV",
+      "Localized": false
+    },
+    {
+      "Id": 5019,
+      "Value": "iNaturalist",
+      "Localized": false
+    },
+    {
+      "Id": 5020,
+      "Value": "GNM",
+      "Localized": false
+    },
+    {
+      "Id": 5021,
+      "Value": "GBIF-SE:GNM",
       "Localized": false
     }
   ],
@@ -4678,6 +4698,2127 @@
             {
               "Value": 675,
               "SosId": 675
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Id": 1,
+      "Name": "DarwinCore",
+      "Description": "The Darwin Core format (https://dwc.tdwg.org/terms/)",
+      "Mappings": [
+        {
+          "Key": "institutionCode",
+          "Description": "The institutionCode term (http://rs.tdwg.org/dwc/terms/institutionCode)",
+          "Values": [
+            {
+              "Value": "SLU Artdatabanken",
+              "SosId": 165
+            },
+            {
+              "Value": "Nationella rapportkommittén",
+              "SosId": 166
+            },
+            {
+              "Value": "Raritetskommittén",
+              "SosId": 167
+            },
+            {
+              "Value": "Blekinge rapportkommitté",
+              "SosId": 168
+            },
+            {
+              "Value": "Bohuslän rapportkommitté",
+              "SosId": 169
+            },
+            {
+              "Value": "Dalarnas rapportkommitté",
+              "SosId": 170
+            },
+            {
+              "Value": "Dalslands rapportkommitté",
+              "SosId": 171
+            },
+            {
+              "Value": "Lokala rapportkommittén Vänersborg",
+              "SosId": 172
+            },
+            {
+              "Value": "Sveriges ornitologiska förening (SOF)",
+              "SosId": 173
+            },
+            {
+              "Value": "Lokala rapportkommittén Lerum",
+              "SosId": 174
+            },
+            {
+              "Value": "Lokala rapportkommittén Skara",
+              "SosId": 175
+            },
+            {
+              "Value": "Lokala rapportkommittén Svenljunga",
+              "SosId": 176
+            },
+            {
+              "Value": "Lokala rapportkommittén Tidaholm",
+              "SosId": 177
+            },
+            {
+              "Value": "Lokala rapportkommittén Vara",
+              "SosId": 178
+            },
+            {
+              "Value": "Lokala rapportkommittén Vbgviken",
+              "SosId": 179
+            },
+            {
+              "Value": "Lokala rapportkommittén Essunga",
+              "SosId": 180
+            },
+            {
+              "Value": "Lokala rapportkommittén Gullspång",
+              "SosId": 181
+            },
+            {
+              "Value": "Lokala rapportkommittén Götene",
+              "SosId": 182
+            },
+            {
+              "Value": "Lokala rapportkommittén Habo-Mullsjö",
+              "SosId": 183
+            },
+            {
+              "Value": "Lokala rapportkommittén Herrljunga",
+              "SosId": 184
+            },
+            {
+              "Value": "Lokala rapportkommittén Hullsjön",
+              "SosId": 185
+            },
+            {
+              "Value": "Östergötlands rapportkommitté",
+              "SosId": 186
+            },
+            {
+              "Value": "Östra Smålands rapportkommitté",
+              "SosId": 187
+            },
+            {
+              "Value": "Lokala rapportkommittén Ale",
+              "SosId": 188
+            },
+            {
+              "Value": "Lokala rapportkommittén Alingsås",
+              "SosId": 189
+            },
+            {
+              "Value": "Lokala rapportkommittén Bollebygd",
+              "SosId": 190
+            },
+            {
+              "Value": "Lokala rapportkommittén Dettern",
+              "SosId": 191
+            },
+            {
+              "Value": "Värmlands rapportkommitté",
+              "SosId": 192
+            },
+            {
+              "Value": "Västerbottens rapportkommitté",
+              "SosId": 193
+            },
+            {
+              "Value": "Västergötlands rapportkommitté",
+              "SosId": 194
+            },
+            {
+              "Value": "Västmanlands rapportkommitté",
+              "SosId": 195
+            },
+            {
+              "Value": "Ångermanlands rapportkommitté",
+              "SosId": 196
+            },
+            {
+              "Value": "Ölands rapportkommitté",
+              "SosId": 197
+            },
+            {
+              "Value": "Närkes rapportkommitté",
+              "SosId": 198
+            },
+            {
+              "Value": "Skånes rapportkommitté",
+              "SosId": 199
+            },
+            {
+              "Value": "Stockholms rapportkommitté",
+              "SosId": 200
+            },
+            {
+              "Value": "Södermanlands rapportkommitté",
+              "SosId": 201
+            },
+            {
+              "Value": "Södra lapplands rapporteringskommitté",
+              "SosId": 202
+            },
+            {
+              "Value": "Upplands rapportkommitté",
+              "SosId": 203
+            },
+            {
+              "Value": "Jämtlands rapportkommitté",
+              "SosId": 204
+            },
+            {
+              "Value": "Jönköpings rapportkommitté",
+              "SosId": 205
+            },
+            {
+              "Value": "Kronobergs rapportkommitté",
+              "SosId": 206
+            },
+            {
+              "Value": "Medelpads rapportkommitté",
+              "SosId": 207
+            },
+            {
+              "Value": "Norra lapplands rapportkommitté",
+              "SosId": 208
+            },
+            {
+              "Value": "Norrbottens rapportkommitté",
+              "SosId": 209
+            },
+            {
+              "Value": "Gotlands rapportkommitté",
+              "SosId": 210
+            },
+            {
+              "Value": "Gästriklands rapportkommitté",
+              "SosId": 211
+            },
+            {
+              "Value": "Göteborgs rapportkommitté",
+              "SosId": 212
+            },
+            {
+              "Value": "Hallands rapportkommitté",
+              "SosId": 213
+            },
+            {
+              "Value": "Hälsinglands rapportkommitté",
+              "SosId": 214
+            },
+            {
+              "Value": "Härjedalens rapportkommitté",
+              "SosId": 215
+            },
+            {
+              "Value": "Länsstyrelsen Gävleborg",
+              "SosId": 216
+            },
+            {
+              "Value": "Länsstyrelsen Halland",
+              "SosId": 217
+            },
+            {
+              "Value": "Länsstyrelsen Södermanland",
+              "SosId": 218
+            },
+            {
+              "Value": "Länsstyrelsen Uppsala",
+              "SosId": 219
+            },
+            {
+              "Value": "Länsstyrelsen Blekinge",
+              "SosId": 220
+            },
+            {
+              "Value": "Länsstyrelsen Gotland",
+              "SosId": 221
+            },
+            {
+              "Value": "Länsstyrelsen Dalarna",
+              "SosId": 222
+            },
+            {
+              "Value": "Länsstyrelsen Kronoberg",
+              "SosId": 223
+            },
+            {
+              "Value": "Länsstyrelsen Norrbotten",
+              "SosId": 224
+            },
+            {
+              "Value": "Länsstyrelsen Västerbotten",
+              "SosId": 225
+            },
+            {
+              "Value": "Länsstyrelsen Västernorrland",
+              "SosId": 226
+            },
+            {
+              "Value": "Länsstyrelsen Västmanland",
+              "SosId": 227
+            },
+            {
+              "Value": "Länsstyrelsen Västra Götaland",
+              "SosId": 228
+            },
+            {
+              "Value": "Länsstyrelsen Örebro",
+              "SosId": 229
+            },
+            {
+              "Value": "Länsstyrelsen Östergötland",
+              "SosId": 230
+            },
+            {
+              "Value": "Länsstyrelsen Jämtland",
+              "SosId": 231
+            },
+            {
+              "Value": "Länsstyrelsen Jönköping",
+              "SosId": 232
+            },
+            {
+              "Value": "Länsstyrelsen Kalmar",
+              "SosId": 233
+            },
+            {
+              "Value": "Länsstyrelsen Skåne",
+              "SosId": 234
+            },
+            {
+              "Value": "Länsstyrelsen Stockholm",
+              "SosId": 235
+            },
+            {
+              "Value": "Länsstyrelsen Värmland",
+              "SosId": 236
+            },
+            {
+              "Value": "Borgholms kommun",
+              "SosId": 237
+            },
+            {
+              "Value": "Eskilstuna kommun",
+              "SosId": 238
+            },
+            {
+              "Value": "Falkenbergs kommun",
+              "SosId": 239
+            },
+            {
+              "Value": "Falu kommun",
+              "SosId": 240
+            },
+            {
+              "Value": "Gävle kommun",
+              "SosId": 241
+            },
+            {
+              "Value": "Hagfors kommun",
+              "SosId": 242
+            },
+            {
+              "Value": "Lycksele kommun",
+              "SosId": 243
+            },
+            {
+              "Value": "Skurups kommun",
+              "SosId": 244
+            },
+            {
+              "Value": "Lunds kommun",
+              "SosId": 245
+            },
+            {
+              "Value": "Örebro kommun",
+              "SosId": 246
+            },
+            {
+              "Value": "Partille kommun",
+              "SosId": 247
+            },
+            {
+              "Value": "Gotlands region",
+              "SosId": 248
+            },
+            {
+              "Value": "Halmstads kommun",
+              "SosId": 249
+            },
+            {
+              "Value": "Lomma kommun",
+              "SosId": 250
+            },
+            {
+              "Value": "Bräcke kommun",
+              "SosId": 251
+            },
+            {
+              "Value": "Nyköpings kommun",
+              "SosId": 252
+            },
+            {
+              "Value": "Eda kommun",
+              "SosId": 253
+            },
+            {
+              "Value": "Säffle kommun",
+              "SosId": 254
+            },
+            {
+              "Value": "Uppsala kommun",
+              "SosId": 255
+            },
+            {
+              "Value": "Varbergs kommun",
+              "SosId": 256
+            },
+            {
+              "Value": "Svenljunga kommun",
+              "SosId": 257
+            },
+            {
+              "Value": "Södertälje kommun",
+              "SosId": 258
+            },
+            {
+              "Value": "Tyresö kommun",
+              "SosId": 259
+            },
+            {
+              "Value": "Upplands-Bro kommun",
+              "SosId": 260
+            },
+            {
+              "Value": "Göteborgs Stad",
+              "SosId": 261
+            },
+            {
+              "Value": "Stockholms Stad",
+              "SosId": 262
+            },
+            {
+              "Value": "Munkedals kommun",
+              "SosId": 263
+            },
+            {
+              "Value": "Norrköpings kommun",
+              "SosId": 264
+            },
+            {
+              "Value": "Norrtälje kommun",
+              "SosId": 265
+            },
+            {
+              "Value": "Nybro kommun",
+              "SosId": 266
+            },
+            {
+              "Value": "Nykvarn kommun",
+              "SosId": 267
+            },
+            {
+              "Value": "Strängnäs kommun",
+              "SosId": 268
+            },
+            {
+              "Value": "Laxå kommun",
+              "SosId": 269
+            },
+            {
+              "Value": "Lindesbergs kommun",
+              "SosId": 270
+            },
+            {
+              "Value": "Linköpings kommun",
+              "SosId": 271
+            },
+            {
+              "Value": "Ludvika kommun",
+              "SosId": 272
+            },
+            {
+              "Value": "Marks kommun",
+              "SosId": 273
+            },
+            {
+              "Value": "Motala kommun",
+              "SosId": 274
+            },
+            {
+              "Value": "Jönköpings kommun",
+              "SosId": 275
+            },
+            {
+              "Value": "Kalix kommun",
+              "SosId": 276
+            },
+            {
+              "Value": "Karlstads kommun",
+              "SosId": 277
+            },
+            {
+              "Value": "Katrineholms kommun",
+              "SosId": 278
+            },
+            {
+              "Value": "Kävlinge kommun",
+              "SosId": 279
+            },
+            {
+              "Value": "Laholms kommun",
+              "SosId": 280
+            },
+            {
+              "Value": "Haninge Kommun",
+              "SosId": 281
+            },
+            {
+              "Value": "Huddinge kommun",
+              "SosId": 282
+            },
+            {
+              "Value": "Hultsfred kommun",
+              "SosId": 283
+            },
+            {
+              "Value": "Härryda kommun",
+              "SosId": 284
+            },
+            {
+              "Value": "Höörs kommun",
+              "SosId": 285
+            },
+            {
+              "Value": "Järfälla kommun",
+              "SosId": 286
+            },
+            {
+              "Value": "Norrtälje naturvårdsstiftelse",
+              "SosId": 287
+            },
+            {
+              "Value": "Skogsstyrelsen Jönköping",
+              "SosId": 288
+            },
+            {
+              "Value": "Skogsstyrelsen Kronoberg",
+              "SosId": 289
+            },
+            {
+              "Value": "Sveaskog (Västerbotten)",
+              "SosId": 291
+            },
+            {
+              "Value": "Calluna AB",
+              "SosId": 292
+            },
+            {
+              "Value": "Medins Biologi AB",
+              "SosId": 293
+            },
+            {
+              "Value": "Naturcentrum AB",
+              "SosId": 294
+            },
+            {
+              "Value": "Pro Natura",
+              "SosId": 295
+            },
+            {
+              "Value": "Regionmuseet Kristianstad",
+              "SosId": 296
+            },
+            {
+              "Value": "Biologiska Museet, Lunds Universitet",
+              "SosId": 297
+            },
+            {
+              "Value": "Göteborgs naturhistoriska museum (GNM)",
+              "SosId": 298
+            },
+            {
+              "Value": "Göteborg-Herbarium GB",
+              "SosId": 299
+            },
+            {
+              "Value": "Stockholm-Naturhistoriska riksmuseet",
+              "SosId": 300
+            },
+            {
+              "Value": "Uppsala-Evolutionsmuseet",
+              "SosId": 301
+            },
+            {
+              "Value": "Köpenhamn",
+              "SosId": 302
+            },
+            {
+              "Value": "Helsingfors",
+              "SosId": 303
+            },
+            {
+              "Value": "Lycksele skogsmuseum",
+              "SosId": 304
+            },
+            {
+              "Value": "Limnodata HB",
+              "SosId": 305
+            },
+            {
+              "Value": "Uppsala-SLU",
+              "SosId": 306
+            },
+            {
+              "Value": "Umeå-Herbarium UME",
+              "SosId": 307
+            },
+            {
+              "Value": "Oskarshamn-Herbarium OHN",
+              "SosId": 308
+            },
+            {
+              "Value": "Visby-Herbarium VI",
+              "SosId": 309
+            },
+            {
+              "Value": "Örebro-Herbarium OREB",
+              "SosId": 310
+            },
+            {
+              "Value": "Oslo",
+              "SosId": 311
+            },
+            {
+              "Value": "Åtgärdsprogram för fjällgås",
+              "SosId": 312
+            },
+            {
+              "Value": "Berguvsprojektet i Dalarnas län",
+              "SosId": 313
+            },
+            {
+              "Value": "Berguvsprojektet i Stockholms län",
+              "SosId": 314
+            },
+            {
+              "Value": "Duvhöksprojektet i Stockholms län",
+              "SosId": 315
+            },
+            {
+              "Value": "Havsörnsprojektet i Gotlands Län",
+              "SosId": 316
+            },
+            {
+              "Value": "Kungsörnsprojektet i Gotlands lan",
+              "SosId": 317
+            },
+            {
+              "Value": "Kungsörnsprojketet i Uppsala län",
+              "SosId": 318
+            },
+            {
+              "Value": "Projekt Vitryggig hackspett",
+              "SosId": 319
+            },
+            {
+              "Value": "Projekt Ängshök",
+              "SosId": 320
+            },
+            {
+              "Value": "Projekt Vitryggig hackspett (Västerbotten)",
+              "SosId": 321
+            },
+            {
+              "Value": "Sparhöksprojktet (Stockholm)",
+              "SosId": 322
+            },
+            {
+              "Value": "Kungsörnsprojektet i Västerbottens län",
+              "SosId": 323
+            },
+            {
+              "Value": "Kungsörnsprojketet i Västmanlands län",
+              "SosId": 324
+            },
+            {
+              "Value": "Projekt Jaktfalk",
+              "SosId": 325
+            },
+            {
+              "Value": "Projekt Lom",
+              "SosId": 326
+            },
+            {
+              "Value": "Projekt Skräntärna",
+              "SosId": 327
+            },
+            {
+              "Value": "Projekt Tornuggla (Öland)",
+              "SosId": 328
+            },
+            {
+              "Value": "Torsås kommun",
+              "SosId": 329
+            },
+            {
+              "Value": "Kungsbacka kommun",
+              "SosId": 330
+            },
+            {
+              "Value": "Uddevalla kommun",
+              "SosId": 331
+            },
+            {
+              "Value": "Sydnärkes Miljöförvaltning",
+              "SosId": 332
+            },
+            {
+              "Value": "Miljönämnden i mellersta Bohuslän",
+              "SosId": 333
+            },
+            {
+              "Value": "Ekerö kommun",
+              "SosId": 334
+            },
+            {
+              "Value": "Trosa kommun",
+              "SosId": 335
+            },
+            {
+              "Value": "Västerviks kommun",
+              "SosId": 336
+            },
+            {
+              "Value": "Gislaveds kommun",
+              "SosId": 337
+            },
+            {
+              "Value": "Sportfiskarna",
+              "SosId": 338
+            },
+            {
+              "Value": "Hallands botaniska förening",
+              "SosId": 339
+            },
+            {
+              "Value": "Västgötabergens Svampklubb",
+              "SosId": 340
+            },
+            {
+              "Value": "Sveriges mykologiska förening",
+              "SosId": 341
+            },
+            {
+              "Value": "Trollhättans stad",
+              "SosId": 342
+            },
+            {
+              "Value": "Floraväkteri-Uppsala län",
+              "SosId": 343
+            },
+            {
+              "Value": "Jämtlands botaniska sällskap",
+              "SosId": 344
+            },
+            {
+              "Value": "Östergötlands flora",
+              "SosId": 346
+            },
+            {
+              "Value": "Örnborg Kyrkander Biologi & miljö",
+              "SosId": 348
+            },
+            {
+              "Value": "Floraväkteri-Skåne län",
+              "SosId": 349
+            },
+            {
+              "Value": "Fungus Info",
+              "SosId": 350
+            },
+            {
+              "Value": "Floraväkteri-Västmanlands län",
+              "SosId": 351
+            },
+            {
+              "Value": "Floraväkteri-Blekinge län",
+              "SosId": 352
+            },
+            {
+              "Value": "Floraväkteri-Stockholms län",
+              "SosId": 353
+            },
+            {
+              "Value": "Pite lappmarks flora – herbarium FPLF",
+              "SosId": 354
+            },
+            {
+              "Value": "Norrköpings herbarium",
+              "SosId": 355
+            },
+            {
+              "Value": "Floraväkteri-Kronobergs län",
+              "SosId": 356
+            },
+            {
+              "Value": "Floraväkteri-Jämtlands län",
+              "SosId": 357
+            },
+            {
+              "Value": "Floraväkteri-Östergötlands län",
+              "SosId": 358
+            },
+            {
+              "Value": "SCA Skog AB",
+              "SosId": 359
+            },
+            {
+              "Value": "Floraväkteri-Torne lappmark BD-län",
+              "SosId": 360
+            },
+            {
+              "Value": "Floraväkteri-Pite lappmark BD-län",
+              "SosId": 361
+            },
+            {
+              "Value": "Floraväkteri-Lule lappmark BD-län",
+              "SosId": 362
+            },
+            {
+              "Value": "Trafikverket",
+              "SosId": 363
+            },
+            {
+              "Value": "Floraväkteri-Öland",
+              "SosId": 364
+            },
+            {
+              "Value": "Älmhults kommun",
+              "SosId": 365
+            },
+            {
+              "Value": "Floraväkteri-Södermanlands län",
+              "SosId": 366
+            },
+            {
+              "Value": "Lilla Edets kommun",
+              "SosId": 367
+            },
+            {
+              "Value": "Ale kommun",
+              "SosId": 368
+            },
+            {
+              "Value": "Floraväkteri-Kalmar län (fastl.)",
+              "SosId": 369
+            },
+            {
+              "Value": "Floraväkteri-Västernorrlands län",
+              "SosId": 370
+            },
+            {
+              "Value": "Floraväkteri-Dalsland O-län",
+              "SosId": 371
+            },
+            {
+              "Value": "Floraväkteri-Bohuslän O-län",
+              "SosId": 372
+            },
+            {
+              "Value": "Floraväkteri-Värmlands län",
+              "SosId": 373
+            },
+            {
+              "Value": "Floraväkteri-Dalarnas län",
+              "SosId": 374
+            },
+            {
+              "Value": "Svenska Botaniska Föreningen (SBF)",
+              "SosId": 375
+            },
+            {
+              "Value": "Floraväkteri-Hälsingland X-län",
+              "SosId": 376
+            },
+            {
+              "Value": "Floraväkteri-Gästrikland X-län",
+              "SosId": 377
+            },
+            {
+              "Value": "Floraväkteri-Västergötland O-län",
+              "SosId": 378
+            },
+            {
+              "Value": "Floraväkteri-Örebro län",
+              "SosId": 379
+            },
+            {
+              "Value": "Floraväkteri-Hallands län",
+              "SosId": 380
+            },
+            {
+              "Value": "Knivsta kommun",
+              "SosId": 381
+            },
+            {
+              "Value": "Floraväkteri-Norrbotten BD-län",
+              "SosId": 382
+            },
+            {
+              "Value": "Vaggeryds kommun",
+              "SosId": 383
+            },
+            {
+              "Value": "Lerums kommun",
+              "SosId": 384
+            },
+            {
+              "Value": "Floraväkteri-Västerbottens län",
+              "SosId": 385
+            },
+            {
+              "Value": "Sjöbo kommun",
+              "SosId": 386
+            },
+            {
+              "Value": "Falköpings kommun",
+              "SosId": 387
+            },
+            {
+              "Value": "Botaniska Föreningen i Västmanlands län",
+              "SosId": 388
+            },
+            {
+              "Value": "Strömstad kommun",
+              "SosId": 389
+            },
+            {
+              "Value": "Floraväkteri-Gotland",
+              "SosId": 390
+            },
+            {
+              "Value": "Floraväkteri-Lycksele lappmark BD-län",
+              "SosId": 391
+            },
+            {
+              "Value": "Arvika kommun",
+              "SosId": 392
+            },
+            {
+              "Value": "Lunds Botaniska förening",
+              "SosId": 393
+            },
+            {
+              "Value": "Jordbruksverket",
+              "SosId": 394
+            },
+            {
+              "Value": "Simrishamns kommun",
+              "SosId": 395
+            },
+            {
+              "Value": "Timrå kommun",
+              "SosId": 396
+            },
+            {
+              "Value": "Piteå kommun",
+              "SosId": 397
+            },
+            {
+              "Value": "Föreningen Smålands flora",
+              "SosId": 398
+            },
+            {
+              "Value": "Ölands botaniska förening",
+              "SosId": 399
+            },
+            {
+              "Value": "Skövde kommun",
+              "SosId": 400
+            },
+            {
+              "Value": "Borås Stad",
+              "SosId": 401
+            },
+            {
+              "Value": "Kristianstad kommun",
+              "SosId": 402
+            },
+            {
+              "Value": "Kristianstads Vattenrike",
+              "SosId": 403
+            },
+            {
+              "Value": "Rio Göteborg Natur- och kulturkooperativ",
+              "SosId": 404
+            },
+            {
+              "Value": "Gnesta kommun",
+              "SosId": 405
+            },
+            {
+              "Value": "Sölvesborgs kommun",
+              "SosId": 406
+            },
+            {
+              "Value": "Sweco",
+              "SosId": 407
+            },
+            {
+              "Value": "Sveriges Entomologiska förening (SEF)",
+              "SosId": 408
+            },
+            {
+              "Value": "Eggegrunds fågelstation",
+              "SosId": 409
+            },
+            {
+              "Value": "Hammarö fågelstation",
+              "SosId": 410
+            },
+            {
+              "Value": "Sotenäs kommun",
+              "SosId": 411
+            },
+            {
+              "Value": "Lekebergs kommun",
+              "SosId": 412
+            },
+            {
+              "Value": "Lysekils kommun",
+              "SosId": 413
+            },
+            {
+              "Value": "Askersunds kommun",
+              "SosId": 414
+            },
+            {
+              "Value": "Tomelilla kommun",
+              "SosId": 415
+            },
+            {
+              "Value": "Stora Fjäderäggs fågelstation",
+              "SosId": 416
+            },
+            {
+              "Value": "Botkyrka kommun",
+              "SosId": 417
+            },
+            {
+              "Value": "Alingsås kommun",
+              "SosId": 418
+            },
+            {
+              "Value": "Östhammars kommun",
+              "SosId": 419
+            },
+            {
+              "Value": "Bjuvs kommun",
+              "SosId": 420
+            },
+            {
+              "Value": "Perstorps kommun",
+              "SosId": 421
+            },
+            {
+              "Value": "Svalövs kommun",
+              "SosId": 422
+            },
+            {
+              "Value": "Lokala rapportkommittén Falköping",
+              "SosId": 423
+            },
+            {
+              "Value": "Lokala rapportkommittén Mark",
+              "SosId": 424
+            },
+            {
+              "Value": "Lokala rapportkommittén Trollhättan",
+              "SosId": 425
+            },
+            {
+              "Value": "Lokala rapportkommittén Ulricehamn",
+              "SosId": 426
+            },
+            {
+              "Value": "Lokala rapportkommittén Grästorp",
+              "SosId": 427
+            },
+            {
+              "Value": "Lokala rapportkommittén Hjo",
+              "SosId": 428
+            },
+            {
+              "Value": "Lokala rapportkommittén Töreboda",
+              "SosId": 429
+            },
+            {
+              "Value": "Lokala rapportkommittén Mariestad",
+              "SosId": 430
+            },
+            {
+              "Value": "Umedeltats fältstation",
+              "SosId": 431
+            },
+            {
+              "Value": "Ånnsjöns fågelstation",
+              "SosId": 432
+            },
+            {
+              "Value": "Landsorts fågelstation",
+              "SosId": 433
+            },
+            {
+              "Value": "Streams & Lakes Consulting AB",
+              "SosId": 434
+            },
+            {
+              "Value": "Karlskrona kommun",
+              "SosId": 435
+            },
+            {
+              "Value": "Nynäshamns ornitologer (NOF)",
+              "SosId": 436
+            },
+            {
+              "Value": "Lokala rapportkommittén Vårgårda",
+              "SosId": 437
+            },
+            {
+              "Value": "Götene kommun",
+              "SosId": 438
+            },
+            {
+              "Value": "Rördrommen fältstation",
+              "SosId": 439
+            },
+            {
+              "Value": "Mönsterås kommun",
+              "SosId": 440
+            },
+            {
+              "Value": "Skara kommun",
+              "SosId": 441
+            },
+            {
+              "Value": "Sollentuna kommun",
+              "SosId": 442
+            },
+            {
+              "Value": "Sunne kommun",
+              "SosId": 443
+            },
+            {
+              "Value": "Vimmerby kommun",
+              "SosId": 444
+            },
+            {
+              "Value": "Västerås kommun",
+              "SosId": 445
+            },
+            {
+              "Value": "Ystad kommun",
+              "SosId": 446
+            },
+            {
+              "Value": "Bollebygd kommun",
+              "SosId": 447
+            },
+            {
+              "Value": "Bromölla kommun",
+              "SosId": 448
+            },
+            {
+              "Value": "Båstad kommun",
+              "SosId": 449
+            },
+            {
+              "Value": "Höganäs kommun",
+              "SosId": 450
+            },
+            {
+              "Value": "Högsby kommun",
+              "SosId": 451
+            },
+            {
+              "Value": "Klippans kommun",
+              "SosId": 452
+            },
+            {
+              "Value": "Mörbylånga kommun",
+              "SosId": 453
+            },
+            {
+              "Value": "Sala kommun",
+              "SosId": 454
+            },
+            {
+              "Value": "Tibro kommun",
+              "SosId": 455
+            },
+            {
+              "Value": "Tjörns kommun",
+              "SosId": 456
+            },
+            {
+              "Value": "Vallentuna kommun",
+              "SosId": 457
+            },
+            {
+              "Value": "Emmaboda kommun",
+              "SosId": 458
+            },
+            {
+              "Value": "Eslöv kommun",
+              "SosId": 459
+            },
+            {
+              "Value": "Hörby kommun",
+              "SosId": 460
+            },
+            {
+              "Value": "Luleå kommun",
+              "SosId": 461
+            },
+            {
+              "Value": "Ockelbo kommun",
+              "SosId": 462
+            },
+            {
+              "Value": "Osby kommun",
+              "SosId": 463
+            },
+            {
+              "Value": "Tanums kommun",
+              "SosId": 464
+            },
+            {
+              "Value": "Tranemo kommun",
+              "SosId": 465
+            },
+            {
+              "Value": "Trelleborgs kommun",
+              "SosId": 466
+            },
+            {
+              "Value": "Österåkers kommun",
+              "SosId": 467
+            },
+            {
+              "Value": "Forshaga kommun",
+              "SosId": 468
+            },
+            {
+              "Value": "Malmö stad",
+              "SosId": 469
+            },
+            {
+              "Value": "Munkfors kommun",
+              "SosId": 470
+            },
+            {
+              "Value": "Kils kommun",
+              "SosId": 471
+            },
+            {
+              "Value": "Karlshamns kommun",
+              "SosId": 472
+            },
+            {
+              "Value": "Olofströms kommun",
+              "SosId": 473
+            },
+            {
+              "Value": "Valdemarsviks kommun",
+              "SosId": 474
+            },
+            {
+              "Value": "Gällivare kommun",
+              "SosId": 475
+            },
+            {
+              "Value": "Leksands kommun",
+              "SosId": 476
+            },
+            {
+              "Value": "Habo kommun",
+              "SosId": 477
+            },
+            {
+              "Value": "Medelpads Botaniska Förening",
+              "SosId": 478
+            },
+            {
+              "Value": "Entomologiska Föreningen i Östergötland",
+              "SosId": 479
+            },
+            {
+              "Value": "Falsterbo fågelstation",
+              "SosId": 480
+            },
+            {
+              "Value": "Getteröns fågelstation",
+              "SosId": 481
+            },
+            {
+              "Value": "Haparanda Sandskär fågelstation",
+              "SosId": 482
+            },
+            {
+              "Value": "Hartsö-Enskär fågelstation",
+              "SosId": 483
+            },
+            {
+              "Value": "Kvismare fågelstation",
+              "SosId": 484
+            },
+            {
+              "Value": "Landsjöns fågelstation",
+              "SosId": 485
+            },
+            {
+              "Value": "Nidingens fågelstation",
+              "SosId": 486
+            },
+            {
+              "Value": "Ottenby fågelstation",
+              "SosId": 487
+            },
+            {
+              "Value": "Ralångens fågelstation",
+              "SosId": 488
+            },
+            {
+              "Value": "Sundre fågelstation",
+              "SosId": 489
+            },
+            {
+              "Value": "Torhamns fågelstation",
+              "SosId": 490
+            },
+            {
+              "Value": "Utklippans fågelstation",
+              "SosId": 491
+            },
+            {
+              "Value": "Grötviks fältstation",
+              "SosId": 492
+            },
+            {
+              "Value": "Hornborgasjöns fältstation",
+              "SosId": 493
+            },
+            {
+              "Value": "Stubbhults fältstation",
+              "SosId": 494
+            },
+            {
+              "Value": "Tåkerns fältstation",
+              "SosId": 495
+            },
+            {
+              "Value": "Örkelljunga kommun",
+              "SosId": 496
+            },
+            {
+              "Value": "Lokala rapportkommittén Tranemo",
+              "SosId": 497
+            },
+            {
+              "Value": "Lokala rapportkommittén Skövde",
+              "SosId": 498
+            },
+            {
+              "Value": "Södertälje Ornitologiska förening",
+              "SosId": 499
+            },
+            {
+              "Value": "Medins Havs- och Vattenkonsulter AB",
+              "SosId": 500
+            },
+            {
+              "Value": "Skogsstyrelsen",
+              "SosId": 501
+            },
+            {
+              "Value": "Tierps kommun",
+              "SosId": 502
+            },
+            {
+              "Value": "Stenungsunds kommun",
+              "SosId": 503
+            },
+            {
+              "Value": "Vingåker kommun",
+              "SosId": 504
+            },
+            {
+              "Value": "Ronneby kommun",
+              "SosId": 505
+            },
+            {
+              "Value": "Strängnäs kommu",
+              "SosId": 506
+            },
+            {
+              "Value": "Helsingborgs stad",
+              "SosId": 507
+            },
+            {
+              "Value": "Ulricehamns kommun",
+              "SosId": 508
+            },
+            {
+              "Value": "Mora kommun",
+              "SosId": 509
+            },
+            {
+              "Value": "Orsa kommun",
+              "SosId": 510
+            },
+            {
+              "Value": "Hässleholms kommun",
+              "SosId": 511
+            },
+            {
+              "Value": "Övertorneå kommun",
+              "SosId": 512
+            },
+            {
+              "Value": "Köpings kommun",
+              "SosId": 513
+            },
+            {
+              "Value": "Växjö kommun",
+              "SosId": 514
+            },
+            {
+              "Value": "Enköpings kommun",
+              "SosId": 515
+            },
+            {
+              "Value": "Mölndals kommun",
+              "SosId": 516
+            },
+            {
+              "Value": "Sundbybergs kommun",
+              "SosId": 517
+            },
+            {
+              "Value": "Upplands Väsby kommun",
+              "SosId": 518
+            },
+            {
+              "Value": "Flens kommun",
+              "SosId": 519
+            },
+            {
+              "Value": "Burlövs kommun",
+              "SosId": 520
+            },
+            {
+              "Value": "Ajtte - Svenskt Fjäll- och Samemuseum",
+              "SosId": 521
+            },
+            {
+              "Value": "Angarngruppen",
+              "SosId": 522
+            },
+            {
+              "Value": "Skogsstyrelsen - Stockholm/Gotland",
+              "SosId": 523
+            },
+            {
+              "Value": "Floraväkteri-Gävleborgs län",
+              "SosId": 524
+            },
+            {
+              "Value": "Mossornas vänner",
+              "SosId": 525
+            },
+            {
+              "Value": "Skogsstyrelsen - Södra Lappland",
+              "SosId": 526
+            },
+            {
+              "Value": "Skogsstyrelsen - Norra Västerbotten",
+              "SosId": 527
+            },
+            {
+              "Value": "Skogsstyrelsen - Södra Dalarna",
+              "SosId": 528
+            },
+            {
+              "Value": "Skogsstyrelsen - Södra Jämtland",
+              "SosId": 529
+            },
+            {
+              "Value": "Skogsstyrelsen - Kronoberg",
+              "SosId": 530
+            },
+            {
+              "Value": "Skogsstyrelsen - Göteborg",
+              "SosId": 531
+            },
+            {
+              "Value": "Skogsstyrelsen - Sörmland/Örebro",
+              "SosId": 532
+            },
+            {
+              "Value": "Skogsstyrelsen - Södra Västerbotten",
+              "SosId": 533
+            },
+            {
+              "Value": "Skogsstyrelsen - Kalmar",
+              "SosId": 534
+            },
+            {
+              "Value": "Skogsstyrelsen - Skaraborg/Fyrbodal",
+              "SosId": 535
+            },
+            {
+              "Value": "Skogsstyrelsen - Halland",
+              "SosId": 536
+            },
+            {
+              "Value": "Skogsstyrelsen - Värmland",
+              "SosId": 537
+            },
+            {
+              "Value": "Våtmarksinventeringen (VMI)",
+              "SosId": 538
+            },
+            {
+              "Value": "Våtmarksinventeringen (VMI) BD län",
+              "SosId": 539
+            },
+            {
+              "Value": "Ecocom",
+              "SosId": 540
+            },
+            {
+              "Value": "Skogsstyrelsen - Gävleborg",
+              "SosId": 541
+            },
+            {
+              "Value": "Skogsstyrelsen - Jönköping/Höglandet",
+              "SosId": 542
+            },
+            {
+              "Value": "Skogsstyrelsen - Norra Jämtland",
+              "SosId": 543
+            },
+            {
+              "Value": "Skogsstyrelsen - Uppsala/Västmanland",
+              "SosId": 544
+            },
+            {
+              "Value": "Skogsstyrelsen - Västernorrland",
+              "SosId": 545
+            },
+            {
+              "Value": "Skogsstyrelsen - Blekinge",
+              "SosId": 546
+            },
+            {
+              "Value": "Surahammars kommun",
+              "SosId": 547
+            },
+            {
+              "Value": "Skogsstyrelsen - Skåne",
+              "SosId": 548
+            },
+            {
+              "Value": "Skogsstyrelsen - Norra Dalarna",
+              "SosId": 549
+            },
+            {
+              "Value": "Skogsstyrelsen - Norra Norrbotten",
+              "SosId": 550
+            },
+            {
+              "Value": "Sigtuna kommun",
+              "SosId": 551
+            },
+            {
+              "Value": "Skogsstyrelsen - Östergötland",
+              "SosId": 552
+            },
+            {
+              "Value": "Södertälje kommun - Naturcentrum",
+              "SosId": 553
+            },
+            {
+              "Value": "Skogsstyrelsen - Södra Norrbotten",
+              "SosId": 554
+            },
+            {
+              "Value": "Aneby kommun",
+              "SosId": 555
+            },
+            {
+              "Value": "Värmdö Fågelklubb",
+              "SosId": 556
+            },
+            {
+              "Value": "Botaniska sällskapet i Stockholm",
+              "SosId": 557
+            },
+            {
+              "Value": "Göteborgs Ornitologiska Förening",
+              "SosId": 558
+            },
+            {
+              "Value": "Örebro läns botaniska sällskap",
+              "SosId": 559
+            },
+            {
+              "Value": "Flens Ornitologiska Förening",
+              "SosId": 560
+            },
+            {
+              "Value": "Upplandsstiftelsen",
+              "SosId": 561
+            },
+            {
+              "Value": "Biogeografisk uppföljning - Mossor",
+              "SosId": 562
+            },
+            {
+              "Value": "Vänersborgs kommun",
+              "SosId": 563
+            },
+            {
+              "Value": "Föreningen Bohusläns Flora",
+              "SosId": 564
+            },
+            {
+              "Value": "Vetlanda kommun",
+              "SosId": 565
+            },
+            {
+              "Value": "Nordens Ark",
+              "SosId": 566
+            },
+            {
+              "Value": "Söderköpings kommun",
+              "SosId": 567
+            },
+            {
+              "Value": "Nynäshamns kommun",
+              "SosId": 568
+            },
+            {
+              "Value": "Hällefors kommun",
+              "SosId": 569
+            },
+            {
+              "Value": "Ljusnarsbergs kommun",
+              "SosId": 570
+            },
+            {
+              "Value": "Dalarnas Botaniska Sällskap (DABS)",
+              "SosId": 571
+            },
+            {
+              "Value": "Svenska fenologinätverket",
+              "SosId": 572
+            },
+            {
+              "Value": "Föreningen Pite Lappmarks flora",
+              "SosId": 573
+            },
+            {
+              "Value": "Upplands Botaniska Förening",
+              "SosId": 574
+            },
+            {
+              "Value": "Västerbottens läns Botaniska Förening",
+              "SosId": 575
+            },
+            {
+              "Value": "Gotlands botaniska förening",
+              "SosId": 576
+            },
+            {
+              "Value": "Föreningen Blekinges flora",
+              "SosId": 577
+            },
+            {
+              "Value": "Gävleborgs Botaniska Sällskap",
+              "SosId": 578
+            },
+            {
+              "Value": "Naturskyddsföreningen - riksföreningen",
+              "SosId": 579
+            },
+            {
+              "Value": "Nora kommun",
+              "SosId": 580
+            },
+            {
+              "Value": "Dalslands botaniska förening",
+              "SosId": 581
+            },
+            {
+              "Value": "Håbo kommun",
+              "SosId": 582
+            },
+            {
+              "Value": "Fågelkalendern",
+              "SosId": 583
+            },
+            {
+              "Value": "Finspångs kommun",
+              "SosId": 584
+            },
+            {
+              "Value": "Skogsstyrelsen - Dalarna",
+              "SosId": 585
+            },
+            {
+              "Value": "Åmåls kommun",
+              "SosId": 586
+            },
+            {
+              "Value": "Nationell valideringsgrupp (NVG) spindeldjur",
+              "SosId": 587
+            },
+            {
+              "Value": "Nationell valideringsgrupp (NVG) fjärilar",
+              "SosId": 588
+            },
+            {
+              "Value": "Tingsryds kommun",
+              "SosId": 589
+            },
+            {
+              "Value": "Skellefteå kommun",
+              "SosId": 590
+            },
+            {
+              "Value": "Mjölby kommun",
+              "SosId": 591
+            },
+            {
+              "Value": "Boxholms kommun",
+              "SosId": 592
+            },
+            {
+              "Value": "Havs- och Vattenmyndigheten (HaV)",
+              "SosId": 593
+            },
+            {
+              "Value": "Sundsvalls kommun",
+              "SosId": 594
+            },
+            {
+              "Value": "SLU Aqua",
+              "SosId": 595
+            },
+            {
+              "Value": "Nässjö kommun",
+              "SosId": 596
+            },
+            {
+              "Value": "Mullsjö kommun",
+              "SosId": 597
+            },
+            {
+              "Value": "Nationell valideringsgrupp (NVG) fladdermöss",
+              "SosId": 598
+            },
+            {
+              "Value": "Projekt trollsländor i Närke",
+              "SosId": 599
+            },
+            {
+              "Value": "Svensk kärnbränslehantering (SKB)",
+              "SosId": 600
+            },
+            {
+              "Value": "Flitiga myran",
+              "SosId": 601
+            },
+            {
+              "Value": "Nationell valideringsgrupp (NVG) tvåvingar",
+              "SosId": 602
+            },
+            {
+              "Value": "IAS",
+              "SosId": 603
+            },
+            {
+              "Value": "Floraväktarna",
+              "SosId": 604
+            },
+            {
+              "Value": "Svenska Jägareförbundet",
+              "SosId": 605
+            },
+            {
+              "Value": "Greensway AB",
+              "SosId": 606
+            },
+            {
+              "Value": "Naturhistoriska riksmuseet",
+              "SosId": 607
+            },
+            {
+              "Value": "IAS (invasivaarter.nu)",
+              "SosId": 608
+            },
+            {
+              "Value": "Projekt Berguv",
+              "SosId": 609
+            },
+            {
+              "Value": "Nationell valideringsgrupp (NVG) iglar",
+              "SosId": 610
+            },
+            {
+              "Value": "Nationell valideringsgrupp (NVG) kräftdjur",
+              "SosId": 611
+            },
+            {
+              "Value": "Laponiaförvaltningen",
+              "SosId": 612
+            },
+            {
+              "Value": "Västergötlands Botaniska Förening",
+              "SosId": 613
+            },
+            {
+              "Value": "Karlskoga kommun",
+              "SosId": 614
+            },
+            {
+              "Value": "Östersunds kommun",
+              "SosId": 615
+            },
+            {
+              "Value": "Naturum Sommen",
+              "SosId": 616
+            },
+            {
+              "Value": "Nationell valideringsgrupp (NVG) Gastropoda",
+              "SosId": 617
+            },
+            {
+              "Value": "Oxelösunds kommun",
+              "SosId": 618
+            },
+            {
+              "Value": "Malung-Sälens kommun",
+              "SosId": 619
+            },
+            {
+              "Value": "Melica",
+              "SosId": 620
+            },
+            {
+              "Value": "Test Artporjekt test",
+              "SosId": 621
+            },
+            {
+              "Value": "Nationell valideringsgrupp (NVG) groddjur",
+              "SosId": 622
+            },
+            {
+              "Value": "Faunaväkteri",
+              "SosId": 623
+            },
+            {
+              "Value": "Nationell valideringsgrupp (NVG) marina däggdjur",
+              "SosId": 624
+            },
+            {
+              "Value": "Test AP Project",
+              "SosId": 625
+            },
+            {
+              "Value": "Norrbottens flora",
+              "SosId": 626
+            },
+            {
+              "Value": "Insjöfåglar RMÖ/GDP",
+              "SosId": 627
+            },
+            {
+              "Value": "Kumla kommun",
+              "SosId": 628
+            },
+            {
+              "Value": "Täby kommun",
+              "SosId": 629
+            },
+            {
+              "Value": "Borlänge kommun",
+              "SosId": 630
+            },
+            {
+              "Value": "Berg kommun",
+              "SosId": 631
+            },
+            {
+              "Value": "Härjedalens kommun",
+              "SosId": 632
+            },
+            {
+              "Value": "Tromsö museum",
+              "SosId": 633
+            },
+            {
+              "Value": "Landskrona kommun",
+              "SosId": 634
+            },
+            {
+              "Value": "Upplands ornitologiska förening (UOF)",
+              "SosId": 635
+            },
+            {
+              "Value": "Naturvårdsverket",
+              "SosId": 636
+            },
+            {
+              "Value": "Hofors kommun",
+              "SosId": 637
+            },
+            {
+              "Value": "Hagströms vattenvård & miljörätt AB",
+              "SosId": 638
+            },
+            {
+              "Value": "Rappen (HaV)",
+              "SosId": 639
+            },
+            {
+              "Value": "Sandvikens kommun",
+              "SosId": 641
+            },
+            {
+              "Value": "Nacka kommun",
+              "SosId": 642
+            },
+            {
+              "Value": "Kinnekulle-floran",
+              "SosId": 643
+            },
+            {
+              "Value": "Örnsköldsviks kommun",
+              "SosId": 644
+            },
+            {
+              "Value": "Lidköpings kommun",
+              "SosId": 645
+            },
+            {
+              "Value": "Västkuststiftelsen",
+              "SosId": 646
+            },
+            {
+              "Value": "Åre kommun",
+              "SosId": 647
+            },
+            {
+              "Value": "Ängelholms kommun",
+              "SosId": 648
+            },
+            {
+              "Value": "Nationell valideringsgrupp (NVG) däggdjur",
+              "SosId": 649
+            },
+            {
+              "Value": "Nationell valideringsgrupp (NVG) svampar",
+              "SosId": 650
+            },
+            {
+              "Value": "Natur- & skogstjänst AB",
+              "SosId": 651
+            },
+            {
+              "Value": "Projekt sydlig kärrsnäppa",
+              "SosId": 652
+            },
+            {
+              "Value": "Nationell valideringsgrupp (NVG) steklar",
+              "SosId": 653
+            },
+            {
+              "Value": "Boxholms Skogar AB",
+              "SosId": 654
+            },
+            {
+              "Value": "Nationell valideringsgrupp (NVG) skinnbaggar",
+              "SosId": 655
+            },
+            {
+              "Value": "Naturskyddsföreningen Gnosjö",
+              "SosId": 656
+            },
+            {
+              "Value": "Öckerö kommun",
+              "SosId": 657
+            },
+            {
+              "Value": "Nationell Valideringsgrupp (NVG) Lavar",
+              "SosId": 658
+            },
+            {
+              "Value": "Fungaväktarna",
+              "SosId": 659
+            },
+            {
+              "Value": "Naturskyddsföreningen Lerum",
+              "SosId": 660
+            },
+            {
+              "Value": "Vellinge kommun",
+              "SosId": 661
+            },
+            {
+              "Value": "Skyddsvärda arter (NV)",
+              "SosId": 663
+            },
+            {
+              "Value": "Nationell valideringsgrupp (NVG) skalbaggar",
+              "SosId": 664
+            },
+            {
+              "Value": "Nationell valideringsgrupp (NVG) kräldjur",
+              "SosId": 665
+            },
+            {
+              "Value": "Pelagia Nature & Environment AB",
+              "SosId": 666
+            },
+            {
+              "Value": "Smålands ornitologiska förening (SmOF)",
+              "SosId": 667
+            },
+            {
+              "Value": "Lunds universitet",
+              "SosId": 668
+            },
+            {
+              "Value": "Ekologigruppen AB",
+              "SosId": 669
+            },
+            {
+              "Value": "Nationell valideringsgrupp (NVG) trollsländor",
+              "SosId": 670
+            },
+            {
+              "Value": "Insamlingsstiftelsen Framtidens Natur & Kulturarv",
+              "SosId": 671
+            },
+            {
+              "Value": "Nationell verifieringsgrupp (NVG) nattsländor",
+              "SosId": 672
+            },
+            {
+              "Value": "Nationell verifieringsgrupp (NVG) alger",
+              "SosId": 673
+            },
+            {
+              "Value": "Mark- och miljödomstolen vid Vänersborgs tingsrätt",
+              "SosId": 674
+            },
+            {
+              "Value": "Skogforsk",
+              "SosId": 675
+            },
+            {
+              "Value": "SLU Swedish Species Information Centre",
+              "SosId": 5001
+            },
+            {
+              "Value": "Department of Aquatic Resources (SLU Aqua)",
+              "SosId": 5002
+            },
+            {
+              "Value": "Environmental data MVM, SLU",
+              "SosId": 5003
+            },
+            {
+              "Value": "Umeå University",
+              "SosId": 5004
+            },
+            {
+              "Value": "Swedish Meteorological and Hydrological Institute (SMHI)",
+              "SosId": 5005
+            },
+            {
+              "Value": "Swedish Museum of Natural History",
+              "SosId": 5006
+            },
+            {
+              "Value": "Station Linné",
+              "SosId": 5007
+            },
+            {
+              "Value": "Department of Biology, Lund University",
+              "SosId": 5008
+            },
+            {
+              "Value": "Overstellar Solutions AB",
+              "SosId": 5009
+            },
+            {
+              "Value": "iNaturalist.org",
+              "SosId": 5010
+            },
+            {
+              "Value": "Swedish Board of Agriculture",
+              "SosId": 5011
+            },
+            {
+              "Value": "Department of Forest Resource Management, SLU",
+              "SosId": 5012
+            },
+            {
+              "Value": "Gothenburg Natural History Museum",
+              "SosId": 5013
+            },
+            {
+              "Value": "Lund University",
+              "SosId": 5014
+            },
+            {
+              "Value": "Biologg",
+              "SosId": 5015
+            },
+            {
+              "Value": "NRM",
+              "SosId": 5016
+            },
+            {
+              "Value": "MZLU",
+              "SosId": 5017
+            },
+            {
+              "Value": "SJV",
+              "SosId": 5018
+            },
+            {
+              "Value": "iNaturalist",
+              "SosId": 5019
+            },
+            {
+              "Value": "GNM",
+              "SosId": 5020
+            },
+            {
+              "Value": "GBIF-SE:GNM",
+              "SosId": 5021
             }
           ]
         }

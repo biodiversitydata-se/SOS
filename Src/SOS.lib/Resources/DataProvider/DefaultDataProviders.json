@@ -125,7 +125,7 @@
         "Organizations": [
             {
                 "CultureCode": "en-GB",
-                "Value": "Department of Aquatic Resources, SLU"
+                "Value": "Department of Aquatic Resources (SLU Aqua)"
             },
             {
                 "CultureCode": "sv-SE",
@@ -135,7 +135,7 @@
         "Paths": [
             {
                 "CultureCode": "en-GB",
-                "path": [ "Department of Aquatic Resources, SLU", "Database for coastal fish" ]
+                "path": [ "Department of Aquatic Resources (SLU Aqua)", "Database for coastal fish" ]
             },
             {
                 "CultureCode": "sv-SE",
@@ -272,7 +272,7 @@
         "Organizations": [
             {
                 "CultureCode": "en-GB",
-                "Value": "Department of Aquatic Resources, SLU"
+                "Value": "Department of Aquatic Resources (SLU Aqua)"
             },
             {
                 "CultureCode": "sv-SE",
@@ -282,7 +282,7 @@
         "Paths": [
             {
                 "CultureCode": "en-GB",
-                "path": [ "Department of Aquatic Resources, SLU", "National register of survey test-fishing" ]
+                "path": [ "Department of Aquatic Resources (SLU Aqua)", "National register of survey test-fishing" ]
             },
             {
                 "CultureCode": "sv-SE",
@@ -343,7 +343,7 @@
         "Organizations": [
             {
                 "CultureCode": "en-GB",
-                "Value": "Department of Aquatic Resources, SLU"
+                "Value": "Department of Aquatic Resources (SLU Aqua)"
             },
             {
                 "CultureCode": "sv-SE",
@@ -353,7 +353,7 @@
         "Paths": [
             {
                 "CultureCode": "en-GB",
-                "path": [ "Department of Aquatic Resources, SLU", "Swedish Electrofishing Register" ]
+                "path": [ "Department of Aquatic Resources (SLU Aqua)", "Swedish Electrofishing Register" ]
             },
             {
                 "CultureCode": "sv-SE",
@@ -966,7 +966,7 @@
         "Organizations": [
             {
                 "CultureCode": "en-GB",
-                "Value": "Swedish Meterological and Hydrological Institute (SMHI)"
+                "Value": "Swedish Meteorological and Hydrological Institute (SMHI)"
             },
             {
                 "CultureCode": "sv-SE",
@@ -1106,7 +1106,7 @@
         "Organizations": [
             {
                 "CultureCode": "en-GB",
-                "Value": "Swedish National Forest Inventory, Department of Forest Resource Management, SLU"
+                "Value": "Department of Forest Resource Management, SLU"
             },
             {
                 "CultureCode": "sv-SE",
@@ -2084,7 +2084,7 @@
         "Organizations": [
             {
                 "CultureCode": "en-GB",
-                "Value": "Swedish National Forest Inventory, Department of Forest Resource Management, SLU"
+                "Value": "Department of Forest Resource Management, SLU"
             },
             {
                 "CultureCode": "sv-SE",

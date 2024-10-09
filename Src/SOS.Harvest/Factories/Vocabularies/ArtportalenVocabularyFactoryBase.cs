@@ -196,16 +196,30 @@ namespace SOS.Harvest.Factories.Vocabularies
 
             foreach (var vocabularyValue in vocabularyValues)
             {
-                foreach (var translation in vocabularyValue.Translations)
+                if (vocabularyValue.Translations != null)
                 {
-                    if (!string.IsNullOrWhiteSpace(translation.Value))
+                    foreach (var translation in vocabularyValue.Translations)
                     {
-                        if (!sosIdByText.ContainsKey(translation.Value))
+                        if (!string.IsNullOrWhiteSpace(translation.Value))
                         {
-                            sosIdByText.Add(translation.Value, vocabularyValue.Id);
+                            if (!sosIdByText.ContainsKey(translation.Value))
+                            {
+                                sosIdByText.Add(translation.Value, vocabularyValue.Id);
+                            }
                         }
                     }
                 }
+                else
+                {
+                    if (!string.IsNullOrWhiteSpace(vocabularyValue.Value))
+                    {
+                        if (!sosIdByText.ContainsKey(vocabularyValue.Value))
+                        {
+                            sosIdByText.Add(vocabularyValue.Value, vocabularyValue.Id);
+                        }
+                    }
+                }
+
 
                 foreach (var keyValuePair in dwcMappingSynonyms.Where(pair => pair.Value == vocabularyValue.Value))
                 {

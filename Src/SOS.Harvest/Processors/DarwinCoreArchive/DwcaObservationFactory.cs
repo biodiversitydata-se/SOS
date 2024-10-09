@@ -24,7 +24,6 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
     {
         private const int DefaultCoordinateUncertaintyInMeters = 5000;
         private readonly IAreaHelper _areaHelper;
-        private readonly IDictionary<VocabularyId, IDictionary<object, int>> _vocabularyById;
         private readonly NetTopologySuite.IO.WKTReader _wktReader = new NetTopologySuite.IO.WKTReader();
 
         private string _englishDataproviderName;
@@ -46,7 +45,6 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             IProcessTimeManager processTimeManager,
             ProcessConfiguration processConfiguration) : base(dataProvider, taxa, dwcaVocabularyById, processTimeManager, processConfiguration)
         {
-            _vocabularyById = dwcaVocabularyById ?? throw new ArgumentNullException(nameof(dwcaVocabularyById));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
             _englishDataproviderName = dataProvider?.Names?.Translate("en-GB")!;
         }
@@ -75,7 +73,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                 return null;
             }
 
-            var accessRights = GetSosId(verbatim.AccessRights, _vocabularyById[VocabularyId.AccessRights]);
+            var accessRights = GetSosId(verbatim.AccessRights, VocabularyById[VocabularyId.AccessRights]);
             var obs = new Observation
             {
                 AccessRights = accessRights,
@@ -91,7 +89,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             else if (verbatim.ObservationExtendedMeasurementOrFacts.HasItems())
                 obs.MeasurementOrFacts = verbatim.ObservationExtendedMeasurementOrFacts?.Select(dwcMof => dwcMof.ToProcessedExtendedMeasurementOrFact()).ToArray();
             obs.BasisOfRecord = GetSosId(verbatim.BasisOfRecord,
-                _vocabularyById[VocabularyId.BasisOfRecord]);
+                VocabularyById[VocabularyId.BasisOfRecord]);
             obs.BibliographicCitation = verbatim.BibliographicCitation;
             obs.CollectionCode = verbatim.CollectionCode;
             obs.CollectionId = verbatim.CollectionID;
@@ -103,14 +101,14 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             obs.InstitutionId = verbatim.InstitutionID;
             string? verbatimInstitutionCode = !string.IsNullOrEmpty(verbatim.InstitutionCode) ? verbatim.InstitutionCode : DataProvider.Organizations?.Translate("en-GB");
             obs.InstitutionCode = GetSosId(verbatimInstitutionCode,
-                _vocabularyById[VocabularyId.Institution]);
+                VocabularyById[VocabularyId.Institution]);
             obs.Language = verbatim.Language;
             obs.License = verbatim.License;
             obs.Modified = DwcParser.ParseDate(verbatim.Modified)?.ToUniversalTime();
             obs.OwnerInstitutionCode = verbatim.OwnerInstitutionCode;
             obs.References = verbatim.References;
             obs.RightsHolder = verbatim.RightsHolder?.Clean();
-            obs.Type = GetSosId(verbatim.Type, _vocabularyById[VocabularyId.Type]);
+            obs.Type = GetSosId(verbatim.Type, VocabularyById[VocabularyId.Type]);
             if (!string.IsNullOrEmpty(verbatim.DataStewardshipDatasetId))
             {
                 obs.DataStewardship = new Lib.Models.Processed.DataStewardship.Common.DataStewardshipInfo
@@ -355,7 +353,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             processedIdentification.IdentificationQualifier = verbatim.IdentificationQualifier;
             processedIdentification.IdentificationReferences = verbatim.IdentificationReferences;
             processedIdentification.IdentificationRemarks = verbatim.IdentificationRemarks?.Clean();
-            processedIdentification.VerificationStatus = GetSosId(verbatim.IdentificationVerificationStatus, _vocabularyById[VocabularyId.VerificationStatus]);
+            processedIdentification.VerificationStatus = GetSosId(verbatim.IdentificationVerificationStatus, VocabularyById[VocabularyId.VerificationStatus]);
             processedIdentification.Verified = GetIsValidated(processedIdentification.VerificationStatus);
             processedIdentification.IdentifiedBy = verbatim.IdentifiedBy?.Clean();
             processedIdentification.TypeStatus = verbatim.TypeStatus;
@@ -388,7 +386,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             var processedLocation = new Location(LocationType.Point);
             processedLocation.Continent = GetSosId(
                 verbatim.Continent,
-                _vocabularyById[VocabularyId.Continent],
+                VocabularyById[VocabularyId.Continent],
                 (int)ContinentId.Europe,
                 MappingNotFoundLogic.UseDefaultValue);
             processedLocation.CoordinatePrecision = verbatim.CoordinatePrecision.ParseDouble();
@@ -396,7 +394,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                 verbatim.CoordinateUncertaintyInMeters?.ParseDoubleConvertToInt() ?? DefaultCoordinateUncertaintyInMeters;
             processedLocation.Country = GetSosId(
                 verbatim.Country,
-                _vocabularyById[VocabularyId.Country],
+                VocabularyById[VocabularyId.Country],
                 (int)CountryId.Sweden,
                 MappingNotFoundLogic.UseDefaultValue);
             processedLocation.CountryCode = verbatim.CountryCode;
@@ -448,9 +446,9 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             processedOccurrence.CatalogNumber = verbatim.CatalogNumber ?? verbatim.OccurrenceID;
             processedOccurrence.Disposition = verbatim.Disposition;
             processedOccurrence.EstablishmentMeans = GetSosId(verbatim.EstablishmentMeans,
-                _vocabularyById[VocabularyId.EstablishmentMeans]);
+                VocabularyById[VocabularyId.EstablishmentMeans]);
             processedOccurrence.IndividualCount = verbatim.IndividualCount;
-            processedOccurrence.LifeStage = GetSosId(verbatim.LifeStage, _vocabularyById[VocabularyId.LifeStage]);
+            processedOccurrence.LifeStage = GetSosId(verbatim.LifeStage, VocabularyById[VocabularyId.LifeStage]);
             processedOccurrence.Media = CreateProcessedMultimedia(
                 verbatim.ObservationMultimedia,
                 verbatim.ObservationAudubonMedia);
@@ -458,7 +456,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             processedOccurrence.OccurrenceRemarks = verbatim.OccurrenceRemarks?.Clean();
             processedOccurrence.OccurrenceStatus = GetSosId(
                 verbatim.OccurrenceStatus,
-                _vocabularyById[VocabularyId.OccurrenceStatus],
+                VocabularyById[VocabularyId.OccurrenceStatus],
                 (int)OccurrenceStatusId.Present);
             processedOccurrence.OrganismQuantity = verbatim.OrganismQuantity;
             if (int.TryParse(verbatim.OrganismQuantity, out var quantity))
@@ -466,17 +464,17 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                 processedOccurrence.OrganismQuantityAggregation = quantity;
                 processedOccurrence.OrganismQuantityInt = quantity;
             }
-            processedOccurrence.OrganismQuantityUnit = GetSosId(verbatim.OrganismQuantityType, _vocabularyById[VocabularyId.Unit]);
+            processedOccurrence.OrganismQuantityUnit = GetSosId(verbatim.OrganismQuantityType, VocabularyById[VocabularyId.Unit]);
             processedOccurrence.OtherCatalogNumbers = verbatim.OtherCatalogNumbers;
             processedOccurrence.Preparations = verbatim.Preparations;
             processedOccurrence.RecordedBy = verbatim.RecordedBy?.Clean();
             processedOccurrence.RecordNumber = verbatim.RecordNumber;
             processedOccurrence.Activity = GetSosId(
                 verbatim.ReproductiveCondition,
-                _vocabularyById[VocabularyId.Activity]);
-            processedOccurrence.Sex = GetSosId(verbatim.Sex, _vocabularyById[VocabularyId.Sex]);
-            processedOccurrence.ReproductiveCondition = GetSosId(verbatim.ReproductiveCondition, _vocabularyById!.GetValue(VocabularyId.ReproductiveCondition));
-            processedOccurrence.Behavior = GetSosId(verbatim.Behavior, _vocabularyById!.GetValue(VocabularyId.Behavior));
+                VocabularyById[VocabularyId.Activity]);
+            processedOccurrence.Sex = GetSosId(verbatim.Sex, VocabularyById[VocabularyId.Sex]);
+            processedOccurrence.ReproductiveCondition = GetSosId(verbatim.ReproductiveCondition, VocabularyById!.GetValue(VocabularyId.ReproductiveCondition));
+            processedOccurrence.Behavior = GetSosId(verbatim.Behavior, VocabularyById!.GetValue(VocabularyId.Behavior));
             processedOccurrence.IsNaturalOccurrence = true;
             processedOccurrence.IsNeverFoundObservation = false;
             processedOccurrence.IsNotRediscoveredObservation = false;
