@@ -399,37 +399,37 @@ This filter will return observation of critically endangered (CR), endangered (E
 
 The following taxon lists exists:
 
-| Id 	| ParentId 	| Title (en) 	| Title (sv) 	|
-|-	|-	|-	|-	|
-| 1 	|  	| Protected by law species 	| Fridlysta arter 	|
-| 2 	|  	| Signal species 	| Signalarter 	|
-| 3 	|  	| Invasive species 	| Främmande arter 	|
-| 4 	| 3 	| Invasive species in Sweden 	| Främmande arter i Sverige 	|
-| 5 	| 3 	| EU regulation 1143/2014 	| EU-förordning 1143/2014 	|
-| 6 	| 3 	| Risk assessment 	| Risklista 	|
-| 7 	|  	| Redlisted species 	| Rödlistade arter 	|
-| 8 	|  	| Habitats directive species 	| Habitatdirektivet 	|
-| 9 	| 8 	| Habitats directive Annex 2 	| Habitatdirektivets bilaga 2 	|
-| 10 	| 8 	| Habitats directive Annex 2, priority species 	| Habitatdirektivets bilaga 2 (prioriterad art) 	|
-| 11 	| 8 	| Habitats directive Annex 4 	| Habitatdirektivets bilaga 4 	|
-| 12 	| 8 	| Habitats directive Annex 5 	| Habitatdirektivets bilaga 5 	|
-| 13 	|  	| Birds Directive	| Fågeldirektivet 	|
-| 14 	| 13 	| Priority birds 	| Prioriterade fåglar 	|
-| 15 	| 13 	| Birds directive - Annex 1 	| Fågeldirektivet - bilaga 1 	|
-| 16 	| 13 	| Birds directive - Annex 2 	| Fågeldirektivet - bilaga 2 	|
-| 17 	|  	| Action plan 	| Åtgärdsprogram 	|
-| 18 	|  	| Swedish forest agency nature conservation species 	| Skogsstyrelsens naturvårdsarter 	|
-| 19 	| 6	| Risk assessment - Severe impact 	| Risklista - Mycket hög risk (SE) 	|
-| 20 	| 6	| Risk assessment - High impact 	| Risklista - Hög risk (HI) 	|
-| 21 	| 6	| Risk assessment - Potentially high impact 	| Risklista - Potentiellt hög risk (PH) 	|
-| 22 	| 6	| Risk assessment - Low impact 	| Risklista - Låg risk (LO) 	|
-| 23 	| 6	| Risk assessment - No known impact 	| Risklista - Ingen känd risk (NK) 	|
-| 24 	| 7	| Red listed species - Near threatened (NT) | Rödlista - Nära hotad (NT) 	|
-| 25 	| 7	| Red listed species - Vulnerable (VU) | Rödlista - Sårbar (VU)	|
-| 26 	| 7	| Red listed species - Endangered (EN) | Rödlista - Starkt hotad (EN) |
-| 27 	| 7	| Red listed species - Critically endangered (CR) | Rödlista - Akut hotad (CR) |
-| 28 	| 7	| Red listed species - Nationally extinct (RE) | Rödlista - Nationellt utdöd (RE) |
-| 29 	| 7	| Red listed species - Data deficient  (DD) | Rödlista - Kunskapsbrist (DD) |
+| Id 	| ParentId 	| Title (en) 	| Title (sv) 	| Description 	|
+|-	|-	|-	|-	|-	|
+| 1 	|  	| Protected by law species 	| Fridlysta arter 	|  	|
+| 2 	|  	| Signal species 	| Signalarter 	|  	|
+| 3 	|  	| Invasive species 	| Främmande arter 	| Främmande arter = Alien species, which are all species that are not considered native, meaning species that have either spontaneously immigrated or that we introduced at some time after year 1800. Currently [2024] listed are [4945 species]( https://artfakta.se/sok/taxa?mainLists=%5B36,37,39,40,41,42,43,48%5D). Note that the current English title for this list is not a correct translation and representaion of the list's content. 	|
+| 4 	| 3 	| Invasive species in Sweden 	| Främmande arter i Sverige 	| Främmande arter i Sverige = Alien species in Sweden. Currently [2024] listed are [4768 species]( https://artfakta.se/sok/taxa?mainLists=%5B36%5D).  Note that the current English title for this list is not a correct translation and representaion of the list's content. 	|
+| 5 	| 3 	| EU regulation 1143/2014 	| EU-förordning 1143/2014 	| [Regulation (EU) No 1143/2014 of the European Parliament and of the Council of 22 October 2014 on the prevention and management of the introduction and spread of invasive alien species](https://eur-lex.europa.eu/eli/reg/2014/1143/oj), listing species considered to be particularly harmful. Currently [2024] listed are [92 species](https://artfakta.se/sok/taxa?mainLists=%5B37%5D). [[Wikipedia](https://en.wikipedia.org/wiki/List_of_invasive_alien_species_of_Union_concern), [Swedish EPA](https://www.naturvardsverket.se/vagledning-och-stod/invasiva-frammande-arter/regler-inom-invasiva-arter/)] 	|
+| 6 	| 3 	| Risk assessment 	| Risklista 	| Risklista = Risk assessment list, listing species for which risk of invasiveness in Sweden has been assessed. Currently [2024] listed are [923 species]( https://artfakta.se/sok/taxa?mainLists=%5B39,40,41,42,43,48%5D) (assessment made in 2018). Species assessed as of the highest risk in categories SE (Very high risk) and HI (High risk) are commonly considered as “species that are invasive in Sweden”, currently [2024] listed are [122 (SE) and 132 (HI) species](https://artfakta.se/sok/taxa?mainLists=%5B39,40%5D). A new risk assessment is under way that will be able to assess about twice as many species. 	|
+| 7 	|  	| Redlisted species 	| Rödlistade arter 	| Species listed in the Swedish Red List compiling information on the extinction risk of individual species. Assessments are based on criteria developed by the International Union for Conservation of Nature (IUCN). Currently containing the results presented in the Swedish Redlist 2020.  	|
+| 8 	|  	| Habitats directive species 	| Habitatdirektivet 	|  	|
+| 9 	| 8 	| Habitats directive Annex 2 	| Habitatdirektivets bilaga 2 	|  	|
+| 10 	| 8 	| Habitats directive Annex 2, priority species 	| Habitatdirektivets bilaga 2 (prioriterad art) 	|  	|
+| 11 	| 8 	| Habitats directive Annex 4 	| Habitatdirektivets bilaga 4 	|  	|
+| 12 	| 8 	| Habitats directive Annex 5 	| Habitatdirektivets bilaga 5 	|  	|
+| 13 	|  	| Birds Directive	| Fågeldirektivet 	|  	|
+| 14 	| 13 	| Priority birds 	| Prioriterade fåglar 	|  	|
+| 15 	| 13 	| Birds directive - Annex 1 	| Fågeldirektivet - bilaga 1 	|  	|
+| 16 	| 13 	| Birds directive - Annex 2 	| Fågeldirektivet - bilaga 2 	|  	|
+| 17 	|  	| Action plan 	| Åtgärdsprogram 	|  	|
+| 18 	|  	| Swedish forest agency nature conservation species 	| Skogsstyrelsens naturvårdsarter 	|  	|
+| 19 	| 6	| Risk assessment - Severe impact 	| Risklista - Mycket hög risk (SE) 	|  	|
+| 20 	| 6	| Risk assessment - High impact 	| Risklista - Hög risk (HI) 	|  	|
+| 21 	| 6	| Risk assessment - Potentially high impact 	| Risklista - Potentiellt hög risk (PH) 	|  	|
+| 22 	| 6	| Risk assessment - Low impact 	| Risklista - Låg risk (LO) 	|  	|
+| 23 	| 6	| Risk assessment - No known impact 	| Risklista - Ingen känd risk (NK) 	|  	|
+| 24 	| 7	| Red listed species - Near threatened (NT) | Rödlista - Nära hotad (NT) 	|  	|
+| 25 	| 7	| Red listed species - Vulnerable (VU) | Rödlista - Sårbar (VU)	|  	|
+| 26 	| 7	| Red listed species - Endangered (EN) | Rödlista - Starkt hotad (EN) |  	|
+| 27 	| 7	| Red listed species - Critically endangered (CR) | Rödlista - Akut hotad (CR) |  	|
+| 28 	| 7	| Red listed species - Nationally extinct (RE) | Rödlista - Nationellt utdöd (RE) |  	|
+| 29 	| 7	| Red listed species - Data deficient  (DD) | Rödlista - Kunskapsbrist (DD) |  	|
 
 
 ### Search for observations with taxon lists - merge
