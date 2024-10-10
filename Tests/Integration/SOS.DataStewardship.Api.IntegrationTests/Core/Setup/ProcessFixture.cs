@@ -2,6 +2,8 @@
 using SOS.Harvest.Processors.DarwinCoreArchive;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Database.Interfaces;
+using SOS.Lib.Enums;
+using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
@@ -19,6 +21,7 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup
         private DwcaDatasetFactory _dwcaDatasetFactory;
         private IVocabularyRepository _vocabularyRepository;
         private Dictionary<int, Taxon> _taxaById;
+        private IDictionary<VocabularyId, IDictionary<object, int>> _dwcaVocabularyById;
         private ITaxonRepository _taxonRepository;
         private IProcessTimeManager _processTimeManager;
         private ProcessConfiguration _processConfiguration;
@@ -61,6 +64,11 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup
         {
             _taxa = await _taxonRepository.GetAllAsync();
             _taxaById = _taxa.ToDictionary(m => m.Id, m => m);
+            var vocabularies = await _vocabularyRepository.GetAllAsync();
+            _dwcaVocabularyById = VocabularyHelper.GetVocabulariesDictionary(
+                    ExternalSystemId.DarwinCore,
+                    vocabularies.ToArray(),
+                    true);
         }
 
         public async Task InitializeElasticsearchIndices()
@@ -280,7 +288,7 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup
             var factory = await DwcaObservationFactory.CreateAsync(
                 dataProvider,
                 _taxaById,
-                _vocabularyRepository,
+                _dwcaVocabularyById,
                 _areaHelper,
                 _processTimeManager,
                 _processConfiguration);
