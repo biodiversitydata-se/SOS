@@ -27,10 +27,11 @@ namespace SOS.Harvest.Processors.Sers
         protected override async Task<(int publicCount, int protectedCount, int failedCount)> ProcessObservationsAsync(
             DataProvider dataProvider,
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
+            IDictionary<VocabularyId, IDictionary<object, int>> dwcaVocabularyById,
             JobRunModes mode,
             IJobCancellationToken cancellationToken)
         {
-            var observationFactory = new SersObservationFactory(dataProvider, taxa, _areaHelper, TimeManager, ProcessConfiguration);
+            var observationFactory = new SersObservationFactory(dataProvider, taxa, dwcaVocabularyById, _areaHelper, TimeManager, ProcessConfiguration);
 
             return await base.ProcessObservationsAsync(
                 dataProvider,

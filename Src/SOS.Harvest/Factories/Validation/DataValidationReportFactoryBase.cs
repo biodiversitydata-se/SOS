@@ -28,6 +28,7 @@ namespace SOS.Harvest.Factories.Validation
         protected readonly IAreaHelper _areaHelper;
         protected readonly ITaxonRepository _processedTaxonRepository;
         protected Dictionary<int, Taxon>? _taxonById;
+        protected IDictionary<VocabularyId, IDictionary<object, int>> _dwcaVocabularyById;
         protected IDictionary<VocabularyId, Vocabulary>? _vocabularyById;
         protected readonly IProcessTimeManager _processTimeManager;
         protected readonly ProcessConfiguration ProcessConfiguration;
@@ -57,6 +58,10 @@ namespace SOS.Harvest.Factories.Validation
             _taxonById = taxa.ToDictionary(m => m.Id, m => m);
             var allVocabularies = await _processedVocabularyRepository.GetAllAsync();
             _vocabularyById = allVocabularies.ToDictionary(f => f.Id, f => f);
+            _dwcaVocabularyById = VocabularyHelper.GetVocabulariesDictionary(
+                    ExternalSystemId.DarwinCore,
+                    allVocabularies,
+                    true);
             await _areaHelper.InitializeAsync();
         }
 

@@ -78,7 +78,7 @@ namespace SOS.Harvest.Managers
 
             var allVocabularies = await _processedVocabularyRepository.GetAllAsync();
             _vocabularyById = allVocabularies.ToDictionary(f => f.Id, f => f);
-            _dwcaVocabularyById = DwcaObservationFactory.GetVocabulariesDictionary(
+            _dwcaVocabularyById = VocabularyHelper.GetVocabulariesDictionary(
                 ExternalSystemId.DarwinCore,
                 allVocabularies,
                 true);

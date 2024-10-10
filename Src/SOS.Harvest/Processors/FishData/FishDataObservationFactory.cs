@@ -8,6 +8,7 @@ using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.FishData;
+using SOS.Lib.Extensions;
 
 namespace SOS.Harvest.Processors.FishData
 {
@@ -23,10 +24,12 @@ namespace SOS.Harvest.Processors.FishData
         /// <param name="areaHelper"></param>
         /// <param name="processTimeManager"></param>
         /// <exception cref="ArgumentNullException"></exception>
-        public FishDataObservationFactory(DataProvider dataProvider, IDictionary<int, Lib.Models.Processed.Observation.Taxon>? taxa,
+        public FishDataObservationFactory(DataProvider dataProvider, 
+            IDictionary<int, Lib.Models.Processed.Observation.Taxon>? taxa,
+            IDictionary<VocabularyId, IDictionary<object, int>> dwcaVocabularyById,
             IAreaHelper areaHelper,
             IProcessTimeManager processTimeManager,
-            ProcessConfiguration processConfiguration) : base(dataProvider, taxa, processTimeManager, processConfiguration)
+            ProcessConfiguration processConfiguration) : base(dataProvider, taxa, dwcaVocabularyById, processTimeManager, processConfiguration)
         {
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
         }
@@ -86,6 +89,8 @@ namespace SOS.Harvest.Processors.FishData
                 obs.Occurrence.OrganismQuantityAggregation = quantity;
                 obs.Occurrence.OrganismQuantityInt = quantity;
             }
+            string? verbatimInstitutionCode = DataProvider.Organizations?.Translate("en-GB");
+            obs.InstitutionCode = GetSosId(verbatimInstitutionCode, VocabularyById[VocabularyId.Institution]);
             obs.AccessRights = GetAccessRightsFromSensitivityCategory(obs.Occurrence.SensitivityCategory);
             AddPositionData(obs.Location, verbatim.DecimalLongitude, verbatim.DecimalLatitude,
                 CoordinateSys.WGS84, verbatim.CoordinateUncertaintyInMeters, taxon?.Attributes?.DisturbanceRadius);

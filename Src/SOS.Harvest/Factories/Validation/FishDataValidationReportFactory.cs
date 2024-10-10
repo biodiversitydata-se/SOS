@@ -87,10 +87,11 @@ namespace SOS.Harvest.Factories.Validation
         private FishDataObservationFactory GetObservationFactory(DataProvider dataProvider)
         {
             if (_fishdataObservationFactory == null)
-            {
+            {                
                 _fishdataObservationFactory = new FishDataObservationFactory(
                     dataProvider,
                     _taxonById,
+                    _dwcaVocabularyById,
                     _areaHelper,
                     _processTimeManager,
                     ProcessConfiguration);

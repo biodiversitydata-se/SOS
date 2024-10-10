@@ -9,6 +9,7 @@ using SOS.Lib.Models.Shared;
 using SOS.Process.UnitTests.TestHelpers.Factories;
 using SOS.TestHelpers.Helpers;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 
@@ -41,16 +42,22 @@ namespace SOS.Process.UnitTests.TestHelpers
             var mammaliaTaxa =
                 MessagePackHelper.CreateListFromMessagePackFile<Taxon>(
                     @"Resources/MammaliaProcessedTaxa.msgpck");
-            var mammaliaTaxonByTaxonId = mammaliaTaxa.ToDictionary(t => t.Id, t => t);
+            var mammaliaTaxonByTaxonId = mammaliaTaxa.ToDictionary(t => t.Id, t => t);            
             var processedAreaRepositoryStub =
                 ProcessedAreaRepositoryStubFactory.Create(AreaType.County, AreaType.Province);
             var vocabularyRepository = VocabularyRepositoryStubFactory.Create();
+            var vocabularies = vocabularyRepository.Object.GetAllAsync().Result;          
+            var dwcaVocabularyById = VocabularyHelper.GetVocabulariesDictionary(
+                ExternalSystemId.DarwinCore,
+                vocabularies.ToArray(),
+                true);
+
             var areaHelper = new AreaHelper(new AreaConfiguration(), processedAreaRepositoryStub.Object);
             var processConfiguration = new ProcessConfiguration();
             var factory = DwcaObservationFactory.CreateAsync(
                 dataProviderDummy,
                 mammaliaTaxonByTaxonId,
-                vocabularyRepository.Object,
+                dwcaVocabularyById,
                 areaHelper,
                 new ProcessTimeManager(processConfiguration),
                 processConfiguration).Result;

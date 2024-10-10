@@ -17,6 +17,9 @@ namespace SOS.Harvest.Processors
     /// </summary>
     public class ObservationFactoryBase : FactoryBase
     {
+        protected IDictionary<int, Lib.Models.Processed.Observation.Taxon> Taxa { get; }
+        protected IDictionary<VocabularyId, IDictionary<object, int>> VocabularyById { get; }
+
         private struct ProtectedArea
         {
             /// <summary>
@@ -133,9 +136,7 @@ namespace SOS.Harvest.Processors
                 var taxonProtection = JsonSerializer.DeserializeAsync<IEnumerable<ProtectedTaxon>>(fs, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }).Result;
                 return taxonProtection?.ToDictionary(tp => tp.TaxonId, tp => tp.Areas?.Select(a => GetAreaKey(a.AreaType, a.FeatureId)).ToHashSet() ?? new HashSet<string>()) ?? new Dictionary<int, HashSet<string>>();
             }
-        }
-
-        protected IDictionary<int, Lib.Models.Processed.Observation.Taxon> Taxa { get; }
+        }        
 
         /// <summary>
         /// Constructor
@@ -146,11 +147,12 @@ namespace SOS.Harvest.Processors
         /// <exception cref="ArgumentNullException"></exception>
         protected ObservationFactoryBase(DataProvider dataProvider,
             IDictionary<int, Lib.Models.Processed.Observation.Taxon>? taxa,
+            IDictionary<VocabularyId, IDictionary<object, int>> vocabularyById,
             IProcessTimeManager processTimeManager,
             ProcessConfiguration processConfiguration) : base(dataProvider, processTimeManager, processConfiguration)
         {
             Taxa = taxa ?? throw new ArgumentNullException(nameof(taxa));
-
+            VocabularyById = vocabularyById ?? throw new ArgumentNullException(nameof(vocabularyById));
             _taxonByScientificName = new HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon>();
             _taxonByScientificNameAuthor = new HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon>();
             _taxonBySynonymName = new HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon>();
@@ -270,6 +272,37 @@ namespace SOS.Harvest.Processors
             }
 
             return 0;
+        }
+
+        protected VocabularyValue? GetSosId(string? val,
+            IDictionary<object, int>? sosIdByValue,
+            int? defaultValue = null,
+            MappingNotFoundLogic mappingNotFoundLogic = MappingNotFoundLogic.UseSourceValue)
+        {
+            if (string.IsNullOrWhiteSpace(val) || sosIdByValue == null)
+            {
+                return defaultValue.HasValue ? new VocabularyValue { Id = defaultValue.Value } : null;
+            }
+
+            var lookupVal = val.ToLower();
+            if (sosIdByValue.TryGetValue(lookupVal, out var sosId))
+            {
+                return new VocabularyValue { Id = sosId };
+            }
+
+            if (mappingNotFoundLogic == MappingNotFoundLogic.UseDefaultValue && defaultValue.HasValue)
+            {
+                return new VocabularyValue { Id = defaultValue.Value };
+            }
+
+            return new VocabularyValue
+            { Id = VocabularyConstants.NoMappingFoundCustomValueIsUsedId, Value = val };
+        }        
+
+        protected enum MappingNotFoundLogic
+        {
+            UseSourceValue,
+            UseDefaultValue
         }
     }
 }

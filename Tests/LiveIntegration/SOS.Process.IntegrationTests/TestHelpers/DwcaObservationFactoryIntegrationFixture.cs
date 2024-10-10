@@ -5,6 +5,7 @@ using SOS.Harvest.Processors.DarwinCoreArchive;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
+using SOS.Lib.Enums;
 using SOS.Lib.Helpers;
 using SOS.Lib.Managers;
 using SOS.Lib.Models.Processed.Observation;
@@ -48,6 +49,7 @@ namespace SOS.Process.LiveIntegrationTests.TestHelpers
         {
             var dataProviderDummy = new DataProvider();
             var taxonByTaxonId = await GetTaxonDictionaryAsync();
+            var dwcaVocabularyById = await GetDwcaVocabularyByIdAsync();
             var processDbConfiguration = GetProcessDbConfiguration();
             var processClient = new ProcessClient(
                 processDbConfiguration.GetMongoDbSettings(),
@@ -62,12 +64,36 @@ namespace SOS.Process.LiveIntegrationTests.TestHelpers
             var dwcaObservationFactory = await DwcaObservationFactory.CreateAsync(
                 dataProviderDummy,
                 taxonByTaxonId,
-                vocabularyRepository,
+                dwcaVocabularyById,
                 areaHelper,
                 new ProcessTimeManager(processConfiguration),
                 processConfiguration);
 
             return dwcaObservationFactory;
+        }
+
+        private async Task<IDictionary<VocabularyId, IDictionary<object, int>>> GetDwcaVocabularyByIdAsync()
+        {
+            var vocabularyRepository = CreateVocabularyRepository();
+            var vocabularies = await vocabularyRepository.GetAllAsync();
+            var vocabularyById = VocabularyHelper.GetVocabulariesDictionary(
+                ExternalSystemId.DarwinCore,
+                vocabularies.ToArray(),
+                true);
+            return vocabularyById;
+        }
+
+        private VocabularyRepository CreateVocabularyRepository()
+        {
+            var processDbConfiguration = GetProcessDbConfiguration();
+            var processClient = new ProcessClient(
+                processDbConfiguration.GetMongoDbSettings(),
+                processDbConfiguration.DatabaseName,
+                processDbConfiguration.ReadBatchSize,
+                processDbConfiguration.WriteBatchSize);
+            var vocabularyRepository =
+                new VocabularyRepository(processClient, new NullLogger<VocabularyRepository>());
+            return vocabularyRepository;
         }
 
         private async Task<IDictionary<int, Taxon>> GetTaxonDictionaryAsync()

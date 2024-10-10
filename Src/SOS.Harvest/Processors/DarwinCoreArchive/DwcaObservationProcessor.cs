@@ -25,28 +25,29 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
         IDwcaObservationProcessor
     {
         private readonly IVerbatimClient _verbatimClient;
-        private readonly IAreaHelper _areaHelper;
-        private readonly IVocabularyRepository _processedVocabularyRepository;
+        private readonly IAreaHelper _areaHelper;        
         private readonly DwcaConfiguration _dwcaConfiguration;
 
         protected override async Task<(int publicCount, int protectedCount, int failedCount)> ProcessObservationsAsync(
             DataProvider dataProvider,
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
+            IDictionary<VocabularyId, IDictionary<object, int>> dwcaVocabularyById,
             JobRunModes mode,
             IJobCancellationToken cancellationToken)
         {
 
             if (_dwcaConfiguration.UseDwcaCollectionRepository)
             {
-                return await ProcessObservationsUsingCollectionDwcAsync(dataProvider, taxa, mode, cancellationToken);
+                return await ProcessObservationsUsingCollectionDwcAsync(dataProvider, taxa, dwcaVocabularyById, mode, cancellationToken);
             }
 
-            return await ProcessObservationsUsingDwcAsync(dataProvider, taxa, mode, cancellationToken);
+            return await ProcessObservationsUsingDwcAsync(dataProvider, taxa, dwcaVocabularyById, mode, cancellationToken);
         }
 
         private async Task<(int publicCount, int protectedCount, int failedCount)> ProcessObservationsUsingDwcAsync(
             DataProvider dataProvider,
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
+            IDictionary<VocabularyId, IDictionary<object, int>> dwcaVocabularyById,
             JobRunModes mode,
             IJobCancellationToken cancellationToken)
         {
@@ -58,7 +59,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             var observationFactory = await DwcaObservationFactory.CreateAsync(
                 dataProvider,
                 taxa,
-                _processedVocabularyRepository,
+                dwcaVocabularyById,
                 _areaHelper,
                 TimeManager,
                 ProcessConfiguration);
@@ -74,6 +75,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
         private async Task<(int publicCount, int protectedCount, int failedCount)> ProcessObservationsUsingCollectionDwcAsync(
             DataProvider dataProvider,
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
+            IDictionary<VocabularyId, IDictionary<object, int>> dwcaVocabularyById,
             JobRunModes mode,
             IJobCancellationToken cancellationToken)
         {
@@ -82,7 +84,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             var observationFactory = await DwcaObservationFactory.CreateAsync(
                 dataProvider,
                 taxa,
-                _processedVocabularyRepository,
+                dwcaVocabularyById,
                 _areaHelper,
                 TimeManager,
                 ProcessConfiguration);
@@ -114,8 +116,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
         /// <exception cref="ArgumentNullException"></exception>
         public DwcaObservationProcessor(
             IVerbatimClient verbatimClient,
-            IProcessedObservationCoreRepository processedObservationRepository,
-            IVocabularyRepository processedVocabularyRepository,
+            IProcessedObservationCoreRepository processedObservationRepository,            
             IVocabularyValueResolver vocabularyValueResolver,
             IAreaHelper areaHelper,
             IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
@@ -128,9 +129,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             ILogger<DwcaObservationProcessor> logger) :
                 base(processedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, processManager, validationManager, diffusionManager, processTimeManager, null, processConfiguration, logger)
         {
-            _verbatimClient = verbatimClient ?? throw new ArgumentNullException(nameof(verbatimClient));
-            _processedVocabularyRepository = processedVocabularyRepository ??
-                                               throw new ArgumentNullException(nameof(processedVocabularyRepository));
+            _verbatimClient = verbatimClient ?? throw new ArgumentNullException(nameof(verbatimClient));           
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
             _dwcaConfiguration = dwcaConfiguration ?? throw new ArgumentNullException(nameof(dwcaConfiguration));
         }

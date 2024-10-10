@@ -88,7 +88,7 @@ namespace SOS.Harvest.Factories.Validation
         {
             if (_virtualHerbariumObservationFactory == null)
             {
-                _virtualHerbariumObservationFactory = new VirtualHerbariumObservationFactory(dataProvider, _taxonById, _areaHelper, _processTimeManager, ProcessConfiguration);
+                _virtualHerbariumObservationFactory = new VirtualHerbariumObservationFactory(dataProvider, _taxonById, _dwcaVocabularyById, _areaHelper, _processTimeManager, ProcessConfiguration);
                 Task.Run(() => _virtualHerbariumObservationFactory.InitializeAsync());
             }
 

@@ -10,6 +10,7 @@ using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Mvm;
 using SOS.Lib.Repositories.Processed.Interfaces;
+using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
 
 namespace SOS.Harvest.Processors.Mvm
@@ -21,15 +22,17 @@ namespace SOS.Harvest.Processors.Mvm
     {
         private readonly IAreaHelper _areaHelper;
         private readonly IMvmObservationVerbatimRepository _mvmObservationVerbatimRepository;
+        private readonly IVocabularyRepository _processedVocabularyRepository;
 
         /// <inheritdoc />
         protected override async Task<(int publicCount, int protectedCount, int failedCount)> ProcessObservationsAsync(
             DataProvider dataProvider,
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
+            IDictionary<VocabularyId, IDictionary<object, int>> dwcaVocabularyById,
             JobRunModes mode,
             IJobCancellationToken cancellationToken)
         {
-            var observationFactory = new MvmObservationFactory(dataProvider, taxa, _areaHelper, TimeManager, ProcessConfiguration);
+            var observationFactory = new MvmObservationFactory(dataProvider, taxa, dwcaVocabularyById, _areaHelper, TimeManager, _processedVocabularyRepository, ProcessConfiguration);
 
             return await base.ProcessObservationsAsync(
                 dataProvider,
@@ -64,6 +67,7 @@ namespace SOS.Harvest.Processors.Mvm
             IDiffusionManager diffusionManager,
             IProcessTimeManager processTimeManager,
             ProcessConfiguration processConfiguration,
+            IVocabularyRepository processedVocabularyRepository,
             ILogger<MvmObservationProcessor> logger) :
             base(processedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, processManager, validationManager, diffusionManager, processTimeManager, null, processConfiguration, logger)
         {
@@ -71,6 +75,7 @@ namespace SOS.Harvest.Processors.Mvm
                                                 throw new ArgumentNullException(
                                                     nameof(mvmObservationVerbatimRepository));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
+            _processedVocabularyRepository = processedVocabularyRepository ?? throw new ArgumentNullException(nameof(processedVocabularyRepository));
         }
 
         public override DataProviderType Type => DataProviderType.MvmObservations;

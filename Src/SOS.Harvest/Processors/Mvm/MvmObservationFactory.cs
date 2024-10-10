@@ -9,12 +9,13 @@ using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Mvm;
+using SOS.Lib.Repositories.Resource.Interfaces;
 
 namespace SOS.Harvest.Processors.Mvm
 {
     public class MvmObservationFactory : ObservationFactoryBase, IObservationFactory<MvmObservationVerbatim>
     {
-        private readonly IAreaHelper _areaHelper;
+        private readonly IAreaHelper _areaHelper;        
 
         /// <summary>
         /// Constructor
@@ -26,11 +27,13 @@ namespace SOS.Harvest.Processors.Mvm
         /// <exception cref="ArgumentNullException"></exception>
         public MvmObservationFactory(DataProvider dataProvider,
             IDictionary<int, Lib.Models.Processed.Observation.Taxon>? taxa,
+            IDictionary<VocabularyId, IDictionary<object, int>> dwcaVocabularyById,
             IAreaHelper areaHelper,
             IProcessTimeManager processTimeManager,
-            ProcessConfiguration processConfiguration) : base(dataProvider, taxa, processTimeManager, processConfiguration)
+            IVocabularyRepository processedVocabularyRepository,
+            ProcessConfiguration processConfiguration) : base(dataProvider, taxa, dwcaVocabularyById, processTimeManager, processConfiguration)
         {
-            _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
+            _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));            
         }
 
         /// <summary>
@@ -77,7 +80,6 @@ namespace SOS.Harvest.Processors.Mvm
                     IsNotRediscoveredObservation = false,
                     IsPositiveObservation = verbatim.IsPositiveObservation,
                     OccurrenceId = verbatim.OccurrenceId,
-                    //ProtectionLevel = CalculateProtectionLevel(taxon),
                     SensitivityCategory = CalculateProtectionLevel(taxon),
                     OrganismQuantity = verbatim.Quantity,
                     OrganismQuantityUnit = string.IsNullOrEmpty(verbatim.QuantityUnit) ? null : new VocabularyValue { Id = -1, Value = verbatim.QuantityUnit },
@@ -97,6 +99,8 @@ namespace SOS.Harvest.Processors.Mvm
                 obs.Occurrence.OrganismQuantityInt = quantity;
             }
 
+            string? verbatimInstitutionCode = DataProvider.Organizations?.Translate("en-GB");
+            obs.InstitutionCode = GetSosId(verbatimInstitutionCode, VocabularyById[VocabularyId.Institution]);
             obs.AccessRights = GetAccessRightsFromSensitivityCategory(obs.Occurrence.SensitivityCategory);
             AddPositionData(obs.Location, verbatim.DecimalLongitude, verbatim.DecimalLatitude,
                 CoordinateSys.WGS84, verbatim.CoordinateUncertaintyInMeters, taxon?.Attributes?.DisturbanceRadius);

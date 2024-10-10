@@ -157,8 +157,7 @@ namespace SOS.Process.LiveIntegrationTests.Processors.DarwinCoreArchive
 
             return new DwcaObservationProcessor(
                 verbatimClient.Object,
-                processedObservationRepository,
-                vocabularyRepository,
+                processedObservationRepository,                
                 new VocabularyValueResolver(vocabularyRepository, new VocabularyConfiguration()),
                 areaHelper,
                 dwcArchiveFileWriterCoordinator,
@@ -178,6 +177,30 @@ namespace SOS.Process.LiveIntegrationTests.Processors.DarwinCoreArchive
             mock.Setup(m => m.ReadBatchSize).Returns(10000);
             mock.Setup(m => m.WriteBatchSize).Returns(1000);
             return mock;
+        }
+
+        private async Task<IDictionary<VocabularyId, IDictionary<object, int>>> GetDwcaVocabularyByIdAsync()
+        {
+            var vocabularyRepository = CreateVocabularyRepository();
+            var vocabularies = await vocabularyRepository.GetAllAsync();
+            var vocabularyById = VocabularyHelper.GetVocabulariesDictionary(
+                ExternalSystemId.DarwinCore,
+                vocabularies.ToArray(),
+                true);
+            return vocabularyById;
+        }
+
+        private VocabularyRepository CreateVocabularyRepository()
+        {
+            var processDbConfiguration = GetProcessDbConfiguration();
+            var processClient = new ProcessClient(
+                processDbConfiguration.GetMongoDbSettings(),
+                processDbConfiguration.DatabaseName,
+                processDbConfiguration.ReadBatchSize,
+                processDbConfiguration.WriteBatchSize);
+            var vocabularyRepository =
+                new VocabularyRepository(processClient, new NullLogger<VocabularyRepository>());
+            return vocabularyRepository;
         }
 
         private async Task<IDictionary<int, Taxon>> GetTaxonDictionaryAsync()
@@ -218,11 +241,12 @@ namespace SOS.Process.LiveIntegrationTests.Processors.DarwinCoreArchive
             var observations = await dwcaReader.ReadArchiveAsync(archiveReader);
             var dwcaProcessor = CreateDwcaObservationProcessor(false, observations);
             var taxonByTaxonId = await GetTaxonDictionaryAsync();
+            var dwcaVocabularyById = await GetDwcaVocabularyByIdAsync();
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var processingStatus = await dwcaProcessor.ProcessAsync(null, taxonByTaxonId, JobRunModes.Full, JobCancellationToken.Null);
+            var processingStatus = await dwcaProcessor.ProcessAsync(null, taxonByTaxonId, dwcaVocabularyById, JobRunModes.Full, JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -247,11 +271,12 @@ namespace SOS.Process.LiveIntegrationTests.Processors.DarwinCoreArchive
             var observations = await dwcaReader.ReadArchiveAsync(archiveReader);
             var dwcaProcessor = CreateDwcaObservationProcessor(false, observations);
             var taxonByTaxonId = await GetTaxonDictionaryAsync();
+            var dwcaVocabularyById = await GetDwcaVocabularyByIdAsync();
 
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var processingStatus = await dwcaProcessor.ProcessAsync(null, taxonByTaxonId, JobRunModes.Full, JobCancellationToken.Null);
+            var processingStatus = await dwcaProcessor.ProcessAsync(null, taxonByTaxonId, dwcaVocabularyById, JobRunModes.Full, JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert

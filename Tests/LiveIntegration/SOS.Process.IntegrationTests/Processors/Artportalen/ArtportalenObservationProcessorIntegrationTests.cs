@@ -47,6 +47,7 @@ namespace SOS.Process.LiveIntegrationTests.Processors.Artportalen
             var dwcArchiveFileWriterCoordinator = CreateDwcArchiveFileWriterCoordinator();
             var artportalenProcessor = CreateArtportalenObservationProcessor(dwcArchiveFileWriterCoordinator, storeProcessedObservations: false, 10000);
             var taxonByTaxonId = await GetTaxonDictionaryAsync();
+            var dwcaVocabularyById = await GetDwcaVocabularyByIdAsync();
             var dataProvider = new DataProvider
             {
                 Id = 1,
@@ -60,7 +61,7 @@ namespace SOS.Process.LiveIntegrationTests.Processors.Artportalen
             //-----------------------------------------------------------------------------------------------------------
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             dwcArchiveFileWriterCoordinator.BeginWriteDwcCsvFiles();
-            var processingStatus = await artportalenProcessor.ProcessAsync(dataProvider, taxonByTaxonId, JobRunModes.Full, JobCancellationToken.Null);
+            var processingStatus = await artportalenProcessor.ProcessAsync(dataProvider, taxonByTaxonId, dwcaVocabularyById, JobRunModes.Full, JobCancellationToken.Null);
             await dwcArchiveFileWriterCoordinator.CreateDwcaFilesFromCreatedCsvFiles(); // FinishAndWriteDwcaFiles()
             dwcArchiveFileWriterCoordinator.DeleteTemporaryCreatedCsvFiles();
 
@@ -225,6 +226,30 @@ namespace SOS.Process.LiveIntegrationTests.Processors.Artportalen
             var processedTaxonRepository = CreateProcessedTaxonRepository();
             var taxa = await processedTaxonRepository.GetAllAsync();
             return taxa.ToDictionary(taxon => taxon.Id, taxon => taxon);
+        }
+
+        private async Task<IDictionary<VocabularyId, IDictionary<object, int>>> GetDwcaVocabularyByIdAsync()
+        {
+            var vocabularyRepository = CreateVocabularyRepository();
+            var vocabularies = await vocabularyRepository.GetAllAsync();
+            var vocabularyById = VocabularyHelper.GetVocabulariesDictionary(
+                ExternalSystemId.DarwinCore,
+                vocabularies.ToArray(),
+                true);
+            return vocabularyById;
+        }
+
+        private VocabularyRepository CreateVocabularyRepository()
+        {
+            var processDbConfiguration = GetProcessDbConfiguration();
+            var processClient = new ProcessClient(
+                processDbConfiguration.GetMongoDbSettings(),
+                processDbConfiguration.DatabaseName,
+                processDbConfiguration.ReadBatchSize,
+                processDbConfiguration.WriteBatchSize);
+            var vocabularyRepository =
+                new VocabularyRepository(processClient, new NullLogger<VocabularyRepository>());
+            return vocabularyRepository;
         }
 
         private TaxonRepository CreateProcessedTaxonRepository()

@@ -10,6 +10,7 @@ using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Jobs.Process;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
@@ -31,6 +32,7 @@ namespace SOS.Harvest.Jobs
             IHarvestInfoRepository harvestInfoRepository,
             IObservationProcessorManager observationProcessorManager,
             ICache<int, Taxon> taxonCache,
+            ICache<VocabularyId, Vocabulary> vocabularyCache,
             IDataProviderCache dataProviderCache,
             IProcessTimeManager processTimeManager,
             IValidationManager validationManager,
@@ -38,7 +40,7 @@ namespace SOS.Harvest.Jobs
             IAreaHelper areaHelper,
             ProcessConfiguration processConfiguration,
             ILogger<ProcessObservationsJobIncremental> logger) : base(processedObservationRepository, processInfoRepository, harvestInfoRepository, observationProcessorManager,
-                taxonCache, dataProviderCache, processTimeManager, validationManager, processTaxaJob, areaHelper, processConfiguration,
+                taxonCache, vocabularyCache, dataProviderCache, processTimeManager, validationManager, processTaxaJob, areaHelper, processConfiguration,
             logger)
         {
 

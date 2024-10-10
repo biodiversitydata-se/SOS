@@ -13,6 +13,7 @@
         public const string Activity = "activity";
         public const string DwcLifeStage = "lifeStage";
         public const string DwcBehavior = "behavior";
+        public const string DwcInstitutionCode = "institutionCode";
         public const string DwcReproductiveCondition = "reproductiveCondition";
         public const string DwcIdentificationVerificationStatus = "identificationVerificationStatus";
     }

@@ -96,6 +96,7 @@ namespace SOS.Process.UnitTests.Jobs
             _harvestInfoRepository.Object,
             _observationProcessorManagerMock.Object,
             _taxonCache.Object,
+            new Mock<ICache<VocabularyId, Vocabulary>>().Object,
             _dataProviderCache.Object,
             _cacheManager.Object,
             _processTimeManagerMock.Object,

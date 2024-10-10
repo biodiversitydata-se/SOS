@@ -28,10 +28,11 @@ namespace SOS.Harvest.Processors.VirtualHerbarium
         protected override async Task<(int publicCount, int protectedCount, int failedCount)> ProcessObservationsAsync(
             DataProvider dataProvider,
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
+            IDictionary<VocabularyId, IDictionary<object, int>> dwcaVocabularyById,
             JobRunModes mode,
             IJobCancellationToken cancellationToken)
         {
-            var observationFactory = new VirtualHerbariumObservationFactory(dataProvider, taxa, _areaHelper, TimeManager, ProcessConfiguration);
+            var observationFactory = new VirtualHerbariumObservationFactory(dataProvider, taxa, dwcaVocabularyById, _areaHelper, TimeManager, ProcessConfiguration);
             await observationFactory.InitializeAsync();
 
             return await base.ProcessObservationsAsync(
