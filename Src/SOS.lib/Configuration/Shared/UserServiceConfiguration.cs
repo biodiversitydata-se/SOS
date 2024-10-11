@@ -36,5 +36,10 @@
         /// Token expiration buffer in seconds.
         /// </summary>
         public int TokenExpirationBufferInSeconds { get; set; }
+        
+        /// <summary>
+        /// Identity provider.
+        /// </summary>
+        public IdentityServerConfiguration IdentityProvider { get; set; }
     }
 }

@@ -261,16 +261,31 @@ namespace SOS.Observations.Api
 
             // Identity service configuration
             var identityServerConfiguration = Configuration.GetSection("IdentityServer").Get<IdentityServerConfiguration>();
+            var userServiceConfiguration = Configuration.GetSection("UserServiceConfiguration").Get<UserServiceConfiguration>();
 
             // Authentication
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(options =>
-                {
-                    options.Audience = identityServerConfiguration.Audience;
-                    options.Authority = identityServerConfiguration.Authority;
-                    options.RequireHttpsMetadata = identityServerConfiguration.RequireHttpsMetadata;
-                    options.TokenValidationParameters.RoleClaimType = "rname";
-                });
+            if (userServiceConfiguration.UseUserAdmin2Api)
+            {
+                services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                    .AddJwtBearer(options =>
+                    {
+                        options.Audience = userServiceConfiguration.IdentityProvider.Audience;
+                        options.Authority = userServiceConfiguration.IdentityProvider.Authority;
+                        options.RequireHttpsMetadata = userServiceConfiguration.IdentityProvider.RequireHttpsMetadata;
+                        options.TokenValidationParameters.RoleClaimType = "rname";
+                    });
+            }
+            else
+            {
+                services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                    .AddJwtBearer(options =>
+                    {
+                        options.Audience = identityServerConfiguration.Audience;
+                        options.Authority = identityServerConfiguration.Authority;
+                        options.RequireHttpsMetadata = identityServerConfiguration.RequireHttpsMetadata;
+                        options.TokenValidationParameters.RoleClaimType = "rname";
+                    });
+            }
 
             services.AddApiVersioning(options =>
             {

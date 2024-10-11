@@ -300,7 +300,7 @@ namespace SOS.Lib.Services
             {
                 await InvalidateAccessTokenAsync();
                 var response = await _httpClientService.GetDataAsync<ResponseModel<PersonModel>>(
-                    new Uri($"{_userServiceConfiguration.BaseAddress}/Person/{personId}?lang={cultureCode}"),
+                    new Uri($"{_userServiceConfiguration.UserAdmin2ApiBaseAddress}/Persons/{personId}?lang={cultureCode}&artdataFormat=true"),
                     new Dictionary<string, string> { { "Authorization", $"Bearer {_jsonWebToken.EncodedToken}" } });
 
                 return response?.Success ?? false
