@@ -18,6 +18,7 @@ namespace SOS.Harvest.Processors.Mvm
         private readonly IAreaHelper _areaHelper;
         private string _englishOrganizationName;
         private string _englishOrganizationNameLowerCase;
+        private VocabularyValue? _institutionCodeVocabularyValue;
 
         /// <summary>
         /// Constructor
@@ -38,6 +39,14 @@ namespace SOS.Harvest.Processors.Mvm
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
             _englishOrganizationName = dataProvider?.Organizations?.Translate("en-GB")!;
             _englishOrganizationNameLowerCase = _englishOrganizationName?.ToLower()!;
+            if (VocabularyById != null && VocabularyById.ContainsKey(VocabularyId.Institution))
+            {
+                _institutionCodeVocabularyValue = GetSosId(_englishOrganizationName,
+                    VocabularyById[VocabularyId.Institution],
+                    null,
+                    MappingNotFoundLogic.UseSourceValue,
+                    _englishOrganizationNameLowerCase);
+            }
         }
 
         /// <summary>
@@ -103,11 +112,7 @@ namespace SOS.Harvest.Processors.Mvm
                 obs.Occurrence.OrganismQuantityInt = quantity;
             }
 
-            obs.InstitutionCode = GetSosId(_englishOrganizationName,
-                    VocabularyById[VocabularyId.Institution],
-                    null,
-                    MappingNotFoundLogic.UseSourceValue,
-                    _englishOrganizationNameLowerCase);
+            obs.InstitutionCode = _institutionCodeVocabularyValue;
             obs.AccessRights = GetAccessRightsFromSensitivityCategory(obs.Occurrence.SensitivityCategory);
             AddPositionData(obs.Location, verbatim.DecimalLongitude, verbatim.DecimalLatitude,
                 CoordinateSys.WGS84, verbatim.CoordinateUncertaintyInMeters, taxon?.Attributes?.DisturbanceRadius);

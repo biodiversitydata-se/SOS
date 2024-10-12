@@ -18,6 +18,7 @@ namespace SOS.Harvest.Processors.Shark
         private readonly IAreaHelper _areaHelper;
         private string _englishOrganizationName;
         private string _englishOrganizationNameLowerCase;
+        private VocabularyValue? _institutionCodeVocabularyValue;
 
         /// <summary>
         /// Constructor
@@ -37,6 +38,14 @@ namespace SOS.Harvest.Processors.Shark
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
             _englishOrganizationName = dataProvider?.Organizations?.Translate("en-GB")!;
             _englishOrganizationNameLowerCase = _englishOrganizationName?.ToLower()!;
+            if (VocabularyById != null && VocabularyById.ContainsKey(VocabularyId.Institution))
+            {
+                _institutionCodeVocabularyValue = GetSosId(_englishOrganizationName,
+                        VocabularyById[VocabularyId.Institution],
+                        null,
+                        MappingNotFoundLogic.UseSourceValue,
+                        _englishOrganizationNameLowerCase);
+            }
         }
 
         /// <summary>
@@ -96,11 +105,7 @@ namespace SOS.Harvest.Processors.Shark
             };
 
             obs.AccessRights = GetAccessRightsFromSensitivityCategory(obs.Occurrence.SensitivityCategory);
-            obs.InstitutionCode = GetSosId(_englishOrganizationName,
-                    VocabularyById[VocabularyId.Institution],
-                    null,
-                    MappingNotFoundLogic.UseSourceValue,
-                    _englishOrganizationNameLowerCase);
+            obs.InstitutionCode = _institutionCodeVocabularyValue;
             AddPositionData(obs.Location, verbatim.SampleLongitudeDd, verbatim.SampleLatitudeDd,
                 CoordinateSys.WGS84, ProcessConstants.DefaultAccuracyInMeters, taxon?.Attributes?.DisturbanceRadius);
             _areaHelper.AddAreaDataToProcessedLocation(obs.Location);

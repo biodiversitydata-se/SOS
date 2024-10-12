@@ -22,6 +22,7 @@ namespace SOS.Harvest.Processors.VirtualHerbarium
         private IDictionary<string, (double longitude, double latitude, int precision)>? _communities;
         private string _englishOrganizationName;
         private string _englishOrganizationNameLowerCase;
+        private VocabularyValue? _institutionCodeVocabularyValue;
 
         private string GetLocality(VirtualHerbariumObservationVerbatim verbatim)
         {
@@ -113,6 +114,14 @@ namespace SOS.Harvest.Processors.VirtualHerbarium
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
             _englishOrganizationName = dataProvider?.Organizations?.Translate("en-GB")!;
             _englishOrganizationNameLowerCase = _englishOrganizationName?.ToLower()!;
+            if (VocabularyById != null && VocabularyById.ContainsKey(VocabularyId.Institution))
+            {
+                _institutionCodeVocabularyValue = GetSosId(_englishOrganizationName,
+                    VocabularyById[VocabularyId.Institution],
+                    null,
+                    MappingNotFoundLogic.UseSourceValue,
+                    _englishOrganizationNameLowerCase);
+            }
         }
 
         public async Task InitializeAsync()
@@ -330,11 +339,7 @@ namespace SOS.Harvest.Processors.VirtualHerbarium
             }
 
             obs.AccessRights = GetAccessRightsFromSensitivityCategory(obs.Occurrence.SensitivityCategory);
-            obs.InstitutionCode = GetSosId(_englishOrganizationName,
-                    VocabularyById[VocabularyId.Institution],
-                    null,
-                    MappingNotFoundLogic.UseSourceValue,
-                    _englishOrganizationNameLowerCase);
+            obs.InstitutionCode = _institutionCodeVocabularyValue;
             AddPositionData(obs.Location, verbatim.DecimalLongitude, verbatim.DecimalLatitude, CoordinateSys.WGS84, verbatim.CoordinatePrecision, taxon?.Attributes?.DisturbanceRadius);
 
             _areaHelper.AddAreaDataToProcessedLocation(obs.Location);
