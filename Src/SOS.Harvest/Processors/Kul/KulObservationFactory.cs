@@ -16,6 +16,8 @@ namespace SOS.Harvest.Processors.Kul
     public class KulObservationFactory : ObservationFactoryBase, IObservationFactory<KulObservationVerbatim>
     {
         private readonly IAreaHelper _areaHelper;
+        private string _englishOrganizationName;
+        private string _englishOrganizationNameLowerCase;
 
         /// <summary>
         /// Constructor
@@ -33,6 +35,8 @@ namespace SOS.Harvest.Processors.Kul
             ProcessConfiguration processConfiguration) : base(dataProvider, taxa, dwcaVocabularyById, processTimeManager, processConfiguration)
         {
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
+            _englishOrganizationName = dataProvider?.Organizations?.Translate("en-GB")!;
+            _englishOrganizationNameLowerCase = _englishOrganizationName?.ToLower()!;
         }
 
         /// <summary>
@@ -90,8 +94,11 @@ namespace SOS.Harvest.Processors.Kul
                 obs.Occurrence.OrganismQuantityAggregation = quantity;
                 obs.Occurrence.OrganismQuantityInt = quantity;
             }
-            string? verbatimInstitutionCode = DataProvider.Organizations?.Translate("en-GB");
-            obs.InstitutionCode = GetSosId(verbatimInstitutionCode, VocabularyById[VocabularyId.Institution]);
+            obs.InstitutionCode = GetSosId(_englishOrganizationName,
+                    VocabularyById[VocabularyId.Institution],
+                    null,
+                    MappingNotFoundLogic.UseSourceValue,
+                    _englishOrganizationNameLowerCase);
             obs.AccessRights = GetAccessRightsFromSensitivityCategory(obs.Occurrence.SensitivityCategory);
             AddPositionData(obs.Location, verbatim.DecimalLongitude, verbatim.DecimalLatitude,
                 CoordinateSys.WGS84, verbatim.CoordinateUncertaintyInMeters, taxon?.Attributes?.DisturbanceRadius);

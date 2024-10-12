@@ -27,6 +27,8 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
         private readonly NetTopologySuite.IO.WKTReader _wktReader = new NetTopologySuite.IO.WKTReader();
 
         private string _englishDataproviderName;
+        private string _englishOrganizationName;
+        private string _englishOrganizationNameLowerCase;
 
         /// <summary>
         /// Constructor
@@ -47,6 +49,8 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
         {
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
             _englishDataproviderName = dataProvider?.Names?.Translate("en-GB")!;
+            _englishOrganizationName = dataProvider?.Organizations?.Translate("en-GB")!;
+            _englishOrganizationNameLowerCase = _englishOrganizationName?.ToLower()!;
         }
 
         public static async Task<DwcaObservationFactory> CreateAsync(
@@ -99,9 +103,19 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             obs.DynamicProperties = verbatim.DynamicProperties;
             obs.InformationWithheld = verbatim.InformationWithheld;
             obs.InstitutionId = verbatim.InstitutionID;
-            string? verbatimInstitutionCode = !string.IsNullOrEmpty(verbatim.InstitutionCode) ? verbatim.InstitutionCode : DataProvider.Organizations?.Translate("en-GB");
-            obs.InstitutionCode = GetSosId(verbatimInstitutionCode,
-                VocabularyById[VocabularyId.Institution]);
+            if (!string.IsNullOrEmpty(verbatim.InstitutionCode))
+            {
+                obs.InstitutionCode = GetSosId(verbatim.InstitutionCode,
+                    VocabularyById[VocabularyId.Institution]);
+            }
+            else
+            {
+                obs.InstitutionCode = GetSosId(_englishOrganizationName,
+                    VocabularyById[VocabularyId.Institution],
+                    null,
+                    MappingNotFoundLogic.UseSourceValue,
+                    _englishOrganizationNameLowerCase);
+            }
             obs.Language = verbatim.Language;
             obs.License = verbatim.License;
             obs.Modified = DwcParser.ParseDate(verbatim.Modified)?.ToUniversalTime();
@@ -147,7 +161,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                 else if (wktGeometry.GeometryType != "Polygon")
                 {
                     var sweref99TmGeom = wktGeometry.Transform(coordinateSystem, CoordinateSys.SWEREF99_TM, true);
-                    NetTopologySuite.Operation.Buffer.EndCapStyle endCapStyle = sweref99TmGeom.Coordinates.Length == 2 ? NetTopologySuite.Operation.Buffer.EndCapStyle.Flat : NetTopologySuite.Operation.Buffer.EndCapStyle.Square;                    
+                    NetTopologySuite.Operation.Buffer.EndCapStyle endCapStyle = sweref99TmGeom.Coordinates.Length == 2 ? NetTopologySuite.Operation.Buffer.EndCapStyle.Flat : NetTopologySuite.Operation.Buffer.EndCapStyle.Square;
                     sweref99TmGeom = sweref99TmGeom.Buffer(coordinateUncertaintyInMeters, endCapStyle);
                     wktGeometry = sweref99TmGeom.Transform(CoordinateSys.SWEREF99_TM, coordinateSystem, true);
                     if (wktGeometry.GeometryType != "Polygon")

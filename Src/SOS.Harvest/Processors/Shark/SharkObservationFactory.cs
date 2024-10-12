@@ -16,6 +16,8 @@ namespace SOS.Harvest.Processors.Shark
     public class SharkObservationFactory : ObservationFactoryBase, IObservationFactory<SharkObservationVerbatim>
     {
         private readonly IAreaHelper _areaHelper;
+        private string _englishOrganizationName;
+        private string _englishOrganizationNameLowerCase;
 
         /// <summary>
         /// Constructor
@@ -33,6 +35,8 @@ namespace SOS.Harvest.Processors.Shark
             ProcessConfiguration processConfiguration) : base(dataProvider, taxa, dwcaVocabularyById, processTimeManager, processConfiguration)
         {
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
+            _englishOrganizationName = dataProvider?.Organizations?.Translate("en-GB")!;
+            _englishOrganizationNameLowerCase = _englishOrganizationName?.ToLower()!;
         }
 
         /// <summary>
@@ -92,8 +96,11 @@ namespace SOS.Harvest.Processors.Shark
             };
 
             obs.AccessRights = GetAccessRightsFromSensitivityCategory(obs.Occurrence.SensitivityCategory);
-            string? verbatimInstitutionCode = DataProvider.Organizations?.Translate("en-GB");
-            obs.InstitutionCode = GetSosId(verbatimInstitutionCode, VocabularyById[VocabularyId.Institution]);
+            obs.InstitutionCode = GetSosId(_englishOrganizationName,
+                    VocabularyById[VocabularyId.Institution],
+                    null,
+                    MappingNotFoundLogic.UseSourceValue,
+                    _englishOrganizationNameLowerCase);
             AddPositionData(obs.Location, verbatim.SampleLongitudeDd, verbatim.SampleLatitudeDd,
                 CoordinateSys.WGS84, ProcessConstants.DefaultAccuracyInMeters, taxon?.Attributes?.DisturbanceRadius);
             _areaHelper.AddAreaDataToProcessedLocation(obs.Location);

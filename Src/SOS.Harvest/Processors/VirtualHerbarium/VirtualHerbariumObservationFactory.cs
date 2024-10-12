@@ -20,6 +20,8 @@ namespace SOS.Harvest.Processors.VirtualHerbarium
     {
         private readonly IAreaHelper _areaHelper;
         private IDictionary<string, (double longitude, double latitude, int precision)>? _communities;
+        private string _englishOrganizationName;
+        private string _englishOrganizationNameLowerCase;
 
         private string GetLocality(VirtualHerbariumObservationVerbatim verbatim)
         {
@@ -109,6 +111,8 @@ namespace SOS.Harvest.Processors.VirtualHerbarium
             ProcessConfiguration processConfiguration) : base(dataProvider, taxa, dwcaVocabularyById, processTimeManager, processConfiguration)
         {
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
+            _englishOrganizationName = dataProvider?.Organizations?.Translate("en-GB")!;
+            _englishOrganizationNameLowerCase = _englishOrganizationName?.ToLower()!;
         }
 
         public async Task InitializeAsync()
@@ -326,8 +330,11 @@ namespace SOS.Harvest.Processors.VirtualHerbarium
             }
 
             obs.AccessRights = GetAccessRightsFromSensitivityCategory(obs.Occurrence.SensitivityCategory);
-            string? verbatimInstitutionCode = DataProvider.Organizations?.Translate("en-GB");
-            obs.InstitutionCode = GetSosId(verbatimInstitutionCode, VocabularyById[VocabularyId.Institution]);
+            obs.InstitutionCode = GetSosId(_englishOrganizationName,
+                    VocabularyById[VocabularyId.Institution],
+                    null,
+                    MappingNotFoundLogic.UseSourceValue,
+                    _englishOrganizationNameLowerCase);
             AddPositionData(obs.Location, verbatim.DecimalLongitude, verbatim.DecimalLatitude, CoordinateSys.WGS84, verbatim.CoordinatePrecision, taxon?.Attributes?.DisturbanceRadius);
 
             _areaHelper.AddAreaDataToProcessedLocation(obs.Location);

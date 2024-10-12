@@ -22,6 +22,8 @@ namespace SOS.Harvest.Processors.ObservationDatabase
     {
         private readonly IAreaHelper _areaHelper;
         private readonly IDictionary<VocabularyId, IDictionary<object, int>> _vocabularyById;
+        private string _englishOrganizationName;
+        private string _englishOrganizationNameLowerCase;
 
         /// <summary>
         /// Constructor
@@ -40,6 +42,8 @@ namespace SOS.Harvest.Processors.ObservationDatabase
         {
             _vocabularyById = dwcaVocabularyById ?? throw new ArgumentNullException(nameof(dwcaVocabularyById));
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
+            _englishOrganizationName = dataProvider?.Organizations?.Translate("en-GB")!;
+            _englishOrganizationNameLowerCase = _englishOrganizationName?.ToLower()!;
         }
 
         /// <summary>
@@ -119,8 +123,11 @@ namespace SOS.Harvest.Processors.ObservationDatabase
                 obs.Occurrence.OrganismQuantityAggregation = quantity;
                 obs.Occurrence.OrganismQuantityInt = quantity;
             }
-            string? verbatimInstitutionCode = DataProvider.Organizations?.Translate("en-GB");
-            obs.InstitutionCode = GetSosId(verbatimInstitutionCode, _vocabularyById[VocabularyId.Institution]);
+            obs.InstitutionCode = GetSosId(_englishOrganizationName,
+                    VocabularyById[VocabularyId.Institution],
+                    null,
+                    MappingNotFoundLogic.UseSourceValue,
+                    _englishOrganizationNameLowerCase);
             AddPositionData(obs.Location, verbatim.CoordinateX, verbatim.CoordinateY, CoordinateSys.Rt90_25_gon_v,
                 verbatim.CoordinateUncertaintyInMeters, taxon?.Attributes?.DisturbanceRadius);
 

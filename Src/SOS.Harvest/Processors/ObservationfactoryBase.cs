@@ -274,17 +274,21 @@ namespace SOS.Harvest.Processors
             return 0;
         }
 
-        protected VocabularyValue? GetSosId(string? val,
-            IDictionary<object, int>? sosIdByValue,
+        protected VocabularyValue? GetSosId(string? val,            
+            IDictionary<object, int>? sosIdByValue,            
             int? defaultValue = null,
-            MappingNotFoundLogic mappingNotFoundLogic = MappingNotFoundLogic.UseSourceValue)
+            MappingNotFoundLogic mappingNotFoundLogic = MappingNotFoundLogic.UseSourceValue,
+            string? lookupVal = null)
         {
             if (string.IsNullOrWhiteSpace(val) || sosIdByValue == null)
             {
                 return defaultValue.HasValue ? new VocabularyValue { Id = defaultValue.Value } : null;
             }
 
-            var lookupVal = val.ToLower();
+            if (lookupVal == null)
+            {
+                lookupVal = val.ToLower();
+            }
             if (sosIdByValue.TryGetValue(lookupVal, out var sosId))
             {
                 return new VocabularyValue { Id = sosId };
