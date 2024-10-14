@@ -3,7 +3,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NLog;
 using NLog.Web;
-using System;
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 namespace SOS.Administration.Gui
@@ -17,7 +16,7 @@ namespace SOS.Administration.Gui
         public static void Main(string[] args)
         {
             var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-            var logger = LogManager.Setup().LoadConfigurationFromAppSettings(environment: env).GetCurrentClassLogger();
+            var logger = NLog.LogManager.Setup().LoadConfigurationFromAppSettings(environment: env).GetCurrentClassLogger();
 
             logger.Debug("Starting Service");
             try
@@ -33,7 +32,7 @@ namespace SOS.Administration.Gui
             finally
             {
                 // Ensure to flush and stop internal timers/threads before application-exit (Avoid segmentation fault on Linux)
-                LogManager.Shutdown();
+                NLog.LogManager.Shutdown();
             }
         }
 
@@ -45,12 +44,12 @@ namespace SOS.Administration.Gui
         public static IHostBuilder CreateHostBuilder(string[] args)
         {
             return Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); })
+                .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>().UseUrls("http://*:5000"); })
                 .ConfigureLogging(logging =>
                 {
                     logging.ClearProviders();
                     logging.SetMinimumLevel(LogLevel.Trace);
-                    LogManager.ReconfigExistingLoggers();
+                    NLog.LogManager.ReconfigExistingLoggers();
                 })
                 .UseNLog();
         }

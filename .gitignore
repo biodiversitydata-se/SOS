@@ -13,6 +13,10 @@
 *.userosscache
 *.sln.docstates
 
+# from adb-devops-template
+*.secret.yaml
+# appsettings.Development.json
+
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 

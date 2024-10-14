@@ -23,11 +23,11 @@ namespace SOS.Administration.Gui.Controllers
         private string _mongoSuffix = "";
         private MongoDbConfiguration _mongoConfiguration;
 
-        public StatusInfoController(ILogger<StatusInfoController> logger, IOptionsMonitor<MongoDbConfiguration> mongoDbSettings, ElasticSearchConfiguration elasticConfiguration)
+        public StatusInfoController(ILogger<StatusInfoController> logger, ElasticSearchConfiguration elasticConfiguration)
         {
             _logger = logger;
-            _mongoClient = new MongoClient(mongoDbSettings.CurrentValue.GetMongoDbSettings());
-            _mongoConfiguration = mongoDbSettings.CurrentValue;
+            _mongoClient = new MongoClient(Settings.ProcessDbConfiguration.GetMongoDbSettings());
+            _mongoConfiguration = Settings.ProcessDbConfiguration;
             if (_mongoConfiguration.DatabaseName.EndsWith("-st"))
             {
                 _mongoSuffix = "-st";

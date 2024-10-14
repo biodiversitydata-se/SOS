@@ -4,8 +4,6 @@ global using Microsoft.AspNetCore.Mvc;
 global using Microsoft.Extensions.Caching.Memory;
 global using Microsoft.OpenApi.Models;
 global using Nest;
-global using NLog;
-global using NLog.Web;
 global using SOS.Lib.Cache;
 global using SOS.Lib.Cache.Interfaces;
 global using SOS.Lib.Configuration.Shared;
@@ -29,4 +27,4 @@ global using System.Collections.Concurrent;
 global using System.Net;
 global using System.Reflection;
 global using System.IO.Compression;
-
+global using Serilog;

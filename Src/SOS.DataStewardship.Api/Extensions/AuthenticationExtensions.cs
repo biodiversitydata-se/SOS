@@ -2,9 +2,9 @@
 
 internal static class AuthenticationExtensions
 {
-    internal static WebApplicationBuilder SetupAuthentication(this WebApplicationBuilder webApplicationBuilder)
+    internal static WebApplicationBuilder SetupAuthentication(this WebApplicationBuilder webApplicationBuilder, ISettings settings)
     {
-        var identityServerConfiguration = webApplicationBuilder.Configuration.GetSection("IdentityServer").Get<IdentityServerConfiguration>();
+        var identityServerConfiguration = settings.IdentityServer;
         webApplicationBuilder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {

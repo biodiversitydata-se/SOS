@@ -1,7 +1,6 @@
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NLog;
@@ -10,7 +9,6 @@ using SOS.Administration.Api.IoC;
 using SOS.Harvest.IoC.Modules;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Configuration.Process;
-using SOS.Lib.Configuration.Shared;
 using System;
 using System.IO;
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
@@ -36,7 +34,7 @@ namespace SOS.Administration.Api
         public static void Main(string[] args)
         {
             var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-            var logger = LogManager.Setup().LoadConfigurationFromAppSettings(environment: env).GetCurrentClassLogger();
+            var logger = NLog.LogManager.Setup().LoadConfigurationFromAppSettings(environment: env).GetCurrentClassLogger();
 
             logger.Debug("Starting Service");
             try
@@ -52,7 +50,7 @@ namespace SOS.Administration.Api
             finally
             {
                 // Ensure to flush and stop internal timers/threads before application-exit (Avoid segmentation fault on Linux)
-                LogManager.Shutdown();
+                NLog.LogManager.Shutdown();
             }
         }
 
@@ -69,13 +67,13 @@ namespace SOS.Administration.Api
                     webBuilder
                         .UseContentRoot(Directory.GetCurrentDirectory())
                         .UseIISIntegration()
-                        .UseStartup<Startup>();
+                        .UseStartup<Startup>().UseUrls("http://*:5005");
                 })
                 .ConfigureLogging(logging =>
                 {
                     logging.ClearProviders();
                     logging.SetMinimumLevel(LogLevel.Trace);
-                    LogManager.ReconfigExistingLoggers();
+                    NLog.LogManager.ReconfigExistingLoggers();
                 })
                 .UseServiceProviderFactory(hostContext =>
                 {
@@ -95,13 +93,13 @@ namespace SOS.Administration.Api
                     }
 
                     /* Get values from secrets storage  */
-                    _verbatimDbConfiguration = hostContext.Configuration.GetSection("VerbatimDbConfiguration").Get<MongoDbConfiguration>();
-                    _processDbConfiguration = hostContext.Configuration.GetSection("ProcessDbConfiguration").Get<MongoDbConfiguration>();
-                    _importConfiguration = hostContext.Configuration.GetSection(nameof(ImportConfiguration)).Get<ImportConfiguration>();
-                    _processConfiguration = hostContext.Configuration.GetSection(nameof(ProcessConfiguration)).Get<ProcessConfiguration>();
-                    _applicationInsightsConfiguration = hostContext.Configuration.GetSection(nameof(ApplicationInsightsConfiguration)).Get<ApplicationInsightsConfiguration>();
-                    _sosApiConfiguration = hostContext.Configuration.GetSection(nameof(SosApiConfiguration)).Get<SosApiConfiguration>();
-                    _userServiceConfiguration = hostContext.Configuration.GetSection(nameof(UserServiceConfiguration)).Get<UserServiceConfiguration>();
+                    _verbatimDbConfiguration = Settings.VerbatimDbConfiguration;
+                    _processDbConfiguration = Settings.ProcessDbConfiguration;
+                    _importConfiguration = Settings.ImportConfiguration;
+                    _processConfiguration = Settings.ProcessConfiguration;
+                    _applicationInsightsConfiguration = Settings.ApplicationInsightsConfiguration;
+                    _sosApiConfiguration = Settings.SosApiConfiguration;
+                    _userServiceConfiguration = Settings.UserServiceConfiguration;
 
                     return new AutofacServiceProviderFactory(builder =>
                         builder

@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOS.UserStatistics.Api", "S
 		{943EA38F-7741-4FB2-9643-D4C66E85500B} = {943EA38F-7741-4FB2-9643-D4C66E85500B}
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOS.Lib", "..\SOS.lib\SOS.Lib.csproj", "{7F923F91-B491-4F3F-B17A-DCF07BDB430C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOS.Lib", "..\SOS.Lib\SOS.Lib.csproj", "{7F923F91-B491-4F3F-B17A-DCF07BDB430C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOS.UserStatistics.Api.IntegrationTests", "..\..\Tests\LiveIntegration\SOS.UserStatistics.Api.IntegrationTests\SOS.UserStatistics.Api.IntegrationTests.csproj", "{5B72422E-ADE4-43B2-9883-E29F483F91C6}"
 	ProjectSection(ProjectDependencies) = postProject

@@ -1,12 +1,9 @@
 ﻿using Hangfire;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Quartz;
 using SOS.Administration.Api.Controllers.Interfaces;
 using SOS.Lib.Jobs.Export;
-using SOS.Lib.Models.Search.Filters;
 using System;
-using System.Net;
 
 namespace SOS.Administration.Api.Controllers
 {

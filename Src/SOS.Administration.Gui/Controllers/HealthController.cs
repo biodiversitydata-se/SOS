@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using SOS.Administration.Gui.Services;
+﻿using SOS.Administration.Gui.Services;
 using System.Threading.Tasks;
 
 namespace SOS.Administration.Gui.Controllers

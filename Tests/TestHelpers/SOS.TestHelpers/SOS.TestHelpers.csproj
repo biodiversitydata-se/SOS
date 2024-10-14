@@ -20,7 +20,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\..\Src\SOS.lib\SOS.Lib.csproj" />
+		<ProjectReference Include="..\..\..\Src\SOS.Lib\SOS.Lib.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

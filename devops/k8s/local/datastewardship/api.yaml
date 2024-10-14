@@ -1,0 +1,78 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: api
+  name: api
+spec:
+  ports:
+    - port: 5000
+      targetPort: 5000
+  type: LoadBalancer
+  selector:
+    app: api
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: api
+  name: api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api
+  strategy: 
+      type: Recreate
+  template:
+    metadata:
+      labels:
+        app: api
+    spec:
+      containers:
+        - env:
+          - name: ApplicationInsights
+            value: '{"InstrumentationKey": "SECRET_PLACEHOLDER","EnableRequestBodyLogging": false,"EnableSearchResponseCountLogging": false}'
+          - name: InstrumentationKey
+            valueFrom:
+              secretKeyRef:
+                name: instrumentation-key
+                key: InstrumentationKey
+          - name: IdentityServer
+            value: '{"Authority": "https://login-test.artdata.slu.se", "Audience": "SOS.Observations", "RequireHttpsMetadata": false}'
+          - name: ProcessDbUserName
+            valueFrom:
+              secretKeyRef:
+                name: process-db-username
+                key: UserName
+          - name: ProcessDbPassword
+            valueFrom:
+              secretKeyRef:
+                name: process-db-password
+                key: Password
+          - name: ProcessDbConfiguration
+            value: '{"UserName": "SECRET_PLACEHOLDER", "Password": "SECRET_PLACEHOLDER", "Hosts": [{"Name": "artmongo2-1-test.artdata.slu.se","Port": 27017}],"ReplicaSetName": null,"DatabaseName": "sos-dev","UseTls": false,"AuthenticationDb": "admin","ReadBatchSize": 10000,"WriteBatchSize": 10000}'
+          - name: SearchDbUserName
+            valueFrom:
+              secretKeyRef:
+                name: search-db-username
+                key: UserName
+          - name: SearchDbPassword
+            valueFrom:
+              secretKeyRef:
+                name:  search-db-password
+                key: Password
+          - name: SearchDbConfiguration
+            value: '{"UserName": "SECRET_PLACEHOLDER", "Password": "SECRET_PLACEHOLDER", "Clusters": [{"Hosts": ["https://artsearch2-1-test.artdata.slu.se:9200"]}],"DebugMode": true,"IndexPrefix": "sos-dev","IndexSettings": [{"Name": "observation","NumberOfReplicas": 0,"NumberOfShards": 1,"NumberOfShardsProtected": 1,"ReadBatchSize": 10000,"WriteBatchSize": 1000,"RequestTimeout": 300,"ScrollBatchSize": 5000,"ScrollTimeout": "300s"},{"Name": "dataset","NumberOfReplicas": 0,"NumberOfShards": 1,"ReadBatchSize": 10000,"WriteBatchSize": 1000,"RequestTimeout": 300,"ScrollBatchSize": 5000,"ScrollTimeout": "300s"},{"Name": "event","NumberOfReplicas": 0,"NumberOfShards": 1,"ReadBatchSize": 10000,"WriteBatchSize": 1000,"RequestTimeout": 300,"ScrollBatchSize": 5000,"ScrollTimeout": "300s"}]}'
+          - name: UserServiceConfiguration
+            value: '{"BaseAddress": "https://artdatauser-st.artdata.slu.se/api","AcceptHeaderContentType": "application/json"}'
+          - name: ASPNETCORE_ENVIRONMENT
+            value: k8s
+          image: api
+          name: api
+          ports:
+            - containerPort: 5000
+          resources: {}
+      restartPolicy: Always
+      # in adb clusters we also set things like topology spread constraints and readiness probe (that uses our /healthz endpoint)!

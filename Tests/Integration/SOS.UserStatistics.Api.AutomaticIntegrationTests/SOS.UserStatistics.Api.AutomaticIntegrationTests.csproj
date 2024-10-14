@@ -53,7 +53,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\..\Src\SOS.Harvest\SOS.Harvest.csproj" />
-		<ProjectReference Include="..\..\..\Src\SOS.lib\SOS.Lib.csproj" />
+		<ProjectReference Include="..\..\..\Src\SOS.Lib\SOS.Lib.csproj" />
 		<ProjectReference Include="..\..\..\Src\SOS.UserStatistics.Api\SOS.UserStatistics.Api.csproj" />
 	</ItemGroup>
 

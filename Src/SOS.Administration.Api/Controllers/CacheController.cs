@@ -34,20 +34,22 @@ namespace SOS.Administration.Api.Controllers
 
         /// <inheritdoc />
         [HttpDelete("{cache}")]
-        [ProducesResponseType(typeof(bool), (int)HttpStatusCode.OK)]
+        // [ProducesResponseType(typeof(bool), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> ClearAsync([FromRoute] Cache cache)
         {
-            try
-            {
-                BackgroundJob.Enqueue<IClearCacheJob>(job => job.RunAsync(new[] { cache }));
-                return new OkObjectResult(await _cacheManager.ClearAsync(cache));
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, $"Failed to clear {cache} cache");
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
-            }
+            return new OkObjectResult("THIS ENDPOINT IS TEMPORARILY DISABLED");
+            // try
+            // {
+            //     BackgroundJob.Enqueue<IClearCacheJob>(job => job.RunAsync(new[] { cache }));
+            //     return new OkObjectResult(await _cacheManager.ClearAsync(cache));
+            // }
+            // catch (Exception e)
+            // {
+            //     _logger.LogError(e, $"Failed to clear {cache} cache");
+            //     return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            // }
         }
     }
 }

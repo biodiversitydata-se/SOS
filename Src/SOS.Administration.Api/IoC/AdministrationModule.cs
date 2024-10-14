@@ -13,7 +13,7 @@ namespace SOS.Administration.Api.IoC
     /// <summary>
     /// Autofac module
     /// </summary>
-    public class AdministrationModule : Module
+    public class AdministrationModule : Autofac.Module
     {
         protected override void Load(ContainerBuilder builder)
         {

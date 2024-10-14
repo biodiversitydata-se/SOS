@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: datastewardship-ingress
+  namespace: datastewardship
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: 20m
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+      - sos-datastewardship.artdata.slu.se
+      secretName: wildcard.artdata.slu.se-tls
+  rules:
+  - host: sos-datastewardship.artdata.slu.se
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: datastewardship-api
+            port:
+              number: 5000

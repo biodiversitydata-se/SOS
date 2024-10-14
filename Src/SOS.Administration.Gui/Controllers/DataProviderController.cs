@@ -1,10 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using SOS.Administration.Gui.Models;
-using SOS.Lib.Configuration.Shared;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -19,11 +16,11 @@ namespace SOS.Administration.Gui.Controllers
         private MongoClient _client;
         private MongoDbConfiguration _configuration;
 
-        public DataProviderController(ILogger<DataProviderController> logger, IOptionsMonitor<MongoDbConfiguration> mongoDbSettings)
+        public DataProviderController(ILogger<DataProviderController> logger)
         {
             _logger = logger;
-            _client = new MongoClient(mongoDbSettings.CurrentValue.GetMongoDbSettings());
-            _configuration = mongoDbSettings.CurrentValue;
+            _client = new MongoClient(Settings.ProcessDbConfiguration.GetMongoDbSettings());
+            _configuration = Settings.ProcessDbConfiguration;
         }
 
         [HttpGet]

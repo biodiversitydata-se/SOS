@@ -1,0 +1,123 @@
+trigger: none
+
+# no PR triggers
+pr: none
+
+variables:
+  # build/deploy settings
+  imageName: 'sosadmingui' # the image name to use
+  environment: dev # deploy environment
+
+  # skip unneeded tasks
+  buildDeployApi: true # set to false to skip executing API build/push/deploy tasks
+  buildDeployWeb: true # set to false to skip executing WEB build/push/deploy tasks
+  runUnitTests: false # set to false to skip executing build/run unit tests task
+
+  # we check if a dockerfile exists before executing build/push/deploy tasks and skip tasks if the dockerfile is missing
+  # check pipeline log for potential error messages
+  pathDockerfileApi: '$(Build.SourcesDirectory)/Src/Dockerfile.administration.gui'
+  pathDockerfileWeb: '$(Build.SourcesDirectory)/Src/SOS.Administration.Gui.Web/Dockerfile'
+  pathDockerfileUnitTests: '$(Build.SourcesDirectory)/api/unittests.Dockerfile'
+  
+  # pipeline settings
+  tag: $(Build.BuildId) # how we tag images
+  kubernetesServiceEndpoint: 'TEST-rke2'
+  containerRegistry: 'azure container registry (ADBPOCREG)'
+  repository: 'adbpocreg.azurecr.io'
+
+resources:
+  repositories:
+    - repository: pipeline-templates
+      type: git
+      name: pipeline-templates
+
+pool:
+  name: linux
+
+stages:
+  - stage: Test
+    displayName: Run unit tests
+    jobs:
+      # unit tests
+      - job: RunUnitTests
+        displayName: Running unit tests
+        steps:
+          - ${{ if eq(variables.runUnitTests, true) }}:
+            - template: adb-docker-build.yaml@pipeline-templates
+              parameters:
+                repository: '$(repository)/${{ lower(variables.imageName) }}-api-unittests'
+                dockerfile: '$(pathDockerfileUnitTests)' # we check if dockerfile exists before executing the task
+                tags: |
+                  $(tag)
+
+  - stage: BuildPush
+    displayName: Build/push images to repo ${{ variables.repository }}
+    jobs:
+      # API
+      - job: BuildPushAPI
+        displayName: Building/pushing API
+        steps:
+          - ${{ if eq(variables.buildDeployApi, true) }}:
+            - template: adb-docker-build-push.yaml@pipeline-templates
+              parameters:
+                containerRegistry: $(containerRegistry)
+                repository: $(repository)
+                imageName: '${{ lower(variables.imageName) }}-api'
+                dockerfile: '$(pathDockerfileApi)' # we check if dockerfile exists before executing the task
+                tags: |
+                  $(tag)
+                  latest
+
+      # WEB
+      - job: BuildPushWEB
+        displayName: Building/pushing WEB
+        steps:
+          - ${{ if eq(variables.buildDeployWeb, true) }}:
+            - task: a8515ec8-7254-4ffd-912c-86772e2b5962@3
+              displayName: Replace placeholders in config  # replace tokens in config, with build parameters (from devops)
+              inputs:
+                rootDirectory: '$(Build.SourcesDirectory)/Src/SOS.Administration.Gui.Web/src/assets/_configs'
+                targetFiles: '**/config.js'
+                encoding: 'auto'
+                writeBOM: true
+                actionOnMissing: 'fail'
+                keepToken: false
+                tokenPrefix: '$('
+                tokenSuffix: ')'
+          - ${{ if eq(variables.buildDeployWeb, true) }}:
+            - template: adb-docker-build-push.yaml@pipeline-templates
+              parameters:
+                containerRegistry: $(containerRegistry)
+                repository: $(repository)
+                imageName: '${{ lower(variables.imageName) }}-web'
+                dockerfile: '$(pathDockerfileWeb)' # we check if dockerfile exists before executing the task
+                tags: |
+                  $(tag)
+                  latest
+
+  - stage: Deploy
+    displayName: Deploy to ${{ upper(variables.environment) }}
+    jobs:
+      # API
+      - job: DeployAPI
+        displayName: Deploying API
+        steps:
+          - ${{ if eq(variables.buildDeployApi, true) }}:
+            - template: adb-kubernetes-deploy-with-file-check.yaml@pipeline-templates
+              parameters:
+                kubernetesServiceEndpoint: $(kubernetesServiceEndpoint)
+                environment: $(environment)/administration.gui
+                manifest: 'api.yaml'
+                dockerfile: '$(pathDockerfileApi)' # we check if dockerfile exists before executing the task
+
+      # WEB
+      - job: DeployWEB
+        displayName: Deploying WEB
+        steps:
+          - ${{ if eq(variables.buildDeployWeb, true) }}:
+            - template: adb-kubernetes-deploy-with-file-check.yaml@pipeline-templates
+              parameters:
+                kubernetesServiceEndpoint: $(kubernetesServiceEndpoint)
+                environment: $(environment)/administration.gui
+                manifest: 'web.yaml'
+                dockerfile: '$(pathDockerfileWeb)' # we check if dockerfile exists before executing the task

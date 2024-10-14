@@ -2,7 +2,7 @@
 
 internal static class ExceptionMiddlewareExtension
 {
-    internal static void ConfigureExceptionHandler(this IApplicationBuilder app, Logger logger, bool isDevelopment)
+    internal static void ConfigureExceptionHandler(this IApplicationBuilder app, bool isDevelopment)
     {
         app.UseExceptionHandler(error =>
         {
@@ -16,7 +16,7 @@ internal static class ExceptionMiddlewareExtension
                     context.Response.ContentType = "application/json";
                     context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
                     errorAsString = exception.Message;
-                    logger.Error(exception, errorAsString);
+                    Log.Logger.Error(exception, errorAsString);
                 }
                 else
                 {

@@ -5,7 +5,7 @@ VisualStudioVersion = 17.3.32811.315
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOS.Analysis.Api", "SOS.Analysis.Api\SOS.Analysis.Api.csproj", "{934DB5A2-474C-4FD0-9741-440B3DC1879E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOS.Lib", "SOS.lib\SOS.Lib.csproj", "{94462E6B-0D05-4DD8-9A7C-9E2343CF23D9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOS.Lib", "SOS.Lib\SOS.Lib.csproj", "{94462E6B-0D05-4DD8-9A7C-9E2343CF23D9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

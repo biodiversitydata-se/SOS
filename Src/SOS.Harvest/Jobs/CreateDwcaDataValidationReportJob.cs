@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using SOS.Harvest.Managers.Interfaces;
 using SOS.Lib.Configuration.Import;
+using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers;
 using SOS.Lib.Jobs.Import;
@@ -12,6 +13,7 @@ using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.DarwinCore;
+using SOS.Lib.Repositories.Verbatim;
 using System.Text;
 
 namespace SOS.Harvest.Jobs
@@ -23,6 +25,7 @@ namespace SOS.Harvest.Jobs
     {
         private readonly IDwcaDataValidationReportManager _dwcaDataValidationReportManager;
         private readonly DwcaConfiguration _dwcaConfiguration;
+        private readonly IVerbatimClient _verbatimClient;
         private readonly IReportManager _reportManager;
         private readonly ILogger<CreateDwcaDataValidationReportJob> _logger;
 
@@ -31,16 +34,19 @@ namespace SOS.Harvest.Jobs
         /// </summary>
         /// <param name="dwcaDataValidationReportManager"></param>
         /// <param name="dwcaConfiguration"></param>
+        /// <param name="verbatimClient"></param>
         /// <param name="reportManager"></param>
         /// <param name="logger"></param>
         public CreateDwcaDataValidationReportJob(
             IDwcaDataValidationReportManager dwcaDataValidationReportManager,
             DwcaConfiguration dwcaConfiguration,
+            IVerbatimClient verbatimClient,
             IReportManager reportManager,
             ILogger<CreateDwcaDataValidationReportJob> logger)
         {
             _dwcaDataValidationReportManager = dwcaDataValidationReportManager ?? throw new ArgumentNullException(nameof(dwcaDataValidationReportManager));
             _dwcaConfiguration = dwcaConfiguration ?? throw new ArgumentNullException(nameof(dwcaConfiguration));
+            _verbatimClient = verbatimClient ?? throw new ArgumentNullException(nameof(verbatimClient));
             _reportManager = reportManager ?? throw new ArgumentNullException(nameof(reportManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
@@ -48,16 +54,20 @@ namespace SOS.Harvest.Jobs
         public async Task<Report> RunAsync(
             string reportId,
             string createdBy,
-            string archivePath,
             int maxNrObservationsToRead,
             int nrValidObservationsInReport,
             int nrInvalidObservationsInReport,
             int nrTaxaInTaxonStatistics,
             IJobCancellationToken cancellationToken)
         {
+            string archivePath = "";
             try
             {
-                _logger.LogInformation("Start DwC-A Test Import Job");
+                var darwinCoreArchiveVerbatimRepository = new DarwinCoreArchiveVerbatimRepository(reportId, _verbatimClient, _logger);
+                archivePath = Path.Combine(_dwcaConfiguration.ImportPath, $"{reportId}.zip");
+                await FileSystemHelper.SaveStreamAsync(archivePath, await darwinCoreArchiveVerbatimRepository.GetReportSourceFileAsync());
+
+                _logger.LogInformation($"Start DwC-A Test Import Job: {archivePath}");
                 using var archiveReader = new ArchiveReader(archivePath, _dwcaConfiguration.ImportPath);
                 var dataValidationSummary = await _dwcaDataValidationReportManager.CreateDataValidationSummary(
                     archiveReader,

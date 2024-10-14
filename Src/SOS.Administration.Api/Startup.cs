@@ -10,12 +10,9 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.OpenApi.Models;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
 using Newtonsoft.Json.Converters;
-using SOS.Lib.Configuration.Import;
-using SOS.Lib.Configuration.Shared;
 using SOS.Lib.JsonConverters;
 using SOS.Lib.Managers;
 using SOS.Lib.Managers.Interfaces;
@@ -27,7 +24,6 @@ using System;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Text.Json.Serialization;
 
 namespace SOS.Administration.Api
@@ -38,6 +34,7 @@ namespace SOS.Administration.Api
     public class Startup
     {
         private bool _isDevelopment;
+
         /// <summary>
         ///     Start up
         /// </summary>
@@ -60,6 +57,7 @@ namespace SOS.Administration.Api
             }
 
             Configuration = builder.Build();
+            Settings.Init(Configuration); // or fail early!
         }
 
         /// <summary>
@@ -132,8 +130,10 @@ namespace SOS.Administration.Api
 
             services.AddMvc();//.SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
 
+            services.AddHealthChecks().AddCheck<HealthCheck>("CustomHealthCheck");
+
             // Hangfire
-            var hangfireDbConfiguration = Configuration.GetSection("HangfireDbConfiguration").Get<HangfireDbConfiguration>();
+            var hangfireDbConfiguration = Settings.HangfireDbConfiguration;
 
             services.AddHangfire(configuration =>
                 configuration
@@ -158,10 +158,10 @@ namespace SOS.Administration.Api
                         })
             );
 
-            var sosApiConfiguration = Configuration.GetSection("SosApiConfiguration").Get<SosApiConfiguration>();
-            services.AddSingleton<SosApiConfiguration>(sosApiConfiguration);
-            var importConfiguration = Configuration.GetSection("ImportConfiguration").Get<ImportConfiguration>();
-            services.AddSingleton<GeoRegionApiConfiguration>(importConfiguration.GeoRegionApiConfiguration);
+            var sosApiConfiguration = Settings.SosApiConfiguration;
+            services.AddSingleton(sosApiConfiguration);
+            var importConfiguration = Settings.ImportConfiguration;
+            services.AddSingleton(importConfiguration.GeoRegionApiConfiguration);
 
             services.AddScoped<ICacheManager, CacheManager>();
 
@@ -206,6 +206,9 @@ namespace SOS.Administration.Api
                 app.UseHsts();
             }
 
+            // Placeholder healthcheck for k8s deployment
+            app.UseHealthChecks("/healthz");
+
             app.UseHangfireDashboard("/hangfire", new DashboardOptions
             {
                 Authorization = new[] { new AllowAllConnectionsFilter() },
@@ -221,9 +224,7 @@ namespace SOS.Administration.Api
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "ObservationProcessingJobs API, version 1");
             });
-
-            app.UseHttpsRedirection();
-
+            
             app.UseRouting();
 
             app.UseAuthorization();

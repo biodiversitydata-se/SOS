@@ -1,6 +1,4 @@
 ﻿using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 
 namespace SOS.Administration.Gui.Controllers
 {
@@ -16,10 +14,10 @@ namespace SOS.Administration.Gui.Controllers
         private IWebHostEnvironment _hostingEnvironment;
         private readonly string _hangfireUrl;
 
-        public HostingEnvironmentController(IWebHostEnvironment hostingEnvironment, IOptionsMonitor<ApiTestConfiguration> optionsMonitor)
+        public HostingEnvironmentController(IWebHostEnvironment hostingEnvironment, ApiTestConfiguration apiTestConfiguration)
         {
             _hostingEnvironment = hostingEnvironment;
-            _hangfireUrl = optionsMonitor.CurrentValue.HangfireUrl;
+            _hangfireUrl = apiTestConfiguration.HangfireUrl;
         }
         [HttpGet]
         public EnvironmentDto Get()

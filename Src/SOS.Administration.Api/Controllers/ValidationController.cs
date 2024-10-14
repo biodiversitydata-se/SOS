@@ -4,10 +4,12 @@ using Microsoft.Extensions.Logging;
 using SOS.Administration.Api.Controllers.Interfaces;
 using SOS.Administration.Api.Models;
 using SOS.Lib.Configuration.Import;
+using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Helpers;
 using SOS.Lib.Jobs.Import;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Shared;
+using SOS.Lib.Repositories.Verbatim;
 using System;
 using System.IO;
 using System.Net;
@@ -23,23 +25,23 @@ namespace SOS.Administration.Api.Controllers
     [Route("[controller]")]
     public class ValidationController : ControllerBase, IValidationController
     {
-        private readonly DwcaConfiguration _dwcaConfiguration;
         private readonly IDataProviderManager _dataProviderManager;
+        private readonly IVerbatimClient _verbatimClient;
         private readonly ILogger<ValidationController> _logger;
 
         /// <summary>
         ///     Constructor
         /// </summary>
-        /// <param name="dwcaConfiguration"></param>
         /// <param name="dataProviderManager"></param>
+        /// <param name="verbatimClient"></param>
         /// <param name="logger"></param>
         public ValidationController(
-            DwcaConfiguration dwcaConfiguration,
             IDataProviderManager dataProviderManager,
+            IVerbatimClient verbatimClient,
             ILogger<ValidationController> logger)
         {
-            _dwcaConfiguration = dwcaConfiguration ?? throw new ArgumentNullException(nameof(dwcaConfiguration));
             _dataProviderManager = dataProviderManager ?? throw new ArgumentNullException(nameof(dataProviderManager));
+            _verbatimClient = verbatimClient ?? throw new ArgumentNullException(nameof(verbatimClient));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -121,20 +123,21 @@ namespace SOS.Administration.Api.Controllers
                 if (model.MaxNrObservationsToRead < model.NrInvalidObservationsInReport + model.NrInvalidObservationsInReport)
                     return new BadRequestObjectResult("MxNrObservationsToRead must be > NrInvalidObservationsInReport + NrInvalidObservationsInReport");
 
-                // Upload file and save temporarily on file system.
-                string filename = FilenameHelper.CreateFilenameWithDate(model.DwcaFile.FileName, true);
-                var filePath = Path.Combine(_dwcaConfiguration.ImportPath, filename);
-                if (System.IO.File.Exists(filePath)) System.IO.File.Delete(filePath);
-                await using var stream = new FileStream(filePath, FileMode.Create);
+                await using var stream = new MemoryStream();
                 await model.DwcaFile.CopyToAsync(stream).ConfigureAwait(false);
+
                 var reportId = Report.CreateReportId();
+                var darwinCoreArchiveVerbatimRepository = new DarwinCoreArchiveVerbatimRepository(reportId, _verbatimClient, _logger);
+                if (!await darwinCoreArchiveVerbatimRepository.StoreReportSourceFileAsync(stream))
+                {
+                    return new BadRequestObjectResult("Failed to store source file");
+                }
 
                 // Enqueue job to Hangfire.
                 BackgroundJob.Enqueue<ICreateDwcaDataValidationReportJob>(job =>
                     job.RunAsync(
                         reportId,
                         model.CreatedBy,
-                        filePath,
                         model.MaxNrObservationsToRead,
                         model.NrValidObservationsInReport,
                         model.NrInvalidObservationsInReport,

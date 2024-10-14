@@ -1,8 +1,5 @@
-﻿using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using SOS.Administration.Gui.Dtos;
-using SOS.Lib.Models.Search.Result;
-using System;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,10 +10,10 @@ namespace SOS.Administration.Gui.Services
     {
         private readonly HttpClient _client;
         private readonly string _apiUrl;
-        public SearchService(IOptionsMonitor<ApiTestConfiguration> optionsMonitor)
+        public SearchService()
         {
             _client = new HttpClient();
-            _apiUrl = optionsMonitor.CurrentValue.ApiUrl;
+            _apiUrl = Settings.ApiTestConfiguration.ApiUrl;
 
         }
         public async Task<PagedResult<SOSObservation>> SearchSOS(SearchFilterDto searchFilter, int take, int skip)

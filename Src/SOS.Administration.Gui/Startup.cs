@@ -1,24 +1,12 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using SOS.Administration.Gui.Managers;
 using SOS.Administration.Gui.Managers.Interfaces;
 using SOS.Administration.Gui.Services;
-using SOS.Lib.Cache;
-using SOS.Lib.Cache.Interfaces;
-using SOS.Lib.Configuration.Shared;
-using SOS.Lib.Database;
-using SOS.Lib.Database.Interfaces;
-using SOS.Lib.Managers;
-using SOS.Lib.Managers.Interfaces;
-using SOS.Lib.Models.Processed.Configuration;
-using SOS.Lib.Repositories.Processed;
-using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Services;
 using SOS.Lib.Services.Interfaces;
 using System.Globalization;
@@ -54,6 +42,7 @@ namespace SOS.Administration.Gui
             }
 
             Configuration = builder.Build();
+            Settings.Init(Configuration); // or fail early!
         }
 
         public IConfiguration Configuration { get; }
@@ -66,18 +55,23 @@ namespace SOS.Administration.Gui
             CultureInfo.DefaultThreadCurrentCulture = culture;
             CultureInfo.DefaultThreadCurrentUICulture = culture;
 
-            services.AddControllersWithViews();
-            // In production, the Angular files will be served from this directory
-            services.AddSpaStaticFiles(configuration =>
+            services.AddHealthChecks().AddCheck<HealthCheck>("CustomHealthCheck");
+
+            // Add CORS
+            services.AddCors(o => o.AddPolicy("allowedOriginsPolicy", services =>
             {
-                configuration.RootPath = "ClientApp/dist";
-            });
+                services.WithOrigins(Settings.AllowedOrigins)
+                    .AllowAnyMethod()
+                    .AllowAnyHeader();
+            }));
+            services.AddControllersWithViews();
+
             services.AddMvcCore().AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
             });
 
-            var authConfig = Configuration.GetSection(nameof(AuthenticationConfiguration)).Get<AuthenticationConfiguration>();
+            var authConfig = Settings.AuthenticationConfiguration;
             services.AddAuthentication(opt =>
             {
                 opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -96,19 +90,17 @@ namespace SOS.Administration.Gui
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(authConfig.SecretKey))
                 };
             });
-            var processDbConfigurationSection = Configuration.GetSection("ProcessDbConfiguration");
-            services.Configure<MongoDbConfiguration>(processDbConfigurationSection);
 
             // Processed Mongo Db
-            var processedDbConfiguration = processDbConfigurationSection.Get<MongoDbConfiguration>();
-            var processedSettings = processedDbConfiguration.GetMongoDbSettings();
-            services.AddScoped<IProcessClient, ProcessClient>(p => new ProcessClient(processedSettings, processedDbConfiguration.DatabaseName,
-                processedDbConfiguration.ReadBatchSize, processedDbConfiguration.WriteBatchSize));
+            var processDbConfiguration = Settings.ProcessDbConfiguration;
+            var processedSettings = processDbConfiguration.GetMongoDbSettings();
+            services.AddScoped<IProcessClient, ProcessClient>(p => new ProcessClient(processedSettings, processDbConfiguration.DatabaseName,
+                processDbConfiguration.ReadBatchSize, processDbConfiguration.WriteBatchSize));
 
             //setup the elastic search configuration
-            var elasticConfiguration = Configuration.GetSection("SearchDbConfiguration").Get<ElasticSearchConfiguration>();
+            var elasticConfiguration = Settings.SearchDbConfiguration;
             services.AddSingleton<IElasticClientManager, ElasticClientManager>(p => new ElasticClientManager(elasticConfiguration));
-            var testElasticSearchConfiguration = Configuration.GetSection("SearchDbConfigurationTest").Get<TestElasticSearchConfiguration>();
+            var testElasticSearchConfiguration = Settings.SearchDbTestConfiguration;
 
             services.AddSingleton(authConfig);
             services.AddSingleton(elasticConfiguration);
@@ -119,14 +111,12 @@ namespace SOS.Administration.Gui
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
-            services.Configure<ApiTestConfiguration>(
-              Configuration.GetSection(nameof(ApiTestConfiguration)));
+            services.AddSingleton(Settings.ApiTestConfiguration);
 
-            services.Configure<ApplicationInsightsConfiguration>(Configuration.GetSection(nameof(ApplicationInsightsConfiguration)));
             services.AddTransient<ISearchService, SearchService>();
             services.AddTransient<ITestService, TestService>();
 
-            services.AddSingleton(Configuration.GetSection(nameof(ApplicationInsightsConfiguration)).Get<ApplicationInsightsConfiguration>());
+            services.AddSingleton(Settings.ApplicationInsightsConfiguration);
             services.AddSingleton<IHttpClientService, HttpClientService>();
             services.AddScoped<IApplicationInsightsService, ApplicationInsightsService>();
 
@@ -150,35 +140,21 @@ namespace SOS.Administration.Gui
                 app.UseHsts();
             }
 
-            app.UseHttpsRedirection();
-            app.UseStaticFiles();
-            if (!_isDevelopment)
-            {
-                app.UseSpaStaticFiles();
-            }
-
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
+
+            // Placeholder healthcheck for k8s deployment
+            app.UseHealthChecks("/healthz");
+
+            // Use CORS
+            app.UseCors("allowedOriginsPolicy");
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller}/{action=Index}/{id?}");
-            });
-
-            app.UseSpa(spa =>
-            {
-                // To learn more about options for serving an Angular SPA from ASP.NET Core,
-                // see https://go.microsoft.com/fwlink/?linkid=864501
-
-                spa.Options.SourcePath = "ClientApp";
-
-                if (_isDevelopment)
-                {
-                    spa.UseAngularCliServer(npmScript: "start");
-                }
             });
         }
     }

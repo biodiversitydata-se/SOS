@@ -1,0 +1,13 @@
+﻿global using Microsoft.AspNetCore.Mvc;
+global using Microsoft.Extensions.Caching.Memory;
+global using Microsoft.OpenApi.Models;
+global using SOS.Lib.Configuration.Shared;
+global using SOS.Lib.Enums;
+global using SOS.Lib.Extensions;
+global using SOS.Lib.Managers;
+global using SOS.Lib.Managers.Interfaces;
+global using SOS.Lib.Models.Search.Filters;
+global using System.Net;
+global using System.Reflection;
+global using System.Threading;
+global using System.Threading.Tasks;

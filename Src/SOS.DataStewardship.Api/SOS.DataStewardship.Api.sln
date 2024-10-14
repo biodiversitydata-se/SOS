@@ -15,7 +15,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOS.DataStewardship.Api", "
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{FA6F93ED-7F08-451A-954D-001712177F47}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOS.Lib", "..\SOS.lib\SOS.Lib.csproj", "{5E4908ED-6221-44E0-B54E-1D3A737354EB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOS.Lib", "..\SOS.Lib\SOS.Lib.csproj", "{5E4908ED-6221-44E0-B54E-1D3A737354EB}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOS.DataStewardship.Api.IntegrationTests", "..\..\Tests\Integration\SOS.DataStewardship.Api.IntegrationTests\SOS.DataStewardship.Api.IntegrationTests.csproj", "{91ABB4A9-25B6-40EB-975A-EF15E838C544}"
 EndProject

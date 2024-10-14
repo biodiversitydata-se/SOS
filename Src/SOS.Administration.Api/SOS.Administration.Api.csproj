@@ -32,19 +32,19 @@
     </ItemGroup>
 
     <ItemGroup>
-        <None Include="nlog.local.config">
+        <None Include="NLog.local.config">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
-        <None Include="nlog.at.config">
+        <None Include="NLog.at.config">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
-        <None Include="nlog.dev.config">
+        <None Include="NLog.dev.config">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
-        <None Include="nlog.prod.config">
+        <None Include="NLog.prod.config">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
-        <None Include="nlog.st.config">
+        <None Include="NLog.st.config">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
     </ItemGroup>
@@ -67,6 +67,6 @@
     <ItemGroup>
         <ProjectReference Include="..\SOS.Export\SOS.Export.csproj" />
         <ProjectReference Include="..\SOS.Harvest\SOS.Harvest.csproj" />
-        <ProjectReference Include="..\SOS.lib\SOS.Lib.csproj" />
+        <ProjectReference Include="..\SOS.Lib\SOS.Lib.csproj" />
     </ItemGroup>
 </Project>

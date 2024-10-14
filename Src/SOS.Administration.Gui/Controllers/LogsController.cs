@@ -146,7 +146,7 @@ namespace SOS.Administration.Gui.Controllers
                 .Sort(f => f
                     .Descending(d => d.Timestamp))
                 );
-            if (result.IsValid)
+            if (result.IsValid && result.Aggregations.Count > 0)
             {
                 var logEntriesDto = new LogEntriesDto();
                 var resultsDto = new List<LogEntryDto>();
@@ -165,6 +165,7 @@ namespace SOS.Administration.Gui.Controllers
                 }
                 logEntriesDto.LogEntries = resultsDto;
                 var aggregationsDto = new List<TermAggregationDto>();
+
                 foreach (var aggName in filterAggregationsNames)
                 {
                     var a = result.Aggregations.Global("global").Filter(aggName).First();

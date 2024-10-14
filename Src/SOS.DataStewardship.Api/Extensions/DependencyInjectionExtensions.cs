@@ -15,19 +15,19 @@ namespace SOS.DataStewardship.Api.Extensions;
 
 internal static class DependencyInjectionExtensions
 {
-    internal static MongoDbConfiguration SetupDependencies(this WebApplicationBuilder webApplicationBuilder)
+    internal static MongoDbConfiguration SetupDependencies(this WebApplicationBuilder webApplicationBuilder, ISettings settings)
     {
         // Configuration
-        var elasticConfiguration = webApplicationBuilder.Configuration.GetSection("SearchDbConfiguration").Get<ElasticSearchConfiguration>();
+        var elasticConfiguration = settings.SearchDbConfiguration;
         webApplicationBuilder.Services.AddSingleton(elasticConfiguration);
         webApplicationBuilder.Services.AddSingleton<IElasticClientManager, ElasticClientManager>(elasticClientManager => new ElasticClientManager(elasticConfiguration));
 
-        var processedDbConfiguration = webApplicationBuilder.Configuration.GetSection("ProcessDbConfiguration").Get<MongoDbConfiguration>();
+        var processedDbConfiguration = settings.ProcessDbConfiguration;
         var processedSettings = processedDbConfiguration.GetMongoDbSettings();
         webApplicationBuilder.Services.AddSingleton<IProcessClient, ProcessClient>(p => new ProcessClient(processedSettings, processedDbConfiguration.DatabaseName,
                 processedDbConfiguration.ReadBatchSize, processedDbConfiguration.WriteBatchSize));        
         
-        webApplicationBuilder.Services.AddSingleton(webApplicationBuilder.Configuration.GetSection("UserServiceConfiguration").Get<UserServiceConfiguration>());
+        webApplicationBuilder.Services.AddSingleton(settings.UserServiceConfiguration);
 
         // Cache
         webApplicationBuilder.Services.AddSingleton<IClassCache<TaxonTree<IBasicTaxon>>, ClassCache<TaxonTree<IBasicTaxon>>>();
@@ -65,7 +65,7 @@ internal static class DependencyInjectionExtensions
         webApplicationBuilder.Services.AddApplicationInsightsTelemetry(webApplicationBuilder.Configuration);
         // Application insights custom
         webApplicationBuilder.Services.AddApplicationInsightsTelemetryProcessor<IgnoreRequestPathsTelemetryProcessor>();
-        webApplicationBuilder.Services.AddSingleton(webApplicationBuilder.Configuration.GetSection("ApplicationInsights").Get<ApplicationInsights>());
+        webApplicationBuilder.Services.AddSingleton(settings.ApplicationInsights);
         webApplicationBuilder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
         webApplicationBuilder.Services.AddSingleton<ITelemetryInitializer, TelemetryInitializer>();
 

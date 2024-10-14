@@ -1,9 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
-using Nest;
+﻿using Nest;
 using Newtonsoft.Json;
-using SOS.Lib.Configuration.Shared;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -106,10 +102,10 @@ namespace SOS.Administration.Gui.Controllers
         private ApplicationInsightsConfiguration _aiConfig;
 
 
-        public PerformanceController(IOptionsMonitor<ApplicationInsightsConfiguration> aiConfig, TestElasticSearchConfiguration testElasticConfiguration)
+        public PerformanceController(ApplicationInsightsConfiguration aiConfig, TestElasticSearchConfiguration testElasticConfiguration)
         {
             _testElasticClient = testElasticConfiguration.GetClients().FirstOrDefault();
-            _aiConfig = aiConfig.CurrentValue;
+            _aiConfig = aiConfig;
         }
 
         public static string GetTelemetry(string appid, string apikey,

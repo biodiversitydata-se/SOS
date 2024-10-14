@@ -1,17 +1,12 @@
 ﻿using Hangfire;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Administration.Api.Controllers.Interfaces;
 using SOS.Administration.Api.Models;
 using SOS.Lib.Database.Interfaces;
-using SOS.Lib.Enums;
 using SOS.Lib.Jobs.Import;
-using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Repositories.Verbatim;
 using System;
 using System.IO;
-using System.Net;
-using System.Threading.Tasks;
 
 namespace SOS.Administration.Api.Controllers
 {
@@ -31,7 +26,6 @@ namespace SOS.Administration.Api.Controllers
         /// </summary>
         /// <param name="dataProviderManager"></param>
         /// <param name="verbatimClient"></param>
-        /// <param name="dwcaConfiguration"></param>
         /// <param name="logger"></param>
         /// <exception cref="ArgumentNullException"></exception>
         public HarvestChecklistJobController(IDataProviderManager dataProviderManager,

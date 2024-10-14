@@ -83,7 +83,7 @@
 	<ItemGroup>
 		<ProjectReference Include="..\SOS.Export\SOS.Export.csproj" />
 		<ProjectReference Include="..\SOS.Harvest\SOS.Harvest.csproj" />
-		<ProjectReference Include="..\SOS.lib\SOS.Lib.csproj" />
+		<ProjectReference Include="..\SOS.Lib\SOS.Lib.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

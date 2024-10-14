@@ -1,10 +1,7 @@
-﻿using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using SOS.Administration.Gui.Dtos;
 using SOS.Administration.Gui.Dtos.Enum;
-using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Models.Shared;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -74,10 +71,10 @@ namespace SOS.Administration.Gui.Services
         private readonly string _apiUrl;
         private readonly List<Test> _tests;
         private readonly ISearchService _searchService;
-        public TestService(IOptionsMonitor<ApiTestConfiguration> optionsMonitor, ISearchService searchService)
+        public TestService(ApiTestConfiguration apiTestConfiguration, ISearchService searchService)
         {
             _client = new HttpClient();
-            _apiUrl = optionsMonitor.CurrentValue.ApiUrl;
+            _apiUrl = apiTestConfiguration.ApiUrl;
             _searchService = searchService;
             _tests = new List<Test>() {
                 new Test()

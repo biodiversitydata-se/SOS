@@ -1,22 +1,17 @@
 ﻿using CSharpFunctionalExtensions;
 using Hangfire;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Administration.Api.Controllers.Interfaces;
 using SOS.Administration.Api.Models;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Database.Interfaces;
-using SOS.Lib.Enums;
 using SOS.Lib.Jobs.Import;
-using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Verbatim;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
 
 namespace SOS.Administration.Api.Controllers
 {
@@ -29,7 +24,6 @@ namespace SOS.Administration.Api.Controllers
     {
         private readonly IDataProviderManager _dataProviderManager;
         private readonly IVerbatimClient _verbatimClient;
-        private readonly DwcaConfiguration _dwcaConfiguration;
         private readonly ILogger<HarvestObservationsJobController> _logger;
 
        /// <summary>
@@ -37,17 +31,14 @@ namespace SOS.Administration.Api.Controllers
        /// </summary>
        /// <param name="dataProviderManager"></param>
        /// <param name="verbatimClient"></param>
-       /// <param name="dwcaConfiguration"></param>
        /// <param name="logger"></param>
        /// <exception cref="ArgumentNullException"></exception>
         public HarvestObservationsJobController(IDataProviderManager dataProviderManager,
             IVerbatimClient verbatimClient,
-            DwcaConfiguration dwcaConfiguration,
             ILogger<HarvestObservationsJobController> logger)
         {
             _dataProviderManager = dataProviderManager ?? throw new ArgumentNullException(nameof(dataProviderManager));
             _verbatimClient = verbatimClient ?? throw new ArgumentNullException(nameof(verbatimClient));
-            _dwcaConfiguration = dwcaConfiguration ?? throw new ArgumentNullException(nameof(dwcaConfiguration));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 

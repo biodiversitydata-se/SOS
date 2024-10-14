@@ -23,16 +23,18 @@ public class ClearCacheEndpoint : IEndpointDefinition
         ILogger<ClearCacheEndpoint> logger,
         [FromRoute, SwaggerParameter("The cache", Required = true)][Required] Cache cache)
     {        
-        if (cache == Cache.ProcessedConfiguration)
-        {
-            processedConfigurationCache.Clear();
-            logger.LogInformation($"The {cache} cache was cleared");
-        }
-        else
-        {
-            logger.LogInformation($"The {cache} cache was requested to be cleared, but there is no implementation.");
-        }
+        // if (cache == Cache.ProcessedConfiguration)
+        // {
+        //     processedConfigurationCache.Clear();
+        //     logger.LogInformation($"The {cache} cache was cleared");
+        // }
+        // else
+        // {
+        //     logger.LogInformation($"The {cache} cache was requested to be cleared, but there is no implementation.");
+        // }
         
-        return Results.Ok(true);
+        // return Results.Ok(true);
+
+        return Results.Ok("Disabled");
     }
 }

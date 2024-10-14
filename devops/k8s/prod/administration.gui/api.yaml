@@ -1,0 +1,95 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: sosadmingui-api
+  name: sosadmingui-api
+  namespace: sosadmingui
+spec:
+  ports:
+    - port: 5000
+      targetPort: 5000
+  selector:
+    app: sosadmingui-api
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: sosadmingui-api
+  name: sosadmingui-api
+  namespace: sosadmingui
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: sosadmingui-api
+  strategy: 
+      type: Recreate
+  template:
+    metadata:
+      annotations:
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/agent-inject-status: "update"
+        vault.hashicorp.com/ca-cert: "/vault/tls/ca-bundle.crt"
+        vault.hashicorp.com/tls-secret: "vault-ca-bundle"
+        vault.hashicorp.com/role: "sosadmingui"
+        vault.hashicorp.com/agent-inject-secret-env: "kv2/data/sosadmingui"
+        vault.hashicorp.com/agent-inject-template-env: |
+          {{- with secret "kv2/data/sosadmingui" -}}
+            {{- range $k, $v := .Data.data -}}
+              export {{ $k }}="{{ $v }}"
+            {{ end }}
+          {{- end }}
+      labels:
+        app: sosadmingui-api
+    spec:
+      serviceAccountName: sosadmingui-sa
+      topologySpreadConstraints: # try to spread out api instances over available nodes
+      - labelSelector:
+          matchLabels:
+            app: sosadmingui-api # pods labeled app: sosadmingui-api
+        maxSkew: 1
+        topologyKey: kubernetes.io/hostname # 1 node = 1 topology
+        whenUnsatisfiable: DoNotSchedule
+      containers:
+        - env:
+          - name: ASPNETCORE_ENVIRONMENT
+            value: prod
+          - name: AllowedOrigins
+            value: 'https://sos-admin.artdata.slu.se'
+          - name: ApiTestConfiguration
+            value: '{"ApiUrl": "https://sos-search.artdata.slu.se/", "HangfireUrl": "https://sos-hangfire.artdata.slu.se/hangfire"}'
+          - name: ApplicationInsightsConfiguration
+            value: '{"BaseAddress": "https://api.applicationinsights.io/v1", "AcceptHeaderContentType": "application/json", "InstrumentationKey": "SECRET_PLACEHOLDER", "ApiKey": "SECRET_PLACEHOLDER", "ApplicationId": "SECRET_PLACEHOLDER"}'
+          - name: AuthenticationConfiguration
+            value: '{"SecretKey": "SECRET_PLACEHOLDER", "SecretPassword": "SECRET_PLACEHOLDER", "Issuer": "https://sos-admin.artdata.slu.se"}'
+          - name: ProcessDbConfiguration
+            value: '{"UserName": "SECRET_PLACEHOLDER", "Password": "SECRET_PLACEHOLDER", "Hosts": [{"Name": "artmongo-1.artdata.slu.se", "Port": 27017}, {"Name": "artmongo-2.artdata.slu.se", "Port": 27017}, {"Name": "artmongo-3.artdata.slu.se", "Port": 27017}], "ReplicaSetName": "mongo-prod", "DatabaseName": "sos", "UseTls": false, "AuthenticationDb": "admin", "ReadBatchSize": 10000, "WriteBatchSize": 10000}'
+          - name: SearchDbConfiguration
+            value: '{"UserName": "SECRET_PLACEHOLDER", "Password": "SECRET_PLACEHOLDER", "Clusters": [{"Hosts": ["https://artsosdata2-1.artdata.slu.se:9200", "https://artsosdata2-2.artdata.slu.se:9200", "https://artsosdata2-3.artdata.slu.se:9200"]}, {"Hosts": ["https://artsosdata2-4.artdata.slu.se:9200", "https://artsosdata2-5.artdata.slu.se:9200", "https://artsosdata2-6.artdata.slu.se:9200"]}], "DebugMode": false, "IndexPrefix": "sos", "IndexSettings": [{"Name": "observation", "ReadBatchSize": 10000, "RequestTimeout": 60, "ScrollBatchSize": 5000, "ScrollTimeout": "300s"}]}'
+          - name: SearchDbTestConfiguration
+            value: '{"UserName": "SECRET_PLACEHOLDER", "Password": "SECRET_PLACEHOLDER", "Clusters": [{"Hosts": ["https://artsosdata2-1.artdata.slu.se:9200", "https://artsosdata2-2.artdata.slu.se:9200", "https://artsosdata2-3.artdata.slu.se:9200"]}, {"Hosts": ["https://artsosdata2-4.artdata.slu.se:9200", "https://artsosdata2-5.artdata.slu.se:9200", "https://artsosdata2-6.artdata.slu.se:9200"]}], "DebugMode": false, "IndexPrefix": "sos-st", "IndexSettings": [{"Name": "observation", "ReadBatchSize": 10000, "RequestTimeout": 60, "ScrollBatchSize": 5000, "ScrollTimeout": "300s"}]}'
+          image: adbpocreg.azurecr.io/sosadmingui-api:$(Parameters.ImageTag)
+          name: sosadmingui-api
+          command: ["sh", "-c"]
+          args: [". /vault/secrets/env && dotnet SOS.Administration.Gui.dll"]
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5000
+          readinessProbe: # ready to accept traffic, failure = stops routing traffic to this pod but does not restart the pod!
+            httpGet:
+              path: /healthz
+              port: 5000
+              httpHeaders:
+              - name: Host
+                value: KubernetesReadinessProbe
+            initialDelaySeconds: 10
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 3
+            periodSeconds: 30 # runs every 30 seconds
+          resources: {}
+      restartPolicy: Always
+      imagePullSecrets:
+        - name: regcred

@@ -1,14 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using MongoDB.Driver.GeoJsonObjectModel;
 using SOS.Administration.Gui.Dtos;
 using SOS.Administration.Gui.Services;
-using SOS.Lib.Configuration.Shared;
-using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Models.Verbatim.Artportalen;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -38,13 +33,13 @@ namespace SOS.Administration.Gui.Controllers
         private MongoClient _client;
         private MongoDbConfiguration _configuration;
 
-        public ObservationsController(ISearchService searchService, IOptionsMonitor<MongoDbConfiguration> mongoDbSettings)
+        public ObservationsController(ISearchService searchService)
         {
             _service = searchService;
-            var mongoSettings = mongoDbSettings.CurrentValue.GetMongoDbSettings();
+            var mongoSettings = Settings.ProcessDbConfiguration.GetMongoDbSettings();
             mongoSettings.SocketTimeout = new TimeSpan(0, 2, 0);
-            _client = new MongoClient(mongoDbSettings.CurrentValue.GetMongoDbSettings());
-            _configuration = mongoDbSettings.CurrentValue;
+            _client = new MongoClient(mongoSettings);
+            _configuration = Settings.ProcessDbConfiguration;
         }
         [HttpGet]
         [Route("real/{occurrenceId}")]

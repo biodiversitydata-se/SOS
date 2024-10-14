@@ -27,7 +27,7 @@ public class GetDatasetsBySearchEndpoint : IEndpointDefinition
         [FromBody, SwaggerRequestBody("The search filter")] DatasetFilter filter,
         [AsParameters] PagingParameters pagingParameters,        
         [FromQuery, SwaggerParameter("The export mode")] ExportMode exportMode = ExportMode.Json)
-    {                
+    {
         var datasets = await dataStewardshipManager
             .GetDatasetsBySearchAsync(filter, pagingParameters.Skip.GetValueOrDefault(0), pagingParameters.Take.GetValueOrDefault(20));            
         

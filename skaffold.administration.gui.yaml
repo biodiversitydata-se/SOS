@@ -1,0 +1,25 @@
+apiVersion: skaffold/v4beta5
+kind: Config
+build:
+  artifacts:
+  - image: api
+    context: ./Src
+    docker:
+      dockerfile: Dockerfile.administration.gui
+  - image: web
+    context: ./Src/SOS.Administration.Gui.Web/
+    docker:
+      dockerfile: Dockerfile
+manifests:
+  rawYaml:
+  - ./devops/k8s/local/administration.gui/*.yaml
+deploy:
+  statusCheck: false
+  kubeContext: docker-desktop
+  kubectl: {}
+  # helm:
+  #   releases:
+  #   - name: redis
+  #     remoteChart: bitnami/redis
+  #     version: 17.3.15
+  #     valuesFiles: ["./devops/helm/local/redis/values.yaml"]
