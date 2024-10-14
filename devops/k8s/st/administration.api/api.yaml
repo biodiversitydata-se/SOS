@@ -64,7 +64,7 @@ spec:
           - name: SosApiConfiguration
             value: '{"ObservationsApiAddresses": [ "https://sos-search-st.artdata.slu.se/" ], "ElasticSearchProxyAddresses": [ "https://sos-proxy-st.artdata.slu.se/" ], "AnalysisApiAddresses": [ "https://sos-analysis-st.artdata.slu.se/" ], "DataStewardshipApiAddresses": [ "https://datastewardship-st.wt.artdata.slu.se/"]}'
           - name: ProcessConfiguration
-            value: '{"TaxonAttributeServiceConfiguration": {"BaseAddress": "https://taxonattributeservice.artdata.slu.se/api", "AcceptHeaderContentType": "application/json"}, "TaxonServiceConfiguration": {"BaseAddress": "https://taxonservice.artdata.slu.se/DarwinCore/DarwinCoreArchiveFile?version=custom", "AcceptHeaderContentType": "application/text", "TaxonApiAddress": "https://taxonapi-st.artdata.slu.se/darwincore/download?version=custom", "UseTaxonApi": true}}'
+            value: '{"TaxonAttributeServiceConfiguration": {"BaseAddress": "https://taxonattributeservice.artdata.slu.se/api", "AcceptHeaderContentType": "application/json"}, "TaxonServiceConfiguration": {"BaseAddress": "https://taxonservice.artdata.slu.se/DarwinCore/DarwinCoreArchiveFile?version=custom", "AcceptHeaderContentType": "application/text", "TaxonApiAddress": "https://taxonapi-st.wt.artdata.slu.se/darwincore/download?version=custom", "UseTaxonApi": true}}'
           - name: UserServiceConfiguration
             value: '{"BaseAddress": "https://artdatauser-st.artdata.slu.se/api","AcceptHeaderContentType": "application/json"}'
           - name: ImportConfiguration

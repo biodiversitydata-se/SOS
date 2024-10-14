@@ -2,10 +2,10 @@
 #@baseUrl = https://localhost:5001/datastewardship/
 
 #Dev
-#@baseUrl = https://sos-datastewardship-dev.artdata.slu.se/datastewardship
+#@baseUrl = https://datastewardship-dev.wt.artdata.slu.se/datastewardship
 
 #ST
-@baseUrl = https://sos-datastewardship-st.artdata.slu.se/datastewardship
+@baseUrl = https://datastewardship-st.wt.artdata.slu.se/datastewardship
 
 #Prod
 #@baseUrl = https://sos-datastewardship.artdata.slu.se/datastewardship
