@@ -170,7 +170,7 @@ namespace SOS.Lib.Services
         public async Task<IEnumerable<AuthorityModel>> GetUserAuthoritiesAsync(int userId, string authorizationApplicationIdentifier = null, string cultureCode = "sv-SE")
         {
             if (!_userServiceConfiguration.UseUserAdmin2Api)
-                return await GetUserAuthoritiesFromUserAdmin1Async(userId);
+                return await GetUserAuthoritiesFromUserAdmin1Async(userId, authorizationApplicationIdentifier, cultureCode);
             else
                 return await GetUserAuthoritiesFromUserAdmin2Async(userId);
         }
