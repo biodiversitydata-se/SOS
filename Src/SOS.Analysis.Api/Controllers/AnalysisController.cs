@@ -1,4 +1,5 @@
 ﻿using Hangfire;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NetTopologySuite.Features;
 using SOS.Analysis.Api.Configuration;
@@ -367,6 +368,7 @@ namespace SOS.Analysis.Api.Controllers
         /// <param name="confirmEncryptPassword">Confirm encrypt password</param>
         /// <returns></returns>
         [HttpPost("/internal/order/aoo_eoo")]
+        [Authorize/*(Roles = "Privat")*/]
         [ProducesResponseType(typeof(FeatureCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
@@ -574,6 +576,7 @@ namespace SOS.Analysis.Api.Controllers
         /// <param name="confirmEncryptPassword">Confirm encrypt password</param>
         /// <returns></returns>
         [HttpPost("/internal/order/aoo_eoo/article17")]
+        [Authorize/*(Roles = "Privat")*/]
         [ProducesResponseType(typeof(FeatureCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
