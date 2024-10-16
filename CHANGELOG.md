@@ -1,5 +1,23 @@
 # Changelog
 
+## [2024.10.16]
+
+### `Added`
+- AOO/EOO file order endpoint in Analysis API (internal).
+- Statistics report endpoints (internal).
+- DwC footprintWKT parsing support.
+
+### `Changed`
+- Updated Institutions vocabulary.
+- InstitutionCode field in DwC-A now uses dataprovider.organization when the value is missing.
+
+### `Fixed`
+- Duplicates of Artportalen observations could occur under certain rare circumstances.
+
+### `Other`
+- Exports performance improvements.
+- Cache improvements.
+
 ## [2024.06.19]
 
 ### `Added`
