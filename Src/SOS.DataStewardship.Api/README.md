@@ -3,7 +3,7 @@
 ## Testning
 
 ### Testmiljö
-https://sos-datastewardship-st.artdata.slu.se/swagger/index.html
+https://datastewardship-st.wt.artdata.slu.se/swagger/index.html
 
 ### Testdata från Artportalen
 - Observationer och event skördas in i testmiljön från 2017-01-01 och framåt.
