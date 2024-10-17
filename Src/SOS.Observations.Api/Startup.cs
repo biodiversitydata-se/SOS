@@ -278,9 +278,9 @@ namespace SOS.Observations.Api
                         {
                             OnTokenValidated = context =>
                             {
-                                var claimsIdentity = context.Principal.Identity as ClaimsIdentity;
+                                var claimsIdentity = context.Principal?.Identity as ClaimsIdentity;
                                 var scopeClaim = claimsIdentity?.FindFirst("scope");
-                                if (scopeClaim != null)
+                                if (claimsIdentity != null && scopeClaim != null)
                                 {
                                     var scopes = scopeClaim.Value.Split(' ');
                                     claimsIdentity.RemoveClaim(scopeClaim);
@@ -292,7 +292,6 @@ namespace SOS.Observations.Api
                                 return Task.CompletedTask;
                             }
                         };
-
                     });
             }
             else
