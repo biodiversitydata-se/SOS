@@ -23,7 +23,7 @@
 		<PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="8.0.10" />
 		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="8.0.1" />
 		<PackageReference Include="MongoDB.Driver" Version="2.29.0" />
-		<PackageReference Include="NEST" Version="7.17.5" />
+		<PackageReference Include="NEST" Version="7.17.4" />
 		<PackageReference Include="NLog" Version="5.3.4" />
 		<PackageReference Include="NLog.Web.AspNetCore" Version="5.3.14" />
 		<PackageReference Include="xunit" Version="2.9.2" />

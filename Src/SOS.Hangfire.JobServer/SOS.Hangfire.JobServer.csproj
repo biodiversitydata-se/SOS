@@ -64,8 +64,8 @@
 		<PackageReference Include="HangFire" Version="1.8.14" />
 		<PackageReference Include="HangFire.Autofac" Version="2.6.0" />
 		<PackageReference Include="HangFire.Mongo" Version="1.10.9" />
-		<PackageReference Include="MassTransit" Version="8.2.5" />
-		<PackageReference Include="MassTransit.Azure.ServiceBus.Core" Version="8.2.5" />
+		<PackageReference Include="MassTransit" Version="8.3.0" />
+		<PackageReference Include="MassTransit.Azure.ServiceBus.Core" Version="8.3.0" />
 		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="8.0.1" />
 		<PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="8.0.0" />

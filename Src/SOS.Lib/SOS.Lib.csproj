@@ -34,7 +34,7 @@
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.10" />		
 		<PackageReference Include="MongoDB.Driver" Version="2.29.0" />
 		<PackageReference Include="MongoDB.Driver.GridFS" Version="2.29.0" />
-		<PackageReference Include="NEST" Version="7.17.5" />
+		<PackageReference Include="NEST" Version="7.17.4" />
 		<PackageReference Include="NetTopologySuite" Version="2.5.0" />
 		<PackageReference Include="NetTopologySuite.IO.GeoJSON" Version="4.0.0" />
 		<PackageReference Include="NetTopologySuite.IO.GeoJSON4STJ" Version="4.0.0" />
