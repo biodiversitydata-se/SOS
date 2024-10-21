@@ -353,8 +353,6 @@ namespace SOS.Lib.Managers
                     return null!;
                 }
 
-                var metaData = CalculateMetadata(gridCellsMetric);
-
                 // We need features to return later so we create them now and don't need to create the polygon more than once
                 var gridCellFeaturesMetric = gridCellsMetric.Select(gc => gc.MetricBoundingBox
                     .ToPolygon()
@@ -366,6 +364,7 @@ namespace SOS.Lib.Managers
                     })
                 ).ToDictionary(f => (string)f.Attributes["id"], f => f);
 
+                var metaData = CalculateMetadata(gridCellsMetric);
                 var featureCollection = new FeatureCollection
                 {
                     BoundingBox = new Envelope(new Coordinate(metaData.MinX, metaData.MaxY), new Coordinate(metaData.MaxX, metaData.MinY)).Transform((CoordinateSys)metricCoordinateSys, coordinateSystem)

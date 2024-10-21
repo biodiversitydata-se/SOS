@@ -374,9 +374,12 @@ namespace SOS.Lib.Extensions
         /// <returns></returns>
         public static Geometry ConcaveHull(this Polygon[] polygons, bool useCenterPoint = true, double alphaValue = 0, bool useEdgeLengthRatio = false, bool allowHoles = false)
         {
+            if (!polygons?.Any() ?? true)
+            {
+                return null;
+            }
             var points = polygons.CalculationPoints(useCenterPoint);
-
-            return points.ToArray().ConcaveHull(alphaValue, useEdgeLengthRatio, allowHoles);
+            return points?.ToArray().ConcaveHull(alphaValue, useEdgeLengthRatio, allowHoles);
         }
 
         /// <summary>
