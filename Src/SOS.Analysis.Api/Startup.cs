@@ -193,46 +193,52 @@ namespace SOS.Analysis.Api
             var userServiceConfiguration = Configuration.GetSection("UserServiceConfiguration").Get<UserServiceConfiguration>();
 
             // Authentication
-            if (userServiceConfiguration!.UseUserAdmin2Api)
+            services.AddAuthentication(options =>
             {
-                services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                    .AddJwtBearer(options =>
-                    {
-                        options.Audience = userServiceConfiguration.IdentityProvider.Audience;
-                        options.Authority = userServiceConfiguration.IdentityProvider.Authority;
-                        options.RequireHttpsMetadata = userServiceConfiguration.IdentityProvider.RequireHttpsMetadata;
-                        options.TokenValidationParameters.RoleClaimType = "rname";
-                        options.Events = new JwtBearerEvents
-                        {
-                            OnTokenValidated = context =>
-                            {
-                                var claimsIdentity = context.Principal?.Identity as ClaimsIdentity;
-                                var scopeClaim = claimsIdentity?.FindFirst("scope");
-                                if (claimsIdentity != null && scopeClaim != null)
-                                {
-                                    var scopes = scopeClaim.Value.Split(' ');
-                                    claimsIdentity.RemoveClaim(scopeClaim);
-                                    foreach (var scope in scopes)
-                                    {
-                                        claimsIdentity.AddClaim(new Claim("scope", scope));
-                                    }
-                                }
-                                return Task.CompletedTask;
-                            }
-                        };
-                    });
-            }
-            else
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer("UserAdmin2", options =>
             {
-                services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(options =>
+                options.Audience = userServiceConfiguration!.IdentityProvider.Audience;
+                options.Authority = userServiceConfiguration.IdentityProvider.Authority;
+                options.RequireHttpsMetadata = userServiceConfiguration.IdentityProvider.RequireHttpsMetadata;
+                options.TokenValidationParameters.RoleClaimType = "rname";
+                options.Events = new JwtBearerEvents
                 {
-                    options.Audience = identityServerConfiguration!.Audience;
-                    options.Authority = identityServerConfiguration.Authority;
-                    options.RequireHttpsMetadata = identityServerConfiguration.RequireHttpsMetadata;
-                    options.TokenValidationParameters.RoleClaimType = "rname";
+                    OnTokenValidated = context =>
+                    {
+                        var claimsIdentity = context.Principal?.Identity as ClaimsIdentity;
+                        var scopeClaim = claimsIdentity?.FindFirst("scope");
+                        if (claimsIdentity != null && scopeClaim != null)
+                        {
+                            var scopes = scopeClaim.Value.Split(' ');
+                            claimsIdentity.RemoveClaim(scopeClaim);
+                            foreach (var scope in scopes)
+                            {
+                                claimsIdentity.AddClaim(new Claim("scope", scope));
+                            }
+                        }
+                        return Task.CompletedTask;
+                    }
+                };
+            })
+            .AddJwtBearer("UserAdmin1", options =>
+            {
+                options.Audience = identityServerConfiguration.Audience;
+                options.Authority = identityServerConfiguration.Authority;
+                options.RequireHttpsMetadata = identityServerConfiguration.RequireHttpsMetadata;
+                options.TokenValidationParameters.RoleClaimType = "rname";
+            });
+
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("MultipleIdentityProviders", policy =>
+                {
+                    policy.RequireAuthenticatedUser();
+                    policy.AddAuthenticationSchemes("UserAdmin1", "UserAdmin2");
                 });
-            }
+            });
 
             // Add application insights.
             services.AddApplicationInsightsTelemetry(Configuration);

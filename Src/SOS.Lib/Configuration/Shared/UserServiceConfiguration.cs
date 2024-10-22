@@ -8,11 +8,6 @@
         public string UserAdmin2ApiBaseAddress { get; set; }
 
         /// <summary>
-        /// Decides whether User Admin 2 - User API should be used.
-        /// </summary>
-        public bool UseUserAdmin2Api { get; set; }
-
-        /// <summary>
         /// SOS client id.
         /// </summary>
         public string ClientId { get; set; }

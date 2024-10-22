@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Exceptions;
 using SOS.Lib.Helpers;
@@ -47,6 +48,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [Authorize(Policy = "MultipleIdentityProviders")]
         [AzureApi, AzureInternalApi]
         public async Task<IActionResult> GetUserInformation(
             [FromQuery] string applicationIdentifier = null,

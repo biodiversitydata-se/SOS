@@ -53,12 +53,34 @@ namespace SOS.Lib.Services
 
         /// <inheritdoc />
         public async Task<UserModel> GetUserAsync()
-        {
-            if (!_userServiceConfiguration.UseUserAdmin2Api)
-                return await GetUserFromUserAdmin1Async();
-            else
+        {            
+            if (IsUserAdmin2Token())
                 return await GetUserFromUserAdmin2Async();
+            else
+                return await GetUserFromUserAdmin1Async();
         }
+
+        private bool IsUserAdmin2Token()
+        {
+            JsonWebToken jwtToken = null;
+
+            try
+            {
+                string token = _authorizationProvider.GetAuthHeader().Replace("Bearer ", "", StringComparison.OrdinalIgnoreCase);
+                var handler = new JsonWebTokenHandler();
+                jwtToken = handler.ReadJsonWebToken(token);
+                Uri tokenUri = new Uri(jwtToken.Issuer.TrimEnd('/'));
+                Uri userAdmin2AuthUri = new Uri(_userServiceConfiguration.IdentityProvider.Authority.TrimEnd('/'));
+                return Uri.Compare(tokenUri, userAdmin2AuthUri, UriComponents.SchemeAndServer | UriComponents.Path, UriFormat.Unescaped, StringComparison.OrdinalIgnoreCase) == 0;
+            }
+            catch (Exception ex) 
+            {
+                _logger.LogError(ex, "Failed to compare token issuer '{Issuer}' with expected authority '{Authority}'.", jwtToken?.Issuer, _userServiceConfiguration.IdentityProvider.Authority);
+            }
+
+            return false;            
+        }
+
 
         private async Task<UserModel> GetUserFromUserAdmin1Async()
         {
@@ -119,10 +141,10 @@ namespace SOS.Lib.Services
         /// <returns></returns>
         public async Task<UserModel> GetUserByIdAsync(int userId)
         {
-            if (!_userServiceConfiguration.UseUserAdmin2Api)
-                return await GetUserByIdFromUserAdmin1Async(userId);
-            else
+            if (IsUserAdmin2Token())
                 return await GetUserByIdFromUserAdmin2Async(userId);
+            else
+                return await GetUserByIdFromUserAdmin1Async(userId);
         }
 
         private async Task<UserModel> GetUserByIdFromUserAdmin1Async(int userId)
@@ -169,10 +191,10 @@ namespace SOS.Lib.Services
         /// <inheritdoc />
         public async Task<IEnumerable<AuthorityModel>> GetUserAuthoritiesAsync(int userId, string authorizationApplicationIdentifier = null, string cultureCode = "sv-SE")
         {
-            if (!_userServiceConfiguration.UseUserAdmin2Api)
-                return await GetUserAuthoritiesFromUserAdmin1Async(userId, authorizationApplicationIdentifier, cultureCode);
-            else
+            if (IsUserAdmin2Token())
                 return await GetUserAuthoritiesFromUserAdmin2Async(userId);
+            else
+                return await GetUserAuthoritiesFromUserAdmin1Async(userId, authorizationApplicationIdentifier, cultureCode);
         }
 
         private async Task<IEnumerable<AuthorityModel>> GetUserAuthoritiesFromUserAdmin1Async(int userId, string authorizationApplicationIdentifier = null, string cultureCode = "sv-SE")
@@ -218,10 +240,10 @@ namespace SOS.Lib.Services
         /// <inheritdoc />
         public async Task<IEnumerable<RoleModel>> GetUserRolesAsync(int userId, string authorizationApplicationIdentifier = null, string cultureCode = "sv-SE")
         {
-            if (!_userServiceConfiguration.UseUserAdmin2Api)
-                return await GetUserRolesFromUserAdmin1Async(userId, authorizationApplicationIdentifier, cultureCode);
-            else
+            if (IsUserAdmin2Token())
                 return await GetUserRolesFromUserAdmin2Async(userId, authorizationApplicationIdentifier, cultureCode);
+            else
+                return await GetUserRolesFromUserAdmin1Async(userId, authorizationApplicationIdentifier, cultureCode);
         }
 
         private async Task<IEnumerable<RoleModel>> GetUserRolesFromUserAdmin1Async(int userId, string authorizationApplicationIdentifier = null, string cultureCode = "sv-SE")
@@ -269,10 +291,10 @@ namespace SOS.Lib.Services
         /// <inheritdoc />
         public async Task<PersonModel> GetPersonAsync(int personId, string cultureCode = "sv-SE")
         {
-            if (!_userServiceConfiguration.UseUserAdmin2Api)
-                return await GetPersonFromUserAdmin1Async(personId, cultureCode);
-            else
+            if (IsUserAdmin2Token())
                 return await GetPersonFromUserAdmin2Async(personId, cultureCode);
+            else
+                return await GetPersonFromUserAdmin1Async(personId, cultureCode);
         }
 
         private async Task<PersonModel> GetPersonFromUserAdmin1Async(int personId, string cultureCode = "sv-SE")

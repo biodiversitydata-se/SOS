@@ -368,7 +368,7 @@ namespace SOS.Analysis.Api.Controllers
         /// <param name="confirmEncryptPassword">Confirm encrypt password</param>
         /// <returns></returns>
         [HttpPost("/internal/order/aoo_eoo")]
-        [Authorize/*(Roles = "Privat")*/]
+        [Authorize(Policy = "MultipleIdentityProviders")]
         [ProducesResponseType(typeof(FeatureCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
@@ -576,7 +576,7 @@ namespace SOS.Analysis.Api.Controllers
         /// <param name="confirmEncryptPassword">Confirm encrypt password</param>
         /// <returns></returns>
         [HttpPost("/internal/order/aoo_eoo/article17")]
-        [Authorize/*(Roles = "Privat")*/]
+        [Authorize(Policy = "MultipleIdentityProviders")]
         [ProducesResponseType(typeof(FeatureCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
