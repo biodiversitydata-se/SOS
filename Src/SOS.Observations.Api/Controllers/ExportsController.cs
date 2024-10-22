@@ -309,7 +309,7 @@ namespace SOS.Observations.Api.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("My")]
-        [Authorize(Policy = "MultipleIdentityProviders")]
+        [Authorize]
         [ProducesResponseType(typeof(IEnumerable<ExportJobInfoDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
@@ -340,7 +340,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("My/{id}")]
-        [Authorize(Policy = "MultipleIdentityProviders")]
+        [Authorize]
         [ProducesResponseType(typeof(ExportJobInfoDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
@@ -713,7 +713,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="cultureCode">The culture code used for translating vocabulary values.</param>
         /// <returns></returns>
         [HttpPost("Order/Csv")]
-        [Authorize(Policy = "MultipleIdentityProviders")]
+        [Authorize]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -800,7 +800,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="confirmEncryptPassword">Confirm encrypt password</param>
         /// <returns></returns>
         [HttpPost("Order/DwC")]
-        [Authorize(Policy = "MultipleIdentityProviders")]
+        [Authorize]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -886,7 +886,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="cultureCode">The culture code used for translating vocabulary values.</param>
         /// <returns></returns>
         [HttpPost("Order/Excel")]
-        [Authorize(Policy = "MultipleIdentityProviders")]
+        [Authorize]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -979,7 +979,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="cultureCode">The culture code used for translation vocabulary values.</param>
         /// <returns></returns>
         [HttpPost("Order/GeoJson")]
-        [Authorize(Policy = "MultipleIdentityProviders")]
+        [Authorize]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -1390,7 +1390,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="cultureCode">The culture code used for translating vocabulary values.</param>
         /// <returns></returns>
         [HttpPost("Internal/Order/Csv")]
-        [Authorize(Policy = "MultipleIdentityProviders")]
+        [Authorize]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -1477,7 +1477,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="confirmEncryptPassword">Confirm encrypt password</param>
         /// <returns></returns>
         [HttpPost("Internal/Order/DwC")]
-        [Authorize(Policy = "MultipleIdentityProviders")]
+        [Authorize]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -1562,7 +1562,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="cultureCode">The culture code used for translating vocabulary values.</param>
         /// <returns></returns>
         [HttpPost("Internal/Order/Excel")]
-        [Authorize(Policy = "MultipleIdentityProviders")]
+        [Authorize]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
@@ -1653,7 +1653,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="cultureCode">The culture code used for translation vocabulary values.</param>
         /// <returns></returns>
         [HttpPost("Internal/Order/GeoJson")]
-        [Authorize(Policy = "MultipleIdentityProviders")]
+        [Authorize]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]

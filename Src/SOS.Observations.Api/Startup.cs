@@ -22,6 +22,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.OpenApi.Models;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
@@ -266,16 +267,15 @@ namespace SOS.Observations.Api
 
             // Authentication
             services.AddAuthentication(options =>
-            {                
-                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            {
+                options.DefaultScheme = "MultipleIdentityProviders";
+                options.DefaultChallengeScheme = "MultipleIdentityProviders";
             })
             .AddJwtBearer("UserAdmin2", options =>
             {
                 options.Audience = userServiceConfiguration.IdentityProvider.Audience;
                 options.Authority = userServiceConfiguration.IdentityProvider.Authority;
                 options.RequireHttpsMetadata = userServiceConfiguration.IdentityProvider.RequireHttpsMetadata;
-                options.TokenValidationParameters.RoleClaimType = "rname";
                 options.Events = new JwtBearerEvents
                 {
                     OnTokenValidated = context =>
@@ -300,16 +300,21 @@ namespace SOS.Observations.Api
                 options.Audience = identityServerConfiguration.Audience;
                 options.Authority = identityServerConfiguration.Authority;
                 options.RequireHttpsMetadata = identityServerConfiguration.RequireHttpsMetadata;
-                options.TokenValidationParameters.RoleClaimType = "rname";
-            });
-            
-            services.AddAuthorization(options =>
+            })
+            .AddPolicyScheme("MultipleIdentityProviders", "MultipleIdentityProviders", options =>
             {
-                options.AddPolicy("MultipleIdentityProviders", policy =>
+                // Select schema based on request (UserAdmin1 or UserAdmin2)
+                options.ForwardDefaultSelector = context =>
                 {                    
-                    policy.RequireAuthenticatedUser();
-                    policy.AddAuthenticationSchemes("UserAdmin1", "UserAdmin2");
-                });
+                    var authHeader = context.Request.Headers["Authorization"].FirstOrDefault();
+                    if (authHeader != null && authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (TokenHelper.IsUserAdmin2Token(authHeader, userServiceConfiguration.IdentityProvider.Authority))                        
+                            return "UserAdmin2"; 
+                    }
+
+                    return "UserAdmin1";
+                };
             });
 
             services.AddApiVersioning(options =>
