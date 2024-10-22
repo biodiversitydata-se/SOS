@@ -1096,7 +1096,7 @@
     "Names": [
       {
         "CultureCode": "en-GB",
-        "Value": "Swedish National Forest Inventory: Presence-absence vegetation data (1995-current)]"
+        "Value": "Swedish National Forest Inventory: Presence-absence vegetation data (1995-current)"
       },
       {
         "CultureCode": "sv-SE",
@@ -1106,7 +1106,7 @@
     "Organizations": [
       {
         "CultureCode": "en-GB",
-        "Value": "Department of Forest Resource Management, SLU"
+        "Value": "Swedish National Forest Inventory, Department of Forest Resource Management, SLU"
       },
       {
         "CultureCode": "sv-SE",
@@ -1801,7 +1801,7 @@
     "IncludeInHealthCheck": true,
     "IncludeInScheduledHarvest": false,
     "IncludeInSearchByDefault": true,
-    "IsActive": false,
+    "IsActive": true,
     "Names": [
       {
         "CultureCode": "en-GB",
@@ -2084,7 +2084,7 @@
     "Organizations": [
       {
         "CultureCode": "en-GB",
-        "Value": "Department of Forest Resource Management, SLU"
+        "Value": "Swedish National Forest Inventory, Department of Forest Resource Management, SLU"
       },
       {
         "CultureCode": "sv-SE",

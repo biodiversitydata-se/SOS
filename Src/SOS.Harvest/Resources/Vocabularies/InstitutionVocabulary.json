@@ -2652,6 +2652,11 @@
       "Id": 5021,
       "Value": "GBIF-SE:GNM",
       "Localized": false
+    },
+    {
+      "Id": 5022,
+      "Value": "Swedish National Forest Inventory, Department of Forest Resource Management, SLU",
+      "Localized": false
     }
   ],
   "ExternalSystemsMapping": [
@@ -6819,6 +6824,10 @@
             {
               "Value": "GBIF-SE:GNM",
               "SosId": 5021
+            },
+            {
+              "Value": "Swedish National Forest Inventory, Department of Forest Resource Management, SLU",
+              "SosId": 5022
             }
           ]
         }

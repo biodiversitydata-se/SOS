@@ -324,12 +324,12 @@ namespace SOS.Lib.Managers
             }
             catch (ArgumentOutOfRangeException e)
             {
-                _logger.LogError(e, "Failed to calculate AOO/EOO. To many buckets");
+                _logger.LogError(e, $"Failed to calculate AOO/EOO. To many buckets. Taxa filter: {string.Join(", ", filter?.Taxa?.Ids ?? Enumerable.Empty<int>())}");
                 throw;
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Failed to calculate AOO/EOO.");
+                _logger.LogError(e, $"Failed to calculate AOO/EOO. Taxa filter: {string.Join(", ", filter?.Taxa?.Ids ?? Enumerable.Empty<int>())}");
                 throw;
             }
         }
