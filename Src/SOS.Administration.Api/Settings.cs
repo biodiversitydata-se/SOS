@@ -35,22 +35,25 @@ public static class Settings
 
         AllowedOrigins = GetConfigValueString("AllowedOrigins", configuration, logger).Split(",").Select(s => s.Trim()).ToArray();
 
-        ImportConfiguration = GetConfigSection<ImportConfiguration>("ImportConfiguration", configuration, logger);
-        ProcessConfiguration = GetConfigSection<ProcessConfiguration>("ProcessConfiguration", configuration, logger);
-        UserServiceConfiguration = GetConfigSection<UserServiceConfiguration>("UserServiceConfiguration", configuration, logger);
-        SosApiConfiguration = GetConfigSection<SosApiConfiguration>("SosApiConfiguration", configuration, logger);
+        ImportConfiguration = GetConfigSection<ImportConfiguration>("ImportConfiguration", configuration, logger, sensitiveSetting: false);
+        ProcessConfiguration = GetConfigSection<ProcessConfiguration>("ProcessConfiguration", configuration, logger, sensitiveSetting: false);
+        UserServiceConfiguration = GetConfigSection<UserServiceConfiguration>("UserServiceConfiguration", configuration, logger, sensitiveSetting: false);
+        SosApiConfiguration = GetConfigSection<SosApiConfiguration>("SosApiConfiguration", configuration, logger, sensitiveSetting: false);
 
         // ApplicationInsights
-        ApplicationInsightsConfiguration = GetConfigSection<ApplicationInsightsConfiguration>("ApplicationInsights", configuration, logger);
-        InstrumentationKey = GetConfigValueString("InstrumentationKey", configuration, logger, sensitiveSetting: true, required: false);
-        if (ApplicationInsightsConfiguration.InstrumentationKey.Contains("SECRET_PLACEHOLDER"))
+        ApplicationInsightsConfiguration = GetConfigSection<ApplicationInsightsConfiguration>("ApplicationInsights", configuration, logger, sensitiveSetting: false, required: false);
+        if (ApplicationInsightsConfiguration != null)
         {
-            ApplicationInsightsConfiguration.InstrumentationKey = InstrumentationKey;
-            logger.LogInformation("replaced SECRET_PLACEHOLDER in ApplicationInsightsConfiguration.InstrumentationKey with the value in InstrumentationKey");
+            InstrumentationKey = GetConfigValueString("InstrumentationKey", configuration, logger, sensitiveSetting: true, required: false);
+            if (ApplicationInsightsConfiguration.InstrumentationKey.Contains("SECRET_PLACEHOLDER"))
+            {
+                ApplicationInsightsConfiguration.InstrumentationKey = InstrumentationKey;
+                logger.LogInformation("replaced SECRET_PLACEHOLDER in ApplicationInsightsConfiguration.InstrumentationKey with the value in InstrumentationKey");
+            }
         }
 
         // Verbatim db
-        VerbatimDbConfiguration = GetConfigSection<MongoDbConfiguration>("VerbatimDbConfiguration", configuration, logger);
+        VerbatimDbConfiguration = GetConfigSection<MongoDbConfiguration>("VerbatimDbConfiguration", configuration, logger, sensitiveSetting: false);
         VerbatimDbUserName = GetConfigValueString("VerbatimDbUserName", configuration, logger, sensitiveSetting: true, required: false);
         if (VerbatimDbConfiguration.UserName.Contains("SECRET_PLACEHOLDER"))
         {
@@ -65,7 +68,7 @@ public static class Settings
         }
 
         // Process db
-        ProcessDbConfiguration = GetConfigSection<MongoDbConfiguration>("ProcessDbConfiguration", configuration, logger);
+        ProcessDbConfiguration = GetConfigSection<MongoDbConfiguration>("ProcessDbConfiguration", configuration, logger, sensitiveSetting: false);
         ProcessDbUserName = GetConfigValueString("ProcessDbUserName", configuration, logger, sensitiveSetting: true, required: false);
         if (ProcessDbConfiguration.UserName.Contains("SECRET_PLACEHOLDER"))
         {
@@ -80,7 +83,7 @@ public static class Settings
         }
         
         // Hangfire db
-        HangfireDbConfiguration = GetConfigSection<HangfireDbConfiguration>("HangfireDbConfiguration", configuration, logger);
+        HangfireDbConfiguration = GetConfigSection<HangfireDbConfiguration>("HangfireDbConfiguration", configuration, logger, sensitiveSetting: false);
         HangfireDbUserName = GetConfigValueString("HangfireDbUserName", configuration, logger, sensitiveSetting: true, required: false);
         if (HangfireDbConfiguration.UserName.Contains("SECRET_PLACEHOLDER"))
         {
@@ -95,7 +98,7 @@ public static class Settings
         }
     }
 
-    private static T GetConfigSection<T>(string key, IConfiguration configuration, ILogger logger, bool sensitiveSetting = false)
+    private static T GetConfigSection<T>(string key, IConfiguration configuration, ILogger logger, bool sensitiveSetting = false, bool required = true)
     {
         var envValueStr = Environment.GetEnvironmentVariable(key);
         var envValue = !string.IsNullOrEmpty(envValueStr) ? JsonSerializer.Deserialize<T>(envValueStr) : default;
@@ -112,8 +115,10 @@ public static class Settings
             return confValue;
         }
 
-        throw new Exception($"value for {key} is null or empty!");
-
+        if (required)
+            throw new Exception($"value for {key} is null or empty!");
+        else
+            return default;
     }
     private static string GetConfigValueString(string key, IConfiguration configuration, ILogger logger, bool sensitiveSetting = false, bool required = true)
     {
