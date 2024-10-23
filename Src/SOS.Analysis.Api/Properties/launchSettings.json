@@ -25,7 +25,17 @@
       "launchUrl": "swagger",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "ST",
-        "DISABLE_HANGFIRE_INIT": "true"                
+        "DISABLE_HANGFIRE_INIT": "true"
+      },
+      "applicationUrl": "https://localhost:7089;http://localhost:5089"
+    },
+    "SOS.Analysis.Api (Prod)": {
+      "commandName": "IISExpress",
+      "launchBrowser": true,
+      "launchUrl": "swagger",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Prod",
+        "DISABLE_HANGFIRE_INIT": "true"
       },
       "applicationUrl": "https://localhost:7089;http://localhost:5089"
     },

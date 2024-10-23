@@ -254,10 +254,35 @@ namespace SOS.Lib.Managers
                 var metricEooGeometries = new Dictionary<double, Geometry>();
                 foreach (var alphaValue in alphaValues)
                 {
-                    var eooGeometry = gridCellFeaturesMetric
-                        .Select(f => f.Value.Geometry as Polygon)
-                            .ToArray()
-                                .ConcaveHull(useCenterPoint, alphaValue, useEdgeLengthRatio, allowHoles);
+                    Geometry eooGeometry = null;
+                    try
+                    {
+                        eooGeometry = gridCellFeaturesMetric
+                            .Select(f => f.Value.Geometry as Polygon)
+                                .ToArray()
+                                    .ConcaveHull(useCenterPoint, alphaValue, useEdgeLengthRatio, allowHoles);
+                    }
+                    catch (Exception ex)
+                    {
+                        // There is a bug in Nettopologysuite, try useCentPoint=false instead.
+                        _logger.LogError(ex, $"Error when calculating ConcaveHull(). Taxa filter: {string.Join(", ", filter?.Taxa?.Ids ?? Enumerable.Empty<int>())}");
+                        if (useCenterPoint)
+                        {
+                            _logger.LogInformation("Try calculate ConcaveHull() with useCenterPoint=false");
+                            try
+                            {
+                                eooGeometry = gridCellFeaturesMetric
+                                    .Select(f => f.Value.Geometry as Polygon)
+                                        .ToArray()
+                                            .ConcaveHull(false, alphaValue, useEdgeLengthRatio, allowHoles);
+                            }
+                            catch(Exception e)
+                            {
+                                _logger.LogError(ex, $"Error when calculating ConcaveHull() with useCenterPoint=false.");
+                            }
+                        }
+                    }
+
 
                     if (eooGeometry == null)
                     {
