@@ -44,7 +44,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="cultureCode">The culture code used for translating role descriptions.</param>
         /// <returns></returns>
         [HttpGet("Information")]
-        [ProducesResponseType(typeof(IEnumerable<UserInformationDto>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(UserInformationDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]

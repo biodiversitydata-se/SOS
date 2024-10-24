@@ -27,8 +27,7 @@ namespace SOS.Shared.Api.Dtos
 
         /// <summary>
         ///     Paged records
-        /// </summary>
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        /// </summary>        
         public IEnumerable<T> Records { get; set; }
 
         /// <summary>
