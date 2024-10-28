@@ -651,6 +651,13 @@ namespace SOS.Observations.Api
             if (_isDevelopment)
             {
                 app.UseDeveloperExceptionPage();
+
+                // Allow client calls
+                app.UseCors(cors => cors
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .AllowAnyOrigin()
+                );
             }
             else
             {
@@ -670,13 +677,6 @@ namespace SOS.Observations.Api
             {
                 app.UseHangfireDashboard();
             }
-
-            // Allow client calls
-            app.UseCors(cors => cors
-                .AllowAnyHeader()
-                .AllowAnyMethod()
-                .AllowAnyOrigin()            
-            );
 
             // Enable middleware to serve generated Swagger as a JSON endpoint.
             app.UseSwagger();

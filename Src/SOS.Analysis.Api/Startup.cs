@@ -468,15 +468,17 @@ namespace SOS.Analysis.Api
             if (_isDevelopment)
             {
                 app.UseDeveloperExceptionPage();
+                // Allow client calls
+                app.UseCors(cors => cors
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .AllowAnyOrigin()
+                );
+                telemetryConfiguration.DisableTelemetry = true;
             }
             else
             {
                 app.UseHsts();
-            }
-
-            if (_isDevelopment)
-            {
-                telemetryConfiguration.DisableTelemetry = true;
             }
 
             if (applicationInsightsConfiguration.EnableRequestBodyLogging)
