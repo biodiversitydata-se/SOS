@@ -22,6 +22,7 @@ using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
@@ -396,7 +397,7 @@ namespace SOS.Lib.Repositories.Processed
             var clusterHealthDictionary = _clusterHealthCache.Get();
             if (clusterHealthDictionary == null)
             {
-                clusterHealthDictionary = new Dictionary<string, ClusterHealthResponse>();
+                clusterHealthDictionary = new ConcurrentDictionary<string, ClusterHealthResponse>();
                 _clusterHealthCache.Set(clusterHealthDictionary);
             }
 
@@ -753,7 +754,7 @@ namespace SOS.Lib.Repositories.Processed
             ElasticSearchConfiguration elasticConfiguration,
             ICache<string, ProcessedConfiguration> processedConfigurationCache,
             ITaxonManager taxonManager,
-            IClassCache<Dictionary<string, ClusterHealthResponse>> clusterHealthCache,
+            IClassCache<ConcurrentDictionary<string, ClusterHealthResponse>> clusterHealthCache,
             ILogger<ProcessedObservationCoreRepository> logger) : base(true, elasticClientManager, processedConfigurationCache, elasticConfiguration, clusterHealthCache, logger)
         {
             if (elasticConfiguration.Clusters != null)

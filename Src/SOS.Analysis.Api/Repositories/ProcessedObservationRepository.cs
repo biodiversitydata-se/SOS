@@ -8,6 +8,7 @@ using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Repositories.Processed;
+using System.Collections.Concurrent;
 
 namespace SOS.Analysis.Api.Repositories
 {
@@ -18,7 +19,7 @@ namespace SOS.Analysis.Api.Repositories
             ICache<string, ProcessedConfiguration> processedConfigurationCache,
             ElasticSearchConfiguration elasticConfiguration,
             ITaxonManager taxonManager,
-            IClassCache<Dictionary<string, ClusterHealthResponse>> clusterHealthCache,
+            IClassCache<ConcurrentDictionary<string, ClusterHealthResponse>> clusterHealthCache,
             ILogger<ProcessedObservationRepository> logger) : base(elasticClientManager, elasticConfiguration, processedConfigurationCache, taxonManager, clusterHealthCache, logger)
         {
 

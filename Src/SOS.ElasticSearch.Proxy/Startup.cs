@@ -21,6 +21,7 @@ using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Resource;
 using SOS.Lib.Repositories.Resource.Interfaces;
+using System.Collections.Concurrent;
 using System.Globalization;
 using System.Text.Json.Serialization;
 
@@ -124,8 +125,8 @@ namespace SOS.ElasticSearch.Proxy
 
             // Add Caches
             services.AddSingleton<ICache<string, ProcessedConfiguration>, ProcessedConfigurationCache>();
-            var clusterHealthCache = new ClassCache<Dictionary<string, ClusterHealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<Dictionary<string, ClusterHealthResponse>>>()) { CacheDuration = TimeSpan.FromMinutes(2) };
-            services.AddSingleton<IClassCache<Dictionary<string, ClusterHealthResponse>>>(clusterHealthCache);
+            var clusterHealthCache = new ClassCache<ConcurrentDictionary<string, ClusterHealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<string, ClusterHealthResponse>>>()) { CacheDuration = TimeSpan.FromMinutes(2) };
+            services.AddSingleton<IClassCache<ConcurrentDictionary<string, ClusterHealthResponse>>>(clusterHealthCache);
 
             // Add repositories
             services.AddScoped<IProcessedConfigurationRepository, ProcessedConfigurationRepository>();

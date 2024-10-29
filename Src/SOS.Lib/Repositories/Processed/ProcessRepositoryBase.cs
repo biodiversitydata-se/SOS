@@ -9,6 +9,7 @@ using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -22,7 +23,7 @@ namespace SOS.Lib.Repositories.Processed
     {
         private readonly IElasticClientManager _elasticClientManager;
         private readonly ICache<string, ProcessedConfiguration> _processedConfigurationCache;
-        protected readonly IClassCache<Dictionary<string, ClusterHealthResponse>> _clusterHealthCache;
+        protected readonly IClassCache<ConcurrentDictionary<string, ClusterHealthResponse>> _clusterHealthCache;
         protected readonly ElasticSearchConfiguration _elasticConfiguration;
         private readonly ElasticSearchIndexConfiguration _elasticSearchIndexConfiguration;
         private readonly bool _toggleable;
@@ -136,7 +137,7 @@ namespace SOS.Lib.Repositories.Processed
             IElasticClientManager elasticClientManager,
             ICache<string, ProcessedConfiguration> processedConfigurationCache,
             ElasticSearchConfiguration elasticConfiguration,
-            IClassCache<Dictionary<string, ClusterHealthResponse>> clusterHealthCache,
+            IClassCache<ConcurrentDictionary<string, ClusterHealthResponse>> clusterHealthCache,
             ILogger<ProcessRepositoryBase<TEntity, TKey>> logger
         )
         {

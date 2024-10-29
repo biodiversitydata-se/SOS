@@ -14,6 +14,7 @@ using SOS.Lib.Models.TaxonTree;
 using SOS.Lib.Repositories.Processed;
 using SOS.Observations.Api.Repositories.Interfaces;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -534,7 +535,7 @@ namespace SOS.Observations.Api.Repositories
             ElasticSearchConfiguration elasticConfiguration,
             ICache<string, ProcessedConfiguration> processedConfigurationCache,
             ITaxonManager taxonManager,
-            IClassCache<Dictionary<string, ClusterHealthResponse>> clusterHealthCache,
+            IClassCache<ConcurrentDictionary<string, ClusterHealthResponse>> clusterHealthCache,
             ILogger<ProcessedTaxonRepository> logger) : base(true, elasticClientManager, processedConfigurationCache, elasticConfiguration, clusterHealthCache, logger)
         {
             _taxonManager = taxonManager ?? throw new ArgumentNullException(nameof(taxonManager));
