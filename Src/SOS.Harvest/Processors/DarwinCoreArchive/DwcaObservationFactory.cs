@@ -22,7 +22,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
     /// </summary>
     public class DwcaObservationFactory : ObservationFactoryBase, IObservationFactory<DwcObservationVerbatim>
     {
-        private const int DefaultCoordinateUncertaintyInMeters = 5000;
+        private int DefaultCoordinateUncertaintyInMeters = 5000;
         private readonly IAreaHelper _areaHelper;
         private readonly NetTopologySuite.IO.WKTReader _wktReader = new NetTopologySuite.IO.WKTReader();
 
@@ -51,6 +51,10 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             _englishDataproviderName = dataProvider?.Names?.Translate("en-GB")!;
             _englishOrganizationName = dataProvider?.Organizations?.Translate("en-GB")!;
             _englishOrganizationNameLowerCase = _englishOrganizationName?.ToLower()!;
+            if (dataProvider != null && dataProvider.CoordinateUncertaintyInMeters > 0)
+            {
+                DefaultCoordinateUncertaintyInMeters = dataProvider.CoordinateUncertaintyInMeters;
+            }
         }
 
         public static async Task<DwcaObservationFactory> CreateAsync(
