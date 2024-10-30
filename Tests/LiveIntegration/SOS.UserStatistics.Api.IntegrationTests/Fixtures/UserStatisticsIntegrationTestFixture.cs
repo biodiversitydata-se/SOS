@@ -3,6 +3,7 @@ using Nest;
 using SOS.Lib.Managers;
 using SOS.Lib.Models.Shared;
 using SOS.UserStatistics.Api.Cache.Managers;
+using System.Collections.Concurrent;
 
 namespace SOS.UserStatistics.Api.IntegrationTests.Fixtures;
 
@@ -82,7 +83,7 @@ public class UserStatisticsIntegrationTestFixture : FixtureBase, IDisposable
 
         var processedConfigurationCache = new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>()), memoryCache, new NullLogger<CacheBase<string, ProcessedConfiguration>>());
         var userStatisticsObservationRepository = new UserStatisticsObservationRepository(elasticClientManager, elasticConfiguration, processedConfigurationCache, 
-            new ClassCache<Dictionary<string, ClusterHealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<Dictionary<string, ClusterHealthResponse>>>()), new NullLogger<UserObservationRepository>());
+            new ClassCache<ConcurrentDictionary<string, ClusterHealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<string, ClusterHealthResponse>>>()), new NullLogger<UserObservationRepository>());
         var userService = CreateUserService();
         UserStatisticsProcessedObservationRepository = userStatisticsProcessedObservationRepository;
         var areaRepository = new AreaRepository(processClient, new NullLogger<AreaRepository>());
@@ -123,7 +124,7 @@ public class UserStatisticsIntegrationTestFixture : FixtureBase, IDisposable
             elasticConfiguration,
             new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>()), memoryCache, new NullLogger<CacheBase<string, ProcessedConfiguration>>() ),
             new Mock<ITaxonManager>().Object,
-            new ClassCache<Dictionary<string, ClusterHealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<Dictionary<string, ClusterHealthResponse>>>()),
+            new ClassCache<ConcurrentDictionary<string, ClusterHealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<string, ClusterHealthResponse>>>()),
             new NullLogger<ProcessedObservationCoreRepository>());
         return userStatisticsProcessedObservationRepository;
     }

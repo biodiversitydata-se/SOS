@@ -4,6 +4,7 @@ using SOS.UserStatistics.Api.Configuration;
 using SOS.Harvest.Extensions;
 using SOS.Lib.Models.Processed.Configuration;
 using Nest;
+using System.Collections.Concurrent;
 
 namespace SOS.UserStatistics.Api.AutomaticIntegrationTests.Fixtures;
 
@@ -181,7 +182,7 @@ public class UserStatisticsAutomaticIntegrationTestFixture : FixtureBase, IDispo
             elasticConfiguration,
             new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>()), memoryCache, new NullLogger<CacheBase<string, ProcessedConfiguration>>()),
             taxonManager,
-            new ClassCache<Dictionary<string, ClusterHealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<Dictionary<string, ClusterHealthResponse>>>()),
+            new ClassCache<ConcurrentDictionary<string, ClusterHealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<string, ClusterHealthResponse>>>()),
             null);
         return userStatisticsProcessedObservationRepository;
     }
@@ -196,7 +197,7 @@ public class UserStatisticsAutomaticIntegrationTestFixture : FixtureBase, IDispo
             elasticClientManager,
             elasticConfiguration,
             new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>()), memoryCache, new NullLogger<CacheBase<string, ProcessedConfiguration>>()),
-            new ClassCache<Dictionary<string, ClusterHealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<Dictionary<string, ClusterHealthResponse>>>()),
+            new ClassCache<ConcurrentDictionary<string, ClusterHealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<string, ClusterHealthResponse>>>()),
             new NullLogger<UserObservationRepository>());
 
         return userStatisticsObservationRepository;
