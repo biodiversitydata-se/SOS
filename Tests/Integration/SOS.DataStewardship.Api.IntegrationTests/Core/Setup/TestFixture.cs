@@ -20,6 +20,7 @@ using SOS.Lib.Models.TaxonTree;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging.Abstractions;
+using System.Collections.Concurrent;
 
 namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup
 {
@@ -89,8 +90,8 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup
             serviceCollection.AddSingleton<IClassCache<TaxonListSetsById>, ClassCache<TaxonListSetsById>>();
             serviceCollection.AddSingleton<IClassCache<TaxonTree<IBasicTaxon>>, ClassCache<TaxonTree<IBasicTaxon>>>();
             serviceCollection.AddSingleton<IProcessedConfigurationRepository, ProcessedConfigurationRepository>();
-            var clusterHealthCache = new ClassCache<Dictionary<string, ClusterHealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<Dictionary<string, ClusterHealthResponse>>>());
-            serviceCollection.AddSingleton<IClassCache<Dictionary<string, ClusterHealthResponse>>>(clusterHealthCache);
+            var clusterHealthCache = new ClassCache<ConcurrentDictionary<string, ClusterHealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<string, ClusterHealthResponse>>>());
+            serviceCollection.AddSingleton<IClassCache<ConcurrentDictionary<string, ClusterHealthResponse>>>(clusterHealthCache);
 
             return serviceCollection;
         }
