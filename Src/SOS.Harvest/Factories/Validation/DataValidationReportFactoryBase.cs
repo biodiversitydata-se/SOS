@@ -177,7 +177,8 @@ namespace SOS.Harvest.Factories.Validation
                             Id = valuePair.Key.Id,
                             Value = valuePair.Key.Value,
                             Count = valuePair.Value,
-                            VerbatimValues = verbatimFieldValues[pair.Key].Single(k => Equals(k.Key, valuePair.Key)).Value.ToList(),
+                            VerbatimValues = verbatimFieldValues[pair.Key]
+                                .FirstOrDefault(k => Equals(k.Key, valuePair.Key)).Value?.ToList() ?? new List<string>()
                         }).ToList(),
                     CustomValues = pair.Value.Where(valuePair => valuePair.Key.IsCustomValue())
                         .Select(valuePair => new DistinctValuesSummaryItem
@@ -246,6 +247,14 @@ namespace SOS.Harvest.Factories.Validation
                 }
                 processedFieldValues[vocabularyId][vocabularyValue]++;
 
+                if (verbatimValue == null)
+                {
+                    verbatimValue = "[null]";
+                }
+                else if (verbatimValue == "")
+                {
+                    verbatimValue = "[empty]";
+                }
                 if (!string.IsNullOrWhiteSpace(verbatimValue))
                 {
                     if (!verbatimFieldValues[vocabularyId].ContainsKey(vocabularyValue))

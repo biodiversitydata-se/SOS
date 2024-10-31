@@ -20,26 +20,46 @@
             /// Unknown defect
             /// </summary>
             Unknown = 0,
+            
             /// <summary>
             /// Taxon was not found
             /// </summary>
             TaxonNotFound,
+            
             /// <summary>
             /// Observation is not in Sweden
             /// </summary>
             LocationOutsideOfSweden,
+            
             /// <summary>
             /// Mandatory information is missing
             /// </summary>
             MissingMandatoryField,
+            
             /// <summary>
             /// Data don't make sense
             /// </summary>
             LogicError,
+            
             /// <summary>
             /// Value out of allowed range
             /// </summary>
-            ValueOutOfRange
+            ValueOutOfRange,
+            
+            /// <summary>
+            /// Date error
+            /// </summary>
+            DateError,
+
+            /// <summary>
+            /// Geographics error
+            /// </summary>
+            GeographicsError,
+
+            /// <summary>
+            /// Identifier error
+            /// </summary>
+            IdentifierError
         }
 
         /// <summary>
