@@ -214,11 +214,20 @@ namespace SOS.Harvest.Processors
                 return taxon;
             }
 
+            List<string> verbatimNames = new List<string>();
+            if (!string.IsNullOrEmpty(verbatimName))
+                verbatimNames.Add(verbatimName);
+            if (!string.IsNullOrEmpty(scientificNameAuthorship))
+                verbatimNames.Add(scientificNameAuthorship);
+            var firstName = names?.FirstOrDefault(n => !string.IsNullOrEmpty(n));
+            if (!string.IsNullOrEmpty(firstName))
+                verbatimNames.Add(firstName);            
+
             return new Lib.Models.Processed.Observation.Taxon
             {
                 Id = -1,
                 VerbatimId = verbatimId ?? taxonId.ToString(),
-                VerbatimName = $"verbatimName='{verbatimName}', scientificName='{scientificNameAuthorship}', names.first='{names?.FirstOrDefault(n => !string.IsNullOrEmpty(n))}'"
+                VerbatimName = verbatimNames.Count == 0 ? null : string.Join(", ", verbatimNames.Select(n => $"'{n}'"))
             };
         }
 

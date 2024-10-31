@@ -113,10 +113,24 @@ namespace SOS.Lib.Managers
 
             if ((observation.Taxon?.Id ?? -1) == -1)
             {
-                AddError(errors, ObservationDefect.ObservationDefectType.TaxonNotFound, 
-                    observation.Taxon?.VerbatimName != null ?
-                        $"Id={observation.Taxon?.VerbatimId}, {observation.Taxon?.VerbatimName}" :
-                        $"Id={observation.Taxon?.VerbatimId}");                
+                string taxonError = null;
+                if (!string.IsNullOrEmpty(observation.Taxon?.VerbatimId) && observation.Taxon?.VerbatimId != "-1")
+                {
+                    taxonError = $"TaxonId={observation.Taxon?.VerbatimId}";
+                }
+                
+                if (!string.IsNullOrEmpty(observation.Taxon?.VerbatimName))
+                {
+                    if (taxonError != null)
+                        taxonError += ", Name=" + observation.Taxon?.VerbatimName;
+                    else
+                        taxonError = "Name=" + observation.Taxon?.VerbatimName;
+                }
+
+                if (taxonError == null)
+                    taxonError = "[empty]";
+
+                AddError(errors, ObservationDefect.ObservationDefectType.TaxonNotFound, taxonError);
             }
 
             if (observation.Location == null || !observation.Location.DecimalLatitude.HasValue ||
