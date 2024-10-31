@@ -218,7 +218,7 @@ namespace SOS.Harvest.Processors
             {
                 Id = -1,
                 VerbatimId = verbatimId ?? taxonId.ToString(),
-                VerbatimName = verbatimName ?? names?.FirstOrDefault(n => !string.IsNullOrEmpty(n))
+                VerbatimName = $"verbatimName='{verbatimName}', scientificName='{scientificNameAuthorship}', names.first='{names?.FirstOrDefault(n => !string.IsNullOrEmpty(n))}'"
             };
         }
 

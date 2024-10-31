@@ -69,11 +69,11 @@ namespace SOS.Lib.Managers
             private const int DatasetIdColumnIndex = 2;
             private const int DatasetNameColumnIndex = 3;
             private const int ModifiedDateColumnIndex = 4;
-            private const int TaxonNotFoundColumnIndex = 5;
-            private const int MissingMandatoryFieldColumnIndex = 6;
-            private const int LocationOutsideOfSwedenColumnIndex = 7;
-            private const int ValueOutOfRangeColumnIndex = 8;
-            private const int LogicErrorColumnIndex = 9;
+            private const int TaxonNotFoundErrorColumnIndex = 5;
+            private const int DateErrorColumnIndex = 6;
+            private const int GeographicsErrorColumnIndex = 7;
+            private const int LocationOutsideOfSwedenErrorColumnIndex = 8;
+            private const int MissingIdentifierErrorColumnIndex = 9;            
 
             public InvalidObservationsExcelWriter(IInvalidObservationRepository invalidObservationRepository)
             {
@@ -117,20 +117,20 @@ namespace SOS.Lib.Managers
                                 switch (defect.DefectType)
                                 {
                                     case Models.Processed.Validation.ObservationDefect.ObservationDefectType.TaxonNotFound:
-                                        worksheet.Cells[rowIndex, TaxonNotFoundColumnIndex].Value = defect.Information;
+                                        worksheet.Cells[rowIndex, TaxonNotFoundErrorColumnIndex].Value = defect.Information;
                                         break;
-                                    case Models.Processed.Validation.ObservationDefect.ObservationDefectType.MissingMandatoryField:
-                                        worksheet.Cells[rowIndex, MissingMandatoryFieldColumnIndex].Value = defect.Information;
+                                    case Models.Processed.Validation.ObservationDefect.ObservationDefectType.DateError:
+                                        worksheet.Cells[rowIndex, DateErrorColumnIndex].Value = defect.Information;
+                                        break;
+                                    case Models.Processed.Validation.ObservationDefect.ObservationDefectType.GeographicsError:
+                                        worksheet.Cells[rowIndex, GeographicsErrorColumnIndex].Value = defect.Information;
                                         break;
                                     case Models.Processed.Validation.ObservationDefect.ObservationDefectType.LocationOutsideOfSweden:
-                                        worksheet.Cells[rowIndex, LocationOutsideOfSwedenColumnIndex].Value = defect.Information;
+                                        worksheet.Cells[rowIndex, LocationOutsideOfSwedenErrorColumnIndex].Value = defect.Information;
                                         break;
-                                    case Models.Processed.Validation.ObservationDefect.ObservationDefectType.ValueOutOfRange:
-                                        worksheet.Cells[rowIndex, ValueOutOfRangeColumnIndex].Value = defect.Information;
-                                        break;
-                                    case Models.Processed.Validation.ObservationDefect.ObservationDefectType.LogicError:
-                                        worksheet.Cells[rowIndex, LogicErrorColumnIndex].Value = defect.Information;
-                                        break;
+                                    case Models.Processed.Validation.ObservationDefect.ObservationDefectType.IdentifierError:
+                                        worksheet.Cells[rowIndex, MissingIdentifierErrorColumnIndex].Value = defect.Information;
+                                        break;                                    
                                 }
                             }
                         }
@@ -154,14 +154,14 @@ namespace SOS.Lib.Managers
                 worksheet.Cells[1, DatasetIdColumnIndex].Value = "DatasetId";
                 worksheet.Cells[1, DatasetNameColumnIndex].Value = "DatasetName";
                 worksheet.Cells[1, ModifiedDateColumnIndex].Value = "ModifiedDate";
-                worksheet.Cells[1, TaxonNotFoundColumnIndex].Value = "TaxonNotFound";
-                worksheet.Cells[1, MissingMandatoryFieldColumnIndex].Value = "MissingMandatoryField";
-                worksheet.Cells[1, LocationOutsideOfSwedenColumnIndex].Value = "LocationOutsideSweden";
-                worksheet.Cells[1, ValueOutOfRangeColumnIndex].Value = "ValueOutOfRange";
-                worksheet.Cells[1, LogicErrorColumnIndex].Value = "LogicError";
+                worksheet.Cells[1, TaxonNotFoundErrorColumnIndex].Value = "TaxonNotFound";
+                worksheet.Cells[1, DateErrorColumnIndex].Value = "DateError";
+                worksheet.Cells[1, GeographicsErrorColumnIndex].Value = "GeographicsError";
+                worksheet.Cells[1, LocationOutsideOfSwedenErrorColumnIndex].Value = "LocationOutsideSweden";
+                worksheet.Cells[1, MissingIdentifierErrorColumnIndex].Value = "MissingIdentifier";                
 
                 // Format style by columns in first row
-                using (var range = worksheet.Cells[1, 1, 1, LogicErrorColumnIndex])
+                using (var range = worksheet.Cells[1, 1, 1, GeographicsErrorColumnIndex])
                 {
                     range.Style.Font.Bold = false;
                     range.Style.Font.Color.SetColor(Color.FromArgb(255, 255, 255));
