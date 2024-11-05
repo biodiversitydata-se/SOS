@@ -4,6 +4,7 @@ using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Search.Enums;
 using SOS.Lib.Models.Search.Filters;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -16,6 +17,8 @@ namespace SOS.Lib.Extensions
     /// </summary>
     public static class SearchExtensionsGeneric
     {
+        private static ConcurrentDictionary<string, IReadOnlyDictionary<IndexName, TypeFieldMappings>> indicesByKey = new ConcurrentDictionary<string, IReadOnlyDictionary<IndexName, TypeFieldMappings>>();
+
         /// <summary>
         /// Range types
         /// </summary>
@@ -216,24 +219,35 @@ namespace SOS.Lib.Extensions
             }
         }
 
-
+        
         /// <summary>
         /// Get sort descriptor
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="client"></param>
-        /// <param name="indexNames"></param>
+        /// <param name="indexName"></param>
         /// <param name="sortings"></param>
         /// <returns></returns>
-        public static async Task<SortDescriptor<T>> GetSortDescriptorAsync<T>(this IElasticClient client, string indexNames, IEnumerable<SortOrderFilter> sortings) where T : class
+        public static async Task<SortDescriptor<T>> GetSortDescriptorAsync<T>(this IElasticClient client, string indexName, IEnumerable<SortOrderFilter> sortings) where T : class
         {
             if (!sortings?.Any() ?? true)
             {
                 return null;
             }
 
+            // make sure that the ordering will be unique.
+            var adjustedSortings = sortings.ToList();
+            if (!sortings.Select(m => m.SortBy?.ToLower().Trim()).Contains("occurrence.occurrenceid"))
+            {
+                adjustedSortings.Add(new SortOrderFilter
+                {
+                    SortBy = "occurrence.occurrenceId",
+                    SortOrder = SearchSortOrder.Asc
+                });
+            }
+
             var sortDescriptor = new SortDescriptor<T>();
-            foreach (var sorting in sortings)
+            foreach (var sorting in adjustedSortings)
             {
                 var sortBy = sorting.SortBy;
                 var sortOrder = sorting.SortOrder;
@@ -271,12 +285,22 @@ namespace SOS.Lib.Extensions
                 {
                     // GetFieldMappingAsync is case sensitive on field names, use updated property names to avoid errors
                     sortBy = string.Join('.', propertyNames);
-                    var response =
-                        await client.Indices.GetFieldMappingAsync(new GetFieldMappingRequest(indexNames, sortBy));
+                    string key = $"{indexName}-{sortBy}";
+                    IReadOnlyDictionary<IndexName, TypeFieldMappings> indices = null;
 
-                    if (response.IsValid)
+                    if (!indicesByKey.TryGetValue(key, out indices))
                     {
-                        var hasKeyword = response.Indices
+                        var response = await client.Indices.GetFieldMappingAsync(new GetFieldMappingRequest(indexName, sortBy));                        
+                        if (response.IsValid)
+                        {
+                            indices = response.Indices;
+                            indicesByKey.TryAdd(key, indices);
+                        }
+                    }              
+
+                    if (indices != null)
+                    {                        
+                        var hasKeyword = indices
                             .FirstOrDefault().Value.Mappings
                             .FirstOrDefault().Value?.Mapping?.Values?
                             .Select(s => s as TextProperty)?
