@@ -54,8 +54,9 @@ namespace SOS.Harvest.Processors
 
         private string GetAreaKey(AreaType areatype, string? featureId) => $"{areatype}-{featureId}";
 
-        private Lib.Models.Processed.Observation.Taxon GetTaxonByName(string name, string? scientificNameAuthorship, bool ignoreDuplicates = false)
+        private Lib.Models.Processed.Observation.Taxon GetTaxonByName(string name, string? scientificNameAuthorship, bool ignoreDuplicates, out string? nameWithoutAuthor)
         {
+            nameWithoutAuthor = null;
             if (string.IsNullOrEmpty(name)) return null!;
             name = name.ToLower();
 
@@ -77,8 +78,7 @@ namespace SOS.Harvest.Processors
                 }
             }
 
-            // Get by scientific name - author
-            string? nameWithoutAuthor = null;
+            // Get by scientific name - author            
             if (!string.IsNullOrEmpty(scientificNameAuthorship))
             {
                 nameWithoutAuthor = name.Replace(scientificNameAuthorship, "", StringComparison.InvariantCultureIgnoreCase).Trim();                
@@ -190,6 +190,7 @@ namespace SOS.Harvest.Processors
         protected Lib.Models.Processed.Observation.Taxon GetTaxon(int taxonId, IEnumerable<string> names = null!, string? scientificNameAuthorship = null,
             bool ignoreDuplicates = false, string? verbatimId = null, string? verbatimName = null)
         {
+            string? nameWithoutAuthor = null;
             Lib.Models.Processed.Observation.Taxon? taxon = null;
             var taxonFound = taxonId < 0 ? false : Taxa.TryGetValue(taxonId, out taxon);
             if ((!taxonFound || taxonId == 0) && (names?.Any() ?? false))
@@ -197,7 +198,7 @@ namespace SOS.Harvest.Processors
                 // If we can't find taxon by id or taxon id is 0 (biota), try by name/s if passed
                 foreach (var name in names)
                 {
-                    taxon = GetTaxonByName(name, scientificNameAuthorship, ignoreDuplicates);
+                    taxon = GetTaxonByName(name, scientificNameAuthorship, ignoreDuplicates, out nameWithoutAuthor);
                     if (taxon != null)
                     {
                         break;
@@ -217,8 +218,8 @@ namespace SOS.Harvest.Processors
             List<string> verbatimNames = new List<string>();
             if (!string.IsNullOrEmpty(verbatimName))
                 verbatimNames.Add(verbatimName);
-            if (!string.IsNullOrEmpty(scientificNameAuthorship))
-                verbatimNames.Add(scientificNameAuthorship);
+            if (!string.IsNullOrEmpty(nameWithoutAuthor))
+                verbatimNames.Add(nameWithoutAuthor);
             var firstName = names?.FirstOrDefault(n => !string.IsNullOrEmpty(n));
             if (!string.IsNullOrEmpty(firstName))
                 verbatimNames.Add(firstName);            

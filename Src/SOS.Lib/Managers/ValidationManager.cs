@@ -114,7 +114,7 @@ namespace SOS.Lib.Managers
             if ((observation.Taxon?.Id ?? -1) == -1)
             {
                 string taxonError = null;
-                if (!string.IsNullOrEmpty(observation.Taxon?.VerbatimId) && observation.Taxon?.VerbatimId != "-1")
+                if (!string.IsNullOrEmpty(observation.Taxon?.VerbatimId) && observation.Taxon?.VerbatimId != (-1).ToString())
                 {
                     taxonError = $"TaxonId={observation.Taxon?.VerbatimId}";
                 }
@@ -122,13 +122,13 @@ namespace SOS.Lib.Managers
                 if (!string.IsNullOrEmpty(observation.Taxon?.VerbatimName))
                 {
                     if (taxonError != null)
-                        taxonError += ", Name=" + observation.Taxon?.VerbatimName;
+                        taxonError += ", Names=" + observation.Taxon?.VerbatimName;
                     else
-                        taxonError = "Name=" + observation.Taxon?.VerbatimName;
+                        taxonError = "Names=" + observation.Taxon?.VerbatimName;
                 }
 
                 if (taxonError == null)
-                    taxonError = "[empty]";
+                    taxonError = "Taxon information is missing";
 
                 AddError(errors, ObservationDefect.ObservationDefectType.TaxonNotFound, taxonError);
             }
