@@ -1,5 +1,15 @@
 # Changelog
 
+
+## [2024.11.06]
+
+### `Fixed`
+- Duplicates could occur when paginating observations where many observations had the same value for the property being sorted on.
+- Data provider default coordinateUncertaintyInMeters were not used for providers with DwC-A data source.
+
+### `Other`
+- Improved invalid observations error descriptions.
+
 ## [2024.10.16]
 
 ### `Added`
