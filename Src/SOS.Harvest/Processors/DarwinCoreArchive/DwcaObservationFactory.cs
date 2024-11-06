@@ -541,6 +541,10 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                 names.Add(verbatim.Species);
             }            
             names.Add(RemoveAuthorFromString(verbatim.ScientificName!));            
+            if (!string.IsNullOrEmpty(verbatim.Genus) && !string.IsNullOrEmpty(verbatim.SpecificEpithet))
+            {
+                names.Add($"{verbatim.Genus} {verbatim.SpecificEpithet}");
+            }
 
             return GetTaxon(parsedTaxonId, names, verbatim.ScientificNameAuthorship, true, verbatim.TaxonID);
         }
