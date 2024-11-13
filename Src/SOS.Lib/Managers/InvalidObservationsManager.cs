@@ -161,7 +161,7 @@ namespace SOS.Lib.Managers
                 worksheet.Cells[1, MissingIdentifierErrorColumnIndex].Value = "MissingIdentifier";                
 
                 // Format style by columns in first row
-                using (var range = worksheet.Cells[1, 1, 1, GeographicsErrorColumnIndex])
+                using (var range = worksheet.Cells[1, 1, 1, MissingIdentifierErrorColumnIndex])
                 {
                     range.Style.Font.Bold = false;
                     range.Style.Font.Color.SetColor(Color.FromArgb(255, 255, 255));
