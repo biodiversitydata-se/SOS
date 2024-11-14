@@ -149,7 +149,9 @@ namespace SOS.Observations.Api.Repositories
                 {
                     item.RedlistCategory = treeNode.Data.Attributes.RedlistCategory ?? "";
                     item.ScientificName = treeNode.Data.ScientificName;
+                    item.SightingName = treeNode.Data.SightingName ?? "";
                     item.VernacularName = treeNode.Data.VernacularName ?? "";
+
                     item.ScientificNameAuthorship = treeNode.Data.ScientificNameAuthorship ?? "";
                 }
             }

@@ -35,6 +35,7 @@ namespace SOS.Lib.Models.Processed.Observation
         /// </summary>
         public string ScientificName { get; set; }
         public string ScientificNameAuthorship { get; set; }
+        public string? SightingName { get; set; }
         public string VernacularName { get; set; }
     }
 }

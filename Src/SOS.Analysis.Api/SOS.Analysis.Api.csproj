@@ -19,10 +19,10 @@
 		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="8.0.1" />
 		<PackageReference Include="NLog.Targets.ElasticSearch" Version="7.7.0" />
 		<PackageReference Include="NLog.Web.AspNetCore" Version="5.3.14" />
-		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.9.0" />
+		<PackageReference Include="Swashbuckle.AspNetCore" Version="7.0.0" />
 		<PackageReference Include="HangFire" Version="1.8.15" />
 		<PackageReference Include="HangFire.Autofac" Version="2.6.0" />
-		<PackageReference Include="HangFire.Mongo" Version="1.10.9" />
+		<PackageReference Include="HangFire.Mongo" Version="1.11.0" />
 	</ItemGroup>
 
 	<ItemGroup>

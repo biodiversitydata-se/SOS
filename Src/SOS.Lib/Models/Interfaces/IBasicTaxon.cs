@@ -33,6 +33,8 @@ namespace SOS.Lib.Models.Interfaces
         string ScientificName { get; set; }
 
         string ScientificNameAuthorship { get; set; }
+        
+        string? SightingName { get; set; }
 
         string VernacularName { get; set; }
 

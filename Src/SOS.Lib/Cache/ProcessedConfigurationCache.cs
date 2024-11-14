@@ -1,5 +1,4 @@
-﻿using Amazon.Runtime.Internal.Util;
-using Microsoft.Extensions.Caching.Memory;
+﻿using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Repositories.Resource.Interfaces;

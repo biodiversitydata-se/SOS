@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using MongoDB.Driver.Linq;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.Interfaces;

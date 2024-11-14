@@ -30,6 +30,7 @@ namespace SOS.Lib.Extensions
                 Id = sourceTaxon.Id,
                 ScientificName = sourceTaxon.ScientificName,
                 ScientificNameAuthorship = sourceTaxon.ScientificNameAuthorship,
+                SightingName = sourceTaxon.SightingName,
                 VernacularName = sourceTaxon.VernacularName
             };
         }

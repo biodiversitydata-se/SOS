@@ -87,7 +87,7 @@ namespace SOS.Harvest.Services.Taxon
 
                 var csvFieldDelimiter = GetCsvFieldDelimiterFromMetaFile(zipArchive);
                 var taxa = GetTaxonCoreData(zipArchive, csvFieldDelimiter);
-                AddVernacularNames(taxa, zipArchive, csvFieldDelimiter);
+                AddNames(taxa, zipArchive, csvFieldDelimiter);
                 AddTaxonRelations(taxa, zipArchive, csvFieldDelimiter);
                 AddTaxonProperties(taxa, zipArchive, csvFieldDelimiter);
                 return taxa.Values;
@@ -158,8 +158,8 @@ namespace SOS.Harvest.Services.Taxon
             .Map(t => t.SwedishOccurrence, 28)
             .Map(t => t.SwedishHistory, 29);
 
-        private IVariableLengthReaderBuilder<DarwinCoreVernacularName> VernacularNameMapping =>
-            new VariableLengthReaderBuilder<DarwinCoreVernacularName>()
+        private IVariableLengthReaderBuilder<DarwinCoreTaxonName> TaxonNamePropertiesMapping =>
+            new VariableLengthReaderBuilder<DarwinCoreTaxonName>()
                 .Map(t => t.TaxonID, indexColumn: 0)
                 .Map(t => t.TaxonNameID, 1)
                 .Map(t => t.Name, 2)
@@ -397,29 +397,32 @@ namespace SOS.Harvest.Services.Taxon
         /// <param name="taxa"></param>
         /// <param name="zipArchive"></param>
         /// <param name="csvFieldDelimiter"></param>
-        private void AddVernacularNames(
+        private void AddNames(
             Dictionary<string, DarwinCoreTaxon> taxa,
             ZipArchive zipArchive,
             string csvFieldDelimiter)
         {
-            _logger.LogDebug("Start adding vernacular names to taxon");
+            _logger.LogDebug("Start adding names to taxon");
             // Try to get VernacularName.csv
-            var vernacularNameFile = zipArchive.Entries.FirstOrDefault(f =>
+            var nameFile = zipArchive.Entries.FirstOrDefault(f =>
                 f.Name.Equals("TaxonNameProperties.csv", StringComparison.CurrentCultureIgnoreCase));
-            if (vernacularNameFile == null)
+            if (nameFile == null)
             {
                 _logger.LogError("Failed to open TaxonNameProperties.csv");
                 return; // If no vernacular name file found, we can't do anything more
             }
             // Read vernacular name data
             using var csvFileHelper = new CsvFileHelper();
-            csvFileHelper.InitializeRead(vernacularNameFile.Open(), csvFieldDelimiter);
+            csvFileHelper.InitializeRead(nameFile.Open(), csvFieldDelimiter);
 
-            // Get all vernacular names from file
-            var vernacularNames = csvFileHelper
-                .GetRecords(VernacularNameMapping)
-                .Where(m => !string.IsNullOrEmpty(m.Language));
-            var vernacularNamesByTaxonId = vernacularNames
+            var allNames = csvFileHelper
+                .GetRecords(TaxonNamePropertiesMapping);
+            var swedishVernacularNamesByTaxonId = allNames
+                .Where(m => m.Language?.Equals("sv", StringComparison.CurrentCultureIgnoreCase) ?? false)
+                .GroupBy(m => m.TaxonID)
+                .ToDictionary(g => g.Key, g => g.Select(m => m));
+            var scientificNamesByTaxonId = allNames
+                .Where(n => n.NameCategoryId.Equals(0))
                 .GroupBy(m => m.TaxonID)
                 .ToDictionary(g => g.Key, g => g.Select(m => m));
 
@@ -427,14 +430,18 @@ namespace SOS.Harvest.Services.Taxon
 
             foreach (var taxon in taxa.Values)
             {
-                if (vernacularNamesByTaxonId.TryGetValue(taxon.TaxonID, out var dwcVernacularNames))
+                if (swedishVernacularNamesByTaxonId.TryGetValue(taxon.TaxonID, out var dwcVernacularNames))
                 {
                     taxon.VernacularNames = dwcVernacularNames;
                     taxon.VernacularName = dwcVernacularNames
-                        .FirstOrDefault(m => m.Language == "sv" && m.IsPreferredName)?.Name;
+                        .FirstOrDefault(m => m.IsPreferredName)?.Name;
+                }
+                if (scientificNamesByTaxonId.TryGetValue(taxon.TaxonID, out var dwcScientificNames))
+                {
+                    taxon.ScientificNames = dwcScientificNames;
                 }
             }
-            _logger.LogDebug("Finish adding vernacular names to taxon");
+            _logger.LogDebug("Finish adding names to taxon");
         }
 
         private class TaxonInfo

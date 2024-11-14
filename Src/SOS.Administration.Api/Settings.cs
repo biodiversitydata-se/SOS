@@ -33,7 +33,7 @@ public static class Settings
         using var loggerFactory = LoggerFactory.Create(loggingBuilder => loggingBuilder.SetMinimumLevel(LogLevel.Debug).AddConsole());
         var logger = loggerFactory.CreateLogger("Settings");
 
-        AllowedOrigins = GetConfigValueString("AllowedOrigins", configuration, logger).Split(",").Select(s => s.Trim()).ToArray();
+        AllowedOrigins = GetConfigValueString("AllowedOrigins", configuration, logger, false, false).Split(",").Select(s => s.Trim()).ToArray();
 
         ImportConfiguration = GetConfigSection<ImportConfiguration>("ImportConfiguration", configuration, logger, sensitiveSetting: false);
         ProcessConfiguration = GetConfigSection<ProcessConfiguration>("ProcessConfiguration", configuration, logger, sensitiveSetting: false);

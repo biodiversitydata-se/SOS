@@ -1,5 +1,6 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Driver;
+using MongoDB.Driver.Linq;
 using SOS.Lib.Database.Interfaces;
 using System;
 using System.Collections.Generic;

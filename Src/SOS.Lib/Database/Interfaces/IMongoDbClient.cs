@@ -5,7 +5,7 @@ namespace SOS.Lib.Database.Interfaces
     /// <summary>
     /// Mongo db client
     /// </summary>
-    public interface IMongoDbClient : IMongoClient
+    public interface IMongoDbClient
     {
         /// <summary>
         /// Read batch size

@@ -2,7 +2,7 @@
 {
     /// <summary>
     /// </summary>
-    public class DarwinCoreVernacularName
+    public class DarwinCoreTaxonName
     {
         /// <summary>
         ///     Country Code

@@ -308,9 +308,14 @@ namespace SOS.Lib.Models.DarwinCore
         public string VernacularName { get; set; }
 
         /// <summary>
+        /// All scientific names
+        /// </summary>
+        public IEnumerable<DarwinCoreTaxonName> ScientificNames { get; set; }
+
+        /// <summary>
         ///     Vernacular names that is used in the vernacular name extension.
         /// </summary>
-        public IEnumerable<DarwinCoreVernacularName> VernacularNames { get; set; }
+        public IEnumerable<DarwinCoreTaxonName> VernacularNames { get; set; }
 
         /// <summary>
         ///     Synonym names (scientific names).

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using MongoDB.Driver.Linq;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
@@ -8,7 +9,6 @@ using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Repositories.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -102,7 +102,7 @@ namespace SOS.Lib.Repositories
         /// </summary>
         protected virtual string CollectionName => $"{_collectionName}{(Mode == JobRunModes.IncrementalActiveInstance ? "_incrementalActive" : Mode == JobRunModes.IncrementalInactiveInstance ? "_incrementalInactive" : "")}";
 
-        protected readonly IMongoClient Client;
+        protected readonly IMongoDbClient Client;
 
         /// <summary>
         ///     Mongo db

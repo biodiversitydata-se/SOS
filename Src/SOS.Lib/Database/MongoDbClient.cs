@@ -6,8 +6,13 @@ namespace SOS.Lib.Database
     /// <summary>
     /// Mongo db base class
     /// </summary>
-    public class MongoDbClient : MongoClient, IMongoDbClient
+    public class MongoDbClient : IMongoDbClient
     {
+        /// <summary>
+        /// Mong client
+        /// </summary>
+        private readonly MongoClient _mongoClient;
+
         /// <summary>
         ///     Name of database
         /// </summary>
@@ -20,8 +25,9 @@ namespace SOS.Lib.Database
         /// <param name="dataBaseName"></param>
         /// <param name="readBatchSize"></param>
         /// <param name="writeBatchSize"></param>
-        public MongoDbClient(MongoClientSettings settings, string dataBaseName, int readBatchSize, int writeBatchSize) : base(settings)
+        public MongoDbClient(MongoClientSettings settings, string dataBaseName, int readBatchSize, int writeBatchSize)
         {
+            _mongoClient = new MongoClient(settings);
             _databaseName = dataBaseName;
             ReadBatchSize = readBatchSize;
             WriteBatchSize = writeBatchSize;
@@ -39,7 +45,7 @@ namespace SOS.Lib.Database
         /// <inheritdoc />
         public IMongoDatabase GetDatabase()
         {
-            return base.GetDatabase(_databaseName);
+            return _mongoClient.GetDatabase(_databaseName);
         }
     }
 }

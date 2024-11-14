@@ -96,6 +96,8 @@ namespace SOS.Lib.Extensions
             taxon.ScientificName = sourceTaxon.ScientificName;
             taxon.ScientificNameAuthorship = sourceTaxon.ScientificNameAuthorship;
             taxon.ScientificNameId = sourceTaxon.ScientificNameID;
+            taxon.SightingName = sourceTaxon.VernacularNames?.FirstOrDefault(vn => vn.Language.Equals("sv", System.StringComparison.CurrentCultureIgnoreCase) && vn.ValidForSighting)?.Name ?? 
+                sourceTaxon.ScientificNames?.FirstOrDefault(sn => sn.ValidForSighting)?.Name;
             taxon.SpecificEpithet = sourceTaxon.SpecificEpithet;
             taxon.Subgenus = sourceTaxon.Subgenus;
             taxon.TaxonConceptId = sourceTaxon.TaxonConceptID;
@@ -150,7 +152,7 @@ namespace SOS.Lib.Extensions
         /// <param name="darwinCoreVernacularNames"></param>
         /// <returns></returns>
         private static IEnumerable<TaxonVernacularName> ToTaxonVernacularNames(
-            this IEnumerable<DarwinCoreVernacularName> darwinCoreVernacularNames)
+            this IEnumerable<DarwinCoreTaxonName> darwinCoreVernacularNames)
         {
             return darwinCoreVernacularNames?.Select(m => m.ToTaxonVernacularName());
         }
@@ -160,7 +162,7 @@ namespace SOS.Lib.Extensions
         /// </summary>
         /// <param name="darwinCoreVernacularName"></param>
         /// <returns></returns>
-        private static TaxonVernacularName ToTaxonVernacularName(this DarwinCoreVernacularName darwinCoreVernacularName)
+        private static TaxonVernacularName ToTaxonVernacularName(this DarwinCoreTaxonName darwinCoreVernacularName)
         {
             return new TaxonVernacularName
             {
