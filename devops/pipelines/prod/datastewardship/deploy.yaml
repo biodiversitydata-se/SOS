@@ -17,7 +17,7 @@ variables:
 
   # pipeline settings
   Parameters.ImageTag: '${{ parameters.imagetag }}'
-  kubernetesServiceEndpoint: 'PROD-rke'
+  kubernetesServiceEndpoint: 'PROD-rke2'
 
 resources:
   repositories:

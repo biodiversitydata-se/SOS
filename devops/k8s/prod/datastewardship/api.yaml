@@ -29,6 +29,7 @@ spec:
   template:
     metadata:
       annotations:
+        logging: "true"
         vault.hashicorp.com/agent-inject: "true"
         vault.hashicorp.com/agent-inject-status: "update"
         vault.hashicorp.com/ca-cert: "/vault/tls/ca-bundle.crt"
