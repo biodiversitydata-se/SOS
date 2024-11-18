@@ -36,10 +36,11 @@ kommando: ```skaffold run -f skaffold.datastewardship.yaml```
 gå till ```http://localhost:5000/swagger``` i din webbläsare   
 *kom ihåg!* kommando: ```skaffold delete -f skaffold.datastewardship.yaml``` för att ta bort rätt container   
 
-## Hemligheter
+## Hemligheter (när du kör skaffold run)
 
-Om vi har hemligheter (API nycklar, connectionstring till central databas etc m.m.) som vi måste använda vid lokal utveckling - men inte vill ska hamna i git - så lägger vi dessa i en fil som heter ```not-for-git.secret.yaml``` i devops/k8s/local. (alternativt 1 fil per hemliget, typ: api-key-st.secret.yaml, connectionstring-to-st.secret.yaml osv).   
+Om vi har hemligheter (API nycklar, connectionstring till central databas etc m.m.) som vi måste använda vid lokal utveckling - men inte vill ska hamna i git - så lägger vi dessa i en fil som heter ```not-for-git.secret.yaml``` i devops/k8s/local. (alternativt 1 fil per hemliget, typ: api-key-st.secret.yaml, connectionstring-to-st.secret.yaml osv). 
 
+Du kan kopiera hela filinnehållet från **[https://vault-test.artdata.slu.se](https://vault-test.artdata.slu.se)**, gå in på applikationens secret path, mappen ```local```.   
 ```*.secret.yaml``` är med i vår .gitignore.
 
 Såhär ser innehållet ut i en *.secret.yaml fil:
@@ -64,4 +65,4 @@ Där vi också konfigurerar vanliga klartext miljövariabler för vanliga icke-h
                   key: apikey
 ```
 
-Detta gör att vårt api (i det här exemplet) har vår hemliga API_KEY_ST tillgänglig som en miljövariabel när vi kör via skaffold. Utanför skaffold (ctrl f5 i Visual Studio eller dotnet run via terminalen etc) kommer vi gå på appsettings.Development.json så här behöver man kopiera copy.me.appsettings.json (som innehåller alla värden som inte är hemliga), döpa denna fil till appsettings.Development.json (som finns i gitignore) och sedan lägga till sina hemligheter i denna. 
+Detta gör att vårt api (i det här exemplet) har vår hemliga API_KEY_ST tillgänglig som en miljövariabel när vi kör via skaffold. Utanför skaffold (ctrl f5 i Visual Studio) kommer vi gå på aktuell appsettings.json-fil och lokala user secrets (Microsofts lösning i dotnet).
