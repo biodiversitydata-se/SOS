@@ -1,6 +1,10 @@
-﻿using Nest;
+﻿using Microsoft.IdentityModel.Tokens;
+using MongoDB.Driver;
+using Nest;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Gis;
+using SOS.Lib.Models.Processed.DataStewardship.Dataset;
+using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Enums;
 using SOS.Lib.Models.Search.Filters;
 using System;
@@ -218,8 +222,18 @@ namespace SOS.Lib.Extensions
                     return m => m.CountDescending();
             }
         }
-
         
+        private static string GetDefaultSortPropertyName(Type type)
+        {
+            return type switch
+            {
+                Type t when t == typeof(Dataset) => "identifier",
+                Type t when t == typeof(Event) => "eventId",
+                Type t when t == typeof(Observation) => "occurrence.occurrenceId",
+                _ => null
+            };
+        }
+
         /// <summary>
         /// Get sort descriptor
         /// </summary>
@@ -237,11 +251,12 @@ namespace SOS.Lib.Extensions
 
             // make sure that the ordering will be unique.
             var adjustedSortings = sortings.ToList();
-            if (!sortings.Select(m => m.SortBy?.ToLower().Trim()).Contains("occurrence.occurrenceid"))
+            string defaultSortProperty = GetDefaultSortPropertyName(typeof(T));
+            if (!defaultSortProperty.IsNullOrEmpty() && !sortings.Select(m => m.SortBy?.ToLower().Trim()).Contains(defaultSortProperty))
             {
                 adjustedSortings.Add(new SortOrderFilter
                 {
-                    SortBy = "occurrence.occurrenceId",
+                    SortBy = defaultSortProperty,
                     SortOrder = SearchSortOrder.Asc
                 });
             }
