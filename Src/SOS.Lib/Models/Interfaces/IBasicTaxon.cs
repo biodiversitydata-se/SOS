@@ -34,7 +34,11 @@ namespace SOS.Lib.Models.Interfaces
 
         string ScientificNameAuthorship { get; set; }
         
-        string? SightingName { get; set; }
+        string? SightingScientificNameAuthorship { get; set; }
+
+        string? SightingScientificName { get; set; }
+
+        string? SightingVernacularName { get; set; }
 
         string VernacularName { get; set; }
 

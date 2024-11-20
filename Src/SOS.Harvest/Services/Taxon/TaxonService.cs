@@ -216,7 +216,6 @@ namespace SOS.Harvest.Services.Taxon
             using var csvFileHelper = new CsvFileHelper();
             csvFileHelper.InitializeRead(taxonFile.Open(), csvFieldDelimiter);
 
-
             // Get all taxa from file
             var alltaxa = csvFileHelper
                 .GetRecords(TaxonMapping);

@@ -26,10 +26,6 @@
         /// </summary>
         public string ScientificName { get; set; }
         /// <summary>
-        /// Name valid for sighting
-        /// </summary>
-        public string? SightingName { get; set; }
-        /// <summary>
         /// Redlist Category
         /// </summary>
         public string RedlistCategory { get; set; }

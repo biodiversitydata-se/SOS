@@ -148,11 +148,9 @@ namespace SOS.Observations.Api.Repositories
                 if (treeNode != null)
                 {
                     item.RedlistCategory = treeNode.Data.Attributes.RedlistCategory ?? "";
-                    item.ScientificName = treeNode.Data.ScientificName;
-                    item.SightingName = treeNode.Data.SightingName ?? "";
-                    item.VernacularName = treeNode.Data.VernacularName ?? "";
-
-                    item.ScientificNameAuthorship = treeNode.Data.ScientificNameAuthorship ?? "";
+                    item.ScientificName = (string.IsNullOrEmpty(treeNode.Data.SightingScientificName) ? treeNode.Data.ScientificName : treeNode.Data.SightingScientificName) ?? "";
+                    item.VernacularName = (string.IsNullOrEmpty(treeNode.Data.SightingVernacularName) ? treeNode.Data.VernacularName : treeNode.Data.SightingVernacularName) ?? "";
+                    item.ScientificNameAuthorship = (string.IsNullOrEmpty(treeNode.Data.SightingScientificName) ? treeNode.Data.ScientificNameAuthorship : treeNode.Data.SightingScientificNameAuthorship) ?? "";
                 }
             }
 

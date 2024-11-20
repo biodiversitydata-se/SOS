@@ -160,5 +160,10 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     Vernacular names.
         /// </summary>
         public IEnumerable<TaxonVernacularName> VernacularNames { get; set; }
+
+        /// <summary>
+        /// Scientific names
+        /// </summary>
+        public IEnumerable<TaxonScientificName> ScientificNames { get; set; }
     }
 }

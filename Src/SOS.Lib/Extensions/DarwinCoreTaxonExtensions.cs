@@ -96,8 +96,6 @@ namespace SOS.Lib.Extensions
             taxon.ScientificName = sourceTaxon.ScientificName;
             taxon.ScientificNameAuthorship = sourceTaxon.ScientificNameAuthorship;
             taxon.ScientificNameId = sourceTaxon.ScientificNameID;
-            taxon.SightingName = sourceTaxon.VernacularNames?.FirstOrDefault(vn => vn.Language.Equals("sv", System.StringComparison.CurrentCultureIgnoreCase) && vn.ValidForSighting)?.Name ?? 
-                sourceTaxon.ScientificNames?.FirstOrDefault(sn => sn.ValidForSighting)?.Name;
             taxon.SpecificEpithet = sourceTaxon.SpecificEpithet;
             taxon.Subgenus = sourceTaxon.Subgenus;
             taxon.TaxonConceptId = sourceTaxon.TaxonConceptID;
@@ -123,7 +121,9 @@ namespace SOS.Lib.Extensions
             taxon.Attributes.SwedishOccurrence = sourceTaxon.DynamicProperties?.SwedishOccurrence;
             taxon.Attributes.Synonyms = sourceTaxon.Synonyms?.ToTaxonSynonymNames();
             taxon.Attributes.TaxonCategory = VocabularyValue.Create(sourceTaxon.DynamicProperties?.TaxonCategoryId);
+            taxon.Attributes.ScientificNames = sourceTaxon.ScientificNames?.ToTaxonScientificNames();
             taxon.Attributes.VernacularNames = sourceTaxon.VernacularNames?.ToTaxonVernacularNames();
+
             taxon.TaxonId = sourceTaxon.TaxonID;
             taxon.TaxonRank = sourceTaxon.TaxonRank;
             taxon.TaxonRemarks = sourceTaxon.TaxonRemarks?.Clean();
@@ -144,6 +144,18 @@ namespace SOS.Lib.Extensions
             taxon.DisplayName = displayName;
 
             return taxon;
+        }
+
+        private static IEnumerable<TaxonScientificName> ToTaxonScientificNames(
+            this IEnumerable<DarwinCoreTaxonName> darwinCoreScientificNames)
+        {
+            return darwinCoreScientificNames?.Select(n => new TaxonScientificName
+            {
+                Author = n.Author,
+                IsPreferredName = n.IsPreferredName,
+                Name = n.Name,
+                ValidForSighting = n.ValidForSighting
+            });
         }
 
         /// <summary>

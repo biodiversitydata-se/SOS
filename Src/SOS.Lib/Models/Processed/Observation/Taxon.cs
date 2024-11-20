@@ -229,9 +229,19 @@ namespace SOS.Lib.Models.Processed.Observation
         public IEnumerable<int> SecondaryParentDyntaxaTaxonIds { get; set; }
 
         /// <summary>
-        /// Name valid for sighting
+        /// Scientific Name valid for sighting
         /// </summary>
-        public string? SightingName { get; set; }
+        public string? SightingScientificName { get; set; }
+
+        /// <summary>
+        /// Scientific Name valid for sighting author
+        /// </summary>
+        public string? SightingScientificNameAuthorship { get; set; }
+
+        /// <summary>
+        /// Vernacular Name valid for sighting
+        /// </summary>
+        public string? SightingVernacularName { get; set; }
 
         /// <summary>
         ///     The name of the first or species epithet of

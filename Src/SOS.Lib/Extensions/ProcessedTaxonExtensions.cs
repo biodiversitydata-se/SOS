@@ -23,6 +23,7 @@ namespace SOS.Lib.Extensions
         /// <returns></returns>
         public static IBasicTaxon ToProcessedBasicTaxon(this Taxon sourceTaxon)
         {
+            var sightingScientificName = sourceTaxon?.Attributes?.ScientificNames?.FirstOrDefault(vn => vn.ValidForSighting);
             return new BasicTaxon
             {
                 Attributes = sourceTaxon.Attributes,
@@ -30,7 +31,9 @@ namespace SOS.Lib.Extensions
                 Id = sourceTaxon.Id,
                 ScientificName = sourceTaxon.ScientificName,
                 ScientificNameAuthorship = sourceTaxon.ScientificNameAuthorship,
-                SightingName = sourceTaxon.SightingName,
+                SightingScientificName = sightingScientificName?.Name,
+                SightingScientificNameAuthorship = sightingScientificName?.Author,
+                SightingVernacularName = sourceTaxon?.Attributes?.VernacularNames?.FirstOrDefault(vn => vn.ValidForSighting)?.Name,
                 VernacularName = sourceTaxon.VernacularName
             };
         }
