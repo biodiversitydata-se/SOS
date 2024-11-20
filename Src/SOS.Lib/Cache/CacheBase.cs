@@ -41,7 +41,6 @@ namespace SOS.Lib.Cache
         public TimeSpan CacheDuration { get; set; } = TimeSpan.FromMinutes(10);
 
         private string _cacheKey = "Cache";
-        public event EventHandler CacheReleased;
         
         /// <summary>
         /// Constructor

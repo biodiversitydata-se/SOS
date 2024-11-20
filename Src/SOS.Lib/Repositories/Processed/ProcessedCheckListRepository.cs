@@ -158,6 +158,7 @@ namespace SOS.Lib.Repositories.Processed
         /// <param name="elasticClientManager"></param>
         /// <param name="elasticConfiguration"></param>
         /// <param name="processedConfigurationCache"></param>
+        /// <param name="clusterHealthCache"></param>
         /// <param name="logger"></param>
         public ProcessedChecklistRepository(
             IElasticClientManager elasticClientManager,

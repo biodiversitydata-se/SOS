@@ -1,11 +1,8 @@
 ﻿using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SOS.Lib.Helpers;
 public static class VocabularyHelper
@@ -19,7 +16,7 @@ public static class VocabularyHelper
     /// <returns></returns>
     public static IDictionary<VocabularyId, IDictionary<object, int>> GetVocabulariesDictionary(
         ExternalSystemId externalSystemId,
-        ICollection<Vocabulary>? allVocabularies,
+        ICollection<Vocabulary> allVocabularies,
         bool convertValuesToLowercase)
     {
         var dic = new Dictionary<VocabularyId, IDictionary<object, int>>();

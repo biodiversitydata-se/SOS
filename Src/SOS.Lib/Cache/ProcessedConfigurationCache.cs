@@ -16,6 +16,8 @@ namespace SOS.Lib.Cache
         /// Constructor
         /// </summary>
         /// <param name="processedConfigurationRepository"></param>
+        /// <param name="memoryCache"></param>
+        /// <param name="logger"></param>
         public ProcessedConfigurationCache(IProcessedConfigurationRepository processedConfigurationRepository, IMemoryCache memoryCache, ILogger<CacheBase<string, ProcessedConfiguration>> logger) : base(processedConfigurationRepository, memoryCache, logger)
         {
             CacheDuration = TimeSpan.FromSeconds(30);

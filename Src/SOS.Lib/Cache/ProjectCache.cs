@@ -15,6 +15,8 @@ namespace SOS.Lib.Cache
         /// Constructor
         /// </summary>
         /// <param name="projectInfoRepository"></param>
+        /// <param name="memoryCache"></param>
+        /// <param name="logger"></param>
         public ProjectCache(IProjectInfoRepository projectInfoRepository, IMemoryCache memoryCache, ILogger<CacheBase<int, ProjectInfo>> logger) : base(projectInfoRepository, memoryCache, logger)
         {
             CacheDuration = TimeSpan.FromMinutes(10);

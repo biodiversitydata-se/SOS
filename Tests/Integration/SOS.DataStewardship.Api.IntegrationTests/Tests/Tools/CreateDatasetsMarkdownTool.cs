@@ -131,7 +131,6 @@ public class CreateDatasetsMarkdownTool
 
     private string CreateMarkdown(List<DatasetInfo> datasetInfos)
     {
-        int totalCount = 0;
         var sb = new StringBuilder();
         sb.AppendLine("| Identifier 	| Title 	| Creator | #Events | #Occurrences |");
         sb.AppendLine("|:---	|:---	|:--- |:---  |---:	|");

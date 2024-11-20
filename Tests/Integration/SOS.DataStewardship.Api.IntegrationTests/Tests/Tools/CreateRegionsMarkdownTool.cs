@@ -8,7 +8,7 @@ public class CreateRegionsMarkdownTool
 {
     [Fact(Skip = "Intended to run on demand")]    
     [Trait("Category", "DataUtil")]
-    public async Task Create_regions_markdown()
+    public void Create_regions_markdown()
     {                
         //-----------------------------------------------------------------------------------------------------------
         // Act

@@ -2,7 +2,6 @@ global using Xunit;
 global using Xunit.Abstractions;
 global using DotNet.Testcontainers.Containers;
 global using DotNet.Testcontainers.Builders;
-global using DotNet.Testcontainers.Configurations;
 global using FluentAssertions;
 global using Microsoft.AspNetCore.Authentication;
 global using Microsoft.AspNetCore.Hosting;

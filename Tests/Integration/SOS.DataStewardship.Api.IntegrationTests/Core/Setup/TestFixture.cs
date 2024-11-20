@@ -17,7 +17,6 @@ using SOS.Lib.Managers;
 using SOS.Lib.Models.TaxonListService;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.TaxonTree;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging.Abstractions;
 using System.Collections.Concurrent;
@@ -26,17 +25,24 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup
 {
     public class TestFixture : IAsyncLifetime
     {
+        private readonly TelemetryConfiguration _telemetryConfiguration;
+
         public ApiWebApplicationFactory ApiFactory { get; set; }
         public TestContainersFixture TestContainerFixture { get; private set; }
         public ServiceProvider? ServiceProvider { get; private set; }
         public ProcessFixture? ProcessFixture { get; private set; }
         public HttpClient ApiClient => ApiFactory.CreateClient();
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public TestFixture()
         {
             ApiFactory = new ApiWebApplicationFactory();
             TestContainerFixture = new TestContainersFixture();
-            TelemetryConfiguration.Active.DisableTelemetry = true;
+
+            _telemetryConfiguration = TelemetryConfiguration.CreateDefault();
+            _telemetryConfiguration.DisableTelemetry = true;
         }
 
         public async Task InitializeAsync()
@@ -46,7 +52,7 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup
             ApiFactory.ServiceProvider = ServiceProvider;
             using var scope = ServiceProvider.CreateScope();
             ProcessFixture = scope.ServiceProvider.GetService<ProcessFixture>();
-            await ProcessFixture.InitializeElasticsearchIndices();
+            await ProcessFixture!.InitializeElasticsearchIndices();
         }
 
         public async Task DisposeAsync()
@@ -78,7 +84,7 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup
             serviceCollection.AddSingleton<IProcessTimeManager, ProcessTimeManager>();
             serviceCollection.AddSingleton<ProcessConfiguration>();
 
-            serviceCollection.AddSingleton<TelemetryClient>();
+            serviceCollection.AddSingleton(new TelemetryClient(_telemetryConfiguration));
             serviceCollection.AddSingleton<IElasticClientManager, ElasticClientTestManager>();
             serviceCollection.AddSingleton<IDatasetRepository, DatasetRepository>();
             serviceCollection.AddSingleton<IEventRepository, EventRepository>();

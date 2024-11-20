@@ -30,13 +30,13 @@ namespace SOS.Lib.Managers
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        /// <inheritdoc>/>
+        /// <inheritdoc/>
         public async Task<IEnumerable<ProjectInfo>> GetAllAsync()
         {
             return await _projectCache.GetAllAsync();
         }
 
-        /// <inheritdoc>/>
+        /// <inheritdoc/>
         public async Task<IEnumerable<ProjectInfo>> GetAsync(IEnumerable<int> projectIds)
         {
             if (!projectIds?.Any() ?? true)

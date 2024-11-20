@@ -132,7 +132,6 @@ namespace SOS.Lib.Helpers
         /// <param name="metricGridCellFeatures"></param>
         /// <param name="gridCellsInMeters"></param>
         /// <param name="attributes"></param>
-        /// <param name="useCenterPoint"></param>
         public static void FillInBlanks(
             IDictionary<string, IFeature> metricGridCellFeatures,
             int gridCellsInMeters,

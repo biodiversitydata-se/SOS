@@ -4,7 +4,6 @@ using MongoDB.Driver;
 using SOS.Lib.Database;
 using Testcontainers.MongoDb;
 using Testcontainers.Elasticsearch;
-using DotNet.Testcontainers.Images;
 
 namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup
 {

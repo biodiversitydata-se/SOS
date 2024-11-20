@@ -242,11 +242,6 @@ namespace SOS.Lib.Models.Verbatim.Artportalen
         public bool? TriggeredObservationRuleUnspontaneous { get; set; }
 
         /// <summary>
-        ///  Triggered observation rule Regional Sighting State
-        /// </summary>
-        //public int? TriggeredObservationRuleRegionalSightingState { get; set; }
-
-        /// <summary>
         ///     Date sighting was added
         /// </summary>
         public DateTime? ReportedDate { get; set; }

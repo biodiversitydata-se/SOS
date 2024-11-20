@@ -20,6 +20,8 @@ namespace SOS.Lib.Cache
         /// Constructor
         /// </summary>
         /// <param name="dataProviderRepository"></param>
+        /// <param name="memoryCache"></param>
+        /// <param name="logger"></param>
         public DataProviderCache(IDataProviderRepository dataProviderRepository, IMemoryCache memoryCache, ILogger<CacheBase<int, DataProvider>> logger) : base(dataProviderRepository, memoryCache, logger)
         {
             CacheDuration = TimeSpan.FromMinutes(5);

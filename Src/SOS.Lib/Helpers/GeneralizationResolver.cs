@@ -166,7 +166,7 @@ namespace SOS.Lib.Helpers
             return dict;
         }
 
-        private T? GetValue<T>(IDictionary<string, object> obs, string propertyPath)
+        private T GetValue<T>(IDictionary<string, object> obs, string propertyPath)
         {
             var parts = propertyPath
                 .Split(".")

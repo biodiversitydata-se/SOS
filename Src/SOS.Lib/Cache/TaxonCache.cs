@@ -17,6 +17,8 @@ namespace SOS.Lib.Cache
         /// Constructor
         /// </summary>
         /// <param name="taxonRepository"></param>
+        /// <param name="memoryCache"></param>
+        /// <param name="logger"></param>
         public TaxonCache(ITaxonRepository taxonRepository, IMemoryCache memoryCache, ILogger<CacheBase<int, Taxon>> logger) : base(taxonRepository, memoryCache, logger)
         {
             CacheDuration = TimeSpan.FromMinutes(10);

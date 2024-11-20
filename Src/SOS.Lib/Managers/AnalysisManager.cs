@@ -112,12 +112,13 @@ namespace SOS.Lib.Managers
         }
 
         /// <summary>
-        ///  Constructor
+        /// Constructor
         /// </summary>
         /// <param name="filterManager"></param>
         /// <param name="processedObservationRepository"></param>
         /// <param name="areaCache"></param>
         /// <param name="fileService"></param>
+        /// <param name="taxonManager"></param>
         /// <param name="logger"></param>
         /// <exception cref="ArgumentNullException"></exception>
         public AnalysisManager(
@@ -278,7 +279,7 @@ namespace SOS.Lib.Managers
                             }
                             catch(Exception e)
                             {
-                                _logger.LogError(ex, $"Error when calculating ConcaveHull() with useCenterPoint=false.");
+                                _logger.LogError(e, $"Error when calculating ConcaveHull() with useCenterPoint=false.");
                             }
                         }
                     }
