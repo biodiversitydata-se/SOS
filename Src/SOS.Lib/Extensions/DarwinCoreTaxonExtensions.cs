@@ -68,6 +68,8 @@ namespace SOS.Lib.Extensions
 
         public static Taxon ToProcessedTaxon(this DarwinCoreTaxon sourceTaxon)
         {
+            var sightingScientificName = sourceTaxon.ScientificNames?.FirstOrDefault(vn => vn.ValidForSighting);
+
             var taxon = new Taxon();
             taxon.SecondaryParentDyntaxaTaxonIds = sourceTaxon.DynamicProperties?.SecondaryParentDyntaxaTaxonIds;
             taxon.AcceptedNameUsage = sourceTaxon.AcceptedNameUsage;
@@ -97,6 +99,9 @@ namespace SOS.Lib.Extensions
             taxon.ScientificNameAuthorship = sourceTaxon.ScientificNameAuthorship;
             taxon.ScientificNameId = sourceTaxon.ScientificNameID;
             taxon.SpecificEpithet = sourceTaxon.SpecificEpithet;
+            taxon.SightingScientificName = sightingScientificName?.Name;
+            taxon.SightingScientificNameAuthorship = sightingScientificName?.Author;
+            taxon.SightingVernacularName = sourceTaxon.VernacularNames?.FirstOrDefault(vn => vn.ValidForSighting)?.Name;
             taxon.Subgenus = sourceTaxon.Subgenus;
             taxon.TaxonConceptId = sourceTaxon.TaxonConceptID;
             taxon.Attributes = new TaxonAttributes();
@@ -121,7 +126,6 @@ namespace SOS.Lib.Extensions
             taxon.Attributes.SwedishOccurrence = sourceTaxon.DynamicProperties?.SwedishOccurrence;
             taxon.Attributes.Synonyms = sourceTaxon.Synonyms?.ToTaxonSynonymNames();
             taxon.Attributes.TaxonCategory = VocabularyValue.Create(sourceTaxon.DynamicProperties?.TaxonCategoryId);
-            taxon.Attributes.ScientificNames = sourceTaxon.ScientificNames?.ToTaxonScientificNames();
             taxon.Attributes.VernacularNames = sourceTaxon.VernacularNames?.ToTaxonVernacularNames();
 
             taxon.TaxonId = sourceTaxon.TaxonID;
