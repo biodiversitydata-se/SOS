@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using Nest;
 using SOS.Lib;
 using SOS.Lib.Cache.Interfaces;
@@ -139,18 +140,20 @@ namespace SOS.Observations.Api.Repositories
             var result = dic.Values
                 .Skip(skip)
                 .Take(take)
-                .ToList();            
-            
+                .ToList();
+
+            var taxonTree = await _taxonManager.GetTaxonTreeAsync();
             foreach (var item in result)
             {
-                var taxonTree = await _taxonManager.GetTaxonTreeAsync();
                 var treeNode = taxonTree.GetTreeNode(item.TaxonId);
                 if (treeNode != null)
                 {
+                    var sightingScientificName = treeNode.Data.Attributes.ScientificNames?.FirstOrDefault(vn => vn.ValidForSighting);
+                    var sightingVernacularName = treeNode.Data.Attributes.VernacularNames?.FirstOrDefault(vn => vn.ValidForSighting);
                     item.RedlistCategory = treeNode.Data.Attributes.RedlistCategory ?? "";
-                    item.ScientificName = (string.IsNullOrEmpty(treeNode.Data.SightingScientificName) ? treeNode.Data.ScientificName : treeNode.Data.SightingScientificName) ?? "";
-                    item.VernacularName = (string.IsNullOrEmpty(treeNode.Data.SightingVernacularName) ? treeNode.Data.VernacularName : treeNode.Data.SightingVernacularName) ?? "";
-                    item.ScientificNameAuthorship = (string.IsNullOrEmpty(treeNode.Data.SightingScientificName) ? treeNode.Data.ScientificNameAuthorship : treeNode.Data.SightingScientificNameAuthorship) ?? "";
+                    item.ScientificName = (string.IsNullOrEmpty(sightingScientificName?.Name) ? treeNode.Data.ScientificName : sightingScientificName.Name) ?? "";
+                    item.VernacularName = (string.IsNullOrEmpty(sightingVernacularName?.Name) ? treeNode.Data.VernacularName : sightingVernacularName.Name) ?? "";
+                    item.ScientificNameAuthorship = (string.IsNullOrEmpty(sightingScientificName?.Name) ? treeNode.Data.ScientificNameAuthorship : sightingScientificName.Author) ?? "";
                 }
             }
 

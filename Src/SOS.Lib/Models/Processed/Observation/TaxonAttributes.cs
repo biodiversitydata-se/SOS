@@ -117,6 +117,11 @@ namespace SOS.Lib.Models.Processed.Observation
         public string RedlistCategoryDerived { get; set; }
 
         /// <summary>
+        /// Scientific names
+        /// </summary>
+        public IEnumerable<TaxonScientificName> ScientificNames { get; set; }
+
+        /// <summary>
         /// Information about how protected information about a species is in Sweden.
         /// This is a value between 1 to 5.
         /// 1 indicates public access and 5 is the highest used security level.
