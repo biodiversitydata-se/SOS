@@ -351,7 +351,7 @@ This filter will return observations within the specified polygon and observatio
 ## Taxon filter
 
 ### Search for observations of a specific taxon
-This filter will return observations where taxon is 100777, otter.
+This filter will return observations where taxon ID is 100077, otter (Lutra lutra).
 ```json
 {        
     "taxon" : {
@@ -361,7 +361,7 @@ This filter will return observations where taxon is 100777, otter.
 ```
 
 ### Include underlying taxa in search
-This filter will return all bird (aves) observations.
+This filter will return observations for all belonging to birds (class Aves), taxon ID 4000104.
 ```json
 {        
     "taxon" : {
@@ -372,7 +372,7 @@ This filter will return all bird (aves) observations.
 ```
 
 ### Search for observations with red list categories
-This filter will return observation of critically endangered (CR), endangered (EN) and vulnerable (VU) species.
+This filter will return observation of species classified as critically endangered (CR), endangered (EN) and vulnerable (VU).
 ```json
 {        
     "taxon" : {
@@ -402,11 +402,11 @@ The following taxon lists exists:
 | Id 	| ParentId 	| Title (en) 	| Title (sv) 	| Description 	|
 |-	|-	|-	|-	|-	|
 | 1 	|  	| Protected by law species 	| Fridlysta arter 	|  	|
-| 2 	|  	| Signal species 	| Signalarter 	|  	|
+| 2 	|  	| Signal species 	| Signalarter 	| Skogsstyrelsens signalarter 	|
 | 3 	|  	| Invasive species 	| Främmande arter 	| Främmande arter = Alien species, which are all species that are not considered native, meaning species that have either spontaneously immigrated or that we introduced at some time after year 1800. Currently [2024] listed are [4945 species]( https://artfakta.se/sok/taxa?mainLists=%5B36,37,39,40,41,42,43,48%5D). Note that the current English title for this list is not a correct translation and representaion of the list's content. 	|
 | 4 	| 3 	| Invasive species in Sweden 	| Främmande arter i Sverige 	| Främmande arter i Sverige = Alien species in Sweden. Currently [2024] listed are [4768 species]( https://artfakta.se/sok/taxa?mainLists=%5B36%5D).  Note that the current English title for this list is not a correct translation and representaion of the list's content. 	|
 | 5 	| 3 	| EU regulation 1143/2014 	| EU-förordning 1143/2014 	| [Regulation (EU) No 1143/2014 of the European Parliament and of the Council of 22 October 2014 on the prevention and management of the introduction and spread of invasive alien species](https://eur-lex.europa.eu/eli/reg/2014/1143/oj), listing species considered to be particularly harmful. Currently [2024] listed are [92 species](https://artfakta.se/sok/taxa?mainLists=%5B37%5D). [[Wikipedia](https://en.wikipedia.org/wiki/List_of_invasive_alien_species_of_Union_concern), [Swedish EPA](https://www.naturvardsverket.se/vagledning-och-stod/invasiva-frammande-arter/regler-inom-invasiva-arter/)] 	|
-| 6 	| 3 	| Risk assessment 	| Risklista 	| Risklista = Risk assessment list, listing species for which risk of invasiveness in Sweden has been assessed. Currently [2024] listed are [923 species]( https://artfakta.se/sok/taxa?mainLists=%5B39,40,41,42,43,48%5D) (assessment made in 2018). Species assessed as of the highest risk in categories SE (Severe risk) and HI (High risk) are commonly considered as “species that are invasive in Sweden”, currently [2024] listed are [122 (SE) and 132 (HI) species](https://artfakta.se/sok/taxa?mainLists=%5B39,40%5D). A new risk assessment is under way that will be able to assess about twice as many species. 	|
+| 6 	| 3 	| Risk assessment 	| Risklista 	| Risklista = Risk assessment list, listing alien species for which risk of invasiveness in Sweden has been assessed. Currently [2024] listed are [923 species]( https://artfakta.se/sok/taxa?mainLists=%5B39,40,41,42,43,48%5D) (assessment made in 2018). Species assessed as of the highest risk in categories SE (Severe risk) and HI (High risk) are commonly considered as “species that are invasive in Sweden”, currently [2024] listed are [122 (SE) and 132 (HI) species](https://artfakta.se/sok/taxa?mainLists=%5B39,40%5D). A new risk assessment is under way that will be able to assess about twice as many species. 	|
 | 7 	|  	| Redlisted species 	| Rödlistade arter 	| Species listed in the Swedish Red List compiling information on the extinction risk of individual species. Assessments are based on criteria developed by the International Union for Conservation of Nature (IUCN). Currently containing the results presented in the Swedish Redlist 2020.  	|
 | 8 	|  	| Habitats directive species 	| Habitatdirektivet 	|  	|
 | 9 	| 8 	| Habitats directive Annex 2 	| Habitatdirektivets bilaga 2 	| The [Habitats Directives]( https://environment.ec.europa.eu/topics/nature-and-biodiversity/habitats-directive_en) provide a legislative framework for all EU countries to protect the most valuable and threatened biodiversity. Species listed in the Annex II of the Habitats Directive are species requiring designation of Special Areas of Conservation. 	|
@@ -418,7 +418,7 @@ The following taxon lists exists:
 | 15 	| 13 	| Birds directive - Annex 1 	| Fågeldirektivet - bilaga 1 	| Bird species listed in Annex I are birds which are the subject of special conservation measures concerning their habitat in order to ensure their survival and reproduction in their area of distribution. As appropriate, Special Protection Areas to be established to assist conservation measures. Currently [2024] [73 species](https://artfakta.se/sok/taxa?mainLists=%5B46%5D). 	|
 | 16 	| 13 	| Birds directive - Annex 2 	| Fågeldirektivet - bilaga 2 	| Bird species listed in Annex II are birds which may potentially be hunted under national legislation within the geographical land and sea area to which the Directive applies, or only within certain specified Member States. Currently [2024] [141 species](https://artfakta.se/sok/taxa?mainLists=%5B47%5D). 	|
 | 17 	|  	| Action plan 	| Åtgärdsprogram 	|  	|
-| 18 	|  	| Swedish forest agency nature conservation species 	| Skogsstyrelsens naturvårdsarter 	|  	|
+| 18 	|  	| Swedish forest agency nature conservation species 	| Skogsstyrelsens naturvårdsarter 	| [Skogsstyrelsens naturvårdsarter](https://www.skogsstyrelsen.se/miljo-och-klimat/biologisk-mangfald/signalarter/). Includes signal species (signal arter), red listed species and species protected by law (fridlysta arter). 	|
 | 19 	| 6	| Risk assessment - Severe impact 	| Risklista - Mycket hög risk (SE) 	|  	|
 | 20 	| 6	| Risk assessment - High impact 	| Risklista - Hög risk (HI) 	|  	|
 | 21 	| 6	| Risk assessment - Potentially high impact 	| Risklista - Potentiellt hög risk (PH) 	|  	|
@@ -434,7 +434,7 @@ The following taxon lists exists:
 
 ### Search for observations with taxon lists - merge
 
-This filter will return observations for all mammal species (TaxonId=4000107) and all Habitats directive species.
+This filter will return observations for all mammal species (TaxonId=4000107) and all species listed in the Habitats directive.
 ```json
 {        
     "taxon" : {
@@ -448,7 +448,7 @@ This filter will return observations for all mammal species (TaxonId=4000107) an
 
 ### Search for observations with taxon lists - filter
 
-This filter will return observations for mammal (TaxonId=4000107) species that are part of the Habitats directive species taxon list.
+This filter will return observations for mammal species (TaxonId=4000107) that are part of the Habitats directive species taxon list.
 ```json
 {        
     "taxon" : {
@@ -462,7 +462,7 @@ This filter will return observations for mammal (TaxonId=4000107) species that a
 
 ### Search for observations with taxon categories
 
-This filter will return observations for bird species. The taxon categories can be found [here](Vocabularies.md#taxonCategory).
+This filter will return observations for species belonging to birds (Aves, TaxonID=4000104). The taxon categories can be found [here](Vocabularies.md#taxonCategory).
 ```json
 {        
     "taxon" : {
