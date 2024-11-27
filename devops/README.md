@@ -31,6 +31,11 @@ gå till ```http://localhost:4200``` i din webbläsare
 api finns på ```http://localhost:5000```   
 *kom ihåg!* kommando: ```skaffold delete -f skaffold.administration.gui.yaml``` för att ta bort allt som du nyss snurrat upp  
 
+###  skaffold.analysis.yaml  
+kommando: ```skaffold run -f skaffold.analysis.yaml```  
+gå till ```http://localhost:5000/swagger``` i din webbläsare   
+*kom ihåg!* kommando: ```skaffold delete -f skaffold.analysis.yaml``` för att ta bort rätt container   
+
 ###  skaffold.datastewardship.yaml  
 kommando: ```skaffold run -f skaffold.datastewardship.yaml```  
 gå till ```http://localhost:5000/swagger``` i din webbläsare   

@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: vault-ca-bundle
+  namespace: sos-analysis-dev
+stringData:
+  ca-bundle.crt: |
+    -----BEGIN CERTIFICATE-----
+    MIIDDTCCAfWgAwIBAgIRAPiO5a8FuFDZvOV6WCQ5CKIwDQYJKoZIhvcNAQELBQAw
+    HzEdMBsGA1UEAxMUVmF1bHQgc2VsZi1zaWduZWQgQ0EwIBcNMjMwMjI1MjE1MzUw
+    WhgPMjEyMzAyMjYwMzUzNTBaMB8xHTAbBgNVBAMTFFZhdWx0IHNlbGYtc2lnbmVk
+    IENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA71j48MjzuhT0JjRH
+    xj1bMOUJj5OKENTWYZZ3tf7/qCu2TrCxAnyqwPv5eh8OxnKSmr3i6B7rZfepE/Xy
+    kcI8aO9WLNmeXlqkxEKu1lANNV6Nz/QYus9UoOdn0zyh09j2FXB1m5mR5SK54QMK
+    wBLcgBLJBmjl4bn2DjCQnJv75zMO7LwUnUrn9GZaefx3IIucdYcFT6VmZPX93Uti
+    aNmWeWWwUycnnkPjM4yh4UgB7XmzekoL4pKafVTFe3yjjUknhdcr66rOt4YSvoS8
+    HRyD/lflzj3ZmMjw5+UE/uuILYdzsL1jrB4kLHXkGBGiSFyhwrv64WZHe3Bhqnbb
+    24yHzQIDAQABo0IwQDAOBgNVHQ8BAf8EBAMCAqQwDwYDVR0TAQH/BAUwAwEB/zAd
+    BgNVHQ4EFgQUh7CFUhrr2zu7IC/+oxCXTSqC+ZYwDQYJKoZIhvcNAQELBQADggEB
+    AA0TbiRK7oJg/dcLWuTTQS85zqfez+FQeyXF66iGORRurDUY3eQg0i+I9WQwWEzj
+    3NN7DaJJGfSaGQImrHsodHS804qmxSdKSuvi6BagbCkuJMStr7g+q94EdNWM+TP8
+    f9RW6amD1s9o27Yv7RORlG0Lv16G/X/Ocyt2hYHU8i9EtoXWH9dRe3w8/sVnDzqm
+    lrZfPLEze/Xpx3EYBIVJmXEh5px23KTGpgYIluFFo/oVbVhxNHxNo0RU619dTMPy
+    u3gxVM58a6v5+mD0GW2Q2N4U7Q/cScnfV6bkMQ50JBLLkQd+fNWvfrg1GJFqhutd
+    KiUXX29odsLGkowNAapeL90=
+    -----END CERTIFICATE-----
+  type: Opaque

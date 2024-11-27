@@ -17,7 +17,6 @@ using SOS.Lib.ActionFilters;
 using SOS.Lib.ApplicationInsights;
 using SOS.Lib.Cache;
 using SOS.Lib.Cache.Interfaces;
-using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.JsonConverters;
@@ -38,7 +37,6 @@ using SOS.Lib.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Swashbuckle.AspNetCore.SwaggerUI;
 using System.Globalization;
-using SOS.Shared.Api.Configuration;
 using SOS.Shared.Api.Utilities.Objects.Interfaces;
 using SOS.Shared.Api.Utilities.Objects;
 using SOS.Shared.Api.Validators.Interfaces;
@@ -146,6 +144,7 @@ namespace SOS.Analysis.Api
             _disableHangfireInit = GetDisableFeature(environmentVariable: "DISABLE_HANGFIRE_INIT");
 
             Configuration = builder.Build();
+            Settings.Init(Configuration); // or fail early!
         }
 
         /// <summary>
@@ -174,6 +173,8 @@ namespace SOS.Analysis.Api
                     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 });
 
+            services.AddHealthChecks().AddCheck<HealthCheck>("CustomHealthCheck");
+
             // MongoDB conventions.
             ConventionRegistry.Register(
                 "MongoDB Solution Conventions",
@@ -185,14 +186,14 @@ namespace SOS.Analysis.Api
                 t => true);
 
             // Identity service configuration
-            var identityServerConfiguration = Configuration.GetSection("IdentityServer").Get<IdentityServerConfiguration>();
+            var identityServerConfiguration = Settings.IdentityServer;
 
             if (identityServerConfiguration == null)
             {
                 throw new Exception("Failed to load Identity Server Configuration");
             }
 
-            var userServiceConfiguration = Configuration.GetSection("UserServiceConfiguration").Get<UserServiceConfiguration>();
+            var userServiceConfiguration = Settings.UserServiceConfiguration;
 
             // Authentication
             services.AddAuthentication(options =>
@@ -250,7 +251,7 @@ namespace SOS.Analysis.Api
             services.AddApplicationInsightsTelemetry(Configuration);
             // Application insights custom
             services.AddApplicationInsightsTelemetryProcessor<IgnoreRequestPathsTelemetryProcessor>();
-            services.AddSingleton(Configuration.GetSection("ApplicationInsights").Get<Lib.Configuration.Shared.ApplicationInsights>()!);
+            services.AddSingleton(Settings.ApplicationInsights!);
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton<ITelemetryInitializer, TelemetryInitializer>();
 
@@ -333,8 +334,7 @@ namespace SOS.Analysis.Api
                     });
                 });
 
-            var analysisConfiguration = Configuration.GetSection("AnalysisConfiguration")
-                .Get<AnalysisConfiguration>();
+            var analysisConfiguration = Settings.AnalysisConfiguration;
 
             // Response compression
             if (analysisConfiguration?.EnableResponseCompression ?? false)
@@ -351,11 +351,11 @@ namespace SOS.Analysis.Api
             }
 
             //setup the elastic search configuration
-            var elasticConfiguration = Configuration.GetSection("SearchDbConfiguration").Get<ElasticSearchConfiguration>();
+            var elasticConfiguration = Settings.SearchDbConfiguration;
             services.AddSingleton<IElasticClientManager, ElasticClientManager>(p => new ElasticClientManager(elasticConfiguration));
 
             // Processed Mongo Db
-            var processedDbConfiguration = Configuration.GetSection("ProcessDbConfiguration").Get<MongoDbConfiguration>();
+            var processedDbConfiguration = Settings.ProcessDbConfiguration;
             if (processedDbConfiguration == null)
             {
                 throw new Exception("Failed to get ProcessDbConfiguration");
@@ -368,10 +368,10 @@ namespace SOS.Analysis.Api
             // Add configuration
             services.AddSingleton(analysisConfiguration!);
             services.AddSingleton(elasticConfiguration!);
-            services.AddSingleton(Configuration.GetSection("InputValaidationConfiguration").Get<InputValaidationConfiguration>()!);
-            services.AddSingleton(Configuration.GetSection("UserServiceConfiguration").Get<UserServiceConfiguration>()!);
-            services.AddSingleton(Configuration.GetSection("AreaConfiguration").Get<AreaConfiguration>()!);
-            services.AddSingleton(Configuration.GetSection("CryptoConfiguration").Get<CryptoConfiguration>()!);
+            services.AddSingleton(Settings.InputValaidationConfiguration!);
+            services.AddSingleton(Settings.UserServiceConfiguration!);
+            services.AddSingleton(Settings.AreaConfiguration!);
+            services.AddSingleton(Settings.CryptoConfiguration!);
 
             // Add security
             services.AddScoped<IAuthorizationProvider, CurrentUserAuthorization>();
@@ -415,7 +415,7 @@ namespace SOS.Analysis.Api
             // Hangfire
             if (!_disableHangfireInit)
             {
-                var mongoConfiguration = Configuration.GetSection("HangfireDbConfiguration").Get<HangfireDbConfiguration>();
+                var mongoConfiguration = Settings.HangfireDbConfiguration;
                 services.AddHangfire(configuration =>
                     configuration
                         .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
@@ -510,6 +510,7 @@ namespace SOS.Analysis.Api
                 }
             });
 
+            app.UseHealthChecks("/healthz");
             app.UseHttpsRedirection();
             app.UseRouting();
 
