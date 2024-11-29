@@ -51,17 +51,17 @@
 
     <ItemGroup>
 	    <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="10.0.0" />
-	    <PackageReference Include="CSharpFunctionalExtensions" Version="3.1.0" />
-	    <PackageReference Include="Elastic.Apm.NLog" Version="8.12.2" />
-	    <PackageReference Include="Elastic.CommonSchema.NLog" Version="8.12.2" />
-	    <PackageReference Include="HangFire" Version="1.8.15" />
+	    <PackageReference Include="CSharpFunctionalExtensions" Version="3.2.0" />
+	    <PackageReference Include="Elastic.Apm.NLog" Version="8.12.3" />
+	    <PackageReference Include="Elastic.CommonSchema.NLog" Version="8.12.3" />
+	    <PackageReference Include="HangFire" Version="1.8.16" />
 	    <PackageReference Include="HangFire.Autofac" Version="2.6.0" />
-	    <PackageReference Include="HangFire.Mongo" Version="1.11.0" />
+	    <PackageReference Include="HangFire.Mongo" Version="1.11.2" />
 	    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="8.0.1" />
 	    <PackageReference Include="NLog.Targets.ElasticSearch" Version="7.7.0" />
-	    <PackageReference Include="NLog.Web.AspNetCore" Version="5.3.14" />
+	    <PackageReference Include="NLog.Web.AspNetCore" Version="5.3.15" />
 	    <PackageReference Include="Quartz" Version="3.13.1" />
-	    <PackageReference Include="Swashbuckle.AspNetCore" Version="7.0.0" />
+	    <PackageReference Include="Swashbuckle.AspNetCore" Version="7.1.0" />
     </ItemGroup>
 
     <ItemGroup>

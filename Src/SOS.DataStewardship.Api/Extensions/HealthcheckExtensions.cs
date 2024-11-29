@@ -12,7 +12,7 @@ internal static class HealthcheckExtensions
     internal static void SetupHealthChecks(this WebApplicationBuilder webApplicationBuilder, MongoDbConfiguration processedDbConfiguration)
     {
         webApplicationBuilder.Services.AddHealthChecks()
-            .AddMongoDb(processedDbConfiguration.GetConnectionString(), tags: new[] { "database", "mongodb" })
+           // .AddMongoDb(processedDbConfiguration.GetConnectionString(), tags: new[] { "database", "mongodb" }) not working with MongoDbdriver 3.0.0
             .AddCheck<DatasetHealthCheck>("Dataset", tags: new[] { "database", "elasticsearch", "query" })
             .AddCheck<EventHealthCheck>("Event", tags: new[] { "database", "elasticsearch", "query" })
             .AddCheck<OccurrenceHealthCheck>("Occurrence", tags: new[] { "database", "elasticsearch", "query" });

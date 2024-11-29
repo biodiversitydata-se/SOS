@@ -25,11 +25,11 @@
 	<ItemGroup>
 		<PackageReference Include="Azure.Storage.Blobs" Version="12.23.0" />
 		<PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="8.0.10" />
-		<PackageReference Include="Microsoft.TypeScript.MSBuild" Version="5.6.2">
+		<PackageReference Include="Microsoft.TypeScript.MSBuild" Version="5.7.1">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="NLog.Web.AspNetCore" Version="5.3.14" />
+		<PackageReference Include="NLog.Web.AspNetCore" Version="5.3.15" />
 	</ItemGroup>
 
 	<ItemGroup>
