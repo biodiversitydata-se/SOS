@@ -37,7 +37,7 @@
 		<PackageReference Include="Azure.Storage.Blobs" Version="12.23.0" />
 		<PackageReference Include="Elastic.Apm.NLog" Version="8.12.3" />
 		<PackageReference Include="Elastic.CommonSchema.NLog" Version="8.12.3" />
-		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="8.0.1" />
+		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="9.0.0" />
 		<PackageReference Include="CSharpFunctionalExtensions" Version="3.2.0" />
 		<PackageReference Include="HangFire" Version="1.8.16" />
 		<PackageReference Include="HangFire.Autofac" Version="2.6.0" />
