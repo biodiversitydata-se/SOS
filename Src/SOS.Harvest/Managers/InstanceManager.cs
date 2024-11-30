@@ -26,13 +26,13 @@ namespace SOS.Harvest.Managers
         {
             try
             {
-                Logger.LogDebug($"Activating instance: {instance}");
+                Logger.LogDebug("Activating instance: {@activeInstance}", instance);
 
                 return await ProcessedObservationRepository.SetActiveInstanceAsync(instance);
             }
             catch (Exception e)
             {
-                Logger.LogError(e, $"Failed to activate instance: {instance}");
+                Logger.LogError(e, "Failed to activate instance: {@activeInstance}", instance);
                 return false;
             }
         }

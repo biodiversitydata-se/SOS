@@ -141,8 +141,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
             }
             catch (Exception e)
             {
-                _logger.LogError(e,
-                    $"Harvest Artportalen checklists ({batchIndex})");
+                _logger.LogError(e,"Harvest Artportalen checklists ({@batchIndex})", batchIndex);
                 throw new Exception("Harvest Artportalen checklists failed");
             }
             finally

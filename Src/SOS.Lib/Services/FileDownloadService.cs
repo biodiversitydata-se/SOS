@@ -35,7 +35,7 @@ namespace SOS.Lib.Services
             }
             catch (Exception e)
             {
-                _logger.LogError($"Failed to get file: {url}", e);
+                _logger.LogError(e, "Failed to get file: {@url}", url);
                 return null;
             }
         }
@@ -75,7 +75,7 @@ namespace SOS.Lib.Services
             }
             catch (Exception e)
             {
-                _logger.LogError($"Failed to get XML-file ({url})", e);
+                _logger.LogError(e, "Failed to get XML-file ({@url})", url);
                 throw;
             }
         }

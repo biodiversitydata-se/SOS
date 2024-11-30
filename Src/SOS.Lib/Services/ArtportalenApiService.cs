@@ -45,7 +45,7 @@ namespace SOS.Lib.Services
             }
             catch (Exception e)
             {
-                _logger.LogError($"Failed to get sighting with sightingId={sightingId} from Artportalen API", e);
+                _logger.LogError(e, "Failed to get sighting with sightingId={@sightingId} from Artportalen API", sightingId);
             }
 
             return null;
@@ -62,7 +62,7 @@ namespace SOS.Lib.Services
             }
             catch (Exception e)
             {
-                _logger.LogError($"Failed to get media for sightingId={sightingId} from Artportalen API", e);
+                _logger.LogError(e, "Failed to get media for sightingId={@sightingId} from Artportalen API", sightingId);
             }
 
             return null;

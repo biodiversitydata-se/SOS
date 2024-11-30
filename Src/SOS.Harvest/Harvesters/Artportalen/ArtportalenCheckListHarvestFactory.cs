@@ -58,7 +58,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Failed to cast Artportalen checklist entity with id:{entity!.Id}");
+                _logger.LogError(ex, "Failed to cast Artportalen checklist entity with id:{@entityId}", entity!.Id);
                 throw;
             }
         }

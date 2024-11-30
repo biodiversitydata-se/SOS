@@ -192,7 +192,7 @@ namespace SOS.Lib.IO.DwcArchive
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"Write observations failed for {dataProvider} and batchId={batchId}");
+                _logger.LogError(e, "Write observations failed for {@dataProvider} and batchId={@batchId}", dataProvider.Identifier, batchId);
                 return false;
             }
         }
@@ -288,12 +288,14 @@ namespace SOS.Lib.IO.DwcArchive
                     if (task.Key.eventBased)
                     {
                         var writeSummary = filePartsInfo.EventDwcaWriteSummary;
-                        _logger.LogInformation($"Generated event based DwC-A file for {dataProvider}. EventCount={writeSummary.EventCount:N0} OccurrenceCount={writeSummary.OccurrenceCount:N0}, EmofCount={writeSummary.EmofCount:N0}, MultimediaCount={writeSummary.MultimediaCount:N0}, Old Hash=\"{dataProvider.LatestUploadedFileHash}\", New Hash=\"{hash}\"");
+                        _logger.LogInformation("Generated event based DwC-A file for {@dataProvider}. EventCount={@eventCount:N0} OccurrenceCount={@occurrenceCount:N0}, EmofCount={@emofCount:N0}, MultimediaCount={@multimediaCount:N0}, Old Hash=\"{@oldHash}\", New Hash=\"{@newHash}\"", 
+                            dataProvider.Identifier, writeSummary.EventCount, writeSummary.OccurrenceCount, writeSummary.EmofCount, writeSummary.MultimediaCount, dataProvider.LatestUploadedFileHash, hash);
                     }
                     else
                     {
                         var writeSummary = filePartsInfo.OccurrenceDwcaWriteSummary;
-                        _logger.LogInformation($"Generated DwC-A file for {dataProvider}. OccurrenceCount={writeSummary.OccurrenceCount:N0}, EmofCount={writeSummary.EmofCount:N0}, MultimediaCount={writeSummary.MultimediaCount:N0}, Old Hash=\"{dataProvider.LatestUploadedFileHash}\", New Hash=\"{hash}\"");
+                        _logger.LogInformation("Generated DwC-A file for {@dataProvider}. OccurrenceCount={@occurrenceCount:N0}, EmofCount={@emofCount:N0}, MultimediaCount={@multimediaCount:N0}, Old Hash=\"{@oldHash}\", New Hash=\"{@newHash}\"",
+                            dataProvider.Identifier, writeSummary.OccurrenceCount, writeSummary.EmofCount, writeSummary.MultimediaCount, dataProvider.LatestUploadedFileHash, hash);
                     }
 
                     if (dataProvider.LatestUploadedFileHash == hash)
@@ -365,7 +367,7 @@ namespace SOS.Lib.IO.DwcArchive
                     }
                     catch (Exception e)
                     {
-                        _logger.LogError(e, $"Failed to delete file: {filePath}");
+                        _logger.LogError(e, "Failed to delete file: {@filePath}", filePath);
                     }
                 }
 
@@ -377,7 +379,7 @@ namespace SOS.Lib.IO.DwcArchive
                     }
                     catch (Exception e)
                     {
-                        _logger.LogError(e, $"Failed to delete file: {filePath}");
+                        _logger.LogError(e, "Failed to delete file: {@filePath}", filePath);
                     }
                 }
 

@@ -52,7 +52,7 @@ namespace SOS.Administration.Api.Controllers
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"{MethodBase.GetCurrentMethod()?.Name}() failed");
+                _logger.LogError(e, "{@methodName}() failed", MethodBase.GetCurrentMethod()?.Name);
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
@@ -71,7 +71,7 @@ namespace SOS.Administration.Api.Controllers
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"{MethodBase.GetCurrentMethod()?.Name}() failed");
+                _logger.LogError(e, "{@methodName}() failed", MethodBase.GetCurrentMethod()?.Name);
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }

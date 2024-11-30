@@ -80,7 +80,7 @@ namespace SOS.Observations.Api.Controllers
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"Error getting area {areaType} {featureId}");
+                _logger.LogError(e, "Error getting area {@areaType} {@featureId}", areaType, featureId);
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }

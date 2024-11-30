@@ -39,13 +39,13 @@ namespace SOS.Harvest.Services
             }
             catch (FaultException e)
             {
-                _logger.LogError(e, $"Failed to get MVM observations from id: {getFromId}, attempt: {attempt}");
+                _logger.LogError(e, "Failed to get {@dataProvider} observations from id: {@getFromId}, attempt: " + attempt, "MVM", getFromId);
 
                 throw;
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"Failed to get MVM observations from id: {getFromId}, attempt: {attempt}");
+                _logger.LogError(e, "Failed to get {@dataProvider} observations from id: {@getFromId}, attempt: " + attempt, "MVM", getFromId);
                 // Give it up to tree attempts to get the data
                 if (attempt < 3)
                 {

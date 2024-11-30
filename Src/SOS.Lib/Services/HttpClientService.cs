@@ -167,7 +167,7 @@ namespace SOS.Lib.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError($"{requestUri.PathAndQuery} \n{responsePhrase}: {ex.Message}");
+                _logger.LogError(ex, "HtppClient.GetDataAsync() failed. RequestUri={@requestUri}", requestUri.AbsolutePath);
             }
             finally
             {
@@ -212,7 +212,7 @@ namespace SOS.Lib.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Post to {requestUri} failed", ex);
+                _logger.LogError(ex, "Post to {@requestUri} failed", requestUri.AbsolutePath);
             }
             finally
             {
@@ -247,7 +247,7 @@ namespace SOS.Lib.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError($"{requestUri.PathAndQuery} \n{ex.Message}");
+                _logger.LogError(ex, "HtppClient.PutDataAsync() failed. RequestUri={@requestUri}", requestUri.AbsolutePath);
             }
             finally
             {
@@ -269,8 +269,7 @@ namespace SOS.Lib.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError($"{requestUri.PathAndQuery} \n{ex.Message}");
-
+                _logger.LogError(ex, "HtppClient.DeleteDataAsync() failed. RequestUri={@requestUri}", requestUri.AbsolutePath);
                 Thread.Sleep(1000);
             }
             finally

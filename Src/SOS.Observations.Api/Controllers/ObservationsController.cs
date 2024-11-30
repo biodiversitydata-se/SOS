@@ -159,7 +159,7 @@ namespace SOS.Observations.Api.Controllers
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"Error getting observation {occurrenceId}");
+                _logger.LogError(e, "Error getting observation {@occurrenceId}", occurrenceId);
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
@@ -773,7 +773,7 @@ namespace SOS.Observations.Api.Controllers
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"Error getting observation {id}");
+                _logger.LogError(e, "Error getting observation {occurrenceId}", id);
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
@@ -938,7 +938,7 @@ namespace SOS.Observations.Api.Controllers
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"Error getting observation {occurrenceId}");
+                _logger.LogError(e, "Error getting observation {@occurrenceId}", occurrenceId);
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
