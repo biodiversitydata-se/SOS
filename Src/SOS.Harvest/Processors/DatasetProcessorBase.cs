@@ -54,9 +54,9 @@ namespace SOS.Harvest.Processors
         {
             try
             {
-                Logger.LogDebug($"Datasets - Start storing {dataProvider.Identifier} batch: {batchId}");
+                Logger.LogDebug("Datasets - Start storing {@dataProvider} batch: {@batchId}", dataProvider.Identifier, batchId);
                 var processedCount = await DatasetRepository.AddManyAsync(processedDatasets);
-                Logger.LogDebug($"Datasets - Finish storing {dataProvider.Identifier} batch: {batchId} ({processedCount})");
+                Logger.LogDebug("Datasets - Finish storing {@dataProvider} batch: {@batchId} ({@datasetProcessCount})", dataProvider.Identifier, batchId, processedCount);
 
                 return processedCount;
             }
@@ -64,13 +64,13 @@ namespace SOS.Harvest.Processors
             {
                 if (attempt < 3)
                 {
-                    Logger.LogWarning(e, $"Datasets - Failed to commit batch: {batchId} for {dataProvider}, attempt: {attempt}");
+                    Logger.LogWarning(e, "Datasets - Failed to commit batch: {@batchId} for {@dataProvider}, attempt: " + attempt, batchId, dataProvider);
                     Thread.Sleep(attempt * 200);
                     attempt++;
                     return await CommitBatchAsync(dataProvider, processedDatasets, batchId, attempt);
                 }
 
-                Logger.LogError(e, $"Datasets - Failed to commit batch:{batchId} for {dataProvider}");
+                Logger.LogError(e, "Datasets - Failed to commit batch:{@batchId} for {@dataProvider}", batchId, dataProvider);
                 throw;
             }
 
@@ -97,16 +97,16 @@ namespace SOS.Harvest.Processors
             try
             {
                 cancellationToken?.ThrowIfCancellationRequested();
-                Logger.LogDebug($"Datasets - Start fetching {dataProvider.Identifier} batch ({startId}-{endId})");
+                Logger.LogDebug("Datasets - Start fetching {@dataProvider} batch ({@batchStartId}-{@batchEndId})", dataProvider.Identifier, startId, endId);
                 var datasetsBatch = await datasetVerbatimRepository.GetBatchAsync(startId, endId);
-                Logger.LogDebug($"Datasets - Finish fetching {dataProvider.Identifier} batch ({startId}-{endId})");
+                Logger.LogDebug("Datasets - Finish fetching {@dataProvider} batch ({@batchStartId}-{@batchEndId})", dataProvider.Identifier, startId, endId);
 
                 if (!datasetsBatch?.Any() ?? true)
                 {
                     return 0;
                 }
 
-                Logger.LogDebug($"Dataset - Start processing {dataProvider.Identifier} batch ({startId}-{endId})");
+                Logger.LogDebug("Dataset - Start processing {@dataProvider} batch ({@batchStartId}-{@batchEndId})", dataProvider.Identifier, startId, endId);
 
                 var datasets = new ConcurrentDictionary<string, Dataset>();
 
@@ -123,7 +123,7 @@ namespace SOS.Harvest.Processors
                     datasets.TryAdd(dataset.Identifier.ToString(), dataset);
                 }
 
-                Logger.LogDebug($"Dataset - Finish processing {dataProvider.Identifier} batch ({startId}-{endId})");
+                Logger.LogDebug("Dataset - Finish processing {@dataProvider} batch ({@batchStartId}-{@batchEndId})", dataProvider.Identifier, startId, endId);
 
                 return await ValidateAndStoreDatasets(dataProvider, datasets.Values, $"{startId}-{endId}");
             }
@@ -134,7 +134,7 @@ namespace SOS.Harvest.Processors
             }
             catch (Exception e)
             {
-                Logger.LogError(e, $"Datasets - Process {dataProvider.Identifier} datasets from id: {startId} to id: {endId} failed");
+                Logger.LogError(e, "Datasets - Process {@dataProvider} datasets from id: {@batchStartId} to id: {@batchEndId} failed", dataProvider.Identifier, startId, endId);
                 throw;
             }
             finally
@@ -221,21 +221,21 @@ namespace SOS.Harvest.Processors
 
             try
             {
-                Logger.LogDebug($"Dataset - Start processing {dataProvider.Identifier} datasets");
+                Logger.LogDebug("Dataset - Start processing {@dataProvider} datasets", dataProvider.Identifier);
                 var processCount = await ProcessDatasetsAsync(dataProvider, cancellationToken);
 
-                Logger.LogInformation($"Dataset - Finish processing {dataProvider.Identifier} datasets.");
+                Logger.LogInformation("Dataset - Finish processing {@dataProvider} datasets.", dataProvider.Identifier);
 
                 return ProcessingStatus.Success(dataProvider.Identifier, Type, startTime, DateTime.Now, processCount, 0, 0);
             }
             catch (JobAbortedException)
             {
-                Logger.LogInformation($"{dataProvider.Identifier} dataset processing was canceled.");
+                Logger.LogInformation("{@dataProvider} dataset processing was canceled.", dataProvider.Identifier);
                 return ProcessingStatus.Cancelled(dataProvider.Identifier, Type, startTime, DateTime.Now);
             }
             catch (Exception e)
             {
-                Logger.LogError(e, $"Failed to process {dataProvider.Identifier} datasets");
+                Logger.LogError(e, "Failed to process {@dataProvider} datasets", dataProvider.Identifier);
                 return ProcessingStatus.Failed(dataProvider.Identifier, Type, startTime, DateTime.Now);
             }
         }

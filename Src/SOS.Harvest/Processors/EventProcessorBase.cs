@@ -69,20 +69,20 @@ namespace SOS.Harvest.Processors
 
             try
             {
-                Logger.LogDebug($"Event - Start processing {dataProvider.Identifier} events");
+                Logger.LogDebug("Event - Start processing {@dataProvider} events", dataProvider.Identifier);
                 var processCount = await ProcessEventsAsync(dataProvider, cancellationToken);
-                Logger.LogInformation($"Event - Finish processing {dataProvider.Identifier} events. publicCount={processCount.publicCount}, protectedCount={processCount.protectedCount}, failedCount={processCount.failedCount}");
+                Logger.LogInformation("Event - Finish processing {@dataProvider} events. publicCount={processCount.publicCount}, protectedCount={processCount.protectedCount}, failedCount={processCount.failedCount}", dataProvider.Identifier, processCount.publicCount, processCount.protectedCount, processCount.failedCount);
 
                 return ProcessingStatus.Success(dataProvider.Identifier, Type, startTime, DateTime.Now, processCount.publicCount, processCount.protectedCount, processCount.failedCount);
             }
             catch (JobAbortedException)
             {
-                Logger.LogInformation($"{dataProvider.Identifier} event processing was canceled.");
+                Logger.LogInformation("{@dataProvider} event processing was canceled.", dataProvider.Identifier);
                 return ProcessingStatus.Cancelled(dataProvider.Identifier, Type, startTime, DateTime.Now);
             }
             catch (Exception e)
             {
-                Logger.LogError(e, $"Failed to process {dataProvider.Identifier} events");
+                Logger.LogError(e, "Failed to process {@dataProvider} events", dataProvider.Identifier);
                 return ProcessingStatus.Failed(dataProvider.Identifier, Type, startTime, DateTime.Now);
             }
         }
@@ -108,12 +108,12 @@ namespace SOS.Harvest.Processors
             try
             {
                 cancellationToken?.ThrowIfCancellationRequested();
-                Logger.LogDebug($"Event - Start fetching {dataProvider.Identifier} batch ({startId}-{endId})");
+                Logger.LogDebug("Event - Start fetching {@dataProvider} batch ({@batchStartId}-{@batchEndId})", dataProvider.Identifier, startId, endId);
                 var verbatimEventsBatch = await eventVerbatimRepository.GetBatchAsync(startId, endId);
-                Logger.LogDebug($"Event - Finish fetching {dataProvider.Identifier} batch ({startId}-{endId})");
+                Logger.LogDebug("Event - Finish fetching {@dataProvider} batch ({@batchStartId}-{@batchEndId})", dataProvider.Identifier, startId, endId);
                 if (!verbatimEventsBatch?.Any() ?? true) return (0, 0, 0);
 
-                Logger.LogDebug($"Event - Start processing {dataProvider.Identifier} batch ({startId}-{endId})");
+                Logger.LogDebug("Event - Start processing {@dataProvider} batch ({@batchStartId}-{@batchEndId})", dataProvider.Identifier, startId, endId);
                 var processedEvents = new ConcurrentDictionary<string, Event>();
                 foreach (var verbatimEvent in verbatimEventsBatch!)
                 {
@@ -122,7 +122,7 @@ namespace SOS.Harvest.Processors
                     processedEvents.TryAdd(processedEvent.EventId, processedEvent);
                 }
 
-                Logger.LogDebug($"Event - Finish processing {dataProvider.Identifier} batch ({startId}-{endId})");
+                Logger.LogDebug("Event - Finish processing {@dataProvider} batch ({@batchStartId}-{@batchEndId})", dataProvider.Identifier, startId, endId);
                 return await ValidateAndStoreEvents(dataProvider, processedEvents.Values, $"{startId}-{endId}");
             }
             catch (JobAbortedException)
@@ -132,7 +132,7 @@ namespace SOS.Harvest.Processors
             }
             catch (Exception e)
             {
-                Logger.LogError(e, $"Event - Process {dataProvider.Identifier} event from id: {startId} to id: {endId} failed");
+                Logger.LogError(e, "Event - Process {@dataProvider} event from id: {@batchStartId} to id: {@batchEndId} failed", dataProvider.Identifier, startId, endId);
                 throw;
             }
             finally
@@ -157,22 +157,22 @@ namespace SOS.Harvest.Processors
         {
             try
             {
-                Logger.LogDebug($"Event - Start storing {dataProvider.Identifier} batch: {batchId}");
+                Logger.LogDebug("Event - Start storing {@dataProvider} batch: {@batchId}", dataProvider.Identifier, batchId);
                 var processedCount = await ObservationEventRepository.AddManyAsync(processedEvents);
-                Logger.LogDebug($"Event - Finish storing {dataProvider.Identifier} batch: {batchId} ({processedCount})");
+                Logger.LogDebug("Event - Finish storing {@dataProvider} batch: {@batchId} ({@eventProcessCount})", dataProvider.Identifier, batchId, processedCount);
                 return processedCount;
             }
             catch (Exception e)
             {
                 if (attempt < 3)
                 {
-                    Logger.LogWarning(e, $"Event - Failed to commit batch: {batchId} for {dataProvider}, attempt: {attempt}");
+                    Logger.LogWarning(e, "Event - Failed to commit batch: {@batchId} for {@dataProvider}, attempt: " + attempt, batchId, dataProvider.Identifier);
                     System.Threading.Thread.Sleep(attempt * 200);
                     attempt++;
                     return await CommitBatchAsync(dataProvider, processedEvents, batchId, attempt);
                 }
 
-                Logger.LogError(e, $"Event - Failed to commit batch:{batchId} for {dataProvider}");
+                Logger.LogError(e, "Event - Failed to commit batch:{@batchId} for {@dataProvider}", batchId, dataProvider.Identifier);
                 throw;
             }
         }
@@ -239,12 +239,12 @@ namespace SOS.Harvest.Processors
             ICollection<Event> events,
             string batchId)
         {
-            Logger.LogDebug($"Start events validation {dataProvider.Identifier} batch: {batchId}");
+            Logger.LogDebug("Start events validation {@dataProvider} batch: {@batchId}", dataProvider.Identifier, batchId);
 
             var invalidEvents = ValidationManager.ValidateEvents(ref events, dataProvider);
             await ValidationManager.AddInvalidEventsToDb(invalidEvents);
 
-            Logger.LogDebug($"End events validation {dataProvider.Identifier} batch: {batchId}");
+            Logger.LogDebug("End events validation {@dataProvider} batch: {@batchId}", dataProvider.Identifier, batchId);
 
             return events;
         }

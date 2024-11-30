@@ -39,7 +39,7 @@ namespace SOS.Harvest.Services
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Failed to get data from KUL");
+                _logger.LogError(e, "Failed to get data from {@dataProvider}", "KUL");
                 throw;
             }
         }

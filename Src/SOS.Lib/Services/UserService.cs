@@ -138,7 +138,7 @@ namespace SOS.Lib.Services
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Failed to get user");
+                _logger.LogError(e, "Failed to get user authorities. UserId={@userId}", userId);                
             }
 
             return null;
@@ -188,7 +188,7 @@ namespace SOS.Lib.Services
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Failed to get user authorities");
+                _logger.LogError(e, "Failed to get user authorities. UserId={@userId}", userId);
             }
 
             return null;
@@ -209,7 +209,7 @@ namespace SOS.Lib.Services
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Failed to get user authorities");
+                _logger.LogError(e, "Failed to get user authorities. UserId={@userId}", userId);                
             }
 
             return null;
@@ -238,7 +238,7 @@ namespace SOS.Lib.Services
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Failed to get user roles");
+                _logger.LogError(e, "Failed to get user roles. UserId={@userId}", userId);                
             }
 
             return null;
@@ -260,7 +260,7 @@ namespace SOS.Lib.Services
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Failed to get user roles");
+                _logger.LogError(e, "Failed to get user roles. UserId={@userId}", userId);                
             }
 
             return null;
@@ -288,7 +288,7 @@ namespace SOS.Lib.Services
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Failed to get person information");
+                _logger.LogError(e, "Failed to get person information. PersonId={@personId}", personId);                
             }
 
             return null;
@@ -309,7 +309,7 @@ namespace SOS.Lib.Services
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Failed to get person information");
+                _logger.LogError(e, "Failed to get person information. PersonId={@personId}", personId);                
             }
 
             return null;

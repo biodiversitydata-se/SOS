@@ -135,12 +135,12 @@ namespace SOS.Harvest.Harvesters.DwC
             }
             catch (JobAbortedException e)
             {
-                _logger.LogError(e, $"Canceled harvest of DwC Archive for {dataProvider.Identifier}");
+                _logger.LogError(e, "Canceled harvest of DwC Archive for {@dataProvider}", dataProvider.Identifier);
                 harvestInfo.Status = RunStatus.Canceled;
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"Failed harvest of DwC Archive for {dataProvider.Identifier}");
+                _logger.LogError(e, "Failed harvest of DwC Archive for {@dataProvider}", dataProvider.Identifier);
                 harvestInfo.Status = RunStatus.Failed;
             }
 
@@ -214,7 +214,7 @@ namespace SOS.Harvest.Harvesters.DwC
                         }
                         catch (Exception e)
                         {
-                            _logger.LogError(e, $"Error getting EML file for {provider.Identifier}:{dataset.Identifier}");
+                            _logger.LogError(e, "Error getting EML file for {@dataProvider}:{@dataset}", provider.Identifier, dataset.Identifier);
                         }
                     }
 

@@ -118,7 +118,7 @@ namespace SOS.Observations.Api.Controllers
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"Error getting last modified date for provider {providerId.ToString(CultureInfo.InvariantCulture)}");
+                _logger.LogError(e, "Error getting last modified date for provider {@dataProviderId}", providerId);
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
@@ -174,7 +174,7 @@ namespace SOS.Observations.Api.Controllers
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"Error getting EML date for provider {providerId.ToString(CultureInfo.InvariantCulture)}");
+                _logger.LogError(e, "Error getting EML date for provider {@dataProviderId}", providerId);
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }

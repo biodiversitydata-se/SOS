@@ -517,13 +517,12 @@ namespace SOS.Lib.IO.DwcArchive
                 await CreateEventDwcArchiveFileAsync(dataProvider, new[] { dwcaFilePartsInfo }, tempFilePath);
 
                 _fileService.MoveFile(tempFilePath, filePath);
-                _logger.LogInformation($"A new .zip({filePath}) was created.");
-
+                _logger.LogInformation($"A new .zip({filePath}) was created. " + "DataProvider={@dataProvider}", dataProvider?.Identifier);
                 return filePath;
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"Creating DwC-A .zip for {dwcaFilePartsInfo?.DataProvider} failed");
+                _logger.LogError(e, "Creating DwC-A .zip for {@dataProvider} failed", dwcaFilePartsInfo?.DataProvider?.Identifier);
                 throw;
             }
             finally

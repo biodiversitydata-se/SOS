@@ -729,7 +729,7 @@ namespace SOS.Lib.Repositories.Processed
                     {
                         if (r.Error != null)
                         {
-                            Logger.LogError($"OccurrenceId: {o?.Occurrence?.OccurrenceId}, {r.Error.Reason}");
+                            Logger.LogError("OccurrenceId: {@occurrenceId}, " + $"{r.Error.Reason}", o?.Occurrence?.OccurrenceId);
                         }
                     })
                 )

@@ -92,19 +92,20 @@ namespace SOS.Export.Services
 
                         if (!zendToResponse.Success)
                         {
-                            _logger.LogError($"Failed to send file with ZendTo. Response: {responseString}");
+                            _logger.LogError("Failed to send file with ZendTo. Response: {@responseString}", responseString);
                         }
 
                         return zendToResponse;
                     }
                     catch (Exception e)
                     {
-                        _logger.LogDebug($"Failed to deserialize ZendTo response: {responseString}", e);
+                        _logger.LogDebug(e, "Failed to deserialize ZendTo response: {@responseString}", responseString);
                         continue;
                     }
                 }
             }
-            _logger.LogDebug($"Failed to send file using ZendTo: {response.ReasonPhrase}");
+
+            _logger.LogDebug("Failed to send file using ZendTo: {@responseReasonPhrase}", response.ReasonPhrase);
             return new ZendToResponse();
         }
 

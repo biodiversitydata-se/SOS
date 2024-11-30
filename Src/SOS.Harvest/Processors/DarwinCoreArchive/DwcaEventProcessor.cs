@@ -78,16 +78,16 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             try
             {
                 cancellationToken?.ThrowIfCancellationRequested();
-                Logger.LogDebug($"Event - Start fetching {dataProvider.Identifier} batch ({startId}-{endId})");
+                Logger.LogDebug("Event - Start fetching {@dataProvider} batch ({@batchStartId}-{@batchEndId})", dataProvider.Identifier, startId, endId);
                 var verbatimEventsBatch = await eventVerbatimRepository.GetBatchAsync(startId, endId);
-                Logger.LogDebug($"Event - Finish fetching {dataProvider.Identifier} batch ({startId}-{endId})");
+                Logger.LogDebug("Event - Finish fetching {@dataProvider} batch ({@batchStartId}-{@batchEndId})", dataProvider.Identifier, startId, endId);
                 if (verbatimEventsBatch == null || verbatimEventsBatch.Count() == 0)
                 {
-                    Logger.LogError($"Event batch is Empty, {dataProvider.Identifier} batch ({startId}-{endId})");
+                    Logger.LogError("Event batch is Empty, {@dataProvider} batch ({@batchStartId}-{@batchEndId})", dataProvider.Identifier, startId, endId);
                     return (0, 0, 0);
                 }
 
-                Logger.LogDebug($"Event - Start processing {dataProvider.Identifier} batch ({startId}-{endId})");
+                Logger.LogDebug("Event - Start processing {@dataProvider} batch ({@batchStartId}-{@batchEndId})", dataProvider.Identifier, startId, endId);
                 var processedEvents = new ConcurrentDictionary<string, Event>();
                 foreach (var verbatimEvent in verbatimEventsBatch)
                 {
@@ -96,7 +96,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                         var processedEvent = eventFactory.CreateEventObservation(verbatimEvent);
                         if (processedEvent == null)
                         {
-                            Logger.LogInformation($"Processed event is null, EventId: {verbatimEvent.EventID})");
+                            Logger.LogInformation("Processed event is null, EventId: {@eventId})", verbatimEvent.EventID);
                             continue;
                         }
                         processedEvents.TryAdd(processedEvent.EventId, processedEvent);
@@ -104,7 +104,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                 }
 
                 await UpdateEventOccurrencesAsync(processedEvents, dataProvider);
-                Logger.LogDebug($"Event - Finish processing {dataProvider.Identifier} batch ({startId}-{endId})");
+                Logger.LogDebug("Event - Finish processing {@dataProvider} batch ({@batchStartId}-{@batchEndId})", dataProvider.Identifier, startId, endId);
                 return await ValidateAndStoreEvents(dataProvider, processedEvents.Values, $"{startId}-{endId}");
             }
             catch (JobAbortedException)
@@ -114,7 +114,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             }
             catch (Exception e)
             {
-                Logger.LogError(e, $"Event - Process {dataProvider.Identifier} event from id: {startId} to id: {endId} failed");
+                Logger.LogError(e, "Event - Process {@dataProvider} event from id: {@batchStartId} to id: {@batchEndId} failed", dataProvider.Identifier, startId, endId);
                 throw;
             }
             finally
@@ -141,7 +141,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             var filter = new SearchFilter(0);
             //filter.IsPartOfDataStewardshipDataset = true;
             filter.Event = new EventFilter { Ids = processedEvents.Keys };
-            Logger.LogInformation($"DwcaEventProcessor.GetEventObservationsDictionaryAsync(). Read data from Observation index: {_processedObservationRepository.PublicIndexName}");
+            Logger.LogInformation("DwcaEventProcessor.GetEventObservationsDictionaryAsync(). Read data from Observation index: {@esPublicIndexName}", _processedObservationRepository.PublicIndexName);
             List<Lib.Models.Search.Result.EventOccurrenceAggregationItem> eventOccurrenceIds = await _processedObservationRepository.GetEventOccurrenceItemsAsync(filter);
             Dictionary<string, List<string>> occurrenceIdsByEventId = eventOccurrenceIds.ToDictionary(m => m.EventId.ToLower(), m => m.OccurrenceIds);
             foreach (var eventPair in processedEvents)

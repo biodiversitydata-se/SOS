@@ -81,16 +81,16 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             try
             {
                 cancellationToken?.ThrowIfCancellationRequested();
-                Logger.LogDebug($"Datasets - Start fetching {dataProvider.Identifier} batch ({startId}-{endId})");
+                Logger.LogDebug("Datasets - Start fetching {@dataProvider} batch ({@batchStartId}-{@batchEndId})", dataProvider.Identifier, startId, endId);
                 var datasetsBatch = await datasetVerbatimRepository.GetBatchAsync(startId, endId);
-                Logger.LogDebug($"Datasets - Finish fetching {dataProvider.Identifier} batch ({startId}-{endId})");
+                Logger.LogDebug("Datasets - Finish fetching {@dataProvider} batch ({@batchStartId}-{@batchEndId})", dataProvider.Identifier, startId, endId);
 
                 if (!datasetsBatch?.Any() ?? true)
                 {
                     return 0;
                 }
 
-                Logger.LogDebug($"Dataset - Start processing {dataProvider.Identifier} batch ({startId}-{endId})");
+                Logger.LogDebug("Dataset - Start processing {@dataProvider} batch ({@batchStartId}-{@batchEndId})", dataProvider.Identifier, startId, endId);
                 var datasets = new ConcurrentDictionary<string, Dataset>();
 
                 foreach (var verbatimDataset in datasetsBatch!)
@@ -107,7 +107,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                 }
 
                 await UpdateDatasetEventsAsync(datasets, dataProvider);
-                Logger.LogDebug($"Dataset - Finish processing {dataProvider.Identifier} batch ({startId}-{endId})");
+                Logger.LogDebug("Dataset - Finish processing {@dataProvider} batch ({@batchStartId}-{@batchEndId})", dataProvider.Identifier, startId, endId);
                 return await ValidateAndStoreDatasets(dataProvider, datasets.Values, $"{startId}-{endId}");
             }
             catch (JobAbortedException)
@@ -117,7 +117,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             }
             catch (Exception e)
             {
-                Logger.LogError(e, $"Datasets - Process {dataProvider.Identifier} datasets from id: {startId} to id: {endId} failed");
+                Logger.LogError(e, "Datasets - Process {@dataProvider} datasets from id: {@batchStartId} to id: {@batchEndId} failed", dataProvider.Identifier, startId, endId);
                 throw;
             }
             finally
@@ -130,14 +130,14 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
         {
             try
             {
-                if (verbatimDataset == null) Logger.LogWarning($"verbatimDataset is null for {dataProvider}");
-                if (dataset == null) Logger.LogWarning($"dataset is null for {dataProvider}");
+                if (verbatimDataset == null) Logger.LogWarning("verbatimDataset is null for {@dataProvider}", dataProvider.Identifier);
+                if (dataset == null) Logger.LogWarning("dataset is null for {@dataProvider}", dataProvider.Identifier);
 
                 if (verbatimDataset != null)
                 {
                     if (verbatimDataset.EventIds == null || verbatimDataset.EventIds.Count == 0)
                     {
-                        Logger.LogWarning($"verbatimDataset contains no eventIds for {dataProvider}");
+                        Logger.LogWarning("verbatimDataset contains no eventIds for {@dataProvider}", dataProvider.Identifier);
                     }
                 }
 
@@ -145,7 +145,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                 {
                     if (dataset.EventIds == null || dataset.EventIds.Count == 0)
                     {
-                        Logger.LogWarning($"dataset contains no eventIds for {dataProvider}");
+                        Logger.LogWarning("dataset contains no eventIds for {@dataProvider}", dataProvider.Identifier);
                     }
                 }
             }
@@ -178,14 +178,16 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                 if (eventIdsByDatasetId.TryGetValue(datasetPair.Key.ToLower(), out var eventIds))
                 {
                     if (eventIds != null && datasetPair.Value.EventIds != null && eventIds.Count != datasetPair.Value.EventIds.Count)
-                        Logger.LogInformation($"Dataset.EventIds differs. #Verbatim={datasetPair.Value.EventIds.Count}, #Processed={eventIds.Count}, DatasetId={datasetPair.Key}, DataProvider={dataProvider}");
+                        Logger.LogInformation("Dataset.EventIds differs. #Verbatim={@verbatimEventIdsCount}, #Processed={@eventIdsCount}, DatasetId={@datasetId}, DataProvider={@dataProvider}", 
+                            datasetPair.Value.EventIds.Count, eventIds.Count, datasetPair.Key, dataProvider.Identifier);
                     datasetPair.Value.EventIds = eventIds;
                 }
                 else
                 {
                     eventIdsByDatasetId.Add(datasetPair.Key, new List<string>());
                     if (datasetPair.Value.EventIds != null && datasetPair.Value.EventIds.Count > 0)
-                        Logger.LogInformation($"Dataset.EventIds differs. #Verbatim={datasetPair.Value.EventIds.Count}, #Processed=0, DatasetId={datasetPair.Key}, DataProvider={dataProvider}");
+                        Logger.LogInformation("Dataset.EventIds differs. #Verbatim={@verbatimEventIdsCount}, #Processed=0, DatasetId={@datasetId}, DataProvider={@dataProvider}", 
+                            datasetPair.Value.EventIds.Count, datasetPair.Key, dataProvider.Identifier);
                     datasetPair.Value.EventIds = null;
                 }
             }

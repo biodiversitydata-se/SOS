@@ -158,7 +158,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Failed to cast Artportalen entity with SightingId={sightingId}");
+                _logger.LogError(ex, "Failed to cast Artportalen entity with SightingId={@sightingId}", sightingId);
                 throw;
             }
         }

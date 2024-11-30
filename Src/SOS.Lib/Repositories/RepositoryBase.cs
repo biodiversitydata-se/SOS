@@ -92,7 +92,7 @@ namespace SOS.Lib.Repositories
                     return await AddBatchAsync(items, mongoCollection, attempt);
                 }
 
-                Logger.LogError(e, $"Failed to add batch to mongodb collection ({MongoCollection})");
+                Logger.LogError(e, "Failed to add batch to mongodb collection ({@mongoCollection})", MongoCollection);
                 throw;
             }
         }
@@ -264,11 +264,12 @@ namespace SOS.Lib.Repositories
 
             if (iterations == nrIterations)
             {
-                Logger.LogError($"Failed waiting for index creation due to timeout. Collection={MongoCollection}. ExpectedRecordsCount={expectedRecordsCount}, DocCount={docCount}");
+                Logger.LogError("Failed waiting for index creation due to timeout. Collection={@mongoCollection}. ExpectedRecordsCount={@expectedRecordsCount}, DocCount={@docCount}",
+                    MongoCollection, expectedRecordsCount, docCount);
             }
             else
             {
-                Logger.LogInformation($"Finish waiting for index creation. Collection={MongoCollection}.");
+                Logger.LogInformation("Finish waiting for index creation. Collection={@mongoCollection}.", MongoCollection);
             }
         }
 

@@ -54,13 +54,13 @@ namespace SOS.Hangfire.JobServer.ServiceBus.Consumers
             var message = context.Message;
             try
             {
-                _logger.LogInformation($"SightingPublishedEvent: Sighting id: {message.SightingId}. Taxon: {message.TaxonName} ({message.TaxonId}).");
+                _logger.LogInformation("SightingPublishedEvent: Sighting id: {@sightingId}. Taxon: {@taxonName} ({@taxonId}).", message.SightingId, message.TaxonName, message.TaxonId);
 
                 var verbatims = await _artportalenObservationHarvester.HarvestObservationsAsync(new[] { context.Message.SightingId }, JobCancellationToken.Null);
 
                 if (!verbatims?.Any() ?? true)
                 {
-                    _logger.LogError($"Failed to harvest Sighting id: {message.SightingId}");
+                    _logger.LogError("Failed to harvest Sighting id: {@sightingId}", message.SightingId);
                     return;
                 }
 
@@ -69,14 +69,14 @@ namespace SOS.Hangfire.JobServer.ServiceBus.Consumers
 
                 if (taxon == null)
                 {
-                    _logger.LogError($"Failed to find taxon with id: {message.TaxonId}");
+                    _logger.LogError("Failed to find taxon with id: {@taxonId}", message.TaxonId);
                     return;
                 }
                 await _artportalenObservationProcessor.ProcessObservationsAsync(provider, new Dictionary<int, Taxon> { { taxon.Id, taxon } }, verbatims);
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"Failed to update Sighting id: {message.SightingId}");
+                _logger.LogError(e, "Failed to update Sighting id: {@sightingId}", message.SightingId);
             }
 
         }

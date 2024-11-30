@@ -71,7 +71,7 @@ namespace SOS.Harvest.Services
             catch (Exception e)
             {
                 string? connectionString = live ? Configuration?.ConnectionStringLive : Configuration?.ConnectionStringBackup;
-                _logger.LogError(e, $"Error when executing QueryAsync(...). ConnectionString={connectionString}");
+                _logger.LogError(e, "Error when executing {@dataProvider} QueryAsync(...). ConnectionString=" +connectionString, "Artportalen");
                 throw;
             }
         }
