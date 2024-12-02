@@ -2,6 +2,7 @@ using FluentValidation;
 using HealthChecks.UI.Client;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Serilog.Filters;
 using Serilog.Formatting.Compact;
 using SOS.DataStewardship.Api.Endpoints;
 using SOS.DataStewardship.Api.Extensions;
@@ -9,14 +10,23 @@ using System.Text.Json.Serialization;
 
 // human readable in the terminal when developing, not all json
 var localDevConfig = new LoggerConfiguration()
-    .MinimumLevel.Debug()
-    .WriteTo.Console()
+        .MinimumLevel.Debug()
+        .Enrich.FromLogContext()
+        .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {SourceContext} {Message:lj} {Properties}{NewLine}{Exception}")
     .CreateLogger();
 
 // compact json when running in the clusters for that sweet sweet structured logging
 var inClusterConfig = new LoggerConfiguration()
-    .MinimumLevel.Debug()
-    .WriteTo.Console(new RenderedCompactJsonFormatter())
+        .MinimumLevel.Information()
+        .WriteTo.Console(new RenderedCompactJsonFormatter())
+        .Enrich.FromLogContext()
+        .MinimumLevel.Override("Microsoft.EntityFrameworkCore", Serilog.Events.LogEventLevel.Warning)
+        .MinimumLevel.Override("Microsoft.AspNetCore.Http.Result", Serilog.Events.LogEventLevel.Warning)
+        .MinimumLevel.Override("Microsoft.AspNetCore.Hosting.Diagnostics", Serilog.Events.LogEventLevel.Warning)
+        .MinimumLevel.Override("Microsoft.AspNetCore.Routing.EndpointMiddleware", Serilog.Events.LogEventLevel.Warning)
+        .MinimumLevel.Override("Microsoft.AspNetCore.Http.HttpResults", Serilog.Events.LogEventLevel.Warning)
+        .MinimumLevel.Override("Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware", Serilog.Events.LogEventLevel.Warning)
+        .Filter.ByExcluding(Matching.WithProperty<string>("RequestPath", p => p == "/health"))
     .CreateLogger();
 
 var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
@@ -31,7 +41,7 @@ try
     var builder = WebApplication.CreateBuilder(args);
 
     // we register serilog with DI here so that we can use it in our application endpoints/handlers/services etc..
-    builder.Logging.AddSerilog(isDevelopment ? localDevConfig : inClusterConfig);
+    builder.Host.UseSerilog(isDevelopment ? localDevConfig : inClusterConfig);
 
     builder.Services.AddMemoryCache();
     builder.SetupUserSecrets();
@@ -79,6 +89,16 @@ try
 
     app.UseAuthentication();
     //app.UseAuthorization();
+
+    // Use Serilog request logging.
+    app.UseSerilogRequestLogging(options =>
+    {
+        options.EnrichDiagnosticContext = (diagnosticContext, httpContext) =>
+        {
+                       
+        };
+    });
+
     app.Run("http://*:5000");
 }
 catch (Exception ex)
