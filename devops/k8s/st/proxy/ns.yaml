@@ -1,0 +1,6 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: sos-proxy-st
+  labels:
+    name: sos-proxy-st

@@ -3,12 +3,10 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging.Abstractions;
 using Nest;
 using SOS.ElasticSearch.Proxy.ApplicationInsights;
-using SOS.ElasticSearch.Proxy.Configuration;
 using SOS.ElasticSearch.Proxy.Middleware;
 using SOS.Lib.ApplicationInsights;
 using SOS.Lib.Cache;
 using SOS.Lib.Cache.Interfaces;
-using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Managers;
@@ -55,6 +53,7 @@ namespace SOS.ElasticSearch.Proxy
             }
 
             Configuration = builder.Build();
+            Settings.Init(Configuration); // or fail early!
         }
 
         /// <summary>
@@ -83,12 +82,13 @@ namespace SOS.ElasticSearch.Proxy
                 });
 
             services.AddMvc();
+            services.AddHealthChecks().AddCheck<HealthCheck>("CustomHealthCheck");
 
             // Add application insights.
             services.AddApplicationInsightsTelemetry(Configuration);
             // Application insights custom
             services.AddApplicationInsightsTelemetryProcessor<IgnoreRequestPathsTelemetryProcessor>();
-            var applicationInsightsConfiguration = Configuration.GetSection("ApplicationInsights").Get<Lib.Configuration.Shared.ApplicationInsights>();
+            var applicationInsightsConfiguration = Settings.ApplicationInsightsConfiguration;
             if (applicationInsightsConfiguration == null)
             {
                 throw new Exception("Failed to load Application Insights Configuration");
@@ -98,7 +98,7 @@ namespace SOS.ElasticSearch.Proxy
             services.AddSingleton<ITelemetryInitializer, TelemetryInitializer>();
 
             //setup the elastic search configuration
-            var elasticConfiguration = Configuration.GetSection("SearchDbConfiguration").Get<ElasticSearchConfiguration>();
+            var elasticConfiguration = Settings.SearchDbConfiguration;
             if (elasticConfiguration == null)
             {
                 throw new Exception("Failed to load Elastic Configuration");
@@ -107,7 +107,7 @@ namespace SOS.ElasticSearch.Proxy
             services.AddSingleton<IElasticClientManager, ElasticClientManager>(p => new ElasticClientManager(elasticConfiguration));
 
             // Processed Mongo Db
-            var processedDbConfiguration = Configuration.GetSection("ProcessDbConfiguration").Get<MongoDbConfiguration>();
+            var processedDbConfiguration = Settings.ProcessDbConfiguration;
             if (processedDbConfiguration == null)
             {
                 throw new Exception("Failed to load Process Db Configuration");
@@ -116,7 +116,7 @@ namespace SOS.ElasticSearch.Proxy
             services.AddScoped<IProcessClient, ProcessClient>(p => new ProcessClient(processedSettings, processedDbConfiguration.DatabaseName,
                 processedDbConfiguration.ReadBatchSize, processedDbConfiguration.WriteBatchSize));
 
-            var proxyConfiguration = Configuration.GetSection("ProxyConfiguration").Get<ProxyConfiguration>();
+            var proxyConfiguration = Settings.ProxyConfiguration;
             if (proxyConfiguration == null)
             {
                 throw new Exception("Failed to load Proxy Configuration");
@@ -157,6 +157,9 @@ namespace SOS.ElasticSearch.Proxy
             {
                 app.UseHsts();
             }
+
+            // Placeholder healthcheck for k8s deployment
+            app.UseHealthChecks("/healthz");
 
             app.UseWhen(context => context.Request.Path.StartsWithSegments("/caches"),
                     builder => builder
