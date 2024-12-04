@@ -125,7 +125,7 @@ namespace SOS.Harvest.Harvesters.iNaturalist
                 else
                 {
                     harvestInfo.Status = RunStatus.Failed;
-                    _logger.LogError($"iNaturalist: Previous harvested observation count is: {currentDocCount}. Now only {nrSightingsHarvested} observations where harvested.");
+                    _logger.LogError("iNaturalist: Previous harvested observation count is: {@currentDocCount}. Now only {@nrSightingsHarvested} observations where harvested.", currentDocCount, nrSightingsHarvested);
                 }
 
             }
@@ -140,7 +140,7 @@ namespace SOS.Harvest.Harvesters.iNaturalist
                 harvestInfo.Status = RunStatus.Failed;
             }
 
-            _logger.LogInformation($"Finish harvesting sightings for iNaturalist data provider. Status={harvestInfo.Status}");
+            _logger.LogInformation("Finish harvesting sightings for iNaturalist data provider. Status={@harvestStatus}", harvestInfo.Status);
             return harvestInfo;
         }
 

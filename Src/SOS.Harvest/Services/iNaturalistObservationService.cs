@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
+using Microsoft.Extensions.Logging;
 using SOS.Harvest.Services.Interfaces;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Models.Verbatim.DarwinCore;
@@ -108,7 +109,7 @@ namespace SOS.Harvest.Services
                     return await GetAsync(fromDate, toDate, ++attempt);
                 }
 
-                _logger.LogError($"Failed to get data from iNaturalist  ({fromDate.ToString("yyyy-MM-dd")}-{toDate.ToString("yyyy-MM-dd")})", e);
+                _logger.LogError(e, "Failed to get data from {@dataProvider} " + $"({fromDate.ToString("yyyy-MM-dd")}-{toDate.ToString("yyyy-MM-dd")})", "iNaturalist");
                 throw;
             }
         }

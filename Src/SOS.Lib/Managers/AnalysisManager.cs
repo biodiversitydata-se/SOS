@@ -607,7 +607,7 @@ namespace SOS.Lib.Managers
                         var treeNode = taxonTree.GetTreeNode(taxonId);
                         if (treeNode == null)
                         {
-                            _logger.LogWarning($"Can't find taxon tree node with TaxonId={taxonId}");
+                            _logger.LogWarning("Can't find taxon tree node with TaxonId={@taxonId}", taxonId);
                             continue;
                         }
                         Models.Interfaces.IBasicTaxon taxon = treeNode.Data;
@@ -751,7 +751,7 @@ namespace SOS.Lib.Managers
                         var treeNode = taxonTree.GetTreeNode(taxonId);
                         if (treeNode == null)
                         {
-                            _logger.LogWarning($"Can't find taxon tree node with TaxonId={taxonId}");
+                            _logger.LogWarning("Can't find taxon tree node with TaxonId={@taxonId}", taxonId);
                             continue;
                         }
                         Models.Interfaces.IBasicTaxon taxon = treeNode.Data;

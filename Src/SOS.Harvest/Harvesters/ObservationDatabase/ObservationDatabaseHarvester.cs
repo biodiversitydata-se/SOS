@@ -66,8 +66,7 @@ namespace SOS.Harvest.Harvesters.ObservationDatabase
             }
             catch (Exception e)
             {
-                Logger.LogError(e,
-                    $"Harvest observation database sightings ({batchIndex})");
+                Logger.LogError(e, "Harvest observation database sightings ({@batchId})", batchIndex);
                 throw;
             }
             finally

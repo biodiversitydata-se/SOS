@@ -22,7 +22,7 @@ public static class TokenHelper
         catch (Exception ex)
         {
             if (logger != null)
-                logger.LogError(ex, "Failed to compare token issuer '{Issuer}' with expected authority '{Authority}'.", jwtToken?.Issuer, userAdmin2AuthUrl);
+                logger.LogError(ex, "Failed to compare token issuer '{@issuer}' with expected authority '{@authority}'.", jwtToken?.Issuer, userAdmin2AuthUrl);
         }
 
         return false;

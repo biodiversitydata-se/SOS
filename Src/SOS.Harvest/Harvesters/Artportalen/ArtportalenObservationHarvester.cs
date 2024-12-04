@@ -88,10 +88,10 @@ namespace SOS.Harvest.Harvesters.Artportalen
             var backupDate = await _metadataRepository.GetLastBackupDateAsync();
             if (_artportalenConfiguration.ValidateDataBaseBackup && backupDate < DateTime.Now.AddDays(-2))
             {
-                throw new Exception($"Artportalen backup to old ({backupDate}). Stopping harvest");
+                throw new Exception("Artportalen backup to old ({backupDate}). Stopping harvest");
             }
 
-            Logger.LogInformation($"Start Artportalen HarvestAllAsync()");
+            Logger.LogInformation("Start {@dataProvider} HarvestAllAsync()", "Artportalen");
             if (_artportalenConfiguration.AddTestSightings && (_artportalenConfiguration.AddTestSightingIds?.Any() ?? false))
             {
                 Logger.LogDebug("Start adding test sightings");
@@ -119,7 +119,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 var currentId = minId;
                 var harvestBatchTasks = new List<Task<int>>();
 
-                Logger.LogDebug($"Start getting Artportalen sightings");
+                Logger.LogDebug("Start getting {@dataProvider} sightings", "Artportalen");
 
                 var batchIndex = 0;
                 // Loop until all sightings are fetched
@@ -146,7 +146,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 var nrSightingsHarvested = harvestBatchTasks.Sum(t => t.Result);
 
                 Logger.LogDebug($"Finish getting Artportalen sightings ({nrSightingsHarvested})");
-                Logger.LogInformation($"Finish Artportalen HarvestAllAsync(). NrSightingsHarvested={nrSightingsHarvested:N0}");
+                Logger.LogInformation("Finish {@dataProvider} HarvestAllAsync(). NrSightingsHarvested={@nrSightingsHarvested:N0}", "Artportalen", nrSightingsHarvested);
                 return nrSightingsHarvested;
             }
 
@@ -218,7 +218,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
             }
 
             Logger.LogDebug($"Finish getting Artportalen sightings ({mode}) (NrSightingsHarvested={nrSightingsHarvested:N0})");
-            Logger.LogInformation($"Finish Artportalen HarvestIncrementalAsync(). NrSightingsHarvested={nrSightingsHarvested:N0}");
+            Logger.LogInformation("Finish {@dataProvider} HarvestIncrementalAsync(). NrSightingsHarvested={@nrSightingsHarvested:N0}", "Artportalen", nrSightingsHarvested);
             return nrSightingsHarvested;
         }
         #endregion Incremental        
@@ -282,8 +282,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
             }
             catch (Exception e)
             {
-                Logger.LogError(e,
-                    $"Harvest Artportalen sightings batch ({batchIndex}) failed");
+                Logger.LogError(e, "Harvest Artportalen sightings batch ({@batchIndex}) failed", batchIndex);
                 throw;
             }
         }
@@ -321,8 +320,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
             }
             catch (Exception e)
             {
-                Logger.LogError(e,
-                    $"Harvest Artportalen sightings batch ({batchIndex}) failed");
+                Logger.LogError(e, "Harvest Artportalen sightings batch ({@batchIndex}) failed", batchIndex);
                 throw;
             }
             finally

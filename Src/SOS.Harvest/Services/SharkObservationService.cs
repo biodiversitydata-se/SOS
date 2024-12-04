@@ -56,7 +56,7 @@ namespace SOS.Harvest.Services
 
                 if (!fileStream?.CanRead ?? true)
                 {
-                    _logger.LogError($"Failed to get data from Shark ({uri.PathAndQuery})");
+                    _logger.LogError("Failed to get data from {@dataProvider} " + $"({uri.PathAndQuery})", "SHARK");
                     return null;
                 }
 
@@ -68,7 +68,7 @@ namespace SOS.Harvest.Services
             }
             catch (Exception e)
             {
-                _logger.LogError($"Failed to get data from Shark ({uri.PathAndQuery})", e);
+                _logger.LogError(e, "Failed to get data from {@dataProvider} " + $"({uri.PathAndQuery})", "SHARK");
                 throw;
             }
         }

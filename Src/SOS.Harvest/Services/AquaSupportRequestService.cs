@@ -37,7 +37,7 @@ namespace SOS.Harvest.Services
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Failed to get data from AquaSupport data");
+                _logger.LogError(e, "Failed to get data from {@dataProvider} data", "Aqua");
                 throw;
             }
             finally

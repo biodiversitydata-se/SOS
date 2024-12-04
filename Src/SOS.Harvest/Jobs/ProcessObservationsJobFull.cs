@@ -240,13 +240,15 @@ namespace SOS.Harvest.Jobs
                     double percentLimit = providerActive!.PreviousProcessLimit / 100.0;
                     if (providerActive.PublicProcessCount > 0 && providerInactive.PublicProcessCount <= percentLimit * providerActive.PublicProcessCount)
                     {
-                        _logger.LogError($"Validation failed. Public observation count for {providerInactive.DataProviderIdentifier} is less than {providerActive!.PreviousProcessLimit}% of last run. Count this time={providerInactive.PublicProcessCount}. Count previous time={providerActive.PublicProcessCount}.");
+                        _logger.LogError("Validation failed. Public observation count for {@dataProvider} is less than {@previousProcessLimit}% of last run. Count this time={@publicProcessCount}. Count previous time={@publicProcessCountPrevious}.", 
+                            providerInactive.DataProviderIdentifier, providerActive!.PreviousProcessLimit, providerInactive.PublicProcessCount, providerActive.PublicProcessCount);
                         return false;
                     }
 
                     if (providerActive.ProtectedProcessCount > 0 && providerInactive.ProtectedProcessCount <= percentLimit * providerActive.ProtectedProcessCount)
                     {
-                        _logger.LogError($"Validation failed. Protected observation count for {providerInactive.DataProviderIdentifier} is less than {providerActive!.PreviousProcessLimit}% of last run. Count this time={providerInactive.ProtectedProcessCount}. Count previous time={providerActive.ProtectedProcessCount}.");
+                        _logger.LogError("Validation failed. Protected observation count for {@dataProvider} is less than {@reviousProcessLimit}% of last run. Count this time={@protectedProcessCount}. Count previous time={@protectedProcessCountPrevious}.", 
+                            providerInactive.DataProviderIdentifier, providerActive!.PreviousProcessLimit, providerActive!.PreviousProcessLimit, providerActive.ProtectedProcessCount);
                         return false;
                     }
                 }
@@ -363,15 +365,15 @@ namespace SOS.Harvest.Jobs
                 _logger.LogInformation($"Set _userObservationRepository.LiveMode={_processedObservationRepository.LiveMode}");
 
                 _logger.LogInformation(
-                    $"Start clear ElasticSearch index: UniqueIndexName={_userObservationRepository.UniqueIndexName}, IndexName={_userObservationRepository.IndexName}");
+                    "Start clear ElasticSearch index: UniqueIndexName={@esUniqueIndexName}, IndexName={@esIndexName}", _userObservationRepository.UniqueIndexName, _userObservationRepository.IndexName);
                 await _userObservationRepository.ClearCollectionAsync();
 
                 _logger.LogInformation(
-                    $"Finish clear ElasticSearch index: {_userObservationRepository.UniqueIndexName}");
+                    "Finish clear ElasticSearch index: {@esUniqueIndexName}", _userObservationRepository.UniqueIndexName);
 
-                _logger.LogInformation($"Start disable indexing ({_userObservationRepository.UniqueIndexName})");
+                _logger.LogInformation("Start disable indexing ({@esUniqueIndexName})", _userObservationRepository.UniqueIndexName);
                 await _userObservationRepository.DisableIndexingAsync();
-                _logger.LogInformation($"Finish disable indexing ({_userObservationRepository.UniqueIndexName})");
+                _logger.LogInformation("Finish disable indexing ({@esUniqueIndexName})", _userObservationRepository.UniqueIndexName);
             }
 
             _dwcArchiveFileWriterCoordinator.BeginWriteDwcCsvFiles();
@@ -446,11 +448,11 @@ namespace SOS.Harvest.Jobs
 
                     if (eventSuccess)
                     {
-                        _logger.LogInformation($"Processing events finished successfully. EventCount={eventProcessCount}");
+                        _logger.LogInformation("Processing events finished successfully. EventCount={@eventProcessCount}", eventProcessCount);
                     }
                     else
                     {
-                        _logger.LogInformation($"Processing events failed. EventCount={eventProcessCount}");
+                        _logger.LogInformation("Processing events failed. EventCount={@eventProcessCount}", eventProcessCount);
                     }
 
                     //----------------------
@@ -471,19 +473,19 @@ namespace SOS.Harvest.Jobs
 
                     if (datasetSuccess)
                     {
-                        _logger.LogInformation($"Processing datasets finished successfully. DatasetCount={datasetProcessCount}");
+                        _logger.LogInformation("Processing datasets finished successfully. DatasetCount={@datasetProcessCount}", datasetProcessCount);
                     }
                     else
                     {
-                        _logger.LogInformation($"Processing datasets failed. DatasetCount={datasetProcessCount}");
+                        _logger.LogInformation("Processing datasets failed. DatasetCount={@datasetProcessCount}", datasetProcessCount);
                     }
                 }
 
                 if (_processConfiguration.ProcessUserObservation)
                 {
-                    _logger.LogInformation($"Start enable indexing ({_userObservationRepository.UniqueIndexName})");
+                    _logger.LogInformation("Start enable indexing ({@esUniqueIndexName})", _userObservationRepository.UniqueIndexName);
                     await _userObservationRepository.EnableIndexingAsync();
-                    _logger.LogInformation($"Finish enable indexing ({_userObservationRepository.UniqueIndexName})");
+                    _logger.LogInformation("Finish enable indexing ({@esUniqueIndexName})", _userObservationRepository.UniqueIndexName);
                 }
 
                 //----------------------------------------------------------------------------
@@ -501,7 +503,7 @@ namespace SOS.Harvest.Jobs
                         var uploadJobId = BackgroundJob.Enqueue<IUploadToStoreJob>(job => job.RunAsync(dwcFile, _exportContainer, true,
                             cancellationToken));
 
-                        _logger.LogInformation($"Upload file to blob storage job with Id={uploadJobId} was enqueued");
+                        _logger.LogInformation("Upload file to blob storage job with Id={@jobId} was enqueued", uploadJobId);
                     }
                 }
 
@@ -511,7 +513,7 @@ namespace SOS.Harvest.Jobs
                 //---------------------------------------------------------
                 // 12. Toggle active instance when full processing is done
                 //---------------------------------------------------------
-                _logger.LogInformation($"Toggle instance {_processedObservationRepository.ActiveInstance} => {_processedObservationRepository.InActiveInstance}");
+                _logger.LogInformation("Toggle instance {@activeInstance} => {@inactiveInstance}", _processedObservationRepository.ActiveInstance, _processedObservationRepository.InActiveInstance);
                 await _processedObservationRepository.SetActiveInstanceAsync(_processedObservationRepository
                     .InActiveInstance);
 
@@ -632,9 +634,10 @@ namespace SOS.Harvest.Jobs
             {
                 foreach (var dataProvider in dataProvidersToProcess)
                 {
-                    _logger.LogInformation($"{dataProvider}, PreviousProcessLimit={dataProvider.PreviousProcessLimit}");
+                    _logger.LogInformation("Start process {@dataProvider}, PreviousProcessLimit={@previousProcessLimit}", dataProvider.Identifier, dataProvider.PreviousProcessLimit);
                 }
             }
+
             return await RunAsync(
                 dataProvidersToProcess,
                 JobRunModes.Full,

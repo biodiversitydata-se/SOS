@@ -2,6 +2,7 @@
 using SOS.Harvest.Services.Interfaces;
 using SOS.Lib.Configuration.Import;
 using System.Xml.Linq;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace SOS.Harvest.Services
 {
@@ -39,7 +40,7 @@ namespace SOS.Harvest.Services
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Failed to get data from Fish data");
+                _logger.LogError(e, "Failed to get data from {@dataProvider}", "Fishdata2");
                 throw;
             }
         }

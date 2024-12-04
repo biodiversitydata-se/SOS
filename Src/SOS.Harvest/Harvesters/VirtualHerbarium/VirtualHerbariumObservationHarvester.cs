@@ -85,7 +85,7 @@ namespace SOS.Harvest.Harvesters.VirtualHerbarium
                         var occurrenceId = $"{verbatim.InstitutionCode}#{verbatim.AccessionNo}#{verbatim.DyntaxaId.ToString(CultureInfo.InvariantCulture)}";
                         if (occurrenceIdsSet.Contains(occurrenceId))
                         {
-                            Logger.LogWarning($"Duplicate observation found in Virtual Herbarium: {occurrenceId}");
+                            Logger.LogWarning("Duplicate observation found in {@dataProvider}: {occurrenceId}", "VirtualHerbarium", occurrenceId);
                             continue;
                         }
 

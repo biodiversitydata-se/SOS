@@ -90,7 +90,7 @@ namespace SOS.Harvest.Processors.Artportalen
                             if (nrErrors == 0)
                             {
                                 string expectedEventId = eventIdByOccurrenceId.GetValueOrDefault(observation.Occurrence.OccurrenceId.ToLower(), "NotFound");
-                                Logger.LogError($"Couldnt find the following event in occurrenceIdsByEventId: EventId={eventId}. OccurrenceId={observation.Occurrence.OccurrenceId}. ExpectedEventId={expectedEventId}. The following eventIds exists in the dictionary: {JsonSerializer.Serialize(occurrenceIdsByEventId.Keys)}");
+                                Logger.LogError("Couldnt find the following event in occurrenceIdsByEventId: EventId={@eventId}. OccurrenceId={@occurrenceId}. ExpectedEventId={@expectedEventId}. The following eventIds exists in the dictionary: " + JsonSerializer.Serialize(occurrenceIdsByEventId.Keys), eventId, observation.Occurrence.OccurrenceId, expectedEventId);
                             }
                             nrErrors++;
                         }
@@ -98,7 +98,7 @@ namespace SOS.Harvest.Processors.Artportalen
 
                     if (nrErrors > 0)
                     {
-                        Logger.LogInformation($"Number of errors in AddObservationEventsAsync={nrErrors}");
+                        Logger.LogInformation("Number of errors in AddObservationEventsAsync={@nrEventErrors}", nrErrors);
                     }
 
                     // write to ES
@@ -113,7 +113,7 @@ namespace SOS.Harvest.Processors.Artportalen
             }
             catch (Exception e)
             {
-                Logger.LogError(e, "Add data stewardship events failed.");
+                Logger.LogError(e, "Add {@dataProvider} data stewardship events failed.", "Artportalen");
                 return (0, 0, 0);
             }
         }

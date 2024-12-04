@@ -76,7 +76,7 @@ namespace SOS.Harvest.Processors.Artportalen
             }
             catch (Exception e)
             {
-                Logger.LogError(e, "Add Artportalen datasets failed.");
+                Logger.LogError(e, "Add {@dataProvider} datasets failed.", "Artportalen");
                 return 0;
             }
         }
@@ -86,7 +86,7 @@ namespace SOS.Harvest.Processors.Artportalen
             var searchFilter = new SearchFilter(0);
             searchFilter.DataStewardshipDatasetIds = new List<string> { datasetIdentifier };
             var eventIds = await _processedObservationRepository.GetAllAggregationItemsAsync(searchFilter, "event.eventId");
-            Logger.LogDebug($"ArtportalenDatasetProcessor.GetEventIdsAsync() used the index: {_processedObservationRepository.PublicIndexName}");
+            Logger.LogDebug("ArtportalenDatasetProcessor.GetEventIdsAsync() used the index: {@esPublicIndexName}", _processedObservationRepository.PublicIndexName);
             return eventIds?.Select(m => m.AggregationKey).ToList();
         }
     }

@@ -88,7 +88,7 @@ namespace SOS.Observations.Api.Controllers
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"Get dataset by id ({id}) failed");
+                _logger.LogError(e, "Get dataset by id ({@datasetId}) failed", id);
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
@@ -206,7 +206,7 @@ namespace SOS.Observations.Api.Controllers
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"Get event by id ({id}) failed");
+                _logger.LogError(e, "Get event by id ({@eventId}) failed", id);
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
@@ -318,7 +318,7 @@ namespace SOS.Observations.Api.Controllers
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"Get occurrence by id ({id}) failed");
+                _logger.LogError(e, "Get occurrence by id ({@occurrenceId}) failed", id);
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }

@@ -54,11 +54,11 @@ namespace SOS.Harvest.Processors
                 elasticSearchWriteTimerSessionId =
                     TimeManager.Start(ProcessTimeManager.TimerTypes.ElasticSearchWrite);
 
-                Logger.LogDebug($"Start storing {dataProvider.Identifier} batch: {batchId}{(protectedData ? " [protected]" : "")}");
+                Logger.LogDebug("Start storing {@dataProvider} batch: {@batchId}" + $"{(protectedData ? " [protected]" : "")}", dataProvider.Identifier, batchId);
                 var processedCount =
                     await ProcessedObservationRepository.AddManyAsync(processedObservations, protectedData);
 
-                Logger.LogDebug($"Finish storing {dataProvider.Identifier} batch: {batchId} ({processedCount}){(protectedData ? " [protected]" : "")}");
+                Logger.LogDebug("Finish storing {@dataProvider} batch: {@batchId} ({@processedCount})" + $"{(protectedData ? " [protected]" : "")}", dataProvider.Identifier, batchId, processedCount);
 
                 return processedCount;
             }
@@ -66,13 +66,13 @@ namespace SOS.Harvest.Processors
             {
                 if (attempt < 3)
                 {
-                    Logger.LogWarning(e, $"Failed to commit batch: {batchId} for {dataProvider}, attempt: {attempt}{(protectedData ? " [protected]" : "")}");
+                    Logger.LogWarning(e, "Failed to commit batch: {@batchId} for {@dataProvider}, attempt: " + $"{attempt}{(protectedData ? " [protected]" : "")}", batchId, dataProvider.Identifier);
                     Thread.Sleep(attempt * 200);
                     attempt++;
                     return await CommitBatchAsync(dataProvider, protectedData, processedObservations, batchId, attempt);
                 }
 
-                Logger.LogError(e, $"Failed to commit batch:{batchId} for {dataProvider}{(protectedData ? " [protected]" : "")}");
+                Logger.LogError(e, "Failed to commit batch:{@batchId} for {@dataProvider}" + $"{(protectedData ? " [protected]" : "")}", batchId, dataProvider.Identifier);
                 throw;
             }
             finally
@@ -96,7 +96,7 @@ namespace SOS.Harvest.Processors
             }
             catch (Exception e)
             {
-                Logger.LogError(e, $"Failed to delete batch by occurrence id's");
+                Logger.LogError(e, "Failed to delete batch by occurrence id's");
                 return false;
             }
         }
@@ -125,7 +125,7 @@ namespace SOS.Harvest.Processors
             try
             {
                 cancellationToken?.ThrowIfCancellationRequested();
-                Logger.LogDebug($"Start fetching {dataProvider.Identifier} batch ({batchId})");
+                Logger.LogDebug("Start fetching {@dataProvider} batch ({@batchId})", dataProvider.Identifier, batchId);
                 var mongoDbReadTimerSessionId = TimeManager.Start(ProcessTimeManager.TimerTypes.MongoDbRead);
 
                 // Make up to 3 attempts with 0,5 sek sleep between the attempts 
@@ -135,7 +135,7 @@ namespace SOS.Harvest.Processors
                 });
 
                 TimeManager.Stop(ProcessTimeManager.TimerTypes.MongoDbRead, mongoDbReadTimerSessionId);
-                Logger.LogDebug($"Finish fetching {dataProvider.Identifier} batch ({batchId})");
+                Logger.LogDebug("Finish fetching {@dataProvider} batch ({@batchId})", dataProvider.Identifier, batchId);
 
                 return await ProcessBatchAsync(dataProvider, verbatimObservationsBatch, batchId, mode,
                     observationFactory);
@@ -147,7 +147,7 @@ namespace SOS.Harvest.Processors
             }
             catch (Exception e)
             {
-                Logger.LogError(e, $"Fetch and Process {dataProvider.Identifier} observations, batch {batchId} failed");
+                Logger.LogError(e, "Fetch and Process {@dataProvider} observations, batch {@batchId} failed", dataProvider.Identifier, batchId);
                 throw;
             }
             finally
@@ -169,7 +169,7 @@ namespace SOS.Harvest.Processors
             string batchId = "")
         {
 
-            Logger.LogDebug($"Start writing {dataProvider.Identifier} CSV ({batchId})");
+            Logger.LogDebug("Start writing {@dataProvider} CSV ({@batchId})", dataProvider.Identifier, batchId);
             var csvWriteTimerSessionId = TimeManager.Start(ProcessTimeManager.TimerTypes.CsvWrite);
 
             LocalDateTimeConverterHelper.ConvertToLocalTime(processedObservations);
@@ -178,7 +178,7 @@ namespace SOS.Harvest.Processors
 
             TimeManager.Stop(ProcessTimeManager.TimerTypes.CsvWrite, csvWriteTimerSessionId);
 
-            Logger.LogDebug($"Finish writing {dataProvider.Identifier} CSV ({batchId}) - {success}");
+            Logger.LogDebug("Finish writing {@dataProvider} CSV ({@batchId}) - " + success, dataProvider.Identifier, batchId);
 
             return success;
         }
@@ -258,9 +258,7 @@ namespace SOS.Harvest.Processors
             var maxId = await observationVerbatimRepository.GetMaxIdAsync();
             var observationCount = await observationVerbatimRepository.CountAllDocumentsAsync();
             var processBatchTasks = new List<Task<(int publicCount, int protectedCount, int failedCount)>>();
-            Logger.LogInformation($"Start processing {dataProvider} data. MaxId={maxId}, Mode={mode}, Count={observationCount}");
-
-            Logger.LogDebug($"{dataProvider.Identifier}");
+            Logger.LogInformation("Start processing {@dataProvider} data. MaxId={@maxId}, Mode={@mode}, Count={@observationCount}", dataProvider.Identifier, maxId, mode, observationCount);            
 
             while (startId <= maxId)
             {
@@ -279,7 +277,6 @@ namespace SOS.Harvest.Processors
             }
 
             await Task.WhenAll(processBatchTasks);
-
             return (processBatchTasks.Sum(t => t.Result.publicCount), processBatchTasks.Sum(t => t.Result.protectedCount), processBatchTasks.Sum(t => t.Result.failedCount));
         }
 
@@ -297,7 +294,7 @@ namespace SOS.Harvest.Processors
                     return (0, 0, 0);
                 }
 
-                Logger.LogDebug($"Start processing {dataProvider.Identifier} batch ({batchId})");
+                Logger.LogDebug("Start processing {@dataProvider} batch ({@batchId})", dataProvider.Identifier, batchId);
                 ConcurrentDictionary<string, Observation> publicObservations, sensitiveObservations;
                 ProcessObservationsBatch(                    
                     verbatimObservationsBatch, 
@@ -306,7 +303,7 @@ namespace SOS.Harvest.Processors
                     out sensitiveObservations);
                 verbatimObservationsBatch = null!;
 
-                Logger.LogDebug($"Finish processing {dataProvider.Identifier} batch ({batchId})");
+                Logger.LogDebug("Finish processing {@dataProvider} batch ({@batchId})", dataProvider.Identifier, batchId);
 
                 if (_logGarbageCharFields)
                 {                    
@@ -316,7 +313,7 @@ namespace SOS.Harvest.Processors
                 // If incremental harvest
                 if (mode != JobRunModes.Full)
                 {
-                    Logger.LogDebug($"Start deleting {dataProvider.Identifier} data {batchId}");
+                    Logger.LogDebug("Start deleting {@dataProvider} data {@batchId}", dataProvider.Identifier, batchId);
                     var occurrenceIds = publicObservations.Select(o => o.Key).ToHashSet();
                     occurrenceIds.UnionWith(sensitiveObservations.Select(o => o.Key));
 
@@ -331,7 +328,7 @@ namespace SOS.Harvest.Processors
                     var deleteResult = await Task.WhenAll(deleteTasks);
                     TimeManager.Stop(ProcessTimeManager.TimerTypes.ElasticsearchDelete, elasticSearchDeleteTimerSessionId);
 
-                    Logger.LogDebug($"Finish deleting {dataProvider.Identifier} data {batchId}: {deleteResult.All(r => r)}");
+                    Logger.LogDebug("Finish deleting {@dataProvider} data {@batchId}: " +$"{deleteResult.All(r => r)}", dataProvider.Identifier, batchId);
                 }
 
                 // Store observations
@@ -356,7 +353,7 @@ namespace SOS.Harvest.Processors
             }
             catch (Exception e)
             {
-                Logger.LogError(e, $"Process {dataProvider.Identifier} observations, batch {batchId} failed");
+                Logger.LogError(e, "Process {@dataProvider} observations, batch {@batchId} failed", dataProvider.Identifier, batchId);
                 throw;
             }
         }
@@ -463,7 +460,7 @@ namespace SOS.Harvest.Processors
                 var propsWithGarabageChars = objectHelper.GetPropertiesWithGarbageChars(observation);
                 if (propsWithGarabageChars.Any())
                 {
-                    Logger.LogDebug($"Garbage chars {dataProvider.Identifier}, id: {observation.Occurrence?.OccurrenceId}, field/s: {string.Join('|', propsWithGarabageChars)}");
+                    Logger.LogDebug("Garbage chars {@dataProvider}, id: {@occurrenceId}, field/s: " + $"{string.Join('|', propsWithGarabageChars)}", dataProvider.Identifier, observation.Occurrence?.OccurrenceId);
                 }
             }
 
@@ -472,7 +469,7 @@ namespace SOS.Harvest.Processors
                 var propsWithGarabageChars = objectHelper.GetPropertiesWithGarbageChars(observation);
                 if (propsWithGarabageChars.Any())
                 {
-                    Logger.LogDebug($"Garbage chars {dataProvider.Identifier}, id: {observation.Occurrence?.OccurrenceId}, field/s: {string.Join('|', propsWithGarabageChars)}");
+                    Logger.LogDebug("Garbage chars {@dataProvider}, id: {@occurrenceId}, field/s: " + $"{string.Join('|', propsWithGarabageChars)}", dataProvider.Identifier, observation.Occurrence?.OccurrenceId);
                 }
             }
         }
@@ -505,7 +502,7 @@ namespace SOS.Harvest.Processors
 
             if (ProcessConfiguration.ProcessUserObservation && mode == JobRunModes.Full && dataProvider.Id == DataProviderIdentifiers.ArtportalenId && !sensitiveObservations)
             {
-                Logger.LogDebug($"Add User Observations. BatchId={batchId}, Protected={sensitiveObservations}, Count={observations!.Count}");
+                Logger.LogDebug("Add User Observations. BatchId={@batchId}, Protected={@sensitiveObservations}, Count={@observationCount}", batchId, sensitiveObservations, observations!.Count);
                 var userObservations = observations.ToUserObservations();
                 await _userObservationRepository.AddManyAsync(userObservations);
             }
@@ -520,7 +517,7 @@ namespace SOS.Harvest.Processors
             ICollection<Observation> observations,
             string batchId)
         {
-            Logger.LogDebug($"Start validating {dataProvider.Identifier} batch: {batchId}");
+            Logger.LogDebug("Start validating {@dataProvider} batch: {@batchId}", dataProvider.Identifier, batchId);
             var validateObservationsTimerSessionId = TimeManager.Start(ProcessTimeManager.TimerTypes.ValidateObservations);
             var invalidObservations = ValidationManager.ValidateObservations(ref observations, dataProvider);
             TimeManager.Stop(ProcessTimeManager.TimerTypes.ValidateObservations, validateObservationsTimerSessionId);
@@ -532,7 +529,7 @@ namespace SOS.Harvest.Processors
             var mongoDbWriteTimerSessionId = TimeManager.Start(ProcessTimeManager.TimerTypes.MongoDbWrite);
             await ValidationManager.AddInvalidObservationsToDb(invalidObservations);
             TimeManager.Stop(ProcessTimeManager.TimerTypes.MongoDbWrite, mongoDbWriteTimerSessionId);
-            Logger.LogDebug($"End validating {dataProvider.Identifier} batch: {batchId}");
+            Logger.LogDebug("End validating {@dataProvider} batch: {@batchId}", dataProvider.Identifier, batchId);
 
             return observations;
         }
@@ -540,23 +537,21 @@ namespace SOS.Harvest.Processors
         private void LogInvalidObservations(DataProvider dataProvider, ICollection<Lib.Models.Processed.Validation.InvalidObservation> invalidObservations)
         {
             const int maxChars = 5000;
+            Logger.LogWarning("Invalid observations for {@dataProvider}. Count={@invalidObservationsCount}.", dataProvider.Identifier, invalidObservations.Count);
 
             try
             {
                 if (invalidObservations == null) return;
                 StringBuilder sb = new StringBuilder();
-                sb.Append($"Invalid observations for {dataProvider}. Count={invalidObservations.Count}. ");
-                foreach (var observation in invalidObservations)
+                foreach (var observation in invalidObservations.Take(10))
                 {
-                    sb.Append($"OccurrenceID=\"{observation.OccurrenceID}\", Defects=\"{string.Join(", ", observation.Defects.Select(m => m.Information))}\". ");
-                    if (sb.Length > maxChars) break;
-                }
-
-                Logger.LogInformation(sb.ToString());
+                    Logger.LogWarning("Invalid observation for DataProvider={@dataProvider}, OccurrenceId={@occurrenceId}, Defects= " + $"{string.Join(", ", observation.Defects.Select(m => m.Information))}", 
+                        dataProvider.Identifier, observation.OccurrenceID);
+                }                
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, "An error occurred in LogArtportalenInvalidObservations()");
+                Logger.LogError(ex, "An error occurred in LogInvalidObservations(). DataProvider={@dataProvider}", dataProvider.Identifier);
             }
         }
 
@@ -584,20 +579,20 @@ namespace SOS.Harvest.Processors
 
             try
             {
-                Logger.LogDebug($"Start processing {dataProvider.Identifier} data");
+                Logger.LogDebug("Start processing {@dataProvider} data", dataProvider.Identifier);
                 var processCount = await ProcessObservationsAsync(dataProvider, taxa, dwcaVocabularyById, mode, cancellationToken);
-                Logger.LogInformation($"Finish processing {dataProvider.Identifier} data. publicCount={processCount.publicCount}, protectedCount={processCount.protectedCount}, failedCount={processCount.failedCount}");
+                Logger.LogInformation("Finish processing {@dataProvider} data. publicCount={@publicProcessCount}, protectedCount={@sensitiveProcessCount}, failedCount={@invalidCount}", dataProvider.Identifier, processCount.publicCount, processCount.protectedCount, processCount.failedCount);
 
                 return ProcessingStatus.Success(dataProvider.Identifier, Type, startTime, DateTime.Now, processCount.publicCount, processCount.protectedCount, processCount.failedCount);
             }
             catch (JobAbortedException)
             {
-                Logger.LogInformation($"{dataProvider.Identifier} observation processing was canceled.");
+                Logger.LogInformation("{@dataProvider} observation processing was canceled.", dataProvider.Identifier);
                 return ProcessingStatus.Cancelled(dataProvider.Identifier, Type, startTime, DateTime.Now);
             }
             catch (Exception e)
             {
-                Logger.LogError(e, $"Failed to process {dataProvider.Identifier} sightings");
+                Logger.LogError(e, "Failed to process {@dataProvider} sightings", dataProvider.Identifier);
                 return ProcessingStatus.Failed(dataProvider.Identifier, Type, startTime, DateTime.Now);
             }
         }

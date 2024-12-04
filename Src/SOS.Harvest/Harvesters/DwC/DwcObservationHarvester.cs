@@ -131,7 +131,7 @@ namespace SOS.Harvest.Harvesters.DwC
                     if (_dwcaConfiguration.MaxNumberOfSightingsHarvested.HasValue &&
                         observationCount >= _dwcaConfiguration.MaxNumberOfSightingsHarvested)
                     {
-                        _logger.LogInformation($"Max observations for {dataProvider.Identifier} reached");
+                        _logger.LogInformation("Max observations for {@dataProvider} reached", dataProvider.Identifier);
                         break;
                     }
 
@@ -150,9 +150,9 @@ namespace SOS.Harvest.Harvesters.DwC
                 if (permanentizeTempCollection)
                 {
                     _logger.LogDebug($"Finish storing DwC-A observations for {dataProvider.Identifier}");
-                    _logger.LogInformation($"Start permanentize temp collection for {dataProvider.Identifier}");
+                    _logger.LogInformation("Start permanentize temp collection for {@dataProvider}", dataProvider.Identifier);
                     await dwcArchiveVerbatimRepository.PermanentizeCollectionAsync();
-                    _logger.LogInformation($"Finish permanentize temp collection for {dataProvider.Identifier}");
+                    _logger.LogInformation("Finish permanentize temp collection for {@dataProvider}", dataProvider.Identifier);
                 }
 
                 // Update harvest info
@@ -162,12 +162,12 @@ namespace SOS.Harvest.Harvesters.DwC
             }
             catch (JobAbortedException e)
             {
-                _logger.LogError(e, $"Canceled harvest of DwC Archive for {dataProvider.Identifier}");
+                _logger.LogError(e, "Canceled harvest of DwC Archive for {@dataProvider}", dataProvider.Identifier);
                 harvestInfo.Status = RunStatus.Canceled;
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"Failed harvest of DwC Archive for {dataProvider.Identifier}");
+                _logger.LogError(e, "Failed harvest of DwC Archive for {@dataProvider}", dataProvider.Identifier);
                 harvestInfo.Status = RunStatus.Failed;
             }
 
@@ -194,10 +194,10 @@ namespace SOS.Harvest.Harvesters.DwC
 
                 if (initializeTempCollection)
                 {
-                    _logger.LogDebug($"Clear DwC-A observations for {dataProvider.Identifier}");
+                    _logger.LogDebug("Clear DwC-A observations for {@dataProvider}", dataProvider.Identifier);
                     await dwcCollectionRepository.DeleteCollectionsAsync();
                     await dwcCollectionRepository.OccurrenceRepository.AddCollectionAsync();
-                    _logger.LogDebug($"Start storing DwC-A observations for {dataProvider.Identifier}");
+                    _logger.LogDebug("Start storing DwC-A observations for {@dataProvider}", dataProvider.Identifier);
                 }
 
                 // Read datasets
@@ -209,7 +209,7 @@ namespace SOS.Harvest.Harvesters.DwC
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, $"Error reading DwC-A datasets for {dataProvider.Identifier}");
+                    _logger.LogError(ex, "Error reading DwC-A datasets for {@dataProvider}", dataProvider.Identifier);
                 }
 
                 // Read observations
@@ -222,7 +222,7 @@ namespace SOS.Harvest.Harvesters.DwC
                     if (_dwcaConfiguration.MaxNumberOfSightingsHarvested.HasValue &&
                         observationCount >= _dwcaConfiguration.MaxNumberOfSightingsHarvested)
                     {
-                        _logger.LogInformation($"Max observations for {dataProvider.Identifier} reached");
+                        _logger.LogInformation("Max observations for {@dataProvider} reached", dataProvider.Identifier);
                         break;
                     }
 
@@ -233,28 +233,28 @@ namespace SOS.Harvest.Harvesters.DwC
                 // Read events
                 try
                 {
-                    _logger.LogInformation($"Start reading DwC-A events for {dataProvider.Identifier}");
+                    _logger.LogInformation("Start reading DwC-A events for {@dataProvider}", dataProvider.Identifier);
                     dwcArchiveReader = new DwcArchiveReader(dataProvider, await dwcCollectionRepository.EventRepository.GetMaxIdAsync());
                     var events = (await dwcArchiveReader.ReadEventsAsync(dwcCollectionArchiveReaderContext))?.ToList();
                     if (events != null && events.Any())
                     {
-                        _logger.LogInformation($"Read {events.Count} events for {dataProvider.Identifier}");
+                        _logger.LogInformation("Read {@eventCount} events for {@dataProvider}", events.Count, dataProvider.Identifier);
                         observationCount += await CreateAndStoreAbsentObservations(dataProvider, dwcCollectionRepository, events);
                         if (initializeTempCollection)
                         {
-                            _logger.LogDebug($"Start storing DwC-A events for {dataProvider.Identifier}");
+                            _logger.LogDebug("Start storing DwC-A events for {@dataProvider}", dataProvider.Identifier);
                             await dwcCollectionRepository.EventRepository.AddCollectionAsync();
                         }
                         await dwcCollectionRepository.EventRepository.AddManyAsync(events);
                     }
                     else
                     {
-                        _logger.LogInformation($"Read 0 events for {dataProvider.Identifier}");
+                        _logger.LogInformation("Read 0 events for {@dataProvider}", dataProvider.Identifier);
                     }
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, $"Error reading DwC-A events for {dataProvider.Identifier}");
+                    _logger.LogError(ex, "Error reading DwC-A events for {@dataProvider}", dataProvider.Identifier);
                 }
 
                 // Save datasets lasts, since DataSet.EventIds could been changed after reading Events
@@ -264,7 +264,7 @@ namespace SOS.Harvest.Harvesters.DwC
                     {
                         if (initializeTempCollection)
                         {
-                            _logger.LogDebug($"Start storing DwC-A datasets for {dataProvider.Identifier}");
+                            _logger.LogDebug("Start storing DwC-A datasets for {@dataProvider}", dataProvider.Identifier);
                             await dwcCollectionRepository.DatasetRepository.AddCollectionAsync();
                         }
                         await dwcCollectionRepository.DatasetRepository.AddManyAsync(datasets);
@@ -272,22 +272,22 @@ namespace SOS.Harvest.Harvesters.DwC
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, $"Error reading DwC-A datasets for {dataProvider.Identifier}");
+                    _logger.LogError(ex, "Error reading DwC-A datasets for {@dataProvider}", dataProvider.Identifier);
                 }
 
                 if (permanentizeTempCollection)
                 {
                     if (await dwcCollectionRepository.OccurrenceRepository.PermanentizeCollectionAsync())
                     {
-                        _logger.LogDebug($"Finish storing DwC-A observations for {dataProvider.Identifier}");
+                        _logger.LogDebug("Finish storing DwC-A observations for {@dataProvider}", dataProvider.Identifier);
                     }
                     if (await dwcCollectionRepository.EventRepository.PermanentizeCollectionAsync())
                     {
-                        _logger.LogDebug($"Finish storing DwC-A events for {dataProvider.Identifier}");
+                        _logger.LogDebug("Finish storing DwC-A events for {@dataProvider}", dataProvider.Identifier);
                     }
                     if (await dwcCollectionRepository.DatasetRepository.PermanentizeCollectionAsync())
                     {
-                        _logger.LogDebug($"Finish storing DwC-A datasets for {dataProvider.Identifier}");
+                        _logger.LogDebug("Finish storing DwC-A datasets for {@dataProvider}", dataProvider.Identifier);
                     }
                 }
 
@@ -295,10 +295,10 @@ namespace SOS.Harvest.Harvesters.DwC
 
                 if (dataProvider.UseVerbatimFileInExport && (dataProvider.Datasets?.Any() ?? false)) // If no dataset, file must have been manually uploaded and is allready stored
                 {
-                    _logger.LogDebug($"Start storing source file for {dataProvider.Identifier}");
+                    _logger.LogDebug("Start storing source file for {@dataProvider}", dataProvider.Identifier);
                     await using var fileStream = File.OpenRead(archivePath);
                     await dwcArchiveVerbatimRepository.StoreSourceFileAsync(dataProvider.Id, fileStream);
-                    _logger.LogDebug($"Finish storing source file for {dataProvider.Identifier}");
+                    _logger.LogDebug("Finish storing source file for {@dataProvider}", dataProvider.Identifier);
                 }
 
                 // Update harvest info
@@ -308,12 +308,12 @@ namespace SOS.Harvest.Harvesters.DwC
             }
             catch (JobAbortedException e)
             {
-                _logger.LogError(e, $"Canceled harvest of DwC Archive for {dataProvider.Identifier}");
+                _logger.LogError(e, "Canceled harvest of DwC Archive for {@dataProvider}", dataProvider.Identifier);
                 harvestInfo.Status = RunStatus.Canceled;
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"Failed harvest of DwC Archive for {dataProvider.Identifier}");
+                _logger.LogError(e, "Failed harvest of DwC Archive for {@dataProvider}", dataProvider.Identifier);
                 harvestInfo.Status = RunStatus.Failed;
             }
 
@@ -329,12 +329,12 @@ namespace SOS.Harvest.Harvesters.DwC
                     return 0;
                 }
 
-                _logger.LogDebug($"Start storing absent DwC-A occurrences for {dataProvider.Identifier}");
+                _logger.LogDebug("Start storing absent DwC-A occurrences for {@dataProvider}", dataProvider.Identifier);
                 // dwcCollectionRepository.OccurrenceRepository.TempMode = false;
                 int observationCount = 0;
                 var batchAbsentObservations = new List<DwcObservationVerbatim>();
                 var id = await dwcCollectionRepository.OccurrenceRepository.GetMaxIdAsync();
-                _logger.LogDebug($"MaxId={id} before adding absent observations");
+                _logger.LogDebug("MaxId={@maxSightingId} before adding absent observations", id);
                 for (int i = 0; i < events!.Count; i++)
                 {
                     DwcEventOccurrenceVerbatim? ev = events[i];
@@ -355,12 +355,12 @@ namespace SOS.Harvest.Harvesters.DwC
                     }
                 }
 
-                _logger.LogDebug($"Finish storing absent DwC-A occurrences for {dataProvider.Identifier}");
+                _logger.LogDebug("Finish storing absent DwC-A occurrences for {@dataProvider}", dataProvider.Identifier);
                 return observationCount;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error storing absent observations for {dataProvider.Identifier}");
+                _logger.LogError(ex, "Error storing absent observations for {@dataProvider}", dataProvider.Identifier);
             }
             finally
             {
@@ -409,7 +409,7 @@ namespace SOS.Harvest.Harvesters.DwC
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"Failed count number of observations for {dataProvider.Identifier}");
+                _logger.LogError(e, "Failed count number of observations for {@dataProvider}", dataProvider.Identifier);
                 return null;
             }
         }
@@ -422,7 +422,7 @@ namespace SOS.Harvest.Harvesters.DwC
                 Status = RunStatus.Failed
             };
             XDocument emlDocument = null!;
-            _logger.LogInformation($"Start harvesting sightings for {provider.Identifier} data provider.");
+            _logger.LogInformation("Start harvesting sightings for {@dataProvider} data provider.", provider.Identifier);
 
             var datasets = provider.Datasets?.Where(ds => ds.Type.Equals(DataProviderDataset.DatasetType.Observations));
             if (datasets?.Any() ?? false)
@@ -457,7 +457,7 @@ namespace SOS.Harvest.Harvesters.DwC
                                         var nrExistingObservations = await GetNumberOfObservationsInExistingCollectionAsync(provider);
                                         if (nrExistingObservations.GetValueOrDefault() > 0)
                                         {
-                                            _logger.LogInformation($"Harvest of {provider.Identifier}:{dataset.Identifier} canceled, No new data");
+                                            _logger.LogInformation("Harvest of {@dataProvider}:{@dataset} canceled, No new data", provider.Identifier, dataset.Identifier);
                                             harvestInfo.Status = RunStatus.CanceledSuccess;
                                             return harvestInfo;
                                         }
@@ -469,7 +469,7 @@ namespace SOS.Harvest.Harvesters.DwC
                         }
                         catch (Exception e)
                         {
-                            _logger.LogError(e, $"Error getting EML file for {provider.Identifier}:{dataset.Identifier}");
+                            _logger.LogError(e, "Error getting EML file for {@dataProvider}:{@dataset}", provider.Identifier, dataset.Identifier);
                         }
                     }
 
@@ -508,11 +508,11 @@ namespace SOS.Harvest.Harvesters.DwC
             {
                 if (!await _dataProviderRepository.StoreEmlAsync(provider.Id, emlDocument))
                 {
-                    _logger.LogWarning($"Error updating EML for {provider.Identifier}");
+                    _logger.LogWarning("Error updating EML for {@dataProvider}", provider.Identifier);
                 }
             }
 
-            _logger.LogInformation($"Finish harvesting sightings for {provider.Identifier} data provider. Status={harvestInfo?.Status}");
+            _logger.LogInformation("Finish harvesting sightings for {@dataProvider} data provider. Status={@harvestStatus}", provider.Identifier, harvestInfo?.Status);
             return harvestInfo!;
         }
     }

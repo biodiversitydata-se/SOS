@@ -1,0 +1,34 @@
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-env
+WORKDIR /app
+
+# copy csproj and restore as distinct layers
+COPY . .
+RUN dotnet restore SOS.ElasticSearch.Proxy/SOS.ElasticSearch.Proxy.csproj
+
+# copy everything else and build
+COPY  . .
+RUN dotnet publish SOS.ElasticSearch.Proxy/SOS.ElasticSearch.Proxy.csproj -c Release -o out
+
+#build runtime image
+FROM mcr.microsoft.com/dotnet/aspnet:8.0-alpine
+
+# enable swedish globalization
+RUN apk add --no-cache icu-libs
+ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
+
+# set time zone
+RUN apk add --no-cache tzdata
+ENV TZ=Europe/Stockholm
+
+# create and use non-root user.. (requires us to use a port number higher than 1024, default 8080. override with Env variable PORT, e.g PORT=8181)
+RUN adduser \
+  --disabled-password \
+  --home /apirunner \
+  --gecos '' apirunner \
+  && chown -R apirunner /apirunner
+USER apirunner
+
+WORKDIR /app
+COPY --from=build-env /app/out ./
+
+ENTRYPOINT ["dotnet", "./SOS.ElasticSearch.Proxy.dll"]

@@ -256,12 +256,12 @@ namespace SOS.Lib.IO.DwcArchive
             }
             catch (JobAbortedException)
             {
-                _logger.LogInformation("CreateDwcArchiveFile was canceled.");
+                _logger.LogInformation("CreateDwcArchiveFile was canceled. DataProvider={@dataProvider}", dataProvider.Identifier);
                 throw;
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Failed to create Dwc Archive File.");
+                _logger.LogError(e, "Failed to create Dwc Archive File. DataProvider={@dataProvider}", dataProvider.Identifier);
                 throw;
             }
             finally

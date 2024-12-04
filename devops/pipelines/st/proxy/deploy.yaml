@@ -1,0 +1,41 @@
+# NO auto-trigger CI/CD for ST
+trigger: none 
+
+# no PR triggers
+pr: none
+
+parameters:
+  - name: imagetag
+    type: string
+
+variables:
+  # deploy settings
+  environment: st # deploy environment
+
+  # skip unneeded tasks
+  deployApi: true # set to false to skip executing API deploy task
+
+  # pipeline settings
+  Parameters.ImageTag: '${{ parameters.imagetag }}'
+  kubernetesServiceEndpoint: 'TEST-rke2'
+
+resources:
+  repositories:
+    - repository: pipeline-templates
+      type: git
+      name: pipeline-templates
+
+pool:
+  name: linux
+
+jobs:
+  # API
+  - job: DeployAPI
+    displayName: Deploying API to ${{ upper(variables.environment) }}
+    steps:
+      - ${{ if eq(variables.deployApi, true) }}:
+        - template: adb-kubernetes-deploy.yaml@pipeline-templates
+          parameters:
+            kubernetesServiceEndpoint: $(kubernetesServiceEndpoint)
+            environment: $(environment)/proxy
+            manifest: 'api.yaml'

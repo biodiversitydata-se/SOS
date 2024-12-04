@@ -55,7 +55,7 @@ namespace SOS.ElasticSearch.Proxy.Controllers
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"Error clearing the {cache} cache");
+                _logger.LogError(e, "Error clearing the {@cacheName} cache", cache);
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
