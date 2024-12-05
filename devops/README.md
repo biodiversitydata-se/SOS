@@ -41,6 +41,11 @@ kommando: ```skaffold run -f skaffold.datastewardship.yaml```
 gå till ```http://localhost:5000/swagger``` i din webbläsare   
 *kom ihåg!* kommando: ```skaffold delete -f skaffold.datastewardship.yaml``` för att ta bort rätt container   
 
+###  skaffold.elasticsearch.proxy.yaml  
+kommando: ```skaffold run -f skaffold.elasticsearch.proxy.yaml```  
+gå till ```http://localhost:5000``` i din webbläsare   
+*kom ihåg!* kommando: ```skaffold delete -f skaffold.elasticsearch.proxy.yaml``` för att ta bort rätt container   
+
 ## Hemligheter (när du kör skaffold run)
 
 Om vi har hemligheter (API nycklar, connectionstring till central databas etc m.m.) som vi måste använda vid lokal utveckling - men inte vill ska hamna i git - så lägger vi dessa i en fil som heter ```not-for-git.secret.yaml``` i devops/k8s/local. (alternativt 1 fil per hemliget, typ: api-key-st.secret.yaml, connectionstring-to-st.secret.yaml osv). 
