@@ -537,11 +537,11 @@ namespace SOS.Harvest.Processors
         private void LogInvalidObservations(DataProvider dataProvider, ICollection<Lib.Models.Processed.Validation.InvalidObservation> invalidObservations)
         {
             const int maxChars = 5000;
-            Logger.LogWarning("Invalid observations for {@dataProvider}. Count={@invalidObservationsCount}.", dataProvider.Identifier, invalidObservations.Count);
 
             try
             {
                 if (invalidObservations == null) return;
+                Logger.LogWarning("Invalid observations for {@dataProvider}. Count={@invalidObservationsCount}.", dataProvider.Identifier, invalidObservations.Count);
                 StringBuilder sb = new StringBuilder();
                 foreach (var observation in invalidObservations.Take(10))
                 {
