@@ -47,8 +47,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(UserInformationDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        [Authorize]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]        
         [AzureApi, AzureInternalApi]
         public async Task<IActionResult> GetUserInformation(
             [FromQuery] string applicationIdentifier = null,
