@@ -16,7 +16,7 @@ namespace SOS.Analysis.Api.Controllers
         [ProducesResponseType(typeof(ApiInformation), (int)HttpStatusCode.OK)]
         public IActionResult GetApiInfoAsync()
         {
-            LogHelper.AddHttpContextItems(HttpContext, ControllerContext, MethodBase.GetCurrentMethod());
+            LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
             var buildDate = Assembly.GetExecutingAssembly().GetBuildDate();
             string version = Assembly.GetExecutingAssembly().GetVersionNumber();
 

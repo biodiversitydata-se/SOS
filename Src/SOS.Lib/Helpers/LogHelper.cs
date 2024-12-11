@@ -5,10 +5,10 @@ using System.Reflection;
 namespace SOS.Lib.Helpers;
 public static class LogHelper
 {
-    public static void AddHttpContextItems(HttpContext? httpContext, ControllerContext controllerContext, MethodBase? methodBase)
+    public static void AddHttpContextItems(HttpContext? httpContext, ControllerContext controllerContext)
     {
-        if (httpContext == null) return;        
-        httpContext.Items["Endpoint"] = controllerContext?.ActionDescriptor?.AttributeRouteInfo?.Template;
-        httpContext.Items["Handler"] = $"{methodBase?.DeclaringType?.FullName}.{methodBase?.Name}";
+        if (httpContext == null) return;
+        httpContext.Items["Endpoint"] = $"/{controllerContext?.ActionDescriptor?.AttributeRouteInfo?.Template}";   
+        httpContext.Items["Handler"] = $"{controllerContext?.ActionDescriptor?.ControllerTypeInfo?.FullName}.{controllerContext?.ActionDescriptor?.MethodInfo?.Name}";
     }
 }

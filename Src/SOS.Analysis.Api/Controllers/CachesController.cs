@@ -43,7 +43,7 @@ namespace SOS.Analysis.Api.Controllers
         {
             try
             {
-                LogHelper.AddHttpContextItems(HttpContext, ControllerContext, MethodBase.GetCurrentMethod());
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 if (cache == Cache.ProcessedConfiguration)
                 {
                     await _processedConfigurationCache.ClearAsync();

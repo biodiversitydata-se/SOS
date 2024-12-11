@@ -96,7 +96,7 @@ namespace SOS.Analysis.Api.Controllers
         {
             try
             {
-                LogHelper.AddHttpContextItems(HttpContext, ControllerContext, MethodBase.GetCurrentMethod());
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 this.User.CheckAuthorization(_analysisConfiguration.ProtectedScope!, searchFilter.ProtectionFilter);
                 searchFilter = await _searchFilterUtility.InitializeSearchFilterAsync(searchFilter);
                 var validationResult = Result.Combine(
@@ -152,7 +152,7 @@ namespace SOS.Analysis.Api.Controllers
         {
             try
             {
-                LogHelper.AddHttpContextItems(HttpContext, ControllerContext, MethodBase.GetCurrentMethod());
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 this.User.CheckAuthorization(_analysisConfiguration.ProtectedScope!, searchFilter.ProtectionFilter);
                 searchFilter = await _searchFilterUtility.InitializeSearchFilterAsync(searchFilter);
 
@@ -207,7 +207,7 @@ namespace SOS.Analysis.Api.Controllers
         {
             try
             {
-                LogHelper.AddHttpContextItems(HttpContext, ControllerContext, MethodBase.GetCurrentMethod());
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 this.User.CheckAuthorization(_analysisConfiguration.ProtectedScope!, searchFilter.ProtectionFilter);
                 searchFilter = await _searchFilterUtility.InitializeSearchFilterAsync(searchFilter);
                 var validationResult = validateFilter ?? false ? (await _inputValidator.ValidateSearchFilterAsync(searchFilter!)) : Result.Success();
@@ -283,7 +283,7 @@ namespace SOS.Analysis.Api.Controllers
         {
             try
             {
-                LogHelper.AddHttpContextItems(HttpContext, ControllerContext, MethodBase.GetCurrentMethod());
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 this.User.CheckAuthorization(_analysisConfiguration.ProtectedScope!, searchFilter.ProtectionFilter);
                 searchFilter = await _searchFilterUtility.InitializeSearchFilterAsync(searchFilter);
                 var edgeLengthValidation = Result.Success();
@@ -401,7 +401,7 @@ namespace SOS.Analysis.Api.Controllers
         {
             try
             {
-                LogHelper.AddHttpContextItems(HttpContext, ControllerContext, MethodBase.GetCurrentMethod());
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 this.User.CheckAuthorization(_analysisConfiguration.ProtectedScope!, searchFilter.ProtectionFilter);
                 searchFilter = await _searchFilterUtility.InitializeSearchFilterAsync(searchFilter);
                 var userExports = await GetUserExportsAsync();
@@ -519,7 +519,7 @@ namespace SOS.Analysis.Api.Controllers
         {
             try
             {
-                LogHelper.AddHttpContextItems(HttpContext, ControllerContext, MethodBase.GetCurrentMethod());
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 this.User.CheckAuthorization(_analysisConfiguration.ProtectedScope!, searchFilter.ProtectionFilter);
                 searchFilter = await _searchFilterUtility.InitializeSearchFilterAsync(searchFilter);
                 var filter = searchFilter?.ToSearchFilter(this.GetUserId(), searchFilter?.ProtectionFilter, "sv-SE")!;
@@ -606,7 +606,7 @@ namespace SOS.Analysis.Api.Controllers
         {
             try
             {
-                LogHelper.AddHttpContextItems(HttpContext, ControllerContext, MethodBase.GetCurrentMethod());
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 this.User.CheckAuthorization(_analysisConfiguration.ProtectedScope!, searchFilter.ProtectionFilter);
                 searchFilter = await _searchFilterUtility.InitializeSearchFilterAsync(searchFilter);
                 var filter = searchFilter?.ToSearchFilter(this.GetUserId(), searchFilter?.ProtectionFilter, "sv-SE")!;
