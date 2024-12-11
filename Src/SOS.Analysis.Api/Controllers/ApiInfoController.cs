@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SOS.Analysis.Api.Controllers.Interfaces;
 using SOS.Lib.Extensions;
+using SOS.Lib.Helpers;
 using SOS.Lib.Models.ApiInfo;
 using System.Net;
 using System.Reflection;
@@ -15,6 +16,7 @@ namespace SOS.Analysis.Api.Controllers
         [ProducesResponseType(typeof(ApiInformation), (int)HttpStatusCode.OK)]
         public IActionResult GetApiInfoAsync()
         {
+            LogHelper.AddHttpContextItems(HttpContext, ControllerContext, MethodBase.GetCurrentMethod());
             var buildDate = Assembly.GetExecutingAssembly().GetBuildDate();
             string version = Assembly.GetExecutingAssembly().GetVersionNumber();
 

@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Enums;
+using SOS.Lib.Helpers;
 using SOS.Lib.Models.Processed.Configuration;
 using System.Net;
+using System.Reflection;
 
 
 namespace SOS.Analysis.Api.Controllers
@@ -41,6 +43,7 @@ namespace SOS.Analysis.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext, MethodBase.GetCurrentMethod());
                 if (cache == Cache.ProcessedConfiguration)
                 {
                     await _processedConfigurationCache.ClearAsync();
@@ -59,6 +62,6 @@ namespace SOS.Analysis.Api.Controllers
                 _logger.LogError(e, "Error clearing the {@cacheName} cache", cache);
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
-        }
+        }        
     }
 }

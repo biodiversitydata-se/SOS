@@ -13,12 +13,10 @@
 
 	<ItemGroup>
 		<PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="8.1.0" />
-		<PackageReference Include="Elastic.Apm.NLog" Version="8.12.3" />
-		<PackageReference Include="Elastic.CommonSchema.NLog" Version="8.12.3" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.10" />
 		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="9.0.0" />
-		<PackageReference Include="NLog.Targets.ElasticSearch" Version="7.7.0" />
-		<PackageReference Include="NLog.Web.AspNetCore" Version="5.3.15" />
+		<PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
+		<PackageReference Include="Serilog.Formatting.Compact" Version="3.0.0" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="7.1.0" />
 		<PackageReference Include="HangFire" Version="1.8.16" />
 		<PackageReference Include="HangFire.Autofac" Version="2.6.0" />
