@@ -18,6 +18,7 @@ public static class Settings
     public static MongoDbConfiguration VerbatimDbConfiguration { get; set; } = new();
     public static MongoDbConfiguration ProcessDbConfiguration { get; set; } = new();
     public static HangfireDbConfiguration HangfireDbConfiguration { get; set; } = new();
+    public static string ClientSecret { get; set; } = "";
     public static string InstrumentationKey { get; set; } = "";
     public static string VerbatimDbUserName { get; set; } = "";
     public static string VerbatimDbPassword { get; set; } = "";
@@ -37,8 +38,17 @@ public static class Settings
 
         ImportConfiguration = GetConfigSection<ImportConfiguration>("ImportConfiguration", configuration, logger, sensitiveSetting: false);
         ProcessConfiguration = GetConfigSection<ProcessConfiguration>("ProcessConfiguration", configuration, logger, sensitiveSetting: false);
-        UserServiceConfiguration = GetConfigSection<UserServiceConfiguration>("UserServiceConfiguration", configuration, logger, sensitiveSetting: false);
         SosApiConfiguration = GetConfigSection<SosApiConfiguration>("SosApiConfiguration", configuration, logger, sensitiveSetting: false);
+
+        UserServiceConfiguration = GetConfigSection<UserServiceConfiguration>("UserServiceConfiguration", configuration, logger, sensitiveSetting: false);
+        if (UserServiceConfiguration != null){
+            ClientSecret = GetConfigValueString("ClientSecret", configuration, logger, sensitiveSetting: true, required: false);
+            if (UserServiceConfiguration.ClientSecret.Contains("SECRET_PLACEHOLDER"))
+            {
+                UserServiceConfiguration.ClientSecret = ClientSecret;
+                logger.LogInformation("replaced SECRET_PLACEHOLDER in UserServiceConfiguration.ClientSecret with the value in ClientSecret");
+            }
+        }
 
         // ApplicationInsights
         ApplicationInsightsConfiguration = GetConfigSection<ApplicationInsightsConfiguration>("ApplicationInsights", configuration, logger, sensitiveSetting: false, required: false);
