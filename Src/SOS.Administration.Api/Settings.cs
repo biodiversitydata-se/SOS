@@ -43,7 +43,7 @@ public static class Settings
         UserServiceConfiguration = GetConfigSection<UserServiceConfiguration>("UserServiceConfiguration", configuration, logger, sensitiveSetting: false);
         if (UserServiceConfiguration != null){
             ClientSecret = GetConfigValueString("ClientSecret", configuration, logger, sensitiveSetting: true, required: false);
-            if (UserServiceConfiguration.ClientSecret.Contains("SECRET_PLACEHOLDER"))
+            if (UserServiceConfiguration.ClientSecret == "SECRET_PLACEHOLDER")
             {
                 UserServiceConfiguration.ClientSecret = ClientSecret;
                 logger.LogInformation("replaced SECRET_PLACEHOLDER in UserServiceConfiguration.ClientSecret with the value in ClientSecret");
