@@ -292,6 +292,7 @@ namespace SOS.Administration.Api.Controllers
             string cultureCode,
             bool includeProvidersWithNoObservations)
         {
+            Thread.CurrentThread.CurrentCulture = new CultureInfo("sv-SE");
             int totalCount = 0;
             var sb = new StringBuilder();
             sb.AppendLine("| Id 	| Name 	| Organization 	| Number of observations 	|");

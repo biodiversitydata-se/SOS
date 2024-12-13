@@ -10,6 +10,7 @@ using SOS.Harvest.IoC.Modules;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Configuration.Process;
 using System;
+using System.Globalization;
 using System.IO;
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
@@ -39,7 +40,12 @@ namespace SOS.Administration.Api
             logger.Debug("Starting Service");
             try
             {
-                CreateHostBuilder(args).Build().Run();
+                var hostBuilder = CreateHostBuilder(args);
+                var swedishCulture = new CultureInfo("sv-SE");
+                CultureInfo.DefaultThreadCurrentCulture = swedishCulture;
+                CultureInfo.DefaultThreadCurrentUICulture = swedishCulture;
+                var app = hostBuilder.Build();
+                app.Run();
             }
             catch (Exception ex)
             {
