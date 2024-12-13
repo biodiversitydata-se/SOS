@@ -198,6 +198,9 @@ namespace SOS.Administration.Api
         /// <param name="env"></param>
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            var swedishCulture = new CultureInfo("sv-SE");            
+            CultureInfo.DefaultThreadCurrentCulture = swedishCulture;
+            CultureInfo.DefaultThreadCurrentUICulture = swedishCulture;
             AutofacContainer = app.ApplicationServices.GetAutofacRoot();
 
             if (_isDevelopment)

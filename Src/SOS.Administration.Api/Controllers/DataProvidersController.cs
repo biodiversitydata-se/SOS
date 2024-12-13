@@ -257,11 +257,15 @@ namespace SOS.Administration.Api.Controllers
         /// <summary>
         /// Get markdowns summary for all data providers.
         /// </summary>
+        /// <param name="cultureCode">Culture code.</param>
+        /// <param name="includeProvidersWithNoObservations">If false, data providers with no observations are excluded from the result.</param>
         /// <returns></returns>
         [HttpGet("GetMarkdown")]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetDataProvidersMarkdownAsync([FromQuery] string cultureCode = "en-GB")
+        public async Task<IActionResult> GetDataProvidersMarkdownAsync(
+            [FromQuery] string cultureCode = "en-GB",
+            [FromQuery] bool includeProvidersWithNoObservations = false)
         {
             try
             {
@@ -273,7 +277,7 @@ namespace SOS.Administration.Api.Controllers
                     .Where(m => m.ProvidersInfo != null && m.ProvidersInfo.Count() > 1)
                     .OrderByDescending(m => m.End)
                     .First();                                
-                var markdown = CreateMarkdown(dataProviders, processInfo.ProvidersInfo, cultureCode);               
+                var markdown = CreateMarkdown(dataProviders, processInfo.ProvidersInfo, cultureCode, includeProvidersWithNoObservations);               
                 return Ok(markdown);
             }
             catch (Exception e)
@@ -283,7 +287,10 @@ namespace SOS.Administration.Api.Controllers
             }
         }
 
-        private string CreateMarkdown(List<DataProvider> dataProviders, IEnumerable<Lib.Models.Processed.ProcessInfo.ProviderInfo> providerInfos, string cultureCode)
+        private string CreateMarkdown(List<DataProvider> dataProviders, 
+            IEnumerable<Lib.Models.Processed.ProcessInfo.ProviderInfo> providerInfos, 
+            string cultureCode,
+            bool includeProvidersWithNoObservations)
         {
             int totalCount = 0;
             var sb = new StringBuilder();
@@ -293,9 +300,11 @@ namespace SOS.Administration.Api.Controllers
             {
                 var providerInfo = providerInfos.FirstOrDefault(m => m.DataProviderId == dataProvider.Id);
                 if (providerInfo == null) continue;
+                int observationCount = providerInfo.PublicProcessCount.GetValueOrDefault(0) + providerInfo.ProtectedProcessCount.GetValueOrDefault(0);
+                if (!includeProvidersWithNoObservations && observationCount == 0) continue;
 
-                sb.AppendLine($"| {dataProvider.Id} | [{dataProvider.Names.Translate(cultureCode)}]({dataProvider.Url}) | {dataProvider.Organizations.Translate(cultureCode)} | {providerInfo.PublicProcessCount + providerInfo.ProtectedProcessCount:N0} |");
-                totalCount += providerInfo.PublicProcessCount.GetValueOrDefault(0) + providerInfo.ProtectedProcessCount.GetValueOrDefault(0);
+                sb.AppendLine($"| {dataProvider.Id} | [{dataProvider.Names.Translate(cultureCode)}]({dataProvider.Url}) | {dataProvider.Organizations.Translate(cultureCode)} | {observationCount:N0} |");
+                totalCount += observationCount;
             }
             sb.AppendLine($"|  |  |  | **{totalCount:N0}** |");
 
