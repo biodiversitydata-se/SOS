@@ -261,7 +261,7 @@ namespace SOS.Administration.Api.Controllers
         [HttpGet("GetMarkdown")]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetDataProvidersMarkdownAsync([FromQuery] string cultureCode = "sv-SE")
+        public async Task<IActionResult> GetDataProvidersMarkdownAsync([FromQuery] string cultureCode = "en-GB")
         {
             try
             {
