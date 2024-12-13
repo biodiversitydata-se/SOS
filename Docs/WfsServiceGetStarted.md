@@ -1,5 +1,5 @@
 # OGC Web Feature Service (WFS) - Get started guide
-All public observations that SOS harvests are available in a OGC Web Feature Service (WFS). This page is a get started guide, for more details see the [SOS WFS technical overview page](WfsService.md).
+All public observations that SOS harvests are available in a direct access OGC Web Feature Service (WFS). This page is a get started guide, for more details see the [SOS WFS technical overview page](WfsService.md).
 - [Get started](#get-started)
 - [Sensitive observations](#sensitive-observations)
 - [Number of observations returned](#number-of-observations-returned)
