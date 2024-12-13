@@ -1,18 +1,15 @@
 ﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Administration.Api.Models;
-using SOS.Lib.Managers.Interfaces;
+using SOS.Lib.Helpers;
 using SOS.Lib.Models.Shared;
+using SOS.Lib.Repositories.Processed.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Net;
-using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Linq;
 
 namespace SOS.Administration.Api.Controllers
@@ -26,17 +23,21 @@ namespace SOS.Administration.Api.Controllers
     {
         private readonly IDataProviderManager _dataProviderManager;
         private readonly ILogger<DataProvidersController> _logger;
+        private readonly IProcessInfoRepository _processInfoRepository;
 
         /// <summary>
         ///     Constructor
         /// </summary>
         /// <param name="dataProviderManager"></param>
+        /// <param name="processInfoRepository"></param>
         /// <param name="logger"></param>
         public DataProvidersController(
             IDataProviderManager dataProviderManager,
+            IProcessInfoRepository processInfoRepository,
             ILogger<DataProvidersController> logger)
         {
             _dataProviderManager = dataProviderManager ?? throw new ArgumentNullException(nameof(dataProviderManager));
+            _processInfoRepository = processInfoRepository ?? throw new ArgumentNullException(nameof(processInfoRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -251,6 +252,54 @@ namespace SOS.Administration.Api.Controllers
                 _logger.LogError(e, "Error getting data providers");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
+        }
+
+        /// <summary>
+        /// Get markdowns summary for all data providers.
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("GetMarkdown")]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> GetDataProvidersMarkdownAsync([FromQuery] string cultureCode = "sv-SE")
+        {
+            try
+            {
+                cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
+                var dataProviders = await _dataProviderManager.GetAllDataProvidersAsync();
+                var processInfo = (await _processInfoRepository.GetAllAsync())
+                    .Where(m => m.Id.Contains("observation", StringComparison.InvariantCultureIgnoreCase))
+                    .Where(m => m.Status == RunStatus.Success)
+                    .Where(m => m.ProvidersInfo != null && m.ProvidersInfo.Count() > 1)
+                    .OrderByDescending(m => m.End)
+                    .First();                                
+                var markdown = CreateMarkdown(dataProviders, processInfo.ProvidersInfo, cultureCode);               
+                return Ok(markdown);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Error getting data providers");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        private string CreateMarkdown(List<DataProvider> dataProviders, IEnumerable<Lib.Models.Processed.ProcessInfo.ProviderInfo> providerInfos, string cultureCode)
+        {
+            int totalCount = 0;
+            var sb = new StringBuilder();
+            sb.AppendLine("| Id 	| Name 	| Organization 	| Number of observations 	|");
+            sb.AppendLine("|:---	|:---	|:--- |---:	|");
+            foreach (var dataProvider in dataProviders)
+            {
+                var providerInfo = providerInfos.FirstOrDefault(m => m.DataProviderId == dataProvider.Id);
+                if (providerInfo == null) continue;
+
+                sb.AppendLine($"| {dataProvider.Id} | [{dataProvider.Names.Translate(cultureCode)}]({dataProvider.Url}) | {dataProvider.Organizations.Translate(cultureCode)} | {providerInfo.PublicProcessCount + providerInfo.ProtectedProcessCount:N0} |");
+                totalCount += providerInfo.PublicProcessCount.GetValueOrDefault(0) + providerInfo.ProtectedProcessCount.GetValueOrDefault(0);
+            }
+            sb.AppendLine($"|  |  |  | **{totalCount:N0}** |");
+
+            return sb.ToString();
         }
 
         /// <summary>

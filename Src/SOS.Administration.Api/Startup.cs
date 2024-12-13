@@ -25,6 +25,8 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.Json.Serialization;
+using SOS.Lib.Repositories.Processed.Interfaces;
+using SOS.Lib.Repositories.Processed;
 
 namespace SOS.Administration.Api
 {
@@ -164,7 +166,8 @@ namespace SOS.Administration.Api
             services.AddSingleton(importConfiguration.GeoRegionApiConfiguration);
 
             services.AddScoped<ICacheManager, CacheManager>();
-
+            services.AddScoped<IProcessInfoRepository, ProcessInfoRepository>();
+            
             services.AddSingleton<IApiUsageStatisticsManager, ApiUsageStatisticsManager>();
             services.AddSingleton<IApplicationInsightsService, ApplicationInsightsService>();
             ApiManagementServiceConfiguration apiMgmtServiceConfiguration = new ApiManagementServiceConfiguration();
