@@ -59,7 +59,7 @@ namespace SOS.Analysis.Api
             Host.CreateDefaultBuilder(args)
                 .UseSerilog(Log.Logger)
                 .ConfigureWebHostDefaults(webBuilder =>
-                {                    
+                {
                     webBuilder.UseStartup<Startup>();
                     webBuilder.UseUrls("http://*:5000");
                 });

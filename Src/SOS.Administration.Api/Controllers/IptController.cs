@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using SOS.Administration.Api.Controllers.Interfaces;
 using SOS.Administration.Api.Managers.Interfaces;
 using SOS.Administration.Api.Models.Ipt;
+using SOS.Lib.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -41,6 +42,7 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 var resources = await _iptManager.GetResourcesAsync();
 
                 return Ok(resources);

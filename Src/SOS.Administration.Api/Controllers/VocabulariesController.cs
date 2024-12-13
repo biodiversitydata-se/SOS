@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using SOS.Administration.Api.Controllers.Interfaces;
 using SOS.Harvest.Harvesters.Interfaces;
 using SOS.Lib.Enums;
+using SOS.Lib.Helpers;
 using SOS.Lib.Jobs.Import;
 using System;
 using System.Linq;
@@ -46,6 +47,7 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 var vocabularyIds = Enum.GetValues(typeof(VocabularyId)).Cast<VocabularyId>();
                 var zipBytes = await _vocabularyHarvester.CreateVocabulariesZipFileAsync(vocabularyIds);
                 return File(zipBytes, "application/zip", "AllVocabularies.zip");
@@ -65,6 +67,7 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 var vocabularyFileTuple =
                     await _vocabularyHarvester.CreateVocabularyFileAsync(vocabularyId);
                 return File(vocabularyFileTuple.Bytes, "application/json", vocabularyFileTuple.Filename);
@@ -84,6 +87,7 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 BackgroundJob.Enqueue<IVocabulariesImportJob>(job => job.RunAsync());
                 return new OkObjectResult("Import vocabularies job was enqueued to Hangfire.");
             }
@@ -105,6 +109,7 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 BackgroundJob.Enqueue<IProjectsHarvestJob>(job => job.RunHarvestProjectsAsync());
                 return new OkObjectResult("Projects harvest job was enqueued to Hangfire.");
             }

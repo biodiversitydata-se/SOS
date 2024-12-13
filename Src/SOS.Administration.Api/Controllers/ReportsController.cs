@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using SOS.Lib.Helpers;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Shared;
 using System;
@@ -46,6 +47,7 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 if (nrOfDays < 0 || nrOfDays > 10000) return BadRequest($"nrOfDays is not in supported range 0-10000");
                 var result = await _reportManager.DeleteOldReportsAndFilesAsync(TimeSpan.FromDays(nrOfDays));
                 if (result.IsFailure) return BadRequest(result.Error);
@@ -71,6 +73,7 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 var report = await _reportManager.GetReportAsync(reportId);
                 if (report == null)
                 {
@@ -98,6 +101,7 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 var reports = await _reportManager.GetAllReportsAsync();
                 reports = reports.OrderByDescending(m => m.CreatedDate).ToList();
                 return new OkObjectResult(reports);
@@ -121,6 +125,7 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 var report = await _reportManager.GetReportAsync(reportId);
                 if (report == null)
                 {
@@ -147,6 +152,7 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 var report = await _reportManager.GetReportAsync(reportId);
                 if (report == null) return NotFound($"reportId \"{reportId}\" not found");
                 var reportFileResult = await _reportManager.GetReportFileAsync(reportId);

@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Quartz;
 using SOS.Administration.Api.Controllers.Interfaces;
+using SOS.Lib.Helpers;
 using SOS.Lib.Jobs.Export;
 using System;
 
@@ -35,6 +36,7 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 if (string.IsNullOrEmpty(blobStorageContainer))
                 {
                     return BadRequest("You must provide a container");
@@ -65,6 +67,7 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 if (string.IsNullOrEmpty(blobStorageContainer))
                 {
                     return BadRequest("You must provide a container");
@@ -95,6 +98,7 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 if (string.IsNullOrEmpty(fileName))
                 {
                     return BadRequest("You must provide a file name");
@@ -119,6 +123,7 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 if (string.IsNullOrEmpty(fileName))
                 {
                     return BadRequest("You must provide a file name");

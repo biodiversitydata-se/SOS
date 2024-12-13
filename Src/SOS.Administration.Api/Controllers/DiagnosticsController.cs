@@ -61,6 +61,7 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 var vocabularyIds = Enum.GetValues(typeof(VocabularyId)).Cast<VocabularyId>();
                 var generatedVocabularies =
                     await _vocabularyHarvester.CreateAllVocabulariesAsync(vocabularyIds);
@@ -88,6 +89,7 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 var dwcTaxa = await _taxonService.GetTaxaAsync();
                 var dwcTaxonById = dwcTaxa.ToDictionary(m => m.Id, m => m);
                 var taxonCategories = TaxonCategoryHelper.GetTaxonCategories(dwcTaxonById);
@@ -128,6 +130,7 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 var dwcTaxa = await _taxonService.GetTaxaAsync();
                 var taxa = dwcTaxa.ToProcessedTaxa();
                 var taxonTree = TaxonTreeFactory.CreateTaxonTree(taxa);

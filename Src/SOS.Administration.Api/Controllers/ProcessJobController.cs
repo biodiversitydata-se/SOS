@@ -3,6 +3,7 @@ using Hangfire;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Administration.Api.Controllers.Interfaces;
+using SOS.Lib.Helpers;
 using SOS.Lib.Jobs.Process;
 using SOS.Lib.Managers.Interfaces;
 using System;
@@ -45,6 +46,7 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 var dataProvidersToProcess = (await _dataProviderManager.GetAllDataProvidersAsync())
                     .Where(dataProvider => dataProvider.IsActive).ToList();
                 if (!dataProvidersToProcess.Any())
@@ -71,6 +73,7 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 RecurringJob.AddOrUpdate<IProcessTaxaJob>(nameof(IProcessTaxaJob), job => job.RunAsync(),
                     $"0 {minute} {hour} * * ?", new RecurringJobOptions { TimeZone = TimeZoneInfo.Local });
                 return new OkObjectResult("Process job added");
@@ -90,6 +93,7 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 BackgroundJob.Enqueue<IProcessTaxaJob>(job => job.RunAsync());
                 return new OkObjectResult("Process taxa job was enqueued to Hangfire.");
             }

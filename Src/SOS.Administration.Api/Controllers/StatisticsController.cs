@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Exceptions;
+using SOS.Lib.Helpers;
 using SOS.Lib.Jobs.Import;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Shared;
@@ -48,6 +49,7 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 RecurringJob.AddOrUpdate<IApiUsageStatisticsHarvestJob>(nameof(IApiUsageStatisticsHarvestJob), job => job.RunHarvestStatisticsAsync(),
                     $"0 {minute} {hour} * * ?", new RecurringJobOptions { TimeZone = TimeZoneInfo.Local });
                 return new OkObjectResult("API statistics harvest job added");
@@ -70,6 +72,7 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 BackgroundJob.Enqueue<IApiUsageStatisticsHarvestJob>(job => job.RunHarvestStatisticsAsync());
                 return new OkObjectResult("API statistics harvest job was enqueued to Hangfire.");
             }
@@ -91,6 +94,7 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 var reportId = Report.CreateReportId();
                 BackgroundJob.Enqueue<IApiUsageStatisticsHarvestJob>(job => job.RunCreateExcelFileReportAsync(reportId, createdBy));
                 return new OkObjectResult($"Create API usage statistics Excel report job with Id \"{reportId}\" was enqueued to Hangfire.");
@@ -120,6 +124,7 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 if (fromDate >= toDate)
                 {
                     return BadRequest("From date must be less than toDate");

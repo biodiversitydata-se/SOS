@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Administration.Api.Controllers.Interfaces;
+using SOS.Lib.Helpers;
 using SOS.Lib.Jobs.Import;
 using SOS.Lib.Managers.Interfaces;
 using System;
@@ -41,6 +42,7 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 RecurringJob.AddOrUpdate<IObservationsHarvestJobFull>($"{nameof(IObservationsHarvestJobFull)}",
                     job => job.RunFullAsync(JobCancellationToken.Null), $"0 {minute} {hour} * * ?", new RecurringJobOptions { TimeZone = TimeZoneInfo.Local });
 
@@ -61,6 +63,7 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 BackgroundJob.Enqueue<IObservationsHarvestJobFull>(job => job.RunFullAsync(JobCancellationToken.Null));
                 return new OkObjectResult("Observations harvest and process job was enqueued to Hangfire.");
             }
@@ -80,6 +83,7 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 BackgroundJob.Enqueue<IObservationsHarvestJobIncremental>(job => job.RunIncrementalActiveAsync(fromDate,
                   JobCancellationToken.Null));
 
@@ -100,6 +104,7 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 BackgroundJob.Enqueue<IObservationsHarvestJobIncremental>(job => job.RunHarvestArtportalenObservationsAsync(ids,
                     JobCancellationToken.Null));
 
@@ -121,6 +126,7 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 if (runIntervalInMinutes <= 0 || runIntervalInMinutes > 59)
                 {
 
@@ -148,6 +154,7 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 RecurringJob.AddOrUpdate<IChecklistsHarvestJob>($"{nameof(IChecklistsHarvestJob)}-Full",
                     job => job.RunAsync(JobCancellationToken.Null), $"0 {minute} {hour} * * ?", new RecurringJobOptions { TimeZone = TimeZoneInfo.Local });
                 return new OkObjectResult("Check lists harvest and process job added");
@@ -167,6 +174,7 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 BackgroundJob.Enqueue<IChecklistsHarvestJob>(job => job.RunAsync(JobCancellationToken.Null));
                 return new OkObjectResult("Check lists harvest and process job was enqueued to Hangfire.");
             }

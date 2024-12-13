@@ -58,6 +58,7 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 var result = await _dataProviderManager.InitDefaultDataProviders(forceOverwriteIfCollectionExist);
                 if (result.IsFailure) return BadRequest(result.Error);
                 return Ok(result.Value);
@@ -88,6 +89,7 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 var dataProvider =
                         await _dataProviderManager.GetDataProviderByIdOrIdentifier(dataProviderIdOrIdentifier);
                 if (dataProvider != null && !forceOverwriteIfCollectionExist)
@@ -121,6 +123,7 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 var result = await _dataProviderManager.InitDefaultEml(datproviderIds);
                 if (result.IsFailure) return BadRequest(result.Error);
                 return Ok(result.Value);
@@ -145,6 +148,7 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 int.TryParse(model.DataProviderIdOrIdentifier, out var providerId);
 
                 if (providerId != -1)
@@ -242,6 +246,7 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 var dataProviders = await _dataProviderManager.GetAllDataProvidersAsync();
 
                 //var dtos = dataProviders.Select(DataProviderDto.Create).ToList(); // todo - use DTO?
@@ -260,15 +265,16 @@ namespace SOS.Administration.Api.Controllers
         /// <param name="cultureCode">Culture code.</param>
         /// <param name="includeProvidersWithNoObservations">If false, data providers with no observations are excluded from the result.</param>
         /// <returns></returns>
-        [HttpGet("GetMarkdown")]
+        [HttpGet("GetMarkdownSummary")]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetDataProvidersMarkdownAsync(
+        public async Task<IActionResult> GetDataProvidersMarkdownSummaryAsync(
             [FromQuery] string cultureCode = "en-GB",
             [FromQuery] bool includeProvidersWithNoObservations = false)
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
                 var dataProviders = await _dataProviderManager.GetAllDataProvidersAsync();
                 var processInfo = (await _processInfoRepository.GetAllAsync())
@@ -292,7 +298,9 @@ namespace SOS.Administration.Api.Controllers
             string cultureCode,
             bool includeProvidersWithNoObservations)
         {
+            _logger.LogInformation("CreateMarkdown culture (before change): {@currentCulture}, numberGroupSeparator: {@numberGroupSeparator}", Thread.CurrentThread.CurrentCulture.Name, Thread.CurrentThread.CurrentCulture.NumberFormat.NumberGroupSeparator);
             Thread.CurrentThread.CurrentCulture = new CultureInfo("sv-SE");
+            _logger.LogInformation("CreateMarkdown culture (after change): {@currentCulture}, numberGroupSeparator: {@numberGroupSeparator}", Thread.CurrentThread.CurrentCulture.Name, Thread.CurrentThread.CurrentCulture.NumberFormat.NumberGroupSeparator);
             int totalCount = 0;
             var sb = new StringBuilder();
             sb.AppendLine("| Id 	| Name 	| Organization 	| Number of observations 	|");
@@ -323,6 +331,7 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 var allDataProviders = await _dataProviderManager.GetAllDataProvidersAsync();
                 var harvestProcessSettings = new DataProviderHarvestAndProcessSettingsDto
                 {

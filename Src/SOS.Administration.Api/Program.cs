@@ -2,9 +2,9 @@ using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using NLog;
-using NLog.Web;
+using Serilog;
+using Serilog.Filters;
+using Serilog.Formatting.Compact;
 using SOS.Administration.Api.IoC;
 using SOS.Harvest.IoC.Modules;
 using SOS.Lib.Configuration.Import;
@@ -12,7 +12,7 @@ using SOS.Lib.Configuration.Process;
 using System;
 using System.Globalization;
 using System.IO;
-using LogLevel = Microsoft.Extensions.Logging.LogLevel;
+using System.Linq;
 
 namespace SOS.Administration.Api
 {
@@ -35,11 +35,34 @@ namespace SOS.Administration.Api
         public static void Main(string[] args)
         {
             var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-            var logger = NLog.LogManager.Setup().LoadConfigurationFromAppSettings(environment: env).GetCurrentClassLogger();
+            bool isLocalDevelopment = new[] { "local", "k8s" }.Contains(env?.ToLower(), StringComparer.CurrentCultureIgnoreCase);
 
-            logger.Debug("Starting Service");
+            // we set up Log.Logger here in order to be able to log if something goes wrong in the startup process
+            Log.Logger = isLocalDevelopment ?
+                    new LoggerConfiguration() // human readable in the terminal when developing, not all json
+                        .MinimumLevel.Debug()
+                        .Enrich.FromLogContext()
+                        .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {SourceContext} {Message:lj} {Properties}{NewLine}{Exception}")
+                    .CreateLogger()
+                :
+                    new LoggerConfiguration() // compact json when running in the clusters for that sweet sweet structured logging
+                        .MinimumLevel.Information()
+                        .WriteTo.Console(new RenderedCompactJsonFormatter())
+                        .Enrich.FromLogContext()
+                        .MinimumLevel.Override("Microsoft.EntityFrameworkCore", Serilog.Events.LogEventLevel.Warning)
+                        .MinimumLevel.Override("Microsoft.AspNetCore.Http.Result", Serilog.Events.LogEventLevel.Warning)
+                        .MinimumLevel.Override("Microsoft.AspNetCore.Hosting.Diagnostics", Serilog.Events.LogEventLevel.Warning)
+                        .MinimumLevel.Override("Microsoft.AspNetCore.Routing.EndpointMiddleware", Serilog.Events.LogEventLevel.Warning)
+                        .MinimumLevel.Override("Microsoft.AspNetCore.Http.HttpResults", Serilog.Events.LogEventLevel.Warning)
+                        .MinimumLevel.Override("Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware", Serilog.Events.LogEventLevel.Warning)
+                        .MinimumLevel.Override("Microsoft.AspNetCore.Mvc.Infrastructure", Serilog.Events.LogEventLevel.Warning)
+                        .MinimumLevel.Override("Microsoft.AspNetCore.Cors.Infrastructure", Serilog.Events.LogEventLevel.Warning)
+                        .Filter.ByExcluding(Matching.WithProperty<string>("RequestPath", p => p == "/healthz"))
+                    .CreateLogger();
+            
             try
             {
+                Log.Logger.Debug("Init SOS Admin API");
                 var hostBuilder = CreateHostBuilder(args);
                 var swedishCulture = new CultureInfo("sv-SE");
                 CultureInfo.DefaultThreadCurrentCulture = swedishCulture;
@@ -48,16 +71,10 @@ namespace SOS.Administration.Api
                 app.Run();
             }
             catch (Exception ex)
-            {
-                //NLog: catch setup errors
-                logger.Error(ex, "Stopped program because of exception");
+            {                
+                Log.Logger.Error(ex, "Stopped program because of exception");
                 throw;
-            }
-            finally
-            {
-                // Ensure to flush and stop internal timers/threads before application-exit (Avoid segmentation fault on Linux)
-                NLog.LogManager.Shutdown();
-            }
+            }            
         }
 
         /// <summary>
@@ -68,18 +85,13 @@ namespace SOS.Administration.Api
         public static IHostBuilder CreateHostBuilder(string[] args)
         {
             return Host.CreateDefaultBuilder(args)
+                .UseSerilog(Log.Logger)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder
                         .UseContentRoot(Directory.GetCurrentDirectory())
                         .UseIISIntegration()
                         .UseStartup<Startup>().UseUrls("http://*:5005");
-                })
-                .ConfigureLogging(logging =>
-                {
-                    logging.ClearProviders();
-                    logging.SetMinimumLevel(LogLevel.Trace);
-                    NLog.LogManager.ReconfigExistingLoggers();
                 })
                 .UseServiceProviderFactory(hostContext =>
                 {
@@ -112,9 +124,7 @@ namespace SOS.Administration.Api
                             .RegisterModule(new HarvestModule { Configurations = (_importConfiguration, null, _verbatimDbConfiguration, _processConfiguration, _processDbConfiguration, _applicationInsightsConfiguration, _sosApiConfiguration, _userServiceConfiguration, null) })
                             .RegisterModule<AdministrationModule>()
                     );
-                }
-                )
-                .UseNLog();
+                });                
         }
     }
 }

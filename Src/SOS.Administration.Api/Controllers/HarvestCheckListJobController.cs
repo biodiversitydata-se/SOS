@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using SOS.Administration.Api.Controllers.Interfaces;
 using SOS.Administration.Api.Models;
 using SOS.Lib.Database.Interfaces;
+using SOS.Lib.Helpers;
 using SOS.Lib.Jobs.Import;
 using SOS.Lib.Repositories.Verbatim;
 using System;
@@ -48,6 +49,7 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 var dataProvider =
                     await _dataProviderManager.GetDataProviderByIdOrIdentifier(model.DataProviderIdOrIdentifier);
                 if (dataProvider == null)

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Administration.Api.Controllers.Interfaces;
 using SOS.Lib.Enums;
+using SOS.Lib.Helpers;
 using SOS.Lib.Jobs.Shared;
 using SOS.Lib.Managers.Interfaces;
 using System;
@@ -39,6 +40,7 @@ namespace SOS.Administration.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> ClearAsync([FromRoute] Cache cache)
         {
+            LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
             return new OkObjectResult("THIS ENDPOINT IS TEMPORARILY DISABLED");
             // try
             // {

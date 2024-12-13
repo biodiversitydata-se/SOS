@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Administration.Api.Controllers.Interfaces;
+using SOS.Lib.Helpers;
 using SOS.Lib.Jobs.Shared;
 using System;
 using System.Net;
@@ -34,6 +35,7 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 if (runIntervalInMinutes <= 0 || runIntervalInMinutes > 59)
                 {
 

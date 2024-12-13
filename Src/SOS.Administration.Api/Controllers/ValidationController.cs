@@ -69,6 +69,7 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 var dataProvider =
                     await _dataProviderManager.GetDataProviderByIdOrIdentifier(dataProviderIdOrIdentifier);
                 if (dataProvider == null)
@@ -117,6 +118,7 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 if (model.DwcaFile == null) return new BadRequestObjectResult("No file is provided");
                 if (model.DwcaFile.Length == 0) return new BadRequestObjectResult("No file content");
                 if (model.MaxNrObservationsToRead <= 0) return new BadRequestObjectResult("MxNrObservationsToRead must be > 0");
@@ -164,6 +166,7 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 var dataProvider =
                     await _dataProviderManager.GetDataProviderByIdOrIdentifier(dataProviderIdOrIdentifier);
                 if (dataProvider == null)
