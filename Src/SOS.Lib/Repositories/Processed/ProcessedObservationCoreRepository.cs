@@ -2,7 +2,6 @@
 using Elasticsearch.Net;
 using Microsoft.Extensions.Logging;
 using Nest;
-using SOS.Lib.Cache;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Enums;
@@ -10,7 +9,6 @@ using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Managers.Interfaces;
-using SOS.Lib.Models.Cache;
 using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.DataQuality;
 using SOS.Lib.Models.Gis;
@@ -55,58 +53,65 @@ namespace SOS.Lib.Repositories.Processed
                 )
                 .Map<Observation>(m => m
                     .AutoMap<Observation>()
-                    .Properties(ps => ps                        
-                        .KeyWordLowerCase(kwlc => kwlc.Id, index: false, docValues: false)
-                        .KeyWordLowerCase(kwlc => kwlc.DynamicProperties, index: false, docValues: false)
-                        .KeyWordLowerCase(kwlc => kwlc.InformationWithheld, index: false, docValues: false)
-                        .KeyWordLowerCase(kwlc => kwlc.BibliographicCitation, index: false, docValues: false)
-                        .KeyWordLowerCase(kwlc => kwlc.CollectionId, index: false, docValues: false)
-                        .KeyWordLowerCase(kwlc => kwlc.CollectionCode, index: false, docValues: false)
-                        .KeyWordLowerCase(kwlc => kwlc.DataGeneralizations, index: false, docValues: false)
-                        .KeyWordLowerCase(kwlc => kwlc.DatasetId, index: false, docValues: false)
-                        .KeyWordLowerCase(kwlc => kwlc.DatasetName) // WFS
-                        .KeyWordLowerCase(kwlc => kwlc.InstitutionId)
-                        .KeyWordLowerCase(kwlc => kwlc.Language, index: false, docValues: false)
-                        .KeyWordLowerCase(kwlc => kwlc.License, index: false, docValues: false)
-                        .KeyWordLowerCase(kwlc => kwlc.OwnerInstitutionCode, index: false, docValues: false)
-                        .KeyWordLowerCase(kwlc => kwlc.PrivateCollection, index: true, docValues: false)
-                        .KeyWordLowerCase(kwlc => kwlc.PublicCollection, index: true, docValues: false)
-                        .KeyWordLowerCase(kwlc => kwlc.References, index: false, docValues: false)
-                        .KeyWordLowerCase(kwlc => kwlc.RightsHolder, index: false, docValues: false)
-                        .KeyWordLowerCase(kwlc => kwlc.SpeciesCollectionLabel, index: true, docValues: false)
-                        .Nested<ExtendedMeasurementOrFact>(n => n
+                    .Properties(ps => ps
+                        .KeywordLowerCase(kwlc => kwlc.Id, IndexSetting.None)
+                        .KeywordLowerCase(kwlc => kwlc.DynamicProperties, IndexSetting.None)
+                        .KeywordLowerCase(kwlc => kwlc.InformationWithheld, IndexSetting.None)
+                        .KeywordLowerCase(kwlc => kwlc.BibliographicCitation, IndexSetting.None)
+                        .KeywordLowerCase(kwlc => kwlc.CollectionId, IndexSetting.None)
+                        .KeywordLowerCase(kwlc => kwlc.CollectionCode, IndexSetting.None)
+                        .KeywordLowerCase(kwlc => kwlc.DataGeneralizations, IndexSetting.None)
+                        .KeywordLowerCase(kwlc => kwlc.DatasetId, IndexSetting.None)
+                        .KeywordLowerCase(kwlc => kwlc.DatasetName, IndexSetting.SearchOnly) // WFS
+                        .KeywordLowerCase(kwlc => kwlc.InstitutionId, IndexSetting.SearchOnly)
+                        .KeywordLowerCase(kwlc => kwlc.Language, IndexSetting.None)
+                        .KeywordLowerCase(kwlc => kwlc.License, IndexSetting.None)
+                        .KeywordLowerCase(kwlc => kwlc.OwnerInstitutionCode, IndexSetting.None)
+                        .KeywordLowerCase(kwlc => kwlc.PrivateCollection, IndexSetting.SearchOnly)
+                        .KeywordLowerCase(kwlc => kwlc.PublicCollection, IndexSetting.SearchOnly)
+                        .KeywordLowerCase(kwlc => kwlc.References, IndexSetting.None)
+                        .KeywordLowerCase(kwlc => kwlc.RightsHolder, IndexSetting.None)
+                        .KeywordLowerCase(kwlc => kwlc.SpeciesCollectionLabel, IndexSetting.SearchOnly)
+                        .NumberVal(n => n.DiffusionStatus, IndexSetting.SearchOnly, NumberType.Byte)
+                        .BooleanVal(b => b.HasGeneralizedObservationInOtherIndex, IndexSetting.SearchOnly)
+                        .BooleanVal(b => b.IsGeneralized, IndexSetting.SearchOnly)
+                        .BooleanVal(b => b.Protected, IndexSetting.None)
+                        .BooleanVal(b => b.Sensitive, IndexSetting.SearchOnly)
+                        .Object<ExtendedMeasurementOrFact>(n => n
                             .Name(nm => nm.MeasurementOrFacts)
                             .Properties(ps => ps
-                                .KeyWordLowerCase(kwlc => kwlc.MeasurementAccuracy, index: false, docValues: false)
-                                .KeyWordLowerCase(kwlc => kwlc.MeasurementDeterminedBy, index: false, docValues: false)
-                                .KeyWordLowerCase(kwlc => kwlc.MeasurementDeterminedDate, index: false, docValues: false)
-                                .KeyWordLowerCase(kwlc => kwlc.MeasurementID, index: false, docValues: false)
-                                .KeyWordLowerCase(kwlc => kwlc.MeasurementMethod, index: false, docValues: false)
-                                .KeyWordLowerCase(kwlc => kwlc.MeasurementRemarks, index: false, docValues: false)
-                                .KeyWordLowerCase(kwlc => kwlc.MeasurementType, index: false, docValues: false)
-                                .KeyWordLowerCase(kwlc => kwlc.MeasurementTypeID, index: false, docValues: false)
-                                .KeyWordLowerCase(kwlc => kwlc.MeasurementUnit, index: false, docValues: false)
-                                .KeyWordLowerCase(kwlc => kwlc.MeasurementUnitID, index: false, docValues: false)
-                                .KeyWordLowerCase(kwlc => kwlc.MeasurementValue, index: false, docValues: false)
-                                .KeyWordLowerCase(kwlc => kwlc.MeasurementValueID, index: false, docValues: false)
-                                .KeyWordLowerCase(kwlc => kwlc.OccurrenceID, index: false, docValues: false)
+                                .KeywordLowerCase(kwlc => kwlc.MeasurementAccuracy, IndexSetting.None)
+                                .KeywordLowerCase(kwlc => kwlc.MeasurementDeterminedBy, IndexSetting.None)
+                                .KeywordLowerCase(kwlc => kwlc.MeasurementDeterminedDate, IndexSetting.None)
+                                .KeywordLowerCase(kwlc => kwlc.MeasurementID, IndexSetting.None)
+                                .KeywordLowerCase(kwlc => kwlc.MeasurementMethod, IndexSetting.None)
+                                .KeywordLowerCase(kwlc => kwlc.MeasurementRemarks, IndexSetting.None)
+                                .KeywordLowerCase(kwlc => kwlc.MeasurementType, IndexSetting.None)
+                                .KeywordLowerCase(kwlc => kwlc.MeasurementTypeID, IndexSetting.None)
+                                .KeywordLowerCase(kwlc => kwlc.MeasurementUnit, IndexSetting.None)
+                                .KeywordLowerCase(kwlc => kwlc.MeasurementUnitID, IndexSetting.None)
+                                .KeywordLowerCase(kwlc => kwlc.MeasurementValue, IndexSetting.None)
+                                .KeywordLowerCase(kwlc => kwlc.MeasurementValueID, IndexSetting.None)
+                                .KeywordLowerCase(kwlc => kwlc.OccurrenceID, IndexSetting.None)
                             )
                         )
                         .Object<ProjectsSummary>(t => t
                             .AutoMap()
                             .Name(nm => nm.ProjectsSummary)
                             .Properties(ps => ps
-                                .KeyWordLowerCase(kwlc => kwlc.Project1Name, index: true, docValues: false) // WFS
-                                .KeyWordLowerCase(kwlc => kwlc.Project1Category, index: true, docValues: false) // WFS
-                                .KeyWordLowerCase(kwlc => kwlc.Project1Url, index: false, docValues: false)
-                                .KeyWordLowerCase(kwlc => kwlc.Project1Values, index: true, docValues: false) // WFS
-                                .KeyWordLowerCase(kwlc => kwlc.Project2Name, index: true, docValues: false) // WFS
-                                .KeyWordLowerCase(kwlc => kwlc.Project2Category, index: true, docValues: false) // WFS
-                                .KeyWordLowerCase(kwlc => kwlc.Project2Url, index: false, docValues: false)
-                                .KeyWordLowerCase(kwlc => kwlc.Project2Values, index: true, docValues: false)
+                                .NumberVal(n => n.Project1Id, IndexSetting.SearchOnly, NumberType.Integer) // WFS
+                                .NumberVal(n => n.Project2Id, IndexSetting.SearchOnly, NumberType.Integer) // WFS
+                                .KeywordLowerCase(kwlc => kwlc.Project1Name, IndexSetting.SearchOnly) // WFS
+                                .KeywordLowerCase(kwlc => kwlc.Project1Category, IndexSetting.SearchOnly) // WFS
+                                .KeywordLowerCase(kwlc => kwlc.Project1Url, IndexSetting.SearchOnly) // WFS
+                                .KeywordLowerCase(kwlc => kwlc.Project1Values, IndexSetting.SearchOnly) // WFS
+                                .KeywordLowerCase(kwlc => kwlc.Project2Name, IndexSetting.SearchOnly) // WFS
+                                .KeywordLowerCase(kwlc => kwlc.Project2Category, IndexSetting.SearchOnly) // WFS
+                                .KeywordLowerCase(kwlc => kwlc.Project2Url, IndexSetting.SearchOnly) // WFS
+                                .KeywordLowerCase(kwlc => kwlc.Project2Values, IndexSetting.SearchOnly) // WFS
                             )
                         )
-                        .Nested<Project>(n => n
+                        .Object<Project>(n => n
                             .AutoMap()
                             .Name(nm => nm.Projects)
                             .Properties(ps => ps.GetMapping())
@@ -118,34 +123,73 @@ namespace SOS.Lib.Repositories.Processed
                         .Object<SOS.Lib.Models.Processed.DataStewardship.Common.DataStewardshipInfo>(d => d
                             .Name(nm => nm.DataStewardship)
                             .Properties(ps => ps
-                                .KeyWordLowerCase(kwlc => kwlc.DatasetIdentifier)
-                                .KeyWordLowerCase(kwlc => kwlc.DatasetTitle)
+                                .KeywordLowerCase(kwlc => kwlc.DatasetIdentifier, IndexSetting.SearchSortAggregate)
+                                .KeywordLowerCase(kwlc => kwlc.DatasetTitle, IndexSetting.None)
                             )
                         )
                         .Object<ArtportalenInternal>(t => t
                             .AutoMap()
                             .Name(nm => nm.ArtportalenInternal)
-                            .Properties(ps => ps
-                                // .KeyWordLowerCase(kwlc => kwlc.LocationExternalId)
-                                .KeyWordLowerCase(kwlc => kwlc.LocationPresentationNameParishRegion, false)
-                                .KeyWordLowerCase(kwlc => kwlc.ParentLocality)
-                                .KeyWordLowerCase(kwlc => kwlc.ReportedByUserAlias)
-                                .KeyWordLowerCase(kwlc => kwlc.SightingBarcodeURL)
-                                .Nested<UserInternal>(n => n
+                            .Properties(ps => ps                                                                
+                                .KeywordLowerCase(kwlc => kwlc.SightingBarcodeURL, IndexSetting.SearchOnly)
+                                .KeywordLowerCase(kwlc => kwlc.BirdValidationAreaIds, IndexSetting.SearchOnly)
+                                .KeywordLowerCase(kwlc => kwlc.LocationPresentationNameParishRegion, IndexSetting.None)
+                                .KeywordLowerCase(kwlc => kwlc.ParentLocality, IndexSetting.None)
+                                .KeywordLowerCase(kwlc => kwlc.ReportedByUserAlias, IndexSetting.None)
+                                .KeywordLowerCase(kwlc => kwlc.Summary, IndexSetting.None)
+                                .BooleanVal(b => b.SecondHandInformation, IndexSetting.SearchOnly)
+                                .BooleanVal(b => b.HasAnyTriggeredVerificationRuleWithWarning, IndexSetting.SearchOnly)
+                                .BooleanVal(b => b.HasTriggeredVerificationRules, IndexSetting.SearchOnly)
+                                .BooleanVal(b => b.HasUserComments, IndexSetting.SearchOnly)
+                                .BooleanVal(b => b.IncrementalHarvested, IndexSetting.SearchOnly)
+                                .BooleanVal(b => b.NoteOfInterest, IndexSetting.SearchOnly)
+                                .NumberVal(n => n.ChecklistId, IndexSetting.SearchOnly, NumberType.Integer)
+                                .NumberVal(n => n.FieldDiaryGroupId, IndexSetting.SearchOnly, NumberType.Integer)
+                                .NumberVal(n => n.ParentLocationId, IndexSetting.SearchOnly, NumberType.Integer)
+                                .NumberVal(n => n.ReportedByUserId, IndexSetting.SearchOnly, NumberType.Integer)
+                                .NumberVal(n => n.ReportedByUserServiceUserId, IndexSetting.SearchOnly, NumberType.Integer)
+                                .NumberVal(n => n.SightingId, IndexSetting.SearchOnly, NumberType.Integer)
+                                .NumberVal(n => n.SightingPublishTypeIds, IndexSetting.SearchOnly, NumberType.Integer)
+                                .NumberVal(n => n.SightingTypeId, IndexSetting.SearchOnly, NumberType.Integer)
+                                .NumberVal(n => n.SightingTypeSearchGroupId, IndexSetting.SearchOnly, NumberType.Integer)
+                                .NumberVal(n => n.SpeciesFactsIds, IndexSetting.SearchOnly, NumberType.Integer)
+                                .NumberVal(n => n.TriggeredObservationRuleFrequencyId, IndexSetting.SearchOnly, NumberType.Integer)
+                                .NumberVal(n => n.TriggeredObservationRuleReproductionId, IndexSetting.SearchOnly, NumberType.Integer)
+                                .NumberVal(n => n.TriggeredObservationRuleActivityRuleId, IndexSetting.None, NumberType.Integer)
+                                .NumberVal(n => n.TriggeredObservationRulePeriodRuleId, IndexSetting.None, NumberType.Integer)
+                                .NumberVal(n => n.TriggeredObservationRulePromptRuleId, IndexSetting.None, NumberType.Integer)
+                                .NumberVal(n => n.TriggeredObservationRuleRegionalSightingState, IndexSetting.None, NumberType.Integer)
+                                .NumberVal(n => n.TriggeredObservationRuleStatusRuleId, IndexSetting.None, NumberType.Integer)
+                                .NumberVal(n => n.ActivityCategoryId, IndexSetting.None, NumberType.Integer)
+                                .BooleanVal(b => b.TriggeredObservationRulePrompts, IndexSetting.None)
+                                .BooleanVal(b => b.TriggeredObservationRuleUnspontaneous, IndexSetting.None)
+                                .NumberVal(n => n.SightingSpeciesCollectionItemId, IndexSetting.None, NumberType.Integer)
+                                .NumberVal(n => n.DiffusionId, IndexSetting.None, NumberType.Integer)
+                                .NumberVal(n => n.IncludedByLocationId, IndexSetting.None, NumberType.Integer)
+                                .Object<UserInternal>(n => n
                                     .AutoMap()
                                     .Name(nm => nm.OccurrenceRecordedByInternal)
                                     .Properties(ps => ps
-                                        .KeyWordLowerCase(kwlc => kwlc.UserAlias)
+                                        .KeywordLowerCase(kwlc => kwlc.UserAlias, IndexSetting.None)
+                                        .NumberVal(n => n.Id, IndexSetting.SearchOnly, NumberType.Integer)
+                                        .NumberVal(n => n.PersonId, IndexSetting.None, NumberType.Integer)
+                                        .NumberVal(n => n.UserServiceUserId, IndexSetting.SearchOnly, NumberType.Integer)
+                                        .BooleanVal(b => b.Discover, IndexSetting.None)
+                                        .BooleanVal(b => b.ViewAccess, IndexSetting.SearchOnly)
                                     )
                                 )
-                                .Nested<UserInternal>(n => n
+                                .Object<UserInternal>(n => n
                                     .AutoMap()
                                     .Name(nm => nm.OccurrenceVerifiedByInternal)
                                     .Properties(ps => ps
-                                        .KeyWordLowerCase(kwlc => kwlc.UserAlias)
+                                        .KeywordLowerCase(kwlc => kwlc.UserAlias, IndexSetting.None)
+                                        .NumberVal(n => n.Id, IndexSetting.SearchOnly, NumberType.Integer)
+                                        .NumberVal(n => n.PersonId, IndexSetting.None, NumberType.Integer)
+                                        .NumberVal(n => n.UserServiceUserId, IndexSetting.SearchOnly, NumberType.Integer)
+                                        .BooleanVal(b => b.Discover, IndexSetting.None)
+                                        .BooleanVal(b => b.ViewAccess, IndexSetting.SearchOnly)
                                     )
-                                )
-                                .KeyWordLowerCase(kwlc => kwlc.BirdValidationAreaIds)
+                                )                                
                             )
                         )
                         .Object<VocabularyValue>(c => c
@@ -156,15 +200,14 @@ namespace SOS.Lib.Repositories.Processed
                             .AutoMap()
                             .Name(nm => nm.DataQuality)
                             .Properties(ps => ps
-                                .KeyWordLowerCase(kwlc => kwlc.UniqueKey, index: false, docValues: false)
+                                .KeywordLowerCase(kwlc => kwlc.UniqueKey, IndexSetting.None)
                             )
                         )
-                        .Object<IDictionary<string, string>>(c => c
-                            .AutoMap()
+                        .Object<IDictionary<string, string>>(c => c                            
                             .Name(nm => nm.Defects)
                             .Properties(ps => ps
-                                .KeyWordLowerCase(kwlc => kwlc.Keys, index: false, docValues: false)
-                                .KeyWordLowerCase(kwlc => kwlc.Values, index: false, docValues: false)
+                                .KeywordLowerCase(kwlc => kwlc.Keys, IndexSetting.None)
+                                .KeywordLowerCase(kwlc => kwlc.Values, IndexSetting.None)
                             )
                         )
                         .Object<Event>(t => t
@@ -175,42 +218,45 @@ namespace SOS.Lib.Repositories.Processed
                         .Object<GeologicalContext>(c => c
                             .Name(nm => nm.GeologicalContext)
                             .Properties(ps => ps
-                                .KeyWordLowerCase(kwlc => kwlc.Bed, index: false, docValues: false)
-                                .KeyWordLowerCase(kwlc => kwlc.EarliestAgeOrLowestStage, index: false, docValues: false)
-                                .KeyWordLowerCase(kwlc => kwlc.EarliestEonOrLowestEonothem, index: false, docValues: false)
-                                .KeyWordLowerCase(kwlc => kwlc.EarliestEpochOrLowestSeries, index: false, docValues: false)
-                                .KeyWordLowerCase(kwlc => kwlc.EarliestEraOrLowestErathem, index: false, docValues: false)
-                                .KeyWordLowerCase(kwlc => kwlc.EarliestGeochronologicalEra, index: false, docValues: false)
-                                .KeyWordLowerCase(kwlc => kwlc.EarliestPeriodOrLowestSystem, index: false, docValues: false)
-                                .KeyWordLowerCase(kwlc => kwlc.Formation, index: false, docValues: false)
-                                .KeyWordLowerCase(kwlc => kwlc.GeologicalContextId, index: false, docValues: false)
-                                .KeyWordLowerCase(kwlc => kwlc.Group, index: false, docValues: false)
-                                .KeyWordLowerCase(kwlc => kwlc.HighestBiostratigraphicZone, index: false, docValues: false)
-                                .KeyWordLowerCase(kwlc => kwlc.LatestAgeOrHighestStage, index: false, docValues: false)
-                                .KeyWordLowerCase(kwlc => kwlc.LatestEonOrHighestEonothem, index: false, docValues: false)
-                                .KeyWordLowerCase(kwlc => kwlc.LatestEpochOrHighestSeries, index: false, docValues: false)
-                                .KeyWordLowerCase(kwlc => kwlc.LatestEraOrHighestErathem, index: false, docValues: false)
-                                .KeyWordLowerCase(kwlc => kwlc.LatestGeochronologicalEra, index: false, docValues: false)
-                                .KeyWordLowerCase(kwlc => kwlc.LatestPeriodOrHighestSystem, index: false, docValues: false)
-                                .KeyWordLowerCase(kwlc => kwlc.LithostratigraphicTerms, index: false, docValues: false)
-                                .KeyWordLowerCase(kwlc => kwlc.LowestBiostratigraphicZone, index: false, docValues: false)
-                                .KeyWordLowerCase(kwlc => kwlc.Member, index: false, docValues: false)
+                                .KeywordLowerCase(kwlc => kwlc.Bed, IndexSetting.None)
+                                .KeywordLowerCase(kwlc => kwlc.EarliestAgeOrLowestStage, IndexSetting.None)
+                                .KeywordLowerCase(kwlc => kwlc.EarliestEonOrLowestEonothem, IndexSetting.None)
+                                .KeywordLowerCase(kwlc => kwlc.EarliestEpochOrLowestSeries, IndexSetting.None)
+                                .KeywordLowerCase(kwlc => kwlc.EarliestEraOrLowestErathem, IndexSetting.None)
+                                .KeywordLowerCase(kwlc => kwlc.EarliestGeochronologicalEra, IndexSetting.None)
+                                .KeywordLowerCase(kwlc => kwlc.EarliestPeriodOrLowestSystem, IndexSetting.None)
+                                .KeywordLowerCase(kwlc => kwlc.Formation, IndexSetting.None)
+                                .KeywordLowerCase(kwlc => kwlc.GeologicalContextId, IndexSetting.None)
+                                .KeywordLowerCase(kwlc => kwlc.Group, IndexSetting.None)
+                                .KeywordLowerCase(kwlc => kwlc.HighestBiostratigraphicZone, IndexSetting.None)
+                                .KeywordLowerCase(kwlc => kwlc.LatestAgeOrHighestStage, IndexSetting.None)
+                                .KeywordLowerCase(kwlc => kwlc.LatestEonOrHighestEonothem, IndexSetting.None)
+                                .KeywordLowerCase(kwlc => kwlc.LatestEpochOrHighestSeries, IndexSetting.None)
+                                .KeywordLowerCase(kwlc => kwlc.LatestEraOrHighestErathem, IndexSetting.None)
+                                .KeywordLowerCase(kwlc => kwlc.LatestGeochronologicalEra, IndexSetting.None)
+                                .KeywordLowerCase(kwlc => kwlc.LatestPeriodOrHighestSystem, IndexSetting.None)
+                                .KeywordLowerCase(kwlc => kwlc.LithostratigraphicTerms, IndexSetting.None)
+                                .KeywordLowerCase(kwlc => kwlc.LowestBiostratigraphicZone, IndexSetting.None)
+                                .KeywordLowerCase(kwlc => kwlc.Member, IndexSetting.None)
                             )
                         )
                         .Object<Identification>(c => c
                             .AutoMap()
                             .Name(nm => nm.Identification)
                             .Properties(ps => ps
-                                .KeyWordLowerCase(kwlc => kwlc.IdentificationRemarks, index: false, docValues: false)
-                                .KeyWordLowerCase(kwlc => kwlc.ConfirmedBy, index: false, docValues: false)
-                                .KeyWordLowerCase(kwlc => kwlc.ConfirmedDate, index: false, docValues: false)
-                                .KeyWordLowerCase(kwlc => kwlc.DateIdentified, index: false, docValues: false)
-                                .KeyWordLowerCase(kwlc => kwlc.IdentificationId, index: false, docValues: false)
-                                .KeyWordLowerCase(kwlc => kwlc.IdentificationQualifier, index: false, docValues: false)
-                                .KeyWordLowerCase(kwlc => kwlc.IdentificationReferences, index: false, docValues: false)
-                                .KeyWordLowerCase(kwlc => kwlc.IdentifiedBy, index: false, docValues: false)
-                                .KeyWordLowerCase(kwlc => kwlc.TypeStatus, index: false, docValues: false)
-                                .KeyWordLowerCase(kwlc => kwlc.VerifiedBy)
+                                .KeywordLowerCase(kwlc => kwlc.IdentificationRemarks, IndexSetting.None)
+                                .KeywordLowerCase(kwlc => kwlc.ConfirmedBy, IndexSetting.None)
+                                .KeywordLowerCase(kwlc => kwlc.ConfirmedDate, IndexSetting.None)
+                                .KeywordLowerCase(kwlc => kwlc.DateIdentified, IndexSetting.None)
+                                .KeywordLowerCase(kwlc => kwlc.IdentificationId, IndexSetting.None)
+                                .KeywordLowerCase(kwlc => kwlc.IdentificationQualifier, IndexSetting.None)
+                                .KeywordLowerCase(kwlc => kwlc.IdentificationReferences, IndexSetting.None)
+                                .KeywordLowerCase(kwlc => kwlc.IdentifiedBy, IndexSetting.None)
+                                .KeywordLowerCase(kwlc => kwlc.TypeStatus, IndexSetting.None)
+                                .KeywordLowerCase(kwlc => kwlc.VerifiedBy, IndexSetting.None)
+                                .BooleanVal(b => b.UncertainIdentification, IndexSetting.SearchOnly)
+                                .BooleanVal(b => b.Validated, IndexSetting.None)
+                                .BooleanVal(b => b.Verified, IndexSetting.SearchOnly)
                                 .Object<VocabularyValue>(c => c
                                     .Name(nm => nm.DeterminationMethod)
                                     .Properties(ps => ps.GetMapping())
@@ -237,10 +283,7 @@ namespace SOS.Lib.Repositories.Processed
                         .Object<MaterialSample>(c => c
                             .Name(nm => nm.MaterialSample)
                             .Properties(ps => ps
-                                .Keyword(kw => kw
-                                    .Name(nm => nm.MaterialSampleId)
-                                    .Index(false)
-                                )
+                                .KeywordLowerCase(kwlc => kwlc.MaterialSampleId, IndexSetting.None)
                             )
                         )
                         .Object<Occurrence>(t => t
@@ -250,43 +293,60 @@ namespace SOS.Lib.Repositories.Processed
                                 .Date(d => d
                                     .Name(nm => nm.ReportedDate)
                                 )
-                                .KeyWordLowerCase(kwlc => kwlc.AssociatedMedia, index: true, docValues: false)
-                                .KeyWordLowerCase(kwlc => kwlc.AssociatedOccurrences, index: false, docValues: false)
-                                .KeyWordLowerCase(kwlc => kwlc.AssociatedReferences, index: false, docValues: false)
-                                .KeyWordLowerCase(kwlc => kwlc.AssociatedSequences, index: false, docValues: false)
-                                .KeyWordLowerCase(kwlc => kwlc.AssociatedTaxa, index: false, docValues: false)
-                                .KeyWordLowerCase(kwlc => kwlc.BiotopeDescription, index: false, docValues: false)
-                                //  .KeyWordLowerCase(kwlc => kwlc.IndividualId, false)
-                                .KeyWordLowerCase(kwlc => kwlc.RecordedBy)
-                                .KeyWordLowerCase(kwlc => kwlc.CatalogNumber)
-                                .KeyWordLowerCase(kwlc => kwlc.Disposition, index: false, docValues: false)
-                                .KeyWordLowerCase(kwlc => kwlc.IndividualCount, index: false, docValues: false)
-                                .KeyWordLowerCase(kwlc => kwlc.OccurrenceId)                                
-                                .KeyWordLowerCase(kwlc => kwlc.OrganismQuantity)
-                                .KeyWordLowerCase(kwlc => kwlc.OtherCatalogNumbers, index: false, docValues: false)
-                                .KeyWordLowerCase(kwlc => kwlc.Preparations, index: false, docValues: false)
-                                .KeyWordLowerCase(kwlc => kwlc.RecordNumber, index: true, docValues: false)
-                                .KeyWordLowerCase(kwlc => kwlc.ReportedBy)
-                                .KeyWordLowerCase(kwlc => kwlc.Url, index: false, docValues: false)
-                                .Nested<Multimedia>(n => n
+                                .KeywordLowerCase(kwlc => kwlc.AssociatedMedia, IndexSetting.SearchOnly)
+                                .KeywordLowerCase(kwlc => kwlc.AssociatedOccurrences, IndexSetting.None)
+                                .KeywordLowerCase(kwlc => kwlc.AssociatedReferences, IndexSetting.None)
+                                .KeywordLowerCase(kwlc => kwlc.AssociatedSequences, IndexSetting.None)
+                                .KeywordLowerCase(kwlc => kwlc.AssociatedTaxa, IndexSetting.None)
+                                .KeywordLowerCase(kwlc => kwlc.BiotopeDescription, IndexSetting.None)                                
+                                .KeywordLowerCase(kwlc => kwlc.RecordedBy, IndexSetting.SearchSortAggregate)
+                                .KeywordLowerCase(kwlc => kwlc.CatalogNumber, IndexSetting.SearchSortAggregate)
+                                .KeywordLowerCase(kwlc => kwlc.Disposition, IndexSetting.None)
+                                .KeywordLowerCase(kwlc => kwlc.IndividualCount, IndexSetting.None)
+                                .KeywordLowerCase(kwlc => kwlc.OccurrenceId, IndexSetting.SearchSortAggregate)
+                                .KeywordLowerCase(kwlc => kwlc.OrganismQuantity, IndexSetting.None)
+                                .KeywordLowerCase(kwlc => kwlc.OtherCatalogNumbers, IndexSetting.None)
+                                .KeywordLowerCase(kwlc => kwlc.Preparations, IndexSetting.None)
+                                .KeywordLowerCase(kwlc => kwlc.RecordNumber, IndexSetting.SearchOnly)
+                                .KeywordLowerCase(kwlc => kwlc.ReportedBy, IndexSetting.SearchSortAggregate)
+                                .KeywordLowerCase(kwlc => kwlc.Url, IndexSetting.None)
+                                .NumberVal(n => n.SensitivityCategory, IndexSetting.SearchOnly, NumberType.Integer)
+                                .NumberVal(n => n.BirdNestActivityId, IndexSetting.SearchOnly, NumberType.Integer)
+                                .NumberVal(n => n.Length, IndexSetting.SearchOnly, NumberType.Integer)
+                                .NumberVal(n => n.Weight, IndexSetting.SearchOnly, NumberType.Integer)
+                                .NumberVal(n => n.CatalogId, IndexSetting.SearchOnly, NumberType.Integer)
+                                .BooleanVal(b => b.IsNaturalOccurrence, IndexSetting.SearchOnly)
+                                .BooleanVal(b => b.IsNeverFoundObservation, IndexSetting.SearchOnly)
+                                .BooleanVal(b => b.IsNotRediscoveredObservation, IndexSetting.SearchOnly)
+                                .BooleanVal(b => b.IsPositiveObservation, IndexSetting.SearchOnly)
+                                .Object<Multimedia>(n => n
                                     .AutoMap()
                                     .Name(nm => nm.Media)
                                     .Properties(ps => ps
-                                        .KeyWordLowerCase(kwlc => kwlc.Description, index: false, docValues: false)
-                                        .KeyWordLowerCase(kwlc => kwlc.Audience, index: false, docValues: false)
-                                        .KeyWordLowerCase(kwlc => kwlc.Contributor, index: false, docValues: false)
-                                        .KeyWordLowerCase(kwlc => kwlc.Created, index: false, docValues: false)
-                                        .KeyWordLowerCase(kwlc => kwlc.Creator, index: false, docValues: false)
-                                        .KeyWordLowerCase(kwlc => kwlc.DatasetID, index: false, docValues: false)
-                                        .KeyWordLowerCase(kwlc => kwlc.Format, index: false, docValues: false)
-                                        .KeyWordLowerCase(kwlc => kwlc.Identifier, index: false, docValues: false)
-                                        .KeyWordLowerCase(kwlc => kwlc.License, index: false, docValues: false)
-                                        .KeyWordLowerCase(kwlc => kwlc.Publisher, index: false, docValues: false)
-                                        .KeyWordLowerCase(kwlc => kwlc.References, index: false, docValues: false)
-                                        .KeyWordLowerCase(kwlc => kwlc.RightsHolder, index: false, docValues: false)
-                                        .KeyWordLowerCase(kwlc => kwlc.Source, index: false, docValues: false)
-                                        .KeyWordLowerCase(kwlc => kwlc.Title, index: false, docValues: false)
-                                        .KeyWordLowerCase(kwlc => kwlc.Type, index: false, docValues: false)
+                                        .KeywordLowerCase(kwlc => kwlc.Description, IndexSetting.None)
+                                        .KeywordLowerCase(kwlc => kwlc.Audience, IndexSetting.None)
+                                        .KeywordLowerCase(kwlc => kwlc.Contributor, IndexSetting.None)
+                                        .KeywordLowerCase(kwlc => kwlc.Created, IndexSetting.None)
+                                        .KeywordLowerCase(kwlc => kwlc.Creator, IndexSetting.None)
+                                        .KeywordLowerCase(kwlc => kwlc.DatasetID, IndexSetting.None)
+                                        .KeywordLowerCase(kwlc => kwlc.Format, IndexSetting.None)
+                                        .KeywordLowerCase(kwlc => kwlc.Identifier, IndexSetting.None)
+                                        .KeywordLowerCase(kwlc => kwlc.License, IndexSetting.None)
+                                        .KeywordLowerCase(kwlc => kwlc.Publisher, IndexSetting.None)
+                                        .KeywordLowerCase(kwlc => kwlc.References, IndexSetting.None)
+                                        .KeywordLowerCase(kwlc => kwlc.RightsHolder, IndexSetting.None)
+                                        .KeywordLowerCase(kwlc => kwlc.Source, IndexSetting.None)
+                                        .KeywordLowerCase(kwlc => kwlc.Title, IndexSetting.None)
+                                        .KeywordLowerCase(kwlc => kwlc.Type, IndexSetting.None)
+                                        .Object<MultimediaComment>(mc => mc
+                                            .AutoMap()
+                                            .Name(nm => nm.Comments)
+                                            .Properties(ps => ps
+                                                .KeywordLowerCase(kwlc => kwlc.Comment, IndexSetting.None)
+                                                .KeywordLowerCase(kwlc => kwlc.CommentBy, IndexSetting.None)
+                                                .KeywordLowerCase(kwlc => kwlc.Created, IndexSetting.None)
+                                            )
+                                        )
                                     )
                                 )
                                 .Object<VocabularyValue>(c => c
@@ -333,11 +393,14 @@ namespace SOS.Lib.Repositories.Processed
                                     .AutoMap()
                                     .Name(nm => nm.Substrate)
                                     .Properties(ps => ps
-                                        .KeyWordLowerCase(kwlc => kwlc.SpeciesScientificName, index: false, docValues: false)
-                                        .KeyWordLowerCase(kwlc => kwlc.Description, index: false, docValues: false)
-                                        .KeyWordLowerCase(kwlc => kwlc.SpeciesDescription, index: false, docValues: false)
-                                        .KeyWordLowerCase(kwlc => kwlc.SubstrateDescription, index: false, docValues: false)
-                                        .KeyWordLowerCase(kwlc => kwlc.SpeciesVernacularName, index: false, docValues: false)
+                                        .KeywordLowerCase(kwlc => kwlc.SpeciesScientificName, IndexSetting.None)
+                                        .KeywordLowerCase(kwlc => kwlc.Description, IndexSetting.None)
+                                        .KeywordLowerCase(kwlc => kwlc.SpeciesDescription, IndexSetting.None)
+                                        .KeywordLowerCase(kwlc => kwlc.SubstrateDescription, IndexSetting.None)
+                                        .KeywordLowerCase(kwlc => kwlc.SpeciesVernacularName, IndexSetting.None)
+                                        .NumberVal(n => n.Quantity, IndexSetting.None, NumberType.Integer)
+                                        .NumberVal(n => n.SpeciesId, IndexSetting.SearchOnly, NumberType.Integer)
+                                        .NumberVal(n => n.Id, IndexSetting.SearchOnly, NumberType.Integer)
                                         .Object<VocabularyValue>(c => c
                                             .Name(nm => nm.Name)
                                             .Properties(ps => ps.GetMapping())
@@ -354,12 +417,12 @@ namespace SOS.Lib.Repositories.Processed
                             .AutoMap()
                             .Name(nm => nm.Organism)
                             .Properties(ps => ps
-                                .KeyWordLowerCase(kwlc => kwlc.AssociatedOrganisms, index: false, docValues: false)
-                                .KeyWordLowerCase(kwlc => kwlc.OrganismId, index: false, docValues: false)
-                                .KeyWordLowerCase(kwlc => kwlc.OrganismName, index: false, docValues: false)
-                                .KeyWordLowerCase(kwlc => kwlc.OrganismRemarks, index: false, docValues: false)
-                                .KeyWordLowerCase(kwlc => kwlc.OrganismScope, index: false, docValues: false)
-                                .KeyWordLowerCase(kwlc => kwlc.PreviousIdentifications, index: false, docValues: false)
+                                .KeywordLowerCase(kwlc => kwlc.AssociatedOrganisms, IndexSetting.None)
+                                .KeywordLowerCase(kwlc => kwlc.OrganismId, IndexSetting.None)
+                                .KeywordLowerCase(kwlc => kwlc.OrganismName, IndexSetting.None)
+                                .KeywordLowerCase(kwlc => kwlc.OrganismRemarks, IndexSetting.None)
+                                .KeywordLowerCase(kwlc => kwlc.OrganismScope, IndexSetting.None)
+                                .KeywordLowerCase(kwlc => kwlc.PreviousIdentifications, IndexSetting.None)
                             )
                         )
                         .Object<Taxon>(t => t
@@ -1062,7 +1125,7 @@ namespace SOS.Lib.Repositories.Processed
 
         /// <inheritdoc />
         public async Task<PagedResult<dynamic>> GetChunkAsync(SearchFilter filter, int skip, int take, bool getAllFields = false)
-        {
+        {            
             var indexNames = GetCurrentIndex(filter);
             var (query, excludeQuery) = GetCoreQueries(filter);
 
@@ -1147,7 +1210,7 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<int>> GetProjectIdsAsync(SearchFilter filter)
+        public async Task<IEnumerable<int>> GetProjectIdsNestedAsync(SearchFilter filter)
         {
             var indexNames = GetCurrentIndex(filter);
             var (query, excludeQuery) = GetCoreQueries(filter);
@@ -1185,6 +1248,39 @@ namespace SOS.Lib.Repositories.Processed
 
             return result;
         }
+
+        public async Task<IEnumerable<int>> GetProjectIdsAsync(SearchFilter filter)
+        {
+            var indexNames = GetCurrentIndex(filter);
+            var (query, excludeQuery) = GetCoreQueries(filter);
+
+            var searchResponse = await Client.SearchAsync<dynamic>(s => s
+                .Index(indexNames)
+                .Query(q => q
+                    .Bool(b => b
+                        .MustNot(excludeQuery)
+                        .Filter(query)
+                    )
+                )
+                .Aggregations(a => a
+                    .Terms("projectId", t => t
+                        .Field("projects.id")
+                    )
+                )
+                .Size(0)
+                .Source(s => s.ExcludeAll())
+                .TrackTotalHits(false)
+            );
+
+            searchResponse.ThrowIfInvalid();
+            var result = searchResponse.Aggregations
+                .Terms("projectId")
+                    .Buckets
+                        .Select(b => int.Parse(b.Key));
+
+            return result;
+        }
+
 
         /// <inheritdoc />
         public async Task<DataQualityReport> GetDataQualityReportAsync(string organismGroup)

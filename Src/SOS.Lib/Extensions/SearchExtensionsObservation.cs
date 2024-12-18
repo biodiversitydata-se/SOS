@@ -29,11 +29,11 @@ namespace SOS.Lib
             }
 
             if (filter.ObservedByMe ?? false)
-            {
-                query.TryAddNestedTermAndCriteria("artportalenInternal.occurrenceRecordedByInternal", new Dictionary<string, object> {
-                    { "userServiceUserId", filter.UserId },
-                    { "viewAccess", true }
-                });
+            {                
+                var objectQueries = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
+                objectQueries.TryAddTermCriteria($"artportalenInternal.occurrenceRecordedByInternal.userServiceUserId", filter.UserId);
+                objectQueries.TryAddTermCriteria($"artportalenInternal.occurrenceRecordedByInternal.viewAccess", true);
+                query.TryAddAndCriteria(objectQueries);
             }
 
             if (filter.ProtectionFilter.Equals(ProtectionFilter.Public))
@@ -93,10 +93,10 @@ namespace SOS.Lib
                 );
 
                 var reportedByMeQuery = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
-                reportedByMeQuery.TryAddNestedTermAndCriteria("artportalenInternal.occurrenceRecordedByInternal", new Dictionary<string, object> {
-                    { "userServiceUserId", filter.UserId },
-                    { "viewAccess", true }
-                });
+                var occurrenceRecordedByInternalQueries = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
+                occurrenceRecordedByInternalQueries.TryAddTermCriteria($"artportalenInternal.occurrenceRecordedByInternal.userServiceUserId", filter.UserId);
+                occurrenceRecordedByInternalQueries.TryAddTermCriteria($"artportalenInternal.occurrenceRecordedByInternal.viewAccess", true);
+                reportedByMeQuery.TryAddAndCriteria(occurrenceRecordedByInternalQueries);
 
                 authorizeQuerys.Add(q => q
                     .Bool(b => b
@@ -141,8 +141,8 @@ namespace SOS.Lib
             }
 
             query.TryAddTermCriteria("artportalenInternal.noteOfInterest", internalFilter.OnlyWithNotesOfInterest, true);
-            query.TryAddNestedTermCriteria("artportalenInternal.occurrenceRecordedByInternal", "id", internalFilter.ObservedByUserId);
-            query.TryAddNestedTermCriteria("artportalenInternal.occurrenceRecordedByInternal", "userServiceUserId", internalFilter.ObservedByUserServiceUserId);
+            query.TryAddTermCriteria("artportalenInternal.occurrenceRecordedByInternal.id", internalFilter.ObservedByUserId);
+            query.TryAddTermCriteria("artportalenInternal.occurrenceRecordedByInternal.userServiceUserId", internalFilter.ObservedByUserServiceUserId);
 
             //search by locationId, but include child-locations observations aswell
             var siteTerms = internalFilter?.SiteIds?.Select(s => $"urn:lsid:artportalen.se:site:{s}");
@@ -685,16 +685,16 @@ namespace SOS.Lib
         public static ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> ToMultimediaQuery(
             this SearchFilterBase filter)
         {
-            var query = filter.ToQuery();
-            query.AddNestedMustExistsCriteria("occurrence.media");
+            var query = filter.ToQuery();            
+            query.AddMustExistsCriteria("occurrence.media");
             return query;
         }
 
         public static ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> ToMeasurementOrFactsQuery(
             this SearchFilterBase filter)
         {
-            var query = filter.ToQuery();
-            query.AddNestedMustExistsCriteria("measurementOrFacts");
+            var query = filter.ToQuery();            
+            query.AddMustExistsCriteria("measurementOrFacts");
             return query;
         }
 
@@ -794,9 +794,7 @@ namespace SOS.Lib
                 filter.IncludeSensitiveGeneralizedObservations = false;
             }
 
-            query.TryAddGeneralizationsCriteria(filter.IncludeSensitiveGeneralizedObservations, filter.IsPublicGeneralizedObservation);
-            //query.TryAddTermCriteria("hasGeneralizedObservationInOtherIndex", filter.IncludeSensitiveGeneralizedObservations);            
-            //query.TryAddTermCriteria("isGeneralized", filter.IsPublicGeneralizedObservation);
+            query.TryAddGeneralizationsCriteria(filter.IncludeSensitiveGeneralizedObservations, filter.IsPublicGeneralizedObservation);            
             query.TryAddTermsCriteria("dataProviderId", filter.DataProviderIds);
             query.TryAddTermsCriteria("dataStewardship.datasetIdentifier", filter.DataStewardshipDatasetIds);
             if (filter.IsPartOfDataStewardshipDataset.GetValueOrDefault(false))
@@ -804,8 +802,8 @@ namespace SOS.Lib
                 query.AddExistsCriteria("dataStewardship");
             }
 
-            query.TryAddTermCriteria("occurrence.isPositiveObservation", filter.PositiveSightings);
-            query.TryAddNestedTermsCriteria("projects", "id", filter.ProjectIds);
+            query.TryAddTermCriteria("occurrence.isPositiveObservation", filter.PositiveSightings);            
+            query.TryAddTermsCriteria("projects.id", filter.ProjectIds);
             query.TryAddNumericRangeCriteria("occurrence.birdNestActivityId", filter.BirdNestActivityLimit, SearchExtensionsGeneric.RangeTypes.LessThanOrEquals);
 
             // Cos4Cloud specific

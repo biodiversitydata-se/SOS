@@ -2,6 +2,7 @@
 using Nest;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Shared;
+using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Managers.Interfaces;
@@ -41,55 +42,55 @@ namespace SOS.Lib.Repositories.Processed
                 .Map<Dataset>(m => m
                     .AutoMap<Dataset>()
                     .Properties(ps => ps
-                        .KeyWordLowerCase(kwlc => kwlc.Id, index: false, docValues: false)
-                        .KeyWordLowerCase(kwlc => kwlc.Identifier)
-                        .KeyWordLowerCase(kwlc => kwlc.DataStewardship)
-                        .KeyWordLowerCase(kwlc => kwlc.Title, index: false, docValues: false)
-                        .KeyWordLowerCase(kwlc => kwlc.ProgrammeArea, index: false, docValues: false)
-                        .KeyWordLowerCase(kwlc => kwlc.DescriptionAccessRights, index: false, docValues: false)
-                        .KeyWordLowerCase(kwlc => kwlc.License, index: false, docValues: false)
-                        .KeyWordLowerCase(kwlc => kwlc.Description, index: false, docValues: false)
-                        .KeyWordLowerCase(kwlc => kwlc.Spatial, index: false, docValues: false)
-                        .KeyWordLowerCase(kwlc => kwlc.Language, index: false, docValues: false)
-                        .KeyWordLowerCase(kwlc => kwlc.Metadatalanguage, index: false, docValues: false)
+                        .KeywordLowerCase(kwlc => kwlc.Id, IndexSetting.None)
+                        .KeywordLowerCase(kwlc => kwlc.Identifier)
+                        .KeywordLowerCase(kwlc => kwlc.DataStewardship)
+                        .KeywordLowerCase(kwlc => kwlc.Title, IndexSetting.None)
+                        .KeywordLowerCase(kwlc => kwlc.ProgrammeArea, IndexSetting.None)
+                        .KeywordLowerCase(kwlc => kwlc.DescriptionAccessRights, IndexSetting.None)
+                        .KeywordLowerCase(kwlc => kwlc.License, IndexSetting.None)
+                        .KeywordLowerCase(kwlc => kwlc.Description, IndexSetting.None)
+                        .KeywordLowerCase(kwlc => kwlc.Spatial, IndexSetting.None)
+                        .KeywordLowerCase(kwlc => kwlc.Language, IndexSetting.None)
+                        .KeywordLowerCase(kwlc => kwlc.Metadatalanguage, IndexSetting.None)
                         .Object<Project>(t => t
                             .AutoMap()
                             .Name(nm => nm.Project)
                             .Properties(ps => ps
-                                .KeyWordLowerCase(kwlc => kwlc.ProjectId)
-                                .KeyWordLowerCase(kwlc => kwlc.ProjectCode)
+                                .KeywordLowerCase(kwlc => kwlc.ProjectId)
+                                .KeywordLowerCase(kwlc => kwlc.ProjectCode)
                             )
                         )
                         .Object<Organisation>(t => t
                             .AutoMap()
                             .Name(nm => nm.Assigner)
                             .Properties(ps => ps
-                                .KeyWordLowerCase(kwlc => kwlc.OrganisationCode, index: false, docValues: false)
-                                .KeyWordLowerCase(kwlc => kwlc.OrganisationID, index: false, docValues: false)
+                                .KeywordLowerCase(kwlc => kwlc.OrganisationCode, IndexSetting.None)
+                                .KeywordLowerCase(kwlc => kwlc.OrganisationID, IndexSetting.None)
                             )
                         )
                         .Object<Organisation>(t => t
                             .AutoMap()
                             .Name(nm => nm.Creator)
                             .Properties(ps => ps
-                                .KeyWordLowerCase(kwlc => kwlc.OrganisationCode, index: false, docValues: false)
-                                .KeyWordLowerCase(kwlc => kwlc.OrganisationID, index: false, docValues: false)
+                                .KeywordLowerCase(kwlc => kwlc.OrganisationCode, IndexSetting.None)
+                                .KeywordLowerCase(kwlc => kwlc.OrganisationID, IndexSetting.None)
                             )
                         )
                         .Object<Organisation>(t => t
                             .AutoMap()
                             .Name(nm => nm.OwnerinstitutionCode)
                             .Properties(ps => ps
-                                .KeyWordLowerCase(kwlc => kwlc.OrganisationCode, index: false, docValues: false)
-                                .KeyWordLowerCase(kwlc => kwlc.OrganisationID, index: false, docValues: false)
+                                .KeywordLowerCase(kwlc => kwlc.OrganisationCode, IndexSetting.None)
+                                .KeywordLowerCase(kwlc => kwlc.OrganisationID, IndexSetting.None)
                             )
                         )
                         .Object<Organisation>(t => t
                             .AutoMap()
                             .Name(nm => nm.Publisher)
                             .Properties(ps => ps
-                                .KeyWordLowerCase(kwlc => kwlc.OrganisationCode, index: false, docValues: false)
-                                .KeyWordLowerCase(kwlc => kwlc.OrganisationID, index: false, docValues: false)
+                                .KeywordLowerCase(kwlc => kwlc.OrganisationCode, IndexSetting.None)
+                                .KeywordLowerCase(kwlc => kwlc.OrganisationID, IndexSetting.None)
                             )
                         )
                     )
