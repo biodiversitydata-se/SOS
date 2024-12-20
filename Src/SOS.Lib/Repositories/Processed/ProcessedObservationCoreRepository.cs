@@ -62,7 +62,7 @@ namespace SOS.Lib.Repositories.Processed
                         .KeywordLowerCase(kwlc => kwlc.CollectionCode, IndexSetting.None)
                         .KeywordLowerCase(kwlc => kwlc.DataGeneralizations, IndexSetting.None)
                         .KeywordLowerCase(kwlc => kwlc.DatasetId, IndexSetting.None)
-                        .KeywordLowerCase(kwlc => kwlc.DatasetName, IndexSetting.SearchOnly) // WFS
+                        .KeywordLowerCase(kwlc => kwlc.DatasetName, IndexSetting.SearchSortAggregate) // WFS
                         .KeywordLowerCase(kwlc => kwlc.InstitutionId, IndexSetting.SearchOnly)
                         .KeywordLowerCase(kwlc => kwlc.Language, IndexSetting.None)
                         .KeywordLowerCase(kwlc => kwlc.License, IndexSetting.None)
@@ -101,7 +101,7 @@ namespace SOS.Lib.Repositories.Processed
                             .Properties(ps => ps
                                 .NumberVal(n => n.Project1Id, IndexSetting.SearchOnly, NumberType.Integer) // WFS
                                 .NumberVal(n => n.Project2Id, IndexSetting.SearchOnly, NumberType.Integer) // WFS
-                                .KeywordLowerCase(kwlc => kwlc.Project1Name, IndexSetting.SearchOnly) // WFS
+                                .KeywordLowerCase(kwlc => kwlc.Project1Name, IndexSetting.SearchSortAggregate) // WFS
                                 .KeywordLowerCase(kwlc => kwlc.Project1Category, IndexSetting.SearchOnly) // WFS
                                 .KeywordLowerCase(kwlc => kwlc.Project1Url, IndexSetting.SearchOnly) // WFS
                                 .KeywordLowerCase(kwlc => kwlc.Project1Values, IndexSetting.SearchOnly) // WFS
@@ -256,7 +256,7 @@ namespace SOS.Lib.Repositories.Processed
                                 .KeywordLowerCase(kwlc => kwlc.VerifiedBy, IndexSetting.None)
                                 .BooleanVal(b => b.UncertainIdentification, IndexSetting.SearchOnly)
                                 .BooleanVal(b => b.Validated, IndexSetting.None)
-                                .BooleanVal(b => b.Verified, IndexSetting.SearchOnly)
+                                .BooleanVal(b => b.Verified, IndexSetting.SearchSortAggregate)
                                 .Object<VocabularyValue>(c => c
                                     .Name(nm => nm.DeterminationMethod)
                                     .Properties(ps => ps.GetMapping())
@@ -267,7 +267,7 @@ namespace SOS.Lib.Repositories.Processed
                                 )
                                 .Object<VocabularyValue>(c => c
                                     .Name(nm => nm.VerificationStatus)
-                                    .Properties(ps => ps.GetMapping())
+                                    .Properties(ps => ps.GetMapping(valueIndexSetting: IndexSetting.SearchSortAggregate))
                                 )
                             )
                         )
@@ -302,19 +302,20 @@ namespace SOS.Lib.Repositories.Processed
                                 .KeywordLowerCase(kwlc => kwlc.RecordedBy, IndexSetting.SearchSortAggregate)
                                 .KeywordLowerCase(kwlc => kwlc.CatalogNumber, IndexSetting.SearchSortAggregate)
                                 .KeywordLowerCase(kwlc => kwlc.Disposition, IndexSetting.None)
-                                .KeywordLowerCase(kwlc => kwlc.IndividualCount, IndexSetting.None)
+                                .KeywordLowerCase(kwlc => kwlc.IndividualCount, IndexSetting.SearchSortAggregate) // Can we set this to: IndexSetting.None? Printobs2 references this property but should rather use OrganismQuantityInt or OrganismQuantity.
                                 .KeywordLowerCase(kwlc => kwlc.OccurrenceId, IndexSetting.SearchSortAggregate)
-                                .KeywordLowerCase(kwlc => kwlc.OrganismQuantity, IndexSetting.None)
+                                .KeywordLowerCase(kwlc => kwlc.OrganismQuantity, IndexSetting.SearchSortAggregate)
                                 .KeywordLowerCase(kwlc => kwlc.OtherCatalogNumbers, IndexSetting.None)
                                 .KeywordLowerCase(kwlc => kwlc.Preparations, IndexSetting.None)
                                 .KeywordLowerCase(kwlc => kwlc.RecordNumber, IndexSetting.SearchOnly)
                                 .KeywordLowerCase(kwlc => kwlc.ReportedBy, IndexSetting.SearchSortAggregate)
                                 .KeywordLowerCase(kwlc => kwlc.Url, IndexSetting.None)
-                                .NumberVal(n => n.SensitivityCategory, IndexSetting.SearchOnly, NumberType.Integer)
+                                .NumberVal(n => n.SensitivityCategory, IndexSetting.SearchSortAggregate, NumberType.Integer)
                                 .NumberVal(n => n.BirdNestActivityId, IndexSetting.SearchOnly, NumberType.Integer)
                                 .NumberVal(n => n.Length, IndexSetting.SearchOnly, NumberType.Integer)
                                 .NumberVal(n => n.Weight, IndexSetting.SearchOnly, NumberType.Integer)
                                 .NumberVal(n => n.CatalogId, IndexSetting.SearchOnly, NumberType.Integer)
+                                .NumberVal(n => n.OrganismQuantityInt, IndexSetting.SearchSortAggregate, NumberType.Integer)
                                 .BooleanVal(b => b.IsNaturalOccurrence, IndexSetting.SearchOnly)
                                 .BooleanVal(b => b.IsNeverFoundObservation, IndexSetting.SearchOnly)
                                 .BooleanVal(b => b.IsNotRediscoveredObservation, IndexSetting.SearchOnly)
@@ -351,11 +352,11 @@ namespace SOS.Lib.Repositories.Processed
                                 )
                                 .Object<VocabularyValue>(c => c
                                     .Name(nm => nm.OccurrenceStatus)
-                                    .Properties(ps => ps.GetMapping())
+                                    .Properties(ps => ps.GetMapping(valueIndexSetting: IndexSetting.SearchSortAggregate))
                                 )
                                 .Object<VocabularyValue>(c => c
                                     .Name(nm => nm.Activity)
-                                    .Properties(ps => ps.GetMapping())
+                                    .Properties(ps => ps.GetMapping(valueIndexSetting: IndexSetting.SearchSortAggregate))
                                 )
                                 .Object<VocabularyValue>(c => c
                                     .Name(nm => nm.Behavior)
@@ -371,7 +372,7 @@ namespace SOS.Lib.Repositories.Processed
                                 )
                                 .Object<VocabularyValue>(c => c
                                     .Name(nm => nm.LifeStage)
-                                    .Properties(ps => ps.GetMapping())
+                                    .Properties(ps => ps.GetMapping(valueIndexSetting: IndexSetting.SearchSortAggregate))
                                 )
                                 .Object<VocabularyValue>(c => c
                                     .Name(nm => nm.OccurrenceStatus)
@@ -387,7 +388,7 @@ namespace SOS.Lib.Repositories.Processed
                                 )
                                 .Object<VocabularyValue>(c => c
                                     .Name(nm => nm.Sex)
-                                    .Properties(ps => ps.GetMapping())
+                                    .Properties(ps => ps.GetMapping(valueIndexSetting: IndexSetting.SearchSortAggregate))
                                 )
                                 .Object<Substrate>(c => c
                                     .AutoMap()

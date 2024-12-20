@@ -77,7 +77,7 @@ namespace SOS.Lib.Extensions
                     .AutoMap()
                     .Name(nm => nm.MeasurementOrFacts)
                     .Properties(ps => ps
-                        .KeywordLowerCase(kwlc => kwlc.OccurrenceID)
+                        .KeywordLowerCase(kwlc => kwlc.OccurrenceID, IndexSetting.SearchSortAggregate)
                         .KeywordLowerCase(kwlc => kwlc.MeasurementRemarks, IndexSetting.None)
                         .KeywordLowerCase(kwlc => kwlc.MeasurementAccuracy, IndexSetting.None)
                         .KeywordLowerCase(kwlc => kwlc.MeasurementDeterminedBy, IndexSetting.None)
@@ -165,7 +165,9 @@ namespace SOS.Lib.Extensions
                 .GeoShape(gs => gs
                     .Name(nn => nn.PointWithDisturbanceBuffer)
                 )
-                .NumberVal(n => n.CoordinateUncertaintyInMeters, IndexSetting.SearchOnly, NumberType.Integer)
+                .NumberVal(n => n.DecimalLongitude, IndexSetting.SearchSortAggregate, NumberType.Double)
+                .NumberVal(n => n.DecimalLatitude, IndexSetting.SearchSortAggregate, NumberType.Double)
+                .NumberVal(n => n.CoordinateUncertaintyInMeters, IndexSetting.SearchSortAggregate, NumberType.Integer)
                 .NumberVal(n => n.Type, IndexSetting.None, NumberType.Byte)
                 .NumberVal(n => n.CoordinatePrecision, IndexSetting.None, NumberType.Double)
                 .NumberVal(n => n.MaximumDepthInMeters, IndexSetting.None, NumberType.Double)
@@ -191,7 +193,7 @@ namespace SOS.Lib.Extensions
                 .Keyword(kw => kw
                     .Name(nm => nm.Locality)
                     .Normalizer("lowercase")
-                    .DocValues(false)
+                    .DocValues(true)
                     .Fields(f => f
                         .Keyword(kw => kw
                             .Name("raw")
@@ -266,28 +268,28 @@ namespace SOS.Lib.Extensions
                     .Name(nm => nm.County)
                     .Properties(ps => ps
                         .KeywordLowerCase(kwlc => kwlc.FeatureId, IndexSetting.SearchSortAggregate)
-                        .KeywordLowerCase(kwlc => kwlc.Name, IndexSetting.SearchOnly)
+                        .KeywordLowerCase(kwlc => kwlc.Name, IndexSetting.SearchSortAggregate)
                     )
                 )
                 .Object<Area>(c => c
                     .Name(nm => nm.Municipality)
                     .Properties(ps => ps
                         .KeywordLowerCase(kwlc => kwlc.FeatureId, IndexSetting.SearchSortAggregate)
-                        .KeywordLowerCase(kwlc => kwlc.Name, IndexSetting.SearchOnly)
+                        .KeywordLowerCase(kwlc => kwlc.Name, IndexSetting.SearchSortAggregate)
                     )
                 )
                 .Object<Area>(c => c
                     .Name(nm => nm.Parish)
                     .Properties(ps => ps
                         .KeywordLowerCase(kwlc => kwlc.FeatureId, IndexSetting.SearchSortAggregate)
-                        .KeywordLowerCase(kwlc => kwlc.Name, IndexSetting.SearchOnly)
+                        .KeywordLowerCase(kwlc => kwlc.Name, IndexSetting.SearchSortAggregate)
                     )
                 )
                 .Object<Area>(c => c
                     .Name(nm => nm.Province)
                     .Properties(ps => ps
                         .KeywordLowerCase(kwlc => kwlc.FeatureId, IndexSetting.SearchSortAggregate)
-                        .KeywordLowerCase(kwlc => kwlc.Name, IndexSetting.SearchOnly)
+                        .KeywordLowerCase(kwlc => kwlc.Name, IndexSetting.SearchSortAggregate)
                     )
                 );
         }
@@ -357,7 +359,7 @@ namespace SOS.Lib.Extensions
                 .KeywordLowerCase(kwlc => kwlc.ParentNameUsage, IndexSetting.None)
                 .KeywordLowerCase(kwlc => kwlc.ParentNameUsageId, IndexSetting.None)
                 .KeywordLowerCase(kwlc => kwlc.Phylum, IndexSetting.None)
-                .KeywordLowerCase(kwlc => kwlc.ScientificName, IndexSetting.SearchOnly)
+                .KeywordLowerCase(kwlc => kwlc.ScientificName, IndexSetting.SearchSortAggregate)
                 .KeywordLowerCase(kwlc => kwlc.ScientificNameAuthorship, IndexSetting.None)
                 .KeywordLowerCase(kwlc => kwlc.ScientificNameId, IndexSetting.None)
                 .KeywordLowerCase(kwlc => kwlc.SpecificEpithet, IndexSetting.None)
@@ -367,7 +369,7 @@ namespace SOS.Lib.Extensions
                 .KeywordLowerCase(kwlc => kwlc.TaxonRank, IndexSetting.SearchOnly)
                 .KeywordLowerCase(kwlc => kwlc.VerbatimId, IndexSetting.None)
                 .KeywordLowerCase(kwlc => kwlc.VerbatimName, IndexSetting.None)
-                .KeywordLowerCase(kwlc => kwlc.VernacularName, IndexSetting.SearchOnly)                
+                .KeywordLowerCase(kwlc => kwlc.VernacularName, IndexSetting.SearchSortAggregate)                
                 .NumberVal(n => n.Id, IndexSetting.SearchSortAggregate, NumberType.Integer)
                 .NumberVal(n => n.SecondaryParentDyntaxaTaxonIds, IndexSetting.None, NumberType.Integer)
                 .BooleanVal(b => b.BirdDirective, IndexSetting.SearchOnly)
@@ -378,8 +380,8 @@ namespace SOS.Lib.Extensions
                         .KeywordLowerCase(kwlc => kwlc.ActionPlan, IndexSetting.SearchOnly) // WFS
                         .KeywordLowerCase(kwlc => kwlc.OrganismGroup, IndexSetting.SearchSortAggregate) // WFS
                         .KeywordLowerCase(kwlc => kwlc.InvasiveRiskAssessmentCategory, IndexSetting.SearchOnly) // WFS
-                        .KeywordLowerCase(kwlc => kwlc.RedlistCategory, IndexSetting.SearchOnly) // WFS
-                        .KeywordLowerCase(kwlc => kwlc.RedlistCategoryDerived, IndexSetting.SearchOnly)
+                        .KeywordLowerCase(kwlc => kwlc.RedlistCategory, IndexSetting.SearchSortAggregate) // WFS
+                        .KeywordLowerCase(kwlc => kwlc.RedlistCategoryDerived, IndexSetting.SearchSortAggregate)
                         .KeywordLowerCase(kwlc => kwlc.SwedishOccurrence, IndexSetting.None)
                         .KeywordLowerCase(kwlc => kwlc.SwedishHistory, IndexSetting.None)
                         .NumberVal(n => n.DyntaxaTaxonId, IndexSetting.None, NumberType.Integer)
@@ -457,12 +459,18 @@ namespace SOS.Lib.Extensions
         /// Get Vocabular mapping
         /// </summary>
         /// <param name="propertiesDescriptor"></param>
+        /// <param name="idIndexSetting"></param>
+        /// <param name="valueIndexSetting"></param>
+        /// <param name="idNumberType"></param>
         /// <returns></returns>
-        public static PropertiesDescriptor<VocabularyValue> GetMapping(this PropertiesDescriptor<VocabularyValue> propertiesDescriptor)
+        public static PropertiesDescriptor<VocabularyValue> GetMapping(this PropertiesDescriptor<VocabularyValue> propertiesDescriptor,
+            IndexSetting idIndexSetting = IndexSetting.SearchSortAggregate,
+            IndexSetting valueIndexSetting = IndexSetting.SearchSortAggregate,
+            NumberType idNumberType = NumberType.Short)
         {
             return propertiesDescriptor
-                .KeywordLowerCase(kwlc => kwlc.Value, IndexSetting.SearchOnly)
-                .NumberVal(n => n.Id, IndexSetting.SearchSortAggregate, NumberType.Short);                
+                .NumberVal(n => n.Id, idIndexSetting, idNumberType)
+                .KeywordLowerCase(kwlc => kwlc.Value, valueIndexSetting);
         }
 
 
