@@ -388,7 +388,7 @@ namespace SOS.Lib.Extensions
                         .NumberVal(n => n.GbifTaxonId, IndexSetting.None, NumberType.Integer)
                         .NumberVal(n => n.ParentDyntaxaTaxonId, IndexSetting.None, NumberType.Integer)
                         .NumberVal(n => n.DisturbanceRadius, IndexSetting.None, NumberType.Integer)
-                        .NumberVal(n => n.SortOrder, IndexSetting.None, NumberType.Integer)
+                        .NumberVal(n => n.SortOrder, IndexSetting.SearchSortAggregate, NumberType.Integer)
                         .NumberVal(n => n.SpeciesGroup, IndexSetting.None, NumberType.Byte)
                         .BooleanVal(n => n.IsRedlisted, IndexSetting.SearchOnly) // WFS
                         .BooleanVal(n => n.IsInvasiveInSweden, IndexSetting.SearchOnly) // WFS
