@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Administration.Api.Controllers.Interfaces;
+using SOS.Lib.Helpers;
 using SOS.Lib.Jobs.Process;
 using SOS.Lib.Managers.Interfaces;
 using System;
@@ -41,6 +42,7 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 if (instance < 0 || instance > 1)
                 {
                     _logger.LogError("Instance must be 0 or 1");

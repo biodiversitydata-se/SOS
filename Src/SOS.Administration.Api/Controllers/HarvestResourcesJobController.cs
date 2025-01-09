@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Administration.Api.Controllers.Interfaces;
+using SOS.Lib.Helpers;
 using SOS.Lib.Jobs.Import;
 using System;
 using System.Net;
@@ -38,6 +39,7 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 RecurringJob.AddOrUpdate<IAreasHarvestJob>(nameof(IAreasHarvestJob), job => job.RunAsync(),
                     $"0 {minute} {hour} * * ?", new RecurringJobOptions { TimeZone = TimeZoneInfo.Local });
                 return new OkObjectResult("Areas harvest job added");
@@ -57,6 +59,7 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 BackgroundJob.Enqueue<IAreasHarvestJob>(job => job.RunAsync());
                 return new OkObjectResult("Areas harvest job was enqueued to Hangfire.");
             }
@@ -80,6 +83,7 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 BackgroundJob.Enqueue<ITaxonListsHarvestJob>(job => job.RunHarvestTaxonListsAsync());
                 return new OkObjectResult("Taxon lists harvest job was enqueued to Hangfire.");
             }
@@ -101,6 +105,7 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 BackgroundJob.Enqueue<IArtportalenDatasetMetadataHarvestJob>(job => job.RunAsync());
                 return new OkObjectResult("Artportalen dataset metadata harvest job was enqueued to Hangfire.");
             }

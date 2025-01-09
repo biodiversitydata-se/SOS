@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Administration.Api.Models;
+using SOS.Lib.Helpers;
 using System;
 using System.Globalization;
 using System.Net;
@@ -51,6 +52,7 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 var environmentInformationDto = new EnvironmentInformationDto
                 {
                     EnvironmentType = WebHostEnvironment.EnvironmentName,

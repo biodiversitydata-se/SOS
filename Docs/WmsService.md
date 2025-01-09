@@ -1,5 +1,5 @@
 # OGC Web Map Service (WMS)
-All public observations that SOS harvests are available in a OGC Web Maps Service (WMS) described on this page. 
+All public observations that SOS harvests are available in a viewing OGC Web Maps Service (WMS) described on this page. 
 
 ## See also
 - [SOS WFS technical overview](WfsService.md)

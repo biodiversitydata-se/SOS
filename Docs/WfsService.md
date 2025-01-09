@@ -1,5 +1,5 @@
 # OGC Web Feature Service (WFS) - Technical overview
-All public observations that SOS harvests are available in a OGC Web Feature Service (WFS) described on this page. A [SOS WFS get started guide](WfsServiceGetStarted.md) is available on a separate page.
+All public observations that SOS harvests are available in a direct access OGC Web Feature Service (WFS) described on this page. A [SOS WFS get started guide](WfsServiceGetStarted.md) is available on a separate page.
 - [WFS service overview](#wfs-service-overview)
 - [Service details](#service-details)
 - [HTTP Request examples](#http-request-examples)
@@ -132,6 +132,12 @@ The WFS is using [GeoServer](https://geoserver.org/) and a plugin to GeoServer t
 Only V 1.0.0 of WFS is supported currently. For security reasons, we upgraded to GeoServer 2.25.2 during summer 2024, but unfortunately GML3 and WFS 2.0.0 stopped working. GeoServer returns a response, but the namespace of the layer becomes null, which means that most applications cannot interpret the data. We have reported the case to GeoServer, but do not currently know when it is planned to be fixed.
 Currently only GML2 and WFS 1.0.0 are working. We therefore recommend changing version in your GIS application as a work-around for the time being. Version can be specified when adding a WFS server connection.
 
+**Want to help?**
+
+If you are a Java developer and want to help us fix the bug, you can find more information about the problem in the following links:
+- [Jira ticket](https://osgeo-org.atlassian.net/jira/software/c/projects/GEOS/issues/GEOS-11510?jql=project%20%3D%20%22GEOS%22%20AND%20textfields%20~%20%22gml3%22%20ORDER%20BY%20created%20DESC)
+- [GeoTools file - ElasticDataStoreFactory.java](https://github.com/geotools/geotools/blob/main/modules/unsupported/elasticsearch/src/main/java/org/geotools/data/elasticsearch/ElasticDataStoreFactory.java)
+*- unlike all other datastores, the ElasticSearchDataStoreFactory lacks a NAMESPACE parameter, so GeoServer cannot inject the workspace-associated namespace URI into it.*
 
 ## Support
 In case of questions or problems, contact support at SLU Artdatabanken: artdatabanken@slu.se

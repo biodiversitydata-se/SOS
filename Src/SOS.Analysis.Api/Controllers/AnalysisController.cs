@@ -7,6 +7,7 @@ using SOS.Analysis.Api.Controllers.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Exceptions;
 using SOS.Lib.Extensions;
+using SOS.Lib.Helpers;
 using SOS.Lib.Jobs.Export;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Analysis;
@@ -23,6 +24,7 @@ using SOS.Shared.Api.Extensions.Dto;
 using SOS.Shared.Api.Utilities.Objects.Interfaces;
 using SOS.Shared.Api.Validators.Interfaces;
 using System.Net;
+using System.Reflection;
 using Result = CSharpFunctionalExtensions.Result;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -94,6 +96,7 @@ namespace SOS.Analysis.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 this.User.CheckAuthorization(_analysisConfiguration.ProtectedScope!, searchFilter.ProtectionFilter);
                 searchFilter = await _searchFilterUtility.InitializeSearchFilterAsync(searchFilter);
                 var validationResult = Result.Combine(
@@ -149,6 +152,7 @@ namespace SOS.Analysis.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 this.User.CheckAuthorization(_analysisConfiguration.ProtectedScope!, searchFilter.ProtectionFilter);
                 searchFilter = await _searchFilterUtility.InitializeSearchFilterAsync(searchFilter);
 
@@ -203,6 +207,7 @@ namespace SOS.Analysis.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 this.User.CheckAuthorization(_analysisConfiguration.ProtectedScope!, searchFilter.ProtectionFilter);
                 searchFilter = await _searchFilterUtility.InitializeSearchFilterAsync(searchFilter);
                 var validationResult = validateFilter ?? false ? (await _inputValidator.ValidateSearchFilterAsync(searchFilter!)) : Result.Success();
@@ -278,6 +283,7 @@ namespace SOS.Analysis.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 this.User.CheckAuthorization(_analysisConfiguration.ProtectedScope!, searchFilter.ProtectionFilter);
                 searchFilter = await _searchFilterUtility.InitializeSearchFilterAsync(searchFilter);
                 var edgeLengthValidation = Result.Success();
@@ -395,6 +401,7 @@ namespace SOS.Analysis.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 this.User.CheckAuthorization(_analysisConfiguration.ProtectedScope!, searchFilter.ProtectionFilter);
                 searchFilter = await _searchFilterUtility.InitializeSearchFilterAsync(searchFilter);
                 var userExports = await GetUserExportsAsync();
@@ -512,6 +519,7 @@ namespace SOS.Analysis.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 this.User.CheckAuthorization(_analysisConfiguration.ProtectedScope!, searchFilter.ProtectionFilter);
                 searchFilter = await _searchFilterUtility.InitializeSearchFilterAsync(searchFilter);
                 var filter = searchFilter?.ToSearchFilter(this.GetUserId(), searchFilter?.ProtectionFilter, "sv-SE")!;
@@ -597,7 +605,8 @@ namespace SOS.Analysis.Api.Controllers
             [FromQuery] string confirmEncryptPassword = "")
         {
             try
-            {                
+            {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 this.User.CheckAuthorization(_analysisConfiguration.ProtectedScope!, searchFilter.ProtectionFilter);
                 searchFilter = await _searchFilterUtility.InitializeSearchFilterAsync(searchFilter);
                 var filter = searchFilter?.ToSearchFilter(this.GetUserId(), searchFilter?.ProtectionFilter, "sv-SE")!;
@@ -700,6 +709,6 @@ namespace SOS.Analysis.Api.Controllers
             }
 
             return Result.Success();
-        }
+        }        
     }
 }

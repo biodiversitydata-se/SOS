@@ -170,7 +170,7 @@ namespace SOS.Lib.Services
         public async Task<IEnumerable<AuthorityModel>> GetUserAuthoritiesAsync(int userId, string authorizationApplicationIdentifier = null, string cultureCode = "sv-SE")
         {
             if (TokenHelper.IsUserAdmin2Token(_authorizationProvider.GetAuthHeader(), _userServiceConfiguration.IdentityProvider.Authority, _logger))
-                return await GetUserAuthoritiesFromUserAdmin2Async(userId);
+                return await GetUserAuthoritiesFromUserAdmin2Async(userId, authorizationApplicationIdentifier);
             else
                 return await GetUserAuthoritiesFromUserAdmin1Async(userId, authorizationApplicationIdentifier, cultureCode);
         }
@@ -194,7 +194,7 @@ namespace SOS.Lib.Services
             return null;
         }
 
-        private async Task<IEnumerable<AuthorityModel>> GetUserAuthoritiesFromUserAdmin2Async(int userId, string authorizationApplicationIdentifier = null, string cultureCode = "sv-SE")
+        private async Task<IEnumerable<AuthorityModel>> GetUserAuthoritiesFromUserAdmin2Async(int userId, string authorizationApplicationIdentifier, string cultureCode = "sv-SE")
         {
             try
             {
@@ -244,7 +244,7 @@ namespace SOS.Lib.Services
             return null;
         }
 
-        private async Task<IEnumerable<RoleModel>> GetUserRolesFromUserAdmin2Async(int userId, string authorizationApplicationIdentifier = null, string cultureCode = "sv-SE")
+        private async Task<IEnumerable<RoleModel>> GetUserRolesFromUserAdmin2Async(int userId, string authorizationApplicationIdentifier, string cultureCode = "sv-SE")
         {
             try
             {

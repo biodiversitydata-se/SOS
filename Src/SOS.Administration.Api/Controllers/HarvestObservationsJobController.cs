@@ -5,6 +5,7 @@ using SOS.Administration.Api.Controllers.Interfaces;
 using SOS.Administration.Api.Models;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Database.Interfaces;
+using SOS.Lib.Helpers;
 using SOS.Lib.Jobs.Import;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Verbatim;
@@ -51,6 +52,7 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 if (dataProviderIdOrIdentifiers == null || dataProviderIdOrIdentifiers.Count == 0)
                 {
                     return new BadRequestObjectResult("dataProviderIdOrIdentifiers is not set");
@@ -97,6 +99,7 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 if (dataProviderIdOrIdentifiers == null || dataProviderIdOrIdentifiers.Count == 0)
                 {
                     return new BadRequestObjectResult("dataProviderIdOrIdentifiers is not set");
@@ -149,6 +152,7 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 var dataProvider =
                     await _dataProviderManager.GetDataProviderByIdOrIdentifier(model.DataProviderIdOrIdentifier);
                 if (dataProvider == null)

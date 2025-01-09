@@ -1,18 +1,15 @@
 ﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Administration.Api.Models;
-using SOS.Lib.Managers.Interfaces;
+using SOS.Lib.Helpers;
 using SOS.Lib.Models.Shared;
+using SOS.Lib.Repositories.Processed.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Net;
-using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Linq;
 
 namespace SOS.Administration.Api.Controllers
@@ -26,17 +23,21 @@ namespace SOS.Administration.Api.Controllers
     {
         private readonly IDataProviderManager _dataProviderManager;
         private readonly ILogger<DataProvidersController> _logger;
+        private readonly IProcessInfoRepository _processInfoRepository;
 
         /// <summary>
         ///     Constructor
         /// </summary>
         /// <param name="dataProviderManager"></param>
+        /// <param name="processInfoRepository"></param>
         /// <param name="logger"></param>
         public DataProvidersController(
             IDataProviderManager dataProviderManager,
+            IProcessInfoRepository processInfoRepository,
             ILogger<DataProvidersController> logger)
         {
             _dataProviderManager = dataProviderManager ?? throw new ArgumentNullException(nameof(dataProviderManager));
+            _processInfoRepository = processInfoRepository ?? throw new ArgumentNullException(nameof(processInfoRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -57,6 +58,7 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 var result = await _dataProviderManager.InitDefaultDataProviders(forceOverwriteIfCollectionExist);
                 if (result.IsFailure) return BadRequest(result.Error);
                 return Ok(result.Value);
@@ -87,6 +89,7 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 var dataProvider =
                         await _dataProviderManager.GetDataProviderByIdOrIdentifier(dataProviderIdOrIdentifier);
                 if (dataProvider != null && !forceOverwriteIfCollectionExist)
@@ -120,6 +123,7 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 var result = await _dataProviderManager.InitDefaultEml(datproviderIds);
                 if (result.IsFailure) return BadRequest(result.Error);
                 return Ok(result.Value);
@@ -144,6 +148,7 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 int.TryParse(model.DataProviderIdOrIdentifier, out var providerId);
 
                 if (providerId != -1)
@@ -241,6 +246,7 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 var dataProviders = await _dataProviderManager.GetAllDataProvidersAsync();
 
                 //var dtos = dataProviders.Select(DataProviderDto.Create).ToList(); // todo - use DTO?
@@ -254,6 +260,67 @@ namespace SOS.Administration.Api.Controllers
         }
 
         /// <summary>
+        /// Get markdowns summary for all data providers.
+        /// </summary>
+        /// <param name="cultureCode">Culture code.</param>
+        /// <param name="includeProvidersWithNoObservations">If false, data providers with no observations are excluded from the result.</param>
+        /// <returns></returns>
+        [HttpGet("GetMarkdownSummary")]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> GetDataProvidersMarkdownSummaryAsync(
+            [FromQuery] string cultureCode = "en-GB",
+            [FromQuery] bool includeProvidersWithNoObservations = false)
+        {
+            try
+            {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
+                cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
+                var dataProviders = await _dataProviderManager.GetAllDataProvidersAsync();
+                var processInfo = (await _processInfoRepository.GetAllAsync())
+                    .Where(m => m.Id.Contains("observation", StringComparison.InvariantCultureIgnoreCase))
+                    .Where(m => m.Status == RunStatus.Success)
+                    .Where(m => m.ProvidersInfo != null && m.ProvidersInfo.Count() > 1)
+                    .OrderByDescending(m => m.End)
+                    .First();                                
+                var markdown = CreateMarkdown(dataProviders, processInfo.ProvidersInfo, cultureCode, includeProvidersWithNoObservations);               
+                return Ok(markdown);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Error getting data providers");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        private string CreateMarkdown(List<DataProvider> dataProviders, 
+            IEnumerable<Lib.Models.Processed.ProcessInfo.ProviderInfo> providerInfos, 
+            string cultureCode,
+            bool includeProvidersWithNoObservations)
+        {
+            _logger.LogInformation("CreateMarkdown culture (before change): {@currentCulture}, numberGroupSeparator: {@numberGroupSeparator}", Thread.CurrentThread.CurrentCulture.Name, Thread.CurrentThread.CurrentCulture.NumberFormat.NumberGroupSeparator);
+            Thread.CurrentThread.CurrentCulture = new CultureInfo("sv-SE");
+            _logger.LogInformation("CreateMarkdown culture (after change): {@currentCulture}, numberGroupSeparator: {@numberGroupSeparator}", Thread.CurrentThread.CurrentCulture.Name, Thread.CurrentThread.CurrentCulture.NumberFormat.NumberGroupSeparator);
+            int totalCount = 0;
+            var sb = new StringBuilder();
+            sb.AppendLine("| Id 	| Name 	| Organization 	| Number of observations 	|");
+            sb.AppendLine("|:---	|:---	|:--- |---:	|");
+            foreach (var dataProvider in dataProviders)
+            {
+                var providerInfo = providerInfos.FirstOrDefault(m => m.DataProviderId == dataProvider.Id);
+                if (providerInfo == null) continue;
+                int observationCount = providerInfo.PublicProcessCount.GetValueOrDefault(0) + providerInfo.ProtectedProcessCount.GetValueOrDefault(0);
+                if (!includeProvidersWithNoObservations && observationCount == 0) continue;
+
+                sb.AppendLine($"| {dataProvider.Id} | [{dataProvider.Names.Translate(cultureCode)}]({dataProvider.Url}) | {dataProvider.Organizations.Translate(cultureCode)} | {observationCount:N0} |");
+                totalCount += observationCount;
+            }
+            sb.AppendLine($"|  |  |  | **{totalCount:N0}** |");
+
+            return sb.ToString();
+        }
+
+        /// <summary>
         ///     Get information about which data sources are included in scheduled harvest and processing.
         /// </summary>
         /// <returns></returns>
@@ -264,6 +331,7 @@ namespace SOS.Administration.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 var allDataProviders = await _dataProviderManager.GetAllDataProvidersAsync();
                 var harvestProcessSettings = new DataProviderHarvestAndProcessSettingsDto
                 {
