@@ -62,7 +62,7 @@ spec:
           - name: AllowedOrigins
             value: '*'
           - name: SosApiConfiguration
-            value: '{"ObservationsApiAddresses": [ "https://sos-search-dev.artdata.slu.se/" ],"ElasticSearchProxyAddresses": [ "https://sos-proxy-dev.artdata.slu.se/" ],"AnalysisApiAddresses": [ "https://sos-analysis-dev.wt.artdata.slu.se/" ],"DataStewardshipApiAddresses": [ "https://datastewardship-dev.wt.artdata.slu.se/" ]}'
+            value: '{"ObservationsApiAddresses": [ "https://sos-search-dev.artdata.slu.se/" ],"ElasticSearchProxyAddresses": [ "https://sos-proxy-dev.wt.artdata.slu.se/" ],"AnalysisApiAddresses": [ "https://sos-analysis-dev.wt.artdata.slu.se/" ],"DataStewardshipApiAddresses": [ "https://datastewardship-dev.wt.artdata.slu.se/" ]}'
           - name: ProcessConfiguration
             value: '{"TaxonAttributeServiceConfiguration": {"BaseAddress": "https://taxonattributeservice.artdata.slu.se/api","AcceptHeaderContentType": "application/json"},"TaxonServiceConfiguration": {"BaseAddress": "https://taxonservice.artdata.slu.se/DarwinCore/DarwinCoreArchiveFile?version=custom","AcceptHeaderContentType": "application/text","TaxonApiAddress": "https://taxonapi-dev.wt.artdata.slu.se/darwincore/download?version=custom","UseTaxonApi": true}}'
           - name: UserServiceConfiguration
