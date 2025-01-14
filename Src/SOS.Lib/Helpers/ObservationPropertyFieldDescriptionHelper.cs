@@ -52,13 +52,8 @@ namespace SOS.Lib.Helpers
                 "projectssummary.project2url",
                 "projectssummary.project2values"
             }
-                .Select(f => propertyFields.FindIndex(pf => pf.PropertyPath.Equals(f, System.StringComparison.CurrentCultureIgnoreCase)))
-                .Where(i => i != -1);
-
-            if (!indexToRemove?.Any() ?? true)
-            {    
-                return;
-            }
+            .Select(f => propertyFields.FindIndex(pf => pf.PropertyPath.Equals(f, System.StringComparison.CurrentCultureIgnoreCase)))
+            .Where(i => i != -1);
 
             indexToRemove.ForEach(i => propertyFields.RemoveAt(i));
 
@@ -123,13 +118,13 @@ namespace SOS.Lib.Helpers
                             DataTypeIsNullable = true,
                             DependsOn = $"Project-{project.Id}.Parameter-{parameter.Id}",
                             DynamicIds = new[] { project.Id, parameter.Id },
-                            EnglishTitle = parameter.Name,
+                            EnglishTitle = $"{parameter.Name} [{project.Id}]",
                             FieldSet = propertyField.FieldSet,
                             FieldSetEnum = propertyField.FieldSetEnum,
                             IsDynamicCreated = true,
                             PropertyName = parameter.Name.Replace(" ", ""),
                             PropertyPath = $"Project-{project.Id}.Parameter-{parameter.Id}",
-                            SwedishTitle = parameter.Name
+                            SwedishTitle = $"{parameter.Name} [{project.Id}]"
                         });
                     }
                 }
