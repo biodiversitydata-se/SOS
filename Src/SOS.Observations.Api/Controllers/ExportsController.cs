@@ -879,6 +879,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="outputFieldSet">Obsolete, will be overided by fieldset in body data if any. The observation property field set.</param>
         /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
         /// <param name="propertyLabelType">The column header type.</param>
+        ///<param name="dynamicProjectDataFields">Use dynamic added project related fields. Only for Excel export</param>
         /// <param name="sensitiveObservations">Include sensitive observations if true</param>
         /// <param name="sendMailFromZendTo">Send pick up file e-mail from ZendTo when file is reay to pick up (Only work if sensitiveObservations = false)</param>
         /// <param name="encryptPassword">Password used to encrypt file</param>
@@ -901,6 +902,7 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.None,
             [FromQuery] bool validateSearchFilter = false,
             [FromQuery] PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
+            [FromQuery] bool dynamicProjectDataFields = false,
             [FromQuery] bool sensitiveObservations = false,
             [FromQuery] bool sendMailFromZendTo = true,
             [FromQuery] string encryptPassword = "",
@@ -928,7 +930,7 @@ namespace SOS.Observations.Api.Controllers
 
                 var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
                     job.RunAsync(exportFilter, roleId, authorizationApplicationIdentifier, this.GetUserEmail(), description, ExportFormat.Excel, cultureCode, false,
-                        propertyLabelType, false, sensitiveObservations, sendMailFromZendTo, encryptedPassword, false, null, JobCancellationToken.Null));
+                        propertyLabelType, false, sensitiveObservations, sendMailFromZendTo, encryptedPassword, dynamicProjectDataFields, null, JobCancellationToken.Null));
 
                 var exportJobInfo = new ExportJobInfo
                 {
@@ -1555,6 +1557,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="outputFieldSet">Obsolete, will be overided by fieldset in body data if any. The observation property field set.</param>
         /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
         /// <param name="propertyLabelType">The column header type.</param>
+        /// <param name="dynamicProjectDataFields">Use dynamic added project related fields. Only for Excel export</param>
         /// <param name="sensitiveObservations">Include sensitive observations if true</param>
         /// <param name="sendMailFromZendTo">Send pick up file e-mail from ZendTo when file is reay to pick up (Only work if sensitiveObservations = false)</param>
         /// <param name="encryptPassword">Password used to encrypt file</param>
@@ -1577,6 +1580,7 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.None,
             [FromQuery] bool validateSearchFilter = false,
             [FromQuery] PropertyLabelType propertyLabelType = PropertyLabelType.PropertyName,
+            [FromQuery] bool dynamicProjectDataFields = false,
             [FromQuery] bool sensitiveObservations = false,
             [FromQuery] bool sendMailFromZendTo = true,
             [FromQuery] string encryptPassword = "",
@@ -1602,7 +1606,7 @@ namespace SOS.Observations.Api.Controllers
                 var exportFilter = (SearchFilter)okResult.Value;
                 var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
                     job.RunAsync(exportFilter, roleId, authorizationApplicationIdentifier, this.GetUserEmail(), description, ExportFormat.Excel, cultureCode, false,
-                        propertyLabelType, false, sensitiveObservations, sendMailFromZendTo, encryptedPassword, false, null, JobCancellationToken.Null));
+                        propertyLabelType, false, sensitiveObservations, sendMailFromZendTo, encryptedPassword, dynamicProjectDataFields, null, JobCancellationToken.Null));
 
                 var exportJobInfo = new ExportJobInfo
                 {
