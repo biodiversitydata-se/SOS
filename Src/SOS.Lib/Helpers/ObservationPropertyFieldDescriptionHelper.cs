@@ -37,6 +37,12 @@ namespace SOS.Lib.Helpers
                 return;
             }
 
+            if (!propertyFields.Any(m => m.PropertyPath.Equals("Projects", StringComparison.CurrentCultureIgnoreCase)))
+            {
+                // Don't add project parameters if Projects field is not requested.
+                return;
+            }
+
             var propertyField = propertyFields.First();
 
             // Remove project related fields
@@ -53,7 +59,7 @@ namespace SOS.Lib.Helpers
                 "projectssummary.project2values"
             }
             .Select(f => propertyFields.FindIndex(pf => pf.PropertyPath.Equals(f, System.StringComparison.CurrentCultureIgnoreCase)))
-            .Where(i => i != -1);
+            .Where(i => i != -1);            
 
             indexToRemove.ForEach(i => propertyFields.RemoveAt(i));
 
