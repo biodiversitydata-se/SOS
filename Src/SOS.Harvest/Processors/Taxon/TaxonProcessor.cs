@@ -409,6 +409,14 @@ namespace SOS.Harvest.Processors.Taxon
                     useCurrentCollection = true;
                 }
 
+                // Check redlisted taxa
+                int nrOfRedlistedTaxa = taxa!.Count(t => t.Value.Attributes.IsRedlisted);
+                if (nrOfRedlistedTaxa < 1000)
+                {
+                    _logger.LogWarning($"Less than 1000 redlisted taxa found: {nrOfRedlistedTaxa}");
+                    useCurrentCollection = true;
+                }
+
                 if (useCurrentCollection)
                 {
                     _logger.LogInformation("Using current taxa collection");

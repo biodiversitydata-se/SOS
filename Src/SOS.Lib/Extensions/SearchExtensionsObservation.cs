@@ -182,10 +182,16 @@ namespace SOS.Lib
 
             if (internalFilter.SpeciesFactsIds?.Any() ?? false)
             {
+                var speciesFactQuerys = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
                 foreach (var factsId in internalFilter.SpeciesFactsIds)
                 {
-                    query.TryAddTermCriteria("artportalenInternal.speciesFactsIds", factsId);
+                    speciesFactQuerys.TryAddTermCriteria("artportalenInternal.speciesFactsIds", factsId);
                 }
+                query.Add(q => q
+                    .Bool(b => b
+                        .Should(speciesFactQuerys)
+                    )
+                );
             }
 
             query.TryAddTermsCriteria("artportalenInternal.triggeredObservationRuleFrequencyId", internalFilter.TriggeredObservationRuleFrequencyIds);
