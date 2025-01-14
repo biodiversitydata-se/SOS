@@ -1,0 +1,93 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: sos-observations-api
+  name: sos-observations-api
+  namespace: sos-observations-st
+spec:
+  ports:
+    - port: 5000
+      targetPort: 5000
+  selector:
+    app: sos-observations-api
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: sos-observations-api
+  name: sos-observations-api
+  namespace: sos-observations-st
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: sos-observations-api
+  strategy: 
+      type: Recreate
+  template:
+    metadata:
+      annotations:
+        logging: "true"
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/agent-inject-status: "update"
+        vault.hashicorp.com/ca-cert: "/vault/tls/ca-bundle.crt"
+        vault.hashicorp.com/tls-secret: "vault-ca-bundle"
+        vault.hashicorp.com/role: "sos-observations"
+        vault.hashicorp.com/agent-inject-secret-env: "kv2/data/sos-observations/st"
+        vault.hashicorp.com/agent-inject-template-env: |
+          {{- with secret "kv2/data/sos-observations/st" -}}
+            {{- range $k, $v := .Data.data -}}
+              export {{ $k }}='{{ $v }}'
+            {{ end }}
+          {{- end }}
+      labels:
+        app: sos-observations-api
+    spec:
+      serviceAccountName: sos-observations-sa
+      topologySpreadConstraints: # try to spread out api instances over available nodes
+      - labelSelector:
+          matchLabels:
+            app: sos-observations-api # pods labeled app: sos-observations-api
+        maxSkew: 1
+        topologyKey: kubernetes.io/hostname # 1 node = 1 topology
+        whenUnsatisfiable: DoNotSchedule
+      containers:
+        - env:
+            - name: ASPNETCORE_ENVIRONMENT
+              value: st
+          image: adbpocreg.azurecr.io/sos-observations-api:$(Parameters.ImageTag)
+          name: sos-observations-api
+          command: ["sh", "-c"]
+          args: [". /vault/secrets/env && dotnet SOS.Observations.Api.dll"]
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5000
+          startupProbe: 
+            httpGet:
+              path: /healthz
+              port: 5000
+            failureThreshold: 5
+            periodSeconds: 10
+          readinessProbe: 
+            httpGet:
+              path: /healthz
+              port: 5000
+              httpHeaders:
+              - name: Host
+                value: KubernetesReadinessProbe
+            successThreshold: 1
+            failureThreshold: 3
+            periodSeconds: 10
+          livenessProbe: 
+            httpGet:
+              path: /healthz
+              port: 5000
+            failureThreshold: 3
+            periodSeconds: 10
+          resources: {}
+      priorityClassName: high-priority
+      restartPolicy: Always
+      imagePullSecrets:
+        - name: regcred

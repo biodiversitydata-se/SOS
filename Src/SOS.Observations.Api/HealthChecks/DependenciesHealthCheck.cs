@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
-using SOS.Lib.Configuration.Shared;
+﻿using Microsoft.Extensions.Diagnostics.HealthChecks;
 using SOS.Observations.Api.Repositories.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -15,16 +13,13 @@ namespace SOS.Observations.Api.HealthChecks
     /// </summary>
     public class DependenciesHealthCheck : IHealthCheck
     {
-        private readonly IConfiguration _configuration;
         private readonly IProcessedObservationRepository _processedObservationRepository;
 
         /// <summary>
         /// Constructor
         /// </summary>
-        public DependenciesHealthCheck(IConfiguration configuration,
-            IProcessedObservationRepository processedObservationRepository)
+        public DependenciesHealthCheck(IProcessedObservationRepository processedObservationRepository)
         {
-            _configuration = configuration;
             _processedObservationRepository = processedObservationRepository;
         }
 
@@ -44,11 +39,11 @@ namespace SOS.Observations.Api.HealthChecks
                 {
                     int esActiveIndex = _processedObservationRepository.ActiveInstance;
                     var observationIndexName = _processedObservationRepository.PublicIndexName;
-                    var processedDbConfiguration = _configuration.GetSection("ProcessDbConfiguration").Get<MongoDbConfiguration>();
-                    var elasticConfiguration = _configuration.GetSection("SearchDbConfiguration").Get<ElasticSearchConfiguration>();
-                    var identityServerConfiguration = _configuration.GetSection("IdentityServer").Get<IdentityServerConfiguration>();
-                    var hangfireConfiguration = _configuration.GetSection("HangfireDbConfiguration").Get<HangfireDbConfiguration>();
-                    var userServiceConfiguration = _configuration.GetSection("UserServiceConfiguration").Get<UserServiceConfiguration>();
+                    var processedDbConfiguration = Settings.ProcessDbConfiguration;
+                    var elasticConfiguration = Settings.SearchDbConfiguration;
+                    var identityServerConfiguration = Settings.IdentityServer;
+                    var hangfireConfiguration = Settings.HangfireDbConfiguration;
+                    var userServiceConfiguration = Settings.UserServiceConfiguration;
                     var esClusterIndex = Math.Min(elasticConfiguration.Clusters.Count() - 1, esActiveIndex);
 
                     var dependencies = new List<(string Title, string Value)>

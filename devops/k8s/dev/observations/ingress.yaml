@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: sos-observations-ingress
+  namespace: sos-observations-dev
+  annotations:
+    cert-manager.io/cluster-issuer: vault-slu.se-cluster-issuer
+    nginx.ingress.kubernetes.io/proxy-body-size: 20m
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+      - sos-search-dev.wt.artdata.slu.se
+      secretName: private-star.artdata.slu.se-tls
+  rules:
+  - host: sos-search-dev.wt.artdata.slu.se
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: sos-observations-api
+            port:
+              number: 5000

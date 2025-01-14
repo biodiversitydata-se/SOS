@@ -49,7 +49,7 @@ namespace SOS.Observations.Api
         public static IHostBuilder CreateHostBuilder(string[] args)
         {
             return Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); })
+                .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>().UseUrls("http://*:5000"); })
                 .ConfigureLogging(logging =>
                 {
                     logging.ClearProviders();

@@ -1,0 +1,88 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: sos-observations-api
+  name: sos-observations-api
+  namespace: sos-observations
+spec:
+  ports:
+    - port: 5000
+      targetPort: 5000
+  selector:
+    app: sos-observations-api
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: sos-observations-api
+  name: sos-observations-api
+  namespace: sos-observations
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: sos-observations-api
+  strategy: 
+      type: Recreate
+  template:
+    metadata:
+      annotations:
+        logging: "true"
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/agent-inject-status: "update"
+        vault.hashicorp.com/ca-cert: "/vault/tls/ca-bundle.crt"
+        vault.hashicorp.com/tls-secret: "vault-ca-bundle"
+        vault.hashicorp.com/role: "sos-observations"
+        vault.hashicorp.com/agent-inject-secret-env: "kv2/data/sos-observations"
+        vault.hashicorp.com/agent-inject-template-env: |
+          {{- with secret "kv2/data/sos-observations" -}}
+            {{- range $k, $v := .Data.data -}}
+              export {{ $k }}='{{ $v }}'
+            {{ end }}
+          {{- end }}
+      labels:
+        app: sos-observations-api
+    spec:
+      serviceAccountName: sos-observations-sa
+      topologySpreadConstraints: # try to spread out api instances over available nodes
+      - labelSelector:
+          matchLabels:
+            app: sos-observations-api # pods labeled app: sos-observations-api
+        maxSkew: 1
+        topologyKey: kubernetes.io/hostname # 1 node = 1 topology
+        whenUnsatisfiable: DoNotSchedule
+      containers:
+        - env:
+            - name: ASPNETCORE_ENVIRONMENT
+              value: prod
+            - name: ApplicationInsights
+              value: '{"InstrumentationKey": "SECRET_PLACEHOLDER"}'
+            - name: ProcessDbConfiguration
+              value: '{"UserName": "SECRET_PLACEHOLDER", "Password": "SECRET_PLACEHOLDER", "Hosts": [{"Name": "artmongo2-1.artdata.slu.se", "Port": 27017}, {"Name": "artmongo2-2.artdata.slu.se", "Port": 27017}, {"Name": "artmongo2-3.artdata.slu.se", "Port": 27017}], "ReplicaSetName": "mongo-prod", "DatabaseName": "sos", "UseTls": false, "AuthenticationDb": "admin"}'
+            - name: SearchDbConfiguration
+              value: '{"UserName": "SECRET_PLACEHOLDER", "Password": "SECRET_PLACEHOLDER", "Clusters": [{"Hosts": ["https://artsosdata2-1.artdata.slu.se:9200", "https://artsosdata2-2.artdata.slu.se:9200", "https://artsosdata2-3.artdata.slu.se:9200"]}, {"Hosts": ["https://artsosdata2-4.artdata.slu.se:9200", "https://artsosdata2-5.artdata.slu.se:9200", "https://artsosdata2-6.artdata.slu.se:9200"]}], "IndexPrefix": "sos", "IndexSettings": [{"Name": "observation", "RequestTimeout": 60}]}'
+          image: adbpocreg.azurecr.io/sos-observations-api:$(Parameters.ImageTag)
+          name: sos-observations-api
+          command: ["sh", "-c"]
+          args: [". /vault/secrets/env && dotnet SOS.Observations.Api.dll"]
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5000
+          readinessProbe: # ready to accept traffic, failure = stops routing traffic to this pod but does not restart the pod!
+            httpGet:
+              path: /healthz
+              port: 5000
+              httpHeaders:
+              - name: Host
+                value: KubernetesReadinessProbe
+            initialDelaySeconds: 10
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 3
+            periodSeconds: 30 # runs every 30 seconds
+          resources: {}
+      restartPolicy: Always
+      imagePullSecrets:
+        - name: regcred
