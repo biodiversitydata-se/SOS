@@ -1,8 +1,10 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using SOS.ElasticSearch.Proxy.Configuration;
 using SOS.ElasticSearch.Proxy.Extensions;
 using SOS.Lib.Extensions;
+using SOS.Lib.Helpers;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using System.Diagnostics;
 using System.Dynamic;
@@ -162,6 +164,7 @@ namespace SOS.ElasticSearch.Proxy.Middleware
                 context.Request.EnableBuffering();
                 var body = await new StreamReader(context.Request.Body).ReadToEndAsync();
                 context.Request.Body.Position = 0;
+                LogHelper.AddHttpContextItems(context);
                 if (_proxyConfiguration.LogOriginalQuery)
                 {
                     _logger.LogInformation($"Original body: {body}");

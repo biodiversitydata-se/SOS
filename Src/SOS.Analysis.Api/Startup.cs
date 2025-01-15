@@ -538,6 +538,11 @@ namespace SOS.Analysis.Api
                         diagnosticContext.Set("Endpoint", endpoint);
                     }
 
+                    if (httpContext.Items.TryGetValue("QueryString", out var queryString))
+                    {
+                        diagnosticContext.Set("QueryString", queryString);
+                    }
+
                     if (httpContext.Items.TryGetValue("Handler", out var handler))
                     {
                         diagnosticContext.Set("Handler", handler);
