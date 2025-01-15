@@ -29,6 +29,7 @@ using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Processed;
 using Serilog;
 using Microsoft.IdentityModel.JsonWebTokens;
+using Microsoft.AspNetCore.Http;
 
 namespace SOS.Administration.Api
 {
@@ -169,7 +170,7 @@ namespace SOS.Administration.Api
 
             services.AddScoped<ICacheManager, CacheManager>();
             services.AddScoped<IProcessInfoRepository, ProcessInfoRepository>();
-            
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton<IApiUsageStatisticsManager, ApiUsageStatisticsManager>();
             services.AddSingleton<IApplicationInsightsService, ApplicationInsightsService>();
             ApiManagementServiceConfiguration apiMgmtServiceConfiguration = new ApiManagementServiceConfiguration();
