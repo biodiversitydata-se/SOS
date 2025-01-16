@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using SOS.Lib.Helpers;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.DataQuality;
 using System;
@@ -43,6 +44,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 return new OkObjectResult(await _dataQualityManager.GetReportAsync(organismGroup));
             }
             catch (Exception e)

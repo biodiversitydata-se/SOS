@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
+using SOS.Lib.Helpers;
 
 namespace SOS.Observations.Api.Controllers
 {
@@ -53,6 +54,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 return new OkObjectResult(await _areaManager.GetAreasAsync(areaTypes, searchString, skip, take));
             }
             catch (Exception e)
@@ -76,6 +78,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 return new OkObjectResult(await _areaManager.GetAreaAsync(areaType, featureId));
             }
             catch (Exception e)
@@ -104,6 +107,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 var zipBytes = await _areaManager.GetZippedAreaAsync(areaType, featureId, (AreaExportFormat)format);
 
                 if (zipBytes == null)

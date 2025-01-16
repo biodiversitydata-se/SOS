@@ -55,6 +55,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
                 var userInfo = await _userManager.GetUserInformationAsync(applicationIdentifier, cultureCode);
                 var dto = userInfo.ToUserInformationDto();

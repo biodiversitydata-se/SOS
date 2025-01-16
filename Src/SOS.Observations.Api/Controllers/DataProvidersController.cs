@@ -78,6 +78,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
                 var dataProviders = await _dataProviderManager.GetDataProvidersAsync(false, cultureCode, includeProvidersWithNoObservations, categories);
 
@@ -109,6 +110,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 var modifiedDate = await _observationManager.GetLatestModifiedDateForProviderAsync(providerId);
                 if (modifiedDate == null)
                 {
@@ -137,6 +139,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 var returnJson = false;
                 if (Request.Headers.ContainsKey("Accept"))
                 {
@@ -190,6 +193,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 var start = DateTime.Now;
                 var entries = new Dictionary<string, HealthReportEntry>();
 

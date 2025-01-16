@@ -6,6 +6,7 @@ using System;
 using System.Net;
 using System.Threading.Tasks;
 using SOS.Lib.Exceptions;
+using SOS.Lib.Helpers;
 
 namespace SOS.Observations.Api.Controllers
 {
@@ -51,6 +52,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 if (fromDate >= toDate)
                 {
                     return BadRequest("From date must be less than toDate");
