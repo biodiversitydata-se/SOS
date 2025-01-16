@@ -131,6 +131,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
                 
                 occurrenceId = WebUtility.UrlDecode(id ?? occurrenceId);
@@ -189,6 +190,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 // SearchFilterDto don't support protection filter, declare it localy
                 var protectionFilter = sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public;
                 this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, protectionFilter);
@@ -288,6 +290,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 // Cache
                 string cacheKey = null;
                 Dictionary<string, CacheEntry<GeoGridResultDto>> geogridAggregationByCacheKey = null;
@@ -434,6 +437,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 // SearchFilterDto don't support protection filter, declare it localy
                 var protectionFilter = sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public;
                 this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, protectionFilter);
@@ -532,6 +536,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 // SearchFilterDto don't support protection filter, declare it localy
                 var protectionFilter = sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public;
                 this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, protectionFilter);
@@ -621,6 +626,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
                 
                 translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
@@ -743,6 +749,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
                 id = WebUtility.UrlDecode(id);
 
@@ -812,6 +819,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 var parameters = new[]
                 {
                     $"skip={skip}",
@@ -843,7 +851,6 @@ namespace SOS.Observations.Api.Controllers
                 {
                     return BadRequest(validationResult.Error);
                 }
-
 
                 var result = await _taxonSearchManager.GetTaxonAggregationAsync(
                     roleId,
@@ -909,6 +916,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
                 
                 occurrenceId = WebUtility.UrlDecode(occurrenceId ?? id);
@@ -968,6 +976,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 // sensitiveObservations is preserved for backward compability
                 filter.ProtectionFilter ??= (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
                 this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, filter.ProtectionFilter);
@@ -1020,6 +1029,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 var result = await _taxonSearchManager.GetCachedTaxonSumAggregationItemsAsync(new int[] { taxonId });
                 if (!result.Any())
                     return NoContent();
@@ -1049,6 +1059,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 var result = await _taxonSearchManager.GetCachedTaxonSumAggregationItemsAsync(taxonIds);
                 if (!result.Any())
                     return NoContent();
@@ -1122,6 +1133,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 var parameters = new[]
                 {
                     $"zoom={zoom}",
@@ -1210,6 +1222,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 // sensitiveObservations is preserved for backward compability
                 filter.ProtectionFilter ??= (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
                 this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, filter.ProtectionFilter);
@@ -1325,6 +1338,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, filter.ProtectionFilter);
 
                 filter = await _searchFilterUtility.InitializeSearchFilterAsync(filter);
@@ -1399,6 +1413,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 // sensitiveObservations is preserved for backward compability
                 filter.ProtectionFilter ??= (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
                 this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, filter.ProtectionFilter);
@@ -1504,6 +1519,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 // sensitiveObservations is preserved for backward compability
                 filter.ProtectionFilter ??= (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
                 this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, filter.ProtectionFilter);
@@ -1632,6 +1648,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 // sensitiveObservations is preserved for backward compability
                 filter.ProtectionFilter ??= (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
                 this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, filter.ProtectionFilter);
@@ -1727,6 +1744,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 // SearchFilterDto don't support protection filter, declare it localy
                 var protectionFilter = sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public;
                 this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, protectionFilter);
@@ -1800,6 +1818,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, ProtectionFilterDto.Sensitive);
 
                 var validationResult = Result.Combine(
@@ -1873,6 +1892,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 // Cache
                 string cacheKey = null;
                 Dictionary<string, CacheEntry<PagedResultDto<TaxonAggregationItemDto>>> resultByCacheKey = null;
@@ -1999,6 +2019,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 var result = await _taxonSearchManager.GetTaxonSumAggregationAsync(
                     this.GetUserId(),
                     taxonFilter.ToTaxonFilterFilter(),
@@ -2059,6 +2080,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 // sensitiveObservations is preserved for backward compability
                 filter.ProtectionFilter ??= (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
                 this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, filter.ProtectionFilter);
@@ -2122,6 +2144,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 filter.ProtectionFilter = ProtectionFilterDto.Sensitive;
                 var validationResult = Result.Combine(
                     validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(filter)) : Result.Success(),
@@ -2179,6 +2202,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 filter.ProtectionFilter = ProtectionFilterDto.Sensitive;
                 var validationResult = Result.Combine(
                    validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(filter)) : Result.Success(),
@@ -2239,6 +2263,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 filter.ProtectionFilter = ProtectionFilterDto.Sensitive;
                 var validationResult = Result.Combine(
                   validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(filter)) : Result.Success(),

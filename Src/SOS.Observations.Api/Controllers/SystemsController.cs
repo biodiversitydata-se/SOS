@@ -8,6 +8,7 @@ using System;
 using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
+using SOS.Lib.Helpers;
 
 namespace SOS.Observations.Api.Controllers
 {
@@ -75,6 +76,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 var fileVersionInfo = System.Diagnostics.FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly().Location);
                 return new OkObjectResult(fileVersionInfo.LegalCopyright);
             }
@@ -98,6 +100,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 return new OkObjectResult(await _processInfoManager.GetProcessInfoAsync(_processedObservationRepository.UniquePublicIndexName));
             }
             catch (Exception e)

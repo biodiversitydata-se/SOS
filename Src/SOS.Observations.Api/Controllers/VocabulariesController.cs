@@ -57,6 +57,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 var projects = await _projectManager.GetAllAsync();
 
                 if (!projects?.Any() ?? true)
@@ -87,6 +88,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 var fieldDescriptions = await Task.Run(() =>
                 {
                     return ObservationPropertyFieldDescriptionHelper.AllFields
@@ -122,6 +124,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 var fieldDescriptions = await Task.Run(() =>
                 {
                     return ObservationPropertyFieldDescriptionHelper.AllFields
@@ -157,6 +160,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 var vocabularies = await _vocabularyManager.GetVocabulariesAsync();
 
                 if (!vocabularies?.Any() ?? true)
@@ -187,6 +191,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 var vocabularyIds = Enum.GetValues(typeof(VocabularyId)).Cast<VocabularyId>();
                 var zipBytes = await _vocabularyManager.GetVocabulariesZipFileAsync(vocabularyIds);
                 if (!zipBytes?.Any() ?? true)
@@ -218,6 +223,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 var vocabularies = await _vocabularyManager.GetVocabulariesAsync();
                 if (vocabularyId == VocabularyIdDto.VerificationStatus) vocabularyId = VocabularyIdDto.VerificationStatus;
                 if (vocabularyId == VocabularyIdDto.SensitivityCategory) vocabularyId = VocabularyIdDto.SensitivityCategory;

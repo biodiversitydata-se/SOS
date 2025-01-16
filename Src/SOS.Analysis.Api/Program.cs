@@ -39,7 +39,7 @@ namespace SOS.Analysis.Api
                         .MinimumLevel.Override("Microsoft.AspNetCore.Mvc.Infrastructure", Serilog.Events.LogEventLevel.Warning)
                         .MinimumLevel.Override("Microsoft.AspNetCore.Cors.Infrastructure", Serilog.Events.LogEventLevel.Warning)                        
                         .Filter.ByExcluding(Matching.WithProperty<string>("RequestPath", p => p == "/healthz"))
-                    .CreateLogger();            
+                    .CreateLogger();
 
             try
             {

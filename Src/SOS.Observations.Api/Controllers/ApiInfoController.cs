@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SOS.Lib.Extensions;
+using SOS.Lib.Helpers;
 using SOS.Lib.Models.ApiInfo;
 using SOS.Lib.Swagger;
 using System;
@@ -17,6 +18,7 @@ namespace SOS.Analysis.Api.Controllers
         [AzureApi, AzureInternalApi]
         public IActionResult GetApiInfoAsync()
         {
+            LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
             var buildDate = Assembly.GetExecutingAssembly().GetBuildDate();
             string version = Assembly.GetExecutingAssembly().GetVersionNumber();
 

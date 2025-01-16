@@ -249,7 +249,11 @@ namespace SOS.Analysis.Api
             });
 
             // Add application insights.
-            services.AddApplicationInsightsTelemetry(Configuration);
+            services.AddApplicationInsightsTelemetry(options =>
+            {
+                options.ConnectionString = Settings.ApplicationInsights.ConnectionString;
+            });
+            
             // Application insights custom
             services.AddApplicationInsightsTelemetryProcessor<IgnoreRequestPathsTelemetryProcessor>();
             services.AddSingleton(Settings.ApplicationInsights!);
@@ -476,7 +480,7 @@ namespace SOS.Analysis.Api
                     .AllowAnyMethod()
                     .AllowAnyOrigin()
                 );
-                telemetryConfiguration.DisableTelemetry = true;
+                telemetryConfiguration.DisableTelemetry = true;                
             }
             else
             {
@@ -536,6 +540,11 @@ namespace SOS.Analysis.Api
                     if (httpContext.Items.TryGetValue("Endpoint", out var endpoint))
                     {
                         diagnosticContext.Set("Endpoint", endpoint);
+                    }
+
+                    if (httpContext.Items.TryGetValue("QueryString", out var queryString))
+                    {
+                        diagnosticContext.Set("QueryString", queryString);
                     }
 
                     if (httpContext.Items.TryGetValue("Handler", out var handler))

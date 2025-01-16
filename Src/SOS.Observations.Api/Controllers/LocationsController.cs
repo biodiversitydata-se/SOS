@@ -16,6 +16,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Result = CSharpFunctionalExtensions.Result;
+using SOS.Lib.Helpers;
 
 namespace SOS.Observations.Api.Controllers
 {
@@ -66,6 +67,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 if (!locationIds?.Any() ?? true)
                 {
                     return BadRequest("You have to provide at least one location id");
@@ -107,6 +109,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 var protectionFilter = sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public;
                 this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope, protectionFilter);
 

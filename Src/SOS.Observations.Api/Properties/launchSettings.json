@@ -13,9 +13,12 @@
       "launchBrowser": true,
       "launchUrl": "swagger",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Dev"
+        "ASPNETCORE_ENVIRONMENT": "dev",
+        "DISABLE_HANGFIRE_INIT": "true",
+        "DISABLE_HEALTHCHECK_INIT": "true",
+        "DISABLE_CACHED_TAXON_SUM_INIT": "true"
       },
-      "applicationUrl": "https://localhost:5001;http://localhost:5000"
+      "applicationUrl": "http://localhost:5000"
     },
     "SOS.Observations.Api (Dev)": {
       "commandName": "IISExpress",
@@ -27,7 +30,7 @@
         "DISABLE_HEALTHCHECK_INIT": "true",
         "DISABLE_CACHED_TAXON_SUM_INIT": "true"
       },
-      "applicationUrl": "https://localhost:5001;http://localhost:5000"
+      "applicationUrl": "http://localhost:5000"
     },
     "SOS.Observations.Api (ST)": {
       "commandName": "IISExpress",
@@ -39,7 +42,7 @@
         "DISABLE_HEALTHCHECK_INIT": "true",
         "DISABLE_CACHED_TAXON_SUM_INIT": "true"
       },
-      "applicationUrl": "https://localhost:5001;http://localhost:5000"
+      "applicationUrl": "http://localhost:5000"
     },
     "SOS.Observations.Api (Prod)": {
       "commandName": "IISExpress",
@@ -51,7 +54,7 @@
         "DISABLE_HEALTHCHECK_INIT": "true",
         "DISABLE_CACHED_TAXON_SUM_INIT": "true"
       },
-      "applicationUrl": "https://localhost:5001;http://localhost:5000"
+      "applicationUrl": "http://localhost:5000"
     },
     "WSL": {
       "commandName": "WSL2",

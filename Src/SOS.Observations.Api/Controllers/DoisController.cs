@@ -17,6 +17,7 @@ using System;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using SOS.Lib.Helpers;
 
 namespace SOS.Observations.Api.Controllers
 {
@@ -79,6 +80,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 var validationResults = Result.Combine(
                     (await _inputValidator.ValidateSearchFilterAsync(filter)),
                     _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false));
@@ -129,6 +131,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 var metadata = await _dataCiteService.GetBatchAsync(take, page, orderBy, sortOrder);
 
                 return new OkObjectResult(metadata);
@@ -153,6 +156,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 var downloadUrl = _blobStorageService.GetDOIDownloadUrl(prefix, suffix);
 
                 return new OkObjectResult(downloadUrl);
@@ -178,6 +182,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 if (string.IsNullOrEmpty(suffix))
                 {
                     return BadRequest("You must provide a doi");
@@ -207,6 +212,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 if (string.IsNullOrEmpty(searchFor))
                 {
                     return BadRequest("You must provide something to search for");

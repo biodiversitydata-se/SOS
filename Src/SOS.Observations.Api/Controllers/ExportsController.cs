@@ -288,6 +288,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 var files = await _blobStorageManager.GetExportFilesAsync();
 
                 if (!files?.Any() ?? true)
@@ -318,6 +319,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 var userExport = await GetUserExportsAsync();
 
                 if (!userExport?.Jobs?.Any() ?? true)
@@ -349,6 +351,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 var userExport = await GetUserExportsAsync();
                 var job = userExport?.Jobs?.Where(j => j.Id.Equals(id))?.FirstOrDefault();
                 if (job == null)
@@ -393,6 +396,7 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] bool gzip = true,
             [FromQuery] bool sensitiveObservations = false)
         {
+            LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
             FileExportResult fileExportResult = null;
             var exportPath = Path.Combine(_exportPath, Guid.NewGuid().ToString());
             try
@@ -470,6 +474,7 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] bool validateSearchFilter = false,
             [FromQuery] bool sensitiveObservations = false)
         {
+            LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
             FileExportResult fileExportResult = null;
             var exportPath = Path.Combine(_exportPath, Guid.NewGuid().ToString());
             try
@@ -553,6 +558,7 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] bool gzip = true,
             [FromQuery] bool sensitiveObservations = false)
         {
+            LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
             FileExportResult fileExportResult = null;
             var exportPath = Path.Combine(_exportPath, Guid.NewGuid().ToString());
             try
@@ -639,6 +645,7 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] bool gzip = true,
             [FromQuery] bool sensitiveObservations = false)
         {
+            LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
             FileExportResult fileExportResult = null;
             var exportPath = Path.Combine(_exportPath, Guid.NewGuid().ToString());
 
@@ -736,6 +743,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 // SearchFilterDto don't support protection filter, declare it localy
                 var protectionFilter = sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public;
                 this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope, protectionFilter);
@@ -821,6 +829,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 // SearchFilterDto don't support protection filter, declare it localy
                 var protectionFilter = sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public;
                 this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope, protectionFilter);
@@ -911,6 +920,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 // SearchFilterDto don't support protection filter, declare it localy
                 var protectionFilter = sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public;
                 this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope, protectionFilter);
@@ -1006,6 +1016,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 // SearchFilterDto don't support protection filter, declare it localy
                 var protectionFilter = sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public;
                 this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope, protectionFilter);
@@ -1082,6 +1093,7 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] bool gzip = true,
             [FromQuery] bool sensitiveObservations = false)
         {
+            LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
             FileExportResult fileExportResult = null;
             var exportPath = Path.Combine(_exportPath, Guid.NewGuid().ToString());
             try
@@ -1158,6 +1170,7 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] bool validateSearchFilter = false,
             [FromQuery] bool sensitiveObservations = false)
         {
+            LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
             FileExportResult fileExportResult = null;
             var exportPath = Path.Combine(_exportPath, Guid.NewGuid().ToString());
             try
@@ -1234,6 +1247,7 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] bool gzip = true,
             [FromQuery] bool sensitiveObservations = false)
         {
+            LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
             FileExportResult fileExportResult = null;
             var exportPath = Path.Combine(_exportPath, Guid.NewGuid().ToString());
             try
@@ -1319,6 +1333,7 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] bool gzip = true,
             [FromQuery] bool sensitiveObservations = false)
         {
+            LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
             FileExportResult fileExportResult = null;
             var exportPath = Path.Combine(_exportPath, Guid.NewGuid().ToString());
             try
@@ -1415,6 +1430,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 filter.ProtectionFilter ??= (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
                 this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope, filter.ProtectionFilter);
 
@@ -1500,6 +1516,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 filter.ProtectionFilter ??= (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
                 this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope, filter.ProtectionFilter);
 
@@ -1589,6 +1606,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 filter.ProtectionFilter ??= (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
                 this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope, filter.ProtectionFilter);
 
@@ -1682,6 +1700,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 filter.ProtectionFilter ??= (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
                 this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope, filter.ProtectionFilter);
 

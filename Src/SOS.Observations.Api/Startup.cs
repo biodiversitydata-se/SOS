@@ -28,6 +28,7 @@ using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
 using Nest;
 using Newtonsoft.Json.Converters;
+using Serilog;
 using SOS.Lib.ActionFilters;
 using SOS.Lib.ApplicationInsights;
 using SOS.Lib.Cache;
@@ -207,6 +208,7 @@ namespace SOS.Observations.Api
 #endif
 
             Configuration = builder.Build();
+            Settings.Init(Configuration); // or fail early!
         }
 
         /// <summary>
@@ -225,7 +227,7 @@ namespace SOS.Observations.Api
             CultureInfo.DefaultThreadCurrentCulture = culture;
             CultureInfo.DefaultThreadCurrentUICulture = culture;
 
-            var applicationInsightsConfiguration = Configuration.GetSection("ApplicationInsights").Get<Lib.Configuration.Shared.ApplicationInsights>();
+            var applicationInsightsConfiguration = Settings.ApplicationInsightsConfiguration;
             services.AddSingleton(applicationInsightsConfiguration);
 
             // Add application insights.
@@ -263,8 +265,8 @@ namespace SOS.Observations.Api
                 t => true);
 
             // Identity service configuration
-            var identityServerConfiguration = Configuration.GetSection("IdentityServer").Get<IdentityServerConfiguration>();
-            var userServiceConfiguration = Configuration.GetSection("UserServiceConfiguration").Get<UserServiceConfiguration>();
+            var identityServerConfiguration = Settings.IdentityServer;
+            var userServiceConfiguration = Settings.UserServiceConfiguration;
 
             // Authentication
             services.AddAuthentication(options =>
@@ -414,8 +416,7 @@ namespace SOS.Observations.Api
                     });
                 });
 
-            var observationApiConfiguration = Configuration.GetSection("ObservationApiConfiguration")
-                .Get<ObservationApiConfiguration>();
+            var observationApiConfiguration = Settings.ObservationApiConfiguration;
 
             // Response compression
             if (observationApiConfiguration.EnableResponseCompression)
@@ -434,7 +435,7 @@ namespace SOS.Observations.Api
             // Hangfire
             if (!_disableHangfireInit)
             {
-                var mongoConfiguration = Configuration.GetSection("HangfireDbConfiguration").Get<HangfireDbConfiguration>();
+                var mongoConfiguration = Settings.HangfireDbConfiguration;
                 services.AddHangfire(configuration =>
                     configuration
                         .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
@@ -459,36 +460,35 @@ namespace SOS.Observations.Api
                 );
             }
 
-            services.AddSingleton(Configuration.GetSection("CryptoConfiguration").Get<CryptoConfiguration>());
+            services.AddSingleton(Settings.CryptoConfiguration);
 
             //setup the elastic search configuration
-            var elasticConfiguration = Configuration.GetSection("SearchDbConfiguration").Get<ElasticSearchConfiguration>();
+            var elasticConfiguration = Settings.SearchDbConfiguration;
             services.AddSingleton<IElasticClientManager, ElasticClientManager>(p => new ElasticClientManager(elasticConfiguration));
 
             // Processed Mongo Db
-            var processedDbConfiguration = Configuration.GetSection("ProcessDbConfiguration").Get<MongoDbConfiguration>();
+            var processedDbConfiguration = Settings.ProcessDbConfiguration;
             var processedSettings = processedDbConfiguration.GetMongoDbSettings();
             services.AddScoped<IProcessClient, ProcessClient>(p => new ProcessClient(processedSettings, processedDbConfiguration.DatabaseName,
                 processedDbConfiguration.ReadBatchSize, processedDbConfiguration.WriteBatchSize));
 
-            var blobStorageConfiguration = Configuration.GetSection("BlobStorageConfiguration")
-                .Get<BlobStorageConfiguration>();
+            var blobStorageConfiguration = Settings.BlobStorageConfiguration;
 
-            var healthCheckConfiguration = Configuration.GetSection("HealthCheckConfiguration").Get<HealthCheckConfiguration>();
-            var artportalenApiServiceConfiguration = Configuration.GetSection("ArtportalenApiServiceConfiguration").Get<ArtportalenApiServiceConfiguration>();
+            var healthCheckConfiguration = Settings.HealthCheckConfiguration;
+            var artportalenApiServiceConfiguration = Settings.ArtportalenApiServiceConfiguration;
 
             // Add configuration
             services.AddSingleton(artportalenApiServiceConfiguration);
             services.AddSingleton(observationApiConfiguration);
             services.AddSingleton(blobStorageConfiguration);
-            services.AddSingleton(Configuration.GetSection("DevOpsConfiguration").Get<DevOpsConfiguration>());
+            services.AddSingleton(Settings.DevOpsConfiguration);
             services.AddSingleton(elasticConfiguration);
-            services.AddSingleton(Configuration.GetSection("InputValaidationConfiguration").Get<InputValaidationConfiguration>()!);
-            services.AddSingleton(Configuration.GetSection("UserServiceConfiguration").Get<UserServiceConfiguration>());
+            services.AddSingleton(Settings.InputValidationConfiguration!);
+            services.AddSingleton(userServiceConfiguration);
             services.AddSingleton(healthCheckConfiguration);
-            services.AddSingleton(Configuration.GetSection("VocabularyConfiguration").Get<VocabularyConfiguration>());
+            services.AddSingleton(Settings.VocabularyConfiguration);
             services.AddSingleton(Configuration);
-            services.AddSingleton(Configuration.GetSection("AreaConfiguration").Get<AreaConfiguration>());
+            services.AddSingleton(Settings.AreaConfiguration);
 
 
 #if !DEBUG
@@ -517,7 +517,8 @@ namespace SOS.Observations.Api
                     //.AddCheck<DuplicateHealthCheck>("Duplicate observations", tags: new[] { "elasticsearch", "harvest" })
                     .AddCheck<ElasticsearchHealthCheck>("Elasticsearch", tags: new[] { "database", "elasticsearch" })
                     .AddCheck<DependenciesHealthCheck>("Dependencies", tags: new[] { "dependencies" })
-                    .AddCheck<APDbRestoreHealthCheck>("Artportalen database backup restore", tags: new[] { "database", "sql server" });
+                    .AddCheck<APDbRestoreHealthCheck>("Artportalen database backup restore", tags: new[] { "database", "sql server" })
+                    .AddCheck<HealthCheck>("CustomHealthCheck", tags: new[] { "k8s" });
 
                 if (CurrentEnvironment.IsEnvironment("prod"))
                 {
@@ -716,12 +717,71 @@ namespace SOS.Observations.Api
             app.UseAuthentication();
             app.UseAuthorization();
 
+            // Use Serilog request logging.
+            app.UseSerilogRequestLogging(options =>
+            {
+                options.EnrichDiagnosticContext = (diagnosticContext, httpContext) =>
+                {
+                    if (httpContext.Items.TryGetValue("UserId", out var userId))
+                    {
+                        diagnosticContext.Set("UserId", userId);
+                    }
+
+                    if (httpContext.Items.TryGetValue("Email", out var email))
+                    {
+                        diagnosticContext.Set("Email", email);
+                    }
+
+                    if (httpContext.Items.TryGetValue("Endpoint", out var endpoint))
+                    {
+                        diagnosticContext.Set("Endpoint", endpoint);
+                    }
+
+                    if (httpContext.Items.TryGetValue("QueryString", out var queryString))
+                    {
+                        diagnosticContext.Set("QueryString", queryString);
+                    }
+
+                    if (httpContext.Items.TryGetValue("Handler", out var handler))
+                    {
+                        diagnosticContext.Set("Handler", handler);
+                    }
+
+                    try
+                    {
+                        var authHeader = httpContext.Request.Headers["Authorization"].FirstOrDefault();
+                        if (authHeader != null && authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+                        {
+                            string token = authHeader.Replace("Bearer ", "", StringComparison.OrdinalIgnoreCase);
+                            var jsonWebTokenHandler = new JsonWebTokenHandler();
+                            var jwt = jsonWebTokenHandler.ReadJsonWebToken(token);
+                            if (jwt != null)
+                            {
+                                string? clientId = jwt.Claims.FirstOrDefault(c => c.Type == "client_id")?.Value;
+                                if (clientId != null) diagnosticContext.Set("ClientId", clientId);
+                                string? name = jwt.Claims.FirstOrDefault(c => c.Type == "name")?.Value;
+                                if (name != null) diagnosticContext.Set("Name", name);
+                                if (jwt.Subject != null) diagnosticContext.Set("Subject", jwt.Subject);
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Logger.Error(ex, "Error when deserializing JWT.");
+                    }
+                };
+            });
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
 #if !DEBUG
                 if (!_disableHealthCheckInit)
                 {
+                    endpoints.MapHealthChecks("/healthz", new HealthCheckOptions()
+                    {
+                        Predicate = r => r.Tags.Contains("k8s")
+                    });
                     endpoints.MapHealthChecks("/health", new HealthCheckOptions()
                     {
                         Predicate = _ => false,

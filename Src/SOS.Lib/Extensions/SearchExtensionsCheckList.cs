@@ -147,7 +147,7 @@ namespace SOS.Lib
             query.TryAddGeographicFilter(filter.Location?.AreaGeographic);
             query.TryAddGeometryFilters(filter.Location?.Geometries);
             query.TryAddTermsCriteria("taxonIds", filter.Taxa?.Ids);
-            query.TryAddNestedTermsCriteria("projects", "id", filter.ProjectIds);
+            query.TryAddTermsCriteria("projects.id", filter.ProjectIds);
 
             return query;
         }
