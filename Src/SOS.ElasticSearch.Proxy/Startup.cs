@@ -86,7 +86,10 @@ namespace SOS.ElasticSearch.Proxy
             services.AddHealthChecks().AddCheck<HealthCheck>("CustomHealthCheck");
 
             // Add application insights.
-            services.AddApplicationInsightsTelemetry(Configuration);
+            services.AddApplicationInsightsTelemetry(options =>
+            {
+                options.ConnectionString = Settings.ApplicationInsightsConfiguration.ConnectionString;
+            });
             // Application insights custom
             services.AddApplicationInsightsTelemetryProcessor<IgnoreRequestPathsTelemetryProcessor>();
             var applicationInsightsConfiguration = Settings.ApplicationInsightsConfiguration;
