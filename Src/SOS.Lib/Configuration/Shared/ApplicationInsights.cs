@@ -8,7 +8,7 @@
         /// <summary>
         /// Connection string
         /// </summary>
-        public string ConnectionString => $"InstrumentationKey={InstrumentationKey};IngestionEndpoint=https://northeurope-3.in.applicationinsights.azure.com/;LiveEndpoint=https://northeurope.livediagnostics.monitor.azure.com/";
+        public string ConnectionString => $"InstrumentationKey={InstrumentationKey};IngestionEndpoint=https://northeurope-5.in.applicationinsights.azure.com/;LiveEndpoint=https://northeurope.livediagnostics.monitor.azure.com/;ApplicationId=e2ecaeec-e9eb-4ade-ab9a-2cabbe7b26c5";
 
         /// <summary>
         /// Log request body 
