@@ -57,7 +57,7 @@ namespace SOS.Lib.Extensions
         public static IEnumerable<SimpleMultimediaRow> ToSimpleMultimediaRows(this
             Observation observation)
         {
-            return observation?.Occurrence?.Media?.Select(m => m.ToSimpleMultimediaRow(observation.Event?.EventId, observation.Occurrence.OccurrenceId, false)) ?? Enumerable.Empty<SimpleMultimediaRow>();
+            return observation?.Occurrence?.Media?.Select(m => m.ToSimpleMultimediaRow(observation.Event?.EventId, observation.Occurrence.OccurrenceId, false, false)) ?? Enumerable.Empty<SimpleMultimediaRow>();
         }
 
         public static IEnumerable<SimpleMultimediaRow> ToArtportalenSimpleMultimediaRows(this
@@ -69,18 +69,18 @@ namespace SOS.Lib.Extensions
         public static IEnumerable<SimpleMultimediaRow> ToArtportalenSimpleMultimediaRows(this
             Observation observation)
         {
-            return observation?.ArtportalenInternal?.Media?.Select(m => m.ToSimpleMultimediaRow(observation.Event?.EventId, observation.Occurrence.OccurrenceId, true)) ?? Enumerable.Empty<SimpleMultimediaRow>();
+            return observation?.ArtportalenInternal?.Media?.Select(m => m.ToSimpleMultimediaRow(observation.Event?.EventId, observation.Occurrence.OccurrenceId, true, true)) ?? Enumerable.Empty<SimpleMultimediaRow>();
         }
 
         private static SimpleMultimediaRow ToSimpleMultimediaRow(
-            this Multimedia multimedia, string eventId, string occurrenceId, bool emptyIdentifier)
+            this Multimedia multimedia, string eventId, string occurrenceId, bool emptyIdentifier, bool useTextHtmlFormat)
         {
             return new SimpleMultimediaRow
             {
                 EventId = eventId,
                 OccurrenceId = occurrenceId,
-                Type = multimedia.Type,
-                Format = multimedia.Format,
+                Type = useTextHtmlFormat ? "Text" : multimedia.Type,
+                Format = useTextHtmlFormat ? "text/html" : multimedia.Format,
                 Identifier = emptyIdentifier ? "" : multimedia.Identifier,
                 References = multimedia.References,
                 Title = multimedia.Title,
