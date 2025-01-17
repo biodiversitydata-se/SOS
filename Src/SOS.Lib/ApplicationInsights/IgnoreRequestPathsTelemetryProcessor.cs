@@ -2,12 +2,14 @@
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.ApplicationInsights.Extensibility;
 using System;
+using System.Linq;
 
 namespace SOS.Lib.ApplicationInsights
 {
     public class IgnoreRequestPathsTelemetryProcessor : ITelemetryProcessor
     {
         private readonly ITelemetryProcessor _next;
+        private readonly string[] _ignorePaths = { "swagger", ".", "healthz" };
 
         /// <summary>
         /// Constructor
@@ -20,11 +22,14 @@ namespace SOS.Lib.ApplicationInsights
 
         public void Process(ITelemetry item)
         {
+            var requestTelemetry = item as RequestTelemetry;
 
-            if (item is RequestTelemetry request &&
-                (request.Url.AbsolutePath.Contains("swagger", StringComparison.CurrentCultureIgnoreCase) || request.Url.AbsolutePath.Contains(".")))
+            if (requestTelemetry != null)
             {
-                return;
+                if (_ignorePaths.Any(ignorePath => requestTelemetry.Url.AbsolutePath.Contains(ignorePath, StringComparison.CurrentCultureIgnoreCase)))
+                { 
+                    return;                    
+                }
             }
 
             _next.Process(item);
