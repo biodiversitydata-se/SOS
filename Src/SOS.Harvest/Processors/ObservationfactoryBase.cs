@@ -273,6 +273,45 @@ namespace SOS.Harvest.Processors
             }
         }
 
+        /// <summary>
+        /// Calculate organism quantity
+        /// </summary>
+        /// <param name="verbatimObservation"></param>
+        /// <returns></returns>
+        protected void CalculateOrganismQuantity(Observation observation)
+        {
+            if (observation.Occurrence.OrganismQuantityInt.HasValue)
+            {
+                observation.Occurrence.OrganismQuantityAggregation = observation.Occurrence.OrganismQuantityInt;
+                return;                
+            }
+
+            if (int.TryParse(observation.Occurrence.OrganismQuantity, out var quantity))
+            {
+                observation.Occurrence.OrganismQuantityAggregation = quantity;
+                observation.Occurrence.OrganismQuantityInt = quantity;
+                return;
+            }
+            else if (int.TryParse(observation.Occurrence.IndividualCount, out var individualCount))
+            {
+                observation.Occurrence.OrganismQuantityAggregation = individualCount;
+                observation.Occurrence.OrganismQuantityInt = individualCount;
+                observation.Occurrence.OrganismQuantity = individualCount.ToString();
+                return;
+            }
+
+            if (observation.Occurrence.IsPositiveObservation)
+            {
+                observation.Occurrence.OrganismQuantityAggregation = 1;
+                observation.Occurrence.OrganismQuantityInt = 1;
+                observation.Occurrence.OrganismQuantity = "1";
+                return;
+            }
+
+            observation.Occurrence.OrganismQuantityAggregation = 0;
+            observation.Occurrence.OrganismQuantityInt = null;
+        }
+
         protected int GetBirdNestActivityId(VocabularyValue? activity, Lib.Models.Processed.Observation.Taxon? taxon)
         {
             if (taxon?.IsBird() ?? false)

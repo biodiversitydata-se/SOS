@@ -346,7 +346,7 @@ namespace SOS.Harvest.Processors.VirtualHerbarium
 
             // Populate generic data
             PopulateGenericData(obs);
-
+            CalculateOrganismQuantity(obs);
             return obs;
         }
 

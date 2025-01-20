@@ -225,6 +225,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             PopulateGenericData(obs);
 
             obs.Occurrence.BirdNestActivityId = GetBirdNestActivityId(obs.Occurrence.Activity, obs.Taxon);
+            CalculateOrganismQuantity(obs);
             return obs;
         }
 
@@ -477,11 +478,6 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                 VocabularyById[VocabularyId.OccurrenceStatus],
                 (int)OccurrenceStatusId.Present);
             processedOccurrence.OrganismQuantity = verbatim.OrganismQuantity;
-            if (int.TryParse(verbatim.OrganismQuantity, out var quantity))
-            {
-                processedOccurrence.OrganismQuantityAggregation = quantity;
-                processedOccurrence.OrganismQuantityInt = quantity;
-            }
             processedOccurrence.OrganismQuantityUnit = GetSosId(verbatim.OrganismQuantityType, VocabularyById[VocabularyId.Unit]);
             processedOccurrence.OtherCatalogNumbers = verbatim.OtherCatalogNumbers;
             processedOccurrence.Preparations = verbatim.Preparations;
@@ -504,7 +500,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             }
 
             //processedOccurrence.ProtectionLevel = CalculateProtectionLevel(taxon, accessRightsId);
-            processedOccurrence.SensitivityCategory = CalculateProtectionLevel(taxon, accessRightsId);
+            processedOccurrence.SensitivityCategory = CalculateProtectionLevel(taxon, accessRightsId);            
             return processedOccurrence;
         }
 
