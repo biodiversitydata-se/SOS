@@ -54,6 +54,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
                 var taxonLists = await _taxonListManager.GetTaxonListsAsync();
 
@@ -85,6 +86,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 var taxonLists = await _taxonListManager.GetTaxonListsAsync();
 
                 if (!taxonLists?.Any() ?? true)

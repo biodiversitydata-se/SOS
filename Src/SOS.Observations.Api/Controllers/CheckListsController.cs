@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using SOS.Lib.Helpers;
 
 namespace SOS.Observations.Api.Controllers
 {
@@ -69,6 +70,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 var taxaValidation = await ValidateTaxaAsync(filter?.TaxonId == null ? new int[0] : new[] { filter.TaxonId });
 
                 if (taxaValidation.IsFailure)
@@ -99,6 +101,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 return new OkObjectResult(await _checklistManager.GetChecklistAsync(id));
             }
             catch (Exception e)
@@ -121,6 +124,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 return new OkObjectResult(await _checklistManager.GetChecklistInternalAsync(id));
             }
             catch (Exception e)

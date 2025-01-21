@@ -1,6 +1,7 @@
 ﻿using Hangfire;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using SOS.Lib.Helpers;
 using SOS.Lib.Swagger;
 using System;
 using System.Net;
@@ -40,6 +41,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 var connection = JobStorage.Current.GetConnection();
                 var jobData = connection.GetJobData(jobId);
 

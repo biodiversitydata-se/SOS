@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging.Abstractions;
 using Nest;
+using Serilog;
 using SOS.ElasticSearch.Proxy.ApplicationInsights;
 using SOS.ElasticSearch.Proxy.Middleware;
 using SOS.Lib.ApplicationInsights;
@@ -85,7 +86,10 @@ namespace SOS.ElasticSearch.Proxy
             services.AddHealthChecks().AddCheck<HealthCheck>("CustomHealthCheck");
 
             // Add application insights.
-            services.AddApplicationInsightsTelemetry(Configuration);
+            services.AddApplicationInsightsTelemetry(options =>
+            {
+                options.ConnectionString = Settings.ApplicationInsightsConfiguration.ConnectionString;
+            });
             // Application insights custom
             services.AddApplicationInsightsTelemetryProcessor<IgnoreRequestPathsTelemetryProcessor>();
             var applicationInsightsConfiguration = Settings.ApplicationInsightsConfiguration;
@@ -172,6 +176,28 @@ namespace SOS.ElasticSearch.Proxy
             );
 
             app.UseMiddleware<RequestMiddleware>();
+
+            // Use Serilog request logging.
+            app.UseSerilogRequestLogging(options =>
+            {
+                options.EnrichDiagnosticContext = (diagnosticContext, httpContext) =>
+                {
+                    if (httpContext.Items.TryGetValue("Endpoint", out var endpoint))
+                    {
+                        diagnosticContext.Set("Endpoint", endpoint);
+                    }
+
+                    if (httpContext.Items.TryGetValue("QueryString", out var queryString))
+                    {
+                        diagnosticContext.Set("QueryString", queryString);
+                    }
+
+                    if (httpContext.Items.TryGetValue("Handler", out var handler))
+                    {
+                        diagnosticContext.Set("Handler", handler);
+                    }
+                };
+            });
         }
     }
 }

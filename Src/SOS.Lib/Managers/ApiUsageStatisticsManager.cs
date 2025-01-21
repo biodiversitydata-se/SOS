@@ -26,6 +26,8 @@ namespace SOS.Lib.Managers
         private IApiManagementUserService _apiManagementUserService;
         private readonly IUserService _userService;
         private readonly ILogger<ApiUsageStatisticsManager> _logger;
+        const int WfsAvgDownload = 100; // WFS doesn't log observation count.
+        const int ObsAvgDownload = 100; // used when the calculation were wrong in some endpoints before 2024-10-15.
 
         private HashSet<string> _observationDetailEndpoints = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
@@ -62,7 +64,7 @@ namespace SOS.Lib.Managers
         {
             "Observations/ObservationsBySearchInternal",
             "Observations/ObservationsBySearch",
-            "Observations/ObservationsBySearchDwc"            
+            "Observations/ObservationsBySearchDwc"
         };
 
         /// <summary>
@@ -193,7 +195,7 @@ namespace SOS.Lib.Managers
             while (await cursor.MoveNextAsync())
             {
                 foreach (ApiUsageStatistics row in cursor.Current)
-                {                    
+                {
                     // Loop through each month
                     while (current <= toDate)
                     {
@@ -209,13 +211,13 @@ namespace SOS.Lib.Managers
 
                             // Observations
                             if (_observationDetailEndpoints.Contains(row.Endpoint))
-                            {                                
+                            {
                                 downloadCount += row.SumResponseCount;
 
                                 result[untilDateKey].ObsevationsRequestCount += row.RequestCount;
                                 result[untilDateKey].ObservationsDownloadCount += GetObservationCount(row);
 
-                                string domain = GetDomain(row);                  
+                                string domain = GetDomain(row);
                                 if (!result[untilDateKey].StatisticsByDomain.ContainsKey(domain))
                                     result[untilDateKey].StatisticsByDomain.Add(domain, new RequestCountTuple());
 
@@ -231,21 +233,21 @@ namespace SOS.Lib.Managers
                                 string domain = GetDomain(row);
                                 if (!result[betweenDateKey].StatisticsByDomain.ContainsKey(domain))
                                     result[betweenDateKey].StatisticsByDomain.Add(domain, new RequestCountTuple());
-                               
+
                                 result[betweenDateKey].StatisticsByDomain[domain].RequestCount += row.RequestCount;
                                 result[betweenDateKey].StatisticsByDomain[domain].DownloadCount += GetObservationCount(row);
                             }
 
                             // WFS
                             if (_wfsEndpoints.Contains(row.Endpoint))
-                            {
-                                result[untilDateKey].WfsRequestCount += row.RequestCount;
+                            {                                
+                                result[untilDateKey].WfsRequestCount += row.RequestCount;                                
                                 result[untilDateKey].WfsDownloadCount += GetObservationCount(row);
                             }
 
                             if (row.Date >= startBetweenDate && _wfsEndpoints.Contains(row.Endpoint))
-                            {
-                                result[betweenDateKey].WfsRequestCount += row.RequestCount;
+                            {                                
+                                result[betweenDateKey].WfsRequestCount += row.RequestCount;                                
                                 result[betweenDateKey].WfsDownloadCount += GetObservationCount(row);
                             }
                         }
@@ -256,9 +258,11 @@ namespace SOS.Lib.Managers
                     }
 
                     current = new DateTime(fromDate.Year, fromDate.Month, DateTime.DaysInMonth(fromDate.Year, fromDate.Month), 23, 59, 59);
-                }
+                }               
             }
-            
+
+            FixWrongObservationCount(result);
+
             // Sort the domain results
             foreach (var pair in result)
             {
@@ -266,7 +270,37 @@ namespace SOS.Lib.Managers
             }
 
             return result;
-        }       
+        }
+
+        private void FixWrongObservationCount(Dictionary<string, RequestStatistics> result)
+        {
+            // WFS logging didn't work between 2024-12-01 and 2025-01-16.
+            if (result.TryGetValue("2024-12-01 to 2024-12-31", out var december2024))
+            {
+                december2024.WfsRequestCount += 700000;
+                december2024.WfsDownloadCount += 700000 * WfsAvgDownload;
+            }
+
+            if (result.TryGetValue("Until 2024-12-31", out var untilDecember2024))
+            {
+                untilDecember2024.WfsRequestCount += 700000;
+                untilDecember2024.WfsDownloadCount += 700000 * WfsAvgDownload;
+            }
+
+            if (result.TryGetValue("2025-01-01 to 2025-01-31", out var january2025))
+            {
+                january2025.WfsRequestCount += 350000;
+                january2025.WfsDownloadCount += 350000 * WfsAvgDownload;
+            }
+
+            if (result.TryGetValue("Until 2025-01-31", out var untiljanuary2025))
+            {
+                untiljanuary2025.WfsRequestCount += 350000;
+                untiljanuary2025.WfsDownloadCount += 350000 * WfsAvgDownload;
+            }
+
+        }
+
 
         private string GetDomain(ApiUsageStatistics row)
         {
@@ -279,13 +313,10 @@ namespace SOS.Lib.Managers
 
         private DateTime _wrongCountDate = new DateTime(2024, 10, 15);
         private long GetObservationCount(ApiUsageStatistics row)
-        {
-            const int wfsAvgDownload = 100; // WFS doesn't log observation count.
-            const int obsAvgDownload = 100; // used when the calculation were wrong in some endpoints before 2024-10-15.
-
+        {            
             if (row.Date < _wrongCountDate && _observationEndpointsWithWrongCountBefore20241015.Contains(row.Endpoint))
             {                
-                return row.RequestCount * obsAvgDownload;
+                return row.RequestCount * ObsAvgDownload;
             }
 
             if (_observationDetailEndpoints.Contains(row.Endpoint))
@@ -295,7 +326,7 @@ namespace SOS.Lib.Managers
 
             if (_wfsEndpoints.Contains(row.Endpoint))
             {                
-                return row.SumResponseCount == 0 ? row.RequestCount * wfsAvgDownload : row.SumResponseCount;
+                return row.SumResponseCount == 0 ? row.RequestCount * WfsAvgDownload : row.SumResponseCount;
             }
 
             return 0;

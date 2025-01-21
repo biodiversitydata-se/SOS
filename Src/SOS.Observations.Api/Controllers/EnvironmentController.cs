@@ -9,6 +9,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using SOS.Shared.Api.Dtos;
+using SOS.Lib.Helpers;
 
 namespace SOS.Observations.Api.Controllers
 {
@@ -53,6 +54,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 var environmentInformationDto = new EnvironmentInformationDto
                 {
                     EnvironmentType = WebHostEnvironment.EnvironmentName,

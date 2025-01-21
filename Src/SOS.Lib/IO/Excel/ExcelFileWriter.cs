@@ -148,6 +148,7 @@ namespace SOS.Lib.IO.Excel
                 int nrObservations = 0;
                 var projectIds = await _processedObservationRepository.GetProjectIdsAsync(filter);
                 var projects = await _projectManager.GetAsync(projectIds);
+                _logger.LogInformation($"Exporting projects to Excel. ProjectIds.Count={projectIds?.Count()}, Projects.Count={projects?.Count()}, dynamicProjectDataFields={dynamicProjectDataFields}");
 
                 var propertyFields = dynamicProjectDataFields && (projects?.Any() ?? false) ? 
                     ObservationPropertyFieldDescriptionHelper.GetExportFieldsFromOutputFields(filter.Output?.Fields, projects: projects) 

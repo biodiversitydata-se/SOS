@@ -642,6 +642,42 @@ namespace SOS.Lib.Extensions
                     )));
         }
 
+        public static void TryAddAndTermCriteria(this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query,            
+            IDictionary<string, object> fieldValues)
+        {
+            if (!fieldValues?.Any() ?? true)
+            {
+                return;
+            }
+
+            var objectQuery = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
+
+            foreach (var fieldValue in fieldValues)
+            {
+                objectQuery.TryAddTermCriteria($"{fieldValue.Key}", fieldValue.Value);
+            }
+
+            query.Add(q => q
+                .Bool(b => b
+                    .Must(objectQuery)
+                ));
+        }
+
+        public static void TryAddAndCriteria(this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query,
+            List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> queries)
+        {
+            if (!queries?.Any() ?? true)
+            {
+                return;
+            }
+            
+            query.Add(q => q
+                .Bool(b => b
+                    .Must(queries)
+                ));
+        }
+
+
         /// <summary>
         /// Try to add query criteria
         /// </summary>

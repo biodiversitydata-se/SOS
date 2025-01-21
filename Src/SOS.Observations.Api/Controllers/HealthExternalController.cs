@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver.Linq;
+using SOS.Lib.Helpers;
 using SOS.Lib.Swagger;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Repositories.Interfaces;
@@ -57,6 +58,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 var start = DateTime.Now;
                 var healthCheck = await _healthCheckService.CheckHealthAsync(new System.Threading.CancellationToken());
                 var entries = new Dictionary<string, HealthReportEntry>();

@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
+using SOS.Lib.Helpers;
 
 namespace SOS.Observations.Api.Controllers
 {
@@ -68,6 +69,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 var dataset = await _dataStewardshipManager.GetDatasetByIdAsync(id);
                 if (dataset == null) return new StatusCodeResult((int)HttpStatusCode.NoContent);
 
@@ -122,6 +124,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 var validationResult = Result.Combine(
                     _inputValidator.ValidateSearchPagingArguments(skip, take),
                     validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(filter)) : Result.Success(),
@@ -186,6 +189,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 var @event = await _dataStewardshipManager.GetEventByIdAsync(id, responseCoordinateSystem);
                 if (@event == null) return new StatusCodeResult((int)HttpStatusCode.NoContent);
 
@@ -240,6 +244,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 var validationResult = Result.Combine(
                     _inputValidator.ValidateSearchPagingArguments(skip, take),
                     validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(filter)) : Result.Success(),
@@ -298,6 +303,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 var occurrence = await _dataStewardshipManager.GetOccurrenceByIdAsync(id, responseCoordinateSystem);
                 if (occurrence == null) return new StatusCodeResult((int)HttpStatusCode.NoContent);
 
@@ -352,6 +358,7 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 var validationResult = Result.Combine(
                     _inputValidator.ValidateSearchPagingArguments(skip, take),
                     validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(filter)) : Result.Success(),
