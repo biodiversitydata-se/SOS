@@ -57,7 +57,6 @@ namespace SOS.ElasticSearch.Proxy.ApplicationInsights
         /// Constructor
         /// </summary>
         /// <param name="httpContextAccessor"></param>
-        /// <param name="applicationInsightsConfiguration"></param>
         public TelemetryInitializer(IHttpContextAccessor httpContextAccessor) : base(httpContextAccessor)
         {
 

@@ -92,12 +92,12 @@ namespace SOS.ElasticSearch.Proxy
             });
             // Application insights custom
             services.AddApplicationInsightsTelemetryProcessor<IgnoreRequestPathsTelemetryProcessor>();
-            var applicationInsightsConfiguration = Settings.ApplicationInsightsConfiguration;
-            if (applicationInsightsConfiguration == null)
+            
+            if (Settings.ApplicationInsightsConfiguration == null)
             {
                 throw new Exception("Failed to load Application Insights Configuration");
             }
-            services.AddSingleton(applicationInsightsConfiguration);
+            services.AddSingleton(Settings.ApplicationInsightsConfiguration);
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton<ITelemetryInitializer, TelemetryInitializer>();
 

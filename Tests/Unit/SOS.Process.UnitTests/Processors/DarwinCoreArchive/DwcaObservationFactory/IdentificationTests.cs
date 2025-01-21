@@ -64,6 +64,30 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
             result.Identification.DateIdentified.Should().Be(date.ToString());
         }
 
+        [Fact]
+        public void DataProvider_with_ReportedAsExpert_as_default()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            var dwcaObservationFactory = _fixture.CreateDwcaObservationFactory(ValidationStatusId.ReportedByExpert);
+            var builder = new DwcObservationVerbatimBuilder();
+            var dwcaObservation = builder
+                .WithDefaultValues()
+                .Build();
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var result = dwcaObservationFactory.CreateProcessedObservation(dwcaObservation, true);
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            result.Identification.VerificationStatus.Id.Should().Be((int)ValidationStatusId.ReportedByExpert);
+            result.Identification.Verified.Should().Be(true);
+        }
+
         [Theory]
         [InlineData("verified", ValidationStatusId.Verified, true)]
         [InlineData("unverified", ValidationStatusId.Unvalidated, false)]
