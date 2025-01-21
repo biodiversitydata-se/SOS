@@ -3,6 +3,7 @@ using SOS.Harvest.Processors.DarwinCoreArchive;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Enums;
+using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
@@ -36,9 +37,9 @@ namespace SOS.Process.UnitTests.TestHelpers
             DwcaObservationFactory = null;
         }
 
-        private DwcaObservationFactory CreateDwcaObservationFactory()
+        public DwcaObservationFactory CreateDwcaObservationFactory(ValidationStatusId? verificationStatusId = null)
         {
-            var dataProviderDummy = new DataProvider();
+            var dataProviderDummy = new DataProvider { DefaultVerificationStatusId = verificationStatusId };
             var mammaliaTaxa =
                 MessagePackHelper.CreateListFromMessagePackFile<Taxon>(
                     @"Resources/MammaliaProcessedTaxa.msgpck");

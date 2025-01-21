@@ -23,6 +23,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
     public class DwcaObservationFactory : ObservationFactoryBase, IObservationFactory<DwcObservationVerbatim>
     {
         private int DefaultCoordinateUncertaintyInMeters = 5000;
+        private readonly DataProvider _dataProvider;
         private readonly IAreaHelper _areaHelper;
         private readonly NetTopologySuite.IO.WKTReader _wktReader = new NetTopologySuite.IO.WKTReader();
 
@@ -47,6 +48,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             IProcessTimeManager processTimeManager,
             ProcessConfiguration processConfiguration) : base(dataProvider, taxa, dwcaVocabularyById, processTimeManager, processConfiguration)
         {
+            _dataProvider = dataProvider;
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
             _englishDataproviderName = dataProvider?.Names?.Translate("en-GB")!;
             _englishOrganizationName = dataProvider?.Organizations?.Translate("en-GB")!;
@@ -372,6 +374,10 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             processedIdentification.IdentificationReferences = verbatim.IdentificationReferences;
             processedIdentification.IdentificationRemarks = verbatim.IdentificationRemarks?.Clean();
             processedIdentification.VerificationStatus = GetSosId(verbatim.IdentificationVerificationStatus, VocabularyById[VocabularyId.VerificationStatus]);
+            if (processedIdentification.VerificationStatus == null && _dataProvider.DefaultVerificationStatusId != null)
+            {
+                processedIdentification.VerificationStatus = VocabularyValue.Create((int)_dataProvider.DefaultVerificationStatusId);
+            }
             processedIdentification.Verified = GetIsValidated(processedIdentification.VerificationStatus);
             processedIdentification.IdentifiedBy = verbatim.IdentifiedBy?.Clean();
             processedIdentification.TypeStatus = verbatim.TypeStatus;

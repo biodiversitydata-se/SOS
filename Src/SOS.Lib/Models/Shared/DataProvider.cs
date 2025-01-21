@@ -3,6 +3,7 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json.Converters;
 using SOS.Lib.Enums;
+using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Interfaces;
 using System;
@@ -35,6 +36,11 @@ namespace SOS.Lib.Models.Shared
         ///     Some providers have multiple dataset 
         /// </summary>
         public IEnumerable<DataProviderDataset> Datasets { get; set; }
+
+        /// <summary>
+        ///     Default verification status
+        /// </summary>
+        public ValidationStatusId? DefaultVerificationStatusId { get; set; }
 
         /// <summary>
         ///     Descriptions of the data provider 
