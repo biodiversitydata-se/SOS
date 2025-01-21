@@ -23,6 +23,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
     public class DwcaObservationFactory : ObservationFactoryBase, IObservationFactory<DwcObservationVerbatim>
     {
         private int DefaultCoordinateUncertaintyInMeters = 5000;
+        private readonly DataProvider _dataProvider;
         private readonly IAreaHelper _areaHelper;
         private readonly NetTopologySuite.IO.WKTReader _wktReader = new NetTopologySuite.IO.WKTReader();
 
@@ -47,6 +48,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             IProcessTimeManager processTimeManager,
             ProcessConfiguration processConfiguration) : base(dataProvider, taxa, dwcaVocabularyById, processTimeManager, processConfiguration)
         {
+            _dataProvider = dataProvider;
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
             _englishDataproviderName = dataProvider?.Names?.Translate("en-GB")!;
             _englishOrganizationName = dataProvider?.Organizations?.Translate("en-GB")!;
@@ -225,6 +227,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             PopulateGenericData(obs);
 
             obs.Occurrence.BirdNestActivityId = GetBirdNestActivityId(obs.Occurrence.Activity, obs.Taxon);
+            CalculateOrganismQuantity(obs);
             return obs;
         }
 
@@ -372,6 +375,10 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             processedIdentification.IdentificationReferences = verbatim.IdentificationReferences;
             processedIdentification.IdentificationRemarks = verbatim.IdentificationRemarks?.Clean();
             processedIdentification.VerificationStatus = GetSosId(verbatim.IdentificationVerificationStatus, VocabularyById[VocabularyId.VerificationStatus]);
+            if (processedIdentification.VerificationStatus == null && _dataProvider.DefaultVerificationStatus != null)
+            {
+                processedIdentification.VerificationStatus = VocabularyValue.Create((int)_dataProvider.DefaultVerificationStatus);
+            }
             processedIdentification.Verified = GetIsValidated(processedIdentification.VerificationStatus);
             processedIdentification.IdentifiedBy = verbatim.IdentifiedBy?.Clean();
             processedIdentification.TypeStatus = verbatim.TypeStatus;
@@ -477,11 +484,6 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                 VocabularyById[VocabularyId.OccurrenceStatus],
                 (int)OccurrenceStatusId.Present);
             processedOccurrence.OrganismQuantity = verbatim.OrganismQuantity;
-            if (int.TryParse(verbatim.OrganismQuantity, out var quantity))
-            {
-                processedOccurrence.OrganismQuantityAggregation = quantity;
-                processedOccurrence.OrganismQuantityInt = quantity;
-            }
             processedOccurrence.OrganismQuantityUnit = GetSosId(verbatim.OrganismQuantityType, VocabularyById[VocabularyId.Unit]);
             processedOccurrence.OtherCatalogNumbers = verbatim.OtherCatalogNumbers;
             processedOccurrence.Preparations = verbatim.Preparations;
@@ -504,7 +506,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             }
 
             //processedOccurrence.ProtectionLevel = CalculateProtectionLevel(taxon, accessRightsId);
-            processedOccurrence.SensitivityCategory = CalculateProtectionLevel(taxon, accessRightsId);
+            processedOccurrence.SensitivityCategory = CalculateProtectionLevel(taxon, accessRightsId);            
             return processedOccurrence;
         }
 

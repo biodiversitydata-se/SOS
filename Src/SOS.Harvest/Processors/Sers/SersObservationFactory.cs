@@ -109,7 +109,7 @@ namespace SOS.Harvest.Processors.Sers
 
             // Populate generic data
             PopulateGenericData(obs);
-
+            CalculateOrganismQuantity(obs);
             return obs;
         }
 

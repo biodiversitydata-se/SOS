@@ -386,6 +386,7 @@
     },
     "CoordinateUncertaintyInMeters": 5000,
     "CreateEventDwC": false,
+    "DefaultVerificationStatus": "ReportedByExpert",
     "Descriptions": [
       {
         "CultureCode": "en-GB",
@@ -538,6 +539,7 @@
         "type": "Observations"
       }
     ],
+    "DefaultVerificationStatus": "ReportedByExpert",
     "Descriptions": [
       {
         "CultureCode": "en-GB",
@@ -620,6 +622,7 @@
         "type": "Observations"
       }
     ],
+    "DefaultVerificationStatus": "ReportedByExpert",
     "Descriptions": [
       {
         "CultureCode": "en-GB",
@@ -702,6 +705,7 @@
         "type": "Observations"
       }
     ],
+    "DefaultVerificationStatus": "ReportedByExpert",
     "Descriptions": [
       {
         "CultureCode": "en-GB",
@@ -782,6 +786,7 @@
         "type": "Observations"
       }
     ],
+    "DefaultVerificationStatus": "ReportedByExpert",
     "Descriptions": [
       {
         "CultureCode": "en-GB",
@@ -1713,6 +1718,7 @@
         "type": "Observations"
       }
     ],
+    "DefaultVerificationStatus": "ReportedByExpert",
     "Descriptions": [
       {
         "CultureCode": "en-GB",
@@ -1784,6 +1790,7 @@
     },
     "CoordinateUncertaintyInMeters": 2000,
     "CreateEventDwC": true,
+    "DefaultVerificationStatus": "ReportedByExpert",
     "Descriptions": [
       {
         "CultureCode": "en-GB",
@@ -1893,6 +1900,7 @@
         "type": "Observations"
       }
     ],
+    "DefaultVerificationStatus": "ReportedByExpert",
     "Descriptions": [
       {
         "CultureCode": "en-GB",
@@ -1983,6 +1991,7 @@
         "type": "Observations"
       }
     ],
+    "DefaultVerificationStatus": "ReportedByExpert",
     "Descriptions": [
       {
         "CultureCode": "en-GB",

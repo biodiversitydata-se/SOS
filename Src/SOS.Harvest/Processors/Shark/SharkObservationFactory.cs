@@ -121,7 +121,7 @@ namespace SOS.Harvest.Processors.Shark
              */
             // Populate generic data
             PopulateGenericData(obs);
-
+            CalculateOrganismQuantity(obs);
             return obs;
         }
 

@@ -120,7 +120,7 @@ namespace SOS.Harvest.Processors.Mvm
 
             // Populate generic data
             PopulateGenericData(obs);
-
+            CalculateOrganismQuantity(obs);
             return obs;
         }
 

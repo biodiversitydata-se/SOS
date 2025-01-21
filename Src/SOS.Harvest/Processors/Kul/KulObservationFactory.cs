@@ -111,7 +111,7 @@ namespace SOS.Harvest.Processors.Kul
 
             // Populate generic data
             PopulateGenericData(obs);
-
+            CalculateOrganismQuantity(obs);
             return obs;
         }
 

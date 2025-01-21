@@ -142,6 +142,7 @@ namespace SOS.Harvest.Processors.ObservationDatabase
             PopulateGenericData(obs);
             obs.Occurrence.Activity = GetActivityValue(verbatim, taxon);
             obs.Occurrence.BirdNestActivityId = GetBirdNestActivityId(obs.Occurrence.Activity, taxon);
+            CalculateOrganismQuantity(obs);
             return obs;
         }
 

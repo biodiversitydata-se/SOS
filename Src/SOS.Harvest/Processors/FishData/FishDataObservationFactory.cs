@@ -110,7 +110,7 @@ namespace SOS.Harvest.Processors.FishData
 
             // Populate generic data
             PopulateGenericData(obs);
-
+            CalculateOrganismQuantity(obs);
             return obs;
         }
 
