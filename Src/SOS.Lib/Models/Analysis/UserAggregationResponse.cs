@@ -13,10 +13,13 @@
         public int Count { get; set; }
 
         /// <summary>
+        /// Organism quantity
+        /// </summary>
+        public int OrganismQuantity { get; set; }        
+
+        /// <summary>
         /// Unique taxon count
         /// </summary>
         public int UniqueTaxon { get; set; }
     }
-
-
 }

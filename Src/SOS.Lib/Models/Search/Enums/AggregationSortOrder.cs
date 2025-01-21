@@ -5,6 +5,8 @@
         CountDescending,
         CountAscending,
         KeyAscending,
-        KeyDescending
+        KeyDescending,
+        OrganismQuantityAscending,
+        OrganismQuantityDescending
     }
 }

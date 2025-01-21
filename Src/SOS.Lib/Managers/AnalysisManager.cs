@@ -30,6 +30,7 @@ using SOS.Lib.Models.Analysis;
 using System.Diagnostics;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
+using SOS.Lib.Models.Search.Result;
 
 namespace SOS.Lib.Managers
 {
@@ -141,15 +142,15 @@ namespace SOS.Lib.Managers
         public async Task<PagedAggregationResult<UserAggregationResponse>?> AggregateByUserFieldAsync(
             int? roleId,
             string authorizationApplicationIdentifier,
-            SearchFilter filter,
+            SearchFilter filter,            
             string aggregationField,
+            bool aggregateOrganismQuantity,
             int? precisionThreshold,
             string afterKey,
             int? take)
         {
             await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
-            var result = await _processedObservationRepository.AggregateByUserFieldAsync(filter, aggregationField, precisionThreshold, afterKey, take);
-
+            var result = await _processedObservationRepository.AggregateByUserFieldAsync(filter, aggregationField, aggregateOrganismQuantity, precisionThreshold, afterKey, take);
 
             return new PagedAggregationResult<UserAggregationResponse>
             {
@@ -158,38 +159,46 @@ namespace SOS.Lib.Managers
                 {
                     AggregationField = r.AggregationField,
                     Count = (int)r.DocCount,
-                    UniqueTaxon = (int)r.UniqueTaxon
+                    UniqueTaxon = (int)r.UniqueTaxon,
+                    OrganismQuantity = (int)r.OrganismQuantity
                 })!
             };
         }
 
         /// <inheritdoc/>
-        public async Task<IEnumerable<AggregationItem>?> AggregateByUserFieldAsync(
+        public async Task<IEnumerable<AggregationItemOrganismQuantity>?> AggregateByUserFieldAsync(
             int? roleId,
             string authorizationApplicationIdentifier,
             SearchFilter filter,
             string aggregationField,
+            bool aggregateOrganismQuantity,
             int? precisionThreshold,
             int take,
             AggregationSortOrder sortOrder = AggregationSortOrder.CountDescending)
         {
             await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
+            if (aggregateOrganismQuantity)
+            {
+                var resultIncludingOrganismQuantity = await _processedObservationRepository.GetAggregationItemsAggregateOrganismQuantityAsync(filter, aggregationField, precisionThreshold ?? 40000, take, sortOrder);
+                return resultIncludingOrganismQuantity;
+            }
+            
             var result = await _processedObservationRepository.GetAggregationItemsAsync(filter, aggregationField, precisionThreshold ?? 40000, take, sortOrder);
-
-            return result?.Select(i => new AggregationItem { AggregationKey = i.AggregationKey, DocCount = i.DocCount })!;
+            return result?.Select(i => new AggregationItemOrganismQuantity { AggregationKey = i.AggregationKey, DocCount = i.DocCount })!;
         }
 
         /// <inheritdoc/>
         public async Task<FeatureCollection> AtlasAggregateAsync(
-        int? roleId,
-        string authorizationApplicationIdentifier,
-        SearchFilter filter,
-        AtlasAreaSize atlasSize)
+            int? roleId,
+            string authorizationApplicationIdentifier,
+            SearchFilter filter,
+            bool aggregateOrganismQuantity,
+            AtlasAreaSize atlasSize)
         {
             await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
             var aggregationField = $"location.{(atlasSize == AtlasAreaSize.Km5x5 ? "atlas5x5" : "atlas10x10")}.featureId";
 
-            var result = await _processedObservationRepository.AggregateByUserFieldAsync(filter, aggregationField, precisionThreshold: 40000, afterKey: null, 10000);
+            var result = await _processedObservationRepository.AggregateByUserFieldAsync(filter, aggregationField, aggregateOrganismQuantity, precisionThreshold: 40000, afterKey: null, take: 10000);
             var futureCollection = new FeatureCollection();
             while (result?.Records?.Any() ?? false)
             {
@@ -199,12 +208,13 @@ namespace SOS.Lib.Managers
                     futureCollection.Add(
                         area.ToFeature(new Dictionary<string, object> {
                             { "observationCount", (int)record.DocCount },
-                            { "taxonCount", (int)record.UniqueTaxon }
+                            { "taxonCount", (int)record.UniqueTaxon },
+                            { "organismQuantityCount", (int)record.OrganismQuantity }
                         })
                     );
                 }
 
-                result = await _processedObservationRepository.AggregateByUserFieldAsync(filter, aggregationField, precisionThreshold: 40000, afterKey: (string)result.SearchAfter?.FirstOrDefault()!, 10000);
+                result = await _processedObservationRepository.AggregateByUserFieldAsync(filter, aggregationField, aggregateOrganismQuantity, precisionThreshold: 40000, afterKey: (string)result.SearchAfter?.FirstOrDefault()!, take: 10000);
             }
 
             return futureCollection;

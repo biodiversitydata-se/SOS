@@ -5,6 +5,7 @@ using SOS.Lib.Models.Analysis;
 using SOS.Lib.Models.Export;
 using SOS.Lib.Models.Search.Enums;
 using SOS.Lib.Models.Search.Filters;
+using SOS.Lib.Models.Search.Result;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -20,6 +21,7 @@ namespace SOS.Lib.Managers.Interfaces
         /// <param name="authorizationApplicationIdentifier"></param>
         /// <param name="filter"></param>
         /// <param name="aggregationField"></param>
+        /// <param name="aggregateOrganismQuantity"></param>
         /// <param name="precisionThreshold"></param>
         /// <param name="afterKey"></param>
         /// <param name="take"></param>
@@ -29,6 +31,7 @@ namespace SOS.Lib.Managers.Interfaces
             string authorizationApplicationIdentifier,
             SearchFilter filter,
             string aggregationField,
+            bool aggregateOrganismQuantity,
             int? precisionThreshold,
             string afterKey,
             int? take);
@@ -40,15 +43,17 @@ namespace SOS.Lib.Managers.Interfaces
         /// <param name="authorizationApplicationIdentifier"></param>
         /// <param name="filter"></param>
         /// <param name="aggregationField"></param>
+        /// <param name="aggregateOrganismQuantity"></param>
         /// <param name="precisionThreshold"></param>
         /// <param name="take"></param>
         /// <param name="sortOrder"></param>
         /// <returns></returns>
-        Task<IEnumerable<AggregationItem>> AggregateByUserFieldAsync(
+        Task<IEnumerable<AggregationItemOrganismQuantity>> AggregateByUserFieldAsync(
             int? roleId,
             string authorizationApplicationIdentifier,
             SearchFilter filter,
             string aggregationField,
+            bool aggregateOrganismQuantity,
             int? precisionThreshold,
             int take,
             AggregationSortOrder sortOrder = AggregationSortOrder.CountDescending);
@@ -59,12 +64,14 @@ namespace SOS.Lib.Managers.Interfaces
         /// <param name="roleId"></param>
         /// <param name="authorizationApplicationIdentifier"></param>
         /// <param name="filter"></param>
+        /// <param name="aggregateOrganismQuantity"></param>
         /// <param name="atlasSize"></param>
         /// <returns></returns>
         Task<FeatureCollection> AtlasAggregateAsync(
         int? roleId,
         string authorizationApplicationIdentifier,
         SearchFilter filter,
+        bool aggregateOrganismQuantity,
         AtlasAreaSize atlasSize);
 
         /// <summary>

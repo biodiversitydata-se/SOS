@@ -20,6 +20,13 @@ namespace SOS.Lib.Models.Search.Result
         public int DocCount { get; set; }
     }
 
+    public class AggregationItemOrganismQuantity
+    {
+        public string AggregationKey { get; set; }
+        public int DocCount { get; set; }
+        public int OrganismQuantity { get; set; }
+    }
+
     public class AggregationResult<T>
     {
         public int TotalCount { get; set; }

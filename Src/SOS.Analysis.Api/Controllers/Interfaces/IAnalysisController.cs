@@ -16,6 +16,7 @@ namespace SOS.Analysis.Api.Controllers.Interfaces
         /// <param name="searchFilter"></param>
         /// <param name="validateFilter"></param>
         /// <param name="aggregationField"></param>
+        /// <param name="aggregateOrganismQuantity"></param>
         /// <param name="precisionThreshold"></param>
         /// <param name="afterKey"></param>
         /// <param name="take"></param>
@@ -26,6 +27,7 @@ namespace SOS.Analysis.Api.Controllers.Interfaces
             SearchFilterInternalDto searchFilter,
             bool? validateFilter,
             string aggregationField,
+            bool? aggregateOrganismQuantity,
             int? precisionThreshold,
             string? afterKey,
             int? take);
@@ -38,6 +40,7 @@ namespace SOS.Analysis.Api.Controllers.Interfaces
         /// <param name="filter"></param>
         /// <param name="validateFilter"></param>
         /// <param name="aggregationField"></param>
+        /// <param name="aggregateOrganismQuantity"></param>
         /// <param name="precisionThreshold"></param>
         /// <param name="take"></param>
         /// <param name="sortOrder"></param>
@@ -46,8 +49,9 @@ namespace SOS.Analysis.Api.Controllers.Interfaces
             int? roleId,
             string? authorizationApplicationIdentifier,
             SearchFilterInternalDto filter,
-           bool? validateFilter,
+            bool? validateFilter,
             string aggregationField,
+            bool? aggregateOrganismQuantity,
             int? precisionThreshold,
             int take,
             AggregationSortOrder sortOrder);
@@ -59,6 +63,7 @@ namespace SOS.Analysis.Api.Controllers.Interfaces
         /// <param name="authorizationApplicationIdentifier"></param>
         /// <param name="searchFilter"></param>
         /// <param name="validateFilter"></param>
+        /// <param name="aggregateOrganismQuantity"></param>
         /// <param name="atlasSize"></param>
         /// <returns></returns>
         Task<IActionResult> AtlasAggregateAsync(
@@ -66,6 +71,7 @@ namespace SOS.Analysis.Api.Controllers.Interfaces
             string? authorizationApplicationIdentifier,
             SearchFilterInternalDto searchFilter,
             bool? validateFilter,
+            bool? aggregateOrganismQuantity,
             AtlasAreaSizeDto atlasSize = AtlasAreaSizeDto.Km10x10
            );
 

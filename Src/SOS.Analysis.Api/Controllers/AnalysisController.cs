@@ -13,6 +13,7 @@ using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Analysis;
 using SOS.Lib.Models.Export;
 using SOS.Lib.Models.Search.Enums;
+using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Services.Interfaces;
 using SOS.Lib.Swagger;
@@ -24,7 +25,6 @@ using SOS.Shared.Api.Extensions.Dto;
 using SOS.Shared.Api.Utilities.Objects.Interfaces;
 using SOS.Shared.Api.Validators.Interfaces;
 using System.Net;
-using System.Reflection;
 using Result = CSharpFunctionalExtensions.Result;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -90,6 +90,7 @@ namespace SOS.Analysis.Api.Controllers
             [FromBody] SearchFilterInternalDto searchFilter,
             [FromQuery] bool? validateFilter,
             [FromQuery] string aggregationField,
+            [FromQuery] bool? aggregateOrganismQuantity,
             [FromQuery] int? precisionThreshold,
             [FromQuery] string? afterKey,
             [FromQuery] int? take = 10)
@@ -115,6 +116,7 @@ namespace SOS.Analysis.Api.Controllers
                     authorizationApplicationIdentifier,
                     filter,
                     aggregationField,
+                    aggregateOrganismQuantity.GetValueOrDefault(false),
                     precisionThreshold,
                     afterKey,
                     take
@@ -135,7 +137,7 @@ namespace SOS.Analysis.Api.Controllers
         }
 
         [HttpPost("/internal/aggregation_simple")]
-        [ProducesResponseType(typeof(IEnumerable<AggregationItemDto>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(IEnumerable<AggregationItemOrganismQuantityDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
@@ -146,6 +148,7 @@ namespace SOS.Analysis.Api.Controllers
             [FromBody] SearchFilterInternalDto searchFilter,
             [FromQuery] bool? validateFilter,
             [FromQuery] string aggregationField,
+            [FromQuery] bool? aggregateOrganismQuantity,
             [FromQuery] int? precisionThreshold,
             [FromQuery] int take = 10,
             [FromQuery] AggregationSortOrder sortOrder = AggregationSortOrder.CountDescending)
@@ -159,7 +162,11 @@ namespace SOS.Analysis.Api.Controllers
                 var validationResult = Result.Combine(
                     validateFilter ?? false ? (await _inputValidator.ValidateSearchFilterAsync(searchFilter!)) : Result.Success(),
                     _inputValidator.ValidateFields(new[] { aggregationField }),
-                    _inputValidator.ValidateInt(take, 1, 250, "take"));
+                    _inputValidator.ValidateInt(take, 1, 250, "take"),
+                    !aggregateOrganismQuantity.GetValueOrDefault(false) && (sortOrder == AggregationSortOrder.OrganismQuantityAscending || sortOrder == AggregationSortOrder.OrganismQuantityDescending)
+                        ? Result.Failure("Sort order cannot use organism quantity when aggregateOrganismQuantity=false")
+                        : Result.Success()
+                    );
 
                 if (validationResult.IsFailure)
                 {
@@ -168,11 +175,12 @@ namespace SOS.Analysis.Api.Controllers
 
                 var filter = searchFilter?.ToSearchFilter(this.GetUserId(), searchFilter?.ProtectionFilter, "sv-SE")!;
 
-                IEnumerable<AggregationItem> result = await _analysisManager.AggregateByUserFieldAsync(
+                IEnumerable<AggregationItemOrganismQuantity> result = await _analysisManager.AggregateByUserFieldAsync(
                     roleId,
                     authorizationApplicationIdentifier,
                     filter,
                     aggregationField,
+                    aggregateOrganismQuantity.GetValueOrDefault(false),
                     precisionThreshold,
                     take,
                     sortOrder
@@ -203,6 +211,7 @@ namespace SOS.Analysis.Api.Controllers
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
             [FromBody] SearchFilterInternalDto searchFilter,
             [FromQuery] bool? validateFilter,
+            [FromQuery] bool? aggregateOrganismQuantity,
             [FromQuery] AtlasAreaSizeDto atlasSize = AtlasAreaSizeDto.Km10x10)
         {
             try
@@ -223,8 +232,9 @@ namespace SOS.Analysis.Api.Controllers
                     roleId,
                     authorizationApplicationIdentifier,
                     filter,
-                    (AtlasAreaSize)atlasSize
-                );
+                    aggregateOrganismQuantity.GetValueOrDefault(false)
+,
+                    (AtlasAreaSize)atlasSize);
 
                 return new OkObjectResult(result!);
             }

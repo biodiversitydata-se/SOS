@@ -1069,6 +1069,60 @@ namespace SOS.Lib.Repositories.Processed
             return result;
         }
 
+        public async Task<IEnumerable<AggregationItemOrganismQuantity>> GetAggregationItemsAggregateOrganismQuantityAsync(SearchFilter filter,
+            string aggregationField,
+            int? precisionThreshold,
+            int size = 65536,
+            AggregationSortOrder sortOrder = AggregationSortOrder.CountDescending)
+        {
+            var indexNames = GetCurrentIndex(filter);
+            var (query, excludeQuery) = GetCoreQueries(filter);
+            var termsOrder = sortOrder.GetTermsOrder<dynamic>();
+            size = Math.Max(1, size);
+
+            var searchResponse = await Client.SearchAsync<dynamic>(s => s
+                .Index(indexNames)
+                .Query(q => q
+                    .Bool(b => b
+                        .MustNot(excludeQuery)
+                        .Filter(query)
+                    )
+                )
+                .Aggregations(a => a
+                    .Terms("termAggregation", t => t
+                        .Size(size)
+                        .Field(aggregationField)
+                        .Order(termsOrder)
+                        .Aggregations(ta => ta
+                            .Sum("totalOrganismQuantity", sa => sa
+                                .Field("occurrence.organismQuantityAggregation")
+                            )
+                        )
+                    )
+                    .Cardinality("cardinalityAggregation", t => t
+                        .Field(aggregationField)
+                        .PrecisionThreshold(precisionThreshold ?? 40000)
+                    )
+                )
+                .Size(0)
+                .Source(s => s.ExcludeAll())
+                .TrackTotalHits(false)
+            );
+
+            searchResponse.ThrowIfInvalid();
+            IEnumerable<AggregationItemOrganismQuantity> result = searchResponse.Aggregations
+                .Terms("termAggregation")
+                .Buckets
+                .Select(b => new AggregationItemOrganismQuantity
+                {
+                    AggregationKey = b.Key,
+                    DocCount = (int)(b.DocCount ?? 0),
+                    OrganismQuantity = (int)(b.Sum("totalOrganismQuantity")?.Value ?? 0)
+                });
+
+            return result;
+        }
+
         /// <inheritdoc />
         public async Task<List<AggregationItem>> GetAllAggregationItemsAsync(SearchFilter filter, string aggregationField)
         {
@@ -1992,13 +2046,17 @@ namespace SOS.Lib.Repositories.Processed
             }
         }
 
-        public async Task<SearchAfterResult<dynamic>> AggregateByUserFieldAsync(SearchFilter filter, string aggregationField, int? precisionThreshold, string? afterKey = null, int? take = 10)
+        public async Task<SearchAfterResult<dynamic>> AggregateByUserFieldAsync(SearchFilter filter,
+            string aggregationField,
+            bool aggregateOrganismQuantity,
+            int? precisionThreshold,
+            string? afterKey = null,
+            int? take = 10)
         {
             var indexNames = GetCurrentIndex(filter);
             var (query, excludeQuery) = GetCoreQueries(filter);
 
-            var tz = TimeZoneInfo.Local.GetUtcOffset(DateTime.Now);
-
+            var tz = TimeZoneInfo.Local.GetUtcOffset(DateTime.Now);            
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
                 .Index(indexNames)
                 .Query(q => q
@@ -2019,8 +2077,10 @@ namespace SOS.Lib.Repositories.Processed
                          )
                     )
                 )
-                .Aggregations(a => a
-                    .Composite("aggregation", c => c
+                .Aggregations(a =>
+                {
+                    // Lägg till Composite-aggregeringen
+                    var compositeAgg = a.Composite("aggregation", c => c
                         .After(string.IsNullOrEmpty(afterKey) ? null : new CompositeKey(new Dictionary<string, object>() { { "termAggregation", afterKey } }))
                         .Size(take)
                         .Sources(s => s
@@ -2028,15 +2088,57 @@ namespace SOS.Lib.Repositories.Processed
                                 .Field("scriptField")
                                 .MissingBucket(true)
                             )
-                        )
+                        )                        
                         .Aggregations(a => a
                             .Cardinality("unique_taxonids", c => c
                                 .Field("taxon.id")
                                 .PrecisionThreshold(precisionThreshold ?? 3000)
                             )
                         )
-                    )
-                )
+                    );
+                    
+                    if (aggregateOrganismQuantity)
+                    {
+                        return a.Composite("aggregation", c => c
+                            .After(string.IsNullOrEmpty(afterKey) ? null : new CompositeKey(new Dictionary<string, object>() { { "termAggregation", afterKey } }))
+                            .Size(take)
+                            .Sources(s => s
+                                .Terms("termAggregation", t => t
+                                    .Field("scriptField")
+                                    .MissingBucket(true)
+                                )
+                            )
+                            .Aggregations(a => a
+                                .Cardinality("unique_taxonids", c => c
+                                    .Field("taxon.id")
+                                    .PrecisionThreshold(precisionThreshold ?? 3000)
+                                )
+                                .Sum("totalOrganismQuantity", s => s
+                                    .Field("occurrence.organismQuantityAggregation")
+                                )
+                            )
+                        );
+                    }
+                    else
+                    {
+                        return a.Composite("aggregation", c => c
+                            .After(string.IsNullOrEmpty(afterKey) ? null : new CompositeKey(new Dictionary<string, object>() { { "termAggregation", afterKey } }))
+                            .Size(take)
+                            .Sources(s => s
+                                .Terms("termAggregation", t => t
+                                    .Field("scriptField")
+                                    .MissingBucket(true)
+                                )
+                            )
+                            .Aggregations(a => a
+                                .Cardinality("unique_taxonids", c => c
+                                    .Field("taxon.id")
+                                    .PrecisionThreshold(precisionThreshold ?? 3000)
+                                )
+                            )
+                        );
+                    }                    
+                })
                 .Size(0)
                 .Source(s => s.ExcludeAll())
             );
@@ -2059,9 +2161,9 @@ namespace SOS.Lib.Repositories.Processed
                         {
                             AggregationField = b.Key.Values.First(),
                             b.DocCount,
-                            UniqueTaxon = b.Cardinality("unique_taxonids").Value
-                        }
-                    )?.ToArray()
+                            UniqueTaxon = b.Cardinality("unique_taxonids").Value,
+                            OrganismQuantity = aggregateOrganismQuantity ? b.Sum("totalOrganismQuantity")?.Value : 0
+                        })?.ToArray()
             };
         }
     }

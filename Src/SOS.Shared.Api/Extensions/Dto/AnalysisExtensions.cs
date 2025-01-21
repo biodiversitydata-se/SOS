@@ -1,6 +1,5 @@
 ﻿using SOS.Lib.Models.Analysis;
-using SOS.Lib.Models.Export;
-using SOS.Shared.Api.Dtos.Export;
+using SOS.Lib.Models.Search.Result;
 using SOS.Shared.Api.Dtos.Search;
 
 namespace SOS.Shared.Api.Extensions.Dto
@@ -21,22 +20,24 @@ namespace SOS.Shared.Api.Extensions.Dto
                 {
                     AggregationField = r.AggregationField,
                     Count = r.Count,
-                    UniqueTaxon = r.UniqueTaxon
+                    UniqueTaxon = r.UniqueTaxon,
+                    OrganismQuantity = r.OrganismQuantity
                 })
             };
         }
 
-        public static IEnumerable<AggregationItemDto> ToDto(this IEnumerable<AggregationItem> result)
+        public static IEnumerable<AggregationItemOrganismQuantityDto> ToDto(this IEnumerable<AggregationItemOrganismQuantity> result)
         {
             if (result == null)
             {
                 return null!;
             }
 
-            return result.Select(item => new AggregationItemDto
+            return result.Select(item => new AggregationItemOrganismQuantityDto
             {
                 AggregationKey = item.AggregationKey,
-                DocCount = item.DocCount
+                DocCount = item.DocCount,
+                OrganismQuantity = item.OrganismQuantity
             });
         }
     }

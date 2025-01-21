@@ -218,6 +218,10 @@ namespace SOS.Lib.Extensions
                     return m => m.KeyDescending();
                 case AggregationSortOrder.KeyAscending:
                     return m => m.KeyAscending();
+                case AggregationSortOrder.OrganismQuantityDescending:
+                    return m => m.Descending("totalOrganismQuantity");
+                case AggregationSortOrder.OrganismQuantityAscending:
+                    return m => m.Ascending("totalOrganismQuantity");
                 default:
                     return m => m.CountDescending();
             }

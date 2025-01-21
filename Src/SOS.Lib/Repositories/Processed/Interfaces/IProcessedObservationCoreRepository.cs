@@ -302,6 +302,12 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
             int? precisionThreshold,
             AggregationSortOrder sortOrder = AggregationSortOrder.CountDescending);
 
+        Task<IEnumerable<AggregationItemOrganismQuantity>> GetAggregationItemsAggregateOrganismQuantityAsync(SearchFilter filter,
+            string aggregationField,
+            int? precisionThreshold,
+            int size = 65536,
+            AggregationSortOrder sortOrder = AggregationSortOrder.CountDescending);
+
         /// <summary>
         /// Aggregate by a field and return the number of documents for each value.
         /// </summary>
@@ -361,10 +367,11 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// </summary>
         /// <param name="filter"></param>
         /// <param name="aggregationField"></param>
+        /// <param name="aggregateOrganismQuantity"></param>
         /// <param name="precisionThreshold"></param>
         /// <param name="afterKey"></param>
         /// <param name="take"></param>
         /// <returns></returns>
-        Task<SearchAfterResult<dynamic>> AggregateByUserFieldAsync(SearchFilter filter, string aggregationField, int? precisionThreshold, string? afterKey = null, int? take = 10);
+        Task<SearchAfterResult<dynamic>> AggregateByUserFieldAsync(SearchFilter filter, string aggregationField, bool aggregateOrganismQuantity, int? precisionThreshold, string? afterKey = null, int? take = 10);
     }
 }
