@@ -39,7 +39,7 @@ namespace SOS.Process.UnitTests.TestHelpers
 
         public DwcaObservationFactory CreateDwcaObservationFactory(ValidationStatusId? verificationStatusId = null)
         {
-            var dataProviderDummy = new DataProvider { DefaultVerificationStatusId = verificationStatusId };
+            var dataProviderDummy = new DataProvider { DefaultVerificationStatus = verificationStatusId };
             var mammaliaTaxa =
                 MessagePackHelper.CreateListFromMessagePackFile<Taxon>(
                     @"Resources/MammaliaProcessedTaxa.msgpck");

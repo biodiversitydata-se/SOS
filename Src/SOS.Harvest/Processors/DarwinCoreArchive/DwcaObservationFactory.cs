@@ -375,9 +375,9 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             processedIdentification.IdentificationReferences = verbatim.IdentificationReferences;
             processedIdentification.IdentificationRemarks = verbatim.IdentificationRemarks?.Clean();
             processedIdentification.VerificationStatus = GetSosId(verbatim.IdentificationVerificationStatus, VocabularyById[VocabularyId.VerificationStatus]);
-            if (processedIdentification.VerificationStatus == null && _dataProvider.DefaultVerificationStatusId != null)
+            if (processedIdentification.VerificationStatus == null && _dataProvider.DefaultVerificationStatus != null)
             {
-                processedIdentification.VerificationStatus = VocabularyValue.Create((int)_dataProvider.DefaultVerificationStatusId);
+                processedIdentification.VerificationStatus = VocabularyValue.Create((int)_dataProvider.DefaultVerificationStatus);
             }
             processedIdentification.Verified = GetIsValidated(processedIdentification.VerificationStatus);
             processedIdentification.IdentifiedBy = verbatim.IdentifiedBy?.Clean();

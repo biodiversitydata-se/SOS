@@ -40,7 +40,7 @@ namespace SOS.Lib.Models.Shared
         /// <summary>
         ///     Default verification status
         /// </summary>
-        public ValidationStatusId? DefaultVerificationStatusId { get; set; }
+        public ValidationStatusId? DefaultVerificationStatus { get; set; }
 
         /// <summary>
         ///     Descriptions of the data provider 
