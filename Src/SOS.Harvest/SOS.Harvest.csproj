@@ -16,20 +16,20 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Autofac" Version="8.1.1" />
-		<PackageReference Include="CSharpFunctionalExtensions" Version="3.2.0" />
+		<PackageReference Include="Autofac" Version="8.2.0" />
+		<PackageReference Include="CSharpFunctionalExtensions" Version="3.4.3" />
 		<PackageReference Include="Dapper" Version="2.1.35" />
 		<PackageReference Include="EnumExtensions.System.Text.Json" Version="1.2.0" />
-		<PackageReference Include="Hangfire.Core" Version="1.8.16" />
+		<PackageReference Include="Hangfire.Core" Version="1.8.17" />
 		<PackageReference Include="JsonDiffPatch.Net" Version="2.3.0" />
 		<PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.2" />
-		<PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.0" />
-		<PackageReference Include="MongoDB.Driver" Version="3.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.1" />
+		<PackageReference Include="MongoDB.Driver" Version="3.1.0" />
 		<PackageReference Include="NetTopologySuite" Version="2.5.0" />
 		<PackageReference Include="NetTopologySuite.IO.GeoJSON" Version="4.0.0" />
 		<PackageReference Include="System.ServiceModel.Duplex" Version="6.0.0" />
-		<PackageReference Include="System.ServiceModel.Http" Version="8.1.0" />
-		<PackageReference Include="System.ServiceModel.NetTcp" Version="8.1.0" />
+		<PackageReference Include="System.ServiceModel.Http" Version="8.1.1" />
+		<PackageReference Include="System.ServiceModel.NetTcp" Version="8.1.1" />
 		<PackageReference Include="System.ServiceModel.Security" Version="6.0.0" />
 	</ItemGroup>
 
