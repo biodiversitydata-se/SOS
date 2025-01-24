@@ -28,6 +28,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using System.IO;
+using System.IO.Compression;
 
 namespace SOS.Observations.Api.Controllers
 {
@@ -396,9 +397,8 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] bool gzip = true,
             [FromQuery] bool sensitiveObservations = false)
         {
-            LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
-            FileExportResult fileExportResult = null;
-            var exportPath = Path.Combine(_exportPath, Guid.NewGuid().ToString());
+            LogHelper.AddHttpContextItems(HttpContext, ControllerContext);            
+            
             try
             {
                 // SearchFilterDto don't support protection filter, declare it localy
@@ -414,16 +414,14 @@ namespace SOS.Observations.Api.Controllers
                 {
                     return validateResult;
                 }
-
-                var exportFilter = (SearchFilter)okResult.Value;
                 
-                fileExportResult =
-                    await _exportManager.CreateExportFileAsync(
+                var exportFilter = (SearchFilter)okResult.Value;
+                (Stream stream, string filename) result =                        
+                    await _exportManager.CreateExportFileInMemoryAsZipStreamAsync(
                         roleId,
                         authorizationApplicationIdentifier,
                         exportFilter,
                         ExportFormat.Csv,
-                        exportPath, 
                         cultureCode,
                         false,
                         propertyLabelType,
@@ -433,9 +431,17 @@ namespace SOS.Observations.Api.Controllers
                         JobCancellationToken.Null);
 
                 if (gzip)
-                    return GetFile(fileExportResult.FilePath, "application/zip");
+                {
+                    return File(result.stream, "application/zip", $"{result.filename}.zip");
+                }
                 else
-                    return GetFile(fileExportResult.FilePath, "text/tab-separated-values"); // or "text/csv"?                
+                {
+                    Response.OnCompleted(async () => { await result.stream.DisposeAsync(); });
+                    var archive = new ZipArchive(result.stream, ZipArchiveMode.Read, leaveOpen: true);
+                    var entry = archive.Entries.FirstOrDefault();
+                    var fileStream = entry.Open();
+                    return File(fileStream, "text/tab-separated-values", entry.Name);
+                }
             }
             catch (AuthenticationRequiredException)
             {
@@ -445,10 +451,6 @@ namespace SOS.Observations.Api.Controllers
             {
                 _logger.LogError(e, "Error exporting Csv file");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
-            }
-            finally
-            {
-                _fileService.DeleteDirectory(exportPath);
             }
         }
 
@@ -473,17 +475,15 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] bool eventBased = false,
             [FromQuery] bool validateSearchFilter = false,
             [FromQuery] bool sensitiveObservations = false)
-        {
+        {            
             LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
-            FileExportResult fileExportResult = null;
-            var exportPath = Path.Combine(_exportPath, Guid.NewGuid().ToString());
+
             try
             {
                 // SearchFilterDto don't support protection filter, declare it localy
                 var protectionFilter = sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public;
                 this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope, protectionFilter);
                 filter.Output = new OutputFilterDto { FieldSet = OutputFieldSet.All };
-
                 var validateResult = await DownloadValidateAsync(filter, validateSearchFilter, protectionFilter, roleId, authorizationApplicationIdentifier);
                 if (validateResult is not OkObjectResult okResult)
                 {
@@ -491,13 +491,12 @@ namespace SOS.Observations.Api.Controllers
                 }
 
                 var exportFilter = (SearchFilter)okResult.Value;
-                fileExportResult =
-                    await _exportManager.CreateExportFileAsync(
+                (Stream stream, string filename) result =
+                    await _exportManager.CreateExportFileInMemoryAsZipStreamAsync(
                         roleId,
                         authorizationApplicationIdentifier,
                         exportFilter,
                         eventBased ? ExportFormat.DwCEvent : ExportFormat.DwC,
-                        exportPath,
                         Cultures.en_GB,
                         false,
                         PropertyLabelType.PropertyPath,
@@ -506,12 +505,12 @@ namespace SOS.Observations.Api.Controllers
                         true,
                         JobCancellationToken.Null);
 
-                if (fileExportResult == null)
+                if (result.stream == null || result.stream.Length == 0)
                 {
                     return new StatusCodeResult((int)HttpStatusCode.NoContent);
                 }
 
-                return GetFile(fileExportResult.FilePath, "application/zip");
+                return File(result.stream, "application/zip", $"{result.filename}.zip");
             }
             catch (AuthenticationRequiredException)
             {
@@ -521,10 +520,6 @@ namespace SOS.Observations.Api.Controllers
             {
                 _logger.LogError(e, "Error exporting DwC file");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
-            }
-            finally
-            {
-                _fileService.DeleteDirectory(exportPath);
             }
         }
 
@@ -559,32 +554,27 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] bool sensitiveObservations = false)
         {
             LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
-            FileExportResult fileExportResult = null;
-            var exportPath = Path.Combine(_exportPath, Guid.NewGuid().ToString());
+
             try
             {
                 // SearchFilterDto don't support protection filter, declare it localy
                 var protectionFilter = sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public;
                 this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope, protectionFilter);
-
                 HandleOutputFieldSet(filter, outputFieldSet);
                 cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
-
                 var validateResult = await DownloadValidateAsync(filter, validateSearchFilter, protectionFilter, roleId, authorizationApplicationIdentifier);
-
                 if (validateResult is not OkObjectResult okResult)
                 {
                     return validateResult;
                 }
 
                 var exportFilter = (SearchFilter)okResult.Value;
-                fileExportResult =
-                    await _exportManager.CreateExportFileAsync(
+                (Stream stream, string filename) result =
+                    await _exportManager.CreateExportFileInMemoryAsZipStreamAsync(
                         roleId,
                         authorizationApplicationIdentifier,
                         exportFilter,
                         ExportFormat.Excel,
-                        exportPath,
                         cultureCode,
                         false,
                         propertyLabelType,
@@ -594,9 +584,9 @@ namespace SOS.Observations.Api.Controllers
                         JobCancellationToken.Null);
 
                 if (gzip)
-                    return GetFile(fileExportResult.FilePath, "application/zip");
+                    return File(result.stream, "application/zip", $"{result.filename}.zip");
                 else
-                    return GetFile(fileExportResult.FilePath, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+                    return File(result.stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"{result.filename}.xlsx");                
             }
             catch (AuthenticationRequiredException)
             {
@@ -606,10 +596,6 @@ namespace SOS.Observations.Api.Controllers
             {
                 _logger.LogError(e, "Error exporting Excel file");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
-            }
-            finally
-            {
-                _fileService.DeleteDirectory(exportPath);
             }
         }
 
@@ -645,9 +631,7 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] bool gzip = true,
             [FromQuery] bool sensitiveObservations = false)
         {
-            LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
-            FileExportResult fileExportResult = null;
-            var exportPath = Path.Combine(_exportPath, Guid.NewGuid().ToString());
+            LogHelper.AddHttpContextItems(HttpContext, ControllerContext);            
 
             try
             {
@@ -656,34 +640,39 @@ namespace SOS.Observations.Api.Controllers
                 this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope, protectionFilter);
                 HandleOutputFieldSet(filter, outputFieldSet);
                 cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
-
                 var validateResult = await DownloadValidateAsync(filter, validateSearchFilter, protectionFilter, roleId, authorizationApplicationIdentifier);
                 if (validateResult is not OkObjectResult okResult)
                 {
                     return validateResult;
-                }
+                }     
 
                 var exportFilter = (SearchFilter)okResult.Value;
-
-                fileExportResult =
-                    await _exportManager.CreateExportFileAsync(
+                (Stream stream, string filename) result =
+                    await _exportManager.CreateExportFileInMemoryAsZipStreamAsync(
                         roleId,
                         authorizationApplicationIdentifier,
                         exportFilter,
                         ExportFormat.GeoJson,
-                        exportPath,
                         cultureCode,
                         flat,
                         propertyLabelType,
                         excludeNullValues,
                         false,
                         gzip,
-                        JobCancellationToken.Null);
+                        JobCancellationToken.Null);    
 
                 if (gzip)
-                    return GetFile(fileExportResult.FilePath, "application/zip");
+                {
+                    return File(result.stream, "application/zip", $"{result.filename}.zip");
+                }
                 else
-                    return GetFile(fileExportResult.FilePath, "application/geo+json");
+                {
+                    Response.OnCompleted(async () => { await result.stream.DisposeAsync(); });
+                    var archive = new ZipArchive(result.stream, ZipArchiveMode.Read, leaveOpen: true);
+                    var entry = archive.Entries.FirstOrDefault();
+                    var fileStream = entry.Open();
+                    return File(fileStream, "application/geo+json", entry.Name);
+                }
             }
             catch (AuthenticationRequiredException)
             {
@@ -691,12 +680,8 @@ namespace SOS.Observations.Api.Controllers
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Error exporting GeoJson file");
+                _logger.LogError(e, "Error exporting GeoJSON file");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
-            }
-            finally
-            {
-                _fileService.DeleteDirectory(exportPath);
             }
         }
 
@@ -1094,13 +1079,11 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] bool sensitiveObservations = false)
         {
             LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
-            FileExportResult fileExportResult = null;
-            var exportPath = Path.Combine(_exportPath, Guid.NewGuid().ToString());
+
             try
-            {
+            {                
                 filter.ProtectionFilter ??= (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
                 this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope, filter.ProtectionFilter);
-
                 HandleOutputFieldSet(filter, outputFieldSet);
                 cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
 
@@ -1112,14 +1095,12 @@ namespace SOS.Observations.Api.Controllers
                 }
 
                 var exportFilter = (SearchFilter)okResult.Value;
-
-                fileExportResult =
-                    await _exportManager.CreateExportFileAsync(
+                (Stream stream, string filename) result =
+                    await _exportManager.CreateExportFileInMemoryAsZipStreamAsync(
                         roleId,
                         authorizationApplicationIdentifier,
                         exportFilter,
                         ExportFormat.Csv,
-                        exportPath, 
                         cultureCode,
                         false,
                         propertyLabelType,
@@ -1129,9 +1110,17 @@ namespace SOS.Observations.Api.Controllers
                         JobCancellationToken.Null);
 
                 if (gzip)
-                    return GetFile(fileExportResult.FilePath, "application/zip");
+                {
+                    return File(result.stream, "application/zip", $"{result.filename}.zip");
+                }
                 else
-                    return GetFile(fileExportResult.FilePath, "text/tab-separated-values"); // or "text/csv"?                
+                {
+                    Response.OnCompleted(async () => { await result.stream.DisposeAsync(); });
+                    var archive = new ZipArchive(result.stream, ZipArchiveMode.Read, leaveOpen: true);
+                    var entry = archive.Entries.FirstOrDefault();
+                    var fileStream = entry.Open();
+                    return File(fileStream, "text/tab-separated-values", entry.Name);
+                }
             }
             catch (AuthenticationRequiredException)
             {
@@ -1141,10 +1130,6 @@ namespace SOS.Observations.Api.Controllers
             {
                 _logger.LogError(e, "Error exporting Csv file");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
-            }
-            finally
-            {
-                _fileService.DeleteDirectory(exportPath);
             }
         }
 
@@ -1171,13 +1156,12 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] bool sensitiveObservations = false)
         {
             LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
-            FileExportResult fileExportResult = null;
-            var exportPath = Path.Combine(_exportPath, Guid.NewGuid().ToString());
+
             try
             {
                 filter.ProtectionFilter ??= (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
                 this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope, filter.ProtectionFilter);
-
+                filter.Output = new OutputFilterExtendedDto { FieldSet = OutputFieldSet.All };
                 var validateResult = await DownloadValidateAsync(filter, validateSearchFilter, filter.ProtectionFilter, roleId, authorizationApplicationIdentifier);
                 if (validateResult is not OkObjectResult okResult)
                 {
@@ -1185,13 +1169,12 @@ namespace SOS.Observations.Api.Controllers
                 }
 
                 var exportFilter = (SearchFilter)okResult.Value;
-                fileExportResult =
-                    await _exportManager.CreateExportFileAsync(
+                (Stream stream, string filename) result =
+                    await _exportManager.CreateExportFileInMemoryAsZipStreamAsync(
                         roleId,
                         authorizationApplicationIdentifier,
                         exportFilter,
                         eventBased ? ExportFormat.DwCEvent : ExportFormat.DwC,
-                        exportPath,
                         Cultures.en_GB,
                         false,
                         PropertyLabelType.PropertyPath,
@@ -1200,7 +1183,12 @@ namespace SOS.Observations.Api.Controllers
                         true,
                         JobCancellationToken.Null);
 
-                return GetFile(fileExportResult.FilePath, "application/zip");
+                if (result.stream == null || result.stream.Length == 0)
+                {
+                    return new StatusCodeResult((int)HttpStatusCode.NoContent);
+                }
+
+                return File(result.stream, "application/zip", $"{result.filename}.zip");
             }
             catch (AuthenticationRequiredException)
             {
@@ -1210,11 +1198,7 @@ namespace SOS.Observations.Api.Controllers
             {
                 _logger.LogError(e, "Error exporting DwC file");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
-            }
-            finally
-            {
-                _fileService.DeleteDirectory(exportPath);
-            }
+            }            
         }
 
         /// <summary>
@@ -1248,31 +1232,26 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] bool sensitiveObservations = false)
         {
             LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
-            FileExportResult fileExportResult = null;
-            var exportPath = Path.Combine(_exportPath, Guid.NewGuid().ToString());
+
             try
             {
                 filter.ProtectionFilter ??= (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
-                this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope, filter.ProtectionFilter);
-
+                this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope, filter.ProtectionFilter);                
                 HandleOutputFieldSet(filter, outputFieldSet);
                 cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
-
                 var validateResult = await DownloadValidateAsync(filter, validateSearchFilter, filter.ProtectionFilter, roleId, authorizationApplicationIdentifier);
-
                 if (validateResult is not OkObjectResult okResult)
                 {
                     return validateResult;
                 }
 
                 var exportFilter = (SearchFilter)okResult.Value;
-                fileExportResult =
-                    await _exportManager.CreateExportFileAsync(
+                (Stream stream, string filename) result =
+                    await _exportManager.CreateExportFileInMemoryAsZipStreamAsync(
                         roleId,
                         authorizationApplicationIdentifier,
                         exportFilter,
                         ExportFormat.Excel,
-                        exportPath,
                         cultureCode,
                         false,
                         propertyLabelType,
@@ -1282,9 +1261,9 @@ namespace SOS.Observations.Api.Controllers
                         JobCancellationToken.Null);
 
                 if (gzip)
-                    return GetFile(fileExportResult.FilePath, "application/zip");
+                    return File(result.stream, "application/zip", $"{result.filename}.zip");
                 else
-                    return GetFile(fileExportResult.FilePath, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+                    return File(result.stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"{result.filename}.xlsx");
             }
             catch (AuthenticationRequiredException)
             {
@@ -1294,11 +1273,7 @@ namespace SOS.Observations.Api.Controllers
             {
                 _logger.LogError(e, "Error exporting Excel file");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
-            }
-            finally
-            {
-                _fileService.DeleteDirectory(exportPath);
-            }
+            }            
         }
 
         /// <summary>
@@ -1334,16 +1309,13 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] bool sensitiveObservations = false)
         {
             LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
-            FileExportResult fileExportResult = null;
-            var exportPath = Path.Combine(_exportPath, Guid.NewGuid().ToString());
+
             try
-            {
+            {                
                 filter.ProtectionFilter ??= (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
                 this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope, filter.ProtectionFilter);
-
                 HandleOutputFieldSet(filter, outputFieldSet);
                 cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
-
                 var validateResult = await DownloadValidateAsync(filter, validateSearchFilter, filter.ProtectionFilter, roleId, authorizationApplicationIdentifier);
                 if (validateResult is not OkObjectResult okResult)
                 {
@@ -1351,14 +1323,12 @@ namespace SOS.Observations.Api.Controllers
                 }
 
                 var exportFilter = (SearchFilter)okResult.Value;
-
-                fileExportResult =
-                    await _exportManager.CreateExportFileAsync(
+                (Stream stream, string filename) result =
+                    await _exportManager.CreateExportFileInMemoryAsZipStreamAsync(
                         roleId,
                         authorizationApplicationIdentifier,
                         exportFilter,
                         ExportFormat.GeoJson,
-                        exportPath,
                         cultureCode,
                         flat,
                         propertyLabelType,
@@ -1368,9 +1338,17 @@ namespace SOS.Observations.Api.Controllers
                         JobCancellationToken.Null);
 
                 if (gzip)
-                    return GetFile(fileExportResult.FilePath, "application/zip");
+                {
+                    return File(result.stream, "application/zip", $"{result.filename}.zip");
+                }
                 else
-                    return GetFile(fileExportResult.FilePath, "application/geo+json");
+                {
+                    Response.OnCompleted(async () => { await result.stream.DisposeAsync(); });
+                    var archive = new ZipArchive(result.stream, ZipArchiveMode.Read, leaveOpen: true);
+                    var entry = archive.Entries.FirstOrDefault();
+                    var fileStream = entry.Open();
+                    return File(fileStream, "application/geo+json", entry.Name);
+                }
             }
             catch (AuthenticationRequiredException)
             {
@@ -1378,12 +1356,8 @@ namespace SOS.Observations.Api.Controllers
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Error exporting GeoJson file");
+                _logger.LogError(e, "Error exporting GeoJSON file");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
-            }
-            finally
-            {
-                 _fileService.DeleteDirectory(exportPath);
             }
         }
 

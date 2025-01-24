@@ -2,6 +2,7 @@
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Export;
 using SOS.Lib.Models.Search.Filters;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace SOS.Observations.Api.Managers.Interfaces
@@ -33,6 +34,19 @@ namespace SOS.Observations.Api.Managers.Interfaces
             SearchFilter filter,
             ExportFormat exportFormat,
             string exportPath,
+            string culture,
+            bool flatOut,
+            PropertyLabelType propertyLabelType,
+            bool excludeNullValues,
+            bool dynamicProjectDataFields,
+            bool gzip,
+            IJobCancellationToken cancellationToken);
+
+        Task<(Stream stream, string filename)> CreateExportFileInMemoryAsZipStreamAsync(
+            int? roleId,
+            string authorizationApplicationIdentifier,
+            SearchFilter filter,
+            ExportFormat exportFormat,
             string culture,
             bool flatOut,
             PropertyLabelType propertyLabelType,

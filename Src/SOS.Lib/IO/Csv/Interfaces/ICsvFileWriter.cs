@@ -2,6 +2,7 @@
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Export;
 using SOS.Lib.Models.Search.Filters;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace SOS.Lib.IO.Excel.Interfaces
@@ -29,5 +30,16 @@ namespace SOS.Lib.IO.Excel.Interfaces
             PropertyLabelType propertyLabelType,
             bool gzip,
             IJobCancellationToken cancellationToken);
+
+        Task<byte[]> CreateFileInMemoryAsync(SearchFilter filter,            
+            string culture,
+            PropertyLabelType propertyLabelType,
+            bool gzip,
+            IJobCancellationToken cancellationToken);
+
+        Task<(Stream stream, string filename)> CreateFileInMemoryAsZipStreamAsync(SearchFilter filter,
+           string culture,
+           PropertyLabelType propertyLabelType,           
+           IJobCancellationToken cancellationToken);
     }
 }
