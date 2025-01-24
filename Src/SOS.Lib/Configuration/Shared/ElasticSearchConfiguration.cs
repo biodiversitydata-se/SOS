@@ -1,5 +1,5 @@
-﻿using Elasticsearch.Net;
-using Nest;
+﻿using Elastic.Clients.Elasticsearch;
+using Elastic.Transport;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -71,17 +71,16 @@ namespace SOS.Lib.Configuration.Shared
         /// Get client created with current configuration
         /// </summary>
         /// <returns></returns>
-        public IElasticClient[] GetClients()
+        public ElasticsearchClient[] GetClients()
         {
             
-            var clients = new List<IElasticClient>();
+            var clients = new List<ElasticsearchClient>();
             foreach (var cluster in Clusters)
             {
                 var uris = cluster.Hosts.Select(u => new Uri(u));
 
-                var connectionPool = new StaticConnectionPool(uris);
-                var settings = new ConnectionSettings(connectionPool)
-                    .EnableApiVersioningHeader()
+                var connectionPool = new StaticNodePool(uris);
+                var settings = new ElasticsearchClientSettings(connectionPool)
                     .EnableHttpCompression(true)
                     .RequestTimeout(TimeSpan.FromSeconds(RequestTimeout ?? 60))
                     .SniffOnStartup(true)
@@ -91,14 +90,14 @@ namespace SOS.Lib.Configuration.Shared
 
                 if (!string.IsNullOrEmpty(UserName) && !string.IsNullOrEmpty(Password))
                 {
-                    settings.BasicAuthentication(UserName, Password);
+                    settings.Authentication(new BasicAuthentication(UserName, Password));
                 }
 
                 if (DebugMode)
                 {
                     settings.EnableDebugMode();
                 }
-                clients.Add(new ElasticClient(settings));
+                clients.Add(new ElasticsearchClient(settings));
             }
 
             return clients.ToArray();

@@ -1,7 +1,9 @@
-﻿using Nest;
+﻿using Elastic.Clients.Elasticsearch.Mapping;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.Verbatim.Artportalen;
 using System;
+using System.Linq;
 using System.Linq.Expressions;
 
 namespace SOS.Lib.Extensions
@@ -16,18 +18,18 @@ namespace SOS.Lib.Extensions
         public static PropertiesDescriptor<Event> GetMapping(this PropertiesDescriptor<Event> propertiesDescriptor)
         {
             return propertiesDescriptor
-                .DateVal(d => d.EndDate, IndexSetting.SearchSortAggregate)
-                .DateVal(d => d.StartDate, IndexSetting.SearchSortAggregate)
-                .NumberVal(n => n.EndDayOfYear, IndexSetting.SearchSortAggregate, NumberType.Short)
-                .NumberVal(n => n.StartDayOfYear, IndexSetting.SearchSortAggregate, NumberType.Short)
-                .NumberVal(n => n.StartDay, IndexSetting.SearchOnly, NumberType.Short)
-                .NumberVal(n => n.EndDay, IndexSetting.SearchOnly, NumberType.Short)
-                .NumberVal(n => n.StartMonth, IndexSetting.SearchSortAggregate, NumberType.Byte)
-                .NumberVal(n => n.EndMonth, IndexSetting.SearchSortAggregate, NumberType.Byte)
-                .NumberVal(n => n.StartHistogramWeek, IndexSetting.SearchSortAggregate, NumberType.Byte)
-                .NumberVal(n => n.EndHistogramWeek, IndexSetting.SearchSortAggregate, NumberType.Byte)
-                .NumberVal(n => n.StartYear, IndexSetting.SearchSortAggregate, NumberType.Short)
-                .NumberVal(n => n.EndYear, IndexSetting.SearchSortAggregate, NumberType.Short)        
+                .Date(d => d.EndDate, c => c.Index(true).DocValues(true))
+                .Date(d => d.StartDate, c => c.Index(true).DocValues(true))
+                .ShortNumber(s => s.EndDayOfYear, c => c.Index(true).DocValues(true))
+                .ShortNumber(s => s.StartDayOfYear, c => c.Index(true).DocValues(true))
+                .ShortNumber(s => s.StartDay, c => c.Index(true))
+                .ShortNumber(s => s.EndDay, c => c.Index(true))
+                .ByteNumber(s => s.StartMonth, c => c.Index(true).DocValues(true))
+                .ByteNumber(s => s.EndMonth, c => c.Index(true).DocValues(true))
+                .ByteNumber(s => s.StartHistogramWeek, c => c.Index(true).DocValues(true))
+                .ByteNumber(s => s.EndHistogramWeek, c => c.Index(true).DocValues(true))
+                .ShortNumber(s => s.StartYear, c => c.Index(true).DocValues(true))
+                .ShortNumber(s => s.EndYear, c => c.Index(true).DocValues(true))
                 .KeywordLowerCase(kwlc => kwlc.EventId, IndexSetting.SearchSortAggregate)
                 .KeywordLowerCase(kwlc => kwlc.EventRemarks, IndexSetting.None)
                 .KeywordLowerCase(kwlc => kwlc.FieldNumber, IndexSetting.None)
@@ -43,6 +45,34 @@ namespace SOS.Lib.Extensions
                 .KeywordLowerCase(kwlc => kwlc.SamplingEffort, IndexSetting.None)
                 .KeywordLowerCase(kwlc => kwlc.SamplingProtocol, IndexSetting.None)
                 .KeywordLowerCase(kwlc => kwlc.VerbatimEventDate, IndexSetting.None)
+                .Object(o => o.Media.FirstOrDefault(), c => c
+                    .Properties(ps => ps
+                        .KeywordLowerCase(kwlc => kwlc.Description, IndexSetting.None)
+                        .KeywordLowerCase(kwlc => kwlc.Audience, IndexSetting.None)
+                        .KeywordLowerCase(kwlc => kwlc.Contributor, IndexSetting.None)
+                        .KeywordLowerCase(kwlc => kwlc.Created, IndexSetting.None)
+                        .KeywordLowerCase(kwlc => kwlc.Creator, IndexSetting.None)
+                        .KeywordLowerCase(kwlc => kwlc.DatasetID, IndexSetting.None)
+                        .KeywordLowerCase(kwlc => kwlc.Format, IndexSetting.None)
+                        .KeywordLowerCase(kwlc => kwlc.Identifier, IndexSetting.None)
+                        .KeywordLowerCase(kwlc => kwlc.License, IndexSetting.None)
+                        .KeywordLowerCase(kwlc => kwlc.Publisher, IndexSetting.None)
+                        .KeywordLowerCase(kwlc => kwlc.References, IndexSetting.None)
+                        .KeywordLowerCase(kwlc => kwlc.RightsHolder, IndexSetting.None)
+                        .KeywordLowerCase(kwlc => kwlc.Source, IndexSetting.None)
+                        .KeywordLowerCase(kwlc => kwlc.Title, IndexSetting.None)
+                        .KeywordLowerCase(kwlc => kwlc.Type, IndexSetting.None)
+                        .Object<MultimediaComment>(mc => mc
+                            .AutoMap()
+                            .Name(nm => nm.Comments)
+                            .Properties(ps => ps
+                                .KeywordLowerCase(kwlc => kwlc.Comment, IndexSetting.None)
+                                .KeywordLowerCase(kwlc => kwlc.CommentBy, IndexSetting.None)
+                                .KeywordLowerCase(kwlc => kwlc.Created, IndexSetting.None)
+                            )
+                        )
+                    )
+                )
                 .Object<Multimedia>(n => n
                     .AutoMap()
                     .Name(nm => nm.Media)
@@ -480,12 +510,11 @@ namespace SOS.Lib.Extensions
         {
             (bool IndexForSearch, bool IndexForSortAndAggregate) indexSettings = GetIndexSettings(indexSetting);
             return propertiesDescriptor
-                .Keyword(kw => kw
+                .Keyword(kw => kw, c => c
                     .DocValues(indexSettings.IndexForSortAndAggregate)
                     .IgnoreAbove(ignoreAbove)
                     .Index(indexSettings.IndexForSearch)
-                    .Name(objectPath)
-                    .IndexOptions(IndexOptions.Docs)                    
+                    .IndexOptions(IndexOptions.Docs)
                     .Normalizer("lowercase")
                 );
         }

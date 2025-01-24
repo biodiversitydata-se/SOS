@@ -1,5 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
-using Nest;
+﻿using Elastic.Clients.Elasticsearch;
+using Microsoft.Extensions.Logging;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Enums;
@@ -157,7 +157,7 @@ namespace SOS.Lib.Repositories.Processed
         public async Task<List<Event>> GetEventsByIds(IEnumerable<string> ids, IEnumerable<SortOrderFilter> sortOrders = null)
         {
             if (ids == null || !ids.Any()) throw new ArgumentException("ids is empty");
-
+            
             var sortDescriptor = await Client.GetSortDescriptorAsync<Event>(IndexName, sortOrders);
             var query = new List<Func<QueryContainerDescriptor<Event>, QueryContainer>>();
             query.TryAddTermsCriteria("eventId", ids);

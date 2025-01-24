@@ -1,7 +1,8 @@
-﻿using CSharpFunctionalExtensions;
-using Elasticsearch.Net;
+﻿using AgileObjects.AgileMapper.Extensions;
+using CSharpFunctionalExtensions;
+using Elastic.Clients.Elasticsearch.Cluster;
+using Elastic.Clients.Elasticsearch.Mapping;
 using Microsoft.Extensions.Logging;
-using Nest;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Enums;
@@ -44,15 +45,14 @@ namespace SOS.Lib.Repositories.Processed
         /// <returns></returns>
         private async Task<bool> AddCollectionAsync(bool protectedIndex)
         {
-            var createIndexResponse = await Client.Indices.CreateAsync(protectedIndex ? ProtectedIndexName : PublicIndexName, s => s
+            await Client.Indices.CreateAsync<Observation>(protectedIndex ? ProtectedIndexName : PublicIndexName, i => i
                 .Settings(s => s
                     .NumberOfShards(protectedIndex ? NumberOfShardsProtected : NumberOfShards)
                     .NumberOfReplicas(NumberOfReplicas)
-                    .Setting("max_terms_count", 110000)
-                    .Setting(UpdatableIndexSettings.MaxResultWindow, 100000)
+                    .MaxTermsCount(110000)
+                    .MaxResultWindow(100000)
                 )
-                .Map<Observation>(m => m
-                    .AutoMap<Observation>()
+                .Mappings(map => map
                     .Properties(ps => ps
                         .KeywordLowerCase(kwlc => kwlc.Id, IndexSetting.None)
                         .KeywordLowerCase(kwlc => kwlc.DynamicProperties, IndexSetting.None)
@@ -130,7 +130,7 @@ namespace SOS.Lib.Repositories.Processed
                         .Object<ArtportalenInternal>(t => t
                             .AutoMap()
                             .Name(nm => nm.ArtportalenInternal)
-                            .Properties(ps => ps                                                                
+                            .Properties(ps => ps
                                 .KeywordLowerCase(kwlc => kwlc.SightingBarcodeURL, IndexSetting.SearchOnly)
                                 .KeywordLowerCase(kwlc => kwlc.BirdValidationAreaIds, IndexSetting.SearchOnly)
                                 .KeywordLowerCase(kwlc => kwlc.LocationPresentationNameParishRegion, IndexSetting.None)
@@ -189,7 +189,7 @@ namespace SOS.Lib.Repositories.Processed
                                         .BooleanVal(b => b.Discover, IndexSetting.None)
                                         .BooleanVal(b => b.ViewAccess, IndexSetting.SearchOnly)
                                     )
-                                )                                
+                                )
                             )
                         )
                         .Object<VocabularyValue>(c => c
@@ -203,7 +203,7 @@ namespace SOS.Lib.Repositories.Processed
                                 .KeywordLowerCase(kwlc => kwlc.UniqueKey, IndexSetting.None)
                             )
                         )
-                        .Object<IDictionary<string, string>>(c => c                            
+                        .Object<IDictionary<string, string>>(c => c
                             .Name(nm => nm.Defects)
                             .Properties(ps => ps
                                 .KeywordLowerCase(kwlc => kwlc.Keys, IndexSetting.None)
@@ -298,7 +298,7 @@ namespace SOS.Lib.Repositories.Processed
                                 .KeywordLowerCase(kwlc => kwlc.AssociatedReferences, IndexSetting.None)
                                 .KeywordLowerCase(kwlc => kwlc.AssociatedSequences, IndexSetting.None)
                                 .KeywordLowerCase(kwlc => kwlc.AssociatedTaxa, IndexSetting.None)
-                                .KeywordLowerCase(kwlc => kwlc.BiotopeDescription, IndexSetting.None)                                
+                                .KeywordLowerCase(kwlc => kwlc.BiotopeDescription, IndexSetting.None)
                                 .KeywordLowerCase(kwlc => kwlc.RecordedBy, IndexSetting.SearchSortAggregate)
                                 .KeywordLowerCase(kwlc => kwlc.CatalogNumber, IndexSetting.SearchSortAggregate)
                                 .KeywordLowerCase(kwlc => kwlc.Disposition, IndexSetting.None)
@@ -438,7 +438,7 @@ namespace SOS.Lib.Repositories.Processed
                     )
                 )
             );
-
+            
             return createIndexResponse.Acknowledged && createIndexResponse.IsValid ? true : throw new Exception($"Failed to create observation index. Error: {createIndexResponse.DebugInformation}");
         }
 
@@ -447,10 +447,14 @@ namespace SOS.Lib.Repositories.Processed
         /// Make sure Elasticserach nodes are up
         /// </summary>
         /// <param name="clusterCount"></param>
-        private void CheckNodes(int clusterCount)
+        private async Task CheckNodesAsync(int clusterCount)
         {
-            CheckNode(PublicIndexName, Math.Max(1, clusterCount - 1)); // Subtract 1 since we are using replicas in prod
-            CheckNode(ProtectedIndexName, Math.Max(1, clusterCount - 1)); // Subtract 1 since we are using replicas in prod
+            var checkNodeTasks = new[]
+            {
+                CheckNodeAsync(PublicIndexName, Math.Max(1, clusterCount - 1)), // Subtract 1 since we are using replicas in prod
+                CheckNodeAsync(ProtectedIndexName, Math.Max(1, clusterCount - 1)) // Subtract 1 since we are using replicas in prod
+            };
+            await Task.WhenAll(checkNodeTasks);
         }
 
         /// <summary>
@@ -459,23 +463,23 @@ namespace SOS.Lib.Repositories.Processed
         /// <param name="indexName"></param>
         /// <param name="minClusterCount"></param>
         /// <exception cref="Exception"></exception>
-        private void CheckNode(string indexName, int minClusterCount)
+        private async Task CheckNodeAsync(string indexName, int minClusterCount)
         {
             var clusterHealthDictionary = _clusterHealthCache.Get();
             if (clusterHealthDictionary == null)
             {
-                clusterHealthDictionary = new ConcurrentDictionary<string, ClusterHealthResponse>();
+                clusterHealthDictionary = new ConcurrentDictionary<string, HealthResponse>();
                 _clusterHealthCache.Set(clusterHealthDictionary);
             }
 
-            ClusterHealthResponse health;
+            HealthResponse health;
             if (clusterHealthDictionary.TryGetValue(indexName, out var clusterHealth))
             {
                 health = clusterHealth;
             }
             else
             {
-                health = Client.Cluster.Health(indexName);
+                health = await Client.Cluster.HealthAsync(indexName);
                 clusterHealthDictionary.TryAdd(indexName, health);
             }
 

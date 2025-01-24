@@ -1,8 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
-using Nest;
+using Elastic.Clients.Elasticsearch;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Shared;
-using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Interfaces;
@@ -13,6 +12,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Elastic.Clients.Elasticsearch.Cluster;
 
 namespace SOS.Lib.Repositories.Processed
 {
@@ -23,7 +23,7 @@ namespace SOS.Lib.Repositories.Processed
     {
         private readonly IElasticClientManager _elasticClientManager;
         private readonly ICache<string, ProcessedConfiguration> _processedConfigurationCache;
-        protected readonly IClassCache<ConcurrentDictionary<string, ClusterHealthResponse>> _clusterHealthCache;
+        protected readonly IClassCache<ConcurrentDictionary<string, HealthResponse>> _clusterHealthCache;
         protected readonly ElasticSearchConfiguration _elasticConfiguration;
         private readonly ElasticSearchIndexConfiguration _elasticSearchIndexConfiguration;
         private readonly bool _toggleable;
@@ -54,9 +54,9 @@ namespace SOS.Lib.Repositories.Processed
             }
         }
 
-        protected IElasticClient Client => ClientCount == 1 ? _elasticClientManager.Clients.FirstOrDefault() : _elasticClientManager.Clients[CurrentInstance];
+        protected ElasticsearchClient Client => ClientCount == 1 ? _elasticClientManager.Clients.FirstOrDefault() : _elasticClientManager.Clients[CurrentInstance];
 
-        protected IElasticClient InActiveClient => ClientCount == 1 ? _elasticClientManager.Clients.FirstOrDefault() : _elasticClientManager.Clients[InActiveInstance];
+        protected ElasticsearchClient InActiveClient => ClientCount == 1 ? _elasticClientManager.Clients.FirstOrDefault() : _elasticClientManager.Clients[InActiveInstance];
 
         protected int ClientCount => _elasticClientManager.Clients.Length;
 
@@ -137,7 +137,7 @@ namespace SOS.Lib.Repositories.Processed
             IElasticClientManager elasticClientManager,
             ICache<string, ProcessedConfiguration> processedConfigurationCache,
             ElasticSearchConfiguration elasticConfiguration,
-            IClassCache<ConcurrentDictionary<string, ClusterHealthResponse>> clusterHealthCache,
+            IClassCache<ConcurrentDictionary<string, HealthResponse>> clusterHealthCache,
             ILogger<ProcessRepositoryBase<TEntity, TKey>> logger
         )
         {
@@ -224,10 +224,8 @@ namespace SOS.Lib.Repositories.Processed
         {
             var searchResponse = await Client.SearchAsync<TEntity>(s => s
                 .Index(IndexName)
-                .Query(q => q.MatchAll())
+                .Query(q => q.MatchAll(q => q.QueryName("GetAllQuery")))
                 .Size(take));
-
-            searchResponse.ThrowIfInvalid();
             return searchResponse.Documents.ToList();
         }
     }
