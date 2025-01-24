@@ -41,6 +41,11 @@ namespace SOS.Lib.Models.Processed.Observation
         public int? GbifTaxonId { get; set; }
 
         /// <summary>
+        /// True if invasive in sweden according to EU Regulation 1143/2014 or to Risklist SE/HI*/
+        /// </summary>
+        public bool IsInvasive { get; set; }
+
+        /// <summary>
         /// True if invasive in sweden according to EU Regulation 1143/2014.
         /// </summary>
         public bool IsInvasiveAccordingToEuRegulation { get; set; }
