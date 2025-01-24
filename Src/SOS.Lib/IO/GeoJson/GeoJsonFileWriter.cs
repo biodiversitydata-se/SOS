@@ -17,7 +17,9 @@ using SOS.Lib.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
+using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Unicode;
@@ -32,6 +34,7 @@ namespace SOS.Lib.IO.GeoJson
         private readonly IVocabularyValueResolver _vocabularyValueResolver;
         private readonly IGeneralizationResolver _generalizationResolver;
         private readonly ILogger<GeoJsonFileWriter> _logger;
+        private const int FastSearchLimit = 10000;
 
         private void EnsureCoordinatesAreRetrievedFromDb(OutputFilter outputFilter)
         {
@@ -259,119 +262,17 @@ namespace SOS.Lib.IO.GeoJson
             bool excludeNullValues,
             bool gzip,
             IJobCancellationToken cancellationToken)
-        {
-            const int fastSearchLimit = 10000;
+        {            
             var temporaryZipExportFolderPath = Path.Combine(exportPath, "zip");
 
             try
-            {
-                var nrObservations = 0;
-                var expectedNoOfObservations = await _processedObservationRepository.GetMatchCountAsync(filter);
-                bool usePointInTimeSearch = expectedNoOfObservations > fastSearchLimit;
-                var propertyFields =
-                    ObservationPropertyFieldDescriptionHelper.GetExportFieldsFromOutputFields(filter.Output?.Fields, true);
-                EnsureCoordinatesAreRetrievedFromDb(filter.Output);
-                JsonSerializerOptions jsonSerializerOptions = CreateJsonSerializerOptions();
-                
+            {                
+                int expectedNoOfObservations = (int)await _processedObservationRepository.GetMatchCountAsync(filter);
+                bool useFastSearch = expectedNoOfObservations <= FastSearchLimit;
                 _fileService.CreateDirectory(temporaryZipExportFolderPath);
                 var observationsFilePath = Path.Combine(temporaryZipExportFolderPath, $"{fileName}.geojson");
                 await using var fileStream = File.Create(observationsFilePath, 1048576);
-                var jsonWriterOptions = new JsonWriterOptions()
-                {
-                    //To be able to display å,ä,ö e.t.c. properly we need to add the range Latin1Supplement to the list of characters which should not be displayed as UTF8 encoded values (\uxxxx).
-                    Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.Latin1Supplement)
-                };
-
-                await using var jsonWriter = new Utf8JsonWriter(fileStream, jsonWriterOptions);
-                jsonWriter.WriteStartObject();
-                jsonWriter.WriteString("type", "FeatureCollection");
-                jsonWriter.WriteString("crs", "EPSG:4326");
-                jsonWriter.WritePropertyName("features");
-                jsonWriter.WriteStartArray();
-
-                PagedResult<dynamic> fastSearchResult = null;
-                SearchAfterResult<dynamic> searchResult = null;
-                if (!usePointInTimeSearch)
-                {
-                    fastSearchResult = await _processedObservationRepository.GetChunkAsync(filter, 0, 10000);
-                }
-                else
-                {                    
-                    searchResult = await _processedObservationRepository.GetObservationsBySearchAfterAsync<dynamic>(filter);                    
-                }
-
-                while ((!usePointInTimeSearch && (fastSearchResult?.Records?.Any() ?? false)) || (usePointInTimeSearch && (searchResult?.Records?.Any() ?? false)))
-                {
-                    cancellationToken?.ThrowIfCancellationRequested();
-                    
-                    if (flatOut)
-                    {
-                        Observation[] processedObservations = null;
-                        
-                        if (usePointInTimeSearch)
-                        {
-                            processedObservations = searchResult.Records.ToObservations().ToArray();
-                        }
-                        else
-                        {
-                            processedObservations = fastSearchResult.Records.ToObservations().ToArray();
-                        }
-                        nrObservations += processedObservations.Length;
-
-                        _vocabularyValueResolver.ResolveVocabularyMappedValues(processedObservations, culture, true);
-                        await _generalizationResolver.ResolveGeneralizedObservationsAsync(filter, processedObservations);
-
-                        foreach (var observation in processedObservations)
-                        {
-                            var flatObservation = new FlatObservation(observation);
-                            await WriteFeature(propertyFields, flatObservation, propertyLabelType, excludeNullValues, jsonWriter, jsonSerializerOptions);
-                        }
-                    }
-                    else
-                    {
-                        IEnumerable<IDictionary<string, object>> processedRecords;
-                        if (usePointInTimeSearch)
-                        {
-                            processedRecords = searchResult.Records.Cast<IDictionary<string, object>>();
-                        }
-                        else
-                        {
-                            processedRecords = fastSearchResult.Records.Cast<IDictionary<string, object>>();
-                        }
-
-                        nrObservations += processedRecords.Count();
-                        _vocabularyValueResolver.ResolveVocabularyMappedValues(processedRecords, culture, true);
-                        await _generalizationResolver.ResolveGeneralizedObservationsAsync(filter, processedRecords);
-
-                        LocalDateTimeConverterHelper.ConvertToLocalTime(processedRecords);
-                        foreach (var record in processedRecords)
-                        {
-                            await WriteFeature(propertyFields, record, excludeNullValues, jsonWriter, jsonSerializerOptions);
-                        }
-                    }
-
-                    // Get next batch of observations.
-                    if (usePointInTimeSearch)
-                    {                        
-                        searchResult = await _processedObservationRepository.GetObservationsBySearchAfterAsync<dynamic>(filter, searchResult.PointInTimeId, searchResult.SearchAfter);                        
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-
-                jsonWriter.WriteEndArray();
-                jsonWriter.WriteEndObject();
-                await jsonWriter.FlushAsync();
-                await jsonWriter.DisposeAsync();
-                fileStream.Close();
-
-                // If less tha 99% of expected observations where fetched, something is wrong
-                if (nrObservations < expectedNoOfObservations * 0.99)
-                {
-                    throw new Exception($"GeoJSON export expected {expectedNoOfObservations} but only got {nrObservations}");
-                }
+                int nrObservations = await WriteGeoJsonFile(filter, culture, flatOut, propertyLabelType, excludeNullValues, expectedNoOfObservations, useFastSearch, fileStream, cancellationToken);
 
                 if (gzip)
                 {
@@ -404,6 +305,163 @@ namespace SOS.Lib.IO.GeoJson
             {
                 _fileService.DeleteDirectory(temporaryZipExportFolderPath);
             }
+        }
+
+        public async Task<(Stream stream, string filename)> CreateFileInMemoryAsZipStreamAsync(
+           SearchFilter filter,
+           string culture,
+           bool flatOut,
+           PropertyLabelType propertyLabelType,
+           bool excludeNullValues,
+           IJobCancellationToken cancellationToken)
+        {            
+            var memoryStream = new MemoryStream();
+
+            try
+            {                
+                int expectedNoOfObservations = (int)await _processedObservationRepository.GetMatchCountAsync(filter);
+                bool useFastSearch = expectedNoOfObservations <= FastSearchLimit;
+                string fileName = $"Observations {DateTime.Now.ToString("yyyy-MM-dd HH.mm")} SOS export";
+                using (var zipArchive = new ZipArchive(memoryStream, ZipArchiveMode.Create, leaveOpen: true))
+                {
+                    var geoJsonFileEntry = zipArchive.CreateEntry($"{fileName}.geojson", useFastSearch ? CompressionLevel.Fastest : CompressionLevel.Optimal);
+                    using (var geoJsonFileZipStream = geoJsonFileEntry.Open())
+                    {
+                        int nrObservations = await WriteGeoJsonFile(filter, culture, flatOut, propertyLabelType, excludeNullValues, expectedNoOfObservations, useFastSearch, geoJsonFileZipStream, cancellationToken);                        
+                    }
+
+                    var jsonEntry = zipArchive.CreateEntry("filter.json");
+                    using (var filterFileZipStream = jsonEntry.Open())
+                    using (var writer = new StreamWriter(filterFileZipStream, Encoding.UTF8))
+                    {
+                        writer.Write(filter.GetFilterAsJson());
+                    }
+                }
+
+                memoryStream.Seek(0, SeekOrigin.Begin);
+                return (memoryStream, fileName);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to create GeoJSON file.");
+                if (memoryStream != null) memoryStream.Dispose();
+                throw;
+            }
+        }
+
+        private async Task<int> WriteGeoJsonFile(
+            SearchFilter filter, 
+            string culture, 
+            bool flatOut, 
+            PropertyLabelType propertyLabelType, 
+            bool excludeNullValues,
+            int expectedNoOfObservations,
+            bool useFastSearch,
+            Stream stream, 
+            IJobCancellationToken cancellationToken)
+        {            
+            var nrObservations = 0;
+            var propertyFields =
+                ObservationPropertyFieldDescriptionHelper.GetExportFieldsFromOutputFields(filter.Output?.Fields, true);
+            EnsureCoordinatesAreRetrievedFromDb(filter.Output);
+            JsonSerializerOptions jsonSerializerOptions = CreateJsonSerializerOptions();
+
+            var jsonWriterOptions = new JsonWriterOptions()
+            {
+                //To be able to display å,ä,ö e.t.c. properly we need to add the range Latin1Supplement to the list of characters which should not be displayed as UTF8 encoded values (\uxxxx).
+                Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.Latin1Supplement)
+            };
+            var jsonWriter = new Utf8JsonWriter(stream, jsonWriterOptions);
+            jsonWriter.WriteStartObject();
+            jsonWriter.WriteString("type", "FeatureCollection");
+            jsonWriter.WriteString("crs", "EPSG:4326");
+            jsonWriter.WritePropertyName("features");
+            jsonWriter.WriteStartArray();
+
+            PagedResult<dynamic> fastSearchResult = null;
+            SearchAfterResult<dynamic> searchResult = null;
+            if (useFastSearch)
+            {
+                fastSearchResult = await _processedObservationRepository.GetChunkAsync(filter, 0, 10000);
+            }
+            else
+            {
+                searchResult = await _processedObservationRepository.GetObservationsBySearchAfterAsync<dynamic>(filter);
+            }
+
+            while ((useFastSearch && (fastSearchResult?.Records?.Any() ?? false)) || (!useFastSearch && (searchResult?.Records?.Any() ?? false)))
+            {
+                cancellationToken?.ThrowIfCancellationRequested();
+
+                if (flatOut)
+                {
+                    Observation[] processedObservations = null;
+
+                    if (useFastSearch)
+                    {
+                        processedObservations = fastSearchResult.Records.ToObservations().ToArray();
+                    }
+                    else
+                    {
+                        processedObservations = searchResult.Records.ToObservations().ToArray();
+                    }
+                    
+                    nrObservations += processedObservations.Length;
+                    _vocabularyValueResolver.ResolveVocabularyMappedValues(processedObservations, culture, true);
+                    await _generalizationResolver.ResolveGeneralizedObservationsAsync(filter, processedObservations);
+
+                    foreach (var observation in processedObservations)
+                    {
+                        var flatObservation = new FlatObservation(observation);
+                        await WriteFeature(propertyFields, flatObservation, propertyLabelType, excludeNullValues, jsonWriter, jsonSerializerOptions);
+                    }
+                }
+                else
+                {
+                    IEnumerable<IDictionary<string, object>> processedRecords;
+                    if (useFastSearch)
+                    {
+                        processedRecords = fastSearchResult.Records.Cast<IDictionary<string, object>>();
+                    }
+                    else
+                    {
+                        processedRecords = searchResult.Records.Cast<IDictionary<string, object>>();
+                    }
+
+                    nrObservations += processedRecords.Count();
+                    _vocabularyValueResolver.ResolveVocabularyMappedValues(processedRecords, culture, true);
+                    await _generalizationResolver.ResolveGeneralizedObservationsAsync(filter, processedRecords);
+                    LocalDateTimeConverterHelper.ConvertToLocalTime(processedRecords);
+                    foreach (var record in processedRecords)
+                    {
+                        await WriteFeature(propertyFields, record, excludeNullValues, jsonWriter, jsonSerializerOptions);
+                    }
+                }
+
+                // Get next batch of observations.
+                if (!useFastSearch)
+                {
+                    searchResult = await _processedObservationRepository.GetObservationsBySearchAfterAsync<dynamic>(filter, searchResult.PointInTimeId, searchResult.SearchAfter);
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            jsonWriter.WriteEndArray();
+            jsonWriter.WriteEndObject();
+            await jsonWriter.FlushAsync();
+            await jsonWriter.DisposeAsync();
+            stream.Close();
+
+            // If less tha 99% of expected observations where fetched, something is wrong
+            if (nrObservations < expectedNoOfObservations * 0.99)
+            {
+                throw new Exception($"GeoJSON export expected {expectedNoOfObservations} but only got {nrObservations}");
+            }
+
+            return nrObservations;
         }
     }
 }
