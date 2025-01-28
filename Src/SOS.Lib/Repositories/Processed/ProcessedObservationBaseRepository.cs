@@ -28,7 +28,7 @@ namespace SOS.Lib.Repositories.Processed
         /// <param name="filter"></param>
         /// <param name="skipAuthorizationFilters"></param>
         /// <returns></returns>
-        protected (ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>, ICollection<Func<QueryContainerDescriptor<object>, QueryContainer>>)
+        protected (ICollection<Func<QueryDescriptor<dynamic>, QueryContainer>>, ICollection<Func<QueryDescriptor<object>, QueryContainer>>)
             GetCoreQueries(SearchFilterBase filter, bool skipAuthorizationFilters = false)
         {
             var query = filter.ToQuery(skipAuthorizationFilters: skipAuthorizationFilters);

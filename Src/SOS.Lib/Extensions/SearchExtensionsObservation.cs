@@ -1,7 +1,11 @@
-﻿using Nest;
+﻿using AgileObjects.AgileMapper.Extensions.Internal;
+using CSharpFunctionalExtensions;
+using Elastic.Clients.Elasticsearch;
+using Elastic.Clients.Elasticsearch.QueryDsl;
 using SOS.Lib.Enums;
 using SOS.Lib.Enums.Artportalen;
 using SOS.Lib.Extensions;
+using SOS.Lib.Models.Processed.Checklist;
 using SOS.Lib.Models.Search.Filters;
 using System;
 using System.Collections.Generic;
@@ -15,12 +19,17 @@ namespace SOS.Lib
     /// </summary>
     public static class SearchExtensionsObservation
     {
+        private static void Addxxx(this QueryDescriptor<Checklist> query, string filter)
+        {
+            query.Addxxx("");
+        }
+
         /// <summary>
         /// Add filter to limit response to only show observations user is allowed to see
         /// </summary>
         /// <param name="query"></param>
         /// <param name="filter"></param>
-        private static void AddAuthorizationFilters(this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, ExtendedAuthorizationFilter filter)
+        private static void AddAuthorizationFilters(this QueryDescriptor<dynamic> query, ExtendedAuthorizationFilter filter)
         {
             if (filter.ReportedByMe ?? false)
             {
@@ -30,7 +39,7 @@ namespace SOS.Lib
 
             if (filter.ObservedByMe ?? false)
             {                
-                var objectQueries = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
+                var objectQueries = new List<Func<QueryDescriptor<dynamic>, QueryContainer>>();
                 objectQueries.TryAddTermCriteria($"artportalenInternal.occurrenceRecordedByInternal.userServiceUserId", filter.UserId);
                 objectQueries.TryAddTermCriteria($"artportalenInternal.occurrenceRecordedByInternal.viewAccess", true);
                 query.TryAddAndCriteria(objectQueries);
@@ -48,10 +57,10 @@ namespace SOS.Lib
             //query.TryAddTermCriteria("diffusionStatus", 0);
 
             // At least on of the sub queries in authorized querys must match
-            var authorizeQuerys = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
+            var authorizeQuerys = new List<Func<QueryDescriptor<dynamic>, QueryContainer>>();
 
             // Match all public observations
-            var publicQuery = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
+            var publicQuery = new List<Func<QueryDescriptor<dynamic>, QueryContainer>>();
             publicQuery.TryAddTermCriteria("sensitive", false);
             authorizeQuerys.Add(q => q
                 .Bool(b => b
@@ -64,7 +73,7 @@ namespace SOS.Lib
             {
                 foreach (var extendedAuthorization in filter.ExtendedAreas)
                 {
-                    var protectedQuery = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
+                    var protectedQuery = new List<Func<QueryDescriptor<dynamic>, QueryContainer>>();
                     protectedQuery.TryAddTermCriteria("sensitive", true);
                     protectedQuery.TryAddNumericRangeCriteria("occurrence.sensitivityCategory", extendedAuthorization.MaxProtectionLevel, SearchExtensionsGeneric.RangeTypes.LessThanOrEquals);
                     protectedQuery.TryAddTermsCriteria("taxon.id", extendedAuthorization.TaxonIds);
@@ -82,7 +91,7 @@ namespace SOS.Lib
             if (filter.UserId != 0)
             {
                 // Add autorization to a users 'own' observations 
-                var observedByMeQuery = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
+                var observedByMeQuery = new List<Func<QueryDescriptor<dynamic>, QueryContainer>>();
                 observedByMeQuery.TryAddTermCriteria("artportalenInternal.reportedByUserServiceUserId",
                     filter.UserId);
 
@@ -92,8 +101,8 @@ namespace SOS.Lib
                     )
                 );
 
-                var reportedByMeQuery = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
-                var occurrenceRecordedByInternalQueries = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
+                var reportedByMeQuery = new List<Func<QueryDescriptor<dynamic>, QueryContainer>>();
+                var occurrenceRecordedByInternalQueries = new List<Func<QueryDescriptor<dynamic>, QueryContainer>>();
                 occurrenceRecordedByInternalQueries.TryAddTermCriteria($"artportalenInternal.occurrenceRecordedByInternal.userServiceUserId", filter.UserId);
                 occurrenceRecordedByInternalQueries.TryAddTermCriteria($"artportalenInternal.occurrenceRecordedByInternal.viewAccess", true);
                 reportedByMeQuery.TryAddAndCriteria(occurrenceRecordedByInternalQueries);
@@ -118,8 +127,7 @@ namespace SOS.Lib
         /// <param name="query"></param>
         /// <param name="filter"></param>
         /// <returns></returns>
-        private static IEnumerable<int> AddInternalFilters(this
-            ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, SearchFilterBase filter)
+        private static IEnumerable<int> AddInternalFilters(this QueryDescriptor<dynamic> query, SearchFilterBase filter)
         {
             var internalFilter = filter as SearchFilterInternal;
 
@@ -182,7 +190,7 @@ namespace SOS.Lib
 
             if (internalFilter.SpeciesFactsIds?.Any() ?? false)
             {
-                var speciesFactQuerys = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
+                var speciesFactQuerys = new List<Func<QueryDescriptor<dynamic>, QueryContainer>>();
                 foreach (var factsId in internalFilter.SpeciesFactsIds)
                 {
                     speciesFactQuerys.TryAddTermCriteria("artportalenInternal.speciesFactsIds", factsId);
@@ -208,7 +216,7 @@ namespace SOS.Lib
 
             if (internalFilter.OnlyWithMedia)
             {
-                var mediaQuerys = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
+                var mediaQuerys = new List<Func<QueryDescriptor<dynamic>, QueryContainer>>();
                 mediaQuerys.AddMustExistsCriteria("occurrence.associatedMedia");
                 mediaQuerys.AddMustExistsCriteria("artportalenInternal.associatedMedia");
                 query.Add(q => q
@@ -383,18 +391,18 @@ namespace SOS.Lib
         /// <param name="excludeQuery"></param>
         /// <returns></returns>
         private static void AddInternalExcludeFilters(this
-            ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> excludeQuery, SearchFilterBase filter)
+            ICollection<Func<QueryDescriptor<dynamic>, QueryContainer>> excludeQuery, SearchFilterBase filter)
         {
             var internalFilter = filter as SearchFilterInternal;
 
             excludeQuery.TryAddTermsCriteria("identification.verificationStatus.id", internalFilter.ExcludeVerificationStatusIds);
         }
 
-        public static void AddSightingTypeFilters<TQueryContainer>(this ICollection<Func<QueryContainerDescriptor<TQueryContainer>, QueryContainer>> query,
+        public static void AddSightingTypeFilters<TQueryContainer>(this ICollection<Func<QueryDescriptor<TQueryContainer>, QueryContainer>> query,
             SearchFilterBase.SightingTypeFilter sightingTypeFilter,
             IEnumerable<int> sightingTypeSearchGroupIds) where TQueryContainer : class
         {
-            var sightingTypeQuery = new List<Func<QueryContainerDescriptor<TQueryContainer>, QueryContainer>>();
+            var sightingTypeQuery = new List<Func<QueryDescriptor<TQueryContainer>, QueryContainer>>();
             var sightingTypeSearchGroupFilter = sightingTypeSearchGroupIds?.Any() ?? false ?
                     sightingTypeSearchGroupIds
                     :
@@ -445,7 +453,7 @@ namespace SOS.Lib
             );
         }
 
-        private static void TryAddDataStewardshipFilter(this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, DataStewardshipFilter filter)
+        private static void TryAddDataStewardshipFilter(this ICollection<Func<QueryDescriptor<dynamic>, QueryContainer>> query, DataStewardshipFilter filter)
         {
             if (filter == null)
             {
@@ -460,7 +468,7 @@ namespace SOS.Lib
         /// </summary>
         /// <param name="query"></param>
         /// <param name="filter"></param>
-        private static void TryAddDeterminationFilters(this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, SearchFilterBase filter)
+        private static void TryAddDeterminationFilters(this ICollection<Func<QueryDescriptor<dynamic>, QueryContainer>> query, SearchFilterBase filter)
         {
             switch (filter.DeterminationFilter)
             {
@@ -473,7 +481,7 @@ namespace SOS.Lib
             }
         }
 
-        private static void TryAddEventFilter(this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, EventFilter filter)
+        private static void TryAddEventFilter(this ICollection<Func<QueryDescriptor<dynamic>, QueryContainer>> query, EventFilter filter)
         {
             if (filter == null)
             {
@@ -490,7 +498,7 @@ namespace SOS.Lib
         /// <param name="query"></param>
         /// <param name="geographicsFilter"></param>
         private static void TryAddGeometryFilters(
-            this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query,
+            this ICollection<Func<QueryDescriptor<dynamic>, QueryContainer>> query,
             GeographicsFilter geographicsFilter)
         {
             if (geographicsFilter == null)
@@ -498,7 +506,7 @@ namespace SOS.Lib
                 return;
             }
 
-            var boundingBoxContainers = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
+            var boundingBoxContainers = new List<Func<QueryDescriptor<dynamic>, QueryContainer>>();
 
             if (!(!geographicsFilter.UsePointAccuracy && geographicsFilter.UseDisturbanceRadius))
             {
@@ -533,7 +541,7 @@ namespace SOS.Lib
                 return;
             }
 
-            var geometryContainers = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
+            var geometryContainers = new List<Func<QueryDescriptor<dynamic>, QueryContainer>>();
 
             foreach (var geom in geographicsFilter.Geometries)
             {
@@ -569,7 +577,7 @@ namespace SOS.Lib
         }
 
         private static void TryAddModifiedDateFilter(this
-                ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, ModifiedDateFilter filter)
+                ICollection<Func<QueryDescriptor<dynamic>, QueryContainer>> query, ModifiedDateFilter filter)
         {
             if (filter == null)
             {
@@ -586,7 +594,7 @@ namespace SOS.Lib
         /// <param name="query"></param>
         /// <param name="geographicAreasFilter"></param>
         private static void TryAddGeographicalAreaFilter(
-            this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query,
+            this ICollection<Func<QueryDescriptor<dynamic>, QueryContainer>> query,
             GeographicAreasFilter geographicAreasFilter)
         {
             if (geographicAreasFilter == null)
@@ -605,7 +613,7 @@ namespace SOS.Lib
         }
 
         private static void TryAddLocationFilter(
-            this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query,
+            this ICollection<Func<QueryDescriptor<dynamic>, QueryContainer>> query,
             LocationFilter filter)
         {
             if (filter == null)
@@ -626,7 +634,7 @@ namespace SOS.Lib
         /// <param name="query"></param>
         /// <param name="filter"></param>
         private static void TryAddNotRecoveredFilter(
-            this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, SearchFilterBase filter)
+            this ICollection<Func<QueryDescriptor<dynamic>, QueryContainer>> query, SearchFilterBase filter)
         {
             switch (filter.NotRecoveredFilter)
             {
@@ -646,7 +654,7 @@ namespace SOS.Lib
         /// <param name="query"></param>
         /// <param name="filter"></param>
         private static void TryAddTaxonCriteria<TQueryContainer>(
-            this ICollection<Func<QueryContainerDescriptor<TQueryContainer>, QueryContainer>> query, TaxonFilter filter) where TQueryContainer : class
+            this ICollection<Func<QueryDescriptor<TQueryContainer>, QueryContainer>> query, TaxonFilter filter) where TQueryContainer : class
         {
             if (filter == null)
             {
@@ -658,7 +666,7 @@ namespace SOS.Lib
             query.TryAddTermsCriteria("occurrence.sex.id", filter.SexIds);
         }
 
-        private static void TryAddValidationStatusFilter(this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, SearchFilterBase filter)
+        private static void TryAddValidationStatusFilter(this ICollection<Func<QueryDescriptor<dynamic>, QueryContainer>> query, SearchFilterBase filter)
         {
             switch (filter.VerificationStatus)
             {
@@ -677,7 +685,7 @@ namespace SOS.Lib
         /// <param name="aggregationType"></param>
         /// <param name="query"></param>
         /// <returns></returns>
-        public static void AddAggregationFilter(this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, AggregationType aggregationType)
+        public static void AddAggregationFilter(this ICollection<Func<QueryDescriptor<dynamic>, QueryContainer>> query, AggregationType aggregationType)
         {
             if (aggregationType.IsDateHistogram() || aggregationType == AggregationType.SightingsPerWeek48)
             {
@@ -712,7 +720,7 @@ namespace SOS.Lib
         /// </summary>
         /// <param name="filter"></param>
         /// <returns></returns>
-        public static ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> ToMultimediaQuery(
+        public static ICollection<Func<QueryDescriptor<dynamic>, QueryContainer>> ToMultimediaQuery(
             this SearchFilterBase filter)
         {
             var query = filter.ToQuery();            
@@ -720,7 +728,7 @@ namespace SOS.Lib
             return query;
         }
 
-        public static ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> ToMeasurementOrFactsQuery(
+        public static ICollection<Func<QueryDescriptor<dynamic>, QueryContainer>> ToMeasurementOrFactsQuery(
             this SearchFilterBase filter)
         {
             var query = filter.ToQuery();            
@@ -735,19 +743,19 @@ namespace SOS.Lib
         /// <param name="extendedAuthorizations"></param>
         /// <param name="onlyAboveMyClearance"></param>
         public static void AddSignalSearchCriteria(
-            this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, IEnumerable<ExtendedAuthorizationAreaFilter> extendedAuthorizations, bool onlyAboveMyClearance)
+            this ICollection<Func<QueryDescriptor<dynamic>, QueryContainer>> query, IEnumerable<ExtendedAuthorizationAreaFilter> extendedAuthorizations, bool onlyAboveMyClearance)
         {
             if (!extendedAuthorizations?.Any() ?? true)
             {
                 return;
             }
 
-            var protectedQuerys = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
+            var protectedQuerys = new List<Func<QueryDescriptor<dynamic>, QueryContainer>>();
 
             // Allow protected observations matching user extended authorization
             foreach (var extendedAuthorization in extendedAuthorizations)
             {
-                var protectedQuery = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
+                var protectedQuery = new List<Func<QueryDescriptor<dynamic>, QueryContainer>>();
                 if (onlyAboveMyClearance)
                 {
                     protectedQuery.TryAddNumericRangeCriteria("occurrence.sensitivityCategory", extendedAuthorization.MaxProtectionLevel, SearchExtensionsGeneric.RangeTypes.GreaterThan);
@@ -776,10 +784,10 @@ namespace SOS.Lib
         /// <param name="skipSightingTypeFilters"></param>
         /// <param name="skipAuthorizationFilters"></param>
         /// <returns></returns>
-        public static ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> ToQuery(
+        public static ICollection<Func<QueryDescriptor<dynamic>, QueryContainer>> ToQuery(
             this SearchFilterBase filter, bool skipSightingTypeFilters = false, bool skipAuthorizationFilters = false)
         {
-            var query = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
+            var query = new List<Func<QueryDescriptor<dynamic>, QueryContainer>>();
 
             if (filter == null)
             {
@@ -860,14 +868,14 @@ namespace SOS.Lib
         /// </summary>
         /// <param name="filter"></param>
         /// <returns></returns>
-        public static List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> ToExcludeQuery(this SearchFilterBase filter)
+        public static List<Func<QueryDescriptor<dynamic>, QueryContainer>> ToExcludeQuery(this SearchFilterBase filter)
         {
             if (filter == null)
             {
                 return null;
             }
 
-            var query = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
+            var query = new List<Func<QueryDescriptor<dynamic>, QueryContainer>>();
 
             if (filter.Location?.AreaGeographic?.GeometryFilter?.IsValid ?? false)
             {

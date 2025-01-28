@@ -1,6 +1,7 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using MongoDB.Driver;
-using Nest;
+using Elastic.Clients.Elasticsearch;
+using Elastic.Clients.Elasticsearch.QueryDsl;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Processed.DataStewardship.Dataset;
@@ -49,14 +50,15 @@ namespace SOS.Lib.Extensions
         /// <summary>
         /// Add geo distance criteria
         /// </summary>
-        /// <typeparam name="TQueryContainer"></typeparam>
+        /// <typeparam name="TQueryDescriptor"></typeparam>
         /// <param name="query"></param>
         /// <param name="field"></param>
         /// <param name="geometry"></param>
         /// <param name="distanceType"></param>
         /// <param name="distance"></param>
-        public static void AddGeoDistanceCriteria<TQueryContainer>(this ICollection<Func<QueryContainerDescriptor<TQueryContainer>, QueryContainer>> query, string field, IGeoShape geometry, GeoDistanceType distanceType, double distance) where TQueryContainer : class
+        public static void AddGeoDistanceCriteria<TQueryDescriptor>(this ICollection<Func<QueryDescriptor<TQueryDescriptor>, QueryDescriptor>> query, string field, IGeoShape geometry, GeoDistanceType distanceType, double distance) where TQueryDescriptor : class
         {
+          
             query.Add(q => q
                 .GeoDistance(gd => gd
                     .Field(field)
@@ -71,12 +73,12 @@ namespace SOS.Lib.Extensions
         /// <summary>
         ///  Add geo shape criteria
         /// </summary>
-        /// <typeparam name="TQueryContainer"></typeparam>
+        /// <typeparam name="TQueryDescriptor"></typeparam>
         /// <param name="query"></param>
         /// <param name="field"></param>
         /// <param name="geometry"></param>
         /// <param name="relation"></param>
-        public static void AddGeoShapeCriteria<TQueryContainer>(this ICollection<Func<QueryContainerDescriptor<TQueryContainer>, QueryContainer>> query, string field, IGeoShape geometry, GeoShapeRelation relation) where TQueryContainer : class
+        public static void AddGeoShapeCriteria<TQueryDescriptor>(this ICollection<Func<QueryDescriptor<TQueryDescriptor>, QueryDescriptor>> query, string field, IGeoShape geometry, GeoShapeRelation relation) where TQueryDescriptor : class
         {
             query.Add(q => q
                 .GeoShape(gd => gd
@@ -90,25 +92,27 @@ namespace SOS.Lib.Extensions
         /// <summary>
         /// Add field must exists criteria
         /// </summary>
-        /// <typeparam name="TQueryContainer"></typeparam>
+        /// <typeparam name="TQueryDescriptor"></typeparam>
         /// <param name="query"></param>
         /// <param name="field"></param>
-        public static void AddMustExistsCriteria<TQueryContainer>(
-            this ICollection<Func<QueryContainerDescriptor<TQueryContainer>, QueryContainer>> query, string field) where TQueryContainer : class
+        public static void AddMustExistsCriteria<TQueryDescriptor>(
+            this ICollection<Func<QueryDescriptor<TQueryDescriptor>, QueryDescriptor>> query, string field) where TQueryDescriptor : class
         {
-            query.Add(q => q
-                .Regexp(re => re.Field(field).Value(".+"))
+            query.Add(q => q.Regexp(re => re
+                .Field(new Field(field))
+                .Value(".+")
             );
+            
         }
 
         /// <summary>
         /// Add nested must exists criteria
         /// </summary>
-        /// <typeparam name="TQueryContainer"></typeparam>
+        /// <typeparam name="TQueryDescriptor"></typeparam>
         /// <param name="query"></param>
         /// <param name="nestedPath"></param>
-        public static void AddNestedMustExistsCriteria<TQueryContainer>(
-            this ICollection<Func<QueryContainerDescriptor<TQueryContainer>, QueryContainer>> query, string nestedPath) where TQueryContainer : class
+        public static void AddNestedMustExistsCriteria<TQueryDescriptor>(
+            this ICollection<Func<QueryDescriptor<TQueryDescriptor>, QueryDescriptor>> query, string nestedPath) where TQueryDescriptor : class
         {
             query.Add(q => q
                 .Nested(n => n
@@ -129,11 +133,11 @@ namespace SOS.Lib.Extensions
         /// <summary>
         /// Add field not exists criteria
         /// </summary>
-        /// <typeparam name="TQueryContainer"></typeparam>
+        /// <typeparam name="TQueryDescriptor"></typeparam>
         /// <param name="query"></param>
         /// <param name="field"></param>
-        public static void AddNotExistsCriteria<TQueryContainer>(
-            this ICollection<Func<QueryContainerDescriptor<TQueryContainer>, QueryContainer>> query, string field) where TQueryContainer : class
+        public static void AddNotExistsCriteria<TQueryDescriptor>(
+            this ICollection<Func<QueryDescriptor<TQueryDescriptor>, QueryDescriptor>> query, string field) where TQueryDescriptor : class
         {
             query.Add(q => q
                 .Bool(b => b
@@ -151,14 +155,14 @@ namespace SOS.Lib.Extensions
         /// <summary>
         ///  Add numeric filter with relation operator
         /// </summary>
-        /// <typeparam name="TQueryContainer"></typeparam>
+        /// <typeparam name="TQueryDescriptor"></typeparam>
         /// <param name="queryInternal"></param>
         /// <param name="fieldName"></param>
         /// <param name="value"></param>
         /// <param name="relationalOperator"></param>
-        public static void AddNumericFilterWithRelationalOperator<TQueryContainer>(this
-            ICollection<Func<QueryContainerDescriptor<TQueryContainer>, QueryContainer>> queryInternal, string fieldName,
-            int value, string relationalOperator) where TQueryContainer : class
+        public static void AddNumericFilterWithRelationalOperator<TQueryDescriptor>(this
+            ICollection<Func<QueryDescriptor<TQueryDescriptor>, QueryDescriptor>> queryInternal, string fieldName,
+            int value, string relationalOperator) where TQueryDescriptor : class
         {
             switch (relationalOperator.ToLower())
             {
@@ -192,10 +196,10 @@ namespace SOS.Lib.Extensions
         /// <summary>
         ///  Add script source
         /// </summary>
-        /// <typeparam name="TQueryContainer"></typeparam>
+        /// <typeparam name="TQueryDescriptor"></typeparam>
         /// <param name="query"></param>
         /// <param name="source"></param>
-        public static void AddScript<TQueryContainer>(this ICollection<Func<QueryContainerDescriptor<TQueryContainer>, QueryContainer>> query, string source) where TQueryContainer : class
+        public static void AddScript<TQueryDescriptor>(this ICollection<Func<QueryDescriptor<TQueryDescriptor>, QueryContainer>> query, string source) where TQueryDescriptor : class
         {
             query.Add(q => q
                 .Script(s => s
@@ -356,12 +360,12 @@ namespace SOS.Lib.Extensions
         /// <summary>
         /// Try to add bounding box criteria
         /// </summary>
-        /// <typeparam name="TQueryContainer"></typeparam>
+        /// <typeparam name="TQueryDescriptor"></typeparam>
         /// <param name="query"></param>
         /// <param name="field"></param>
         /// <param name="boundingBox"></param>
-        public static void TryAddBoundingBoxCriteria<TQueryContainer>(this
-            ICollection<Func<QueryContainerDescriptor<TQueryContainer>, QueryContainer>> query, string field, LatLonBoundingBox boundingBox) where TQueryContainer : class
+        public static void TryAddBoundingBoxCriteria<TQueryDescriptor>(this
+            ICollection<Func<QueryDescriptor<TQueryDescriptor>, QueryContainer>> query, string field, LatLonBoundingBox boundingBox) where TQueryDescriptor : class
         {
             if (boundingBox?.BottomRight == null || boundingBox?.TopLeft == null)
             {
@@ -383,14 +387,14 @@ namespace SOS.Lib.Extensions
         /// <summary>
         /// Try to add nested term criteria
         /// </summary>
-        /// <typeparam name="TQueryContainer"></typeparam>
+        /// <typeparam name="TQueryDescriptor"></typeparam>
         /// <typeparam name="TValue"></typeparam>
         /// <param name="query"></param>
         /// <param name="nestedPath"></param>
         /// <param name="field"></param>
         /// <param name="value"></param>
-        public static void TryAddNestedTermCriteria<TQueryContainer, TValue>(this
-            ICollection<Func<QueryContainerDescriptor<TQueryContainer>, QueryContainer>> query, string nestedPath, string field, TValue value) where TQueryContainer : class
+        public static void TryAddNestedTermCriteria<TQueryDescriptor, TValue>(this
+            ICollection<Func<QueryDescriptor<TQueryDescriptor>, QueryContainer>> query, string nestedPath, string field, TValue value) where TQueryDescriptor : class
         {
             if (value == null)
             {
@@ -411,14 +415,14 @@ namespace SOS.Lib.Extensions
         /// <summary>
         /// Try to add nested terms criteria
         /// </summary>
-        /// <typeparam name="TQueryContainer"></typeparam>
+        /// <typeparam name="TQueryDescriptor"></typeparam>
         /// <typeparam name="TValue"></typeparam>
         /// <param name="query"></param>
         /// <param name="nestedPath"></param>
         /// <param name="field"></param>
         /// <param name="values"></param>
-        public static void TryAddNestedTermsCriteria<TQueryContainer, TValue>(this
-            ICollection<Func<QueryContainerDescriptor<TQueryContainer>, QueryContainer>> query, string nestedPath, string field, IEnumerable<TValue> values) where TQueryContainer : class
+        public static void TryAddNestedTermsCriteria<TQueryDescriptor, TValue>(this
+            ICollection<Func<QueryDescriptor<TQueryDescriptor>, QueryContainer>> query, string nestedPath, string field, IEnumerable<TValue> values) where TQueryDescriptor : class
         {
             if (values?.Any() ?? false)
             {
@@ -437,12 +441,12 @@ namespace SOS.Lib.Extensions
         /// <summary>
         ///  Add numeric range criteria if value is not null 
         /// </summary>
-        /// <typeparam name="TQueryContainer"></typeparam>
+        /// <typeparam name="TQueryDescriptor"></typeparam>
         /// <param name="query"></param>
         /// <param name="field"></param>
         /// <param name="value"></param>
         /// <param name="type"></param>
-        public static void TryAddNumericRangeCriteria<TQueryContainer>(this ICollection<Func<QueryContainerDescriptor<TQueryContainer>, QueryContainer>> query, string field, double? value, RangeTypes type) where TQueryContainer : class
+        public static void TryAddNumericRangeCriteria<TQueryDescriptor>(this ICollection<Func<QueryDescriptor<TQueryDescriptor>, QueryContainer>> query, string field, double? value, RangeTypes type) where TQueryDescriptor : class
         {
             if (value.HasValue)
             {
@@ -487,12 +491,12 @@ namespace SOS.Lib.Extensions
         /// <summary>
         /// Try add date filter criteria
         /// </summary>
-        /// <typeparam name="TQueryContainer"></typeparam>
+        /// <typeparam name="TQueryDescriptor"></typeparam>
         /// <param name="query"></param>
         /// <param name="filter"></param>
         /// <param name="eventField"></param>
-        public static void TryAddEventDateCritera<TQueryContainer>(
-            this ICollection<Func<QueryContainerDescriptor<TQueryContainer>, QueryContainer>> query, DateFilter filter, string eventField) where TQueryContainer : class
+        public static void TryAddEventDateCritera<TQueryDescriptor>(
+           this QueryDescriptor<TQueryDescriptor> query, DateFilter filter, string eventField) where TQueryDescriptor : class
         {
             if (filter == null)
             {
@@ -506,12 +510,12 @@ namespace SOS.Lib.Extensions
         /// <summary>
         /// Try add date range criteria
         /// </summary>
-        /// <typeparam name="TQueryContainer"></typeparam>
+        /// <typeparam name="TQueryDescriptor"></typeparam>
         /// <param name="query"></param>
         /// <param name="field"></param>
         /// <param name="dateTime"></param>
         /// <param name="type"></param>
-        public static void TryAddDateRangeCriteria<TQueryContainer>(this ICollection<Func<QueryContainerDescriptor<TQueryContainer>, QueryContainer>> query, string field, DateTime? dateTime, RangeTypes type) where TQueryContainer : class
+        public static void TryAddDateRangeCriteria<TQueryDescriptor>(this ICollection<Func<QueryDescriptor<TQueryDescriptor>, QueryContainer>> query, string field, DateTime? dateTime, RangeTypes type) where TQueryDescriptor : class
         {
             if (dateTime.HasValue)
             {
@@ -573,12 +577,12 @@ namespace SOS.Lib.Extensions
         /// <summary>
         /// Add date range query to filter
         /// </summary>
-        /// <typeparam name="TQueryContainer"></typeparam>
+        /// <typeparam name="TQueryDescriptor"></typeparam>
         /// <param name="query"></param>
         /// <param name="filter"></param>
         /// <param name="startDateField"></param>
         /// <param name="endDateField"></param>
-        public static void TryAddDateRangeFilters<TQueryContainer>(this ICollection<Func<QueryContainerDescriptor<TQueryContainer>, QueryContainer>> query, DateFilter filter, string startDateField, string endDateField) where TQueryContainer : class
+        public static void TryAddDateRangeFilters<TQueryDescriptor>(this ICollection<Func<QueryDescriptor<TQueryDescriptor>, QueryContainer>> query, DateFilter filter, string startDateField, string endDateField) where TQueryDescriptor : class
         {
             if (filter == null)
             {
@@ -621,7 +625,7 @@ namespace SOS.Lib.Extensions
         /// <param name="nestedPath"></param>
         /// <param name="fieldValues"></param>
         public static void TryAddNestedTermAndCriteria(this
-            ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, string nestedPath,
+            ICollection<Func<QueryDescriptor<dynamic>, QueryContainer>> query, string nestedPath,
             IDictionary<string, object> fieldValues)
         {
             if (!fieldValues?.Any() ?? true)
@@ -629,7 +633,7 @@ namespace SOS.Lib.Extensions
                 return;
             }
 
-            var nestedQuery = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
+            var nestedQuery = new List<Func<QueryDescriptor<dynamic>, QueryContainer>>();
 
             foreach (var fieldValue in fieldValues)
             {
@@ -646,7 +650,7 @@ namespace SOS.Lib.Extensions
                     )));
         }
 
-        public static void TryAddAndTermCriteria(this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query,            
+        public static void TryAddAndTermCriteria(this ICollection<Func<QueryDescriptor<dynamic>, QueryContainer>> query,            
             IDictionary<string, object> fieldValues)
         {
             if (!fieldValues?.Any() ?? true)
@@ -654,7 +658,7 @@ namespace SOS.Lib.Extensions
                 return;
             }
 
-            var objectQuery = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
+            var objectQuery = new List<Func<QueryDescriptor<dynamic>, QueryContainer>>();
 
             foreach (var fieldValue in fieldValues)
             {
@@ -667,8 +671,8 @@ namespace SOS.Lib.Extensions
                 ));
         }
 
-        public static void TryAddAndCriteria(this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query,
-            List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> queries)
+        public static void TryAddAndCriteria(this ICollection<Func<QueryDescriptor<dynamic>, QueryContainer>> query,
+            List<Func<QueryDescriptor<dynamic>, QueryContainer>> queries)
         {
             if (!queries?.Any() ?? true)
             {
@@ -683,73 +687,154 @@ namespace SOS.Lib.Extensions
 
 
         /// <summary>
-        /// Try to add query criteria
+        /// 
         /// </summary>
-        /// <typeparam name="TQueryContainer"></typeparam>
+        /// <typeparam name="TQueryDescriptor"></typeparam>
         /// <typeparam name="TTerms"></typeparam>
         /// <param name="query"></param>
         /// <param name="field"></param>
         /// <param name="terms"></param>
-        public static void TryAddTermsCriteria<TQueryContainer, TTerms>(
-                    this ICollection<Func<QueryContainerDescriptor<TQueryContainer>, QueryContainer>> query, string field, IEnumerable<TTerms> terms) where TQueryContainer : class
+        public static void TryAddTermsCriteria<TQueryDescriptor, TTerms>(
+                    this QueryDescriptor<TQueryDescriptor> query, string field, IEnumerable<TTerms> terms) where TQueryDescriptor : class
         {
             if (terms?.Any() ?? false)
             {
-                query.Add(q => q
+                if (terms is IEnumerable<bool> boolValues)
+                {
+                    query
+                        .Terms(t => t
+                            .Field(field)
+                            .Terms(new TermsQueryField(boolValues.Select(b => FieldValue.Boolean(b)).ToArray()))
+                        );
+                    return;
+                }
+                if (terms is IEnumerable<double> doubleValues)
+                {
+                    query
+                        .Terms(t => t
+                            .Field(field)
+                            .Terms(new TermsQueryField(doubleValues.Select(d => FieldValue.Double(d)).ToArray()))
+                        );
+                    return;
+                }
+                if (terms is IEnumerable<long> longValues)
+                {
+                    query
+                         .Terms(t => t
+                             .Field(field)
+                             .Terms(new TermsQueryField(longValues.Select(b => FieldValue.Long(b)).ToArray()))
+                         );
+                    return;
+                }
+                if (terms is IEnumerable<int> intValues)
+                {
+                    query
+                        .Terms(t => t
+                            .Field(field)
+                            .Terms(new TermsQueryField(intValues.Select(i => FieldValue.Long(i)).ToArray()))
+                        );
+                    return;
+                }
+                if (terms is IEnumerable<short> shortValues)
+                {
+                    query
+                         .Terms(t => t
+                             .Field(field)
+                             .Terms(new TermsQueryField(shortValues.Select(s => FieldValue.Long(s)).ToArray()))
+                         );
+                    return;
+                }
+                if (terms is IEnumerable<byte> byteValues)
+                {
+                    query
+                        .Terms(t => t
+                            .Field(field)
+                            .Terms(new TermsQueryField(byteValues.Select(b => FieldValue.Long(b)).ToArray()))
+                        );
+                    return;
+                }
+
+                query
                     .Terms(t => t
                         .Field(field)
-                        .Terms(terms)
-                    )
-                );
+                        .Terms(new TermsQueryField(terms.Select(s => FieldValue.String(s?.ToString())).ToArray()))
+                    );
             }
         }
 
-        public static void AddExistsCriteria<TQueryContainer>(
-            this ICollection<Func<QueryContainerDescriptor<TQueryContainer>, QueryContainer>> query, string field) where TQueryContainer : class
+        public static void AddExistsCriteria<TQueryDescriptor>(
+            this QueryDescriptor<TQueryDescriptor> query, string field) where TQueryDescriptor : class
         {
-            query.Add(q => q
-                .Exists(e => e
-                    .Field(field)
-                )
+            query.Exists(e => e
+                .Field(field)
             );
         }
 
         /// <summary>
-        /// Try to add query criteria
+        ///  Try to add query criteria
         /// </summary>
-        /// <typeparam name="TQueryContainer"></typeparam>
+        /// <typeparam name="TQueryDescriptor"></typeparam>
         /// <typeparam name="TValue"></typeparam>
         /// <param name="query"></param>
         /// <param name="field"></param>
         /// <param name="value"></param>
-        public static void TryAddTermCriteria<TQueryContainer, TValue>(
-            this ICollection<Func<QueryContainerDescriptor<TQueryContainer>, QueryContainer>> query, string field, TValue value) where TQueryContainer : class
+        public static void TryAddTermCriteria<TQueryDescriptor, TValue>(
+            this QueryDescriptor<TQueryDescriptor> query, string field, TValue value) where TQueryDescriptor : class
         {
             if (!string.IsNullOrEmpty(value?.ToString()))
             {
-                query.Add(q => q
-                    .Term(m => m.Field(field).Value(value))); // new Field(field)
+                if (value is bool boolValue)
+                {
+                    query.Term(m => m.Field(field).Value(FieldValue.Boolean(boolValue)));
+                    return;
+                }
+                if (value is double doubleValue)
+                {
+                    query.Term(m => m.Field(field).Value(FieldValue.Double(doubleValue)));
+                    return;
+                }
+                if (value is long longValue )
+                {
+                    query.Term(m => m.Field(field).Value(FieldValue.Long(longValue)));
+                    return;
+                }
+                if (value is int intValue)
+                {
+                    query.Term(m => m.Field(field).Value(FieldValue.Long(intValue)));
+                    return;
+                }
+                if (value is short shortValue)
+                {
+                    query.Term(m => m.Field(field).Value(FieldValue.Long(shortValue)));
+                    return;
+                }
+                if (value is byte byteValue)
+                {
+                    query.Term(m => m.Field(field).Value(FieldValue.Long(byteValue)));
+                    return;
+                }
+
+                query.Term(m => m.Field(field).Value(FieldValue.String(value?.ToString())));
             }
         }
 
-        public static void TryAddGeneralizationsCriteria<TQueryContainer>(
-            this ICollection<Func<QueryContainerDescriptor<TQueryContainer>, QueryContainer>> query, bool? includeSensitiveGeneralizedObservations, bool? isGeneralized) where TQueryContainer : class
+        
+        public static void TryAddGeneralizationsCriteria<TQueryDescriptor>(
+            this QueryDescriptor<TQueryDescriptor> query, bool? includeSensitiveGeneralizedObservations, bool? isGeneralized) where TQueryDescriptor : class
         {
             if (includeSensitiveGeneralizedObservations.HasValue)
             {
-                query.Add(q => q
-                    .Bool(p => p
-                        .Should(s => s
-                            .Term(t => t
-                                .Field("hasGeneralizedObservationInOtherIndex")
-                                .Value(includeSensitiveGeneralizedObservations)),
-                            s => s
-                            .Bool(t => t
-                                .MustNot(s => s
-                                  .Exists(e => 
-                                    e.Field("hasGeneralizedObservationInOtherIndex")                                
-                                    )
-                                  )
+                query.Bool(p => p
+                    .Should(s => s
+                        .Term(t => t
+                            .Field("hasGeneralizedObservationInOtherIndex")
+                            .Value(FieldValue.Boolean(includeSensitiveGeneralizedObservations.Value))),
+                        s => s
+                        .Bool(t => t
+                            .MustNot(s => s
+                                .Exists(e => 
+                                e.Field("hasGeneralizedObservationInOtherIndex")                                
+                                )
                                 )
                             )
                         )
@@ -758,60 +843,57 @@ namespace SOS.Lib.Extensions
 
             if (isGeneralized.HasValue)
             {
-                query.Add(q => q
-                    .Bool(p => p
-                        .Should(s => s
-                            .Term(t => t
-                                .Field("isGeneralized")
-                                .Value(isGeneralized)),
-                            s => s
-                            .Bool(t => t
-                                .MustNot(s => s
-                                  .Exists(e =>
+                query.Bool(p => p
+                    .Should(s => s
+                        .Term(t => t
+                            .Field("isGeneralized")
+                            .Value(FieldValue.Boolean(isGeneralized.Value))),
+                        s => s
+                        .Bool(t => t
+                            .MustNot(s => s
+                                .Exists(e =>
                                     e.Field("isGeneralized")
-                                    )
-                                  )
                                 )
                             )
                         )
-                    );
+                    )
+                );
             }
         }
 
         /// <summary>
         /// Try to add query criteria where property must match a specified value
         /// </summary>
-        /// <typeparam name="TQueryContainer"></typeparam>
+        /// <typeparam name="TQueryDescriptor"></typeparam>
         /// <typeparam name="TValue"></typeparam>
         /// <param name="query"></param>
         /// <param name="field"></param>
         /// <param name="value"></param>
         /// <param name="matchValue"></param>
-        public static void TryAddTermCriteria<TQueryContainer, TValue>(
-            this ICollection<Func<QueryContainerDescriptor<TQueryContainer>, QueryContainer>> query, string field, TValue value, TValue matchValue) where TQueryContainer : class
+        public static void TryAddTermCriteria<TQueryDescriptor, TValue>(
+           this QueryDescriptor<TQueryDescriptor> query, string field, TValue value, TValue matchValue) where TQueryDescriptor : class
         {
             if (!string.IsNullOrEmpty(value?.ToString()) && matchValue.Equals(value))
             {
-                query.Add(q => q
-                    .Term(m => m.Field(field).Value(value)));
+                query.TryAddTermCriteria(field, value);
             }
         }
 
         /// <summary>
         /// Add time range filters
         /// </summary>
-        /// <typeparam name="TQueryContainer"></typeparam>
+        /// <typeparam name="TQueryDescriptor"></typeparam>
         /// <param name="query"></param>
         /// <param name="filter"></param>
         /// <param name="field"></param>
-        public static void TryAddTimeRangeFilters<TQueryContainer>(this ICollection<Func<QueryContainerDescriptor<TQueryContainer>, QueryContainer>> query, DateFilter filter, string field) where TQueryContainer : class
+        public static void TryAddTimeRangeFilters<TQueryDescriptor>(this QueryDescriptor<TQueryDescriptor> query, DateFilter filter, string field) where TQueryDescriptor : class
         {
             if (!filter?.TimeRanges?.Any() ?? true)
             {
                 return;
             }
 
-            var timeRangeContainers = new List<Func<QueryContainerDescriptor<TQueryContainer>, QueryContainer>>();
+            var timeRangeContainers = new List<Func<QueryDescriptor<TQueryDescriptor>, QueryDescriptor>>();
             foreach (var timeRange in filter.TimeRanges)
             {
                 switch (timeRange)
@@ -847,7 +929,7 @@ namespace SOS.Lib.Extensions
         /// <param name="query"></param>
         /// <param name="field"></param>
         /// <param name="wildcard"></param>
-        public static void TryAddWildcardCriteria(this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, string field, string wildcard)
+        public static void TryAddWildcardCriteria(this ICollection<Func<QueryDescriptor<dynamic>, QueryContainer>> query, string field, string wildcard)
         {
             if (string.IsNullOrEmpty(wildcard))
             {

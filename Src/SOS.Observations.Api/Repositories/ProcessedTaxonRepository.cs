@@ -114,8 +114,8 @@ namespace SOS.Observations.Api.Repositories
         /// <returns></returns>
         private async Task<Dictionary<int, (int, DateTime?, DateTime?)>> GetAllObservationCountByTaxonIdAsync(
             string indexName,
-            ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query,
-            ICollection<Func<QueryContainerDescriptor<object>, QueryContainer>> excludeQuery,
+            ICollection<Func<QueryDescriptor<dynamic>, QueryContainer>> query,
+            ICollection<Func<QueryDescriptor<object>, QueryContainer>> excludeQuery,
             int taxonCount)
         {
             if (taxonCount is > 0 and <= 10000)
@@ -290,8 +290,8 @@ namespace SOS.Observations.Api.Repositories
 
         private async Task<Dictionary<int, TaxonProvinceAgg>> GetElasticTaxonSumAggregationByTaxonIdAsync(
             string indexName,
-            ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query,
-            ICollection<Func<QueryContainerDescriptor<object>, QueryContainer>> excludeQuery)
+            ICollection<Func<QueryDescriptor<dynamic>, QueryContainer>> query,
+            ICollection<Func<QueryDescriptor<object>, QueryContainer>> excludeQuery)
         {
             var items = new List<TaxonProvinceItem>();
             CompositeKey nextPageKey = null;
@@ -342,8 +342,8 @@ namespace SOS.Observations.Api.Repositories
         /// <param name="nextPage">The key is a combination of GeoTile string and TaxonId. Should be null in the first request.</param>
         /// <returns></returns>
         private async Task<ISearchResponse<dynamic>> PageGeoTileAndTaxaAsync(
-            ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query,
-            ICollection<Func<QueryContainerDescriptor<object>, QueryContainer>> excludeQuery,
+            ICollection<Func<QueryDescriptor<dynamic>, QueryContainer>> query,
+            ICollection<Func<QueryDescriptor<object>, QueryContainer>> excludeQuery,
             int zoom,
             CompositeKey nextPage)
         {
@@ -380,8 +380,8 @@ namespace SOS.Observations.Api.Repositories
 
         private async Task<ISearchResponse<dynamic>> PageTaxaCompositeAggregationAsync(
             string indexName,
-            ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query,
-            ICollection<Func<QueryContainerDescriptor<object>, QueryContainer>> excludeQuery,
+            ICollection<Func<QueryDescriptor<dynamic>, QueryContainer>> query,
+            ICollection<Func<QueryDescriptor<object>, QueryContainer>> excludeQuery,
             CompositeKey nextPage,
             int take)
         {
@@ -435,8 +435,8 @@ namespace SOS.Observations.Api.Repositories
 
         private async Task<ISearchResponse<dynamic>> TaxonProvinceCompositeAggregationAsync(
             string indexName,
-            ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query,
-            ICollection<Func<QueryContainerDescriptor<object>, QueryContainer>> excludeQuery,
+            ICollection<Func<QueryDescriptor<dynamic>, QueryContainer>> query,
+            ICollection<Func<QueryDescriptor<object>, QueryContainer>> excludeQuery,
             CompositeKey nextPage,
             int take)
         {
@@ -473,8 +473,8 @@ namespace SOS.Observations.Api.Repositories
 
         private async Task<Dictionary<int, (int, DateTime?, DateTime?)>> TaxaTermsAggregationAsync(
             string indexName,
-            ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query,
-            ICollection<Func<QueryContainerDescriptor<object>, QueryContainer>> excludeQuery,
+            ICollection<Func<QueryDescriptor<dynamic>, QueryContainer>> query,
+            ICollection<Func<QueryDescriptor<object>, QueryContainer>> excludeQuery,
             int size)
         {
             var searchResponse = await Client.SearchAsync<dynamic>(s => s

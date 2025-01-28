@@ -159,7 +159,7 @@ namespace SOS.Lib.Repositories.Processed
             if (ids == null || !ids.Any()) throw new ArgumentException("ids is empty");
             
             var sortDescriptor = await Client.GetSortDescriptorAsync<Event>(IndexName, sortOrders);
-            var query = new List<Func<QueryContainerDescriptor<Event>, QueryContainer>>();
+            var query = new List<Func<QueryDescriptor<Event>, QueryContainer>>();
             query.TryAddTermsCriteria("eventId", ids);
             var searchResponse = await Client.SearchAsync<Event>(s => s
                 .Index(IndexName)
@@ -364,8 +364,8 @@ namespace SOS.Lib.Repositories.Processed
             string indexName,
             string aggregationFieldKey,
             string aggregationFieldList,
-            ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query,
-            ICollection<Func<QueryContainerDescriptor<object>, QueryContainer>> excludeQuery,
+            ICollection<Func<QueryDescriptor<dynamic>, QueryContainer>> query,
+            ICollection<Func<QueryDescriptor<object>, QueryContainer>> excludeQuery,
             CompositeKey nextPage,
             int take)
         {
@@ -432,8 +432,8 @@ namespace SOS.Lib.Repositories.Processed
         private async Task<ISearchResponse<dynamic>> PageAggregationItemAsync(
             string indexName,
             string aggregationField,
-            ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query,
-            ICollection<Func<QueryContainerDescriptor<object>, QueryContainer>> excludeQuery,
+            ICollection<Func<QueryDescriptor<dynamic>, QueryContainer>> query,
+            ICollection<Func<QueryDescriptor<object>, QueryContainer>> excludeQuery,
             CompositeKey nextPage,
             int take)
         {
@@ -518,7 +518,7 @@ namespace SOS.Lib.Repositories.Processed
             };
         }
 
-        protected (ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>, ICollection<Func<QueryContainerDescriptor<object>, QueryContainer>>)
+        protected (ICollection<Func<QueryDescriptor<dynamic>, QueryContainer>>, ICollection<Func<QueryDescriptor<object>, QueryContainer>>)
             GetCoreQueries(EventSearchFilter filter)
         {
             var query = filter.ToQuery<dynamic>();

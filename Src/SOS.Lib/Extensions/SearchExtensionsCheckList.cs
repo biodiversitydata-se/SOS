@@ -1,4 +1,5 @@
-﻿using Nest;
+﻿using Elastic.Clients.Elasticsearch;
+using Elastic.Clients.Elasticsearch.QueryDsl;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Search.Filters;
 using System;
@@ -20,7 +21,8 @@ namespace SOS.Lib
         /// <param name="query"></param>
         /// <param name="geographicsFilter"></param>
         private static void TryAddGeometryFilters<TQueryContainer>(
-            this ICollection<Func<QueryContainerDescriptor<TQueryContainer>, QueryContainer>> query,
+            
+            this ICollection<Func<QueryDescriptor<TQueryContainer>>> query,
             GeographicsFilter geographicsFilter) where TQueryContainer : class
         {
             if (geographicsFilter == null)
@@ -28,8 +30,7 @@ namespace SOS.Lib
                 return;
             }
 
-            var boundingBoxContainers = new List<Func<QueryContainerDescriptor<TQueryContainer>, QueryContainer>>();
-
+            var boundingBoxContainers = new List<Func<QueryDescriptor<TQueryContainer>>>();
             if (!(!geographicsFilter.UsePointAccuracy && geographicsFilter.UseDisturbanceRadius))
             {
                 boundingBoxContainers.TryAddBoundingBoxCriteria(
@@ -62,7 +63,7 @@ namespace SOS.Lib
             {
                 return;
             }
-            var geometryContainers = new List<Func<QueryContainerDescriptor<TQueryContainer>, QueryContainer>>();
+            var geometryContainers = new List<Func<QueryDescriptor<TQueryContainer>, QueryContainer>>();
 
             foreach (var geom in geographicsFilter.Geometries)
             {
@@ -103,7 +104,7 @@ namespace SOS.Lib
         /// <typeparam name="TQueryContainer"></typeparam>
         /// <param name="query"></param>
         /// <param name="geographicAreasFilter"></param>
-        private static void TryAddGeographicFilter<TQueryContainer>(this ICollection<Func<QueryContainerDescriptor<TQueryContainer>, QueryContainer>> query,
+        private static void TryAddGeographicFilter<TQueryContainer>(this ICollection<Func<QueryDescriptor<TQueryContainer>, QueryContainer>> query,
             GeographicAreasFilter geographicAreasFilter) where TQueryContainer : class
         {
             if (geographicAreasFilter == null)
@@ -126,10 +127,10 @@ namespace SOS.Lib
         /// </summary>
         /// <param name="filter"></param>
         /// <returns></returns>
-        public static ICollection<Func<QueryContainerDescriptor<TQueryContainer>, QueryContainer>> ToQuery<TQueryContainer>(
+        public static ICollection<Func<QueryDescriptor<TQueryContainer>, QueryContainer>> ToQuery<TQueryContainer>(
             this ChecklistSearchFilter filter) where TQueryContainer : class
         {
-            var query = new List<Func<QueryContainerDescriptor<TQueryContainer>, QueryContainer>>();
+            var query = new List<Func<QueryDescriptor<TQueryContainer>, QueryContainer>>();
 
             if (filter == null)
             {

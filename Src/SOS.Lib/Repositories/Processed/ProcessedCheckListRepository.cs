@@ -1,5 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
-using Nest;
+﻿using Elastic.Clients.Elasticsearch.IndexManagement;
+using Microsoft.Extensions.Logging;
+using SOS.Lib;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Enums;
@@ -234,6 +235,7 @@ namespace SOS.Lib.Repositories.Processed
             var searchResponse = await Client.SearchAsync<Checklist>(s => s
                 .Index(IndexName)
                 .Query(q => q
+                
                     .Bool(b => b
                         .Filter(f => f.Term(t => t
                             .Field("_id")
@@ -256,9 +258,11 @@ namespace SOS.Lib.Repositories.Processed
         public async Task<PagedResult<Checklist>> GetChunkAsync(SearchFilter filter, int skip, int take, string sortBy,
             SearchSortOrder sortOrder)
         {
+        
             var searchResponse = await Client.SearchAsync<Checklist>(s => s
                 .Index(IndexName)
                 .Query(q => q
+                .
                     .Bool(b => b
                         .Filter(f => f.Exists(e => e.Field(f => f.Id)))
                     )
@@ -312,7 +316,7 @@ namespace SOS.Lib.Repositories.Processed
         public async Task<int> GetPresentCountAsync(ChecklistSearchFilter filter)
         {
             var query = filter.ToQuery<Checklist>();
-            var foundQuery = new List<Func<QueryContainerDescriptor<Checklist>, QueryContainer>>();
+            var foundQuery = new List<Func<QueryDescriptor<Checklist>, QueryContainer>>();
             foundQuery.TryAddTermsCriteria("taxonIdsFound", filter.Taxa?.Ids);
 
             var countResponse = await Client.CountAsync<Checklist>(s => s
@@ -337,7 +341,7 @@ namespace SOS.Lib.Repositories.Processed
         public async Task<int> GetAbsentCountAsync(ChecklistSearchFilter filter)
         {
             var query = filter.ToQuery<Checklist>();
-            var nonQuery = new List<Func<QueryContainerDescriptor<Checklist>, QueryContainer>>();
+            var nonQuery = new List<Func<QueryDescriptor<Checklist>, QueryContainer>>();
             nonQuery.TryAddTermsCriteria("taxonIdsFound", filter.Taxa?.Ids);
 
             var countResponse = await Client.CountAsync<Checklist>(s => s

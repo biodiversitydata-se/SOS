@@ -112,7 +112,7 @@ namespace SOS.Lib.Repositories.Processed
                 sourceFilter.Excludes(e => e.Fields(excludeFields.Select(f => new Field(f))));
             }
 
-            var query = new List<Func<QueryContainerDescriptor<Dataset>, QueryContainer>>();
+            var query = new List<Func<QueryDescriptor<Dataset>, QueryContainer>>();
             query.TryAddTermsCriteria("identifier", ids);
             var searchResponse = await Client.SearchAsync<Dataset>(s => s
                 .Index(IndexName)
