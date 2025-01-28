@@ -73,8 +73,11 @@ namespace SOS.Lib.IO.Excel
                 var observationsFilePath = Path.Combine(temporaryZipExportFolderPath, $"{fileName}.csv");
                 int expectedNoOfObservations = (int)await _processedObservationRepository.GetMatchCountAsync(filter);
                 bool useFastSearch = expectedNoOfObservations <= FastSearchLimit;
-                await using var fileStream = File.Create(observationsFilePath);
-                int nrObservations = await WriteCsvFile(filter, culture, propertyLabelType, expectedNoOfObservations, useFastSearch, fileStream, cancellationToken);
+                int nrObservations = 0;
+                await using (var fileStream = File.Create(observationsFilePath))
+                {
+                    nrObservations = await WriteCsvFile(filter, culture, propertyLabelType, expectedNoOfObservations, useFastSearch, fileStream, cancellationToken);
+                }
 
                 if (gzip)
                 {
