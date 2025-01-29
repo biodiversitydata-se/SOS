@@ -230,13 +230,11 @@ namespace SOS.Lib.IO.Excel
                 // Fetch observations from ElasticSearch.
                 if (useFastSearch)
                 {
-                    processedObservations = fastSearchResult.Records.ToObservationsArray();
-                    fastSearchResult = null;
+                    processedObservations = fastSearchResult.Records.ToObservationsArray();                    
                 }
                 else
                 {
-                    processedObservations = searchResult.Records.ToArray();
-                    searchResult = null;
+                    processedObservations = searchResult.Records.ToArray();                    
                 }                               
 
                 // Resolve vocabulary values.
@@ -265,7 +263,9 @@ namespace SOS.Lib.IO.Excel
                 searchResult = await _processedObservationRepository.GetObservationsBySearchAfterAsync<Observation>(
                     filter, searchResult.PointInTimeId, searchResult.SearchAfter);                                
             }
-            
+
+            searchResult = null;
+            fastSearchResult = null;
             csvFileHelper.FinishWrite();
             await csvFileHelper.FlushAsync();
             if (nrObservations < expectedNoOfObservations * 0.99)

@@ -399,13 +399,11 @@ namespace SOS.Lib.IO.GeoJson
 
                     if (useFastSearch)
                     {
-                        processedObservations = fastSearchResult.Records.ToObservationsArray();
-                        fastSearchResult = null;
+                        processedObservations = fastSearchResult.Records.ToObservationsArray();          
                     }
                     else
                     {
                         processedObservations = searchResult.Records.ToObservationsArray();
-                        searchResult = null;
                     }
                     
                     nrObservations += processedObservations.Length;
@@ -448,6 +446,8 @@ namespace SOS.Lib.IO.GeoJson
                 searchResult = await _processedObservationRepository.GetObservationsBySearchAfterAsync<dynamic>(filter, searchResult.PointInTimeId, searchResult.SearchAfter);           
             }
 
+            searchResult = null;
+            fastSearchResult = null;
             jsonWriter.WriteEndArray();
             jsonWriter.WriteEndObject();
             await jsonWriter.FlushAsync();
