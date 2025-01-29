@@ -196,20 +196,19 @@ namespace SOS.Lib.IO.Excel
         }
 
         private async Task<int> WriteCsvFile(
-            SearchFilter filter, 
-            string culture, 
-            PropertyLabelType propertyLabelType, 
-            int expectedNoOfObservations, 
-            bool useFastSearch, 
-            Stream stream, 
+            SearchFilter filter,
+            string culture,
+            PropertyLabelType propertyLabelType,
+            int expectedNoOfObservations,
+            bool useFastSearch,
+            Stream stream,
             IJobCancellationToken cancellationToken)
         {
-            
             int nrObservations = 0;
             var propertyFields = ObservationPropertyFieldDescriptionHelper.GetExportFieldsFromOutputFields(filter.Output?.Fields);
-            using CsvFileHelper csvFileHelper = new CsvFileHelper();            
+            using CsvFileHelper csvFileHelper = new CsvFileHelper();
             csvFileHelper.InitializeWrite(stream, "\t", leaveStreamOpen: true);
-            csvFileHelper.WriteRow(propertyFields.Select(pf => ObservationPropertyFieldDescriptionHelper.GetPropertyLabel(pf, propertyLabelType)));            
+            csvFileHelper.WriteRow(propertyFields.Select(pf => ObservationPropertyFieldDescriptionHelper.GetPropertyLabel(pf, propertyLabelType)));
             Models.Search.Result.PagedResult<dynamic> fastSearchResult = null;
             Models.Search.Result.SearchAfterResult<Observation> searchResult = null;
             if (useFastSearch)
@@ -221,20 +220,24 @@ namespace SOS.Lib.IO.Excel
                 searchResult = await _processedObservationRepository.GetObservationsBySearchAfterAsync<Observation>(filter);
             }
 
+            var fields = new List<string>(propertyFields.Count);
+
             while ((useFastSearch && (fastSearchResult?.Records?.Any() ?? false)) || (!useFastSearch && (searchResult?.Records?.Any() ?? false)))
-            {                
+            {
                 cancellationToken?.ThrowIfCancellationRequested();
                 Observation[] processedObservations = null;
 
                 // Fetch observations from ElasticSearch.
                 if (useFastSearch)
                 {
-                    processedObservations = fastSearchResult.Records.ToObservations().ToArray();
+                    processedObservations = fastSearchResult.Records.ToObservationsArray();
+                    fastSearchResult = null;
                 }
                 else
                 {
                     processedObservations = searchResult.Records.ToArray();
-                }
+                    searchResult = null;
+                }                               
 
                 // Resolve vocabulary values.
                 _vocabularyValueResolver.ResolveVocabularyMappedValues(processedObservations, culture);
@@ -244,34 +247,27 @@ namespace SOS.Lib.IO.Excel
                 foreach (var observation in processedObservations)
                 {
                     var flatObservation = new FlatObservation(observation);
-                    var fields = new List<string>();
+                    fields.Clear();
+
                     foreach (var propertyField in propertyFields)
                     {
-                        var value = flatObservation.GetValue(propertyField);
-                        var stringValue = flatObservation.GetStringValue(propertyField);
-                        fields.Add(stringValue);
+                        fields.Add(flatObservation.GetStringValue(propertyField));
                     }
+
                     csvFileHelper.WriteRow(fields);
                 }
-
+                
                 nrObservations += processedObservations.Length;
+                processedObservations = null;
+                if (useFastSearch) break;
 
-                // Get next batch of observations.
-                if (!useFastSearch)
-                {
-                    // Start fetching next batch of observations.
-                    searchResult = await _processedObservationRepository.GetObservationsBySearchAfterAsync<Observation>(filter, searchResult.PointInTimeId, searchResult.SearchAfter);
-                }
-                else
-                {
-                    break;
-                }
+                // Get next batch of observations.                
+                searchResult = await _processedObservationRepository.GetObservationsBySearchAfterAsync<Observation>(
+                    filter, searchResult.PointInTimeId, searchResult.SearchAfter);                                
             }
-
+            
             csvFileHelper.FinishWrite();
-            csvFileHelper.Flush();
-
-            // If less tha 99% of expected observations where fetched, something is wrong
+            await csvFileHelper.FlushAsync();
             if (nrObservations < expectedNoOfObservations * 0.99)
             {
                 throw new Exception($"Csv export expected {expectedNoOfObservations} but only got {nrObservations}");

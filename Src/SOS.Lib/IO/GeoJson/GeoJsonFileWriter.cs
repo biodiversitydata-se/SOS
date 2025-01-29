@@ -371,7 +371,7 @@ namespace SOS.Lib.IO.GeoJson
                 //To be able to display å,ä,ö e.t.c. properly we need to add the range Latin1Supplement to the list of characters which should not be displayed as UTF8 encoded values (\uxxxx).
                 Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.Latin1Supplement)
             };
-            var jsonWriter = new Utf8JsonWriter(stream, jsonWriterOptions);
+            await using var jsonWriter = new Utf8JsonWriter(stream, jsonWriterOptions);
             jsonWriter.WriteStartObject();
             jsonWriter.WriteString("type", "FeatureCollection");
             jsonWriter.WriteString("crs", "EPSG:4326");
@@ -399,11 +399,13 @@ namespace SOS.Lib.IO.GeoJson
 
                     if (useFastSearch)
                     {
-                        processedObservations = fastSearchResult.Records.ToObservations().ToArray();
+                        processedObservations = fastSearchResult.Records.ToObservationsArray();
+                        fastSearchResult = null;
                     }
                     else
                     {
-                        processedObservations = searchResult.Records.ToObservations().ToArray();
+                        processedObservations = searchResult.Records.ToObservationsArray();
+                        searchResult = null;
                     }
                     
                     nrObservations += processedObservations.Length;
@@ -415,6 +417,8 @@ namespace SOS.Lib.IO.GeoJson
                         var flatObservation = new FlatObservation(observation);
                         await WriteFeature(propertyFields, flatObservation, propertyLabelType, excludeNullValues, jsonWriter, jsonSerializerOptions);
                     }
+
+                    processedObservations = null;
                 }
                 else
                 {
@@ -438,15 +442,10 @@ namespace SOS.Lib.IO.GeoJson
                     }
                 }
 
-                // Get next batch of observations.
-                if (!useFastSearch)
-                {
-                    searchResult = await _processedObservationRepository.GetObservationsBySearchAfterAsync<dynamic>(filter, searchResult.PointInTimeId, searchResult.SearchAfter);
-                }
-                else
-                {
-                    break;
-                }
+                if (useFastSearch) break;
+
+                // Get next batch of observations.        
+                searchResult = await _processedObservationRepository.GetObservationsBySearchAfterAsync<dynamic>(filter, searchResult.PointInTimeId, searchResult.SearchAfter);           
             }
 
             jsonWriter.WriteEndArray();

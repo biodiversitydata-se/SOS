@@ -431,15 +431,16 @@ namespace SOS.Observations.Api.Controllers
                         JobCancellationToken.Null);
 
                 if (gzip)
-                {
-                    return File(result.stream, "application/zip", $"{result.filename}.zip");
+                {                    
+                    return File(result.stream, "application/zip", $"{result.filename}.zip");                    
                 }
                 else
                 {
-                    Response.OnCompleted(async () => { await result.stream.DisposeAsync(); });
-                    var archive = new ZipArchive(result.stream, ZipArchiveMode.Read, leaveOpen: true);
+                    Stream fileStream = null;
+                    Response.OnCompleted(async () => { await result.stream.DisposeAsync(); fileStream?.Dispose(); });
+                    using var archive = new ZipArchive(result.stream, ZipArchiveMode.Read, leaveOpen: true);
                     var entry = archive.Entries.FirstOrDefault();
-                    var fileStream = entry.Open();
+                    fileStream = entry.Open();
                     return File(fileStream, "text/tab-separated-values", entry.Name);
                 }
             }
@@ -667,10 +668,11 @@ namespace SOS.Observations.Api.Controllers
                 }
                 else
                 {
-                    Response.OnCompleted(async () => { await result.stream.DisposeAsync(); });
-                    var archive = new ZipArchive(result.stream, ZipArchiveMode.Read, leaveOpen: true);
+                    Stream fileStream = null;
+                    Response.OnCompleted(async () => { await result.stream.DisposeAsync(); fileStream?.Dispose(); });                    
+                    using var archive = new ZipArchive(result.stream, ZipArchiveMode.Read, leaveOpen: true);
                     var entry = archive.Entries.FirstOrDefault();
-                    var fileStream = entry.Open();
+                    fileStream = entry.Open();
                     return File(fileStream, "application/geo+json", entry.Name);
                 }
             }
@@ -1115,10 +1117,11 @@ namespace SOS.Observations.Api.Controllers
                 }
                 else
                 {
-                    Response.OnCompleted(async () => { await result.stream.DisposeAsync(); });
-                    var archive = new ZipArchive(result.stream, ZipArchiveMode.Read, leaveOpen: true);
+                    Stream fileStream = null;
+                    Response.OnCompleted(async () => { await result.stream.DisposeAsync(); fileStream?.Dispose(); });                    
+                    using var archive = new ZipArchive(result.stream, ZipArchiveMode.Read, leaveOpen: true);
                     var entry = archive.Entries.FirstOrDefault();
-                    var fileStream = entry.Open();
+                    fileStream = entry.Open();
                     return File(fileStream, "text/tab-separated-values", entry.Name);
                 }
             }
@@ -1343,10 +1346,11 @@ namespace SOS.Observations.Api.Controllers
                 }
                 else
                 {
-                    Response.OnCompleted(async () => { await result.stream.DisposeAsync(); });
-                    var archive = new ZipArchive(result.stream, ZipArchiveMode.Read, leaveOpen: true);
+                    Stream fileStream = null;
+                    Response.OnCompleted(async () => { await result.stream.DisposeAsync(); fileStream?.Dispose(); });                    
+                    using var archive = new ZipArchive(result.stream, ZipArchiveMode.Read, leaveOpen: true);
                     var entry = archive.Entries.FirstOrDefault();
-                    var fileStream = entry.Open();
+                    fileStream = entry.Open();
                     return File(fileStream, "application/geo+json", entry.Name);
                 }
             }

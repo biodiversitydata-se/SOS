@@ -291,11 +291,13 @@ namespace SOS.Lib.IO.Excel
                     Observation[] processedObservations = null;
                     if (useFastSearch)
                     {
-                        processedObservations = fastSearchResult.Records.ToObservations().ToArray();
+                        processedObservations = fastSearchResult.Records.ToObservationsArray();
+                        fastSearchResult = null;
                     }
                     else
                     {
                         processedObservations = searchResult.Records.ToArray();
+                        searchResult = null;
                     }
 
                     // Resolve vocabulary values.
@@ -357,18 +359,11 @@ namespace SOS.Lib.IO.Excel
                         rowIndex++;
                     }
 
+                    
                     nrObservations += processedObservations.Length;
-
-                    // Get next batch of observations.
-                    if (!useFastSearch)
-                    {
-                        // Start fetching next batch of observations.
-                        searchResult = await _processedObservationRepository.GetObservationsBySearchAfterAsync<Observation>(filter, searchResult.PointInTimeId, searchResult.SearchAfter);
-                    }
-                    else
-                    {
-                        break;
-                    }
+                    processedObservations = null;
+                    if (useFastSearch) break;
+                    searchResult = await _processedObservationRepository.GetObservationsBySearchAfterAsync<Observation>(filter, searchResult.PointInTimeId, searchResult.SearchAfter);
                 }
 
                 // If less tha 99% of expected observations where fetched, something is wrong
