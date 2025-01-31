@@ -599,7 +599,7 @@ namespace SOS.Observations.Api.Managers
                             };
                             if (!hasAccess)
                             {
-                                return false;
+                                throw new AuthenticationRequiredException("User don't have the SightingIndication permission that is required");
                             }
                         }
                     }
@@ -611,7 +611,7 @@ namespace SOS.Observations.Api.Managers
                             var geometry = geoShape.ToGeometry();
                             if (!filter.ExtendedAuthorization.ExtendedAreas.Exists(ea => ea.GeographicAreas?.GeometryFilter?.Geometries.Exists(g => g.ToGeometry().Contains(geometry)) ?? false))
                             {
-                                return false;
+                                throw new AuthenticationRequiredException("User don't have the SightingIndication permission that is required");
                             }
                         }
                     }
