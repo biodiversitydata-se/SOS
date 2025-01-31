@@ -580,8 +580,43 @@ namespace SOS.Observations.Api.Managers
                     throw new AuthenticationRequiredException("User don't have the SightingIndication permission that is required");
                 }
 
-                var result = await _processedObservationRepository.SignalSearchInternalAsync(filter, onlyAboveMyClearance);
-                return result;
+                if (filter.Location != null)
+                {
+                    if (filter.Location.Areas?.Any() ?? false)
+                    {
+                        // Check if user has access to provided areas
+                        foreach(var area in filter.Location.Areas)
+                        {
+                            var hasAccess = area.AreaType switch
+                            {
+                                AreaType.BirdValidationArea => filter.ExtendedAuthorization.ExtendedAreas.Exists(ea => ea.GeographicAreas?.BirdValidationAreaIds?.Exists(bva => bva.Equals(area.FeatureId)) ?? false),
+                                AreaType.CountryRegion => filter.ExtendedAuthorization.ExtendedAreas.Exists(ea => ea.GeographicAreas?.CountryRegionIds?.Exists(bva => bva.Equals(area.FeatureId)) ?? false),
+                                AreaType.County => filter.ExtendedAuthorization.ExtendedAreas.Exists(ea => ea.GeographicAreas?.CountyIds?.Exists(bva => bva.Equals(area.FeatureId)) ?? false),
+                                AreaType.Municipality => filter.ExtendedAuthorization.ExtendedAreas.Exists(ea => ea.GeographicAreas?.MunicipalityIds?.Exists(bva => bva.Equals(area.FeatureId)) ?? false),
+                                AreaType.Parish => filter.ExtendedAuthorization.ExtendedAreas.Exists(ea => ea.GeographicAreas?.ParishIds?.Exists(bva => bva.Equals(area.FeatureId)) ?? false),
+                                AreaType.Province => filter.ExtendedAuthorization.ExtendedAreas.Exists(ea => ea.GeographicAreas?.ProvinceIds?.Exists(bva => bva.Equals(area.FeatureId)) ?? false),
+                                _ => false
+                            };
+                            if (!hasAccess)
+                            {
+                                return false;
+                            }
+                        }
+                    }
+                    if (filter.Location.Geometries?.Geometries?.Any() ?? false)
+                    {
+                        // Check if user has access to provided geometries
+                        foreach (var geoShape in filter.Location.Geometries?.Geometries)
+                        {
+                            var geometry = geoShape.ToGeometry();
+                            if (!filter.ExtendedAuthorization.ExtendedAreas.Exists(ea => ea.GeographicAreas?.GeometryFilter?.Geometries.Exists(g => g.ToGeometry().Contains(geometry)) ?? false))
+                            {
+                                return false;
+                            }
+                        }
+                    }
+                }
+                return await _processedObservationRepository.SignalSearchInternalAsync(filter, onlyAboveMyClearance);
             }
             catch (TimeoutException e)
             {
