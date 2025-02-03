@@ -23,6 +23,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using OfficeOpenXml;
+using SOS.Lib.Models.Search.Enums;
 
 namespace SOS.Observations.Api.Managers
 {
@@ -564,7 +565,7 @@ namespace SOS.Observations.Api.Managers
         }
 
         /// <inheritdoc />
-        public async Task<bool> SignalSearchInternalAsync(
+        public async Task<SignalSerachResult> SignalSearchInternalAsync(
             int? roleId,
             string authorizationApplicationIdentifier,
             SearchFilter filter,
@@ -579,44 +580,59 @@ namespace SOS.Observations.Api.Managers
                 {
                     throw new AuthenticationRequiredException("User don't have the SightingIndication permission that is required");
                 }
-
-                if (filter.Location != null)
+                if (filter.Location?.AreaGeographic != null)
                 {
-                    if (filter.Location.Areas?.Any() ?? false)
+                    var areaGeographic = filter.Location?.AreaGeographic;
+                    var hasAccess = true;
+                    if ((areaGeographic.CountryRegionIds?.Count() ?? 0) != 0)
                     {
-                        // Check if user has access to provided areas
-                        foreach(var area in filter.Location.Areas)
+                        hasAccess = hasAccess && filter.ExtendedAuthorization.ExtendedAreas.Exists(ea => (ea.GeographicAreas?.CountryRegionIds?.Intersect(areaGeographic.CountryRegionIds)?.Count() ?? 0) > 0);
+                    }
+                    if ((areaGeographic.CountyIds?.Count() ?? 0) != 0)
+                    {
+                        hasAccess = hasAccess && filter.ExtendedAuthorization.ExtendedAreas.Exists(ea => (ea.GeographicAreas?.CountyIds?.Intersect(areaGeographic.CountyIds)?.Count() ?? 0) > 0);
+                    }
+                    if ((areaGeographic.MunicipalityIds?.Count() ?? 0) != 0)
+                    {
+                        hasAccess = hasAccess && filter.ExtendedAuthorization.ExtendedAreas.Exists(ea => (ea.GeographicAreas?.MunicipalityIds?.Intersect(areaGeographic.MunicipalityIds)?.Count() ?? 0) > 0);
+                    }
+                    if ((areaGeographic.ParishIds?.Count() ?? 0) != 0)
+                    {
+                        hasAccess = hasAccess && filter.ExtendedAuthorization.ExtendedAreas.Exists(ea => (ea.GeographicAreas?.ParishIds?.Intersect(areaGeographic.ParishIds)?.Count() ?? 0) > 0);
+                    }
+                    if ((areaGeographic.ProvinceIds?.Count() ?? 0) != 0)
+                    {
+                        hasAccess = hasAccess && filter.ExtendedAuthorization.ExtendedAreas.Exists(ea => (ea.GeographicAreas?.ProvinceIds?.Intersect(areaGeographic.ProvinceIds)?.Count() ?? 0) > 0);
+                    }
+                    if (!hasAccess)
+                    {
+                        return SignalSerachResult.NoPermissions;
+                    }
+
+                    if (areaGeographic.GeometryFilter?.Geometries?.Any() ?? false)
+                    {
+                        // Check if user has access to provided geometries
+                        foreach (var geoShape in areaGeographic.GeometryFilter.Geometries)
                         {
-                            var hasAccess = area.AreaType switch
+                            var geometry = geoShape.ToGeometry();
+                            if (!filter.ExtendedAuthorization.ExtendedAreas.Exists(ea => ea.GeographicAreas?.GeometryFilter?.Geometries?.Exists(g => g.ToGeometry().Contains(geometry)) ?? false))
                             {
-                                AreaType.BirdValidationArea => filter.ExtendedAuthorization.ExtendedAreas.Exists(ea => ea.GeographicAreas?.BirdValidationAreaIds?.Exists(bva => bva.Equals(area.FeatureId)) ?? false),
-                                AreaType.CountryRegion => filter.ExtendedAuthorization.ExtendedAreas.Exists(ea => ea.GeographicAreas?.CountryRegionIds?.Exists(bva => bva.Equals(area.FeatureId)) ?? false),
-                                AreaType.County => filter.ExtendedAuthorization.ExtendedAreas.Exists(ea => ea.GeographicAreas?.CountyIds?.Exists(bva => bva.Equals(area.FeatureId)) ?? false),
-                                AreaType.Municipality => filter.ExtendedAuthorization.ExtendedAreas.Exists(ea => ea.GeographicAreas?.MunicipalityIds?.Exists(bva => bva.Equals(area.FeatureId)) ?? false),
-                                AreaType.Parish => filter.ExtendedAuthorization.ExtendedAreas.Exists(ea => ea.GeographicAreas?.ParishIds?.Exists(bva => bva.Equals(area.FeatureId)) ?? false),
-                                AreaType.Province => filter.ExtendedAuthorization.ExtendedAreas.Exists(ea => ea.GeographicAreas?.ProvinceIds?.Exists(bva => bva.Equals(area.FeatureId)) ?? false),
-                                _ => false
-                            };
-                            if (!hasAccess)
-                            {
-                                throw new AuthenticationRequiredException("User don't have the SightingIndication permission that is required");
+                                return SignalSerachResult.NoPermissions;
                             }
                         }
                     }
-                    if (filter.Location.Geometries?.Geometries?.Any() ?? false)
+                    if (filter.Location.Geometries.BoundingBox != null)
                     {
-                        // Check if user has access to provided geometries
-                        foreach (var geoShape in filter.Location.Geometries?.Geometries)
+                        var bbGeometry = filter.Location.Geometries.BoundingBox.ToGeoemtry();
+                        if (!filter.ExtendedAuthorization.ExtendedAreas.Exists(ea => ea.GeographicAreas?.GeometryFilter?.Geometries?.Exists(g => g.ToGeometry().Contains(bbGeometry)) ?? false))
                         {
-                            var geometry = geoShape.ToGeometry();
-                            if (!filter.ExtendedAuthorization.ExtendedAreas.Exists(ea => ea.GeographicAreas?.GeometryFilter?.Geometries.Exists(g => g.ToGeometry().Contains(geometry)) ?? false))
-                            {
-                                throw new AuthenticationRequiredException("User don't have the SightingIndication permission that is required");
-                            }
+                            return SignalSerachResult.NoPermissions;
                         }
                     }
                 }
-                return await _processedObservationRepository.SignalSearchInternalAsync(filter, onlyAboveMyClearance);
+              
+                var result = await _processedObservationRepository.SignalSearchInternalAsync(filter, onlyAboveMyClearance);
+                return result ? SignalSerachResult.Yes : SignalSerachResult.No;
             }
             catch (TimeoutException e)
             {

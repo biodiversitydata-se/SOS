@@ -8,6 +8,7 @@ using SOS.Lib.Helpers;
 using SOS.Lib.JsonConverters;
 using SOS.Lib.Models.Cache;
 using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.Search.Enums;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Swagger;
@@ -1833,7 +1834,12 @@ namespace SOS.Observations.Api.Controllers
                 var searchFilter = filter.ToSearchFilterInternal(this.GetUserId(), true);
                 var taxonFound = await _observationManager.SignalSearchInternalAsync(roleId, authorizationApplicationIdentifier, searchFilter, areaBuffer, onlyAboveMyClearance);
 
-                return new OkObjectResult(taxonFound);
+                if (taxonFound.Equals(SignalSerachResult.NoPermissions))
+                {
+                    throw new AuthenticationRequiredException("User don't have the SightingIndication permission in provided areas");
+                }
+
+                return new OkObjectResult(taxonFound.Equals(SignalSerachResult.Yes));
             }
             catch (AuthenticationRequiredException e)
             {
