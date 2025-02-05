@@ -14,8 +14,6 @@ namespace SOS.Lib.Extensions
     {
         private static IDictionary<int, VocabularyValue> _protectionLevelCache =
             new ConcurrentDictionary<int, VocabularyValue>();
-
-        private static HashSet<string> _isInvasiveInSwedenCategories = new HashSet<string>() { "5", "7", "8", "9" };
         private static HashSet<string> _redlistCategories = new HashSet<string>() { "cr", "en", "vu", "nt" };
 
         /// <summary>
@@ -112,9 +110,8 @@ namespace SOS.Lib.Extensions
             //taxon.Attributes.ProtectionLevel = sourceTaxon.DynamicProperties?.ProtectionLevel.ToProtectionLevel();
             taxon.Attributes.SensitivityCategory = sourceTaxon.DynamicProperties?.ProtectionLevel.ToProtectionLevel();
             taxon.Attributes.ProtectedByLaw = sourceTaxon.DynamicProperties?.ProtectedByLaw ?? false;
-            taxon.Attributes.IsInvasive = sourceTaxon.DynamicProperties?.IsInvasive ?? false;
             taxon.Attributes.IsInvasiveAccordingToEuRegulation = sourceTaxon.DynamicProperties?.IsEURegulation_1143_2014 ?? false;
-            taxon.Attributes.IsInvasiveInSweden = _isInvasiveInSwedenCategories.Contains(sourceTaxon.DynamicProperties?.SwedishHistoryId ?? string.Empty);
+            taxon.Attributes.IsInvasiveInSweden = sourceTaxon.DynamicProperties?.IsInvasiveInSweden ?? false;
             taxon.Attributes.InvasiveRiskAssessmentCategory = sourceTaxon.DynamicProperties?.SwedishHistoryCategory?.Substring(0, 2);
             taxon.Attributes.RedlistCategory = sourceTaxon.DynamicProperties?.RedlistCategory?.Substring(0, 2);
             taxon.Attributes.ScientificNames = sourceTaxon.ScientificNames?.ToTaxonScientificNames();

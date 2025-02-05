@@ -657,9 +657,9 @@ namespace SOS.Lib
             query.TryAddTermsCriteria("taxon.id", filter.Ids);
             query.TryAddTermsCriteria("occurrence.sex.id", filter.SexIds);
 
-            if (filter.IsInvasive.HasValue)
+            if (filter.IsInvasiveInSweden.HasValue)
             {
-                query.TryAddTermCriteria("taxon.isInvasive", filter.IsInvasive.Value);
+                query.TryAddTermCriteria("taxon.isInvasiveInSweden", filter.IsInvasiveInSweden.Value);
             }
         }
 

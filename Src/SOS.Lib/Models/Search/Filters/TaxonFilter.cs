@@ -41,7 +41,7 @@ namespace SOS.Lib.Models.Search.Filters
         /// Search for non invasive taxa (false)
         /// Search for both (null)
         /// </summary>
-        public bool? IsInvasive { get; set; }
+        public bool? IsInvasiveInSweden { get; set; }
 
         /// <summary>
         /// Taxon kingdoms

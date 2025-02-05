@@ -125,7 +125,7 @@ namespace SOS.Harvest.Processors.Taxon
                             case 37:
                             case 39:
                             case 40:
-                                taxon.DynamicProperties.IsInvasive = true;
+                                taxon.DynamicProperties.IsInvasiveInSweden = true;
                                 break;
                             case 34:
                             case 281:

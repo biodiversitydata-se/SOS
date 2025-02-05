@@ -22,7 +22,7 @@ namespace SOS.Shared.Api.Dtos.Filter
         /// Search for non invasive taxa (false)
         /// Search for both (null)
         /// </summary>
-        public bool? IsInvasive { get; set; }
+        public bool? IsInvasiveInSweden { get; set; }
 
         /// <summary>
         /// Add (merge) or filter taxa by using taxon lists.

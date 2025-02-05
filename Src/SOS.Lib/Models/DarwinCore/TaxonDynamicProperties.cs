@@ -50,7 +50,7 @@ namespace SOS.Lib.Models.DarwinCore
         /// <summary>
         /// True if in EU list or in risk list and classified as severe or high risk
         /// </summary>
-        public bool IsInvasive { get; set; }
+        public bool IsInvasiveInSweden { get; set; }
 
         /// <summary>
         ///     part of Habitats directive article 2
