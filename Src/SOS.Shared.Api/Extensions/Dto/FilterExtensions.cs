@@ -447,6 +447,7 @@ namespace SOS.Shared.Api.Extensions.Dto
             {
                 Ids = filterDto.Ids,
                 IncludeUnderlyingTaxa = filterDto.IncludeUnderlyingTaxa ?? false,
+                IsInvasive = filterDto.IsInvasive,
                 ListIds = filterDto.TaxonListIds,
                 TaxonListOperator = TaxonFilter.TaxonListOp.Merge,
             };

@@ -18,6 +18,13 @@ namespace SOS.Shared.Api.Dtos.Filter
         public IEnumerable<int>? Ids { get; set; }
 
         /// <summary>
+        /// Search for only invasive taxa (true)
+        /// Search for non invasive taxa (false)
+        /// Search for both (null)
+        /// </summary>
+        public bool? IsInvasive { get; set; }
+
+        /// <summary>
         /// Add (merge) or filter taxa by using taxon lists.
         /// </summary>
         public IEnumerable<int>? TaxonListIds { get; set; }

@@ -656,6 +656,11 @@ namespace SOS.Lib
             query.TryAddTermsCriteria("taxon.attributes.redlistCategoryDerived", filter.RedListCategories?.Select(m => m.ToUpper()));
             query.TryAddTermsCriteria("taxon.id", filter.Ids);
             query.TryAddTermsCriteria("occurrence.sex.id", filter.SexIds);
+
+            if (filter.IsInvasive.HasValue)
+            {
+                query.TryAddTermCriteria("taxon.isInvasive", filter.IsInvasive.Value);
+            }
         }
 
         private static void TryAddValidationStatusFilter(this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, SearchFilterBase filter)
