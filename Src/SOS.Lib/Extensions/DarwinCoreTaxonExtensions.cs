@@ -112,7 +112,6 @@ namespace SOS.Lib.Extensions
             //taxon.Attributes.ProtectionLevel = sourceTaxon.DynamicProperties?.ProtectionLevel.ToProtectionLevel();
             taxon.Attributes.SensitivityCategory = sourceTaxon.DynamicProperties?.ProtectionLevel.ToProtectionLevel();
             taxon.Attributes.ProtectedByLaw = sourceTaxon.DynamicProperties?.ProtectedByLaw ?? false;
-            taxon.Attributes.IsInvasive = sourceTaxon.DynamicProperties?.IsInvasive ?? false;
             taxon.Attributes.IsInvasiveAccordingToEuRegulation = sourceTaxon.DynamicProperties?.IsEURegulation_1143_2014 ?? false;
             taxon.Attributes.IsInvasiveInSweden = _isInvasiveInSwedenCategories.Contains(sourceTaxon.DynamicProperties?.SwedishHistoryId ?? string.Empty);
             taxon.Attributes.InvasiveRiskAssessmentCategory = sourceTaxon.DynamicProperties?.SwedishHistoryCategory?.Substring(0, 2);

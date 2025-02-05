@@ -48,11 +48,6 @@ namespace SOS.Lib.Models.DarwinCore
         public bool IsEURegulation_1143_2014 { get; set; }
 
         /// <summary>
-        /// True if in EU list or in risk list and classified as severe or high risk
-        /// </summary>
-        public bool IsInvasive { get; set; }
-
-        /// <summary>
         ///     part of Habitats directive article 2
         /// </summary>
         public bool? Natura2000HabitatsDirectiveArticle2 { get; set; }
