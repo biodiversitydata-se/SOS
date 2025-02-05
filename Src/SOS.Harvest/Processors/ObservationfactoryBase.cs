@@ -294,22 +294,17 @@ namespace SOS.Harvest.Processors
             }
             else if (int.TryParse(observation.Occurrence.IndividualCount, out var individualCount))
             {
-                observation.Occurrence.OrganismQuantityAggregation = individualCount;
-                observation.Occurrence.OrganismQuantityInt = individualCount;
-                observation.Occurrence.OrganismQuantity = individualCount.ToString();
+                observation.Occurrence.OrganismQuantityAggregation = individualCount;                
                 return;
             }
 
             if (observation.Occurrence.IsPositiveObservation)
             {
-                observation.Occurrence.OrganismQuantityAggregation = 1;
-                observation.Occurrence.OrganismQuantityInt = 1;
-                observation.Occurrence.OrganismQuantity = "1";
+                observation.Occurrence.OrganismQuantityAggregation = 1;                
                 return;
             }
 
-            observation.Occurrence.OrganismQuantityAggregation = 0;
-            observation.Occurrence.OrganismQuantityInt = null;
+            observation.Occurrence.OrganismQuantityAggregation = 0;            
         }
 
         protected int GetBirdNestActivityId(VocabularyValue? activity, Lib.Models.Processed.Observation.Taxon? taxon)

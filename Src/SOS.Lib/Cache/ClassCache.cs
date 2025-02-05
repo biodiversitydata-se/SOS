@@ -95,13 +95,14 @@ namespace SOS.Lib.Cache
         public void Set(TClass entity)
         {
             lock (InitLock)
-            {
+            {                
+                _renewalTimer?.Dispose();
                 var expirationToken = new CancellationChangeToken(
                     new CancellationTokenSource(CacheDuration).Token);
                 var cacheEntryOptions = new MemoryCacheEntryOptions()
                     .SetPriority(CacheItemPriority.NeverRemove)
                     .AddExpirationToken(expirationToken)
-                    .RegisterPostEvictionCallback(callback: OnCacheEviction, state: this);                
+                    .RegisterPostEvictionCallback(callback: OnCacheEviction, state: this);
                 _memoryCache.Set(_cacheKey, entity, cacheEntryOptions);
                 Logger.LogInformation($"Cache set. Key=\"{_cacheKey}\"");
                 var expirationTime = CacheDuration - CacheExpireSoonTimeSpan;

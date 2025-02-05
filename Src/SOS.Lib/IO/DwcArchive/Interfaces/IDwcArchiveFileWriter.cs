@@ -8,6 +8,7 @@ using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace SOS.Lib.IO.DwcArchive.Interfaces
@@ -59,6 +60,14 @@ namespace SOS.Lib.IO.DwcArchive.Interfaces
             ProcessInfo processInfo,
             string exportFolderPath,
             IJobCancellationToken cancellationToken);
+
+        Task<(Stream stream, string filename)> CreateDwcArchiveFileInMemoryAsync(
+            DataProvider dataProvider,
+            SearchFilter filter,
+            IProcessedObservationCoreRepository processedObservationRepository,
+            IEnumerable<FieldDescription> fieldDescriptions,
+            ProcessInfo processInfo,
+            IJobCancellationToken cancellationToken);        
 
         /// <summary>
         /// Write part of DwC-A CSV files to disk.
