@@ -87,7 +87,7 @@ public static class Settings
         if (required)
             throw new Exception($"value for {key} is null or empty!");
         else
-            return default;
+            return default!;
     }
     private static string GetConfigValueString(string key, IConfiguration configuration, ILogger logger, bool sensitiveSetting = false, bool required = true)
     {

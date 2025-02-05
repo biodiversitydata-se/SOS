@@ -167,7 +167,7 @@ namespace SOS.Observations.Api.Managers
             var dict = new Dictionary<string, IDictionary<string, object>>();
             foreach(var obs in observations)
             {
-                string? occurrenceId = GetValue<string?>(obs, "occurrence.occurrenceId");
+                var occurrenceId = GetValue<string>(obs, "occurrence.occurrenceId");
                 if (occurrenceId != null)
                 {
                     dict.Add(occurrenceId, obs);
@@ -177,7 +177,7 @@ namespace SOS.Observations.Api.Managers
             return dict;
         }
 
-        private T? GetValue<T>(IDictionary<string, object> obs, string propertyPath)
+        private T GetValue<T>(IDictionary<string, object> obs, string propertyPath)
         {
             var parts = propertyPath
                 .Split(".")

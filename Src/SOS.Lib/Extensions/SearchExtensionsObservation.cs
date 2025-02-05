@@ -659,7 +659,7 @@ namespace SOS.Lib
 
             if (filter.IsInvasiveInSweden.HasValue)
             {
-                query.TryAddTermCriteria("taxon.isInvasiveInSweden", filter.IsInvasiveInSweden.Value);
+                query.TryAddTermCriteria("taxon.attributes.isInvasiveInSweden", filter.IsInvasiveInSweden.Value);
             }
         }
 
