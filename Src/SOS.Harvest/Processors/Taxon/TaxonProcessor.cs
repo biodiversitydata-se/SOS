@@ -112,7 +112,7 @@ namespace SOS.Harvest.Processors.Taxon
             }
 
             var taxaDictonary = taxa!.ToDictionary(t => t.Id, t => t);
-            var lists = await _taxonListService.GetTaxaAsync(new[] { 37 /*EU-förordning 1143/2014*/, 39 /*Risklista (SE)*/, 40 /*Risklista (HI)*/, 34 /*Fridlysta arter*/, 281 /*Fridlysta fåglar*/ });
+            var lists = await _taxonListService.GetTaxaAsync(new[] { 34 /*Fridlysta arter*/, 281 /*Fridlysta fåglar*/ });
             
             foreach(var list in lists)
             {
@@ -122,11 +122,6 @@ namespace SOS.Harvest.Processors.Taxon
                     {
                         switch (list.ListId)
                         {
-                            case 37:
-                            case 39:
-                            case 40:
-                                taxon.DynamicProperties.IsInvasiveInSweden = true;
-                                break;
                             case 34:
                             case 281:
                                 taxon.DynamicProperties.ProtectedByLaw = true;

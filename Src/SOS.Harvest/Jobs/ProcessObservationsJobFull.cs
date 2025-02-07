@@ -218,13 +218,13 @@ namespace SOS.Harvest.Jobs
             var processInfoActive = await GetProcessInfoAsync(_processedObservationRepository.UniquePublicIndexName);
             _processedObservationRepository.LiveMode = false;
 
-            if (!(processInfoActive?.ProvidersInfo?.Any() ?? true))
+            if (!processInfoActive?.ProvidersInfo?.Any() ?? true)
             {
                 // Processing not done before
                 return true;
             }
 
-            if (!(processInfoInactive?.ProvidersInfo?.Any() ?? true))
+            if (!processInfoInactive?.ProvidersInfo?.Any() ?? true)
             {
                 // Something is wrong. process info should be saved at this point
                 _logger.LogError("Can't find any process information for current processing");

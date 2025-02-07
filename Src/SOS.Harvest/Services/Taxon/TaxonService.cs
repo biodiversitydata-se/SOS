@@ -362,6 +362,7 @@ namespace SOS.Harvest.Services.Taxon
                 .GetRecords(TaxonPropertiesMapping)
                 .Select(m => new TaxonProperties<int>
                 {
+                    IsInvasiveInSweden = m.IsInvasiveInSweden,
                     GbifTaxonId = m.GbifTaxonId,
                     TaxonCategoryId = m.TaxonCategoryId,
                     TaxonCategorySwedishName = m.TaxonCategorySwedishName,
@@ -378,6 +379,7 @@ namespace SOS.Harvest.Services.Taxon
             {
                 if (taxonPropertiesById.TryGetValue(taxon.DynamicProperties.DyntaxaTaxonId, out var taxonProperties))
                 {
+                    taxon.DynamicProperties.IsInvasiveInSweden = taxonProperties.IsInvasiveInSweden;
                     taxon.SortOrder = taxonProperties.SortOrder.GetValueOrDefault(0);
                     taxon.DynamicProperties.GbifTaxonId = taxonProperties.GbifTaxonId;
                     taxon.DynamicProperties.TaxonCategoryId = taxonProperties.TaxonCategoryId;
