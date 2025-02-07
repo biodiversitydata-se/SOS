@@ -530,5 +530,139 @@ namespace SOS.Lib.IO.DwcArchive
                 _fileService.DeleteFile(tempFilePath);
             }
         }
+
+        public async Task<(Stream stream, string filename)> CreateEventDwcArchiveFileInMemoryAsync(
+            DataProvider dataProvider, 
+            SearchFilter filter, 
+            IProcessedObservationCoreRepository processedObservationRepository, 
+            ProcessInfo processInfo, 
+            IJobCancellationToken cancellationToken)
+        {
+            var memoryStream = new MemoryStream();
+
+            try
+            {
+                bool eventFileCreated = false;
+                bool emofFileCreated = false;
+                bool multimediaFileCreated = false;
+                int nrObservations = 0;
+                string fileName = $"Observations {DateTime.Now.ToString("yyyy-MM-dd HH.mm")} SOS export";
+                var expectedNoOfObservations = await processedObservationRepository.GetMatchCountAsync(filter);
+
+                using (var zipArchive = new ZipArchive(memoryStream, ZipArchiveMode.Update, leaveOpen: true))
+                {
+                    // Create Event.txt
+                    var eventFieldDescriptions = FieldDescriptionHelper.GetAllDwcEventCoreFieldDescriptions().ToList();
+                    var eventFileEntry = zipArchive.CreateEntry("event.txt", System.IO.Compression.CompressionLevel.Optimal);
+                    using (var eventFileZipStream = eventFileEntry.Open())
+                    {
+                        eventFileCreated = await _dwcArchiveEventCsvWriter.CreateEventCsvFileAsync(
+                            filter,
+                            eventFileZipStream,
+                            eventFieldDescriptions,
+                            processedObservationRepository,
+                            cancellationToken);
+                    }
+
+                    // Create Occurrence.txt
+                    var occurrenceFieldDescriptions = FieldDescriptionHelper.GetAllDwcCoreEventOccurrenceFieldDescriptions().ToList();
+                    var occurrenceFileEntry = zipArchive.CreateEntry("occurrence.txt", System.IO.Compression.CompressionLevel.Optimal);
+                    using (var occurrenceFileZipStream = occurrenceFileEntry.Open())
+                    {
+                        nrObservations = await _dwcArchiveOccurrenceCsvWriter.CreateOccurrenceCsvFileAsync(
+                            filter,
+                            occurrenceFileZipStream,
+                            occurrenceFieldDescriptions,
+                            processedObservationRepository,
+                            cancellationToken,
+                            false,
+                            true);                        
+                    }
+
+                    // If less than 99% of expected observations where fetched, something is wrong
+                    if (nrObservations < expectedNoOfObservations * 0.99)
+                    {
+                        throw new Exception($"Dwc export expected {expectedNoOfObservations} but only got {nrObservations}");
+                    }
+
+                    // Create ExtendedMeasurementOrFact.txt
+                    var emofFileEntry = zipArchive.CreateEntry("extendedMeasurementOrFact.txt", System.IO.Compression.CompressionLevel.Optimal);
+                    using (var emofFileZipStream = emofFileEntry.Open())
+                    {                     
+                        emofFileCreated = await _extendedMeasurementOrFactCsvWriter.CreateCsvFileAsync(
+                            filter,
+                            emofFileZipStream,
+                            processedObservationRepository,
+                            cancellationToken,
+                            true);                        
+                    }
+                    if (!emofFileCreated) emofFileEntry.Delete(); // Delete extension files if not used.
+
+                    // Create multimedia.txt
+                    var multimediaFileEntry = zipArchive.CreateEntry("multimedia.txt", System.IO.Compression.CompressionLevel.Optimal);
+                    using (var multimediaFileZipStream = multimediaFileEntry.Open())
+                    { 
+                        multimediaFileCreated = await _simpleMultimediaCsvWriter.CreateCsvFileAsync(
+                            filter,
+                            multimediaFileZipStream,
+                            processedObservationRepository,
+                            cancellationToken,
+                            true);
+                    }
+                    if (!multimediaFileCreated) multimediaFileEntry.Delete(); // Delete extension files if not used.
+
+                    // Create meta.xml
+                    var metaFileEntry = zipArchive.CreateEntry("meta.xml", System.IO.Compression.CompressionLevel.Optimal);
+                    using (var metaFileZipStream = metaFileEntry.Open())
+                    {  
+                        var dwcExtensions = new List<DwcaEventFilePart>();
+                        dwcExtensions.Add(DwcaEventFilePart.Occurrence);
+                        if (emofFileCreated) dwcExtensions.Add(DwcaEventFilePart.Emof);
+                        if (multimediaFileCreated) dwcExtensions.Add(DwcaEventFilePart.Multimedia);
+                        DwcArchiveMetaFileWriter.CreateEventMetaXmlFile(metaFileZipStream, eventFieldDescriptions, dwcExtensions, occurrenceFieldDescriptions);
+                    }
+
+                    var emlFile = await _dataProviderRepository.GetEmlAsync(dataProvider.Id);
+                    if (emlFile == null)
+                    {
+                        throw new Exception($"No eml found for provider: {dataProvider.Identifier}");
+                    }
+                    else
+                    {
+                        DwCArchiveEmlFileFactory.SetPubDateToCurrentDate(emlFile);
+                        var emlFileEntry = zipArchive.CreateEntry("eml.xml", System.IO.Compression.CompressionLevel.Optimal);
+                        using (var emlFileZipStream = emlFileEntry.Open())
+                        {
+                            await emlFile.SaveAsync(emlFileZipStream, SaveOptions.None, CancellationToken.None);
+                        }
+                    }
+
+                    // Create processinfo.xml
+                    if (processInfo != null)
+                    {
+                        var processInfoFileEntry = zipArchive.CreateEntry("processinfo.xml", System.IO.Compression.CompressionLevel.Optimal);
+                        using (var processInfoFileZipStream = processInfoFileEntry.Open())
+                        {
+                            DwcProcessInfoFileWriter.CreateProcessInfoFile(processInfoFileZipStream, processInfo);
+                        }
+                    }
+                }
+
+                memoryStream.Seek(0, SeekOrigin.Begin);
+                return (memoryStream, fileName);
+            }
+            catch (JobAbortedException)
+            {
+                _logger.LogInformation("CreateDwcArchiveFile was canceled. DataProvider={@dataProvider}", dataProvider.Identifier);
+                if (memoryStream != null) memoryStream.Dispose();
+                throw;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to create Dwc Archive File. DataProvider={@dataProvider}", dataProvider.Identifier);
+                if (memoryStream != null) memoryStream.Dispose();
+                throw;
+            }
+        }
     }
 }

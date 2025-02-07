@@ -253,8 +253,8 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive.DwcaObservationFact
         [Theory]
         [InlineData("1", 1)]
         [InlineData("  254 ", 254)]
-        [InlineData("", 1)]
-        [InlineData(null, 1)]
+        [InlineData("", null)]
+        [InlineData(null, null)]
         public void OrganismQuantityInt_is_parsed_from_OrganismQuantity(
             string organismQuantity,
             int? expectedValue)

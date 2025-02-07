@@ -1787,7 +1787,7 @@ namespace SOS.Lib.Repositories.Processed
 
             return new SearchAfterResult<T>
             {
-                Records = (IEnumerable<T>)(typeof(T).Equals(typeof(Observation)) ? searchResponse.Documents?.ToObservations()?.ToArray() : searchResponse.Documents),
+                Records = (IEnumerable<T>)(typeof(T).Equals(typeof(Observation)) ? searchResponse.Documents?.ToObservationsArray() : searchResponse.Documents),
                 PointInTimeId = searchResponse.PointInTimeId,
                 SearchAfter = searchResponse.Hits?.LastOrDefault()?.Sorts
             };

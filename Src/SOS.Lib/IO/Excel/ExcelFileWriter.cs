@@ -16,11 +16,12 @@ using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Services.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace SOS.Lib.IO.Excel
@@ -36,6 +37,7 @@ namespace SOS.Lib.IO.Excel
         private readonly IVocabularyValueResolver _vocabularyValueResolver;
         private readonly IGeneralizationResolver _generalizationResolver;
         private readonly ILogger<ExcelFileWriter> _logger;
+        private const int FastSearchLimit = 10000;
 
         private void FormatColumns(ExcelWorksheet worksheet, List<PropertyFieldDescription> propertyFields)
         {
@@ -130,7 +132,8 @@ namespace SOS.Lib.IO.Excel
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task<FileExportResult> CreateFileAync(SearchFilter filter,
+        public async Task<FileExportResult> CreateFileAync(
+            SearchFilter filter,
             string exportPath,
             string fileName,
             string culture,
@@ -138,30 +141,132 @@ namespace SOS.Lib.IO.Excel
             bool dynamicProjectDataFields,
             bool gzip,
             IJobCancellationToken cancellationToken)
-        {
-            const int fastSearchLimit = 10000;
+        {            
             var temporaryZipExportFolderPath = Path.Combine(exportPath, "zip");
 
             try
             {
-                string excelFilePath = null;
+                _fileService.CreateDirectory(temporaryZipExportFolderPath);
+                var expectedNoOfObservations = (int)await _processedObservationRepository.GetMatchCountAsync(filter);
+                bool useFastSearch = expectedNoOfObservations <= FastSearchLimit;
+                (int nrObservations, int fileCount, List<ExcelPackage> excelPackages) result = await WriteExcelFiles(filter, fileName, culture, propertyLabelType, dynamicProjectDataFields, temporaryZipExportFolderPath, expectedNoOfObservations, useFastSearch, null, cancellationToken);
+
+                // If more than one file created, we must return zip file
+                if (gzip || result.fileCount > 1)
+                {
+                    await StoreFilterAsync(temporaryZipExportFolderPath, filter);
+
+                    var zipFilePath = Path.Join(exportPath, $"{fileName}.zip");
+                    _fileService.CompressDirectory(temporaryZipExportFolderPath, zipFilePath);
+
+                    return new FileExportResult
+                    {
+                        FilePath = zipFilePath,
+                        NrObservations = result.nrObservations
+                    };
+                }
+                else
+                {
+                    var destinationFilePath = Path.Combine(exportPath, $"{fileName}.xlsx");
+                    _fileService.MoveFile(result.excelPackages.First().File.FullName, destinationFilePath);
+                    return new FileExportResult
+                    {
+                        FilePath = destinationFilePath,
+                        NrObservations = result.nrObservations
+                    };
+                }
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to create Excel File.");
+                throw;
+            }
+            finally
+            {
+                _fileService.DeleteDirectory(temporaryZipExportFolderPath);
+            }
+        }
+
+        public async Task<(Stream stream, string filename)> CreateFileInMemoryAsync(SearchFilter filter,
+           string culture,
+           PropertyLabelType propertyLabelType,
+           bool dynamicProjectDataFields,
+           bool gzip,
+           IJobCancellationToken cancellationToken)
+        {
+            MemoryStream memoryStream = new MemoryStream();
+            MemoryStream zipMemoryStream = null;
+
+            try
+            {
+                int expectedNoOfObservations = (int)await _processedObservationRepository.GetMatchCountAsync(filter);
+                bool useFastSearch = expectedNoOfObservations <= FastSearchLimit;
+                string fileName = $"Observations {DateTime.Now.ToString("yyyy-MM-dd HH.mm")} SOS export";                
+                (int nrObservations, int fileCount, List<ExcelPackage> excelPackages) result = await WriteExcelFiles(filter, fileName, culture, propertyLabelType, dynamicProjectDataFields, null, expectedNoOfObservations, useFastSearch, memoryStream, cancellationToken);
+
+                if (gzip)
+                {
+                    zipMemoryStream = new MemoryStream();
+                    using (var zipArchive = new ZipArchive(zipMemoryStream, ZipArchiveMode.Create, leaveOpen: true))
+                    {
+                        var excelFileEntry = zipArchive.CreateEntry($"{fileName}.xlsx", System.IO.Compression.CompressionLevel.NoCompression); // xlsx is already a compressed format.                       
+                        memoryStream.Seek(0, SeekOrigin.Begin);
+                        using (var excelFileZipStream = excelFileEntry.Open())
+                        {
+                            memoryStream.CopyTo(excelFileZipStream);                            
+                        }
+
+                        var jsonEntry = zipArchive.CreateEntry("filter.json", System.IO.Compression.CompressionLevel.Fastest);
+                        using (var filterFileZipStream = jsonEntry.Open())
+                        using (var writer = new StreamWriter(filterFileZipStream, Encoding.UTF8))
+                        {
+                            writer.Write(filter.GetFilterAsJson());
+                        }
+                    }
+
+                    await memoryStream.DisposeAsync();
+                    memoryStream = zipMemoryStream;
+                }
+
+                memoryStream.Seek(0, SeekOrigin.Begin);
+                return (memoryStream, fileName);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to create Excel file.");
+                if (memoryStream != null) memoryStream.Dispose();
+                if (zipMemoryStream != null) zipMemoryStream.Dispose();
+                throw;
+            }
+        }
+
+        private async Task<(int nrObservations, int fileCount, List<ExcelPackage> excelPackages)> WriteExcelFiles(
+            SearchFilter filter,
+            string fileName,
+            string culture,
+            PropertyLabelType propertyLabelType,
+            bool dynamicProjectDataFields,
+            string temporaryZipExportFolderPath,
+            int expectedNoOfObservations,
+            bool useFastSearch,
+            Stream stream,
+            IJobCancellationToken cancellationToken)
+        {
+            try
+            {
                 int nrObservations = 0;
                 var projectIds = await _processedObservationRepository.GetProjectIdsAsync(filter);
                 var projects = await _projectManager.GetAsync(projectIds);
                 _logger.LogInformation($"Exporting projects to Excel. ProjectIds.Count={projectIds?.Count()}, Projects.Count={projects?.Count()}, dynamicProjectDataFields={dynamicProjectDataFields}");
 
-                var propertyFields = dynamicProjectDataFields && (projects?.Any() ?? false) ? 
-                    ObservationPropertyFieldDescriptionHelper.GetExportFieldsFromOutputFields(filter.Output?.Fields, projects: projects) 
+                var excelPackages = new List<ExcelPackage>();
+                var propertyFields = dynamicProjectDataFields && (projects?.Any() ?? false) ?
+                    ObservationPropertyFieldDescriptionHelper.GetExportFieldsFromOutputFields(filter.Output?.Fields, projects: projects)
                     :
                     ObservationPropertyFieldDescriptionHelper.GetExportFieldsFromOutputFields(filter.Output?.Fields);
-
-                _fileService.CreateDirectory(temporaryZipExportFolderPath);
-
-                var expectedNoOfObservations = await _processedObservationRepository.GetMatchCountAsync(filter);
-                bool usePointInTimeSearch = expectedNoOfObservations > fastSearchLimit;
                 Models.Search.Result.PagedResult<dynamic> fastSearchResult = null;
                 Models.Search.Result.SearchAfterResult<Observation> searchResult = null;
-                if (!usePointInTimeSearch)
+                if (useFastSearch)
                 {
                     fastSearchResult = await _processedObservationRepository.GetChunkAsync(filter, 0, 10000);
                 }
@@ -176,20 +281,21 @@ namespace SOS.Lib.IO.Excel
                 ExcelWorksheet sheet = null;
                 ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
                 var packageSaveTasks = new List<Task>();
+                var excelStreams = new List<Stream>();
 
-                while ((!usePointInTimeSearch && (fastSearchResult?.Records?.Any() ?? false)) || (usePointInTimeSearch && (searchResult?.Records?.Any() ?? false)))
+                while ((useFastSearch && (fastSearchResult?.Records?.Any() ?? false)) || (!useFastSearch && (searchResult?.Records?.Any() ?? false)))
                 {
-                    cancellationToken?.ThrowIfCancellationRequested();                    
+                    cancellationToken?.ThrowIfCancellationRequested();
 
                     // Fetch observations from ElasticSearch.
                     Observation[] processedObservations = null;
-                    if (usePointInTimeSearch)
+                    if (useFastSearch)
                     {
-                        processedObservations = searchResult.Records.ToArray();
+                        processedObservations = fastSearchResult.Records.ToObservationsArray();                        
                     }
                     else
                     {
-                        processedObservations = fastSearchResult.Records.ToObservations().ToArray();
+                        processedObservations = searchResult.Records.ToArray();                        
                     }
 
                     // Resolve vocabulary values.
@@ -212,14 +318,22 @@ namespace SOS.Lib.IO.Excel
                         var flatObservation = new FlatObservation(observation);
                         // Max 100000 observations rows in a file
                         if (rowIndex % 100002 == 0)
-                        {
-                            packageSaveTasks.Add(TrySavePackageAync(package));
-
+                        {                            
                             // Create new file
                             fileCount++;
-                            excelFilePath = Path.Combine(temporaryZipExportFolderPath, $"{fileName}{(fileCount > 1 ? $" ({fileCount})" : string.Empty)}.xlsx");
-                            var file = new FileInfo(excelFilePath);
-                            package = new ExcelPackage(file);
+                            if (stream != null)
+                            {
+                                package = new ExcelPackage(stream); // save to stream instead of file.
+                            }
+                            else
+                            {
+                                packageSaveTasks.Add(TrySavePackageAync(package));
+                                var excelFilePath = Path.Combine(temporaryZipExportFolderPath, $"{fileName}{(fileCount > 1 ? $" ({fileCount})" : string.Empty)}.xlsx");
+                                var file = new FileInfo(excelFilePath);
+                                package = new ExcelPackage(file);
+                                excelPackages.Add(package);                                
+                            }
+
                             sheet = package.Workbook.Worksheets.Add("Observations");
                             WriteHeader(sheet, propertyFields, propertyLabelType);
                             rowIndex = 2;
@@ -242,63 +356,37 @@ namespace SOS.Lib.IO.Excel
 
                         rowIndex++;
                     }
-
+                    
                     nrObservations += processedObservations.Length;
-
-                    // Get next batch of observations.
-                    if (usePointInTimeSearch)
-                    {
-                        // Start fetching next batch of observations.
-                        searchResult = await _processedObservationRepository.GetObservationsBySearchAfterAsync<Observation>(filter, searchResult.PointInTimeId, searchResult.SearchAfter);
-                    }
-                    else
-                    {
-                        break;
-                    }
+                    processedObservations = null;
+                    if (useFastSearch) break;
+                    searchResult = await _processedObservationRepository.GetObservationsBySearchAfterAsync<Observation>(filter, searchResult.PointInTimeId, searchResult.SearchAfter);
                 }
 
+                fastSearchResult = null;
+                searchResult = null;
                 // If less tha 99% of expected observations where fetched, something is wrong
                 if (nrObservations < expectedNoOfObservations * 0.99)
                 {
                     throw new Exception($"Excel export expected {expectedNoOfObservations} but only got {nrObservations}");
                 }
 
-                packageSaveTasks.Add(TrySavePackageAync(package));
-                await Task.WhenAll(packageSaveTasks);
-
-                // If more than one file created, we must return zip file
-                if (gzip || fileCount > 1)
+                if (stream != null)
                 {
-                    await StoreFilterAsync(temporaryZipExportFolderPath, filter);
-                   
-                    var zipFilePath = Path.Join(exportPath, $"{fileName}.zip");
-                    _fileService.CompressDirectory(temporaryZipExportFolderPath, zipFilePath);
-                    
-                    return new FileExportResult
-                    {
-                        FilePath = zipFilePath,
-                        NrObservations = nrObservations
-                    };
+                    await package.SaveAsync();                    
                 }
                 else
                 {
-                    var destinationFilePath = Path.Combine(exportPath, $"{fileName}.xlsx");
-                    _fileService.MoveFile(excelFilePath, destinationFilePath);
-                    return new FileExportResult
-                    {
-                        FilePath = destinationFilePath,
-                        NrObservations = nrObservations
-                    };
+                    packageSaveTasks.Add(TrySavePackageAync(package));
+                    await Task.WhenAll(packageSaveTasks);
                 }
+                
+                return (nrObservations, fileCount, excelPackages);
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                _logger.LogError(e, "Failed to create Excel File.");
+                _logger.LogError(ex, "Error when creating Excel file");
                 throw;
-            }
-            finally
-            {
-                _fileService.DeleteDirectory(temporaryZipExportFolderPath);
             }
         }
     }
