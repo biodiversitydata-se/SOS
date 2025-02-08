@@ -18,7 +18,7 @@ namespace SOS.Process.UnitTests.Services
         {
         }
 
-        [Fact]
+        [Fact(Skip = "Intended to run on demand when needed")]
         public async Task GetINaturalistObservations_SpecificPage()
         {
             // Arrange
@@ -31,7 +31,7 @@ namespace SOS.Process.UnitTests.Services
             result.Should().NotBeNull();
         }
 
-        [Fact]
+        [Fact(Skip = "Intended to run on demand when needed")]
         public async Task GetINaturalistObservations_IterateByIdAbove()
         {
             // Arrange
@@ -49,7 +49,7 @@ namespace SOS.Process.UnitTests.Services
             observations.Should().NotBeNull();
         }
 
-        [Fact]
+        [Fact(Skip = "Intended to run on demand when needed")]
         public async Task GetINaturalistObservations_IterateByUpdatedFromDate()
         {
             // Arrange
