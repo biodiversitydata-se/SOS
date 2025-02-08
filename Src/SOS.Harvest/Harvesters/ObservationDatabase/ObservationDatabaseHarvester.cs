@@ -230,5 +230,10 @@ namespace SOS.Harvest.Harvesters.ObservationDatabase
             });
             return null!;
         }
+
+        public Task<HarvestInfo> HarvestCompleteObservationsWithDelayAsync(DataProvider provider, IJobCancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

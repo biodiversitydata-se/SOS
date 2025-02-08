@@ -114,7 +114,7 @@ namespace SOS.Lib.Repositories
         /// </summary>
         protected readonly ILogger Logger;
 
-        protected IMongoCollection<TEntity> GetMongoCollection(string collectionName)
+        public IMongoCollection<TEntity> GetMongoCollection(string collectionName)
         {
             return Database.GetCollection<TEntity>(collectionName)
                 .WithWriteConcern(new WriteConcern(1, journal: true));
@@ -272,6 +272,91 @@ namespace SOS.Lib.Repositories
                 Logger.LogInformation("Finish waiting for index creation. Collection={@mongoCollection}.", MongoCollection);
             }
         }
+
+        public async Task<bool> UpsertManyAsync(IEnumerable<TEntity> items)
+        {
+            return await UpsertManyAsync(items, MongoCollection);
+        }
+
+        public async Task<bool> UpsertManyAsync(IEnumerable<TEntity> items, IMongoCollection<TEntity> mongoCollection)
+        {
+            if (!items?.Any() ?? true)
+            {
+                return true;
+            }
+
+            var success = true;
+            var count = 0;
+            var entities = items.ToArray();
+            var batch = entities.Skip(0).Take(BatchSizeWrite)?.ToArray();
+
+            while (batch?.Any() ?? false)
+            {
+                success = success && await UpsertBatchAsync(batch, mongoCollection);
+                count++;
+                batch = entities.Skip(BatchSizeWrite * count).Take(BatchSizeWrite)?.ToArray();
+            }
+
+            return success;
+        }
+
+        private async Task<bool> UpsertBatchAsync(IEnumerable<TEntity> batch, IMongoCollection<TEntity> mongoCollection, byte attempt = 1)
+        {
+            var items = batch?.ToArray();
+            try
+            {
+                var bulkOps = new List<WriteModel<TEntity>>();
+
+                foreach (var item in items)
+                {
+                    var filter = Builders<TEntity>.Filter.Eq("_id", item.Id);
+                    var update = Builders<TEntity>.Update.Set(x => x, item); // Sätter hela dokumentet
+                    var upsert = new ReplaceOneModel<TEntity>(filter, item) { IsUpsert = true };
+
+                    bulkOps.Add(upsert);
+                }
+
+                await mongoCollection.BulkWriteAsync(bulkOps, new BulkWriteOptions { IsOrdered = false });
+                return true;
+            }
+            catch (MongoCommandException e)
+            {
+                switch (e.Code)
+                {
+                    case 16500: // Request Rate too Large
+                        var batchCount = items.Length / 2;
+                        if (batchCount > 5)
+                        {
+                            var addTasks = new List<Task<bool>>
+                            {
+                                UpsertBatchAsync(items.Take(batchCount), mongoCollection),
+                                UpsertBatchAsync(items.Skip(batchCount), mongoCollection)
+                            };
+
+                            await Task.WhenAll(addTasks);
+                            return addTasks.All(t => t.Result);
+                        }
+                        break;
+                }
+
+                Logger.LogError(e.ToString());
+                throw;
+            }
+            catch (Exception e)
+            {
+                if (attempt < 3)
+                {
+                    Logger.LogWarning($"Upsert batch to MongoDB collection ({mongoCollection.CollectionNamespace}). Attempt {attempt} failed. Retrying...");
+                    Thread.Sleep(attempt * 1000);
+                    attempt++;
+                    return await UpsertBatchAsync(items, mongoCollection, attempt);
+                }
+
+                Logger.LogError(e, "Failed to upsert batch to MongoDB collection ({@mongoCollection})", mongoCollection);
+                throw;
+            }
+        }
+
 
         /// <inheritdoc />
         public async Task<bool> AddManyAsync(IEnumerable<TEntity> items, IMongoCollection<TEntity> mongoCollection)
@@ -626,7 +711,7 @@ namespace SOS.Lib.Repositories
 
         /// <inheritdoc />
         public async Task<TKey> GetMaxIdAsync(IMongoCollection<TEntity> mongoCollection)
-        {
+        {            
             try
             {
                 Logger.LogDebug($"Try to get max id for ({mongoCollection.CollectionNamespace})");
@@ -643,6 +728,37 @@ namespace SOS.Lib.Repositories
             {
                 Logger.LogError(e, "Failed to get max id");
 
+                throw;
+            }
+        }
+
+        public async Task<TKey> GetMaxIdAsync(string collectionName)
+        {
+            var collection = GetMongoCollection(collectionName);
+            return await GetMaxIdAsync(collection);
+        }
+
+
+        public async Task<TEntity> GetDocumentWithMaxIdAsync(IMongoCollection<TEntity> mongoCollection)
+        {
+            try
+            {
+                var document = await mongoCollection
+                    .Find(FilterDefinition<TEntity>.Empty)
+                    .Sort(Builders<TEntity>.Sort.Descending("_id"))
+                    .Limit(1)
+                    .FirstOrDefaultAsync();
+
+                if (document == null)
+                {
+                    Logger.LogWarning($"No document found in collection {mongoCollection}.");
+                }
+
+                return document;
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e, $"Failed to fetch document with max id from {mongoCollection}");
                 throw;
             }
         }
@@ -688,6 +804,16 @@ namespace SOS.Lib.Repositories
                 Logger.LogError(e, "Failed to update entity");
                 throw;
             }
+        }
+
+        public async Task<bool> AddCollectionAsync(IMongoCollection<TEntity> mongoCollection)
+        {
+            return await AddCollectionAsync(mongoCollection.CollectionNamespace.CollectionName);
+        }
+
+        public async Task<bool> DeleteCollectionAsync(IMongoCollection<TEntity> mongoCollection)
+        {
+            return await DeleteCollectionAsync(mongoCollection.CollectionNamespace.CollectionName);
         }
     }
 }

@@ -149,5 +149,10 @@ namespace SOS.Harvest.Harvesters.AquaSupport.Kul
             });
             return null!;
         }
+
+        public Task<HarvestInfo> HarvestCompleteObservationsWithDelayAsync(DataProvider provider, IJobCancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

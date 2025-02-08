@@ -288,6 +288,8 @@ namespace SOS.Harvest.IoC.Modules
                 .InstancePerLifetimeScope();
             builder.RegisterType<VirtualHerbariumObservationVerbatimRepository>()
                 .As<IVirtualHerbariumObservationVerbatimRepository>().InstancePerLifetimeScope();
+            builder.RegisterType<iNaturalistCompleteObservationVerbatimRepository>().As<IiNaturalistCompleteObservationVerbatimRepository>()
+                .InstancePerLifetimeScope();
 
             // Repositories processed 
             builder.RegisterType<UserObservationRepository>().As<IUserObservationRepository>()
@@ -402,6 +404,7 @@ namespace SOS.Harvest.IoC.Modules
             builder.RegisterType<HttpClientService>().As<IHttpClientService>().InstancePerLifetimeScope();
             builder.RegisterType<KulObservationService>().As<IKulObservationService>().InstancePerLifetimeScope();
             builder.RegisterType<iNaturalistObservationService>().As<IiNaturalistObservationService>().InstancePerLifetimeScope();
+            builder.RegisterType<iNaturalistApiObservationService>().InstancePerLifetimeScope();
             builder.RegisterType<MvmObservationService>().As<IMvmObservationService>().InstancePerLifetimeScope();
             builder.RegisterType<NorsObservationService>().As<INorsObservationService>().InstancePerLifetimeScope();
             builder.RegisterType<ObservationDatabaseDataService>().As<IObservationDatabaseDataService>().InstancePerLifetimeScope();
