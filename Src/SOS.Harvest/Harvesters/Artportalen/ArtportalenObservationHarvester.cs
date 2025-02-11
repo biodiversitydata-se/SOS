@@ -395,19 +395,12 @@ namespace SOS.Harvest.Harvesters.Artportalen
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
 
             _semaphore = new SemaphoreSlim(artportalenConfiguration.NoOfThreads, artportalenConfiguration.NoOfThreads);
-        }
+        }        
 
         /// inheritdoc />
-        public async Task<HarvestInfo> HarvestObservationsAsync(IJobCancellationToken cancellationToken)
-        {
-            await Task.Run(() => throw new NotImplementedException("Not implemented for this provider"));
-            return null!;
-        }
-
-        /// inheritdoc />
-        public async Task<HarvestInfo> HarvestObservationsAsync(JobRunModes mode,
-            DateTime? fromDate,
-            IJobCancellationToken cancellationToken)
+        public async Task<HarvestInfo> HarvestObservationsAsync(DataProvider dataProvider,
+            JobRunModes mode,
+            DateTime? fromDate, IJobCancellationToken cancellationToken)
         {
             var runStatus = RunStatus.Success;
             var harvestCount = 0;
@@ -447,7 +440,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 runStatus = RunStatus.Failed;
             }
 
-            return await FinishHarvestAsync(initValues, runStatus, harvestCount, dataLastModified, notes);
+            return await FinishHarvestAsync(initValues, runStatus, harvestCount, mode == JobRunModes.Full ? 80 : 0, dataLastModified, notes);
         }
 
         /// inheritdoc />

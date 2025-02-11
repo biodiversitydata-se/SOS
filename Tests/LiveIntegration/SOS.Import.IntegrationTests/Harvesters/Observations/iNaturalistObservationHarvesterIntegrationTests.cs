@@ -46,7 +46,7 @@ namespace SOS.Import.LiveIntegrationTests.Harvesters.Observations
         //    //-----------------------------------------------------------------------------------------------------------
         //    // Act
         //    //-----------------------------------------------------------------------------------------------------------
-        //    var result = await iNaturalistObservationHarvester.HarvestObservationsAsync(JobRunModes.Full, null, JobCancellationToken.Null);
+        //    var result = await iNaturalistObservationHarvester.HarvestObservationsAsync(new DataProvider(), JobRunModes.Full, null, JobCancellationToken.Null);
 
         //    //-----------------------------------------------------------------------------------------------------------
         //    // Assert
@@ -83,7 +83,7 @@ namespace SOS.Import.LiveIntegrationTests.Harvesters.Observations
         //    //-----------------------------------------------------------------------------------------------------------
         //    // Act
         //    //-----------------------------------------------------------------------------------------------------------
-        //    var result = await iNaturalistObservationHarvester.HarvestObservationsAsync(JobRunModes.Full, null, JobCancellationToken.Null);
+        //    var result = await iNaturalistObservationHarvester.HarvestObservationsAsync(new DataProvider(), JobRunModes.Full, null, JobCancellationToken.Null);
 
         //    //-----------------------------------------------------------------------------------------------------------
         //    // Assert

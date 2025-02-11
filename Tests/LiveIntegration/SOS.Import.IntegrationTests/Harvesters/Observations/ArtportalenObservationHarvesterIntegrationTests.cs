@@ -13,6 +13,7 @@ using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Verbatim;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
@@ -89,7 +90,7 @@ namespace SOS.Import.LiveIntegrationTests.Harvesters.Observations
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var res = await observationHarvester.HarvestObservationsAsync(JobRunModes.Full, null, JobCancellationToken.Null);
+            var res = await observationHarvester.HarvestObservationsAsync(new DataProvider(), JobRunModes.Full, null, JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -152,7 +153,7 @@ namespace SOS.Import.LiveIntegrationTests.Harvesters.Observations
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var res = await observationHarvester.HarvestObservationsAsync(JobRunModes.Full, null, JobCancellationToken.Null);
+            var res = await observationHarvester.HarvestObservationsAsync(new DataProvider(), JobRunModes.Full, null, JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert

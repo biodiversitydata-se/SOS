@@ -381,9 +381,9 @@ namespace SOS.Harvest.Harvesters.DwC
         }
 
         /// inheritdoc />
-        public async Task<HarvestInfo> HarvestObservationsAsync(JobRunModes mode,
-            DateTime? fromDate,
-            IJobCancellationToken cancellationToken)
+        public async Task<HarvestInfo> HarvestObservationsAsync(DataProvider dataProvider,
+            JobRunModes mode,
+            DateTime? fromDate, IJobCancellationToken cancellationToken)
         {
             await Task.Run(() =>
             {

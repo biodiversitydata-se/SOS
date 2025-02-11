@@ -9,6 +9,7 @@ using SOS.Harvest.Services.Interfaces;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Enums;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.INaturalist.Service;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Repositories.Verbatim;
@@ -58,23 +59,23 @@ namespace SOS.Harvest.Harvesters.iNaturalist
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task<HarvestInfo> HarvestObservationsAsync(JobRunModes mode,
-            DateTime? fromDate,
-            IJobCancellationToken cancellationToken)
+        public async Task<HarvestInfo> HarvestObservationsAsync(DataProvider dataProvider,
+            JobRunModes mode,
+            DateTime? fromDate, IJobCancellationToken cancellationToken)
         {
             await Task.Run(() => throw new NotImplementedException("Not implemented for this provider"));
             return null!;
         }
 
-        public async Task<HarvestInfo> HarvestObservationsAsync(IJobCancellationToken cancellationToken)
+        public async Task<HarvestInfo> HarvestObservationsAsync(Lib.Models.Shared.DataProvider provider, IJobCancellationToken cancellationToken)
         {
-            var oldWayTask = HarvestObservationsOldWayAsync(cancellationToken);
-            var newWayTask = HarvestObservationsNewWayAsync(cancellationToken);
+            var oldWayTask = HarvestObservationsOldWayAsync(provider, cancellationToken);
+            var newWayTask = HarvestObservationsNewWayAsync(provider,cancellationToken);
             var results = await Task.WhenAll(oldWayTask, newWayTask);
             return await oldWayTask;
         }
 
-        private async Task<HarvestInfo> HarvestObservationsOldWayAsync(IJobCancellationToken cancellationToken)
+        private async Task<HarvestInfo> HarvestObservationsOldWayAsync(Lib.Models.Shared.DataProvider provider, IJobCancellationToken cancellationToken)
         {
             var harvestInfo = new HarvestInfo("iNaturallist", DateTime.Now);
             var dataProvider = new Lib.Models.Shared.DataProvider() { Id = 19, Identifier = "iNaturalist" };
@@ -169,7 +170,7 @@ namespace SOS.Harvest.Harvesters.iNaturalist
             return harvestInfo;
         }
 
-        private async Task<HarvestInfo> HarvestObservationsNewWayAsync(IJobCancellationToken cancellationToken)
+        private async Task<HarvestInfo> HarvestObservationsNewWayAsync(Lib.Models.Shared.DataProvider provider, IJobCancellationToken cancellationToken)
         {
             var harvestInfo = new HarvestInfo("iNaturallist", DateTime.Now);
             
@@ -326,12 +327,7 @@ namespace SOS.Harvest.Harvesters.iNaturalist
 
             _logger.LogInformation("Finish complete harvesting observations for {@dataProvider} data provider. Status={@harvestStatus}", "iNaturalist", harvestInfo.Status);
             return harvestInfo;
-        }
-
-        public Task<HarvestInfo> HarvestObservationsAsync(Lib.Models.Shared.DataProvider provider, IJobCancellationToken cancellationToken)
-        {
-            throw new NotImplementedException("Not implemented for this provider");
-        }
+        }        
 
         private async Task<DateTimeOffset?> GetLatestUpdatedDate(IMongoCollection<iNaturalistVerbatimObservation> incrementalTempMongoCollection)
         {

@@ -6,6 +6,7 @@ using SOS.Harvest.Harvesters.Shark;
 using SOS.Harvest.Services.Interfaces;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Enums;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
 using System;
 using System.Threading.Tasks;
@@ -53,7 +54,7 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.HarvestObservationsAsync(JobCancellationToken.Null);
+            var result = await TestObject.HarvestObservationsAsync(new DataProvider(), JobCancellationToken.Null);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------

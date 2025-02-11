@@ -7,6 +7,7 @@ using SOS.Harvest.Harvesters.AquaSupport.Kul;
 using SOS.Harvest.Services;
 using SOS.Lib.Database;
 using SOS.Lib.Enums;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Verbatim;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
 using SOS.Lib.Services;
@@ -51,7 +52,7 @@ namespace SOS.Import.LiveIntegrationTests.Harvesters.Observations
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await kulObservationHarvester.HarvestObservationsAsync(JobRunModes.Full, null, JobCancellationToken.Null);
+            var result = await kulObservationHarvester.HarvestObservationsAsync(new DataProvider(), JobRunModes.Full, null, JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -82,7 +83,7 @@ namespace SOS.Import.LiveIntegrationTests.Harvesters.Observations
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await kulObservationHarvester.HarvestObservationsAsync(JobRunModes.Full, null, JobCancellationToken.Null);
+            var result = await kulObservationHarvester.HarvestObservationsAsync(new DataProvider(), JobRunModes.Full, null, JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert

@@ -140,11 +140,11 @@ namespace SOS.Harvest.Jobs
                     {
                         if (dataProvider.SupportIncrementalHarvest)
                         {
-                            harvestTaskByDataProvider.Add(dataProvider, harvester.HarvestObservationsAsync(mode, fromDate, cancellationToken));
+                            harvestTaskByDataProvider.Add(dataProvider, harvester.HarvestObservationsAsync(dataProvider, mode, fromDate, cancellationToken));
                         }
                         else
                         {
-                            harvestTaskByDataProvider.Add(dataProvider, harvester.HarvestObservationsAsync(cancellationToken));
+                            harvestTaskByDataProvider.Add(dataProvider, harvester.HarvestObservationsAsync(dataProvider, cancellationToken));
                         }
                     }
 

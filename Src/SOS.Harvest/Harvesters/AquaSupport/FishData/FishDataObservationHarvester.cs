@@ -51,10 +51,22 @@ namespace SOS.Harvest.Harvesters.AquaSupport.FishData
 
             _fishDataServiceConfiguration = fishDataServiceConfiguration ??
                                        throw new ArgumentNullException(nameof(fishDataServiceConfiguration));
+        }      
+
+        /// inheritdoc />
+        public async Task<HarvestInfo> HarvestObservationsAsync(DataProvider dataProvider,
+            JobRunModes mode,
+            DateTime? fromDate, IJobCancellationToken cancellationToken)
+        {
+            await Task.Run(() =>
+            {
+                throw new NotImplementedException("Not implemented for this provider");
+            });
+            return null!;
         }
 
         /// inheritdoc />
-        public async Task<HarvestInfo> HarvestObservationsAsync(IJobCancellationToken cancellationToken)
+        public async Task<HarvestInfo> HarvestObservationsAsync(DataProvider provider, IJobCancellationToken cancellationToken)
         {
             var runStatus = RunStatus.Success;
             var harvestCount = 0;
@@ -132,29 +144,7 @@ namespace SOS.Harvest.Harvesters.AquaSupport.FishData
                 runStatus = RunStatus.Failed;
             }
 
-            return await FinishHarvestAsync(initValues, runStatus, harvestCount);
-        }
-
-        /// inheritdoc />
-        public async Task<HarvestInfo> HarvestObservationsAsync(JobRunModes mode,
-            DateTime? fromDate,
-            IJobCancellationToken cancellationToken)
-        {
-            await Task.Run(() =>
-            {
-                throw new NotImplementedException("Not implemented for this provider");
-            });
-            return null!;
-        }
-
-        /// inheritdoc />
-        public async Task<HarvestInfo> HarvestObservationsAsync(DataProvider provider, IJobCancellationToken cancellationToken)
-        {
-            await Task.Run(() =>
-            {
-                throw new NotImplementedException("Not implemented for this provider");
-            });
-            return null!;
+            return await FinishHarvestAsync(initValues, runStatus, harvestCount, provider.PreviousProcessLimit.GetValueOrDefault(80));
         }
 
         public Task<HarvestInfo> HarvestCompleteObservationsWithDelayAsync(DataProvider provider, IJobCancellationToken cancellationToken)
