@@ -133,5 +133,10 @@ namespace SOS.Harvest.Harvesters.Mvm
             });
             return null!;
         }
+
+        public Task<HarvestInfo> HarvestCompleteObservationsWithDelayAsync(DataProvider provider, IJobCancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

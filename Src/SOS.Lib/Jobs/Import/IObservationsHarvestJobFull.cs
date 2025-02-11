@@ -32,5 +32,17 @@ namespace SOS.Lib.Jobs.Import
         Task<bool> RunHarvestObservationsAsync(
             List<string> harvestDataProviderIdOrIdentifiers,
             IJobCancellationToken cancellationToken);
+
+        /// <summary>
+        ///    Full harvest of iNaturalist observations.
+        /// </summary>        
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        [DisableConcurrentExecution(timeoutInSeconds: 60 * 60)]
+        [JobDisplayName("Full iNaturalist harvest observations")]
+        [AutomaticRetry(Attempts = 0, LogEvents = false, OnAttemptsExceeded = AttemptsExceededAction.Delete)]
+        [Queue("high")]
+        Task<bool> RunFulliNaturalistHarvestObservationsAsync(
+            IJobCancellationToken cancellationToken);
     }
 }
