@@ -484,5 +484,10 @@ namespace SOS.Harvest.Harvesters.Artportalen
 
             return null;
         }
+
+        public Task<HarvestInfo> HarvestCompleteObservationsWithDelayAsync(DataProvider provider, IJobCancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

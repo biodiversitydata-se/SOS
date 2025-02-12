@@ -117,6 +117,116 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "LiveIntegration", "LiveInte
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOS.Shared.Api", "Src\SOS.Shared.Api\SOS.Shared.Api.csproj", "{0964ED67-D326-4DC6-9981-722B57941744}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "k8s", "k8s", "{BF0484AD-4215-4478-B46E-AF17643A796F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "local", "local", "{2A9DE856-4794-410A-A187-F220A45B2EAD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dev", "dev", "{381F6625-C59F-4255-92ED-BE4FE3DD2431}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "st", "st", "{2DB6DB3D-E156-4975-AF5D-742C8AF7B43F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "prod", "prod", "{BCD9308C-6F24-4B9D-97A6-94C2195982C6}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "administration.api", "administration.api", "{699E5164-7934-4EF6-9FF1-56AF263EADB2}"
+	ProjectSection(SolutionItems) = preProject
+		devops\k8s\dev\administration.api\api.yaml = devops\k8s\dev\administration.api\api.yaml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "administration.gui", "administration.gui", "{CEEE9D79-44E6-4B97-8F93-C33F9677EE5E}"
+	ProjectSection(SolutionItems) = preProject
+		devops\k8s\dev\administration.gui\api.yaml = devops\k8s\dev\administration.gui\api.yaml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "analysis", "analysis", "{855801E5-AFD8-42C4-B9B5-7F7A27560307}"
+	ProjectSection(SolutionItems) = preProject
+		devops\k8s\dev\analysis\api.yaml = devops\k8s\dev\analysis\api.yaml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "observations", "observations", "{5631EB28-47D6-4F84-981B-BA799A5453C7}"
+	ProjectSection(SolutionItems) = preProject
+		devops\k8s\dev\observations\api.yaml = devops\k8s\dev\observations\api.yaml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "administration.api", "administration.api", "{A4C3FF83-18CB-478E-9477-0603AE91AD04}"
+	ProjectSection(SolutionItems) = preProject
+		devops\k8s\local\administration.api\api.yaml = devops\k8s\local\administration.api\api.yaml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "administration.api", "administration.api", "{8D6F1408-F03B-4C28-A514-377B316056D2}"
+	ProjectSection(SolutionItems) = preProject
+		devops\k8s\prod\administration.api\api.yaml = devops\k8s\prod\administration.api\api.yaml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "administration.api", "administration.api", "{27FA99AC-8A53-4791-99C5-C9F557978BBF}"
+	ProjectSection(SolutionItems) = preProject
+		devops\k8s\st\administration.api\api.yaml = devops\k8s\st\administration.api\api.yaml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "administration.gui", "administration.gui", "{69C5047E-7019-413F-8CBA-5ED7D549CDDB}"
+	ProjectSection(SolutionItems) = preProject
+		devops\k8s\local\administration.gui\api.yaml = devops\k8s\local\administration.gui\api.yaml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "administration.gui", "administration.gui", "{59FEB4AF-191D-4383-BDAA-CAB77614FABF}"
+	ProjectSection(SolutionItems) = preProject
+		devops\k8s\prod\administration.gui\api.yaml = devops\k8s\prod\administration.gui\api.yaml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "administration.gui", "administration.gui", "{17EA1AE8-AEFC-4835-BDA6-116AB4BCCA6C}"
+	ProjectSection(SolutionItems) = preProject
+		devops\k8s\st\administration.gui\api.yaml = devops\k8s\st\administration.gui\api.yaml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "analysis", "analysis", "{3A2C48B6-A752-4088-81D8-DC3D05E038EB}"
+	ProjectSection(SolutionItems) = preProject
+		devops\k8s\local\analysis\api.yaml = devops\k8s\local\analysis\api.yaml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "analysis", "analysis", "{EDB7EF56-4335-41C1-9D55-DF62BBF6D9B4}"
+	ProjectSection(SolutionItems) = preProject
+		devops\k8s\prod\analysis\api.yaml = devops\k8s\prod\analysis\api.yaml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "analysis", "analysis", "{B05D1420-83C5-4C35-A072-754E5AC4E9FB}"
+	ProjectSection(SolutionItems) = preProject
+		devops\k8s\st\analysis\api.yaml = devops\k8s\st\analysis\api.yaml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "observations", "observations", "{A18A0685-F5A9-4702-AAA0-D9C51FB2400A}"
+	ProjectSection(SolutionItems) = preProject
+		devops\k8s\local\observations\api.yaml = devops\k8s\local\observations\api.yaml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "observations", "observations", "{FAC95385-CB0D-4335-A1F3-0AF0D15473B1}"
+	ProjectSection(SolutionItems) = preProject
+		devops\k8s\prod\observations\api.yaml = devops\k8s\prod\observations\api.yaml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "observations", "observations", "{ACC3AAD4-609E-4FEF-99EF-F8DDE6265B5F}"
+	ProjectSection(SolutionItems) = preProject
+		devops\k8s\st\observations\api.yaml = devops\k8s\st\observations\api.yaml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "proxy", "proxy", "{3669CB09-BB01-4EDC-9ED7-0BF18596DAC1}"
+	ProjectSection(SolutionItems) = preProject
+		devops\k8s\dev\proxy\api.yaml = devops\k8s\dev\proxy\api.yaml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "proxy", "proxy", "{146ACFA3-5B34-43E3-8059-7C93BDBBC43D}"
+	ProjectSection(SolutionItems) = preProject
+		devops\k8s\local\proxy\api.yaml = devops\k8s\local\proxy\api.yaml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "proxy", "proxy", "{60BDF2DA-5FF7-4B68-9651-25D4D5A64738}"
+	ProjectSection(SolutionItems) = preProject
+		devops\k8s\prod\proxy\api.yaml = devops\k8s\prod\proxy\api.yaml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "proxy", "proxy", "{BCFE127C-070E-4D23-8E93-B09CE544DDDF}"
+	ProjectSection(SolutionItems) = preProject
+		devops\k8s\st\proxy\api.yaml = devops\k8s\st\proxy\api.yaml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -261,6 +371,30 @@ Global
 		{7B04B5EA-4DAB-4BEA-9346-DADBF21EFC81} = {A3C5E4A0-5599-48B7-BE17-07E19D585ACE}
 		{FE09BD2E-E0A8-465B-9917-D31AA720E646} = {7C2C0ABC-542C-47C2-86C0-C3EDE2C0DC90}
 		{0964ED67-D326-4DC6-9981-722B57941744} = {A1FE1227-E3C9-455B-9F43-FEEEFB131B25}
+		{2A9DE856-4794-410A-A187-F220A45B2EAD} = {BF0484AD-4215-4478-B46E-AF17643A796F}
+		{381F6625-C59F-4255-92ED-BE4FE3DD2431} = {BF0484AD-4215-4478-B46E-AF17643A796F}
+		{2DB6DB3D-E156-4975-AF5D-742C8AF7B43F} = {BF0484AD-4215-4478-B46E-AF17643A796F}
+		{BCD9308C-6F24-4B9D-97A6-94C2195982C6} = {BF0484AD-4215-4478-B46E-AF17643A796F}
+		{699E5164-7934-4EF6-9FF1-56AF263EADB2} = {381F6625-C59F-4255-92ED-BE4FE3DD2431}
+		{CEEE9D79-44E6-4B97-8F93-C33F9677EE5E} = {381F6625-C59F-4255-92ED-BE4FE3DD2431}
+		{855801E5-AFD8-42C4-B9B5-7F7A27560307} = {381F6625-C59F-4255-92ED-BE4FE3DD2431}
+		{5631EB28-47D6-4F84-981B-BA799A5453C7} = {381F6625-C59F-4255-92ED-BE4FE3DD2431}
+		{A4C3FF83-18CB-478E-9477-0603AE91AD04} = {2A9DE856-4794-410A-A187-F220A45B2EAD}
+		{8D6F1408-F03B-4C28-A514-377B316056D2} = {BCD9308C-6F24-4B9D-97A6-94C2195982C6}
+		{27FA99AC-8A53-4791-99C5-C9F557978BBF} = {2DB6DB3D-E156-4975-AF5D-742C8AF7B43F}
+		{69C5047E-7019-413F-8CBA-5ED7D549CDDB} = {2A9DE856-4794-410A-A187-F220A45B2EAD}
+		{59FEB4AF-191D-4383-BDAA-CAB77614FABF} = {BCD9308C-6F24-4B9D-97A6-94C2195982C6}
+		{17EA1AE8-AEFC-4835-BDA6-116AB4BCCA6C} = {2DB6DB3D-E156-4975-AF5D-742C8AF7B43F}
+		{3A2C48B6-A752-4088-81D8-DC3D05E038EB} = {2A9DE856-4794-410A-A187-F220A45B2EAD}
+		{EDB7EF56-4335-41C1-9D55-DF62BBF6D9B4} = {BCD9308C-6F24-4B9D-97A6-94C2195982C6}
+		{B05D1420-83C5-4C35-A072-754E5AC4E9FB} = {2DB6DB3D-E156-4975-AF5D-742C8AF7B43F}
+		{A18A0685-F5A9-4702-AAA0-D9C51FB2400A} = {2A9DE856-4794-410A-A187-F220A45B2EAD}
+		{FAC95385-CB0D-4335-A1F3-0AF0D15473B1} = {BCD9308C-6F24-4B9D-97A6-94C2195982C6}
+		{ACC3AAD4-609E-4FEF-99EF-F8DDE6265B5F} = {2DB6DB3D-E156-4975-AF5D-742C8AF7B43F}
+		{3669CB09-BB01-4EDC-9ED7-0BF18596DAC1} = {381F6625-C59F-4255-92ED-BE4FE3DD2431}
+		{146ACFA3-5B34-43E3-8059-7C93BDBBC43D} = {2A9DE856-4794-410A-A187-F220A45B2EAD}
+		{60BDF2DA-5FF7-4B68-9651-25D4D5A64738} = {BCD9308C-6F24-4B9D-97A6-94C2195982C6}
+		{BCFE127C-070E-4D23-8E93-B09CE544DDDF} = {2DB6DB3D-E156-4975-AF5D-742C8AF7B43F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7CBCE6ED-CC4F-4B55-913F-1231086E92FE}

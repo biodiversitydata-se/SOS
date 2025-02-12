@@ -515,5 +515,10 @@ namespace SOS.Harvest.Harvesters.DwC
             _logger.LogInformation("Finish harvesting sightings for {@dataProvider} data provider. Status={@harvestStatus}", provider.Identifier, harvestInfo?.Status);
             return harvestInfo!;
         }
+
+        public Task<HarvestInfo> HarvestCompleteObservationsWithDelayAsync(DataProvider provider, IJobCancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

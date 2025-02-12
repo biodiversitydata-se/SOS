@@ -135,5 +135,10 @@ namespace SOS.Harvest.Harvesters.VirtualHerbarium
             await Task.Run(() => throw new NotImplementedException("Not implemented for this provider"));
             return null!;
         }
+
+        public Task<HarvestInfo> HarvestCompleteObservationsWithDelayAsync(DataProvider provider, IJobCancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -156,5 +156,10 @@ namespace SOS.Harvest.Harvesters.AquaSupport.FishData
             });
             return null!;
         }
+
+        public Task<HarvestInfo> HarvestCompleteObservationsWithDelayAsync(DataProvider provider, IJobCancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

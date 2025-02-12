@@ -39,5 +39,20 @@ namespace SOS.Lib.Extensions
 
             return JsonSerializer.Deserialize<IEnumerable<Observation>>(JsonSerializer.Serialize(dynamicObjects), jsonSerializerOptions);
         }
+
+        /// <summary>
+        /// Cast dynamic to observations array.
+        /// </summary>
+        /// <param name="dynamicObjects"></param>
+        /// <returns></returns>
+        public static Observation[] ToObservationsArray(this IEnumerable<dynamic> dynamicObjects)
+        {
+            if (dynamicObjects == null)
+            {
+                return null;
+            }
+            
+            return JsonSerializer.Deserialize<Observation[]>(JsonSerializer.Serialize(dynamicObjects), jsonSerializerOptions);
+        }
     }
 }

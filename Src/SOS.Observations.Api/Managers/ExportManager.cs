@@ -14,7 +14,9 @@ using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Repositories.Interfaces;
 using System;
+using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SOS.Observations.Api.Managers
@@ -33,6 +35,7 @@ namespace SOS.Observations.Api.Managers
         private readonly ILogger<ExportManager> _logger;
         private readonly IProcessedObservationRepository _processedObservationRepository;
         private readonly IProcessInfoRepository _processInfoRepository;
+        private static readonly SemaphoreSlim _downloadSemaphore = new SemaphoreSlim(3, 3);
 
         /// <summary>
         /// Create an Csv file
@@ -308,6 +311,93 @@ namespace SOS.Observations.Api.Managers
             {
                 _logger.LogError(e, "Failed to create export file");
                 return null;
+            }
+        }                
+
+        public async Task<(Stream stream, string filename)> CreateExportFileInMemoryAsZipStreamAsync(
+            int? roleId,
+            string authorizationApplicationIdentifier,
+            SearchFilter filter,
+            ExportFormat exportFormat,
+            string culture,
+            bool flatOut,
+            PropertyLabelType propertyLabelType,
+            bool excludeNullValues,
+            bool dynamicProjectDataFields,
+            bool gzip,
+            IJobCancellationToken cancellationToken)
+        {
+            await _downloadSemaphore.WaitAsync();
+            try
+            {
+                await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);                
+                var fileExportResult = exportFormat switch
+                {
+                    ExportFormat.Csv => await _csvWriter.CreateFileInMemoryAsZipStreamAsync(filter, culture, propertyLabelType, cancellationToken),
+                    ExportFormat.DwCEvent => await CreateDwcExportInMemoryAsync(filter,cancellationToken, eventDwC: true),
+                    ExportFormat.Excel => await _excelWriter.CreateFileInMemoryAsync(filter, culture, propertyLabelType, dynamicProjectDataFields, gzip, cancellationToken),
+                    ExportFormat.GeoJson => await _geoJsonWriter.CreateFileInMemoryAsZipStreamAsync(filter, culture, flatOut, propertyLabelType, excludeNullValues, cancellationToken),
+                    ExportFormat.DwC => await CreateDwcExportInMemoryAsync(filter, cancellationToken, eventDwC: false),
+                    _ => throw new NotImplementedException()
+                };
+
+                return fileExportResult;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to create export file");
+                throw;
+            }
+            finally
+            {
+                _downloadSemaphore.Release();
+            }
+        }
+
+        private async Task<(Stream stream, string filename)> CreateDwcExportInMemoryAsync(
+            SearchFilter filter,             
+            IJobCancellationToken cancellationToken,
+            bool eventDwC = false)
+        {
+            try
+            {
+                var processInfo = await _processInfoRepository.GetAsync(_processedObservationRepository.PublicIndexName);
+
+                if (eventDwC)
+                {
+                    filter.Output.SortOrders = new[] { new SortOrderFilter { SortBy = "event.eventId", SortOrder = SearchSortOrder.Asc } };
+                    return await _dwcArchiveEventFileWriter.CreateEventDwcArchiveFileInMemoryAsync(
+                       DataProvider.FilterSubsetDataProvider,
+                       filter,
+                       _processedObservationRepository,
+                       processInfo,
+                       cancellationToken);                    
+                }
+                else
+                {
+                    var propertyFields =
+                       ObservationPropertyFieldDescriptionHelper.GetExportFieldsFromOutputFields(filter?.Output?.Fields);
+                    var fieldDescriptions = FieldDescriptionHelper.GetAllDwcOccurrenceCoreFieldDescriptions().
+                       Where(fd => propertyFields.Select(pf => pf?.DwcIdentifier?.ToLower()).Contains(fd?.DwcIdentifier?.ToLower()));
+
+                    return await _dwcArchiveFileWriter.CreateDwcArchiveFileInMemoryAsync(
+                        DataProvider.FilterSubsetDataProvider,
+                        filter,
+                        _processedObservationRepository,
+                        fieldDescriptions,
+                        processInfo,
+                        cancellationToken);
+                }
+            }
+            catch (JobAbortedException)
+            {
+                _logger.LogInformation("Export sightings was canceled.");
+                throw;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to export sightings");
+                throw;
             }
         }
     }
