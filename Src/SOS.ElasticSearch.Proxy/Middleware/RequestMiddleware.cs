@@ -156,13 +156,16 @@ namespace SOS.ElasticSearch.Proxy.Middleware
         /// <returns></returns>
         public async Task Invoke(HttpContext context)
         {
+            string originalBody = null;
+            string body = null;
+
             try
             {
                 var requestStopwatch = Stopwatch.StartNew();
                 var targetUri = BuildTargetUri(context.Request);
 
                 context.Request.EnableBuffering();
-                var body = await new StreamReader(context.Request.Body).ReadToEndAsync();
+                body = await new StreamReader(context.Request.Body).ReadToEndAsync();
                 context.Request.Body.Position = 0;
                 LogHelper.AddHttpContextItems(context);
                 if (_proxyConfiguration.LogOriginalQuery)
@@ -175,6 +178,7 @@ namespace SOS.ElasticSearch.Proxy.Middleware
                 if (targetUri != null)
                 {
                     _logger.LogDebug($"Target: {targetUri.AbsoluteUri}");
+                    originalBody = body;
                     var targetRequestMessage = CreateTargetMessage(context, targetUri, ref body);
                     if (_proxyConfiguration.LogRequest && targetRequestMessage.Content != null)
                     {
@@ -225,7 +229,7 @@ namespace SOS.ElasticSearch.Proxy.Middleware
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Error in RequestMiddleware.Invoke()");
+                _logger.LogError(e, $"Error in RequestMiddleware.Invoke(). Original body=\"{originalBody}\", New body=\"{body}\"");
                 throw;
             }
         }
