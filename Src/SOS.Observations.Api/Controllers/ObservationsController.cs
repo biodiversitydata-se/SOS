@@ -1801,6 +1801,8 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
         /// <param name="areaBuffer">Are buffer 0 to 100m.</param>
         /// <param name="onlyAboveMyClearance">If true, get signal only above users clearance.</param>
+        /// <param name="returnHttp403WhenNoPermissions">If true, a http 403 will be returned if user try to serach in area where he/she don't have permission to search. 
+        /// If false, the serach will ignore areas the user don't have permission to search in and false will always be returned for those areas</param>
         /// <returns></returns>
         [HttpPost("Internal/SignalSearch")]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
@@ -1815,7 +1817,8 @@ namespace SOS.Observations.Api.Controllers
             [FromBody] SignalFilterDto filter,
             [FromQuery] bool validateSearchFilter = false, // if false, only mandatory requirements will be validated
             [FromQuery] int areaBuffer = 0,
-            [FromQuery] bool onlyAboveMyClearance = true)
+            [FromQuery] bool onlyAboveMyClearance = true,
+            [FromQuery] bool? returnHttp403WhenNoPermissions = false)
         {
             try
             {
@@ -1832,7 +1835,7 @@ namespace SOS.Observations.Api.Controllers
                 }
 
                 var searchFilter = filter.ToSearchFilterInternal(this.GetUserId(), true);
-                var taxonFound = await _observationManager.SignalSearchInternalAsync(roleId, authorizationApplicationIdentifier, searchFilter, areaBuffer, onlyAboveMyClearance);
+                var taxonFound = await _observationManager.SignalSearchInternalAsync(roleId, authorizationApplicationIdentifier, searchFilter, areaBuffer, onlyAboveMyClearance, returnHttp403WhenNoPermissions ?? false);
 
                 if (taxonFound.Equals(SignalSerachResult.NoPermissions))
                 {

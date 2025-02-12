@@ -570,7 +570,8 @@ namespace SOS.Observations.Api.Managers
             string authorizationApplicationIdentifier,
             SearchFilter filter,
             int areaBuffer,
-            bool onlyAboveMyClearance)
+            bool onlyAboveMyClearance,
+            bool validateGeographic)
         {
             try
             {
@@ -580,7 +581,7 @@ namespace SOS.Observations.Api.Managers
                 {
                     throw new AuthenticationRequiredException("User don't have the SightingIndication permission that is required");
                 }
-                if (filter.Location?.AreaGeographic != null)
+                if (validateGeographic && filter.Location?.AreaGeographic != null)
                 {
                     var areaGeographic = filter.Location?.AreaGeographic;
                     var hasAccess = true;

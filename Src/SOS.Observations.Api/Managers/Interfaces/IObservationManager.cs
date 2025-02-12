@@ -172,13 +172,15 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <param name="filter"></param>
         /// <param name="areaBuffer"></param>
         /// <param name="onlyAboveMyClearance"></param>
+        /// <param name="validateGeographic"></param>
         /// <returns></returns>
         Task<SignalSerachResult> SignalSearchInternalAsync(
             int? roleId,
             string authorizationApplicationIdentifier,
             SearchFilter filter,
             int areaBuffer,
-            bool onlyAboveMyClearance = true);
+            bool onlyAboveMyClearance = true,
+            bool validateGeographic = false);
 
         /// <summary>
         /// Count documents in index
