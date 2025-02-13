@@ -40,6 +40,8 @@ namespace SOS.Lib.Models.Shared
         /// <summary>
         ///     Default verification status
         /// </summary>
+        [BsonRepresentation(BsonType.String)]
+        [Newtonsoft.Json.JsonConverter(typeof(StringEnumConverter))]
         public ValidationStatusId? DefaultVerificationStatus { get; set; }
 
         /// <summary>
