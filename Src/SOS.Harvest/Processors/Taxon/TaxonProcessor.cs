@@ -18,7 +18,6 @@ namespace SOS.Harvest.Processors.Taxon
     public class TaxonProcessor : ITaxonProcessor
     {
         private readonly ITaxonAttributeService _taxonAttributeService;
-        private readonly ITaxonListService _taxonListService;
         private readonly ITaxonService _taxonService;
         private readonly ITaxonRepository _processedTaxonRepository;
         private readonly Repositories.Source.Artportalen.Interfaces.ITaxonRepository _apTaxonRepository;
@@ -97,39 +96,6 @@ namespace SOS.Harvest.Processors.Taxon
                 skip += take;
             }
             await Task.WhenAll(getTaxonAttributesTasks);
-        }
-
-        /// <summary>
-        ///     Populate dynamic properties from taxon lists
-        /// </summary>
-        /// <param name="taxa"></param>
-        /// <returns></returns>
-        private async Task AddTaxonListDataAsync(IEnumerable<DarwinCoreTaxon> taxa)
-        {
-            if (!taxa?.Any() ?? true)
-            {
-                return;
-            }
-
-            var taxaDictonary = taxa!.ToDictionary(t => t.Id, t => t);
-            var lists = await _taxonListService.GetTaxaAsync(new[] { 34 /*Fridlysta arter*/, 281 /*Fridlysta fåglar*/ });
-            
-            foreach(var list in lists)
-            {
-                foreach(var taxonInfo in list.TaxonInformation)
-                {
-                    if(taxaDictonary.TryGetValue(taxonInfo.Id, out var taxon))
-                    {
-                        switch (list.ListId)
-                        {
-                            case 34:
-                            case 281:
-                                taxon.DynamicProperties.ProtectedByLaw = true;
-                                break;
-                        }
-                    }
-                }
-            }
         }
 
         /// <summary>
@@ -345,7 +311,6 @@ namespace SOS.Harvest.Processors.Taxon
         /// </summary>
         /// <param name="taxonService"></param>
         /// <param name="taxonAttributeService"></param>
-        /// <param name="taxonListService"></param>
         /// <param name="processedTaxonRepository"></param>
         /// <param name="apTaxonRepository"></param>
         /// <param name="processConfiguration"></param>
@@ -355,7 +320,6 @@ namespace SOS.Harvest.Processors.Taxon
         public TaxonProcessor(
             ITaxonService taxonService,
             ITaxonAttributeService taxonAttributeService,
-            ITaxonListService taxonListService,
             ITaxonRepository processedTaxonRepository,
             Repositories.Source.Artportalen.Interfaces.ITaxonRepository apTaxonRepository,
             ProcessConfiguration processConfiguration,
@@ -365,7 +329,6 @@ namespace SOS.Harvest.Processors.Taxon
             _taxonService = taxonService ?? throw new ArgumentNullException(nameof(taxonService));
             _taxonAttributeService =
                 taxonAttributeService ?? throw new ArgumentNullException(nameof(taxonAttributeService));
-            _taxonListService = taxonListService ?? throw new ArgumentNullException(nameof(taxonListService));
             _processedTaxonRepository = processedTaxonRepository ?? throw new ArgumentNullException(nameof(processedTaxonRepository));
             _apTaxonRepository = apTaxonRepository ?? throw new ArgumentNullException(nameof(apTaxonRepository));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -388,9 +351,6 @@ namespace SOS.Harvest.Processors.Taxon
                 _logger.LogDebug("Start adding taxon attributes");
                 await AddTaxonAttributesAsync(dwcTaxa);
                 _logger.LogDebug("Finish adding taxon attributes");
-                _logger.LogDebug("Start adding taxon list data");
-                await AddTaxonListDataAsync(dwcTaxa);
-                _logger.LogDebug("Finish adding taxon list data");
                 var taxa = dwcTaxa.ToProcessedTaxa();
 
                 var taxonCount = await _processedTaxonRepository.CountAllDocumentsAsync();

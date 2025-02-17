@@ -128,7 +128,7 @@ namespace SOS.Lib.Extensions
             taxon.TaxonomicStatus = sourceTaxon.TaxonomicStatus;
             taxon.VernacularName = sourceTaxon.VernacularName;
             taxon.VerbatimTaxonRank = sourceTaxon.VerbatimTaxonRank;
-
+            
             var displayName = taxon.ScientificName?.Trim();
             if (!string.IsNullOrEmpty(taxon.ScientificNameAuthorship))
             {
