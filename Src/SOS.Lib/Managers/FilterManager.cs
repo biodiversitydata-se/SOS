@@ -53,7 +53,6 @@ namespace SOS.Lib.Managers
             if (roleId != 0)
             {
                 var userRoles = await _userService.GetUserRolesAsync(userId, authorizationApplicationIdentifier);
-
                 var role = userRoles?.Where(r => r.Id.Equals(roleId))?.FirstOrDefault();
                 authorities = role?.Authorities;
             }
@@ -317,6 +316,7 @@ namespace SOS.Lib.Managers
             }
 
             var geographicFilter = new GeographicAreasFilter();
+
             foreach (var areaFilter in areas)
             {
                 if (areaBuffer != 0 || usePointAccuracy || useDisturbanceRadius)
@@ -356,7 +356,6 @@ namespace SOS.Lib.Managers
                         break;
                 }
             }
-
             return geographicFilter;
         }
 

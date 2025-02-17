@@ -110,5 +110,15 @@ namespace SOS.Harvest.Jobs
                 null,
                 cancellationToken)) != -1;
         }
+
+        public async Task<bool> RunFulliNaturalistHarvestObservationsAsync(IJobCancellationToken cancellationToken)
+        {
+            var dataProvider =
+                await _dataProviderManager.GetDataProviderByIdOrIdentifier("iNaturalist");
+            return (await HarvestCompleteWithDelayAsync(
+                dataProvider,                
+                null,
+                cancellationToken)) != -1;
+        }
     }
 }

@@ -98,10 +98,10 @@ namespace SOS.Harvest.Jobs
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         protected async Task<long> HarvestAsync(
-        IEnumerable<DataProvider> dataProviders,
-        JobRunModes mode,
-        DateTime? fromDate,
-        IJobCancellationToken cancellationToken)
+            IEnumerable<DataProvider> dataProviders,
+            JobRunModes mode,
+            DateTime? fromDate,
+            IJobCancellationToken cancellationToken)
         {
             _logger.BeginScope(new[] { new KeyValuePair<string, object>("mode", mode.GetLoggerMode()) });
             try
@@ -140,11 +140,11 @@ namespace SOS.Harvest.Jobs
                     {
                         if (dataProvider.SupportIncrementalHarvest)
                         {
-                            harvestTaskByDataProvider.Add(dataProvider, harvester.HarvestObservationsAsync(mode, fromDate, cancellationToken));
+                            harvestTaskByDataProvider.Add(dataProvider, harvester.HarvestObservationsAsync(dataProvider, mode, fromDate, cancellationToken));
                         }
                         else
                         {
-                            harvestTaskByDataProvider.Add(dataProvider, harvester.HarvestObservationsAsync(cancellationToken));
+                            harvestTaskByDataProvider.Add(dataProvider, harvester.HarvestObservationsAsync(dataProvider, cancellationToken));
                         }
                     }
 
@@ -179,7 +179,43 @@ namespace SOS.Harvest.Jobs
             }
         }
 
+        /// <summary>
+        /// Run job
+        /// </summary>
+        /// <param name="dataProviders"></param>
+        /// <param name="mode"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        protected async Task<long> HarvestCompleteWithDelayAsync(
+            DataProvider dataProvider,
+            DateTime? fromDate,
+            IJobCancellationToken cancellationToken)
+        {            
+            try
+            {
+                if (dataProvider == null)
+                {
+                    _logger.LogError("No data provider for harvest");
+                    return 0;
+                }
 
+                _logger.LogInformation("Start harvest observations complete with delay for {@dataProvider}", dataProvider.Identifier);
+                var harvester = _observationHarvesterManager.GetHarvester(dataProvider.Type);
+                var harvestInfo = await harvester.HarvestCompleteObservationsWithDelayAsync(dataProvider, cancellationToken);
+                _logger.LogInformation("Finish harvest observations complete with delay for {@dataProvider}. Success: {@success}", dataProvider.Identifier, harvestInfo.Status == RunStatus.Success);
+                return harvestInfo.Status == RunStatus.Success ? harvestInfo.Count : -1;
+            }
+            catch (JobAbortedException)
+            {
+                _logger.LogInformation("Harvest observations complete with delay for {@dataProvider} was cancelled.", dataProvider?.Identifier);
+                return 0;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Harvest observations complete with delay for {@dataProvider} job failed.", dataProvider.Identifier);
+                throw new Exception($"Harvest observations complete with delay for {dataProvider} job failed.");
+            }
+        }
 
         protected virtual async Task PostHarvestAsync(IDictionary<DataProvider, Task<HarvestInfo>> harvestTaskByDataProvider)
         {

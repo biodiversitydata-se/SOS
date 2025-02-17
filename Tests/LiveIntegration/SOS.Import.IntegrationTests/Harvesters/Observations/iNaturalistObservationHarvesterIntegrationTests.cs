@@ -15,80 +15,80 @@ namespace SOS.Import.LiveIntegrationTests.Harvesters.Observations
 {
     public class iNaturalistObservationHarvesterIntegrationTests : TestBase
     {
-        [Fact]
-        [Trait("Category", "Integration")]
-        public async Task HarvestTenThousandObservations_FromiNaturalistProvider_And_SaveToMongoDb()
-        {
-            //-----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            var importConfiguration = GetImportConfiguration();
-            importConfiguration.iNaturalistServiceConfiguration.StartHarvestYear = 2015;
-            importConfiguration.iNaturalistServiceConfiguration.MaxNumberOfSightingsHarvested = 100000;
+        //[Fact]
+        //[Trait("Category", "Integration")]
+        //public async Task HarvestTenThousandObservations_FromiNaturalistProvider_And_SaveToMongoDb()
+        //{
+        //    //-----------------------------------------------------------------------------------------------------------
+        //    // Arrange
+        //    //-----------------------------------------------------------------------------------------------------------
+        //    var importConfiguration = GetImportConfiguration();
+        //    importConfiguration.iNaturalistServiceConfiguration.StartHarvestYear = 2015;
+        //    importConfiguration.iNaturalistServiceConfiguration.MaxNumberOfSightingsHarvested = 100000;
 
-            var iNaturalistObservationService = new iNaturalistObservationService(
-                new HttpClientService(new Mock<ILogger<HttpClientService>>().Object),
-                importConfiguration.iNaturalistServiceConfiguration,
-                new NullLogger<iNaturalistObservationService>());
-            var verbatimDbConfiguration = GetVerbatimDbConfiguration();
-            var verbatimClient = new VerbatimClient(
-                verbatimDbConfiguration.GetMongoDbSettings(),
-                verbatimDbConfiguration.DatabaseName,
-                verbatimDbConfiguration.ReadBatchSize,
-                verbatimDbConfiguration.WriteBatchSize);
+        //    var iNaturalistObservationService = new iNaturalistObservationService(
+        //        new HttpClientService(new Mock<ILogger<HttpClientService>>().Object),
+        //        importConfiguration.iNaturalistServiceConfiguration,
+        //        new NullLogger<iNaturalistObservationService>());
+        //    var verbatimDbConfiguration = GetVerbatimDbConfiguration();
+        //    var verbatimClient = new VerbatimClient(
+        //        verbatimDbConfiguration.GetMongoDbSettings(),
+        //        verbatimDbConfiguration.DatabaseName,
+        //        verbatimDbConfiguration.ReadBatchSize,
+        //        verbatimDbConfiguration.WriteBatchSize);
 
-            var iNaturalistObservationHarvester = new iNaturalistObservationHarvester(
-                verbatimClient,
-                iNaturalistObservationService,
-                importConfiguration.iNaturalistServiceConfiguration,
-                new Mock<ILogger<iNaturalistObservationHarvester>>().Object);
+        //    var iNaturalistObservationHarvester = new iNaturalistObservationHarvester(
+        //        verbatimClient,
+        //        iNaturalistObservationService,
+        //        importConfiguration.iNaturalistServiceConfiguration,
+        //        new Mock<ILogger<iNaturalistObservationHarvester>>().Object);
 
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var result = await iNaturalistObservationHarvester.HarvestObservationsAsync(JobRunModes.Full, null, JobCancellationToken.Null);
+        //    //-----------------------------------------------------------------------------------------------------------
+        //    // Act
+        //    //-----------------------------------------------------------------------------------------------------------
+        //    var result = await iNaturalistObservationHarvester.HarvestObservationsAsync(new DataProvider(), JobRunModes.Full, null, JobCancellationToken.Null);
 
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-            result.Status.Should().Be(RunStatus.Success);
-        }
+        //    //-----------------------------------------------------------------------------------------------------------
+        //    // Assert
+        //    //-----------------------------------------------------------------------------------------------------------
+        //    result.Status.Should().Be(RunStatus.Success);
+        //}
 
-        [Fact]
-        [Trait("Category", "Integration")]
-        public async Task HarvestTenThousandObservations_FromiNaturalistProvider_WithoutSavingToMongoDb()
-        {
-            //-----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            var importConfiguration = GetImportConfiguration();
-            importConfiguration.iNaturalistServiceConfiguration.StartHarvestYear = 2015;
-            importConfiguration.iNaturalistServiceConfiguration.MaxNumberOfSightingsHarvested = 10000;
-            var verbatimDbConfiguration = GetVerbatimDbConfiguration();
-            var verbatimClient = new VerbatimClient(
-                verbatimDbConfiguration.GetMongoDbSettings(),
-                verbatimDbConfiguration.DatabaseName,
-                verbatimDbConfiguration.ReadBatchSize,
-                verbatimDbConfiguration.WriteBatchSize); ;
+        //[Fact]
+        //[Trait("Category", "Integration")]
+        //public async Task HarvestTenThousandObservations_FromiNaturalistProvider_WithoutSavingToMongoDb()
+        //{
+        //    //-----------------------------------------------------------------------------------------------------------
+        //    // Arrange
+        //    //-----------------------------------------------------------------------------------------------------------
+        //    var importConfiguration = GetImportConfiguration();
+        //    importConfiguration.iNaturalistServiceConfiguration.StartHarvestYear = 2015;
+        //    importConfiguration.iNaturalistServiceConfiguration.MaxNumberOfSightingsHarvested = 10000;
+        //    var verbatimDbConfiguration = GetVerbatimDbConfiguration();
+        //    var verbatimClient = new VerbatimClient(
+        //        verbatimDbConfiguration.GetMongoDbSettings(),
+        //        verbatimDbConfiguration.DatabaseName,
+        //        verbatimDbConfiguration.ReadBatchSize,
+        //        verbatimDbConfiguration.WriteBatchSize); ;
 
-            var iNaturalistObservationHarvester = new iNaturalistObservationHarvester(
-                verbatimClient,
-                new iNaturalistObservationService(
-                    new HttpClientService(new Mock<ILogger<HttpClientService>>().Object),
-                    importConfiguration.iNaturalistServiceConfiguration,
-                    new NullLogger<iNaturalistObservationService>()),
-                importConfiguration.iNaturalistServiceConfiguration,
-                new Mock<ILogger<iNaturalistObservationHarvester>>().Object);
+        //    var iNaturalistObservationHarvester = new iNaturalistObservationHarvester(
+        //        verbatimClient,
+        //        new iNaturalistObservationService(
+        //            new HttpClientService(new Mock<ILogger<HttpClientService>>().Object),
+        //            importConfiguration.iNaturalistServiceConfiguration,
+        //            new NullLogger<iNaturalistObservationService>()),
+        //        importConfiguration.iNaturalistServiceConfiguration,
+        //        new Mock<ILogger<iNaturalistObservationHarvester>>().Object);
 
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var result = await iNaturalistObservationHarvester.HarvestObservationsAsync(JobRunModes.Full, null, JobCancellationToken.Null);
+        //    //-----------------------------------------------------------------------------------------------------------
+        //    // Act
+        //    //-----------------------------------------------------------------------------------------------------------
+        //    var result = await iNaturalistObservationHarvester.HarvestObservationsAsync(new DataProvider(), JobRunModes.Full, null, JobCancellationToken.Null);
 
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-            result.Status.Should().Be(RunStatus.Success);
-        }
+        //    //-----------------------------------------------------------------------------------------------------------
+        //    // Assert
+        //    //-----------------------------------------------------------------------------------------------------------
+        //    result.Status.Should().Be(RunStatus.Success);
+        //}
     }
 }

@@ -381,9 +381,9 @@ namespace SOS.Harvest.Harvesters.DwC
         }
 
         /// inheritdoc />
-        public async Task<HarvestInfo> HarvestObservationsAsync(JobRunModes mode,
-            DateTime? fromDate,
-            IJobCancellationToken cancellationToken)
+        public async Task<HarvestInfo> HarvestObservationsAsync(DataProvider dataProvider,
+            JobRunModes mode,
+            DateTime? fromDate, IJobCancellationToken cancellationToken)
         {
             await Task.Run(() =>
             {
@@ -514,6 +514,11 @@ namespace SOS.Harvest.Harvesters.DwC
 
             _logger.LogInformation("Finish harvesting sightings for {@dataProvider} data provider. Status={@harvestStatus}", provider.Identifier, harvestInfo?.Status);
             return harvestInfo!;
+        }
+
+        public Task<HarvestInfo> HarvestCompleteObservationsWithDelayAsync(DataProvider provider, IJobCancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
         }
     }
 }

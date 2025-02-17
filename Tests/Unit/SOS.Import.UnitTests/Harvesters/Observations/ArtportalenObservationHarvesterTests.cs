@@ -10,6 +10,7 @@ using SOS.Lib.Configuration.Import;
 using SOS.Lib.Constants;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers.Interfaces;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
@@ -151,7 +152,7 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.HarvestObservationsAsync(JobRunModes.Full, null, JobCancellationToken.Null);
+            var result = await TestObject.HarvestObservationsAsync(new DataProvider(), JobRunModes.Full, null, JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
@@ -222,7 +223,7 @@ namespace SOS.Import.UnitTests.Harvesters.Observations
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.HarvestObservationsAsync(JobRunModes.Full, null, JobCancellationToken.Null);
+            var result = await TestObject.HarvestObservationsAsync(new DataProvider(), JobRunModes.Full, null, JobCancellationToken.Null);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
