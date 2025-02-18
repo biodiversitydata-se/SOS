@@ -33,7 +33,9 @@ spec:
       containers:
         - env:
           - name: ASPNETCORE_ENVIRONMENT
-            value: dev          
+            value: dev   
+          - name: CorsAllowAny
+            value: "true"
           - name: DISABLE_HANGFIRE_INIT
             value: 'true'
           - name: DISABLE_HEALTHCHECK_INIT

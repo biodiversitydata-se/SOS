@@ -9,6 +9,7 @@ using System.Text.Json;
 
 public static class Settings
 {
+    public static bool CorsAllowAny { get; set; } = false;
     public static UserServiceConfiguration UserServiceConfiguration { get; set; } = new();
     public static ObservationApiConfiguration ObservationApiConfiguration { get; set; } = new();
     public static VocabularyConfiguration VocabularyConfiguration { get; set; } = new();
@@ -47,6 +48,7 @@ public static class Settings
         using var loggerFactory = LoggerFactory.Create(loggingBuilder => loggingBuilder.SetMinimumLevel(LogLevel.Debug).AddConsole());
         var logger = loggerFactory.CreateLogger("Settings");
 
+        CorsAllowAny = GetConfigValueString("CorsAllowAny", configuration, logger, sensitiveSetting: false, required: false)?.Equals("true", StringComparison.CurrentCultureIgnoreCase) ?? false;
         IdentityServer = GetConfigSection<IdentityServerConfiguration>("IdentityServer", configuration, logger);
         ObservationApiConfiguration = GetConfigSection<ObservationApiConfiguration>("ObservationApiConfiguration", configuration, logger);
         VocabularyConfiguration = GetConfigSection<VocabularyConfiguration>("VocabularyConfiguration", configuration, logger);

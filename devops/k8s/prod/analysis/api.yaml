@@ -57,6 +57,8 @@ spec:
         - env:
           - name: ASPNETCORE_ENVIRONMENT
             value: prod
+          - name: CorsAllowAny
+            value: "false"
           - name: IdentityServer
             value: '{"Authority": "https://ids.artdatabanken.se", "Audience": "SOS.Observations", "RequireHttpsMetadata": false}'
           - name: AreaConfiguration
