@@ -1,18 +1,31 @@
 ﻿using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Moq;
+using SOS.Lib.JsonConverters;
 using SOS.Observations.Api.Middleware;
 using SOS.Shared.Api.Dtos.Filter;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Xunit;
 
 namespace SOS.Observations.Api.UnitTests.Middleware;
 public class StoreRequestBodyMiddlewareTests
 {
+    private readonly static JsonSerializerOptions jsonSerializerOptions = new JsonSerializerOptions()
+    {
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+        PropertyNameCaseInsensitive = true,
+        Converters = {
+                new JsonStringEnumConverter(),
+                new GeoShapeConverter(),
+                new NetTopologySuite.IO.Converters.GeoJsonConverterFactory()
+            }
+    };
+
     [Fact]
     public async Task Invoke_Should_Store_RequestBody_When_Method_Is_Post_Or_Put()
     {
@@ -63,7 +76,7 @@ public class StoreRequestBodyMiddlewareTests
         // Assert
         context.Items.ContainsKey("Request-body").Should().BeTrue();
         requestBody.Should().NotBe((string)context.Items["Request-body"]);
-        var newRequestBody = JsonSerializer.Deserialize<SearchFilterInternalDto>((string)context.Items["Request-body"]);
+        var newRequestBody = JsonSerializer.Deserialize<SearchFilterInternalDto>((string)context.Items["Request-body"], jsonSerializerOptions);
         newRequestBody.Taxon.Ids.Should().ContainSingle().Which.Should().Be(-1);
     }
 

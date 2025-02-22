@@ -1,11 +1,13 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Nest;
+using SOS.Lib.JsonConverters;
 using SOS.Shared.Api.Dtos.Filter;
 using System;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace SOS.Observations.Api.Middleware
@@ -14,6 +16,16 @@ namespace SOS.Observations.Api.Middleware
     {
         private readonly RequestDelegate _next;
         private const int ApplicationInsightsMaxSize = 8192;
+        private readonly static JsonSerializerOptions jsonSerializerOptions = new JsonSerializerOptions()
+        {
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+            PropertyNameCaseInsensitive = true,
+            Converters = {
+                new JsonStringEnumConverter(),
+                new GeoShapeConverter(),
+                new NetTopologySuite.IO.Converters.GeoJsonConverterFactory()
+            }
+        };
 
         public StoreRequestBodyMiddleware(RequestDelegate next)
         {
@@ -41,17 +53,17 @@ namespace SOS.Observations.Api.Middleware
                         // truncate the body to the max size
                         try
                         {
-                            var searchFilter = JsonSerializer.Deserialize<SearchFilterInternalDto>(body);
+                            var searchFilter = JsonSerializer.Deserialize<SearchFilterInternalDto>(body, jsonSerializerOptions);
                             if (searchFilter?.Taxon?.Ids != null && searchFilter.Taxon.Ids.Any())
                             {                                
                                 searchFilter.Taxon.Ids = [-1];
-                                body = JsonSerializer.Serialize(searchFilter);
+                                body = JsonSerializer.Serialize(searchFilter, jsonSerializerOptions);
                             }
 
                             if (body.Length > ApplicationInsightsMaxSize && searchFilter?.Geographics?.Geometries != null && searchFilter.Geographics.Geometries.Any())
                             {
                                 searchFilter.Geographics.Geometries = [ new PointGeoShape(new GeoCoordinate(-1, -1)) ];
-                                body = JsonSerializer.Serialize(searchFilter);
+                                body = JsonSerializer.Serialize(searchFilter, jsonSerializerOptions);
                             }
                         }
                         catch (Exception ex)
