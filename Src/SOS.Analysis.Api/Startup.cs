@@ -166,6 +166,18 @@ namespace SOS.Analysis.Api
             CultureInfo.DefaultThreadCurrentUICulture = culture;            
             services.AddMemoryCache();
 
+            if (Settings.CorsAllowAny)
+            {
+                services.AddCors(options =>
+                {
+                    options.AddPolicy(name: "AllowAll", policy => policy
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .AllowAnyOrigin()
+                    );
+                });
+            }
+
             services.AddControllers()
                 .AddJsonOptions(options =>
                 {
@@ -461,6 +473,11 @@ namespace SOS.Analysis.Api
             Lib.Configuration.Shared.ApplicationInsights applicationInsightsConfiguration,
             AnalysisConfiguration statisticsConfiguration)
         {
+            if (Settings.CorsAllowAny)
+            {
+                app.UseCors("AllowAll");
+            }
+
             if (!_disableHangfireInit)
             {
                 app.UseHangfireDashboard();
@@ -474,12 +491,6 @@ namespace SOS.Analysis.Api
             if (_isDevelopment)
             {
                 app.UseDeveloperExceptionPage();
-                // Allow client calls
-                app.UseCors(cors => cors
-                    .AllowAnyHeader()
-                    .AllowAnyMethod()
-                    .AllowAnyOrigin()
-                );
                 telemetryConfiguration.DisableTelemetry = true;                
             }
             else

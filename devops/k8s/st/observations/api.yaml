@@ -57,6 +57,8 @@ spec:
         - env:
             - name: ASPNETCORE_ENVIRONMENT
               value: st
+            - name: CorsAllowAny
+              value: "true"
           image: adbpocreg.azurecr.io/sos-observations-api:$(Parameters.ImageTag)
           name: sos-observations-api
           command: ["sh", "-c"]
