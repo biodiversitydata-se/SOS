@@ -22,6 +22,11 @@ namespace SOS.Lib.Helpers
         private readonly IFilterManager _filterManager;
         private readonly IProcessedObservationCoreRepository _processedObservationRepository;
 
+        public GeneralizationResolver()
+        {
+
+        }
+
         public GeneralizationResolver(ILogger<GeneralizationResolver> logger, IFilterManager filterManager, IProcessedObservationCoreRepository processedObservationRepository)
         {
             _logger = logger;

@@ -47,6 +47,11 @@ namespace SOS.Lib.Cache
             }
         }
 
+        public ClassCache()
+        {
+
+        }
+
         /// <summary>
         /// Constructor
         /// </summary>
