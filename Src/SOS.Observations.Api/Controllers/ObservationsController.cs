@@ -1839,7 +1839,11 @@ namespace SOS.Observations.Api.Controllers
 
                 if (taxonFound.Equals(SignalSerachResult.NoPermissions))
                 {
-                    throw new AuthenticationRequiredException("User don't have the SightingIndication permission in provided areas");
+                    _logger.LogInformation("User don't have the SightingIndication permission in provided areas");
+                    _logger.LogInformation($"Unauthorized. X-Authorization-Application-Identifier={authorizationApplicationIdentifier ?? "[null]"}");
+                    _logger.LogInformation($"Unauthorized. X-Authorization-Role-Id={roleId?.ToString() ?? "[null]"}");
+                    LogUserInformation();
+                    return new StatusCodeResult((int)HttpStatusCode.Forbidden);
                 }
 
                 return new OkObjectResult(taxonFound.Equals(SignalSerachResult.Yes));

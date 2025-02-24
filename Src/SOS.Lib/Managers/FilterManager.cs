@@ -31,7 +31,7 @@ namespace SOS.Lib.Managers
         }
 
         /// <summary>
-        ///  Add extended authorization if any
+        /// Add extended authorization if any
         /// </summary>
         /// <param name="userId"></param>
         /// <param name="roleId"></param>
@@ -40,8 +40,9 @@ namespace SOS.Lib.Managers
         /// <param name="areaBuffer"></param>
         /// <param name="usePointAccuracy"></param>
         /// <param name="useDisturbanceRadius"></param>
+        /// <param name="addAreaGeometries"></param>
         /// <returns></returns>
-        private async Task<List<ExtendedAuthorizationAreaFilter>> GetExtendedAuthorizationAreas(int userId, int roleId, string authorizationApplicationIdentifier, string authorityIdentity, int areaBuffer, bool usePointAccuracy, bool useDisturbanceRadius)
+        private async Task<List<ExtendedAuthorizationAreaFilter>> GetExtendedAuthorizationAreas(int userId, int roleId, string authorizationApplicationIdentifier, string authorityIdentity, int areaBuffer, bool usePointAccuracy, bool useDisturbanceRadius, bool addAreaGeometries)
         {
             if (userId == 0)
             {
@@ -97,7 +98,7 @@ namespace SOS.Lib.Managers
 
                         areaFilters.Add(new AreaFilter { AreaType = (AreaType)area.AreaTypeId, FeatureId = area.FeatureId });
                     }
-                    extendedAuthorizationAreaFilter.GeographicAreas = await PopulateGeographicalFilterAsync(areaFilters, areaBuffer, usePointAccuracy, useDisturbanceRadius);
+                    extendedAuthorizationAreaFilter.GeographicAreas = await PopulateGeographicalFilterAsync(areaFilters, areaBuffer, usePointAccuracy, useDisturbanceRadius, addAreaGeometries);
                 }
 
                 extendedAuthorizationAreaFilter.TaxonIds = (await GetTaxonIdsAsync(authority.TaxonIds, true, null))?.ToList();
@@ -307,8 +308,9 @@ namespace SOS.Lib.Managers
         /// <param name="areaBuffer"></param>
         /// <param name="usePointAccuracy"></param>
         /// <param name="useDisturbanceRadius"></param>
+        /// <param name="addAreaGeometries"></param>
         /// <returns></returns>
-        private async Task<GeographicAreasFilter> PopulateGeographicalFilterAsync(IEnumerable<AreaFilter> areas, int areaBuffer, bool usePointAccuracy, bool useDisturbanceRadius)
+        private async Task<GeographicAreasFilter> PopulateGeographicalFilterAsync(IEnumerable<AreaFilter> areas, int areaBuffer, bool usePointAccuracy, bool useDisturbanceRadius, bool addAreaGeometries = false)
         {
             if (!areas?.Any() ?? true)
             {
@@ -319,10 +321,13 @@ namespace SOS.Lib.Managers
 
             foreach (var areaFilter in areas)
             {
-                if (areaBuffer != 0 || usePointAccuracy || useDisturbanceRadius)
+                if (addAreaGeometries || areaBuffer != 0 || usePointAccuracy || useDisturbanceRadius)
                 {
                     await AddGeometryAsync(geographicFilter, areaFilter.AreaType, areaFilter.FeatureId, areaBuffer, usePointAccuracy, useDisturbanceRadius);
-                    continue;
+                    if (!addAreaGeometries) // addAreaGeometries is used by signal serach to validate bounding boxes and geometries
+                    {
+                        continue;
+                    }
                 }
 
                 switch (areaFilter.AreaType)
@@ -406,7 +411,15 @@ namespace SOS.Lib.Managers
         }
 
         /// <inheritdoc />
-        public async Task PrepareFilterAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilterBase filter, string authorityIdentity, int? areaBuffer, bool? authorizationUsePointAccuracy, bool? authorizationUseDisturbanceRadius, bool? setDefaultProviders)
+        public async Task PrepareFilterAsync(int? roleId, 
+            string authorizationApplicationIdentifier, 
+            SearchFilterBase filter, 
+            string authorityIdentity, 
+            int? areaBuffer, 
+            bool? authorizationUsePointAccuracy, 
+            bool? authorizationUseDisturbanceRadius, 
+            bool? setDefaultProviders,
+            bool? addAreaGeometries)
         {
             filter.RoleId = roleId;
             filter.AuthorizationApplicationIdentifier = authorizationApplicationIdentifier;
@@ -422,7 +435,7 @@ namespace SOS.Lib.Managers
 
             if (!filter.ExtendedAuthorization.ProtectionFilter.Equals(ProtectionFilter.Public))
             {
-                filter.ExtendedAuthorization.ExtendedAreas = await GetExtendedAuthorizationAreas(filter.ExtendedAuthorization.UserId, roleId ?? 0, authorizationApplicationIdentifier, authorityIdentity, areaBuffer ?? 0, authorizationUsePointAccuracy ?? false, authorizationUseDisturbanceRadius ?? false);
+                filter.ExtendedAuthorization.ExtendedAreas = await GetExtendedAuthorizationAreas(filter.ExtendedAuthorization.UserId, roleId ?? 0, authorizationApplicationIdentifier, authorityIdentity, areaBuffer ?? 0, authorizationUsePointAccuracy ?? false, authorizationUseDisturbanceRadius ?? false, addAreaGeometries ?? false);
 
                 // If it's a request for protected observations, make sure occurrence.occurrenceId will be returned for log purpose
                 if (filter is SearchFilter searchFilter)

@@ -575,63 +575,84 @@ namespace SOS.Observations.Api.Managers
         {
             try
             {
-                await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter, "SightingIndication", areaBuffer, filter?.Location?.Geometries?.UsePointAccuracy, filter?.Location?.Geometries?.UseDisturbanceRadius);
+                await _filterManager.PrepareFilterAsync(roleId, 
+                    authorizationApplicationIdentifier, 
+                    filter, 
+                    "SightingIndication", 
+                    areaBuffer, 
+                    filter?.Location?.Geometries?.UsePointAccuracy, 
+                    filter?.Location?.Geometries?.UseDisturbanceRadius, 
+                    addAreaGeometries: filter?.Location?.Geometries.BoundingBox != null || (filter?.Location?.Geometries?.Geometries?.Count ?? 0) != 0);
 
                 if (!filter.ExtendedAuthorization?.ExtendedAreas?.Any() ?? true)
                 {
                     throw new AuthenticationRequiredException("User don't have the SightingIndication permission that is required");
                 }
-                if (validateGeographic && filter.Location?.AreaGeographic != null)
-                {
-                    var areaGeographic = filter.Location?.AreaGeographic;
-                    var hasAccess = true;
-                    if ((areaGeographic.CountryRegionIds?.Count() ?? 0) != 0)
+                if (validateGeographic && filter.Location != null) { 
+                    if (filter.Location.AreaGeographic != null)
                     {
-                        hasAccess = hasAccess && filter.ExtendedAuthorization.ExtendedAreas.Exists(ea => (ea.GeographicAreas?.CountryRegionIds?.Intersect(areaGeographic.CountryRegionIds)?.Count() ?? 0) > 0);
-                    }
-                    if ((areaGeographic.CountyIds?.Count() ?? 0) != 0)
-                    {
-                        hasAccess = hasAccess && filter.ExtendedAuthorization.ExtendedAreas.Exists(ea => (ea.GeographicAreas?.CountyIds?.Intersect(areaGeographic.CountyIds)?.Count() ?? 0) > 0);
-                    }
-                    if ((areaGeographic.MunicipalityIds?.Count() ?? 0) != 0)
-                    {
-                        hasAccess = hasAccess && filter.ExtendedAuthorization.ExtendedAreas.Exists(ea => (ea.GeographicAreas?.MunicipalityIds?.Intersect(areaGeographic.MunicipalityIds)?.Count() ?? 0) > 0);
-                    }
-                    if ((areaGeographic.ParishIds?.Count() ?? 0) != 0)
-                    {
-                        hasAccess = hasAccess && filter.ExtendedAuthorization.ExtendedAreas.Exists(ea => (ea.GeographicAreas?.ParishIds?.Intersect(areaGeographic.ParishIds)?.Count() ?? 0) > 0);
-                    }
-                    if ((areaGeographic.ProvinceIds?.Count() ?? 0) != 0)
-                    {
-                        hasAccess = hasAccess && filter.ExtendedAuthorization.ExtendedAreas.Exists(ea => (ea.GeographicAreas?.ProvinceIds?.Intersect(areaGeographic.ProvinceIds)?.Count() ?? 0) > 0);
-                    }
-                    if (!hasAccess)
-                    {
-                        return SignalSerachResult.NoPermissions;
-                    }
+                        var areaGeographic = filter.Location.AreaGeographic;
+                        var hasAccess = true;
+                        if ((areaGeographic.CountryRegionIds?.Count() ?? 0) != 0)
+                        {
+                            hasAccess = hasAccess && filter.ExtendedAuthorization.ExtendedAreas.Exists(ea => (ea.GeographicAreas?.CountryRegionIds?.Intersect(areaGeographic.CountryRegionIds)?.Count() ?? 0) > 0);
+                        }
+                        if ((areaGeographic.CountyIds?.Count() ?? 0) != 0)
+                        {
+                            hasAccess = hasAccess && filter.ExtendedAuthorization.ExtendedAreas.Exists(ea => (ea.GeographicAreas?.CountyIds?.Intersect(areaGeographic.CountyIds)?.Count() ?? 0) > 0);
+                        }
+                        if ((areaGeographic.MunicipalityIds?.Count() ?? 0) != 0)
+                        {
+                            hasAccess = hasAccess && filter.ExtendedAuthorization.ExtendedAreas.Exists(ea => (ea.GeographicAreas?.MunicipalityIds?.Intersect(areaGeographic.MunicipalityIds)?.Count() ?? 0) > 0);
+                        }
+                        if ((areaGeographic.ParishIds?.Count() ?? 0) != 0)
+                        {
+                            hasAccess = hasAccess && filter.ExtendedAuthorization.ExtendedAreas.Exists(ea => (ea.GeographicAreas?.ParishIds?.Intersect(areaGeographic.ParishIds)?.Count() ?? 0) > 0);
+                        }
+                        if ((areaGeographic.ProvinceIds?.Count() ?? 0) != 0)
+                        {
+                            hasAccess = hasAccess && filter.ExtendedAuthorization.ExtendedAreas.Exists(ea => (ea.GeographicAreas?.ProvinceIds?.Intersect(areaGeographic.ProvinceIds)?.Count() ?? 0) > 0);
+                        }
+                        if (!hasAccess)
+                        {
+                            return SignalSerachResult.NoPermissions;
+                        }
 
-                    if (areaGeographic.GeometryFilter?.Geometries?.Any() ?? false)
+                        if (areaGeographic.GeometryFilter?.Geometries?.Any() ?? false)
+                        {
+                            // Check if user has access to provided geometries
+                            foreach (var geoShape in areaGeographic.GeometryFilter.Geometries)
+                            {
+                                var geometry = geoShape.ToGeometry();
+                                if (!filter.ExtendedAuthorization.ExtendedAreas.Exists(ea => ea.GeographicAreas?.GeometryFilter?.Geometries?.Exists(g => g.ToGeometry().Intersects(geometry)) ?? false))
+                                {
+                                    return SignalSerachResult.NoPermissions;
+                                }
+                            }
+                        }
+                    }
+                    if ((filter.Location.Geometries?.Geometries?.Count() ?? 0) != 0)
                     {
                         // Check if user has access to provided geometries
-                        foreach (var geoShape in areaGeographic.GeometryFilter.Geometries)
+                        foreach (var geoShape in filter.Location.Geometries.Geometries)
                         {
                             var geometry = geoShape.ToGeometry();
-                            if (!filter.ExtendedAuthorization.ExtendedAreas.Exists(ea => ea.GeographicAreas?.GeometryFilter?.Geometries?.Exists(g => g.ToGeometry().Contains(geometry)) ?? false))
+                            if (!filter.ExtendedAuthorization.ExtendedAreas.Exists(ea => ea.GeographicAreas?.GeometryFilter?.Geometries?.Exists(g => g.ToGeometry().Intersects(geometry)) ?? false))
                             {
                                 return SignalSerachResult.NoPermissions;
                             }
                         }
                     }
-                    if (filter.Location.Geometries.BoundingBox != null)
+                    if (filter.Location.Geometries?.BoundingBox != null)
                     {
                         var bbGeometry = filter.Location.Geometries.BoundingBox.ToGeoemtry();
-                        if (!filter.ExtendedAuthorization.ExtendedAreas.Exists(ea => ea.GeographicAreas?.GeometryFilter?.Geometries?.Exists(g => g.ToGeometry().Contains(bbGeometry)) ?? false))
+                        if (!filter.ExtendedAuthorization.ExtendedAreas.Exists(ea => ea.GeographicAreas?.GeometryFilter?.Geometries?.Exists(g => g.ToGeometry().Intersects(bbGeometry)) ?? false))
                         {
                             return SignalSerachResult.NoPermissions;
                         }
                     }
                 }
-              
+
                 var result = await _processedObservationRepository.SignalSearchInternalAsync(filter, onlyAboveMyClearance);
                 return result ? SignalSerachResult.Yes : SignalSerachResult.No;
             }

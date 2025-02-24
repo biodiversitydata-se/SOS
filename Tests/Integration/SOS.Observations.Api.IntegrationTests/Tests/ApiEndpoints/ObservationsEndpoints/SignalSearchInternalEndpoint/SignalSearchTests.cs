@@ -44,6 +44,7 @@ public class SignalSearchTests : TestBase
             StartDate = new DateTime(1999, 12, 1),
             Geographics = new GeographicsFilterDto
             {
+
                 BoundingBox = new LatLonBoundingBoxDto
                 {
                     BottomRight = new LatLonCoordinateDto { Latitude = 50, Longitude = 25 },
