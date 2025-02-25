@@ -308,7 +308,7 @@ namespace SOS.Lib.Managers
         /// <param name="areaBuffer"></param>
         /// <param name="usePointAccuracy"></param>
         /// <param name="useDisturbanceRadius"></param>
-        /// <param name="addAreaGeometries"></param>
+        /// <param name="addAreaGeometries">Used by signal serach to validate bounding boxes and geometries</param>
         /// <returns></returns>
         private async Task<GeographicAreasFilter> PopulateGeographicalFilterAsync(IEnumerable<AreaFilter> areas, int areaBuffer, bool usePointAccuracy, bool useDisturbanceRadius, bool addAreaGeometries = false)
         {
@@ -324,10 +324,7 @@ namespace SOS.Lib.Managers
                 if (addAreaGeometries || areaBuffer != 0 || usePointAccuracy || useDisturbanceRadius)
                 {
                     await AddGeometryAsync(geographicFilter, areaFilter.AreaType, areaFilter.FeatureId, areaBuffer, usePointAccuracy, useDisturbanceRadius);
-                    if (!addAreaGeometries) // addAreaGeometries is used by signal serach to validate bounding boxes and geometries
-                    {
-                        continue;
-                    }
+                    continue;
                 }
 
                 switch (areaFilter.AreaType)
