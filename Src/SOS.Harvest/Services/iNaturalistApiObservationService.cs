@@ -13,6 +13,17 @@ namespace SOS.Harvest.Services
         private const int PageSize = 100;
         private const int NumberOfRetries = 5;
         private const int MaxPage = 100;
+        private static JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions()
+        {
+            DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull,
+            PropertyNamingPolicy = null,
+            WriteIndented = true,
+            PropertyNameCaseInsensitive = true,
+            Converters =
+            {
+                new StringConverter()
+            }
+        };
 
         /// <summary>
         /// Constructor
@@ -65,17 +76,9 @@ namespace SOS.Harvest.Services
                             new KeyValuePair<string, string>("Accept", "application/json"),
                         ])
                     );
-                var serializerOptions = new JsonSerializerOptions()
-                {
-                    DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull,
-                    PropertyNamingPolicy = null,
-                    WriteIndented = true,
-                    PropertyNameCaseInsensitive = true
-                };
-                serializerOptions.Converters.Add(new StringConverter());
-                var s = new StreamReader(observationsResult);
-                var json = await s.ReadToEndAsync();
-                var result = JsonSerializer.Deserialize<SOS.Lib.Models.Verbatim.INaturalist.Service.ObservationsResponse>(json, serializerOptions);
+
+                var result = await JsonSerializer.DeserializeAsync<SOS.Lib.Models.Verbatim.INaturalist.Service.ObservationsResponse>(
+                    observationsResult, _jsonSerializerOptions);
                 return result;
             }
             catch (Exception e)
