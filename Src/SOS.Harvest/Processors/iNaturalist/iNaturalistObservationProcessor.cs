@@ -31,8 +31,8 @@ namespace SOS.Harvest.Processors.iNaturalist
             IDictionary<VocabularyId, IDictionary<object, int>> dwcaVocabularyById,
             JobRunModes mode,
             IJobCancellationToken cancellationToken)
-        {
-            var observationFactory = new iNaturalistObservationFactory(dataProvider, taxa, dwcaVocabularyById, _areaHelper, TimeManager, ProcessConfiguration);
+        {            
+            var observationFactory = new iNaturalistObservationFactory(dataProvider, taxa, dwcaVocabularyById, _areaHelper, TimeManager, ProcessConfiguration, Logger);
             await observationFactory.InitializeAsync();
 
             return await base.ProcessObservationsAsync(

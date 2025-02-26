@@ -1,4 +1,5 @@
-﻿using SOS.Harvest.Managers.Interfaces;
+﻿using Microsoft.Extensions.Logging;
+using SOS.Harvest.Managers.Interfaces;
 using SOS.Harvest.Processors.Interfaces;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
@@ -24,6 +25,7 @@ namespace SOS.Harvest.Processors.iNaturalist
         private string _englishOrganizationName;
         private string _englishOrganizationNameLowerCase;
         private VocabularyValue? _institutionCodeVocabularyValue;
+        private ILogger _logger;
 
         /// <summary>
         /// Constructor
@@ -39,8 +41,10 @@ namespace SOS.Harvest.Processors.iNaturalist
             IDictionary<VocabularyId, IDictionary<object, int>> dwcaVocabularyById,
             IAreaHelper areaHelper,
             IProcessTimeManager processTimeManager,
-            ProcessConfiguration processConfiguration) : base(dataProvider, taxa, dwcaVocabularyById, processTimeManager, processConfiguration)
+            ProcessConfiguration processConfiguration,
+            ILogger logger) : base(dataProvider, taxa, dwcaVocabularyById, processTimeManager, processConfiguration)
         {
+            _logger = logger;
             _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
             _englishOrganizationName = dataProvider?.Organizations?.Translate("en-GB")!;
             _englishOrganizationNameLowerCase = _englishOrganizationName?.ToLower()!;
@@ -55,7 +59,7 @@ namespace SOS.Harvest.Processors.iNaturalist
             if (dataProvider != null && dataProvider.CoordinateUncertaintyInMeters > 0)
             {
                 DefaultCoordinateUncertaintyInMeters = dataProvider.CoordinateUncertaintyInMeters;
-            }
+            }            
         }
 
         public async Task InitializeAsync()
@@ -88,7 +92,15 @@ namespace SOS.Harvest.Processors.iNaturalist
             obs.License = verbatim.License_code;
             obs.BasisOfRecord = new VocabularyValue { Id = (int)BasisOfRecordId.HumanObservation };
             obs.DatasetName = "iNaturalist";
-            obs.Modified = verbatim.Updated_at!.Value.DateTime.ToUniversalTime();
+            if (verbatim.Updated_at == null)
+            {
+                _logger.LogWarning("Updated_at is null for observation with id {0}", verbatim.Id);
+                obs.Modified = verbatim.Created_at!.Value.DateTime.ToUniversalTime();
+            }
+            else
+            { 
+                obs.Modified = verbatim.Updated_at!.Value.DateTime.ToUniversalTime();
+            }
             obs.InstitutionCode = _institutionCodeVocabularyValue;
             obs.OwnerInstitutionCode = "iNaturalist";            
             //obs.RightsHolder = verbatim.RightsHolder?.Clean();            
