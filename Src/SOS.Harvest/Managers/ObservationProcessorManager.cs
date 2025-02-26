@@ -3,6 +3,7 @@ using SOS.Harvest.Processors.Artportalen.Interfaces;
 using SOS.Harvest.Processors.DarwinCoreArchive.Interfaces;
 using SOS.Harvest.Processors.FishData.Interfaces;
 using SOS.Harvest.Processors.iNaturalist;
+using SOS.Harvest.Processors.iNaturalist.Interfaces;
 using SOS.Harvest.Processors.Interfaces;
 using SOS.Harvest.Processors.Kul.Interfaces;
 using SOS.Harvest.Processors.Mvm.Interfaces;
@@ -31,7 +32,7 @@ namespace SOS.Harvest.Managers
             ISersObservationProcessor sersObservationProcessor,
             ISharkObservationProcessor sharkObservationProcessor,
             IVirtualHerbariumObservationProcessor virtualHerbariumObservationProcessor,
-            iNaturalistObservationProcessor iNaturalistObservationProcessor
+            IiNaturalistObservationProcessor iNaturalistObservationProcessor
             )
         {
             if (artportalenObservationProcessor == null) throw new ArgumentNullException(nameof(artportalenObservationProcessor));
