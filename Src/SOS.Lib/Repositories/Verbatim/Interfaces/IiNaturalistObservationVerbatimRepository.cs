@@ -5,7 +5,7 @@ namespace SOS.Lib.Repositories.Verbatim.Interfaces
     /// <summary>
     /// 
     /// </summary>
-    public interface IiNaturalistCompleteObservationVerbatimRepository : IVerbatimRepositoryBase<iNaturalistVerbatimObservation,int>
+    public interface IiNaturalistObservationVerbatimRepository : IVerbatimRepositoryBase<iNaturalistVerbatimObservation,int>
     {
     }
 }

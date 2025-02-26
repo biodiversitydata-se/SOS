@@ -24,7 +24,7 @@ namespace SOS.Harvest.Harvesters.iNaturalist
         private readonly IiNaturalistObservationService _iNaturalistObservationService;
         private readonly iNaturalistServiceConfiguration _iNaturalistServiceConfiguration;
         private readonly iNaturalistApiObservationService _iNaturalistApiObservationService;
-        private readonly IiNaturalistCompleteObservationVerbatimRepository _iNaturalistCompleteRepository;
+        private readonly IiNaturalistObservationVerbatimRepository _iNaturalistVerbatimRepository;
         private readonly ILogger<iNaturalistObservationHarvester> _logger;
         private const string IncrementalCollectionName = "iNaturalistObservations";
         private const string IncrementalTempCollectionName = "iNaturalistObservations_temp";
@@ -44,7 +44,7 @@ namespace SOS.Harvest.Harvesters.iNaturalist
             IiNaturalistObservationService iNaturalistObservationService,
             iNaturalistApiObservationService iNaturalistApiObservationService,
             iNaturalistServiceConfiguration iNaturalistServiceConfiguration,
-            IiNaturalistCompleteObservationVerbatimRepository iNaturalistCompleteRepository,
+            IiNaturalistObservationVerbatimRepository iNaturalistCompleteRepository,
             ILogger<iNaturalistObservationHarvester> logger)
         {
             _verbatimClient = verbatimClient ?? throw new ArgumentNullException(nameof(verbatimClient));
@@ -54,7 +54,7 @@ namespace SOS.Harvest.Harvesters.iNaturalist
                 iNaturalistApiObservationService ?? throw new ArgumentNullException(nameof(iNaturalistApiObservationService));
             _iNaturalistServiceConfiguration = iNaturalistServiceConfiguration ??
                                                throw new ArgumentNullException(nameof(iNaturalistServiceConfiguration));
-            _iNaturalistCompleteRepository = iNaturalistCompleteRepository ??
+            _iNaturalistVerbatimRepository = iNaturalistCompleteRepository ??
                                                throw new ArgumentNullException(nameof(iNaturalistCompleteRepository));            
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
@@ -178,8 +178,8 @@ namespace SOS.Harvest.Harvesters.iNaturalist
             {
                 // If iNaturalist_full exists, rename it to iNaturalist_incremental_temp
                 // Otherwise, create a copy of iNaturalist_incremental with the name iNaturalist_incremental_temp
-                bool fullCollectionExists = await _iNaturalistCompleteRepository.CheckIfCollectionExistsAsync(FullCollectionName);
-                bool incrementalCollectionExists = await _iNaturalistCompleteRepository.CheckIfCollectionExistsAsync(IncrementalCollectionName);
+                bool fullCollectionExists = await _iNaturalistVerbatimRepository.CheckIfCollectionExistsAsync(FullCollectionName);
+                bool incrementalCollectionExists = await _iNaturalistVerbatimRepository.CheckIfCollectionExistsAsync(IncrementalCollectionName);
                 if (!fullCollectionExists && !incrementalCollectionExists)
                 {
                     _logger.LogError("{@dataProvider}: No full or incremental collection exists. Cannot harvest.", "iNaturalist");
@@ -188,16 +188,16 @@ namespace SOS.Harvest.Harvesters.iNaturalist
                 }
                 if (fullCollectionExists)
                 {
-                    await _iNaturalistCompleteRepository.RenameCollectionAsync(FullCollectionName, IncrementalTempCollectionName);
+                    await _iNaturalistVerbatimRepository.RenameCollectionAsync(FullCollectionName, IncrementalTempCollectionName);
                 }
                 else
                 {
-                    await _iNaturalistCompleteRepository.CopyCollectionAsync(IncrementalCollectionName, IncrementalTempCollectionName);
+                    await _iNaturalistVerbatimRepository.CopyCollectionAsync(IncrementalCollectionName, IncrementalTempCollectionName);
                 }
 
                 // Harvest latest day(s) observations
-                var incrementalMongoCollection = _iNaturalistCompleteRepository.GetMongoCollection(IncrementalCollectionName);
-                var incrementalTempMongoCollection = _iNaturalistCompleteRepository.GetMongoCollection(IncrementalTempCollectionName);
+                var incrementalMongoCollection = _iNaturalistVerbatimRepository.GetMongoCollection(IncrementalCollectionName);
+                var incrementalTempMongoCollection = _iNaturalistVerbatimRepository.GetMongoCollection(IncrementalTempCollectionName);
                 _logger.LogInformation("Start harvesting incremental {@dataProvider} observations", "iNaturalist");
                 _logger.LogInformation(GetINatHarvestSettingsInfoString());
                 var nrSightingsHarvested = 0;
@@ -211,7 +211,7 @@ namespace SOS.Harvest.Harvesters.iNaturalist
                         break;
                     }
                     
-                    await _iNaturalistCompleteRepository.UpsertManyAsync(pageResult.Observations, incrementalTempMongoCollection);
+                    await _iNaturalistVerbatimRepository.UpsertManyAsync(pageResult.Observations, incrementalTempMongoCollection);
                     nrSightingsHarvested += pageResult.Observations.Count();
 
                     if (nrSightingsHarvested % 10000 == 0)
@@ -226,14 +226,14 @@ namespace SOS.Harvest.Harvesters.iNaturalist
 
                 // Update harvest info
                 harvestInfo.End = DateTime.Now;
-                var tempDocCount = await _iNaturalistCompleteRepository.CountAllDocumentsAsync(incrementalTempMongoCollection);
-                var currentDocCount = await _iNaturalistCompleteRepository.CountAllDocumentsAsync(incrementalMongoCollection);
+                var tempDocCount = await _iNaturalistVerbatimRepository.CountAllDocumentsAsync(incrementalTempMongoCollection);
+                var currentDocCount = await _iNaturalistVerbatimRepository.CountAllDocumentsAsync(incrementalMongoCollection);
                 harvestInfo.Count = (int)tempDocCount;
                 if (tempDocCount >= currentDocCount * 0.8)
                 {
                     harvestInfo.Status = RunStatus.Success;
                     _logger.LogInformation("Start permanentize temp collection for incremental {@dataProvider} verbatim. Temp name={incrementalTempCollectionName}, New name={incrementalCollectionName}", "iNaturalist", IncrementalTempCollectionName, IncrementalCollectionName);
-                    await _iNaturalistCompleteRepository.PermanentizeCollectionAsync(IncrementalTempCollectionName, IncrementalCollectionName);
+                    await _iNaturalistVerbatimRepository.PermanentizeCollectionAsync(IncrementalTempCollectionName, IncrementalCollectionName);
                     _logger.LogInformation("Finish permanentize temp collection for incremental {@dataProvider} verbatim", "iNaturalist");
                 }
                 else
@@ -264,11 +264,11 @@ namespace SOS.Harvest.Harvesters.iNaturalist
 
             try
             {
-                var completeMongoCollection = _iNaturalistCompleteRepository.GetMongoCollection(FullCollectionName);
-                var completeTempMongoCollection = _iNaturalistCompleteRepository.GetMongoCollection(FullTempCollectionName);
+                var completeMongoCollection = _iNaturalistVerbatimRepository.GetMongoCollection(FullCollectionName);
+                var completeTempMongoCollection = _iNaturalistVerbatimRepository.GetMongoCollection(FullTempCollectionName);
                 int idAbove = _iNaturalistServiceConfiguration.HarvestCompleteStartId;                
-                var currentDocCount = await _iNaturalistCompleteRepository.CountAllDocumentsAsync(completeMongoCollection);                
-                (bool tempExists, int? latestId) = await CheckCompleteHarvestTempModeAsync(_iNaturalistCompleteRepository, completeTempMongoCollection);
+                var currentDocCount = await _iNaturalistVerbatimRepository.CountAllDocumentsAsync(completeMongoCollection);                
+                (bool tempExists, int? latestId) = await CheckCompleteHarvestTempModeAsync(_iNaturalistVerbatimRepository, completeTempMongoCollection);
                 if (tempExists)
                 {
                     // Continue harvest from last id
@@ -276,7 +276,7 @@ namespace SOS.Harvest.Harvesters.iNaturalist
                 }
                 else
                 {                    
-                    await _iNaturalistCompleteRepository.AddCollectionAsync(completeTempMongoCollection);
+                    await _iNaturalistVerbatimRepository.AddCollectionAsync(completeTempMongoCollection);
                 }
 
                 _logger.LogInformation("Start harvesting complete {@dataProvider} observations", "iNaturalist");
@@ -284,7 +284,7 @@ namespace SOS.Harvest.Harvesters.iNaturalist
                 var nrSightingsHarvested = 0;                
                 await foreach (var pageResult in _iNaturalistApiObservationService.GetByIterationAsync(idAbove, _iNaturalistServiceConfiguration.HarvestCompleBatchDelayInSeconds))
                 {                    
-                    await _iNaturalistCompleteRepository.AddManyAsync(pageResult.Observations, completeTempMongoCollection);
+                    await _iNaturalistVerbatimRepository.AddManyAsync(pageResult.Observations, completeTempMongoCollection);
                     nrSightingsHarvested += pageResult.Observations.Count();
 
                     if (nrSightingsHarvested % 10000 == 0)
@@ -299,13 +299,13 @@ namespace SOS.Harvest.Harvesters.iNaturalist
 
                 // Update harvest info
                 harvestInfo.End = DateTime.Now;                
-                var tempDocCount = await _iNaturalistCompleteRepository.CountAllDocumentsAsync(completeTempMongoCollection);
+                var tempDocCount = await _iNaturalistVerbatimRepository.CountAllDocumentsAsync(completeTempMongoCollection);
                 harvestInfo.Count = (int)tempDocCount;                
                 if (tempDocCount >= currentDocCount * 0.8)
                 {
                     harvestInfo.Status = RunStatus.Success;                    
                     _logger.LogInformation("Start permanentize temp collection for complete {@dataProvider} verbatim. Temp name={incrementalTempCollectionName}, New name={incrementalCollectionName}", "iNaturalist", completeTempMongoCollection, completeMongoCollection);
-                    await _iNaturalistCompleteRepository.PermanentizeCollectionAsync(completeTempMongoCollection, completeMongoCollection);
+                    await _iNaturalistVerbatimRepository.PermanentizeCollectionAsync(completeTempMongoCollection, completeMongoCollection);
                     _logger.LogInformation("Finish permanentize temp collection for complete {@dataProvider} verbatim", "iNaturalist");
                 }
                 else
@@ -369,7 +369,7 @@ namespace SOS.Harvest.Harvesters.iNaturalist
         }        
 
         private async Task<(bool tempExists, int? latestId)> CheckCompleteHarvestTempModeAsync(
-            IiNaturalistCompleteObservationVerbatimRepository repository,
+            IiNaturalistObservationVerbatimRepository repository,
             MongoDB.Driver.IMongoCollection<iNaturalistVerbatimObservation> tempMongoCollection)
         {            
             bool collectionExists = await repository.CheckIfCollectionExistsAsync(tempMongoCollection.CollectionNamespace.CollectionName);

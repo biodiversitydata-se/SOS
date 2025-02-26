@@ -533,6 +533,12 @@ namespace SOS.Lib.Models.Verbatim.INaturalist.Service
         [System.Text.Json.Serialization.JsonPropertyName("id")]
         public int Id { get; set; }
 
+        [System.Text.Json.Serialization.JsonPropertyName("positional_accuracy")]
+        public int? PositionalAccuracy { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("public_positional_accuracy")]
+        public int? PublicPositionalAccuracy { get; set; }        
+         
         [System.Text.Json.Serialization.JsonPropertyName("cached_votes_total")]
         public int? Cached_votes_total { get; set; }
 

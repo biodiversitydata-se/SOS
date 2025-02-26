@@ -2,6 +2,7 @@
 using SOS.Harvest.Processors.Artportalen.Interfaces;
 using SOS.Harvest.Processors.DarwinCoreArchive.Interfaces;
 using SOS.Harvest.Processors.FishData.Interfaces;
+using SOS.Harvest.Processors.iNaturalist;
 using SOS.Harvest.Processors.Interfaces;
 using SOS.Harvest.Processors.Kul.Interfaces;
 using SOS.Harvest.Processors.Mvm.Interfaces;
@@ -29,7 +30,8 @@ namespace SOS.Harvest.Managers
             IObservationDatabaseProcessor observationDatabaseProcessor,
             ISersObservationProcessor sersObservationProcessor,
             ISharkObservationProcessor sharkObservationProcessor,
-            IVirtualHerbariumObservationProcessor virtualHerbariumObservationProcessor
+            IVirtualHerbariumObservationProcessor virtualHerbariumObservationProcessor,
+            iNaturalistObservationProcessor iNaturalistObservationProcessor
             )
         {
             if (artportalenObservationProcessor == null) throw new ArgumentNullException(nameof(artportalenObservationProcessor));
@@ -41,6 +43,7 @@ namespace SOS.Harvest.Managers
             if (sersObservationProcessor == null) throw new ArgumentNullException(nameof(sersObservationProcessor));
             if (sharkObservationProcessor == null) throw new ArgumentNullException(nameof(sharkObservationProcessor));
             if (virtualHerbariumObservationProcessor == null) throw new ArgumentNullException(nameof(virtualHerbariumObservationProcessor));
+            if (iNaturalistObservationProcessor == null) throw new ArgumentNullException(nameof(iNaturalistObservationProcessor));
 
             _processorByType = new Dictionary<DataProviderType, IObservationProcessor>
             {
@@ -55,7 +58,7 @@ namespace SOS.Harvest.Managers
                 {DataProviderType.SersObservations, sersObservationProcessor},
                 {DataProviderType.SharkObservations, sharkObservationProcessor},
                 {DataProviderType.VirtualHerbariumObservations, virtualHerbariumObservationProcessor},
-                {DataProviderType.iNaturalistObservations, dwcaObservationProcessor}
+                {DataProviderType.iNaturalistObservations, iNaturalistObservationProcessor}
             };
         }
 
