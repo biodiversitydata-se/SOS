@@ -75,10 +75,12 @@ namespace SOS.Harvest.Processors.iNaturalist
         /// <returns></returns>
         public Observation CreateProcessedObservation(iNaturalistVerbatimObservation verbatim, bool diffuseIfSupported)
         {
+            _logger.LogInformation("Start processing iNaturalist observation");
             if (verbatim == null)
             {
                 return null;
             }
+            _logger.LogInformation("Processing observation with Id={id}, ObservationId={observationId}", verbatim.Id, verbatim.ObservationId);
 
             var accessRights = GetSosId(AccessRightsId.FreeUsage.ToString(), VocabularyById[VocabularyId.AccessRights]);
             var obs = new Observation
@@ -86,12 +88,14 @@ namespace SOS.Harvest.Processors.iNaturalist
                 AccessRights = accessRights,
                 DataProviderId = DataProvider.Id,
                 DiffusionStatus = DiffusionStatus.NotDiffused,
-            };            
+            };
+            _logger.LogInformation("iNaturalist - step 1. created obs");
 
             // Record level
             obs.License = verbatim.License_code;
             obs.BasisOfRecord = new VocabularyValue { Id = (int)BasisOfRecordId.HumanObservation };
             obs.DatasetName = "iNaturalist";
+            _logger.LogInformation("iNaturalist - step 2.");
             if (verbatim.Updated_at == null)
             {
                 _logger.LogWarning("Updated_at is null for observation with Id={id}, ObservationId={observationId}", verbatim.Id, verbatim.ObservationId);
@@ -102,17 +106,21 @@ namespace SOS.Harvest.Processors.iNaturalist
                 obs.Modified = verbatim.Updated_at!.Value.DateTime.ToUniversalTime();
             }
             obs.InstitutionCode = _institutionCodeVocabularyValue;
-            obs.OwnerInstitutionCode = "iNaturalist";            
+            obs.OwnerInstitutionCode = "iNaturalist";
+            _logger.LogInformation("iNaturalist - step 3.");
             //obs.RightsHolder = verbatim.RightsHolder?.Clean();            
 
             // Event
             obs.Event = CreateProcessedEvent(verbatim);
+            _logger.LogInformation("iNaturalist - step 4. event created");
 
             // Identification
             obs.Identification = CreateProcessedIdentification(verbatim);
+            _logger.LogInformation("iNaturalist - step 5. identification created");
 
             // Taxon
             obs.Taxon = CreateProcessedTaxon(verbatim);
+            _logger.LogInformation("iNaturalist - step 6. taxon created");
 
             // Location
             obs.Location = CreateProcessedLocation(verbatim);
@@ -128,10 +136,12 @@ namespace SOS.Harvest.Processors.iNaturalist
                 coordinateUncertaintyInMeters,
                 obs.Taxon?.Attributes?.DisturbanceRadius);
             _areaHelper.AddAreaDataToProcessedLocation(obs.Location);
+            _logger.LogInformation("iNaturalist - step 7. location created");
 
             // Occurrence
             obs.Occurrence = CreateProcessedOccurrence(verbatim, obs.Taxon, obs.AccessRights != null ? (AccessRightsId)obs.AccessRights.Id : null);
-            
+            _logger.LogInformation("iNaturalist - step 8. occurrence created");
+
             if (obs.ShallBeProtected())
             {
                 obs.Sensitive = true;
@@ -146,6 +156,7 @@ namespace SOS.Harvest.Processors.iNaturalist
             PopulateGenericData(obs);
             obs.Occurrence.BirdNestActivityId = GetBirdNestActivityId(obs.Occurrence.Activity, obs.Taxon);
             CalculateOrganismQuantity(obs);
+            _logger.LogInformation("iNaturalist - step 9. finish");
             //obs.AccessRights = GetAccessRightsFromSensitivityCategory(obs.Occurrence.SensitivityCategory);
             return obs;
         }
