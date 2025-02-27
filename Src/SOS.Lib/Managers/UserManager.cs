@@ -37,6 +37,18 @@ namespace SOS.Lib.Managers
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
+        public async Task<UserInformation> GetBasicUserInformationAsync()
+        {
+            var user = await UserService.GetUserAsync();
+            if (user == null) throw new AuthenticationRequiredException("User is null, probably due to missing authentication header.");
+            return new UserInformation
+            {
+                UserName = user.UserName,
+                Id = user.Id,
+                Email = user.EmailAddress
+            };
+        }
+
         /// <summary>
         /// Get user information.
         /// </summary>
