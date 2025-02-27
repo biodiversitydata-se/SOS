@@ -1,7 +1,6 @@
 ﻿using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 using MongoDB.Driver;
 using SOS.Harvest.Harvesters.iNaturalist.Interfaces;
 using SOS.Harvest.Services;
@@ -77,7 +76,7 @@ namespace SOS.Harvest.Harvesters.iNaturalist
 
         private async Task<HarvestInfo> HarvestObservationsOldWayAsync(Lib.Models.Shared.DataProvider provider, IJobCancellationToken cancellationToken)
         {
-            var harvestInfo = new HarvestInfo("iNaturallist", DateTime.Now);
+            var harvestInfo = new HarvestInfo("iNaturalist", DateTime.Now);
             var dataProvider = new Lib.Models.Shared.DataProvider() { Id = 19, Identifier = "iNaturalist" };
             using var dwcCollectionRepository = new DwcCollectionRepository(dataProvider, _verbatimClient, _logger);
             dwcCollectionRepository.BeginTempMode();
@@ -172,7 +171,7 @@ namespace SOS.Harvest.Harvesters.iNaturalist
 
         private async Task<HarvestInfo> HarvestObservationsNewWayAsync(Lib.Models.Shared.DataProvider provider, IJobCancellationToken cancellationToken)
         {
-            var harvestInfo = new HarvestInfo("iNaturallist", DateTime.Now);
+            var harvestInfo = new HarvestInfo("iNaturalist", DateTime.Now);
             
             try
             {
@@ -197,12 +196,14 @@ namespace SOS.Harvest.Harvesters.iNaturalist
 
                 // Harvest latest day(s) observations
                 var incrementalMongoCollection = _iNaturalistVerbatimRepository.GetMongoCollection(IncrementalCollectionName);
-                var incrementalTempMongoCollection = _iNaturalistVerbatimRepository.GetMongoCollection(IncrementalTempCollectionName);
-                _logger.LogInformation("Start harvesting incremental {@dataProvider} observations", "iNaturalist");
-                _logger.LogInformation(GetINatHarvestSettingsInfoString());
+                var incrementalTempMongoCollection = _iNaturalistVerbatimRepository.GetMongoCollection(IncrementalTempCollectionName);                
                 var nrSightingsHarvested = 0;
                 DateTimeOffset? latestDate = await GetLatestUpdatedDate(incrementalTempMongoCollection);
-                var startHarvestDate = latestDate ?? DateTimeOffset.UtcNow - TimeSpan.FromDays(7);                
+                (bool collectionsExists, int? maxId, int? maxObservationId) = await GetMongoCollectionMaxIdsAsync(_iNaturalistVerbatimRepository, incrementalTempMongoCollection);
+                int documentId = maxId.GetValueOrDefault() + 1;
+                var startHarvestDate = latestDate ?? DateTimeOffset.UtcNow - TimeSpan.FromDays(7);
+                _logger.LogInformation("Start harvesting incremental {@dataProvider} observations. maxId={maxId}, maxObservationId={maxObservationId}, startHarvestDate={startHarvestDate}", "iNaturalist", maxId, maxObservationId, startHarvestDate);
+                _logger.LogInformation(GetINatHarvestSettingsInfoString());
                 await foreach (var pageResult in _iNaturalistApiObservationService.GetByIterationAsync(startHarvestDate.DateTime, _iNaturalistServiceConfiguration.HarvestCompleBatchDelayInSeconds))
                 {
                     if (pageResult.TotalCount > MaxNrIncrementalObservations)
@@ -210,8 +211,12 @@ namespace SOS.Harvest.Harvesters.iNaturalist
                         _logger.LogWarning("Number of incremental {@dataProvider} observations exceeds limit of 100 000. Aborting harvest.", "iNaturalist");
                         break;
                     }
-                    
-                    await _iNaturalistVerbatimRepository.UpsertManyAsync(pageResult.Observations, incrementalTempMongoCollection);
+                    foreach (var observation in pageResult.Observations)
+                    {
+                        observation.Id = documentId++;
+                    }
+
+                    await _iNaturalistVerbatimRepository.UpsertManyAsync(pageResult.Observations, incrementalTempMongoCollection, "ObservationId");
                     nrSightingsHarvested += pageResult.Observations.Count();
 
                     if (nrSightingsHarvested % 10000 == 0)
@@ -258,7 +263,7 @@ namespace SOS.Harvest.Harvesters.iNaturalist
             return harvestInfo;
         }
 
-        public async Task<HarvestInfo> HarvestCompleteObservationsWithDelayAsync(Lib.Models.Shared.DataProvider provider, IJobCancellationToken cancellationToken)
+        public async Task<HarvestInfo> HarvestCompleteObservationsWithDelayAsync(DataProvider provider, IJobCancellationToken cancellationToken)
         {
             var harvestInfo = new HarvestInfo("iNaturalist", DateTime.Now);
 
@@ -267,12 +272,15 @@ namespace SOS.Harvest.Harvesters.iNaturalist
                 var completeMongoCollection = _iNaturalistVerbatimRepository.GetMongoCollection(FullCollectionName);
                 var completeTempMongoCollection = _iNaturalistVerbatimRepository.GetMongoCollection(FullTempCollectionName);
                 int idAbove = _iNaturalistServiceConfiguration.HarvestCompleteStartId;                
-                var currentDocCount = await _iNaturalistVerbatimRepository.CountAllDocumentsAsync(completeMongoCollection);                
-                (bool tempExists, int? latestId) = await CheckCompleteHarvestTempModeAsync(_iNaturalistVerbatimRepository, completeTempMongoCollection);
-                if (tempExists)
+                var currentDocCount = await _iNaturalistVerbatimRepository.CountAllDocumentsAsync(completeMongoCollection);
+                int documentId = 0;
+                (bool collectionsExists, int? maxId, int? maxObservationId) = await GetMongoCollectionMaxIdsAsync(_iNaturalistVerbatimRepository, completeTempMongoCollection);
+                if (collectionsExists)
                 {
                     // Continue harvest from last id
-                    idAbove = latestId ?? idAbove;
+                    idAbove = maxObservationId ?? idAbove;
+                    documentId = maxId.GetValueOrDefault() + 1;
+                    _logger.LogInformation("Continue harvesting complete {@dataProvider} observations from id={idAbove}, documentId={documentId}", "iNaturalist", idAbove, documentId);
                 }
                 else
                 {                    
@@ -283,7 +291,11 @@ namespace SOS.Harvest.Harvesters.iNaturalist
                 _logger.LogInformation(GetINatHarvestSettingsInfoString());
                 var nrSightingsHarvested = 0;                
                 await foreach (var pageResult in _iNaturalistApiObservationService.GetByIterationAsync(idAbove, _iNaturalistServiceConfiguration.HarvestCompleBatchDelayInSeconds))
-                {                    
+                {
+                    foreach (var observation in pageResult.Observations)
+                    {
+                        observation.Id = documentId++;
+                    }
                     await _iNaturalistVerbatimRepository.AddManyAsync(pageResult.Observations, completeTempMongoCollection);
                     nrSightingsHarvested += pageResult.Observations.Count();
 
@@ -368,18 +380,18 @@ namespace SOS.Harvest.Harvesters.iNaturalist
             return sb.ToString();
         }        
 
-        private async Task<(bool tempExists, int? latestId)> CheckCompleteHarvestTempModeAsync(
+        private async Task<(bool collectionsExists, int? maxId, int? maxObservationId)> GetMongoCollectionMaxIdsAsync(
             IiNaturalistObservationVerbatimRepository repository,
-            MongoDB.Driver.IMongoCollection<iNaturalistVerbatimObservation> tempMongoCollection)
+            IMongoCollection<iNaturalistVerbatimObservation> tempMongoCollection)
         {            
             bool collectionExists = await repository.CheckIfCollectionExistsAsync(tempMongoCollection.CollectionNamespace.CollectionName);
             if (collectionExists)
-            {
-                var maxId = await repository.GetMaxIdAsync(tempMongoCollection);                
-                return (true, maxId);
+            {                
+                (int maxId, int maxObservationId) maxVal = await repository.GetMaxValueWithIdAsync<int>(tempMongoCollection, "ObservationId");
+                return (true, maxVal.maxId, maxVal.maxObservationId);
             }
             
-            return (false, null);
+            return (false, null, null);
         }
     }
 }

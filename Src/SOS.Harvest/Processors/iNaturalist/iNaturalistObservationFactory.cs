@@ -283,6 +283,14 @@ namespace SOS.Harvest.Processors.iNaturalist
 
         private Lib.Models.Processed.Observation.Taxon CreateProcessedTaxon(iNaturalistVerbatimObservation verbatim)
         {
+            if (verbatim.Taxon == null || string.IsNullOrEmpty(verbatim.Taxon.Name))
+            {
+                return new Lib.Models.Processed.Observation.Taxon
+                {
+                    Id = -1
+                };
+            }
+
             var parsedTaxonId = -1;            
             var names = new HashSet<string>
             {

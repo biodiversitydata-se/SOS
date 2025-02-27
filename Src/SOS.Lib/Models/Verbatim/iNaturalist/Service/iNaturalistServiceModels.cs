@@ -530,8 +530,13 @@ namespace SOS.Lib.Models.Verbatim.INaturalist.Service
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial record iNaturalistVerbatimObservation : IEntity<int>
     {
-        [System.Text.Json.Serialization.JsonPropertyName("id")]
+        /// <summary>
+        /// Unique id
+        /// </summary>
         public int Id { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("id")]
+        public int ObservationId { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("positional_accuracy")]
         public int? PositionalAccuracy { get; set; }
