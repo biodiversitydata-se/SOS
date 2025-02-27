@@ -533,6 +533,7 @@ namespace SOS.Lib.Models.Verbatim.INaturalist.Service
         /// <summary>
         /// Unique id
         /// </summary>
+        [System.Text.Json.Serialization.JsonPropertyName("unique_document_id")]
         public int Id { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("id")]
