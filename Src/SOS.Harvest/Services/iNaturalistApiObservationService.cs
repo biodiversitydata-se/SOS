@@ -40,7 +40,7 @@ namespace SOS.Harvest.Services
 
         public async Task<SOS.Lib.Models.Verbatim.INaturalist.Service.ObservationsResponse> GetAsync(
             DateTime? updatedFromDate,            
-            int? idAbove,
+            long? idAbove,
             int page,
             string orderBy = "id")
         {
@@ -49,7 +49,7 @@ namespace SOS.Harvest.Services
 
         private async Task<SOS.Lib.Models.Verbatim.INaturalist.Service.ObservationsResponse> GetAsync(
             DateTime? updatedFromDate, 
-            int? idAbove,
+            long? idAbove,
             int page,
             byte attempt,
             string orderBy = "id")
@@ -96,7 +96,7 @@ namespace SOS.Harvest.Services
         }      
 
         public async IAsyncEnumerable<(ICollection<SOS.Lib.Models.Verbatim.INaturalist.Service.iNaturalistVerbatimObservation> Observations, int TotalCount)> GetByIterationAsync(
-            int idAbove,
+            long idAbove,
             int sleepSeconds = 1)
         {
             var endOfChunk = false;

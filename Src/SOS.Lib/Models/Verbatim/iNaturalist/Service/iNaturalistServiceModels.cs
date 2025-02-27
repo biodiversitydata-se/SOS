@@ -537,7 +537,7 @@ namespace SOS.Lib.Models.Verbatim.INaturalist.Service
         public int Id { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("id")]
-        public int ObservationId { get; set; }
+        public long ObservationId { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("positional_accuracy")]
         public int? PositionalAccuracy { get; set; }

@@ -271,7 +271,7 @@ namespace SOS.Harvest.Harvesters.iNaturalist
             {
                 var completeMongoCollection = _iNaturalistVerbatimRepository.GetMongoCollection(FullCollectionName);
                 var completeTempMongoCollection = _iNaturalistVerbatimRepository.GetMongoCollection(FullTempCollectionName);
-                int idAbove = _iNaturalistServiceConfiguration.HarvestCompleteStartId;                
+                long idAbove = _iNaturalistServiceConfiguration.HarvestCompleteStartId;
                 var currentDocCount = await _iNaturalistVerbatimRepository.CountAllDocumentsAsync(completeMongoCollection);
                 int documentId = 0;
                 (bool collectionsExists, int? maxId, int? maxObservationId) = await GetMongoCollectionMaxIdsAsync(_iNaturalistVerbatimRepository, completeTempMongoCollection);
@@ -301,7 +301,7 @@ namespace SOS.Harvest.Harvesters.iNaturalist
 
                     if (nrSightingsHarvested % 10000 == 0)
                     {
-                        _logger.LogInformation("{nrSightingsHarvested} complete {@dataProvider} observations harvested. Total count={totalCount}", nrSightingsHarvested, "iNaturalist", pageResult.TotalCount);                        
+                        _logger.LogInformation("{nrSightingsHarvested} complete {@dataProvider} observations harvested. Total count={totalCount}, maxObsId={maxObsId}", nrSightingsHarvested, "iNaturalist", pageResult.TotalCount,pageResult.Observations.Last().ObservationId);
                     }
 
                     cancellationToken?.ThrowIfCancellationRequested();

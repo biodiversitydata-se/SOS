@@ -94,7 +94,7 @@ namespace SOS.Harvest.Processors.iNaturalist
             obs.DatasetName = "iNaturalist";
             if (verbatim.Updated_at == null)
             {
-                _logger.LogWarning("Updated_at is null for observation with id {0}", verbatim.Id);
+                _logger.LogWarning("Updated_at is null for observation with Id={id}, ObservationId={observationId}", verbatim.Id, verbatim.ObservationId);
                 obs.Modified = verbatim.Created_at!.Value.DateTime.ToUniversalTime();
             }
             else
@@ -253,8 +253,8 @@ namespace SOS.Harvest.Processors.iNaturalist
         private Occurrence CreateProcessedOccurrence(iNaturalistVerbatimObservation verbatim, Lib.Models.Processed.Observation.Taxon? taxon, AccessRightsId? accessRightsId)
         {
             var processedOccurrence = new Occurrence();
-            processedOccurrence.CatalogNumber = verbatim.Id.ToString();
-            processedOccurrence.OccurrenceId = $"https://www.inaturalist.org/observations/{verbatim.Id}";
+            processedOccurrence.CatalogNumber = verbatim.ObservationId.ToString();
+            processedOccurrence.OccurrenceId = $"https://www.inaturalist.org/observations/{verbatim.ObservationId}";
             processedOccurrence.ReportedDate = verbatim.Created_at!.Value.DateTime.ToUniversalTime();
             processedOccurrence.OccurrenceRemarks = verbatim.Description?.Clean();
             processedOccurrence.Url = verbatim.Uri;

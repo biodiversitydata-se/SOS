@@ -31,12 +31,12 @@ namespace SOS.Process.UnitTests.Services
             result.Should().NotBeNull();
         }
 
-        [Fact(Skip = "Intended to run on demand when needed")]
+        [Fact(Skip = "Intended to run on demand when needed")]        
         public async Task GetINaturalistObservations_IterateByIdAbove()
         {
             // Arrange
             var iNatService = new iNaturalistApiObservationService(new HttpClientService(new Mock<ILogger<HttpClientService>>().Object), new NullLogger<iNaturalistApiObservationService>());
-            int idAbove = 236000000;
+            long idAbove = 236000000;
 
             // Act
             var observations = new List<iNaturalistVerbatimObservation>();
