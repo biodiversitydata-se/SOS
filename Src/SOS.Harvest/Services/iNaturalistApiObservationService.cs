@@ -132,7 +132,7 @@ namespace SOS.Harvest.Services
                 }
 
                 yield return (results.Results, results.Total_results.GetValueOrDefault(0));
-                idAbove = results.Results.Last().Id!;
+                idAbove = results.Results.Last().ObservationId!;
                 await Task.Delay(sleepSeconds * 1000);
             }
         }    
