@@ -64,7 +64,6 @@ namespace SOS.Harvest.Services
                 {
                     updatedFromDate = new DateTime(1900, 1, 1);
                 }
-                var observations = new List<DwcObservationVerbatim>();                
                 var observationsResult = await _httpClientService.GetFileStreamAsync(
                     new Uri($"https://api.inaturalist.org/v1/observations?place_id=7599&order=asc&order_by={orderBy}" +
                             $"&updated_since={updatedFromDate}" +
@@ -79,6 +78,15 @@ namespace SOS.Harvest.Services
 
                 var result = await JsonSerializer.DeserializeAsync<SOS.Lib.Models.Verbatim.INaturalist.Service.ObservationsResponse>(
                     observationsResult, _jsonSerializerOptions);
+                if (result?.Results != null)
+                {
+                    foreach (var obs in result.Results)
+                    {
+                        obs.ObservationId = obs.Id;
+                        obs.Id = 0;
+                    }
+                }                
+
                 return result;
             }
             catch (Exception e)
