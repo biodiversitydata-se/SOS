@@ -217,7 +217,8 @@ namespace SOS.Harvest.Processors.iNaturalist
 
         private Event CreateProcessedEvent(iNaturalistVerbatimObservation verbatim)
         {            
-            var processedEvent = new Event(verbatim.Time_observed_at!.Value.DateTime.ToUniversalTime());
+            var processedEvent = new Event(verbatim.Observed_on != null ? verbatim.Observed_on.Value.DateTime : verbatim.Created_at!.Value.DateTime, 
+                verbatim.Time_observed_at != null ? verbatim.Time_observed_at.Value.TimeOfDay : null);
             return processedEvent;
         }
 
