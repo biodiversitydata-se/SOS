@@ -75,52 +75,35 @@ namespace SOS.Harvest.Processors.iNaturalist
         /// <returns></returns>
         public Observation CreateProcessedObservation(iNaturalistVerbatimObservation verbatim, bool diffuseIfSupported)
         {
-            _logger.LogInformation("Start processing iNaturalist observation");
             if (verbatim == null)
             {
                 return null;
             }
-            _logger.LogInformation("Processing observation with Id={id}, ObservationId={observationId}", verbatim.Id, verbatim.ObservationId);
 
-            var accessRights = GetSosId(AccessRightsId.FreeUsage.ToString(), VocabularyById[VocabularyId.AccessRights]);
+            var accessRights = VocabularyValue.Create((int)AccessRightsId.FreeUsage);
             var obs = new Observation
             {
                 AccessRights = accessRights,
                 DataProviderId = DataProvider.Id,
                 DiffusionStatus = DiffusionStatus.NotDiffused,
             };
-            _logger.LogInformation("iNaturalist - step 1. created obs");
 
             // Record level
-            obs.License = verbatim.License_code;
+            obs.License = verbatim.License_code?.Clean();
             obs.BasisOfRecord = new VocabularyValue { Id = (int)BasisOfRecordId.HumanObservation };
             obs.DatasetName = "iNaturalist";
-            _logger.LogInformation("iNaturalist - step 2.");
-            if (verbatim.Updated_at == null)
-            {
-                _logger.LogWarning("Updated_at is null for observation with Id={id}, ObservationId={observationId}", verbatim.Id, verbatim.ObservationId);
-                obs.Modified = verbatim.Created_at!.Value.DateTime.ToUniversalTime();
-            }
-            else
-            { 
-                obs.Modified = verbatim.Updated_at!.Value.DateTime.ToUniversalTime();
-            }
+            obs.Modified = verbatim.Updated_at != null ? verbatim.Updated_at!.Value.DateTime.ToUniversalTime() : verbatim.Created_at!.Value.DateTime.ToUniversalTime();
             obs.InstitutionCode = _institutionCodeVocabularyValue;
-            obs.OwnerInstitutionCode = "iNaturalist";
-            _logger.LogInformation("iNaturalist - step 3.");
-            //obs.RightsHolder = verbatim.RightsHolder?.Clean();            
+            obs.OwnerInstitutionCode = "iNaturalist";            
 
             // Event
             obs.Event = CreateProcessedEvent(verbatim);
-            _logger.LogInformation("iNaturalist - step 4. event created");
 
             // Identification
             obs.Identification = CreateProcessedIdentification(verbatim);
-            _logger.LogInformation("iNaturalist - step 5. identification created");
 
             // Taxon
             obs.Taxon = CreateProcessedTaxon(verbatim);
-            _logger.LogInformation("iNaturalist - step 6. taxon created");
 
             // Location
             obs.Location = CreateProcessedLocation(verbatim);
@@ -136,11 +119,9 @@ namespace SOS.Harvest.Processors.iNaturalist
                 coordinateUncertaintyInMeters,
                 obs.Taxon?.Attributes?.DisturbanceRadius);
             _areaHelper.AddAreaDataToProcessedLocation(obs.Location);
-            _logger.LogInformation("iNaturalist - step 7. location created");
 
             // Occurrence
             obs.Occurrence = CreateProcessedOccurrence(verbatim, obs.Taxon, obs.AccessRights != null ? (AccessRightsId)obs.AccessRights.Id : null);
-            _logger.LogInformation("iNaturalist - step 8. occurrence created");
 
             if (obs.ShallBeProtected())
             {
@@ -155,8 +136,7 @@ namespace SOS.Harvest.Processors.iNaturalist
             // Populate generic data
             PopulateGenericData(obs);
             obs.Occurrence.BirdNestActivityId = GetBirdNestActivityId(obs.Occurrence.Activity, obs.Taxon);
-            CalculateOrganismQuantity(obs);
-            _logger.LogInformation("iNaturalist - step 9. finish");
+            CalculateOrganismQuantity(obs);            
             //obs.AccessRights = GetAccessRightsFromSensitivityCategory(obs.Occurrence.SensitivityCategory);
             return obs;
         }
@@ -212,16 +192,48 @@ namespace SOS.Harvest.Processors.iNaturalist
                     verbatim.Observed_on != null ? verbatim.Observed_on!.Value.DateTime.ToUniversalTime().ToString() :
                     verbatim.Created_at!.Value.DateTime.ToUniversalTime().ToString(),
                 Creator = verbatim.User.Name ?? verbatim.User.Login,
-                License = photo.License_code,
+                License = photo.License_code ?? photo.Attribution,
                 RightsHolder = verbatim.User.Name ?? verbatim.User.Login
             }).ToList();
         }
 
         private Event CreateProcessedEvent(iNaturalistVerbatimObservation verbatim)
-        {            
-            var processedEvent = new Event(verbatim.Observed_on != null ? verbatim.Observed_on.Value.DateTime : verbatim.Created_at!.Value.DateTime, 
+        {
+            //var observationDate = GetObservationDate(
+            //    verbatim.Observed_on != null ? verbatim.Observed_on.Value.DateTime : verbatim.Created_at!.Value.DateTime,
+            //    verbatim.Time_observed_at != null ? verbatim.Time_observed_at.Value.TimeOfDay : null);
+            var processedEvent = new Event(verbatim.Time_observed_at != null ? verbatim.Time_observed_at.Value.DateTime : 
+                verbatim.Observed_on != null ? verbatim.Observed_on.Value.DateTime : verbatim.Created_at!.Value.DateTime,
                 verbatim.Time_observed_at != null ? verbatim.Time_observed_at.Value.TimeOfDay : null);
             return processedEvent;
+        }
+
+        private DateTime? GetObservationDate(
+            DateTime? startDate,
+            TimeSpan? startTime)
+        {
+            DateTime? startDateResult;
+
+            // Add time to start date if it exists
+            if (startDate.HasValue && startTime.HasValue)
+            {
+                startDateResult = startDate.Value.ToLocalTime().Date + startTime;
+            }
+            else if (startDate.HasValue && !startTime.HasValue)
+            {
+                startDateResult = startDate.Value.ToLocalTime().Date;
+            }
+            else
+            {
+                startDateResult = null;
+            }
+         
+            if (startDateResult.HasValue && startDateResult.Value.Kind == DateTimeKind.Unspecified)
+            {
+                startDateResult = DateTime.SpecifyKind(startDateResult.Value, DateTimeKind.Local);
+            }
+
+            return startDateResult;
         }
 
         private Lib.Models.Processed.Observation.Identification CreateProcessedIdentification(iNaturalistVerbatimObservation verbatim)
@@ -272,25 +284,13 @@ namespace SOS.Harvest.Processors.iNaturalist
             processedOccurrence.ReportedDate = verbatim.Created_at!.Value.DateTime.ToUniversalTime();
             processedOccurrence.OccurrenceRemarks = verbatim.Description?.Clean();
             processedOccurrence.Url = verbatim.Uri;
-            processedOccurrence.RecordedBy = verbatim.User.Name ?? verbatim.User.Login;            
-            //processedOccurrence.IndividualCount = verbatim.IndividualCount;
-            
+            processedOccurrence.RecordedBy = processedOccurrence.ReportedBy = verbatim.User.Name?.Clean() ?? verbatim.User.Login?.Clean();            
             processedOccurrence.Media = CreateProcessedMultimedia(verbatim);
-            processedOccurrence.OccurrenceStatus = GetSosId(
-                OccurrenceStatusId.Present.ToString(),
-                VocabularyById[VocabularyId.OccurrenceStatus],
-                (int)OccurrenceStatusId.Present);
-
+            processedOccurrence.OccurrenceStatus = VocabularyValue.Create((int)OccurrenceStatusId.Present);
             processedOccurrence.IsNaturalOccurrence = true;
             processedOccurrence.IsNeverFoundObservation = false;
             processedOccurrence.IsNotRediscoveredObservation = false;
             processedOccurrence.IsPositiveObservation = true;
-            if (processedOccurrence.OccurrenceStatus?.Id == (int)OccurrenceStatusId.Absent)
-            {
-                processedOccurrence.IsPositiveObservation = false;
-                processedOccurrence.IsNeverFoundObservation = true;
-            }
-            
             processedOccurrence.SensitivityCategory = CalculateProtectionLevel(taxon, accessRightsId);
             return processedOccurrence;
         }
@@ -312,7 +312,7 @@ namespace SOS.Harvest.Processors.iNaturalist
                 RemoveAuthorFromString(verbatim.Taxon.Name!)
             };                        
 
-            return GetTaxon(parsedTaxonId, names, null, true);
+            return GetTaxon(parsedTaxonId, names, null, true, null, verbatim?.Species_guess);
         }
 
         public static string RemoveAuthorFromString(string input)
