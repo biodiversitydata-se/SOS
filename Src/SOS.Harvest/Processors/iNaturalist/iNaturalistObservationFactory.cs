@@ -208,7 +208,9 @@ namespace SOS.Harvest.Processors.iNaturalist
                 Identifier = photo.Url,                
                 Type = "StillImage",
                 Format = "image/jpeg",
-                Created = verbatim.Time_observed_at!.Value.DateTime.ToUniversalTime().ToString(),
+                Created = verbatim.Time_observed_at != null ? verbatim.Time_observed_at!.Value.DateTime.ToUniversalTime().ToString() :
+                    verbatim.Observed_on != null ? verbatim.Observed_on!.Value.DateTime.ToUniversalTime().ToString() :
+                    verbatim.Created_at!.Value.DateTime.ToUniversalTime().ToString(),
                 Creator = verbatim.User.Name ?? verbatim.User.Login,
                 License = photo.License_code,
                 RightsHolder = verbatim.User.Name ?? verbatim.User.Login
