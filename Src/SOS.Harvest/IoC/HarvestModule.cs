@@ -398,7 +398,8 @@ namespace SOS.Harvest.IoC.Modules
             builder.RegisterType<NorsDataValidationReportFactory>().InstancePerLifetimeScope();
             builder.RegisterType<SersDataValidationReportFactory>().InstancePerLifetimeScope();
             builder.RegisterType<VirtualHerbariumValidationReportFactory>().InstancePerLifetimeScope();
-
+            builder.RegisterType<iNaturalistDataValidationReportFactory>().InstancePerLifetimeScope();
+            
             // Add verbatim data Services
             builder.RegisterType<AquaSupportRequestService>().As<IAquaSupportRequestService>();
             builder.RegisterType<GeoRegionApiService>().As<IGeoRegionApiService>().InstancePerLifetimeScope();
