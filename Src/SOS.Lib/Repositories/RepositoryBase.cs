@@ -745,8 +745,7 @@ namespace SOS.Lib.Repositories
             string fieldName) where T : IConvertible
         {
             try
-            {                
-                fieldName = "PreviousProcessLimit";
+            {
                 Logger.LogDebug($"Trying to get max value for field '{fieldName}' in ({mongoCollection.CollectionNamespace})");
 
                 var pipeline = new[]
