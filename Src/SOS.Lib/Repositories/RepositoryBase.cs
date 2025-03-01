@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 using SOS.Lib.Database.Interfaces;
@@ -315,10 +316,15 @@ namespace SOS.Lib.Repositories
                 {
                     var comparisonValue = typeof(TEntity).GetProperty(comparisonField)?.GetValue(item);
                     if (comparisonValue == null)
-                        throw new ArgumentException($"Field '{comparisonField}' not found or has null value.");
-
+                        throw new ArgumentException($"Field '{comparisonField}' not found or has null value.");                    
                     var filter = Builders<TEntity>.Filter.Eq(comparisonField, comparisonValue);
-                    var upsert = new ReplaceOneModel<TEntity>(filter, item) { IsUpsert = true };
+                    var bsonDocument = item.ToBsonDocument();
+                    if (comparisonField != "_id") 
+                        bsonDocument.Remove("_id"); // Remove _id before upsert
+                    var upsert = new ReplaceOneModel<TEntity>(filter, BsonSerializer.Deserialize<TEntity>(bsonDocument))
+                    {
+                        IsUpsert = true
+                    };
 
                     bulkOps.Add(upsert);
                 }
