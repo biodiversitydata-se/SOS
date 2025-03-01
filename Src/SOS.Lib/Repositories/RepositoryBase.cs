@@ -311,21 +311,37 @@ namespace SOS.Lib.Repositories
             try
             {
                 var bulkOps = new List<WriteModel<TEntity>>();
+                if (comparisonField != "_id")
+                {                    
+                    // Fetch all existing documents from MongoDB based on comparisonField
+                    var comparisonValues = items.Select(i => typeof(TEntity).GetProperty(comparisonField)?.GetValue(i)).Where(v => v != null).ToList();
+                    var existingDocs = await mongoCollection.Find(Builders<TEntity>.Filter.In(comparisonField, comparisonValues)).ToListAsync();                    
+                    var existingDocsDict = existingDocs.ToDictionary(doc => typeof(TEntity).GetProperty(comparisonField)?.GetValue(doc));
+
+                    // Update the batch objects with correct _id if they already exist in the database
+                    var compProperty = typeof(TEntity).GetProperty(comparisonField);
+                    foreach (var item in items)
+                    {
+                        var comparisonValue = compProperty?.GetValue(item);
+                        if (comparisonValue != null && existingDocsDict.TryGetValue(comparisonValue, out var existingDoc))
+                        {
+                            item.Id = existingDoc.Id;
+                            //var idValue = typeof(TEntity).GetProperty("_id")?.GetValue(existingDoc);
+                            //if (idValue != null)
+                            //{
+                            //    typeof(TEntity).GetProperty("_id")?.SetValue(item, idValue);
+                            //}
+                        }
+                    }
+                }
 
                 foreach (var item in items)
-                {
+                {                    
                     var comparisonValue = typeof(TEntity).GetProperty(comparisonField)?.GetValue(item);
                     if (comparisonValue == null)
-                        throw new ArgumentException($"Field '{comparisonField}' not found or has null value.");                    
+                        throw new ArgumentException($"Field '{comparisonField}' not found or has null value.");
                     var filter = Builders<TEntity>.Filter.Eq(comparisonField, comparisonValue);
-                    var bsonDocument = item.ToBsonDocument();
-                    if (comparisonField != "_id") 
-                        bsonDocument.Remove("_id"); // Remove _id before upsert
-                    var upsert = new ReplaceOneModel<TEntity>(filter, BsonSerializer.Deserialize<TEntity>(bsonDocument))
-                    {
-                        IsUpsert = true
-                    };
-
+                    var upsert = new ReplaceOneModel<TEntity>(filter, item) { IsUpsert = true };
                     bulkOps.Add(upsert);
                 }
 
