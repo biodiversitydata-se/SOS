@@ -90,8 +90,7 @@ namespace SOS.Harvest.Factories.Validation
         {
             if (_iNaturalistObservationFactory == null)
             {
-                _iNaturalistObservationFactory = new iNaturalistObservationFactory(dataProvider, _taxonById, _dwcaVocabularyById, _areaHelper, _processTimeManager, ProcessConfiguration, _logger);
-                Task.Run(() => _iNaturalistObservationFactory.InitializeAsync());
+                _iNaturalistObservationFactory = new iNaturalistObservationFactory(dataProvider, _taxonById, _dwcaVocabularyById, _areaHelper, _processTimeManager, ProcessConfiguration, _logger);                
             }
 
             return _iNaturalistObservationFactory;

@@ -21,8 +21,7 @@ namespace SOS.Harvest.Processors.iNaturalist
     {
         private int DefaultCoordinateUncertaintyInMeters = 5000;
         private readonly IAreaHelper _areaHelper;
-        private IDictionary<string, (double longitude, double latitude, int precision)>? _communities;
-        private string _englishOrganizationName;
+        private string _englishOrganizationName = string.Empty;
         private string _englishOrganizationNameLowerCase;
         private VocabularyValue? _institutionCodeVocabularyValue;
         private ILogger _logger;
@@ -60,11 +59,6 @@ namespace SOS.Harvest.Processors.iNaturalist
             {
                 DefaultCoordinateUncertaintyInMeters = dataProvider.CoordinateUncertaintyInMeters;
             }            
-        }
-
-        public async Task InitializeAsync()
-        {
-            //_communities = await GetCommunitiesAsync();
         }
 
         /// <summary>
@@ -107,18 +101,20 @@ namespace SOS.Harvest.Processors.iNaturalist
 
             // Location
             obs.Location = CreateProcessedLocation(verbatim);
-            var verbatimLongitude = verbatim.Geojson.Coordinates.First();
-            var verbatimLatitude = verbatim.Geojson.Coordinates.Last();
-
-            var coordinateUncertaintyInMeters = verbatim.PublicPositionalAccuracy ?? DefaultCoordinateUncertaintyInMeters;
-            AddPositionData(
-                obs.Location,
-                verbatimLongitude,
-                verbatimLatitude,
-                CoordinateSys.WGS84,
-                coordinateUncertaintyInMeters,
-                obs.Taxon?.Attributes?.DisturbanceRadius);
-            _areaHelper.AddAreaDataToProcessedLocation(obs.Location);
+            if (verbatim?.Geojson?.Coordinates != null)
+            {
+                var verbatimLongitude = verbatim.Geojson.Coordinates.First();
+                var verbatimLatitude = verbatim.Geojson.Coordinates.Last();
+                var coordinateUncertaintyInMeters = verbatim.PublicPositionalAccuracy ?? DefaultCoordinateUncertaintyInMeters;
+                AddPositionData(
+                    obs.Location,
+                    verbatimLongitude,
+                    verbatimLatitude,
+                    CoordinateSys.WGS84,
+                    coordinateUncertaintyInMeters,
+                    obs.Taxon?.Attributes?.DisturbanceRadius);
+                _areaHelper.AddAreaDataToProcessedLocation(obs.Location);
+            }
 
             // Occurrence
             obs.Occurrence = CreateProcessedOccurrence(verbatim, obs.Taxon, obs.AccessRights != null ? (AccessRightsId)obs.AccessRights.Id : null);
@@ -139,36 +135,6 @@ namespace SOS.Harvest.Processors.iNaturalist
             CalculateOrganismQuantity(obs);            
             //obs.AccessRights = GetAccessRightsFromSensitivityCategory(obs.Occurrence.SensitivityCategory);
             return obs;
-        }
-
-        /// <summary>
-        ///     Gets the occurrence status. Set to Present if DyntaxaTaxonId from provider is greater than 0 and Absent if
-        ///     DyntaxaTaxonId is 0
-        /// </summary>
-        private VocabularyValue GetOccurrenceStatusId(int dyntaxaTaxonId)
-        {
-            if (dyntaxaTaxonId == 0)
-            {
-                return new VocabularyValue { Id = (int)OccurrenceStatusId.Absent };
-            }
-
-            return new VocabularyValue { Id = (int)OccurrenceStatusId.Present };
-        }
-
-        /// <summary>
-        ///     Set to False if DyntaxaTaxonId from provider is greater than 0 and True if DyntaxaTaxonId is 0.
-        /// </summary>
-        private bool GetIsNeverFoundObservation(int dyntaxaTaxonId)
-        {
-            return dyntaxaTaxonId == 0;
-        }
-
-        /// <summary>
-        ///     Set to True if DyntaxaTaxonId from provider is greater than 0 and False if DyntaxaTaxonId is 0.
-        /// </summary>
-        private bool GetIsPositiveObservation(int dyntaxaTaxonId)
-        {
-            return dyntaxaTaxonId != 0;
         }
 
         public bool IsVerbatimObservationDiffusedByProvider(iNaturalistVerbatimObservation verbatim)
@@ -198,43 +164,12 @@ namespace SOS.Harvest.Processors.iNaturalist
         }
 
         private Event CreateProcessedEvent(iNaturalistVerbatimObservation verbatim)
-        {
-            //var observationDate = GetObservationDate(
-            //    verbatim.Observed_on != null ? verbatim.Observed_on.Value.DateTime : verbatim.Created_at!.Value.DateTime,
-            //    verbatim.Time_observed_at != null ? verbatim.Time_observed_at.Value.TimeOfDay : null);
+        {            
             var processedEvent = new Event(verbatim.Time_observed_at != null ? verbatim.Time_observed_at.Value.DateTime : 
                 verbatim.Observed_on != null ? verbatim.Observed_on.Value.DateTime : verbatim.Created_at!.Value.DateTime,
                 verbatim.Time_observed_at != null ? verbatim.Time_observed_at.Value.TimeOfDay : null);
             return processedEvent;
-        }
-
-        private DateTime? GetObservationDate(
-            DateTime? startDate,
-            TimeSpan? startTime)
-        {
-            DateTime? startDateResult;
-
-            // Add time to start date if it exists
-            if (startDate.HasValue && startTime.HasValue)
-            {
-                startDateResult = startDate.Value.ToLocalTime().Date + startTime;
-            }
-            else if (startDate.HasValue && !startTime.HasValue)
-            {
-                startDateResult = startDate.Value.ToLocalTime().Date;
-            }
-            else
-            {
-                startDateResult = null;
-            }
-         
-            if (startDateResult.HasValue && startDateResult.Value.Kind == DateTimeKind.Unspecified)
-            {
-                startDateResult = DateTime.SpecifyKind(startDateResult.Value, DateTimeKind.Local);
-            }
-
-            return startDateResult;
-        }
+        }        
 
         private Lib.Models.Processed.Observation.Identification CreateProcessedIdentification(iNaturalistVerbatimObservation verbatim)
         {

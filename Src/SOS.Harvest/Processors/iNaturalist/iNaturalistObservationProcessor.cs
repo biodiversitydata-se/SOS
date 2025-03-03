@@ -33,8 +33,6 @@ namespace SOS.Harvest.Processors.iNaturalist
             IJobCancellationToken cancellationToken)
         {            
             var observationFactory = new iNaturalistObservationFactory(dataProvider, taxa, dwcaVocabularyById, _areaHelper, TimeManager, ProcessConfiguration, Logger);
-            await observationFactory.InitializeAsync();
-
             return await base.ProcessObservationsAsync(
                 dataProvider,
                 mode,
