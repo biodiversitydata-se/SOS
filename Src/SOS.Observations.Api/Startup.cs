@@ -755,12 +755,14 @@ namespace SOS.Observations.Api
                         diagnosticContext.Set("Handler", handler);
                     }
 
+                    string originalToken = string.Empty;
                     try
                     {
                         var authHeader = httpContext.Request.Headers["Authorization"].FirstOrDefault();
+                        originalToken = authHeader;
                         if (authHeader != null && authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
                         {
-                            string token = authHeader.Replace("Bearer ", "", StringComparison.OrdinalIgnoreCase);
+                            string token = authHeader.Replace("Bearer ", "", StringComparison.OrdinalIgnoreCase).Trim();
                             var jsonWebTokenHandler = new JsonWebTokenHandler();
                             var jwt = jsonWebTokenHandler.ReadJsonWebToken(token);
                             if (jwt != null)
@@ -775,7 +777,7 @@ namespace SOS.Observations.Api
                     }
                     catch (Exception ex)
                     {
-                        Log.Logger.Error(ex, "Error when deserializing JWT.");
+                        Log.Logger.Error(ex, "Error when deserializing JWT. Token={token}", originalToken);
                     }
                 };
             });
