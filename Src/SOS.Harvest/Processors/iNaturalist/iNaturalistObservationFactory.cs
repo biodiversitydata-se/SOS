@@ -174,7 +174,7 @@ namespace SOS.Harvest.Processors.iNaturalist
         private Lib.Models.Processed.Observation.Identification CreateProcessedIdentification(iNaturalistVerbatimObservation verbatim)
         {
             var processedIdentification = new Lib.Models.Processed.Observation.Identification();                        
-            if (verbatim.Identifications_count > 0 && verbatim.Identifications_most_agree == true && verbatim.Non_owner_ids != null)
+            if (verbatim.Identifications_count > 0 && verbatim.Identifications_most_agree == true && verbatim.Non_owner_ids != null && verbatim.Non_owner_ids.Any())
             {
                 processedIdentification.IdentifiedBy = string.Join(", ", verbatim.Non_owner_ids.Select(m => m.User.Name != null ?  m.User.Name.Clean() : m.User.Login.Clean()));
                 processedIdentification.DateIdentified = verbatim.Non_owner_ids.Last().Created_at!.Value.DateTime.ToUniversalTime().ToString();
