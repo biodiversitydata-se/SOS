@@ -759,6 +759,28 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <summary>
+        /// Populate sortable fields
+        /// </summary>
+        /// <param name="properties"></param>
+        /// <param name="sortableFields"></param>
+        /// <param name="parents"></param>
+        private void PopulateSortableFields(IProperties properties, ref HashSet<string> sortableFields, string parents)
+        {
+            foreach (var property in properties)
+            {
+                var name = $"{(string.IsNullOrEmpty(parents) ? "" : $"{parents}.")}{property.Key.Name}";
+                if (property.Value is ObjectProperty op)
+                {
+                    PopulateSortableFields(op.Properties, ref sortableFields, name);
+                }
+                if (property.Value is KeywordProperty kwp && kwp.DocValues == null && kwp.Index == null)
+                {
+                    sortableFields.Add(name);
+                }
+            }
+        }
+
+        /// <summary>
         /// Write data to elastic search
         /// </summary>
         /// <param name="items"></param>
@@ -1906,6 +1928,23 @@ namespace SOS.Lib.Repositories.Processed
                 Logger.LogError(e.ToString());
                 return null;
             }
+        }
+
+        /// <inheritdoc />
+        public async Task<IEnumerable<string>> GetSortableFieldsAsync()
+        {
+            var sortableFields = new HashSet<string>();
+            var mappings = await Client.Indices.GetMappingAsync<Observation>(o => o.Index(PublicIndexName));
+            if (mappings.IsValid)
+            {
+                foreach (var value in mappings.Indices.Values)
+                {
+                    PopulateSortableFields(value.Mappings.Properties, ref sortableFields, "");
+                }
+
+            }
+
+            return sortableFields;
         }
 
         /// <inheritdoc />
