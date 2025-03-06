@@ -560,6 +560,7 @@ namespace SOS.Observations.Api
             services.AddSingleton<IClassCache<Dictionary<string, CacheEntry<PagedResultDto<TaxonAggregationItemDto>>>>>(taxonAggregationInternalCache);
             var clusterHealthCache = new ClassCache<ConcurrentDictionary<string, ClusterHealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<string, ClusterHealthResponse>>>()) { CacheDuration = TimeSpan.FromMinutes(2) };
             services.AddSingleton<IClassCache<ConcurrentDictionary<string, ClusterHealthResponse>>>(clusterHealthCache);
+            services.AddSingleton<SortableFieldsCache>();
 
             // Add managers
             services.AddScoped<IAreaManager, AreaManager>();

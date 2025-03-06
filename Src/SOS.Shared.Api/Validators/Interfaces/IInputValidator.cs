@@ -145,6 +145,14 @@ namespace SOS.Shared.Api.Validators.Interfaces
         /// <returns></returns>
         Task<Result> ValidateSignalSearchAsync(SignalFilterDto filter, bool validateSearchFilter, int areaBuffer);
 
+
+        /// <summary>
+        /// Validate sort fields
+        /// </summary>
+        /// <param name="sortFields"></param>
+        /// <returns></returns>
+        Task<Result> ValidateSortFieldsAsync(IEnumerable<string> sortFields);
+
         /// <summary>
         /// Validate taxa
         /// </summary>
