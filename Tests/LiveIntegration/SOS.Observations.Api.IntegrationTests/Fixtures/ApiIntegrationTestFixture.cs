@@ -264,7 +264,8 @@ namespace SOS.Observations.Api.LiveIntegrationTests.Fixtures
                 ProcessedObservationRepository,
                 new NullLogger<DataProvidersController>());
             var cryptoService = new CryptoService(new CryptoConfiguration() { Password = "password", Salt = "salt" });
-            ExportsController = new ExportsController(ObservationManager, blobStorageManagerMock.Object, exportManager, cryptoService, fileService, userExportRepository, inputValidator, observationApiConfiguration,
+            var userManager = new UserManager(userService, areaCache, new NullLogger<UserManager>());
+            ExportsController = new ExportsController(ObservationManager, blobStorageManagerMock.Object, exportManager, userManager, cryptoService, fileService, userExportRepository, inputValidator, observationApiConfiguration,
                 new NullLogger<ExportsController>());
             ExportsController.ControllerContext.HttpContext = new DefaultHttpContext();
             TaxonManager = taxonManager;

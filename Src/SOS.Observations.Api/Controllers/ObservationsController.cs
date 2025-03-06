@@ -49,8 +49,7 @@ namespace SOS.Observations.Api.Controllers
         private readonly IInputValidator _inputValidator;
         private readonly ObservationApiConfiguration _observationApiConfiguration;
         private readonly IClassCache<Dictionary<string, CacheEntry<GeoGridResultDto>>> _geogridAggregationCache;
-        private readonly IClassCache<Dictionary<string, CacheEntry<PagedResultDto<TaxonAggregationItemDto>>>> _taxonAggregationInternalCache;
-        private static readonly SHA256 _sha256 = SHA256.Create();        
+        private readonly IClassCache<Dictionary<string, CacheEntry<PagedResultDto<TaxonAggregationItemDto>>>> _taxonAggregationInternalCache;           
         private readonly ILogger<ObservationsController> _logger;
 
         private JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions
@@ -397,10 +396,11 @@ namespace SOS.Observations.Api.Controllers
 
                 string key = keyBuilder.ToString();
                 byte[] keyBytes = Encoding.UTF8.GetBytes(key);
-
-                // Skapa en hash för att få en kortare och unik nyckel
-                byte[] hashBytes = _sha256.ComputeHash(keyBytes);
-                return BitConverter.ToString(hashBytes).Replace("-", "").ToLowerInvariant();
+                using (var sha256 = SHA256.Create())
+                {
+                    byte[] hashBytes = sha256.ComputeHash(keyBytes);
+                    return BitConverter.ToString(hashBytes).Replace("-", "").ToLowerInvariant();
+                }             
             }
             catch (Exception ex)
             {

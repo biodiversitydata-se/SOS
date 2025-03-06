@@ -11,5 +11,6 @@ namespace SOS.Lib.Managers.Interfaces
     {
         IUserService UserService { get; set; }
         Task<UserInformation> GetUserInformationAsync(string applicationIdentifier, string cultureCode);
+        Task<UserInformation> GetBasicUserInformationAsync();
     }
 }
