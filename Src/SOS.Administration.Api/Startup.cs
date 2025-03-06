@@ -30,6 +30,9 @@ using SOS.Lib.Repositories.Processed;
 using Serilog;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.AspNetCore.Http;
+using SOS.Lib.Repositories.Resource.Interfaces;
+using SOS.Lib.Repositories.Resource;
+using SOS.Administration.Api.Managers;
 
 namespace SOS.Administration.Api
 {
@@ -168,6 +171,7 @@ namespace SOS.Administration.Api
             var importConfiguration = Settings.ImportConfiguration;
             services.AddSingleton(importConfiguration.GeoRegionApiConfiguration);
 
+            services.AddScoped<DiagnosticsManager>();
             services.AddScoped<ICacheManager, CacheManager>();
             services.AddScoped<IProcessInfoRepository, ProcessInfoRepository>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
@@ -176,6 +180,7 @@ namespace SOS.Administration.Api
             ApiManagementServiceConfiguration apiMgmtServiceConfiguration = new ApiManagementServiceConfiguration();
             services.AddSingleton(apiMgmtServiceConfiguration);
             services.AddScoped<IAuthorizationProvider, CurrentUserAuthorization>();
+            services.AddScoped<ITaxonRepository, TaxonRepository>();
 
             /*       // Add managers
                    services.AddSingleton<IIptManager, IIptManager>();

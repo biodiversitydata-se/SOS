@@ -1,18 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using SOS.Administration.Api.Controllers.Interfaces;
+using SOS.Administration.Api.Managers;
 using SOS.Harvest.Harvesters.Interfaces;
 using SOS.Harvest.Helpers.Interfaces;
 using SOS.Harvest.Services.Taxon.Interfaces;
-using SOS.Lib.Enums;
-using SOS.Lib.Extensions;
 using SOS.Lib.Factories;
 using SOS.Lib.Helpers;
 using System;
 using System.Linq;
-using System.Net;
-using System.Reflection;
-using System.Threading.Tasks;
 
 namespace SOS.Administration.Api.Controllers
 {
@@ -26,6 +21,7 @@ namespace SOS.Administration.Api.Controllers
         private readonly IVocabulariesDiffHelper _vocabulariesDiffHelper;
         private readonly IVocabularyHarvester _vocabularyHarvester;
         private readonly ITaxonService _taxonService;
+        private readonly DiagnosticsManager _diagnosticsManager;
         private readonly ILogger<DiagnosticsController> _logger;
 
         /// <summary>
@@ -34,11 +30,13 @@ namespace SOS.Administration.Api.Controllers
         /// <param name="vocabularyHarvester"></param>
         /// <param name="vocabulariesDiffHelper"></param>
         /// <param name="taxonService"></param>
+        /// <param name="diagnosticsManager"></param>        
         /// <param name="logger"></param>        
         public DiagnosticsController(
             IVocabularyHarvester vocabularyHarvester,
             IVocabulariesDiffHelper vocabulariesDiffHelper,
             ITaxonService taxonService,
+            DiagnosticsManager diagnosticsManager,
             ILogger<DiagnosticsController> logger)
         {
             _vocabularyHarvester =
@@ -47,6 +45,8 @@ namespace SOS.Administration.Api.Controllers
                 vocabulariesDiffHelper ?? throw new ArgumentNullException(nameof(vocabulariesDiffHelper));
             _taxonService =
                 taxonService ?? throw new ArgumentNullException(nameof(taxonService));
+            _diagnosticsManager =
+                diagnosticsManager ?? throw new ArgumentNullException(nameof(diagnosticsManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -162,5 +162,28 @@ namespace SOS.Administration.Api.Controllers
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
+
+        /// <summary>
+        ///     Get taxa categories summary.
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("TaxaSummary")]
+        //[ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> GetTaxaSummary(string collectionName = "Taxon")
+        {
+            try
+            {
+                var json = await _diagnosticsManager.CreateBasicTaxaSummaryJsonAsync(collectionName);
+                return File(System.Text.Encoding.UTF8.GetBytes(json),"text/plain", "TaxaSummary.json");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "{@methodName}() failed", MethodBase.GetCurrentMethod()?.Name);
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+        
     }
 }
