@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
-using SOS.Lib.Configuration.Import;
-using SOS.Lib.Models.Verbatim.DarwinCore;
+using SOS.Lib.Models.Verbatim.INaturalist.Service;
 using SOS.Lib.Services.Interfaces;
+using System.Text;
 using System.Text.Json;
 
 namespace SOS.Harvest.Services
@@ -45,7 +45,7 @@ namespace SOS.Harvest.Services
             string orderBy = "id")
         {
             return await GetAsync(updatedFromDate, idAbove, page, 1, orderBy);
-        }
+        }        
 
         private async Task<SOS.Lib.Models.Verbatim.INaturalist.Service.ObservationsResponse> GetAsync(
             DateTime? updatedFromDate, 
@@ -64,7 +64,7 @@ namespace SOS.Harvest.Services
                 {
                     updatedFromDate = new DateTime(1900, 1, 1);
                 }
-                var observationsResult = await _httpClientService.GetFileStreamAsync(
+                var observationsResultStream = await _httpClientService.GetFileStreamAsync(
                     new Uri($"https://api.inaturalist.org/v1/observations?place_id=7599&order=asc&order_by={orderBy}" +
                             $"&updated_since={updatedFromDate}" +
                             $"&id_above={idAbove}" +
@@ -75,17 +75,19 @@ namespace SOS.Harvest.Services
                             new KeyValuePair<string, string>("Accept", "application/json"),
                         ])
                     );
+                //await DebugINaturalistPropertiesAsync(observationsResultStream);
 
                 var result = await JsonSerializer.DeserializeAsync<SOS.Lib.Models.Verbatim.INaturalist.Service.ObservationsResponse>(
-                    observationsResult, _jsonSerializerOptions);
+                    observationsResultStream, _jsonSerializerOptions);
                 if (result?.Results != null)
                 {
+                    //DebugINaturalistProperties(result.Results);
                     foreach (var obs in result.Results)
                     {
                         obs.ObservationId = obs.Id;
-                        obs.Id = 0;
+                        obs.Id = 0;                        
                     }
-                }                
+                }
 
                 return result;
             }
@@ -101,7 +103,68 @@ namespace SOS.Harvest.Services
                 _logger.LogError($"Failed to get data from iNaturalist API (updatedFromDate={updatedFromDate}, idAbove={idAbove})", e);
                 throw;
             }
-        }      
+        }
+
+        public static Dictionary<string, List<string>> InterestingObservations = new Dictionary<string, List<string>>();
+        public static Dictionary<string, string> Annotations = new Dictionary<string, string>();
+        private async Task DebugINaturalistPropertiesAsync(Stream stream)
+        {            
+            using var memoryStream = new MemoryStream();
+            await stream.CopyToAsync(memoryStream);
+            stream.Position = 0;
+            var rawJsonData = Encoding.UTF8.GetString(memoryStream.ToArray());
+            bool annotationAdded = AddDictionaryData(rawJsonData, "Annotation", "\"annotations\":[{");
+            bool projectAdded = AddDictionaryData(rawJsonData, "Project", "\"project_ids\":[{");
+            bool spamAdded = AddDictionaryData(rawJsonData, "Spam", "\"spam\":true");
+            bool suspendedAdded = AddDictionaryData(rawJsonData, "Suspended", "\"suspended\":true");
+            bool captiveAdded = AddDictionaryData(rawJsonData, "Captive", "\"captive\":true");
+            bool obscuredAdded = AddDictionaryData(rawJsonData, "Obscured", "\"obscured\":true");
+            bool taxonGeoprivacyAdded = AddDictionaryData(rawJsonData, "TaxonGeoprivacy", "\"taxon_geoprivacy\":\"");
+            bool geoPrivacyAdded = AddDictionaryData(rawJsonData, "GeoPrivacy", "\"geoprivacy\":\"");
+            bool projectObservationsAdded = AddDictionaryData(rawJsonData, "ProjectObservations", "\"project_observations\":[{");
+
+            if (annotationAdded && projectAdded && spamAdded && suspendedAdded && captiveAdded && obscuredAdded && taxonGeoprivacyAdded && geoPrivacyAdded && projectObservationsAdded)
+            {
+                _logger.LogWarning("Interesting observations found");
+            }            
+        }
+
+        private void DebugINaturalistProperties(ICollection<iNaturalistVerbatimObservation> observations)
+        {
+            foreach (var obs in observations)
+            {                
+                if (obs.Annotations != null && obs.Annotations.Any())
+                {
+                    foreach (var annotation in obs.Annotations)
+                    {
+                        if (annotation.Concatenated_attr_val != null && !Annotations.ContainsKey(annotation.Concatenated_attr_val))
+                        {
+                            Annotations.Add(annotation.Concatenated_attr_val, obs.Uri);
+                        }
+                    }
+                }
+            }
+        }
+
+        private static bool AddDictionaryData(string rawJsonData, string property, string searchString)
+        {
+            if (rawJsonData.Contains(searchString, StringComparison.InvariantCultureIgnoreCase))
+            {
+                if (InterestingObservations.ContainsKey(property))
+                {
+                    if (InterestingObservations[property].Count < 10)
+                        InterestingObservations[property].Add(rawJsonData);
+                    else
+                        return true;
+                }
+                else
+                {
+                    InterestingObservations.Add(property, new List<string> { rawJsonData });
+                }
+            }
+
+            return false;
+        }
 
         public async IAsyncEnumerable<(ICollection<SOS.Lib.Models.Verbatim.INaturalist.Service.iNaturalistVerbatimObservation> Observations, int TotalCount)> GetByIterationAsync(
             long idAbove,

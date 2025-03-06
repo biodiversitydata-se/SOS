@@ -69,10 +69,10 @@ namespace SOS.Harvest.Processors.iNaturalist
         /// <returns></returns>
         public Observation CreateProcessedObservation(iNaturalistVerbatimObservation verbatim, bool diffuseIfSupported)
         {
-            if (verbatim == null)
+            if (verbatim == null || verbatim.User.Suspended.GetValueOrDefault(false) == true)
             {
                 return null;
-            }
+            }  
 
             var accessRights = VocabularyValue.Create((int)AccessRightsId.FreeUsage);
             var obs = new Observation
@@ -88,7 +88,7 @@ namespace SOS.Harvest.Processors.iNaturalist
             obs.DatasetName = "iNaturalist";
             obs.Modified = verbatim.Updated_at != null ? verbatim.Updated_at!.Value.DateTime.ToUniversalTime() : verbatim.Created_at!.Value.DateTime.ToUniversalTime();
             obs.InstitutionCode = _institutionCodeVocabularyValue;
-            obs.OwnerInstitutionCode = "iNaturalist";            
+            obs.OwnerInstitutionCode = "iNaturalist";
 
             // Event
             obs.Event = CreateProcessedEvent(verbatim);
@@ -151,15 +151,15 @@ namespace SOS.Harvest.Processors.iNaturalist
 
             return verbatim.Photos.Select(photo => new Multimedia
             {
-                Identifier = photo.Url,                
+                Identifier = photo.Url,
                 Type = "StillImage",
                 Format = "image/jpeg",
                 Created = verbatim.Time_observed_at != null ? verbatim.Time_observed_at!.Value.DateTime.ToUniversalTime().ToString() :
                     verbatim.Observed_on != null ? verbatim.Observed_on!.Value.DateTime.ToUniversalTime().ToString() :
                     verbatim.Created_at!.Value.DateTime.ToUniversalTime().ToString(),
-                Creator = verbatim.User.Name ?? verbatim.User.Login,
+                Creator = GetUsername(verbatim.User),
                 License = photo.License_code ?? photo.Attribution,
-                RightsHolder = verbatim.User.Name ?? verbatim.User.Login
+                RightsHolder = GetUsername(verbatim.User)
             }).ToList();
         }
 
@@ -174,14 +174,23 @@ namespace SOS.Harvest.Processors.iNaturalist
         private Lib.Models.Processed.Observation.Identification CreateProcessedIdentification(iNaturalistVerbatimObservation verbatim)
         {
             var processedIdentification = new Lib.Models.Processed.Observation.Identification();                        
-            if (verbatim.Identifications_count > 0 && verbatim.Identifications_most_agree == true && verbatim.Non_owner_ids != null && verbatim.Non_owner_ids.Any())
-            {
-                processedIdentification.IdentifiedBy = string.Join(", ", verbatim.Non_owner_ids.Select(m => m.User.Name != null ?  m.User.Name.Clean() : m.User.Login.Clean()));
-                processedIdentification.DateIdentified = verbatim.Non_owner_ids.Last().Created_at!.Value.DateTime.ToUniversalTime().ToString();
+            if (verbatim.Identifications_count > 0 && verbatim.Identifications_most_agree == true && verbatim.Identifications != null && verbatim.Identifications.Any())
+            {                
+                var validIdentifications = verbatim.Identifications.Where(m => m.User.Suspended.GetValueOrDefault() == false);
+                if (validIdentifications.Any())
+                {
+                    processedIdentification.IdentifiedBy = string.Join(", ", validIdentifications.Select(m => GetUsername(m.User)));
+                    processedIdentification.DateIdentified = validIdentifications.Last().Created_at!.Value.DateTime.ToUniversalTime().ToString();
+                }
             }
+            
             //processedIdentification.Verified = verbatim.Quality_grade == "research";
-
             return processedIdentification;
+        }
+
+        private string GetUsername(User user)
+        {
+            return user.Name != null ? user.Name.Clean() : user.Login.Clean();
         }
 
         private bool GetIsValidated(VocabularyValue? validationStatus)
@@ -207,6 +216,14 @@ namespace SOS.Harvest.Processors.iNaturalist
         {
             var processedLocation = new Location(LocationType.Point);
             processedLocation.Locality = verbatim.Place_guess?.Clean();
+            if (verbatim.Taxon_geoprivacy == "obscured")
+            {
+                // The observation is obscured due to threatened taxon
+            }
+            if (verbatim.Obscured.GetValueOrDefault() == true)
+            {
+                // The observation is obscured
+            }
             return processedLocation;
         }
 
@@ -219,15 +236,72 @@ namespace SOS.Harvest.Processors.iNaturalist
             processedOccurrence.ReportedDate = verbatim.Created_at!.Value.DateTime.ToUniversalTime();
             processedOccurrence.OccurrenceRemarks = verbatim.Description?.Clean();
             processedOccurrence.Url = verbatim.Uri;
-            processedOccurrence.RecordedBy = processedOccurrence.ReportedBy = verbatim.User.Name?.Clean() ?? verbatim.User.Login?.Clean();            
+            processedOccurrence.RecordedBy = processedOccurrence.ReportedBy = GetUsername(verbatim.User);
             processedOccurrence.Media = CreateProcessedMultimedia(verbatim);
             processedOccurrence.OccurrenceStatus = VocabularyValue.Create((int)OccurrenceStatusId.Present);
-            processedOccurrence.IsNaturalOccurrence = true;
+            processedOccurrence.IsNaturalOccurrence = !verbatim.Captive.GetValueOrDefault();
             processedOccurrence.IsNeverFoundObservation = false;
             processedOccurrence.IsNotRediscoveredObservation = false;
             processedOccurrence.IsPositiveObservation = true;
-            processedOccurrence.SensitivityCategory = CalculateProtectionLevel(taxon, accessRightsId);
+            processedOccurrence.SensitivityCategory = CalculateProtectionLevel(taxon, accessRightsId);            
+            CreateFromAnnotations(processedOccurrence, verbatim.Annotations);
             return processedOccurrence;
+        }
+
+        private void CreateFromAnnotations(Occurrence occurrence, ICollection<Annotation> annotations)
+        {
+            if (annotations == null || annotations.Count == 0) return;
+            foreach (var annotation in annotations)
+            {
+                if (annotation.User.Suspended.GetValueOrDefault(false) == true) continue;
+                switch (annotation.Controlled_value_id)
+                {
+                    case 2:
+                        occurrence.LifeStage = VocabularyValue.Create((int)LifeStageId.Adult);
+                        break;
+                    case 4:
+                        occurrence.LifeStage = VocabularyValue.Create((int)LifeStageId.Pupa);                        
+                        break;
+                    case 5:
+                        occurrence.LifeStage = VocabularyValue.Create((int)LifeStageId.LarvaOrNymph);
+                        break;
+                    case 6:
+                        occurrence.LifeStage = VocabularyValue.Create((int)LifeStageId.Larvae);
+                        break;
+                    case 7:
+                        occurrence.LifeStage = VocabularyValue.Create((int)LifeStageId.Egg);
+                        break;
+                    case 8:
+                        occurrence.LifeStage = VocabularyValue.Create((int)LifeStageId.Juvenile);
+                        break;
+                    case 16:
+                        occurrence.LifeStage = VocabularyValue.Create((int)LifeStageId.SubAdult);
+                        break;
+                    case 13:
+                        occurrence.LifeStage = VocabularyValue.Create((int)LifeStageId.Flowering);
+                        break;
+                    case 14:
+                        occurrence.LifeStage = VocabularyValue.Create((int)LifeStageId.FruitOrSeedDispersal);
+                        break;
+                    case 15:
+                        occurrence.LifeStage = VocabularyValue.Create((int)LifeStageId.FlowerBud);
+                        break;
+                    case 10:
+                        occurrence.Sex = VocabularyValue.Create((int)SexId.Female);                        
+                        break;
+                    case 11:
+                        occurrence.Sex = VocabularyValue.Create((int)SexId.Male);
+                        break;
+                    case 18:
+                        // alive
+                        break;
+                    case 19:
+                        occurrence.Activity = VocabularyValue.Create((int)ActivityId.FoundDead);
+                        break;                    
+                    default:
+                        break;
+                }
+            }
         }
 
         private Lib.Models.Processed.Observation.Taxon CreateProcessedTaxon(iNaturalistVerbatimObservation verbatim)

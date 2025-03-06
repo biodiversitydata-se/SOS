@@ -351,6 +351,12 @@
         ///     Teleomorph (perfect).
         ///     (Teleomorf)
         /// </summary>
-        TeleomorphPerfect = 57
+        TeleomorphPerfect = 57,
+        
+        NaupliusLarva = 58,
+       
+        Copepodite = 59,
+        
+        SubAdult = 60
     }
 }
