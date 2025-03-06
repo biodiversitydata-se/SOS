@@ -1,5 +1,6 @@
 ﻿using Asp.Versioning;
 using Asp.Versioning.ApiExplorer;
+using Autofac.Core;
 using Hangfire;
 using Hangfire.Mongo;
 using Hangfire.Mongo.Migration.Strategies;
@@ -227,6 +228,17 @@ namespace SOS.Observations.Api
             CultureInfo.DefaultThreadCurrentCulture = culture;
             CultureInfo.DefaultThreadCurrentUICulture = culture;
 
+            if (Settings.CorsAllowAny)
+            {
+                services.AddCors(options =>
+                {
+                    options.AddPolicy(name: "AllowAll", policy => policy
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .AllowAnyOrigin()
+                    );
+                });
+            }
             var applicationInsightsConfiguration = Settings.ApplicationInsightsConfiguration;
             services.AddSingleton(applicationInsightsConfiguration);
 
@@ -643,6 +655,11 @@ namespace SOS.Observations.Api
             ObservationApiConfiguration observationApiConfiguration,
             IProtectedLogRepository protectedLogRepository)
         {
+            if (Settings.CorsAllowAny)
+            {
+                app.UseCors("AllowAll");
+            }
+
             if (observationApiConfiguration.EnableResponseCompression)
             {
                 app.UseResponseCompression();
@@ -651,13 +668,6 @@ namespace SOS.Observations.Api
             if (_isDevelopment)
             {
                 app.UseDeveloperExceptionPage();
-
-                // Allow client calls
-                app.UseCors(cors => cors
-                    .AllowAnyHeader()
-                    .AllowAnyMethod()
-                    .AllowAnyOrigin()
-                );
             }
             else
             {
@@ -745,12 +755,14 @@ namespace SOS.Observations.Api
                         diagnosticContext.Set("Handler", handler);
                     }
 
+                    string originalToken = string.Empty;
                     try
                     {
                         var authHeader = httpContext.Request.Headers["Authorization"].FirstOrDefault();
+                        originalToken = authHeader;
                         if (authHeader != null && authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
                         {
-                            string token = authHeader.Replace("Bearer ", "", StringComparison.OrdinalIgnoreCase);
+                            string token = authHeader.Replace("Bearer ", "", StringComparison.OrdinalIgnoreCase).Trim();
                             var jsonWebTokenHandler = new JsonWebTokenHandler();
                             var jwt = jsonWebTokenHandler.ReadJsonWebToken(token);
                             if (jwt != null)
@@ -765,7 +777,7 @@ namespace SOS.Observations.Api
                     }
                     catch (Exception ex)
                     {
-                        Log.Logger.Error(ex, "Error when deserializing JWT.");
+                        Log.Logger.Error(ex, "Error when deserializing JWT. Token={token}", originalToken);
                     }
                 };
             });

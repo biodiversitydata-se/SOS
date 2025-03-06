@@ -156,18 +156,21 @@ namespace SOS.ElasticSearch.Proxy.Middleware
         /// <returns></returns>
         public async Task Invoke(HttpContext context)
         {
+            string originalBody = null;
+            string body = null;
+
             try
             {
                 var requestStopwatch = Stopwatch.StartNew();
                 var targetUri = BuildTargetUri(context.Request);
 
                 context.Request.EnableBuffering();
-                var body = await new StreamReader(context.Request.Body).ReadToEndAsync();
+                body = await new StreamReader(context.Request.Body).ReadToEndAsync();
                 context.Request.Body.Position = 0;
                 LogHelper.AddHttpContextItems(context);
                 if (_proxyConfiguration.LogOriginalQuery)
                 {
-                    _logger.LogInformation($"Original body: {body}");
+                    _logger.LogInformation("Original body: {@requestBody}", body);
                 }
 
                 context.Items.Add("Requesting-System", "WFS");
@@ -175,10 +178,11 @@ namespace SOS.ElasticSearch.Proxy.Middleware
                 if (targetUri != null)
                 {
                     _logger.LogDebug($"Target: {targetUri.AbsoluteUri}");
+                    originalBody = body;
                     var targetRequestMessage = CreateTargetMessage(context, targetUri, ref body);
                     if (_proxyConfiguration.LogRequest && targetRequestMessage.Content != null)
                     {
-                        _logger.LogInformation($"Request:\r\n{body}");
+                        _logger.LogInformation("Request body: {@requestBody}", body);
                     }
                     var httpClientHandler = new HttpClientHandler();
                     httpClientHandler.ServerCertificateCustomValidationCallback += (sender, certificate, chain, errors) => true;
@@ -192,7 +196,7 @@ namespace SOS.ElasticSearch.Proxy.Middleware
                     if (_proxyConfiguration.LogResponse)
                     {
                         string response = await responseMessage.Content.ReadAsStringAsync();
-                        _logger.LogInformation($"Response:\r\n{response.WithMaxLength(_proxyConfiguration.LogResponseMaxCharacters)}");
+                        _logger.LogInformation("Response body:{@responseBody}", response.WithMaxLength(_proxyConfiguration.LogResponseMaxCharacters));
                     }
                     await responseMessage.Content.CopyToAsync(context.Response.Body);
 
@@ -216,7 +220,7 @@ namespace SOS.ElasticSearch.Proxy.Middleware
                     requestStopwatch.Stop();
                     if (_proxyConfiguration.LogPerformance)
                     {
-                        _logger.LogInformation($"Request time: {requestStopwatch.ElapsedMilliseconds}ms");
+                        _logger.LogInformation("Request time: {@requestTimeMs}ms", requestStopwatch.ElapsedMilliseconds);
                     }
                     return;
                 }
@@ -225,7 +229,7 @@ namespace SOS.ElasticSearch.Proxy.Middleware
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Error in RequestMiddleware.Invoke()");
+                _logger.LogError(e, "Error in RequestMiddleware.Invoke(). Original body: {@originalRequestBody}, New body={@requestBody}", originalBody, body);
                 throw;
             }
         }

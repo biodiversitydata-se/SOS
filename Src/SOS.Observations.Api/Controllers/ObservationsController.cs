@@ -8,6 +8,7 @@ using SOS.Lib.Helpers;
 using SOS.Lib.JsonConverters;
 using SOS.Lib.Models.Cache;
 using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.Search.Enums;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Swagger;
@@ -48,8 +49,7 @@ namespace SOS.Observations.Api.Controllers
         private readonly IInputValidator _inputValidator;
         private readonly ObservationApiConfiguration _observationApiConfiguration;
         private readonly IClassCache<Dictionary<string, CacheEntry<GeoGridResultDto>>> _geogridAggregationCache;
-        private readonly IClassCache<Dictionary<string, CacheEntry<PagedResultDto<TaxonAggregationItemDto>>>> _taxonAggregationInternalCache;
-        private static readonly SHA256 _sha256 = SHA256.Create();        
+        private readonly IClassCache<Dictionary<string, CacheEntry<PagedResultDto<TaxonAggregationItemDto>>>> _taxonAggregationInternalCache;           
         private readonly ILogger<ObservationsController> _logger;
 
         private JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions
@@ -396,10 +396,11 @@ namespace SOS.Observations.Api.Controllers
 
                 string key = keyBuilder.ToString();
                 byte[] keyBytes = Encoding.UTF8.GetBytes(key);
-
-                // Skapa en hash för att få en kortare och unik nyckel
-                byte[] hashBytes = _sha256.ComputeHash(keyBytes);
-                return BitConverter.ToString(hashBytes).Replace("-", "").ToLowerInvariant();
+                using (var sha256 = SHA256.Create())
+                {
+                    byte[] hashBytes = sha256.ComputeHash(keyBytes);
+                    return BitConverter.ToString(hashBytes).Replace("-", "").ToLowerInvariant();
+                }             
             }
             catch (Exception ex)
             {
@@ -1800,6 +1801,8 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
         /// <param name="areaBuffer">Are buffer 0 to 100m.</param>
         /// <param name="onlyAboveMyClearance">If true, get signal only above users clearance.</param>
+        /// <param name="returnHttp403WhenNoPermissions">If true, a http 403 will be returned if user try to serach in area where he/she don't have permission to search. 
+        /// If false, the serach will ignore areas the user don't have permission to search in and false will always be returned for those areas</param>
         /// <returns></returns>
         [HttpPost("Internal/SignalSearch")]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
@@ -1814,7 +1817,8 @@ namespace SOS.Observations.Api.Controllers
             [FromBody] SignalFilterDto filter,
             [FromQuery] bool validateSearchFilter = false, // if false, only mandatory requirements will be validated
             [FromQuery] int areaBuffer = 0,
-            [FromQuery] bool onlyAboveMyClearance = true)
+            [FromQuery] bool onlyAboveMyClearance = true,
+            [FromQuery] bool? returnHttp403WhenNoPermissions = false)
         {
             try
             {
@@ -1831,9 +1835,18 @@ namespace SOS.Observations.Api.Controllers
                 }
 
                 var searchFilter = filter.ToSearchFilterInternal(this.GetUserId(), true);
-                var taxonFound = await _observationManager.SignalSearchInternalAsync(roleId, authorizationApplicationIdentifier, searchFilter, areaBuffer, onlyAboveMyClearance);
+                var taxonFound = await _observationManager.SignalSearchInternalAsync(roleId, authorizationApplicationIdentifier, searchFilter, areaBuffer, onlyAboveMyClearance, returnHttp403WhenNoPermissions ?? false);
 
-                return new OkObjectResult(taxonFound);
+                if (taxonFound.Equals(SignalSerachResult.NoPermissions))
+                {
+                    _logger.LogInformation("User don't have the SightingIndication permission in provided areas");
+                    _logger.LogInformation($"Unauthorized. X-Authorization-Application-Identifier={authorizationApplicationIdentifier ?? "[null]"}");
+                    _logger.LogInformation($"Unauthorized. X-Authorization-Role-Id={roleId?.ToString() ?? "[null]"}");
+                    LogUserInformation();
+                    return new StatusCodeResult((int)HttpStatusCode.Forbidden);
+                }
+
+                return new OkObjectResult(taxonFound.Equals(SignalSerachResult.Yes));
             }
             catch (AuthenticationRequiredException e)
             {
