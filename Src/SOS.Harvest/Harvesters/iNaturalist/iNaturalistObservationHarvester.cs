@@ -201,10 +201,10 @@ namespace SOS.Harvest.Harvesters.iNaturalist
                 DateTimeOffset? latestDate = await GetLatestUpdatedDate(incrementalTempMongoCollection);
                 (bool collectionsExists, int? maxId, int? maxObservationId) = await GetMongoCollectionMaxIdsAsync(_iNaturalistVerbatimRepository, incrementalTempMongoCollection);
                 int documentId = maxId.GetValueOrDefault() + 1;
-                var startHarvestDate = latestDate ?? DateTimeOffset.UtcNow - TimeSpan.FromDays(7);
+                var startHarvestDate = latestDate != null ? latestDate - TimeSpan.FromMinutes(3) : DateTimeOffset.UtcNow - TimeSpan.FromDays(7);
                 _logger.LogInformation("Start harvesting incremental {@dataProvider} observations. maxId={maxId}, maxObservationId={maxObservationId}, startHarvestDate={startHarvestDate}", "iNaturalist", maxId, maxObservationId, startHarvestDate);
                 _logger.LogInformation(GetINatHarvestSettingsInfoString());
-                await foreach (var pageResult in _iNaturalistApiObservationService.GetByIterationAsync(startHarvestDate.DateTime, _iNaturalistServiceConfiguration.HarvestCompleBatchDelayInSeconds))
+                await foreach (var pageResult in _iNaturalistApiObservationService.GetByIterationAsync(startHarvestDate.Value.DateTime, _iNaturalistServiceConfiguration.HarvestCompleBatchDelayInSeconds))
                 {
                     if (pageResult.TotalCount > MaxNrIncrementalObservations)
                     {
