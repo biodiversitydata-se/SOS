@@ -85,7 +85,6 @@ public class HarvestFixture : IHarvestFixture
     {
         return new DwcaConfiguration()
         {
-            UseDwcaCollectionRepository = true,
             ImportPath = Path.GetTempPath(),
             BatchSize = 10000,
             ForceHarvestUnchangedDwca = true

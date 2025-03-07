@@ -12,7 +12,6 @@ using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.DarwinCore;
 using SOS.Lib.Repositories.Processed.Interfaces;
-using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Repositories.Verbatim;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
 
@@ -29,22 +28,6 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
         private readonly DwcaConfiguration _dwcaConfiguration;
 
         protected override async Task<(int publicCount, int protectedCount, int failedCount)> ProcessObservationsAsync(
-            DataProvider dataProvider,
-            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
-            IDictionary<VocabularyId, IDictionary<object, int>> dwcaVocabularyById,
-            JobRunModes mode,
-            IJobCancellationToken cancellationToken)
-        {
-
-            if (_dwcaConfiguration.UseDwcaCollectionRepository)
-            {
-                return await ProcessObservationsUsingCollectionDwcAsync(dataProvider, taxa, dwcaVocabularyById, mode, cancellationToken);
-            }
-
-            return await ProcessObservationsUsingDwcAsync(dataProvider, taxa, dwcaVocabularyById, mode, cancellationToken);
-        }
-
-        private async Task<(int publicCount, int protectedCount, int failedCount)> ProcessObservationsUsingDwcAsync(
             DataProvider dataProvider,
             IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
             IDictionary<VocabularyId, IDictionary<object, int>> dwcaVocabularyById,
@@ -70,33 +53,9 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                 observationFactory,
                 dwcArchiveVerbatimRepository,
                 cancellationToken);
+
+            
         }
-
-        private async Task<(int publicCount, int protectedCount, int failedCount)> ProcessObservationsUsingCollectionDwcAsync(
-            DataProvider dataProvider,
-            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
-            IDictionary<VocabularyId, IDictionary<object, int>> dwcaVocabularyById,
-            JobRunModes mode,
-            IJobCancellationToken cancellationToken)
-        {
-            using var dwcCollectionRepository = new DwcCollectionRepository(dataProvider, _verbatimClient, Logger);
-
-            var observationFactory = await DwcaObservationFactory.CreateAsync(
-                dataProvider,
-                taxa,
-                dwcaVocabularyById,
-                _areaHelper,
-                TimeManager,
-                ProcessConfiguration);
-
-            return await base.ProcessObservationsAsync(
-                dataProvider,
-                mode,
-                observationFactory,
-                dwcCollectionRepository.OccurrenceRepository,
-                cancellationToken);
-        }
-
 
         /// <summary>
         /// Constructor
