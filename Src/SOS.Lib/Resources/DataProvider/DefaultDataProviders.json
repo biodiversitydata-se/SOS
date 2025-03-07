@@ -390,7 +390,7 @@
     "Descriptions": [
       {
         "CultureCode": "en-GB",
-        "Value": "Records of specimen from the six largest herbaria in Sweden are gathered in the Virtual Herbarium, incluidng Herbarium Gothenburg (GB), Botanical Museum Lund (LD), Biological Museum Oskarshamn (OHN), Swedish Museum of Natural History Stockholm (S), Herbarium Umeå (UME), Museum of Evolution Uppsala (UPS)."
+        "Value": "Records of specimen from the six largest herbaria in Sweden are gathered in the Virtual Herbarium, including Herbarium Gothenburg (GB), Botanical Museum Lund (LD), Biological Museum Oskarshamn (OHN), Swedish Museum of Natural History Stockholm (S), Herbarium Umeå (UME), Museum of Evolution Uppsala (UPS)."
       },
       {
         "CultureCode": "sv-SE",
@@ -402,7 +402,7 @@
     "Id": 7,
     "Identifier": "VirtualHerbarium",
     "IncludeInHealthCheck": true,
-    "IncludeInScheduledHarvest": true,
+    "IncludeInScheduledHarvest": false,
     "IncludeInSearchByDefault": true,
     "IsActive": true,
     "Names": [
