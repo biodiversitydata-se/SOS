@@ -314,7 +314,7 @@ namespace SOS.Lib.Repositories.Processed
                                 .NumberVal(n => n.BirdNestActivityId, IndexSetting.SearchOnly, NumberType.Integer)
                                 .NumberVal(n => n.Length, IndexSetting.SearchOnly, NumberType.Integer)
                                 .NumberVal(n => n.Weight, IndexSetting.SearchOnly, NumberType.Integer)
-                                .NumberVal(n => n.CatalogId, IndexSetting.SearchOnly, NumberType.Integer)
+                                .NumberVal(n => n.CatalogId, IndexSetting.SearchSortAggregate, NumberType.Integer)
                                 .NumberVal(n => n.OrganismQuantityInt, IndexSetting.SearchSortAggregate, NumberType.Integer)
                                 .BooleanVal(b => b.IsNaturalOccurrence, IndexSetting.SearchOnly)
                                 .BooleanVal(b => b.IsNeverFoundObservation, IndexSetting.SearchOnly)
