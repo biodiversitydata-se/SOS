@@ -1221,10 +1221,9 @@ namespace SOS.Lib.Repositories.Processed
                 .Sort(sort => sortDescriptor)
             );
 
-            searchResponse.ThrowIfInvalid();
+          searchResponse.ThrowIfInvalid();
 
             var totalCount = searchResponse.HitsMetadata.Total.Value;
-
             var includeRealCount = totalCount >= ElasticSearchMaxRecords;
 
             if (filter is SearchFilterInternal internalFilter)

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Nest;
+using OfficeOpenXml.Export.ToCollection;
 using SOS.Lib.Cache;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Enums;
@@ -1551,6 +1552,10 @@ namespace SOS.Observations.Api.Controllers
                     }
                 }
                 var result = await _observationManager.GetChunkAsync(roleId, authorizationApplicationIdentifier, filter.ToSearchFilterInternal(this.GetUserId(), translationCultureCode, sortBy, sortOrder), skip, take);
+                if (result == null)
+                {
+                    throw new Exception("Something went wrong when your query was executed. Make sure your filter is correct.");
+                }
                 GeoPagedResultDto<dynamic> dto = result.ToGeoPagedResultDto(result.Records, outputFormat);
                 this.LogObservationCount(dto?.Records?.Count() ?? 0);
                 return new OkObjectResult(dto);
