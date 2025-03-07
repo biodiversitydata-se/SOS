@@ -174,7 +174,7 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <param name="onlyAboveMyClearance"></param>
         /// <param name="validateGeographic"></param>
         /// <returns></returns>
-        Task<SignalSerachResult> SignalSearchInternalAsync(
+        Task<SignalSearchResult> SignalSearchInternalAsync(
             int? roleId,
             string authorizationApplicationIdentifier,
             SearchFilter filter,

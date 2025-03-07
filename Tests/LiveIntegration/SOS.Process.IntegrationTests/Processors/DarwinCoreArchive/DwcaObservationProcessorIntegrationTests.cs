@@ -159,8 +159,7 @@ namespace SOS.Process.LiveIntegrationTests.Processors.DarwinCoreArchive
             var dwcaConfiguration = new DwcaConfiguration()
             {
                 BatchSize = 5000,
-                ImportPath = @"C:\Temp",
-                UseDwcaCollectionRepository = true
+                ImportPath = @"C:\Temp"
             };
 
             return new DwcaObservationProcessor(

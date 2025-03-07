@@ -102,7 +102,6 @@ public static class Settings
             logger.LogInformation("replaced SECRET_PLACEHOLDER in BlobStorageConfiguration.Key with the value in BlobStorageKey");
         }
 
-
         // CryptoConfiguration
         CryptoConfiguration = GetConfigSection<CryptoConfiguration>("CryptoConfiguration", configuration, logger);
         Password = GetConfigValueString("Password", configuration, logger, sensitiveSetting: true, required: false);

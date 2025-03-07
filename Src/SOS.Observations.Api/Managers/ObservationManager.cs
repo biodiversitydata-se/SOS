@@ -24,6 +24,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using OfficeOpenXml;
 using SOS.Lib.Models.Search.Enums;
+using Nest;
 
 namespace SOS.Observations.Api.Managers
 {
@@ -565,7 +566,7 @@ namespace SOS.Observations.Api.Managers
         }
 
         /// <inheritdoc />
-        public async Task<SignalSerachResult> SignalSearchInternalAsync(
+        public async Task<SignalSearchResult> SignalSearchInternalAsync(
             int? roleId,
             string authorizationApplicationIdentifier,
             SearchFilter filter,
@@ -588,7 +589,9 @@ namespace SOS.Observations.Api.Managers
                 {
                     throw new AuthenticationRequiredException("User don't have the SightingIndication permission that is required");
                 }
-                if (validateGeographic && filter.Location != null) { 
+                bool hasPartialAccess = false;
+                if (validateGeographic && filter.Location != null) 
+                {                    
                     if (filter.Location.AreaGeographic != null)
                     {
                         var areaGeographic = filter.Location.AreaGeographic;
@@ -615,7 +618,7 @@ namespace SOS.Observations.Api.Managers
                         }
                         if (!hasAccess)
                         {
-                            return SignalSerachResult.NoPermissions;
+                            return SignalSearchResult.NoPermissions;
                         }
 
                         if (areaGeographic.GeometryFilter?.Geometries?.Any() ?? false)
@@ -626,7 +629,7 @@ namespace SOS.Observations.Api.Managers
                                 var geometry = geoShape.ToGeometry();
                                 if (!filter.ExtendedAuthorization.ExtendedAreas.Exists(ea => ea.GeographicAreas?.GeometryFilter?.Geometries?.Exists(g => g.ToGeometry().Intersects(geometry)) ?? false))
                                 {
-                                    return SignalSerachResult.NoPermissions;
+                                    return SignalSearchResult.NoPermissions;
                                 }
                             }
                         }
@@ -634,27 +637,51 @@ namespace SOS.Observations.Api.Managers
                     if ((filter.Location.Geometries?.Geometries?.Count() ?? 0) != 0)
                     {
                         // Check if user has access to provided geometries
+                        var authorizedGeometries = filter.ExtendedAuthorization.ExtendedAreas
+                            .SelectMany(ea => ea.GeographicAreas?.GeometryFilter?.Geometries ?? new List<IGeoShape>())
+                            .Select(g => g.ToGeometry())
+                            .ToList();
+                        bool allOutside = true;
                         foreach (var geoShape in filter.Location.Geometries.Geometries)
                         {
                             var geometry = geoShape.ToGeometry();
-                            if (!filter.ExtendedAuthorization.ExtendedAreas.Exists(ea => ea.GeographicAreas?.GeometryFilter?.Geometries?.Exists(g => g.ToGeometry().Intersects(geometry)) ?? false))
+                            var filterGeometryCheck = CheckGeometryPermission(geometry, authorizedGeometries);
+                            if (filterGeometryCheck == FilterGeometryCheck.IsInside)
                             {
-                                return SignalSerachResult.NoPermissions;
+                                allOutside = false;
+                            }
+                            else if (filterGeometryCheck == FilterGeometryCheck.IsIntersecting)
+                            {
+                                hasPartialAccess = true;
+                                allOutside = false;
                             }
                         }
+                        if (allOutside)
+                            return SignalSearchResult.NoPermissions;
                     }
                     if (filter.Location.Geometries?.BoundingBox != null)
                     {
-                        var bbGeometry = filter.Location.Geometries.BoundingBox.ToGeoemtry();
-                        if (!filter.ExtendedAuthorization.ExtendedAreas.Exists(ea => ea.GeographicAreas?.GeometryFilter?.Geometries?.Exists(g => g.ToGeometry().Intersects(bbGeometry)) ?? false))
+                        var authorizedGeometries = filter.ExtendedAuthorization.ExtendedAreas
+                            .SelectMany(ea => ea.GeographicAreas?.GeometryFilter?.Geometries ?? new List<IGeoShape>())
+                            .Select(g => g.ToGeometry())
+                            .ToList();
+                        var bboxGeometry = filter.Location.Geometries.BoundingBox.ToGeometry();
+                        var filterGeometryCheck = CheckGeometryPermission(bboxGeometry, authorizedGeometries);
+                        if (filterGeometryCheck == FilterGeometryCheck.IsOutside)
                         {
-                            return SignalSerachResult.NoPermissions;
+                            return SignalSearchResult.NoPermissions;
+                        }
+                        else if (filterGeometryCheck == FilterGeometryCheck.IsIntersecting)
+                        {
+                            hasPartialAccess = true;
                         }
                     }
                 }
 
                 var result = await _processedObservationRepository.SignalSearchInternalAsync(filter, onlyAboveMyClearance);
-                return result ? SignalSerachResult.Yes : SignalSerachResult.No;
+                if (validateGeographic && result == false && hasPartialAccess)
+                    return SignalSearchResult.PartialNoPermissions;
+                return result ? SignalSearchResult.Yes : SignalSearchResult.No;
             }
             catch (TimeoutException e)
             {
@@ -666,6 +693,20 @@ namespace SOS.Observations.Api.Managers
                 _logger.LogError(e, "Signal search failed");
                 throw;
             }
+        }
+
+        private FilterGeometryCheck CheckGeometryPermission(NetTopologySuite.Geometries.Geometry filterGeometry, List<NetTopologySuite.Geometries.Geometry> authorizedGeometries)
+        {
+            if (authorizedGeometries.Any(authGeo => authGeo.Contains(filterGeometry))) return FilterGeometryCheck.IsInside;
+            if (!authorizedGeometries.Any(authGeo => authGeo.Intersects(filterGeometry))) return FilterGeometryCheck.IsOutside;
+            return FilterGeometryCheck.IsIntersecting;
+        }
+
+        private enum FilterGeometryCheck
+        {
+            IsInside,
+            IsOutside,
+            IsIntersecting,
         }
 
         /// <inheritdoc />

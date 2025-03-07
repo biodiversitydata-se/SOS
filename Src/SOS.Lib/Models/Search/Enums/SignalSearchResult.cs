@@ -1,9 +1,10 @@
 ﻿namespace SOS.Lib.Models.Search.Enums
 {
-    public enum SignalSerachResult
+    public enum SignalSearchResult
     {
 
         NoPermissions = 0, 
+        PartialNoPermissions,
         No,
         Yes
     }
