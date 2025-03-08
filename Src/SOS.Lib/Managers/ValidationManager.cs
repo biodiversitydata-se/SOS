@@ -111,6 +111,15 @@ namespace SOS.Lib.Managers
                 AddError(errors, ObservationDefect.ObservationDefectType.DateError, $"Event StartDate '{observation.Event.StartDate}' is greater than EndDate '{observation.Event.EndDate}'");
             }
 
+            if (string.IsNullOrEmpty(observation.Occurrence.RecordedBy))
+            {
+                AddError(errors, ObservationDefect.ObservationDefectType.RecordedByError, "RecordedBy is null or empty");
+            }
+            else if (observation.Occurrence.RecordedBy.Equals("[SuspendedUser]", StringComparison.InvariantCultureIgnoreCase))
+            {
+                AddError(errors, ObservationDefect.ObservationDefectType.RecordedByError, "RecordedBy user is suspended");
+            }
+
             if ((observation.Taxon?.Id ?? -1) == -1)
             {
                 string taxonError = null;

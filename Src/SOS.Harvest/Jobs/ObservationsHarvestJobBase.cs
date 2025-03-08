@@ -201,7 +201,7 @@ namespace SOS.Harvest.Jobs
 
                 _logger.LogInformation("Start harvest observations complete with delay for {@dataProvider}", dataProvider.Identifier);
                 var harvester = _observationHarvesterManager.GetHarvester(dataProvider.Type);
-                var harvestInfo = await harvester.HarvestCompleteObservationsWithDelayAsync(dataProvider, cancellationToken);
+                var harvestInfo = await harvester.HarvestAllObservationsSlowlyAsync(dataProvider, cancellationToken);
                 _logger.LogInformation("Finish harvest observations complete with delay for {@dataProvider}. Success: {@success}", dataProvider.Identifier, harvestInfo.Status == RunStatus.Success);
                 return harvestInfo.Status == RunStatus.Success ? harvestInfo.Count : -1;
             }

@@ -263,7 +263,7 @@ namespace SOS.Harvest.Harvesters.iNaturalist
             return harvestInfo;
         }
 
-        public async Task<HarvestInfo> HarvestCompleteObservationsWithDelayAsync(DataProvider provider, IJobCancellationToken cancellationToken)
+        public async Task<HarvestInfo> HarvestAllObservationsSlowlyAsync(DataProvider provider, IJobCancellationToken cancellationToken)
         {
             var harvestInfo = new HarvestInfo("iNaturalist", DateTime.Now);
 
@@ -280,14 +280,14 @@ namespace SOS.Harvest.Harvesters.iNaturalist
                     // Continue harvest from last id
                     idAbove = maxObservationId ?? idAbove;
                     documentId = maxId.GetValueOrDefault() + 1;
-                    _logger.LogInformation("Continue harvesting complete {@dataProvider} observations from id={idAbove}, documentId={documentId}", "iNaturalist", idAbove, documentId);
+                    _logger.LogInformation("Continue harvesting all observations slowly for {@dataProvider} from id={idAbove}, documentId={documentId}", "iNaturalist", idAbove, documentId);
                 }
                 else
                 {                    
                     await _iNaturalistVerbatimRepository.AddCollectionAsync(completeTempMongoCollection);
                 }
 
-                _logger.LogInformation("Start harvesting complete {@dataProvider} observations", "iNaturalist");
+                _logger.LogInformation("Start harvesting all observations slowly for {@dataProvider}", "iNaturalist");
                 _logger.LogInformation(GetINatHarvestSettingsInfoString());
                 var nrSightingsHarvested = 0;                
                 await foreach (var pageResult in _iNaturalistApiObservationService.GetByIterationAsync(idAbove, _iNaturalistServiceConfiguration.HarvestCompleBatchDelayInSeconds))
@@ -301,13 +301,13 @@ namespace SOS.Harvest.Harvesters.iNaturalist
 
                     if (nrSightingsHarvested % 10000 == 0)
                     {
-                        _logger.LogInformation("{nrSightingsHarvested} complete {@dataProvider} observations harvested. Total count={totalCount}, maxObsId={maxObsId}", nrSightingsHarvested, "iNaturalist", pageResult.TotalCount,pageResult.Observations.Last().ObservationId);
+                        _logger.LogInformation("{nrSightingsHarvested} observations harvested for {@dataProvider} (harvest all slowly). Total count={totalCount}, maxObsId={maxObsId}", nrSightingsHarvested, "iNaturalist", pageResult.TotalCount,pageResult.Observations.Last().ObservationId);
                     }
 
                     cancellationToken?.ThrowIfCancellationRequested();
                 }
 
-                _logger.LogInformation("Finished harvesting complete {@dataProvider} observations", "iNaturalist");
+                _logger.LogInformation("Finished harvesting all observations slowly for {@dataProvider}", "iNaturalist");
 
                 // Update harvest info
                 harvestInfo.End = DateTime.Now;                
@@ -316,28 +316,28 @@ namespace SOS.Harvest.Harvesters.iNaturalist
                 if (tempDocCount >= currentDocCount * 0.8)
                 {
                     harvestInfo.Status = RunStatus.Success;                    
-                    _logger.LogInformation("Start permanentize temp collection for complete {@dataProvider} verbatim. Temp name={incrementalTempCollectionName}, New name={incrementalCollectionName}", "iNaturalist", completeTempMongoCollection, completeMongoCollection);
+                    _logger.LogInformation("Start permanentize temp collection for {@dataProvider} (harvest all slowly). Temp name={incrementalTempCollectionName}, New name={incrementalCollectionName}", "iNaturalist", completeTempMongoCollection.CollectionNamespace, completeMongoCollection.CollectionNamespace);
                     await _iNaturalistVerbatimRepository.PermanentizeCollectionAsync(completeTempMongoCollection, completeMongoCollection);
-                    _logger.LogInformation("Finish permanentize temp collection for complete {@dataProvider} verbatim", "iNaturalist");
+                    _logger.LogInformation("Finish permanentize temp collection for {@dataProvider} (harvest all slowly)", "iNaturalist");
                 }
                 else
                 {
                     harvestInfo.Status = RunStatus.Failed;
-                    _logger.LogError("{@dataProvider}: Previous complete harvested observation count is: {@currentDocCount}. Now only {@tempDocCount} observations where harvested.", "iNaturalist", currentDocCount, tempDocCount);
+                    _logger.LogError("{@dataProvider}: Previous harvest all slowly harvested observation count is: {@currentDocCount}. Now only {@tempDocCount} observations where harvested.", "iNaturalist", currentDocCount, tempDocCount);
                 }
             }
             catch (JobAbortedException)
             {
-                _logger.LogInformation("{@dataProvider} complete harvest was cancelled.", "iNaturalist");
+                _logger.LogInformation("{@dataProvider} harvest all slowly was cancelled.", "iNaturalist");
                 harvestInfo.Status = RunStatus.Canceled;
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Failed complete {@dataProvider} harvest", "iNaturalist");
+                _logger.LogError(e, "Failed harvest all slowly for {@dataProvider}", "iNaturalist");
                 harvestInfo.Status = RunStatus.Failed;
             }
 
-            _logger.LogInformation("Finish complete harvesting observations for {@dataProvider} data provider. Status={@harvestStatus}", "iNaturalist", harvestInfo.Status);
+            _logger.LogInformation("Finish harvest all slowly harvesting observations for {@dataProvider} data provider. Status={@harvestStatus}", "iNaturalist", harvestInfo.Status);
             return harvestInfo;
         }        
 

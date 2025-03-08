@@ -59,7 +59,12 @@
             /// <summary>
             /// Identifier error
             /// </summary>
-            IdentifierError
+            IdentifierError,
+
+            /// <summary>
+            /// RecordedBy error
+            /// </summary>
+            RecordedByError
         }
 
         /// <summary>

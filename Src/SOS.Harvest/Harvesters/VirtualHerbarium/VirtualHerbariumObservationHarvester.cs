@@ -40,7 +40,7 @@ namespace SOS.Harvest.Harvesters.VirtualHerbarium
                                                         nameof(virtualHerbariumServiceConfiguration));
         }
 
-        public Task<HarvestInfo> HarvestCompleteObservationsWithDelayAsync(DataProvider provider, IJobCancellationToken cancellationToken)
+        public Task<HarvestInfo> HarvestAllObservationsSlowlyAsync(DataProvider provider, IJobCancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }

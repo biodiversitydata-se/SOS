@@ -69,7 +69,7 @@ namespace SOS.Harvest.Processors.iNaturalist
         /// <returns></returns>
         public Observation CreateProcessedObservation(iNaturalistVerbatimObservation verbatim, bool diffuseIfSupported)
         {
-            if (verbatim == null || verbatim.User.Suspended.GetValueOrDefault(false) == true)
+            if (verbatim == null)
             {
                 return null;
             }  
@@ -236,7 +236,14 @@ namespace SOS.Harvest.Processors.iNaturalist
             processedOccurrence.ReportedDate = verbatim.Created_at!.Value.DateTime.ToUniversalTime();
             processedOccurrence.OccurrenceRemarks = verbatim.Description?.Clean();
             processedOccurrence.Url = verbatim.Uri;
-            processedOccurrence.RecordedBy = processedOccurrence.ReportedBy = GetUsername(verbatim.User);
+            if (verbatim.User.Suspended.GetValueOrDefault(false) == true)
+            {
+                processedOccurrence.RecordedBy = processedOccurrence.ReportedBy = "[SuspendedUser]";
+            }
+            else
+            {
+                processedOccurrence.RecordedBy = processedOccurrence.ReportedBy = GetUsername(verbatim.User);
+            }
             processedOccurrence.Media = CreateProcessedMultimedia(verbatim);
             processedOccurrence.OccurrenceStatus = VocabularyValue.Create((int)OccurrenceStatusId.Present);
             processedOccurrence.IsNaturalOccurrence = !verbatim.Captive.GetValueOrDefault();
