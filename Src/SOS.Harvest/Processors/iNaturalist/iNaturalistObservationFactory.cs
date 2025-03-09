@@ -190,7 +190,7 @@ namespace SOS.Harvest.Processors.iNaturalist
 
         private string GetUsername(User user)
         {
-            return user.Name != null ? user.Name.Clean() : user.Login.Clean();
+            return !string.IsNullOrEmpty(user.Name) ? user.Name.Clean() : user.Login.Clean();
         }
 
         private bool GetIsValidated(VocabularyValue? validationStatus)
