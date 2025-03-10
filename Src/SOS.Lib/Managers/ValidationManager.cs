@@ -111,11 +111,12 @@ namespace SOS.Lib.Managers
                 AddError(errors, ObservationDefect.ObservationDefectType.DateError, $"Event StartDate '{observation.Event.StartDate}' is greater than EndDate '{observation.Event.EndDate}'");
             }
 
-            if (string.IsNullOrEmpty(observation.Occurrence.RecordedBy))
-            {
-                AddError(errors, ObservationDefect.ObservationDefectType.RecordedByError, "RecordedBy is null or empty");
-            }
-            else if (observation.Occurrence.RecordedBy.Equals("[SuspendedUser]", StringComparison.InvariantCultureIgnoreCase))
+            // Many observations in MVM, VirtualHerbarium, SHARK, ObservationDatabase doesn't have any RecordedBy.
+            //if (string.IsNullOrEmpty(observation.Occurrence.RecordedBy))
+            //{
+            //    AddError(errors, ObservationDefect.ObservationDefectType.RecordedByError, "RecordedBy is null or empty");
+            //}
+            if (!string.IsNullOrEmpty(observation.Occurrence.RecordedBy) && observation.Occurrence.RecordedBy.Equals("[SuspendedUser]", StringComparison.InvariantCultureIgnoreCase))
             {
                 AddError(errors, ObservationDefect.ObservationDefectType.RecordedByError, "RecordedBy user is suspended");
             }
