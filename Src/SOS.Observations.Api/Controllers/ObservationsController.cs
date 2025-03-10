@@ -2042,7 +2042,11 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
-                var validationResult = string.IsNullOrEmpty(sortBy) ? Result.Success() : (await _inputValidator.ValidateSortFieldsAsync(new[] { sortBy }));
+                var validationResult = sortBy switch
+                {
+                    "SumObservationCount" or "ObservationCount" or "SumProvinceCount" or "ProvinceCount" => Result.Success(),
+                    _ => Result.Failure($"{sortBy} is not a allowed sort field")
+                };
                 if (validationResult.IsFailure) return BadRequest(validationResult.Error);
 
                 LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
