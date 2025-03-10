@@ -1811,8 +1811,10 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
         /// <param name="areaBuffer">Are buffer 0 to 100m.</param>
         /// <param name="onlyAboveMyClearance">If true, get signal only above users clearance.</param>
-        /// <param name="returnHttp403WhenNoPermissions">If true, a http 403 will be returned if user try to serach in area where he/she don't have permission to search. 
-        /// If false, the serach will ignore areas the user don't have permission to search in and false will always be returned for those areas</param>
+        /// <param name="returnHttp403Or409WhenNoPermissions">
+        /// If true, a http 403 will be returned if the user tries to search in areas where he/she don't have permission to search.
+        /// Http 409 will be returned if the user tries to search in areas where he/she have partial permission to search and the signal search returns false.        
+        /// </param>
         /// <returns></returns>
         [HttpPost("Internal/SignalSearch")]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
@@ -1828,7 +1830,7 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] bool validateSearchFilter = false, // if false, only mandatory requirements will be validated
             [FromQuery] int areaBuffer = 0,
             [FromQuery] bool onlyAboveMyClearance = true,
-            [FromQuery] bool? returnHttp403WhenNoPermissions = false)
+            [FromQuery] bool? returnHttp403Or409WhenNoPermissions = false)
         {
             try
             {
@@ -1845,18 +1847,22 @@ namespace SOS.Observations.Api.Controllers
                 }
 
                 var searchFilter = filter.ToSearchFilterInternal(this.GetUserId(), true);
-                var taxonFound = await _observationManager.SignalSearchInternalAsync(roleId, authorizationApplicationIdentifier, searchFilter, areaBuffer, onlyAboveMyClearance, returnHttp403WhenNoPermissions ?? false);
+                var taxonFound = await _observationManager.SignalSearchInternalAsync(roleId, authorizationApplicationIdentifier, searchFilter, areaBuffer, onlyAboveMyClearance, returnHttp403Or409WhenNoPermissions ?? false);
 
-                if (taxonFound.Equals(SignalSerachResult.NoPermissions))
+                if (taxonFound == SignalSearchResult.NoPermissions || taxonFound == SignalSearchResult.PartialNoPermissions)
                 {
                     _logger.LogInformation("User don't have the SightingIndication permission in provided areas");
                     _logger.LogInformation($"Unauthorized. X-Authorization-Application-Identifier={authorizationApplicationIdentifier ?? "[null]"}");
                     _logger.LogInformation($"Unauthorized. X-Authorization-Role-Id={roleId?.ToString() ?? "[null]"}");
                     LogUserInformation();
-                    return new StatusCodeResult((int)HttpStatusCode.Forbidden);
+
+                    if (taxonFound == SignalSearchResult.NoPermissions)
+                        return new StatusCodeResult((int)HttpStatusCode.Forbidden);
+                    else if (taxonFound == SignalSearchResult.PartialNoPermissions)
+                        return new StatusCodeResult((int)HttpStatusCode.Conflict);
                 }
 
-                return new OkObjectResult(taxonFound.Equals(SignalSerachResult.Yes));
+                return new OkObjectResult(taxonFound.Equals(SignalSearchResult.Yes));
             }
             catch (AuthenticationRequiredException e)
             {

@@ -61,12 +61,17 @@
             WebMercatorX: 1954632.89,
             WebMercatorY: 8420675.02);
 
+        public static (double TopLeftLatitude, double TopLeftLongitude, double BottomRightLatitude, double BottomRightLongitude) TierpCenterBbox = (
+            TopLeftLatitude: 60.3433 + 0.009,
+            TopLeftLongitude: 17.5151 - 0.018,
+            BottomRightLatitude: 60.3433 - 0.009,
+            BottomRightLongitude: 17.5151 + 0.018);
+
         public static (double TopLeftLatitude, double TopLeftLongitude, double BottomRightLatitude, double BottomRightLongitude) TierpMunicipalityBbox = (
             TopLeftLatitude: 60.5,
             TopLeftLongitude: 17.1,
             BottomRightLatitude: 60.1,
             BottomRightLongitude: 17.9);
-
 
         public static (double Latitude, double Longitude, double WebMercatorX, double WebMercatorY) JönköpingMunicipality = (
             Latitude: 57.7826,
