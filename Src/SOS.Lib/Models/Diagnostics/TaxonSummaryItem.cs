@@ -20,8 +20,7 @@ public class TaxonSummaryItem
     public bool ProtectedByLaw { get; set; }   
     public string RedlistCategory { get; set; }
     public string RedlistCategoryDerived { get; set; }
-    public int SensitivityCategory { get; set; }
-    public int SortOrder { get; set; }
+    public int SensitivityCategory { get; set; }    
     public SpeciesGroup SpeciesGroup { get; set; }
     public string SwedishOccurrence { get; set; }
     public string SwedishHistory { get; set; }    
