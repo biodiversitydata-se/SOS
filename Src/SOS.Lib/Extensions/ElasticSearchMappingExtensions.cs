@@ -1,7 +1,6 @@
 ﻿using Elastic.Clients.Elasticsearch.Mapping;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
-using SOS.Lib.Models.Verbatim.Artportalen;
 using System;
 using System.Linq;
 using System.Linq.Expressions;
@@ -342,6 +341,15 @@ namespace SOS.Lib.Extensions
                 .DateVal(d => d.StartDate, IndexSetting.None)
                 .DateVal(d => d.EndDate, IndexSetting.None)
                 .BooleanVal(b => b.IsPublic, IndexSetting.None)
+                .Object(o => o.ProjectParameters, p => p.Properties(p => p
+                    .KeywordLowerCase(kwlc => kwlc.ProjectParameters.First().DataType, IndexSetting.None)
+                    .KeywordLowerCase(kwlc => kwlc.ProjectParameters.First().Name, IndexSetting.None)
+                    .KeywordLowerCase(kwlc => kwlc.ProjectParameters.First().Unit, IndexSetting.None)
+                    .KeywordLowerCase(kwlc => kwlc.ProjectParameters.First().Description, IndexSetting.None)
+                    .KeywordLowerCase(kwlc => kwlc.ProjectParameters.First().Value, IndexSetting.None)
+                )
+                       
+                 ))
                 .Object<ProjectParameter>(n => n
                     .AutoMap()
                     .Name(nm => nm.ProjectParameters)
@@ -353,6 +361,21 @@ namespace SOS.Lib.Extensions
                         .KeywordLowerCase(kwlc => kwlc.Value, IndexSetting.None)
                     )
                 );
+        }
+
+        /// <summary>
+        /// Get mapping for project parameters
+        /// </summary>
+        /// <param name="propertiesDescriptor"></param>
+        /// <returns></returns>
+        public static PropertiesDescriptor<ProjectParameter> GetMapping(this PropertiesDescriptor<ProjectParameter> propertiesDescriptor)
+        {
+            return propertiesDescriptor
+                .KeywordLowerCase(kwlc => kwlc.DataType, IndexSetting.None)
+                .KeywordLowerCase(kwlc => kwlc.Name, IndexSetting.None)
+                .KeywordLowerCase(kwlc => kwlc.Unit, IndexSetting.None)
+                .KeywordLowerCase(kwlc => kwlc.Description, IndexSetting.None)
+                .KeywordLowerCase(kwlc => kwlc.Value, IndexSetting.None);
         }
 
         /// <summary>

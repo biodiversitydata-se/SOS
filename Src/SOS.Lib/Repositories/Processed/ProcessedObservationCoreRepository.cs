@@ -2,7 +2,6 @@
 using CSharpFunctionalExtensions;
 using Elastic.Clients.Elasticsearch.Cluster;
 using Elastic.Clients.Elasticsearch.Mapping;
-using Elastic.Clients.Elasticsearch.Aggregations;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Shared;
@@ -27,7 +26,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
-using System.Collections.ObjectModel;
 using Elastic.Clients.Elasticsearch;
 
 namespace SOS.Lib.Repositories.Processed
@@ -80,6 +78,34 @@ namespace SOS.Lib.Repositories.Processed
                         .BooleanVal(b => b.IsGeneralized, IndexSetting.SearchOnly)
                         .BooleanVal(b => b.Protected, IndexSetting.None)
                         .BooleanVal(b => b.Sensitive, IndexSetting.SearchOnly)
+                        .Nested(c => c.MeasurementOrFacts, c => c.Properties(ps => ps
+                            .KeywordLowerCase(kwlc => kwlc.MeasurementAccuracy, IndexSetting.None)
+                            .KeywordLowerCase(kwlc => kwlc.MeasurementDeterminedBy, IndexSetting.None)
+                            .KeywordLowerCase(kwlc => kwlc.MeasurementDeterminedDate, IndexSetting.None)
+                            .KeywordLowerCase(kwlc => kwlc.MeasurementID, IndexSetting.None)
+                            .KeywordLowerCase(kwlc => kwlc.MeasurementMethod, IndexSetting.None)
+                            .KeywordLowerCase(kwlc => kwlc.MeasurementRemarks, IndexSetting.None)
+                            .KeywordLowerCase(kwlc => kwlc.MeasurementType, IndexSetting.None)
+                            .KeywordLowerCase(kwlc => kwlc.MeasurementTypeID, IndexSetting.None)
+                            .KeywordLowerCase(kwlc => kwlc.MeasurementUnit, IndexSetting.None)
+                            .KeywordLowerCase(kwlc => kwlc.MeasurementUnitID, IndexSetting.None)
+                            .KeywordLowerCase(kwlc => kwlc.MeasurementValue, IndexSetting.None)
+                            .KeywordLowerCase(kwlc => kwlc.MeasurementValueID, IndexSetting.None)
+                            .KeywordLowerCase(kwlc => kwlc.OccurrenceID, IndexSetting.None)
+                        ))
+                        .Object(c => c.ProjectsSummary, c => c.Properties(ps => ps
+                            .NumberVal(n => n.ProjectsSummary.Project1Id, IndexSetting.SearchOnly, NumberType.Integer) // WFS
+                            .NumberVal(n => n.ProjectsSummary.Project2Id, IndexSetting.SearchOnly, NumberType.Integer) // WFS
+                            .KeywordLowerCase(kwlc => kwlc.ProjectsSummary.Project1Name, IndexSetting.SearchSortAggregate) // WFS
+                            .KeywordLowerCase(kwlc => kwlc.ProjectsSummary.Project1Category, IndexSetting.SearchOnly) // WFS
+                            .KeywordLowerCase(kwlc => kwlc.ProjectsSummary.Project1Url, IndexSetting.SearchOnly) // WFS
+                            .KeywordLowerCase(kwlc => kwlc.ProjectsSummary.Project1Values, IndexSetting.SearchOnly) // WFS
+                            .KeywordLowerCase(kwlc => kwlc.ProjectsSummary.Project2Name, IndexSetting.SearchOnly) // WFS
+                            .KeywordLowerCase(kwlc => kwlc.ProjectsSummary.Project2Category, IndexSetting.SearchOnly) // WFS
+                            .KeywordLowerCase(kwlc => kwlc.ProjectsSummary.Project2Url, IndexSetting.SearchOnly) // WFS
+                            .KeywordLowerCase(kwlc => kwlc.ProjectsSummary.Project2Values, IndexSetting.SearchOnly) // WFS
+
+                         ))
                         .Object<ExtendedMeasurementOrFact>(n => n
                             .Name(nm => nm.MeasurementOrFacts)
                             .Properties(ps => ps
@@ -98,22 +124,8 @@ namespace SOS.Lib.Repositories.Processed
                                 .KeywordLowerCase(kwlc => kwlc.OccurrenceID, IndexSetting.None)
                             )
                         )
-                        .Object<ProjectsSummary>(t => t
-                            .AutoMap()
-                            .Name(nm => nm.ProjectsSummary)
-                            .Properties(ps => ps
-                                .NumberVal(n => n.Project1Id, IndexSetting.SearchOnly, NumberType.Integer) // WFS
-                                .NumberVal(n => n.Project2Id, IndexSetting.SearchOnly, NumberType.Integer) // WFS
-                                .KeywordLowerCase(kwlc => kwlc.Project1Name, IndexSetting.SearchSortAggregate) // WFS
-                                .KeywordLowerCase(kwlc => kwlc.Project1Category, IndexSetting.SearchOnly) // WFS
-                                .KeywordLowerCase(kwlc => kwlc.Project1Url, IndexSetting.SearchOnly) // WFS
-                                .KeywordLowerCase(kwlc => kwlc.Project1Values, IndexSetting.SearchOnly) // WFS
-                                .KeywordLowerCase(kwlc => kwlc.Project2Name, IndexSetting.SearchOnly) // WFS
-                                .KeywordLowerCase(kwlc => kwlc.Project2Category, IndexSetting.SearchOnly) // WFS
-                                .KeywordLowerCase(kwlc => kwlc.Project2Url, IndexSetting.SearchOnly) // WFS
-                                .KeywordLowerCase(kwlc => kwlc.Project2Values, IndexSetting.SearchOnly) // WFS
-                            )
-                        )
+
+                       
                         .Object<Project>(n => n
                             .AutoMap()
                             .Name(nm => nm.Projects)
