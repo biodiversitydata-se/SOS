@@ -111,6 +111,7 @@ namespace SOS.Harvest.Factories.Validation
                     if (verbatimObservation == null || nrProcessedObservations >= maxNrObservationsToRead) continue;
                     var processedObservation = await CreateProcessedObservationAsync(verbatimObservation, dataProvider);
                     nrProcessedObservations++;
+                    if (processedObservation == null) continue;
                     LocalDateTimeConverterHelper.ConvertToLocalTime(processedObservation);
                     _vocabularyValueResolver.ResolveVocabularyMappedValues(new List<Observation>
                             {processedObservation!}, true);
