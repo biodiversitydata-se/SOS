@@ -59,7 +59,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="locationIds"></param>
         /// <returns></returns>
         [HttpPost]
-        [ProducesResponseType(typeof(LocationDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(List<LocationDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [AzureApi, AzureInternalApi]

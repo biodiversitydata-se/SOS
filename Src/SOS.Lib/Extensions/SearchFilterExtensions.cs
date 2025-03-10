@@ -4,6 +4,8 @@ using SOS.Lib.Models.Search.Filters;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
+using System.Text.Json;
 
 namespace SOS.Lib.Extensions
 {
@@ -12,6 +14,29 @@ namespace SOS.Lib.Extensions
     /// </summary>
     public static class SearchFilterExtensions
     {
+        private static JsonSerializerOptions _serializeOptions = new JsonSerializerOptions
+        {
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+            Converters = { new JsonStringEnumConverter() }
+        };
+
+        /// <summary>
+        /// Get filter as json string.
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <returns></returns>
+        public static string GetFilterAsJson(this SearchFilterBase filter)
+        {
+            try
+            {
+                return JsonSerializer.Serialize(filter, _serializeOptions);
+            }
+            catch
+            {
+                return "";
+            }
+        }
+
         /// <summary>
         /// Populate output fields based on property set
         /// </summary>

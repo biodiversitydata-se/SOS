@@ -237,7 +237,7 @@ namespace SOS.Harvest.Jobs
 
                 if ((providerActive?.PreviousProcessLimit ?? 0) > 0)
                 {
-                    double percentLimit = providerActive!.PreviousProcessLimit / 100.0;
+                    double percentLimit = Math.Max(0, (providerActive!.PreviousProcessLimit-2) / 100.0); // Allow 2% less than limit in order to allow some invalid observations.
                     if (providerActive.PublicProcessCount > 0 && providerInactive.PublicProcessCount <= percentLimit * providerActive.PublicProcessCount)
                     {
                         _logger.LogError("Validation failed. Public observation count for {@dataProvider} is less than {@previousProcessLimit}% of last run. Count this time={@publicProcessCount}. Count previous time={@publicProcessCountPrevious}.", 

@@ -22,11 +22,6 @@ namespace SOS.Lib.Configuration.Import
         /// </summary>
         public int? MaxNumberOfSightingsHarvested { get; set; } = null;
 
-        /// <summary>
-        /// Feature toggle for deciding if to use the new Dwca parser with support for datasets.
-        /// </summary>
-        public bool UseDwcaCollectionRepository { get; set; }
-
         public bool ForceHarvestUnchangedDwca { get; set; } = false;
     }
 }

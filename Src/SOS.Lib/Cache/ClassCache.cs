@@ -6,12 +6,10 @@ using SOS.Lib.Extensions;
 using SOS.Lib.JsonConverters;
 using SOS.Lib.Models.Cache;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading;
@@ -45,6 +43,11 @@ namespace SOS.Lib.Cache
             {
                 CacheReleased.Invoke(this, EventArgs.Empty);
             }
+        }
+
+        public ClassCache()
+        {
+
         }
 
         /// <summary>
@@ -95,13 +98,14 @@ namespace SOS.Lib.Cache
         public void Set(TClass entity)
         {
             lock (InitLock)
-            {
+            {                
+                _renewalTimer?.Dispose();
                 var expirationToken = new CancellationChangeToken(
                     new CancellationTokenSource(CacheDuration).Token);
                 var cacheEntryOptions = new MemoryCacheEntryOptions()
                     .SetPriority(CacheItemPriority.NeverRemove)
                     .AddExpirationToken(expirationToken)
-                    .RegisterPostEvictionCallback(callback: OnCacheEviction, state: this);                
+                    .RegisterPostEvictionCallback(callback: OnCacheEviction, state: this);
                 _memoryCache.Set(_cacheKey, entity, cacheEntryOptions);
                 Logger.LogInformation($"Cache set. Key=\"{_cacheKey}\"");
                 var expirationTime = CacheDuration - CacheExpireSoonTimeSpan;

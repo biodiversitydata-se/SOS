@@ -57,6 +57,8 @@ spec:
         - env:
           - name: ASPNETCORE_ENVIRONMENT
             value: st
+          - name: CorsAllowAny
+            value: "true"
           - name: IdentityServer
             value: '{"Authority": "https://login-test.artdata.slu.se", "Audience": "SOS.Observations", "RequireHttpsMetadata": false}'
           - name: AreaConfiguration

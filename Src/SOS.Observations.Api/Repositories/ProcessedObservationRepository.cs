@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Tokens;
 using Nest;
 using SOS.Lib;
 using SOS.Lib.Cache.Interfaces;

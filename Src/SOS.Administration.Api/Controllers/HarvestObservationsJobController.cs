@@ -193,5 +193,47 @@ namespace SOS.Administration.Api.Controllers
         }
 
         #endregion DwC-A
+
+        [HttpPost("FulliNaturalist/Run")]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult RuniNaturalistFullObservationsHarvestJob()
+        {
+            try
+            {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);                
+                BackgroundJob.Enqueue<IObservationsHarvestJobFull>(job => job.RunFulliNaturalistHarvestObservationsAsync(                    
+                    JobCancellationToken.Null));
+                return new OkObjectResult("Harvest full iNaturalist observations job enqueued to Hangfire");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Enqueuing harvest full iNaturalist observations job failed");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        [HttpPost("FulliNaturalist/Schedule")]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult ScheduleiNaturalistFullObservationsHarvestJob([FromQuery] int days, [FromQuery] int hour, [FromQuery] int minute)
+        {
+            try
+            {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
+                string cronExpression = $"0 {minute} {hour} */{days} * ?";
+                RecurringJob.AddOrUpdate<IObservationsHarvestJobFull>($"{nameof(IObservationsHarvestJobFull)}",
+                    job => job.RunFulliNaturalistHarvestObservationsAsync(JobCancellationToken.Null), cronExpression,
+                    new RecurringJobOptions { TimeZone = TimeZoneInfo.Local });
+
+                return new OkObjectResult("Harvest full iNaturalist observations job scheduled to Hangfire");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Scheduled harvest full iNaturalist observations job failed");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
     }
 }

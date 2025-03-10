@@ -49,10 +49,19 @@ namespace SOS.Harvest.Harvesters.Biologg
             _biologgConfiguration = biologgConfiguration ?? throw new ArgumentNullException(nameof(biologgConfiguration));
             _dwcaConfiguration = dwcaConfiguration ?? throw new ArgumentNullException(nameof(dwcaConfiguration));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        }        
+
+        /// inheritdoc />
+        public async Task<HarvestInfo> HarvestObservationsAsync(DataProvider dataProvider,
+            JobRunModes mode,
+            DateTime? fromDate, IJobCancellationToken cancellationToken)
+        {
+            await Task.Run(() => throw new NotImplementedException("Not implemented for this provider"));
+            return null!;
         }
 
         /// inheritdoc />
-        public async Task<HarvestInfo> HarvestObservationsAsync(IJobCancellationToken cancellationToken)
+        public async Task<HarvestInfo> HarvestObservationsAsync(DataProvider provider, IJobCancellationToken cancellationToken)
         {
             var harvestInfo = new HarvestInfo("Biologg", DateTime.Now)
             {
@@ -62,8 +71,6 @@ namespace SOS.Harvest.Harvesters.Biologg
 
             try
             {
-                var provider = await _dataProviderRepository.GetAsync(18);
-
                 if (provider == null)
                 {
                     throw new Exception("Can't load provider info for Biologg");
@@ -122,20 +129,9 @@ namespace SOS.Harvest.Harvesters.Biologg
             return harvestInfo;
         }
 
-        /// inheritdoc />
-        public async Task<HarvestInfo> HarvestObservationsAsync(JobRunModes mode,
-            DateTime? fromDate,
-            IJobCancellationToken cancellationToken)
+        public Task<HarvestInfo> HarvestCompleteObservationsWithDelayAsync(DataProvider provider, IJobCancellationToken cancellationToken)
         {
-            await Task.Run(() => throw new NotImplementedException("Not implemented for this provider"));
-            return null!;
-        }
-
-        /// inheritdoc />
-        public async Task<HarvestInfo> HarvestObservationsAsync(DataProvider provider, IJobCancellationToken cancellationToken)
-        {
-            await Task.Run(() => throw new NotImplementedException("Not implemented for this provider"));
-            return null!;
+            throw new NotImplementedException();
         }
     }
 }

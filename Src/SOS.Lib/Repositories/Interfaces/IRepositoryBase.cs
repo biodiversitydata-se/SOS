@@ -36,6 +36,8 @@ namespace SOS.Lib.Repositories.Interfaces
         /// <remarks>Uses typeof(TEntity).Name as MongoDb collection name.</remarks>
         Task<bool> AddCollectionAsync();
 
+        Task<bool> AddCollectionAsync(IMongoCollection<TEntity> mongoCollection);
+
         /// <summary>
         ///     Add collection if not exists
         /// </summary>
@@ -65,6 +67,8 @@ namespace SOS.Lib.Repositories.Interfaces
         /// <returns></returns>
         Task<bool> AddManyAsync(IEnumerable<TEntity> items, IMongoCollection<TEntity> mongoCollection);
 
+        Task<bool> UpsertManyAsync(IEnumerable<TEntity> items);
+        Task<bool> UpsertManyAsync(IEnumerable<TEntity> items, IMongoCollection<TEntity> mongoCollection);
 
         /// <summary>
         ///     Add or update existing entity
@@ -140,6 +144,8 @@ namespace SOS.Lib.Repositories.Interfaces
         /// <remarks>Uses typeof(TEntity).Name as MongoDb collection name.</remarks>
         /// <returns></returns>
         Task<bool> DeleteCollectionAsync();
+
+        Task<bool> DeleteCollectionAsync(IMongoCollection<TEntity> mongoCollection);
 
         /// <summary>
         ///     Remove collection
@@ -308,6 +314,8 @@ namespace SOS.Lib.Repositories.Interfaces
         /// <returns></returns>
         Task<TKey> GetMaxIdAsync(IMongoCollection<TEntity> mongoCollection);
 
+        Task<TEntity> GetDocumentWithMaxIdAsync(IMongoCollection<TEntity> mongoCollection);
+
         /// <summary>
         /// Query collection
         /// </summary>
@@ -339,5 +347,7 @@ namespace SOS.Lib.Repositories.Interfaces
         Task<bool> UpdateAsync(TKey id, TEntity entity, IMongoCollection<TEntity> mongoCollection);
 
         Task WaitForDataInsert(long expectedRecordsCount, TimeSpan? timeout = null);
+
+        IMongoCollection<TEntity> GetMongoCollection(string collectionName);
     }
 }

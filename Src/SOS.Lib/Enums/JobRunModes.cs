@@ -18,6 +18,11 @@
         /// <summary>
         /// Incremental harvest, processing to active instance
         /// </summary>
-        IncrementalActiveInstance
+        IncrementalActiveInstance,
+
+        /// <summary>
+        /// Full harvest with delay in order to avoid source rate limits
+        /// </summary>
+        FullWithDelay
     }
 }

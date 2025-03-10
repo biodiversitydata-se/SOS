@@ -58,10 +58,17 @@ namespace SOS.Harvest.Harvesters
         /// <param name="initValues"></param>
         /// <param name="runStatus"></param>
         /// <param name="harvestCount"></param>
+        /// <param name="previousProcessLimit"></param>
         /// <param name="dataLastModified"></param>
-        /// <param name="notes"></param>
         /// <returns></returns>
-        protected async Task<HarvestInfo> FinishHarvestAsync((DateTime startDate, long preHarvestCount) initValues, RunStatus runStatus, int harvestCount, DateTime? dataLastModified = null, string? notes = null)
+        /// <param name="notes"></param>
+        protected async Task<HarvestInfo> FinishHarvestAsync(
+            (DateTime startDate, long preHarvestCount) initValues, 
+            RunStatus runStatus, 
+            int harvestCount, 
+            int previousProcessLimit = 80,
+            DateTime? dataLastModified = null, 
+            string? notes = null)
         {
             // Update harvest info
             var harvestInfo = new HarvestInfo(_provider, initValues.startDate);
@@ -72,7 +79,7 @@ namespace SOS.Harvest.Harvesters
 
             if (VerbatimRepository.TempMode && runStatus == RunStatus.Success)
             {
-                if (harvestCount >= initValues.preHarvestCount * 0.8)
+                if (harvestCount >= initValues.preHarvestCount * (previousProcessLimit / 100.0))
                 {
                     harvestInfo.Status = RunStatus.Success;
                     Logger.LogInformation($"Start permanentize temp collection for {_provider} verbatim");

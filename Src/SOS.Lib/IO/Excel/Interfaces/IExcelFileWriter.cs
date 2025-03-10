@@ -2,6 +2,7 @@
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Export;
 using SOS.Lib.Models.Search.Filters;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace SOS.Lib.IO.Excel.Interfaces
@@ -20,9 +21,18 @@ namespace SOS.Lib.IO.Excel.Interfaces
         /// <param name="gzip"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<FileExportResult> CreateFileAync(SearchFilter filter,
+        Task<FileExportResult> CreateFileAync(
+            SearchFilter filter,
             string exportPath,
             string fileName,
+            string culture,
+            PropertyLabelType propertyLabelType,
+            bool dynamicProjectDataFields,
+            bool gzip,
+            IJobCancellationToken cancellationToken);
+
+        Task<(Stream stream, string filename)> CreateFileInMemoryAsync(
+            SearchFilter filter,
             string culture,
             PropertyLabelType propertyLabelType,
             bool dynamicProjectDataFields,

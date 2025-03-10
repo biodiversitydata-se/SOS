@@ -26,6 +26,7 @@ namespace SOS.Lib.Managers.Interfaces
         /// <param name="authorizationUsePointAccuracy"></param>
         /// <param name="authorizationUseDisturbanceRadius"></param>
         /// <param name="setDefaultProviders"></param>
+        /// <param name="addAreaGeometries"></param>
         /// <returns></returns>
         Task PrepareFilterAsync(
             int? roleId,
@@ -35,7 +36,8 @@ namespace SOS.Lib.Managers.Interfaces
             int? areaBuffer = 0,
             bool? authorizationUsePointAccuracy = false,
             bool? authorizationUseDisturbanceRadius = false,
-            bool? setDefaultProviders = true);
+            bool? setDefaultProviders = true,
+            bool? addAreaGeometries = false);
 
         /// <summary>
         /// Add additional information if necessary

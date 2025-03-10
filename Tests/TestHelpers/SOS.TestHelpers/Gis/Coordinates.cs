@@ -42,5 +42,42 @@
 
         public static (double Latitude, double Longitude) FalkenbergMunicipality =
             (Latitude: 56.901389, Longitude: 12.497222);
+
+        public static (double Latitude, double Longitude, double WebMercatorX, double WebMercatorY) UppsalaMunicipality = (
+            Latitude: 59.8586, 
+            Longitude: 17.6389,
+            WebMercatorX: 1963553.37,
+            WebMercatorY: 8368323.80);
+
+        public static (double TopLeftLatitude, double TopLeftLongitude, double BottomRightLatitude, double BottomRightLongitude) UppsalaMunicipalityBbox = (
+            TopLeftLatitude: 60.1,
+            TopLeftLongitude: 17.3,
+            BottomRightLatitude: 59.65,
+            BottomRightLongitude: 18.05);
+
+        public static (double Latitude, double Longitude, double WebMercatorX, double WebMercatorY) TierpMunicipality = (
+            Latitude: 60.3433,
+            Longitude: 17.5151,
+            WebMercatorX: 1954632.89,
+            WebMercatorY: 8420675.02);
+
+        public static (double TopLeftLatitude, double TopLeftLongitude, double BottomRightLatitude, double BottomRightLongitude) TierpMunicipalityBbox = (
+            TopLeftLatitude: 60.5,
+            TopLeftLongitude: 17.1,
+            BottomRightLatitude: 60.1,
+            BottomRightLongitude: 17.9);
+
+
+        public static (double Latitude, double Longitude, double WebMercatorX, double WebMercatorY) JönköpingMunicipality = (
+            Latitude: 57.7826,
+            Longitude: 14.1618,
+            WebMercatorX: 1576484.36,
+            WebMercatorY: 7921786.57);
+
+        public static (double TopLeftLatitude, double TopLeftLongitude, double BottomRightLatitude, double BottomRightLongitude) JönköpingMunicipalityBbox = (
+            TopLeftLatitude: 57.95,
+            TopLeftLongitude: 13.75,
+            BottomRightLatitude: 57.60,
+            BottomRightLongitude: 14.50);
     }
 }

@@ -1,5 +1,16 @@
 # Changelog
 
+## [2025.02.12]
+
+### `Added`
+- Response compression is now enabled. Use request header `Accept-Encoding: gzip, deflate, br`.
+
+### `Changed`
+- Use text/html format for multimedia.csv in Artportalen DwC-A.
+
+### `Other`
+- Taxon list id 2 - Signal species, now uses Taxon list service id 282 instead of 33.
+- Elasticsearch index optimizations.
 
 ## [2024.11.06]
 

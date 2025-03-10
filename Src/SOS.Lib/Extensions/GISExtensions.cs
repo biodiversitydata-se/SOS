@@ -654,6 +654,20 @@ namespace SOS.Lib.Extensions
                 new Envelope(new Coordinate(boundingBox.BottomRight.Longitude, boundingBox.BottomRight.Latitude), new Coordinate(boundingBox.TopLeft.Longitude, boundingBox.TopLeft.Latitude));
         }
 
+        public static Geometry? ToGeoemtry(this LatLonBoundingBox boundingBox)
+        {
+            return boundingBox?.BottomRight == null || boundingBox?.TopLeft == null ?
+                null :
+                new Polygon(new LinearRing([
+                    new Coordinate(boundingBox.TopLeft.Longitude, boundingBox.TopLeft.Latitude),
+                    new Coordinate(boundingBox.BottomRight.Longitude, boundingBox.TopLeft.Latitude),
+                    new Coordinate(boundingBox.BottomRight.Longitude, boundingBox.BottomRight.Latitude),
+                    new Coordinate(boundingBox.TopLeft.Longitude, boundingBox.BottomRight.Latitude),
+                    new Coordinate(boundingBox.TopLeft.Longitude, boundingBox.TopLeft.Latitude)
+                ])
+            );
+        }
+
         /// <summary>
         ///     Cast geometry to geo json
         /// </summary>

@@ -249,7 +249,8 @@ namespace SOS.Observations.Api.LiveIntegrationTests.Fixtures
             var exportManager = new ExportManager(csvFileWriter, dwcArchiveFileWriter, dwcArchiveEventFileWriter, excelFileWriter, geojsonFileWriter,
                 ProcessedObservationRepository, processInfoRepository, filterManager, new NullLogger<ExportManager>());
             var userExportRepository = new UserExportRepository(processClient, new NullLogger<UserExportRepository>());
-            var inputValidator = new InputValidator(areaCache, taxonManager, inputValaidationConfiguration);
+            var sortableFieldsCache = new SortableFieldsCache(ProcessedObservationRepository, memoryCache);
+            var inputValidator = new InputValidator(areaCache, sortableFieldsCache, taxonManager, inputValaidationConfiguration);
             var searchFilterUtility = new SearchFilterUtility(new AreaConfiguration(), areaCache);
             ObservationsController = new ObservationsController(ObservationManager, taxonSearchManager, searchFilterUtility, inputValidator, observationApiConfiguration, 
                 new Mock<ClassCache<Dictionary<string, CacheEntry<GeoGridResultDto>>>>().Object,
@@ -264,7 +265,8 @@ namespace SOS.Observations.Api.LiveIntegrationTests.Fixtures
                 ProcessedObservationRepository,
                 new NullLogger<DataProvidersController>());
             var cryptoService = new CryptoService(new CryptoConfiguration() { Password = "password", Salt = "salt" });
-            ExportsController = new ExportsController(ObservationManager, blobStorageManagerMock.Object, exportManager, cryptoService, fileService, userExportRepository, inputValidator, observationApiConfiguration,
+            var userManager = new UserManager(userService, areaCache, new NullLogger<UserManager>());
+            ExportsController = new ExportsController(ObservationManager, blobStorageManagerMock.Object, exportManager, userManager, cryptoService, fileService, userExportRepository, inputValidator, observationApiConfiguration,
                 new NullLogger<ExportsController>());
             ExportsController.ControllerContext.HttpContext = new DefaultHttpContext();
             TaxonManager = taxonManager;
