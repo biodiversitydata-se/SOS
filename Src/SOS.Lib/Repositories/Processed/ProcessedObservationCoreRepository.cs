@@ -769,14 +769,22 @@ namespace SOS.Lib.Repositories.Processed
             foreach (var property in properties)
             {
                 var name = $"{(string.IsNullOrEmpty(parents) ? "" : $"{parents}.")}{property.Key.Name}";
+
                 if (property.Value is ObjectProperty op)
                 {
                     PopulateSortableFields(op.Properties, ref sortableFields, name);
                 }
-                if (property.Value is KeywordProperty kwp && kwp.DocValues == null && kwp.Index == null)
+                if (property.Value is IDocValuesProperty dvp && dvp.DocValues == null && (
+                        property.Value is BooleanProperty bp && bp.Index == null ||
+                        property.Value is DateProperty dp && dp.Index == null ||
+                        property.Value is KeywordProperty kwp && kwp.Index == null ||
+                        property.Value is NumberProperty np && np.Index == null
+                    )
+                )
                 {
                     sortableFields.Add(name);
                 }
+                
             }
         }
 

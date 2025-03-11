@@ -55,6 +55,7 @@ namespace SOS.Harvest.Repositories.Source.ObservationsDatabase
 	                h.noggrannhet_tal AS CoordinateUncertaintyInMeters,
 	                COALESCE(h.leg, '')	AS Observers, 
 	                COALESCE(h.[källaklartext], '')	AS Origin,
+                    COALESCE(h.[Uppgiftslämnare], '') AS ReportedBy,
 	                COALESCE(h.[Antal/Yta], '')	AS IndividualCount,	
 	                COALESCE(h.Stadium, '')	AS Stadium, 
 	                COALESCE(h.biotop, '')	AS Habitat,

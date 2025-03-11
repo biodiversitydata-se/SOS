@@ -8,7 +8,6 @@ using SOS.Harvest.Managers;
 using SOS.Harvest.Processors.DarwinCoreArchive;
 using SOS.Lib.Cache;
 using SOS.Lib.Configuration.Export;
-using SOS.Lib.Configuration.Import;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
@@ -156,12 +155,6 @@ namespace SOS.Process.LiveIntegrationTests.Processors.DarwinCoreArchive
             var vocabularyRepository =
                 new VocabularyRepository(processClient, new NullLogger<VocabularyRepository>());
 
-            var dwcaConfiguration = new DwcaConfiguration()
-            {
-                BatchSize = 5000,
-                ImportPath = @"C:\Temp"
-            };
-
             return new DwcaObservationProcessor(
                 verbatimClient,
                 processedObservationRepository,                
@@ -173,7 +166,6 @@ namespace SOS.Process.LiveIntegrationTests.Processors.DarwinCoreArchive
                 diffusionManager,
                 processTimeManager,
                 processConfiguration,
-                dwcaConfiguration,
                 new NullLogger<DwcaObservationProcessor>());
         }
 

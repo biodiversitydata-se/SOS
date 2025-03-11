@@ -88,7 +88,6 @@ namespace SOS.Harvest.Processors.ObservationDatabase
                     Verified = false,
                     VerificationStatus = new VocabularyValue { Id = (int)ValidationStatusId.ReportedByExpert }
                 },
-                InstitutionId = verbatim.SCI_code,
                 Location = new Location(LocationType.Point)
                 {
                     Attributes = new LocationAttributes
@@ -119,10 +118,11 @@ namespace SOS.Harvest.Processors.ObservationDatabase
                     //ProtectionLevel = verbatim.ProtectionLevel,
                     SensitivityCategory = verbatim.ProtectionLevel,
                     RecordedBy = verbatim.Observers,
-                    ReportedDate = verbatim.StartDate.HasValue ? verbatim.StartDate.Value.ToUniversalTime() : null
+                    ReportedDate = verbatim.StartDate.HasValue ? verbatim.StartDate.Value.ToUniversalTime() : null,
+                    ReportedBy = verbatim.ReportedBy?.Clean()
                 },
-                OwnerInstitutionCode = verbatim.SCI_code,
-                RightsHolder = verbatim.SCI_name?.Clean(),
+                OwnerInstitutionCode = "SLU Artdatabanken",
+                RightsHolder = verbatim.ReportedBy?.Clean(),
                 Taxon = taxon
             };
 

@@ -41,6 +41,8 @@ namespace SOS.Lib.Models.Verbatim.ObservationDatabase
 
         public string Origin { get; set; }
 
+        public string ReportedBy { get; set; }
+
         public string Parish { get; set; }
 
         public int ProtectionLevel { get; set; }
