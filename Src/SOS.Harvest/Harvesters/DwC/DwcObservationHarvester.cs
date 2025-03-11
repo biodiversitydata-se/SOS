@@ -29,6 +29,63 @@ namespace SOS.Harvest.Harvesters.DwC
         private readonly ILogger<DwcObservationHarvester> _logger;
 
         /// <summary>
+        /// Save absent observation
+        /// </summary>
+        /// <param name="dataProvider"></param>
+        /// <param name="dwcCollectionRepository"></param>
+        /// <param name="events"></param>
+        /// <returns></returns>
+        private async Task<int> CreateAndStoreAbsentObservations(DataProvider dataProvider, DwcCollectionRepository dwcCollectionRepository, List<DwcEventOccurrenceVerbatim>? events)
+        {
+            try
+            {
+                if (!events?.Any() ?? true)
+                {
+                    return 0;
+                }
+
+                _logger.LogDebug("Start storing absent DwC-A occurrences for {@dataProvider}", dataProvider.Identifier);
+                // dwcCollectionRepository.OccurrenceRepository.TempMode = false;
+                int observationCount = 0;
+                var batchAbsentObservations = new List<DwcObservationVerbatim>();
+                var id = await dwcCollectionRepository.OccurrenceRepository.GetMaxIdAsync();
+                _logger.LogDebug("MaxId={@maxSightingId} before adding absent observations", id);
+                for (int i = 0; i < events!.Count; i++)
+                {
+                    DwcEventOccurrenceVerbatim? ev = events[i];
+                    ev.Observations = null; // todo - handle this logic in the DwC-A parser.
+                    var absentObservations = ev.CreateAbsentObservations();
+                    foreach (var observation in absentObservations)
+                    {
+                        observation.Id = ++id;
+                    }
+                    batchAbsentObservations.AddRange(absentObservations);
+
+                    // store batch of absent observations if this is the last iterated event or batch is larger than 10 000.
+                    if (i == events.Count - 1 || batchAbsentObservations.Count > 10000)
+                    {
+                        observationCount += batchAbsentObservations.Count();
+                        await dwcCollectionRepository.OccurrenceRepository.AddManyAsync(batchAbsentObservations);
+                        batchAbsentObservations.Clear();
+                    }
+                }
+
+                _logger.LogDebug("Finish storing absent DwC-A occurrences for {@dataProvider}", dataProvider.Identifier);
+                return observationCount;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error storing absent observations for {@dataProvider}", dataProvider.Identifier);
+            }
+            finally
+            {
+                dwcCollectionRepository.OccurrenceRepository.TempMode = true;
+            }
+
+            return 0;
+        }
+
+        /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="verbatimClient"></param>
@@ -76,31 +133,38 @@ namespace SOS.Harvest.Harvesters.DwC
 
             try
             {
+                using var archiveReader = new ArchiveReader(archivePath, _dwcaConfiguration.ImportPath);
+                var dwcCollectionArchiveReaderContext = ArchiveReaderContext.Create(archiveReader, dataProvider, _dwcaConfiguration);
+                var dwcCollectionRepository = new DwcCollectionRepository(dataProvider, _verbatimClient, _logger);
+                dwcCollectionRepository.BeginTempMode();
+
                 if (initializeTempCollection)
                 {
-                    _logger.LogDebug($"Start clearing DwC-A observations for {dataProvider.Identifier}");
-                    await dwcArchiveVerbatimRepository.DeleteCollectionAsync();
-                    await dwcArchiveVerbatimRepository.AddCollectionAsync();
-                    _logger.LogDebug($"Finish clearing DwC-A observations for {dataProvider.Identifier}");
-
-                    _logger.LogDebug($"Start storing DwC-A observations for {dataProvider.Identifier}");
+                    _logger.LogDebug("Clear DwC-A observations for {@dataProvider}", dataProvider.Identifier);
+                    await dwcCollectionRepository.DeleteCollectionsAsync();
+                    await dwcCollectionRepository.OccurrenceRepository.AddCollectionAsync();
+                    _logger.LogDebug("Start storing DwC-A observations for {@dataProvider}", dataProvider.Identifier);
                 }
-                var dwcArchiveReader = new DwcArchiveReader(dataProvider, await dwcArchiveVerbatimRepository.GetMaxIdAsync());
-                var observationCount = 0;
-                using var archiveReader = new ArchiveReader(archivePath, _dwcaConfiguration.ImportPath);
 
-                var observationBatches =
-                    dwcArchiveReader.ReadArchiveInBatchesAsync(archiveReader,
-                        _dwcaConfiguration.BatchSize);
+                // Read datasets
+                List<Lib.Models.Processed.DataStewardship.Dataset.DwcVerbatimDataset>? datasets = null;
+                var dwcArchiveReader = new DwcArchiveReader(dataProvider, await dwcCollectionRepository.DatasetRepository.GetMaxIdAsync());
+                try
+                {
+                    datasets = await dwcArchiveReader.ReadDatasetsAsync(dwcCollectionArchiveReaderContext);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error reading DwC-A datasets for {@dataProvider}", dataProvider.Identifier);
+                }
+
+                // Read observations
+                int observationCount = 0;
+                dwcArchiveReader = new DwcArchiveReader(dataProvider, await dwcCollectionRepository.OccurrenceRepository.GetMaxIdAsync());
+                var observationBatches = dwcArchiveReader.ReadOccurrencesInBatchesAsync(dwcCollectionArchiveReaderContext);
                 await foreach (var verbatimObservationsBatch in observationBatches)
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
-
-                    if (!verbatimObservationsBatch?.Any() ?? true)
-                    {
-                        continue;
-                    }
-
                     if (_dwcaConfiguration.MaxNumberOfSightingsHarvested.HasValue &&
                         observationCount >= _dwcaConfiguration.MaxNumberOfSightingsHarvested)
                     {
@@ -109,23 +173,78 @@ namespace SOS.Harvest.Harvesters.DwC
                     }
 
                     observationCount += verbatimObservationsBatch!.Count();
-                    await dwcArchiveVerbatimRepository.AddManyAsync(verbatimObservationsBatch);
+                    await dwcCollectionRepository.OccurrenceRepository.AddManyAsync(verbatimObservationsBatch);
                 }
 
-                if (dataProvider.UseVerbatimFileInExport && (dataProvider.Datasets?.Any() ?? false)) // If no dataset, file must have been manually uploaded and is allready stored
+                // Read events
+                try
                 {
-                    _logger.LogDebug($"Start storing source file for {dataProvider.Identifier}");
-                    await using var fileStream = File.OpenRead(archivePath);
-                    await dwcArchiveVerbatimRepository.StoreSourceFileAsync(dataProvider.Id, fileStream);
-                    _logger.LogDebug($"Finish storing source file for {dataProvider.Identifier}");
+                    _logger.LogInformation("Start reading DwC-A events for {@dataProvider}", dataProvider.Identifier);
+                    dwcArchiveReader = new DwcArchiveReader(dataProvider, await dwcCollectionRepository.EventRepository.GetMaxIdAsync());
+                    var events = (await dwcArchiveReader.ReadEventsAsync(dwcCollectionArchiveReaderContext))?.ToList();
+                    if (events != null && events.Any())
+                    {
+                        _logger.LogInformation("Read {@eventCount} events for {@dataProvider}", events.Count, dataProvider.Identifier);
+                        observationCount += await CreateAndStoreAbsentObservations(dataProvider, dwcCollectionRepository, events);
+                        if (initializeTempCollection)
+                        {
+                            _logger.LogDebug("Start storing DwC-A events for {@dataProvider}", dataProvider.Identifier);
+                            await dwcCollectionRepository.EventRepository.AddCollectionAsync();
+                        }
+                        await dwcCollectionRepository.EventRepository.AddManyAsync(events);
+                    }
+                    else
+                    {
+                        _logger.LogInformation("Read 0 events for {@dataProvider}", dataProvider.Identifier);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error reading DwC-A events for {@dataProvider}", dataProvider.Identifier);
+                }
+
+                // Save datasets lasts, since DataSet.EventIds could been changed after reading Events
+                try
+                {
+                    if (datasets != null && datasets.Any())
+                    {
+                        if (initializeTempCollection)
+                        {
+                            _logger.LogDebug("Start storing DwC-A datasets for {@dataProvider}", dataProvider.Identifier);
+                            await dwcCollectionRepository.DatasetRepository.AddCollectionAsync();
+                        }
+                        await dwcCollectionRepository.DatasetRepository.AddManyAsync(datasets);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error reading DwC-A datasets for {@dataProvider}", dataProvider.Identifier);
                 }
 
                 if (permanentizeTempCollection)
                 {
-                    _logger.LogDebug($"Finish storing DwC-A observations for {dataProvider.Identifier}");
-                    _logger.LogInformation("Start permanentize temp collection for {@dataProvider}", dataProvider.Identifier);
-                    await dwcArchiveVerbatimRepository.PermanentizeCollectionAsync();
-                    _logger.LogInformation("Finish permanentize temp collection for {@dataProvider}", dataProvider.Identifier);
+                    if (await dwcCollectionRepository.OccurrenceRepository.PermanentizeCollectionAsync())
+                    {
+                        _logger.LogDebug("Finish storing DwC-A observations for {@dataProvider}", dataProvider.Identifier);
+                    }
+                    if (await dwcCollectionRepository.EventRepository.PermanentizeCollectionAsync())
+                    {
+                        _logger.LogDebug("Finish storing DwC-A events for {@dataProvider}", dataProvider.Identifier);
+                    }
+                    if (await dwcCollectionRepository.DatasetRepository.PermanentizeCollectionAsync())
+                    {
+                        _logger.LogDebug("Finish storing DwC-A datasets for {@dataProvider}", dataProvider.Identifier);
+                    }
+                }
+
+                dwcCollectionRepository.EndTempMode();
+
+                if (dataProvider.UseVerbatimFileInExport && (dataProvider.Datasets?.Any() ?? false)) // If no dataset, file must have been manually uploaded and is allready stored
+                {
+                    _logger.LogDebug("Start storing source file for {@dataProvider}", dataProvider.Identifier);
+                    await using var fileStream = File.OpenRead(archivePath);
+                    await dwcArchiveVerbatimRepository.StoreSourceFileAsync(dataProvider.Id, fileStream);
+                    _logger.LogDebug("Finish storing source file for {@dataProvider}", dataProvider.Identifier);
                 }
 
                 // Update harvest info
@@ -144,7 +263,7 @@ namespace SOS.Harvest.Harvesters.DwC
                 harvestInfo.Status = RunStatus.Failed;
             }
 
-            return harvestInfo; 
+            return harvestInfo;
         }
 
         /// <summary>

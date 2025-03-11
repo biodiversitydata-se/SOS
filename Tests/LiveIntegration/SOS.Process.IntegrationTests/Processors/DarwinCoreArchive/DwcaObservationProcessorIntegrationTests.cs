@@ -156,12 +156,6 @@ namespace SOS.Process.LiveIntegrationTests.Processors.DarwinCoreArchive
             var vocabularyRepository =
                 new VocabularyRepository(processClient, new NullLogger<VocabularyRepository>());
 
-            var dwcaConfiguration = new DwcaConfiguration()
-            {
-                BatchSize = 5000,
-                ImportPath = @"C:\Temp"
-            };
-
             return new DwcaObservationProcessor(
                 verbatimClient,
                 processedObservationRepository,                
@@ -173,7 +167,6 @@ namespace SOS.Process.LiveIntegrationTests.Processors.DarwinCoreArchive
                 diffusionManager,
                 processTimeManager,
                 processConfiguration,
-                dwcaConfiguration,
                 new NullLogger<DwcaObservationProcessor>());
         }
 
