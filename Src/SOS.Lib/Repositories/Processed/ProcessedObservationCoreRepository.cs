@@ -55,6 +55,7 @@ namespace SOS.Lib.Repositories.Processed
                 )
                 .Mappings(map => map
                     .Properties(ps => ps
+                    .Boolean(ps => ps.Id)
                         .KeywordLowerCase(kwlc => kwlc.Id, IndexSetting.None)
                         .KeywordLowerCase(kwlc => kwlc.DynamicProperties, IndexSetting.None)
                         .KeywordLowerCase(kwlc => kwlc.InformationWithheld, IndexSetting.None)
@@ -78,21 +79,6 @@ namespace SOS.Lib.Repositories.Processed
                         .BooleanVal(b => b.IsGeneralized, IndexSetting.SearchOnly)
                         .BooleanVal(b => b.Protected, IndexSetting.None)
                         .BooleanVal(b => b.Sensitive, IndexSetting.SearchOnly)
-                        .Nested(c => c.MeasurementOrFacts, c => c.Properties(ps => ps
-                            .KeywordLowerCase(kwlc => kwlc.MeasurementAccuracy, IndexSetting.None)
-                            .KeywordLowerCase(kwlc => kwlc.MeasurementDeterminedBy, IndexSetting.None)
-                            .KeywordLowerCase(kwlc => kwlc.MeasurementDeterminedDate, IndexSetting.None)
-                            .KeywordLowerCase(kwlc => kwlc.MeasurementID, IndexSetting.None)
-                            .KeywordLowerCase(kwlc => kwlc.MeasurementMethod, IndexSetting.None)
-                            .KeywordLowerCase(kwlc => kwlc.MeasurementRemarks, IndexSetting.None)
-                            .KeywordLowerCase(kwlc => kwlc.MeasurementType, IndexSetting.None)
-                            .KeywordLowerCase(kwlc => kwlc.MeasurementTypeID, IndexSetting.None)
-                            .KeywordLowerCase(kwlc => kwlc.MeasurementUnit, IndexSetting.None)
-                            .KeywordLowerCase(kwlc => kwlc.MeasurementUnitID, IndexSetting.None)
-                            .KeywordLowerCase(kwlc => kwlc.MeasurementValue, IndexSetting.None)
-                            .KeywordLowerCase(kwlc => kwlc.MeasurementValueID, IndexSetting.None)
-                            .KeywordLowerCase(kwlc => kwlc.OccurrenceID, IndexSetting.None)
-                        ))
                         .Object(c => c.ProjectsSummary, c => c.Properties(ps => ps
                             .NumberVal(n => n.ProjectsSummary.Project1Id, IndexSetting.SearchOnly, NumberType.Integer) // WFS
                             .NumberVal(n => n.ProjectsSummary.Project2Id, IndexSetting.SearchOnly, NumberType.Integer) // WFS
