@@ -183,8 +183,12 @@ namespace SOS.Harvest.Processors.iNaturalist
                     processedIdentification.DateIdentified = validIdentifications.Last().Created_at!.Value.DateTime.ToUniversalTime().ToString();
                 }
             }
-            
-            //processedIdentification.Verified = verbatim.Quality_grade == "research";
+
+            if (verbatim.Quality_grade == "research")
+            {
+                processedIdentification.VerificationStatus = VocabularyValue.Create((int)ValidationStatusId.ApprovedBasedOnCommunityConsensus);
+            }
+
             return processedIdentification;
         }
 
