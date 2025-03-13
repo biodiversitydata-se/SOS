@@ -118,7 +118,7 @@ namespace SOS.Harvest.Processors.ObservationDatabase
                     //ProtectionLevel = verbatim.ProtectionLevel,
                     SensitivityCategory = verbatim.ProtectionLevel,
                     RecordedBy = verbatim.Observers,
-                    ReportedDate = verbatim.StartDate.HasValue ? verbatim.StartDate.Value.ToUniversalTime() : null,
+                    ReportedDate = verbatim.RegisterDate,
                     ReportedBy = verbatim.ReportedBy?.Clean()
                 },
                 OwnerInstitutionCode = "SLU Artdatabanken",
