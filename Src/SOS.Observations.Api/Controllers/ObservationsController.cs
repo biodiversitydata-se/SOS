@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Nest;
 using OfficeOpenXml.Export.ToCollection;
+using Org.BouncyCastle.Pqc.Crypto.Lms;
 using SOS.Lib.Cache;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Enums;
@@ -30,6 +31,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Security;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -1829,9 +1831,9 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
         /// <param name="areaBuffer">Are buffer 0 to 100m.</param>
         /// <param name="onlyAboveMyClearance">If true, get signal only above users clearance.</param>
-        /// <param name="returnHttp403Or409WhenNoPermissions">
-        /// If true, a http 403 will be returned if the user tries to search in areas where he/she don't have permission to search.
-        /// Http 409 will be returned if the user tries to search in areas where he/she have partial permission to search and the signal search returns false.        
+        /// <param name="returnHttp4xxWhenNoPermissions">
+        /// If true, an HTTP 403 response will be returned if the user attempts to search in areas where they lack permission.
+        /// An HTTP 409 response will be returned if the user has partial permission to search in an area and the signal search returns false.
         /// </param>
         /// <returns></returns>
         [HttpPost("Internal/SignalSearch")]
@@ -1848,7 +1850,7 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] bool validateSearchFilter = false, // if false, only mandatory requirements will be validated
             [FromQuery] int areaBuffer = 0,
             [FromQuery] bool onlyAboveMyClearance = true,
-            [FromQuery] bool? returnHttp403Or409WhenNoPermissions = false)
+            [FromQuery] bool? returnHttp4xxWhenNoPermissions = false)
         {
             try
             {
@@ -1865,7 +1867,7 @@ namespace SOS.Observations.Api.Controllers
                 }
 
                 var searchFilter = filter.ToSearchFilterInternal(this.GetUserId(), true);
-                var taxonFound = await _observationManager.SignalSearchInternalAsync(roleId, authorizationApplicationIdentifier, searchFilter, areaBuffer, onlyAboveMyClearance, returnHttp403Or409WhenNoPermissions ?? false);
+                var taxonFound = await _observationManager.SignalSearchInternalAsync(roleId, authorizationApplicationIdentifier, searchFilter, areaBuffer, onlyAboveMyClearance, returnHttp4xxWhenNoPermissions ?? false);
 
                 if (taxonFound == SignalSearchResult.NoPermissions || taxonFound == SignalSearchResult.PartialNoPermissions)
                 {
