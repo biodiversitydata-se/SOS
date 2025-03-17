@@ -1938,9 +1938,9 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<string>> GetSortableFieldsAsync()
+        public async Task<HashSet<string>> GetSortableFieldsAsync()
         {
-            var sortableFields = new HashSet<string>();
+            var sortableFields = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             var mappings = await Client.Indices.GetMappingAsync<Observation>(o => o.Index(PublicIndexName));
             if (mappings.IsValid)
             {
@@ -1948,7 +1948,6 @@ namespace SOS.Lib.Repositories.Processed
                 {
                     PopulateSortableFields(value.Mappings.Properties, ref sortableFields, "");
                 }
-
             }
 
             return sortableFields;

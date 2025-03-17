@@ -357,7 +357,7 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// Get a list of sortable fields
         /// </summary>
         /// <returns></returns>
-        Task<IEnumerable<string>> GetSortableFieldsAsync();
+        Task<HashSet<string>> GetSortableFieldsAsync();
 
         /// <summary>
         /// Wait for public index to be created.

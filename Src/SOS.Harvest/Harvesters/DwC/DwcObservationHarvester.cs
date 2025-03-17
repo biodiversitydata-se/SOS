@@ -7,6 +7,7 @@ using SOS.Harvest.Harvesters.DwC.Interfaces;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Enums;
+using SOS.Lib.Helpers;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.DarwinCore;
 using SOS.Lib.Models.Verbatim.Shared;
@@ -254,7 +255,7 @@ namespace SOS.Harvest.Harvesters.DwC
             }
             catch (JobAbortedException e)
             {
-                _logger.LogError(e, "Canceled harvest of DwC Archive for {@dataProvider}", dataProvider.Identifier);
+                _logger.LogError(e, "Canceled harvest of DwC Archive for {@dataProvider}. {memoryUsage}", dataProvider.Identifier, LogHelper.GetMemoryUsageSummary());
                 harvestInfo.Status = RunStatus.Canceled;
             }
             catch (Exception e)
