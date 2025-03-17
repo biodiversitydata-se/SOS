@@ -9,6 +9,7 @@ using SOS.Harvest.Services.Interfaces;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Enums;
+using SOS.Lib.Helpers;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.INaturalist.Service;
 using SOS.Lib.Models.Verbatim.Shared;
@@ -157,7 +158,7 @@ namespace SOS.Harvest.Harvesters.iNaturalist
             }
             catch (JobAbortedException e)
             {
-                _logger.LogInformation(e, $"iNaturalist harvest was cancelled: {e.Message}");
+                _logger.LogInformation(e, $"iNaturalist harvest was cancelled: {e.Message}. {LogHelper.GetMemoryUsageSummary()}");
                 harvestInfo.Status = RunStatus.Canceled;
             }
             catch (Exception e)
@@ -245,7 +246,7 @@ namespace SOS.Harvest.Harvesters.iNaturalist
             }
             catch (JobAbortedException)
             {
-                _logger.LogInformation("{@dataProvider} incremental harvest was cancelled.", "iNaturalist");
+                _logger.LogInformation("{@dataProvider} incremental harvest was cancelled. {memoryUsage}", "iNaturalist", LogHelper.GetMemoryUsageSummary());
                 harvestInfo.Status = RunStatus.Canceled;
             }
             catch (Exception e)
@@ -316,7 +317,7 @@ namespace SOS.Harvest.Harvesters.iNaturalist
             }
             catch (JobAbortedException)
             {
-                _logger.LogInformation("{@dataProvider} complete harvest was cancelled.", "iNaturalist");
+                _logger.LogInformation("{@dataProvider} complete harvest was cancelled. {memoryUsage}", "iNaturalist", LogHelper.GetMemoryUsageSummary());
                 harvestInfo.Status = RunStatus.Canceled;
             }
             catch (Exception e)
