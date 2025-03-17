@@ -429,9 +429,9 @@ namespace SOS.Harvest.Harvesters.Artportalen
                     notes = lastBackupDate.HasValue ? $"Database backup restore: {lastBackupDate}" : null;
                 }
             }
-            catch (JobAbortedException)
+            catch (JobAbortedException e)
             {
-                Logger.LogInformation("Artportalen harvest was cancelled.");
+                Logger.LogInformation(e, $"Artportalen harvest was cancelled: {e.Message}");
                 runStatus = RunStatus.Canceled;
             }
             catch (Exception e)
@@ -466,9 +466,9 @@ namespace SOS.Harvest.Harvesters.Artportalen
                     _sightingRepository.GetChunkAsync(ids),
                     1);
             }
-            catch (JobAbortedException)
+            catch (JobAbortedException e)
             {
-                Logger.LogInformation("Harvest Artportalen observations by id was cancelled.");
+                Logger.LogInformation(e, $"Harvest Artportalen observations by id was cancelled: {e.Message}");
             }
             catch (Exception e)
             {

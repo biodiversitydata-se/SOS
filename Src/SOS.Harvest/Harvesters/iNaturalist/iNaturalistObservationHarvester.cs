@@ -155,9 +155,9 @@ namespace SOS.Harvest.Harvesters.iNaturalist
                 }
 
             }
-            catch (JobAbortedException)
+            catch (JobAbortedException e)
             {
-                _logger.LogInformation("iNaturalist harvest was cancelled.");
+                _logger.LogInformation(e, $"iNaturalist harvest was cancelled: {e.Message}");
                 harvestInfo.Status = RunStatus.Canceled;
             }
             catch (Exception e)
