@@ -1,4 +1,5 @@
-﻿using NetTopologySuite.Geometries;
+﻿using CSharpFunctionalExtensions;
+using NetTopologySuite.Geometries;
 using SOS.Shared.Api.Dtos.Enum;
 using SOS.Shared.Api.Dtos.Filter;
 using System.Threading.Tasks;
@@ -151,7 +152,7 @@ namespace SOS.Shared.Api.Validators.Interfaces
         /// </summary>
         /// <param name="sortFields"></param>
         /// <returns></returns>
-        Task<Result> ValidateSortFieldsAsync(IEnumerable<string> sortFields);
+        Task<Result<List<string>>> ValidateSortFieldsAsync(IEnumerable<string> sortFields);
 
         /// <summary>
         /// Validate taxa

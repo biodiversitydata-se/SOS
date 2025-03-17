@@ -23,18 +23,18 @@ namespace SOS.Lib.Cache
         /// Get sortable fields
         /// </summary>
         /// <returns></returns>
-        public async Task<IEnumerable<string>> GetSortableFieldsAsync()
+        public async Task<HashSet<string>> GetSortableFieldsAsync()
         {
-            if (_memoryCache.TryGetValue(_cacheKey, out IEnumerable<string> list) && (list?.Count() ?? 0) != 0) {
-                return list;
+            if (_memoryCache.TryGetValue(_cacheKey, out HashSet<string> hashSet) && (hashSet?.Count() ?? 0) != 0) {
+                return hashSet;
             }
 
-            list = await _processedObservationCoreRepository.GetSortableFieldsAsync();
+            hashSet = await _processedObservationCoreRepository.GetSortableFieldsAsync();
             var cacheEntryOptions = new MemoryCacheEntryOptions()
                        .SetAbsoluteExpiration(TimeSpan.FromMinutes(60));
-            _memoryCache.Set(_cacheKey, list, cacheEntryOptions);
+            _memoryCache.Set(_cacheKey, hashSet, cacheEntryOptions);
 
-            return list;
+            return hashSet;
         }
     }
 }

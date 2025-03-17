@@ -1,4 +1,5 @@
-﻿using NetTopologySuite.Geometries;
+﻿using CSharpFunctionalExtensions;
+using NetTopologySuite.Geometries;
 using SOS.Lib.Cache;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Enums;
@@ -459,29 +460,36 @@ namespace SOS.Shared.Api.Validators
         }
 
         /// <inheritdoc/>
-        public async Task<Result> ValidateSortFieldsAsync(IEnumerable<string> sortFields)
-        {
+        public async Task<Result<List<string>>> ValidateSortFieldsAsync(IEnumerable<string> sortFields)
+        {            
             if ((sortFields?.Count() ?? 0) == 0)
             {
-                return Result.Success();
+                return Result.Success<List<string>>(null);
             }
 
+            var sortableFieldsSet = await _sortableFieldsCache.GetSortableFieldsAsync();
             var errors = new List<string>();
-            var sortableFields = (HashSet<string>)await _sortableFieldsCache.GetSortableFieldsAsync();
-            foreach(var sortField in sortFields)
+            var validFields = new List<string>();
+
+            foreach (var sortField in sortFields)
             {
-                if (!sortableFields?.TryGetValue(sortField, out var sortableField) ?? false)
+                string sortableField = null;
+                if (!sortableFieldsSet?.TryGetValue(sortField, out sortableField) ?? false)
                 {
                     errors.Add($"{sortField} is not a sortable field");
                 }
+                else
+                {
+                    validFields.Add(sortableField);
+                }
             }
 
-            if (errors.Count() != 0)
+            if (errors.Count > 0)
             {
-                return Result.Failure(string.Join(", ", errors));
+                return Result.Failure<List<string>>(string.Join(", ", errors));
             }
 
-            return Result.Success();
+            return Result.Success(validFields);
         }
 
         /// <inheritdoc/>

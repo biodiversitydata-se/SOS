@@ -547,13 +547,18 @@ namespace SOS.Observations.Api.Controllers
                 filter = await _searchFilterUtility.InitializeSearchFilterAsync(filter);
                 translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
                 var validationResult = Result.Combine(
-                    _inputValidator.ValidateSearchPagingArguments(skip, take),
-                    string.IsNullOrEmpty(sortBy) ? Result.Success() :  (await _inputValidator.ValidateSortFieldsAsync(new[] { sortBy })),
+                    _inputValidator.ValidateSearchPagingArguments(skip, take),                    
                     validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(filter)) : Result.Success(),
                     _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
                     _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries),
                     _inputValidator.ValidateTranslationCultureCode(translationCultureCode));
                 if (validationResult.IsFailure) return BadRequest(validationResult.Error);
+                var sortFieldValidationResult = string.IsNullOrEmpty(sortBy) ? Result.Success<List<string>>(null) : (await _inputValidator.ValidateSortFieldsAsync(new[] { sortBy }));
+                if (sortFieldValidationResult.IsFailure) return BadRequest(sortFieldValidationResult.Error);
+                if (sortFieldValidationResult.Value != null && sortFieldValidationResult.Value.Any())
+                {
+                    sortBy = sortFieldValidationResult.Value.First();
+                }
                 SearchFilter searchFilter = filter.ToSearchFilter(this.GetUserId(), protectionFilter, translationCultureCode, sortBy, sortOrder);
                 var result = await _observationManager.GetChunkAsync(roleId, authorizationApplicationIdentifier, searchFilter, skip, take);
                 PagedResultDto<dynamic> dto = result?.ToPagedResultDto(result.Records);
@@ -630,8 +635,12 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
-                var validationResult = string.IsNullOrEmpty(sortBy) ? Result.Success() : (await _inputValidator.ValidateSortFieldsAsync(new[] { sortBy }));
-                if (validationResult.IsFailure) return BadRequest(validationResult.Error);
+                var sortFieldValidationResult = string.IsNullOrEmpty(sortBy) ? Result.Success<List<string>>(null) : (await _inputValidator.ValidateSortFieldsAsync(new[] { sortBy }));
+                if (sortFieldValidationResult.IsFailure) return BadRequest(sortFieldValidationResult.Error);
+                if (sortFieldValidationResult.Value != null && sortFieldValidationResult.Value.Any())
+                {
+                    sortBy = sortFieldValidationResult.Value.First();
+                }                
 
                 LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
@@ -1532,8 +1541,7 @@ namespace SOS.Observations.Api.Controllers
                 this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, filter.ProtectionFilter);
                 filter = await _searchFilterUtility.InitializeSearchFilterAsync(filter);
                 translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
-                var validationResult = Result.Combine(
-                    validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(filter)) : Result.Success(),
+                var validationResult = Result.Combine(                    
                     string.IsNullOrEmpty(sortBy) ? Result.Success() : (await _inputValidator.ValidateSortFieldsAsync(new[] { sortBy })),
                     _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
                     _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries),
@@ -1541,6 +1549,12 @@ namespace SOS.Observations.Api.Controllers
                     _inputValidator.ValidateTranslationCultureCode(translationCultureCode));
 
                 if (validationResult.IsFailure) return BadRequest(validationResult.Error);
+                var sortFieldValidationResult = string.IsNullOrEmpty(sortBy) ? Result.Success<List<string>>(null) : (await _inputValidator.ValidateSortFieldsAsync(new[] { sortBy }));
+                if (sortFieldValidationResult.IsFailure) return BadRequest(sortFieldValidationResult.Error);
+                if (sortFieldValidationResult.Value != null && sortFieldValidationResult.Value.Any())
+                {
+                    sortBy = sortFieldValidationResult.Value.First();
+                }
                 if (outputFormat == OutputFormatDto.GeoJson || outputFormat == OutputFormatDto.GeoJsonFlat)
                 {
                     var outPutFields = EnsureCoordinatesIsRetrievedFromDb(filter?.Output?.Fields);
@@ -1762,8 +1776,7 @@ namespace SOS.Observations.Api.Controllers
                 filter = await _searchFilterUtility.InitializeSearchFilterAsync(filter);
                 translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
                 const int maxTotalCount = 100000;
-                var validationResult = Result.Combine(
-                    validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(filter)) : Result.Success(),
+                var validationResult = Result.Combine(                    
                     string.IsNullOrEmpty(sortBy) ? Result.Success() : (await _inputValidator.ValidateSortFieldsAsync(new[] { sortBy })),
                     _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
                     _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries),
@@ -1771,7 +1784,12 @@ namespace SOS.Observations.Api.Controllers
                     _inputValidator.ValidateTranslationCultureCode(translationCultureCode));
 
                 if (validationResult.IsFailure) return BadRequest(validationResult.Error);
-
+                var sortFieldValidationResult = string.IsNullOrEmpty(sortBy) ? Result.Success<List<string>>(null) : (await _inputValidator.ValidateSortFieldsAsync(new[] { sortBy }));
+                if (sortFieldValidationResult.IsFailure) return BadRequest(sortFieldValidationResult.Error);
+                if (sortFieldValidationResult.Value != null && sortFieldValidationResult.Value.Any())
+                {
+                    sortBy = sortFieldValidationResult.Value.First();
+                }
                 SearchFilter searchFilter = filter.ToSearchFilter(this.GetUserId(), protectionFilter, translationCultureCode, sortBy, sortOrder);
                 var result = await _observationManager.GetObservationsByScrollAsync(roleId, authorizationApplicationIdentifier, searchFilter, take, scrollId);
                 if (result.TotalCount > maxTotalCount)
