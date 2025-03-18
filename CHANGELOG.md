@@ -1,5 +1,14 @@
 # Changelog
 
+## [2025.03.18]
+
+### `Added`
+- Signal search - Possibility to receive an indication that region authorization is missing.
+- Validation for sortBy fields.
+
+### `Other`
+- Improved Observation database harvest and processing.
+
 ## [2025.02.12]
 
 ### `Added`
