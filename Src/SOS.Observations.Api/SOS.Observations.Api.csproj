@@ -34,7 +34,7 @@
 		<PackageReference Include="AspNetCore.HealthChecks.System" Version="8.0.1" />
 		<PackageReference Include="AspNetCore.HealthChecks.SystemMemory" Version="1.0.1" />
 		<PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="8.0.1" />
-		<PackageReference Include="Azure.Storage.Blobs" Version="12.23.0" />		
+		<PackageReference Include="Azure.Storage.Blobs" Version="12.24.0" />		
 		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="9.0.1" />
 		<PackageReference Include="CSharpFunctionalExtensions" Version="3.4.3" />
 		<PackageReference Include="HangFire" Version="1.8.17" />

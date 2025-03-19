@@ -54,6 +54,23 @@ namespace SOS.Lib.Repositories.Processed
             }
         }
 
+        /// <summary>
+        /// Add many items to db
+        /// </summary>
+        /// <param name="items"></param>
+        /// <param name="indexName"></param>
+        /// <param name="refreshIndex"></param>
+        /// <returns></returns>
+        protected async Task<int> AddManyAsync(IEnumerable<TEntity> items, string indexName, bool refreshIndex = false)
+        {
+            // Save valid processed data
+            Logger.LogDebug($"Start indexing batch for searching in {indexName} with {items.Count()} items");
+            var indexResult = await WriteToElasticAsync(items, indexName, refreshIndex);
+            Logger.LogDebug($"Finished indexing batch for searching in {indexName}");
+            if (indexResult == null || indexResult.TotalNumberOfFailedBuffers > 0) return 0;
+            return items.Count();
+        }
+
         protected ElasticsearchClient Client => ClientCount == 1 ? _elasticClientManager.Clients.FirstOrDefault() : _elasticClientManager.Clients[CurrentInstance];
 
         protected ElasticsearchClient InActiveClient => ClientCount == 1 ? _elasticClientManager.Clients.FirstOrDefault() : _elasticClientManager.Clients[InActiveInstance];
@@ -79,9 +96,63 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <summary>
+        /// Delete all documents
+        /// </summary>
+        /// <param name="indexName"></param>
+        /// <param name="waitForCompletion"></param>
+        /// <returns></returns>
+        protected async Task<bool> DeleteAllDocumentsAsync(string indexName, bool waitForCompletion = false)
+        {
+            try
+            {
+                var res = await Client.DeleteByQueryAsync<TEntity>(indexName, d => d
+                    .Query(q => q.MatchAll(ma => ma.Boost(1)))
+                    .Refresh(waitForCompletion)
+                    .WaitForCompletion(waitForCompletion)
+                );
+
+                return res.IsValidResponse;
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e.ToString());
+                return false;
+            }
+        }
+
+        protected async Task<bool> DeleteCollectionAsync(string indexName)
+        {
+            var res = await Client.Indices.DeleteAsync(indexName);
+            return res.IsValidResponse;
+        }
+
+        /// <summary>
         ///     Logger
         /// </summary>
         protected readonly ILogger<ProcessRepositoryBase<TEntity, TKey>> Logger;
+
+        /// <summary>
+        /// Get free disk space
+        /// </summary>
+        /// <returns></returns>
+        protected async Task<IDictionary<string, int>> GetDiskUsageAsync()
+        {
+            var diskUsage = new Dictionary<string, int>();
+            var response = await Client.Nodes.StatsAsync(stats => stats.Metric(new Metrics("fs")));
+            if (response.IsValidResponse)
+            {
+                // Get the disk usage from the response
+                foreach (var node in response.Nodes)
+                {
+                    foreach (var data in node.Value.Fs.Data)
+                    {
+                        diskUsage.Add(data.Path, (int)((data.FreeInBytes ?? 0) / (data.TotalInBytes ?? 1)));
+                    }
+                }
+            }
+
+            return diskUsage;
+        }
 
         /// <summary>
         /// Get name of instance
@@ -123,6 +194,92 @@ namespace SOS.Lib.Repositories.Processed
         protected string ScrollTimeout => _elasticSearchIndexConfiguration.ScrollTimeout;
 
         /// <summary>
+        /// Set index refresh interval
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="duration"></param>
+        /// <returns></returns>
+        protected async Task<bool> SetIndexRefreshIntervalAsync(string index, Duration duration)
+        {
+            var getResponse = await Client.Indices.GetSettingsAsync<TEntity>(r => r.Name(new[] { index }));
+
+            if (getResponse.IsValidResponse)
+            {
+                if (getResponse.Values.TryGetValue(index, out var indexState))
+                {
+                    indexState.Settings.RefreshInterval = duration;
+                    var setResponse = await Client.Indices.PutSettingsAsync<TEntity>(indexState.Settings);
+
+                    return setResponse.IsValidResponse;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Write data to Elastic Search
+        /// </summary>
+        /// <param name="items"></param>
+        /// <param name="indexName"></param>
+        /// <param name="refreshIndex"></param>
+        /// <returns></returns>
+        protected async Task<BulkAllObserver> WriteToElasticAsync(IEnumerable<TEntity> items, string indexName, bool refreshIndex = false)
+        {
+            if (!items.Any())
+            {
+                return null;
+            }
+            var percentagesUsed = await GetDiskUsageAsync();
+            foreach (var percentageUsed in percentagesUsed)
+            {
+                if (percentageUsed.Value > 90)
+                {
+                    Logger.LogError($"Disk usage too high in cluster, node {percentageUsed.Key}: ({percentageUsed.Value}%), aborting indexing");
+                    return null;
+                }
+                Logger.LogDebug($"Current diskusage in cluster, node {percentageUsed.Key}: ({percentageUsed.Value}%");
+            }
+
+            var count = 0;
+            return Client.BulkAll(items, b => b
+                    .Index(IndexName)
+                    // how long to wait between retries
+                    .BackOffTime("30s")
+                    // how many retries are attempted if a failure occurs                        .
+                    .BackOffRetries(2)
+                    // how many concurrent bulk requests to make
+                    .MaxDegreeOfParallelism(Environment.ProcessorCount)
+                    // number of items per bulk request
+                    .Size(WriteBatchSize)
+                    .RefreshOnCompleted(refreshIndex)
+                    .DroppedDocumentCallback((r, o) =>
+                    {
+                        if (r.Error != null)
+                        {
+                            Logger.LogError($"Failed to add {nameof(TEntity)} with id: {o.Id}, Error: {r.Error.Reason}");
+                        }
+                    })
+                )
+                .Wait(TimeSpan.FromHours(1),
+                    next =>
+                    {
+                        Logger.LogDebug($"Indexing item for search:{count += next.Items.Count}");
+                    });
+        }
+
+        /// <summary>
+        /// Write items to default index
+        /// </summary>
+        /// <param name="items"></param>
+        /// <param name="refreshIndex"></param>
+        /// <returns></returns>
+        protected async Task<BulkAllObserver> WriteToElasticAsync(IEnumerable<TEntity> items, bool refreshIndex = false)
+        {
+            return await WriteToElasticAsync(items, IndexName, refreshIndex);
+        }
+
+        /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="toggleable"></param>
@@ -157,6 +314,12 @@ namespace SOS.Lib.Repositories.Processed
             LiveMode = false;
         }
 
+        /// <inheritdoc />
+        public async Task<int> AddManyAsync(IEnumerable<TEntity> items, bool refreshIndex = false)
+        {
+            return await AddManyAsync(items, IndexName, refreshIndex);
+        }
+
         /// <summary>
         ///     Dispose
         /// </summary>
@@ -173,11 +336,36 @@ namespace SOS.Lib.Repositories.Processed
         public byte InActiveInstance => (byte)(ActiveInstance == 0 ? 1 : 0);
 
         /// <inheritdoc />
-        public byte CurrentInstance => LiveMode ? ActiveInstance : InActiveInstance;       
+        public byte CurrentInstance => LiveMode ? ActiveInstance : InActiveInstance;
 
+        /// <inheritdoc />
         public async Task ClearConfigurationCacheAsync()
         {
             await _processedConfigurationCache.ClearAsync();
+        }
+
+        /// <inheritdoc />
+        public async Task<bool> DeleteAllDocumentsAsync(bool waitForCompletion = false)
+        {
+            return await DeleteAllDocumentsAsync(IndexName, waitForCompletion);
+        }
+
+        /// <inheritdoc />
+        public async Task<bool> DeleteCollectionAsync()
+        {
+            return await DeleteCollectionAsync(IndexName);
+        }
+
+        /// <inheritdoc />
+        public async Task<bool> DisableIndexingAsync()
+        {
+            return await SetIndexRefreshIntervalAsync(IndexName, Duration.MinusOne);
+        }
+
+        /// <inheritdoc />
+        public async Task EnableIndexingAsync()
+        {
+            await SetIndexRefreshIntervalAsync(IndexName, new Duration(5000.0));
         }
 
         public string IndexName => IndexHelper.GetIndexName<TEntity>(_elasticConfiguration.IndexPrefix, ClientCount == 1, LiveMode ? ActiveInstance : InActiveInstance, false);

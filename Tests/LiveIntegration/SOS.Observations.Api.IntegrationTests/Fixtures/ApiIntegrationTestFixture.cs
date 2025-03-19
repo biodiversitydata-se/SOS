@@ -213,9 +213,9 @@ namespace SOS.Observations.Api.LiveIntegrationTests.Fixtures
             TaxonRepository = new TaxonRepository(processClient, new NullLogger<TaxonRepository>());
             var taxonManager = CreateTaxonManager(processClient, TaxonRepository, memoryCache);
             var processedConfigurationCache = new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>()), new MemoryCache(new MemoryCacheOptions()), new NullLogger<ProcessedConfigurationCache>());
-            var clusterHealthCache = new ClassCache<ConcurrentDictionary<string, ClusterHealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<string, ClusterHealthResponse>>>());
+            var clusterHealthCache = new ClassCache<ConcurrentDictionary<string, HealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<string, HealthResponse>>>());
             ProcessedObservationRepository = CreateProcessedObservationRepository(elasticConfiguration, elasticClientManager, processedConfigurationCache, taxonManager, processClient, memoryCache);
-            EventRepository = new EventRepository(elasticClientManager, elasticConfiguration, processedConfigurationCache, new ClassCache<ConcurrentDictionary<string, ClusterHealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<string, ClusterHealthResponse>>>()), new NullLogger<EventRepository>());
+            EventRepository = new EventRepository(elasticClientManager, elasticConfiguration, processedConfigurationCache, new ClassCache<ConcurrentDictionary<string, HealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<string, HealthResponse>>>()), new NullLogger<EventRepository>());
             InvalidObservationRepository = new InvalidObservationRepository(processClient, new NullLogger<InvalidObservationRepository>());
             var processedTaxonRepository = CreateProcessedTaxonRepository(elasticConfiguration, elasticClientManager, processClient, taxonManager);
             var vocabularyRepository = new VocabularyRepository(processClient, new NullLogger<VocabularyRepository>());
@@ -298,7 +298,7 @@ namespace SOS.Observations.Api.LiveIntegrationTests.Fixtures
 
             var processedLocationController = new ProcessedLocationRepository(elasticClientManager,
                 elasticConfiguration, processedConfigurationCache,
-                new ClassCache<ConcurrentDictionary<string, ClusterHealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<string, ClusterHealthResponse>>>()),
+                new ClassCache<ConcurrentDictionary<string, HealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<string, HealthResponse>>>()),
                 new NullLogger<ProcessedLocationRepository>());
             var locationManager = new LocationManager(processedLocationController, filterManager, new NullLogger<LocationManager>());
             LocationsController = new LocationsController(locationManager, inputValidator, observationApiConfiguration, new NullLogger<LocationsController>());
@@ -440,7 +440,7 @@ namespace SOS.Observations.Api.LiveIntegrationTests.Fixtures
                 processedConfigurationCache,
                 elasticConfiguration,
                 taxonManager,
-                new ClassCache<ConcurrentDictionary<string, ClusterHealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<string, ClusterHealthResponse>>>()),
+                new ClassCache<ConcurrentDictionary<string, HealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<string, HealthResponse>>>()),
                 new NullLogger<ProcessedObservationRepository>());
             return processedObservationRepository;
         }
@@ -449,7 +449,7 @@ namespace SOS.Observations.Api.LiveIntegrationTests.Fixtures
             ElasticSearchConfiguration elasticConfiguration,
             IElasticClientManager elasticClientManager,
             ProcessedConfigurationCache processedConfigurationCache,
-            IClassCache<ConcurrentDictionary<string, ClusterHealthResponse>> clusterHealthCache,
+            IClassCache<ConcurrentDictionary<string, HealthResponse>> clusterHealthCache,
             IProcessClient processClient)
         {
             var processedObservationRepository = new ProcessedObservationRepositoryTest(
@@ -472,7 +472,7 @@ namespace SOS.Observations.Api.LiveIntegrationTests.Fixtures
                 elasticConfiguration,
                 new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>()), new MemoryCache(new MemoryCacheOptions()), new NullLogger<ProcessedConfigurationCache>()),
                 taxonManager,
-                new ClassCache<ConcurrentDictionary<string, ClusterHealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<string, ClusterHealthResponse>>>()),
+                new ClassCache<ConcurrentDictionary<string, HealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<string, HealthResponse>>>()),
                 new NullLogger<ProcessedTaxonRepository>());
             return processedTaxonRepository;
         }

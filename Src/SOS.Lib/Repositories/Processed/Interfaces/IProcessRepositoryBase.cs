@@ -16,11 +16,48 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         byte ActiveInstance { get; }
 
         /// <summary>
+        /// Add many documents to index
+        /// </summary>
+        /// <param name="items"></param>
+        /// <param name="refreshIndex"></param>
+        /// <returns></returns>
+        Task<int> AddManyAsync(IEnumerable<TEntity> items, bool refreshIndex = false);
+
+        /// <summary>
         /// Return current instance
         /// </summary>
         byte CurrentInstance { get; }
         
+        /// <summary>
+        /// Clear configuration cache
+        /// </summary>
+        /// <returns></returns>
         Task ClearConfigurationCacheAsync();
+
+        /// <summary>
+        /// Delete alla documents in a Index
+        /// </summary>
+        /// <param name="waitForCompletion"></param>
+        /// <returns></returns>
+        Task<bool> DeleteAllDocumentsAsync(bool waitForCompletion = false);
+
+        /// <summary>
+        /// Delete a collection
+        /// </summary>
+        /// <returns></returns>
+        Task<bool> DeleteCollectionAsync();
+
+        /// <summary>
+        /// Disable indexing
+        /// </summary>
+        /// <returns></returns>
+        Task<bool> DisableIndexingAsync();
+
+        /// <summary>
+        /// Enable indexing
+        /// </summary>
+        /// <returns></returns>
+        Task EnableIndexingAsync();
 
         /// <summary>
         ///     Get 0 or 1 depending of witch instance to update

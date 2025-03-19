@@ -1,11 +1,12 @@
 ﻿using AgileObjects.AgileMapper.Extensions.Internal;
 using CSharpFunctionalExtensions;
 using Elastic.Clients.Elasticsearch;
+using Elastic.Clients.Elasticsearch.Core.Search;
 using Elastic.Clients.Elasticsearch.QueryDsl;
+using NetTopologySuite.Geometries;
 using SOS.Lib.Enums;
 using SOS.Lib.Enums.Artportalen;
 using SOS.Lib.Extensions;
-using SOS.Lib.Models.Processed.Checklist;
 using SOS.Lib.Models.Search.Filters;
 using System;
 using System.Collections.Generic;
@@ -19,36 +20,36 @@ namespace SOS.Lib
     /// </summary>
     public static class SearchExtensionsObservation
     {
-        private static void Addxxx(this QueryDescriptor<Checklist> query, string filter)
-        {
-            query.Addxxx("");
-        }
-
         /// <summary>
         /// Add filter to limit response to only show observations user is allowed to see
         /// </summary>
-        /// <param name="query"></param>
+        /// <param name="queries"></param>
         /// <param name="filter"></param>
-        private static void AddAuthorizationFilters<TQueryDescriptor>(this ICollection<QueryDescriptor<TQueryDescriptor>> queries, ExtendedAuthorizationFilter filter) where TQueryDescriptor : class
+        private static void AddAuthorizationFilters<TQueryDescriptor>(this ICollection<Action<QueryDescriptor<TQueryDescriptor>>> queries, ExtendedAuthorizationFilter filter) where TQueryDescriptor : class
         {
             if (filter.ReportedByMe ?? false)
             {
-                query.TryAddTermCriteria("artportalenInternal.reportedByUserServiceUserId",
-                    filter.UserId);
+                queries.Add(q => q
+                    .TryAddTermCriteria("artportalenInternal.reportedByUserServiceUserId", filter.UserId)
+                );
             }
 
             if (filter.ObservedByMe ?? false)
-            {                
-                var objectQueries = new List<Func<QueryDescriptor<dynamic>, QueryContainer>>();
-                objectQueries.TryAddTermCriteria($"artportalenInternal.occurrenceRecordedByInternal.userServiceUserId", filter.UserId);
-                objectQueries.TryAddTermCriteria($"artportalenInternal.occurrenceRecordedByInternal.viewAccess", true);
-                query.TryAddAndCriteria(objectQueries);
+            {
+                queries.Add(q => q
+                    .TryAddTermCriteria($"artportalenInternal.occurrenceRecordedByInternal.userServiceUserId", filter.UserId)
+                );
+                queries.Add(q => q
+                    .TryAddTermCriteria($"artportalenInternal.occurrenceRecordedByInternal.viewAccess", true)
+                );
             }
 
             if (filter.ProtectionFilter.Equals(ProtectionFilter.Public))
             {
                 // Just to be sure since we can query both public and protected index... Only public observations
-                query.TryAddTermCriteria("sensitive", false);
+                queries.Add(q => q
+                    .TryAddTermCriteria("sensitive", false)
+                );
                 return;
             }
 
@@ -57,31 +58,27 @@ namespace SOS.Lib
             //query.TryAddTermCriteria("diffusionStatus", 0);
 
             // At least on of the sub queries in authorized querys must match
-            var authorizeQuerys = new List<Func<QueryDescriptor<dynamic>, QueryContainer>>();
-
-            // Match all public observations
-            var publicQuery = new List<Func<QueryDescriptor<dynamic>, QueryContainer>>();
-            publicQuery.TryAddTermCriteria("sensitive", false);
-            authorizeQuerys.Add(q => q
-                .Bool(b => b
-                    .Filter(publicQuery)
-                )
-            );
+            var restrictionFilter = new List<Action<QueryDescriptor<TQueryDescriptor>>>() {
+                q => q.TryAddTermCriteria("sensitive", false)  // Match all public observations
+            };
 
             // Match user specific areas and taxa
             if (filter.ExtendedAreas?.Any() ?? false)
             {
                 foreach (var extendedAuthorization in filter.ExtendedAreas)
                 {
-                    var protectedQuery = new List<Func<QueryDescriptor<dynamic>, QueryContainer>>();
-                    protectedQuery.TryAddTermCriteria("sensitive", true);
-                    protectedQuery.TryAddNumericRangeCriteria("occurrence.sensitivityCategory", extendedAuthorization.MaxProtectionLevel, SearchExtensionsGeneric.RangeTypes.LessThanOrEquals);
-                    protectedQuery.TryAddTermsCriteria("taxon.id", extendedAuthorization.TaxonIds);
-                    TryAddGeographicalAreaFilter(protectedQuery, extendedAuthorization.GeographicAreas);
+                    var protectedQuery = new List<Action<QueryDescriptor<TQueryDescriptor>>>();
+                    protectedQuery.TryAddGeographicalAreaFilter(extendedAuthorization.GeographicAreas);
 
-                    authorizeQuerys.Add(q => q
+                    protectedQuery.Add(q => q
+                        .TryAddTermCriteria("sensitive", true)
+                        .TryAddNumericRangeCriteria("occurrence.sensitivityCategory", extendedAuthorization.MaxProtectionLevel, RangeTypes.LessThanOrEquals)
+                        .TryAddTermsCriteria("taxon.id", extendedAuthorization.TaxonIds)
+                    );
+                    
+                    restrictionFilter.Add(q => q
                         .Bool(b => b
-                            .Filter(protectedQuery)
+                            .Filter(protectedQuery.ToArray())
                         )
                     );
                 }
@@ -91,277 +88,259 @@ namespace SOS.Lib
             if (filter.UserId != 0)
             {
                 // Add autorization to a users 'own' observations 
-                var observedByMeQuery = new List<Func<QueryDescriptor<dynamic>, QueryContainer>>();
+                var observedByMeQuery = new QueryDescriptor<TQueryDescriptor>();
                 observedByMeQuery.TryAddTermCriteria("artportalenInternal.reportedByUserServiceUserId",
                     filter.UserId);
 
-                authorizeQuerys.Add(q => q
+                restrictionFilter.Add(q => q
                     .Bool(b => b
                         .Filter(observedByMeQuery)
                     )
                 );
 
-                var reportedByMeQuery = new List<Func<QueryDescriptor<dynamic>, QueryContainer>>();
-                var occurrenceRecordedByInternalQueries = new List<Func<QueryDescriptor<dynamic>, QueryContainer>>();
-                occurrenceRecordedByInternalQueries.TryAddTermCriteria($"artportalenInternal.occurrenceRecordedByInternal.userServiceUserId", filter.UserId);
-                occurrenceRecordedByInternalQueries.TryAddTermCriteria($"artportalenInternal.occurrenceRecordedByInternal.viewAccess", true);
-                reportedByMeQuery.TryAddAndCriteria(occurrenceRecordedByInternalQueries);
+                var reportedByMeQuery = new QueryDescriptor<TQueryDescriptor>();
+                reportedByMeQuery.TryAddTermCriteria($"artportalenInternal.occurrenceRecordedByInternal.userServiceUserId", filter.UserId);
+                reportedByMeQuery.TryAddTermCriteria($"artportalenInternal.occurrenceRecordedByInternal.viewAccess", true);
 
-                authorizeQuerys.Add(q => q
+                restrictionFilter.Add(q => q
                     .Bool(b => b
                         .Filter(reportedByMeQuery)
                     )
                 );
             }
 
-            query.Add(q => q
+            queries.Add(q => q
                 .Bool(b => b
-                    .Should(authorizeQuerys)
-                )
+                    .Should(restrictionFilter.ToArray())
+                )   
             );
         }
 
         /// <summary>
         /// Add internal filters to query
         /// </summary>
-        /// <param name="query"></param>
+        /// <param name="queries"></param>
         /// <param name="filter"></param>
         /// <returns></returns>
-        private static IEnumerable<int> AddInternalFilters(this QueryDescriptor<dynamic> query, SearchFilterBase filter)
+        private static IEnumerable<int> TryAddInternalFilters<TQueryDescriptor>(this ICollection<Action<QueryDescriptor<TQueryDescriptor>>> queries, SearchFilterBase filter) where TQueryDescriptor : class
         {
-            var internalFilter = filter as SearchFilterInternal;
-
-            query.TryAddTermCriteria("artportalenInternal.checklistId", internalFilter.ChecklistId);
-            query.TryAddTermsCriteria("artportalenInternal.fieldDiaryGroupId", internalFilter.FieldDiaryGroupIds);
-            query.TryAddTermsCriteria("artportalenInternal.datasourceId", internalFilter.DatasourceIds);
-            query.TryAddTermCriteria("artportalenInternal.hasTriggeredVerificationRules", internalFilter.HasTriggeredVerificationRule, true);
-            query.TryAddTermCriteria("artportalenInternal.hasAnyTriggeredVerificationRuleWithWarning", internalFilter.HasTriggeredVerificationRuleWithWarning, true);
-            query.TryAddTermCriteria("artportalenInternal.hasUserComments", internalFilter.OnlyWithUserComments, true);
-
-            switch (internalFilter.UnspontaneousFilter)
+            if (filter is SearchFilterInternal internalFilter)
             {
-                case SightingUnspontaneousFilter.NotUnspontaneous:
-                    query.TryAddTermCriteria("occurrence.isNaturalOccurrence", true);
-                    break;
-                case SightingUnspontaneousFilter.Unspontaneous:
-                    query.TryAddTermCriteria("occurrence.isNaturalOccurrence", false);
-                    break;
-            }
+                queries.Add(q => q
+                    .TryAddTermCriteria("artportalenInternal.checklistId", internalFilter.ChecklistId)
+                    .TryAddTermsCriteria("artportalenInternal.fieldDiaryGroupId", internalFilter.FieldDiaryGroupIds)
+                    .TryAddTermsCriteria("artportalenInternal.datasourceId", internalFilter.DatasourceIds)
+                    .TryAddTermCriteria("artportalenInternal.hasTriggeredVerificationRules", internalFilter.HasTriggeredVerificationRule, true)
+                    .TryAddTermCriteria("artportalenInternal.hasAnyTriggeredVerificationRuleWithWarning", internalFilter.HasTriggeredVerificationRuleWithWarning, true)
+                    .TryAddTermCriteria("artportalenInternal.hasUserComments", internalFilter.OnlyWithUserComments, true)
+                    .TryAddTermCriteria("artportalenInternal.noteOfInterest", internalFilter.OnlyWithNotesOfInterest, true)
+                    .TryAddTermCriteria("artportalenInternal.occurrenceRecordedByInternal.id", internalFilter.ObservedByUserId)
+                    .TryAddTermCriteria("artportalenInternal.occurrenceRecordedByInternal.userServiceUserId", internalFilter.ObservedByUserServiceUserId)
+                    .TryAddTermsCriteria("artportalenInternal.regionalSightingStateId", internalFilter.RegionalSightingStateIdsFilter)
+                    .TryAddTermCriteria("artportalenInternal.reportedByUserId", internalFilter.ReportedByUserId)
+                    .TryAddTermCriteria("artportalenInternal.reportedByUserServiceUserId", internalFilter.ReportedByUserServiceUserId)
+                    .TryAddTermsCriteria("artportalenInternal.sightingPublishTypeIds", internalFilter.PublishTypeIdsFilter)
+                    .TryAddTermsCriteria("artportalenInternal.triggeredObservationRuleFrequencyId", internalFilter.TriggeredObservationRuleFrequencyIds)
+                    .TryAddTermsCriteria("artportalenInternal.triggeredObservationRuleReproductionId", internalFilter.TriggeredObservationRuleReproductionIds)
+                    .TryAddTermsCriteria("event.discoveryMethod.id", internalFilter.DiscoveryMethodIds)
+                    .TryAddTermsCriteria("identification.verificationStatus.id", internalFilter.VerificationStatusIds)
+                    .TryAddTermCriteria("institutionId", internalFilter.InstitutionId)
+                    .TryAddTermsCriteria("location.attributes.projectId", internalFilter.SiteProjectIds)
+                    .TryAddTermsCriteria("occurrence.activity.id", internalFilter.ActivityIds)
+                    .TryAddTermCriteria("occurrence.biotope.id", internalFilter.BiotopeId)
+                    .TryAddTermsCriteria("occurrence.lifeStage.id", internalFilter.LifeStageIds)
+                    .TryAddDateRangeCriteria("occurrence.reportedDate", internalFilter.ReportedDateFrom, RangeTypes.GreaterThanOrEquals)
+                    .TryAddDateRangeCriteria("occurrence.reportedDate", internalFilter.ReportedDateTo, RangeTypes.LessThanOrEquals)
+                    .TryAddTermCriteria("occurrence.substrate.id", internalFilter.SubstrateId)
+                    .TryAddTermCriteria("occurrence.substrate.speciesId", internalFilter.SubstrateSpeciesId)
+                    .TryAddTermCriteria("privateCollection", internalFilter.PrivateCollection)
+                    .TryAddTermCriteria("publicCollection", internalFilter.PublicCollection)
+                    .TryAddTermCriteria("speciesCollectionLabel", internalFilter.SpeciesCollectionLabel)
+                );
 
-            query.TryAddTermCriteria("artportalenInternal.noteOfInterest", internalFilter.OnlyWithNotesOfInterest, true);
-            query.TryAddTermCriteria("artportalenInternal.occurrenceRecordedByInternal.id", internalFilter.ObservedByUserId);
-            query.TryAddTermCriteria("artportalenInternal.occurrenceRecordedByInternal.userServiceUserId", internalFilter.ObservedByUserServiceUserId);
+                switch (internalFilter.UnspontaneousFilter)
+                {
+                    case SightingUnspontaneousFilter.NotUnspontaneous:
+                        queries.Add(q => q.TryAddTermCriteria("occurrence.isNaturalOccurrence", true));
+                        break;
+                    case SightingUnspontaneousFilter.Unspontaneous:
+                        queries.Add(q => q.TryAddTermCriteria("occurrence.isNaturalOccurrence", false));
+                        break;
+                }
 
-            //search by locationId, but include child-locations observations aswell
-            var siteTerms = internalFilter?.SiteIds?.Select(s => $"urn:lsid:artportalen.se:site:{s}");
-            if (siteTerms?.Any() ?? false)
-            {
-
-                query.Add(q => q
-                    .Bool(p => p
+                //search by locationId, but include child-locations observations aswell
+                var siteTerms = internalFilter?.SiteIds?.Select(s => $"urn:lsid:artportalen.se:site:{s}");
+                if (siteTerms?.Any() ?? false)
+                {
+                    queries.Add(q => q.Bool(p => p
                         .Should(s => s
-                            .Terms(t => t
-                                .Field("location.locationId")
-                                .Terms(siteTerms)),
+                            .TryAddTermsCriteria("location.locationId", siteTerms),
                             s => s
-                            .Terms(t => t
-                                .Field("artportalenInternal.parentLocationId")
-                                .Terms(internalFilter.SiteIds))
-                             )
+                            .TryAddTermsCriteria("artportalenInternal.parentLocationId", internalFilter.SiteIds)
+                        )
+                    ));
+                }
+
+                if (internalFilter.OnlySecondHandInformation)
+                {
+                    queries.Add(q => q.TryAddTermCriteria("artportalenInternal.secondHandInformation", true));
+                }
+
+                if (internalFilter.OnlyWithBarcode)
+                {
+                    queries.Add(q => q.AddMustExistsCriteria("artportalenInternal.sightingBarcodeURL"));
+                }
+
+                if (internalFilter.SpeciesFactsIds?.Any() ?? false)
+                {
+                    var speciesFactQuerys = new List<Action<QueryDescriptor<TQueryDescriptor>>>();
+                    foreach (var factsId in internalFilter.SpeciesFactsIds)
+                    {
+                        speciesFactQuerys.Add(a => a.TryAddTermCriteria("artportalenInternal.speciesFactsIds", factsId));
+                    }
+                    queries.Add(q => q.Bool(b => b
+                        .Should(speciesFactQuerys.ToArray())
+                    ));
+                }
+
+                if (internalFilter.OnlyWithMedia)
+                {
+                    var mediaQueries = new Action<QueryDescriptor<TQueryDescriptor>>[] { 
+                        q => q.AddMustExistsCriteria("occurrence.associatedMedia"),
+                        q => q.AddMustExistsCriteria("artportalenInternal.associatedMedia")
+                    };
+                    queries.Add(q => q
+                        .Bool(b => b
+                            .Should(mediaQueries.ToArray())
                         )
                     );
-            }
-
-            query.TryAddTermsCriteria("artportalenInternal.regionalSightingStateId", internalFilter.RegionalSightingStateIdsFilter);
-            query.TryAddTermCriteria("artportalenInternal.reportedByUserId", internalFilter.ReportedByUserId);
-            query.TryAddTermCriteria("artportalenInternal.reportedByUserServiceUserId", internalFilter.ReportedByUserServiceUserId);
-
-            if (internalFilter.OnlySecondHandInformation)
-            {
-                query.TryAddTermCriteria("artportalenInternal.secondHandInformation", true);
-            }
-
-            if (internalFilter.OnlyWithBarcode)
-            {
-                query.AddMustExistsCriteria("artportalenInternal.sightingBarcodeURL");
-            }
-
-            query.TryAddTermsCriteria("artportalenInternal.sightingPublishTypeIds", internalFilter.PublishTypeIdsFilter);
-
-            if (internalFilter.SpeciesFactsIds?.Any() ?? false)
-            {
-                var speciesFactQuerys = new List<Func<QueryDescriptor<dynamic>, QueryContainer>>();
-                foreach (var factsId in internalFilter.SpeciesFactsIds)
-                {
-                    speciesFactQuerys.TryAddTermCriteria("artportalenInternal.speciesFactsIds", factsId);
-                }
-                query.Add(q => q
-                    .Bool(b => b
-                        .Should(speciesFactQuerys)
-                    )
-                );
-            }
-
-            query.TryAddTermsCriteria("artportalenInternal.triggeredObservationRuleFrequencyId", internalFilter.TriggeredObservationRuleFrequencyIds);
-            query.TryAddTermsCriteria("artportalenInternal.triggeredObservationRuleReproductionId", internalFilter.TriggeredObservationRuleReproductionIds);
-
-            query.TryAddTermsCriteria("event.discoveryMethod.id", internalFilter.DiscoveryMethodIds);
-
-            query.TryAddTermsCriteria("identification.verificationStatus.id", internalFilter.VerificationStatusIds);
-            query.TryAddTermCriteria("institutionId", internalFilter.InstitutionId);
-
-            query.TryAddTermsCriteria("location.attributes.projectId", internalFilter.SiteProjectIds);
-
-            query.TryAddTermsCriteria("occurrence.activity.id", internalFilter.ActivityIds);
-
-            if (internalFilter.OnlyWithMedia)
-            {
-                var mediaQuerys = new List<Func<QueryDescriptor<dynamic>, QueryContainer>>();
-                mediaQuerys.AddMustExistsCriteria("occurrence.associatedMedia");
-                mediaQuerys.AddMustExistsCriteria("artportalenInternal.associatedMedia");
-                query.Add(q => q
-                    .Bool(b => b
-                        .Should(mediaQuerys)
-                    )
-                );
-            }
-
-            query.TryAddTermCriteria("occurrence.biotope.id", internalFilter.BiotopeId);
-
-            switch (internalFilter.NotPresentFilter)
-            {
-                case SightingNotPresentFilter.DontIncludeNotPresent:
-                    query.TryAddTermCriteria("occurrence.isNeverFoundObservation", false);
-                    break;
-                case SightingNotPresentFilter.OnlyNotPresent:
-                    query.TryAddTermCriteria("occurrence.isNeverFoundObservation", true);
-                    break;
-            }
-
-            if (internalFilter.Length.HasValue && !string.IsNullOrWhiteSpace(internalFilter.LengthOperator))
-            {
-                query.AddNumericFilterWithRelationalOperator("occurrence.length", internalFilter.Length.Value, internalFilter.LengthOperator);
-            }
-
-            query.TryAddTermsCriteria("occurrence.lifeStage.id", internalFilter.LifeStageIds);
-
-            if (internalFilter.OnlyWithNotes)
-            {
-                query.AddMustExistsCriteria("occurrence.occurrenceRemarks");
-                //  query.TryAddWildcardCriteria("occurrence.occurrenceRemarks", "?*");
-            }
-
-            if (internalFilter.Quantity.HasValue && !string.IsNullOrWhiteSpace(internalFilter.QuantityOperator))
-            {
-                query.AddNumericFilterWithRelationalOperator("occurrence.organismQuantityInt", internalFilter.Quantity.Value, internalFilter.QuantityOperator);
-            }
-            if (internalFilter.QuantityOperator?.ToLower() == "missing")
-            {
-                query.AddNotExistsCriteria("occurrence.organismQuantityInt");
-            }
-
-            query.TryAddDateRangeCriteria("occurrence.reportedDate", internalFilter.ReportedDateFrom, SearchExtensionsGeneric.RangeTypes.GreaterThanOrEquals);
-            query.TryAddDateRangeCriteria("occurrence.reportedDate", internalFilter.ReportedDateTo, SearchExtensionsGeneric.RangeTypes.LessThanOrEquals);
-
-            query.TryAddTermCriteria("occurrence.substrate.id", internalFilter.SubstrateId);
-            query.TryAddTermCriteria("occurrence.substrate.speciesId", internalFilter.SubstrateSpeciesId);
-
-            if (internalFilter.Weight.HasValue && !string.IsNullOrWhiteSpace(internalFilter.WeightOperator))
-            {
-                query.AddNumericFilterWithRelationalOperator("occurrence.weight", internalFilter.Weight.Value, internalFilter.WeightOperator);
-            }
-
-            query.TryAddTermCriteria("privateCollection", internalFilter.PrivateCollection);
-            query.TryAddTermCriteria("publicCollection", internalFilter.PublicCollection);
-
-            query.TryAddTermCriteria("speciesCollectionLabel", internalFilter.SpeciesCollectionLabel);
-
-            if (internalFilter.Months?.Any() ?? false)
-            {
-                switch (internalFilter.MonthsComparison)
-                {
-                    case DateFilterComparison.BothStartDateAndEndDate:
-                        query.TryAddTermsCriteria("event.startMonth", internalFilter.Months);
-                        query.TryAddTermsCriteria("event.endMonth", internalFilter.Months);
-                        break;
-                    case DateFilterComparison.EndDate:
-                        query.TryAddTermsCriteria("event.endMonth", internalFilter.Months);
-                        break;
-                    case DateFilterComparison.StartDateEndDateMonthRange:
-                        query.TryAddTermsCriteria("artportalenInternal.eventMonths", internalFilter.Months);
-                        break;
-                    default:
-                        query.TryAddTermsCriteria("event.startMonth", internalFilter.Months);
-                        break;
-                }
-            }
-
-            if (internalFilter.Years?.Any() ?? false)
-            {
-                switch (internalFilter.YearsComparison)
-                {
-                    case DateFilterComparison.BothStartDateAndEndDate:
-                        query.TryAddTermsCriteria("event.startYear", internalFilter.Years);
-                        query.TryAddTermsCriteria("event.endYear", internalFilter.Years);
-                        break;
-                    case DateFilterComparison.EndDate:
-                        query.TryAddTermsCriteria("event.endYear", internalFilter.Years);
-                        break;
-                    default:
-                        query.TryAddTermsCriteria("event.startYear", internalFilter.Years);
-                        break;
-                }
-            }
-
-            if (internalFilter.Date != null && internalFilter.UsePeriodForAllYears && internalFilter.Date.StartDate.HasValue && internalFilter.Date.EndDate.HasValue)
-            {
-                var selector = "";
-                if (filter.Date.DateFilterType == DateFilter.DateRangeFilterType.BetweenStartDateAndEndDate)
-                {
-                    selector = "(daysOfStartYear.contains(startDayOfYear) && daysOfEndYear.contains(endDayOfYear))";
-                }
-                else if (filter.Date.DateFilterType == DateFilter.DateRangeFilterType.OnlyStartDate)
-                {
-                    selector = "(daysOfStartYear.contains(startDayOfYear))";
-                }
-                else if (filter.Date.DateFilterType == DateFilter.DateRangeFilterType.OnlyEndDate)
-                {
-                    selector = "(daysOfEndYear.contains(endDayOfYear))";
-                }
-                else if (filter.Date.DateFilterType == DateFilter.DateRangeFilterType.OverlappingStartDateAndEndDate)
-                {
-                    selector = "(daysOfStartYear.contains(startDayOfYear)) || (daysOfEndYear.contains(endDayOfYear))";
                 }
 
-                // Interval can start or end in a leap year. If it's starts with a leap year and spans to a new year, add day 366.
-                // If it's end with a leap year and spans over feb, add leap day
-                var daysOfLeapYear = new HashSet<int>();
-                PopulateDaysInInterval(ref daysOfLeapYear, 2000, internalFilter.Date.StartDate.Value, internalFilter.Date.EndDate.Value);
-                PopulateDaysInInterval(ref daysOfLeapYear, 2003, internalFilter.Date.StartDate.Value, internalFilter.Date.EndDate.Value);
+                switch (internalFilter.NotPresentFilter)
+                {
+                    case SightingNotPresentFilter.DontIncludeNotPresent:
+                        queries.Add(q => q.TryAddTermCriteria("occurrence.isNeverFoundObservation", false));
+                        break;
+                    case SightingNotPresentFilter.OnlyNotPresent:
+                        queries.Add(q => q.TryAddTermCriteria("occurrence.isNeverFoundObservation", true));
+                        break;
+                }
 
-                var daysOfNonLeapYear = new HashSet<int>();
-                PopulateDaysInInterval(ref daysOfNonLeapYear, 2002, internalFilter.Date.StartDate.Value, internalFilter.Date.EndDate.Value);
+                if (internalFilter.Length.HasValue && !string.IsNullOrWhiteSpace(internalFilter.LengthOperator))
+                {
+                    queries.Add(q => q.AddNumericFilterWithRelationalOperator("occurrence.length", internalFilter.Length.Value, internalFilter.LengthOperator));
+                }
+                if (internalFilter.OnlyWithNotes)
+                {
+                    queries.Add(q => q.AddMustExistsCriteria("occurrence.occurrenceRemarks"));
+                }
+                if (internalFilter.Quantity.HasValue && !string.IsNullOrWhiteSpace(internalFilter.QuantityOperator))
+                {
+                    queries.Add(q => q.AddNumericFilterWithRelationalOperator("occurrence.organismQuantityInt", internalFilter.Quantity.Value, internalFilter.QuantityOperator));
+                }
+                if (internalFilter.QuantityOperator?.ToLower() == "missing")
+                {
+                    queries.Add(q => q.AddNotExistsCriteria("occurrence.organismQuantityInt"));
+                }
+                if (internalFilter.Weight.HasValue && !string.IsNullOrWhiteSpace(internalFilter.WeightOperator))
+                {
+                    queries.Add(q => q.AddNumericFilterWithRelationalOperator("occurrence.weight", internalFilter.Weight.Value, internalFilter.WeightOperator));
+                }
+                if (internalFilter.Months?.Any() ?? false)
+                {
+                    switch (internalFilter.MonthsComparison)
+                    {
+                        case DateFilterComparison.BothStartDateAndEndDate:
+                            queries.Add(q => q
+                                .TryAddTermsCriteria("event.startMonth", internalFilter.Months)
+                                .TryAddTermsCriteria("event.endMonth", internalFilter.Months)
+                            );
+                            break;
+                        case DateFilterComparison.EndDate:
+                            queries.Add(q => q.TryAddTermsCriteria("event.endMonth", internalFilter.Months));
+                            break;
+                        case DateFilterComparison.StartDateEndDateMonthRange:
+                            queries.Add(q => q.TryAddTermsCriteria("artportalenInternal.eventMonths", internalFilter.Months));
+                            break;
+                        default:
+                            queries.Add(q => q.TryAddTermsCriteria("event.startMonth", internalFilter.Months));
+                            break;
+                    }
+                }
 
-                query.AddScript($@"
-                    HashSet daysOfLeapYear = new HashSet([{string.Join(',', daysOfLeapYear)}]);
-                    HashSet daysOfNonLeapYear = new HashSet([{string.Join(',', daysOfNonLeapYear)}]);
+                if (internalFilter.Years?.Any() ?? false)
+                {
+                    switch (internalFilter.YearsComparison)
+                    {
+                        case DateFilterComparison.BothStartDateAndEndDate:
+                            queries.Add(q => q
+                                .TryAddTermsCriteria("event.startYear", internalFilter.Years)
+                                .TryAddTermsCriteria("event.endYear", internalFilter.Years)
+                            );
+                            break;
+                        case DateFilterComparison.EndDate:
+                            queries.Add(q => q.TryAddTermsCriteria("event.endYear", internalFilter.Years));
+                            break;
+                        default:
+                            queries.Add(q => q.TryAddTermsCriteria("event.startYear", internalFilter.Years));
+                            break;
+                    }
+                }
+
+                if (internalFilter.Date != null && internalFilter.UsePeriodForAllYears && internalFilter.Date.StartDate.HasValue && internalFilter.Date.EndDate.HasValue)
+                {
+                    var selector = "";
+                    if (filter.Date.DateFilterType == DateFilter.DateRangeFilterType.BetweenStartDateAndEndDate)
+                    {
+                        selector = "(daysOfStartYear.contains(startDayOfYear) && daysOfEndYear.contains(endDayOfYear))";
+                    }
+                    else if (filter.Date.DateFilterType == DateFilter.DateRangeFilterType.OnlyStartDate)
+                    {
+                        selector = "(daysOfStartYear.contains(startDayOfYear))";
+                    }
+                    else if (filter.Date.DateFilterType == DateFilter.DateRangeFilterType.OnlyEndDate)
+                    {
+                        selector = "(daysOfEndYear.contains(endDayOfYear))";
+                    }
+                    else if (filter.Date.DateFilterType == DateFilter.DateRangeFilterType.OverlappingStartDateAndEndDate)
+                    {
+                        selector = "(daysOfStartYear.contains(startDayOfYear)) || (daysOfEndYear.contains(endDayOfYear))";
+                    }
+
+                    // Interval can start or end in a leap year. If it's starts with a leap year and spans to a new year, add day 366.
+                    // If it's end with a leap year and spans over feb, add leap day
+                    var daysOfLeapYear = new HashSet<int>();
+                    PopulateDaysInInterval(ref daysOfLeapYear, 2000, internalFilter.Date.StartDate.Value, internalFilter.Date.EndDate.Value);
+                    PopulateDaysInInterval(ref daysOfLeapYear, 2003, internalFilter.Date.StartDate.Value, internalFilter.Date.EndDate.Value);
+
+                    var daysOfNonLeapYear = new HashSet<int>();
+                    PopulateDaysInInterval(ref daysOfNonLeapYear, 2002, internalFilter.Date.StartDate.Value, internalFilter.Date.EndDate.Value);
+
+                    queries.Add(q => q
+                        .TryAddScript($@"
+                            HashSet daysOfLeapYear = new HashSet([{string.Join(',', daysOfLeapYear)}]);
+                            HashSet daysOfNonLeapYear = new HashSet([{string.Join(',', daysOfNonLeapYear)}]);
                     
-                    int startYear = (int)doc['event.startYear'].value;
-                    HashSet daysOfStartYear = (startYear % 400 === 0 || startYear % 100 !== 0 && startYear % 4 === 0) ? daysOfLeapYear : daysOfNonLeapYear;
-                    int startDayOfYear = (int)doc['event.startDayOfYear'].value;
+                            int startYear = (int)doc['event.startYear'].value;
+                            HashSet daysOfStartYear = (startYear % 400 === 0 || startYear % 100 !== 0 && startYear % 4 === 0) ? daysOfLeapYear : daysOfNonLeapYear;
+                            int startDayOfYear = (int)doc['event.startDayOfYear'].value;
                     
-                    int endYear = (int)doc['event.endYear'].value;
-                    HashSet daysOfEndYear =  (endYear % 400 === 0 || endYear % 100 !== 0 && endYear % 4 === 0) ? daysOfLeapYear : daysOfNonLeapYear;
-                    int endDayOfYear = (int)doc['event.endDayOfYear'].value;
+                            int endYear = (int)doc['event.endYear'].value;
+                            HashSet daysOfEndYear =  (endYear % 400 === 0 || endYear % 100 !== 0 && endYear % 4 === 0) ? daysOfLeapYear : daysOfNonLeapYear;
+                            int endDayOfYear = (int)doc['event.endDayOfYear'].value;
 
-                    if({selector})
-                        return true;
+                            if({selector})
+                                return true;
 
-                    return false;
-                ");
+                            return false;
+                        ")
+                    );
+                }
+
+                return internalFilter.SightingTypeSearchGroupIds;
             }
 
-            return internalFilter.SightingTypeSearchGroupIds;
+            return null;
         }
 
         private static void PopulateDaysInInterval(ref HashSet<int> daysOfYear, int startYear, DateTime startDate, DateTime endDate)
@@ -388,21 +367,306 @@ namespace SOS.Lib
         /// 
         /// </summary>
         /// <param name="filter"></param>
-        /// <param name="excludeQuery"></param>
+        /// <param name="excludeQueries"></param>
         /// <returns></returns>
-        private static void AddInternalExcludeFilters(this
-            ICollection<Func<QueryDescriptor<dynamic>, QueryContainer>> excludeQuery, SearchFilterBase filter)
+        private static ICollection<Action<QueryDescriptor<TQueryDescriptor>>> TryAddInternalExcludeFilters<TQueryDescriptor>(this
+            ICollection<Action<QueryDescriptor<TQueryDescriptor>>> excludeQueries, SearchFilterBase filter) where TQueryDescriptor : class
         {
-            var internalFilter = filter as SearchFilterInternal;
-
-            excludeQuery.TryAddTermsCriteria("identification.verificationStatus.id", internalFilter.ExcludeVerificationStatusIds);
+            if (filter is SearchFilterInternal internalFilter)
+            {
+                excludeQueries.Add(q => q.TryAddTermsCriteria("identification.verificationStatus.id", internalFilter.ExcludeVerificationStatusIds));
+            }
+            return excludeQueries;
         }
 
-        public static void AddSightingTypeFilters<TQueryContainer>(this ICollection<Func<QueryDescriptor<TQueryContainer>, QueryContainer>> query,
-            SearchFilterBase.SightingTypeFilter sightingTypeFilter,
-            IEnumerable<int> sightingTypeSearchGroupIds) where TQueryContainer : class
+        private static ICollection<Action<QueryDescriptor<TQueryDescriptor>>> TryAddDataStewardshipFilter<TQueryDescriptor>(this ICollection<Action<QueryDescriptor<TQueryDescriptor>>> queries, DataStewardshipFilter filter) where TQueryDescriptor : class
         {
-            var sightingTypeQuery = new List<Func<QueryDescriptor<TQueryContainer>, QueryContainer>>();
+            if (filter != null)
+            {
+                queries.Add(q => q.TryAddTermsCriteria("dataStewardship.datasetIdentifier", filter.DatasetIdentifiers));
+            }
+
+            return queries;
+        }
+
+        /// <summary>
+        /// Add determination filters
+        /// </summary>
+        /// <param name="queries"></param>
+        /// <param name="filter"></param>
+        private static ICollection<Action<QueryDescriptor<TQueryDescriptor>>> TryAddDeterminationFilters<TQueryDescriptor>(this ICollection<Action<QueryDescriptor<TQueryDescriptor>>> queries, SearchFilterBase filter) where TQueryDescriptor : class
+        {
+            switch (filter.DeterminationFilter)
+            {
+                case SightingDeterminationFilter.NotUnsureDetermination:
+                    queries.Add(q => q.TryAddTermCriteria("identification.uncertainIdentification", false));
+                    break;
+                case SightingDeterminationFilter.OnlyUnsureDetermination:
+                    queries.Add(q => q.TryAddTermCriteria("identification.uncertainIdentification", true));
+                    break;
+            }
+            return queries;
+        }
+
+        private static ICollection<Action<QueryDescriptor<TQueryDescriptor>>> TryAddEventFilter<TQueryDescriptor>(this ICollection<Action<QueryDescriptor<TQueryDescriptor>>> queries, EventFilter filter) where TQueryDescriptor : class
+        {
+            if (filter != null)
+            {
+                queries.Add(q => q.TryAddTermsCriteria("event.eventId", filter.Ids));
+            }
+            return queries;
+        }
+
+
+        /// <summary>
+        /// Add geometry filter to query
+        /// </summary>
+        /// <param name="queries"></param>
+        /// <param name="geographicsFilter"></param>
+        private static ICollection<Action<QueryDescriptor<TQueryDescriptor>>> TryAddGeometryFilters<TQueryDescriptor>(
+            this ICollection<Action<QueryDescriptor<TQueryDescriptor>>> queries,
+            GeographicsFilter geographicsFilter) where TQueryDescriptor : class
+        {
+            if (geographicsFilter != null)
+            {
+                var boundingBoxContainers = new List<Action<QueryDescriptor<TQueryDescriptor>>>();
+
+                if (!(!geographicsFilter.UsePointAccuracy && geographicsFilter.UseDisturbanceRadius))
+                {
+                    boundingBoxContainers.Add(q => q.TryAddBoundingBoxCriteria(
+                        $"location.{(geographicsFilter.UsePointAccuracy ? "pointWithBuffer" : "point")}",
+                        geographicsFilter.BoundingBox));
+                }
+
+                if (geographicsFilter.UseDisturbanceRadius)
+                {
+                    // Add both point and pointWithDisturbanceBuffer, since pointWithDisturbanceBuffer can be null if no dist buffer exists
+                    boundingBoxContainers.Add(q => q
+                        .TryAddBoundingBoxCriteria("location.point", geographicsFilter.BoundingBox)
+                    );
+                    boundingBoxContainers.Add(q => q
+                        .TryAddBoundingBoxCriteria("location.pointWithDisturbanceBuffer", geographicsFilter.BoundingBox)
+                    );
+                }
+
+                if (boundingBoxContainers.Any())
+                {
+                    queries.Add(q => q.Bool(b => b
+                            .Should(boundingBoxContainers.ToArray())
+                        )
+                    );
+                }
+
+                if (geographicsFilter?.IsValid ?? false)
+                {
+                    var geometryContainers = new List<Action<QueryDescriptor<TQueryDescriptor>>>();
+
+                    foreach (var geom in geographicsFilter.Geometries)
+                    {
+                        switch (geom.OgcGeometryType)
+                        {
+                            case OgcGeometryType.Point:
+                                geometryContainers.Add(q => q
+                                    .AddGeoDistanceCriteria($"location.{(geographicsFilter.UsePointAccuracy ? "pointWithBuffer" : "point")}", geom as Point, GeoDistanceType.Arc, geographicsFilter.MaxDistanceFromPoint ?? 0)
+                                );
+
+                                if (!geographicsFilter.UseDisturbanceRadius)
+                                {
+                                    continue;
+                                }
+                                geometryContainers.Add(q => q
+                                    .AddGeoDistanceCriteria("location.pointWithDisturbanceBuffer", geom as Point, GeoDistanceType.Arc, geographicsFilter.MaxDistanceFromPoint ?? 0)
+                                );
+                                break;
+                            case OgcGeometryType.Polygon:
+                            case OgcGeometryType.MultiPolygon:
+                                var vaildGeometry = geom.TryMakeValid();
+                                geometryContainers.Add(q => q
+                                    .AddGeoShapeCriteria($"location.{(geographicsFilter.UsePointAccuracy ? "pointWithBuffer" : "point")}", vaildGeometry, geographicsFilter.UsePointAccuracy ? GeoShapeRelation.Intersects : GeoShapeRelation.Within)
+                                );
+                                if (!geographicsFilter.UseDisturbanceRadius)
+                                {
+                                    continue;
+                                }
+                                geometryContainers.Add(q => q  
+                                    .AddGeoShapeCriteria("location.pointWithDisturbanceBuffer", vaildGeometry, GeoShapeRelation.Intersects)
+                                );
+                                break;
+                        }
+                    }
+
+                    queries.Add(q => q.Bool(b => b
+                            .Should(geometryContainers.ToArray())
+                        )
+                    );
+                }
+            }
+
+            return queries;
+        }
+
+        private static ICollection<Action<QueryDescriptor<TQueryDescriptor>>> TryAddModifiedDateFilter<TQueryDescriptor>(this
+                ICollection<Action<QueryDescriptor<TQueryDescriptor>>> queries, ModifiedDateFilter filter) where TQueryDescriptor : class
+        {
+            if (filter != null)
+            {
+                queries.Add(q => q
+                    .TryAddDateRangeCriteria("modified", filter.From, RangeTypes.GreaterThanOrEquals)
+                    .TryAddDateRangeCriteria("modified", filter.To, RangeTypes.LessThanOrEquals)
+                );
+            }
+
+            return queries;
+        }
+
+        /// <summary>
+        /// Try to add geographic filter
+        /// </summary>
+        /// <param name="queries"></param>
+        /// <param name="geographicAreasFilter"></param>
+        private static ICollection<Action<QueryDescriptor<TQueryDescriptor>>> TryAddGeographicalAreaFilter<TQueryDescriptor>(
+            this ICollection<Action<QueryDescriptor<TQueryDescriptor>>> queries,
+            GeographicAreasFilter geographicAreasFilter) where TQueryDescriptor : class
+        {
+            if (geographicAreasFilter != null)
+            {
+                queries.TryAddGeometryFilters(geographicAreasFilter.GeometryFilter);
+                queries.Add(q => q
+                    .TryAddTermsCriteria("artportalenInternal.birdValidationAreaIds", geographicAreasFilter.BirdValidationAreaIds)
+                    .TryAddTermsCriteria("location.countryRegion.featureId", geographicAreasFilter.CountryRegionIds)
+                    .TryAddTermsCriteria("location.county.featureId", geographicAreasFilter.CountyIds)
+                    .TryAddTermsCriteria("location.municipality.featureId", geographicAreasFilter.MunicipalityIds)
+                    .TryAddTermsCriteria("location.parish.featureId", geographicAreasFilter.ParishIds)
+                    .TryAddTermsCriteria("location.province.featureId", geographicAreasFilter.ProvinceIds)
+                );
+            }
+
+            return queries;
+                   
+        }
+
+        private static ICollection<Action<QueryDescriptor<TQueryDescriptor>>> TryAddLocationFilter<TQueryDescriptor>(
+            this ICollection<Action<QueryDescriptor<TQueryDescriptor>>> queries,
+            LocationFilter filter) where TQueryDescriptor : class
+        {
+            if (filter != null)
+            {
+                queries.TryAddGeographicalAreaFilter(filter.AreaGeographic);
+                queries.TryAddGeometryFilters(filter.Geometries);
+                queries.Add(q => q
+                    .TryAddTermsCriteria("location.locationId", filter.LocationIds)
+                    .TryAddWildcardCriteria("location.locality", filter.NameFilter)
+
+                    .TryAddNumericRangeCriteria("location.coordinateUncertaintyInMeters", filter.MaxAccuracy, RangeTypes.LessThanOrEquals)
+                );
+                
+            }
+            return queries;
+        }
+
+        /// <summary>
+        /// Try to add not recovered filter
+        /// </summary>
+        /// <param name="queries"></param>
+        /// <param name="filter"></param>
+        private static ICollection<Action<QueryDescriptor<TQueryDescriptor>>> TryAddNotRecoveredFilter<TQueryDescriptor>(
+            this ICollection<Action<QueryDescriptor<TQueryDescriptor>>> queries, SearchFilterBase filter) where TQueryDescriptor : class
+        {
+            if (filter != null)
+            {
+                switch (filter.NotRecoveredFilter)
+                {
+                    case SightingNotRecoveredFilter.DontIncludeNotRecovered:
+                        queries.Add(q => q.TryAddTermCriteria("occurrence.isNotRediscoveredObservation", false));
+                        break;
+                    case SightingNotRecoveredFilter.OnlyNotRecovered:
+                        queries.Add(q => q.TryAddTermCriteria("occurrence.isNotRediscoveredObservation", true));
+                        break;
+                }
+
+            }
+            return queries;
+        }
+
+        /// <summary>
+        /// Try to add taxon search criteria
+        /// </summary>
+        /// <typeparam name="TQueryDescriptor"></typeparam>
+        /// <param name="queries"></param>
+        /// <param name="filter"></param>
+        private static ICollection<Action<QueryDescriptor<TQueryDescriptor>>> TryAddTaxonCriteria<TQueryDescriptor>(
+            this ICollection<Action<QueryDescriptor<TQueryDescriptor>>> queries, TaxonFilter filter) where TQueryDescriptor : class
+        {
+            if (filter != null)
+            {
+                queries.Add(q => q
+                    .TryAddTermsCriteria("taxon.attributes.redlistCategoryDerived", filter.RedListCategories?.Select(m => m.ToUpper()))
+                    .TryAddTermsCriteria("taxon.id", filter.Ids)
+                    .TryAddTermsCriteria("occurrence.sex.id", filter.SexIds)
+                );
+            }
+
+            return queries;
+        }
+
+        private static ICollection<Action<QueryDescriptor<TQueryDescriptor>>> TryAddValidationStatusFilter<TQueryDescriptor>(this ICollection<Action<QueryDescriptor<TQueryDescriptor>>> queries, SearchFilterBase filter) where TQueryDescriptor : class
+        {
+            if (filter != null)
+            {
+                switch (filter.VerificationStatus)
+                {
+                    case SearchFilterBase.StatusVerification.Verified:
+                        queries.Add(q => q.TryAddTermCriteria("identification.verified", true, true));
+                        break;
+                    case SearchFilterBase.StatusVerification.NotVerified:
+                        queries.Add(q => q.TryAddTermCriteria("identification.verified", false, false));
+                        break;
+                }
+            }
+
+            return queries;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="aggregationType"></param>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        public static void AddAggregationFilter<TQueryDescriptor>(this QueryDescriptor<TQueryDescriptor> query, AggregationType aggregationType) where TQueryDescriptor : class
+        {
+            if (aggregationType.IsDateHistogram() || aggregationType == AggregationType.SightingsPerWeek48)
+            {
+                // Do only include sightings whose period don't exceeds one week/year
+                var maxDuration = aggregationType switch
+                {
+                    AggregationType.QuantityPerWeek => 7,
+                    AggregationType.SightingsPerWeek => 7,
+                    AggregationType.SightingsPerWeek48 => 7,
+                    AggregationType.QuantityPerYear => 365,
+                    AggregationType.SightingsPerYear => 365,
+                    _ => 365
+                };
+
+                query.TryAddScript($@"ChronoUnit.DAYS.between(doc['event.startDate'].value, doc['event.endDate'].value) <= {maxDuration}");
+            }
+
+            if (aggregationType.IsSpeciesSightingsList())
+            {
+                query.TryAddTermsCriteria("artportalenInternal.sightingTypeId", new[] {
+                    (int)SightingType.NormalSighting,
+                    (int)SightingType.AggregationSighting,
+                    (int)SightingType.ReplacementSighting,
+                    (int)SightingType.CorrectionSighting,
+                    (int)SightingType.AssessmentSightingForOwnBreeding
+                });
+            }
+        }
+
+        public static void AddSightingTypeFilters<TQueryDescriptor>(this ICollection<Action<QueryDescriptor<TQueryDescriptor>>> queries,
+            SearchFilterBase.SightingTypeFilter sightingTypeFilter,
+            IEnumerable<int> sightingTypeSearchGroupIds) where TQueryDescriptor : class
+        {
             var sightingTypeSearchGroupFilter = sightingTypeSearchGroupIds?.Any() ?? false ?
                     sightingTypeSearchGroupIds
                     :
@@ -437,6 +701,7 @@ namespace SOS.Lib
                         (int)SightingTypeSearchGroup.OwnBreedingAssessment }
                     };
 
+            var sightingTypeQuery = new QueryDescriptor<TQueryDescriptor>();
             sightingTypeQuery.TryAddTermsCriteria("artportalenInternal.sightingTypeSearchGroupId", sightingTypeSearchGroupFilter);
 
             // If not only Assessment is selected
@@ -446,273 +711,11 @@ namespace SOS.Lib
                 sightingTypeQuery.AddNotExistsCriteria("artportalenInternal.sightingTypeSearchGroupId");
             }
 
-            query.Add(q => q
+            queries.Add(q => q
                 .Bool(b => b
                     .Should(sightingTypeQuery)
                 )
             );
-        }
-
-        private static void TryAddDataStewardshipFilter(this ICollection<Func<QueryDescriptor<dynamic>, QueryContainer>> query, DataStewardshipFilter filter)
-        {
-            if (filter == null)
-            {
-                return;
-            }
-
-            query.TryAddTermsCriteria("dataStewardship.datasetIdentifier", filter.DatasetIdentifiers);
-        }
-
-        /// <summary>
-        /// Add determination filters
-        /// </summary>
-        /// <param name="query"></param>
-        /// <param name="filter"></param>
-        private static void TryAddDeterminationFilters(this ICollection<Func<QueryDescriptor<dynamic>, QueryContainer>> query, SearchFilterBase filter)
-        {
-            switch (filter.DeterminationFilter)
-            {
-                case SightingDeterminationFilter.NotUnsureDetermination:
-                    query.TryAddTermCriteria("identification.uncertainIdentification", false);
-                    break;
-                case SightingDeterminationFilter.OnlyUnsureDetermination:
-                    query.TryAddTermCriteria("identification.uncertainIdentification", true);
-                    break;
-            }
-        }
-
-        private static void TryAddEventFilter(this ICollection<Func<QueryDescriptor<dynamic>, QueryContainer>> query, EventFilter filter)
-        {
-            if (filter == null)
-            {
-                return;
-            }
-
-            query.TryAddTermsCriteria("event.eventId", filter.Ids);
-        }
-
-
-        /// <summary>
-        /// Add geometry filter to query
-        /// </summary>
-        /// <param name="query"></param>
-        /// <param name="geographicsFilter"></param>
-        private static void TryAddGeometryFilters(
-            this ICollection<Func<QueryDescriptor<dynamic>, QueryContainer>> query,
-            GeographicsFilter geographicsFilter)
-        {
-            if (geographicsFilter == null)
-            {
-                return;
-            }
-
-            var boundingBoxContainers = new List<Func<QueryDescriptor<dynamic>, QueryContainer>>();
-
-            if (!(!geographicsFilter.UsePointAccuracy && geographicsFilter.UseDisturbanceRadius))
-            {
-                boundingBoxContainers.TryAddBoundingBoxCriteria(
-                    $"location.{(geographicsFilter.UsePointAccuracy ? "pointWithBuffer" : "point")}",
-                    geographicsFilter.BoundingBox);
-            }
-
-            if (geographicsFilter.UseDisturbanceRadius)
-            {
-                // Add both point and pointWithDisturbanceBuffer, since pointWithDisturbanceBuffer can be null if no dist buffer exists
-                boundingBoxContainers.TryAddBoundingBoxCriteria(
-                    "location.point",
-                    geographicsFilter.BoundingBox);
-
-                boundingBoxContainers.TryAddBoundingBoxCriteria(
-                    "location.pointWithDisturbanceBuffer",
-                    geographicsFilter.BoundingBox);
-            }
-
-            if (boundingBoxContainers.Any())
-            {
-                query.Add(q => q
-                    .Bool(b => b
-                        .Should(boundingBoxContainers)
-                    )
-                );
-            }
-
-            if (!geographicsFilter?.IsValid ?? true)
-            {
-                return;
-            }
-
-            var geometryContainers = new List<Func<QueryDescriptor<dynamic>, QueryContainer>>();
-
-            foreach (var geom in geographicsFilter.Geometries)
-            {
-                switch (geom.Type.ToLower())
-                {
-                    case "point":
-                        geometryContainers.AddGeoDistanceCriteria($"location.{(geographicsFilter.UsePointAccuracy ? "pointWithBuffer" : "point")}", geom, GeoDistanceType.Arc, geographicsFilter.MaxDistanceFromPoint ?? 0);
-
-                        if (!geographicsFilter.UseDisturbanceRadius)
-                        {
-                            continue;
-                        }
-                        geometryContainers.AddGeoDistanceCriteria("location.pointWithDisturbanceBuffer", geom, GeoDistanceType.Arc, geographicsFilter.MaxDistanceFromPoint ?? 0);
-                        break;
-                    case "polygon":
-                    case "multipolygon":
-                        var vaildGeometry = geom.TryMakeValid();
-                        geometryContainers.AddGeoShapeCriteria($"location.{(geographicsFilter.UsePointAccuracy ? "pointWithBuffer" : "point")}", vaildGeometry, geographicsFilter.UsePointAccuracy ? GeoShapeRelation.Intersects : GeoShapeRelation.Within);
-                        if (!geographicsFilter.UseDisturbanceRadius)
-                        {
-                            continue;
-                        }
-                        geometryContainers.AddGeoShapeCriteria("location.pointWithDisturbanceBuffer", vaildGeometry, GeoShapeRelation.Intersects);
-                        break;
-                }
-            }
-
-            query.Add(q => q
-                .Bool(b => b
-                    .Should(geometryContainers)
-                )
-            );
-        }
-
-        private static void TryAddModifiedDateFilter(this
-                ICollection<Func<QueryDescriptor<dynamic>, QueryContainer>> query, ModifiedDateFilter filter)
-        {
-            if (filter == null)
-            {
-                return;
-            }
-
-            query.TryAddDateRangeCriteria("modified", filter.From, RangeTypes.GreaterThanOrEquals);
-            query.TryAddDateRangeCriteria("modified", filter.To, RangeTypes.LessThanOrEquals);
-        }
-
-        /// <summary>
-        /// Try to add geographic filter
-        /// </summary>
-        /// <param name="query"></param>
-        /// <param name="geographicAreasFilter"></param>
-        private static void TryAddGeographicalAreaFilter(
-            this ICollection<Func<QueryDescriptor<dynamic>, QueryContainer>> query,
-            GeographicAreasFilter geographicAreasFilter)
-        {
-            if (geographicAreasFilter == null)
-            {
-                return;
-            }
-
-            query.TryAddTermsCriteria("artportalenInternal.birdValidationAreaIds", geographicAreasFilter.BirdValidationAreaIds);
-            query.TryAddTermsCriteria("location.countryRegion.featureId", geographicAreasFilter.CountryRegionIds);
-            query.TryAddTermsCriteria("location.county.featureId", geographicAreasFilter.CountyIds);
-            query.TryAddTermsCriteria("location.municipality.featureId", geographicAreasFilter.MunicipalityIds);
-            query.TryAddTermsCriteria("location.parish.featureId", geographicAreasFilter.ParishIds);
-            query.TryAddTermsCriteria("location.province.featureId", geographicAreasFilter.ProvinceIds);
-
-            query.TryAddGeometryFilters(geographicAreasFilter.GeometryFilter);
-        }
-
-        private static void TryAddLocationFilter(
-            this ICollection<Func<QueryDescriptor<dynamic>, QueryContainer>> query,
-            LocationFilter filter)
-        {
-            if (filter == null)
-            {
-                return;
-            }
-
-            query.TryAddTermsCriteria("location.locationId", filter.LocationIds);
-            query.TryAddWildcardCriteria("location.locality", filter.NameFilter);
-            query.TryAddGeographicalAreaFilter(filter.AreaGeographic);
-            query.TryAddGeometryFilters(filter.Geometries);
-            query.TryAddNumericRangeCriteria("location.coordinateUncertaintyInMeters", filter.MaxAccuracy, SearchExtensionsGeneric.RangeTypes.LessThanOrEquals);
-        }
-
-        /// <summary>
-        /// Try to add not recovered filter
-        /// </summary>
-        /// <param name="query"></param>
-        /// <param name="filter"></param>
-        private static void TryAddNotRecoveredFilter(
-            this ICollection<Func<QueryDescriptor<dynamic>, QueryContainer>> query, SearchFilterBase filter)
-        {
-            switch (filter.NotRecoveredFilter)
-            {
-                case SightingNotRecoveredFilter.DontIncludeNotRecovered:
-                    query.TryAddTermCriteria("occurrence.isNotRediscoveredObservation", false);
-                    break;
-                case SightingNotRecoveredFilter.OnlyNotRecovered:
-                    query.TryAddTermCriteria("occurrence.isNotRediscoveredObservation", true);
-                    break;
-            }
-        }
-
-        /// <summary>
-        /// Try to add taxon search criteria
-        /// </summary>
-        /// <typeparam name="TQueryContainer"></typeparam>
-        /// <param name="query"></param>
-        /// <param name="filter"></param>
-        private static void TryAddTaxonCriteria<TQueryContainer>(
-            this ICollection<Func<QueryDescriptor<TQueryContainer>, QueryContainer>> query, TaxonFilter filter) where TQueryContainer : class
-        {
-            if (filter == null)
-            {
-                return;
-            }
-
-            query.TryAddTermsCriteria("taxon.attributes.redlistCategoryDerived", filter.RedListCategories?.Select(m => m.ToUpper()));
-            query.TryAddTermsCriteria("taxon.id", filter.Ids);
-            query.TryAddTermsCriteria("occurrence.sex.id", filter.SexIds);
-        }
-
-        private static void TryAddValidationStatusFilter(this ICollection<Func<QueryDescriptor<dynamic>, QueryContainer>> query, SearchFilterBase filter)
-        {
-            switch (filter.VerificationStatus)
-            {
-                case SearchFilterBase.StatusVerification.Verified:
-                    query.TryAddTermCriteria("identification.verified", true, true);
-                    break;
-                case SearchFilterBase.StatusVerification.NotVerified:
-                    query.TryAddTermCriteria("identification.verified", false, false);
-                    break;
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="aggregationType"></param>
-        /// <param name="query"></param>
-        /// <returns></returns>
-        public static void AddAggregationFilter(this ICollection<Func<QueryDescriptor<dynamic>, QueryContainer>> query, AggregationType aggregationType)
-        {
-            if (aggregationType.IsDateHistogram() || aggregationType == AggregationType.SightingsPerWeek48)
-            {
-                // Do only include sightings whose period don't exceeds one week/year
-                var maxDuration = aggregationType switch
-                {
-                    AggregationType.QuantityPerWeek => 7,
-                    AggregationType.SightingsPerWeek => 7,
-                    AggregationType.SightingsPerWeek48 => 7,
-                    AggregationType.QuantityPerYear => 365,
-                    AggregationType.SightingsPerYear => 365,
-                    _ => 365
-                };
-
-                query.AddScript($@"ChronoUnit.DAYS.between(doc['event.startDate'].value, doc['event.endDate'].value) <= {maxDuration}");
-            }
-
-            if (aggregationType.IsSpeciesSightingsList())
-            {
-                query.TryAddTermsCriteria("artportalenInternal.sightingTypeId", new[] {
-                    (int)SightingType.NormalSighting,
-                    (int)SightingType.AggregationSighting,
-                    (int)SightingType.ReplacementSighting,
-                    (int)SightingType.CorrectionSighting,
-                    (int)SightingType.AssessmentSightingForOwnBreeding
-                });
-            }
         }
 
         /// <summary>
@@ -720,61 +723,60 @@ namespace SOS.Lib
         /// </summary>
         /// <param name="filter"></param>
         /// <returns></returns>
-        public static ICollection<Func<QueryDescriptor<dynamic>, QueryContainer>> ToMultimediaQuery(
-            this SearchFilterBase filter)
+        public static ICollection<Action<QueryDescriptor<TQueryDescriptor>>> ToMultimediaQuery<TQueryDescriptor>(
+            this SearchFilterBase filter) where TQueryDescriptor : class
         {
-            var query = filter.ToQuery();            
-            query.AddMustExistsCriteria("occurrence.media");
-            return query;
+            var queries = filter.ToQuery<TQueryDescriptor>();
+            queries.Add(q => q.AddMustExistsCriteria("occurrence.media"));
+            return queries;
         }
 
-        public static ICollection<Func<QueryDescriptor<dynamic>, QueryContainer>> ToMeasurementOrFactsQuery(
-            this SearchFilterBase filter)
+        public static ICollection<Action<QueryDescriptor<TQueryDescriptor>>> ToMeasurementOrFactsQuery<TQueryDescriptor>(
+            this SearchFilterBase filter) where TQueryDescriptor : class
         {
-            var query = filter.ToQuery();            
-            query.AddMustExistsCriteria("measurementOrFacts");
-            return query;
+            var queries = filter.ToQuery<TQueryDescriptor>();
+            queries.Add(q => q.AddMustExistsCriteria("measurementOrFacts"));
+            return queries;
         }
 
         /// <summary>
         /// Add signal search specific arguments
         /// </summary>
-        /// <param name="query"></param>
+        /// <param name="queries"></param>
         /// <param name="extendedAuthorizations"></param>
         /// <param name="onlyAboveMyClearance"></param>
-        public static void AddSignalSearchCriteria(
-            this ICollection<Func<QueryDescriptor<dynamic>, QueryContainer>> query, IEnumerable<ExtendedAuthorizationAreaFilter> extendedAuthorizations, bool onlyAboveMyClearance)
+        public static ICollection<Action<QueryDescriptor<TQueryDescriptor>>> AddSignalSearchCriteria<TQueryDescriptor>(
+            this ICollection<Action<QueryDescriptor<TQueryDescriptor>>> queries, IEnumerable<ExtendedAuthorizationAreaFilter> extendedAuthorizations, bool onlyAboveMyClearance) where TQueryDescriptor : class
         {
-            if (!extendedAuthorizations?.Any() ?? true)
+            var protectedQuerys = new List<Action<QueryDescriptor<TQueryDescriptor>>>();
+            if (extendedAuthorizations?.Any() ?? false)
             {
-                return;
-            }
-
-            var protectedQuerys = new List<Func<QueryDescriptor<dynamic>, QueryContainer>>();
-
-            // Allow protected observations matching user extended authorization
-            foreach (var extendedAuthorization in extendedAuthorizations)
-            {
-                var protectedQuery = new List<Func<QueryDescriptor<dynamic>, QueryContainer>>();
-                if (onlyAboveMyClearance)
+                // Allow protected observations matching user extended authorization
+                foreach (var extendedAuthorization in extendedAuthorizations)
                 {
-                    protectedQuery.TryAddNumericRangeCriteria("occurrence.sensitivityCategory", extendedAuthorization.MaxProtectionLevel, SearchExtensionsGeneric.RangeTypes.GreaterThan);
+                    var protectedQuery = new List<Action<QueryDescriptor<TQueryDescriptor>>>();
+                    if (onlyAboveMyClearance)
+                    {
+                        protectedQuery.Add(q => q.TryAddNumericRangeCriteria("occurrence.sensitivityCategory", extendedAuthorization.MaxProtectionLevel, RangeTypes.GreaterThan));
+                    }
+
+                    TryAddGeographicalAreaFilter(protectedQuery, extendedAuthorization.GeographicAreas);
+
+                    protectedQuerys.Add(q => q
+                        .Bool(b => b
+                            .Filter(protectedQuery.ToArray())
+                        )
+                    );
                 }
 
-                TryAddGeographicalAreaFilter(protectedQuery, extendedAuthorization.GeographicAreas);
-
-                protectedQuerys.Add(q => q
+                queries.Add(q => q
                     .Bool(b => b
-                        .Filter(protectedQuery)
+                        .Should(protectedQuerys.ToArray())
                     )
                 );
             }
 
-            query.Add(q => q
-                .Bool(b => b
-                    .Should(protectedQuerys)
-                )
-            );
+            return queries;
         }
 
         /// <summary>
@@ -784,14 +786,14 @@ namespace SOS.Lib
         /// <param name="skipSightingTypeFilters"></param>
         /// <param name="skipAuthorizationFilters"></param>
         /// <returns></returns>
-        public static ICollection<Func<QueryDescriptor<dynamic>, QueryContainer>> ToQuery(
-            this SearchFilterBase filter, bool skipSightingTypeFilters = false, bool skipAuthorizationFilters = false)
+        public static ICollection<Action<QueryDescriptor<TQueryDescriptor>>> ToQuery<TQueryDescriptor>(
+            this SearchFilterBase filter, bool skipSightingTypeFilters = false, bool skipAuthorizationFilters = false) where TQueryDescriptor : class
         {
-            var query = new List<Func<QueryDescriptor<dynamic>, QueryContainer>>();
+            var queries = new List<Action<QueryDescriptor<TQueryDescriptor>>>();
 
             if (filter == null)
             {
-                return query;
+                return queries;
             }
 
             if (skipAuthorizationFilters)
@@ -802,65 +804,55 @@ namespace SOS.Lib
             }
             else
             {
-                query.AddAuthorizationFilters(filter.ExtendedAuthorization);
+                queries.AddAuthorizationFilters(filter.ExtendedAuthorization);
             }
-
-            query.TryAddTermsCriteria("occurrence.sensitivityCategory", filter.SensitivityCategories);
-
-            // If internal filter is "Use Period For All Year" we cannot apply date-range filter.
-            if (!(filter is SearchFilterInternal filterInternal && filterInternal.UsePeriodForAllYears))
-            {
-                query.TryAddDateRangeFilters(filter.Date, "event.startDate", "event.endDate");
-            }
-
-            query.TryAddDataStewardshipFilter(filter.DataStewardship);
-            query.TryAddEventFilter(filter.Event);
-            query.TryAddTimeRangeFilters(filter.Date, "event.startDate");
-            query.TryAddDeterminationFilters(filter);
-            query.TryAddLocationFilter(filter.Location);
-            query.TryAddModifiedDateFilter(filter.ModifiedDate);
-            query.TryAddNotRecoveredFilter(filter);
-            query.TryAddValidationStatusFilter(filter);
-            query.TryAddTaxonCriteria(filter.Taxa);
-            query.TryAddTermsCriteria("occurrence.occurrenceId", filter.OccurrenceIds);
-
-            //query.TryAddTermsCriteria("diffusionStatus", filter.DiffusionStatuses?.Select(ds => (int)ds));            
-
             // Only possible to use generalization filter when searching sensitive observations.
             if (filter.ExtendedAuthorization?.ProtectionFilter == ProtectionFilter.Public || filter.ExtendedAuthorization?.ProtectionFilter == ProtectionFilter.BothPublicAndSensitive)
             {
                 filter.IncludeSensitiveGeneralizedObservations = false;
             }
 
-            query.TryAddGeneralizationsCriteria(filter.IncludeSensitiveGeneralizedObservations, filter.IsPublicGeneralizedObservation);            
-            query.TryAddTermsCriteria("dataProviderId", filter.DataProviderIds);
-            query.TryAddTermsCriteria("dataStewardship.datasetIdentifier", filter.DataStewardshipDatasetIds);
+            queries.TryAddDataStewardshipFilter(filter.DataStewardship)
+                .TryAddEventFilter(filter.Event)
+                .TryAddDeterminationFilters(filter)
+                .TryAddLocationFilter(filter.Location)
+                .TryAddModifiedDateFilter(filter.ModifiedDate)
+                .TryAddNotRecoveredFilter(filter)
+                .TryAddTaxonCriteria(filter.Taxa)
+                .TryAddValidationStatusFilter(filter);
+            queries.Add(q => q
+                .TryAddGeneralizationsCriteria(filter.IncludeSensitiveGeneralizedObservations, filter.IsPublicGeneralizedObservation)
+                .TryAddNumericRangeCriteria("occurrence.birdNestActivityId", filter.BirdNestActivityLimit, RangeTypes.LessThanOrEquals)
+                .TryAddTermsCriteria("dataProviderId", filter.DataProviderIds)
+                .TryAddTermsCriteria("dataStewardship.datasetIdentifier", filter.DataStewardshipDatasetIds)
+                .TryAddTermCriteria("occurrence.isPositiveObservation", filter.PositiveSightings)
+                .TryAddTermsCriteria("occurrence.occurrenceId", filter.OccurrenceIds)
+                .TryAddTermsCriteria("occurrence.sensitivityCategory", filter.SensitivityCategories)
+                .TryAddTermsCriteria("projects.id", filter.ProjectIds)
+                .TryAddTermsCriteria("taxon.kingdom", filter.Taxa?.Kingdoms)  // Cos4Cloud specific
+                .TryAddTermsCriteria("taxon.scientificName", filter.Taxa?.ScientificNames) // Cos4Cloud specific
+                .TryAddTermsCriteria("license", filter.Licenses) // Cos4Cloud specific
+                .TryAddTimeRangeFilters(filter.Date, "event.startDate")
+            );
+
+            // If internal filter is "Use Period For All Year" we cannot apply date-range filter.
+            if (!(filter is SearchFilterInternal filterInternal && filterInternal.UsePeriodForAllYears))
+            {
+                queries.Add(q => q.TryAddDateRangeFilters(filter.Date, "event.startDate", "event.endDate"));
+            }
+
             if (filter.IsPartOfDataStewardshipDataset.GetValueOrDefault(false))
             {
-                query.AddExistsCriteria("dataStewardship");
+                queries.Add(q => q.AddExistsCriteria("dataStewardship"));
             }
 
-            query.TryAddTermCriteria("occurrence.isPositiveObservation", filter.PositiveSightings);            
-            query.TryAddTermsCriteria("projects.id", filter.ProjectIds);
-            query.TryAddNumericRangeCriteria("occurrence.birdNestActivityId", filter.BirdNestActivityLimit, SearchExtensionsGeneric.RangeTypes.LessThanOrEquals);
-
-            // Cos4Cloud specific
-            query.TryAddTermsCriteria("taxon.kingdom", filter.Taxa?.Kingdoms);
-            query.TryAddTermsCriteria("taxon.scientificName", filter.Taxa?.ScientificNames);
-            query.TryAddTermsCriteria("license", filter.Licenses);
-
-            IEnumerable<int> sightingTypeSearchGroupIds = null!;
-            if (filter is SearchFilterInternal)
-            {
-                sightingTypeSearchGroupIds = query.AddInternalFilters(filter);
-            }
-
+            var sightingTypeSearchGroupIds = queries.TryAddInternalFilters(filter);
             if (!skipSightingTypeFilters || (sightingTypeSearchGroupIds?.Any() ?? false))
             {
-                query.AddSightingTypeFilters(filter.TypeFilter, sightingTypeSearchGroupIds);
+                queries.AddSightingTypeFilters(filter.TypeFilter, sightingTypeSearchGroupIds);
             }
 
-            return query;
+            return queries;
         }
 
         /// <summary>
@@ -868,42 +860,37 @@ namespace SOS.Lib
         /// </summary>
         /// <param name="filter"></param>
         /// <returns></returns>
-        public static List<Func<QueryDescriptor<dynamic>, QueryContainer>> ToExcludeQuery(this SearchFilterBase filter)
+        public static ICollection<Action<QueryDescriptor<TQueryDescriptor>>> ToExcludeQuery<TQueryDescriptor>(this SearchFilterBase filter) where TQueryDescriptor : class
         {
+            var queries = new List<Action<QueryDescriptor<TQueryDescriptor>>>();
+
             if (filter == null)
             {
-                return null;
-            }
-
-            var query = new List<Func<QueryDescriptor<dynamic>, QueryContainer>>();
-
-            if (filter.Location?.AreaGeographic?.GeometryFilter?.IsValid ?? false)
-            {
-                foreach (var geom in filter.Location.AreaGeographic?.GeometryFilter.Geometries)
+                if (filter.Location?.AreaGeographic?.GeometryFilter?.IsValid ?? false)
                 {
-                    switch (geom.Type.ToLower())
+                    foreach (var geom in filter.Location.AreaGeographic?.GeometryFilter.Geometries)
                     {
-                        case "holepolygon":
-                            query.AddGeoShapeCriteria($"location.{(filter.Location.AreaGeographic.GeometryFilter.UsePointAccuracy ? "pointWithBuffer" : "point")}", geom, GeoShapeRelation.Intersects);
-                            if (!filter.Location.AreaGeographic.GeometryFilter.UseDisturbanceRadius) // Not sure this should be used here
-                            {
-                                continue;
-                            }
-                            query.AddGeoShapeCriteria("location.pointWithDisturbanceBuffer", geom, GeoShapeRelation.Intersects);
+                        switch (geom.OgcGeometryType)
+                        {
+                            case OgcGeometryType.Polygon:
+                            case OgcGeometryType.MultiPolygon:
+                                queries.Add(q => q.AddGeoShapeCriteria($"location.{(filter.Location.AreaGeographic.GeometryFilter.UsePointAccuracy ? "pointWithBuffer" : "point")}", geom, GeoShapeRelation.Intersects));
+                                if (!filter.Location.AreaGeographic.GeometryFilter.UseDisturbanceRadius) // Not sure this should be used here
+                                {
+                                    continue;
+                                }
+                                queries.Add(q => q.AddGeoShapeCriteria("location.pointWithDisturbanceBuffer", geom, GeoShapeRelation.Intersects));
 
-                            break;
+                                break;
+                        }
                     }
                 }
+
+                queries.Add(q => q.TryAddTermsCriteria("occurrence.occurrenceId", filter.ExcludeFilter?.OccurrenceIds));
+                queries.TryAddInternalExcludeFilters(filter);
             }
 
-            query.TryAddTermsCriteria("occurrence.occurrenceId", filter.ExcludeFilter?.OccurrenceIds);
-
-            if (filter is SearchFilterInternal)
-            {
-                query.AddInternalExcludeFilters(filter);
-            }
-
-            return query;
+            return queries;
         }
 
         /// <summary>
@@ -912,78 +899,53 @@ namespace SOS.Lib
         /// <param name="properties"></param>
         /// <param name="isInternal"></param>        
         /// <returns></returns>
-        public static Func<SourceFilterDescriptor<dynamic>, ISourceFilter> ToProjection(this IEnumerable<string> properties,
+        public static SourceConfig ToProjection(
+            this IEnumerable<string> properties,
             bool isInternal)
         {
-            var projection = new SourceFilterDescriptor<dynamic>();/*.Excludes(e => e
-                .Field("event.endDay")
-                .Field("event.endMonth")
-                .Field("event.endYear")
-                .Field("event.startDay")
-                .Field("event.startMonth")
-                .Field("event.startYear")
-            );*/
+            var excludes = new List<string>() {
+                "defects",
+                "event.endDayOfYear",
+                "event.startDayOfYear",
+                "event.endHistogramWeek",
+                "event.startHistogramWeek",
+                "location.attributes.isPrivate",
+                "location.point",
+                "location.pointLocation",
+                "location.pointWithBuffer",
+                "location.pointWithDisturbanceBuffer",
+                "location.isInEconomicZoneOfSweden"
+            };
+            
             if (isInternal)
             {
-                projection.Excludes(e => e
-                    .Field("defects")
-                    .Field("event.endDayOfYear")
-                    .Field("event.startDayOfYear")
-                    .Field("event.endHistogramWeek")
-                    .Field("event.startHistogramWeek")
-                    .Field("artportalenInternal.activityCategoryId")
-                    .Field("artportalenInternal.triggeredObservationRuleUnspontaneous")
-                    .Field("location.attributes.isPrivate")
-                    .Field("location.point")
-                    .Field("location.pointLocation")
-                    .Field("location.pointWithBuffer")
-                    .Field("location.pointWithDisturbanceBuffer")
-                    .Field("location.isInEconomicZoneOfSweden"));
+                excludes.AddRange(new[] {
+                    "artportalenInternal.activityCategoryId",
+                    "artportalenInternal.triggeredObservationRuleUnspontaneous"
+                });
             }
             else
             {
-                projection.Excludes(e => e
-                    .Field("defects")
-                    .Field("event.endDayOfYear")
-                    .Field("event.startDayOfYear")
-                    .Field("event.endHistogramWeek")
-                    .Field("event.startHistogramWeek")
-                    .Field("artportalenInternal")
-                    .Field("location.attributes.isPrivate")
-                    .Field("location.point")
-                    .Field("location.pointLocation")
-                    .Field("location.pointWithBuffer")
-                    .Field("location.pointWithDisturbanceBuffer")
-                    .Field("location.isInEconomicZoneOfSweden")
-                );
+                excludes.Add("artportalenInternal");
             }
 
-            if (properties?.Any() ?? false)
+            return new SourceConfig(new SourceFilter
             {
-                projection.Includes(i => i.Fields(properties.Select(p => p.ToField())));
-            }
-
-            return p => projection;
+                Excludes = Fields.FromStrings(excludes.ToArray()),
+                Includes = (properties?.Count() ?? 0) == 0 ? null : Fields.FromStrings(properties.ToArray())
+            });
         }
 
         /// <summary>
-        /// Build a projection string
+        /// Create source config
         /// </summary>        
-        public static Func<SourceFilterDescriptor<dynamic>, ISourceFilter> ToProjection(this IEnumerable<string> includes, IEnumerable<string> excludes = null)
+        public static SourceConfig ToProjection(this (IEnumerable<string> Includes, IEnumerable<string> Excludes) sourceFields)
         {
-            var projection = new SourceFilterDescriptor<dynamic>();
-
-            if (includes?.Any() ?? false)
+            return new SourceConfig(new SourceFilter
             {
-                projection.Includes(i => i.Fields(includes.Select(p => p.ToField())));
-            }
-
-            if (excludes?.Any() ?? false)
-            {
-                projection.Excludes(i => i.Fields(excludes.Select(p => p.ToField())));
-            }
-
-            return p => projection;
+                Excludes = (sourceFields.Excludes?.Count() ?? 0) == 0 ? null : Fields.FromStrings(sourceFields.Excludes.ToArray()),
+                Includes = (sourceFields.Includes?.Count() ?? 0) == 0 ? null : Fields.FromStrings(sourceFields.Includes.ToArray())
+            });
         }
     }
 }

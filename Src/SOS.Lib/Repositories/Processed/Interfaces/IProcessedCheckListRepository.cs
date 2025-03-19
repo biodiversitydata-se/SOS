@@ -12,29 +12,10 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
     public interface IProcessedChecklistRepository : IProcessRepositoryBase<Checklist, string>
     {
         /// <summary>
-        ///  Add many items
-        /// </summary>
-        /// <param name="checklists"></param>
-        /// <returns></returns>
-        Task<int> AddManyAsync(IEnumerable<Checklist> checklists);
-
-        /// <summary>
         /// Clear the collection
         /// </summary>
         /// <returns></returns>
         Task<bool> ClearCollectionAsync();
-
-        /// <summary>
-        /// Turn of indexing
-        /// </summary>
-        /// <returns></returns>
-        Task<bool> DisableIndexingAsync();
-
-        /// <summary>
-        /// Turn on indexing
-        /// </summary>
-        /// <returns></returns>
-        Task EnableIndexingAsync();
 
         /// <summary>
         /// Get a checklist by it's id
@@ -92,7 +73,5 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// </summary>
         /// <returns></returns>
         Task<bool> VerifyCollectionAsync();
-
-        Task<bool> DeleteAllDocumentsAsync(bool waitForCompletion = false);
     }
 }

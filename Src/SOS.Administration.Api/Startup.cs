@@ -13,9 +13,6 @@ using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
 using Newtonsoft.Json.Converters;
-using SOS.Lib.JsonConverters;
-using SOS.Lib.Managers;
-using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Security.Interfaces;
 using SOS.Lib.Security;
 using SOS.Lib.Services;
@@ -149,7 +146,7 @@ namespace SOS.Administration.Api
                     .UseSimpleAssemblyNameTypeSerializer()
                     .UseRecommendedSerializerSettings(m =>
                     {
-                        m.Converters.Add(new NewtonsoftGeoShapeConverter());
+                        m.Converters.Add(new NetTopologySuite.IO.GeoJsonConverter());
                         m.Converters.Add(new StringEnumConverter());
                     })
                     .UseMongoStorage(new MongoClient(hangfireDbConfiguration.GetMongoDbSettings()),

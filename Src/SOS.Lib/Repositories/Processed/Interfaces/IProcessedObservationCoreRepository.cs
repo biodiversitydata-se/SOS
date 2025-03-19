@@ -1,5 +1,4 @@
-﻿using Elasticsearch.Net;
-using Nest;
+﻿using Elastic.Clients.Elasticsearch;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.DataQuality;
@@ -105,7 +104,7 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// Get current disk usage
         /// </summary>
         /// <returns></returns>
-        int GetDiskUsage();
+        Task<IDictionary<string, int>> GetDiskUsageAsync();
 
         /// <summary>
         /// Get aggregation in metric tiles 
@@ -124,7 +123,7 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
             MetricCoordinateSys metricCoordinateSys,
             bool skipAuthorizationFilters = false,
             int? maxBuckets = null,
-            CompositeKey afterKey = null,
+            ICollection<FieldValue> afterKey = null,
             TimeSpan? timeout = null);
 
         /// <summary>
@@ -133,8 +132,8 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// <param name="waitForStatus"></param>
         /// <param name="waitForSeconds"></param>
         /// <returns></returns>
-        Task<WaitForStatus> GetHealthStatusAsync(WaitForStatus waitForStatus, int waitForSeconds);
-
+        Task<HealthStatus> GetHealthStatusAsync(HealthStatus waitForStatus, int waitForSeconds);
+        
         /// <summary>
         /// Get latest data modified date for passed provider 
         /// </summary>

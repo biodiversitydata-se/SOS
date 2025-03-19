@@ -1,5 +1,7 @@
-﻿using Microsoft.Extensions.Logging;
-using Nest;
+﻿using Elastic.Clients.Elasticsearch;
+using Elastic.Clients.Elasticsearch.Cluster;
+using Elastic.Clients.Elasticsearch.QueryDsl;
+using Microsoft.Extensions.Logging;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Enums;
@@ -28,11 +30,11 @@ namespace SOS.Lib.Repositories.Processed
         /// <param name="filter"></param>
         /// <param name="skipAuthorizationFilters"></param>
         /// <returns></returns>
-        protected (ICollection<Func<QueryDescriptor<dynamic>, QueryContainer>>, ICollection<Func<QueryDescriptor<object>, QueryContainer>>)
+        protected (ICollection<Action<QueryDescriptor<dynamic>>> Filter, ICollection<Action<QueryDescriptor<dynamic>>> Exclude)
             GetCoreQueries(SearchFilterBase filter, bool skipAuthorizationFilters = false)
         {
-            var query = filter.ToQuery(skipAuthorizationFilters: skipAuthorizationFilters);
-            var excludeQuery = filter.ToExcludeQuery();
+            var query = filter.ToQuery<dynamic>(skipAuthorizationFilters: skipAuthorizationFilters);
+            var excludeQuery = filter.ToExcludeQuery<dynamic>();
 
             return (query, excludeQuery);
         }
@@ -72,13 +74,13 @@ namespace SOS.Lib.Repositories.Processed
         /// <param name="searchIndex"></param>
         /// <param name="searchDescriptor"></param>
         /// <param name="pointInTimeId"></param>
-        /// <param name="searchAfter"></param>
+        /// <param name="nextPageKey"></param>
         /// <returns></returns>
-        protected async Task<ISearchResponse<T>> SearchAfterAsync<T>(
+        protected async Task<SearchResponse<T>> SearchAfterAsync<T>(
            string searchIndex,
-           SearchDescriptor<T> searchDescriptor,
+           SearchRequestDescriptor<T> searchDescriptor,
            string pointInTimeId = null,
-           IEnumerable<object> searchAfter = null) where T : class
+           ICollection<FieldValue> nextPageKey = null) where T : class
         {
             var keepAlive = "10m";
             if (string.IsNullOrEmpty(pointInTimeId))
@@ -96,11 +98,12 @@ namespace SOS.Lib.Repositories.Processed
             var searchResponse = await PollyHelper.GetRetryPolicy(3, 100).ExecuteAsync(async () =>
             {
                 var queryResponse = await Client.SearchAsync<T>(searchDescriptor
-                   .Sort(s => s.Ascending(SortSpecialField.ShardDocumentOrder))
-                   .PointInTime(pointInTimeId, pit => pit.KeepAlive(keepAlive))
-                   .SearchAfter(searchAfter)
+                   .Index(searchIndex)
+                   .Sort(s => s.Field("_shard_doc"))
+                   .SearchAfter(nextPageKey)
                    .Size(ScrollBatchSize)
-                   .TrackTotalHits(false)
+                   .TrackTotalHits(new Elastic.Clients.Elasticsearch.Core.Search.TrackHits(false))
+                   .Pit(pointInTimeId, pit => pit.KeepAlive(keepAlive))
                 );
 
                 queryResponse.ThrowIfInvalid();
@@ -130,7 +133,7 @@ namespace SOS.Lib.Repositories.Processed
             IElasticClientManager elasticClientManager,
             ICache<string, ProcessedConfiguration> processedConfigurationCache,
             ElasticSearchConfiguration elasticConfiguration,
-            IClassCache<ConcurrentDictionary<string, ClusterHealthResponse>> clusterHealthCache,
+             IClassCache<ConcurrentDictionary<string, HealthResponse>> clusterHealthCache,
             ILogger<ProcessedObservationBaseRepository> logger) : base(true, elasticClientManager, processedConfigurationCache, elasticConfiguration, clusterHealthCache, logger)
         {
             LiveMode = liveMode;

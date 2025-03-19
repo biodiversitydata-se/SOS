@@ -39,113 +39,236 @@ namespace SOS.Lib.Repositories.Processed
         /// <returns></returns>
         private async Task<bool> AddCollectionAsync()
         {
-            var createIndexResponse = await Client.Indices.CreateAsync(IndexName, s => s
+            var createIndexResponse = await Client.Indices.CreateAsync<Event>(IndexName, s => s
                 .Settings(s => s
                     .NumberOfShards(NumberOfShards)
                     .NumberOfReplicas(NumberOfReplicas)
-                    .Setting("max_terms_count", 110000)
-                    .Setting(UpdatableIndexSettings.MaxResultWindow, 100000)
+                    .Settings(s => s
+                        .MaxResultWindow(100000)
+                        .MaxTermsCount(110000)
+                    )
                 )
-                .Map<Event>(m => m
-                    .AutoMap<Event>()
+                .Mappings(map => map
                     .Properties(ps => ps
-                        .KeywordLowerCase(kwlc => kwlc.Id, IndexSetting.None)
-                        .KeywordLowerCase(kwlc => kwlc.EventId)
-                        .KeywordLowerCase(kwlc => kwlc.ParentEventId, IndexSetting.None)
-                        .KeywordLowerCase(kwlc => kwlc.EventType, IndexSetting.None)
-                        .KeywordLowerCase(kwlc => kwlc.SamplingProtocol, IndexSetting.None)
-                        .KeywordLowerCase(kwlc => kwlc.SamplingEffort, IndexSetting.None)
-                        .KeywordLowerCase(kwlc => kwlc.SampleSizeValue, IndexSetting.None)
-                        .KeywordLowerCase(kwlc => kwlc.SampleSizeUnit, IndexSetting.None)
-                        .KeywordLowerCase(kwlc => kwlc.PlainStartDate, IndexSetting.SearchOnly)
-                        .KeywordLowerCase(kwlc => kwlc.PlainStartTime, IndexSetting.None)
-                        .KeywordLowerCase(kwlc => kwlc.PlainEndDate, IndexSetting.SearchOnly)
-                        .KeywordLowerCase(kwlc => kwlc.PlainEndTime, IndexSetting.None)
-                        .KeywordLowerCase(kwlc => kwlc.Habitat, IndexSetting.None)
-                        .Date(d => d
-                            .Name(nm => nm.EndDate)
-                        )
-                        .Date(d => d
-                            .Name(nm => nm.StartDate)
-                        )
-                        .Text(t => t
-                            .Name(nm => nm.EventRemarks)
-                            .IndexOptions(IndexOptions.Docs)
-                        )
-                        .Object<Location>(l => l
-                            .AutoMap()
-                            .Name(nm => nm.Location)
-                            .Properties(ps => ps.GetMapping())
-                        )
-                        .Object<DataStewardshipInfo>(l => l
-                            .AutoMap()
-                            .Name(nm => nm.DataStewardship)
+                        .KeywordVal(kwlc => kwlc.Id, IndexSetting.None)
+                        .KeywordVal(kwlc => kwlc.EventId)
+                        .KeywordVal(kwlc => kwlc.ParentEventId, IndexSetting.None)
+                        .KeywordVal(kwlc => kwlc.EventType, IndexSetting.None)
+                        .KeywordVal(kwlc => kwlc.SamplingProtocol, IndexSetting.None)
+                        .KeywordVal(kwlc => kwlc.SamplingEffort, IndexSetting.None)
+                        .KeywordVal(kwlc => kwlc.SampleSizeValue, IndexSetting.None)
+                        .KeywordVal(kwlc => kwlc.SampleSizeUnit, IndexSetting.None)
+                        .KeywordVal(kwlc => kwlc.PlainStartDate, IndexSetting.SearchOnly)
+                        .KeywordVal(kwlc => kwlc.PlainStartTime, IndexSetting.None)
+                        .KeywordVal(kwlc => kwlc.PlainEndDate, IndexSetting.SearchOnly)
+                        .KeywordVal(kwlc => kwlc.PlainEndTime, IndexSetting.None)
+                        .KeywordVal(kwlc => kwlc.Habitat, IndexSetting.None)
+                        .DateVal(d => d.EndDate, IndexSetting.SearchOnly)
+                        .DateVal(d => d.StartDate, IndexSetting.SearchOnly)
+                        .TextVal(t => t.EventRemarks, false)
+                        .Object(o => o.Location, l => l
                             .Properties(ps => ps
-                                .KeywordLowerCase(kwlc => kwlc.DatasetIdentifier)
-                                .KeywordLowerCase(kwlc => kwlc.DatasetTitle)
-                            )
-                        )
-                        .Object<VocabularyValue>(t => t
-                            .Name(nm => nm.DiscoveryMethod)
-                            .Properties(ps => ps
-                                .KeywordLowerCase(kwlc => kwlc.Value)
-                                .Number(nr => nr
-                                    .Name(nm => nm.Id)
-                                    .Type(NumberType.Integer)
+                                .GeoShape(gs => gs.Location.Point)
+                                .GeoPoint(gp => gp.Location.PointLocation)
+                                .GeoShape(gs => gs.Location.PointWithBuffer)
+                                .GeoShape(gs => gs.Location.PointWithDisturbanceBuffer)
+                                .NumberVal(n => n.Location.DecimalLongitude, IndexSetting.SearchSortAggregate, NumberType.Double)
+                                .NumberVal(n => n.Location.DecimalLatitude, IndexSetting.SearchSortAggregate, NumberType.Double)
+                                .NumberVal(n => n.Location.CoordinateUncertaintyInMeters, IndexSetting.SearchSortAggregate, NumberType.Integer)
+                                .NumberVal(n => n.Location.Type, IndexSetting.None, NumberType.Byte)
+                                .NumberVal(n => n.Location.CoordinatePrecision, IndexSetting.None, NumberType.Double)
+                                .NumberVal(n => n.Location.MaximumDepthInMeters, IndexSetting.None, NumberType.Double)
+                                .NumberVal(n => n.Location.MaximumDistanceAboveSurfaceInMeters, IndexSetting.None, NumberType.Double)
+                                .NumberVal(n => n.Location.MaximumElevationInMeters, IndexSetting.None, NumberType.Double)
+                                .NumberVal(n => n.Location.MinimumDepthInMeters, IndexSetting.None, NumberType.Double)
+                                .NumberVal(n => n.Location.MinimumDistanceAboveSurfaceInMeters, IndexSetting.None, NumberType.Double)
+                                .NumberVal(n => n.Location.MinimumElevationInMeters, IndexSetting.None, NumberType.Double)
+                                .BooleanVal(b => b.Location.IsInEconomicZoneOfSweden, IndexSetting.SearchOnly)
+                                .KeywordVal(kwlc => kwlc.Location.LocationId, IndexSetting.SearchSortAggregate)
+                                .KeywordVal(kwlc => kwlc.Location.CountryCode, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Location.FootprintSRS, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Location.GeodeticDatum, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Location.GeoreferencedBy, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Location.GeoreferencedDate, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Location.GeoreferenceProtocol, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Location.GeoreferenceSources, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Location.GeoreferenceVerificationStatus, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Location.HigherGeography, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Location.HigherGeographyId, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Location.Island, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Location.IslandGroup, IndexSetting.None)
+                                .Keyword(kw => kw.Location.Locality, kw => kw
+                                    .Normalizer("lowercase")
+                                    .DocValues(true)
+                                    .Fields(f => f
+                                        .Keyword("raw", kw => kw
+                                            .DocValues(false)
+                                        )
+                                    )
+                                )
+                                .KeywordVal(kwlc => kwlc.Location.LocationRemarks, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Location.LocationAccordingTo, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Location.FootprintSpatialFit, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Location.FootprintWKT, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Location.GeoreferenceRemarks, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Location.PointRadiusSpatialFit, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Location.VerbatimCoordinates, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Location.VerbatimCoordinateSystem, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Location.VerbatimDepth, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Location.VerbatimElevation, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Location.VerbatimLatitude, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Location.VerbatimLocality, IndexSetting.SearchOnly) // WFS
+                                .KeywordVal(kwlc => kwlc.Location.VerbatimLongitude, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Location.VerbatimSRS, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Location.WaterBody, IndexSetting.None)
+                                .Object(o => o.Location.Attributes, c => c
+                                    .Properties(ps => ps
+                                        .BooleanVal(b => b.Location.Attributes.IsPrivate, IndexSetting.None)
+                                        .NumberVal(n => n.Location.Attributes.ProjectId, IndexSetting.SearchOnly, NumberType.Integer)
+                                        .KeywordVal(kwlc => kwlc.Location.Attributes.ExternalId, IndexSetting.SearchOnly)
+                                        .KeywordVal(kwlc => kwlc.Location.Attributes.CountyPartIdByCoordinate, IndexSetting.SearchOnly)
+                                        .KeywordVal(kwlc => kwlc.Location.Attributes.ProvincePartIdByCoordinate, IndexSetting.SearchOnly)
+                                        .KeywordVal(kwlc => kwlc.Location.Attributes.VerbatimMunicipality, IndexSetting.None)
+                                        .KeywordVal(kwlc => kwlc.Location.Attributes.VerbatimProvince, IndexSetting.None)
+                                    )
+                                )
+                                .Object(o => o.Location.Continent, c => c
+                                    .Properties(ps => ps
+                                        .KeywordVal(kwlc => kwlc.Location.Continent.Value, IndexSetting.None)
+                                        .NumberVal(nr => nr.Location.Continent.Id, IndexSetting.None, NumberType.Byte)
+                                    )
+                                )
+                                .Object(o => o.Location.Country, c => c
+                                    .Properties(ps => ps
+                                        .KeywordVal(kwlc => kwlc.Location.Country.Value, IndexSetting.SearchOnly)
+                                        .NumberVal(nr => nr.Location.Country.Id, IndexSetting.SearchSortAggregate, NumberType.Byte)
+                                    )
+                                )
+                                .Object(o => o.Location.Atlas10x10, c => c
+                                    .Properties(ps => ps
+                                        .KeywordVal(kwlc => kwlc.Location.Atlas10x10.FeatureId, IndexSetting.SearchSortAggregate)
+                                        .KeywordVal(kwlc => kwlc.Location.Atlas10x10.Name, IndexSetting.None)
+                                    )
+                                )
+                                .Object(o => o.Location.Atlas5x5, c => c
+                                    .Properties(ps => ps
+                                        .KeywordVal(kwlc => kwlc.Location.Atlas5x5.FeatureId, IndexSetting.SearchSortAggregate)
+                                        .KeywordVal(kwlc => kwlc.Location.Atlas5x5.Name, IndexSetting.None)
+                                    )
+                                )
+                                .Object(o => o.Location.CountryRegion, c => c
+                                    .Properties(ps => ps
+                                        .KeywordVal(kwlc => kwlc.Location.CountryRegion.FeatureId, IndexSetting.SearchSortAggregate)
+                                        .KeywordVal(kwlc => kwlc.Location.CountryRegion.Name, IndexSetting.SearchOnly)
+                                    )
+                                )
+                                .Object(o => o.Location.County, c => c
+                                    .Properties(ps => ps
+                                        .KeywordVal(kwlc => kwlc.Location.County.FeatureId, IndexSetting.SearchSortAggregate)
+                                        .KeywordVal(kwlc => kwlc.Location.County.Name, IndexSetting.SearchSortAggregate)
+                                    )
+                                )
+                                .Object(o => o.Location.Municipality, c => c
+                                    .Properties(ps => ps
+                                        .KeywordVal(kwlc => kwlc.Location.Municipality.FeatureId, IndexSetting.SearchSortAggregate)
+                                        .KeywordVal(kwlc => kwlc.Location.Municipality.Name, IndexSetting.SearchSortAggregate)
+                                    )
+                                )
+                                .Object(o => o.Location.Parish, c => c
+                                    .Properties(ps => ps
+                                        .KeywordVal(kwlc => kwlc.Location.Parish.FeatureId, IndexSetting.SearchSortAggregate)
+                                        .KeywordVal(kwlc => kwlc.Location.Parish.Name, IndexSetting.SearchSortAggregate)
+                                    )
+                                )
+                                .Object(o => o.Location.Province, c => c
+                                    .Properties(ps => ps
+                                        .KeywordVal(kwlc => kwlc.Location.Province.FeatureId, IndexSetting.SearchSortAggregate)
+                                        .KeywordVal(kwlc => kwlc.Location.Province.Name, IndexSetting.SearchSortAggregate)
+                                    )
                                 )
                             )
                         )
-                        .Object<ExtendedMeasurementOrFact>(n => n
-                            .AutoMap()
-                            .Name(nm => nm.MeasurementOrFacts)
+                        .Object(o => o.DataStewardship, l => l
                             .Properties(ps => ps
-                                .KeywordLowerCase(kwlc => kwlc.OccurrenceID)
-                                .KeywordLowerCase(kwlc => kwlc.MeasurementRemarks, IndexSetting.None)
-                                .KeywordLowerCase(kwlc => kwlc.MeasurementAccuracy, IndexSetting.None)
-                                .KeywordLowerCase(kwlc => kwlc.MeasurementDeterminedBy, IndexSetting.None)
-                                .KeywordLowerCase(kwlc => kwlc.MeasurementDeterminedDate, IndexSetting.None)
-                                .KeywordLowerCase(kwlc => kwlc.MeasurementID, IndexSetting.None)
-                                .KeywordLowerCase(kwlc => kwlc.MeasurementMethod, IndexSetting.None)
-                                .KeywordLowerCase(kwlc => kwlc.MeasurementType, IndexSetting.None)
-                                .KeywordLowerCase(kwlc => kwlc.MeasurementTypeID, IndexSetting.None)
-                                .KeywordLowerCase(kwlc => kwlc.MeasurementUnit, IndexSetting.None)
-                                .KeywordLowerCase(kwlc => kwlc.MeasurementUnitID, IndexSetting.None)
-                                .KeywordLowerCase(kwlc => kwlc.MeasurementValue, IndexSetting.None)
-                                .KeywordLowerCase(kwlc => kwlc.MeasurementValueID, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.DataStewardship.DatasetIdentifier)
+                                .KeywordVal(kwlc => kwlc.DataStewardship.DatasetTitle)
                             )
                         )
-                        .Object<Multimedia>(n => n
-                            .AutoMap()
-                            .Name(nm => nm.Media)
+                        .Object(o => o.DiscoveryMethod, t => t
                             .Properties(ps => ps
-                                .KeywordLowerCase(kwlc => kwlc.Description, IndexSetting.None)
-                                .KeywordLowerCase(kwlc => kwlc.Audience, IndexSetting.None)
-                                .KeywordLowerCase(kwlc => kwlc.Contributor, IndexSetting.None)
-                                .KeywordLowerCase(kwlc => kwlc.Created, IndexSetting.None)
-                                .KeywordLowerCase(kwlc => kwlc.Creator, IndexSetting.None)
-                                .KeywordLowerCase(kwlc => kwlc.DatasetID, IndexSetting.None)
-                                .KeywordLowerCase(kwlc => kwlc.Format, IndexSetting.None)
-                                .KeywordLowerCase(kwlc => kwlc.Identifier, IndexSetting.None)
-                                .KeywordLowerCase(kwlc => kwlc.License, IndexSetting.None)
-                                .KeywordLowerCase(kwlc => kwlc.Publisher, IndexSetting.None)
-                                .KeywordLowerCase(kwlc => kwlc.References, IndexSetting.None)
-                                .KeywordLowerCase(kwlc => kwlc.RightsHolder, IndexSetting.None)
-                                .KeywordLowerCase(kwlc => kwlc.Source, IndexSetting.None)
-                                .KeywordLowerCase(kwlc => kwlc.Title, IndexSetting.None)
-                                .KeywordLowerCase(kwlc => kwlc.Type, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.DiscoveryMethod.Value, IndexSetting.SearchOnly)
+                                .NumberVal(nr => nr.DiscoveryMethod.Id, IndexSetting.SearchSortAggregate, NumberType.Short)
                             )
                         )
-                        .Object<Organisation>(t => t
-                            .AutoMap()
-                            .Name(nm => nm.RecorderOrganisation)
+                        .Object(o => o.MeasurementOrFacts, n => n
                             .Properties(ps => ps
-                                .KeywordLowerCase(kwlc => kwlc.OrganisationCode, IndexSetting.None)
-                                .KeywordLowerCase(kwlc => kwlc.OrganisationID, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.MeasurementOrFacts.First().OccurrenceID)
+                                .KeywordVal(kwlc => kwlc.MeasurementOrFacts.First().MeasurementRemarks, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.MeasurementOrFacts.First().MeasurementAccuracy, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.MeasurementOrFacts.First().MeasurementDeterminedBy, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.MeasurementOrFacts.First().MeasurementDeterminedDate, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.MeasurementOrFacts.First().MeasurementID, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.MeasurementOrFacts.First().MeasurementMethod, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.MeasurementOrFacts.First().MeasurementType, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.MeasurementOrFacts.First().MeasurementTypeID, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.MeasurementOrFacts.First().MeasurementUnit, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.MeasurementOrFacts.First().MeasurementUnitID, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.MeasurementOrFacts.First().MeasurementValue, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.MeasurementOrFacts.First().MeasurementValueID, IndexSetting.None)
                             )
                         )
-                        .Object<WeatherVariable>(t => t
-                            .AutoMap()
-                            .Name(nm => nm.Weather)
+                        .Object(o => o.Media, n => n
+                            .Properties(ps => ps
+                                .KeywordVal(kwlc => kwlc.Media.First().Description, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Media.First().Audience, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Media.First().Contributor, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Media.First().Created, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Media.First().Creator, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Media.First().DatasetID, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Media.First().Format, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Media.First().Identifier, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Media.First().License, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Media.First().Publisher, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Media.First().References, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Media.First().RightsHolder, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Media.First().Source, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Media.First().Title, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Media.First().Type, IndexSetting.None)
+                            )
+                        )
+                        .Object(o => o.RecorderOrganisation, t => t
+                            .Properties(ps => ps
+                                .KeywordVal(kwlc => kwlc.RecorderOrganisation.First().OrganisationCode, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.RecorderOrganisation.First().OrganisationID, IndexSetting.None)
+                            )
+                        )
+                        .Object(o => o.Weather, t => t
+                            .Properties(ps => ps
+                                .Object(o => o.Weather.AirTemperature, o => o
+                                    .Properties(ps => ps
+                                        .NumberVal(n => n.Weather.AirTemperature.WeatherMeasure, IndexSetting.None, NumberType.Double)
+                                        .NumberVal(n => n.Weather.AirTemperature.Unit, IndexSetting.None, NumberType.Byte)
+                                    )
+                                )
+                                .NumberVal(n => n.Weather.Cloudiness, IndexSetting.None, NumberType.Byte)
+                                .NumberVal(n => n.Weather.Precipitation, IndexSetting.None, NumberType.Byte)
+                                .NumberVal(n => n.Weather.SnowCover, IndexSetting.None, NumberType.Byte)
+                                .NumberVal(n => n.Weather.Sunshine, IndexSetting.None, NumberType.Byte)
+                                .NumberVal(n => n.Weather.WindDirectionCompass, IndexSetting.None, NumberType.Byte)
+                                .Object(o => o.Weather.WindDirectionDegrees, o => o
+                                    .Properties(ps => ps
+                                        .NumberVal(n => n.Weather.WindDirectionDegrees.WeatherMeasure, IndexSetting.None, NumberType.Double)
+                                        .NumberVal(n => n.Weather.WindDirectionDegrees.Unit, IndexSetting.None, NumberType.Byte)
+                                    )
+                                )
+                                .Object(o => o.Weather.WindSpeed, o => o
+                                    .Properties(ps => ps
+                                        .NumberVal(n => n.Weather.WindSpeed.WeatherMeasure, IndexSetting.None, NumberType.Double)
+                                        .NumberVal(n => n.Weather.WindSpeed.Unit, IndexSetting.None, NumberType.Byte)
+                                    )
+                                )
+                               .NumberVal(n => n.Weather.WindStrength, IndexSetting.None, NumberType.Byte)
+                            )
                         )
                     )
                 )
@@ -159,7 +282,7 @@ namespace SOS.Lib.Repositories.Processed
             if (ids == null || !ids.Any()) throw new ArgumentException("ids is empty");
             
             var sortDescriptor = await Client.GetSortDescriptorAsync<Event>(IndexName, sortOrders);
-            var query = new List<Func<QueryDescriptor<Event>, QueryContainer>>();
+            var query = new List<Action<SearchRequestDescriptor<Event>>>();
             query.TryAddTermsCriteria("eventId", ids);
             var searchResponse = await Client.SearchAsync<Event>(s => s
                 .Index(IndexName)
@@ -176,16 +299,6 @@ namespace SOS.Lib.Repositories.Processed
             if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
             var events = searchResponse.Documents.ToList();
             return events;
-        }
-
-        /// <summary>
-        /// Delete collection
-        /// </summary>
-        /// <returns></returns>
-        public async Task<bool> DeleteCollectionAsync()
-        {
-            var res = await Client.Indices.DeleteAsync(IndexName);
-            return res.IsValid;
         }
 
         /// <summary>
@@ -253,7 +366,7 @@ namespace SOS.Lib.Repositories.Processed
             IElasticClientManager elasticClientManager,
             ElasticSearchConfiguration elasticConfiguration,
             ICache<string, ProcessedConfiguration> processedConfigurationCache,
-            IClassCache<ConcurrentDictionary<string, ClusterHealthResponse>> clusterHealthCache,
+            IClassCache<ConcurrentDictionary<string, HealthResponse>> clusterHealthCache,
             ILogger<EventRepository> logger) : base(true, elasticClientManager, processedConfigurationCache, elasticConfiguration, clusterHealthCache, logger)
         {
             LiveMode = true;
@@ -272,26 +385,6 @@ namespace SOS.Lib.Repositories.Processed
                 if (indexResult == null || indexResult.TotalNumberOfFailedBuffers > 0) return 0;
                 return items.Count();
             });
-        }
-
-        public async Task<bool> DeleteAllDocumentsAsync(bool waitForCompletion = false)
-        {
-            try
-            {
-                var res = await Client.DeleteByQueryAsync<Event>(q => q
-                    .Index(IndexName)
-                    .Query(q => q.MatchAll())
-                    .WaitForCompletion(waitForCompletion)
-                    .Refresh(waitForCompletion)
-                );
-
-                return res.IsValid;
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e.ToString());
-                return false;
-            }
         }
 
         /// <inheritdoc />
@@ -476,7 +569,7 @@ namespace SOS.Lib.Repositories.Processed
 
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
                 .Index(indexName)
-                .Source(getAllFields ? p => new SourceFilterDescriptor<dynamic>() : filter.OutputIncludeFields.ToProjection(filter.OutputExcludeFields))
+                .Source(getAllFields ? null : (filter.OutputIncludeFields, filter.OutputExcludeFields).ToProjection())
                 .From(skip)
                 .Size(take)
                 .Query(q => q
@@ -583,10 +676,7 @@ namespace SOS.Lib.Repositories.Processed
         {
             try
             {
-                var countResponse = await Client.CountAsync<Event>(s => s
-                    .Index(IndexName)
-                );
-
+                var countResponse = await Client.CountAsync<Event>(IndexName);
                 countResponse.ThrowIfInvalid();
                 return countResponse.Count;
             }

@@ -1,5 +1,4 @@
-﻿using Nest;
-using SOS.Lib.Enums;
+﻿using SOS.Lib.Enums;
 using SOS.Lib.Swagger;
 using System.Text.Json.Serialization;
 using static SOS.Lib.Swagger.UseSchema;

@@ -42,55 +42,55 @@ namespace SOS.Lib.Repositories.Processed
                 .Map<Dataset>(m => m
                     .AutoMap<Dataset>()
                     .Properties(ps => ps
-                        .KeywordLowerCase(kwlc => kwlc.Id, IndexSetting.None)
-                        .KeywordLowerCase(kwlc => kwlc.Identifier)
-                        .KeywordLowerCase(kwlc => kwlc.DataStewardship)
-                        .KeywordLowerCase(kwlc => kwlc.Title, IndexSetting.None)
-                        .KeywordLowerCase(kwlc => kwlc.ProgrammeArea, IndexSetting.None)
-                        .KeywordLowerCase(kwlc => kwlc.DescriptionAccessRights, IndexSetting.None)
-                        .KeywordLowerCase(kwlc => kwlc.License, IndexSetting.None)
-                        .KeywordLowerCase(kwlc => kwlc.Description, IndexSetting.None)
-                        .KeywordLowerCase(kwlc => kwlc.Spatial, IndexSetting.None)
-                        .KeywordLowerCase(kwlc => kwlc.Language, IndexSetting.None)
-                        .KeywordLowerCase(kwlc => kwlc.Metadatalanguage, IndexSetting.None)
+                        .KeywordVal(kwlc => kwlc.Id, IndexSetting.None)
+                        .KeywordVal(kwlc => kwlc.Identifier)
+                        .KeywordVal(kwlc => kwlc.DataStewardship)
+                        .KeywordVal(kwlc => kwlc.Title, IndexSetting.None)
+                        .KeywordVal(kwlc => kwlc.ProgrammeArea, IndexSetting.None)
+                        .KeywordVal(kwlc => kwlc.DescriptionAccessRights, IndexSetting.None)
+                        .KeywordVal(kwlc => kwlc.License, IndexSetting.None)
+                        .KeywordVal(kwlc => kwlc.Description, IndexSetting.None)
+                        .KeywordVal(kwlc => kwlc.Spatial, IndexSetting.None)
+                        .KeywordVal(kwlc => kwlc.Language, IndexSetting.None)
+                        .KeywordVal(kwlc => kwlc.Metadatalanguage, IndexSetting.None)
                         .Object<Project>(t => t
                             .AutoMap()
                             .Name(nm => nm.Project)
                             .Properties(ps => ps
-                                .KeywordLowerCase(kwlc => kwlc.ProjectId)
-                                .KeywordLowerCase(kwlc => kwlc.ProjectCode)
+                                .KeywordVal(kwlc => kwlc.ProjectId)
+                                .KeywordVal(kwlc => kwlc.ProjectCode)
                             )
                         )
                         .Object<Organisation>(t => t
                             .AutoMap()
                             .Name(nm => nm.Assigner)
                             .Properties(ps => ps
-                                .KeywordLowerCase(kwlc => kwlc.OrganisationCode, IndexSetting.None)
-                                .KeywordLowerCase(kwlc => kwlc.OrganisationID, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.OrganisationCode, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.OrganisationID, IndexSetting.None)
                             )
                         )
                         .Object<Organisation>(t => t
                             .AutoMap()
                             .Name(nm => nm.Creator)
                             .Properties(ps => ps
-                                .KeywordLowerCase(kwlc => kwlc.OrganisationCode, IndexSetting.None)
-                                .KeywordLowerCase(kwlc => kwlc.OrganisationID, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.OrganisationCode, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.OrganisationID, IndexSetting.None)
                             )
                         )
                         .Object<Organisation>(t => t
                             .AutoMap()
                             .Name(nm => nm.OwnerinstitutionCode)
                             .Properties(ps => ps
-                                .KeywordLowerCase(kwlc => kwlc.OrganisationCode, IndexSetting.None)
-                                .KeywordLowerCase(kwlc => kwlc.OrganisationID, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.OrganisationCode, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.OrganisationID, IndexSetting.None)
                             )
                         )
                         .Object<Organisation>(t => t
                             .AutoMap()
                             .Name(nm => nm.Publisher)
                             .Properties(ps => ps
-                                .KeywordLowerCase(kwlc => kwlc.OrganisationCode, IndexSetting.None)
-                                .KeywordLowerCase(kwlc => kwlc.OrganisationID, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.OrganisationCode, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.OrganisationID, IndexSetting.None)
                             )
                         )
                     )
@@ -123,23 +123,13 @@ namespace SOS.Lib.Repositories.Processed
                 )
                 .Source(s => sourceFilter)
                 .Size(ids?.Count() ?? 0)
-                .Sort(sort => sortDescriptor)
+                .Sort((sort => sortDescriptor)
                 .TrackTotalHits(false)
             );
 
             if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
             var datasets = searchResponse.Documents.ToList();
             return datasets;
-        }
-
-        /// <summary>
-        /// Delete collection
-        /// </summary>
-        /// <returns></returns>
-        public async Task<bool> DeleteCollectionAsync()
-        {
-            var res = await Client.Indices.DeleteAsync(IndexName);
-            return res.IsValid;
         }
 
         /// <summary>
@@ -207,7 +197,7 @@ namespace SOS.Lib.Repositories.Processed
             IElasticClientManager elasticClientManager,
             ElasticSearchConfiguration elasticConfiguration,
             ICache<string, ProcessedConfiguration> processedConfigurationCache,
-            IClassCache<ConcurrentDictionary<string, ClusterHealthResponse>> clusterHealthCache,
+            IClassCache<ConcurrentDictionary<string, HealthResponse>> clusterHealthCache,
             ILogger<DatasetRepository> logger) : base(true, elasticClientManager, processedConfigurationCache, elasticConfiguration, clusterHealthCache, logger)
         {
             LiveMode = true;
@@ -226,26 +216,6 @@ namespace SOS.Lib.Repositories.Processed
                 if (indexResult == null || indexResult.TotalNumberOfFailedBuffers > 0) return 0;
                 return items.Count();
             });
-        }
-
-        public async Task<bool> DeleteAllDocumentsAsync(bool waitForCompletion = false)
-        {
-            try
-            {
-                var res = await Client.DeleteByQueryAsync<Dataset>(q => q
-                    .Index(IndexName)
-                    .Query(q => q.MatchAll())
-                    .WaitForCompletion(waitForCompletion)
-                    .Refresh(waitForCompletion)
-                );
-
-                return res.IsValid;
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e.ToString());
-                return false;
-            }
         }
 
         /// <inheritdoc />
