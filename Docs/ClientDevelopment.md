@@ -10,7 +10,7 @@ This document contains some basic information about SOS and tips on what to cons
 - [Data ingestion](#data-ingestion)
 
 ## Basics
-Regardless of whether you are developing a web, app or desktop solution, it is best practice to communicate with SOS through a dedicated backend and not access the API directly from the web browser or phone app. This way, you only need to make changes in one place, the App Backend, if there are structural changes in the SOS API.
+Regardless of whether you are developing a web, mobile, or desktop solution, it is best practice to communicate with SOS through a dedicated backend rather than accessing the API directly from the web browser or phone app. This way, you only need to make changes in one place, the App Backend, if there are structural changes in the SOS API.
 ```mermaid
 sequenceDiagram
   App->>App Backend: POST /Observations/Search
@@ -21,7 +21,7 @@ sequenceDiagram
 
 
 ## Case sensitivity
-Use "case insensitive" when deserializing JSON data from SOS. This prevents errors that can be difficult to identify.
+Use **case-insensitive** deserialization when handling JSON data from SOS. This prevents errors that can be difficult to identify.
 ```csharp
 var jsonSerializerOptions = new JsonSerializerOptions {
   PropertyNameCaseInsensitive = true
@@ -32,13 +32,13 @@ var jsonSerializerOptions = new JsonSerializerOptions {
 ## Null values
 
 ### Requests
-Instead of setting JSON properties to `null` or empty object/array, you can omit the property entirely. This reduces the amount of data being sent and simplifies troubleshooting, as it becomes easier to identify the relevant parts.
+Instead of setting JSON properties to `null` or an empty object/array, you can omit the property entirely. This reduces the amount of data being sent and simplifies troubleshooting, as it becomes easier to identify the relevant parts..
 
 ### Responses
-The SOS API uses `DefaultIgnoreCondition = JsonIgnoreCondition.Never` which means that nullable properties will be serialized as `null` (with some exceptions explained below).
+The SOS API uses `DefaultIgnoreCondition = JsonIgnoreCondition.Never`, meaning nullable properties will be serialized as `null` (with some exceptions explained below).
 ```csharp
 var jsonSerializerOptions = new JsonSerializerOptions {
-  DefaultIgnoreCondition = JsonIgnoreCondition.Never
+  DefaultIgnoreCondition = JsonIgnoreCondition.Never,
   PropertyNameCaseInsensitive = true  
 };
 ```
@@ -46,7 +46,7 @@ var jsonSerializerOptions = new JsonSerializerOptions {
 **Example**
 ```json
 {
-  "propertyWithValue": "My value"
+  "propertyWithValue": "My value",
   "propertyWithoutValue": null
 }
 ```
@@ -133,7 +133,7 @@ Explicitly exclude null values<br/>
 ```
 
 
-## Headers
+## Custom Headers
 When calling SOS, you can include certain values in the request headers. In many cases, this is not necessary, but for certain functionality, it is required to include correct information, and in other cases, it simplifies troubleshooting, for example. Below, you can read about different values that can be included in your requests.
 
 ### X-Requesting-System
@@ -147,6 +147,12 @@ If you have authorization associated with a role in SLU's authorization system, 
 
 ### X-Api-Version
 This header is for future version control of SOS. You don't need to specify any value for now.
+
+## Standard headers
+
+### X-Forwarded-Proto
+If you include the `X-Forwarded-Proto` header with the value `http`, the request will be rejected with a `308 Permanent Redirect` response. This ensures that all communication with the SOS API is performed over HTTPS. If you encounter this response, make sure that your client is using HTTPS when making requests to the API.
+
 
 
 ## Resources
