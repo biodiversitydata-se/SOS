@@ -29,7 +29,7 @@ namespace SOS.Lib
         /// </summary>
         /// <param name="query"></param>
         /// <param name="filter"></param>
-        private static void AddAuthorizationFilters(this QueryDescriptor<dynamic> query, ExtendedAuthorizationFilter filter)
+        private static void AddAuthorizationFilters<TQueryDescriptor>(this ICollection<QueryDescriptor<TQueryDescriptor>> queries, ExtendedAuthorizationFilter filter) where TQueryDescriptor : class
         {
             if (filter.ReportedByMe ?? false)
             {
