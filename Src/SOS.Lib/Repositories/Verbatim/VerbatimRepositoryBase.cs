@@ -345,5 +345,33 @@ namespace SOS.Lib.Repositories.Verbatim
                 return false;
             }
         }
+
+        public async Task<bool> CheckDuplicatesAsync(string field, IMongoCollection<TEntity> mongoCollection)
+        {
+            try
+            {
+                var pipeline = new[]
+                {
+                    new BsonDocument("$group", new BsonDocument
+                    {
+                        { "_id", $"${field}" },
+                        { "count", new BsonDocument("$sum", 1) }
+                    }),
+                    new BsonDocument("$match", new BsonDocument
+                    {
+                        { "count", new BsonDocument("$gt", 1) }
+                    })
+                };
+
+                var result = await mongoCollection.Aggregate<BsonDocument>(pipeline).FirstOrDefaultAsync();
+
+                return result != null;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, $"Error checking duplicates for field {field}: {ex.Message}");
+                throw;
+            }
+        }
     }
 }
