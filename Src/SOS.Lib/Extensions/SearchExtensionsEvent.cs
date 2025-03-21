@@ -1,9 +1,8 @@
-﻿using Nest;
+﻿using Elastic.Clients.Elasticsearch.QueryDsl;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Search.Filters;
 using System;
 using System.Collections.Generic;
-using static SOS.Lib.Extensions.SearchExtensionsGeneric;
 
 namespace SOS.Lib
 {
@@ -17,32 +16,37 @@ namespace SOS.Lib
         /// </summary>
         /// <param name="filter"></param>
         /// <returns></returns>
-        public static ICollection<Func<QueryDescriptor<TQueryContainer>, QueryContainer>> ToQuery<TQueryContainer>(
-            this EventSearchFilter filter) where TQueryContainer : class
+        public static ICollection<Action<QueryDescriptor<TQueryDescriptor>>> ToQuery<TQueryDescriptor>(
+            this EventSearchFilter filter) where TQueryDescriptor : class
         {
-            var query = new List<Func<QueryDescriptor<TQueryContainer>, QueryContainer>>();
-            if (filter == null) return query;
+            var queries = new List<Action<QueryDescriptor<TQueryDescriptor>>>();
+            if (filter == null) return queries;
 
-            query.TryAddTermsCriteria("dataProviderId", filter.DataProviderIds);
-            query.TryAddTermsCriteria("eventId", filter.EventIds);
-            query.TryAddTermsCriteria("dataStewardship.datasetIdentifier", filter.DatasetIds);
+            queries.Add(q => q
+                .TryAddTermsCriteria("dataProviderId", filter.DataProviderIds)
+                .TryAddTermsCriteria("eventId", filter.EventIds)
+                .TryAddTermsCriteria("dataStewardship.datasetIdentifier", filter.DatasetIds)
+            );
+           
             if (filter.IsPartOfDataStewardshipDataset.GetValueOrDefault(false))
             {
-                query.AddExistsCriteria("dataStewardship");
+                queries.Add(q => q
+                    .AddExistsCriteria("dataStewardship")
+                );
             }
 
-            return query;
+            return queries;
         }
 
-        public static List<Func<QueryDescriptor<dynamic>, QueryContainer>> ToExcludeQuery(this EventSearchFilter filter)
+        public static ICollection<Action<QueryDescriptor<TQueryDescriptor>>> ToExcludeQuery<TQueryDescriptor>(this EventSearchFilter filter) where TQueryDescriptor : class
         {
             if (filter == null)
             {
                 return null;
             }
 
-            var query = new List<Func<QueryDescriptor<dynamic>, QueryContainer>>();
-            return query;
+            var queries = new List<Action<QueryDescriptor<TQueryDescriptor>>>();
+            return queries;
         }
     }
 }

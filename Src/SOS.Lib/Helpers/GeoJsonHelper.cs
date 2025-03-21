@@ -1,7 +1,5 @@
-﻿using Nest;
-using NetTopologySuite.Features;
+﻿using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
-using SOS.Lib.Extensions;
 using SOS.Lib.Models.Processed.Observation;
 using System.Collections.Generic;
 using System.Globalization;
@@ -277,20 +275,6 @@ namespace SOS.Lib.Helpers
                     resultDictionary.Add(prefix + pair.Key, pair.Value);
                 }
             }
-        }
-
-        public static Feature GetFeature(IGeoShape geometry, AttributesTable attributesTable)
-        {
-            var geom = geometry.ToGeometry();
-            var feature = new Feature(geom, attributesTable);
-            return feature;
-        }
-
-        public static string GetFeatureAsGeoJsonString(IGeoShape geometry, AttributesTable attributesTable)
-        {
-            var feature = GetFeature(geometry, attributesTable);
-            string strGeoJson = GeoJsonWriter.Write(feature);
-            return strGeoJson;
         }
 
         public static string GetGridCellId(int gridCellSizeInMeters, int left, int bottom)

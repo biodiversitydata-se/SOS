@@ -1,4 +1,4 @@
-﻿using Nest;
+﻿using Elastic.Clients.Elasticsearch;
 using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -31,7 +31,11 @@ namespace SOS.Lib.JsonConverters
             reader.Read();
             var val2 = reader.GetDouble();
             reader.Read();
-            return new GeoLocation(property1 == "lat" ? val1 : val2, property2 == "lon" ? val2 : val1);
+            return GeoLocation.LatitudeLongitude(new LatLonGeoLocation
+            {
+                Lat = property1 == "lat" ? val1 : val2,
+                Lon = property2 == "lon" ? val2 : val1
+            });
         }
 
 
@@ -41,10 +45,11 @@ namespace SOS.Lib.JsonConverters
             {
                 return;
             }
-
             writer.WriteStartObject();
-            writer.WriteNumber("lat", value.Latitude);
-            writer.WriteNumber("lon", value.Longitude);
+            if (value.TryGetLatitudeLongitude(out var latLon)) {
+                writer.WriteNumber("lat", latLon.Lat);
+                writer.WriteNumber("lon", latLon.Lon);
+            }
             writer.WriteEndObject();
         }
     }

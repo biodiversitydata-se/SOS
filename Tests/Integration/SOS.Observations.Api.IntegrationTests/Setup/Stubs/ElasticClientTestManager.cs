@@ -1,14 +1,14 @@
-﻿using Nest;
+﻿using Elastic.Clients.Elasticsearch;
 using SOS.Lib.Managers.Interfaces;
 
 namespace SOS.Observations.Api.IntegrationTests.Setup.Stubs;
 internal class ElasticClientTestManager : IElasticClientManager
 {
-    private IElasticClient[] _clients;
-    public ElasticClientTestManager(IElasticClient elasticClient)
+    private ElasticsearchClient[] _clients;
+    public ElasticClientTestManager(ElasticsearchClient elasticClient)
     {
-        _clients = new IElasticClient[] { elasticClient };
+        _clients = new ElasticsearchClient[] { elasticClient };
     }
 
-    public IElasticClient[] Clients => _clients;
+    public ElasticsearchClient[] Clients => _clients;
 }

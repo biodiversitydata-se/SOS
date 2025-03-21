@@ -97,7 +97,7 @@ namespace SOS.Lib.Repositories.Processed
             // Retry policy by Polly
             var searchResponse = await PollyHelper.GetRetryPolicy(3, 100).ExecuteAsync(async () =>
             {
-                var queryResponse = await Client.SearchAsync<T>(searchDescriptor
+                var queryResponse = await Client.SearchAsync(searchDescriptor
                    .Index(searchIndex)
                    .Sort(s => s.Field("_shard_doc"))
                    .SearchAfter(nextPageKey)

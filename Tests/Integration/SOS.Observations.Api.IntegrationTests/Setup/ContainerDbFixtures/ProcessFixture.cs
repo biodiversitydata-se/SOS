@@ -1,8 +1,7 @@
 ﻿using DwC_A;
-using FluentAssertions.Common;
+using Elastic.Clients.Elasticsearch.Cluster;
 using Microsoft.ApplicationInsights;
 using Microsoft.Extensions.Caching.Memory;
-using Nest;
 using SOS.Harvest.DarwinCore;
 using SOS.Harvest.DarwinCore.Interfaces;
 using SOS.Harvest.Managers;
@@ -485,7 +484,7 @@ public class ProcessFixture : IProcessFixture
         {
             await _processedObservationCoreRepository.DeleteAllDocumentsAsync(protectedIndex);
         }
-        _processedObservationCoreRepository.AddMany(observations, protectedIndex, true);
+        await _processedObservationCoreRepository.AddManyAsync(observations, protectedIndex, true);
     }
 
     public DwcaObservationFactory GetDwcaObservationFactory(bool initAreaHelper)

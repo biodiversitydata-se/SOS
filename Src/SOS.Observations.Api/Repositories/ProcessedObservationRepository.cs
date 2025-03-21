@@ -1,5 +1,8 @@
-﻿using Microsoft.Extensions.Logging;
-using Nest;
+﻿using Elastic.Clients.Elasticsearch;
+using Elastic.Clients.Elasticsearch.Aggregations;
+using Elastic.Clients.Elasticsearch.Cluster;
+using Elastic.Clients.Elasticsearch.Mapping;
+using Microsoft.Extensions.Logging;
 using SOS.Lib;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Shared;
@@ -38,31 +41,33 @@ namespace SOS.Observations.Api.Repositories
         public async Task<PagedResult<dynamic>> GetAggregatedChunkAsync(SearchFilter filter, AggregationType aggregationType, int skip, int take)
         {
             var indexNames = GetCurrentIndex(filter);
-            var (query, excludeQuery) = GetCoreQueries(filter);
-            query.AddAggregationFilter(aggregationType);
+            var (queries, excludeQueries) = GetCoreQueries(filter);
+            queries.Add(q => q
+                .AddAggregationFilter(aggregationType)
+            );
             
             // Get number of distinct values
             var searchResponseCount = await Client.SearchAsync<dynamic>(s => s
                 .Index(indexNames)
                 .Query(q => q
                     .Bool(b => b
-                        .MustNot(excludeQuery)
-                        .Filter(query)
+                        .MustNot(excludeQueries.ToArray())
+                        .Filter(queries.ToArray())
                     )
                 )
                 .Aggregations(a => a
-                    .Cardinality("species_count", c => c
-                        .Field("taxon.id")
+                    .Add("species_count", a => a
+                        .Cardinality(c => c
+                            .Field("taxon.id")
+                        )
                     )
                 )
-                .Size(0)
-                .Source(filter.Output?.Fields.ToProjection(filter is SearchFilterInternal))
-                .TrackTotalHits(false)
+                .AddDefaultAggrigationSettings()
             );
 
             searchResponseCount.ThrowIfInvalid();
 
-            var maxResult = (int?)searchResponseCount.Aggregations.Cardinality("species_count").Value ?? 0;
+            var maxResult = (int?)searchResponseCount.Aggregations.GetCardinality("species_count").Value ?? 0;
             if (aggregationType == AggregationType.SpeciesSightingsListTaxonCount)
             {
                 return new PagedResult<dynamic>
@@ -84,46 +89,46 @@ namespace SOS.Observations.Api.Repositories
             }
             
             // Get the real result
-            var searchResponse = await Client.SearchAsync<dynamic>(s => s
-                .Index(indexNames)
+            var searchResponse = await Client.SearchAsync<dynamic>(indexNames, s => s
                 .Query(q => q
                     .Bool(b => b
-                        .MustNot(excludeQuery)
-                        .Filter(query)
+                        .MustNot(excludeQueries.ToArray())
+                        .Filter(queries.ToArray())
                     )
                 )
                 .Aggregations(a => a
-                    .Composite("species", c => c
-                        .Size(size)
-                        .Sources(s => s
-                            .Terms("sortOrder", t => t
-                                .Field("taxon.attributes.sortOrder")
-                             )
-                            .Terms("id", t => t
-                                .Field("taxon.id")
+                    .Add("species", a => a
+                        .Composite(c => c
+                            .Size(size)
+                            .Sources(
+                                [
+                                    CreateCompositeTermsAggregationSource(
+                                        ("sortOrder", "taxon.attributes.sortOrder", SortOrder.Asc),
+                                        ("id", "taxon.id", SortOrder.Asc)
+                                    )
+                                ]
                             )
-                        )                        
+                        )
+                    )
+                    
                 )
-            )
-                .Size(0)
-                .Source(s => s.ExcludeAll())
-                .TrackTotalHits(false)
+                .AddDefaultAggrigationSettings()
             );
 
             searchResponse.ThrowIfInvalid();
             var buckets = searchResponse
                 .Aggregations
-                .Composite("species")
-                .Buckets?
-                .Select(b =>
-                        new AggregatedSpecies
-                        {
-                            DocCount = b.DocCount,
-                            TaxonId = int.Parse(b.Key["id"].ToString())
-                        }
-                    ).ToList();
+                .GetComposite("species")
+                    .Buckets?
+                    .Select(b =>
+                            new AggregatedSpecies
+                            {
+                                DocCount = b.DocCount,
+                                TaxonId = int.Parse(b.Key["id"].ToString())
+                            }
+                        ).ToList();
 
-            Dictionary<int, AggregatedSpecies> dic = new Dictionary<int, AggregatedSpecies>();
+            var dic = new Dictionary<int, AggregatedSpecies>();
             for (int i = 0; i < buckets.Count; i++)
             {
                 if (!dic.ContainsKey(buckets[i].TaxonId))
@@ -176,58 +181,63 @@ namespace SOS.Observations.Api.Repositories
         public async Task<PagedResult<dynamic>> GetAggregatedHistogramChunkAsync(SearchFilter filter, AggregationType aggregationType)
         {
             var indexNames = GetCurrentIndex(filter);
-            var (query, excludeQuery) = GetCoreQueries(filter);
-            query.AddAggregationFilter(aggregationType);
-
+            var (queries, excludeQueries) = GetCoreQueries(filter);
+            queries.Add(q => q
+                .AddAggregationFilter(aggregationType)
+            );
+            
             var tz = TimeZoneInfo.Local.GetUtcOffset(DateTime.Now);
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
                 .Index(indexNames)
                 .Query(q => q
                     .Bool(b => b
-                        .MustNot(excludeQuery)
-                        .Filter(query)
+                        .MustNot(excludeQueries.ToArray())
+                        .Filter(queries.ToArray())
                     )
                 )
                 .Aggregations(a => a
-
-                    .DateHistogram("aggregation", dh => dh
-                        .Field("event.startDate")
-                        .CalendarInterval(aggregationType switch
-                        {
-                            AggregationType.QuantityPerYear => DateInterval.Year,
-                            AggregationType.SightingsPerYear => DateInterval.Year,
-                            AggregationType.QuantityPerWeek => DateInterval.Week,
-                            AggregationType.SightingsPerWeek => DateInterval.Week,
-                            _ => DateInterval.Day
-                        }
+                    .Add("aggregation", a => a
+                        .DateHistogram(dh => dh
+                            .Field("event.startDate")
+                            .CalendarInterval(aggregationType switch
+                            {
+                                AggregationType.QuantityPerYear => CalendarInterval.Year,
+                                AggregationType.SightingsPerYear => CalendarInterval.Year,
+                                AggregationType.QuantityPerWeek => CalendarInterval.Week,
+                                AggregationType.SightingsPerWeek => CalendarInterval.Week,
+                                _ => CalendarInterval.Day
+                            }
                         )
                         .TimeZone($"{(tz.TotalMinutes > 0 ? "+" : "")}{tz.Hours:00}:{tz.Minutes:00}")
                         .Format("yyyy-MM-dd")
-                        .Aggregations(a => a
-                            .Sum("quantity", sum => sum
-                                .Field("occurrence.organismQuantityAggregation")
-                            )
+                        
                         )
-                    )
+                        .Aggregations(a => a
+                            .Add("quantity", a => a
+                                .Sum(sum => sum
+                                    .Field("occurrence.organismQuantityAggregation")
+                                )
+                            )   
+                        )
+                    )     
                 )
-            .Size(0)
-                .Source(s => s.ExcludeAll())
+                .AddDefaultAggrigationSettings()
             );
 
             searchResponse.ThrowIfInvalid();
 
-            var totalCount = searchResponse.HitsMetadata.Total.Value;
+            var totalCount = searchResponse.Total;
 
             var result = searchResponse
                 .Aggregations
-                .DateHistogram("aggregation")
+                .GetDateHistogram("aggregation")
                 .Buckets?
                 .Select(b =>
                     new
                     {
                         Date = DateTime.Parse(b.KeyAsString),
                         b.DocCount,
-                        Quantity = b.Sum("quantity").Value
+                        Quantity = b.Aggregations.GetSum("quantity").Value
                     }).ToList();
 
             return new PagedResult<dynamic>
@@ -245,54 +255,58 @@ namespace SOS.Observations.Api.Repositories
         public async Task<PagedResult<dynamic>> GetAggregated48WeekHistogramAsync(SearchFilter filter)
         {
             var indexNames = GetCurrentIndex(filter);
-            var (query, excludeQuery) = GetCoreQueries(filter);
-            query.AddAggregationFilter(AggregationType.SightingsPerWeek48);
+            var (queries, excludeQueries) = GetCoreQueries(filter);
+            queries.Add(a => a.AddAggregationFilter(AggregationType.SightingsPerWeek48));
 
             var tz = TimeZoneInfo.Local.GetUtcOffset(DateTime.Now);
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
                 .Index(indexNames)
                 .Query(q => q
                     .Bool(b => b
-                        .MustNot(excludeQuery)
-                        .Filter(query)
+                        .MustNot(excludeQueries.ToArray())
+                        .Filter(queries.ToArray())
                     )
                 )
-                .RuntimeFields(rf => rf
-                    .RuntimeField("yearWeek", FieldType.Keyword, s => s
-                        .Script("emit(doc['event.startYear'].value + '-' + doc['event.startHistogramWeek'].value);")
+                .RuntimeMappings(rtm => rtm
+                    .Add("yearWeek", a => a
+                            .Script(s => s
+                                .Source("emit(doc['event.startYear'].value + '-' + doc['event.startHistogramWeek'].value);")                           
+                            )
+                           .Type(RuntimeFieldType.Keyword)
                     )
                 )
                 .Aggregations(a => a
-                    .Terms("yearWeekAggregation", t => t
-                        .Field("yearWeek")
-                        .Size(1000)
-                        .Order(o => o
-                            .Ascending("_key")
+                    .Add("yearWeekAggregation", a => a
+                        .Terms(t => t
+                            .Field("yearWeek")
+                            .Size(1000)
+                            .Order(new[] { new KeyValuePair<Field, SortOrder>(Field.KeyField, SortOrder.Asc) })
                         )
                         .Aggregations(a => a
-                            .Sum("quantity", sum => sum
-                                .Field("occurrence.organismQuantityAggregation")
+                            .Add("quantity", a => a
+                                .Sum(sum => sum
+                                    .Field("occurrence.organismQuantityAggregation")
+                                )
                             )
                         )
                     )
                 )
-                .Size(0)
-                .Source(s => s.ExcludeAll())
+                .AddDefaultAggrigationSettings()
             );
 
             searchResponse.ThrowIfInvalid();
 
             var yearWeekAggregations = searchResponse
                 .Aggregations
-                .Terms("yearWeekAggregation")
+                .GetStringTerms("yearWeekAggregation")
                 .Buckets?
                 .Select(b =>
                     new
                     {
-                        Year = int.Parse(b.Key.Substring(0, 4)),
-                        Week = int.Parse(b.Key.Substring(5)),
+                        Year = int.Parse(b.Key.Value?.ToString().Substring(0, 4)),
+                        Week = int.Parse(b.Key.Value?.ToString().Substring(5)),
                         DocCount = b.DocCount,
-                        Quantity = b.Sum("quantity").Value
+                        Quantity = b.Aggregations.GetSum("quantity").Value ?? 0.0
                     })
                     .OrderBy(ob => ob.Year).ThenBy(tb => tb.Week).ToDictionary(b => $"{b.Year}-{b.Week}", b => b);
 
@@ -300,24 +314,28 @@ namespace SOS.Observations.Api.Repositories
             var yearWeeks = new List<dynamic>();
             if (yearWeekAggregations?.Any() ?? false)
             {
-                var currentYear = yearWeekAggregations.First().Value.Year;
-                var currentWeek = yearWeekAggregations.First().Value.Week;
-                var lastYear = yearWeekAggregations.Last().Value.Year;
-                var lastWeek = yearWeekAggregations.Last().Value.Week;
+                var firstValue = yearWeekAggregations.First().Value;
+                var currentYear = firstValue.Year;
+                var currentWeek = firstValue.Week;
+                var lastYear = firstValue.Year;
+                var lastWeek = firstValue.Week;
 
                 while (currentYear < lastYear || (currentYear == lastYear && currentWeek <= lastWeek))
                 {
-                    if (!yearWeekAggregations.TryGetValue($"{currentYear}-{currentWeek}", out var yearWeekAggregation))
+                    if (yearWeekAggregations.TryGetValue($"{currentYear}-{currentWeek}", out var yearWeekAggregation))
                     {
-                        yearWeekAggregation = new
+                        yearWeeks.Add(yearWeekAggregation);
+                    }
+                    else
+                    {
+                        yearWeeks.Add(new
                         {
                             Year = currentYear,
                             Week = currentWeek,
                             DocCount = (long?)0,
                             Quantity = (double?)0.0
-                        };
+                        });
                     }
-                    yearWeeks.Add(yearWeekAggregation);
 
                     if (currentWeek == 48)
                     {
@@ -345,55 +363,56 @@ namespace SOS.Observations.Api.Repositories
                 int zoom)
         {
             var indexNames = GetCurrentIndex(filter);
-            var (query, excludeQuery) = GetCoreQueries(filter);
+            var (queries, excludeQueries) = GetCoreQueries(filter);
 
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
                 .Index(indexNames)
+                .Query(q => q
+                    .Bool(b => b
+                        .MustNot(excludeQueries.ToArray())
+                        .Filter(queries.ToArray())
+                    )
+                )
                 .Aggregations(a => a
-                    .Filter("geotile_filter", g => g
-                        .Filter(f => f
-                            .GeoBoundingBox(bb => bb
-                                .Field("location.pointLocation")
-                                .BoundingBox(b => b
-                                    .TopLeft(filter.Location.Geometries.BoundingBox.TopLeft.ToGeoLocation())
-                                    .BottomRight(filter.Location.Geometries.BoundingBox.BottomRight.ToGeoLocation())
-                               )
+                    .Add("geotile_filter", a => a
+                        .Filter(g => g
+                            .GeoBoundingBox(gbb => gbb
+                               .Field("location.pointLocation")
+                               .BoundingBox(filter.Location.Geometries.BoundingBox.ToGeoBounds())
                             )
                         )
                         .Aggregations(ab => ab
-                            .GeoTile("geotile_grid", gg => gg
-                                .Field("location.pointLocation")
-                                .Size(MaxNrElasticSearchAggregationBuckets + 1)
-                                .Precision((GeoTilePrecision)(zoom))
-                                .Aggregations(b => b
-                                    .Cardinality("taxa_count", t => t
-                                    .Field("taxon.id"))
+                            .Add("geotile_grid", a => a
+                                .GeotileGrid(gtg => gtg
+                                    .Field("location.pointLocation")
+                                    .Size(MaxNrElasticSearchAggregationBuckets + 1)
+                                    .Precision(zoom)
+                                )
+                                .Aggregations(a => a
+                                    .Add("taxa_count", a => a
+                                        .Cardinality(t => t
+                                            .Field("taxon.id")
+                                        )
+                                    )
                                 )
                             )
                         )
                     )
+                    
                 )
-                .Query(q => q
-                    .Bool(b => b
-                        .MustNot(excludeQuery)
-                        .Filter(query)
-                    )
-                )
-                .Size(0)
-                .Source(s => s.ExcludeAll())
-                .TrackTotalHits(false)
+                .AddDefaultAggrigationSettings()
             );
 
-            if (!searchResponse.IsValid)
+            if (!searchResponse.IsValidResponse)
             {
-                if (searchResponse.ServerError?.Error?.CausedBy?.Type == "too_many_buckets_exception")
+                if (searchResponse.ElasticsearchServerError?.Error?.CausedBy?.Type == "too_many_buckets_exception")
                 {
                     throw new ArgumentOutOfRangeException($"The number of cells that will be returned is too large. The limit is {MaxNrElasticSearchAggregationBuckets} cells. Try using lower zoom or a smaller bounding box.");
                 }
                 searchResponse.ThrowIfInvalid();
             }
 
-            var nrOfGridCells = (int?)searchResponse.Aggregations?.Filter("geotile_filter")?.GeoTile("geotile_grid")?.Buckets?.Count ?? 0;
+            var nrOfGridCells = (int?)searchResponse.Aggregations?.GetFilter("geotile_filter")?.Aggregations.GetGeotileGrid("geotile_grid")?.Buckets?.Count ?? 0;
             if (nrOfGridCells > MaxNrElasticSearchAggregationBuckets)
             {
                 throw new ArgumentOutOfRangeException($"The number of cells that will be returned is too large. The limit is {MaxNrElasticSearchAggregationBuckets} cells. Try using lower zoom or a smaller bounding box.");
@@ -401,10 +420,10 @@ namespace SOS.Observations.Api.Repositories
 
             var georesult = searchResponse
                 .Aggregations
-                .Filter("geotile_filter")
-                .GeoTile("geotile_grid")
+                .GetFilter("geotile_filter")
+                .Aggregations.GetGeotileGrid("geotile_grid")
                 .Buckets?
-                .Select(b => GridCellTile.Create(b.Key, b.DocCount, (long?)b.Cardinality("taxa_count").Value));
+                .Select(b => GridCellTile.Create(b.Key, b.DocCount, b.Aggregations.GetCardinality("taxa_count").Value));
 
             var gridResult = new GeoGridTileResult()
             {
@@ -422,25 +441,28 @@ namespace SOS.Observations.Api.Repositories
         public async Task<int> GetProvinceCountAsync(SearchFilterBase filter)
         {
             var indexNames = GetCurrentIndex(filter);
-            var (query, excludeQuery) = GetCoreQueries(filter);
+            var (queries, excludeQueries) = GetCoreQueries(filter);
 
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
                 .Index(indexNames)
-                .Aggregations(a => a.Cardinality("provinceCount", c => c
-                    .Field("location.province.featureId")))
                 .Query(q => q
                     .Bool(b => b
-                        .MustNot(excludeQuery)
-                        .Filter(query)
+                        .MustNot(excludeQueries.ToArray())
+                        .Filter(queries.ToArray())
                     )
                 )
-                .Size(0)
-                .Source(s => s.ExcludeAll())
-                .TrackTotalHits(false)
+                .Aggregations(a => a
+                    .Add("provinceCount", a => a
+                        .Cardinality(c => c
+                            .Field("location.province.featureId")
+                        )
+                    )
+                ) 
+                .AddDefaultAggrigationSettings()
             );
 
             searchResponse.ThrowIfInvalid();
-            int provinceCount = Convert.ToInt32(searchResponse.Aggregations.Cardinality("provinceCount").Value);
+            int provinceCount = Convert.ToInt32(searchResponse.Aggregations.GetCardinality("provinceCount").Value);
             return provinceCount;
         }
 
@@ -449,53 +471,56 @@ namespace SOS.Observations.Api.Repositories
         {
             try
             {
-                var (query, excludeQuery) = GetCoreQueries(filter);
+                var (queries, excludeQueries) = GetCoreQueries(filter);
 
                 var searchResponse = await Client.SearchAsync<dynamic>(s => s
                    .Index(new[] { PublicIndexName, ProtectedIndexName })
                    .Query(q => q
                         .Bool(b => b
-                            .MustNot(excludeQuery)
-                            .Filter(query)
+                            .MustNot(excludeQueries.ToArray())
+                            .Filter(queries.ToArray())
                         )
                     )
                     .Aggregations(a => a
-                        .Composite("observationByYear", c => c
-                            .Size(100) // 100 years
-                            .Sources(s => s
-                                .Terms("startYear", t => t
-                                    .Field("event.startYear")
-                                    .Order(SortOrder.Descending)
+                        .Add("observationByYear", a => a
+                            .Composite(c => c
+                                .Size(100) // 100 years
+                                .Sources(
+                                    [
+                                        CreateCompositeTermsAggregationSource(("startYear", "event.startYear", SortOrder.Desc)),
+                                    ]
                                 )
                             )
                             .Aggregations(a => a
-                                .Cardinality("unique_taxonids", c => c
-                                    .Field("taxon.id")
+                                .Add("unique_taxonids", a => a
+                                    .Cardinality(c => c
+                                        .Field("taxon.id")
+                                    )
+                                
                                 )
                             )
                         )
                     )
-                    .Size(0)
-                    .Source(s => s.ExcludeAll())
-                    .TrackTotalHits(false)
+                    .AddDefaultAggrigationSettings()
                 );
 
                 searchResponse.ThrowIfInvalid();
 
                 var result = new HashSet<YearCountResult>();
-                foreach (var bucket in searchResponse.Aggregations.Composite("observationByYear").Buckets)
+                foreach (var bucket in searchResponse.Aggregations.GetComposite("observationByYear").Buckets)
                 {
                     var key = bucket.Key;
 
-                    key.TryGetValue("startYear", out int startYear);
+                    key.TryGetValue("startYear", out var startYearField);
+                    startYearField.TryGetLong(out var startYear);
                     var count = bucket.DocCount;
-                    var taxonCount = (long)bucket.Cardinality("unique_taxonids").Value;
+                    var taxonCount = bucket.Aggregations.GetCardinality("unique_taxonids").Value;
 
                     result.Add(new YearCountResult
                     {
-                        Count = count ?? 0,
+                        Count = count,
                         TaxonCount = taxonCount,
-                        Year = startYear
+                        Year = (int)startYear
                     });
                 }
 
@@ -513,59 +538,61 @@ namespace SOS.Observations.Api.Repositories
         {
             try
             {
-                var (query, excludeQuery) = GetCoreQueries(filter);
+                var (queries, excludeQueries) = GetCoreQueries(filter);
 
                 var searchResponse = await Client.SearchAsync<dynamic>(s => s
                    .Index(new[] { PublicIndexName, ProtectedIndexName })
                    .Query(q => q
                         .Bool(b => b
-                            .MustNot(excludeQuery)
-                            .Filter(query)
+                            .MustNot(excludeQueries.ToArray())
+                            .Filter(queries.ToArray())
                         )
                     )
                     .Aggregations(a => a
-                        .Composite("observationByYearMonth", c => c
-                            .Size(1200) // 12 months * 100 year
-                            .Sources(s => s
-                                .Terms("startYear", t => t
-                                    .Field("event.startYear")
-                                    .Order(SortOrder.Descending)
-                                )
-                                .Terms("startMonth", t => t
-                                    .Field("event.startMonth")
-                                    .Order(SortOrder.Descending)
+                        .Add("observationByYearMonth", a => a
+                            .Composite(c => c
+                                .Size(1200) // 12 months * 100 year
+                                .Sources(
+                                    [
+                                        CreateCompositeTermsAggregationSource(
+                                            ("startYear", "event.startYear", SortOrder.Desc),
+                                            ("startMonth", "event.startMonth", SortOrder.Desc)
+                                        )
+                                    ]
                                 )
                             )
                             .Aggregations(a => a
-                                .Cardinality("unique_taxonids", c => c
-                                    .Field("taxon.id")
-                                )
+                                .Add("unique_taxonids", a => a
+                                    .Cardinality(c => c
+                                        .Field("taxon.id")
+                                    )
+                                ) 
                             )
                         )
                     )
-                    .Size(0)
-                    .Source(s => s.ExcludeAll())
-                    .TrackTotalHits(false)
+                    .AddDefaultAggrigationSettings()
                 );
 
                 searchResponse.ThrowIfInvalid();
 
                 var result = new HashSet<YearMonthCountResult>();
-                foreach (var bucket in searchResponse.Aggregations.Composite("observationByYearMonth").Buckets)
+                foreach (var bucket in searchResponse.Aggregations.GetComposite("observationByYearMonth").Buckets)
                 {
                     var key = bucket.Key;
 
-                    key.TryGetValue("startYear", out int startYear);
-                    key.TryGetValue("startMonth", out int startMonth);
+                    key.TryGetValue("startYear", out var startYearField);
+                    startYearField.TryGetLong(out var startYear);
+                    key.TryGetValue("startMonth", out var startMonthField);
+                    startMonthField.TryGetLong(out var startMonth);
                     var count = bucket.DocCount;
-                    var taxonCount = (long)bucket.Cardinality("unique_taxonids").Value;
+                    var taxonCount = (long)bucket.Aggregations.GetCardinality("unique_taxonids").Value;
 
                     result.Add(new YearMonthCountResult
                     {
-                        Count = count ?? 0,
-                        Month = startMonth,
+                        Count = count,
+                        Month = (int)startMonth,
                         TaxonCount = taxonCount,
-                        Year = startYear
+                        Year = (int)startYear
                     });
                 }
 
@@ -584,67 +611,68 @@ namespace SOS.Observations.Api.Repositories
         {
             try
             {
-                var (query, excludeQuery) = GetCoreQueries(filter);
+                var (queries, excludeQueries) = GetCoreQueries(filter);
 
                 // First get observations count and taxon count group by day
                 var searchResponse = await Client.SearchAsync<dynamic>(s => s
                    .Index(new[] { PublicIndexName, ProtectedIndexName })
                    .Query(q => q
                         .Bool(b => b
-                            .MustNot(excludeQuery)
-                            .Filter(query)
+                            .MustNot(excludeQueries.ToArray())
+                            .Filter(queries.ToArray())
                         )
                     )
                     .Aggregations(a => a
-                        .Composite("observationByYearMonth", c => c
-                            .Size(skip + take) // Take as few as possible
-                            .Sources(s => s
-                                .Terms("startYear", t => t
-                                    .Field("event.startYear")
-                                    .Order(SortOrder.Descending)
-                                )
-                                .Terms("startMonth", t => t
-                                    .Field("event.startMonth")
-                                    .Order(SortOrder.Descending)
-                                )
-                                .Terms("startDay", t => t
-                                    .Field("event.startDay")
-                                    .Order(SortOrder.Descending)
+                        .Add("observationByYearMonth", a => a
+                            .Composite(c => c
+                                .Size(skip + take) // Take as few as possible
+                                .Sources(
+                                    [
+                                         CreateCompositeTermsAggregationSource(
+                                            ("startYear", "event.startYear", SortOrder.Desc),
+                                            ("startMonth", "event.startMonth", SortOrder.Desc),
+                                            ("startDay", "event.startDay", SortOrder.Desc)
+                                        )
+                                    ]
                                 )
                             )
                             .Aggregations(a => a
-                                .Cardinality("unique_taxonids", c => c
-                                    .Field("taxon.id")
-                                )
+                                .Add("unique_taxonids", a => a
+                                    .Cardinality(c => c
+                                        .Field("taxon.id")
+                                    )
+                                )   
                             )
                         )
                     )
-                    .Size(0)
-                    .Source(s => s.ExcludeAll())
-                    .TrackTotalHits(false)
+                    .AddDefaultAggrigationSettings()
                 );
 
                 searchResponse.ThrowIfInvalid();
 
                 var result = new Dictionary<string, YearMonthDayCountResult>();
-                foreach (var bucket in searchResponse.Aggregations.Composite("observationByYearMonth").Buckets.Skip(skip))
+                foreach (var bucket in searchResponse.Aggregations.GetComposite("observationByYearMonth").Buckets.Skip(skip))
                 {
                     var key = bucket.Key;
 
-                    key.TryGetValue("startYear", out int startYear);
-                    key.TryGetValue("startMonth", out int startMonth);
-                    key.TryGetValue("startDay", out int startDay);
+                    key.TryGetValue("startYear", out var startYearField);
+                    startYearField.TryGetLong(out var startYear);
+                    key.TryGetValue("startMonth", out var startMonthField);
+                    startMonthField.TryGetLong(out var startMonth);
+                    key.TryGetValue("startDay", out var startDayField);
+                    startDayField.TryGetLong(out var startDay);
+
                     var count = bucket.DocCount;
-                    var taxonCount = (long)bucket.Cardinality("unique_taxonids").Value;
+                    var taxonCount = (long)bucket.Aggregations.GetCardinality("unique_taxonids").Value;
 
                     result.Add($"{startYear}-{startMonth}-{startDay}", new YearMonthDayCountResult
                     {
-                        Count = count ?? 0,
-                        Day = startDay,
+                        Count = count,
+                        Day = (int)startDay,
                         Localities = new HashSet<IdName<string>>(),
-                        Month = startMonth,
+                        Month = (int)startMonth,
                         TaxonCount = taxonCount,
-                        Year = startYear
+                        Year = (int)startYear
                     });
                 }
 
@@ -666,55 +694,48 @@ namespace SOS.Observations.Api.Repositories
                        .Index(new[] { PublicIndexName, ProtectedIndexName })
                        .Query(q => q
                             .Bool(b => b
-                                .MustNot(excludeQuery)
-                                .Filter(query)
+                                .MustNot(excludeQueries.ToArray())
+                                .Filter(queries.ToArray())
                             )
                         )
                         .Aggregations(a => a
-                            .Composite("localityByYearMonth", c => c
-                                .Size((skip + take) * 10) // 10 locations for one day must be enought
-                                .Sources(s => s
-                                    .Terms("startYear", t => t
-                                        .Field("event.startYear")
-                                        .Order(SortOrder.Descending)
-                                    )
-                                    .Terms("startMonth", t => t
-                                        .Field("event.startMonth")
-                                        .Order(SortOrder.Descending)
-                                    )
-                                    .Terms("startDay", t => t
-                                        .Field("event.startDay")
-                                        .Order(SortOrder.Descending)
-                                    )
-                                     .Terms("locationId", t => t
-                                        .Field("location.locationId")
-                                        .Order(SortOrder.Descending)
-                                    )
-                                      .Terms("locality", t => t
-                                        .Field("location.locality.raw")
-                                        .Order(SortOrder.Descending)
+                            .Add("localityByYearMonth", a => a
+                                .Composite(c => c
+                                    .Size((skip + take) * 10) // 10 locations for one day must be enought
+                                    .Sources(
+                                        [
+                                             CreateCompositeTermsAggregationSource(
+                                                ("startYear", "event.startYear", SortOrder.Desc),
+                                                ("startMonth", "event.startMonth", SortOrder.Desc),
+                                                ("startDay", "event.startDay", SortOrder.Desc),
+                                                ("locationId", "location.locationId", SortOrder.Desc),
+                                                ("locality", "location.locality.raw", SortOrder.Desc)
+                                            )
+                                        ]
                                     )
                                 )
-
                             )
                         )
-                        .Size(0)
-                        .Source(s => s.ExcludeAll())
-                        .TrackTotalHits(false)
+                        .AddDefaultAggrigationSettings()
                     );
 
                     searchResponse.ThrowIfInvalid();
 
                     // Add locations to result
-                    foreach (var bucket in searchResponseLocality.Aggregations.Composite("localityByYearMonth").Buckets)
+                    foreach (var bucket in searchResponseLocality.Aggregations.GetComposite("localityByYearMonth").Buckets)
                     {
                         var key = bucket.Key;
 
-                        key.TryGetValue("startYear", out int startYear);
-                        key.TryGetValue("startMonth", out int startMonth);
-                        key.TryGetValue("startDay", out int startDay);
-                        key.TryGetValue("locationId", out string locationId);
-                        key.TryGetValue("locality", out string locality);
+                        key.TryGetValue("startYear", out var startYearField);
+                        startYearField.TryGetLong(out var startYear);
+                        key.TryGetValue("startMonth", out var startMonthField);
+                        startMonthField.TryGetLong(out var startMonth);
+                        key.TryGetValue("startDay", out var startDayField);
+                        startDayField.TryGetLong(out var startDay);
+                        key.TryGetValue("locationId", out var locationIdField);
+                        locationIdField.TryGetString(out var locationId);
+                        key.TryGetValue("locality", out var localityField);
+                        localityField.TryGetString(out var locality);
                         var itemKey = $"{startYear}-{startMonth}-{startDay}";
 
                         if (result.TryGetValue(itemKey, out var item))
@@ -739,21 +760,20 @@ namespace SOS.Observations.Api.Repositories
             var searchResponse = await Client.SearchAsync<Observation>(s => s
                 .Index(protectedIndex ? ProtectedIndexName : PublicIndexName)
                 .Aggregations(a => a
-                    .Terms("uniqueOccurrenceIdCount", t => t
-                        .Field(f => f.Occurrence.OccurrenceId)
-                        .MinimumDocumentCount(2)
-                        .Size(1)
+                    .Add("uniqueOccurrenceIdCount", a => a
+                        .Terms(t => t
+                            .Field(f => f.Occurrence.OccurrenceId)
+                            .MinDocCount(2)
+                            .Size(1)
+                        )
                     )
                 )
-                .Size(0)
-                .Source(s => s.ExcludeAll())
-                .TrackTotalHits(false)
+                .AddDefaultAggrigationSettings()
             );
-
             searchResponse.ThrowIfInvalid();
 
             return searchResponse.Aggregations
-                .Terms("uniqueOccurrenceIdCount")
+                .GetStringTerms("uniqueOccurrenceIdCount")
                 .Buckets.Count > 0;
         }
 
@@ -769,19 +789,17 @@ namespace SOS.Observations.Api.Repositories
             filter.ExtendedAuthorization.UserId = 0;
             filter.ExtendedAuthorization.ProtectionFilter = ProtectionFilter.Sensitive;
 
-            var (query, excludeQuery) = GetCoreQueries(filter, true);
-            query.AddSignalSearchCriteria(extendedAuthorizations, onlyAboveMyClearance);
-
-            var searchResponse = await Client.CountAsync<dynamic>(s => s
-                .Index(ProtectedIndexName)
+            var (queries, excludeQueries) = GetCoreQueries(filter, true);
+            queries.AddSignalSearchCriteria<dynamic>(extendedAuthorizations, onlyAboveMyClearance);
+        
+            var searchResponse = await Client.CountAsync<dynamic>(ProtectedIndexName, s => s
                 .Query(q => q
                     .Bool(b => b
-                        .MustNot(excludeQuery)
-                        .Filter(query)
+                        .MustNot(excludeQueries.ToArray())
+                        .Filter(queries.ToArray())
                     )
                 )
             );
-
             searchResponse.ThrowIfInvalid();
 
             return searchResponse.Count > 0;

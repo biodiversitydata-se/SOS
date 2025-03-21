@@ -373,14 +373,14 @@ namespace SOS.Lib.Managers
         /// <returns></returns>
         private async Task AddGeometryAsync(GeographicAreasFilter geographicFilter, AreaType areaType, string featureId, int areaBuffer, bool usePointAccuracy, bool useDisturbanceRadius)
         {
-            var geoShape = await _areaCache.GetGeometryAsync(areaType, featureId);
+            var geometry = await _areaCache.GetGeometryAsync(areaType, featureId);
 
-            if (geoShape != null)
+            if (geometry != null)
             {
                 // If area buffer is set. Extend area with buffer in order to hit outside original area
                 if (areaBuffer != 0)
                 {
-                    geoShape = geoShape.ToGeometry().Buffer(areaBuffer).ToGeoShape();
+                    geometry = geometry.Buffer(areaBuffer);
                 }
 
                 (geographicFilter.GeometryFilter ??= new GeographicsFilter
@@ -388,7 +388,7 @@ namespace SOS.Lib.Managers
                     MaxDistanceFromPoint = 0,
                     UseDisturbanceRadius = useDisturbanceRadius,
                     UsePointAccuracy = usePointAccuracy
-                }).Geometries.Add(geoShape);
+                }).Geometries.Add(geometry);
             }
         }
 

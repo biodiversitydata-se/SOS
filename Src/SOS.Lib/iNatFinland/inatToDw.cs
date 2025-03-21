@@ -242,7 +242,7 @@ public class inatToDw
         {
             //var privateData = privateObservationData.SelectToken($"$.observations[?(@.id == {inat["id"]})]")?.ToObject<Dictionary<string, object>>();
             var logSuffix = "";
-            bool hasPrivateData = false;
+           // bool hasPrivateData = false;
             //if (privateData != null)
             //{
             //    hasPrivateData = true;

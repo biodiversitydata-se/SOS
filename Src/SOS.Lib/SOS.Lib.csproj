@@ -36,6 +36,7 @@
 		<PackageReference Include="MongoDB.Driver" Version="3.2.1" />
 		<PackageReference Include="NetTopologySuite" Version="2.5.0" />
 		<PackageReference Include="NetTopologySuite.IO.GeoJSON" Version="4.0.0" />
+		<PackageReference Include="NetTopologySuite.IO.GeoJSON4STJ" Version="4.0.0" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 		<PackageReference Include="NReco.Csv" Version="1.0.3" />
 		<PackageReference Include="Polly" Version="8.5.2" />

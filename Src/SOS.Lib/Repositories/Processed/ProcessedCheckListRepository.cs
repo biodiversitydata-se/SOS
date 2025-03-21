@@ -11,7 +11,6 @@ using SOS.Lib.Helpers;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Checklist;
 using SOS.Lib.Models.Processed.Configuration;
-using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Repositories.Processed.Interfaces;
@@ -326,58 +325,7 @@ namespace SOS.Lib.Repositories.Processed
                 )
             );
 
-            return createIndexResponse.Acknowledged && createIndexResponse.IsValid ? true : throw new Exception($"Failed to create checklist index. Error: {createIndexResponse.DebugInformation}");
-        }
-
-
-        /// <summary>
-        /// Write data to elastic search
-        /// </summary>
-        /// <param name="items"></param>
-        /// <returns></returns>
-        private async Task<BulkAllObserver> WriteToElasticAsync(IEnumerable<Checklist> items)
-        {
-            if (!items.Any())
-            {
-                return null;
-            }
-
-            var percentagesUsed = await GetDiskUsageAsync();
-
-            //check
-            
-            var diskUsageDescription = "Current diskusage in cluster:";
-            foreach (var record in percentagesUsed)
-            {
-                var percentageUsed = record.Value;
-                diskUsageDescription += percentageUsed + $"% in node {record.Key}";
-                if (percentageUsed > 90)
-                {
-                    Logger.LogError($"Disk usage too high in cluster ({percentageUsed}%), aborting indexing");
-                    return null;
-                }
-                    
-            }
-            Logger.LogDebug(diskUsageDescription);
-
-            var count = 0;
-            return Client.BulkAll(items, b => b
-                    .Index(IndexName)
-                    // how long to wait between retries
-                    .BackOffTime("30s")
-                    // how many retries are attempted if a failure occurs                        .
-                    .BackOffRetries(2)
-                    // how many concurrent bulk requests to make
-                    .MaxDegreeOfParallelism(Environment.ProcessorCount)
-                    // number of items per bulk request
-                    .Size(WriteBatchSize)
-                    .DroppedDocumentCallback((r, o) =>
-                    {
-                        Logger.LogError($"Check list id: {o?.Id}, Error: {r.Error.Reason}");
-                    })
-                )
-                .Wait(TimeSpan.FromDays(1),
-                    next => { Logger.LogDebug($"Indexing checklists for search:{count += next.Items.Count}"); });
+            return createIndexResponse.Acknowledged && createIndexResponse.IsValidResponse ? true : throw new Exception($"Failed to create checklist index. Error: {createIndexResponse.DebugInformation}");
         }
 
         /// <summary>
@@ -488,15 +436,14 @@ namespace SOS.Lib.Repositories.Processed
         public async Task<int> GetPresentCountAsync(ChecklistSearchFilter filter)
         {
             var query = filter.ToQuery<Checklist>();
-            var foundQuery = new List<Func<QueryDescriptor<Checklist>, QueryContainer>>();
-            foundQuery.TryAddTermsCriteria("taxonIdsFound", filter.Taxa?.Ids);
+            query.Add(q => q
+                .TryAddTermsCriteria("taxonIdsFound", filter.Taxa?.Ids)
+            );
 
-            var countResponse = await Client.CountAsync<Checklist>(s => s
-                .Index(IndexName)
+            var countResponse = await Client.CountAsync<Checklist>(IndexName, s => s
                 .Query(q => q
                     .Bool(b => b
-                        .Filter(query)
-                        .Must(foundQuery)
+                        .Filter(query.ToArray())
                     )
                 )
             );
@@ -513,14 +460,13 @@ namespace SOS.Lib.Repositories.Processed
         public async Task<int> GetAbsentCountAsync(ChecklistSearchFilter filter)
         {
             var query = filter.ToQuery<Checklist>();
-            var nonQuery = new List<Func<QueryDescriptor<Checklist>, QueryContainer>>();
+            var nonQuery = new QueryDescriptor<Checklist>();
             nonQuery.TryAddTermsCriteria("taxonIdsFound", filter.Taxa?.Ids);
 
-            var countResponse = await Client.CountAsync<Checklist>(s => s
-                .Index(IndexName)
+            var countResponse = await Client.CountAsync<Checklist>(IndexName, s => s
                 .Query(q => q
                     .Bool(b => b
-                        .Filter(query)
+                        .Filter(query.ToArray())
                         .MustNot(nonQuery)
                     )
                 )

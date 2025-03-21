@@ -36,7 +36,7 @@ namespace SOS.Lib.Repositories.Resource
             ILogger<AreaRepository> logger) : base(processClient, logger)
         {
             _jsonSerializerOptions = new JsonSerializerOptions();
-            _jsonSerializerOptions.Converters.Add(new GeometryConverter());
+            _jsonSerializerOptions.Converters.Add(new NetTopologySuite.IO.Converters.GeoJsonConverterFactory());
 
             if (Database != null)
             {

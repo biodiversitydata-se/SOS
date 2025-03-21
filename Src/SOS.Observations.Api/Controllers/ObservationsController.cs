@@ -1,14 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Nest;
-using OfficeOpenXml.Export.ToCollection;
-using SOS.Lib.Cache;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Exceptions;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
-using SOS.Lib.JsonConverters;
 using SOS.Lib.Models.Cache;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Enums;
@@ -64,7 +60,6 @@ namespace SOS.Observations.Api.Controllers
             Converters =
             {
                 new JsonStringEnumConverter(),
-                new GeoShapeConverter(),
                 new NetTopologySuite.IO.Converters.GeoJsonConverterFactory()
             }
         };

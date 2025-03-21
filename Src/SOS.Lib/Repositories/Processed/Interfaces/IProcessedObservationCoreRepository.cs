@@ -24,15 +24,6 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// <param name="protectedIndex"></param>
         /// <param name="refreshIndex"></param>
         /// <returns></returns>
-        int AddMany(IEnumerable<Observation> observations, bool protectedIndex, bool refreshIndex = false);
-
-        /// <summary>
-        ///  Add many items
-        /// </summary>
-        /// <param name="observations"></param>
-        /// <param name="protectedIndex"></param>
-        /// <param name="refreshIndex"></param>
-        /// <returns></returns>
         Task<int> AddManyAsync(IEnumerable<Observation> observations, bool protectedIndex, bool refreshIndex = false);
 
         /// <summary>
@@ -100,11 +91,6 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// <returns></returns>
         Task<DataQualityReport> GetDataQualityReportAsync(string organismGroup);
 
-        /// <summary>
-        /// Get current disk usage
-        /// </summary>
-        /// <returns></returns>
-        Task<IDictionary<string, int>> GetDiskUsageAsync();
 
         /// <summary>
         /// Get aggregation in metric tiles 
@@ -123,7 +109,7 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
             MetricCoordinateSys metricCoordinateSys,
             bool skipAuthorizationFilters = false,
             int? maxBuckets = null,
-            ICollection<FieldValue> afterKey = null,
+            IReadOnlyDictionary<string, FieldValue> afterKey = null,
             TimeSpan? timeout = null);
 
         /// <summary>
@@ -170,6 +156,18 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         Task<IEnumerable<Observation>> GetObservationsAsync(IEnumerable<string> occurrenceIds, bool protectedIndex);
 
         /// <summary>
+        /// Get observations by scroll
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="take"></param>
+        /// <param name="scrollId"></param>
+        /// <returns></returns>
+        Task<ScrollResult<dynamic>> GetObservationsByScrollAsync(
+            SearchFilter filter,
+            int take,
+            string scrollId);
+
+        /// <summary>
         /// Get all project id's matching filter
         /// </summary>
         /// <param name="filter"></param>
@@ -181,41 +179,36 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// </summary>
         /// <param name="filter"></param>
         /// <param name="pointInTimeId"></param>
-        /// <param name="searchAfter"></param>
+        /// <param name="afterKey"></param>
         /// <returns></returns>
-        Task<SearchAfterResult<ExtendedMeasurementOrFactRow>> GetMeasurementOrFactsBySearchAfterAsync(
-            SearchFilterBase filter,
-            string pointInTimeId = null,
-            IEnumerable<object> searchAfter = null);
+        Task<SearchAfterResult<ExtendedMeasurementOrFactRow, IReadOnlyCollection<FieldValue>>> GetMeasurementOrFactsBySearchAfterAsync(
+           SearchFilterBase filter,
+           string pointInTimeId = null,
+           IReadOnlyCollection<FieldValue> afterKey = null);
 
         /// <summary>
         /// Get multimedia  by using search after
         /// </summary>
         /// <param name="filter"></param>
         /// <param name="pointInTimeId"></param>
-        /// <param name="searchAfter"></param>
+        /// <param name="afterKey"></param>
         /// <returns></returns>
-        Task<SearchAfterResult<SimpleMultimediaRow>> GetMultimediaBySearchAfterAsync(
+        Task<SearchAfterResult<SimpleMultimediaRow, IReadOnlyCollection<FieldValue>>> GetMultimediaBySearchAfterAsync(
             SearchFilterBase filter,
             string pointInTimeId = null,
-            IEnumerable<object> searchAfter = null);
+            IReadOnlyCollection<FieldValue> afterKey = null);
 
         /// <summary>
         /// Get observations by using search after
         /// </summary>
         /// <param name="filter"></param>
         /// <param name="pointInTimeId"></param>
-        /// <param name="searchAfter"></param>
+        /// <param name="afterKey"></param>
         /// <returns></returns>
-        Task<SearchAfterResult<T>> GetObservationsBySearchAfterAsync<T>(
-            SearchFilter filter,
-            string pointInTimeId = null,
-            IEnumerable<object> searchAfter = null);
-
-        Task<ScrollResult<dynamic>> GetObservationsByScrollAsync(
-            SearchFilter filter,
-            int take,
-            string scrollId);
+        Task<SearchAfterResult<T, IReadOnlyCollection<FieldValue>>> GetObservationsBySearchAfterAsync<T>(
+             SearchFilter filter,
+             string pointInTimeId = null,
+             ICollection<FieldValue> afterKey = null);
 
         /// <summary>
         /// Get provider meta data
@@ -377,6 +370,11 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// <param name="afterKey"></param>
         /// <param name="take"></param>
         /// <returns></returns>
-        Task<SearchAfterResult<dynamic>> AggregateByUserFieldAsync(SearchFilter filter, string aggregationField, bool aggregateOrganismQuantity, int? precisionThreshold, string? afterKey = null, int? take = 10);
+        Task<SearchAfterResult<dynamic, IReadOnlyDictionary<string, FieldValue>>> AggregateByUserFieldAsync(
+            SearchFilter filter, 
+            string aggregationField,
+            bool aggregateOrganismQuantity, 
+            int? precisionThreshold, 
+            IReadOnlyDictionary<string, FieldValue> afterKey = null, int? take = 10);
     }
 }

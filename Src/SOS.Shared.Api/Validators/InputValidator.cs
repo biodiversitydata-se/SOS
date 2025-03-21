@@ -261,7 +261,7 @@ namespace SOS.Shared.Api.Validators
 
         /// <inheritdoc/>
         public Result ValidateGeometries(
-            IEnumerable<Nest.IGeoShape> geometries)
+            IEnumerable<Geometry> geometries)
         {
             if (!geometries?.Any() ?? true)
             {
@@ -272,9 +272,7 @@ namespace SOS.Shared.Api.Validators
             {
                 foreach (var geoemtry in geometries)
                 {
-                    var geom = geoemtry.ToGeometry();
-
-                    if (!geom.IsValid)
+                    if (!geoemtry.IsValid)
                     {
                         throw new Exception("Invalid geometry");
                     }

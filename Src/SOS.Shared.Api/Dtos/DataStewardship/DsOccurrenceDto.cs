@@ -1,4 +1,4 @@
-﻿using Nest;
+﻿using NetTopologySuite.Geometries;
 using SOS.Shared.Api.Dtos.DataStewardship.Enums;
 using Swashbuckle.AspNetCore.Annotations;
 using System.ComponentModel.DataAnnotations;
@@ -44,7 +44,7 @@ namespace SOS.Shared.Api.Dtos.DataStewardship
         /// <summary>
         /// The specific place where an organism was located when it was observed.
         /// </summary>
-        public IGeoShape ObservationPoint { get; set; }
+        public Point ObservationPoint { get; set; }
 
         /// <summary>
         /// Taxonomic information about the observation. States which species (or subspecies, species aggregation, genus, family etc) was observed and identified.

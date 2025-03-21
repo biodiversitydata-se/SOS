@@ -22,7 +22,6 @@ public class DataStewardshipManager : IDataStewardshipManager
         Converters =
         {
             new JsonStringEnumConverter(),
-            new GeoShapeConverter(),
             new NetTopologySuite.IO.Converters.GeoJsonConverterFactory()
         }
     };

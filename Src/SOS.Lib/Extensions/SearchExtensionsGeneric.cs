@@ -166,18 +166,19 @@ namespace SOS.Lib.Extensions
         /// </summary>
         /// <typeparam name="TQueryDescriptor"></typeparam>
         /// <param name="query"></param>
-        /// <param name="filter"></param>
         /// <param name="eventField"></param>
-        public static void TryAddEventDateCritera<TQueryDescriptor>(
-           this QueryDescriptor<TQueryDescriptor> query, DateFilter filter, string eventField) where TQueryDescriptor : class
+        /// <param name="filter"></param>
+        /// <returns></returns>
+        public static QueryDescriptor<TQueryDescriptor> TryAddEventDateCritera<TQueryDescriptor>(
+           this QueryDescriptor<TQueryDescriptor> query, string eventField, DateFilter filter) where TQueryDescriptor : class
         {
-            if (filter == null)
+            if (filter != null)
             {
-                return;
+                query.TryAddDateRangeFilters(filter, $"{eventField}.startDate", $"{eventField}.endDate");
+                query.TryAddTimeRangeFilters(filter, $"{eventField}.startDate");
+                
             }
-
-            query.TryAddDateRangeFilters(filter, $"{eventField}.startDate", $"{eventField}.endDate");
-            query.TryAddTimeRangeFilters(filter, $"{eventField}.startDate");
+            return query;
         }
 
  

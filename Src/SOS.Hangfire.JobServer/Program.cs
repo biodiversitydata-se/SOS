@@ -1,5 +1,6 @@
 ﻿using Autofac;
 using Autofac.Extensions.DependencyInjection;
+using Elastic.Clients.Elasticsearch.Cluster;
 using Hangfire;
 using Hangfire.Mongo;
 using Hangfire.Mongo.Migration.Strategies;
@@ -140,7 +141,7 @@ namespace SOS.Hangfire.JobServer
                             .UseSimpleAssemblyNameTypeSerializer()
                             .UseRecommendedSerializerSettings(m =>
                             {
-                                m.Converters.Add(new NewtonsoftGeoShapeConverter());
+                                m.Converters.Add(new NetTopologySuite.IO.Converters.GeometryConverter());
                                 m.Converters.Add(new StringEnumConverter());
                             })
                             .UseMongoStorage(new MongoClient(_hangfireDbConfiguration.GetMongoDbSettings()),

@@ -60,6 +60,18 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         Task EnableIndexingAsync();
 
         /// <summary>
+        /// Get free disk space
+        /// </summary>
+        /// <returns></returns>
+        Task<IDictionary<string, int>> GetDiskUsageAsync();
+
+        /// <summary>
+        /// Count documents in index
+        /// </summary>
+        /// <returns></returns>
+        Task<long> IndexCountAsync();
+
+        /// <summary>
         ///     Get 0 or 1 depending of witch instance to update
         /// </summary>
         byte InActiveInstance { get; }

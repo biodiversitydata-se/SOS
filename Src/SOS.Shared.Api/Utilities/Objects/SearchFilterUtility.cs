@@ -25,13 +25,13 @@ namespace SOS.Shared.Api.Utilities.Objects
             bool autoAdjustBoundingBox = true)
         {            
             Envelope swedenBoundingBox = _swedenExtentBoundingBox;
-            var userBoundingBox = new Envelope(new[]
-            {
-                new Coordinate(filter?.BoundingBox?.TopLeft?.Longitude ?? 0, filter?.BoundingBox?.TopLeft?.Latitude ?? 90),
-                new Coordinate(filter?.BoundingBox?.BottomRight?.Longitude ?? 90, filter?.BoundingBox?.TopLeft?.Latitude ?? 90),
-                new Coordinate(filter?.BoundingBox?.BottomRight?.Longitude ?? 90, filter?.BoundingBox?.BottomRight?.Latitude ?? 0),
-                new Coordinate(filter?.BoundingBox?.TopLeft?.Longitude ?? 0, filter?.BoundingBox?.BottomRight?.Latitude ?? 0),
-            });
+            var userBoundingBox = new Envelope([
+                    new Coordinate(filter?.BoundingBox?.TopLeft?.Longitude ?? 0, filter?.BoundingBox?.TopLeft?.Latitude ?? 90),
+                    new Coordinate(filter?.BoundingBox?.BottomRight?.Longitude ?? 90, filter?.BoundingBox?.TopLeft?.Latitude ?? 90),
+                    new Coordinate(filter?.BoundingBox?.BottomRight?.Longitude ?? 90, filter?.BoundingBox?.BottomRight?.Latitude ?? 0),
+                    new Coordinate(filter?.BoundingBox?.TopLeft?.Longitude ?? 0, filter?.BoundingBox?.BottomRight?.Latitude ?? 0)
+                ]
+            );
             var boundingBox = swedenBoundingBox.Intersection(userBoundingBox);
 
             if (autoAdjustBoundingBox)
@@ -42,7 +42,7 @@ namespace SOS.Shared.Api.Utilities.Objects
                 if (filter?.Areas?.Any() ?? false)
                 {
                     var areas = await _areaCache.GetAreasAsync(filter.Areas.Select(a => ((AreaType)a.AreaType, a.FeatureId)));
-                    var areaGeometries = areas?.Select(a => a.BoundingBox.GetPolygon().ToGeoShape());
+                    var areaGeometries = areas?.Select(a => a.BoundingBox.GetPolygon());
 
                     var areaPolygons = areas?.Select(a => a.BoundingBox.GetPolygon());
 
@@ -55,9 +55,8 @@ namespace SOS.Shared.Api.Utilities.Objects
                 // If geometries passed, adjust bounding box to them
                 if (filter?.Geometries?.Any() ?? false)
                 {
-                    foreach (var geoShape in filter.Geometries)
+                    foreach (var geometry in filter.Geometries)
                     {
-                        var geometry = geoShape.ToGeometry();
                         geometryUnion = geometryUnion == null ? geometry : geometryUnion.Union(geometry);
                     }
                 }
@@ -89,7 +88,7 @@ namespace SOS.Shared.Api.Utilities.Objects
         private async Task Initialize()
         {
             // Get geometry of sweden economic zone
-            var swedenGeometry = (await _areaCache.GetGeometryAsync(AreaType.EconomicZoneOfSweden, "1")).ToGeometry();
+            var swedenGeometry = (await _areaCache.GetGeometryAsync(AreaType.EconomicZoneOfSweden, "1"));
             if (_areaConfiguration.SwedenExtentBufferKm.GetValueOrDefault(0) > 0)
             {
                 var sweref99TmGeom = swedenGeometry.Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM, false);

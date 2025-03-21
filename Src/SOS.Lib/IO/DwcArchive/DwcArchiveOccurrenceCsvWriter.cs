@@ -309,7 +309,7 @@ namespace SOS.Lib.IO.DwcArchive
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
                     // Start fetching next batch of observations.
-                    var searchResultTask = processedObservationRepository.GetObservationsBySearchAfterAsync<Observation>(filter, searchResult.PointInTimeId, searchResult.SearchAfter);
+                    var searchResultTask = processedObservationRepository.GetObservationsBySearchAfterAsync<Observation>(filter, searchResult.PointInTimeId, searchResult.SearchAfter == null ? null : [searchResult.SearchAfter.ToFieldValue()]);
 
                     elasticRetrievalStopwatch.Start();
                     var processedObservations = searchResult.Records.ToArray();

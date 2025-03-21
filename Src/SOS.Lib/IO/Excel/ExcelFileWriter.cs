@@ -1,4 +1,5 @@
-﻿using Hangfire;
+﻿using Elastic.Clients.Elasticsearch;
+using Hangfire;
 using Microsoft.Extensions.Logging;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
@@ -265,7 +266,7 @@ namespace SOS.Lib.IO.Excel
                     :
                     ObservationPropertyFieldDescriptionHelper.GetExportFieldsFromOutputFields(filter.Output?.Fields);
                 Models.Search.Result.PagedResult<dynamic> fastSearchResult = null;
-                Models.Search.Result.SearchAfterResult<Observation> searchResult = null;
+                Models.Search.Result.SearchAfterResult<Observation, IReadOnlyCollection<FieldValue>> searchResult = null;
                 if (useFastSearch)
                 {
                     fastSearchResult = await _processedObservationRepository.GetChunkAsync(filter, 0, 10000);
@@ -360,7 +361,7 @@ namespace SOS.Lib.IO.Excel
                     nrObservations += processedObservations.Length;
                     processedObservations = null;
                     if (useFastSearch) break;
-                    searchResult = await _processedObservationRepository.GetObservationsBySearchAfterAsync<Observation>(filter, searchResult.PointInTimeId, searchResult.SearchAfter);
+                    searchResult = await _processedObservationRepository.GetObservationsBySearchAfterAsync<Observation>(filter, searchResult.PointInTimeId, searchResult.SearchAfter == null ? null : [searchResult.SearchAfter.ToFieldValue()]);
                 }
 
                 fastSearchResult = null;

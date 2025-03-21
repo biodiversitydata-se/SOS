@@ -1,9 +1,10 @@
-﻿using Elasticsearch.Net;
-using SOS.Lib.Database.Interfaces;
+﻿using SOS.Lib.Database.Interfaces;
 using MongoDB.Driver;
 using SOS.Lib.Database;
 using Testcontainers.MongoDb;
 using Testcontainers.Elasticsearch;
+using Elastic.Clients.Elasticsearch;
+using MongoDB.Driver.Core.Configuration;
 
 namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup
 {
@@ -24,7 +25,7 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup
         public class TestSubstituteModels
         {
             public IProcessClient? ProcessClient { get; set; } = null;
-            public IElasticClient? ElasticClient { get; set; }
+            public ElasticsearchClient? ElasticClient { get; set; }
         }
 
         public TestContainersFixture()
@@ -70,22 +71,23 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup
             return serviceCollection;
         }
 
-        private async Task<ElasticClient> InitializeElasticsearchAsync()
+        private async Task<ElasticsearchClient> InitializeElasticsearchAsync()
         {
             if (UseKibanaDebug)
             {
                 return await InitializeElasticsearchWithKibanaAsync();
             }
             await ElasticsearchContainer.StartAsync().ConfigureAwait(false);
-            var elasticClient = new ElasticClient(new ConnectionSettings(new Uri(ElasticsearchContainer.GetConnectionString()))
-                .ServerCertificateValidationCallback(CertificateValidations.AllowAll)
-                .EnableApiVersioningHeader()
-          //      .BasicAuthentication(ELASTIC_USERNAME, ELASTIC_PASSWORD)
-            .EnableDebugMode());
+            var elasticClient = new ElasticsearchClient(new ElasticsearchClientSettings(new Uri(ElasticsearchContainer.GetConnectionString()))
+                .ServerCertificateValidationCallback((sender, certificate, chain, sslPolicyErrors) => true)
+                //.EnableApiVersioningHeader()
+                .EnableDebugMode()
+            );
+            
             return elasticClient;
         }
 
-        private async Task<ElasticClient> InitializeElasticsearchWithKibanaAsync()
+        private async Task<ElasticsearchClient> InitializeElasticsearchWithKibanaAsync()
         {
             var network = new NetworkBuilder()
                 .WithName(Guid.NewGuid().ToString("D"))
@@ -113,10 +115,11 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup
             await kibanaContainer.StartAsync().ConfigureAwait(false);
 
             var elasticUri = new UriBuilder(Uri.UriSchemeHttp, ElasticsearchContainer.Hostname, ElasticsearchContainer.GetMappedPublicPort(9200)).ToString();
-            var elasticClient = new ElasticClient(new ConnectionSettings(new Uri(elasticUri))
-                .ServerCertificateValidationCallback(CertificateValidations.AllowAll)
-                .EnableApiVersioningHeader()
-            .EnableDebugMode());
+            var elasticClient = new ElasticsearchClient(new ElasticsearchClientSettings(new Uri(ElasticsearchContainer.GetConnectionString()))
+                .ServerCertificateValidationCallback((sender, certificate, chain, sslPolicyErrors) => true)
+                //.EnableApiVersioningHeader()
+                .EnableDebugMode()
+            );
             return elasticClient;
         }
 

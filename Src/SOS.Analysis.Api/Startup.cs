@@ -44,7 +44,6 @@ using SOS.Shared.Api.Validators;
 using System.Reflection;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Logging.Abstractions;
-using Nest;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Processed;
 using Hangfire;
@@ -59,6 +58,7 @@ using SOS.Lib.Helpers;
 using System.Collections.Concurrent;
 using Serilog;
 using Microsoft.IdentityModel.JsonWebTokens;
+using Elastic.Clients.Elasticsearch.Cluster;
 
 namespace SOS.Analysis.Api
 {
@@ -181,7 +181,6 @@ namespace SOS.Analysis.Api
             services.AddControllers()
                 .AddJsonOptions(options =>
                 {
-                    options.JsonSerializerOptions.Converters.Add(new GeoShapeConverter());
                     options.JsonSerializerOptions.Converters.Add(new NetTopologySuite.IO.Converters.GeoJsonConverterFactory());
                     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 });
@@ -439,7 +438,7 @@ namespace SOS.Analysis.Api
                         .UseSimpleAssemblyNameTypeSerializer()
                         .UseRecommendedSerializerSettings(m =>
                         {
-                            m.Converters.Add(new NewtonsoftGeoShapeConverter());
+                            m.Converters.Add(new NetTopologySuite.IO.Converters.GeometryConverter());
                             m.Converters.Add(new StringEnumConverter());
                         })
                         .UseMongoStorage(new MongoClient(mongoConfiguration.GetMongoDbSettings()),

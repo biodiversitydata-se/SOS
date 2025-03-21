@@ -1,7 +1,6 @@
 ﻿using AgileObjects.AgileMapper.Extensions;
 using Hangfire;
 using Microsoft.Extensions.Logging;
-using Nest;
 using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
 using NReco.Csv;
@@ -31,6 +30,8 @@ using System.Diagnostics;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
 using SOS.Lib.Models.Search.Result;
+using Elastic.Clients.Elasticsearch;
+using System.Collections.ObjectModel;
 
 namespace SOS.Lib.Managers
 {
@@ -139,7 +140,7 @@ namespace SOS.Lib.Managers
         }
 
         /// <inheritdoc/>
-        public async Task<PagedAggregationResult<UserAggregationResponse>?> AggregateByUserFieldAsync(
+        public async Task<PagedAggregationResult<UserAggregationResponse>> AggregateByUserFieldAsync(
             int? roleId,
             string authorizationApplicationIdentifier,
             SearchFilter filter,            
@@ -150,7 +151,11 @@ namespace SOS.Lib.Managers
             int? take)
         {
             await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
-            var result = await _processedObservationRepository.AggregateByUserFieldAsync(filter, aggregationField, aggregateOrganismQuantity, precisionThreshold, afterKey, take);
+            var result = await _processedObservationRepository.AggregateByUserFieldAsync(filter, aggregationField, aggregateOrganismQuantity, precisionThreshold, 
+                new ReadOnlyDictionary<string, FieldValue>(new Dictionary<string, FieldValue>
+                {
+                    { aggregationField, afterKey.ToFieldValue() }
+                }), take);
 
             return new PagedAggregationResult<UserAggregationResponse>
             {
@@ -204,7 +209,7 @@ namespace SOS.Lib.Managers
             {
                 foreach (var record in result.Records)
                 {
-                    var area = (IGeoShape)await _areaCache.GetGeometryAsync(atlasSize switch { AtlasAreaSize.Km5x5 => AreaType.Atlas5x5, _ => AreaType.Atlas10x10 }, record.AggregationField);
+                    var area = await _areaCache.GetGeometryAsync(atlasSize switch { AtlasAreaSize.Km5x5 => AreaType.Atlas5x5, _ => AreaType.Atlas10x10 }, record.AggregationField);
                     futureCollection.Add(
                         area.ToFeature(new Dictionary<string, object> {
                             { "observationCount", (int)record.DocCount },
@@ -214,7 +219,7 @@ namespace SOS.Lib.Managers
                     );
                 }
 
-                result = await _processedObservationRepository.AggregateByUserFieldAsync(filter, aggregationField, aggregateOrganismQuantity, precisionThreshold: 40000, afterKey: (string)result.SearchAfter?.FirstOrDefault()!, take: 10000);
+                result = await _processedObservationRepository.AggregateByUserFieldAsync(filter, aggregationField, aggregateOrganismQuantity, precisionThreshold: 40000, afterKey: result.SearchAfter, take: 10000);
             }
 
             return futureCollection;
@@ -293,8 +298,7 @@ namespace SOS.Lib.Managers
                             }
                         }
                     }
-
-
+                    
                     if (eooGeometry == null)
                     {
                         return null!;

@@ -1,12 +1,14 @@
-﻿namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup;
+﻿using Elastic.Clients.Elasticsearch;
+
+namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup;
 
 public class ElasticClientTestManager : IElasticClientManager
 {
-    private IElasticClient[] _clients;
-    public ElasticClientTestManager(IElasticClient elasticClient)
+    private ElasticsearchClient[] _clients;
+    public ElasticClientTestManager(ElasticsearchClient elasticClient)
     {
-        _clients = new IElasticClient[] { elasticClient };
+        _clients = new ElasticsearchClient[] { elasticClient };
     }
 
-    public IElasticClient[] Clients => _clients;
+    public ElasticsearchClient[] Clients => _clients;
 }

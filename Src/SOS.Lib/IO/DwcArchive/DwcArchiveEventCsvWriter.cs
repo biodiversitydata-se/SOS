@@ -62,7 +62,7 @@ namespace SOS.Lib.IO.DwcArchive
                 while (searchResult?.Records?.Any() ?? false)
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
-                    var searchResultTask = processedObservationRepository.GetObservationsBySearchAfterAsync<Observation>(filter, searchResult.PointInTimeId, searchResult.SearchAfter);
+                    var searchResultTask = processedObservationRepository.GetObservationsBySearchAfterAsync<Observation>(filter, searchResult.PointInTimeId, searchResult.SearchAfter == null ? null : [searchResult.SearchAfter.ToFieldValue()]);
 
                     // Fetch observations from ElasticSearch.
                     elasticRetrievalStopwatch.Start();

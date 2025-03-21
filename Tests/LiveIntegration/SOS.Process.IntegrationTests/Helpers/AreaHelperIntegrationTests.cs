@@ -30,8 +30,8 @@ namespace SOS.Process.LiveIntegrationTests.Helpers
             {
                 Location = new Location(LocationType.Point)
                 {
-                    DecimalLatitude = Coordinates.BorgholmMunicipality.Latitude,
-                    DecimalLongitude = Coordinates.BorgholmMunicipality.Longitude
+                    DecimalLatitude = TestCoordinates.BorgholmMunicipality.Latitude,
+                    DecimalLongitude = TestCoordinates.BorgholmMunicipality.Longitude
                 }
             };
             observations.Add(observation);
@@ -60,8 +60,8 @@ namespace SOS.Process.LiveIntegrationTests.Helpers
             {
                 Location = new Location(LocationType.Point)
                 {
-                    DecimalLatitude = Coordinates.KalmarMunicipality.Latitude,
-                    DecimalLongitude = Coordinates.KalmarMunicipality.Longitude
+                    DecimalLatitude = TestCoordinates.KalmarMunicipality.Latitude,
+                    DecimalLongitude = TestCoordinates.KalmarMunicipality.Longitude
                 }
             };
             observations.Add(observation);
@@ -90,8 +90,8 @@ namespace SOS.Process.LiveIntegrationTests.Helpers
             {
                 Location = new Location(LocationType.Point)
                 {
-                    DecimalLatitude = Coordinates.KirunaMunicipality.Latitude,
-                    DecimalLongitude = Coordinates.KirunaMunicipality.Longitude
+                    DecimalLatitude = TestCoordinates.KirunaMunicipality.Latitude,
+                    DecimalLongitude = TestCoordinates.KirunaMunicipality.Longitude
                 }
             };
 

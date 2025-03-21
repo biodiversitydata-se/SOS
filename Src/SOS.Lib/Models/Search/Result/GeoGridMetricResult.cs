@@ -1,4 +1,4 @@
-﻿using Nest;
+﻿using Elastic.Clients.Elasticsearch;
 using SOS.Lib.Models.Gis;
 using System.Collections.Generic;
 
@@ -12,7 +12,7 @@ namespace SOS.Lib.Models.Search.Result
         /// <summary>
         /// Key used to get next page when many buckets are returned
         /// </summary>
-        public CompositeKey AfterKey { get; set; }
+        public IReadOnlyDictionary<string, FieldValue> AfterKey { get; set; }
 
         /// <summary>
         /// Input bounding box

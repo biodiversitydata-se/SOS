@@ -35,15 +35,16 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Data
         {
             var filter = new GeometryFilter
             {
-                GeographicArea = new PolygonGeoShape(new List<List<GeoCoordinate>> { new List<GeoCoordinate>
-                        {
-                            new GeoCoordinate(minLat, maxLon),
-                            new GeoCoordinate(maxLat, maxLon),
-                            new GeoCoordinate(maxLat, minLon),
-                            new GeoCoordinate(minLat, minLon),
-                            new GeoCoordinate(minLat, maxLon)
-                        }
-                    })
+
+                GeographicArea = new Polygon(
+                    new LinearRing([
+                        new Coordinate(maxLon, minLat),
+                        new Coordinate(maxLon, maxLat),
+                        new Coordinate(minLon, maxLat),
+                        new Coordinate(minLon, minLat),
+                        new Coordinate(maxLon, minLat)
+                    ])
+                )
             };
 
             return filter;
@@ -53,7 +54,7 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Data
         {
             var filter = new GeometryFilter 
             {
-                GeographicArea = new PointGeoShape(new GeoCoordinate(lat, lon)),
+                GeographicArea = new Point(lon, lat),
                 MaxDistanceFromGeometries = distance
             };
 

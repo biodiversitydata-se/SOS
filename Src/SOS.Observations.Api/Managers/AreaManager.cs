@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using Nest;
 using NetTopologySuite.Features;
 using NetTopologySuite.IO;
 using SOS.Lib.Cache.Interfaces;
@@ -23,6 +22,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using ArgumentException = System.ArgumentException;
+using NetTopologySuite.Geometries;
 
 namespace SOS.Observations.Api.Managers
 {
@@ -110,7 +110,7 @@ namespace SOS.Observations.Api.Managers
                 }
 
                 var geometry = await _areaCache.GetGeometryAsync(area.AreaType, area.FeatureId);
-
+                
                 var attributesTable = new AttributesTable
                 {
                     { "AreaType", area.AreaType.ToString() },
@@ -118,7 +118,8 @@ namespace SOS.Observations.Api.Managers
                     { "Name", area.Name },
                     { "BoundingBox", area.BoundingBox }
                 };
-                var areaString = GeoJsonHelper.GetFeatureAsGeoJsonString(geometry, attributesTable);
+                
+                var areaString = geometry.ToFeature(attributesTable).ToGeoJsonString();
                 return CreateZipFile($"area{area.Id}.geojson", Encoding.UTF8.GetBytes(areaString));
             }
             catch (Exception e)
@@ -138,7 +139,7 @@ namespace SOS.Observations.Api.Managers
                 }
 
                 var geometry = await _areaCache.GetGeometryAsync(area.AreaType, area.FeatureId);
-                var geom = geometry.ToGeometry();
+                var geom = geometry;
                 var areaString = _wktWriter.Write(geom);
                 return CreateZipFile($"area{area.Id}.wkt", Encoding.UTF8.GetBytes(areaString));
             }
@@ -247,13 +248,13 @@ namespace SOS.Observations.Api.Managers
         }
 
         /// <inheritdoc />
-        public async Task<IGeoShape> GetGeometryAsync(AreaType areaType, string featureId)
+        public async Task<Geometry> GetGeometryAsync(AreaType areaType, string featureId)
         {
             return await _areaCache.GetGeometryAsync(areaType, featureId);
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<IGeoShape>> GetGeometriesAsync(IEnumerable<(AreaType areaType, string featureId)> areaKeys)
+        public async Task<IEnumerable<Geometry>> GetGeometriesAsync(IEnumerable<(AreaType areaType, string featureId)> areaKeys)
         {
             return await _areaCache.GetGeometriesAsync(areaKeys);
         }

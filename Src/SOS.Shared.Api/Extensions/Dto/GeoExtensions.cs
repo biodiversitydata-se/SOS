@@ -3,22 +3,9 @@ using NetTopologySuite.Geometries;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
-using SOS.Lib.Models;
-using SOS.Lib.Models.Export;
 using SOS.Lib.Models.Gis;
-using SOS.Lib.Models.Processed.Observation;
-using SOS.Lib.Models.Search.Filters;
-using SOS.Lib.Models.Search.Result;
-using SOS.Lib.Models.Shared;
-using SOS.Lib.Models.UserService;
 using SOS.Shared.Api.Dtos;
-using SOS.Shared.Api.Dtos.Enum;
-using SOS.Shared.Api.Dtos.Export;
 using SOS.Shared.Api.Dtos.Filter;
-using SOS.Shared.Api.Dtos.Location;
-using SOS.Shared.Api.Dtos.Observation;
-using SOS.Shared.Api.Dtos.Vocabulary;
-using Location = SOS.Lib.Models.Processed.Observation.Location;
 
 namespace SOS.Shared.Api.Extensions.Dto
 {

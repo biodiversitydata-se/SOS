@@ -1,4 +1,5 @@
-﻿using Hangfire;
+﻿using Elastic.Clients.Elasticsearch;
+using Hangfire;
 using Microsoft.Extensions.Logging;
 using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
@@ -379,7 +380,7 @@ namespace SOS.Lib.IO.GeoJson
             jsonWriter.WriteStartArray();
 
             PagedResult<dynamic> fastSearchResult = null;
-            SearchAfterResult<dynamic> searchResult = null;
+            SearchAfterResult<dynamic, IReadOnlyCollection<FieldValue>> searchResult = null;
             if (useFastSearch)
             {
                 fastSearchResult = await _processedObservationRepository.GetChunkAsync(filter, 0, 10000);
@@ -443,7 +444,7 @@ namespace SOS.Lib.IO.GeoJson
                 if (useFastSearch) break;
 
                 // Get next batch of observations.        
-                searchResult = await _processedObservationRepository.GetObservationsBySearchAfterAsync<dynamic>(filter, searchResult.PointInTimeId, searchResult.SearchAfter);           
+                searchResult = await _processedObservationRepository.GetObservationsBySearchAfterAsync<dynamic>(filter, searchResult.PointInTimeId, searchResult.SearchAfter == null ? null : [searchResult.SearchAfter.ToFieldValue()]);           
             }
 
             searchResult = null;

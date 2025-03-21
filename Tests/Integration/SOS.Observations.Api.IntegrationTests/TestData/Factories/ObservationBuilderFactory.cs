@@ -1,6 +1,6 @@
-﻿using FizzWare.NBuilder;
+﻿using Elastic.Clients.Elasticsearch;
+using FizzWare.NBuilder;
 using FizzWare.NBuilder.Implementation;
-using Nest;
 using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Observations.Api.IntegrationTests.Helpers;
@@ -105,8 +105,8 @@ internal static class ObservationsBuilderFactory
         {
             obs.Location.DecimalLatitude = latitude;
             obs.Location.DecimalLongitude = longitude;
-            obs.Location.PointLocation = new GeoLocation(latitude, longitude);
-            obs.Location.Point = new PointGeoShape(new GeoCoordinate(latitude, longitude));
+            obs.Location.PointLocation = GeoLocation.Coordinates([longitude, latitude]);
+            obs.Location.Point = new NetTopologySuite.Geometries.Point(longitude, latitude);
         });
 
         return operable;

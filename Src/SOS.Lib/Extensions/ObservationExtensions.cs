@@ -14,7 +14,6 @@ namespace SOS.Lib.Extensions
             PropertyNameCaseInsensitive = true,
             Converters =
             {
-                new GeoShapeConverter(),
                 new NetTopologySuite.IO.Converters.GeoJsonConverterFactory(),
                 new JsonStringEnumConverter()
             }

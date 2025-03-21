@@ -2,7 +2,6 @@
 using Elastic.Clients.Elasticsearch.QueryDsl;
 using NetTopologySuite.Geometries;
 using SOS.Lib.Extensions;
-using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Search.Filters;
 using System;
 using System.Collections.Generic;
@@ -15,7 +14,6 @@ namespace SOS.Lib
     /// </summary>
     public static class SearchExtensionsChecklist
     {
-
         /// <summary>
         /// Add geometry filter to query
         /// </summary>
@@ -134,7 +132,7 @@ namespace SOS.Lib
 
 
         /// <summary>
-        ///     Create search filter
+        /// Create search filter
         /// </summary>
         /// <param name="filter"></param>
         /// <returns></returns>
@@ -153,12 +151,11 @@ namespace SOS.Lib
                 .TryAddScript((filter.Date?.MinEffortTime ?? TimeSpan.Zero) > TimeSpan.Zero ? $"return doc['event.endDate'].value.getMillis() - doc['event.startDate'].value.getMillis() >= {filter.Date.MinEffortTime.TotalMilliseconds}L;" : null)
                 .TryAddTermsCriteria("taxonIds", filter.Taxa?.Ids)
                 .TryAddTermsCriteria("projects.id", filter.ProjectIds)
+                .TryAddEventDateCritera("event", filter.Date)
             );
 
             query.TryAddGeographicFilter(filter.Location?.AreaGeographic);
             query.TryAddGeometryFilters(filter.Location?.Geometries);
-    
-            query.TryAddEventDateCritera(filter.Date, "event").;
 
             return query;
         }

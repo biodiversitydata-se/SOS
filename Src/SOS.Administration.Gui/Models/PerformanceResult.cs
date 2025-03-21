@@ -1,9 +1,5 @@
-﻿using Nest;
-using System;
-
-namespace SOS.Administration.Gui.Models
+﻿namespace SOS.Administration.Gui.Models
 {
-    [ElasticsearchType(IdProperty = nameof(Id))]
     public class PerformanceResult
     {
         public int? Id { get; set; }

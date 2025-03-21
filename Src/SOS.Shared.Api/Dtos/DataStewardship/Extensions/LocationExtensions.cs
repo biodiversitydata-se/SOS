@@ -1,4 +1,5 @@
 ﻿using SOS.Lib.Enums;
+using SOS.Lib.Extensions;
 using SOS.Shared.Api.Dtos.DataStewardship.Enums;
 
 namespace SOS.Shared.Api.Dtos.DataStewardship.Extensions
@@ -22,7 +23,7 @@ namespace SOS.Shared.Api.Dtos.DataStewardship.Extensions
                 LocationID = location?.LocationId,
                 LocationRemarks = location.LocationRemarks,
                 //LocationType = // ? todo - add location type to models.
-                Emplacement = location?.Point.ConvertCoordinateSystem(responseCoordinateSystem)
+                Emplacement = location?.Point.Transform(CoordinateSys.WGS84, responseCoordinateSystem)
             };
         }
     }

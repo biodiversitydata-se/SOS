@@ -1,7 +1,7 @@
-﻿using Microsoft.ApplicationInsights.Extensibility;
+﻿using Elastic.Clients.Elasticsearch.Cluster;
+using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging.Abstractions;
-using Nest;
 using Serilog;
 using SOS.ElasticSearch.Proxy.ApplicationInsights;
 using SOS.ElasticSearch.Proxy.Middleware;

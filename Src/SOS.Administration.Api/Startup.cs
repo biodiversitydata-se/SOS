@@ -146,7 +146,7 @@ namespace SOS.Administration.Api
                     .UseSimpleAssemblyNameTypeSerializer()
                     .UseRecommendedSerializerSettings(m =>
                     {
-                        m.Converters.Add(new NetTopologySuite.IO.GeoJsonConverter());
+                        m.Converters.Add(new NetTopologySuite.IO.Converters.GeometryConverter());
                         m.Converters.Add(new StringEnumConverter());
                     })
                     .UseMongoStorage(new MongoClient(hangfireDbConfiguration.GetMongoDbSettings()),

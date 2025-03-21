@@ -1,5 +1,8 @@
-﻿using Microsoft.Extensions.Logging;
-using Nest;
+﻿using Elastic.Clients.Elasticsearch;
+using Elastic.Clients.Elasticsearch.Cluster;
+using Elastic.Clients.Elasticsearch.Core.Search;
+using Elastic.Clients.Elasticsearch.QueryDsl;
+using Microsoft.Extensions.Logging;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Enums;
@@ -7,7 +10,6 @@ using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Configuration;
-using SOS.Lib.Models.Processed.DataStewardship.Common;
 using SOS.Lib.Models.Processed.DataStewardship.Dataset;
 using SOS.Lib.Models.Search.Filters;
 //using SOS.Lib.Models.Processed.Observation;
@@ -32,16 +34,17 @@ namespace SOS.Lib.Repositories.Processed
         /// <returns></returns>
         private async Task<bool> AddCollectionAsync()
         {
-            var createIndexResponse = await Client.Indices.CreateAsync(IndexName, s => s
-                .Settings(s => s
-                    .NumberOfShards(NumberOfShards)
-                    .NumberOfReplicas(NumberOfReplicas)
-                    .Setting("max_terms_count", 110000)
-                    .Setting(UpdatableIndexSettings.MaxResultWindow, 100000)
-                )
-                .Map<Dataset>(m => m
-                    .AutoMap<Dataset>()
-                    .Properties(ps => ps
+            var createIndexResponse = await Client.Indices.CreateAsync<Dataset>(IndexName, s => s
+               .Settings(s => s
+                   .NumberOfShards(NumberOfShards)
+                   .NumberOfReplicas(NumberOfReplicas)
+                   .Settings(s => s
+                       .MaxResultWindow(100000)
+                       .MaxTermsCount(110000)
+                   )
+               )
+               .Mappings(map => map
+                   .Properties(ps => ps
                         .KeywordVal(kwlc => kwlc.Id, IndexSetting.None)
                         .KeywordVal(kwlc => kwlc.Identifier)
                         .KeywordVal(kwlc => kwlc.DataStewardship)
@@ -53,51 +56,42 @@ namespace SOS.Lib.Repositories.Processed
                         .KeywordVal(kwlc => kwlc.Spatial, IndexSetting.None)
                         .KeywordVal(kwlc => kwlc.Language, IndexSetting.None)
                         .KeywordVal(kwlc => kwlc.Metadatalanguage, IndexSetting.None)
-                        .Object<Project>(t => t
-                            .AutoMap()
-                            .Name(nm => nm.Project)
+                        .Object(o => o.Project, p => p
                             .Properties(ps => ps
-                                .KeywordVal(kwlc => kwlc.ProjectId)
-                                .KeywordVal(kwlc => kwlc.ProjectCode)
+                                .KeywordVal(kwlc => kwlc.Project.First().ProjectId)
+                                .KeywordVal(kwlc => kwlc.Project.First().ProjectCode)
+                                .NumberVal(kwlc => kwlc.Project.First().ProjectType, IndexSetting.SearchSortAggregate, NumberType.Byte)
                             )
                         )
-                        .Object<Organisation>(t => t
-                            .AutoMap()
-                            .Name(nm => nm.Assigner)
+                        .Object(o => o.Assigner, p => p
                             .Properties(ps => ps
-                                .KeywordVal(kwlc => kwlc.OrganisationCode, IndexSetting.None)
-                                .KeywordVal(kwlc => kwlc.OrganisationID, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Assigner.OrganisationCode, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Assigner.OrganisationID, IndexSetting.None)
                             )
                         )
-                        .Object<Organisation>(t => t
-                            .AutoMap()
-                            .Name(nm => nm.Creator)
+                        .Object(o => o.Creator, p => p
                             .Properties(ps => ps
-                                .KeywordVal(kwlc => kwlc.OrganisationCode, IndexSetting.None)
-                                .KeywordVal(kwlc => kwlc.OrganisationID, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Creator.First().OrganisationCode, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Creator.First().OrganisationID, IndexSetting.None)
                             )
                         )
-                        .Object<Organisation>(t => t
-                            .AutoMap()
-                            .Name(nm => nm.OwnerinstitutionCode)
+                        .Object(o => o.OwnerinstitutionCode, p => p
                             .Properties(ps => ps
-                                .KeywordVal(kwlc => kwlc.OrganisationCode, IndexSetting.None)
-                                .KeywordVal(kwlc => kwlc.OrganisationID, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.OwnerinstitutionCode.OrganisationCode, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.OwnerinstitutionCode.OrganisationID, IndexSetting.None)
                             )
                         )
-                        .Object<Organisation>(t => t
-                            .AutoMap()
-                            .Name(nm => nm.Publisher)
+                        .Object(o => o.Publisher, p => p
                             .Properties(ps => ps
-                                .KeywordVal(kwlc => kwlc.OrganisationCode, IndexSetting.None)
-                                .KeywordVal(kwlc => kwlc.OrganisationID, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Publisher.OrganisationCode, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Publisher.OrganisationID, IndexSetting.None)
                             )
                         )
                     )
                 )
             );
 
-            return createIndexResponse.Acknowledged && createIndexResponse.IsValid ? true : throw new Exception($"Failed to create Dataset index. Error: {createIndexResponse.DebugInformation}");
+            return createIndexResponse.Acknowledged && createIndexResponse.IsValidResponse ? true : throw new Exception($"Failed to create Dataset index. Error: {createIndexResponse.DebugInformation}");
         }
 
         public async Task<List<Dataset>> GetDatasetsByIds(IEnumerable<string> ids, IEnumerable<string> excludeFields = null, IEnumerable<SortOrderFilter> sortOrders = null)
@@ -106,83 +100,31 @@ namespace SOS.Lib.Repositories.Processed
 
             var sortDescriptor = await Client.GetSortDescriptorAsync<Dataset>(IndexName, sortOrders);
 
-            var sourceFilter = new SourceFilterDescriptor<dynamic>();
-            if (excludeFields != null && excludeFields.Count() > 0)
-            {
-                sourceFilter.Excludes(e => e.Fields(excludeFields.Select(f => new Field(f))));
-            }
-
-            var query = new List<Func<QueryDescriptor<Dataset>, QueryContainer>>();
-            query.TryAddTermsCriteria("identifier", ids);
+            var source = new SourceConfig(new SourceFilter { 
+                Excludes = excludeFields != null && excludeFields.Count() > 0 ? Fields.FromStrings(excludeFields.ToArray()) : null,
+                Includes = new[] { "occurrence.occurrenceId" }.ToFields() 
+            });
+            var queries = new List<Action<QueryDescriptor<Dataset>>>();
+            queries.Add(q => q
+                .TryAddTermsCriteria("identifier", ids)
+            );
+          
             var searchResponse = await Client.SearchAsync<Dataset>(s => s
                 .Index(IndexName)
                 .Query(q => q
                     .Bool(b => b
-                        .Filter(query)
+                        .Filter(queries.ToArray())
                     )
                 )
-                .Source(s => sourceFilter)
+                .Source(source)
                 .Size(ids?.Count() ?? 0)
-                .Sort((sort => sortDescriptor)
-                .TrackTotalHits(false)
+                .Sort(sortDescriptor.ToArray())
+                .TrackTotalHits(new TrackHits(false))
             );
 
-            if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
+            if (!searchResponse.IsValidResponse) throw new InvalidOperationException(searchResponse.DebugInformation);
             var datasets = searchResponse.Documents.ToList();
             return datasets;
-        }
-
-        /// <summary>
-        /// Write data to elastic search
-        /// </summary>
-        /// <param name="items"></param>
-        /// <returns></returns>
-        private BulkAllObserver WriteToElastic(IEnumerable<Dataset> items)
-        {
-            if (!items.Any())
-            {
-                return null;
-            }
-
-            //check
-            var currentAllocation = Client.Cat.Allocation();
-            if (currentAllocation != null && currentAllocation.IsValid)
-            {
-                var diskUsageDescription = "Current diskusage in cluster:";
-                foreach (var record in currentAllocation.Records)
-                {
-                    if (int.TryParse(record.DiskPercent, out int percentageUsed))
-                    {
-                        diskUsageDescription += percentageUsed + "% ";
-                        if (percentageUsed > 90)
-                        {
-                            Logger.LogError($"Disk usage too high in cluster ({percentageUsed}%), aborting indexing");
-                            return null;
-                        }
-                    }
-                }
-
-                Logger.LogDebug(diskUsageDescription);
-            }
-
-            var count = 0;
-            return Client.BulkAll(items, b => b
-                    .Index(IndexName)
-                    // how long to wait between retries
-                    .BackOffTime("30s")
-                    // how many retries are attempted if a failure occurs                        .
-                    .BackOffRetries(2)
-                    // how many concurrent bulk requests to make
-                    .MaxDegreeOfParallelism(Environment.ProcessorCount)
-                    // number of items per bulk request
-                    .Size(WriteBatchSize)
-                    .DroppedDocumentCallback((r, o) =>
-                    {
-                        Logger.LogError($"Dataset identifier: {o?.Identifier}, Error: {r?.Error?.Reason}");
-                    })
-                )
-                .Wait(TimeSpan.FromDays(1),
-                    next => { Logger.LogDebug($"Indexing datasets for search:{count += next.Items.Count}"); });
         }
 
         /// <summary>
@@ -205,41 +147,10 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <inheritdoc />
-        public async Task<int> AddManyAsync(IEnumerable<Dataset> items)
-        {
-            return await Task.Run(() =>
-            {
-                // Save valid processed data
-                Logger.LogDebug($"Start indexing Dataset batch for searching with {items.Count()} items");
-                var indexResult = WriteToElastic(items);
-                Logger.LogDebug("Finished indexing Dataset batch for searching");
-                if (indexResult == null || indexResult.TotalNumberOfFailedBuffers > 0) return 0;
-                return items.Count();
-            });
-        }
-
-        /// <inheritdoc />
         public async Task<bool> ClearCollectionAsync()
         {
             await DeleteCollectionAsync();
             return await AddCollectionAsync();
-        }
-
-        /// <inheritdoc />
-        public async Task<bool> DisableIndexingAsync()
-        {
-            var updateSettingsResponse =
-                await Client.Indices.UpdateSettingsAsync(IndexName,
-                    p => p.IndexSettings(g => g.RefreshInterval(-1)));
-
-            return updateSettingsResponse.Acknowledged && updateSettingsResponse.IsValid;
-        }
-
-        /// <inheritdoc />
-        public async Task EnableIndexingAsync()
-        {
-            await Client.Indices.UpdateSettingsAsync(IndexName,
-                p => p.IndexSettings(g => g.RefreshInterval(new Time(5000))));
         }
 
         /// <inheritdoc />
@@ -283,24 +194,6 @@ namespace SOS.Lib.Repositories.Processed
             else
             {
                 Logger.LogInformation($"Finish waiting for index creation. Index={IndexName}.");
-            }
-        }
-
-        public async Task<long> IndexCountAsync()
-        {
-            try
-            {
-                var countResponse = await Client.CountAsync<Dataset>(s => s
-                    .Index(IndexName)
-                );
-
-                countResponse.ThrowIfInvalid();
-                return countResponse.Count;
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e.ToString());
-                return -1;
             }
         }
     }

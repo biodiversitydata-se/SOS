@@ -1,9 +1,9 @@
-﻿using FluentAssertions;
+﻿using Elastic.Clients.Elasticsearch.Cluster;
+using FluentAssertions;
 using Hangfire;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
-using Nest;
 using SOS.Harvest.Managers;
 using SOS.Harvest.Processors.Artportalen;
 using SOS.Harvest.Repositories.Source.Artportalen;

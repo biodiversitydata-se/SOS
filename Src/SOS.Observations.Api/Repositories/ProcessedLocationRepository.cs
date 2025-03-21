@@ -1,5 +1,7 @@
-﻿using Microsoft.Extensions.Logging;
-using Nest;
+﻿using Elastic.Clients.Elasticsearch;
+using Elastic.Clients.Elasticsearch.Cluster;
+using Elastic.Clients.Elasticsearch.Core.Search;
+using Microsoft.Extensions.Logging;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Extensions;
@@ -56,24 +58,21 @@ namespace SOS.Observations.Api.Repositories
                 .Query(q => q
                     .Bool(b => b
                         .Filter(f => f
-                            .Terms(t => t
-                                .Field("location.locationId")
-                                .Terms(locationIds)
-                            )
+                            .TryAddTermsCriteria("location.locationId", locationIds)
                         )
                     )
                 )
                 .Collapse(c => c.Field("location.locationId"))
-               .Size(locationIds.Count())
-               .Source(s => s
-                    .Includes(i => i
-                        .Field("location")
-                    )
-                    .Excludes(e => e
-                        .Field("location.pointLocation")
+                .Size(locationIds.Count())
+                .Source(new SourceConfig(
+                    new SourceFilter()
+                        {
+                            Excludes = Fields.FromString("location.pointLocation"),
+                            Includes = Fields.FromString("location")
+                        }
                     )
                 )
-               .TrackTotalHits(false)
+               .TrackTotalHits(new TrackHits(false))
             );
 
             searchResponse.ThrowIfInvalid();
@@ -85,63 +84,60 @@ namespace SOS.Observations.Api.Repositories
             int take)
         {
             var indexName = GetCurrentIndex(filter);
-            var (query, excludeQuery) = GetCoreQueries(filter);
+            var (queries, excludeQueries) = GetCoreQueries(filter);
 
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
                 .Index(indexName)
                 .Query(q => q
                     .Bool(b => b
-                        .MustNot(excludeQuery)
-                        .Filter(query)
+                        .MustNot(excludeQueries.ToArray())
+                        .Filter(queries.ToArray())
                     )
                 )
                 .Aggregations(a => a
-                    .Composite("locations", g => g
-                        .Size(skip + take)
-                        .Sources(src => src
-                            .Terms("id", tt => tt
-                                .Field("location.locationId")
-                            )
-                            .Terms("name", tt => tt
-                                .Field("location.locality")
-                            )
-                            .Terms("county", tt => tt
-                                .Field("location.county.name")
-                            )
-                            .Terms("municipality", tt => tt
-                                .Field("location.municipality.name")
-                            )
-                            .Terms("parish", tt => tt
-                                .Field("location.parish.name")
-                            )
-                            .Terms("longitude", tt => tt
-                                .Field("location.decimalLongitude")
-                            )
-                            .Terms("latitude", tt => tt
-                                .Field("location.decimalLatitude")
-                            )
+                    .Add("locations", a => a
+                        .Composite(c => c
+                            .Size(skip + take)
+                            .Sources(
+                                [
+                                    CreateCompositeTermsAggregationSource(
+                                        ("id", "location.locationId", SortOrder.Asc),
+                                        ("name", "location.locality", SortOrder.Asc),
+                                        ("county", "location.county.name", SortOrder.Asc),
+                                        ("municipality", "location.municipality.name", SortOrder.Asc),
+                                        ("parish", "location.parish.name", SortOrder.Asc),
+                                        ("longitude", "location.decimalLongitude", SortOrder.Asc),
+                                        ("latitude", "location.decimalLatitude", SortOrder.Asc)
+                                    )
+                                ]
+                             )
                         )
                     )
                 )
-                .Size(0)
-                .Source(s => s.ExcludeAll())
-                .TrackTotalHits(false)
+                .AddDefaultAggrigationSettings()
             );
 
             searchResponse.ThrowIfInvalid();
 
             var result = new List<LocationSearchResult>();
-            foreach (var bucket in searchResponse.Aggregations.Composite("locations").Buckets?.Skip(skip))
+            foreach (var bucket in searchResponse.Aggregations.GetComposite("locations").Buckets?.Skip(skip))
             {
+                bucket.Key["county"].TryGetString(out var county);
+                bucket.Key["id"].TryGetString(out var id);
+                bucket.Key["latitude"].TryGetDouble(out var latitude);
+                bucket.Key["longitude"].TryGetLong(out var longitude);
+                bucket.Key["municipality"].TryGetString(out var municipality);
+                bucket.Key["name"].TryGetString(out var name);
+                bucket.Key["parish"].TryGetString(out var parish);
                 result.Add(new LocationSearchResult
                 {
-                    County = (string)bucket.Key["county"],
-                    Id = (string)bucket.Key["id"],
-                    Latitude = (double)bucket.Key["latitude"],
-                    Longitude = (double)bucket.Key["longitude"],
-                    Municipality = (string)bucket.Key["municipality"],
-                    Name = (string)bucket.Key["name"],
-                    Parish = (string)bucket.Key["parish"]
+                    County = county,
+                    Id = id,
+                    Latitude = latitude ?? 0, 
+                    Longitude = longitude ?? 0,
+                    Municipality = municipality,
+                    Name = name,
+                    Parish = parish
                 });
             }
 

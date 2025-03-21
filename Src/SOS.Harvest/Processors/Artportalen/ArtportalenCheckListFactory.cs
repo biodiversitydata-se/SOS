@@ -81,7 +81,7 @@ namespace SOS.Harvest.Processors.Artportalen
                 site.YCoord,
                 CoordinateSys.WebMercator,
                 point,
-                site.PointWithBuffer,
+                site.PointWithBuffer.ToGeometry(),
                 site.Accuracy,
                 0);
 

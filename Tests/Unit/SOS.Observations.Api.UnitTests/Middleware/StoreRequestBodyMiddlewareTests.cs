@@ -21,7 +21,6 @@ public class StoreRequestBodyMiddlewareTests
         PropertyNameCaseInsensitive = true,
         Converters = {
                 new JsonStringEnumConverter(),
-                new GeoShapeConverter(),
                 new NetTopologySuite.IO.Converters.GeoJsonConverterFactory()
             }
     };

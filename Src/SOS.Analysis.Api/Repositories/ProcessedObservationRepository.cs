@@ -1,4 +1,5 @@
-﻿using Nest;
+﻿using Elastic.Clients.Elasticsearch;
+using Elastic.Clients.Elasticsearch.Cluster;
 using SOS.Analysis.Api.Repositories.Interfaces;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Shared;
@@ -26,10 +27,10 @@ namespace SOS.Analysis.Api.Repositories
         }
 
         /// <inheritdoc />
-        public async Task<SearchAfterResult<dynamic>> AggregateByUserFieldAsync(SearchFilter filter, string aggregationField, int? precisionThreshold, string? afterKey = null, int? take = 10)
+        public async Task<SearchAfterResult<dynamic, IReadOnlyCollection<FieldValue>>> AggregateByUserFieldAsync(SearchFilter filter, string aggregationField, int? precisionThreshold, string? afterKey = null, int? take = 10)
         {
             var indexNames = GetCurrentIndex(filter);
-            var (query, excludeQuery) = GetCoreQueries(filter);
+            var (queries, excludeQueries) = GetCoreQueries(filter);
 
             var tz = TimeZoneInfo.Local.GetUtcOffset(DateTime.Now);
 
@@ -37,63 +38,66 @@ namespace SOS.Analysis.Api.Repositories
                 .Index(indexNames)
                 .Query(q => q
                     .Bool(b => b
-                        .MustNot(excludeQuery)
-                        .Filter(query)
+                        .MustNot(excludeQueries.ToArray())
+                        .Filter(queries.ToArray())
                     )
                 )
-                .RuntimeFields(rf => rf // Since missing field seems replaced by MissingBucket in Nest implementation, we need to make a script field to handle empty string and null the same way
-                    .RuntimeField("scriptField", FieldType.Keyword, s => s
-                            .Script(@$"
-                            if (!doc['{aggregationField}'].empty){{  
-                                String value = '' + doc['{aggregationField}'].value; 
-                                if (value != '') {{ 
-                                    emit(value); 
-                                }} 
-                            }}"
-                         )
+                .ScriptFields(sf => sf // Since missing field seems replaced by MissingBucket in Nest implementation, we need to make a script field to handle empty string and null the same way
+                    .Add("scriptField", a => a
+                        .Script(s => s
+                            .Source(@$"
+                                if (!doc['{aggregationField}'].empty){{  
+                                    String value = '' + doc['{aggregationField}'].value; 
+                                    if (value != '') {{ 
+                                        emit(value); 
+                                    }} 
+                                }}"
+                            )// FieldType.Keyword
+                        )
+                        
                     )
                 )
                 .Aggregations(a => a
-                    .Composite("aggregation", c => c
-                        .After(string.IsNullOrEmpty(afterKey) ? null : new CompositeKey(new Dictionary<string, object>() { { "termAggregation", afterKey } }))
+                    .Add("aggregation", a => a
+                        .Composite(c => c
+                        .After(a => a.Add("scriptField".ToField(), afterKey))
                         .Size(take)
-                        .Sources(s => s
-                            .Terms("termAggregation", t => t
-                                .Field("scriptField")
-                                .MissingBucket(true)
-                            )
+                        .Sources(
+                            [
+                                CreateCompositeTermsAggregationSource(
+                                    ("termAggregation", "scriptField", SortOrder.Asc, true)
+                                )
+                            ]
                         )
-                        .Aggregations(a => a
-                            .Cardinality("unique_taxonids", c => c
+                    )
+                    .Aggregations(a => a
+                        .Add("unique_taxonids", a => a
+                            .Cardinality(c => c
                                 .Field("taxon.id")
                                 .PrecisionThreshold(precisionThreshold ?? 3000)
+                                )
                             )
                         )
                     )
                 )
-                .Size(0)
-                .Source(s => s.ExcludeAll())
+                .AddDefaultAggrigationSettings()
             );
 
             searchResponse.ThrowIfInvalid();
-            afterKey = searchResponse
-               .Aggregations
-               .Composite("aggregation")
-               .AfterKey?.Values.FirstOrDefault()?.ToString()!;
+            var compositeAgg = searchResponse.Aggregations?.GetComposite("aggregation");
+            compositeAgg?.AfterKey?.Values.FirstOrDefault().TryGetString(out afterKey);
 
-            return new SearchAfterResult<dynamic>
+            return new SearchAfterResult<dynamic, IReadOnlyCollection<FieldValue>>
             {
-                SearchAfter = new[] { afterKey },
-                Records = searchResponse
-                    .Aggregations
-                    .Composite("aggregation")
+                SearchAfter = string.IsNullOrEmpty(afterKey) ? null! : [afterKey],
+                Records = compositeAgg?
                     .Buckets?
                     .Select(b =>
                         new
                         {
                             AggregationField = b.Key.Values.First(),
                             b.DocCount,
-                            UniqueTaxon = b.Cardinality("unique_taxonids").Value
+                            UniqueTaxon = b.Aggregations?.GetCardinality("unique_taxonids")?.Value
                         }
                     )?.ToArray()
             };

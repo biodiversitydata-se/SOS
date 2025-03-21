@@ -1,8 +1,8 @@
-﻿using FluentAssertions;
+﻿using Elastic.Clients.Elasticsearch.Cluster;
+using FluentAssertions;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
-using Nest;
 using SOS.Lib.Cache;
 using SOS.Lib.Database;
 using SOS.Lib.Managers;

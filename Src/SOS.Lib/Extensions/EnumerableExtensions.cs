@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace SOS.Lib.Extensions
 {
@@ -35,6 +37,22 @@ namespace SOS.Lib.Extensions
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Cast IEnumerable to read only collection
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="enumerable"></param>
+        /// <returns></returns>
+        public static IReadOnlyCollection<T> ToReadOnlyCollection<T>(this IEnumerable<T> enumerable)
+        {
+            return new ReadOnlyCollection<T>(enumerable?.ToList());
+        }
+
+        public static ICollection<T> ToCollection<T>(this IReadOnlyCollection<T> collection)
+        {
+            return new Collection<T>(collection?.ToList());
         }
     }
 }

@@ -2,7 +2,7 @@
 
 namespace SOS.Lib.Models.Search.Result
 {
-    public class SearchAfterResult<T>
+    public class SearchAfterResult<TRecord, TSearchAfter>
     {
         /// <summary>
         /// Point in time id
@@ -12,11 +12,11 @@ namespace SOS.Lib.Models.Search.Result
         /// <summary>
         /// Returned records
         /// </summary>
-        public IEnumerable<T> Records { get; set; }
+        public IEnumerable<TRecord> Records { get; set; }
 
         /// <summary>
         /// Search after objects
         /// </summary>
-        public IEnumerable<object> SearchAfter { get; set; }
+        public TSearchAfter SearchAfter { get; set; }
     }
 }

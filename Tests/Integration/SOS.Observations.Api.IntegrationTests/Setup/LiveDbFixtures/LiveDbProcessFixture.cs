@@ -1,8 +1,8 @@
 ﻿using DwC_A;
+using Elastic.Clients.Elasticsearch.Cluster;
 using Microsoft.ApplicationInsights;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
-using Nest;
 using SOS.Harvest.DarwinCore;
 using SOS.Harvest.DarwinCore.Interfaces;
 using SOS.Harvest.Managers;
@@ -502,7 +502,7 @@ public class LiveDbProcessFixture : IProcessFixture
         {
             await _processedObservationCoreRepository.DeleteAllDocumentsAsync(protectedIndex);
         }
-        _processedObservationCoreRepository.AddMany(observations, protectedIndex, true);
+       await _processedObservationCoreRepository.AddManyAsync(observations, protectedIndex, true);
     }
 
     public DwcaObservationFactory GetDwcaObservationFactory(bool initAreaHelper)

@@ -1,7 +1,6 @@
 ﻿using NetTopologySuite.Geometries;
 using SOS.Shared.Api.Dtos.Enum;
 using SOS.Shared.Api.Dtos.Filter;
-using System.Threading.Tasks;
 using Result = CSharpFunctionalExtensions.Result;
 
 namespace SOS.Shared.Api.Validators.Interfaces
@@ -82,7 +81,7 @@ namespace SOS.Shared.Api.Validators.Interfaces
         /// <param name="geometries"></param>
         /// <returns></returns>
         Result ValidateGeometries(
-            IEnumerable<Nest.IGeoShape> geometries);
+            IEnumerable<Geometry> geometries);
 
         /// <summary>
         /// Validate grid cell size in m

@@ -30,7 +30,6 @@ public class TestBase
         Converters =
         {
             new JsonStringEnumConverter(),
-            new GeoShapeConverter(),
             new NetTopologySuite.IO.Converters.GeoJsonConverterFactory()
         }
     };

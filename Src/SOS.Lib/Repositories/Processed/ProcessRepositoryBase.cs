@@ -13,6 +13,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Elastic.Clients.Elasticsearch.Cluster;
+using SOS.Lib.Extensions;
+using Elastic.Clients.Elasticsearch.Aggregations;
 
 namespace SOS.Lib.Repositories.Processed
 {
@@ -54,6 +56,12 @@ namespace SOS.Lib.Repositories.Processed
             }
         }
 
+        protected enum SourceTypes
+        {
+            Term,
+            GeoTileGrid
+        }
+
         /// <summary>
         /// Add many items to db
         /// </summary>
@@ -76,6 +84,54 @@ namespace SOS.Lib.Repositories.Processed
         protected ElasticsearchClient InActiveClient => ClientCount == 1 ? _elasticClientManager.Clients.FirstOrDefault() : _elasticClientManager.Clients[InActiveInstance];
 
         protected int ClientCount => _elasticClientManager.Clients.Length;
+
+        protected IDictionary<string, CompositeAggregationSource> CreateCompositeTermsAggregationSource(params (string Key, string Term, SortOrder SortOrder)[] sources)
+        {
+            return CreateCompositeTermsAggregationSource(sources.Select(s => (s.Key, s.Term, s.SortOrder, MissingBucket: false, IsScript: false)).ToArray());
+        }
+        protected IDictionary<string, CompositeAggregationSource> CreateCompositeTermsAggregationSource(params (string Key, string Term, SortOrder SortOrder, bool MissingBucket)[] sources)
+        {
+            return CreateCompositeTermsAggregationSource(sources.Select(s => (s.Key, s.Term, s.SortOrder, s.MissingBucket, IsScript: false)).ToArray());
+        }
+
+        protected IDictionary<string, CompositeAggregationSource> CreateCompositeTermsAggregationSource(params (string Key, string Term, SortOrder SortOrder, bool MissingBucket, bool IsScript)[] sources)
+        {
+            var requestParams = sources.Select(s => ((SourceTypes Type, string Key, string Field, SortOrder SortOrder, bool? MissingBucket, bool? IsScript, int? Precision))(Type: SourceTypes.Term, s.Key, Field: s.Term, s.SortOrder, s.MissingBucket, s.IsScript, Precision: null));
+            return CreateCompositeAggregationSource(requestParams.ToArray());
+        }
+
+        protected IDictionary<string, CompositeAggregationSource> CreateCompositeAggregationSource(params (SourceTypes Type, string Key, string Field, SortOrder SortOrder, bool? MissingBucket, bool? IsScript, int? Precision)[] sources)
+        {
+            var response = new Dictionary<string, CompositeAggregationSource>();
+
+            foreach (var source in sources)
+            {
+                response.Add(source.Key, new CompositeAggregationSource
+                {
+                    GeotileGrid = source.Type == SourceTypes.GeoTileGrid ? new CompositeGeoTileGridAggregation
+                    {
+                        Script = source.IsScript ?? false ? new Script
+                        {
+                            Source = source.Field
+                        } : null,
+                        Field = source.IsScript ?? false ? null : source.Field,
+                        Precision = source.Precision,
+                        Order = source.SortOrder
+                    } : null,
+                    Terms = source.Type == SourceTypes.Term ? new CompositeTermsAggregation
+                    {
+                        Script = source.IsScript ?? false ? new Script
+                        {
+                            Source = source.Field
+                        } : null,
+                        Field = source.IsScript ?? false ? null : source.Field,
+                        MissingBucket = source.MissingBucket,
+                        Order = source.SortOrder
+                    } : null
+                });
+            }
+            return response;
+        }
 
         /// <summary>
         ///     Dispose
@@ -132,29 +188,6 @@ namespace SOS.Lib.Repositories.Processed
         protected readonly ILogger<ProcessRepositoryBase<TEntity, TKey>> Logger;
 
         /// <summary>
-        /// Get free disk space
-        /// </summary>
-        /// <returns></returns>
-        protected async Task<IDictionary<string, int>> GetDiskUsageAsync()
-        {
-            var diskUsage = new Dictionary<string, int>();
-            var response = await Client.Nodes.StatsAsync(stats => stats.Metric(new Metrics("fs")));
-            if (response.IsValidResponse)
-            {
-                // Get the disk usage from the response
-                foreach (var node in response.Nodes)
-                {
-                    foreach (var data in node.Value.Fs.Data)
-                    {
-                        diskUsage.Add(data.Path, (int)((data.FreeInBytes ?? 0) / (data.TotalInBytes ?? 1)));
-                    }
-                }
-            }
-
-            return diskUsage;
-        }
-
-        /// <summary>
         /// Get name of instance
         /// </summary>
         /// <param name="instance"></param>
@@ -167,6 +200,27 @@ namespace SOS.Lib.Repositories.Processed
         /// Index prefix (if any)
         /// </summary>
         protected string IndexPrefix => _elasticConfiguration.IndexPrefix;
+
+        /// <summary>
+        /// Count documents in index
+        /// </summary>
+        /// <param name="indexName"></param>
+        /// <returns></returns>
+        protected async Task<long> IndexCountAsync(string indexName)
+        {
+            try
+            {
+                var countResponse = await Client.CountAsync(indexName);
+
+                countResponse.ThrowIfInvalid();
+                return countResponse.Count;
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e.ToString());
+                return -1;
+            }
+        }
 
         /// <summary>
         /// number of replicas
@@ -366,6 +420,32 @@ namespace SOS.Lib.Repositories.Processed
         public async Task EnableIndexingAsync()
         {
             await SetIndexRefreshIntervalAsync(IndexName, new Duration(5000.0));
+        }
+
+        /// <inheritdoc/>
+        public async Task<IDictionary<string, int>> GetDiskUsageAsync()
+        {
+            var diskUsage = new Dictionary<string, int>();
+            var response = await Client.Nodes.StatsAsync(stats => stats.Metric(new Metrics("fs")));
+            if (response.IsValidResponse)
+            {
+                // Get the disk usage from the response
+                foreach (var node in response.Nodes)
+                {
+                    foreach (var data in node.Value.Fs.Data)
+                    {
+                        diskUsage.Add(data.Path, (int)((data.FreeInBytes ?? 0) / (data.TotalInBytes ?? 1)));
+                    }
+                }
+            }
+
+            return diskUsage;
+        }
+
+        /// <inheritdoc />
+        public async Task<long> IndexCountAsync()
+        {
+            return await IndexCountAsync(IndexName);
         }
 
         public string IndexName => IndexHelper.GetIndexName<TEntity>(_elasticConfiguration.IndexPrefix, ClientCount == 1, LiveMode ? ActiveInstance : InActiveInstance, false);

@@ -437,6 +437,17 @@ namespace SOS.Lib.Extensions
         }
 
         /// <summary>
+        /// Cast fetaure to geo json string
+        /// </summary>
+        /// <param name="feature"></param>
+        /// <returns></returns>
+        public static string ToGeoJsonString(this Feature feature)
+        {
+            var geoJsonWriter = new GeoJsonWriter();
+            return geoJsonWriter.Write(feature);
+        }
+
+        /// <summary>
         /// Create a new feature
         /// </summary>
         /// <param name="geometry"></param>

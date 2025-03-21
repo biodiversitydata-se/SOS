@@ -1,3 +1,4 @@
+using NetTopologySuite.Geometries;
 using SOS.DataStewardship.Api.Contracts.Enums;
 using Swashbuckle.AspNetCore.Annotations;
 using System.ComponentModel.DataAnnotations;
@@ -38,7 +39,7 @@ namespace SOS.DataStewardship.Api.Contracts.Models
         /// <summary>
         /// The specific place where an organism was located when it was observed.
         /// </summary>
-        public IGeoShape ObservationPoint { get; set; }
+        public Point ObservationPoint { get; set; }
 
         /// <summary>
         /// Taxonomic information about the observation. States which species (or subspecies, species aggregation, genus, family etc) was observed and identified.

@@ -1,10 +1,10 @@
-﻿using FluentAssertions;
+﻿using Elastic.Clients.Elasticsearch.Cluster;
+using FluentAssertions;
 using Hangfire;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
-using Nest;
 using SOS.Export.Managers;
 using SOS.Export.Services.Interfaces;
 using SOS.Lib.Cache;

@@ -1,4 +1,8 @@
 ﻿using Elastic.Clients.Elasticsearch;
+using Elastic.Clients.Elasticsearch.Aggregations;
+using Elastic.Clients.Elasticsearch.Cluster;
+using Elastic.Clients.Elasticsearch.Core.Search;
+using Elastic.Clients.Elasticsearch.QueryDsl;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Shared;
@@ -8,8 +12,6 @@ using SOS.Lib.Helpers;
 using SOS.Lib.JsonConverters;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Configuration;
-using SOS.Lib.Models.Processed.DataStewardship.Common;
-using SOS.Lib.Models.Processed.DataStewardship.Event;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
@@ -22,6 +24,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Event = SOS.Lib.Models.Processed.DataStewardship.Event.Event;
+
 
 namespace SOS.Lib.Repositories.Processed
 {
@@ -274,84 +277,41 @@ namespace SOS.Lib.Repositories.Processed
                 )
             );
 
-            return createIndexResponse.Acknowledged && createIndexResponse.IsValid ? true : throw new Exception($"Failed to create ObservationEvent index. Error: {createIndexResponse.DebugInformation}");
+            return createIndexResponse.Acknowledged && createIndexResponse.IsValidResponse ? true : throw new Exception($"Failed to create ObservationEvent index. Error: {createIndexResponse.DebugInformation}");
         }
+
+        private readonly static JsonSerializerOptions jsonSerializerOptions = new ()
+        {
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+            PropertyNameCaseInsensitive = true,
+            Converters = {
+                new JsonStringEnumConverter(),
+                new NetTopologySuite.IO.Converters.GeoJsonConverterFactory()
+            }
+        };
 
         public async Task<List<Event>> GetEventsByIds(IEnumerable<string> ids, IEnumerable<SortOrderFilter> sortOrders = null)
         {
             if (ids == null || !ids.Any()) throw new ArgumentException("ids is empty");
             
             var sortDescriptor = await Client.GetSortDescriptorAsync<Event>(IndexName, sortOrders);
-            var query = new List<Action<SearchRequestDescriptor<Event>>>();
+            var query = new QueryDescriptor<Event>();
             query.TryAddTermsCriteria("eventId", ids);
             var searchResponse = await Client.SearchAsync<Event>(s => s
                 .Index(IndexName)
                 .Query(q => q
                     .Bool(b => b
-                        .Filter(query)
+                        .Filter(q)
                     )
                 )
                 .Size(ids?.Count() ?? 0)
-                .Sort(sort => sortDescriptor)
-                .TrackTotalHits(false)
+                .Sort(sortDescriptor.ToArray())
+                .TrackTotalHits(new TrackHits(false))
             );
 
-            if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
+            if (!searchResponse.IsValidResponse) throw new InvalidOperationException(searchResponse.DebugInformation);
             var events = searchResponse.Documents.ToList();
             return events;
-        }
-
-        /// <summary>
-        /// Write data to elastic search
-        /// </summary>
-        /// <param name="items"></param>
-        /// <returns></returns>
-        private BulkAllObserver WriteToElastic(IEnumerable<Event> items)
-        {
-            if (!items.Any())
-            {
-                return null;
-            }
-
-            //check
-            var currentAllocation = Client.Cat.Allocation();
-            if (currentAllocation != null && currentAllocation.IsValid)
-            {
-                var diskUsageDescription = "Current diskusage in cluster:";
-                foreach (var record in currentAllocation.Records)
-                {
-                    if (int.TryParse(record.DiskPercent, out int percentageUsed))
-                    {
-                        diskUsageDescription += percentageUsed + "% ";
-                        if (percentageUsed > 90)
-                        {
-                            Logger.LogError($"Disk usage too high in cluster ({percentageUsed}%), aborting indexing");
-                            return null;
-                        }
-                    }
-                }
-
-                Logger.LogDebug(diskUsageDescription);
-            }
-
-            var count = 0;
-            return Client.BulkAll(items, b => b
-                    .Index(IndexName)
-                    // how long to wait between retries
-                    .BackOffTime("30s")
-                    // how many retries are attempted if a failure occurs                        .
-                    .BackOffRetries(2)
-                    // how many concurrent bulk requests to make
-                    .MaxDegreeOfParallelism(Environment.ProcessorCount)
-                    // number of items per bulk request
-                    .Size(WriteBatchSize)
-                    .DroppedDocumentCallback((r, o) =>
-                    {
-                        Logger.LogError($"EventId: {o?.EventId}, Error: {r?.Error?.Reason}");
-                    })
-                )
-                .Wait(TimeSpan.FromDays(1),
-                    next => { Logger.LogDebug($"Indexing events for search:{count += next.Items.Count}"); });
         }
 
         /// <summary>
@@ -374,41 +334,10 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <inheritdoc />
-        public async Task<int> AddManyAsync(IEnumerable<Event> items)
-        {
-            return await Task.Run(() =>
-            {
-                // Save valid processed data
-                Logger.LogDebug($"Start indexing ObservationEvent batch for searching with {items.Count()} items");
-                var indexResult = WriteToElastic(items);
-                Logger.LogDebug("Finished indexing ObservationEvent batch for searching");
-                if (indexResult == null || indexResult.TotalNumberOfFailedBuffers > 0) return 0;
-                return items.Count();
-            });
-        }
-
-        /// <inheritdoc />
         public async Task<bool> ClearCollectionAsync()
         {
             await DeleteCollectionAsync();
             return await AddCollectionAsync();
-        }
-
-        /// <inheritdoc />
-        public async Task<bool> DisableIndexingAsync()
-        {
-            var updateSettingsResponse =
-                await Client.Indices.UpdateSettingsAsync(IndexName,
-                    p => p.IndexSettings(g => g.RefreshInterval(-1)));
-
-            return updateSettingsResponse.Acknowledged && updateSettingsResponse.IsValid;
-        }
-
-        /// <inheritdoc />
-        public async Task EnableIndexingAsync()
-        {
-            await Client.Indices.UpdateSettingsAsync(IndexName,
-                p => p.IndexSettings(g => g.RefreshInterval(new Time(5000))));
         }
 
         /// <inheritdoc />
@@ -430,66 +359,63 @@ namespace SOS.Lib.Repositories.Processed
         public async Task<List<AggregationItemList<TKey, TValue>>> GetAllAggregationItemsListAsync<TKey, TValue>(EventSearchFilter filter, string aggregationFieldKey, string aggregationFieldList)
         {
             var indexName = IndexName;
-            var (query, excludeQuery) = GetCoreQueries(filter);
+            var (query, excludeQuery) = GetCoreQueries<dynamic>(filter);
             var aggregationDictionary = new Dictionary<TKey, List<TValue>>();
-            CompositeKey nextPageKey = null;
+            IReadOnlyDictionary<Field, FieldValue> nextPageKey = null;
             do
             {
                 var searchResponse = await PageAggregationItemListAsync(indexName, aggregationFieldKey, aggregationFieldList, query, excludeQuery, nextPageKey, MaxNrElasticSearchAggregationBuckets);
-                var compositeAgg = searchResponse.Aggregations.Composite("compositeAggregation");
+                var compositeAgg = searchResponse.Aggregations.GetComposite("compositeAggregation");
                 foreach (var bucket in compositeAgg.Buckets)
                 {
-                    TKey keyValue = (TKey)bucket.Key[aggregationFieldKey];
-                    TValue listValue = (TValue)bucket.Key[aggregationFieldList];
+                    TKey keyValue = (TKey)bucket.Key[aggregationFieldKey].Value;
+                    TValue listValue = (TValue)bucket.Key[aggregationFieldList].Value;
                     if (!aggregationDictionary.ContainsKey(keyValue))
                         aggregationDictionary[keyValue] = new List<TValue>();
                     aggregationDictionary[keyValue].Add(listValue);
                 }
 
-                nextPageKey = compositeAgg.Buckets.Count >= MaxNrElasticSearchAggregationBuckets ? compositeAgg.AfterKey : null;
+                nextPageKey = compositeAgg.Buckets.Count >= MaxNrElasticSearchAggregationBuckets ? compositeAgg.AfterKey?.ToDictionary(ak => ak.Key.ToField(), ak => ak.Value) : null;
             } while (nextPageKey != null);
 
             var items = aggregationDictionary.Select(m => new AggregationItemList<TKey, TValue> { AggregationKey = m.Key, Items = m.Value }).ToList();
             return items;
         }
 
-        private async Task<ISearchResponse<dynamic>> PageAggregationItemListAsync(
+        private async Task<SearchResponse<dynamic>> PageAggregationItemListAsync(
             string indexName,
             string aggregationFieldKey,
             string aggregationFieldList,
-            ICollection<Func<QueryDescriptor<dynamic>, QueryContainer>> query,
-            ICollection<Func<QueryDescriptor<object>, QueryContainer>> excludeQuery,
-            CompositeKey nextPage,
+            ICollection<Action<QueryDescriptor<dynamic>>> queries,
+            ICollection<Action<QueryDescriptor<dynamic>>> excludeQueries,
+            IReadOnlyDictionary<Field, FieldValue> nextPage,
             int take)
         {
-            ISearchResponse<dynamic> searchResponse;
-
-            searchResponse = await Client.SearchAsync<dynamic>(s => s
-                .Index(indexName)
+            var searchResponse = await Client.SearchAsync<dynamic>(indexName, s => s
+                
                 .Query(q => q
                     .Bool(b => b
-                        .MustNot(excludeQuery)
-                        .Filter(query)
+                        .MustNot(excludeQueries.ToArray())
+                        .Filter(queries.ToArray())
                     )
                 )
                 .Aggregations(a => a
-                    .Composite("compositeAggregation", g => g
-                        .After(nextPage ?? null)
-                        .Size(take)
-                        .Sources(src => src
-                            .Terms(aggregationFieldKey, tt => tt
-                                .Field(aggregationFieldKey)
-                                .Order(SortOrder.Descending)
-                            )
-                            .Terms(aggregationFieldList, tt => tt
-                                .Field(aggregationFieldList)
+                    .Add("compositeAggregation", a => a
+                        .Composite(c => c
+                            .After(ak => nextPage?.ToFluentDictionary())
+                            .Size(take)
+                            .Sources(
+                                [
+                                    CreateCompositeTermsAggregationSource(
+                                        (aggregationFieldKey, aggregationFieldKey, SortOrder.Desc),
+                                        (aggregationFieldList, aggregationFieldList, SortOrder.Asc)
+                                    )
+                                ]
                             )
                         )
                     )
                 )
-                .Size(0)
-                .Source(s => s.ExcludeAll())
-                .TrackTotalHits(false)
+                .AddDefaultAggrigationSettings()
             );
 
             searchResponse.ThrowIfInvalid();
@@ -499,61 +425,62 @@ namespace SOS.Lib.Repositories.Processed
         public async Task<List<AggregationItem>> GetAllAggregationItemsAsync(EventSearchFilter filter, string aggregationField)
         {
             var indexName = IndexName;
-            var (query, excludeQuery) = GetCoreQueries(filter);
+            var (query, excludeQuery) = GetCoreQueries<dynamic>(filter);
             var items = new List<AggregationItem>();
-            CompositeKey nextPageKey = null;
+            IReadOnlyDictionary<Field, FieldValue> nextPageKey = null;
             var take = MaxNrElasticSearchAggregationBuckets;
             do
             {
                 var searchResponse = await PageAggregationItemAsync(indexName, aggregationField, query, excludeQuery, nextPageKey, take);
-                var compositeAgg = searchResponse.Aggregations.Composite("compositeAggregation");
+                var compositeAgg = searchResponse.Aggregations.GetComposite("compositeAggregation");
                 foreach (var bucket in compositeAgg.Buckets)
                 {
                     items.Add(new AggregationItem
                     {
-                        AggregationKey = bucket.Key["termAggregation"].ToString(),
-                        DocCount = Convert.ToInt32(bucket.DocCount.GetValueOrDefault(0))
+                        AggregationKey = bucket.Key["termAggregation"].Value.ToString(),
+                        DocCount = Convert.ToInt32(bucket.DocCount)
                     });
                 }
 
-                nextPageKey = compositeAgg.Buckets.Count >= take ? compositeAgg.AfterKey : null;
+                nextPageKey = compositeAgg.Buckets.Count >= take ? compositeAgg.AfterKey?.ToDictionary(ak => ak.Key.ToField(), ak => ak.Value) : null;
             } while (nextPageKey != null);
 
             return items;
         }
 
-        private async Task<ISearchResponse<dynamic>> PageAggregationItemAsync(
+        private async Task<SearchResponse<dynamic>> PageAggregationItemAsync(
             string indexName,
             string aggregationField,
-            ICollection<Func<QueryDescriptor<dynamic>, QueryContainer>> query,
-            ICollection<Func<QueryDescriptor<object>, QueryContainer>> excludeQuery,
-            CompositeKey nextPage,
+            ICollection<Action<QueryDescriptor<dynamic>>> queries,
+            ICollection<Action<QueryDescriptor<dynamic>>> excludeQueries,
+            IReadOnlyDictionary<Field, FieldValue> nextPageKey,
             int take)
         {
-            ISearchResponse<dynamic> searchResponse;
-
-            searchResponse = await Client.SearchAsync<dynamic>(s => s
+            var searchResponse = await Client.SearchAsync<dynamic>(s => s
                 .Index(indexName)
                 .Query(q => q
                     .Bool(b => b
-                        .MustNot(excludeQuery)
-                        .Filter(query)
+                        .MustNot(excludeQueries.ToArray())
+                        .Filter(queries.ToArray())
                     )
                 )
                 .Aggregations(a => a
-                    .Composite("compositeAggregation", g => g
-                        .After(nextPage ?? null)
-                        .Size(take)
-                        .Sources(src => src
-                            .Terms("termAggregation", tt => tt
-                                .Field(aggregationField)
+                    .Add("compositeAggregation", a => a
+                        .Composite(c => c
+                            .After(npk => nextPageKey.ToFluentDictionary() ?? null)
+                            .Size(take)
+                            .Sources(
+                                [
+                                    CreateCompositeTermsAggregationSource(
+                                        ("termAggregation", aggregationField, SortOrder.Desc)
+                                    )
+                                ]
                             )
                         )
                     )
+
                 )
-                .Size(0)
-                .Source(s => s.ExcludeAll())
-                .TrackTotalHits(false)
+                .AddDefaultAggrigationSettings()
             );
 
             searchResponse.ThrowIfInvalid();
@@ -564,7 +491,7 @@ namespace SOS.Lib.Repositories.Processed
         public async Task<PagedResult<dynamic>> GetChunkAsync(EventSearchFilter filter, int skip, int take, bool getAllFields = false)
         {
             string indexName = IndexName;
-            var (query, excludeQuery) = GetCoreQueries(filter);
+            var (queries, excludeQueries) = GetCoreQueries<dynamic>(filter);
             var sortDescriptor = await Client.GetSortDescriptorAsync<Event>(indexName, filter.SortOrders);
 
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
@@ -574,25 +501,24 @@ namespace SOS.Lib.Repositories.Processed
                 .Size(take)
                 .Query(q => q
                     .Bool(b => b
-                        .MustNot(excludeQuery)
-                        .Filter(query)
+                        .MustNot(excludeQueries.ToArray())
+                        .Filter(queries.ToArray())
                     )
                 )
-                .Sort(sort => sortDescriptor)
+                .Sort(sort => sortDescriptor.ToArray())
             );
 
             searchResponse.ThrowIfInvalid();
-            var totalCount = searchResponse.HitsMetadata.Total.Value;
+            var totalCount = searchResponse.Total;
             var includeRealCount = totalCount >= ElasticSearchMaxRecords;
 
             if (includeRealCount)
             {
-                var countResponse = await Client.CountAsync<dynamic>(s => s
-                    .Index(indexName)
+                var countResponse = await Client.CountAsync<dynamic>(indexName, s => s
                     .Query(q => q
                         .Bool(b => b
-                            .MustNot(excludeQuery)
-                            .Filter(query)
+                            .MustNot(excludeQueries.ToArray())
+                            .Filter(queries.ToArray())
                         )
                     )
                 );
@@ -611,11 +537,11 @@ namespace SOS.Lib.Repositories.Processed
             };
         }
 
-        protected (ICollection<Func<QueryDescriptor<dynamic>, QueryContainer>>, ICollection<Func<QueryDescriptor<object>, QueryContainer>>)
-            GetCoreQueries(EventSearchFilter filter)
+        protected (ICollection<Action<QueryDescriptor<TQueryDescriptor>>>, ICollection<Action<QueryDescriptor<TQueryDescriptor>>>)
+            GetCoreQueries<TQueryDescriptor>(EventSearchFilter filter) where TQueryDescriptor : class
         {
-            var query = filter.ToQuery<dynamic>();
-            var excludeQuery = filter.ToExcludeQuery();
+            var query = filter.ToQuery<TQueryDescriptor>();
+            var excludeQuery = filter.ToExcludeQuery<TQueryDescriptor>();
 
             return (query, excludeQuery);
         }
@@ -632,17 +558,6 @@ namespace SOS.Lib.Repositories.Processed
             return JsonSerializer.Deserialize<List<Event>>(
                 JsonSerializer.Serialize(dynamicObjects, jsonSerializerOptions), jsonSerializerOptions);
         }
-
-        protected readonly static JsonSerializerOptions jsonSerializerOptions = new JsonSerializerOptions()
-        {
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-            PropertyNameCaseInsensitive = true,
-            Converters = {
-                new JsonStringEnumConverter(),
-                new GeoShapeConverter(),
-                new NetTopologySuite.IO.Converters.GeoJsonConverterFactory()
-            }
-        };
 
         public async Task WaitForIndexCreation(long expectedRecordsCount, TimeSpan? timeout = null)
         {

@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
-using Nest;
+using NetTopologySuite.Geometries;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
@@ -22,7 +22,7 @@ namespace SOS.Lib.Cache
     {
         private readonly IAreaRepository _areaRepository;
 
-        protected readonly ConcurrentDictionary<(AreaType, string), IGeoShape> _geometryCache;
+        protected readonly ConcurrentDictionary<(AreaType, string), Geometry> _geometryCache;
         private const int NumberOfEntriesCleanupLimit = 50000;
 
         /// <summary>
@@ -34,7 +34,7 @@ namespace SOS.Lib.Cache
         public AreaCache(IAreaRepository areaRepository, IMemoryCache memoryCache, ILogger<CacheBase<string, Area>> logger) : base(areaRepository, memoryCache, logger)
         {
             _areaRepository = areaRepository;
-            _geometryCache = new ConcurrentDictionary<(AreaType, string), IGeoShape>();
+            _geometryCache = new ConcurrentDictionary<(AreaType, string), Geometry>();
             CacheDuration = TimeSpan.FromMinutes(10);
         }
 
@@ -91,14 +91,14 @@ namespace SOS.Lib.Cache
         }
 
         /// <inheritdoc />
-        public async Task<IGeoShape> GetGeometryAsync(AreaType areaType, string featureId)
+        public async Task<Geometry> GetGeometryAsync(AreaType areaType, string featureId)
         {
             if (_geometryCache.TryGetValue((areaType, featureId), out var geometry))
             {
                 return geometry;
             }
 
-            geometry = (await _areaRepository.GetGeometryAsync(areaType, featureId))?.ToGeoShape();
+            geometry = (await _areaRepository.GetGeometryAsync(areaType, featureId));
 
             if (geometry != null)
             {
@@ -115,7 +115,7 @@ namespace SOS.Lib.Cache
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<IGeoShape>> GetGeometriesAsync(
+        public async Task<IEnumerable<Geometry>> GetGeometriesAsync(
             IEnumerable<(AreaType areaType, string featureId)> areaKeys)
         {
             if (!areaKeys?.Any() ?? true)

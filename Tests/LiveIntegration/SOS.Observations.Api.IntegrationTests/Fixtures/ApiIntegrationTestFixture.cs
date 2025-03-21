@@ -51,9 +51,9 @@ using SOS.Shared.Api.Configuration;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Shared.Api.Dtos;
 using SOS.Lib.Models.Cache;
-using Nest;
 using SOS.Lib.Cache.Interfaces;
 using System.Collections.Concurrent;
+using Elastic.Clients.Elasticsearch.Cluster;
 
 namespace SOS.Observations.Api.LiveIntegrationTests.Fixtures
 {

@@ -8,12 +8,24 @@ namespace SOS.Lib.Extensions
 {
     public static class ElasticSearchTypeCastExtensions
     {
-        /// <summary>
         /// Cast Readonly dictionary to fluent dictionary
-        /// </summary>
-        /// <param name="readOnlyDictionary"></param>
-        /// <returns></returns>
-        public static FluentDictionary<Field, FieldValue> ToFluentDictionary(this IReadOnlyDictionary<string, FieldValue> readOnlyDictionary)
+        public static FluentDictionary<TKey, TValue> ToFluentDictionary<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> readOnlyDictionary)
+        {
+            if ((readOnlyDictionary?.Count ?? 0) == 0)
+            {
+                return null;
+            }
+
+            var fluentDictionary = new FluentDictionary<TKey, TValue>();
+            foreach (var item in readOnlyDictionary)
+            {
+                fluentDictionary.Add(item.Key, item.Value);
+            }
+
+            return fluentDictionary;
+        }
+
+        public static FluentDictionary<Field, FieldValue> ToFluentFieldDictionary(this IReadOnlyDictionary<string, FieldValue> readOnlyDictionary)
         {
             if ((readOnlyDictionary?.Count ?? 0) == 0)
             {
@@ -23,7 +35,7 @@ namespace SOS.Lib.Extensions
             var fluentDictionary = new FluentDictionary<Field, FieldValue>();
             foreach (var item in readOnlyDictionary)
             {
-                fluentDictionary.Add(Field.FromString(item.Key), item.Value);
+                fluentDictionary.Add(item.Key, item.Value);
             }
 
             return fluentDictionary;
@@ -90,6 +102,10 @@ namespace SOS.Lib.Extensions
 
         public static FieldValue ToFieldValue<TValue>(this TValue value)
         {
+            if (value == null)
+            {
+                return null;
+            }
             var boolValue = value as bool?;
             if (boolValue ?? false)
             {

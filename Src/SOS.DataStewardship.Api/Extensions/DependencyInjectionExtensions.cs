@@ -10,6 +10,7 @@ using SOS.DataStewardship.Api.Application.Managers.Interfaces;
 using SOS.DataStewardship.Api.Application.Managers;
 using Autofac.Core;
 using Microsoft.Extensions.Logging.Abstractions;
+using Elastic.Clients.Elasticsearch.Cluster;
 
 namespace SOS.DataStewardship.Api.Extensions;
 
@@ -36,8 +37,8 @@ internal static class DependencyInjectionExtensions
         webApplicationBuilder.Services.AddSingleton<IAreaCache, AreaCache>();
         webApplicationBuilder.Services.AddSingleton(new AreaConfiguration());
         webApplicationBuilder.Services.AddSingleton<IDataProviderCache, DataProviderCache>();
-        var clusterHealthCache = new ClassCache<ConcurrentDictionary<string, ClusterHealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<string, ClusterHealthResponse>>>()) { CacheDuration = TimeSpan.FromMinutes(2) };
-        webApplicationBuilder.Services.AddSingleton<IClassCache<ConcurrentDictionary<string, ClusterHealthResponse>>>(clusterHealthCache);
+        var clusterHealthCache = new ClassCache<ConcurrentDictionary<string, HealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<string, HealthResponse>>>()) { CacheDuration = TimeSpan.FromMinutes(2) };
+        webApplicationBuilder.Services.AddSingleton<IClassCache<ConcurrentDictionary<string, HealthResponse>>>(clusterHealthCache);
 
         // Security
         webApplicationBuilder.Services.AddSingleton<IAuthorizationProvider, CurrentUserAuthorization>();

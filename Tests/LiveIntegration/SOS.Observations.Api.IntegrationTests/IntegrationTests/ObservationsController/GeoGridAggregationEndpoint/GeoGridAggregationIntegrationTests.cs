@@ -1,5 +1,4 @@
 ﻿using FluentAssertions;
-using Nest;
 using SOS.Shared.Api.Dtos;
 using SOS.Shared.Api.Dtos.Enum;
 using SOS.Shared.Api.Dtos.Filter;
@@ -11,6 +10,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
+using NetTopologySuite.Geometries;
 
 namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.ObservationsController.GeoGridAggregationEndpoint
 {
@@ -73,7 +73,7 @@ namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.Observation
                 },
                 Geographics = new GeographicsFilterDto
                 {
-                    Geometries = new List<IGeoShape> { new PointGeoShape(new GeoCoordinate(58.01563, 14.99047)) },
+                    Geometries = new List<Geometry> { new Point(14.99047, 58.01563) },
                     MaxDistanceFromPoint = 5000
                 },
                 VerificationStatus = StatusVerificationDto.BothVerifiedAndNotVerified,

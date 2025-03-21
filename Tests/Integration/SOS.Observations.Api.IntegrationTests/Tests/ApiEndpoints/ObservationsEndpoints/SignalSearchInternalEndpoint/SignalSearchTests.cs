@@ -8,7 +8,7 @@ using SOS.TestHelpers.Gis;
 using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Helpers;
 using SOS.Shared.Api.Dtos.Enum;
-using Nest;
+using NetTopologySuite.Geometries;
 
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsEndpoints.SignalSearchInternalEndpoint;
 
@@ -32,7 +32,7 @@ public class SignalSearchTests : TestBase
                 .With(p => p.EndDate = new DateTime(2000, 1, 1))
                 .With(p => p.Site.County = new GeographicalArea { FeatureId = CountyId.Uppsala })
                 .With(p => p.Site.Municipality = new GeographicalArea { FeatureId = MunicipalityId.Uppsala.ToString() })
-                .HaveCoordinates(Coordinates.UppsalaMunicipality.Longitude, Coordinates.UppsalaMunicipality.Latitude, 50)            
+                .HaveCoordinates(TestCoordinates.UppsalaMunicipality.Longitude, TestCoordinates.UppsalaMunicipality.Latitude, 50)            
             .Build();
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);        
         var userServiceStub = UserServiceStubFactory.CreateWithCountySightingIndicationAuthority(
@@ -79,7 +79,7 @@ public class SignalSearchTests : TestBase
                 .With(p => p.EndDate = new DateTime(2000, 1, 1))
                 .With(p => p.Site.County = new GeographicalArea { FeatureId = CountyId.Uppsala })
                 .With(p => p.Site.Municipality = new GeographicalArea { FeatureId = MunicipalityId.Uppsala.ToString() })
-                .HaveCoordinates(Coordinates.UppsalaMunicipality.Longitude, Coordinates.UppsalaMunicipality.Latitude, 50)
+                .HaveCoordinates(TestCoordinates.UppsalaMunicipality.Longitude, TestCoordinates.UppsalaMunicipality.Latitude, 50)
             .Build();
 
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);        
@@ -126,14 +126,14 @@ public class SignalSearchTests : TestBase
                 .With(p => p.EndDate = new DateTime(2000, 1, 1))
                 .With(p => p.Site.County = new GeographicalArea { FeatureId = CountyId.Uppsala })
                 .With(p => p.Site.Municipality = new GeographicalArea { FeatureId = MunicipalityId.Uppsala.ToString() })
-                .HaveCoordinates(Coordinates.UppsalaMunicipality.Longitude, Coordinates.UppsalaMunicipality.Latitude, 50)                
+                .HaveCoordinates(TestCoordinates.UppsalaMunicipality.Longitude, TestCoordinates.UppsalaMunicipality.Latitude, 50)                
             .TheNext(50)
                 .With(p => p.TaxonId = sensitiveTaxonId)
                 .With(p => p.StartDate = new DateTime(2000, 1, 1))
                 .With(p => p.EndDate = new DateTime(2000, 1, 1))
                 .With(p => p.Site.County = new GeographicalArea { FeatureId = CountyId.Jönköping })
                 .With(p => p.Site.Municipality = new GeographicalArea { FeatureId = MunicipalityId.Jönköping.ToString() })
-                .HaveCoordinates(Coordinates.JönköpingMunicipality.Longitude, Coordinates.JönköpingMunicipality.Latitude, 50)                
+                .HaveCoordinates(TestCoordinates.JönköpingMunicipality.Longitude, TestCoordinates.JönköpingMunicipality.Latitude, 50)                
             .Build();
 
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);       
@@ -143,13 +143,13 @@ public class SignalSearchTests : TestBase
             maxProtectionLevel: 1,
             countyFeatureId: CountyId.Uppsala);
         var apiClient = TestFixture.CreateApiClientWithReplacedService(userServiceStub);
-        var searchFilter = CreateSearchFilter(1999, sensitiveTaxonId, Coordinates.UppsalaMunicipalityBbox, usePolygon: false);
+        var searchFilter = CreateSearchFilter(1999, sensitiveTaxonId, TestCoordinates.UppsalaMunicipalityBbox, usePolygon: false);
         var response = await apiClient.PostAsync($"/observations/internal/signalsearch?onlyAboveMyClearance=true", JsonContent.Create(searchFilter, null, JsonSerializerOptions));
         var result = await response.Content.ReadFromJsonAsync<bool>();
         result.Should().BeTrue();
 
         // Test 2 - User has permission for Uppsala county, search in Uppsala using polygon => Should return true
-        searchFilter = CreateSearchFilter(1999, sensitiveTaxonId, Coordinates.UppsalaMunicipalityBbox, usePolygon: true);
+        searchFilter = CreateSearchFilter(1999, sensitiveTaxonId, TestCoordinates.UppsalaMunicipalityBbox, usePolygon: true);
         response = await apiClient.PostAsync($"/observations/internal/signalsearch?onlyAboveMyClearance=true", JsonContent.Create(searchFilter, null, JsonSerializerOptions));
         result = await response.Content.ReadFromJsonAsync<bool>();
         result.Should().BeTrue();
@@ -161,13 +161,13 @@ public class SignalSearchTests : TestBase
         result.Should().BeTrue();
 
         // Test 4 - User has no permission for Jönköping county, search in Jönköping with bbox => Should return false        
-        searchFilter = CreateSearchFilter(1999, sensitiveTaxonId, Coordinates.JönköpingMunicipalityBbox, usePolygon: false);
+        searchFilter = CreateSearchFilter(1999, sensitiveTaxonId, TestCoordinates.JönköpingMunicipalityBbox, usePolygon: false);
         response = await apiClient.PostAsync($"/observations/internal/signalsearch?onlyAboveMyClearance=true", JsonContent.Create(searchFilter, null, JsonSerializerOptions));
         result = await response.Content.ReadFromJsonAsync<bool>();
         result.Should().BeFalse();
 
         // Test 5 - User has no permission for Jönköping county, search in Jönköping with polygon => Should return false        
-        searchFilter = CreateSearchFilter(1999, sensitiveTaxonId, Coordinates.JönköpingMunicipalityBbox, usePolygon: true);
+        searchFilter = CreateSearchFilter(1999, sensitiveTaxonId, TestCoordinates.JönköpingMunicipalityBbox, usePolygon: true);
         response = await apiClient.PostAsync($"/observations/internal/signalsearch?onlyAboveMyClearance=true", JsonContent.Create(searchFilter, null, JsonSerializerOptions));
         result = await response.Content.ReadFromJsonAsync<bool>();
         result.Should().BeFalse();
@@ -179,20 +179,20 @@ public class SignalSearchTests : TestBase
         result.Should().BeFalse();
 
         // Test 7 - User has permission for Uppsala county, search in Tierp with bbox => Should return false since there are no observations in Tierp
-        searchFilter = CreateSearchFilter(1999, sensitiveTaxonId, Coordinates.TierpCenterBbox, usePolygon: false);
+        searchFilter = CreateSearchFilter(1999, sensitiveTaxonId, TestCoordinates.TierpCenterBbox, usePolygon: false);
         response = await apiClient.PostAsync($"/observations/internal/signalsearch?onlyAboveMyClearance=true&returnHttp403Or409WhenNoPermissions=true", JsonContent.Create(searchFilter, null, JsonSerializerOptions));
         result = await response.Content.ReadFromJsonAsync<bool>();
         result.Should().BeFalse();
 
         // Test 8 - User has permission for Uppsala county, search in Tierp with polygon => Should return false since there are no observations in Tierp
-        searchFilter = CreateSearchFilter(1999, sensitiveTaxonId, Coordinates.TierpCenterBbox, usePolygon: true);
+        searchFilter = CreateSearchFilter(1999, sensitiveTaxonId, TestCoordinates.TierpCenterBbox, usePolygon: true);
         response = await apiClient.PostAsync($"/observations/internal/signalsearch?onlyAboveMyClearance=true&returnHttp403Or409WhenNoPermissions=true", JsonContent.Create(searchFilter, null, JsonSerializerOptions));
         result = await response.Content.ReadFromJsonAsync<bool>();
         result.Should().BeFalse();
 
         // Test 9 - User has permission for Uppsala county, search in Tierp with bbox that intersects with an area where the user doesn't have access
         //       => Should return Http 409
-        searchFilter = CreateSearchFilter(1999, sensitiveTaxonId, Coordinates.TierpMunicipalityBbox, usePolygon: false);
+        searchFilter = CreateSearchFilter(1999, sensitiveTaxonId, TestCoordinates.TierpMunicipalityBbox, usePolygon: false);
         response = await apiClient.PostAsync($"/observations/internal/signalsearch?onlyAboveMyClearance=true&returnHttp403Or409WhenNoPermissions=true", JsonContent.Create(searchFilter, null, JsonSerializerOptions));
         response.StatusCode.Should().Be(HttpStatusCode.Conflict);
 
@@ -202,12 +202,12 @@ public class SignalSearchTests : TestBase
         response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
 
         // Test 11 - User has no permissions for Jönköping county, search in Jönköping using bbox => Should return http 403
-        searchFilter = CreateSearchFilter(1999, sensitiveTaxonId, Coordinates.JönköpingMunicipalityBbox, usePolygon: false);
+        searchFilter = CreateSearchFilter(1999, sensitiveTaxonId, TestCoordinates.JönköpingMunicipalityBbox, usePolygon: false);
         response = await apiClient.PostAsync($"/observations/internal/signalsearch?onlyAboveMyClearance=true&returnHttp403Or409WhenNoPermissions=true", JsonContent.Create(searchFilter, null, JsonSerializerOptions));
         response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
 
         // Test 12 - User has no permissions for Jönköping county, search in Jönköping using polygon => Should return http 403
-        searchFilter = CreateSearchFilter(1999, sensitiveTaxonId, Coordinates.JönköpingMunicipalityBbox, usePolygon: true);
+        searchFilter = CreateSearchFilter(1999, sensitiveTaxonId, TestCoordinates.JönköpingMunicipalityBbox, usePolygon: true);
         response = await apiClient.PostAsync($"/observations/internal/signalsearch?onlyAboveMyClearance=true&returnHttp403Or409WhenNoPermissions=true", JsonContent.Create(searchFilter, null, JsonSerializerOptions));
         response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
@@ -219,19 +219,18 @@ public class SignalSearchTests : TestBase
             StartDate = new DateTime(startYear, 1, 1),
             Geographics = new GeographicsFilterDto
             {
-                Geometries = usePolygon ? new List<IGeoShape>()
+                Geometries = usePolygon ? new List<Geometry>()
                 {
-                    new PolygonGeoShape(new []
-                    { 
-                        new []
-                        {
-                            new GeoCoordinate(bbox.TopLeftLatitude, bbox.TopLeftLongitude),
-                            new GeoCoordinate(bbox.TopLeftLatitude, bbox.BottomRightLongitude),
-                            new GeoCoordinate(bbox.BottomRightLatitude, bbox.BottomRightLongitude),
-                            new GeoCoordinate(bbox.BottomRightLatitude, bbox.TopLeftLongitude),
-                            new GeoCoordinate(bbox.TopLeftLatitude, bbox.TopLeftLongitude)
-                        }
-                    })
+                    new Polygon(new LinearRing(
+                                [
+                                new Coordinate(bbox.TopLeftLongitude, bbox.TopLeftLatitude),
+                                new Coordinate(bbox.BottomRightLongitude, bbox.TopLeftLatitude),
+                                new Coordinate(bbox.BottomRightLongitude, bbox.BottomRightLatitude),
+                                new Coordinate(bbox.TopLeftLongitude, bbox.BottomRightLatitude),
+                                new Coordinate(bbox.TopLeftLongitude, bbox.TopLeftLatitude)
+                            ]
+                            )
+                        )
                 } : null,
                 BoundingBox = !usePolygon ? new LatLonBoundingBoxDto
                 {                    

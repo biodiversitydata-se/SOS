@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
 using SOS.Lib.Enums;
-using SOS.Lib.JsonConverters;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Filters;
@@ -35,7 +34,6 @@ namespace SOS.Observations.Api.Managers
             Converters =
         {
             new JsonStringEnumConverter(),
-            new GeoShapeConverter(),
             new NetTopologySuite.IO.Converters.GeoJsonConverterFactory()
         }
         };

@@ -1,10 +1,8 @@
 ﻿using AgileObjects.AgileMapper.Extensions;
 using CSharpFunctionalExtensions;
 using Elastic.Clients.Elasticsearch;
-using Elastic.Clients.Elasticsearch.Aggregations;
 using Elastic.Clients.Elasticsearch.Core.Search;
 using Elastic.Clients.Elasticsearch.Cluster;
-using Elastic.Clients.Elasticsearch.Fluent;
 using Elastic.Clients.Elasticsearch.Mapping;
 using Elastic.Clients.Elasticsearch.QueryDsl;
 using Microsoft.Extensions.Logging;
@@ -995,7 +993,7 @@ namespace SOS.Lib.Repositories.Processed
            string aggregationField,
            ICollection<Action<QueryDescriptor<dynamic>>> queryDescriptors,
            ICollection<Action<QueryDescriptor<object>>> excludeQueryDescriptors,
-           IReadOnlyDictionary<string, FieldValue> nextPageKey,
+           IReadOnlyDictionary<Field, FieldValue> nextPageKey,
            int take)
         {
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
@@ -1012,18 +1010,12 @@ namespace SOS.Lib.Repositories.Processed
                            .After(a => nextPageKey.ToFluentDictionary())
                            .Size(take)
                            .Sources(
-                           [
-                               new Dictionary<string, CompositeAggregationSource>
-                                {
-                                    {
-                                        "termAggregation", new CompositeAggregationSource{
-                                            Terms = new CompositeTermsAggregation{
-                                                Field = aggregationField
-                                            }
-                                        }
-                                    }
-                                }
-                           ])
+                                [
+                                    CreateCompositeTermsAggregationSource(
+                                        ("termAggregation", "aggregationField", SortOrder.Asc)
+                                    )
+                                ]
+                            )
                        )
                    )
                )
@@ -1041,7 +1033,7 @@ namespace SOS.Lib.Repositories.Processed
             string aggregationFieldList,
             ICollection<Action<QueryDescriptor<dynamic>>> queryDescriptors,
             ICollection<Action<QueryDescriptor<object>>> excludeQueryDescriptors,
-            IReadOnlyDictionary<string, FieldValue> nextPageKey,
+            IReadOnlyDictionary<Field, FieldValue> nextPageKey,
             int take)
         {
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
@@ -1058,29 +1050,13 @@ namespace SOS.Lib.Repositories.Processed
                             .After(a => nextPageKey.ToFluentDictionary())
                             .Size(take)
                             .Sources(
-                            [
-                                new Dictionary<string, CompositeAggregationSource>
-                                {
-                                    {
-                                        aggregationFieldKey, new CompositeAggregationSource{
-                                            Terms = new CompositeTermsAggregation{
-                                                Field = aggregationFieldKey,
-                                                Order = SortOrder.Desc
-                                            }
-                                        }
-                                    }
-                                },
-                                new Dictionary<string, CompositeAggregationSource>
-                                {
-                                    {
-                                        aggregationFieldList, new CompositeAggregationSource{
-                                            Terms = new CompositeTermsAggregation{
-                                                Field = aggregationFieldList
-                                            }
-                                        }
-                                    }
-                                }
-                            ])
+                                [
+                                    CreateCompositeTermsAggregationSource(
+                                        (aggregationFieldKey, aggregationFieldKey, SortOrder.Desc),
+                                        (aggregationFieldList, aggregationFieldList, SortOrder.Asc)
+                                    )
+                                ]
+                            )
                         )
                     )
                 )
@@ -1104,7 +1080,7 @@ namespace SOS.Lib.Repositories.Processed
             string indexName,
             ICollection<Action<QueryDescriptor<dynamic>>> queryDescriptors,
             ICollection<Action<QueryDescriptor<object>>> excludeQueryDescriptors,
-            FluentDictionary<Field, FieldValue> nextPageKey,
+            IReadOnlyDictionary<Field, FieldValue> nextPageKey,
             int take)
         {
             Action<QueryDescriptor<dynamic>>[] x = null;
@@ -1119,32 +1095,16 @@ namespace SOS.Lib.Repositories.Processed
                  .Aggregations(a => a
                       .Add("compositeAggregation", ca => ca
                          .Composite(c => c
-                             .After(a => nextPageKey)
+                             .After(a => nextPageKey.ToFluentDictionary())
                              .Size(take)
                              .Sources(
-                             [
-                                 new Dictionary<string, CompositeAggregationSource>
-                                {
-                                    {
-                                        "eventId", new CompositeAggregationSource{
-                                            Terms = new CompositeTermsAggregation{
-                                                Field = "event.eventId",
-                                                Order = SortOrder.Asc
-                                            }
-                                        }
-                                    }
-                                },
-                                new Dictionary<string, CompositeAggregationSource>
-                                {
-                                    {
-                                        "occurrenceId", new CompositeAggregationSource{
-                                            Terms = new CompositeTermsAggregation{
-                                                Field = "occurrence.occurrenceId"
-                                            }
-                                        }
-                                    }
-                                }
-                             ])
+                                [
+                                    CreateCompositeTermsAggregationSource(
+                                        ("eventId", "event.eventId", SortOrder.Asc),
+                                        ("occurrenceId", "occurrence.occurrenceId", SortOrder.Asc)
+                                    )
+                                ]
+                            )
                          )
                      )
 
@@ -1471,7 +1431,7 @@ namespace SOS.Lib.Repositories.Processed
             var indexName = GetCurrentIndex(filter);
             var (query, excludeQuery) = GetCoreQueries(filter);
             var items = new List<AggregationItem>();
-            IReadOnlyDictionary<string, FieldValue> nextPageKey = null;
+            IReadOnlyDictionary<Field, FieldValue> nextPageKey = null;
             var take = MaxNrElasticSearchAggregationBuckets;
             do
             {
@@ -1487,7 +1447,7 @@ namespace SOS.Lib.Repositories.Processed
                     });
                 }
 
-                nextPageKey = compositeAgg.Buckets.Count >= take ? compositeAgg.AfterKey : null;
+                nextPageKey = compositeAgg.Buckets.Count >= take ? compositeAgg.AfterKey?.ToDictionary(ak => ak.Key.ToField(), ak => ak.Value) : null;
             } while (nextPageKey != null);
 
             return items;
@@ -1501,7 +1461,7 @@ namespace SOS.Lib.Repositories.Processed
             var indexName = GetCurrentIndex(filter);
             var (query, excludeQuery) = GetCoreQueries(filter);
             var aggregationDictionary = new Dictionary<TKey, List<TValue>>();
-            IReadOnlyDictionary<string, FieldValue> nextPageKey = null;
+            IReadOnlyDictionary<Field, FieldValue> nextPageKey = null;
             var pageTaxaAsyncTake = MaxNrElasticSearchAggregationBuckets;
             do
             {
@@ -1516,7 +1476,7 @@ namespace SOS.Lib.Repositories.Processed
                     aggregationDictionary[keyValue].Add(listValue);
                 }
 
-                nextPageKey = compositeAgg.Buckets.Count >= pageTaxaAsyncTake ? compositeAgg.AfterKey : null;
+                nextPageKey = compositeAgg.Buckets.Count >= pageTaxaAsyncTake ? compositeAgg.AfterKey?.ToDictionary(ak => ak.Key.ToField(), ak => ak.Value) : null;
             } while (nextPageKey != null);
 
             var items = aggregationDictionary.Select(m => new AggregationItemList<TKey, TValue> { AggregationKey = m.Key, Items = m.Value }).ToList();
@@ -1583,7 +1543,7 @@ namespace SOS.Lib.Repositories.Processed
             var indexName = GetCurrentIndex(filter);
             var (query, excludeQuery) = GetCoreQueries(filter);
             var occurrencesByEventId = new Dictionary<string, List<string>>();
-            FluentDictionary<Field, FieldValue> nextPageKey = null;
+            IReadOnlyDictionary<Field, FieldValue> nextPageKey = null;
             var take = MaxNrElasticSearchAggregationBuckets;
             do
             {
@@ -1599,7 +1559,7 @@ namespace SOS.Lib.Repositories.Processed
                 }
 
 
-                nextPageKey = compositeAgg.Buckets.Count >= take ? compositeAgg.AfterKey.ToFluentDictionary() : null;
+                nextPageKey = compositeAgg.Buckets.Count >= take ? compositeAgg.AfterKey?.ToDictionary(ak => ak.Key.ToField(), ak => ak.Value) : null;
             } while (nextPageKey != null);
 
 
@@ -1649,7 +1609,7 @@ namespace SOS.Lib.Repositories.Processed
             return result;
         }
 
-        public async Task<IEnumerable<long>> GetProjectIdsAsync(SearchFilter filter)
+        public async Task<IEnumerable<int>> GetProjectIdsAsync(SearchFilter filter)
         {
             var indexNames = GetCurrentIndex(filter);
             var (query, excludeQuery) = GetCoreQueries(filter);
@@ -1676,7 +1636,7 @@ namespace SOS.Lib.Repositories.Processed
             var result = searchResponse.Aggregations
                 .GetLongTerms("projectId")
                     .Buckets
-                        .Select(b => b.Key);
+                        .Select(b => (int)b.Key);
 
             return result;
         }
@@ -1878,35 +1838,15 @@ namespace SOS.Lib.Repositories.Processed
                     .Add("gridCells", a => a
                         .Composite(c => c
                             .Size(maxBuckets ?? MaxNrElasticSearchAggregationBuckets + 1)
-                            .After(a => afterKey.ToFluentDictionary())
-                            .Sources(new List<IDictionary<string, CompositeAggregationSource>>
-                            {
-                                new Dictionary<string, CompositeAggregationSource>
-                                {
-                                    {
-                                        "metric_x",
-                                            new CompositeAggregationSource{
-                                                Terms = new CompositeTermsAggregation {
-                                                    Script = new Script
-                                                    {
-                                                        Source = $"(Math.floor(doc['location.{(metricCoordinateSys.Equals(MetricCoordinateSys.ETRS89) || metricCoordinateSys.Equals(MetricCoordinateSys.ETRS89_LAEA_Europe) ? "etrs89X" : "sweref99TmX")}'].value / {gridCellSizeInMeters}) * {gridCellSizeInMeters}).intValue()"
-                                                    }
-                                                }
-                                            }
-                                    },
-                                    {
-                                        "metric_y",
-                                            new CompositeAggregationSource{
-                                                Terms = new CompositeTermsAggregation {
-                                                    Script = new Script
-                                                    {
-                                                        Source = $"(Math.floor(doc['location.{(metricCoordinateSys.Equals(MetricCoordinateSys.ETRS89) || metricCoordinateSys.Equals(MetricCoordinateSys.ETRS89_LAEA_Europe) ? "etrs89Y" : "sweref99TmY")}'].value / {gridCellSizeInMeters}) * {gridCellSizeInMeters}).intValue()"
-                                                    }
-                                                }
-                                            }
-                                    }
-                                }
-                            })
+                            .After(a => afterKey.ToDictionary(ak => ak.Key.ToField(), ak => ak.Value).ToFluentDictionary())
+                            .Sources(
+                                [
+                                    CreateCompositeTermsAggregationSource(
+                                        ("metric_x", $"(Math.floor(doc['location.{(metricCoordinateSys.Equals(MetricCoordinateSys.ETRS89) || metricCoordinateSys.Equals(MetricCoordinateSys.ETRS89_LAEA_Europe) ? "etrs89X" : "sweref99TmX")}'].value / {gridCellSizeInMeters}) * {gridCellSizeInMeters}).intValue()", SortOrder.Asc, false, true),
+                                        ("metric_y", $"(Math.floor(doc['location.{(metricCoordinateSys.Equals(MetricCoordinateSys.ETRS89) || metricCoordinateSys.Equals(MetricCoordinateSys.ETRS89_LAEA_Europe) ? "etrs89Y" : "sweref99TmY")}'].value / {gridCellSizeInMeters}) * {gridCellSizeInMeters}).intValue()", SortOrder.Asc, false, true)
+                                    )
+                                ]
+                            )
                         ).Aggregations(a => a
                             .Add("taxa_count", a => a
                                 .Cardinality(c => c
@@ -1963,10 +1903,10 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <inheritdoc />
-        public async Task<SearchAfterResult<ExtendedMeasurementOrFactRow>> GetMeasurementOrFactsBySearchAfterAsync(
+        public async Task<SearchAfterResult<ExtendedMeasurementOrFactRow, IReadOnlyCollection<FieldValue>>> GetMeasurementOrFactsBySearchAfterAsync(
            SearchFilterBase filter,
            string pointInTimeId = null,
-           ICollection<FieldValue> afterKey = null)
+           IReadOnlyCollection<FieldValue> afterKey = null)
         {
             var searchIndex = GetCurrentIndex(filter);
             var searchResponse = await SearchAfterAsync<dynamic>(searchIndex, new SearchRequestDescriptor<dynamic>()
@@ -1983,22 +1923,22 @@ namespace SOS.Lib.Repositories.Processed
                     }
                 )),
                 pointInTimeId,
-                afterKey
+                afterKey?.ToArray()
             );
 
-            return new SearchAfterResult<ExtendedMeasurementOrFactRow>
+            return new SearchAfterResult<ExtendedMeasurementOrFactRow, IReadOnlyCollection<FieldValue>>
             {
                 Records = searchResponse.Documents.ToObservations()?.ToExtendedMeasurementOrFactRows(),
                 PointInTimeId = searchResponse.PitId,
-                SearchAfter = searchResponse.Hits?.LastOrDefault()?.Sort?.Select(s => s.Value)
+                SearchAfter = searchResponse.Hits?.LastOrDefault()?.Sort
             };
         }
 
         /// <inheritdoc />
-        public async Task<SearchAfterResult<SimpleMultimediaRow>> GetMultimediaBySearchAfterAsync(
+        public async Task<SearchAfterResult<SimpleMultimediaRow, IReadOnlyCollection<FieldValue>>> GetMultimediaBySearchAfterAsync(
             SearchFilterBase filter,
             string pointInTimeId = null,
-            ICollection<FieldValue> afterKey = null)
+            IReadOnlyCollection<FieldValue> afterKey = null)
         {
             var searchIndex = GetCurrentIndex(filter);
 
@@ -2016,13 +1956,13 @@ namespace SOS.Lib.Repositories.Processed
                     }
                 )),
                 pointInTimeId,
-                afterKey);
+                afterKey?.ToArray());
 
-            return new SearchAfterResult<SimpleMultimediaRow>
+            return new SearchAfterResult<SimpleMultimediaRow, IReadOnlyCollection<FieldValue>>
             {
                 Records = searchResponse.Documents?.ToObservations().ToSimpleMultimediaRows(),
                 PointInTimeId = searchResponse.PitId,
-                SearchAfter = searchResponse.Hits?.LastOrDefault()?.Sort?.Select(s => s.Value)
+                SearchAfter = searchResponse.Hits?.LastOrDefault()?.Sort
             };
         }
 
@@ -2091,8 +2031,60 @@ namespace SOS.Lib.Repositories.Processed
             }
         }
 
+        public async Task<ScrollResult<dynamic>> GetObservationsByScrollAsync(
+            SearchFilter filter,
+            int take,
+            string scrollId)
+        {
+            var indexNames = GetCurrentIndex(filter);
+            var (queries, excludeQueries) = GetCoreQueries(filter);
+
+            var sortDescriptor = await Client.GetSortDescriptorAsync<dynamic>(indexNames, filter?.Output?.SortOrders);
+
+            // Retry policy by Polly
+            var response = await PollyHelper.GetRetryPolicy(3, 100).ExecuteAsync(async () =>
+            {
+                if (string.IsNullOrEmpty(scrollId))
+                {
+                    var searchResponse = await Client.SearchAsync<dynamic>(s => s
+                        .Index(indexNames)
+                        .Query(q => q
+                            .Bool(b => b
+                                .MustNot(excludeQueries.ToArray())
+                                .Filter(queries.ToArray())
+                            )
+                        )
+                        .Sort(sortDescriptor.ToArray())
+                        .Size(take)
+                        .Source(filter.Output?.Fields.ToProjection(filter is SearchFilterInternal))
+                        .Scroll(ScrollTimeout)
+                    );
+
+                    searchResponse.ThrowIfInvalid();
+                    return (searchResponse.Documents, TotalCount: searchResponse.Total, searchResponse.ScrollId);
+                }            
+                else
+                {
+                    var scrollResult = await Client.ScrollAsync<dynamic>(new ScrollRequest()
+                        {
+                            ScrollId = scrollId
+                        }
+                    );
+                    return (scrollResult.Documents, TotalCount: scrollResult.Total, scrollResult.ScrollId);
+                }
+            });
+
+            return new ScrollResult<dynamic>
+            {
+                Records = response.Documents,
+                ScrollId = response.Documents.Count < take ? null : response.ScrollId?.Id,
+                Take = take,
+                TotalCount = response.TotalCount
+            };
+        }
+
         /// <inheritdoc />
-        public async Task<SearchAfterResult<T>> GetObservationsBySearchAfterAsync<T>(
+        public async Task<SearchAfterResult<T, IReadOnlyCollection<FieldValue>>> GetObservationsBySearchAfterAsync<T>(
             SearchFilter filter,
             string pointInTimeId = null,
             ICollection<FieldValue> afterKey = null)
@@ -2119,11 +2111,11 @@ namespace SOS.Lib.Repositories.Processed
                 return queryResponse;
             });
 
-            return new SearchAfterResult<T>
+            return new SearchAfterResult<T, IReadOnlyCollection<FieldValue>>
             {
                 Records = (IEnumerable<T>)(typeof(T).Equals(typeof(Observation)) ? searchResponse.Documents?.ToObservationsArray() : searchResponse.Documents),
                 PointInTimeId = searchResponse.PitId,
-                SearchAfter = searchResponse.Hits?.LastOrDefault()?.Sort?.Select(s => s.Value)
+                SearchAfter = searchResponse.Hits?.LastOrDefault()?.Sort
             };
         }
 
@@ -2353,11 +2345,11 @@ namespace SOS.Lib.Repositories.Processed
             }
         }
 
-        public async Task<SearchAfterResult<dynamic>> AggregateByUserFieldAsync(SearchFilter filter,
+        public async Task<SearchAfterResult<dynamic, IReadOnlyDictionary<string, FieldValue>>> AggregateByUserFieldAsync(SearchFilter filter,
             string aggregationField,
             bool aggregateOrganismQuantity,
             int? precisionThreshold,
-            string? afterKey = null,
+            IReadOnlyDictionary<string, FieldValue>? afterKey = null,
             int? take = 10)
         {
             var indexNames = GetCurrentIndex(filter);
@@ -2387,21 +2379,15 @@ namespace SOS.Lib.Repositories.Processed
                 .Aggregations(a => a
                     .Add("aggregation", a => a
                         .Composite(c => c
-                            //.After(string.IsNullOrEmpty(afterKey) ? null : new CompositeKey(new Dictionary<string, object>() { { "termAggregation", afterKey } }))
+                            .After(ak => afterKey.ToFluentFieldDictionary())
                             .Size(take)
-                            .Sources([
-                                new Dictionary<string, CompositeAggregationSource>
-                                {
-                                    {
-                                        "termAggregation", new CompositeAggregationSource{
-                                            Terms = new CompositeTermsAggregation{
-                                                Field = "scriptField".ToField(),
-                                                MissingBucket = true
-                                            }
-                                        }
-                                    }
-                                }
-                            ])
+                            .Sources(
+                                [
+                                    CreateCompositeTermsAggregationSource(
+                                        ("termAggregation", "scriptField", SortOrder.Asc, true)
+                                    )
+                                ]
+                            )
                         )
                         .Aggregations(aa => {
                             var subAggs = aa.Add("unique_taxonids", a => a
@@ -2427,14 +2413,14 @@ namespace SOS.Lib.Repositories.Processed
             );
 
             searchResponse.ThrowIfInvalid();
-            searchResponse
+            afterKey = searchResponse
                .Aggregations
                 .GetComposite("aggregation")
-                    .AfterKey.FirstOrDefault().Value.TryGetString(out afterKey);
+                    .AfterKey;
               
-            return new SearchAfterResult<dynamic>
+            return new SearchAfterResult<dynamic, IReadOnlyDictionary<string, FieldValue>>
             {
-                SearchAfter = new[] { afterKey },
+                SearchAfter = afterKey,
                 Records = searchResponse
                     .Aggregations
                     .GetComposite("aggregation")

@@ -11,29 +11,10 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
     public interface IDatasetRepository : IProcessRepositoryBase<Dataset, string>
     {
         /// <summary>
-        ///  Add many items
-        /// </summary>
-        /// <param name="datasets"></param>
-        /// <returns></returns>
-        Task<int> AddManyAsync(IEnumerable<Dataset> datasets);
-
-        /// <summary>
         /// Clear the collection
         /// </summary>
         /// <returns></returns>
         Task<bool> ClearCollectionAsync();
-
-        /// <summary>
-        /// Turn of indexing
-        /// </summary>
-        /// <returns></returns>
-        Task<bool> DisableIndexingAsync();
-
-        /// <summary>
-        /// Turn on indexing
-        /// </summary>
-        /// <returns></returns>
-        Task EnableIndexingAsync();
 
         /// <summary>
         /// Name of index 
@@ -53,14 +34,6 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
 
         Task<List<Dataset>> GetDatasetsByIds(IEnumerable<string> ids, IEnumerable<string> excludeFields = null, IEnumerable<SortOrderFilter> sortOrders = null);
 
-        Task<bool> DeleteAllDocumentsAsync(bool waitForCompletion = false);
-
         Task WaitForIndexCreation(long expectedRecordsCount, TimeSpan? timeout = null);
-
-        /// <summary>
-        /// Count documents in index
-        /// </summary>        
-        /// <returns></returns>
-        Task<long> IndexCountAsync();
     }
 }

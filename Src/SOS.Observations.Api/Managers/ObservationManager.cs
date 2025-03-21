@@ -24,7 +24,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using OfficeOpenXml;
 using SOS.Lib.Models.Search.Enums;
-using Nest;
+using NetTopologySuite.Geometries;
 
 namespace SOS.Observations.Api.Managers
 {
@@ -624,10 +624,9 @@ namespace SOS.Observations.Api.Managers
                         if (areaGeographic.GeometryFilter?.Geometries?.Any() ?? false)
                         {
                             // Check if user has access to provided geometries
-                            foreach (var geoShape in areaGeographic.GeometryFilter.Geometries)
+                            foreach (var geometry in areaGeographic.GeometryFilter.Geometries)
                             {
-                                var geometry = geoShape.ToGeometry();
-                                if (!filter.ExtendedAuthorization.ExtendedAreas.Exists(ea => ea.GeographicAreas?.GeometryFilter?.Geometries?.Exists(g => g.ToGeometry().Intersects(geometry)) ?? false))
+                                if (!filter.ExtendedAuthorization.ExtendedAreas.Exists(ea => ea.GeographicAreas?.GeometryFilter?.Geometries?.Exists(g => g.Intersects(geometry)) ?? false))
                                 {
                                     return SignalSearchResult.NoPermissions;
                                 }
@@ -638,13 +637,10 @@ namespace SOS.Observations.Api.Managers
                     {
                         // Check if user has access to provided geometries
                         var authorizedGeometries = filter.ExtendedAuthorization.ExtendedAreas
-                            .SelectMany(ea => ea.GeographicAreas?.GeometryFilter?.Geometries ?? new List<IGeoShape>())
-                            .Select(g => g.ToGeometry())
-                            .ToList();
+                            .SelectMany(ea => ea.GeographicAreas?.GeometryFilter?.Geometries ?? new List<Geometry>()).ToList();
                         bool allOutside = true;
-                        foreach (var geoShape in filter.Location.Geometries.Geometries)
+                        foreach (var geometry in filter.Location.Geometries.Geometries)
                         {
-                            var geometry = geoShape.ToGeometry();
                             var filterGeometryCheck = CheckGeometryPermission(geometry, authorizedGeometries);
                             if (filterGeometryCheck == FilterGeometryCheck.IsInside)
                             {
@@ -662,9 +658,7 @@ namespace SOS.Observations.Api.Managers
                     if (filter.Location.Geometries?.BoundingBox != null)
                     {
                         var authorizedGeometries = filter.ExtendedAuthorization.ExtendedAreas
-                            .SelectMany(ea => ea.GeographicAreas?.GeometryFilter?.Geometries ?? new List<IGeoShape>())
-                            .Select(g => g.ToGeometry())
-                            .ToList();
+                            .SelectMany(ea => ea.GeographicAreas?.GeometryFilter?.Geometries ?? new List<Geometry>()).ToList();
                         var bboxGeometry = filter.Location.Geometries.BoundingBox.ToGeometry();
                         var filterGeometryCheck = CheckGeometryPermission(bboxGeometry, authorizedGeometries);
                         if (filterGeometryCheck == FilterGeometryCheck.IsOutside)
@@ -695,7 +689,7 @@ namespace SOS.Observations.Api.Managers
             }
         }
 
-        private FilterGeometryCheck CheckGeometryPermission(NetTopologySuite.Geometries.Geometry filterGeometry, List<NetTopologySuite.Geometries.Geometry> authorizedGeometries)
+        private FilterGeometryCheck CheckGeometryPermission(Geometry filterGeometry, List<Geometry> authorizedGeometries)
         {
             if (authorizedGeometries.Any(authGeo => authGeo.Contains(filterGeometry))) return FilterGeometryCheck.IsInside;
             if (!authorizedGeometries.Any(authGeo => authGeo.Intersects(filterGeometry))) return FilterGeometryCheck.IsOutside;

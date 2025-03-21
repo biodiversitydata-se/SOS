@@ -1,6 +1,7 @@
 ﻿using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
+using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.IO.DwcArchive.Interfaces;
 using SOS.Lib.Models.DarwinCore;
@@ -44,7 +45,7 @@ namespace SOS.Lib.IO.DwcArchive
                 while (searchResult?.Records?.Any() ?? false)
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
-                    var searchResultTask = processedObservationRepository.GetMultimediaBySearchAfterAsync(filter, searchResult.PointInTimeId, searchResult.SearchAfter);
+                    var searchResultTask = processedObservationRepository.GetMultimediaBySearchAfterAsync(filter, searchResult.PointInTimeId, searchResult.SearchAfter == null ? null : [searchResult.SearchAfter.ToFieldValue()]);
 
                     // Fetch observations from ElasticSearch.
                     var multimediaRows = searchResult.Records.ToArray();

@@ -22,7 +22,6 @@ namespace SOS.Observations.Api.Controllers
                     Converters =
                     {
                         new JsonStringEnumConverter(),
-                        new GeoShapeConverter(),
                         new NetTopologySuite.IO.Converters.GeoJsonConverterFactory() // Is this needed?
                     }
                 }));

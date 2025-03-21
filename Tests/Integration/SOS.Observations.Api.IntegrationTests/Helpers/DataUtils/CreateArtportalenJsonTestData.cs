@@ -60,7 +60,7 @@ public class CreateArtportalenJsonTestData : TestBase
 
         // Serialize using System.Text.Json.JsonSerializer
         var jsonSerializerOptions = new JsonSerializerOptions() { PropertyNameCaseInsensitive = true };
-        jsonSerializerOptions.Converters.Add(new GeoShapeConverter());
+        serializeOptions.Converters.Add(new NetTopologySuite.IO.Converters.GeoJsonConverterFactory());
         jsonSerializerOptions.Converters.Add(new GeoLocationConverter());
         var strJson2 = JsonSerializer.Serialize(verbatimObservations, jsonSerializerOptions);
         File.WriteAllText(@"C:\Temp\ArtportalenVerbatimObservations10000_2.json", strJson2, Encoding.UTF8);
@@ -103,7 +103,7 @@ public class CreateArtportalenJsonTestData : TestBase
         var serializeOptions = new JsonSerializerOptions { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull };
         serializeOptions.Converters.Add(new ObjectIdConverter());
         serializeOptions.Converters.Add(new JsonStringEnumConverter());
-        serializeOptions.Converters.Add(new GeoShapeConverter());
+        serializeOptions.Converters.Add(new NetTopologySuite.IO.Converters.GeoJsonConverterFactory());
         serializeOptions.Converters.Add(new GeoLocationConverter());
 
         var strJson = JsonSerializer.Serialize(verbatimChecklists, serializeOptions);

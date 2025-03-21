@@ -1,6 +1,7 @@
 ﻿using Asp.Versioning;
 using Asp.Versioning.ApiExplorer;
 using Autofac.Core;
+using Elastic.Clients.Elasticsearch.Cluster;
 using Hangfire;
 using Hangfire.Mongo;
 using Hangfire.Mongo.Migration.Strategies;
@@ -27,7 +28,6 @@ using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.OpenApi.Models;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
-using Nest;
 using Newtonsoft.Json.Converters;
 using Serilog;
 using SOS.Lib.ActionFilters;
@@ -262,7 +262,6 @@ namespace SOS.Observations.Api
                     options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
                     options.JsonSerializerOptions.ReadCommentHandling = JsonCommentHandling.Skip;
                     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-                    options.JsonSerializerOptions.Converters.Add(new GeoShapeConverter());
                     options.JsonSerializerOptions.Converters.Add(new NetTopologySuite.IO.Converters.GeoJsonConverterFactory()); // Is this needed?
                 });
 
@@ -454,7 +453,7 @@ namespace SOS.Observations.Api
                         .UseSimpleAssemblyNameTypeSerializer()
                         .UseRecommendedSerializerSettings(m =>
                         {
-                            m.Converters.Add(new NewtonsoftGeoShapeConverter());
+                            m.Converters.Add(new NetTopologySuite.IO.Converters.GeometryConverter());
                             m.Converters.Add(new StringEnumConverter());
                         })
                         .UseMongoStorage(new MongoClient(mongoConfiguration.GetMongoDbSettings()),
