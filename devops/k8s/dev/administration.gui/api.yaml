@@ -30,22 +30,9 @@ spec:
     metadata:
       annotations:
         logging: "true"
-        vault.hashicorp.com/agent-inject: "true"
-        vault.hashicorp.com/agent-inject-status: "update"
-        vault.hashicorp.com/ca-cert: "/vault/tls/ca-bundle.crt"
-        vault.hashicorp.com/tls-secret: "vault-ca-bundle"
-        vault.hashicorp.com/role: "sosadmingui"
-        vault.hashicorp.com/agent-inject-secret-env: "kv2/data/sosadmingui/dev"
-        vault.hashicorp.com/agent-inject-template-env: |
-          {{- with secret "kv2/data/sosadmingui/dev" -}}
-            {{- range $k, $v := .Data.data -}}
-              export {{ $k }}="{{ $v }}"
-            {{ end }}
-          {{- end }}
       labels:
         app: sosadmingui-api
     spec:
-      serviceAccountName: sosadmingui-sa
       topologySpreadConstraints: # try to spread out api instances over available nodes
       - labelSelector:
           matchLabels:
@@ -57,6 +44,61 @@ spec:
         - env:
           - name: ASPNETCORE_ENVIRONMENT
             value: k8s-dev
+          - name: ApiKey
+            valueFrom:
+                secretKeyRef:
+                  key: ApiKey
+                  name: sosadmingui-secret
+          - name: ApplicationId
+            valueFrom:
+                secretKeyRef:
+                  key: ApplicationId
+                  name: sosadmingui-secret
+          - name: AuthSecretKey
+            valueFrom:
+                secretKeyRef:
+                  key: AuthSecretKey
+                  name: sosadmingui-secret
+          - name: AuthSecretPassword
+            valueFrom:
+                secretKeyRef:
+                  key: AuthSecretPassword
+                  name: sosadmingui-secret
+          - name: InstrumentationKey
+            valueFrom:
+                secretKeyRef:
+                  key: InstrumentationKey
+                  name: sosadmingui-secret
+          - name: ProcessDbPassword
+            valueFrom:
+                secretKeyRef:
+                  key: ProcessDbPassword
+                  name: sosadmingui-secret
+          - name: ProcessDbUserName
+            valueFrom:
+                secretKeyRef:
+                  key: ProcessDbUserName
+                  name: sosadmingui-secret
+          - name: SearchDbPassword
+            valueFrom:
+                secretKeyRef:
+                  key: SearchDbPassword
+                  name: sosadmingui-secret
+          - name: SearchDbTestPassword
+            valueFrom:
+                secretKeyRef:
+                  key: SearchDbTestPassword
+                  name: sosadmingui-secret
+          - name: SearchDbTestUserName
+            valueFrom:
+                secretKeyRef:
+                  key: SearchDbTestUserName
+                  name: sosadmingui-secret
+          - name: SearchDbUserName
+            valueFrom:
+                secretKeyRef:
+                  key: SearchDbUserName
+                  name: sosadmingui-secret
           - name: AllowedOrigins
             value: https://sosadmingui-dev.wt.artdata.slu.se
           - name: ApiTestConfiguration
@@ -73,8 +115,6 @@ spec:
             value: '{"UserName": "SECRET_PLACEHOLDER", "Password": "SECRET_PLACEHOLDER", "Clusters": [{"Hosts": ["https://artsearch2-1-test.artdata.slu.se:9200"]}], "DebugMode": true, "IndexPrefix": "sos-st", "IndexSettings": [{"Name": "observation", "ReadBatchSize": 10000, "RequestTimeout": 300, "ScrollBatchSize": 5000, "ScrollTimeout": "300s"}]}'
           image: adbpocreg.azurecr.io/sosadmingui-api:$(Build.BuildId)
           name: sosadmingui-api
-          command: ["sh", "-c"]
-          args: [". /vault/secrets/env && dotnet SOS.Administration.Gui.dll"]
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 5000
