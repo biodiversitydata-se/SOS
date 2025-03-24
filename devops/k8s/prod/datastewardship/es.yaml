@@ -1,0 +1,16 @@
+apiVersion: external-secrets.io/v1beta1
+kind: ExternalSecret
+metadata:
+  name: datastewardship-es
+  namespace: datastewardship
+spec:
+  refreshInterval: "120s"
+  secretStoreRef:
+    name: kubernetes-p2-artdata-css
+    kind: ClusterSecretStore
+  target:
+    name: datastewardship-secret
+    creationPolicy: Owner
+  dataFrom:
+  - extract:
+      key: kv2/datastewardship

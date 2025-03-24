@@ -30,22 +30,9 @@ spec:
     metadata:
       annotations:
         logging: "true"
-        vault.hashicorp.com/agent-inject: "true"
-        vault.hashicorp.com/agent-inject-status: "update"
-        vault.hashicorp.com/ca-cert: "/vault/tls/ca-bundle.crt"
-        vault.hashicorp.com/tls-secret: "vault-ca-bundle"
-        vault.hashicorp.com/role: "sos-observations"
-        vault.hashicorp.com/agent-inject-secret-env: "kv2/data/sos-observations"
-        vault.hashicorp.com/agent-inject-template-env: |
-          {{- with secret "kv2/data/sos-observations" -}}
-            {{- range $k, $v := .Data.data -}}
-              export {{ $k }}='{{ $v }}'
-            {{ end }}
-          {{- end }}
       labels:
         app: sos-observations-api
     spec:
-      serviceAccountName: sos-observations-sa
       topologySpreadConstraints: # try to spread out api instances over available nodes
       - labelSelector:
           matchLabels:
@@ -55,14 +42,77 @@ spec:
         whenUnsatisfiable: DoNotSchedule
       containers:
         - env:
-            - name: ASPNETCORE_ENVIRONMENT
-              value: prod
-            - name: CorsAllowAny
-              value: "false"
+          - name: ASPNETCORE_ENVIRONMENT
+            value: prod
+          - name: AzureSubscriptionKey
+            valueFrom:
+                secretKeyRef:
+                  key: AzureSubscriptionKey
+                  name: sos-observations-secret
+          - name: BlobStorageConnectionString
+            valueFrom:
+                secretKeyRef:
+                  key: BlobStorageConnectionString
+                  name: sos-observations-secret
+          - name: BlobStorageKey
+            valueFrom:
+                secretKeyRef:
+                  key: BlobStorageKey
+                  name: sos-observations-secret
+          - name: ClientSecret
+            valueFrom:
+                secretKeyRef:
+                  key: ClientSecret
+                  name: sos-observations-secret
+          - name: Salt
+            valueFrom:
+                secretKeyRef:
+                  key: Salt
+                  name: sos-observations-secret
+          - name: Password
+            valueFrom:
+                secretKeyRef:
+                  key: Password
+                  name: sos-observations-secret
+          - name: InstrumentationKey
+            valueFrom:
+                secretKeyRef:
+                  key: InstrumentationKey
+                  name: sos-observations-secret
+          - name: ProcessDbPassword
+            valueFrom:
+                secretKeyRef:
+                  key: ProcessDbPassword
+                  name: sos-observations-secret
+          - name: ProcessDbUserName
+            valueFrom:
+                secretKeyRef:
+                  key: ProcessDbUserName
+                  name: sos-observations-secret
+          - name: SearchDbPassword
+            valueFrom:
+                secretKeyRef:
+                  key: SearchDbPassword
+                  name: sos-observations-secret
+          - name: SearchDbUserName
+            valueFrom:
+                secretKeyRef:
+                  key: SearchDbUserName
+                  name: sos-observations-secret
+          - name: HangfireDbPassword
+            valueFrom:
+                secretKeyRef:
+                  key: HangfireDbPassword
+                  name: sos-observations-secret
+          - name: HangfireDbUserName
+            valueFrom:
+                secretKeyRef:
+                  key: HangfireDbUserName
+                  name: sos-observations-secret
+          - name: CorsAllowAny
+            value: "false"
           image: adbpocreg.azurecr.io/sos-observations-api:$(Parameters.ImageTag)
           name: sos-observations-api
-          command: ["sh", "-c"]
-          args: [". /vault/secrets/env && dotnet SOS.Observations.Api.dll"]
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 5000
