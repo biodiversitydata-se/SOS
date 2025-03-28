@@ -1,5 +1,4 @@
-﻿using Microsoft.IdentityModel.Tokens;
-using MongoDB.Driver;
+﻿using MongoDB.Driver;
 using Elastic.Clients.Elasticsearch;
 using Elastic.Clients.Elasticsearch.QueryDsl;
 using SOS.Lib.Enums;
@@ -71,7 +70,7 @@ namespace SOS.Lib.Extensions
             // make sure that the ordering will be unique.
             var adjustedSortings = sortings.ToList();
             string defaultSortProperty = GetDefaultSortPropertyName(typeof(T));
-            if (!defaultSortProperty.IsNullOrEmpty() && !sortings.Select(m => m.SortBy?.ToLower().Trim()).Contains(defaultSortProperty))
+            if (!string.IsNullOrEmpty(defaultSortProperty) && !sortings.Select(m => m.SortBy?.ToLower().Trim()).Contains(defaultSortProperty))
             {
                 adjustedSortings.Add(new SortOrderFilter
                 {
