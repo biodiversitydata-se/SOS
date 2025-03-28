@@ -23,7 +23,7 @@ namespace SOS.Lib.Extensions
 
         public static void ThrowIfInvalid<T>(this SearchResponse<T> response) where T : class
         {
-            if (!response.IsValidResponse)
+            if (!response?.IsValidResponse ?? true)
             {
                 ThrowException(response.ElasticsearchServerError, response.DebugInformation);
             }
@@ -32,6 +32,14 @@ namespace SOS.Lib.Extensions
         public static void ThrowIfInvalid(this CountResponse response)
         {
             if (!response.IsValidResponse)
+            {
+                ThrowException(response.ElasticsearchServerError, response.DebugInformation);
+            }
+        }
+
+        public static void ThrowIfInvalid(this OpenPointInTimeResponse response)
+        {
+            if (!response?.IsValidResponse ?? true)
             {
                 ThrowException(response.ElasticsearchServerError, response.DebugInformation);
             }

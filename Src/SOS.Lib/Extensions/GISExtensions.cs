@@ -720,9 +720,14 @@ namespace SOS.Lib.Extensions
             return geometry;
         }
 
-        public static GeoLocation ToGeoLocation(this Point point)
+        public static LatLonGeoLocation ToGeoLocation(this Point point)
         {
-            return GeoLocation.Coordinates(new[] { point.Coordinate.X , point.Coordinate.Y });
+            if (point == null)
+            {
+                return null;
+            }
+
+            return new LatLonGeoLocation { Lat = point.Coordinate.Y, Lon = point.Coordinate.X };
         }
 
         public static Envelope Transform(

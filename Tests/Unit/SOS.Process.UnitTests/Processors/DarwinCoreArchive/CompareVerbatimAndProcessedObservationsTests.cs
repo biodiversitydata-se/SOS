@@ -57,6 +57,7 @@ namespace SOS.Process.UnitTests.Processors.DarwinCoreArchive
                 Formatting.Indented,
                 new JsonSerializerSettings
                 {
+                    Converters = [new NetTopologySuite.IO.Converters.GeometryConverter()],
                     NullValueHandling = NullValueHandling.Ignore
                 });
 

@@ -374,7 +374,7 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     Point used in distance from point search.
         /// </summary>
         [SwaggerExclude]
-        public GeoLocation PointLocation { get; set; }
+        public LatLonGeoLocation PointLocation { get; set; }
 
         /// <summary>
         ///     Point with accuracy buffer (WGS84).

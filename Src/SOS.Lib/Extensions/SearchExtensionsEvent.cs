@@ -22,17 +22,13 @@ namespace SOS.Lib
             var queries = new List<Action<QueryDescriptor<TQueryDescriptor>>>();
             if (filter == null) return queries;
 
-            queries.Add(q => q
-                .TryAddTermsCriteria("dataProviderId", filter.DataProviderIds)
+            queries.TryAddTermsCriteria("dataProviderId", filter.DataProviderIds)
                 .TryAddTermsCriteria("eventId", filter.EventIds)
-                .TryAddTermsCriteria("dataStewardship.datasetIdentifier", filter.DatasetIds)
-            );
+                .TryAddTermsCriteria("dataStewardship.datasetIdentifier", filter.DatasetIds);
            
             if (filter.IsPartOfDataStewardshipDataset.GetValueOrDefault(false))
             {
-                queries.Add(q => q
-                    .AddExistsCriteria("dataStewardship")
-                );
+                queries.AddExistsCriteria("dataStewardship");
             }
 
             return queries;

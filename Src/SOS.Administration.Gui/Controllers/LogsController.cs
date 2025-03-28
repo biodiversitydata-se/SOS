@@ -1,4 +1,6 @@
 ﻿using Elastic.Clients.Elasticsearch;
+using Elastic.Clients.Elasticsearch.IndexManagement;
+using Elastic.Clients.Elasticsearch.QueryDsl;
 using SOS.Lib.Extensions;
 using System.Collections.Generic;
 using System.Linq;
@@ -86,6 +88,30 @@ namespace SOS.Administration.Gui.Controllers
             {
                 queryString = "*" + textFilter + "*";
             }
+            var queries = new List<Action<QueryDescriptor<LogEntry>>>()
+                .TryAddTermsCriteria("log.level.keyword", filterLevels)
+                .TryAddTermsCriteria("host.name.keyword", filterHosts)
+                .TryAddTermsCriteria("process.name.keyword", filterProcesses)
+                .TryAddDateRangeCriteria("timestamp", DateTime.Now.AddMinutes(-dateFilterMinutes), RangeTypes.GreaterThanOrEquals);
+
+            var filtered_levels_queries = new List<Action<QueryDescriptor<LogEntry>>>()
+                .TryAddWildcardCriteria("message", queryString)
+                .TryAddTermsCriteria("host.name.keyword", filterHosts)
+                .TryAddTermsCriteria("process.name.keyword", filterProcesses)
+                .TryAddDateRangeCriteria("timestamp", DateTime.Now.AddMinutes(-dateFilterMinutes), RangeTypes.GreaterThanOrEquals);
+
+            var filtered_hosts_queries = new List<Action<QueryDescriptor<LogEntry>>>()
+                .TryAddWildcardCriteria("message", queryString)
+                .TryAddTermsCriteria("log.level.keyword", filterLevels)
+                .TryAddTermsCriteria("process.name.keyword", filterProcesses)
+                .TryAddDateRangeCriteria("timestamp", DateTime.Now.AddMinutes(-dateFilterMinutes), RangeTypes.GreaterThanOrEquals);
+
+            var filtered_processes_queries = new List<Action<QueryDescriptor<LogEntry>>>()
+                .TryAddWildcardCriteria("message", queryString)
+                .TryAddTermsCriteria("log.level.keyword", filterLevels)
+                .TryAddTermsCriteria("host.name.keyword", filterHosts)
+                .TryAddDateRangeCriteria("timestamp", DateTime.Now.AddMinutes(-dateFilterMinutes), RangeTypes.GreaterThanOrEquals);
+
             var result = await _elasticClient.SearchAsync<LogEntry>(p => p
                 .Index(_indexName)
                 .Size(take)
@@ -93,12 +119,7 @@ namespace SOS.Administration.Gui.Controllers
                 .Query(q => q
                     .Bool(b => b
                         .Must(f => f.Wildcard(m => m.Field(ff => ff.Error.Message).Value(queryString)))
-                        .Filter(f => f
-                            .TryAddTermsCriteria("log.level.keyword", filterLevels)
-                            .TryAddTermsCriteria("host.name.keyword", filterHosts)
-                            .TryAddTermsCriteria("process.name.keyword", filterProcesses)
-                            .TryAddDateRangeCriteria("timestamp", DateTime.Now.AddMinutes(-dateFilterMinutes), RangeTypes.GreaterThanOrEquals)
-                        )
+                        .Filter(queries.ToArray())
                     )
                 )
                 .Aggregations(a => a
@@ -107,14 +128,7 @@ namespace SOS.Administration.Gui.Controllers
                             .Add("filtered_levels", a => a
                                 .Filter(f => f
                                     .Bool(b => b
-                                        .Must(m => m
-                                            .TryAddWildcardCriteria("message", queryString)
-                                        )
-                                        .Filter(f => f
-                                            .TryAddTermsCriteria("host.name.keyword", filterHosts)
-                                            .TryAddTermsCriteria("process.name.keyword", filterProcesses)
-                                            .TryAddDateRangeCriteria("timestamp", DateTime.Now.AddMinutes(-dateFilterMinutes), RangeTypes.GreaterThanOrEquals)
-                                        )
+                                        .Filter(filtered_levels_queries.ToArray())
                                     )
                                 )
                                 .Aggregations(fa => fa
@@ -128,14 +142,7 @@ namespace SOS.Administration.Gui.Controllers
                             .Add("filtered_hosts", a => a
                                 .Filter(f => f
                                     .Bool(b => b
-                                        .Must(m => m
-                                            .TryAddWildcardCriteria("message", queryString)
-                                        )
-                                        .Filter(f => f
-                                            .TryAddTermsCriteria("log.level.keyword", filterLevels)
-                                            .TryAddTermsCriteria("process.name.keyword", filterProcesses)
-                                            .TryAddDateRangeCriteria("timestamp", DateTime.Now.AddMinutes(-dateFilterMinutes), RangeTypes.GreaterThanOrEquals)
-                                        )
+                                        .Filter(filtered_hosts_queries.ToArray())
                                     )
                                 )
                                 .Aggregations(fa => fa
@@ -149,14 +156,7 @@ namespace SOS.Administration.Gui.Controllers
                             .Add("filtered_processes", a => a
                                 .Filter(f => f
                                     .Bool(b => b
-                                        .Must(m => m
-                                            .TryAddWildcardCriteria("message", queryString)
-                                        )
-                                        .Filter(f => f
-                                            .TryAddTermsCriteria("log.level.keyword", filterLevels)
-                                            .TryAddTermsCriteria("host.name.keyword", filterHosts)
-                                            .TryAddDateRangeCriteria("timestamp", DateTime.Now.AddMinutes(-dateFilterMinutes), RangeTypes.GreaterThanOrEquals)
-                                        )
+                                        .Filter(filtered_processes_queries.ToArray())
                                     )
                                 )
                                 .Aggregations(fa => fa

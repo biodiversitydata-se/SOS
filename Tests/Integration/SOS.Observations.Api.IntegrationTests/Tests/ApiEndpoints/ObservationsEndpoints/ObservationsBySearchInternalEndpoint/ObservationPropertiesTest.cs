@@ -266,7 +266,7 @@ public class ObservationPropertiesTest : TestBase
                 Municipality = new Lib.Models.Processed.Observation.Area { FeatureId = "FId", Name = "M" },
                 Parish = new Lib.Models.Processed.Observation.Area { FeatureId = "FId", Name = "P" },
                 Point = new NetTopologySuite.Geometries.Point(17.577532793729183, 59.86035103929389),
-                PointLocation = Elastic.Clients.Elasticsearch.GeoLocation.Coordinates([17.577532793729183, 59.86035103929389]),
+                PointLocation = new Elastic.Clients.Elasticsearch.LatLonGeoLocation { Lat = 59.86035103929389, Lon = 17.577532793729183 },
                 PointRadiusSpatialFit = "PRSF",
                 PointWithBuffer = new NetTopologySuite.Geometries.Point(17.577532793729183, 59.86035103929389).ToCircle(10),
                 PointWithDisturbanceBuffer = new NetTopologySuite.Geometries.Point(17.577532793729183, 59.86035103929389).ToCircle(15),

@@ -1,7 +1,9 @@
 ﻿using Elastic.Clients.Elasticsearch;
 using Elastic.Clients.Elasticsearch.Cluster;
 using Elastic.Clients.Elasticsearch.Core.Search;
+using Elastic.Clients.Elasticsearch.QueryDsl;
 using Microsoft.Extensions.Logging;
+using SOS.Lib;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Extensions;
@@ -52,25 +54,20 @@ namespace SOS.Observations.Api.Repositories
             {
                 return null;
             }
+            
+            var queries = new List<Action<QueryDescriptor<Observation>>>()
+                 .TryAddTermsCriteria("location.locationId", locationIds);
 
             var searchResponse = await Client.SearchAsync<Observation>(s => s
                 .Index($"{PublicIndexName}, {ProtectedIndexName}")
                 .Query(q => q
                     .Bool(b => b
-                        .Filter(f => f
-                            .TryAddTermsCriteria("location.locationId", locationIds)
-                        )
+                        .Filter(queries.ToArray())
                     )
                 )
                 .Collapse(c => c.Field("location.locationId"))
                 .Size(locationIds.Count())
-                .Source(new SourceConfig(
-                    new SourceFilter()
-                        {
-                            Excludes = Fields.FromString("location.pointLocation"),
-                            Includes = Fields.FromString("location")
-                        }
-                    )
+                .Source((Includes : new[] { "location" }, Excludes: new[] { "location.pointLocation" }).ToProjection()
                 )
                .TrackTotalHits(new TrackHits(false))
             );

@@ -110,7 +110,7 @@ namespace SOS.Lib.Helpers
             }
             CachedProperties.TryAdd(type, new ConcurrentDictionary<PropertyInfo, Func<object, object>>());
 
-            var properties = type.GetProperties().Where(x => x.CanRead);
+            var properties = type.GetProperties().Where(x => x.CanRead && !x.Module.Name.Contains("NetTopologySuite", StringComparison.CurrentCultureIgnoreCase));
             foreach (var propertyInfo in properties)
             {
                 var getter = CompilePropertyGetter(propertyInfo);

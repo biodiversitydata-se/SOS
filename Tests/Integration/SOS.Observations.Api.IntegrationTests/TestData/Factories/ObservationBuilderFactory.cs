@@ -105,7 +105,7 @@ internal static class ObservationsBuilderFactory
         {
             obs.Location.DecimalLatitude = latitude;
             obs.Location.DecimalLongitude = longitude;
-            obs.Location.PointLocation = GeoLocation.Coordinates([longitude, latitude]);
+            obs.Location.PointLocation = new LatLonGeoLocation { Lat = latitude, Lon = longitude };
             obs.Location.Point = new NetTopologySuite.Geometries.Point(longitude, latitude);
         });
 

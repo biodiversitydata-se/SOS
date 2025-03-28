@@ -35,13 +35,12 @@ namespace SOS.Lib.Repositories.Processed
         private async Task<bool> AddCollectionAsync()
         {
             var createIndexResponse = await Client.Indices.CreateAsync<Dataset>(IndexName, s => s
+               .Index(IndexName)
                .Settings(s => s
                    .NumberOfShards(NumberOfShards)
                    .NumberOfReplicas(NumberOfReplicas)
-                   .Settings(s => s
-                       .MaxResultWindow(100000)
-                       .MaxTermsCount(110000)
-                   )
+                   .MaxResultWindow(100000)
+                   .MaxTermsCount(110000)
                )
                .Mappings(map => map
                    .Properties(ps => ps
@@ -99,15 +98,8 @@ namespace SOS.Lib.Repositories.Processed
             if (ids == null || !ids.Any()) throw new ArgumentException("ids is empty");
 
             var sortDescriptor = await Client.GetSortDescriptorAsync<Dataset>(IndexName, sortOrders);
-
-            var source = new SourceConfig(new SourceFilter { 
-                Excludes = excludeFields != null && excludeFields.Count() > 0 ? Fields.FromStrings(excludeFields.ToArray()) : null,
-                Includes = new[] { "occurrence.occurrenceId" }.ToFields() 
-            });
             var queries = new List<Action<QueryDescriptor<Dataset>>>();
-            queries.Add(q => q
-                .TryAddTermsCriteria("identifier", ids)
-            );
+            queries.TryAddTermsCriteria("identifier", ids);
           
             var searchResponse = await Client.SearchAsync<Dataset>(s => s
                 .Index(IndexName)
@@ -116,7 +108,7 @@ namespace SOS.Lib.Repositories.Processed
                         .Filter(queries.ToArray())
                     )
                 )
-                .Source(source)
+                .Source((Includes: new[] { "occurrence.occurrenceId" }, Excludes: excludeFields).ToProjection())
                 .Size(ids?.Count() ?? 0)
                 .Sort(sortDescriptor.ToArray())
                 .TrackTotalHits(new TrackHits(false))

@@ -15,6 +15,8 @@ using System.Threading.Tasks;
 using Elastic.Clients.Elasticsearch.Cluster;
 using SOS.Lib.Extensions;
 using Elastic.Clients.Elasticsearch.Aggregations;
+using Elastic.Clients.Elasticsearch.IndexManagement;
+using Elastic.Transport;
 
 namespace SOS.Lib.Repositories.Processed
 {
@@ -25,12 +27,15 @@ namespace SOS.Lib.Repositories.Processed
     {
         private readonly IElasticClientManager _elasticClientManager;
         private readonly ICache<string, ProcessedConfiguration> _processedConfigurationCache;
+        private readonly bool _toggleable;
+        private int _maxDiskUsed;
+        private int _writeCallsSinceLastDiskUsageCheck;
         protected readonly IClassCache<ConcurrentDictionary<string, HealthResponse>> _clusterHealthCache;
         protected readonly ElasticSearchConfiguration _elasticConfiguration;
         private readonly ElasticSearchIndexConfiguration _elasticSearchIndexConfiguration;
-        private readonly bool _toggleable;
+        
         protected string _id = typeof(TEntity).Name;
-
+         
         /// <summary>
         ///     Disposed
         /// </summary>
@@ -79,9 +84,9 @@ namespace SOS.Lib.Repositories.Processed
             return items.Count();
         }
 
-        protected ElasticsearchClient Client => ClientCount == 1 ? _elasticClientManager.Clients.FirstOrDefault() : _elasticClientManager.Clients[CurrentInstance];
+        protected ElasticsearchClient Client => ClientCount == 1 ? _elasticClientManager.Clients.First() : _elasticClientManager.Clients[CurrentInstance];
 
-        protected ElasticsearchClient InActiveClient => ClientCount == 1 ? _elasticClientManager.Clients.FirstOrDefault() : _elasticClientManager.Clients[InActiveInstance];
+        protected ElasticsearchClient InActiveClient => ClientCount == 1 ? _elasticClientManager.Clients.First() : _elasticClientManager.Clients[InActiveInstance];
 
         protected int ClientCount => _elasticClientManager.Clients.Length;
 
@@ -178,8 +183,15 @@ namespace SOS.Lib.Repositories.Processed
 
         protected async Task<bool> DeleteCollectionAsync(string indexName)
         {
-            var res = await Client.Indices.DeleteAsync(indexName);
-            return res.IsValidResponse;
+            try
+            {
+                var res = await Client.Indices.DeleteAsync(indexName);
+                return res.IsValidResponse;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         /// <summary>
@@ -248,6 +260,61 @@ namespace SOS.Lib.Repositories.Processed
         protected string ScrollTimeout => _elasticSearchIndexConfiguration.ScrollTimeout;
 
         /// <summary>
+        /// Execute search after query
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="searchIndex"></param>
+        /// <param name="searchDescriptor"></param>
+        /// <param name="pointInTimeId"></param>
+        /// <param name="nextPageKey"></param>
+        /// <returns></returns>
+        protected async Task<SearchResponse<T>> SearchAfterAsync<T>(
+           string searchIndex,
+           SearchRequestDescriptor<T> searchDescriptor,
+           string pointInTimeId = null,
+           ICollection<FieldValue> nextPageKey = null) where T : class
+        {
+            var keepAlive = new Duration(1000 * 60 * 5);
+            if (string.IsNullOrEmpty(pointInTimeId))
+            {
+                var pitResponse = await Client.OpenPointInTimeAsync(searchIndex, pit => pit
+                    .RequestConfiguration(c => c
+                        .RequestTimeout(TimeSpan.FromSeconds(30))
+                    )
+                    .KeepAlive(keepAlive)
+                );
+
+                pitResponse.ThrowIfInvalid();
+
+                pointInTimeId = pitResponse.Id;
+            }
+
+            // Retry policy by Polly
+            var searchResponse = await PollyHelper.GetRetryPolicy(3, 100).ExecuteAsync(async () =>
+            {
+                var queryResponse = await Client.SearchAsync(searchDescriptor
+                   .Index(searchIndex)
+                   .Sort(s => s.Field("_shard_doc"))
+                   .SearchAfter(nextPageKey)
+                   .Size(ScrollBatchSize)
+                   .TrackTotalHits(new Elastic.Clients.Elasticsearch.Core.Search.TrackHits(false))
+                   .Pit(pointInTimeId, pit => pit.KeepAlive(keepAlive))
+                );
+
+                queryResponse.ThrowIfInvalid();
+
+                return queryResponse;
+            });
+
+            if (!string.IsNullOrEmpty(pointInTimeId) && (searchResponse?.Hits?.Count ?? 0) == 0)
+            {
+                await Client.ClosePointInTimeAsync(pitr => pitr.Id(pointInTimeId));
+            }
+
+            return searchResponse;
+        }
+
+        /// <summary>
         /// Set index refresh interval
         /// </summary>
         /// <param name="index"></param>
@@ -255,20 +322,11 @@ namespace SOS.Lib.Repositories.Processed
         /// <returns></returns>
         protected async Task<bool> SetIndexRefreshIntervalAsync(string index, Duration duration)
         {
-            var getResponse = await Client.Indices.GetSettingsAsync<TEntity>(r => r.Name(new[] { index }));
+            var indexState = new IndexState() { Settings = new IndexSettings() };
+            indexState.Settings.RefreshInterval = duration;
+            var setResponse = await Client.Indices.PutSettingsAsync<TEntity>(indexState.Settings, index);
 
-            if (getResponse.IsValidResponse)
-            {
-                if (getResponse.Values.TryGetValue(index, out var indexState))
-                {
-                    indexState.Settings.RefreshInterval = duration;
-                    var setResponse = await Client.Indices.PutSettingsAsync<TEntity>(indexState.Settings);
-
-                    return setResponse.IsValidResponse;
-                }
-            }
-
-            return false;
+            return setResponse.IsValidResponse;
         }
 
         /// <summary>
@@ -284,17 +342,28 @@ namespace SOS.Lib.Repositories.Processed
             {
                 return null;
             }
-            var percentagesUsed = await GetDiskUsageAsync();
-            foreach (var percentageUsed in percentagesUsed)
+            // We don't need to check disk space every time
+            if (_maxDiskUsed == 0 || 
+                (_maxDiskUsed < 50 && _writeCallsSinceLastDiskUsageCheck >= 20) ||
+                (_maxDiskUsed < 80 && _writeCallsSinceLastDiskUsageCheck >= 10)
+            )
             {
-                if (percentageUsed.Value > 90)
+                _writeCallsSinceLastDiskUsageCheck = 0;
+                var percentagesUsed = await GetDiskUsageAsync();
+                foreach (var percentageUsed in percentagesUsed)
                 {
-                    Logger.LogError($"Disk usage too high in cluster, node {percentageUsed.Key}: ({percentageUsed.Value}%), aborting indexing");
-                    return null;
+                    if (percentageUsed.Value > 90)
+                    {
+                        Logger.LogError($"Disk usage too high in cluster, node {percentageUsed.Key}: ({percentageUsed.Value}%), aborting indexing");
+                        return null;
+                    }
+                    _maxDiskUsed = percentageUsed.Value > _maxDiskUsed ? percentageUsed.Value : _maxDiskUsed;
+                    Logger.LogDebug($"Current diskusage in cluster, node {percentageUsed.Key}: ({percentageUsed.Value}%");
                 }
-                Logger.LogDebug($"Current diskusage in cluster, node {percentageUsed.Key}: ({percentageUsed.Value}%");
             }
-
+            
+            _writeCallsSinceLastDiskUsageCheck++;
+            
             var count = 0;
             return Client.BulkAll(items, b => b
                     .Index(IndexName)
@@ -426,16 +495,16 @@ namespace SOS.Lib.Repositories.Processed
         public async Task<IDictionary<string, int>> GetDiskUsageAsync()
         {
             var diskUsage = new Dictionary<string, int>();
-            var response = await Client.Nodes.StatsAsync(stats => stats.Metric(new Metrics("fs")));
+
+            var response = await Client.Nodes.StatsAsync(s => s.Metric(new Metrics("fs")));
             if (response.IsValidResponse)
             {
                 // Get the disk usage from the response
                 foreach (var node in response.Nodes)
                 {
-                    foreach (var data in node.Value.Fs.Data)
-                    {
-                        diskUsage.Add(data.Path, (int)((data.FreeInBytes ?? 0) / (data.TotalInBytes ?? 1)));
-                    }
+                    var free = node.Value.Fs.Total.AvailableInBytes ?? 0;
+                    var total = node.Value.Fs.Total.TotalInBytes ?? 1;
+                    diskUsage.Add(node.Key, 100 - (int)Math.Abs(((double)free / (double)total) * 100));
                 }
             }
 

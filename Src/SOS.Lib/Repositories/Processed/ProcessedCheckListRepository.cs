@@ -35,6 +35,7 @@ namespace SOS.Lib.Repositories.Processed
         private async Task<bool> AddCollectionAsync()
         {
             var createIndexResponse = await Client.Indices.CreateAsync<Checklist>(IndexName, i => i
+                .Index(IndexName)
                 .Settings(s => s
                     .NumberOfShards(NumberOfShards)
                     .NumberOfReplicas(NumberOfReplicas)
@@ -367,7 +368,7 @@ namespace SOS.Lib.Repositories.Processed
                     )
 
                 .Size(1)
-                .Source(new SourceConfig(new SourceFilter { Excludes = internalCall ? null : new[] { "artportalenInternal" }.ToFields() }))
+                .Source((Includes: Array.Empty<string>(), Excludes: internalCall ? null : new[] { "artportalenInternal" }).ToProjection())
                 .TrackTotalHits(new TrackHits(false))
             );
 
@@ -435,15 +436,13 @@ namespace SOS.Lib.Repositories.Processed
         /// <returns></returns>
         public async Task<int> GetPresentCountAsync(ChecklistSearchFilter filter)
         {
-            var query = filter.ToQuery<Checklist>();
-            query.Add(q => q
-                .TryAddTermsCriteria("taxonIdsFound", filter.Taxa?.Ids)
-            );
+            var queries = filter.ToQuery<Checklist>();
+            queries.TryAddTermsCriteria("taxonIdsFound", filter.Taxa?.Ids);
 
             var countResponse = await Client.CountAsync<Checklist>(IndexName, s => s
                 .Query(q => q
                     .Bool(b => b
-                        .Filter(query.ToArray())
+                        .Filter(queries.ToArray())
                     )
                 )
             );
@@ -459,15 +458,15 @@ namespace SOS.Lib.Repositories.Processed
         /// <returns></returns>
         public async Task<int> GetAbsentCountAsync(ChecklistSearchFilter filter)
         {
-            var query = filter.ToQuery<Checklist>();
-            var nonQuery = new QueryDescriptor<Checklist>();
-            nonQuery.TryAddTermsCriteria("taxonIdsFound", filter.Taxa?.Ids);
+            var queries = filter.ToQuery<Checklist>();
+            var nonQueries = new List<Action<QueryDescriptor<Checklist>>>();
+            nonQueries.TryAddTermsCriteria("taxonIdsFound", filter.Taxa?.Ids);
 
             var countResponse = await Client.CountAsync<Checklist>(IndexName, s => s
                 .Query(q => q
                     .Bool(b => b
-                        .Filter(query.ToArray())
-                        .MustNot(nonQuery)
+                        .Filter(queries.ToArray())
+                        .MustNot(nonQueries.ToArray())
                     )
                 )
             );

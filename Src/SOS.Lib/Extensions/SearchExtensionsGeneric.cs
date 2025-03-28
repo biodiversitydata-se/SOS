@@ -165,83 +165,85 @@ namespace SOS.Lib.Extensions
         /// Try add date filter criteria
         /// </summary>
         /// <typeparam name="TQueryDescriptor"></typeparam>
-        /// <param name="query"></param>
+        /// <param name="queries"></param>
         /// <param name="eventField"></param>
         /// <param name="filter"></param>
         /// <returns></returns>
-        public static QueryDescriptor<TQueryDescriptor> TryAddEventDateCritera<TQueryDescriptor>(
-           this QueryDescriptor<TQueryDescriptor> query, string eventField, DateFilter filter) where TQueryDescriptor : class
+        public static ICollection<Action<QueryDescriptor<TQueryDescriptor>>> TryAddEventDateCritera<TQueryDescriptor>(
+           this ICollection<Action<QueryDescriptor<TQueryDescriptor>>> queries, string eventField, DateFilter filter) where TQueryDescriptor : class
         {
             if (filter != null)
             {
-                query.TryAddDateRangeFilters(filter, $"{eventField}.startDate", $"{eventField}.endDate");
-                query.TryAddTimeRangeFilters(filter, $"{eventField}.startDate");
+                queries.TryAddDateRangeFilters(filter, $"{eventField}.startDate", $"{eventField}.endDate");
+                queries.TryAddTimeRangeFilters(filter, $"{eventField}.startDate");
                 
             }
-            return query;
+            return queries;
         }
 
- 
+
         /// <summary>
         /// Add date range query to filter
         /// </summary>
         /// <typeparam name="TQueryDescriptor"></typeparam>
-        /// <param name="query"></param>
+        /// <param name="queries"></param>
         /// <param name="filter"></param>
         /// <param name="startDateField"></param>
         /// <param name="endDateField"></param>
-        public static QueryDescriptor<TQueryDescriptor> TryAddDateRangeFilters<TQueryDescriptor>(this QueryDescriptor<TQueryDescriptor> query, DateFilter filter, string startDateField, string endDateField) where TQueryDescriptor : class
+        public static ICollection<Action<QueryDescriptor<TQueryDescriptor>>> TryAddDateRangeFilters<TQueryDescriptor>(this ICollection<Action<QueryDescriptor<TQueryDescriptor>>> queries, DateFilter filter, string startDateField, string endDateField) where TQueryDescriptor : class
         {
             if (filter != null)
             {
                 if (filter.DateFilterType == DateFilter.DateRangeFilterType.BetweenStartDateAndEndDate)
                 {
-                    query.TryAddDateRangeCriteria(startDateField, filter.StartDate, RangeTypes.GreaterThanOrEquals);
-                    query.TryAddDateRangeCriteria(endDateField, filter.EndDate, RangeTypes.LessThanOrEquals);
+                    queries.TryAddDateRangeCriteria(startDateField, filter.StartDate, RangeTypes.GreaterThanOrEquals);
+                    queries.TryAddDateRangeCriteria(endDateField, filter.EndDate, RangeTypes.LessThanOrEquals);
                 }
                 else if (filter.DateFilterType == DateFilter.DateRangeFilterType.OverlappingStartDateAndEndDate)
                 {
-                    query.TryAddDateRangeCriteria(startDateField, filter.EndDate, RangeTypes.LessThanOrEquals);
-                    query.TryAddDateRangeCriteria(endDateField, filter.StartDate, RangeTypes.GreaterThanOrEquals);
+                    queries.TryAddDateRangeCriteria(startDateField, filter.EndDate, RangeTypes.LessThanOrEquals);
+                    queries.TryAddDateRangeCriteria(endDateField, filter.StartDate, RangeTypes.GreaterThanOrEquals);
 
                 }
                 else if (filter.DateFilterType == DateFilter.DateRangeFilterType.OnlyStartDate)
                 {
                     if (filter.StartDate.HasValue && filter.EndDate.HasValue)
                     {
-                        query.TryAddDateRangeCriteria(startDateField, filter.StartDate, RangeTypes.GreaterThanOrEquals);
-                        query.TryAddDateRangeCriteria(startDateField, filter.EndDate, RangeTypes.LessThanOrEquals);
+                        queries.TryAddDateRangeCriteria(startDateField, filter.StartDate, RangeTypes.GreaterThanOrEquals);
+                        queries.TryAddDateRangeCriteria(startDateField, filter.EndDate, RangeTypes.LessThanOrEquals);
                     }
                 }
                 else if (filter.DateFilterType == DateFilter.DateRangeFilterType.OnlyEndDate)
                 {
                     if (filter.StartDate.HasValue && filter.EndDate.HasValue)
                     {
-                        query.TryAddDateRangeCriteria(endDateField, filter.StartDate, RangeTypes.GreaterThanOrEquals);
-                        query.TryAddDateRangeCriteria(endDateField, filter.EndDate, RangeTypes.LessThanOrEquals);
+                        queries.TryAddDateRangeCriteria(endDateField, filter.StartDate, RangeTypes.GreaterThanOrEquals);
+                        queries.TryAddDateRangeCriteria(endDateField, filter.EndDate, RangeTypes.LessThanOrEquals);
                     }
                 }
             }
 
-            return query;
+            return queries;
         }
 
-        public static QueryDescriptor<TQueryDescriptor> TryAddGeneralizationsCriteria<TQueryDescriptor>(
-            this QueryDescriptor<TQueryDescriptor> query, bool? includeSensitiveGeneralizedObservations, bool? isGeneralized) where TQueryDescriptor : class
+        public static ICollection<Action<QueryDescriptor<TQueryDescriptor>>> TryAddGeneralizationsCriteria<TQueryDescriptor>(
+            this ICollection<Action<QueryDescriptor<TQueryDescriptor>>> queries, bool? includeSensitiveGeneralizedObservations, bool? isGeneralized) where TQueryDescriptor : class
         {
             if (includeSensitiveGeneralizedObservations.HasValue)
             {
-                return query.Bool(p => p
-                    .Should(s => s
-                        .Term(t => t
-                            .Field("hasGeneralizedObservationInOtherIndex")
-                            .Value(FieldValue.Boolean(includeSensitiveGeneralizedObservations.Value))),
-                        s => s
-                        .Bool(t => t
-                            .MustNot(s => s
-                                .Exists(e => 
-                                e.Field("hasGeneralizedObservationInOtherIndex")                                
-                                )
+                queries.Add(q => q 
+                    .Bool(p => p
+                        .Should(s => s
+                            .Term(t => t
+                                .Field("hasGeneralizedObservationInOtherIndex")
+                                .Value(FieldValue.Boolean(includeSensitiveGeneralizedObservations.Value))),
+                            s => s
+                            .Bool(t => t
+                                .MustNot(s => s
+                                    .Exists(e => 
+                                    e.Field("hasGeneralizedObservationInOtherIndex")                                
+                                    )
+                                    )
                                 )
                             )
                         )
@@ -250,57 +252,59 @@ namespace SOS.Lib.Extensions
 
             if (isGeneralized.HasValue)
             {
-                return query.Bool(p => p
-                    .Should(s => s
-                        .Term(t => t
-                            .Field("isGeneralized")
-                            .Value(FieldValue.Boolean(isGeneralized.Value))),
-                        s => s
-                        .Bool(t => t
-                            .MustNot(s => s
-                                .Exists(e =>
-                                    e.Field("isGeneralized")
+                queries.Add(q => q
+                    .Bool(p => p
+                        .Should(s => s
+                            .Term(t => t
+                                .Field("isGeneralized")
+                                .Value(FieldValue.Boolean(isGeneralized.Value))),
+                            s => s
+                            .Bool(t => t
+                                .MustNot(s => s
+                                    .Exists(e =>
+                                        e.Field("isGeneralized")
+                                    )
                                 )
                             )
                         )
                     )
                 );
             }
-            return query;
+            return queries;
         }
 
         /// <summary>
         /// Add time range filters
         /// </summary>
         /// <typeparam name="TQueryDescriptor"></typeparam>
-        /// <param name="query"></param>
+        /// <param name="queries"></param>
         /// <param name="filter"></param>
         /// <param name="field"></param>
-        public static void TryAddTimeRangeFilters<TQueryDescriptor>(this QueryDescriptor<TQueryDescriptor> query, DateFilter filter, string field) where TQueryDescriptor : class
+        public static ICollection<Action<QueryDescriptor<TQueryDescriptor>>> TryAddTimeRangeFilters<TQueryDescriptor>(this ICollection<Action<QueryDescriptor<TQueryDescriptor>>> queries, DateFilter filter, string field) where TQueryDescriptor : class
         {
-            if (!filter?.TimeRanges?.Any() ?? true)
+            if (filter?.TimeRanges?.Any() ?? false)
             {
-                return;
-            }
+                var timeRangeContainers = new List<Action<QueryDescriptor<TQueryDescriptor>>>();
+                foreach (var timeRange in filter.TimeRanges)
+                {
+                    timeRangeContainers.TryAddScript(timeRange switch
+                        {
+                            DateFilter.TimeRange.Morning => $@"[4, 5, 6, 7, 8].contains(doc['{field}'].value.getHour())",
+                            DateFilter.TimeRange.Forenoon => $@"[9, 10, 11, 12].contains(doc['{field}'].value.getHour())",
+                            DateFilter.TimeRange.Afternoon => $@"[13, 14, 15, 16, 17].contains(doc['{field}'].value.getHour())",
+                            DateFilter.TimeRange.Evening => $@"[18, 19, 20, 21, 22].contains(doc['{field}'].value.getHour())",
+                            _ => $@"[23, 0, 1, 2, 3].contains(doc['{field}'].value.getHour())"
+                        });
+                }
 
-            var timeRangeContainers = new List<Action<QueryDescriptor<TQueryDescriptor>>>();
-            foreach (var timeRange in filter.TimeRanges)
-            {
-                timeRangeContainers.Add(a => a
-                    .TryAddScript(timeRange switch
-                    {
-                        DateFilter.TimeRange.Morning => $@"[4, 5, 6, 7, 8].contains(doc['{field}'].value.getHour())",
-                        DateFilter.TimeRange.Forenoon => $@"[9, 10, 11, 12].contains(doc['{field}'].value.getHour())",
-                        DateFilter.TimeRange.Afternoon => $@"[13, 14, 15, 16, 17].contains(doc['{field}'].value.getHour())",
-                        DateFilter.TimeRange.Evening => $@"[18, 19, 20, 21, 22].contains(doc['{field}'].value.getHour())",
-                        _ => $@"[23, 0, 1, 2, 3].contains(doc['{field}'].value.getHour())"
-                    })
-                );
+                queries.Add(q => q
+                    .Bool(b => b
+                        .Should(timeRangeContainers.ToArray())
+                    )
+                );  
             }
-
-            query.Bool(b => b
-                .Should(timeRangeContainers.ToArray())
-            );
+            return queries;
+           
         }
     }
 }

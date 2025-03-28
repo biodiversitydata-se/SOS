@@ -43,13 +43,12 @@ namespace SOS.Lib.Repositories.Processed
         private async Task<bool> AddCollectionAsync()
         {
             var createIndexResponse = await Client.Indices.CreateAsync<Event>(IndexName, s => s
+                .Index(IndexName)
                 .Settings(s => s
                     .NumberOfShards(NumberOfShards)
                     .NumberOfReplicas(NumberOfReplicas)
-                    .Settings(s => s
-                        .MaxResultWindow(100000)
-                        .MaxTermsCount(110000)
-                    )
+                    .MaxResultWindow(100000)
+                    .MaxTermsCount(110000)
                 )
                 .Mappings(map => map
                     .Properties(ps => ps
@@ -295,13 +294,13 @@ namespace SOS.Lib.Repositories.Processed
             if (ids == null || !ids.Any()) throw new ArgumentException("ids is empty");
             
             var sortDescriptor = await Client.GetSortDescriptorAsync<Event>(IndexName, sortOrders);
-            var query = new QueryDescriptor<Event>();
-            query.TryAddTermsCriteria("eventId", ids);
+            var queries = new List<Action<QueryDescriptor<Event>>>();
+            queries.TryAddTermsCriteria("eventId", ids);
             var searchResponse = await Client.SearchAsync<Event>(s => s
                 .Index(IndexName)
                 .Query(q => q
                     .Bool(b => b
-                        .Filter(q)
+                        .Filter(queries.ToArray())
                     )
                 )
                 .Size(ids?.Count() ?? 0)

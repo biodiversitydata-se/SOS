@@ -1,10 +1,13 @@
 ﻿using DotNet.Testcontainers.Builders;
 using DotNet.Testcontainers.Containers;
 using Elastic.Clients.Elasticsearch;
+using Elastic.Clients.Elasticsearch.Serialization;
 using Elastic.Transport;
 using MongoDB.Driver;
 using SOS.Lib.Database;
 using SOS.Lib.Database.Interfaces;
+using SOS.Lib.Helpers;
+using SOS.Lib.JsonConverters;
 using SOS.Observations.Api.IntegrationTests.Extensions;
 using Testcontainers.Elasticsearch;
 using Testcontainers.MongoDb;
@@ -68,11 +71,11 @@ public class TestContainersFixture : IAsyncLifetime
             .WithCleanUp(true)
             .WithPassword(ELASTIC_PASSWORD)
         .Build();
+
         await _elasticsearchContainer.StartAsync().ConfigureAwait(false);
-        var elasticClient = new ElasticsearchClient(new ElasticsearchClientSettings(new Uri(_elasticsearchContainer.GetConnectionString()))
-            .ServerCertificateValidationCallback(CertificateValidations.AllowAll)
-           // .EnableApiVersioningHeader()
-        .EnableDebugMode());
+        var elasticUri = new Uri(_elasticsearchContainer.GetConnectionString());
+        var elasticClientSettings = ElasticSearchHelper.GetDefaultSettings(elasticUri).EnableDebugMode();
+        var elasticClient = new ElasticsearchClient(elasticClientSettings);
 
         return elasticClient;
     }
@@ -104,12 +107,9 @@ public class TestContainersFixture : IAsyncLifetime
         await _elasticsearchContainer.StartAsync().ConfigureAwait(false);
         await kibanaContainer.StartAsync().ConfigureAwait(false);
 
-        var elasticUri = new UriBuilder(Uri.UriSchemeHttp, _elasticsearchContainer.Hostname, _elasticsearchContainer.GetMappedPublicPort(9200)).ToString();
-        var elasticClient = new ElasticsearchClient(new ElasticsearchClientSettings(new Uri(elasticUri))
-            .ServerCertificateValidationCallback(CertificateValidations.AllowAll)
-            //.EnableApiVersioningHeader()
-            .EnableDebugMode()
-        );
+        var elasticUri = new UriBuilder(Uri.UriSchemeHttp, _elasticsearchContainer.Hostname, _elasticsearchContainer.GetMappedPublicPort(9200));
+        var elasticClientSettings = ElasticSearchHelper.GetDefaultSettings(elasticUri.Uri).EnableDebugMode();
+        var elasticClient = new ElasticsearchClient(elasticClientSettings);
         return elasticClient;
     }
 

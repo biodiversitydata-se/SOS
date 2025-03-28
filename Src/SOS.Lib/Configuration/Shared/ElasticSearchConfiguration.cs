@@ -1,8 +1,13 @@
 ﻿using Elastic.Clients.Elasticsearch;
+using Elastic.Clients.Elasticsearch.Serialization;
 using Elastic.Transport;
+using SOS.Lib.Helpers;
+using SOS.Lib.JsonConverters;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace SOS.Lib.Configuration.Shared
 {
@@ -12,7 +17,7 @@ namespace SOS.Lib.Configuration.Shared
     public class ElasticSearchConfiguration
     {
         private string _indexPrefix;
-
+       
         /// <summary>
         /// Elastic clusters
         /// </summary>
@@ -73,21 +78,17 @@ namespace SOS.Lib.Configuration.Shared
         /// <returns></returns>
         public ElasticsearchClient[] GetClients()
         {
-            
             var clients = new List<ElasticsearchClient>();
             foreach (var cluster in Clusters)
             {
-                var uris = cluster.Hosts.Select(u => new Uri(u));
-
-                var connectionPool = new StaticNodePool(uris);
-                var settings = new ElasticsearchClientSettings(connectionPool)
+                var uris = cluster.Hosts.Select(u => new Uri(u))?.ToArray();
+                var settings = ElasticSearchHelper.GetDefaultSettings(uris).EnableDebugMode()
                     .EnableHttpCompression(true)
                     .RequestTimeout(TimeSpan.FromSeconds(RequestTimeout ?? 60))
                     .SniffOnStartup(true)
                     .SniffOnConnectionFault(true)
-                    .SniffLifeSpan(new TimeSpan(0, 30, 0))
-                    .ServerCertificateValidationCallback(CertificateValidations.AllowAll);
-
+                    .SniffLifeSpan(new TimeSpan(0, 30, 0));
+  
                 if (!string.IsNullOrEmpty(UserName) && !string.IsNullOrEmpty(Password))
                 {
                     settings.Authentication(new BasicAuthentication(UserName, Password));

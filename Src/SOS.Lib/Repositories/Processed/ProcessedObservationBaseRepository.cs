@@ -6,7 +6,6 @@ using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Enums;
 using SOS.Lib.Exceptions;
-using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Configuration;
@@ -15,7 +14,6 @@ using SOS.Lib.Models.Search.Filters;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace SOS.Lib.Repositories.Processed
 {
@@ -33,10 +31,10 @@ namespace SOS.Lib.Repositories.Processed
         protected (ICollection<Action<QueryDescriptor<dynamic>>> Filter, ICollection<Action<QueryDescriptor<dynamic>>> Exclude)
             GetCoreQueries(SearchFilterBase filter, bool skipAuthorizationFilters = false)
         {
-            var query = filter.ToQuery<dynamic>(skipAuthorizationFilters: skipAuthorizationFilters);
-            var excludeQuery = filter.ToExcludeQuery<dynamic>();
+            var queries = filter.ToQuery<dynamic>(skipAuthorizationFilters: skipAuthorizationFilters);
+            var excludeQueries = filter.ToExcludeQuery<dynamic>();
 
-            return (query, excludeQuery);
+            return (queries, excludeQueries);
         }
 
         /// <summary>
@@ -66,59 +64,7 @@ namespace SOS.Lib.Repositories.Processed
                 _ => PublicIndexName
             };
         }
-
-        /// <summary>
-        /// Execute search after query
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="searchIndex"></param>
-        /// <param name="searchDescriptor"></param>
-        /// <param name="pointInTimeId"></param>
-        /// <param name="nextPageKey"></param>
-        /// <returns></returns>
-        protected async Task<SearchResponse<T>> SearchAfterAsync<T>(
-           string searchIndex,
-           SearchRequestDescriptor<T> searchDescriptor,
-           string pointInTimeId = null,
-           ICollection<FieldValue> nextPageKey = null) where T : class
-        {
-            var keepAlive = "10m";
-            if (string.IsNullOrEmpty(pointInTimeId))
-            {
-                var pitResponse = await Client.OpenPointInTimeAsync(searchIndex, pit => pit
-                    .RequestConfiguration(c => c
-                        .RequestTimeout(TimeSpan.FromSeconds(30))
-                    )
-                    .KeepAlive(keepAlive)
-                );
-                pointInTimeId = pitResponse.Id;
-            }
-
-            // Retry policy by Polly
-            var searchResponse = await PollyHelper.GetRetryPolicy(3, 100).ExecuteAsync(async () =>
-            {
-                var queryResponse = await Client.SearchAsync(searchDescriptor
-                   .Index(searchIndex)
-                   .Sort(s => s.Field("_shard_doc"))
-                   .SearchAfter(nextPageKey)
-                   .Size(ScrollBatchSize)
-                   .TrackTotalHits(new Elastic.Clients.Elasticsearch.Core.Search.TrackHits(false))
-                   .Pit(pointInTimeId, pit => pit.KeepAlive(keepAlive))
-                );
-
-                queryResponse.ThrowIfInvalid();
-
-                return queryResponse;
-            });
-
-            if (!string.IsNullOrEmpty(pointInTimeId) && (searchResponse?.Hits?.Count ?? 0) == 0)
-            {
-                await Client.ClosePointInTimeAsync(pitr => pitr.Id(pointInTimeId));
-            }
-
-            return searchResponse;
-        }
-
+        
         /// <summary>
         /// Constructor used in admin mode
         /// </summary>

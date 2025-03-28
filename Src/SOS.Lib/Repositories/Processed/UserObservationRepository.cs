@@ -28,13 +28,12 @@ namespace SOS.Lib.Repositories.Processed
         private async Task<bool> AddCollectionAsync()
         {
             var createIndexResponse = await Client.Indices.CreateAsync<UserObservation>(IndexName, s => s
-               .Settings(s => s
+                .Index(IndexName)
+                .Settings(s => s
                    .NumberOfShards(NumberOfShards)
                    .NumberOfReplicas(NumberOfReplicas)
-                   .Settings(s => s
-                       .MaxResultWindow(100000)
-                       .MaxTermsCount(110000)
-                   )
+                   .MaxResultWindow(100000)
+                   .MaxTermsCount(110000)
                )
                .Mappings(map => map
                     .Properties(ps => ps

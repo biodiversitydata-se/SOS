@@ -42,9 +42,7 @@ namespace SOS.Observations.Api.Repositories
         {
             var indexNames = GetCurrentIndex(filter);
             var (queries, excludeQueries) = GetCoreQueries(filter);
-            queries.Add(q => q
-                .AddAggregationFilter(aggregationType)
-            );
+            queries.AddAggregationFilter(aggregationType);
             
             // Get number of distinct values
             var searchResponseCount = await Client.SearchAsync<dynamic>(s => s
@@ -182,9 +180,7 @@ namespace SOS.Observations.Api.Repositories
         {
             var indexNames = GetCurrentIndex(filter);
             var (queries, excludeQueries) = GetCoreQueries(filter);
-            queries.Add(q => q
-                .AddAggregationFilter(aggregationType)
-            );
+            queries.AddAggregationFilter(aggregationType);
             
             var tz = TimeZoneInfo.Local.GetUtcOffset(DateTime.Now);
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
@@ -256,7 +252,7 @@ namespace SOS.Observations.Api.Repositories
         {
             var indexNames = GetCurrentIndex(filter);
             var (queries, excludeQueries) = GetCoreQueries(filter);
-            queries.Add(a => a.AddAggregationFilter(AggregationType.SightingsPerWeek48));
+            queries.AddAggregationFilter(AggregationType.SightingsPerWeek48);
 
             var tz = TimeZoneInfo.Local.GetUtcOffset(DateTime.Now);
             var searchResponse = await Client.SearchAsync<dynamic>(s => s

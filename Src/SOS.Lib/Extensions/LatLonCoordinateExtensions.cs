@@ -5,13 +5,13 @@ namespace SOS.Lib.Extensions
 {
     public static class LatLonCoordinateExtensions
     {
-        public static GeoLocation ToGeoLocation(this LatLonCoordinate coordinate)
+        public static LatLonGeoLocation ToGeoLocation(this LatLonCoordinate coordinate)
         {
-            return GeoLocation.LatitudeLongitude(new LatLonGeoLocation
+            return new LatLonGeoLocation
             {
                 Lat = coordinate.Latitude,
                 Lon = coordinate.Longitude
-            });
+            };
         }
         public static GeoBounds ToGeoBounds(this LatLonBoundingBox bbox)
         {
