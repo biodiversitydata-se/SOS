@@ -36,6 +36,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Threading;
 using System.Threading.Tasks;
 using Result = CSharpFunctionalExtensions.Result;
 
@@ -56,6 +57,8 @@ namespace SOS.Observations.Api.Controllers
         private readonly IClassCache<Dictionary<string, CacheEntry<GeoGridResultDto>>> _geogridAggregationCache;
         private readonly IClassCache<Dictionary<string, CacheEntry<PagedResultDto<TaxonAggregationItemDto>>>> _taxonAggregationInternalCache;           
         private readonly ILogger<ObservationsController> _logger;
+        private static readonly SemaphoreSlim _artfaktaAggregationSemaphore = new SemaphoreSlim(4);
+        private static readonly SemaphoreSlim _aggregationSemaphore = new SemaphoreSlim(8);
 
         private JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions
         {
@@ -293,6 +296,27 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] bool sensitiveObservations = false,
             [FromQuery] bool? skipCache = false)
         {
+            string requestingSystem = null;
+            if (this.Request.Headers.TryGetValue("X-Requesting-System", out var requestingSystemVal))
+            {
+                requestingSystem = requestingSystemVal.ToString();
+            }
+
+            if (requestingSystem == "Artfakta - SearchService")
+            {
+                if (!await _artfaktaAggregationSemaphore.WaitAsync(TimeSpan.FromMinutes(1)))
+                {
+                    return new StatusCodeResult((int)HttpStatusCode.TooManyRequests);
+                }
+            }
+            else
+            {
+                if (!await _aggregationSemaphore.WaitAsync(TimeSpan.FromMinutes(1)))
+                {
+                    return new StatusCodeResult((int)HttpStatusCode.TooManyRequests);
+                }
+            }
+
             try
             {
                 LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
@@ -383,6 +407,17 @@ namespace SOS.Observations.Api.Controllers
             {
                 _logger.LogError(e, "GeoGridAggregation error.");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+            finally
+            {
+                if (requestingSystem == "Artfakta - SearchService")
+                {
+                    _artfaktaAggregationSemaphore.Release();
+                }
+                else
+                {
+                    _aggregationSemaphore.Release();
+                }
             }
         }
 
@@ -835,15 +870,36 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] string translationCultureCode = "sv-SE",
             [FromQuery] bool sensitiveObservations = false)
         {
+            string requestingSystem = null;
+            if (this.Request.Headers.TryGetValue("X-Requesting-System", out var requestingSystemVal))
+            {
+                requestingSystem = requestingSystemVal.ToString();
+            }
+
+            if (requestingSystem == "Artfakta - SearchService")
+            {
+                if (!await _artfaktaAggregationSemaphore.WaitAsync(TimeSpan.FromMinutes(1)))
+                {
+                    return new StatusCodeResult((int)HttpStatusCode.TooManyRequests);
+                }
+            }
+            else
+            {
+                if (!await _aggregationSemaphore.WaitAsync(TimeSpan.FromMinutes(1)))
+                {
+                    return new StatusCodeResult((int)HttpStatusCode.TooManyRequests);
+                }
+            }
+
             try
             {
                 LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 var parameters = new[]
                 {
-                    $"skip={skip}",
-                    $"take={take}",
-                    $"sensitiveObservations={sensitiveObservations}"
-                };
+            $"skip={skip}",
+            $"take={take}",
+            $"sensitiveObservations={sensitiveObservations}"
+        };
                 string cacheKey = CreateCacheKey(string.Join("&", parameters), filter);
                 HttpContext.Items.TryAdd("CacheKey", cacheKey);
 
@@ -901,6 +957,17 @@ namespace SOS.Observations.Api.Controllers
             {
                 _logger.LogError(e, "TaxonAggregation error.");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+            finally
+            {
+                if (requestingSystem == "Artfakta - SearchService")
+                {
+                    _artfaktaAggregationSemaphore.Release();
+                }
+                else
+                {
+                    _aggregationSemaphore.Release();
+                }
             }
         }
 
@@ -1149,6 +1216,27 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] string translationCultureCode = "sv-SE",
             [FromQuery] bool sensitiveObservations = false)
         {
+            string requestingSystem = null;
+            if (this.Request.Headers.TryGetValue("X-Requesting-System", out var requestingSystemVal))
+            {
+                requestingSystem = requestingSystemVal.ToString();
+            }
+
+            if (requestingSystem == "Artfakta - SearchService")
+            {
+                if (!await _artfaktaAggregationSemaphore.WaitAsync(TimeSpan.FromMinutes(1)))
+                {
+                    return new StatusCodeResult((int)HttpStatusCode.TooManyRequests);
+                }
+            }
+            else
+            {
+                if (!await _aggregationSemaphore.WaitAsync(TimeSpan.FromMinutes(1)))
+                {
+                    return new StatusCodeResult((int)HttpStatusCode.TooManyRequests);
+                }
+            }
+
             try
             {
                 LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
@@ -1208,6 +1296,17 @@ namespace SOS.Observations.Api.Controllers
             {
                 _logger.LogError(e, "GeoGridAggregation error.");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+            finally
+            {
+                if (requestingSystem == "Artfakta - SearchService")
+                {
+                    _artfaktaAggregationSemaphore.Release();
+                }
+                else
+                {
+                    _aggregationSemaphore.Release();
+                }
             }
         }
 
@@ -1939,6 +2038,27 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] bool sumUnderlyingTaxa = false,
             [FromQuery] bool? skipCache = false)
         {
+            string requestingSystem = null;
+            if (this.Request.Headers.TryGetValue("X-Requesting-System", out var requestingSystemVal))
+            {
+                requestingSystem = requestingSystemVal.ToString();
+            }
+
+            if (requestingSystem == "Artfakta - SearchService")
+            {
+                if (!await _artfaktaAggregationSemaphore.WaitAsync(TimeSpan.FromMinutes(1)))
+                {
+                    return new StatusCodeResult((int)HttpStatusCode.TooManyRequests);
+                }
+            }
+            else
+            {
+                if (!await _aggregationSemaphore.WaitAsync(TimeSpan.FromMinutes(1)))
+                {
+                    return new StatusCodeResult((int)HttpStatusCode.TooManyRequests);
+                }
+            }
+
             try
             {
                 LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
@@ -1987,7 +2107,7 @@ namespace SOS.Observations.Api.Controllers
                     _inputValidator.ValidateTranslationCultureCode(translationCultureCode),
                     _inputValidator.ValidateTaxonAggregationPagingArguments(skip, take),
                     await _inputValidator.ValidateTilesLimitAsync(boundingBox, 1, _observationManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, searchFilter), true)
-                 );
+                    );
 
                 if (validationResult.IsFailure)
                 {
@@ -2038,6 +2158,17 @@ namespace SOS.Observations.Api.Controllers
                 _logger.LogError(e, "TaxonAggregation error.");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
+            finally
+            {
+                if (requestingSystem == "Artfakta - SearchService")
+                {
+                    _artfaktaAggregationSemaphore.Release();
+                }
+                else
+                {
+                    _aggregationSemaphore.Release();
+                }
+            }
         }
 
         /// <summary>
@@ -2066,6 +2197,11 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] string sortBy = "SumObservationCount",
             [FromQuery] SearchSortOrder sortOrder = SearchSortOrder.Desc)
         {
+            if (!await _artfaktaAggregationSemaphore.WaitAsync(TimeSpan.FromMinutes(1)))
+            {
+                return new StatusCodeResult((int)HttpStatusCode.TooManyRequests);
+            }
+
             try
             {
                 var validationResult = sortBy switch
@@ -2106,6 +2242,10 @@ namespace SOS.Observations.Api.Controllers
             {
                 _logger.LogError(e, "TaxonSumAggregation error.");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+            finally
+            {
+                _artfaktaAggregationSemaphore.Release();
             }
         }
 
