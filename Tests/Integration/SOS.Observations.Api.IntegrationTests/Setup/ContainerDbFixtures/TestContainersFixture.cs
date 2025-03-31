@@ -1,13 +1,10 @@
 ﻿using DotNet.Testcontainers.Builders;
 using DotNet.Testcontainers.Containers;
 using Elastic.Clients.Elasticsearch;
-using Elastic.Clients.Elasticsearch.Serialization;
-using Elastic.Transport;
 using MongoDB.Driver;
 using SOS.Lib.Database;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Helpers;
-using SOS.Lib.JsonConverters;
 using SOS.Observations.Api.IntegrationTests.Extensions;
 using Testcontainers.Elasticsearch;
 using Testcontainers.MongoDb;
@@ -17,7 +14,7 @@ public class TestContainersFixture : IAsyncLifetime
 {
     private bool UseKibanaDebug;
     private const string ELASTIC_PASSWORD = "elastic";
-    private const string ELASTIC_IMAGE_NAME = "elasticsearch:8.7.1";
+    private const string ELASTIC_IMAGE_NAME = "elasticsearch:8.17.3";
 
     private const string MONGODB_USERNAME = "mongo";
     private const string MONGODB_PASSWORD = "admin";

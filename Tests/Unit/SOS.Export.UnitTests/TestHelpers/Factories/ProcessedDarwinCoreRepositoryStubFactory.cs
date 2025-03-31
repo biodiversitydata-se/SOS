@@ -44,19 +44,5 @@ namespace SOS.Export.UnitTests.TestHelpers.Factories
 
             return stub;
         }
-
-        private static IEnumerable<Observation> LoadObservations(string fileName)
-        {
-            var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            var filePath = Path.Combine(assemblyPath, fileName);
-            var str = File.ReadAllText(filePath, Encoding.UTF8);
-
-            var serializeOptions = new JsonSerializerOptions { DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull };
-            serializeOptions.Converters.Add(new ObjectIdConverter());
-
-            var observations = JsonSerializer.Deserialize<List<Observation>>(str, serializeOptions);
-
-            return observations;
-        }
     }
 }

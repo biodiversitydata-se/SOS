@@ -103,13 +103,12 @@ namespace SOS.Lib
         {
             if (geographicAreasFilter != null)
             {
-                queries
-                   .TryAddTermsCriteria("location.countryRegion.featureId", geographicAreasFilter.CountryRegionIds)
-                   .TryAddTermsCriteria("location.county.featureId", geographicAreasFilter.CountyIds)
-                   .TryAddTermsCriteria("location.municipality.featureId", geographicAreasFilter.MunicipalityIds)
-                   .TryAddTermsCriteria("location.parish.featureId", geographicAreasFilter.ParishIds)
-                   .TryAddTermsCriteria("location.province.featureId", geographicAreasFilter.ProvinceIds)
-                   .TryAddGeometryFilters(geographicAreasFilter.GeometryFilter);
+                queries.TryAddTermsCriteria("location.countryRegion.featureId", geographicAreasFilter.CountryRegionIds);
+                queries.TryAddTermsCriteria("location.county.featureId", geographicAreasFilter.CountyIds);
+                queries.TryAddTermsCriteria("location.municipality.featureId", geographicAreasFilter.MunicipalityIds);
+                queries.TryAddTermsCriteria("location.parish.featureId", geographicAreasFilter.ParishIds);
+                queries.TryAddTermsCriteria("location.province.featureId", geographicAreasFilter.ProvinceIds);
+                queries.TryAddGeometryFilters(geographicAreasFilter.GeometryFilter);
             }
 
             return queries;
@@ -128,14 +127,13 @@ namespace SOS.Lib
 
             if (filter != null)
             {
-                queries
-                    .TryAddTermsCriteria("dataProviderId", filter.DataProviderIds)
-                    .TryAddScript((filter.Date?.MinEffortTime ?? TimeSpan.Zero) > TimeSpan.Zero ? $"return doc['event.endDate'].value.getMillis() - doc['event.startDate'].value.getMillis() >= {filter.Date.MinEffortTime.TotalMilliseconds}L;" : null)
-                    .TryAddTermsCriteria("taxonIds", filter.Taxa?.Ids)
-                    .TryAddTermsCriteria("projects.id", filter.ProjectIds)
-                    .TryAddEventDateCritera("event", filter.Date)
-                    .TryAddGeographicFilter(filter.Location?.AreaGeographic)
-                    .TryAddGeometryFilters(filter.Location?.Geometries);
+                queries.TryAddTermsCriteria("dataProviderId", filter.DataProviderIds);
+                queries.TryAddScript((filter.Date?.MinEffortTime ?? TimeSpan.Zero) > TimeSpan.Zero ? $"return doc['event.endDate'].value.getMillis() - doc['event.startDate'].value.getMillis() >= {filter.Date.MinEffortTime.TotalMilliseconds}L;" : null);
+                queries.TryAddTermsCriteria("taxonIds", filter.Taxa?.Ids);
+                queries.TryAddTermsCriteria("projects.id", filter.ProjectIds);
+                queries.TryAddEventDateCritera("event", filter.Date);
+                queries.TryAddGeographicFilter(filter.Location?.AreaGeographic);
+                queries.TryAddGeometryFilters(filter.Location?.Geometries);
             }
 
             return queries;

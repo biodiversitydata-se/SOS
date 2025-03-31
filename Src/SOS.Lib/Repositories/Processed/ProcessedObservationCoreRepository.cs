@@ -921,8 +921,8 @@ namespace SOS.Lib.Repositories.Processed
                         }
                         prevOccurrenceId = occurrenceId;
                     }
-                    var deleteQueries = new List<Action<QueryDescriptor<Observation>>>()
-                        .TryAddTermCriteria("_id", idsToRemove);
+                    var deleteQueries = new List<Action<QueryDescriptor<Observation>>>();
+                    deleteQueries.TryAddTermCriteria("_id", idsToRemove);
 
                     await DeleteAsync(deleteQueries, protectedIndex);
                     duplicates = await TryToGetOccurenceIdDuplicatesAsync(protectedIndex, maxReturnedItems);
@@ -1193,8 +1193,8 @@ namespace SOS.Lib.Repositories.Processed
         /// <inheritdoc />
         public async Task<bool> DeleteByOccurrenceIdAsync(IEnumerable<string> occurenceIds, bool protectedIndex)
         {
-            var deleteQueries = new List<Action<QueryDescriptor<Observation>>>()
-                      .TryAddTermsCriteria("occurrence.occurrenceId", occurenceIds);
+            var deleteQueries = new List<Action<QueryDescriptor<Observation>>>();
+            deleteQueries.TryAddTermsCriteria("occurrence.occurrenceId", occurenceIds);
 
             return await DeleteAsync(deleteQueries, protectedIndex);
         }
@@ -1202,8 +1202,8 @@ namespace SOS.Lib.Repositories.Processed
         /// <inheritdoc />
         public async Task<bool> DeleteProviderDataAsync(DataProvider dataProvider, bool protectedIndex)
         {
-            var deleteQueries = new List<Action<QueryDescriptor<Observation>>>()
-                      .TryAddTermCriteria("dataProviderId", dataProvider.Id);
+            var deleteQueries = new List<Action<QueryDescriptor<Observation>>>();
+            deleteQueries.TryAddTermCriteria("dataProviderId", dataProvider.Id);
 
             return await DeleteAsync(deleteQueries, protectedIndex);
         }
@@ -1872,11 +1872,12 @@ namespace SOS.Lib.Repositories.Processed
            IReadOnlyCollection<FieldValue> afterKey = null)
         {
             var searchIndex = GetCurrentIndex(filter);
+            var queries = filter.ToMeasurementOrFactsQuery<dynamic>();
             var searchResponse = await SearchAfterAsync<dynamic>(searchIndex, new SearchRequestDescriptor<dynamic>()
                 .Index(searchIndex)
                 .Query(query => query
-                    .Bool(boolQueryDescriptor => boolQueryDescriptor
-                        .Filter(f => filter.ToMeasurementOrFactsQuery<dynamic>())
+                    .Bool(b => b
+                        .Filter(queries.ToArray())
                     )
                 )
                 .Source(
@@ -1901,12 +1902,12 @@ namespace SOS.Lib.Repositories.Processed
             IReadOnlyCollection<FieldValue> afterKey = null)
         {
             var searchIndex = GetCurrentIndex(filter);
-
+            var queries = filter.ToMultimediaQuery<dynamic>();
             var searchResponse = await SearchAfterAsync<dynamic>(searchIndex, new SearchRequestDescriptor<dynamic>()
                 .Index(searchIndex)
                 .Query(query => query
                     .Bool(boolQueryDescriptor => boolQueryDescriptor
-                        .Filter(f => filter.ToMultimediaQuery<dynamic>())
+                        .Filter(queries.ToArray())
                 )
             )
                 .Source(

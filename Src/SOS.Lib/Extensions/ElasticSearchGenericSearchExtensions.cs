@@ -61,7 +61,7 @@ namespace SOS.Lib.Extensions
         /// <param name="queries"></param>
         /// <param name="field"></param>
         /// <returns></returns>
-        public static ICollection<Action<QueryDescriptor<TQueryDescriptor>>> AddExistsCriteria<TQueryDescriptor>(
+        public static void AddExistsCriteria<TQueryDescriptor>(
             this ICollection<Action<QueryDescriptor<TQueryDescriptor>>> queries, string field) where TQueryDescriptor : class
         {
             queries.Add(q => q
@@ -69,8 +69,6 @@ namespace SOS.Lib.Extensions
                     .Field(field)
                 )
             );
-
-            return queries;
         }
 
         /// <summary>
@@ -79,7 +77,7 @@ namespace SOS.Lib.Extensions
         /// <typeparam name="TQueryDescriptor"></typeparam>
         /// <param name="queries"></param>
         /// <param name="field"></param>
-        public static ICollection<Action<QueryDescriptor<TQueryDescriptor>>> AddMustExistsCriteria<TQueryDescriptor>(
+        public static void AddMustExistsCriteria<TQueryDescriptor>(
             this ICollection<Action<QueryDescriptor<TQueryDescriptor>>> queries, string field) where TQueryDescriptor : class
         {
             queries.Add(q => q
@@ -88,7 +86,6 @@ namespace SOS.Lib.Extensions
                     .Value(".+")
                 )
             );
-            return queries; 
         }
 
         /// <summary>
@@ -97,7 +94,7 @@ namespace SOS.Lib.Extensions
         /// <typeparam name="TQueryDescriptor"></typeparam>
         /// <param name="queries"></param>
         /// <param name="nestedPath"></param>
-        public static ICollection<Action<QueryDescriptor<TQueryDescriptor>>> AddNestedMustExistsCriteria<TQueryDescriptor>(
+        public static void AddNestedMustExistsCriteria<TQueryDescriptor>(
             this ICollection<Action<QueryDescriptor<TQueryDescriptor>>> queries, string nestedPath) where TQueryDescriptor : class
         {
             queries.Add(q => q
@@ -114,8 +111,6 @@ namespace SOS.Lib.Extensions
                     )
                 )
             );
-
-            return queries;
         }
 
         /// <summary>
@@ -124,7 +119,7 @@ namespace SOS.Lib.Extensions
         /// <typeparam name="TQueryDescriptor"></typeparam>
         /// <param name="queries"></param>
         /// <param name="field"></param>
-        public static ICollection<Action<QueryDescriptor<TQueryDescriptor>>> AddNotExistsCriteria<TQueryDescriptor>(
+        public static void AddNotExistsCriteria<TQueryDescriptor>(
             this ICollection<Action<QueryDescriptor<TQueryDescriptor>>> queries, string field) where TQueryDescriptor : class
         {
             queries.Add(q => q
@@ -136,7 +131,6 @@ namespace SOS.Lib.Extensions
                     )
                 )
             );
-            return queries;
         }
 
         /// <summary>
@@ -147,7 +141,7 @@ namespace SOS.Lib.Extensions
         /// <param name="fieldName"></param>
         /// <param name="value"></param>
         /// <param name="relationalOperator"></param>
-        public static ICollection<Action<QueryDescriptor<TQueryDescriptor>>> AddNumericFilterWithRelationalOperator<TQueryDescriptor>(
+        public static void AddNumericFilterWithRelationalOperator<TQueryDescriptor>(
             this ICollection<Action<QueryDescriptor<TQueryDescriptor>>> queries, 
             string fieldName,
             int value, string relationalOperator) where TQueryDescriptor : class
@@ -193,7 +187,6 @@ namespace SOS.Lib.Extensions
                     );
                     break;
             }
-            return queries;
         }
 
         /// <summary>
@@ -202,7 +195,7 @@ namespace SOS.Lib.Extensions
         /// <typeparam name="TQueryDescriptor"></typeparam>
         /// <param name="queries"></param>
         /// <param name="source"></param>
-        public static ICollection<Action<QueryDescriptor<TQueryDescriptor>>> TryAddScript<TQueryDescriptor>(this ICollection<Action<QueryDescriptor<TQueryDescriptor>>> queries, string source) where TQueryDescriptor : class
+        public static void TryAddScript<TQueryDescriptor>(this ICollection<Action<QueryDescriptor<TQueryDescriptor>>> queries, string source) where TQueryDescriptor : class
         {
             if (!string.IsNullOrEmpty(source))
             {
@@ -214,8 +207,6 @@ namespace SOS.Lib.Extensions
                     )
                 );
             }
-
-            return queries;
         }
 
         /// <summary>
@@ -225,7 +216,7 @@ namespace SOS.Lib.Extensions
         /// <param name="queries"></param>
         /// <param name="field"></param>
         /// <param name="boundingBox"></param>
-        public static ICollection<Action<QueryDescriptor<TQueryDescriptor>>> TryAddBoundingBoxCriteria<TQueryDescriptor>(
+        public static void TryAddBoundingBoxCriteria<TQueryDescriptor>(
             this ICollection<Action<QueryDescriptor<TQueryDescriptor>>> queries, 
             string field, 
             LatLonBoundingBox boundingBox) where TQueryDescriptor : class
@@ -247,7 +238,6 @@ namespace SOS.Lib.Extensions
                     )
                 );
             }
-            return queries;
         }
 
         /// <summary>
@@ -259,7 +249,7 @@ namespace SOS.Lib.Extensions
         /// <param name="nestedPath"></param>
         /// <param name="field"></param>
         /// <param name="value"></param>
-        public static ICollection<Action<QueryDescriptor<TQueryDescriptor>>> TryAddNestedTermCriteria<TQueryDescriptor, TValue>(
+        public static void TryAddNestedTermCriteria<TQueryDescriptor, TValue>(
             this ICollection<Action<QueryDescriptor<TQueryDescriptor>>> queries, 
             string nestedPath, string field, TValue value) where TQueryDescriptor : class
         {
@@ -277,8 +267,6 @@ namespace SOS.Lib.Extensions
                     )
                 );
             }
-
-            return queries;
         }
 
         /// <summary>
@@ -290,7 +278,7 @@ namespace SOS.Lib.Extensions
         /// <param name="nestedPath"></param>
         /// <param name="field"></param>
         /// <param name="values"></param>
-        public static ICollection<Action<QueryDescriptor<TQueryDescriptor>>> TryAddNestedTermsCriteria<TQueryDescriptor, TValue>(
+        public static void TryAddNestedTermsCriteria<TQueryDescriptor, TValue>(
             this ICollection<Action<QueryDescriptor<TQueryDescriptor>>> queries, string nestedPath, string field, IEnumerable<TValue> values) where TQueryDescriptor : class
         {
             if (values?.Any() ?? false)
@@ -307,8 +295,6 @@ namespace SOS.Lib.Extensions
                    )
                 );
             }
-
-            return queries;
         }
 
         /// <summary>
@@ -319,7 +305,7 @@ namespace SOS.Lib.Extensions
         /// <param name="field"></param>
         /// <param name="value"></param>
         /// <param name="type"></param>
-        public static ICollection<Action<QueryDescriptor<TQueryDescriptor>>> TryAddNumericRangeCriteria<TQueryDescriptor>(this ICollection<Action<QueryDescriptor<TQueryDescriptor>>> queries, string field, double? value, RangeTypes type) where TQueryDescriptor : class
+        public static void TryAddNumericRangeCriteria<TQueryDescriptor>(this ICollection<Action<QueryDescriptor<TQueryDescriptor>>> queries, string field, double? value, RangeTypes type) where TQueryDescriptor : class
         {
             if (value != null)
             {
@@ -367,8 +353,6 @@ namespace SOS.Lib.Extensions
                         break;
                 }
             }
-
-            return queries;
         }
 
         /// <summary>
@@ -379,7 +363,7 @@ namespace SOS.Lib.Extensions
         /// <param name="field"></param>
         /// <param name="dateTime"></param>
         /// <param name="type"></param>
-        public static ICollection<Action<QueryDescriptor<TQueryDescriptor>>> TryAddDateRangeCriteria<TQueryDescriptor>(this ICollection<Action<QueryDescriptor<TQueryDescriptor>>> queries, string field, DateTime? dateTime, RangeTypes type) where TQueryDescriptor : class
+        public static void TryAddDateRangeCriteria<TQueryDescriptor>(this ICollection<Action<QueryDescriptor<TQueryDescriptor>>> queries, string field, DateTime? dateTime, RangeTypes type) where TQueryDescriptor : class
         {
             if (dateTime.HasValue)
             {
@@ -427,7 +411,6 @@ namespace SOS.Lib.Extensions
                         break;
                 }
             }
-            return queries;
         }
 
         /// <summary>
@@ -439,7 +422,7 @@ namespace SOS.Lib.Extensions
         /// <param name="point"></param>
         /// <param name="distanceType"></param>
         /// <param name="distance"></param>
-        public static ICollection<Action<QueryDescriptor<TQueryDescriptor>>> TryAddGeoDistanceCriteria<TQueryDescriptor>(this ICollection<Action<QueryDescriptor<TQueryDescriptor>>> queries, string field, Point point, GeoDistanceType distanceType, double distance) where TQueryDescriptor : class
+        public static void TryAddGeoDistanceCriteria<TQueryDescriptor>(this ICollection<Action<QueryDescriptor<TQueryDescriptor>>> queries, string field, Point point, GeoDistanceType distanceType, double distance) where TQueryDescriptor : class
         {
             if (distance != 0)
             {
@@ -453,8 +436,6 @@ namespace SOS.Lib.Extensions
                     )
                 );
             }
-
-            return queries;
         }
 
         /// <summary>
@@ -465,7 +446,7 @@ namespace SOS.Lib.Extensions
         /// <param name="field"></param>
         /// <param name="geometry"></param>
         /// <param name="relation"></param>
-        public static ICollection<Action<QueryDescriptor<TQueryDescriptor>>> TryAddGeoShapeCriteria<TQueryDescriptor>(this ICollection<Action<QueryDescriptor<TQueryDescriptor>>> queries, string field, Geometry geometry, GeoShapeRelation relation) where TQueryDescriptor : class
+        public static void TryAddGeoShapeCriteria<TQueryDescriptor>(this ICollection<Action<QueryDescriptor<TQueryDescriptor>>> queries, string field, Geometry geometry, GeoShapeRelation relation) where TQueryDescriptor : class
         {
             if (geometry?.IsValid ?? false)
             {
@@ -477,8 +458,6 @@ namespace SOS.Lib.Extensions
                     )
                 ));
             }
-
-            return queries;
         }
 
         /// <summary>
@@ -487,7 +466,7 @@ namespace SOS.Lib.Extensions
         /// <param name="queries"></param>
         /// <param name="nestedPath"></param>
         /// <param name="fieldValues"></param>
-        public static ICollection<Action<QueryDescriptor<TQueryDescriptor>>> TryAddNestedTermAndCriteria<TQueryDescriptor>(this
+        public static void TryAddNestedTermAndCriteria<TQueryDescriptor>(this
             ICollection<Action<QueryDescriptor<TQueryDescriptor>>> queries, string nestedPath,
             IDictionary<string, object> fieldValues) where TQueryDescriptor : class
         {
@@ -510,7 +489,6 @@ namespace SOS.Lib.Extensions
                     )
                 );
             }
-            return queries;
         }
 
         /// <summary>
@@ -521,7 +499,7 @@ namespace SOS.Lib.Extensions
         /// <param name="queries"></param>
         /// <param name="field"></param>
         /// <param name="terms"></param>
-        public static ICollection<Action<QueryDescriptor<TQueryDescriptor>>> TryAddTermsCriteria<TQueryDescriptor, TTerms>(
+        public static void TryAddTermsCriteria<TQueryDescriptor, TTerms>(
                     this ICollection<Action<QueryDescriptor<TQueryDescriptor>>> queries, string field, IEnumerable<TTerms> terms) where TQueryDescriptor : class
         {
             if (terms?.Any() ?? false)
@@ -590,7 +568,6 @@ namespace SOS.Lib.Extensions
                     );
                 }   
             }
-            return queries;
         }
 
 
@@ -603,7 +580,7 @@ namespace SOS.Lib.Extensions
         /// <param name="queries"></param>
         /// <param name="field"></param>
         /// <param name="value"></param>
-        public static ICollection<Action<QueryDescriptor<TQueryDescriptor>>> TryAddTermCriteria<TQueryDescriptor, TValue>(
+        public static void TryAddTermCriteria<TQueryDescriptor, TValue>(
             this ICollection<Action<QueryDescriptor<TQueryDescriptor>>> queries, string field, TValue value) where TQueryDescriptor : class
         {
             if (!string.IsNullOrEmpty(value?.ToString()))
@@ -672,8 +649,6 @@ namespace SOS.Lib.Extensions
                     );
                 }
             }
-            return queries;
-            
         }
 
         /// <summary>
@@ -685,14 +660,13 @@ namespace SOS.Lib.Extensions
         /// <param name="field"></param>
         /// <param name="value"></param>
         /// <param name="matchValue"></param>
-        public static ICollection<Action<QueryDescriptor<TQueryDescriptor>>> TryAddTermCriteria<TQueryDescriptor, TValue>(
+        public static void TryAddTermCriteria<TQueryDescriptor, TValue>(
            this ICollection<Action<QueryDescriptor<TQueryDescriptor>>> queries, string field, TValue value, TValue matchValue) where TQueryDescriptor : class
         {
             if (!string.IsNullOrEmpty(value?.ToString()) && matchValue.Equals(value))
             {
                 queries.TryAddTermCriteria(field, value);
             }
-            return queries;
         }
 
         /// <summary>
@@ -701,7 +675,7 @@ namespace SOS.Lib.Extensions
         /// <param name="queries"></param>
         /// <param name="field"></param>
         /// <param name="wildcard"></param>
-        public static ICollection<Action<QueryDescriptor<TQueryDescriptor>>> TryAddWildcardCriteria<TQueryDescriptor>(this ICollection<Action<QueryDescriptor<TQueryDescriptor>>> queries, string field, string wildcard) where TQueryDescriptor : class
+        public static void TryAddWildcardCriteria<TQueryDescriptor>(this ICollection<Action<QueryDescriptor<TQueryDescriptor>>> queries, string field, string wildcard) where TQueryDescriptor : class
         {
             if (!string.IsNullOrEmpty(wildcard))
             {
@@ -713,7 +687,6 @@ namespace SOS.Lib.Extensions
                     )
                 );
             }
-            return queries;
         }
     }
 }

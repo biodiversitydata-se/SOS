@@ -444,7 +444,7 @@ namespace SOS.Lib.IO.GeoJson
                 if (useFastSearch) break;
 
                 // Get next batch of observations.        
-                searchResult = await _processedObservationRepository.GetObservationsBySearchAfterAsync<dynamic>(filter, searchResult.PointInTimeId, searchResult.SearchAfter == null ? null : [searchResult.SearchAfter.ToFieldValue()]);           
+                searchResult = await _processedObservationRepository.GetObservationsBySearchAfterAsync<dynamic>(filter, searchResult.PointInTimeId, searchResult.SearchAfter?.ToArray());           
             }
 
             searchResult = null;

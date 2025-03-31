@@ -82,7 +82,7 @@ namespace SOS.Lib.Configuration.Shared
             foreach (var cluster in Clusters)
             {
                 var uris = cluster.Hosts.Select(u => new Uri(u))?.ToArray();
-                var settings = ElasticSearchHelper.GetDefaultSettings(uris).EnableDebugMode()
+                var settings = ElasticSearchHelper.GetDefaultSettings(uris)
                     .EnableHttpCompression(true)
                     .RequestTimeout(TimeSpan.FromSeconds(RequestTimeout ?? 60))
                     .SniffOnStartup(true)

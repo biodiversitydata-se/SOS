@@ -26,6 +26,7 @@ public class DownloadDwcTests : TestBase
         var searchFilter = new SearchFilterDto { };
 
         // Act
+        
         var response = await apiClient.PostAsync($"/exports/download/dwc", JsonContent.Create(searchFilter));
         byte[] contentBytes = await response.Content.ReadAsByteArrayAsync();
 

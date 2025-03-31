@@ -263,7 +263,7 @@ namespace SOS.Lib.IO.Excel
 
                 // Get next batch of observations.                
                 searchResult = await _processedObservationRepository.GetObservationsBySearchAfterAsync<Observation>(
-                    filter, searchResult.PointInTimeId, searchResult.SearchAfter == null ? null : [searchResult.SearchAfter.ToFieldValue()]);                                
+                    filter, searchResult.PointInTimeId, searchResult.SearchAfter?.ToArray());                                
             }
 
             searchResult = null;

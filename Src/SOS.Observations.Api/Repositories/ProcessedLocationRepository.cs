@@ -54,9 +54,9 @@ namespace SOS.Observations.Api.Repositories
             {
                 return null;
             }
-            
-            var queries = new List<Action<QueryDescriptor<Observation>>>()
-                 .TryAddTermsCriteria("location.locationId", locationIds);
+
+            var queries = new List<Action<QueryDescriptor<Observation>>>();
+            queries.TryAddTermsCriteria("location.locationId", locationIds);
 
             var searchResponse = await Client.SearchAsync<Observation>(s => s
                 .Index($"{PublicIndexName}, {ProtectedIndexName}")

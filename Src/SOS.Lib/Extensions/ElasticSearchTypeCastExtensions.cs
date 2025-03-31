@@ -121,8 +121,8 @@ namespace SOS.Lib.Extensions
             var shortValue = value as long?;
             var byteValue = value as long?;
             if (longValue != null ||
-                intValue != 0 ||
-                shortValue != 0 ||
+                intValue != null ||
+                shortValue != null ||
                 byteValue != null)
             {
                 return FieldValue.Long(longValue ?? intValue ?? shortValue ?? byteValue ?? 0);

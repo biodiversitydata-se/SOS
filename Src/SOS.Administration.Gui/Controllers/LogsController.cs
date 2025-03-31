@@ -88,29 +88,29 @@ namespace SOS.Administration.Gui.Controllers
             {
                 queryString = "*" + textFilter + "*";
             }
-            var queries = new List<Action<QueryDescriptor<LogEntry>>>()
-                .TryAddTermsCriteria("log.level.keyword", filterLevels)
-                .TryAddTermsCriteria("host.name.keyword", filterHosts)
-                .TryAddTermsCriteria("process.name.keyword", filterProcesses)
-                .TryAddDateRangeCriteria("timestamp", DateTime.Now.AddMinutes(-dateFilterMinutes), RangeTypes.GreaterThanOrEquals);
+            var queries = new List<Action<QueryDescriptor<LogEntry>>>();
+            queries.TryAddTermsCriteria("log.level.keyword", filterLevels);
+            queries.TryAddTermsCriteria("host.name.keyword", filterHosts);
+            queries.TryAddTermsCriteria("process.name.keyword", filterProcesses);
+            queries.TryAddDateRangeCriteria("timestamp", DateTime.Now.AddMinutes(-dateFilterMinutes), RangeTypes.GreaterThanOrEquals);
 
-            var filtered_levels_queries = new List<Action<QueryDescriptor<LogEntry>>>()
-                .TryAddWildcardCriteria("message", queryString)
-                .TryAddTermsCriteria("host.name.keyword", filterHosts)
-                .TryAddTermsCriteria("process.name.keyword", filterProcesses)
-                .TryAddDateRangeCriteria("timestamp", DateTime.Now.AddMinutes(-dateFilterMinutes), RangeTypes.GreaterThanOrEquals);
+            var filtered_levels_queries = new List<Action<QueryDescriptor<LogEntry>>>();
+            filtered_levels_queries.TryAddWildcardCriteria("message", queryString);
+            filtered_levels_queries.TryAddTermsCriteria("host.name.keyword", filterHosts);
+            filtered_levels_queries.TryAddTermsCriteria("process.name.keyword", filterProcesses);
+            filtered_levels_queries.TryAddDateRangeCriteria("timestamp", DateTime.Now.AddMinutes(-dateFilterMinutes), RangeTypes.GreaterThanOrEquals);
 
-            var filtered_hosts_queries = new List<Action<QueryDescriptor<LogEntry>>>()
-                .TryAddWildcardCriteria("message", queryString)
-                .TryAddTermsCriteria("log.level.keyword", filterLevels)
-                .TryAddTermsCriteria("process.name.keyword", filterProcesses)
-                .TryAddDateRangeCriteria("timestamp", DateTime.Now.AddMinutes(-dateFilterMinutes), RangeTypes.GreaterThanOrEquals);
+            var filtered_hosts_queries = new List<Action<QueryDescriptor<LogEntry>>>();
+            filtered_hosts_queries.TryAddWildcardCriteria("message", queryString);
+            filtered_hosts_queries.TryAddTermsCriteria("log.level.keyword", filterLevels);
+            filtered_hosts_queries.TryAddTermsCriteria("process.name.keyword", filterProcesses);
+            filtered_hosts_queries.TryAddDateRangeCriteria("timestamp", DateTime.Now.AddMinutes(-dateFilterMinutes), RangeTypes.GreaterThanOrEquals);
 
-            var filtered_processes_queries = new List<Action<QueryDescriptor<LogEntry>>>()
-                .TryAddWildcardCriteria("message", queryString)
-                .TryAddTermsCriteria("log.level.keyword", filterLevels)
-                .TryAddTermsCriteria("host.name.keyword", filterHosts)
-                .TryAddDateRangeCriteria("timestamp", DateTime.Now.AddMinutes(-dateFilterMinutes), RangeTypes.GreaterThanOrEquals);
+            var filtered_processes_queries = new List<Action<QueryDescriptor<LogEntry>>>();
+            filtered_processes_queries.TryAddWildcardCriteria("message", queryString);
+            filtered_processes_queries.TryAddTermsCriteria("log.level.keyword", filterLevels);
+            filtered_processes_queries.TryAddTermsCriteria("host.name.keyword", filterHosts);
+            filtered_processes_queries.TryAddDateRangeCriteria("timestamp", DateTime.Now.AddMinutes(-dateFilterMinutes), RangeTypes.GreaterThanOrEquals);
 
             var result = await _elasticClient.SearchAsync<LogEntry>(p => p
                 .Index(_indexName)
