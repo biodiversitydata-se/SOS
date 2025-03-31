@@ -511,12 +511,7 @@ namespace SOS.Observations.Api
                     options.Period = TimeSpan.FromSeconds(600); // Create new health check every 10 minutes and cache result
                     options.Timeout = TimeSpan.FromSeconds(60);
                 });
-                healthChecks
-                    .AddDiskStorageHealthCheck(
-                        x => x.AddDrive("C:\\", (long)(healthCheckConfiguration.MinimumLocalDiskStorage * 1000)),
-                        name: $"Primary disk: min {healthCheckConfiguration.MinimumLocalDiskStorage}GB free - warning",
-                        failureStatus: HealthStatus.Degraded,
-                        tags: new[] { "disk" })
+                healthChecks                    
                     //  .AddMongoDb(processedDbConfiguration.GetConnectionString(), tags: new[] { "database", "mongodb" })
                     .AddHangfire(a => a.MinimumAvailableServers = 1, "Hangfire", tags: new[] { "hangfire" })
                     .AddCheck<DataAmountHealthCheck>("Data amount", tags: new[] { "database", "elasticsearch", "data" })
