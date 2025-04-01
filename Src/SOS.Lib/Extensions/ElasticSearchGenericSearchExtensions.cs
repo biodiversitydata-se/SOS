@@ -229,10 +229,10 @@ namespace SOS.Lib.Extensions
                         .BoundingBox(
                             GeoBounds.Coordinates(new CoordsGeoBounds
                             {
-                                Bottom = boundingBox.TopLeft.Latitude,
+                                Bottom = boundingBox.BottomRight.Latitude,
                                 Left = boundingBox.TopLeft.Longitude,
                                 Right = boundingBox.BottomRight.Longitude,
-                                Top = boundingBox.BottomRight.Latitude
+                                Top = boundingBox.TopLeft.Latitude
                             })
                         )
                     )

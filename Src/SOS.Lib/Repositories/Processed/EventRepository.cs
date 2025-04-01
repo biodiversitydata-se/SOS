@@ -406,7 +406,9 @@ namespace SOS.Lib.Repositories.Processed
                             .Sources(
                                 [
                                     CreateCompositeTermsAggregationSource(
-                                        (aggregationFieldKey, aggregationFieldKey, SortOrder.Desc),
+                                        (aggregationFieldKey, aggregationFieldKey, SortOrder.Desc)
+                                    ),
+                                    CreateCompositeTermsAggregationSource(
                                         (aggregationFieldList, aggregationFieldList, SortOrder.Asc)
                                     )
                                 ]

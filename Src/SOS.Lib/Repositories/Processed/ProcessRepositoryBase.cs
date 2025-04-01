@@ -366,7 +366,7 @@ namespace SOS.Lib.Repositories.Processed
             
             var count = 0;
             return Client.BulkAll(items, b => b
-                    .Index(IndexName)
+                    .Index(indexName)
                     // how long to wait between retries
                     .BackOffTime("30s")
                     // how many retries are attempted if a failure occurs                        .
@@ -389,17 +389,6 @@ namespace SOS.Lib.Repositories.Processed
                     {
                         Logger.LogDebug($"Indexing item for search:{count += next.Items.Count}");
                     });
-        }
-
-        /// <summary>
-        /// Write items to default index
-        /// </summary>
-        /// <param name="items"></param>
-        /// <param name="refreshIndex"></param>
-        /// <returns></returns>
-        protected async Task<BulkAllObserver> WriteToElasticAsync(IEnumerable<TEntity> items, bool refreshIndex = false)
-        {
-            return await WriteToElasticAsync(items, IndexName, refreshIndex);
         }
 
         /// <summary>

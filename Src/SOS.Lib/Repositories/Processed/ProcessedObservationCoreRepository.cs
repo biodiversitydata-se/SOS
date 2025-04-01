@@ -1039,7 +1039,9 @@ namespace SOS.Lib.Repositories.Processed
                             .Sources(
                                 [
                                     CreateCompositeTermsAggregationSource(
-                                        (aggregationFieldKey, aggregationFieldKey, SortOrder.Desc),
+                                        (aggregationFieldKey, aggregationFieldKey, SortOrder.Desc)
+                                    ),
+                                     CreateCompositeTermsAggregationSource(
                                         (aggregationFieldList, aggregationFieldList, SortOrder.Asc)
                                     )
                                 ]
@@ -1086,7 +1088,9 @@ namespace SOS.Lib.Repositories.Processed
                              .Sources(
                                 [
                                     CreateCompositeTermsAggregationSource(
-                                        ("eventId", "event.eventId", SortOrder.Asc),
+                                        ("eventId", "event.eventId", SortOrder.Asc)
+                                    ),
+                                     CreateCompositeTermsAggregationSource(
                                         ("occurrenceId", "occurrence.occurrenceId", SortOrder.Asc)
                                     )
                                 ]
@@ -1489,7 +1493,7 @@ namespace SOS.Lib.Repositories.Processed
 
                 totalCount = countResponse.Count;
             }
-
+            
             return new PagedResult<dynamic>
             {
                 Records = searchResponse.Documents,
@@ -1754,7 +1758,7 @@ namespace SOS.Lib.Repositories.Processed
         /// <inheritdoc />
         public async Task<long> GetMatchCountAsync(SearchFilterBase filter, bool skipAuthorizationFilters = false)
         {
-            var indexNames = GetCurrentIndex(filter, skipAuthorizationFilters);
+           var indexNames = GetCurrentIndex(filter, skipAuthorizationFilters);
             var (query, excludeQuery) = GetCoreQueries(filter, skipAuthorizationFilters);
 
             var countResponse = await Client.CountAsync<dynamic>(indexNames, s => s
@@ -1801,11 +1805,13 @@ namespace SOS.Lib.Repositories.Processed
                     .Add("gridCells", a => a
                         .Composite(c => c
                             .Size(maxBuckets ?? MaxNrElasticSearchAggregationBuckets + 1)
-                            .After(a => afterKey.ToDictionary(ak => ak.Key.ToField(), ak => ak.Value).ToFluentDictionary())
+                            .After(a => afterKey?.ToDictionary(ak => ak.Key.ToField(), ak => ak.Value).ToFluentDictionary())
                             .Sources(
                                 [
                                     CreateCompositeTermsAggregationSource(
-                                        ("metric_x", $"(Math.floor(doc['location.{(metricCoordinateSys.Equals(MetricCoordinateSys.ETRS89) || metricCoordinateSys.Equals(MetricCoordinateSys.ETRS89_LAEA_Europe) ? "etrs89X" : "sweref99TmX")}'].value / {gridCellSizeInMeters}) * {gridCellSizeInMeters}).intValue()", SortOrder.Asc, false, true),
+                                        ("metric_x", $"(Math.floor(doc['location.{(metricCoordinateSys.Equals(MetricCoordinateSys.ETRS89) || metricCoordinateSys.Equals(MetricCoordinateSys.ETRS89_LAEA_Europe) ? "etrs89X" : "sweref99TmX")}'].value / {gridCellSizeInMeters}) * {gridCellSizeInMeters}).intValue()", SortOrder.Asc, false, true)
+                                    ),
+                                    CreateCompositeTermsAggregationSource(
                                         ("metric_y", $"(Math.floor(doc['location.{(metricCoordinateSys.Equals(MetricCoordinateSys.ETRS89) || metricCoordinateSys.Equals(MetricCoordinateSys.ETRS89_LAEA_Europe) ? "etrs89Y" : "sweref99TmY")}'].value / {gridCellSizeInMeters}) * {gridCellSizeInMeters}).intValue()", SortOrder.Asc, false, true)
                                     )
                                 ]
@@ -2332,7 +2338,7 @@ namespace SOS.Lib.Repositories.Processed
                 .Aggregations(a => a
                     .Add("aggregation", a => a
                         .Composite(c => c
-                            .After(ak => afterKey.ToFluentFieldDictionary())
+                            .After(ak => afterKey?.ToFluentFieldDictionary())
                             .Size(take)
                             .Sources(
                                 [

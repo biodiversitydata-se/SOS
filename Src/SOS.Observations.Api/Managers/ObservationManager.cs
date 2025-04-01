@@ -25,6 +25,10 @@ using System.Threading.Tasks;
 using OfficeOpenXml;
 using SOS.Lib.Models.Search.Enums;
 using NetTopologySuite.Geometries;
+using System.Text.Json;
+using Newtonsoft.Json.Linq;
+using System.Text.Json.Nodes;
+using System.Collections;
 
 namespace SOS.Observations.Api.Managers
 {
@@ -50,17 +54,39 @@ namespace SOS.Observations.Api.Managers
             return await _processedObservationRepository.GetProvinceCountAsync(filter);
         }
 
-        private async Task PostProcessObservations(SearchFilter filter, ProtectionFilter protectionFilter, IEnumerable<dynamic> processedObservations, string cultureCode)
+        private async Task<IEnumerable<dynamic>> PostProcessObservationsAsync(SearchFilter filter, ProtectionFilter protectionFilter, IEnumerable<dynamic> processedObservations, string cultureCode)
         {
             if (!processedObservations?.Any() ?? true)
             {
-                return;
+                return processedObservations;
             }
 
             try
             {
-                var occurenceIds = new HashSet<string>();
-                var observations = processedObservations.Cast<IDictionary<string, object>>().ToList();
+                try
+                {
+                    var xxx = (JsonElement)processedObservations.First();
+                    var tt = xxx.Deserialize<JsonObject>();
+                    var tfft = xxx.Deserialize<JsonNode>();
+
+                    var yyy = processedObservations.Cast<JsonElement>;
+                    var yyys = processedObservations.Cast<JsonObject>;
+
+                    var dddd = processedObservations.Cast<IEnumerable<JsonNode>>;
+                    
+                }
+                catch
+                {
+
+                }
+                
+
+                 var occurenceIds = new HashSet<string>();
+                var observationss = JsonSerializer.Deserialize<IEnumerable<JsonNode>>(JsonSerializer.Serialize(processedObservations));
+                var observations = processedObservations.Select(po => {
+                    var vc = (JsonElement)po;
+                    return vc.Deserialize<JsonNode>();
+                });
                 LocalDateTimeConverterHelper.ConvertToLocalTime(observations);
 
                 // Resolve vocabulary values.
@@ -68,10 +94,11 @@ namespace SOS.Observations.Api.Managers
 
                 foreach (var obs in observations)
                 {
+                    var sensitive = (bool?)obs["sensitive"];
+                    var occurrenceObject = obs["occurrence"];
                     if (!protectionFilter.Equals(ProtectionFilter.Public) &&
-                        obs.TryGetValue(nameof(Observation.Sensitive).ToLower(), out var sensitive) &&
-                        obs.TryGetValue(nameof(Observation.Occurrence).ToLower(), out var occurrenceObject)
-                    )
+                        sensitive.HasValue &&
+                        occurrenceObject != null)
                     {
                         if (((bool)sensitive) && occurrenceObject is IDictionary<string, object> occurrenceDictionary && occurrenceDictionary.TryGetValue("occurrenceId", out var occurenceId))
                         {
@@ -104,6 +131,8 @@ namespace SOS.Observations.Api.Managers
                 }
 
                 await _generalizationResolver.ResolveGeneralizedObservationsAsync(filter, observations);
+
+                return observations.Select(o => JsonDocument.Parse(o.ToJsonString()));
             }
             catch (Exception e)
             {
@@ -367,7 +396,7 @@ namespace SOS.Observations.Api.Managers
                 await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
                 var processedObservations =
                     await _processedObservationRepository.GetChunkAsync(filter, skip, take);
-                await PostProcessObservations(filter, filter.ExtendedAuthorization.ProtectionFilter, processedObservations.Records, filter.FieldTranslationCultureCode);
+                processedObservations.Records = await PostProcessObservationsAsync(filter, filter.ExtendedAuthorization.ProtectionFilter, processedObservations.Records, filter.FieldTranslationCultureCode);
 
                 return processedObservations;
             }
@@ -400,7 +429,7 @@ namespace SOS.Observations.Api.Managers
                 await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
                 var processedObservations =
                     await _processedObservationRepository.GetObservationsByScrollAsync(filter, take, scrollId);
-                await PostProcessObservations(filter, filter.ExtendedAuthorization.ProtectionFilter, processedObservations.Records, filter.FieldTranslationCultureCode);
+                processedObservations.Records = await PostProcessObservationsAsync(filter, filter.ExtendedAuthorization.ProtectionFilter, processedObservations.Records, filter.FieldTranslationCultureCode);
                 return processedObservations;
             }
             catch (AuthenticationRequiredException)
@@ -728,7 +757,7 @@ namespace SOS.Observations.Api.Managers
 
             var processedObservation = await _processedObservationRepository.GetObservationAsync(occurrenceId, filter);
 
-            await PostProcessObservations(filter, protectionFilter, processedObservation, translationCultureCode);
+            processedObservation.Records = await PostProcessObservationsAsync(filter, protectionFilter, processedObservation, translationCultureCode);
 
             return (processedObservation?.Count ?? 0) == 1 ? processedObservation[0] : null;
         }

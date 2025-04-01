@@ -7,6 +7,7 @@ using SOS.Lib.Repositories.Resource.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 
 namespace SOS.Lib.Helpers
@@ -66,7 +67,7 @@ namespace SOS.Lib.Helpers
         }
 
         private void ResolveVocabularyMappedValues(
-            IDictionary<string, object> obs,
+            JsonNode obs,
             string cultureCode)
         {
             var valueMappingDictionaries = _valueMappingDictionariesByCultureCode[cultureCode];
@@ -78,91 +79,84 @@ namespace SOS.Lib.Helpers
             ResolveVocabularyMappedValue(obs, nameof(Observation.InstitutionCode), valueMappingDictionaries[VocabularyId.Institution]);
 
             // Event
-            if (obs.TryGetValue(nameof(Observation.Event).ToLower(), out var eventObject))
+            var eventObject = obs["event"];
+            if (eventObject != null)
             {
-                var eventDictionary = eventObject as IDictionary<string, object>;
-                ResolveVocabularyMappedValue(eventDictionary, nameof(Observation.Event.DiscoveryMethod), valueMappingDictionaries[VocabularyId.DiscoveryMethod]);
+                ResolveVocabularyMappedValue(eventObject, nameof(Observation.Event.DiscoveryMethod), valueMappingDictionaries[VocabularyId.DiscoveryMethod]);
             }
 
             // Identification
-            if (obs.TryGetValue(nameof(Observation.Identification).ToLower(),
-                out var identificationObject))
+            var identificationObject = obs["identification"];
+            if (identificationObject != null)
             {
-                var identificationDictionary = identificationObject as IDictionary<string, object>;
                 //  ResolveVocabularyMappedValue(identificationDictionary, nameof(Observation.Identification.ValidationStatus), valueMappingDictionaries[VocabularyId.VerificationStatus]);
-                ResolveVocabularyMappedValue(identificationDictionary, nameof(Observation.Identification.VerificationStatus), valueMappingDictionaries[VocabularyId.VerificationStatus]);
-                ResolveVocabularyMappedValue(identificationDictionary, nameof(Observation.Identification.DeterminationMethod), valueMappingDictionaries[VocabularyId.DeterminationMethod]);
+                ResolveVocabularyMappedValue(identificationObject, nameof(Observation.Identification.VerificationStatus), valueMappingDictionaries[VocabularyId.VerificationStatus]);
+                ResolveVocabularyMappedValue(identificationObject, nameof(Observation.Identification.DeterminationMethod), valueMappingDictionaries[VocabularyId.DeterminationMethod]);
             }
 
             // Occurrence
-            if (obs.TryGetValue(nameof(Observation.Occurrence).ToLower(),
-                            out var occurrenceObject))
+            var occurrenceObject = obs["occurrence"];
+            if (occurrenceObject != null)
             {
-                var occurrenceDictionary = occurrenceObject as IDictionary<string, object>;
-                ResolveVocabularyMappedValue(occurrenceDictionary, nameof(Observation.Occurrence.Activity), valueMappingDictionaries[VocabularyId.Activity]);
-                ResolveVocabularyMappedValue(occurrenceDictionary, nameof(Observation.Occurrence.Behavior), valueMappingDictionaries[VocabularyId.Behavior]);
-                ResolveVocabularyMappedValue(occurrenceDictionary, nameof(Observation.Occurrence.Biotope), valueMappingDictionaries[VocabularyId.Biotope]);
-                ResolveVocabularyMappedValue(occurrenceDictionary, nameof(Observation.Occurrence.EstablishmentMeans), valueMappingDictionaries[VocabularyId.EstablishmentMeans]);
-                ResolveVocabularyMappedValue(occurrenceDictionary, nameof(Observation.Occurrence.Sex), valueMappingDictionaries[VocabularyId.Sex]);
-                ResolveVocabularyMappedValue(occurrenceDictionary, nameof(Observation.Occurrence.ReproductiveCondition), valueMappingDictionaries[VocabularyId.ReproductiveCondition]);
-                ResolveVocabularyMappedValue(occurrenceDictionary, nameof(Observation.Occurrence.LifeStage), valueMappingDictionaries[VocabularyId.LifeStage]);
-                ResolveVocabularyMappedValue(occurrenceDictionary, nameof(Observation.Occurrence.OrganismQuantityUnit), valueMappingDictionaries[VocabularyId.Unit]);
-                ResolveVocabularyMappedValue(occurrenceDictionary, nameof(Observation.Occurrence.OccurrenceStatus), valueMappingDictionaries[VocabularyId.OccurrenceStatus]);
+                ResolveVocabularyMappedValue(occurrenceObject, nameof(Observation.Occurrence.Activity), valueMappingDictionaries[VocabularyId.Activity]);
+                ResolveVocabularyMappedValue(occurrenceObject, nameof(Observation.Occurrence.Behavior), valueMappingDictionaries[VocabularyId.Behavior]);
+                ResolveVocabularyMappedValue(occurrenceObject, nameof(Observation.Occurrence.EstablishmentMeans), valueMappingDictionaries[VocabularyId.EstablishmentMeans]);
+                ResolveVocabularyMappedValue(occurrenceObject, nameof(Observation.Occurrence.Sex), valueMappingDictionaries[VocabularyId.Sex]);
+                ResolveVocabularyMappedValue(occurrenceObject, nameof(Observation.Occurrence.ReproductiveCondition), valueMappingDictionaries[VocabularyId.ReproductiveCondition]);
+                ResolveVocabularyMappedValue(occurrenceObject, nameof(Observation.Occurrence.LifeStage), valueMappingDictionaries[VocabularyId.LifeStage]);
+                ResolveVocabularyMappedValue(occurrenceObject, nameof(Observation.Occurrence.OrganismQuantityUnit), valueMappingDictionaries[VocabularyId.Unit]);
+                ResolveVocabularyMappedValue(occurrenceObject, nameof(Observation.Occurrence.OccurrenceStatus), valueMappingDictionaries[VocabularyId.OccurrenceStatus]);
 
                 // Occurrence.Substrate
-                if (occurrenceDictionary != null && occurrenceDictionary.TryGetValue(nameof(Observation.Occurrence.Substrate).ToLower(),
-                    out var substrateObject))
+                var substrateObject = occurrenceObject["substrate"];
+                if (substrateObject != null)
                 {
-                    var substrateDictionary = substrateObject as IDictionary<string, object>;
-                    ResolveVocabularyMappedValue(substrateDictionary, nameof(Observation.Occurrence.Substrate.Name), valueMappingDictionaries[VocabularyId.Substrate]);
+                    ResolveVocabularyMappedValue(substrateObject, nameof(Observation.Occurrence.Substrate.Name), valueMappingDictionaries[VocabularyId.Substrate]);
                 }
             }
 
             // Location
-            if (obs.TryGetValue(nameof(Observation.Location).ToLower(), out var locationObject))
+            var locationObject = obs["location"];
+            if (locationObject != null)
             {
-                var locationDictionary = locationObject as IDictionary<string, object>;
-
-                ResolveVocabularyMappedValue(locationDictionary, nameof(Observation.Location.Continent), valueMappingDictionaries[VocabularyId.Continent]);
-                ResolveVocabularyMappedValue(locationDictionary, nameof(Observation.Location.Country), valueMappingDictionaries[VocabularyId.Country]);
+                ResolveVocabularyMappedValue(locationObject, nameof(Observation.Location.Continent), valueMappingDictionaries[VocabularyId.Continent]);
+                ResolveVocabularyMappedValue(locationObject, nameof(Observation.Location.Country), valueMappingDictionaries[VocabularyId.Country]);
             }
 
             // Taxon
-            if (obs.TryGetValue(nameof(Observation.Taxon).ToLower(), out var taxonObject))
+            var taxonObject = obs["taxon"];
+            if (taxonObject != null)
             {
                 var taxonDictionary = taxonObject as IDictionary<string, object>;
 
                 // Taxon.Attributes
-                if (taxonDictionary != null && taxonDictionary.TryGetValue(
-                    nameof(Observation.Taxon.Attributes).ToLower(),
-                    out var taxonAttributesObject))
+                var taxonAttributesObject = taxonObject["attributes"];
+                if (taxonAttributesObject != null)
                 {
-                    var taxonAttributesDictionary = taxonAttributesObject as IDictionary<string, object>;
                     //   ResolveVocabularyMappedValue(taxonAttributesDictionary, nameof(Observation.Taxon.Attributes.ProtectionLevel), valueMappingDictionaries[VocabularyId.SensitivityCategory]);
-                    ResolveVocabularyMappedValue(taxonAttributesDictionary, nameof(Observation.Taxon.Attributes.SensitivityCategory), valueMappingDictionaries[VocabularyId.SensitivityCategory]);
-                    ResolveVocabularyMappedValue(taxonAttributesDictionary, nameof(Observation.Taxon.Attributes.TaxonCategory), valueMappingDictionaries[VocabularyId.TaxonCategory]);
+                    ResolveVocabularyMappedValue(taxonAttributesObject, nameof(Observation.Taxon.Attributes.SensitivityCategory), valueMappingDictionaries[VocabularyId.SensitivityCategory]);
+                    ResolveVocabularyMappedValue(taxonAttributesObject, nameof(Observation.Taxon.Attributes.TaxonCategory), valueMappingDictionaries[VocabularyId.TaxonCategory]);
                 }
             }
         }
 
         private void ResolveVocabularyMappedValue(
-            IDictionary<string, object> observationNode,
+            JsonNode observationNode,
             string fieldName,
             Dictionary<int, string> valueById)
         {
             if (observationNode == null || valueById == null) return;
             var camelCaseName = fieldName.ToCamelCase();
 
-            if (observationNode.ContainsKey(camelCaseName))
+            var node = observationNode[camelCaseName];
+            if (node != null)
             {
-                if (observationNode[camelCaseName] is IDictionary<string, object> fieldNode &&
-                    fieldNode.ContainsKey("id"))
-                {
-                    var id = (long)fieldNode["id"];
+                var id = (long?)node["id"];
+                if (id.HasValue) {
                     if (id != VocabularyConstants.NoMappingFoundCustomValueIsUsedId &&
-                        valueById.TryGetValue((int)id, out var translatedValue))
+                            valueById.TryGetValue((int)id, out var translatedValue))
                     {
-                        fieldNode["value"] = translatedValue;
+                        node["value"] = translatedValue;
                     }
                 }
             }
@@ -253,7 +247,7 @@ namespace SOS.Lib.Helpers
             }
         }
 
-        public void ResolveVocabularyMappedValues(IEnumerable<IDictionary<string, object>> processedRecords,
+        public void ResolveVocabularyMappedValues(IEnumerable<JsonNode> processedRecords,
             string cultureCode,
             bool forceResolve = false)
         {

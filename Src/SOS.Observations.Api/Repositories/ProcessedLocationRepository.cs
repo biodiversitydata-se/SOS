@@ -98,12 +98,23 @@ namespace SOS.Observations.Api.Repositories
                             .Sources(
                                 [
                                     CreateCompositeTermsAggregationSource(
-                                        ("id", "location.locationId", SortOrder.Asc),
-                                        ("name", "location.locality", SortOrder.Asc),
-                                        ("county", "location.county.name", SortOrder.Asc),
-                                        ("municipality", "location.municipality.name", SortOrder.Asc),
-                                        ("parish", "location.parish.name", SortOrder.Asc),
-                                        ("longitude", "location.decimalLongitude", SortOrder.Asc),
+                                        ("id", "location.locationId", SortOrder.Asc)
+                                    ),
+                                    CreateCompositeTermsAggregationSource(
+                                        ("name", "location.locality", SortOrder.Asc)
+                                    ),
+                                    CreateCompositeTermsAggregationSource(
+                                        ("county", "location.county.name", SortOrder.Asc)
+                                    ),CreateCompositeTermsAggregationSource(                                       
+                                        ("municipality", "location.municipality.name", SortOrder.Asc)
+                                    ),
+                                    CreateCompositeTermsAggregationSource(
+                                        ("parish", "location.parish.name", SortOrder.Asc)
+                                    ),
+                                    CreateCompositeTermsAggregationSource(
+                                        ("longitude", "location.decimalLongitude", SortOrder.Asc)
+                                    ),
+                                    CreateCompositeTermsAggregationSource(
                                         ("latitude", "location.decimalLatitude", SortOrder.Asc)
                                     )
                                 ]

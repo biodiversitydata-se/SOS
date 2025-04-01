@@ -75,7 +75,6 @@ public class MetricGridAggregationInternalTests : TestBase
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        result!.GridCells.Sum(gc => gc.ObservationsCount).Should().Be(60,
-            because: "");
+        result!.GridCells.Sum(gc => gc.ObservationsCount).Should().Be(60, because: "");
     }
 }

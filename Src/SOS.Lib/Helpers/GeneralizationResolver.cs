@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 
 namespace SOS.Lib.Helpers
@@ -34,7 +35,7 @@ namespace SOS.Lib.Helpers
             _processedObservationRepository = processedObservationRepository;
         }
 
-        public async Task ResolveGeneralizedObservationsAsync(SearchFilter filter, IEnumerable<IDictionary<string, object>> observations)
+        public async Task ResolveGeneralizedObservationsAsync(SearchFilter filter, IEnumerable<JsonNode> observations)
         {            
             try
             {
@@ -43,7 +44,7 @@ namespace SOS.Lib.Helpers
                     return;
                 }
 
-                List<IDictionary<string, object>> generalizedObservations = GetGeneralizedObservations(observations);
+                List<JsonNode> generalizedObservations = GetGeneralizedObservations(observations);
                 var generalizedOccurrenceIds = GetOccurrenceIds(generalizedObservations);
                 var protectedFilter = filter.Clone();
                 protectedFilter.ExtendedAuthorization.ProtectionFilter = ProtectionFilter.Sensitive;
@@ -65,7 +66,7 @@ namespace SOS.Lib.Helpers
                 await _filterManager.PrepareFilterAsync(protectedFilter.RoleId, protectedFilter.AuthorizationApplicationIdentifier, protectedFilter);
                 var dynamicSensitiveObservationsResult = await _processedObservationRepository.GetChunkAsync(protectedFilter, 0, 1000);
 
-                List<IDictionary<string, object>> sensitiveObservations = dynamicSensitiveObservationsResult.Records.Cast<IDictionary<string, object>>().ToList();
+                var sensitiveObservations = dynamicSensitiveObservationsResult.Records.Cast<JsonNode>().ToList();
                 UpdateGeneralizedWithRealValues(generalizedObservations, sensitiveObservations);
             }
             catch (Exception ex)
@@ -116,7 +117,7 @@ namespace SOS.Lib.Helpers
             }
         }
 
-        private void UpdateGeneralizedWithRealValues(List<IDictionary<string, object>> observations, List<IDictionary<string, object>> realObservations)
+        private void UpdateGeneralizedWithRealValues(IEnumerable<JsonNode> observations, IEnumerable<JsonNode> realObservations)
         {
             var obsByOccurrenceId = GetObservationsByOccurrenceIdDictionary(observations);
             var realObsByOccurrenceId = GetObservationsByOccurrenceIdDictionary(realObservations);
@@ -156,19 +157,23 @@ namespace SOS.Lib.Helpers
             }
         }
 
-        private Dictionary<string, IDictionary<string, object>> GetObservationsByOccurrenceIdDictionary(List<IDictionary<string, object>> observations)
+        private IDictionary<string, JsonNode> GetObservationsByOccurrenceIdDictionary(IEnumerable<JsonNode> observations)
         {
-            var dict = new Dictionary<string, IDictionary<string, object>>();
+            var nodes = new Dictionary<string, JsonNode>();
             foreach (var obs in observations)
             {
-                string? occurrenceId = GetValue<string?>(obs, "occurrence.occurrenceId");
-                if (occurrenceId != null)
+                var occurrenceObject = obs["occurrence"];
+                if (occurrenceObject != null)
                 {
-                    dict.Add(occurrenceId, obs);
+                    var occurrenceId = (string)occurrenceObject["occurrenceId"];
+                    if (occurrenceId != null)
+                    {
+                        nodes.Add(occurrenceId, obs);
+                    }
                 }
             }
 
-            return dict;
+            return nodes;
         }
 
         private T GetValue<T>(IDictionary<string, object> obs, string propertyPath)
@@ -226,69 +231,41 @@ namespace SOS.Lib.Helpers
             }
         }
 
-        private void UpdateGeneralizedWithRealValues(IDictionary<string, object> obs, IDictionary<string, object> realObs)
+        private void UpdateGeneralizedWithRealValues(JsonNode obs, JsonNode realObs)
         {
             // isGeneralized
-            if (obs.ContainsKey("isGeneralized"))
+            var isGeneralized = (bool?)obs["isGeneralized"];
+            var isGeneralizedReal = (bool?)realObs["isGeneralized"];
+            if ((isGeneralized ?? false) && (isGeneralizedReal ?? false))
             {
-                if (realObs.ContainsKey("isGeneralized"))
-                {
-                    obs["isGeneralized"] = realObs["isGeneralized"];
-                }
+                obs["isGeneralized"] = realObs["isGeneralized"];
             }
 
-            if (obs.ContainsKey("location"))
+            var location = obs["location"];
+            var locationReal = realObs["location"];
+            if (location != null && locationReal != null)
             {
-                if (realObs.ContainsKey("location"))
-                {
-                    obs["location"] = realObs["location"];
-                }
-            }
-            
-            if (obs.ContainsKey("sensitive"))
-            {
-                if (realObs.ContainsKey("sensitive"))
-                {
-                    obs["sensitive"] = realObs["sensitive"];
-                }
+                obs["location"] = realObs["location"];
             }
 
-            if (obs.ContainsKey("sensitive"))
+            var sensitive = obs["sensitive"];
+            var sensitiveReal = realObs["sensitive"];
+            if (sensitive != null && sensitiveReal != null)
             {
-                if (realObs.ContainsKey("sensitive"))
-                {
-                    obs["sensitive"] = realObs["sensitive"];
-                }
-            }
-            
-            if (obs.TryGetValue(nameof(Observation.Occurrence).ToLower(),
-                            out var occurrenceObject))
-            {
-                var occurrenceDictionary = occurrenceObject as IDictionary<string, object>;
-                if (occurrenceDictionary.TryGetValue("sensitivityCategory", out var sensitivityCategory))
-                {
-                    if (realObs.TryGetValue(nameof(Observation.Occurrence).ToLower(),
-                            out var realOccurrenceObject))
-                    {
-                        var realOccurrenceDictionary = realOccurrenceObject as IDictionary<string, object>;
-                        if (realOccurrenceDictionary.ContainsKey("sensitivityCategory"))
-                        {
-                            realOccurrenceDictionary["sensitivityCategory"] = sensitivityCategory;
-                        }
-                    }
-                }
+                obs["sensitive"] = realObs["sensitive"];
             }
 
-
-
-            // Replace all fields
-            //foreach (var key in obs.Keys)
-            //{
-            //    if (realObs.ContainsKey(key))
-            //    {
-            //        obs[key] = realObs[key];
-            //    }
-            //}
+            var occurrence = obs["occurrence"];
+            var occurrenceReal = realObs["occurrence"];
+            if (occurrence != null && occurrenceReal != null)
+            {
+                var sensitiveCategory = occurrence["sensitivityCategory"];
+                var sensitiveCategoryReal = occurrenceReal["sensitivityCategory"];
+                if (sensitiveCategory != null && sensitiveCategoryReal != null)
+                {
+                    occurrenceReal["sensitivityCategory"] = occurrence["sensitivityCategory"];
+                }
+            }
         }
 
         private void UpdateGeneralizedWithRealValues(Observation obs, Observation realObs)
@@ -307,17 +284,18 @@ namespace SOS.Lib.Helpers
                 new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
         }
 
-        private List<string> GetOccurrenceIds(List<IDictionary<string, object>> observations)
+        private List<string> GetOccurrenceIds(List<JsonNode> observations)
         {
             var occurrenceIds = new List<string>();
             foreach (var obs in observations)
             {
                 // Occurrence
-                if (obs.TryGetValue(nameof(Observation.Occurrence).ToLower(),
-                                out var occurrenceObject))
+                var occurrenceObject = obs["occurrence"];
+                if (occurrenceObject != null)
                 {
-                    var occurrenceDictionary = occurrenceObject as IDictionary<string, object>;
-                    if (occurrenceDictionary.TryGetValue("occurrenceId", out var occurrenceId))
+                    var occurrenceId = (string)occurrenceObject["occurrenceId"];
+                   
+                    if (!string.IsNullOrEmpty(occurrenceId))
                     {
                         occurrenceIds.Add((string)occurrenceId);
                     }
@@ -327,21 +305,18 @@ namespace SOS.Lib.Helpers
             return occurrenceIds;
         }
 
-        private List<IDictionary<string, object>> GetGeneralizedObservations(IEnumerable<IDictionary<string, object>> observations)
+        private List<JsonNode> GetGeneralizedObservations(IEnumerable<JsonNode> observations)
         {
-            var generalizedObservations = new List<IDictionary<string, object>>();
+            var generalizedObservations = new List<JsonNode>();
             try
             {
                 foreach (var obs in observations)
                 {
                     if (obs == null) continue;
-                    if (obs.ContainsKey("isGeneralized"))
+                    var isGeneralized = (bool?)obs["isGeneralized"];
+                    if (isGeneralized ?? false)
                     {
-                        bool isGeneralized = (bool)obs["isGeneralized"];
-                        if (isGeneralized)
-                        {
-                            generalizedObservations.Add(obs);
-                        }
+                        generalizedObservations.Add(obs);
                     }
                 }
             }

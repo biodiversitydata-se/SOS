@@ -817,30 +817,32 @@ namespace SOS.Lib
 
             if (filter == null)
             {
-                if (filter.Location?.AreaGeographic?.GeometryFilter?.IsValid ?? false)
-                {
-                    foreach (var geom in filter.Location.AreaGeographic?.GeometryFilter.Geometries)
-                    {
-                        switch (geom.OgcGeometryType)
-                        {
-                            case OgcGeometryType.Polygon:
-                            case OgcGeometryType.MultiPolygon:
-                                queries.TryAddGeoShapeCriteria($"location.{(filter.Location.AreaGeographic.GeometryFilter.UsePointAccuracy ? "pointWithBuffer" : "point")}", geom, GeoShapeRelation.Intersects);
-                                if (!filter.Location.AreaGeographic.GeometryFilter.UseDisturbanceRadius) // Not sure this should be used here
-                                {
-                                    continue;
-                                }
-                                queries.TryAddGeoShapeCriteria("location.pointWithDisturbanceBuffer", geom, GeoShapeRelation.Intersects);
-
-                                break;
-                        }
-                    }
-                }
-
-                queries.TryAddTermsCriteria("occurrence.occurrenceId", filter.ExcludeFilter?.OccurrenceIds);
-                queries.TryAddInternalExcludeFilters(filter);
+                return queries;
             }
 
+            if (filter.Location?.AreaGeographic?.GeometryFilter?.IsValid ?? false)
+            {
+                foreach (var geom in filter.Location.AreaGeographic?.GeometryFilter.Geometries)
+                {
+                    switch (geom.OgcGeometryType)
+                    {
+                        case OgcGeometryType.Polygon:
+                        case OgcGeometryType.MultiPolygon:
+                            queries.TryAddGeoShapeCriteria($"location.{(filter.Location.AreaGeographic.GeometryFilter.UsePointAccuracy ? "pointWithBuffer" : "point")}", geom, GeoShapeRelation.Intersects);
+                            if (!filter.Location.AreaGeographic.GeometryFilter.UseDisturbanceRadius) // Not sure this should be used here
+                            {
+                                continue;
+                            }
+                            queries.TryAddGeoShapeCriteria("location.pointWithDisturbanceBuffer", geom, GeoShapeRelation.Intersects);
+
+                            break;
+                    }
+                }
+            }
+
+            queries.TryAddTermsCriteria("occurrence.occurrenceId", filter.ExcludeFilter?.OccurrenceIds);
+            queries.TryAddInternalExcludeFilters(filter);
+     
             return queries;
         }
 

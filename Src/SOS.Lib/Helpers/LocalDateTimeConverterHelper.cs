@@ -1,6 +1,8 @@
-﻿using SOS.Lib.Models.Processed.Observation;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using SOS.Lib.Models.Processed.Observation;
 using System;
 using System.Collections.Generic;
+using System.Text.Json.Nodes;
 
 namespace SOS.Lib.Helpers
 {
@@ -21,7 +23,7 @@ namespace SOS.Lib.Helpers
             }
         }
 
-        public static void ConvertToLocalTime(IEnumerable<IDictionary<string, object>> processedRecords)
+        public static void ConvertToLocalTime(IEnumerable<JsonNode> processedRecords)
         {
             if (processedRecords == null) return;
 
@@ -47,64 +49,50 @@ namespace SOS.Lib.Helpers
             }
         }
 
-        private static void ConvertToLocalTime(IDictionary<string, object> obs)
+        private static void ConvertToLocalTime(JsonNode obs)
         {
             // Created
-            if (obs.TryGetValue("created", out var createdDateObject))
+            var createdDateString = (string)obs["created"];
+            if (createdDateString != null)
             {
-                if (createdDateObject is string createdDateString)
-                {
-                    obs["created"] = DateTime.Parse(createdDateString);
-                }
+                obs["created"] = DateTime.Parse(createdDateString);
             }
 
             // Modified
-            if (obs.TryGetValue("modified", out var modifiedDateObject))
+            var modifiedDateString = (string)obs["modified"];
+            if (modifiedDateString != null)
             {
-                if (modifiedDateObject is string modifiedDateString)
-                {
-                    obs["modified"] = DateTime.Parse(modifiedDateString);
-                }
+                obs["modified"] = DateTime.Parse(modifiedDateString);
             }
 
             // Event
-            if (obs.TryGetValue("event", out var eventObject))
+            var eventObject = obs["event"];
+            if (eventObject != null)
             {
-                if (eventObject is IDictionary<string, object> eventDictionary)
+                // StartDate
+                var startDateString = (string)eventObject["startDate"];
+                if (startDateString != null)
                 {
-                    // StartDate
-                    if (eventDictionary.TryGetValue("startDate", out var startDateObject))
-                    {
-                        if (startDateObject is string startDateString)
-                        {
-                            eventDictionary["startDate"] = DateTime.Parse(startDateString);
-                        }
-                    }
+                    eventObject["startDate"] = DateTime.Parse(startDateString);
+                }
 
-                    // EndDate
-                    if (eventDictionary.TryGetValue("endDate", out var endDateObject))
-                    {
-                        if (endDateObject is string endDateString)
-                        {
-                            eventDictionary["endDate"] = DateTime.Parse(endDateString);
-                        }
-                    }
+                // EndDate
+                var endDateString = (string)eventObject["endDate"];
+                if (endDateString != null)
+                {
+                    eventObject["endDate"] = DateTime.Parse(endDateString);
                 }
             }
 
             // Occurrence
-            if (obs.TryGetValue("occurrence", out var occurrenceObject))
+            var occurrenceObject = obs["occurrence"];
+            if (occurrenceObject != null)
             {
-                if (occurrenceObject is IDictionary<string, object> occurrenceDictionary)
+                // StartDate
+                var reportedDateString = (string)occurrenceObject["reportedDate"];
+                if (reportedDateString != null)
                 {
-                    // StartDate
-                    if (occurrenceDictionary.TryGetValue("reportedDate", out var reportedDateObject))
-                    {
-                        if (reportedDateObject is string reportedDateString)
-                        {
-                            occurrenceDictionary["reportedDate"] = DateTime.Parse(reportedDateString);
-                        }
-                    }
+                    occurrenceObject["reportedDate"] = DateTime.Parse(reportedDateString);
                 }
             }
         }

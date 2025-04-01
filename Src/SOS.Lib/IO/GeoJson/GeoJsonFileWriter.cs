@@ -23,8 +23,10 @@ using System.Linq;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Text.Unicode;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace SOS.Lib.IO.GeoJson
 {
@@ -107,40 +109,30 @@ namespace SOS.Lib.IO.GeoJson
             return attributesTable;
         }
 
-        private Geometry GetFeatureGeometryFromDictionary(IDictionary<string, object> record)
+        private Geometry GetFeatureGeometryFromDictionary(JsonNode record)
         {
             double? decimalLatitude = null;
             double? decimalLongitude = null;
-            if (record.TryGetValue(nameof(Observation.Location).ToLower(), out var locationObject))
+            var locationObject = record["location"];
+            if (locationObject == null)
             {
-                var locationDictionary = locationObject as IDictionary<string, object>;
-                if (locationDictionary == null) return null;
-                if (locationDictionary.TryGetValue("decimalLatitude", out var decimalLatitudeObject))
-                {
-                    decimalLatitude = decimalLatitudeObject as double?;
-                }
-                if (locationDictionary.TryGetValue("decimalLongitude", out var decimalLongitudeObject))
-                {
-                    decimalLongitude = decimalLongitudeObject as double?;
-                }
+                return null;
             }
+            decimalLatitude = (double?)locationObject["decimalLatitude"];
 
             if (decimalLatitude == null || decimalLongitude == null) return null;
             Geometry geometry = new Point(decimalLongitude.Value, decimalLatitude.Value);
             return geometry;
         }
 
-        private string GetOccurrenceIdFromDictionary(IDictionary<string, object> record)
+        private string GetOccurrenceIdFromDictionary(JsonNode record)
         {
             string occurrenceId = null;
-            if (record.TryGetValue(nameof(Observation.Occurrence).ToLower(), out var occurrenceObject))
+
+            var occurrenceObject = record["occurrence"];
+            if (occurrenceObject != null)
             {
-                var occurrenceDictionary = occurrenceObject as IDictionary<string, object>;
-                if (occurrenceDictionary == null) return null;
-                if (occurrenceDictionary.TryGetValue("occurrenceId", out var occurrenceIdObject))
-                {
-                    occurrenceId = occurrenceIdObject.ToString();
-                }
+                occurrenceId = (string)occurrenceObject["occurrenceId"];
             }
 
             return occurrenceId;
@@ -177,14 +169,17 @@ namespace SOS.Lib.IO.GeoJson
 
         private async Task WriteFeature(
             IEnumerable<PropertyFieldDescription> propertyFields,
-            IDictionary<string, object> record,
+            JsonNode record,
             bool excludeNullValues,
             Utf8JsonWriter jsonWriter,
             JsonSerializerOptions jsonSerializerOptions)
         {
             Geometry geometry = GetFeatureGeometryFromDictionary(record);
             if (geometry == null) return;
-            AttributesTable attributesTable = new AttributesTable(record);
+
+            var data = JsonSerializer.Deserialize<Dictionary<string, object>>(record);
+            
+            var attributesTable = new AttributesTable(data);
             string id = GetOccurrenceIdFromDictionary(record);
             await WriteFeature(geometry, attributesTable, id, jsonWriter, jsonSerializerOptions);
         }
@@ -421,14 +416,14 @@ namespace SOS.Lib.IO.GeoJson
                 }
                 else
                 {
-                    IEnumerable<IDictionary<string, object>> processedRecords;
+                    IEnumerable<JsonNode> processedRecords;
                     if (useFastSearch)
                     {
-                        processedRecords = fastSearchResult.Records.Cast<IDictionary<string, object>>();
+                        processedRecords = fastSearchResult.Records.Cast<JsonNode>();
                     }
                     else
                     {
-                        processedRecords = searchResult.Records.Cast<IDictionary<string, object>>();
+                        processedRecords = searchResult.Records.Cast<JsonNode>();
                     }
 
                     nrObservations += processedRecords.Count();

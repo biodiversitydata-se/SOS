@@ -168,7 +168,7 @@ namespace SOS.Lib.Extensions
         /// <param name="eventField"></param>
         /// <param name="filter"></param>
         /// <returns></returns>
-        public static ICollection<Action<QueryDescriptor<TQueryDescriptor>>> TryAddEventDateCritera<TQueryDescriptor>(
+        public static void TryAddEventDateCritera<TQueryDescriptor>(
            this ICollection<Action<QueryDescriptor<TQueryDescriptor>>> queries, string eventField, DateFilter filter) where TQueryDescriptor : class
         {
             if (filter != null)
@@ -177,7 +177,6 @@ namespace SOS.Lib.Extensions
                 queries.TryAddTimeRangeFilters(filter, $"{eventField}.startDate");
                 
             }
-            return queries;
         }
 
 
@@ -189,7 +188,7 @@ namespace SOS.Lib.Extensions
         /// <param name="filter"></param>
         /// <param name="startDateField"></param>
         /// <param name="endDateField"></param>
-        public static ICollection<Action<QueryDescriptor<TQueryDescriptor>>> TryAddDateRangeFilters<TQueryDescriptor>(this ICollection<Action<QueryDescriptor<TQueryDescriptor>>> queries, DateFilter filter, string startDateField, string endDateField) where TQueryDescriptor : class
+        public static void TryAddDateRangeFilters<TQueryDescriptor>(this ICollection<Action<QueryDescriptor<TQueryDescriptor>>> queries, DateFilter filter, string startDateField, string endDateField) where TQueryDescriptor : class
         {
             if (filter != null)
             {
@@ -221,11 +220,9 @@ namespace SOS.Lib.Extensions
                     }
                 }
             }
-
-            return queries;
         }
 
-        public static ICollection<Action<QueryDescriptor<TQueryDescriptor>>> TryAddGeneralizationsCriteria<TQueryDescriptor>(
+        public static void TryAddGeneralizationsCriteria<TQueryDescriptor>(
             this ICollection<Action<QueryDescriptor<TQueryDescriptor>>> queries, bool? includeSensitiveGeneralizedObservations, bool? isGeneralized) where TQueryDescriptor : class
         {
             if (includeSensitiveGeneralizedObservations.HasValue)
@@ -269,7 +266,7 @@ namespace SOS.Lib.Extensions
                     )
                 );
             }
-            return queries;
+
         }
 
         /// <summary>
@@ -279,7 +276,7 @@ namespace SOS.Lib.Extensions
         /// <param name="queries"></param>
         /// <param name="filter"></param>
         /// <param name="field"></param>
-        public static ICollection<Action<QueryDescriptor<TQueryDescriptor>>> TryAddTimeRangeFilters<TQueryDescriptor>(this ICollection<Action<QueryDescriptor<TQueryDescriptor>>> queries, DateFilter filter, string field) where TQueryDescriptor : class
+        public static void TryAddTimeRangeFilters<TQueryDescriptor>(this ICollection<Action<QueryDescriptor<TQueryDescriptor>>> queries, DateFilter filter, string field) where TQueryDescriptor : class
         {
             if (filter?.TimeRanges?.Any() ?? false)
             {
@@ -301,9 +298,7 @@ namespace SOS.Lib.Extensions
                         .Should(timeRangeContainers.ToArray())
                     )
                 );  
-            }
-            return queries;
-           
+            }  
         }
     }
 }

@@ -6,7 +6,6 @@ using Elastic.Clients.Elasticsearch.Fluent;
 using Elastic.Clients.Elasticsearch.QueryDsl;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver.Linq;
-using Org.BouncyCastle.Asn1.Cmp;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Extensions;
@@ -16,7 +15,6 @@ using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
-using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.TaxonTree;
 using SOS.Lib.Repositories.Processed;
 using SOS.Observations.Api.Repositories.Interfaces;
@@ -372,7 +370,9 @@ namespace SOS.Observations.Api.Repositories
                             .Sources(
                                 [
                                     CreateCompositeAggregationSource(
-                                        (SourceTypes.GeoTileGrid, "geoTile", "location.pointLocation", SortOrder.Asc, null, null, Precision: zoom),
+                                        (SourceTypes.GeoTileGrid, "geoTile", "location.pointLocation", SortOrder.Asc, null, null, Precision: zoom)
+                                    ),
+                                     CreateCompositeAggregationSource(
                                         (SourceTypes.Term, "taxon", "taxon.id", SortOrder.Asc, null, null, null)
                                     )
                                 ]
@@ -460,7 +460,9 @@ namespace SOS.Observations.Api.Repositories
                             .Sources(
                                 [
                                     CreateCompositeTermsAggregationSource(
-                                        ("taxonId", "taxon.id", SortOrder.Asc),
+                                        ("taxonId", "taxon.id", SortOrder.Asc)
+                                    ),
+                                     CreateCompositeTermsAggregationSource(
                                         ("provinceId", "location.province.featureId", SortOrder.Asc)
                                     )
                                 ]

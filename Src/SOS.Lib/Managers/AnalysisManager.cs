@@ -152,6 +152,7 @@ namespace SOS.Lib.Managers
         {
             await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
             var result = await _processedObservationRepository.AggregateByUserFieldAsync(filter, aggregationField, aggregateOrganismQuantity, precisionThreshold, 
+                string.IsNullOrEmpty(afterKey) ? null :
                 new ReadOnlyDictionary<string, FieldValue>(new Dictionary<string, FieldValue>
                 {
                     { aggregationField, afterKey.ToFieldValue() }

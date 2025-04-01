@@ -551,7 +551,9 @@ namespace SOS.Observations.Api.Repositories
                                 .Sources(
                                     [
                                         CreateCompositeTermsAggregationSource(
-                                            ("startYear", "event.startYear", SortOrder.Desc),
+                                            ("startYear", "event.startYear", SortOrder.Desc)
+                                        ),
+                                        CreateCompositeTermsAggregationSource(
                                             ("startMonth", "event.startMonth", SortOrder.Desc)
                                         )
                                     ]
@@ -625,8 +627,12 @@ namespace SOS.Observations.Api.Repositories
                                 .Sources(
                                     [
                                          CreateCompositeTermsAggregationSource(
-                                            ("startYear", "event.startYear", SortOrder.Desc),
-                                            ("startMonth", "event.startMonth", SortOrder.Desc),
+                                            ("startYear", "event.startYear", SortOrder.Desc)
+                                        ),
+                                        CreateCompositeTermsAggregationSource(
+                                            ("startMonth", "event.startMonth", SortOrder.Desc)
+                                        ),
+                                        CreateCompositeTermsAggregationSource(
                                             ("startDay", "event.startDay", SortOrder.Desc)
                                         )
                                     ]
@@ -700,11 +706,19 @@ namespace SOS.Observations.Api.Repositories
                                     .Size((skip + take) * 10) // 10 locations for one day must be enought
                                     .Sources(
                                         [
-                                             CreateCompositeTermsAggregationSource(
-                                                ("startYear", "event.startYear", SortOrder.Desc),
-                                                ("startMonth", "event.startMonth", SortOrder.Desc),
-                                                ("startDay", "event.startDay", SortOrder.Desc),
-                                                ("locationId", "location.locationId", SortOrder.Desc),
+                                            CreateCompositeTermsAggregationSource(
+                                                ("startYear", "event.startYear", SortOrder.Desc)
+                                            ),
+                                            CreateCompositeTermsAggregationSource(
+                                                ("startMonth", "event.startMonth", SortOrder.Desc)
+                                            ),
+                                            CreateCompositeTermsAggregationSource(
+                                                ("startDay", "event.startDay", SortOrder.Desc)
+                                            ),
+                                            CreateCompositeTermsAggregationSource(
+                                                ("locationId", "location.locationId", SortOrder.Desc)
+                                            ),
+                                            CreateCompositeTermsAggregationSource(
                                                 ("locality", "location.locality.raw", SortOrder.Desc)
                                             )
                                         ]
