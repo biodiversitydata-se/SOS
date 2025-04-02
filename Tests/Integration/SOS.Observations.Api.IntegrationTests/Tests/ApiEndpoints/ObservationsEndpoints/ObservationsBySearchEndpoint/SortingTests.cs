@@ -90,7 +90,7 @@ public class SortingTests : TestBase
         }
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
         var apiClient = TestFixture.CreateApiClient();
-        var searchFilter = new SearchFilterDto { OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present, Output = new OutputFilterDto { FieldSet = Lib.Enums.OutputFieldSet.All } };
+        var searchFilter = new SearchFilterDto { OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present, Output = new OutputFilterDto { Fields = ["modified"] } };
 
         // Act - paginate
         var responseAsc1 = await apiClient.PostAsync($"/observations/search?sortBy=modified&sortOrder=asc&skip=0&take=50", JsonContent.Create(searchFilter));

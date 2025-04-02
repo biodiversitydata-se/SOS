@@ -81,7 +81,7 @@ namespace SOS.Observations.Api.Repositories
             int take)
         {
             var indexName = GetCurrentIndex(filter);
-            var (queries, excludeQueries) = GetCoreQueries(filter);
+            var (queries, excludeQueries) = GetCoreQueries<dynamic>(filter);
 
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
                 .Index(indexName)

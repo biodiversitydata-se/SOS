@@ -29,6 +29,7 @@ using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Result = CSharpFunctionalExtensions.Result;
@@ -551,7 +552,7 @@ namespace SOS.Observations.Api.Controllers
                 if (validationResult.IsFailure) return BadRequest(validationResult.Error);
                 SearchFilter searchFilter = filter.ToSearchFilter(this.GetUserId(), protectionFilter, translationCultureCode, sortBy, sortOrder);
                 var result = await _observationManager.GetChunkAsync(roleId, authorizationApplicationIdentifier, searchFilter, skip, take);
-                PagedResultDto<dynamic> dto = result?.ToPagedResultDto(result.Records);
+                var dto = result?.ToPagedResultDto(result.Records);
                 this.LogObservationCount(dto?.Records?.Count() ?? 0);
                 return new OkObjectResult(dto);
             }
@@ -1551,7 +1552,7 @@ namespace SOS.Observations.Api.Controllers
                 {
                     throw new Exception("Something went wrong when your query was executed. Make sure your filter is correct.");
                 }
-                GeoPagedResultDto<dynamic> dto = result.ToGeoPagedResultDto(result.Records, outputFormat);
+                GeoPagedResultDto<JsonObject> dto = result.ToGeoPagedResultDto(result.Records, outputFormat);
                 this.LogObservationCount(dto?.Records?.Count() ?? 0);
                 return new OkObjectResult(dto);
             }
@@ -1774,7 +1775,7 @@ namespace SOS.Observations.Api.Controllers
                     return BadRequest($"Scroll total count limit is maxTotalCount. Your result is {result.TotalCount}. Try use a more specific filter.");
                 }
 
-                ScrollResultDto<dynamic> dto = result.ToScrollResultDto(result.Records);
+                ScrollResultDto<JsonObject> dto = result.ToScrollResultDto(result.Records);
                 this.LogObservationCount(dto?.Records?.Count() ?? 0);
                 return new OkObjectResult(dto);
             }

@@ -293,7 +293,7 @@ namespace SOS.Lib.Repositories.Processed
         {
             if (ids == null || !ids.Any()) throw new ArgumentException("ids is empty");
             
-            var sortDescriptor = await Client.GetSortDescriptorAsync<Event>(IndexName, sortOrders);
+            var sortDescriptor = await Client.GetSortDescriptorAsync<Event, Event>(IndexName, sortOrders);
             var queries = new List<Action<QueryDescriptor<Event>>>();
             queries.TryAddTermsCriteria("eventId", ids);
             var searchResponse = await Client.SearchAsync<Event>(s => s
@@ -493,7 +493,7 @@ namespace SOS.Lib.Repositories.Processed
         {
             string indexName = IndexName;
             var (queries, excludeQueries) = GetCoreQueries<dynamic>(filter);
-            var sortDescriptor = await Client.GetSortDescriptorAsync<Event>(indexName, filter.SortOrders);
+            var sortDescriptor = await Client.GetSortDescriptorAsync<Event, Event>(indexName, filter.SortOrders);
 
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
                 .Index(indexName)

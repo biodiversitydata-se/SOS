@@ -64,9 +64,9 @@ namespace SOS.Lib.Helpers
                 }
 
                 await _filterManager.PrepareFilterAsync(protectedFilter.RoleId, protectedFilter.AuthorizationApplicationIdentifier, protectedFilter);
-                var dynamicSensitiveObservationsResult = await _processedObservationRepository.GetChunkAsync(protectedFilter, 0, 1000);
+                var dynamicSensitiveObservationsResult = await _processedObservationRepository.GetChunkAsync<JsonNode>(protectedFilter, 0, 1000);
 
-                var sensitiveObservations = dynamicSensitiveObservationsResult.Records.Cast<JsonNode>().ToList();
+                var sensitiveObservations = dynamicSensitiveObservationsResult.Records;
                 UpdateGeneralizedWithRealValues(generalizedObservations, sensitiveObservations);
             }
             catch (Exception ex)
@@ -106,7 +106,7 @@ namespace SOS.Lib.Helpers
                 }
 
                 await _filterManager.PrepareFilterAsync(filter.RoleId, filter.AuthorizationApplicationIdentifier, protectedFilter);
-                var dynamicSensitiveObservationsResult = await _processedObservationRepository.GetChunkAsync(protectedFilter, 0, 1000);
+                var dynamicSensitiveObservationsResult = await _processedObservationRepository.GetChunkAsync<dynamic>(protectedFilter, 0, 1000);
 
                 var sensitiveObservations = CastDynamicsToObservations(dynamicSensitiveObservationsResult.Records);
                 UpdateGeneralizedWithRealValues(generalizedObservations, sensitiveObservations);
@@ -176,94 +176,39 @@ namespace SOS.Lib.Helpers
             return nodes;
         }
 
-        private T GetValue<T>(IDictionary<string, object> obs, string propertyPath)
-        {
-            var parts = propertyPath
-                .Split(".")
-                .Select(m => m.ToCamelCase());
-
-            var currentVal = obs;
-            foreach (var part in parts)
-            {
-                if (currentVal.TryGetValue(part, out var currentValObject))
-                {
-                    if (currentValObject is IDictionary<string, object>)
-                    {
-                        currentVal = (IDictionary<string, object>)currentValObject;
-                    }
-                    else
-                    {
-                        return (T)currentValObject;
-                    }
-                }
-            }
-
-            return default;
-        }
-
-        private void UpdateValue<T>(IDictionary<string, object> obs, string propertyPath, T newValue)
-        {
-            var parts = propertyPath
-                .Split(".")
-                .Select(m => m.ToCamelCase())
-                .ToList();
-
-            var currentVal = obs;
-            for (int i = 0; i < parts.Count; i++)
-            {
-                string part = parts[i];
-                if (i == parts.Count - 1)
-                {
-                    if (currentVal.ContainsKey(part))
-                    {
-                        currentVal[part] = newValue;
-                    }
-                    return;
-                }
-
-                if (currentVal.TryGetValue(part, out var currentValObject))
-                {
-                    if (currentValObject is IDictionary<string, object>)
-                    {
-                        currentVal = (IDictionary<string, object>)currentValObject;
-                    }
-                }
-            }
-        }
-
         private void UpdateGeneralizedWithRealValues(JsonNode obs, JsonNode realObs)
         {
             // isGeneralized
             var isGeneralized = (bool?)obs["isGeneralized"];
             var isGeneralizedReal = (bool?)realObs["isGeneralized"];
-            if ((isGeneralized ?? false) && (isGeneralizedReal ?? false))
+            if (isGeneralized.HasValue && isGeneralizedReal.HasValue)
             {
-                obs["isGeneralized"] = realObs["isGeneralized"];
+                obs["isGeneralized"] = isGeneralizedReal;
             }
 
             var location = obs["location"];
             var locationReal = realObs["location"];
             if (location != null && locationReal != null)
             {
-                obs["location"] = realObs["location"];
+                obs["location"].ReplaceWith(locationReal.DeepClone());
             }
 
-            var sensitive = obs["sensitive"];
-            var sensitiveReal = realObs["sensitive"];
-            if (sensitive != null && sensitiveReal != null)
+            var sensitive = (bool?)obs["sensitive"];
+            var sensitiveReal = (bool?)realObs["sensitive"];
+            if (sensitive.HasValue && sensitiveReal.HasValue)
             {
-                obs["sensitive"] = realObs["sensitive"];
+                obs["sensitive"] = sensitiveReal;
             }
 
             var occurrence = obs["occurrence"];
             var occurrenceReal = realObs["occurrence"];
             if (occurrence != null && occurrenceReal != null)
             {
-                var sensitiveCategory = occurrence["sensitivityCategory"];
-                var sensitiveCategoryReal = occurrenceReal["sensitivityCategory"];
-                if (sensitiveCategory != null && sensitiveCategoryReal != null)
+                var sensitiveCategory = (int?)occurrence["sensitivityCategory"];
+                var sensitiveCategoryReal = (int?)occurrenceReal["sensitivityCategory"];
+                if (sensitiveCategory.HasValue && sensitiveCategoryReal.HasValue)
                 {
-                    occurrenceReal["sensitivityCategory"] = occurrence["sensitivityCategory"];
+                    occurrence["sensitivityCategory"] = sensitiveCategoryReal;
                 }
             }
         }

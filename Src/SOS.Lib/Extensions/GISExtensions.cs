@@ -15,7 +15,6 @@ using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 
 namespace SOS.Lib.Extensions
 {
@@ -394,24 +393,6 @@ namespace SOS.Lib.Extensions
         }
 
 
-        public static bool IsValid(this GeoJsonGeometry<GeoJson2DCoordinates> geoJsonGeometry)
-        {
-            switch (geoJsonGeometry?.Type)
-            {
-                case MongoDB.Driver.GeoJsonObjectModel.GeoJsonObjectType.Point:
-                    var point = (GeoJsonPoint<GeoJson2DCoordinates>)geoJsonGeometry;
-                    return (point?.Coordinates.X ?? 0) != 0 && (point?.Coordinates.Y ?? 0) != 0;
-                case MongoDB.Driver.GeoJsonObjectModel.GeoJsonObjectType.Polygon:
-                    var polygon = (GeoJsonPolygon<GeoJson2DCoordinates>)geoJsonGeometry;
-                    return (polygon?.Coordinates?.Exterior?.Positions?.Count ?? 0) > 2;
-                case MongoDB.Driver.GeoJsonObjectModel.GeoJsonObjectType.MultiPolygon:
-                    var multiPolygon = (GeoJsonMultiPolygon<GeoJson2DCoordinates>)geoJsonGeometry;
-                    return (multiPolygon?.Coordinates?.Polygons?.FirstOrDefault()?.Exterior?.Positions?.Count ?? 0) > 2;
-                default:
-                    return false;
-            }
-        }
-
         /// <summary>
         /// Cast XY bounding box to polygon
         /// </summary>
@@ -566,28 +547,6 @@ namespace SOS.Lib.Extensions
         public static IFeature ToFeature(this Geometry geometry, IDictionary<string, object> attributes = null)
         {
             return geometry == null ? null : new Feature { Geometry = geometry, Attributes = attributes == null ? null : new AttributesTable(attributes) };
-        }
-
-        /// <summary>
-        /// Cast envelope to geoemtry
-        /// </summary>
-        /// <param name="geometry"></param>
-        /// <returns></returns>
-        public static Envelope ToEnvelope(this Geometry geometry)
-        {
-            return (geometry?.Coordinates?.Any() ?? false) ? new Envelope(geometry.Coordinates) : null;
-        }
-
-        /// <summary>
-        /// Cast LatLonBoundingBox to envelope
-        /// </summary>
-        /// <param name="boundingBox"></param>
-        /// <returns></returns>
-        public static Envelope ToEnvelope(this LatLonBoundingBox boundingBox)
-        {
-            return boundingBox?.BottomRight == null || boundingBox?.TopLeft == null ?
-                null :
-                new Envelope(new Coordinate(boundingBox.BottomRight.Longitude, boundingBox.BottomRight.Latitude), new Coordinate(boundingBox.TopLeft.Longitude, boundingBox.TopLeft.Latitude));
         }
 
         public static Geometry? ToGeometry(this LatLonBoundingBox boundingBox)

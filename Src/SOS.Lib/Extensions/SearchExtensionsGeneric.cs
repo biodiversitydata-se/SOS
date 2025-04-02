@@ -55,12 +55,12 @@ namespace SOS.Lib.Extensions
         /// <summary>
         /// Get sort descriptor
         /// </summary>
-        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="TQueryDescriptor"></typeparam>
         /// <param name="client"></param>
         /// <param name="indexName"></param>
         /// <param name="sortings"></param>
         /// <returns></returns>
-        public static async Task<ICollection<Action<SortOptionsDescriptor<T>>>> GetSortDescriptorAsync<T>(this ElasticsearchClient client, string indexName, IEnumerable<SortOrderFilter> sortings) where T : class
+        public static async Task<ICollection<Action<SortOptionsDescriptor<TQueryDescriptor>>>> GetSortDescriptorAsync<TQueryDescriptor, TEntity>(this ElasticsearchClient client, string indexName, IEnumerable<SortOrderFilter> sortings) where TQueryDescriptor : class where TEntity : class
         {
             if (!sortings?.Any() ?? true)
             {
@@ -69,7 +69,7 @@ namespace SOS.Lib.Extensions
 
             // make sure that the ordering will be unique.
             var adjustedSortings = sortings.ToList();
-            string defaultSortProperty = GetDefaultSortPropertyName(typeof(T));
+            string defaultSortProperty = GetDefaultSortPropertyName(typeof(TEntity));
             if (!string.IsNullOrEmpty(defaultSortProperty) && !sortings.Select(m => m.SortBy?.ToLower().Trim()).Contains(defaultSortProperty))
             {
                 adjustedSortings.Add(new SortOrderFilter
@@ -79,7 +79,7 @@ namespace SOS.Lib.Extensions
                 });
             }
 
-            var sortDescriptor = new List<Action<SortOptionsDescriptor<T>>>();
+            var sortDescriptor = new List<Action<SortOptionsDescriptor<TQueryDescriptor>>>();
             foreach (var sorting in adjustedSortings)
             {
                 var sortBy = sorting.SortBy;
@@ -88,7 +88,7 @@ namespace SOS.Lib.Extensions
                 // Split sort string 
                 var propertyNames = sortBy.Split('.');
                 // Create a object of current class
-                var parent = Activator.CreateInstance(typeof(T));
+                var parent = Activator.CreateInstance(typeof(TEntity));
                 var targetProperty = (PropertyInfo)null;
 
                 // Loop throw all levels in passed sort string

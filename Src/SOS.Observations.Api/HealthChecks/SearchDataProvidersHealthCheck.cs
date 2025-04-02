@@ -8,6 +8,7 @@ using SOS.Observations.Api.Managers.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -28,7 +29,7 @@ namespace SOS.Observations.Api.HealthChecks
                 return (NumberOfProviders: 0, SuccessfulProviders: 0, Msg: "No providers found", Status: HealthStatus.Unhealthy);
             }
 
-            var providerSearchTasks = new Dictionary<DataProvider, Task<PagedResult<dynamic>>>();
+            var providerSearchTasks = new Dictionary<DataProvider, Task<PagedResult<JsonObject>>>();
 
             foreach (var provider in providers)
             {

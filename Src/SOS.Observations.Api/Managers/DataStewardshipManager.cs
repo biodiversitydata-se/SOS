@@ -93,7 +93,7 @@ namespace SOS.Observations.Api.Managers
             filter.Event = new EventFilter { Ids = new[] { id } };
             filter.Output.Fields = _observationEventOutputFields?.ToList();
 
-            var pageResult = await _processedObservationCoreRepository.GetChunkAsync(filter, 0, 1, true);
+            var pageResult = await _processedObservationCoreRepository.GetChunkAsync<dynamic>(filter, 0, 1, true);
             var observation = pageResult.Records.FirstOrDefault();
             if (observation == null) return null;
 
@@ -317,7 +317,7 @@ namespace SOS.Observations.Api.Managers
             };
             filter.Output.Fields = _observationOccurrenceOutputFields?.ToList();
 
-            IEnumerable<dynamic> observations = await _processedObservationCoreRepository.GetObservationAsync(id, filter, true);
+            IEnumerable<dynamic> observations = await _processedObservationCoreRepository.GetObservationAsync<dynamic>(id, filter, true);
             var observation = observations?.FirstOrDefault();
 
             if (observation == null)
@@ -336,7 +336,7 @@ namespace SOS.Observations.Api.Managers
             filter.IsPartOfDataStewardshipDataset = true;
             filter.Output.Fields = _observationOccurrenceOutputFields?.ToList();
             await _filterManager.PrepareFilterAsync(null, null, filter);
-            var pageResult = await _processedObservationCoreRepository.GetChunkAsync(filter, skip, take, true);
+            var pageResult = await _processedObservationCoreRepository.GetChunkAsync<dynamic>(filter, skip, take, true);
             var observations = CastDynamicsToObservations(pageResult.Records);
             var occurrences = observations.Select(o => o.ToDto(responseCoordinateSystem)).ToList();
 

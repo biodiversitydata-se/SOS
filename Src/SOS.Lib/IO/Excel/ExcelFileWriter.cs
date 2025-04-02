@@ -269,7 +269,7 @@ namespace SOS.Lib.IO.Excel
                 Models.Search.Result.SearchAfterResult<Observation, IReadOnlyCollection<FieldValue>> searchResult = null;
                 if (useFastSearch)
                 {
-                    fastSearchResult = await _processedObservationRepository.GetChunkAsync(filter, 0, 10000);
+                    fastSearchResult = await _processedObservationRepository.GetChunkAsync<dynamic>(filter, 0, 10000);
                 }
                 else
                 {

@@ -162,10 +162,10 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// <param name="take"></param>
         /// <param name="scrollId"></param>
         /// <returns></returns>
-        Task<ScrollResult<dynamic>> GetObservationsByScrollAsync(
+        Task<ScrollResult<T>> GetObservationsByScrollAsync<T>(
             SearchFilter filter,
             int take,
-            string scrollId);
+            string scrollId) where T : class;
 
         /// <summary>
         /// Get all project id's matching filter
@@ -334,7 +334,7 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// <param name="take"></param>
         /// <param name="getAllFields">If true all observation fields will be retrieved.</param>
         /// <returns></returns>
-        Task<PagedResult<dynamic>> GetChunkAsync(SearchFilter filter, int skip, int take, bool getAllFields = false);
+        Task<PagedResult<T>> GetChunkAsync<T>(SearchFilter filter, int skip, int take, bool getAllFields = false) where T : class;
 
         /// <summary>
         /// Gets a single observation
@@ -343,7 +343,7 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// <param name="filter"></param>
         /// <param name="getAllFields">If true all observation fields will be retrieved.</param>
         /// <returns></returns>
-        Task<dynamic> GetObservationAsync(string occurrenceId, SearchFilter filter, bool getAllFields = false);
+        Task<T> GetObservationAsync<T>(string occurrenceId, SearchFilter filter, bool getAllFields = false) where T : class;
 
         /// <summary>
         /// Get a list of sortable fields

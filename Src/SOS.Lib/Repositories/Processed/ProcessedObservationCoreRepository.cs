@@ -29,7 +29,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Elastic.Clients.Elasticsearch.MachineLearning;
 
 namespace SOS.Lib.Repositories.Processed
 {
@@ -1245,7 +1244,7 @@ namespace SOS.Lib.Repositories.Processed
             AggregationSortOrder sortOrder = AggregationSortOrder.CountDescending)
         {
             var indexNames = GetCurrentIndex(filter);
-            var (query, excludeQuery) = GetCoreQueries(filter);
+            var (query, excludeQuery) = GetCoreQueries<dynamic>(filter);
             var termsOrder = sortOrder.GetTermsOrder();
             size = Math.Max(1, size);
 
@@ -1288,7 +1287,7 @@ namespace SOS.Lib.Repositories.Processed
             AggregationSortOrder sortOrder = AggregationSortOrder.CountDescending)
         {
             var indexNames = GetCurrentIndex(filter);
-            var (query, excludeQuery) = GetCoreQueries(filter);
+            var (query, excludeQuery) = GetCoreQueries<dynamic>(filter);
             int size = Math.Max(1, Math.Min(65536, skip + take));
             var termsOrder = sortOrder.GetTermsOrder();
 
@@ -1345,7 +1344,7 @@ namespace SOS.Lib.Repositories.Processed
             AggregationSortOrder sortOrder = AggregationSortOrder.CountDescending)
         {
             var indexNames = GetCurrentIndex(filter);
-            var (query, excludeQuery) = GetCoreQueries(filter);
+            var (query, excludeQuery) = GetCoreQueries<dynamic>(filter);
             var termsOrder = sortOrder.GetTermsOrder();
             size = Math.Max(1, size);
 
@@ -1395,7 +1394,7 @@ namespace SOS.Lib.Repositories.Processed
         public async Task<List<AggregationItem>> GetAllAggregationItemsAsync(SearchFilter filter, string aggregationField)
         {
             var indexName = GetCurrentIndex(filter);
-            var (query, excludeQuery) = GetCoreQueries(filter);
+            var (query, excludeQuery) = GetCoreQueries<dynamic>(filter);
             var items = new List<AggregationItem>();
             IReadOnlyDictionary<Field, FieldValue> nextPageKey = null;
             var take = MaxNrElasticSearchAggregationBuckets;
@@ -1425,7 +1424,7 @@ namespace SOS.Lib.Repositories.Processed
             string aggregationFieldList)
         {
             var indexName = GetCurrentIndex(filter);
-            var (query, excludeQuery) = GetCoreQueries(filter);
+            var (query, excludeQuery) = GetCoreQueries<dynamic>(filter);
             var aggregationDictionary = new Dictionary<TKey, List<TValue>>();
             IReadOnlyDictionary<Field, FieldValue> nextPageKey = null;
             var pageTaxaAsyncTake = MaxNrElasticSearchAggregationBuckets;
@@ -1450,12 +1449,13 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <inheritdoc />
-        public async Task<PagedResult<dynamic>> GetChunkAsync(SearchFilter filter, int skip, int take, bool getAllFields = false)
+        public async Task<PagedResult<T>> GetChunkAsync<T>(SearchFilter filter, int skip, int take, bool getAllFields = false) where T : class
         {
             var indexNames = GetCurrentIndex(filter);
-            var (query, excludeQuery) = GetCoreQueries(filter);
-            var sortDescriptor = await Client.GetSortDescriptorAsync<dynamic>(indexNames, filter?.Output?.SortOrders);
-            var searchResponse = await Client.SearchAsync<dynamic>(s => s
+
+            var (query, excludeQuery) = GetCoreQueries<T>(filter);
+            var sortDescriptor = await Client.GetSortDescriptorAsync<T, Observation>(indexNames, filter?.Output?.SortOrders);
+            var searchResponse = await Client.SearchAsync<T>(s => s
                 .Index(indexNames)
                 .Source(getAllFields ? new SourceConfig(true) : filter.Output?.Fields.ToProjection(filter is SearchFilterInternal))
                 .From(skip)
@@ -1481,7 +1481,7 @@ namespace SOS.Lib.Repositories.Processed
 
             if (includeRealCount)
             {
-                var countResponse = await Client.CountAsync<dynamic>(indexNames, s => s
+                var countResponse = await Client.CountAsync<T>(indexNames, s => s
                     .Query(q => q
                         .Bool(b => b
                             .MustNot(excludeQuery.ToArray())
@@ -1493,8 +1493,7 @@ namespace SOS.Lib.Repositories.Processed
 
                 totalCount = countResponse.Count;
             }
-            
-            return new PagedResult<dynamic>
+            return new PagedResult<T>
             {
                 Records = searchResponse.Documents,
                 Skip = skip,
@@ -1507,7 +1506,7 @@ namespace SOS.Lib.Repositories.Processed
         public async Task<List<EventOccurrenceAggregationItem>> GetEventOccurrenceItemsAsync(SearchFilter filter)
         {
             var indexName = GetCurrentIndex(filter);
-            var (query, excludeQuery) = GetCoreQueries(filter);
+            var (query, excludeQuery) = GetCoreQueries<dynamic>(filter);
             var occurrencesByEventId = new Dictionary<string, List<string>>();
             IReadOnlyDictionary<Field, FieldValue> nextPageKey = null;
             var take = MaxNrElasticSearchAggregationBuckets;
@@ -1537,7 +1536,7 @@ namespace SOS.Lib.Repositories.Processed
         public async Task<IEnumerable<long>> GetProjectIdsNestedAsync(SearchFilter filter)
         {
             var indexNames = GetCurrentIndex(filter);
-            var (query, excludeQuery) = GetCoreQueries(filter);
+            var (query, excludeQuery) = GetCoreQueries<dynamic>(filter);
 
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
                 .Index(indexNames)
@@ -1578,7 +1577,7 @@ namespace SOS.Lib.Repositories.Processed
         public async Task<IEnumerable<int>> GetProjectIdsAsync(SearchFilter filter)
         {
             var indexNames = GetCurrentIndex(filter);
-            var (query, excludeQuery) = GetCoreQueries(filter);
+            var (query, excludeQuery) = GetCoreQueries<dynamic>(filter);
 
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
                 .Index(indexNames)
@@ -1759,7 +1758,7 @@ namespace SOS.Lib.Repositories.Processed
         public async Task<long> GetMatchCountAsync(SearchFilterBase filter, bool skipAuthorizationFilters = false)
         {
            var indexNames = GetCurrentIndex(filter, skipAuthorizationFilters);
-            var (query, excludeQuery) = GetCoreQueries(filter, skipAuthorizationFilters);
+            var (query, excludeQuery) = GetCoreQueries<dynamic>(filter, skipAuthorizationFilters);
 
             var countResponse = await Client.CountAsync<dynamic>(indexNames, s => s
                 .Query(q => q
@@ -1785,7 +1784,7 @@ namespace SOS.Lib.Repositories.Processed
             TimeSpan? timeout = null)
         {
             var indexNames = GetCurrentIndex(filter);
-            var (query, excludeQuery) = GetCoreQueries(filter, skipAuthorizationFilters: skipAuthorizationFilters);
+            var (query, excludeQuery) = GetCoreQueries<dynamic>(filter, skipAuthorizationFilters: skipAuthorizationFilters);
 
             // Max buckets can't exceed MaxNrElasticSearchAggregationBuckets
             if (maxBuckets.HasValue && maxBuckets.Value > MaxNrElasticSearchAggregationBuckets)
@@ -1931,13 +1930,13 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <inheritdoc/>
-        public async Task<dynamic> GetObservationAsync(string occurrenceId, SearchFilter filter, bool getAllFields = false)
+        public async Task<T> GetObservationAsync<T>(string occurrenceId, SearchFilter filter, bool getAllFields = false) where T : class
         {
             var indexNames = GetCurrentIndex(filter);
-            var queries = filter.ToQuery<dynamic>(skipSightingTypeFilters: true);
+            var queries = filter.ToQuery<T>(skipSightingTypeFilters: true);
             queries.TryAddTermCriteria("occurrence.occurrenceId", occurrenceId);
 
-            var searchResponse = await Client.SearchAsync<dynamic>(s => s
+            var searchResponse = await Client.SearchAsync<T>(s => s
                 .Index(indexNames)
                 .Query(q => q
                     .Bool(b => b
@@ -1950,7 +1949,7 @@ namespace SOS.Lib.Repositories.Processed
             );
             searchResponse.ThrowIfInvalid();
 
-            return searchResponse.Documents;
+            return searchResponse.Documents?.FirstOrDefault();
         }
 
         /// <inheritdoc />
@@ -1990,22 +1989,23 @@ namespace SOS.Lib.Repositories.Processed
             }
         }
 
-        public async Task<ScrollResult<dynamic>> GetObservationsByScrollAsync(
+        /// <inheritdoc/>
+        public async Task<ScrollResult<T>> GetObservationsByScrollAsync<T>(
             SearchFilter filter,
             int take,
-            string scrollId)
+            string scrollId) where T : class
         {
             var indexNames = GetCurrentIndex(filter);
-            var (queries, excludeQueries) = GetCoreQueries(filter);
+            var (queries, excludeQueries) = GetCoreQueries<T>(filter);
 
-            var sortDescriptor = await Client.GetSortDescriptorAsync<dynamic>(indexNames, filter?.Output?.SortOrders);
+            var sortDescriptor = await Client.GetSortDescriptorAsync<T, Observation>(indexNames, filter?.Output?.SortOrders);
 
             // Retry policy by Polly
             var response = await PollyHelper.GetRetryPolicy(3, 100).ExecuteAsync(async () =>
             {
                 if (string.IsNullOrEmpty(scrollId))
                 {
-                    var searchResponse = await Client.SearchAsync<dynamic>(s => s
+                    var searchResponse = await Client.SearchAsync<T>(s => s
                         .Index(indexNames)
                         .Query(q => q
                             .Bool(b => b
@@ -2013,7 +2013,7 @@ namespace SOS.Lib.Repositories.Processed
                                 .Filter(queries.ToArray())
                             )
                         )
-                        .Sort(sortDescriptor.ToArray())
+                        .Sort(sortDescriptor?.ToArray())
                         .Size(take)
                         .Source(filter.Output?.Fields.ToProjection(filter is SearchFilterInternal))
                         .Scroll(ScrollTimeout)
@@ -2024,7 +2024,7 @@ namespace SOS.Lib.Repositories.Processed
                 }
                 else
                 {
-                    var scrollResult = await Client.ScrollAsync<dynamic>(new ScrollRequest()
+                    var scrollResult = await Client.ScrollAsync<T>(new ScrollRequest()
                     {
                         ScrollId = scrollId
                     }
@@ -2033,7 +2033,7 @@ namespace SOS.Lib.Repositories.Processed
                 }
             });
 
-            return new ScrollResult<dynamic>
+            return new ScrollResult<T>
             {
                 Records = response.Documents,
                 ScrollId = response.Documents.Count < take ? null : response.ScrollId?.Id,
@@ -2049,7 +2049,7 @@ namespace SOS.Lib.Repositories.Processed
             ICollection<FieldValue> afterKey = null)
         {
             var searchIndex = GetCurrentIndex(filter);
-            var (query, excludeQuery) = GetCoreQueries(filter);
+            var (query, excludeQuery) = GetCoreQueries<dynamic>(filter);
 
             // Retry policy by Polly
             var searchResponse = await PollyHelper.GetRetryPolicy(3, 100).ExecuteAsync(async () =>
@@ -2312,7 +2312,7 @@ namespace SOS.Lib.Repositories.Processed
             int? take = 10)
         {
             var indexNames = GetCurrentIndex(filter);
-            var (query, excludeQuery) = GetCoreQueries(filter);
+            var (query, excludeQuery) = GetCoreQueries<dynamic>(filter);
 
             var tz = TimeZoneInfo.Local.GetUtcOffset(DateTime.Now);
             var searchResponse = await Client.SearchAsync<dynamic>(s => s

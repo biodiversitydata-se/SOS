@@ -27,7 +27,7 @@ public class HarvestJobTests : TestBase
     {
         // Arrange
         IDwcObservationHarvester dwcObservationHarvester = TestFixture.ServiceProvider.GetService<IDwcObservationHarvester>()!;
-        DataProvider dataProvider = new DataProvider() { Id = 13 };
+        DataProvider dataProvider = new DataProvider() { Id = 13, Identifier = "test" };
 
         // Act
         await dwcObservationHarvester.HarvestObservationsAsync(@"Resources/Dwca/dwca-datastewardship-single-dataset.zip", dataProvider, JobCancellationToken.Null);

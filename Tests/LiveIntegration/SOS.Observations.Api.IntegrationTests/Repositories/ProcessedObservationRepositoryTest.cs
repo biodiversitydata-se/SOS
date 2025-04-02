@@ -47,7 +47,7 @@ namespace SOS.Observations.Api.LiveIntegrationTests.Repositories
            ICollection<FieldValue> searchAfter = null)
         {
             var searchIndex = GetCurrentIndex(filter);
-            var (queries, excludeQueries) = GetCoreQueries(filter);
+            var (queries, excludeQueries) = GetCoreQueries<dynamic>(filter);
             var searchResponse = await SearchAfterAsync(searchIndex, new SearchRequestDescriptor<dynamic>()
                 .Index(searchIndex)
                 .Query(q => q

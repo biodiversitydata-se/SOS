@@ -41,7 +41,7 @@ namespace SOS.Observations.Api.Repositories
         public async Task<PagedResult<dynamic>> GetAggregatedChunkAsync(SearchFilter filter, AggregationType aggregationType, int skip, int take)
         {
             var indexNames = GetCurrentIndex(filter);
-            var (queries, excludeQueries) = GetCoreQueries(filter);
+            var (queries, excludeQueries) = GetCoreQueries<dynamic>(filter);
             queries.AddAggregationFilter(aggregationType);
             
             // Get number of distinct values
@@ -179,7 +179,7 @@ namespace SOS.Observations.Api.Repositories
         public async Task<PagedResult<dynamic>> GetAggregatedHistogramChunkAsync(SearchFilter filter, AggregationType aggregationType)
         {
             var indexNames = GetCurrentIndex(filter);
-            var (queries, excludeQueries) = GetCoreQueries(filter);
+            var (queries, excludeQueries) = GetCoreQueries<dynamic>(filter);
             queries.AddAggregationFilter(aggregationType);
             
             var tz = TimeZoneInfo.Local.GetUtcOffset(DateTime.Now);
@@ -217,7 +217,7 @@ namespace SOS.Observations.Api.Repositories
                         )
                     )     
                 )
-                .AddDefaultAggrigationSettings()
+                .AddDefaultAggrigationSettings(trackHits: true)
             );
 
             searchResponse.ThrowIfInvalid();
@@ -251,7 +251,7 @@ namespace SOS.Observations.Api.Repositories
         public async Task<PagedResult<dynamic>> GetAggregated48WeekHistogramAsync(SearchFilter filter)
         {
             var indexNames = GetCurrentIndex(filter);
-            var (queries, excludeQueries) = GetCoreQueries(filter);
+            var (queries, excludeQueries) = GetCoreQueries<dynamic>(filter);
             queries.AddAggregationFilter(AggregationType.SightingsPerWeek48);
 
             var tz = TimeZoneInfo.Local.GetUtcOffset(DateTime.Now);
@@ -359,7 +359,7 @@ namespace SOS.Observations.Api.Repositories
                 int zoom)
         {
             var indexNames = GetCurrentIndex(filter);
-            var (queries, excludeQueries) = GetCoreQueries(filter);
+            var (queries, excludeQueries) = GetCoreQueries<dynamic>(filter);
 
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
                 .Index(indexNames)
@@ -437,7 +437,7 @@ namespace SOS.Observations.Api.Repositories
         public async Task<int> GetProvinceCountAsync(SearchFilterBase filter)
         {
             var indexNames = GetCurrentIndex(filter);
-            var (queries, excludeQueries) = GetCoreQueries(filter);
+            var (queries, excludeQueries) = GetCoreQueries<dynamic>(filter);
 
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
                 .Index(indexNames)
@@ -467,7 +467,7 @@ namespace SOS.Observations.Api.Repositories
         {
             try
             {
-                var (queries, excludeQueries) = GetCoreQueries(filter);
+                var (queries, excludeQueries) = GetCoreQueries<dynamic>(filter);
 
                 var searchResponse = await Client.SearchAsync<dynamic>(s => s
                    .Index(new[] { PublicIndexName, ProtectedIndexName })
@@ -534,7 +534,7 @@ namespace SOS.Observations.Api.Repositories
         {
             try
             {
-                var (queries, excludeQueries) = GetCoreQueries(filter);
+                var (queries, excludeQueries) = GetCoreQueries<dynamic>(filter);
 
                 var searchResponse = await Client.SearchAsync<dynamic>(s => s
                    .Index(new[] { PublicIndexName, ProtectedIndexName })
@@ -594,7 +594,6 @@ namespace SOS.Observations.Api.Repositories
                     });
                 }
 
-
                 return result;
             }
             catch (Exception e)
@@ -609,7 +608,7 @@ namespace SOS.Observations.Api.Repositories
         {
             try
             {
-                var (queries, excludeQueries) = GetCoreQueries(filter);
+                var (queries, excludeQueries) = GetCoreQueries<dynamic>(filter);
 
                 // First get observations count and taxon count group by day
                 var searchResponse = await Client.SearchAsync<dynamic>(s => s
@@ -799,7 +798,7 @@ namespace SOS.Observations.Api.Repositories
             filter.ExtendedAuthorization.UserId = 0;
             filter.ExtendedAuthorization.ProtectionFilter = ProtectionFilter.Sensitive;
 
-            var (queries, excludeQueries) = GetCoreQueries(filter, true);
+            var (queries, excludeQueries) = GetCoreQueries<dynamic>(filter, true);
             queries.AddSignalSearchCriteria<dynamic>(extendedAuthorizations, onlyAboveMyClearance);
         
             var searchResponse = await Client.CountAsync<dynamic>(ProtectedIndexName, s => s

@@ -159,7 +159,7 @@ namespace SOS.Observations.Api.Repositories
         private async Task<Dictionary<int, (int, DateTime?, DateTime?)>> GetTaxonAggregationAsync(SearchFilter filter)
         {
             var indexName = GetCurrentIndex(filter);
-            var (query, excludeQuery) = GetCoreQueries(filter);
+            var (query, excludeQuery) = GetCoreQueries<dynamic>(filter);
             var observationCountByTaxonId = await GetAllObservationCountByTaxonIdAsync(
                 indexName,
                 query,
@@ -183,7 +183,7 @@ namespace SOS.Observations.Api.Repositories
                 filter.Taxa.Ids = taxonTree.GetUnderlyingTaxonIds(filter.Taxa?.Ids, true);
             }
 
-            var (query, excludeQuery) = GetCoreQueries(filter);
+            var (query, excludeQuery) = GetCoreQueries<dynamic>(filter);
             observationCountByTaxonId = await GetAllObservationCountByTaxonIdAsync(
                 indexName,
                 query,
@@ -500,7 +500,7 @@ namespace SOS.Observations.Api.Repositories
                         .Terms(t => t
                             .Field("taxon.id")
                             .Size(size)
-                        
+                            .ValueType("long")
                         )
                         .Aggregations(a => a
                             .Add("firstSighting", a => a
@@ -522,9 +522,9 @@ namespace SOS.Observations.Api.Repositories
             searchResponse.ThrowIfInvalid();
 
             var observationCountByTaxonId = new Dictionary<int, (int, DateTime?, DateTime?)>();
-            foreach (var bucket in searchResponse.Aggregations.GetStringTerms("taxa").Buckets)
+            foreach (var bucket in searchResponse.Aggregations.GetLongTerms("taxa").Buckets)
             {
-                observationCountByTaxonId.Add(int.Parse(bucket.Key.Value.ToString()),
+                observationCountByTaxonId.Add((int)bucket.Key,
                     (
                         (int)bucket.DocCount,
                         DateTime.Parse(bucket.Aggregations.GetMin("firstSighting").ValueAsString),
@@ -567,7 +567,7 @@ namespace SOS.Observations.Api.Repositories
             SearchFilter filter,
             int zoom)
         {
-            var (query, excludeQuery) = GetCoreQueries(filter);
+            var (query, excludeQuery) = GetCoreQueries<dynamic>(filter);
 
             var taxaByGeoTile = new Dictionary<string, Dictionary<int, long?>>();
             IReadOnlyDictionary<Field, FieldValue> nextPageKey = null;
@@ -607,7 +607,7 @@ namespace SOS.Observations.Api.Repositories
                 int? taxonIdPage)
         {
             int maxNrBucketsInPageResult = MaxNrElasticSearchAggregationBuckets * 3;
-            var (queries, excludeQueries) = GetCoreQueries(filter);
+            var (queries, excludeQueries) = GetCoreQueries<dynamic>(filter);
 
             int nrAdded = 0;
             var taxaByGeoTile = new Dictionary<string, Dictionary<int, long?>>();
@@ -727,7 +727,7 @@ namespace SOS.Observations.Api.Repositories
             var indexName = GetCurrentIndex(filter);
             Dictionary<int, TaxonProvinceAgg> observationCountByTaxonId = null;
 
-            var (queryWithoutTaxaFilter, excludeQueryWithoutTaxaFilter) = GetCoreQueries(filter);
+            var (queryWithoutTaxaFilter, excludeQueryWithoutTaxaFilter) = GetCoreQueries<dynamic>(filter);
             observationCountByTaxonId = await GetElasticTaxonSumAggregationByTaxonIdAsync(
                 indexName,
                 queryWithoutTaxaFilter,
@@ -842,7 +842,7 @@ namespace SOS.Observations.Api.Repositories
             SearchFilter filter)
         {
             var indexNames = GetCurrentIndex(filter);
-            var (queries, excludeQueries) = GetCoreQueries(filter);
+            var (queries, excludeQueries) = GetCoreQueries<dynamic>(filter);
 
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
                 .Index(indexNames)

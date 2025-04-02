@@ -46,7 +46,7 @@ namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.Observation
             await customRepository.AddManyAsync(observations, protectedIndex);
             await customRepository.EnableIndexingAsync(protectedIndex);
             SearchFilter filter = new SearchFilter(0);
-            var obs = await customRepository.GetObservationAsync("obs1", filter);
+            var obs = await customRepository.GetObservationAsync<dynamic>("obs1", filter);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert

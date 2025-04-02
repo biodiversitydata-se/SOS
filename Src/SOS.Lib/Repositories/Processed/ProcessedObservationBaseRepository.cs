@@ -28,11 +28,11 @@ namespace SOS.Lib.Repositories.Processed
         /// <param name="filter"></param>
         /// <param name="skipAuthorizationFilters"></param>
         /// <returns></returns>
-        protected (ICollection<Action<QueryDescriptor<dynamic>>> Filter, ICollection<Action<QueryDescriptor<dynamic>>> Exclude)
-            GetCoreQueries(SearchFilterBase filter, bool skipAuthorizationFilters = false)
+        protected (ICollection<Action<QueryDescriptor<TQueryDescriptor>>> Filter, ICollection<Action<QueryDescriptor<TQueryDescriptor>>> Exclude)
+            GetCoreQueries<TQueryDescriptor>(SearchFilterBase filter, bool skipAuthorizationFilters = false) where TQueryDescriptor : class
         {
-            var queries = filter.ToQuery<dynamic>(skipAuthorizationFilters: skipAuthorizationFilters);
-            var excludeQueries = filter.ToExcludeQuery<dynamic>();
+            var queries = filter.ToQuery<TQueryDescriptor>(skipAuthorizationFilters: skipAuthorizationFilters);
+            var excludeQueries = filter.ToExcludeQuery<TQueryDescriptor>();
 
             return (queries, excludeQueries);
         }

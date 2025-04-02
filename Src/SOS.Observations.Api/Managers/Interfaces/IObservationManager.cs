@@ -5,6 +5,7 @@ using SOS.Lib.Models.Search.Result;
 using SOS.Shared.Api.Dtos;
 using System;
 using System.Collections.Generic;
+using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 using static SOS.Observations.Api.Managers.ObservationManager;
 
@@ -38,7 +39,7 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <param name="skip"></param>
         /// <param name="take"></param>
         /// <returns></returns>
-        Task<PagedResult<dynamic>> GetChunkAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilter filter, int skip, int take);
+        Task<PagedResult<JsonObject>> GetChunkAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilter filter, int skip, int take);
 
         /// <summary>
         /// Get observations by scroll
@@ -49,7 +50,7 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <param name="take"></param>
         /// <param name="scrollId"></param>
         /// <returns></returns>
-        Task<ScrollResult<dynamic>> GetObservationsByScrollAsync(
+        Task<ScrollResult<JsonObject>> GetObservationsByScrollAsync(
             int? roleId,
             string authorizationApplicationIdentifier,
             SearchFilter filter,
@@ -130,7 +131,7 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <param name="includeInternalFields"></param>
         /// <param name="resolveGeneralizedObservations"></param>
         /// <returns></returns>
-        Task<dynamic> GetObservationAsync(
+        Task<JsonObject> GetObservationAsync(
             int? userId,
             int? roleId,
             string authorizationApplicationIdentifier,

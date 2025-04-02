@@ -1,13 +1,9 @@
 ﻿using Elastic.Clients.Elasticsearch;
-using Elastic.Clients.Elasticsearch.Serialization;
 using Elastic.Transport;
 using SOS.Lib.Helpers;
-using SOS.Lib.JsonConverters;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace SOS.Lib.Configuration.Shared
 {

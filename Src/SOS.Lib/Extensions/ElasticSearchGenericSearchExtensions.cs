@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Elastic.Clients.Elasticsearch.Core.Search;
 using NetTopologySuite.Geometries;
+using System.Text.Json;
 
 namespace SOS.Lib.Extensions
 {
@@ -40,18 +41,18 @@ namespace SOS.Lib.Extensions
     public static class ElasticSearchGenericSearchExtensions
     {
         /// <summary>
-        /// 
+        /// Get default settings for aggregations
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="searchRequestDescriptor"></param>
         /// <param name="size"></param>
+        /// <param name="trackHits"></param>
         /// <returns></returns>
-        public static SearchRequestDescriptor<T> AddDefaultAggrigationSettings<T>(this SearchRequestDescriptor<T> searchRequestDescriptor, int? size = 0)
+        public static SearchRequestDescriptor<T> AddDefaultAggrigationSettings<T>(this SearchRequestDescriptor<T> searchRequestDescriptor, int? size = 0, bool trackHits = false)
         {
             return searchRequestDescriptor
                 .Size(size)
-                .Source(new SourceConfig(new SourceFilter { Excludes = Fields.FromStrings(["*"]) } ))
-                .TrackTotalHits(new TrackHits(false));
+                .TrackTotalHits(new TrackHits(trackHits));
         }
 
         /// <summary>
@@ -450,13 +451,30 @@ namespace SOS.Lib.Extensions
         {
             if (geometry?.IsValid ?? false)
             {
-                queries.Add(q => q.GeoShape(gd => gd
-                    .Field(field.ToField())
+                var options = new JsonSerializerOptions();
+                options.Converters.Add(new NetTopologySuite.IO.Converters.GeoJsonConverterFactory());
+                var shape = JsonSerializer.Deserialize<object>(JsonSerializer.Serialize(geometry, options));
+                var gsq = new GeoShapeQuery
+                {
+                    Field = field.ToField(),
+                    Shape = new GeoShapeFieldQuery
+                    {
+                        Relation = relation,
+                        Shape = shape
+                    }
+                };
+               
+                queries.Add(q => q
+                    .GeoShape(gsq)
+
+                /*.GeoShape(gd => gd
+                    .Field(field)
                     .Shape(s => s
-                        .Shape(geometry.ToGeoJson())
+                        .Shape(shape)
                         .Relation(relation)
                     )
-                ));
+                )*/
+                );
             }
         }
 

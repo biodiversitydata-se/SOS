@@ -97,7 +97,7 @@ namespace SOS.Lib.Repositories.Processed
         {
             if (ids == null || !ids.Any()) throw new ArgumentException("ids is empty");
 
-            var sortDescriptor = await Client.GetSortDescriptorAsync<Dataset>(IndexName, sortOrders);
+            var sortDescriptor = await Client.GetSortDescriptorAsync<Dataset, Dataset>(IndexName, sortOrders);
             var queries = new List<Action<QueryDescriptor<Dataset>>>();
             queries.TryAddTermsCriteria("identifier", ids);
           

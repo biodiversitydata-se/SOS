@@ -30,7 +30,7 @@ namespace SOS.Analysis.Api.Repositories
         public async Task<SearchAfterResult<dynamic, IReadOnlyCollection<FieldValue>>> AggregateByUserFieldAsync(SearchFilter filter, string aggregationField, int? precisionThreshold, string? afterKey = null, int? take = 10)
         {
             var indexNames = GetCurrentIndex(filter);
-            var (queries, excludeQueries) = GetCoreQueries(filter);
+            var (queries, excludeQueries) = GetCoreQueries<dynamic>(filter);
 
             var tz = TimeZoneInfo.Local.GetUtcOffset(DateTime.Now);
 
