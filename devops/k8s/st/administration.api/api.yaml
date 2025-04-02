@@ -33,6 +33,7 @@ spec:
       labels:
         app: sosadminapi-api
     spec:
+      serviceAccountName: ""
       topologySpreadConstraints: # try to spread out api instances over available nodes
       - labelSelector:
           matchLabels:
