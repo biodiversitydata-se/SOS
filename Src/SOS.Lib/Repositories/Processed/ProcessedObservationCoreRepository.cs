@@ -1471,7 +1471,7 @@ namespace SOS.Lib.Repositories.Processed
 
             searchResponse.ThrowIfInvalid();
 
-            var totalCount = (long)searchResponse.HitsMetadata.Hits.Count;
+            var totalCount = searchResponse.Total;
             var includeRealCount = totalCount >= ElasticSearchMaxRecords;
 
             if (filter is SearchFilterInternal internalFilter)

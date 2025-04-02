@@ -100,7 +100,7 @@ namespace SOS.Lib.Repositories.Processed
             var sortDescriptor = await Client.GetSortDescriptorAsync<Dataset, Dataset>(IndexName, sortOrders);
             var queries = new List<Action<QueryDescriptor<Dataset>>>();
             queries.TryAddTermsCriteria("identifier", ids);
-          
+            
             var searchResponse = await Client.SearchAsync<Dataset>(s => s
                 .Index(IndexName)
                 .Query(q => q
@@ -108,9 +108,9 @@ namespace SOS.Lib.Repositories.Processed
                         .Filter(queries.ToArray())
                     )
                 )
-                .Source((Includes: new[] { "occurrence.occurrenceId" }, Excludes: excludeFields).ToProjection())
+                .Source((Includes: Array.Empty<string>(), Excludes: excludeFields).ToProjection())
                 .Size(ids?.Count() ?? 0)
-                .Sort(sortDescriptor.ToArray())
+                .Sort(sortDescriptor?.ToArray())
                 .TrackTotalHits(new TrackHits(false))
             );
 

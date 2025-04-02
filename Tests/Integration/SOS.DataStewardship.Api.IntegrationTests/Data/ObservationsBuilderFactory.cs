@@ -105,11 +105,7 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Data
             {
                 obs.Location.DecimalLatitude = latitude;
                 obs.Location.DecimalLongitude = longitude;
-                obs.Location.PointLocation = GeoLocation.LatitudeLongitude(new LatLonGeoLocation
-                {
-                    Lat = latitude,
-                    Lon = longitude
-                });
+                obs.Location.PointLocation = new LatLonGeoLocation { Lat = latitude, Lon = longitude };
                 obs.Location.Point = new Point(longitude, latitude);
             });
 

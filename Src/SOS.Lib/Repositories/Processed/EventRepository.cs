@@ -304,7 +304,7 @@ namespace SOS.Lib.Repositories.Processed
                     )
                 )
                 .Size(ids?.Count() ?? 0)
-                .Sort(sortDescriptor.ToArray())
+                .Sort(sortDescriptor?.ToArray())
                 .TrackTotalHits(new TrackHits(false))
             );
 
@@ -506,7 +506,7 @@ namespace SOS.Lib.Repositories.Processed
                         .Filter(queries.ToArray())
                     )
                 )
-                .Sort(sort => sortDescriptor.ToArray())
+                .Sort(sort => sortDescriptor?.ToArray())
             );
 
             searchResponse.ThrowIfInvalid();

@@ -118,6 +118,13 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOS.Shared.Api", "Src\SOS.Shared.Api\SOS.Shared.Api.csproj", "{0964ED67-D326-4DC6-9981-722B57941744}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "k8s", "k8s", "{BF0484AD-4215-4478-B46E-AF17643A796F}"
+	ProjectSection(SolutionItems) = preProject
+		Src\Dockerfile.administration.api = Src\Dockerfile.administration.api
+		Src\Dockerfile.administration.gui = Src\Dockerfile.administration.gui
+		Src\Dockerfile.analysis = Src\Dockerfile.analysis
+		Src\Dockerfile.elasticsearch.proxy = Src\Dockerfile.elasticsearch.proxy
+		Src\Dockerfile.observations = Src\Dockerfile.observations
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "local", "local", "{2A9DE856-4794-410A-A187-F220A45B2EAD}"
 EndProject

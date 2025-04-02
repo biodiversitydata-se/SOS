@@ -11,6 +11,6 @@ public static class HttpClientJsonExtensions
     {
         var postResponse = await client.PostAsJsonAsync(requestUri, value, options, cancellationToken);
         var result = await postResponse.Content.ReadFromJsonAsync<TResult>(options);
-        return result;
+        return result!;
     }
 }

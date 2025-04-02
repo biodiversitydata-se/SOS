@@ -110,7 +110,7 @@ public class DwcaImportTests : TestBase
         //-----------------------------------------------------------------------------------------------------------
         // Arrange
         //-----------------------------------------------------------------------------------------------------------        
-        var files = new List<(string filePath, DataProvider dataProvider)>()
+        var files = new List<(string filePath, DataProvider dataProvider)>
         {
             (@"Data/Resources/dwca-datastewardship-single-dataset.zip", new DataProvider { Id = 105, Identifier = "TestDataStewardshipBats", Type = DataProviderType.DwcA }),
             (@"Data/Resources/dwca-datastewardship-single-dataset-with-other-dataset-identifier.zip", new DataProvider { Id = 106, Identifier = "TestDataStewardshipBats (other name)", Type = DataProviderType.DwcA })
@@ -144,15 +144,15 @@ public class DwcaImportTests : TestBase
             "Dataset Bats (Hallaröd)"
         };
 
-        datasetsBySearchPageResult.TotalCount.Should().Be(2, "because each DwC-A file contains 1 datasets");
+        datasetsBySearchPageResult.TotalCount.Should().Be(2, $"because each DwC-A file contains 2 datasets");
         datasetsBySearchPageResult.Records.Select(m => m.Identifier).Should().BeEquivalentTo(exptectedDatasets);
         datasetsBySearchPageResult.Records.Should().AllSatisfy(m => m.EventIds.Should().NotBeEmpty(), "because the datasets have events");
 
-        eventsBySearchPageResult.TotalCount.Should().Be(14, "because each DwC-A file contains 7 events");
+        eventsBySearchPageResult.TotalCount.Should().Be(14, "because each DwC-A file contains 14 events");
         eventsBySearchPageResult.Records.Should().AllSatisfy(m => m.Dataset.Identifier.Should().BeOneOf(exptectedDatasets));
         eventsBySearchPageResult.Records.Should().AllSatisfy(m => m.OccurrenceIds.Should().NotBeEmpty(), "because the events have occurrences");
 
-        occurrencesBySearchPageResult.TotalCount.Should().Be(30, "because each DwC-A file contains 15 occurrences");
+        occurrencesBySearchPageResult.TotalCount.Should().Be(30, "because each DwC-A file contains 30 occurrences");
         occurrencesBySearchPageResult.Records.Should().AllSatisfy(m => m.Dataset.Identifier.Should().BeOneOf(exptectedDatasets));
     }
 
