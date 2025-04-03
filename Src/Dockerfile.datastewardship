@@ -10,7 +10,7 @@ COPY  . .
 RUN dotnet publish SOS.DataStewardship.Api/SOS.DataStewardship.Api.csproj -c Release -o out
 
 #build runtime image
-FROM mcr.microsoft.com/dotnet/aspnet:8.0-alpine
+FROM mcr.microsoft.com/dotnet/aspnet:9.0-alpine
 
 # set time zone
 RUN apk add --no-cache tzdata
