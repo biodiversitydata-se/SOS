@@ -23,6 +23,7 @@ public class TestFixture : IAsyncLifetime
     /// The <see cref="ObservationsApiWebApplicationFactory"/> used to create the API client.
     /// </summary>
     public ObservationsApiWebApplicationFactory ApiFactory { get; set; }
+    public AnalysisApiApplicationFactory AnalysisApiFactory { get; set; }
 
     public TestContainersFixture TestContainerFixture { get; private set; }
     public ServiceProvider ServiceProvider { get; private set; } = null!;
@@ -35,17 +36,27 @@ public class TestFixture : IAsyncLifetime
     public TestFixture()
     {
         ApiFactory = new ObservationsApiWebApplicationFactory();
+        AnalysisApiFactory = new AnalysisApiApplicationFactory();
         TestContainerFixture = new TestContainersFixture();
         TelemetryConfiguration.Active.DisableTelemetry = true;
     }
 
     /// <summary>
-    /// Creates and returns a new <see cref="HttpClient"/> instance that is ready to interact with the REST API.
+    /// Creates and returns a new <see cref="HttpClient"/> instance that is ready to interact with the Observation REST API.
     /// </summary>
     /// <returns>A new <see cref="HttpClient"/> instance.</returns>
     public HttpClient CreateApiClient()
     {
         return ApiFactory.CreateClient();
+    }
+
+    /// <summary>
+    /// Creates and returns a new <see cref="HttpClient"/> instance that is ready to interact with the Analysis REST API.
+    /// </summary>
+    /// <returns>A new <see cref="HttpClient"/> instance.</returns>
+    public HttpClient CreateAnalysisApiClient()
+    {
+        return AnalysisApiFactory.CreateClient();
     }
 
     public HttpClient CreateApiClientWithReplacedService<TService>(TService service) where TService : class
@@ -70,6 +81,7 @@ public class TestFixture : IAsyncLifetime
         var services = GetServiceCollections();
         ServiceProvider = ServiceProviderExtensions.RegisterServices(services);
         ApiFactory.ServiceProvider = ServiceProvider;
+        AnalysisApiFactory.ServiceProvider = ServiceProvider;
         using var scope = ServiceProvider.CreateScope();
         ProcessFixture = scope.ServiceProvider.GetService<IProcessFixture>()!;
         await ProcessFixture.InitializeElasticsearchIndices();
@@ -112,6 +124,7 @@ public class TestFixture : IAsyncLifetime
     public async Task DisposeAsync()
     {
         await ApiFactory.DisposeAsync();
+        await AnalysisApiFactory.DisposeAsync();
     }
 
     internal void ResetTaxonSumAggregationCache()

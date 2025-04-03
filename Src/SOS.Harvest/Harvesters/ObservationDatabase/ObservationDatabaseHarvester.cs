@@ -110,6 +110,7 @@ namespace SOS.Harvest.Harvesters.ObservationDatabase
                 OccurrenceRemarks = entity.OccurrenceRemarks,
                 Observers = entity.Observers,
                 Origin = entity.Origin,
+                ReportedBy = entity.ReportedBy,
                 Parish = entity.Parish,
                 ProtectionLevel = entity.ProtectionLevel,
                 Province = entity.Province,

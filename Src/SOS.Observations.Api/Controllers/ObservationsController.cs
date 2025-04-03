@@ -26,11 +26,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Security;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
+using System.Threading;
 using System.Threading.Tasks;
 using Result = CSharpFunctionalExtensions.Result;
 
@@ -51,6 +53,8 @@ namespace SOS.Observations.Api.Controllers
         private readonly IClassCache<Dictionary<string, CacheEntry<GeoGridResultDto>>> _geogridAggregationCache;
         private readonly IClassCache<Dictionary<string, CacheEntry<PagedResultDto<TaxonAggregationItemDto>>>> _taxonAggregationInternalCache;           
         private readonly ILogger<ObservationsController> _logger;
+        private static readonly SemaphoreSlim _artfaktaAggregationSemaphore = new SemaphoreSlim(4);
+        private static readonly SemaphoreSlim _aggregationSemaphore = new SemaphoreSlim(8);
 
         private JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions
         {
@@ -287,6 +291,27 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] bool sensitiveObservations = false,
             [FromQuery] bool? skipCache = false)
         {
+            string requestingSystem = null;
+            if (this.Request.Headers.TryGetValue("X-Requesting-System", out var requestingSystemVal))
+            {
+                requestingSystem = requestingSystemVal.ToString();
+            }
+
+            if (requestingSystem == "Artfakta - SearchService")
+            {
+                if (!await _artfaktaAggregationSemaphore.WaitAsync(TimeSpan.FromMinutes(1)))
+                {
+                    return new StatusCodeResult((int)HttpStatusCode.TooManyRequests);
+                }
+            }
+            else
+            {
+                if (!await _aggregationSemaphore.WaitAsync(TimeSpan.FromMinutes(1)))
+                {
+                    return new StatusCodeResult((int)HttpStatusCode.TooManyRequests);
+                }
+            }
+
             try
             {
                 LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
@@ -377,6 +402,17 @@ namespace SOS.Observations.Api.Controllers
             {
                 _logger.LogError(e, "GeoGridAggregation error.");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+            finally
+            {
+                if (requestingSystem == "Artfakta - SearchService")
+                {
+                    _artfaktaAggregationSemaphore.Release();
+                }
+                else
+                {
+                    _aggregationSemaphore.Release();
+                }
             }
         }
 
@@ -543,13 +579,18 @@ namespace SOS.Observations.Api.Controllers
                 filter = await _searchFilterUtility.InitializeSearchFilterAsync(filter);
                 translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
                 var validationResult = Result.Combine(
-                    _inputValidator.ValidateSearchPagingArguments(skip, take),
-                    string.IsNullOrEmpty(sortBy) ? Result.Success() :  (await _inputValidator.ValidateSortFieldsAsync(new[] { sortBy })),
+                    _inputValidator.ValidateSearchPagingArguments(skip, take),                    
                     validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(filter)) : Result.Success(),
                     _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
                     _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries),
                     _inputValidator.ValidateTranslationCultureCode(translationCultureCode));
                 if (validationResult.IsFailure) return BadRequest(validationResult.Error);
+                var sortFieldValidationResult = string.IsNullOrEmpty(sortBy) ? Result.Success<List<string>>(null) : (await _inputValidator.ValidateSortFieldsAsync(new[] { sortBy }));
+                if (sortFieldValidationResult.IsFailure) return BadRequest(sortFieldValidationResult.Error);
+                if (sortFieldValidationResult.Value != null && sortFieldValidationResult.Value.Any())
+                {
+                    sortBy = sortFieldValidationResult.Value.First();
+                }
                 SearchFilter searchFilter = filter.ToSearchFilter(this.GetUserId(), protectionFilter, translationCultureCode, sortBy, sortOrder);
                 var result = await _observationManager.GetChunkAsync(roleId, authorizationApplicationIdentifier, searchFilter, skip, take);
                 var dto = result?.ToPagedResultDto(result.Records);
@@ -626,8 +667,12 @@ namespace SOS.Observations.Api.Controllers
         {
             try
             {
-                var validationResult = string.IsNullOrEmpty(sortBy) ? Result.Success() : (await _inputValidator.ValidateSortFieldsAsync(new[] { sortBy }));
-                if (validationResult.IsFailure) return BadRequest(validationResult.Error);
+                var sortFieldValidationResult = string.IsNullOrEmpty(sortBy) ? Result.Success<List<string>>(null) : (await _inputValidator.ValidateSortFieldsAsync(new[] { sortBy }));
+                if (sortFieldValidationResult.IsFailure) return BadRequest(sortFieldValidationResult.Error);
+                if (sortFieldValidationResult.Value != null && sortFieldValidationResult.Value.Any())
+                {
+                    sortBy = sortFieldValidationResult.Value.First();
+                }                
 
                 LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
@@ -820,15 +865,36 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] string translationCultureCode = "sv-SE",
             [FromQuery] bool sensitiveObservations = false)
         {
+            string requestingSystem = null;
+            if (this.Request.Headers.TryGetValue("X-Requesting-System", out var requestingSystemVal))
+            {
+                requestingSystem = requestingSystemVal.ToString();
+            }
+
+            if (requestingSystem == "Artfakta - SearchService")
+            {
+                if (!await _artfaktaAggregationSemaphore.WaitAsync(TimeSpan.FromMinutes(1)))
+                {
+                    return new StatusCodeResult((int)HttpStatusCode.TooManyRequests);
+                }
+            }
+            else
+            {
+                if (!await _aggregationSemaphore.WaitAsync(TimeSpan.FromMinutes(1)))
+                {
+                    return new StatusCodeResult((int)HttpStatusCode.TooManyRequests);
+                }
+            }
+
             try
             {
                 LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 var parameters = new[]
                 {
-                    $"skip={skip}",
-                    $"take={take}",
-                    $"sensitiveObservations={sensitiveObservations}"
-                };
+            $"skip={skip}",
+            $"take={take}",
+            $"sensitiveObservations={sensitiveObservations}"
+        };
                 string cacheKey = CreateCacheKey(string.Join("&", parameters), filter);
                 HttpContext.Items.TryAdd("CacheKey", cacheKey);
 
@@ -886,6 +952,17 @@ namespace SOS.Observations.Api.Controllers
             {
                 _logger.LogError(e, "TaxonAggregation error.");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+            finally
+            {
+                if (requestingSystem == "Artfakta - SearchService")
+                {
+                    _artfaktaAggregationSemaphore.Release();
+                }
+                else
+                {
+                    _aggregationSemaphore.Release();
+                }
             }
         }
 
@@ -1134,6 +1211,27 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] string translationCultureCode = "sv-SE",
             [FromQuery] bool sensitiveObservations = false)
         {
+            string requestingSystem = null;
+            if (this.Request.Headers.TryGetValue("X-Requesting-System", out var requestingSystemVal))
+            {
+                requestingSystem = requestingSystemVal.ToString();
+            }
+
+            if (requestingSystem == "Artfakta - SearchService")
+            {
+                if (!await _artfaktaAggregationSemaphore.WaitAsync(TimeSpan.FromMinutes(1)))
+                {
+                    return new StatusCodeResult((int)HttpStatusCode.TooManyRequests);
+                }
+            }
+            else
+            {
+                if (!await _aggregationSemaphore.WaitAsync(TimeSpan.FromMinutes(1)))
+                {
+                    return new StatusCodeResult((int)HttpStatusCode.TooManyRequests);
+                }
+            }
+
             try
             {
                 LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
@@ -1193,6 +1291,17 @@ namespace SOS.Observations.Api.Controllers
             {
                 _logger.LogError(e, "GeoGridAggregation error.");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+            finally
+            {
+                if (requestingSystem == "Artfakta - SearchService")
+                {
+                    _artfaktaAggregationSemaphore.Release();
+                }
+                else
+                {
+                    _aggregationSemaphore.Release();
+                }
             }
         }
 
@@ -1528,8 +1637,7 @@ namespace SOS.Observations.Api.Controllers
                 this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, filter.ProtectionFilter);
                 filter = await _searchFilterUtility.InitializeSearchFilterAsync(filter);
                 translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
-                var validationResult = Result.Combine(
-                    validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(filter)) : Result.Success(),
+                var validationResult = Result.Combine(                    
                     string.IsNullOrEmpty(sortBy) ? Result.Success() : (await _inputValidator.ValidateSortFieldsAsync(new[] { sortBy })),
                     _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
                     _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries),
@@ -1537,6 +1645,12 @@ namespace SOS.Observations.Api.Controllers
                     _inputValidator.ValidateTranslationCultureCode(translationCultureCode));
 
                 if (validationResult.IsFailure) return BadRequest(validationResult.Error);
+                var sortFieldValidationResult = string.IsNullOrEmpty(sortBy) ? Result.Success<List<string>>(null) : (await _inputValidator.ValidateSortFieldsAsync(new[] { sortBy }));
+                if (sortFieldValidationResult.IsFailure) return BadRequest(sortFieldValidationResult.Error);
+                if (sortFieldValidationResult.Value != null && sortFieldValidationResult.Value.Any())
+                {
+                    sortBy = sortFieldValidationResult.Value.First();
+                }
                 if (outputFormat == OutputFormatDto.GeoJson || outputFormat == OutputFormatDto.GeoJsonFlat)
                 {
                     var outPutFields = EnsureCoordinatesIsRetrievedFromDb(filter?.Output?.Fields);
@@ -1758,8 +1872,7 @@ namespace SOS.Observations.Api.Controllers
                 filter = await _searchFilterUtility.InitializeSearchFilterAsync(filter);
                 translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
                 const int maxTotalCount = 100000;
-                var validationResult = Result.Combine(
-                    validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(filter)) : Result.Success(),
+                var validationResult = Result.Combine(                    
                     string.IsNullOrEmpty(sortBy) ? Result.Success() : (await _inputValidator.ValidateSortFieldsAsync(new[] { sortBy })),
                     _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
                     _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries),
@@ -1767,7 +1880,12 @@ namespace SOS.Observations.Api.Controllers
                     _inputValidator.ValidateTranslationCultureCode(translationCultureCode));
 
                 if (validationResult.IsFailure) return BadRequest(validationResult.Error);
-
+                var sortFieldValidationResult = string.IsNullOrEmpty(sortBy) ? Result.Success<List<string>>(null) : (await _inputValidator.ValidateSortFieldsAsync(new[] { sortBy }));
+                if (sortFieldValidationResult.IsFailure) return BadRequest(sortFieldValidationResult.Error);
+                if (sortFieldValidationResult.Value != null && sortFieldValidationResult.Value.Any())
+                {
+                    sortBy = sortFieldValidationResult.Value.First();
+                }
                 SearchFilter searchFilter = filter.ToSearchFilter(this.GetUserId(), protectionFilter, translationCultureCode, sortBy, sortOrder);
                 var result = await _observationManager.GetObservationsByScrollAsync(roleId, authorizationApplicationIdentifier, searchFilter, take, scrollId);
                 if (result.TotalCount > maxTotalCount)
@@ -1807,9 +1925,9 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
         /// <param name="areaBuffer">Are buffer 0 to 100m.</param>
         /// <param name="onlyAboveMyClearance">If true, get signal only above users clearance.</param>
-        /// <param name="returnHttp403Or409WhenNoPermissions">
-        /// If true, a http 403 will be returned if the user tries to search in areas where he/she don't have permission to search.
-        /// Http 409 will be returned if the user tries to search in areas where he/she have partial permission to search and the signal search returns false.        
+        /// <param name="returnHttp4xxWhenNoPermissions">
+        /// If true, an HTTP 403 response will be returned if the user attempts to search in areas where they lack permission.
+        /// An HTTP 409 response will be returned if the user has partial permission to search in an area and the signal search returns false.
         /// </param>
         /// <returns></returns>
         [HttpPost("Internal/SignalSearch")]
@@ -1826,7 +1944,7 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] bool validateSearchFilter = false, // if false, only mandatory requirements will be validated
             [FromQuery] int areaBuffer = 0,
             [FromQuery] bool onlyAboveMyClearance = true,
-            [FromQuery] bool? returnHttp403Or409WhenNoPermissions = false)
+            [FromQuery] bool? returnHttp4xxWhenNoPermissions = false)
         {
             try
             {
@@ -1843,7 +1961,7 @@ namespace SOS.Observations.Api.Controllers
                 }
 
                 var searchFilter = filter.ToSearchFilterInternal(this.GetUserId(), true);
-                var taxonFound = await _observationManager.SignalSearchInternalAsync(roleId, authorizationApplicationIdentifier, searchFilter, areaBuffer, onlyAboveMyClearance, returnHttp403Or409WhenNoPermissions ?? false);
+                var taxonFound = await _observationManager.SignalSearchInternalAsync(roleId, authorizationApplicationIdentifier, searchFilter, areaBuffer, onlyAboveMyClearance, returnHttp4xxWhenNoPermissions ?? false);
 
                 if (taxonFound == SignalSearchResult.NoPermissions || taxonFound == SignalSearchResult.PartialNoPermissions)
                 {
@@ -1915,6 +2033,27 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] bool sumUnderlyingTaxa = false,
             [FromQuery] bool? skipCache = false)
         {
+            string requestingSystem = null;
+            if (this.Request.Headers.TryGetValue("X-Requesting-System", out var requestingSystemVal))
+            {
+                requestingSystem = requestingSystemVal.ToString();
+            }
+
+            if (requestingSystem == "Artfakta - SearchService")
+            {
+                if (!await _artfaktaAggregationSemaphore.WaitAsync(TimeSpan.FromMinutes(1)))
+                {
+                    return new StatusCodeResult((int)HttpStatusCode.TooManyRequests);
+                }
+            }
+            else
+            {
+                if (!await _aggregationSemaphore.WaitAsync(TimeSpan.FromMinutes(1)))
+                {
+                    return new StatusCodeResult((int)HttpStatusCode.TooManyRequests);
+                }
+            }
+
             try
             {
                 LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
@@ -1963,7 +2102,7 @@ namespace SOS.Observations.Api.Controllers
                     _inputValidator.ValidateTranslationCultureCode(translationCultureCode),
                     _inputValidator.ValidateTaxonAggregationPagingArguments(skip, take),
                     await _inputValidator.ValidateTilesLimitAsync(boundingBox, 1, _observationManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, searchFilter), true)
-                 );
+                    );
 
                 if (validationResult.IsFailure)
                 {
@@ -2014,6 +2153,17 @@ namespace SOS.Observations.Api.Controllers
                 _logger.LogError(e, "TaxonAggregation error.");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
+            finally
+            {
+                if (requestingSystem == "Artfakta - SearchService")
+                {
+                    _artfaktaAggregationSemaphore.Release();
+                }
+                else
+                {
+                    _aggregationSemaphore.Release();
+                }
+            }
         }
 
         /// <summary>
@@ -2042,6 +2192,11 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] string sortBy = "SumObservationCount",
             [FromQuery] SearchSortOrder sortOrder = SearchSortOrder.Desc)
         {
+            if (!await _artfaktaAggregationSemaphore.WaitAsync(TimeSpan.FromMinutes(1)))
+            {
+                return new StatusCodeResult((int)HttpStatusCode.TooManyRequests);
+            }
+
             try
             {
                 var validationResult = sortBy switch
@@ -2082,6 +2237,10 @@ namespace SOS.Observations.Api.Controllers
             {
                 _logger.LogError(e, "TaxonSumAggregation error.");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+            finally
+            {
+                _artfaktaAggregationSemaphore.Release();
             }
         }
 

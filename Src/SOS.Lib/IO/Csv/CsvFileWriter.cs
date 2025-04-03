@@ -275,23 +275,8 @@ namespace SOS.Lib.IO.Excel
                 throw new Exception($"Csv export expected {expectedNoOfObservations} but only got {nrObservations}");
             }
 
-            LogMemoryUsage();
+            _logger.LogInformation(LogHelper.GetMemoryUsageSummary());
             return nrObservations;
-        }
-
-        private void LogMemoryUsage()
-        {
-            try
-            {
-                var memoryUsage = GC.GetTotalMemory(false);
-                GCMemoryInfo memoryInfo = GC.GetGCMemoryInfo();
-                var process = Process.GetCurrentProcess();
-                _logger.LogInformation($"GC.MemoryUsage={memoryUsage / 1024 / 1024} MB, GC.LargeObjectHeap={memoryInfo.GenerationInfo[2].SizeAfterBytes / 1024 / 1024} MB, Process.PrivateMemorySize64={process.PrivateMemorySize64 / 1024 / 1024} MB, Process.WorkingSet64={process.WorkingSet64 / 1024 / 1024} MB, Process.VirtualMemorySize64={process.VirtualMemorySize64 / 1024 / 1024}  MB");
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Failed to log memory usage.");
-            }                       
         }
     }
 }

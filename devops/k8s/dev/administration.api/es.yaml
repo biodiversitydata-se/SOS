@@ -1,0 +1,16 @@
+apiVersion: external-secrets.io/v1beta1
+kind: ExternalSecret
+metadata:
+  name: sosadminapi-es
+  namespace: sosadminapi-dev
+spec:
+  refreshInterval: "120s"
+  secretStoreRef:
+    name: kubernetes-t2-artdata-css
+    kind: ClusterSecretStore
+  target:
+    name: sosadminapi-secret
+    creationPolicy: Owner
+  dataFrom:
+  - extract:
+      key: kv2/sosadminapi/dev

@@ -30,22 +30,10 @@ spec:
     metadata:
       annotations:
         logging: "true"
-        vault.hashicorp.com/agent-inject: "true"
-        vault.hashicorp.com/agent-inject-status: "update"
-        vault.hashicorp.com/ca-cert: "/vault/tls/ca-bundle.crt"
-        vault.hashicorp.com/tls-secret: "vault-ca-bundle"
-        vault.hashicorp.com/role: "sosadminapi"
-        vault.hashicorp.com/agent-inject-secret-env: "kv2/data/sosadminapi/dev"
-        vault.hashicorp.com/agent-inject-template-env: |
-          {{- with secret "kv2/data/sosadminapi/dev" -}}
-            {{- range $k, $v := .Data.data -}}
-              export {{ $k }}="{{ $v }}"
-            {{ end }}
-          {{- end }}
       labels:
         app: sosadminapi-api
     spec:
-      serviceAccountName: sosadminapi-sa
+      serviceAccountName: ""
       topologySpreadConstraints: # try to spread out api instances over available nodes
       - labelSelector:
           matchLabels:
@@ -57,6 +45,41 @@ spec:
         - env:
           - name: ASPNETCORE_ENVIRONMENT
             value: k8s-dev
+          - name: HangfireDbPassword
+            valueFrom:
+                secretKeyRef:
+                  key: HangfireDbPassword
+                  name: sosadminapi-secret
+          - name: HangfireDbUserName
+            valueFrom:
+                secretKeyRef:
+                  key: HangfireDbUserName
+                  name: sosadminapi-secret
+          - name: InstrumentationKey
+            valueFrom:
+                secretKeyRef:
+                  key: InstrumentationKey
+                  name: sosadminapi-secret
+          - name: ProcessDbPassword
+            valueFrom:
+                secretKeyRef:
+                  key: ProcessDbPassword
+                  name: sosadminapi-secret
+          - name: ProcessDbUserName
+            valueFrom:
+                secretKeyRef:
+                  key: ProcessDbUserName
+                  name: sosadminapi-secret
+          - name: VerbatimDbPassword
+            valueFrom:
+                secretKeyRef:
+                  key: VerbatimDbPassword
+                  name: sosadminapi-secret
+          - name: VerbatimDbUserName
+            valueFrom:
+                secretKeyRef:
+                  key: VerbatimDbUserName
+                  name: sosadminapi-secret
           - name: ApplicationInsights
             value: '{"InstrumentationKey": "SECRET_PLACEHOLDER", "EnableRequestBodyLogging": false, "EnableSearchResponseCountLogging": false}'
           - name: AllowedOrigins
@@ -77,8 +100,6 @@ spec:
             value: '{"UserName": "SECRET_PLACEHOLDER", "Password": "SECRET_PLACEHOLDER", "Hosts": [{"Name": "artmongo-t-1.artdata.slu.se","Port": 27017}],"DatabaseName": "sos-hangfire-dev", "UseTls": false, "AuthenticationDb": "admin", "JobExpirationDays": 3}'
           image: adbpocreg.azurecr.io/sosadminapi-api:$(Build.BuildId)
           name: sosadminapi-api
-          command: ["sh", "-c"]
-          args: [". /vault/secrets/env && dotnet SOS.Administration.Api.dll"]
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 5005

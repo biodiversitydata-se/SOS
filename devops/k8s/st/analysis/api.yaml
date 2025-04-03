@@ -30,22 +30,9 @@ spec:
     metadata:
       annotations:
         logging: "true"
-        vault.hashicorp.com/agent-inject: "true"
-        vault.hashicorp.com/agent-inject-status: "update"
-        vault.hashicorp.com/ca-cert: "/vault/tls/ca-bundle.crt"
-        vault.hashicorp.com/tls-secret: "vault-ca-bundle"
-        vault.hashicorp.com/role: "sos-analysis"
-        vault.hashicorp.com/agent-inject-secret-env: "kv2/data/sos-analysis/st"
-        vault.hashicorp.com/agent-inject-template-env: |
-          {{- with secret "kv2/data/sos-analysis/st" -}}
-            {{- range $k, $v := .Data.data -}}
-              export {{ $k }}='{{ $v }}'
-            {{ end }}
-          {{- end }}
       labels:
         app: sos-analysis-api
     spec:
-      serviceAccountName: sos-analysis-sa
       topologySpreadConstraints: # try to spread out api instances over available nodes
       - labelSelector:
           matchLabels:
@@ -57,6 +44,56 @@ spec:
         - env:
           - name: ASPNETCORE_ENVIRONMENT
             value: st
+          - name: ClientSecret
+            valueFrom:
+                secretKeyRef:
+                  key: ClientSecret
+                  name: sos-analysis-secret
+          - name: Salt
+            valueFrom:
+                secretKeyRef:
+                  key: Salt
+                  name: sos-analysis-secret
+          - name: Password
+            valueFrom:
+                secretKeyRef:
+                  key: Password
+                  name: sos-analysis-secret
+          - name: InstrumentationKey
+            valueFrom:
+                secretKeyRef:
+                  key: InstrumentationKey
+                  name: sos-analysis-secret
+          - name: ProcessDbPassword
+            valueFrom:
+                secretKeyRef:
+                  key: ProcessDbPassword
+                  name: sos-analysis-secret
+          - name: ProcessDbUserName
+            valueFrom:
+                secretKeyRef:
+                  key: ProcessDbUserName
+                  name: sos-analysis-secret
+          - name: SearchDbPassword
+            valueFrom:
+                secretKeyRef:
+                  key: SearchDbPassword
+                  name: sos-analysis-secret
+          - name: SearchDbUserName
+            valueFrom:
+                secretKeyRef:
+                  key: SearchDbUserName
+                  name: sos-analysis-secret
+          - name: HangfireDbPassword
+            valueFrom:
+                secretKeyRef:
+                  key: HangfireDbPassword
+                  name: sos-analysis-secret
+          - name: HangfireDbUserName
+            valueFrom:
+                secretKeyRef:
+                  key: HangfireDbUserName
+                  name: sos-analysis-secret
           - name: CorsAllowAny
             value: "true"
           - name: IdentityServer
@@ -79,8 +116,6 @@ spec:
             value: '{"UserName": "SECRET_PLACEHOLDER", "Password": "SECRET_PLACEHOLDER", "Hosts": [{"Name": "artmongo-t-1.artdata.slu.se","Port": 27017}], "ReplicaSetName": null, "DatabaseName": "sos-hangfire-st", "UseTls": false, "AuthenticationDb": "admin", "JobExpirationDays": 3}'
           image: adbpocreg.azurecr.io/sos-analysis-api:$(Parameters.ImageTag)
           name: sos-analysis-api
-          command: ["sh", "-c"]
-          args: [". /vault/secrets/env && dotnet SOS.Analysis.Api.dll"]
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 5000

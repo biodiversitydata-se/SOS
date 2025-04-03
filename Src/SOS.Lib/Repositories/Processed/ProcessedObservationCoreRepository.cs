@@ -2153,7 +2153,7 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<string>> GetSortableFieldsAsync()
+        public async Task<HashSet<string>> GetSortableFieldsAsync()
         {
             var sortableFields = new HashSet<string>();
             var mappings = await Client.Indices.GetMappingAsync<Observation>();

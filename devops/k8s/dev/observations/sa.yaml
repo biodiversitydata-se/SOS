@@ -1,6 +1,0 @@
- apiVersion: v1
- kind: ServiceAccount
- metadata:
-  name: sos-observations-sa
-  namespace: sos-observations-dev
-

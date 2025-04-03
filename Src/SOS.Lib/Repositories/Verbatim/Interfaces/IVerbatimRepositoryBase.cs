@@ -46,5 +46,6 @@ namespace SOS.Lib.Repositories.Verbatim.Interfaces
         Task<bool> CopyCollectionAsync(string sourceCollectionName, string targetCollectionName, bool overwriteExistingTargetCollection = true);
         Task<bool> PermanentizeCollectionAsync(string tempCollectionName, string targetCollectionName);
         Task<bool> PermanentizeCollectionAsync(IMongoCollection<TEntity> tempCollection, IMongoCollection<TEntity> targetCollection);
+        Task<bool> CheckDuplicatesAsync(string field, IMongoCollection<TEntity> mongoCollection);
     }
 }

@@ -26,10 +26,10 @@ As the first step towards authorization, you will need to receive your unique cl
 
 | Name 	| Value 	|
 |-	|-	|
-| Scope 	| SOS.Observations.Protected openid 	|
-| OAuth 2.0 Server 	| https://ids.artdatabanken.se 	|
-| Auth URL 	| https://ids.artdatabanken.se/connect/authorize 	|
-| Access token URL 	| https://ids.artdatabanken.se/connect/token 	|
+| Scope 	| SOS.Observations.Protected  	|
+| OAuth 2.0 Server 	| https://useradmin-auth.slu.se 	|
+| Auth URL 	| https://useradmin-auth.slu.se/connect/authorize 	|
+| Access token URL 	| https://useradmin-auth.slu.se/connect/token 	|
 
 
-![Login page](Images/ids-login2.png "Login page")
+![Login page](Images/idp-login.png "Login page")

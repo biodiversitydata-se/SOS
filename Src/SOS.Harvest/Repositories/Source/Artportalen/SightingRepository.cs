@@ -153,7 +153,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
                     Logger.LogDebug($"Artportalen SightingRepository.GetChunkAsync returned no sightings. Live={Live}, startId={startId}, maxRows={maxRows}");
                 }
 
-                return result!;
+                return result?.DistinctBy(s => s.Id);
             }
             catch (Exception e)
             {
@@ -191,7 +191,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<SightingEntity>> GetChunkAsync(DateTime modifiedSince, int maxRows)
+        public async Task<IEnumerable<SightingEntity>?> GetChunkAsync(DateTime modifiedSince, int maxRows)
         {
             try
             {
@@ -203,7 +203,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
                     Logger.LogDebug($"Artportalen SightingRepository.GetChunkAsync returned no sightings. Live={Live}, modifiedSince={modifiedSince}, maxRows={maxRows}");
                 }
 
-                return result!;
+                return result?.DistinctBy(s => s.Id);
             }
             catch (Exception e)
             {
