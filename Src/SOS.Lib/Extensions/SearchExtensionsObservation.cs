@@ -35,7 +35,7 @@ namespace SOS.Lib
                 objectQueries.TryAddTermCriteria($"artportalenInternal.occurrenceRecordedByInternal.viewAccess", true);
                 queries.Add(q => q
                     .Bool(b => b
-                        .Must(objectQueries.ToArray())
+                        .Filter(objectQueries.ToArray())
                     )
                  );
             }
@@ -103,7 +103,7 @@ namespace SOS.Lib
 
                 reportedByMeQueries.Add(q => q
                     .Bool(b => b
-                        .Must(occurrenceRecordedByInternalQueries.ToArray())
+                        .Filter(occurrenceRecordedByInternalQueries.ToArray())
                     )
                  );
 
