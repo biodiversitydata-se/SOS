@@ -28,7 +28,6 @@ using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.OpenApi.Models;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
-using Newtonsoft.Json.Converters;
 using Serilog;
 using SOS.Lib.ActionFilters;
 using SOS.Lib.ApplicationInsights;
@@ -256,13 +255,13 @@ namespace SOS.Observations.Api
             services.AddControllers()
                 .AddJsonOptions(options =>
                 {
+                    options.JsonSerializerOptions.Converters.Add(new NetTopologySuite.IO.Converters.GeoJsonConverterFactory());
+                    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                     options.JsonSerializerOptions.AllowTrailingCommas = true;
                     //options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull; // Some clients does not support omitting null values, so use JsonIgnoreCondition.Never for now.
                     options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.Never;
                     options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
                     options.JsonSerializerOptions.ReadCommentHandling = JsonCommentHandling.Skip;
-                    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-                    options.JsonSerializerOptions.Converters.Add(new NetTopologySuite.IO.Converters.GeoJsonConverterFactory()); // Is this needed?
                 });
 
             // MongoDB conventions.
@@ -454,7 +453,7 @@ namespace SOS.Observations.Api
                         .UseRecommendedSerializerSettings(m =>
                         {
                             m.Converters.Add(new NetTopologySuite.IO.Converters.GeometryConverter());
-                            m.Converters.Add(new StringEnumConverter());
+                            m.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
                         })
                         .UseMongoStorage(new MongoClient(mongoConfiguration.GetMongoDbSettings()),
                             mongoConfiguration.DatabaseName,
@@ -798,7 +797,7 @@ namespace SOS.Observations.Api
                         ResponseWriter = async (context, _) =>
                         {
                             var report = HealthReportCachePublisher.LatestAll;
-                            var result = report == null ? "{}" : Newtonsoft.Json.JsonConvert.SerializeObject(
+                            var result = report == null ? "{}" : JsonSerializer.Serialize(
                                 new
                                 {
                                     status = report.Status.ToString(),
@@ -812,11 +811,7 @@ namespace SOS.Observations.Api
                                             e.Value.Status),
                                         tags = e.Value.Tags
                                     }).ToList()
-                                }, Newtonsoft.Json.Formatting.None,
-                                new Newtonsoft.Json.JsonSerializerSettings
-                                {
-                                    NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore
-                                });
+                                }, new JsonSerializerOptions { RespectNullableAnnotations = true });
                             context.Response.ContentType = System.Net.Mime.MediaTypeNames.Application.Json;
                             await context.Response.WriteAsync(result);
                         }
