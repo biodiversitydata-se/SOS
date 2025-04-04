@@ -47,6 +47,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Processed;
 using Hangfire;
+using Newtonsoft.Json.Converters;
 using SOS.Analysis.Api.Repositories.Interfaces;
 using SOS.Analysis.Api.Repositories;
 using Hangfire.Mongo;
@@ -439,7 +440,7 @@ namespace SOS.Analysis.Api
                         .UseRecommendedSerializerSettings(m =>
                         {
                             m.Converters.Add(new NetTopologySuite.IO.Converters.GeometryConverter());
-                            m.Converters.Add(new Newtonsoft.Json.Converters.StringEnumConverter());
+                            m.Converters.Add(new StringEnumConverter());
                         })
                         .UseMongoStorage(new MongoClient(mongoConfiguration.GetMongoDbSettings()),
                             mongoConfiguration.DatabaseName,
