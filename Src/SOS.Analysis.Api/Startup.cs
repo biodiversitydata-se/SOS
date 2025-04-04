@@ -209,56 +209,31 @@ namespace SOS.Analysis.Api
             var userServiceConfiguration = Settings.UserServiceConfiguration;
 
             // Authentication
-            services.AddAuthentication(options =>
-            {
-                options.DefaultScheme = "MultipleIdentityProviders";
-                options.DefaultChallengeScheme = "MultipleIdentityProviders";
-            })
-            .AddJwtBearer("UserAdmin2", options =>
-            {
-                options.Audience = userServiceConfiguration.IdentityProvider.Audience;
-                options.Authority = userServiceConfiguration.IdentityProvider.Authority;
-                options.RequireHttpsMetadata = userServiceConfiguration.IdentityProvider.RequireHttpsMetadata;
-                options.Events = new JwtBearerEvents
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
                 {
-                    OnTokenValidated = context =>
+                    options.Audience = userServiceConfiguration.IdentityProvider.Audience;
+                    options.Authority = userServiceConfiguration.IdentityProvider.Authority;
+                    options.RequireHttpsMetadata = userServiceConfiguration.IdentityProvider.RequireHttpsMetadata;
+                    options.Events = new JwtBearerEvents
                     {
-                        var claimsIdentity = context.Principal?.Identity as ClaimsIdentity;
-                        var scopeClaim = claimsIdentity?.FindFirst("scope");
-                        if (claimsIdentity != null && scopeClaim != null)
+                        OnTokenValidated = context =>
                         {
-                            var scopes = scopeClaim.Value.Split(' ');
-                            claimsIdentity.RemoveClaim(scopeClaim);
-                            foreach (var scope in scopes)
+                            var claimsIdentity = context.Principal?.Identity as ClaimsIdentity;
+                            var scopeClaim = claimsIdentity?.FindFirst("scope");
+                            if (claimsIdentity != null && scopeClaim != null)
                             {
-                                claimsIdentity.AddClaim(new Claim("scope", scope));
+                                var scopes = scopeClaim.Value.Split(' ');
+                                claimsIdentity.RemoveClaim(scopeClaim);
+                                foreach (var scope in scopes)
+                                {
+                                    claimsIdentity.AddClaim(new Claim("scope", scope));
+                                }
                             }
+                            return Task.CompletedTask;
                         }
-                        return Task.CompletedTask;
-                    }
-                };
-            })
-            .AddJwtBearer("UserAdmin1", options =>
-            {
-                options.Audience = identityServerConfiguration.Audience;
-                options.Authority = identityServerConfiguration.Authority;
-                options.RequireHttpsMetadata = identityServerConfiguration.RequireHttpsMetadata;
-            })
-            .AddPolicyScheme("MultipleIdentityProviders", "MultipleIdentityProviders", options =>
-            {
-                // Select schema based on request (UserAdmin1 or UserAdmin2)
-                options.ForwardDefaultSelector = context =>
-                {
-                    var authHeader = context.Request.Headers["Authorization"].FirstOrDefault();
-                    if (authHeader != null && authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
-                    {
-                        if (TokenHelper.IsUserAdmin2Token(authHeader, userServiceConfiguration.IdentityProvider.Authority))
-                            return "UserAdmin2";
-                    }
-
-                    return "UserAdmin1";
-                };
-            });
+                    };
+                });
 
             // Add application insights.
             services.AddApplicationInsightsTelemetry(options =>
