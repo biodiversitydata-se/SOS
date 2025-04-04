@@ -452,6 +452,7 @@ namespace SOS.Observations.Api.Controllers
             catch (SemaphoreTimeoutException)
             {
                 HttpContext.Items["SemaphoreLimitUsed"] = "timeout";
+                _logger.LogError("Too many requests. Semaphore limit reached. Endpoint={endpoint}, UserType={@userType}", this.GetEndpointName(ControllerContext), this.GetApiUserType());
                 return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
             }
             catch (AuthenticationRequiredException)
@@ -526,6 +527,7 @@ namespace SOS.Observations.Api.Controllers
             catch (SemaphoreTimeoutException)
             {
                 HttpContext.Items["SemaphoreLimitUsed"] = "timeout";
+                _logger.LogError("Too many requests. Semaphore limit reached. Endpoint={endpoint}, UserType={@userType}", this.GetEndpointName(ControllerContext), this.GetApiUserType());
                 return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
             }
             catch (AuthenticationRequiredException)
@@ -607,6 +609,7 @@ namespace SOS.Observations.Api.Controllers
             catch (SemaphoreTimeoutException)
             {
                 HttpContext.Items["SemaphoreLimitUsed"] = "timeout";
+                _logger.LogError("Too many requests. Semaphore limit reached. Endpoint={endpoint}, UserType={@userType}", this.GetEndpointName(ControllerContext), this.GetApiUserType());
                 return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
             }
             catch (AuthenticationRequiredException)
@@ -699,6 +702,7 @@ namespace SOS.Observations.Api.Controllers
             catch (SemaphoreTimeoutException)
             {
                 HttpContext.Items["SemaphoreLimitUsed"] = "timeout";
+                _logger.LogError("Too many requests. Semaphore limit reached. Endpoint={endpoint}, UserType={@userType}", this.GetEndpointName(ControllerContext), this.GetApiUserType());
                 return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
             }
             catch (AuthenticationRequiredException)
@@ -1153,6 +1157,7 @@ namespace SOS.Observations.Api.Controllers
             catch (SemaphoreTimeoutException)
             {
                 HttpContext.Items["SemaphoreLimitUsed"] = "timeout";
+                _logger.LogError("Too many requests. Semaphore limit reached. Endpoint={endpoint}, UserType={@userType}", this.GetEndpointName(ControllerContext), this.GetApiUserType());
                 return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
             }
             catch (AuthenticationRequiredException)
@@ -1226,6 +1231,7 @@ namespace SOS.Observations.Api.Controllers
             catch (SemaphoreTimeoutException)
             {
                 HttpContext.Items["SemaphoreLimitUsed"] = "timeout";
+                _logger.LogError("Too many requests. Semaphore limit reached. Endpoint={endpoint}, UserType={@userType}", this.GetEndpointName(ControllerContext), this.GetApiUserType());
                 return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
             }
             catch (AuthenticationRequiredException)
@@ -1306,6 +1312,7 @@ namespace SOS.Observations.Api.Controllers
             catch (SemaphoreTimeoutException)
             {
                 HttpContext.Items["SemaphoreLimitUsed"] = "timeout";
+                _logger.LogError("Too many requests. Semaphore limit reached. Endpoint={endpoint}, UserType={@userType}", this.GetEndpointName(ControllerContext), this.GetApiUserType());
                 return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
             }
             catch (AuthenticationRequiredException)
@@ -1397,6 +1404,7 @@ namespace SOS.Observations.Api.Controllers
             catch (SemaphoreTimeoutException)
             {
                 HttpContext.Items["SemaphoreLimitUsed"] = "timeout";
+                _logger.LogError("Too many requests. Semaphore limit reached. Endpoint={endpoint}, UserType={@userType}", this.GetEndpointName(ControllerContext), this.GetApiUserType());                
                 return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
             }
             catch (AuthenticationRequiredException)
