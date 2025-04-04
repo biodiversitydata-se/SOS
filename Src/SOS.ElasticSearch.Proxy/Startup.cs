@@ -184,17 +184,17 @@ namespace SOS.ElasticSearch.Proxy
                 {
                     if (httpContext.Items.TryGetValue("Endpoint", out var endpoint))
                     {
-                        diagnosticContext.Set("Endpoint", endpoint);
+                        diagnosticContext.Set("Endpoint", endpoint!);
                     }
 
                     if (httpContext.Items.TryGetValue("QueryString", out var queryString))
                     {
-                        diagnosticContext.Set("QueryString", queryString);
+                        diagnosticContext.Set("QueryString", queryString!);
                     }
 
                     if (httpContext.Items.TryGetValue("Handler", out var handler))
                     {
-                        diagnosticContext.Set("Handler", handler);
+                        diagnosticContext.Set("Handler", handler!);
                     }
                 };
             });

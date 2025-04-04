@@ -362,7 +362,9 @@ namespace SOS.Harvest.Services.Taxon
                 .GetRecords(TaxonPropertiesMapping)
                 .Select(m => new TaxonProperties<int>
                 {
+                    IsInvasiveInSweden = m.IsInvasiveInSweden,
                     GbifTaxonId = m.GbifTaxonId,
+                    ProtectedByLaw = m.ProtectedByLaw,
                     TaxonCategoryId = m.TaxonCategoryId,
                     TaxonCategorySwedishName = m.TaxonCategorySwedishName,
                     TaxonCategoryEnglishName = m.TaxonCategoryEnglishName,
@@ -378,12 +380,14 @@ namespace SOS.Harvest.Services.Taxon
             {
                 if (taxonPropertiesById.TryGetValue(taxon.DynamicProperties.DyntaxaTaxonId, out var taxonProperties))
                 {
-                    taxon.SortOrder = taxonProperties.SortOrder.GetValueOrDefault(0);
+                    taxon.DynamicProperties.IsInvasiveInSweden = taxonProperties.IsInvasiveInSweden;
+                    taxon.DynamicProperties.ProtectedByLaw = taxonProperties.ProtectedByLaw;
                     taxon.DynamicProperties.GbifTaxonId = taxonProperties.GbifTaxonId;
                     taxon.DynamicProperties.TaxonCategoryId = taxonProperties.TaxonCategoryId;
                     taxon.DynamicProperties.TaxonCategorySwedishName = taxonProperties.TaxonCategorySwedishName;
                     taxon.DynamicProperties.TaxonCategoryEnglishName = taxonProperties.TaxonCategoryEnglishName;
                     taxon.DynamicProperties.TaxonCategoryDarwinCoreName = taxonProperties.TaxonCategoryDarwinCoreName;
+                    taxon.SortOrder = taxonProperties.SortOrder.GetValueOrDefault(0);
                 }
             }
             _logger.LogDebug("Finish adding taxon properties to taxon");

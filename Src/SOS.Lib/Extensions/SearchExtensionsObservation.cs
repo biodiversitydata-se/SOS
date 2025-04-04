@@ -558,11 +558,18 @@ namespace SOS.Lib
         private static void TryAddTaxonCriteria<TQueryDescriptor>(
             this ICollection<Action<QueryDescriptor<TQueryDescriptor>>> queries, TaxonFilter filter) where TQueryDescriptor : class
         {
-            if (filter != null)
+            if (filter == null)
             {
-                queries.TryAddTermsCriteria("taxon.attributes.redlistCategoryDerived", filter.RedListCategories?.Select(m => m.ToUpper()));
-                queries.TryAddTermsCriteria("taxon.id", filter.Ids);
-                queries.TryAddTermsCriteria("occurrence.sex.id", filter.SexIds);
+                return;
+            }
+
+            queries.TryAddTermsCriteria("taxon.attributes.redlistCategoryDerived", filter.RedListCategories?.Select(m => m.ToUpper()));
+            queries.TryAddTermsCriteria("taxon.id", filter.Ids);
+            queries.TryAddTermsCriteria("occurrence.sex.id", filter.SexIds);
+
+            if (filter.IsInvasiveInSweden.HasValue)
+            {
+                query.TryAddTermCriteria("taxon.attributes.isInvasiveInSweden", filter.IsInvasiveInSweden.Value);
             }
         }
 

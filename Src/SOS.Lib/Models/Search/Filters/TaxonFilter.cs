@@ -37,6 +37,13 @@ namespace SOS.Lib.Models.Search.Filters
         public bool IncludeUnderlyingTaxa { get; set; }
 
         /// <summary>
+        /// Search for only invasive taxa (true)
+        /// Search for non invasive taxa (false)
+        /// Search for both (null)
+        /// </summary>
+        public bool? IsInvasiveInSweden { get; set; }
+
+        /// <summary>
         /// Taxon kingdoms
         /// </summary>
         public IEnumerable<string> Kingdoms { get; set; }
