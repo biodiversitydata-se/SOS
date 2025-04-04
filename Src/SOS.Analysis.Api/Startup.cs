@@ -19,7 +19,6 @@ using SOS.Lib.Cache;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Database;
 using SOS.Lib.Database.Interfaces;
-using SOS.Lib.JsonConverters;
 using SOS.Lib.Managers;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Middleware;
@@ -59,6 +58,7 @@ using System.Collections.Concurrent;
 using Serilog;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Elastic.Clients.Elasticsearch.Cluster;
+using SOS.Lib.JsonConverters;
 
 namespace SOS.Analysis.Api
 {
@@ -176,12 +176,12 @@ namespace SOS.Analysis.Api
                         .AllowAnyOrigin()
                     );
                 });
-            }
+            } 
 
             services.AddControllers()
                 .AddJsonOptions(options =>
                 {
-                    options.JsonSerializerOptions.Converters.Add(new NetTopologySuite.IO.Converters.GeoJsonConverterFactory());
+                    options.JsonSerializerOptions.Converters.Add(new GeometryConverter());
                     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 });
 

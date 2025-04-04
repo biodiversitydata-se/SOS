@@ -122,9 +122,9 @@ public class SortingTests : TestBase
         var searchFilter = new SearchFilterDto { OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present };
 
         // Act
-        var responseAsc = await apiClient.PostAsync($"/observations/search?sortBy=Taxon.Id&sortOrder=asc", JsonContent.Create(searchFilter));
+        var responseAsc = await apiClient.PostAsync($"/observations/search?sortBy=taxon.id&sortOrder=asc", JsonContent.Create(searchFilter));
         var resultAsc = await responseAsc.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
-        var responseDesc = await apiClient.PostAsync($"/observations/search?sortBy=Taxon.Id&sortOrder=desc", JsonContent.Create(searchFilter));
+        var responseDesc = await apiClient.PostAsync($"/observations/search?sortBy=taxon.id&sortOrder=desc", JsonContent.Create(searchFilter));
         var resultDesc = await responseDesc.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
 
         // Assert

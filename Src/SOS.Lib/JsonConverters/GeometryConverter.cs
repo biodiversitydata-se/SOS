@@ -135,7 +135,7 @@ namespace SOS.Lib.JsonConverters
                 var property = reader.GetString();
                 reader.Read();
 
-                switch (property)
+                switch (property?.ToLower())
                 {
                     case "coordinates":
                         coordinateString = ReadCoordinateData(ref reader);

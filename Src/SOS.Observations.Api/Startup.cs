@@ -262,7 +262,7 @@ namespace SOS.Observations.Api
                     options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
                     options.JsonSerializerOptions.ReadCommentHandling = JsonCommentHandling.Skip;
                     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-                    options.JsonSerializerOptions.Converters.Add(new NetTopologySuite.IO.Converters.GeoJsonConverterFactory()); // Is this needed?
+                    options.JsonSerializerOptions.Converters.Add(new GeometryConverter()); 
                 });
 
             // MongoDB conventions.

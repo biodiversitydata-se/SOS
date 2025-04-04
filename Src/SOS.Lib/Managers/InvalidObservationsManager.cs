@@ -83,7 +83,7 @@ namespace SOS.Lib.Managers
             public async Task<byte[]> CreateExcelFile(string datasetId)
             {
                 _datasetId = datasetId;
-                ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+                ExcelPackage.License.SetNonCommercialOrganization("SLU");
                 using var package = new ExcelPackage();
                 var sheet = package.Workbook.Worksheets.Add("Invalid observations");
                 AddHeaders(sheet);

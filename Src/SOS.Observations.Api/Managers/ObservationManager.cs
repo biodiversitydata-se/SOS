@@ -960,7 +960,7 @@ namespace SOS.Observations.Api.Managers
         {
             public async Task<byte[]> CreateExcelFileAsync(Dictionary<string, ObservationStatistics> statisticsByDate)
             {
-                ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+                ExcelPackage.License.SetNonCommercialOrganization("SLU");
                 using var package = new ExcelPackage();
                 foreach (var item in statisticsByDate)
                 {

@@ -2333,6 +2333,7 @@ namespace SOS.Lib.Repositories.Processed
                                 }} 
                             }}")
                         )
+                        .Type(RuntimeFieldType.Keyword)
                     )
                 )
                 .Aggregations(a => a

@@ -280,7 +280,7 @@ namespace SOS.Lib.IO.Excel
                 var rowIndex = 0;
                 ExcelPackage package = null;
                 ExcelWorksheet sheet = null;
-                ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+                ExcelPackage.License.SetNonCommercialOrganization("SLU");
                 var packageSaveTasks = new List<Task>();
                 var excelStreams = new List<Stream>();
 
