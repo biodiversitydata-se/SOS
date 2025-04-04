@@ -499,6 +499,7 @@ namespace SOS.Analysis.Api
                 app.UseHsts();
             }
 
+            app.UseMiddleware<LogApiUserTypeMiddleware>();
             if (applicationInsightsConfiguration.EnableRequestBodyLogging)
             {
                 app.UseMiddleware<EnableRequestBufferingMiddelware>();

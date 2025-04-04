@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Nest;
 using OfficeOpenXml.Export.ToCollection;
@@ -10,6 +11,7 @@ using SOS.Lib.Exceptions;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.JsonConverters;
+using SOS.Lib.Managers;
 using SOS.Lib.Models.Cache;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Enums;
@@ -55,10 +57,9 @@ namespace SOS.Observations.Api.Controllers
         private readonly IInputValidator _inputValidator;
         private readonly ObservationApiConfiguration _observationApiConfiguration;
         private readonly IClassCache<Dictionary<string, CacheEntry<GeoGridResultDto>>> _geogridAggregationCache;
-        private readonly IClassCache<Dictionary<string, CacheEntry<PagedResultDto<TaxonAggregationItemDto>>>> _taxonAggregationInternalCache;           
-        private readonly ILogger<ObservationsController> _logger;
-        private static readonly SemaphoreSlim _artfaktaAggregationSemaphore = new SemaphoreSlim(4);
-        private static readonly SemaphoreSlim _aggregationSemaphore = new SemaphoreSlim(8);
+        private readonly IClassCache<Dictionary<string, CacheEntry<PagedResultDto<TaxonAggregationItemDto>>>> _taxonAggregationInternalCache;
+        private readonly SemaphoreLimitManager _semaphoreLimitManager;
+        private readonly ILogger<ObservationsController> _logger;        
 
         private JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions
         {
@@ -84,6 +85,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="observationApiConfiguration"></param>
         /// <param name="geogridAggregationCache"></param>
         /// <param name="taxonAggregationInternalCache"></param>
+        /// <param name="semaphoreLimitManager"></param>
         /// <param name="logger"></param>
         /// <exception cref="ArgumentNullException"></exception>
         public ObservationsController(
@@ -94,6 +96,7 @@ namespace SOS.Observations.Api.Controllers
             ObservationApiConfiguration observationApiConfiguration,
             IClassCache<Dictionary<string, CacheEntry<GeoGridResultDto>>> geogridAggregationCache,
             IClassCache<Dictionary<string, CacheEntry<PagedResultDto<TaxonAggregationItemDto>>>> taxonAggregationInternalCache,
+            SemaphoreLimitManager semaphoreLimitManager,
             ILogger<ObservationsController> logger) 
         {
             _observationManager = observationManager ?? throw new ArgumentNullException(nameof(observationManager));
@@ -103,6 +106,7 @@ namespace SOS.Observations.Api.Controllers
             _observationApiConfiguration = observationApiConfiguration ?? throw new ArgumentNullException(nameof(observationApiConfiguration));
             _geogridAggregationCache = geogridAggregationCache ?? throw new ArgumentNullException(nameof(geogridAggregationCache));
             _taxonAggregationInternalCache = taxonAggregationInternalCache ?? throw new ArgumentNullException(nameof(taxonAggregationInternalCache));
+            _semaphoreLimitManager = semaphoreLimitManager ?? throw new ArgumentNullException(nameof(semaphoreLimitManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -296,25 +300,20 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] bool sensitiveObservations = false,
             [FromQuery] bool? skipCache = false)
         {
-            string requestingSystem = null;
-            if (this.Request.Headers.TryGetValue("X-Requesting-System", out var requestingSystemVal))
+            var userType = this.GetApiUserType();
+            var semaphore = _semaphoreLimitManager.GetAggregationSemaphore(userType);
+            HttpContext.Items["SemaphoreLimitUsed"] = "no";
+            if (semaphore.CurrentCount == 0)
             {
-                requestingSystem = requestingSystemVal.ToString();
+                _logger.LogInformation("All semaphore slots are occupied. Request will be queued. UserType={@userType}", userType);
+                HttpContext.Items["SemaphoreLimitUsed"] = "wait";
             }
 
-            if (requestingSystem == "Artfakta - SearchService")
+            if (!await semaphore.WaitAsync(_semaphoreLimitManager.DefaultTimeout))
             {
-                if (!await _artfaktaAggregationSemaphore.WaitAsync(TimeSpan.FromMinutes(1)))
-                {
-                    return new StatusCodeResult((int)HttpStatusCode.TooManyRequests);
-                }
-            }
-            else
-            {
-                if (!await _aggregationSemaphore.WaitAsync(TimeSpan.FromMinutes(1)))
-                {
-                    return new StatusCodeResult((int)HttpStatusCode.TooManyRequests);
-                }
+                _logger.LogWarning("Too many requests. Semaphore limit reached. UserType={@userType}", userType);
+                HttpContext.Items["SemaphoreLimitUsed"] = "timeout";
+                return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
             }
 
             try
@@ -410,14 +409,7 @@ namespace SOS.Observations.Api.Controllers
             }
             finally
             {
-                if (requestingSystem == "Artfakta - SearchService")
-                {
-                    _artfaktaAggregationSemaphore.Release();
-                }
-                else
-                {
-                    _aggregationSemaphore.Release();
-                }
+                semaphore.Release();
             }
         }
 
@@ -476,6 +468,22 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] bool validateSearchFilter = false,
             [FromQuery] bool sensitiveObservations = false)
         {
+            var userType = this.GetApiUserType();
+            var semaphore = _semaphoreLimitManager.GetAggregationSemaphore(userType);
+            HttpContext.Items["SemaphoreLimitUsed"] = "no";
+            if (semaphore.CurrentCount == 0)
+            {
+                _logger.LogInformation("All semaphore slots are occupied. Request will be queued. UserType={@userType}", userType);
+                HttpContext.Items["SemaphoreLimitUsed"] = "wait";
+            }
+
+            if (!await semaphore.WaitAsync(_semaphoreLimitManager.DefaultTimeout))
+            {
+                _logger.LogWarning("Too many requests. Semaphore limit reached. UserType={@userType}", userType);
+                HttpContext.Items["SemaphoreLimitUsed"] = "timeout";
+                return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
+            }
+
             try
             {
                 LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
@@ -527,6 +535,10 @@ namespace SOS.Observations.Api.Controllers
                 _logger.LogError(e, "Metric grid aggregation error.");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
+            finally
+            {
+                semaphore.Release();
+            }
         }
 
         /// <summary>
@@ -575,6 +587,22 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] string translationCultureCode = "sv-SE",
             [FromQuery] bool sensitiveObservations = false)
         {
+            var userType = this.GetApiUserType();
+            var semaphore = _semaphoreLimitManager.GetObservationSemaphore(userType);
+            HttpContext.Items["SemaphoreLimitUsed"] = "no";
+            if (semaphore.CurrentCount == 0)
+            {
+                _logger.LogInformation("All semaphore slots are occupied. Request will be queued. UserType={@userType}", userType);
+                HttpContext.Items["SemaphoreLimitUsed"] = "wait";
+            }
+
+            if (!await semaphore.WaitAsync(_semaphoreLimitManager.DefaultTimeout))
+            {
+                _logger.LogWarning("Too many requests. Semaphore limit reached. UserType={@userType}", userType);
+                HttpContext.Items["SemaphoreLimitUsed"] = "timeout";
+                return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
+            }
+
             try
             {
                 LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
@@ -618,6 +646,10 @@ namespace SOS.Observations.Api.Controllers
             {
                 _logger.LogError(e, "Search error");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+            finally
+            {
+                semaphore.Release();
             }
         }
 
@@ -670,6 +702,22 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] string sortBy = null!,
             [FromQuery] SearchSortOrder sortOrder = SearchSortOrder.Asc)
         {
+            var userType = this.GetApiUserType();
+            var semaphore = _semaphoreLimitManager.GetObservationSemaphore(userType);
+            HttpContext.Items["SemaphoreLimitUsed"] = "no";
+            if (semaphore.CurrentCount == 0)
+            {
+                _logger.LogInformation("All semaphore slots are occupied. Request will be queued. UserType={@userType}", userType);
+                HttpContext.Items["SemaphoreLimitUsed"] = "wait";
+            }
+
+            if (!await semaphore.WaitAsync(_semaphoreLimitManager.DefaultTimeout))
+            {
+                _logger.LogWarning("Too many requests. Semaphore limit reached. UserType={@userType}", userType);
+                HttpContext.Items["SemaphoreLimitUsed"] = "timeout";
+                return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
+            }
+
             try
             {
                 var sortFieldValidationResult = string.IsNullOrEmpty(sortBy) ? Result.Success<List<string>>(null) : (await _inputValidator.ValidateSortFieldsAsync(new[] { sortBy }));
@@ -772,6 +820,10 @@ namespace SOS.Observations.Api.Controllers
                 _logger.LogError(e, "Search DwC error");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
+            finally
+            {
+                semaphore.Release();
+            }
         }
 
         /// <summary>
@@ -870,25 +922,20 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] string translationCultureCode = "sv-SE",
             [FromQuery] bool sensitiveObservations = false)
         {
-            string requestingSystem = null;
-            if (this.Request.Headers.TryGetValue("X-Requesting-System", out var requestingSystemVal))
+            var userType = this.GetApiUserType();
+            var semaphore = _semaphoreLimitManager.GetAggregationSemaphore(userType);
+            HttpContext.Items["SemaphoreLimitUsed"] = "no";
+            if (semaphore.CurrentCount == 0)
             {
-                requestingSystem = requestingSystemVal.ToString();
+                _logger.LogInformation("All semaphore slots are occupied. Request will be queued. UserType={@userType}", userType);
+                HttpContext.Items["SemaphoreLimitUsed"] = "wait";
             }
 
-            if (requestingSystem == "Artfakta - SearchService")
+            if (!await semaphore.WaitAsync(_semaphoreLimitManager.DefaultTimeout))
             {
-                if (!await _artfaktaAggregationSemaphore.WaitAsync(TimeSpan.FromMinutes(1)))
-                {
-                    return new StatusCodeResult((int)HttpStatusCode.TooManyRequests);
-                }
-            }
-            else
-            {
-                if (!await _aggregationSemaphore.WaitAsync(TimeSpan.FromMinutes(1)))
-                {
-                    return new StatusCodeResult((int)HttpStatusCode.TooManyRequests);
-                }
+                _logger.LogWarning("Too many requests. Semaphore limit reached. UserType={@userType}", userType);
+                HttpContext.Items["SemaphoreLimitUsed"] = "timeout";
+                return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
             }
 
             try
@@ -896,10 +943,10 @@ namespace SOS.Observations.Api.Controllers
                 LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 var parameters = new[]
                 {
-            $"skip={skip}",
-            $"take={take}",
-            $"sensitiveObservations={sensitiveObservations}"
-        };
+                    $"skip={skip}",
+                    $"take={take}",
+                    $"sensitiveObservations={sensitiveObservations}"
+                };
                 string cacheKey = CreateCacheKey(string.Join("&", parameters), filter);
                 HttpContext.Items.TryAdd("CacheKey", cacheKey);
 
@@ -960,14 +1007,7 @@ namespace SOS.Observations.Api.Controllers
             }
             finally
             {
-                if (requestingSystem == "Artfakta - SearchService")
-                {
-                    _artfaktaAggregationSemaphore.Release();
-                }
-                else
-                {
-                    _aggregationSemaphore.Release();
-                }
+                semaphore.Release();
             }
         }
 
@@ -1216,25 +1256,20 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] string translationCultureCode = "sv-SE",
             [FromQuery] bool sensitiveObservations = false)
         {
-            string requestingSystem = null;
-            if (this.Request.Headers.TryGetValue("X-Requesting-System", out var requestingSystemVal))
+            var userType = this.GetApiUserType();
+            var semaphore = _semaphoreLimitManager.GetAggregationSemaphore(userType);
+            HttpContext.Items["SemaphoreLimitUsed"] = "no";
+            if (semaphore.CurrentCount == 0)
             {
-                requestingSystem = requestingSystemVal.ToString();
+                _logger.LogInformation("All semaphore slots are occupied. Request will be queued. UserType={@userType}", userType);
+                HttpContext.Items["SemaphoreLimitUsed"] = "wait";
             }
 
-            if (requestingSystem == "Artfakta - SearchService")
+            if (!await semaphore.WaitAsync(_semaphoreLimitManager.DefaultTimeout))
             {
-                if (!await _artfaktaAggregationSemaphore.WaitAsync(TimeSpan.FromMinutes(1)))
-                {
-                    return new StatusCodeResult((int)HttpStatusCode.TooManyRequests);
-                }
-            }
-            else
-            {
-                if (!await _aggregationSemaphore.WaitAsync(TimeSpan.FromMinutes(1)))
-                {
-                    return new StatusCodeResult((int)HttpStatusCode.TooManyRequests);
-                }
+                _logger.LogWarning("Too many requests. Semaphore limit reached. UserType={@userType}", userType);
+                HttpContext.Items["SemaphoreLimitUsed"] = "timeout";
+                return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
             }
 
             try
@@ -1299,14 +1334,7 @@ namespace SOS.Observations.Api.Controllers
             }
             finally
             {
-                if (requestingSystem == "Artfakta - SearchService")
-                {
-                    _artfaktaAggregationSemaphore.Release();
-                }
-                else
-                {
-                    _aggregationSemaphore.Release();
-                }
+                semaphore.Release();
             }
         }
 
@@ -1337,6 +1365,22 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] string translationCultureCode = "sv-SE",
             [FromQuery] bool sensitiveObservations = false)
         {
+            var userType = this.GetApiUserType();
+            var semaphore = _semaphoreLimitManager.GetAggregationSemaphore(userType);
+            HttpContext.Items["SemaphoreLimitUsed"] = "no";
+            if (semaphore.CurrentCount == 0)
+            {
+                _logger.LogInformation("All semaphore slots are occupied. Request will be queued. UserType={@userType}", userType);
+                HttpContext.Items["SemaphoreLimitUsed"] = "wait";
+            }
+
+            if (!await semaphore.WaitAsync(_semaphoreLimitManager.DefaultTimeout))
+            {
+                _logger.LogWarning("Too many requests. Semaphore limit reached. UserType={@userType}", userType);
+                HttpContext.Items["SemaphoreLimitUsed"] = "timeout";
+                return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
+            }
+
             try
             {
                 LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
@@ -1390,6 +1434,10 @@ namespace SOS.Observations.Api.Controllers
             {
                 _logger.LogError(e, "GeoGridAggregationGeoJson error.");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+            finally
+            {
+                semaphore.Release();
             }
         }
 
@@ -1453,6 +1501,22 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] bool validateSearchFilter = false,
             [FromQuery] string translationCultureCode = "sv-SE")
         {
+            var userType = this.GetApiUserType();
+            var semaphore = _semaphoreLimitManager.GetAggregationSemaphore(userType);
+            HttpContext.Items["SemaphoreLimitUsed"] = "no";
+            if (semaphore.CurrentCount == 0)
+            {
+                _logger.LogInformation("All semaphore slots are occupied. Request will be queued. UserType={@userType}", userType);
+                HttpContext.Items["SemaphoreLimitUsed"] = "wait";
+            }
+
+            if (!await semaphore.WaitAsync(_semaphoreLimitManager.DefaultTimeout))
+            {
+                _logger.LogWarning("Too many requests. Semaphore limit reached. UserType={@userType}", userType);
+                HttpContext.Items["SemaphoreLimitUsed"] = "timeout";
+                return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
+            }
+
             try
             {
                 LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
@@ -1496,6 +1560,10 @@ namespace SOS.Observations.Api.Controllers
                 _logger.LogError(e, "GeoGridAggregation error.");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
+            finally
+            {
+                semaphore.Release();
+            }
         }
 
         /// <summary>
@@ -1528,6 +1596,22 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] MetricCoordinateSys metricCoordinateSys = MetricCoordinateSys.SWEREF99_TM,
             [FromQuery] OutputFormatDto outputFormat = OutputFormatDto.Json)
         {
+            var userType = this.GetApiUserType();
+            var semaphore = _semaphoreLimitManager.GetAggregationSemaphore(userType);
+            HttpContext.Items["SemaphoreLimitUsed"] = "no";
+            if (semaphore.CurrentCount == 0)
+            {
+                _logger.LogInformation("All semaphore slots are occupied. Request will be queued. UserType={@userType}", userType);
+                HttpContext.Items["SemaphoreLimitUsed"] = "wait";
+            }
+
+            if (!await semaphore.WaitAsync(_semaphoreLimitManager.DefaultTimeout))
+            {
+                _logger.LogWarning("Too many requests. Semaphore limit reached. UserType={@userType}", userType);
+                HttpContext.Items["SemaphoreLimitUsed"] = "timeout";
+                return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
+            }
+
             try
             {
                 LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
@@ -1584,6 +1668,10 @@ namespace SOS.Observations.Api.Controllers
                 _logger.LogError(e, "Metric grid aggregation error.");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
+            finally
+            {
+                semaphore.Release();
+            }
         }
 
         /// <summary>
@@ -1634,6 +1722,22 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] bool sensitiveObservations = false,
             [FromQuery] OutputFormatDto outputFormat = OutputFormatDto.Json)
         {
+            var userType = this.GetApiUserType();
+            var semaphore = _semaphoreLimitManager.GetObservationSemaphore(userType);
+            HttpContext.Items["SemaphoreLimitUsed"] = "no";
+            if (semaphore.CurrentCount == 0)
+            {
+                _logger.LogInformation("All semaphore slots are occupied. Request will be queued. UserType={@userType}", userType);
+                HttpContext.Items["SemaphoreLimitUsed"] = "wait";
+            }
+
+            if (!await semaphore.WaitAsync(_semaphoreLimitManager.DefaultTimeout))
+            {
+                _logger.LogWarning("Too many requests. Semaphore limit reached. UserType={@userType}", userType);
+                HttpContext.Items["SemaphoreLimitUsed"] = "timeout";
+                return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
+            }
+
             try
             {
                 LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
@@ -1691,6 +1795,10 @@ namespace SOS.Observations.Api.Controllers
             {
                 _logger.LogError(e, "SearchInternal error");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+            finally
+            {
+                semaphore.Release();
             }
         }
 
@@ -1772,6 +1880,22 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] string translationCultureCode = "sv-SE",
             [FromQuery] bool sensitiveObservations = false)
         {
+            var userType = this.GetApiUserType();
+            var semaphore = _semaphoreLimitManager.GetAggregationSemaphore(userType);
+            HttpContext.Items["SemaphoreLimitUsed"] = "no";
+            if (semaphore.CurrentCount == 0)
+            {
+                _logger.LogInformation("All semaphore slots are occupied. Request will be queued. UserType={@userType}", userType);
+                HttpContext.Items["SemaphoreLimitUsed"] = "wait";
+            }
+
+            if (!await semaphore.WaitAsync(_semaphoreLimitManager.DefaultTimeout))
+            {
+                _logger.LogWarning("Too many requests. Semaphore limit reached. UserType={@userType}", userType);
+                HttpContext.Items["SemaphoreLimitUsed"] = "timeout";
+                return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
+            }
+
             try
             {
                 LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
@@ -1820,6 +1944,10 @@ namespace SOS.Observations.Api.Controllers
             {
                 _logger.LogError(e, "SearchAggregatedInternal error");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+            finally
+            {
+                semaphore.Release();
             }
         }
 
@@ -1951,6 +2079,22 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] bool onlyAboveMyClearance = true,
             [FromQuery] bool? returnHttp4xxWhenNoPermissions = false)
         {
+            var userType = this.GetApiUserType();
+            var semaphore = _semaphoreLimitManager.GetAggregationSemaphore(userType);
+            HttpContext.Items["SemaphoreLimitUsed"] = "no";
+            if (semaphore.CurrentCount == 0)
+            {
+                _logger.LogInformation("All semaphore slots are occupied. Request will be queued. UserType={@userType}", userType);
+                HttpContext.Items["SemaphoreLimitUsed"] = "wait";
+            }
+
+            if (!await semaphore.WaitAsync(_semaphoreLimitManager.DefaultTimeout))
+            {
+                _logger.LogWarning("Too many requests. Semaphore limit reached. UserType={@userType}", userType);
+                HttpContext.Items["SemaphoreLimitUsed"] = "timeout";
+                return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
+            }
+
             try
             {
                 LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
@@ -2000,6 +2144,10 @@ namespace SOS.Observations.Api.Controllers
                 _logger.LogError(e, "Signal search Internal error");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
+            finally
+            {
+                semaphore.Release();
+            }
         }
 
         /// <summary>
@@ -2038,25 +2186,20 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] bool sumUnderlyingTaxa = false,
             [FromQuery] bool? skipCache = false)
         {
-            string requestingSystem = null;
-            if (this.Request.Headers.TryGetValue("X-Requesting-System", out var requestingSystemVal))
+            var userType = this.GetApiUserType();
+            var semaphore = _semaphoreLimitManager.GetAggregationSemaphore(userType);
+            HttpContext.Items["SemaphoreLimitUsed"] = "no";
+            if (semaphore.CurrentCount == 0)
             {
-                requestingSystem = requestingSystemVal.ToString();
+                _logger.LogInformation("All semaphore slots are occupied. Request will be queued. UserType={@userType}", userType);
+                HttpContext.Items["SemaphoreLimitUsed"] = "wait";
             }
 
-            if (requestingSystem == "Artfakta - SearchService")
+            if (!await semaphore.WaitAsync(_semaphoreLimitManager.DefaultTimeout))
             {
-                if (!await _artfaktaAggregationSemaphore.WaitAsync(TimeSpan.FromMinutes(1)))
-                {
-                    return new StatusCodeResult((int)HttpStatusCode.TooManyRequests);
-                }
-            }
-            else
-            {
-                if (!await _aggregationSemaphore.WaitAsync(TimeSpan.FromMinutes(1)))
-                {
-                    return new StatusCodeResult((int)HttpStatusCode.TooManyRequests);
-                }
+                _logger.LogWarning("Too many requests. Semaphore limit reached. UserType={@userType}", userType);
+                HttpContext.Items["SemaphoreLimitUsed"] = "timeout";
+                return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
             }
 
             try
@@ -2160,14 +2303,7 @@ namespace SOS.Observations.Api.Controllers
             }
             finally
             {
-                if (requestingSystem == "Artfakta - SearchService")
-                {
-                    _artfaktaAggregationSemaphore.Release();
-                }
-                else
-                {
-                    _aggregationSemaphore.Release();
-                }
+                semaphore.Release();
             }
         }
 
@@ -2197,9 +2333,20 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] string sortBy = "SumObservationCount",
             [FromQuery] SearchSortOrder sortOrder = SearchSortOrder.Desc)
         {
-            if (!await _artfaktaAggregationSemaphore.WaitAsync(TimeSpan.FromMinutes(1)))
+            var userType = this.GetApiUserType();
+            var semaphore = _semaphoreLimitManager.GetAggregationSemaphore(userType);
+            HttpContext.Items["SemaphoreLimitUsed"] = "no";
+            if (semaphore.CurrentCount == 0)
             {
-                return new StatusCodeResult((int)HttpStatusCode.TooManyRequests);
+                _logger.LogInformation("All semaphore slots are occupied. Request will be queued. UserType={@userType}", userType);
+                HttpContext.Items["SemaphoreLimitUsed"] = "wait";
+            }
+
+            if (!await semaphore.WaitAsync(_semaphoreLimitManager.DefaultTimeout))
+            {
+                _logger.LogWarning("Too many requests. Semaphore limit reached. UserType={@userType}", userType);
+                HttpContext.Items["SemaphoreLimitUsed"] = "timeout";
+                return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
             }
 
             try
@@ -2245,7 +2392,7 @@ namespace SOS.Observations.Api.Controllers
             }
             finally
             {
-                _artfaktaAggregationSemaphore.Release();
+                semaphore.Release();
             }
         }
 

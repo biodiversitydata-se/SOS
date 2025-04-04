@@ -449,6 +449,11 @@ namespace SOS.Observations.Api.Controllers
                     return File(fileStream, "text/tab-separated-values", entry.Name);
                 }
             }
+            catch (SemaphoreTimeoutException)
+            {
+                HttpContext.Items["SemaphoreLimitUsed"] = "timeout";
+                return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
+            }
             catch (AuthenticationRequiredException)
             {
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
@@ -517,6 +522,11 @@ namespace SOS.Observations.Api.Controllers
                 }
 
                 return File(result.stream, "application/zip", $"{result.filename}.zip");
+            }
+            catch (SemaphoreTimeoutException)
+            {
+                HttpContext.Items["SemaphoreLimitUsed"] = "timeout";
+                return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
             }
             catch (AuthenticationRequiredException)
             {
@@ -593,6 +603,11 @@ namespace SOS.Observations.Api.Controllers
                     return File(result.stream, "application/zip", $"{result.filename}.zip");
                 else
                     return File(result.stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"{result.filename}.xlsx");                
+            }
+            catch (SemaphoreTimeoutException)
+            {
+                HttpContext.Items["SemaphoreLimitUsed"] = "timeout";
+                return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
             }
             catch (AuthenticationRequiredException)
             {
@@ -680,6 +695,11 @@ namespace SOS.Observations.Api.Controllers
                     fileStream = entry.Open();
                     return File(fileStream, "application/geo+json", entry.Name);
                 }
+            }
+            catch (SemaphoreTimeoutException)
+            {
+                HttpContext.Items["SemaphoreLimitUsed"] = "timeout";
+                return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
             }
             catch (AuthenticationRequiredException)
             {
@@ -1130,6 +1150,11 @@ namespace SOS.Observations.Api.Controllers
                     return File(fileStream, "text/tab-separated-values", entry.Name);
                 }
             }
+            catch (SemaphoreTimeoutException)
+            {
+                HttpContext.Items["SemaphoreLimitUsed"] = "timeout";
+                return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
+            }
             catch (AuthenticationRequiredException)
             {
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
@@ -1197,6 +1222,11 @@ namespace SOS.Observations.Api.Controllers
                 }
 
                 return File(result.stream, "application/zip", $"{result.filename}.zip");
+            }
+            catch (SemaphoreTimeoutException)
+            {
+                HttpContext.Items["SemaphoreLimitUsed"] = "timeout";
+                return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
             }
             catch (AuthenticationRequiredException)
             {
@@ -1272,6 +1302,11 @@ namespace SOS.Observations.Api.Controllers
                     return File(result.stream, "application/zip", $"{result.filename}.zip");
                 else
                     return File(result.stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"{result.filename}.xlsx");
+            }
+            catch (SemaphoreTimeoutException)
+            {
+                HttpContext.Items["SemaphoreLimitUsed"] = "timeout";
+                return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
             }
             catch (AuthenticationRequiredException)
             {
@@ -1358,6 +1393,11 @@ namespace SOS.Observations.Api.Controllers
                     fileStream = entry.Open();
                     return File(fileStream, "application/geo+json", entry.Name);
                 }
+            }
+            catch (SemaphoreTimeoutException)
+            {
+                HttpContext.Items["SemaphoreLimitUsed"] = "timeout";
+                return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
             }
             catch (AuthenticationRequiredException)
             {

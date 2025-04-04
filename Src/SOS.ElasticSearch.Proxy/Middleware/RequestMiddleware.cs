@@ -1,13 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using SOS.ElasticSearch.Proxy.Configuration;
 using SOS.ElasticSearch.Proxy.Extensions;
+using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using System.Diagnostics;
 using System.Dynamic;
+using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -19,6 +20,7 @@ namespace SOS.ElasticSearch.Proxy.Middleware
         private readonly IProcessedObservationCoreRepository _processedObservationRepository;
         private readonly ProxyConfiguration _proxyConfiguration;
         private readonly ILogger<RequestMiddleware> _logger;
+        private static readonly SemaphoreSlim _requestSemaphore = new SemaphoreSlim(5);
 
         /// <summary>
         /// Build target uri
@@ -158,6 +160,22 @@ namespace SOS.ElasticSearch.Proxy.Middleware
         {
             string originalBody = null;
             string body = null;
+            context.Items["SemaphoreLimitUsed"] = "no";
+            
+            if (_requestSemaphore.CurrentCount == 0)
+            {
+                _logger.LogInformation("All semaphore slots are occupied. Request will be queued. UserType={@userType}", ApiUserType.Unknown);
+                context.Items["SemaphoreLimitUsed"] = "wait";
+            }
+
+            if (!await _requestSemaphore.WaitAsync(TimeSpan.FromSeconds(50)))
+            {
+                _logger.LogWarning("Too many requests. Semaphore limit reached. UserType={@userType}", ApiUserType.Unknown);
+                context.Items["SemaphoreLimitUsed"] = "timeout";
+                context.Response.StatusCode = (int)HttpStatusCode.ServiceUnavailable;
+                await context.Response.WriteAsync("Too many requests. Please try again later.");
+                return;
+            }
 
             try
             {
@@ -174,6 +192,7 @@ namespace SOS.ElasticSearch.Proxy.Middleware
                 }
 
                 context.Items.Add("Requesting-System", "WFS");
+                context.Items["ApiUserType"] = ApiUserType.Unknown;
 
                 if (targetUri != null)
                 {
@@ -231,6 +250,10 @@ namespace SOS.ElasticSearch.Proxy.Middleware
             {
                 _logger.LogError(e, "Error in RequestMiddleware.Invoke(). Original body: {@originalRequestBody}, New body={@requestBody}", originalBody, body);
                 throw;
+            }
+            finally
+            {
+                _requestSemaphore.Release();
             }
         }
     }
