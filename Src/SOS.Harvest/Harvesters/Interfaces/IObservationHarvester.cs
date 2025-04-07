@@ -31,6 +31,6 @@ namespace SOS.Harvest.Harvesters.Interfaces
         /// <param name="dataProvider"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        Task<HarvestInfo> HarvestCompleteObservationsWithDelayAsync(DataProvider dataProvider, IJobCancellationToken cancellationToken);
+        Task<HarvestInfo> HarvestAllObservationsSlowlyAsync(DataProvider dataProvider, IJobCancellationToken cancellationToken);
     }
 }

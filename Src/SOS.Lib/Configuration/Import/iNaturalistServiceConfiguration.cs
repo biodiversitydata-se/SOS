@@ -11,7 +11,7 @@ namespace SOS.Lib.Configuration.Import
         /// </summary>
         public int StartHarvestYear { get; set; } = 2014;
 
-        public int HarvestCompleteStartId { get; set; } = 200_000_000; //236_000_000;
+        public long HarvestCompleteStartId { get; set; } = 200_000_000; //236_000_000;
 
         public int HarvestCompleBatchDelayInSeconds { get; set; } = 2;
     }

@@ -179,7 +179,7 @@ namespace SOS.Harvest.Harvesters.Shark
             return datasets;
         }
 
-        public Task<HarvestInfo> HarvestCompleteObservationsWithDelayAsync(DataProvider provider, IJobCancellationToken cancellationToken)
+        public Task<HarvestInfo> HarvestAllObservationsSlowlyAsync(DataProvider provider, IJobCancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }

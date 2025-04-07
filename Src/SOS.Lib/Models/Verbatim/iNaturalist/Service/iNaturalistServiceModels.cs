@@ -446,6 +446,8 @@ namespace SOS.Lib.Models.Verbatim.INaturalist.Service
         [System.Text.Json.Serialization.JsonPropertyName("taxon")]
         public ObservationTaxon Taxon { get; set; }
 
+        [System.Text.Json.Serialization.JsonPropertyName("user")]
+        public User User { get; set; }
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
@@ -530,9 +532,26 @@ namespace SOS.Lib.Models.Verbatim.INaturalist.Service
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial record iNaturalistVerbatimObservation : IEntity<int>
     {
+        /// <summary>
+        /// Unique id
+        /// </summary>
         [System.Text.Json.Serialization.JsonPropertyName("id")]
         public int Id { get; set; }
+        
+        public long ObservationId { get; set; }
 
+        [System.Text.Json.Serialization.JsonPropertyName("annotations")]
+        public System.Collections.Generic.ICollection<Annotation> Annotations { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("identifications")]
+        public System.Collections.Generic.ICollection<Identification> Identifications { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("positional_accuracy")]
+        public int? PositionalAccuracy { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("public_positional_accuracy")]
+        public int? PublicPositionalAccuracy { get; set; }        
+         
         [System.Text.Json.Serialization.JsonPropertyName("cached_votes_total")]
         public int? Cached_votes_total { get; set; }
 
@@ -991,6 +1010,9 @@ namespace SOS.Lib.Models.Verbatim.INaturalist.Service
         [System.Text.Json.Serialization.JsonPropertyName("icon_content_type")]
         public string Icon_content_type { get; set; }
 
+        [System.Text.Json.Serialization.JsonPropertyName("suspended")]
+        public bool? Suspended { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("icon_file_name")]
         public string Icon_file_name { get; set; }
 
@@ -1005,7 +1027,6 @@ namespace SOS.Lib.Models.Verbatim.INaturalist.Service
 
         [System.Text.Json.Serialization.JsonPropertyName("name")]
         public string Name { get; set; }
-
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
@@ -2066,12 +2087,20 @@ namespace SOS.Lib.Models.Verbatim.INaturalist.Service
         [System.Text.Json.Serialization.JsonPropertyName("resource_id")]
         public int? Resource_id { get; set; }
 
+        [System.Text.Json.Serialization.JsonPropertyName("concatenated_attr_val")]
+        public string? Concatenated_attr_val { get; set; }
+
         [System.Text.Json.Serialization.JsonPropertyName("controlled_attribute_id")]
         public int? Controlled_attribute_id { get; set; }
 
         [System.Text.Json.Serialization.JsonPropertyName("controlled_value_id")]
         public int? Controlled_value_id { get; set; }
 
+        [System.Text.Json.Serialization.JsonPropertyName("user_id")]
+        public int UserId { get; set; }
+
+        [System.Text.Json.Serialization.JsonPropertyName("user")]
+        public User User { get; set; }
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]

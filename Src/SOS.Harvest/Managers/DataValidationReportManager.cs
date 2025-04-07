@@ -19,7 +19,8 @@ namespace SOS.Harvest.Managers
             KulDataValidationReportFactory kulDataValidationReportFactory,
             SersDataValidationReportFactory sersDataValidationReportFactory,
             NorsDataValidationReportFactory norsDataValidationReportFactory,
-            VirtualHerbariumValidationReportFactory virtualHerbariumDataValidationReportFactory)
+            VirtualHerbariumValidationReportFactory virtualHerbariumDataValidationReportFactory,
+            iNaturalistDataValidationReportFactory iNaturalistDataValidationReportFactory)
         {
             if (fishDataValidationReportFactory == null) throw new ArgumentNullException(nameof(fishDataValidationReportFactory));
             if (dwcaDataValidationReportFactory == null) throw new ArgumentNullException(nameof(dwcaDataValidationReportFactory));
@@ -28,6 +29,7 @@ namespace SOS.Harvest.Managers
             if (sersDataValidationReportFactory == null) throw new ArgumentNullException(nameof(sersDataValidationReportFactory));
             if (norsDataValidationReportFactory == null) throw new ArgumentNullException(nameof(norsDataValidationReportFactory));
             if (virtualHerbariumDataValidationReportFactory == null) throw new ArgumentNullException(nameof(virtualHerbariumDataValidationReportFactory));
+            if (iNaturalistDataValidationReportFactory == null) throw new ArgumentNullException(nameof(iNaturalistDataValidationReportFactory));
 
             _reportCreatorByType = new Dictionary<DataProviderType, IDataValidationReportFactory>
             {
@@ -38,7 +40,7 @@ namespace SOS.Harvest.Managers
                 {DataProviderType.NorsObservations, norsDataValidationReportFactory},
                 {DataProviderType.VirtualHerbariumObservations, virtualHerbariumDataValidationReportFactory},
                 {DataProviderType.DwcA, dwcaDataValidationReportFactory},
-                {DataProviderType.iNaturalistObservations, dwcaDataValidationReportFactory}
+                {DataProviderType.iNaturalistObservations, iNaturalistDataValidationReportFactory}
             };
         }
 

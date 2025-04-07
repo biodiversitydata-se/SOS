@@ -34,6 +34,21 @@
       ]
     },
     {
+      "Id": 2,
+      "Value": "Approved based on community consensus",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "Godkänd baserat på communitykonsensus"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "Approved based on community consensus"
+        }
+      ]
+    },
+    {
       "Id": 10,
       "Value": "Unvalidated",
       "Localized": true,
@@ -417,6 +432,10 @@
             {
               "Value": "Reportedbyexpert",
               "SosId": 1
+            },
+            {
+              "Value": "Approved based on community consensus",
+              "SosId": 2
             },
             {
               "Value": "Ovaliderad",

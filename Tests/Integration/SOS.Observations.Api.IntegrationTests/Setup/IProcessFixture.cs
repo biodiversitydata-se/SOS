@@ -1,4 +1,5 @@
 ﻿using SOS.Harvest.Processors.DarwinCoreArchive;
+using SOS.Harvest.Processors.iNaturalist;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Checklist;
 using SOS.Lib.Models.Processed.DataStewardship.Dataset;
@@ -22,6 +23,7 @@ public interface IProcessFixture
     Task AddObservationsToElasticsearchAsync(IEnumerable<Observation> observations, bool clearExistingObservations = true, int delayInMs = 100);
     Task<DwcaObservationFactory> CreateDarwinCoreFactoryAsync(DataProvider dataProvider);
     DwcaObservationFactory GetDarwinCoreFactory(bool initAreaHelper);
+    iNaturalistObservationFactory GetiNaturalistFactory(bool initAreaHelper);
     Task<long> GetDatasetsCount();
     DwcaDatasetFactory GetDwcaDatasetFactory();
     DwcaEventFactory GetDwcaEventFactory(bool initAreaHelper);

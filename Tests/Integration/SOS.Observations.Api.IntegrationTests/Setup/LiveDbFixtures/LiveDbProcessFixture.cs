@@ -9,6 +9,7 @@ using SOS.Harvest.Managers;
 using SOS.Harvest.Managers.Interfaces;
 using SOS.Harvest.Processors.Artportalen;
 using SOS.Harvest.Processors.DarwinCoreArchive;
+using SOS.Harvest.Processors.iNaturalist;
 using SOS.Lib.Cache;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Process;
@@ -638,6 +639,11 @@ public class LiveDbProcessFixture : IProcessFixture
     }
 
     public Task<List<Observation>> ProcessAndAddObservationsToElasticSearchUsingObservationProcessor(IEnumerable<ArtportalenObservationVerbatim> verbatimObservations)
+    {
+        throw new NotImplementedException();
+    }
+
+    public iNaturalistObservationFactory GetiNaturalistFactory(bool initAreaHelper)
     {
         throw new NotImplementedException();
     }

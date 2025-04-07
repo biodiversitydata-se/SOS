@@ -5,13 +5,13 @@ using SOS.Lib.Repositories.Verbatim.Interfaces;
 
 namespace SOS.Lib.Repositories.Verbatim
 {
-    public class iNaturalistCompleteObservationVerbatimRepository :
+    public class iNaturalistObservationVerbatimRepository :
         VerbatimRepositoryBase<iNaturalistVerbatimObservation, int>,
-        IiNaturalistCompleteObservationVerbatimRepository
+        IiNaturalistObservationVerbatimRepository
     {
-        public iNaturalistCompleteObservationVerbatimRepository(
+        public iNaturalistObservationVerbatimRepository(
             IVerbatimClient importClient,
-            ILogger<iNaturalistCompleteObservationVerbatimRepository> logger) : base(importClient, "iNaturalist_full", logger)
+            ILogger<iNaturalistObservationVerbatimRepository> logger) : base(importClient, "iNaturalistObservations", logger)
         {
         }
     }

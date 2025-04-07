@@ -223,7 +223,7 @@ namespace SOS.Administration.Api.Controllers
             {
                 LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 string cronExpression = $"0 {minute} {hour} */{days} * ?";
-                RecurringJob.AddOrUpdate<IObservationsHarvestJobFull>($"{nameof(IObservationsHarvestJobFull)}",
+                RecurringJob.AddOrUpdate<IObservationsHarvestJobFull>($"{nameof(IObservationsHarvestJobFull)}-iNaturalist",
                     job => job.RunFulliNaturalistHarvestObservationsAsync(JobCancellationToken.Null), cronExpression,
                     new RecurringJobOptions { TimeZone = TimeZoneInfo.Local });
 

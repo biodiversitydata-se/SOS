@@ -187,8 +187,13 @@ namespace SOS.Harvest.Processors
         /// <param name="verbatimId"></param>
         /// <param name="verbatimName"></param>
         /// <returns></returns>
-        protected Lib.Models.Processed.Observation.Taxon GetTaxon(int taxonId, IEnumerable<string> names = null!, string? scientificNameAuthorship = null,
-            bool ignoreDuplicates = false, string? verbatimId = null, string? verbatimName = null)
+        protected Lib.Models.Processed.Observation.Taxon GetTaxon(
+            int taxonId, 
+            IEnumerable<string> names = null!, 
+            string? scientificNameAuthorship = null,
+            bool ignoreDuplicates = false, 
+            string? verbatimId = null, 
+            string? verbatimName = null)
         {
             string? nameWithoutAuthor = null;
             Lib.Models.Processed.Observation.Taxon? taxon = null;

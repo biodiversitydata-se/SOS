@@ -44,6 +44,8 @@ using SOS.Harvest.Processors.DarwinCoreArchive;
 using SOS.Harvest.Processors.DarwinCoreArchive.Interfaces;
 using SOS.Harvest.Processors.FishData;
 using SOS.Harvest.Processors.FishData.Interfaces;
+using SOS.Harvest.Processors.iNaturalist;
+using SOS.Harvest.Processors.iNaturalist.Interfaces;
 using SOS.Harvest.Processors.Kul;
 using SOS.Harvest.Processors.Kul.Interfaces;
 using SOS.Harvest.Processors.Mvm;
@@ -288,7 +290,7 @@ namespace SOS.Harvest.IoC.Modules
                 .InstancePerLifetimeScope();
             builder.RegisterType<VirtualHerbariumObservationVerbatimRepository>()
                 .As<IVirtualHerbariumObservationVerbatimRepository>().InstancePerLifetimeScope();
-            builder.RegisterType<iNaturalistCompleteObservationVerbatimRepository>().As<IiNaturalistCompleteObservationVerbatimRepository>()
+            builder.RegisterType<iNaturalistObservationVerbatimRepository>().As<IiNaturalistObservationVerbatimRepository>()
                 .InstancePerLifetimeScope();
 
             // Repositories processed 
@@ -348,6 +350,8 @@ namespace SOS.Harvest.IoC.Modules
                 .InstancePerLifetimeScope();
             builder.RegisterType<VirtualHerbariumObservationProcessor>().As<IVirtualHerbariumObservationProcessor>()
                 .InstancePerLifetimeScope();
+            builder.RegisterType<iNaturalistObservationProcessor>().As<IiNaturalistObservationProcessor>()
+                .InstancePerLifetimeScope();
             builder.RegisterType<TaxonProcessor>().As<ITaxonProcessor>()
                 .InstancePerLifetimeScope();
             builder.RegisterType<DwcaDatasetProcessor>().As<IDwcaDatasetProcessor>().InstancePerLifetimeScope();
@@ -394,7 +398,8 @@ namespace SOS.Harvest.IoC.Modules
             builder.RegisterType<NorsDataValidationReportFactory>().InstancePerLifetimeScope();
             builder.RegisterType<SersDataValidationReportFactory>().InstancePerLifetimeScope();
             builder.RegisterType<VirtualHerbariumValidationReportFactory>().InstancePerLifetimeScope();
-
+            builder.RegisterType<iNaturalistDataValidationReportFactory>().InstancePerLifetimeScope();
+            
             // Add verbatim data Services
             builder.RegisterType<AquaSupportRequestService>().As<IAquaSupportRequestService>();
             builder.RegisterType<GeoRegionApiService>().As<IGeoRegionApiService>().InstancePerLifetimeScope();
