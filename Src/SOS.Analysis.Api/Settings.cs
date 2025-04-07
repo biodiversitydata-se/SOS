@@ -9,7 +9,6 @@ public static class Settings
     public static AnalysisConfiguration AnalysisConfiguration { get; set; } = new();
     public static UserServiceConfiguration UserServiceConfiguration { get; set; } = new();
     public static CryptoConfiguration CryptoConfiguration { get; set; } = new();
-    public static IdentityServerConfiguration IdentityServer { get; set; } = new();
     public static AreaConfiguration AreaConfiguration { get; set; } = new();
     public static InputValaidationConfiguration InputValaidationConfiguration { get; set; } = new();
     public static ApplicationInsights ApplicationInsights { get; set; } = new();
@@ -45,7 +44,6 @@ public static class Settings
             logger.LogInformation("replaced SECRET_PLACEHOLDER in UserServiceConfiguration.ClientSecret with the value in ClientSecret");
         }
 
-        IdentityServer = GetConfigSection<IdentityServerConfiguration>("IdentityServer", configuration, logger);
         AreaConfiguration = GetConfigSection<AreaConfiguration>("AreaConfiguration", configuration, logger);
         InputValaidationConfiguration = GetConfigSection<InputValaidationConfiguration>("InputValaidationConfiguration", configuration, logger);
 
