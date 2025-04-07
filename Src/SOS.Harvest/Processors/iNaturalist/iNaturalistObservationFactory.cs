@@ -88,7 +88,11 @@ namespace SOS.Harvest.Processors.iNaturalist
             obs.DatasetName = "iNaturalist";
             obs.Modified = verbatim.Updated_at != null ? verbatim.Updated_at!.Value.DateTime.ToUniversalTime() : verbatim.Created_at!.Value.DateTime.ToUniversalTime();
             obs.InstitutionCode = _institutionCodeVocabularyValue;
-            obs.OwnerInstitutionCode = "iNaturalist";
+            obs.OwnerInstitutionCode = "iNaturalist";            
+            if (verbatim.Obscured.GetValueOrDefault() == true)
+            {
+                obs.DataGeneralizations = "The coordinates have been obfuscated to protect sensitive information";                
+            }
 
             // Event
             obs.Event = CreateProcessedEvent(verbatim);
@@ -220,17 +224,8 @@ namespace SOS.Harvest.Processors.iNaturalist
         {
             var processedLocation = new Location(LocationType.Point);
             processedLocation.Locality = verbatim.Place_guess?.Clean();
-            if (verbatim.Taxon_geoprivacy == "obscured")
-            {
-                // The observation is obscured due to threatened taxon
-            }
-            if (verbatim.Obscured.GetValueOrDefault() == true)
-            {
-                // The observation is obscured
-            }
             return processedLocation;
         }
-
 
         private Occurrence CreateProcessedOccurrence(iNaturalistVerbatimObservation verbatim, Lib.Models.Processed.Observation.Taxon? taxon, AccessRightsId? accessRightsId)
         {
