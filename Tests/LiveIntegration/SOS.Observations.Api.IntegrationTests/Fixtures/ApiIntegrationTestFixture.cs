@@ -255,6 +255,7 @@ namespace SOS.Observations.Api.LiveIntegrationTests.Fixtures
             ObservationsController = new ObservationsController(ObservationManager, taxonSearchManager, searchFilterUtility, inputValidator, observationApiConfiguration, 
                 new Mock<ClassCache<Dictionary<string, CacheEntry<GeoGridResultDto>>>>().Object,
                 new Mock<ClassCache<Dictionary<string, CacheEntry<PagedResultDto<TaxonAggregationItemDto>>>>>().Object,
+                new SemaphoreLimitManager(new SemaphoreLimitsConfiguration(), new NullLogger<SemaphoreLimitManager>()),
                 new NullLogger<ObservationsController>());
             var ctx = new ControllerContext() { HttpContext = new DefaultHttpContext() };
             ObservationsController.ControllerContext = ctx;

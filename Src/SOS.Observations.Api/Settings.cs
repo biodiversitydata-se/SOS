@@ -14,6 +14,7 @@ public static class Settings
     public static ObservationApiConfiguration ObservationApiConfiguration { get; set; } = new();
     public static VocabularyConfiguration VocabularyConfiguration { get; set; } = new();
     public static ArtportalenApiServiceConfiguration ArtportalenApiServiceConfiguration { get; set; } = new();
+    public static SemaphoreLimitsConfiguration SemaphoreLimitsConfiguration { get; set; } = new();
     public static AreaConfiguration AreaConfiguration { get; set; } = new();
     public static InputValaidationConfiguration InputValidationConfiguration { get; set; } = new();
     public static ApplicationInsights ApplicationInsightsConfiguration { get; set; } = new();
@@ -52,6 +53,7 @@ public static class Settings
         IdentityServer = GetConfigSection<IdentityServerConfiguration>("IdentityServer", configuration, logger);
         ObservationApiConfiguration = GetConfigSection<ObservationApiConfiguration>("ObservationApiConfiguration", configuration, logger);
         VocabularyConfiguration = GetConfigSection<VocabularyConfiguration>("VocabularyConfiguration", configuration, logger);
+        SemaphoreLimitsConfiguration = GetConfigSection<SemaphoreLimitsConfiguration>("SemaphoreLimitsConfiguration", configuration, logger);        
         ArtportalenApiServiceConfiguration = GetConfigSection<ArtportalenApiServiceConfiguration>("ArtportalenApiServiceConfiguration", configuration, logger);
         AreaConfiguration = GetConfigSection<AreaConfiguration>("AreaConfiguration", configuration, logger);
         InputValidationConfiguration = GetConfigSection<InputValaidationConfiguration>("InputValaidationConfiguration", configuration, logger);
