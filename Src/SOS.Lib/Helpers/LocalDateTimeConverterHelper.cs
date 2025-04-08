@@ -51,6 +51,10 @@ namespace SOS.Lib.Helpers
 
         private static void ConvertToLocalTime(JsonNode obs)
         {
+            if (obs == null)
+            {
+                return;
+            }
             // Created
             var createdDateString = (string)obs["created"];
             if (createdDateString != null)

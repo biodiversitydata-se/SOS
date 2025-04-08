@@ -30,12 +30,12 @@ namespace SOS.Lib
 
             if (filter.ObservedByMe ?? false)
             {
-                var objectQueries = new List<Action<QueryDescriptor<TQueryDescriptor>>>();
-                objectQueries.TryAddTermCriteria($"artportalenInternal.occurrenceRecordedByInternal.userServiceUserId", filter.UserId);
-                objectQueries.TryAddTermCriteria($"artportalenInternal.occurrenceRecordedByInternal.viewAccess", true);
+                var observedByMeQueries = new List<Action<QueryDescriptor<TQueryDescriptor>>>();
+                observedByMeQueries.TryAddTermCriteria($"artportalenInternal.occurrenceRecordedByInternal.userServiceUserId", filter.UserId);
+                observedByMeQueries.TryAddTermCriteria($"artportalenInternal.occurrenceRecordedByInternal.viewAccess", true);
                 queries.Add(q => q
                     .Bool(b => b
-                        .Filter(objectQueries.ToArray())
+                        .Filter(observedByMeQueries.ToArray())
                     )
                  );
             }
@@ -97,15 +97,8 @@ namespace SOS.Lib
                 );
 
                 var reportedByMeQueries = new List<Action<QueryDescriptor<TQueryDescriptor>>>();
-                var occurrenceRecordedByInternalQueries = new List<Action<QueryDescriptor<TQueryDescriptor>>>();
-                occurrenceRecordedByInternalQueries.TryAddTermCriteria($"artportalenInternal.occurrenceRecordedByInternal.userServiceUserId", filter.UserId);
-                occurrenceRecordedByInternalQueries.TryAddTermCriteria($"artportalenInternal.occurrenceRecordedByInternal.viewAccess", true);
-
-                reportedByMeQueries.Add(q => q
-                    .Bool(b => b
-                        .Filter(occurrenceRecordedByInternalQueries.ToArray())
-                    )
-                 );
+                reportedByMeQueries.TryAddTermCriteria($"artportalenInternal.occurrenceRecordedByInternal.userServiceUserId", filter.UserId);
+                reportedByMeQueries.TryAddTermCriteria($"artportalenInternal.occurrenceRecordedByInternal.viewAccess", true);
 
                 authorizeQuerys.Add(q => q
                     .Bool(b => b

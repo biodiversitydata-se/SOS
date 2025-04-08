@@ -53,9 +53,9 @@ namespace SOS.Observations.Api.Managers
 
         private async Task<IEnumerable<JsonObject>> PostProcessObservationsAsync(SearchFilter filter, ProtectionFilter protectionFilter, IEnumerable<JsonObject> observations, string cultureCode)
         {
-            if (!observations?.Any() ?? true)
+            if (!observations.Where(o => o != null)?.Any() ?? true)
             {
-                return observations;
+                return Array.Empty<JsonObject>();
             }
 
             try
