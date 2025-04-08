@@ -59,6 +59,7 @@ using Serilog;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Elastic.Clients.Elasticsearch.Cluster;
 using SOS.Lib.JsonConverters;
+using NetTopologySuite.Geometries;
 
 namespace SOS.Analysis.Api
 {
@@ -259,6 +260,8 @@ namespace SOS.Analysis.Api
 
             services.AddSwaggerGen(options =>
                 {
+                    options.MapType<Geometry>(() => new OpenApiSchema { Type = "object" });
+
                     var currentAssembly = Assembly.GetExecutingAssembly();
                     var xmlDocs = currentAssembly.GetReferencedAssemblies()
                         .Union(new AssemblyName[] { currentAssembly.GetName() })

@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
@@ -28,6 +29,7 @@ using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.OpenApi.Models;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
+using NetTopologySuite.Geometries;
 using Newtonsoft.Json.Converters;
 using Serilog;
 using SOS.Lib.ActionFilters;
@@ -326,6 +328,8 @@ namespace SOS.Observations.Api
             services.AddSwaggerGen(
                 options =>
                 {
+                    options.MapType<Geometry>(() => new OpenApiSchema { Type = "object" });
+
                     // add a custom operation filters
                     options.OperationFilter<SwaggerDefaultValues>();
                     options.OperationFilter<SwaggerAddOptionalHeaderParameters>();

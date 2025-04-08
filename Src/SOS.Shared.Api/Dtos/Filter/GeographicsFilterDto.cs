@@ -1,5 +1,8 @@
 ﻿
 using NetTopologySuite.Geometries;
+using SOS.Lib.Swagger;
+using Swashbuckle.AspNetCore.Annotations;
+using System.Text.Json.Serialization;
 
 namespace SOS.Shared.Api.Dtos.Filter
 {
@@ -42,7 +45,7 @@ namespace SOS.Shared.Api.Dtos.Filter
         /// Point or polygon geometry used for search.
         /// If the geometry is a point, then MaxDistanceFromPoint is also used in search.
         /// </summary>
-        public ICollection<Geometry>? Geometries { get; set; }
+        public ICollection<Geometry> Geometries { get; set; }
 
         /// <summary>
         /// Filter on location id/s. Only observations with passed location id/s this will be returned
