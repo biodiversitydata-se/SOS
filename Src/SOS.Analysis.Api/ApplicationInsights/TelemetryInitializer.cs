@@ -33,6 +33,22 @@ public class TelemetryInitializer : TelemetryInitializerBase
                 }
             }
 
+            if (platformContext.Items.TryGetValue("ApiUserType", out object? apiUserType))
+            {
+                if (apiUserType != null && !telemetry.Context.GlobalProperties.ContainsKey("ApiUserType"))
+                {
+                    telemetry.Context.GlobalProperties.Add("ApiUserType", apiUserType.ToString());
+                }
+            }
+
+            if (platformContext.Items.TryGetValue("SemaphoreLimitUsed", out object? semaphoreLimitUsed))
+            {
+                if (semaphoreLimitUsed != null && !telemetry.Context.GlobalProperties.ContainsKey("SemaphoreLimitUsed"))
+                {
+                    telemetry.Context.GlobalProperties.Add("SemaphoreLimitUsed", semaphoreLimitUsed.ToString());
+                }
+            }
+
             if (_loggSearchResponseCount && platformContext.Items.TryGetValue("Observation-count", out var observationCount))
             {
                 if (int.TryParse(observationCount?.ToString(), out var obsCount) && !telemetry.Context.GlobalProperties.ContainsKey("Observation-count"))

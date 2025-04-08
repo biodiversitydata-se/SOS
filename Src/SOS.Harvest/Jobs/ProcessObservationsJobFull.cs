@@ -242,16 +242,16 @@ namespace SOS.Harvest.Jobs
                 if ((providerActive?.PreviousProcessLimit ?? 0) > 0)
                 {
                     double percentLimit = Math.Max(0, (providerActive!.PreviousProcessLimit-2) / 100.0); // Allow 2% less than limit in order to allow some invalid observations.
-                    if (providerActive.PublicProcessCount > 0 && providerInactive.PublicProcessCount <= percentLimit * providerActive.PublicProcessCount)
+                    int activeCount = providerActive.PublicProcessCount.GetValueOrDefault() + providerActive.ProtectedProcessCount.GetValueOrDefault();
+                    int inactiveCount = providerInactive.PublicProcessCount.GetValueOrDefault() + providerInactive.ProtectedProcessCount.GetValueOrDefault();
+                    int activeCountLimit = (int)(percentLimit * activeCount);
+                    if (inactiveCount < activeCountLimit)
                     {
-                        _logger.LogError("Validation failed. Public observation count for {@dataProvider} is less than {@previousProcessLimit}% of last run. Count this time={@publicProcessCount}. Count previous time={@publicProcessCountPrevious}.", 
-                            providerInactive.DataProviderIdentifier, providerActive!.PreviousProcessLimit, providerInactive.PublicProcessCount, providerActive.PublicProcessCount);
-                        return false;
-                    }
-
-                    if (providerActive.ProtectedProcessCount > 0 && providerInactive.ProtectedProcessCount <= percentLimit * providerActive.ProtectedProcessCount)
-                    {
-                        _logger.LogError("Validation failed. Protected observation count for {@dataProvider} is less than {@reviousProcessLimit}% of last run. Count this time={@protectedProcessCount}. Count previous time={@protectedProcessCountPrevious}.", 
+                        _logger.LogError("Validation failed. Observation count for {@dataProvider} is less than {@previousProcessLimit}% of last run. Count this time={@observationCount}. Count previous time={@previousObservationCount}.",
+                            providerInactive.DataProviderIdentifier, providerActive!.PreviousProcessLimit, inactiveCount, activeCount);
+                        _logger.LogError("Validation failed. Public observation count for {@dataProvider} is less than {@previousProcessLimit}% of last run. Count this time={@publicProcessCount}. Count previous time={@publicProcessCountPrevious}.",
+                        providerInactive.DataProviderIdentifier, providerActive!.PreviousProcessLimit, providerInactive.PublicProcessCount, providerActive.PublicProcessCount);
+                        _logger.LogError("Validation failed. Protected observation count for {@dataProvider} is less than {@reviousProcessLimit}% of last run. Count this time={@protectedProcessCount}. Count previous time={@protectedProcessCountPrevious}.",
                             providerInactive.DataProviderIdentifier, providerActive!.PreviousProcessLimit, providerActive!.PreviousProcessLimit, providerActive.ProtectedProcessCount);
                         return false;
                     }

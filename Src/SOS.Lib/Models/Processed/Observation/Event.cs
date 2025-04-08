@@ -37,6 +37,18 @@ namespace SOS.Lib.Models.Processed.Observation
         /// <summary>
         /// Constructor
         /// </summary>
+        /// <param name="observationDate"></param>
+        public Event(DateTime observationDate) : this(observationDate, observationDate)
+        {
+        }
+
+        public Event(DateTime? observationDate, TimeSpan? observationTime) : this(observationDate, observationTime, observationDate, observationTime)
+        {
+        }
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
         /// <param name="startDate"></param>
         /// <param name="endDate"></param>
         public Event(DateTime? startDate, DateTime? endDate)

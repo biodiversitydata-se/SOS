@@ -281,7 +281,6 @@ namespace SOS.Observations.Api
             var userServiceConfiguration = Settings.UserServiceConfiguration;
 
             // Authentication
-            // Authentication
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
@@ -468,6 +467,7 @@ namespace SOS.Observations.Api
             var artportalenApiServiceConfiguration = Settings.ArtportalenApiServiceConfiguration;
 
             // Add configuration
+            services.AddSingleton(Settings.SemaphoreLimitsConfiguration);
             services.AddSingleton(artportalenApiServiceConfiguration);
             services.AddSingleton(observationApiConfiguration);
             services.AddSingleton(blobStorageConfiguration);
@@ -555,6 +555,7 @@ namespace SOS.Observations.Api
             services.AddScoped<IUserManager, UserManager>();
             services.AddScoped<IVocabularyManager, VocabularyManager>();
             services.AddSingleton<IApiUsageStatisticsManager, ApiUsageStatisticsManager>();
+            services.AddSingleton<SemaphoreLimitManager>();
 
             // Add repositories
             services.AddScoped<IApiUsageStatisticsRepository, ApiUsageStatisticsRepository>();
@@ -651,6 +652,7 @@ namespace SOS.Observations.Api
             configuration.DisableTelemetry = true;
 #endif
 
+            app.UseMiddleware<LogApiUserTypeMiddleware>();
             if (applicationInsightsConfiguration.EnableRequestBodyLogging)
             {
                 app.UseMiddleware<EnableRequestBufferingMiddelware>();

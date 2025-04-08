@@ -1362,7 +1362,7 @@
         "path": [ "iNaturalist.org", "iNaturalist Sverige" ]
       }
     ],
-    "PreviousProcessLimit": 95,
+    "PreviousProcessLimit": 10,
     "SupportDatasets": false,
     "SupportDynamicEml": false,
     "SupportEvents": false,

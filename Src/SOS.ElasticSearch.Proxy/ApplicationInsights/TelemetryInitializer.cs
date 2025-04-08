@@ -31,6 +31,22 @@ namespace SOS.ElasticSearch.Proxy.ApplicationInsights
                 telemetry.Context.GlobalProperties.Add("Requesting-System", requestingSystem.ToString());
             }
 
+            if (platformContext.Items.TryGetValue("ApiUserType", out object? apiUserType))
+            {
+                if (apiUserType != null && !telemetry.Context.GlobalProperties.ContainsKey("ApiUserType"))
+                {
+                    telemetry.Context.GlobalProperties.Add("ApiUserType", apiUserType.ToString());
+                }
+            }
+
+            if (platformContext.Items.TryGetValue("SemaphoreLimitUsed", out object? semaphoreLimitUsed))
+            {
+                if (semaphoreLimitUsed != null && !telemetry.Context.GlobalProperties.ContainsKey("SemaphoreLimitUsed"))
+                {
+                    telemetry.Context.GlobalProperties.Add("SemaphoreLimitUsed", semaphoreLimitUsed.ToString());
+                }
+            }
+
             if (platformContext.Items.TryGetValue("Observation-count", out var observationCount))
             {
                 if (int.TryParse(observationCount?.ToString(), out var obsCount) && !requestTelemetry.Context.GlobalProperties.ContainsKey("Observation-count"))

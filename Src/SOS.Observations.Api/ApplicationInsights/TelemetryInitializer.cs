@@ -35,6 +35,22 @@ namespace SOS.Observations.Api.ApplicationInsights
                 if (platformContext.Request.Query.TryGetValue("protectedObservations", out var value) && !requestTelemetry.Context.GlobalProperties.ContainsKey("Protected-observations"))
                 {
                     requestTelemetry.Context.GlobalProperties.Add("Protected-observations", value);
+                }              
+
+                if (platformContext.Items.TryGetValue("ApiUserType", out object apiUserType))
+                {
+                    if (apiUserType != null && !telemetry.Context.GlobalProperties.ContainsKey("ApiUserType"))
+                    {
+                        telemetry.Context.GlobalProperties.Add("ApiUserType", apiUserType.ToString());
+                    }
+                }
+
+                if (platformContext.Items.TryGetValue("SemaphoreLimitUsed", out object semaphoreLimitUsed))
+                {
+                    if (semaphoreLimitUsed != null && !telemetry.Context.GlobalProperties.ContainsKey("SemaphoreLimitUsed"))
+                    {
+                        telemetry.Context.GlobalProperties.Add("SemaphoreLimitUsed", semaphoreLimitUsed.ToString());
+                    }
                 }
 
                 if (_loggRequestBody && platformContext.Items.TryGetValue("Request-body", out var requestBody))
@@ -52,7 +68,7 @@ namespace SOS.Observations.Api.ApplicationInsights
                     {
                         requestTelemetry.Context.GlobalProperties.Add("Observation-count", obsCount.ToString());
                     }
-                }
+                }                
 
                 if (platformContext.Request.ContentLength != null && !requestTelemetry.Context.GlobalProperties.ContainsKey("Request-length"))
                 {

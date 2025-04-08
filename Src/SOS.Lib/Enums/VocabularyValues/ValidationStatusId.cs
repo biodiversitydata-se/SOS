@@ -18,6 +18,12 @@
         ReportedByExpert = 1,
 
         /// <summary>
+        ///     "Approved based on community consensus".
+        ///     (Godkänd baserat på communitykonsensus)
+        /// </summary>
+        ApprovedBasedOnCommunityConsensus = 2,
+
+        /// <summary>
         ///     Unvalidated.
         ///     (Ovaliderad)
         /// </summary>

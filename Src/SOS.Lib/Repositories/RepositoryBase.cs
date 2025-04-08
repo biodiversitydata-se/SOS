@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 using SOS.Lib.Database.Interfaces;
@@ -273,12 +274,12 @@ namespace SOS.Lib.Repositories
             }
         }
 
-        public async Task<bool> UpsertManyAsync(IEnumerable<TEntity> items)
+        public async Task<bool> UpsertManyAsync(IEnumerable<TEntity> items, string comparisionField = "_id")
         {
-            return await UpsertManyAsync(items, MongoCollection);
+            return await UpsertManyAsync(items, MongoCollection, comparisionField);
         }
 
-        public async Task<bool> UpsertManyAsync(IEnumerable<TEntity> items, IMongoCollection<TEntity> mongoCollection)
+        public async Task<bool> UpsertManyAsync(IEnumerable<TEntity> items, IMongoCollection<TEntity> mongoCollection, string comparisionField = "_id")
         {
             if (!items?.Any() ?? true)
             {
@@ -292,7 +293,7 @@ namespace SOS.Lib.Repositories
 
             while (batch?.Any() ?? false)
             {
-                success = success && await UpsertBatchAsync(batch, mongoCollection);
+                success = success && await UpsertBatchAsync(batch, mongoCollection, comparisionField);
                 count++;
                 batch = entities.Skip(BatchSizeWrite * count).Take(BatchSizeWrite)?.ToArray();
             }
@@ -300,19 +301,47 @@ namespace SOS.Lib.Repositories
             return success;
         }
 
-        private async Task<bool> UpsertBatchAsync(IEnumerable<TEntity> batch, IMongoCollection<TEntity> mongoCollection, byte attempt = 1)
+        private async Task<bool> UpsertBatchAsync(
+            IEnumerable<TEntity> batch,
+            IMongoCollection<TEntity> mongoCollection,
+            string comparisonField = "_id",
+            byte attempt = 1)
         {
             var items = batch?.ToArray();
             try
             {
                 var bulkOps = new List<WriteModel<TEntity>>();
+                if (comparisonField != "_id")
+                {                    
+                    // Fetch all existing documents from MongoDB based on comparisonField
+                    var comparisonValues = items.Select(i => typeof(TEntity).GetProperty(comparisonField)?.GetValue(i)).Where(v => v != null).ToList();
+                    var existingDocs = await mongoCollection.Find(Builders<TEntity>.Filter.In(comparisonField, comparisonValues)).ToListAsync();                    
+                    var existingDocsDict = existingDocs.ToDictionary(doc => typeof(TEntity).GetProperty(comparisonField)?.GetValue(doc));
+
+                    // Update the batch objects with correct _id if they already exist in the database
+                    var compProperty = typeof(TEntity).GetProperty(comparisonField);
+                    foreach (var item in items)
+                    {
+                        var comparisonValue = compProperty?.GetValue(item);
+                        if (comparisonValue != null && existingDocsDict.TryGetValue(comparisonValue, out var existingDoc))
+                        {
+                            item.Id = existingDoc.Id;
+                            //var idValue = typeof(TEntity).GetProperty("_id")?.GetValue(existingDoc);
+                            //if (idValue != null)
+                            //{
+                            //    typeof(TEntity).GetProperty("_id")?.SetValue(item, idValue);
+                            //}
+                        }
+                    }
+                }
 
                 foreach (var item in items)
-                {
-                    var filter = Builders<TEntity>.Filter.Eq("_id", item.Id);
-                    var update = Builders<TEntity>.Update.Set(x => x, item); // Sätter hela dokumentet
+                {                    
+                    var comparisonValue = typeof(TEntity).GetProperty(comparisonField)?.GetValue(item);
+                    if (comparisonValue == null)
+                        throw new ArgumentException($"Field '{comparisonField}' not found or has null value.");
+                    var filter = Builders<TEntity>.Filter.Eq(comparisonField, comparisonValue);
                     var upsert = new ReplaceOneModel<TEntity>(filter, item) { IsUpsert = true };
-
                     bulkOps.Add(upsert);
                 }
 
@@ -328,10 +357,10 @@ namespace SOS.Lib.Repositories
                         if (batchCount > 5)
                         {
                             var addTasks = new List<Task<bool>>
-                            {
-                                UpsertBatchAsync(items.Take(batchCount), mongoCollection),
-                                UpsertBatchAsync(items.Skip(batchCount), mongoCollection)
-                            };
+                    {
+                        UpsertBatchAsync(items.Take(batchCount), mongoCollection, comparisonField),
+                        UpsertBatchAsync(items.Skip(batchCount), mongoCollection, comparisonField)
+                    };
 
                             await Task.WhenAll(addTasks);
                             return addTasks.All(t => t.Result);
@@ -349,13 +378,14 @@ namespace SOS.Lib.Repositories
                     Logger.LogWarning($"Upsert batch to MongoDB collection ({mongoCollection.CollectionNamespace}). Attempt {attempt} failed. Retrying...");
                     Thread.Sleep(attempt * 1000);
                     attempt++;
-                    return await UpsertBatchAsync(items, mongoCollection, attempt);
+                    return await UpsertBatchAsync(items, mongoCollection, comparisonField, attempt);
                 }
 
                 Logger.LogError(e, "Failed to upsert batch to MongoDB collection ({@mongoCollection})", mongoCollection);
                 throw;
             }
         }
+
 
 
         /// <inheritdoc />
@@ -731,6 +761,188 @@ namespace SOS.Lib.Repositories
                 throw;
             }
         }
+
+        public async Task<(int Id, T AggregationValue)> GetMaxValueWithIdAsync<T>(
+            IMongoCollection<TEntity> mongoCollection,
+            string fieldName) where T : IConvertible
+        {
+            try
+            {
+                Logger.LogDebug($"Trying to get max value for field '{fieldName}' in ({mongoCollection.CollectionNamespace})");
+
+                var pipeline = new[]
+                {
+                    new BsonDocument("$sort", new BsonDocument
+                    {
+                        { fieldName, -1 },
+                        { "_id", -1 }
+                    }),
+                    new BsonDocument("$limit", 1),
+                    new BsonDocument("$project", new BsonDocument
+                    {
+                        { "_id", 1 },
+                        { fieldName, 1 }
+                    })
+                };
+
+                var result = await mongoCollection.Aggregate<BsonDocument>(pipeline).FirstOrDefaultAsync();
+
+                if (result != null && result.Contains("_id") && result.Contains(fieldName))
+                {
+                    int id = result["_id"].AsInt32;
+                    T fieldValue = ConvertToType<T>(result[fieldName]);
+                    return (id, fieldValue);
+                }
+
+                return default;
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e, $"Failed to get max value for field '{fieldName}'");
+                throw;
+            }
+        }
+
+        private T ConvertToType<T>(BsonValue bsonValue)
+        {
+            if (bsonValue.IsBsonNull)
+                return default;
+
+            return (T)Convert.ChangeType(bsonValue.ToString(), typeof(T)); // Konvertera till T
+        }
+
+        //public async Task<BsonDocument> GetMaxValueWithIdAsync(
+        //    IMongoCollection<BsonDocument> mongoCollection,
+        //    string fieldName)
+        //{
+        //    try
+        //    {
+        //        Logger.LogDebug($"Trying to get max value for field '{fieldName}' in ({mongoCollection.CollectionNamespace})");
+
+        //        var pipeline = new[]
+        //        {
+        //            new BsonDocument("$sort", new BsonDocument(fieldName, -1)), // Sortera fallande
+        //            new BsonDocument("$limit", 1), // Ta endast det första dokumentet
+        //            new BsonDocument("$project", new BsonDocument
+        //            {
+        //                { "_id", 1 },
+        //                { fieldName, 1 }
+        //            }) // Behåll endast _id och det angivna fältet
+        //        };
+
+        //        var result = await mongoCollection.Aggregate<BsonDocument>(pipeline).FirstOrDefaultAsync();
+
+        //        return result ?? new BsonDocument(); // Returnera tomt dokument om inget hittas
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        Logger.LogError(e, $"Failed to get max value for field '{fieldName}'");
+        //        throw;
+        //    }
+        //}
+
+
+        //public record MaxFieldResult<TId, TValue>(TId Id, TValue MaxValue);
+
+        //public async Task<MaxFieldResult<TId, TValue>> GetMaxFieldValueAsync<TId, TValue>(
+        //    IMongoCollection<TEntity> mongoCollection, Expression<Func<TEntity, TValue>> fieldSelector)
+        //{
+        //    try
+        //    {
+        //        var fieldName = ((MemberExpression)fieldSelector.Body).Member.Name;
+        //        Logger.LogDebug($"Trying to get max value for field '{fieldName}' in ({mongoCollection.CollectionNamespace})");
+
+        //        var result = await mongoCollection
+        //            .Find(FilterDefinition<TEntity>.Empty)
+        //            .Sort(Builders<TEntity>.Sort.Descending(fieldSelector)) // Sortera på valt fält
+        //            .Limit(1) // Ta bara första träffen
+        //            .Project(d => new { Id = d.Id, MaxValue = fieldSelector.Compile().Invoke(d) }) // Projicera korrekt
+        //            .FirstOrDefaultAsync();
+
+        //        if (result == null)
+        //            return new MaxFieldResult<TId, TValue>(default!, default!);
+
+        //        return new MaxFieldResult<TId, TValue>(result.Id, result.MaxValue);
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        Logger.LogError(e, "Failed to get max value");
+        //        throw;
+        //    }
+        //}
+
+
+
+        //public async Task<int> GetMaxFieldValueAsync(IMongoCollection<TEntity> mongoCollection, string fieldName)
+        //{
+        //    try
+        //    {
+        //        Logger.LogDebug($"Trying to get max value for field '{fieldName}' in ({mongoCollection.CollectionNamespace})");
+
+        //        var result = await mongoCollection.Aggregate()
+        //            .Group(new BsonDocument
+        //            {
+        //                { "_id", BsonNull.Value },
+        //                { "maxValue", new BsonDocument("$max", $"${fieldName}") }
+        //            })
+        //            .FirstOrDefaultAsync();
+
+        //        return result == null ? 0 : result["maxValue"].AsInt32;
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        Logger.LogError(e, $"Failed to get max value for field '{fieldName}'");
+        //        throw;
+        //    }
+        //}
+
+
+        //public async Task<int> GetMaxObservationIdAsync(IMongoCollection<TEntity> mongoCollection)
+        //{
+        //    try
+        //    {
+        //        Logger.LogDebug($"Trying to get max ObservationId for ({mongoCollection.CollectionNamespace})");
+
+        //        var maxObservationId = await mongoCollection
+        //            .Find(FilterDefinition<TEntity>.Empty)
+        //            .Sort(Builders<TEntity>.Sort.Descending("ObservationId"))
+        //            .Limit(1)
+        //            .Project(d => d.ObservationId)
+        //            .FirstOrDefaultAsync();
+
+        //        return maxObservationId;
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        Logger.LogError(e, "Failed to get max ObservationId");
+        //        throw;
+        //    }
+        //}
+
+
+        //public async Task<int> GetMaxObservationIdAsync(IMongoCollection<TEntity> mongoCollection, string field)
+        //{
+        //    try
+        //    {
+        //        Logger.LogDebug($"Trying to get max {field} for ({mongoCollection.CollectionNamespace})");
+
+        //        var result = await mongoCollection.Aggregate()
+        //            .Group(new BsonDocument
+        //            {
+        //        { "_id", BsonNull.Value }, // Grupp utan faktisk gruppering
+        //        { "maxObservationId", new BsonDocument("$max", "$ObservationId") }
+        //            })
+        //            .FirstOrDefaultAsync();
+
+        //        return result == null ? 0 : result["maxObservationId"].AsInt32;
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        Logger.LogError(e, "Failed to get max ObservationId");
+        //        throw;
+        //    }
+        //}
+
 
         public async Task<TKey> GetMaxIdAsync(string collectionName)
         {
