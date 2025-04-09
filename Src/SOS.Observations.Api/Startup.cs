@@ -114,8 +114,9 @@ namespace SOS.Observations.Api
         private const string InternalApiPrefix = "Internal";
         private const string AzureApiPrefix = "Azure";
         private IWebHostEnvironment CurrentEnvironment { get; set; }
-        private bool _isDevelopment;
+        private bool _isDevelopment;        
         private bool _disableHangfireInit = false;
+        private bool _useLocalHangfire = false;
         private bool _disableHealthCheckInit = false;
         private bool _disableCachedTaxonSumAggregationInit = false;
 
@@ -192,9 +193,10 @@ namespace SOS.Observations.Api
                 .AddEnvironmentVariables();
 
             _isDevelopment = CurrentEnvironment.IsEnvironment("local") || CurrentEnvironment.IsEnvironment("dev") || CurrentEnvironment.IsEnvironment("st");
-            _disableHangfireInit = GetDisableFeature(environmentVariable: "DISABLE_HANGFIRE_INIT");
-            _disableHealthCheckInit = GetDisableFeature(environmentVariable: "DISABLE_HEALTHCHECK_INIT");
-            _disableCachedTaxonSumAggregationInit = GetDisableFeature(environmentVariable: "DISABLE_CACHED_TAXON_SUM_INIT");
+            _disableHangfireInit = GetEnvironmentBool(environmentVariable: "DISABLE_HANGFIRE_INIT");
+            _useLocalHangfire = GetEnvironmentBool(environmentVariable: "USE_LOCAL_HANGFIRE");
+            _disableHealthCheckInit = GetEnvironmentBool(environmentVariable: "DISABLE_HEALTHCHECK_INIT");
+            _disableCachedTaxonSumAggregationInit = GetEnvironmentBool(environmentVariable: "DISABLE_CACHED_TAXON_SUM_INIT");
 
             // Add user secrets if debug or if development mode.            
             // (%APPDATA%\Microsoft\UserSecrets\92cd2cdb-499c-480d-9f04-feaf7a68f89c\secrets.json)
@@ -423,6 +425,10 @@ namespace SOS.Observations.Api
             if (!_disableHangfireInit)
             {
                 var mongoConfiguration = Settings.HangfireDbConfiguration;
+                if (_useLocalHangfire)
+                {
+                    mongoConfiguration = Settings.LocalHangfireDbConfiguration;
+                }
                 services.AddHangfire(configuration =>
                     configuration
                         .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
@@ -836,22 +842,22 @@ namespace SOS.Observations.Api
             return apiVersions;
         }
 
-        private static bool GetDisableFeature(string environmentVariable)
+        private static bool GetEnvironmentBool(string environmentVariable, bool defaultValue = false)
         {
             string value = Environment.GetEnvironmentVariable(environmentVariable);
 
             if (value != null)
             {
-                if (bool.TryParse(value, out var disableHangfireInit))
+                if (bool.TryParse(value, out var boolValue))
                 {
-                    return disableHangfireInit;
+                    return boolValue;
                 }
 
-                return false;
+                return defaultValue;
             }
             else
             {
-                return false;
+                return defaultValue;
             }
         }
     }

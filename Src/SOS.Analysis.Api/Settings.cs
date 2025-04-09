@@ -16,6 +16,7 @@ public static class Settings
     public static ElasticSearchConfiguration SearchDbConfiguration { get; set; } = new();
     public static MongoDbConfiguration ProcessDbConfiguration { get; set; } = new();
     public static HangfireDbConfiguration HangfireDbConfiguration { get; set; } = new();
+    public static HangfireDbConfiguration LocalHangfireDbConfiguration { get; set; } = new();
     public static string InstrumentationKey { get; set; } = "";
     public static string SearchDbUserName { get; set; } = "";
     public static string SearchDbPassword { get; set; } = "";
@@ -120,6 +121,7 @@ public static class Settings
             HangfireDbConfiguration.Password = HangfireDbPassword;
             logger.LogInformation("replaced SECRET_PLACEHOLDER in HangfireDbConfiguration.Password with the value in HangfireDbPassword");
         }
+        LocalHangfireDbConfiguration = GetConfigSection<HangfireDbConfiguration>("LocalHangfireDbConfiguration", configuration, logger, sensitiveSetting: false);
     }
 
     private static T GetConfigSection<T>(string key, IConfiguration configuration, ILogger logger, bool sensitiveSetting = false, bool required = true)

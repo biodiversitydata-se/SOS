@@ -71,6 +71,7 @@ namespace SOS.Analysis.Api
         private const string PublicApiName = "PublicSosAnalysis";
         private const string InternalApiPrefix = "Internal";
         private bool _disableHangfireInit = false;
+        private bool _useLocalHangfire = false;
         private bool _isDevelopment;
         private IWebHostEnvironment CurrentEnvironment { get; set; }
 
@@ -143,7 +144,8 @@ namespace SOS.Analysis.Api
                 // In production you should store the secret values as environment variables.
                 builder.AddUserSecrets<Startup>();
             }
-            _disableHangfireInit = GetDisableFeature(environmentVariable: "DISABLE_HANGFIRE_INIT");
+            _disableHangfireInit = GetEnvironmentBool(environmentVariable: "DISABLE_HANGFIRE_INIT");
+            _useLocalHangfire = GetEnvironmentBool(environmentVariable: "USE_LOCAL_HANGFIRE");
 
             Configuration = builder.Build();
             Settings.Init(Configuration); // or fail early!
@@ -409,6 +411,10 @@ namespace SOS.Analysis.Api
             if (!_disableHangfireInit)
             {
                 var mongoConfiguration = Settings.HangfireDbConfiguration;
+                if (_useLocalHangfire)
+                {
+                    mongoConfiguration = Settings.LocalHangfireDbConfiguration;
+                }
                 services.AddHangfire(configuration =>
                     configuration
                         .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
@@ -582,7 +588,7 @@ namespace SOS.Analysis.Api
             return apiVersions;
         }
 
-        private static bool GetDisableFeature(string environmentVariable)
+        private static bool GetEnvironmentBool(string environmentVariable, bool defaultValue = false)
         {
             string value = Environment.GetEnvironmentVariable(environmentVariable);
 
@@ -593,11 +599,11 @@ namespace SOS.Analysis.Api
                     return val;
                 }
 
-                return false;
+                return defaultValue;
             }
             else
             {
-                return false;
+                return defaultValue;
             }
         }
     }

@@ -1,12 +1,32 @@
 {
   "$schema": "http://json.schemastore.org/launchsettings.json",
   "profiles": {
-    "SOS.Administration.Api": {
+    "SOS.Administration.Api (local)": {
       "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "swagger",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "local"
+      },
+      "applicationUrl": "http://localhost:5005"
+    },
+    "SOS.Administration.Api (Dev)": {
+      "commandName": "IISExpress",
+      "launchBrowser": true,
+      "launchUrl": "swagger",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Dev",        
+        "USE_LOCAL_HANGFIRE": "false"        
+      },
+      "applicationUrl": "http://localhost:5005"
+    },
+    "SOS.Administration.Api (ST)": {
+      "commandName": "IISExpress",
+      "launchBrowser": true,
+      "launchUrl": "swagger",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "ST",        
+        "USE_LOCAL_HANGFIRE": "false"
       },
       "applicationUrl": "http://localhost:5005"
     }

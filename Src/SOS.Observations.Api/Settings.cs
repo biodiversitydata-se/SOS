@@ -21,6 +21,7 @@ public static class Settings
     public static BlobStorageConfiguration BlobStorageConfiguration { get; set; } = new();
     public static CryptoConfiguration CryptoConfiguration { get; set; } = new();
     public static HangfireDbConfiguration HangfireDbConfiguration { get; set; } = new();
+    public static HangfireDbConfiguration LocalHangfireDbConfiguration { get; set; } = new();
     public static MongoDbConfiguration ProcessDbConfiguration { get; set; } = new();
     public static ElasticSearchConfiguration SearchDbConfiguration { get; set; } = new();
     public static IdentityServerConfiguration IdentityServer { get; set; } = new();
@@ -133,6 +134,7 @@ public static class Settings
             HangfireDbConfiguration.Password = HangfireDbPassword;
             logger.LogInformation("replaced SECRET_PLACEHOLDER in HangfireDbConfiguration.Password with the value in HangfireDbPassword");
         }
+        LocalHangfireDbConfiguration = GetConfigSection<HangfireDbConfiguration>("LocalHangfireDbConfiguration", configuration, logger, sensitiveSetting: false);
 
         // Process db
         ProcessDbConfiguration = GetConfigSection<MongoDbConfiguration>("ProcessDbConfiguration", configuration, logger, sensitiveSetting: false);

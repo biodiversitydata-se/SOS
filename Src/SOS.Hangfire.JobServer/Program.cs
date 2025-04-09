@@ -53,6 +53,7 @@ namespace SOS.Hangfire.JobServer
         private static ApiManagementServiceConfiguration _apiManagementServiceConfiguration;
         private static CryptoConfiguration _cryptoConfiguration;
         private static HangfireDbConfiguration _hangfireDbConfiguration;
+        private static HangfireDbConfiguration _localHangfireDbConfiguration;
         private static MongoDbConfiguration _verbatimDbConfiguration;
         private static MongoDbConfiguration _processDbConfiguration;
         private static ElasticSearchConfiguration _searchDbConfiguration;
@@ -65,6 +66,7 @@ namespace SOS.Hangfire.JobServer
         private static SosApiConfiguration _sosApiConfiguration;
         private static UserServiceConfiguration _userServiceConfiguration;
         private static AreaConfiguration _areaConfiguration;
+        private static bool _useLocalHangfire;
 
         /// <summary>
         ///     Application entry point
@@ -76,7 +78,7 @@ namespace SOS.Hangfire.JobServer
             _env = args?.Any() ?? false
                 ? args[0].ToLower()
                 : Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")?.ToLower();
-
+            _useLocalHangfire = GetEnvironmentBool(environmentVariable: "USE_LOCAL_HANGFIRE");
             Console.WriteLine("Starting up in environment:" + _env);
 
 
@@ -133,6 +135,8 @@ namespace SOS.Hangfire.JobServer
                     services.AddSingleton<IClassCache<ConcurrentDictionary<string, ClusterHealthResponse>>>(clusterHealthCache);
 
                     _hangfireDbConfiguration = hostContext.Configuration.GetSection("HangfireDbConfiguration").Get<HangfireDbConfiguration>();
+                    _localHangfireDbConfiguration = hostContext.Configuration.GetSection("LocalHangfireDbConfiguration").Get<HangfireDbConfiguration>();
+                    var hangfireConfiguration = _useLocalHangfire ? _localHangfireDbConfiguration : _hangfireDbConfiguration;
 
                     services.AddHangfire(configuration =>
                         configuration
@@ -143,12 +147,12 @@ namespace SOS.Hangfire.JobServer
                                 m.Converters.Add(new NewtonsoftGeoShapeConverter());
                                 m.Converters.Add(new StringEnumConverter());
                             })
-                            .UseMongoStorage(new MongoClient(_hangfireDbConfiguration.GetMongoDbSettings()),
-                                _hangfireDbConfiguration.DatabaseName,
+                            .UseMongoStorage(new MongoClient(hangfireConfiguration.GetMongoDbSettings()),
+                                hangfireConfiguration.DatabaseName,
                                 new MongoStorageOptions
                                 {
                                     CheckConnection = true,
-                                    CheckQueuedJobsStrategy = (_hangfireDbConfiguration?.Hosts?.Length ?? 0) < 2 ? CheckQueuedJobsStrategy.TailNotificationsCollection : CheckQueuedJobsStrategy.Watch,
+                                    CheckQueuedJobsStrategy = (hangfireConfiguration?.Hosts?.Length ?? 0) < 2 ? CheckQueuedJobsStrategy.TailNotificationsCollection : CheckQueuedJobsStrategy.Watch,
                                     CountersAggregateInterval = TimeSpan.FromMinutes(10), // Default 5
                                     // ConnectionCheckTimeout = TimeSpan.FromSeconds(5),
                                     //  DistributedLockLifetime = TimeSpan.FromSeconds(30),
@@ -164,7 +168,7 @@ namespace SOS.Hangfire.JobServer
                                 })
                     );// ;// ;
                     GlobalJobFilters.Filters.Add(
-                        new HangfireJobExpirationTimeAttribute(_hangfireDbConfiguration.JobExpirationDays));
+                        new HangfireJobExpirationTimeAttribute(hangfireConfiguration.JobExpirationDays));
                     GlobalJobFilters.Filters.Add(new AutomaticRetryAttribute { Attempts = 0 });
 
                     // Add the processing server as IHostedService
@@ -244,14 +248,15 @@ namespace SOS.Hangfire.JobServer
 
         private static void LogStartupSettings(ILogger<Program> logger)
         {
+            var hangfireConfiguration = _useLocalHangfire ? _localHangfireDbConfiguration : _hangfireDbConfiguration;
             var sb = new StringBuilder();
             sb.AppendLine("Hangfire JobServer Started with the following settings:");
 
             sb.AppendLine("Hangfire settings:");
             sb.AppendLine("================");
             sb.AppendLine(
-                $"[MongoDb].[Servers]: {string.Join(", ", _hangfireDbConfiguration.Hosts.Select(x => x.Name))}");
-            sb.AppendLine($"[MongoDb].[DatabaseName]: {_hangfireDbConfiguration.DatabaseName}");
+                $"[MongoDb].[Servers]: {string.Join(", ", hangfireConfiguration.Hosts.Select(x => x.Name))}");
+            sb.AppendLine($"[MongoDb].[DatabaseName]: {hangfireConfiguration.DatabaseName}");
             sb.AppendLine("");
 
             sb.AppendLine("Import settings:");
@@ -360,6 +365,25 @@ namespace SOS.Hangfire.JobServer
 
 
             logger.LogInformation(sb.ToString());
+        }
+
+        private static bool GetEnvironmentBool(string environmentVariable, bool defaultValue = false)
+        {
+            string value = Environment.GetEnvironmentVariable(environmentVariable);
+
+            if (value != null)
+            {
+                if (bool.TryParse(value, out var boolValue))
+                {
+                    return boolValue;
+                }
+
+                return defaultValue;
+            }
+            else
+            {
+                return defaultValue;
+            }
         }
     }
 }
