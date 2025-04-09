@@ -30,14 +30,7 @@ public static class LogHelper
             GCMemoryInfo memoryInfo = GC.GetGCMemoryInfo();
             var process = Process.GetCurrentProcess();
 
-            return $"""
-                Memory Usage (MB):
-                GC Heap Usage: {memoryUsage / 1024 / 1024}
-                GC Committed Memory: {memoryInfo.TotalCommittedBytes / 1024 / 1024}
-                Process Private Memory: {process.PrivateMemorySize64 / 1024 / 1024}
-                Process RAM Usage: {process.WorkingSet64 / 1024 / 1024}
-                Process.PeakWorkingSet={process.PeakWorkingSet64 / 1024 / 1024}
-                """;
+            return $"Memory Usage (MB): GC Heap Usage: {memoryUsage / 1024 / 1024}, Process RAM: {process.WorkingSet64 / 1024 / 1024}, Peak RAM: {process.PeakWorkingSet64 / 1024 / 1024}";
         }
         catch (Exception e)
         {
