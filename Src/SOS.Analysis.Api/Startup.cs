@@ -59,6 +59,7 @@ using SOS.Lib.Helpers;
 using System.Collections.Concurrent;
 using Serilog;
 using Microsoft.IdentityModel.JsonWebTokens;
+using Polly;
 
 namespace SOS.Analysis.Api
 {
@@ -544,7 +545,12 @@ namespace SOS.Analysis.Api
                     if (httpContext.Items.TryGetValue("Handler", out var handler))
                     {
                         diagnosticContext.Set("Handler", handler);
-                    }  
+                    }
+
+                    if (httpContext.Items.TryGetValue("ApiUserType", out var apiUserType))
+                    {
+                        diagnosticContext.Set("ApiUserType", apiUserType);
+                    }
 
                     try
                     {

@@ -196,6 +196,11 @@ namespace SOS.ElasticSearch.Proxy
                     {
                         diagnosticContext.Set("Handler", handler);
                     }
+
+                    if (httpContext.Items.TryGetValue("ApiUserType", out var apiUserType))
+                    {
+                        diagnosticContext.Set("ApiUserType", apiUserType);
+                    }
                 };
             });
         }

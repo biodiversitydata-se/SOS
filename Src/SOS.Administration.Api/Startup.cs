@@ -276,6 +276,11 @@ namespace SOS.Administration.Api
                         diagnosticContext.Set("Handler", handler);
                     }
 
+                    if (httpContext.Items.TryGetValue("ApiUserType", out var apiUserType))
+                    {
+                        diagnosticContext.Set("ApiUserType", apiUserType);
+                    }
+
                     try
                     {
                         var authHeader = httpContext.Request.Headers["Authorization"].FirstOrDefault();

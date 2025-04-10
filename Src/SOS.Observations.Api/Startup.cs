@@ -735,6 +735,11 @@ namespace SOS.Observations.Api
                         diagnosticContext.Set("Handler", handler);
                     }
 
+                    if (httpContext.Items.TryGetValue("ApiUserType", out var apiUserType))
+                    {
+                        diagnosticContext.Set("ApiUserType", apiUserType);
+                    }
+
                     string originalToken = string.Empty;
                     try
                     {
