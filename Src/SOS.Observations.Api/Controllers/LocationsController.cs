@@ -17,6 +17,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Result = CSharpFunctionalExtensions.Result;
 using SOS.Lib.Helpers;
+using SOS.Lib.Managers;
 
 namespace SOS.Observations.Api.Controllers
 {
@@ -30,6 +31,7 @@ namespace SOS.Observations.Api.Controllers
         private readonly ILocationManager _locationManager;
         private readonly IInputValidator _inputValidator;
         private readonly ObservationApiConfiguration _observationApiConfiguration;
+        private readonly SemaphoreLimitManager _semaphoreLimitManager;
         private readonly ILogger<LocationsController> _logger;
 
         /// <summary>
@@ -38,18 +40,21 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="locationManager"></param>
         /// <param name="inputValidator"></param>
         /// <param name="observationApiConfiguration"></param>
+        /// <param name="semaphoreLimitManager"></param>
         /// <param name="logger"></param>
         /// <exception cref="ArgumentNullException"></exception>
         public LocationsController(
             ILocationManager locationManager,
             IInputValidator inputValidator,
             ObservationApiConfiguration observationApiConfiguration,
+            SemaphoreLimitManager semaphoreLimitManager,
             ILogger<LocationsController> logger)
         {
             _locationManager = locationManager ??
                                   throw new ArgumentNullException(nameof(locationManager));
             _inputValidator = inputValidator ?? throw new ArgumentNullException(nameof(inputValidator));
             _observationApiConfiguration = observationApiConfiguration ?? throw new ArgumentNullException(nameof(observationApiConfiguration));
+            _semaphoreLimitManager = semaphoreLimitManager ?? throw new ArgumentNullException(nameof(semaphoreLimitManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -65,6 +70,22 @@ namespace SOS.Observations.Api.Controllers
         [AzureApi, AzureInternalApi]
         public async Task<IActionResult> GetLocationsByIds([FromBody] IEnumerable<string> locationIds)
         {
+            var userType = this.GetApiUserType();
+            var semaphore = _semaphoreLimitManager.GetAggregationSemaphore(userType);
+            HttpContext.Items["SemaphoreLimitUsed"] = "no";
+            if (semaphore.CurrentCount == 0)
+            {
+                _logger.LogWarning("All semaphore slots are occupied. Request will be queued. Endpoint={endpoint}, UserType={@userType}", this.GetEndpointName(ControllerContext), userType);
+                HttpContext.Items["SemaphoreLimitUsed"] = "wait";
+            }
+
+            if (!await semaphore.WaitAsync(_semaphoreLimitManager.DefaultTimeout))
+            {
+                _logger.LogError("Too many requests. Semaphore limit reached. Endpoint={endpoint}, UserType={@userType}", this.GetEndpointName(ControllerContext), userType);
+                HttpContext.Items["SemaphoreLimitUsed"] = "timeout";
+                return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
+            }
+
             try
             {
                 LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
@@ -87,6 +108,10 @@ namespace SOS.Observations.Api.Controllers
                 _logger.LogError(e, "Failed to get locations");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
+            finally
+            {
+                semaphore.Release();
+            }
         }
 
         /// <summary>
@@ -107,6 +132,22 @@ namespace SOS.Observations.Api.Controllers
         public async Task<IActionResult> SearchAsync([FromBody] GeographicsFilterDto filter, [FromQuery] int skip = 0, [FromQuery] int take = 100, [FromQuery] bool sensitiveObservations = false, [FromQuery] int? roleId = null,
             [FromQuery] string authorizationApplicationIdentifier = null)
         {
+            var userType = this.GetApiUserType();
+            var semaphore = _semaphoreLimitManager.GetAggregationSemaphore(userType);
+            HttpContext.Items["SemaphoreLimitUsed"] = "no";
+            if (semaphore.CurrentCount == 0)
+            {
+                _logger.LogWarning("All semaphore slots are occupied. Request will be queued. Endpoint={endpoint}, UserType={@userType}", this.GetEndpointName(ControllerContext), userType);
+                HttpContext.Items["SemaphoreLimitUsed"] = "wait";
+            }
+
+            if (!await semaphore.WaitAsync(_semaphoreLimitManager.DefaultTimeout))
+            {
+                _logger.LogError("Too many requests. Semaphore limit reached. Endpoint={endpoint}, UserType={@userType}", this.GetEndpointName(ControllerContext), userType);
+                HttpContext.Items["SemaphoreLimitUsed"] = "timeout";
+                return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
+            }
+
             try
             {
                 LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
@@ -133,6 +174,10 @@ namespace SOS.Observations.Api.Controllers
             {
                 _logger.LogError(e, "Failed to get locations");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+            finally
+            {
+                semaphore.Release();
             }
         }
     }

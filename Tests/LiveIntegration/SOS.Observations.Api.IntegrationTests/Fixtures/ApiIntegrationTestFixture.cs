@@ -302,7 +302,12 @@ namespace SOS.Observations.Api.LiveIntegrationTests.Fixtures
                 new ClassCache<ConcurrentDictionary<string, ClusterHealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<string, ClusterHealthResponse>>>()),
                 new NullLogger<ProcessedLocationRepository>());
             var locationManager = new LocationManager(processedLocationController, filterManager, new NullLogger<LocationManager>());
-            LocationsController = new LocationsController(locationManager, inputValidator, observationApiConfiguration, new NullLogger<LocationsController>());
+            LocationsController = new LocationsController(
+                locationManager, 
+                inputValidator, 
+                observationApiConfiguration,
+                new SemaphoreLimitManager(new SemaphoreLimitsConfiguration(), new NullLogger<SemaphoreLimitManager>()), 
+                new NullLogger<LocationsController>());
             AreasController = new AreasController(areaManager, new NullLogger<AreasController>());
         }
 
