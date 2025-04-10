@@ -53,6 +53,14 @@ namespace SOS.Observations.Api.ApplicationInsights
                     }
                 }
 
+                if (platformContext.Items.TryGetValue("SemaphoreWaitSeconds", out object? semaphoreWaitSeconds))
+                {
+                    if (semaphoreWaitSeconds != null && !telemetry.Context.GlobalProperties.ContainsKey("SemaphoreWaitSeconds"))
+                    {
+                        telemetry.Context.GlobalProperties.Add("SemaphoreWaitSeconds", semaphoreWaitSeconds.ToString());
+                    }
+                }
+
                 if (_loggRequestBody && platformContext.Items.TryGetValue("Request-body", out var requestBody))
                 {
                     if (!requestTelemetry.Context.GlobalProperties.ContainsKey("Request-body"))

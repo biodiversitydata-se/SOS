@@ -201,6 +201,16 @@ namespace SOS.ElasticSearch.Proxy
                     {
                         diagnosticContext.Set("ApiUserType", apiUserType);
                     }
+
+                    if (httpContext.Items.TryGetValue("SemaphoreLimitUsed", out var semaphoreLimitUsed))
+                    {
+                        diagnosticContext.Set("SemaphoreLimitUsed", semaphoreLimitUsed);
+                    }
+
+                    if (httpContext.Items.TryGetValue("SemaphoreWaitSeconds", out var semaphoreWaitSeconds))
+                    {
+                        diagnosticContext.Set("SemaphoreWaitSeconds", semaphoreWaitSeconds);
+                    }
                 };
             });
         }

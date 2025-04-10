@@ -740,6 +740,16 @@ namespace SOS.Observations.Api
                         diagnosticContext.Set("ApiUserType", apiUserType);
                     }
 
+                    if (httpContext.Items.TryGetValue("SemaphoreLimitUsed", out var semaphoreLimitUsed))
+                    {
+                        diagnosticContext.Set("SemaphoreLimitUsed", semaphoreLimitUsed);
+                    }
+
+                    if (httpContext.Items.TryGetValue("SemaphoreWaitSeconds", out var semaphoreWaitSeconds))
+                    {
+                        diagnosticContext.Set("SemaphoreWaitSeconds", semaphoreWaitSeconds);
+                    }
+
                     string originalToken = string.Empty;
                     try
                     {
