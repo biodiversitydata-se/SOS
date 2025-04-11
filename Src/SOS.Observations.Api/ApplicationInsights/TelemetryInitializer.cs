@@ -45,11 +45,11 @@ namespace SOS.Observations.Api.ApplicationInsights
                     }
                 }
 
-                if (platformContext.Items.TryGetValue("SemaphoreLimitUsed", out object semaphoreLimitUsed))
+                if (platformContext.Items.TryGetValue("SemaphoreStatus", out object semaphoreStatus))
                 {
-                    if (semaphoreLimitUsed != null && !telemetry.Context.GlobalProperties.ContainsKey("SemaphoreLimitUsed"))
+                    if (semaphoreStatus != null && !telemetry.Context.GlobalProperties.ContainsKey("SemaphoreStatus"))
                     {
-                        telemetry.Context.GlobalProperties.Add("SemaphoreLimitUsed", semaphoreLimitUsed.ToString());
+                        telemetry.Context.GlobalProperties.Add("SemaphoreStatus", semaphoreStatus.ToString());
                     }
                 }
 

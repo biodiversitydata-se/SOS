@@ -164,13 +164,13 @@ namespace SOS.ElasticSearch.Proxy.Middleware
             if (_requestSemaphore.CurrentCount == 0)
             {
                 _logger.LogWarning("All semaphore slots are occupied. Request will be queued. UserType={@userType}", ApiUserType.Unknown);
-                context.Items["SemaphoreLimitUsed"] = "Wait";
+                context.Items["SemaphoreStatus"] = "Wait";
             }
 
             if (!await _requestSemaphore.WaitAsync(TimeSpan.FromSeconds(50)))
             {
                 _logger.LogError("Too many requests. Semaphore limit reached. UserType={@userType}", ApiUserType.Unknown);
-                context.Items["SemaphoreLimitUsed"] = "Timeout";
+                context.Items["SemaphoreStatus"] = "Timeout";
                 context.Response.StatusCode = (int)HttpStatusCode.ServiceUnavailable;
                 await context.Response.WriteAsync("Too many requests. Please try again later.");
                 return;

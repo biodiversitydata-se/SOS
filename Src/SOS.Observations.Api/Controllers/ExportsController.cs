@@ -451,7 +451,7 @@ namespace SOS.Observations.Api.Controllers
             }
             catch (SemaphoreTimeoutException)
             {
-                HttpContext.Items["SemaphoreLimitUsed"] = "Timeout";
+                HttpContext.Items["SemaphoreStatus"] = "Timeout";
                 _logger.LogError("Too many requests. Semaphore limit reached. Endpoint={endpoint}, UserType={@userType}", this.GetEndpointName(ControllerContext), this.GetApiUserType());
                 return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
             }
@@ -526,7 +526,7 @@ namespace SOS.Observations.Api.Controllers
             }
             catch (SemaphoreTimeoutException)
             {
-                HttpContext.Items["SemaphoreLimitUsed"] = "Timeout";
+                HttpContext.Items["SemaphoreStatus"] = "Timeout";
                 _logger.LogError("Too many requests. Semaphore limit reached. Endpoint={endpoint}, UserType={@userType}", this.GetEndpointName(ControllerContext), this.GetApiUserType());
                 return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
             }
@@ -608,7 +608,7 @@ namespace SOS.Observations.Api.Controllers
             }
             catch (SemaphoreTimeoutException)
             {
-                HttpContext.Items["SemaphoreLimitUsed"] = "Timeout";
+                HttpContext.Items["SemaphoreStatus"] = "Timeout";
                 _logger.LogError("Too many requests. Semaphore limit reached. Endpoint={endpoint}, UserType={@userType}", this.GetEndpointName(ControllerContext), this.GetApiUserType());
                 return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
             }
@@ -701,7 +701,7 @@ namespace SOS.Observations.Api.Controllers
             }
             catch (SemaphoreTimeoutException)
             {
-                HttpContext.Items["SemaphoreLimitUsed"] = "Timeout";
+                HttpContext.Items["SemaphoreStatus"] = "Timeout";
                 _logger.LogError("Too many requests. Semaphore limit reached. Endpoint={endpoint}, UserType={@userType}", this.GetEndpointName(ControllerContext), this.GetApiUserType());
                 return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
             }
@@ -1156,7 +1156,7 @@ namespace SOS.Observations.Api.Controllers
             }
             catch (SemaphoreTimeoutException)
             {
-                HttpContext.Items["SemaphoreLimitUsed"] = "Timeout";
+                HttpContext.Items["SemaphoreStatus"] = "Timeout";
                 _logger.LogError("Too many requests. Semaphore limit reached. Endpoint={endpoint}, UserType={@userType}", this.GetEndpointName(ControllerContext), this.GetApiUserType());
                 return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
             }
@@ -1230,7 +1230,7 @@ namespace SOS.Observations.Api.Controllers
             }
             catch (SemaphoreTimeoutException)
             {
-                HttpContext.Items["SemaphoreLimitUsed"] = "Timeout";
+                HttpContext.Items["SemaphoreStatus"] = "Timeout";
                 _logger.LogError("Too many requests. Semaphore limit reached. Endpoint={endpoint}, UserType={@userType}", this.GetEndpointName(ControllerContext), this.GetApiUserType());
                 return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
             }
@@ -1311,7 +1311,7 @@ namespace SOS.Observations.Api.Controllers
             }
             catch (SemaphoreTimeoutException)
             {
-                HttpContext.Items["SemaphoreLimitUsed"] = "Timeout";
+                HttpContext.Items["SemaphoreStatus"] = "Timeout";
                 _logger.LogError("Too many requests. Semaphore limit reached. Endpoint={endpoint}, UserType={@userType}", this.GetEndpointName(ControllerContext), this.GetApiUserType());
                 return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
             }
@@ -1403,7 +1403,7 @@ namespace SOS.Observations.Api.Controllers
             }
             catch (SemaphoreTimeoutException)
             {
-                HttpContext.Items["SemaphoreLimitUsed"] = "Timeout";
+                HttpContext.Items["SemaphoreStatus"] = "Timeout";
                 _logger.LogError("Too many requests. Semaphore limit reached. Endpoint={endpoint}, UserType={@userType}", this.GetEndpointName(ControllerContext), this.GetApiUserType());                
                 return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
             }

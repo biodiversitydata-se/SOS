@@ -202,9 +202,9 @@ namespace SOS.ElasticSearch.Proxy
                         diagnosticContext.Set("ApiUserType", apiUserType);
                     }
 
-                    if (httpContext.Items.TryGetValue("SemaphoreLimitUsed", out var semaphoreLimitUsed))
+                    if (httpContext.Items.TryGetValue("SemaphoreStatus", out var semaphoreStatus))
                     {
-                        diagnosticContext.Set("SemaphoreLimitUsed", semaphoreLimitUsed);
+                        diagnosticContext.Set("SemaphoreStatus", semaphoreStatus);
                     }
 
                     if (httpContext.Items.TryGetValue("SemaphoreWaitSeconds", out var semaphoreWaitSeconds))
