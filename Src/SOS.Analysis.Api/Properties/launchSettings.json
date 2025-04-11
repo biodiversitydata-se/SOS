@@ -1,15 +1,15 @@
-﻿{
+{
   "profiles": {
     "SOS.Analysis.Api (local)": {
       "commandName": "Project",
-      "dotnetRunMessages": true,
       "launchBrowser": true,
       "launchUrl": "swagger",
-      "applicationUrl": "http://localhost:5000",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "local",
         "DISABLE_HANGFIRE_INIT": "true"
-      }
+      },
+      "dotnetRunMessages": true,
+      "applicationUrl": "http://localhost:5000"
     },
     "SOS.Analysis.Api (Dev)": {
       "commandName": "IISExpress",
@@ -18,7 +18,7 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Dev",
         "DISABLE_HANGFIRE_INIT": "true",
-        "USE_LOCAL_HANGFIRE": "true"        
+        "USE_LOCAL_HANGFIRE": "true"
       },
       "applicationUrl": "http://localhost:5000"
     },
@@ -29,9 +29,17 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "ST",
         "DISABLE_HANGFIRE_INIT": "true",
-        "USE_LOCAL_HANGFIRE": "true"        
+        "USE_LOCAL_HANGFIRE": "true"
       },
       "applicationUrl": "http://localhost:5000"
+    }
+  },
+  "iisSettings": {
+    "windowsAuthentication": false,
+    "anonymousAuthentication": true,
+    "iisExpress": {
+      "applicationUrl": "http://localhost:61465/",
+      "sslPort": 44393
     }
   }
 }
