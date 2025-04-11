@@ -301,7 +301,7 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] bool sensitiveObservations = false,
             [FromQuery] bool? skipCache = false)
         {
-            var semaphore = await GetSemaphoreAsync(SemaphoreType.Aggregation);
+            var semaphore = await GetSemaphoreAsync(SemaphoreType.Aggregation, HttpContext);
             if (semaphore == null) return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
 
             try
@@ -456,7 +456,7 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] bool validateSearchFilter = false,
             [FromQuery] bool sensitiveObservations = false)
         {
-            var semaphore = await GetSemaphoreAsync(SemaphoreType.Aggregation);
+            var semaphore = await GetSemaphoreAsync(SemaphoreType.Aggregation, HttpContext);
             if (semaphore == null) return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
 
             try
@@ -562,7 +562,7 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] string translationCultureCode = "sv-SE",
             [FromQuery] bool sensitiveObservations = false)
         {
-            var semaphore = await GetSemaphoreAsync(SemaphoreType.Observation);
+            var semaphore = await GetSemaphoreAsync(SemaphoreType.Observation, HttpContext);
             if (semaphore == null) return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
 
             try
@@ -664,7 +664,7 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] string sortBy = null!,
             [FromQuery] SearchSortOrder sortOrder = SearchSortOrder.Asc)
         {
-            var semaphore = await GetSemaphoreAsync(SemaphoreType.Observation);
+            var semaphore = await GetSemaphoreAsync(SemaphoreType.Observation, HttpContext);
             if (semaphore == null) return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
 
             try
@@ -871,7 +871,7 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] string translationCultureCode = "sv-SE",
             [FromQuery] bool sensitiveObservations = false)
         {
-            var semaphore = await GetSemaphoreAsync(SemaphoreType.Aggregation);
+            var semaphore = await GetSemaphoreAsync(SemaphoreType.Aggregation, HttpContext);
             if (semaphore == null) return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
 
             try
@@ -1192,7 +1192,7 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] string translationCultureCode = "sv-SE",
             [FromQuery] bool sensitiveObservations = false)
         {
-            var semaphore = await GetSemaphoreAsync(SemaphoreType.Aggregation);
+            var semaphore = await GetSemaphoreAsync(SemaphoreType.Aggregation, HttpContext);
             if (semaphore == null) return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
 
             try
@@ -1288,7 +1288,7 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] string translationCultureCode = "sv-SE",
             [FromQuery] bool sensitiveObservations = false)
         {
-            var semaphore = await GetSemaphoreAsync(SemaphoreType.Aggregation);
+            var semaphore = await GetSemaphoreAsync(SemaphoreType.Aggregation, HttpContext);
             if (semaphore == null) return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
 
             try
@@ -1411,7 +1411,7 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] bool validateSearchFilter = false,
             [FromQuery] string translationCultureCode = "sv-SE")
         {
-            var semaphore = await GetSemaphoreAsync(SemaphoreType.Aggregation);
+            var semaphore = await GetSemaphoreAsync(SemaphoreType.Aggregation, HttpContext);
             if (semaphore == null) return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
 
             try
@@ -1493,7 +1493,7 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] MetricCoordinateSys metricCoordinateSys = MetricCoordinateSys.SWEREF99_TM,
             [FromQuery] OutputFormatDto outputFormat = OutputFormatDto.Json)
         {
-            var semaphore = await GetSemaphoreAsync(SemaphoreType.Aggregation);
+            var semaphore = await GetSemaphoreAsync(SemaphoreType.Aggregation, HttpContext);
             if (semaphore == null) return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
 
             try
@@ -1606,7 +1606,7 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] bool sensitiveObservations = false,
             [FromQuery] OutputFormatDto outputFormat = OutputFormatDto.Json)
         {
-            var semaphore = await GetSemaphoreAsync(SemaphoreType.Observation);
+            var semaphore = await GetSemaphoreAsync(SemaphoreType.Observation, HttpContext);
             if (semaphore == null) return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
 
             try
@@ -1751,7 +1751,7 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] string translationCultureCode = "sv-SE",
             [FromQuery] bool sensitiveObservations = false)
         {
-            var semaphore = await GetSemaphoreAsync(SemaphoreType.Aggregation);
+            var semaphore = await GetSemaphoreAsync(SemaphoreType.Aggregation, HttpContext);
             if (semaphore == null) return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
 
             try
@@ -1937,7 +1937,7 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] bool onlyAboveMyClearance = true,
             [FromQuery] bool? returnHttp4xxWhenNoPermissions = false)
         {
-            var semaphore = await GetSemaphoreAsync(SemaphoreType.Aggregation);
+            var semaphore = await GetSemaphoreAsync(SemaphoreType.Aggregation, HttpContext);
             if (semaphore == null) return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
 
             try
@@ -2031,7 +2031,7 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] bool sumUnderlyingTaxa = false,
             [FromQuery] bool? skipCache = false)
         {
-            var semaphore = await GetSemaphoreAsync(SemaphoreType.Aggregation);
+            var semaphore = await GetSemaphoreAsync(SemaphoreType.Aggregation, HttpContext);
             if (semaphore == null) return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
 
             try
@@ -2165,7 +2165,7 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] string sortBy = "SumObservationCount",
             [FromQuery] SearchSortOrder sortOrder = SearchSortOrder.Desc)
         {
-            var semaphore = await GetSemaphoreAsync(SemaphoreType.Aggregation);
+            var semaphore = await GetSemaphoreAsync(SemaphoreType.Aggregation, HttpContext);
             if (semaphore == null) return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
 
             try
@@ -2464,7 +2464,7 @@ namespace SOS.Observations.Api.Controllers
             }
         }
 
-        private async Task<SemaphoreSlim?> GetSemaphoreAsync(SemaphoreType semaphoreType)
+        private async Task<SemaphoreSlim?> GetSemaphoreAsync(SemaphoreType semaphoreType, HttpContext httpContext)
         {
             var userType = this.GetApiUserType();
             SemaphoreSlim semaphore;
@@ -2481,20 +2481,20 @@ namespace SOS.Observations.Api.Controllers
             if (semaphore.CurrentCount == 0)
             {
                 _logger.LogWarning("All semaphore slots are occupied. Request will be queued. Endpoint={endpoint}, UserType={@userType}", this.GetEndpointName(ControllerContext), userType);
-                HttpContext.Items["SemaphoreLimitUsed"] = "Wait";
+                httpContext.Items["SemaphoreLimitUsed"] = "Wait";
             }
 
             if (!await semaphore.WaitAsync(_semaphoreLimitManager.DefaultTimeout))
             {
                 _logger.LogError("Too many requests. Semaphore limit reached. Endpoint={endpoint}, UserType={@userType}", this.GetEndpointName(ControllerContext), userType);
-                HttpContext.Items["SemaphoreLimitUsed"] = "Timeout";
+                httpContext.Items["SemaphoreLimitUsed"] = "Timeout";
                 return null;
             }
 
             semaphoreTime.Stop();
             if (semaphoreTime.ElapsedMilliseconds > 1000)
             {
-                HttpContext.Items["SemaphoreWaitSeconds"] = (int)Math.Round(semaphoreTime.ElapsedMilliseconds / 1000.0);
+                httpContext.Items["SemaphoreWaitSeconds"] = (int)Math.Round(semaphoreTime.ElapsedMilliseconds / 1000.0);
             }
 
             return semaphore;

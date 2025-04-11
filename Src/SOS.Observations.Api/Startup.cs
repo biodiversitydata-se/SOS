@@ -652,9 +652,11 @@ namespace SOS.Observations.Api
             {
                 app.UseHsts();
             }
-#if DEBUG
-            configuration.DisableTelemetry = true;
-#endif
+
+            if (env.EnvironmentName.ToLower() != "prod")
+            {
+                configuration.DisableTelemetry = true;
+            }
 
             app.UseMiddleware<LogApiUserTypeMiddleware>();
             if (applicationInsightsConfiguration.EnableRequestBodyLogging)
