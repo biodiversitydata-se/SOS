@@ -28,6 +28,11 @@ public static class UserTypeHelper
         {
             requestingSystem = requestingSystemVal.ToString();
         }
+        else if (request.Headers.TryGetValue("Requesting-System", out var requestingSystemV))
+        {
+            requestingSystem = requestingSystemV.ToString();
+        }
+
         if (requestingSystem != null)
         {
             if (requestingSystem.StartsWith("Artfakta", System.StringComparison.InvariantCultureIgnoreCase))

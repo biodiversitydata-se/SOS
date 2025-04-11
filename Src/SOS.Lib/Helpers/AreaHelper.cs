@@ -33,7 +33,7 @@ namespace SOS.Lib.Helpers
             AreaType.EconomicZoneOfSweden
         };
 
-        private IDictionary<string, PositionLocation> _featureCache;
+        private ConcurrentDictionary<string, PositionLocation> _featureCache;
         private readonly AreaConfiguration _areaConfiguration;
         private readonly IAreaRepository _processedAreaRepository;
         private STRtree<IFeature> _strTree;
@@ -69,67 +69,41 @@ namespace SOS.Lib.Helpers
             // Round coordinates to 5 decimals (roughly 1m)
             var key = $"{Math.Round(decimalLongitude, 5)}-{Math.Round(decimalLatitude, 5)}";
 
-            // Try to get areas from cache. If areas not found for that position, try to get from repository
-            if (!_featureCache.TryGetValue(key, out var positionLocation))
+            return _featureCache.GetOrAdd(key, _ =>
             {
-                lock (_lockObject)
-                {
-                    var features = GetPointFeatures(decimalLongitude, decimalLatitude);
-                    positionLocation = new PositionLocation();
+                var features = GetPointFeatures(decimalLongitude, decimalLatitude);
+                var positionLocation = new PositionLocation();
 
-                    if (features != null)
+                foreach (var feature in features ?? Enumerable.Empty<IFeature>())
+                {
+                    if (Enum.TryParse(typeof(AreaType), feature.Attributes.GetOptionalValue("areaType")?.ToString(), out var areaTypeObj))
                     {
-                        foreach (var feature in features)
+                        var areaType = (AreaType)areaTypeObj;
+                        var featureId = feature.Attributes.GetOptionalValue("featureId")?.ToString();
+                        var name = feature.Attributes.GetOptionalValue("name")?.ToString();
+
+                        var area = string.IsNullOrEmpty(featureId) ? null! : new Area
                         {
-                            if (Enum.TryParse(typeof(AreaType), feature.Attributes.GetOptionalValue("areaType").ToString(),
-                                out var areaType))
-                            {
-                                var featureId = feature.Attributes.GetOptionalValue("featureId")?.ToString();
-                                var name = feature.Attributes.GetOptionalValue("name")?.ToString();
-                                var area = string.IsNullOrEmpty(featureId) ? null! : new Area
-                                {
-                                    FeatureId = featureId,
-                                    Name = string.IsNullOrEmpty(name) ? null : name // Make sure name equals null if empty. To prevent empty string and null to be handled different when aggregation on the field
-                                };
-                                switch ((AreaType)areaType)
-                                {
-                                    case AreaType.Atlas5x5:
-                                        positionLocation.Atlas5x5 = area;
-                                        break;
-                                    case AreaType.Atlas10x10:
-                                        positionLocation.Atlas10x10 = area;
-                                        break;
-                                    case AreaType.CountryRegion:
-                                        positionLocation.CountryRegion = area;
-                                        break;
-                                    case AreaType.County:
-                                        positionLocation.County = area;
-                                        break;
-                                    case AreaType.Municipality:
-                                        positionLocation.Municipality = area;
-                                        break;
-                                    case AreaType.Parish:
-                                        positionLocation.Parish = area;
-                                        break;
-                                    case AreaType.Province:
-                                        positionLocation.Province = area;
-                                        break;
-                                    case AreaType.EconomicZoneOfSweden:
-                                        positionLocation.EconomicZoneOfSweden = true;
-                                        break;
-                                }
-                            }
+                            FeatureId = featureId,
+                            Name = string.IsNullOrEmpty(name) ? null : name
+                        };
+
+                        switch (areaType)
+                        {
+                            case AreaType.Atlas5x5: positionLocation.Atlas5x5 = area; break;
+                            case AreaType.Atlas10x10: positionLocation.Atlas10x10 = area; break;
+                            case AreaType.CountryRegion: positionLocation.CountryRegion = area; break;
+                            case AreaType.County: positionLocation.County = area; break;
+                            case AreaType.Municipality: positionLocation.Municipality = area; break;
+                            case AreaType.Parish: positionLocation.Parish = area; break;
+                            case AreaType.Province: positionLocation.Province = area; break;
+                            case AreaType.EconomicZoneOfSweden: positionLocation.EconomicZoneOfSweden = true; break;
                         }
                     }
-
-                    if (!_featureCache.ContainsKey(key))
-                    {
-                        _featureCache.TryAdd(key, positionLocation);
-                    }
                 }
-            }
 
-            return positionLocation;
+                return positionLocation;
+            });
         }
 
         private static string GetProvincePartIdByCoordinate(string provinceFeatureId)
@@ -270,7 +244,7 @@ namespace SOS.Lib.Helpers
                             geometry = sweref99TmGeom.Transform(CoordinateSys.SWEREF99_TM, CoordinateSys.WGS84, false);
                         }
 
-                        var feature = geometry.ToFeature(attributes);
+                        var feature = geometry.ToFeature(attributes);                        
                         _strTree.Insert(feature.Geometry.EnvelopeInternal, feature);
                     }
 

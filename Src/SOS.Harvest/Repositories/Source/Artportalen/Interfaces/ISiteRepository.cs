@@ -25,7 +25,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen.Interfaces
         /// Get id from sites connected to more than one sighting
         /// </summary>
         /// <returns></returns>
-        Task<IEnumerable<int>> GetFreqventlyUsedIdsAsync();
+        Task<IEnumerable<int>> GetFrequentlyUsedIdsAsync();
 
         /// <summary>
         /// Get site geometry

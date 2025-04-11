@@ -39,11 +39,19 @@ namespace SOS.ElasticSearch.Proxy.ApplicationInsights
                 }
             }
 
-            if (platformContext.Items.TryGetValue("SemaphoreLimitUsed", out object? semaphoreLimitUsed))
+            if (platformContext.Items.TryGetValue("SemaphoreStatus", out object? semaphoreStatus))
             {
-                if (semaphoreLimitUsed != null && !telemetry.Context.GlobalProperties.ContainsKey("SemaphoreLimitUsed"))
+                if (semaphoreStatus != null && !telemetry.Context.GlobalProperties.ContainsKey("SemaphoreStatus"))
                 {
-                    telemetry.Context.GlobalProperties.Add("SemaphoreLimitUsed", semaphoreLimitUsed.ToString());
+                    telemetry.Context.GlobalProperties.Add("SemaphoreStatus", semaphoreStatus.ToString());
+                }
+            }
+
+            if (platformContext.Items.TryGetValue("SemaphoreWaitSeconds", out object? semaphoreWaitSeconds))
+            {
+                if (semaphoreWaitSeconds != null && !telemetry.Context.GlobalProperties.ContainsKey("SemaphoreWaitSeconds"))
+                {
+                    telemetry.Context.GlobalProperties.Add("SemaphoreWaitSeconds", semaphoreWaitSeconds.ToString());
                 }
             }
 

@@ -39,6 +39,7 @@ namespace SOS.Administration.Api
     public class Startup
     {
         private bool _isDevelopment;
+        private bool _useLocalHangfire = false;
 
         /// <summary>
         ///     Start up
@@ -61,6 +62,7 @@ namespace SOS.Administration.Api
                 builder.AddUserSecrets<Startup>();
             }
 
+            _useLocalHangfire = GetEnvironmentBool(environmentVariable: "USE_LOCAL_HANGFIRE");
             Configuration = builder.Build();
             Settings.Init(Configuration); // or fail early!
         }
@@ -138,7 +140,11 @@ namespace SOS.Administration.Api
             services.AddHealthChecks().AddCheck<HealthCheck>("CustomHealthCheck");
 
             // Hangfire
-            var hangfireDbConfiguration = Settings.HangfireDbConfiguration;
+            var hangfireDbConfiguration = Settings.HangfireDbConfiguration;            
+            if (_useLocalHangfire)
+            {
+                hangfireDbConfiguration = Settings.LocalHangfireDbConfiguration;
+            }
 
             services.AddHangfire(configuration =>
                 configuration
@@ -267,6 +273,11 @@ namespace SOS.Administration.Api
                         diagnosticContext.Set("Handler", handler);
                     }
 
+                    if (httpContext.Items.TryGetValue("ApiUserType", out var apiUserType))
+                    {
+                        diagnosticContext.Set("ApiUserType", apiUserType);
+                    }
+
                     try
                     {
                         var authHeader = httpContext.Request.Headers["Authorization"].FirstOrDefault();
@@ -293,6 +304,25 @@ namespace SOS.Administration.Api
             });
 
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
+        }
+
+        private static bool GetEnvironmentBool(string environmentVariable, bool defaultValue = false)
+        {
+            string value = Environment.GetEnvironmentVariable(environmentVariable);
+
+            if (value != null)
+            {
+                if (bool.TryParse(value, out var boolValue))
+                {
+                    return boolValue;
+                }
+
+                return defaultValue;
+            }
+            else
+            {
+                return defaultValue;
+            }
         }
     }
 

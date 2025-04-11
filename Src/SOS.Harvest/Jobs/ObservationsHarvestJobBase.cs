@@ -7,6 +7,7 @@ using SOS.Harvest.Harvesters.Interfaces;
 using SOS.Harvest.Managers.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
+using SOS.Lib.Helpers;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Shared;
@@ -242,8 +243,8 @@ namespace SOS.Harvest.Jobs
                     p.SupportIncrementalHarvest
                 )
             );
-
-            _logger.LogInformation($"Start harvest job ({mode})");
+            
+            _logger.LogInformation($"Start harvest job ({mode}). {LogHelper.GetMemoryUsageSummary()}");
             await HarvestResources(mode, cancellationToken);
             var harvestCount = await HarvestAsync(harvestProviders, mode, fromDate, cancellationToken);
 
@@ -253,7 +254,7 @@ namespace SOS.Harvest.Jobs
                 throw new Exception($"Harvest job ({mode}) failed");
             }
 
-            _logger.LogInformation($"Finish harvest job ({mode})");
+            _logger.LogInformation($"Finish harvest job ({mode}). {LogHelper.GetMemoryUsageSummary()}");
 
             return harvestCount;
         }

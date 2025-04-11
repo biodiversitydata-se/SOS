@@ -1,5 +1,17 @@
 # Changelog
 
+## [2025.04.10]
+
+### `Fixed`
+- Prevent duplicate harvest of Artportalen observations.
+
+### `Added`
+- Rate limiting by using semaphores in order to limit maximum number of concurrent requests.
+
+### `Changed`
+- iNaturalist harvest is now using the iNaturalist API instead of GBIF API.
+- Change download limit to 50k observations in order to improve general performance.
+
 ## [2025.03.18]
 
 ### `Added`

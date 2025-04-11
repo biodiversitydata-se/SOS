@@ -12,6 +12,7 @@ using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Enums;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Swagger;
 using SOS.Observations.Api.Configuration;
 using SOS.Observations.Api.Helpers;
@@ -26,6 +27,7 @@ using SOS.Shared.Api.Utilities.Objects.Interfaces;
 using SOS.Shared.Api.Validators.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Security.Cryptography;
@@ -293,21 +295,9 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] bool sensitiveObservations = false,
             [FromQuery] bool? skipCache = false)
         {
-            var userType = this.GetApiUserType();
-            var semaphore = _semaphoreLimitManager.GetAggregationSemaphore(userType);
-            HttpContext.Items["SemaphoreLimitUsed"] = "no";
-            if (semaphore.CurrentCount == 0)
-            {
-                _logger.LogWarning("All semaphore slots are occupied. Request will be queued. Endpoint={endpoint}, UserType={@userType}", this.GetEndpointName(ControllerContext), userType);
-                HttpContext.Items["SemaphoreLimitUsed"] = "wait";
-            }
-
-            if (!await semaphore.WaitAsync(_semaphoreLimitManager.DefaultTimeout))
-            {
-                _logger.LogError("Too many requests. Semaphore limit reached. Endpoint={endpoint}, UserType={@userType}", this.GetEndpointName(ControllerContext), userType);
-                HttpContext.Items["SemaphoreLimitUsed"] = "timeout";
-                return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
-            }
+            var semaphoreResult = await GetSemaphoreAsync(SemaphoreType.Aggregation, HttpContext);
+            LogHelper.AddSemaphoreHttpContextItems(semaphoreResult, HttpContext);
+            if (semaphoreResult?.Semaphore == null) return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
 
             try
             {
@@ -402,7 +392,7 @@ namespace SOS.Observations.Api.Controllers
             }
             finally
             {
-                semaphore.Release();
+                semaphoreResult.Semaphore.Release();
             }
         }
 
@@ -461,21 +451,9 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] bool validateSearchFilter = false,
             [FromQuery] bool sensitiveObservations = false)
         {
-            var userType = this.GetApiUserType();
-            var semaphore = _semaphoreLimitManager.GetAggregationSemaphore(userType);
-            HttpContext.Items["SemaphoreLimitUsed"] = "no";
-            if (semaphore.CurrentCount == 0)
-            {
-                _logger.LogWarning("All semaphore slots are occupied. Request will be queued. Endpoint={endpoint}, UserType={@userType}", this.GetEndpointName(ControllerContext), userType);
-                HttpContext.Items["SemaphoreLimitUsed"] = "wait";
-            }
-
-            if (!await semaphore.WaitAsync(_semaphoreLimitManager.DefaultTimeout))
-            {
-                _logger.LogError("Too many requests. Semaphore limit reached. Endpoint={endpoint}, UserType={@userType}", this.GetEndpointName(ControllerContext), userType);
-                HttpContext.Items["SemaphoreLimitUsed"] = "timeout";
-                return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
-            }
+            var semaphoreResult = await GetSemaphoreAsync(SemaphoreType.Aggregation, HttpContext);
+            LogHelper.AddSemaphoreHttpContextItems(semaphoreResult, HttpContext);
+            if (semaphoreResult?.Semaphore == null) return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
 
             try
             {
@@ -530,7 +508,7 @@ namespace SOS.Observations.Api.Controllers
             }
             finally
             {
-                semaphore.Release();
+                semaphoreResult.Semaphore.Release();
             }
         }
 
@@ -580,21 +558,9 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] string translationCultureCode = "sv-SE",
             [FromQuery] bool sensitiveObservations = false)
         {
-            var userType = this.GetApiUserType();
-            var semaphore = _semaphoreLimitManager.GetObservationSemaphore(userType);
-            HttpContext.Items["SemaphoreLimitUsed"] = "no";
-            if (semaphore.CurrentCount == 0)
-            {
-                _logger.LogWarning("All semaphore slots are occupied. Request will be queued. Endpoint={endpoint}, UserType={@userType}", this.GetEndpointName(ControllerContext), userType);
-                HttpContext.Items["SemaphoreLimitUsed"] = "wait";
-            }
-
-            if (!await semaphore.WaitAsync(_semaphoreLimitManager.DefaultTimeout))
-            {
-                _logger.LogError("Too many requests. Semaphore limit reached. Endpoint={endpoint}, UserType={@userType}", this.GetEndpointName(ControllerContext), userType);
-                HttpContext.Items["SemaphoreLimitUsed"] = "timeout";
-                return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
-            }
+            var semaphoreResult = await GetSemaphoreAsync(SemaphoreType.Observation, HttpContext);
+            LogHelper.AddSemaphoreHttpContextItems(semaphoreResult, HttpContext);
+            if (semaphoreResult.Semaphore == null) return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
 
             try
             {
@@ -642,7 +608,7 @@ namespace SOS.Observations.Api.Controllers
             }
             finally
             {
-                semaphore.Release();
+                semaphoreResult.Semaphore.Release();
             }
         }
 
@@ -695,21 +661,9 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] string sortBy = null!,
             [FromQuery] SearchSortOrder sortOrder = SearchSortOrder.Asc)
         {
-            var userType = this.GetApiUserType();
-            var semaphore = _semaphoreLimitManager.GetObservationSemaphore(userType);
-            HttpContext.Items["SemaphoreLimitUsed"] = "no";
-            if (semaphore.CurrentCount == 0)
-            {
-                _logger.LogWarning("All semaphore slots are occupied. Request will be queued. Endpoint={endpoint}, UserType={@userType}", this.GetEndpointName(ControllerContext), userType);
-                HttpContext.Items["SemaphoreLimitUsed"] = "wait";
-            }
-
-            if (!await semaphore.WaitAsync(_semaphoreLimitManager.DefaultTimeout))
-            {
-                _logger.LogError("Too many requests. Semaphore limit reached. Endpoint={endpoint}, UserType={@userType}", this.GetEndpointName(ControllerContext), userType);
-                HttpContext.Items["SemaphoreLimitUsed"] = "timeout";
-                return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
-            }
+            var semaphoreResult = await GetSemaphoreAsync(SemaphoreType.Observation, HttpContext);
+            LogHelper.AddSemaphoreHttpContextItems(semaphoreResult, HttpContext);
+            if (semaphoreResult.Semaphore == null) return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
 
             try
             {
@@ -815,7 +769,7 @@ namespace SOS.Observations.Api.Controllers
             }
             finally
             {
-                semaphore.Release();
+                semaphoreResult.Semaphore.Release();
             }
         }
 
@@ -915,21 +869,9 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] string translationCultureCode = "sv-SE",
             [FromQuery] bool sensitiveObservations = false)
         {
-            var userType = this.GetApiUserType();
-            var semaphore = _semaphoreLimitManager.GetAggregationSemaphore(userType);
-            HttpContext.Items["SemaphoreLimitUsed"] = "no";
-            if (semaphore.CurrentCount == 0)
-            {
-                _logger.LogWarning("All semaphore slots are occupied. Request will be queued. Endpoint={endpoint}, UserType={@userType}", this.GetEndpointName(ControllerContext), userType);
-                HttpContext.Items["SemaphoreLimitUsed"] = "wait";
-            }
-
-            if (!await semaphore.WaitAsync(_semaphoreLimitManager.DefaultTimeout))
-            {
-                _logger.LogError("Too many requests. Semaphore limit reached. Endpoint={endpoint}, UserType={@userType}", this.GetEndpointName(ControllerContext), userType);
-                HttpContext.Items["SemaphoreLimitUsed"] = "timeout";
-                return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
-            }
+            var semaphoreResult = await GetSemaphoreAsync(SemaphoreType.Aggregation, HttpContext);
+            LogHelper.AddSemaphoreHttpContextItems(semaphoreResult, HttpContext);
+            if (semaphoreResult.Semaphore == null) return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
 
             try
             {
@@ -1000,7 +942,7 @@ namespace SOS.Observations.Api.Controllers
             }
             finally
             {
-                semaphore.Release();
+                semaphoreResult.Semaphore.Release();
             }
         }
 
@@ -1249,21 +1191,9 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] string translationCultureCode = "sv-SE",
             [FromQuery] bool sensitiveObservations = false)
         {
-            var userType = this.GetApiUserType();
-            var semaphore = _semaphoreLimitManager.GetAggregationSemaphore(userType);
-            HttpContext.Items["SemaphoreLimitUsed"] = "no";
-            if (semaphore.CurrentCount == 0)
-            {
-                _logger.LogWarning("All semaphore slots are occupied. Request will be queued. Endpoint={endpoint}, UserType={@userType}", this.GetEndpointName(ControllerContext), userType);
-                HttpContext.Items["SemaphoreLimitUsed"] = "wait";
-            }
-
-            if (!await semaphore.WaitAsync(_semaphoreLimitManager.DefaultTimeout))
-            {
-                _logger.LogError("Too many requests. Semaphore limit reached. Endpoint={endpoint}, UserType={@userType}", this.GetEndpointName(ControllerContext), userType);
-                HttpContext.Items["SemaphoreLimitUsed"] = "timeout";
-                return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
-            }
+            var semaphoreResult = await GetSemaphoreAsync(SemaphoreType.Aggregation, HttpContext);
+            LogHelper.AddSemaphoreHttpContextItems(semaphoreResult, HttpContext);
+            if (semaphoreResult.Semaphore == null) return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
 
             try
             {
@@ -1327,7 +1257,7 @@ namespace SOS.Observations.Api.Controllers
             }
             finally
             {
-                semaphore.Release();
+                semaphoreResult.Semaphore.Release();
             }
         }
 
@@ -1358,21 +1288,9 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] string translationCultureCode = "sv-SE",
             [FromQuery] bool sensitiveObservations = false)
         {
-            var userType = this.GetApiUserType();
-            var semaphore = _semaphoreLimitManager.GetAggregationSemaphore(userType);
-            HttpContext.Items["SemaphoreLimitUsed"] = "no";
-            if (semaphore.CurrentCount == 0)
-            {
-                _logger.LogWarning("All semaphore slots are occupied. Request will be queued. Endpoint={endpoint}, UserType={@userType}", this.GetEndpointName(ControllerContext), userType);
-                HttpContext.Items["SemaphoreLimitUsed"] = "wait";
-            }
-
-            if (!await semaphore.WaitAsync(_semaphoreLimitManager.DefaultTimeout))
-            {
-                _logger.LogError("Too many requests. Semaphore limit reached. Endpoint={endpoint}, UserType={@userType}", this.GetEndpointName(ControllerContext), userType);
-                HttpContext.Items["SemaphoreLimitUsed"] = "timeout";
-                return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
-            }
+            var semaphoreResult = await GetSemaphoreAsync(SemaphoreType.Aggregation, HttpContext);
+            LogHelper.AddSemaphoreHttpContextItems(semaphoreResult, HttpContext);
+            if (semaphoreResult.Semaphore == null) return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
 
             try
             {
@@ -1430,7 +1348,7 @@ namespace SOS.Observations.Api.Controllers
             }
             finally
             {
-                semaphore.Release();
+                semaphoreResult.Semaphore.Release();
             }
         }
 
@@ -1494,21 +1412,9 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] bool validateSearchFilter = false,
             [FromQuery] string translationCultureCode = "sv-SE")
         {
-            var userType = this.GetApiUserType();
-            var semaphore = _semaphoreLimitManager.GetAggregationSemaphore(userType);
-            HttpContext.Items["SemaphoreLimitUsed"] = "no";
-            if (semaphore.CurrentCount == 0)
-            {
-                _logger.LogWarning("All semaphore slots are occupied. Request will be queued. Endpoint={endpoint}, UserType={@userType}", this.GetEndpointName(ControllerContext), userType);
-                HttpContext.Items["SemaphoreLimitUsed"] = "wait";
-            }
-
-            if (!await semaphore.WaitAsync(_semaphoreLimitManager.DefaultTimeout))
-            {
-                _logger.LogError("Too many requests. Semaphore limit reached. Endpoint={endpoint}, UserType={@userType}", this.GetEndpointName(ControllerContext), userType);
-                HttpContext.Items["SemaphoreLimitUsed"] = "timeout";
-                return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
-            }
+            var semaphoreResult = await GetSemaphoreAsync(SemaphoreType.Aggregation, HttpContext);
+            LogHelper.AddSemaphoreHttpContextItems(semaphoreResult, HttpContext);
+            if (semaphoreResult.Semaphore == null) return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
 
             try
             {
@@ -1555,9 +1461,9 @@ namespace SOS.Observations.Api.Controllers
             }
             finally
             {
-                semaphore.Release();
+                semaphoreResult.Semaphore.Release();
             }
-        }
+        }               
 
         /// <summary>
         /// Aggregates observations into grid cells. Each grid cell contains the number
@@ -1589,21 +1495,9 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] MetricCoordinateSys metricCoordinateSys = MetricCoordinateSys.SWEREF99_TM,
             [FromQuery] OutputFormatDto outputFormat = OutputFormatDto.Json)
         {
-            var userType = this.GetApiUserType();
-            var semaphore = _semaphoreLimitManager.GetAggregationSemaphore(userType);
-            HttpContext.Items["SemaphoreLimitUsed"] = "no";
-            if (semaphore.CurrentCount == 0)
-            {
-                _logger.LogWarning("All semaphore slots are occupied. Request will be queued. Endpoint={endpoint}, UserType={@userType}", this.GetEndpointName(ControllerContext), userType);
-                HttpContext.Items["SemaphoreLimitUsed"] = "wait";
-            }
-
-            if (!await semaphore.WaitAsync(_semaphoreLimitManager.DefaultTimeout))
-            {
-                _logger.LogError("Too many requests. Semaphore limit reached. Endpoint={endpoint}, UserType={@userType}", this.GetEndpointName(ControllerContext), userType);
-                HttpContext.Items["SemaphoreLimitUsed"] = "timeout";
-                return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
-            }
+            var semaphoreResult = await GetSemaphoreAsync(SemaphoreType.Aggregation, HttpContext);
+            LogHelper.AddSemaphoreHttpContextItems(semaphoreResult, HttpContext);
+            if (semaphoreResult.Semaphore == null) return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
 
             try
             {
@@ -1663,7 +1557,7 @@ namespace SOS.Observations.Api.Controllers
             }
             finally
             {
-                semaphore.Release();
+                semaphoreResult.Semaphore.Release();
             }
         }
 
@@ -1715,21 +1609,9 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] bool sensitiveObservations = false,
             [FromQuery] OutputFormatDto outputFormat = OutputFormatDto.Json)
         {
-            var userType = this.GetApiUserType();
-            var semaphore = _semaphoreLimitManager.GetObservationSemaphore(userType);
-            HttpContext.Items["SemaphoreLimitUsed"] = "no";
-            if (semaphore.CurrentCount == 0)
-            {
-                _logger.LogWarning("All semaphore slots are occupied. Request will be queued. Endpoint={endpoint}, UserType={@userType}", this.GetEndpointName(ControllerContext), userType);
-                HttpContext.Items["SemaphoreLimitUsed"] = "wait";
-            }
-
-            if (!await semaphore.WaitAsync(_semaphoreLimitManager.DefaultTimeout))
-            {
-                _logger.LogError("Too many requests. Semaphore limit reached. Endpoint={endpoint}, UserType={@userType}", this.GetEndpointName(ControllerContext), userType);
-                HttpContext.Items["SemaphoreLimitUsed"] = "timeout";
-                return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
-            }
+            var semaphoreResult = await GetSemaphoreAsync(SemaphoreType.Observation, HttpContext);
+            LogHelper.AddSemaphoreHttpContextItems(semaphoreResult, HttpContext);
+            if (semaphoreResult.Semaphore == null) return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
 
             try
             {
@@ -1791,7 +1673,7 @@ namespace SOS.Observations.Api.Controllers
             }
             finally
             {
-                semaphore.Release();
+                semaphoreResult.Semaphore.Release();
             }
         }
 
@@ -1873,21 +1755,9 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] string translationCultureCode = "sv-SE",
             [FromQuery] bool sensitiveObservations = false)
         {
-            var userType = this.GetApiUserType();
-            var semaphore = _semaphoreLimitManager.GetAggregationSemaphore(userType);
-            HttpContext.Items["SemaphoreLimitUsed"] = "no";
-            if (semaphore.CurrentCount == 0)
-            {
-                _logger.LogWarning("All semaphore slots are occupied. Request will be queued. Endpoint={endpoint}, UserType={@userType}", this.GetEndpointName(ControllerContext), userType);
-                HttpContext.Items["SemaphoreLimitUsed"] = "wait";
-            }
-
-            if (!await semaphore.WaitAsync(_semaphoreLimitManager.DefaultTimeout))
-            {
-                _logger.LogError("Too many requests. Semaphore limit reached. Endpoint={endpoint}, UserType={@userType}", this.GetEndpointName(ControllerContext), userType);
-                HttpContext.Items["SemaphoreLimitUsed"] = "timeout";
-                return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
-            }
+            var semaphoreResult = await GetSemaphoreAsync(SemaphoreType.Aggregation, HttpContext);
+            LogHelper.AddSemaphoreHttpContextItems(semaphoreResult, HttpContext);
+            if (semaphoreResult.Semaphore == null) return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
 
             try
             {
@@ -1940,7 +1810,7 @@ namespace SOS.Observations.Api.Controllers
             }
             finally
             {
-                semaphore.Release();
+                semaphoreResult.Semaphore.Release();
             }
         }
 
@@ -2072,21 +1942,9 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] bool onlyAboveMyClearance = true,
             [FromQuery] bool? returnHttp4xxWhenNoPermissions = false)
         {
-            var userType = this.GetApiUserType();
-            var semaphore = _semaphoreLimitManager.GetAggregationSemaphore(userType);
-            HttpContext.Items["SemaphoreLimitUsed"] = "no";
-            if (semaphore.CurrentCount == 0)
-            {
-                _logger.LogWarning("All semaphore slots are occupied. Request will be queued. Endpoint={endpoint}, UserType={@userType}", this.GetEndpointName(ControllerContext), userType);
-                HttpContext.Items["SemaphoreLimitUsed"] = "wait";
-            }
-
-            if (!await semaphore.WaitAsync(_semaphoreLimitManager.DefaultTimeout))
-            {
-                _logger.LogError("Too many requests. Semaphore limit reached. Endpoint={endpoint}, UserType={@userType}", this.GetEndpointName(ControllerContext), userType);
-                HttpContext.Items["SemaphoreLimitUsed"] = "timeout";
-                return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
-            }
+            var semaphoreResult = await GetSemaphoreAsync(SemaphoreType.Aggregation, HttpContext);
+            LogHelper.AddSemaphoreHttpContextItems(semaphoreResult, HttpContext);
+            if (semaphoreResult.Semaphore == null) return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
 
             try
             {
@@ -2139,7 +1997,7 @@ namespace SOS.Observations.Api.Controllers
             }
             finally
             {
-                semaphore.Release();
+                semaphoreResult.Semaphore.Release();
             }
         }
 
@@ -2179,21 +2037,9 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] bool sumUnderlyingTaxa = false,
             [FromQuery] bool? skipCache = false)
         {
-            var userType = this.GetApiUserType();
-            var semaphore = _semaphoreLimitManager.GetAggregationSemaphore(userType);
-            HttpContext.Items["SemaphoreLimitUsed"] = "no";
-            if (semaphore.CurrentCount == 0)
-            {
-                _logger.LogWarning("All semaphore slots are occupied. Request will be queued. Endpoint={endpoint}, UserType={@userType}", this.GetEndpointName(ControllerContext), userType);
-                HttpContext.Items["SemaphoreLimitUsed"] = "wait";
-            }
-
-            if (!await semaphore.WaitAsync(_semaphoreLimitManager.DefaultTimeout))
-            {
-                _logger.LogError("Too many requests. Semaphore limit reached. Endpoint={endpoint}, UserType={@userType}", this.GetEndpointName(ControllerContext), userType);
-                HttpContext.Items["SemaphoreLimitUsed"] = "timeout";
-                return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
-            }
+            var semaphoreResult = await GetSemaphoreAsync(SemaphoreType.Aggregation, HttpContext);
+            LogHelper.AddSemaphoreHttpContextItems(semaphoreResult, HttpContext);
+            if (semaphoreResult.Semaphore == null) return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
 
             try
             {
@@ -2296,7 +2142,7 @@ namespace SOS.Observations.Api.Controllers
             }
             finally
             {
-                semaphore.Release();
+                semaphoreResult.Semaphore.Release();
             }
         }
 
@@ -2326,21 +2172,9 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] string sortBy = "SumObservationCount",
             [FromQuery] SearchSortOrder sortOrder = SearchSortOrder.Desc)
         {
-            var userType = this.GetApiUserType();
-            var semaphore = _semaphoreLimitManager.GetAggregationSemaphore(userType);
-            HttpContext.Items["SemaphoreLimitUsed"] = "no";
-            if (semaphore.CurrentCount == 0)
-            {
-                _logger.LogWarning("All semaphore slots are occupied. Request will be queued. Endpoint={endpoint}, UserType={@userType}", this.GetEndpointName(ControllerContext), userType);
-                HttpContext.Items["SemaphoreLimitUsed"] = "wait";
-            }
-
-            if (!await semaphore.WaitAsync(_semaphoreLimitManager.DefaultTimeout))
-            {
-                _logger.LogError("Too many requests. Semaphore limit reached. Endpoint={endpoint}, UserType={@userType}", this.GetEndpointName(ControllerContext), userType);
-                HttpContext.Items["SemaphoreLimitUsed"] = "timeout";
-                return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
-            }
+            var semaphoreResult = await GetSemaphoreAsync(SemaphoreType.Aggregation, HttpContext);
+            LogHelper.AddSemaphoreHttpContextItems(semaphoreResult, HttpContext);
+            if (semaphoreResult.Semaphore == null) return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
 
             try
             {
@@ -2385,7 +2219,7 @@ namespace SOS.Observations.Api.Controllers
             }
             finally
             {
-                semaphore.Release();
+                semaphoreResult.Semaphore.Release();
             }
         }
 
@@ -2636,6 +2470,38 @@ namespace SOS.Observations.Api.Controllers
                 _logger.LogError(e, "Failed to get user year month count");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
+        }
+
+        private async Task<SemaphoreResult> GetSemaphoreAsync(SemaphoreType semaphoreType, HttpContext httpContext)
+        {
+            var semaphoreResult = new SemaphoreResult();
+            var userType = this.GetApiUserType();            
+            if (semaphoreType == SemaphoreType.Aggregation)
+            {
+                semaphoreResult.Semaphore = _semaphoreLimitManager.GetAggregationSemaphore(userType);
+            }
+            else
+            {
+                semaphoreResult.Semaphore = _semaphoreLimitManager.GetObservationSemaphore(userType);
+            }
+
+            var semaphoreTime = Stopwatch.StartNew();
+            if (semaphoreResult.Semaphore.CurrentCount == 0)
+            {
+                _logger.LogWarning("All semaphore slots are occupied. Request will be queued. Endpoint={endpoint}, UserType={@userType}", this.GetEndpointName(ControllerContext), userType);
+                semaphoreResult.SemaphoreStatus = "Wait";                
+            }
+
+            if (!await semaphoreResult.Semaphore.WaitAsync(_semaphoreLimitManager.DefaultTimeout).ConfigureAwait(true))
+            {
+                _logger.LogError("Too many requests. Semaphore limit reached. Endpoint={endpoint}, UserType={@userType}", this.GetEndpointName(ControllerContext), userType);                
+                semaphoreResult.SemaphoreStatus = "Timeout";
+                return semaphoreResult;
+            }
+
+            semaphoreTime.Stop();
+            semaphoreResult.SemaphoreWaitTime = semaphoreTime.Elapsed;            
+            return semaphoreResult;
         }
     }
 }

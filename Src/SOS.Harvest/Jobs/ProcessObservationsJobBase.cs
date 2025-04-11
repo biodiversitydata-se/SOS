@@ -555,7 +555,7 @@ namespace SOS.Harvest.Jobs
                     await PostProcessingAsync(dataProvidersToProcess, taxonById!, (result.Sum(s => s.Value.PublicCount), result.Sum(s => s.Value.ProtectedCount)), cancellationToken!);
                 }
 
-                _logger.LogInformation($"Processing done: {success} {mode}");
+                _logger.LogInformation($"Processing done: {success} {mode}. {LogHelper.GetMemoryUsageSummary()}");
 
                 _processTimeManager.Stop(ProcessTimeManager.TimerTypes.ProcessOverall, processOverallTimerSessionId);
 

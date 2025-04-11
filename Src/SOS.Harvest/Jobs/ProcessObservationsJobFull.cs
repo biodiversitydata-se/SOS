@@ -9,6 +9,7 @@ using SOS.Harvest.Processors.Interfaces;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
+using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.IO.DwcArchive.Interfaces;
 using SOS.Lib.Jobs.Export;
@@ -633,7 +634,7 @@ namespace SOS.Harvest.Jobs
 
             var dataProviders = await _dataProviderCache.GetAllAsync();
             var dataProvidersToProcess = dataProviders.Where(dataProvider => dataProvider.IsActive).ToList();
-            _logger.LogInformation("Start process observations");
+            _logger.LogInformation($"Start process observations. {LogHelper.GetMemoryUsageSummary()}");
             if (dataProvidersToProcess != null)
             {
                 foreach (var dataProvider in dataProvidersToProcess)
