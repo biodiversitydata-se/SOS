@@ -10,6 +10,7 @@
 
 ### `Changed`
 - iNaturalist harvest is now using the iNaturalist API instead of GBIF API.
+- Change download limit to 50k observations in order to improve general performance.
 
 ## [2025.03.18]
 
