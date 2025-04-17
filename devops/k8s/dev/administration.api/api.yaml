@@ -6,6 +6,7 @@ metadata:
   name: sosadminapi-api
   namespace: sosadminapi-dev
 spec:
+  type: ClusterIP
   ports:
     - port: 5005
       targetPort: 5005
@@ -33,6 +34,8 @@ spec:
       labels:
         app: sosadminapi-api
     spec:
+      securityContext:
+        runAsNonRoot: true
       serviceAccountName: ""
       topologySpreadConstraints: # try to spread out api instances over available nodes
       - labelSelector:
@@ -115,7 +118,19 @@ spec:
             successThreshold: 1
             failureThreshold: 3
             periodSeconds: 30 # runs every 30 seconds
-          resources: {}
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsUser: 1000
+            runAsGroup: 1000
+            capabilities:
+              drop:
+                - ALL
+          resources:
+            requests:
+              cpu: 11m
+              memory: 230M
+            limits:
+              memory: 230M
       restartPolicy: Always
       imagePullSecrets:
         - name: regcred

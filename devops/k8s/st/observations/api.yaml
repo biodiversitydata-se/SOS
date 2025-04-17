@@ -6,6 +6,7 @@ metadata:
   name: sos-observations-api
   namespace: sos-observations-st
 spec:
+  type: ClusterIP
   ports:
     - port: 5000
       targetPort: 5000
@@ -33,6 +34,8 @@ spec:
       labels:
         app: sos-observations-api
     spec:
+      securityContext:
+        runAsNonRoot: true
       topologySpreadConstraints: # try to spread out api instances over available nodes
       - labelSelector:
           matchLabels:
@@ -138,7 +141,19 @@ spec:
               port: 5000
             failureThreshold: 3
             periodSeconds: 30
-          resources: {}
+          resources:
+            requests:
+              cpu: 35m
+              memory: 3.5G
+            limits:
+              memory: 3.5G
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsUser: 1000
+            runAsGroup: 1000
+            capabilities:
+              drop:
+                - ALL
       priorityClassName: high-priority
       restartPolicy: Always
       imagePullSecrets:
