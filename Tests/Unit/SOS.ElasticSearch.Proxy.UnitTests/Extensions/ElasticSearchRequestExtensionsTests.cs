@@ -48,7 +48,7 @@ namespace SOS.ElasticSearch.Proxy.UnitTests.Extensions
 
             // Assert
             string expected = """
-                {"size":1,"query":{"match_all":{}},"from":0,"sort":[{"event.endDate":{"order":"desc"}}]}
+                {"size":1,"query":{"match_all":{}},"from":0,"sort":[{"event.endDate":{"order":"desc"}},{"occurrenceId":{"order":"desc"}}]}
                 """;
             strResult.Should().Be(expected);
         }
