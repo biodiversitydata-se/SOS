@@ -6,6 +6,7 @@ metadata:
   name: sosadmingui-web
   namespace: sosadmingui-st
 spec:
+  type: ClusterIP
   ports:
     - port: 4200
       targetPort: 4200
@@ -33,6 +34,8 @@ spec:
       labels:
         app: sosadmingui-web
     spec:
+      securityContext:
+        runAsNonRoot: true
       topologySpreadConstraints: # try to spread out web instances over available nodes
         - labelSelector:
             matchLabels:
@@ -48,7 +51,19 @@ spec:
           name: sosadmingui-web
           ports:
             - containerPort: 4200
-          resources: {}
+          resources:
+            requests:
+              cpu: 15m
+              memory: 105M
+            limits:
+              memory: 105M
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsUser: 1000
+            runAsGroup: 1000
+            capabilities:
+              drop:
+                - ALL
       restartPolicy: Always
       imagePullSecrets:
         - name: regcred

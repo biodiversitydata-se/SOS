@@ -6,6 +6,7 @@ metadata:
   name: sos-analysis-api
   namespace: sos-analysis-st
 spec:
+  type: ClusterIP
   ports:
     - port: 5000
       targetPort: 5000
@@ -33,6 +34,8 @@ spec:
       labels:
         app: sos-analysis-api
     spec:
+      securityContext:
+        runAsNonRoot: true
       topologySpreadConstraints: # try to spread out api instances over available nodes
       - labelSelector:
           matchLabels:
@@ -131,7 +134,19 @@ spec:
             successThreshold: 1
             failureThreshold: 3
             periodSeconds: 30 # runs every 30 seconds
-          resources: {}
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsUser: 1000
+            runAsGroup: 1000
+            capabilities:
+              drop:
+                - ALL
+          resources:
+            requests:
+              cpu: 11m
+              memory: 3600M
+            limits:
+              memory: 3600M
       restartPolicy: Always
       imagePullSecrets:
         - name: regcred

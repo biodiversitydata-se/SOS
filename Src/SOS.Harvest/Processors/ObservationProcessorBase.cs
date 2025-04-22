@@ -137,8 +137,10 @@ namespace SOS.Harvest.Processors
                 TimeManager.Stop(ProcessTimeManager.TimerTypes.MongoDbRead, mongoDbReadTimerSessionId);
                 Logger.LogDebug("Finish fetching {@dataProvider} batch ({@batchId})", dataProvider.Identifier, batchId);
 
-                return await ProcessBatchAsync(dataProvider, verbatimObservationsBatch, batchId, mode,
+                var result = await ProcessBatchAsync(dataProvider, verbatimObservationsBatch, batchId, mode,
                     observationFactory);
+                Logger.LogInformation($"Finish processing batch for {dataProvider.Identifier}. BatchId={batchId}. {LogHelper.GetMemoryUsageSummary()}");
+                return result;
             }
             catch (JobAbortedException)
             {

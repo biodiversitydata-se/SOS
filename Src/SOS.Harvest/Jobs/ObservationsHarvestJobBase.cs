@@ -24,42 +24,10 @@ namespace SOS.Harvest.Jobs
         private readonly IProjectHarvester _projectHarvester;
         private readonly IArtportalenDatasetMetadataHarvester _artportalenDatasetMetadataHarvester;
         private readonly ITaxonListHarvester _taxonListHarvester;
-
-        private async Task<bool> HarvestResources(
-            JobRunModes mode,
-            IJobCancellationToken cancellationToken)
-        {
-            _logger.BeginScope(new[] { new KeyValuePair<string, object>("mode", mode.GetLoggerMode()) });
-            try
-            {
-                _logger.LogInformation($"Start {mode} resources harvest jobs");
-                if (mode == JobRunModes.Full)
-                {
-                    await _projectHarvester.HarvestProjectsAsync();
-                    await _taxonListHarvester.HarvestTaxonListsAsync();
-                    await _artportalenDatasetMetadataHarvester.HarvestDatasetsAsync();
-                }
-
-                _logger.LogInformation($"Finish {mode} resources harvest jobs");
-                return true;
-            }
-            catch (JobAbortedException)
-            {
-                _logger.LogInformation($"{mode} resources harvest job was cancelled.");
-                return false;
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, $"{mode} resources harvest job failed.");
-                return false;
-            }
-        }
-
         protected readonly IHarvestInfoRepository _harvestInfoRepository;
         protected readonly IDataProviderManager _dataProviderManager;
         protected readonly IObservationHarvesterManager _observationHarvesterManager;
-        protected readonly ILogger<ObservationsHarvestJobBase> _logger;
-
+        protected readonly ILogger<ObservationsHarvestJobBase> _logger;       
 
         /// <summary>
         /// Constructor
@@ -89,6 +57,36 @@ namespace SOS.Harvest.Jobs
             _artportalenDatasetMetadataHarvester = artportalenDatasetMetadataHarvester ?? throw new ArgumentNullException(nameof(artportalenDatasetMetadataHarvester));
             _taxonListHarvester = taxonListHarvester ?? throw new ArgumentNullException(nameof(taxonListHarvester));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        }
+
+        private async Task<bool> HarvestResources(
+           JobRunModes mode,
+           IJobCancellationToken cancellationToken)
+        {
+            _logger.BeginScope(new[] { new KeyValuePair<string, object>("mode", mode.GetLoggerMode()) });
+            try
+            {
+                _logger.LogInformation($"Start {mode} resources harvest jobs");
+                if (mode == JobRunModes.Full)
+                {
+                    await _projectHarvester.HarvestProjectsAsync();
+                    await _taxonListHarvester.HarvestTaxonListsAsync();
+                    await _artportalenDatasetMetadataHarvester.HarvestDatasetsAsync();
+                }
+
+                _logger.LogInformation($"Finish {mode} resources harvest jobs");
+                return true;
+            }
+            catch (JobAbortedException)
+            {
+                _logger.LogInformation($"{mode} resources harvest job was cancelled.");
+                return false;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, $"{mode} resources harvest job failed.");
+                return false;
+            }
         }
 
         /// <summary>
@@ -121,52 +119,93 @@ namespace SOS.Harvest.Jobs
 
                 //------------------------------------------------------------------------
                 // 2. Harvest observations 
-                //------------------------------------------------------------------------
-                var harvestTaskByDataProvider = new Dictionary<DataProvider, Task<HarvestInfo>>();
+                //------------------------------------------------------------------------                
                 _logger.LogInformation($"Start adding harvesters ({mode}).");
                 foreach (var dataProvider in dataProviders)
                 {
                     _logger.LogInformation($"{dataProvider}, PreviousProcessLimit={dataProvider.PreviousProcessLimit}");
                 }
+                
+                var harvestTaskByDataProvider = new Dictionary<DataProvider, Func<Task<HarvestInfo>>>();
+                var harvestTasks = new List<Task>();
+                var semaphore = new SemaphoreSlim(3);                
+                var harvestResults = new Dictionary<DataProvider, HarvestInfo>();
 
                 foreach (var dataProvider in dataProviders)
                 {
                     var harvester = _observationHarvesterManager.GetHarvester(dataProvider.Type);
 
-                    if (dataProvider.Type == DataProviderType.DwcA)
+                    Func<Task<HarvestInfo>> harvestFunc = () =>
                     {
-                        harvestTaskByDataProvider.Add(dataProvider, harvester.HarvestObservationsAsync(dataProvider, cancellationToken));
-                    }
-                    else
-                    {
-                        if (dataProvider.SupportIncrementalHarvest)
+                        if (dataProvider.Type == DataProviderType.DwcA)
                         {
-                            harvestTaskByDataProvider.Add(dataProvider, harvester.HarvestObservationsAsync(dataProvider, mode, fromDate, cancellationToken));
+                            return harvester.HarvestObservationsAsync(dataProvider, cancellationToken);
+                        }
+                        else if (dataProvider.SupportIncrementalHarvest)
+                        {
+                            return harvester.HarvestObservationsAsync(dataProvider, mode, fromDate, cancellationToken);
                         }
                         else
                         {
-                            harvestTaskByDataProvider.Add(dataProvider, harvester.HarvestObservationsAsync(dataProvider, cancellationToken));
+                            return harvester.HarvestObservationsAsync(dataProvider, cancellationToken);
                         }
-                    }
+                    };
 
-                    _logger.LogDebug($"Added {dataProvider.Names.Translate("en-GB")} for {mode} harvest");
+                    harvestTaskByDataProvider.Add(dataProvider, harvestFunc);
+                    _logger.LogDebug($"Planned harvest for {dataProvider.Names.Translate("en-GB")} (type: {dataProvider.Type})");
                 }
-                _logger.LogDebug($"Finish adding harvesters ({mode}).");
 
                 _logger.LogInformation($"Start {mode} observations harvesting.");
 
-                await Task.WhenAll(harvestTaskByDataProvider.Values);
-                await PostHarvestAsync(harvestTaskByDataProvider);
+                foreach (var kvp in harvestTaskByDataProvider)
+                {
+                    var dataProvider = kvp.Key;
+                    var harvestFunc = kvp.Value;
+
+                    var task = Task.Run(async () =>
+                    {
+                        await semaphore.WaitAsync();
+                        try
+                        {
+                            _logger.LogInformation($"Start harvest for {dataProvider.Identifier}. {LogHelper.GetMemoryUsageSummary()}");
+
+                            var result = await harvestFunc();
+
+                            lock (harvestResults)
+                            {
+                                harvestResults[dataProvider] = result;
+                            }
+
+                            _logger.LogInformation($"Finished harvest for {dataProvider.Identifier}. {LogHelper.GetMemoryUsageSummary()}");
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex, $"Failed harvest for {dataProvider.Identifier}");
+                        }
+                        finally
+                        {
+                            semaphore.Release();
+                        }
+                    });
+
+                    harvestTasks.Add(task);
+                }
+
+                await Task.WhenAll(harvestTasks);
+                await PostHarvestAsync(harvestResults);
+
 
                 //---------------------------------------------------------------------------------------------------------
-                // 4. Make sure mandatory providers where successful
+                // 4. Make sure mandatory providers were successful
                 //---------------------------------------------------------------------------------------------------------
-                var success = harvestTaskByDataProvider.Where(dp => dp.Key.HarvestFailPreventProcessing)
-                    .All(r => r.Value.Result.Status == RunStatus.Success);
+                var success = harvestResults
+                    .Where(dp => dp.Key.HarvestFailPreventProcessing)
+                    .All(r => r.Value.Status == RunStatus.Success);
 
                 _logger.LogInformation($"Finish {mode} observations harvesting. Success: {success}");
 
-                return success ? harvestTaskByDataProvider.Sum(ht => ht.Value.Result.Count) : -1;
+                return success ? harvestResults.Sum(ht => ht.Value.Count) : -1;
+
             }
             catch (JobAbortedException)
             {
@@ -191,7 +230,7 @@ namespace SOS.Harvest.Jobs
             DataProvider dataProvider,
             DateTime? fromDate,
             IJobCancellationToken cancellationToken)
-        {            
+        {
             try
             {
                 if (dataProvider == null)
@@ -218,7 +257,7 @@ namespace SOS.Harvest.Jobs
             }
         }
 
-        protected virtual async Task PostHarvestAsync(IDictionary<DataProvider, Task<HarvestInfo>> harvestTaskByDataProvider)
+        protected virtual async Task PostHarvestAsync(IDictionary<DataProvider, HarvestInfo> harvestTaskByDataProvider)
         {
         }
 
@@ -243,7 +282,7 @@ namespace SOS.Harvest.Jobs
                     p.SupportIncrementalHarvest
                 )
             );
-            
+
             _logger.LogInformation($"Start harvest job ({mode}). {LogHelper.GetMemoryUsageSummary()}");
             await HarvestResources(mode, cancellationToken);
             var harvestCount = await HarvestAsync(harvestProviders, mode, fromDate, cancellationToken);
