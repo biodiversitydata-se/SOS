@@ -2169,7 +2169,7 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <inheritdoc />
-        public Uri HostUrl => new Uri("");
+        public Uri HostUrl => Client.ElasticsearchClientSettings.NodePool.Nodes.FirstOrDefault().Uri;
 
         //Client.Nodes.Info(i => i.Human(true)).Nodes.First().Value.Http.PublishAddress
         //  Client.Nodes.Info(i => i.Human(true)).ConnectionSettings.ConnectionPool.Nodes.FirstOrDefault().Uri;
