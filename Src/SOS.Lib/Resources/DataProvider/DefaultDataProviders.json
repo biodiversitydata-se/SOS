@@ -170,6 +170,7 @@
     },
     "CoordinateUncertaintyInMeters": 1000,
     "CreateEventDwC": false,
+    "DefaultVerificationStatus": "ReportedByExpert",
     "Descriptions": [
       {
         "CultureCode": "en-GB",
@@ -463,6 +464,7 @@
     },
     "CoordinateUncertaintyInMeters": 1200,
     "CreateEventDwC": false,
+    "DefaultVerificationStatus": "ReportedByExpert",
     "Descriptions": [
       {
         "CultureCode": "en-GB",
@@ -869,6 +871,7 @@
         "type": "Observations"
       }
     ],
+    "DefaultVerificationStatus": "ReportedByExpert",
     "Descriptions": [
       {
         "CultureCode": "en-GB",
@@ -940,6 +943,7 @@
       "Email": "shark@smhi.se"
     },
     "CoordinateUncertaintyInMeters": 5000,
+    "DefaultVerificationStatus": "ReportedByExpert",
     "Descriptions": [
       {
         "CultureCode": "en-GB",
@@ -1157,6 +1161,7 @@
     },
     "CoordinateUncertaintyInMeters": 1131,
     "CreateEventDwC": false,
+    "DefaultVerificationStatus": "ReportedByExpert",
     "Descriptions": [
       {
         "CultureCode": "en-GB",
@@ -1395,6 +1400,7 @@
         "type": "Observations"
       }
     ],
+    "DefaultVerificationStatus": "ReportedByExpert",
     "Descriptions": [
       {
         "CultureCode": "en-GB",
@@ -1476,6 +1482,7 @@
         "type": "Observations"
       }
     ],
+    "DefaultVerificationStatus": "ReportedByExpert",
     "Descriptions": [
       {
         "CultureCode": "en-GB",
@@ -1557,6 +1564,7 @@
         "type": "Observations"
       }
     ],
+    "DefaultVerificationStatus": "ReportedByExpert",
     "Descriptions": [
       {
         "CultureCode": "en-GB",
@@ -1639,6 +1647,7 @@
         "type": "Observations"
       }
     ],
+    "DefaultVerificationStatus": "ReportedByExpert",
     "Descriptions": [
       {
         "CultureCode": "en-GB",
