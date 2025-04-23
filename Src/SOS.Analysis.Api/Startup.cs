@@ -53,14 +53,12 @@ using Hangfire.Mongo;
 using Hangfire.Mongo.Migration.Strategies;
 using Hangfire.Mongo.Migration.Strategies.Backup;
 using System.Security.Claims;
-using SOS.Lib.Helpers;
 using System.Collections.Concurrent;
 using Serilog;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Elastic.Clients.Elasticsearch.Cluster;
 using SOS.Lib.JsonConverters;
 using NetTopologySuite.Geometries;
-using Polly;
 
 namespace SOS.Analysis.Api
 {
