@@ -674,27 +674,6 @@ namespace SOS.Lib
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="query"></param>
-        /// <param name="timeSeriesType"></param>
-        /// <returns></returns>
-        public static void AddTimeSeriesFilter(this ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query, TimeSeriesType timeSeriesType)
-        {
-            // Do only include sightings whose period don't exceeds one day/week/month/year
-            var maxDuration = timeSeriesType switch
-            {
-                TimeSeriesType.Year => 365,
-                TimeSeriesType.Month => 30,
-                TimeSeriesType.Week48 => 7,
-                TimeSeriesType.Day => 1,
-                _ => 365
-            };
-
-            query.AddScript($@"ChronoUnit.DAYS.between(doc['event.startDate'].value, doc['event.endDate'].value) <= {maxDuration}");
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
         /// <param name="aggregationType"></param>
         /// <param name="query"></param>
         /// <returns></returns>

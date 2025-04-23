@@ -345,7 +345,6 @@ namespace SOS.Observations.Api.Repositories
         {
             var indexNames = GetCurrentIndex(filter);
             var (query, excludeQuery) = GetCoreQueries(filter);
-            query.AddTimeSeriesFilter(timeSeriesType);
 
             var field = timeSeriesType switch
             {
@@ -415,7 +414,6 @@ namespace SOS.Observations.Api.Repositories
         {
             var indexNames = GetCurrentIndex(filter);
             var (query, excludeQuery) = GetCoreQueries(filter);
-            query.AddTimeSeriesFilter(timeSeriesType);
 
             var tz = TimeZoneInfo.Local.GetUtcOffset(DateTime.Now);
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
