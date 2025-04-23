@@ -29,7 +29,7 @@ namespace SOS.Lib
             }
 
             if (filter.ObservedByMe ?? false)
-            {                
+            {
                 var objectQueries = new List<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>();
                 objectQueries.TryAddTermCriteria($"artportalenInternal.occurrenceRecordedByInternal.userServiceUserId", filter.UserId);
                 objectQueries.TryAddTermCriteria($"artportalenInternal.occurrenceRecordedByInternal.viewAccess", true);
@@ -358,7 +358,7 @@ namespace SOS.Lib
 
         private static void PopulateDaysInInterval(ref HashSet<int> daysOfYear, int startYear, DateTime startDate, DateTime endDate)
         {
-            var filterStartDate = CreateDate(startYear, startDate.Month,startDate.Day);
+            var filterStartDate = CreateDate(startYear, startDate.Month, startDate.Day);
             var filterEndDate = CreateDate(startYear + endDate.Year - startDate.Year, endDate.Month, endDate.Day);
 
             var count = 0;
@@ -715,7 +715,7 @@ namespace SOS.Lib
         public static ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> ToMultimediaQuery(
             this SearchFilterBase filter)
         {
-            var query = filter.ToQuery();            
+            var query = filter.ToQuery();
             query.AddMustExistsCriteria("occurrence.media");
             return query;
         }
@@ -723,7 +723,7 @@ namespace SOS.Lib
         public static ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> ToMeasurementOrFactsQuery(
             this SearchFilterBase filter)
         {
-            var query = filter.ToQuery();            
+            var query = filter.ToQuery();
             query.AddMustExistsCriteria("measurementOrFacts");
             return query;
         }
@@ -824,7 +824,7 @@ namespace SOS.Lib
                 filter.IncludeSensitiveGeneralizedObservations = false;
             }
 
-            query.TryAddGeneralizationsCriteria(filter.IncludeSensitiveGeneralizedObservations, filter.IsPublicGeneralizedObservation);            
+            query.TryAddGeneralizationsCriteria(filter.IncludeSensitiveGeneralizedObservations, filter.IsPublicGeneralizedObservation);
             query.TryAddTermsCriteria("dataProviderId", filter.DataProviderIds);
             query.TryAddTermsCriteria("dataStewardship.datasetIdentifier", filter.DataStewardshipDatasetIds);
             if (filter.IsPartOfDataStewardshipDataset.GetValueOrDefault(false))
@@ -832,7 +832,7 @@ namespace SOS.Lib
                 query.AddExistsCriteria("dataStewardship");
             }
 
-            query.TryAddTermCriteria("occurrence.isPositiveObservation", filter.PositiveSightings);            
+            query.TryAddTermCriteria("occurrence.isPositiveObservation", filter.PositiveSightings);
             query.TryAddTermsCriteria("projects.id", filter.ProjectIds);
             query.TryAddNumericRangeCriteria("occurrence.birdNestActivityId", filter.BirdNestActivityLimit, SearchExtensionsGeneric.RangeTypes.LessThanOrEquals);
 

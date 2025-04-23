@@ -1,4 +1,5 @@
-﻿using SOS.Lib.Helpers;
+﻿using SOS.Lib.Enums;
+using SOS.Lib.Helpers;
 using SOS.Lib.Models.Search.Result;
 using SOS.Shared.Api.Dtos;
 
@@ -130,6 +131,25 @@ namespace SOS.Shared.Api.Extensions.Dto
                 HasMorePages = scrollResult.ScrollId != null,
                 Take = scrollResult.Take,
                 TotalCount = scrollResult.TotalCount
+            };
+        }
+
+        public static IEnumerable<TimeSeriesHistogramResultDto> ToTimeSeriesHistogramResultDtos(
+            this IEnumerable<TimeSeriesHistogramResult> result)
+        {
+            return result.Select(item => item.ToTimeSeriesHistogramResultDto());
+        }
+
+        public static TimeSeriesHistogramResultDto ToTimeSeriesHistogramResultDto(
+            this TimeSeriesHistogramResult result)
+        {
+            return new TimeSeriesHistogramResultDto
+            {
+                Type = (TimeSeriesTypeDto)(int)result.Type,
+                Period = result.Period,
+                Observations = result.Observations,
+                Quantity = result.Quantity,
+                Taxa = result.Taxa
             };
         }
     }
