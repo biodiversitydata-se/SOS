@@ -2156,12 +2156,12 @@ namespace SOS.Lib.Repositories.Processed
         public async Task<HashSet<string>> GetSortableFieldsAsync()
         {
             var sortableFields = new HashSet<string>();
-            var mappings = await Client.Indices.GetMappingAsync<Observation>();
-            if (mappings.IsValidResponse)
+            var response = await Client.Indices.GetMappingAsync<Observation>();
+            if (response.IsValidResponse)
             {
-                foreach (var value in mappings.Indices.Values)
+                foreach (var mapping in response.Mappings)
                 {
-                    PopulateSortableFields(value.Mappings.Properties, ref sortableFields, "");
+                    PopulateSortableFields(mapping.Value.Mappings.Properties, ref sortableFields, "");
                 }
             }
 
@@ -2179,7 +2179,7 @@ namespace SOS.Lib.Repositories.Processed
         {
             try
             {
-                var countResponse = await Client.CountAsync<dynamic>(protectedIndex ? ProtectedIndexName : PublicIndexName);
+                var countResponse = await Client.CountAsync<dynamic>(c => c.Indices(protectedIndex ? ProtectedIndexName : PublicIndexName));
                 countResponse.ThrowIfInvalid();
 
                 return countResponse.Count;
@@ -2316,7 +2316,7 @@ namespace SOS.Lib.Repositories.Processed
 
             var tz = TimeZoneInfo.Local.GetUtcOffset(DateTime.Now);
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
-                .Index(indexNames)
+                .Indices(indexNames)
                 .Query(q => q
                     .Bool(b => b
                         .MustNot(excludeQuery.ToArray())
@@ -2365,8 +2365,6 @@ namespace SOS.Lib.Repositories.Processed
                                     )
                                 );
                             }
-
-                            return subAggs;
                         })
                     )
                 )

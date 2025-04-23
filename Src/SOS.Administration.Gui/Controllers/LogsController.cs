@@ -1,5 +1,4 @@
 ﻿using Elastic.Clients.Elasticsearch;
-using Elastic.Clients.Elasticsearch.IndexManagement;
 using Elastic.Clients.Elasticsearch.QueryDsl;
 using SOS.Lib.Extensions;
 using System.Collections.Generic;
@@ -113,7 +112,7 @@ namespace SOS.Administration.Gui.Controllers
             filtered_processes_queries.TryAddDateRangeCriteria("timestamp", DateTime.Now.AddMinutes(-dateFilterMinutes), RangeTypes.GreaterThanOrEquals);
 
             var result = await _elasticClient.SearchAsync<LogEntry>(p => p
-                .Index(_indexName)
+                .Indices(_indexName)
                 .Size(take)
                 .From(skip)
                 .Query(q => q
@@ -179,7 +178,7 @@ namespace SOS.Administration.Gui.Controllers
                     )
                 )
                 .Sort(s => s
-                    .Field(f => f.Timestamp, new FieldSort { Order = SortOrder.Desc })
+                    .Field(f => f.Timestamp, SortOrder.Desc)
                 )
             );
             if (result.IsValidResponse && result.Aggregations.Count > 0)

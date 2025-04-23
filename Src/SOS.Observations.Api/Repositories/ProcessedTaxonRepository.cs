@@ -614,13 +614,11 @@ namespace SOS.Observations.Api.Repositories
             IReadOnlyDictionary<Field, FieldValue> nextPageKey = null;
             if (!string.IsNullOrEmpty(geoTilePage) && taxonIdPage.HasValue)
             {
-                nextPageKey = new FluentDictionary<Field, FieldValue>(
-                    new Dictionary<Field, FieldValue>
+                nextPageKey = new Dictionary<Field, FieldValue>
                     {
                         { Field.FromString("geoTile"), FieldValue.String(geoTilePage) },
                         { Field.FromString("taxon"), FieldValue.Long(taxonIdPage ?? 0) }
-                    }
-                );
+                    }.ToFluentDictionary();
             }
 
             do
