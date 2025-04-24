@@ -200,7 +200,7 @@ namespace SOS.Harvest.Harvesters.iNaturalist
                 var incrementalTempMongoCollection = _iNaturalistVerbatimRepository.GetMongoCollection(IncrementalTempCollectionName);                
                 var nrSightingsHarvested = 0;
                 DateTimeOffset? latestDate = await GetLatestUpdatedDate(incrementalTempMongoCollection);
-                (bool collectionsExists, int? maxId, int? maxObservationId) = await GetMongoCollectionMaxIdsAsync(_iNaturalistVerbatimRepository, incrementalTempMongoCollection);
+                (bool collectionsExists, int? maxId, long? maxObservationId) = await GetMongoCollectionMaxIdsAsync(_iNaturalistVerbatimRepository, incrementalTempMongoCollection);
                 int documentId = maxId.GetValueOrDefault() + 1;
                 var startHarvestDate = latestDate != null ? latestDate - TimeSpan.FromMinutes(3) : DateTimeOffset.UtcNow - TimeSpan.FromDays(7);
                 _logger.LogInformation("Start harvesting incremental {@dataProvider} observations. maxId={maxId}, maxObservationId={maxObservationId}, startHarvestDate={startHarvestDate}", "iNaturalist", maxId, maxObservationId, startHarvestDate);
@@ -275,7 +275,7 @@ namespace SOS.Harvest.Harvesters.iNaturalist
                 long idAbove = _iNaturalistServiceConfiguration.HarvestCompleteStartId;
                 var currentDocCount = await _iNaturalistVerbatimRepository.CountAllDocumentsAsync(completeMongoCollection);
                 int documentId = 0;
-                (bool collectionsExists, int? maxId, int? maxObservationId) = await GetMongoCollectionMaxIdsAsync(_iNaturalistVerbatimRepository, completeTempMongoCollection);
+                (bool collectionsExists, int? maxId, long? maxObservationId) = await GetMongoCollectionMaxIdsAsync(_iNaturalistVerbatimRepository, completeTempMongoCollection);
                 if (collectionsExists)
                 {
                     // Continue harvest from last id
@@ -381,15 +381,15 @@ namespace SOS.Harvest.Harvesters.iNaturalist
             return sb.ToString();
         }        
 
-        private async Task<(bool collectionsExists, int? maxId, int? maxObservationId)> GetMongoCollectionMaxIdsAsync(
+        private async Task<(bool collectionsExists, int? maxId, long? maxObservationId)> GetMongoCollectionMaxIdsAsync(
             IiNaturalistObservationVerbatimRepository repository,
             IMongoCollection<iNaturalistVerbatimObservation> tempMongoCollection)
         {            
             bool collectionExists = await repository.CheckIfCollectionExistsAsync(tempMongoCollection.CollectionNamespace.CollectionName);
             if (collectionExists)
-            {                
-                (int maxId, int maxObservationId) maxVal = await repository.GetMaxValueWithIdAsync<int>(tempMongoCollection, "ObservationId");
-                return (true, maxVal.maxId, maxVal.maxObservationId);
+            { 
+                var maxObs = await repository.GetDocumentWithMaxIdAsync(tempMongoCollection);                
+                return (true, maxObs.Id, maxObs.ObservationId);
             }
             
             return (false, null, null);
