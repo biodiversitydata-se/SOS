@@ -69,111 +69,8 @@ namespace SOS.Harvest.Harvesters.iNaturalist
 
         public async Task<HarvestInfo> HarvestObservationsAsync(Lib.Models.Shared.DataProvider provider, IJobCancellationToken cancellationToken)
         {
-            var oldWayTask = HarvestObservationsOldWayAsync(provider, cancellationToken);
-            var newWayTask = HarvestObservationsNewWayAsync(provider,cancellationToken);
-            var results = await Task.WhenAll(oldWayTask, newWayTask);
-            return await oldWayTask;
-        }
-
-        private async Task<HarvestInfo> HarvestObservationsOldWayAsync(Lib.Models.Shared.DataProvider provider, IJobCancellationToken cancellationToken)
-        {
             var harvestInfo = new HarvestInfo("iNaturalist", DateTime.Now);
-            var dataProvider = new Lib.Models.Shared.DataProvider() { Id = 19, Identifier = "iNaturalist" };
-            using var dwcCollectionRepository = new DwcCollectionRepository(dataProvider, _verbatimClient, _logger);
-            dwcCollectionRepository.BeginTempMode();
 
-            // Get current document count from permanent index
-            var currentDocCount = await dwcCollectionRepository.OccurrenceRepository.CountAllDocumentsAsync();
-            dwcCollectionRepository.BeginTempMode();
-
-            try
-            {
-                _logger.LogInformation("Start harvesting sightings for iNaturalist data provider");
-                _logger.LogInformation(GetINatHarvestSettingsInfoString());
-
-                // Make sure we have an empty collection.
-                _logger.LogInformation("Start empty collection for iNaturalist verbatim collection");
-                await dwcCollectionRepository.OccurrenceRepository.DeleteCollectionAsync();
-                _logger.LogInformation("Finish empty collection for iNaturalist verbatim collection");
-
-                var nrSightingsHarvested = 0;
-
-                var startDate = new DateTime(_iNaturalistServiceConfiguration.StartHarvestYear, 1, 1);
-                var endDate = startDate.AddMonths(1).AddDays(-1);
-                var gBIFResult = await _iNaturalistObservationService.GetAsync(startDate, endDate);
-
-                var id = 0;
-                // Loop until all sightings are fetched.
-                do
-                {
-                    _logger.LogDebug(
-                        $"Fetching iNaturalist observations between dates {startDate.ToString("yyyy-MM-dd")} and {endDate.ToString("yyyy-MM-dd")}");
-
-                    foreach (var observation in gBIFResult)
-                    {
-                        observation.Id = ++id;
-                    }
-
-                    // Add sightings to MongoDb
-                    await dwcCollectionRepository.OccurrenceRepository.AddManyAsync(gBIFResult);
-
-                    nrSightingsHarvested += gBIFResult.Count();
-
-                    _logger.LogDebug($"{nrSightingsHarvested} iNaturalist observations harvested");
-
-                    cancellationToken?.ThrowIfCancellationRequested();
-                    if (_iNaturalistServiceConfiguration.MaxNumberOfSightingsHarvested.HasValue &&
-                        nrSightingsHarvested >= _iNaturalistServiceConfiguration.MaxNumberOfSightingsHarvested)
-                    {
-                        _logger.LogInformation("Max iNaturalist observations reached");
-                        break;
-                    }
-
-                    startDate = endDate.AddDays(1);
-                    endDate = startDate.AddMonths(1).AddDays(-1);
-                    gBIFResult = await _iNaturalistObservationService.GetAsync(startDate, endDate);
-
-                } while (gBIFResult != null && endDate <= DateTime.Now);
-
-                _logger.LogInformation("Finished harvesting sightings for iNaturalist data provider");
-
-                // Update harvest info
-                harvestInfo.End = DateTime.Now;
-                harvestInfo.Count = nrSightingsHarvested;
-
-                if (nrSightingsHarvested >= currentDocCount * 0.8)
-                {
-                    harvestInfo.Status = RunStatus.Success;
-                    _logger.LogInformation("Start permanentize temp collection for iNaturalist verbatim");
-                    await dwcCollectionRepository.OccurrenceRepository.PermanentizeCollectionAsync();
-                    _logger.LogInformation("Finish permanentize temp collection for iNaturalist verbatim");
-                }
-                else
-                {
-                    harvestInfo.Status = RunStatus.Failed;
-                    _logger.LogError("iNaturalist: Previous harvested observation count is: {@currentDocCount}. Now only {@nrSightingsHarvested} observations where harvested.", currentDocCount, nrSightingsHarvested);
-                }
-
-            }
-            catch (JobAbortedException e)
-            {
-                _logger.LogInformation(e, $"iNaturalist harvest was cancelled: {e.Message}. {LogHelper.GetMemoryUsageSummary()}");
-                harvestInfo.Status = RunStatus.Canceled;
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Failed to harvest iNaturalist");
-                harvestInfo.Status = RunStatus.Failed;
-            }
-
-            _logger.LogInformation("Finish harvesting sightings for iNaturalist data provider. Status={@harvestStatus}", harvestInfo.Status);
-            return harvestInfo;
-        }
-
-        private async Task<HarvestInfo> HarvestObservationsNewWayAsync(Lib.Models.Shared.DataProvider provider, IJobCancellationToken cancellationToken)
-        {
-            var harvestInfo = new HarvestInfo("iNaturalist", DateTime.Now);
-            
             try
             {
                 // If iNaturalist_full exists, rename it to iNaturalist_incremental_temp
@@ -197,7 +94,7 @@ namespace SOS.Harvest.Harvesters.iNaturalist
 
                 // Harvest latest day(s) observations
                 var incrementalMongoCollection = _iNaturalistVerbatimRepository.GetMongoCollection(IncrementalCollectionName);
-                var incrementalTempMongoCollection = _iNaturalistVerbatimRepository.GetMongoCollection(IncrementalTempCollectionName);                
+                var incrementalTempMongoCollection = _iNaturalistVerbatimRepository.GetMongoCollection(IncrementalTempCollectionName);
                 var nrSightingsHarvested = 0;
                 DateTimeOffset? latestDate = await GetLatestUpdatedDate(incrementalTempMongoCollection);
                 (bool collectionsExists, int? maxId, long? maxObservationId) = await GetMongoCollectionMaxIdsAsync(_iNaturalistVerbatimRepository, incrementalTempMongoCollection);
@@ -387,9 +284,9 @@ namespace SOS.Harvest.Harvesters.iNaturalist
         {            
             bool collectionExists = await repository.CheckIfCollectionExistsAsync(tempMongoCollection.CollectionNamespace.CollectionName);
             if (collectionExists)
-            { 
-                var maxObs = await repository.GetDocumentWithMaxIdAsync(tempMongoCollection);                
-                return (true, maxObs.Id, maxObs.ObservationId);
+            {
+                var maxIdObservation = await repository.GetDocumentWithMaxIdAsync(tempMongoCollection);
+                return (true, maxIdObservation.Id, maxIdObservation.ObservationId);
             }
             
             return (false, null, null);
