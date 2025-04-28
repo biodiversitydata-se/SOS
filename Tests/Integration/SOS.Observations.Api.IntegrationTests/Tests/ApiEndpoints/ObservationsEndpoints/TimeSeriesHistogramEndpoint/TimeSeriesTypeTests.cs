@@ -98,7 +98,7 @@ public class TimeSeriesTypeTests : TestBase
         // Arrange - Create verbatim observations
         //-----------------------------------------------------------------------------------------------------------
 
-        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(120)
            .All()
                .HaveValuesFromPredefinedObservations()
            .TheFirst(20)
@@ -165,7 +165,7 @@ public class TimeSeriesTypeTests : TestBase
             new TimeSeriesHistogramResultDto { Period = 3, Observations = 20, Taxa = 1 },
             new TimeSeriesHistogramResultDto { Period = 4 },
             new TimeSeriesHistogramResultDto { Period = 5 },
-            new TimeSeriesHistogramResultDto { Period = 6, Observations = 40, Taxa = 2 },
+            new TimeSeriesHistogramResultDto { Period = 6, Observations = 60, Taxa = 2 },
             new TimeSeriesHistogramResultDto { Period = 7 },
             new TimeSeriesHistogramResultDto { Period = 8 },
             new TimeSeriesHistogramResultDto { Period = 9 },
@@ -173,6 +173,6 @@ public class TimeSeriesTypeTests : TestBase
             new TimeSeriesHistogramResultDto { Period = 11 },
             new TimeSeriesHistogramResultDto { Period = 12 }
         }, options => options.Excluding(m => m.Quantity).Excluding(m => m.Type));
-        //result!.FirstOrDefault(r => r.Period == 6)?.Observations.Should().Be(60); 
+        result!.FirstOrDefault(r => r.Period == 6)?.Observations.Should().Be(60); 
     }
 }
