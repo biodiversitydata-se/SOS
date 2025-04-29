@@ -24,7 +24,6 @@ public static class Settings
     public static HangfireDbConfiguration LocalHangfireDbConfiguration { get; set; } = new();
     public static MongoDbConfiguration ProcessDbConfiguration { get; set; } = new();
     public static ElasticSearchConfiguration SearchDbConfiguration { get; set; } = new();
-    public static IdentityServerConfiguration IdentityServer { get; set; } = new();
     public static DevOpsConfiguration DevOpsConfiguration { get; set; } = new();
     public static HealthCheckConfiguration HealthCheckConfiguration { get; set; } = new();
     public static string ClientSecret { get; set; } = "";
@@ -51,7 +50,6 @@ public static class Settings
         var logger = loggerFactory.CreateLogger("Settings");
 
         CorsAllowAny = GetConfigValueString("CorsAllowAny", configuration, logger, sensitiveSetting: false, required: false)?.Equals("true", StringComparison.CurrentCultureIgnoreCase) ?? false;
-        IdentityServer = GetConfigSection<IdentityServerConfiguration>("IdentityServer", configuration, logger);
         ObservationApiConfiguration = GetConfigSection<ObservationApiConfiguration>("ObservationApiConfiguration", configuration, logger);
         VocabularyConfiguration = GetConfigSection<VocabularyConfiguration>("VocabularyConfiguration", configuration, logger);
         SemaphoreLimitsConfiguration = GetConfigSection<SemaphoreLimitsConfiguration>("SemaphoreLimitsConfiguration", configuration, logger);        

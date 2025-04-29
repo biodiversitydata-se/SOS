@@ -278,8 +278,6 @@ namespace SOS.Observations.Api
                 },
                 t => true);
 
-            // Identity service configuration
-            var identityServerConfiguration = Settings.IdentityServer;
             var userServiceConfiguration = Settings.UserServiceConfiguration;
 
             // Authentication

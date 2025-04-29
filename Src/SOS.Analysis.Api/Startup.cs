@@ -201,14 +201,6 @@ namespace SOS.Analysis.Api
                 },
                 t => true);
 
-            // Identity service configuration
-            var identityServerConfiguration = Settings.IdentityServer;
-
-            if (identityServerConfiguration == null)
-            {
-                throw new Exception("Failed to load Identity Server Configuration");
-            }
-
             var userServiceConfiguration = Settings.UserServiceConfiguration;
 
             // Authentication
