@@ -128,7 +128,7 @@ namespace SOS.Harvest.Jobs
                 
                 var harvestTaskByDataProvider = new Dictionary<DataProvider, Func<Task<HarvestInfo>>>();
                 var harvestTasks = new List<Task>();
-                var semaphore = new SemaphoreSlim(3);                
+                var semaphore = new SemaphoreSlim(3); // limit the number of concurrent harvests to 3.
                 var harvestResults = new Dictionary<DataProvider, HarvestInfo>();
 
                 foreach (var dataProvider in dataProviders)

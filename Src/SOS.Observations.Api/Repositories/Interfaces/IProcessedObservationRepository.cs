@@ -35,6 +35,22 @@ namespace SOS.Observations.Api.Repositories.Interfaces
         Task<PagedResult<dynamic>> GetAggregated48WeekHistogramAsync(SearchFilter filter);
 
         /// <summary>
+        /// Get histogram based on year
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="timeSeriesType"></param>
+        /// <returns></returns>
+        Task<IEnumerable<TimeSeriesHistogramResult>> GetYearHistogramAsync(SearchFilter filter, TimeSeriesType timeSeriesType);
+
+        /// <summary>
+        /// Get histogram based on a time series
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="timeSeriesType"></param>
+        /// <returns></returns>
+        Task<IEnumerable<TimeSeriesHistogramResult>> GetTimeSeriesHistogramAsync(SearchFilter filter, TimeSeriesType timeSeriesType);
+
+        /// <summary>
         /// Get geo grid tile aggregation
         /// </summary>
         /// <param name="filter"></param>

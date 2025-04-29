@@ -20,7 +20,7 @@ namespace SOS.ElasticSearch.Proxy.Middleware
         private readonly IProcessedObservationCoreRepository _processedObservationRepository;
         private readonly ProxyConfiguration _proxyConfiguration;
         private readonly ILogger<RequestMiddleware> _logger;
-        private static readonly SemaphoreSlim _requestSemaphore = new SemaphoreSlim(5);
+        private static readonly SemaphoreSlim _requestSemaphore = new SemaphoreSlim(4);
 
         /// <summary>
         /// Build target uri

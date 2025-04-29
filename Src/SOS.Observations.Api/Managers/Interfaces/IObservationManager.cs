@@ -69,6 +69,20 @@ namespace SOS.Observations.Api.Managers.Interfaces
         Task<PagedResult<dynamic>> GetAggregatedChunkAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilter filter, AggregationType aggregationType, int skip, int take);
 
         /// <summary>
+        /// Get aggregated data
+        /// </summary>
+        /// <param name="roleId"></param>
+        /// <param name="authorizationApplicationIdentifier"></param>
+        /// <param name="filter"></param>
+        /// <param name="timeSeriesType"></param>
+        /// <returns></returns>
+        Task<IEnumerable<TimeSeriesHistogramResult>> GetTimeSeriesHistogramAsync(
+            int? roleId, 
+            string authorizationApplicationIdentifier, 
+            SearchFilter filter, 
+            TimeSeriesType timeSeriesType);
+
+        /// <summary>
         /// Geo grid tile aggregation
         /// </summary>
         /// <param name="roleId"></param>
