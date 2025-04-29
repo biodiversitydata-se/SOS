@@ -1864,7 +1864,11 @@ namespace SOS.Observations.Api.Controllers
                     return BadRequest(validationResult.Error);
                 }
                                 
-                var result = await _observationManager.GetTimeSeriesHistogramAsync(roleId, authorizationApplicationIdentifier, filter.ToSearchFilterInternal(this.GetUserId(), "sv-SE"), (TimeSeriesType) timeSeriesType);
+                var result = await _observationManager.GetTimeSeriesHistogramAsync(
+                    roleId, 
+                    authorizationApplicationIdentifier, 
+                    filter.ToSearchFilterInternal(this.GetUserId(), "sv-SE"), 
+                    (TimeSeriesType) timeSeriesType);
                 IEnumerable<TimeSeriesHistogramResultDto> dtos = result.ToTimeSeriesHistogramResultDtos();
                 return new OkObjectResult(dtos);
             }
