@@ -1,9 +1,12 @@
 ﻿using Microsoft.Extensions.Logging;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Enums;
+using SOS.Lib.Models.Shared;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace SOS.Lib.Managers;
 public class SemaphoreLimitManager
@@ -43,7 +46,41 @@ public class SemaphoreLimitManager
         }
     }
 
-    public SemaphoreSlim GetObservationSemaphore(ApiUserType userType)
+    public async Task<SemaphoreResult> GetSemaphoreAsync(SemaphoreType semaphoreType, ApiUserType userType, string endpointName)
+    {
+        var semaphoreResult = new SemaphoreResult();        
+        if (semaphoreType == SemaphoreType.Aggregation)
+        {
+            semaphoreResult.Semaphore = GetAggregationSemaphore(userType);
+        }
+        else
+        {
+            semaphoreResult.Semaphore = GetObservationSemaphore(userType);
+        }
+
+        var semaphoreTime = Stopwatch.StartNew();
+        if (semaphoreResult.Semaphore.CurrentCount == 0)
+        {
+            _logger.LogWarning("All semaphore slots are occupied. Request will be queued. Endpoint={endpoint}, UserType={@userType}", endpointName, userType);
+            semaphoreResult.SemaphoreStatus = "Wait";
+        }
+
+        if (!await semaphoreResult.Semaphore.WaitAsync(DefaultTimeout).ConfigureAwait(true))
+        {
+            _logger.LogError("Too many requests. Semaphore limit reached. Endpoint={endpoint}, UserType={@userType}", endpointName, userType);
+            semaphoreResult.SemaphoreStatus = "Timeout";
+            semaphoreTime.Stop();
+            semaphoreResult.SemaphoreWaitTime = semaphoreTime.Elapsed;
+            semaphoreResult.Semaphore = null;
+            return semaphoreResult;
+        }
+
+        semaphoreTime.Stop();
+        semaphoreResult.SemaphoreWaitTime = semaphoreTime.Elapsed;
+        return semaphoreResult;
+    }
+
+    private SemaphoreSlim GetObservationSemaphore(ApiUserType userType)
     {
         if (_observationSemaphores.TryGetValue(userType, out var semaphore))
         {
@@ -63,7 +100,7 @@ public class SemaphoreLimitManager
         }
     }
 
-    public SemaphoreSlim GetAggregationSemaphore(ApiUserType userType)
+    private SemaphoreSlim GetAggregationSemaphore(ApiUserType userType)
     {
         if (_aggregationSemaphores.TryGetValue(userType, out var semaphore))
         {
