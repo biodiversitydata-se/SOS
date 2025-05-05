@@ -26,6 +26,8 @@ using OfficeOpenXml;
 using SOS.Lib.Models.Search.Enums;
 using NetTopologySuite.Geometries;
 using System.Text.Json.Nodes;
+using NetTopologySuite.Features;
+using SOS.Shared.Api.Dtos.Enum;
 
 namespace SOS.Observations.Api.Managers
 {
@@ -235,7 +237,7 @@ namespace SOS.Observations.Api.Managers
             bool aggregateOrganismQuantity,
             CoordinateSys coordinateSys)
         {
-            try
+            try 
             {
                 await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
 
@@ -262,14 +264,14 @@ namespace SOS.Observations.Api.Managers
                         var observationsCount = record.DocCount;
                         var organismQuantity = record.OrganismQuantity;
                         var taxaCount = record.UniqueTaxon;
-                        var geoShape = (IGeoShape)await _areaManager.GetGeometryAsync((AreaType)areaType, featureId);
+                        var geometry = await _areaManager.GetGeometryAsync((AreaType)areaType, featureId);
 
-                        if (geoShape == null)
+                        if (geometry == null)
                         {
                             continue;
                         }
 
-                        var geometry = geoShape.ToGeometry().Transform(CoordinateSys.WGS84, coordinateSys);
+                        geometry = geometry.Transform(CoordinateSys.WGS84, coordinateSys);
 
                         var feature = new Feature
                         {
@@ -287,7 +289,7 @@ namespace SOS.Observations.Api.Managers
                         };
                         featureCollection.Add(feature);
                     }
-                    result = await _processedObservationRepository.AggregateByUserFieldAsync(filter, areaTypeProperty, false, null, result.SearchAfter?.FirstOrDefault()?.ToString(), 1000);
+                    result = await _processedObservationRepository.AggregateByUserFieldAsync(filter, areaTypeProperty, false, null, result.SearchAfter, 1000);
                 }
 
                 return featureCollection;

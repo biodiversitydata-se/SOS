@@ -2390,8 +2390,8 @@ namespace SOS.Lib.Repositories.Processed
                         var obj = new ExpandoObject();
                         obj.TryAdd("AggregationField", b.Key.Values.First());
                         obj.TryAdd("DocCount", b.DocCount);
-                        obj.TryAdd("UniqueTaxon", b.Cardinality("unique_taxonids").Value);
-                        obj.TryAdd("OrganismQuantity", aggregateOrganismQuantity ? b.Sum("totalOrganismQuantity")?.Value : 0);
+                        obj.TryAdd("UniqueTaxon", b.Aggregations.GetCardinality("unique_taxonids").Value);
+                        obj.TryAdd("OrganismQuantity", aggregateOrganismQuantity ? b.Aggregations.GetSum("totalOrganismQuantity")?.Value : 0);
 
                         return obj;
                     })

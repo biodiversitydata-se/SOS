@@ -1,4 +1,6 @@
-﻿using SOS.Lib.Models.Search.Result;
+﻿using NetTopologySuite.Geometries;
+using SOS.Lib.Enums;
+using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Models.Shared;
 using SOS.Shared.Api.Dtos;
 using SOS.Shared.Api.Dtos.Enum;
@@ -46,5 +48,21 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <param name="format"></param>
         /// <returns></returns>
         Task<byte[]> GetZippedAreaAsync(AreaTypeDto areaType, string featureId, AreaExportFormat format);
+
+        /// <summary>
+        /// Get geometry
+        /// </summary>
+        /// <param name="areaType"></param>
+        /// <param name="featureId"></param>
+        /// <returns></returns>
+        Task<Geometry> GetGeometryAsync(AreaType areaType, string featureId);
+
+
+        /// <summary>
+        /// Get geometries
+        /// </summary>
+        /// <param name="areaKeys"></param>
+        /// <returns></returns>
+        Task<IEnumerable<Geometry>> GetGeometriesAsync(IEnumerable<(AreaType areaType, string featureId)> areaKeys);
     }
 }
