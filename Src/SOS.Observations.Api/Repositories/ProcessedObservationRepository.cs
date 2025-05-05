@@ -41,7 +41,7 @@ namespace SOS.Observations.Api.Repositories
             var indexNames = GetCurrentIndex(filter);
             var (query, excludeQuery) = GetCoreQueries(filter);
             query.AddAggregationFilter(aggregationType);
-            
+
             // Get number of distinct values
             var searchResponseCount = await Client.SearchAsync<dynamic>(s => s
                 .Index(indexNames)
@@ -83,7 +83,7 @@ namespace SOS.Observations.Api.Repositories
                 size = maxResult == 0 ? 1 : maxResult;
                 take = maxResult;
             }
-            
+
             // Get the real result
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
                 .Index(indexNames)
@@ -103,7 +103,7 @@ namespace SOS.Observations.Api.Repositories
                             .Terms("id", t => t
                                 .Field("taxon.id")
                             )
-                        )                        
+                        )
                 )
             )
                 .Size(0)
@@ -426,10 +426,10 @@ namespace SOS.Observations.Api.Repositories
                 )
                 .Aggregations(a => a
 
-                    .DateHistogram("aggregation", dh => dh
-                        .Field("event.startDate")
+                    .DateHistogram("aggregation", dh =>
+                    {
+                        dh.Field("event.startDate")
                         .CalendarInterval(DateInterval.Year)
-                        .ExtendedBounds(filter.Date.StartDate, filter.Date.EndDate)
                         .TimeZone($"{(tz.TotalMinutes > 0 ? "+" : "")}{tz.Hours:00}:{tz.Minutes:00}")
                         .Format("yyyy-MM-dd")
                         .Aggregations(a => a
@@ -439,8 +439,15 @@ namespace SOS.Observations.Api.Repositories
                             .Cardinality("unique_taxonids", c => c
                                 .Field("taxon.id")
                             )
-                        )
-                    )
+                        );
+
+                        if (filter.Date != null)
+                        {
+                            dh.ExtendedBounds(filter.Date.StartDate, filter.Date.EndDate);
+                        }
+
+                        return dh;
+                    })
                 )
             .Size(0)
                 .Source(s => s.ExcludeAll())

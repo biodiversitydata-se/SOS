@@ -96,6 +96,75 @@ public class TimeSeriesTypeTests : TestBase
     }
 
     [Fact]
+    public async Task TestTimeSeriesHistogramPerYearWithoutDateFilter()
+    {
+        //-----------------------------------------------------------------------------------------------------------
+        // Arrange - Create verbatim observations
+        //-----------------------------------------------------------------------------------------------------------
+
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+           .All()
+               .HaveValuesFromPredefinedObservations()
+           .TheFirst(20)
+               .With(p => p.TaxonId = 100011)
+               .With(p => p.StartDate = new DateTime(2000, 1, 1))
+               .With(p => p.EndDate = new DateTime(2000, 1, 1))
+           .TheNext(20)
+               .With(p => p.TaxonId = 100012)
+               .With(p => p.StartDate = new DateTime(2002, 1, 15))
+               .With(p => p.EndDate = new DateTime(2002, 1, 18))
+           .TheNext(20)
+               .With(p => p.TaxonId = 100012)
+               .With(p => p.StartDate = new DateTime(2004, 1, 30))
+               .With(p => p.EndDate = new DateTime(2004, 1, 30))
+           .TheNext(20)
+               .With(p => p.TaxonId = 100016)
+               .With(p => p.StartDate = new DateTime(2006, 1, 1))
+               .With(p => p.EndDate = new DateTime(2006, 2, 1))
+           .TheLast(20)
+               .With(p => p.TaxonId = 100017)
+               .With(p => p.StartDate = new DateTime(2006, 4, 1))
+               .With(p => p.EndDate = new DateTime(2006, 4, 15))
+           .Build();
+
+        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
+        var apiClient = TestFixture.CreateApiClient();
+
+        var searchFilter = new SearchFilterAggregationInternalDto
+        {
+            Taxon = new TaxonFilterDto
+            {
+                Ids = new[] { 100011, 100012, 100016, 100017 }
+            }
+        };
+        var timeSeriesType = TimeSeriesType.Year;
+
+        var options = new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true,
+            Converters = { new JsonStringEnumConverter() }
+        };
+
+        // Act
+        var response = await apiClient.PostAsync($"/observations/internal/timeserieshistogram?timeSeriesType={timeSeriesType}", JsonContent.Create(searchFilter));
+        var result = await response.Content.ReadFromJsonAsync<IEnumerable<TimeSeriesHistogramResultDto>>(options);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        result!.Count().Should().Be(7); //Only from year of first sighting to last, 2000-2006
+        result!.FirstOrDefault(r => r.Period == 2006)?.Taxa.Should().Be(2);
+        result.Should().BeEquivalentTo(new List<TimeSeriesHistogramResultDto> {
+            new TimeSeriesHistogramResultDto { Period = 2006, Observations = 40, Taxa = 2 },
+            new TimeSeriesHistogramResultDto { Period = 2005 },
+            new TimeSeriesHistogramResultDto { Period = 2004, Observations = 20, Taxa = 1 },
+            new TimeSeriesHistogramResultDto { Period = 2003 },
+            new TimeSeriesHistogramResultDto { Period = 2002, Observations = 20, Taxa = 1 },
+            new TimeSeriesHistogramResultDto { Period = 2001 },
+            new TimeSeriesHistogramResultDto { Period = 2000, Observations = 20, Taxa = 1 }
+        }, options => options.Excluding(m => m.Quantity).Excluding(m => m.Type));
+    }
+
+    [Fact]
     public async Task TestTimeSeriesHistogramPerMonth()
     {
         //-----------------------------------------------------------------------------------------------------------
