@@ -19,7 +19,7 @@
 	  <PackageReference Include="Hangfire.Core" Version="1.8.18" />
 	  <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="9.0.4" />
 	  <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.4" />
-	  <PackageReference Include="MongoDB.Driver" Version="3.3.0" />
+	  <PackageReference Include="MongoDB.Driver" Version="3.4.0" />
 	  <PackageReference Include="System.Text.Encoding.CodePages" Version="9.0.4" />
     </ItemGroup>
 
