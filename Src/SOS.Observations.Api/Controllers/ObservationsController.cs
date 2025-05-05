@@ -2573,11 +2573,14 @@ namespace SOS.Observations.Api.Controllers
             {
                 _logger.LogError("Too many requests. Semaphore limit reached. Endpoint={endpoint}, UserType={@userType}", this.GetEndpointName(ControllerContext), userType);                
                 semaphoreResult.SemaphoreStatus = "Timeout";
+                semaphoreTime.Stop();
+                semaphoreResult.SemaphoreWaitTime = semaphoreTime.Elapsed;
+                semaphoreResult.Semaphore = null;
                 return semaphoreResult;
             }
 
             semaphoreTime.Stop();
-            semaphoreResult.SemaphoreWaitTime = semaphoreTime.Elapsed;            
+            semaphoreResult.SemaphoreWaitTime = semaphoreTime.Elapsed;
             return semaphoreResult;
         }
     }
