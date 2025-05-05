@@ -333,7 +333,7 @@ namespace SOS.Lib
 
         private static void PopulateDaysInInterval(ref HashSet<int> daysOfYear, int startYear, DateTime startDate, DateTime endDate)
         {
-            var filterStartDate = CreateDate(startYear, startDate.Month,startDate.Day);
+            var filterStartDate = CreateDate(startYear, startDate.Month, startDate.Day);
             var filterEndDate = CreateDate(startYear + endDate.Year - startDate.Year, endDate.Month, endDate.Day);
 
             var count = 0;

@@ -199,7 +199,6 @@ namespace SOS.Analysis.Api
                 },
                 t => true);
 
-           
             var userServiceConfiguration = Settings.UserServiceConfiguration;
 
             // Authentication

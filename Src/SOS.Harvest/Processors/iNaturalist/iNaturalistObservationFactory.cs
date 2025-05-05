@@ -191,6 +191,7 @@ namespace SOS.Harvest.Processors.iNaturalist
             if (verbatim.Quality_grade == "research")
             {
                 processedIdentification.VerificationStatus = VocabularyValue.Create((int)ValidationStatusId.ApprovedBasedOnCommunityConsensus);
+                processedIdentification.Verified = true;
             }
 
             return processedIdentification;

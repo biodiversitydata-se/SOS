@@ -935,6 +935,34 @@ namespace SOS.Observations.Api.Managers
             return excelFile;
         }
 
+        public async Task<IEnumerable<TimeSeriesHistogramResult>> GetTimeSeriesHistogramAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilter filter, TimeSeriesType timeSeriesType)
+        {
+            try
+            {
+                await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
+
+                if (timeSeriesType == TimeSeriesType.Year)
+                    return await _processedObservationRepository.GetYearHistogramAsync(filter, timeSeriesType);
+                else 
+                    return await _processedObservationRepository.GetTimeSeriesHistogramAsync(filter, timeSeriesType);
+ 
+            }
+            catch (AuthenticationRequiredException)
+            {
+                throw;
+            }
+            catch (TimeoutException e)
+            {
+                _logger.LogError(e, "Get aggregated chunk of observations timeout");
+                throw;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to get aggregated chunk of observations");
+                return null;
+            }
+        }
+
         public class ObservationStatistics
         {
             public int TotalCount { get; set; }
