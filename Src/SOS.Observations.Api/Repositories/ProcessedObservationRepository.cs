@@ -429,6 +429,7 @@ namespace SOS.Observations.Api.Repositories
                     .DateHistogram("aggregation", dh => dh
                         .Field("event.startDate")
                         .CalendarInterval(DateInterval.Year)
+                        .ExtendedBounds(filter.Date.StartDate, filter.Date.EndDate)
                         .TimeZone($"{(tz.TotalMinutes > 0 ? "+" : "")}{tz.Hours:00}:{tz.Minutes:00}")
                         .Format("yyyy-MM-dd")
                         .Aggregations(a => a
@@ -453,6 +454,7 @@ namespace SOS.Observations.Api.Repositories
                 .Aggregations
                 .DateHistogram("aggregation")
                 .Buckets?
+                .OrderByDescending(b => b.KeyAsString)
                 .Select(b =>
                     new TimeSeriesHistogramResult
                     {
