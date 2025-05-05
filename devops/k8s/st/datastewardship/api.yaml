@@ -6,6 +6,7 @@ metadata:
   name: datastewardship-api
   namespace: datastewardship-st
 spec:
+  type: ClusterIP
   ports:
     - port: 5000
       targetPort: 5000
@@ -30,22 +31,11 @@ spec:
     metadata:
       annotations:
         logging: "true"
-        vault.hashicorp.com/agent-inject: "true"
-        vault.hashicorp.com/agent-inject-status: "update"
-        vault.hashicorp.com/ca-cert: "/vault/tls/ca-bundle.crt"
-        vault.hashicorp.com/tls-secret: "vault-ca-bundle"
-        vault.hashicorp.com/role: "datastewardship"
-        vault.hashicorp.com/agent-inject-secret-env: "kv2/data/datastewardship/st"
-        vault.hashicorp.com/agent-inject-template-env: |
-          {{- with secret "kv2/data/datastewardship/st" -}}
-            {{- range $k, $v := .Data.data -}}
-              export {{ $k }}="{{ $v }}"
-            {{ end }}
-          {{- end }}
       labels:
         app: datastewardship-api
     spec:
-      serviceAccountName: datastewardship-sa
+      securityContext:
+        runAsNonRoot: true
       topologySpreadConstraints: # try to spread out api instances over available nodes
       - labelSelector:
           matchLabels:
@@ -57,6 +47,31 @@ spec:
         - env:
             - name: ASPNETCORE_ENVIRONMENT
               value: k8s-st
+            - name: InstrumentationKey
+              valueFrom:
+                  secretKeyRef:
+                    key: InstrumentationKey
+                    name: datastewardship-secret
+            - name: ProcessDbPassword
+              valueFrom:
+                  secretKeyRef:
+                    key: ProcessDbPassword
+                    name: datastewardship-secret
+            - name: ProcessDbUserName
+              valueFrom:
+                  secretKeyRef:
+                    key: ProcessDbUserName
+                    name: datastewardship-secret
+            - name: SearchDbPassword
+              valueFrom:
+                  secretKeyRef:
+                    key: SearchDbPassword
+                    name: datastewardship-secret
+            - name: SearchDbUserName
+              valueFrom:
+                  secretKeyRef:
+                    key: SearchDbUserName
+                    name: datastewardship-secret
             - name: ApplicationInsights
               value: '{"InstrumentationKey": "SECRET_PLACEHOLDER", "EnableRequestBodyLogging": false,"EnableSearchResponseCountLogging": false}'
             - name: IdentityServer
@@ -69,8 +84,6 @@ spec:
               value: '{"BaseAddress": "https://artdatauser-st.artdata.slu.se/api","AcceptHeaderContentType": "application/json"}'
           image: adbpocreg.azurecr.io/datastewardship-api:$(Parameters.ImageTag)
           name: datastewardship-api
-          command: ["sh", "-c"]
-          args: [". /vault/secrets/env && dotnet SOS.DataStewardship.Api.dll"]
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 5000
@@ -86,7 +99,19 @@ spec:
             successThreshold: 1
             failureThreshold: 3
             periodSeconds: 30 # runs every 30 seconds
-          resources: {}
+          resources:
+            requests:
+              cpu: 35m
+              memory: 3500M
+            limits:
+              memory: 3500M
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsUser: 1000
+            runAsGroup: 1000
+            capabilities:
+              drop:
+                - ALL
       restartPolicy: Always
       imagePullSecrets:
         - name: regcred

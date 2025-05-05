@@ -1,4 +1,6 @@
-﻿using NetTopologySuite.Geometries;
+﻿using CSharpFunctionalExtensions;
+using NetTopologySuite.Geometries;
+using SOS.Lib.Cache;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
@@ -14,9 +16,13 @@ using Result = CSharpFunctionalExtensions.Result;
 
 namespace SOS.Shared.Api.Validators
 {
+    /// <summary>
+    /// Validate input
+    /// </summary>
     public class InputValidator : IInputValidator
     {
         private readonly IAreaCache _areaCache;
+        private readonly SortableFieldsCache _sortableFieldsCache;
         private readonly ITaxonManager _taxonManager;
         
         private readonly double _countFactor;
@@ -56,16 +62,20 @@ namespace SOS.Shared.Api.Validators
         /// Constructor
         /// </summary>
         /// <param name="areaCache"></param>
+        /// <param name="sortableFieldsCache"></param>
         /// <param name="taxonManager"></param>
         /// <param name="configuration"></param>
         /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentException"></exception>
         public InputValidator(
             IAreaCache areaCache,
+            SortableFieldsCache sortableFieldsCache,
             ITaxonManager taxonManager,
             InputValaidationConfiguration configuration
         )
         {
             _areaCache = areaCache ?? throw new ArgumentNullException(nameof(areaCache));
+            _sortableFieldsCache = sortableFieldsCache ?? throw new ArgumentNullException(nameof(sortableFieldsCache));
             _taxonManager = taxonManager ?? throw new ArgumentNullException(nameof(taxonManager));
             if (configuration == null)
             {
@@ -419,14 +429,7 @@ namespace SOS.Shared.Api.Validators
             if (errors.Count > 0) return Result.Failure(string.Join(". ", errors));
             return Result.Success();
         }
-
-        /// <summary>
-        ///  Validate signal search filter
-        /// </summary>
-        /// <param name="filter"></param>
-        /// <param name="validateSearchFilter"></param>
-        /// <param name="areaBuffer"></param>
-        /// <returns></returns>
+        /// <inheritdoc/>
         public async Task<Result> ValidateSignalSearchAsync(SignalFilterDto filter, bool validateSearchFilter, int areaBuffer)
         {
             Result validateTaxonLists(TaxonFilterBaseDto filter)
@@ -456,6 +459,40 @@ namespace SOS.Shared.Api.Validators
             );
         }
 
+        /// <inheritdoc/>
+        public async Task<Result<List<string>>> ValidateSortFieldsAsync(IEnumerable<string> sortFields)
+        {            
+            if ((sortFields?.Count() ?? 0) == 0)
+            {
+                return Result.Success<List<string>>(null);
+            }
+
+            var sortableFieldsSet = await _sortableFieldsCache.GetSortableFieldsAsync();
+            var errors = new List<string>();
+            var validFields = new List<string>();
+
+            foreach (var sortField in sortFields)
+            {
+                string sortableField = null;
+                if (!sortableFieldsSet?.TryGetValue(sortField, out sortableField) ?? false)
+                {
+                    errors.Add($"{sortField} is not a sortable field");
+                }
+                else
+                {
+                    validFields.Add(sortableField);
+                }
+            }
+
+            if (errors.Count > 0)
+            {
+                return Result.Failure<List<string>>(string.Join(", ", errors));
+            }
+
+            return Result.Success(validFields);
+        }
+
+        /// <inheritdoc/>
         public async Task<Result> ValidateTaxaAsync(IEnumerable<int> taxonIds)
         {
             var taxonTree = await _taxonManager.GetTaxonTreeAsync();

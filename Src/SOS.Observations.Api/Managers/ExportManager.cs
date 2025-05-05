@@ -2,6 +2,7 @@
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Enums;
+using SOS.Lib.Exceptions;
 using SOS.Lib.Helpers;
 using SOS.Lib.IO.DwcArchive.Interfaces;
 using SOS.Lib.IO.Excel.Interfaces;
@@ -326,8 +327,12 @@ namespace SOS.Observations.Api.Managers
             bool dynamicProjectDataFields,
             bool gzip,
             IJobCancellationToken cancellationToken)
-        {
-            await _downloadSemaphore.WaitAsync();
+        {   
+            if (!await _downloadSemaphore.WaitAsync(TimeSpan.FromSeconds(60)))
+            {
+                throw new SemaphoreTimeoutException();
+            }
+
             try
             {
                 await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);                

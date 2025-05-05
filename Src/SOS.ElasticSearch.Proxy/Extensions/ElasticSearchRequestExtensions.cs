@@ -3,6 +3,63 @@ namespace SOS.ElasticSearch.Proxy.Extensions
 {
     public static class ElasticSearchRequestExtensions
     {
+        private static ICollection<IDictionary<string, object>> TryOptimizeQuery(ICollection<IDictionary<string, object>> shouldQuery, ICollection<IDictionary<string, object>> filterQuery)
+        {
+            if ((shouldQuery?.Count() ?? 0) == 0)
+            {
+                return shouldQuery!;
+            }
+            var cleanedQuery = new List<IDictionary<string, object>>();
+            var termCriterias = new Dictionary<string, IList<object>>();
+            foreach (var part in shouldQuery!)
+            {
+                bool addPart = true;
+                foreach (var criteria in part)
+                {
+                    if (criteria.Key.Equals("term"))
+                    {
+                        var term = (IDictionary<string, object>)criteria.Value;
+                        var key = term.Keys.FirstOrDefault()?.ToString();
+                        if (!string.IsNullOrEmpty(key))
+                        {
+                            if (!termCriterias.TryGetValue(key, out var termValue))
+                            {
+                                termValue = new List<object>();
+                                termCriterias.Add(key, termValue);
+                            }
+                            var value = term.Values?.FirstOrDefault();
+                            if (value != null)
+                            {
+                                termValue!.Add(value);
+                                addPart = false;
+                            }
+                        }
+                    }
+                }
+                if (addPart)
+                {
+                    cleanedQuery.Add(part);
+                }
+            }
+            foreach (var termCriteria in termCriterias)
+            {
+                if (termCriteria.Value.Count() == 1)
+                {
+                    filterQuery.Add(new Dictionary<string, object>() { { "term",
+                        new Dictionary<string, object>() { { termCriteria.Key, termCriteria.Value.First() } } } }
+                    );
+                }
+                else
+                {
+                    filterQuery.Add(new Dictionary<string, object>() { { "terms",
+                        new Dictionary<string, object>() { { termCriteria.Key, termCriteria.Value } } } }
+                    );
+                }
+            }
+
+            return cleanedQuery;
+        }
+
         /// <summary>
         /// Remove some fields from search response
         /// </summary>
@@ -44,6 +101,7 @@ namespace SOS.ElasticSearch.Proxy.Extensions
             IDictionary<string, object> queryDictionary = new Dictionary<string, object>();
             IDictionary<string, object> boolDictionary = new Dictionary<string, object>();
             ICollection<IDictionary<string, object>> filterList = new List<IDictionary<string, object>>();
+            ICollection<IDictionary<string, object>> shouldList = new List<IDictionary<string, object>>();
             if (bodyDictionary.TryGetValue("query", out var query))
             {
                 queryDictionary = (IDictionary<string, object>)query;
@@ -66,6 +124,20 @@ namespace SOS.ElasticSearch.Proxy.Extensions
                             filterList.Add((IDictionary<string, object>)filter);
                         }
                     }
+                    else if (boolDictionary.TryGetValue("should", out var should))
+                    {
+                        if (should.GetType().Name.Contains("List", StringComparison.CurrentCultureIgnoreCase))
+                        {
+                            foreach (var dictionary in (IEnumerable<object>)should)
+                            {
+                                shouldList.Add((IDictionary<string, object>)dictionary);
+                            }
+                        }
+                        else
+                        {
+                            shouldList.Add((IDictionary<string, object>)should);
+                        }
+                    }
                 }
                 else // Leaf Query
                 {
@@ -76,6 +148,9 @@ namespace SOS.ElasticSearch.Proxy.Extensions
                     }
                 }
             }
+
+            // Try to rewrite all multiple term should to terms filter
+            shouldList = TryOptimizeQuery(shouldList, filterList);
 
             ICollection<IDictionary<string, object>> sightingTypeQuery = new List<IDictionary<string, object>>();
             // Only Artportalen observations with specified default sightingTypeSearchGroupId
@@ -96,6 +171,16 @@ namespace SOS.ElasticSearch.Proxy.Extensions
             );
 
             boolDictionary["filter"] = filterList;
+
+            if (shouldList.Count == 0 && boolDictionary.ContainsKey("should"))
+            { 
+                boolDictionary.Remove("should");
+            }
+            else if (shouldList.Count != 0)
+            {
+                boolDictionary["should"] = shouldList;
+            }
+            
             queryDictionary["bool"] = boolDictionary;
             bodyDictionary["query"] = queryDictionary;
         }
@@ -113,18 +198,32 @@ namespace SOS.ElasticSearch.Proxy.Extensions
 
             if (bodyDictionary.TryGetValue("sort", out dynamic? sort))
             {
-                var sortDictionaryList = (List<object>)sort;
-                if (sortDictionaryList.Count == 0) return;
-                if (sortDictionaryList.Count > 1)
-                {
-                    sortDictionaryList = new List<object> { sortDictionaryList[0] };
+                ICollection<object> sortDictionaryList = null!;
+                try
+                {   // Asume sort is a list
+                    sortDictionaryList = (ICollection<object>)sort;
                 }
-
-                var sortDictionary = (IDictionary<string, object>)sortDictionaryList.First();
-                if (sortDictionary.ContainsKey("_id"))
+                catch
                 {
-                    sortDictionary.Add("event.endDate", new { order = "desc" });
-                    sortDictionary.Remove("_id");
+                    // If sort was'nt a list, it's must be a dictionary
+                    sortDictionaryList = new List<object>
+                    {
+                        (IDictionary<string, object>)sort
+                    };
+                }
+                finally
+                {
+                    foreach (var obj in sortDictionaryList)
+                    {
+                        var sortDictionary = obj as IDictionary<string, object>;
+                        if ((sortDictionary?.Count ?? 0) == 0) continue;
+
+                        if (sortDictionary!.ContainsKey("_id"))
+                        {
+                            sortDictionary.Add("event.endDate", new { order = "desc" });
+                            sortDictionary.Remove("_id");
+                        }
+                    }
                     bodyDictionary["sort"] = sortDictionaryList;
                 }
             }

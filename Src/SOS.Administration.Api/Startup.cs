@@ -30,6 +30,9 @@ using SOS.Lib.Repositories.Processed;
 using Serilog;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.AspNetCore.Http;
+using SOS.Lib.Repositories.Resource.Interfaces;
+using SOS.Lib.Repositories.Resource;
+using SOS.Administration.Api.Managers;
 
 namespace SOS.Administration.Api
 {
@@ -39,6 +42,7 @@ namespace SOS.Administration.Api
     public class Startup
     {
         private bool _isDevelopment;
+        private bool _useLocalHangfire = false;
 
         /// <summary>
         ///     Start up
@@ -61,6 +65,7 @@ namespace SOS.Administration.Api
                 builder.AddUserSecrets<Startup>();
             }
 
+            _useLocalHangfire = GetEnvironmentBool(environmentVariable: "USE_LOCAL_HANGFIRE");
             Configuration = builder.Build();
             Settings.Init(Configuration); // or fail early!
         }
@@ -138,7 +143,11 @@ namespace SOS.Administration.Api
             services.AddHealthChecks().AddCheck<HealthCheck>("CustomHealthCheck");
 
             // Hangfire
-            var hangfireDbConfiguration = Settings.HangfireDbConfiguration;
+            var hangfireDbConfiguration = Settings.HangfireDbConfiguration;            
+            if (_useLocalHangfire)
+            {
+                hangfireDbConfiguration = Settings.LocalHangfireDbConfiguration;
+            }
 
             services.AddHangfire(configuration =>
                 configuration
@@ -168,6 +177,7 @@ namespace SOS.Administration.Api
             var importConfiguration = Settings.ImportConfiguration;
             services.AddSingleton(importConfiguration.GeoRegionApiConfiguration);
 
+            services.AddScoped<DiagnosticsManager>();
             services.AddScoped<ICacheManager, CacheManager>();
             services.AddScoped<IProcessInfoRepository, ProcessInfoRepository>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
@@ -176,6 +186,7 @@ namespace SOS.Administration.Api
             ApiManagementServiceConfiguration apiMgmtServiceConfiguration = new ApiManagementServiceConfiguration();
             services.AddSingleton(apiMgmtServiceConfiguration);
             services.AddScoped<IAuthorizationProvider, CurrentUserAuthorization>();
+            services.AddScoped<ITaxonRepository, TaxonRepository>();
 
             /*       // Add managers
                    services.AddSingleton<IIptManager, IIptManager>();
@@ -265,6 +276,11 @@ namespace SOS.Administration.Api
                         diagnosticContext.Set("Handler", handler);
                     }
 
+                    if (httpContext.Items.TryGetValue("ApiUserType", out var apiUserType))
+                    {
+                        diagnosticContext.Set("ApiUserType", apiUserType);
+                    }
+
                     try
                     {
                         var authHeader = httpContext.Request.Headers["Authorization"].FirstOrDefault();
@@ -291,6 +307,25 @@ namespace SOS.Administration.Api
             });
 
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
+        }
+
+        private static bool GetEnvironmentBool(string environmentVariable, bool defaultValue = false)
+        {
+            string value = Environment.GetEnvironmentVariable(environmentVariable);
+
+            if (value != null)
+            {
+                if (bool.TryParse(value, out var boolValue))
+                {
+                    return boolValue;
+                }
+
+                return defaultValue;
+            }
+            else
+            {
+                return defaultValue;
+            }
         }
     }
 

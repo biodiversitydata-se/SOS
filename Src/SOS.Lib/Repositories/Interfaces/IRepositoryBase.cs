@@ -67,8 +67,8 @@ namespace SOS.Lib.Repositories.Interfaces
         /// <returns></returns>
         Task<bool> AddManyAsync(IEnumerable<TEntity> items, IMongoCollection<TEntity> mongoCollection);
 
-        Task<bool> UpsertManyAsync(IEnumerable<TEntity> items);
-        Task<bool> UpsertManyAsync(IEnumerable<TEntity> items, IMongoCollection<TEntity> mongoCollection);
+        Task<bool> UpsertManyAsync(IEnumerable<TEntity> items, string comparisionField = "_id");
+        Task<bool> UpsertManyAsync(IEnumerable<TEntity> items, IMongoCollection<TEntity> mongoCollection, string comparisionField = "_id");
 
         /// <summary>
         ///     Add or update existing entity
@@ -313,6 +313,10 @@ namespace SOS.Lib.Repositories.Interfaces
         /// </summary>
         /// <returns></returns>
         Task<TKey> GetMaxIdAsync(IMongoCollection<TEntity> mongoCollection);
+
+        Task<(int Id, T AggregationValue)> GetMaxValueWithIdAsync<T>(
+            IMongoCollection<TEntity> mongoCollection,
+            string fieldName) where T : IConvertible;
 
         Task<TEntity> GetDocumentWithMaxIdAsync(IMongoCollection<TEntity> mongoCollection);
 

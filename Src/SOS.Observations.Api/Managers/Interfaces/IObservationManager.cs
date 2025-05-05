@@ -1,8 +1,10 @@
-﻿using SOS.Lib.Enums;
+﻿using NetTopologySuite.Features;
+using SOS.Lib.Enums;
 using SOS.Lib.Models.Search.Enums;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
 using SOS.Shared.Api.Dtos;
+using SOS.Shared.Api.Dtos.Enum;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -57,6 +59,24 @@ namespace SOS.Observations.Api.Managers.Interfaces
             string scrollId);
 
         /// <summary>
+        /// Aggregate on geometry area
+        /// </summary>
+        /// <param name="roleId"></param>
+        /// <param name="authorizationApplicationIdentifier"></param>
+        /// <param name="filter"></param>
+        /// <param name="areaType"></param>
+        /// <param name="aggregateOrganismQuantity"></param>
+        /// <param name="coordinateSys"></param>
+        /// <returns></returns>
+        Task<FeatureCollection> GetAreaAggregationAsync(
+            int? roleId,
+            string authorizationApplicationIdentifier,
+            SearchFilter filter,
+            AreaTypeAggregateDto areaType,
+            bool aggregateOrganismQuantity,
+            CoordinateSys coordinateSys);
+
+        /// <summary>
         /// Get aggregated data
         /// </summary>
         /// <param name="roleId"></param>
@@ -67,6 +87,20 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <param name="take"></param>
         /// <returns></returns>
         Task<PagedResult<dynamic>> GetAggregatedChunkAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilter filter, AggregationType aggregationType, int skip, int take);
+
+        /// <summary>
+        /// Get aggregated data
+        /// </summary>
+        /// <param name="roleId"></param>
+        /// <param name="authorizationApplicationIdentifier"></param>
+        /// <param name="filter"></param>
+        /// <param name="timeSeriesType"></param>
+        /// <returns></returns>
+        Task<IEnumerable<TimeSeriesHistogramResult>> GetTimeSeriesHistogramAsync(
+            int? roleId, 
+            string authorizationApplicationIdentifier, 
+            SearchFilter filter, 
+            TimeSeriesType timeSeriesType);
 
         /// <summary>
         /// Geo grid tile aggregation
@@ -174,7 +208,7 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <param name="onlyAboveMyClearance"></param>
         /// <param name="validateGeographic"></param>
         /// <returns></returns>
-        Task<SignalSerachResult> SignalSearchInternalAsync(
+        Task<SignalSearchResult> SignalSearchInternalAsync(
             int? roleId,
             string authorizationApplicationIdentifier,
             SearchFilter filter,

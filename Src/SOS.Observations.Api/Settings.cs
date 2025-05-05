@@ -9,19 +9,21 @@ using System.Text.Json;
 
 public static class Settings
 {
+    public static bool CorsAllowAny { get; set; } = false;
     public static UserServiceConfiguration UserServiceConfiguration { get; set; } = new();
     public static ObservationApiConfiguration ObservationApiConfiguration { get; set; } = new();
     public static VocabularyConfiguration VocabularyConfiguration { get; set; } = new();
     public static ArtportalenApiServiceConfiguration ArtportalenApiServiceConfiguration { get; set; } = new();
+    public static SemaphoreLimitsConfiguration SemaphoreLimitsConfiguration { get; set; } = new();
     public static AreaConfiguration AreaConfiguration { get; set; } = new();
     public static InputValaidationConfiguration InputValidationConfiguration { get; set; } = new();
     public static ApplicationInsights ApplicationInsightsConfiguration { get; set; } = new();
     public static BlobStorageConfiguration BlobStorageConfiguration { get; set; } = new();
     public static CryptoConfiguration CryptoConfiguration { get; set; } = new();
     public static HangfireDbConfiguration HangfireDbConfiguration { get; set; } = new();
+    public static HangfireDbConfiguration LocalHangfireDbConfiguration { get; set; } = new();
     public static MongoDbConfiguration ProcessDbConfiguration { get; set; } = new();
     public static ElasticSearchConfiguration SearchDbConfiguration { get; set; } = new();
-    public static IdentityServerConfiguration IdentityServer { get; set; } = new();
     public static DevOpsConfiguration DevOpsConfiguration { get; set; } = new();
     public static HealthCheckConfiguration HealthCheckConfiguration { get; set; } = new();
     public static string ClientSecret { get; set; } = "";
@@ -47,9 +49,10 @@ public static class Settings
         using var loggerFactory = LoggerFactory.Create(loggingBuilder => loggingBuilder.SetMinimumLevel(LogLevel.Debug).AddConsole());
         var logger = loggerFactory.CreateLogger("Settings");
 
-        IdentityServer = GetConfigSection<IdentityServerConfiguration>("IdentityServer", configuration, logger);
+        CorsAllowAny = GetConfigValueString("CorsAllowAny", configuration, logger, sensitiveSetting: false, required: false)?.Equals("true", StringComparison.CurrentCultureIgnoreCase) ?? false;
         ObservationApiConfiguration = GetConfigSection<ObservationApiConfiguration>("ObservationApiConfiguration", configuration, logger);
         VocabularyConfiguration = GetConfigSection<VocabularyConfiguration>("VocabularyConfiguration", configuration, logger);
+        SemaphoreLimitsConfiguration = GetConfigSection<SemaphoreLimitsConfiguration>("SemaphoreLimitsConfiguration", configuration, logger);        
         ArtportalenApiServiceConfiguration = GetConfigSection<ArtportalenApiServiceConfiguration>("ArtportalenApiServiceConfiguration", configuration, logger);
         AreaConfiguration = GetConfigSection<AreaConfiguration>("AreaConfiguration", configuration, logger);
         InputValidationConfiguration = GetConfigSection<InputValaidationConfiguration>("InputValaidationConfiguration", configuration, logger);
@@ -100,7 +103,6 @@ public static class Settings
             logger.LogInformation("replaced SECRET_PLACEHOLDER in BlobStorageConfiguration.Key with the value in BlobStorageKey");
         }
 
-
         // CryptoConfiguration
         CryptoConfiguration = GetConfigSection<CryptoConfiguration>("CryptoConfiguration", configuration, logger);
         Password = GetConfigValueString("Password", configuration, logger, sensitiveSetting: true, required: false);
@@ -130,6 +132,7 @@ public static class Settings
             HangfireDbConfiguration.Password = HangfireDbPassword;
             logger.LogInformation("replaced SECRET_PLACEHOLDER in HangfireDbConfiguration.Password with the value in HangfireDbPassword");
         }
+        LocalHangfireDbConfiguration = GetConfigSection<HangfireDbConfiguration>("LocalHangfireDbConfiguration", configuration, logger, sensitiveSetting: false);
 
         // Process db
         ProcessDbConfiguration = GetConfigSection<MongoDbConfiguration>("ProcessDbConfiguration", configuration, logger, sensitiveSetting: false);

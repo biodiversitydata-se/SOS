@@ -170,6 +170,7 @@
     },
     "CoordinateUncertaintyInMeters": 1000,
     "CreateEventDwC": false,
+    "DefaultVerificationStatus": "ReportedByExpert",
     "Descriptions": [
       {
         "CultureCode": "en-GB",
@@ -390,7 +391,7 @@
     "Descriptions": [
       {
         "CultureCode": "en-GB",
-        "Value": "Records of specimen from the six largest herbaria in Sweden are gathered in the Virtual Herbarium, incluidng Herbarium Gothenburg (GB), Botanical Museum Lund (LD), Biological Museum Oskarshamn (OHN), Swedish Museum of Natural History Stockholm (S), Herbarium Umeå (UME), Museum of Evolution Uppsala (UPS)."
+        "Value": "Records of specimen from the six largest herbaria in Sweden are gathered in the Virtual Herbarium, including Herbarium Gothenburg (GB), Botanical Museum Lund (LD), Biological Museum Oskarshamn (OHN), Swedish Museum of Natural History Stockholm (S), Herbarium Umeå (UME), Museum of Evolution Uppsala (UPS)."
       },
       {
         "CultureCode": "sv-SE",
@@ -402,7 +403,7 @@
     "Id": 7,
     "Identifier": "VirtualHerbarium",
     "IncludeInHealthCheck": true,
-    "IncludeInScheduledHarvest": true,
+    "IncludeInScheduledHarvest": false,
     "IncludeInSearchByDefault": true,
     "IsActive": true,
     "Names": [
@@ -463,6 +464,7 @@
     },
     "CoordinateUncertaintyInMeters": 1200,
     "CreateEventDwC": false,
+    "DefaultVerificationStatus": "ReportedByExpert",
     "Descriptions": [
       {
         "CultureCode": "en-GB",
@@ -869,6 +871,7 @@
         "type": "Observations"
       }
     ],
+    "DefaultVerificationStatus": "ReportedByExpert",
     "Descriptions": [
       {
         "CultureCode": "en-GB",
@@ -940,6 +943,7 @@
       "Email": "shark@smhi.se"
     },
     "CoordinateUncertaintyInMeters": 5000,
+    "DefaultVerificationStatus": "ReportedByExpert",
     "Descriptions": [
       {
         "CultureCode": "en-GB",
@@ -1157,6 +1161,7 @@
     },
     "CoordinateUncertaintyInMeters": 1131,
     "CreateEventDwC": false,
+    "DefaultVerificationStatus": "ReportedByExpert",
     "Descriptions": [
       {
         "CultureCode": "en-GB",
@@ -1362,7 +1367,7 @@
         "path": [ "iNaturalist.org", "iNaturalist Sverige" ]
       }
     ],
-    "PreviousProcessLimit": 95,
+    "PreviousProcessLimit": 10,
     "SupportDatasets": false,
     "SupportDynamicEml": false,
     "SupportEvents": false,
@@ -1395,6 +1400,7 @@
         "type": "Observations"
       }
     ],
+    "DefaultVerificationStatus": "ReportedByExpert",
     "Descriptions": [
       {
         "CultureCode": "en-GB",
@@ -1476,6 +1482,7 @@
         "type": "Observations"
       }
     ],
+    "DefaultVerificationStatus": "ReportedByExpert",
     "Descriptions": [
       {
         "CultureCode": "en-GB",
@@ -1557,6 +1564,7 @@
         "type": "Observations"
       }
     ],
+    "DefaultVerificationStatus": "ReportedByExpert",
     "Descriptions": [
       {
         "CultureCode": "en-GB",
@@ -1639,6 +1647,7 @@
         "type": "Observations"
       }
     ],
+    "DefaultVerificationStatus": "ReportedByExpert",
     "Descriptions": [
       {
         "CultureCode": "en-GB",

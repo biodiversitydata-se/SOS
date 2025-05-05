@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Tokens;
+using MongoDB.Driver.Linq;
 using Nest;
 using SOS.Lib;
 using SOS.Lib.Cache.Interfaces;
@@ -41,7 +41,7 @@ namespace SOS.Observations.Api.Repositories
             var indexNames = GetCurrentIndex(filter);
             var (query, excludeQuery) = GetCoreQueries(filter);
             query.AddAggregationFilter(aggregationType);
-            
+
             // Get number of distinct values
             var searchResponseCount = await Client.SearchAsync<dynamic>(s => s
                 .Index(indexNames)
@@ -83,7 +83,7 @@ namespace SOS.Observations.Api.Repositories
                 size = maxResult == 0 ? 1 : maxResult;
                 take = maxResult;
             }
-            
+
             // Get the real result
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
                 .Index(indexNames)
@@ -103,7 +103,7 @@ namespace SOS.Observations.Api.Repositories
                             .Terms("id", t => t
                                 .Field("taxon.id")
                             )
-                        )                        
+                        )
                 )
             )
                 .Size(0)
@@ -336,6 +336,141 @@ namespace SOS.Observations.Api.Repositories
                 Take = yearWeeks.Count(),
                 TotalCount = yearWeeks.Count()
             };
+
+            // When operation is disposed, telemetry item is sent.
+        }
+
+        /// <inheritdoc />
+        public async Task<IEnumerable<TimeSeriesHistogramResult>> GetTimeSeriesHistogramAsync(SearchFilter filter, TimeSeriesType timeSeriesType)
+        {
+            var indexNames = GetCurrentIndex(filter);
+            var (query, excludeQuery) = GetCoreQueries(filter);
+
+            var field = timeSeriesType switch
+            {
+                TimeSeriesType.Month => "event.startMonth",
+                TimeSeriesType.Week48 => "event.startHistogramWeek",
+                TimeSeriesType.Day => "event.startDay",
+                _ => "event.startDay"
+            };
+
+            var extendedBoundsMax = timeSeriesType switch
+            {
+                TimeSeriesType.Month => 12,
+                TimeSeriesType.Week48 => 48,
+                TimeSeriesType.Day => 365,
+                _ => 365
+            };
+
+            var searchResponse = await Client.SearchAsync<dynamic>(s => s
+                .Index(indexNames)
+                .Query(q => q
+                    .Bool(b => b
+                        .MustNot(excludeQuery)
+                        .Filter(query)
+                    )
+                )
+                .Aggregations(a => a
+                    .Histogram("aggregation", dh => dh
+                        .Field(field)
+                        .Interval(1)
+                        .ExtendedBounds(1, extendedBoundsMax)
+                        .Aggregations(a => a
+                            .Sum("quantity", sum => sum
+                                .Field("occurrence.organismQuantityAggregation")
+                            )
+                            .Cardinality("unique_taxonids", c => c
+                                .Field("taxon.id")
+                            )
+                        )
+                    )
+                )
+            .Size(0)
+                .Source(s => s.ExcludeAll())
+            );
+
+            searchResponse.ThrowIfInvalid();
+
+            var totalCount = searchResponse.HitsMetadata.Total.Value;
+            return searchResponse
+                .Aggregations
+                .Histogram("aggregation")
+                .Buckets?
+                .Select(b =>
+                    new TimeSeriesHistogramResult
+                    {
+                        Type = timeSeriesType,
+                        Period = (int)b.Key,
+                        Observations = (int)b.DocCount,
+                        Quantity = (int)b.Sum("quantity").Value,
+                        Taxa = (int)b.Cardinality("unique_taxonids").Value
+                    });
+
+            // When operation is disposed, telemetry item is sent.
+        }
+
+        /// <inheritdoc />
+        public async Task<IEnumerable<TimeSeriesHistogramResult>> GetYearHistogramAsync(SearchFilter filter, TimeSeriesType timeSeriesType)
+        {
+            var indexNames = GetCurrentIndex(filter);
+            var (query, excludeQuery) = GetCoreQueries(filter);
+
+            var tz = TimeZoneInfo.Local.GetUtcOffset(DateTime.Now);
+            var searchResponse = await Client.SearchAsync<dynamic>(s => s
+                .Index(indexNames)
+                .Query(q => q
+                    .Bool(b => b
+                        .MustNot(excludeQuery)
+                        .Filter(query)
+                    )
+                )
+                .Aggregations(a => a
+
+                    .DateHistogram("aggregation", dh =>
+                    {
+                        dh.Field("event.startDate")
+                        .CalendarInterval(DateInterval.Year)
+                        .TimeZone($"{(tz.TotalMinutes > 0 ? "+" : "")}{tz.Hours:00}:{tz.Minutes:00}")
+                        .Format("yyyy-MM-dd")
+                        .Aggregations(a => a
+                            .Sum("quantity", sum => sum
+                                .Field("occurrence.organismQuantityAggregation")
+                            )
+                            .Cardinality("unique_taxonids", c => c
+                                .Field("taxon.id")
+                            )
+                        );
+
+                        if (filter.Date != null)
+                        {
+                            dh.ExtendedBounds(filter.Date.StartDate, filter.Date.EndDate);
+                        }
+
+                        return dh;
+                    })
+                )
+            .Size(0)
+                .Source(s => s.ExcludeAll())
+            );
+
+            searchResponse.ThrowIfInvalid();
+
+            var totalCount = searchResponse.HitsMetadata.Total.Value;
+
+            return searchResponse
+                .Aggregations
+                .DateHistogram("aggregation")
+                .Buckets?
+                .OrderByDescending(b => b.KeyAsString)
+                .Select(b =>
+                    new TimeSeriesHistogramResult
+                    {
+                        Type = timeSeriesType,
+                        Period = DateTime.Parse(b.KeyAsString).Year,
+                        Observations = (int)b.DocCount,
+                        Quantity = (int)b.Sum("quantity").Value,
+                        Taxa = (int)b.Cardinality("unique_taxonids").Value
+                    });
 
             // When operation is disposed, telemetry item is sent.
         }

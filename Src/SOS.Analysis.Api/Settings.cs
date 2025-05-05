@@ -5,16 +5,17 @@ using System.Text.Json;
 
 public static class Settings
 {
+    public static bool CorsAllowAny { get; set; } = false;
     public static AnalysisConfiguration AnalysisConfiguration { get; set; } = new();
     public static UserServiceConfiguration UserServiceConfiguration { get; set; } = new();
     public static CryptoConfiguration CryptoConfiguration { get; set; } = new();
-    public static IdentityServerConfiguration IdentityServer { get; set; } = new();
     public static AreaConfiguration AreaConfiguration { get; set; } = new();
     public static InputValaidationConfiguration InputValaidationConfiguration { get; set; } = new();
     public static ApplicationInsights ApplicationInsights { get; set; } = new();
     public static ElasticSearchConfiguration SearchDbConfiguration { get; set; } = new();
     public static MongoDbConfiguration ProcessDbConfiguration { get; set; } = new();
     public static HangfireDbConfiguration HangfireDbConfiguration { get; set; } = new();
+    public static HangfireDbConfiguration LocalHangfireDbConfiguration { get; set; } = new();
     public static string InstrumentationKey { get; set; } = "";
     public static string SearchDbUserName { get; set; } = "";
     public static string SearchDbPassword { get; set; } = "";
@@ -33,6 +34,7 @@ public static class Settings
         using var loggerFactory = LoggerFactory.Create(loggingBuilder => loggingBuilder.SetMinimumLevel(LogLevel.Debug).AddConsole());
         var logger = loggerFactory.CreateLogger("Settings");
 
+        CorsAllowAny = GetConfigValueString("CorsAllowAny", configuration, logger, sensitiveSetting: false, required: false)?.Equals("true", StringComparison.CurrentCultureIgnoreCase) ?? false;
         AnalysisConfiguration = GetConfigSection<AnalysisConfiguration>("AnalysisConfiguration", configuration, logger);
 
         UserServiceConfiguration = GetConfigSection<UserServiceConfiguration>("UserServiceConfiguration", configuration, logger);
@@ -43,7 +45,6 @@ public static class Settings
             logger.LogInformation("replaced SECRET_PLACEHOLDER in UserServiceConfiguration.ClientSecret with the value in ClientSecret");
         }
 
-        IdentityServer = GetConfigSection<IdentityServerConfiguration>("IdentityServer", configuration, logger);
         AreaConfiguration = GetConfigSection<AreaConfiguration>("AreaConfiguration", configuration, logger);
         InputValaidationConfiguration = GetConfigSection<InputValaidationConfiguration>("InputValaidationConfiguration", configuration, logger);
 
@@ -118,6 +119,7 @@ public static class Settings
             HangfireDbConfiguration.Password = HangfireDbPassword;
             logger.LogInformation("replaced SECRET_PLACEHOLDER in HangfireDbConfiguration.Password with the value in HangfireDbPassword");
         }
+        LocalHangfireDbConfiguration = GetConfigSection<HangfireDbConfiguration>("LocalHangfireDbConfiguration", configuration, logger, sensitiveSetting: false);
     }
 
     private static T GetConfigSection<T>(string key, IConfiguration configuration, ILogger logger, bool sensitiveSetting = false, bool required = true)

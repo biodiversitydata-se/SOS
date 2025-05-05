@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using SOS.Lib.Cache;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Enums;
@@ -119,44 +118,46 @@ namespace SOS.Lib.Managers
             //_logger.LogDebug($"CacheManager.ClearAsync({cache}) called. Distributed cache not implemented, but the local cache is cleared.");
             
             var success = true;
-            var client = new HttpClient();
-            if (_sosApiConfiguration?.ObservationsApiAddresses?.Any() ?? false)
-            {
-                foreach (var observationsApiAddress in _sosApiConfiguration.ObservationsApiAddresses)
-                {
-                    var requestUri = $"{observationsApiAddress}Caches/{cache}";
-                    success = success && await ClearAsync(client, requestUri);
-                }
-            }
+            // todo - Clear distributed cache (Redis) when implemented.
 
-            if (cache.Equals(Enums.Cache.ProcessedConfiguration) && (_sosApiConfiguration?.ElasticSearchProxyAddresses?.Any() ?? false))
-            {
-                foreach (var elasticSearchProxyAddress in _sosApiConfiguration.ElasticSearchProxyAddresses)
-                {
-                    var requestUri = $"{elasticSearchProxyAddress}Caches/{cache}";
-                    success = success && await ClearAsync(client, requestUri);
-                }
-            }
+            //var client = new HttpClient();
+            //if (_sosApiConfiguration?.ObservationsApiAddresses?.Any() ?? false)
+            //{
+            //    foreach (var observationsApiAddress in _sosApiConfiguration.ObservationsApiAddresses)
+            //    {
+            //        var requestUri = $"{observationsApiAddress}Caches/{cache}";
+            //        success = success && await ClearAsync(client, requestUri);
+            //    }
+            //}
 
-            if (cache.Equals(Enums.Cache.ProcessedConfiguration) && (_sosApiConfiguration?.AnalysisApiAddresses?.Any() ?? false))
-            {
-                foreach (var analysisApiAddress in _sosApiConfiguration.AnalysisApiAddresses)
-                {
-                    var requestUri = $"{analysisApiAddress}Caches/{cache}";
-                    success = success && await ClearAsync(client, requestUri);
-                }
-            }
+            //if (cache.Equals(Enums.Cache.ProcessedConfiguration) && (_sosApiConfiguration?.ElasticSearchProxyAddresses?.Any() ?? false))
+            //{
+            //    foreach (var elasticSearchProxyAddress in _sosApiConfiguration.ElasticSearchProxyAddresses)
+            //    {
+            //        var requestUri = $"{elasticSearchProxyAddress}Caches/{cache}";
+            //        success = success && await ClearAsync(client, requestUri);
+            //    }
+            //}
 
-            if (cache.Equals(Enums.Cache.ProcessedConfiguration) && (_sosApiConfiguration?.DataStewardshipApiAddresses?.Any() ?? false))
-            {
-                foreach (var dataStewardshipApiAddress in _sosApiConfiguration.DataStewardshipApiAddresses)
-                {
-                    var requestUri = $"{dataStewardshipApiAddress}Caches/{cache}";
-                    success = success && await ClearAsync(client, requestUri);
-                }
-            }
+            //if (cache.Equals(Enums.Cache.ProcessedConfiguration) && (_sosApiConfiguration?.AnalysisApiAddresses?.Any() ?? false))
+            //{
+            //    foreach (var analysisApiAddress in _sosApiConfiguration.AnalysisApiAddresses)
+            //    {
+            //        var requestUri = $"{analysisApiAddress}Caches/{cache}";
+            //        success = success && await ClearAsync(client, requestUri);
+            //    }
+            //}
 
-            _logger.LogInformation($"CacheManager.ClearAsync({cache}) called.");
+            //if (cache.Equals(Enums.Cache.ProcessedConfiguration) && (_sosApiConfiguration?.DataStewardshipApiAddresses?.Any() ?? false))
+            //{
+            //    foreach (var dataStewardshipApiAddress in _sosApiConfiguration.DataStewardshipApiAddresses)
+            //    {
+            //        var requestUri = $"{dataStewardshipApiAddress}Caches/{cache}";
+            //        success = success && await ClearAsync(client, requestUri);
+            //    }
+            //}
+
+            //_logger.LogInformation($"CacheManager.ClearAsync({cache}) called.");
             return success;
         }
     }

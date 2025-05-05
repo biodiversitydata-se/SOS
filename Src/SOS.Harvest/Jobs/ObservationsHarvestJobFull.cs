@@ -20,12 +20,12 @@ namespace SOS.Harvest.Jobs
     {
         private readonly IProcessObservationsJobFull _processObservationsJobFull;
 
-        protected override async Task PostHarvestAsync(IDictionary<DataProvider, Task<HarvestInfo>> harvestTaskByDataProvider)
+        protected override async Task PostHarvestAsync(IDictionary<DataProvider, HarvestInfo> harvestResultByDataProvider)
         {
-            foreach (var task in harvestTaskByDataProvider)
+            foreach (var task in harvestResultByDataProvider)
             {
                 var provider = task.Key;
-                var harvestInfo = task.Value.Result;
+                var harvestInfo = task.Value;
 
                 // Some properties can be updated for DwcA providers, update provider on success
                 if (harvestInfo.Status == RunStatus.Success && provider.Type == DataProviderType.DwcA)
@@ -116,7 +116,7 @@ namespace SOS.Harvest.Jobs
             var dataProvider =
                 await _dataProviderManager.GetDataProviderByIdOrIdentifier("iNaturalist");
             return (await HarvestCompleteWithDelayAsync(
-                dataProvider,                
+                dataProvider,
                 null,
                 cancellationToken)) != -1;
         }

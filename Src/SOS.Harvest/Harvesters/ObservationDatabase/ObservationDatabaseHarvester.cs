@@ -110,6 +110,7 @@ namespace SOS.Harvest.Harvesters.ObservationDatabase
                 OccurrenceRemarks = entity.OccurrenceRemarks,
                 Observers = entity.Observers,
                 Origin = entity.Origin,
+                ReportedBy = entity.ReportedBy,
                 Parish = entity.Parish,
                 ProtectionLevel = entity.ProtectionLevel,
                 Province = entity.Province,
@@ -221,7 +222,7 @@ namespace SOS.Harvest.Harvesters.ObservationDatabase
             return await FinishHarvestAsync(initValues, runStatus, harvestCount, provider.PreviousProcessLimit.GetValueOrDefault(80));
         }
 
-        public Task<HarvestInfo> HarvestCompleteObservationsWithDelayAsync(DataProvider provider, IJobCancellationToken cancellationToken)
+        public Task<HarvestInfo> HarvestAllObservationsSlowlyAsync(DataProvider provider, IJobCancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }

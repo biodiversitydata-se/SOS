@@ -10,6 +10,7 @@ using SOS.Harvest.Managers.Interfaces;
 using SOS.Harvest.Processors;
 using SOS.Harvest.Processors.Artportalen;
 using SOS.Harvest.Processors.DarwinCoreArchive;
+using SOS.Harvest.Processors.iNaturalist;
 using SOS.Lib.Cache;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Process;
@@ -32,6 +33,7 @@ using SOS.Lib.Models.TaxonListService;
 using SOS.Lib.Models.TaxonTree;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Models.Verbatim.DarwinCore;
+using SOS.Lib.Models.Verbatim.INaturalist.Service;
 using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Resource;
@@ -52,6 +54,7 @@ public class ProcessFixture : IProcessFixture
     private IProcessClient _processClient;
     private IAreaHelper _areaHelper;
     private DwcaObservationFactory? _darwinCoreFactory;
+    private iNaturalistObservationFactory? _iNaturalistFactory;    
     private DwcaEventFactory? _dwcaEventFactory;
     private DwcaDatasetFactory? _dwcaDatasetFactory;
     private IVocabularyRepository _vocabularyRepository;
@@ -286,6 +289,20 @@ public class ProcessFixture : IProcessFixture
         return processedObservations;
     }
 
+    public List<Observation> ProcessObservations(IEnumerable<iNaturalistVerbatimObservation> verbatimObservations, bool initAreaHelper = false)
+    {
+        var processedObservations = new List<Observation>();
+        bool diffuseIfSupported = false;
+        var factory = GetiNaturalistFactory(initAreaHelper);
+        foreach (var verbatimObservation in verbatimObservations)
+        {
+            var processedObservation = factory.CreateProcessedObservation(verbatimObservation, diffuseIfSupported);
+            processedObservations.Add(processedObservation!);
+        }
+
+        return processedObservations;
+    }
+
     public DwcaObservationFactory GetDarwinCoreFactory(bool initAreaHelper)
     {
         if (_darwinCoreFactory == null)
@@ -301,6 +318,29 @@ public class ProcessFixture : IProcessFixture
         }
 
         return _darwinCoreFactory;
+    }
+
+    public iNaturalistObservationFactory GetiNaturalistFactory(bool initAreaHelper)
+    {
+        if (_iNaturalistFactory == null)
+        {
+            var dataProvider = new DataProvider() { Id = 19, Identifier = "iNaturalist" };
+            _areaHelper = new AreaHelper(new AreaConfiguration(), new AreaRepository(_processClient, new NullLogger<AreaRepository>()));
+            _iNaturalistFactory = new iNaturalistObservationFactory(
+                dataProvider, 
+                _taxaById, 
+                _dwcaVocabularyById,
+                _areaHelper,
+                _processTimeManager, 
+                _processConfiguration, new NullLogger<iNaturalistObservationFactory>());       
+        }
+
+        if (initAreaHelper && !_areaHelper.IsInitialized)
+        {
+            _areaHelper.InitializeAsync().Wait();
+        }
+
+        return _iNaturalistFactory;
     }
 
     public async Task<DwcaObservationFactory> CreateDarwinCoreFactoryAsync(DataProvider dataProvider)

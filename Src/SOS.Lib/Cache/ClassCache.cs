@@ -6,12 +6,10 @@ using SOS.Lib.Extensions;
 using SOS.Lib.JsonConverters;
 using SOS.Lib.Models.Cache;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading;
@@ -45,6 +43,11 @@ namespace SOS.Lib.Cache
             {
                 CacheReleased.Invoke(this, EventArgs.Empty);
             }
+        }
+
+        public ClassCache()
+        {
+
         }
 
         /// <summary>

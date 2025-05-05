@@ -1,20 +1,13 @@
 {
-  "profiles": {
-    "IIS Express": {
-      "commandName": "IISExpress",
-      "launchBrowser": true,
-      "launchUrl": "swagger",
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "local"
-      }
-    },
-    "SOS.Search.Service": {
+  "profiles": {    
+    "SOS.Observations.API (local)": {
       "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "swagger",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "dev",
+        "ASPNETCORE_ENVIRONMENT": "local",
         "DISABLE_HANGFIRE_INIT": "true",
+        "USE_LOCAL_HANGFIRE": "true",
         "DISABLE_HEALTHCHECK_INIT": "true",
         "DISABLE_CACHED_TAXON_SUM_INIT": "true"
       },
@@ -27,6 +20,7 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Dev",
         "DISABLE_HANGFIRE_INIT": "true",
+        "USE_LOCAL_HANGFIRE": "true",
         "DISABLE_HEALTHCHECK_INIT": "true",
         "DISABLE_CACHED_TAXON_SUM_INIT": "true"
       },
@@ -39,6 +33,7 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "ST",
         "DISABLE_HANGFIRE_INIT": "true",
+        "USE_LOCAL_HANGFIRE": "true",
         "DISABLE_HEALTHCHECK_INIT": "true",
         "DISABLE_CACHED_TAXON_SUM_INIT": "true"
       },
@@ -51,6 +46,7 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Prod",
         "DISABLE_HANGFIRE_INIT": "true",
+        "USE_LOCAL_HANGFIRE": "true",
         "DISABLE_HEALTHCHECK_INIT": "true",
         "DISABLE_CACHED_TAXON_SUM_INIT": "true"
       },

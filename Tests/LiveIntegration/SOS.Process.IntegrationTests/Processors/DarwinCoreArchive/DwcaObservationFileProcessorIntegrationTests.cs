@@ -149,12 +149,6 @@ namespace SOS.Process.LiveIntegrationTests.Processors.DarwinCoreArchive
                 new DwcaFilesCreationConfiguration { IsEnabled = true, FolderPath = @"c:\temp" },
                 new NullLogger<DwcArchiveFileWriterCoordinator>()
             );
-            var dwcaConfiguration = new DwcaConfiguration()
-            {
-                BatchSize = 5000,
-                ImportPath = @"C:\Temp",
-                UseDwcaCollectionRepository = true
-            };
 
             return new DwcaObservationProcessor(
                 verbatimClient.Object,
@@ -167,7 +161,6 @@ namespace SOS.Process.LiveIntegrationTests.Processors.DarwinCoreArchive
                 diffusionManager,
                 processTimeManager,
                 processConfiguration,
-                dwcaConfiguration,
                 new NullLogger<DwcaObservationProcessor>());
         }
 

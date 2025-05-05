@@ -654,7 +654,7 @@ namespace SOS.Lib.Extensions
                 new Envelope(new Coordinate(boundingBox.BottomRight.Longitude, boundingBox.BottomRight.Latitude), new Coordinate(boundingBox.TopLeft.Longitude, boundingBox.TopLeft.Latitude));
         }
 
-        public static Geometry? ToGeoemtry(this LatLonBoundingBox boundingBox)
+        public static Geometry? ToGeometry(this LatLonBoundingBox boundingBox)
         {
             return boundingBox?.BottomRight == null || boundingBox?.TopLeft == null ?
                 null :

@@ -137,8 +137,10 @@ namespace SOS.Harvest.Processors
                 TimeManager.Stop(ProcessTimeManager.TimerTypes.MongoDbRead, mongoDbReadTimerSessionId);
                 Logger.LogDebug("Finish fetching {@dataProvider} batch ({@batchId})", dataProvider.Identifier, batchId);
 
-                return await ProcessBatchAsync(dataProvider, verbatimObservationsBatch, batchId, mode,
+                var result = await ProcessBatchAsync(dataProvider, verbatimObservationsBatch, batchId, mode,
                     observationFactory);
+                Logger.LogInformation($"Finish processing batch for {dataProvider.Identifier}. BatchId={batchId}. {LogHelper.GetMemoryUsageSummary()}");
+                return result;
             }
             catch (JobAbortedException)
             {
@@ -372,22 +374,25 @@ namespace SOS.Harvest.Processors
                 if (observationFactory.IsVerbatimObservationDiffusedByProvider(verbatimObservation))
                 {
                     observation = observationFactory.CreateProcessedObservation(verbatimObservation, true);
-                    if (observation.ShallBeProtected())
+                    if (observation != null)
                     {
-                        // If the observation shall be protected, then create the observation with real coordinates.
-                        observation = observationFactory.CreateProcessedObservation(verbatimObservation, false);
-                    }
-                    else
-                    {
-                        // Add duplicate observation with real coordinates to sensitive index.
-                        var observationWithRealCoordinates = observationFactory.CreateProcessedObservation(verbatimObservation, false);
-                        if (observationWithRealCoordinates != null)
+                        if (observation.ShallBeProtected())
                         {
-                            observationWithRealCoordinates.Sensitive = true;
-                            observationWithRealCoordinates.HasGeneralizedObservationInOtherIndex = true;
-                            observationWithRealCoordinates.Occurrence.SensitivityCategory = 3;
-                            observationWithRealCoordinates.AccessRights = new VocabularyValue { Id = (int)AccessRightsId.NotForPublicUsage };
-                            sensitiveObservations.TryAdd(observationWithRealCoordinates.Occurrence!.OccurrenceId, observationWithRealCoordinates);
+                            // If the observation shall be protected, then create the observation with real coordinates.
+                            observation = observationFactory.CreateProcessedObservation(verbatimObservation, false);
+                        }
+                        else
+                        {
+                            // Add duplicate observation with real coordinates to sensitive index.
+                            var observationWithRealCoordinates = observationFactory.CreateProcessedObservation(verbatimObservation, false);
+                            if (observationWithRealCoordinates != null)
+                            {
+                                observationWithRealCoordinates.Sensitive = true;
+                                observationWithRealCoordinates.HasGeneralizedObservationInOtherIndex = true;
+                                observationWithRealCoordinates.Occurrence.SensitivityCategory = 3;
+                                observationWithRealCoordinates.AccessRights = new VocabularyValue { Id = (int)AccessRightsId.NotForPublicUsage };
+                                sensitiveObservations.TryAdd(observationWithRealCoordinates.Occurrence!.OccurrenceId, observationWithRealCoordinates);
+                            }
                         }
                     }
                 }

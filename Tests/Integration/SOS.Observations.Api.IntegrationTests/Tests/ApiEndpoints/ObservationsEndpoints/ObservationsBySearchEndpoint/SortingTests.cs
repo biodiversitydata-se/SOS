@@ -104,10 +104,51 @@ public class SortingTests : TestBase
         {
             if (previousDate != null)
             {
-                obs.Modified.Value.Should().BeAfter(previousDate.Value);
+                obs.Modified.Value.Should().BeOnOrAfter(previousDate.Value);
             }
             previousDate = obs.Modified.Value;
         }
+    }
+
+    [Fact]
+    public async Task ObservationsBySearchEndpoint_ReturnsObservationsInCorrectOrder_WhenSortByUsingPascalCase()
+    {
+        // Arrange
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+            .All().HaveValuesFromPredefinedObservations()
+            .Build();
+        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
+        var apiClient = TestFixture.CreateApiClient();
+        var searchFilter = new SearchFilterDto { OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present };
+
+        // Act
+        var responseAsc = await apiClient.PostAsync($"/observations/search?sortBy=Taxon.Id&sortOrder=asc", JsonContent.Create(searchFilter));
+        var resultAsc = await responseAsc.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+        var responseDesc = await apiClient.PostAsync($"/observations/search?sortBy=Taxon.Id&sortOrder=desc", JsonContent.Create(searchFilter));
+        var resultDesc = await responseDesc.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+
+        // Assert
+        responseAsc.StatusCode.Should().Be(HttpStatusCode.OK);
+        responseDesc.StatusCode.Should().Be(HttpStatusCode.OK);
+        resultAsc!.Records.Select(m => m.Id).Should().BeInAscendingOrder();
+        resultDesc!.Records.Select(m => m.Id).Should().BeInDescendingOrder();
+    }
+
+    [Fact]
+    public async Task ObservationsBySearchEndpoint_ReturnsBadRequest_WhenSortByPropertyThatDoesntExists()
+    {
+        // Arrange
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+            .All().HaveValuesFromPredefinedObservations()
+            .Build();
+        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
+        var apiClient = TestFixture.CreateApiClient();
+        var searchFilter = new SearchFilterDto { OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present };
+
+        // Act
+        var responseAsc = await apiClient.PostAsync($"/observations/search?sortBy=Taxn.Id&sortOrder=asc", JsonContent.Create(searchFilter));
         
+        // Assert
+        responseAsc.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 }

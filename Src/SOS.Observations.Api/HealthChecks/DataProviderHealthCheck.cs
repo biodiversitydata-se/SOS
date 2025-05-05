@@ -58,6 +58,11 @@ namespace SOS.Observations.Api.HealthChecks
 
                 if (emlCount > providerCount * 0.9)
                 {
+                    return new HealthCheckResult(HealthStatus.Healthy, "Almost all providers have an EML file");
+                }
+
+                if (emlCount > providerCount * 0.75)
+                {
                     return new HealthCheckResult(HealthStatus.Degraded, "Almost all providers have an EML file");
                 }
 

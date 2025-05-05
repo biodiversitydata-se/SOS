@@ -20,8 +20,8 @@ namespace SOS.Lib.Extensions
                 .DateVal(d => d.StartDate, IndexSetting.SearchSortAggregate)
                 .NumberVal(n => n.EndDayOfYear, IndexSetting.SearchSortAggregate, NumberType.Short)
                 .NumberVal(n => n.StartDayOfYear, IndexSetting.SearchSortAggregate, NumberType.Short)
-                .NumberVal(n => n.StartDay, IndexSetting.SearchOnly, NumberType.Short)
-                .NumberVal(n => n.EndDay, IndexSetting.SearchOnly, NumberType.Short)
+                .NumberVal(n => n.StartDay, IndexSetting.SearchSortAggregate, NumberType.Short)
+                .NumberVal(n => n.EndDay, IndexSetting.SearchSortAggregate, NumberType.Short)
                 .NumberVal(n => n.StartMonth, IndexSetting.SearchSortAggregate, NumberType.Byte)
                 .NumberVal(n => n.EndMonth, IndexSetting.SearchSortAggregate, NumberType.Byte)
                 .NumberVal(n => n.StartHistogramWeek, IndexSetting.SearchSortAggregate, NumberType.Byte)
@@ -246,21 +246,21 @@ namespace SOS.Lib.Extensions
                     .Name(nm => nm.Atlas10x10)
                     .Properties(ps => ps
                         .KeywordLowerCase(kwlc => kwlc.FeatureId, IndexSetting.SearchSortAggregate)
-                        .KeywordLowerCase(kwlc => kwlc.Name, IndexSetting.None)
+                        .KeywordLowerCase(kwlc => kwlc.Name, IndexSetting.SearchSortAggregate)
                     )
                 )
                 .Object<Area>(c => c
                     .Name(nm => nm.Atlas5x5)
                     .Properties(ps => ps
                         .KeywordLowerCase(kwlc => kwlc.FeatureId, IndexSetting.SearchSortAggregate)
-                        .KeywordLowerCase(kwlc => kwlc.Name, IndexSetting.None)
+                        .KeywordLowerCase(kwlc => kwlc.Name, IndexSetting.SearchSortAggregate)
                     )
                 )
                 .Object<Area>(c => c
                     .Name(nm => nm.CountryRegion)
                     .Properties(ps => ps
                         .KeywordLowerCase(kwlc => kwlc.FeatureId, IndexSetting.SearchSortAggregate)
-                        .KeywordLowerCase(kwlc => kwlc.Name, IndexSetting.SearchOnly)
+                        .KeywordLowerCase(kwlc => kwlc.Name, IndexSetting.SearchSortAggregate)
                     )
                 )
                 .Object<Area>(c => c

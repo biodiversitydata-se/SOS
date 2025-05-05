@@ -14,6 +14,8 @@ namespace SOS.Lib.JsonConverters
     /// </summary>
     public class GeometryConverter : JsonConverter<Geometry>
     {
+        private static GeometryFactory geomFactory = new GeometryFactory();
+
         private string ReadCoordinateData(ref Utf8JsonReader reader)
         {
             var result = new StringBuilder();
@@ -147,8 +149,7 @@ namespace SOS.Lib.JsonConverters
 
                 reader.Read();
             }
-
-            var geomFactory = new GeometryFactory();
+            
             switch (type?.ToLower())
             {
                 case "point":

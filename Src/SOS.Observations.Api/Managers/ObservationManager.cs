@@ -24,6 +24,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using OfficeOpenXml;
 using SOS.Lib.Models.Search.Enums;
+using Nest;
+using SOS.Shared.Api.Dtos.Enum;
+using NetTopologySuite.Features;
 
 namespace SOS.Observations.Api.Managers
 {
@@ -32,6 +35,7 @@ namespace SOS.Observations.Api.Managers
     /// </summary>
     public class ObservationManager : IObservationManager
     {
+        private readonly IAreaManager _areaManager;
         private readonly IProcessedObservationRepository _processedObservationRepository;
         private readonly IProtectedLogRepository _protectedLogRepository;
         private readonly IFilterManager _filterManager;
@@ -311,6 +315,7 @@ namespace SOS.Observations.Api.Managers
         /// <summary>
         /// Constructor
         /// </summary>
+        /// <param name="areaManager"></param>
         /// <param name="processedObservationRepository"></param>
         /// <param name="protectedLogRepository"></param>
         /// <param name="vocabularyValueResolver"></param>
@@ -322,6 +327,7 @@ namespace SOS.Observations.Api.Managers
         /// <param name="dataProviderCache"></param>
         /// <param name="logger"></param>
         public ObservationManager(
+            IAreaManager areaManager,
             IProcessedObservationRepository processedObservationRepository,
             IProtectedLogRepository protectedLogRepository,
             IVocabularyValueResolver vocabularyValueResolver,
@@ -333,6 +339,7 @@ namespace SOS.Observations.Api.Managers
             IDataProviderCache dataProviderCache,
             ILogger<ObservationManager> logger)
         {
+            _areaManager = areaManager ?? throw new ArgumentNullException(nameof(areaManager));
             _processedObservationRepository = processedObservationRepository ??
                                               throw new ArgumentNullException(nameof(processedObservationRepository));
             _protectedLogRepository =
@@ -418,6 +425,87 @@ namespace SOS.Observations.Api.Managers
             }
         }
 
+        public async Task<FeatureCollection> GetAreaAggregationAsync(
+            int? roleId,
+            string authorizationApplicationIdentifier,
+            SearchFilter filter,
+            AreaTypeAggregateDto areaType,
+            bool aggregateOrganismQuantity,
+            CoordinateSys coordinateSys)
+        {
+            try
+            {
+                await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
+
+                var areaTypeProperty = areaType switch
+                {
+                    AreaTypeAggregateDto.Atlas10x10 => "location.atlas10x1.featureId",
+                    AreaTypeAggregateDto.Atlas5x5 => "location.atlas5x5.featureId",
+                    AreaTypeAggregateDto.CountryRegion => "location.countryRegion.featureId",
+                    AreaTypeAggregateDto.County => "location.county.featureId",
+                    AreaTypeAggregateDto.Municipality => "location.municipality.featureId",
+                    AreaTypeAggregateDto.Parish => "location.parish.featureId",
+                    _ => "location.province.featureId"
+                };
+
+                var result = await _processedObservationRepository.AggregateByUserFieldAsync(filter, areaTypeProperty, aggregateOrganismQuantity, null, null, 1000);
+
+                var featureCollection = new FeatureCollection();
+
+                while (result?.Records?.Count() != 0)
+                {
+                    foreach (var record in result.Records)
+                    {
+                        var featureId = record.AggregationField;
+                        var observationsCount = record.DocCount;
+                        var organismQuantity = record.OrganismQuantity;
+                        var taxaCount = record.UniqueTaxon;
+                        var geoShape = (IGeoShape)await _areaManager.GetGeometryAsync((AreaType)areaType, featureId);
+
+                        if (geoShape == null)
+                        {
+                            continue;
+                        }
+
+                        var geometry = geoShape.ToGeometry().Transform(CoordinateSys.WGS84, coordinateSys);
+
+                        var feature = new Feature
+                        {
+                            Attributes = new AttributesTable(new[]
+                            {
+                                new KeyValuePair<string, object>("id", featureId),
+                                new KeyValuePair<string, object>("observationsCount", observationsCount),
+                                new KeyValuePair<string, object>("organismQuantity", organismQuantity),
+                                new KeyValuePair<string, object>("taxaCount", taxaCount),
+                                new KeyValuePair<string, object>("metricCRS", coordinateSys.ToString())
+                               
+                            }),
+                            Geometry = geometry,
+                            BoundingBox = geometry.EnvelopeInternal
+                        };
+                        featureCollection.Add(feature);
+                    }
+                    result = await _processedObservationRepository.AggregateByUserFieldAsync(filter, areaTypeProperty, false, null, result.SearchAfter?.FirstOrDefault()?.ToString(), 1000);
+                }
+
+                return featureCollection;
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+                _logger.LogError(e, "Failed to aggregate to metric tiles. To many buckets");
+                throw;
+            }
+            catch (TimeoutException e)
+            {
+                _logger.LogError(e, "Aggregate to metric tiles timeout");
+                throw;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to aggregate to metric tiles.");
+                throw;
+            }
+        }
 
         /// <inheritdoc />
         public async Task<PagedResult<dynamic>> GetAggregatedChunkAsync(
@@ -565,7 +653,7 @@ namespace SOS.Observations.Api.Managers
         }
 
         /// <inheritdoc />
-        public async Task<SignalSerachResult> SignalSearchInternalAsync(
+        public async Task<SignalSearchResult> SignalSearchInternalAsync(
             int? roleId,
             string authorizationApplicationIdentifier,
             SearchFilter filter,
@@ -575,65 +663,112 @@ namespace SOS.Observations.Api.Managers
         {
             try
             {
-                await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter, "SightingIndication", areaBuffer, filter?.Location?.Geometries?.UsePointAccuracy, filter?.Location?.Geometries?.UseDisturbanceRadius);
+                await _filterManager.PrepareFilterAsync(roleId, 
+                    authorizationApplicationIdentifier, 
+                    filter, 
+                    "SightingIndication", 
+                    areaBuffer, 
+                    filter?.Location?.Geometries?.UsePointAccuracy, 
+                    filter?.Location?.Geometries?.UseDisturbanceRadius, 
+                    addAreaGeometries: filter?.Location?.Geometries.BoundingBox != null || (filter?.Location?.Geometries?.Geometries?.Count ?? 0) != 0);
 
                 if (!filter.ExtendedAuthorization?.ExtendedAreas?.Any() ?? true)
                 {
                     throw new AuthenticationRequiredException("User don't have the SightingIndication permission that is required");
                 }
-                if (validateGeographic && filter.Location?.AreaGeographic != null)
-                {
-                    var areaGeographic = filter.Location?.AreaGeographic;
-                    var hasAccess = true;
-                    if ((areaGeographic.CountryRegionIds?.Count() ?? 0) != 0)
+                bool hasPartialAccess = false;
+                if (validateGeographic && filter.Location != null) 
+                {                    
+                    if (filter.Location.AreaGeographic != null)
                     {
-                        hasAccess = hasAccess && filter.ExtendedAuthorization.ExtendedAreas.Exists(ea => (ea.GeographicAreas?.CountryRegionIds?.Intersect(areaGeographic.CountryRegionIds)?.Count() ?? 0) > 0);
-                    }
-                    if ((areaGeographic.CountyIds?.Count() ?? 0) != 0)
-                    {
-                        hasAccess = hasAccess && filter.ExtendedAuthorization.ExtendedAreas.Exists(ea => (ea.GeographicAreas?.CountyIds?.Intersect(areaGeographic.CountyIds)?.Count() ?? 0) > 0);
-                    }
-                    if ((areaGeographic.MunicipalityIds?.Count() ?? 0) != 0)
-                    {
-                        hasAccess = hasAccess && filter.ExtendedAuthorization.ExtendedAreas.Exists(ea => (ea.GeographicAreas?.MunicipalityIds?.Intersect(areaGeographic.MunicipalityIds)?.Count() ?? 0) > 0);
-                    }
-                    if ((areaGeographic.ParishIds?.Count() ?? 0) != 0)
-                    {
-                        hasAccess = hasAccess && filter.ExtendedAuthorization.ExtendedAreas.Exists(ea => (ea.GeographicAreas?.ParishIds?.Intersect(areaGeographic.ParishIds)?.Count() ?? 0) > 0);
-                    }
-                    if ((areaGeographic.ProvinceIds?.Count() ?? 0) != 0)
-                    {
-                        hasAccess = hasAccess && filter.ExtendedAuthorization.ExtendedAreas.Exists(ea => (ea.GeographicAreas?.ProvinceIds?.Intersect(areaGeographic.ProvinceIds)?.Count() ?? 0) > 0);
-                    }
-                    if (!hasAccess)
-                    {
-                        return SignalSerachResult.NoPermissions;
-                    }
-
-                    if (areaGeographic.GeometryFilter?.Geometries?.Any() ?? false)
-                    {
-                        // Check if user has access to provided geometries
-                        foreach (var geoShape in areaGeographic.GeometryFilter.Geometries)
+                        var areaGeographic = filter.Location.AreaGeographic;
+                        var hasAccess = true;
+                        if ((areaGeographic.CountryRegionIds?.Count() ?? 0) != 0)
                         {
-                            var geometry = geoShape.ToGeometry();
-                            if (!filter.ExtendedAuthorization.ExtendedAreas.Exists(ea => ea.GeographicAreas?.GeometryFilter?.Geometries?.Exists(g => g.ToGeometry().Contains(geometry)) ?? false))
+                            hasAccess = hasAccess && filter.ExtendedAuthorization.ExtendedAreas.Exists(ea => (ea.GeographicAreas?.CountryRegionIds?.Intersect(areaGeographic.CountryRegionIds)?.Count() ?? 0) > 0);
+                        }
+                        if ((areaGeographic.CountyIds?.Count() ?? 0) != 0)
+                        {
+                            hasAccess = hasAccess && filter.ExtendedAuthorization.ExtendedAreas.Exists(ea => (ea.GeographicAreas?.CountyIds?.Intersect(areaGeographic.CountyIds)?.Count() ?? 0) > 0);
+                        }
+                        if ((areaGeographic.MunicipalityIds?.Count() ?? 0) != 0)
+                        {
+                            hasAccess = hasAccess && filter.ExtendedAuthorization.ExtendedAreas.Exists(ea => (ea.GeographicAreas?.MunicipalityIds?.Intersect(areaGeographic.MunicipalityIds)?.Count() ?? 0) > 0);
+                        }
+                        if ((areaGeographic.ParishIds?.Count() ?? 0) != 0)
+                        {
+                            hasAccess = hasAccess && filter.ExtendedAuthorization.ExtendedAreas.Exists(ea => (ea.GeographicAreas?.ParishIds?.Intersect(areaGeographic.ParishIds)?.Count() ?? 0) > 0);
+                        }
+                        if ((areaGeographic.ProvinceIds?.Count() ?? 0) != 0)
+                        {
+                            hasAccess = hasAccess && filter.ExtendedAuthorization.ExtendedAreas.Exists(ea => (ea.GeographicAreas?.ProvinceIds?.Intersect(areaGeographic.ProvinceIds)?.Count() ?? 0) > 0);
+                        }
+                        if (!hasAccess)
+                        {
+                            return SignalSearchResult.NoPermissions;
+                        }
+
+                        if (areaGeographic.GeometryFilter?.Geometries?.Any() ?? false)
+                        {
+                            // Check if user has access to provided geometries
+                            foreach (var geoShape in areaGeographic.GeometryFilter.Geometries)
                             {
-                                return SignalSerachResult.NoPermissions;
+                                var geometry = geoShape.ToGeometry();
+                                if (!filter.ExtendedAuthorization.ExtendedAreas.Exists(ea => ea.GeographicAreas?.GeometryFilter?.Geometries?.Exists(g => g.ToGeometry().Intersects(geometry)) ?? false))
+                                {
+                                    return SignalSearchResult.NoPermissions;
+                                }
                             }
                         }
                     }
-                    if (filter.Location.Geometries.BoundingBox != null)
+                    if ((filter.Location.Geometries?.Geometries?.Count() ?? 0) != 0)
                     {
-                        var bbGeometry = filter.Location.Geometries.BoundingBox.ToGeoemtry();
-                        if (!filter.ExtendedAuthorization.ExtendedAreas.Exists(ea => ea.GeographicAreas?.GeometryFilter?.Geometries?.Exists(g => g.ToGeometry().Contains(bbGeometry)) ?? false))
+                        // Check if user has access to provided geometries
+                        var authorizedGeometries = filter.ExtendedAuthorization.ExtendedAreas
+                            .SelectMany(ea => ea.GeographicAreas?.GeometryFilter?.Geometries ?? new List<IGeoShape>())
+                            .Select(g => g.ToGeometry())
+                            .ToList();
+                        bool allOutside = true;
+                        foreach (var geoShape in filter.Location.Geometries.Geometries)
                         {
-                            return SignalSerachResult.NoPermissions;
+                            var geometry = geoShape.ToGeometry();
+                            var filterGeometryCheck = CheckGeometryPermission(geometry, authorizedGeometries);
+                            if (filterGeometryCheck == FilterGeometryCheck.IsInside)
+                            {
+                                allOutside = false;
+                            }
+                            else if (filterGeometryCheck == FilterGeometryCheck.IsIntersecting)
+                            {
+                                hasPartialAccess = true;
+                                allOutside = false;
+                            }
+                        }
+                        if (allOutside)
+                            return SignalSearchResult.NoPermissions;
+                    }
+                    if (filter.Location.Geometries?.BoundingBox != null)
+                    {
+                        var authorizedGeometries = filter.ExtendedAuthorization.ExtendedAreas
+                            .SelectMany(ea => ea.GeographicAreas?.GeometryFilter?.Geometries ?? new List<IGeoShape>())
+                            .Select(g => g.ToGeometry())
+                            .ToList();
+                        var bboxGeometry = filter.Location.Geometries.BoundingBox.ToGeometry();
+                        var filterGeometryCheck = CheckGeometryPermission(bboxGeometry, authorizedGeometries);
+                        if (filterGeometryCheck == FilterGeometryCheck.IsOutside)
+                        {
+                            return SignalSearchResult.NoPermissions;
+                        }
+                        else if (filterGeometryCheck == FilterGeometryCheck.IsIntersecting)
+                        {
+                            hasPartialAccess = true;
                         }
                     }
                 }
-              
+
                 var result = await _processedObservationRepository.SignalSearchInternalAsync(filter, onlyAboveMyClearance);
-                return result ? SignalSerachResult.Yes : SignalSerachResult.No;
+                if (validateGeographic && result == false && hasPartialAccess)
+                    return SignalSearchResult.PartialNoPermissions;
+                return result ? SignalSearchResult.Yes : SignalSearchResult.No;
             }
             catch (TimeoutException e)
             {
@@ -645,6 +780,20 @@ namespace SOS.Observations.Api.Managers
                 _logger.LogError(e, "Signal search failed");
                 throw;
             }
+        }
+
+        private FilterGeometryCheck CheckGeometryPermission(NetTopologySuite.Geometries.Geometry filterGeometry, List<NetTopologySuite.Geometries.Geometry> authorizedGeometries)
+        {
+            if (authorizedGeometries.Any(authGeo => authGeo.Contains(filterGeometry))) return FilterGeometryCheck.IsInside;
+            if (!authorizedGeometries.Any(authGeo => authGeo.Intersects(filterGeometry))) return FilterGeometryCheck.IsOutside;
+            return FilterGeometryCheck.IsIntersecting;
+        }
+
+        private enum FilterGeometryCheck
+        {
+            IsInside,
+            IsOutside,
+            IsIntersecting,
         }
 
         /// <inheritdoc />
@@ -1075,6 +1224,34 @@ namespace SOS.Observations.Api.Managers
             var summaryExcelWriter = new ObservationStatisticsSummaryExcelWriter();
             byte[] excelFile = await summaryExcelWriter.CreateExcelFileAsync(statisticsByDate);
             return excelFile;
+        }
+
+        public async Task<IEnumerable<TimeSeriesHistogramResult>> GetTimeSeriesHistogramAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilter filter, TimeSeriesType timeSeriesType)
+        {
+            try
+            {
+                await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
+
+                if (timeSeriesType == TimeSeriesType.Year)
+                    return await _processedObservationRepository.GetYearHistogramAsync(filter, timeSeriesType);
+                else 
+                    return await _processedObservationRepository.GetTimeSeriesHistogramAsync(filter, timeSeriesType);
+ 
+            }
+            catch (AuthenticationRequiredException)
+            {
+                throw;
+            }
+            catch (TimeoutException e)
+            {
+                _logger.LogError(e, "Get aggregated chunk of observations timeout");
+                throw;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to get aggregated chunk of observations");
+                return null;
+            }
         }
 
         public class ObservationStatistics

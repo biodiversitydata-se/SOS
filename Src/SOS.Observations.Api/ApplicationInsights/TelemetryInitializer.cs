@@ -35,6 +35,30 @@ namespace SOS.Observations.Api.ApplicationInsights
                 if (platformContext.Request.Query.TryGetValue("protectedObservations", out var value) && !requestTelemetry.Context.GlobalProperties.ContainsKey("Protected-observations"))
                 {
                     requestTelemetry.Context.GlobalProperties.Add("Protected-observations", value);
+                }              
+
+                if (platformContext.Items.TryGetValue("ApiUserType", out object apiUserType))
+                {
+                    if (apiUserType != null && !telemetry.Context.GlobalProperties.ContainsKey("ApiUserType"))
+                    {
+                        telemetry.Context.GlobalProperties.Add("ApiUserType", apiUserType.ToString());
+                    }
+                }
+
+                if (platformContext.Items.TryGetValue("SemaphoreStatus", out object semaphoreStatus))
+                {
+                    if (semaphoreStatus != null && !telemetry.Context.GlobalProperties.ContainsKey("SemaphoreStatus"))
+                    {
+                        telemetry.Context.GlobalProperties.Add("SemaphoreStatus", semaphoreStatus.ToString());
+                    }
+                }
+
+                if (platformContext.Items.TryGetValue("SemaphoreWaitSeconds", out object? semaphoreWaitSeconds))
+                {
+                    if (semaphoreWaitSeconds != null && !telemetry.Context.GlobalProperties.ContainsKey("SemaphoreWaitSeconds"))
+                    {
+                        telemetry.Context.GlobalProperties.Add("SemaphoreWaitSeconds", semaphoreWaitSeconds.ToString());
+                    }
                 }
 
                 if (_loggRequestBody && platformContext.Items.TryGetValue("Request-body", out var requestBody))
@@ -52,7 +76,7 @@ namespace SOS.Observations.Api.ApplicationInsights
                     {
                         requestTelemetry.Context.GlobalProperties.Add("Observation-count", obsCount.ToString());
                     }
-                }
+                }                
 
                 if (platformContext.Request.ContentLength != null && !requestTelemetry.Context.GlobalProperties.ContainsKey("Request-length"))
                 {

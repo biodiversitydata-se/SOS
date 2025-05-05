@@ -59,6 +59,7 @@ using SOS.Lib.Helpers;
 using System.Collections.Concurrent;
 using Serilog;
 using Microsoft.IdentityModel.JsonWebTokens;
+using Polly;
 
 namespace SOS.Analysis.Api
 {
@@ -71,6 +72,7 @@ namespace SOS.Analysis.Api
         private const string PublicApiName = "PublicSosAnalysis";
         private const string InternalApiPrefix = "Internal";
         private bool _disableHangfireInit = false;
+        private bool _useLocalHangfire = false;
         private bool _isDevelopment;
         private IWebHostEnvironment CurrentEnvironment { get; set; }
 
@@ -143,7 +145,8 @@ namespace SOS.Analysis.Api
                 // In production you should store the secret values as environment variables.
                 builder.AddUserSecrets<Startup>();
             }
-            _disableHangfireInit = GetDisableFeature(environmentVariable: "DISABLE_HANGFIRE_INIT");
+            _disableHangfireInit = GetEnvironmentBool(environmentVariable: "DISABLE_HANGFIRE_INIT");
+            _useLocalHangfire = GetEnvironmentBool(environmentVariable: "USE_LOCAL_HANGFIRE");
 
             Configuration = builder.Build();
             Settings.Init(Configuration); // or fail early!
@@ -166,6 +169,18 @@ namespace SOS.Analysis.Api
             CultureInfo.DefaultThreadCurrentUICulture = culture;            
             services.AddMemoryCache();
 
+            if (Settings.CorsAllowAny)
+            {
+                services.AddCors(options =>
+                {
+                    options.AddPolicy(name: "AllowAll", policy => policy
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .AllowAnyOrigin()
+                    );
+                });
+            }
+
             services.AddControllers()
                 .AddJsonOptions(options =>
                 {
@@ -186,67 +201,34 @@ namespace SOS.Analysis.Api
                 },
                 t => true);
 
-            // Identity service configuration
-            var identityServerConfiguration = Settings.IdentityServer;
-
-            if (identityServerConfiguration == null)
-            {
-                throw new Exception("Failed to load Identity Server Configuration");
-            }
-
             var userServiceConfiguration = Settings.UserServiceConfiguration;
 
             // Authentication
-            services.AddAuthentication(options =>
-            {
-                options.DefaultScheme = "MultipleIdentityProviders";
-                options.DefaultChallengeScheme = "MultipleIdentityProviders";
-            })
-            .AddJwtBearer("UserAdmin2", options =>
-            {
-                options.Audience = userServiceConfiguration.IdentityProvider.Audience;
-                options.Authority = userServiceConfiguration.IdentityProvider.Authority;
-                options.RequireHttpsMetadata = userServiceConfiguration.IdentityProvider.RequireHttpsMetadata;
-                options.Events = new JwtBearerEvents
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
                 {
-                    OnTokenValidated = context =>
+                    options.Audience = userServiceConfiguration.IdentityProvider.Audience;
+                    options.Authority = userServiceConfiguration.IdentityProvider.Authority;
+                    options.RequireHttpsMetadata = userServiceConfiguration.IdentityProvider.RequireHttpsMetadata;
+                    options.Events = new JwtBearerEvents
                     {
-                        var claimsIdentity = context.Principal?.Identity as ClaimsIdentity;
-                        var scopeClaim = claimsIdentity?.FindFirst("scope");
-                        if (claimsIdentity != null && scopeClaim != null)
+                        OnTokenValidated = context =>
                         {
-                            var scopes = scopeClaim.Value.Split(' ');
-                            claimsIdentity.RemoveClaim(scopeClaim);
-                            foreach (var scope in scopes)
+                            var claimsIdentity = context.Principal?.Identity as ClaimsIdentity;
+                            var scopeClaim = claimsIdentity?.FindFirst("scope");
+                            if (claimsIdentity != null && scopeClaim != null)
                             {
-                                claimsIdentity.AddClaim(new Claim("scope", scope));
+                                var scopes = scopeClaim.Value.Split(' ');
+                                claimsIdentity.RemoveClaim(scopeClaim);
+                                foreach (var scope in scopes)
+                                {
+                                    claimsIdentity.AddClaim(new Claim("scope", scope));
+                                }
                             }
+                            return Task.CompletedTask;
                         }
-                        return Task.CompletedTask;
-                    }
-                };
-            })
-            .AddJwtBearer("UserAdmin1", options =>
-            {
-                options.Audience = identityServerConfiguration.Audience;
-                options.Authority = identityServerConfiguration.Authority;
-                options.RequireHttpsMetadata = identityServerConfiguration.RequireHttpsMetadata;
-            })
-            .AddPolicyScheme("MultipleIdentityProviders", "MultipleIdentityProviders", options =>
-            {
-                // Select schema based on request (UserAdmin1 or UserAdmin2)
-                options.ForwardDefaultSelector = context =>
-                {
-                    var authHeader = context.Request.Headers["Authorization"].FirstOrDefault();
-                    if (authHeader != null && authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
-                    {
-                        if (TokenHelper.IsUserAdmin2Token(authHeader, userServiceConfiguration.IdentityProvider.Authority))
-                            return "UserAdmin2";
-                    }
-
-                    return "UserAdmin1";
-                };
-            });
+                    };
+                });
 
             // Add application insights.
             services.AddApplicationInsightsTelemetry(options =>
@@ -389,7 +371,8 @@ namespace SOS.Analysis.Api
             services.AddSingleton<IClassCache<TaxonTree<IBasicTaxon>>, ClassCache<TaxonTree<IBasicTaxon>>>();
             var clusterHealthCache = new ClassCache<ConcurrentDictionary<string, ClusterHealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<string, ClusterHealthResponse>>>()) { CacheDuration = TimeSpan.FromMinutes(2) };
             services.AddSingleton<IClassCache<ConcurrentDictionary<string, ClusterHealthResponse>>>(clusterHealthCache);
-            
+            services.AddSingleton<SortableFieldsCache>();
+
             // Add managers            
             services.AddScoped<IAnalysisManager, AnalysisManager>();
             services.AddScoped<IFilterManager, FilterManager>();
@@ -421,6 +404,10 @@ namespace SOS.Analysis.Api
             if (!_disableHangfireInit)
             {
                 var mongoConfiguration = Settings.HangfireDbConfiguration;
+                if (_useLocalHangfire)
+                {
+                    mongoConfiguration = Settings.LocalHangfireDbConfiguration;
+                }
                 services.AddHangfire(configuration =>
                     configuration
                         .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
@@ -461,6 +448,11 @@ namespace SOS.Analysis.Api
             Lib.Configuration.Shared.ApplicationInsights applicationInsightsConfiguration,
             AnalysisConfiguration statisticsConfiguration)
         {
+            if (Settings.CorsAllowAny)
+            {
+                app.UseCors("AllowAll");
+            }
+
             if (!_disableHangfireInit)
             {
                 app.UseHangfireDashboard();
@@ -474,12 +466,6 @@ namespace SOS.Analysis.Api
             if (_isDevelopment)
             {
                 app.UseDeveloperExceptionPage();
-                // Allow client calls
-                app.UseCors(cors => cors
-                    .AllowAnyHeader()
-                    .AllowAnyMethod()
-                    .AllowAnyOrigin()
-                );
                 telemetryConfiguration.DisableTelemetry = true;                
             }
             else
@@ -487,6 +473,7 @@ namespace SOS.Analysis.Api
                 app.UseHsts();
             }
 
+            app.UseMiddleware<LogApiUserTypeMiddleware>();
             if (applicationInsightsConfiguration.EnableRequestBodyLogging)
             {
                 app.UseMiddleware<EnableRequestBufferingMiddelware>();
@@ -550,7 +537,22 @@ namespace SOS.Analysis.Api
                     if (httpContext.Items.TryGetValue("Handler", out var handler))
                     {
                         diagnosticContext.Set("Handler", handler);
-                    }  
+                    }
+
+                    if (httpContext.Items.TryGetValue("ApiUserType", out var apiUserType))
+                    {
+                        diagnosticContext.Set("ApiUserType", apiUserType);
+                    }
+
+                    if (httpContext.Items.TryGetValue("SemaphoreStatus", out var semaphoreStatus))
+                    {
+                        diagnosticContext.Set("SemaphoreStatus", semaphoreStatus);
+                    }
+
+                    if (httpContext.Items.TryGetValue("SemaphoreWaitSeconds", out var semaphoreWaitSeconds))
+                    {
+                        diagnosticContext.Set("SemaphoreWaitSeconds", semaphoreWaitSeconds);
+                    }
 
                     try
                     {
@@ -594,7 +596,7 @@ namespace SOS.Analysis.Api
             return apiVersions;
         }
 
-        private static bool GetDisableFeature(string environmentVariable)
+        private static bool GetEnvironmentBool(string environmentVariable, bool defaultValue = false)
         {
             string value = Environment.GetEnvironmentVariable(environmentVariable);
 
@@ -605,11 +607,11 @@ namespace SOS.Analysis.Api
                     return val;
                 }
 
-                return false;
+                return defaultValue;
             }
             else
             {
-                return false;
+                return defaultValue;
             }
         }
     }

@@ -6,6 +6,7 @@ metadata:
   name: sos-analysis-api
   namespace: sos-analysis-dev
 spec:
+  type: ClusterIP
   ports:
     - port: 5000
       targetPort: 5000
@@ -30,22 +31,11 @@ spec:
     metadata:
       annotations:
         logging: "true"
-        vault.hashicorp.com/agent-inject: "true"
-        vault.hashicorp.com/agent-inject-status: "update"
-        vault.hashicorp.com/ca-cert: "/vault/tls/ca-bundle.crt"
-        vault.hashicorp.com/tls-secret: "vault-ca-bundle"
-        vault.hashicorp.com/role: "sos-analysis"
-        vault.hashicorp.com/agent-inject-secret-env: "kv2/data/sos-analysis/dev"
-        vault.hashicorp.com/agent-inject-template-env: |
-          {{- with secret "kv2/data/sos-analysis/dev" -}}
-            {{- range $k, $v := .Data.data -}}
-              export {{ $k }}='{{ $v }}'
-            {{ end }}
-          {{- end }}
       labels:
         app: sos-analysis-api
     spec:
-      serviceAccountName: sos-analysis-sa
+      securityContext:
+        runAsNonRoot: true
       topologySpreadConstraints: # try to spread out api instances over available nodes
       - labelSelector:
           matchLabels:
@@ -57,8 +47,58 @@ spec:
         - env:
           - name: ASPNETCORE_ENVIRONMENT
             value: dev
-          - name: IdentityServer
-            value: '{"Authority": "https://login-test.artdata.slu.se", "Audience": "SOS.Observations", "RequireHttpsMetadata": false}'
+          - name: ClientSecret
+            valueFrom:
+                secretKeyRef:
+                  key: ClientSecret
+                  name: sos-analysis-secret
+          - name: Salt
+            valueFrom:
+                secretKeyRef:
+                  key: Salt
+                  name: sos-analysis-secret
+          - name: Password
+            valueFrom:
+                secretKeyRef:
+                  key: Password
+                  name: sos-analysis-secret
+          - name: InstrumentationKey
+            valueFrom:
+                secretKeyRef:
+                  key: InstrumentationKey
+                  name: sos-analysis-secret
+          - name: ProcessDbPassword
+            valueFrom:
+                secretKeyRef:
+                  key: ProcessDbPassword
+                  name: sos-analysis-secret
+          - name: ProcessDbUserName
+            valueFrom:
+                secretKeyRef:
+                  key: ProcessDbUserName
+                  name: sos-analysis-secret
+          - name: SearchDbPassword
+            valueFrom:
+                secretKeyRef:
+                  key: SearchDbPassword
+                  name: sos-analysis-secret
+          - name: SearchDbUserName
+            valueFrom:
+                secretKeyRef:
+                  key: SearchDbUserName
+                  name: sos-analysis-secret
+          - name: HangfireDbPassword
+            valueFrom:
+                secretKeyRef:
+                  key: HangfireDbPassword
+                  name: sos-analysis-secret
+          - name: HangfireDbUserName
+            valueFrom:
+                secretKeyRef:
+                  key: HangfireDbUserName
+                  name: sos-analysis-secret
+          - name: CorsAllowAny
+            value: "true"
           - name: AreaConfiguration
             value: '{"SwedenExtentBufferKm": 200}'
           - name: InputValaidationConfiguration
@@ -68,7 +108,7 @@ spec:
           - name: ApplicationInsights
             value: '{"InstrumentationKey": "SECRET_PLACEHOLDER", "EnableRequestBodyLogging": false, "EnableSearchResponseCountLogging": false}'
           - name: UserServiceConfiguration
-            value: '{"BaseAddress": "https://artdatauser-st.artdata.slu.se/api", "AcceptHeaderContentType": "application/json", "UserAdmin2ApiBaseAddress": "https://useradmin2-api-dev.wt.artdata.slu.se", "ClientId": "SOS", "ClientSecret": "SECRET_PLACEHOLDER", "Scope": "useradmin.api SOS.Observations.Protected openid", "TokenUrl": "https://useradmin2-auth-dev.wt.artdata.slu.se/connect/token", "TokenExpirationBufferInSeconds": 300, "IdentityProvider": {"Authority": "https://useradmin2-auth-dev.wt.artdata.slu.se", "Audience": "https://sos-search-dev.artdata.slu.se", "RequireHttpsMetadata": false}}'
+            value: '{ "UserAdmin2ApiBaseAddress": "https://useradmin2-api-dev.wt.artdata.slu.se", "ClientId": "SOS", "ClientSecret": "SECRET_PLACEHOLDER", "Scope": "useradmin.api SOS.Observations.Protected openid", "TokenUrl": "https://useradmin2-auth-dev.wt.artdata.slu.se/connect/token", "TokenExpirationBufferInSeconds": 300, "IdentityProvider": {"Authority": "https://useradmin2-auth-dev.wt.artdata.slu.se", "Audience": "https://sos-analysis-dev.wt.artdata.slu.se", "RequireHttpsMetadata": false}}'
           - name: SearchDbConfiguration
             value: '{"UserName": "SECRET_PLACEHOLDER", "Password": "SECRET_PLACEHOLDER", "Clusters": [{"Hosts": ["https://artsearch2-1-test.artdata.slu.se:9200"]}],"DebugMode": true,"IndexPrefix": "sos-dev","IndexSettings": [{"Name": "observation","NumberOfReplicas": 0,"NumberOfShards": 1,"NumberOfShardsProtected": 1,"ReadBatchSize": 10000,"WriteBatchSize": 1000,"RequestTimeout": 300,"ScrollBatchSize": 5000,"ScrollTimeout": "300s"}, {"Name": "dataset", "NumberOfReplicas": 0,"NumberOfShards": 1, "ReadBatchSize": 10000, "WriteBatchSize": 1000, "RequestTimeout": 300, "ScrollBatchSize": 5000, "ScrollTimeout": "300s"}, {"Name": "event", "NumberOfReplicas": 0, "NumberOfShards": 1, "ReadBatchSize": 10000, "WriteBatchSize": 1000, "RequestTimeout": 300, "ScrollBatchSize": 5000, "ScrollTimeout": "300s"}]}'
           - name: ProcessDbConfiguration
@@ -77,8 +117,6 @@ spec:
             value: '{"UserName": "SECRET_PLACEHOLDER", "Password": "SECRET_PLACEHOLDER", "Hosts": [{"Name": "artmongo-t-1.artdata.slu.se","Port": 27017}],"DatabaseName": "sos-hangfire-dev", "UseTls": false, "AuthenticationDb": "admin", "JobExpirationDays": 3}'
           image: adbpocreg.azurecr.io/sos-analysis-api:$(Build.BuildId)
           name: sos-analysis-api
-          command: ["sh", "-c"]
-          args: [". /vault/secrets/env && dotnet SOS.Analysis.Api.dll"]
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 5000
@@ -94,7 +132,19 @@ spec:
             successThreshold: 1
             failureThreshold: 3
             periodSeconds: 30 # runs every 30 seconds
-          resources: {}
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsUser: 1000
+            runAsGroup: 1000
+            capabilities:
+              drop:
+                - ALL
+          resources:
+            requests:
+              cpu: 11m
+              memory: 1600M
+            limits:
+              memory: 1600M
       restartPolicy: Always
       imagePullSecrets:
         - name: regcred

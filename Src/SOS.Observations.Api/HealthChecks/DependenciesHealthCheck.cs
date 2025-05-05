@@ -41,7 +41,7 @@ namespace SOS.Observations.Api.HealthChecks
                     var observationIndexName = _processedObservationRepository.PublicIndexName;
                     var processedDbConfiguration = Settings.ProcessDbConfiguration;
                     var elasticConfiguration = Settings.SearchDbConfiguration;
-                    var identityServerConfiguration = Settings.IdentityServer;
+                    var identityServerConfiguration = Settings.UserServiceConfiguration.IdentityProvider;
                     var hangfireConfiguration = Settings.HangfireDbConfiguration;
                     var userServiceConfiguration = Settings.UserServiceConfiguration;
                     var esClusterIndex = Math.Min(elasticConfiguration.Clusters.Count() - 1, esActiveIndex);

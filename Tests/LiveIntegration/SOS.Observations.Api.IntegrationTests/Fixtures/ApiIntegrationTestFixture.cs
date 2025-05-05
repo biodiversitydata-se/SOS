@@ -243,17 +243,19 @@ namespace SOS.Observations.Api.LiveIntegrationTests.Fixtures
             var userService = CreateUserService();
             var filterManager = new FilterManager(taxonManager, userService, areaCache, dataProviderCache);
             FilterManager = filterManager;
-            ObservationManager = CreateObservationManager((ProcessedObservationRepository)ProcessedObservationRepository, VocabularyValueResolver, processClient, filterManager);
+            ObservationManager = CreateObservationManager(areaManager, (ProcessedObservationRepository)ProcessedObservationRepository, VocabularyValueResolver, processClient, filterManager);
             var taxonSearchManager = CreateTaxonSearchManager(processedTaxonRepository, filterManager);
             var inputValaidationConfiguration = GetInputValaidationConfiguration();
             var exportManager = new ExportManager(csvFileWriter, dwcArchiveFileWriter, dwcArchiveEventFileWriter, excelFileWriter, geojsonFileWriter,
                 ProcessedObservationRepository, processInfoRepository, filterManager, new NullLogger<ExportManager>());
             var userExportRepository = new UserExportRepository(processClient, new NullLogger<UserExportRepository>());
-            var inputValidator = new InputValidator(areaCache, taxonManager, inputValaidationConfiguration);
+            var sortableFieldsCache = new SortableFieldsCache(ProcessedObservationRepository, memoryCache);
+            var inputValidator = new InputValidator(areaCache, sortableFieldsCache, taxonManager, inputValaidationConfiguration);
             var searchFilterUtility = new SearchFilterUtility(new AreaConfiguration(), areaCache);
             ObservationsController = new ObservationsController(ObservationManager, taxonSearchManager, searchFilterUtility, inputValidator, observationApiConfiguration, 
                 new Mock<ClassCache<Dictionary<string, CacheEntry<GeoGridResultDto>>>>().Object,
                 new Mock<ClassCache<Dictionary<string, CacheEntry<PagedResultDto<TaxonAggregationItemDto>>>>>().Object,
+                new SemaphoreLimitManager(new SemaphoreLimitsConfiguration(), new NullLogger<SemaphoreLimitManager>()),
                 new NullLogger<ObservationsController>());
             var ctx = new ControllerContext() { HttpContext = new DefaultHttpContext() };
             ObservationsController.ControllerContext = ctx;
@@ -264,7 +266,8 @@ namespace SOS.Observations.Api.LiveIntegrationTests.Fixtures
                 ProcessedObservationRepository,
                 new NullLogger<DataProvidersController>());
             var cryptoService = new CryptoService(new CryptoConfiguration() { Password = "password", Salt = "salt" });
-            ExportsController = new ExportsController(ObservationManager, blobStorageManagerMock.Object, exportManager, cryptoService, fileService, userExportRepository, inputValidator, observationApiConfiguration,
+            var userManager = new UserManager(userService, areaCache, new NullLogger<UserManager>());
+            ExportsController = new ExportsController(ObservationManager, blobStorageManagerMock.Object, exportManager, userManager, cryptoService, fileService, userExportRepository, inputValidator, observationApiConfiguration,
                 new NullLogger<ExportsController>());
             ExportsController.ControllerContext.HttpContext = new DefaultHttpContext();
             TaxonManager = taxonManager;
@@ -299,7 +302,12 @@ namespace SOS.Observations.Api.LiveIntegrationTests.Fixtures
                 new ClassCache<ConcurrentDictionary<string, ClusterHealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<string, ClusterHealthResponse>>>()),
                 new NullLogger<ProcessedLocationRepository>());
             var locationManager = new LocationManager(processedLocationController, filterManager, new NullLogger<LocationManager>());
-            LocationsController = new LocationsController(locationManager, inputValidator, observationApiConfiguration, new NullLogger<LocationsController>());
+            LocationsController = new LocationsController(
+                locationManager, 
+                inputValidator, 
+                observationApiConfiguration,
+                new SemaphoreLimitManager(new SemaphoreLimitsConfiguration(), new NullLogger<SemaphoreLimitManager>()), 
+                new NullLogger<LocationsController>());
             AreasController = new AreasController(areaManager, new NullLogger<AreasController>());
         }
 
@@ -351,6 +359,7 @@ namespace SOS.Observations.Api.LiveIntegrationTests.Fixtures
         }
 
         private ObservationManager CreateObservationManager(
+            IAreaManager areaManager,
             ProcessedObservationRepository processedObservationRepository,
             VocabularyValueResolver vocabularyValueResolver,
             ProcessClient processClient,
@@ -363,7 +372,9 @@ namespace SOS.Observations.Api.LiveIntegrationTests.Fixtures
                 new ArtportalenApiServiceConfiguration { BaseAddress = "https://api.artdata.slu.se/observations/v2", AcceptHeaderContentType = "application/json" },
                 new NullLogger<ArtportalenApiService>());
 
-            var observationsManager = new ObservationManager(processedObservationRepository,
+            var observationsManager = new ObservationManager(
+                areaManager,
+                processedObservationRepository,
                 protectedLogRepository,
                 vocabularyValueResolver,
                 filterManager,

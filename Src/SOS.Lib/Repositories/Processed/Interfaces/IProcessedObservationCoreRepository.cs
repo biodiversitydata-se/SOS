@@ -354,6 +354,12 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         Task<dynamic> GetObservationAsync(string occurrenceId, SearchFilter filter, bool getAllFields = false);
 
         /// <summary>
+        /// Get a list of sortable fields
+        /// </summary>
+        /// <returns></returns>
+        Task<HashSet<string>> GetSortableFieldsAsync();
+
+        /// <summary>
         /// Wait for public index to be created.
         /// </summary>
         /// <param name="expectedRecordsCount"></param>

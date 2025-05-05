@@ -1,16 +1,23 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Nest;
+using OfficeOpenXml.Export.ToCollection;
+using Org.BouncyCastle.Pqc.Crypto.Lms;
+using SOS.Lib.Cache;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Exceptions;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.JsonConverters;
+using SOS.Lib.Managers;
 using SOS.Lib.Models.Cache;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Enums;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Swagger;
 using SOS.Observations.Api.Configuration;
 using SOS.Observations.Api.Helpers;
@@ -25,12 +32,16 @@ using SOS.Shared.Api.Utilities.Objects.Interfaces;
 using SOS.Shared.Api.Validators.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
+using System.Security;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Threading;
 using System.Threading.Tasks;
 using Result = CSharpFunctionalExtensions.Result;
 
@@ -50,8 +61,8 @@ namespace SOS.Observations.Api.Controllers
         private readonly ObservationApiConfiguration _observationApiConfiguration;
         private readonly IClassCache<Dictionary<string, CacheEntry<GeoGridResultDto>>> _geogridAggregationCache;
         private readonly IClassCache<Dictionary<string, CacheEntry<PagedResultDto<TaxonAggregationItemDto>>>> _taxonAggregationInternalCache;
-        private static readonly SHA256 _sha256 = SHA256.Create();        
-        private readonly ILogger<ObservationsController> _logger;
+        private readonly SemaphoreLimitManager _semaphoreLimitManager;
+        private readonly ILogger<ObservationsController> _logger;        
 
         private JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions
         {
@@ -77,6 +88,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="observationApiConfiguration"></param>
         /// <param name="geogridAggregationCache"></param>
         /// <param name="taxonAggregationInternalCache"></param>
+        /// <param name="semaphoreLimitManager"></param>
         /// <param name="logger"></param>
         /// <exception cref="ArgumentNullException"></exception>
         public ObservationsController(
@@ -87,6 +99,7 @@ namespace SOS.Observations.Api.Controllers
             ObservationApiConfiguration observationApiConfiguration,
             IClassCache<Dictionary<string, CacheEntry<GeoGridResultDto>>> geogridAggregationCache,
             IClassCache<Dictionary<string, CacheEntry<PagedResultDto<TaxonAggregationItemDto>>>> taxonAggregationInternalCache,
+            SemaphoreLimitManager semaphoreLimitManager,
             ILogger<ObservationsController> logger) 
         {
             _observationManager = observationManager ?? throw new ArgumentNullException(nameof(observationManager));
@@ -96,6 +109,7 @@ namespace SOS.Observations.Api.Controllers
             _observationApiConfiguration = observationApiConfiguration ?? throw new ArgumentNullException(nameof(observationApiConfiguration));
             _geogridAggregationCache = geogridAggregationCache ?? throw new ArgumentNullException(nameof(geogridAggregationCache));
             _taxonAggregationInternalCache = taxonAggregationInternalCache ?? throw new ArgumentNullException(nameof(taxonAggregationInternalCache));
+            _semaphoreLimitManager = semaphoreLimitManager ?? throw new ArgumentNullException(nameof(semaphoreLimitManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -289,6 +303,11 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] bool sensitiveObservations = false,
             [FromQuery] bool? skipCache = false)
         {
+            ApiUserType userType = this.GetApiUserType();
+            var semaphoreResult = await _semaphoreLimitManager.GetSemaphoreAsync(SemaphoreType.Aggregation, userType, this.GetEndpointName(ControllerContext));
+            LogHelper.AddSemaphoreHttpContextItems(semaphoreResult, HttpContext);
+            if (semaphoreResult?.Semaphore == null) return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
+
             try
             {
                 LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
@@ -380,6 +399,10 @@ namespace SOS.Observations.Api.Controllers
                 _logger.LogError(e, "GeoGridAggregation error.");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
+            finally
+            {
+                semaphoreResult.Semaphore.Release();
+            }
         }
 
         private string CreateCacheKey(string queryString, object request)
@@ -397,10 +420,11 @@ namespace SOS.Observations.Api.Controllers
 
                 string key = keyBuilder.ToString();
                 byte[] keyBytes = Encoding.UTF8.GetBytes(key);
-
-                // Skapa en hash för att få en kortare och unik nyckel
-                byte[] hashBytes = _sha256.ComputeHash(keyBytes);
-                return BitConverter.ToString(hashBytes).Replace("-", "").ToLowerInvariant();
+                using (var sha256 = SHA256.Create())
+                {
+                    byte[] hashBytes = sha256.ComputeHash(keyBytes);
+                    return BitConverter.ToString(hashBytes).Replace("-", "").ToLowerInvariant();
+                }             
             }
             catch (Exception ex)
             {
@@ -436,6 +460,11 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] bool validateSearchFilter = false,
             [FromQuery] bool sensitiveObservations = false)
         {
+            ApiUserType userType = this.GetApiUserType();
+            var semaphoreResult = await _semaphoreLimitManager.GetSemaphoreAsync(SemaphoreType.Aggregation, userType, this.GetEndpointName(ControllerContext));
+            LogHelper.AddSemaphoreHttpContextItems(semaphoreResult, HttpContext);
+            if (semaphoreResult?.Semaphore == null) return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
+
             try
             {
                 LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
@@ -487,6 +516,10 @@ namespace SOS.Observations.Api.Controllers
                 _logger.LogError(e, "Metric grid aggregation error.");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
+            finally
+            {
+                semaphoreResult.Semaphore.Release();
+            }
         }
 
         /// <summary>
@@ -535,6 +568,11 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] string translationCultureCode = "sv-SE",
             [FromQuery] bool sensitiveObservations = false)
         {
+            ApiUserType userType = this.GetApiUserType();
+            var semaphoreResult = await _semaphoreLimitManager.GetSemaphoreAsync(SemaphoreType.Observation, userType, this.GetEndpointName(ControllerContext));
+            LogHelper.AddSemaphoreHttpContextItems(semaphoreResult, HttpContext);
+            if (semaphoreResult.Semaphore == null) return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
+
             try
             {
                 LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
@@ -544,13 +582,18 @@ namespace SOS.Observations.Api.Controllers
                 filter = await _searchFilterUtility.InitializeSearchFilterAsync(filter);
                 translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
                 var validationResult = Result.Combine(
-                    _inputValidator.ValidateSearchPagingArguments(skip, take),
+                    _inputValidator.ValidateSearchPagingArguments(skip, take),                    
                     validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(filter)) : Result.Success(),
                     _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
                     _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries),
-                    _inputValidator.ValidatePropertyExists(nameof(sortBy), sortBy),
                     _inputValidator.ValidateTranslationCultureCode(translationCultureCode));
                 if (validationResult.IsFailure) return BadRequest(validationResult.Error);
+                var sortFieldValidationResult = string.IsNullOrEmpty(sortBy) ? Result.Success<List<string>>(null) : (await _inputValidator.ValidateSortFieldsAsync(new[] { sortBy }));
+                if (sortFieldValidationResult.IsFailure) return BadRequest(sortFieldValidationResult.Error);
+                if (sortFieldValidationResult.Value != null && sortFieldValidationResult.Value.Any())
+                {
+                    sortBy = sortFieldValidationResult.Value.First();
+                }
                 SearchFilter searchFilter = filter.ToSearchFilter(this.GetUserId(), protectionFilter, translationCultureCode, sortBy, sortOrder);
                 var result = await _observationManager.GetChunkAsync(roleId, authorizationApplicationIdentifier, searchFilter, skip, take);
                 PagedResultDto<dynamic> dto = result?.ToPagedResultDto(result.Records);
@@ -573,6 +616,10 @@ namespace SOS.Observations.Api.Controllers
             {
                 _logger.LogError(e, "Search error");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+            finally
+            {
+                semaphoreResult.Semaphore.Release();
             }
         }
 
@@ -625,8 +672,20 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] string sortBy = null!,
             [FromQuery] SearchSortOrder sortOrder = SearchSortOrder.Asc)
         {
+            ApiUserType userType = this.GetApiUserType();
+            var semaphoreResult = await _semaphoreLimitManager.GetSemaphoreAsync(SemaphoreType.Observation, userType, this.GetEndpointName(ControllerContext));
+            LogHelper.AddSemaphoreHttpContextItems(semaphoreResult, HttpContext);
+            if (semaphoreResult.Semaphore == null) return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
+
             try
             {
+                var sortFieldValidationResult = string.IsNullOrEmpty(sortBy) ? Result.Success<List<string>>(null) : (await _inputValidator.ValidateSortFieldsAsync(new[] { sortBy }));
+                if (sortFieldValidationResult.IsFailure) return BadRequest(sortFieldValidationResult.Error);
+                if (sortFieldValidationResult.Value != null && sortFieldValidationResult.Value.Any())
+                {
+                    sortBy = sortFieldValidationResult.Value.First();
+                }                
+
                 LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
                 
@@ -719,6 +778,10 @@ namespace SOS.Observations.Api.Controllers
             {
                 _logger.LogError(e, "Search DwC error");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+            finally
+            {
+                semaphoreResult.Semaphore.Release();
             }
         }
 
@@ -818,6 +881,11 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] string translationCultureCode = "sv-SE",
             [FromQuery] bool sensitiveObservations = false)
         {
+            ApiUserType userType = this.GetApiUserType();
+            var semaphoreResult = await _semaphoreLimitManager.GetSemaphoreAsync(SemaphoreType.Aggregation, userType, this.GetEndpointName(ControllerContext));
+            LogHelper.AddSemaphoreHttpContextItems(semaphoreResult, HttpContext);
+            if (semaphoreResult.Semaphore == null) return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
+
             try
             {
                 LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
@@ -884,6 +952,10 @@ namespace SOS.Observations.Api.Controllers
             {
                 _logger.LogError(e, "TaxonAggregation error.");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+            finally
+            {
+                semaphoreResult.Semaphore.Release();
             }
         }
 
@@ -1132,6 +1204,11 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] string translationCultureCode = "sv-SE",
             [FromQuery] bool sensitiveObservations = false)
         {
+            ApiUserType userType = this.GetApiUserType();
+            var semaphoreResult = await _semaphoreLimitManager.GetSemaphoreAsync(SemaphoreType.Aggregation, userType, this.GetEndpointName(ControllerContext));
+            LogHelper.AddSemaphoreHttpContextItems(semaphoreResult, HttpContext);
+            if (semaphoreResult.Semaphore == null) return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
+
             try
             {
                 LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
@@ -1192,6 +1269,10 @@ namespace SOS.Observations.Api.Controllers
                 _logger.LogError(e, "GeoGridAggregation error.");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
+            finally
+            {
+                semaphoreResult.Semaphore.Release();
+            }
         }
 
         /// <summary>
@@ -1221,6 +1302,11 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] string translationCultureCode = "sv-SE",
             [FromQuery] bool sensitiveObservations = false)
         {
+            ApiUserType userType = this.GetApiUserType();
+            var semaphoreResult = await _semaphoreLimitManager.GetSemaphoreAsync(SemaphoreType.Aggregation, userType, this.GetEndpointName(ControllerContext));
+            LogHelper.AddSemaphoreHttpContextItems(semaphoreResult, HttpContext);
+            if (semaphoreResult.Semaphore == null) return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
+
             try
             {
                 LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
@@ -1274,6 +1360,10 @@ namespace SOS.Observations.Api.Controllers
             {
                 _logger.LogError(e, "GeoGridAggregationGeoJson error.");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+            finally
+            {
+                semaphoreResult.Semaphore.Release();
             }
         }
 
@@ -1337,6 +1427,11 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] bool validateSearchFilter = false,
             [FromQuery] string translationCultureCode = "sv-SE")
         {
+            ApiUserType userType = this.GetApiUserType();
+            var semaphoreResult = await _semaphoreLimitManager.GetSemaphoreAsync(SemaphoreType.Aggregation, userType, this.GetEndpointName(ControllerContext));
+            LogHelper.AddSemaphoreHttpContextItems(semaphoreResult, HttpContext);
+            if (semaphoreResult.Semaphore == null) return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
+
             try
             {
                 LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
@@ -1380,7 +1475,11 @@ namespace SOS.Observations.Api.Controllers
                 _logger.LogError(e, "GeoGridAggregation error.");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
-        }
+            finally
+            {
+                semaphoreResult.Semaphore.Release();
+            }
+        }               
 
         /// <summary>
         /// Aggregates observations into grid cells. Each grid cell contains the number
@@ -1412,6 +1511,11 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] MetricCoordinateSys metricCoordinateSys = MetricCoordinateSys.SWEREF99_TM,
             [FromQuery] OutputFormatDto outputFormat = OutputFormatDto.Json)
         {
+            ApiUserType userType = this.GetApiUserType();
+            var semaphoreResult = await _semaphoreLimitManager.GetSemaphoreAsync(SemaphoreType.Aggregation, userType, this.GetEndpointName(ControllerContext));
+            LogHelper.AddSemaphoreHttpContextItems(semaphoreResult, HttpContext);
+            if (semaphoreResult.Semaphore == null) return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
+
             try
             {
                 LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
@@ -1468,7 +1572,100 @@ namespace SOS.Observations.Api.Controllers
                 _logger.LogError(e, "Metric grid aggregation error.");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
+            finally
+            {
+                semaphoreResult.Semaphore.Release();
+            }
         }
+
+        /// <summary>
+        /// Aggregate observation on passed area. Be careful to aggreagete on large areas. It will be slow to return many large geometries
+        /// </summary>
+        /// <param name="roleId"></param>
+        /// <param name="authorizationApplicationIdentifier"></param>
+        /// <param name="filter"></param>
+        /// <param name="areaType"></param>
+        /// <param name="aggregateOrganismQuantity"></param>
+        /// <param name="validateSearchFilter"></param>
+        /// <param name="coordinateSys"></param>
+        /// <returns></returns>
+        [HttpPost("Internal/AreaAggregation/{areaType}")]
+        [ProducesResponseType(typeof(object), (int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.RequestTimeout)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [InternalApi, AzureInternalApi]
+        public async Task<IActionResult> AreaAggregationInternalAsync(
+            [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
+            [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
+            [FromBody] SearchFilterAggregationInternalDto filter,
+            [FromRoute] AreaTypeAggregateDto areaType,
+            [FromQuery] bool aggregateOrganismQuantity = false, 
+            [FromQuery] bool validateSearchFilter = false,
+            [FromQuery] CoordinateSys coordinateSys = CoordinateSys.SWEREF99_TM)
+        {
+            ApiUserType userType = this.GetApiUserType();
+            var semaphoreResult = await _semaphoreLimitManager.GetSemaphoreAsync(SemaphoreType.Aggregation, userType, this.GetEndpointName(ControllerContext));
+            LogHelper.AddSemaphoreHttpContextItems(semaphoreResult, HttpContext);
+            if (semaphoreResult.Semaphore == null) return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
+
+            try
+            {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
+                this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, filter.ProtectionFilter);
+
+                filter = await _searchFilterUtility.InitializeSearchFilterAsync(filter);
+                var boundingBox = filter.Geographics.BoundingBox.ToEnvelope();
+                var searchFilter = filter.ToSearchFilter(this.GetUserId(), filter.ProtectionFilter, "en-GB");
+
+                var validationResult = Result.Combine(
+                    validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(filter)) : Result.Success(),
+                    _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
+                    _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries)
+                );
+
+                if (validationResult.IsFailure)
+                {
+                    return BadRequest(validationResult.Error);
+                }
+
+                var result = await _observationManager.GetAreaAggregationAsync(
+                    roleId,
+                    authorizationApplicationIdentifier,
+                    searchFilter,
+                    areaType,
+                    aggregateOrganismQuantity,
+                    coordinateSys);
+
+                return new OkObjectResult(result);
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (AuthenticationRequiredException e)
+            {
+                _logger.LogInformation(e, e.Message);
+                _logger.LogInformation($"Unauthorized. X-Authorization-Application-Identifier={authorizationApplicationIdentifier ?? "[null]"}");
+                _logger.LogInformation($"Unauthorized. X-Authorization-Role-Id={roleId?.ToString() ?? "[null]"}");
+                LogUserInformation();
+                return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
+            }
+            catch (TimeoutException)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.RequestTimeout);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Metric grid aggregation error.");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+            finally
+            {
+                semaphoreResult.Semaphore.Release();
+            }
+        }
+
 
         /// <summary>
         ///     Get observations matching the provided search filter. Permitted filter values depends on the specific filter field:
@@ -1518,6 +1715,11 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] bool sensitiveObservations = false,
             [FromQuery] OutputFormatDto outputFormat = OutputFormatDto.Json)
         {
+            ApiUserType userType = this.GetApiUserType();
+            var semaphoreResult = await _semaphoreLimitManager.GetSemaphoreAsync(SemaphoreType.Observation, userType, this.GetEndpointName(ControllerContext));
+            LogHelper.AddSemaphoreHttpContextItems(semaphoreResult, HttpContext);
+            if (semaphoreResult.Semaphore == null) return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
+
             try
             {
                 LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
@@ -1526,15 +1728,20 @@ namespace SOS.Observations.Api.Controllers
                 this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, filter.ProtectionFilter);
                 filter = await _searchFilterUtility.InitializeSearchFilterAsync(filter);
                 translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
-                var validationResult = Result.Combine(
-                    validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(filter)) : Result.Success(),
+                var validationResult = Result.Combine(                    
+                    string.IsNullOrEmpty(sortBy) ? Result.Success() : (await _inputValidator.ValidateSortFieldsAsync(new[] { sortBy })),
                     _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
                     _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries),
-                    _inputValidator.ValidatePropertyExists(nameof(sortBy), sortBy),
                     _inputValidator.ValidateSearchPagingArgumentsInternal(skip, take),
                     _inputValidator.ValidateTranslationCultureCode(translationCultureCode));
 
                 if (validationResult.IsFailure) return BadRequest(validationResult.Error);
+                var sortFieldValidationResult = string.IsNullOrEmpty(sortBy) ? Result.Success<List<string>>(null) : (await _inputValidator.ValidateSortFieldsAsync(new[] { sortBy }));
+                if (sortFieldValidationResult.IsFailure) return BadRequest(sortFieldValidationResult.Error);
+                if (sortFieldValidationResult.Value != null && sortFieldValidationResult.Value.Any())
+                {
+                    sortBy = sortFieldValidationResult.Value.First();
+                }
                 if (outputFormat == OutputFormatDto.GeoJson || outputFormat == OutputFormatDto.GeoJsonFlat)
                 {
                     var outPutFields = EnsureCoordinatesIsRetrievedFromDb(filter?.Output?.Fields);
@@ -1546,6 +1753,10 @@ namespace SOS.Observations.Api.Controllers
                     }
                 }
                 var result = await _observationManager.GetChunkAsync(roleId, authorizationApplicationIdentifier, filter.ToSearchFilterInternal(this.GetUserId(), translationCultureCode, sortBy, sortOrder), skip, take);
+                if (result == null)
+                {
+                    throw new Exception("Something went wrong when your query was executed. Make sure your filter is correct.");
+                }
                 GeoPagedResultDto<dynamic> dto = result.ToGeoPagedResultDto(result.Records, outputFormat);
                 this.LogObservationCount(dto?.Records?.Count() ?? 0);
                 return new OkObjectResult(dto);
@@ -1566,6 +1777,10 @@ namespace SOS.Observations.Api.Controllers
             {
                 _logger.LogError(e, "SearchInternal error");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+            finally
+            {
+                semaphoreResult.Semaphore.Release();
             }
         }
 
@@ -1647,6 +1862,11 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] string translationCultureCode = "sv-SE",
             [FromQuery] bool sensitiveObservations = false)
         {
+            ApiUserType userType = this.GetApiUserType();
+            var semaphoreResult = await _semaphoreLimitManager.GetSemaphoreAsync(SemaphoreType.Aggregation, userType, this.GetEndpointName(ControllerContext));
+            LogHelper.AddSemaphoreHttpContextItems(semaphoreResult, HttpContext);
+            if (semaphoreResult.Semaphore == null) return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
+
             try
             {
                 LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
@@ -1694,6 +1914,79 @@ namespace SOS.Observations.Api.Controllers
             catch (Exception e)
             {
                 _logger.LogError(e, "SearchAggregatedInternal error");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+            finally
+            {
+                semaphoreResult.Semaphore.Release();
+            }
+        }
+
+        /// <summary>
+        /// Aggregate observations into a time series.
+        /// </summary>
+        /// <param name="roleId">Limit user authorization to specified role</param>
+        /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
+        /// <param name="filter">Filter used to limit the search.</param>
+        /// <param name="timeSeriesType">The aggregation type</param>
+        /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
+        /// <param name="sensitiveObservations">If true, only sensitive (protected) observations will be searched (this requires authentication and authorization). If false, public available observations will be searched.</param>
+        /// <returns></returns>
+        [HttpPost("Internal/TimeSeriesHistogram")]
+        [ProducesResponseType(typeof(IEnumerable<TimeSeriesHistogramResultDto>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.RequestTimeout)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [InternalApi, AzureInternalApi]
+        public async Task<IActionResult> TimeSeriesHistogramInternal(
+            [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
+            [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
+            [FromBody] SearchFilterAggregationInternalDto filter,
+            [FromQuery] TimeSeriesTypeDto timeSeriesType,
+            [FromQuery] bool validateSearchFilter = false,
+            [FromQuery] bool sensitiveObservations = false)
+        {
+            try
+            {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
+                // sensitiveObservations is preserved for backward compability
+                filter.ProtectionFilter ??= (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
+                this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, filter.ProtectionFilter);
+                filter = await _searchFilterUtility.InitializeSearchFilterAsync(filter);
+                var validationResult = Result.Combine(
+                    validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(filter)) : Result.Success(),
+                    _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
+                    _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries));
+
+                if (validationResult.IsFailure)
+                {
+                    return BadRequest(validationResult.Error);
+                }
+                                
+                var result = await _observationManager.GetTimeSeriesHistogramAsync(
+                    roleId, 
+                    authorizationApplicationIdentifier, 
+                    filter.ToSearchFilterInternal(this.GetUserId(), "sv-SE"), 
+                    (TimeSeriesType) timeSeriesType);
+                IEnumerable<TimeSeriesHistogramResultDto> dtos = result.ToTimeSeriesHistogramResultDtos();
+                return new OkObjectResult(dtos);
+            }
+            catch (AuthenticationRequiredException e)
+            {
+                _logger.LogInformation(e, e.Message);
+                _logger.LogInformation($"Unauthorized. X-Authorization-Application-Identifier={authorizationApplicationIdentifier ?? "[null]"}");
+                _logger.LogInformation($"Unauthorized. X-Authorization-Role-Id={roleId?.ToString() ?? "[null]"}");
+                LogUserInformation();
+                return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
+            }
+            catch (TimeoutException)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.RequestTimeout);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "TimeSeriesHistogram error");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
         }
@@ -1752,16 +2045,20 @@ namespace SOS.Observations.Api.Controllers
                 filter = await _searchFilterUtility.InitializeSearchFilterAsync(filter);
                 translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
                 const int maxTotalCount = 100000;
-                var validationResult = Result.Combine(
-                    validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(filter)) : Result.Success(),
+                var validationResult = Result.Combine(                    
+                    string.IsNullOrEmpty(sortBy) ? Result.Success() : (await _inputValidator.ValidateSortFieldsAsync(new[] { sortBy })),
                     _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
                     _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries),
                     take <= 10000 ? Result.Success() : Result.Failure("You can't take more than 10 000 at a time."),
-                    _inputValidator.ValidatePropertyExists(nameof(sortBy), sortBy),
                     _inputValidator.ValidateTranslationCultureCode(translationCultureCode));
 
                 if (validationResult.IsFailure) return BadRequest(validationResult.Error);
-
+                var sortFieldValidationResult = string.IsNullOrEmpty(sortBy) ? Result.Success<List<string>>(null) : (await _inputValidator.ValidateSortFieldsAsync(new[] { sortBy }));
+                if (sortFieldValidationResult.IsFailure) return BadRequest(sortFieldValidationResult.Error);
+                if (sortFieldValidationResult.Value != null && sortFieldValidationResult.Value.Any())
+                {
+                    sortBy = sortFieldValidationResult.Value.First();
+                }
                 SearchFilter searchFilter = filter.ToSearchFilter(this.GetUserId(), protectionFilter, translationCultureCode, sortBy, sortOrder);
                 var result = await _observationManager.GetObservationsByScrollAsync(roleId, authorizationApplicationIdentifier, searchFilter, take, scrollId);
                 if (result.TotalCount > maxTotalCount)
@@ -1801,8 +2098,10 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
         /// <param name="areaBuffer">Are buffer 0 to 100m.</param>
         /// <param name="onlyAboveMyClearance">If true, get signal only above users clearance.</param>
-        /// <param name="returnHttp403WhenNoPermissions">If true, a http 403 will be returned if user try to serach in area where he/she don't have permission to search. 
-        /// If false, the serach will ignore areas the user don't have permission to search in and false will always be returned for those areas</param>
+        /// <param name="returnHttp4xxWhenNoPermissions">
+        /// If true, an HTTP 403 response will be returned if the user attempts to search in areas where they lack permission.
+        /// An HTTP 409 response will be returned if the user has partial permission to search in an area and the signal search returns false.
+        /// </param>
         /// <returns></returns>
         [HttpPost("Internal/SignalSearch")]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
@@ -1818,8 +2117,13 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] bool validateSearchFilter = false, // if false, only mandatory requirements will be validated
             [FromQuery] int areaBuffer = 0,
             [FromQuery] bool onlyAboveMyClearance = true,
-            [FromQuery] bool? returnHttp403WhenNoPermissions = false)
+            [FromQuery] bool? returnHttp4xxWhenNoPermissions = false)
         {
+            ApiUserType userType = this.GetApiUserType();
+            var semaphoreResult = await _semaphoreLimitManager.GetSemaphoreAsync(SemaphoreType.Aggregation, userType, this.GetEndpointName(ControllerContext));
+            LogHelper.AddSemaphoreHttpContextItems(semaphoreResult, HttpContext);
+            if (semaphoreResult.Semaphore == null) return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
+
             try
             {
                 LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
@@ -1835,14 +2139,22 @@ namespace SOS.Observations.Api.Controllers
                 }
 
                 var searchFilter = filter.ToSearchFilterInternal(this.GetUserId(), true);
-                var taxonFound = await _observationManager.SignalSearchInternalAsync(roleId, authorizationApplicationIdentifier, searchFilter, areaBuffer, onlyAboveMyClearance, returnHttp403WhenNoPermissions ?? false);
+                var taxonFound = await _observationManager.SignalSearchInternalAsync(roleId, authorizationApplicationIdentifier, searchFilter, areaBuffer, onlyAboveMyClearance, returnHttp4xxWhenNoPermissions ?? false);
 
-                if (taxonFound.Equals(SignalSerachResult.NoPermissions))
+                if (taxonFound == SignalSearchResult.NoPermissions || taxonFound == SignalSearchResult.PartialNoPermissions)
                 {
-                    throw new AuthenticationRequiredException("User don't have the SightingIndication permission in provided areas");
+                    _logger.LogInformation("User don't have the SightingIndication permission in provided areas");
+                    _logger.LogInformation($"Unauthorized. X-Authorization-Application-Identifier={authorizationApplicationIdentifier ?? "[null]"}");
+                    _logger.LogInformation($"Unauthorized. X-Authorization-Role-Id={roleId?.ToString() ?? "[null]"}");
+                    LogUserInformation();
+
+                    if (taxonFound == SignalSearchResult.NoPermissions)
+                        return new StatusCodeResult((int)HttpStatusCode.Forbidden);
+                    else if (taxonFound == SignalSearchResult.PartialNoPermissions)
+                        return new StatusCodeResult((int)HttpStatusCode.Conflict);
                 }
 
-                return new OkObjectResult(taxonFound.Equals(SignalSerachResult.Yes));
+                return new OkObjectResult(taxonFound.Equals(SignalSearchResult.Yes));
             }
             catch (AuthenticationRequiredException e)
             {
@@ -1860,6 +2172,10 @@ namespace SOS.Observations.Api.Controllers
             {
                 _logger.LogError(e, "Signal search Internal error");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+            finally
+            {
+                semaphoreResult.Semaphore.Release();
             }
         }
 
@@ -1899,6 +2215,11 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] bool sumUnderlyingTaxa = false,
             [FromQuery] bool? skipCache = false)
         {
+            ApiUserType userType = this.GetApiUserType();
+            var semaphoreResult = await _semaphoreLimitManager.GetSemaphoreAsync(SemaphoreType.Aggregation, userType, this.GetEndpointName(ControllerContext));
+            LogHelper.AddSemaphoreHttpContextItems(semaphoreResult, HttpContext);
+            if (semaphoreResult.Semaphore == null) return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
+
             try
             {
                 LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
@@ -1947,7 +2268,7 @@ namespace SOS.Observations.Api.Controllers
                     _inputValidator.ValidateTranslationCultureCode(translationCultureCode),
                     _inputValidator.ValidateTaxonAggregationPagingArguments(skip, take),
                     await _inputValidator.ValidateTilesLimitAsync(boundingBox, 1, _observationManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, searchFilter), true)
-                 );
+                    );
 
                 if (validationResult.IsFailure)
                 {
@@ -1998,6 +2319,10 @@ namespace SOS.Observations.Api.Controllers
                 _logger.LogError(e, "TaxonAggregation error.");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
+            finally
+            {
+                semaphoreResult.Semaphore.Release();
+            }
         }
 
         /// <summary>
@@ -2026,8 +2351,20 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] string sortBy = "SumObservationCount",
             [FromQuery] SearchSortOrder sortOrder = SearchSortOrder.Desc)
         {
+            ApiUserType userType = this.GetApiUserType();
+            var semaphoreResult = await _semaphoreLimitManager.GetSemaphoreAsync(SemaphoreType.Aggregation, userType, this.GetEndpointName(ControllerContext));
+            LogHelper.AddSemaphoreHttpContextItems(semaphoreResult, HttpContext);
+            if (semaphoreResult.Semaphore == null) return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
+
             try
             {
+                var validationResult = sortBy switch
+                {
+                    "SumObservationCount" or "ObservationCount" or "SumProvinceCount" or "ProvinceCount" => Result.Success(),
+                    _ => Result.Failure($"{sortBy} is not a allowed sort field")
+                };
+                if (validationResult.IsFailure) return BadRequest(validationResult.Error);
+
                 LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 var result = await _taxonSearchManager.GetTaxonSumAggregationAsync(
                     this.GetUserId(),
@@ -2059,6 +2396,10 @@ namespace SOS.Observations.Api.Controllers
             {
                 _logger.LogError(e, "TaxonSumAggregation error.");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+            finally
+            {
+                semaphoreResult.Semaphore.Release();
             }
         }
 
@@ -2309,6 +2650,6 @@ namespace SOS.Observations.Api.Controllers
                 _logger.LogError(e, "Failed to get user year month count");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
-        }
+        }        
     }
 }

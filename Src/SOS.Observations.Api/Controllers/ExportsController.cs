@@ -29,6 +29,7 @@ using System.Net;
 using System.Threading.Tasks;
 using System.IO;
 using System.IO.Compression;
+using SOS.Lib.Managers.Interfaces;
 
 namespace SOS.Observations.Api.Controllers
 {
@@ -43,6 +44,7 @@ namespace SOS.Observations.Api.Controllers
         private readonly IBlobStorageManager _blobStorageManager;
         private readonly ICryptoService _cryptoService;
         private readonly IExportManager _exportManager;
+        private readonly IUserManager _userManager;
         private readonly IFileService _fileService;
         private readonly IUserExportRepository _userExportRepository;
         private readonly IInputValidator _inputValidator;
@@ -50,7 +52,7 @@ namespace SOS.Observations.Api.Controllers
         private readonly long _orderExportObservationsLimit;
         private readonly long _downloadExportObservationsLimit;
         private readonly string _exportPath;
-        private readonly ObservationApiConfiguration _observationApiConfiguration;
+        private readonly ObservationApiConfiguration _observationApiConfiguration;        
         private readonly ILogger<ExportsController> _logger;
 
         /// <summary>
@@ -241,6 +243,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="observationManager"></param>
         /// <param name="blobStorageManager"></param>
         /// <param name="exportManager"></param>
+        /// <param name="userManager"></param>
         /// <param name="cryptoService"></param>
         /// <param name="fileService"></param>
         /// <param name="userExportRepository"></param>
@@ -252,6 +255,7 @@ namespace SOS.Observations.Api.Controllers
             IObservationManager observationManager,
             IBlobStorageManager blobStorageManager,
             IExportManager exportManager,
+            IUserManager userManager,
             ICryptoService cryptoService,
             IFileService fileService,
             IUserExportRepository userExportRepository,
@@ -262,6 +266,7 @@ namespace SOS.Observations.Api.Controllers
             _observationManager = observationManager ?? throw new ArgumentNullException(nameof(observationManager));
             _blobStorageManager = blobStorageManager ?? throw new ArgumentNullException(nameof(blobStorageManager));
             _exportManager = exportManager ?? throw new ArgumentNullException(nameof(exportManager));
+            _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
             _cryptoService = cryptoService ?? throw new ArgumentNullException(nameof(cryptoService));
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
             _userExportRepository =
@@ -444,6 +449,12 @@ namespace SOS.Observations.Api.Controllers
                     return File(fileStream, "text/tab-separated-values", entry.Name);
                 }
             }
+            catch (SemaphoreTimeoutException)
+            {
+                HttpContext.Items["SemaphoreStatus"] = "Timeout";
+                _logger.LogError("Too many requests. Semaphore limit reached. Endpoint={endpoint}, UserType={@userType}", this.GetEndpointName(ControllerContext), this.GetApiUserType());
+                return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
+            }
             catch (AuthenticationRequiredException)
             {
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
@@ -512,6 +523,12 @@ namespace SOS.Observations.Api.Controllers
                 }
 
                 return File(result.stream, "application/zip", $"{result.filename}.zip");
+            }
+            catch (SemaphoreTimeoutException)
+            {
+                HttpContext.Items["SemaphoreStatus"] = "Timeout";
+                _logger.LogError("Too many requests. Semaphore limit reached. Endpoint={endpoint}, UserType={@userType}", this.GetEndpointName(ControllerContext), this.GetApiUserType());
+                return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
             }
             catch (AuthenticationRequiredException)
             {
@@ -588,6 +605,12 @@ namespace SOS.Observations.Api.Controllers
                     return File(result.stream, "application/zip", $"{result.filename}.zip");
                 else
                     return File(result.stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"{result.filename}.xlsx");                
+            }
+            catch (SemaphoreTimeoutException)
+            {
+                HttpContext.Items["SemaphoreStatus"] = "Timeout";
+                _logger.LogError("Too many requests. Semaphore limit reached. Endpoint={endpoint}, UserType={@userType}", this.GetEndpointName(ControllerContext), this.GetApiUserType());
+                return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
             }
             catch (AuthenticationRequiredException)
             {
@@ -676,6 +699,12 @@ namespace SOS.Observations.Api.Controllers
                     return File(fileStream, "application/geo+json", entry.Name);
                 }
             }
+            catch (SemaphoreTimeoutException)
+            {
+                HttpContext.Items["SemaphoreStatus"] = "Timeout";
+                _logger.LogError("Too many requests. Semaphore limit reached. Endpoint={endpoint}, UserType={@userType}", this.GetEndpointName(ControllerContext), this.GetApiUserType());
+                return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
+            }
             catch (AuthenticationRequiredException)
             {
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
@@ -734,11 +763,11 @@ namespace SOS.Observations.Api.Controllers
                 // SearchFilterDto don't support protection filter, declare it localy
                 var protectionFilter = sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public;
                 this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope, protectionFilter);
-
+                var userInfo = await _userManager.GetBasicUserInformationAsync();
                 HandleOutputFieldSet(filter, outputFieldSet);
                 var userExports = await GetUserExportsAsync();
                 cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
-                var validateResult = await OrderValidateAsync(filter, validateSearchFilter, this.GetUserEmail(), userExports, protectionFilter, sendMailFromZendTo, encryptPassword, confirmEncryptPassword, roleId, authorizationApplicationIdentifier);
+                var validateResult = await OrderValidateAsync(filter, validateSearchFilter, userInfo.Email, userExports, protectionFilter, sendMailFromZendTo, encryptPassword, confirmEncryptPassword, roleId, authorizationApplicationIdentifier);
 
                 if (validateResult.Result is not OkObjectResult okResult)
                 {
@@ -747,7 +776,7 @@ namespace SOS.Observations.Api.Controllers
                 var encryptedPassword = await _cryptoService.EncryptAsync(encryptPassword);
                 var exportFilter = (SearchFilter)okResult.Value;
                 var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
-                    job.RunAsync(exportFilter, roleId, authorizationApplicationIdentifier, this.GetUserEmail(), description, ExportFormat.Csv, cultureCode, false,
+                    job.RunAsync(exportFilter, roleId, authorizationApplicationIdentifier, userInfo.Email, description, ExportFormat.Csv, cultureCode, false,
                         propertyLabelType, false, sensitiveObservations, sendMailFromZendTo, encryptedPassword, false, null, JobCancellationToken.Null));
 
                 var exportJobInfo = new ExportJobInfo
@@ -820,9 +849,9 @@ namespace SOS.Observations.Api.Controllers
                 // SearchFilterDto don't support protection filter, declare it localy
                 var protectionFilter = sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public;
                 this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope, protectionFilter);
-
+                var userInfo = await _userManager.GetBasicUserInformationAsync();
                 var userExports = await GetUserExportsAsync();
-                var validateResult = await OrderValidateAsync(filter, validateSearchFilter, this.GetUserEmail(), userExports, protectionFilter, sendMailFromZendTo, encryptPassword, confirmEncryptPassword, roleId, authorizationApplicationIdentifier);
+                var validateResult = await OrderValidateAsync(filter, validateSearchFilter, userInfo.Email, userExports, protectionFilter, sendMailFromZendTo, encryptPassword, confirmEncryptPassword, roleId, authorizationApplicationIdentifier);
 
                 if (validateResult.Result is not OkObjectResult okResult)
                 {
@@ -832,7 +861,7 @@ namespace SOS.Observations.Api.Controllers
                 var encryptedPassword = await _cryptoService.EncryptAsync(encryptPassword);
                 var exportFilter = (SearchFilter)okResult.Value;
                 var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
-                    job.RunAsync(exportFilter, roleId, authorizationApplicationIdentifier, this.GetUserEmail(), description, eventBased ? ExportFormat.DwCEvent : ExportFormat.DwC, "en-GB", false,
+                    job.RunAsync(exportFilter, roleId, authorizationApplicationIdentifier, userInfo.Email, description, eventBased ? ExportFormat.DwCEvent : ExportFormat.DwC, "en-GB", false,
                         PropertyLabelType.PropertyName, false, sensitiveObservations, sendMailFromZendTo, encryptedPassword, false, null, JobCancellationToken.Null));
 
                 var exportJobInfo = new ExportJobInfo
@@ -911,11 +940,11 @@ namespace SOS.Observations.Api.Controllers
                 // SearchFilterDto don't support protection filter, declare it localy
                 var protectionFilter = sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public;
                 this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope, protectionFilter);
-
+                var userInfo = await _userManager.GetBasicUserInformationAsync();
                 HandleOutputFieldSet(filter, outputFieldSet);
                 var userExports = await GetUserExportsAsync();
                 cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
-                var validateResult = await OrderValidateAsync(filter, validateSearchFilter, this.GetUserEmail(), userExports, protectionFilter, sendMailFromZendTo, encryptPassword, confirmEncryptPassword, roleId, authorizationApplicationIdentifier);
+                var validateResult = await OrderValidateAsync(filter, validateSearchFilter, userInfo.Email, userExports, protectionFilter, sendMailFromZendTo, encryptPassword, confirmEncryptPassword, roleId, authorizationApplicationIdentifier);
 
                 if (validateResult.Result is not OkObjectResult okResult)
                 {
@@ -926,7 +955,7 @@ namespace SOS.Observations.Api.Controllers
                 var encryptedPassword = await _cryptoService.EncryptAsync(encryptPassword);
 
                 var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
-                    job.RunAsync(exportFilter, roleId, authorizationApplicationIdentifier, this.GetUserEmail(), description, ExportFormat.Excel, cultureCode, false,
+                    job.RunAsync(exportFilter, roleId, authorizationApplicationIdentifier, userInfo.Email, description, ExportFormat.Excel, cultureCode, false,
                         propertyLabelType, false, sensitiveObservations, sendMailFromZendTo, encryptedPassword, dynamicProjectDataFields, null, JobCancellationToken.Null));
 
                 var exportJobInfo = new ExportJobInfo
@@ -1007,11 +1036,11 @@ namespace SOS.Observations.Api.Controllers
                 // SearchFilterDto don't support protection filter, declare it localy
                 var protectionFilter = sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public;
                 this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope, protectionFilter);
-
+                var userInfo = await _userManager.GetBasicUserInformationAsync();
                 HandleOutputFieldSet(filter, outputFieldSet);
                 var userExports = await GetUserExportsAsync();
                 cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
-                var validateResult = await OrderValidateAsync(filter, validateSearchFilter, this.GetUserEmail(), userExports, protectionFilter, sendMailFromZendTo, encryptPassword, confirmEncryptPassword, roleId, authorizationApplicationIdentifier);
+                var validateResult = await OrderValidateAsync(filter, validateSearchFilter, userInfo.Email, userExports, protectionFilter, sendMailFromZendTo, encryptPassword, confirmEncryptPassword, roleId, authorizationApplicationIdentifier);
 
                 if (validateResult.Result is not OkObjectResult okResult)
                 {
@@ -1021,7 +1050,7 @@ namespace SOS.Observations.Api.Controllers
                 var encryptedPassword = await _cryptoService.EncryptAsync(encryptPassword);
                 var exportFilter = (SearchFilter)okResult.Value;
                 var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
-                    job.RunAsync(exportFilter, roleId, authorizationApplicationIdentifier, this.GetUserEmail(), description, ExportFormat.GeoJson, cultureCode,
+                    job.RunAsync(exportFilter, roleId, authorizationApplicationIdentifier, userInfo.Email, description, ExportFormat.GeoJson, cultureCode,
                         flat, propertyLabelType, excludeNullValues, sensitiveObservations, sendMailFromZendTo, encryptedPassword, false, null, JobCancellationToken.Null));
 
                 var exportJobInfo = new ExportJobInfo
@@ -1125,6 +1154,12 @@ namespace SOS.Observations.Api.Controllers
                     return File(fileStream, "text/tab-separated-values", entry.Name);
                 }
             }
+            catch (SemaphoreTimeoutException)
+            {
+                HttpContext.Items["SemaphoreStatus"] = "Timeout";
+                _logger.LogError("Too many requests. Semaphore limit reached. Endpoint={endpoint}, UserType={@userType}", this.GetEndpointName(ControllerContext), this.GetApiUserType());
+                return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
+            }
             catch (AuthenticationRequiredException)
             {
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
@@ -1192,6 +1227,12 @@ namespace SOS.Observations.Api.Controllers
                 }
 
                 return File(result.stream, "application/zip", $"{result.filename}.zip");
+            }
+            catch (SemaphoreTimeoutException)
+            {
+                HttpContext.Items["SemaphoreStatus"] = "Timeout";
+                _logger.LogError("Too many requests. Semaphore limit reached. Endpoint={endpoint}, UserType={@userType}", this.GetEndpointName(ControllerContext), this.GetApiUserType());
+                return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
             }
             catch (AuthenticationRequiredException)
             {
@@ -1267,6 +1308,12 @@ namespace SOS.Observations.Api.Controllers
                     return File(result.stream, "application/zip", $"{result.filename}.zip");
                 else
                     return File(result.stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"{result.filename}.xlsx");
+            }
+            catch (SemaphoreTimeoutException)
+            {
+                HttpContext.Items["SemaphoreStatus"] = "Timeout";
+                _logger.LogError("Too many requests. Semaphore limit reached. Endpoint={endpoint}, UserType={@userType}", this.GetEndpointName(ControllerContext), this.GetApiUserType());
+                return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
             }
             catch (AuthenticationRequiredException)
             {
@@ -1354,6 +1401,12 @@ namespace SOS.Observations.Api.Controllers
                     return File(fileStream, "application/geo+json", entry.Name);
                 }
             }
+            catch (SemaphoreTimeoutException)
+            {
+                HttpContext.Items["SemaphoreStatus"] = "Timeout";
+                _logger.LogError("Too many requests. Semaphore limit reached. Endpoint={endpoint}, UserType={@userType}", this.GetEndpointName(ControllerContext), this.GetApiUserType());                
+                return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
+            }
             catch (AuthenticationRequiredException)
             {
                 return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
@@ -1411,11 +1464,11 @@ namespace SOS.Observations.Api.Controllers
                 LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 filter.ProtectionFilter ??= (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
                 this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope, filter.ProtectionFilter);
-
+                var userInfo = await _userManager.GetBasicUserInformationAsync();
                 HandleOutputFieldSet(filter, outputFieldSet);
                 var userExports = await GetUserExportsAsync();
                 cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
-                var validateResult = await OrderValidateAsync(filter, validateSearchFilter, this.GetUserEmail(), userExports, filter.ProtectionFilter, sendMailFromZendTo, encryptPassword, confirmEncryptPassword, roleId, authorizationApplicationIdentifier);
+                var validateResult = await OrderValidateAsync(filter, validateSearchFilter, userInfo.Email, userExports, filter.ProtectionFilter, sendMailFromZendTo, encryptPassword, confirmEncryptPassword, roleId, authorizationApplicationIdentifier);
 
                 if (validateResult.Result is not OkObjectResult okResult)
                 {
@@ -1425,7 +1478,7 @@ namespace SOS.Observations.Api.Controllers
                 var encryptedPassword = await _cryptoService.EncryptAsync(encryptPassword);
                 var exportFilter = (SearchFilter)okResult.Value;
                 var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
-                    job.RunAsync(exportFilter, roleId, authorizationApplicationIdentifier, this.GetUserEmail(), description, ExportFormat.Csv, cultureCode, false,
+                    job.RunAsync(exportFilter, roleId, authorizationApplicationIdentifier, userInfo.Email, description, ExportFormat.Csv, cultureCode, false,
                         propertyLabelType, false, sensitiveObservations, sendMailFromZendTo, encryptedPassword, false, null, JobCancellationToken.Null));
 
                 var exportJobInfo = new ExportJobInfo
@@ -1497,9 +1550,9 @@ namespace SOS.Observations.Api.Controllers
                 LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 filter.ProtectionFilter ??= (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
                 this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope, filter.ProtectionFilter);
-
+                var userInfo = await _userManager.GetBasicUserInformationAsync();
                 var userExports = await GetUserExportsAsync();
-                var validateResult = await OrderValidateAsync(filter, validateSearchFilter, this.GetUserEmail(), userExports, filter.ProtectionFilter, sendMailFromZendTo, encryptPassword, confirmEncryptPassword, roleId, authorizationApplicationIdentifier);
+                var validateResult = await OrderValidateAsync(filter, validateSearchFilter, userInfo.Email, userExports, filter.ProtectionFilter, sendMailFromZendTo, encryptPassword, confirmEncryptPassword, roleId, authorizationApplicationIdentifier);
 
                 if (validateResult.Result is not OkObjectResult okResult)
                 {
@@ -1509,7 +1562,7 @@ namespace SOS.Observations.Api.Controllers
                 var encryptedPassword = await _cryptoService.EncryptAsync(encryptPassword);
                 var exportFilter = (SearchFilter)okResult.Value;
                 var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
-                    job.RunAsync(exportFilter, roleId, authorizationApplicationIdentifier, this.GetUserEmail(), description, eventBased ? ExportFormat.DwCEvent : ExportFormat.DwC, "en-GB", false,
+                    job.RunAsync(exportFilter, roleId, authorizationApplicationIdentifier, userInfo.Email, description, eventBased ? ExportFormat.DwCEvent : ExportFormat.DwC, "en-GB", false,
                         PropertyLabelType.PropertyName, false, sensitiveObservations, sendMailFromZendTo, encryptedPassword, false, null, JobCancellationToken.Null));
 
                 var exportJobInfo = new ExportJobInfo
@@ -1587,11 +1640,11 @@ namespace SOS.Observations.Api.Controllers
                 LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 filter.ProtectionFilter ??= (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
                 this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope, filter.ProtectionFilter);
-
+                var userInfo = await _userManager.GetBasicUserInformationAsync();
                 HandleOutputFieldSet(filter, outputFieldSet);
                 var userExports = await GetUserExportsAsync();
                 cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
-                var validateResult = await OrderValidateAsync(filter, validateSearchFilter, this.GetUserEmail(), userExports, filter.ProtectionFilter, sendMailFromZendTo, encryptPassword, confirmEncryptPassword, roleId, authorizationApplicationIdentifier);
+                var validateResult = await OrderValidateAsync(filter, validateSearchFilter, userInfo.Email, userExports, filter.ProtectionFilter, sendMailFromZendTo, encryptPassword, confirmEncryptPassword, roleId, authorizationApplicationIdentifier);
 
                 if (validateResult.Result is not OkObjectResult okResult)
                 {
@@ -1601,7 +1654,7 @@ namespace SOS.Observations.Api.Controllers
                 var encryptedPassword = await _cryptoService.EncryptAsync(encryptPassword);
                 var exportFilter = (SearchFilter)okResult.Value;
                 var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
-                    job.RunAsync(exportFilter, roleId, authorizationApplicationIdentifier, this.GetUserEmail(), description, ExportFormat.Excel, cultureCode, false,
+                    job.RunAsync(exportFilter, roleId, authorizationApplicationIdentifier, userInfo.Email, description, ExportFormat.Excel, cultureCode, false,
                         propertyLabelType, false, sensitiveObservations, sendMailFromZendTo, encryptedPassword, dynamicProjectDataFields, null, JobCancellationToken.Null));
 
                 var exportJobInfo = new ExportJobInfo
@@ -1681,11 +1734,11 @@ namespace SOS.Observations.Api.Controllers
                 LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 filter.ProtectionFilter ??= (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
                 this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope, filter.ProtectionFilter);
-
+                var userInfo = await _userManager.GetBasicUserInformationAsync();
                 HandleOutputFieldSet(filter, outputFieldSet);
                 var userExports = await GetUserExportsAsync();
                 cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
-                var validateResult = await OrderValidateAsync(filter, validateSearchFilter, this.GetUserEmail(), userExports, filter.ProtectionFilter, sendMailFromZendTo, encryptPassword, confirmEncryptPassword, roleId, authorizationApplicationIdentifier);
+                var validateResult = await OrderValidateAsync(filter, validateSearchFilter, userInfo.Email, userExports, filter.ProtectionFilter, sendMailFromZendTo, encryptPassword, confirmEncryptPassword, roleId, authorizationApplicationIdentifier);
 
                 if (validateResult.Result is not OkObjectResult okResult)
                 {
@@ -1695,7 +1748,7 @@ namespace SOS.Observations.Api.Controllers
                 var encryptedPassword = await _cryptoService.EncryptAsync(encryptPassword);
                 var exportFilter = (SearchFilter)okResult.Value;
                 var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
-                    job.RunAsync(exportFilter, roleId, authorizationApplicationIdentifier, this.GetUserEmail(), description, ExportFormat.GeoJson, cultureCode,
+                    job.RunAsync(exportFilter, roleId, authorizationApplicationIdentifier, userInfo.Email, description, ExportFormat.GeoJson, cultureCode,
                         flat, propertyLabelType, excludeNullValues, sensitiveObservations, sendMailFromZendTo, encryptedPassword, false, null, JobCancellationToken.Null));
 
                 var exportJobInfo = new ExportJobInfo

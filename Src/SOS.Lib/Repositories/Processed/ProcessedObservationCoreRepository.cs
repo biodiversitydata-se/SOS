@@ -2,6 +2,7 @@
 using Elasticsearch.Net;
 using Microsoft.Extensions.Logging;
 using Nest;
+using NetTopologySuite.Mathematics;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Enums;
@@ -22,6 +23,7 @@ using SOS.Lib.Repositories.Processed.Interfaces;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -314,7 +316,7 @@ namespace SOS.Lib.Repositories.Processed
                                 .NumberVal(n => n.BirdNestActivityId, IndexSetting.SearchOnly, NumberType.Integer)
                                 .NumberVal(n => n.Length, IndexSetting.SearchOnly, NumberType.Integer)
                                 .NumberVal(n => n.Weight, IndexSetting.SearchOnly, NumberType.Integer)
-                                .NumberVal(n => n.CatalogId, IndexSetting.SearchOnly, NumberType.Integer)
+                                .NumberVal(n => n.CatalogId, IndexSetting.SearchSortAggregate, NumberType.Integer)
                                 .NumberVal(n => n.OrganismQuantityInt, IndexSetting.SearchSortAggregate, NumberType.Integer)
                                 .BooleanVal(b => b.IsNaturalOccurrence, IndexSetting.SearchOnly)
                                 .BooleanVal(b => b.IsNeverFoundObservation, IndexSetting.SearchOnly)
@@ -759,6 +761,36 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <summary>
+        /// Populate sortable fields
+        /// </summary>
+        /// <param name="properties"></param>
+        /// <param name="sortableFields"></param>
+        /// <param name="parents"></param>
+        private void PopulateSortableFields(IProperties properties, ref HashSet<string> sortableFields, string parents)
+        {
+            foreach (var property in properties)
+            {
+                var name = $"{(string.IsNullOrEmpty(parents) ? "" : $"{parents}.")}{property.Key.Name}";
+
+                if (property.Value is ObjectProperty op)
+                {
+                    PopulateSortableFields(op.Properties, ref sortableFields, name);
+                }
+                if (property.Value is IDocValuesProperty dvp && dvp.DocValues == null && (
+                        property.Value is BooleanProperty bp && bp.Index == null ||
+                        property.Value is DateProperty dp && dp.Index == null ||
+                        property.Value is KeywordProperty kwp && kwp.Index == null ||
+                        property.Value is NumberProperty np && np.Index == null
+                    )
+                )
+                {
+                    sortableFields.Add(name);
+                }
+                
+            }
+        }
+
+        /// <summary>
         /// Write data to elastic search
         /// </summary>
         /// <param name="items"></param>
@@ -1199,10 +1231,9 @@ namespace SOS.Lib.Repositories.Processed
                 .Sort(sort => sortDescriptor)
             );
 
-            searchResponse.ThrowIfInvalid();
+          searchResponse.ThrowIfInvalid();
 
             var totalCount = searchResponse.HitsMetadata.Total.Value;
-
             var includeRealCount = totalCount >= ElasticSearchMaxRecords;
 
             if (filter is SearchFilterInternal internalFilter)
@@ -1909,6 +1940,22 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <inheritdoc />
+        public async Task<HashSet<string>> GetSortableFieldsAsync()
+        {
+            var sortableFields = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            var mappings = await Client.Indices.GetMappingAsync<Observation>(o => o.Index(PublicIndexName));
+            if (mappings.IsValid)
+            {
+                foreach (var value in mappings.Indices.Values)
+                {
+                    PopulateSortableFields(value.Mappings.Properties, ref sortableFields, "");
+                }
+            }
+
+            return sortableFields;
+        }
+
+        /// <inheritdoc />
         public Uri HostUrl => Client.ConnectionSettings.ConnectionPool.Nodes.FirstOrDefault().Uri;
 
         /// <inheritdoc />
@@ -2149,6 +2196,7 @@ namespace SOS.Lib.Repositories.Processed
                .Composite("aggregation")
                .AfterKey?.Values.FirstOrDefault()?.ToString()!;
 
+        
             return new SearchAfterResult<dynamic>
             {
                 SearchAfter = new[] { afterKey },
@@ -2157,13 +2205,16 @@ namespace SOS.Lib.Repositories.Processed
                     .Composite("aggregation")
                     .Buckets?
                     .Select(b =>
-                        new
-                        {
-                            AggregationField = b.Key.Values.First(),
-                            b.DocCount,
-                            UniqueTaxon = b.Cardinality("unique_taxonids").Value,
-                            OrganismQuantity = aggregateOrganismQuantity ? b.Sum("totalOrganismQuantity")?.Value : 0
-                        })?.ToArray()
+                    {
+                        var obj = new ExpandoObject();
+                        obj.TryAdd("AggregationField", b.Key.Values.First());
+                        obj.TryAdd("DocCount", b.DocCount);
+                        obj.TryAdd("UniqueTaxon", b.Cardinality("unique_taxonids").Value);
+                        obj.TryAdd("OrganismQuantity", aggregateOrganismQuantity ? b.Sum("totalOrganismQuantity")?.Value : 0);
+  
+                        return obj;
+                    })
+                    ?.ToArray()
             };
         }
     }
