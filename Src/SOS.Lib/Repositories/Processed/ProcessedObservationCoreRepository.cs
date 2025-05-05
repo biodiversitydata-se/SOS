@@ -2,6 +2,7 @@
 using Elasticsearch.Net;
 using Microsoft.Extensions.Logging;
 using Nest;
+using NetTopologySuite.Mathematics;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Enums;
@@ -22,6 +23,7 @@ using SOS.Lib.Repositories.Processed.Interfaces;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -2194,6 +2196,7 @@ namespace SOS.Lib.Repositories.Processed
                .Composite("aggregation")
                .AfterKey?.Values.FirstOrDefault()?.ToString()!;
 
+        
             return new SearchAfterResult<dynamic>
             {
                 SearchAfter = new[] { afterKey },
@@ -2202,13 +2205,16 @@ namespace SOS.Lib.Repositories.Processed
                     .Composite("aggregation")
                     .Buckets?
                     .Select(b =>
-                        new
-                        {
-                            AggregationField = b.Key.Values.First(),
-                            b.DocCount,
-                            UniqueTaxon = b.Cardinality("unique_taxonids").Value,
-                            OrganismQuantity = aggregateOrganismQuantity ? b.Sum("totalOrganismQuantity")?.Value : 0
-                        })?.ToArray()
+                    {
+                        var obj = new ExpandoObject();
+                        obj.TryAdd("AggregationField", b.Key.Values.First());
+                        obj.TryAdd("DocCount", b.DocCount);
+                        obj.TryAdd("UniqueTaxon", b.Cardinality("unique_taxonids").Value);
+                        obj.TryAdd("OrganismQuantity", aggregateOrganismQuantity ? b.Sum("totalOrganismQuantity")?.Value : 0);
+  
+                        return obj;
+                    })
+                    ?.ToArray()
             };
         }
     }
