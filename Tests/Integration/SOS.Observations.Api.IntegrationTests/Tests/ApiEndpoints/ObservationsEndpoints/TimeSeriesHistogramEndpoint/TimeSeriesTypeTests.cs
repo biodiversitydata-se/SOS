@@ -78,16 +78,20 @@ public class TimeSeriesTypeTests : TestBase
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        result!.Count().Should().Be(7);
+        result!.Count().Should().Be(11);
         result!.FirstOrDefault(r => r.Period == 2006)?.Taxa.Should().Be(2);
         result.Should().BeEquivalentTo(new List<TimeSeriesHistogramResultDto> {
-            new TimeSeriesHistogramResultDto { Period = 2000, Observations = 20, Taxa = 1 },
-            new TimeSeriesHistogramResultDto { Period = 2001 },
-            new TimeSeriesHistogramResultDto { Period = 2002, Observations = 20, Taxa = 1 },
-            new TimeSeriesHistogramResultDto { Period = 2003 },
-            new TimeSeriesHistogramResultDto { Period = 2004, Observations = 20, Taxa = 1 },
+            new TimeSeriesHistogramResultDto { Period = 2010 },
+            new TimeSeriesHistogramResultDto { Period = 2009 },
+            new TimeSeriesHistogramResultDto { Period = 2008 },
+            new TimeSeriesHistogramResultDto { Period = 2007 },
+            new TimeSeriesHistogramResultDto { Period = 2006, Observations = 40, Taxa = 2 },
             new TimeSeriesHistogramResultDto { Period = 2005 },
-            new TimeSeriesHistogramResultDto { Period = 2006, Observations = 40, Taxa = 2 }
+            new TimeSeriesHistogramResultDto { Period = 2004, Observations = 20, Taxa = 1 },
+            new TimeSeriesHistogramResultDto { Period = 2003 },
+            new TimeSeriesHistogramResultDto { Period = 2002, Observations = 20, Taxa = 1 },
+            new TimeSeriesHistogramResultDto { Period = 2001 },
+            new TimeSeriesHistogramResultDto { Period = 2000, Observations = 20, Taxa = 1 }
         }, options => options.Excluding(m => m.Quantity).Excluding(m => m.Type));
     }
 
