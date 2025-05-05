@@ -26,6 +26,7 @@ using SOS.Lib.Repositories.Processed.Interfaces;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -2385,13 +2386,16 @@ namespace SOS.Lib.Repositories.Processed
                     .GetComposite("aggregation")
                     .Buckets?
                     .Select(b =>
-                        new
-                        {
-                            AggregationField = b.Key.Values.First(),
-                            b.DocCount,
-                            UniqueTaxon = b.Aggregations.GetCardinality("unique_taxonids").Value,
-                            OrganismQuantity = aggregateOrganismQuantity ? b.Aggregations.GetSum("totalOrganismQuantity")?.Value : 0
-                        })?.ToArray()
+                    {
+                        var obj = new ExpandoObject();
+                        obj.TryAdd("AggregationField", b.Key.Values.First());
+                        obj.TryAdd("DocCount", b.DocCount);
+                        obj.TryAdd("UniqueTaxon", b.Cardinality("unique_taxonids").Value);
+                        obj.TryAdd("OrganismQuantity", aggregateOrganismQuantity ? b.Sum("totalOrganismQuantity")?.Value : 0);
+
+                        return obj;
+                    })
+                    ?.ToArray()
             };
         }
     }

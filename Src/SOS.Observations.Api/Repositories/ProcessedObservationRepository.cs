@@ -475,6 +475,7 @@ namespace SOS.Observations.Api.Repositories
                 .Aggregations
                     .GetDateHistogram("aggregation")
                 .Buckets?
+                .OrderByDescending(b => b.KeyAsString)
                 .Select(b =>
                     new TimeSeriesHistogramResult
                     {
