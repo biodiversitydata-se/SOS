@@ -1,8 +1,10 @@
-﻿using SOS.Lib.Enums;
+﻿using NetTopologySuite.Features;
+using SOS.Lib.Enums;
 using SOS.Lib.Models.Search.Enums;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
 using SOS.Shared.Api.Dtos;
+using SOS.Shared.Api.Dtos.Enum;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -55,6 +57,24 @@ namespace SOS.Observations.Api.Managers.Interfaces
             SearchFilter filter,
             int take,
             string scrollId);
+
+        /// <summary>
+        /// Aggregate on geometry area
+        /// </summary>
+        /// <param name="roleId"></param>
+        /// <param name="authorizationApplicationIdentifier"></param>
+        /// <param name="filter"></param>
+        /// <param name="areaType"></param>
+        /// <param name="aggregateOrganismQuantity"></param>
+        /// <param name="coordinateSys"></param>
+        /// <returns></returns>
+        Task<FeatureCollection> GetAreaAggregationAsync(
+            int? roleId,
+            string authorizationApplicationIdentifier,
+            SearchFilter filter,
+            AreaTypeAggregateDto areaType,
+            bool aggregateOrganismQuantity,
+            CoordinateSys coordinateSys);
 
         /// <summary>
         /// Get aggregated data

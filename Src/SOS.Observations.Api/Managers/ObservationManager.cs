@@ -25,6 +25,8 @@ using System.Threading.Tasks;
 using OfficeOpenXml;
 using SOS.Lib.Models.Search.Enums;
 using Nest;
+using SOS.Shared.Api.Dtos.Enum;
+using NetTopologySuite.Features;
 
 namespace SOS.Observations.Api.Managers
 {
@@ -33,6 +35,7 @@ namespace SOS.Observations.Api.Managers
     /// </summary>
     public class ObservationManager : IObservationManager
     {
+        private readonly IAreaManager _areaManager;
         private readonly IProcessedObservationRepository _processedObservationRepository;
         private readonly IProtectedLogRepository _protectedLogRepository;
         private readonly IFilterManager _filterManager;
@@ -312,6 +315,7 @@ namespace SOS.Observations.Api.Managers
         /// <summary>
         /// Constructor
         /// </summary>
+        /// <param name="areaManager"></param>
         /// <param name="processedObservationRepository"></param>
         /// <param name="protectedLogRepository"></param>
         /// <param name="vocabularyValueResolver"></param>
@@ -323,6 +327,7 @@ namespace SOS.Observations.Api.Managers
         /// <param name="dataProviderCache"></param>
         /// <param name="logger"></param>
         public ObservationManager(
+            IAreaManager areaManager,
             IProcessedObservationRepository processedObservationRepository,
             IProtectedLogRepository protectedLogRepository,
             IVocabularyValueResolver vocabularyValueResolver,
@@ -334,6 +339,7 @@ namespace SOS.Observations.Api.Managers
             IDataProviderCache dataProviderCache,
             ILogger<ObservationManager> logger)
         {
+            _areaManager = areaManager ?? throw new ArgumentNullException(nameof(areaManager));
             _processedObservationRepository = processedObservationRepository ??
                                               throw new ArgumentNullException(nameof(processedObservationRepository));
             _protectedLogRepository =
@@ -419,6 +425,87 @@ namespace SOS.Observations.Api.Managers
             }
         }
 
+        public async Task<FeatureCollection> GetAreaAggregationAsync(
+            int? roleId,
+            string authorizationApplicationIdentifier,
+            SearchFilter filter,
+            AreaTypeAggregateDto areaType,
+            bool aggregateOrganismQuantity,
+            CoordinateSys coordinateSys)
+        {
+            try
+            {
+                await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
+
+                var areaTypeProperty = areaType switch
+                {
+                    AreaTypeAggregateDto.Atlas10x10 => "location.atlas10x1.featureId",
+                    AreaTypeAggregateDto.Atlas5x5 => "location.atlas5x5.featureId",
+                    AreaTypeAggregateDto.CountryRegion => "location.countryRegion.featureId",
+                    AreaTypeAggregateDto.County => "location.county.featureId",
+                    AreaTypeAggregateDto.Municipality => "location.municipality.featureId",
+                    AreaTypeAggregateDto.Parish => "location.parish.featureId",
+                    _ => "location.province.featureId"
+                };
+
+                var result = await _processedObservationRepository.AggregateByUserFieldAsync(filter, areaTypeProperty, aggregateOrganismQuantity, null, null, 1000);
+
+                var featureCollection = new FeatureCollection();
+
+                while (result?.Records?.Count() != 0)
+                {
+                    foreach (var record in result.Records)
+                    {
+                        var featureId = record.AggregationField;
+                        var observationsCount = record.DocCount;
+                        var organismQuantity = record.OrganismQuantity;
+                        var taxaCount = record.UniqueTaxon;
+                        var geoShape = (IGeoShape)await _areaManager.GetGeometryAsync((AreaType)areaType, featureId);
+
+                        if (geoShape == null)
+                        {
+                            continue;
+                        }
+
+                        var geometry = geoShape.ToGeometry().Transform(CoordinateSys.WGS84, coordinateSys);
+
+                        var feature = new Feature
+                        {
+                            Attributes = new AttributesTable(new[]
+                            {
+                                new KeyValuePair<string, object>("id", featureId),
+                                new KeyValuePair<string, object>("observationsCount", observationsCount),
+                                new KeyValuePair<string, object>("organismQuantity", organismQuantity),
+                                new KeyValuePair<string, object>("taxaCount", taxaCount),
+                                new KeyValuePair<string, object>("metricCRS", coordinateSys.ToString())
+                               
+                            }),
+                            Geometry = geometry,
+                            BoundingBox = geometry.EnvelopeInternal
+                        };
+                        featureCollection.Add(feature);
+                    }
+                    result = await _processedObservationRepository.AggregateByUserFieldAsync(filter, areaTypeProperty, false, null, result.SearchAfter?.FirstOrDefault()?.ToString(), 1000);
+                }
+
+                return featureCollection;
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+                _logger.LogError(e, "Failed to aggregate to metric tiles. To many buckets");
+                throw;
+            }
+            catch (TimeoutException e)
+            {
+                _logger.LogError(e, "Aggregate to metric tiles timeout");
+                throw;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to aggregate to metric tiles.");
+                throw;
+            }
+        }
 
         /// <inheritdoc />
         public async Task<PagedResult<dynamic>> GetAggregatedChunkAsync(
