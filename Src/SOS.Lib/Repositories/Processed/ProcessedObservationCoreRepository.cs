@@ -1249,7 +1249,7 @@ namespace SOS.Lib.Repositories.Processed
             size = Math.Max(1, size);
 
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
-                .Index(indexNames)
+                .Indices(indexNames)
                 .Query(q => q
                     .Bool(b => b
                         .MustNot(excludeQuery.ToArray())
@@ -1292,7 +1292,7 @@ namespace SOS.Lib.Repositories.Processed
             var termsOrder = sortOrder.GetTermsOrder();
 
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
-                .Index(indexNames)
+                .Indices(indexNames)
                 .Query(q => q
                     .Bool(b => b
                         .MustNot(excludeQuery.ToArray())
@@ -1349,7 +1349,7 @@ namespace SOS.Lib.Repositories.Processed
             size = Math.Max(1, size);
 
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
-                .Index(indexNames)
+                .Indices(indexNames)
                 .Query(q => q
                     .Bool(b => b
                         .MustNot(excludeQuery.ToArray())
@@ -1456,7 +1456,7 @@ namespace SOS.Lib.Repositories.Processed
             var (query, excludeQuery) = GetCoreQueries<T>(filter);
             var sortDescriptor = await Client.GetSortDescriptorAsync<T, Observation>(indexNames, filter?.Output?.SortOrders);
             var searchResponse = await Client.SearchAsync<T>(s => s
-                .Index(indexNames)
+                .Indices(indexNames)
                 .Source(getAllFields ? new SourceConfig(true) : filter.Output?.Fields.ToProjection(filter is SearchFilterInternal))
                 .From(skip)
                 .Size(take)
@@ -1539,7 +1539,7 @@ namespace SOS.Lib.Repositories.Processed
             var (query, excludeQuery) = GetCoreQueries<dynamic>(filter);
 
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
-                .Index(indexNames)
+                .Indices(indexNames)
                 .Query(q => q
                     .Bool(b => b
                         .MustNot(excludeQuery.ToArray())
@@ -1580,7 +1580,7 @@ namespace SOS.Lib.Repositories.Processed
             var (query, excludeQuery) = GetCoreQueries<dynamic>(filter);
 
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
-                .Index(indexNames)
+                .Indices(indexNames)
                 .Query(q => q
                     .Bool(b => b
                         .MustNot(excludeQuery.ToArray())
@@ -1793,7 +1793,7 @@ namespace SOS.Lib.Repositories.Processed
             }
 
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
-                .Index(indexNames)
+                .Indices(indexNames)
                 .Query(q => q
                     .Bool(b => b
                         .MustNot(excludeQuery.ToArray())
@@ -1937,7 +1937,7 @@ namespace SOS.Lib.Repositories.Processed
             queries.TryAddTermCriteria("occurrence.occurrenceId", occurrenceId);
 
             var searchResponse = await Client.SearchAsync<T>(s => s
-                .Index(indexNames)
+                .Indices(indexNames)
                 .Query(q => q
                     .Bool(b => b
                         .Filter(queries.ToArray())
@@ -2006,7 +2006,7 @@ namespace SOS.Lib.Repositories.Processed
                 if (string.IsNullOrEmpty(scrollId))
                 {
                     var searchResponse = await Client.SearchAsync<T>(s => s
-                        .Index(indexNames)
+                        .Indices(indexNames)
                         .Query(q => q
                             .Bool(b => b
                                 .MustNot(excludeQueries.ToArray())

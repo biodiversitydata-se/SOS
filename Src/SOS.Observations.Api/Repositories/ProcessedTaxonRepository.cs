@@ -843,7 +843,7 @@ namespace SOS.Observations.Api.Repositories
             var (queries, excludeQueries) = GetCoreQueries<dynamic>(filter);
 
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
-                .Index(indexNames)
+                .Indices(indexNames)
                 .Query(q => q
                     .Bool(b => b
                         .MustNot(excludeQueries.ToArray())
