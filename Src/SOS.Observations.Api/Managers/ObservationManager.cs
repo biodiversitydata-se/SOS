@@ -439,7 +439,7 @@ namespace SOS.Observations.Api.Managers
 
                 var areaTypeProperty = areaType switch
                 {
-                    AreaTypeAggregateDto.Atlas10x10 => "location.atlas10x1.featureId",
+                    AreaTypeAggregateDto.Atlas10x10 => "location.atlas10x10.featureId",
                     AreaTypeAggregateDto.Atlas5x5 => "location.atlas5x5.featureId",
                     AreaTypeAggregateDto.CountryRegion => "location.countryRegion.featureId",
                     AreaTypeAggregateDto.County => "location.county.featureId",
@@ -447,7 +447,6 @@ namespace SOS.Observations.Api.Managers
                     AreaTypeAggregateDto.Parish => "location.parish.featureId",
                     _ => "location.province.featureId"
                 };
-
                 var result = await _processedObservationRepository.AggregateByUserFieldAsync(filter, areaTypeProperty, aggregateOrganismQuantity, null, null, 1000);
 
                 var featureCollection = new FeatureCollection();

@@ -2102,14 +2102,13 @@ namespace SOS.Lib.Repositories.Processed
         {
             var indexNames = GetCurrentIndex(filter);
             var (query, excludeQuery) = GetCoreQueries(filter);
-
             var tz = TimeZoneInfo.Local.GetUtcOffset(DateTime.Now);            
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
                 .Index(indexNames)
                 .Query(q => q
                     .Bool(b => b
                         .MustNot(excludeQuery)
-                        .Filter(query)
+                       // .Filter(query)
                     )
                 )
                 .RuntimeFields(rf => rf // Since missing field seems replaced by MissingBucket in Nest implementation, we need to make a script field to handle empty string and null the same way
@@ -2126,24 +2125,6 @@ namespace SOS.Lib.Repositories.Processed
                 )
                 .Aggregations(a =>
                 {
-                    // Lägg till Composite-aggregeringen
-                    var compositeAgg = a.Composite("aggregation", c => c
-                        .After(string.IsNullOrEmpty(afterKey) ? null : new CompositeKey(new Dictionary<string, object>() { { "termAggregation", afterKey } }))
-                        .Size(take)
-                        .Sources(s => s
-                            .Terms("termAggregation", t => t
-                                .Field("scriptField")
-                                .MissingBucket(true)
-                            )
-                        )                        
-                        .Aggregations(a => a
-                            .Cardinality("unique_taxonids", c => c
-                                .Field("taxon.id")
-                                .PrecisionThreshold(precisionThreshold ?? 3000)
-                            )
-                        )
-                    );
-                    
                     if (aggregateOrganismQuantity)
                     {
                         return a.Composite("aggregation", c => c
@@ -2196,7 +2177,6 @@ namespace SOS.Lib.Repositories.Processed
                .Composite("aggregation")
                .AfterKey?.Values.FirstOrDefault()?.ToString()!;
 
-        
             return new SearchAfterResult<dynamic>
             {
                 SearchAfter = new[] { afterKey },
