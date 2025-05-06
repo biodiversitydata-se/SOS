@@ -30,8 +30,8 @@ namespace SOS.Lib.Helpers
                             o.Converters.Remove(stringEnumConverter);
                         }
                         o.Converters.Add(new NetTopologySuite.IO.Converters.GeoJsonConverterFactory());
-                    }
-                    )
+                    }),
+                    requestInvoker: new HttpRequestInvoker()
                 ) 
                 .ServerCertificateValidationCallback(CertificateValidations.AllowAll);
 

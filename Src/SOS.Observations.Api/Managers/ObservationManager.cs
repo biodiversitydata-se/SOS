@@ -271,23 +271,13 @@ namespace SOS.Observations.Api.Managers
                             continue;
                         }
 
-                        geometry = geometry.Transform(CoordinateSys.WGS84, coordinateSys);
-
-                        var feature = new Feature
-                        {
-                            Attributes = new AttributesTable(new[]
-                            {
-                                new KeyValuePair<string, object>("id", featureId),
-                                new KeyValuePair<string, object>("observationsCount", observationsCount),
-                                new KeyValuePair<string, object>("organismQuantity", organismQuantity),
-                                new KeyValuePair<string, object>("taxaCount", taxaCount),
-                                new KeyValuePair<string, object>("metricCRS", coordinateSys.ToString())
-                               
-                            }),
-                            Geometry = geometry,
-                            BoundingBox = geometry.EnvelopeInternal
-                        };
-                        featureCollection.Add(feature);
+                        featureCollection.Add(geometry.Transform(CoordinateSys.WGS84, coordinateSys).ToFeature(new Dictionary<string, object> {
+                            { "id", "featureId" },
+                            { "observationsCount", observationsCount },
+                            { "taxaCount", taxaCount },
+                            { "organismQuantity", organismQuantity },
+                            { "metricCRS", coordinateSys.ToString() }
+                        }));
                     }
                     result = await _processedObservationRepository.AggregateByUserFieldAsync(filter, areaTypeProperty, false, null, result.SearchAfter, 1000);
                 }

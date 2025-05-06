@@ -210,12 +210,17 @@ namespace SOS.Lib.Managers
             {
                 foreach (var record in result.Records)
                 {
+                    var featureId = record.AggregationField;
+                    var observationsCount = (int)record.DocCount;
+                    var organismQuantity = (int)record.OrganismQuantity;
+                    var taxaCount = (int)record.UniqueTaxon;
                     var area = await _areaCache.GetGeometryAsync(atlasSize switch { AtlasAreaSize.Km5x5 => AreaType.Atlas5x5, _ => AreaType.Atlas10x10 }, record.AggregationField);
                     futureCollection.Add(
                         area.ToFeature(new Dictionary<string, object> {
-                            { "observationCount", (int)record.DocCount },
-                            { "taxonCount", (int)record.UniqueTaxon },
-                            { "organismQuantityCount", (int)record.OrganismQuantity }
+                            { "id", "featureId" },
+                            { "observationCount", observationsCount },
+                            { "taxonCount", taxaCount },
+                            { "organismQuantityCount", organismQuantity }
                         })
                     );
                 }

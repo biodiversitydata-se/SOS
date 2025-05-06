@@ -84,16 +84,16 @@ namespace SOS.Lib.Configuration.Shared
                     .SniffOnStartup(true)
                     .SniffOnConnectionFault(true)
                     .SniffLifeSpan(new TimeSpan(0, 30, 0));
-  
+            
                 if (!string.IsNullOrEmpty(UserName) && !string.IsNullOrEmpty(Password))
                 {
                     settings.Authentication(new BasicAuthentication(UserName, Password));
                 }
-
                 if (DebugMode)
                 {
                     settings.EnableDebugMode();
                 }
+                
                 clients.Add(new ElasticsearchClient(settings));
             }
 

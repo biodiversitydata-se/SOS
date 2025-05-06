@@ -891,7 +891,7 @@ namespace SOS.Lib.Repositories.Processed
                 while (duplicates?.Any() ?? false)
                 {
                     var searchResponse = await Client.SearchAsync<dynamic>(s => s
-                        .Index(protectedIndex ? ProtectedIndexName : PublicIndexName)
+                        .Indices(protectedIndex ? ProtectedIndexName : PublicIndexName)
                         .Query(q => q
                             .Terms(t => t
                                 .Field("occurrence.occurrenceId")
@@ -984,7 +984,7 @@ namespace SOS.Lib.Repositories.Processed
            int take)
         {
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
-               .Index(indexName)
+               .Indices(indexName)
                .Query(q => q
                    .Bool(b => b
                        .MustNot(excludeQueryDescriptors?.ToArray())
@@ -1024,7 +1024,7 @@ namespace SOS.Lib.Repositories.Processed
             int take)
         {
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
-                .Index(indexName)
+                .Indices(indexName)
                 .Query(q => q
                     .Bool(b => b
                         .MustNot(excludeQueryDescriptors?.ToArray())
@@ -1073,7 +1073,7 @@ namespace SOS.Lib.Repositories.Processed
             int take)
         {
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
-                 .Index(indexName)
+                 .Indices(indexName)
                  .Query(q => q
                      .Bool(b => b
                          .MustNot(excludeQueryDescriptors?.ToArray())
@@ -1613,7 +1613,7 @@ namespace SOS.Lib.Repositories.Processed
             var index = PublicIndexName;
 
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
-                .Index(index)
+                .Indices(index)
                 .Query(q => q
                     .Bool(b => b
                         .Filter(f => f.Term(t => t
@@ -1655,7 +1655,7 @@ namespace SOS.Lib.Repositories.Processed
                 foreach (var duplicate in duplicates)
                 {
                     searchResponse = await Client.SearchAsync<dynamic>(s => s
-                        .Index(index)
+                        .Indices(index)
                         .Query(q => q
                             .Bool(b => b
                                 .Filter(f => f.Term(t => t
@@ -1880,7 +1880,7 @@ namespace SOS.Lib.Repositories.Processed
             var searchIndex = GetCurrentIndex(filter);
             var queries = filter.ToMeasurementOrFactsQuery<dynamic>();
             var searchResponse = await SearchAfterAsync<dynamic>(searchIndex, new SearchRequestDescriptor<dynamic>()
-                .Index(searchIndex)
+                .Indices(searchIndex)
                 .Query(query => query
                     .Bool(b => b
                         .Filter(queries.ToArray())
@@ -1910,7 +1910,7 @@ namespace SOS.Lib.Repositories.Processed
             var searchIndex = GetCurrentIndex(filter);
             var queries = filter.ToMultimediaQuery<dynamic>();
             var searchResponse = await SearchAfterAsync<dynamic>(searchIndex, new SearchRequestDescriptor<dynamic>()
-                .Index(searchIndex)
+                .Indices(searchIndex)
                 .Query(query => query
                     .Bool(boolQueryDescriptor => boolQueryDescriptor
                         .Filter(queries.ToArray())
@@ -1968,7 +1968,7 @@ namespace SOS.Lib.Repositories.Processed
             try
             {
                 var searchResponse = await Client.SearchAsync<Observation>(s => s
-                    .Index(protectedIndex ? ProtectedIndexName : PublicIndexName)
+                    .Indices(protectedIndex ? ProtectedIndexName : PublicIndexName)
                     .Query(q => q
                         .Terms(t => t
                             .Field(f => f.Occurrence.OccurrenceId)
@@ -2056,7 +2056,7 @@ namespace SOS.Lib.Repositories.Processed
             var searchResponse = await PollyHelper.GetRetryPolicy(3, 100).ExecuteAsync(async () =>
             {
                 var queryResponse = await SearchAfterAsync<dynamic>(searchIndex, new SearchRequestDescriptor<dynamic>()
-                .Index(searchIndex)
+                .Indices(searchIndex)
                 .Source(filter.Output?.Fields.ToProjection(filter is SearchFilterInternal))
                     .Query(q => q
                         .Bool(b => b
@@ -2083,7 +2083,7 @@ namespace SOS.Lib.Repositories.Processed
         public async Task<(DateTime? firstSpotted, DateTime? lastSpotted, GeoBounds geographicCoverage)> GetProviderMetaDataAsync(int providerId, bool protectedIndex)
         {
             var res = await Client.SearchAsync<Observation>(s => s
-                .Index(protectedIndex ? ProtectedIndexName : PublicIndexName)
+                .Indices(protectedIndex ? ProtectedIndexName : PublicIndexName)
                 .Query(q => q
                     .Term(t => t
                         .Field(f => f.DataProviderId)
@@ -2131,7 +2131,7 @@ namespace SOS.Lib.Repositories.Processed
             try
             {
                 var searchResponse = await Client.SearchAsync<Observation>(s => s
-                    .Index(protectedIndex ? ProtectedIndexName : PublicIndexName)
+                    .Indices(protectedIndex ? ProtectedIndexName : PublicIndexName)
                     .Query(q => q
                         .FunctionScore(fs => fs
                             .Functions(f => f
