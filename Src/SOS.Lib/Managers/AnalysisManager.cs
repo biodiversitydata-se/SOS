@@ -217,7 +217,7 @@ namespace SOS.Lib.Managers
             try
             {
                 await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);   
-                var result = await _processedObservationRepository.AggregateByUserFieldAsync(filter, areaTypeProperty, aggregateOrganismQuantity ?? false, precisionThreshold, null, 1000, false);
+                var result = await _processedObservationRepository.AggregateByUserFieldAsync(filter, areaTypeProperty, aggregateOrganismQuantity ?? false, precisionThreshold, null, 5000, false);
 
                 var featureCollection = new FeatureCollection();
                 while (result?.Records?.Count() != 0)
@@ -256,7 +256,7 @@ namespace SOS.Lib.Managers
                         };
                         featureCollection.Add(feature);
                     }
-                    result = await _processedObservationRepository.AggregateByUserFieldAsync(filter, areaTypeProperty, false, precisionThreshold, result.SearchAfter?.FirstOrDefault()?.ToString(), 1000, false);
+                    result = await _processedObservationRepository.AggregateByUserFieldAsync(filter, areaTypeProperty, false, precisionThreshold, result.SearchAfter, 5000, false);
                 }
 
                 return featureCollection; 

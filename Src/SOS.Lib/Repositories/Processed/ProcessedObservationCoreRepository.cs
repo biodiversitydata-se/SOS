@@ -26,10 +26,10 @@ using SOS.Lib.Repositories.Processed.Interfaces;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Dynamic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Elastic.Clients.Elasticsearch.Fluent;
 
 namespace SOS.Lib.Repositories.Processed
 {
@@ -2309,70 +2309,86 @@ namespace SOS.Lib.Repositories.Processed
             string aggregationField,
             bool aggregateOrganismQuantity,
             int? precisionThreshold,
-            string? afterKey = null,
+            IReadOnlyDictionary<string, FieldValue>? afterKey = null,
             int? take = 10,
             bool? useScript = true)
         {
             var indexNames = GetCurrentIndex(filter);
-            var (query, excludeQuery) = GetCoreQueries(filter);
+            var (queries, excludeQueries) = GetCoreQueries<dynamic>(filter);
             var tz = TimeZoneInfo.Local.GetUtcOffset(DateTime.Now);
 
-            RuntimeFieldsDescriptor runtimeFieldsDescriptor = null;
+            IDictionary<Field, RuntimeField> fluentDictionaryOfFieldRuntimeField = null;
             if (useScript ?? true)
             {
-                runtimeFieldsDescriptor = new RuntimeFieldsDescriptor().RuntimeField("scriptField", FieldType.Keyword, s => s
-                    .Script(@$"
+                var fieldName = "scriptField";
+                fluentDictionaryOfFieldRuntimeField = new Dictionary<Field, RuntimeField>();
+                fluentDictionaryOfFieldRuntimeField.Add(fieldName.ToField(), new RuntimeField(RuntimeFieldType.Keyword) {
+                    Script = new Script() { 
+                        Id = fieldName,
+                        Source = @$"
                         if (!doc['{aggregationField}'].empty){{  
                             String value = '' + doc['{aggregationField}'].value; 
                             if (value != '') {{ 
                                 emit(value); 
                             }} 
                         }}"
-                    )
-                );
-                aggregationField = "scriptField";
+                    }
+                });
+               
+                aggregationField = fieldName;
             }
 
-            var searchResponse = 
+            var searchResponse =
                 await Client.SearchAsync<dynamic>(s => s
-                .Index(indexNames)
+                .Indices(indexNames)
                 .Query(q => q
                     .Bool(b => b
-                        .MustNot(excludeQuery)
-                        .Filter(query)
+                        .MustNot(excludeQueries.ToArray())
+                        .Filter(queries.ToArray())
                     )
                 )
-                .RuntimeFields(rf => runtimeFieldsDescriptor) 
+                .RuntimeMappings(fluentDictionaryOfFieldRuntimeField)
                 .Aggregations(a => a
-                    .Composite("aggregation", c => c
-                        .After(string.IsNullOrEmpty(afterKey) ? null : new CompositeKey(new Dictionary<string, object>() { { "termAggregation", afterKey } }))
-                        .Size(take)
-                        .Sources(s => s
-                            .Terms("termAggregation", t => t
-                                .Field(aggregationField)
-                                .MissingBucket(true)
+                    .Add("aggregation", a => a
+                        .Composite(c => c
+                            .After(ak => afterKey?.ToFluentFieldDictionary())
+                            .Size(take)
+                            .Sources(
+                                [
+                                    CreateCompositeTermsAggregationSource(
+                                        ("termAggregation", "scriptField", SortOrder.Asc, true)
+                                    )
+                                ]
                             )
                         )
-                        .Aggregations(a => {
-                            var cardinality = a
-                            .Cardinality("unique_taxonids", c => c
-                                .Field("taxon.id")
-                                .PrecisionThreshold(precisionThreshold ?? 3000)
+                        .Aggregations(aa =>
+                        {
+                            var subAggs = aa.Add("unique_taxonids", a => a
+                                .Cardinality(c => c
+                                    .Field("taxon.id")
+                                    .PrecisionThreshold(precisionThreshold ?? 3000)
+                                )
                             );
-
                             if (aggregateOrganismQuantity)
                             {
-                                cardinality.Sum("totalOrganismQuantity", s => s
-                                    .Field("occurrence.organismQuantityAggregation")
+                                subAggs.Add("totalOrganismQuantity", a => a
+                                    .Sum(s => s
+                                        .Field("occurrence.organismQuantityAggregation")
+                                    )
                                 );
                             }
-                            return cardinality;
                         })
                     )
                 )
-                .Size(0)
-                .Source(s => s.ExcludeAll())
+                .AddDefaultAggrigationSettings()
             );
+
+              
+            searchResponse.ThrowIfInvalid();
+            afterKey = searchResponse
+               .Aggregations
+                .GetComposite("aggregation")
+                    .AfterKey;
 
             searchResponse.ThrowIfInvalid();
             afterKey = searchResponse
@@ -2381,25 +2397,20 @@ namespace SOS.Lib.Repositories.Processed
                     .AfterKey;
 
             return new SearchAfterResult<dynamic, IReadOnlyDictionary<string, FieldValue>>
-            return new SearchAfterResult<dynamic>
-            return new SearchAfterResult<dynamic>
             {
                 SearchAfter = afterKey,
                 Records = searchResponse
                     .Aggregations
                     .GetComposite("aggregation")
                     .Buckets?
-                    .Select(b =>
-                    {
-                        var obj = new ExpandoObject();
-                        obj.TryAdd("AggregationField", b.Key.Values.First());
-                        obj.TryAdd("DocCount", b.DocCount);
-                        obj.TryAdd("UniqueTaxon", b.Aggregations.GetCardinality("unique_taxonids").Value);
-                        obj.TryAdd("OrganismQuantity", aggregateOrganismQuantity ? b.Aggregations.GetSum("totalOrganismQuantity")?.Value : 0);
-
-                        return obj;
-                    })
-                    ?.ToArray()
+                        .Select(b =>
+                            new
+                            {
+                                AggregationField = b.Key.Values.First(),
+                                b.DocCount,
+                                UniqueTaxon = b.Aggregations.GetCardinality("unique_taxonids").Value,
+                                OrganismQuantity = aggregateOrganismQuantity ? b.Aggregations.GetSum("totalOrganismQuantity")?.Value : 0
+                            })?.ToArray()
             };
         }
     }

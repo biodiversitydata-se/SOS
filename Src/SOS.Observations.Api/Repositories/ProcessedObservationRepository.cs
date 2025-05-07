@@ -437,6 +437,16 @@ namespace SOS.Observations.Api.Repositories
             var (queries, excludeQueries) = GetCoreQueries<dynamic>(filter);
 
             var tz = TimeZoneInfo.Local.GetUtcOffset(DateTime.Now);
+            ExtendedBounds<FieldDateMath> extendedBounds = null;
+            if (filter.Date != null)
+            {
+                extendedBounds = new ExtendedBounds<FieldDateMath>
+                {
+                    Max = filter.Date.EndDate,
+                    Min = filter.Date.StartDate
+                };
+            }
+
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
                 .Indices(indexNames)
                 .Query(q => q
@@ -447,12 +457,13 @@ namespace SOS.Observations.Api.Repositories
                 )
                 .Aggregations(a => a
                     .Add("aggregation", a => a
-                        .DateHistogram(dh =>
-                        {     
-                            dh.Field("event.startDate")
+                        .DateHistogram(dh => dh
+                           
+                            .Field("event.startDate")
                             .CalendarInterval(CalendarInterval.Year)
                             .TimeZone($"{(tz.TotalMinutes > 0 ? "+" : "")}{tz.Hours:00}:{tz.Minutes:00}")
                             .Format("yyyy-MM-dd")
+                            .ExtendedBounds(extendedBounds)
                         )
                         .AddAggregation("quantity", a => a
                             .Sum(s => s
@@ -463,15 +474,9 @@ namespace SOS.Observations.Api.Repositories
                             .Cardinality(s => s
                                 .Field("taxon.id")
                             )
-                        );
-
-                        if (filter.Date != null)
-                        {
-                            dh.ExtendedBounds(filter.Date.StartDate, filter.Date.EndDate);
-                        }
-
-                        return dh;
-                    })
+                        )
+                        
+                    )
                 )
                 .AddDefaultAggrigationSettings()
             );

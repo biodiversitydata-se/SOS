@@ -1,7 +1,6 @@
 ﻿using Hangfire;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Nest;
 using NetTopologySuite.Features;
 using SOS.Analysis.Api.Configuration;
 using SOS.Analysis.Api.Controllers.Interfaces;
