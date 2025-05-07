@@ -60,24 +60,6 @@ namespace SOS.Observations.Api.Managers.Interfaces
             string scrollId);
 
         /// <summary>
-        /// Aggregate on geometry area
-        /// </summary>
-        /// <param name="roleId"></param>
-        /// <param name="authorizationApplicationIdentifier"></param>
-        /// <param name="filter"></param>
-        /// <param name="areaType"></param>
-        /// <param name="aggregateOrganismQuantity"></param>
-        /// <param name="coordinateSys"></param>
-        /// <returns></returns>
-        Task<FeatureCollection> GetAreaAggregationAsync(
-            int? roleId,
-            string authorizationApplicationIdentifier,
-            SearchFilter filter,
-            AreaTypeAggregateDto areaType,
-            bool aggregateOrganismQuantity,
-            CoordinateSys coordinateSys);
-
-        /// <summary>
         /// Get aggregated data
         /// </summary>
         /// <param name="roleId"></param>

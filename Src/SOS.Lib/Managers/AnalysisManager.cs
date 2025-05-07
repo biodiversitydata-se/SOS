@@ -194,41 +194,88 @@ namespace SOS.Lib.Managers
         }
 
         /// <inheritdoc/>
-        public async Task<FeatureCollection> AtlasAggregateAsync(
+        public async Task<FeatureCollection> AreaAggregateAsync(
             int? roleId,
             string authorizationApplicationIdentifier,
             SearchFilter filter,
-            bool aggregateOrganismQuantity,
-            AtlasAreaSize atlasSize)
+            AreaTypeAggregate areaType,
+            int? precisionThreshold,
+            bool? aggregateOrganismQuantity,
+            CoordinateSys? coordinateSys)
         {
-            await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
-            var aggregationField = $"location.{(atlasSize == AtlasAreaSize.Km5x5 ? "atlas5x5" : "atlas10x10")}.featureId";
-
-            var result = await _processedObservationRepository.AggregateByUserFieldAsync(filter, aggregationField, aggregateOrganismQuantity, precisionThreshold: 40000, afterKey: null, take: 10000);
-            var futureCollection = new FeatureCollection();
-            while (result?.Records?.Any() ?? false)
+            var areaTypeProperty = areaType switch
             {
-                foreach (var record in result.Records)
+                AreaTypeAggregate.Atlas10x10 => "location.atlas10x10.featureId",
+                AreaTypeAggregate.Atlas5x5 => "location.atlas5x5.featureId",
+                AreaTypeAggregate.CountryRegion => "location.countryRegion.featureId",
+                AreaTypeAggregate.County => "location.county.featureId",
+                AreaTypeAggregate.Municipality => "location.municipality.featureId",
+                AreaTypeAggregate.Parish => "location.parish.featureId",
+                _ => "location.province.featureId"
+            };
+
+            try
+            {
+                await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);   
+                var result = await _processedObservationRepository.AggregateByUserFieldAsync(filter, areaTypeProperty, aggregateOrganismQuantity ?? false, precisionThreshold, null, 1000, false);
+
+                var featureCollection = new FeatureCollection();
+                while (result?.Records?.Count() != 0)
                 {
-                    var featureId = record.AggregationField;
-                    var observationsCount = (int)record.DocCount;
-                    var organismQuantity = (int)record.OrganismQuantity;
-                    var taxaCount = (int)record.UniqueTaxon;
-                    var area = await _areaCache.GetGeometryAsync(atlasSize switch { AtlasAreaSize.Km5x5 => AreaType.Atlas5x5, _ => AreaType.Atlas10x10 }, record.AggregationField);
-                    futureCollection.Add(
-                        area.ToFeature(new Dictionary<string, object> {
-                            { "id", "featureId" },
-                            { "observationCount", observationsCount },
-                            { "taxonCount", taxaCount },
-                            { "organismQuantityCount", organismQuantity }
-                        })
-                    );
+                    foreach (var record in result.Records)
+                    {
+                        var featureId = record.AggregationField;
+                        var observationsCount = record.DocCount;
+                        var organismQuantity = record.OrganismQuantity;
+                        var taxaCount = record.UniqueTaxon;
+                        var geometry = await _areaCache.GetGeometryAsync((AreaType)areaType, featureId);
+
+                        if (geometry == null)
+                        {
+                            continue;
+                        }
+                        if ((coordinateSys ?? CoordinateSys.WGS84) != CoordinateSys.WGS84)
+                        {
+                            geometry = geometry.Transform(CoordinateSys.WGS84, coordinateSys ?? CoordinateSys.WGS84);
+                        }
+                        
+                        var attributes = new HashSet<KeyValuePair<string, object>>([
+                            new KeyValuePair<string, object>("id", featureId),
+                            new KeyValuePair<string, object>("observationsCount", observationsCount),
+                            new KeyValuePair<string, object>("taxaCount", taxaCount),
+                            new KeyValuePair<string, object>("metricCRS", coordinateSys.ToString())
+                        ]);
+                        if (aggregateOrganismQuantity ?? false) {
+                            attributes.Add(new KeyValuePair<string, object>("organismQuantity", organismQuantity));
+                        }
+                        var feature = new Feature
+                        {
+                            Attributes = new AttributesTable(attributes),
+                            Geometry = geometry,
+                            BoundingBox = geometry.EnvelopeInternal
+                        };
+                        featureCollection.Add(feature);
+                    }
+                    result = await _processedObservationRepository.AggregateByUserFieldAsync(filter, areaTypeProperty, false, precisionThreshold, result.SearchAfter?.FirstOrDefault()?.ToString(), 1000, false);
                 }
 
-                result = await _processedObservationRepository.AggregateByUserFieldAsync(filter, aggregationField, aggregateOrganismQuantity, precisionThreshold: 40000, afterKey: result.SearchAfter, take: 10000);
+                return featureCollection; 
             }
-
-            return futureCollection;
+            catch (ArgumentOutOfRangeException e)
+            {
+                _logger.LogError(e, $"Failed to aggregate on {areaTypeProperty}. To many buckets");
+                throw;
+            }
+            catch (TimeoutException e)
+            {
+                _logger.LogError(e, $"Aggregate on {areaTypeProperty} timeout");
+                throw;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, $"Failed to aggregate on {areaTypeProperty}.");
+                throw;
+            }
         }
 
         /// <inheritdoc/>

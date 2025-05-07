@@ -86,7 +86,7 @@ namespace SOS.Observations.Api.Repositories
                 size = maxResult == 0 ? 1 : maxResult;
                 take = maxResult;
             }
-            
+
             // Get the real result
             var searchResponse = await Client.SearchAsync<dynamic>(indexNames, s => s
                 .Query(q => q
@@ -447,8 +447,9 @@ namespace SOS.Observations.Api.Repositories
                 )
                 .Aggregations(a => a
                     .Add("aggregation", a => a
-                        .DateHistogram(dh => dh
-                            .Field("event.startDate")
+                        .DateHistogram(dh =>
+                        {     
+                            dh.Field("event.startDate")
                             .CalendarInterval(CalendarInterval.Year)
                             .TimeZone($"{(tz.TotalMinutes > 0 ? "+" : "")}{tz.Hours:00}:{tz.Minutes:00}")
                             .Format("yyyy-MM-dd")
@@ -462,8 +463,15 @@ namespace SOS.Observations.Api.Repositories
                             .Cardinality(s => s
                                 .Field("taxon.id")
                             )
-                        )
-                    )
+                        );
+
+                        if (filter.Date != null)
+                        {
+                            dh.ExtendedBounds(filter.Date.StartDate, filter.Date.EndDate);
+                        }
+
+                        return dh;
+                    })
                 )
                 .AddDefaultAggrigationSettings()
             );
