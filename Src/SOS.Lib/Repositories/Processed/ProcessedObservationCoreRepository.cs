@@ -2321,20 +2321,21 @@ namespace SOS.Lib.Repositories.Processed
             if (useScript ?? true)
             {
                 var fieldName = "scriptField";
-                fluentDictionaryOfFieldRuntimeField = new Dictionary<Field, RuntimeField>();
-                fluentDictionaryOfFieldRuntimeField.Add(fieldName.ToField(), new RuntimeField(RuntimeFieldType.Keyword) {
-                    Script = new Script() { 
-                        Id = fieldName,
-                        Source = @$"
-                        if (!doc['{aggregationField}'].empty){{  
-                            String value = '' + doc['{aggregationField}'].value; 
-                            if (value != '') {{ 
-                                emit(value); 
-                            }} 
-                        }}"
-                    }
-                });
-               
+                fluentDictionaryOfFieldRuntimeField = new Dictionary<Field, RuntimeField> {
+                    { fieldName.ToField(),  new RuntimeField(RuntimeFieldType.Keyword) {
+                        Script = new Script() {
+                            Id = fieldName,
+                            Source = @$"
+                            if (!doc['{aggregationField}'].empty){{  
+                                String value = '' + doc['{aggregationField}'].value; 
+                                if (value != '') {{ 
+                                    emit(value); 
+                                }} 
+                            }}"
+                        }
+                    } }
+                };
+                
                 aggregationField = fieldName;
             }
 
@@ -2383,7 +2384,6 @@ namespace SOS.Lib.Repositories.Processed
                 .AddDefaultAggrigationSettings()
             );
 
-              
             searchResponse.ThrowIfInvalid();
             afterKey = searchResponse
                .Aggregations
