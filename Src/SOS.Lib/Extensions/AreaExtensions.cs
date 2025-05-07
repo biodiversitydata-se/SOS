@@ -12,7 +12,7 @@ namespace SOS.Lib.Extensions
         /// <returns></returns>
         public static string ToAreaId(this AreaType type, string featureId)
         {
-            return $"{type}:{featureId}".ToLower();
+            return $"{type}:{featureId}";
         }
     }
 }

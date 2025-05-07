@@ -156,7 +156,7 @@ namespace SOS.Lib.Repositories.Resource
         {
             foreach (var geometry in areaGeometries)
             {
-                var fileName = geometry.Key.ToLower();
+                var fileName = geometry.Key;
                 var geometryString = JsonSerializer.Serialize(geometry.Value, _jsonSerializerOptions);
                 var byteArray = Encoding.UTF8.GetBytes(geometryString);
 
