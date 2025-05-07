@@ -1,10 +1,10 @@
-﻿namespace SOS.Shared.Api.Dtos.Enum
+﻿namespace SOS.Lib.Enums
 {
 
     /// <summary>
-    /// Area types that can be aggregated dto
+    /// Area types that can be aggregated
     /// </summary>
-    public enum AreaTypeAggregateDto
+    public enum AreaTypeAggregate
     {
         Municipality = 1,
         CountryRegion = 13,

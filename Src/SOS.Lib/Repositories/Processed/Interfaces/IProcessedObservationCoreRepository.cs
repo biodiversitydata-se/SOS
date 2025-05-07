@@ -377,7 +377,9 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// <param name="precisionThreshold"></param>
         /// <param name="afterKey"></param>
         /// <param name="take"></param>
+        /// <param name="useScript">If aggregation is made on mandatory field, you don't need to aggregate on script field. 
+        /// Setting this to false will make a faster aggregation, but empty value and null will be handled different</param>
         /// <returns></returns>
-        Task<SearchAfterResult<dynamic>> AggregateByUserFieldAsync(SearchFilter filter, string aggregationField, bool aggregateOrganismQuantity, int? precisionThreshold, string? afterKey = null, int? take = 10);
+        Task<SearchAfterResult<dynamic>> AggregateByUserFieldAsync(SearchFilter filter, string aggregationField, bool aggregateOrganismQuantity, int? precisionThreshold, string? afterKey = null, int? take = 10, bool? useScript = true);
     }
 }

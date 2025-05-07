@@ -246,21 +246,21 @@ namespace SOS.Lib.Extensions
                     .Name(nm => nm.Atlas10x10)
                     .Properties(ps => ps
                         .KeywordLowerCase(kwlc => kwlc.FeatureId, IndexSetting.SearchSortAggregate)
-                        .KeywordLowerCase(kwlc => kwlc.Name, IndexSetting.SearchSortAggregate)
+                        .KeywordLowerCase(kwlc => kwlc.Name, IndexSetting.None)
                     )
                 )
                 .Object<Area>(c => c
                     .Name(nm => nm.Atlas5x5)
                     .Properties(ps => ps
                         .KeywordLowerCase(kwlc => kwlc.FeatureId, IndexSetting.SearchSortAggregate)
-                        .KeywordLowerCase(kwlc => kwlc.Name, IndexSetting.SearchSortAggregate)
+                        .KeywordLowerCase(kwlc => kwlc.Name, IndexSetting.None)
                     )
                 )
                 .Object<Area>(c => c
                     .Name(nm => nm.CountryRegion)
                     .Properties(ps => ps
                         .KeywordLowerCase(kwlc => kwlc.FeatureId, IndexSetting.SearchSortAggregate)
-                        .KeywordLowerCase(kwlc => kwlc.Name, IndexSetting.SearchSortAggregate)
+                        .KeywordLowerCase(kwlc => kwlc.Name, IndexSetting.SearchOnly)
                     )
                 )
                 .Object<Area>(c => c

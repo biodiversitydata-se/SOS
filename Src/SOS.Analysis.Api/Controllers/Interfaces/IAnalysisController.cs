@@ -57,23 +57,26 @@ namespace SOS.Analysis.Api.Controllers.Interfaces
             AggregationSortOrder sortOrder);
 
         /// <summary>
-        /// Atlas square aggregation
+        /// Area aggregation
         /// </summary>
         /// <param name="roleId"></param>
         /// <param name="authorizationApplicationIdentifier"></param>
         /// <param name="searchFilter"></param>
-        /// <param name="validateFilter"></param>
+        /// <param name="areaType"></param>
+        /// <param name="coordinateSys"></param>
+        /// <param name="precisionThreshold"></param>
         /// <param name="aggregateOrganismQuantity"></param>
-        /// <param name="atlasSize"></param>
+        /// <param name="validateFilter"></param>
         /// <returns></returns>
-        Task<IActionResult> AtlasAggregateAsync(
+        Task<IActionResult> AreaAggregateAsync(
             int? roleId,
             string? authorizationApplicationIdentifier,
             SearchFilterInternalDto searchFilter,
-            bool? validateFilter,
+            AreaTypeAggregate areaType,
+            CoordinateSys coordinateSys,
+            int? precisionThreshold,
             bool? aggregateOrganismQuantity,
-            AtlasAreaSizeDto atlasSize = AtlasAreaSizeDto.Km10x10
-           );
+            bool? validateFilter);
 
         /// <summary>
         /// Calculate AOO and EOO and get geometry showing coverage 

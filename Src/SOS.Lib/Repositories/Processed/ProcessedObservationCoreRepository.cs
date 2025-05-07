@@ -2098,75 +2098,66 @@ namespace SOS.Lib.Repositories.Processed
             bool aggregateOrganismQuantity,
             int? precisionThreshold,
             string? afterKey = null,
-            int? take = 10)
+            int? take = 10,
+            bool? useScript = true)
         {
             var indexNames = GetCurrentIndex(filter);
             var (query, excludeQuery) = GetCoreQueries(filter);
-            var tz = TimeZoneInfo.Local.GetUtcOffset(DateTime.Now);            
-            var searchResponse = await Client.SearchAsync<dynamic>(s => s
+            var tz = TimeZoneInfo.Local.GetUtcOffset(DateTime.Now);
+
+            RuntimeFieldsDescriptor runtimeFieldsDescriptor = null;
+            if (useScript ?? true)
+            {
+                runtimeFieldsDescriptor = new RuntimeFieldsDescriptor().RuntimeField("scriptField", FieldType.Keyword, s => s
+                    .Script(@$"
+                        if (!doc['{aggregationField}'].empty){{  
+                            String value = '' + doc['{aggregationField}'].value; 
+                            if (value != '') {{ 
+                                emit(value); 
+                            }} 
+                        }}"
+                    )
+                );
+                aggregationField = "scriptField";
+            }
+
+            var searchResponse = 
+                await Client.SearchAsync<dynamic>(s => s
                 .Index(indexNames)
                 .Query(q => q
                     .Bool(b => b
                         .MustNot(excludeQuery)
-                       // .Filter(query)
+                        .Filter(query)
                     )
                 )
-                .RuntimeFields(rf => rf // Since missing field seems replaced by MissingBucket in Nest implementation, we need to make a script field to handle empty string and null the same way
-                    .RuntimeField("scriptField", FieldType.Keyword, s => s
-                            .Script(@$"
-                            if (!doc['{aggregationField}'].empty){{  
-                                String value = '' + doc['{aggregationField}'].value; 
-                                if (value != '') {{ 
-                                    emit(value); 
-                                }} 
-                            }}"
-                         )
-                    )
-                )
-                .Aggregations(a =>
-                {
-                    if (aggregateOrganismQuantity)
-                    {
-                        return a.Composite("aggregation", c => c
-                            .After(string.IsNullOrEmpty(afterKey) ? null : new CompositeKey(new Dictionary<string, object>() { { "termAggregation", afterKey } }))
-                            .Size(take)
-                            .Sources(s => s
-                                .Terms("termAggregation", t => t
-                                    .Field("scriptField")
-                                    .MissingBucket(true)
-                                )
+                .RuntimeFields(rf => runtimeFieldsDescriptor) 
+                .Aggregations(a => a
+                    .Composite("aggregation", c => c
+                        .After(string.IsNullOrEmpty(afterKey) ? null : new CompositeKey(new Dictionary<string, object>() { { "termAggregation", afterKey } }))
+                        .Size(take)
+                        .Sources(s => s
+                            .Terms("termAggregation", t => t
+                                .Field(aggregationField)
+                                .MissingBucket(true)
                             )
-                            .Aggregations(a => a
-                                .Cardinality("unique_taxonids", c => c
-                                    .Field("taxon.id")
-                                    .PrecisionThreshold(precisionThreshold ?? 3000)
-                                )
-                                .Sum("totalOrganismQuantity", s => s
+                        )
+                        .Aggregations(a => {
+                            var cardinality = a
+                            .Cardinality("unique_taxonids", c => c
+                                .Field("taxon.id")
+                                .PrecisionThreshold(precisionThreshold ?? 3000)
+                            );
+
+                            if (aggregateOrganismQuantity)
+                            {
+                                cardinality.Sum("totalOrganismQuantity", s => s
                                     .Field("occurrence.organismQuantityAggregation")
-                                )
-                            )
-                        );
-                    }
-                    else
-                    {
-                        return a.Composite("aggregation", c => c
-                            .After(string.IsNullOrEmpty(afterKey) ? null : new CompositeKey(new Dictionary<string, object>() { { "termAggregation", afterKey } }))
-                            .Size(take)
-                            .Sources(s => s
-                                .Terms("termAggregation", t => t
-                                    .Field("scriptField")
-                                    .MissingBucket(true)
-                                )
-                            )
-                            .Aggregations(a => a
-                                .Cardinality("unique_taxonids", c => c
-                                    .Field("taxon.id")
-                                    .PrecisionThreshold(precisionThreshold ?? 3000)
-                                )
-                            )
-                        );
-                    }                    
-                })
+                                );
+                            }
+                            return cardinality;
+                        })
+                    )
+                )
                 .Size(0)
                 .Source(s => s.ExcludeAll())
             );
