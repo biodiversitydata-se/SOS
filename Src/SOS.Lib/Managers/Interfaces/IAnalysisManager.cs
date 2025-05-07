@@ -76,7 +76,7 @@ namespace SOS.Lib.Managers.Interfaces
             AreaTypeAggregate areaType,
             int? precisionThreshold,
             bool? aggregateOrganismQuantity,
-            CoordinateSys coordinateSys);
+            CoordinateSys? coordinateSys);
 
         /// <summary>
         /// Calculate AOO and EOO

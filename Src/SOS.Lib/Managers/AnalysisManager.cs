@@ -195,7 +195,7 @@ namespace SOS.Lib.Managers
             AreaTypeAggregate areaType,
             int? precisionThreshold,
             bool? aggregateOrganismQuantity,
-            CoordinateSys coordinateSys)
+            CoordinateSys? coordinateSys)
         {
             var areaTypeProperty = areaType switch
             {
@@ -229,7 +229,7 @@ namespace SOS.Lib.Managers
                             continue;
                         }
 
-                        var geometry = geoShape.ToGeometry().Transform(CoordinateSys.WGS84, coordinateSys);
+                        var geometry = geoShape.ToGeometry().Transform(CoordinateSys.WGS84, coordinateSys ?? CoordinateSys.WGS84);
                         var attributes = new HashSet<KeyValuePair<string, object>>([
                             new KeyValuePair<string, object>("id", featureId),
                             new KeyValuePair<string, object>("observationsCount", observationsCount),

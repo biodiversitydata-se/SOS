@@ -211,7 +211,7 @@ namespace SOS.Analysis.Api.Controllers
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
             [FromBody] SearchFilterInternalDto searchFilter,
             [FromQuery] AreaTypeAggregate areaType,
-            [FromQuery] CoordinateSys coordinateSys,
+            [FromQuery] CoordinateSys? coordinateSys,
             [FromQuery] int? precisionThreshold,
             [FromQuery] bool? aggregateOrganismQuantity,
             [FromQuery] bool? validateFilter)

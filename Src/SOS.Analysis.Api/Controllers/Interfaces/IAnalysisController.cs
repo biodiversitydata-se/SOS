@@ -73,7 +73,7 @@ namespace SOS.Analysis.Api.Controllers.Interfaces
             string? authorizationApplicationIdentifier,
             SearchFilterInternalDto searchFilter,
             AreaTypeAggregate areaType,
-            CoordinateSys coordinateSys,
+            CoordinateSys? coordinateSys,
             int? precisionThreshold,
             bool? aggregateOrganismQuantity,
             bool? validateFilter);
