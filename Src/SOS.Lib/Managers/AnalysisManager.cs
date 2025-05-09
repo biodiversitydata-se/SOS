@@ -104,7 +104,7 @@ namespace SOS.Lib.Managers
                 {
                     var geometry = result.Value;
                     feature.Geometry = geometry;
-                    feature.BoundingBox = geometry.EnvelopeInternal;
+                  //  feature.BoundingBox = geometry.EnvelopeInternal;
                 }
             }
         }
