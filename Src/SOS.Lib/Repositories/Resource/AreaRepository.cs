@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using AgileObjects.AgileMapper.Extensions;
+using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
@@ -155,6 +156,37 @@ namespace SOS.Lib.Repositories.Resource
                 .Skip(skip)
                 .Limit(take)
                 .ToListAsync();
+
+            return new PagedResult<Area>
+            {
+                Records = result,
+                Skip = skip,
+                Take = take,
+                TotalCount = total
+            };
+        }
+
+        /// <inheritdoc />
+        public async Task<PagedResult<Area>> GetAreasAsync(
+            IEnumerable<(AreaType AreaType, string FeatureId)> areaKeys,
+            int skip, 
+            int take)
+        {
+            var filters = new List<FilterDefinition<Area>>();
+            IEnumerable<Area> result = null;
+            var total = 0L;
+            if (areaKeys?.Any() ?? false)
+            {
+                var filter = Builders<Area>.Filter.In("_id", areaKeys.Select(ak => ak.AreaType.ToAreaId(ak.FeatureId)));
+                total = await MongoCollection
+                    .Find(filter)
+                    .CountDocumentsAsync();
+                result = await MongoCollection
+                    .Find(filter)
+                    .Skip(skip)
+                    .Limit(take)
+                    .ToListAsync();
+            }
 
             return new PagedResult<Area>
             {
