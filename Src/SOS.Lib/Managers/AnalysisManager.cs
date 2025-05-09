@@ -31,6 +31,7 @@ using System.Diagnostics;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
 using SOS.Lib.Models.Search.Result;
+using System.Threading;
 
 namespace SOS.Lib.Managers
 {
@@ -42,6 +43,68 @@ namespace SOS.Lib.Managers
         private readonly IAreaCache _areaCache;
         private readonly IFileService _fileService;
         private readonly ILogger<AnalysisManager> _logger;
+        private readonly SemaphoreSlim _semaphore;
+
+        /// <summary>
+        /// Add a geoemtry to feature
+        /// </summary>
+        /// <param name="feature"></param>
+        /// <param name="areaType"></param>
+        /// <param name="featureId"></param>
+        /// <param name="coordinateSys"></param>
+        /// <returns></returns>
+        private async Task AddFeatureGeometryAsync(
+            Feature feature,
+            AreaTypeAggregate areaType,
+            string featureId,
+            CoordinateSys? coordinateSys)
+        {
+            try
+            {
+                var geoShape = (IGeoShape)await _areaCache.GetGeometryAsync((AreaType)areaType, featureId);
+                if (geoShape == null)
+                {
+                    return;
+                }
+
+                var geometry = geoShape.ToGeometry().Transform(CoordinateSys.WGS84, coordinateSys ?? CoordinateSys.WGS84);
+                feature.Geometry = geometry;
+                feature.BoundingBox = geometry.EnvelopeInternal;
+            }
+            finally
+            {
+                _semaphore.Release();
+            }
+        }
+
+        /// <summary>
+        /// Add geometries to features using bound box
+        /// </summary>
+        /// <param name="areaType"></param>
+        /// <param name="features"></param>
+        /// <returns></returns>
+        private async Task AddBBoxGeometriesAsync(AreaTypeAggregate areaType, IDictionary<string, Feature> features)
+        {
+            if ((features?.Count() ?? 0) == 0)
+            {
+                return;
+            }
+            var results = await _areaCache.GetBBoxGeometriesAsync(features.Select(f => ((AreaType)areaType, f.Key)));
+            if ((results?.Count() ?? 0) == 0)
+            {
+                return;
+            }
+
+            foreach(var result in results)
+            {
+                if (features.TryGetValue(result.Key.featureId, out var feature))
+                {
+                    var geometry = result.Value.ToGeometry();
+                    feature.Geometry = geometry;
+                    feature.BoundingBox = geometry.EnvelopeInternal;
+                }
+            }
+        }
 
         /// <summary>
         /// Calculate some metadata for grid cells
@@ -74,6 +137,33 @@ namespace SOS.Lib.Managers
             }
 
             return (observationsCount, minX ?? 0.0, maxX ?? 0.0, minY ?? 0.0, maxY ?? 0.0);
+        }
+
+        private KeyValuePair<string, Feature> GetFeature(
+            dynamic record,
+            AreaTypeAggregate areaType,
+            bool? aggregateOrganismQuantity,
+            CoordinateSys? coordinateSys)
+        {
+            var featureId = record.AggregationField;
+            var observationsCount = record.DocCount;
+            var organismQuantity = record.OrganismQuantity;
+            var taxaCount = record.UniqueTaxon;
+           
+            var attributes = new HashSet<KeyValuePair<string, object>>([
+                new KeyValuePair<string, object>("id", featureId),
+                        new KeyValuePair<string, object>("observationsCount", observationsCount),
+                        new KeyValuePair<string, object>("taxaCount", taxaCount),
+                        new KeyValuePair<string, object>("metricCRS", coordinateSys.ToString())
+            ]);
+            if (aggregateOrganismQuantity ?? false)
+            {
+                attributes.Add(new KeyValuePair<string, object>("organismQuantity", organismQuantity));
+            }
+            return new KeyValuePair<string, Feature>(featureId, new Feature
+            {
+                Attributes = new AttributesTable(attributes)
+            }); 
         }
 
         /// <summary>
@@ -136,6 +226,8 @@ namespace SOS.Lib.Managers
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
             _taxonManager = taxonManager ?? throw new ArgumentNullException(nameof(taxonManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            var processorCount = Environment.ProcessorCount;
+            _semaphore = new SemaphoreSlim(processorCount, processorCount);
         }
 
         /// <inheritdoc/>
@@ -204,52 +296,56 @@ namespace SOS.Lib.Managers
                 AreaTypeAggregate.CountryRegion => "location.countryRegion.featureId",
                 AreaTypeAggregate.County => "location.county.featureId",
                 AreaTypeAggregate.Municipality => "location.municipality.featureId",
-                AreaTypeAggregate.Parish => "location.parish.featureId",
+               // AreaTypeAggregate.Parish => "location.parish.featureId",
                 _ => "location.province.featureId"
             };
 
             try
             {
                 await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);   
-                var result = await _processedObservationRepository.AggregateByUserFieldAsync(filter, areaTypeProperty, aggregateOrganismQuantity ?? false, precisionThreshold, null, 1000, false);
-
+                var result = await _processedObservationRepository.AggregateByUserFieldAsync(filter, areaTypeProperty, aggregateOrganismQuantity ?? false, precisionThreshold, null, 5000, false);
                 var featureCollection = new FeatureCollection();
+                var addGeometryTasks = new HashSet<Task>();
+                var features = new Dictionary<string, Feature>();
+                var useGeometryBBox = new[] { AreaTypeAggregate.Atlas10x10, AreaTypeAggregate.Atlas5x5 }.Contains(areaType);
+                
                 while (result?.Records?.Count() != 0)
                 {
+                    // Start getting next batch while we getting the geometries
+                    var nextBatchTask = _processedObservationRepository.AggregateByUserFieldAsync(filter, areaTypeProperty, false, precisionThreshold, result.SearchAfter?.FirstOrDefault()?.ToString(), 1000, false);
+                    
                     foreach (var record in result.Records)
                     {
-                        var featureId = record.AggregationField;
-                        var observationsCount = record.DocCount;
-                        var organismQuantity = record.OrganismQuantity;
-                        var taxaCount = record.UniqueTaxon;
-                        var geoShape = (IGeoShape)await _areaCache.GetGeometryAsync((AreaType)areaType, featureId);
-
-                        if (geoShape == null)
+                        var response = GetFeature(record, areaType, aggregateOrganismQuantity, coordinateSys);
+                        var featureId = response.Key;
+                        if (!string.IsNullOrEmpty(featureId))
                         {
-                            continue;
-                        }
+                            var feature = response.Value;
+                            featureCollection.Add(feature);
 
-                        var geometry = geoShape.ToGeometry().Transform(CoordinateSys.WGS84, coordinateSys ?? CoordinateSys.WGS84);
-                        var attributes = new HashSet<KeyValuePair<string, object>>([
-                            new KeyValuePair<string, object>("id", featureId),
-                            new KeyValuePair<string, object>("observationsCount", observationsCount),
-                            new KeyValuePair<string, object>("taxaCount", taxaCount),
-                            new KeyValuePair<string, object>("metricCRS", coordinateSys.ToString())
-                        ]);
-                        if (aggregateOrganismQuantity ?? false) {
-                            attributes.Add(new KeyValuePair<string, object>("organismQuantity", organismQuantity));
+                            if (useGeometryBBox)
+                            {
+                                features.Add(featureId, feature);
+                            }
+                            else
+                            {
+                                await _semaphore.WaitAsync();
+                                addGeometryTasks.Add(AddFeatureGeometryAsync(feature, areaType, featureId, coordinateSys));
+                            }
                         }
-                        var feature = new Feature
-                        {
-                            Attributes = new AttributesTable(attributes),
-                            Geometry = geometry,
-                            BoundingBox = geometry.EnvelopeInternal
-                        };
-                        featureCollection.Add(feature);
                     }
-                    result = await _processedObservationRepository.AggregateByUserFieldAsync(filter, areaTypeProperty, false, precisionThreshold, result.SearchAfter?.FirstOrDefault()?.ToString(), 1000, false);
+                    if (useGeometryBBox)
+                    {
+                        await AddBBoxGeometriesAsync(areaType, features);
+                    }
+                    else
+                    {
+                        await Task.WhenAll(addGeometryTasks);
+                    }
+                    
+                    result = await nextBatchTask;
                 }
-
+                
                 return featureCollection; 
             }
             catch (ArgumentOutOfRangeException e)

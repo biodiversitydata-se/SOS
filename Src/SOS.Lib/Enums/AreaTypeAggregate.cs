@@ -9,7 +9,7 @@
         Municipality = 1,
         CountryRegion = 13,
         Province = 16,
-        Parish = 19,
+      //  Parish = 19, 
         County = 21,
         Atlas5x5 = 29,
         Atlas10x10 = 30

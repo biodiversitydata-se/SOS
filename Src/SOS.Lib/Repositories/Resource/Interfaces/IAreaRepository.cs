@@ -43,6 +43,23 @@ namespace SOS.Lib.Repositories.Resource.Interfaces
         Task<PagedResult<Area>> GetAreasAsync(IEnumerable<AreaType> areaTypes, string searchString, int skip,
             int take);
 
+        /// <summary>
+        /// Get areas by id
+        /// </summary>
+        /// <param name="areaIds"></param>
+        /// <param name="skip"></param>
+        /// <param name="take"></param>
+        /// <returns></returns>
+        Task<PagedResult<Area>> GetAreasAsync(
+            IEnumerable<(AreaType AreaType, string FeatureId)> areaKeys,
+            int skip,
+            int take);
+
+        /// <summary>
+        /// Get areas by type
+        /// </summary>
+        /// <param name="areaTypes"></param>
+        /// <returns></returns>
         Task<List<Area>> GetAsync(AreaType[] areaTypes);
 
         /// <summary>
