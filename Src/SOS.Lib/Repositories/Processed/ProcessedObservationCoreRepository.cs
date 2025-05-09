@@ -1,6 +1,7 @@
 ﻿using AgileObjects.AgileMapper.Extensions;
 using CSharpFunctionalExtensions;
 using Elastic.Clients.Elasticsearch;
+using Elastic.Clients.Elasticsearch.Aggregations;
 using Elastic.Clients.Elasticsearch.Core.Search;
 using Elastic.Clients.Elasticsearch.Cluster;
 using Elastic.Clients.Elasticsearch.Mapping;
@@ -2157,12 +2158,12 @@ namespace SOS.Lib.Repositories.Processed
         public async Task<HashSet<string>> GetSortableFieldsAsync()
         {
             var sortableFields = new HashSet<string>();
-            var response = await Client.Indices.GetMappingAsync<Observation>();
-            if (response.IsValidResponse)
+            var mappings = await Client.Indices.GetMappingAsync<Observation>();
+            if (mappings.IsValidResponse)
             {
-                foreach (var mapping in response.Mappings)
+                foreach (var value in mappings.Indices.Values)
                 {
-                    PopulateSortableFields(mapping.Value.Mappings.Properties, ref sortableFields, "");
+                    PopulateSortableFields(value.Mappings.Properties, ref sortableFields, "");
                 }
             }
 
@@ -2317,26 +2318,46 @@ namespace SOS.Lib.Repositories.Processed
             var (queries, excludeQueries) = GetCoreQueries<dynamic>(filter);
             var tz = TimeZoneInfo.Local.GetUtcOffset(DateTime.Now);
 
-            IDictionary<Field, RuntimeField> fluentDictionaryOfFieldRuntimeField = null;
+            FluentDescriptorDictionary<Field, RuntimeFieldDescriptor<dynamic>> runtimeMapping = null;
             if (useScript ?? true)
             {
                 var fieldName = "scriptField";
-                fluentDictionaryOfFieldRuntimeField = new Dictionary<Field, RuntimeField> {
-                    { fieldName.ToField(),  new RuntimeField(RuntimeFieldType.Keyword) {
-                        Script = new Script() {
-                            Id = fieldName,
-                            Source = @$"
-                            if (!doc['{aggregationField}'].empty){{  
-                                String value = '' + doc['{aggregationField}'].value; 
-                                if (value != '') {{ 
-                                    emit(value); 
-                                }} 
-                            }}"
-                        }
-                    } }
+                var runtimeFieldDescriptor = new RuntimeFieldDescriptor<dynamic>();
+                runtimeFieldDescriptor.Script(new Script()
+                {
+                    Id = fieldName,
+                    Source = @$"
+                        if (!doc['{aggregationField}'].empty){{  
+                            String value = '' + doc['{aggregationField}'].value; 
+                            if (value != '') {{ 
+                                emit(value); 
+                            }} 
+                        }}",
+                });
+                runtimeFieldDescriptor.Type(RuntimeFieldType.Keyword);
+                runtimeMapping = new FluentDescriptorDictionary<Field, RuntimeFieldDescriptor<dynamic>>
+                {
+                    { fieldName.ToField(), runtimeFieldDescriptor }
                 };
-                
                 aggregationField = fieldName;
+            }
+
+            var aggregations = new FluentDescriptorDictionary<string, AggregationDescriptor<dynamic>> {
+                { 
+                    "unique_taxonids", a => a
+                        .Cardinality(c => c
+                            .Field("taxon.id")
+                            .PrecisionThreshold(precisionThreshold ?? 3000)
+                        )
+                }
+            };
+            if (aggregateOrganismQuantity)
+            {
+                aggregations.Add("totalOrganismQuantity", a => a
+                        .Sum(s => s
+                            .Field("occurrence.organismQuantityAggregation")
+                        )
+                    );
             }
 
             var searchResponse =
@@ -2348,7 +2369,7 @@ namespace SOS.Lib.Repositories.Processed
                         .Filter(queries.ToArray())
                     )
                 )
-                .RuntimeMappings(fluentDictionaryOfFieldRuntimeField)
+                .RuntimeMappings(g => runtimeMapping)
                 .Aggregations(a => a
                     .Add("aggregation", a => a
                         .Composite(c => c
@@ -2357,28 +2378,12 @@ namespace SOS.Lib.Repositories.Processed
                             .Sources(
                                 [
                                     CreateCompositeTermsAggregationSource(
-                                        ("termAggregation", "scriptField", SortOrder.Asc, true)
+                                        ("termAggregation", aggregationField, SortOrder.Asc, true)
                                     )
                                 ]
                             )
                         )
-                        .Aggregations(aa =>
-                        {
-                            var subAggs = aa.Add("unique_taxonids", a => a
-                                .Cardinality(c => c
-                                    .Field("taxon.id")
-                                    .PrecisionThreshold(precisionThreshold ?? 3000)
-                                )
-                            );
-                            if (aggregateOrganismQuantity)
-                            {
-                                subAggs.Add("totalOrganismQuantity", a => a
-                                    .Sum(s => s
-                                        .Field("occurrence.organismQuantityAggregation")
-                                    )
-                                );
-                            }
-                        })
+                        .Aggregations(aa => aggregations)
                     )
                 )
                 .AddDefaultAggrigationSettings()
@@ -2406,11 +2411,12 @@ namespace SOS.Lib.Repositories.Processed
                         .Select(b =>
                             new
                             {
-                                AggregationField = b.Key.Values.First(),
+                                AggregationField = b.Key.Values.First().Value,
                                 b.DocCount,
                                 UniqueTaxon = b.Aggregations.GetCardinality("unique_taxonids").Value,
                                 OrganismQuantity = aggregateOrganismQuantity ? b.Aggregations.GetSum("totalOrganismQuantity")?.Value : 0
-                            })?.ToArray()
+                            }
+                        )?.ToArray()
             };
         }
     }

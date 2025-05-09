@@ -186,7 +186,7 @@ namespace SOS.Analysis.Api
                     options.JsonSerializerOptions.Converters.Add(new GeometryConverter());
                     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 });
-
+           
             services.AddHealthChecks().AddCheck<HealthCheck>("CustomHealthCheck");
 
             // MongoDB conventions.

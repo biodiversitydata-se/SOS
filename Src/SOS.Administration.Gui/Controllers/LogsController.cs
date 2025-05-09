@@ -178,7 +178,7 @@ namespace SOS.Administration.Gui.Controllers
                     )
                 )
                 .Sort(s => s
-                    .Field(f => f.Timestamp, SortOrder.Desc)
+                    .Field(f => f.Timestamp, new FieldSort { Order = SortOrder.Desc })
                 )
             );
             if (result.IsValidResponse && result.Aggregations.Count > 0)

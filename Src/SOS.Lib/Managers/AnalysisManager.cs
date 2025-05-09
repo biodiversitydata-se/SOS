@@ -142,7 +142,7 @@ namespace SOS.Lib.Managers
             return (observationsCount, minX ?? 0.0, maxX ?? 0.0, minY ?? 0.0, maxY ?? 0.0);
         }
 
-        private KeyValuePair<string, Feature> GetFeature(
+        private (string Id, Feature Feature) GetAreaFeature(
             dynamic record,
             AreaTypeAggregate areaType,
             bool? aggregateOrganismQuantity,
@@ -152,21 +152,25 @@ namespace SOS.Lib.Managers
             var observationsCount = record.DocCount;
             var organismQuantity = record.OrganismQuantity;
             var taxaCount = record.UniqueTaxon;
-           
-            var attributes = new HashSet<KeyValuePair<string, object>>([
-                new KeyValuePair<string, object>("id", featureId),
-                        new KeyValuePair<string, object>("observationsCount", observationsCount),
-                        new KeyValuePair<string, object>("taxaCount", taxaCount),
-                        new KeyValuePair<string, object>("metricCRS", coordinateSys.ToString())
-            ]);
+
+            var attributes = new Dictionary<string, object>
+            {
+                { "id", featureId },
+                { "observationsCount", observationsCount },
+                { "taxaCount", taxaCount },
+                { "metricCRS", coordinateSys.ToString() }
+            };
             if (aggregateOrganismQuantity ?? false)
             {
-                attributes.Add(new KeyValuePair<string, object>("organismQuantity", organismQuantity));
+                attributes.Add("organismQuantity", organismQuantity);
             }
-            return new KeyValuePair<string, Feature>(featureId, new Feature
-            {
-                Attributes = new AttributesTable(attributes)
-            }); 
+            return (
+                Id: featureId ?? "",
+                Feature: new Feature
+                {
+                    Attributes = new AttributesTable(attributes)
+                }
+            ); 
         }
 
         /// <summary>
@@ -324,11 +328,11 @@ namespace SOS.Lib.Managers
                     
                     foreach (var record in result.Records)
                     {
-                        var response = GetFeature(record, areaType, aggregateOrganismQuantity, coordinateSys);
-                        var featureId = response.Key;
+                        var response = GetAreaFeature(record, areaType, aggregateOrganismQuantity, coordinateSys);
+                        var featureId = response?.Item1;
                         if (!string.IsNullOrEmpty(featureId))
                         {
-                            var feature = response.Value;
+                            var feature = response.Item2;
                             featureCollection.Add(feature);
 
                             if (useGeometryBBox)
@@ -470,13 +474,14 @@ namespace SOS.Lib.Managers
 
                     featureCollection.Add(new Feature(
                         eooGeometry.Transform((CoordinateSys)metricCoordinateSys, coordinateSystem),
-                        new AttributesTable(new KeyValuePair<string, object>[] {
-                                new KeyValuePair<string, object>("id", aooEooItem.Id),
-                                new KeyValuePair<string, object>("aoo", aooEooItem.Aoo),
-                                new KeyValuePair<string, object>("eoo", aooEooItem.Eoo),
-                                new KeyValuePair<string, object>("gridCellArea", aooEooItem.GridCellArea),
-                                new KeyValuePair<string, object>("gridCellAreaUnit", aooEooItem.GridCellAreaUnit),
-                                new KeyValuePair<string, object>("observationsCount", aooEooItem.ObservationsCount)
+                        new AttributesTable(new Dictionary<string, object>
+                            {
+                                { "id", aooEooItem.Id },
+                                { "aoo", aooEooItem.Aoo },
+                                { "eoo", aooEooItem.Eoo },
+                                { "gridCellArea", aooEooItem.GridCellArea },
+                                { "gridCellAreaUnit", aooEooItem.GridCellAreaUnit },
+                                { "observationsCount", aooEooItem.ObservationsCount }
                             }
                         )
                     ));

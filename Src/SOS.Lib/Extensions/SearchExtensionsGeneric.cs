@@ -122,10 +122,10 @@ namespace SOS.Lib.Extensions
                     IReadOnlyDictionary<IndexName, TypeFieldMappings> fieldMappings = null;
                     if (!indicesByKey.TryGetValue(key, out fieldMappings))
                     {
-                        var response = await client.Indices.GetFieldMappingAsync(new GetFieldMappingRequest(indexName, sortBy));                        
+                        var response = await client.Indices.GetFieldMappingAsync(new GetFieldMappingRequest(indexName, sortBy));
                         if (response.IsValidResponse)
                         {
-                            fieldMappings = response.FieldMappings.ToDictionary(fm => IndexName.From<string>(fm.Key), fm => fm.Value);
+                            fieldMappings = response.FieldMappings;
                             indicesByKey.TryAdd(key, fieldMappings);
                         }
                     }

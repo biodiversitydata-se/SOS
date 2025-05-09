@@ -426,7 +426,7 @@ namespace SOS.Lib.Repositories.Processed
             var indexName = IndexName;
             var (query, excludeQuery) = GetCoreQueries<dynamic>(filter);
             var items = new List<AggregationItem>();
-            IDictionary<Field, FieldValue> nextPageKey = null;
+            IReadOnlyDictionary<Field, FieldValue> nextPageKey = null;
             var take = MaxNrElasticSearchAggregationBuckets;
             do
             {
@@ -452,7 +452,7 @@ namespace SOS.Lib.Repositories.Processed
             string aggregationField,
             ICollection<Action<QueryDescriptor<dynamic>>> queries,
             ICollection<Action<QueryDescriptor<dynamic>>> excludeQueries,
-            IDictionary<Field, FieldValue> nextPageKey,
+            IReadOnlyDictionary<Field, FieldValue> nextPageKey,
             int take)
         {
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
@@ -466,7 +466,7 @@ namespace SOS.Lib.Repositories.Processed
                 .Aggregations(a => a
                     .Add("compositeAggregation", a => a
                         .Composite(c => c
-                            .After(nextPageKey)
+                            .After(npk => nextPageKey.ToFluentDictionary() ?? null)
                             .Size(take)
                             .Sources(
                                 [

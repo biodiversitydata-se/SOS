@@ -437,13 +437,13 @@ namespace SOS.Observations.Api.Repositories
             var (queries, excludeQueries) = GetCoreQueries<dynamic>(filter);
 
             var tz = TimeZoneInfo.Local.GetUtcOffset(DateTime.Now);
-            ExtendedBounds<FieldDateMath> extendedBounds = null;
+            ExtendedBoundsDate extendedBounds = null;
             if (filter.Date != null)
             {
-                extendedBounds = new ExtendedBounds<FieldDateMath>
+                extendedBounds = new ExtendedBoundsDate
                 {
-                    Max = filter.Date.EndDate,
-                    Min = filter.Date.StartDate
+                    Max = filter.Date.EndDate.HasValue ? new FieldDateMath(filter.Date.EndDate.Value.ToUniversalTime().Ticks) : null,
+                    Min = filter.Date.StartDate.HasValue ? new FieldDateMath(filter.Date.StartDate.Value.ToUniversalTime().Ticks) : null
                 };
             }
 
@@ -465,17 +465,18 @@ namespace SOS.Observations.Api.Repositories
                             .Format("yyyy-MM-dd")
                             .ExtendedBounds(extendedBounds)
                         )
-                        .AddAggregation("quantity", a => a
-                            .Sum(s => s
-                                .Field("occurrence.organismQuantityAggregation")
+                        .Aggregations(a => a
+                            .Add("quantity", a => a
+                                .Sum(s => s
+                                    .Field("occurrence.organismQuantityAggregation")
+                                )
+                            )
+                            .Add("unique_taxonids", a => a
+                                .Cardinality(s => s
+                                    .Field("taxon.id")
+                                )
                             )
                         )
-                        .AddAggregation("unique_taxonids", a => a
-                            .Cardinality(s => s
-                                .Field("taxon.id")
-                            )
-                        )
-                        
                     )
                 )
                 .AddDefaultAggrigationSettings()

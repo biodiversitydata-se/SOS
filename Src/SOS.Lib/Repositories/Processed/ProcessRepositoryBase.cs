@@ -322,7 +322,10 @@ namespace SOS.Lib.Repositories.Processed
         /// <returns></returns>
         protected async Task<bool> SetIndexRefreshIntervalAsync(string index, Duration duration)
         {
-            var setResponse = await Client.Indices.PutSettingsAsync<TEntity>(s => new IndexSettings { RefreshInterval = duration });
+            var indexState = new IndexState() { Settings = new IndexSettings() };
+            indexState.Settings.RefreshInterval = duration;
+            var setResponse = await Client.Indices.PutSettingsAsync<TEntity>(indexState.Settings, index);
+
             return setResponse.IsValidResponse;
         }
 

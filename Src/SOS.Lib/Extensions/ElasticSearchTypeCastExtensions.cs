@@ -130,7 +130,7 @@ namespace SOS.Lib.Extensions
             return FieldValue.String(value?.ToString());
         }
 
-        public static ICollection<FieldValue> ToFieldValues<TValue>(this IEnumerable<TValue> values)
+        public static IReadOnlyCollection<FieldValue> ToFieldValues<TValue>(this IEnumerable<TValue> values)
         {
             return values?.Select(v => v.ToFieldValue()).ToList();
         }

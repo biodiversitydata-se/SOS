@@ -278,8 +278,8 @@ namespace SOS.Harvest.Jobs
                 // Get public meta data
                 var metadata = await _processedObservationRepository.GetProviderMetaDataAsync(provider.Id, false);
 
-                var currentBottomRight = new LatLonGeoLocation(0, 0);
-                var currentTopLeft = new LatLonGeoLocation(0, 0);
+                var currentBottomRight = new LatLonGeoLocation();
+                var currentTopLeft = new LatLonGeoLocation();
                 if (metadata.geographicCoverage.TryGetTopLeftBottomRight(out var storedTopLeftBottomRight))
                 {
                     if (storedTopLeftBottomRight.BottomRight.TryGetLatitudeLongitude(out var storedBottomRight))

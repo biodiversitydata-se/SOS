@@ -165,7 +165,7 @@ namespace SOS.Administration.Gui.Controllers
                 .Index("sos-st-loadtests-summaries")
                 .Size(5)
                 .Sort(f => f
-                    .Field("timestamp".ToField(), SortOrder.Desc )
+                    .Field("timestamp".ToField(), new FieldSort { Order = SortOrder.Desc })
                 )
             );
             if (result.IsValidResponse)
