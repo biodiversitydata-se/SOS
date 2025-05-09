@@ -30,6 +30,11 @@ namespace SOS.Shared.Api.Extensions.Controller
             return $"/{controllerContext?.ActionDescriptor?.AttributeRouteInfo?.Template}";
         }
 
+        public static string? GetEndpointName(this ControllerContext controllerContext)
+        {
+            return $"/{controllerContext?.ActionDescriptor?.AttributeRouteInfo?.Template}";
+        }
+
         public static ApiUserType GetApiUserType(this ControllerBase controller)
         {
             if (controller.HttpContext.Items.TryGetValue("ApiUserType", out var userTypeObj) && userTypeObj is ApiUserType userType)

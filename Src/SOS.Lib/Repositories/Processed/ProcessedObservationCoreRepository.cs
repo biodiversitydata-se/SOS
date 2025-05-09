@@ -29,6 +29,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Elastic.Clients.Elasticsearch.Fluent;
 
 namespace SOS.Lib.Repositories.Processed
 {
@@ -228,8 +229,8 @@ namespace SOS.Lib.Repositories.Processed
                             .Date(d => d.Event.StartDate, c => c.Index(true).DocValues(true))
                             .ShortNumber(s => s.Event.EndDayOfYear, c => c.Index(true).DocValues(true))
                             .ShortNumber(s => s.Event.StartDayOfYear, c => c.Index(true).DocValues(true))
-                            .ShortNumber(s => s.Event.StartDay, c => c.Index(true))
-                            .ShortNumber(s => s.Event.EndDay, c => c.Index(true))
+                            .ShortNumber(s => s.Event.StartDay, c => c.Index(true).DocValues(true))
+                            .ShortNumber(s => s.Event.EndDay, c => c.Index(true).DocValues(true))
                             .ByteNumber(s => s.Event.StartMonth, c => c.Index(true).DocValues(true))
                             .ByteNumber(s => s.Event.EndMonth, c => c.Index(true).DocValues(true))
                             .ByteNumber(s => s.Event.StartHistogramWeek, c => c.Index(true).DocValues(true))
@@ -890,7 +891,7 @@ namespace SOS.Lib.Repositories.Processed
                 while (duplicates?.Any() ?? false)
                 {
                     var searchResponse = await Client.SearchAsync<dynamic>(s => s
-                        .Index(protectedIndex ? ProtectedIndexName : PublicIndexName)
+                        .Indices(protectedIndex ? ProtectedIndexName : PublicIndexName)
                         .Query(q => q
                             .Terms(t => t
                                 .Field("occurrence.occurrenceId")
@@ -983,7 +984,7 @@ namespace SOS.Lib.Repositories.Processed
            int take)
         {
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
-               .Index(indexName)
+               .Indices(indexName)
                .Query(q => q
                    .Bool(b => b
                        .MustNot(excludeQueryDescriptors?.ToArray())
@@ -1023,7 +1024,7 @@ namespace SOS.Lib.Repositories.Processed
             int take)
         {
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
-                .Index(indexName)
+                .Indices(indexName)
                 .Query(q => q
                     .Bool(b => b
                         .MustNot(excludeQueryDescriptors?.ToArray())
@@ -1072,7 +1073,7 @@ namespace SOS.Lib.Repositories.Processed
             int take)
         {
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
-                 .Index(indexName)
+                 .Indices(indexName)
                  .Query(q => q
                      .Bool(b => b
                          .MustNot(excludeQueryDescriptors?.ToArray())
@@ -1249,7 +1250,7 @@ namespace SOS.Lib.Repositories.Processed
             size = Math.Max(1, size);
 
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
-                .Index(indexNames)
+                .Indices(indexNames)
                 .Query(q => q
                     .Bool(b => b
                         .MustNot(excludeQuery.ToArray())
@@ -1292,7 +1293,7 @@ namespace SOS.Lib.Repositories.Processed
             var termsOrder = sortOrder.GetTermsOrder();
 
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
-                .Index(indexNames)
+                .Indices(indexNames)
                 .Query(q => q
                     .Bool(b => b
                         .MustNot(excludeQuery.ToArray())
@@ -1349,7 +1350,7 @@ namespace SOS.Lib.Repositories.Processed
             size = Math.Max(1, size);
 
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
-                .Index(indexNames)
+                .Indices(indexNames)
                 .Query(q => q
                     .Bool(b => b
                         .MustNot(excludeQuery.ToArray())
@@ -1456,7 +1457,7 @@ namespace SOS.Lib.Repositories.Processed
             var (query, excludeQuery) = GetCoreQueries<T>(filter);
             var sortDescriptor = await Client.GetSortDescriptorAsync<T, Observation>(indexNames, filter?.Output?.SortOrders);
             var searchResponse = await Client.SearchAsync<T>(s => s
-                .Index(indexNames)
+                .Indices(indexNames)
                 .Source(getAllFields ? new SourceConfig(true) : filter.Output?.Fields.ToProjection(filter is SearchFilterInternal))
                 .From(skip)
                 .Size(take)
@@ -1539,7 +1540,7 @@ namespace SOS.Lib.Repositories.Processed
             var (query, excludeQuery) = GetCoreQueries<dynamic>(filter);
 
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
-                .Index(indexNames)
+                .Indices(indexNames)
                 .Query(q => q
                     .Bool(b => b
                         .MustNot(excludeQuery.ToArray())
@@ -1580,7 +1581,7 @@ namespace SOS.Lib.Repositories.Processed
             var (query, excludeQuery) = GetCoreQueries<dynamic>(filter);
 
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
-                .Index(indexNames)
+                .Indices(indexNames)
                 .Query(q => q
                     .Bool(b => b
                         .MustNot(excludeQuery.ToArray())
@@ -1612,7 +1613,7 @@ namespace SOS.Lib.Repositories.Processed
             var index = PublicIndexName;
 
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
-                .Index(index)
+                .Indices(index)
                 .Query(q => q
                     .Bool(b => b
                         .Filter(f => f.Term(t => t
@@ -1654,7 +1655,7 @@ namespace SOS.Lib.Repositories.Processed
                 foreach (var duplicate in duplicates)
                 {
                     searchResponse = await Client.SearchAsync<dynamic>(s => s
-                        .Index(index)
+                        .Indices(index)
                         .Query(q => q
                             .Bool(b => b
                                 .Filter(f => f.Term(t => t
@@ -1793,7 +1794,7 @@ namespace SOS.Lib.Repositories.Processed
             }
 
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
-                .Index(indexNames)
+                .Indices(indexNames)
                 .Query(q => q
                     .Bool(b => b
                         .MustNot(excludeQuery.ToArray())
@@ -1879,7 +1880,7 @@ namespace SOS.Lib.Repositories.Processed
             var searchIndex = GetCurrentIndex(filter);
             var queries = filter.ToMeasurementOrFactsQuery<dynamic>();
             var searchResponse = await SearchAfterAsync<dynamic>(searchIndex, new SearchRequestDescriptor<dynamic>()
-                .Index(searchIndex)
+                .Indices(searchIndex)
                 .Query(query => query
                     .Bool(b => b
                         .Filter(queries.ToArray())
@@ -1909,7 +1910,7 @@ namespace SOS.Lib.Repositories.Processed
             var searchIndex = GetCurrentIndex(filter);
             var queries = filter.ToMultimediaQuery<dynamic>();
             var searchResponse = await SearchAfterAsync<dynamic>(searchIndex, new SearchRequestDescriptor<dynamic>()
-                .Index(searchIndex)
+                .Indices(searchIndex)
                 .Query(query => query
                     .Bool(boolQueryDescriptor => boolQueryDescriptor
                         .Filter(queries.ToArray())
@@ -1937,7 +1938,7 @@ namespace SOS.Lib.Repositories.Processed
             queries.TryAddTermCriteria("occurrence.occurrenceId", occurrenceId);
 
             var searchResponse = await Client.SearchAsync<T>(s => s
-                .Index(indexNames)
+                .Indices(indexNames)
                 .Query(q => q
                     .Bool(b => b
                         .Filter(queries.ToArray())
@@ -1967,7 +1968,7 @@ namespace SOS.Lib.Repositories.Processed
             try
             {
                 var searchResponse = await Client.SearchAsync<Observation>(s => s
-                    .Index(protectedIndex ? ProtectedIndexName : PublicIndexName)
+                    .Indices(protectedIndex ? ProtectedIndexName : PublicIndexName)
                     .Query(q => q
                         .Terms(t => t
                             .Field(f => f.Occurrence.OccurrenceId)
@@ -2006,7 +2007,7 @@ namespace SOS.Lib.Repositories.Processed
                 if (string.IsNullOrEmpty(scrollId))
                 {
                     var searchResponse = await Client.SearchAsync<T>(s => s
-                        .Index(indexNames)
+                        .Indices(indexNames)
                         .Query(q => q
                             .Bool(b => b
                                 .MustNot(excludeQueries.ToArray())
@@ -2055,7 +2056,7 @@ namespace SOS.Lib.Repositories.Processed
             var searchResponse = await PollyHelper.GetRetryPolicy(3, 100).ExecuteAsync(async () =>
             {
                 var queryResponse = await SearchAfterAsync<dynamic>(searchIndex, new SearchRequestDescriptor<dynamic>()
-                .Index(searchIndex)
+                .Indices(searchIndex)
                 .Source(filter.Output?.Fields.ToProjection(filter is SearchFilterInternal))
                     .Query(q => q
                         .Bool(b => b
@@ -2082,7 +2083,7 @@ namespace SOS.Lib.Repositories.Processed
         public async Task<(DateTime? firstSpotted, DateTime? lastSpotted, GeoBounds geographicCoverage)> GetProviderMetaDataAsync(int providerId, bool protectedIndex)
         {
             var res = await Client.SearchAsync<Observation>(s => s
-                .Index(protectedIndex ? ProtectedIndexName : PublicIndexName)
+                .Indices(protectedIndex ? ProtectedIndexName : PublicIndexName)
                 .Query(q => q
                     .Term(t => t
                         .Field(f => f.DataProviderId)
@@ -2130,7 +2131,7 @@ namespace SOS.Lib.Repositories.Processed
             try
             {
                 var searchResponse = await Client.SearchAsync<Observation>(s => s
-                    .Index(protectedIndex ? ProtectedIndexName : PublicIndexName)
+                    .Indices(protectedIndex ? ProtectedIndexName : PublicIndexName)
                     .Query(q => q
                         .FunctionScore(fs => fs
                             .Functions(f => f
@@ -2156,12 +2157,12 @@ namespace SOS.Lib.Repositories.Processed
         public async Task<HashSet<string>> GetSortableFieldsAsync()
         {
             var sortableFields = new HashSet<string>();
-            var mappings = await Client.Indices.GetMappingAsync<Observation>();
-            if (mappings.IsValidResponse)
+            var response = await Client.Indices.GetMappingAsync<Observation>();
+            if (response.IsValidResponse)
             {
-                foreach (var value in mappings.Indices.Values)
+                foreach (var mapping in response.Mappings)
                 {
-                    PopulateSortableFields(value.Mappings.Properties, ref sortableFields, "");
+                    PopulateSortableFields(mapping.Value.Mappings.Properties, ref sortableFields, "");
                 }
             }
 
@@ -2179,7 +2180,7 @@ namespace SOS.Lib.Repositories.Processed
         {
             try
             {
-                var countResponse = await Client.CountAsync<dynamic>(protectedIndex ? ProtectedIndexName : PublicIndexName);
+                var countResponse = await Client.CountAsync<dynamic>(c => c.Indices(protectedIndex ? ProtectedIndexName : PublicIndexName));
                 countResponse.ThrowIfInvalid();
 
                 return countResponse.Count;
@@ -2309,33 +2310,45 @@ namespace SOS.Lib.Repositories.Processed
             bool aggregateOrganismQuantity,
             int? precisionThreshold,
             IReadOnlyDictionary<string, FieldValue>? afterKey = null,
-            int? take = 10)
+            int? take = 10,
+            bool? useScript = true)
         {
             var indexNames = GetCurrentIndex(filter);
-            var (query, excludeQuery) = GetCoreQueries<dynamic>(filter);
-
+            var (queries, excludeQueries) = GetCoreQueries<dynamic>(filter);
             var tz = TimeZoneInfo.Local.GetUtcOffset(DateTime.Now);
-            var searchResponse = await Client.SearchAsync<dynamic>(s => s
-                .Index(indexNames)
-                .Query(q => q
-                    .Bool(b => b
-                        .MustNot(excludeQuery.ToArray())
-                        .Filter(query.ToArray())
-                    )
-                )
-                .RuntimeMappings(rtm => rtm
-                    .Add("scriptField", a => a
-                        .Script(s => s.Source(@$"
+
+            IDictionary<Field, RuntimeField> fluentDictionaryOfFieldRuntimeField = null;
+            if (useScript ?? true)
+            {
+                var fieldName = "scriptField";
+                fluentDictionaryOfFieldRuntimeField = new Dictionary<Field, RuntimeField> {
+                    { fieldName.ToField(),  new RuntimeField(RuntimeFieldType.Keyword) {
+                        Script = new Script() {
+                            Id = fieldName,
+                            Source = @$"
                             if (!doc['{aggregationField}'].empty){{  
                                 String value = '' + doc['{aggregationField}'].value; 
                                 if (value != '') {{ 
                                     emit(value); 
                                 }} 
-                            }}")
-                        )
-                        .Type(RuntimeFieldType.Keyword)
+                            }}"
+                        }
+                    } }
+                };
+                
+                aggregationField = fieldName;
+            }
+
+            var searchResponse =
+                await Client.SearchAsync<dynamic>(s => s
+                .Indices(indexNames)
+                .Query(q => q
+                    .Bool(b => b
+                        .MustNot(excludeQueries.ToArray())
+                        .Filter(queries.ToArray())
                     )
                 )
+                .RuntimeMappings(fluentDictionaryOfFieldRuntimeField)
                 .Aggregations(a => a
                     .Add("aggregation", a => a
                         .Composite(c => c
@@ -2365,13 +2378,17 @@ namespace SOS.Lib.Repositories.Processed
                                     )
                                 );
                             }
-
-                            return subAggs;
                         })
                     )
                 )
                 .AddDefaultAggrigationSettings()
             );
+
+            searchResponse.ThrowIfInvalid();
+            afterKey = searchResponse
+               .Aggregations
+                .GetComposite("aggregation")
+                    .AfterKey;
 
             searchResponse.ThrowIfInvalid();
             afterKey = searchResponse
@@ -2386,14 +2403,14 @@ namespace SOS.Lib.Repositories.Processed
                     .Aggregations
                     .GetComposite("aggregation")
                     .Buckets?
-                    .Select(b =>
-                        new
-                        {
-                            AggregationField = b.Key.Values.First(),
-                            b.DocCount,
-                            UniqueTaxon = b.Aggregations.GetCardinality("unique_taxonids").Value,
-                            OrganismQuantity = aggregateOrganismQuantity ? b.Aggregations.GetSum("totalOrganismQuantity")?.Value : 0
-                        })?.ToArray()
+                        .Select(b =>
+                            new
+                            {
+                                AggregationField = b.Key.Values.First(),
+                                b.DocCount,
+                                UniqueTaxon = b.Aggregations.GetCardinality("unique_taxonids").Value,
+                                OrganismQuantity = aggregateOrganismQuantity ? b.Aggregations.GetSum("totalOrganismQuantity")?.Value : 0
+                            })?.ToArray()
             };
         }
     }

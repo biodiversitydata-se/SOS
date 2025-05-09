@@ -125,7 +125,7 @@ namespace SOS.Lib.Extensions
                         var response = await client.Indices.GetFieldMappingAsync(new GetFieldMappingRequest(indexName, sortBy));                        
                         if (response.IsValidResponse)
                         {
-                            fieldMappings = response.FieldMappings;
+                            fieldMappings = response.FieldMappings.ToDictionary(fm => IndexName.From<string>(fm.Key), fm => fm.Value);
                             indicesByKey.TryAdd(key, fieldMappings);
                         }
                     }

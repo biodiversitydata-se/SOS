@@ -3,6 +3,7 @@ using Elastic.Clients.Elasticsearch.Aggregations;
 using Elastic.Clients.Elasticsearch.Cluster;
 using Elastic.Clients.Elasticsearch.Mapping;
 using Microsoft.Extensions.Logging;
+using Microsoft.VisualBasic;
 using SOS.Lib;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Shared;
@@ -46,7 +47,7 @@ namespace SOS.Observations.Api.Repositories
             
             // Get number of distinct values
             var searchResponseCount = await Client.SearchAsync<dynamic>(s => s
-                .Index(indexNames)
+                .Indices(indexNames)
                 .Query(q => q
                     .Bool(b => b
                         .MustNot(excludeQueries.ToArray())
@@ -85,7 +86,7 @@ namespace SOS.Observations.Api.Repositories
                 size = maxResult == 0 ? 1 : maxResult;
                 take = maxResult;
             }
-            
+
             // Get the real result
             var searchResponse = await Client.SearchAsync<dynamic>(indexNames, s => s
                 .Query(q => q
@@ -184,7 +185,7 @@ namespace SOS.Observations.Api.Repositories
             
             var tz = TimeZoneInfo.Local.GetUtcOffset(DateTime.Now);
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
-                .Index(indexNames)
+                .Indices(indexNames)
                 .Query(q => q
                     .Bool(b => b
                         .MustNot(excludeQueries.ToArray())
@@ -256,7 +257,7 @@ namespace SOS.Observations.Api.Repositories
 
             var tz = TimeZoneInfo.Local.GetUtcOffset(DateTime.Now);
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
-                .Index(indexNames)
+                .Indices(indexNames)
                 .Query(q => q
                     .Bool(b => b
                         .MustNot(excludeQueries.ToArray())
@@ -354,6 +355,154 @@ namespace SOS.Observations.Api.Repositories
         }
 
         /// <inheritdoc />
+        public async Task<IEnumerable<TimeSeriesHistogramResult>> GetTimeSeriesHistogramAsync(SearchFilter filter, TimeSeriesType timeSeriesType)
+        {
+            var indexNames = GetCurrentIndex(filter);
+            var (queries, excludeQueries) = GetCoreQueries<dynamic>(filter);
+   
+            var field = timeSeriesType switch
+            {
+                TimeSeriesType.Month => "event.startMonth",
+                TimeSeriesType.Week48 => "event.startHistogramWeek",
+                TimeSeriesType.Day => "event.startDay",
+                _ => "event.startDay"
+            };
+
+            var extendedBoundsMax = timeSeriesType switch
+            {
+                TimeSeriesType.Month => 12,
+                TimeSeriesType.Week48 => 48,
+                TimeSeriesType.Day => 365,
+                _ => 365
+            };
+
+            var searchResponse = await Client.SearchAsync<dynamic>(s => s
+                .Indices(indexNames)
+                .Query(q => q
+                    .Bool(b => b
+                        .MustNot(excludeQueries.ToArray())
+                        .Filter(queries.ToArray())
+                    )
+                )
+                .Aggregations(a => a
+                    .Add("aggregation", a => a
+                        .Histogram(h => h
+                             .Field(field)
+                             .Interval(1)
+                            .ExtendedBounds(eb => eb
+                                .Min(1)
+                                .Max(extendedBoundsMax)
+                            )
+                        )
+                        .Aggregations(a => a
+                            .Add("quantity", a => a
+                                .Sum(s => s
+                                    .Field("occurrence.organismQuantityAggregation")
+                                )
+                            )
+                            .Add("unique_taxonids", a => a
+                                .Cardinality(c => c
+                                     .Field("taxon.id")
+                                )
+                            )
+                        )
+                    )
+                )
+                .AddDefaultAggrigationSettings()
+            );
+
+            searchResponse.ThrowIfInvalid();
+
+            var totalCount = searchResponse.Total;
+            return searchResponse
+                .Aggregations.GetHistogram("aggregation")
+                    .Buckets?
+                        .Select(b =>
+                            new TimeSeriesHistogramResult
+                            {
+                                Type = timeSeriesType,
+                                Period = (int)b.Key,
+                                Observations = (int)b.DocCount,
+                                Quantity = (int)b.Aggregations.GetSum("quantity").Value,
+                                Taxa = (int)b.Aggregations.GetCardinality("unique_taxonids").Value
+                        });
+
+            // When operation is disposed, telemetry item is sent.
+        }
+
+        /// <inheritdoc />
+        public async Task<IEnumerable<TimeSeriesHistogramResult>> GetYearHistogramAsync(SearchFilter filter, TimeSeriesType timeSeriesType)
+        {
+            var indexNames = GetCurrentIndex(filter);
+            var (queries, excludeQueries) = GetCoreQueries<dynamic>(filter);
+
+            var tz = TimeZoneInfo.Local.GetUtcOffset(DateTime.Now);
+            ExtendedBounds<FieldDateMath> extendedBounds = null;
+            if (filter.Date != null)
+            {
+                extendedBounds = new ExtendedBounds<FieldDateMath>
+                {
+                    Max = filter.Date.EndDate,
+                    Min = filter.Date.StartDate
+                };
+            }
+
+            var searchResponse = await Client.SearchAsync<dynamic>(s => s
+                .Indices(indexNames)
+                .Query(q => q
+                    .Bool(b => b
+                        .MustNot(excludeQueries.ToArray())
+                        .Filter(queries.ToArray())
+                    )
+                )
+                .Aggregations(a => a
+                    .Add("aggregation", a => a
+                        .DateHistogram(dh => dh
+                           
+                            .Field("event.startDate")
+                            .CalendarInterval(CalendarInterval.Year)
+                            .TimeZone($"{(tz.TotalMinutes > 0 ? "+" : "")}{tz.Hours:00}:{tz.Minutes:00}")
+                            .Format("yyyy-MM-dd")
+                            .ExtendedBounds(extendedBounds)
+                        )
+                        .AddAggregation("quantity", a => a
+                            .Sum(s => s
+                                .Field("occurrence.organismQuantityAggregation")
+                            )
+                        )
+                        .AddAggregation("unique_taxonids", a => a
+                            .Cardinality(s => s
+                                .Field("taxon.id")
+                            )
+                        )
+                        
+                    )
+                )
+                .AddDefaultAggrigationSettings()
+            );
+
+            searchResponse.ThrowIfInvalid();
+
+            var totalCount = searchResponse.Total;
+            return searchResponse
+                .Aggregations
+                    .GetDateHistogram("aggregation")
+                .Buckets?
+                .OrderByDescending(b => b.KeyAsString)
+                .Select(b =>
+                    new TimeSeriesHistogramResult
+                    {
+                        Type = timeSeriesType,
+                        Period = DateTime.Parse(b.KeyAsString).Year,
+                        Observations = (int)b.DocCount,
+                        Quantity = (int)b.Aggregations.GetSum("quantity").Value,
+                        Taxa = (int)b.Aggregations.GetCardinality("unique_taxonids").Value
+                    });
+
+            // When operation is disposed, telemetry item is sent.
+        }
+
+        /// <inheritdoc />
         public async Task<GeoGridTileResult> GetGeogridTileAggregationAsync(
                 SearchFilter filter,
                 int zoom)
@@ -362,7 +511,7 @@ namespace SOS.Observations.Api.Repositories
             var (queries, excludeQueries) = GetCoreQueries<dynamic>(filter);
 
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
-                .Index(indexNames)
+                .Indices(indexNames)
                 .Query(q => q
                     .Bool(b => b
                         .MustNot(excludeQueries.ToArray())
@@ -440,7 +589,7 @@ namespace SOS.Observations.Api.Repositories
             var (queries, excludeQueries) = GetCoreQueries<dynamic>(filter);
 
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
-                .Index(indexNames)
+                .Indices(indexNames)
                 .Query(q => q
                     .Bool(b => b
                         .MustNot(excludeQueries.ToArray())

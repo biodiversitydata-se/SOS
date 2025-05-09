@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
-using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 using SOS.Lib.Database.Interfaces;
@@ -221,7 +220,10 @@ namespace SOS.Lib.Repositories
             try
             {
                 // Create the collection
-                await Database.CreateCollectionAsync(collectionName);
+                await Database.CreateCollectionAsync(collectionName, new CreateCollectionOptions { 
+                    Collation = new Collation(locale: "sv", strength: CollationStrength.Primary),
+                    IndexOptionDefaults = new IndexOptionDefaults()
+                });
                 Logger.LogInformation($"The following MongoDB collection was created: [{collectionName}]");
 
                 return true;

@@ -243,7 +243,7 @@ namespace SOS.Observations.Api.LiveIntegrationTests.Fixtures
             var userService = CreateUserService();
             var filterManager = new FilterManager(taxonManager, userService, areaCache, dataProviderCache);
             FilterManager = filterManager;
-            ObservationManager = CreateObservationManager((ProcessedObservationRepository)ProcessedObservationRepository, VocabularyValueResolver, processClient, filterManager);
+            ObservationManager = CreateObservationManager(areaManager, (ProcessedObservationRepository)ProcessedObservationRepository, VocabularyValueResolver, processClient, filterManager);
             var taxonSearchManager = CreateTaxonSearchManager(processedTaxonRepository, filterManager);
             var inputValaidationConfiguration = GetInputValaidationConfiguration();
             var exportManager = new ExportManager(csvFileWriter, dwcArchiveFileWriter, dwcArchiveEventFileWriter, excelFileWriter, geojsonFileWriter,
@@ -359,6 +359,7 @@ namespace SOS.Observations.Api.LiveIntegrationTests.Fixtures
         }
 
         private ObservationManager CreateObservationManager(
+            IAreaManager areaManager,
             ProcessedObservationRepository processedObservationRepository,
             VocabularyValueResolver vocabularyValueResolver,
             ProcessClient processClient,
@@ -371,7 +372,9 @@ namespace SOS.Observations.Api.LiveIntegrationTests.Fixtures
                 new ArtportalenApiServiceConfiguration { BaseAddress = "https://api.artdata.slu.se/observations/v2", AcceptHeaderContentType = "application/json" },
                 new NullLogger<ArtportalenApiService>());
 
-            var observationsManager = new ObservationManager(processedObservationRepository,
+            var observationsManager = new ObservationManager(
+                areaManager,
+                processedObservationRepository,
                 protectedLogRepository,
                 vocabularyValueResolver,
                 filterManager,

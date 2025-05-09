@@ -10,14 +10,12 @@ using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Jobs.Export;
 using SOS.Lib.Managers.Interfaces;
-using SOS.Lib.Models.Analysis;
 using SOS.Lib.Models.Export;
 using SOS.Lib.Models.Search.Enums;
 using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Services.Interfaces;
 using SOS.Lib.Swagger;
-using SOS.Shared.Api.Dtos.Enum;
 using SOS.Shared.Api.Dtos.Filter;
 using SOS.Shared.Api.Dtos.Search;
 using SOS.Shared.Api.Extensions.Controller;
@@ -200,20 +198,23 @@ namespace SOS.Analysis.Api.Controllers
             }
         }
 
-        [HttpPost("/internal/atlas")]
+        [HttpPost("/internal/areas/aggregation")]
         [ProducesResponseType(typeof(FeatureCollection), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [InternalApi]
-        public async Task<IActionResult> AtlasAggregateAsync(
+        public async Task<IActionResult> AreaAggregateAsync(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
             [FromBody] SearchFilterInternalDto searchFilter,
-            [FromQuery] bool? validateFilter,
+            [FromQuery] AreaTypeAggregate areaType,
+            [FromQuery] CoordinateSys? coordinateSys,
+            [FromQuery] int? precisionThreshold,
             [FromQuery] bool? aggregateOrganismQuantity,
-            [FromQuery] AtlasAreaSizeDto atlasSize = AtlasAreaSizeDto.Km10x10)
+            [FromQuery] bool? validateFilter)
         {
+
             try
             {
                 LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
@@ -228,13 +229,14 @@ namespace SOS.Analysis.Api.Controllers
 
                 var filter = searchFilter?.ToSearchFilter(this.GetUserId(), searchFilter?.ProtectionFilter, "sv-SE")!;
 
-                FeatureCollection result = await _analysisManager.AtlasAggregateAsync(
+                var result = await _analysisManager.AreaAggregateAsync(
                     roleId,
                     authorizationApplicationIdentifier,
                     filter,
-                    aggregateOrganismQuantity.GetValueOrDefault(false)
-,
-                    (AtlasAreaSize)atlasSize);
+                    areaType,
+                    precisionThreshold,
+                    aggregateOrganismQuantity,
+                    coordinateSys);
 
                 return new OkObjectResult(result!);
             }

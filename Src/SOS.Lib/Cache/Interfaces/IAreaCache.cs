@@ -52,5 +52,14 @@ namespace SOS.Lib.Cache.Interfaces
         /// <param name="areaKeys"></param>
         /// <returns></returns>
         Task<IEnumerable<Geometry>> GetGeometriesAsync(IEnumerable<(AreaType areaType, string featureId)> areaKeys);
+
+        /// <summary>
+        /// Get bounding box geometries
+        /// </summary>
+        /// <param name="areaKeys"></param>
+        /// <returns></returns>
+        Task<IDictionary<(AreaType areaType, string featureId), Geometry>> GetBBoxGeometriesAsync(
+           IEnumerable<(AreaType areaType, string featureId)> areaKeys);
+        
     }
 }

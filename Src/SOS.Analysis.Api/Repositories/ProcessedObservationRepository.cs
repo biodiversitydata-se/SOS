@@ -35,7 +35,7 @@ namespace SOS.Analysis.Api.Repositories
             var tz = TimeZoneInfo.Local.GetUtcOffset(DateTime.Now);
 
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
-                .Index(indexNames)
+                .Indices(indexNames)
                 .Query(q => q
                     .Bool(b => b
                         .MustNot(excludeQueries.ToArray())

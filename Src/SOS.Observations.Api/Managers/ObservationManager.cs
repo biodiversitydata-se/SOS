@@ -26,6 +26,8 @@ using OfficeOpenXml;
 using SOS.Lib.Models.Search.Enums;
 using NetTopologySuite.Geometries;
 using System.Text.Json.Nodes;
+using NetTopologySuite.Features;
+using SOS.Shared.Api.Dtos.Enum;
 
 namespace SOS.Observations.Api.Managers
 {
@@ -34,6 +36,7 @@ namespace SOS.Observations.Api.Managers
     /// </summary>
     public class ObservationManager : IObservationManager
     {
+        private readonly IAreaManager _areaManager;
         private readonly IProcessedObservationRepository _processedObservationRepository;
         private readonly IProtectedLogRepository _protectedLogRepository;
         private readonly IFilterManager _filterManager;
@@ -118,6 +121,7 @@ namespace SOS.Observations.Api.Managers
         /// <summary>
         /// Constructor
         /// </summary>
+        /// <param name="areaManager"></param>
         /// <param name="processedObservationRepository"></param>
         /// <param name="protectedLogRepository"></param>
         /// <param name="vocabularyValueResolver"></param>
@@ -129,6 +133,7 @@ namespace SOS.Observations.Api.Managers
         /// <param name="dataProviderCache"></param>
         /// <param name="logger"></param>
         public ObservationManager(
+            IAreaManager areaManager,
             IProcessedObservationRepository processedObservationRepository,
             IProtectedLogRepository protectedLogRepository,
             IVocabularyValueResolver vocabularyValueResolver,
@@ -140,6 +145,7 @@ namespace SOS.Observations.Api.Managers
             IDataProviderCache dataProviderCache,
             ILogger<ObservationManager> logger)
         {
+            _areaManager = areaManager ?? throw new ArgumentNullException(nameof(areaManager));
             _processedObservationRepository = processedObservationRepository ??
                                               throw new ArgumentNullException(nameof(processedObservationRepository));
             _protectedLogRepository =
@@ -222,7 +228,6 @@ namespace SOS.Observations.Api.Managers
                 return null;
             }
         }
-
 
         /// <inheritdoc />
         public async Task<PagedResult<dynamic>> GetAggregatedChunkAsync(
@@ -933,6 +938,34 @@ namespace SOS.Observations.Api.Managers
             var summaryExcelWriter = new ObservationStatisticsSummaryExcelWriter();
             byte[] excelFile = await summaryExcelWriter.CreateExcelFileAsync(statisticsByDate);
             return excelFile;
+        }
+
+        public async Task<IEnumerable<TimeSeriesHistogramResult>> GetTimeSeriesHistogramAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilter filter, TimeSeriesType timeSeriesType)
+        {
+            try
+            {
+                await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
+
+                if (timeSeriesType == TimeSeriesType.Year)
+                    return await _processedObservationRepository.GetYearHistogramAsync(filter, timeSeriesType);
+                else 
+                    return await _processedObservationRepository.GetTimeSeriesHistogramAsync(filter, timeSeriesType);
+ 
+            }
+            catch (AuthenticationRequiredException)
+            {
+                throw;
+            }
+            catch (TimeoutException e)
+            {
+                _logger.LogError(e, "Get aggregated chunk of observations timeout");
+                throw;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to get aggregated chunk of observations");
+                return null;
+            }
         }
 
         public class ObservationStatistics

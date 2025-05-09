@@ -1,5 +1,4 @@
-﻿using Elastic.Clients.Elasticsearch;
-using Elastic.Clients.Elasticsearch.Cluster;
+﻿using Elastic.Clients.Elasticsearch.Cluster;
 using Elastic.Clients.Elasticsearch.Core.Search;
 using Elastic.Clients.Elasticsearch.QueryDsl;
 using Microsoft.Extensions.Logging;
@@ -12,7 +11,6 @@ using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Processed.DataStewardship.Dataset;
 using SOS.Lib.Models.Search.Filters;
-//using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using System;
 using System.Collections.Concurrent;

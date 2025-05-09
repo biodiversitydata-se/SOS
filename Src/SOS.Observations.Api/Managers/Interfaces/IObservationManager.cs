@@ -1,8 +1,10 @@
-﻿using SOS.Lib.Enums;
+﻿using NetTopologySuite.Features;
+using SOS.Lib.Enums;
 using SOS.Lib.Models.Search.Enums;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
 using SOS.Shared.Api.Dtos;
+using SOS.Shared.Api.Dtos.Enum;
 using System;
 using System.Collections.Generic;
 using System.Text.Json.Nodes;
@@ -68,6 +70,20 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <param name="take"></param>
         /// <returns></returns>
         Task<PagedResult<dynamic>> GetAggregatedChunkAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilter filter, AggregationType aggregationType, int skip, int take);
+
+        /// <summary>
+        /// Get aggregated data
+        /// </summary>
+        /// <param name="roleId"></param>
+        /// <param name="authorizationApplicationIdentifier"></param>
+        /// <param name="filter"></param>
+        /// <param name="timeSeriesType"></param>
+        /// <returns></returns>
+        Task<IEnumerable<TimeSeriesHistogramResult>> GetTimeSeriesHistogramAsync(
+            int? roleId, 
+            string authorizationApplicationIdentifier, 
+            SearchFilter filter, 
+            TimeSeriesType timeSeriesType);
 
         /// <summary>
         /// Geo grid tile aggregation

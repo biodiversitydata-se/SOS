@@ -16,7 +16,7 @@ using Elastic.Clients.Elasticsearch.Cluster;
 using SOS.Lib.Extensions;
 using Elastic.Clients.Elasticsearch.Aggregations;
 using Elastic.Clients.Elasticsearch.IndexManagement;
-using Elastic.Transport;
+using System.Threading;
 
 namespace SOS.Lib.Repositories.Processed
 {
@@ -292,8 +292,8 @@ namespace SOS.Lib.Repositories.Processed
             // Retry policy by Polly
             var searchResponse = await PollyHelper.GetRetryPolicy(3, 100).ExecuteAsync(async () =>
             {
-                var queryResponse = await Client.SearchAsync(searchDescriptor
-                   .Index(searchIndex)
+                var queryResponse = await Client.SearchAsync<T>(searchDescriptor
+                   .Indices(searchIndex)
                    .Sort(s => s.Field("_shard_doc"))
                    .SearchAfter(nextPageKey)
                    .Size(ScrollBatchSize)
@@ -322,10 +322,7 @@ namespace SOS.Lib.Repositories.Processed
         /// <returns></returns>
         protected async Task<bool> SetIndexRefreshIntervalAsync(string index, Duration duration)
         {
-            var indexState = new IndexState() { Settings = new IndexSettings() };
-            indexState.Settings.RefreshInterval = duration;
-            var setResponse = await Client.Indices.PutSettingsAsync<TEntity>(indexState.Settings, index);
-
+            var setResponse = await Client.Indices.PutSettingsAsync<TEntity>(s => new IndexSettings { RefreshInterval = duration });
             return setResponse.IsValidResponse;
         }
 
@@ -549,7 +546,7 @@ namespace SOS.Lib.Repositories.Processed
         public async Task<List<TEntity>> GetAllAsync(int take = 10000)
         {
             var searchResponse = await Client.SearchAsync<TEntity>(s => s
-                .Index(IndexName)
+                .Indices(IndexName)
                 .Query(q => q.MatchAll(q => q.QueryName("GetAllQuery")))
                 .Size(take));
             return searchResponse.Documents.ToList();

@@ -59,20 +59,24 @@ namespace SOS.Lib.Managers.Interfaces
             AggregationSortOrder sortOrder = AggregationSortOrder.CountDescending);
 
         /// <summary>
-        /// Aggregate by atlas square
+        /// Aggreagate on area
         /// </summary>
         /// <param name="roleId"></param>
         /// <param name="authorizationApplicationIdentifier"></param>
         /// <param name="filter"></param>
+        /// <param name="areaType"></param>
+        /// <param name="precisionThreshold"></param>
         /// <param name="aggregateOrganismQuantity"></param>
-        /// <param name="atlasSize"></param>
+        /// <param name="coordinateSys"></param>
         /// <returns></returns>
-        Task<FeatureCollection> AtlasAggregateAsync(
-        int? roleId,
-        string authorizationApplicationIdentifier,
-        SearchFilter filter,
-        bool aggregateOrganismQuantity,
-        AtlasAreaSize atlasSize);
+        Task<FeatureCollection> AreaAggregateAsync(
+            int? roleId,
+            string authorizationApplicationIdentifier,
+            SearchFilter filter,
+            AreaTypeAggregate areaType,
+            int? precisionThreshold,
+            bool? aggregateOrganismQuantity,
+            CoordinateSys? coordinateSys);
 
         /// <summary>
         /// Calculate AOO and EOO

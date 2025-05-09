@@ -1,5 +1,4 @@
 ﻿using Elastic.Clients.Elasticsearch;
-using Elastic.Clients.Elasticsearch.Aggregations;
 using Elastic.Clients.Elasticsearch.Cluster;
 using Elastic.Clients.Elasticsearch.Core.Search;
 using Elastic.Clients.Elasticsearch.QueryDsl;
@@ -9,7 +8,6 @@ using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
-using SOS.Lib.JsonConverters;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Processed.Observation;
@@ -297,7 +295,7 @@ namespace SOS.Lib.Repositories.Processed
             var queries = new List<Action<QueryDescriptor<Event>>>();
             queries.TryAddTermsCriteria("eventId", ids);
             var searchResponse = await Client.SearchAsync<Event>(s => s
-                .Index(IndexName)
+                .Indices(IndexName)
                 .Query(q => q
                     .Bool(b => b
                         .Filter(queries.ToArray())
@@ -428,7 +426,7 @@ namespace SOS.Lib.Repositories.Processed
             var indexName = IndexName;
             var (query, excludeQuery) = GetCoreQueries<dynamic>(filter);
             var items = new List<AggregationItem>();
-            IReadOnlyDictionary<Field, FieldValue> nextPageKey = null;
+            IDictionary<Field, FieldValue> nextPageKey = null;
             var take = MaxNrElasticSearchAggregationBuckets;
             do
             {
@@ -454,11 +452,11 @@ namespace SOS.Lib.Repositories.Processed
             string aggregationField,
             ICollection<Action<QueryDescriptor<dynamic>>> queries,
             ICollection<Action<QueryDescriptor<dynamic>>> excludeQueries,
-            IReadOnlyDictionary<Field, FieldValue> nextPageKey,
+            IDictionary<Field, FieldValue> nextPageKey,
             int take)
         {
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
-                .Index(indexName)
+                .Indices(indexName)
                 .Query(q => q
                     .Bool(b => b
                         .MustNot(excludeQueries.ToArray())
@@ -468,7 +466,7 @@ namespace SOS.Lib.Repositories.Processed
                 .Aggregations(a => a
                     .Add("compositeAggregation", a => a
                         .Composite(c => c
-                            .After(npk => nextPageKey.ToFluentDictionary() ?? null)
+                            .After(nextPageKey)
                             .Size(take)
                             .Sources(
                                 [
@@ -496,7 +494,7 @@ namespace SOS.Lib.Repositories.Processed
             var sortDescriptor = await Client.GetSortDescriptorAsync<Event, Event>(indexName, filter.SortOrders);
 
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
-                .Index(indexName)
+                .Indices(indexName)
                 .Source(getAllFields ? null : (filter.OutputIncludeFields, filter.OutputExcludeFields).ToProjection())
                 .From(skip)
                 .Size(take)
@@ -592,7 +590,7 @@ namespace SOS.Lib.Repositories.Processed
         {
             try
             {
-                var countResponse = await Client.CountAsync<Event>(IndexName);
+                var countResponse = await Client.CountAsync<Event>(c => c.Indices(IndexName));
                 countResponse.ThrowIfInvalid();
                 return countResponse.Count;
             }

@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using AgileObjects.AgileMapper.Extensions;
+using Microsoft.Extensions.Logging;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
 using NetTopologySuite.Geometries;
@@ -75,10 +77,23 @@ namespace SOS.Lib.Repositories.Resource
         {
             try
             {
-                var bytes = await _gridFSBucket.DownloadAsBytesByNameAsync(areaType.ToAreaId(featureId));
-                var utfString = Encoding.UTF8.GetString(bytes, 0, bytes.Length);
+                var areaId = areaType.ToAreaId(featureId);
+                //var bytes = await _gridFSBucket.DownloadAsBytesByNameAsync(areaId); // Is case sensitive, Problem with agggregation methods and fields using lower case normalizer
+                
+                // Handle case insensitive
+                var filter = Builders<GridFSFileInfo>.Filter.Regex("filename", new BsonRegularExpression($"^{areaId}$", "i"));
+                var files = await _gridFSBucket.FindAsync(filter);
+                var fileInfo = await files.FirstOrDefaultAsync();
 
-                return JsonSerializer.Deserialize<Geometry>(utfString, _jsonSerializerOptions);
+                if (fileInfo != null)
+                {
+                    var bytes = await _gridFSBucket.DownloadAsBytesAsync(fileInfo.Id);
+                    var utfString = Encoding.UTF8.GetString(bytes, 0, bytes.Length);
+
+                    return JsonSerializer.Deserialize<Geometry>(utfString, _jsonSerializerOptions);
+                }
+
+                return null;
             }
             catch
             {
@@ -141,6 +156,37 @@ namespace SOS.Lib.Repositories.Resource
                 .Skip(skip)
                 .Limit(take)
                 .ToListAsync();
+
+            return new PagedResult<Area>
+            {
+                Records = result,
+                Skip = skip,
+                Take = take,
+                TotalCount = total
+            };
+        }
+
+        /// <inheritdoc />
+        public async Task<PagedResult<Area>> GetAreasAsync(
+            IEnumerable<(AreaType AreaType, string FeatureId)> areaKeys,
+            int skip, 
+            int take)
+        {
+            var filters = new List<FilterDefinition<Area>>();
+            IEnumerable<Area> result = null;
+            var total = 0L;
+            if (areaKeys?.Any() ?? false)
+            {
+                var filter = Builders<Area>.Filter.In("_id", areaKeys.Select(ak => ak.AreaType.ToAreaId(ak.FeatureId)));
+                total = await MongoCollection
+                    .Find(filter)
+                    .CountDocumentsAsync();
+                result = await MongoCollection
+                    .Find(filter)
+                    .Skip(skip)
+                    .Limit(take)
+                    .ToListAsync();
+            }
 
             return new PagedResult<Area>
             {
