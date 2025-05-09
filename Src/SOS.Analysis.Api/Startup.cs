@@ -184,6 +184,7 @@ namespace SOS.Analysis.Api
                 .AddJsonOptions(options =>
                 {
                     options.JsonSerializerOptions.Converters.Add(new GeometryConverter());
+                    options.JsonSerializerOptions.Converters.Add(new NetTopologySuite.IO.Converters.GeoJsonConverterFactory()); // Used for FeatureCollections
                     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 });
            
