@@ -62,13 +62,15 @@ namespace SOS.Lib.Managers
         {
             try
             {
-                var geoShape = (IGeoShape)await _areaCache.GetGeometryAsync((AreaType)areaType, featureId);
-                if (geoShape == null)
+                var geometry = await _areaCache.GetGeometryAsync((AreaType)areaType, featureId);
+                if (geometry == null)
                 {
                     return;
                 }
-
-                var geometry = geoShape.ToGeometry().Transform(CoordinateSys.WGS84, coordinateSys ?? CoordinateSys.WGS84);
+                if((coordinateSys ?? CoordinateSys.WGS84) != CoordinateSys.WGS84)
+                {
+                    geometry = geometry.Transform(CoordinateSys.WGS84, coordinateSys ?? CoordinateSys.WGS84);
+                }
                 feature.Geometry = geometry;
                 feature.BoundingBox = geometry.EnvelopeInternal;
             }
@@ -100,7 +102,7 @@ namespace SOS.Lib.Managers
             {
                 if (features.TryGetValue(result.Key.featureId, out var feature))
                 {
-                    var geometry = result.Value.ToGeometry();
+                    var geometry = result.Value;
                     feature.Geometry = geometry;
                     feature.BoundingBox = geometry.EnvelopeInternal;
                 }
@@ -318,7 +320,7 @@ namespace SOS.Lib.Managers
                 while (result?.Records?.Count() != 0)
                 {
                     // Start getting next batch while we getting the geometries
-                    var nextBatchTask = _processedObservationRepository.AggregateByUserFieldAsync(filter, areaTypeProperty, false, precisionThreshold, result.SearchAfter?.FirstOrDefault()?.ToString(), 1000, false);
+                    var nextBatchTask = _processedObservationRepository.AggregateByUserFieldAsync(filter, areaTypeProperty, false, precisionThreshold, result.SearchAfter, 1000, false);
                     
                     foreach (var record in result.Records)
                     {

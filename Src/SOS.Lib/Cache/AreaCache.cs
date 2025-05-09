@@ -39,7 +39,7 @@ namespace SOS.Lib.Cache
 
         private IEnumerable<(AreaType AreaType, string FeatureId)> GetKeysMissingInCache(IEnumerable<(AreaType AreaType, string FeatureId)> keys) => keys?.Select(k => NormalizeKey(k)).Except(_geometryCache.Keys);
 
-        private IDictionary<(AreaType AreaType, string FeatureId), IGeoShape> GetAreasFromCache(IEnumerable<(AreaType AreaType, string FeatureId)> keys) => _geometryCache.Where(gc => (keys?.Select(k => NormalizeKey(k))).Contains(gc.Key)).ToDictionary(gc => gc.Key, gc => gc.Value);
+        private IDictionary<(AreaType AreaType, string FeatureId), Geometry> GetAreasFromCache(IEnumerable<(AreaType AreaType, string FeatureId)> keys) => _geometryCache.Where(gc => (keys?.Select(k => NormalizeKey(k))).Contains(gc.Key)).ToDictionary(gc => gc.Key, gc => gc.Value);
 
         private (AreaType AreaType, string FeatureId) NormalizeKey((AreaType AreaType, string FeatureId) key) => (key.AreaType, key.FeatureId?.ToLower());
 
