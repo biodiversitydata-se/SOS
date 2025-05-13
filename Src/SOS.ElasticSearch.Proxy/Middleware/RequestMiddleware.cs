@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Converters;
 using SOS.ElasticSearch.Proxy.Configuration;
 using SOS.ElasticSearch.Proxy.Extensions;
+using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
@@ -18,6 +19,7 @@ namespace SOS.ElasticSearch.Proxy.Middleware
     {
         private readonly RequestDelegate _nextMiddleware;
         private readonly IProcessedObservationCoreRepository _processedObservationRepository;
+        private readonly IDataProviderCache _dataProviderCache;
         private readonly ProxyConfiguration _proxyConfiguration;
         private readonly ILogger<RequestMiddleware> _logger;
         private static readonly SemaphoreSlim _requestSemaphore = new SemaphoreSlim(4);
@@ -138,12 +140,14 @@ namespace SOS.ElasticSearch.Proxy.Middleware
         /// <exception cref="ArgumentNullException"></exception>
         public RequestMiddleware(RequestDelegate nextMiddleware,
             IProcessedObservationCoreRepository processedObservationRepository,
+            IDataProviderCache dataProviderCache,
             ProxyConfiguration proxyConfiguration,
             ILogger<RequestMiddleware> logger)
         {
             _nextMiddleware = nextMiddleware;
             _processedObservationRepository = processedObservationRepository ??
                                               throw new ArgumentNullException(nameof(processedObservationRepository));
+            _dataProviderCache = dataProviderCache ?? throw new ArgumentNullException(nameof(dataProviderCache));
             _proxyConfiguration = proxyConfiguration ??
                                   throw new ArgumentNullException(nameof(proxyConfiguration));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -158,8 +162,8 @@ namespace SOS.ElasticSearch.Proxy.Middleware
         /// <returns></returns>
         public async Task Invoke(HttpContext context)
         {
-            string originalBody = null;
-            string body = null;
+            string originalBody = null!;
+            string body = null!;
             var semaphoreTime = Stopwatch.StartNew();
             if (_requestSemaphore.CurrentCount == 0)
             {
