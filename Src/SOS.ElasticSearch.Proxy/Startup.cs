@@ -134,8 +134,10 @@ namespace SOS.ElasticSearch.Proxy
             services.AddSingleton<IClassCache<ConcurrentDictionary<string, ClusterHealthResponse>>>(clusterHealthCache);
 
             // Add repositories
+            services.AddScoped<IDataProviderRepository, DataProviderRepository>();
             services.AddScoped<IProcessedConfigurationRepository, ProcessedConfigurationRepository>();
             services.AddScoped<IProcessedObservationCoreRepository, ProcessedObservationCoreRepository>();
+            
             services.AddScoped<ITaxonRepository, TaxonRepository>();
             services.AddScoped<ITaxonListRepository, TaxonListRepository>();
 

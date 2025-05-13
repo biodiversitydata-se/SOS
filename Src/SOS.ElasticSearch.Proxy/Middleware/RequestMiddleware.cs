@@ -50,7 +50,7 @@ namespace SOS.ElasticSearch.Proxy.Middleware
             return new Uri(_processedObservationRepository.HostUrl, string.Join('/', uriParts.Where(p => !string.IsNullOrEmpty(p))));
         }
 
-        private HttpRequestMessage CreateTargetMessage(HttpContext context, Uri targetUri, ref string body)
+        private async Task<(HttpRequestMessage Message, string Body)> CreateTargetMessageAsync(HttpContext context, Uri targetUri, string body)
         {
             var requestMessage = new HttpRequestMessage();
             foreach (var header in context.Request.Headers)
@@ -66,7 +66,7 @@ namespace SOS.ElasticSearch.Proxy.Middleware
                 !HttpMethods.IsDelete(requestMessage.Method.Method) &&
                 !HttpMethods.IsTrace(requestMessage.Method.Method))
             {
-                body = RewriteBody(body);
+                body = await RewriteBodyAsync(body);
 
                 var memStr = new MemoryStream(Encoding.UTF8.GetBytes(body));
                 var streamContent = new StreamContent(memStr);
@@ -86,7 +86,7 @@ namespace SOS.ElasticSearch.Proxy.Middleware
                 requestMessage.Content = streamContent;
             }
 
-            return requestMessage;
+            return (requestMessage, body);
         }
 
         private void CopyFromTargetResponseHeaders(HttpContext context, HttpResponseMessage responseMessage)
@@ -113,7 +113,7 @@ namespace SOS.ElasticSearch.Proxy.Middleware
             return new HttpMethod(method);
         }
 
-        private string RewriteBody(string body)
+        private async Task<string> RewriteBodyAsync(string body)
         {
             if (string.IsNullOrEmpty(body))
             {
@@ -121,7 +121,7 @@ namespace SOS.ElasticSearch.Proxy.Middleware
             }
 
             var bodyDictionary = (IDictionary<string, Object>)JsonConvert.DeserializeObject<ExpandoObject>(body, new ExpandoObjectConverter())!;
-            bodyDictionary.UpdateQuery();
+            bodyDictionary.UpdateQuery(await _dataProviderCache.GetDefaultIdsAsync());
             if (_proxyConfiguration.ExcludeFieldsInElasticsearchQuery)
             {
                 bodyDictionary.UpdateExclude(_proxyConfiguration.ExcludeFields!);
@@ -207,7 +207,9 @@ namespace SOS.ElasticSearch.Proxy.Middleware
                 {
                     _logger.LogDebug($"Target: {targetUri.AbsoluteUri}");
                     originalBody = body;
-                    var targetRequestMessage = CreateTargetMessage(context, targetUri, ref body);
+                    var createMessageResponse = await CreateTargetMessageAsync(context, targetUri, body);
+                    var targetRequestMessage = createMessageResponse.Message;
+                    body = createMessageResponse.Body;
                     if (_proxyConfiguration.LogRequest && targetRequestMessage.Content != null)
                     {
                         _logger.LogInformation("Request body: {@requestBody}", body);
