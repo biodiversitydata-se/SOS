@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Converters;
 using SOS.ElasticSearch.Proxy.Configuration;
 using SOS.ElasticSearch.Proxy.Extensions;
+using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
@@ -18,6 +19,7 @@ namespace SOS.ElasticSearch.Proxy.Middleware
     {
         private readonly RequestDelegate _nextMiddleware;
         private readonly IProcessedObservationCoreRepository _processedObservationRepository;
+        private readonly IDataProviderCache _dataProviderCache;
         private readonly ProxyConfiguration _proxyConfiguration;
         private readonly ILogger<RequestMiddleware> _logger;
         private static readonly SemaphoreSlim _requestSemaphore = new SemaphoreSlim(4);
@@ -48,7 +50,7 @@ namespace SOS.ElasticSearch.Proxy.Middleware
             return new Uri(_processedObservationRepository.HostUrl, string.Join('/', uriParts.Where(p => !string.IsNullOrEmpty(p))));
         }
 
-        private HttpRequestMessage CreateTargetMessage(HttpContext context, Uri targetUri, ref string body)
+        private async Task<(HttpRequestMessage Message, string Body)> CreateTargetMessageAsync(HttpContext context, Uri targetUri, string body)
         {
             var requestMessage = new HttpRequestMessage();
             foreach (var header in context.Request.Headers)
@@ -64,7 +66,7 @@ namespace SOS.ElasticSearch.Proxy.Middleware
                 !HttpMethods.IsDelete(requestMessage.Method.Method) &&
                 !HttpMethods.IsTrace(requestMessage.Method.Method))
             {
-                body = RewriteBody(body);
+                body = await RewriteBodyAsync(body);
 
                 var memStr = new MemoryStream(Encoding.UTF8.GetBytes(body));
                 var streamContent = new StreamContent(memStr);
@@ -84,7 +86,7 @@ namespace SOS.ElasticSearch.Proxy.Middleware
                 requestMessage.Content = streamContent;
             }
 
-            return requestMessage;
+            return (requestMessage, body);
         }
 
         private void CopyFromTargetResponseHeaders(HttpContext context, HttpResponseMessage responseMessage)
@@ -111,7 +113,7 @@ namespace SOS.ElasticSearch.Proxy.Middleware
             return new HttpMethod(method);
         }
 
-        private string RewriteBody(string body)
+        private async Task<string> RewriteBodyAsync(string body)
         {
             if (string.IsNullOrEmpty(body))
             {
@@ -119,7 +121,7 @@ namespace SOS.ElasticSearch.Proxy.Middleware
             }
 
             var bodyDictionary = (IDictionary<string, Object>)JsonConvert.DeserializeObject<ExpandoObject>(body, new ExpandoObjectConverter())!;
-            bodyDictionary.UpdateQuery();
+            bodyDictionary.UpdateQuery(await _dataProviderCache.GetDefaultIdsAsync());
             if (_proxyConfiguration.ExcludeFieldsInElasticsearchQuery)
             {
                 bodyDictionary.UpdateExclude(_proxyConfiguration.ExcludeFields!);
@@ -138,12 +140,14 @@ namespace SOS.ElasticSearch.Proxy.Middleware
         /// <exception cref="ArgumentNullException"></exception>
         public RequestMiddleware(RequestDelegate nextMiddleware,
             IProcessedObservationCoreRepository processedObservationRepository,
+            IDataProviderCache dataProviderCache,
             ProxyConfiguration proxyConfiguration,
             ILogger<RequestMiddleware> logger)
         {
             _nextMiddleware = nextMiddleware;
             _processedObservationRepository = processedObservationRepository ??
                                               throw new ArgumentNullException(nameof(processedObservationRepository));
+            _dataProviderCache = dataProviderCache ?? throw new ArgumentNullException(nameof(dataProviderCache));
             _proxyConfiguration = proxyConfiguration ??
                                   throw new ArgumentNullException(nameof(proxyConfiguration));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -158,8 +162,8 @@ namespace SOS.ElasticSearch.Proxy.Middleware
         /// <returns></returns>
         public async Task Invoke(HttpContext context)
         {
-            string originalBody = null;
-            string body = null;
+            string originalBody = null!;
+            string body = null!;
             var semaphoreTime = Stopwatch.StartNew();
             if (_requestSemaphore.CurrentCount == 0)
             {
@@ -203,7 +207,9 @@ namespace SOS.ElasticSearch.Proxy.Middleware
                 {
                     _logger.LogDebug($"Target: {targetUri.AbsoluteUri}");
                     originalBody = body;
-                    var targetRequestMessage = CreateTargetMessage(context, targetUri, ref body);
+                    var createMessageResponse = await CreateTargetMessageAsync(context, targetUri, body);
+                    var targetRequestMessage = createMessageResponse.Message;
+                    body = createMessageResponse.Body;
                     if (_proxyConfiguration.LogRequest && targetRequestMessage.Content != null)
                     {
                         _logger.LogInformation("Request body: {@requestBody}", body);

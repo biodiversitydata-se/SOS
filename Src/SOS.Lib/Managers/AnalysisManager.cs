@@ -142,6 +142,7 @@ namespace SOS.Lib.Managers
             return (observationsCount, minX ?? 0.0, maxX ?? 0.0, minY ?? 0.0, maxY ?? 0.0);
         }
 
+
         private (string Id, Feature Feature) GetAreaFeature(
             dynamic record,
             AreaTypeAggregate areaType,
@@ -170,8 +171,9 @@ namespace SOS.Lib.Managers
                 {
                     Attributes = new AttributesTable(attributes)
                 }
-            ); 
+            );
         }
+
 
         /// <summary>
         /// Get grid cells
@@ -329,7 +331,7 @@ namespace SOS.Lib.Managers
                     foreach (var record in result.Records)
                     {
                         var response = GetAreaFeature(record, areaType, aggregateOrganismQuantity, coordinateSys);
-                        var featureId = response?.Item1;
+                        var featureId = response.Item1;
                         if (!string.IsNullOrEmpty(featureId))
                         {
                             var feature = response.Item2;

@@ -1,10 +1,11 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Cache.Interfaces;
-using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
@@ -25,6 +26,12 @@ namespace SOS.Lib.Cache
         public DataProviderCache(IDataProviderRepository dataProviderRepository, IMemoryCache memoryCache, ILogger<CacheBase<int, DataProvider>> logger) : base(dataProviderRepository, memoryCache, logger)
         {
             CacheDuration = TimeSpan.FromMinutes(5);
+        }
+
+        public async Task<IEnumerable<int>> GetDefaultIdsAsync()
+        {
+            var allProviders = await GetAllAsync();
+            return allProviders?.Where(p => p.IsActive && p.IncludeInSearchByDefault).Select(p => p.Id).ToArray(); 
         }
 
         /// <inheritdoc />
