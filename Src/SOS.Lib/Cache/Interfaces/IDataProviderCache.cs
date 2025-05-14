@@ -1,4 +1,5 @@
 ﻿using SOS.Lib.Models.Shared;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
@@ -9,6 +10,12 @@ namespace SOS.Lib.Cache.Interfaces
     /// </summary>
     public interface IDataProviderCache : ICache<int, DataProvider>
     {
+        /// <summary>
+        /// Get Default providers id
+        /// </summary>
+        /// <returns></returns>
+        Task<IEnumerable<int>> GetDefaultIdsAsync();
+
         /// <summary>
         /// Get eml data
         /// </summary>

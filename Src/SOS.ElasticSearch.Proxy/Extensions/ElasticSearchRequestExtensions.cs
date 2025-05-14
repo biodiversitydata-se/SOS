@@ -1,8 +1,28 @@
 ﻿
+
 namespace SOS.ElasticSearch.Proxy.Extensions
 {
     public static class ElasticSearchRequestExtensions
     {
+        private static bool CheckIfCriteriaExists(IEnumerable<IDictionary<string, object>> criterias, string property)
+        {
+            var criteriaExists = false;
+            foreach (var criteria in criterias)
+            {
+                foreach (var dictionary in criteria)
+                {
+                    var dic = dictionary.Value as IDictionary<string, object>;
+                    if (dic != null && dic.Keys.Count(k => k.Equals(property, StringComparison.CurrentCultureIgnoreCase)) != 0)
+                    {
+                        criteriaExists = true;
+                        break;
+                    }
+                }
+            }
+
+            return criteriaExists;
+        }
+
         private static ICollection<IDictionary<string, object>> TryOptimizeQuery(ICollection<IDictionary<string, object>> shouldQuery, ICollection<IDictionary<string, object>> filterQuery)
         {
             if ((shouldQuery?.Count() ?? 0) == 0)
@@ -91,7 +111,7 @@ namespace SOS.ElasticSearch.Proxy.Extensions
         /// Update query with mandatory search parameters
         /// </summary>
         /// <param name="bodyDictionary"></param>
-        public static void UpdateQuery(this IDictionary<string, object>? bodyDictionary)
+        public static void UpdateQuery(this IDictionary<string, object>? bodyDictionary, IEnumerable<int> defaultProviderIds)
         {
             if (bodyDictionary == null)
             {
@@ -151,6 +171,13 @@ namespace SOS.ElasticSearch.Proxy.Extensions
 
             // Try to rewrite all multiple term should to terms filter
             shouldList = TryOptimizeQuery(shouldList, filterList);
+
+            if (!(CheckIfCriteriaExists(shouldList, "dataProviderId") || CheckIfCriteriaExists(filterList, "dataProviderId")))
+            {
+                filterList.Add(new Dictionary<string, object>() { { "terms",
+                    new Dictionary<string, object>() { { "dataProviderId", defaultProviderIds } } } }
+                );
+            }
 
             ICollection<IDictionary<string, object>> sightingTypeQuery = new List<IDictionary<string, object>>();
             // Only Artportalen observations with specified default sightingTypeSearchGroupId
