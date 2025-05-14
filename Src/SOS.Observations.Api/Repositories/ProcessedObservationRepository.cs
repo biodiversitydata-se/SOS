@@ -439,11 +439,15 @@ namespace SOS.Observations.Api.Repositories
             var tz = TimeZoneInfo.Local.GetUtcOffset(DateTime.Now);
             ExtendedBoundsDate extendedBounds = null;
             if (filter.Date != null)
-            {
+            {        
                 extendedBounds = new ExtendedBoundsDate
                 {
-                    Max = filter.Date.EndDate.HasValue ? new FieldDateMath(filter.Date.EndDate.Value.ToUniversalTime().Ticks) : null,
-                    Min = filter.Date.StartDate.HasValue ? new FieldDateMath(filter.Date.StartDate.Value.ToUniversalTime().Ticks) : null
+                    Max = filter.Date.EndDate.HasValue
+                        ? new FieldDateMath(filter.Date.EndDate.Value.ToString("yyyy-MM-ddTHH:mm:ss"))
+                        : null,
+                    Min = filter.Date.StartDate.HasValue
+                        ? new FieldDateMath(filter.Date.StartDate.Value.ToString("yyyy-MM-ddTHH:mm:ss"))
+                        : null
                 };
             }
 
@@ -460,9 +464,9 @@ namespace SOS.Observations.Api.Repositories
                         .DateHistogram(dh => dh
                            
                             .Field("event.startDate")
-                            .CalendarInterval(CalendarInterval.Year)
+                            .CalendarInterval(CalendarInterval.Year)                            
                             .TimeZone($"{(tz.TotalMinutes > 0 ? "+" : "")}{tz.Hours:00}:{tz.Minutes:00}")
-                            .Format("yyyy-MM-dd")
+                            .Format("yyyy-MM-dd||date_optional_time")
                             .ExtendedBounds(extendedBounds)
                         )
                         .Aggregations(a => a
