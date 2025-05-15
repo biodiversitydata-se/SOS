@@ -2158,7 +2158,7 @@ namespace SOS.Lib.Repositories.Processed
         public async Task<HashSet<string>> GetSortableFieldsAsync()
         {
             var sortableFields = new HashSet<string>();
-            var mappings = await Client.Indices.GetMappingAsync<Observation>();
+            var mappings = await Client.Indices.GetMappingAsync<Observation>(o => o.Indices(PublicIndexName));
             if (mappings.IsValidResponse)
             {
                 foreach (var value in mappings.Indices.Values)
