@@ -745,7 +745,6 @@ namespace SOS.Lib.Extensions
             }
 
             TransformCacheKey? cacheKey = null;
-
             if (usePointCache && geometry is Point point)
             {
                 var key = new TransformCacheKey(fromCoordinateSystem, toCoordinateSystem, point.Coordinate.X, point.Coordinate.Y);
@@ -757,13 +756,8 @@ namespace SOS.Lib.Extensions
                 cacheKey = key;
             }
 
-            var mathTransformFilter = MathTransformFilterDictionary[
-                new Tuple<CoordinateSys, CoordinateSys>(fromCoordinateSystem, toCoordinateSystem)];
-
-            var transformedGeometry = geometry is Point
-                ? new Point(geometry.Coordinate)
-                : geometry.Copy();
-
+            var transformedGeometry = geometry is Point ? new Point(geometry.Coordinate.X, geometry.Coordinate.Y) : geometry.Copy();
+            var mathTransformFilter = MathTransformFilterDictionary[new(fromCoordinateSystem, toCoordinateSystem)];
             transformedGeometry.Apply(mathTransformFilter);
             transformedGeometry.SRID = (int)toCoordinateSystem;
 
@@ -782,7 +776,7 @@ namespace SOS.Lib.Extensions
                 _transformPointCache.TryAdd(cacheKey.Value, transformedPoint);
                 if (_transformPointCache.Count > MaxCacheSize)
                 {
-                    _transformPointCache.Clear(); // Clear the cache if it exceeds the max size                    
+                    _transformPointCache.TryRemove(_transformPointCache.First()); // Remove first added item if cache is full                    
                 }
             }
 
