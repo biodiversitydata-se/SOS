@@ -1,15 +1,15 @@
-﻿using Microsoft.Extensions.Logging;
-using Nest;
+﻿using Elastic.Clients.Elasticsearch;
+using Elastic.Clients.Elasticsearch.Cluster;
+using Elastic.Clients.Elasticsearch.Core.Search;
+using Elastic.Clients.Elasticsearch.QueryDsl;
+using Microsoft.Extensions.Logging;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
-using SOS.Lib.JsonConverters;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Configuration;
-using SOS.Lib.Models.Processed.DataStewardship.Common;
-using SOS.Lib.Models.Processed.DataStewardship.Event;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
@@ -22,6 +22,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Event = SOS.Lib.Models.Processed.DataStewardship.Event.Event;
+
 
 namespace SOS.Lib.Repositories.Processed
 {
@@ -39,206 +40,275 @@ namespace SOS.Lib.Repositories.Processed
         /// <returns></returns>
         private async Task<bool> AddCollectionAsync()
         {
-            var createIndexResponse = await Client.Indices.CreateAsync(IndexName, s => s
+            var createIndexResponse = await Client.Indices.CreateAsync<Event>(IndexName, s => s
+                .Index(IndexName)
                 .Settings(s => s
                     .NumberOfShards(NumberOfShards)
                     .NumberOfReplicas(NumberOfReplicas)
-                    .Setting("max_terms_count", 110000)
-                    .Setting(UpdatableIndexSettings.MaxResultWindow, 100000)
+                    .MaxResultWindow(100000)
+                    .MaxTermsCount(110000)
                 )
-                .Map<Event>(m => m
-                    .AutoMap<Event>()
+                .Mappings(map => map
                     .Properties(ps => ps
-                        .KeywordLowerCase(kwlc => kwlc.Id, IndexSetting.None)
-                        .KeywordLowerCase(kwlc => kwlc.EventId)
-                        .KeywordLowerCase(kwlc => kwlc.ParentEventId, IndexSetting.None)
-                        .KeywordLowerCase(kwlc => kwlc.EventType, IndexSetting.None)
-                        .KeywordLowerCase(kwlc => kwlc.SamplingProtocol, IndexSetting.None)
-                        .KeywordLowerCase(kwlc => kwlc.SamplingEffort, IndexSetting.None)
-                        .KeywordLowerCase(kwlc => kwlc.SampleSizeValue, IndexSetting.None)
-                        .KeywordLowerCase(kwlc => kwlc.SampleSizeUnit, IndexSetting.None)
-                        .KeywordLowerCase(kwlc => kwlc.PlainStartDate, IndexSetting.SearchOnly)
-                        .KeywordLowerCase(kwlc => kwlc.PlainStartTime, IndexSetting.None)
-                        .KeywordLowerCase(kwlc => kwlc.PlainEndDate, IndexSetting.SearchOnly)
-                        .KeywordLowerCase(kwlc => kwlc.PlainEndTime, IndexSetting.None)
-                        .KeywordLowerCase(kwlc => kwlc.Habitat, IndexSetting.None)
-                        .Date(d => d
-                            .Name(nm => nm.EndDate)
-                        )
-                        .Date(d => d
-                            .Name(nm => nm.StartDate)
-                        )
-                        .Text(t => t
-                            .Name(nm => nm.EventRemarks)
-                            .IndexOptions(IndexOptions.Docs)
-                        )
-                        .Object<Location>(l => l
-                            .AutoMap()
-                            .Name(nm => nm.Location)
-                            .Properties(ps => ps.GetMapping())
-                        )
-                        .Object<DataStewardshipInfo>(l => l
-                            .AutoMap()
-                            .Name(nm => nm.DataStewardship)
+                        .KeywordVal(kwlc => kwlc.Id, IndexSetting.None)
+                        .KeywordVal(kwlc => kwlc.EventId)
+                        .KeywordVal(kwlc => kwlc.ParentEventId, IndexSetting.None)
+                        .KeywordVal(kwlc => kwlc.EventType, IndexSetting.None)
+                        .KeywordVal(kwlc => kwlc.SamplingProtocol, IndexSetting.None)
+                        .KeywordVal(kwlc => kwlc.SamplingEffort, IndexSetting.None)
+                        .KeywordVal(kwlc => kwlc.SampleSizeValue, IndexSetting.None)
+                        .KeywordVal(kwlc => kwlc.SampleSizeUnit, IndexSetting.None)
+                        .KeywordVal(kwlc => kwlc.PlainStartDate, IndexSetting.SearchOnly)
+                        .KeywordVal(kwlc => kwlc.PlainStartTime, IndexSetting.None)
+                        .KeywordVal(kwlc => kwlc.PlainEndDate, IndexSetting.SearchOnly)
+                        .KeywordVal(kwlc => kwlc.PlainEndTime, IndexSetting.None)
+                        .KeywordVal(kwlc => kwlc.Habitat, IndexSetting.None)
+                        .DateVal(d => d.EndDate, IndexSetting.SearchOnly)
+                        .DateVal(d => d.StartDate, IndexSetting.SearchOnly)
+                        .TextVal(t => t.EventRemarks, false)
+                        .Object(o => o.Location, l => l
                             .Properties(ps => ps
-                                .KeywordLowerCase(kwlc => kwlc.DatasetIdentifier)
-                                .KeywordLowerCase(kwlc => kwlc.DatasetTitle)
-                            )
-                        )
-                        .Object<VocabularyValue>(t => t
-                            .Name(nm => nm.DiscoveryMethod)
-                            .Properties(ps => ps
-                                .KeywordLowerCase(kwlc => kwlc.Value)
-                                .Number(nr => nr
-                                    .Name(nm => nm.Id)
-                                    .Type(NumberType.Integer)
+                                .GeoShape(gs => gs.Location.Point)
+                                .GeoPoint(gp => gp.Location.PointLocation)
+                                .GeoShape(gs => gs.Location.PointWithBuffer)
+                                .GeoShape(gs => gs.Location.PointWithDisturbanceBuffer)
+                                .NumberVal(n => n.Location.DecimalLongitude, IndexSetting.SearchSortAggregate, NumberType.Double)
+                                .NumberVal(n => n.Location.DecimalLatitude, IndexSetting.SearchSortAggregate, NumberType.Double)
+                                .NumberVal(n => n.Location.CoordinateUncertaintyInMeters, IndexSetting.SearchSortAggregate, NumberType.Integer)
+                                .NumberVal(n => n.Location.Type, IndexSetting.None, NumberType.Byte)
+                                .NumberVal(n => n.Location.CoordinatePrecision, IndexSetting.None, NumberType.Double)
+                                .NumberVal(n => n.Location.MaximumDepthInMeters, IndexSetting.None, NumberType.Double)
+                                .NumberVal(n => n.Location.MaximumDistanceAboveSurfaceInMeters, IndexSetting.None, NumberType.Double)
+                                .NumberVal(n => n.Location.MaximumElevationInMeters, IndexSetting.None, NumberType.Double)
+                                .NumberVal(n => n.Location.MinimumDepthInMeters, IndexSetting.None, NumberType.Double)
+                                .NumberVal(n => n.Location.MinimumDistanceAboveSurfaceInMeters, IndexSetting.None, NumberType.Double)
+                                .NumberVal(n => n.Location.MinimumElevationInMeters, IndexSetting.None, NumberType.Double)
+                                .BooleanVal(b => b.Location.IsInEconomicZoneOfSweden, IndexSetting.SearchOnly)
+                                .KeywordVal(kwlc => kwlc.Location.LocationId, IndexSetting.SearchSortAggregate)
+                                .KeywordVal(kwlc => kwlc.Location.CountryCode, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Location.FootprintSRS, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Location.GeodeticDatum, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Location.GeoreferencedBy, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Location.GeoreferencedDate, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Location.GeoreferenceProtocol, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Location.GeoreferenceSources, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Location.GeoreferenceVerificationStatus, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Location.HigherGeography, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Location.HigherGeographyId, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Location.Island, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Location.IslandGroup, IndexSetting.None)
+                                .Keyword(kw => kw.Location.Locality, kw => kw
+                                    .Normalizer("lowercase")
+                                    .DocValues(true)
+                                    .Fields(f => f
+                                        .Keyword("raw", kw => kw
+                                            .DocValues(false)
+                                        )
+                                    )
+                                )
+                                .KeywordVal(kwlc => kwlc.Location.LocationRemarks, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Location.LocationAccordingTo, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Location.FootprintSpatialFit, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Location.FootprintWKT, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Location.GeoreferenceRemarks, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Location.PointRadiusSpatialFit, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Location.VerbatimCoordinates, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Location.VerbatimCoordinateSystem, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Location.VerbatimDepth, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Location.VerbatimElevation, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Location.VerbatimLatitude, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Location.VerbatimLocality, IndexSetting.SearchOnly) // WFS
+                                .KeywordVal(kwlc => kwlc.Location.VerbatimLongitude, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Location.VerbatimSRS, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Location.WaterBody, IndexSetting.None)
+                                .Object(o => o.Location.Attributes, c => c
+                                    .Properties(ps => ps
+                                        .BooleanVal(b => b.Location.Attributes.IsPrivate, IndexSetting.None)
+                                        .NumberVal(n => n.Location.Attributes.ProjectId, IndexSetting.SearchOnly, NumberType.Integer)
+                                        .KeywordVal(kwlc => kwlc.Location.Attributes.ExternalId, IndexSetting.SearchOnly)
+                                        .KeywordVal(kwlc => kwlc.Location.Attributes.CountyPartIdByCoordinate, IndexSetting.SearchOnly)
+                                        .KeywordVal(kwlc => kwlc.Location.Attributes.ProvincePartIdByCoordinate, IndexSetting.SearchOnly)
+                                        .KeywordVal(kwlc => kwlc.Location.Attributes.VerbatimMunicipality, IndexSetting.None)
+                                        .KeywordVal(kwlc => kwlc.Location.Attributes.VerbatimProvince, IndexSetting.None)
+                                    )
+                                )
+                                .Object(o => o.Location.Continent, c => c
+                                    .Properties(ps => ps
+                                        .KeywordVal(kwlc => kwlc.Location.Continent.Value, IndexSetting.None)
+                                        .NumberVal(nr => nr.Location.Continent.Id, IndexSetting.None, NumberType.Byte)
+                                    )
+                                )
+                                .Object(o => o.Location.Country, c => c
+                                    .Properties(ps => ps
+                                        .KeywordVal(kwlc => kwlc.Location.Country.Value, IndexSetting.SearchOnly)
+                                        .NumberVal(nr => nr.Location.Country.Id, IndexSetting.SearchSortAggregate, NumberType.Byte)
+                                    )
+                                )
+                                .Object(o => o.Location.Atlas10x10, c => c
+                                    .Properties(ps => ps
+                                        .KeywordVal(kwlc => kwlc.Location.Atlas10x10.FeatureId, IndexSetting.SearchSortAggregate)
+                                        .KeywordVal(kwlc => kwlc.Location.Atlas10x10.Name, IndexSetting.None)
+                                    )
+                                )
+                                .Object(o => o.Location.Atlas5x5, c => c
+                                    .Properties(ps => ps
+                                        .KeywordVal(kwlc => kwlc.Location.Atlas5x5.FeatureId, IndexSetting.SearchSortAggregate)
+                                        .KeywordVal(kwlc => kwlc.Location.Atlas5x5.Name, IndexSetting.None)
+                                    )
+                                )
+                                .Object(o => o.Location.CountryRegion, c => c
+                                    .Properties(ps => ps
+                                        .KeywordVal(kwlc => kwlc.Location.CountryRegion.FeatureId, IndexSetting.SearchSortAggregate)
+                                        .KeywordVal(kwlc => kwlc.Location.CountryRegion.Name, IndexSetting.SearchOnly)
+                                    )
+                                )
+                                .Object(o => o.Location.County, c => c
+                                    .Properties(ps => ps
+                                        .KeywordVal(kwlc => kwlc.Location.County.FeatureId, IndexSetting.SearchSortAggregate)
+                                        .KeywordVal(kwlc => kwlc.Location.County.Name, IndexSetting.SearchSortAggregate)
+                                    )
+                                )
+                                .Object(o => o.Location.Municipality, c => c
+                                    .Properties(ps => ps
+                                        .KeywordVal(kwlc => kwlc.Location.Municipality.FeatureId, IndexSetting.SearchSortAggregate)
+                                        .KeywordVal(kwlc => kwlc.Location.Municipality.Name, IndexSetting.SearchSortAggregate)
+                                    )
+                                )
+                                .Object(o => o.Location.Parish, c => c
+                                    .Properties(ps => ps
+                                        .KeywordVal(kwlc => kwlc.Location.Parish.FeatureId, IndexSetting.SearchSortAggregate)
+                                        .KeywordVal(kwlc => kwlc.Location.Parish.Name, IndexSetting.SearchSortAggregate)
+                                    )
+                                )
+                                .Object(o => o.Location.Province, c => c
+                                    .Properties(ps => ps
+                                        .KeywordVal(kwlc => kwlc.Location.Province.FeatureId, IndexSetting.SearchSortAggregate)
+                                        .KeywordVal(kwlc => kwlc.Location.Province.Name, IndexSetting.SearchSortAggregate)
+                                    )
                                 )
                             )
                         )
-                        .Object<ExtendedMeasurementOrFact>(n => n
-                            .AutoMap()
-                            .Name(nm => nm.MeasurementOrFacts)
+                        .Object(o => o.DataStewardship, l => l
                             .Properties(ps => ps
-                                .KeywordLowerCase(kwlc => kwlc.OccurrenceID)
-                                .KeywordLowerCase(kwlc => kwlc.MeasurementRemarks, IndexSetting.None)
-                                .KeywordLowerCase(kwlc => kwlc.MeasurementAccuracy, IndexSetting.None)
-                                .KeywordLowerCase(kwlc => kwlc.MeasurementDeterminedBy, IndexSetting.None)
-                                .KeywordLowerCase(kwlc => kwlc.MeasurementDeterminedDate, IndexSetting.None)
-                                .KeywordLowerCase(kwlc => kwlc.MeasurementID, IndexSetting.None)
-                                .KeywordLowerCase(kwlc => kwlc.MeasurementMethod, IndexSetting.None)
-                                .KeywordLowerCase(kwlc => kwlc.MeasurementType, IndexSetting.None)
-                                .KeywordLowerCase(kwlc => kwlc.MeasurementTypeID, IndexSetting.None)
-                                .KeywordLowerCase(kwlc => kwlc.MeasurementUnit, IndexSetting.None)
-                                .KeywordLowerCase(kwlc => kwlc.MeasurementUnitID, IndexSetting.None)
-                                .KeywordLowerCase(kwlc => kwlc.MeasurementValue, IndexSetting.None)
-                                .KeywordLowerCase(kwlc => kwlc.MeasurementValueID, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.DataStewardship.DatasetIdentifier)
+                                .KeywordVal(kwlc => kwlc.DataStewardship.DatasetTitle)
                             )
                         )
-                        .Object<Multimedia>(n => n
-                            .AutoMap()
-                            .Name(nm => nm.Media)
+                        .Object(o => o.DiscoveryMethod, t => t
                             .Properties(ps => ps
-                                .KeywordLowerCase(kwlc => kwlc.Description, IndexSetting.None)
-                                .KeywordLowerCase(kwlc => kwlc.Audience, IndexSetting.None)
-                                .KeywordLowerCase(kwlc => kwlc.Contributor, IndexSetting.None)
-                                .KeywordLowerCase(kwlc => kwlc.Created, IndexSetting.None)
-                                .KeywordLowerCase(kwlc => kwlc.Creator, IndexSetting.None)
-                                .KeywordLowerCase(kwlc => kwlc.DatasetID, IndexSetting.None)
-                                .KeywordLowerCase(kwlc => kwlc.Format, IndexSetting.None)
-                                .KeywordLowerCase(kwlc => kwlc.Identifier, IndexSetting.None)
-                                .KeywordLowerCase(kwlc => kwlc.License, IndexSetting.None)
-                                .KeywordLowerCase(kwlc => kwlc.Publisher, IndexSetting.None)
-                                .KeywordLowerCase(kwlc => kwlc.References, IndexSetting.None)
-                                .KeywordLowerCase(kwlc => kwlc.RightsHolder, IndexSetting.None)
-                                .KeywordLowerCase(kwlc => kwlc.Source, IndexSetting.None)
-                                .KeywordLowerCase(kwlc => kwlc.Title, IndexSetting.None)
-                                .KeywordLowerCase(kwlc => kwlc.Type, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.DiscoveryMethod.Value, IndexSetting.SearchOnly)
+                                .NumberVal(nr => nr.DiscoveryMethod.Id, IndexSetting.SearchSortAggregate, NumberType.Short)
                             )
                         )
-                        .Object<Organisation>(t => t
-                            .AutoMap()
-                            .Name(nm => nm.RecorderOrganisation)
+                        .Object(o => o.MeasurementOrFacts, n => n
                             .Properties(ps => ps
-                                .KeywordLowerCase(kwlc => kwlc.OrganisationCode, IndexSetting.None)
-                                .KeywordLowerCase(kwlc => kwlc.OrganisationID, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.MeasurementOrFacts.First().OccurrenceID)
+                                .KeywordVal(kwlc => kwlc.MeasurementOrFacts.First().MeasurementRemarks, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.MeasurementOrFacts.First().MeasurementAccuracy, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.MeasurementOrFacts.First().MeasurementDeterminedBy, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.MeasurementOrFacts.First().MeasurementDeterminedDate, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.MeasurementOrFacts.First().MeasurementID, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.MeasurementOrFacts.First().MeasurementMethod, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.MeasurementOrFacts.First().MeasurementType, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.MeasurementOrFacts.First().MeasurementTypeID, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.MeasurementOrFacts.First().MeasurementUnit, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.MeasurementOrFacts.First().MeasurementUnitID, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.MeasurementOrFacts.First().MeasurementValue, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.MeasurementOrFacts.First().MeasurementValueID, IndexSetting.None)
                             )
                         )
-                        .Object<WeatherVariable>(t => t
-                            .AutoMap()
-                            .Name(nm => nm.Weather)
+                        .Object(o => o.Media, n => n
+                            .Properties(ps => ps
+                                .KeywordVal(kwlc => kwlc.Media.First().Description, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Media.First().Audience, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Media.First().Contributor, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Media.First().Created, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Media.First().Creator, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Media.First().DatasetID, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Media.First().Format, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Media.First().Identifier, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Media.First().License, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Media.First().Publisher, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Media.First().References, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Media.First().RightsHolder, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Media.First().Source, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Media.First().Title, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Media.First().Type, IndexSetting.None)
+                            )
+                        )
+                        .Object(o => o.RecorderOrganisation, t => t
+                            .Properties(ps => ps
+                                .KeywordVal(kwlc => kwlc.RecorderOrganisation.First().OrganisationCode, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.RecorderOrganisation.First().OrganisationID, IndexSetting.None)
+                            )
+                        )
+                        .Object(o => o.Weather, t => t
+                            .Properties(ps => ps
+                                .Object(o => o.Weather.AirTemperature, o => o
+                                    .Properties(ps => ps
+                                        .NumberVal(n => n.Weather.AirTemperature.WeatherMeasure, IndexSetting.None, NumberType.Double)
+                                        .NumberVal(n => n.Weather.AirTemperature.Unit, IndexSetting.None, NumberType.Byte)
+                                    )
+                                )
+                                .NumberVal(n => n.Weather.Cloudiness, IndexSetting.None, NumberType.Byte)
+                                .NumberVal(n => n.Weather.Precipitation, IndexSetting.None, NumberType.Byte)
+                                .NumberVal(n => n.Weather.SnowCover, IndexSetting.None, NumberType.Byte)
+                                .NumberVal(n => n.Weather.Sunshine, IndexSetting.None, NumberType.Byte)
+                                .NumberVal(n => n.Weather.WindDirectionCompass, IndexSetting.None, NumberType.Byte)
+                                .Object(o => o.Weather.WindDirectionDegrees, o => o
+                                    .Properties(ps => ps
+                                        .NumberVal(n => n.Weather.WindDirectionDegrees.WeatherMeasure, IndexSetting.None, NumberType.Double)
+                                        .NumberVal(n => n.Weather.WindDirectionDegrees.Unit, IndexSetting.None, NumberType.Byte)
+                                    )
+                                )
+                                .Object(o => o.Weather.WindSpeed, o => o
+                                    .Properties(ps => ps
+                                        .NumberVal(n => n.Weather.WindSpeed.WeatherMeasure, IndexSetting.None, NumberType.Double)
+                                        .NumberVal(n => n.Weather.WindSpeed.Unit, IndexSetting.None, NumberType.Byte)
+                                    )
+                                )
+                               .NumberVal(n => n.Weather.WindStrength, IndexSetting.None, NumberType.Byte)
+                            )
                         )
                     )
                 )
             );
 
-            return createIndexResponse.Acknowledged && createIndexResponse.IsValid ? true : throw new Exception($"Failed to create ObservationEvent index. Error: {createIndexResponse.DebugInformation}");
+            return createIndexResponse.Acknowledged && createIndexResponse.IsValidResponse ? true : throw new Exception($"Failed to create ObservationEvent index. Error: {createIndexResponse.DebugInformation}");
         }
+
+        private readonly static JsonSerializerOptions jsonSerializerOptions = new ()
+        {
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+            PropertyNameCaseInsensitive = true,
+            Converters = {
+                new JsonStringEnumConverter(),
+                new NetTopologySuite.IO.Converters.GeoJsonConverterFactory()
+            }
+        };
 
         public async Task<List<Event>> GetEventsByIds(IEnumerable<string> ids, IEnumerable<SortOrderFilter> sortOrders = null)
         {
             if (ids == null || !ids.Any()) throw new ArgumentException("ids is empty");
-
-            var sortDescriptor = await Client.GetSortDescriptorAsync<Event>(IndexName, sortOrders);
-            var query = new List<Func<QueryContainerDescriptor<Event>, QueryContainer>>();
-            query.TryAddTermsCriteria("eventId", ids);
+            
+            var sortDescriptor = await Client.GetSortDescriptorAsync<Event, Event>(IndexName, sortOrders);
+            var queries = new List<Action<QueryDescriptor<Event>>>();
+            queries.TryAddTermsCriteria("eventId", ids);
             var searchResponse = await Client.SearchAsync<Event>(s => s
-                .Index(IndexName)
+                .Indices(IndexName)
                 .Query(q => q
                     .Bool(b => b
-                        .Filter(query)
+                        .Filter(queries.ToArray())
                     )
                 )
                 .Size(ids?.Count() ?? 0)
-                .Sort(sort => sortDescriptor)
-                .TrackTotalHits(false)
+                .Sort(sortDescriptor?.ToArray())
+                .TrackTotalHits(new TrackHits(false))
             );
 
-            if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
+            if (!searchResponse.IsValidResponse) throw new InvalidOperationException(searchResponse.DebugInformation);
             var events = searchResponse.Documents.ToList();
             return events;
-        }
-
-        /// <summary>
-        /// Delete collection
-        /// </summary>
-        /// <returns></returns>
-        public async Task<bool> DeleteCollectionAsync()
-        {
-            var res = await Client.Indices.DeleteAsync(IndexName);
-            return res.IsValid;
-        }
-
-        /// <summary>
-        /// Write data to elastic search
-        /// </summary>
-        /// <param name="items"></param>
-        /// <returns></returns>
-        private BulkAllObserver WriteToElastic(IEnumerable<Event> items)
-        {
-            if (!items.Any())
-            {
-                return null;
-            }
-
-            //check
-            var currentAllocation = Client.Cat.Allocation();
-            if (currentAllocation != null && currentAllocation.IsValid)
-            {
-                var diskUsageDescription = "Current diskusage in cluster:";
-                foreach (var record in currentAllocation.Records)
-                {
-                    if (int.TryParse(record.DiskPercent, out int percentageUsed))
-                    {
-                        diskUsageDescription += percentageUsed + "% ";
-                        if (percentageUsed > 90)
-                        {
-                            Logger.LogError($"Disk usage too high in cluster ({percentageUsed}%), aborting indexing");
-                            return null;
-                        }
-                    }
-                }
-
-                Logger.LogDebug(diskUsageDescription);
-            }
-
-            var count = 0;
-            return Client.BulkAll(items, b => b
-                    .Index(IndexName)
-                    // how long to wait between retries
-                    .BackOffTime("30s")
-                    // how many retries are attempted if a failure occurs                        .
-                    .BackOffRetries(2)
-                    // how many concurrent bulk requests to make
-                    .MaxDegreeOfParallelism(Environment.ProcessorCount)
-                    // number of items per bulk request
-                    .Size(WriteBatchSize)
-                    .DroppedDocumentCallback((r, o) =>
-                    {
-                        Logger.LogError($"EventId: {o?.EventId}, Error: {r?.Error?.Reason}");
-                    })
-                )
-                .Wait(TimeSpan.FromDays(1),
-                    next => { Logger.LogDebug($"Indexing events for search:{count += next.Items.Count}"); });
         }
 
         /// <summary>
@@ -253,7 +323,7 @@ namespace SOS.Lib.Repositories.Processed
             IElasticClientManager elasticClientManager,
             ElasticSearchConfiguration elasticConfiguration,
             ICache<string, ProcessedConfiguration> processedConfigurationCache,
-            IClassCache<ConcurrentDictionary<string, ClusterHealthResponse>> clusterHealthCache,
+            IClassCache<ConcurrentDictionary<string, HealthResponse>> clusterHealthCache,
             ILogger<EventRepository> logger) : base(true, elasticClientManager, processedConfigurationCache, elasticConfiguration, clusterHealthCache, logger)
         {
             LiveMode = true;
@@ -261,61 +331,10 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <inheritdoc />
-        public async Task<int> AddManyAsync(IEnumerable<Event> items)
-        {
-            return await Task.Run(() =>
-            {
-                // Save valid processed data
-                Logger.LogDebug($"Start indexing ObservationEvent batch for searching with {items.Count()} items");
-                var indexResult = WriteToElastic(items);
-                Logger.LogDebug("Finished indexing ObservationEvent batch for searching");
-                if (indexResult == null || indexResult.TotalNumberOfFailedBuffers > 0) return 0;
-                return items.Count();
-            });
-        }
-
-        public async Task<bool> DeleteAllDocumentsAsync(bool waitForCompletion = false)
-        {
-            try
-            {
-                var res = await Client.DeleteByQueryAsync<Event>(q => q
-                    .Index(IndexName)
-                    .Query(q => q.MatchAll())
-                    .WaitForCompletion(waitForCompletion)
-                    .Refresh(waitForCompletion)
-                );
-
-                return res.IsValid;
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e.ToString());
-                return false;
-            }
-        }
-
-        /// <inheritdoc />
         public async Task<bool> ClearCollectionAsync()
         {
             await DeleteCollectionAsync();
             return await AddCollectionAsync();
-        }
-
-        /// <inheritdoc />
-        public async Task<bool> DisableIndexingAsync()
-        {
-            var updateSettingsResponse =
-                await Client.Indices.UpdateSettingsAsync(IndexName,
-                    p => p.IndexSettings(g => g.RefreshInterval(-1)));
-
-            return updateSettingsResponse.Acknowledged && updateSettingsResponse.IsValid;
-        }
-
-        /// <inheritdoc />
-        public async Task EnableIndexingAsync()
-        {
-            await Client.Indices.UpdateSettingsAsync(IndexName,
-                p => p.IndexSettings(g => g.RefreshInterval(new Time(5000))));
         }
 
         /// <inheritdoc />
@@ -337,66 +356,65 @@ namespace SOS.Lib.Repositories.Processed
         public async Task<List<AggregationItemList<TKey, TValue>>> GetAllAggregationItemsListAsync<TKey, TValue>(EventSearchFilter filter, string aggregationFieldKey, string aggregationFieldList)
         {
             var indexName = IndexName;
-            var (query, excludeQuery) = GetCoreQueries(filter);
+            var (query, excludeQuery) = GetCoreQueries<dynamic>(filter);
             var aggregationDictionary = new Dictionary<TKey, List<TValue>>();
-            CompositeKey nextPageKey = null;
+            IReadOnlyDictionary<Field, FieldValue> nextPageKey = null;
             do
             {
                 var searchResponse = await PageAggregationItemListAsync(indexName, aggregationFieldKey, aggregationFieldList, query, excludeQuery, nextPageKey, MaxNrElasticSearchAggregationBuckets);
-                var compositeAgg = searchResponse.Aggregations.Composite("compositeAggregation");
+                var compositeAgg = searchResponse.Aggregations.GetComposite("compositeAggregation");
                 foreach (var bucket in compositeAgg.Buckets)
                 {
-                    TKey keyValue = (TKey)bucket.Key[aggregationFieldKey];
-                    TValue listValue = (TValue)bucket.Key[aggregationFieldList];
+                    TKey keyValue = (TKey)bucket.Key[aggregationFieldKey].Value;
+                    TValue listValue = (TValue)bucket.Key[aggregationFieldList].Value;
                     if (!aggregationDictionary.ContainsKey(keyValue))
                         aggregationDictionary[keyValue] = new List<TValue>();
                     aggregationDictionary[keyValue].Add(listValue);
                 }
 
-                nextPageKey = compositeAgg.Buckets.Count >= MaxNrElasticSearchAggregationBuckets ? compositeAgg.AfterKey : null;
+                nextPageKey = compositeAgg.Buckets.Count >= MaxNrElasticSearchAggregationBuckets ? compositeAgg.AfterKey?.ToDictionary(ak => ak.Key.ToField(), ak => ak.Value) : null;
             } while (nextPageKey != null);
 
             var items = aggregationDictionary.Select(m => new AggregationItemList<TKey, TValue> { AggregationKey = m.Key, Items = m.Value }).ToList();
             return items;
         }
 
-        private async Task<ISearchResponse<dynamic>> PageAggregationItemListAsync(
+        private async Task<SearchResponse<dynamic>> PageAggregationItemListAsync(
             string indexName,
             string aggregationFieldKey,
             string aggregationFieldList,
-            ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query,
-            ICollection<Func<QueryContainerDescriptor<object>, QueryContainer>> excludeQuery,
-            CompositeKey nextPage,
+            ICollection<Action<QueryDescriptor<dynamic>>> queries,
+            ICollection<Action<QueryDescriptor<dynamic>>> excludeQueries,
+            IReadOnlyDictionary<Field, FieldValue> nextPage,
             int take)
         {
-            ISearchResponse<dynamic> searchResponse;
-
-            searchResponse = await Client.SearchAsync<dynamic>(s => s
-                .Index(indexName)
+            var searchResponse = await Client.SearchAsync<dynamic>(indexName, s => s
+                
                 .Query(q => q
                     .Bool(b => b
-                        .MustNot(excludeQuery)
-                        .Filter(query)
+                        .MustNot(excludeQueries.ToArray())
+                        .Filter(queries.ToArray())
                     )
                 )
                 .Aggregations(a => a
-                    .Composite("compositeAggregation", g => g
-                        .After(nextPage ?? null)
-                        .Size(take)
-                        .Sources(src => src
-                            .Terms(aggregationFieldKey, tt => tt
-                                .Field(aggregationFieldKey)
-                                .Order(SortOrder.Descending)
-                            )
-                            .Terms(aggregationFieldList, tt => tt
-                                .Field(aggregationFieldList)
+                    .Add("compositeAggregation", a => a
+                        .Composite(c => c
+                            .After(ak => nextPage?.ToFluentDictionary())
+                            .Size(take)
+                            .Sources(
+                                [
+                                    CreateCompositeTermsAggregationSource(
+                                        (aggregationFieldKey, aggregationFieldKey, SortOrder.Desc)
+                                    ),
+                                    CreateCompositeTermsAggregationSource(
+                                        (aggregationFieldList, aggregationFieldList, SortOrder.Asc)
+                                    )
+                                ]
                             )
                         )
                     )
                 )
-                .Size(0)
-                .Source(s => s.ExcludeAll())
-                .TrackTotalHits(false)
+                .AddDefaultAggrigationSettings()
             );
 
             searchResponse.ThrowIfInvalid();
@@ -406,61 +424,62 @@ namespace SOS.Lib.Repositories.Processed
         public async Task<List<AggregationItem>> GetAllAggregationItemsAsync(EventSearchFilter filter, string aggregationField)
         {
             var indexName = IndexName;
-            var (query, excludeQuery) = GetCoreQueries(filter);
+            var (query, excludeQuery) = GetCoreQueries<dynamic>(filter);
             var items = new List<AggregationItem>();
-            CompositeKey nextPageKey = null;
+            IReadOnlyDictionary<Field, FieldValue> nextPageKey = null;
             var take = MaxNrElasticSearchAggregationBuckets;
             do
             {
                 var searchResponse = await PageAggregationItemAsync(indexName, aggregationField, query, excludeQuery, nextPageKey, take);
-                var compositeAgg = searchResponse.Aggregations.Composite("compositeAggregation");
+                var compositeAgg = searchResponse.Aggregations.GetComposite("compositeAggregation");
                 foreach (var bucket in compositeAgg.Buckets)
                 {
                     items.Add(new AggregationItem
                     {
-                        AggregationKey = bucket.Key["termAggregation"].ToString(),
-                        DocCount = Convert.ToInt32(bucket.DocCount.GetValueOrDefault(0))
+                        AggregationKey = bucket.Key["termAggregation"].Value.ToString(),
+                        DocCount = Convert.ToInt32(bucket.DocCount)
                     });
                 }
 
-                nextPageKey = compositeAgg.Buckets.Count >= take ? compositeAgg.AfterKey : null;
+                nextPageKey = compositeAgg.Buckets.Count >= take ? compositeAgg.AfterKey?.ToDictionary(ak => ak.Key.ToField(), ak => ak.Value) : null;
             } while (nextPageKey != null);
 
             return items;
         }
 
-        private async Task<ISearchResponse<dynamic>> PageAggregationItemAsync(
+        private async Task<SearchResponse<dynamic>> PageAggregationItemAsync(
             string indexName,
             string aggregationField,
-            ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>> query,
-            ICollection<Func<QueryContainerDescriptor<object>, QueryContainer>> excludeQuery,
-            CompositeKey nextPage,
+            ICollection<Action<QueryDescriptor<dynamic>>> queries,
+            ICollection<Action<QueryDescriptor<dynamic>>> excludeQueries,
+            IReadOnlyDictionary<Field, FieldValue> nextPageKey,
             int take)
         {
-            ISearchResponse<dynamic> searchResponse;
-
-            searchResponse = await Client.SearchAsync<dynamic>(s => s
-                .Index(indexName)
+            var searchResponse = await Client.SearchAsync<dynamic>(s => s
+                .Indices(indexName)
                 .Query(q => q
                     .Bool(b => b
-                        .MustNot(excludeQuery)
-                        .Filter(query)
+                        .MustNot(excludeQueries.ToArray())
+                        .Filter(queries.ToArray())
                     )
                 )
                 .Aggregations(a => a
-                    .Composite("compositeAggregation", g => g
-                        .After(nextPage ?? null)
-                        .Size(take)
-                        .Sources(src => src
-                            .Terms("termAggregation", tt => tt
-                                .Field(aggregationField)
+                    .Add("compositeAggregation", a => a
+                        .Composite(c => c
+                            .After(npk => nextPageKey.ToFluentDictionary() ?? null)
+                            .Size(take)
+                            .Sources(
+                                [
+                                    CreateCompositeTermsAggregationSource(
+                                        ("termAggregation", aggregationField, SortOrder.Desc)
+                                    )
+                                ]
                             )
                         )
                     )
+
                 )
-                .Size(0)
-                .Source(s => s.ExcludeAll())
-                .TrackTotalHits(false)
+                .AddDefaultAggrigationSettings()
             );
 
             searchResponse.ThrowIfInvalid();
@@ -471,35 +490,34 @@ namespace SOS.Lib.Repositories.Processed
         public async Task<PagedResult<dynamic>> GetChunkAsync(EventSearchFilter filter, int skip, int take, bool getAllFields = false)
         {
             string indexName = IndexName;
-            var (query, excludeQuery) = GetCoreQueries(filter);
-            var sortDescriptor = await Client.GetSortDescriptorAsync<Event>(indexName, filter.SortOrders);
+            var (queries, excludeQueries) = GetCoreQueries<dynamic>(filter);
+            var sortDescriptor = await Client.GetSortDescriptorAsync<Event, Event>(indexName, filter.SortOrders);
 
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
-                .Index(indexName)
-                .Source(getAllFields ? p => new SourceFilterDescriptor<dynamic>() : filter.OutputIncludeFields.ToProjection(filter.OutputExcludeFields))
+                .Indices(indexName)
+                .Source(getAllFields ? null : (filter.OutputIncludeFields, filter.OutputExcludeFields).ToProjection())
                 .From(skip)
                 .Size(take)
                 .Query(q => q
                     .Bool(b => b
-                        .MustNot(excludeQuery)
-                        .Filter(query)
+                        .MustNot(excludeQueries.ToArray())
+                        .Filter(queries.ToArray())
                     )
                 )
-                .Sort(sort => sortDescriptor)
+                .Sort(sort => sortDescriptor?.ToArray())
             );
 
             searchResponse.ThrowIfInvalid();
-            var totalCount = searchResponse.HitsMetadata.Total.Value;
+            var totalCount = searchResponse.Total;
             var includeRealCount = totalCount >= ElasticSearchMaxRecords;
 
             if (includeRealCount)
             {
-                var countResponse = await Client.CountAsync<dynamic>(s => s
-                    .Index(indexName)
+                var countResponse = await Client.CountAsync<dynamic>(indexName, s => s
                     .Query(q => q
                         .Bool(b => b
-                            .MustNot(excludeQuery)
-                            .Filter(query)
+                            .MustNot(excludeQueries.ToArray())
+                            .Filter(queries.ToArray())
                         )
                     )
                 );
@@ -518,11 +536,11 @@ namespace SOS.Lib.Repositories.Processed
             };
         }
 
-        protected (ICollection<Func<QueryContainerDescriptor<dynamic>, QueryContainer>>, ICollection<Func<QueryContainerDescriptor<object>, QueryContainer>>)
-            GetCoreQueries(EventSearchFilter filter)
+        protected (ICollection<Action<QueryDescriptor<TQueryDescriptor>>>, ICollection<Action<QueryDescriptor<TQueryDescriptor>>>)
+            GetCoreQueries<TQueryDescriptor>(EventSearchFilter filter) where TQueryDescriptor : class
         {
-            var query = filter.ToQuery<dynamic>();
-            var excludeQuery = filter.ToExcludeQuery();
+            var query = filter.ToQuery<TQueryDescriptor>();
+            var excludeQuery = filter.ToExcludeQuery<TQueryDescriptor>();
 
             return (query, excludeQuery);
         }
@@ -539,17 +557,6 @@ namespace SOS.Lib.Repositories.Processed
             return JsonSerializer.Deserialize<List<Event>>(
                 JsonSerializer.Serialize(dynamicObjects, jsonSerializerOptions), jsonSerializerOptions);
         }
-
-        protected readonly static JsonSerializerOptions jsonSerializerOptions = new JsonSerializerOptions()
-        {
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-            PropertyNameCaseInsensitive = true,
-            Converters = {
-                new JsonStringEnumConverter(),
-                new GeoShapeConverter(),
-                new NetTopologySuite.IO.Converters.GeoJsonConverterFactory()
-            }
-        };
 
         public async Task WaitForIndexCreation(long expectedRecordsCount, TimeSpan? timeout = null)
         {
@@ -583,10 +590,7 @@ namespace SOS.Lib.Repositories.Processed
         {
             try
             {
-                var countResponse = await Client.CountAsync<Event>(s => s
-                    .Index(IndexName)
-                );
-
+                var countResponse = await Client.CountAsync<Event>(c => c.Indices(IndexName));
                 countResponse.ThrowIfInvalid();
                 return countResponse.Count;
             }

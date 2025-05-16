@@ -1,4 +1,5 @@
-﻿using FizzWare.NBuilder.Implementation;
+﻿using FizzWare.NBuilder;
+using FizzWare.NBuilder.Implementation;
 using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Models.Processed.Observation;
 
@@ -104,8 +105,8 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Data
             {
                 obs.Location.DecimalLatitude = latitude;
                 obs.Location.DecimalLongitude = longitude;
-                obs.Location.PointLocation = new GeoLocation(latitude, longitude);
-                obs.Location.Point = new PointGeoShape(new GeoCoordinate(latitude, longitude));
+                obs.Location.PointLocation = new LatLonGeoLocation { Lat = latitude, Lon = longitude };
+                obs.Location.Point = new Point(longitude, latitude);
             });
 
             return operable;

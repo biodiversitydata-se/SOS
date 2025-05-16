@@ -376,7 +376,7 @@ namespace SOS.Harvest.Processors.Artportalen
                         diffuse ? site.YCoordDiffused : site.YCoord,
                         CoordinateSys.WebMercator,
                         (Point)(diffuse ? site.PointDiffused : site.Point)?.ToGeometry()!,
-                        diffuse ? site.PointWithBufferDiffused : site.PointWithBuffer,
+                        (diffuse ? site.PointWithBufferDiffused : site.PointWithBuffer).ToGeometry(),
                         diffuse ? GetDiffusionCoordinateUncertainty(site.DiffusionId) : site.Accuracy,
                         taxon?.Attributes?.DisturbanceRadius
                     );

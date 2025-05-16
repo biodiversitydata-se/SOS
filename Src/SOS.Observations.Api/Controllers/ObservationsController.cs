@@ -1,16 +1,11 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Nest;
-using OfficeOpenXml.Export.ToCollection;
-using Org.BouncyCastle.Pqc.Crypto.Lms;
-using SOS.Lib.Cache;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Exceptions;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
-using SOS.Lib.JsonConverters;
 using SOS.Lib.Managers;
 using SOS.Lib.Models.Cache;
 using SOS.Lib.Models.Processed.Observation;
@@ -35,13 +30,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
-using System.Security;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
-using System.Threading;
 using System.Threading.Tasks;
 using Result = CSharpFunctionalExtensions.Result;
 
@@ -62,7 +55,7 @@ namespace SOS.Observations.Api.Controllers
         private readonly IClassCache<Dictionary<string, CacheEntry<GeoGridResultDto>>> _geogridAggregationCache;
         private readonly IClassCache<Dictionary<string, CacheEntry<PagedResultDto<TaxonAggregationItemDto>>>> _taxonAggregationInternalCache;
         private readonly SemaphoreLimitManager _semaphoreLimitManager;
-        private readonly ILogger<ObservationsController> _logger;        
+        private readonly ILogger<ObservationsController> _logger;
 
         private JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions
         {
@@ -73,7 +66,6 @@ namespace SOS.Observations.Api.Controllers
             Converters =
             {
                 new JsonStringEnumConverter(),
-                new GeoShapeConverter(),
                 new NetTopologySuite.IO.Converters.GeoJsonConverterFactory()
             }
         };
@@ -596,7 +588,7 @@ namespace SOS.Observations.Api.Controllers
                 }
                 SearchFilter searchFilter = filter.ToSearchFilter(this.GetUserId(), protectionFilter, translationCultureCode, sortBy, sortOrder);
                 var result = await _observationManager.GetChunkAsync(roleId, authorizationApplicationIdentifier, searchFilter, skip, take);
-                PagedResultDto<dynamic> dto = result?.ToPagedResultDto(result.Records);
+                var dto = result?.ToPagedResultDto(result.Records);
                 this.LogObservationCount(dto?.Records?.Count() ?? 0);
                 return new OkObjectResult(dto);
             }
@@ -1668,7 +1660,7 @@ namespace SOS.Observations.Api.Controllers
                 {
                     throw new Exception("Something went wrong when your query was executed. Make sure your filter is correct.");
                 }
-                GeoPagedResultDto<dynamic> dto = result.ToGeoPagedResultDto(result.Records, outputFormat);
+                GeoPagedResultDto<JsonObject> dto = result.ToGeoPagedResultDto(result.Records, outputFormat);
                 this.LogObservationCount(dto?.Records?.Count() ?? 0);
                 return new OkObjectResult(dto);
             }
@@ -1977,7 +1969,7 @@ namespace SOS.Observations.Api.Controllers
                     return BadRequest($"Scroll total count limit is maxTotalCount. Your result is {result.TotalCount}. Try use a more specific filter.");
                 }
 
-                ScrollResultDto<dynamic> dto = result.ToScrollResultDto(result.Records);
+                ScrollResultDto<JsonObject> dto = result.ToScrollResultDto(result.Records);
                 this.LogObservationCount(dto?.Records?.Count() ?? 0);
                 return new OkObjectResult(dto);
             }

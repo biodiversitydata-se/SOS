@@ -1,9 +1,7 @@
 ﻿using SOS.Lib.Enums.VocabularyValues;
-using SOS.Lib.JsonConverters;
 using SOS.Lib.Models.Processed.Observation;
 using System.Collections.Generic;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace SOS.Lib.Extensions
 {
@@ -14,9 +12,7 @@ namespace SOS.Lib.Extensions
             PropertyNameCaseInsensitive = true,
             Converters =
             {
-                new GeoShapeConverter(),
                 new NetTopologySuite.IO.Converters.GeoJsonConverterFactory(),
-                new JsonStringEnumConverter()
             }
         };
 
@@ -51,7 +47,7 @@ namespace SOS.Lib.Extensions
             {
                 return null;
             }
-            
+
             return JsonSerializer.Deserialize<Observation[]>(JsonSerializer.Serialize(dynamicObjects), jsonSerializerOptions);
         }
     }

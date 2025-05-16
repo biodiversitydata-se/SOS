@@ -1,4 +1,4 @@
-﻿using Nest;
+﻿using Elastic.Clients.Elasticsearch;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Shared;
 using System;
@@ -62,7 +62,10 @@ namespace SOS.Lib.Factories
 
         private static void SetGeographicCoverage(XElement dataset, GeoBounds geoBounds)
         {
-            if (geoBounds == null)
+            if (geoBounds == null || 
+                !geoBounds.TryGetTopLeftBottomRight(out var topLeftBottomRight) ||
+                !topLeftBottomRight.BottomRight.TryGetLatitudeLongitude(out var bottomRight) ||
+                !topLeftBottomRight.TopLeft.TryGetLatitudeLongitude(out var topLeft))
             {
                 return;
             }
@@ -71,10 +74,10 @@ namespace SOS.Lib.Factories
             var geographicCoverage = GetElement(coverage, "geographicCoverage");
             GetElement(geographicCoverage, "geographicDescription").SetValue("All data is collected within Sweden.");
             var boundingCoordinates = GetElement(geographicCoverage, "boundingCoordinates");
-            GetElement(boundingCoordinates, "westBoundingCoordinate").SetValue(geoBounds.TopLeft.Lon ?? 0.0);
-            GetElement(boundingCoordinates, "eastBoundingCoordinate").SetValue(geoBounds.BottomRight.Lon ?? 0.0);
-            GetElement(boundingCoordinates, "northBoundingCoordinate").SetValue(geoBounds.TopLeft.Lat ?? 0.0);
-            GetElement(boundingCoordinates, "southBoundingCoordinate").SetValue(geoBounds.BottomRight.Lat ?? 0.0);
+            GetElement(boundingCoordinates, "westBoundingCoordinate").SetValue(topLeft.Lon);
+            GetElement(boundingCoordinates, "eastBoundingCoordinate").SetValue(bottomRight.Lon);
+            GetElement(boundingCoordinates, "northBoundingCoordinate").SetValue(topLeft.Lat);
+            GetElement(boundingCoordinates, "southBoundingCoordinate").SetValue(bottomRight.Lat);
         }
 
         private static void SetTemporalCoverage(XElement dataset, DateTime? firstSpotted, DateTime? lastSpotted)

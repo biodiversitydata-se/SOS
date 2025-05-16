@@ -1,8 +1,8 @@
-﻿using Microsoft.Extensions.Caching.Memory;
+﻿using Elastic.Clients.Elasticsearch.Cluster;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
-using Nest;
 using SOS.Lib.Cache;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
@@ -14,7 +14,6 @@ using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Resource;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Text.Json;
@@ -48,7 +47,7 @@ namespace SOS.Export.LiveIntegrationTests.TestDataTools
                 new ElasticSearchConfiguration(),
                 new ProcessedConfigurationCache(new ProcessedConfigurationRepository(exportClient, new NullLogger<ProcessedConfigurationRepository>()), new MemoryCache(new MemoryCacheOptions()), new NullLogger<ProcessedConfigurationCache>()),
                 new Mock<ITaxonManager>().Object,
-                new ClassCache<ConcurrentDictionary<string, ClusterHealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<string, ClusterHealthResponse>>>()),
+                new ClassCache<ConcurrentDictionary<string, HealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<string, HealthResponse>>>()),
                 new Mock<ILogger<ProcessedObservationCoreRepository>>().Object);
 
             //-----------------------------------------------------------------------------------------------------------

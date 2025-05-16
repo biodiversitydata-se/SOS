@@ -1,8 +1,7 @@
 ﻿using DwC_A;
-using FluentAssertions.Common;
+using Elastic.Clients.Elasticsearch.Cluster;
 using Microsoft.ApplicationInsights;
 using Microsoft.Extensions.Caching.Memory;
-using Nest;
 using SOS.Harvest.DarwinCore;
 using SOS.Harvest.DarwinCore.Interfaces;
 using SOS.Harvest.Managers;
@@ -130,8 +129,8 @@ public class ProcessFixture : IProcessFixture
         serviceCollection.AddSingleton<IEventRepository, EventRepository>();
         serviceCollection.AddSingleton<IClassCache<TaxonTree<IBasicTaxon>>, ClassCache<TaxonTree<IBasicTaxon>>>();
         serviceCollection.AddSingleton<IClassCache<TaxonListSetsById>, ClassCache<TaxonListSetsById>>();
-        var clusterHealthCache = new ClassCache<ConcurrentDictionary<string, ClusterHealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<string, ClusterHealthResponse>>>()) { CacheDuration = TimeSpan.FromMinutes(2) };
-        serviceCollection.AddSingleton<IClassCache<ConcurrentDictionary<string, ClusterHealthResponse>>>(clusterHealthCache);
+        var clusterHealthCache = new ClassCache<ConcurrentDictionary<string, HealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<string, HealthResponse>>>()) { CacheDuration = TimeSpan.FromMinutes(2) };
+        serviceCollection.AddSingleton<IClassCache<ConcurrentDictionary<string, HealthResponse>>>(clusterHealthCache);
         var geoGridAggregationCache = new ClassCache<Dictionary<string, CacheEntry<GeoGridResultDto>>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<Dictionary<string, CacheEntry<GeoGridResultDto>>>>()) { CacheDuration = TimeSpan.FromHours(48) };
         serviceCollection.AddSingleton<IClassCache<Dictionary<string, CacheEntry<GeoGridResultDto>>>>(geoGridAggregationCache);
         var taxonAggregationInternalCache = new ClassCache<Dictionary<string, CacheEntry<PagedResultDto<TaxonAggregationItemDto>>>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<Dictionary<string, CacheEntry<PagedResultDto<TaxonAggregationItemDto>>>>>()) { CacheDuration = TimeSpan.FromHours(1) };
@@ -525,7 +524,7 @@ public class ProcessFixture : IProcessFixture
         {
             await _processedObservationCoreRepository.DeleteAllDocumentsAsync(protectedIndex);
         }
-        _processedObservationCoreRepository.AddMany(observations, protectedIndex, true);
+        await _processedObservationCoreRepository.AddManyAsync(observations, protectedIndex, true);
     }
 
     public DwcaObservationFactory GetDwcaObservationFactory(bool initAreaHelper)

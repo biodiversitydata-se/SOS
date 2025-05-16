@@ -1,5 +1,4 @@
 ﻿using FizzWare.NBuilder;
-using Nest;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
@@ -8,7 +7,6 @@ using SOS.Shared.Api.Dtos;
 using SOS.Shared.Api.Dtos.Filter;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Extensions;
-using Nest;
 using SOS.Observations.Api.IntegrationTests.Setup;
 using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
 
@@ -267,11 +265,11 @@ public class ObservationPropertiesTest : TestBase
                 MinimumElevationInMeters = 9,
                 Municipality = new Lib.Models.Processed.Observation.Area { FeatureId = "FId", Name = "M" },
                 Parish = new Lib.Models.Processed.Observation.Area { FeatureId = "FId", Name = "P" },
-                Point = new PointGeoShape(new GeoCoordinate(59.86035103929389, 17.577532793729183)),
-                PointLocation = new GeoLocation(59.86035103929389, 17.577532793729183),
+                Point = new NetTopologySuite.Geometries.Point(17.577532793729183, 59.86035103929389),
+                PointLocation = new Elastic.Clients.Elasticsearch.LatLonGeoLocation { Lat = 59.86035103929389, Lon = 17.577532793729183 },
                 PointRadiusSpatialFit = "PRSF",
-                PointWithBuffer = new NetTopologySuite.Geometries.Point(17.577532793729183, 59.86035103929389).ToCircle(10).ToGeoShape() as PolygonGeoShape,
-                PointWithDisturbanceBuffer = new NetTopologySuite.Geometries.Point(17.577532793729183, 59.86035103929389).ToCircle(15).ToGeoShape() as PolygonGeoShape,
+                PointWithBuffer = new NetTopologySuite.Geometries.Point(17.577532793729183, 59.86035103929389).ToCircle(10),
+                PointWithDisturbanceBuffer = new NetTopologySuite.Geometries.Point(17.577532793729183, 59.86035103929389).ToCircle(15),
                 Province = new Lib.Models.Processed.Observation.Area { FeatureId = "FId", Name = "P" },
                 Sweref99TmX = 180,
                 Sweref99TmY = 90,

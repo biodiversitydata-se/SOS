@@ -1,3 +1,4 @@
+using NetTopologySuite.Geometries;
 namespace SOS.DataStewardship.Api.Contracts.Models
 {    
     /// <summary>
@@ -8,7 +9,7 @@ namespace SOS.DataStewardship.Api.Contracts.Models
         /// <summary>
 		/// GeoJSON geometry
 		/// </summary>
-        public IGeoShape GeographicArea { get; set; }        
+        public Geometry GeographicArea { get; set; }        
         
         /// <summary>
 		/// The offset in meters from the geometries. This variable is required if geometries type is point

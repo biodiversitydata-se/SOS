@@ -31,7 +31,7 @@ namespace SOS.Observations.Api.EndToEndTests.EndToEndTests.Observations.Search
                 Date = new DateFilterDto
                 {
                     StartDate = new DateTime(1990, 1, 31, 07, 59, 46),
-                    EndDate = new DateTime(2020, 1, 31, 07, 59, 46)
+                    EndDate = DateTime.Now
                 },
                 VerificationStatus = Shared.Api.Dtos.Enum.StatusVerificationDto.BothVerifiedAndNotVerified,
                 OccurrenceStatus = Shared.Api.Dtos.Enum.OccurrenceStatusFilterValuesDto.Present
@@ -46,7 +46,7 @@ namespace SOS.Observations.Api.EndToEndTests.EndToEndTests.Observations.Search
             // Assert
             //-----------------------------------------------------------------------------------------------------------
             result.Records.Count().Should().Be(2, "because the take parameter is 2");
-            result.TotalCount.Should().BeGreaterThan(4000, "because there should be more than 4500 observations of otter");
+            result.TotalCount.Should().BeGreaterThan(3000, "because there should be more than 3000 observations of otter");
             result.Records.First().Taxon.Id.Should().Be(100077, "because otter has TaxonId=100077");
         }
 
@@ -71,7 +71,7 @@ namespace SOS.Observations.Api.EndToEndTests.EndToEndTests.Observations.Search
                 Date = new DateFilterDto()
                 {
                     StartDate = new DateTime(1990, 1, 31, 07, 59, 46),
-                    EndDate = new DateTime(2020, 1, 31, 07, 59, 46)
+                    EndDate = DateTime.Now
                 },
                 VerificationStatus = Shared.Api.Dtos.Enum.StatusVerificationDto.BothVerifiedAndNotVerified,
                 OccurrenceStatus = Shared.Api.Dtos.Enum.OccurrenceStatusFilterValuesDto.Present

@@ -14,7 +14,7 @@ namespace SOS.Lib.Extensions
     /// </summary>
     public static class SearchFilterExtensions
     {
-        private static JsonSerializerOptions _serializeOptions = new JsonSerializerOptions
+        private static JsonSerializerOptions _serializeOptions = new()
         {
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
             Converters = { new JsonStringEnumConverter() }

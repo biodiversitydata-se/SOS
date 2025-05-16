@@ -86,7 +86,7 @@ namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.Observation
             var result = GetResult<PagedResultDto<Observation>>(response);
             string fileName = @"C:\Temp\SosObservationsExport.json";
             var jsonSerializerOptions = new JsonSerializerOptions() { PropertyNameCaseInsensitive = true };
-            jsonSerializerOptions.Converters.Add(new GeoShapeConverter());
+            jsonSerializerOptions.Converters.Add(new NetTopologySuite.IO.Converters.GeoJsonConverterFactory());
             jsonSerializerOptions.Converters.Add(new GeoLocationConverter());
             string jsonString = JsonSerializer.Serialize(result.Records, jsonSerializerOptions);
             await System.IO.File.WriteAllTextAsync(fileName, jsonString);
@@ -103,7 +103,7 @@ namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.Observation
         {
             var okObjectResult = (OkObjectResult)response;
             var jsonSerializerOptions = new JsonSerializerOptions() { PropertyNameCaseInsensitive = true };
-            jsonSerializerOptions.Converters.Add(new GeoShapeConverter());
+            jsonSerializerOptions.Converters.Add(new NetTopologySuite.IO.Converters.GeoJsonConverterFactory());
             jsonSerializerOptions.Converters.Add(new GeoLocationConverter());
             var strJson = JsonSerializer.Serialize(okObjectResult.Value, jsonSerializerOptions);
             var result = JsonSerializer.Deserialize<T>(strJson, jsonSerializerOptions);

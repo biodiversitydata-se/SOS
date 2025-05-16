@@ -1,8 +1,8 @@
-﻿using FluentAssertions;
+﻿using Elastic.Clients.Elasticsearch.Cluster;
+using FluentAssertions;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
-using Nest;
 using SOS.Lib.Cache;
 using SOS.Lib.Database;
 using SOS.Lib.Managers;
@@ -75,7 +75,7 @@ namespace SOS.Export.LiveIntegrationTests.Repositories
                     elasticConfiguration,
                     new ProcessedConfigurationCache(new ProcessedConfigurationRepository(exportClient, new NullLogger<ProcessedConfigurationRepository>()), new MemoryCache(new MemoryCacheOptions()), new NullLogger<ProcessedConfigurationCache>()),
                     new Mock<ITaxonManager>().Object,
-                    new ClassCache<ConcurrentDictionary<string, ClusterHealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<string, ClusterHealthResponse>>>()),
+                    new ClassCache<ConcurrentDictionary<string, HealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<string, HealthResponse>>>()),
                     new NullLogger<ProcessedObservationCoreRepository>());
 
             return processedObservationRepository;

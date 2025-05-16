@@ -1,4 +1,5 @@
-﻿using Nest;
+﻿using Elastic.Clients.Elasticsearch;
+using NetTopologySuite.Geometries;
 using SOS.Lib.Enums;
 using SOS.Lib.Swagger;
 using System.Text.Json.Serialization;
@@ -367,25 +368,25 @@ namespace SOS.Lib.Models.Processed.Observation
         ///     Point (WGS84).
         /// </summary>
         [SwaggerExclude]
-        public PointGeoShape Point { get; set; }
+        public Point Point { get; set; }
 
         /// <summary>
         ///     Point used in distance from point search.
         /// </summary>
         [SwaggerExclude]
-        public GeoLocation PointLocation { get; set; }
+        public LatLonGeoLocation PointLocation { get; set; }
 
         /// <summary>
         ///     Point with accuracy buffer (WGS84).
         /// </summary>
         [SwaggerExclude]
-        public PolygonGeoShape PointWithBuffer { get; set; }
+        public Geometry PointWithBuffer { get; set; }
 
         /// <summary>
         /// Point with disturbance buffer
         /// </summary>
         [SwaggerExclude]
-        public PolygonGeoShape PointWithDisturbanceBuffer { get; set; }
+        public Geometry PointWithDisturbanceBuffer { get; set; }
 
         /// <summary>
         ///     The ratio of the area of the point-radius

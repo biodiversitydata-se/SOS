@@ -1,9 +1,10 @@
-﻿using Elasticsearch.Net;
-using SOS.Lib.Database.Interfaces;
+﻿using SOS.Lib.Database.Interfaces;
 using MongoDB.Driver;
 using SOS.Lib.Database;
 using Testcontainers.MongoDb;
 using Testcontainers.Elasticsearch;
+using SOS.Lib.Helpers;
+using System;
 
 namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup
 {
@@ -11,7 +12,7 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup
     {
         private bool UseKibanaDebug;
         private const string ELASTIC_PASSWORD = "elastic";
-        private const string ELASTIC_IMAGE_NAME = "elasticsearch:8.7.1";
+        private const string ELASTIC_IMAGE_NAME = "elasticsearch:8.17.3";
 
         private const string MONGODB_USERNAME = "mongo";
         private const string MONGODB_PASSWORD = "admin";
@@ -24,7 +25,7 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup
         public class TestSubstituteModels
         {
             public IProcessClient? ProcessClient { get; set; } = null;
-            public IElasticClient? ElasticClient { get; set; }
+            public ElasticsearchClient? ElasticClient { get; set; }
         }
 
         public TestContainersFixture()
@@ -70,22 +71,21 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup
             return serviceCollection;
         }
 
-        private async Task<ElasticClient> InitializeElasticsearchAsync()
+        private async Task<ElasticsearchClient> InitializeElasticsearchAsync()
         {
             if (UseKibanaDebug)
             {
                 return await InitializeElasticsearchWithKibanaAsync();
             }
             await ElasticsearchContainer.StartAsync().ConfigureAwait(false);
-            var elasticClient = new ElasticClient(new ConnectionSettings(new Uri(ElasticsearchContainer.GetConnectionString()))
-                .ServerCertificateValidationCallback(CertificateValidations.AllowAll)
-                .EnableApiVersioningHeader()
-          //      .BasicAuthentication(ELASTIC_USERNAME, ELASTIC_PASSWORD)
-            .EnableDebugMode());
+            var settings = ElasticSearchHelper.GetDefaultSettings(new Uri(ElasticsearchContainer.GetConnectionString()))
+                .EnableDebugMode();
+            var elasticClient = new ElasticsearchClient(settings);
+            
             return elasticClient;
         }
 
-        private async Task<ElasticClient> InitializeElasticsearchWithKibanaAsync()
+        private async Task<ElasticsearchClient> InitializeElasticsearchWithKibanaAsync()
         {
             var network = new NetworkBuilder()
                 .WithName(Guid.NewGuid().ToString("D"))
@@ -102,7 +102,7 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup
 
             var kibanaContainer = new ContainerBuilder()
               .WithName(Guid.NewGuid().ToString("D"))
-              .WithImage("docker.elastic.co/kibana/kibana:8.7.1")
+              .WithImage("docker.elastic.co/kibana/kibana:8.17.3")
               .WithPortBinding(5601, 5601)
               .WithNetwork(network)
               .WithEnvironment("ELASTICSEARCH_HOSTS", $"http://elastic-test-network:9200")
@@ -113,10 +113,10 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup
             await kibanaContainer.StartAsync().ConfigureAwait(false);
 
             var elasticUri = new UriBuilder(Uri.UriSchemeHttp, ElasticsearchContainer.Hostname, ElasticsearchContainer.GetMappedPublicPort(9200)).ToString();
-            var elasticClient = new ElasticClient(new ConnectionSettings(new Uri(elasticUri))
-                .ServerCertificateValidationCallback(CertificateValidations.AllowAll)
-                .EnableApiVersioningHeader()
-            .EnableDebugMode());
+            var settings = ElasticSearchHelper.GetDefaultSettings(new Uri(ElasticsearchContainer.GetConnectionString()))
+                .EnableDebugMode();
+
+            var elasticClient = new ElasticsearchClient(settings);
             return elasticClient;
         }
 

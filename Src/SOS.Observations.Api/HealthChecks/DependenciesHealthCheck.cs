@@ -41,7 +41,6 @@ namespace SOS.Observations.Api.HealthChecks
                     var observationIndexName = _processedObservationRepository.PublicIndexName;
                     var processedDbConfiguration = Settings.ProcessDbConfiguration;
                     var elasticConfiguration = Settings.SearchDbConfiguration;
-                    var identityServerConfiguration = Settings.UserServiceConfiguration.IdentityProvider;
                     var hangfireConfiguration = Settings.HangfireDbConfiguration;
                     var userServiceConfiguration = Settings.UserServiceConfiguration;
                     var esClusterIndex = Math.Min(elasticConfiguration.Clusters.Count() - 1, esActiveIndex);
@@ -51,8 +50,7 @@ namespace SOS.Observations.Api.HealthChecks
                     ("MongoDb", $"{processedDbConfiguration.Hosts.First().Name} ({processedDbConfiguration.DatabaseName})"),
                     ("Hangfire", $"{hangfireConfiguration.Hosts.First().Name} ({hangfireConfiguration.DatabaseName})"),
                     ("Elasticsearch", $"{elasticConfiguration.Clusters.ElementAt(esClusterIndex).Hosts.First()} ({observationIndexName})"),
-                    ("ArtdataUserService",$"{userServiceConfiguration.BaseAddress}"),
-                    ("IdentityServer", $"{identityServerConfiguration.Authority}")
+                    ("ArtdataUserService",$"{userServiceConfiguration.BaseAddress}")
                 };
 
                     string str = string.Join(", ", dependencies.Select(m => $"**{m.Title}**: [{m.Value}]"));

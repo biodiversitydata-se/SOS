@@ -1,4 +1,5 @@
-﻿using Moq;
+﻿using Elastic.Clients.Elasticsearch;
+using Moq;
 using SOS.Lib.JsonConverters;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Filters;
@@ -21,13 +22,13 @@ namespace SOS.Export.LiveIntegrationTests.TestHelpers.Factories
             var stub = new Mock<IProcessedObservationCoreRepository>();
             var observations = LoadObservations(fileName);
             stub
-                .Setup(pdcr => pdcr.GetObservationsBySearchAfterAsync<Observation>(It.IsAny<SearchFilter>(), It.IsAny<string>(), It.IsAny<IEnumerable<object>>()))
+                .Setup(pdcr => pdcr.GetObservationsBySearchAfterAsync<Observation>(It.IsAny<SearchFilter>(), It.IsAny<string>(), It.IsAny<ICollection<FieldValue>>()))
                 .ReturnsAsync(observations);
 
             return stub;
         }
 
-        private static SearchAfterResult<Observation> LoadObservations(string fileName)
+        private static SearchAfterResult<Observation, IReadOnlyCollection<FieldValue>> LoadObservations(string fileName)
         {
             var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             var filePath = Path.Combine(assemblyPath, fileName);
@@ -37,7 +38,7 @@ namespace SOS.Export.LiveIntegrationTests.TestHelpers.Factories
 
             var observations = JsonSerializer.Deserialize<List<Observation>>(str, serializeOptions!);
 
-            return new SearchAfterResult<Observation> { Records = observations };
+            return new SearchAfterResult<Observation, IReadOnlyCollection<FieldValue>> { Records = observations };
         }
     }
 }

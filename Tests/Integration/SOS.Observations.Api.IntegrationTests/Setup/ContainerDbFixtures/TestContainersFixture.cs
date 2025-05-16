@@ -1,10 +1,10 @@
 ﻿using DotNet.Testcontainers.Builders;
 using DotNet.Testcontainers.Containers;
-using Elasticsearch.Net;
+using Elastic.Clients.Elasticsearch;
 using MongoDB.Driver;
-using Nest;
 using SOS.Lib.Database;
 using SOS.Lib.Database.Interfaces;
+using SOS.Lib.Helpers;
 using SOS.Observations.Api.IntegrationTests.Extensions;
 using Testcontainers.Elasticsearch;
 using Testcontainers.MongoDb;
@@ -14,7 +14,7 @@ public class TestContainersFixture : IAsyncLifetime
 {
     private bool UseKibanaDebug;
     private const string ELASTIC_PASSWORD = "elastic";
-    private const string ELASTIC_IMAGE_NAME = "elasticsearch:8.7.1";
+    private const string ELASTIC_IMAGE_NAME = "elasticsearch:8.17.3";
 
     private const string MONGODB_USERNAME = "mongo";
     private const string MONGODB_PASSWORD = "admin";
@@ -25,7 +25,7 @@ public class TestContainersFixture : IAsyncLifetime
     private MongoDbContainer? _mongoDbHarvestDbContainer { get; set; }
     private IProcessClient? _processClient { get; set; }
     private IVerbatimClient? _verbatimClient { get; set; }
-    private IElasticClient? _elasticClient { get; set; }
+    private ElasticsearchClient? _elasticClient { get; set; }
 
     public TestContainersFixture()
     {
@@ -56,7 +56,7 @@ public class TestContainersFixture : IAsyncLifetime
         return serviceCollection;
     }
 
-    private async Task<ElasticClient> InitializeElasticsearchAsync()
+    private async Task<ElasticsearchClient> InitializeElasticsearchAsync()
     {
         if (UseKibanaDebug)
         {
@@ -68,16 +68,16 @@ public class TestContainersFixture : IAsyncLifetime
             .WithCleanUp(true)
             .WithPassword(ELASTIC_PASSWORD)
         .Build();
+
         await _elasticsearchContainer.StartAsync().ConfigureAwait(false);
-        var elasticClient = new ElasticClient(new ConnectionSettings(new Uri(_elasticsearchContainer.GetConnectionString()))
-            .ServerCertificateValidationCallback(CertificateValidations.AllowAll)
-            .EnableApiVersioningHeader()
-        .EnableDebugMode());
+        var elasticUri = new Uri(_elasticsearchContainer.GetConnectionString());
+        var elasticClientSettings = ElasticSearchHelper.GetDefaultSettings(elasticUri).EnableDebugMode();
+        var elasticClient = new ElasticsearchClient(elasticClientSettings);
 
         return elasticClient;
     }
 
-    private async Task<ElasticClient> InitializeElasticsearchWithKibanaAsync()
+    private async Task<ElasticsearchClient> InitializeElasticsearchWithKibanaAsync()
     {
         var network = new NetworkBuilder()
             .WithName(Guid.NewGuid().ToString("D"))
@@ -104,11 +104,9 @@ public class TestContainersFixture : IAsyncLifetime
         await _elasticsearchContainer.StartAsync().ConfigureAwait(false);
         await kibanaContainer.StartAsync().ConfigureAwait(false);
 
-        var elasticUri = new UriBuilder(Uri.UriSchemeHttp, _elasticsearchContainer.Hostname, _elasticsearchContainer.GetMappedPublicPort(9200)).ToString();
-        var elasticClient = new ElasticClient(new ConnectionSettings(new Uri(elasticUri))
-            .ServerCertificateValidationCallback(CertificateValidations.AllowAll)
-            .EnableApiVersioningHeader()
-        .EnableDebugMode());
+        var elasticUri = new UriBuilder(Uri.UriSchemeHttp, _elasticsearchContainer.Hostname, _elasticsearchContainer.GetMappedPublicPort(9200));
+        var elasticClientSettings = ElasticSearchHelper.GetDefaultSettings(elasticUri.Uri).EnableDebugMode();
+        var elasticClient = new ElasticsearchClient(elasticClientSettings);
         return elasticClient;
     }
 

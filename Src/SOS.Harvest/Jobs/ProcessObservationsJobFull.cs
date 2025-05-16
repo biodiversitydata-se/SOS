@@ -1,4 +1,4 @@
-﻿using Elasticsearch.Net;
+﻿using Elastic.Clients.Elasticsearch;
 using Hangfire;
 using Microsoft.Extensions.Logging;
 using SOS.Harvest.Managers;
@@ -160,8 +160,8 @@ namespace SOS.Harvest.Jobs
         /// <returns></returns>
         private async Task<bool> ValidateIndexesAsync()
         {
-            var healthStatus = await _processedObservationRepository.GetHealthStatusAsync(WaitForStatus.Green, 1);
-            if (healthStatus == WaitForStatus.Red)
+            var healthStatus = await _processedObservationRepository.GetHealthStatusAsync(HealthStatus.Green, 1);
+            if (healthStatus == HealthStatus.Red)
             {
                 _logger.LogError("Elastich health status: Red");
                 return false;
@@ -183,12 +183,16 @@ namespace SOS.Harvest.Jobs
                 return false;
             }
 
-            var diskUsagePercent = _processedObservationRepository.GetDiskUsage();
-            if (diskUsagePercent >= 95)
+            var diskUsagePercents = await _processedObservationRepository.GetDiskUsageAsync();
+            foreach(var diskUsagePercent in diskUsagePercents)
             {
-                _logger.LogError($"Validation failed. Current disk usage {diskUsagePercent}%");
-                return false;
+                if (diskUsagePercent.Value >= 95)
+                {
+                    _logger.LogError($"Validation failed. Current disk usage {diskUsagePercent}% dor node: {diskUsagePercent.Key}");
+                    return false;
+                }
             }
+            
 
             var validationTasks = new[]
             {

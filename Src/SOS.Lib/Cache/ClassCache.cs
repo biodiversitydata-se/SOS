@@ -1,9 +1,9 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
+using NetTopologySuite.IO.Converters;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Extensions;
-using SOS.Lib.JsonConverters;
 using SOS.Lib.Models.Cache;
 using System;
 using System.Collections.Generic;
@@ -70,8 +70,7 @@ namespace SOS.Lib.Cache
                 Converters =
                 {
                     new JsonStringEnumConverter(),
-                    new GeoShapeConverter(),
-                    new NetTopologySuite.IO.Converters.GeoJsonConverterFactory()
+                    new GeoJsonConverterFactory()
                 }
             };
         }

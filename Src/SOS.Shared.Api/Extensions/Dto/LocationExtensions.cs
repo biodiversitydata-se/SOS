@@ -1,4 +1,5 @@
-﻿using SOS.Lib.Models.Search.Result;
+﻿using NetTopologySuite.Geometries;
+using SOS.Lib.Models.Search.Result;
 using SOS.Shared.Api.Dtos;
 using SOS.Shared.Api.Dtos.Location;
 using Location = SOS.Lib.Models.Processed.Observation.Location;

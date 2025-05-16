@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using NetTopologySuite.Geometries;
 using SOS.DataStewardship.Api.Contracts.Enums;
 
 namespace SOS.DataStewardship.Api.Contracts.Models
@@ -35,7 +36,7 @@ namespace SOS.DataStewardship.Api.Contracts.Models
         /// Information about the shape and geographic position of the site. It is possible to provide the geographic position of each site in two ways. The geographic position of a line- or polygon-shaped site can thereby be provided both as a point, e.g. the centroid, a corner or the start point (described by methodology), and as a line or polygon with coordinates for the full extent of the site. The geographic position of a point-shaped site is provided as a point.
         /// </summary>        
         [Required]
-        public IGeoShape Emplacement { get; set; }
+        public Geometry Emplacement { get; set; }
 
         /// <summary>
         /// County

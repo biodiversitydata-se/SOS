@@ -10,7 +10,7 @@
 	</PropertyGroup>
 
 	<PropertyGroup>
-		<TargetFramework>net8.0</TargetFramework>
+		<TargetFramework>net9.0</TargetFramework>
 		<TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
 		<TypeScriptToolsVersion>Latest</TypeScriptToolsVersion>
 		<IsPackable>false</IsPackable>
@@ -23,13 +23,13 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Azure.Storage.Blobs" Version="12.23.0" />
-		<PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="8.0.10" />
-		<PackageReference Include="Microsoft.TypeScript.MSBuild" Version="5.7.1">
+		<PackageReference Include="Azure.Storage.Blobs" Version="12.24.0" />
+		<PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="9.0.4" />
+		<PackageReference Include="Microsoft.TypeScript.MSBuild" Version="5.8.3">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="NLog.Web.AspNetCore" Version="5.3.15" />
+		<PackageReference Include="NLog.Web.AspNetCore" Version="5.4.0" />
 	</ItemGroup>
 
 	<ItemGroup>

@@ -7,7 +7,7 @@
     ///     Longitude = X
     ///     Latitude = Y
     /// </remarks>
-    public static class Coordinates
+    public static class TestCoordinates
     {
         public static (
             double Latitude,

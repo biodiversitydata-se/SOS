@@ -2,6 +2,7 @@
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.Search.Result;
 using SOS.Shared.Api.Dtos;
+using System.Text.Json.Nodes;
 
 
 namespace SOS.Shared.Api.Extensions.Dto
@@ -109,10 +110,10 @@ namespace SOS.Shared.Api.Extensions.Dto
                     TotalCount = pagedResult.TotalCount,
                 };
             }
-
-            var dictionaryRecords = records.Cast<IDictionary<string, object>>();
+            
+            var jsonRecords = records.Cast<JsonObject>();
             bool flattenProperties = outputFormat == OutputFormatDto.GeoJsonFlat;
-            string geoJson = GeoJsonHelper.GetFeatureCollectionString(dictionaryRecords, flattenProperties);
+            string geoJson = GeoJsonHelper.GetFeatureCollectionString(jsonRecords, flattenProperties);
             return new GeoPagedResultDto<TRecordDto>
             {
                 Skip = pagedResult.Skip,

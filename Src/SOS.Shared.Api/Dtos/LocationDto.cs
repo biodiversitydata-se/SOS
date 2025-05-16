@@ -1,4 +1,4 @@
-﻿using Nest;
+﻿using NetTopologySuite.Geometries;
 using SOS.Lib.Enums;
 
 namespace SOS.Shared.Api.Dtos
@@ -144,17 +144,17 @@ namespace SOS.Shared.Api.Dtos
         /// <summary>
         ///     Point (WGS84).
         /// </summary>
-        public PointGeoShape Point { get; set; }
+        public Point Point { get; set; }
 
         /// <summary>
         ///     Point with accuracy buffer (WGS84).
         /// </summary>
-        public PolygonGeoShape PointWithBuffer { get; set; }
+        public Geometry PointWithBuffer { get; set; }
 
         /// <summary>
         /// Point with disturbance buffer
         /// </summary>
-        public PolygonGeoShape PointWithDisturbanceBuffer { get; set; }
+        public Geometry PointWithDisturbanceBuffer { get; set; }
 
         /// <summary>
         /// Id of project

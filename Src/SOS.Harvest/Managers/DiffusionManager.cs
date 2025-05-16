@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
-using Nest;
+using NetTopologySuite.Geometries;
 using SOS.Harvest.Managers.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Enums.VocabularyValues;
@@ -82,22 +82,22 @@ namespace SOS.Harvest.Managers
             var newCoordinateUncertaintyInMeters = coordinateUncertaintyInMeters > mod ? coordinateUncertaintyInMeters : mod;
             var diffusedPoint =
                 diffusedUntransformedPoint.Transform(CoordinateSys.SWEREF99_TM, CoordinateSys.WGS84);
-            var diffusedPointWithBuffer = ((NetTopologySuite.Geometries.Point)diffusedPoint).ToCircle(newCoordinateUncertaintyInMeters);
-            PolygonGeoShape diffusedPointWithDisturbanceBuffer = null!;
+            var diffusedPointWithBuffer = diffusedPoint.ToCircle(newCoordinateUncertaintyInMeters);
+            Geometry diffusedPointWithDisturbanceBuffer = null!;
 
             var taxonDisturbanceRadius = observation.Taxon?.Attributes?.DisturbanceRadius ?? 0;
             if (taxonDisturbanceRadius > 0)
             {
-                diffusedPointWithDisturbanceBuffer = (PolygonGeoShape)((NetTopologySuite.Geometries.Point)diffusedPoint).ToCircle(taxonDisturbanceRadius).ToGeoShape();
+                diffusedPointWithDisturbanceBuffer = diffusedPoint.ToCircle(taxonDisturbanceRadius);
             }
 
             // Set location diffused geographical data
             location.DecimalLongitude = diffusedPoint.Coordinate.X;
             location.DecimalLatitude = diffusedPoint.Coordinate.Y;
             location.CoordinateUncertaintyInMeters = newCoordinateUncertaintyInMeters;
-            location.Point = (PointGeoShape)diffusedPoint.ToGeoShape();
+            location.Point = diffusedPoint;
             location.PointLocation = location.Point.ToGeoLocation();
-            location.PointWithBuffer = (PolygonGeoShape)diffusedPointWithBuffer.ToGeoShape();
+            location.PointWithBuffer = diffusedPointWithBuffer;
             location.PointWithDisturbanceBuffer = diffusedPointWithDisturbanceBuffer;
 
             _areaHelper.AddAreaDataToProcessedLocation(observation.Location);

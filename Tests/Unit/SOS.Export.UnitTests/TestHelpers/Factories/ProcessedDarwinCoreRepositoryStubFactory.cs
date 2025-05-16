@@ -1,4 +1,5 @@
-﻿using Moq;
+﻿using Elastic.Clients.Elasticsearch;
+using Moq;
 using SOS.Lib.JsonConverters;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Filters;
@@ -22,40 +23,26 @@ namespace SOS.Export.UnitTests.TestHelpers.Factories
             var stub = new Mock<IProcessedObservationCoreRepository>();
 
             stub.SetupSequence(pdcr => pdcr.GetObservationsBySearchAfterAsync<Observation>(It.IsAny<SearchFilter>(), null, null))
-                .ReturnsAsync(new SearchAfterResult<Observation>
+                .ReturnsAsync(new SearchAfterResult<Observation, IReadOnlyCollection<FieldValue>>
                 {
                     Records = new[] { observation } // return the observation the first call.
                 })
-                .ReturnsAsync(new SearchAfterResult<Observation>
+                .ReturnsAsync(new SearchAfterResult<Observation, IReadOnlyCollection<FieldValue>>
                 {
                     Records = Enumerable.Empty<Observation>()  // return empty the second call. new Observation[0]
                 });
-
-            stub.SetupSequence(pdcr => pdcr.GetObservationsBySearchAfterAsync<Observation>(It.IsAny<SearchFilter>(), It.IsAny<string>(), It.IsAny<IEnumerable<object>>()))
-                .ReturnsAsync(new SearchAfterResult<Observation>
+  
+            stub.SetupSequence(pdcr => pdcr.GetObservationsBySearchAfterAsync<Observation>(It.IsAny<SearchFilter>(), It.IsAny<string>(), It.IsAny<ICollection<FieldValue>>()))
+                .ReturnsAsync(new SearchAfterResult<Observation, IReadOnlyCollection<FieldValue>>
                 {
                     Records = new[] { observation } // return the observation the first call.
                 })
-                .ReturnsAsync(new SearchAfterResult<Observation>
+                .ReturnsAsync(new SearchAfterResult<Observation, IReadOnlyCollection<FieldValue>>
                 {
                     Records = Enumerable.Empty<Observation>()  // return empty the second call. new Observation[0]
                 });
 
             return stub;
-        }
-
-        private static IEnumerable<Observation> LoadObservations(string fileName)
-        {
-            var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            var filePath = Path.Combine(assemblyPath, fileName);
-            var str = File.ReadAllText(filePath, Encoding.UTF8);
-
-            var serializeOptions = new JsonSerializerOptions { DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull };
-            serializeOptions.Converters.Add(new ObjectIdConverter());
-
-            var observations = JsonSerializer.Deserialize<List<Observation>>(str, serializeOptions);
-
-            return observations;
         }
     }
 }

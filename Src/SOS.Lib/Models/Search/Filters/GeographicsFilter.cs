@@ -1,4 +1,4 @@
-﻿using Nest;
+﻿using NetTopologySuite.Geometries;
 using SOS.Lib.Models.Gis;
 using System;
 using System.Collections.Generic;
@@ -16,7 +16,7 @@ namespace SOS.Lib.Models.Search.Filters
         /// </summary>
         public GeographicsFilter()
         {
-            Geometries = new List<IGeoShape>();
+            Geometries = new List<Geometry>();
         }
 
         /// <summary>
@@ -36,7 +36,7 @@ namespace SOS.Lib.Models.Search.Filters
         ///     If point and accuracy is greater tha 0, sightings inside circle (center point + buffer (accuracy)) will be returned
         ///     If polygon, sightings inside polygon will be returned
         /// </summary>
-        public List<IGeoShape> Geometries { get; set; }
+        public List<Geometry> Geometries { get; set; }
 
         /// <summary>
         /// Makes a simple validation of the geometry
@@ -52,9 +52,9 @@ namespace SOS.Lib.Models.Search.Filters
                 foreach (var geom in Geometries)
                 {
                     var valid = geom != null &&
-                                (geom.Type.Equals("Point", StringComparison.CurrentCultureIgnoreCase) &&
+                                (geom.OgcGeometryType.Equals(OgcGeometryType.Point) &&
                                  MaxDistanceFromPoint > 0.0 ||
-                                 new[] { "polygon", "multipolygon" }.Contains(geom.Type.ToLower()));
+                                 new[] { OgcGeometryType.Polygon, OgcGeometryType.MultiPolygon }.Contains(geom.OgcGeometryType));
                     if (!valid)
                     {
                         return valid;

@@ -1,6 +1,4 @@
-﻿using MongoDB.Driver.GeoJsonObjectModel;
-using Nest;
-using NetTopologySuite.Geometries;
+﻿using NetTopologySuite.Geometries;
 using SOS.Harvest.Managers;
 using SOS.Harvest.Managers.Interfaces;
 using SOS.Lib.Configuration.Process;
@@ -50,7 +48,7 @@ namespace SOS.Harvest.Processors
         /// <param name="pointWithBuffer"></param>
         /// <param name="pointWithDisturbanceBuffer"></param>
         /// <param name="coordinateUncertaintyInMeters"></param>
-        private void InitializeLocation(Location location, double? verbatimLongitude, double? verbatimLatitude, CoordinateSys verbatimCoordinateSystem, Point point, PolygonGeoShape? pointWithBuffer, PolygonGeoShape? pointWithDisturbanceBuffer, int? coordinateUncertaintyInMeters)
+        private void InitializeLocation(Location location, double? verbatimLongitude, double? verbatimLatitude, CoordinateSys verbatimCoordinateSystem, Point point, Geometry pointWithBuffer, Geometry pointWithDisturbanceBuffer, int? coordinateUncertaintyInMeters)
         {
             location.Continent = new VocabularyValue { Id = (int)ContinentId.Europe };
             location.CoordinateUncertaintyInMeters = coordinateUncertaintyInMeters;
@@ -65,7 +63,7 @@ namespace SOS.Harvest.Processors
 
             location.DecimalLongitude = Math.Round(point.X, 5);
             location.DecimalLatitude = Math.Round(point.Y, 5);
-            location.Point = point.ToGeoShape() as PointGeoShape;
+            location.Point = point;
             location.PointLocation = point.ToGeoLocation();
 
             location.PointWithBuffer = pointWithBuffer;
@@ -139,7 +137,7 @@ namespace SOS.Harvest.Processors
             var pointWithBuffer = point.ToCircle(coordinateUncertaintyInMeters!.Value);
             var pointWithDisturbanceBuffer = GetPointWithDisturbanceBuffer(point, taxonDisturbanceRadius);
 
-            InitializeLocation(location, verbatimLongitude, verbatimLatitude, verbatimCoordinateSystem, point, pointWithBuffer?.ToGeoShape() as PolygonGeoShape, pointWithDisturbanceBuffer?.ToGeoShape() as PolygonGeoShape, coordinateUncertaintyInMeters);
+            InitializeLocation(location, verbatimLongitude, verbatimLatitude, verbatimCoordinateSystem, point, pointWithBuffer, pointWithDisturbanceBuffer, coordinateUncertaintyInMeters);
         }
 
         /// <summary>
@@ -159,7 +157,7 @@ namespace SOS.Harvest.Processors
             double? verbatimLatitude, 
             CoordinateSys verbatimCoordinateSystem, 
             Point point,
-            GeoJsonGeometry<GeoJson2DCoordinates> pointWithBuffer, 
+            Geometry pointWithBuffer, 
             int? coordinateUncertaintyInMeters, 
             int? taxonDisturbanceRadius)
         {
@@ -170,39 +168,7 @@ namespace SOS.Harvest.Processors
 
             var pointWithDisturbanceBuffer = GetPointWithDisturbanceBuffer(point, taxonDisturbanceRadius);
 
-            InitializeLocation(location, verbatimLongitude, verbatimLatitude, verbatimCoordinateSystem, point, pointWithBuffer?.ToGeoShape() as PolygonGeoShape, pointWithDisturbanceBuffer?.ToGeoShape() as PolygonGeoShape, coordinateUncertaintyInMeters);
-        }
-
-
-        /// <summary>
-        /// Add position data
-        /// </summary>
-        /// <param name="location"></param>
-        /// <param name="verbatimLongitude"></param>
-        /// <param name="verbatimLatitude"></param>
-        /// <param name="verbatimCoordinateSystem"></param>
-        /// <param name="point"></param>
-        /// <param name="pointWithBuffer"></param>
-        /// <param name="coordinateUncertaintyInMeters"></param>
-        /// <param name="taxonDisturbanceRadius"></param>
-        protected void AddPositionData(
-            Location location,
-            double? verbatimLongitude,
-            double? verbatimLatitude,
-            CoordinateSys verbatimCoordinateSystem,
-            Point point,
-            IGeoShape pointWithBuffer,
-            int? coordinateUncertaintyInMeters,
-            int? taxonDisturbanceRadius)
-        {
-            if ((coordinateUncertaintyInMeters ?? 0) == 0)
-            {
-                coordinateUncertaintyInMeters = DataProvider.CoordinateUncertaintyInMeters;
-            }
-
-            var pointWithDisturbanceBuffer = GetPointWithDisturbanceBuffer(point, taxonDisturbanceRadius);
-
-            InitializeLocation(location, verbatimLongitude, verbatimLatitude, verbatimCoordinateSystem, point, (PolygonGeoShape) pointWithBuffer, pointWithDisturbanceBuffer?.ToGeoShape() as PolygonGeoShape, coordinateUncertaintyInMeters);
+            InitializeLocation(location, verbatimLongitude, verbatimLatitude, verbatimCoordinateSystem, point, pointWithBuffer, pointWithDisturbanceBuffer, coordinateUncertaintyInMeters);
         }
 
         /// <summary>

@@ -1,4 +1,4 @@
-﻿using Nest;
+﻿using NetTopologySuite.Geometries;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Models.Shared;
@@ -50,18 +50,19 @@ namespace SOS.Observations.Api.Managers.Interfaces
         Task<byte[]> GetZippedAreaAsync(AreaTypeDto areaType, string featureId, AreaExportFormat format);
 
         /// <summary>
-        /// Get a area geometry
+        /// Get geometry
         /// </summary>
         /// <param name="areaType"></param>
         /// <param name="featureId"></param>
         /// <returns></returns>
-        Task<IGeoShape> GetGeometryAsync(AreaType areaType, string featureId);
+        Task<Geometry> GetGeometryAsync(AreaType areaType, string featureId);
+
 
         /// <summary>
-        /// Get multiple geometries
+        /// Get geometries
         /// </summary>
         /// <param name="areaKeys"></param>
         /// <returns></returns>
-        Task<IEnumerable<IGeoShape>> GetGeometriesAsync(IEnumerable<(AreaType areaType, string featureId)> areaKeys);
+        Task<IEnumerable<Geometry>> GetGeometriesAsync(IEnumerable<(AreaType areaType, string featureId)> areaKeys);
     }
 }

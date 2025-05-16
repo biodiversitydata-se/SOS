@@ -1,6 +1,6 @@
 ﻿using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Managers.Interfaces;
-using IElasticClient = Nest.IElasticClient;
+using Elastic.Clients.Elasticsearch;
 
 namespace SOS.Lib.Managers
 {
@@ -19,6 +19,6 @@ namespace SOS.Lib.Managers
         }
 
         /// <inheritdoc />
-        public IElasticClient[] Clients { get; }
+        public ElasticsearchClient[] Clients { get; }
     }
 }

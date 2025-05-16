@@ -29,7 +29,7 @@ namespace SOS.Observations.Api.EndToEndTests.EndToEndTests.Observations.TaxonAgg
                 Date = new DateFilterDto()
                 {
                     StartDate = new DateTime(1990, 1, 31, 07, 59, 46),
-                    EndDate = new DateTime(2020, 1, 31, 07, 59, 46)
+                    EndDate = DateTime.Now
                 },
                 VerificationStatus = Shared.Api.Dtos.Enum.StatusVerificationDto.BothVerifiedAndNotVerified,
                 OccurrenceStatus = Shared.Api.Dtos.Enum.OccurrenceStatusFilterValuesDto.Present

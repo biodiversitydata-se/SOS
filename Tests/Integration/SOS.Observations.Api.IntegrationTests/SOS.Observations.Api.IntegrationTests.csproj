@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 
@@ -23,22 +23,22 @@
   </ItemGroup>
 
   <ItemGroup>
-	<PackageReference Include="Bogus" Version="35.6.1" />
+	<PackageReference Include="Bogus" Version="35.6.3" />
 	<PackageReference Include="FluentAssertions" Version="[7.0.0]" />
 	<PackageReference Include="NBuilder" Version="6.1.0" />
 	<PackageReference Include="NSubstitute" Version="5.3.0" />
 	<PackageReference Include="LinqStatistics" Version="3.0.1" />
-	<PackageReference Include="Testcontainers" Version="4.0.0" />
-	<PackageReference Include="Testcontainers.Elasticsearch" Version="4.0.0" />
-	<PackageReference Include="Testcontainers.MongoDb" Version="4.0.0" />
-	<PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.10" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
-    <PackageReference Include="xunit" Version="2.9.2" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2">
+	<PackageReference Include="Testcontainers" Version="4.4.0" />
+	<PackageReference Include="Testcontainers.Elasticsearch" Version="4.4.0" />
+	<PackageReference Include="Testcontainers.MongoDb" Version="4.4.0" />
+	<PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="9.0.4" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.0">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="coverlet.collector" Version="6.0.2">
+    <PackageReference Include="coverlet.collector" Version="6.0.4">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>

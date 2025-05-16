@@ -14,7 +14,6 @@ public class TestBase
         PropertyNameCaseInsensitive = true,
         Converters = {
             new JsonStringEnumConverter(),
-            new GeoShapeConverter(),
             new NetTopologySuite.IO.Converters.GeoJsonConverterFactory()
         }
     };

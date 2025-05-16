@@ -19,7 +19,6 @@ using SOS.Lib.Cache;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Database;
 using SOS.Lib.Database.Interfaces;
-using SOS.Lib.JsonConverters;
 using SOS.Lib.Managers;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Middleware;
@@ -44,7 +43,6 @@ using SOS.Shared.Api.Validators;
 using System.Reflection;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Logging.Abstractions;
-using Nest;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Processed;
 using Hangfire;
@@ -55,7 +53,6 @@ using Hangfire.Mongo;
 using Hangfire.Mongo.Migration.Strategies;
 using Hangfire.Mongo.Migration.Strategies.Backup;
 using System.Security.Claims;
-using SOS.Lib.Helpers;
 using System.Collections.Concurrent;
 using Serilog;
 using Microsoft.IdentityModel.JsonWebTokens;
@@ -184,13 +181,13 @@ namespace SOS.Analysis.Api
                         .AllowAnyOrigin()
                     );
                 });
-            }
+            } 
 
             services.AddControllers()
                 .AddJsonOptions(options =>
                 {
-                    options.JsonSerializerOptions.Converters.Add(new GeoShapeConverter());
-                    options.JsonSerializerOptions.Converters.Add(new NetTopologySuite.IO.Converters.GeoJsonConverterFactory());
+                    options.JsonSerializerOptions.Converters.Add(new GeometryConverter());
+                    options.JsonSerializerOptions.Converters.Add(new NetTopologySuite.IO.Converters.GeoJsonConverterFactory()); // Used for FeatureCollections
                     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 });
 
@@ -265,6 +262,8 @@ namespace SOS.Analysis.Api
 
             services.AddSwaggerGen(options =>
                 {
+                    options.MapType<Geometry>(() => new OpenApiSchema { Type = "object" });
+
                     var currentAssembly = Assembly.GetExecutingAssembly();
                     var xmlDocs = currentAssembly.GetReferencedAssemblies()
                         .Union(new AssemblyName[] { currentAssembly.GetName() })
@@ -380,8 +379,8 @@ namespace SOS.Analysis.Api
             services.AddSingleton<ICache<string, ProcessedConfiguration>, ProcessedConfigurationCache>();
             services.AddSingleton<IClassCache<TaxonListSetsById>, ClassCache<TaxonListSetsById>>();
             services.AddSingleton<IClassCache<TaxonTree<IBasicTaxon>>, ClassCache<TaxonTree<IBasicTaxon>>>();
-            var clusterHealthCache = new ClassCache<ConcurrentDictionary<string, ClusterHealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<string, ClusterHealthResponse>>>()) { CacheDuration = TimeSpan.FromMinutes(2) };
-            services.AddSingleton<IClassCache<ConcurrentDictionary<string, ClusterHealthResponse>>>(clusterHealthCache);
+            var clusterHealthCache = new ClassCache<ConcurrentDictionary<string, HealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<string, HealthResponse>>>()) { CacheDuration = TimeSpan.FromMinutes(2) };
+            services.AddSingleton<IClassCache<ConcurrentDictionary<string, HealthResponse>>>(clusterHealthCache);
             services.AddSingleton<SortableFieldsCache>();
 
             // Add managers            
@@ -425,7 +424,7 @@ namespace SOS.Analysis.Api
                         .UseSimpleAssemblyNameTypeSerializer()
                         .UseRecommendedSerializerSettings(m =>
                         {
-                            m.Converters.Add(new NewtonsoftGeoShapeConverter());
+                            m.Converters.Add(new NetTopologySuite.IO.Converters.GeometryConverter());
                             m.Converters.Add(new StringEnumConverter());
                         })
                         .UseMongoStorage(new MongoClient(mongoConfiguration.GetMongoDbSettings()),

@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
-using Nest;
-using SOS.Lib.JsonConverters;
+using NetTopologySuite.Geometries;
 using SOS.Shared.Api.Dtos.Filter;
 using System;
 using System.IO;
@@ -22,7 +21,6 @@ namespace SOS.Observations.Api.Middleware
             PropertyNameCaseInsensitive = true,
             Converters = {
                 new JsonStringEnumConverter(),
-                new GeoShapeConverter(),
                 new NetTopologySuite.IO.Converters.GeoJsonConverterFactory()
             }
         };
@@ -62,7 +60,7 @@ namespace SOS.Observations.Api.Middleware
 
                             if (body.Length > ApplicationInsightsMaxSize && searchFilter?.Geographics?.Geometries != null && searchFilter.Geographics.Geometries.Any())
                             {
-                                searchFilter.Geographics.Geometries = [ new PointGeoShape(new GeoCoordinate(-1, -1)) ];
+                                searchFilter.Geographics.Geometries = [ new Point(-1, -1) ];
                                 body = JsonSerializer.Serialize(searchFilter, jsonSerializerOptions);
                             }
                         }

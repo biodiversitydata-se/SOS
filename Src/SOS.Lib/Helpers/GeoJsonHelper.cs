@@ -1,5 +1,4 @@
-﻿using Nest;
-using NetTopologySuite.Features;
+﻿using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Processed.Observation;
@@ -7,6 +6,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace SOS.Lib.Helpers
 {
@@ -182,7 +182,7 @@ namespace SOS.Lib.Helpers
             }
         }
 
-        public static string GetFeatureCollectionString(IEnumerable<IDictionary<string, object>> records, bool flattenProperties)
+        public static string GetFeatureCollectionString(IEnumerable<JsonObject> records, bool flattenProperties)
         {
             var featureCollection = GetFeatureCollection(records, flattenProperties);
             var geoJsonWriter = new NetTopologySuite.IO.GeoJsonWriter();
@@ -190,7 +190,7 @@ namespace SOS.Lib.Helpers
             return strJson;
         }
 
-        public static FeatureCollection GetFeatureCollection(IEnumerable<IDictionary<string, object>> records, bool flattenProperties)
+        public static FeatureCollection GetFeatureCollection(IEnumerable<JsonObject> records, bool flattenProperties)
         {
             var featureCollection = new FeatureCollection();
 
@@ -201,96 +201,155 @@ namespace SOS.Lib.Helpers
             }
 
             return featureCollection;
-        }
+        }        
 
-        public static Feature GetFeature(IDictionary<string, object> record, bool flattenProperties, GeoJsonGeometryType geometryType = GeoJsonGeometryType.Point)
+        public static Feature GetFeature(JsonNode record, bool flattenProperties, GeoJsonGeometryType geometryType = GeoJsonGeometryType.Point)
         {
             Geometry geometry = null;
-
-            if (record.TryGetValue(nameof(Observation.Location).ToLower(),
-                out var locationObject))
+                        
+            if (record is JsonObject obj &&
+                obj.TryGetPropertyValue(nameof(Observation.Location).ToLower(), out JsonNode locationNode))
             {
-                var locationDictionary = locationObject as IDictionary<string, object>;
                 if (geometryType == GeoJsonGeometryType.Point)
-                {
-                    var decimalLatitude = (double)locationDictionary["decimalLatitude"];
-                    var decimalLongitude = (double)locationDictionary["decimalLongitude"];
+                {               
+                    var decimalLatitude = locationNode["decimalLatitude"].GetValue<double>();
+                    var decimalLongitude = locationNode["decimalLongitude"].GetValue<double>();
                     geometry = new Point(decimalLongitude, decimalLatitude);
                 }
                 else if (geometryType == GeoJsonGeometryType.PointWithBuffer)
-                {
-                    var str = JsonSerializer.Serialize(locationDictionary["pointWithBuffer"]);
-                    geometry = GeoJsonReader.Read<Polygon>(str);
-                    locationDictionary.Remove("pointWithBuffer"); // Remove from properties. Just need this for geometry.
+                {                    
+                    var str = JsonSerializer.Serialize(locationNode["pointWithBuffer"]);
+                    //var str = locationNode["pointWithBuffer"].ToJsonString();
+                    ((JsonObject)locationNode).Remove("pointWithBuffer"); // Remove from properties. Just need this for geometry.                    
                 }
                 else if (geometryType == GeoJsonGeometryType.PointWithDisturbanceBuffer)
                 {
-                    var str = JsonSerializer.Serialize(locationDictionary["pointWithDisturbanceBuffer"]);
-                    geometry = GeoJsonReader.Read<Polygon>(str);
-                    locationDictionary.Remove("pointWithDisturbanceBuffer"); // Remove from properties. Just need this for geometry.
+                    var str = JsonSerializer.Serialize(locationNode["pointWithDisturbanceBuffer"]);
+                    //var str = locationNode["pointWithDisturbanceBuffer"].ToJsonString();
+                    ((JsonObject)locationNode).Remove("pointWithDisturbanceBuffer"); // Remove from properties. Just need this for geometry.    
                 }
             }
 
-            var attributesDictionary = flattenProperties ? FlattenDictionary(record) : record;
+            var attributesDictionary = flattenProperties ? CreateFlatDictionary(record) : CreateHierarchicalDictionary(record);
             var feature = new Feature(geometry, new AttributesTable(attributesDictionary));
             return feature;
-        }
+        }        
 
-        private static IDictionary<string, object> FlattenDictionary(IDictionary<string, object> dictionary)
-        {
-            Dictionary<string, object> result = new Dictionary<string, object>();
-            FlattenDictionary("", dictionary, result);
+        private static IDictionary<string, object> CreateHierarchicalDictionary(JsonNode record)
+        {            
+            var result = ToHierarchicalDictionary(record) as Dictionary<string, object?>;
             return result;
         }
 
-        private static void FlattenDictionary(
-            string prefix,
-            IDictionary<string, object> sourceDictionary,
-            IDictionary<string, object> resultDictionary)
+        private static object? ToHierarchicalDictionary(JsonNode? node)
         {
-            foreach (var pair in sourceDictionary)
+            switch (node)
             {
-                if (pair.Value is IDictionary<string, object> subDictionary)
-                {
-                    FlattenDictionary(prefix + pair.Key + ".", subDictionary, resultDictionary);
-                }
-                else if (pair.Value is IList<object> list)
-                {
-                    bool isChildrenDictionaries = list.OfType<IDictionary<string, object>>().Any();
-                    if (isChildrenDictionaries)
+                case JsonObject obj:
+                    var dict = new Dictionary<string, object?>();
+                    foreach (var kvp in obj)
                     {
-                        for (int i = 0; i < list.Count; i++)
-                        {
-                            if (list[i] is IDictionary<string, object> subListDictionary)
-                            {
-                                FlattenDictionary($"{prefix}{pair.Key}[{i}].", subListDictionary, resultDictionary);
-                            }
-                        }
+                        dict[kvp.Key] = ToHierarchicalDictionary(kvp.Value);
                     }
-                    else
-                    {
-                        resultDictionary.Add(prefix + pair.Key, pair.Value);
-                    }
-                }
-                else
-                {
-                    resultDictionary.Add(prefix + pair.Key, pair.Value);
-                }
+                    return dict;
+
+                case JsonArray array:
+                    return array.Select(ToHierarchicalDictionary).ToList();
+
+                case JsonValue value:
+                    return ExtractValue(value);
+
+                case null:
+                    return null;
+
+                default:
+                    return node.ToJsonString();
             }
         }
 
-        public static Feature GetFeature(IGeoShape geometry, AttributesTable attributesTable)
+        private static IDictionary<string, object> CreateFlatDictionary(JsonNode record)
         {
-            var geom = geometry.ToGeometry();
-            var feature = new Feature(geom, attributesTable);
-            return feature;
+            Dictionary<string, object> result = new Dictionary<string, object>();
+            PopulateFlatDictionary("", record, result);
+            return result;
         }
 
-        public static string GetFeatureAsGeoJsonString(IGeoShape geometry, AttributesTable attributesTable)
+        private static void PopulateFlatDictionary(
+            string prefix,
+            JsonNode node,
+            IDictionary<string, object?> resultDictionary)
         {
-            var feature = GetFeature(geometry, attributesTable);
-            string strGeoJson = GeoJsonWriter.Write(feature);
-            return strGeoJson;
+            switch (node)
+            {
+                case JsonObject obj:
+                    foreach (var kvp in obj)
+                    {
+                        PopulateFlatDictionary($"{prefix}{kvp.Key}.", kvp.Value, resultDictionary);
+                    }
+                    break;
+
+                case JsonArray array:
+                    for (int i = 0; i < array.Count; i++)
+                    {
+                        PopulateFlatDictionary($"{prefix}[{i}].", array[i], resultDictionary);
+                    }
+                    break;
+
+                case JsonValue value:
+                    resultDictionary[prefix.TrimEnd('.')] = value.ToJsonString();                    
+                    object? actualValue = value.TryGetValue<JsonElement>(out var je)
+                        ? ExtractJsonElementValue(je)
+                        : value.GetValue<object?>();
+                    resultDictionary[prefix.TrimEnd('.')] = actualValue;                    
+                    break;
+
+                case null:
+                    resultDictionary[prefix.TrimEnd('.')] = null;
+                    break;
+            }
+        }
+
+        private static object? ExtractJsonElementValue(JsonElement je)
+        {
+            if (je.ValueKind == JsonValueKind.Number)
+            {
+                if (je.TryGetInt32(out var i)) return i;
+                if (je.TryGetInt64(out var l)) return l;                
+                return je.GetDouble();
+            }
+            
+            return je.ValueKind switch
+            {
+                JsonValueKind.String => je.GetString(),
+                JsonValueKind.True => true,
+                JsonValueKind.False => false,
+                JsonValueKind.Null => null,
+                _ => je.GetValue(false)
+            };
+        }
+
+        private static object? ExtractValue(JsonValue value)
+        {
+            if (value.TryGetValue<JsonElement>(out var je))
+            {
+                if (je.ValueKind == JsonValueKind.Number)
+                {
+                    if (je.TryGetInt32(out var i)) return i;
+                    if (je.TryGetInt64(out var l)) return l;
+                    return je.GetDouble();
+                }
+
+                return je.ValueKind switch
+                {
+                    JsonValueKind.String => je.GetString(),
+                    JsonValueKind.True => true,
+                    JsonValueKind.False => false,
+                    JsonValueKind.Null => null,
+                    _ => je.ToString()
+                };                
+            }
+
+            return value.GetValue<object?>();
         }
 
         public static string GetGridCellId(int gridCellSizeInMeters, int left, int bottom)

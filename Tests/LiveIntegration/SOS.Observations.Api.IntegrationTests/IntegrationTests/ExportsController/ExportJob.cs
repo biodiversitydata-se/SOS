@@ -1,10 +1,8 @@
 ﻿using FluentAssertions;
-using Nest;
 using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.IO;
 using SOS.Lib.Enums;
-using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.JsonConverters;
 using SOS.Shared.Api.Dtos.Filter;
@@ -40,15 +38,14 @@ namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.ExportsCont
             var featureCollection = LoadFeatureCollection(geojsonFilePath);
             var feature = featureCollection[0];
             var geometry = feature.Geometry;
-            var geoShape = geometry.ToGeoShape();
-
+           
             var searchFilter = new SearchFilterDto()
             {
                 Geographics = new GeographicsFilterDto
                 {
-                    Geometries = new List<IGeoShape>()
+                    Geometries = new List<Geometry>()
                     {
-                        geoShape
+                        geometry
                     },
                     ConsiderObservationAccuracy = false
                 },
@@ -89,15 +86,14 @@ namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.ExportsCont
             var featureCollection = LoadFeatureCollection(geojsonFilePath);
             var feature = featureCollection[0];
             var geometry = feature.Geometry;
-            var geoShape = geometry.ToGeoShape();
 
             var searchFilter = new SearchFilterDto()
             {
                 Geographics = new GeographicsFilterDto
                 {
-                    Geometries = new List<IGeoShape>()
+                    Geometries = new List<Geometry>()
                     {
-                        geoShape
+                        geometry
                     },
                     ConsiderObservationAccuracy = false
                 },
@@ -139,7 +135,7 @@ namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.ExportsCont
             var jsonSerializerOptions = new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true,
-                Converters = { new GeoShapeConverter(), new GeoLocationConverter(), new JsonStringEnumConverter() }
+                Converters = { new NetTopologySuite.IO.Converters.GeoJsonConverterFactory(), new GeoLocationConverter(), new JsonStringEnumConverter() }
             };
             var searchFilter = JsonSerializer.Deserialize<SearchFilterDto>(str, jsonSerializerOptions);
 
@@ -177,7 +173,7 @@ namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.ExportsCont
             var jsonSerializerOptions = new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true,
-                Converters = { new GeoShapeConverter(), new GeoLocationConverter(), new JsonStringEnumConverter() }
+                Converters = { new NetTopologySuite.IO.Converters.GeoJsonConverterFactory(), new GeoLocationConverter(), new JsonStringEnumConverter() }
             };
             var searchFilter = JsonSerializer.Deserialize<ExportFilterDto>(str, jsonSerializerOptions);
             FeatureCollection featureCollection = new FeatureCollection();

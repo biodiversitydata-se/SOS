@@ -1,5 +1,4 @@
-﻿using Elasticsearch.Net;
-using Nest;
+﻿using Elastic.Clients.Elasticsearch;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.DataQuality;
@@ -18,15 +17,6 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
     /// </summary>
     public interface IProcessedObservationCoreRepository : IProcessRepositoryBase<Observation, string>
     {
-        /// <summary>
-        ///  Add many items
-        /// </summary>
-        /// <param name="observations"></param>
-        /// <param name="protectedIndex"></param>
-        /// <param name="refreshIndex"></param>
-        /// <returns></returns>
-        int AddMany(IEnumerable<Observation> observations, bool protectedIndex, bool refreshIndex = false);
-
         /// <summary>
         ///  Add many items
         /// </summary>
@@ -101,11 +91,6 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// <returns></returns>
         Task<DataQualityReport> GetDataQualityReportAsync(string organismGroup);
 
-        /// <summary>
-        /// Get current disk usage
-        /// </summary>
-        /// <returns></returns>
-        int GetDiskUsage();
 
         /// <summary>
         /// Get aggregation in metric tiles 
@@ -124,7 +109,7 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
             MetricCoordinateSys metricCoordinateSys,
             bool skipAuthorizationFilters = false,
             int? maxBuckets = null,
-            CompositeKey afterKey = null,
+            IReadOnlyDictionary<string, FieldValue> afterKey = null,
             TimeSpan? timeout = null);
 
         /// <summary>
@@ -133,8 +118,8 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// <param name="waitForStatus"></param>
         /// <param name="waitForSeconds"></param>
         /// <returns></returns>
-        Task<WaitForStatus> GetHealthStatusAsync(WaitForStatus waitForStatus, int waitForSeconds);
-
+        Task<HealthStatus> GetHealthStatusAsync(HealthStatus waitForStatus, int waitForSeconds);
+        
         /// <summary>
         /// Get latest data modified date for passed provider 
         /// </summary>
@@ -171,6 +156,18 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         Task<IEnumerable<Observation>> GetObservationsAsync(IEnumerable<string> occurrenceIds, bool protectedIndex);
 
         /// <summary>
+        /// Get observations by scroll
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="take"></param>
+        /// <param name="scrollId"></param>
+        /// <returns></returns>
+        Task<ScrollResult<T>> GetObservationsByScrollAsync<T>(
+            SearchFilter filter,
+            int take,
+            string scrollId) where T : class;
+
+        /// <summary>
         /// Get all project id's matching filter
         /// </summary>
         /// <param name="filter"></param>
@@ -182,41 +179,36 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// </summary>
         /// <param name="filter"></param>
         /// <param name="pointInTimeId"></param>
-        /// <param name="searchAfter"></param>
+        /// <param name="afterKey"></param>
         /// <returns></returns>
-        Task<SearchAfterResult<ExtendedMeasurementOrFactRow>> GetMeasurementOrFactsBySearchAfterAsync(
-            SearchFilterBase filter,
-            string pointInTimeId = null,
-            IEnumerable<object> searchAfter = null);
+        Task<SearchAfterResult<ExtendedMeasurementOrFactRow, IReadOnlyCollection<FieldValue>>> GetMeasurementOrFactsBySearchAfterAsync(
+           SearchFilterBase filter,
+           string pointInTimeId = null,
+           IReadOnlyCollection<FieldValue> afterKey = null);
 
         /// <summary>
         /// Get multimedia  by using search after
         /// </summary>
         /// <param name="filter"></param>
         /// <param name="pointInTimeId"></param>
-        /// <param name="searchAfter"></param>
+        /// <param name="afterKey"></param>
         /// <returns></returns>
-        Task<SearchAfterResult<SimpleMultimediaRow>> GetMultimediaBySearchAfterAsync(
+        Task<SearchAfterResult<SimpleMultimediaRow, IReadOnlyCollection<FieldValue>>> GetMultimediaBySearchAfterAsync(
             SearchFilterBase filter,
             string pointInTimeId = null,
-            IEnumerable<object> searchAfter = null);
+            IReadOnlyCollection<FieldValue> afterKey = null);
 
         /// <summary>
         /// Get observations by using search after
         /// </summary>
         /// <param name="filter"></param>
         /// <param name="pointInTimeId"></param>
-        /// <param name="searchAfter"></param>
+        /// <param name="afterKey"></param>
         /// <returns></returns>
-        Task<SearchAfterResult<T>> GetObservationsBySearchAfterAsync<T>(
-            SearchFilter filter,
-            string pointInTimeId = null,
-            IEnumerable<object> searchAfter = null);
-
-        Task<ScrollResult<dynamic>> GetObservationsByScrollAsync(
-            SearchFilter filter,
-            int take,
-            string scrollId);
+        Task<SearchAfterResult<T, IReadOnlyCollection<FieldValue>>> GetObservationsBySearchAfterAsync<T>(
+             SearchFilter filter,
+             string pointInTimeId = null,
+             ICollection<FieldValue> afterKey = null);
 
         /// <summary>
         /// Get provider meta data
@@ -342,7 +334,7 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// <param name="take"></param>
         /// <param name="getAllFields">If true all observation fields will be retrieved.</param>
         /// <returns></returns>
-        Task<PagedResult<dynamic>> GetChunkAsync(SearchFilter filter, int skip, int take, bool getAllFields = false);
+        Task<PagedResult<T>> GetChunkAsync<T>(SearchFilter filter, int skip, int take, bool getAllFields = false) where T : class;
 
         /// <summary>
         /// Gets a single observation
@@ -351,7 +343,7 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// <param name="filter"></param>
         /// <param name="getAllFields">If true all observation fields will be retrieved.</param>
         /// <returns></returns>
-        Task<dynamic> GetObservationAsync(string occurrenceId, SearchFilter filter, bool getAllFields = false);
+        Task<T> GetObservationAsync<T>(string occurrenceId, SearchFilter filter, bool getAllFields = false) where T : class;
 
         /// <summary>
         /// Get a list of sortable fields
@@ -380,6 +372,12 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// <param name="useScript">If aggregation is made on mandatory field, you don't need to aggregate on script field. 
         /// Setting this to false will make a faster aggregation, but empty value and null will be handled different</param>
         /// <returns></returns>
-        Task<SearchAfterResult<dynamic>> AggregateByUserFieldAsync(SearchFilter filter, string aggregationField, bool aggregateOrganismQuantity, int? precisionThreshold, string? afterKey = null, int? take = 10, bool? useScript = true);
+        Task<SearchAfterResult<dynamic, IReadOnlyDictionary<string, FieldValue>>> AggregateByUserFieldAsync(SearchFilter filter,
+            string aggregationField,
+            bool aggregateOrganismQuantity,
+            int? precisionThreshold,
+            IReadOnlyDictionary<string, FieldValue>? afterKey = null,
+            int? take = 10,
+            bool? useScript = true);
     }
 }

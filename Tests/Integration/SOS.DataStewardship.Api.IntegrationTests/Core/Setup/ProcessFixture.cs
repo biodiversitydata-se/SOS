@@ -142,7 +142,6 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup
             }
         }
 
-
         public async Task AddDataToElasticsearchAsync(
             List<Dataset> datasets, 
             List<Lib.Models.Processed.DataStewardship.Event.Event> events, 

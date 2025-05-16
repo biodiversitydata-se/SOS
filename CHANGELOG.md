@@ -1,5 +1,10 @@
 # Changelog
 
+## [2025.05.14]
+
+### `Changed`
+- `taxon.attributes.isInvasiveInSweden` is now including only taxa with `Severe risk` or `High risk`.
+
 ## [2025.04.10]
 
 ### `Fixed`

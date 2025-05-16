@@ -1,4 +1,4 @@
-﻿using Nest;
+﻿using NetTopologySuite.Geometries;
 using System.Collections.Generic;
 
 namespace SOS.Administration.Gui.Dtos
@@ -28,7 +28,7 @@ namespace SOS.Administration.Gui.Dtos
         /// Point or polygon geometry used for search.
         /// If the geometry is a point, then MaxDistanceFromPoint is also used in search.
         /// </summary>
-        public ICollection<IGeoShape> Geometries { get; set; }
+        public ICollection<Geometry> Geometries { get; set; }
 
         /// <summary>
         /// If true, observations that are outside Geometries polygons

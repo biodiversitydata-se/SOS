@@ -15,7 +15,7 @@ internal static class JsonSerializationExtensions
             options.SerializerOptions.PropertyNameCaseInsensitive = true;
             options.SerializerOptions.ReadCommentHandling = JsonCommentHandling.Skip;
             options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
-            options.SerializerOptions.Converters.Add(new GeoShapeConverter());
+            options.SerializerOptions.Converters.Add(new NetTopologySuite.IO.Converters.GeoJsonConverterFactory());
         });
 
         return webApplicationBuilder;

@@ -18,6 +18,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Text;
 using System.Diagnostics;
+using Elastic.Clients.Elasticsearch;
 
 namespace SOS.Lib.IO.Excel
 {
@@ -211,10 +212,10 @@ namespace SOS.Lib.IO.Excel
             csvFileHelper.InitializeWrite(stream, "\t", leaveStreamOpen: true);
             csvFileHelper.WriteRow(propertyFields.Select(pf => ObservationPropertyFieldDescriptionHelper.GetPropertyLabel(pf, propertyLabelType)));
             Models.Search.Result.PagedResult<dynamic> fastSearchResult = null;
-            Models.Search.Result.SearchAfterResult<Observation> searchResult = null;
+            Models.Search.Result.SearchAfterResult<Observation, IReadOnlyCollection<FieldValue>> searchResult = null;
             if (useFastSearch)
             {
-                fastSearchResult = await _processedObservationRepository.GetChunkAsync(filter, 0, 10000);
+                fastSearchResult = await _processedObservationRepository.GetChunkAsync<dynamic>(filter, 0, 10000);
             }
             else
             {
@@ -262,7 +263,7 @@ namespace SOS.Lib.IO.Excel
 
                 // Get next batch of observations.                
                 searchResult = await _processedObservationRepository.GetObservationsBySearchAfterAsync<Observation>(
-                    filter, searchResult.PointInTimeId, searchResult.SearchAfter);                                
+                    filter, searchResult.PointInTimeId, searchResult.SearchAfter?.ToArray());                                
             }
 
             searchResult = null;

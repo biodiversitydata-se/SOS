@@ -1,10 +1,10 @@
-﻿using FluentAssertions;
+﻿using Elastic.Clients.Elasticsearch.Cluster;
+using FluentAssertions;
 using Hangfire;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
-using Nest;
 using SOS.Export.Managers;
 using SOS.Export.Services.Interfaces;
 using SOS.Lib.Cache;
@@ -79,7 +79,7 @@ namespace SOS.Export.LiveIntegrationTests.Managers
                 elasticConfiguration,
                 new ProcessedConfigurationCache(processedConfigurationRepository, new MemoryCache(new MemoryCacheOptions()), new NullLogger<ProcessedConfigurationCache>()),
                 new Mock<ITaxonManager>().Object,
-                new ClassCache<ConcurrentDictionary<string, ClusterHealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<string, ClusterHealthResponse>>>()),
+                new ClassCache<ConcurrentDictionary<string, HealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<string, HealthResponse>>>()),
                 new Mock<ILogger<ProcessedObservationCoreRepository>>().Object);
             var projectInfoRepository = new ProjectInfoRepository(processClient, new NullLogger<ProjectInfoRepository>());
             var projectInfoCache = new ProjectCache(projectInfoRepository, new MemoryCache(new MemoryCacheOptions()), new NullLogger<ProjectCache>());

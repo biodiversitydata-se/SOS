@@ -1,4 +1,4 @@
-﻿using Nest;
+﻿using NetTopologySuite.Geometries;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Models.Shared;
@@ -44,21 +44,22 @@ namespace SOS.Lib.Cache.Interfaces
         /// <param name="areaType"></param>
         /// <param name="featureId"></param>
         /// <returns></returns>
-        Task<IGeoShape> GetGeometryAsync(AreaType areaType, string featureId);
+        Task<Geometry> GetGeometryAsync(AreaType areaType, string featureId);
 
         /// <summary>
         /// Get multiple geometries
         /// </summary>
         /// <param name="areaKeys"></param>
         /// <returns></returns>
-        Task<IEnumerable<IGeoShape>> GetGeometriesAsync(IEnumerable<(AreaType areaType, string featureId)> areaKeys);
+        Task<IEnumerable<Geometry>> GetGeometriesAsync(IEnumerable<(AreaType areaType, string featureId)> areaKeys);
 
         /// <summary>
         /// Get bounding box geometries
         /// </summary>
         /// <param name="areaKeys"></param>
         /// <returns></returns>
-        Task<IDictionary<(AreaType areaType, string featureId), IGeoShape>> GetBBoxGeometriesAsync(
+        Task<IDictionary<(AreaType areaType, string featureId), Geometry>> GetBBoxGeometriesAsync(
            IEnumerable<(AreaType areaType, string featureId)> areaKeys);
+        
     }
 }

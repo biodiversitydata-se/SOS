@@ -24,9 +24,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using OfficeOpenXml;
 using SOS.Lib.Models.Search.Enums;
-using Nest;
-using SOS.Shared.Api.Dtos.Enum;
+using NetTopologySuite.Geometries;
+using System.Text.Json.Nodes;
 using NetTopologySuite.Features;
+using SOS.Shared.Api.Dtos.Enum;
 
 namespace SOS.Observations.Api.Managers
 {
@@ -53,17 +54,16 @@ namespace SOS.Observations.Api.Managers
             return await _processedObservationRepository.GetProvinceCountAsync(filter);
         }
 
-        private async Task PostProcessObservations(SearchFilter filter, ProtectionFilter protectionFilter, IEnumerable<dynamic> processedObservations, string cultureCode)
+        private async Task<IEnumerable<JsonObject>> PostProcessObservationsAsync(SearchFilter filter, ProtectionFilter protectionFilter, IEnumerable<JsonObject> observations, string cultureCode)
         {
-            if (!processedObservations?.Any() ?? true)
+            if (!observations.Where(o => o != null)?.Any() ?? true)
             {
-                return;
+                return Array.Empty<JsonObject>();
             }
 
             try
             {
                 var occurenceIds = new HashSet<string>();
-                var observations = processedObservations.Cast<IDictionary<string, object>>().ToList();
                 LocalDateTimeConverterHelper.ConvertToLocalTime(observations);
 
                 // Resolve vocabulary values.
@@ -71,10 +71,11 @@ namespace SOS.Observations.Api.Managers
 
                 foreach (var obs in observations)
                 {
+                    var sensitive = (bool?)obs["sensitive"];
+                    var occurrenceObject = obs["occurrence"];
                     if (!protectionFilter.Equals(ProtectionFilter.Public) &&
-                        obs.TryGetValue(nameof(Observation.Sensitive).ToLower(), out var sensitive) &&
-                        obs.TryGetValue(nameof(Observation.Occurrence).ToLower(), out var occurrenceObject)
-                    )
+                        sensitive.HasValue &&
+                        occurrenceObject != null)
                     {
                         if (((bool)sensitive) && occurrenceObject is IDictionary<string, object> occurrenceDictionary && occurrenceDictionary.TryGetValue("occurrenceId", out var occurenceId))
                         {
@@ -107,209 +108,14 @@ namespace SOS.Observations.Api.Managers
                 }
 
                 await _generalizationResolver.ResolveGeneralizedObservationsAsync(filter, observations);
+
+                return observations;
             }
             catch (Exception e)
             {
                 _logger.LogError(e, "Error in postprocessing observations");
                 throw;
             }
-        }
-
-        private async Task ResolveGeneralizedObservations(SearchFilter filter, List<IDictionary<string, object>> observations)
-        {
-            try
-            {
-                List<IDictionary<string, object>> generalizedObservations = GetGeneralizedObservations(observations);
-                var generalizedOccurrenceIds = GetOccurrenceIds(generalizedObservations);
-                var protectedFilter = filter.Clone();
-                protectedFilter.ExtendedAuthorization.ProtectionFilter = ProtectionFilter.Sensitive;
-                protectedFilter.IncludeSensitiveGeneralizedObservations = true;
-                protectedFilter.IsPublicGeneralizedObservation = false;
-                protectedFilter.OccurrenceIds = generalizedOccurrenceIds;
-                if (protectedFilter.Output.Fields != null)
-                {
-                    if (!protectedFilter.Output.Fields.Contains("Occurrence.OccurrenceId"))
-                    {
-                        protectedFilter.Output.Fields.Add("Occurrence.OccurrenceId");
-                    }
-                    if (!protectedFilter.Output.Fields.Contains("IsGeneralized"))
-                    {
-                        protectedFilter.Output.Fields.Add("IsGeneralized");
-                    }
-                }
-
-                await _filterManager.PrepareFilterAsync(null, null, protectedFilter); // todo - add role and applicationId
-                var dynamicSensitiveObservationsResult = await _processedObservationRepository.GetChunkAsync(protectedFilter, 0, 1000);
-
-                List<IDictionary<string, object>> sensitiveObservations = dynamicSensitiveObservationsResult.Records.Cast<IDictionary<string, object>>().ToList();
-                UpdateGeneralizedWithRealValues(generalizedObservations, sensitiveObservations);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error when resolving generalized observations");
-            }
-        }
-
-        private void UpdateGeneralizedWithRealValues(List<IDictionary<string, object>> observations, List<IDictionary<string, object>> realObservations)
-        {
-            var obsByOccurrenceId = CreateObservationsByOccurrenceId(observations);
-            var realObsByOccurrenceId = CreateObservationsByOccurrenceId(realObservations);
-            int nrUpdated = 0;
-            foreach (var kvp in realObsByOccurrenceId)
-            {
-                if (obsByOccurrenceId.TryGetValue(kvp.Key, out var observation))
-                {
-                    UpdateGeneralizedWithRealValues(observation, kvp.Value);
-                    nrUpdated++;
-                }
-            }
-
-            _logger.LogInformation($"{nrUpdated} generalized observations were updated with real coordinates.");
-        }
-
-        private Dictionary<string, IDictionary<string, object>> CreateObservationsByOccurrenceId(List<IDictionary<string, object>> observations)
-        {
-            var dict = new Dictionary<string, IDictionary<string, object>>();
-            foreach(var obs in observations)
-            {
-                var occurrenceId = GetValue<string>(obs, "occurrence.occurrenceId");
-                if (occurrenceId != null)
-                {
-                    dict.Add(occurrenceId, obs);
-                }
-            }
-
-            return dict;
-        }
-
-        private T GetValue<T>(IDictionary<string, object> obs, string propertyPath)
-        {
-            var parts = propertyPath
-                .Split(".")
-                .Select(m => m.ToCamelCase());
-
-            var currentVal = obs;
-            foreach (var part in parts)
-            {
-                if (currentVal.TryGetValue(part, out var currentValObject))
-                {
-                    if (currentValObject is IDictionary<string, object>)
-                    {
-                        currentVal = (IDictionary<string, object>)currentValObject;
-                    }
-                    else
-                    {
-                        return (T)currentValObject;
-                    }
-                }
-            }
-
-            return default;
-        }
-
-        private void UpdateValue<T>(IDictionary<string, object> obs, string propertyPath, T newValue)
-        {
-            var parts = propertyPath
-                .Split(".")
-                .Select(m => m.ToCamelCase())
-                .ToList();
-
-            var currentVal = obs;
-            for (int i = 0; i < parts.Count; i++)
-            {
-                string part = parts[i];
-                if (i == parts.Count - 1)
-                {
-                    if (currentVal.ContainsKey(part))
-                    {
-                        currentVal[part] = newValue;
-                    }
-                    return;
-                }
-
-                if (currentVal.TryGetValue(part, out var currentValObject))
-                {
-                    if (currentValObject is IDictionary<string, object>)
-                    {
-                        currentVal = (IDictionary<string, object>)currentValObject;
-                    }
-                }
-            }
-        }
-
-        private void UpdateGeneralizedWithRealValues(IDictionary<string, object> obs, IDictionary<string, object> realObs)
-        {
-            // isGeneralized
-            if (obs.ContainsKey("isGeneralized"))
-            {
-                if (realObs.ContainsKey("isGeneralized"))
-                {
-                    obs["isGeneralized"] = realObs["isGeneralized"];
-                }
-            }
-
-            if (obs.ContainsKey("location"))
-            {
-                if (realObs.ContainsKey("location"))
-                {
-                    obs["location"] = realObs["location"];
-                }
-            }
-
-            // Replace all fields
-            //foreach (var key in obs.Keys)
-            //{
-            //    if (realObs.ContainsKey(key))
-            //    {
-            //        obs[key] = realObs[key];
-            //    }
-            //}
-        }
-
-        private List<string> GetOccurrenceIds(List<IDictionary<string, object>> observations)
-        {
-            var occurrenceIds = new List<string>();
-            foreach (var obs in observations)
-            {
-                // Occurrence
-                if (obs.TryGetValue(nameof(Observation.Occurrence).ToLower(),
-                                out var occurrenceObject))
-                {
-                    var occurrenceDictionary = occurrenceObject as IDictionary<string, object>;
-                    if (occurrenceDictionary.TryGetValue("occurrenceId", out var occurrenceId))
-                    {
-                        occurrenceIds.Add((string)occurrenceId);
-                    }
-                }
-            }
-
-            return occurrenceIds;
-        }
-
-        private List<IDictionary<string, object>> GetGeneralizedObservations(List<IDictionary<string, object>> observations)
-        {
-            var generalizedObservations = new List<IDictionary<string, object>>();
-            try
-            {
-                foreach (var obs in observations)
-                {
-                    if (obs == null) continue;
-                    if (obs.ContainsKey("isGeneralized"))
-                    {
-                        bool isGeneralized = (bool)obs["isGeneralized"];
-                        if (isGeneralized)
-                        {
-                            generalizedObservations.Add(obs);
-                        }
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Error when getting generalized observations");
-            }
-
-            return generalizedObservations;
         }
 
         /// <summary>
@@ -361,7 +167,7 @@ namespace SOS.Observations.Api.Managers
         public int MaxNrElasticSearchAggregationBuckets => _processedObservationRepository.MaxNrElasticSearchAggregationBuckets;
 
         /// <inheritdoc />
-        public async Task<PagedResult<dynamic>> GetChunkAsync(
+        public async Task<PagedResult<JsonObject>> GetChunkAsync(
             int? roleId,
             string authorizationApplicationIdentifier,
             SearchFilter filter,
@@ -371,11 +177,10 @@ namespace SOS.Observations.Api.Managers
             try
             {
                 await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
-                var processedObservations =
-                    await _processedObservationRepository.GetChunkAsync(filter, skip, take);
-                await PostProcessObservations(filter, filter.ExtendedAuthorization.ProtectionFilter, processedObservations.Records, filter.FieldTranslationCultureCode);
-
-                return processedObservations;
+                var response =
+                    await _processedObservationRepository.GetChunkAsync<JsonObject>(filter, skip, take);
+                response.Records = await PostProcessObservationsAsync(filter, filter.ExtendedAuthorization.ProtectionFilter, response.Records, filter.FieldTranslationCultureCode);
+                return response;
             }
             catch (AuthenticationRequiredException)
             {
@@ -394,7 +199,7 @@ namespace SOS.Observations.Api.Managers
         }
 
         /// <inheritdoc />
-        public async Task<ScrollResult<dynamic>> GetObservationsByScrollAsync(
+        public async Task<ScrollResult<JsonObject>> GetObservationsByScrollAsync(
             int? roleId,
             string authorizationApplicationIdentifier,
             SearchFilter filter,
@@ -404,10 +209,9 @@ namespace SOS.Observations.Api.Managers
             try
             {
                 await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
-                var processedObservations =
-                    await _processedObservationRepository.GetObservationsByScrollAsync(filter, take, scrollId);
-                await PostProcessObservations(filter, filter.ExtendedAuthorization.ProtectionFilter, processedObservations.Records, filter.FieldTranslationCultureCode);
-                return processedObservations;
+                var response = await _processedObservationRepository.GetObservationsByScrollAsync<JsonObject>(filter, take, scrollId);
+                response.Records = await PostProcessObservationsAsync(filter, filter.ExtendedAuthorization.ProtectionFilter, response.Records, filter.FieldTranslationCultureCode);
+                return response;
             }
             catch (AuthenticationRequiredException)
             {
@@ -629,10 +433,9 @@ namespace SOS.Observations.Api.Managers
                         if (areaGeographic.GeometryFilter?.Geometries?.Any() ?? false)
                         {
                             // Check if user has access to provided geometries
-                            foreach (var geoShape in areaGeographic.GeometryFilter.Geometries)
+                            foreach (var geometry in areaGeographic.GeometryFilter.Geometries)
                             {
-                                var geometry = geoShape.ToGeometry();
-                                if (!filter.ExtendedAuthorization.ExtendedAreas.Exists(ea => ea.GeographicAreas?.GeometryFilter?.Geometries?.Exists(g => g.ToGeometry().Intersects(geometry)) ?? false))
+                                if (!filter.ExtendedAuthorization.ExtendedAreas.Exists(ea => ea.GeographicAreas?.GeometryFilter?.Geometries?.Exists(g => g.Intersects(geometry)) ?? false))
                                 {
                                     return SignalSearchResult.NoPermissions;
                                 }
@@ -643,13 +446,10 @@ namespace SOS.Observations.Api.Managers
                     {
                         // Check if user has access to provided geometries
                         var authorizedGeometries = filter.ExtendedAuthorization.ExtendedAreas
-                            .SelectMany(ea => ea.GeographicAreas?.GeometryFilter?.Geometries ?? new List<IGeoShape>())
-                            .Select(g => g.ToGeometry())
-                            .ToList();
+                            .SelectMany(ea => ea.GeographicAreas?.GeometryFilter?.Geometries ?? new List<Geometry>()).ToList();
                         bool allOutside = true;
-                        foreach (var geoShape in filter.Location.Geometries.Geometries)
+                        foreach (var geometry in filter.Location.Geometries.Geometries)
                         {
-                            var geometry = geoShape.ToGeometry();
                             var filterGeometryCheck = CheckGeometryPermission(geometry, authorizedGeometries);
                             if (filterGeometryCheck == FilterGeometryCheck.IsInside)
                             {
@@ -667,9 +467,7 @@ namespace SOS.Observations.Api.Managers
                     if (filter.Location.Geometries?.BoundingBox != null)
                     {
                         var authorizedGeometries = filter.ExtendedAuthorization.ExtendedAreas
-                            .SelectMany(ea => ea.GeographicAreas?.GeometryFilter?.Geometries ?? new List<IGeoShape>())
-                            .Select(g => g.ToGeometry())
-                            .ToList();
+                            .SelectMany(ea => ea.GeographicAreas?.GeometryFilter?.Geometries ?? new List<Geometry>()).ToList();
                         var bboxGeometry = filter.Location.Geometries.BoundingBox.ToGeometry();
                         var filterGeometryCheck = CheckGeometryPermission(bboxGeometry, authorizedGeometries);
                         if (filterGeometryCheck == FilterGeometryCheck.IsOutside)
@@ -700,7 +498,7 @@ namespace SOS.Observations.Api.Managers
             }
         }
 
-        private FilterGeometryCheck CheckGeometryPermission(NetTopologySuite.Geometries.Geometry filterGeometry, List<NetTopologySuite.Geometries.Geometry> authorizedGeometries)
+        private FilterGeometryCheck CheckGeometryPermission(Geometry filterGeometry, List<Geometry> authorizedGeometries)
         {
             if (authorizedGeometries.Any(authGeo => authGeo.Contains(filterGeometry))) return FilterGeometryCheck.IsInside;
             if (!authorizedGeometries.Any(authGeo => authGeo.Intersects(filterGeometry))) return FilterGeometryCheck.IsOutside;
@@ -721,7 +519,7 @@ namespace SOS.Observations.Api.Managers
         }
 
         /// <inheritdoc />
-        public async Task<dynamic> GetObservationAsync(int? userId, int? roleId, string authorizationApplicationIdentifier, string occurrenceId, OutputFieldSet outputFieldSet,
+        public async Task<JsonObject> GetObservationAsync(int? userId, int? roleId, string authorizationApplicationIdentifier, string occurrenceId, OutputFieldSet outputFieldSet,
             string translationCultureCode, bool protectedObservations, bool includeInternalFields, bool resolveGeneralizedObservations)
         {
             var protectionFilter = protectedObservations ? ProtectionFilter.Sensitive : ProtectionFilter.Public;
@@ -737,11 +535,9 @@ namespace SOS.Observations.Api.Managers
 
             await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter, "Sighting", null, null, null, false);
 
-            var processedObservation = await _processedObservationRepository.GetObservationAsync(occurrenceId, filter);
-
-            await PostProcessObservations(filter, protectionFilter, processedObservation, translationCultureCode);
-
-            return (processedObservation?.Count ?? 0) == 1 ? processedObservation[0] : null;
+            var observation = await _processedObservationRepository.GetObservationAsync<JsonObject>(occurrenceId, filter);
+            var processedObservations = await PostProcessObservationsAsync(filter, protectionFilter,[observation], translationCultureCode);
+            return processedObservations.FirstOrDefault();
         }
 
         /// <inheritdoc />
@@ -1197,7 +993,7 @@ namespace SOS.Observations.Api.Managers
         {
             public async Task<byte[]> CreateExcelFileAsync(Dictionary<string, ObservationStatistics> statisticsByDate)
             {
-                ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+                ExcelPackage.License.SetNonCommercialOrganization("SLU");
                 using var package = new ExcelPackage();
                 foreach (var item in statisticsByDate)
                 {

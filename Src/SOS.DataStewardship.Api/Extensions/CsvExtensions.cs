@@ -249,9 +249,9 @@ namespace SOS.DataStewardship.Api.Extensions
 
             foreach (var occurrence in occurrences)
             {
-                var point = (PointGeoShape)occurrence.ObservationPoint;
-                var lon = point?.Coordinates.Longitude;
-                var lat = point?.Coordinates.Latitude;
+                var point = occurrence.ObservationPoint;
+                var lon = point?.Coordinate.X;
+                var lat = point?.Coordinate.Y;
 
                 csvFileHelper.WriteRow(new[] {
                     occurrence.OccurrenceID,

@@ -124,8 +124,8 @@ namespace SOS.TestHelpers.Helpers.Builders
         public DwcObservationVerbatimBuilder WithDefaultValues()
         {
             WithGeodeticDatum(CoordinateSys.WGS84.EpsgCode());
-            WithDecimalLatitude(Coordinates.TranasMunicipality.Latitude);
-            WithDecimalLongitude(Coordinates.TranasMunicipality.Longitude);
+            WithDecimalLatitude(TestCoordinates.TranasMunicipality.Latitude);
+            WithDecimalLongitude(TestCoordinates.TranasMunicipality.Longitude);
 
             return this;
         }

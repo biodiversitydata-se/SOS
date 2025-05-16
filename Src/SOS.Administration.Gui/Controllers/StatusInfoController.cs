@@ -1,11 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Elastic.Clients.Elasticsearch;
+using Elastic.Clients.Elasticsearch.Nodes;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using Nest;
 using SOS.Administration.Gui.Models;
-using SOS.Lib.Configuration.Shared;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -19,7 +17,7 @@ namespace SOS.Administration.Gui.Controllers
     {
         private readonly ILogger<StatusInfoController> _logger;
         private MongoClient _mongoClient;
-        private IElasticClient _elasticClient;
+        private ElasticsearchClient _elasticClient;
         private string _mongoSuffix = "";
         private MongoDbConfiguration _mongoConfiguration;
 
@@ -78,31 +76,36 @@ namespace SOS.Administration.Gui.Controllers
         }
         [HttpGet]
         [Route("searchindex")]
-        public SearchIndexInfoDto GetSearchIndexInfo()
+        public async Task<SearchIndexInfoDto> GetSearchIndexInfo()
         {
-            var allocation = _elasticClient.Cat.Allocation();
+            var diskUsage = new Dictionary<string, int>();
+            var response = await _elasticClient.Nodes.StatsAsync(stats => stats.Metric(new Metrics("fs")));
             var info = new SearchIndexInfoDto();
-            if (allocation.IsValid)
+            
+            if (!response.IsValidResponse)
             {
-                var allocations = new List<SearchIndexInfoDto.AllocationInfo>();
-                foreach (var record in allocation.Records)
-                {
-                    if (int.TryParse(record.DiskPercent, out int percentage))
-                    {
-                        allocations.Add(new SearchIndexInfoDto.AllocationInfo()
-                        {
-                            Node = record.Node,
-                            DiskAvailable = record.DiskAvailable,
-                            DiskTotal = record.DiskTotal,
-                            DiskUsed = record.DiskUsed,
-                            Percentage = percentage
-                        });
-                    }
-                }
-                info.Allocations = allocations;
+                return info;
             }
-            return info;
+
+            var allocations = new List<SearchIndexInfoDto.AllocationInfo>();
+            foreach (var node in response.Nodes)
+            {
+                foreach (var data in node.Value.Fs.Data)
+                {
+                    allocations.Add(new SearchIndexInfoDto.AllocationInfo()
+                    {
+                        Node = data.Path,
+                        DiskAvailable = data.FreeInBytes?.ToString(),
+                        DiskTotal = data.TotalInBytes?.ToString(),
+                        DiskUsed = (data.TotalInBytes ?? 0 - data.FreeInBytes ?? 0).ToString(),
+                        Percentage = (int)((data.FreeInBytes ?? 0) / (data.TotalInBytes ?? 1))
+                    });
+                }
+            }
+            info.Allocations = allocations;
+            return info; 
         }
+
         [HttpGet]
         [Route("mongoinfo")]
         public MongoDbInfoDto GetMongoDatabaseInfo()

@@ -1,6 +1,7 @@
 ﻿using SOS.Lib.Configuration.Process;
 using SOS.Lib.Models.Processed.Observation;
 using System.Collections.Generic;
+using System.Text.Json.Nodes;
 
 namespace SOS.Lib.Helpers.Interfaces
 {
@@ -32,7 +33,7 @@ namespace SOS.Lib.Helpers.Interfaces
         /// <param name="processedRecords"></param>
         /// <param name="cultureCode"></param>
         /// <param name="forceResolve">Ignore configuration setting, that can prevent resolve, and force resolve of values.</param>
-        public void ResolveVocabularyMappedValues(IEnumerable<IDictionary<string, object>> processedRecords,
+        public void ResolveVocabularyMappedValues(IEnumerable<JsonNode> processedRecords,
             string cultureCode,
             bool forceResolve = false);
     }

@@ -1,4 +1,4 @@
-﻿using Nest;
+﻿using Elastic.Clients.Elasticsearch;
 
 namespace SOS.Lib.Managers.Interfaces
 {
@@ -10,6 +10,6 @@ namespace SOS.Lib.Managers.Interfaces
         /// <summary>
         /// Elastic search clients
         /// </summary>
-        IElasticClient[] Clients { get; }
+        ElasticsearchClient[] Clients { get; }
     }
 }

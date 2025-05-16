@@ -22,7 +22,6 @@ public class DataStewardshipManager : IDataStewardshipManager
         Converters =
         {
             new JsonStringEnumConverter(),
-            new GeoShapeConverter(),
             new NetTopologySuite.IO.Converters.GeoJsonConverterFactory()
         }
     };
@@ -85,7 +84,7 @@ public class DataStewardshipManager : IDataStewardshipManager
         };
         filter.Output.Fields = _observationEventOutputFields;
 
-        var pageResult = await _processedObservationCoreRepository.GetChunkAsync(filter, 0, 1, true);
+        var pageResult = await _processedObservationCoreRepository.GetChunkAsync<dynamic>(filter, 0, 1, true);
         var observation = pageResult.Records.FirstOrDefault();
         if (observation == null) return null;
 
@@ -275,7 +274,7 @@ public class DataStewardshipManager : IDataStewardshipManager
             records = observationDatasets.Select(m => m.ToDataset()).ToList();
         }
 
-        return new Contracts.Models.PagedResult<Dataset>()
+        return new PagedResult<Dataset>()
         {
             Skip = skip,
             Take = take,
@@ -314,7 +313,7 @@ public class DataStewardshipManager : IDataStewardshipManager
         };
         filter.Output.Fields = _observationOccurrenceOutputFields;
 
-        IEnumerable<dynamic> observations = await _processedObservationCoreRepository.GetObservationAsync(id, filter, true);
+        IEnumerable<dynamic> observations = await _processedObservationCoreRepository.GetObservationAsync<dynamic>(id, filter, true);
         var observation = observations?.FirstOrDefault();
 
         if (observation == null)
@@ -334,7 +333,7 @@ public class DataStewardshipManager : IDataStewardshipManager
         filter.IsPartOfDataStewardshipDataset = true;
         filter.Output.Fields = _observationOccurrenceOutputFields;
         await _filterManager.PrepareFilterAsync(null, null, filter);
-        var pageResult = await _processedObservationCoreRepository.GetChunkAsync(filter, skip, take, true);
+        var pageResult = await _processedObservationCoreRepository.GetChunkAsync<dynamic>(filter, skip, take, true);
         var observations = CastDynamicsToObservations(pageResult.Records);
         var occurrences = observations.Select(x => x.ToOccurrenceModel(responseCoordinateSystem)).ToList();
 

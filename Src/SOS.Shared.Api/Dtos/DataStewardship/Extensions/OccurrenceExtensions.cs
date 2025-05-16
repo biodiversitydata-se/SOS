@@ -1,12 +1,8 @@
-﻿using Nest;
-using SOS.Lib.Enums;
+﻿using SOS.Lib.Enums;
 using SOS.Lib.Enums.VocabularyValues;
+using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Shared.Api.Dtos.DataStewardship.Enums;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 
 namespace SOS.Shared.Api.Dtos.DataStewardship.Extensions
 {
@@ -222,9 +218,9 @@ namespace SOS.Shared.Api.Dtos.DataStewardship.Extensions
 
             foreach (var occurrence in occurrences)
             {
-                var point = (PointGeoShape)occurrence.ObservationPoint;
-                var lon = point?.Coordinates.Longitude;
-                var lat = point?.Coordinates.Latitude;
+                var point = occurrence.ObservationPoint;
+                var lon = point?.Coordinate.X;
+                var lat = point?.Coordinate.Y;
 
                 csvFileHelper.WriteRow(new[] {
                     occurrence.OccurrenceID,
@@ -270,7 +266,7 @@ namespace SOS.Shared.Api.Dtos.DataStewardship.Extensions
             occurrence.Dataset.Identifier = observation?.DataStewardship?.DatasetIdentifier;
             occurrence.IdentificationVerificationStatus = observation?.Identification?.VerificationStatus?.Value;
             occurrence.ObservationCertainty = observation?.Location?.CoordinateUncertaintyInMeters == null ? null : Convert.ToDouble(observation.Location.CoordinateUncertaintyInMeters);
-            occurrence.ObservationPoint = observation?.Location?.Point.ConvertCoordinateSystem(responseCoordinateSystem);
+            occurrence.ObservationPoint = observation?.Location?.Point.Transform(CoordinateSys.WGS84, responseCoordinateSystem);
             occurrence.EventStartDate = observation.Event.StartDate;
             occurrence.EventEndDate = observation.Event.EndDate;
             occurrence.ObservationTime = observation.Event.StartDate == observation.Event.EndDate ? observation.Event.StartDate : null;

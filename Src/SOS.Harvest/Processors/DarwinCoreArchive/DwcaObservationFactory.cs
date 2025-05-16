@@ -178,14 +178,14 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
 
                 double? decimalLongitude = verbatim.DecimalLongitude.ParseDouble() ?? verbatim.VerbatimLongitude.ParseDouble() ?? wktGeometry.Centroid.X;
                 double? decimalLatitude = verbatim.DecimalLatitude.ParseDouble() ?? verbatim.VerbatimLatitude.ParseDouble() ?? wktGeometry.Centroid.Y;
-                var geoShape = wktGeometry.ToGeoShape();
+   
                 AddPositionData(
                     obs.Location,
                     decimalLongitude,
                     decimalLatitude,
                     coordinateSystem,
                     wktGeometry!.Centroid,
-                    geoShape,
+                    wktGeometry,
                     coordinateUncertaintyInMeters,
                     obs.Taxon?.Attributes?.DisturbanceRadius
                 );

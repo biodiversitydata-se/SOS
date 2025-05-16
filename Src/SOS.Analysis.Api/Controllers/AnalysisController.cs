@@ -1,7 +1,6 @@
 ﻿using Hangfire;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Nest;
 using NetTopologySuite.Features;
 using SOS.Analysis.Api.Configuration;
 using SOS.Analysis.Api.Controllers.Interfaces;
@@ -11,7 +10,6 @@ using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Jobs.Export;
 using SOS.Lib.Managers.Interfaces;
-using SOS.Lib.Models.Analysis;
 using SOS.Lib.Models.Export;
 using SOS.Lib.Models.Search.Enums;
 using SOS.Lib.Models.Search.Result;

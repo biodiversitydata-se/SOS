@@ -1,5 +1,4 @@
 ﻿using FluentAssertions;
-using Nest;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers;
 using SOS.Shared.Api.Dtos.Enum;
@@ -10,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
+using NetTopologySuite.Geometries;
 
 namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.ExportsController
 {
@@ -35,17 +35,18 @@ namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.ExportsCont
                 Taxon = new TaxonFilterDto { Ids = new List<int> { TestData.TaxonIds.Otter }, IncludeUnderlyingTaxa = true },
                 Geographics = new GeographicsFilterDto
                 {
-                    Geometries = new List<IGeoShape>()
+                    Geometries = new List<Geometry>()
                     {
-                        new PolygonGeoShape(new List<List<GeoCoordinate>> { new List<GeoCoordinate>
-                            {
-                                new GeoCoordinate(57.92573, 15.07063),
-                                new GeoCoordinate(58.16108, 15.00510),
-                                new GeoCoordinate(58.10148, 14.58003),
-                                new GeoCoordinate(57.93294, 14.64143),
-                                new GeoCoordinate(57.92573, 15.07063)
-                            }
-                        })
+                        new Polygon(new LinearRing(
+                                [
+                                new Coordinate(15.07063, 57.92573),
+                                new Coordinate(15.00510, 58.16108),
+                                new Coordinate(14.58003, 58.10148),
+                                new Coordinate(14.64143, 57.93294),
+                                new Coordinate(15.07063, 57.92573)
+                            ]
+                            )
+                        )
                     },
                     ConsiderObservationAccuracy = true
                 },

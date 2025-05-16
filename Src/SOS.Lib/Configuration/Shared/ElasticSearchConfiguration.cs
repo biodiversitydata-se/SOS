@@ -1,5 +1,6 @@
-﻿using Elasticsearch.Net;
-using Nest;
+﻿using Elastic.Clients.Elasticsearch;
+using Elastic.Transport;
+using SOS.Lib.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +13,7 @@ namespace SOS.Lib.Configuration.Shared
     public class ElasticSearchConfiguration
     {
         private string _indexPrefix;
-
+       
         /// <summary>
         /// Elastic clusters
         /// </summary>
@@ -71,34 +72,29 @@ namespace SOS.Lib.Configuration.Shared
         /// Get client created with current configuration
         /// </summary>
         /// <returns></returns>
-        public IElasticClient[] GetClients()
+        public ElasticsearchClient[] GetClients()
         {
-            
-            var clients = new List<IElasticClient>();
+            var clients = new List<ElasticsearchClient>();
             foreach (var cluster in Clusters)
             {
-                var uris = cluster.Hosts.Select(u => new Uri(u));
-
-                var connectionPool = new StaticConnectionPool(uris);
-                var settings = new ConnectionSettings(connectionPool)
-                    .EnableApiVersioningHeader()
+                var uris = cluster.Hosts.Select(u => new Uri(u))?.ToArray();
+                var settings = ElasticSearchHelper.GetDefaultSettings(uris)
                     .EnableHttpCompression(true)
                     .RequestTimeout(TimeSpan.FromSeconds(RequestTimeout ?? 60))
                     .SniffOnStartup(true)
                     .SniffOnConnectionFault(true)
-                    .SniffLifeSpan(new TimeSpan(0, 30, 0))
-                    .ServerCertificateValidationCallback(CertificateValidations.AllowAll);
-
+                    .SniffLifeSpan(new TimeSpan(0, 30, 0));
+            
                 if (!string.IsNullOrEmpty(UserName) && !string.IsNullOrEmpty(Password))
                 {
-                    settings.BasicAuthentication(UserName, Password);
+                    settings.Authentication(new BasicAuthentication(UserName, Password));
                 }
-
                 if (DebugMode)
                 {
                     settings.EnableDebugMode();
                 }
-                clients.Add(new ElasticClient(settings));
+                
+                clients.Add(new ElasticsearchClient(settings));
             }
 
             return clients.ToArray();

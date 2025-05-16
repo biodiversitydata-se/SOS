@@ -1,5 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
-using Nest;
+﻿using Elastic.Clients.Elasticsearch;
+using Elastic.Clients.Elasticsearch.Cluster;
+using Microsoft.Extensions.Logging;
 using SOS.Lib;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Shared;
@@ -36,34 +37,34 @@ namespace SOS.Observations.Api.LiveIntegrationTests.Repositories
             IElasticClientManager elasticClientManager,
             ElasticSearchConfiguration elasticConfiguration,
             ICache<string, ProcessedConfiguration> processedConfigurationCache,
-            IClassCache<ConcurrentDictionary<string, ClusterHealthResponse>> clusterHealthCache,
+            IClassCache<ConcurrentDictionary<string, HealthResponse>> clusterHealthCache,
             ILogger<ProcessedObservationRepositoryTest> logger) : base(true, elasticClientManager, processedConfigurationCache, elasticConfiguration, clusterHealthCache, logger)
         {
 
         }
 
-        public async Task<SearchAfterResult<Observation>> GetNaturalisChunkAsync(SearchFilterInternal filter, string pointInTimeId = null,
-           IEnumerable<object> searchAfter = null)
+        public async Task<SearchAfterResult<Observation, ICollection<FieldValue>>> GetNaturalisChunkAsync(SearchFilterInternal filter, string pointInTimeId = null,
+           ICollection<FieldValue> searchAfter = null)
         {
             var searchIndex = GetCurrentIndex(filter);
-            var (query, excludeQuery) = GetCoreQueries(filter);
-            var searchResponse = await SearchAfterAsync(searchIndex, new SearchDescriptor<dynamic>()
+            var (queries, excludeQueries) = GetCoreQueries<dynamic>(filter);
+            var searchResponse = await SearchAfterAsync(searchIndex, new SearchRequestDescriptor<dynamic>()
                 .Index(searchIndex)
                 .Query(q => q
                         .Bool(b => b
-                            .MustNot(excludeQuery)
-                            .Filter(query)
+                            .MustNot(excludeQueries.ToArray())
+                            .Filter(queries.ToArray())
                         )
                     )
                 .Source(filter.Output?.Fields.ToProjection(false)),
                 pointInTimeId,
                 searchAfter);
-
-            return new SearchAfterResult<Observation>
+           
+            return new SearchAfterResult<Observation, ICollection<FieldValue>>
             {
                 Records = searchResponse.Documents.ToObservations(),
-                PointInTimeId = searchResponse.PointInTimeId,
-                SearchAfter = searchResponse.Hits?.LastOrDefault()?.Sorts
+                PointInTimeId = searchResponse.PitId,
+                SearchAfter = searchResponse.Hits?.LastOrDefault()?.Sort?.ToCollection()
             };
         }
     }

@@ -10,7 +10,7 @@
       "applicationUrl": "http://localhost:5005"
     },
     "SOS.Administration.Api (Dev)": {
-      "commandName": "IISExpress",
+      "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "swagger",
       "environmentVariables": {
@@ -20,7 +20,7 @@
       "applicationUrl": "http://localhost:5005"
     },
     "SOS.Administration.Api (ST)": {
-      "commandName": "IISExpress",
+      "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "swagger",
       "environmentVariables": {

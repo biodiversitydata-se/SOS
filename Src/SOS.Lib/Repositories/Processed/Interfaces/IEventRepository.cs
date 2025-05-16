@@ -12,13 +12,6 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
     public interface IEventRepository : IProcessRepositoryBase<Event, string>
     {
         /// <summary>
-        ///  Add many items
-        /// </summary>
-        /// <param name="datasets"></param>
-        /// <returns></returns>
-        Task<int> AddManyAsync(IEnumerable<Event> datasets);
-
-        /// <summary>
         /// Clear the collection
         /// </summary>
         /// <returns></returns>

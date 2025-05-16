@@ -1,5 +1,6 @@
 ﻿using Autofac;
 using Autofac.Extensions.DependencyInjection;
+using Elastic.Clients.Elasticsearch.Cluster;
 using Hangfire;
 using Hangfire.Mongo;
 using Hangfire.Mongo.Migration.Strategies;
@@ -131,8 +132,8 @@ namespace SOS.Hangfire.JobServer
                     services.AddMemoryCache();
                     services.AddSingleton<IClassCache<TaxonTree<IBasicTaxon>>, ClassCache<TaxonTree<IBasicTaxon>>>();
                     services.AddSingleton<IClassCache<TaxonListSetsById>, ClassCache<TaxonListSetsById>>();
-                    var clusterHealthCache = new ClassCache<ConcurrentDictionary<string, ClusterHealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<string, ClusterHealthResponse>>>()) { CacheDuration = TimeSpan.FromMinutes(2) };
-                    services.AddSingleton<IClassCache<ConcurrentDictionary<string, ClusterHealthResponse>>>(clusterHealthCache);
+                    var clusterHealthCache = new ClassCache<ConcurrentDictionary<string, HealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<string, HealthResponse>>>()) { CacheDuration = TimeSpan.FromMinutes(2) };
+                    services.AddSingleton<IClassCache<ConcurrentDictionary<string, HealthResponse>>>(clusterHealthCache);
 
                     _hangfireDbConfiguration = hostContext.Configuration.GetSection("HangfireDbConfiguration").Get<HangfireDbConfiguration>();
                     _localHangfireDbConfiguration = hostContext.Configuration.GetSection("LocalHangfireDbConfiguration").Get<HangfireDbConfiguration>();
@@ -144,7 +145,7 @@ namespace SOS.Hangfire.JobServer
                             .UseSimpleAssemblyNameTypeSerializer()
                             .UseRecommendedSerializerSettings(m =>
                             {
-                                m.Converters.Add(new NewtonsoftGeoShapeConverter());
+                                m.Converters.Add(new NetTopologySuite.IO.Converters.GeometryConverter());
                                 m.Converters.Add(new StringEnumConverter());
                             })
                             .UseMongoStorage(new MongoClient(hangfireConfiguration.GetMongoDbSettings()),

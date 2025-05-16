@@ -1,8 +1,8 @@
 ﻿using DwC_A;
+using Elastic.Clients.Elasticsearch.Cluster;
 using Microsoft.ApplicationInsights;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
-using Nest;
 using SOS.Harvest.DarwinCore;
 using SOS.Harvest.DarwinCore.Interfaces;
 using SOS.Harvest.Managers;
@@ -124,8 +124,8 @@ public class LiveDbProcessFixture : IProcessFixture
         serviceCollection.AddSingleton<IEventRepository, EventRepository>();
         serviceCollection.AddSingleton<IClassCache<TaxonTree<IBasicTaxon>>, ClassCache<TaxonTree<IBasicTaxon>>>();
         serviceCollection.AddSingleton<IClassCache<TaxonListSetsById>, ClassCache<TaxonListSetsById>>();
-        var clusterHealthCache = new ClassCache<ConcurrentDictionary<string, ClusterHealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<string, ClusterHealthResponse>>>()) { CacheDuration = TimeSpan.FromMinutes(2) };
-        serviceCollection.AddSingleton<IClassCache<ConcurrentDictionary<string, ClusterHealthResponse>>>(clusterHealthCache);
+        var clusterHealthCache = new ClassCache<ConcurrentDictionary<string, HealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<string, HealthResponse>>>()) { CacheDuration = TimeSpan.FromMinutes(2) };
+        serviceCollection.AddSingleton<IClassCache<ConcurrentDictionary<string, HealthResponse>>>(clusterHealthCache);
         serviceCollection.AddSingleton<ITaxonListRepository, TaxonListRepository>();
         serviceCollection.AddSingleton<ITaxonManager, TaxonManager>();
         serviceCollection.AddSingleton<IProcessedTaxonRepository, ProcessedTaxonRepository>();
@@ -503,7 +503,7 @@ public class LiveDbProcessFixture : IProcessFixture
         {
             await _processedObservationCoreRepository.DeleteAllDocumentsAsync(protectedIndex);
         }
-        _processedObservationCoreRepository.AddMany(observations, protectedIndex, true);
+       await _processedObservationCoreRepository.AddManyAsync(observations, protectedIndex, true);
     }
 
     public DwcaObservationFactory GetDwcaObservationFactory(bool initAreaHelper)

@@ -353,7 +353,7 @@ namespace SOS.Lib.Managers
         {
             public async Task<byte[]> CreateExcelFileAsync(Dictionary<string, RequestStatistics> statisticsByDate)
             {
-                ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+                ExcelPackage.License.SetNonCommercialOrganization("SLU");
                 using var package = new ExcelPackage();
                 if (statisticsByDate != null && statisticsByDate.Count > 0)
                 {
@@ -461,7 +461,7 @@ namespace SOS.Lib.Managers
 
             public async Task<byte[]> CreateStatisticsExcelFile()
             {
-                ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+                ExcelPackage.License.SetNonCommercialOrganization("SLU");
                 using var package = new ExcelPackage();
                 var sheet = package.Workbook.Worksheets.Add("API Usage Statistics");
                 AddHeaders(sheet);

@@ -1,6 +1,6 @@
 ﻿using Asp.Versioning;
 using Asp.Versioning.ApiExplorer;
-using Autofac.Core;
+using Elastic.Clients.Elasticsearch.Cluster;
 using Hangfire;
 using Hangfire.Mongo;
 using Hangfire.Mongo.Migration.Strategies;
@@ -20,22 +20,19 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.OpenApi.Models;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
-using Nest;
+using NetTopologySuite.Geometries;
 using Newtonsoft.Json.Converters;
 using Serilog;
 using SOS.Lib.ActionFilters;
 using SOS.Lib.ApplicationInsights;
 using SOS.Lib.Cache;
 using SOS.Lib.Cache.Interfaces;
-using SOS.Lib.Configuration.Process;
-using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Enums;
@@ -78,7 +75,6 @@ using SOS.Observations.Api.Middleware;
 using SOS.Observations.Api.Repositories;
 using SOS.Observations.Api.Repositories.Interfaces;
 using SOS.Observations.Api.Services.Interfaces;
-using SOS.Shared.Api.Configuration;
 using SOS.Shared.Api.Dtos;
 using SOS.Shared.Api.Utilities.Objects;
 using SOS.Shared.Api.Utilities.Objects.Interfaces;
@@ -264,8 +260,8 @@ namespace SOS.Observations.Api
                     options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
                     options.JsonSerializerOptions.ReadCommentHandling = JsonCommentHandling.Skip;
                     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-                    options.JsonSerializerOptions.Converters.Add(new GeoShapeConverter());
-                    options.JsonSerializerOptions.Converters.Add(new NetTopologySuite.IO.Converters.GeoJsonConverterFactory()); // Is this needed?
+                    options.JsonSerializerOptions.Converters.Add(new GeometryConverter());
+                    options.JsonSerializerOptions.Converters.Add(new NetTopologySuite.IO.Converters.GeoJsonConverterFactory()); // Used for FeatureCollections
                 });
 
             // MongoDB conventions.
@@ -278,6 +274,7 @@ namespace SOS.Observations.Api
                 },
                 t => true);
 
+            // Identity service configuration
             var userServiceConfiguration = Settings.UserServiceConfiguration;
 
             // Authentication
@@ -327,6 +324,8 @@ namespace SOS.Observations.Api
             services.AddSwaggerGen(
                 options =>
                 {
+                    options.MapType<Geometry>(() => new OpenApiSchema { Type = "object" });
+
                     // add a custom operation filters
                     options.OperationFilter<SwaggerDefaultValues>();
                     options.OperationFilter<SwaggerAddOptionalHeaderParameters>();
@@ -433,7 +432,7 @@ namespace SOS.Observations.Api
                         .UseSimpleAssemblyNameTypeSerializer()
                         .UseRecommendedSerializerSettings(m =>
                         {
-                            m.Converters.Add(new NewtonsoftGeoShapeConverter());
+                            m.Converters.Add(new NetTopologySuite.IO.Converters.GeometryConverter());
                             m.Converters.Add(new StringEnumConverter());
                         })
                         .UseMongoStorage(new MongoClient(mongoConfiguration.GetMongoDbSettings()),
@@ -534,8 +533,8 @@ namespace SOS.Observations.Api
             services.AddSingleton<IClassCache<Dictionary<string, CacheEntry<GeoGridResultDto>>>>(geoGridAggregationCache);
             var taxonAggregationInternalCache = new ClassCache<Dictionary<string, CacheEntry<PagedResultDto<TaxonAggregationItemDto>>>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<Dictionary<string, CacheEntry<PagedResultDto<TaxonAggregationItemDto>>>>>()) { CacheDuration = TimeSpan.FromHours(1) };
             services.AddSingleton<IClassCache<Dictionary<string, CacheEntry<PagedResultDto<TaxonAggregationItemDto>>>>>(taxonAggregationInternalCache);
-            var clusterHealthCache = new ClassCache<ConcurrentDictionary<string, ClusterHealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<string, ClusterHealthResponse>>>()) { CacheDuration = TimeSpan.FromMinutes(2) };
-            services.AddSingleton<IClassCache<ConcurrentDictionary<string, ClusterHealthResponse>>>(clusterHealthCache);
+            var clusterHealthCache = new ClassCache<ConcurrentDictionary<string, HealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<string, HealthResponse>>>()) { CacheDuration = TimeSpan.FromMinutes(2) };
+            services.AddSingleton<IClassCache<ConcurrentDictionary<string, HealthResponse>>>(clusterHealthCache);
             services.AddSingleton<SortableFieldsCache>();
 
             // Add managers

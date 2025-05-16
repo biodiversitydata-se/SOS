@@ -10,26 +10,26 @@
 	</PropertyGroup>
 
 	<PropertyGroup>
-		<TargetFramework>net8.0</TargetFramework>
+		<TargetFramework>net9.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Autofac" Version="8.1.1" />
-		<PackageReference Include="CSharpFunctionalExtensions" Version="3.2.0" />
-		<PackageReference Include="Dapper" Version="2.1.35" />
+		<PackageReference Include="Autofac" Version="8.3.0" />
+		<PackageReference Include="CSharpFunctionalExtensions" Version="3.6.0" />
+		<PackageReference Include="Dapper" Version="2.1.66" />
 		<PackageReference Include="EnumExtensions.System.Text.Json" Version="1.2.0" />
-		<PackageReference Include="Hangfire.Core" Version="1.8.16" />
-		<PackageReference Include="JsonDiffPatch.Net" Version="2.3.0" />
-		<PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.2" />
-		<PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.0" />
-		<PackageReference Include="MongoDB.Driver" Version="3.0.0" />
-		<PackageReference Include="NetTopologySuite" Version="2.5.0" />
+		<PackageReference Include="Hangfire.Core" Version="1.8.18" />
+		<PackageReference Include="JsonDiffPatch.Net" Version="2.4.0" />
+		<PackageReference Include="Microsoft.Data.SqlClient" Version="6.0.2" />
+		<PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.4" />
+		<PackageReference Include="MongoDB.Driver" Version="3.4.0" />
+		<PackageReference Include="NetTopologySuite" Version="2.6.0" />
 		<PackageReference Include="NetTopologySuite.IO.GeoJSON" Version="4.0.0" />
 		<PackageReference Include="System.ServiceModel.Duplex" Version="6.0.0" />
-		<PackageReference Include="System.ServiceModel.Http" Version="8.1.0" />
-		<PackageReference Include="System.ServiceModel.NetTcp" Version="8.1.0" />
+		<PackageReference Include="System.ServiceModel.Http" Version="8.1.2" />
+		<PackageReference Include="System.ServiceModel.NetTcp" Version="8.1.2" />
 		<PackageReference Include="System.ServiceModel.Security" Version="6.0.0" />
 	</ItemGroup>
 

@@ -1,8 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
-using Nest;
+using Elastic.Clients.Elasticsearch;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Shared;
-using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Interfaces;
@@ -13,6 +12,11 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Elastic.Clients.Elasticsearch.Cluster;
+using SOS.Lib.Extensions;
+using Elastic.Clients.Elasticsearch.Aggregations;
+using Elastic.Clients.Elasticsearch.IndexManagement;
+using System.Threading;
 
 namespace SOS.Lib.Repositories.Processed
 {
@@ -23,12 +27,15 @@ namespace SOS.Lib.Repositories.Processed
     {
         private readonly IElasticClientManager _elasticClientManager;
         private readonly ICache<string, ProcessedConfiguration> _processedConfigurationCache;
-        protected readonly IClassCache<ConcurrentDictionary<string, ClusterHealthResponse>> _clusterHealthCache;
+        private readonly bool _toggleable;
+        private int _maxDiskUsed;
+        private int _writeCallsSinceLastDiskUsageCheck;
+        protected readonly IClassCache<ConcurrentDictionary<string, HealthResponse>> _clusterHealthCache;
         protected readonly ElasticSearchConfiguration _elasticConfiguration;
         private readonly ElasticSearchIndexConfiguration _elasticSearchIndexConfiguration;
-        private readonly bool _toggleable;
+        
         protected string _id = typeof(TEntity).Name;
-
+         
         /// <summary>
         ///     Disposed
         /// </summary>
@@ -54,11 +61,82 @@ namespace SOS.Lib.Repositories.Processed
             }
         }
 
-        protected IElasticClient Client => ClientCount == 1 ? _elasticClientManager.Clients.FirstOrDefault() : _elasticClientManager.Clients[CurrentInstance];
+        protected enum SourceTypes
+        {
+            Term,
+            GeoTileGrid
+        }
 
-        protected IElasticClient InActiveClient => ClientCount == 1 ? _elasticClientManager.Clients.FirstOrDefault() : _elasticClientManager.Clients[InActiveInstance];
+        /// <summary>
+        /// Add many items to db
+        /// </summary>
+        /// <param name="items"></param>
+        /// <param name="indexName"></param>
+        /// <param name="refreshIndex"></param>
+        /// <returns></returns>
+        protected async Task<int> AddManyAsync(IEnumerable<TEntity> items, string indexName, bool refreshIndex = false)
+        {
+            // Save valid processed data
+            Logger.LogDebug($"Start indexing batch for searching in {indexName} with {items.Count()} items");
+            var indexResult = await WriteToElasticAsync(items, indexName, refreshIndex);
+            Logger.LogDebug($"Finished indexing batch for searching in {indexName}");
+            if (indexResult == null || indexResult.TotalNumberOfFailedBuffers > 0) return 0;
+            return items.Count();
+        }
+
+        protected ElasticsearchClient Client => ClientCount == 1 ? _elasticClientManager.Clients.First() : _elasticClientManager.Clients[CurrentInstance];
+
+        protected ElasticsearchClient InActiveClient => ClientCount == 1 ? _elasticClientManager.Clients.First() : _elasticClientManager.Clients[InActiveInstance];
 
         protected int ClientCount => _elasticClientManager.Clients.Length;
+
+        protected IDictionary<string, CompositeAggregationSource> CreateCompositeTermsAggregationSource(params (string Key, string Term, SortOrder SortOrder)[] sources)
+        {
+            return CreateCompositeTermsAggregationSource(sources.Select(s => (s.Key, s.Term, s.SortOrder, MissingBucket: false, IsScript: false)).ToArray());
+        }
+        protected IDictionary<string, CompositeAggregationSource> CreateCompositeTermsAggregationSource(params (string Key, string Term, SortOrder SortOrder, bool MissingBucket)[] sources)
+        {
+            return CreateCompositeTermsAggregationSource(sources.Select(s => (s.Key, s.Term, s.SortOrder, s.MissingBucket, IsScript: false)).ToArray());
+        }
+
+        protected IDictionary<string, CompositeAggregationSource> CreateCompositeTermsAggregationSource(params (string Key, string Term, SortOrder SortOrder, bool MissingBucket, bool IsScript)[] sources)
+        {
+            var requestParams = sources.Select(s => ((SourceTypes Type, string Key, string Field, SortOrder SortOrder, bool? MissingBucket, bool? IsScript, int? Precision))(Type: SourceTypes.Term, s.Key, Field: s.Term, s.SortOrder, s.MissingBucket, s.IsScript, Precision: null));
+            return CreateCompositeAggregationSource(requestParams.ToArray());
+        }
+
+        protected IDictionary<string, CompositeAggregationSource> CreateCompositeAggregationSource(params (SourceTypes Type, string Key, string Field, SortOrder SortOrder, bool? MissingBucket, bool? IsScript, int? Precision)[] sources)
+        {
+            var response = new Dictionary<string, CompositeAggregationSource>();
+
+            foreach (var source in sources)
+            {
+                response.Add(source.Key, new CompositeAggregationSource
+                {
+                    GeotileGrid = source.Type == SourceTypes.GeoTileGrid ? new CompositeGeoTileGridAggregation
+                    {
+                        Script = source.IsScript ?? false ? new Script
+                        {
+                            Source = source.Field
+                        } : null,
+                        Field = source.IsScript ?? false ? null : source.Field,
+                        Precision = source.Precision,
+                        Order = source.SortOrder
+                    } : null,
+                    Terms = source.Type == SourceTypes.Term ? new CompositeTermsAggregation
+                    {
+                        Script = source.IsScript ?? false ? new Script
+                        {
+                            Source = source.Field
+                        } : null,
+                        Field = source.IsScript ?? false ? null : source.Field,
+                        MissingBucket = source.MissingBucket,
+                        Order = source.SortOrder
+                    } : null
+                });
+            }
+            return response;
+        }
 
         /// <summary>
         ///     Dispose
@@ -79,6 +157,44 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <summary>
+        /// Delete all documents
+        /// </summary>
+        /// <param name="indexName"></param>
+        /// <param name="waitForCompletion"></param>
+        /// <returns></returns>
+        protected async Task<bool> DeleteAllDocumentsAsync(string indexName, bool waitForCompletion = false)
+        {
+            try
+            {
+                var res = await Client.DeleteByQueryAsync<TEntity>(indexName, d => d
+                    .Query(q => q.MatchAll(ma => ma.Boost(1)))
+                    .Refresh(waitForCompletion)
+                    .WaitForCompletion(waitForCompletion)
+                );
+
+                return res.IsValidResponse;
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e.ToString());
+                return false;
+            }
+        }
+
+        protected async Task<bool> DeleteCollectionAsync(string indexName)
+        {
+            try
+            {
+                var res = await Client.Indices.DeleteAsync(indexName);
+                return res.IsValidResponse;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
         ///     Logger
         /// </summary>
         protected readonly ILogger<ProcessRepositoryBase<TEntity, TKey>> Logger;
@@ -96,6 +212,27 @@ namespace SOS.Lib.Repositories.Processed
         /// Index prefix (if any)
         /// </summary>
         protected string IndexPrefix => _elasticConfiguration.IndexPrefix;
+
+        /// <summary>
+        /// Count documents in index
+        /// </summary>
+        /// <param name="indexName"></param>
+        /// <returns></returns>
+        protected async Task<long> IndexCountAsync(string indexName)
+        {
+            try
+            {
+                var countResponse = await Client.CountAsync(indexName);
+
+                countResponse.ThrowIfInvalid();
+                return countResponse.Count;
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e.ToString());
+                return -1;
+            }
+        }
 
         /// <summary>
         /// number of replicas
@@ -123,6 +260,138 @@ namespace SOS.Lib.Repositories.Processed
         protected string ScrollTimeout => _elasticSearchIndexConfiguration.ScrollTimeout;
 
         /// <summary>
+        /// Execute search after query
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="searchIndex"></param>
+        /// <param name="searchDescriptor"></param>
+        /// <param name="pointInTimeId"></param>
+        /// <param name="nextPageKey"></param>
+        /// <returns></returns>
+        protected async Task<SearchResponse<T>> SearchAfterAsync<T>(
+           string searchIndex,
+           SearchRequestDescriptor<T> searchDescriptor,
+           string pointInTimeId = null,
+           ICollection<FieldValue> nextPageKey = null) where T : class
+        {
+            var keepAlive = new Duration(1000 * 60 * 5);
+            if (string.IsNullOrEmpty(pointInTimeId))
+            {
+                var pitResponse = await Client.OpenPointInTimeAsync(searchIndex, pit => pit
+                    .RequestConfiguration(c => c
+                        .RequestTimeout(TimeSpan.FromSeconds(30))
+                    )
+                    .KeepAlive(keepAlive)
+                );
+
+                pitResponse.ThrowIfInvalid();
+
+                pointInTimeId = pitResponse.Id;
+            }
+
+            // Retry policy by Polly
+            var searchResponse = await PollyHelper.GetRetryPolicy(3, 100).ExecuteAsync(async () =>
+            {
+                var queryResponse = await Client.SearchAsync<T>(searchDescriptor
+                   .Indices(searchIndex)
+                   .Sort(s => s.Field("_shard_doc"))
+                   .SearchAfter(nextPageKey)
+                   .Size(ScrollBatchSize)
+                   .TrackTotalHits(new Elastic.Clients.Elasticsearch.Core.Search.TrackHits(false))
+                   .Pit(pointInTimeId, pit => pit.KeepAlive(keepAlive))
+                );
+
+                queryResponse.ThrowIfInvalid();
+
+                return queryResponse;
+            });
+
+            if (!string.IsNullOrEmpty(pointInTimeId) && (searchResponse?.Hits?.Count ?? 0) == 0)
+            {
+                await Client.ClosePointInTimeAsync(pitr => pitr.Id(pointInTimeId));
+            }
+
+            return searchResponse;
+        }
+
+        /// <summary>
+        /// Set index refresh interval
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="duration"></param>
+        /// <returns></returns>
+        protected async Task<bool> SetIndexRefreshIntervalAsync(string index, Duration duration)
+        {
+            var indexState = new IndexState() { Settings = new IndexSettings() };
+            indexState.Settings.RefreshInterval = duration;
+            var setResponse = await Client.Indices.PutSettingsAsync<TEntity>(indexState.Settings, index);
+
+            return setResponse.IsValidResponse;
+        }
+
+        /// <summary>
+        /// Write data to Elastic Search
+        /// </summary>
+        /// <param name="items"></param>
+        /// <param name="indexName"></param>
+        /// <param name="refreshIndex"></param>
+        /// <returns></returns>
+        protected async Task<BulkAllObserver> WriteToElasticAsync(IEnumerable<TEntity> items, string indexName, bool refreshIndex = false)
+        {
+            if (!items.Any())
+            {
+                return null;
+            }
+            // We don't need to check disk space every time
+            if (_maxDiskUsed == 0 || 
+                (_maxDiskUsed < 50 && _writeCallsSinceLastDiskUsageCheck >= 20) ||
+                (_maxDiskUsed < 80 && _writeCallsSinceLastDiskUsageCheck >= 10)
+            )
+            {
+                _writeCallsSinceLastDiskUsageCheck = 0;
+                var percentagesUsed = await GetDiskUsageAsync();
+                foreach (var percentageUsed in percentagesUsed)
+                {
+                    if (percentageUsed.Value > 90)
+                    {
+                        Logger.LogError($"Disk usage too high in cluster, node {percentageUsed.Key}: ({percentageUsed.Value}%), aborting indexing");
+                        return null;
+                    }
+                    _maxDiskUsed = percentageUsed.Value > _maxDiskUsed ? percentageUsed.Value : _maxDiskUsed;
+                    Logger.LogDebug($"Current diskusage in cluster, node {percentageUsed.Key}: ({percentageUsed.Value}%");
+                }
+            }
+            
+            _writeCallsSinceLastDiskUsageCheck++;
+            
+            var count = 0;
+            return Client.BulkAll(items, b => b
+                    .Index(indexName)
+                    // how long to wait between retries
+                    .BackOffTime("30s")
+                    // how many retries are attempted if a failure occurs                        .
+                    .BackOffRetries(2)
+                    // how many concurrent bulk requests to make
+                    .MaxDegreeOfParallelism(Environment.ProcessorCount)
+                    // number of items per bulk request
+                    .Size(WriteBatchSize)
+                    .RefreshOnCompleted(refreshIndex)
+                    .DroppedDocumentCallback((r, o) =>
+                    {
+                        if (r.Error != null)
+                        {
+                            Logger.LogError($"Failed to add {nameof(TEntity)} with id: {o.Id}, Error: {r.Error.Reason}");
+                        }
+                    })
+                )
+                .Wait(TimeSpan.FromHours(1),
+                    next =>
+                    {
+                        Logger.LogDebug($"Indexing item for search:{count += next.Items.Count}");
+                    });
+        }
+
+        /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="toggleable"></param>
@@ -137,7 +406,7 @@ namespace SOS.Lib.Repositories.Processed
             IElasticClientManager elasticClientManager,
             ICache<string, ProcessedConfiguration> processedConfigurationCache,
             ElasticSearchConfiguration elasticConfiguration,
-            IClassCache<ConcurrentDictionary<string, ClusterHealthResponse>> clusterHealthCache,
+            IClassCache<ConcurrentDictionary<string, HealthResponse>> clusterHealthCache,
             ILogger<ProcessRepositoryBase<TEntity, TKey>> logger
         )
         {
@@ -157,6 +426,12 @@ namespace SOS.Lib.Repositories.Processed
             LiveMode = false;
         }
 
+        /// <inheritdoc />
+        public async Task<int> AddManyAsync(IEnumerable<TEntity> items, bool refreshIndex = false)
+        {
+            return await AddManyAsync(items, IndexName, refreshIndex);
+        }
+
         /// <summary>
         ///     Dispose
         /// </summary>
@@ -173,11 +448,62 @@ namespace SOS.Lib.Repositories.Processed
         public byte InActiveInstance => (byte)(ActiveInstance == 0 ? 1 : 0);
 
         /// <inheritdoc />
-        public byte CurrentInstance => LiveMode ? ActiveInstance : InActiveInstance;       
+        public byte CurrentInstance => LiveMode ? ActiveInstance : InActiveInstance;
 
+        /// <inheritdoc />
         public async Task ClearConfigurationCacheAsync()
         {
             await _processedConfigurationCache.ClearAsync();
+        }
+
+        /// <inheritdoc />
+        public async Task<bool> DeleteAllDocumentsAsync(bool waitForCompletion = false)
+        {
+            return await DeleteAllDocumentsAsync(IndexName, waitForCompletion);
+        }
+
+        /// <inheritdoc />
+        public async Task<bool> DeleteCollectionAsync()
+        {
+            return await DeleteCollectionAsync(IndexName);
+        }
+
+        /// <inheritdoc />
+        public async Task<bool> DisableIndexingAsync()
+        {
+            return await SetIndexRefreshIntervalAsync(IndexName, Duration.MinusOne);
+        }
+
+        /// <inheritdoc />
+        public async Task EnableIndexingAsync()
+        {
+            await SetIndexRefreshIntervalAsync(IndexName, new Duration(5000.0));
+        }
+
+        /// <inheritdoc/>
+        public async Task<IDictionary<string, int>> GetDiskUsageAsync()
+        {
+            var diskUsage = new Dictionary<string, int>();
+
+            var response = await Client.Nodes.StatsAsync(s => s.Metric(new Metrics("fs")));
+            if (response.IsValidResponse)
+            {
+                // Get the disk usage from the response
+                foreach (var node in response.Nodes)
+                {
+                    var free = node.Value.Fs.Total.AvailableInBytes ?? 0;
+                    var total = node.Value.Fs.Total.TotalInBytes ?? 1;
+                    diskUsage.Add(node.Key, 100 - (int)Math.Abs(((double)free / (double)total) * 100));
+                }
+            }
+
+            return diskUsage;
+        }
+
+        /// <inheritdoc />
+        public async Task<long> IndexCountAsync()
+        {
+            return await IndexCountAsync(IndexName);
         }
 
         public string IndexName => IndexHelper.GetIndexName<TEntity>(_elasticConfiguration.IndexPrefix, ClientCount == 1, LiveMode ? ActiveInstance : InActiveInstance, false);
@@ -223,11 +549,9 @@ namespace SOS.Lib.Repositories.Processed
         public async Task<List<TEntity>> GetAllAsync(int take = 10000)
         {
             var searchResponse = await Client.SearchAsync<TEntity>(s => s
-                .Index(IndexName)
-                .Query(q => q.MatchAll())
+                .Indices(IndexName)
+                .Query(q => q.MatchAll(q => q.QueryName("GetAllQuery")))
                 .Size(take));
-
-            searchResponse.ThrowIfInvalid();
             return searchResponse.Documents.ToList();
         }
     }

@@ -33,6 +33,31 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DataStewardship", "DataStew
 		..\..\Docs\DataStewardship\search-filter.md = ..\..\Docs\DataStewardship\search-filter.md
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "k8s", "k8s", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+	ProjectSection(SolutionItems) = preProject
+		..\Dockerfile.datastewardship = ..\Dockerfile.datastewardship
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dev", "dev", "{49E9D584-1AD6-4082-AF84-ADECD3C8EAB9}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\devops\k8s\dev\datastewardship\api.yaml = ..\..\devops\k8s\dev\datastewardship\api.yaml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "st", "st", "{2BFFC333-71DA-4C3D-AB4B-D60218BCDE6A}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\devops\k8s\st\datastewardship\api.yaml = ..\..\devops\k8s\st\datastewardship\api.yaml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "prod", "prod", "{9A8F5C5F-BAA7-49AB-9BE9-991578D46619}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\devops\k8s\prod\datastewardship\api.yaml = ..\..\devops\k8s\prod\datastewardship\api.yaml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "local", "local", "{2769BCE1-99A7-4DE5-8EE4-5AE602E37231}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\devops\k8s\local\datastewardship\api.yaml = ..\..\devops\k8s\local\datastewardship\api.yaml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -71,6 +96,11 @@ Global
 		{91ABB4A9-25B6-40EB-975A-EF15E838C544} = {FA6F93ED-7F08-451A-954D-001712177F47}
 		{989F302C-76B5-4628-9CB4-94E1FFC20706} = {4D034C63-2074-4DF4-81EA-ABCE23213A98}
 		{428724B9-0CDB-440A-AE76-A2FE8B44805C} = {989F302C-76B5-4628-9CB4-94E1FFC20706}
+		{02EA681E-C7D8-13C7-8484-4AC65E1B71E8} = {4D034C63-2074-4DF4-81EA-ABCE23213A98}
+		{49E9D584-1AD6-4082-AF84-ADECD3C8EAB9} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{2BFFC333-71DA-4C3D-AB4B-D60218BCDE6A} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{9A8F5C5F-BAA7-49AB-9BE9-991578D46619} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{2769BCE1-99A7-4DE5-8EE4-5AE602E37231} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7FC36558-1827-4EDC-9FAA-4BC1C21B2FE7}

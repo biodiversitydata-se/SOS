@@ -1,7 +1,6 @@
-﻿using Elasticsearch.Net;
+﻿using Elastic.Clients.Elasticsearch;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Logging;
-using Nest;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Managers.Interfaces;
@@ -14,6 +13,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using HealthStatus = Microsoft.Extensions.Diagnostics.HealthChecks.HealthStatus;
 
 namespace SOS.Observations.Api.HealthChecks
 {
@@ -50,7 +50,7 @@ namespace SOS.Observations.Api.HealthChecks
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        protected IElasticClient Client => ClientCount == 1 ? _elasticClientManager.Clients.FirstOrDefault() : _elasticClientManager.Clients[ActiveInstance];
+        protected ElasticsearchClient Client => ClientCount == 1 ? _elasticClientManager.Clients.FirstOrDefault() : _elasticClientManager.Clients[ActiveInstance];
         protected int ClientCount => _elasticClientManager.Clients.Length;
         public byte ActiveInstance => GetConfiguration()?.ActiveInstance ?? 1;
 
@@ -74,38 +74,23 @@ namespace SOS.Observations.Api.HealthChecks
             try
             {
                 StringBuilder sb = new StringBuilder();
-                var client = Client;
-                var health = await client.Cluster.HealthAsync();
-                if (!health.IsValid)
+                var health = await Client.Cluster.HealthAsync();
+                if (!health.IsValidResponse)
                 {
                     _logger.LogError(new Exception(health.DebugInformation), "Elasticsearch health check failed");
                     return new HealthCheckResult(HealthStatus.Degraded, "Elasticsearch health check failed. client.Cluster.HealthAsync() returned invalid response.");
                 }
 
                 sb.Append($"{health.ClusterName}: {health.Status}");
-                var catNodes = await client.Cat.NodesAsync();
-                if (catNodes.IsValid)
-                {
-                    int percent = 0;
-                    foreach (var nodeRecord in catNodes.Records)
-                    {
-                        int parsedPercent = int.Parse(nodeRecord.HeapPercent);
-                        percent = Math.Max(percent, parsedPercent);
-                    }
 
-                    sb.Append($" ({percent}% mem usage)");
-                }
+                var message = await GetHeapUsedPercentMessageAsync(Client);
 
-                string message = sb.ToString();
-                switch (health.Status)
+                return new HealthCheckResult(health.Status switch
                 {
-                    case Health.Green:
-                        return new HealthCheckResult(HealthStatus.Healthy, message);
-                    case Health.Yellow:
-                        return new HealthCheckResult(HealthStatus.Degraded, message);
-                    default:
-                        return new HealthCheckResult(HealthStatus.Unhealthy, message);
-                }
+                    Elastic.Clients.Elasticsearch.HealthStatus.Green => HealthStatus.Healthy,
+                    Elastic.Clients.Elasticsearch.HealthStatus.Yellow => HealthStatus.Degraded,
+                    _ => HealthStatus.Unhealthy
+                }, message);
             }
             catch (Exception e)
             {
@@ -119,14 +104,14 @@ namespace SOS.Observations.Api.HealthChecks
         {
             try
             {
-                List<string> clusterStatuses = new List<string>();
-                Health status = Health.Green;
+                var clusterStatuses = new List<string>();
+                var status = Elastic.Clients.Elasticsearch.HealthStatus.Green;
                 foreach (var client in _elasticClientManager.Clients)
                 {
                     StringBuilder sb = new StringBuilder();
                     bool isActive = Client == client;
                     var health = await client.Cluster.HealthAsync();
-                    if (!health.IsValid)
+                    if (!health.IsValidResponse)
                     {
                         _logger.LogError(new Exception(health.DebugInformation), "Elasticsearch health check failed");
                         return new HealthCheckResult(HealthStatus.Degraded, "Elasticsearch health check failed. client.Cluster.HealthAsync() returned invalid response.");
@@ -138,39 +123,49 @@ namespace SOS.Observations.Api.HealthChecks
                     else
                         sb.Append($"{health.ClusterName}: {health.Status}");
 
-                    var catNodes = await client.Cat.NodesAsync();
-                    if (catNodes.IsValid)
+                    var message = await GetHeapUsedPercentMessageAsync(client);
+                    if (!string.IsNullOrEmpty(message))
                     {
-                        int percent = 0;
-                        foreach (var nodeRecord in catNodes.Records)
-                        {
-                            int parsedPercent = int.Parse(nodeRecord.HeapPercent);
-                            percent = Math.Max(percent, parsedPercent);
-                        }
-
-                        sb.Append($" ({percent}% mem usage)");
+                        clusterStatuses.Add(message);
                     }
-
-                    string message = sb.ToString();
-                    clusterStatuses.Add(message);
                 }
 
                 string resultMessage = string.Join(", ", clusterStatuses);
-                switch (status)
+
+                return new HealthCheckResult(status switch
                 {
-                    case Health.Green:
-                        return new HealthCheckResult(HealthStatus.Healthy, resultMessage);
-                    case Health.Yellow:
-                        return new HealthCheckResult(HealthStatus.Degraded, resultMessage);
-                    default:
-                        return new HealthCheckResult(HealthStatus.Unhealthy, resultMessage);
-                }
+                    Elastic.Clients.Elasticsearch.HealthStatus.Green => HealthStatus.Healthy,
+                    Elastic.Clients.Elasticsearch.HealthStatus.Yellow => HealthStatus.Degraded,
+                    _ => HealthStatus.Unhealthy
+                }, resultMessage);
             }
             catch (Exception e)
             {
                 _logger.LogError(e, "Elasticsearch health check failed");
                 return new HealthCheckResult(HealthStatus.Degraded, $"Elasticsearch health check failed. Message: {e.Message}", e);
             }
+        }
+
+        private async Task<string> GetHeapUsedPercentMessageAsync(ElasticsearchClient client)
+        {
+            
+            var nodeStatsResponse = await client.Nodes.StatsAsync();
+
+            // Check if the response is valid
+            if (nodeStatsResponse.IsValidResponse)
+            {
+                var sb = new StringBuilder();
+                int percent = 0;
+                foreach (var node in nodeStatsResponse.Nodes)
+                {
+                    percent = Math.Max(percent, (byte)(node.Value.Jvm.Mem.HeapUsedPercent ?? 0));
+                }
+                sb.Append($" ({percent}% mem usage)");
+
+                return sb.ToString();
+            }
+
+            return null;
         }
 
 

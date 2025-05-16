@@ -1,19 +1,15 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Nest;
-using SOS.Lib.Configuration.Shared;
-using System;
+﻿using Elastic.Clients.Elasticsearch;
+using Elastic.Clients.Elasticsearch.QueryDsl;
+using SOS.Lib.Extensions;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace SOS.Administration.Gui.Controllers
 {
     public class LogEntry
     {
-        [Text(Name = "log.level")]
         public string Level { get; set; }
         public string Message { get; set; }
-        [Date(Name = "@timestamp")]
         public DateTime Timestamp { get; set; }
         public LogProcess Process { get; set; }
         public LogHost Host { get; set; }
@@ -30,7 +26,6 @@ namespace SOS.Administration.Gui.Controllers
     public class LogError
     {
         public string Message { get; set; }
-        [Text(Name = "stack_trace")]
         public string StackTrace { get; set; }
         public string Type { get; set; }
     }
@@ -64,7 +59,7 @@ namespace SOS.Administration.Gui.Controllers
     public class LogsController : ControllerBase
     {
 
-        private readonly IElasticClient _elasticClient;
+        private readonly ElasticsearchClient _elasticClient;
         private readonly string _indexName = "logs-*";
 
 
@@ -92,61 +87,101 @@ namespace SOS.Administration.Gui.Controllers
             {
                 queryString = "*" + textFilter + "*";
             }
-            var filterAggregationsNames = new List<string>() { "filtered_levels", "filtered_hosts", "filtered_processes" };
+            var queries = new List<Action<QueryDescriptor<LogEntry>>>();
+            queries.TryAddTermsCriteria("log.level.keyword", filterLevels);
+            queries.TryAddTermsCriteria("host.name.keyword", filterHosts);
+            queries.TryAddTermsCriteria("process.name.keyword", filterProcesses);
+            queries.TryAddDateRangeCriteria("timestamp", DateTime.Now.AddMinutes(-dateFilterMinutes), RangeTypes.GreaterThanOrEquals);
+
+            var filtered_levels_queries = new List<Action<QueryDescriptor<LogEntry>>>();
+            filtered_levels_queries.TryAddWildcardCriteria("message", queryString);
+            filtered_levels_queries.TryAddTermsCriteria("host.name.keyword", filterHosts);
+            filtered_levels_queries.TryAddTermsCriteria("process.name.keyword", filterProcesses);
+            filtered_levels_queries.TryAddDateRangeCriteria("timestamp", DateTime.Now.AddMinutes(-dateFilterMinutes), RangeTypes.GreaterThanOrEquals);
+
+            var filtered_hosts_queries = new List<Action<QueryDescriptor<LogEntry>>>();
+            filtered_hosts_queries.TryAddWildcardCriteria("message", queryString);
+            filtered_hosts_queries.TryAddTermsCriteria("log.level.keyword", filterLevels);
+            filtered_hosts_queries.TryAddTermsCriteria("process.name.keyword", filterProcesses);
+            filtered_hosts_queries.TryAddDateRangeCriteria("timestamp", DateTime.Now.AddMinutes(-dateFilterMinutes), RangeTypes.GreaterThanOrEquals);
+
+            var filtered_processes_queries = new List<Action<QueryDescriptor<LogEntry>>>();
+            filtered_processes_queries.TryAddWildcardCriteria("message", queryString);
+            filtered_processes_queries.TryAddTermsCriteria("log.level.keyword", filterLevels);
+            filtered_processes_queries.TryAddTermsCriteria("host.name.keyword", filterHosts);
+            filtered_processes_queries.TryAddDateRangeCriteria("timestamp", DateTime.Now.AddMinutes(-dateFilterMinutes), RangeTypes.GreaterThanOrEquals);
+
             var result = await _elasticClient.SearchAsync<LogEntry>(p => p
-                .Index(_indexName)
+                .Indices(_indexName)
                 .Size(take)
-                .Skip(skip)
+                .From(skip)
                 .Query(q => q
                     .Bool(b => b
-                        .Must(f => f.Wildcard(m => m.Field(ff => ff.Message).Value(queryString)))
-                        .Filter(f => f.Terms(t => t.Field("log.level.keyword").Terms(filterLevels)),
-                                f => f.Terms(t => t.Field("host.name.keyword").Terms(filterHosts)),
-                                f => f.Terms(t => t.Field("process.name.keyword").Terms(filterProcesses)),
-                                f => f.DateRange(t => t.Field(f => f.Timestamp).GreaterThanOrEquals(DateMath.Anchored(DateTime.Now.AddMinutes(-dateFilterMinutes)))))
-                        ))
-                .Aggregations(a => a.Global("global", g => g.Aggregations(aa => aa
-                    .Filter("filtered_levels", f => f
-                        .Filter(ff => ff.Bool(t => t
-                            .Must(f => f.Wildcard(m => m.Field(ff => ff.Message).Value(queryString)))
-                            .Filter(
-                                    f => f.Terms(t => t.Field("host.name.keyword").Terms(filterHosts)),
-                                    f => f.Terms(t => t.Field("process.name.keyword").Terms(filterProcesses)),
-                                    f => f.DateRange(t => t.Field(f => f.Timestamp).GreaterThanOrEquals(DateMath.Anchored(DateTime.Now.AddMinutes(-dateFilterMinutes)))))
-                            ))
-                        .Aggregations(fa => fa
-                            .Terms("Log Levels", tt => tt.Field("log.level.keyword")))
+                        .Must(f => f.Wildcard(m => m.Field(ff => ff.Error.Message).Value(queryString)))
+                        .Filter(queries.ToArray())
+                    )
+                )
+                .Aggregations(a => a
+                    .Add("global", a => a
+                        .Aggregations(a => a
+                            .Add("filtered_levels", a => a
+                                .Filter(f => f
+                                    .Bool(b => b
+                                        .Filter(filtered_levels_queries.ToArray())
+                                    )
+                                )
+                                .Aggregations(fa => fa
+                                    .Add("Log Levels", a => a
+                                        .Terms(t => t
+                                            .Field("log.level.keyword")
+                                        )
+                                    )
+                                )
+                            )
+                            .Add("filtered_hosts", a => a
+                                .Filter(f => f
+                                    .Bool(b => b
+                                        .Filter(filtered_hosts_queries.ToArray())
+                                    )
+                                )
+                                .Aggregations(fa => fa
+                                    .Add("Hosts", a => a
+                                        .Terms(t => t
+                                            .Field("host.name.keyword")
+                                        )
+                                    )
+                                )
+                            )
+                            .Add("filtered_processes", a => a
+                                .Filter(f => f
+                                    .Bool(b => b
+                                        .Filter(filtered_processes_queries.ToArray())
+                                    )
+                                )
+                                .Aggregations(fa => fa
+                                    .Add("Processes", a => a
+                                        .Terms(t => t
+                                            .Field("process.name.keyword")
+                                        )
+                                    )
+                                )
+                            )
                         )
-                    .Filter("filtered_hosts", f => f
-                        .Filter(ff => ff.Bool(t => t
-                            .Must(f => f.Wildcard(m => m.Field(ff => ff.Message).Value(queryString)))
-                            .Filter(f => f.Terms(t => t.Field("log.level.keyword").Terms(filterLevels)),
-                                    f => f.Terms(t => t.Field("process.name.keyword").Terms(filterProcesses)),
-                                    f => f.DateRange(t => t.Field(f => f.Timestamp).GreaterThanOrEquals(DateMath.Anchored(DateTime.Now.AddMinutes(-dateFilterMinutes)))))
-                            ))
-                        .Aggregations(fa => fa
-                            .Terms("Hosts", tt => tt.Field("host.name.keyword")))
-                        )
-                     .Filter("filtered_processes", f => f
-                        .Filter(ff => ff.Bool(t => t
-                            .Must(f => f.Wildcard(m => m.Field(ff => ff.Message).Value(queryString)))
-                            .Filter(f => f.Terms(t => t.Field("log.level.keyword").Terms(filterLevels)),
-                                    f => f.Terms(t => t.Field("host.name.keyword").Terms(filterHosts)),
-                                    f => f.DateRange(t => t.Field(f => f.Timestamp).GreaterThanOrEquals(DateMath.Anchored(DateTime.Now.AddMinutes(-dateFilterMinutes)))))
-                            ))
-                        .Aggregations(fa => fa
-                            .Terms("Processes", tt => tt.Field("process.name.keyword")))
-                        )
-                    )))
+                    )
+                )   
                 .Highlight(h => h
-                  .Fields(f => f
-                        .Field(ff => ff.Message)
-                        .PreTags("<b style='color:yellow'>")
-                        .PostTags("</b>")))
-                .Sort(f => f
-                    .Descending(d => d.Timestamp))
-                );
-            if (result.IsValid && result.Aggregations.Count > 0)
+                    .Fields(f => f
+                        .Add("message" ,f => f
+                            .PreTags(["<b style='color:yellow'>"])
+                            .PostTags(["</b>"])
+                        )
+                    )
+                )
+                .Sort(s => s
+                    .Field(f => f.Timestamp, new FieldSort { Order = SortOrder.Desc })
+                )
+            );
+            if (result.IsValidResponse && result.Aggregations.Count > 0)
             {
                 var logEntriesDto = new LogEntriesDto();
                 var resultsDto = new List<LogEntryDto>();
@@ -166,17 +201,21 @@ namespace SOS.Administration.Gui.Controllers
                 logEntriesDto.LogEntries = resultsDto;
                 var aggregationsDto = new List<TermAggregationDto>();
 
-                foreach (var aggName in filterAggregationsNames)
+                var filterAggregations= new[] { 
+                    (f: "filtered_levels", a: "Log Levels"), 
+                    (f: "filtered_hosts", a : "Hosts"), 
+                    (f: "filtered_processes", a: "Processes") };
+                foreach (var filterAgg in filterAggregations)
                 {
-                    var a = result.Aggregations.Global("global").Filter(aggName).First();
-                    var agg = result.Aggregations.Global("global").Filter(aggName).Terms(a.Key);
+                    var a = result.Aggregations.GetGlobal("global").Aggregations.GetFilter(filterAgg.f);
+                    var agg = a.Aggregations.GetStringTerms(filterAgg.a);
                     var terms = new List<TermDto>();
 
                     foreach (var bucket in agg.Buckets)
                     {
-                        terms.Add(new TermDto() { Name = bucket.Key, DocCount = bucket.DocCount });
+                        terms.Add(new TermDto() { Name = (string)bucket.Key.Value, DocCount = bucket.DocCount });
                     }
-                    var aggDto = new TermAggregationDto() { Name = a.Key, Terms = terms };
+                    var aggDto = new TermAggregationDto() { Name = filterAgg.a, Terms = terms };
                     aggregationsDto.Add(aggDto);
                 }
 

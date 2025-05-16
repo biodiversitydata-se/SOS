@@ -1,10 +1,11 @@
-﻿using Nest;
+﻿using Elastic.Clients.Elasticsearch;
 using Newtonsoft.Json;
+using SOS.Lib.Extensions;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Threading.Tasks;
+
 
 namespace SOS.Administration.Gui.Controllers
 {
@@ -96,7 +97,7 @@ namespace SOS.Administration.Gui.Controllers
     public class PerformanceController : ControllerBase
     {
 
-        private readonly IElasticClient _testElasticClient;
+        private readonly ElasticsearchClient _testElasticClient;
         private const string aiTelemetryURL = "https://api.applicationinsights.io/v1/apps/{0}/{1}/{2}?{3}";
         private const string aiQueryURL = "https://api.applicationinsights.io/v1/apps/{0}/{1}?{2}";
         private ApplicationInsightsConfiguration _aiConfig;
@@ -164,9 +165,10 @@ namespace SOS.Administration.Gui.Controllers
                 .Index("sos-st-loadtests-summaries")
                 .Size(5)
                 .Sort(f => f
-                    .Descending(d => d.Timestamp))
-                );
-            if (result.IsValid)
+                    .Field("timestamp".ToField(), new FieldSort { Order = SortOrder.Desc })
+                )
+            );
+            if (result.IsValidResponse)
             {
                 return result.Documents;
             }
@@ -203,7 +205,7 @@ namespace SOS.Administration.Gui.Controllers
                         {
                             if (!requestDictionary.ContainsKey(innerSeg.RequestName))
                             {
-                                requestDictionary[innerSeg.RequestName] = new List<PerformanceData.Request>();
+                                requestDictionary.Add(innerSeg.RequestName, new List<PerformanceData.Request>());
                             }
                             requestDictionary[innerSeg.RequestName].Add(new PerformanceData.Request()
                             {

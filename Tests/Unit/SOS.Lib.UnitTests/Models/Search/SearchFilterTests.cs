@@ -1,5 +1,5 @@
 ﻿using FluentAssertions;
-using Nest;
+using NetTopologySuite.Geometries;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Search.Filters;
 using System;
@@ -29,16 +29,15 @@ namespace SOS.Lib.UnitTests.Models.Search
                         {
                             MaxDistanceFromPoint = 50,
                             UsePointAccuracy = true,
-                            Geometries = new List<IGeoShape>
+                            Geometries = new List<Geometry>
                             {
-                                new PolygonGeoShape(new[]
-                                {
-                                    new[]
-                                    {
-                                        new GeoCoordinate(1, 2),
-                                        new GeoCoordinate(3, 4)
-                                    }
-                                })
+                                 new Polygon(new LinearRing([
+                                     new Coordinate(1, 10),
+                                     new Coordinate(10, 10),
+                                     new Coordinate(10, 1),
+                                     new Coordinate(1, 1),
+                                     new Coordinate(1, 10)
+                                ]))
                             }
                         }
                     }
@@ -76,16 +75,15 @@ namespace SOS.Lib.UnitTests.Models.Search
                         {
                             MaxDistanceFromPoint = 50,
                             UsePointAccuracy = true,
-                            Geometries = new List<IGeoShape>
+                            Geometries = new List<Geometry>
                             {
-                                new PolygonGeoShape(new[]
-                                {
-                                    new[]
-                                    {
-                                        new GeoCoordinate(1, 2),
-                                        new GeoCoordinate(3, 4)
-                                    }
-                                })
+                                 new Polygon(new LinearRing([
+                                     new Coordinate(1, 10),
+                                     new Coordinate(10, 10),
+                                     new Coordinate(10, 1),
+                                     new Coordinate(1, 1),
+                                     new Coordinate(1, 10)
+                                ]))
                             }
                         }
                     }

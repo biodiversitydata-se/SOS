@@ -119,7 +119,7 @@ namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsE
                 Geographics = new GeographicsFilterDto
                 {
                     Geometries = new[] {
-                        new Point(11.50005, 68.00004).ToCircle(10).ToGeoShape()
+                        new Point(11.50005, 68.00004).ToCircle(10)
                     }
                 }
             };
@@ -151,7 +151,7 @@ namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsE
                 Geographics = new GeographicsFilterDto
                 {
                     Geometries = new[] {
-                        new Point(11.50005, 68.00004).ToCircle(10).ToGeoShape()
+                        new Point(11.50005, 68.00004).ToCircle(10)
                     },
                     MaxAccuracy = 15
                 }
@@ -186,7 +186,7 @@ namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsE
                 Geographics = new GeographicsFilterDto
                 {
                     Geometries = new[] {
-                        new Point(11.50005, 68.00004).ToCircle(10).ToGeoShape()
+                        new Point(11.50005, 68.00004).ToCircle(10)
                     },
                     ConsiderObservationAccuracy = true
                 }
@@ -225,7 +225,7 @@ namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsE
                 Geographics = new GeographicsFilterDto
                 {
                     Geometries = new[] {
-                        new Point(11.50005, 68.00004).ToCircle(10).ToGeoShape()
+                        new Point(11.50005, 68.00004).ToCircle(10)
                     },
                     ConsiderDisturbanceRadius = true
                 }

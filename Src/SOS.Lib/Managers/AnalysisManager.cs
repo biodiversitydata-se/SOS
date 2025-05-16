@@ -1,7 +1,6 @@
 ﻿using AgileObjects.AgileMapper.Extensions;
 using Hangfire;
 using Microsoft.Extensions.Logging;
-using Nest;
 using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
 using NReco.Csv;
@@ -31,6 +30,8 @@ using System.Diagnostics;
 using System.Text.Encodings.Web;
 using System.Text.Unicode;
 using SOS.Lib.Models.Search.Result;
+using Elastic.Clients.Elasticsearch;
+using System.Collections.ObjectModel;
 using System.Threading;
 
 namespace SOS.Lib.Managers
@@ -61,13 +62,15 @@ namespace SOS.Lib.Managers
         {
             try
             {
-                var geoShape = (IGeoShape)await _areaCache.GetGeometryAsync((AreaType)areaType, featureId);
-                if (geoShape == null)
+                var geometry = await _areaCache.GetGeometryAsync((AreaType)areaType, featureId);
+                if (geometry == null)
                 {
                     return;
                 }
-
-                var geometry = geoShape.ToGeometry().Transform(CoordinateSys.WGS84, coordinateSys ?? CoordinateSys.WGS84);
+                if((coordinateSys ?? CoordinateSys.WGS84) != CoordinateSys.WGS84)
+                {
+                    geometry = geometry.Transform(CoordinateSys.WGS84, coordinateSys ?? CoordinateSys.WGS84);
+                }
                 feature.Geometry = geometry;
                 feature.BoundingBox = geometry.EnvelopeInternal;
             }
@@ -99,9 +102,9 @@ namespace SOS.Lib.Managers
             {
                 if (features.TryGetValue(result.Key.featureId, out var feature))
                 {
-                    var geometry = result.Value.ToGeometry();
+                    var geometry = result.Value;
                     feature.Geometry = geometry;
-                    feature.BoundingBox = geometry.EnvelopeInternal;
+                  //  feature.BoundingBox = geometry.EnvelopeInternal;
                 }
             }
         }
@@ -237,7 +240,7 @@ namespace SOS.Lib.Managers
         }
 
         /// <inheritdoc/>
-        public async Task<PagedAggregationResult<UserAggregationResponse>?> AggregateByUserFieldAsync(
+        public async Task<PagedAggregationResult<UserAggregationResponse>> AggregateByUserFieldAsync(
             int? roleId,
             string authorizationApplicationIdentifier,
             SearchFilter filter,            
@@ -248,7 +251,12 @@ namespace SOS.Lib.Managers
             int? take)
         {
             await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
-            var result = await _processedObservationRepository.AggregateByUserFieldAsync(filter, aggregationField, aggregateOrganismQuantity, precisionThreshold, afterKey, take);
+            var result = await _processedObservationRepository.AggregateByUserFieldAsync(filter, aggregationField, aggregateOrganismQuantity, precisionThreshold, 
+                string.IsNullOrEmpty(afterKey) ? null :
+                new ReadOnlyDictionary<string, FieldValue>(new Dictionary<string, FieldValue>
+                {
+                    { aggregationField, afterKey.ToFieldValue() }
+                }), take);
 
             return new PagedAggregationResult<UserAggregationResponse>
             {
@@ -318,7 +326,7 @@ namespace SOS.Lib.Managers
                 while (result?.Records?.Count() != 0)
                 {
                     // Start getting next batch while we getting the geometries
-                    var nextBatchTask = _processedObservationRepository.AggregateByUserFieldAsync(filter, areaTypeProperty, false, precisionThreshold, result.SearchAfter?.FirstOrDefault()?.ToString(), 1000, false);
+                    var nextBatchTask = _processedObservationRepository.AggregateByUserFieldAsync(filter, areaTypeProperty, false, precisionThreshold, result.SearchAfter, 1000, false);
                     
                     foreach (var record in result.Records)
                     {
@@ -444,8 +452,7 @@ namespace SOS.Lib.Managers
                             }
                         }
                     }
-
-
+                    
                     if (eooGeometry == null)
                     {
                         return null!;
@@ -469,13 +476,14 @@ namespace SOS.Lib.Managers
 
                     featureCollection.Add(new Feature(
                         eooGeometry.Transform((CoordinateSys)metricCoordinateSys, coordinateSystem),
-                        new AttributesTable(new KeyValuePair<string, object>[] {
-                                new KeyValuePair<string, object>("id", aooEooItem.Id),
-                                new KeyValuePair<string, object>("aoo", aooEooItem.Aoo),
-                                new KeyValuePair<string, object>("eoo", aooEooItem.Eoo),
-                                new KeyValuePair<string, object>("gridCellArea", aooEooItem.GridCellArea),
-                                new KeyValuePair<string, object>("gridCellAreaUnit", aooEooItem.GridCellAreaUnit),
-                                new KeyValuePair<string, object>("observationsCount", aooEooItem.ObservationsCount)
+                        new AttributesTable(new Dictionary<string, object>
+                            {
+                                { "id", aooEooItem.Id },
+                                { "aoo", aooEooItem.Aoo },
+                                { "eoo", aooEooItem.Eoo },
+                                { "gridCellArea", aooEooItem.GridCellArea },
+                                { "gridCellAreaUnit", aooEooItem.GridCellAreaUnit },
+                                { "observationsCount", aooEooItem.ObservationsCount }
                             }
                         )
                     ));

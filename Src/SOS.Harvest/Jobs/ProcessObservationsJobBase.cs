@@ -1,4 +1,5 @@
 ﻿using AgileObjects.AgileMapper.Extensions;
+using Elastic.Clients.Elasticsearch;
 using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
@@ -277,6 +278,19 @@ namespace SOS.Harvest.Jobs
                 // Get public meta data
                 var metadata = await _processedObservationRepository.GetProviderMetaDataAsync(provider.Id, false);
 
+                var currentBottomRight = new LatLonGeoLocation();
+                var currentTopLeft = new LatLonGeoLocation();
+                if (metadata.geographicCoverage.TryGetTopLeftBottomRight(out var storedTopLeftBottomRight))
+                {
+                    if (storedTopLeftBottomRight.BottomRight.TryGetLatitudeLongitude(out var storedBottomRight))
+                    {
+                        currentBottomRight = storedBottomRight;
+                    }
+                    if (storedTopLeftBottomRight.TopLeft.TryGetLatitudeLongitude(out var storedTopLeft))
+                    {
+                        currentTopLeft = storedTopLeft;
+                    }
+                }
                 // Get protected meta data
                 var protctedMetadata = await _processedObservationRepository.GetProviderMetaDataAsync(provider.Id, true);
 
@@ -290,28 +304,37 @@ namespace SOS.Harvest.Jobs
                 {
                     metadata.lastSpotted = protctedMetadata.lastSpotted;
                 }
-
-                if (protctedMetadata.geographicCoverage.BottomRight.Lon > metadata.geographicCoverage.BottomRight.Lon)
+                if (protctedMetadata.geographicCoverage.TryGetTopLeftBottomRight(out var topLeftBottomRight))
                 {
-                    metadata.geographicCoverage.BottomRight.Lon = protctedMetadata.geographicCoverage.BottomRight.Lon;
+                    if (topLeftBottomRight.BottomRight.TryGetLatitudeLongitude(out var bottomRight)) {
+                        if (bottomRight.Lon > currentBottomRight.Lon)
+                        {
+                            currentBottomRight.Lon = bottomRight.Lon;
+                        }
+                        if (bottomRight.Lat < currentBottomRight.Lat)
+                        {
+                            currentBottomRight.Lat = bottomRight.Lat;
+                        }
+                    }
+
+                    if (topLeftBottomRight.TopLeft.TryGetLatitudeLongitude(out var topLeft))
+                    {
+                        if (topLeft.Lon < currentTopLeft.Lon)
+                        {
+                            currentTopLeft.Lon = topLeft.Lon;
+                        }
+                        if (topLeft.Lat > currentTopLeft.Lat)
+                        {
+                            currentTopLeft.Lat = topLeft.Lat;
+                        }
+                    }
                 }
 
-                if (protctedMetadata.geographicCoverage.BottomRight.Lat < metadata.geographicCoverage.BottomRight.Lat)
+                DwCArchiveEmlFileFactory.UpdateDynamicMetaData(eml, metadata.firstSpotted, metadata.lastSpotted, GeoBounds.TopLeftBottomRight(new TopLeftBottomRightGeoBounds
                 {
-                    metadata.geographicCoverage.BottomRight.Lat = protctedMetadata.geographicCoverage.BottomRight.Lat;
-                }
-
-                if (protctedMetadata.geographicCoverage.TopLeft.Lon < metadata.geographicCoverage.TopLeft.Lon)
-                {
-                    metadata.geographicCoverage.TopLeft.Lon = protctedMetadata.geographicCoverage.TopLeft.Lon;
-                }
-
-                if (protctedMetadata.geographicCoverage.TopLeft.Lat > metadata.geographicCoverage.TopLeft.Lat)
-                {
-                    metadata.geographicCoverage.BottomRight.Lat = protctedMetadata.geographicCoverage.BottomRight.Lat;
-                }
-
-                DwCArchiveEmlFileFactory.UpdateDynamicMetaData(eml, metadata.firstSpotted, metadata.lastSpotted, metadata.geographicCoverage);
+                    BottomRight = currentBottomRight,
+                    TopLeft = currentTopLeft
+                }));
                 await _dataProviderCache.StoreEmlAsync(provider.Id, eml);
             }
         }

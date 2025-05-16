@@ -106,7 +106,7 @@ spec:
           - name: AllowedOrigins
             value: https://sosadmingui-st.wt.artdata.slu.se 
           - name: ApiTestConfiguration
-            value: '{"ApiUrl": "https://sos-search-st.artdata.slu.se/", "HangfireUrl": "https://sosadminapi-st.wt.artdata.slu.se/hangfire"}'
+            value: '{"ApiUrl": "https://sos-search-st.wt.artdata.slu.se/", "HangfireUrl": "https://sosadminapi-st.wt.artdata.slu.se/hangfire"}'
           - name: ApplicationInsightsConfiguration
             value: '{"BaseAddress": "https://api.applicationinsights.io/v1", "AcceptHeaderContentType": "application/json", "InstrumentationKey": "SECRET_PLACEHOLDER", "ApiKey": "SECRET_PLACEHOLDER", "ApplicationId": "SECRET_PLACEHOLDER"}'
           - name: AuthenticationConfiguration

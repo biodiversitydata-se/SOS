@@ -29,7 +29,6 @@ namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.Observation
         private readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions()
         {
             Converters = {
-                    new GeoShapeConverter(),
                     new NetTopologySuite.IO.Converters.GeoJsonConverterFactory(),
                     new JsonStringEnumConverter()
                 },
