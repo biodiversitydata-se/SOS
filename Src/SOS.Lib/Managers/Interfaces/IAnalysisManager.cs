@@ -48,7 +48,7 @@ namespace SOS.Lib.Managers.Interfaces
         /// <param name="take"></param>
         /// <param name="sortOrder"></param>
         /// <returns></returns>
-        Task<IEnumerable<AggregationItemOrganismQuantity>> AggregateByUserFieldAsync(
+        Task<IEnumerable<AggregationItem>> AggregateByUserFieldAsync(
             int? roleId,
             string authorizationApplicationIdentifier,
             SearchFilter filter,

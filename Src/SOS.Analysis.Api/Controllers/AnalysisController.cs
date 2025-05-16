@@ -173,7 +173,7 @@ namespace SOS.Analysis.Api.Controllers
 
                 var filter = searchFilter?.ToSearchFilter(this.GetUserId(), searchFilter?.ProtectionFilter, "sv-SE")!;
 
-                IEnumerable<AggregationItemOrganismQuantity> result = await _analysisManager.AggregateByUserFieldAsync(
+                IEnumerable<AggregationItem> result = await _analysisManager.AggregateByUserFieldAsync(
                     roleId,
                     authorizationApplicationIdentifier,
                     filter,

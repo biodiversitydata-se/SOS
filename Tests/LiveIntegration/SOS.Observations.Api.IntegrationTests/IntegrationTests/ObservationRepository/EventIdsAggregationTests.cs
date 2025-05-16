@@ -40,7 +40,8 @@ namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.Observation
             // Assert
             //-----------------------------------------------------------------------------------------------------------
             eventIds.Should().NotBeNull();
-            eventIds.Count().Should().Be(eventIdsAll.Count());
+            eventIds.Should().NotBeNull();
+            eventIds.Records.Count().Should().Be(eventIdsAll.Count());
         }
 
 
@@ -67,7 +68,7 @@ namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.Observation
             // Assert
             //-----------------------------------------------------------------------------------------------------------
             occurrenceIds.Should().NotBeNull();
-            occurrenceIds.Count().Should().Be(occurrenceIdsAll.Count());
+            occurrenceIds.Records.Count().Should().Be(occurrenceIdsAll.Count());
         }
 
         [Fact]

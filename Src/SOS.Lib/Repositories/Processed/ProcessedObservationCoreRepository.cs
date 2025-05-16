@@ -976,6 +976,27 @@ namespace SOS.Lib.Repositories.Processed
             }
         }
 
+        private FluentDescriptorDictionary<Field, RuntimeFieldDescriptor<dynamic>> GetRuntimeMappingScriptField(string fieldName, string scriptFieldName)
+        {
+            var runtimeFieldDescriptor = new RuntimeFieldDescriptor<dynamic>();
+            runtimeFieldDescriptor.Script(new Script()
+            {
+                Id = scriptFieldName,
+                Source = @$"
+                    if (!doc['{fieldName}'].empty){{  
+                        String value = '' + doc['{fieldName}'].value; 
+                        if (value != '') {{ 
+                            emit(value); 
+                        }} 
+                    }}",
+            });
+            runtimeFieldDescriptor.Type(RuntimeFieldType.Keyword);
+            return new FluentDescriptorDictionary<Field, RuntimeFieldDescriptor<dynamic>>
+            {
+                { scriptFieldName.ToField(), runtimeFieldDescriptor }
+            };
+        }
+
         private async Task<SearchResponse<dynamic>> PageAggregationItemAsync(
            string indexName,
            string aggregationField,
@@ -1238,61 +1259,29 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<AggregationItem>> GetAggregationItemsAsync(
+        public async Task<PagedResult<AggregationItem>> GetAggregationItemsAsync(
             SearchFilter filter,
             string aggregationField,
-            int? precisionThreshold,
-            int size = 65536,
-            AggregationSortOrder sortOrder = AggregationSortOrder.CountDescending)
-        {
-            var indexNames = GetCurrentIndex(filter);
-            var (query, excludeQuery) = GetCoreQueries<dynamic>(filter);
-            var termsOrder = sortOrder.GetTermsOrder();
-            size = Math.Max(1, size);
-
-            var searchResponse = await Client.SearchAsync<dynamic>(s => s
-                .Indices(indexNames)
-                .Query(q => q
-                    .Bool(b => b
-                        .MustNot(excludeQuery.ToArray())
-                        .Filter(query.ToArray())
-                    )
-                )
-                .Aggregations(a => a
-                    .Add("termAggregation", a => a
-                        .Terms(t => t
-                            .Size(size)
-                            .Field(aggregationField)
-                            .ValueType("string")
-                            .Order(termsOrder)
-                        )
-                    )
-                )
-                .AddDefaultAggrigationSettings()
-            );
-
-            searchResponse.ThrowIfInvalid();
-            IEnumerable<AggregationItem> result = searchResponse.Aggregations
-                .GetStringTerms("termAggregation")
-                .Buckets
-                .Select(b => new AggregationItem { AggregationKey = b.Key.Value.ToString(), DocCount = (int)b.DocCount });
-
-            return result;
-        }
-
-        /// <inheritdoc />
-        public async Task<PagedResult<AggregationItem>> GetAggregationItemsAsync(SearchFilter filter,
-            string aggregationField,
-            int skip,
-            int take,
-            int? precisionThreshold,
-            AggregationSortOrder sortOrder = AggregationSortOrder.CountDescending)
+            int skip = 0,
+            int take = 65536,
+            int? precisionThreshold = null,
+            AggregationSortOrder? sortOrder = AggregationSortOrder.CountDescending,
+            bool? useScript = false,
+            bool? aggregateCardinality = false,
+            bool? aggregateOrganismQuantity = false
+        )
         {
             var indexNames = GetCurrentIndex(filter);
             var (query, excludeQuery) = GetCoreQueries<dynamic>(filter);
             int size = Math.Max(1, Math.Min(65536, skip + take));
-            var termsOrder = sortOrder.GetTermsOrder();
-
+            var termsOrder = sortOrder.HasValue ? sortOrder.Value.GetTermsOrder() : null;
+            FluentDescriptorDictionary<Field, RuntimeFieldDescriptor<dynamic>> runtimeMapping = null;
+            if (useScript ?? true)
+            {
+                var scriptFieldName = "scriptField";
+                runtimeMapping = GetRuntimeMappingScriptField(aggregationField, scriptFieldName);
+                aggregationField = scriptFieldName;
+            }
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
                 .Indices(indexNames)
                 .Query(q => q
@@ -1301,22 +1290,39 @@ namespace SOS.Lib.Repositories.Processed
                         .Filter(query.ToArray())
                     )
                 )
-                .Aggregations(a => a
-                    .Add("termAggregation", a => a
-                        .Terms(t => t
+                .RuntimeMappings(rm => runtimeMapping)
+                .Aggregations(a => {
+                    a.Add("termAggregation", a => {
+                        a.Terms(t => t
                             .Size(size)
                             .Field(aggregationField)
                             .ValueType("string")
                             .Order(termsOrder)
-                        )
-                    )
-                    .Add("cardinalityAggregation", a => a
-                        .Cardinality(c => c
-                            .Field(aggregationField)
-                            .PrecisionThreshold(precisionThreshold ?? 40000)
-                        )
-                    )
-                )
+                        );
+                        
+                        if (aggregateOrganismQuantity ?? false)
+                        {
+                            a.Aggregations(a => a
+                                .Add("totalOrganismQuantity", a => a
+                                    .Sum(sa => sa
+                                        .Field("occurrence.organismQuantityAggregation")
+                                    )
+                                )
+                            );
+                        }
+                    });
+                    if (aggregateCardinality ?? false)
+                    {
+                        a.Add("cardinalityAggregation", a => a
+                            .Cardinality(c => c
+                                .Field(aggregationField)
+                                .PrecisionThreshold(precisionThreshold ?? 40000)
+                            )
+                        );
+                    }
+                        
+                    return a;
+                })
                 .AddDefaultAggrigationSettings()
             );
 
@@ -1324,10 +1330,16 @@ namespace SOS.Lib.Repositories.Processed
             IEnumerable<AggregationItem> records = searchResponse.Aggregations
                 .GetStringTerms("termAggregation")
                 .Buckets
-                    .Select(b => new AggregationItem { AggregationKey = b.Key.Value.ToString(), DocCount = (int)b.DocCount })
+                    .Select(b => new AggregationItem { 
+                        AggregationKey = b.Key.Value.ToString(), 
+                        DocCount = (int)b.DocCount,
+                        OrganismQuantity = aggregateOrganismQuantity ?? false ? (int)(b.Aggregations.GetSum("totalOrganismQuantity")?.Value ?? 0) : 0
+                    })
                     .Skip(skip)
                     .Take(take);
-            var totalCount = searchResponse.Aggregations.GetCardinality("cardinalityAggregation").Value;
+            var totalCount = 0L;
+            totalCount = aggregateCardinality ?? false ? searchResponse.Aggregations.GetCardinality("cardinalityAggregation").Value : searchResponse.Total;
+
             var result = new PagedResult<AggregationItem>()
             {
                 Records = records,
@@ -1339,7 +1351,7 @@ namespace SOS.Lib.Repositories.Processed
             return result;
         }
 
-        public async Task<IEnumerable<AggregationItemOrganismQuantity>> GetAggregationItemsAggregateOrganismQuantityAsync(SearchFilter filter,
+        public async Task<IEnumerable<AggregationItem>> GetAggregationItemsAggregateOrganismQuantityAsync(SearchFilter filter,
             string aggregationField,
             int? precisionThreshold,
             int size = 65536,
@@ -1382,7 +1394,7 @@ namespace SOS.Lib.Repositories.Processed
             var result = searchResponse.Aggregations
                 .GetStringTerms("termAggregation")
                 .Buckets
-                    .Select(b => new AggregationItemOrganismQuantity
+                    .Select(b => new AggregationItem
                     {
                         AggregationKey = b.Key.Value.ToString(),
                         DocCount = (int)b.DocCount,
@@ -2316,30 +2328,13 @@ namespace SOS.Lib.Repositories.Processed
         {
             var indexNames = GetCurrentIndex(filter);
             var (queries, excludeQueries) = GetCoreQueries<dynamic>(filter);
-            var tz = TimeZoneInfo.Local.GetUtcOffset(DateTime.Now);
 
             FluentDescriptorDictionary<Field, RuntimeFieldDescriptor<dynamic>> runtimeMapping = null;
             if (useScript ?? true)
             {
-                var fieldName = "scriptField";
-                var runtimeFieldDescriptor = new RuntimeFieldDescriptor<dynamic>();
-                runtimeFieldDescriptor.Script(new Script()
-                {
-                    Id = fieldName,
-                    Source = @$"
-                        if (!doc['{aggregationField}'].empty){{  
-                            String value = '' + doc['{aggregationField}'].value; 
-                            if (value != '') {{ 
-                                emit(value); 
-                            }} 
-                        }}",
-                });
-                runtimeFieldDescriptor.Type(RuntimeFieldType.Keyword);
-                runtimeMapping = new FluentDescriptorDictionary<Field, RuntimeFieldDescriptor<dynamic>>
-                {
-                    { fieldName.ToField(), runtimeFieldDescriptor }
-                };
-                aggregationField = fieldName;
+                var scriptFieldName = "scriptField";
+                runtimeMapping = GetRuntimeMappingScriptField(aggregationField, scriptFieldName);
+                aggregationField = scriptFieldName;
             }
 
             var aggregations = new FluentDescriptorDictionary<string, AggregationDescriptor<dynamic>> {
@@ -2388,12 +2383,6 @@ namespace SOS.Lib.Repositories.Processed
                 )
                 .AddDefaultAggrigationSettings()
             );
-
-            searchResponse.ThrowIfInvalid();
-            afterKey = searchResponse
-               .Aggregations
-                .GetComposite("aggregation")
-                    .AfterKey;
 
             searchResponse.ThrowIfInvalid();
             afterKey = searchResponse

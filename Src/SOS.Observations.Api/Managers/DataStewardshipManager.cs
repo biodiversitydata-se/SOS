@@ -166,7 +166,9 @@ namespace SOS.Observations.Api.Managers
                 skip,
                 take,
                 precisionThreshold: 40000,
-                Lib.Models.Search.Enums.AggregationSortOrder.KeyAscending);
+                Lib.Models.Search.Enums.AggregationSortOrder.KeyAscending,
+                false,
+                true);
             int count = eventIdPageResult.Records.Count();
             int totalCount = Convert.ToInt32(eventIdPageResult.TotalCount);
             var records = Enumerable.Empty<DsEventDto>();
@@ -199,11 +201,11 @@ namespace SOS.Observations.Api.Managers
             await _filterManager.PrepareFilterAsync(null, null, filter);
             var records = Enumerable.Empty<DsEventDto>();
             var allEventIds = await _processedObservationCoreRepository.GetAggregationItemsAsync(filter, "event.eventId", precisionThreshold: 40000);
-            int totalCount = allEventIds.Count();
-            if (allEventIds.Any())
+            int totalCount = allEventIds?.Records?.Count() ?? 0;
+            if (totalCount != 0)
             {
                 EventSearchFilter eventSearchFilter = new EventSearchFilter();
-                eventSearchFilter.EventIds = allEventIds.Select(m => m.AggregationKey).ToList();
+                eventSearchFilter.EventIds = allEventIds.Records.Select(m => m.AggregationKey).ToList();
                 eventSearchFilter.SortOrders = new List<SortOrderFilter>
             {
                 new SortOrderFilter { SortBy = "startDate", SortOrder = SearchSortOrder.Desc },
@@ -260,7 +262,9 @@ namespace SOS.Observations.Api.Managers
                 skip,
                 take,
                 precisionThreshold: 40000,
-                Lib.Models.Search.Enums.AggregationSortOrder.KeyAscending);
+                Lib.Models.Search.Enums.AggregationSortOrder.KeyAscending,
+                false,
+                true);
 
             int totalCount = Convert.ToInt32(aggregationResult.TotalCount);
             var records = Enumerable.Empty<DsDatasetDto>();

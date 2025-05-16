@@ -26,7 +26,7 @@ namespace SOS.Shared.Api.Extensions.Dto
             };
         }
 
-        public static IEnumerable<AggregationItemOrganismQuantityDto> ToDto(this IEnumerable<AggregationItemOrganismQuantity> result)
+        public static IEnumerable<AggregationItemOrganismQuantityDto> ToDto(this IEnumerable<AggregationItem> result)
         {
             if (result == null)
             {
