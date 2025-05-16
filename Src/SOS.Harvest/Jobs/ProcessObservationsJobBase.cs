@@ -5,6 +5,7 @@ using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Harvest.Managers;
 using SOS.Harvest.Managers.Interfaces;
+using SOS.Harvest.Processors;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
@@ -506,6 +507,11 @@ namespace SOS.Harvest.Jobs
                 // 1. Arrange
                 //-----------------
                 _processedObservationRepository.LiveMode = mode == JobRunModes.IncrementalActiveInstance;
+                if (mode == JobRunModes.Full)
+                {
+                    GISExtensions.NumberOfCacheHits = 0;
+                    ObservationFactoryBase.NumberOfTaxonClones = 0;
+                }
 
                 //-----------------
                 // 2. Validation
@@ -558,6 +564,7 @@ namespace SOS.Harvest.Jobs
 
                 _logger.LogInformation($"Processing done: {success} {mode}. {LogHelper.GetMemoryUsageSummary()}");
                 _logger.LogInformation($"Number of GIS point transform cache hits: {GISExtensions.NumberOfCacheHits}");
+                _logger.LogInformation($"Number of taxon clones: {ObservationFactoryBase.NumberOfTaxonClones}");
 
                 _processTimeManager.Stop(ProcessTimeManager.TimerTypes.ProcessOverall, processOverallTimerSessionId);
 

@@ -17,6 +17,7 @@ namespace SOS.Harvest.Processors
     /// </summary>
     public class ObservationFactoryBase : FactoryBase
     {
+        public static int NumberOfTaxonClones = 0;
         protected IDictionary<int, Lib.Models.Processed.Observation.Taxon> Taxa { get; }
         protected IDictionary<VocabularyId, IDictionary<object, int>> VocabularyById { get; }
 
@@ -218,6 +219,7 @@ namespace SOS.Harvest.Processors
                     taxon = taxon.Clone();
                     taxon.VerbatimId = verbatimId ?? taxonId.ToString();
                     taxon.VerbatimName = verbatimName ?? names?.FirstOrDefault(n => !string.IsNullOrEmpty(n));
+                    NumberOfTaxonClones++;
                 }
 
                 return taxon;

@@ -23,7 +23,7 @@ namespace SOS.Lib.Extensions
     /// </summary>
     public static class GISExtensions
     {        
-        private const int MaxCacheSize = 10_000;
+        private const int MaxCacheSize = 1_000_000;
         public static int NumberOfCacheHits = 0;
         private static readonly ConcurrentDictionary<TransformCacheKey, Point> _transformPointCache = new();
         private static readonly HashSet<CoordinateSys> _roundedCoordinateSystems = new()
@@ -761,7 +761,7 @@ namespace SOS.Lib.Extensions
                 new Tuple<CoordinateSys, CoordinateSys>(fromCoordinateSystem, toCoordinateSystem)];
 
             var transformedGeometry = geometry is Point
-                ? new Point(geometry.Coordinate)
+                ? new Point(geometry.Coordinate.X, geometry.Coordinate.Y, geometry.Coordinate.Z)
                 : geometry.Copy();
 
             transformedGeometry.Apply(mathTransformFilter);
@@ -879,10 +879,12 @@ namespace SOS.Lib.Extensions
 
             return false;
         }
-        #endregion Public
+        #endregion Public      
 
         private readonly struct TransformCacheKey : IEquatable<TransformCacheKey>
-        {
+        {            
+            private const double Tolerance = 1e-5; // WGS 84 coordinates within 1.5 meters is considered equal
+
             public CoordinateSys From { get; }
             public CoordinateSys To { get; }
             public double X { get; }
@@ -897,49 +899,24 @@ namespace SOS.Lib.Extensions
             }
 
             public bool Equals(TransformCacheKey other) =>
-                From == other.From && To == other.To && X == other.X && Y == other.Y;
+                From == other.From &&
+                To == other.To &&
+                AreClose(X, other.X) &&
+                AreClose(Y, other.Y);
 
-            public override bool Equals(object obj) => obj is TransformCacheKey other && Equals(other);
+            public override bool Equals(object obj) =>
+                obj is TransformCacheKey other && Equals(other);
 
-            public override int GetHashCode() => HashCode.Combine(From, To, X, Y);
+            public override int GetHashCode()
+            {
+                long xRounded = (long)Math.Round(X / Tolerance, MidpointRounding.AwayFromZero);
+                long yRounded = (long)Math.Round(Y / Tolerance, MidpointRounding.AwayFromZero);
+                return HashCode.Combine(From, To, xRounded, yRounded);
+            }
+
+            private static bool AreClose(double a, double b) =>
+                Math.Abs(a - b) < Tolerance;
         }
-
-        //private readonly struct TransformCacheKey : IEquatable<TransformCacheKey>
-        //{
-        //    private const double Tolerance = 1e-6;
-
-        //    public CoordinateSys From { get; }
-        //    public CoordinateSys To { get; }
-        //    public double X { get; }
-        //    public double Y { get; }
-
-        //    public TransformCacheKey(CoordinateSys from, CoordinateSys to, double x, double y)
-        //    {
-        //        From = from;
-        //        To = to;
-        //        X = x;
-        //        Y = y;
-        //    }
-
-        //    public bool Equals(TransformCacheKey other) =>
-        //        From == other.From &&
-        //        To == other.To &&
-        //        AreClose(X, other.X) &&
-        //        AreClose(Y, other.Y);
-
-        //    public override bool Equals(object obj) =>
-        //        obj is TransformCacheKey other && Equals(other);
-
-        //    public override int GetHashCode()
-        //    {                
-        //        long xRounded = (long)(X / Tolerance);
-        //        long yRounded = (long)(Y / Tolerance);
-        //        return HashCode.Combine(From, To, xRounded, yRounded);
-        //    }
-
-        //    private static bool AreClose(double a, double b) =>
-        //        Math.Abs(a - b) < Tolerance;
-        //}
 
     }
 }
