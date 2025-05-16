@@ -47,3 +47,6 @@ The following endpoints exists in Species Observation System API (SOS):
 | &nbsp;  	|  	|  	|  	|  	|
 | **Locations** 	| 	|  	|  	|  	|  
 | /Locations 	| Locations_GetLocationsByIds 	| GET 	| Get location info by id. 	|
+| &nbsp;  	|  	|  	|  	|  	|
+| **API Info** 	| 	|  	|  	|  	|  
+| /ApiInfo 	| API_Information_ 	| GET 	| Get information about this API. 	|
