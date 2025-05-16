@@ -196,11 +196,11 @@ public class DataStewardshipManager : IDataStewardshipManager
         await _filterManager.PrepareFilterAsync(null, null, filter);        
         var records = Enumerable.Empty<Contracts.Models.Event>();
         var allEventIds = await _processedObservationCoreRepository.GetAggregationItemsAsync(filter, "event.eventId");
-        int totalCount = allEventIds.Count();
-        if (allEventIds.Any())
+        int totalCount = allEventIds?.Records.Count() ?? 0;
+        if (totalCount != 0)
         {
             EventSearchFilter eventSearchFilter = new EventSearchFilter();
-            eventSearchFilter.EventIds = allEventIds.Select(m => m.AggregationKey).ToList();
+            eventSearchFilter.EventIds = allEventIds.Records.Select(m => m.AggregationKey).ToList();
             eventSearchFilter.SortOrders = new List<SortOrderFilter>
             {
                 new SortOrderFilter { SortBy = "startDate", SortOrder = SearchSortOrder.Desc },
