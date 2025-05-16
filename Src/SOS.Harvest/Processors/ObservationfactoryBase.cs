@@ -213,9 +213,13 @@ namespace SOS.Harvest.Processors
 
             if (taxon != null)
             {
-                taxon = taxon.Clone();
-                taxon.VerbatimId = verbatimId ?? taxonId.ToString();
-                taxon.VerbatimName = verbatimName ?? names?.FirstOrDefault(n => !string.IsNullOrEmpty(n));
+                if (!string.IsNullOrEmpty(verbatimId) || !string.IsNullOrEmpty(verbatimName))
+                {
+                    taxon = taxon.Clone();
+                    taxon.VerbatimId = verbatimId ?? taxonId.ToString();
+                    taxon.VerbatimName = verbatimName ?? names?.FirstOrDefault(n => !string.IsNullOrEmpty(n));
+                }
+
                 return taxon;
             }
 
