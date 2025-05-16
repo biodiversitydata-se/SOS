@@ -272,7 +272,7 @@ namespace SOS.Lib.Managers
         }
 
         /// <inheritdoc/>
-        public async Task<IEnumerable<AggregationItemOrganismQuantity>?> AggregateByUserFieldAsync(
+        public async Task<IEnumerable<AggregationItem>?> AggregateByUserFieldAsync(
             int? roleId,
             string authorizationApplicationIdentifier,
             SearchFilter filter,
@@ -283,14 +283,14 @@ namespace SOS.Lib.Managers
             AggregationSortOrder sortOrder = AggregationSortOrder.CountDescending)
         {
             await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
-            if (aggregateOrganismQuantity)
+          /*  if (aggregateOrganismQuantity)
             {
                 var resultIncludingOrganismQuantity = await _processedObservationRepository.GetAggregationItemsAggregateOrganismQuantityAsync(filter, aggregationField, precisionThreshold ?? 40000, take, sortOrder);
                 return resultIncludingOrganismQuantity;
             }
-            
-            var result = await _processedObservationRepository.GetAggregationItemsAsync(filter, aggregationField, precisionThreshold ?? 40000, take, sortOrder);
-            return result?.Select(i => new AggregationItemOrganismQuantity { AggregationKey = i.AggregationKey, DocCount = i.DocCount })!;
+            */
+            var result = await _processedObservationRepository.GetAggregationItemsAsync(filter, aggregationField, 0, take, precisionThreshold ?? 40000, sortOrder, true, false, aggregateOrganismQuantity);
+            return result?.Records;
         }
 
         /// <inheritdoc/>

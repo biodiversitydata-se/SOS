@@ -281,20 +281,32 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// <returns></returns>
         Task<bool> VerifyCollectionAsync(bool protectedIndex);
 
-        Task<IEnumerable<AggregationItem>> GetAggregationItemsAsync(SearchFilter filter,
+        /// <summary>
+        /// Aggregate on passed field
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="aggregationField"></param>
+        /// <param name="skip"></param>
+        /// <param name="take"></param>
+        /// <param name="precisionThreshold"></param>
+        /// <param name="sortOrder"></param>
+        /// <param name="useScript"></param>
+        /// <param name="aggregateCardinality"></param>
+        /// <param name="aggregateOrganismQuantity"></param>
+        /// <returns></returns>
+        Task<PagedResult<AggregationItem>> GetAggregationItemsAsync(
+            SearchFilter filter,
             string aggregationField,
+            int skip = 0,
+            int take = 65536,
             int? precisionThreshold = null,
-            int size = 65536,
-            AggregationSortOrder sortOrder = AggregationSortOrder.CountDescending);
+            AggregationSortOrder? sortOrder = AggregationSortOrder.CountDescending,
+            bool? useScript = false,
+            bool? aggregateCardinality = false,
+            bool? aggregateOrganismQuantity = false
+        );
 
-        Task<PagedResult<AggregationItem>> GetAggregationItemsAsync(SearchFilter filter,
-            string aggregationField,
-            int skip,
-            int take,
-            int? precisionThreshold,
-            AggregationSortOrder sortOrder = AggregationSortOrder.CountDescending);
-
-        Task<IEnumerable<AggregationItemOrganismQuantity>> GetAggregationItemsAggregateOrganismQuantityAsync(SearchFilter filter,
+        Task<IEnumerable<AggregationItem>> GetAggregationItemsAggregateOrganismQuantityAsync(SearchFilter filter,
             string aggregationField,
             int? precisionThreshold,
             int size = 65536,
