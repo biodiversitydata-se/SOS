@@ -8,6 +8,7 @@ using SOS.Harvest.Managers.Interfaces;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
+using SOS.Lib.Extensions;
 using SOS.Lib.Factories;
 using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
@@ -556,6 +557,7 @@ namespace SOS.Harvest.Jobs
                 }
 
                 _logger.LogInformation($"Processing done: {success} {mode}. {LogHelper.GetMemoryUsageSummary()}");
+                _logger.LogInformation($"Number of GIS point transform cache hits: {GISExtensions.NumberOfCacheHits}");
 
                 _processTimeManager.Stop(ProcessTimeManager.TimerTypes.ProcessOverall, processOverallTimerSessionId);
 

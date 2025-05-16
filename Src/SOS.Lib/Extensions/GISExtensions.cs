@@ -22,8 +22,18 @@ namespace SOS.Lib.Extensions
     ///     NetTopologySuite extensions
     /// </summary>
     public static class GISExtensions
-    {
-        private readonly static IDictionary<string, Point> _transformPointCache = new ConcurrentDictionary<string, Point>();
+    {        
+        private const int MaxCacheSize = 10_000;
+        public static int NumberOfCacheHits = 0;
+        private static readonly ConcurrentDictionary<TransformCacheKey, Point> _transformPointCache = new();
+        private static readonly HashSet<CoordinateSys> _roundedCoordinateSystems = new()
+        {
+            CoordinateSys.ETRS89_LAEA_Europe,
+            CoordinateSys.Rt90_25_gon_v,
+            CoordinateSys.SWEREF99_TM,
+            CoordinateSys.WebMercator
+        };
+
         private readonly static WKTReader _wktReader;
         /// <summary>
         ///     Constructor
@@ -726,9 +736,7 @@ namespace SOS.Lib.Extensions
             bool usePointCache = true) where T : Geometry
         {
             if (geometry == null)
-            {
                 return null;
-            }
 
             if (fromCoordinateSystem == toCoordinateSystem)
             {
@@ -736,48 +744,51 @@ namespace SOS.Lib.Extensions
                 return geometry;
             }
 
-            var key = string.Empty;
+            TransformCacheKey? cacheKey = null;
+
             if (usePointCache && geometry is Point point)
             {
-                key = $"{fromCoordinateSystem}:{toCoordinateSystem}:{point.Coordinate.X}:{point.Coordinate.Y}";
-
+                var key = new TransformCacheKey(fromCoordinateSystem, toCoordinateSystem, point.Coordinate.X, point.Coordinate.Y);
                 if (_transformPointCache.TryGetValue(key, out var cachedPoint))
                 {
+                    NumberOfCacheHits++;
                     return cachedPoint as T;
                 }
+                cacheKey = key;
             }
 
-            var mathTransformFilter =
-                MathTransformFilterDictionary[
-                    new Tuple<CoordinateSys, CoordinateSys>(fromCoordinateSystem, toCoordinateSystem)];
-            var transformedGeometry = geometry.Copy();
+            var mathTransformFilter = MathTransformFilterDictionary[
+                new Tuple<CoordinateSys, CoordinateSys>(fromCoordinateSystem, toCoordinateSystem)];
+
+            var transformedGeometry = geometry is Point
+                ? new Point(geometry.Coordinate)
+                : geometry.Copy();
+
             transformedGeometry.Apply(mathTransformFilter);
             transformedGeometry.SRID = (int)toCoordinateSystem;
 
-            // Remove decimals for some coordinate systems
-            if (toCoordinateSystem == CoordinateSys.ETRS89_LAEA_Europe ||
-                toCoordinateSystem == CoordinateSys.Rt90_25_gon_v ||
-                toCoordinateSystem == CoordinateSys.SWEREF99_TM ||
-                toCoordinateSystem == CoordinateSys.WebMercator)
+            if (_roundedCoordinateSystems.Contains(toCoordinateSystem))
             {
-                foreach (var coordinate in transformedGeometry.Coordinates)
+                var coords = transformedGeometry.Coordinates;
+                for (int i = 0; i < coords.Length; i++)
                 {
-                    coordinate.X = Math.Round(coordinate.X, 0);
-                    coordinate.Y = Math.Round(coordinate.Y, 0);
+                    coords[i].X = Math.Round(coords[i].X, 0);
+                    coords[i].Y = Math.Round(coords[i].Y, 0);
                 }
             }
 
-            if (!string.IsNullOrEmpty(key))
+            if (cacheKey.HasValue && transformedGeometry is Point transformedPoint)
             {
-                // If we got this far and key is set, try add point to cache
-                lock (_transformPointCache)
+                _transformPointCache.TryAdd(cacheKey.Value, transformedPoint);
+                if (_transformPointCache.Count > MaxCacheSize)
                 {
-                    _transformPointCache.TryAdd(key, transformedGeometry as Point);
+                    _transformPointCache.Clear(); // Clear the cache if it exceeds the max size                    
                 }
             }
 
             return transformedGeometry as T;
         }
+
 
         /// <summary>
         ///     Convert angle to radians
@@ -869,5 +880,66 @@ namespace SOS.Lib.Extensions
             return false;
         }
         #endregion Public
+
+        private readonly struct TransformCacheKey : IEquatable<TransformCacheKey>
+        {
+            public CoordinateSys From { get; }
+            public CoordinateSys To { get; }
+            public double X { get; }
+            public double Y { get; }
+
+            public TransformCacheKey(CoordinateSys from, CoordinateSys to, double x, double y)
+            {
+                From = from;
+                To = to;
+                X = x;
+                Y = y;
+            }
+
+            public bool Equals(TransformCacheKey other) =>
+                From == other.From && To == other.To && X == other.X && Y == other.Y;
+
+            public override bool Equals(object obj) => obj is TransformCacheKey other && Equals(other);
+
+            public override int GetHashCode() => HashCode.Combine(From, To, X, Y);
+        }
+
+        //private readonly struct TransformCacheKey : IEquatable<TransformCacheKey>
+        //{
+        //    private const double Tolerance = 1e-6;
+
+        //    public CoordinateSys From { get; }
+        //    public CoordinateSys To { get; }
+        //    public double X { get; }
+        //    public double Y { get; }
+
+        //    public TransformCacheKey(CoordinateSys from, CoordinateSys to, double x, double y)
+        //    {
+        //        From = from;
+        //        To = to;
+        //        X = x;
+        //        Y = y;
+        //    }
+
+        //    public bool Equals(TransformCacheKey other) =>
+        //        From == other.From &&
+        //        To == other.To &&
+        //        AreClose(X, other.X) &&
+        //        AreClose(Y, other.Y);
+
+        //    public override bool Equals(object obj) =>
+        //        obj is TransformCacheKey other && Equals(other);
+
+        //    public override int GetHashCode()
+        //    {                
+        //        long xRounded = (long)(X / Tolerance);
+        //        long yRounded = (long)(Y / Tolerance);
+        //        return HashCode.Combine(From, To, xRounded, yRounded);
+        //    }
+
+        //    private static bool AreClose(double a, double b) =>
+        //        Math.Abs(a - b) < Tolerance;
+        //}
+
     }
 }
