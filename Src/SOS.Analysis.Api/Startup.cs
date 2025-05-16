@@ -56,9 +56,12 @@ using System.Security.Claims;
 using System.Collections.Concurrent;
 using Serilog;
 using Microsoft.IdentityModel.JsonWebTokens;
-using Elastic.Clients.Elasticsearch.Cluster;
+using SOS.Analysis.Api.HealthChecks;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using HealthChecks.UI.Client;
 using SOS.Lib.JsonConverters;
 using NetTopologySuite.Geometries;
+using Elastic.Clients.Elasticsearch.Cluster;
 
 namespace SOS.Analysis.Api
 {
@@ -71,6 +74,7 @@ namespace SOS.Analysis.Api
         private const string PublicApiName = "PublicSosAnalysis";
         private const string InternalApiPrefix = "Internal";
         private bool _disableHangfireInit = false;
+        private bool _disableHealthCheckInit = false;
         private bool _useLocalHangfire = false;
         private bool _isDevelopment;
         private IWebHostEnvironment CurrentEnvironment { get; set; }
@@ -145,6 +149,7 @@ namespace SOS.Analysis.Api
                 builder.AddUserSecrets<Startup>();
             }
             _disableHangfireInit = GetEnvironmentBool(environmentVariable: "DISABLE_HANGFIRE_INIT");
+            _disableHealthCheckInit = GetEnvironmentBool(environmentVariable: "DISABLE_HEALTHCHECK_INIT");
             _useLocalHangfire = GetEnvironmentBool(environmentVariable: "USE_LOCAL_HANGFIRE");
 
             Configuration = builder.Build();
@@ -187,8 +192,6 @@ namespace SOS.Analysis.Api
                     options.JsonSerializerOptions.Converters.Add(new NetTopologySuite.IO.Converters.GeoJsonConverterFactory()); // Used for FeatureCollections
                     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 });
-           
-            services.AddHealthChecks().AddCheck<HealthCheck>("CustomHealthCheck");
 
             // MongoDB conventions.
             ConventionRegistry.Register(
@@ -262,7 +265,6 @@ namespace SOS.Analysis.Api
             services.AddSwaggerGen(options =>
                 {
                     options.MapType<Geometry>(() => new OpenApiSchema { Type = "object" });
-
                     var currentAssembly = Assembly.GetExecutingAssembly();
                     var xmlDocs = currentAssembly.GetReferencedAssemblies()
                         .Union(new AssemblyName[] { currentAssembly.GetName() })
@@ -353,6 +355,14 @@ namespace SOS.Analysis.Api
             services.AddScoped<IProcessClient, ProcessClient>(p => new ProcessClient(processedSettings, processedDbConfiguration.DatabaseName,
                 processedDbConfiguration.ReadBatchSize, processedDbConfiguration.WriteBatchSize));
 
+            if (!_disableHealthCheckInit)
+            {
+                services.AddHealthChecks()
+                    .AddCheck<HealthCheck>("CustomHealthCheck", tags: ["k8s"])
+                    .AddCheck<AggregateHealthCheck>("AggregateHealthCheck", tags: ["Analysis.API"])
+                    .AddSystemMemory(1000, "System memory", tags: ["System"]);
+            }
+
             // Add configuration
             services.AddSingleton(analysisConfiguration!);
             services.AddSingleton(elasticConfiguration!);
@@ -373,7 +383,7 @@ namespace SOS.Analysis.Api
             var clusterHealthCache = new ClassCache<ConcurrentDictionary<string, HealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<string, HealthResponse>>>()) { CacheDuration = TimeSpan.FromMinutes(2) };
             services.AddSingleton<IClassCache<ConcurrentDictionary<string, HealthResponse>>>(clusterHealthCache);
             services.AddSingleton<SortableFieldsCache>();
-
+            
             // Add managers            
             services.AddScoped<IAnalysisManager, AnalysisManager>();
             services.AddScoped<IFilterManager, FilterManager>();
@@ -583,9 +593,18 @@ namespace SOS.Analysis.Api
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+
+                if (!_disableHealthCheckInit)
+                {
+                    endpoints.MapHealthChecks("/healthz");
+                    endpoints.MapHealthChecks("/health", new HealthCheckOptions()
+                    {
+                        ResponseWriter = (context, _) => UIResponseWriter.WriteHealthCheckUIResponse(context, _)
+                    });
+                }
             });
         }
-
+        
         private static IReadOnlyList<ApiVersion> GetApiVersions(ApiDescription apiDescription)
         {
             var apiVersionMetadata = apiDescription.ActionDescriptor.GetApiVersionMetadata();

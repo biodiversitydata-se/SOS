@@ -490,7 +490,8 @@ namespace SOS.Observations.Api
                     options.Period = TimeSpan.FromSeconds(600); // Create new health check every 10 minutes and cache result
                     options.Timeout = TimeSpan.FromSeconds(60);
                 });
-                healthChecks                    
+                healthChecks 
+                    .AddSystemMemory(1000, "System memory", tags: ["System"])
                     //  .AddMongoDb(processedDbConfiguration.GetConnectionString(), tags: new[] { "database", "mongodb" })
                     .AddHangfire(a => a.MinimumAvailableServers = 1, "Hangfire", tags: new[] { "hangfire" })
                     .AddCheck<DataAmountHealthCheck>("Data amount", tags: new[] { "database", "elasticsearch", "data" })
