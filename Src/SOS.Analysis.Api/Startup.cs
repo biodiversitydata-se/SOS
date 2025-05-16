@@ -56,10 +56,12 @@ using System.Security.Claims;
 using System.Collections.Concurrent;
 using Serilog;
 using Microsoft.IdentityModel.JsonWebTokens;
-using Polly;
 using SOS.Analysis.Api.HealthChecks;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using HealthChecks.UI.Client;
+using SOS.Lib.JsonConverters;
+using NetTopologySuite.Geometries;
+using Elastic.Clients.Elasticsearch.Cluster;
 
 namespace SOS.Analysis.Api
 {
@@ -263,7 +265,6 @@ namespace SOS.Analysis.Api
             services.AddSwaggerGen(options =>
                 {
                     options.MapType<Geometry>(() => new OpenApiSchema { Type = "object" });
-
                     var currentAssembly = Assembly.GetExecutingAssembly();
                     var xmlDocs = currentAssembly.GetReferencedAssemblies()
                         .Union(new AssemblyName[] { currentAssembly.GetName() })
@@ -382,7 +383,7 @@ namespace SOS.Analysis.Api
             var clusterHealthCache = new ClassCache<ConcurrentDictionary<string, HealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<string, HealthResponse>>>()) { CacheDuration = TimeSpan.FromMinutes(2) };
             services.AddSingleton<IClassCache<ConcurrentDictionary<string, HealthResponse>>>(clusterHealthCache);
             services.AddSingleton<SortableFieldsCache>();
-
+            
             // Add managers            
             services.AddScoped<IAnalysisManager, AnalysisManager>();
             services.AddScoped<IFilterManager, FilterManager>();
