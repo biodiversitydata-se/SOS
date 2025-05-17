@@ -555,16 +555,14 @@ namespace SOS.Harvest.Jobs
                 //---------------------------------------------------------------
                 await EnableIndexingAsync();
 
-                if (success)
-                {
-                    // Update dynamic provider data
-                    await UpdateProvidersMetadataAsync(dataProvidersToProcess);
-                    await PostProcessingAsync(dataProvidersToProcess, taxonById!, (result.Sum(s => s.Value.PublicCount), result.Sum(s => s.Value.ProtectedCount)), cancellationToken!);
-                }
-
                 _logger.LogInformation($"Processing done: {success} {mode}. {LogHelper.GetMemoryUsageSummary()}");
                 _logger.LogInformation($"Number of GIS point transform cache hits: {GISExtensions.NumberOfCacheHits}");
                 _logger.LogInformation($"Number of taxon clones: {ObservationFactoryBase.NumberOfTaxonClones}");
+
+                if (success)
+                {
+                    await PostProcessingAsync(dataProvidersToProcess, taxonById!, (result.Sum(s => s.Value.PublicCount), result.Sum(s => s.Value.ProtectedCount)), cancellationToken!);
+                }                
 
                 _processTimeManager.Stop(ProcessTimeManager.TimerTypes.ProcessOverall, processOverallTimerSessionId);
 
