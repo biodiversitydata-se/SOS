@@ -745,7 +745,6 @@ namespace SOS.Lib.Extensions
             }
 
             TransformCacheKey? cacheKey = null;
-
             if (usePointCache && geometry is Point point)
             {
                 var key = new TransformCacheKey(fromCoordinateSystem, toCoordinateSystem, point.Coordinate.X, point.Coordinate.Y);
@@ -782,7 +781,7 @@ namespace SOS.Lib.Extensions
                 _transformPointCache.TryAdd(cacheKey.Value, transformedPoint);
                 if (_transformPointCache.Count > MaxCacheSize)
                 {
-                    _transformPointCache.Clear(); // Clear the cache if it exceeds the max size                    
+                    _transformPointCache.TryRemove(_transformPointCache.First()); // Remove first added item if cache is full                    
                 }
             }
 
