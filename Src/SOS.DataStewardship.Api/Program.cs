@@ -1,6 +1,7 @@
 using FluentValidation;
 using HealthChecks.UI.Client;
 using Microsoft.ApplicationInsights.Extensibility;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Serilog.Filters;
 using Serilog.Formatting.Compact;
@@ -75,12 +76,15 @@ try
     var app = builder.Build();
 
     app.ConfigureExceptionHandler(isDevelopment);
-    app.UseEndpointDefinitions();    
+    app.UseEndpointDefinitions();
+
+    app.UseHealthChecks("/healthz");
     app.UseHealthChecks("/health", new HealthCheckOptions()
     {
         Predicate = _ => true,
         ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
     });
+
     app.UseSwagger();        
     app.UseSwaggerUI(options =>
     {            
