@@ -25,6 +25,7 @@ namespace SOS.Lib.Extensions
     {        
         private const int MaxCacheSize = 1_000_000;
         public static int NumberOfCacheHits = 0;
+        public static int NumberOfCachedItems = 0;
         private static readonly ConcurrentDictionary<TransformCacheKey, Point> _transformPointCache = new();
         private static readonly HashSet<CoordinateSys> _roundedCoordinateSystems = new()
         {
@@ -777,12 +778,14 @@ namespace SOS.Lib.Extensions
             }
 
             if (cacheKey.HasValue && transformedGeometry is Point transformedPoint)
-            {
-                _transformPointCache.TryAdd(cacheKey.Value, transformedPoint);
+            {                
                 if (_transformPointCache.Count > MaxCacheSize)
                 {
-                    _transformPointCache.TryRemove(_transformPointCache.First()); // Remove first added item if cache is full                    
+                    _transformPointCache.Clear();
                 }
+
+                _transformPointCache.TryAdd(cacheKey.Value, transformedPoint);
+                NumberOfCachedItems++;
             }
 
             return transformedGeometry as T;

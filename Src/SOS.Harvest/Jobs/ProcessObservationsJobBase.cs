@@ -557,6 +557,7 @@ namespace SOS.Harvest.Jobs
 
                 _logger.LogInformation($"Processing done: {success} {mode}. {LogHelper.GetMemoryUsageSummary()}");
                 _logger.LogInformation($"Number of GIS point transform cache hits: {GISExtensions.NumberOfCacheHits}");
+                _logger.LogInformation($"Number of GIS point transform cache inserts: {GISExtensions.NumberOfCachedItems}");
                 _logger.LogInformation($"Number of taxon clones: {ObservationFactoryBase.NumberOfTaxonClones}");
 
                 if (success)
