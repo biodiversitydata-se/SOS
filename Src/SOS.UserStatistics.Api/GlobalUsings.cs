@@ -3,7 +3,6 @@ global using Microsoft.AspNetCore.Diagnostics;
 global using Microsoft.AspNetCore.Mvc;
 global using Microsoft.Extensions.Caching.Memory;
 global using Microsoft.OpenApi.Models;
-global using Nest;
 global using NLog;
 global using NLog.Web;
 global using SOS.Lib.Cache;

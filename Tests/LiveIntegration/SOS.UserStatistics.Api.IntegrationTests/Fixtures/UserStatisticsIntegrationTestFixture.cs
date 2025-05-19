@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using Nest;
-using SOS.Lib.Managers;
+﻿using Elastic.Clients.Elasticsearch.Cluster;
 using SOS.Lib.Models.Shared;
 using SOS.UserStatistics.Api.Cache.Managers;
 using System.Collections.Concurrent;
@@ -69,7 +67,6 @@ public class UserStatisticsIntegrationTestFixture : FixtureBase, IDisposable
     {
         UserAuthenticationToken = GetUserAuthenticationToken();
         ElasticSearchConfiguration elasticConfiguration = GetSearchDbConfiguration();
-
         var elasticClientManager = new ElasticClientManager(elasticConfiguration);
         var mongoDbConfiguration = GetMongoDbConfiguration();
         var processedSettings = mongoDbConfiguration.GetMongoDbSettings();
@@ -83,7 +80,7 @@ public class UserStatisticsIntegrationTestFixture : FixtureBase, IDisposable
 
         var processedConfigurationCache = new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>()), memoryCache, new NullLogger<CacheBase<string, ProcessedConfiguration>>());
         var userStatisticsObservationRepository = new UserStatisticsObservationRepository(elasticClientManager, elasticConfiguration, processedConfigurationCache, 
-            new ClassCache<ConcurrentDictionary<string, ClusterHealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<string, ClusterHealthResponse>>>()), new NullLogger<UserObservationRepository>());
+            new ClassCache<ConcurrentDictionary<string, HealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<string, HealthResponse>>>()), new NullLogger<UserObservationRepository>());
         var userService = CreateUserService();
         UserStatisticsProcessedObservationRepository = userStatisticsProcessedObservationRepository;
         var areaRepository = new AreaRepository(processClient, new NullLogger<AreaRepository>());
@@ -124,7 +121,7 @@ public class UserStatisticsIntegrationTestFixture : FixtureBase, IDisposable
             elasticConfiguration,
             new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>()), memoryCache, new NullLogger<CacheBase<string, ProcessedConfiguration>>() ),
             new Mock<ITaxonManager>().Object,
-            new ClassCache<ConcurrentDictionary<string, ClusterHealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<string, ClusterHealthResponse>>>()),
+            new ClassCache<ConcurrentDictionary<string, HealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<string, HealthResponse>>>()),
             new NullLogger<ProcessedObservationCoreRepository>());
         return userStatisticsProcessedObservationRepository;
     }

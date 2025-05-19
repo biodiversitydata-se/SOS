@@ -1,4 +1,6 @@
-﻿namespace SOS.UserStatistics.Api.Repositories.Interfaces;
+﻿using Elastic.Clients.Elasticsearch.Cluster;
+
+namespace SOS.UserStatistics.Api.Repositories.Interfaces;
 
 public class UserStatisticsProcessedObservationRepository : ProcessedObservationCoreRepository, IUserStatisticsProcessedObservationRepository
 {
@@ -7,7 +9,7 @@ public class UserStatisticsProcessedObservationRepository : ProcessedObservation
         ElasticSearchConfiguration elasticConfiguration,
         ICache<string, ProcessedConfiguration> processedConfigurationCache,
         ITaxonManager taxonManager,
-        IClassCache<ConcurrentDictionary<string, ClusterHealthResponse>> clusterHealthCache,
+        IClassCache<ConcurrentDictionary<string, HealthResponse>> clusterHealthCache,
         ILogger<ProcessedObservationCoreRepository> logger
     ) : base(elasticClientManager, elasticConfiguration, processedConfigurationCache, taxonManager, clusterHealthCache, logger)
     {
@@ -16,58 +18,68 @@ public class UserStatisticsProcessedObservationRepository : ProcessedObservation
 
     public async Task<PagedResult<UserStatisticsItem>> PagedSpeciesCountSearchAsync(SpeciesCountUserStatisticsQuery filter, int? skip, int? take)
     {
-        var query = filter.ToProcessedObservationQuery<Observation>();
+        var queries = filter.ToProcessedObservationQuery<Observation>();
         var searchResponse = await Client.SearchAsync<Observation>(s => s
             .Index(IndexName)
             .Query(q => q
                 .Bool(b => b
-                    .Filter(query)
+                    .Filter(queries.ToArray())
                 )
             )
             .Aggregations(a => a
-                .Nested("league", n => n
-                    .Path("artportalenInternal.occurrenceRecordedByInternal")
-                    .Aggregations(ag => ag
-                        .Terms("taxaCountByUserId", t => t
-                            .Field("artportalenInternal.occurrenceRecordedByInternal.id")
-                            .Size(65536)
+                .Add("league", a => a
+                    .Nested(n => n
+                        .Path("artportalenInternal.occurrenceRecordedByInternal")
+                    )
+                    .Aggregations(a => a
+                        .Add("taxaCountByUserId", a => a
+                            .Terms(t => t
+                                .Field("artportalenInternal.occurrenceRecordedByInternal.id")
+                                .Size(65536)
+                            )
                             .Aggregations(a => a
-                                .ReverseNested("recorder", rn => rn
-                                    .Aggregations(aa => aa
-                                        .Cardinality("taxaCount", c => c
-                                            .Field("taxon.id")
+                                .Add("recorder", a => a
+                                    .ReverseNested(rn => rn
+                                        .Path(null)
+                                    )
+                                    .Aggregations(a => a
+                                        .Add("taxaCount", a => a
+                                            .Cardinality(c => c
+                                                .Field("taxon.id")
+                                            )
                                         )
                                     )
                                 )
-                                .BucketSort("sortByTaxaCount", b => b
-                                    .Sort(s => s
-                                        .Descending("recorder.taxaCount"))
-                                    .From(skip)
-                                    .Size(take)
+                                 .Add("sortByTaxaCount", a => a
+                                    .BucketSort(bs => bs
+                                        .Sort(s => s
+                                            .Field("recorder.taxaCount".ToField(), c => c.Order(Elastic.Clients.Elasticsearch.SortOrder.Desc))
+                                        )
+                                        .From(skip)
+                                        .Size(take)
+                                    )
                                 )
                             )
                         )
-                        .Cardinality("userCount", t => t
-                            .Field("artportalenInternal.occurrenceRecordedByInternal.id")
+                        .Add("userCount", a => a
+                            .Cardinality(c => c
+                                .Field("artportalenInternal.occurrenceRecordedByInternal.id")
+                            )
                         )
                     )
                 )
             )
-            .Size(0)
-            .Source(so => so.ExcludeAll())
-            .TrackTotalHits(false)
+            .AddDefaultAggrigationSettings()
         );
 
-        if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
+        if (!searchResponse.IsValidResponse) throw new InvalidOperationException(searchResponse.DebugInformation);
 
         var buckets = searchResponse
-            .Aggregations
-            .Nested("league")
-            .Terms("taxaCountByUserId")
-            .Buckets
-            .Select(b => new UserStatisticsItem { UserId = Convert.ToInt32(b.Key), ObservationCount = Convert.ToInt32(b.DocCount ?? 0), SpeciesCount = Convert.ToInt32(b.ReverseNested("recorder").Cardinality("taxaCount").Value) }).ToList();
+            .Aggregations.GetNested("league")
+                    .Aggregations.GetLongTerms("taxaCountByUserId").Buckets
+                .Select(b => new UserStatisticsItem { UserId = Convert.ToInt32(b.Key), ObservationCount = Convert.ToInt32(b.DocCount), SpeciesCount = Convert.ToInt32(b.Aggregations.GetReverseNested("recorder").Aggregations.GetCardinality("taxaCount").Value) }).ToList();
 
-        int totalCount = Convert.ToInt32(searchResponse.Aggregations.Nested("league").Cardinality("userCount").Value ?? 0);
+        int totalCount = Convert.ToInt32(searchResponse.Aggregations.GetNested("league").Aggregations.GetCardinality("userCount").Value);
 
         // Update skip and take
         if (skip == null)
@@ -100,36 +112,49 @@ public class UserStatisticsProcessedObservationRepository : ProcessedObservation
 
     public async Task<List<UserStatisticsItem>> AreaSpeciesCountSearchAsync(SpeciesCountUserStatisticsQuery filter, List<int> userIds)
     {
-        var query = filter.ToProcessedObservationQuery<Observation>();
-        query.TryAddNestedTermsCriteria("artportalenInternal.occurrenceRecordedByInternal", "id", userIds);
+        var queries = filter.ToProcessedObservationQuery<Observation>();
+        queries.TryAddNestedTermsCriteria("artportalenInternal.occurrenceRecordedByInternal", "id", userIds);
         var searchResponse = await Client.SearchAsync<Observation>(s => s
             .Index(IndexName)
             .Query(q => q
                 .Bool(b => b
-                    .Filter(query)
+                    .Filter(queries.ToArray())
                 )
             )
             .Aggregations(a => a
-                .Nested("league", n => n
-                    .Path("artportalenInternal.occurrenceRecordedByInternal")
-                    .Aggregations(ag => ag
-                        .Terms("taxaCountByUserId", t => t
-                            .Field("artportalenInternal.occurrenceRecordedByInternal.id")
-                            .Size(65536) // userIds.Count?
-                            .Aggregations(a => a
-                                .ReverseNested("recorder", rn => rn
+                .Add("league", a => a
+                    .Nested(n => n
+                        .Path("artportalenInternal.occurrenceRecordedByInternal")
+                    )
+                    .Aggregations(a => a
+                        .Add("taxaCountByUserId", a => a
+                            .Terms(t => t
+                                .Field("artportalenInternal.occurrenceRecordedByInternal.id")
+                                .Size(65536) // userIds.Count?
+                            )
+                            .Aggregations(a => a 
+                                .Add("recorder", a => a
+                                    .ReverseNested(rn => rn
+                                        .Path(null)
+                                    )
                                     .Aggregations(a => a
-                                        .Terms("province", t => t
-                                            .Field("location.province.featureId")
-                                            .Size(33) // max number of provinces
+                                        .Add("province", a => a
+                                            .Terms(t => t
+                                                .Field("location.province.featureId")
+                                                .Size(33) // max number of provinces
+                                            )
                                             .Aggregations(a => a
-                                                .Cardinality("taxonCount", c => c
-                                                    .Field("taxon.id")
+                                                .Add("taxonCount", a => a
+                                                    .Cardinality(c => c
+                                                        .Field("taxon.id")
+                                                    )
                                                 )
                                             )
                                         )
-                                        .Cardinality("sumTaxaCount", c => c
-                                            .Field("taxon.id")
+                                        .Add("sumTaxaCount", a => a
+                                            .Cardinality(c => c
+                                                .Field("taxon.id")
+                                            )
                                         )
                                     )
                                 )
@@ -138,30 +163,27 @@ public class UserStatisticsProcessedObservationRepository : ProcessedObservation
                     )
                 )
             )
-            .Size(0)
-            .Source(so => so.ExcludeAll())
-            .TrackTotalHits(false)
+           .AddDefaultAggrigationSettings()
         );
 
 
-        if (!searchResponse.IsValid) throw new InvalidOperationException(searchResponse.DebugInformation);
+        if (!searchResponse.IsValidResponse) throw new InvalidOperationException(searchResponse.DebugInformation);
 
         var items = searchResponse
             .Aggregations
-            .Nested("league")
-            .Terms("taxaCountByUserId")
-            .Buckets
-            .Select(b => new UserStatisticsItem
-            {
-                UserId = Convert.ToInt32(b.Key),
-                ObservationCount = Convert.ToInt32(b.DocCount ?? 0),
-                SpeciesCount = Convert.ToInt32(b.ReverseNested("recorder").Cardinality("sumTaxaCount").Value),
-                SpeciesCountByFeatureId = b
-                    .ReverseNested("recorder")
-                    .Terms("province")
-                    .Buckets
-                    .ToDictionary(bu => bu.Key, bu => Convert.ToInt32(bu.Cardinality("taxonCount").Value.GetValueOrDefault()))
-            }).ToList();
+                .GetNested("league")
+                    .Aggregations
+                        .GetLongTerms("taxaCountByUserId")
+                            .Buckets
+                                .Select(b => new UserStatisticsItem
+                                {
+                                    UserId = Convert.ToInt32(b.Key),
+                                    ObservationCount = Convert.ToInt32(b.DocCount),
+                                    SpeciesCount = Convert.ToInt32(b.Aggregations.GetReverseNested("recorder").Aggregations.GetCardinality("sumTaxaCount").Value),
+                                    SpeciesCountByFeatureId = b.Aggregations.GetReverseNested("recorder").Aggregations.GetStringTerms("province").Buckets
+                                        .ToDictionary(bu => bu.Key.Value.ToString(), bu => Convert.ToInt32(bu.Aggregations.GetCardinality("taxonCount").Value))
+                                }
+                                ).ToList();
 
         return items;
     }
@@ -171,7 +193,7 @@ public class UserStatisticsProcessedObservationRepository : ProcessedObservation
     //public async Task<PagedResult<dynamic>> TopListGetProvinceCrossLeagueAsync(SearchFilter filter, int skip, int take)
     public async Task<PagedResult<dynamic>> TopListGetProvinceCrossLeagueAsync(SpeciesCountUserStatisticsQuery filter, int skip, int take)
     {
-        var query = filter.ToProcessedObservationQuery<Observation>();
+        var queries = filter.ToProcessedObservationQuery<Observation>();
         //var (query, excludeQuery) = GetCoreQueries(filter);
 
         var searchResponse = await Client.SearchAsync<Observation>(s => s
@@ -179,52 +201,66 @@ public class UserStatisticsProcessedObservationRepository : ProcessedObservation
            .Query(q => q
                 .Bool(b => b
                     //.MustNot(excludeQuery)
-                    .Filter(query)
+                    .Filter(queries.ToArray())
                 )
             )
             .Aggregations(a => a
-                .Nested("league", n => n
-                    .Path("artportalenInternal.occurrenceRecordedByInternal")
+                .Add("league", a => a
+                    .Nested(n => n
+                        .Path("artportalenInternal.occurrenceRecordedByInternal")
+                    )
                     .Aggregations(a => a
-                        .Terms("recordedBy", t => t
-                            .Field("artportalenInternal.occurrenceRecordedByInternal.id")
-                            .Size(skip + take)
+                        .Add("recordedBy", a => a
+                            .Terms(t => t
+                                .Field("artportalenInternal.occurrenceRecordedByInternal.id")
+                                .Size(skip + take)
+                            )
                             .Aggregations(a => a
-                                .ReverseNested("recorder", rn => rn
+                                .Add("recorder", a => a
+                                    .ReverseNested(rn => rn
+                                        .Path(null)
+                                    )
                                     .Aggregations(a => a
-                                        .Terms("province", t => t
-                                            .Field("location.province.name")
-                                            .Size(33)
+                                        .Add("province", a => a
+                                            .Terms(t => t
+                                                .Field("location.province.name")
+                                                .Size(33)
+                                            )
                                             .Aggregations(a => a
-                                                .Cardinality("taxonCount", c => c
-                                                    .Field("taxon.id")
+                                                .Add("taxonCount", a => a
+                                                    .Cardinality(c => c
+                                                        .Field("taxon.id")
+                                                    )
                                                 )
                                             )
                                         )
-                                        .SumBucket("taxonCount", sb => sb
-                                            .BucketsPath("province.taxonCount")
+                                        .Add("taxonCount", a => a
+                                            .SumBucket(sb => sb
+                                                .BucketsPath("province.taxonCount")
+                                            )
                                         )
                                     )
-                                )
-                                .BucketSort("leagueSort", bs => bs
-                                    .Sort(s => s
-                                        .Descending("recorder.taxonCount")
+                                    .BucketSort(bs => bs
+                                        .Sort(s => s
+                                            .Field("recorder.taxonCount", c => c.Order(Elastic.Clients.Elasticsearch.SortOrder.Desc))
+                                        )
                                     )
                                 )
                             )
                         )
-                        .Cardinality("recordedByCount", c => c
-                            .Field("artportalenInternal.occurrenceRecordedByInternal.id")
+                        .Add("recordedByCount", a => a
+                            .Cardinality(c => c
+                                .Field("artportalenInternal.occurrenceRecordedByInternal.id")
+                            )
                         )
                     )
                 )
+               
             )
-            .Size(0)
-            .Source(s => s.ExcludeAll())
-            .TrackTotalHits(false)
+            .AddDefaultAggrigationSettings()
         );
 
-        if (!searchResponse.IsValid)
+        if (!searchResponse.IsValidResponse)
         {
             throw new InvalidOperationException(searchResponse.DebugInformation);
         }
@@ -233,15 +269,15 @@ public class UserStatisticsProcessedObservationRepository : ProcessedObservation
         {
             Skip = skip,
             Take = take,
-            TotalCount = (long)searchResponse.Aggregations.Nested("league").Cardinality("recordedByCount").Value,
-            Records = searchResponse.Aggregations.Nested("league").Terms("recordedBy").Buckets.Skip(skip).Take(take).Select(b =>
+            TotalCount = (long)searchResponse.Aggregations.GetNested("league").Aggregations.GetCardinality("recordedByCount").Value,
+            Records = searchResponse.Aggregations.GetNested("league").Aggregations.GetLongTerms("recordedBy").Buckets.Skip(skip).Take(take).Select(b =>
                 new
                 {
                     Id = b.Key,
-                    Provinces = b.ReverseNested("recorder").Terms("province").Buckets.Select(b => new
+                    Provinces = b.Aggregations.GetReverseNested("recorder").Aggregations.GetStringTerms("province").Buckets.Select(b => new
                     {
                         Id = b.Key,
-                        TaxonCount = (int)b.Cardinality("taxonCount").Value
+                        TaxonCount = (int)b.Aggregations.GetCardinality("taxonCount").Value
                     })
                 }
             )
@@ -250,41 +286,45 @@ public class UserStatisticsProcessedObservationRepository : ProcessedObservation
 
     public async Task<PagedResult<dynamic>> TopListGetLocationLeagueAsync(SearchFilter filter, int skip, int take)
     {
-        var (query, excludeQuery) = GetCoreQueries(filter);
+        var (queries, excludeQueries) = GetCoreQueries<dynamic>(filter);
 
         var searchResponse = await Client.SearchAsync<dynamic>(s => s
            .Index(new[] { PublicIndexName, ProtectedIndexName })
            .Query(q => q
                 .Bool(b => b
-                    .MustNot(excludeQuery)
-                    .Filter(query)
+                    .MustNot(excludeQueries.ToArray())
+                    .Filter(queries.ToArray())
                 )
             )
             .Aggregations(a => a
-                .Terms("localities", c => c
-                    .Field("location.locationId")
-                    .Size(skip + take)
+                .Add("localities", a => a
+                    .Terms(t => t
+                        .Field("location.locationId")
+                        .Size(skip + take)
+                    )
                     .Aggregations(a => a
-                        .Cardinality("taxonCount", c => c
-                            .Field("taxon.id")
-                        )
-                        .BucketSort("sort", bs => bs
-                            .Sort(s => s
-                                .Descending("taxonCount.value")
+                        .Add("taxonCount", a => a
+                            .Cardinality(c => c
+                                .Field("taxon.id")
+                            )
+                            .BucketSort(bs => bs
+                                .Sort(s => s
+                                    .Field("taxonCount.value", c => c.Order(Elastic.Clients.Elasticsearch.SortOrder.Desc))
+                                )
                             )
                         )
                     )
                 )
-                .Cardinality("localityCount", c => c
-                    .Field("location.locationId")
+                .Add("localityCount", a => a
+                    .Cardinality(c => c
+                        .Field("location.locationId")
+                    )
                 )
             )
-            .Size(0)
-            .Source(s => s.ExcludeAll())
-            .TrackTotalHits(false)
+             .AddDefaultAggrigationSettings()
         );
 
-        if (!searchResponse.IsValid)
+        if (!searchResponse.IsValidResponse)
         {
             throw new InvalidOperationException(searchResponse.DebugInformation);
         }
@@ -293,12 +333,12 @@ public class UserStatisticsProcessedObservationRepository : ProcessedObservation
         {
             Skip = skip,
             Take = take,
-            TotalCount = (long)searchResponse.Aggregations.Cardinality("localityCount").Value,
-            Records = searchResponse.Aggregations.Terms("localities").Buckets.Skip(skip).Take(take).Select(b =>
+            TotalCount = (long)searchResponse.Aggregations.GetCardinality("localityCount").Value,
+            Records = searchResponse.Aggregations.GetStringTerms("localities").Buckets.Skip(skip).Take(take).Select(b =>
                 new
                 {
                     Id = b.Key,
-                    TaxonCount = (int)b.Cardinality("taxonCount").Value
+                    TaxonCount = (int)b.Aggregations.GetCardinality("taxonCount").Value
                 }
             )
         };
@@ -307,59 +347,70 @@ public class UserStatisticsProcessedObservationRepository : ProcessedObservation
     /// <inheritdoc/>
     public async Task<PagedResult<dynamic>> TopListGetMonthCrossLeagueAsync(SearchFilter filter, int skip, int take)
     {
-        var (query, excludeQuery) = GetCoreQueries(filter);
+        var (queries, excludeQueries) = GetCoreQueries<dynamic>(filter);
 
         var searchResponse = await Client.SearchAsync<dynamic>(s => s
            .Index(new[] { PublicIndexName, ProtectedIndexName })
            .Query(q => q
                 .Bool(b => b
-                    .MustNot(excludeQuery)
-                    .Filter(query)
+                    .MustNot(excludeQueries.ToArray())
+                    .Filter(queries.ToArray())
                 )
             )
             .Aggregations(a => a
-                .Nested("league", n => n
-                    .Path("artportalenInternal.occurrenceRecordedByInternal")
+                .Add("league", a => a
+                    .Nested(n => n
+                        .Path("artportalenInternal.occurrenceRecordedByInternal")
+                    )
                     .Aggregations(a => a
-                        .Terms("recordedBy", t => t
-                            .Field("artportalenInternal.occurrenceRecordedByInternal.id")
-                            .Size(skip + take)
+                        .Add("recordedBy", a => a
+                            .Terms(t => t
+                                .Field("artportalenInternal.occurrenceRecordedByInternal.id")
+                                .Size(skip + take)
+                            )
                             .Aggregations(a => a
-                                .ReverseNested("recorder", rn => rn
+                                .Add("recorder", a => a
+                                    .ReverseNested(rn => rn
+                                        .Path(null)
+                                    )
                                     .Aggregations(a => a
-                                        .Terms("months", t => t
-                                            .Field("event.startMonth")
-                                            .Size(12)
+                                        .Add("months", a => a
+                                            .Terms(t => t
+                                                .Field("event.startMonth")
+                                                .Size(12)
+                                            )
                                             .Aggregations(a => a
-                                                .Cardinality("taxonCount", c => c
-                                                    .Field("taxon.id")
+                                                .Add("taxonCount", a => a
+                                                    .Cardinality(c => c
+                                                        .Field("taxon.id")
+                                                    )
                                                 )
                                             )
+                                            .SumBucket(sb => sb
+                                                .BucketsPath("months.taxonCount")
+                                            )
                                         )
-                                        .SumBucket("taxonCount", sb => sb
-                                            .BucketsPath("months.taxonCount")
+                                    )
+                                    .BucketSort(bs => bs
+                                        .Sort(s => s
+                                            .Field("recorder.taxonCount", c => c.Order(Elastic.Clients.Elasticsearch.SortOrder.Desc))
                                         )
                                     )
                                 )
-                                .BucketSort("leagueSort", bs => bs
-                                    .Sort(s => s
-                                        .Descending("recorder.taxonCount")
-                                    )
-                                )
-                            )
+                            ) 
                         )
-                        .Cardinality("recordedByCount", c => c
-                            .Field("artportalenInternal.occurrenceRecordedByInternal.id")
+                        .Add("recordedByCount", a => a
+                            .Cardinality(c => c
+                                .Field("artportalenInternal.occurrenceRecordedByInternal.id")
+                            )
                         )
                     )
                 )
             )
-            .Size(0)
-            .Source(s => s.ExcludeAll())
-            .TrackTotalHits(false)
+             .AddDefaultAggrigationSettings()
         );
 
-        if (!searchResponse.IsValid)
+        if (!searchResponse.IsValidResponse)
         {
             throw new InvalidOperationException(searchResponse.DebugInformation);
         }
@@ -368,58 +419,62 @@ public class UserStatisticsProcessedObservationRepository : ProcessedObservation
         {
             Skip = skip,
             Take = take,
-            Records = searchResponse.Aggregations.Nested("league").Terms("recordedBy").Buckets.Skip(skip).Take(take).Select(b =>
+            Records = searchResponse.Aggregations.GetNested("league").Aggregations.GetLongTerms("recordedBy").Buckets.Skip(skip).Take(take).Select(b =>
                 new
                 {
                     Id = b.Key,
-                    Provinces = b.ReverseNested("recorder").Terms("months").Buckets.Select(b => new
+                    Provinces = b.Aggregations.GetReverseNested("recorder").Aggregations.GetLongTerms("months").Buckets.Select(b => new
                     {
                         Id = b.Key,
-                        TaxonCount = (int)b.Cardinality("taxonCount").Value
+                        TaxonCount = (int)b.Aggregations.GetCardinality("taxonCount").Value
                     })
                 }
             ),
-            TotalCount = (long)searchResponse.Aggregations.Nested("league").Cardinality("recordedByCount").Value
+            TotalCount = (long)searchResponse.Aggregations.GetNested("league").Aggregations.GetCardinality("recordedByCount").Value
         };
     }
 
     public async Task<PagedResult<dynamic>> TopListGetMunicipalityLeagueAsync(SearchFilter filter, int skip, int take)
     {
-        var (query, excludeQuery) = GetCoreQueries(filter);
+        var (queries, excludeQueries) = GetCoreQueries<dynamic>(filter);
 
         var searchResponse = await Client.SearchAsync<dynamic>(s => s
            .Index(new[] { PublicIndexName, ProtectedIndexName })
            .Query(q => q
                 .Bool(b => b
-                    .MustNot(excludeQuery)
-                    .Filter(query)
+                    .MustNot(excludeQueries.ToArray())
+                    .Filter(queries.ToArray())
                 )
             )
             .Aggregations(a => a
-                .Terms("municipalities", c => c
-                    .Field("location.municipality.featureId")
-                    .Size(skip + take)
+                .Add("municipalities", a => a
+                    .Terms(t => t
+                        .Field("location.municipality.featureId")
+                        .Size(skip + take)
+                    )
                     .Aggregations(a => a
-                        .Cardinality("taxonCount", c => c
-                            .Field("taxon.id")
-                        )
-                        .BucketSort("sort", bs => bs
-                            .Sort(s => s
-                                .Descending("taxonCount.value")
+                        .Add("taxonCount", a => a
+                            .Cardinality(c => c
+                                .Field("taxon.id")
+                            )
+                            .BucketSort(bs => bs
+                                .Sort(s => s
+                                    .Field("taxonCount.value", c => c.Order(Elastic.Clients.Elasticsearch.SortOrder.Desc))
+                                )
                             )
                         )
                     )
                 )
-                .Cardinality("municipalityCount", c => c
-                    .Field("location.municipality.featureId")
+                .Add("municipalityCount", a => a
+                    .Cardinality(c => c
+                        .Field("location.municipality.featureId")
+                    )
                 )
             )
-            .Size(0)
-            .Source(s => s.ExcludeAll())
-            .TrackTotalHits(false)
+           .AddDefaultAggrigationSettings()
         );
 
-        if (!searchResponse.IsValid)
+        if (!searchResponse.IsValidResponse)
         {
             throw new InvalidOperationException(searchResponse.DebugInformation);
         }
@@ -428,12 +483,12 @@ public class UserStatisticsProcessedObservationRepository : ProcessedObservation
         {
             Skip = skip,
             Take = take,
-            TotalCount = (long)searchResponse.Aggregations.Cardinality("municipalityCount").Value,
-            Records = searchResponse.Aggregations.Terms("municipalities").Buckets.Skip(skip).Take(take).Select(b =>
+            TotalCount = (long)searchResponse.Aggregations.GetCardinality("municipalityCount").Value,
+            Records = searchResponse.Aggregations.GetStringTerms("municipalities").Buckets.Skip(skip).Take(take).Select(b =>
                 new
                 {
                     Id = b.Key,
-                    TaxonCount = (int)b.Cardinality("taxonCount").Value
+                    TaxonCount = (int)b.Aggregations.GetCardinality("taxonCount").Value
                 }
             )
         };
@@ -442,41 +497,45 @@ public class UserStatisticsProcessedObservationRepository : ProcessedObservation
     /// <inheritdoc/>
     public async Task<PagedResult<dynamic>> TopListGetProvinceLeagueAsync(SearchFilter filter, int skip, int take)
     {
-        var (query, excludeQuery) = GetCoreQueries(filter);
+        var (queries, excludeQueries) = GetCoreQueries<dynamic>(filter);
 
         var searchResponse = await Client.SearchAsync<dynamic>(s => s
            .Index(new[] { PublicIndexName, ProtectedIndexName })
            .Query(q => q
                 .Bool(b => b
-                    .MustNot(excludeQuery)
-                    .Filter(query)
+                    .MustNot(excludeQueries.ToArray())
+                    .Filter(queries.ToArray())
                 )
             )
             .Aggregations(a => a
-                .Terms("provinces", c => c
-                    .Field("location.province.featureId")
-                    .Size(skip + take)
+                .Add("provinces", a => a
+                    .Terms(t => t
+                        .Field("location.province.featureId")
+                        .Size(skip + take)
+                    )
                     .Aggregations(a => a
-                        .Cardinality("taxonCount", c => c
-                            .Field("taxon.id")
-                        )
-                        .BucketSort("sort", bs => bs
-                            .Sort(s => s
-                                .Descending("taxonCount.value")
+                        .Add("taxonCount", a => a
+                            .Cardinality(c => c
+                                .Field("taxon.id")
+                            )
+                            .BucketSort(bs => bs
+                                .Sort(s => s
+                                    .Field("taxonCount.value", c => c.Order(Elastic.Clients.Elasticsearch.SortOrder.Desc))
+                                )
                             )
                         )
                     )
                 )
-                .Cardinality("provinceCount", c => c
-                    .Field("location.province.featureId")
+                .Add("provinceCount", a => a
+                    .Cardinality(c => c
+                        .Field("location.province.featureId")
+                    )
                 )
             )
-            .Size(0)
-            .Source(s => s.ExcludeAll())
-            .TrackTotalHits(false)
+            .AddDefaultAggrigationSettings()
         );
 
-        if (!searchResponse.IsValid)
+        if (!searchResponse.IsValidResponse)
         {
             throw new InvalidOperationException(searchResponse.DebugInformation);
         }
@@ -485,12 +544,12 @@ public class UserStatisticsProcessedObservationRepository : ProcessedObservation
         {
             Skip = skip,
             Take = take,
-            TotalCount = (long)searchResponse.Aggregations.Cardinality("provinceCount").Value,
-            Records = searchResponse.Aggregations.Terms("provinces").Buckets.Skip(skip).Take(take).Select(b =>
+            TotalCount = (long)searchResponse.Aggregations.GetCardinality("provinceCount").Value,
+            Records = searchResponse.Aggregations.GetStringTerms("provinces").Buckets.Skip(skip).Take(take).Select(b =>
                 new
                 {
                     Id = b.Key,
-                    TaxonCount = (int)b.Cardinality("taxonCount").Value
+                    TaxonCount = (int)b.Aggregations.GetCardinality("taxonCount").Value
                 }
             )
         };
@@ -499,31 +558,33 @@ public class UserStatisticsProcessedObservationRepository : ProcessedObservation
     /// <inheritdoc/>
     public async Task<PagedResult<dynamic>> TopListGetReportingVolumeLeagueAsync(SearchFilter filter, int skip, int take)
     {
-        var (query, excludeQuery) = GetCoreQueries(filter);
+        var (queries, excludeQueries) = GetCoreQueries<dynamic>(filter);
 
         var searchResponse = await Client.SearchAsync<dynamic>(s => s
            .Index(new[] { PublicIndexName, ProtectedIndexName })
            .Query(q => q
                 .Bool(b => b
-                    .MustNot(excludeQuery)
-                    .Filter(query)
+                    .MustNot(excludeQueries.ToArray())
+                    .Filter(queries.ToArray())
                 )
             )
             .Aggregations(a => a
-                .Terms("reportedBy", c => c
-                    .Field("artportalenInternal.reportedByUserId")
-                    .Size(skip + take)
+                .Add("reportedBy", a => a
+                    .Terms(t => t
+                        .Field("artportalenInternal.reportedByUserId")
+                        .Size(skip + take)
+                    )
                 )
-                .Cardinality("reportedByCount", c => c
-                    .Field("artportalenInternal.reportedByUserId")
+                .Add("reportedByCount", a => a
+                    .Cardinality(c => c
+                         .Field("artportalenInternal.reportedByUserId")
+                    )
                 )
             )
-            .Size(0)
-            .Source(s => s.ExcludeAll())
-            .TrackTotalHits(false)
+            .AddDefaultAggrigationSettings()
         );
 
-        if (!searchResponse.IsValid)
+        if (!searchResponse.IsValidResponse)
         {
             throw new InvalidOperationException(searchResponse.DebugInformation);
         }
@@ -532,8 +593,8 @@ public class UserStatisticsProcessedObservationRepository : ProcessedObservation
         {
             Skip = skip,
             Take = take,
-            TotalCount = (long)searchResponse.Aggregations.Cardinality("reportedByCount").Value,
-            Records = searchResponse.Aggregations.Terms("reportedBy").Buckets.Skip(skip).Take(take).Select(b =>
+            TotalCount = (long)searchResponse.Aggregations.GetCardinality("reportedByCount").Value,
+            Records = searchResponse.Aggregations.GetLongTerms("reportedBy").Buckets.Skip(skip).Take(take).Select(b =>
                 new
                 {
                     Id = b.Key,
