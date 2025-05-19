@@ -289,7 +289,7 @@ namespace SOS.Lib.Managers
                 return resultIncludingOrganismQuantity;
             }
             */
-            var result = await _processedObservationRepository.GetAggregationItemsAsync(filter, aggregationField, 0, take, precisionThreshold ?? 40000, sortOrder, true, false, aggregateOrganismQuantity);
+            var result = await _processedObservationRepository.GetAggregationItemsAsync(filter, aggregationField, 0, take, precisionThreshold ?? 40000, sortOrder, false, false, aggregateOrganismQuantity);
             return result?.Records;
         }
 

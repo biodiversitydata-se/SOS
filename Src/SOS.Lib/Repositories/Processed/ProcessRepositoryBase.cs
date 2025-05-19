@@ -16,7 +16,7 @@ using Elastic.Clients.Elasticsearch.Cluster;
 using SOS.Lib.Extensions;
 using Elastic.Clients.Elasticsearch.Aggregations;
 using Elastic.Clients.Elasticsearch.IndexManagement;
-using System.Threading;
+using Elastic.Clients.Elasticsearch.Mapping;
 
 namespace SOS.Lib.Repositories.Processed
 {
@@ -41,6 +41,7 @@ namespace SOS.Lib.Repositories.Processed
         /// </summary>
         private bool _disposed;
 
+
         /// <summary>
         ///     Get configuration object
         /// </summary>
@@ -58,6 +59,34 @@ namespace SOS.Lib.Repositories.Processed
                 Logger.LogError(e.ToString());
 
                 return default;
+            }
+        }
+
+        private void PopulateFieldTypes(Properties properties, ref Dictionary<string, string> fieldTypes, string parents = null)
+        {
+            foreach (var property in properties)
+            {
+                var name = $"{(string.IsNullOrEmpty(parents) ? "" : $"{parents}.")}{property.Key.Name}";
+
+                if (property.Value is ObjectProperty op)
+                {
+                    PopulateFieldTypes(op.Properties, ref fieldTypes, name);
+                }
+                else
+                {
+                    var type = property.Value switch
+                    {
+                        ByteNumberProperty or
+                        IntegerNumberProperty or
+                        LongNumberProperty or
+                        ShortNumberProperty => "long",
+                        DoubleNumberProperty or
+                        FloatNumberProperty => "double",
+                        _ => "string"
+                    };
+
+                    fieldTypes.Add(name, type);
+                }
             }
         }
 
@@ -553,6 +582,23 @@ namespace SOS.Lib.Repositories.Processed
                 .Query(q => q.MatchAll(q => q.QueryName("GetAllQuery")))
                 .Size(take));
             return searchResponse.Documents.ToList();
+        }
+
+        public async Task<IDictionary<string, string>> GetMappingAsync()
+        {
+            var fieldTypes = new Dictionary<string, string>();
+            var mappingResponse = await Client.Indices.GetMappingAsync<TEntity>(o => o
+                .Indices(IndexName)
+            );
+            if (mappingResponse.IsValidResponse)
+            {
+                foreach (var value in mappingResponse.Indices.Values)
+                {
+                    PopulateFieldTypes(value.Mappings.Properties, ref fieldTypes, null);
+                }
+            }
+
+            return fieldTypes;
         }
     }
 }

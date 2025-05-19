@@ -1268,7 +1268,8 @@ namespace SOS.Lib.Repositories.Processed
             AggregationSortOrder? sortOrder = AggregationSortOrder.CountDescending,
             bool? useScript = false,
             bool? aggregateCardinality = false,
-            bool? aggregateOrganismQuantity = false
+            bool? aggregateOrganismQuantity = false,
+            string fieldType = "string"
         )
         {
             var indexNames = GetCurrentIndex(filter);
@@ -1276,12 +1277,15 @@ namespace SOS.Lib.Repositories.Processed
             int size = Math.Max(1, Math.Min(65536, skip + take));
             var termsOrder = sortOrder.HasValue ? sortOrder.Value.GetTermsOrder() : null;
             FluentDescriptorDictionary<Field, RuntimeFieldDescriptor<dynamic>> runtimeMapping = null;
+            ;
+
             if (useScript ?? true)
             {
                 var scriptFieldName = "scriptField";
                 runtimeMapping = GetRuntimeMappingScriptField(aggregationField, scriptFieldName);
                 aggregationField = scriptFieldName;
             }
+           
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
                 .Indices(indexNames)
                 .Query(q => q
@@ -1291,15 +1295,17 @@ namespace SOS.Lib.Repositories.Processed
                     )
                 )
                 .RuntimeMappings(rm => runtimeMapping)
-                .Aggregations(a => {
-                    a.Add("termAggregation", a => {
+                .Aggregations(a =>
+                {
+                    a.Add("termAggregation", a =>
+                    {
                         a.Terms(t => t
                             .Size(size)
                             .Field(aggregationField)
-                            .ValueType("string")
+                            .ValueType(fieldType ?? "string")
                             .Order(termsOrder)
                         );
-                        
+
                         if (aggregateOrganismQuantity ?? false)
                         {
                             a.Aggregations(a => a
@@ -1320,29 +1326,49 @@ namespace SOS.Lib.Repositories.Processed
                             )
                         );
                     }
-                        
+
                     return a;
                 })
                 .AddDefaultAggrigationSettings()
             );
 
             searchResponse.ThrowIfInvalid();
-            IEnumerable<AggregationItem> records = searchResponse.Aggregations
-                .GetStringTerms("termAggregation")
-                .Buckets
-                    .Select(b => new AggregationItem { 
-                        AggregationKey = b.Key.Value.ToString(), 
-                        DocCount = (int)b.DocCount,
-                        OrganismQuantity = aggregateOrganismQuantity ?? false ? (int)(b.Aggregations.GetSum("totalOrganismQuantity")?.Value ?? 0) : 0
-                    })
-                    .Skip(skip)
-                    .Take(take);
+            var records = fieldType switch
+            {
+                "double" => searchResponse.Aggregations.GetDoubleTerms("termAggregation")
+                    .Buckets
+                        .Select(b => new AggregationItem
+                        {
+                            AggregationKey = b.Key.ToString(),
+                            DocCount = (int)b.DocCount,
+                            OrganismQuantity = aggregateOrganismQuantity ?? false ? (int)(b.Aggregations.GetSum("totalOrganismQuantity")?.Value ?? 0) : 0
+                        }),
+                "long" => searchResponse.Aggregations.GetLongTerms("termAggregation")
+                    .Buckets
+                        .Select(b => new AggregationItem
+                        {
+                            AggregationKey = b.Key.ToString(),
+                            DocCount = (int)b.DocCount,
+                            OrganismQuantity = aggregateOrganismQuantity ?? false ? (int)(b.Aggregations.GetSum("totalOrganismQuantity")?.Value ?? 0) : 0
+                        }),
+                _ => searchResponse.Aggregations.GetStringTerms("termAggregation")
+                    .Buckets
+                        .Select(b => new AggregationItem
+                        {
+                            AggregationKey = b.Key.Value.ToString(),
+                            DocCount = (int)b.DocCount,
+                            OrganismQuantity = aggregateOrganismQuantity ?? false ? (int)(b.Aggregations.GetSum("totalOrganismQuantity")?.Value ?? 0) : 0
+                        })
+            };
+
             var totalCount = 0L;
             totalCount = aggregateCardinality ?? false ? searchResponse.Aggregations.GetCardinality("cardinalityAggregation").Value : searchResponse.Total;
 
             var result = new PagedResult<AggregationItem>()
             {
-                Records = records,
+                Records = records
+                    .Skip(skip)
+                    .Take(take),
                 Skip = skip,
                 Take = take,
                 TotalCount = totalCount
@@ -2170,7 +2196,9 @@ namespace SOS.Lib.Repositories.Processed
         public async Task<HashSet<string>> GetSortableFieldsAsync()
         {
             var sortableFields = new HashSet<string>();
-            var mappings = await Client.Indices.GetMappingAsync<Observation>(o => o.Indices(PublicIndexName));
+            var mappings = await Client.Indices.GetMappingAsync<Observation>(o => o
+                .Indices(PublicIndexName)
+            );
             if (mappings.IsValidResponse)
             {
                 foreach (var value in mappings.Indices.Values)
@@ -2337,24 +2365,6 @@ namespace SOS.Lib.Repositories.Processed
                 aggregationField = scriptFieldName;
             }
 
-            var aggregations = new FluentDescriptorDictionary<string, AggregationDescriptor<dynamic>> {
-                { 
-                    "unique_taxonids", a => a
-                        .Cardinality(c => c
-                            .Field("taxon.id")
-                            .PrecisionThreshold(precisionThreshold ?? 3000)
-                        )
-                }
-            };
-            if (aggregateOrganismQuantity)
-            {
-                aggregations.Add("totalOrganismQuantity", a => a
-                        .Sum(s => s
-                            .Field("occurrence.organismQuantityAggregation")
-                        )
-                    );
-            }
-
             var searchResponse =
                 await Client.SearchAsync<dynamic>(s => s
                 .Indices(indexNames)
@@ -2378,7 +2388,27 @@ namespace SOS.Lib.Repositories.Processed
                                 ]
                             )
                         )
-                        .Aggregations(aa => aggregations)
+                        .Aggregations(a => 
+                        {
+                            var aggregations = new FluentDescriptorDictionary<string, AggregationDescriptor<dynamic>> {
+                                {
+                                    "unique_taxonids", a => a
+                                        .Cardinality(c => c
+                                            .Field("taxon.id")
+                                            .PrecisionThreshold(precisionThreshold ?? 3000)
+                                        )
+                                }
+                            };
+                            if (aggregateOrganismQuantity)
+                            {
+                                aggregations.Add("totalOrganismQuantity", a => a
+                                        .Sum(s => s
+                                            .Field("occurrence.organismQuantityAggregation")
+                                        )
+                                    );
+                            }
+                            return aggregations;
+                        })
                     )
                 )
                 .AddDefaultAggrigationSettings()

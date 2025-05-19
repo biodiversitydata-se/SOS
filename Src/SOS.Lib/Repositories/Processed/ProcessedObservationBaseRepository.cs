@@ -1,5 +1,4 @@
-﻿using Elastic.Clients.Elasticsearch;
-using Elastic.Clients.Elasticsearch.Cluster;
+﻿using Elastic.Clients.Elasticsearch.Cluster;
 using Elastic.Clients.Elasticsearch.QueryDsl;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Cache.Interfaces;
