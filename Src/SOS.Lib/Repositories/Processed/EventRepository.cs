@@ -292,13 +292,14 @@ namespace SOS.Lib.Repositories.Processed
             if (ids == null || !ids.Any()) throw new ArgumentException("ids is empty");
             
             var sortDescriptor = await Client.GetSortDescriptorAsync<Event, Event>(IndexName, sortOrders);
-            var queries = new List<Action<QueryDescriptor<Event>>>();
-            queries.TryAddTermsCriteria("eventId", ids);
             var searchResponse = await Client.SearchAsync<Event>(s => s
                 .Indices(IndexName)
                 .Query(q => q
                     .Bool(b => b
-                        .Filter(queries.ToArray())
+                        .Filter(f => f.Terms(t => t
+                           .Field("eventId")
+                           .Terms(new TermsQueryField(ids.Select(s => FieldValue.String(s)).ToArray()))
+                        ))
                     )
                 )
                 .Size(ids?.Count() ?? 0)

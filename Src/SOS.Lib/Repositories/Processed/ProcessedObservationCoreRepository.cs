@@ -1277,7 +1277,6 @@ namespace SOS.Lib.Repositories.Processed
             int size = Math.Max(1, Math.Min(65536, skip + take));
             var termsOrder = sortOrder.HasValue ? sortOrder.Value.GetTermsOrder() : null;
             FluentDescriptorDictionary<Field, RuntimeFieldDescriptor<dynamic>> runtimeMapping = null;
-            ;
 
             if (useScript ?? true)
             {
