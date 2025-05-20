@@ -79,7 +79,11 @@ try
     app.ConfigureExceptionHandler(isDevelopment);
     app.UseEndpointDefinitions();
 
-    app.UseHealthChecks("/healthz");
+
+    app.MapHealthChecks("/healthz", new HealthCheckOptions()
+    {
+        Predicate = _ => false,        
+    });
     app.UseHealthChecks("/health", new HealthCheckOptions()
     {
         Predicate = _ => true,
