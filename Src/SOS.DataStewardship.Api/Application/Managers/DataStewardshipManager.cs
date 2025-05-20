@@ -2,9 +2,6 @@
 using SOS.DataStewardship.Api.Contracts.Enums;
 using SOS.DataStewardship.Api.Contracts.Models;
 using SOS.DataStewardship.Api.Extensions;
-using SOS.Lib.JsonConverters;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace SOS.DataStewardship.Api.Application.Managers;
 
@@ -15,32 +12,6 @@ public class DataStewardshipManager : IDataStewardshipManager
     private readonly IProcessedObservationCoreRepository _processedObservationCoreRepository;
     private readonly IFilterManager _filterManager;
     private readonly ILogger<DataStewardshipManager> _logger;
-
-    private JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions(JsonSerializerDefaults.Web)
-    {
-        PropertyNameCaseInsensitive = true,
-        Converters =
-        {
-            new JsonStringEnumConverter(),
-            new GeometryConverter()
-        }
-    };
-
-    private readonly List<string> _observationEventOutputFields = new List<string>
-       {
-            "dataStewardship",
-            "event.eventId",
-            "event.parentEventId",
-            "event.eventRemarks",
-            "event.media",
-            "event.startDate",
-            "event.endDate",
-            "event.SamplingProtocol",
-            "institutionCode",
-            "institutionId",
-            "location",
-            "occurrence.RecordedBy"
-        };
 
     private readonly List<string> _observationOccurrenceOutputFields = new List<string>
     {
@@ -63,37 +34,6 @@ public class DataStewardshipManager : IDataStewardshipManager
         "taxon"
     };
 
-    private List<Observation> CastDynamicsToObservations(IEnumerable<dynamic> dynamicObjects)
-    {
-        if (dynamicObjects == null) return null;
-        return JsonSerializer.Deserialize<List<Observation>>(JsonSerializer.Serialize(dynamicObjects, _jsonSerializerOptions), _jsonSerializerOptions);
-    }
-
-    private Observation CastDynamicToObservation(dynamic dynamicObject)
-    {
-        if (dynamicObject == null) return null;
-        return JsonSerializer.Deserialize<Observation>(JsonSerializer.Serialize(dynamicObject, _jsonSerializerOptions), _jsonSerializerOptions);
-    }
-
-    private async Task<Contracts.Models.Event> GetEventByIdFromObservationIndexAsync(string id, CoordinateSystem responseCoordinateSystem)
-    {
-        var filter = new SearchFilter(0);
-        filter.Event = new EventFilter
-        {
-            Ids = new List<string> { id }
-        };
-        filter.Output.Fields = _observationEventOutputFields;
-
-        var pageResult = await _processedObservationCoreRepository.GetChunkAsync<dynamic>(filter, 0, 1, true);
-        var observation = pageResult.Records.FirstOrDefault();
-        if (observation == null) return null;
-
-        Observation obs = CastDynamicToObservation(observation);
-        var occurrenceIds = await _processedObservationCoreRepository.GetAllAggregationItemsAsync(filter, "occurrence.occurrenceId");
-        var ev = obs.ToEventModel(occurrenceIds.Select(m => m.AggregationKey), responseCoordinateSystem);
-        return ev;
-    }
-
     private async Task<Contracts.Models.Event> GetEventByIdFromEventIndexAsync(string id, CoordinateSystem responseCoordinateSystem)
     {
         var observationEvents = await _observationEventRepository.GetEventsByIds(new List<string> { id });
@@ -105,51 +45,9 @@ public class DataStewardshipManager : IDataStewardshipManager
     }
 
     /// <remarks>
-    /// This search uses the Observation index.
-    /// </remarks>
-    private async Task<Contracts.Models.PagedResult<Contracts.Models.Event>> GetEventsBySearchFromObservationIndexAsync(EventsFilter eventsFilter, 
-        int skip, 
-        int take,
-        CoordinateSystem responseCoordinateSystem)
-    {
-        var filter = eventsFilter.ToSearchFilter();
-        await _filterManager.PrepareFilterAsync(null, null, filter);
-        var eventOccurrenceIds = await _processedObservationCoreRepository.GetEventOccurrenceItemsAsync(filter);
-        var occurrenceIdsByEventId = eventOccurrenceIds.ToDictionary(m => m.EventId, m => m.OccurrenceIds);
-        var eventIds = occurrenceIdsByEventId
-            .OrderBy(m => m.Key) // todo - support sorting by other properties?
-            .Skip(skip)
-            .Take(take)
-            .ToList();
-
-        var firstOccurrenceIdInEvents = eventIds.Select(m => m.Value.First());
-        var observations = await _processedObservationCoreRepository.GetObservationsAsync(firstOccurrenceIdInEvents, _observationEventOutputFields, false);
-        var events = new List<Contracts.Models.Event>();
-        foreach (var observation in observations)
-        {
-            var occurrenceIds = occurrenceIdsByEventId[observation.Event.EventId.ToLower()];
-            var eventModel = observation.ToEventModel(occurrenceIds, responseCoordinateSystem);
-            events.Add(eventModel);
-        }
-
-        int count = events.Count();
-        int totalCount = eventOccurrenceIds.Count;
-        var records = events;
-
-        return new Contracts.Models.PagedResult<Contracts.Models.Event>()
-        {
-            Skip = skip,
-            Take = take,
-            Count = count,
-            TotalCount = totalCount,
-            Records = records
-        };
-    }
-
-    /// <remarks>
     /// This search uses the Event index.
     /// </remarks>
-    private async Task<Contracts.Models.PagedResult<Contracts.Models.Event>> GetEventsBySearchFromEventIndexAsync(EventsFilter eventsFilter, 
+    private async Task<PagedResult<Contracts.Models.Event>> GetEventsBySearchFromEventIndexAsync(EventsFilter eventsFilter, 
         int skip, 
         int take, 
         CoordinateSystem responseCoordinateSystem)
@@ -184,42 +82,6 @@ public class DataStewardshipManager : IDataStewardshipManager
             Count = count,
             TotalCount = totalCount,
             Records = records            
-        };
-    }
-
-    private async Task<Contracts.Models.PagedResult<Contracts.Models.Event>> GetEventsBySearchFromEventIndexSortByDateAsync(EventsFilter eventsFilter,
-        int skip,
-        int take,
-        CoordinateSystem responseCoordinateSystem)
-    {
-        var filter = eventsFilter.ToSearchFilter();
-        await _filterManager.PrepareFilterAsync(null, null, filter);        
-        var records = Enumerable.Empty<Contracts.Models.Event>();
-        var allEventIds = await _processedObservationCoreRepository.GetAggregationItemsAsync(filter, "event.eventId");
-        int totalCount = allEventIds?.Records.Count() ?? 0;
-        if (totalCount != 0)
-        {
-            EventSearchFilter eventSearchFilter = new EventSearchFilter();
-            eventSearchFilter.EventIds = allEventIds.Records.Select(m => m.AggregationKey).ToList();
-            eventSearchFilter.SortOrders = new List<SortOrderFilter>
-            {
-                new SortOrderFilter { SortBy = "startDate", SortOrder = SearchSortOrder.Desc },
-                new SortOrderFilter { SortBy = "eventId", SortOrder = SearchSortOrder.Asc }
-            };
-            var chunk = await _observationEventRepository.GetChunkAsync(eventSearchFilter, skip, take);
-            records = EventRepository
-                .CastDynamicsToEvents(chunk.Records)
-                .Select(m => m.ToEventModel(responseCoordinateSystem))
-                .ToList();
-        }
-
-        return new Contracts.Models.PagedResult<Contracts.Models.Event>()
-        {
-            Skip = skip,
-            Take = take,
-            Count = records.Count(),
-            TotalCount = totalCount,
-            Records = records
         };
     }
 
