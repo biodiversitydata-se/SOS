@@ -29,7 +29,8 @@ namespace SOS.Lib.Helpers
                         {
                             o.Converters.Remove(stringEnumConverter);
                         }
-                        o.Converters.Add(new NetTopologySuite.IO.Converters.GeoJsonConverterFactory());
+                        o.Converters.Add(new JsonConverters.GeometryConverter());
+                        //o.Converters.Add(new NetTopologySuite.IO.Converters.GeoJsonConverterFactory());
                     }),
                     requestInvoker: new HttpRequestInvoker()
                 ) 

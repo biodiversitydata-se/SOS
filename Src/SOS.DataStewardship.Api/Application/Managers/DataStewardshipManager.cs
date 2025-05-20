@@ -22,7 +22,7 @@ public class DataStewardshipManager : IDataStewardshipManager
         Converters =
         {
             new JsonStringEnumConverter(),
-            new NetTopologySuite.IO.Converters.GeoJsonConverterFactory()
+            new GeometryConverter()
         }
     };
 
@@ -296,7 +296,7 @@ public class DataStewardshipManager : IDataStewardshipManager
         return evnt;
     }
 
-    public async Task<Contracts.Models.PagedResult<Contracts.Models.Event>> GetEventsBySearchAsync(EventsFilter eventsFilter, 
+    public async Task<PagedResult<Contracts.Models.Event>> GetEventsBySearchAsync(EventsFilter eventsFilter, 
         int skip, 
         int take, 
         CoordinateSystem responseCoordinateSystem)
@@ -313,8 +313,7 @@ public class DataStewardshipManager : IDataStewardshipManager
         };
         filter.Output.Fields = _observationOccurrenceOutputFields;
 
-        IEnumerable<dynamic> observations = await _processedObservationCoreRepository.GetObservationAsync<dynamic>(id, filter, true);
-        var observation = observations?.FirstOrDefault();
+        var observation = await _processedObservationCoreRepository.GetObservationAsync<Observation>(id, filter, true);
 
         if (observation == null)
         {
@@ -322,22 +321,21 @@ public class DataStewardshipManager : IDataStewardshipManager
             return null!;
         }
 
-        Observation obs = CastDynamicToObservation(observation);
-        var occurrence = obs.ToOccurrenceModel(responseCoordinateSystem);
+        var occurrence = observation.ToOccurrenceModel(responseCoordinateSystem);
         return occurrence;
     }
 
-    public async Task<Contracts.Models.PagedResult<Contracts.Models.Occurrence>> GetOccurrencesBySearchAsync(OccurrenceFilter occurrenceFilter, int skip, int take, CoordinateSystem responseCoordinateSystem)
+    public async Task<PagedResult<Contracts.Models.Occurrence>> GetOccurrencesBySearchAsync(OccurrenceFilter occurrenceFilter, int skip, int take, CoordinateSystem responseCoordinateSystem)
     {
         var filter = occurrenceFilter.ToSearchFilter();
         filter.IsPartOfDataStewardshipDataset = true;
         filter.Output.Fields = _observationOccurrenceOutputFields;
         await _filterManager.PrepareFilterAsync(null, null, filter);
-        var pageResult = await _processedObservationCoreRepository.GetChunkAsync<dynamic>(filter, skip, take, true);
-        var observations = CastDynamicsToObservations(pageResult.Records);
+        var pageResult = await _processedObservationCoreRepository.GetChunkAsync<Observation>(filter, skip, take, true);
+        var observations = pageResult.Records;
         var occurrences = observations.Select(x => x.ToOccurrenceModel(responseCoordinateSystem)).ToList();
 
-        return new Contracts.Models.PagedResult<Contracts.Models.Occurrence>()
+        return new PagedResult<Contracts.Models.Occurrence>()
         {
             Skip = skip,
             Take = take,
