@@ -354,9 +354,9 @@ namespace SOS.Analysis.Api
                 processedDbConfiguration.ReadBatchSize, processedDbConfiguration.WriteBatchSize));
 
             services.AddHealthChecks()
-            .AddCheck<HealthCheck>("CustomHealthCheck", tags: ["k8s"])
-                .AddCheck<AggregateHealthCheck>("AggregateHealthCheck", tags: ["Analysis.API"])
-                .AddSystemMemory(1000, "System memory", tags: ["System"]);
+            .AddCheck<HealthCheck>("CustomHealthCheck", tags: ["k8s"]);
+              //  .AddCheck<AggregateHealthCheck>("AggregateHealthCheck", tags: ["Analysis.API"])
+              //  .AddSystemMemory(1000, "System memory", tags: ["System"]);
 
             // Add configuration
             services.AddSingleton(analysisConfiguration!);
