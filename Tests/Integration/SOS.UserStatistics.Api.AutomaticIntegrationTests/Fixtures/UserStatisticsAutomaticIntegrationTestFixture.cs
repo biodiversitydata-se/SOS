@@ -182,7 +182,8 @@ public class UserStatisticsAutomaticIntegrationTestFixture : FixtureBase, IDispo
             elasticConfiguration,
             new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>()), memoryCache, new NullLogger<CacheBase<string, ProcessedConfiguration>>()),
             taxonManager,
-            new ClassCache<ConcurrentDictionary<string, HealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<string, HealthResponse>>>()),
+            new ClassCache<ConcurrentDictionary<string, HealthResponse>>(memoryCache, new NullLogger<ClassCache<ConcurrentDictionary<string, HealthResponse>>>()),
+            memoryCache,
             new NullLogger<UserStatisticsProcessedObservationRepository>());
         return userStatisticsProcessedObservationRepository;
     }
@@ -198,6 +199,7 @@ public class UserStatisticsAutomaticIntegrationTestFixture : FixtureBase, IDispo
             elasticConfiguration,
             new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>()), memoryCache, new NullLogger<CacheBase<string, ProcessedConfiguration>>()),
             new ClassCache<ConcurrentDictionary<string, HealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<string, HealthResponse>>>()),
+            memoryCache,
             new NullLogger<UserObservationRepository>());
 
         return userStatisticsObservationRepository;

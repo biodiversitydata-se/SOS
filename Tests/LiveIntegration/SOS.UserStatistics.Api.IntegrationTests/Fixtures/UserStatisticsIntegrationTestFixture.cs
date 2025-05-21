@@ -80,7 +80,9 @@ public class UserStatisticsIntegrationTestFixture : FixtureBase, IDisposable
 
         var processedConfigurationCache = new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>()), memoryCache, new NullLogger<CacheBase<string, ProcessedConfiguration>>());
         var userStatisticsObservationRepository = new UserStatisticsObservationRepository(elasticClientManager, elasticConfiguration, processedConfigurationCache, 
-            new ClassCache<ConcurrentDictionary<string, HealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<string, HealthResponse>>>()), new NullLogger<UserObservationRepository>());
+            new ClassCache<ConcurrentDictionary<string, HealthResponse>>(memoryCache, 
+            new NullLogger<ClassCache<ConcurrentDictionary<string, HealthResponse>>>()),
+            memoryCache, new NullLogger<UserObservationRepository>());
         var userService = CreateUserService();
         UserStatisticsProcessedObservationRepository = userStatisticsProcessedObservationRepository;
         var areaRepository = new AreaRepository(processClient, new NullLogger<AreaRepository>());
@@ -121,7 +123,8 @@ public class UserStatisticsIntegrationTestFixture : FixtureBase, IDisposable
             elasticConfiguration,
             new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>()), memoryCache, new NullLogger<CacheBase<string, ProcessedConfiguration>>() ),
             new Mock<ITaxonManager>().Object,
-            new ClassCache<ConcurrentDictionary<string, HealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<string, HealthResponse>>>()),
+            new ClassCache<ConcurrentDictionary<string, HealthResponse>>(memoryCache, new NullLogger<ClassCache<ConcurrentDictionary<string, HealthResponse>>>()),
+            memoryCache,
             new NullLogger<ProcessedObservationCoreRepository>());
         return userStatisticsProcessedObservationRepository;
     }

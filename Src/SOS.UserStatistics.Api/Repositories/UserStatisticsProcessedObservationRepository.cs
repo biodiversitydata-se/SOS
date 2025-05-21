@@ -10,8 +10,9 @@ public class UserStatisticsProcessedObservationRepository : ProcessedObservation
         ICache<string, ProcessedConfiguration> processedConfigurationCache,
         ITaxonManager taxonManager,
         IClassCache<ConcurrentDictionary<string, HealthResponse>> clusterHealthCache,
+        IMemoryCache memoryCache,
         ILogger<ProcessedObservationCoreRepository> logger
-    ) : base(elasticClientManager, elasticConfiguration, processedConfigurationCache, taxonManager, clusterHealthCache, logger)
+    ) : base(elasticClientManager, elasticConfiguration, processedConfigurationCache, taxonManager, clusterHealthCache, memoryCache, logger)
     {
 
     }
