@@ -491,7 +491,6 @@ namespace SOS.Observations.Api
                     options.Timeout = TimeSpan.FromSeconds(60);
                 });
                 healthChecks 
-                    .AddSystemMemory(1000, "System memory", tags: ["System"])
                     //  .AddMongoDb(processedDbConfiguration.GetConnectionString(), tags: new[] { "database", "mongodb" })
                     .AddHangfire(a => a.MinimumAvailableServers = 1, "Hangfire", tags: new[] { "hangfire" })
                     .AddCheck<DataAmountHealthCheck>("Data amount", tags: new[] { "database", "elasticsearch", "data" })
