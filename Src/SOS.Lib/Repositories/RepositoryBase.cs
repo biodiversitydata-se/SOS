@@ -2,6 +2,7 @@
 using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
+using MongoDB.NetTopologySuite.Serialization;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
@@ -148,6 +149,7 @@ namespace SOS.Lib.Repositories
             ILogger logger
         ) : this(client, typeof(TEntity).Name, logger)
         {
+           
         }
 
         /// <summary>
@@ -160,8 +162,10 @@ namespace SOS.Lib.Repositories
             IMongoDbClient client,
             string collectionName,
             ILogger logger
-        )
+        ) 
         {
+            BsonNetTopologySuiteSerializers.Register();
+
             Client = client ?? throw new ArgumentNullException(nameof(client));
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
@@ -172,7 +176,7 @@ namespace SOS.Lib.Repositories
 
             // Clean name from non alfa numeric chats
             _collectionName = collectionName.UntilNonAlfanumeric();
-        }
+        } 
 
 
         /// <summary>

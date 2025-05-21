@@ -32,7 +32,6 @@ using System.Text.Unicode;
 using SOS.Lib.Models.Search.Result;
 using Elastic.Clients.Elasticsearch;
 using System.Collections.ObjectModel;
-using System.Threading;
 
 namespace SOS.Lib.Managers
 {
@@ -44,41 +43,6 @@ namespace SOS.Lib.Managers
         private readonly IAreaCache _areaCache;
         private readonly IFileService _fileService;
         private readonly ILogger<AnalysisManager> _logger;
-        private readonly SemaphoreSlim _semaphore;
-
-        /// <summary>
-        /// Add a geoemtry to feature
-        /// </summary>
-        /// <param name="feature"></param>
-        /// <param name="areaType"></param>
-        /// <param name="featureId"></param>
-        /// <param name="coordinateSys"></param>
-        /// <returns></returns>
-        private async Task AddFeatureGeometryAsync(
-            Feature feature,
-            AreaTypeAggregate areaType,
-            string featureId,
-            CoordinateSys? coordinateSys)
-        {
-            try
-            {
-                var geometry = await _areaCache.GetGeometryAsync((AreaType)areaType, featureId);
-                if (geometry == null)
-                {
-                    return;
-                }
-                if((coordinateSys ?? CoordinateSys.WGS84) != CoordinateSys.WGS84)
-                {
-                    geometry = geometry.Transform(CoordinateSys.WGS84, coordinateSys ?? CoordinateSys.WGS84);
-                }
-                feature.Geometry = geometry;
-                feature.BoundingBox = geometry.EnvelopeInternal;
-            }
-            finally
-            {
-                _semaphore.Release();
-            }
-        }
 
         /// <summary>
         /// Add geometries to features using bound box
@@ -86,13 +50,13 @@ namespace SOS.Lib.Managers
         /// <param name="areaType"></param>
         /// <param name="features"></param>
         /// <returns></returns>
-        private async Task AddBBoxGeometriesAsync(AreaTypeAggregate areaType, IDictionary<string, Feature> features)
+        private async Task AddGridGeometriesAsync(AreaTypeAggregate areaType, IDictionary<string, Feature> features)
         {
             if ((features?.Count() ?? 0) == 0)
             {
                 return;
             }
-            var results = await _areaCache.GetBBoxGeometriesAsync(features.Select(f => ((AreaType)areaType, f.Key)));
+            var results = await _areaCache.GetGeometriesAsync(features.Select(f => ((AreaType)areaType, f.Key)));
             if ((results?.Count() ?? 0) == 0)
             {
                 return;
@@ -104,7 +68,6 @@ namespace SOS.Lib.Managers
                 {
                     var geometry = result.Value;
                     feature.Geometry = geometry;
-                  //  feature.BoundingBox = geometry.EnvelopeInternal;
                 }
             }
         }
@@ -143,7 +106,7 @@ namespace SOS.Lib.Managers
         }
 
 
-        private (string Id, Feature Feature) GetAreaFeature(
+        private (string Id, Feature Feature) CreateAreaFeature(
             dynamic record,
             AreaTypeAggregate areaType,
             bool? aggregateOrganismQuantity,
@@ -235,8 +198,7 @@ namespace SOS.Lib.Managers
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
             _taxonManager = taxonManager ?? throw new ArgumentNullException(nameof(taxonManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            var processorCount = Environment.ProcessorCount;
-            _semaphore = new SemaphoreSlim(processorCount, processorCount);
+           
         }
 
         /// <inheritdoc/>
@@ -321,7 +283,7 @@ namespace SOS.Lib.Managers
                 var featureCollection = new FeatureCollection();
                 var addGeometryTasks = new HashSet<Task>();
                 var features = new Dictionary<string, Feature>();
-                var useGeometryBBox = new[] { AreaTypeAggregate.Atlas10x10, AreaTypeAggregate.Atlas5x5 }.Contains(areaType);
+                
                 
                 while (result?.Records?.Count() != 0)
                 {
@@ -330,32 +292,17 @@ namespace SOS.Lib.Managers
                     
                     foreach (var record in result.Records)
                     {
-                        var response = GetAreaFeature(record, areaType, aggregateOrganismQuantity, coordinateSys);
+                        var response = CreateAreaFeature(record, areaType, aggregateOrganismQuantity, coordinateSys);
                         var featureId = response.Item1;
                         if (!string.IsNullOrEmpty(featureId))
                         {
                             var feature = response.Item2;
                             featureCollection.Add(feature);
-
-                            if (useGeometryBBox)
-                            {
-                                features.Add(featureId, feature);
-                            }
-                            else
-                            {
-                                await _semaphore.WaitAsync();
-                                addGeometryTasks.Add(AddFeatureGeometryAsync(feature, areaType, featureId, coordinateSys));
-                            }
+                            features.Add(featureId, feature);
                         }
                     }
-                    if (useGeometryBBox)
-                    {
-                        await AddBBoxGeometriesAsync(areaType, features);
-                    }
-                    else
-                    {
-                        await Task.WhenAll(addGeometryTasks);
-                    }
+                   
+                    await AddGridGeometriesAsync(areaType, features);
                     
                     result = await nextBatchTask;
                 }

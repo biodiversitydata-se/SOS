@@ -1,4 +1,5 @@
-﻿using SOS.Lib.Enums;
+﻿using NetTopologySuite.Geometries;
+using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Interfaces;
@@ -30,6 +31,11 @@ namespace SOS.Lib.Models.Shared
         ///     Feature Id.
         /// </summary>
         public string FeatureId { get; set; }
+
+        /// <summary>
+        /// If any type of Atlas grid we now that the geometry will only contain 5 coordinates. Then we can store it here to get quick access to the geometry 
+        /// </summary>
+        public Geometry GridGeometry { get; set; }
 
         /// <summary>
         ///     Area Id

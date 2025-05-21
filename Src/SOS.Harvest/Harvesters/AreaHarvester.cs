@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.IO;
@@ -81,6 +82,11 @@ namespace SOS.Harvest.Harvesters
                         TopLeft = new LatLonCoordinate(bbox[3], bbox[0]),
                         BottomRight = new LatLonCoordinate(bbox[1], bbox[2])
                     };
+                    if (new[] { AreaType.Atlas10x10, AreaType.Atlas5x5 }.Contains(area.AreaType))
+                    {
+                        area.GridGeometry = feature.Geometry;
+                    }
+                    
                     areas.Add(area);
                     areaGeometries.Add(area.Id, feature.Geometry);
                 }

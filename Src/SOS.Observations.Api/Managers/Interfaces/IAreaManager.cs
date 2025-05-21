@@ -56,13 +56,5 @@ namespace SOS.Observations.Api.Managers.Interfaces
         /// <param name="featureId"></param>
         /// <returns></returns>
         Task<Geometry> GetGeometryAsync(AreaType areaType, string featureId);
-
-
-        /// <summary>
-        /// Get geometries
-        /// </summary>
-        /// <param name="areaKeys"></param>
-        /// <returns></returns>
-        Task<IEnumerable<Geometry>> GetGeometriesAsync(IEnumerable<(AreaType areaType, string featureId)> areaKeys);
     }
 }

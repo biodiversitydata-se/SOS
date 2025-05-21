@@ -11,6 +11,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SOS.Lib.Cache
@@ -23,7 +24,8 @@ namespace SOS.Lib.Cache
         private readonly IAreaRepository _areaRepository;
         private const int NumberOfEntriesCleanupLimit = 75000;
         private readonly ConcurrentDictionary<(AreaType AreaType, string FeatureId), Geometry> _geometryCache;
-      
+        private readonly SemaphoreSlim _semaphore;
+
         private void AddAreaToCache((AreaType AreaType, string FeatureId) key, Geometry geometry)
         {
             if (geometry != null)
@@ -37,9 +39,33 @@ namespace SOS.Lib.Cache
             }
         }
 
-        private IEnumerable<(AreaType AreaType, string FeatureId)> GetKeysMissingInCache(IEnumerable<(AreaType AreaType, string FeatureId)> keys) => keys?.Select(k => NormalizeKey(k)).Except(_geometryCache.Keys);
+        private async Task AddAreasWithGridGeometryToCache((AreaType areaType, string featureId)[] missingInCache)
+        {
+            var getGeometryTasks = new List<Task<Geometry>>();
+            var missingCount = missingInCache.Count();
+            var batchSizeDefault = missingCount > 1000 ? 1000 : missingCount;
+            var fetchCount = 0;
+            for (int i = 0; i < missingCount; i += batchSizeDefault)
+            {
+                var notFetchCount = missingCount - fetchCount;
+                var batchSize = notFetchCount < batchSizeDefault ? notFetchCount : batchSizeDefault;
+                var batch = new (AreaType areaType, string featureId)[batchSize];
+                Array.Copy(missingInCache, i, batch, 0, batchSize);
+                var pagedAreas = await _areaRepository.GetAreasAsync(batch, 0, batchSize);
+                if ((pagedAreas.Records?.Count() ?? 0) != 0)
+                {
+                    foreach (var area in pagedAreas.Records)
+                    {
+                        AddAreaToCache((area.AreaType, area.FeatureId), area.GridGeometry);
+                    }
+                }
+                fetchCount += batchSize;
+            }
+        }
 
         private IDictionary<(AreaType AreaType, string FeatureId), Geometry> GetAreasFromCache(IEnumerable<(AreaType AreaType, string FeatureId)> keys) => _geometryCache.Where(gc => (keys?.Select(k => NormalizeKey(k))).Contains(gc.Key)).ToDictionary(gc => gc.Key, gc => gc.Value);
+
+        private IEnumerable<(AreaType AreaType, string FeatureId)> GetKeysMissingInCache(IEnumerable<(AreaType AreaType, string FeatureId)> keys) => keys?.Select(k => NormalizeKey(k)).Except(_geometryCache.Keys);
 
         private (AreaType AreaType, string FeatureId) NormalizeKey((AreaType AreaType, string FeatureId) key) => (key.AreaType, key.FeatureId?.ToLower());
 
@@ -54,6 +80,8 @@ namespace SOS.Lib.Cache
             _areaRepository = areaRepository;
             _geometryCache = new ConcurrentDictionary<(AreaType, string), Geometry>();
             CacheDuration = TimeSpan.FromMinutes(10);
+            var processorCount = Environment.ProcessorCount;
+            _semaphore = new SemaphoreSlim(processorCount, processorCount);
         }
 
         /// <summary>
@@ -115,15 +143,23 @@ namespace SOS.Lib.Cache
             {
                 return geometry;
             }
-
-            geometry = (await _areaRepository.GetGeometryAsync(areaType, featureId));
+            try
+            {
+                await _semaphore.WaitAsync();
+                geometry = (await _areaRepository.GetGeometryAsync(areaType, featureId));
+            }
+            finally
+            {
+                _semaphore.Release();
+            }
+            
             AddAreaToCache((areaType, featureId), geometry);
            
             return geometry;
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<Geometry>> GetGeometriesAsync(
+        public async Task<IDictionary<(AreaType areaType, string featureId), Geometry>> GetGeometriesAsync(
             IEnumerable<(AreaType areaType, string featureId)> areaKeys)
         {
             if (!areaKeys?.Any() ?? true)
@@ -134,49 +170,17 @@ namespace SOS.Lib.Cache
             var missingInCache = GetKeysMissingInCache(areaKeys);
             if (missingInCache?.Any() ?? false)
             {
-                await Task.WhenAll(missingInCache.Select(mic => GetGeometryAsync(mic.Item1, mic.Item2)));
-            }
-
-            return GetAreasFromCache(areaKeys)?.Values;
-        }
-
-        public async Task<IDictionary<(AreaType areaType, string featureId), Geometry>> GetBBoxGeometriesAsync(
-           IEnumerable<(AreaType areaType, string featureId)> areaKeys)
-        {
-            if (!areaKeys?.Any() ?? true)
-            {
-                return null;
-            }
-
-            var missingInCache = GetKeysMissingInCache(areaKeys)?.ToArray();
-            if (missingInCache?.Any() ?? false)
-            {
-                var missingCount = missingInCache.Count();   
-                var batchSizeDefault = missingCount > 1000 ? 1000 : missingCount;
-                var fetchCount = 0;
-                for (int i = 0; i < missingCount; i += batchSizeDefault)
+                var missingWithGridGeometry = missingInCache.Where(a => new[] { AreaType.Atlas10x10, AreaType.Atlas5x5 }.Contains(a.AreaType));
+                if (missingWithGridGeometry.Count() != 0)
                 {
-                    var notFetchCount = missingCount - fetchCount;
-                    var batchSize = notFetchCount < batchSizeDefault ? notFetchCount : batchSizeDefault;
-                    var batch = new (AreaType areaType, string featureId)[batchSize];
-                    Array.Copy(missingInCache, i, batch, 0, batchSize);
-                    var pagedAreas = await _areaRepository.GetAreasAsync(batch, 0, batchSize);
-                    if ((pagedAreas.Records?.Count() ?? 0) != 0)
-                    {
-                        foreach (var area in pagedAreas.Records)
-                        {
-                            var geometry = new Polygon(new LinearRing([
-                                new Coordinate(area.BoundingBox.TopLeft.Longitude, area.BoundingBox.TopLeft.Latitude),
-                                new Coordinate(area.BoundingBox.BottomRight.Longitude, area.BoundingBox.TopLeft.Latitude),
-                                new Coordinate(area.BoundingBox.BottomRight.Longitude, area.BoundingBox.BottomRight.Latitude),
-                                new Coordinate(area.BoundingBox.TopLeft.Longitude, area.BoundingBox.BottomRight.Latitude),
-                                new Coordinate(area.BoundingBox.TopLeft.Longitude, area.BoundingBox.TopLeft.Latitude)
-                            ]));
-                            AddAreaToCache((area.AreaType, area.FeatureId), geometry);
-                        }
-                    }
-                    fetchCount += batchSize;
+                    await AddAreasWithGridGeometryToCache(missingWithGridGeometry.ToArray());
                 }
+                
+                var missingWithOutGridGeometry = missingInCache.Where(a => !new[] { AreaType.Atlas10x10, AreaType.Atlas5x5 }.Contains(a.AreaType));
+                if (missingWithOutGridGeometry.Count() != 0)
+                {
+                    await Task.WhenAll(missingWithOutGridGeometry.Select(mic => GetGeometryAsync(mic.Item1, mic.Item2)));
+                } 
             }
 
             return GetAreasFromCache(areaKeys);

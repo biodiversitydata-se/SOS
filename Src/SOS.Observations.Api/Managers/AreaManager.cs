@@ -252,11 +252,5 @@ namespace SOS.Observations.Api.Managers
         {
             return await _areaCache.GetGeometryAsync(areaType, featureId);
         }
-
-        /// <inheritdoc />
-        public async Task<IEnumerable<Geometry>> GetGeometriesAsync(IEnumerable<(AreaType areaType, string featureId)> areaKeys)
-        {
-            return await _areaCache.GetGeometriesAsync(areaKeys);
-        }
     }
 }
