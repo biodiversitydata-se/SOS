@@ -1,5 +1,6 @@
 ﻿using Elastic.Clients.Elasticsearch;
 using Elastic.Clients.Elasticsearch.Cluster;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using SOS.Lib;
 using SOS.Lib.Cache.Interfaces;
@@ -25,20 +26,22 @@ namespace SOS.Observations.Api.LiveIntegrationTests.Repositories
     public class ProcessedObservationRepositoryTest : ProcessedObservationBaseRepository,
         IProcessedObservationRepositoryTest
     {
+        /// <summary>
         /// Constructor used in public mode
         /// </summary>
         /// <param name="elasticClientManager"></param>
         /// <param name="elasticConfiguration"></param>
         /// <param name="processedConfigurationCache"></param>
-        /// <param name="telemetry"></param>
-        /// <param name="taxonManager"></param>
+        /// <param name="clusterHealthCache"></param>
+        /// <param name="memoryCache"></param>
         /// <param name="logger"></param>
         public ProcessedObservationRepositoryTest(
             IElasticClientManager elasticClientManager,
             ElasticSearchConfiguration elasticConfiguration,
             ICache<string, ProcessedConfiguration> processedConfigurationCache,
             IClassCache<ConcurrentDictionary<string, HealthResponse>> clusterHealthCache,
-            ILogger<ProcessedObservationRepositoryTest> logger) : base(true, elasticClientManager, processedConfigurationCache, elasticConfiguration, clusterHealthCache, logger)
+            IMemoryCache memoryCache,
+            ILogger<ProcessedObservationRepositoryTest> logger) : base(true, elasticClientManager, processedConfigurationCache, elasticConfiguration, clusterHealthCache, memoryCache, logger)
         {
 
         }

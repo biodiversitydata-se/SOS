@@ -1,5 +1,6 @@
 ﻿using Elastic.Clients.Elasticsearch.Cluster;
 using Elastic.Clients.Elasticsearch.QueryDsl;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Shared;
@@ -72,14 +73,16 @@ namespace SOS.Lib.Repositories.Processed
         /// <param name="processedConfigurationCache"></param>
         /// <param name="elasticConfiguration"></param>
         /// <param name="clusterHealthCache"></param>
+        /// <param name="memoryCache"></param>
         /// <param name="logger"></param>
         public ProcessedObservationBaseRepository(
             bool liveMode,
             IElasticClientManager elasticClientManager,
             ICache<string, ProcessedConfiguration> processedConfigurationCache,
             ElasticSearchConfiguration elasticConfiguration,
-             IClassCache<ConcurrentDictionary<string, HealthResponse>> clusterHealthCache,
-            ILogger<ProcessedObservationBaseRepository> logger) : base(true, elasticClientManager, processedConfigurationCache, elasticConfiguration, clusterHealthCache, logger)
+            IClassCache<ConcurrentDictionary<string, HealthResponse>> clusterHealthCache,
+            IMemoryCache memoryCache,
+            ILogger<ProcessedObservationBaseRepository> logger) : base(true, elasticClientManager, processedConfigurationCache, elasticConfiguration, clusterHealthCache, memoryCache, logger)
         {
             LiveMode = liveMode;
         }

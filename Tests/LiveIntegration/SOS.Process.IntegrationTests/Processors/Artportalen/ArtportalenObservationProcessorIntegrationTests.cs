@@ -111,6 +111,7 @@ namespace SOS.Process.LiveIntegrationTests.Processors.Artportalen
                     new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>()), new MemoryCache(new MemoryCacheOptions()), new NullLogger<ProcessedConfigurationCache>()),
                     new Mock<ITaxonManager>().Object,
                     new ClassCache<ConcurrentDictionary<string, HealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<string, HealthResponse>>>()),
+                    new MemoryCache(new MemoryCacheOptions()),
                     new NullLogger<ProcessedObservationCoreRepository>());
             }
             else

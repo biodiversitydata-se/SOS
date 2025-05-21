@@ -31,6 +31,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Elastic.Clients.Elasticsearch.Fluent;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace SOS.Lib.Repositories.Processed
 {
@@ -1170,6 +1171,7 @@ namespace SOS.Lib.Repositories.Processed
         /// <param name="processedConfigurationCache"></param>
         /// <param name="taxonManager"></param>
         /// <param name="clusterHealthCache"></param>
+        /// <param name="memoryCache"></param>
         /// <param name="logger"></param>
         public ProcessedObservationCoreRepository(
             IElasticClientManager elasticClientManager,
@@ -1177,7 +1179,8 @@ namespace SOS.Lib.Repositories.Processed
             ICache<string, ProcessedConfiguration> processedConfigurationCache,
             ITaxonManager taxonManager,
             IClassCache<ConcurrentDictionary<string, HealthResponse>> clusterHealthCache,
-            ILogger<ProcessedObservationCoreRepository> logger) : base(true, elasticClientManager, processedConfigurationCache, elasticConfiguration, clusterHealthCache, logger)
+            IMemoryCache memoryCache,
+            ILogger<ProcessedObservationCoreRepository> logger) : base(true, elasticClientManager, processedConfigurationCache, elasticConfiguration, clusterHealthCache, memoryCache, logger)
         {
             if (elasticConfiguration.Clusters != null)
             {
@@ -1268,8 +1271,7 @@ namespace SOS.Lib.Repositories.Processed
             AggregationSortOrder? sortOrder = AggregationSortOrder.CountDescending,
             bool? useScript = false,
             bool? aggregateCardinality = false,
-            bool? aggregateOrganismQuantity = false,
-            string fieldType = "string"
+            bool? aggregateOrganismQuantity = false
         )
         {
             var indexNames = GetCurrentIndex(filter);
@@ -1278,13 +1280,18 @@ namespace SOS.Lib.Repositories.Processed
             var termsOrder = sortOrder.HasValue ? sortOrder.Value.GetTermsOrder() : null;
             FluentDescriptorDictionary<Field, RuntimeFieldDescriptor<dynamic>> runtimeMapping = null;
 
+            var fieldType = "string";
             if (useScript ?? true)
             {
                 var scriptFieldName = "scriptField";
                 runtimeMapping = GetRuntimeMappingScriptField(aggregationField, scriptFieldName);
                 aggregationField = scriptFieldName;
             }
-           
+            else
+            {
+                fieldType = await GetFieldTypeAsync(aggregationField);
+            }
+
             var searchResponse = await Client.SearchAsync<dynamic>(s => s
                 .Indices(indexNames)
                 .Query(q => q

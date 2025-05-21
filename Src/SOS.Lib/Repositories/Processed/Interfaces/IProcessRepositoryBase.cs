@@ -109,11 +109,5 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// <param name="take">The max number of records to get.</param>
         /// <returns></returns>
         Task<List<TEntity>> GetAllAsync(int take = 10000);
-
-        /// <summary>
-        /// Get field mapping
-        /// </summary>
-        /// <returns></returns>
-        Task<IDictionary<string, string>> GetMappingAsync();
     }
 }

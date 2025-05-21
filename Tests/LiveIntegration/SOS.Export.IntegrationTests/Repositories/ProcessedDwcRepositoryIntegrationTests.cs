@@ -76,6 +76,7 @@ namespace SOS.Export.LiveIntegrationTests.Repositories
                     new ProcessedConfigurationCache(new ProcessedConfigurationRepository(exportClient, new NullLogger<ProcessedConfigurationRepository>()), new MemoryCache(new MemoryCacheOptions()), new NullLogger<ProcessedConfigurationCache>()),
                     new Mock<ITaxonManager>().Object,
                     new ClassCache<ConcurrentDictionary<string, HealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<string, HealthResponse>>>()),
+                    new MemoryCache(new MemoryCacheOptions()),
                     new NullLogger<ProcessedObservationCoreRepository>());
 
             return processedObservationRepository;

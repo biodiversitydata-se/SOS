@@ -80,6 +80,7 @@ namespace SOS.Export.LiveIntegrationTests.Managers
                 new ProcessedConfigurationCache(processedConfigurationRepository, new MemoryCache(new MemoryCacheOptions()), new NullLogger<ProcessedConfigurationCache>()),
                 new Mock<ITaxonManager>().Object,
                 new ClassCache<ConcurrentDictionary<string, HealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<string, HealthResponse>>>()),
+                new MemoryCache(new MemoryCacheOptions()),
                 new Mock<ILogger<ProcessedObservationCoreRepository>>().Object);
             var projectInfoRepository = new ProjectInfoRepository(processClient, new NullLogger<ProjectInfoRepository>());
             var projectInfoCache = new ProjectCache(projectInfoRepository, new MemoryCache(new MemoryCacheOptions()), new NullLogger<ProjectCache>());

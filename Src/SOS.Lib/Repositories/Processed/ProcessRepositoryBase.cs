@@ -17,6 +17,7 @@ using SOS.Lib.Extensions;
 using Elastic.Clients.Elasticsearch.Aggregations;
 using Elastic.Clients.Elasticsearch.IndexManagement;
 using Elastic.Clients.Elasticsearch.Mapping;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace SOS.Lib.Repositories.Processed
 {
@@ -33,7 +34,9 @@ namespace SOS.Lib.Repositories.Processed
         protected readonly IClassCache<ConcurrentDictionary<string, HealthResponse>> _clusterHealthCache;
         protected readonly ElasticSearchConfiguration _elasticConfiguration;
         private readonly ElasticSearchIndexConfiguration _elasticSearchIndexConfiguration;
-        
+        private readonly IMemoryCache _memoryCache;
+        private string _cacheKeyFieldType = $"FieldType-{typeof(TEntity).Name}";
+
         protected string _id = typeof(TEntity).Name;
          
         /// <summary>
@@ -60,6 +63,23 @@ namespace SOS.Lib.Repositories.Processed
 
                 return default;
             }
+        }
+
+        private async Task<IDictionary<string, string>> GetFieldTypesAsync()
+        {
+            var fieldTypes = new Dictionary<string, string>();
+            var mappingResponse = await Client.Indices.GetMappingAsync<TEntity>(o => o
+                .Indices(IndexName)
+            );
+            if (mappingResponse.IsValidResponse)
+            {
+                foreach (var value in mappingResponse.Indices.Values)
+                {
+                    PopulateFieldTypes(value.Mappings.Properties, ref fieldTypes, null);
+                }
+            }
+
+            return fieldTypes;
         }
 
         private void PopulateFieldTypes(Properties properties, ref Dictionary<string, string> fieldTypes, string parents = null)
@@ -227,6 +247,26 @@ namespace SOS.Lib.Repositories.Processed
         ///     Logger
         /// </summary>
         protected readonly ILogger<ProcessRepositoryBase<TEntity, TKey>> Logger;
+
+        protected async Task<string> GetFieldTypeAsync(string field)
+        {
+            if (!_memoryCache.TryGetValue(_cacheKeyFieldType, out IDictionary<string, string> fieldTypes))
+            {
+                fieldTypes = await GetFieldTypesAsync();
+                if ((fieldTypes?.Count() ?? 0) != 0)
+                {
+                    var cacheEntryOptions = new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(60 * 12));
+                    _memoryCache.Set(_cacheKeyFieldType, fieldTypes, cacheEntryOptions);
+                }
+            }
+
+            if (fieldTypes?.TryGetValue(field, out var fieldType) ?? false)
+            {
+                return fieldType;
+            }
+
+            return "string";
+        }
 
         /// <summary>
         /// Get name of instance
@@ -428,6 +468,7 @@ namespace SOS.Lib.Repositories.Processed
         /// <param name="processedConfigurationCache"></param>
         /// <param name="elasticConfiguration"></param>
         /// <param name="clusterHealthCache"></param>
+        /// <param name="memoryCache"></param>
         /// <param name="logger"></param>
         /// <exception cref="ArgumentNullException"></exception>
         protected ProcessRepositoryBase(
@@ -436,6 +477,7 @@ namespace SOS.Lib.Repositories.Processed
             ICache<string, ProcessedConfiguration> processedConfigurationCache,
             ElasticSearchConfiguration elasticConfiguration,
             IClassCache<ConcurrentDictionary<string, HealthResponse>> clusterHealthCache,
+            IMemoryCache memoryCache,
             ILogger<ProcessRepositoryBase<TEntity, TKey>> logger
         )
         {
@@ -450,6 +492,7 @@ namespace SOS.Lib.Repositories.Processed
                 logger.LogError($"Settings for index {IndexHelper.GetInstanceName<TEntity>()} is missing. Default settings is used.");
                 _elasticSearchIndexConfiguration = new ElasticSearchIndexConfiguration() { Name = IndexHelper.GetInstanceName<TEntity>() };
             }
+            _memoryCache = memoryCache ?? throw new ArgumentNullException(nameof(memoryCache));
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
             // Default use non live instance
             LiveMode = false;
@@ -582,23 +625,6 @@ namespace SOS.Lib.Repositories.Processed
                 .Query(q => q.MatchAll(q => q.QueryName("GetAllQuery")))
                 .Size(take));
             return searchResponse.Documents.ToList();
-        }
-
-        public async Task<IDictionary<string, string>> GetMappingAsync()
-        {
-            var fieldTypes = new Dictionary<string, string>();
-            var mappingResponse = await Client.Indices.GetMappingAsync<TEntity>(o => o
-                .Indices(IndexName)
-            );
-            if (mappingResponse.IsValidResponse)
-            {
-                foreach (var value in mappingResponse.Indices.Values)
-                {
-                    PopulateFieldTypes(value.Mappings.Properties, ref fieldTypes, null);
-                }
-            }
-
-            return fieldTypes;
         }
     }
 }

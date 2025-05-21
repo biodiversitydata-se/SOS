@@ -293,7 +293,6 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// <param name="useScript"></param>
         /// <param name="aggregateCardinality"></param>
         /// <param name="aggregateOrganismQuantity"></param>
-        /// <param name="fieldType"></param>
         /// <returns></returns>
         Task<PagedResult<AggregationItem>> GetAggregationItemsAsync(
             SearchFilter filter,
@@ -304,8 +303,7 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
             AggregationSortOrder? sortOrder = AggregationSortOrder.CountDescending,
             bool? useScript = false,
             bool? aggregateCardinality = false,
-            bool? aggregateOrganismQuantity = false,
-            string fieldType = null
+            bool? aggregateOrganismQuantity = false
         );
 
         Task<IEnumerable<AggregationItem>> GetAggregationItemsAggregateOrganismQuantityAsync(SearchFilter filter,

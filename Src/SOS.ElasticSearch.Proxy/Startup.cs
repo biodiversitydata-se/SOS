@@ -202,17 +202,17 @@ namespace SOS.ElasticSearch.Proxy
 
                     if (httpContext.Items.TryGetValue("ApiUserType", out var apiUserType))
                     {
-                        diagnosticContext.Set("ApiUserType", apiUserType);
+                        diagnosticContext.Set("ApiUserType", apiUserType!);
                     }
 
                     if (httpContext.Items.TryGetValue("SemaphoreStatus", out var semaphoreStatus))
                     {
-                        diagnosticContext.Set("SemaphoreStatus", semaphoreStatus);
+                        diagnosticContext.Set("SemaphoreStatus", semaphoreStatus!);
                     }
 
                     if (httpContext.Items.TryGetValue("SemaphoreWaitSeconds", out var semaphoreWaitSeconds))
                     {
-                        diagnosticContext.Set("SemaphoreWaitSeconds", semaphoreWaitSeconds);
+                        diagnosticContext.Set("SemaphoreWaitSeconds", semaphoreWaitSeconds!);
                     }
                 };
             });
