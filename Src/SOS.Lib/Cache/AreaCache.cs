@@ -170,13 +170,13 @@ namespace SOS.Lib.Cache
             var missingInCache = GetKeysMissingInCache(areaKeys);
             if (missingInCache?.Any() ?? false)
             {
-                var missingWithGridGeometry = missingInCache.Where(a => new[] { AreaType.Atlas10x10, AreaType.Atlas5x5 }.Contains(a.AreaType));
+                var missingWithGridGeometry = missingInCache.Where(a => a.AreaType.HasGridGeometry());
                 if (missingWithGridGeometry.Count() != 0)
                 {
                     await AddAreasWithGridGeometryToCache(missingWithGridGeometry.ToArray());
                 }
                 
-                var missingWithOutGridGeometry = missingInCache.Where(a => !new[] { AreaType.Atlas10x10, AreaType.Atlas5x5 }.Contains(a.AreaType));
+                var missingWithOutGridGeometry = missingInCache.Where(a => !a.AreaType.HasGridGeometry());
                 if (missingWithOutGridGeometry.Count() != 0)
                 {
                     await Task.WhenAll(missingWithOutGridGeometry.Select(mic => GetGeometryAsync(mic.Item1, mic.Item2)));
