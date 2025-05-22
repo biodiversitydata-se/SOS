@@ -71,7 +71,7 @@ namespace SOS.Harvest.Processors.Shark
                 {
                     IdentifiedBy = verbatim.AnalysedBy,
                     UncertainIdentification = false,
-                    Verified = false,
+                    Verified = true,
                     VerificationStatus = new VocabularyValue { Id = (int)ValidationStatusId.ReportedByExpert }
                 },
                 Location = new Location(LocationType.Point)

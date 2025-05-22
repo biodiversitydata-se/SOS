@@ -85,7 +85,7 @@ namespace SOS.Harvest.Processors.ObservationDatabase
                 Identification = new Identification
                 {
                     UncertainIdentification = false,
-                    Verified = false,
+                    Verified = true,
                     VerificationStatus = new VocabularyValue { Id = (int)ValidationStatusId.ReportedByExpert }
                 },
                 Location = new Location(LocationType.Point)

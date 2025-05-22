@@ -586,7 +586,10 @@ namespace SOS.Analysis.Api
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-                endpoints.MapHealthChecks("/healthz");
+                endpoints.MapHealthChecks("/healthz", new HealthCheckOptions()
+                {
+                    Predicate = _ => false,
+                });
                 endpoints.MapHealthChecks("/health", new HealthCheckOptions()
                 {
                     ResponseWriter = (context, _) => UIResponseWriter.WriteHealthCheckUIResponse(context, _)
