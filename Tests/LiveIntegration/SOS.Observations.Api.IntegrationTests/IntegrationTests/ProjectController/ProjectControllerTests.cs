@@ -1,8 +1,4 @@
 ﻿using FluentAssertions;
-using SOS.Lib.Helpers;
-using SOS.Lib.Models.Search.Result;
-using SOS.Shared.Api.Dtos;
-using SOS.Shared.Api.Dtos.Enum;
 using SOS.Observations.Api.LiveIntegrationTests.Extensions;
 using SOS.Observations.Api.LiveIntegrationTests.Fixtures;
 using System.Collections.Generic;
