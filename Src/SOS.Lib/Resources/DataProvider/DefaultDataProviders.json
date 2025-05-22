@@ -1062,6 +1062,7 @@
         "path": [ "Havsfiskelaboratoriet, Institutionen för akvatiska resurser", "Fiskdata2" ]
       }
     ],
+    "DefaultVerificationStatus": "ReportedByExpert",
     "PreviousProcessLimit": 95,
     "SupportDatasets": false,
     "SupportDynamicEml": false,

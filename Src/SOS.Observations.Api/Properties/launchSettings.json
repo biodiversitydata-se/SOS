@@ -14,7 +14,7 @@
       "applicationUrl": "http://localhost:5000"
     },
     "SOS.Observations.Api (Dev)": {
-      "commandName": "IISExpress",
+      "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "swagger",
       "environmentVariables": {
@@ -27,7 +27,7 @@
       "applicationUrl": "http://localhost:5000"
     },
     "SOS.Observations.Api (ST)": {
-      "commandName": "IISExpress",
+      "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "swagger",
       "environmentVariables": {
@@ -40,7 +40,7 @@
       "applicationUrl": "http://localhost:5000"
     },
     "SOS.Observations.Api (Prod)": {
-      "commandName": "IISExpress",
+      "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "swagger",
       "environmentVariables": {
