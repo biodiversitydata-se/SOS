@@ -65,6 +65,7 @@ namespace SOS.Harvest.Harvesters
                 {
                     if (await _projectInfoRepository.AddCollectionAsync())
                     {
+                        await _projectInfoRepository.CreateIndexesAsync();
                         await _projectInfoRepository.AddManyAsync(projects);
                         // Clear observation api cache
                         await _cacheManager.ClearAsync(Cache.Projects);
@@ -101,6 +102,8 @@ namespace SOS.Harvest.Harvesters
 
             var projectInfo = new ProjectInfo
             {
+                ControlingOrganisationId = projectEntity.ControlingOrganisationId,
+                ControlingUserId = projectEntity.ControlingUserId,
                 Id = projectEntity.Id,
                 Name = projectEntity.Name,
                 StartDate = projectEntity.StartDate,

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace SOS.Shared.Api.Dtos
+﻿namespace SOS.Shared.Api.Dtos
 {
     /// <summary>
     /// Dto

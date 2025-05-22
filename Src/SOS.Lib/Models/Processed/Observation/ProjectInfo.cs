@@ -36,6 +36,16 @@ namespace SOS.Lib.Models.Processed.Observation
         public string CategorySwedish { get; set; }
 
         /// <summary>
+        /// Id of controling organization if any
+        /// </summary>
+        public int? ControlingOrganisationId { get; set; }
+
+        /// <summary>
+        /// Id of controling user if any
+        /// </summary>
+        public int? ControlingUserId { get; set; }
+
+        /// <summary>
         ///     Description of a project.
         /// </summary>
         public string Description { get; set; }
