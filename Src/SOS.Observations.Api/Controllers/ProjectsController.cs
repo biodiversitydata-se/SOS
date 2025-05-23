@@ -19,10 +19,10 @@ namespace SOS.Observations.Api.Controllers
     /// </summary>
     [Route("[controller]")]
     [ApiController]
-    public class ProjectesController : ControllerBase
+    public class ProjectsController : ControllerBase
     {
         private readonly IProjectManager _projectManager;
-        private readonly ILogger<ProjectesController> _logger;
+        private readonly ILogger<ProjectsController> _logger;
 
         /// <summary>
         /// Constructor
@@ -30,9 +30,9 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="projectManager"></param>
         /// <param name="logger"></param>
         /// <exception cref="ArgumentNullException"></exception>
-        public ProjectesController(
+        public ProjectsController(
             IProjectManager projectManager,
-            ILogger<ProjectesController> logger) 
+            ILogger<ProjectsController> logger) 
         {
             _projectManager = projectManager ?? throw new ArgumentNullException(nameof(projectManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
