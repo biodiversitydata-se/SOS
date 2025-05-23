@@ -162,6 +162,22 @@ namespace SOS.Lib.Extensions
                 out result);
         }
 
+        public static bool GetBoolean(this string? value, bool defaultValue = false)
+        {
+            if (value != null)
+            {
+                if (bool.TryParse(value, out var boolValue))
+                {
+                    return boolValue;
+                }
+                return defaultValue;
+            }
+            else
+            {
+                return defaultValue;
+            }
+        }
+
         /// <summary>
         ///     Parse a Boolean value.
         /// </summary>

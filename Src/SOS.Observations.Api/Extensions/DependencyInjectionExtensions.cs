@@ -72,10 +72,7 @@ public static class DependencyInjectionExtensions
             c.ConnectionString = applicationInsightsConfiguration.ConnectionString;
         });        
         services.AddApplicationInsightsTelemetryProcessor<IgnoreRequestPathsTelemetryProcessor>();
-        services.AddSingleton<ITelemetryInitializer, TelemetryInitializer>();
-
-        // Add Swagger services.
-        services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
+        services.AddSingleton<ITelemetryInitializer, TelemetryInitializer>();        
 
         //setup the Elasticsearch configuration
         var elasticConfiguration = Settings.SearchDbConfiguration;
@@ -200,59 +197,5 @@ public static class DependencyInjectionExtensions
         services.AddSingleton<IVocabularyValueResolver, VocabularyValueResolver>();
 
         return services;
-    }
-
-    public class ConfigureSwaggerOptions : IConfigureOptions<SwaggerGenOptions>
-    {
-        readonly IApiVersionDescriptionProvider provider;
-        public ConfigureSwaggerOptions(IApiVersionDescriptionProvider provider)
-        {
-            this.provider = provider;
-        }
-        public void Configure(SwaggerGenOptions options)
-        {
-            foreach (var description in provider.ApiVersionDescriptions)
-            {
-                options.SwaggerDoc(
-                       $"InternalSosObservations{description.GroupName}",
-                       new OpenApiInfo()
-                       {
-                           Title = $"SOS Observations API (Internal) {description.GroupName.ToUpperInvariant()}",
-                           Version = description.ApiVersion.ToString(),
-                           Description = "Species Observation System (SOS) - Observations API. Internal API." + (description.IsDeprecated ? " This API version has been deprecated." : "")
-                       });
-                options.SwaggerDoc(
-                    $"PublicSosObservations{description.GroupName}",
-                    new OpenApiInfo()
-                    {
-                        Title = $"SOS Observations API (Public) {description.GroupName.ToUpperInvariant()}",
-                        Version = description.ApiVersion.ToString(),
-                        Description = "Species Observation System (SOS) - Observations API. Public API." + (description.IsDeprecated ? " This API version has been deprecated." : "")
-                    });
-                options.SwaggerDoc(
-                       $"AzureInternalSosObservations{description.GroupName}",
-                       new OpenApiInfo()
-                       {
-                           Title = $"SOS Observations API (Internal - Azure) {description.GroupName.ToUpperInvariant()}",
-                           Version = description.ApiVersion.ToString(),
-                           Description = "Species Observation System (SOS) - Observations API. Internal - Azure API." + (description.IsDeprecated ? " This API version has been deprecated." : "")
-                       });
-                options.SwaggerDoc(
-                    $"AzurePublicSosObservations{description.GroupName}",
-                    new OpenApiInfo()
-                    {
-                        Title = $"SOS Observations API (Public - Azure) {description.GroupName.ToUpperInvariant()}",
-                        Version = description.ApiVersion.ToString(),
-                        Description = "Species Observation System (SOS) - Observations API. Public - Azure API." + (description.IsDeprecated ? " This API version has been deprecated." : "")
-                    });
-                options.CustomOperationIds(apiDesc =>
-                {
-                    apiDesc.TryGetMethodInfo(out MethodInfo methodInfo);
-                    string controller = apiDesc.ActionDescriptor.RouteValues["controller"];
-                    string methodName = methodInfo.Name;
-                    return $"{controller}_{methodName}".Replace("Async", "", StringComparison.InvariantCultureIgnoreCase);
-                });
-            }
-        }
-    }
+    }    
 }
