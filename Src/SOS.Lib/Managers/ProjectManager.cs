@@ -45,5 +45,28 @@ namespace SOS.Lib.Managers
             }
             return (await GetAllAsync()).Where(p => projectIds.Contains(p.Id));
         }
+
+        /// <inheritdoc/>
+        public async Task<IEnumerable<ProjectInfo>> GetAsync(string filter, int? userId)
+        {
+            try
+            {
+                return (await GetAllAsync()).Where(p => 
+                    (p.IsPublic || p.ControlingUserId == userId) &&
+                    (
+                        string.IsNullOrEmpty(filter) ||
+                        (p.Category?.Contains(filter, StringComparison.CurrentCultureIgnoreCase) ?? false) ||
+                        (p.CategorySwedish?.Contains(filter, StringComparison.CurrentCultureIgnoreCase) ?? false) ||
+                        (p.Description?.Contains(filter, StringComparison.CurrentCultureIgnoreCase) ?? false) ||
+                        (p.Name?.Contains(filter, StringComparison.CurrentCultureIgnoreCase) ?? false)
+                    )
+               );
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to get projects");
+                return null;
+            }
+        }
     }
 }

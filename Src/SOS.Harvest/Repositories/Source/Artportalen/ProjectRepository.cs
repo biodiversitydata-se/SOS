@@ -14,6 +14,8 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
     {
         private string SelectSql => @"
                 SELECT 
+                    p.ControlingOrganisationId,
+                    p.ControlingUserId,
 	                p.Id,
                     p.IsPublic,
                     p.IsHideall,
