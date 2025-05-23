@@ -2,12 +2,12 @@
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Helpers;
 using SOS.Lib.Managers.Interfaces;
-using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Swagger;
 using SOS.Shared.Api.Dtos.Vocabulary;
 using SOS.Shared.Api.Extensions.Controller;
 using SOS.Shared.Api.Extensions.Dto;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -44,9 +44,8 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="filter">Limit project list by this filter</param>
         /// <returns></returns>
         [HttpGet]
-        [ProducesResponseType(typeof(ProjectDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(IEnumerable<ProjectDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        [ProducesResponseType((int)HttpStatusCode.RequestTimeout)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [AzureApi, AzureInternalApi]
         public async Task<IActionResult> GetProjectes(
@@ -62,7 +61,6 @@ namespace SOS.Observations.Api.Controllers
                 {
                     return new StatusCodeResult((int)HttpStatusCode.NoContent);
                 }
-                this.LogObservationCount(1);
                 return new OkObjectResult(projects.Select(p => p.ToDto()));
             }
             catch (Exception e)
@@ -70,6 +68,39 @@ namespace SOS.Observations.Api.Controllers
                 _logger.LogError(e, "Error getting projects");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
-        }   
+        }
+
+        /// <summary>
+        /// Get project by id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("{id}")]
+        [ProducesResponseType(typeof(ProjectDto), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [AzureApi, AzureInternalApi]
+        public async Task<IActionResult> GetProjecte(
+            [FromRoute] int id)
+        {
+            try
+            {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
+
+                var project = await _projectManager.GetAsync(id, base.User?.GetUserId());
+
+                if (project == null)
+                {
+                    return new StatusCodeResult((int)HttpStatusCode.NoContent);
+                }
+
+                return new OkObjectResult(project.ToDto());
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, $"Error getting project: {id}");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
     }
 }
