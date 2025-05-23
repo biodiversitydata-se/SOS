@@ -68,5 +68,21 @@ namespace SOS.Lib.Managers
                 return null;
             }
         }
+
+        /// <inheritdoc/>
+        public async Task<ProjectInfo> GetAsync(int id, int? userId)
+        {
+            try
+            {
+                return (await GetAllAsync()).FirstOrDefault(p =>
+                    (p.IsPublic || p.ControlingUserId == userId) && p.Id.Equals(id)
+               );
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, $"Failed to get project: {id}");
+                return null;
+            }
+        }
     }
 }

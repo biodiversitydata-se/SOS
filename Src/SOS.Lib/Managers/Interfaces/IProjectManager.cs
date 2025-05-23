@@ -29,5 +29,13 @@ namespace SOS.Lib.Managers.Interfaces
         /// <param name="userId"></param>
         /// <returns></returns>
         Task<IEnumerable<ProjectInfo>> GetAsync(string filter, int? userId);
+
+        /// <summary>
+        /// Get project by id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        Task<ProjectInfo> GetAsync(int id, int? userId);
     }
 }
