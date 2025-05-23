@@ -12,7 +12,7 @@
       "applicationUrl": "http://localhost:5000"
     },
     "SOS.Analysis.Api (Dev)": {
-      "commandName": "IISExpress",
+      "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "swagger",
       "environmentVariables": {
@@ -23,7 +23,7 @@
       "applicationUrl": "http://localhost:5000"
     },
     "SOS.Analysis.Api (ST)": {
-      "commandName": "IISExpress",
+      "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "swagger",
       "environmentVariables": {

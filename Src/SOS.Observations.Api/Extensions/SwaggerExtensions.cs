@@ -1,12 +1,15 @@
 ﻿using Asp.Versioning;
 using Asp.Versioning.ApiExplorer;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Mvc.Abstractions;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using NetTopologySuite.Geometries;
 using SOS.Lib.ActionFilters;
 using SOS.Lib.Swagger;
-using SOS.Observations.Api.Helpers;
+using Swashbuckle.AspNetCore.SwaggerGen;
 using Swashbuckle.AspNetCore.SwaggerUI;
 using System;
 using System.Collections.Generic;
@@ -27,6 +30,9 @@ public static class SwaggerExtensions
 
     public static IServiceCollection SetupSwagger(this IServiceCollection services)
     {
+        // Add Swagger services.
+        services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
+
         services.AddApiVersioning(options =>
         {
             options.DefaultApiVersion = new ApiVersion(1, 5);
@@ -72,7 +78,7 @@ public static class SwaggerExtensions
 
                 options.DocInclusionPredicate((documentName, apiDescription) =>
                 {
-                    var apiVersions = StartupHelpers.GetApiVersions(apiDescription);
+                    var apiVersions = GetApiVersions(apiDescription);
                     var versionMatch = apiVersions.Any(v => $"{InternalApiName}v{v}" == documentName) 
                         || apiVersions.Any(v => $"{PublicApiName}v{v}" == documentName) 
                         || apiVersions.Any(v => $"{AzureInternalApiName}v{v}" == documentName) 
@@ -153,5 +159,70 @@ public static class SwaggerExtensions
         });
 
         return app;
+    }
+
+    private static IReadOnlyList<ApiVersion> GetApiVersions(ApiDescription apiDescription)
+    {
+        var apiVersionMetadata = apiDescription.ActionDescriptor.GetApiVersionMetadata();
+        var actionApiVersionModel = apiVersionMetadata.Map(ApiVersionMapping.Explicit | ApiVersionMapping.Implicit);
+
+        var apiVersions = actionApiVersionModel.DeclaredApiVersions.Any()
+            ? actionApiVersionModel.DeclaredApiVersions
+            : actionApiVersionModel.ImplementedApiVersions;
+        return apiVersions;
+    }
+
+    public class ConfigureSwaggerOptions : IConfigureOptions<SwaggerGenOptions>
+    {
+        readonly IApiVersionDescriptionProvider provider;
+        public ConfigureSwaggerOptions(IApiVersionDescriptionProvider provider)
+        {
+            this.provider = provider;
+        }
+        public void Configure(SwaggerGenOptions options)
+        {
+            foreach (var description in provider.ApiVersionDescriptions)
+            {
+                options.SwaggerDoc(
+                       $"InternalSosObservations{description.GroupName}",
+                       new OpenApiInfo()
+                       {
+                           Title = $"SOS Observations API (Internal) {description.GroupName.ToUpperInvariant()}",
+                           Version = description.ApiVersion.ToString(),
+                           Description = "Species Observation System (SOS) - Observations API. Internal API." + (description.IsDeprecated ? " This API version has been deprecated." : "")
+                       });
+                options.SwaggerDoc(
+                    $"PublicSosObservations{description.GroupName}",
+                    new OpenApiInfo()
+                    {
+                        Title = $"SOS Observations API (Public) {description.GroupName.ToUpperInvariant()}",
+                        Version = description.ApiVersion.ToString(),
+                        Description = "Species Observation System (SOS) - Observations API. Public API." + (description.IsDeprecated ? " This API version has been deprecated." : "")
+                    });
+                options.SwaggerDoc(
+                       $"AzureInternalSosObservations{description.GroupName}",
+                       new OpenApiInfo()
+                       {
+                           Title = $"SOS Observations API (Internal - Azure) {description.GroupName.ToUpperInvariant()}",
+                           Version = description.ApiVersion.ToString(),
+                           Description = "Species Observation System (SOS) - Observations API. Internal - Azure API." + (description.IsDeprecated ? " This API version has been deprecated." : "")
+                       });
+                options.SwaggerDoc(
+                    $"AzurePublicSosObservations{description.GroupName}",
+                    new OpenApiInfo()
+                    {
+                        Title = $"SOS Observations API (Public - Azure) {description.GroupName.ToUpperInvariant()}",
+                        Version = description.ApiVersion.ToString(),
+                        Description = "Species Observation System (SOS) - Observations API. Public - Azure API." + (description.IsDeprecated ? " This API version has been deprecated." : "")
+                    });
+                options.CustomOperationIds(apiDesc =>
+                {
+                    apiDesc.TryGetMethodInfo(out MethodInfo methodInfo);
+                    string controller = apiDesc.ActionDescriptor.RouteValues["controller"];
+                    string methodName = methodInfo.Name;
+                    return $"{controller}_{methodName}".Replace("Async", "", StringComparison.InvariantCultureIgnoreCase);
+                });
+            }
+        }
     }
 }
