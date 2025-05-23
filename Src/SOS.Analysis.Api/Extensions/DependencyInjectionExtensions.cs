@@ -1,8 +1,5 @@
-﻿using Asp.Versioning.ApiExplorer;
-using Microsoft.ApplicationInsights.Extensibility;
+﻿using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Options;
-using Microsoft.OpenApi.Models;
 using SOS.Analysis.Api.ApplicationInsights;
 using SOS.Lib.ApplicationInsights;
 using SOS.Lib.Cache;
@@ -21,12 +18,10 @@ using SOS.Lib.Security;
 using SOS.Lib.Security.Interfaces;
 using SOS.Lib.Services;
 using SOS.Lib.Services.Interfaces;
-using Swashbuckle.AspNetCore.SwaggerGen;
 using SOS.Shared.Api.Utilities.Objects.Interfaces;
 using SOS.Shared.Api.Utilities.Objects;
 using SOS.Shared.Api.Validators.Interfaces;
 using SOS.Shared.Api.Validators;
-using System.Reflection;
 using Microsoft.Extensions.Logging.Abstractions;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Processed;
@@ -114,59 +109,5 @@ public static class DependencyInjectionExtensions
         services.AddScoped<IInputValidator, InputValidator>();     
 
         return services;
-    }
-
-    public class ConfigureSwaggerOptions : IConfigureOptions<SwaggerGenOptions>
-    {
-        readonly IApiVersionDescriptionProvider provider;
-        public ConfigureSwaggerOptions(IApiVersionDescriptionProvider provider)
-        {
-            this.provider = provider;
-        }
-        public void Configure(SwaggerGenOptions options)
-        {
-            foreach (var description in provider.ApiVersionDescriptions)
-            {
-                options.SwaggerDoc(
-                       $"InternalSosObservations{description.GroupName}",
-                       new OpenApiInfo()
-                       {
-                           Title = $"SOS Observations API (Internal) {description.GroupName.ToUpperInvariant()}",
-                           Version = description.ApiVersion.ToString(),
-                           Description = "Species Observation System (SOS) - Observations API. Internal API." + (description.IsDeprecated ? " This API version has been deprecated." : "")
-                       });
-                options.SwaggerDoc(
-                    $"PublicSosObservations{description.GroupName}",
-                    new OpenApiInfo()
-                    {
-                        Title = $"SOS Observations API (Public) {description.GroupName.ToUpperInvariant()}",
-                        Version = description.ApiVersion.ToString(),
-                        Description = "Species Observation System (SOS) - Observations API. Public API." + (description.IsDeprecated ? " This API version has been deprecated." : "")
-                    });
-                options.SwaggerDoc(
-                       $"AzureInternalSosObservations{description.GroupName}",
-                       new OpenApiInfo()
-                       {
-                           Title = $"SOS Observations API (Internal - Azure) {description.GroupName.ToUpperInvariant()}",
-                           Version = description.ApiVersion.ToString(),
-                           Description = "Species Observation System (SOS) - Observations API. Internal - Azure API." + (description.IsDeprecated ? " This API version has been deprecated." : "")
-                       });
-                options.SwaggerDoc(
-                    $"AzurePublicSosObservations{description.GroupName}",
-                    new OpenApiInfo()
-                    {
-                        Title = $"SOS Observations API (Public - Azure) {description.GroupName.ToUpperInvariant()}",
-                        Version = description.ApiVersion.ToString(),
-                        Description = "Species Observation System (SOS) - Observations API. Public - Azure API." + (description.IsDeprecated ? " This API version has been deprecated." : "")
-                    });
-                options.CustomOperationIds(apiDesc =>
-                {
-                    apiDesc.TryGetMethodInfo(out MethodInfo methodInfo);
-                    string controller = apiDesc.ActionDescriptor.RouteValues["controller"];
-                    string methodName = methodInfo.Name;
-                    return $"{controller}_{methodName}".Replace("Async", "", StringComparison.InvariantCultureIgnoreCase);
-                });
-            }
-        }
-    }
+    }  
 }
