@@ -69,7 +69,7 @@ namespace SOS.Observations.Api.LiveIntegrationTests.Fixtures
         public UserController UserController { get; private set; }
         public DataProvidersController DataProvidersController { get; private set; }
         public AreasController AreasController { get; private set; }
-        public ProjectesController ProjectesController { get; private set; }
+        public ProjectsController ProjectsController { get; private set; }
         public IProcessedObservationRepository ProcessedObservationRepository { get; set; }
         public IEventRepository EventRepository { get; set; }
         public IInvalidObservationRepository InvalidObservationRepository { get; set; }
@@ -311,7 +311,7 @@ namespace SOS.Observations.Api.LiveIntegrationTests.Fixtures
                 new SemaphoreLimitManager(new SemaphoreLimitsConfiguration(), new NullLogger<SemaphoreLimitManager>()), 
                 new NullLogger<LocationsController>());
             AreasController = new AreasController(areaManager, new NullLogger<AreasController>());
-            ProjectesController = new ProjectesController(projectManger, new NullLogger<ProjectesController>());
+            ProjectsController = new ProjectsController(projectManger, new NullLogger<ProjectsController>());
         }
 
         private DwcArchiveFileWriter CreateDwcArchiveFileWriter(VocabularyValueResolver vocabularyValueResolver, ProcessClient processClient)
