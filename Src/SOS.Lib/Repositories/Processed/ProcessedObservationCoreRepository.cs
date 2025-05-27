@@ -1335,7 +1335,7 @@ namespace SOS.Lib.Repositories.Processed
 
                     return a;
                 })
-                .AddDefaultAggrigationSettings()
+                .AddDefaultAggrigationSettings(trackHits: true)
             );
 
             searchResponse.ThrowIfInvalid();

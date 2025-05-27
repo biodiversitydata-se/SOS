@@ -59,7 +59,8 @@ public class DataStewardshipManager : IDataStewardshipManager
             skip, 
             take,
             precisionThreshold: null,
-            Lib.Models.Search.Enums.AggregationSortOrder.KeyAscending);
+            Lib.Models.Search.Enums.AggregationSortOrder.KeyAscending,
+            aggregateCardinality: true);
         int count = eventIdPageResult.Records.Count();
         int totalCount = Convert.ToInt32(eventIdPageResult.TotalCount);
         var records = Enumerable.Empty<Contracts.Models.Event>();
@@ -121,7 +122,8 @@ public class DataStewardshipManager : IDataStewardshipManager
             skip,
             take,
             precisionThreshold: null,
-            Lib.Models.Search.Enums.AggregationSortOrder.KeyAscending);        
+            Lib.Models.Search.Enums.AggregationSortOrder.KeyAscending,
+            aggregateCardinality: true);        
         int count = aggregationResult.Records.Count();
         int totalCount = Convert.ToInt32(aggregationResult.TotalCount);
         var records = Enumerable.Empty<Dataset>();
