@@ -1,73 +1,120 @@
+using Microsoft.ApplicationInsights.Extensibility;
+using MongoDB.Bson.Serialization.Conventions;
 using Serilog;
-using Serilog.Filters;
-using Serilog.Formatting.Compact;
-using LogLevel = Microsoft.Extensions.Logging.LogLevel;
+using SOS.ElasticSearch.Proxy.Extensions;
+using System.Globalization;
+using System.Text.Json.Serialization;
 
-namespace SOS.ElasticSearch.Proxy
+// --- Program startup ---
+
+try
 {
-    /// <summary>
-    ///     Program class
-    /// </summary>
-    public class Program
+    var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+    bool isLocalDevelopment = new[] { "local", "k8s" }.Contains(env?.ToLower(), StringComparer.CurrentCultureIgnoreCase);
+    bool isDevelopment = new[] { "local", "dev", "st" }.Contains(env?.ToLower(), StringComparer.CurrentCultureIgnoreCase);    
+
+    // Setup logging
+    SerilogExtensions.SetupSerilog(isDevelopment);
+    Log.Logger.Information("Starting Service");
+
+    var builder = WebApplication.CreateBuilder(args);
+    builder.Host.UseSerilog(Log.Logger);
+
+    // Set Swedish culture globally
+    SetCulture("sv-SE");
+
+    // Register MongoDB conventions
+    RegisterMongoConventions();
+
+    // Build configuration
+    var configurationRoot = BuildConfiguration(builder, isDevelopment);
+    Settings.Init(configurationRoot);
+
+    // Register services
+    ConfigureServices(builder.Services, configurationRoot, isDevelopment);
+
+    // Build app and configure middleware pipeline
+    var app = builder.Build();
+    ConfigureMiddleware(app, isDevelopment);
+
+    // Start the application
+    await app.RunAsync("http://*:5000");
+}
+catch (Exception ex)
+{
+    Log.Fatal(ex, "Application terminated unexpectedly");
+}
+finally
+{
+    await Log.CloseAndFlushAsync();
+}
+
+// --- Helper methods for startup ---
+
+static void SetCulture(string cultureName)
+{
+    var culture = new CultureInfo(cultureName);
+    CultureInfo.DefaultThreadCurrentCulture = culture;
+    CultureInfo.DefaultThreadCurrentUICulture = culture;
+}
+
+static void RegisterMongoConventions()
+{
+    ConventionRegistry.Register(
+        "MongoDB Solution Conventions",
+        new ConventionPack { new IgnoreExtraElementsConvention(true), new IgnoreIfNullConvention(true) },
+        t => true);
+}
+
+static IConfigurationRoot BuildConfiguration(WebApplicationBuilder builder, bool isDevelopment)
+{
+    var environment = builder.Environment.EnvironmentName.ToLower();
+    var configBuilder = new ConfigurationBuilder()
+        .SetBasePath(builder.Environment.ContentRootPath)
+        .AddJsonFile("appsettings.json", true, true)
+        .AddJsonFile($"appsettings.{environment}.json", true)
+        .AddEnvironmentVariables();
+    if (isDevelopment)
+        configBuilder.AddUserSecrets<Program>();
+    return configBuilder.Build();
+}
+
+static void ConfigureServices(IServiceCollection services, IConfigurationRoot configuration, bool isDevelopment)
+{
+    services.AddDependencyInjectionServices(configuration);
+    services.AddMvcCore(option => { option.EnableEndpointRouting = false; })
+        .AddApiExplorer()
+        .AddJsonOptions(options =>
+        {
+            options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+        });
+    services.AddMvc();
+    services.SetupHealthchecks();
+}
+
+static void ConfigureMiddleware(WebApplication app, bool isDevelopment)
+{    
+    if (isDevelopment)
+        app.UseDeveloperExceptionPage();
+    else
+        app.UseHsts();
+
+    if (!app.Environment.IsEnvironment("prod"))
     {
-        /// <summary>
-        ///     Main
-        /// </summary>
-        /// <param name="args"></param>
-        public static void Main(string[] args)
-        {
-            var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-            bool isLocalDevelopment = new[] { "local", "k8s" }.Contains(env?.ToLower(), StringComparer.CurrentCultureIgnoreCase);
-            
-            // we set up Log.Logger here in order to be able to log if something goes wrong in the startup process
-            Log.Logger = isLocalDevelopment ?
-                    new LoggerConfiguration() // human readable in the terminal when developing, not all json
-                        .MinimumLevel.Debug()
-                        .Enrich.FromLogContext()
-                        .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {SourceContext} {Message:lj} {Properties}{NewLine}{Exception}")
-                    .CreateLogger()
-                :
-                    new LoggerConfiguration() // compact json when running in the clusters for that sweet sweet structured logging
-                        .MinimumLevel.Information()
-                        .WriteTo.Console(new RenderedCompactJsonFormatter())
-                        .Enrich.FromLogContext()
-                        .MinimumLevel.Override("Microsoft.EntityFrameworkCore", Serilog.Events.LogEventLevel.Warning)
-                        .MinimumLevel.Override("Microsoft.AspNetCore.Http.Result", Serilog.Events.LogEventLevel.Warning)
-                        .MinimumLevel.Override("Microsoft.AspNetCore.Hosting.Diagnostics", Serilog.Events.LogEventLevel.Warning)
-                        .MinimumLevel.Override("Microsoft.AspNetCore.Routing.EndpointMiddleware", Serilog.Events.LogEventLevel.Warning)
-                        .MinimumLevel.Override("Microsoft.AspNetCore.Http.HttpResults", Serilog.Events.LogEventLevel.Warning)
-                        .MinimumLevel.Override("Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware", Serilog.Events.LogEventLevel.Warning)
-                        .MinimumLevel.Override("Microsoft.AspNetCore.Mvc.Infrastructure", Serilog.Events.LogEventLevel.Warning)
-                        .MinimumLevel.Override("Microsoft.AspNetCore.Cors.Infrastructure", Serilog.Events.LogEventLevel.Warning)
-                        .Filter.ByExcluding(Matching.WithProperty<string>("RequestPath", p => p == "/healthz"))
-                    .CreateLogger();
-
-            Log.Logger.Debug("Starting Service");
-            try
-            {
-                CreateHostBuilder(args).Build().Run();
-            }
-            catch (Exception ex)
-            {                
-                Log.Logger.Error(ex, "Stopped program because of exception");
-                throw;
-            }
-        }
-
-        /// <summary>
-        ///     Create a host builder
-        /// </summary>
-        /// <param name="args"></param>
-        /// <returns></returns>
-        public static IHostBuilder CreateHostBuilder(string[] args)
-        {
-            return Host.CreateDefaultBuilder(args)
-                .UseSerilog(Log.Logger)
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseStartup<Startup>()
-                              .UseUrls("http://*:5000");
-                });
-        }
+        var telemetryConfig = app.Services.GetRequiredService<TelemetryConfiguration>();
+        telemetryConfig.DisableTelemetry = true;
     }
+
+    app.UseWhen(context => context.Request.Path.StartsWithSegments("/caches"),
+            builder => builder
+            .UseRouting()
+            .UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+            }
+        )
+    );
+
+    app.ApplyUseSerilogRequestLogging();    
+    app.ApplyMapHealthChecks();
 }

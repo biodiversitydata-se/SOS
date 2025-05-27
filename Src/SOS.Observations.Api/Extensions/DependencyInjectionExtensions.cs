@@ -1,12 +1,9 @@
-﻿using Asp.Versioning.ApiExplorer;
-using Elastic.Clients.Elasticsearch.Cluster;
+﻿using Elastic.Clients.Elasticsearch.Cluster;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
-using Microsoft.Extensions.Options;
-using Microsoft.OpenApi.Models;
 using SOS.Lib.ApplicationInsights;
 using SOS.Lib.Cache;
 using SOS.Lib.Cache.Interfaces;
@@ -50,11 +47,9 @@ using SOS.Shared.Api.Utilities.Objects;
 using SOS.Shared.Api.Utilities.Objects.Interfaces;
 using SOS.Shared.Api.Validators;
 using SOS.Shared.Api.Validators.Interfaces;
-using Swashbuckle.AspNetCore.SwaggerGen;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Reflection;
 using DataProviderManager = SOS.Observations.Api.Managers.DataProviderManager;
 using IDataProviderManager = SOS.Observations.Api.Managers.Interfaces.IDataProviderManager;
 
