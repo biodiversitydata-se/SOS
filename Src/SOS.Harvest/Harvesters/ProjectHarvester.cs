@@ -65,7 +65,7 @@ namespace SOS.Harvest.Harvesters
                 {
                     if (await _projectInfoRepository.AddCollectionAsync())
                     {
-                        await _projectInfoRepository.CreateIndexesAsync();
+                        //Todo fix index creation await _projectInfoRepository.CreateIndexesAsync();
                         await _projectInfoRepository.AddManyAsync(projects);
                         // Clear observation api cache
                         await _cacheManager.ClearAsync(Cache.Projects);
