@@ -1,4 +1,5 @@
 using Hangfire;
+using Hangfire.Dashboard;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -99,9 +100,15 @@ static void ConfigureServices(IServiceCollection services, IConfigurationRoot co
 }
 
 static void ConfigureMiddleware(WebApplication app, bool isDevelopment, bool disableHangfireInit)
-{    
+{
     if (!disableHangfireInit)
-       app.UseHangfireDashboard();
+    {
+        app.UseHangfireDashboard("/hangfire", new DashboardOptions
+        {
+            Authorization = [new AllowAllConnectionsFilter()],
+            IgnoreAntiforgeryToken = true
+        });
+    }
     if (isDevelopment)
         app.UseDeveloperExceptionPage();
     else
@@ -113,4 +120,16 @@ static void ConfigureMiddleware(WebApplication app, bool isDevelopment, bool dis
     app.MapControllers();
     app.ApplyMapHealthChecks();    
     app.ApplyUseSwagger();
+}
+
+public class AllowAllConnectionsFilter : IDashboardAuthorizationFilter
+{
+    /// <summary>
+    /// </summary>
+    /// <param name="context"></param>
+    /// <returns></returns>
+    public bool Authorize(DashboardContext context)
+    {
+        return true;
+    }
 }
