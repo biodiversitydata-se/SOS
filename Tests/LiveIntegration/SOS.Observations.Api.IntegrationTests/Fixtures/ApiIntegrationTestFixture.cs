@@ -254,8 +254,8 @@ namespace SOS.Observations.Api.LiveIntegrationTests.Fixtures
             var inputValidator = new InputValidator(areaCache, sortableFieldsCache, taxonManager, inputValaidationConfiguration);
             var searchFilterUtility = new SearchFilterUtility(new AreaConfiguration(), areaCache);
             ObservationsController = new ObservationsController(ObservationManager, taxonSearchManager, searchFilterUtility, inputValidator, observationApiConfiguration, 
-                new Mock<ClassCache<Dictionary<string, CacheEntry<GeoGridResultDto>>>>().Object,
-                new Mock<ClassCache<Dictionary<string, CacheEntry<PagedResultDto<TaxonAggregationItemDto>>>>>().Object,
+                new Mock<ClassCache<ConcurrentDictionary<string, CacheEntry<GeoGridResultDto>>>>().Object,
+                new Mock<ClassCache<ConcurrentDictionary<string, CacheEntry<PagedResultDto<TaxonAggregationItemDto>>>>>().Object,
                 new SemaphoreLimitManager(new SemaphoreLimitsConfiguration(), new NullLogger<SemaphoreLimitManager>()),
                 new NullLogger<ObservationsController>());
             var ctx = new ControllerContext() { HttpContext = new DefaultHttpContext() };
@@ -383,7 +383,7 @@ namespace SOS.Observations.Api.LiveIntegrationTests.Fixtures
                 filterManager,
                 new HttpContextAccessor(),
                 new TaxonObservationCountCache(),
-                new ClassCache<Dictionary<int, TaxonSumAggregationItem>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<Dictionary<int, TaxonSumAggregationItem>>>()) { CacheDuration = TimeSpan.FromHours(4) },
+                new ClassCache<ConcurrentDictionary<int, TaxonSumAggregationItem>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<int, TaxonSumAggregationItem>>>()) { CacheDuration = TimeSpan.FromHours(4) },
                 new Mock<IGeneralizationResolver>().Object,
                 new Mock<IDataProviderCache>().Object,
                 new NullLogger<ObservationManager>());
@@ -398,7 +398,7 @@ namespace SOS.Observations.Api.LiveIntegrationTests.Fixtures
         {
             var taxonSearchManager = new TaxonSearchManager(processedTaxonRepository,
                 filterManager,
-                new ClassCache<Dictionary<int, TaxonSumAggregationItem>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<Dictionary<int, TaxonSumAggregationItem>>>()) { CacheDuration = TimeSpan.FromHours(4) },
+                new ClassCache<ConcurrentDictionary<int, TaxonSumAggregationItem>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<int, TaxonSumAggregationItem>>>()) { CacheDuration = TimeSpan.FromHours(4) },
                 new NullLogger<TaxonSearchManager>());
 
             return taxonSearchManager;

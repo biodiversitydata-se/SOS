@@ -6,6 +6,7 @@ using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Cache;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
@@ -131,6 +132,14 @@ namespace SOS.Lib.Cache
             }
         }
 
+        public void CheckCacheSize<T>(ConcurrentDictionary<string, CacheEntry<T>> dictionary)
+        {
+            if (dictionary.Count >= _maxNumberOfItems)
+            {
+                RemoveLeastUsedItems(ref dictionary);
+            }
+        }
+
         private void RemoveLeastUsedItems<T>(ref Dictionary<string, CacheEntry<T>> dictionary)
         {
             var itemsToRemove = dictionary.OrderBy(entry => entry.Value.Count)
@@ -140,6 +149,17 @@ namespace SOS.Lib.Cache
 
             dictionary = dictionary.Where(kvp => !itemsToRemove.Contains(kvp.Key))
                             .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+        }
+
+        private void RemoveLeastUsedItems<T>(ref ConcurrentDictionary<string, CacheEntry<T>> dictionary)
+        {
+            var itemsToRemove = dictionary.OrderBy(entry => entry.Value.Count)
+                                      .Take(Convert.ToInt32(_maxNumberOfItems * 0.1))
+                                      .Select(entry => entry.Key)
+                                      .ToList();
+
+            dictionary = dictionary.Where(kvp => !itemsToRemove.Contains(kvp.Key))
+                            .ToConcurrentDictionary(kvp => kvp.Key, kvp => kvp.Value);
         }
 
         public CacheEntry<T> CreateCacheEntry<T>(T item)

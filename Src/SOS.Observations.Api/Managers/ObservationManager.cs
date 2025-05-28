@@ -28,6 +28,7 @@ using NetTopologySuite.Geometries;
 using System.Text.Json.Nodes;
 using NetTopologySuite.Features;
 using SOS.Shared.Api.Dtos.Enum;
+using System.Collections.Concurrent;
 
 namespace SOS.Observations.Api.Managers
 {
@@ -43,7 +44,7 @@ namespace SOS.Observations.Api.Managers
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IVocabularyValueResolver _vocabularyValueResolver;
         private readonly ITaxonObservationCountCache _taxonObservationCountCache;
-        private readonly IClassCache<Dictionary<int, TaxonSumAggregationItem>> _taxonSumAggregationCache;
+        private readonly IClassCache<ConcurrentDictionary<int, TaxonSumAggregationItem>> _taxonSumAggregationCache;
         private readonly IGeneralizationResolver _generalizationResolver;
         private readonly IDataProviderCache _dataProviderCache;
         private readonly ILogger<ObservationManager> _logger;
@@ -140,7 +141,7 @@ namespace SOS.Observations.Api.Managers
             IFilterManager filterManager,
             IHttpContextAccessor httpContextAccessor,
             ITaxonObservationCountCache taxonObservationCountCache,
-            IClassCache<Dictionary<int, TaxonSumAggregationItem>> taxonSumAggregationCache,
+            IClassCache<ConcurrentDictionary<int, TaxonSumAggregationItem>> taxonSumAggregationCache,
             IGeneralizationResolver generalizationResolver,
             IDataProviderCache dataProviderCache,
             ILogger<ObservationManager> logger)

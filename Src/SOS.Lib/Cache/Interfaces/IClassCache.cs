@@ -1,5 +1,6 @@
 ﻿using SOS.Lib.Models.Cache;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 
@@ -36,5 +37,6 @@ namespace SOS.Lib.Cache.Interfaces
         CacheEntry<T> CreateCacheEntry<T>(T item);
         T GetCacheEntryValue<T>(CacheEntry<T> entry);
         void CheckCacheSize<T>(Dictionary<string, CacheEntry<T>> dictionary);
+        void CheckCacheSize<T>(ConcurrentDictionary<string, CacheEntry<T>> dictionary);
     }
 }

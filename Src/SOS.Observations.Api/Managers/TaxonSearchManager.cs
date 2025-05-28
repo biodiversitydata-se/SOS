@@ -17,6 +17,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Collections.Concurrent;
+using SOS.Lib.Extensions;
 
 namespace SOS.Observations.Api.Managers
 {
@@ -27,11 +29,11 @@ namespace SOS.Observations.Api.Managers
     {
         private readonly IProcessedTaxonRepository _processedTaxonRepository;
         private readonly IFilterManager _filterManager;
-        private readonly IClassCache<Dictionary<int, TaxonSumAggregationItem>> _taxonSumAggregationCache;
+        private readonly IClassCache<ConcurrentDictionary<int, TaxonSumAggregationItem>> _taxonSumAggregationCache;
         private readonly ILogger<TaxonSearchManager> _logger;
         private static readonly SemaphoreSlim _taxonSumAggregationSemaphore = new SemaphoreSlim(1, 1);
 
-        private async Task<Dictionary<int, TaxonSumAggregationItem>> GetCachedTaxonSumAggregation(int? userId)
+        private async Task<ConcurrentDictionary<int, TaxonSumAggregationItem>> GetCachedTaxonSumAggregation(int? userId)
         {
             var taxonAggregation = _taxonSumAggregationCache.Get();
             if (taxonAggregation == null)
@@ -141,7 +143,7 @@ namespace SOS.Observations.Api.Managers
         public TaxonSearchManager(
             IProcessedTaxonRepository processedTaxonRepository,
             IFilterManager filterManager,
-            IClassCache<Dictionary<int, TaxonSumAggregationItem>> taxonSumAggregationCache,
+            IClassCache<ConcurrentDictionary<int, TaxonSumAggregationItem>> taxonSumAggregationCache,
             ILogger<TaxonSearchManager> logger)
         {
             _processedTaxonRepository = processedTaxonRepository ??
@@ -233,7 +235,7 @@ namespace SOS.Observations.Api.Managers
             {
                 var taxonIds = await _filterManager.GetTaxonIdsFromFilterAsync(taxonFilter);
                 var cachedTaxonSumAggregation = await GetCachedTaxonSumAggregation(userId);
-                Dictionary<int, TaxonSumAggregationItem> aggregationByTaxonId = null;
+                ConcurrentDictionary<int, TaxonSumAggregationItem> aggregationByTaxonId = null;
                 if (taxonIds == null)
                 {
                     aggregationByTaxonId = cachedTaxonSumAggregation;
@@ -242,7 +244,7 @@ namespace SOS.Observations.Api.Managers
                 {
                     aggregationByTaxonId = cachedTaxonSumAggregation
                         .Where(m => taxonIds.Contains(m.Key))
-                        .ToDictionary(m => m.Key, m => m.Value);
+                        .ToConcurrentDictionary(m => m.Key, m => m.Value);
                 }
 
                 // Update skip and take

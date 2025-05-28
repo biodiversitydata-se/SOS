@@ -26,6 +26,7 @@ using SOS.Shared.Api.Extensions.Dto;
 using SOS.Shared.Api.Utilities.Objects.Interfaces;
 using SOS.Shared.Api.Validators.Interfaces;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -52,8 +53,8 @@ namespace SOS.Observations.Api.Controllers
         private readonly ISearchFilterUtility _searchFilterUtility;
         private readonly IInputValidator _inputValidator;
         private readonly ObservationApiConfiguration _observationApiConfiguration;
-        private readonly IClassCache<Dictionary<string, CacheEntry<GeoGridResultDto>>> _geogridAggregationCache;
-        private readonly IClassCache<Dictionary<string, CacheEntry<PagedResultDto<TaxonAggregationItemDto>>>> _taxonAggregationInternalCache;
+        private readonly IClassCache<ConcurrentDictionary<string, CacheEntry<GeoGridResultDto>>> _geogridAggregationCache;
+        private readonly IClassCache<ConcurrentDictionary<string, CacheEntry<PagedResultDto<TaxonAggregationItemDto>>>> _taxonAggregationInternalCache;
         private readonly SemaphoreLimitManager _semaphoreLimitManager;
         private readonly ILogger<ObservationsController> _logger;
 
@@ -89,8 +90,8 @@ namespace SOS.Observations.Api.Controllers
             ISearchFilterUtility searchFilterUtility,
             IInputValidator inputValidator,
             ObservationApiConfiguration observationApiConfiguration,
-            IClassCache<Dictionary<string, CacheEntry<GeoGridResultDto>>> geogridAggregationCache,
-            IClassCache<Dictionary<string, CacheEntry<PagedResultDto<TaxonAggregationItemDto>>>> taxonAggregationInternalCache,
+            IClassCache<ConcurrentDictionary<string, CacheEntry<GeoGridResultDto>>> geogridAggregationCache,
+            IClassCache<ConcurrentDictionary<string, CacheEntry<PagedResultDto<TaxonAggregationItemDto>>>> taxonAggregationInternalCache,
             SemaphoreLimitManager semaphoreLimitManager,
             ILogger<ObservationsController> logger) 
         {
@@ -305,7 +306,7 @@ namespace SOS.Observations.Api.Controllers
                 LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 // Cache
                 string cacheKey = null;
-                Dictionary<string, CacheEntry<GeoGridResultDto>> geogridAggregationByCacheKey = null;
+                ConcurrentDictionary<string, CacheEntry<GeoGridResultDto>> geogridAggregationByCacheKey = null;
                 bool useCache = !sensitiveObservations && Request.ContentLength < 10000;
                 if (useCache)
                 {
@@ -319,7 +320,7 @@ namespace SOS.Observations.Api.Controllers
                     geogridAggregationByCacheKey = _geogridAggregationCache.Get();
                     if (geogridAggregationByCacheKey == null)
                     {
-                        geogridAggregationByCacheKey = new Dictionary<string, CacheEntry<GeoGridResultDto>>();
+                        geogridAggregationByCacheKey = new ConcurrentDictionary<string, CacheEntry<GeoGridResultDto>>();
                         _geogridAggregationCache.Set(geogridAggregationByCacheKey);
                     }
                     if (!skipCache.GetValueOrDefault(false) && cacheKey != null && geogridAggregationByCacheKey.TryGetValue(cacheKey, out CacheEntry<GeoGridResultDto> cacheEntry))
@@ -2128,7 +2129,7 @@ namespace SOS.Observations.Api.Controllers
                 LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 // Cache
                 string cacheKey = null;
-                Dictionary<string, CacheEntry<PagedResultDto<TaxonAggregationItemDto>>> resultByCacheKey = null;
+                ConcurrentDictionary<string, CacheEntry<PagedResultDto<TaxonAggregationItemDto>>> resultByCacheKey = null;
                 bool useCache = !sensitiveObservations && Request.ContentLength < 10000;
                 if (useCache)
                 {
@@ -2144,7 +2145,7 @@ namespace SOS.Observations.Api.Controllers
                     resultByCacheKey = _taxonAggregationInternalCache.Get();
                     if (resultByCacheKey == null)
                     {
-                        resultByCacheKey = new Dictionary<string, CacheEntry<PagedResultDto<TaxonAggregationItemDto>>>();
+                        resultByCacheKey = new ConcurrentDictionary<string, CacheEntry<PagedResultDto<TaxonAggregationItemDto>>>();
                         _taxonAggregationInternalCache.Set(resultByCacheKey);
                     }
                     if (!skipCache.GetValueOrDefault(false) && cacheKey != null && resultByCacheKey.TryGetValue(cacheKey, out var cacheEntry))
