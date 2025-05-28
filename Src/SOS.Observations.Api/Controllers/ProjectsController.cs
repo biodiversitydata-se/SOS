@@ -70,6 +70,34 @@ namespace SOS.Observations.Api.Controllers
             }
         }
 
+
+        [HttpPost]
+        [ProducesResponseType(typeof(IEnumerable<ProjectDto>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [AzureApi, AzureInternalApi]
+        public async Task<IActionResult> GetProjectesById(
+            [FromBody] int[] ids)
+        {
+            try
+            {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
+
+                var projects = await _projectManager.GetAsync(ids, base.User?.GetUserId());
+
+                if ((projects?.Count() ?? 0) == 0)
+                {
+                    return new StatusCodeResult((int)HttpStatusCode.NoContent);
+                }
+                return new OkObjectResult(projects.Select(p => p.ToDto()));
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Error getting projects");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
         /// <summary>
         /// Get project by id
         /// </summary>

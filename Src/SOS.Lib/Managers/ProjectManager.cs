@@ -37,13 +37,13 @@ namespace SOS.Lib.Managers
         }
 
         /// <inheritdoc/>
-        public async Task<IEnumerable<ProjectInfo>> GetAsync(IEnumerable<int> projectIds)
+        public async Task<IEnumerable<ProjectInfo>> GetAsync(IEnumerable<int> projectIds, int? userId = null)
         {
             if (!projectIds?.Any() ?? true)
             {
                 return null!;
             }
-            return (await GetAllAsync()).Where(p => projectIds.Contains(p.Id));
+            return (await GetAllAsync()).Where(p => projectIds.Contains(p.Id) && (userId == null || p.IsPublic || p.ControlingUserId == userId));
         }
 
         /// <inheritdoc/>
