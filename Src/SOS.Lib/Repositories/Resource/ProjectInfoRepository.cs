@@ -28,7 +28,7 @@ namespace SOS.Lib.Repositories.Resource
         /// <inheritdoc/>
         public async Task CreateIndexesAsync()
         {
-            await MongoCollection.Indexes.CreateManyAsync([
+            await base.AddIndexes([
                 new CreateIndexModel<ProjectInfo>(Builders<ProjectInfo>.IndexKeys
                     .Text(pi => pi.Category)
                     .Text(pi => pi.CategorySwedish)
