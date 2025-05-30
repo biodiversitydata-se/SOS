@@ -724,7 +724,7 @@ namespace SOS.Observations.Api.Repositories
         /// </summary>
         /// <param name="filter"></param>
         /// <returns></returns>
-        public async Task<Dictionary<int, TaxonSumAggregationItem>> GetTaxonSumAggregationAsync(SearchFilter filter)
+        public async Task<ConcurrentDictionary<int, TaxonSumAggregationItem>> GetTaxonSumAggregationAsync(SearchFilter filter)
         {
             var indexName = GetCurrentIndex(filter);
             Dictionary<int, TaxonProvinceAgg> observationCountByTaxonId = null;
@@ -819,7 +819,7 @@ namespace SOS.Observations.Api.Repositories
                 }
             }
 
-            var result = new Dictionary<int, TaxonSumAggregationItem>();
+            var result = new ConcurrentDictionary<int, TaxonSumAggregationItem>();
             foreach (var node in treeNodeSumByTaxonId.Values)
             {
                 var agg = new TaxonSumAggregationItem()
@@ -832,7 +832,7 @@ namespace SOS.Observations.Api.Repositories
                     SumObservationCountByProvinceId = node.SumObservationCountByProvinceId
                 };
 
-                result.Add(node.TreeNode.TaxonId, agg);
+                result.TryAdd(node.TreeNode.TaxonId, agg);
             }
 
             return result;

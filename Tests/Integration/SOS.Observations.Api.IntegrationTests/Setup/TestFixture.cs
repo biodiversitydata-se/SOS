@@ -5,6 +5,7 @@ using SOS.Lib.Models.Search.Result;
 using SOS.Observations.Api.IntegrationTests.Extensions;
 using SOS.Observations.Api.IntegrationTests.Setup.ContainerDbFixtures;
 using SOS.Observations.Api.IntegrationTests.Setup.LiveDbFixtures;
+using System.Collections.Concurrent;
 
 namespace SOS.Observations.Api.IntegrationTests.Setup;
 
@@ -129,7 +130,7 @@ public class TestFixture : IAsyncLifetime
 
     internal void ResetTaxonSumAggregationCache()
     {
-        IClassCache<Dictionary<int, TaxonSumAggregationItem>>? cache = ApiFactory.Services.GetService<IClassCache<Dictionary<int, TaxonSumAggregationItem>>>()!;
+        IClassCache<ConcurrentDictionary<int, TaxonSumAggregationItem>>? cache = ApiFactory.Services.GetService<IClassCache<ConcurrentDictionary<int, TaxonSumAggregationItem>>>()!;
         var c = cache.Get();
         if (c != null)
         {

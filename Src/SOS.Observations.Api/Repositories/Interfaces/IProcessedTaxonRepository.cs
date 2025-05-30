@@ -4,6 +4,7 @@ using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Repositories.Processed.Interfaces;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -43,7 +44,7 @@ namespace SOS.Observations.Api.Repositories.Interfaces
         /// </summary>
         /// <param name="filter"></param>
         /// <returns></returns>
-        Task<Dictionary<int, TaxonSumAggregationItem>> GetTaxonSumAggregationAsync(SearchFilter filter);
+        Task<ConcurrentDictionary<int, TaxonSumAggregationItem>> GetTaxonSumAggregationAsync(SearchFilter filter);
 
         /// <summary>
         /// Get indication if taxa exists in specified area
