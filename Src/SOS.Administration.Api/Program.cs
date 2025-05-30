@@ -116,10 +116,10 @@ static void ConfigureMiddleware(WebApplication app, bool isDevelopment, bool dis
     
     app.UseRouting();  
     app.UseAuthorization();
-    app.ApplyUseSerilogRequestLogging();
-    app.MapControllers();
+    app.ApplyUseSerilogRequestLogging();    
     app.ApplyMapHealthChecks();    
     app.ApplyUseSwagger();
+    app.MapControllers();
 }
 
 public class AllowAllConnectionsFilter : IDashboardAuthorizationFilter
