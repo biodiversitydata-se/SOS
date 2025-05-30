@@ -8,12 +8,5 @@
 
             return services;
         }
-
-        public static WebApplication ApplyMapHealthChecks(this WebApplication app)
-        {
-            app.MapHealthChecks("/healthz");
-
-            return app;
-        }
     }
 }

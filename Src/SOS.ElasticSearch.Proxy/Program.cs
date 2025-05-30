@@ -106,6 +106,8 @@ static void ConfigureMiddleware(WebApplication app, bool isDevelopment)
         telemetryConfig.DisableTelemetry = true;
     }
 
+    app.UseHealthChecks("/healthz");
+
     app.UseWhen(context => context.Request.Path.StartsWithSegments("/caches"),
             builder => builder
             .UseRouting()
@@ -117,6 +119,5 @@ static void ConfigureMiddleware(WebApplication app, bool isDevelopment)
     );
 
     app.UseMiddleware<RequestMiddleware>();
-    app.ApplyUseSerilogRequestLogging();    
-    app.ApplyMapHealthChecks();
+    app.ApplyUseSerilogRequestLogging();       
 }

@@ -186,11 +186,11 @@ static void ConfigureMiddleware(WebApplication app, bool isDevelopment, bool dis
     app.UseRouting();
     app.UseAuthentication();
     app.UseAuthorization();
-    app.ApplyUseSerilogRequestLogging();
-    app.MapControllers();
+    app.ApplyUseSerilogRequestLogging();    
     app.ApplyMapHealthChecks(disableHealthCheckInit);
     app.UseSwagger();
     app.ApplyUseSwaggerUI();
+    app.MapControllers();
 }
 
 static async Task EnsureProtectedLogIndexAsync(WebApplication app)
