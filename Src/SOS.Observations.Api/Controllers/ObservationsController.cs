@@ -2034,7 +2034,9 @@ namespace SOS.Observations.Api.Controllers
 
                 var validationResult = Result.Combine(
                     (await _inputValidator.ValidateSignalSearchAsync(filter, validateSearchFilter, areaBuffer)),
-                    _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false));
+                    _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
+                    _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries)
+                );
 
                 if (validationResult.IsFailure)
                 {
