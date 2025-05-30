@@ -88,7 +88,6 @@ namespace SOS.Observations.Api.Repositories
                 size = maxResult == 0 ? 1 : maxResult;
                 take = maxResult;
             }
-
             // Get the real result
             var searchResponse = await Client.SearchAsync<dynamic>(indexNames, s => s
                 .Query(q => q
@@ -104,7 +103,9 @@ namespace SOS.Observations.Api.Repositories
                             .Sources(
                                 [
                                     CreateCompositeTermsAggregationSource(
-                                        ("sortOrder", "taxon.attributes.sortOrder", SortOrder.Asc),
+                                        ("sortOrder", "taxon.attributes.sortOrder", SortOrder.Asc)
+                                    ),
+                                    CreateCompositeTermsAggregationSource(
                                         ("id", "taxon.id", SortOrder.Asc)
                                     )
                                 ]
