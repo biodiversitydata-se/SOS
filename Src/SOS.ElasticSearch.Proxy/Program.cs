@@ -2,6 +2,7 @@ using Microsoft.ApplicationInsights.Extensibility;
 using MongoDB.Bson.Serialization.Conventions;
 using Serilog;
 using SOS.ElasticSearch.Proxy.Extensions;
+using SOS.ElasticSearch.Proxy.Middleware;
 using System.Globalization;
 using System.Text.Json.Serialization;
 
@@ -115,6 +116,7 @@ static void ConfigureMiddleware(WebApplication app, bool isDevelopment)
         )
     );
 
+    app.UseMiddleware<RequestMiddleware>();
     app.ApplyUseSerilogRequestLogging();    
     app.ApplyMapHealthChecks();
 }
