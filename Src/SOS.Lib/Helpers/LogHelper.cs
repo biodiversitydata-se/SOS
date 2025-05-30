@@ -16,8 +16,8 @@ public static class LogHelper
         {
             httpContext.Items["SemaphoreStatus"] = semaphoreResult.SemaphoreStatus;
         }
-        if (semaphoreResult.SemaphoreWaitTime.HasValue)
-        {            
+        if (semaphoreResult.SemaphoreWaitTime.HasValue && !string.IsNullOrEmpty(semaphoreResult.SemaphoreStatus))
+        {
             httpContext.Items["SemaphoreWaitSeconds"] = (int)Math.Round(semaphoreResult.SemaphoreWaitTime.Value.TotalSeconds);
         }
     }
