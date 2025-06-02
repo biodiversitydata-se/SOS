@@ -328,7 +328,7 @@ namespace SOS.Lib.IO.GeoJson
             jsonWriter.WriteStartArray();
 
             PagedResult<Observation> fastSearchResult = null;
-            SearchAfterResult<Observation, IReadOnlyCollection<FieldValue>> searchResult = null;
+            SearchAfterResult<Observation, ICollection<FieldValue>> searchResult = null;
             if (useFastSearch)
             {
                 fastSearchResult = await _processedObservationRepository.GetChunkAsync<Observation>(filter, 0, 10000);
