@@ -375,7 +375,7 @@ namespace SOS.Lib.IO.GeoJson
             jsonWriter.WriteStartArray();
 
             PagedResult<dynamic> fastSearchResult = null;
-            SearchAfterResult<dynamic, IReadOnlyCollection<FieldValue>> searchResult = null;
+            SearchAfterResult<dynamic, ICollection<FieldValue>> searchResult = null;
             if (useFastSearch)
             {
                 fastSearchResult = await _processedObservationRepository.GetChunkAsync<dynamic>(filter, 0, 10000);
@@ -439,7 +439,7 @@ namespace SOS.Lib.IO.GeoJson
                 if (useFastSearch) break;
 
                 // Get next batch of observations.        
-                searchResult = await _processedObservationRepository.GetObservationsBySearchAfterAsync<dynamic>(filter, searchResult.PointInTimeId, searchResult.SearchAfter?.ToArray());           
+                searchResult = await _processedObservationRepository.GetObservationsBySearchAfterAsync<dynamic>(filter, searchResult.PointInTimeId, searchResult.SearchAfter);           
             }
 
             searchResult = null;

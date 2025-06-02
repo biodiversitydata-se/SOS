@@ -205,7 +205,7 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
         /// <param name="pointInTimeId"></param>
         /// <param name="afterKey"></param>
         /// <returns></returns>
-        Task<SearchAfterResult<T, IReadOnlyCollection<FieldValue>>> GetObservationsBySearchAfterAsync<T>(
+        Task<SearchAfterResult<T, ICollection<FieldValue>>> GetObservationsBySearchAfterAsync<T>(
              SearchFilter filter,
              string pointInTimeId = null,
              ICollection<FieldValue> afterKey = null);

@@ -2089,7 +2089,7 @@ namespace SOS.Lib.Repositories.Processed
         }
 
         /// <inheritdoc />
-        public async Task<SearchAfterResult<T, IReadOnlyCollection<FieldValue>>> GetObservationsBySearchAfterAsync<T>(
+        public async Task<SearchAfterResult<T, ICollection<FieldValue>>> GetObservationsBySearchAfterAsync<T>(
             SearchFilter filter,
             string pointInTimeId = null,
             ICollection<FieldValue> afterKey = null)
@@ -2116,11 +2116,11 @@ namespace SOS.Lib.Repositories.Processed
                 return queryResponse;
             });
 
-            return new SearchAfterResult<T, IReadOnlyCollection<FieldValue>>
+            return new SearchAfterResult<T, ICollection<FieldValue>>
             {
                 Records = (IEnumerable<T>)(typeof(T).Equals(typeof(Observation)) ? searchResponse.Documents?.ToObservationsArray() : searchResponse.Documents),
                 PointInTimeId = searchResponse.PitId,
-                SearchAfter = searchResponse.Hits?.LastOrDefault()?.Sort
+                SearchAfter = searchResponse.Hits?.LastOrDefault()?.Sort.ToCollection()
             };
         }
 
