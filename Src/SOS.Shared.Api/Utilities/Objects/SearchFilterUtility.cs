@@ -55,10 +55,19 @@ namespace SOS.Shared.Api.Utilities.Objects
                 // If geometries passed, adjust bounding box to them
                 if (filter?.Geometries?.Any() ?? false)
                 {
-                    foreach (var geometry in filter.Geometries)
+                    // Try to make geometries valid and update user filter
+                    var validGeometries = new List<Geometry>();
+                    foreach(var geometry in filter?.Geometries)
                     {
-                        geometryUnion = geometryUnion == null ? geometry : geometryUnion.Union(geometry);
+                        var vaildGeometry = geometry.TryMakeValid();
+                        validGeometries.Add(vaildGeometry);
+
+                        if (vaildGeometry.IsValid)
+                        {
+                            geometryUnion = geometryUnion == null ? geometry : geometryUnion.Union(vaildGeometry);
+                        }
                     }
+                    filter.Geometries = validGeometries;
                 }
 
                 if (geometryUnion != null)
