@@ -23,21 +23,21 @@ namespace SOS.Export.UnitTests.TestHelpers.Factories
             var stub = new Mock<IProcessedObservationCoreRepository>();
 
             stub.SetupSequence(pdcr => pdcr.GetObservationsBySearchAfterAsync<Observation>(It.IsAny<SearchFilter>(), null, null))
-                .ReturnsAsync(new SearchAfterResult<Observation, IReadOnlyCollection<FieldValue>>
+                .ReturnsAsync(new SearchAfterResult<Observation, ICollection<FieldValue>>
                 {
                     Records = new[] { observation } // return the observation the first call.
                 })
-                .ReturnsAsync(new SearchAfterResult<Observation, IReadOnlyCollection<FieldValue>>
+                .ReturnsAsync(new SearchAfterResult<Observation, ICollection<FieldValue>>
                 {
                     Records = Enumerable.Empty<Observation>()  // return empty the second call. new Observation[0]
                 });
   
             stub.SetupSequence(pdcr => pdcr.GetObservationsBySearchAfterAsync<Observation>(It.IsAny<SearchFilter>(), It.IsAny<string>(), It.IsAny<ICollection<FieldValue>>()))
-                .ReturnsAsync(new SearchAfterResult<Observation, IReadOnlyCollection<FieldValue>>
+                .ReturnsAsync(new SearchAfterResult<Observation, ICollection<FieldValue>>
                 {
                     Records = new[] { observation } // return the observation the first call.
                 })
-                .ReturnsAsync(new SearchAfterResult<Observation, IReadOnlyCollection<FieldValue>>
+                .ReturnsAsync(new SearchAfterResult<Observation, ICollection<FieldValue>>
                 {
                     Records = Enumerable.Empty<Observation>()  // return empty the second call. new Observation[0]
                 });

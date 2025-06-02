@@ -14,7 +14,7 @@ namespace SOS.Observations.Api.Middleware
     public class StoreRequestBodyMiddleware
     {
         private readonly RequestDelegate _next;
-        private const int ApplicationInsightsMaxSize = 8192;
+        private const int ApplicationInsightsMaxSize = 4096;
         private readonly static JsonSerializerOptions jsonSerializerOptions = new JsonSerializerOptions()
         {
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,

@@ -21,14 +21,14 @@ namespace SOS.Export.LiveIntegrationTests.TestHelpers.Factories
         {
             var stub = new Mock<IProcessedObservationCoreRepository>();
             var observations = LoadObservations(fileName);
-            stub
+            stub                
                 .Setup(pdcr => pdcr.GetObservationsBySearchAfterAsync<Observation>(It.IsAny<SearchFilter>(), It.IsAny<string>(), It.IsAny<ICollection<FieldValue>>()))
                 .ReturnsAsync(observations);
 
             return stub;
         }
 
-        private static SearchAfterResult<Observation, IReadOnlyCollection<FieldValue>> LoadObservations(string fileName)
+        private static SearchAfterResult<Observation, ICollection<FieldValue>> LoadObservations(string fileName)
         {
             var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             var filePath = Path.Combine(assemblyPath, fileName);
@@ -38,7 +38,7 @@ namespace SOS.Export.LiveIntegrationTests.TestHelpers.Factories
 
             var observations = JsonSerializer.Deserialize<List<Observation>>(str, serializeOptions!);
 
-            return new SearchAfterResult<Observation, IReadOnlyCollection<FieldValue>> { Records = observations };
+            return new SearchAfterResult<Observation, ICollection<FieldValue>> { Records = observations };
         }
-    }
+    }   
 }

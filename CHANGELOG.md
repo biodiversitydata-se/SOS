@@ -1,5 +1,12 @@
 # Changelog
 
+## [2025.05.30]
+
+### `Changed`
+- Set `observation.Verified=true` for multiple datasets.
+- Switch Elasticsearch driver to use `Elastic.Clients.Elasticsearch`.
+
+
 ## [2025.05.14]
 
 ### `Changed`

@@ -266,7 +266,7 @@ namespace SOS.Lib.IO.Excel
                     :
                     ObservationPropertyFieldDescriptionHelper.GetExportFieldsFromOutputFields(filter.Output?.Fields);
                 Models.Search.Result.PagedResult<dynamic> fastSearchResult = null;
-                Models.Search.Result.SearchAfterResult<Observation, IReadOnlyCollection<FieldValue>> searchResult = null;
+                Models.Search.Result.SearchAfterResult<Observation, ICollection<FieldValue>> searchResult = null;
                 if (useFastSearch)
                 {
                     fastSearchResult = await _processedObservationRepository.GetChunkAsync<dynamic>(filter, 0, 10000);
@@ -361,7 +361,7 @@ namespace SOS.Lib.IO.Excel
                     nrObservations += processedObservations.Length;
                     processedObservations = null;
                     if (useFastSearch) break;
-                    searchResult = await _processedObservationRepository.GetObservationsBySearchAfterAsync<Observation>(filter, searchResult.PointInTimeId, searchResult.SearchAfter == null ? null : [searchResult.SearchAfter.ToFieldValue()]);
+                    searchResult = await _processedObservationRepository.GetObservationsBySearchAfterAsync<Observation>(filter, searchResult.PointInTimeId, searchResult.SearchAfter);
                 }
 
                 fastSearchResult = null;

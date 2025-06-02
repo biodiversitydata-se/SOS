@@ -212,7 +212,7 @@ namespace SOS.Lib.IO.Excel
             csvFileHelper.InitializeWrite(stream, "\t", leaveStreamOpen: true);
             csvFileHelper.WriteRow(propertyFields.Select(pf => ObservationPropertyFieldDescriptionHelper.GetPropertyLabel(pf, propertyLabelType)));
             Models.Search.Result.PagedResult<dynamic> fastSearchResult = null;
-            Models.Search.Result.SearchAfterResult<Observation, IReadOnlyCollection<FieldValue>> searchResult = null;
+            Models.Search.Result.SearchAfterResult<Observation, ICollection<FieldValue>> searchResult = null;
             if (useFastSearch)
             {
                 fastSearchResult = await _processedObservationRepository.GetChunkAsync<dynamic>(filter, 0, 10000);
@@ -263,7 +263,7 @@ namespace SOS.Lib.IO.Excel
 
                 // Get next batch of observations.                
                 searchResult = await _processedObservationRepository.GetObservationsBySearchAfterAsync<Observation>(
-                    filter, searchResult.PointInTimeId, searchResult.SearchAfter?.ToArray());                                
+                    filter, searchResult.PointInTimeId, searchResult.SearchAfter);                                
             }
 
             searchResult = null;
