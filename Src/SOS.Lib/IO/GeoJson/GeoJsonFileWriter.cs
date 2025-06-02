@@ -26,7 +26,6 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Unicode;
 using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace SOS.Lib.IO.GeoJson
 {
@@ -65,13 +64,6 @@ namespace SOS.Lib.IO.GeoJson
             return jsonSerializerOptions;
         }
 
-        private List<Observation> CastDynamicsToObservations(IEnumerable<dynamic> dynamicObjects)
-        {
-            if (dynamicObjects == null) return null;
-            return System.Text.Json.JsonSerializer.Deserialize<List<Observation>>(System.Text.Json.JsonSerializer.Serialize(dynamicObjects),
-                new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-        }
-
         private AttributesTable GetFeatureAttributesTable(
             FlatObservation flatObservation,
             IEnumerable<PropertyFieldDescription> propertyFields,
@@ -90,25 +82,6 @@ namespace SOS.Lib.IO.GeoJson
             return attributesTable;
         }
 
-        private AttributesTable GetFeatureAttributesTable(IDictionary<string, object> record, ICollection<string> outputFields)
-        {
-            AttributesTable attributesTable = null;
-            if (outputFields != null && outputFields.Any())
-            {
-                attributesTable = new AttributesTable();
-                foreach (var pair in record.Where(m => outputFields.Contains(m.Key, StringComparer.InvariantCultureIgnoreCase)))
-                {
-                    attributesTable.Add(pair.Key, pair.Value);
-                }
-            }
-            else
-            {
-                attributesTable = new AttributesTable(record);
-            }
-
-            return attributesTable;
-        }
-
         private Geometry GetFeatureGeometryFromDictionary(JsonNode record)
         {
             double? decimalLatitude = null;
@@ -119,7 +92,7 @@ namespace SOS.Lib.IO.GeoJson
                 return null;
             }
             decimalLatitude = (double?)locationObject["decimalLatitude"];
-
+            decimalLongitude = (double?)locationObject["decimalLongitude"];
             if (decimalLatitude == null || decimalLongitude == null) return null;
             Geometry geometry = new Point(decimalLongitude.Value, decimalLatitude.Value);
             return geometry;
@@ -142,26 +115,6 @@ namespace SOS.Lib.IO.GeoJson
         {
             double? decimalLatitude = flatObservation.LocationDecimalLatitude;
             double? decimalLongitude = flatObservation.LocationDecimalLongitude;
-            if (decimalLatitude == null || decimalLongitude == null) return null;
-            Geometry geometry = new Point(decimalLongitude.Value, decimalLatitude.Value);
-            return geometry;
-        }
-
-        private Geometry GetFeatureGeometry(IDictionary<string, object> record)
-        {
-            double? decimalLatitude = null;
-            double? decimalLongitude = null;
-
-            if (record.TryGetValue("Location.DecimalLatitude", out var decimalLatitudeObject))
-            {
-                decimalLatitude = (double)decimalLatitudeObject;
-            }
-
-            if (record.TryGetValue("Location.DecimalLongitude", out var decimalLongitudeObject))
-            {
-                decimalLongitude = (double)decimalLongitudeObject;
-            }
-
             if (decimalLatitude == null || decimalLongitude == null) return null;
             Geometry geometry = new Point(decimalLongitude.Value, decimalLatitude.Value);
             return geometry;
@@ -374,15 +327,15 @@ namespace SOS.Lib.IO.GeoJson
             jsonWriter.WritePropertyName("features");
             jsonWriter.WriteStartArray();
 
-            PagedResult<dynamic> fastSearchResult = null;
-            SearchAfterResult<dynamic, IReadOnlyCollection<FieldValue>> searchResult = null;
+            PagedResult<Observation> fastSearchResult = null;
+            SearchAfterResult<Observation, IReadOnlyCollection<FieldValue>> searchResult = null;
             if (useFastSearch)
             {
-                fastSearchResult = await _processedObservationRepository.GetChunkAsync<dynamic>(filter, 0, 10000);
+                fastSearchResult = await _processedObservationRepository.GetChunkAsync<Observation>(filter, 0, 10000);
             }
             else
             {
-                searchResult = await _processedObservationRepository.GetObservationsBySearchAfterAsync<dynamic>(filter);
+                searchResult = await _processedObservationRepository.GetObservationsBySearchAfterAsync<Observation>(filter);
             }
 
             while ((useFastSearch && (fastSearchResult?.Records?.Any() ?? false)) || (!useFastSearch && (searchResult?.Records?.Any() ?? false)))
@@ -391,17 +344,7 @@ namespace SOS.Lib.IO.GeoJson
 
                 if (flatOut)
                 {
-                    Observation[] processedObservations = null;
-
-                    if (useFastSearch)
-                    {
-                        processedObservations = fastSearchResult.Records.ToObservationsArray();          
-                    }
-                    else
-                    {
-                        processedObservations = searchResult.Records.ToObservationsArray();
-                    }
-                    
+                    var processedObservations = useFastSearch ? fastSearchResult.Records.ToObservationsArray() : searchResult.Records.ToObservationsArray();
                     nrObservations += processedObservations.Length;
                     _vocabularyValueResolver.ResolveVocabularyMappedValues(processedObservations, culture, true);
                     await _generalizationResolver.ResolveGeneralizedObservationsAsync(filter, processedObservations);
@@ -416,16 +359,9 @@ namespace SOS.Lib.IO.GeoJson
                 }
                 else
                 {
-                    IEnumerable<JsonNode> processedRecords;
-                    if (useFastSearch)
-                    {
-                        processedRecords = fastSearchResult.Records.Cast<JsonNode>();
-                    }
-                    else
-                    {
-                        processedRecords = searchResult.Records.Cast<JsonNode>();
-                    }
-
+                    var processedRecords = (useFastSearch ? fastSearchResult.Records : searchResult.Records)
+                        .Select(r => JsonSerializer.SerializeToNode(r, typeof(Observation), new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase, DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull }));
+                    
                     nrObservations += processedRecords.Count();
                     _vocabularyValueResolver.ResolveVocabularyMappedValues(processedRecords, culture, true);
                     await _generalizationResolver.ResolveGeneralizedObservationsAsync(filter, processedRecords);
@@ -439,7 +375,7 @@ namespace SOS.Lib.IO.GeoJson
                 if (useFastSearch) break;
 
                 // Get next batch of observations.        
-                searchResult = await _processedObservationRepository.GetObservationsBySearchAfterAsync<dynamic>(filter, searchResult.PointInTimeId, searchResult.SearchAfter?.ToArray());           
+                searchResult = await _processedObservationRepository.GetObservationsBySearchAfterAsync<Observation>(filter, searchResult.PointInTimeId, searchResult.SearchAfter?.ToArray());           
             }
 
             searchResult = null;
