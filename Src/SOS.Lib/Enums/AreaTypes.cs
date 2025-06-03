@@ -21,6 +21,7 @@
         Atlas5x5 = 29,
         Atlas10x10 = 30,
         SfvDistricts = 34,
-        Campus = 35
+        Campus = 35,
+        Sveaskog = 36
     }
 }
