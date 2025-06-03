@@ -56,13 +56,13 @@
 		<PackageReference Include="Serilog.Formatting.Compact" Version="3.0.0" />
 	    <PackageReference Include="HangFire" Version="1.8.20" />
 	    <PackageReference Include="HangFire.Autofac" Version="2.7.0" />
-	    <PackageReference Include="HangFire.Mongo" Version="1.11.5" />
+	    <PackageReference Include="HangFire.Mongo" Version="1.11.6" />
 	    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="9.0.5" />
 		<PackageReference Include="NetTopologySuite" Version="2.6.0" />
 		<PackageReference Include="NetTopologySuite.IO.GeoJSON" Version="4.0.0" />
 		<PackageReference Include="NetTopologySuite.IO.GeoJSON4STJ" Version="4.0.0" />
 	    <PackageReference Include="Quartz" Version="3.14.0" />
-	    <PackageReference Include="Swashbuckle.AspNetCore" Version="8.1.1" />
+	    <PackageReference Include="Swashbuckle.AspNetCore" Version="8.1.2" />
     </ItemGroup>
 
     <ItemGroup>
