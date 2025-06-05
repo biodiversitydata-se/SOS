@@ -84,8 +84,12 @@ static IConfigurationRoot BuildConfiguration(WebApplicationBuilder builder, bool
         .AddJsonFile("appsettings.json", true, true)
         .AddJsonFile($"appsettings.{environment}.json", true)
         .AddEnvironmentVariables();
+#if DEBUG
+    configBuilder.AddUserSecrets<Program>();
+#else
     if (isDevelopment)
         configBuilder.AddUserSecrets<Program>();
+#endif
     return configBuilder.Build();
 }
 
