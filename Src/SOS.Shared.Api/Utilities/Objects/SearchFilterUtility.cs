@@ -59,12 +59,17 @@ namespace SOS.Shared.Api.Utilities.Objects
                     var validGeometries = new List<Geometry>();
                     foreach(var geometry in filter?.Geometries)
                     {
-                        var vaildGeometry = geometry.TryMakeValid();
-                        validGeometries.Add(vaildGeometry);
-
-                        if (vaildGeometry.IsValid)
+                        var validGeometry = geometry.TryMakeValid();
+                        if (validGeometry == null)
                         {
-                            geometryUnion = geometryUnion == null ? geometry : geometryUnion.Union(vaildGeometry);
+                            filter.IsGeometryInvalid = true;
+                            return null;
+                        }
+                        validGeometries.Add(validGeometry);
+
+                        if (validGeometry.IsValid)
+                        {
+                            geometryUnion = geometryUnion == null ? geometry : geometryUnion.Union(validGeometry);
                         }
                     }
                     filter.Geometries = validGeometries;

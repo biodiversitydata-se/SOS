@@ -106,6 +106,15 @@ namespace SOS.Lib.JsonConverters
                 return null;
             }
 
+            foreach(var coords in coordinates)
+            {
+                int coordinatesCount = coords.Count();
+                if (coordinatesCount > 0 && coordinatesCount < 3)
+                {
+                    return null;
+                }
+            }
+
             var exteriorRing = geomFactory.CreateLinearRing(coordinates.First()
                 .Select(p => new Coordinate(p[0], p[1])).ToArray());
 

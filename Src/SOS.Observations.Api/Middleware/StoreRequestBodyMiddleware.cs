@@ -1,12 +1,10 @@
 ﻿using Microsoft.AspNetCore.Http;
-using NetTopologySuite.Geometries;
-using SOS.Shared.Api.Dtos.Filter;
+using SOS.Lib.Extensions;
 using System;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Text.Json;
-using System.Text.Json.Serialization;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace SOS.Observations.Api.Middleware
@@ -14,16 +12,7 @@ namespace SOS.Observations.Api.Middleware
     public class StoreRequestBodyMiddleware
     {
         private readonly RequestDelegate _next;
-        private const int ApplicationInsightsMaxSize = 4096;
-        private readonly static JsonSerializerOptions jsonSerializerOptions = new JsonSerializerOptions()
-        {
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-            PropertyNameCaseInsensitive = true,
-            Converters = {
-                new JsonStringEnumConverter(),
-                new NetTopologySuite.IO.Converters.GeoJsonConverterFactory()
-            }
-        };
+        private const int ApplicationInsightsMaxSize = 8192;        
 
         public StoreRequestBodyMiddleware(RequestDelegate next)
         {
@@ -48,26 +37,7 @@ namespace SOS.Observations.Api.Middleware
 
                     if (body != null && body.Length > ApplicationInsightsMaxSize)
                     {
-                        // truncate the body to the max size
-                        try
-                        {
-                            var searchFilter = JsonSerializer.Deserialize<SearchFilterInternalDto>(body, jsonSerializerOptions);
-                            if (searchFilter?.Taxon?.Ids != null && searchFilter.Taxon.Ids.Any())
-                            {                                
-                                searchFilter.Taxon.Ids = [-1];
-                                body = JsonSerializer.Serialize(searchFilter, jsonSerializerOptions);
-                            }
-
-                            if (body.Length > ApplicationInsightsMaxSize && searchFilter?.Geographics?.Geometries != null && searchFilter.Geographics.Geometries.Any())
-                            {
-                                searchFilter.Geographics.Geometries = [ new Point(-1, -1) ];
-                                body = JsonSerializer.Serialize(searchFilter, jsonSerializerOptions);
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine($"Deserialization failed: {ex.Message}");
-                        }
+                        body = TruncateRequestBody(body);
                     }
 
                     context.Items.Add("Request-body", body);
@@ -77,6 +47,53 @@ namespace SOS.Observations.Api.Middleware
             {
                 await _next(context);
             }
+        }
+
+        private string TruncateRequestBody(string body)
+        {
+            // truncate the body to the max size
+            try
+            {
+                body = body.CleanNewLineTab();                
+                if (body.Length < ApplicationInsightsMaxSize) return body;
+                body = ReplaceTaxonIdsWithPlaceholder(body);
+                if (body.Length < ApplicationInsightsMaxSize) return body;
+                body = ReplaceCoordinatesWithPlaceholder(body);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Deserialization failed: {ex.Message}");
+            }
+
+            return body;
+        }
+        
+        private static readonly Regex TaxonBlockRegex = new Regex(
+            @"""taxon""\s*:\s*\{[^{}]*?""ids""\s*:\s*\[[^\]]*?\]",
+            RegexOptions.Compiled | RegexOptions.IgnoreCase
+        );
+
+        private static readonly Regex IdsArrayRegex = new Regex(
+            @"""ids""\s*:\s*\[[^\]]*?\]",
+            RegexOptions.Compiled | RegexOptions.IgnoreCase
+        );
+
+        private static readonly Regex CoordinatesRegex = new Regex(
+            @"""coordinates""\s*:\s*\[\s*(\[\s*(\[\s*[^]]*?\s*\]\s*,?\s*)+\s*\])\s*\]",
+            RegexOptions.Compiled | RegexOptions.IgnoreCase
+        );
+
+        static string ReplaceTaxonIdsWithPlaceholder(string json)
+        {
+            return TaxonBlockRegex.Replace(json, match =>
+            {
+                return IdsArrayRegex.Replace(match.Value, @"""ids"":[-1]");
+            });
+        }
+
+        static string ReplaceCoordinatesWithPlaceholder(string json)
+        {
+            return CoordinatesRegex.Replace(json, @"""coordinates"":[-1]");
         }
     }
 }

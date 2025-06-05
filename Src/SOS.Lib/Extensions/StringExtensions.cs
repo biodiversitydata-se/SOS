@@ -50,6 +50,19 @@ namespace SOS.Lib.Extensions
             }).CleanEnclosingQuotes().Trim();
         }
 
+        public static string CleanNewLineTab(this string value)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return value;
+            }
+
+            return RxNewLineTab.Replace(value, match => // Slower, but handles new line and tab correctly.
+            {
+                return "";
+            }).CleanEnclosingQuotes().RemoveWhiteSpace().Trim();
+        }
+
         /// <summary>
         /// Checks if the string contains unprintable characters.
         /// </summary>
