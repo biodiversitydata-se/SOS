@@ -292,6 +292,7 @@ namespace SOS.Harvest.Processors.VirtualHerbarium
             var obs = new Observation
             {
                 DataProviderId = DataProvider.Id,
+                MongoDbId = verbatim.Id,
                 BasisOfRecord = new VocabularyValue { Id = (int)BasisOfRecordId.HumanObservation },
                 DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProviderIdentifiers.VirtualHerbarium}",
                 DatasetName = "Virtual Herbarium",

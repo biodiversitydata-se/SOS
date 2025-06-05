@@ -61,6 +61,7 @@ namespace SOS.Harvest.Processors.Mvm
             var obs = new Observation
             {
                 DataProviderId = DataProvider.Id,
+                MongoDbId = verbatim.Id,
                 BasisOfRecord = new VocabularyValue { Id = (int)BasisOfRecordId.HumanObservation },
                 DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProviderIdentifiers.MVM}",
                 DatasetName = "MVM",

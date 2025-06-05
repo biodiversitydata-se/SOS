@@ -337,6 +337,11 @@ namespace SOS.Lib.Models.Processed.Observation
         /// </summary>
         public DateTime Created { get; set; }
 
+        /// <summary>
+        /// MongoDb Id.
+        /// </summary>
+        public int MongoDbId { get; set; }
+
         public DataQuality DataQuality { get; set; }
 
         public override string ToString()
