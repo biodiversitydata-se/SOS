@@ -10,13 +10,16 @@ namespace SOS.Administration.Api.Extensions;
 
 public static class HangfireExtensions
 {
-    public static IServiceCollection SetupHangfire(this IServiceCollection services, bool useLocalHangfire)
+    public static IServiceCollection SetupHangfire(this IServiceCollection services, bool useLocalHangfire, string hangfireDbConnectionString)
     {
-        var hangfireDbConfiguration = Settings.HangfireDbConfiguration;
-        if (useLocalHangfire)
-        {
-            hangfireDbConfiguration = Settings.LocalHangfireDbConfiguration;
-        }
+        var mongoConfiguration = useLocalHangfire
+            ? Settings.LocalHangfireDbConfiguration
+            : Settings.HangfireDbConfiguration;
+
+        var mongoClientSettings = !string.IsNullOrEmpty(hangfireDbConnectionString)
+            ? MongoClientSettings.FromConnectionString(hangfireDbConnectionString)
+            : mongoConfiguration.GetMongoDbSettings();
+
         services.AddHangfire(configuration =>
             configuration
                 .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
@@ -26,8 +29,8 @@ public static class HangfireExtensions
                     m.Converters.Add(new NetTopologySuite.IO.Converters.GeometryConverter());
                     m.Converters.Add(new StringEnumConverter());
                 })
-                .UseMongoStorage(new MongoClient(hangfireDbConfiguration.GetMongoDbSettings()),
-                    hangfireDbConfiguration.DatabaseName,
+                .UseMongoStorage(new MongoClient(mongoClientSettings),
+                    mongoConfiguration.DatabaseName,
                     new MongoStorageOptions
                     {
                         MigrationOptions = new MongoMigrationOptions
