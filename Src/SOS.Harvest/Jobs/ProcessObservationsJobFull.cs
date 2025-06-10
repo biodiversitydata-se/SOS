@@ -412,10 +412,6 @@ namespace SOS.Harvest.Jobs
                     {
                         throw new Exception("Failed to harvest incremetal inactive instance");
                     }
-                } // We only need to delete duplicates if incremental not should run (Incremental take care of it in that case)
-                else if (!await _processedObservationRepository.EnsureNoDuplicatesAsync())
-                {
-                    _logger.LogError($"Failed to delete duplicates");
                 }
 
                 //----------------------------------

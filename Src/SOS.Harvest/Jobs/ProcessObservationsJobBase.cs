@@ -481,10 +481,7 @@ namespace SOS.Harvest.Jobs
         /// <returns></returns>
         protected virtual async Task PostProcessingAsync(IEnumerable<DataProvider> dataProvidersToProcess, IDictionary<int, Taxon> taxonById, (int publicCount, int protectedCount) indexCounts, IJobCancellationToken cancellationToken)
         {
-            if (!await _processedObservationRepository.EnsureNoDuplicatesAsync())
-            {
-                _logger.LogError($"Failed to delete duplicates");
-            }
+            
         }
 
         /// <summary>
