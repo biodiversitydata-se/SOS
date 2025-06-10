@@ -3,10 +3,11 @@ using SOS.Lib.Models.Processed.DataStewardship.Common;
 using SOS.Lib.Models.Processed.DataStewardship.Enums;
 using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace SOS.Lib.Models.Processed.DataStewardship.Dataset
 {
-    public class Dataset : IEntity<string>
+    public class Dataset : IEntity<string>, IElasticEntity
     {
         /// <summary>
         ///     Unique id.
@@ -127,6 +128,9 @@ namespace SOS.Lib.Models.Processed.DataStewardship.Dataset
         /// A list of unique identites for surveys that is part of the dataset (before validation).
         /// </summary>
         public List<string> VerbatimEventIds { get; set; }
+
+        [JsonIgnore]
+        public string ElasticsearchId => Identifier;
 
         public override string ToString()
         {

@@ -3,10 +3,11 @@ using SOS.Lib.Models.Processed.DataStewardship.Common;
 using SOS.Lib.Models.Processed.Observation;
 using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace SOS.Lib.Models.Processed.DataStewardship.Event
 {
-    public class Event : IEntity<string>
+    public class Event : IEntity<string>, IElasticEntity
     {
         /// <summary>
         ///     Unique id.
@@ -178,6 +179,9 @@ namespace SOS.Lib.Models.Processed.DataStewardship.Event
         /// A list of unique identities of the occurrences made during an event (before occurrence validation).
         /// </summary>
         public List<string> VerbatimOccurrenceIds { get; set; }
+
+        [JsonIgnore]
+        public string ElasticsearchId => EventId;
 
         public override string ToString()
         {

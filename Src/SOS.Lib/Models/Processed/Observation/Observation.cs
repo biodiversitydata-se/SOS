@@ -3,6 +3,7 @@ using SOS.Lib.Models.Processed.DataStewardship.Common;
 using SOS.Lib.Swagger;
 using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace SOS.Lib.Models.Processed.Observation
 {
@@ -28,7 +29,7 @@ namespace SOS.Lib.Models.Processed.Observation
     /// <summary>
     ///     Information about a species observation.
     /// </summary>
-    public class Observation : IEntity<string>
+    public class Observation : IEntity<string>, IElasticEntity
     {
         /// <summary>
         /// Constructor
@@ -343,6 +344,9 @@ namespace SOS.Lib.Models.Processed.Observation
         public int MongoDbId { get; set; }
 
         public DataQuality DataQuality { get; set; }
+
+        [JsonIgnore]
+        public string ElasticsearchId => Occurrence?.OccurrenceId;
 
         public override string ToString()
         {
