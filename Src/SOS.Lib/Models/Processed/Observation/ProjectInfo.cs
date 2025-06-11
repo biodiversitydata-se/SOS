@@ -99,6 +99,11 @@ namespace SOS.Lib.Models.Processed.Observation
         /// </summary>
         public string SurveyMethodUrl { get; set; }
 
+        /// <summary>
+        /// Owner id in user admin
+        /// </summary>
+        public int? UserServiceUserId { get; set; }
+
         public override string ToString()
         {
             return $"{nameof(Id)}: {Id}, {nameof(Name)}: {Name}, {nameof(Owner)}: {Owner}";

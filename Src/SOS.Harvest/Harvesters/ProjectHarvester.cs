@@ -123,7 +123,8 @@ namespace SOS.Harvest.Harvesters
                 }),
                 ProjectURL = projectEntity.ProjectURL,
                 SurveyMethod = projectEntity.SurveyMethod,
-                SurveyMethodUrl = projectEntity.SurveyMethodUrl
+                SurveyMethodUrl = projectEntity.SurveyMethodUrl,
+                UserServiceUserId = projectEntity.UserServiceUserId
             };
 
             return projectInfo;
