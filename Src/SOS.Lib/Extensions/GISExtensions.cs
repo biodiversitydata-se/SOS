@@ -23,7 +23,7 @@ namespace SOS.Lib.Extensions
     /// </summary>
     public static class GISExtensions
     {        
-        private const int MaxCacheSize = 3_000_000;
+        private const int MaxCacheSize = 5_000_000;
         public static int NumberOfCacheHits = 0;
         public static int NumberOfCachedItems = 0;
         private static readonly ConcurrentDictionary<TransformCacheKey, Point> _transformPointCache = new();

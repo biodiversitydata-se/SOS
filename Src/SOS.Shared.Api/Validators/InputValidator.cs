@@ -343,10 +343,17 @@ namespace SOS.Shared.Api.Validators
                 errors.Add(areaValidationResult.Error);
             }
 
-            var bboxResult = ValidateBoundingBox(filter?.Geographics?.BoundingBox, bboxMandatory);
-            if (bboxResult.IsFailure)
+            if (filter.Geographics != null && filter.Geographics.IsGeometryInvalid)
             {
-                errors.Add(bboxResult.Error);
+                errors.Add("Invalid geometry");
+            }
+            else
+            {
+                var bboxResult = ValidateBoundingBox(filter?.Geographics?.BoundingBox, bboxMandatory);
+                if (bboxResult.IsFailure)
+                {
+                    errors.Add(bboxResult.Error);
+                }
             }
 
             if (filter?.ModifiedDate?.From > filter?.ModifiedDate?.To)

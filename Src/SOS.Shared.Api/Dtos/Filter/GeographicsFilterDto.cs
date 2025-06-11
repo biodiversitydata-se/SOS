@@ -61,5 +61,11 @@ namespace SOS.Shared.Api.Dtos.Filter
         /// Limit observation accuracy. Only observations with accuracy less than this will be returned
         /// </summary>
         public int? MaxAccuracy { get; set; }
+
+        /// <summary>
+        /// Indicates that the geometry is invalid.
+        /// </summary>
+        [JsonIgnore]
+        public bool IsGeometryInvalid { get; set; }
     }
 }

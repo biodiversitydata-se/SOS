@@ -86,6 +86,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             var accessRights = GetSosId(verbatim.AccessRights, VocabularyById[VocabularyId.AccessRights]);
             var obs = new Observation
             {
+                MongoDbId = verbatim.Id,
                 AccessRights = accessRights,
                 DataProviderId = DataProvider.Id,
                 DiffusionStatus = DiffusionStatus.NotDiffused,

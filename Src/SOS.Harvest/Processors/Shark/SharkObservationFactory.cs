@@ -57,10 +57,11 @@ namespace SOS.Harvest.Processors.Shark
         public Observation CreateProcessedObservation(SharkObservationVerbatim verbatim, bool diffuseIfSupported)
         {
             var taxon = GetTaxon(verbatim.DyntaxaId.HasValue ? verbatim.DyntaxaId.Value : -1, new[] { verbatim.ScientificName, verbatim.ReportedScientificName }.Distinct());
-            var sharkSampleId = $"{(string.IsNullOrEmpty(verbatim.Sharksampleidmd5) ? verbatim.SharkSampleId : verbatim.Sharksampleidmd5)}-{taxon.Id}".RemoveWhiteSpace();
+            var sharkSampleId = $"{(string.IsNullOrEmpty(verbatim.Sharksampleidmd5) ? verbatim.SharkSampleId : verbatim.Sharksampleidmd5)}-{taxon.Id}-{verbatim.ReportedScientificName}".Clean().RemoveWhiteSpace();
 
             var obs = new Observation
             {
+                MongoDbId = verbatim.Id,
                 DataProviderId = DataProvider.Id,
                 BasisOfRecord = new VocabularyValue { Id = (int)BasisOfRecordId.HumanObservation },
                 DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProviderIdentifiers.SHARK}",

@@ -1,4 +1,4 @@
-FROM node:20.11 AS build
+FROM reg.app.slu.se/hub/node:20.11 AS build
 WORKDIR /usr/src/app
 COPY package.json package-lock.json ./
 RUN npm install
@@ -9,7 +9,7 @@ RUN npm run build
 # make sure entrypoint.sh has correct line endings
 RUN apt-get update && apt-get install -y dos2unix && dos2unix ./entrypoint.sh && chmod +x entrypoint.sh
 
-FROM nginx:1.25.3-alpine as runtime
+FROM reg.app.slu.se/hub/nginx:1.25.3-alpine as runtime
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /usr/src/app/dist /var/share/nginx/html
 
@@ -25,11 +25,8 @@ COPY --from=build /usr/src/app/entrypoint.sh ./entrypoint.sh
 
 ## add necessary permissions
 RUN chown -R webrunner:webrunner /var/share/nginx/html && chmod -R 755 /var/share/nginx/html && \
-        chown -R webrunner:webrunner /var/cache/nginx && \
-        chown -R webrunner:webrunner /var/log/nginx && \
-        chown -R webrunner:webrunner /etc/nginx/conf.d
-RUN touch /var/run/nginx.pid && \
-        chown -R webrunner:webrunner /var/run/nginx.pid
+    chown -R webrunner:webrunner /var/cache/nginx /var/log/nginx /etc/nginx/conf.d && \
+    touch /var/run/nginx.pid && chown -R webrunner:webrunner /var/run/nginx.pid
 
 USER webrunner
 

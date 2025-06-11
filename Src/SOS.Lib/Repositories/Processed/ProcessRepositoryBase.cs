@@ -24,7 +24,7 @@ namespace SOS.Lib.Repositories.Processed
     /// <summary>
     ///     Base class for cosmos db repositories
     /// </summary>
-    public abstract class ProcessRepositoryBase<TEntity, TKey> : IProcessRepositoryBase<TEntity, TKey> where TEntity : class, IEntity<TKey>
+    public abstract class ProcessRepositoryBase<TEntity, TKey> : IProcessRepositoryBase<TEntity, TKey> where TEntity : class, IEntity<TKey>, IElasticEntity
     {
         private readonly IElasticClientManager _elasticClientManager;
         private readonly ICache<string, ProcessedConfiguration> _processedConfigurationCache;
@@ -436,6 +436,17 @@ namespace SOS.Lib.Repositories.Processed
             var count = 0;
             return Client.BulkAll(items, b => b
                     .Index(indexName)
+                    // Set _id to unique value
+                    .BufferToBulk((descriptor, buffer) =>
+                    {                        
+                        foreach (var item in buffer)
+                        {                           
+                            descriptor.Index<TEntity>(item, op => op
+                               .Index(indexName)
+                               .Id(item.ElasticsearchId)                           
+                           );
+                        }
+                    })
                     // how long to wait between retries
                     .BackOffTime("30s")
                     // how many retries are attempted if a failure occurs                        .

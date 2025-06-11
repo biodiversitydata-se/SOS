@@ -77,6 +77,7 @@ namespace SOS.Harvest.Processors.iNaturalist
             var accessRights = VocabularyValue.Create((int)AccessRightsId.FreeUsage);
             var obs = new Observation
             {
+                MongoDbId = verbatim.Id,
                 AccessRights = accessRights,
                 DataProviderId = DataProvider.Id,
                 DiffusionStatus = DiffusionStatus.NotDiffused,

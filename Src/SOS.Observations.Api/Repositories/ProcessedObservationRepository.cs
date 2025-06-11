@@ -315,10 +315,11 @@ namespace SOS.Observations.Api.Repositories
             if (yearWeekAggregations?.Any() ?? false)
             {
                 var firstValue = yearWeekAggregations.First().Value;
+                var lastValue = yearWeekAggregations.Last().Value;
                 var currentYear = firstValue.Year;
                 var currentWeek = firstValue.Week;
-                var lastYear = firstValue.Year;
-                var lastWeek = firstValue.Week;
+                var lastYear = lastValue.Year;
+                var lastWeek = lastValue.Week;
 
                 while (currentYear < lastYear || (currentYear == lastYear && currentWeek <= lastWeek))
                 {

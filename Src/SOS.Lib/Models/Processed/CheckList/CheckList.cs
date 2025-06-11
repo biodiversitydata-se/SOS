@@ -2,10 +2,11 @@
 using SOS.Lib.Models.Processed.Observation;
 using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace SOS.Lib.Models.Processed.Checklist
 {
-    public class Checklist : IEntity<string>
+    public class Checklist : IEntity<string>, IElasticEntity
     {
         /// <summary>
         /// Values used internal in Artportalen
@@ -76,5 +77,8 @@ namespace SOS.Lib.Models.Processed.Checklist
         /// Taxon id's found
         /// </summary>
         public IEnumerable<int> TaxonIdsFound { get; set; }
+
+        [JsonIgnore]
+        public string ElasticsearchId => Id;
     }
 }

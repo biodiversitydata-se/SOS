@@ -295,6 +295,7 @@ namespace SOS.Harvest.Processors.Artportalen
 
                 var obs = new Observation
                 {
+                    MongoDbId = verbatimObservation.Id,
                     DiffusionStatus = diffuse ? DiffusionStatus.DiffusedByProvider : DiffusionStatus.NotDiffused,
                     IsGeneralized = diffuse
                 };

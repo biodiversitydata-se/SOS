@@ -5,7 +5,7 @@ using System.Threading;
 
 namespace SOS.Lib.Models.Processed.Observation
 {
-    public class UserObservation : IEntity<long>
+    public class UserObservation : IEntity<long>, IElasticEntity
     {
         public long Id { get; set; }
         public int UserId { get; set; }
@@ -32,6 +32,7 @@ namespace SOS.Lib.Models.Processed.Observation
         public string TaxonVernacularName { get; set; }
         public int TaxonSortOrder { get; set; }
 
+        public string ElasticsearchId => Id.ToString();
 
         public static long CreateId()
         {

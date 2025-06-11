@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build-env
+FROM reg.app.slu.se/mcr/dotnet/sdk:9.0 AS build-env
 WORKDIR /app
 
 # copy csproj and restore as distinct layers
@@ -10,22 +10,20 @@ COPY  . .
 RUN dotnet publish SOS.Administration.Gui/SOS.Administration.Gui.csproj -c Release -o out
 
 #build runtime image
-FROM mcr.microsoft.com/dotnet/aspnet:9.0-alpine
+FROM reg.app.slu.se/mcr/dotnet/aspnet:9.0-alpine
 
-# enable swedish globalization
-RUN apk add --no-cache icu-libs icu-data-full
+# Install necessary libraries, configure timezone, and create a non-root user in one layer
+RUN apk add --no-cache icu-libs icu-data-full tzdata && \
+    # Set the timezone
+    cp /usr/share/zoneinfo/Europe/Stockholm /etc/localtime && \
+    # Create a non-root user with UID 1000 and set permissions
+    adduser -u 1000 --disabled-password --home /apirunner --gecos '' apirunner && \
+    chown -R apirunner /apirunner
+
+# Set environment variables
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
-
-# set time zone
-RUN apk add --no-cache tzdata
 ENV TZ=Europe/Stockholm
 
-# create and use non-root user.. (requires us to use a port number higher than 1024, default 8080. override with Env variable PORT, e.g PORT=8181)
-RUN adduser \
-  --disabled-password \
-  --home /apirunner \
-  --gecos '' apirunner \
-  && chown -R apirunner /apirunner
 USER apirunner
 
 WORKDIR /app

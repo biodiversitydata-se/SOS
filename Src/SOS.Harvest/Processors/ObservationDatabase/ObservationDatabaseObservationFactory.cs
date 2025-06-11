@@ -67,6 +67,7 @@ namespace SOS.Harvest.Processors.ObservationDatabase
 
             var obs = new Observation
             {
+                MongoDbId = verbatim.Id,
                 AccessRights = new VocabularyValue { Id = (int)AccessRightsId.NotForPublicUsage },
                 DataProviderId = DataProvider.Id,
                 BasisOfRecord = new VocabularyValue { Id = (int)BasisOfRecordId.HumanObservation },

@@ -59,6 +59,7 @@ namespace SOS.Harvest.Processors.FishData
             var obs = new Observation
             {
                 DataProviderId = DataProvider.Id,
+                MongoDbId = verbatim.Id,
                 BasisOfRecord = new VocabularyValue { Id = (int)BasisOfRecordId.HumanObservation },
                 DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProviderIdentifiers.FishData}",
                 DatasetName = "Fish data",
@@ -67,7 +68,7 @@ namespace SOS.Harvest.Processors.FishData
                 Identification = new Identification
                 {
                     UncertainIdentification = false,
-                    Verified = false,
+                    Verified = true,
                     VerificationStatus = new VocabularyValue { Id = (int)ValidationStatusId.ReportedByExpert }
                 },
                 Location = new Location(LocationType.Point)

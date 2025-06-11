@@ -60,6 +60,7 @@ namespace SOS.Harvest.Processors.Kul
             var obs = new Observation
             {
                 DataProviderId = DataProvider.Id,
+                MongoDbId = verbatim.Id,
                 BasisOfRecord = new VocabularyValue { Id = (int)BasisOfRecordId.HumanObservation },
                 DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProviderIdentifiers.KUL}",
                 DatasetName = "KUL",
