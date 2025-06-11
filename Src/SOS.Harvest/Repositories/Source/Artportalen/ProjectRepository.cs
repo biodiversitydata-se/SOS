@@ -31,7 +31,8 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
 	                CASE 
 		                WHEN o.Id IS NOT NULL THEN o.Name
 		                WHEN pn.Id IS NOT NULL THEN pn.FirstName + ' ' + pn.LastName 
-	                END AS Owner
+	                END AS Owner,
+                    u.UserServiceUserId
                 FROM 
 	                Project p 
 	                LEFT JOIN ProjectCategory pc ON p.ProjectCategoryId = pc.Id

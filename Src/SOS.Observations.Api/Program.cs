@@ -184,14 +184,11 @@ static void ConfigureServices(
 
 static void ConfigureMiddleware(WebApplication app, bool isDevelopment, bool disableHangfireInit, bool disableHealthCheckInit)
 {
+    app.ApplyUseExceptionHandler();
     if (Settings.CorsAllowAny)
         app.UseCors("AllowAll");
     if (Settings.ObservationApiConfiguration.EnableResponseCompression)
-        app.UseResponseCompression();
-    if (isDevelopment)
-        app.UseDeveloperExceptionPage();
-    else
-        app.UseHsts();
+        app.UseResponseCompression();   
 
     if (!app.Environment.IsEnvironment("prod"))
     {
@@ -199,7 +196,7 @@ static void ConfigureMiddleware(WebApplication app, bool isDevelopment, bool dis
         telemetryConfig.DisableTelemetry = true;
     }
 
-    app.UseMiddleware<LogApiUserTypeMiddleware>();
+    app.UseMiddleware<LogApiUserTypeMiddleware>();    
     if (Settings.ApplicationInsightsConfiguration.EnableRequestBodyLogging)
     {
         app.UseMiddleware<EnableRequestBufferingMiddelware>();

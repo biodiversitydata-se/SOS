@@ -2,14 +2,15 @@
 using NetTopologySuite.Geometries;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Processed.Observation;
-using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Models.Processed.Observation;
-using SOS.Shared.Api.Dtos;
-using SOS.Shared.Api.Dtos.Enum;
-using SOS.Shared.Api.Dtos.Filter;
+using SOS.Lib.Models.Verbatim.Artportalen;
+using SOS.Lib.Models.Verbatim.INaturalist.Service;
 using SOS.Observations.Api.IntegrationTests.Setup;
 using SOS.Observations.Api.IntegrationTests.TestData.Factories;
 using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
+using SOS.Shared.Api.Dtos;
+using SOS.Shared.Api.Dtos.Enum;
+using SOS.Shared.Api.Dtos.Filter;
 
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsEndpoints.ObservationsBySearchEndpoint
 {
@@ -277,6 +278,44 @@ namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsE
             response.StatusCode.Should().Be(HttpStatusCode.OK);
             result!.TotalCount.Should().Be(60,
                 because: "60 observations added to Elasticsearch are located inside bounding box used in the filter.");
+        }
+
+        [Fact]
+        public async Task ObservationsBySearchEndpoint_ReturnsBadRequest_WhenFilteringByInvalidPolygon()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------                        
+            var apiClient = TestFixture.CreateApiClient();
+
+            // Create polygon where end coordinate differs from start coordinate.
+            var json = @"
+            {
+                ""geographics"": {
+                    ""geometries"": [
+                        {
+                            ""type"": ""polygon"",
+                            ""coordinates"": [
+                                [
+                                    [15.07063, 57.92573],
+                                    [15.0051, 58.16108],
+                                    [14.58003, 58.10148],
+                                    [14.64143, 57.93294],
+                                    [15.07063, 58.92573]
+                                ]
+                            ]
+                        }
+                    ]
+                }
+            }";
+
+            // Act            
+            var response = await apiClient.PostAsync("/observations/search", new StringContent(json, Encoding.UTF8, "application/json"));
+            var result = await response.Content.ReadAsStringAsync();
+
+            // Assert
+            response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            result!.Should().Be("Invalid JSON in request body. Geometry - points must form a closed linestring");
         }
     }
 }

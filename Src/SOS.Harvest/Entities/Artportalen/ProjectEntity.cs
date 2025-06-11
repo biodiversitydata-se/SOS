@@ -85,5 +85,10 @@
         ///     Survey method url
         /// </summary>
         public string? SurveyMethodUrl { get; set; }
+
+        /// <summary>
+        /// Owner id in user admin
+        /// </summary>
+        public int? UserServiceUserId { get; set; }
     }
 }
