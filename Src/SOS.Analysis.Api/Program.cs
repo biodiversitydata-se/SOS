@@ -139,16 +139,13 @@ static void ConfigureServices(IServiceCollection services, IConfigurationRoot co
 
 static void ConfigureMiddleware(WebApplication app, bool isDevelopment, bool disableHangfireInit)
 {
+    app.ApplyUseExceptionHandler();
     if (Settings.CorsAllowAny)
         app.UseCors("AllowAll");
     if (Settings.AnalysisConfiguration.EnableResponseCompression)
         app.UseResponseCompression();
     if (!disableHangfireInit)
         app.UseHangfireDashboard();
-    if (isDevelopment)
-        app.UseDeveloperExceptionPage();
-    else
-        app.UseHsts();
 
     if (!app.Environment.IsEnvironment("prod"))
     {
