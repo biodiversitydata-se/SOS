@@ -32,12 +32,11 @@ namespace SOS.Lib.Repositories.Resource
                 new CreateIndexModel<ProjectInfo>(Builders<ProjectInfo>.IndexKeys
                     .Text(pi => pi.Category)
                     .Text(pi => pi.CategorySwedish)
-                    .Text(pi => pi.Description)
                     .Text(pi => pi.Name)
                 ),
                 new CreateIndexModel<ProjectInfo>(Builders<ProjectInfo>.IndexKeys.Ascending(pi => pi.ControlingOrganisationId)),
-                new CreateIndexModel<ProjectInfo>(Builders<ProjectInfo>.IndexKeys.Ascending(pi => pi.ControlingUserId)),
-                new CreateIndexModel<ProjectInfo>(Builders<ProjectInfo>.IndexKeys.Ascending(pi => pi.IsPublic))
+                new CreateIndexModel<ProjectInfo>(Builders<ProjectInfo>.IndexKeys.Ascending(pi => pi.IsPublic)),
+                new CreateIndexModel<ProjectInfo>(Builders<ProjectInfo>.IndexKeys.Ascending(pi => pi.UserServiceUserId))
            ]);
         }
 
@@ -47,7 +46,7 @@ namespace SOS.Lib.Repositories.Resource
             var filters = new[] {
                 Builders<ProjectInfo>.Filter.Or(
                     Builders<ProjectInfo>.Filter.Eq(a => a.IsPublic, true),
-                    Builders<ProjectInfo>.Filter.Eq(a => a.ControlingUserId, userId)
+                    Builders<ProjectInfo>.Filter.Eq(a => a.UserServiceUserId, userId)
                 ),
                 Builders<ProjectInfo>.Filter.Text(filter, new TextSearchOptions{ CaseSensitive = false })
             };

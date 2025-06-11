@@ -43,7 +43,7 @@ namespace SOS.Lib.Managers
             {
                 return null!;
             }
-            return (await GetAllAsync()).Where(p => projectIds.Contains(p.Id) && (userId == null || p.IsPublic || p.ControlingUserId == userId));
+            return (await GetAllAsync()).Where(p => projectIds.Contains(p.Id) && (userId == null || p.IsPublic || p.UserServiceUserId == userId));
         }
 
         /// <inheritdoc/>
@@ -52,12 +52,11 @@ namespace SOS.Lib.Managers
             try
             {
                 return (await GetAllAsync()).Where(p => 
-                    (p.IsPublic || p.ControlingUserId == userId) &&
+                    (p.IsPublic || p.UserServiceUserId == userId) &&
                     (
                         string.IsNullOrEmpty(filter) ||
                         (p.Category?.Contains(filter, StringComparison.CurrentCultureIgnoreCase) ?? false) ||
                         (p.CategorySwedish?.Contains(filter, StringComparison.CurrentCultureIgnoreCase) ?? false) ||
-                        (p.Description?.Contains(filter, StringComparison.CurrentCultureIgnoreCase) ?? false) ||
                         (p.Name?.Contains(filter, StringComparison.CurrentCultureIgnoreCase) ?? false)
                     )
                );
@@ -75,7 +74,7 @@ namespace SOS.Lib.Managers
             try
             {
                 return (await GetAllAsync()).FirstOrDefault(p =>
-                    (p.IsPublic || p.ControlingUserId == userId) && p.Id.Equals(id)
+                    (p.IsPublic || p.UserServiceUserId == userId) && p.Id.Equals(id)
                );
             }
             catch (Exception e)
