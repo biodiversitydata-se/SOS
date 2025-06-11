@@ -32,7 +32,6 @@ namespace SOS.Lib.Repositories.Resource
                 new CreateIndexModel<ProjectInfo>(Builders<ProjectInfo>.IndexKeys
                     .Text(pi => pi.Category)
                     .Text(pi => pi.CategorySwedish)
-                    .Text(pi => pi.Description)
                     .Text(pi => pi.Name)
                 ),
                 new CreateIndexModel<ProjectInfo>(Builders<ProjectInfo>.IndexKeys.Ascending(pi => pi.ControlingOrganisationId)),

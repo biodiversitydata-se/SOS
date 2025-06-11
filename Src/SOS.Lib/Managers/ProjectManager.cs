@@ -57,7 +57,6 @@ namespace SOS.Lib.Managers
                         string.IsNullOrEmpty(filter) ||
                         (p.Category?.Contains(filter, StringComparison.CurrentCultureIgnoreCase) ?? false) ||
                         (p.CategorySwedish?.Contains(filter, StringComparison.CurrentCultureIgnoreCase) ?? false) ||
-                        (p.Description?.Contains(filter, StringComparison.CurrentCultureIgnoreCase) ?? false) ||
                         (p.Name?.Contains(filter, StringComparison.CurrentCultureIgnoreCase) ?? false)
                     )
                );
