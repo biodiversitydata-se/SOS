@@ -46,13 +46,13 @@ var adminApi = builder.AddProject<Projects.SOS_Administration_Api>(name: "sos-ad
     .WithReference(hangfireDb)
     .WaitFor(hangfireDb);
 
-//// Configure Hangfire JobServer
-//builder.AddProject<Projects.SOS_Hangfire_JobServer>("sos-hangfire-jobserver")
-//    .WithHttpEndpoint()
-//    .WithEnvironment("ASPNETCORE_ENVIRONMENT", env.AspNetCoreEnvironment)
-//    .WithEnvironment("USE_LOCAL_HANGFIRE", env.UseLocalHangfireDb.ToString())
-//    .WithReference(hangfireDb)
-//    .WaitFor(hangfireDb);
+// Configure Hangfire JobServer
+builder.AddProject<Projects.SOS_Hangfire_JobServer>("sos-hangfire-jobserver")
+    .WithHttpEndpoint()
+    .WithEnvironment("ASPNETCORE_ENVIRONMENT", env.AspNetCoreEnvironment)
+    .WithEnvironment("USE_LOCAL_HANGFIRE", env.UseLocalHangfireDb.ToString())
+    .WithReference(hangfireDb)
+    .WaitFor(hangfireDb);
 
 //// Configure Admin GUI BFF
 //var adminGuiBff = builder.AddProject<Projects.SOS_Administration_Gui>("sos-admin-gui-bff", configure: static project =>
