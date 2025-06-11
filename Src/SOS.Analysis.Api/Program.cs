@@ -8,6 +8,7 @@ using Serilog.Formatting.Compact;
 using SOS.Analysis.Api.Extensions;
 using SOS.Analysis.Api.Middleware;
 using SOS.Lib.Extensions;
+using SOS.Lib.Helpers;
 using SOS.Lib.JsonConverters;
 using SOS.Lib.Middleware;
 using System.Globalization;
@@ -28,7 +29,9 @@ try
     Log.Logger.Information("Starting Service");
 
     var builder = WebApplication.CreateBuilder(args);
-    builder.Host.UseSerilog(Log.Logger);
+    //builder.Host.UseSerilog(Log.Logger);
+    builder.AddServiceDefaults();
+    SeriLogHelper.ConfigureSerilog(builder);
 
     // Set Swedish culture globally
     SetCulture("sv-SE");
@@ -41,14 +44,21 @@ try
     Settings.Init(configurationRoot);
 
     // Register services
-    ConfigureServices(builder.Services, configurationRoot, isDevelopment, disableHangfireInit, useLocalHangfire);
+    ConfigureServices(
+        builder, 
+        configurationRoot, 
+        isDevelopment, 
+        disableHangfireInit, 
+        useLocalHangfire);
 
     // Build app and configure middleware pipeline
     var app = builder.Build();
+    app.MapDefaultEndpoints();
     ConfigureMiddleware(app, isDevelopment, disableHangfireInit);
 
     // Start the application
-    await app.RunAsync("http://*:5000");
+    string? aspnetCoreUrls = Environment.GetEnvironmentVariable("ASPNETCORE_URLS");
+    await app.RunAsync(aspnetCoreUrls ?? "http://*:5000");
 }
 catch (Exception ex)
 {
@@ -93,8 +103,14 @@ static IConfigurationRoot BuildConfiguration(WebApplicationBuilder builder, bool
     return configBuilder.Build();
 }
 
-static void ConfigureServices(IServiceCollection services, IConfigurationRoot configuration, bool isDevelopment, bool disableHangfireInit, bool useLocalHangfire)
+static void ConfigureServices(
+    WebApplicationBuilder builder,
+    IConfigurationRoot configuration, 
+    bool isDevelopment, 
+    bool disableHangfireInit, 
+    bool useLocalHangfire)
 {
+    IServiceCollection services = builder.Services;
     services.AddDependencyInjectionServices(configuration);
 
     if (Settings.CorsAllowAny)
@@ -133,7 +149,10 @@ static void ConfigureServices(IServiceCollection services, IConfigurationRoot co
         });
     }
     if (!disableHangfireInit)
-        services.SetupHangfire(useLocalHangfire);
+    {
+        string? hangfireDbConnectionString = builder.Configuration.GetConnectionString("hangfire-mongodb"); // Get Hangfire MongoDB from .Net Aspire configuration.
+        services.SetupHangfire(useLocalHangfire, hangfireDbConnectionString);
+    }
     services.SetupHealthchecks();
 }
 

@@ -31,11 +31,26 @@ var observationApi = builder.AddProject<Projects.SOS_Observations_Api>("sos-obse
     .WithReference(hangfireDb)
     .WaitFor(hangfireDb);
 
+// Configure Analysis API
+var analysisApi = builder.AddProject<Projects.SOS_Observations_Api>("sos-analysis-api", configure: static project =>
+    {
+        project.ExcludeLaunchProfile = true;
+    })
+    .WithEnvironment("ASPNETCORE_ENVIRONMENT", env.AspNetCoreEnvironment)
+    .WithEnvironment("USE_LOCAL_HANGFIRE", env.UseLocalHangfireDb.ToString())
+    .WithEnvironment("DISABLE_HANGFIRE_INIT", env.DisableHangfireInit.ToString())
+    .WithEnvironment("DISABLE_HEALTHCHECK_INIT", env.DisableHealthcheckInit.ToString())    
+    .WithHttpEndpoint(name: "http", port: 5001)
+    .WithUrl("http://localhost:5001/swagger", "Analysis API (Swagger)")
+    .WithHttpHealthCheck("/healthz")
+    .WithReference(hangfireDb)
+    .WaitFor(hangfireDb);
+
 // Configure Administration API
 var adminApi = builder.AddProject<Projects.SOS_Administration_Api>(name: "sos-administration-api", configure: static project =>
-{
-    project.ExcludeLaunchProfile = true;
-})
+    {
+        project.ExcludeLaunchProfile = true;
+    })
     .WithEnvironment("ASPNETCORE_ENVIRONMENT", env.AspNetCoreEnvironment)
     .WithEnvironment("USE_LOCAL_HANGFIRE", env.UseLocalHangfireDb.ToString())
     .WithEnvironment("DISABLE_HANGFIRE_INIT", env.DisableHangfireInit.ToString())
@@ -47,7 +62,10 @@ var adminApi = builder.AddProject<Projects.SOS_Administration_Api>(name: "sos-ad
     .WaitFor(hangfireDb);
 
 // Configure Hangfire JobServer
-builder.AddProject<Projects.SOS_Hangfire_JobServer>("sos-hangfire-jobserver")
+builder.AddProject<Projects.SOS_Hangfire_JobServer>("sos-hangfire-jobserver", configure: static project =>
+    {
+        project.ExcludeLaunchProfile = true;
+    })
     .WithHttpEndpoint()
     .WithEnvironment("ASPNETCORE_ENVIRONMENT", env.AspNetCoreEnvironment)
     .WithEnvironment("USE_LOCAL_HANGFIRE", env.UseLocalHangfireDb.ToString())
