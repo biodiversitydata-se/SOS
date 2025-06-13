@@ -55,6 +55,7 @@
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\SOS.Lib\SOS.Lib.csproj" />
+		<ProjectReference Include="..\SOS.ServiceDefaults\SOS.ServiceDefaults.csproj" />
 		<ProjectReference Include="..\SOS.Shared.Api\SOS.Shared.Api.csproj" />
 	</ItemGroup>
 	<ItemGroup>

@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Sdk Name="Aspire.AppHost.Sdk" Version="9.0.0" />
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsAspireHost>true</IsAspireHost>
+    <UserSecretsId>14f6519c-5160-4d45-b57b-525904dce4f1</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Aspire.Hosting.AppHost" Version="9.3.0" />
+	<PackageReference Include="Aspire.Hosting.MongoDB" Version="9.3.0" />
+	<PackageReference Include="Aspire.Hosting.NodeJs" Version="9.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SOS.Observations.Api\SOS.Observations.Api.csproj" />
+	<ProjectReference Include="..\SOS.Administration.Api\SOS.Administration.Api.csproj" />
+	<ProjectReference Include="..\SOS.Administration.Gui\SOS.Administration.Gui.csproj" />
+	<ProjectReference Include="..\SOS.Hangfire.JobServer\SOS.Hangfire.JobServer.csproj" />
+  </ItemGroup>
+
+</Project>

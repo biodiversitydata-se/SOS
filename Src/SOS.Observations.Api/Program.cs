@@ -1,4 +1,4 @@
-﻿using Hangfire;
+using Hangfire;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -9,6 +9,7 @@ using Microsoft.Extensions.Hosting;
 using MongoDB.Bson.Serialization.Conventions;
 using Serilog;
 using SOS.Lib.Extensions;
+using SOS.Lib.Helpers;
 using SOS.Lib.JsonConverters;
 using SOS.Lib.Middleware;
 using SOS.Lib.Repositories.Processed.Interfaces;
@@ -40,23 +41,32 @@ try
     Log.Logger.Information("Starting Service");
 
     var builder = WebApplication.CreateBuilder(args);
-    builder.Host.UseSerilog(Log.Logger);
+    //builder.Host.UseSerilog(Log.Logger);
+    builder.AddServiceDefaults();
+    SeriLogHelper.ConfigureSerilog(builder);
 
     // Set Swedish culture globally
     SetCulture("sv-SE");
 
     // Register MongoDB conventions
-    RegisterMongoConventions();
+    RegisterMongoConventions();    
 
     // Build configuration
     var configurationRoot = BuildConfiguration(builder, isDevelopment);
     Settings.Init(configurationRoot);
-
+        
     // Register services
-    ConfigureServices(builder.Services, configurationRoot, isDevelopment, disableHangfireInit, useLocalHangfire, disableHealthCheckInit, builder.Environment.IsEnvironment("prod"));
+    ConfigureServices(
+        builder, 
+        configurationRoot, 
+        isDevelopment, 
+        disableHangfireInit, 
+        useLocalHangfire, 
+        disableHealthCheckInit);
 
     // Build app and configure middleware pipeline
     var app = builder.Build();
+    app.MapDefaultEndpoints();
     ConfigureMiddleware(app, isDevelopment, disableHangfireInit, disableHealthCheckInit);
 
     // Ensure protected log collection and index
@@ -67,7 +77,8 @@ try
         InitializeTaxonSumAggregationCache(app);
 
     // Start the application
-    await app.RunAsync("http://*:5000");
+    string aspnetCoreUrls = Environment.GetEnvironmentVariable("ASPNETCORE_URLS");    
+    await app.RunAsync(aspnetCoreUrls ?? "http://*:5000");    
 }
 catch (Exception ex)
 {
@@ -112,8 +123,15 @@ static IConfigurationRoot BuildConfiguration(WebApplicationBuilder builder, bool
     return configBuilder.Build();
 }
 
-static void ConfigureServices(IServiceCollection services, IConfigurationRoot configuration, bool isDevelopment, bool disableHangfireInit, bool useLocalHangfire, bool disableHealthCheckInit, bool isProd)
+static void ConfigureServices(
+    WebApplicationBuilder builder,    
+    IConfigurationRoot configuration, 
+    bool isDevelopment, 
+    bool disableHangfireInit, 
+    bool useLocalHangfire, 
+    bool disableHealthCheckInit)
 {
+    IServiceCollection services = builder.Services;
     services.AddDependencyInjectionServices(configuration);
 
     if (Settings.CorsAllowAny)
@@ -156,20 +174,21 @@ static void ConfigureServices(IServiceCollection services, IConfigurationRoot co
         });
     }
     if (!disableHangfireInit)
-        services.SetupHangfire(useLocalHangfire);
-    services.SetupHealthchecks(disableHealthCheckInit, isProd);
+    {
+        string hangfireDbConnectionString = builder.Configuration.GetConnectionString("hangfire-mongodb"); // Get Hangfire MongoDB from .Net Aspire configuration.
+        services.SetupHangfire(useLocalHangfire, hangfireDbConnectionString);
+    }
+    
+    services.SetupHealthchecks(disableHealthCheckInit, isProductionEnvironment: builder.Environment.IsEnvironment("prod"));
 }
 
 static void ConfigureMiddleware(WebApplication app, bool isDevelopment, bool disableHangfireInit, bool disableHealthCheckInit)
 {
+    app.ApplyUseExceptionHandler();
     if (Settings.CorsAllowAny)
         app.UseCors("AllowAll");
     if (Settings.ObservationApiConfiguration.EnableResponseCompression)
-        app.UseResponseCompression();
-    if (isDevelopment)
-        app.UseDeveloperExceptionPage();
-    else
-        app.UseHsts();
+        app.UseResponseCompression();   
 
     if (!app.Environment.IsEnvironment("prod"))
     {
@@ -177,7 +196,7 @@ static void ConfigureMiddleware(WebApplication app, bool isDevelopment, bool dis
         telemetryConfig.DisableTelemetry = true;
     }
 
-    app.UseMiddleware<LogApiUserTypeMiddleware>();
+    app.UseMiddleware<LogApiUserTypeMiddleware>();    
     if (Settings.ApplicationInsightsConfiguration.EnableRequestBodyLogging)
     {
         app.UseMiddleware<EnableRequestBufferingMiddelware>();

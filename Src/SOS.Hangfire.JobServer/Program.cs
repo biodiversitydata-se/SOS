@@ -6,6 +6,7 @@ using Hangfire.Mongo;
 using Hangfire.Mongo.Migration.Strategies;
 using Hangfire.Mongo.Migration.Strategies.Backup;
 using MassTransit;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,7 +15,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
-using Nest;
 using Newtonsoft.Json.Converters;
 using NLog.Web;
 using SOS.Export.IoC.Modules;
@@ -28,7 +28,6 @@ using SOS.Lib.Configuration.Import;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Context;
-using SOS.Lib.JsonConverters;
 using SOS.Lib.Managers;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Interfaces;
@@ -36,7 +35,6 @@ using SOS.Lib.Models.TaxonListService;
 using SOS.Lib.Models.TaxonTree;
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -53,7 +51,6 @@ namespace SOS.Hangfire.JobServer
         private static string _env;
         private static ApiManagementServiceConfiguration _apiManagementServiceConfiguration;
         private static CryptoConfiguration _cryptoConfiguration;
-        private static HangfireDbConfiguration _hangfireDbConfiguration;
         private static HangfireDbConfiguration _localHangfireDbConfiguration;
         private static MongoDbConfiguration _verbatimDbConfiguration;
         private static MongoDbConfiguration _processDbConfiguration;
@@ -67,7 +64,9 @@ namespace SOS.Hangfire.JobServer
         private static SosApiConfiguration _sosApiConfiguration;
         private static UserServiceConfiguration _userServiceConfiguration;
         private static AreaConfiguration _areaConfiguration;
+        private static HangfireDbConfiguration _hangfireDbConfiguration;
         private static bool _useLocalHangfire;
+        private static string? _hangfireDbConnectionString = null;
 
         /// <summary>
         ///     Application entry point
@@ -83,14 +82,21 @@ namespace SOS.Hangfire.JobServer
             Console.WriteLine("Starting up in environment:" + _env);
 
 
-            if (new[] { "local", "dev", "st", "prod", "at" }.Contains(_env, StringComparer.CurrentCultureIgnoreCase))
+            if (new[] { "local", "dev", "st", "prod", "at" }.Contains(_env, StringComparer.InvariantCultureIgnoreCase))
             {
-                var host = CreateHostBuilder(args).Build();
+                var builder = CreateHostBuilder(args);
+
+                var host = builder.Build();
+                host.MapDefaultEndpoints();
                 HangfireJobServerContext.Host = host;
                 LogStartupSettings(host.Services.GetService<ILogger<Program>>());
                 LogManager.Logger = host.Services.GetService<ILogger<LogManager>>();
                 LogManager.LogInformation("LogManager created");
-                await host.RunAsync();
+                host.MapGet("/", () => "Hangfire worker is running.");
+
+                // Start the application
+                string aspnetCoreUrls = Environment.GetEnvironmentVariable("ASPNETCORE_URLS");
+                await host.RunAsync();                
             }
         }
 
@@ -99,165 +105,160 @@ namespace SOS.Hangfire.JobServer
         /// </summary>
         /// <param name="args"></param>
         /// <returns></returns>
-        private static IHostBuilder CreateHostBuilder(string[] args)
+        private static WebApplicationBuilder CreateHostBuilder(string[] args)
         {
-            return Host.CreateDefaultBuilder(args)
-                .ConfigureAppConfiguration((hostingContext, configuration) =>
-                {
-                    configuration.SetBasePath(Directory.GetCurrentDirectory())
-                        .AddJsonFile("appsettings.json", false, true)
-                        .AddJsonFile($"appsettings.{_env}.json", false, true)
-                        .AddEnvironmentVariables();
+            WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+            builder.AddServiceDefaults();
+            
+            string env = args?.Any() ?? false
+                ? args[0].ToLower()
+                : Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")?.ToLower();
 
-                    // If Development mode, add secrets stored on developer machine 
-                    // (%APPDATA%\Microsoft\UserSecrets\92cd2cdb-499c-480d-9f04-feaf7a68f89c\secrets.json)
-                    // In production you should store the secret values as environment variables.
-                    configuration.AddUserSecrets<Program>();
-                })
-                .ConfigureLogging((hostingContext, logging) =>
-                {
-                    logging
-                        .ClearProviders()
-                        .AddConfiguration(hostingContext.Configuration.GetSection("Logging"))
-                        .AddNLog($"NLog.{_env}.config");
+            builder.Configuration
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .AddJsonFile($"appsettings.{env}.json", optional: false, reloadOnChange: true)
+                .AddEnvironmentVariables()
+                .AddUserSecrets<Program>();
 
-                })
-                .ConfigureServices((hostContext, services) =>
-                {
-                    // Use Swedish culture info.
-                    var culture = new CultureInfo("sv-SE");
-                    CultureInfo.DefaultThreadCurrentCulture = culture;
-                    CultureInfo.DefaultThreadCurrentUICulture = culture;
+            builder.Logging.ClearProviders();
+            builder.Logging.AddConfiguration(builder.Configuration.GetSection("Logging"));
+            builder.Logging.AddNLog($"NLog.{env}.config");
 
-                    services.AddMemoryCache();
-                    services.AddSingleton<IClassCache<TaxonTree<IBasicTaxon>>, ClassCache<TaxonTree<IBasicTaxon>>>();
-                    services.AddSingleton<IClassCache<TaxonListSetsById>, ClassCache<TaxonListSetsById>>();
-                    var clusterHealthCache = new ClassCache<ConcurrentDictionary<string, HealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<string, HealthResponse>>>()) { CacheDuration = TimeSpan.FromMinutes(2) };
-                    services.AddSingleton<IClassCache<ConcurrentDictionary<string, HealthResponse>>>(clusterHealthCache);
+            // Use Swedish culture info.
+            var culture = new CultureInfo("sv-SE");
+            CultureInfo.DefaultThreadCurrentCulture = culture;
+            CultureInfo.DefaultThreadCurrentUICulture = culture;
 
-                    _hangfireDbConfiguration = hostContext.Configuration.GetSection("HangfireDbConfiguration").Get<HangfireDbConfiguration>();
-                    _localHangfireDbConfiguration = hostContext.Configuration.GetSection("LocalHangfireDbConfiguration").Get<HangfireDbConfiguration>();
-                    var hangfireConfiguration = _useLocalHangfire ? _localHangfireDbConfiguration : _hangfireDbConfiguration;
+            var services = builder.Services;
 
-                    services.AddHangfire(configuration =>
-                        configuration
-                            .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
-                            .UseSimpleAssemblyNameTypeSerializer()
-                            .UseRecommendedSerializerSettings(m =>
-                            {
-                                m.Converters.Add(new NetTopologySuite.IO.Converters.GeometryConverter());
-                                m.Converters.Add(new StringEnumConverter());
-                            })
-                            .UseMongoStorage(new MongoClient(hangfireConfiguration.GetMongoDbSettings()),
-                                hangfireConfiguration.DatabaseName,
-                                new MongoStorageOptions
-                                {
-                                    CheckConnection = true,
-                                    CheckQueuedJobsStrategy = (hangfireConfiguration?.Hosts?.Length ?? 0) < 2 ? CheckQueuedJobsStrategy.TailNotificationsCollection : CheckQueuedJobsStrategy.Watch,
-                                    CountersAggregateInterval = TimeSpan.FromMinutes(10), // Default 5
-                                    // ConnectionCheckTimeout = TimeSpan.FromSeconds(5),
-                                    //  DistributedLockLifetime = TimeSpan.FromSeconds(30),
-                                    JobExpirationCheckInterval = TimeSpan.FromMinutes(10),
-                                    // MigrationLockTimeout = TimeSpan.FromMinutes(1),
-                                    MigrationOptions = new MongoMigrationOptions
-                                    {
-                                        MigrationStrategy = new MigrateMongoMigrationStrategy(),
-                                        BackupStrategy = new CollectionMongoBackupStrategy()
-                                    },
-                                    Prefix = "hangfire",
-                                    QueuePollInterval = TimeSpan.FromSeconds(10) // Deafult 15
-                                })
-                    );// ;// ;
-                    GlobalJobFilters.Filters.Add(
-                        new HangfireJobExpirationTimeAttribute(hangfireConfiguration.JobExpirationDays));
-                    GlobalJobFilters.Filters.Add(new AutomaticRetryAttribute { Attempts = 0 });
+            services.AddMemoryCache();
+            services.AddSingleton<IClassCache<TaxonTree<IBasicTaxon>>, ClassCache<TaxonTree<IBasicTaxon>>>();
+            services.AddSingleton<IClassCache<TaxonListSetsById>, ClassCache<TaxonListSetsById>>();
+            var clusterHealthCache = new ClassCache<ConcurrentDictionary<string, HealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<string, HealthResponse>>>()) { CacheDuration = TimeSpan.FromMinutes(2) };
+            services.AddSingleton<IClassCache<ConcurrentDictionary<string, HealthResponse>>>(clusterHealthCache);
 
-                    // Add the processing server as IHostedService
-                    services.AddHangfireServer(options =>
+            var configuration = builder.Configuration;
+
+            _hangfireDbConnectionString = builder.Configuration.GetConnectionString("hangfire-mongodb");
+            var hangfireDbConfig = configuration.GetSection("HangfireDbConfiguration").Get<HangfireDbConfiguration>();
+            var _localHangfireDbConfiguration = configuration.GetSection("LocalHangfireDbConfiguration").Get<HangfireDbConfiguration>();
+
+            _hangfireDbConfiguration = _useLocalHangfire
+                ? _localHangfireDbConfiguration
+                : hangfireDbConfig;
+
+            var mongoClientSettings = !string.IsNullOrEmpty(_hangfireDbConnectionString)
+                ? MongoClientSettings.FromConnectionString(_hangfireDbConnectionString)
+                : _hangfireDbConfiguration.GetMongoDbSettings();
+
+            services.AddHangfire(configuration =>
+                configuration
+                    .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+                    .UseSimpleAssemblyNameTypeSerializer()
+                    .UseRecommendedSerializerSettings(m =>
                     {
-                        options.Queues = new[] { "high", "medium", "low", "default" };
-                    });
-
-                    // MongoDB conventions.
-                    ConventionRegistry.Register(
-                        "MongoDB Solution Conventions",
-                        new ConventionPack
+                        m.Converters.Add(new NetTopologySuite.IO.Converters.GeometryConverter());
+                        m.Converters.Add(new StringEnumConverter());
+                    })
+                    .UseMongoStorage(new MongoClient(mongoClientSettings),
+                        _hangfireDbConfiguration.DatabaseName,
+                        new MongoStorageOptions
                         {
+                            CheckConnection = true,
+                            CheckQueuedJobsStrategy = (_hangfireDbConfiguration?.Hosts?.Length ?? 0) < 2 ? CheckQueuedJobsStrategy.TailNotificationsCollection : CheckQueuedJobsStrategy.Watch,
+                            CountersAggregateInterval = TimeSpan.FromMinutes(10), // Default 5
+                                                                                  // ConnectionCheckTimeout = TimeSpan.FromSeconds(5),
+                                                                                  //  DistributedLockLifetime = TimeSpan.FromSeconds(30),
+                            JobExpirationCheckInterval = TimeSpan.FromMinutes(10),
+                            // MigrationLockTimeout = TimeSpan.FromMinutes(1),
+                            MigrationOptions = new MongoMigrationOptions
+                            {
+                                MigrationStrategy = new MigrateMongoMigrationStrategy(),
+                                BackupStrategy = new CollectionMongoBackupStrategy()
+                            },
+                            Prefix = "hangfire",
+                            QueuePollInterval = TimeSpan.FromSeconds(10) // Deafult 15
+                        })
+            );
+            GlobalJobFilters.Filters.Add(
+                new HangfireJobExpirationTimeAttribute(_hangfireDbConfiguration.JobExpirationDays));
+            GlobalJobFilters.Filters.Add(new AutomaticRetryAttribute { Attempts = 0 });
+
+            // Add the processing server as IHostedService
+            services.AddHangfireServer(options =>
+            {
+                options.Queues = new[] { "high", "medium", "low", "default" };
+            });
+
+            // MongoDB conventions.
+            ConventionRegistry.Register(
+                "MongoDB Solution Conventions",
+                new ConventionPack
+                {
                             new IgnoreExtraElementsConvention(true),
                             new IgnoreIfNullConvention(true)
-                        },
-                        t => true);
+                },
+                t => true);
 
-                    // Get configuration
-                    _apiManagementServiceConfiguration = hostContext.Configuration.GetSection("ApiManagementServiceConfiguration").Get<ApiManagementServiceConfiguration>();
-                    _cryptoConfiguration = hostContext.Configuration.GetSection("CryptoConfiguration").Get<CryptoConfiguration>();
-                    _verbatimDbConfiguration = hostContext.Configuration.GetSection("VerbatimDbConfiguration").Get<MongoDbConfiguration>();
-                    _processDbConfiguration = hostContext.Configuration.GetSection("ProcessDbConfiguration").Get<MongoDbConfiguration>();
-                    _searchDbConfiguration = hostContext.Configuration.GetSection("SearchDbConfiguration").Get<ElasticSearchConfiguration>();
-                    _importConfiguration = hostContext.Configuration.GetSection(nameof(ImportConfiguration))
-                        .Get<ImportConfiguration>();
-                    _processConfiguration = hostContext.Configuration.GetSection(nameof(ProcessConfiguration))
-                        .Get<ProcessConfiguration>();
-                    _exportConfiguration = hostContext.Configuration.GetSection(nameof(ExportConfiguration))
-                        .Get<ExportConfiguration>();
-                    _blobStorageConfiguration = hostContext.Configuration.GetSection(nameof(BlobStorageConfiguration))
-                        .Get<BlobStorageConfiguration>();
-                    _dataCiteServiceConfiguration = hostContext.Configuration.GetSection(nameof(DataCiteServiceConfiguration))
-                        .Get<DataCiteServiceConfiguration>();
-                    _applicationInsightsConfiguration = hostContext.Configuration.GetSection(nameof(ApplicationInsightsConfiguration))
-                        .Get<ApplicationInsightsConfiguration>();
-                    _sosApiConfiguration = hostContext.Configuration.GetSection(nameof(SosApiConfiguration))
-                        .Get<SosApiConfiguration>();
-                    _userServiceConfiguration = hostContext.Configuration.GetSection(nameof(UserServiceConfiguration))
-                        .Get<UserServiceConfiguration>();
-                    _areaConfiguration = hostContext.Configuration.GetSection(nameof(AreaConfiguration))
-                        .Get<AreaConfiguration>();
+            // Get configuration
+            _apiManagementServiceConfiguration = configuration.GetSection("ApiManagementServiceConfiguration").Get<ApiManagementServiceConfiguration>();
+            _cryptoConfiguration = configuration.GetSection("CryptoConfiguration").Get<CryptoConfiguration>();
+            _verbatimDbConfiguration = configuration.GetSection("VerbatimDbConfiguration").Get<MongoDbConfiguration>();
+            _processDbConfiguration = configuration.GetSection("ProcessDbConfiguration").Get<MongoDbConfiguration>();
+            _searchDbConfiguration = configuration.GetSection("SearchDbConfiguration").Get<ElasticSearchConfiguration>();
+            _importConfiguration = configuration.GetSection(nameof(ImportConfiguration)).Get<ImportConfiguration>();
+            _processConfiguration = configuration.GetSection(nameof(ProcessConfiguration)).Get<ProcessConfiguration>();
+            _exportConfiguration = configuration.GetSection(nameof(ExportConfiguration)).Get<ExportConfiguration>();
+            _blobStorageConfiguration = configuration.GetSection(nameof(BlobStorageConfiguration)).Get<BlobStorageConfiguration>();
+            _dataCiteServiceConfiguration = configuration.GetSection(nameof(DataCiteServiceConfiguration)).Get<DataCiteServiceConfiguration>();
+            _applicationInsightsConfiguration = configuration.GetSection(nameof(ApplicationInsightsConfiguration)).Get<ApplicationInsightsConfiguration>();
+            _sosApiConfiguration = configuration.GetSection(nameof(SosApiConfiguration)).Get<SosApiConfiguration>();
+            _userServiceConfiguration = configuration.GetSection(nameof(UserServiceConfiguration)).Get<UserServiceConfiguration>();
+            _areaConfiguration = configuration.GetSection(nameof(AreaConfiguration)).Get<AreaConfiguration>();
 
-                    services.AddSingleton(_searchDbConfiguration);
-                    services.AddSingleton<IElasticClientManager, ElasticClientManager>(p => new ElasticClientManager(_searchDbConfiguration));
+            services.AddSingleton(_searchDbConfiguration);
+            services.AddSingleton<IElasticClientManager, ElasticClientManager>(p => new ElasticClientManager(_searchDbConfiguration));
 
-                    var jobServerConfiguration = hostContext.Configuration.GetSection("JobServerConfiguration").Get<JobServerConfiguration>();
-                    if (jobServerConfiguration.EnableBusHarvest)
+            var jobServerConfiguration = configuration.GetSection("JobServerConfiguration").Get<JobServerConfiguration>();
+            if (jobServerConfiguration.EnableBusHarvest)
+            {
+                services.AddMassTransit(cfg =>
+                {
+                    cfg.AddConsumer<ArtportalenConsumer>();
+                    cfg.UsingAzureServiceBus((context, cfg) =>
                     {
-                        services.AddMassTransit(cfg =>
+                        var busConfiguration = configuration.GetSection("BusConfiguration").Get<BusConfiguration>();
+                        cfg.Host($"Endpoint={busConfiguration.Host};SharedAccessKeyName={busConfiguration.SharedAccessKeyName};SharedAccessKey={busConfiguration.SharedAccessKey}");
+                        cfg.ReceiveEndpoint(busConfiguration.Queue, e =>
                         {
-                            cfg.AddConsumer<ArtportalenConsumer>();
-                            cfg.UsingAzureServiceBus((context, cfg) =>
-                            {
-                                var busConfiguration = hostContext.Configuration.GetSection("BusConfiguration").Get<BusConfiguration>();
-                                cfg.Host($"Endpoint={busConfiguration.Host};SharedAccessKeyName={busConfiguration.SharedAccessKeyName};SharedAccessKey={busConfiguration.SharedAccessKey}");
-                                cfg.ReceiveEndpoint(busConfiguration.Queue, e =>
-                                {
-                                    e.MaxConcurrentCalls = 1;
-                                    e.ConfigureConsumer<ArtportalenConsumer>(context);
-                                });
-                            });
+                            e.MaxConcurrentCalls = 1;
+                            e.ConfigureConsumer<ArtportalenConsumer>(context);
                         });
-                    }
-                })
-                .UseServiceProviderFactory(hostContext =>
-                    {
-                        return new AutofacServiceProviderFactory(builder =>
-                            builder
-                                .RegisterModule(new HarvestModule { Configurations = (_importConfiguration, _apiManagementServiceConfiguration, _verbatimDbConfiguration, _processConfiguration, _processDbConfiguration, _applicationInsightsConfiguration, _sosApiConfiguration, _userServiceConfiguration, _areaConfiguration) })
-                                .RegisterModule(new ExportModule { Configurations = (_exportConfiguration, _processDbConfiguration, _blobStorageConfiguration, _cryptoConfiguration, _dataCiteServiceConfiguration, _userServiceConfiguration, _areaConfiguration) })
-                        );
-                    }
-                )
-                .UseNLog();
+                    });
+                });
+            }
+
+            builder.Host.UseServiceProviderFactory(hostContext => new AutofacServiceProviderFactory(builder =>
+                builder
+                    .RegisterModule(new HarvestModule { Configurations = (_importConfiguration, _apiManagementServiceConfiguration, _verbatimDbConfiguration, _processConfiguration, _processDbConfiguration, _applicationInsightsConfiguration, _sosApiConfiguration, _userServiceConfiguration, _areaConfiguration) })
+                    .RegisterModule(new ExportModule { Configurations = (_exportConfiguration, _processDbConfiguration, _blobStorageConfiguration, _cryptoConfiguration, _dataCiteServiceConfiguration, _userServiceConfiguration, _areaConfiguration) })
+            ));
+
+            builder.Host.UseNLog();
+            return builder;
         }
 
         private static void LogStartupSettings(ILogger<Program> logger)
         {
-            var hangfireConfiguration = _useLocalHangfire ? _localHangfireDbConfiguration : _hangfireDbConfiguration;
             var sb = new StringBuilder();
             sb.AppendLine("Hangfire JobServer Started with the following settings:");
 
             sb.AppendLine("Hangfire settings:");
             sb.AppendLine("================");
             sb.AppendLine(
-                $"[MongoDb].[Servers]: {string.Join(", ", hangfireConfiguration.Hosts.Select(x => x.Name))}");
-            sb.AppendLine($"[MongoDb].[DatabaseName]: {hangfireConfiguration.DatabaseName}");
+                $"[MongoDb].[Servers]: {string.Join(", ", _hangfireDbConfiguration.Hosts.Select(x => x.Name))}");
+            sb.AppendLine($"[MongoDb].[DatabaseName]: {_hangfireDbConfiguration.DatabaseName}");
             sb.AppendLine("");
 
             sb.AppendLine("Import settings:");
