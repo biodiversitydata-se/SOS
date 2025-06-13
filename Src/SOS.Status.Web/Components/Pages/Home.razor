@@ -1,0 +1,156 @@
+﻿@page "/"
+
+<PageTitle>Home</PageTitle>
+
+
+@* <MudDataGrid Items="@Elements.Take(4)" Hover="@_hover" Dense="@_dense" Striped="@_striped" Bordered="@_bordered"
+             RowStyleFunc="@_rowStyleFunc">
+    <Columns>
+        <PropertyColumn Property="x => x.Number" Title="Nr" />
+        <PropertyColumn Property="x => x.Sign" />
+        <PropertyColumn Property="x => x.Name" CellStyleFunc="@_cellStyleFunc" />
+        <PropertyColumn Property="x => x.Position" />
+        <PropertyColumn Property="x => x.Molar" Title="Molar mass" />
+    </Columns>
+</MudDataGrid> *@
+
+@* <MudPaper MaxWidth="1200px" Elevation="0" >
+    <MudContainer MaxWidth="MaxWidth.Small"> *@
+    <MudDataGrid Items="@dataSources" T="DataSourceModel" Hover="true" Bordered="false" Striped="true" Dense="true" ColumnResizeMode="ResizeMode.Column">
+    <Columns>
+        <PropertyColumn Property="x => x.Name" Title="Datasource" StickyLeft="true" />
+        <PropertyColumn Property="x => x.PublicActive" Title="Public Active" />
+            <PropertyColumn Property="x => x.PublicInactive" Title="Public Inactive" />
+        <PropertyColumn Property="x => x.PublicDiff" Title="Diff" CellStyleFunc="@_cellStyleFunc" />
+        <PropertyColumn Property="x => x.ProtectedActive" Title="Protected Active" />
+        <PropertyColumn Property="x => x.ProtectedInactive" Title="Protected Inactive" />
+        <PropertyColumn Property="x => x.ProtectedDiff" Title="Diff" CellStyleFunc="@_cellStyleFunc" />
+        <PropertyColumn Property="x => x.InvalidActive" Title="Invalid Active" />
+        <PropertyColumn Property="x => x.InvalidInactive" Title="Invalid Inactive" />
+        <PropertyColumn Property="x => x.InvalidDiff" Title="Diff" CellStyleFunc="@_cellStyleFunc" />
+    </Columns>
+</MudDataGrid>
+    @* </MudContainer>
+</MudPaper> *@
+
+<MudTable Items="@dataSources" Hover="true" Bordered="true" Striped="true" Dense="true">
+    <HeaderContent>
+        <MudTh>Datasource</MudTh>
+        <MudTh>Public Active</MudTh>
+        <MudTh>Public Inactive</MudTh>
+        <MudTh>Diff</MudTh>
+        <MudTh>Protected Active</MudTh>
+        <MudTh>Protected Inactive</MudTh>
+        <MudTh>Diff</MudTh>
+        <MudTh>Invalid Active</MudTh>
+        <MudTh>Invalid Inactive</MudTh>
+        <MudTh>Diff</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd>@context.Name</MudTd>
+        <MudTd>@context.PublicActive</MudTd>
+        <MudTd>@context.PublicInactive</MudTd>
+        <MudTd Style="@GetDiffStyle(context.PublicDiff)">@context.PublicDiff</MudTd>
+        <MudTd>@context.ProtectedActive</MudTd>
+        <MudTd>@context.ProtectedInactive</MudTd>
+        <MudTd Style="@GetDiffStyle(context.ProtectedDiff)">@context.ProtectedDiff</MudTd>
+        <MudTd>@context.InvalidActive</MudTd>
+        <MudTd>@context.InvalidInactive</MudTd>
+        <MudTd Style="@GetDiffStyle(context.InvalidDiff)">@context.InvalidDiff</MudTd>
+    </RowTemplate>
+</MudTable>
+
+
+@code {
+    public class DataSourceModel
+    {
+        public string Name { get; set; }
+        public long PublicActive { get; set; }
+        public long PublicInactive { get; set; }
+        public int PublicDiff { get; set; }
+        public long ProtectedActive { get; set; }
+        public long ProtectedInactive { get; set; }
+        public int ProtectedDiff { get; set; }
+        public long InvalidActive { get; set; }
+        public long InvalidInactive { get; set; }
+        public int InvalidDiff { get; set; }
+    }
+
+    private List<DataSourceModel> dataSources = new()
+    {
+        new DataSourceModel
+        {
+            Name = "Artportalen",
+            PublicActive = 112_804_914,
+            PublicInactive = 112_771_759,
+            PublicDiff = 33155,
+            ProtectedActive = 747677,
+            ProtectedInactive = 747705,
+            ProtectedDiff = -28,
+            InvalidActive = 69,
+            InvalidInactive = 69,
+            InvalidDiff = 0
+        },
+        new DataSourceModel
+        {
+            Name = "KUL",
+            PublicActive = 326_529,
+            PublicInactive = 326_529,
+            PublicDiff = 0,
+            ProtectedActive = 0,
+            ProtectedInactive = 0,
+            ProtectedDiff = 0,
+            InvalidActive = 16614,
+            InvalidInactive = 16614,
+            InvalidDiff = 0
+        },
+        // Lägg till fler enligt behov
+    };
+
+    private string GetDiffStyle(int value)
+    {
+        if (value > 0)
+            return "color: white; background-color: #4caf50; font-weight: bold;"; // grönt
+        if (value < 0)
+            return "color: black; background-color: #ffeb3b; font-weight: bold;"; // gult
+        return "color: white; background-color: #4caf50;"; // grönt (neutral 0)
+    }
+
+    private Func<DataSourceModel, string> _cellStyleFunc => x =>
+    {
+        string style = "";
+
+        if (x.PublicDiff >= 0)
+            return "background-color:#8CED8C";
+        else if (x.PublicDiff < 0)
+            return "background-color:red";
+
+        // style += "background-color:#8CED8C";
+
+        // else if (x.Number == 2)
+        //     style += "background-color:#E5BDE5";
+
+        // else if (x.Number == 3)
+        //     style += "background-color:#EACE5D";
+
+        // else if (x.Number == 4)
+        //     style += "background-color:#F1F165";
+
+        // if (x.Molar > 5)
+        //     style += ";font-weight:bold";
+
+        return style;
+    };
+
+    private string DiffColor(DataSourceModel model, int value)
+    {
+        if (value is int diff)
+        {
+            if (diff > 0)
+                return "bg-green lighten-4";
+            else if (diff < 0)
+                return "bg-yellow lighten-4";
+        }
+        return string.Empty;
+    }
+}

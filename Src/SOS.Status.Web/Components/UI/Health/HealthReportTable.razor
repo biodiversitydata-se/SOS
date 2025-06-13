@@ -1,0 +1,31 @@
+<MudText Typo="Typo.h6" Class="pt-4">@Title</MudText>
+<MudTable Items="@HealthReport?.Entries" T="KeyValuePair<string, HealthReportEntryDto>" Hover="true" Bordered="false" Striped="true" Dense="true">    
+    <HeaderContent>
+        <MudTh>Status</MudTh>
+        <MudTh>Name</MudTh>
+        <MudTh>Description</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd><MudIcon Icon="@Icons.Material.Filled.Circle" Style="@GetHealthStatusCircleStyle(context.Value.Status)" /></MudTd>
+        <MudTd>@context.Key</MudTd>
+        <MudTd>@context.Value.Description</MudTd>
+    </RowTemplate>
+</MudTable>
+
+@code {
+    [Parameter]
+    public HealthReportDto? HealthReport { get; set; }  
+
+    [Parameter]
+    public string? Title { get; set; }
+
+    private string GetHealthStatusCircleStyle(string status)
+    {
+        if (status.Equals("healthy", StringComparison.InvariantCultureIgnoreCase))
+            return "color:green; font-size:18px;";
+        else if (status.Equals("degraded", StringComparison.InvariantCultureIgnoreCase))
+            return "color:orange; font-size:18px;";
+        else
+            return "color:red; font-size:18px;";
+    }
+}

@@ -1,0 +1,21 @@
+﻿@if (Show)
+{
+    <p>@Header</p>
+    <MudAlert Severity="Severity.Warning" @attributes="@AlertAttributes">
+        @ChildContent
+    </MudAlert>
+}
+
+@code {
+    [Parameter]
+    public bool Show { get; set; }
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; } = @<b>This is a default value</b>;
+
+    [Parameter]
+    public RenderFragment Header { get; set; } = default!;
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AlertAttributes { get; set; }
+}

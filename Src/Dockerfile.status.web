@@ -1,0 +1,32 @@
+FROM reg.app.slu.se/mcr/dotnet/sdk:9.0 AS build-env
+WORKDIR /app
+
+# copy csproj and restore as distinct layers
+COPY . .
+RUN dotnet restore SOS.Status.Web/SOS.Status.Web.csproj
+
+# copy everything else and build
+COPY  . .
+RUN dotnet publish SOS.Status.Web/SOS.Status.Web.csproj -c Release -o out
+
+#build runtime image
+FROM reg.app.slu.se/mcr/dotnet/aspnet:9.0-alpine
+
+# Install necessary libraries, configure timezone, and create a non-root user in one layer
+RUN apk add --no-cache icu-libs icu-data-full tzdata && \
+    # Set the timezone
+    cp /usr/share/zoneinfo/Europe/Stockholm /etc/localtime && \
+    # Create a non-root user with UID 1000 and set permissions
+    adduser -u 1000 --disabled-password --home /apirunner --gecos '' apirunner && \
+    chown -R apirunner /apirunner
+
+# Set environment variables
+ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
+ENV TZ=Europe/Stockholm
+
+USER apirunner
+
+WORKDIR /app
+COPY --from=build-env /app/out ./
+
+ENTRYPOINT ["dotnet", "SOS.Status.Web.dll"]

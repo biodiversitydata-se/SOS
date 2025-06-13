@@ -1,0 +1,36 @@
+<MudText Typo="Typo.h6" Class="pt-4">@Title</MudText>
+<MudDataGrid Items="@HealthReport?.Entries" T="KeyValuePair<string, HealthReportEntryDto>" Hover="true" Bordered="false" Striped="true" Dense="true" ColumnResizeMode="ResizeMode.Column">
+    <Columns>
+        <TemplateColumn>
+            <HeaderTemplate>
+                Status
+            </HeaderTemplate>
+            <CellTemplate>
+                <MudStack Row>
+                    <MudIcon Icon="@Icons.Material.Filled.Circle" Style="@GetHealthStatusCircleStyle(context.Item.Value.Status)" />
+                </MudStack>
+            </CellTemplate>
+        </TemplateColumn>
+        <PropertyColumn Property="x => x.Key" Title="Name" Sortable="false" />
+        <PropertyColumn Property="x => x.Value.Description" Title="Description" Sortable="false" />
+    </Columns>    
+</MudDataGrid>
+
+
+@code {
+    [Parameter]
+    public HealthReportDto? HealthReport { get; set; }
+   
+    [Parameter]
+    public string? Title { get; set; }
+
+    private string GetHealthStatusCircleStyle(string status)
+    {
+        if (status.Equals("healthy", StringComparison.InvariantCultureIgnoreCase))
+            return "color:green; font-size:18px;";
+        else if (status.Equals("degraded", StringComparison.InvariantCultureIgnoreCase))
+            return "color:orange; font-size:18px;";
+        else
+            return "color:red; font-size:18px;";
+    }
+}

@@ -1,0 +1,90 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: web
+  name: web
+spec:
+  ports:
+    - port: 5006
+      targetPort: 5006
+  type: LoadBalancer
+  selector:
+    app: web
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: web
+  name: web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: web
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      containers:
+        - name: web
+          image: web  # <-- byt till rätt image-tag
+          ports:
+            - containerPort: 5006
+          env:
+            - name: ASPNETCORE_ENVIRONMENT
+              value: dev
+            - name: UserServiceConfiguration
+              value: '{"BaseAddress": "https://artdatauser-st.artdata.slu.se/api", "AcceptHeaderContentType": "application/json", "UserAdmin2ApiBaseAddress": "https://useradmin2-api-st.wt.artdata.slu.se", "ClientId": "SOS.Administration.Gui", "ClientSecret": "SECRET_PLACEHOLDER", "Scope": "SOS.Observations.Protected openid profile email roles", "TokenUrl": "https://useradmin2-auth-st.wt.artdata.slu.se/connect/token", "TokenExpirationBufferInSeconds": 300, "IdentityProvider": {"Authority": "https://useradmin2-auth-st.wt.artdata.slu.se", "Audience": "https://sos-search-st.wt.artdata.slu.se", "RequireHttpsMetadata": false}}'                    
+            - name: ProcessDbConfiguration
+              value: '{"UserName": "SECRET_PLACEHOLDER", "Password": "SECRET_PLACEHOLDER", "Hosts": [{"Name": "artmongo-t-1.artdata.slu.se","Port": 27017}], "ReplicaSetName": null, "DatabaseName": "sos-dev", "UseTls": false, "AuthenticationDb": "admin", "ReadBatchSize": 10000, "WriteBatchSize": 10000}'                
+            - name: ProcessDbUserName
+              valueFrom:
+                secretKeyRef:
+                  name: process-db-username
+                  key: UserName
+            - name: ProcessDbPassword
+              valueFrom:
+                secretKeyRef:
+                  name: process-db-password
+                  key: Password
+            - name: SearchDbConfiguration
+              value: '{"UserName": "SECRET_PLACEHOLDER", "Password": "SECRET_PLACEHOLDER", "Clusters": [{"Hosts": ["https://artsearch2-1-test.artdata.slu.se:9200"]}],"DebugMode": true,"IndexPrefix": "sos-dev","IndexSettings": [{"Name": "observation","NumberOfReplicas": 0,"NumberOfShards": 1,"NumberOfShardsProtected": 1,"ReadBatchSize": 10000,"WriteBatchSize": 1000,"RequestTimeout": 300,"ScrollBatchSize": 5000,"ScrollTimeout": "300s"}, {"Name": "dataset", "NumberOfReplicas": 0,"NumberOfShards": 1, "ReadBatchSize": 10000, "WriteBatchSize": 1000, "RequestTimeout": 300, "ScrollBatchSize": 5000, "ScrollTimeout": "300s"}, {"Name": "event", "NumberOfReplicas": 0, "NumberOfShards": 1, "ReadBatchSize": 10000, "WriteBatchSize": 1000, "RequestTimeout": 300, "ScrollBatchSize": 5000, "ScrollTimeout": "300s"}]}'                
+            - name: SearchDbUserName
+              valueFrom:
+                secretKeyRef:
+                  name: search-db-username
+                  key: UserName
+            - name: SearchDbPassword
+              valueFrom:
+                secretKeyRef:
+                  name:  search-db-password
+                  key: Password
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 5006
+              httpHeaders:
+              - name: Host
+                value: KubernetesReadinessProbe
+            successThreshold: 1
+            failureThreshold: 3
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 5006
+            failureThreshold: 3
+            periodSeconds: 10
+          startupProbe:
+            httpGet:
+              path: /healthz
+              port: 5006
+            failureThreshold: 5
+            periodSeconds: 10
+          resources: {}
+      restartPolicy: Always

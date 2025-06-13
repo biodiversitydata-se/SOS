@@ -1,0 +1,91 @@
+﻿@page "/test"
+@page "/test/{id:int}"
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@using SOS.Status.Web.Extensions
+@inject IJSRuntime JsRuntime
+@inject AppState State
+@inject ProtectedLocalStorage protectedLocalStorage
+@inject ILogger<TestPage> Logger
+
+<PageTitle>Test page</PageTitle>
+
+<MudTabs Outlined="true" Elevation="1" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-6">
+    <MudTabPanel Text="Komponenter">
+        <MudTabs Outlined="true" Elevation="0" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-3">
+            <MudTabPanel Text="Komponent i C#">
+                <MyComponent Message="En komponent byggd enbart med C# utan .razor-fil." />
+            </MudTabPanel>
+            <MudTabPanel Text="Templated component">
+                <ListView TItem="LocationItem" Items="points" Context="point">
+                    <ItemTemplate>
+                        @point.Id. @point.Name (@point.Longitude,@point.Latitude)
+                    </ItemTemplate>
+                </ListView>
+            </MudTabPanel>
+            <MudTabPanel Text="RenderFragment">
+                <DismissableAlert Show="@showDismissableAlert" @ref="dismissableAlert" class="caption1" id="myDismissableAlertId">
+                    <Header>
+                        Headertext
+                    </Header>
+                    <ChildContent>
+                        <p>Detta är en varning</p>
+                    </ChildContent>
+                </DismissableAlert>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" @onclick="ToggleDismissableAlert">Toggle alert</MudButton>
+            </MudTabPanel>            
+        </MudTabs>
+    </MudTabPanel>
+    <MudTabPanel Text="Databindning & Parametrar">
+        <MudTabs Outlined="true" Elevation="0" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-3">
+            <MudTabPanel Text="Routing parameter">
+                <MudText Typo="Typo.body1" Class="pt-4">Detta Id-värde kommer från query parameter: @Id</MudText>                
+            </MudTabPanel>
+            <MudTabPanel Text="Databindning">
+                <input type="text" @bind="@myString" @bind:event="oninput" @ref="inputElement" />
+                <p>My string: @myString</p>
+            </MudTabPanel>
+            <MudTabPanel Text="Cascading value">
+                <CascadingValue Value="@Style">
+                    <ChildComponent>
+                    </ChildComponent>
+                </CascadingValue>
+            </MudTabPanel>
+        </MudTabs>
+    </MudTabPanel>
+    <MudTabPanel Text="Events">        
+        <MudTabs Outlined="true" Elevation="0" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-2">
+            <MudTabPanel Text="Event StopPropagation">
+                <div @onmousemove="OuterMouseMove">
+                    <p style="height:50px;background-color:antiquewhite;">OuterMouseMove: @outerPos</p>
+                    <div @onmousemove="InnerMouseMove" @onmousemove:stopPropagation="true">
+                        <p style="height:50px;background-color:lightcyan;">InnerMouseMove: @innerPos</p>
+                    </div>
+                </div>
+            </MudTabPanel>
+            <MudTabPanel Text="EventCallback">
+                <p>Increment: @increment</p>
+                Input: <input type="number" @bind="@increment" />
+                <CustomInput @bind-CounterValue="@increment" />
+            </MudTabPanel>
+            <MudTabPanel Text="Debounce">
+                <MudTextField @bind-Value="searchText"
+                              Label="Sök"
+                              DebounceInterval="500"
+                              Immediate="false" />
+                <p style="margin-top:6px;">Du skrev: @searchText</p>
+            </MudTabPanel>
+        </MudTabs>
+    </MudTabPanel>
+    <MudTabPanel Text="State">
+        <MudText Typo="Typo.body1" Class="pt-4">Välkommen @State.Username!</MudText>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" @onclick="@(() => ChangeNameAsync("Sara"))">Byt namn 1</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" @onclick="@(e => ChangeNameAsync("Martin"))"> Byt namn 2</MudButton>        
+        <div>
+            <MudText Typo="Typo.h6" Class="pt-4">State as JSON for debugging purpose</MudText>            
+            <pre>@(State?.ToJson() ?? "State is null")</pre>
+        </div>
+    </MudTabPanel>    
+    <MudTabPanel Text="JavaScript">
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" @onclick="TestJavaScriptAsync">Testa JavaScript</MudButton>        
+    </MudTabPanel>           
+</MudTabs>

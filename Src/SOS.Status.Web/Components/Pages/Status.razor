@@ -1,0 +1,30 @@
+﻿@page "/status"
+@inject StatusInfoManager statusInfoManager;
+
+<PageTitle>Status info</PageTitle>
+<MudText Typo="Typo.h4">Status info</MudText>
+<ProcessStatusSummary ProcessSummary="@processSummary" />
+<MudDivider Class="my-2" />
+<DataProviderGridVerbose ProcessSummary="@processSummary" Sortable="true" />
+
+@if (processSummary != null)
+{
+    @* <DataProviderStatus ProcessStatus="@processSummary.ActiveProcessStatus" DataProviderStatuses="@processSummary.DataProviderStatuses" /> *@
+}
+
+@code {
+    private ProcessSummaryDto? processSummary;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            processSummary = await statusInfoManager.GetProcessSummaryAsync();
+        }
+        catch (Exception ex)
+        {
+            // In a production environment, you would want to handle this error appropriately
+            Console.WriteLine($"Error fetching process information: {ex.Message}");
+        }
+    }
+}

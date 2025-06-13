@@ -1,0 +1,80 @@
+﻿@page "/statuswithoutinactive"
+@inject StatusInfoManager statusInfoManager;
+
+<PageTitle>Status info</PageTitle>
+<MudText Typo="Typo.h4">Status info</MudText>
+@if (processSummary is null)
+{
+    <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+}
+else
+{
+    <ProcessStatusSummary ProcessSummary="@processSummary" />
+    <MudDivider Class="my-2" />
+    <MudTabs Outlined="true">
+        <MudTabPanel Text="Datasets" Icon="@Icons.Material.Filled.Storage">
+            <DataProviderGrid ProcessSummary="@processSummary" />        
+        </MudTabPanel>
+        <MudTabPanel Text="Indices" Icon="@Icons.Material.Outlined.Dataset"> @* ViewList *@
+            <MudTabs Outlined="true">
+                <MudTabPanel Text="@($"{processSummary.ActiveProcessStatus.Name} (Active)")">
+                    <DataProviderIndexStatus ProcessStatus="@processSummary.ActiveProcessStatus" DataProviderStatuses="@processSummary.DataProviderStatuses" ActiveInstance="true" />
+                </MudTabPanel>
+                <MudTabPanel Text="@processSummary.InactiveProcessStatus.Name">
+                    <DataProviderIndexStatus ProcessStatus="@processSummary.InactiveProcessStatus" DataProviderStatuses="@processSummary.DataProviderStatuses" ActiveInstance="false" />
+                </MudTabPanel>
+            </MudTabs>
+        </MudTabPanel>
+        <MudTabPanel Text="Tests" Icon="@Icons.Material.Outlined.Science" BadgeDot="true" BadgeColor="@testsTabBadgeColor">
+            <HealthReportsSummary 
+                ObservationApiHealthReport="@observationsApiHealthReport" 
+                AnalysisApiHealthReport="@analysisApiHealthReport" 
+                ElasticsearchProxyHealthReport="@elasticsearchProxyHealthReport"
+                DataStewardshipApiHealthReport="@dataStewardshipApiHealthReport" />
+        </MudTabPanel>
+        <MudTabPanel Text="Markdown" Icon="@Icons.Material.Outlined.Science">
+            <MudMarkdown Value="@Value" />
+        </MudTabPanel>        
+    </MudTabs>
+}
+
+@code {
+    private ProcessSummaryDto? processSummary;
+    private HealthReportDto? observationsApiHealthReport;
+    private HealthReportDto? analysisApiHealthReport;
+    private HealthReportDto? elasticsearchProxyHealthReport;
+    private HealthReportDto? dataStewardshipApiHealthReport;
+    private Color testsTabBadgeColor;
+    private string Value { get; } = "text *italics* and **bold**\r\n# Heading1\r\nText\r\n### Heading3\r\n- Test";
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {           
+            var processSummaryTask = statusInfoManager.GetProcessSummaryAsync();
+            var observationsTask = statusInfoManager.GetObservationsApiHealthAsync();
+            var analysisTask = statusInfoManager.GetAnalysisApiHealthAsync();
+            var elasticsearchTask = statusInfoManager.GetElasticsearchProxyHealthAsync();
+            var dataStewardshipTask = statusInfoManager.GetDataStewardshipApiHealthAsync();
+
+            await Task.WhenAll(processSummaryTask, observationsTask, analysisTask, elasticsearchTask, dataStewardshipTask);
+
+            processSummary = await processSummaryTask;
+            observationsApiHealthReport = await observationsTask;
+            analysisApiHealthReport = await analysisTask;
+            elasticsearchProxyHealthReport = await elasticsearchTask;
+            dataStewardshipApiHealthReport = await dataStewardshipTask;
+
+            testsTabBadgeColor = ColorHelper.GetHealthColor(
+                observationsApiHealthReport?.Status,
+                analysisApiHealthReport?.Status,
+                elasticsearchProxyHealthReport?.Status,
+                dataStewardshipApiHealthReport?.Status);
+        }
+        catch (Exception ex)
+        {
+            // In a production environment, you would want to handle this error appropriately
+            Console.WriteLine($"Error fetching process information: {ex.Message}");
+        }
+    }
+}

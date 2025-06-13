@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
@@ -19,30 +20,9 @@ namespace SOS.Administration.Gui
     {
         private bool _isDevelopment;
 
-        /// <summary>
-        ///     Start up
-        /// </summary>
-        /// <param name="env"></param>
-        public Startup(IWebHostEnvironment env)
+        public Startup(bool isDevelopment)
         {
-            var environment = env.EnvironmentName.ToLower();
-
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(env.ContentRootPath)
-                .AddJsonFile("appsettings.json", true, true)
-                .AddJsonFile($"appsettings.{environment}.json", true)
-                .AddEnvironmentVariables();
-            _isDevelopment = environment.Equals("local");
-            if (_isDevelopment)
-            {
-                // If Development mode, add secrets stored on developer machine 
-                // (%APPDATA%\Microsoft\UserSecrets\92cd2cdb-499c-480d-9f04-feaf7a68f89c\secrets.json)
-                // In production you should store the secret values as environment variables.
-                builder.AddUserSecrets<Startup>();
-            }
-
-            Configuration = builder.Build();
-            Settings.Init(Configuration); // or fail early!
+            _isDevelopment = isDevelopment;
         }
 
         public IConfiguration Configuration { get; }
@@ -55,7 +35,8 @@ namespace SOS.Administration.Gui
             CultureInfo.DefaultThreadCurrentCulture = culture;
             CultureInfo.DefaultThreadCurrentUICulture = culture;
 
-            services.AddHealthChecks().AddCheck<HealthCheck>("CustomHealthCheck");
+            services.AddHealthChecks()
+                .AddCheck<HealthCheck>("CustomHealthCheck", tags: ["k8s"]);            
 
             // Add CORS
             services.AddCors(o => o.AddPolicy("allowedOriginsPolicy", services =>
@@ -63,7 +44,8 @@ namespace SOS.Administration.Gui
                 services.WithOrigins(Settings.AllowedOrigins)
                     .AllowAnyMethod()
                     .AllowAnyHeader();
-            }));
+
+            }));            
             services.AddControllersWithViews();
 
             services.AddMvcCore().AddJsonOptions(options =>
@@ -127,7 +109,7 @@ namespace SOS.Administration.Gui
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(WebApplication app, IWebHostEnvironment env)
         {
             if (_isDevelopment)
             {
@@ -145,17 +127,17 @@ namespace SOS.Administration.Gui
             app.UseAuthorization();
 
             // Placeholder healthcheck for k8s deployment
-            app.UseHealthChecks("/healthz");
+            app.MapHealthChecks("/healthz", new HealthCheckOptions()
+            {
+                Predicate = r => r.Tags.Contains("k8s")
+            });            
 
             // Use CORS
             app.UseCors("allowedOriginsPolicy");
-
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllerRoute(
-                    name: "default",
-                    pattern: "{controller}/{action=Index}/{id?}");
-            });
+            
+            app.MapControllerRoute(
+                name: "default",
+                pattern: "{controller}/{action=Index}/{id?}");
         }
     }
 }

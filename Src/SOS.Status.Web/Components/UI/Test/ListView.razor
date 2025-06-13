@@ -1,0 +1,20 @@
+﻿@typeparam TItem
+
+<ErrorBoundary>
+<ul style="margin-left: 10px;">
+    @foreach (var item in Items)
+    {
+        <li>
+            @ItemTemplate(item)
+        </li>
+    }    
+</ul>
+</ErrorBoundary>
+
+@code {
+    [Parameter, EditorRequired]
+    public required RenderFragment<TItem> ItemTemplate { get; set; }
+
+    [Parameter, EditorRequired]
+    public required IReadOnlyList<TItem> Items { get; set; }
+}

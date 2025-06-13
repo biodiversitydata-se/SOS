@@ -1,0 +1,133 @@
+﻿@page "/taxafilter"
+@inject AppSettingsState Settings
+<PageTitle>Taxa filter</PageTitle>
+
+@* <MudPaper Class="p-4"> *@
+    <MudGrid Class="p-4">
+        <!-- Vänster kolumn -->
+        <MudItem xs="12" md="6">
+            <MudText Typo="Typo.h6">Sök efter taxa</MudText>
+
+            <MudAutocomplete T="Taxon"                
+                             @ref="MAC"
+                             Label="Taxa"                             
+                             ValueChanged="@OnTaxonSelected"
+                             SearchFunc="@SearchTaxa"                             
+                             ToStringFunc="@(t => t?.Namn)"                             
+                             MinCharacters="2"
+                             Clearable="true"
+                             Dense="true"
+                             ResetValueOnEmptyText="true"                             
+                             Placeholder="Skriv minst 2 tecken"                             
+                             />
+        </MudItem>
+
+        @* Value="value1"
+            OnBlur="AddSelectedTaxon" 
+        Text="@searchText"
+        TextChanged="@OnSearchTextChanged" *@
+        <!-- Höger kolumn -->
+        <MudItem xs="12" md="6">
+            <MudText Typo="Typo.h6">Valda taxon</MudText>
+
+            <MudTable Items="selectedTaxa" Dense="true">
+                <HeaderContent>
+                    <MudTh>Id</MudTh>
+                    <MudTh>Namn</MudTh>
+                    <MudTh></MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd>@context.Id</MudTd>
+                    <MudTd>@context.Namn</MudTd>
+                    <MudTd>
+                        <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                       Color="Color.Error"
+                                       OnClick="() => RemoveFromSelection(context)" />
+                    </MudTd>
+                </RowTemplate>
+            </MudTable>
+        </MudItem>
+    </MudGrid>
+@* </MudPaper> *@
+
+@code {
+    private Taxon value1;
+    private string searchText;
+    private MudAutocomplete<Taxon> MAC;
+
+    private List<Taxon> allTaxa = new()
+    {
+        new Taxon { Id = 1, Namn = "Gråsparv" },
+        new Taxon { Id = 2, Namn = "Rödhake" },
+        new Taxon { Id = 3, Namn = "Kråka" },
+        new Taxon { Id = 4, Namn = "Kattuggla" },
+        new Taxon { Id = 5, Namn = "Silltrut" },
+        new Taxon { Id = 6, Namn = "Talgoxe" },
+        new Taxon { Id = 7, Namn = "Blåmes" },
+        new Taxon { Id = 8, Namn = "Skata" },
+        new Taxon { Id = 9, Namn = "Hackspett" },
+        new Taxon { Id = 10, Namn = "Blåkråka" },
+    };
+
+    private List<Taxon> selectedTaxa = new();
+
+    private Task<IEnumerable<Taxon>> SearchTaxa(string value, CancellationToken token)
+    {
+        if (string.IsNullOrWhiteSpace(value) || value.Length < 2)
+            return Task.FromResult(Enumerable.Empty<Taxon>());
+
+        var result = allTaxa
+            .Where(t => t.Namn.Contains(value, StringComparison.OrdinalIgnoreCase))
+            // .Where(t => !selectedTaxa.Any(s => s.Id == t.Id))
+            .ToList();
+
+        return Task.FromResult(result.AsEnumerable());
+    }
+
+    private async Task OnTaxonSelected(Taxon selected)
+    {
+        if (selected != null && !selectedTaxa.Any(t => t.Id == selected.Id))
+        {
+            selectedTaxa.Add(selected);
+            Settings.AddTaxon(selected);
+        }
+
+        // // Rensa fältet efter val
+        // value1 = null;
+        // searchText = string.Empty;
+        // // this.MAC.Text = string.Empty; // Rensa textfältet i Autocomplete
+        // // this.MAC.Value = null; // Rensa värdet i Autocomplete
+        // await this.MAC.ClearAsync(); // Rensa Autocomplete-fältet
+        
+        // StateHasChanged();
+        // Valfritt: du kan också kalla StateHasChanged om något måste uppdateras direkt
+    }
+
+    private void OnSearchTextChanged(string newText)
+    {
+        searchText = newText;
+    }
+
+    private void AddSelectedTaxon()
+    {
+        if (value1 != null && !selectedTaxa.Any(t => t.Id == value1.Id))
+        {
+            selectedTaxa.Add(value1);
+            value1 = null;
+        }
+    }
+
+    private void RemoveFromSelection(Taxon item)
+    {
+        selectedTaxa.Remove(item);
+    }
+
+    public class Taxon
+    {
+        public int Id { get; set; }
+        public string Namn { get; set; }
+
+        public override string ToString() => Namn; // Används av Autocomplete
+    }
+
+}

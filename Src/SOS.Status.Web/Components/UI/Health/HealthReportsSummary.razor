@@ -1,0 +1,65 @@
+<MudTabs Outlined="true">
+    <MudTabPanel Text="Observation API" Icon="@Icons.Material.Filled.Search" BadgeDot="true" BadgeColor="@observationApiTabBadgeColor"> @* Map *@
+        <HealthReportGrid HealthReport="@ObservationApiHealthReport" Title="Observation API" />
+    </MudTabPanel>
+    <MudTabPanel Text="Analysis API" Icon="@Icons.Material.Outlined.Analytics" BadgeDot="true" BadgeColor="@analysisApiTabBadgeColor">  @* Insights, Timeline, ShowChart *@
+        <HealthReportGrid HealthReport="@AnalysisApiHealthReport" Title="Analysis API" />
+    </MudTabPanel>
+    <MudTabPanel Text="Elasticsearch Proxy" Icon="@Icons.Material.Outlined.Public" BadgeDot="true" BadgeColor="@elasticsearchProxyTabBadgeColor"> @* Map *@
+        <HealthReportGrid HealthReport="@ElasticsearchProxyHealthReport" Title="Elasticsearch Proxy" />        
+    </MudTabPanel>
+    <MudTabPanel Text="Data stewardship API" Icon="@Icons.Material.Outlined.Park" BadgeDot="true" BadgeColor="@dataStewardshipApiTabBadgeColor">
+        <HealthReportGrid HealthReport="@DataStewardshipApiHealthReport" Title="Data stewardship API" />        
+    </MudTabPanel>
+</MudTabs>
+
+@code {
+    [Parameter]
+    public HealthReportDto? ObservationApiHealthReport { get; set; }
+
+    [Parameter]
+    public HealthReportDto? AnalysisApiHealthReport { get; set; }
+
+    [Parameter]
+    public HealthReportDto? ElasticsearchProxyHealthReport { get; set; }
+
+    [Parameter]
+    public HealthReportDto? DataStewardshipApiHealthReport { get; set; }
+
+    private Color observationApiTabBadgeColor;
+    private Color analysisApiTabBadgeColor;
+    private Color elasticsearchProxyTabBadgeColor;
+    private Color dataStewardshipApiTabBadgeColor;
+
+    private Color GetAnalysisApiColor()
+    {
+        Console.WriteLine("GetAnalysisApiColor()");
+        return analysisApiTabBadgeColor;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            observationApiTabBadgeColor = ColorHelper.GetHealthColor(ObservationApiHealthReport?.Status);
+            analysisApiTabBadgeColor = ColorHelper.GetHealthColor(AnalysisApiHealthReport?.Status);
+            elasticsearchProxyTabBadgeColor = ColorHelper.GetHealthColor(ElasticsearchProxyHealthReport?.Status);
+            dataStewardshipApiTabBadgeColor = ColorHelper.GetHealthColor(DataStewardshipApiHealthReport?.Status);
+        }
+        catch (Exception ex)
+        {
+            // In a production environment, you would want to handle this error appropriately
+            Console.WriteLine($"Error fetching process information: {ex.Message}");
+        }
+    }
+
+    private string GetHealthStatusCircleStyle(string status)
+    {
+        if (status.Equals("healthy", StringComparison.InvariantCultureIgnoreCase))
+            return "color:green; font-size:18px;";
+        else if (status.Equals("degraded", StringComparison.InvariantCultureIgnoreCase))
+            return "color:orange; font-size:18px;";
+        else
+            return "color:red; font-size:18px;";
+    }
+}

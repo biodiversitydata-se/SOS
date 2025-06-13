@@ -1,0 +1,69 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: sosadmingui-web
+  name: sosadmingui-web
+  namespace: sosadmingui-dev
+spec:
+  type: ClusterIP
+  ports:
+    - port: 4200
+      targetPort: 4200
+  selector:
+    app: sosadmingui-web
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: sosadmingui-web
+  name: sosadmingui-web
+  namespace: sosadmingui-dev
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: sosadmingui-web
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        logging: "true"
+      labels:
+        app: sosadmingui-web
+    spec:
+      securityContext:
+        runAsNonRoot: true
+      topologySpreadConstraints: # try to spread out web instances over available nodes
+        - labelSelector:
+            matchLabels:
+              app: sosadmingui-web # pods labeled app:sosadmingui-web
+          maxSkew: 1
+          topologyKey: kubernetes.io/hostname # 1 node = 1 topology
+          whenUnsatisfiable: ScheduleAnyway
+      containers:
+        - env:
+            - name: SPAENVIRONMENT
+              value: dev
+          image: adbpocreg.azurecr.io/sosadmingui-web:$(Build.BuildId)
+          name: sosadmingui-web
+          ports:
+            - containerPort: 4200
+          resources:
+            requests:
+              cpu: 15m
+              memory: 105M
+            limits:
+              memory: 105M
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsUser: 1000
+            runAsGroup: 1000
+            capabilities:
+              drop:
+                - ALL
+      restartPolicy: Always
+      imagePullSecrets:
+        - name: regcred

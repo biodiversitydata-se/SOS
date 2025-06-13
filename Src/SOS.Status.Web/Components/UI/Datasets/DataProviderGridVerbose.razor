@@ -1,0 +1,19 @@
+<MudDataGrid Items="@ProcessSummary?.DataProviderStatuses" T="DataProviderStatusDto" Hover="true" Bordered="false" Striped="true" Dense="true" ColumnResizeMode="ResizeMode.Column">
+    <Columns>
+        <PropertyColumn Property="x => x.Id" Title="Id" Sortable="@Sortable" />
+        <PropertyColumn Property="x => x.Identifier" Title="Dataset" Sortable="@Sortable" />
+        <PropertyColumn Property="x => x.PublicActive" Title="Public Active" Format="N0" Sortable="@Sortable" />
+        <PropertyColumn Property="x => x.PublicInactive" Title="Public Inactive" Format="N0" Sortable="@Sortable" />
+        <PropertyColumn Property="x => x.PublicDiff" Title="Diff" CellStyleFunc="@CssHelper.PublicObservationCellStyleFunc" Format="N0" Sortable="@Sortable" />
+        <PropertyColumn Property="x => x.ProtectedActive" Title="Protected Active" Format="N0" Sortable="@Sortable" />
+        <PropertyColumn Property="x => x.ProtectedInactive" Title="Protected Inactive" Format="N0" Sortable="@Sortable" />
+        <PropertyColumn Property="x => x.ProtectedDiff" Title="Diff" CellStyleFunc="@CssHelper.ProtectedObservationCellStyleFunc" Format="N0" Sortable="@Sortable" />
+        <PropertyColumn Property="x => x.InvalidActive" Title="Invalid Active" Format="N0" Sortable="@Sortable" />
+        <PropertyColumn Property="x => x.InvalidInactive" Title="Invalid Inactive" Format="N0" Sortable="@Sortable" />
+        <PropertyColumn Property="x => x.InvalidDiff" Title="Diff" CellStyleFunc="@CssHelper.InvalidObservationCellStyleFunc" Format="N0" Sortable="@Sortable" />
+        @* <PropertyColumn Property="x => DateTimeHelper.FormatTimeSpan(x.HarvestTimeActive)" Title="Harvest time" Sortable="@Sortable" />
+        <PropertyColumn Property="x => DateTimeHelper.FormatTimeSpan(x.ProcessTimeActive)" Title="Process time" Sortable="@Sortable" /> *@
+    </Columns>    
+</MudDataGrid>
+
+

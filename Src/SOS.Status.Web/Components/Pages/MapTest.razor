@@ -1,0 +1,405 @@
+﻿@page "/maptest"
+@inject IJSRuntime JsRuntime
+
+<PageTitle>Map test</PageTitle>
+
+<h1>Map test</h1>
+
+<p role="status">Current count: @currentCount</p>
+
+<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+<button @onclick="onClickRun">Run</button>
+<MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="onClickRun">Primary</MudButton>
+@* <RealTimeMap @ref="realTimeMap" Parameters="parameters" OnClickMap="onClickMap" height="460px" width="620px"></RealTimeMap> *@
+
+<MudGrid Class="mt-4">
+    <!-- Tabellkolumn -->
+    <MudItem xs="12" md="6">
+        <MudTable Items="@points" Hover="true" Dense="true" @bind-SelectedItem="@selectedItem" RowClick="OnRowClick">
+            <HeaderContent>
+                <MudTh>Id</MudTh>
+                <MudTh>Namn</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Id">@context.Id</MudTd>
+                <MudTd DataLabel="Namn">@context.Name</MudTd>
+            </RowTemplate>
+        </MudTable>
+    </MudItem>
+
+    <!-- Karta -->
+    <MudItem xs="12" md="6" Class="d-flex justify-center align-center">
+        <RealTimeMap @ref="realTimeMap"
+                     OnAfterMapLoaded="@OnAfterMapLoaded"
+                     Parameters="parameters"                     
+                     OnClickMap="OnMapClick"                     
+                     height="460px"
+                     width="620px" />
+    </MudItem>
+</MudGrid>
+
+@* <MudGrid Class="mt-4">
+    <!-- Tabellkolumn -->
+    <MudItem xs="12" md="6">
+        <MudTable Items="@items" Hover="true" Dense="true">
+            <HeaderContent>
+                <MudTh>Id</MudTh>
+                <MudTh>Namn</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Id">@context.Id</MudTd>
+                <MudTd DataLabel="Namn">@context.Name</MudTd>
+            </RowTemplate>
+        </MudTable>
+    </MudItem>
+
+    <!-- Karta -->
+    <MudItem xs="12" md="6" Class="d-flex justify-center align-center">
+        <RealTimeMap @ref="realTimeMap"
+                        Parameters="parameters"
+                        OnClickMap="onClickMap"
+                        height="460px"
+                        width="620px" />
+    </MudItem>
+</MudGrid> *@
+
+
+
+@code {
+    private int currentCount = 0;
+
+    private void IncrementCount()
+    {
+        currentCount++;
+    }
+
+    RealTimeMap? realTimeMap;	//reference to map control
+    static string openCycleMapAPIKey = "";
+
+    RealTimeMap.LoadParameters parameters = new RealTimeMap.LoadParameters()  //general map settings
+    {
+        location = new RealTimeMap.Location()
+        {
+            latitude = 58.4501715,
+            longitude = 15.1107672,
+        },
+
+        zoomLevel = 6,        
+        basemap = new RealTimeMap.Basemap()
+        {
+            basemapLayers = new List<RealTimeMap.BasemapLayer>()
+            {
+                new RealTimeMap.BasemapLayer()
+                {
+                    url = "http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                    attribution = "©Open Street Map",
+                    title = "Open Street Map",
+                    detectRetina = true
+                },
+                new RealTimeMap.BasemapLayer()
+                {
+                    url = "https://tile.opentopomap.org/{z}/{x}/{y}.png",
+                    attribution = "Open Topo",
+                    title = "Open Topo",
+                    detectRetina = true
+                },
+                new RealTimeMap.BasemapLayer()
+                {
+                    url = "https://tile.thunderforest.com/cycle/{z}/{x}/{y}.png?apikey=" + openCycleMapAPIKey,
+                    attribution = "©Open Cycle Map",
+                    title = "Open Cycle Map"
+                }
+            }
+        },
+
+        // interactionOptions = new RealTimeMap.InteractionOptions()
+        // {
+        //     doubleClickZoom = true,
+        //     shiftBoxZoom = false
+        // }
+    };
+
+    public void onClickMap(RealTimeMap.ClicksMapArgs value)
+    {
+        //where value.sender is RealTimeMap control reference
+        Console.WriteLine(value.location.latitude);
+        Console.WriteLine(value.location.longitude);
+
+
+
+    }
+
+    //points (coordonate) on the route. For simulation...
+    List<List<double>> coordinates = new List<List<double>>() {
+        new List<double>() { 44.4502578, 26.1108199 },
+        new List<double>() { 44.4500215, 26.1105407 },
+        new List<double>() { 44.4497369, 26.1093086 },
+        new List<double>() { 44.4496145 , 26.1088460 },
+        new List<double>() {  44.4491875, 26.1079328 }
+    };
+
+    RealTimeMap.PointSymbol symbol = new RealTimeMap.PointSymbol()
+    {
+        color = "red",
+        fillColor = "yellow",
+        radius = 10,
+        weight = 3,
+        opacity = 1,
+        fillOpacity = 1
+    };
+    bool run = false;
+    private async Task onClickRun() //Button onclick event
+    {
+        run = !run;
+        for (var i = 0; i < 1000; i++)
+        {
+            var pas = i % coordinates.Count;
+            RealTimeMap.PointTooltip tooltip = new RealTimeMap.PointTooltip()
+            {
+                content = $"{Math.Round(coordinates[pas][0], 3)},{Math.Round(coordinates[pas][1], 3)}",
+                opacity = 0.6
+            };
+
+            await realTimeMap.movePoint(coordinates[pas].ToArray(), symbol, tooltip);
+            await Task.Delay(1000);
+            if (run == false)
+                return;
+        }
+    }
+
+
+    private List<LocationItem> points;
+    private LocationItem selectedItem;
+
+    private List<Item> items = new()
+    {
+        new Item { Id = 1, Name = "Första" },
+        new Item { Id = 2, Name = "Andra" },
+        new Item { Id = 3, Name = "Tredje" }
+    };
+
+    private void onClickMap(MouseEventArgs args)
+    {
+        // Hantera klick på karta
+    }
+
+    public class Item
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+    }
+
+    public class LocationItem
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public double Latitude { get; set; }
+        public double Longitude { get; set; }
+    }
+
+    protected override void OnInitialized()
+    {
+        points = new()
+        {
+            new LocationItem { Id = 1, Name = "Uppsala", Latitude = 59.8586, Longitude = 17.6389 },
+            new LocationItem { Id = 2, Name = "Göteborg", Latitude = 57.7089, Longitude = 11.9746 },
+            new LocationItem { Id = 3, Name = "Luleå", Latitude = 65.5848, Longitude = 22.1567 }
+        };
+
+
+        // var points2 = new List<RealTimeMap.StreamPoint> { new RealTimeMap.StreamPoint()
+        // {
+        //     latitude = 58.4504845,
+        //     longitude = 14.1128922,
+        //     guid = Guid.Parse("15366d7f-0689-4b8e-a2ee-29e5cb27f76e") //existing guide in the Geometric.Points collection
+        // }
+        // };
+
+        // realTimeMap.Geometric.Points.upload(points2).Wait();
+
+        //parameters = new { Points = points }; // eller din egen parameterklass
+    }
+
+    private void OnRowClick(TableRowClickEventArgs<LocationItem> args)
+    {
+        selectedItem = args.Item;
+        //realTimeMap?.HighlightPoint(selectedItem);
+    }
+
+    public void OnMapClick(RealTimeMap.ClicksMapArgs value)
+    {
+        //where value.sender is RealTimeMap control reference
+        Console.WriteLine(value.location.latitude);
+        Console.WriteLine(value.location.longitude);
+
+
+        // List<RealTimeMap.StreamPoint> findedPoints = new List<RealTimeMap.StreamPoint>();
+        // findedPoints = (value.sender as RealTimeMap).Geometric.Points.getItems(point => (value.sender as RealTimeMap).Geometric.Computations.distance(
+        //     point,
+        //     new RealTimeMap.StreamPoint() { latitude = value.location.latitude, longitude = value.location.longitude },
+        //     RealTimeMap.UnitOfMeasure.meters
+        //     ) <= 100
+        // );
+
+        List<RealTimeMap.StreamPoint> findedPoints = new List<RealTimeMap.StreamPoint>();
+        findedPoints = (value.sender as RealTimeMap).Geometric.Points.getItems(point => (value.sender as RealTimeMap).Geometric.Computations.distance(
+            point,
+            new RealTimeMap.StreamPoint() { latitude = value.location.latitude, longitude = value.location.longitude },
+            RealTimeMap.UnitOfMeasure.meters
+            ) <= 100
+        );
+
+        foreach (var item in findedPoints)
+        {            
+            item.type = "green";
+            realTimeMap.Geometric.Points.update(item);
+            Console.WriteLine($"GUID: {item.guid}, Type: {item.type}, Registration Number: {(item.value as Attributes)?.registrationNumber}");
+        }
+
+        Task.Run(async delegate
+        {
+            await JsRuntime.InvokeVoidAsync("alert", $"GUID: {findedPoints.First().guid}\nType: {findedPoints.First().type}\nRegistration Number: {(findedPoints.First().value as Attributes).registrationNumber}"); // Alert
+        });
+
+
+
+        int x = 8;
+
+    }
+
+    private bool _hasInitialized = false;
+
+    // protected override async Task OnAfterRenderAsync(bool firstRender)
+    // {
+    //     if (firstRender)
+    //     {
+    //         _hasInitialized = true;
+
+    //         // Nu är realTimeMap inte längre null
+    //         if (realTimeMap != null)
+    //         {
+    //             // var points2 = new List<RealTimeMap.StreamPoint> { new RealTimeMap.StreamPoint()
+    //             //     {
+    //             //         latitude = 58.4504845,
+    //             //         longitude = 14.1128922,
+    //             //         guid = Guid.Parse("15366d7f-0689-4b8e-a2ee-29e5cb27f76e") //existing guide in the Geometric.Points collection
+    //             //     }
+    //             // };
+
+    //             // realTimeMap.Geometric.Points.upload(points2).Wait();
+
+    //             // Exempel: anropa en metod på realTimeMap
+    //             // await realTimeMap.HighlightPointAsync(selectedItem);
+    //         }
+
+    //         // Om du behöver uppdatera UI
+    //         StateHasChanged();
+    //     }
+    // }
+
+    public async Task OnAfterMapLoaded(RealTimeMap.MapEventArgs args)
+    {
+        // realTimeMap.Geometric.Points.Appearance(item => true).pattern = new RealTimeMap.PointSymbol()
+        // {
+        //     radius = 8,
+        //     color = "black",
+        //     opacity = 0.68,
+        //     fillColor = "blue",
+        //     weight = 2,
+        //     fillOpacity = 0.68
+        // };
+        realTimeMap.Geometric.Points.Appearance(item => !(item.type == "red" || item.type == "green" || item.type == "blue")).pattern = new RealTimeMap.PointSymbol() { radius = 8, color = "#28ffff", opacity = 0.68, fillColor = "orange", weight = 2, fillOpacity = 0.68 };
+        realTimeMap.Geometric.Points.Appearance(item => item.type == "red").pattern = new RealTimeMap.PointSymbol() { radius = 8, color = "rgb(200,100,0)", opacity = 0.68, fillColor = "red", weight = 4, fillOpacity = 0.68 };
+        realTimeMap.Geometric.Points.Appearance(item => item.type == "green").pattern = new RealTimeMap.PointSymbol() { radius = 10, color = "white", opacity = 0.68, fillColor = "green", weight = 2, fillOpacity = 0.68 };
+        realTimeMap.Geometric.Points.Appearance(item => item.type == "blue").pattern = new RealTimeMap.PointSymbol() { radius = 12, color = "#28ffff", opacity = 0.68, fillColor = "blue", weight = 2, fillOpacity = 0.68 };
+
+
+        await args.sender!.Geometric.Points.upload(new InputData().input);
+
+
+        //await realTimeMap.Geometric.DisplayPolygonsFromArray()
+        // await args.sender.Geometric.DisplayPointsFromArray.addPoint(
+        // new double[2] { 58.97248976827578, 14.326675905214792 },
+        // new RealTimeMap.PointSymbol()
+        // {
+        //     color = "yellow",
+        //     fillColor = "yellow",
+        //     opacity = 0.8,
+        //     fillOpacity = 0,
+        //     radius = 12,
+        //     weight = 2
+        // });
+
+        //await args.sender.Geometric.DataFromGeoJSON.addObject(geojsonObject);
+    }
+
+    // private void OnMapClick(LocationItem clickedItem)
+    // {
+    //     selectedItem = clickedItem;
+    // }
+
+    public class Attributes
+    {
+        public string? registrationNumber { get; set; }
+        public string? vehicleType { get; set; }
+        public string? description { get; set; }
+
+    }
+
+    public class Observation
+    {
+        public string OccurrenceId { get; set; }
+        public Guid Guid { get; set; }
+        public double Latitude { get; set; }
+        public double Longitude { get; set; }
+        public string VernacularName { get; set; }
+        public int TaxonId { get; set; }
+    }
+
+    public class InputData
+    {
+        public List<RealTimeMap.StreamPoint> input = new List<RealTimeMap.StreamPoint>() {
+          new RealTimeMap.StreamPoint()
+         {
+                guid = Guid.Parse("28466d7f-0689-4b8e-a2ee-28e5cb27f86f"),
+                latitude=58.972801938829356,
+                longitude = 15.326177627532893,
+                type = "red",
+                value = new Attributes() { registrationNumber = "B 24 AAB", vehicleType = "special car" }
+         },
+          new RealTimeMap.StreamPoint()
+         {
+                guid = Guid.Parse("48466d7f-0689-4b8e-a2ee-28e5cb27f86f"),
+                latitude=59.971876662076546,
+                longitude = 14.328737648076636,
+                type = "blue",
+
+               value = new Attributes() { registrationNumber = "B 24 AAD", vehicleType = "bus", description="black color, two occupants in the car" }
+         },
+          new RealTimeMap.StreamPoint()
+         {
+               guid = Guid.Parse("88466d7f-0689-4b8e-a2ee-28e5cb27f86f"),
+             latitude= 60.97290712065776,
+             longitude = 15.329964708333343,
+             type = "blue",
+            value = new Attributes() { registrationNumber = "B 24 DAA", vehicleType = "special car"}
+         },
+          new RealTimeMap.StreamPoint()
+         {
+               guid = Guid.Parse("68466d7f-0689-4b8e-a2ee-28e5cb27f86f"),
+             latitude=58.97129017044845,
+             longitude = 15.32946103324729,
+             type = "other",
+            value = new Attributes() { registrationNumber = "B 24 DAB", vehicleType = "bus"}
+         },
+          new RealTimeMap.StreamPoint()
+             {
+                guid = Guid.Parse("82466d7f-0689-4b8e-a2ee-28e5cb27f86f"),
+                 latitude= 59.971356241788044,
+                 longitude = 13.32843148166333,
+                type = "blue",
+                    value = new Attributes() { registrationNumber = "B 24 DBA", vehicleType = "special car", description = "blue color" }
+             },
+        };
+    }
+}

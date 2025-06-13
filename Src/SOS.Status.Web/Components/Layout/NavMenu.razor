@@ -1,0 +1,36 @@
+﻿<MudNavMenu >
+    <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Outlined.Home">Hem</MudNavLink>
+    <MudNavLink Href="statuswithoutinactive" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Outlined.BarChart">Status</MudNavLink>    
+    <MudNavLink Href="statuswithoutsort" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Outlined.Dashboard">Status utan sortering</MudNavLink>
+    <MudNavLink Href="statuswithtable" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Outlined.ShowChart">Status med tabell</MudNavLink>    
+    <MudNavLink Href="maptest?id=5" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Outlined.Public">Karttest</MudNavLink>
+    <MudNavLink Href="test?id=5" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Outlined.Public">Testsida</MudNavLink>
+</MudNavMenu>
+
+@code {
+    private void OnDeleteClick()
+    {        
+        Console.WriteLine("OnDeleteClick()");
+    }
+}
+
+@* <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Hem</MudNavLink> *@
+@* <MudNavLink Href="counter" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Search">Fynd</MudNavLink>
+    <MudNavLink Href="counter" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Functions">Statistik</MudNavLink>
+    <MudNavLink Href="counter" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.FileDownload">Export</MudNavLink>
+    <MudNavLink Href="counter" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Calculate">Analys</MudNavLink>
+    <MudNavLink Href="counter" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.BarChart">Diagram</MudNavLink>
+    <MudNavLink Href="counter" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.GridView">Rutnätskarta</MudNavLink> *@
+
+@* <MudNavLink Href="status" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Search">Status (gammal)</MudNavLink>        
+    <MudNavLink Href="statuswithtablewithoutdiff" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Search">Status med tabell (utan diff)</MudNavLink>   *@  
+    
+@*   <MudNavLink Href="oldstatus" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Search">Fynd</MudNavLink>
+    <MudNavLink Href="counter" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Functions">Statistik</MudNavLink>    
+    <MudNavGroup Title="Export" Icon="@Icons.Material.Filled.Settings" Expanded="false">
+        <MudNavLink Href="counter" Match="NavLinkMatch.Prefix">Export</MudNavLink>
+        <MudNavLink Href="counter" Match="NavLinkMatch.Prefix">Mina exporter</MudNavLink>
+    </MudNavGroup>
+    <MudNavLink Href="counter" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.StackedLineChart">Analys</MudNavLink>
+    <MudNavLink Href="counter" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.BarChart">Diagram</MudNavLink>
+    <MudNavLink Href="counter" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.GridView">Rutnätskarta</MudNavLink> *@
