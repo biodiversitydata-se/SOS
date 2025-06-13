@@ -1,8 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using SOS.Administration.Gui.Clients;
 using SOS.Administration.Gui.Dtos;
 using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SOS.Administration.Gui.Services
 {
@@ -10,63 +8,39 @@ namespace SOS.Administration.Gui.Services
     {
         private readonly HttpClient _client;
         private readonly string _apiUrl;
+        private readonly SosObservationsApiClient _sosObservationsApiClient;
+
         public SearchService()
         {
             _client = new HttpClient();
             _apiUrl = Settings.ApiTestConfiguration.ApiUrl;
-
         }
+
+        public SearchService(SosObservationsApiClient sosObservationsApiClient)
+        {
+            _sosObservationsApiClient = sosObservationsApiClient;
+        }
+
         public async Task<PagedResult<SOSObservation>> SearchSOS(SearchFilterDto searchFilter, int take, int skip)
         {
-            var response = await _client.PostAsync($"{_apiUrl}Observations/Search?take={take}&skip={skip}", new StringContent(JsonConvert.SerializeObject(searchFilter), Encoding.UTF8, "application/json"));
-            if (response.IsSuccessStatusCode)
-            {
-                var resultString = response.Content.ReadAsStringAsync().Result;
-                return JsonConvert.DeserializeObject<PagedResult<SOSObservation>>(resultString);
-            }
-            else
-            {
-                throw new Exception("Call to API failed, responseCode:" + response.StatusCode);
-            }
+            var result = await _sosObservationsApiClient.SearchSOS(searchFilter, take, skip);
+            return result;
         }
         public async Task<PagedResult<TaxonAggregationItemDto>> SearchSOSTaxonAggregation(SearchFilterDto searchFilter, int take, int skip, double? bboxleft = null, double? bboxtop = null, double? bboxright = null, double? bboxbottom = null)
         {
-            var bboxstring = "";
-            if (bboxleft.HasValue && bboxtop.HasValue && bboxright.HasValue && bboxbottom.HasValue)
-            {
-                bboxstring = $"&bboxLeft={bboxleft}&bboxTop={bboxtop}&bboxRight={bboxright}&bboxBottom={bboxbottom}".Replace(',', '.');
-            }
-            var response = await _client.PostAsync($"{_apiUrl}Observations/TaxonAggregation?take={take}&skip={skip}" + bboxstring, new StringContent(JsonConvert.SerializeObject(searchFilter), Encoding.UTF8, "application/json"));
-            if (response.IsSuccessStatusCode)
-            {
-                var resultString = response.Content.ReadAsStringAsync().Result;
-                return JsonConvert.DeserializeObject<PagedResult<TaxonAggregationItemDto>>(resultString);
-            }
-            else
-            {
-                throw new Exception("Call to API failed, responseCode:" + response.StatusCode);
-            }
+            var result = await _sosObservationsApiClient.SearchSOSTaxonAggregation(searchFilter, take, skip, bboxleft, bboxtop, bboxright, bboxbottom);
+            return result;
         }
         public async Task<GeoGridResultDto> SearchSOSGeoAggregation(SearchFilterDto searchFilter)
         {
-            var response = await _client.PostAsync($"{_apiUrl}Observations/geogridaggregation?zoom=10", new StringContent(JsonConvert.SerializeObject(searchFilter), Encoding.UTF8, "application/json"));
-            if (response.IsSuccessStatusCode)
-            {
-                var resultString = response.Content.ReadAsStringAsync().Result;
-                return JsonConvert.DeserializeObject<GeoGridResultDto>(resultString);
-            }
-            else
-            {
-                throw new Exception("Call to API failed, responseCode:" + response.StatusCode);
-            }
+            var result = await _sosObservationsApiClient.SearchSOSGeoAggregation(searchFilter);
+            return result;
         }
 
         public async Task<string> GetHealthStatus()
         {
-            var response = await _client.GetAsync(new Uri($"{_apiUrl}health-json"));
-            var resultString = await response.Content.ReadAsStringAsync();
-
-            return resultString;
+            var result = await _sosObservationsApiClient.GetHealthStatus();
+            return result;
         }
     }
 }
