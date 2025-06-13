@@ -52,7 +52,11 @@ namespace SOS.Lib.Managers
             try
             {
                 return (await GetAllAsync()).Where(p => 
-                    (p.IsPublic || p.UserServiceUserId == userId) &&
+                    (
+                        p.IsPublic || 
+                        p.UserServiceUserId == userId ||
+                        p.MemberIds.Contains(userId ?? 0)
+                    ) &&
                     (
                         string.IsNullOrEmpty(filter) ||
                         (p.Category?.Contains(filter, StringComparison.CurrentCultureIgnoreCase) ?? false) ||

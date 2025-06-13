@@ -50,6 +50,8 @@
         /// </summary>
         public bool IsHideall { get; set; }
 
+        public ICollection<int>? MembersIds { get; set; }
+
         /// <summary>
         ///     Name of project
         /// </summary>

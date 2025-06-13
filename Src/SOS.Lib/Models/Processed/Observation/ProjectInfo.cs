@@ -61,6 +61,11 @@ namespace SOS.Lib.Models.Processed.Observation
         public int Id { get; set; }
 
         /// <summary>
+        /// Id's of project members
+        /// </summary>
+        public IEnumerable<int> MemberIds { get; set; } = [];
+
+        /// <summary>
         ///     Name of the project.
         /// </summary>
         public string Name { get; set; }

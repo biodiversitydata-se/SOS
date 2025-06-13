@@ -112,6 +112,7 @@ namespace SOS.Harvest.Harvesters
                 CategorySwedish = projectEntity.CategorySwedish,
                 Description = projectEntity.Description?.Clean(),
                 IsPublic = projectEntity.IsPublic,
+                MemberIds = projectEntity.MembersIds,
                 Owner = projectEntity.Owner,
                 ProjectParameters = projectEntity.Parameters?.Select(p => new ProjectParameter
                 {

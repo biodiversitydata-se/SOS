@@ -5,6 +5,7 @@ using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SOS.Lib.Repositories.Resource
@@ -45,8 +46,9 @@ namespace SOS.Lib.Repositories.Resource
         {
             var filters = new[] {
                 Builders<ProjectInfo>.Filter.Or(
-                    Builders<ProjectInfo>.Filter.Eq(a => a.IsPublic, true),
-                    Builders<ProjectInfo>.Filter.Eq(a => a.UserServiceUserId, userId)
+                    Builders<ProjectInfo>.Filter.Eq(p => p.IsPublic, true),
+                    Builders<ProjectInfo>.Filter.Eq(p => p.UserServiceUserId, userId),
+                    Builders<ProjectInfo>.Filter.Eq(p => p.MemberIds.Contains(userId), true)
                 ),
                 Builders<ProjectInfo>.Filter.Text(filter, new TextSearchOptions{ CaseSensitive = false })
             };

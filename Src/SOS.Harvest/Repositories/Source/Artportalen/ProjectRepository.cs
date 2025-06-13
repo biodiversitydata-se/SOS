@@ -45,6 +45,42 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
 	                LEFT JOIN [User] u ON p.ControlingUserId = u.Id
 	                LEFT JOIN Person pn ON u.PersonId = pn.Id";
 
+        private async Task AddProjectMembers(IEnumerable<ProjectEntity> projects)
+        {
+            if (!projects?.Any() ?? true)
+            {
+                return;
+            }
+
+            var projectDictionary = projects!.ToDictionary(p => p.Id, p => p);
+            var query = @"
+                SELECT 
+                    pm.ProjectId, u.UserServiceUserId
+                FROM
+                    ProjectMember pm
+                    INNER JOIN [User] u ON pm.UserId = u.Id
+                    INNER JOIN @tvp tvp ON pm.ProjectId = tvp.Id 
+                WHERE
+                    u.UserServiceUserId > 0";
+
+            var projectMembers = await QueryAsync<ProjectMemberEntity>(
+                    query,
+                    new { tvp = projects!.Select(p => p.Id).ToSqlRecords().AsTableValuedParameter("dbo.IdValueTable") });
+
+            if (!projectMembers?.Any() ?? true)
+            {
+                return;
+            }
+
+            foreach (var projectMember in projectMembers!)
+            {
+                if (projectDictionary.TryGetValue(projectMember.ProjectId, out var project))
+                {
+                    project.MembersIds ??= new HashSet<int>();
+                    project.MembersIds!.Add(projectMember.UserServiceUserId);
+                }
+            }
+        }
 
         private async Task AddProjectParameters(IEnumerable<ProjectEntity> projects)
         {
@@ -67,7 +103,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
                         END AS DataType   
                     FROM 
 	                    ProjectParameter pp
-                         INNER JOIN @tvp tvp ON pp.ProjectId = tvp.Id 
+                        INNER JOIN @tvp tvp ON pp.ProjectId = tvp.Id 
                     WHERE
 	                    pp.IsDeleted = 0";
 
@@ -111,7 +147,8 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
             {
                 var projects = await QueryAsync<ProjectEntity>(SelectSql, null!);
                 await AddProjectParameters(projects);
-      
+                await AddProjectMembers(projects);
+
                 return projects;
             }
             catch (Exception e)
@@ -130,6 +167,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
 
                 var projects = await QueryAsync<ProjectEntity>(query, new { ProjectId = projectId });
                 await AddProjectParameters(projects);
+                await AddProjectMembers(projects);
 
                 return projects?.FirstOrDefault();
             }
