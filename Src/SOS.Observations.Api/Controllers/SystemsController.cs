@@ -241,28 +241,51 @@ namespace SOS.Observations.Api.Controllers
         }
 
         [HttpGet]
-        [Route("dataproviderstatus")]
+        [Route("processummary")]
         [InternalApi]
-        public IEnumerable<DataProviderStatusDto> GetDataProviderStatus()
+        public ProcessSummaryDto GetProcessSummary()
         {
             var activeInstance = GetActiveInstance();
             var processInfos = GetMongoDbProcessInfo();
+            var processSummary = GetProcessSummary(processInfos, activeInstance);
+            return processSummary;
+        }
+        
+        private ProcessSummaryDto GetProcessSummary(IEnumerable<MongoDbProcessInfoDto>? processInfos, ActiveInstanceInfoDto? activeInstanceInfo)
+        {
+            MongoDbProcessInfoDto activeInfos = processInfos.FirstOrDefault(m => int.Parse(m.Id.Last().ToString()) == activeInstanceInfo.ActiveInstance);
+            var inactiveInfos = processInfos.FirstOrDefault(m => int.Parse(m.Id.Last().ToString()) != activeInstanceInfo.ActiveInstance);
+            var processSummary = new ProcessSummaryDto
+            {
+                ActiveProcessStatus = CreateProcessStatus(activeInfos),
+                InactiveProcessStatus = CreateProcessStatus(inactiveInfos),
+                DataProviderStatuses = GetDataProviderStatuses(activeInfos, inactiveInfos)
+            };
 
-            var items = GetDataProviderStatusItems(processInfos, activeInstance);
-            return items;
+            return processSummary;
         }
 
-        private List<DataProviderStatusDto> GetDataProviderStatusItems(IEnumerable<MongoDbProcessInfoDto>? processInfos, ActiveInstanceInfoDto? activeInstanceInfo)
+        private ProcessStatusDto CreateProcessStatus(MongoDbProcessInfoDto processInfo)
         {
-            var activeInfos = processInfos.FirstOrDefault(m => int.Parse(m.Id.Last().ToString()) == activeInstanceInfo.ActiveInstance);
-            var inactiveInfos = processInfos.FirstOrDefault(m => int.Parse(m.Id.Last().ToString()) != activeInstanceInfo.ActiveInstance);
+            return new ProcessStatusDto
+            {
+                Name = processInfo.Id,
+                Status = processInfo.Status,
+                PublicCount = processInfo.PublicCount,
+                ProtectedCount = processInfo.ProtectedCount,
+                InvalidCount = processInfo.ProcessFailCount,
+                Start = processInfo.Start,
+                End = processInfo.End
+            };
+        }
 
-            var rows = new List<DataProviderStatusDto>();
+        private List<DataProviderStatusDto> GetDataProviderStatuses(MongoDbProcessInfoDto activeInfos, MongoDbProcessInfoDto inactiveInfos)
+        {
+            List<DataProviderStatusDto> rows = new();
             var inactiveProvidersById = inactiveInfos.ProvidersInfo
-                .ToDictionary(m => m.DataProviderId!.Value, m => m);
+                            .ToDictionary(m => m.DataProviderId!.Value, m => m);
 
             var dataProviderById = _dataProviderCache.GetAllAsync().Result.ToDictionary(m => m.Id, m => m);
-
             foreach (var activeProvider in activeInfos.ProvidersInfo.OrderBy(m => m.DataProviderId))
             {
                 var dataProvider = dataProviderById[activeProvider.DataProviderId.GetValueOrDefault()];
