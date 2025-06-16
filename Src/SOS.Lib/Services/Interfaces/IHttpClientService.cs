@@ -24,8 +24,10 @@ namespace SOS.Lib.Services.Interfaces
         /// <typeparam name="T"></typeparam>
         /// <param name="requestUri"></param>
         /// <param name="headerData"></param>
+        /// <param name="timeout"></param>
+        /// <param name="retryCount"></param>
         /// <returns></returns>
-        Task<T> GetDataAsync<T>(Uri requestUri, IDictionary<string, string> headerData);
+        Task<T> GetDataAsync<T>(Uri requestUri, IDictionary<string, string> headerData, TimeSpan? timeout = null, int? retryCount = null);
 
         /// <summary>
         ///     Get file data stream

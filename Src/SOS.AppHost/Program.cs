@@ -72,30 +72,30 @@ builder.AddProject<Projects.SOS_Hangfire_JobServer>("sos-hangfire-jobserver", co
     .WithReference(hangfireDb)
     .WaitFor(hangfireDb);
 
-//// Configure Admin GUI BFF
-//var adminGuiBff = builder.AddProject<Projects.SOS_Administration_Gui>("sos-admin-gui-bff", configure: static project =>
-//{
-//    project.ExcludeLaunchProfile = true;
-//})
-//    .WithEnvironment("ASPNETCORE_ENVIRONMENT", env.AspNetCoreEnvironment)
-//    .WithEnvironment("USE_LOCAL_OBSERVATION_API", env.UseLocalObservationApi.ToString())
-//    .WithHttpEndpoint(name: "http", port: 5050)
-//    .WithReference(observationApi)
-//    .WithHttpHealthCheck("/healthz")
-//    .WaitFor(observationApi)
-//    .WithExplicitStart();
+// Configure Admin GUI BFF
+var adminGuiBff = builder.AddProject<Projects.SOS_Administration_Gui>("sos-admin-gui-bff", configure: static project =>
+    {
+        project.ExcludeLaunchProfile = true;
+    })
+    .WithEnvironment("ASPNETCORE_ENVIRONMENT", env.AspNetCoreEnvironment)
+    .WithEnvironment("USE_LOCAL_OBSERVATION_API", env.UseLocalObservationApi.ToString())
+    .WithHttpEndpoint(name: "http", port: 5050)
+    .WithReference(observationApi)
+    .WithHttpHealthCheck("/healthz")
+    .WaitFor(observationApi)
+    .WithExplicitStart();
 
-//// Configure Admin GUI (Angular)
-//var adminGui = builder.AddNpmApp("sos-admin-gui-angular", "../SOS.Administration.Gui.Web")
-//    .WithReference(adminGuiBff)
-//    .WaitFor(adminGuiBff)
-//    .WithHttpEndpoint(name: "angular-ui", env: "PORT")
-//    .WithUrlForEndpoint("angular-ui", endpoint =>
-//    {
-//        endpoint.Url = "http://localhost:4200";
-//        endpoint.DisplayText = $"Admin GUI (http://localhost:4200)";
-//    })
-//    .WithExplicitStart();
+// Configure Admin GUI (Angular)
+var adminGui = builder.AddNpmApp("sos-admin-gui-angular", "../SOS.Administration.Gui.Web")
+    .WithReference(adminGuiBff)
+    .WaitFor(adminGuiBff)
+    .WithHttpEndpoint(name: "angular-ui", env: "PORT")
+    .WithUrlForEndpoint("angular-ui", endpoint =>
+    {
+        endpoint.Url = "http://localhost:4200";
+        endpoint.DisplayText = $"Admin GUI (http://localhost:4200)";
+    })
+    .WithExplicitStart();
 
 // Healthcheck UI
 //builder.AddHealthChecksUI("healthchecksui")

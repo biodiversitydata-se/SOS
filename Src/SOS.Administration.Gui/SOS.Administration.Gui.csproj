@@ -22,14 +22,16 @@
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.5" />
 		<PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="9.0.5" />
 		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="9.0.5" />
-		<PackageReference Include="MongoDB.Driver" Version="3.4.0" />
-		<PackageReference Include="NLog" Version="5.5.0" />
-		<PackageReference Include="NLog.Web.AspNetCore" Version="5.5.0" />
+		<PackageReference Include="MongoDB.Driver" Version="3.4.0" />		
 		<PackageReference Include="xunit" Version="2.9.3" />
+		<PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
+		<PackageReference Include="Serilog.Formatting.Compact" Version="3.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\SOS.Lib\SOS.Lib.csproj" />
+		<ProjectReference Include="..\SOS.ServiceDefaults\SOS.ServiceDefaults.csproj" />
+		<ProjectReference Include="..\SOS.Shared.Api\SOS.Shared.Api.csproj" />
 	</ItemGroup>
 
 </Project>
