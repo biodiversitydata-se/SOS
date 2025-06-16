@@ -47,12 +47,12 @@ namespace SOS.Shared.Api.Extensions.Dto
                     .AddCheck<ElasticsearchProxyHealthCheck>("ElasticSearch Proxy", tags: new[] { "wfs", "elasticsearch" })
                     //.AddCheck<DuplicateHealthCheck>("Duplicate observations", tags: new[] { "elasticsearch", "harvest" })
                     .AddCheck<ElasticsearchHealthCheck>("Elasticsearch", tags: new[] { "database", "elasticsearch" })
-                    .AddCheck<DependenciesHealthCheck>("Dependencies", tags: new[] { "dependencies" })
-                    .AddCheck<APDbRestoreHealthCheck>("Artportalen database backup restore", tags: new[] { "database", "sql server" })
+                    .AddCheck<DependenciesHealthCheck>("Dependencies", tags: new[] { "dependencies" })                    
                     .AddCheck<HealthCheck>("CustomHealthCheck", tags: new[] { "k8s" });
 
                 if (isProductionEnvironment)
                 {
+                    healthChecks.AddCheck<APDbRestoreHealthCheck>("Artportalen database backup restore", tags: new[] { "database", "sql server" });
                     healthChecks.AddCheck<DwcaHealthCheck>("DwC-A files", tags: new[] { "dwca", "export" });
                     healthChecks.AddCheck<ApplicationInsightstHealthCheck>("Application Insights", tags: new[] { "application insights", "harvest" });
                     healthChecks.AddCheck<WFSHealthCheck>("WFS", tags: new[] { "wfs" }); // add this to ST environment when we have a GeoServer test environment.
