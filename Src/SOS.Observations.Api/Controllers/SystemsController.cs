@@ -1,14 +1,23 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Elastic.Clients.Elasticsearch;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using MongoDB.Bson;
+using MongoDB.Driver;
+using SOS.Lib.Cache.Interfaces;
+using SOS.Lib.Configuration.Shared;
+using SOS.Lib.Helpers;
 using SOS.Lib.Swagger;
-using SOS.Shared.Api.Dtos;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Repositories.Interfaces;
+using SOS.Shared.Api.Dtos;
+using SOS.Shared.Api.Dtos.Status;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
-using SOS.Lib.Helpers;
+using SOS.Lib.Extensions;
 
 namespace SOS.Observations.Api.Controllers
 {
@@ -22,6 +31,11 @@ namespace SOS.Observations.Api.Controllers
         private readonly IDevOpsManager _devOpsManager;
         private readonly IProcessInfoManager _processInfoManager;
         private readonly IProcessedObservationRepository _processedObservationRepository;
+        private readonly IDataProviderCache _dataProviderCache;
+        private MongoClient _mongoClient;
+        private ElasticsearchClient _elasticClient;
+        private string _mongoSuffix = "";
+        private MongoDbConfiguration _mongoConfiguration;
         private readonly ILogger<SystemsController> _logger;
 
         /// <summary>
@@ -30,18 +44,34 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="devOpsManager"></param>
         /// <param name="processInfoManager"></param>
         /// <param name="processedObservationRepository"></param>
+        /// <param name="elasticConfiguration"></param>
+        /// <param name="dataProviderCache"></param>
         /// <param name="logger"></param>
         /// <exception cref="ArgumentNullException"></exception>
         public SystemsController(
             IDevOpsManager devOpsManager,
             IProcessInfoManager processInfoManager,
             IProcessedObservationRepository processedObservationRepository,
+            ElasticSearchConfiguration elasticConfiguration, 
+            IDataProviderCache dataProviderCache,
             ILogger<SystemsController> logger)
         {
             _processInfoManager = processInfoManager ?? throw new ArgumentNullException(nameof(processInfoManager));
             _processedObservationRepository = processedObservationRepository ??
                                               throw new ArgumentNullException(nameof(processedObservationRepository));
             _devOpsManager = devOpsManager ?? throw new ArgumentNullException(nameof(devOpsManager));
+            _mongoClient = new MongoClient(Settings.ProcessDbConfiguration.GetMongoDbSettings());
+            _mongoConfiguration = Settings.ProcessDbConfiguration;
+            if (_mongoConfiguration.DatabaseName.EndsWith("-st"))
+            {
+                _mongoSuffix = "-st";
+            }
+            else if (_mongoConfiguration.DatabaseName.EndsWith("-dev"))
+            {
+                _mongoSuffix = "-dev";
+            }
+            _elasticClient = elasticConfiguration.GetClients().FirstOrDefault();
+            _dataProviderCache = dataProviderCache ?? throw new System.ArgumentNullException(nameof(dataProviderCache));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
         /*
@@ -108,6 +138,158 @@ namespace SOS.Observations.Api.Controllers
                 _logger.LogError(e, "Error getting process information");
                 return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
             }
+        }
+
+        [HttpGet]
+        [Route("harvest")]
+        [InternalApi]
+        public IEnumerable<HarvestInfoDto> GetHarvestInfo()
+        {
+            var database = _mongoClient.GetDatabase("sos-harvest" + _mongoSuffix);
+            var collection = database.GetCollection<HarvestInfoDto>("HarvestInfo");
+            var providers = collection.Find(new BsonDocument());
+            return providers.ToList();
+        }
+
+        [HttpGet]
+        [Route("processmongodb")]
+        [InternalApi]
+        public IEnumerable<MongoDbProcessInfoDto> GetMongoDbProcessInfo()
+        {
+            var database = _mongoClient.GetDatabase(_mongoConfiguration.DatabaseName);
+            var queryBuilder = Builders<MongoDbProcessInfoDto>.Filter;
+            var query = queryBuilder.Regex(pi => pi.Id, @"observation-\d");
+            var processInfos = database.GetCollection<MongoDbProcessInfoDto>("ProcessInfo")
+            .Find(query)
+            .SortByDescending(p => p.End);
+
+            return processInfos?.ToList();
+        }
+
+        [HttpGet]
+        [Route("activeinstance")]
+        [InternalApi]
+        public ActiveInstanceInfoDto GetActiveInstance()
+        {
+            var database = _mongoClient.GetDatabase(_mongoConfiguration.DatabaseName);
+            var collection = database.GetCollection<ActiveInstanceInfoDto>("ProcessedConfiguration");
+            var instance = collection.Find(new BsonDocument())?.ToList();
+            return instance.FirstOrDefault(i => i.Id.Equals("Observation", System.StringComparison.CurrentCultureIgnoreCase));
+        }
+
+        [HttpGet]
+        [Route("processing")]
+        [InternalApi]
+        public IEnumerable<HangfireJobDto> GetProcessing()
+        {
+            var database = _mongoClient.GetDatabase("sos-hangfire" + _mongoSuffix);
+            var collection = database.GetCollection<HangfireJobDto>("hangfire.jobGraph");
+            var filter = Builders<HangfireJobDto>.Filter.Eq(p => p.StateName, "Processing");
+            var jobs = collection.Find(filter).ToList();
+            return jobs;
+        }
+
+        [HttpGet]
+        [Route("searchindex")]
+        [InternalApi]
+        public async Task<SearchIndexInfoDto> GetSearchIndexInfo()
+        {
+            var diskUsage = new Dictionary<string, int>();
+            var response = await _elasticClient.Nodes.StatsAsync(stats => stats.Metric(new Metrics("fs")));
+            var info = new SearchIndexInfoDto();
+
+            if (!response.IsValidResponse)
+            {
+                return info;
+            }
+
+            var allocations = new List<SearchIndexInfoDto.AllocationInfo>();
+            foreach (var node in response.Nodes)
+            {
+                foreach (var data in node.Value.Fs.Data)
+                {
+                    allocations.Add(new SearchIndexInfoDto.AllocationInfo()
+                    {
+                        Node = data.Path,
+                        DiskAvailable = data.FreeInBytes?.ToString(),
+                        DiskTotal = data.TotalInBytes?.ToString(),
+                        DiskUsed = (data.TotalInBytes ?? 0 - data.FreeInBytes ?? 0).ToString(),
+                        Percentage = (int)((data.FreeInBytes ?? 0) / (data.TotalInBytes ?? 1))
+                    });
+                }
+            }
+            info.Allocations = allocations;
+            return info;
+        }
+
+        [HttpGet]
+        [Route("mongoinfo")]
+        [InternalApi]
+        public MongoDbInfoDto GetMongoDatabaseInfo()
+        {
+            var db = _mongoClient.GetDatabase("sos-hangfire" + _mongoSuffix);
+            var command = new BsonDocument { { "dbStats", 1 }, { "scale", 1000 } };
+            var result = db.RunCommand<BsonDocument>(command);
+            var usedSize = result.GetValue("fsUsedSize");
+            var totalSize = result.GetValue("fsTotalSize");
+            var info = new MongoDbInfoDto()
+            {
+                DiskTotal = totalSize.ToString(),
+                DiskUsed = usedSize.ToString()
+            };
+            return info;
+        }
+
+        [HttpGet]
+        [Route("dataproviderstatus")]
+        [InternalApi]
+        public IEnumerable<DataProviderStatusDto> GetDataProviderStatus()
+        {
+            var activeInstance = GetActiveInstance();
+            var processInfos = GetMongoDbProcessInfo();
+
+            var items = GetDataProviderStatusItems(processInfos, activeInstance);
+            return items;
+        }
+
+        private List<DataProviderStatusDto> GetDataProviderStatusItems(IEnumerable<MongoDbProcessInfoDto>? processInfos, ActiveInstanceInfoDto? activeInstanceInfo)
+        {
+            var activeInfos = processInfos.FirstOrDefault(m => int.Parse(m.Id.Last().ToString()) == activeInstanceInfo.ActiveInstance);
+            var inactiveInfos = processInfos.FirstOrDefault(m => int.Parse(m.Id.Last().ToString()) != activeInstanceInfo.ActiveInstance);
+
+            var rows = new List<DataProviderStatusDto>();
+            var inactiveProvidersById = inactiveInfos.ProvidersInfo
+                .ToDictionary(m => m.DataProviderId!.Value, m => m);
+
+            var dataProviderById = _dataProviderCache.GetAllAsync().Result.ToDictionary(m => m.Id, m => m);
+
+            foreach (var activeProvider in activeInfos.ProvidersInfo.OrderBy(m => m.DataProviderId))
+            {
+                var dataProvider = dataProviderById[activeProvider.DataProviderId.GetValueOrDefault()];
+                var inactiveProvider = inactiveProvidersById.GetValueOrDefault(activeProvider.DataProviderId!.Value, null);
+
+                var row = new DataProviderStatusDto
+                {
+                    Id = activeProvider.DataProviderId ?? 0,
+                    Identifier = activeProvider.DataProviderIdentifier,
+                    Name = dataProvider.Names.Translate("en-GB"),
+                    SwedishName = dataProvider.Names.Translate("sv-SE"),
+                    PublicActive = activeProvider?.PublicProcessCount ?? 0,
+                    PublicInactive = inactiveProvider?.PublicProcessCount ?? 0,
+                    PublicDiff = (activeProvider?.PublicProcessCount ?? 0) - (inactiveProvider?.PublicProcessCount ?? 0),
+                    ProtectedActive = activeProvider?.ProtectedProcessCount ?? 0,
+                    ProtectedInactive = inactiveProvider?.ProtectedProcessCount ?? 0,
+                    ProtectedDiff = (activeProvider?.ProtectedProcessCount ?? 0) - (inactiveProvider?.ProtectedProcessCount ?? 0),
+                    // Note: Invalid counts are not available in the ProcessInfoDto, keeping them as 0
+                    InvalidActive = activeProvider?.ProcessFailCount.GetValueOrDefault(0) ?? 0,
+                    InvalidInactive = inactiveProvider?.ProcessFailCount.GetValueOrDefault(0) ?? 0,
+                    InvalidDiff = (activeProvider?.ProcessFailCount.GetValueOrDefault(0) ?? 0) - (inactiveProvider?.ProcessFailCount.GetValueOrDefault(0) ?? 0)
+                };
+
+                rows.Add(row);
+            }
+
+            return rows.OrderBy(r => r.Id).ToList();
         }
     }
 }
