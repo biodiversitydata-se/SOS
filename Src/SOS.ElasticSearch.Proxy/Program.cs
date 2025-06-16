@@ -1,4 +1,6 @@
+using HealthChecks.UI.Client;
 using Microsoft.ApplicationInsights.Extensibility;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using MongoDB.Bson.Serialization.Conventions;
 using Serilog;
 using SOS.ElasticSearch.Proxy.Extensions;
@@ -111,6 +113,12 @@ static void ConfigureMiddleware(WebApplication app, bool isDevelopment)
     }
 
     app.UseHealthChecks("/healthz");
+    app.UseHealthChecks("/health", new HealthCheckOptions()
+    {
+        Predicate = _ => true,
+        ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+    });
+
 
     app.UseWhen(context => context.Request.Path.StartsWithSegments("/caches"),
             builder => builder
