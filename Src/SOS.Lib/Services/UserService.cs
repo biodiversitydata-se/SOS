@@ -64,7 +64,9 @@ namespace SOS.Lib.Services
 
                 var response = await _httpClientService.GetDataAsync<ResponseModel<UserModel>>(
                     new Uri($"{_userServiceConfiguration.UserAdmin2ApiBaseAddress}/Users/Current?artdataFormat=true"),
-                    new Dictionary<string, string> { { "Authorization", authorizationHeader } });
+                    new Dictionary<string, string> { { "Authorization", authorizationHeader } },
+                    TimeSpan.FromSeconds(3),
+                    5);
 
                 return response?.Success ?? false
                     ? response.Result
@@ -90,7 +92,9 @@ namespace SOS.Lib.Services
                 await InvalidateAccessTokenAsync();
                 var response = await _httpClientService.GetDataAsync<ResponseModel<UserModel>>(
                     new Uri($"{_userServiceConfiguration.UserAdmin2ApiBaseAddress}/Users/{userId}?artdataFormat=true"),
-                    new Dictionary<string, string> { { "Authorization", $"Bearer {_jsonWebToken.EncodedToken}" } });
+                    new Dictionary<string, string> { { "Authorization", $"Bearer {_jsonWebToken.EncodedToken}" } },
+                    TimeSpan.FromSeconds(3),
+                    5);
 
                 return response.Success
                     ? response.Result
@@ -112,7 +116,9 @@ namespace SOS.Lib.Services
                 await InvalidateAccessTokenAsync();
                 var response = await _httpClientService.GetDataAsync<ResponseModel<IEnumerable<AuthorityModel>>>(
                     new Uri($"{_userServiceConfiguration.UserAdmin2ApiBaseAddress}/Users/{userId}/permissions?applicationIdentifier={authorizationApplicationIdentifier ?? "artportalen"}&lang={cultureCode}&artdataFormat=true"),
-                    new Dictionary<string, string> { { "Authorization", $"Bearer {_jsonWebToken.EncodedToken}" } });
+                    new Dictionary<string, string> { { "Authorization", $"Bearer {_jsonWebToken.EncodedToken}" } },
+                    TimeSpan.FromSeconds(3),
+                    5);
 
                 return response.Success
                     ? response.Result
@@ -135,7 +141,9 @@ namespace SOS.Lib.Services
                 var cultureId = CultureCodeHelper.GetCultureId(cultureCode);
                 var response = await _httpClientService.GetDataAsync<ResponseModel<IEnumerable<RoleModel>>>(
                     new Uri($"{_userServiceConfiguration.UserAdmin2ApiBaseAddress}/Users/{userId}/roles?applicationIdentifier={authorizationApplicationIdentifier ?? "artportalen"}&localeId={cultureId}&artdataFormat=true"),
-                    new Dictionary<string, string> { { "Authorization", $"Bearer {_jsonWebToken.EncodedToken}" } });
+                    new Dictionary<string, string> { { "Authorization", $"Bearer {_jsonWebToken.EncodedToken}" } },
+                    TimeSpan.FromSeconds(3),
+                    5);
 
                 return response?.Success ?? false
                     ? response.Result
@@ -157,7 +165,9 @@ namespace SOS.Lib.Services
                 await InvalidateAccessTokenAsync();
                 var response = await _httpClientService.GetDataAsync<ResponseModel<PersonModel>>(
                     new Uri($"{_userServiceConfiguration.UserAdmin2ApiBaseAddress}/Persons/{personId}?lang={cultureCode}&artdataFormat=true"),
-                    new Dictionary<string, string> { { "Authorization", $"Bearer {_jsonWebToken.EncodedToken}" } });
+                    new Dictionary<string, string> { { "Authorization", $"Bearer {_jsonWebToken.EncodedToken}" } },
+                    TimeSpan.FromSeconds(3),
+                    5);
 
                 return response?.Success ?? false
                     ? response.Result

@@ -293,7 +293,7 @@ namespace SOS.Observations.Api.LiveIntegrationTests.Fixtures
             AzureSearchHealthCheck = new AzureSearchHealthCheck(healthCheckConfiguration, new NullLogger<AzureSearchHealthCheck>());
             var devOpsService = new DevOpsService(new HttpClientService(new NullLogger<HttpClientService>()), new DevOpsConfiguration(), new NullLogger<DevOpsService>());
             var devOpsManager = new DevOpsManager(devOpsService, new DevOpsConfiguration(), new NullLogger<DevOpsManager>());
-            SystemsController = new SystemsController(devOpsManager, processInfoManager, ProcessedObservationRepository, new NullLogger<SystemsController>());
+            SystemsController = new SystemsController(devOpsManager, processInfoManager, ProcessedObservationRepository, elasticConfiguration, dataProviderCache, new NullLogger<SystemsController>());
             _userManager = new UserManager(userService, areaCache, new NullLogger<UserManager>());
             UserController = new UserController(_userManager, new NullLogger<UserController>());
             SersObservationVerbatimRepository = new SersObservationVerbatimRepository(importClient, new NullLogger<SersObservationVerbatimRepository>());
