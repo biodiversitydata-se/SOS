@@ -11,7 +11,7 @@
 	<dataset>
 		<identifier></identifier>
 		<alternateIdentifier>urn:lsid:artdata.slu.se:SOS:iNaturalist</alternateIdentifier>
-		<title>iNaturalist Research-grade Observations Sweden</title>
+		<title>iNaturalist Observations Sweden</title>
 		<creator>
 			<organizationName>iNaturalist.org</organizationName>
 			<individualName>
@@ -38,6 +38,9 @@
 			</para>
 			<para>
 				I nuvarande skick kan här inte 'forskningsklass' fynd och övriga skiljas åt. En uppdelning av dataset m.a.p. fyndens klassning planeras.
+			</para>
+			<para>
+				Detta dataset innehåller för näravarande bara publika observationer, d.v.s. inte skyddade fynd av skyddsklassade arter.
 			</para>
 			<para>
 				iNaturalist.Se är den svenska delen av det internationella iNaturalist-nätverket, som är ett gemensamt initiativ av California Academy of Sciences och National Geographic Society. SLU Artdatabanken är medlem i nätverket och ansvarar för den svenska noden.
