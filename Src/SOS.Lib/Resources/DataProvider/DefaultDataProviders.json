@@ -1245,11 +1245,11 @@
     "Descriptions": [
       {
         "CultureCode": "en-GB",
-        "Value": "Biologg is a mobile game that logs observations of species in the wild. By recording species observations you can collect points, level up in different species groups and do challenges. The data collected can later be used for research and nature conservation."
+        "Value": "Biologg is a mobile game that logs observations of species in the wild. By recording species observations you can collect points, level up in different species groups and do challenges. The data collected can later be used for research and nature conservation. Using the mobile Biologg app species observations were collected during years 2019-2024."
       },
       {
         "CultureCode": "sv-SE",
-        "Value": "Biologg är ett mobilspel som går ut på att logga observationer av arter ute i naturen. I spelet kan man samla poäng, levla up i olika artgrupper och göra utmaningar. Den data som samlas in kommer senare att kunna användas för forskning och naturvård."
+        "Value": "Biologg är ett mobilspel som går ut på att logga observationer av arter ute i naturen. I spelet kan man samla poäng, levla up i olika artgrupper och göra utmaningar. Den data som samlas in kommer senare att kunna användas för forskning och naturvård. Genom Biologg appen samlades in observationer under åren 2019-2024."
       }
     ],
     "HarvestFailPreventProcessing": false,
@@ -1323,11 +1323,11 @@
     "Descriptions": [
       {
         "CultureCode": "en-GB",
-        "Value": "iNaturalist.se is an online-community where members can learn about species in an interactive way together. Posting photos of their observations, they let other species experts and naturalists help with identification. Here, they can keep track of their observations as well as those of others, read species facts and learn how to identify more of the species in Swedish nature. Observations featured here are only those of Research Grade – i.e. those that fulfil a set of criteria, where one is that at least 2/3 of users contributing an identification agree. They are harvested daily from GBIF who in turn gets them as an export from iNaturalist.org on a weekly basis.  iNaturalist.Se is the Swedish part of the international iNaturalist Network, which is a joint initiative between the California Academy of Sciences and the National Geographic Society. The SLU Swedish Species Information Centre is a member of the network, managing the Swedish node."
+        "Value": "iNaturalist.se is an online-community where members can learn about species in an interactive way together. Posting photos of their observations, they let other species experts and naturalists help with identification. Here, they can keep track of their observations as well as those of others, read species facts and learn how to identify more of the species in Swedish nature. This dataset currently combines observations of Research Grade (i.e. those that fulfil a set of criteria, where one is that at least 2/3 of users contributing an identification agree) and other Casual observations (either not fulfilling citeria or not having been reviewed yet). They are harvested daily directly from iNaturalist.org. This dataset currently contains only public observations (i.e. not protected sensitive observations). iNaturalist.Se is the Swedish part of the international iNaturalist Network, which is a joint initiative between the California Academy of Sciences and the National Geographic Society. The SLU Swedish Species Information Centre is a member of the network, managing the Swedish node."
       },
       {
         "CultureCode": "sv-SE",
-        "Value": "iNaturalist.se är en online-community där naturälskare över hela världen kan lära sig om arter på ett roligt sätt tillsammans. De laddar upp bilder på sina artobservationer och låter andra art- och naturintresserade hjälpa till med artbestämningen. De kan hålla koll på sina och andras fynd, läs fakta om arterna och lär sig känna igen fler arter i Sveriges natur. Fynd som tillhandahålls här är bara de som uppnått forskningsklass – d.v.s. att de uppfyller ett antal kriterier, varav ett är att minst 2/3 av de användare som bidrar med artbestämning är överens. De skördas dagligen från GBIF som i sin tur får exporter från iNaturalist.org en gång per vecka. iNaturalist.Se är den svenska delen av det internationella iNaturalist-nätverket, som är ett gemensamt initiativ av California Academy of Sciences och National Geographic Society. SLU Artdatabanken är medlem i nätverket och ansvarar för den svenska noden. "
+        "Value": "iNaturalist.se är en online-community där naturälskare över hela världen kan lära sig om arter på ett roligt sätt tillsammans. De laddar upp bilder på sina artobservationer och låter andra art- och naturintresserade hjälpa till med artbestämningen. De kan hålla koll på sina och andras fynd, läs fakta om arterna och lär sig känna igen fler arter i Sveriges natur. detta dataset tillhandahåller för närvarande både observationer som uppnått forskningsklass (d.v.s. att de uppfyller ett antal kriterier, varav ett är att minst 2/3 av de användare som bidrar med artbestämning är överens) och övriga (som antingen inte uppfyller kriterier, eller inte hunnits granska än). De skördas dagligen från iNaturalist.org. Detta dataset innehåller för närvarande bara publika observationer (d.v.s. inga skyddade fynd). iNaturalist.Se är den svenska delen av det internationella iNaturalist-nätverket, som är ett gemensamt initiativ av California Academy of Sciences och National Geographic Society. SLU Artdatabanken är medlem i nätverket och ansvarar för den svenska noden. "
       }
     ],
     "HarvestFailPreventProcessing": false,
@@ -1341,7 +1341,7 @@
     "Names": [
       {
         "CultureCode": "en-GB",
-        "Value": "iNaturalist Research-grade Observations Sweden"
+        "Value": "iNaturalist Observations Sweden"
       },
       {
         "CultureCode": "sv-SE",
