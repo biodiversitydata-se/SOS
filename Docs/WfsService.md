@@ -139,5 +139,8 @@ If you are a Java developer and want to help us fix the bug, you can find more i
 - [GeoTools file - ElasticDataStoreFactory.java](https://github.com/geotools/geotools/blob/main/modules/unsupported/elasticsearch/src/main/java/org/geotools/data/elasticsearch/ElasticDataStoreFactory.java)
 *- unlike all other datastores, the ElasticSearchDataStoreFactory lacks a NAMESPACE parameter, so GeoServer cannot inject the workspace-associated namespace URI into it.*
 
+### SSL error - certificate problem:
+An upgrade of the Geoserver can cause a certificate error when try to connect. This is because the software used uses outdated protocols that are no longer supported. To overcome this, you need to update your software. For example, install the latest version of QGIS.
+
 ## Support
 In case of questions or problems, contact support at SLU Artdatabanken: artdatabanken@slu.se
