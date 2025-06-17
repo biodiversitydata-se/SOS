@@ -61,7 +61,7 @@ public class SemaphoreLimitManager
         var semaphoreTime = Stopwatch.StartNew();
         if (semaphoreResult.Semaphore.CurrentCount == 0)
         {
-            _logger.LogWarning("All semaphore slots are occupied. Request will be queued. Endpoint={endpoint}, UserType={@userType}", endpointName, userType);
+            _logger.LogDebug("All semaphore slots are occupied. Request will be queued. Endpoint={endpoint}, UserType={@userType}", endpointName, userType);
             semaphoreResult.SemaphoreStatus = "Wait";
         }
 
