@@ -15,8 +15,7 @@
 		<Nullable>enable</Nullable>
 	</PropertyGroup>
 
-	<ItemGroup>
-		<PackageReference Include="Autofac" Version="8.3.0" />
+	<ItemGroup>		
 		<PackageReference Include="CSharpFunctionalExtensions" Version="3.6.0" />
 		<PackageReference Include="Dapper" Version="2.1.66" />
 		<PackageReference Include="EnumExtensions.System.Text.Json" Version="1.2.0" />
