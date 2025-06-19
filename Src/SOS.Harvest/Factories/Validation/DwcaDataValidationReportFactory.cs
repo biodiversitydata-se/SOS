@@ -2,6 +2,7 @@
 using MongoDB.Driver;
 using SOS.Harvest.Managers.Interfaces;
 using SOS.Harvest.Processors.DarwinCoreArchive;
+using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Enums;
@@ -36,8 +37,10 @@ namespace SOS.Harvest.Factories.Validation
             ITaxonRepository processedTaxonRepository,
             IProcessTimeManager processTimeManager,
             ProcessConfiguration processConfiguration,
+            ICache<int, Taxon> taxonCache,
+            ICache<VocabularyId, Vocabulary> vocabularyCache,
             ILoggerFactory loggerFactory)
-            : base(processedVocabularyRepository, validationManager, areaHelper, vocabularyValueResolver, processedTaxonRepository, processTimeManager, processConfiguration)
+            : base(processedVocabularyRepository, validationManager, areaHelper, vocabularyValueResolver, processedTaxonRepository, processTimeManager, processConfiguration, taxonCache, vocabularyCache)
         {
             _verbatimClient = verbatimClient ?? throw new ArgumentNullException(nameof(verbatimClient));
             _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));

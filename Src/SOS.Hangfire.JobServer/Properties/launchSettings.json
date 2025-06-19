@@ -6,7 +6,10 @@
     },
     "SOS.Hangfire.JobServer (ST)": {
       "commandName": "Project",
-      "commandLineArgs": "ST"
+      "commandLineArgs": "ST",
+      "environmentVariables": {
+        "USE_LOCAL_HANGFIRE": "true"
+      }
     },
     "Docker": {
       "commandName": "Docker",

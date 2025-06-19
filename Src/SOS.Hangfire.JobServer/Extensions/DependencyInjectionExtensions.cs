@@ -127,7 +127,7 @@ namespace SOS.Hangfire.JobServer.Extensions;
 
 public static class DependencyInjectionExtensions
 {
-    public static IServiceCollection AddDependencyInjectionServices(this IServiceCollection services, IConfigurationRoot configuration)
+    public static IServiceCollection AddDependencyInjectionServices(this IServiceCollection services, IConfigurationRoot configuration, bool excludeParishGeometries = false)
     {
         // Get configuration
         var apiManagementServiceConfiguration = configuration.GetSection("ApiManagementServiceConfiguration").Get<ApiManagementServiceConfiguration>();
@@ -144,6 +144,7 @@ public static class DependencyInjectionExtensions
         var sosApiConfiguration = configuration.GetSection(nameof(SosApiConfiguration)).Get<SosApiConfiguration>();
         var userServiceConfiguration = configuration.GetSection(nameof(UserServiceConfiguration)).Get<UserServiceConfiguration>();
         var areaConfiguration = configuration.GetSection(nameof(AreaConfiguration)).Get<AreaConfiguration>();
+        areaConfiguration.ExcludeParishGeometries = excludeParishGeometries;
 
         // Elasticsearch
         services.AddSingleton(searchDbConfiguration);

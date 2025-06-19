@@ -25,7 +25,7 @@
       "launchUrl": "swagger",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "ST",
-        "USE_LOCAL_HANGFIRE": "false"
+        "USE_LOCAL_HANGFIRE": "true"
       },
       "applicationUrl": "http://localhost:5005"
     }

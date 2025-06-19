@@ -54,6 +54,7 @@ namespace SOS.Hangfire.JobServer
         private static HangfireDbConfiguration _hangfireDbConfiguration;
         private static bool _useLocalHangfire;
         private static string? _hangfireDbConnectionString = null;
+        private static bool _excludeParishGeometries = false; // Exclude parish geometries when running tests in order to improve performance.
 
         /// <summary>
         ///     Application entry point
@@ -66,6 +67,7 @@ namespace SOS.Hangfire.JobServer
                 ? args[0].ToLower()
                 : Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")?.ToLower();
             _useLocalHangfire = GetEnvironmentBool(environmentVariable: "USE_LOCAL_HANGFIRE");
+            _excludeParishGeometries = GetEnvironmentBool(environmentVariable: "EXCLUDE_PARISH_GEOMETRIES");
             Console.WriteLine("Starting up in environment:" + _env);
 
 
@@ -136,6 +138,7 @@ namespace SOS.Hangfire.JobServer
             _hangfireDbConnectionString = builder.Configuration.GetConnectionString("hangfire-mongodb");
             var hangfireDbConfig = configuration.GetSection("HangfireDbConfiguration").Get<HangfireDbConfiguration>();
             var localHangfireDbConfiguration = configuration.GetSection("LocalHangfireDbConfiguration").Get<HangfireDbConfiguration>();
+            _areaConfiguration.ExcludeParishGeometries = _excludeParishGeometries;
 
             _hangfireDbConfiguration = _useLocalHangfire
                 ? localHangfireDbConfiguration
@@ -213,7 +216,7 @@ namespace SOS.Hangfire.JobServer
                 });
             }
 
-            services.AddDependencyInjectionServices(configuration);
+            services.AddDependencyInjectionServices(configuration, _excludeParishGeometries);
    
             builder.Host.UseNLog();
             return builder;
