@@ -75,5 +75,10 @@
         /// Minimum protected observations processed for switching active instance
         /// </summary>
         public long MinObservationProtectedCount { get; set; }
+
+        /// <summary>
+        /// Use dataset count validation.
+        /// </summary>
+        public bool UseDatasetCountValidation { get; set; } = true;
     }
 }
