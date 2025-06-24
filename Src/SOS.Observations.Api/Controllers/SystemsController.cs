@@ -256,13 +256,27 @@ namespace SOS.Observations.Api.Controllers
             MongoDbProcessInfoDto activeInfos = processInfos.FirstOrDefault(m => int.Parse(m.Id.Last().ToString()) == activeInstanceInfo.ActiveInstance);
             var inactiveInfos = processInfos.FirstOrDefault(m => int.Parse(m.Id.Last().ToString()) != activeInstanceInfo.ActiveInstance);
             var processSummary = new ProcessSummaryDto
-            {                
-                ActiveProcessInfo = activeInfos,
-                InactiveProcessInfo = inactiveInfos,
+            {
+                ActiveProcessStatus = CreateProcessStatus(activeInfos),
+                InactiveProcessStatus = CreateProcessStatus(inactiveInfos),
                 DataProviderStatuses = GetDataProviderStatuses(activeInfos, inactiveInfos)
             };
 
             return processSummary;
+        }
+
+        private ProcessStatusDto CreateProcessStatus(MongoDbProcessInfoDto processInfo)
+        {
+            return new ProcessStatusDto
+            {
+                Name = processInfo.Id,
+                Status = processInfo.Status,
+                PublicCount = processInfo.PublicCount,
+                ProtectedCount = processInfo.ProtectedCount,
+                InvalidCount = processInfo.ProcessFailCount,
+                Start = processInfo.Start,
+                End = processInfo.End
+            };
         }
 
         private List<DataProviderStatusDto> GetDataProviderStatuses(MongoDbProcessInfoDto activeInfos, MongoDbProcessInfoDto inactiveInfos)
@@ -276,7 +290,11 @@ namespace SOS.Observations.Api.Controllers
             {
                 var dataProvider = dataProviderById[activeProvider.DataProviderId.GetValueOrDefault()];
                 var inactiveProvider = inactiveProvidersById.GetValueOrDefault(activeProvider.DataProviderId!.Value, null);
-
+                var activeHarvestTime = (activeProvider.HarvestEnd ?? DateTime.UtcNow) - (activeProvider.HarvestStart ?? DateTime.UtcNow);
+                var inactiveHarvestTime = (inactiveProvider?.HarvestEnd ?? DateTime.UtcNow) - (inactiveProvider?.HarvestStart ?? DateTime.UtcNow);
+                var activeProcessTime = (activeProvider.ProcessEnd ?? DateTime.UtcNow) - (activeProvider.ProcessStart ?? DateTime.UtcNow);
+                var inactiveProcessTime = (inactiveProvider?.ProcessEnd ?? DateTime.UtcNow) - (inactiveProvider?.ProcessStart ?? DateTime.UtcNow);
+                
                 var row = new DataProviderStatusDto
                 {
                     Id = activeProvider.DataProviderId ?? 0,
@@ -288,11 +306,22 @@ namespace SOS.Observations.Api.Controllers
                     PublicDiff = (activeProvider?.PublicProcessCount ?? 0) - (inactiveProvider?.PublicProcessCount ?? 0),
                     ProtectedActive = activeProvider?.ProtectedProcessCount ?? 0,
                     ProtectedInactive = inactiveProvider?.ProtectedProcessCount ?? 0,
-                    ProtectedDiff = (activeProvider?.ProtectedProcessCount ?? 0) - (inactiveProvider?.ProtectedProcessCount ?? 0),
-                    // Note: Invalid counts are not available in the ProcessInfoDto, keeping them as 0
+                    ProtectedDiff = (activeProvider?.ProtectedProcessCount ?? 0) - (inactiveProvider?.ProtectedProcessCount ?? 0),                    
                     InvalidActive = activeProvider?.ProcessFailCount.GetValueOrDefault(0) ?? 0,
                     InvalidInactive = inactiveProvider?.ProcessFailCount.GetValueOrDefault(0) ?? 0,
-                    InvalidDiff = (activeProvider?.ProcessFailCount.GetValueOrDefault(0) ?? 0) - (inactiveProvider?.ProcessFailCount.GetValueOrDefault(0) ?? 0)
+                    InvalidDiff = (activeProvider?.ProcessFailCount.GetValueOrDefault(0) ?? 0) - (inactiveProvider?.ProcessFailCount.GetValueOrDefault(0) ?? 0),
+                    HarvestTimeActive = activeHarvestTime,
+                    HarvestTimeInactive = inactiveHarvestTime,
+                    HarvestTimeDiff = activeHarvestTime - inactiveHarvestTime,
+                    ProcessTimeActive = activeProcessTime,
+                    ProcessTimeInactive = inactiveProcessTime,
+                    ProcessTimeDiff = activeProcessTime - inactiveProcessTime,
+                    HarvestStatusActive = activeProvider.HarvestStatus,
+                    HarvestStatusInactive = inactiveProvider?.HarvestStatus ?? "Unknown",
+                    LatestIncrementalPublicCount = activeProvider.LatestIncrementalPublicCount,
+                    LatestIncrementalProtectedCount = activeProvider.LatestIncrementalProtectedCount,
+                    LatestIncrementalEnd = activeProvider.LatestIncrementalEnd,
+                    LatestIncrementalTime = (activeProvider.LatestIncrementalEnd ?? DateTime.UtcNow) - (activeProvider.LatestIncrementalStart ?? DateTime.UtcNow),        
                 };
 
                 rows.Add(row);
