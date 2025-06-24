@@ -241,7 +241,7 @@ namespace SOS.Observations.Api.Controllers
         }
 
         [HttpGet]
-        [Route("processummary")]
+        [Route("process-summary")]
         [InternalApi]
         public ProcessSummaryDto GetProcessSummary()
         {
@@ -256,27 +256,13 @@ namespace SOS.Observations.Api.Controllers
             MongoDbProcessInfoDto activeInfos = processInfos.FirstOrDefault(m => int.Parse(m.Id.Last().ToString()) == activeInstanceInfo.ActiveInstance);
             var inactiveInfos = processInfos.FirstOrDefault(m => int.Parse(m.Id.Last().ToString()) != activeInstanceInfo.ActiveInstance);
             var processSummary = new ProcessSummaryDto
-            {
-                ActiveProcessStatus = CreateProcessStatus(activeInfos),
-                InactiveProcessStatus = CreateProcessStatus(inactiveInfos),
+            {                
+                ActiveProcessInfo = activeInfos,
+                InactiveProcessInfo = inactiveInfos,
                 DataProviderStatuses = GetDataProviderStatuses(activeInfos, inactiveInfos)
             };
 
             return processSummary;
-        }
-
-        private ProcessStatusDto CreateProcessStatus(MongoDbProcessInfoDto processInfo)
-        {
-            return new ProcessStatusDto
-            {
-                Name = processInfo.Id,
-                Status = processInfo.Status,
-                PublicCount = processInfo.PublicCount,
-                ProtectedCount = processInfo.ProtectedCount,
-                InvalidCount = processInfo.ProcessFailCount,
-                Start = processInfo.Start,
-                End = processInfo.End
-            };
         }
 
         private List<DataProviderStatusDto> GetDataProviderStatuses(MongoDbProcessInfoDto activeInfos, MongoDbProcessInfoDto inactiveInfos)
