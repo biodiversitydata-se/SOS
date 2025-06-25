@@ -55,7 +55,7 @@ namespace SOS.Observations.Api.Controllers
             {
                 LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
 
-                var projects = await _projectManager.GetAsync(filter, base.User?.GetUserId());
+                var projects = await _projectManager.GetAsync(filter);
 
                 if ((projects?.Count() ?? 0) == 0)
                 {
@@ -83,7 +83,7 @@ namespace SOS.Observations.Api.Controllers
             {
                 LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
 
-                var projects = await _projectManager.GetAsync(ids, base.User?.GetUserId());
+                var projects = await _projectManager.GetAsync(ids);
 
                 if ((projects?.Count() ?? 0) == 0)
                 {

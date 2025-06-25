@@ -21,7 +21,7 @@ namespace SOS.Lib.Managers.Interfaces
         /// <param name="projectIds"></param>
         /// <param name="userId"></param>
         /// <returns></returns>
-        Task<IEnumerable<ProjectInfo>> GetAsync(IEnumerable<int> projectIds, int? userId = null);
+        Task<IEnumerable<ProjectInfo>> GetAsync(IEnumerable<int> projectIds);
 
         /// <summary>
         /// Get projects
@@ -29,7 +29,7 @@ namespace SOS.Lib.Managers.Interfaces
         /// <param name="filter"></param>
         /// <param name="userId"></param>
         /// <returns></returns>
-        Task<IEnumerable<ProjectInfo>> GetAsync(string filter, int? userId);
+        Task<IEnumerable<ProjectInfo>> GetAsync(string filter);
 
         /// <summary>
         /// Get project by id

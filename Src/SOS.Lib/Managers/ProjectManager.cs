@@ -37,32 +37,25 @@ namespace SOS.Lib.Managers
         }
 
         /// <inheritdoc/>
-        public async Task<IEnumerable<ProjectInfo>> GetAsync(IEnumerable<int> projectIds, int? userId = null)
+        public async Task<IEnumerable<ProjectInfo>> GetAsync(IEnumerable<int> projectIds)
         {
             if (!projectIds?.Any() ?? true)
             {
                 return null!;
             }
-            return (await GetAllAsync()).Where(p => projectIds.Contains(p.Id) && (userId == null || p.IsPublic || p.UserServiceUserId == userId));
+            return (await GetAllAsync()).Where(p => projectIds.Contains(p.Id));
         }
 
         /// <inheritdoc/>
-        public async Task<IEnumerable<ProjectInfo>> GetAsync(string filter, int? userId)
+        public async Task<IEnumerable<ProjectInfo>> GetAsync(string filter)
         {
             try
             {
                 return (await GetAllAsync()).Where(p => 
-                    (
-                        p.IsPublic || 
-                        p.UserServiceUserId == userId ||
-                        p.MemberIds.Contains(userId ?? 0)
-                    ) &&
-                    (
-                        string.IsNullOrEmpty(filter) ||
-                        (p.Category?.Contains(filter, StringComparison.CurrentCultureIgnoreCase) ?? false) ||
-                        (p.CategorySwedish?.Contains(filter, StringComparison.CurrentCultureIgnoreCase) ?? false) ||
-                        (p.Name?.Contains(filter, StringComparison.CurrentCultureIgnoreCase) ?? false)
-                    )
+                    string.IsNullOrEmpty(filter) ||
+                    (p.Category?.Contains(filter, StringComparison.CurrentCultureIgnoreCase) ?? false) ||
+                    (p.CategorySwedish?.Contains(filter, StringComparison.CurrentCultureIgnoreCase) ?? false) ||
+                    (p.Name?.Contains(filter, StringComparison.CurrentCultureIgnoreCase) ?? false)
                );
             }
             catch (Exception e)
