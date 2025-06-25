@@ -167,7 +167,7 @@ namespace SOS.ElasticSearch.Proxy.Middleware
             var semaphoreTime = Stopwatch.StartNew();
             if (_requestSemaphore.CurrentCount == 0)
             {
-                _logger.LogWarning("All semaphore slots are occupied. Request will be queued. UserType={@userType}", ApiUserType.Unknown);
+                _logger.LogDebug("All semaphore slots are occupied. Request will be queued. UserType={@userType}", ApiUserType.Unknown);
                 context.Items["SemaphoreStatus"] = "Wait";
             }
 

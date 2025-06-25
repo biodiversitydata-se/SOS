@@ -13,8 +13,7 @@
 	  <TargetFramework>net9.0</TargetFramework>
   </PropertyGroup>
 
-  <ItemGroup>
-	  <PackageReference Include="Autofac" Version="8.3.0" />
+  <ItemGroup>	  
 	  <PackageReference Include="Azure.Storage.Blobs" Version="12.24.0" />
 	  <PackageReference Include="Hangfire.Core" Version="1.8.20" />
 	  <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="9.0.5" />

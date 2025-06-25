@@ -1,6 +1,24 @@
 {
   "$schema": "https://json.schemastore.org/launchsettings.json",
   "profiles": {
+    "AppHost (Dev)": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "launchBrowser": true,
+      "applicationUrl": "https://localhost:17168;http://localhost:15009",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Dev",
+        "DOTNET_ENVIRONMENT": "Dev",
+        "DOTNET_DASHBOARD_OTLP_ENDPOINT_URL": "https://localhost:21056",
+        "DOTNET_RESOURCE_SERVICE_ENDPOINT_URL": "https://localhost:22144",
+        "DISABLE_HANGFIRE_INIT": "false",
+        "USE_LOCAL_HANGFIRE": "true",
+        "DISABLE_HEALTHCHECK_INIT": "true",
+        "DISABLE_CACHED_TAXON_SUM_INIT": "true",
+        "USE_LOCAL_OBSERVATION_API": "true",
+        "EXCLUDE_PARISH_GEOMETRIES": "true"
+      }
+    },
     "AppHost (ST)": {
       "commandName": "Project",
       "dotnetRunMessages": true,
@@ -15,7 +33,8 @@
         "USE_LOCAL_HANGFIRE": "true",
         "DISABLE_HEALTHCHECK_INIT": "true",
         "DISABLE_CACHED_TAXON_SUM_INIT": "true",
-        "USE_LOCAL_OBSERVATION_API": "true"
+        "USE_LOCAL_OBSERVATION_API": "true",
+        "EXCLUDE_PARISH_GEOMETRIES": "true"
       }
     },
     "AppHost (local)": {
@@ -31,7 +50,8 @@
         "DISABLE_HANGFIRE_INIT": "false",
         "USE_LOCAL_HANGFIRE": "true",
         "DISABLE_HEALTHCHECK_INIT": "true",
-        "DISABLE_CACHED_TAXON_SUM_INIT": "true"
+        "DISABLE_CACHED_TAXON_SUM_INIT": "true",
+        "EXCLUDE_PARISH_GEOMETRIES": "true"
       }
     },
     "AppHost http (local)": {
@@ -47,7 +67,8 @@
         "DISABLE_HANGFIRE_INIT": "false",
         "USE_LOCAL_HANGFIRE": "true",
         "DISABLE_HEALTHCHECK_INIT": "true",
-        "DISABLE_CACHED_TAXON_SUM_INIT": "true"
+        "DISABLE_CACHED_TAXON_SUM_INIT": "true",
+        "EXCLUDE_PARISH_GEOMETRIES": "true"
       }
     }
   }

@@ -77,7 +77,8 @@ In QGIS select "Modify WFS connection" and then select 1.0 under "Version":
 
 ![modifyConnection_version_QGIS](Images/wfs_modifyConnection_version_QGIS.jpg)
 
-
+### SSL error - certificate problem:
+An upgrade of the Geoserver can cause a certificate error when try to connect. This is because the software used uses outdated protocols that are no longer supported. To overcome this, you need to update your software. For example, install the latest version of QGIS.
 
 ## Support
 In case of questions or problems, contact support at SLU Artdatabanken: artdatabanken@slu.se

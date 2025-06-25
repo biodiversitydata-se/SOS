@@ -1,6 +1,7 @@
 ﻿using MongoDB.Driver;
 using SOS.Harvest.Factories.Validation.Interfaces;
 using SOS.Harvest.Managers.Interfaces;
+using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
@@ -27,11 +28,14 @@ namespace SOS.Harvest.Factories.Validation
         protected readonly IVocabularyRepository _processedVocabularyRepository;
         protected readonly IAreaHelper _areaHelper;
         protected readonly ITaxonRepository _processedTaxonRepository;
+        protected readonly ICache<int, Taxon> _taxonCache;
+        protected readonly ICache<VocabularyId, Vocabulary> _vocabularyCache;
         protected Dictionary<int, Taxon>? _taxonById;
         protected IDictionary<VocabularyId, IDictionary<object, int>> _dwcaVocabularyById;
-        protected IDictionary<VocabularyId, Vocabulary>? _vocabularyById;
+        protected IDictionary<VocabularyId, Vocabulary>? _vocabularyById;        
         protected readonly IProcessTimeManager _processTimeManager;
         protected readonly ProcessConfiguration ProcessConfiguration;
+        private readonly SemaphoreSlim _initializeSemaphoreSlim = new SemaphoreSlim(1, 1);
 
         protected DataValidationReportFactoryBase(
             IVocabularyRepository processedVocabularyRepository,
@@ -40,7 +44,9 @@ namespace SOS.Harvest.Factories.Validation
             IVocabularyValueResolver vocabularyValueResolver,
             ITaxonRepository processedTaxonRepository,
             IProcessTimeManager processTimeManager,
-            ProcessConfiguration processConfiguration)
+            ProcessConfiguration processConfiguration,
+            ICache<int, Taxon> taxonCache,
+            ICache<VocabularyId, Vocabulary> vocabularyCache)
         {
             _vocabularyValueResolver = vocabularyValueResolver ?? throw new ArgumentNullException(nameof(vocabularyValueResolver));
             _validationManager = validationManager ?? throw new ArgumentNullException(nameof(validationManager));
@@ -49,20 +55,30 @@ namespace SOS.Harvest.Factories.Validation
             _processedTaxonRepository = processedTaxonRepository ?? throw new ArgumentNullException(nameof(processedTaxonRepository));
             _processTimeManager = processTimeManager;
             ProcessConfiguration = processConfiguration ?? throw new ArgumentNullException(nameof(processConfiguration));
+            _taxonCache = taxonCache ?? throw new ArgumentNullException(nameof(taxonCache));
+            _vocabularyCache = vocabularyCache ?? throw new ArgumentNullException(nameof(vocabularyCache));
             Task.Run(InitializeAsync).Wait();
         }
 
         private async Task InitializeAsync()
         {
-            var taxa = await _processedTaxonRepository.GetAllAsync();
-            _taxonById = taxa.ToDictionary(m => m.Id, m => m);
-            var allVocabularies = await _processedVocabularyRepository.GetAllAsync();
-            _vocabularyById = allVocabularies.ToDictionary(f => f.Id, f => f);
-            _dwcaVocabularyById = VocabularyHelper.GetVocabulariesDictionary(
-                    ExternalSystemId.DarwinCore,
-                    allVocabularies,
-                    true);
-            await _areaHelper.InitializeAsync();
+            await _initializeSemaphoreSlim.WaitAsync();
+            try
+            {
+                var taxa = await _taxonCache.GetAllAsync();
+                _taxonById = taxa.ToDictionary(m => m.Id, m => m);
+                var allVocabularies = (await _vocabularyCache.GetAllAsync()).ToList();
+                _vocabularyById = allVocabularies.ToDictionary(f => f.Id, f => f);
+                _dwcaVocabularyById = VocabularyHelper.GetVocabulariesDictionary(
+                        ExternalSystemId.DarwinCore,
+                        allVocabularies,
+                        true);
+                await _areaHelper.InitializeAsync();
+            }
+            finally
+            {
+                _initializeSemaphoreSlim.Release();
+            }            
         }
 
         protected abstract Task<IAsyncCursor<TVerbatimObservation>> GetAllObservationsByCursorAsync(DataProvider dataProvider);

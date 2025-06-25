@@ -28,5 +28,8 @@ All public observations that SOS harvests are available in a viewing OGC Web Map
 ## Known problems
 The WMS is using [GeoServer](https://geoserver.org/) and a plugin to GeoServer that has a [bug](https://github.com/ngageoint/elasticgeo/issues/122) leading to that requests sometimes stop being processed and no observations are returned until the server is restarted. This problem occurs about once a month. Currently we are restarting GeoServer once a day to try avoid that this problem affects users of the WMS.
 
+### SSL error - certificate problem:
+An upgrade of the Geoserver can cause a certificate error when try to connect. This is because the software used uses outdated protocols that are no longer supported. To overcome this, you need to update your software. For example, install the latest version of QGIS.
+
 ## Support
 In case of questions or problems, contact support at SLU Artdatabanken: artdatabanken@slu.se

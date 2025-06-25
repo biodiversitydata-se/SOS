@@ -254,10 +254,13 @@ namespace SOS.Harvest.Jobs
                         providerInactive.DataProviderIdentifier, providerActive!.PreviousProcessLimit, providerInactive.PublicProcessCount, providerActive.PublicProcessCount);
                         _logger.LogError("Validation failed. Protected observation count for {@dataProvider} is less than {@reviousProcessLimit}% of last run. Count this time={@protectedProcessCount}. Count previous time={@protectedProcessCountPrevious}.",
                             providerInactive.DataProviderIdentifier, providerActive!.PreviousProcessLimit, providerActive!.PreviousProcessLimit, providerActive.ProtectedProcessCount);
-                        return false;
+                        
+                        if (_processConfiguration.UseDatasetCountValidation)
+                            return false;
                     }
                 }
             }
+
             return true;
         }
 

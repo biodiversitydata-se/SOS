@@ -241,33 +241,60 @@ namespace SOS.Observations.Api.Controllers
         }
 
         [HttpGet]
-        [Route("dataproviderstatus")]
+        [Route("process-summary")]
         [InternalApi]
-        public IEnumerable<DataProviderStatusDto> GetDataProviderStatus()
+        public ProcessSummaryDto GetProcessSummary()
         {
             var activeInstance = GetActiveInstance();
             var processInfos = GetMongoDbProcessInfo();
+            var processSummary = GetProcessSummary(processInfos, activeInstance);
+            return processSummary;
+        }
+        
+        private ProcessSummaryDto GetProcessSummary(IEnumerable<MongoDbProcessInfoDto>? processInfos, ActiveInstanceInfoDto? activeInstanceInfo)
+        {
+            MongoDbProcessInfoDto activeInfos = processInfos.FirstOrDefault(m => int.Parse(m.Id.Last().ToString()) == activeInstanceInfo.ActiveInstance);
+            var inactiveInfos = processInfos.FirstOrDefault(m => int.Parse(m.Id.Last().ToString()) != activeInstanceInfo.ActiveInstance);
+            var processSummary = new ProcessSummaryDto
+            {
+                ActiveProcessStatus = CreateProcessStatus(activeInfos),
+                InactiveProcessStatus = CreateProcessStatus(inactiveInfos),
+                DataProviderStatuses = GetDataProviderStatuses(activeInfos, inactiveInfos)
+            };
 
-            var items = GetDataProviderStatusItems(processInfos, activeInstance);
-            return items;
+            return processSummary;
         }
 
-        private List<DataProviderStatusDto> GetDataProviderStatusItems(IEnumerable<MongoDbProcessInfoDto>? processInfos, ActiveInstanceInfoDto? activeInstanceInfo)
+        private ProcessStatusDto CreateProcessStatus(MongoDbProcessInfoDto processInfo)
         {
-            var activeInfos = processInfos.FirstOrDefault(m => int.Parse(m.Id.Last().ToString()) == activeInstanceInfo.ActiveInstance);
-            var inactiveInfos = processInfos.FirstOrDefault(m => int.Parse(m.Id.Last().ToString()) != activeInstanceInfo.ActiveInstance);
+            return new ProcessStatusDto
+            {
+                Name = processInfo.Id,
+                Status = processInfo.Status,
+                PublicCount = processInfo.PublicCount,
+                ProtectedCount = processInfo.ProtectedCount,
+                InvalidCount = processInfo.ProcessFailCount,
+                Start = processInfo.Start,
+                End = processInfo.End
+            };
+        }
 
-            var rows = new List<DataProviderStatusDto>();
+        private List<DataProviderStatusDto> GetDataProviderStatuses(MongoDbProcessInfoDto activeInfos, MongoDbProcessInfoDto inactiveInfos)
+        {
+            List<DataProviderStatusDto> rows = new();
             var inactiveProvidersById = inactiveInfos.ProvidersInfo
-                .ToDictionary(m => m.DataProviderId!.Value, m => m);
+                            .ToDictionary(m => m.DataProviderId!.Value, m => m);
 
             var dataProviderById = _dataProviderCache.GetAllAsync().Result.ToDictionary(m => m.Id, m => m);
-
             foreach (var activeProvider in activeInfos.ProvidersInfo.OrderBy(m => m.DataProviderId))
             {
                 var dataProvider = dataProviderById[activeProvider.DataProviderId.GetValueOrDefault()];
                 var inactiveProvider = inactiveProvidersById.GetValueOrDefault(activeProvider.DataProviderId!.Value, null);
-
+                var activeHarvestTime = (activeProvider.HarvestEnd ?? DateTime.UtcNow) - (activeProvider.HarvestStart ?? DateTime.UtcNow);
+                var inactiveHarvestTime = (inactiveProvider?.HarvestEnd ?? DateTime.UtcNow) - (inactiveProvider?.HarvestStart ?? DateTime.UtcNow);
+                var activeProcessTime = (activeProvider.ProcessEnd ?? DateTime.UtcNow) - (activeProvider.ProcessStart ?? DateTime.UtcNow);
+                var inactiveProcessTime = (inactiveProvider?.ProcessEnd ?? DateTime.UtcNow) - (inactiveProvider?.ProcessStart ?? DateTime.UtcNow);
+                
                 var row = new DataProviderStatusDto
                 {
                     Id = activeProvider.DataProviderId ?? 0,
@@ -279,11 +306,22 @@ namespace SOS.Observations.Api.Controllers
                     PublicDiff = (activeProvider?.PublicProcessCount ?? 0) - (inactiveProvider?.PublicProcessCount ?? 0),
                     ProtectedActive = activeProvider?.ProtectedProcessCount ?? 0,
                     ProtectedInactive = inactiveProvider?.ProtectedProcessCount ?? 0,
-                    ProtectedDiff = (activeProvider?.ProtectedProcessCount ?? 0) - (inactiveProvider?.ProtectedProcessCount ?? 0),
-                    // Note: Invalid counts are not available in the ProcessInfoDto, keeping them as 0
+                    ProtectedDiff = (activeProvider?.ProtectedProcessCount ?? 0) - (inactiveProvider?.ProtectedProcessCount ?? 0),                    
                     InvalidActive = activeProvider?.ProcessFailCount.GetValueOrDefault(0) ?? 0,
                     InvalidInactive = inactiveProvider?.ProcessFailCount.GetValueOrDefault(0) ?? 0,
-                    InvalidDiff = (activeProvider?.ProcessFailCount.GetValueOrDefault(0) ?? 0) - (inactiveProvider?.ProcessFailCount.GetValueOrDefault(0) ?? 0)
+                    InvalidDiff = (activeProvider?.ProcessFailCount.GetValueOrDefault(0) ?? 0) - (inactiveProvider?.ProcessFailCount.GetValueOrDefault(0) ?? 0),
+                    HarvestTimeActive = activeHarvestTime,
+                    HarvestTimeInactive = inactiveHarvestTime,
+                    HarvestTimeDiff = activeHarvestTime - inactiveHarvestTime,
+                    ProcessTimeActive = activeProcessTime,
+                    ProcessTimeInactive = inactiveProcessTime,
+                    ProcessTimeDiff = activeProcessTime - inactiveProcessTime,
+                    HarvestStatusActive = activeProvider.HarvestStatus,
+                    HarvestStatusInactive = inactiveProvider?.HarvestStatus ?? "Unknown",
+                    LatestIncrementalPublicCount = activeProvider.LatestIncrementalPublicCount,
+                    LatestIncrementalProtectedCount = activeProvider.LatestIncrementalProtectedCount,
+                    LatestIncrementalEnd = activeProvider.LatestIncrementalEnd,
+                    LatestIncrementalTime = (activeProvider.LatestIncrementalEnd ?? DateTime.UtcNow) - (activeProvider.LatestIncrementalStart ?? DateTime.UtcNow),        
                 };
 
                 rows.Add(row);

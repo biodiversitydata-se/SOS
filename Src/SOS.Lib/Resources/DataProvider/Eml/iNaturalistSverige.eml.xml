@@ -11,7 +11,7 @@
 	<dataset>
 		<identifier></identifier>
 		<alternateIdentifier>urn:lsid:artdata.slu.se:SOS:iNaturalist</alternateIdentifier>
-		<title>iNaturalist Research-grade Observations Sweden</title>
+		<title>iNaturalist Observations Sweden</title>
 		<creator>
 			<organizationName>iNaturalist.org</organizationName>
 			<individualName>
@@ -30,9 +30,21 @@
 			<organizationName>SLU Artdatabanken</organizationName>
 		</metadataProvider>
 		<abstract>
-			<para>iNaturalist.Se är en online-community där naturälskare över hela världen kan lära sig om arter på ett roligt sätt tillsammans. De laddar upp bilder på sina artobservationer och låter andra art- och naturintresserade hjälpa till med artbestämningen. De kan hålla koll på sina och andras fynd, läs fakta om arterna och lär sig känna igen fler arter i Sveriges natur.</para>
-			<para>Fynd som tillhandahålls här är bara de som uppnått forskningsklass – d.v.s. att de uppfyller ett antal kriterier, varav ett är att minst 2/3 av de användare som bidrar med artbestämning är överens. De skördas dagligen från GBIF som i sin tur får exporter från iNaturalist.org en gång per vecka.</para>
-			<para>iNaturalist.Se är den svenska delen av det internationella iNaturalist-nätverket, som är ett gemensamt initiativ av California Academy of Sciences och National Geographic Society. SLU Artdatabanken är medlem i nätverket och ansvarar för den svenska noden.</para>
+			<para>
+				iNaturalist.Se är en online-community där naturälskare över hela världen kan lära sig om arter på ett roligt sätt tillsammans. De laddar upp bilder på sina artobservationer och låter andra art- och naturintresserade hjälpa till med artbestämningen. De kan hålla koll på sina och andras fynd, läs fakta om arterna och lär sig känna igen fler arter i Sveriges natur.
+			</para>
+			<para>
+				Fynd som tillhandahålls här är både de som uppnått forskningsklass (d.v.s. att de uppfyller ett antal kriterier, varav ett är att minst 2/3 av de användare som bidrar med artbestämning är överens) och övriga (som antingen inte uppfyller kriterier, eller inte hunnits granskas). De skördas dagligen från GBIF som i sin tur får exporter från iNaturalist.org en gång per vecka.
+			</para>
+			<para>
+				I nuvarande skick kan här inte 'forskningsklass' fynd och övriga skiljas åt. En uppdelning av dataset m.a.p. fyndens klassning planeras.
+			</para>
+			<para>
+				Detta dataset innehåller för näravarande bara publika observationer, d.v.s. inte skyddade fynd av skyddsklassade arter.
+			</para>
+			<para>
+				iNaturalist.Se är den svenska delen av det internationella iNaturalist-nätverket, som är ett gemensamt initiativ av California Academy of Sciences och National Geographic Society. SLU Artdatabanken är medlem i nätverket och ansvarar för den svenska noden.
+			</para>
 		</abstract>
 		<resourceType>
 		</resourceType>

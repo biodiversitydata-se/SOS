@@ -2,6 +2,7 @@
 using MongoDB.Driver;
 using SOS.Harvest.Managers.Interfaces;
 using SOS.Harvest.Processors.iNaturalist;
+using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers.Interfaces;
@@ -34,8 +35,10 @@ namespace SOS.Harvest.Factories.Validation
             IiNaturalistObservationVerbatimRepository iNaturalistObservationVerbatimRepository,
             IProcessTimeManager processTimeManager,
             ProcessConfiguration processConfiguration,
+            ICache<int, Taxon> taxonCache,
+            ICache<VocabularyId, Vocabulary> vocabularyCache,
             ILogger<iNaturalistDataValidationReportFactory> logger)
-            : base(processedVocabularyRepository, validationManager, areaHelper, vocabularyValueResolver, processedTaxonRepository, processTimeManager, processConfiguration)
+            : base(processedVocabularyRepository, validationManager, areaHelper, vocabularyValueResolver, processedTaxonRepository, processTimeManager, processConfiguration, taxonCache, vocabularyCache)
         {
             _iNaturalistObservationVerbatimRepository = iNaturalistObservationVerbatimRepository;
             _logger = logger;

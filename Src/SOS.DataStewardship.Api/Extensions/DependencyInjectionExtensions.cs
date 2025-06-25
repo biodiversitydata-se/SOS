@@ -8,7 +8,6 @@ using SOS.Lib.Services;
 using SOS.DataStewardship.Api.Application.Infrastructure.ApplicationInsights;
 using SOS.DataStewardship.Api.Application.Managers.Interfaces;
 using SOS.DataStewardship.Api.Application.Managers;
-using Autofac.Core;
 using Microsoft.Extensions.Logging.Abstractions;
 using Elastic.Clients.Elasticsearch.Cluster;
 
