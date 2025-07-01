@@ -51,7 +51,7 @@ namespace SOS.Shared.Api.Validators
 
                 if (count > tilesLimit * _countFactor)
                 {
-                    return Result.Failure($"The number of cells that can be returned is too large. The limit is {tilesLimit} cells. Try using larger grid cell size or a smaller bounding box.");
+                    return Result.Failure($"The number of cells that can be returned is too large. The limit is {tilesLimit} cells. Your query results in {maxTilesTot} possible cells and {count} observations. Try using larger grid cell size or a smaller bounding box.");
                 }
             }
 
