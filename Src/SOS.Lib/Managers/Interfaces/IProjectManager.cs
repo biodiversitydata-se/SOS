@@ -10,16 +10,16 @@ namespace SOS.Lib.Managers.Interfaces
     public interface IProjectManager
     {
         /// <summary>
-        ///     Get projects.
+        /// Get projects.
         /// </summary>
+        /// <param name="includeHidden"></param>
         /// <returns></returns>
-        Task<IEnumerable<ProjectInfo>> GetAllAsync();
+        Task<IEnumerable<ProjectInfo>> GetAllAsync(bool includeHidden);
 
         /// <summary>
         /// Get projects by id
         /// </summary>
         /// <param name="projectIds"></param>
-        /// <param name="userId"></param>
         /// <returns></returns>
         Task<IEnumerable<ProjectInfo>> GetAsync(IEnumerable<int> projectIds);
 
@@ -29,7 +29,7 @@ namespace SOS.Lib.Managers.Interfaces
         /// <param name="filter"></param>
         /// <param name="userId"></param>
         /// <returns></returns>
-        Task<IEnumerable<ProjectInfo>> GetAsync(string filter);
+        Task<IEnumerable<ProjectInfo>> GetAsync(string filter, int? userId);
 
         /// <summary>
         /// Get project by id

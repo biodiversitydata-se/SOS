@@ -17,6 +17,35 @@ namespace SOS.Lib.Managers
         private readonly ILogger<IProjectManager> _logger;
         private readonly ICache<int, ProjectInfo> _projectCache;
 
+        private async Task<IEnumerable<ProjectInfo>> GetPermittedAsync(string filter, int? userId)
+        {
+            if ((userId ?? 0).Equals(0))
+            {
+                userId = -1; // UserServiceUserId equals 0 if not found, set userid = -1 to not match them
+            }
+            try
+            {
+                return (await _projectCache.GetAllAsync())?.Where(p =>
+                    (
+                        !p.IsHidden ||
+                        p.UserServiceUserId == userId ||
+                        p.MemberIds.Contains(userId ?? 0)
+                    ) &&
+                    (
+                        string.IsNullOrEmpty(filter) ||
+                        (p.Category?.Contains(filter, StringComparison.CurrentCultureIgnoreCase) ?? false) ||
+                        (p.CategorySwedish?.Contains(filter, StringComparison.CurrentCultureIgnoreCase) ?? false) ||
+                        (p.Name?.Contains(filter, StringComparison.CurrentCultureIgnoreCase) ?? false)
+                    )
+               );
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to get projects");
+                return null;
+            }
+        }
+
         /// <summary>
         ///     Constructor
         /// </summary>
@@ -31,9 +60,9 @@ namespace SOS.Lib.Managers
         }
 
         /// <inheritdoc/>
-        public async Task<IEnumerable<ProjectInfo>> GetAllAsync()
+        public async Task<IEnumerable<ProjectInfo>> GetAllAsync(bool includeHidden = false)
         {
-            return await _projectCache.GetAllAsync();
+            return (await _projectCache.GetAllAsync())?.Where(p => !p.IsHidden || includeHidden);
         }
 
         /// <inheritdoc/>
@@ -43,42 +72,19 @@ namespace SOS.Lib.Managers
             {
                 return null!;
             }
-            return (await GetAllAsync()).Where(p => projectIds.Contains(p.Id));
+            return (await _projectCache.GetAllAsync()).Where(p => !p.IsHidden && projectIds.Contains(p.Id));
         }
 
         /// <inheritdoc/>
-        public async Task<IEnumerable<ProjectInfo>> GetAsync(string filter)
+        public async Task<IEnumerable<ProjectInfo>> GetAsync(string filter, int? userId)
         {
-            try
-            {
-                return (await GetAllAsync()).Where(p => 
-                    string.IsNullOrEmpty(filter) ||
-                    (p.Category?.Contains(filter, StringComparison.CurrentCultureIgnoreCase) ?? false) ||
-                    (p.CategorySwedish?.Contains(filter, StringComparison.CurrentCultureIgnoreCase) ?? false) ||
-                    (p.Name?.Contains(filter, StringComparison.CurrentCultureIgnoreCase) ?? false)
-               );
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Failed to get projects");
-                return null;
-            }
+            return await GetPermittedAsync(filter, userId);
         }
 
         /// <inheritdoc/>
         public async Task<ProjectInfo> GetAsync(int id, int? userId)
         {
-            try
-            {
-                return (await GetAllAsync()).FirstOrDefault(p =>
-                    (p.IsPublic || p.UserServiceUserId == userId) && p.Id.Equals(id)
-               );
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, $"Failed to get project: {id}");
-                return null;
-            }
+            return (await GetPermittedAsync(null, userId)).FirstOrDefault(p => p.Id.Equals(id));
         }
     }
 }
