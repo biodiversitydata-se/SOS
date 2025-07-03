@@ -33,7 +33,7 @@ namespace SOS.Export.Services
         public async Task<ZendToResponse> SendFile(string emailAddress, string description, string filePath, ExportFormat exportFormat,
             bool informRecipients = true, bool informPasscode = true, bool encryptFile = false, string encryptPassword = null)
         {
-
+            _logger.LogInformation(filePath + " is being sent to ZendTo with email address: {emailAddress}, exportFormat: {exportFormat}", emailAddress, exportFormat);
             using var form = new MultipartFormDataContent();
             //    form.Headers.ContentType = MediaTypeHeaderValue.Parse("multipart/form-data"); //new MediaTypeHeaderValue("application/x-www-form-urlencoded");
             DateTime fileCreationDate = File.GetCreationTime(filePath);
@@ -99,13 +99,13 @@ namespace SOS.Export.Services
                     }
                     catch (Exception e)
                     {
-                        _logger.LogDebug(e, "Failed to deserialize ZendTo response: {@responseString}", responseString);
+                        _logger.LogError(e, "Failed to deserialize ZendTo response: {@responseString}", responseString);
                         continue;
                     }
                 }
             }
 
-            _logger.LogDebug("Failed to send file using ZendTo: {@responseReasonPhrase}", response.ReasonPhrase);
+            _logger.LogError("Failed to send file using ZendTo: {@responseReasonPhrase}", response.ReasonPhrase);
             return new ZendToResponse();
         }
 
