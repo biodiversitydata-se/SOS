@@ -48,7 +48,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [AzureApi, AzureInternalApi]
-        public async Task<IActionResult> GetProjects(
+        public async Task<IActionResult> GetProjectsAsync(
             [FromQuery] string filter)
         {
             try
@@ -76,14 +76,14 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [AzureApi, AzureInternalApi]
-        public async Task<IActionResult> GetProjectesById(
+        public async Task<IActionResult> GetProjectsGetProjectesByIdAsync(
             [FromBody] int[] ids)
         {
             try
             {
                 LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
 
-                var projects = await _projectManager.GetAsync(ids);
+                var projects = await _projectManager.GetAsync(ids, base.User?.GetUserId());
 
                 if ((projects?.Count() ?? 0) == 0)
                 {
@@ -108,7 +108,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [AzureApi, AzureInternalApi]
-        public async Task<IActionResult> GetProject(
+        public async Task<IActionResult> GetProjectAsync(
             [FromRoute] int id)
         {
             try

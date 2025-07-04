@@ -66,13 +66,13 @@ namespace SOS.Lib.Managers
         }
 
         /// <inheritdoc/>
-        public async Task<IEnumerable<ProjectInfo>> GetAsync(IEnumerable<int> projectIds)
+        public async Task<IEnumerable<ProjectInfo>> GetAsync(IEnumerable<int> projectIds, int? userId = null)
         {
             if (!projectIds?.Any() ?? true)
             {
                 return null!;
             }
-            return (await _projectCache.GetAllAsync()).Where(p => !p.IsHidden && projectIds.Contains(p.Id));
+            return (await GetPermittedAsync(null, userId)).Where(p => projectIds.Contains(p.Id));
         }
 
         /// <inheritdoc/>

@@ -31,7 +31,7 @@ namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.ProjectsCon
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------            
-            var response = await _fixture.ProjectsController.GetProjectes(null);
+            var response = await _fixture.ProjectsController.GetProjectsAsync(null);
             var result = response.GetResult<IEnumerable<ProjectDto>>();
 
             //-----------------------------------------------------------------------------------------------------------
