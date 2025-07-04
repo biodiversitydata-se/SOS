@@ -55,7 +55,6 @@ namespace SOS.Harvest.Harvesters
                 }
 
                 var projects = projectEntities!
-                    .Where(m => m.IsHideall == false)
                     .Select(CastToProjectInfo)
                     .ToList()
                     .OrderBy(m => m.Id);
@@ -112,6 +111,7 @@ namespace SOS.Harvest.Harvesters
                 CategorySwedish = projectEntity.CategorySwedish,
                 Description = projectEntity.Description?.Clean(),
                 IsPublic = projectEntity.IsPublic,
+                IsHidden = projectEntity.IsHideall,
                 MemberIds = projectEntity.MembersIds,
                 Owner = projectEntity.Owner,
                 ProjectParameters = projectEntity.Parameters?.Select(p => new ProjectParameter

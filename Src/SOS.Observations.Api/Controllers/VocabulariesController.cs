@@ -58,7 +58,7 @@ namespace SOS.Observations.Api.Controllers
             try
             {
                 LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
-                var projects = await _projectManager.GetAllAsync();
+                var projects = await _projectManager.GetAllAsync(false);
 
                 if (!projects?.Any() ?? true)
                 {
