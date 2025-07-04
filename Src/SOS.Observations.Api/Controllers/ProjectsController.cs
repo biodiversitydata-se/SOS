@@ -116,7 +116,6 @@ namespace SOS.Observations.Api.Controllers
                 LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
 
                 var project = await _projectManager.GetAsync(id, base.User?.GetUserId());
-
                 if (project == null)
                 {
                     return new StatusCodeResult((int)HttpStatusCode.NoContent);
