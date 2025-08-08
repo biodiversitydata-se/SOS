@@ -1,11 +1,11 @@
 ﻿using FizzWare.NBuilder;
+using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Processed.Observation;
-using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Verbatim.Artportalen;
-using SOS.Lib.Models.Verbatim.INaturalist.Service;
 using SOS.Observations.Api.IntegrationTests.Setup;
+using SOS.Observations.Api.IntegrationTests.TestData;
 using SOS.Observations.Api.IntegrationTests.TestData.Factories;
 using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
 using SOS.Shared.Api.Dtos;
@@ -92,7 +92,7 @@ namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsE
                     }
                 }
             };
-
+           
             // Act
             var response = await apiClient.PostAsync($"/observations/search", JsonContent.Create(searchFilter));
             var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
@@ -316,6 +316,45 @@ namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsE
             // Assert
             response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             result!.Should().Be("Invalid JSON in request body. Geometry - points must form a closed linestring");
+        }
+
+        [Fact]
+        public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_WhenFilteringByMunicipalityPolygon()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            var uppsala = Geometries.UppsalaMunicipality();
+            var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+               .All().HaveValuesFromPredefinedObservations()
+               .TheFirst(30).HaveCoordinatesInGeometry(uppsala, 10)
+                .TheNext(30).HaveCoordinatesInGeometry(uppsala, 1000)
+                .TheNext(20).HaveCoordinatesOusideGeometry(uppsala, 10)
+                .TheNext(20).HaveCoordinatesOusideGeometry(uppsala, 10)
+               .Build();
+            await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
+            var apiClient = TestFixture.CreateApiClient();
+            var searchFilter = new SearchFilterDto
+            {
+                Geographics = new GeographicsFilterDto
+                {
+                    Geometries = [uppsala]
+                    
+                }
+            };
+           // var geoJsonConverterFactory = new NetTopologySuite.IO.Converters.GeoJsonConverterFactory();
+           // var geometryConverter = geoJsonConverterFactory.CreateConverter(typeof(Geometry), null);
+            var jsonSerializerOptions = new JsonSerializerOptions();
+            jsonSerializerOptions.Converters.Add(new NetTopologySuite.IO.Converters.GeoJsonConverterFactory());
+
+            // Act
+            var response = await apiClient.PostAsync($"/observations/search", JsonContent.Create(searchFilter, options: jsonSerializerOptions));
+            var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+
+            // Assert
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
+            result!.TotalCount.Should().Be(60,
+                because: "60 observations added to Elasticsearch are in the municipality Uppsala.");
         }
     }
 }
