@@ -1,11 +1,15 @@
-using Microsoft.AspNetCore.Authentication;
+using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting.StaticWebAssets;
 using MudBlazor;
 using MudBlazor.Services;
 using Serilog;
+using SOS.Status.Web.Client.JsonConverters;
 using SOS.Status.Web.Components;
+using SOS.Status.Web.Endpoints;
 using SOS.Status.Web.Extensions;
+using System.Globalization;
+using System.Text.Json.Serialization;
 
 // --- Program startup ---
 
@@ -23,22 +27,64 @@ try
 
     // Add services to the container.
     builder.Services.AddRazorComponents()
-        .AddInteractiveServerComponents();
+        .AddInteractiveServerComponents()
+        .AddInteractiveWebAssemblyComponents()
+        .AddAuthenticationStateSerialization(options => options.SerializeAllClaims = true);
+
+    //builder.Services.AddHttpClient<StatusInfoApiClient>(client =>
+    //{
+    //    client.BaseAddress = new Uri("http://localhost:5006");
+    //});
 
     builder.Services.AddDependencyInjectionServices(configurationRoot);
     builder.Services.SetupAuthentication();
-    builder.Services.AddAuthorization();
-    builder.Services.AddHttpContextAccessor();    
+    builder.Services.AddAuthorization();    
     builder.Logging.AddConsole();
     builder.Logging.SetMinimumLevel(LogLevel.Debug);
     builder.Services.AddHealthChecks();
+    builder.Services.AddCors(options =>
+    {
+        options.AddPolicy("AllowBlazorClient", policy =>
+        {
+            policy.WithOrigins("http://localhost:5006")
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        });
+
+        options.AddPolicy("AllowAll", policy =>
+        {
+            policy.AllowAnyOrigin()
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        });
+    });
+    builder.Services.AddBlazoredLocalStorage();
+    builder.Services.ConfigureHttpJsonOptions(options =>
+    {
+        options.SerializerOptions.PropertyNameCaseInsensitive = true;
+        options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
+        options.SerializerOptions.Converters.Add(new GeoJsonConverter());
+    });
     var app = builder.Build();
 
+    // Use Swedish culture
+    var culture = new CultureInfo("sv-SE");
+    CultureInfo.DefaultThreadCurrentCulture = culture;
+    CultureInfo.DefaultThreadCurrentUICulture = culture;
+
+    app.MapStatusInfoEndpoints();
+    app.MapTaxonDiagramEndpoints();
+    app.MapObservationSearchEndpoints();
+
     // Configure the HTTP request pipeline.
-    if (!app.Environment.IsDevelopment())
+    if (isDevelopment)
+    {
+        app.UseWebAssemblyDebugging();                
+    }
+    else
     {
         app.UseExceptionHandler("/Error", createScopeForErrors: true);
-        // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+        //The default HSTS value is 30 days.You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
         app.UseHsts();
     }
 
@@ -52,18 +98,23 @@ try
     app.UseStaticFiles();
     app.MapStaticAssets();
     app.MapRazorComponents<App>()
-        .AddInteractiveServerRenderMode();
+        .AddInteractiveServerRenderMode()
+        .AddInteractiveWebAssemblyRenderMode()
+        .AddAdditionalAssemblies(typeof(SOS.Status.Web.Client._Imports).Assembly);
 
     app.MapLoginEndpoint();
     app.MapLogoutEndpoint();
+    app.MapDebugTokenEndpoint();
     app.MapHealthChecks("/healthz", new HealthCheckOptions()
     {
         Predicate = r => r.Tags.Contains("k8s")
     });
 
+    app.UseCors("AllowAll");
+
     // Start the application
     string? aspnetCoreUrls = Environment.GetEnvironmentVariable("ASPNETCORE_URLS");
-    await app.RunAsync(aspnetCoreUrls ?? "http://*:5006");    
+    await app.RunAsync(aspnetCoreUrls ?? "http://*:5006");
 }
 catch (Exception ex)
 {

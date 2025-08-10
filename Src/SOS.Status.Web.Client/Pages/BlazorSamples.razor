@@ -1,0 +1,121 @@
+﻿@using SOS.Status.Web.Client.Models.BlazorSamples
+@page "/blazorsamples"
+@page "/blazorsamples/{id:int}"
+@inject IJSRuntime JsRuntime
+@inject AppState State
+@inject Blazored.LocalStorage.ILocalStorageService LocalStorage
+@inject ILogger<BlazorSamples> Logger
+
+
+<PageTitle>Blazor samples</PageTitle>
+<MudText Typo="Typo.h4">Blazor samples</MudText>
+<MudTabs Class="mt-2" Outlined="true" Elevation="1" Rounded="true" Border="true" ApplyEffectsToContainer="true" PanelClass="pa-6">
+    <MudTabPanel Text="Components">
+        <MudTabs Outlined="true" Elevation="0" Rounded="true" Border="true" ApplyEffectsToContainer="true" PanelClass="pa-3">
+            <MudTabPanel Text="Component in C#">
+                <MyComponent Message="A component built in C# without .razor file." />
+            </MudTabPanel>
+            <MudTabPanel Text="Templated component">
+                <ListView TItem="LocationItem" Items="points" Context="point">
+                    <ItemTemplate>
+                        @point.Id. @point.Name (@point.Longitude,@point.Latitude)
+                    </ItemTemplate>
+                </ListView>
+            </MudTabPanel>
+            <MudTabPanel Text="RenderFragment">
+                <DismissableAlert Show="@showDismissableAlert" @ref="dismissableAlert" class="caption1" id="myDismissableAlertId">
+                    <Header>
+                        Headertext
+                    </Header>
+                    <ChildContent>
+                        <p>This is a warning</p>
+                    </ChildContent>
+                </DismissableAlert>
+                <MudButton Class="my-2" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" @onclick="ToggleDismissableAlert">Toggle alert</MudButton>
+            </MudTabPanel>            
+        </MudTabs>
+    </MudTabPanel>
+    <MudTabPanel Text="Data binding">
+        <MudTabs Outlined="true" Elevation="0" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-3">
+            <MudTabPanel Text="Routing parameter">
+                <MudText Typo="Typo.body1" Class="pt-4">This Id value comes from query parameter: @Id</MudText>                
+            </MudTabPanel>
+            <MudTabPanel Text="Data binding">
+                <input type="text" @bind="@myString" @bind:event="oninput" @ref="inputElement" />
+                <p>My string: @myString</p>
+            </MudTabPanel>
+            <MudTabPanel Text="Cascading value">
+                <CascadingValue Value="@Style">
+                    <ChildComponent>
+                    </ChildComponent>
+                </CascadingValue>
+            </MudTabPanel>
+        </MudTabs>
+    </MudTabPanel>
+    <MudTabPanel Text="Events">        
+        <MudTabs Outlined="true" Elevation="0" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-2">
+            <MudTabPanel Text="Event StopPropagation">
+                <div @onmousemove="OuterMouseMove">
+                    <p style="height:50px;background-color:antiquewhite;">OuterMouseMove: @outerPos</p>
+                    <div @onmousemove="InnerMouseMove" @onmousemove:stopPropagation="true">
+                        <p style="height:50px;background-color:lightcyan;">InnerMouseMove: @innerPos</p>
+                    </div>
+                </div>
+            </MudTabPanel>
+            <MudTabPanel Text="EventCallback">
+                <p>Increment: @increment</p>
+                Input: <input type="number" @bind="@increment" />
+                <CustomInput @bind-CounterValue="@increment" />
+            </MudTabPanel>
+            <MudTabPanel Text="Debounce">
+                <MudTextField @bind-Value="searchText"
+                              Label="Sök"
+                              DebounceInterval="500"
+                              Immediate="false" />
+                <p style="margin-top:6px;">Du skrev: @searchText</p>
+            </MudTabPanel>
+        </MudTabs>
+    </MudTabPanel>
+    <MudTabPanel Text="State">
+        <p>This page uses local storage</p>
+        <MudText Typo="Typo.body1" Class="pt-4">Welcome @State.Username!</MudText>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" @onclick="@(() => ChangeNameAsync("Sara"))">Byt namn 1</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" @onclick="@(e => ChangeNameAsync("Martin"))"> Byt namn 2</MudButton>        
+        <div>
+            <MudText Typo="Typo.h6" Class="pt-4">State as JSON for debugging purpose</MudText>            
+            <pre>@(State?.ToJson() ?? "State is null")</pre>
+        </div>
+    </MudTabPanel>    
+    <MudTabPanel Text="JavaScript">
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" @onclick="TestJavaScriptAsync">Test JavaScript</MudButton>        
+    </MudTabPanel>
+
+    <MudTabPanel Text="Mermaid">
+        <MudTabs Outlined="true" Elevation="0" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-2">
+            <MudTabPanel Text="Sample 1">
+                <h1>A Mermaid Diagram</h1>
+                <p>Below is a Mermaid diagram rendered by the <code>MermaidRender</code> component.</p>
+
+                <pre class="mermaid">
+                pie title Petz adopted by volunteers
+                "Dogs": 386
+                "Cats": 85
+                "Rats": 15
+                </pre>
+
+                <MermaidRender Selector="pre.mermaid" />
+            </MudTabPanel>
+            <MudTabPanel Text="Sample 2">
+                <h1>A Mermaid Diagram</h1>
+                <p>Below is a Mermaid diagram rendered by the <code>MermaidDiagram</code> component.</p>
+
+                <MermaidDiagram Definition="@this.diagramDef" />
+                @* <HtmlRender Selector=".mermaid" HtmlContent="@this.htmlContent" SecurityLevel="SecurityLevel.Loose" /> *@
+            </MudTabPanel>            
+        </MudTabs>
+    </MudTabPanel>
+    <MudTabPanel Text="Markdown">
+        <h1>Markdown component</h1>
+        <MudMarkdown Value="@markdown" />
+    </MudTabPanel>
+</MudTabs>

@@ -8,16 +8,7 @@
       },
       "dotnetRunMessages": true,
       "applicationUrl": "http://localhost:5006"
-    },
-    "SOS.Status.Web (Development)": {
-      "commandName": "Project",
-      "launchBrowser": true,
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
-      },
-      "dotnetRunMessages": true,
-      "applicationUrl": "http://localhost:5006"
-    },
+    },   
     "SOS.Status.Web (Dev)": {
       "commandName": "Project",
       "launchBrowser": true,
@@ -48,13 +39,15 @@
     "Container (Dockerfile)": {
       "commandName": "Docker",
       "launchBrowser": true,
-      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}",
+      "launchUrl": "http://localhost:5006",
       "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "ST",
         "ASPNETCORE_HTTPS_PORTS": "8081",
-        "ASPNETCORE_HTTP_PORTS": "8080"
+        "ASPNETCORE_HTTP_PORTS": "8080",
+        "ASPNETCORE_URLS": "http://+:5006"
       },
-      "publishAllPorts": true,
-      "useSSL": true
+      "containerPort": 5006,      
+      "useSSL": false
     }
   },
   "$schema": "https://json.schemastore.org/launchsettings.json"

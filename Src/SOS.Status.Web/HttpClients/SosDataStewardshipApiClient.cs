@@ -1,4 +1,4 @@
-﻿using SOS.Status.Web.Models;
+﻿using SOS.Status.Web.Client.Models;
 
 namespace SOS.Status.Web.HttpClients;
 

@@ -1,0 +1,89 @@
+﻿@using System.Diagnostics
+@using SOS.Status.Web.Client.Abstractions
+@page "/"
+@inject IStatusInfoService statusInfoService
+@inject ILogger<Status> Logger
+
+<PageTitle>Status info</PageTitle>
+<MudText Typo="Typo.h4">Status info</MudText>
+@if (processSummary is null)
+{
+    <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+}
+else
+{
+    <ProcessStatusSummary ProcessSummary="@processSummary" />
+    <MudDivider Class="my-2" />
+    <MudTabs Outlined="true">
+        <MudTabPanel Text="Datasets" Icon="@Icons.Material.Filled.Storage">
+            <DataProviderGrid ProcessSummary="@processSummary" />
+        </MudTabPanel>
+        <MudTabPanel Text="Indices" Icon="@Icons.Material.Outlined.Dataset">            
+            <MudTabs Outlined="true">
+                <MudTabPanel Text="@($"{processSummary.ActiveProcessStatus.Name} (Active)")">
+                    <DataProviderIndexStatus ProcessStatus="@processSummary.ActiveProcessStatus" DataProviderStatuses="@processSummary.DataProviderStatuses" ActiveInstance="true" />
+                </MudTabPanel>
+                <MudTabPanel Text="@processSummary.InactiveProcessStatus.Name">
+                    <DataProviderIndexStatus ProcessStatus="@processSummary.InactiveProcessStatus" DataProviderStatuses="@processSummary.DataProviderStatuses" ActiveInstance="false" />
+                </MudTabPanel>
+            </MudTabs>
+        </MudTabPanel>
+        <MudTabPanel Text="Tests" Icon="@Icons.Material.Outlined.Science" BadgeDot="true" BadgeColor="@testsTabBadgeColor">
+            <HealthReportsSummary ObservationApiHealthReport="@observationsApiHealthReport"
+                                  AnalysisApiHealthReport="@analysisApiHealthReport"
+                                  ElasticsearchProxyHealthReport="@elasticsearchProxyHealthReport"
+                                  DataStewardshipApiHealthReport="@dataStewardshipApiHealthReport" />
+        </MudTabPanel>
+    </MudTabs>
+}
+
+@code {
+    private ProcessSummaryDto? processSummary;
+    private HealthReportDto? observationsApiHealthReport;
+    private HealthReportDto? analysisApiHealthReport;
+    private HealthReportDto? elasticsearchProxyHealthReport;
+    private HealthReportDto? dataStewardshipApiHealthReport;
+    private Color testsTabBadgeColor;    
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            Stopwatch sp = Stopwatch.StartNew();
+            processSummary = await statusInfoService.GetProcessSummaryAsync();
+            _ = LoadTestsTabDataAsync();
+            sp.Stop();
+            Logger.LogInformation("Initial load in {LoadTimeMilliseconds} ms", sp.ElapsedMilliseconds);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError("Error fetching process information: {ErrorMessage}", ex.Message);
+        }
+    }
+
+    private async Task LoadTestsTabDataAsync()
+    {
+        var fetchObservationsTask = statusInfoService.GetObservationsApiHealthAsync()
+            .ContinueWith(t => observationsApiHealthReport = t.Result);
+
+        var fetchAnalysisTask = statusInfoService.GetAnalysisApiHealthAsync()
+            .ContinueWith(t => analysisApiHealthReport = t.Result);
+
+        var fetchElasticsearchTask = statusInfoService.GetElasticsearchProxyHealthAsync()
+            .ContinueWith(t => elasticsearchProxyHealthReport = t.Result);
+
+        var fetchDataStewardshipTask = statusInfoService.GetDataStewardshipApiHealthAsync()
+            .ContinueWith(t => dataStewardshipApiHealthReport = t.Result);
+
+        await Task.WhenAll(fetchObservationsTask, fetchAnalysisTask, fetchElasticsearchTask, fetchDataStewardshipTask);
+
+        testsTabBadgeColor = ColorHelper.GetHealthColor(
+            observationsApiHealthReport?.Status,
+            analysisApiHealthReport?.Status,
+            elasticsearchProxyHealthReport?.Status,
+            dataStewardshipApiHealthReport?.Status
+        );
+
+        await InvokeAsync(StateHasChanged);
+    }
+}

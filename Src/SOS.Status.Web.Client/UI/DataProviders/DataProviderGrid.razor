@@ -1,0 +1,88 @@
+@using SOS.Status.Web.Client.Dtos
+@using SOS.Status.Web.Client.Helpers
+<MudDataGrid Class="no-last-row-scroll" Items="@ProcessSummary?.DataProviderStatuses" T="DataProviderStatusDto" Hover="true" Bordered="true" Striped="true" Dense="true" ColumnResizeMode="ResizeMode.Container" FixedHeader="true">
+    <Columns>
+        <HierarchyColumn T="DataProviderStatusDto" />
+        <PropertyColumn Property="x => x.Id" Title="Id" Sortable="false" />
+        <PropertyColumn Property="x => x.Identifier" Title="Dataset" Sortable="false" />
+        <PropertyColumn Property="x => x.PublicActive" Title="Public" Format="N0" Sortable="false" />
+        @* <PropertyColumn Property="x => x.PublicActiveWithDiff" Title="Public" Sortable="false" CellStyleFunc="@CssHelper.PublicObservationCellStyleFunc2" /> *@
+        <PropertyColumn Property="x => x.PublicDiff" Title="Diff" CellStyleFunc="@CssHelper.PublicObservationCellStyleFunc" Format="N0" Sortable="false" />        
+        <PropertyColumn Property="x => x.ProtectedActive" Title="Protected" Format="N0" Sortable="false" />
+        <PropertyColumn Property="x => x.ProtectedDiff" Title="Diff" CellStyleFunc="@CssHelper.ProtectedObservationCellStyleFunc" Format="N0" Sortable="false" />
+        <PropertyColumn Property="x => x.InvalidActive" Title="Invalid" Format="N0" Sortable="false" />
+        <PropertyColumn Property="x => x.InvalidDiff" Title="Diff" CellStyleFunc="@CssHelper.InvalidObservationCellStyleFunc" Format="N0" Sortable="false" />
+        @* <PropertyColumn Property="x => DateTimeHelper.FormatTimeSpan(x.HarvestTimeActive)" Title="Harvest time" Sortable="false" /> *@
+        <PropertyColumn Property="x => DateTimeHelper.FormatTimeSpan(x.ProcessTimeActive, null)" Title="Process time" Sortable="false" />
+        @* <PropertyColumn Property="x => x.ProcessedPerSecondActive" Title="Process/second" Format="N0" Sortable="false" /> *@
+    </Columns>
+    <ChildRowContent>        
+        <MudSimpleTable Bordered="true" Striped="true" Dense="true">
+            <colgroup>
+                <col style="width:1%; white-space:nowrap;" /> <!-- Property -->
+                <col style="width: 1%; min-width:100px; white-space:nowrap;" /> <!-- Active -->
+                <col style="width: 1%; min-width:100px; white-space:nowrap;" /> <!-- Inactive -->
+                <col /> <!-- Diff -->
+            </colgroup>
+            <thead>
+                <tr>
+                    <th>Property</th>
+                    <th>Active</th>
+                    <th>Inactive</th>
+                    <th>Diff</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Public</td>
+                    <td>@context.Item.PublicActive.ToString("N0")</td>
+                    <td>@context.Item.PublicInactive.ToString("N0")</td>
+                    <td>@(context.Item.PublicDiff != 0 ? context.Item.PublicDiff.ToString("N0") : "")</td>
+                </tr>
+                <tr>
+                    <td>Protected</td>
+                    <td>@context.Item.ProtectedActive.ToString("N0")</td>
+                    <td>@context.Item.ProtectedInactive.ToString("N0")</td>
+                    <td>@(context.Item.ProtectedDiff != 0 ? context.Item.ProtectedDiff.ToString("N0") : "")</td>
+                </tr>
+                <tr>
+                    <td>Invalid</td>
+                    <td>@context.Item.InvalidActive.ToString("N0")</td>
+                    <td>@context.Item.InvalidInactive.ToString("N0")</td>
+                    <td>@(context.Item.InvalidDiff != 0 ? context.Item.InvalidDiff.ToString("N0") : "")</td>
+                </tr>
+                <tr>
+                    <td>Harvest</td>
+                    <td>@DateTimeHelper.FormatTimeSpan(context.Item.HarvestTimeActive)</td>
+                    <td>@DateTimeHelper.FormatTimeSpan(context.Item.HarvestTimeInactive)</td>
+                    <td>@DateTimeHelper.FormatTimeSpan(context.Item.HarvestTimeDiff, minThreshold: TimeSpan.FromMinutes(1))</td>
+                </tr>
+                <tr>
+                    <td>Process</td>
+                    <td>@DateTimeHelper.FormatTimeSpan(context.Item.ProcessTimeActive)</td>
+                    <td>@DateTimeHelper.FormatTimeSpan(context.Item.ProcessTimeInactive)</td>
+                    <td>@DateTimeHelper.FormatTimeSpan(context.Item.ProcessTimeDiff, minThreshold: TimeSpan.FromMinutes(1))</td>
+                </tr>
+                <tr>
+                    <td>Processed per second</td>
+                    <td>@context.Item.ProcessedPerSecondActive.ToString("N0")</td>
+                    <td>@context.Item.ProcessedPerSecondInactive.ToString("N0")</td>
+                    <td>@(context.Item.ProcessedPerSecondDiff != 0 ? context.Item.ProcessedPerSecondDiff.ToString("N0") : "")</td>
+                </tr>
+                @if (context.Item.Id == 1) // Artportalen
+                {
+                    <tr>
+                        <td>Incremental</td>
+                        <td colspan="3">@DateTimeHelper.FormatTimeSpan(context.Item.LatestIncrementalTime)</td>
+                    </tr>
+                }
+            </tbody>
+        </MudSimpleTable>        
+        <div style="height:16px"></div> <!-- Ger luft så scroll inte triggas -->        
+    </ChildRowContent>
+</MudDataGrid>
+
+@code {
+    [Parameter]
+    public ProcessSummaryDto? ProcessSummary { get; set; }
+}

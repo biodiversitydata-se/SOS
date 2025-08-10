@@ -1,88 +1,95 @@
-﻿using SOS.Lib.Models.Processed.Observation;
-using SOS.Shared.Api.Dtos;
-using SOS.Shared.Api.Dtos.Filter;
-using SOS.Shared.Api.Dtos.Status;
-using SOS.Status.Web.Models;
+﻿using SOS.Shared.Api.Dtos.Status;
+using SOS.Status.Web.Client.Dtos;
+using SOS.Status.Web.Client.JsonConverters;
+using SOS.Status.Web.Client.Models;
+using System.Text.Json.Serialization;
 
 namespace SOS.Status.Web.HttpClients;
 
 public class SosObservationsApiClient
 {
     private readonly HttpClient _httpClient;
-    public SosObservationsApiClient(HttpClient httpClient)
+    private readonly ILogger<SosObservationsApiClient> _logger;
+    private System.Text.Json.JsonSerializerOptions _jsonSerializerOptions = new System.Text.Json.JsonSerializerOptions
+    {
+        PropertyNameCaseInsensitive = true,
+        Converters =
+        {
+            new JsonStringEnumConverter(),
+            new GeoJsonConverter()
+        }
+    };
+
+    public SosObservationsApiClient(HttpClient httpClient, ILogger<SosObservationsApiClient> logger)
     {
         _httpClient = httpClient;
+        _logger = logger;
     }
 
-    public async Task<PagedResultDto<Observation>?> SearchObservationsAsync(
-        SearchFilterInternalDto filter,
+    public async Task<SOS.Status.Web.Client.Dtos.SosObsApi.PagedResultDto<SOS.Status.Web.Client.Dtos.SosObsApi.Observation>?> SearchObservationsAsync(
+        Client.Dtos.SosObsApi.SearchFilterInternalDto filter,
         int skip = 0,
         int take = 100,
         string sortBy = "",
         string sortOrder = "Asc",
         bool validateSearchFilter = false,
         string translationCultureCode = "sv-SE",
-        bool sensitiveObservations = false,
-        string outputFormat = "Json")
+        bool sensitiveObservations = false)
     {
-        var url = $"/observations/internal/search?skip={skip}&take={take}&sortBy={sortBy}&sortOrder={sortOrder}&validateSearchFilter={validateSearchFilter}&translationCultureCode={translationCultureCode}&sensitiveObservations={sensitiveObservations}&outputFormat={outputFormat}";
-        var response = await _httpClient.PostAsJsonAsync(url, filter);
+        var url = $"/observations/internal/search?skip={skip}&take={take}&sortBy={sortBy}&sortOrder={sortOrder}&validateSearchFilter={validateSearchFilter}&translationCultureCode={translationCultureCode}&sensitiveObservations={sensitiveObservations}";
+        var response = await _httpClient.PostAsJsonAsync(url, filter, _jsonSerializerOptions);
         response.EnsureSuccessStatusCode();
-        return await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+        return await response.Content.ReadFromJsonAsync<SOS.Status.Web.Client.Dtos.SosObsApi.PagedResultDto<SOS.Status.Web.Client.Dtos.SosObsApi.Observation>>();
     }
 
-    public async Task<ProcessSummaryDto?> GetProcessSummary()
+    public async Task<Client.Dtos.ProcessSummaryDto?> GetProcessSummary()
     {
         try
         {
-            return await _httpClient.GetFromJsonAsync<ProcessSummaryDto>($"systems/process-summary");
+            return await _httpClient.GetFromJsonAsync<Client.Dtos.ProcessSummaryDto>($"systems/process-summary");
         }
         catch (Exception ex)
         {
-            // In a production environment, you would want to handle this error appropriately
-            Console.WriteLine($"Error fetching process summary: {ex.Message}");
+            _logger.LogError("Error fetching process summary: {ErrorMsg}", ex.Message);
             return null;
         }
     }
 
-    public async Task<ProcessInfoDto?> GetProcessInfo(bool active)
+    public async Task<Client.Dtos.ProcessInfoDto?> GetProcessInfo(bool active)
     {
         try
         {
-            return await _httpClient.GetFromJsonAsync<ProcessInfoDto>($"Systems/ProcessInformation?active={active}");
+            return await _httpClient.GetFromJsonAsync<Client.Dtos.ProcessInfoDto>($"Systems/ProcessInformation?active={active}");
         }
         catch (Exception ex)
         {
-            // In a production environment, you would want to handle this error appropriately
-            Console.WriteLine($"Error fetching process information: {ex.Message}");
+            _logger.LogError("Error fetching process information: {ErrorMsg}", ex.Message);
             return null;
         }
     }
 
-    public async Task<List<DataProviderStatusDto>?> GetDataProviderStatus()
+    public async Task<List<Client.Dtos.DataProviderStatusDto>?> GetDataProviderStatus()
     {
         try
         {
-            return await _httpClient.GetFromJsonAsync<List<DataProviderStatusDto>>("Systems/dataproviderstatus");
+            return await _httpClient.GetFromJsonAsync<List<Client.Dtos.DataProviderStatusDto>>("Systems/dataproviderstatus");
         }
         catch (Exception ex)
         {
-            // In a production environment, you would want to handle this error appropriately
-            Console.WriteLine($"Error fetching data provider status: {ex.Message}");
+            _logger.LogError("Error fetching data provider status: {ErrorMsg}", ex.Message);
             return null;
         }
     }
 
-    public async Task<IEnumerable<MongoDbProcessInfoDto>?> GetProcessInfo()
+    public async Task<IEnumerable<Client.Dtos.MongoDbProcessInfoDto>?> GetProcessInfo()
     {
         try
         {
-            return await _httpClient.GetFromJsonAsync<IEnumerable<MongoDbProcessInfoDto>>("systems/processmongodb");
+            return await _httpClient.GetFromJsonAsync<IEnumerable<Client.Dtos.MongoDbProcessInfoDto>>("systems/processmongodb");
         }
         catch (Exception ex)
         {
-            // In a production environment, you would want to handle this error appropriately
-            Console.WriteLine($"Error fetching process information: {ex.Message}");
+            _logger.LogError("Error fetching process information: {ErrorMsg}", ex.Message);
             return null;
         }
     }
@@ -95,8 +102,7 @@ public class SosObservationsApiClient
         }
         catch (Exception ex)
         {
-            // In a production environment, you would want to handle this error appropriately
-            Console.WriteLine($"Error fetching harvest information: {ex.Message}");
+            _logger.LogError("Error fetching harvest information: {ErrorMsg}", ex.Message);
             return null;
         }
     }
@@ -109,8 +115,7 @@ public class SosObservationsApiClient
         }
         catch (Exception ex)
         {
-            // In a production environment, you would want to handle this error appropriately
-            Console.WriteLine($"Error fetching active instance: {ex.Message}");
+            _logger.LogError("Error fetching active instance: {ErrorMsg}", ex.Message);
             return null;
         }
     }
@@ -123,8 +128,7 @@ public class SosObservationsApiClient
         }
         catch (Exception ex)
         {
-            // In a production environment, you would want to handle this error appropriately
-            Console.WriteLine($"Error fetching processing jobs: {ex.Message}");
+            _logger.LogError("Error fetching processing jobs: {ErrorMsg}", ex.Message);
             return null;
         }
     }
@@ -137,8 +141,7 @@ public class SosObservationsApiClient
         }
         catch (Exception ex)
         {
-            // In a production environment, you would want to handle this error appropriately
-            Console.WriteLine($"Error fetching search index info: {ex.Message}");
+            _logger.LogError("Error fetching search index info: {ErrorMsg}", ex.Message);
             return null;
         }
     }
@@ -151,8 +154,7 @@ public class SosObservationsApiClient
         }
         catch (Exception ex)
         {
-            // In a production environment, you would want to handle this error appropriately
-            Console.WriteLine($"Error fetching MongoDB info: {ex.Message}");
+            _logger.LogError("Error fetching MongoDB info: {ErrorMsg}", ex.Message);
             return null;
         }
     }
@@ -165,9 +167,46 @@ public class SosObservationsApiClient
         }
         catch (Exception ex)
         {
-            // In a production environment, you would want to handle this error appropriately
-            Console.WriteLine($"Error fetching health: {ex.Message}");
+            _logger.LogError("Error fetching health: {ErrorMsg}", ex.Message);
             return null;
+        }
+    }
+
+    public async Task<string?> GetTaxonRelationsDiagramAsync(
+        int[] taxonIds,
+        TaxonRelationsTreeIterationMode treeIterationMode = TaxonRelationsTreeIterationMode.BothParentsAndChildren,
+        bool includeSecondaryRelations = true,
+        string translationCultureCode = "sv-SE")
+    {
+        try
+        {
+            var query = string.Join("&", taxonIds.Select(id => $"taxonIds={id}"));
+            var url = $"systems/TaxonRelationsDiagram?{query}" +
+                      $"&treeIterationMode={treeIterationMode}" +
+                      $"&includeSecondaryRelations={includeSecondaryRelations.ToString().ToLower()}" +
+                      $"&diagramFormat=Mermaid" + // always Mermaid
+                      $"&translationCultureCode={translationCultureCode}";
+
+            var response = await _httpClient.GetAsync(url);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadAsStringAsync();
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                return $"Error: {error}";
+            }
+            else
+            {
+                return $"Unknown error: {response.StatusCode}";
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError("Error fetching diagram: {ErrorMsg}", ex.Message);
+            return $"Exception: {ex.Message}";
         }
     }
 }

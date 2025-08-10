@@ -10,8 +10,7 @@ spec:
   ingressClassName: nginx
   tls:
     - hosts:
-      - sosadmingui-dev.wt.artdata.slu.se
-      - sosadmingui-bff-dev.wt.artdata.slu.se
+      - sosadmingui-dev.wt.artdata.slu.se      
       secretName: private-star.artdata.slu.se-tls
   rules:
   - host: sosadmingui-dev.wt.artdata.slu.se
@@ -23,14 +22,4 @@ spec:
           service:
             name: sosadmingui-web
             port:
-              number: 4200
-  - host: sosadmingui-bff-dev.wt.artdata.slu.se
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: sosadmingui-api
-            port:
-              number: 5000
+              number: 5006  

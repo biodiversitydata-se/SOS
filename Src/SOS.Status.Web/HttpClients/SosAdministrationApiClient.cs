@@ -6,10 +6,12 @@ namespace SOS.Status.Web.HttpClients;
 public class SosAdministrationApiClient
 {
     private readonly HttpClient _httpClient;
+    private readonly ILogger<SosAdministrationApiClient> _logger;
 
-    public SosAdministrationApiClient(HttpClient httpClient)
+    public SosAdministrationApiClient(HttpClient httpClient, ILogger<SosAdministrationApiClient> logger)
     {
         _httpClient = httpClient;
+        _logger = logger;
     }
 
     public async Task<IEnumerable<ProcessInfoDto>?> GetProcessInfo()
@@ -20,8 +22,7 @@ public class SosAdministrationApiClient
         }
         catch (Exception ex)
         {
-            // In a production environment, you would want to handle this error appropriately
-            Console.WriteLine($"Error fetching process information: {ex.Message}");
+            _logger.LogError("Error fetching process information: {ErrorMsg}", ex.Message);
             return null;
         }
     }
@@ -34,8 +35,7 @@ public class SosAdministrationApiClient
         }
         catch (Exception ex)
         {
-            // In a production environment, you would want to handle this error appropriately
-            Console.WriteLine($"Error fetching harvest information: {ex.Message}");
+            _logger.LogError("Error fetching harvest information: {ErrorMsg}", ex.Message);
             return null;
         }
     }
@@ -48,8 +48,7 @@ public class SosAdministrationApiClient
         }
         catch (Exception ex)
         {
-            // In a production environment, you would want to handle this error appropriately
-            Console.WriteLine($"Error fetching active instance: {ex.Message}");
+            _logger.LogError("Error fetching active instance: {ErrorMsg}", ex.Message);
             return null;
         }
     }
@@ -62,8 +61,7 @@ public class SosAdministrationApiClient
         }
         catch (Exception ex)
         {
-            // In a production environment, you would want to handle this error appropriately
-            Console.WriteLine($"Error fetching processing jobs: {ex.Message}");
+            _logger.LogError("Error fetching processing jobs: {ErrorMsg}", ex.Message);
             return null;
         }
     }
@@ -76,8 +74,7 @@ public class SosAdministrationApiClient
         }
         catch (Exception ex)
         {
-            // In a production environment, you would want to handle this error appropriately
-            Console.WriteLine($"Error fetching search index info: {ex.Message}");
+            _logger.LogError("Error fetching index info: {ErrorMsg}", ex.Message);
             return null;
         }
     }
@@ -90,8 +87,7 @@ public class SosAdministrationApiClient
         }
         catch (Exception ex)
         {
-            // In a production environment, you would want to handle this error appropriately
-            Console.WriteLine($"Error fetching MongoDB info: {ex.Message}");
+            _logger.LogError("Error fetching MongoDB info: {ErrorMsg}", ex.Message);
             return null;
         }
     }

@@ -1,0 +1,14 @@
+﻿@inject NavigationManager NavigationManager
+@inject ILogger<RedirectToLogin> Logger
+
+@code {
+    protected override void OnInitialized()
+    {
+        Logger.LogInformation("RedirectToLogin called at {Time}", DateTime.UtcNow);
+
+        NavigationManager.NavigateTo(
+            $"authentication/login?returnUrl={Uri.EscapeDataString(NavigationManager.Uri)}",
+            forceLoad: true
+        );        
+    }
+}

@@ -1,0 +1,167 @@
+﻿@using System.Security.Claims
+@using Microsoft.AspNetCore.Components.Authorization
+@inherits LayoutComponentBase
+@inject NavigationManager Navigation
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+@* Required *@
+<MudThemeProvider @ref="@_mudThemeProvider" Theme="_themeManager.Theme" />
+<MudPopoverProvider />
+
+@* Needed for dialogs *@
+<MudDialogProvider />
+
+@* Needed for snackbars *@
+<MudSnackbarProvider />
+
+<MudLayout>        
+    <MudThemeManager Open="themeManagerOpen" OpenChanged="OnOpenThemeManager" Theme="_themeManager" ThemeChanged="OnUpdateTheme"/>
+    
+    <MudAppBar Elevation="_themeManager.AppBarElevation">
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => OnDrawerToggle())" />        
+        <MudText Typo="Typo.h5" Class="ml-3">SOS Status</MudText>
+        <MudTooltip Text="Render mode">
+            <MudText Typo="Typo.body2" Class="ml-3">(@GetRenderModeDescription())</MudText>
+        </MudTooltip>
+        <MudSpacer />        
+        <AuthorizeView>
+            <Authorized>                
+                <MudMenu Color="Color.Inherit" Variant="Variant.Text" EndIcon="@Icons.Material.Filled.KeyboardArrowDown" Label="@name">
+                    <MudMenuItem Label="Logout" OnClick="OnLogout" Icon="@Icons.Material.Outlined.Logout" />
+                </MudMenu>
+            </Authorized>
+            <NotAuthorized>
+                <MudButton Color="Color.Inherit" Variant="Variant.Text" OnClick="OnLogin" StartIcon="@Icons.Material.Filled.Login">Login</MudButton>
+            </NotAuthorized>
+        </AuthorizeView>
+
+        <MudIconButton Icon="@Icons.Material.Filled.Palette"
+                       OnClick="@((e) => OnOpenThemeManager(true))"
+                       Color="Color.Inherit"
+                        />
+        @* <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End" /> *@
+        <MudIconButton Icon="@GetDrawerIcon()"
+                       OnClick="@OnToggleRightDrawer"
+                       Color="Color.Inherit"
+                       Edge="Edge.End"
+                       Title="Open/close right panel" />
+    </MudAppBar> 
+    
+    <MudDrawer @bind-Open="leftDrawerOpen" ClipMode="_themeManager.DrawerClipMode" Elevation="_themeManager.DrawerElevation">
+        <NavMenu />        
+    </MudDrawer> 
+    
+    <MudDrawer Anchor="Anchor.End"
+                Open="@rightDrawerOpen"
+                Elevation="1"
+                ClipMode="DrawerClipMode.Always"
+                Variant="DrawerVariant.Persistent">
+        <MudDrawerHeader>
+            <MudText Typo="Typo.h6">Search filter</MudText>
+        </MudDrawerHeader>
+        <MudDrawerContainer>
+            <MudNavMenu>                                
+                <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Outlined.Dataset">Dataset</MudNavLink>
+                <MudNavLink Href="" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Outlined.BugReport">Taxa</MudNavLink>
+                <MudNavLink Href="" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Outlined.Schedule">Date</MudNavLink>
+                <MudNavLink Href="" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Outlined.ListAlt">Observation properties</MudNavLink>                
+                <MudButton Variant="Variant.Filled" Class="mx-2 my-2" StartIcon="@Icons.Material.Outlined.Delete" Color="Color.Primary">Clear filter</MudButton>
+            </MudNavMenu>
+        </MudDrawerContainer>
+    </MudDrawer>
+
+    <MudMainContent Class="pt-17 pa-4">
+        <MudContainer MaxWidth="MaxWidth.Large">
+            @Body        
+        </MudContainer>
+    </MudMainContent>
+</MudLayout>
+
+
+@code {    
+    private bool themeManagerOpen = false;
+    private bool leftDrawerOpen = true;
+    private bool rightDrawerOpen = false;
+    private string? firstName;
+    private string? name;    
+    private MudThemeProvider _mudThemeProvider;
+    private ThemeManagerTheme _themeManager = new ThemeManagerTheme()
+    {
+        DrawerClipMode = DrawerClipMode.Always,
+        Theme = CustomTheme.MyCustomTheme
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Settings.OnChange += StateHasChanged;
+
+        var authState = await AuthenticationStateProvider
+            .GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity is not null && user.Identity.IsAuthenticated)
+        {
+            firstName = user.FindFirst(ClaimTypes.GivenName)?.Value;
+            name = user.FindFirst("name")?.Value;
+            var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var lastName = user.FindFirst(ClaimTypes.Surname)?.Value;
+            var email = user.FindFirst(ClaimTypes.Email)?.Value;
+        }                
+
+        StateHasChanged();
+    }    
+
+    private string GetRenderModeDescription()
+    {
+        return this.RendererInfo.Name switch  
+        {  
+            "WebAssembly" => "🌐 WebAssembly",
+            "Server" => "💻 Server",
+            "Static" => "📄 Static",  
+            _ => "❓ Unknown"  
+        };
+        //return OperatingSystem.IsBrowser() ? "🌐 WebAssembly" : "🖥 Server";
+    }
+
+    private void OnOpenThemeManager(bool value)
+    {
+        themeManagerOpen = value;
+    }
+
+    private void OnUpdateTheme(ThemeManagerTheme value)
+    {
+        _themeManager = value;
+        StateHasChanged();
+    }
+
+    private void OnLogin()
+    {        
+        Navigation.NavigateTo("authentication/login", forceLoad: true);        
+    }
+
+    private void OnLogout()
+    {
+        Navigation.NavigateTo("/signout", forceLoad: true);
+        //Navigation.NavigateTo("/signout?returnUrl=test", forceLoad: true); // if you want to redirect to a specific page after logout
+    }
+    
+    private void OnDrawerToggle()
+    {
+        leftDrawerOpen = !leftDrawerOpen;
+    }
+
+    private void OnToggleRightDrawer()
+    {
+        rightDrawerOpen = !rightDrawerOpen;
+    }
+
+    private string GetDrawerIcon()
+    {
+        return rightDrawerOpen ? Icons.Material.Filled.ChevronRight : Icons.Material.Filled.MenuOpen;
+    }       
+
+    public void Dispose()
+    {
+        //Settings.OnChange -= StateHasChanged;
+    }    
+}

@@ -1,0 +1,127 @@
+﻿@page "/taxondiagram"
+@using SOS.Status.Web.Client.Abstractions
+@inject HttpClient Http
+@inject ITaxonDiagramService taxonDiagramService
+@inject IJSRuntime JS
+
+<PageTitle>Taxon Relations Diagram</PageTitle>
+<MudText Typo="Typo.h4">Taxon Relations Diagram</MudText>
+<MudPaper Class="pa-6 mx-auto mt-4" >    
+    <MudGrid>
+        <MudItem xs="12" sm="12" md="12" lg="6">
+            <MudTextField @bind-Value="taxonIdsInput"
+                          Label="Taxon IDs"
+                          Variant="Variant.Outlined"
+                          Lines="4"
+                          Text="@taxonIdsInput" />
+        </MudItem>
+        <MudItem xs="12" sm="12" md="12" lg="6">
+            <MudStack>
+                <MudStack Row="true" Justify="Justify.FlexStart">
+                    <MudSelect T="TaxonRelationsTreeIterationMode"
+                               Label="Iteration Mode"
+                               @bind-Value="treeIterationMode"
+                               Variant="Variant.Outlined">
+                        <MudSelectItem Value="TaxonRelationsTreeIterationMode.BothParentsAndChildren">Both Parents and Children</MudSelectItem>
+                        <MudSelectItem Value="TaxonRelationsTreeIterationMode.OnlyParents">Only Parents</MudSelectItem>
+                        <MudSelectItem Value="TaxonRelationsTreeIterationMode.OnlyChildren">Only Children</MudSelectItem>
+                    </MudSelect>
+                    <MudSelect T="string"
+                               Label="Language"
+                               @bind-Value="translationCultureCode"
+                               Variant="Variant.Outlined">
+                        <MudSelectItem Value="@("sv-SE")">Swedish</MudSelectItem>
+                        <MudSelectItem Value="@("en-GB")">English</MudSelectItem>
+                    </MudSelect>
+                </MudStack>
+                <MudStack Row="true" Justify="Justify.SpaceBetween">
+                    <MudCheckBox T="bool" @bind-Value="includeSecondaryRelations"
+                                 Label="Include Secondary Relations" />
+                    <MudSelect T="int?" Label="Load example" Variant="Variant.Outlined" ValueChanged="LoadExample" Dense="true" Margin="Margin.Dense" FitContent="true">
+                        <MudSelectItem T="int?" Value="101656">Trumgräshoppa (101656)</MudSelectItem>
+                        <MudSelectItem T="int?" Value="266239">Gråtrut x havstrut (266239)</MudSelectItem>
+                        <MudSelectItem T="int?" Value="4000107">Däggdjur (4000107)</MudSelectItem>
+                    </MudSelect>
+                </MudStack>
+            </MudStack>
+        </MudItem>
+    </MudGrid>
+    <MudButton OnClick="GetDiagram"
+               Variant="Variant.Filled"
+               Color="Color.Primary"
+               Class="mt-4"
+               Disabled="@string.IsNullOrWhiteSpace(taxonIdsInput)">
+        Create diagram
+    </MudButton>
+   
+    @if (!string.IsNullOrWhiteSpace(diagramResult))
+    {
+        <MudTabs Class="mt-2" @bind-ActivePanelIndex="activeTabIndex" Outlined="true" Border="true" ApplyEffectsToContainer="true">
+            <MudTabPanel Text="Diagram" Icon="@Icons.Material.Filled.TableChart">
+                <MermaidDiagram Definition="@this.diagramResult" class="my-2" />
+            </MudTabPanel>
+            <MudTabPanel Text="Text" Icon="@Icons.Material.Filled.TextFields">
+                <MudStack Row="true" AlignItems="AlignItems.Start" Spacing="2" Class="my-2">
+                    <MudTextField T="string"
+                                  Value="@diagramResult"
+                                  ReadOnly="true"
+                                  AutoGrow="true"
+                                  MaxLines="30"
+                                  Variant="Variant.Outlined" />
+                    <MudIconButton Icon="@copyIcon"
+                                   Color="Color.Primary"
+                                   OnClick="CopyDiagramToClipboard"
+                                   Size="Size.Medium"
+                                   AriaLabel="Copy diagram to clipboard" />
+                </MudStack>
+            </MudTabPanel>            
+        </MudTabs>
+    }    
+</MudPaper>
+
+@code {
+    private string taxonIdsInput = "";
+    private int activeTabIndex = 0;
+    private TaxonRelationsTreeIterationMode treeIterationMode = TaxonRelationsTreeIterationMode.BothParentsAndChildren;
+    private bool includeSecondaryRelations = true; // Default checked
+    private string translationCultureCode = "sv-SE";
+    private int? selectedExampleId;
+    private string? diagramResult;
+    private string copyIcon = Icons.Material.Filled.ContentCopy;
+
+    private void LoadExample(int? id)
+    {
+        if (id.HasValue)
+            taxonIdsInput = id.Value.ToString();
+    }
+
+    private async Task GetDiagram()
+    {
+        var taxonIds = taxonIdsInput
+            .Split(new[] { '\r', '\n', ',' }, StringSplitOptions.RemoveEmptyEntries)
+            .Select(id => int.Parse(id.Trim()))
+            .ToArray();
+
+        var result = await taxonDiagramService.GetTaxonRelationsDiagramAsync(taxonIds, treeIterationMode, includeSecondaryRelations, translationCultureCode);
+        diagramResult = result;               
+    }    
+
+    private async Task CopyDiagramToClipboard()
+    {
+        if (!string.IsNullOrEmpty(diagramResult))
+        {
+            await JS.InvokeVoidAsync("navigator.clipboard.writeText", diagramResult);
+
+            // Change icon
+            copyIcon = Icons.Material.Filled.Check;
+            StateHasChanged();
+
+            // Wait 1 second
+            await Task.Delay(1000);
+
+            // Reset icon
+            copyIcon = Icons.Material.Filled.ContentCopy;
+            StateHasChanged();
+        }
+    }
+}

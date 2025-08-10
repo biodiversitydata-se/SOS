@@ -1,33 +1,45 @@
-# See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
-
-# This stage is used when running from VS in fast mode (Default for Debug configuration)
+# Base image for runtime
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
 USER $APP_UID
 WORKDIR /app
-EXPOSE 8080
-EXPOSE 8081
+EXPOSE 5006
 
-
-# This stage is used to build the service project
+# Build image
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
+
+# Install wasm-tools and Python
+RUN dotnet workload install wasm-tools \
+    && apt-get update \
+    && apt-get install -y python3 python3-pip \
+    && ln -s /usr/bin/python3 /usr/bin/python
+
 COPY ["Directory.Build.props", "."]
 COPY ["Src/SOS.Status.Web/SOS.Status.Web.csproj", "Src/SOS.Status.Web/"]
 COPY ["Src/SOS.Shared.Api/SOS.Shared.Api.csproj", "Src/SOS.Shared.Api/"]
 COPY ["Src/SOS.Lib/SOS.Lib.csproj", "Src/SOS.Lib/"]
+COPY ["Src/SOS.Status.Web.Client/SOS.Status.Web.Client.csproj", "Src/SOS.Status.Web.Client/"]
 RUN dotnet restore "./Src/SOS.Status.Web/SOS.Status.Web.csproj"
+
 COPY . .
 WORKDIR "/src/Src/SOS.Status.Web"
 RUN dotnet build "./SOS.Status.Web.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
-# This stage is used to publish the service project to be copied to the final stage
+# Publish stage
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./SOS.Status.Web.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "./SOS.Status.Web.csproj" \
+    -c Release \
+    -o /app/publish \
+    /p:UseAppHost=false \
+    /p:BlazorWebAssemblyEnableLinking=true \
+    /p:BlazorWebAssemblyEnableTimeZoneSupport=true \
+    /p:RunAOTCompilation=false  # sätt true om du vill köra AOT också
 
-# This stage is used in production or when running from VS in regular mode (Default when not using the Debug configuration)
+# Final runtime image
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+
 ENTRYPOINT ["dotnet", "SOS.Status.Web.dll"]

@@ -2,68 +2,91 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: sosadmingui-web
-  name: sosadmingui-web
+    app: web
+  name: web
   namespace: sosadmingui-dev
 spec:
-  type: ClusterIP
   ports:
-    - port: 4200
-      targetPort: 4200
+    - port: 5006
+      targetPort: 5006
+  type: LoadBalancer
   selector:
-    app: sosadmingui-web
+    app: web
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: sosadmingui-web
-  name: sosadmingui-web
+    app: web
+  name: web
   namespace: sosadmingui-dev
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
-      app: sosadmingui-web
+      app: web
   strategy:
     type: Recreate
   template:
     metadata:
-      annotations:
-        logging: "true"
       labels:
-        app: sosadmingui-web
+        app: web
     spec:
-      securityContext:
-        runAsNonRoot: true
-      topologySpreadConstraints: # try to spread out web instances over available nodes
-        - labelSelector:
-            matchLabels:
-              app: sosadmingui-web # pods labeled app:sosadmingui-web
-          maxSkew: 1
-          topologyKey: kubernetes.io/hostname # 1 node = 1 topology
-          whenUnsatisfiable: ScheduleAnyway
       containers:
-        - env:
-            - name: SPAENVIRONMENT
-              value: dev
-          image: adbpocreg.azurecr.io/sosadmingui-web:$(Build.BuildId)
-          name: sosadmingui-web
+        - name: web
+          image: web
           ports:
-            - containerPort: 4200
-          resources:
-            requests:
-              cpu: 15m
-              memory: 105M
-            limits:
-              memory: 105M
-          securityContext:
-            allowPrivilegeEscalation: false
-            runAsUser: 1000
-            runAsGroup: 1000
-            capabilities:
-              drop:
-                - ALL
+            - containerPort: 5006
+          env:
+            - name: ASPNETCORE_ENVIRONMENT
+              value: dev
+            - name: UserServiceConfiguration
+              value: '{"BaseAddress": "https://artdatauser-dev.artdata.slu.se/api", "AcceptHeaderContentType": "application/json", "UserAdmin2ApiBaseAddress": "https://useradmin2-api-dev.wt.artdata.slu.se", "ClientId": "SOS.Administration.Gui", "ClientSecret": "SECRET_PLACEHOLDER", "Scope": "SOS.Observations.Protected openid profile email roles", "TokenUrl": "https://useradmin2-auth-dev.wt.artdata.slu.se/connect/token", "TokenExpirationBufferInSeconds": 300, "IdentityProvider": {"Authority": "https://useradmin2-auth-dev.wt.artdata.slu.se", "Audience": "https://sos-search-dev.wt.artdata.slu.se", "RequireHttpsMetadata": false}}'                    
+            - name: ProcessDbConfiguration
+              value: '{"UserName": "SECRET_PLACEHOLDER", "Password": "SECRET_PLACEHOLDER", "Hosts": [{"Name": "artmongo-t-1.artdata.slu.se","Port": 27017}], "ReplicaSetName": null, "DatabaseName": "sos-dev", "UseTls": false, "AuthenticationDb": "admin", "ReadBatchSize": 10000, "WriteBatchSize": 10000}'                
+            - name: ProcessDbUserName
+              valueFrom:
+                secretKeyRef:
+                  name: process-db-username
+                  key: UserName
+            - name: ProcessDbPassword
+              valueFrom:
+                secretKeyRef:
+                  name: process-db-password
+                  key: Password
+            - name: SearchDbConfiguration
+              value: '{"UserName": "SECRET_PLACEHOLDER", "Password": "SECRET_PLACEHOLDER", "Clusters": [{"Hosts": ["https://artsearch2-1-test.artdata.slu.se:9200"]}],"DebugMode": true,"IndexPrefix": "sos-dev","IndexSettings": [{"Name": "observation","NumberOfReplicas": 0,"NumberOfShards": 1,"NumberOfShardsProtected": 1,"ReadBatchSize": 10000,"WriteBatchSize": 1000,"RequestTimeout": 300,"ScrollBatchSize": 5000,"ScrollTimeout": "300s"}, {"Name": "dataset", "NumberOfReplicas": 0,"NumberOfShards": 1, "ReadBatchSize": 10000, "WriteBatchSize": 1000, "RequestTimeout": 300, "ScrollBatchSize": 5000, "ScrollTimeout": "300s"}, {"Name": "event", "NumberOfReplicas": 0, "NumberOfShards": 1, "ReadBatchSize": 10000, "WriteBatchSize": 1000, "RequestTimeout": 300, "ScrollBatchSize": 5000, "ScrollTimeout": "300s"}]}'                
+            - name: SearchDbUserName
+              valueFrom:
+                secretKeyRef:
+                  name: search-db-username
+                  key: UserName
+            - name: SearchDbPassword
+              valueFrom:
+                secretKeyRef:
+                  name:  search-db-password
+                  key: Password
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 5006
+              httpHeaders:
+              - name: Host
+                value: KubernetesReadinessProbe
+            successThreshold: 1
+            failureThreshold: 3
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 5006
+            failureThreshold: 3
+            periodSeconds: 10
+          startupProbe:
+            httpGet:
+              path: /healthz
+              port: 5006
+            failureThreshold: 5
+            periodSeconds: 10
+          resources: {}
       restartPolicy: Always
-      imagePullSecrets:
-        - name: regcred

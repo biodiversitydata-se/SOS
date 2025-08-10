@@ -1,0 +1,20 @@
+﻿<div>
+    CounterValue in CustomInput is: @CounterValue
+</div>
+
+<MudButton Class="my-2" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" @onclick="UpdateCounterValue">Increment</MudButton>
+@code {
+    [Parameter]
+    public int CounterValue { get; set; }
+
+    [Parameter]
+    public EventCallback<int> CounterValueChanged { get; set; }
+
+    async Task UpdateCounterValue()
+    {
+        CounterValue++;
+
+        // Anropa eventet så att parent-komponenten uppdateras
+        await CounterValueChanged.InvokeAsync(CounterValue);
+    }
+}

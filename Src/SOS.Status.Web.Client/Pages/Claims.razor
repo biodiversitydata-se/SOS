@@ -1,0 +1,68 @@
+﻿@using System.Security.Claims
+@using Microsoft.AspNetCore.Components.Authorization
+@page "/claims"
+@attribute [Authorize]
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+<PageTitle>ClaimsPrincipal data</PageTitle>
+<MudText Typo="Typo.h4">ClaimsPrincipal data</MudText>
+@if (claims.Any())
+{
+    <MudSimpleTable Class="mt-2" Bordered="true" Striped="true" Dense="true">
+        <colgroup>
+            <col style="width:1%; white-space:nowrap;" />
+        </colgroup>
+        <thead>
+            <tr>
+                <th>Type</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var claim in claims)
+            {
+                <tr>
+                    <td>@claim.Type</td>
+                    <td>@claim.Value</td>
+                </tr>
+            }
+        </tbody>
+    </MudSimpleTable>
+}
+
+@code {
+    private string? authMessage;
+    private string? surname;
+    private IEnumerable<Claim> claims = Enumerable.Empty<Claim>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetClaimsPrincipalData();
+    }
+
+    private async Task GetClaimsPrincipalData()
+    {
+        var authState = await AuthenticationStateProvider
+            .GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity is not null && user.Identity.IsAuthenticated)
+        {
+            var firstName = user.FindFirst(ClaimTypes.GivenName)?.Value;
+            var name = user.FindFirst("name")?.Value;
+            var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var lastName = user.FindFirst(ClaimTypes.Surname)?.Value;
+            var email = user.FindFirst(ClaimTypes.Email)?.Value;
+            var identityName = user.Identity.Name;
+
+            authMessage = $"{name} is authenticated.";
+            claims = user.Claims;
+            surname = user.FindFirst(c => c.Type == ClaimTypes.Surname)?.Value;
+        }
+        else
+        {
+            authMessage = "The user is NOT authenticated.";
+        }
+    }
+
+}

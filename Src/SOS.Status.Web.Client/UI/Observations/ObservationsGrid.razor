@@ -1,0 +1,167 @@
+@using SOS.Status.Web.Client.Dtos
+@using SOS.Status.Web.Client.Helpers
+
+<MudDataGrid Class="no-last-row-scroll" Items="@ObservationsPageResult?.Records" T="Observation" Hover="true" Bordered="true" Striped="true" Dense="true" ColumnResizeMode="ResizeMode.Container" FixedHeader="true">
+    <Columns>
+        <HierarchyColumn T="Observation" />
+        <PropertyColumn Property="x => x.Taxon.VernacularName" Title="Swedish name" Sortable="false" />
+        <PropertyColumn Property="x => x.Taxon.ScientificName" Title="Scientific name" Sortable="false" />        
+        <PropertyColumn Property="x => x.Event.PlainStartDate" Title="Start date" Sortable="false" />        
+        <PropertyColumn Property="x => x.Event.PlainEndDate" Title="End date" Sortable="false" />
+        <PropertyColumn Property="x => x.Location.Locality" Title="Locality" Sortable="false" />
+        <PropertyColumn Property="x => x.Location.Municipality.Name" Title="Municipality" Sortable="false" />
+        <PropertyColumn Property="x => x.Location.County.Name" Title="County" Sortable="false" />
+        <PropertyColumn Property="x => x.Occurrence.RecordedBy" Title="Recorded by" Sortable="false" />
+    </Columns>
+    <ChildRowContent>
+        @* <MudCheckBox @bind-Value="hideDefaultValues" Label="Hide default values" /> *@
+        @* <MudText Typo="Typo.h6" Class="mt-2 mb-1">Record level</MudText> *@
+        <MudCheckBox @bind-Value="hideDefaultValues" Label="Hide default values" />
+
+        @foreach (var group in ObservationPropertyGroup.Groups)
+        {
+            <MudStack Row="true" AlignItems="AlignItems.Center">
+                <MudText Typo="Typo.h6" Class="mt-2 mb-1">@group.Title</MudText>
+                @* <MudCheckBox @bind-Value="hideDefaultValues" Label="Hide default values" /> *@
+            </MudStack>
+
+            <MudSimpleTable Bordered="true" Striped="true" Dense="true">
+                <colgroup>
+                    <col style="width:1%; white-space:nowrap;" />
+                    <col />
+                </colgroup>
+                <tbody>
+                    @foreach (var row in group.Rows)
+                    {
+                        var value = row.ValueSelector(context.Item);
+
+                        if (ShouldRender(value, row.DefaultValues))
+                        {
+                            if (row.IsLink)
+                            {
+                                @RenderLinkRow(row.Label, value?.ToString())
+                            }
+                            else
+                            {
+                                @RenderRow(row.Label, value)
+                            }
+                        }
+                    }
+                </tbody>
+            </MudSimpleTable>
+        }              
+    </ChildRowContent>
+</MudDataGrid>
+
+@code {
+
+    [Parameter]
+    public PagedResultDto<Observation>? ObservationsPageResult { get; set; }
+    public bool hideDefaultValues { get; set; } = true;
+
+    private bool ShouldRender(object? value, object[] defaults)
+    {
+        if (!hideDefaultValues)
+            return true;
+
+        if (value == null)
+            return false;
+
+        if (value is string s)
+            return !string.IsNullOrEmpty(s) && !defaults.Contains(s);
+
+        return !defaults.Contains(value) &&
+               !Equals(value, value.GetType().IsValueType ? Activator.CreateInstance(value.GetType()) : null);
+    }
+
+
+    private RenderFragment RenderRow<T>(string title, T value, params T[]? customDefaults)
+    {
+        return builder =>
+        {
+            bool show = !hideDefaultValues;
+
+            if (!show)
+            {
+                if (value is string s)
+                {
+                    // Empty strings should bed hidden                    
+                    show = !string.IsNullOrEmpty(s);
+
+                    // Check if it matches any custom defaults                    
+                    if (customDefaults != null && customDefaults.Length > 0)
+                        show &= !customDefaults.Contains(value);
+                }
+                else
+                {
+                    // If not custom defaults is set, use the type default                    
+                    if (customDefaults == null || customDefaults.Length == 0)
+                    {
+                        show = !EqualityComparer<T>.Default.Equals(value, default!);
+                    }
+                    else
+                    {                        
+                        // Hide if the value matches any custom defaults
+                        show = !customDefaults.Contains(value);
+                    }
+                }
+            }
+
+            if (show)
+            {
+                builder.OpenElement(0, "tr");
+                builder.OpenElement(1, "td");
+                builder.AddContent(2, title);
+                builder.CloseElement();
+                builder.OpenElement(3, "td");
+                builder.AddContent(4, value?.ToString());
+                builder.CloseElement();
+                builder.CloseElement();
+            }
+        };
+    }
+
+    private RenderFragment RenderLinkRow(string title, string? url, params string[]? customDefaults)
+    {
+        return builder =>
+        {
+            bool show = !hideDefaultValues;
+
+            if (!show)
+            {                
+                // If url is null, empty or matches default => hide
+                if (string.IsNullOrEmpty(url))
+                {
+                    show = false;
+                }
+                else if (customDefaults != null && customDefaults.Length > 0)
+                {
+                    show = !customDefaults.Contains(url);
+                }
+                else
+                {
+                    show = true;
+                }
+            }
+
+            if (show)
+            {
+                builder.OpenElement(0, "tr");
+
+                builder.OpenElement(1, "td");
+                builder.AddContent(2, title);
+                builder.CloseElement();
+
+                builder.OpenElement(3, "td");
+                builder.OpenElement(4, "a");
+                builder.AddAttribute(5, "href", url);
+                builder.AddAttribute(6, "target", "_blank");
+                builder.AddContent(7, url);
+                builder.CloseElement(); // a
+                builder.CloseElement(); // td
+
+                builder.CloseElement(); // tr
+            }
+        };
+    }
+}

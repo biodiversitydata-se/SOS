@@ -1,0 +1,50 @@
+﻿@page "/observationssearch"
+@using SOS.Status.Web.Client.Abstractions
+@inject IJSRuntime JsRuntime
+@inject IObservationSearchService searchService
+@inject ISnackbar Snackbar
+
+<PageTitle>Observations search</PageTitle>
+<MudText Typo="Typo.h4">Observations search</MudText>
+<MudTabs Class="mt-2" @bind-ActivePanelIndex="activeTabIndex" Outlined="true" Border="true">
+    <MudTabPanel Text="Search" Icon="@Icons.Material.Filled.Search">
+        <MudTextField @bind-Value="searchFilter"
+                      Placeholder="JSON search filter"
+                      Lines="20"
+                      FullWidth="true"
+                      Margin="Margin.Dense"
+                      Variant="Variant.Outlined" />
+
+        <MudStack Row="true" Justify="Justify.FlexStart">
+            <MudButton Variant="Variant.Filled"
+                       StartIcon="@Icons.Material.Outlined.Search"
+                       Color="Color.Primary"
+                       OnClick="OnSearchObservationsAsync"
+                       Disabled="@string.IsNullOrWhiteSpace(searchFilter)"
+                       Class="mt-2">
+                Search
+            </MudButton>
+
+            <MudSelect T="int?" Label="Load example" Variant="Variant.Outlined" ValueChanged="LoadExample" Dense="true" Margin="Margin.Dense" FitContent="true">
+                @foreach (var example in TaxonSearchFilterSamples.Samples)
+                {
+                    <MudSelectItem  T="int?" Value="@example.Key">@example.Value.Name</MudSelectItem>
+                }
+            </MudSelect>
+        </MudStack>
+    </MudTabPanel>
+
+    <MudTabPanel Text="Table result" Icon="@Icons.Material.Outlined.Dataset">
+        <ObservationsGrid ObservationsPageResult="@observationSearchResult" />
+    </MudTabPanel>
+
+    <MudTabPanel Text="Map result" Icon="@Icons.Material.Outlined.Map">
+        <RealTimeMap @ref="realTimeMap"
+                     OnAfterMapLoaded="@OnAfterMapLoadedAsync"
+                     OnZoomLevelEndChange="@OnZoomLevelEndChange"                     
+                     OnClickMap="OnMapClick"
+                     Parameters="mapSettings"
+                     height="600px"
+                     width="100%" />   
+    </MudTabPanel>    
+</MudTabs>

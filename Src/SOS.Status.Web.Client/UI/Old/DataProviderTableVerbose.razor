@@ -1,0 +1,71 @@
+@using SOS.Status.Web.Client.Dtos
+<MudTable @ref="mudTable" Class="data-provider-table" Items="@ProcessSummary?.DataProviderStatuses" T="DataProviderStatusDto" Hover="true" Bordered="false" Striped="true" Dense="true" RowClass="cursor-pointer" RowClassFunc="@SelectedRowClassFunc" OnRowClick="RowClickEvent">
+    <HeaderContent>
+        <MudTh>Id</MudTh>
+        <MudTh>Dataset</MudTh>
+        <MudTh>Public Active</MudTh>
+        <MudTh>Public Inactive</MudTh>
+        <MudTh>Diff</MudTh>
+        <MudTh>Protected Active</MudTh>
+        <MudTh>Protected Inactive</MudTh>
+        <MudTh>Diff</MudTh>
+        <MudTh>Invalid Active</MudTh>
+        <MudTh>Invalid Inactive</MudTh>
+        <MudTh>Diff</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd>@context.Id</MudTd>
+        <MudTd>@context.Identifier</MudTd>
+        <MudTd>@context.PublicActive.ToString("N0", new CultureInfo("sv-SE"))</MudTd>
+        <MudTd>@context.PublicInactive.ToString("N0", new CultureInfo("sv-SE"))</MudTd>
+        <MudTd Class="@GetDiffClass(context.PublicActive, context.PublicInactive)">@context.PublicDiff.ToString("N0", new CultureInfo("sv-SE"))</MudTd>
+        <MudTd>@context.ProtectedActive.ToString("N0", new CultureInfo("sv-SE"))</MudTd>
+        <MudTd>@context.ProtectedInactive.ToString("N0", new CultureInfo("sv-SE"))</MudTd>
+        <MudTd Class="@GetDiffClass(context.ProtectedActive, context.ProtectedInactive)">@context.ProtectedDiff.ToString("N0", new CultureInfo("sv-SE"))</MudTd>
+        <MudTd>@context.InvalidActive.ToString("N0", new CultureInfo("sv-SE"))</MudTd>
+        <MudTd>@context.InvalidInactive.ToString("N0", new CultureInfo("sv-SE"))</MudTd>
+        <MudTd Class="@GetDiffClass(context.InvalidInactive, context.InvalidActive)">@context.InvalidDiff.ToString("N0", new CultureInfo("sv-SE"))</MudTd>
+    </RowTemplate>
+</MudTable>
+
+@code {
+    [Parameter]
+    public ProcessSummaryDto? ProcessSummary { get; set; }
+
+    private int selectedRowNumber = -1;
+    private MudTable<DataProviderStatusDto>? mudTable;
+    
+    string GetDiffClass(int activeValue, int inactiveValue)
+    {
+        int diff = activeValue - inactiveValue;
+        if (diff >= 0)
+            return "bg-success";
+        else if ((double)activeValue / inactiveValue >= 0.95)
+            return "bg-warning";
+        else
+            return "bg-danger";
+    }
+
+    private void RowClickEvent(TableRowClickEventArgs<DataProviderStatusDto> tableRowClickEventArgs)
+    {
+        //clickedEvents.Add("Row has been clicked");
+    }
+
+    private string SelectedRowClassFunc(DataProviderStatusDto element, int rowNumber)
+    {
+        if (selectedRowNumber == rowNumber)
+        {
+            selectedRowNumber = -1;
+            return string.Empty;
+        }
+        else if (mudTable.SelectedItem != null && mudTable.SelectedItem.Equals(element))
+        {
+            selectedRowNumber = rowNumber;
+            return "selected";
+        }
+        else
+        {
+            return string.Empty;
+        }
+    }
+}

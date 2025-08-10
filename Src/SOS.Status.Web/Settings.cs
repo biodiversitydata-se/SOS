@@ -1,14 +1,15 @@
 using SOS.Lib.Configuration.Shared;
-using SOS.Status.Web.Models;
+using SOS.Status.Web.Client.Models;
 using System.Text.Json;
 
 public static class Settings
-{    
+{
+    public static string BlazorRenderMode { get; private set; } = "Server"; // "WebAssembly", "Server" or "Auto"
     public static UserServiceConfiguration UserServiceConfiguration { get; set; } = new();
     public static HttpClientsConfiguration HttpClientsConfiguration { get; set; } = new();
     public static MongoDbConfiguration ProcessDbConfiguration { get; set; } = new();
-    public static ElasticSearchConfiguration SearchDbConfiguration { get; set; } = new();    
-    public static string ClientSecret { get; set; } = ""; 
+    public static ElasticSearchConfiguration SearchDbConfiguration { get; set; } = new();
+    public static string ClientSecret { get; set; } = "";
     public static string SearchDbUserName { get; set; } = "";
     public static string SearchDbPassword { get; set; } = "";
     public static string ProcessDbUserName { get; set; } = "";
@@ -21,7 +22,8 @@ public static class Settings
         using var loggerFactory = LoggerFactory.Create(loggingBuilder => loggingBuilder.SetMinimumLevel(LogLevel.Debug).AddConsole());
         var logger = loggerFactory.CreateLogger("Settings");
 
-        HttpClientsConfiguration = GetConfigSection<HttpClientsConfiguration>("HttpClients", configuration, logger, sensitiveSetting: false);        
+        BlazorRenderMode = GetConfigValueString("BlazorRenderMode", configuration, logger, sensitiveSetting: false, required: false);
+        HttpClientsConfiguration = GetConfigSection<HttpClientsConfiguration>("HttpClients", configuration, logger, sensitiveSetting: false);
 
         // User service config
         UserServiceConfiguration = GetConfigSection<UserServiceConfiguration>("UserServiceConfiguration", configuration, logger, sensitiveSetting: false);
@@ -30,7 +32,7 @@ public static class Settings
         {
             UserServiceConfiguration.ClientSecret = ClientSecret;
             logger.LogInformation("replaced SECRET_PLACEHOLDER in UserServiceConfiguration.ClientSecret with the value in ClientSecret");
-        } 
+        }
 
         // Process db
         ProcessDbConfiguration = GetConfigSection<MongoDbConfiguration>("ProcessDbConfiguration", configuration, logger, sensitiveSetting: false);
@@ -63,7 +65,7 @@ public static class Settings
         }
     }
 
-    private static T GetConfigSection<T>(string key, IConfiguration configuration, ILogger logger, bool sensitiveSetting = false, bool required = true)
+    private static T GetConfigSection<T>(string key, IConfiguration configuration, ILogger logger, bool sensitiveSetting = false, bool required = true) where T : class
     {
         var envValueStr = Environment.GetEnvironmentVariable(key);
         var envValue = !string.IsNullOrEmpty(envValueStr) ? JsonSerializer.Deserialize<T>(envValueStr) : default;
@@ -83,7 +85,7 @@ public static class Settings
         if (required)
             throw new Exception($"value for {key} is null or empty!");
         else
-            return default;
+            return null!;
     }
     private static string GetConfigValueString(string key, IConfiguration configuration, ILogger logger, bool sensitiveSetting = false, bool required = true)
     {
