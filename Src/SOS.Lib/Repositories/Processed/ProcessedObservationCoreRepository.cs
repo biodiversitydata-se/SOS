@@ -56,7 +56,7 @@ namespace SOS.Lib.Repositories.Processed
                 .Settings(s => s
                     .NumberOfShards(protectedIndex ? NumberOfShardsProtected : NumberOfShards)
                     .NumberOfReplicas(NumberOfReplicas)
-                    .MaxTermsCount(110000)
+                    .MaxTermsCount(120000)
                     .MaxResultWindow(100000)
                 )
                 .Mappings(map => map
