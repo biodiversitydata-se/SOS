@@ -1,5 +1,7 @@
 using Hangfire;
-using Hangfire.Dashboard;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -44,10 +46,10 @@ try
 
     // Register services
     ConfigureServices(
-        builder, 
-        configurationRoot, 
-        isDevelopment, 
-        disableHangfireInit, 
+        builder,
+        configurationRoot,
+        isDevelopment,
+        disableHangfireInit,
         useLocalHangfire);
 
     // Build app and configure middleware pipeline
@@ -56,7 +58,7 @@ try
     ConfigureMiddleware(app, isDevelopment, disableHangfireInit);
 
     // Start the application    
-    string aspnetCoreUrls = Environment.GetEnvironmentVariable("ASPNETCORE_URLS");    
+    string aspnetCoreUrls = Environment.GetEnvironmentVariable("ASPNETCORE_URLS");
     await app.RunAsync(aspnetCoreUrls ?? "http://*:5005");
 }
 catch (Exception ex)
@@ -104,57 +106,94 @@ static IConfigurationRoot BuildConfiguration(WebApplicationBuilder builder, bool
 
 static void ConfigureServices(
     WebApplicationBuilder builder,
-    IConfigurationRoot configuration, 
-    bool isDevelopment, 
-    bool disableHangfireInit, 
+    IConfigurationRoot configuration,
+    bool isDevelopment,
+    bool disableHangfireInit,
     bool useLocalHangfire)
 {
     IServiceCollection services = builder.Services;
     services.AddDependencyInjectionServices();
     services.AddMemoryCache();
     services.AddControllers()
-        .AddJsonOptions(x => { x.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()); });        
+        .AddJsonOptions(x => { x.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()); });
     services.SetupSwagger();
     if (!disableHangfireInit)
     {
         string hangfireDbConnectionString = builder.Configuration.GetConnectionString("hangfire-mongodb"); // Get Hangfire MongoDB from .Net Aspire configuration.
         services.SetupHangfire(useLocalHangfire, hangfireDbConnectionString);
     }
-    
+
+    services.AddAuthentication(options =>
+    {
+        options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
+    })
+        .AddCookie()
+        .AddOpenIdConnect(options =>
+        {
+            options.RequireHttpsMetadata = !isDevelopment;
+            options.Authority = Settings.AuthenticationConfiguration.Authority;
+            options.ClientId = Settings.AuthenticationConfiguration.ClientId;
+            options.ResponseType = "code";
+            options.SaveTokens = true;
+            options.Scope.Add("openid");
+            options.Scope.Add("profile");
+            options.Scope.Add("roles");
+            
+        });
+
+    services.AddAuthorization();
     services.SetupHealthchecks();
 }
 
 static void ConfigureMiddleware(WebApplication app, bool isDevelopment, bool disableHangfireInit)
 {
+    app.ApplyUseSerilogRequestLogging();
+    app.ApplyMapHealthChecks();
+
+    app.MapGet("/login", async context =>
+    {
+        await context.ChallengeAsync(OpenIdConnectDefaults.AuthenticationScheme, new AuthenticationProperties
+        {
+            RedirectUri = "/hangfire"
+        });
+    });
+    app.MapGet("/logout", async context =>
+    {
+        await context.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme); // Clear local cookie
+        await context.SignOutAsync(OpenIdConnectDefaults.AuthenticationScheme, new AuthenticationProperties
+        {
+            RedirectUri = "/hangfire"
+        });
+    });
+
+    app.Use(async (context, next) =>
+    {
+        // we manually check taht user is in role because it works for both hangfire and api
+        if ((context.Request.Path.Value?.Contains("health") ?? false) ||
+            (context.User?.IsInRole("SOS-ADMIN") ?? false))
+        {
+            await next();
+            return;
+        }
+
+        // If access wsa not granted, send user to login
+        await context.ChallengeAsync(OpenIdConnectDefaults.AuthenticationScheme);
+        return;
+    });
+
     if (!disableHangfireInit)
     {
         app.UseHangfireDashboard("/hangfire", new DashboardOptions
         {
-            Authorization = [new AllowAllConnectionsFilter()],
-            IgnoreAntiforgeryToken = true
+            AppPath = "/logout", // You can use this to make the "Back to site" link go to logout
         });
     }
     if (isDevelopment)
         app.UseDeveloperExceptionPage();
     else
         app.UseHsts();
-    
-    app.UseRouting();  
-    app.UseAuthorization();
-    app.ApplyUseSerilogRequestLogging();    
-    app.ApplyMapHealthChecks();    
+
     app.ApplyUseSwagger();
     app.MapControllers();
-}
-
-public class AllowAllConnectionsFilter : IDashboardAuthorizationFilter
-{
-    /// <summary>
-    /// </summary>
-    /// <param name="context"></param>
-    /// <returns></returns>
-    public bool Authorize(DashboardContext context)
-    {
-        return true;
-    }
 }

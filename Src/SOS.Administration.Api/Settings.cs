@@ -10,6 +10,7 @@ public static class Settings
 {
     public static string[] AllowedOrigins { get; set; } = [];
 
+    public static AuthenticationConfiguration AuthenticationConfiguration { get; set; } = new();
     public static ImportConfiguration ImportConfiguration { get; set; } = new();
     public static ProcessConfiguration ProcessConfiguration { get; set; } = new();
     public static UserServiceConfiguration UserServiceConfiguration { get; set; } = new();
@@ -36,7 +37,7 @@ public static class Settings
         var logger = loggerFactory.CreateLogger("Settings");
 
         AllowedOrigins = GetConfigValueString("AllowedOrigins", configuration, logger, false, false).Split(",").Select(s => s.Trim()).ToArray();
-
+        AuthenticationConfiguration = GetConfigSection<AuthenticationConfiguration>("AuthenticationConfiguration", configuration, logger, sensitiveSetting: false);
         ImportConfiguration = GetConfigSection<ImportConfiguration>("ImportConfiguration", configuration, logger, sensitiveSetting: false);
         ProcessConfiguration = GetConfigSection<ProcessConfiguration>("ProcessConfiguration", configuration, logger, sensitiveSetting: false);
         SosApiConfiguration = GetConfigSection<SosApiConfiguration>("SosApiConfiguration", configuration, logger, sensitiveSetting: false);

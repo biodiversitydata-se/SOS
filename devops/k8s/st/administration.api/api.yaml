@@ -87,6 +87,8 @@ spec:
             value: '{"InstrumentationKey": "SECRET_PLACEHOLDER", "EnableRequestBodyLogging": false,"EnableSearchResponseCountLogging": false}'
           - name: AllowedOrigins
             value: '*' 
+          - name: AuthenticationConfiguration
+            value: '{"Authority": "https://useradmin2-auth-st.wt.artdata.slu.se", "ClientId": "sos.admin.api"}'
           - name: SosApiConfiguration
             value: '{"ObservationsApiAddresses": [ "https://sos-search-st.wt.artdata.slu.se/" ], "ElasticSearchProxyAddresses": [ "https://sos-proxy-st.wt.artdata.slu.se/" ], "AnalysisApiAddresses": [ "https://sos-analysis-st.wt.artdata.slu.se/" ], "DataStewardshipApiAddresses": [ "https://datastewardship-st.wt.artdata.slu.se/"]}'
           - name: ProcessConfiguration

@@ -36,13 +36,15 @@ spec:
             value: k8s
           - name: ApplicationInsights
             value: '{"InstrumentationKey": "SECRET_PLACEHOLDER", "EnableRequestBodyLogging": false, "EnableSearchResponseCountLogging": false}'
+          - name: AuthenticationConfiguration
+            value: '{"Authority": "https://useradmin2-auth-dev.wt.artdata.slu.se", "ClientId": "sos.admin.api"}'
+          - name: AllowedOrigins
+            value: '*'
           - name: InstrumentationKey
             valueFrom:
               secretKeyRef:
                 name: instrumentation-key
                 key: InstrumentationKey
-          - name: AllowedOrigins
-            value: '*'
           - name: SosApiConfiguration
             value: '{"ObservationsApiAddresses": [ "https://sos-search-dev.wt.artdata.slu.se/" ],"ElasticSearchProxyAddresses": [ "https://sos-proxy-dev.wt.artdata.slu.se/" ],"AnalysisApiAddresses": [ "https://sos-analysis-dev.wt.artdata.slu.se/" ],"DataStewardshipApiAddresses": [ "https://datastewardship-dev.wt.artdata.slu.se/" ]}'
           - name: ProcessConfiguration

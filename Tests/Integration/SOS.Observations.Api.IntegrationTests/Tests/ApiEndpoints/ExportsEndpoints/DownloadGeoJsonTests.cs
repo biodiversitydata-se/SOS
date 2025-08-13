@@ -35,4 +35,26 @@ public class DownloadGeoJsonTests : TestBase
         var fileEntries = GeoJsonHelper.ReadGeoJsonFile(contentBytes);
         fileEntries.Count.Should().Be(100, because: "100 observations were added and no filter was used.");
     }
+
+
+    [Fact]
+    public async Task DownloadGeoJsonFileEndpoint_ReturnsExpectedRows_WhenNoFilterWasUsedAndManyObservationsWasReturned()
+    {
+        // Arrange
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(11000)
+            .All().HaveValuesFromPredefinedObservations()
+            .Build();
+        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
+        var apiClient = TestFixture.CreateApiClient();
+        var searchFilter = new SearchFilterDto { Output = new OutputFilterDto { FieldSet = OutputFieldSet.Minimum } };
+
+        // Act
+        var response = await apiClient.PostAsync($"/exports/download/geojson?gzip=false", JsonContent.Create(searchFilter));
+        byte[] contentBytes = await response.Content.ReadAsByteArrayAsync();
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var fileEntries = GeoJsonHelper.ReadGeoJsonFile(contentBytes);
+        fileEntries.Count.Should().Be(11000, because: "11000 observations were added and no filter was used.");
+    }
 }

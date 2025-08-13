@@ -83,6 +83,8 @@ spec:
             value: '{"InstrumentationKey": "SECRET_PLACEHOLDER", "EnableRequestBodyLogging": false, "EnableSearchResponseCountLogging": false}'
           - name: AllowedOrigins
             value: '*' 
+          - name: AuthenticationConfiguration
+            value: '{"Authority": "https://useradmin-auth.slu.se", "ClientId": "sos.admin.api"}'
           - name: SosApiConfiguration
             value: '{"ObservationsApiAddresses": [ "http://172.23.1.9:83/", "http://172.23.1.10:83/" ], "ElasticSearchProxyAddresses": [ "http://172.23.1.41:83/", "http://172.23.1.42:83/" ], "AnalysisApiAddresses": [ "http://172.23.1.9:84/", "http://172.23.1.10:84/" ], "DataStewardshipApiAddresses": [ "http://172.23.1.9:85/", "http://172.23.1.10:85/" ]}'
           - name: ProcessConfiguration
