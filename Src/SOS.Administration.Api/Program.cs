@@ -127,7 +127,7 @@ static void ConfigureServices(
         options.KnownNetworks.Clear();
         options.KnownProxies.Clear();
     });
-    /*
+    /* Data protection is required to use authentication i k8s
     services.AddDataProtection()
         .PersistKeysToAzureBlobStorage(new CloudStorageAccount(new StorageCredentials("artdatastorage", Encoding.UTF8.GetBytes("")), true), "openid-keys")
         .SetApplicationName("SOSAdminAPI");
@@ -172,7 +172,7 @@ static void ConfigureServices(
     services.AddMemoryCache();
     services.AddControllers(options =>
     {
-        /*var policy = new AuthorizationPolicyBuilder()
+        /*var policy = new AuthorizationPolicyBuilder() Remove comment to apply policy
             .RequireAuthenticatedUser()
             .Build();
         options.Filters.Add(new AuthorizeFilter(policy));*/
@@ -196,7 +196,7 @@ static void ConfigureMiddleware(WebApplication app, bool isDevelopment, bool dis
     app.UseForwardedHeaders();
     app.UseHttpsRedirection(); 
     app.UseRouting();
-   // app.UseAuthentication();
+   // app.UseAuthentication(); 
    // app.UseAuthorization();
 
     app.ApplyUseSerilogRequestLogging();
@@ -231,7 +231,7 @@ static void ConfigureMiddleware(WebApplication app, bool isDevelopment, bool dis
             Authorization = [new AllowAllConnectionsFilter()],
             IgnoreAntiforgeryToken = true
         });
-      //  .RequireAuthorization("SOS_ADMIN_POLICY");
+      //  .RequireAuthorization("SOS_ADMIN_POLICY"); // This replaces standard authorization filter
 
     }
     if (isDevelopment)
