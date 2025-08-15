@@ -127,14 +127,21 @@ static void ConfigureServices(
         options.KnownNetworks.Clear();
         options.KnownProxies.Clear();
     });
-    
+
     if (!isDevelopment)
     {
+        var redis = RedisSentinelHelper.ConnectToRedisViaSentinel(
+            sentinelHost: "redis.redis-dev.svc.cluster.local", // DNS of your Sentinel service
+            sentinelPort: 26379,
+            masterName: "mymaster",
+            redisPassword: "TripodoGumballoWhoopee3oIgnoreoDill"
+        );
+
+        services.AddSingleton<IConnectionMultiplexer>(redis);
         services.AddDataProtection()
-            .PersistKeysToStackExchangeRedis(ConnectionMultiplexer.Connect("redis.redis-dev.svc.cluster.local:26379,password=TripodoGumballoWhoopee3oIgnoreoDill,serviceName=mymaster,allowAdmin=true"), "DataProtection-Keys")
+            .PersistKeysToStackExchangeRedis(redis, "DataProtection-Keys")
             .SetApplicationName("SOSAdminAPI");
     }
-
     services.AddAuthentication(options =>
     {
         options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
