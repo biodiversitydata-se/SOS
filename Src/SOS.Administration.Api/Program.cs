@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc.Authorization;
@@ -125,6 +126,11 @@ static void ConfigureServices(
         options.KnownNetworks.Clear();
         options.KnownProxies.Clear();
     });
+
+    services.AddDataProtection()
+        .SetApplicationName("SOSAdminAPI");
+    //.PersistKeysToStackExchangeRedis(redisConnectionMultiplexer, "DataProtection-Keys")
+
 
     services.AddAuthentication(options =>
     {
