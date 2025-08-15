@@ -4,6 +4,9 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,6 +15,7 @@ using MongoDB.Bson.Serialization.Conventions;
 using Serilog;
 using SOS.Administration.Api.Extensions;
 using SOS.Lib.Helpers;
+using StackExchange.Redis;
 using System;
 using System.Globalization;
 using System.Linq;
@@ -114,6 +118,23 @@ static void ConfigureServices(
     bool useLocalHangfire)
 {
     IServiceCollection services = builder.Services;
+
+    services.Configure<ForwardedHeadersOptions>(options =>
+    {
+        options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+        options.RequireHeaderSymmetry = false;
+        options.ForwardLimit = null;
+        options.KnownNetworks.Clear();
+        options.KnownProxies.Clear();
+    });
+    
+    if (!isDevelopment)
+    {
+        services.AddDataProtection()
+            .PersistKeysToStackExchangeRedis(ConnectionMultiplexer.Connect("redis.redis-dev.svc.cluster.local:26379,password=TripodoGumballoWhoopee3oIgnoreoDill,serviceName=mymaster,allowAdmin=true"), "DataProtection-Keys")
+            .SetApplicationName("SOSAdminAPI");
+    }
+
     services.AddAuthentication(options =>
     {
         options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
@@ -130,7 +151,18 @@ static void ConfigureServices(
             options.Scope.Add("openid");
             options.Scope.Add("profile");
             options.Scope.Add("roles");
-
+            options.Events = new OpenIdConnectEvents
+            {
+                OnRemoteFailure = context =>
+                {
+                    // Log the exception message to help debug
+                    var error = context.Failure?.Message;
+                    Console.WriteLine($"OpenID Connect Remote Failure: {error}");
+                    context.HandleResponse(); // Prevent default error handling
+                    context.Response.Redirect("/error?message=" + Uri.EscapeDataString(error));
+                    return Task.CompletedTask;
+                }
+            };
         });
 
     services.AddAuthorization(options =>
@@ -164,6 +196,8 @@ static void ConfigureServices(
 
 static void ConfigureMiddleware(WebApplication app, bool isDevelopment, bool disableHangfireInit)
 {
+    app.UseForwardedHeaders();
+    app.UseHttpsRedirection();  // Optional, but safe
     app.UseRouting();
     app.UseAuthentication();
     app.UseAuthorization();
@@ -186,6 +220,12 @@ static void ConfigureMiddleware(WebApplication app, bool isDevelopment, bool dis
             RedirectUri = "/hangfire"
         });
     });
+    app.MapGet("/error", async context =>
+    {
+        var message = context.Request.Query["message"].ToString();
+        context.Response.ContentType = "text/plain";
+        await context.Response.WriteAsync($"Authentication error:\n{message}");
+    }).AllowAnonymous(); ;
 
     if (!disableHangfireInit)
     {
