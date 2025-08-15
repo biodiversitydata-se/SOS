@@ -1,12 +1,11 @@
-using Microsoft.Azure.Storage;
-using Microsoft.Azure.Storage.Auth;
+
 using Hangfire;
+using Hangfire.Dashboard;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc.Authorization;
@@ -20,7 +19,6 @@ using SOS.Lib.Helpers;
 using System;
 using System.Globalization;
 using System.Linq;
-using System.Text;
 using System.Text.Json.Serialization;
 
 // --- Program startup ---
@@ -228,9 +226,10 @@ static void ConfigureMiddleware(WebApplication app, bool isDevelopment, bool dis
 
     if (!disableHangfireInit)
     {
-        app.MapHangfireDashboard("/hangfire", new DashboardOptions
+        app.UseHangfireDashboard("/hangfire", new DashboardOptions
         {
-            AppPath = "/logout", // You can use this to make the "Back to site" link go to logout
+            Authorization = [new AllowAllConnectionsFilter()],
+            IgnoreAntiforgeryToken = true
         });
       //  .RequireAuthorization("SOS_ADMIN_POLICY");
 
@@ -242,4 +241,16 @@ static void ConfigureMiddleware(WebApplication app, bool isDevelopment, bool dis
 
     app.ApplyUseSwagger();
     app.MapControllers();
+}
+
+public class AllowAllConnectionsFilter : IDashboardAuthorizationFilter
+{
+    /// <summary>
+    /// </summary>
+    /// <param name="context"></param>
+    /// <returns></returns>
+    public bool Authorize(DashboardContext context)
+    {
+        return true;
+    }
 }
