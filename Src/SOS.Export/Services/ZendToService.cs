@@ -110,6 +110,8 @@ namespace SOS.Export.Services
                             _logger.LogError("Failed to send file with ZendTo. Response: {@responseString}. Email: {emailAddress}, ExportFormat: {exportFormat}, FileSizeMB: {fileSizeMb}", responseString, emailAddress, exportFormat, fileSizeMb);
                         }
 
+                        _logger.LogInformation("{filePath} has successfully being sent to ZendTo with email address: {emailAddress}, exportFormat: {exportFormat}, fileSizeMB: {fileSizeMb}",
+                            filePath, emailAddress, exportFormat, fileSizeMb.HasValue ? fileSizeMb.Value.ToString("F2") : "N/A");
                         return zendToResponse;
                     }
                     catch (Exception e)
@@ -120,7 +122,7 @@ namespace SOS.Export.Services
                 }
             }
 
-            _logger.LogError("Failed to send file using ZendTo: {@responseReasonPhrase}", response.ReasonPhrase);
+            _logger.LogError("Failed to send file using ZendTo: {@responseReasonPhrase}, Email: {emailAddress}, ExportFormat: {exportFormat}, FileSizeMB: {fileSizeMb}", response.ReasonPhrase, emailAddress, exportFormat, fileSizeMb);
             return new ZendToResponse();
         }
 
