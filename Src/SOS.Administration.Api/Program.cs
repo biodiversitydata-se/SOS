@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Configuration;
@@ -141,6 +142,18 @@ static void ConfigureServices(
             options.Scope.Add("openid");
             options.Scope.Add("profile");
             options.Scope.Add("roles");
+            options.Events = new OpenIdConnectEvents
+            {
+                OnRemoteFailure = context =>
+                {
+                    // Log the exception message to help debug
+                    var error = context.Failure?.Message;
+                    Console.WriteLine($"OpenID Connect Remote Failure: {error}");
+                    context.HandleResponse(); // Prevent default error handling
+                    context.Response.Redirect("/error?message=" + Uri.EscapeDataString(error));
+                    return Task.CompletedTask;
+                }
+            };
         });
 
     services.AddAuthorization(options =>
@@ -175,6 +188,7 @@ static void ConfigureServices(
 static void ConfigureMiddleware(WebApplication app, bool isDevelopment, bool disableHangfireInit)
 {
     app.UseForwardedHeaders();
+    app.UseHttpsRedirection();  // Optional, but safe
     app.UseRouting();
     app.UseAuthentication();
     app.UseAuthorization();
@@ -196,6 +210,13 @@ static void ConfigureMiddleware(WebApplication app, bool isDevelopment, bool dis
         {
             RedirectUri = "/hangfire"
         });
+    });
+
+    app.MapGet("/error", async context =>
+    {
+        var message = context.Request.Query["message"].ToString();
+        context.Response.ContentType = "text/plain";
+        await context.Response.WriteAsync($"Authentication error:\n{message}");
     });
 
     if (!disableHangfireInit)
