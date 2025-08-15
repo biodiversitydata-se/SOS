@@ -54,6 +54,7 @@
 	    <PackageReference Include="CSharpFunctionalExtensions" Version="3.6.0" />
 	    <PackageReference Include="Microsoft.AspNetCore.Authentication.Cookies" Version="2.3.0" />
 	    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="9.0.8" />
+	    <PackageReference Include="Microsoft.AspNetCore.DataProtection.AzureStorage" Version="3.1.24" />
 		<PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
 		<PackageReference Include="Serilog.Formatting.Compact" Version="3.0.0" />
 	    <PackageReference Include="HangFire" Version="1.8.20" />

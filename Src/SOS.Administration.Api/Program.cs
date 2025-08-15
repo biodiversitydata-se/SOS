@@ -1,3 +1,5 @@
+using Microsoft.Azure.Storage;
+using Microsoft.Azure.Storage.Auth;
 using Hangfire;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -18,6 +20,7 @@ using SOS.Lib.Helpers;
 using System;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 using System.Text.Json.Serialization;
 
 // --- Program startup ---
@@ -126,12 +129,11 @@ static void ConfigureServices(
         options.KnownNetworks.Clear();
         options.KnownProxies.Clear();
     });
-
+    /*
     services.AddDataProtection()
+        .PersistKeysToAzureBlobStorage(new CloudStorageAccount(new StorageCredentials("artdatastorage", Encoding.UTF8.GetBytes("")), true), "openid-keys")
         .SetApplicationName("SOSAdminAPI");
-    //.PersistKeysToStackExchangeRedis(redisConnectionMultiplexer, "DataProtection-Keys")
-
-
+    */
     services.AddAuthentication(options =>
     {
         options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
@@ -172,10 +174,10 @@ static void ConfigureServices(
     services.AddMemoryCache();
     services.AddControllers(options =>
     {
-        var policy = new AuthorizationPolicyBuilder()
+        /*var policy = new AuthorizationPolicyBuilder()
             .RequireAuthenticatedUser()
             .Build();
-        options.Filters.Add(new AuthorizeFilter(policy));
+        options.Filters.Add(new AuthorizeFilter(policy));*/
     })
     .AddJsonOptions(options =>
     {
@@ -194,10 +196,10 @@ static void ConfigureServices(
 static void ConfigureMiddleware(WebApplication app, bool isDevelopment, bool disableHangfireInit)
 {
     app.UseForwardedHeaders();
-    app.UseHttpsRedirection();  // Optional, but safe
+    app.UseHttpsRedirection(); 
     app.UseRouting();
-    app.UseAuthentication();
-    app.UseAuthorization();
+   // app.UseAuthentication();
+   // app.UseAuthorization();
 
     app.ApplyUseSerilogRequestLogging();
     app.ApplyMapHealthChecks();
@@ -228,10 +230,9 @@ static void ConfigureMiddleware(WebApplication app, bool isDevelopment, bool dis
     {
         app.MapHangfireDashboard("/hangfire", new DashboardOptions
         {
-            //  Authorization = new[] { new RoleAuthorizationFilter() },
             AppPath = "/logout", // You can use this to make the "Back to site" link go to logout
-        })
-        .RequireAuthorization("SOS_ADMIN_POLICY");
+        });
+      //  .RequireAuthorization("SOS_ADMIN_POLICY");
 
     }
     if (isDevelopment)
