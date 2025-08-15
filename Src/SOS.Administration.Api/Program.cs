@@ -15,6 +15,7 @@ using MongoDB.Bson.Serialization.Conventions;
 using Serilog;
 using SOS.Administration.Api.Extensions;
 using SOS.Lib.Helpers;
+using StackExchange.Redis;
 using System;
 using System.Globalization;
 using System.Linq;
@@ -126,11 +127,13 @@ static void ConfigureServices(
         options.KnownNetworks.Clear();
         options.KnownProxies.Clear();
     });
-
-    services.AddDataProtection()
-        .SetApplicationName("SOSAdminAPI");
-    //.PersistKeysToStackExchangeRedis(redisConnectionMultiplexer, "DataProtection-Keys")
-
+    
+    if (!isDevelopment)
+    {
+        services.AddDataProtection()
+            .PersistKeysToStackExchangeRedis(ConnectionMultiplexer.Connect("redis.redis-dev.svc.cluster.local:26379,password=TripodoGumballoWhoopee3oIgnoreoDill,serviceName=mymaster,allowAdmin=true"), "DataProtection-Keys")
+            .SetApplicationName("SOSAdminAPI");
+    }
 
     services.AddAuthentication(options =>
     {
