@@ -2,7 +2,9 @@ using Hangfire;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -112,17 +114,6 @@ static void ConfigureServices(
     bool useLocalHangfire)
 {
     IServiceCollection services = builder.Services;
-    services.AddDependencyInjectionServices();
-    services.AddMemoryCache();
-    services.AddControllers()
-        .AddJsonOptions(x => { x.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()); });
-    services.SetupSwagger();
-    if (!disableHangfireInit)
-    {
-        string hangfireDbConnectionString = builder.Configuration.GetConnectionString("hangfire-mongodb"); // Get Hangfire MongoDB from .Net Aspire configuration.
-        services.SetupHangfire(useLocalHangfire, hangfireDbConnectionString);
-    }
-
     services.AddAuthentication(options =>
     {
         options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
@@ -139,15 +130,44 @@ static void ConfigureServices(
             options.Scope.Add("openid");
             options.Scope.Add("profile");
             options.Scope.Add("roles");
-            
+
         });
 
-    services.AddAuthorization();
+    services.AddAuthorization(options =>
+    {
+        options.AddPolicy("SOS_ADMIN_POLICY", policy =>
+            policy.RequireRole("SOS-ADMIN"));
+    });
+
+    services.AddDependencyInjectionServices();
+    services.AddMemoryCache();
+    services.AddControllers(options =>
+    {
+        var policy = new AuthorizationPolicyBuilder()
+            .RequireAuthenticatedUser()
+            .Build();
+        options.Filters.Add(new AuthorizeFilter(policy));
+    })
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
+    services.SetupSwagger();
+    if (!disableHangfireInit)
+    {
+        string hangfireDbConnectionString = builder.Configuration.GetConnectionString("hangfire-mongodb"); // Get Hangfire MongoDB from .Net Aspire configuration.
+        services.SetupHangfire(useLocalHangfire, hangfireDbConnectionString);
+    }
+
     services.SetupHealthchecks();
 }
 
 static void ConfigureMiddleware(WebApplication app, bool isDevelopment, bool disableHangfireInit)
 {
+    app.UseRouting();
+    app.UseAuthentication();
+    app.UseAuthorization();
+
     app.ApplyUseSerilogRequestLogging();
     app.ApplyMapHealthChecks();
 
@@ -157,7 +177,7 @@ static void ConfigureMiddleware(WebApplication app, bool isDevelopment, bool dis
         {
             RedirectUri = "/hangfire"
         });
-    });
+    }).AllowAnonymous();
     app.MapGet("/logout", async context =>
     {
         await context.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme); // Clear local cookie
@@ -167,27 +187,15 @@ static void ConfigureMiddleware(WebApplication app, bool isDevelopment, bool dis
         });
     });
 
-    app.Use(async (context, next) =>
-    {
-        // we manually check taht user is in role because it works for both hangfire and api
-        if ((context.Request.Path.Value?.Contains("health") ?? false) ||
-            (context.User?.IsInRole("SOS-ADMIN") ?? false))
-        {
-            await next();
-            return;
-        }
-
-        // If access wsa not granted, send user to login
-        await context.ChallengeAsync(OpenIdConnectDefaults.AuthenticationScheme);
-        return;
-    });
-
     if (!disableHangfireInit)
     {
-        app.UseHangfireDashboard("/hangfire", new DashboardOptions
+        app.MapHangfireDashboard("/hangfire", new DashboardOptions
         {
+            //  Authorization = new[] { new RoleAuthorizationFilter() },
             AppPath = "/logout", // You can use this to make the "Back to site" link go to logout
-        });
+        })
+        .RequireAuthorization("SOS_ADMIN_POLICY");
+
     }
     if (isDevelopment)
         app.UseDeveloperExceptionPage();

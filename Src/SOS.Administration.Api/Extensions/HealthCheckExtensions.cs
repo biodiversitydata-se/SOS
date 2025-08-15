@@ -15,7 +15,7 @@ namespace SOS.Administration.Api.Extensions
         public static WebApplication ApplyMapHealthChecks(this WebApplication app)
         {            
             //app.UseHealthChecks("/healthz");
-            app.MapHealthChecks("/healthz");
+            app.MapHealthChecks("/healthz").AllowAnonymous();
 
             return app;
         }

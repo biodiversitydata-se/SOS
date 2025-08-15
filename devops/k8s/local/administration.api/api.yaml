@@ -58,37 +58,37 @@ spec:
           - name: VerbatimDbUserName
             valueFrom:
               secretKeyRef:
-                name: verbatim-db-username
-                key: UserName
+                name: verbatim-db-user-name
+                key: VerbatimDbUserName
           - name: VerbatimDbPassword
             valueFrom:
               secretKeyRef:
                 name: verbatim-db-password
-                key: Password
+                key: VerbatimDbPassword
           - name: ProcessDbConfiguration
             value: '{"UserName": "SECRET_PLACEHOLDER", "Password": "SECRET_PLACEHOLDER", "Hosts": [{"Name": "artmongo-t-1.artdata.slu.se","Port": 27017}], "ReplicaSetName": null, "DatabaseName": "sos-dev", "UseTls": false, "AuthenticationDb": "admin", "ReadBatchSize": 10000, "WriteBatchSize": 10000}'
           - name: ProcessDbUserName
             valueFrom:
               secretKeyRef:
-                name: process-db-username
-                key: UserName
+                name: process-db-user-name
+                key: ProcessDbUserName
           - name: ProcessDbPassword
             valueFrom:
               secretKeyRef:
                 name: process-db-password
-                key: Password
+                key: ProcessDbPassword
           - name: HangfireDbConfiguration
             value: '{"UserName": "SECRET_PLACEHOLDER", "Password": "SECRET_PLACEHOLDER", "Hosts": [{"Name": "artmongo-t-1.artdata.slu.se","Port": 27017}],"DatabaseName": "sos-hangfire-dev", "UseTls": false, "AuthenticationDb": "admin", "JobExpirationDays": 3}'
           - name: HangfireDbUserName
             valueFrom:
               secretKeyRef:
-                name: hangfire-db-username
-                key: UserName
+                name: hangfire-db-user-name
+                key: HangfireDbUserName
           - name: HangfireDbPassword
             valueFrom:
               secretKeyRef:
                 name: hangfire-db-password
-                key: Password
+                key: HangfireDbPassword
           # - name: RedisPassword
           #   value: 'endastILokalUtveckling'
           # - name: RedisConnectionString
