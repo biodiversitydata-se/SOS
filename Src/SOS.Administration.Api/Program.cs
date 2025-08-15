@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -114,6 +115,16 @@ static void ConfigureServices(
     bool useLocalHangfire)
 {
     IServiceCollection services = builder.Services;
+
+    services.Configure<ForwardedHeadersOptions>(options =>
+    {
+        options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+        options.RequireHeaderSymmetry = false;
+        options.ForwardLimit = null;
+        options.KnownNetworks.Clear();
+        options.KnownProxies.Clear();
+    });
+
     services.AddAuthentication(options =>
     {
         options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
@@ -130,7 +141,6 @@ static void ConfigureServices(
             options.Scope.Add("openid");
             options.Scope.Add("profile");
             options.Scope.Add("roles");
-
         });
 
     services.AddAuthorization(options =>
@@ -164,6 +174,7 @@ static void ConfigureServices(
 
 static void ConfigureMiddleware(WebApplication app, bool isDevelopment, bool disableHangfireInit)
 {
+    app.UseForwardedHeaders();
     app.UseRouting();
     app.UseAuthentication();
     app.UseAuthorization();
