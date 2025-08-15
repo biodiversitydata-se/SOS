@@ -375,7 +375,8 @@ namespace SOS.Observations.Api.Controllers
         }
 
         /// <summary>
-        ///  Download Csv export file. The limit is 25 000 observations. If you need to download more observations, use the OrderCsv endpoint.
+        /// Download Csv export file. The limit is 25 000 observations. If you need to download more observations, use the OrderCsv endpoint.
+        /// By default, the file is compressed (zipped) using the GZIP format, but this can be changed via the <paramref name="gzip"/> parameter.
         /// </summary>
         /// <param name="roleId">Limit user authorization too specified role</param>
         /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
@@ -543,6 +544,7 @@ namespace SOS.Observations.Api.Controllers
 
         /// <summary>
         ///  Download Excel export file. The limit is 25 000 observations. If you need to download more observations, use the OrderExcel endpoint.
+        ///  By default, the file is compressed (zipped) using the GZIP format, but this can be changed via the <paramref name="gzip"/> parameter.
         /// </summary>
         /// <param name="roleId">Limit user authorization too specified role</param>
         /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
@@ -625,6 +627,7 @@ namespace SOS.Observations.Api.Controllers
 
         /// <summary>
         /// Download GeoJson export file. The limit is 25 000 observations. If you need to download more observations, use the OrderGeoJson endpoint.
+        /// By default, the file is compressed (zipped) using the GZIP format, but this can be changed via the <paramref name="gzip"/> parameter.
         /// </summary>
         /// <param name="roleId">Limit user authorization too specified role</param>
         /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
@@ -1082,7 +1085,8 @@ namespace SOS.Observations.Api.Controllers
 
         #region Internal
         /// <summary>
-        ///  Download Csv export file. The limit is 25 000 observations. If you need to download more observations, use the OrderCsv endpoint.
+        /// Download Csv export file. The limit is 25 000 observations. If you need to download more observations, use the OrderCsv endpoint.
+        /// By default, the file is compressed (zipped) using the GZIP format, but this can be changed via the <paramref name="gzip"/> parameter.
         /// </summary>
         /// <param name="roleId">Limit user authorization too specified role</param>
         /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
@@ -1247,6 +1251,7 @@ namespace SOS.Observations.Api.Controllers
 
         /// <summary>
         ///  Download Excel export file. The limit is 25 000 observations. If you need to download more observations, use the OrderExcel endpoint.
+        ///  By default, the file is compressed (zipped) using the GZIP format, but this can be changed via the <paramref name="gzip"/> parameter.
         /// </summary>
         /// <param name="roleId">Limit user authorization too specified role</param>
         /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
@@ -1328,6 +1333,7 @@ namespace SOS.Observations.Api.Controllers
 
         /// <summary>
         /// Download GeoJson export file. The limit is 25 000 observations. If you need to download more observations, use the OrderGeoJson endpoint.
+        /// By default, the file is compressed (zipped) using the GZIP format, but this can be changed via the <paramref name="gzip"/> parameter.
         /// </summary>
         /// <param name="roleId">Limit user authorization too specified role</param>
         /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
