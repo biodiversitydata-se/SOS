@@ -33,7 +33,22 @@ namespace SOS.Export.Services
         public async Task<ZendToResponse> SendFile(string emailAddress, string description, string filePath, ExportFormat exportFormat,
             bool informRecipients = true, bool informPasscode = true, bool encryptFile = false, string encryptPassword = null)
         {
-            _logger.LogInformation(filePath + " is being sent to ZendTo with email address: {emailAddress}, exportFormat: {exportFormat}", emailAddress, exportFormat);
+            double? fileSizeMb = null;
+
+            try
+            {
+                var fileInfo = new FileInfo(filePath);
+                fileSizeMb = fileInfo.Length / (1024.0 * 1024.0);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Could not read file size for {filePath}", filePath);
+            }
+
+            _logger.LogInformation(
+                "{filePath} is being sent to ZendTo with email address: {emailAddress}, exportFormat: {exportFormat}, fileSizeMB: {fileSizeMb}",
+                filePath, emailAddress, exportFormat, fileSizeMb.HasValue ? fileSizeMb.Value.ToString("F2") : "N/A");
+
             using var form = new MultipartFormDataContent();
             //    form.Headers.ContentType = MediaTypeHeaderValue.Parse("multipart/form-data"); //new MediaTypeHeaderValue("application/x-www-form-urlencoded");
             DateTime fileCreationDate = File.GetCreationTime(filePath);
@@ -92,7 +107,7 @@ namespace SOS.Export.Services
 
                         if (!zendToResponse.Success)
                         {
-                            _logger.LogError("Failed to send file with ZendTo. Response: {@responseString}", responseString);
+                            _logger.LogError("Failed to send file with ZendTo. Response: {@responseString}. Email: {emailAddress}, ExportFormat: {exportFormat}, FileSizeMB: {fileSizeMb}", responseString, emailAddress, exportFormat, fileSizeMb);
                         }
 
                         return zendToResponse;
