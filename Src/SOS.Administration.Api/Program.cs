@@ -211,13 +211,12 @@ static void ConfigureMiddleware(WebApplication app, bool isDevelopment, bool dis
             RedirectUri = "/hangfire"
         });
     });
-
     app.MapGet("/error", async context =>
     {
         var message = context.Request.Query["message"].ToString();
         context.Response.ContentType = "text/plain";
         await context.Response.WriteAsync($"Authentication error:\n{message}");
-    });
+    }).AllowAnonymous(); ;
 
     if (!disableHangfireInit)
     {
