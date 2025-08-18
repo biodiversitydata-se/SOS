@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc.Authorization;
@@ -16,6 +17,7 @@ using MongoDB.Bson.Serialization.Conventions;
 using Serilog;
 using SOS.Administration.Api.Extensions;
 using SOS.Lib.Helpers;
+using StackExchange.Redis;
 using System;
 using System.Globalization;
 using System.Linq;
@@ -127,11 +129,56 @@ static void ConfigureServices(
         options.KnownNetworks.Clear();
         options.KnownProxies.Clear();
     });
-    /* Data protection is required to use authentication i k8s
+
+   
+    var redisConfiguration = isDevelopment ? 
+        new ConfigurationOptions
+        {
+            AllowAdmin = true,
+            CommandMap = CommandMap.Default,
+            EndPoints = { $"{"localhost"}:{6379}" },
+            Password = "redispass",  
+        } : 
+        new ConfigurationOptions
+        {
+            AllowAdmin = true,
+            CommandMap = CommandMap.Sentinel,
+            EndPoints = { $"{"redis.redis-dev.svc.cluster.local"}:{26379}" },
+            Password = "TripodoGumballoWhoopee3oIgnoreoDill",
+            ServiceName = "mymaster"
+        };
+
+        
+    var sentinelConnection = ConnectionMultiplexer.Connect(redisConfiguration);
     services.AddDataProtection()
-        .PersistKeysToAzureBlobStorage(new CloudStorageAccount(new StorageCredentials("artdatastorage", Encoding.UTF8.GetBytes("")), true), "openid-keys")
+        .PersistKeysToStackExchangeRedis(sentinelConnection, "DataProtection-Keys")
         .SetApplicationName("SOSAdminAPI");
-    */
+        /*
+        var server = sentinelConnection.GetServer(sentinelHost, sentinelPort);
+        var result = server.Execute("SENTINEL", "get-master-addr-by-name", masterName);
+        if (result.Resp2Type == ResultType.Array)
+        {
+            var values = (RedisResult[])result;
+            var masterIp = values[0].ToString();
+            var masterPort = values[1].ToString();
+            var masterConfig = new ConfigurationOptions
+            {
+                CommandMap = CommandMap.Default,
+                EndPoints = { $"{masterIp}:{masterPort}" },
+                Password = "TripodoGumballoWhoopee3oIgnoreoDill",
+                AllowAdmin = true,
+            };
+            var redis = ConnectionMultiplexer.Connect(masterConfig);
+            services.AddDataProtection()
+                .PersistKeysToStackExchangeRedis(redis, "DataProtection-Keys")
+                .SetApplicationName("SOSAdminAPI");
+       
+        }
+        else
+        {
+            throw new Exception("Failed to get Redis master address.");
+        } */
+
     services.AddAuthentication(options =>
     {
         options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
@@ -172,10 +219,10 @@ static void ConfigureServices(
     services.AddMemoryCache();
     services.AddControllers(options =>
     {
-        /*var policy = new AuthorizationPolicyBuilder() Remove comment to apply policy
+        var policy = new AuthorizationPolicyBuilder() 
             .RequireAuthenticatedUser()
             .Build();
-        options.Filters.Add(new AuthorizeFilter(policy));*/
+        options.Filters.Add(new AuthorizeFilter(policy));
     })
     .AddJsonOptions(options =>
     {
@@ -196,8 +243,8 @@ static void ConfigureMiddleware(WebApplication app, bool isDevelopment, bool dis
     app.UseForwardedHeaders();
     app.UseHttpsRedirection(); 
     app.UseRouting();
-   // app.UseAuthentication(); 
-   // app.UseAuthorization();
+    app.UseAuthentication(); 
+    app.UseAuthorization();
 
     app.ApplyUseSerilogRequestLogging();
     app.ApplyMapHealthChecks();
@@ -226,14 +273,13 @@ static void ConfigureMiddleware(WebApplication app, bool isDevelopment, bool dis
 
     if (!disableHangfireInit)
     {
-        app.UseHangfireDashboard("/hangfire", new DashboardOptions
+        app.MapHangfireDashboard("/hangfire", new DashboardOptions
         {
-            Authorization = [new AllowAllConnectionsFilter()],
-            IgnoreAntiforgeryToken = true
-        });
-      //  .RequireAuthorization("SOS_ADMIN_POLICY"); // This replaces standard authorization filter
-
+            AppPath = "/logout", // You can use this to make the "Back to site" link go to logout
+        })
+        .RequireAuthorization("SOS_ADMIN_POLICY"); // This replaces standard authorization filter
     }
+
     if (isDevelopment)
         app.UseDeveloperExceptionPage();
     else
