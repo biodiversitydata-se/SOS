@@ -148,14 +148,13 @@ static void ConfigureServices(
             ServiceName = "mymaster"
         };
 
-        
-    var sentinelConnection = ConnectionMultiplexer.Connect(redisConfiguration);
-    services.AddDataProtection()
-        .PersistKeysToStackExchangeRedis(sentinelConnection, "DataProtection-Keys")
-        .SetApplicationName("SOSAdminAPI");
-        /*
-        var server = sentinelConnection.GetServer(sentinelHost, sentinelPort);
-        var result = server.Execute("SENTINEL", "get-master-addr-by-name", masterName);
+
+    ConnectionMultiplexer redisConnection = ConnectionMultiplexer.Connect(redisConfiguration);
+    
+    if (!isDevelopment)
+    {
+        var server = redisConnection.GetServer("redis.redis-dev.svc.cluster.local", 26379);
+        var result = server.Execute("SENTINEL", "get-master-addr-by-name", "mymaster");
         if (result.Resp2Type == ResultType.Array)
         {
             var values = (RedisResult[])result;
@@ -168,16 +167,19 @@ static void ConfigureServices(
                 Password = "TripodoGumballoWhoopee3oIgnoreoDill",
                 AllowAdmin = true,
             };
-            var redis = ConnectionMultiplexer.Connect(masterConfig);
-            services.AddDataProtection()
-                .PersistKeysToStackExchangeRedis(redis, "DataProtection-Keys")
-                .SetApplicationName("SOSAdminAPI");
-       
+            redisConnection = ConnectionMultiplexer.Connect(masterConfig);
         }
         else
         {
             throw new Exception("Failed to get Redis master address.");
-        } */
+        }
+    }
+    
+    services.AddDataProtection()
+        .PersistKeysToStackExchangeRedis(redisConnection, "DataProtection-Keys")
+        .SetApplicationName("SOSAdminAPI");
+        /*
+         */
 
     services.AddAuthentication(options =>
     {
