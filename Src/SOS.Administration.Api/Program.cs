@@ -130,56 +130,21 @@ static void ConfigureServices(
         options.KnownProxies.Clear();
     });
 
-   
-    var redisConfiguration = isDevelopment ? 
-        new ConfigurationOptions
+    if (!string.IsNullOrEmpty(Settings.RedisConfiguration.EndPoint))
+    {
+        var redisConfiguration = new ConfigurationOptions
         {
             AllowAdmin = true,
             CommandMap = CommandMap.Default,
-            EndPoints = { $"{"localhost"}:{6379}" },
-            Password = "redispass",  
-        } : 
-        new ConfigurationOptions
-        {
-            AllowAdmin = true,
-            CommandMap = CommandMap.Sentinel,
-            EndPoints = { $"{"redis.redis-dev.svc.cluster.local"}:{26379}" },
-            Password = "TripodoGumballoWhoopee3oIgnoreoDill",
-            ServiceName = "mymaster"
+            EndPoints = { $"{Settings.RedisConfiguration.EndPoint}:{Settings.RedisConfiguration.Port}" },
+            Password = Settings.RedisConfiguration.Password,
         };
-
-
-    ConnectionMultiplexer redisConnection = ConnectionMultiplexer.Connect(redisConfiguration);
-    
-    if (!isDevelopment)
-    {
-        var server = redisConnection.GetServer("redis.redis-dev.svc.cluster.local", 26379);
-        var result = server.Execute("SENTINEL", "get-master-addr-by-name", "mymaster");
-        if (result.Resp2Type == ResultType.Array)
-        {
-            var values = (RedisResult[])result;
-            var masterIp = values[0].ToString();
-            var masterPort = values[1].ToString();
-            var masterConfig = new ConfigurationOptions
-            {
-                CommandMap = CommandMap.Default,
-                EndPoints = { $"{masterIp}:{masterPort}" },
-                Password = "TripodoGumballoWhoopee3oIgnoreoDill",
-                AllowAdmin = true,
-            };
-            redisConnection = ConnectionMultiplexer.Connect(masterConfig);
-        }
-        else
-        {
-            throw new Exception("Failed to get Redis master address.");
-        }
+        var redisConnection = ConnectionMultiplexer.Connect(redisConfiguration);
+        services.AddDataProtection()
+            .PersistKeysToStackExchangeRedis(redisConnection, "DataProtection-Keys")
+            .SetApplicationName("SOSAdminAPI");
     }
-    
-    services.AddDataProtection()
-        .PersistKeysToStackExchangeRedis(redisConnection, "DataProtection-Keys")
-        .SetApplicationName("SOSAdminAPI");
-        /*
-         */
+   
 
     services.AddAuthentication(options =>
     {

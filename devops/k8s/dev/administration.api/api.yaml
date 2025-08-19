@@ -93,6 +93,8 @@ spec:
             value: '{"ObservationsApiAddresses": [ "https://sos-search-dev.wt.artdata.slu.se/" ],"ElasticSearchProxyAddresses": [ "https://sos-proxy-dev.wt.artdata.slu.se/" ],"AnalysisApiAddresses": [ "https://sos-analysis-dev.wt.artdata.slu.se/" ],"DataStewardshipApiAddresses": [ "https://datastewardship-dev.wt.artdata.slu.se/" ]}'
           - name: ProcessConfiguration
             value: '{"TaxonAttributeServiceConfiguration": {"BaseAddress": "https://taxonattributeservice.artdata.slu.se/api","AcceptHeaderContentType": "application/json"},"TaxonServiceConfiguration": {"BaseAddress": "https://taxonservice.artdata.slu.se/DarwinCore/DarwinCoreArchiveFile?version=custom","AcceptHeaderContentType": "application/text","TaxonApiAddress": "https://taxonapi-dev.wt.artdata.slu.se/darwincore/download?version=custom"}}'
+          - name: RedisConfiguration
+            value: '{"EndPoint": "redis.redis-dev.svc.cluster.local", "Port": 26379, "Password": "SECRET_PLACEHOLDER", "ServiceName": "mymaster"}}'
           - name: UserServiceConfiguration
             value: '{"BaseAddress": "https://artdatauser-dev.artdata.slu.se/api", "AcceptHeaderContentType": "application/json", "UserAdmin2ApiBaseAddress": "https://useradmin2-api-dev.wt.artdata.slu.se", "ClientId": "SOS", "ClientSecret": "SECRET_PLACEHOLDER", "Scope": "useradmin.api SOS.Observations.Protected openid", "TokenUrl": "http://useradmin2-auth-dev.wt.artdata.slu.se/connect/token", "TokenExpirationBufferInSeconds": 300, "IdentityProvider": {"Authority": "https://useradmin2-auth-dev.wt.artdata.slu.se", "Audience": "https://sos-search-dev.artdata.slu.se", "RequireHttpsMetadata ": false}}'
           - name: ImportConfiguration
