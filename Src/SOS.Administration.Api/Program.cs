@@ -130,15 +130,16 @@ static void ConfigureServices(
         options.KnownProxies.Clear();
     });
 
-    if (!string.IsNullOrEmpty(Settings.RedisConfiguration.EndPoint))
+    if (!string.IsNullOrEmpty(Settings.RedisConfiguration?.EndPoint))
     {
         var redisConfiguration = new ConfigurationOptions
         {
             AllowAdmin = true,
             CommandMap = CommandMap.Default,
             EndPoints = { $"{Settings.RedisConfiguration.EndPoint}:{Settings.RedisConfiguration.Port}" },
-            Password = Settings.RedisConfiguration.Password,
+            Password = Settings.RedisConfiguration.Password
         };
+        Log.Logger.Information("Connecting to Redis at {Host}:{Port}:(Length)", Settings.RedisConfiguration.EndPoint, Settings.RedisConfiguration.Port, Settings.RedisConfiguration.Password?.Length);
         var redisConnection = ConnectionMultiplexer.Connect(redisConfiguration);
         services.AddDataProtection()
             .PersistKeysToStackExchangeRedis(redisConnection, "DataProtection-Keys")

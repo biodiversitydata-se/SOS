@@ -110,7 +110,6 @@ public static class Settings
         {
             RedisConfiguration.Password = GetConfigValueString("RedisPassword", configuration, logger, sensitiveSetting: true, required: true);
             logger.LogInformation("replaced SECRET_PLACEHOLDER in RedisConfiguration.Password with the value in RedisPassword");
-            logger.LogInformation($"Redis config. Endpoint:{RedisConfiguration.EndPoint}, Password:{RedisConfiguration.Password}, Port:{RedisConfiguration.Port}, ServiceName:{RedisConfiguration.ServiceName}");
         }
         else
         {
