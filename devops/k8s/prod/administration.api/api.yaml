@@ -90,7 +90,7 @@ spec:
           - name: ProcessConfiguration
             value: '{"TaxonAttributeServiceConfiguration": {"BaseAddress": "https://taxonattributeservice.artdata.slu.se/api", "AcceptHeaderContentType": "application/json"}, "TaxonServiceConfiguration": {"BaseAddress": "https://taxonservice.artdata.slu.se/DarwinCore/DarwinCoreArchiveFile?version=custom", "AcceptHeaderContentType": "application/text", "TaxonApiAddress": "https://taxonapi.artdata.slu.se/darwincore/download?version=custom"}}'
           - name: RedisConfiguration
-            value: '{"EndPoint": "redis.redis.svc.cluster.local", "Port": 26379, "Password": "SECRET_PLACEHOLDER", "ServiceName": "mymaster"}}'
+            value: '{"EndPoint": "redis.redis.svc.cluster.local", "Port": 26379, "Password": "SECRET_PLACEHOLDER", "ServiceName": "mymaster"}'
           - name: UserServiceConfiguration
             value: '{"AcceptHeaderContentType": "application/json", "UserAdmin2ApiBaseAddress": "https://useradmin-api.slu.se", "ClientId": "SOS", "ClientSecret": "SECRET_PLACEHOLDER", "Scope": "useradmin.api SOS.Observations.Protected openid", "TokenUrl": "https://useradmin-auth.slu.se/connect/token", "TokenExpirationBufferInSeconds": 300, "IdentityProvider": {"Authority": "https://useradmin-auth.slu.se", "Audience": "https://sos-search.artdata.slu.se", "RequireHttpsMetadata ": false}}'
           - name: ImportConfiguration
