@@ -131,8 +131,6 @@ static async Task ConfigureServicesAsync(
         options.KnownProxies.Clear();
     });
 
-    Settings.RedisConfiguration.EndPoint = "localhost";
-    Settings.RedisConfiguration.Password = "redispass";
     if (!string.IsNullOrEmpty(Settings.RedisConfiguration?.EndPoint))
     {
         const int maxAttempts = 5;
