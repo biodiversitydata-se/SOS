@@ -19,6 +19,7 @@ using SOS.Administration.Api.Extensions;
 using SOS.Lib.Helpers;
 using StackExchange.Redis;
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text.Json.Serialization;
@@ -53,7 +54,7 @@ try
     Settings.Init(configurationRoot);
 
     // Register services
-    ConfigureServices(
+    await ConfigureServicesAsync(
         builder,
         configurationRoot,
         isDevelopment,
@@ -112,7 +113,7 @@ static IConfigurationRoot BuildConfiguration(WebApplicationBuilder builder, bool
     return configBuilder.Build();
 }
 
-static async Task ConfigureServices(
+static async Task ConfigureServicesAsync(
     WebApplicationBuilder builder,
     IConfigurationRoot configuration,
     bool isDevelopment,
@@ -130,20 +131,27 @@ static async Task ConfigureServices(
         options.KnownProxies.Clear();
     });
 
+    Settings.RedisConfiguration.EndPoint = "localhost";
+    Settings.RedisConfiguration.Password = "redispass";
     if (!string.IsNullOrEmpty(Settings.RedisConfiguration?.EndPoint))
     {
+        const int maxAttempts = 5;
         var redisConfiguration = new ConfigurationOptions
         {
             AbortOnConnectFail = false,
             AllowAdmin = true,
-            CommandMap = CommandMap.Default,
+            CommandMap = CommandMap.Sentinel,
+            ConnectRetry = maxAttempts,
             EndPoints = { $"{Settings.RedisConfiguration.EndPoint}:{Settings.RedisConfiguration.Port}" },
-            Password = Settings.RedisConfiguration.Password
+            IncludeDetailInExceptions = true,
+            Password = Settings.RedisConfiguration.Password,
+            ServiceName = Settings.RedisConfiguration.ServiceName 
         };
+        
         var passwordLength = Settings.RedisConfiguration.Password?.Length ?? 0;
         Log.Logger.Information("Connecting to Redis at {Host}:{Port}:({passwordLength})", Settings.RedisConfiguration.EndPoint, Settings.RedisConfiguration.Port, passwordLength);
         ConnectionMultiplexer redisConnection = null;
-        const int maxAttempts = 5;
+        
         var attempts = 0;
         while (!redisConnection?.IsConnected ?? true)
         {
@@ -175,8 +183,7 @@ static async Task ConfigureServices(
         services.AddDataProtection()
             .PersistKeysToStackExchangeRedis(redisConnection, "DataProtection-Keys")
             .SetApplicationName("SOSAdminAPI");
-    }
-        
+    }   
    
     services.AddAuthentication(options =>
     {
