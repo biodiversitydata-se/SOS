@@ -112,7 +112,7 @@ static IConfigurationRoot BuildConfiguration(WebApplicationBuilder builder, bool
     return configBuilder.Build();
 }
 
-static void ConfigureServices(
+static async Task ConfigureServices(
     WebApplicationBuilder builder,
     IConfigurationRoot configuration,
     bool isDevelopment,
@@ -134,6 +134,7 @@ static void ConfigureServices(
     {
         var redisConfiguration = new ConfigurationOptions
         {
+            AbortOnConnectFail = false,
             AllowAdmin = true,
             CommandMap = CommandMap.Default,
             EndPoints = { $"{Settings.RedisConfiguration.EndPoint}:{Settings.RedisConfiguration.Port}" },
@@ -141,13 +142,42 @@ static void ConfigureServices(
         };
         var passwordLength = Settings.RedisConfiguration.Password?.Length ?? 0;
         Log.Logger.Information("Connecting to Redis at {Host}:{Port}:({passwordLength})", Settings.RedisConfiguration.EndPoint, Settings.RedisConfiguration.Port, passwordLength);
-        var redisConnection = ConnectionMultiplexer.Connect(redisConfiguration);
+        ConnectionMultiplexer redisConnection = null;
+        const int maxAttempts = 5;
+        var attempts = 0;
+        while (!redisConnection?.IsConnected ?? true)
+        {
+            try
+            {
+
+                attempts++;
+                Log.Logger.Information("Connecting to Redis attempt: {attempts}", attempts);
+                redisConnection = await ConnectionMultiplexer.ConnectAsync(redisConfiguration);
+                if (redisConnection.IsConnected)
+                {
+                    Log.Logger.Information("Connected to Redis successfully.");
+                    break;
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Warning(ex, "Failed to connect to Redis on attempt {Attempts}", attempts);
+            }
+
+            if (attempts >= maxAttempts)
+            {
+                Log.Logger.Fatal("Exceeded maximum Redis connection attempts ({MaxAttempts}).", maxAttempts);
+                throw new Exception($"Could not connect to Redis after {maxAttempts} attempts.");
+            }
+
+            await Task.Delay(1000); // Use async-friendly delay instead of Thread.Sleep
+        }
         services.AddDataProtection()
             .PersistKeysToStackExchangeRedis(redisConnection, "DataProtection-Keys")
             .SetApplicationName("SOSAdminAPI");
     }
+        
    
-
     services.AddAuthentication(options =>
     {
         options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
