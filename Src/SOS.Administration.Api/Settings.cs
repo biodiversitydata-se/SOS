@@ -108,7 +108,7 @@ public static class Settings
         RedisConfiguration = GetConfigSection<RedisConfiguration>("RedisConfiguration", configuration, logger, sensitiveSetting: false);
         if (RedisConfiguration.Password.Contains("SECRET_PLACEHOLDER", StringComparison.CurrentCultureIgnoreCase))
         {
-            RedisConfiguration.Password = GetConfigValueString("RedisPassword", configuration, logger, sensitiveSetting: true, required: false);
+            RedisConfiguration.Password = GetConfigValueString("RedisPassword", configuration, logger, sensitiveSetting: true, required: true);
             logger.LogInformation("replaced SECRET_PLACEHOLDER in RedisConfiguration.Password with the value in RedisPassword");
             logger.LogInformation($"Redis config. Endpoint:{RedisConfiguration.EndPoint}, Password:{RedisConfiguration.Password}, Port:{RedisConfiguration.Port}, ServiceName:{RedisConfiguration.ServiceName}");
         }

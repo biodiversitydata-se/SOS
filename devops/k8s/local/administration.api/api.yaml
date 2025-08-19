@@ -79,6 +79,11 @@ spec:
               secretKeyRef:
                 name: process-db-password
                 key: ProcessDbPassword
+          - name: RedisPassword
+            valueFrom:
+              secretKeyRef:
+                key: RedisPassword
+                name: sosadminapi-secret
           - name: HangfireDbConfiguration
             value: '{"UserName": "SECRET_PLACEHOLDER", "Password": "SECRET_PLACEHOLDER", "Hosts": [{"Name": "artmongo-t-1.artdata.slu.se","Port": 27017}],"DatabaseName": "sos-hangfire-dev", "UseTls": false, "AuthenticationDb": "admin", "JobExpirationDays": 3}'
           - name: HangfireDbUserName

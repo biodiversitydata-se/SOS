@@ -69,6 +69,11 @@ spec:
                 secretKeyRef:
                   key: ProcessDbUserName
                   name: sosadminapi-secret
+          - name: RedisPassword
+            valueFrom:
+                secretKeyRef:
+                  key: RedisPassword
+                  name: sosadminapi-secret
           - name: VerbatimDbPassword
             valueFrom:
                 secretKeyRef:
