@@ -139,7 +139,8 @@ static void ConfigureServices(
             EndPoints = { $"{Settings.RedisConfiguration.EndPoint}:{Settings.RedisConfiguration.Port}" },
             Password = Settings.RedisConfiguration.Password
         };
-        Log.Logger.Information("Connecting to Redis at {Host}:{Port}:(Length)", Settings.RedisConfiguration.EndPoint, Settings.RedisConfiguration.Port, Settings.RedisConfiguration.Password?.Length);
+        var passwordLength = Settings.RedisConfiguration.Password?.Length ?? 0;
+        Log.Logger.Information("Connecting to Redis at {Host}:{Port}:({passwordLength})", Settings.RedisConfiguration.EndPoint, Settings.RedisConfiguration.Port, passwordLength);
         var redisConnection = ConnectionMultiplexer.Connect(redisConfiguration);
         services.AddDataProtection()
             .PersistKeysToStackExchangeRedis(redisConnection, "DataProtection-Keys")
