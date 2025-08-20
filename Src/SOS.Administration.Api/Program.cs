@@ -1,15 +1,8 @@
 
 using Hangfire;
-using Hangfire.Dashboard;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -17,7 +10,6 @@ using MongoDB.Bson.Serialization.Conventions;
 using Serilog;
 using SOS.Administration.Api.Extensions;
 using SOS.Lib.Helpers;
-using StackExchange.Redis;
 using System;
 using System.Globalization;
 using System.Linq;
@@ -129,65 +121,14 @@ static async Task ConfigureServicesAsync(
         options.KnownNetworks.Clear();
         options.KnownProxies.Clear();
     });
-    
-    if (!string.IsNullOrEmpty(Settings.RedisConfiguration?.EndPoint))
-    {
-        var redisConnection = await ConnectionMultiplexer.ConnectAsync(ConfigurationOptions.Parse($"{Settings.RedisConfiguration.EndPoint}:{Settings.RedisConfiguration.Port},password={Settings.RedisConfiguration.Password},serviceName={Settings.RedisConfiguration.ServiceName},allowAdmin=true"));
-        Log.Logger.Information($"Redis connected: {redisConnection?.IsConnected ?? false}");
-        services.AddDataProtection()
-            .PersistKeysToStackExchangeRedis(redisConnection, "DataProtection-Keys")
-            .SetApplicationName("SOSAdminAPI");
-    }   
-   
-    services.AddAuthentication(options =>
-    {
-        options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-        options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
-    })
-        .AddCookie()
-        .AddOpenIdConnect(options =>
-        {
-            options.RequireHttpsMetadata = !isDevelopment;
-            options.Authority = Settings.AuthenticationConfiguration.Authority;
-            options.ClientId = Settings.AuthenticationConfiguration.ClientId;
-            options.ResponseType = "code";
-            options.SaveTokens = true;
-            options.Scope.Add("openid");
-            options.Scope.Add("profile");
-            options.Scope.Add("roles");
-            options.Events = new OpenIdConnectEvents
-            {
-                OnRemoteFailure = context =>
-                {
-                    // Log the exception message to help debug
-                    var error = context.Failure?.Message;
-                    Console.WriteLine($"OpenID Connect Remote Failure: {error}");
-                    context.HandleResponse(); // Prevent default error handling
-                    context.Response.Redirect("/error?message=" + Uri.EscapeDataString(error));
-                    return Task.CompletedTask;
-                }
-            };
-        });
-
-    services.AddAuthorization(options =>
-    {
-        options.AddPolicy("SOS_ADMIN_POLICY", policy =>
-            policy.RequireRole("SOS-ADMIN"));
-    });
 
     services.AddDependencyInjectionServices();
     services.AddMemoryCache();
-    services.AddControllers(options =>
-    {
-        var policy = new AuthorizationPolicyBuilder() 
-            .RequireAuthenticatedUser()
-            .Build();
-        options.Filters.Add(new AuthorizeFilter(policy));
-    })
-    .AddJsonOptions(options =>
-    {
-        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-    });
+    services.AddControllers()
+        .AddJsonOptions(options =>
+        {
+            options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+        });
     services.SetupSwagger();
     if (!disableHangfireInit)
     {
@@ -203,41 +144,21 @@ static void ConfigureMiddleware(WebApplication app, bool isDevelopment, bool dis
     app.UseForwardedHeaders();
     app.UseHttpsRedirection(); 
     app.UseRouting();
-    app.UseAuthentication(); 
-    app.UseAuthorization();
 
     app.ApplyUseSerilogRequestLogging();
     app.ApplyMapHealthChecks();
 
-    app.MapGet("/login", async context =>
-    {
-        await context.ChallengeAsync(OpenIdConnectDefaults.AuthenticationScheme, new AuthenticationProperties
-        {
-            RedirectUri = "/hangfire"
-        });
-    }).AllowAnonymous();
-    app.MapGet("/logout", async context =>
-    {
-        await context.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme); // Clear local cookie
-        await context.SignOutAsync(OpenIdConnectDefaults.AuthenticationScheme, new AuthenticationProperties
-        {
-            RedirectUri = "/hangfire"
-        });
-    });
     app.MapGet("/error", async context =>
     {
         var message = context.Request.Query["message"].ToString();
         context.Response.ContentType = "text/plain";
-        await context.Response.WriteAsync($"Authentication error:\n{message}");
+        await context.Response.WriteAsync($"Error:\n{message}");
     }).AllowAnonymous(); ;
 
     if (!disableHangfireInit)
     {
-        app.MapHangfireDashboard("/hangfire", new DashboardOptions
-        {
-            AppPath = "/logout", // You can use this to make the "Back to site" link go to logout
-        })
-        .RequireAuthorization("SOS_ADMIN_POLICY"); // This replaces standard authorization filter
+        app.MapHangfireDashboard("/hangfire");
+        
     }
 
     if (isDevelopment)
@@ -247,16 +168,4 @@ static void ConfigureMiddleware(WebApplication app, bool isDevelopment, bool dis
 
     app.ApplyUseSwagger();
     app.MapControllers();
-}
-
-public class AllowAllConnectionsFilter : IDashboardAuthorizationFilter
-{
-    /// <summary>
-    /// </summary>
-    /// <param name="context"></param>
-    /// <returns></returns>
-    public bool Authorize(DashboardContext context)
-    {
-        return true;
-    }
 }
