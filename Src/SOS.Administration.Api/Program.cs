@@ -19,7 +19,6 @@ using SOS.Administration.Api.Extensions;
 using SOS.Lib.Helpers;
 using StackExchange.Redis;
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text.Json.Serialization;
@@ -130,37 +129,14 @@ static async Task ConfigureServicesAsync(
         options.KnownNetworks.Clear();
         options.KnownProxies.Clear();
     });
-    /*Settings.RedisConfiguration.EndPoint = "localhost";
-    Settings.RedisConfiguration.Password = "redispass";
-    Settings.RedisConfiguration.ServiceName = "mymaster";*/
+    
     if (!string.IsNullOrEmpty(Settings.RedisConfiguration?.EndPoint))
     {
-        const int maxAttempts = 5;
-         var redisConfiguration = new ConfigurationOptions
-         {
-             AbortOnConnectFail = false,
-             AllowAdmin = true,
-             CommandMap = CommandMap.Default,
-             ConnectRetry = maxAttempts,
-             EndPoints = { $"{Settings.RedisConfiguration.EndPoint}:{Settings.RedisConfiguration.Port}" },
-             IncludeDetailInExceptions = true,
-             Password = Settings.RedisConfiguration.Password,
-             ServiceName = Settings.RedisConfiguration.ServiceName 
-         };
-
-        try
-        {
-            //var redisConnection = await ConnectionMultiplexer.ConnectAsync(redisConfiguration);
-           var redisConnection = await ConnectionMultiplexer.ConnectAsync(ConfigurationOptions.Parse($"{Settings.RedisConfiguration.EndPoint}:{Settings.RedisConfiguration.Port},password={Settings.RedisConfiguration.Password},serviceName={Settings.RedisConfiguration.ServiceName},allowAdmin=true"));
-            services.AddDataProtection()
-                .PersistKeysToStackExchangeRedis(redisConnection, "DataProtection-Keys")
-                .SetApplicationName("SOSAdminAPI");
-        }
-        catch(Exception e)
-        {
-            
-            Log.Fatal(e, "Failed to connect to Redis");
-        }
+        var redisConnection = await ConnectionMultiplexer.ConnectAsync(ConfigurationOptions.Parse($"{Settings.RedisConfiguration.EndPoint}:{Settings.RedisConfiguration.Port},password={Settings.RedisConfiguration.Password},serviceName={Settings.RedisConfiguration.ServiceName},allowAdmin=true"));
+        Log.Logger.Information($"Redis connected: {redisConnection?.IsConnected ?? false}");
+        services.AddDataProtection()
+            .PersistKeysToStackExchangeRedis(redisConnection, "DataProtection-Keys")
+            .SetApplicationName("SOSAdminAPI");
     }   
    
     services.AddAuthentication(options =>
