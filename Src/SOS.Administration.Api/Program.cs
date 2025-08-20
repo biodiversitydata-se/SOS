@@ -1,5 +1,6 @@
 
 using Hangfire;
+using Hangfire.Dashboard;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -157,8 +158,11 @@ static void ConfigureMiddleware(WebApplication app, bool isDevelopment, bool dis
 
     if (!disableHangfireInit)
     {
-        app.MapHangfireDashboard("/hangfire");
-        
+        app.UseHangfireDashboard("/hangfire", new DashboardOptions
+        {
+            Authorization = [new AllowAllConnectionsFilter()],
+            IgnoreAntiforgeryToken = true
+        });
     }
 
     if (isDevelopment)
@@ -168,4 +172,16 @@ static void ConfigureMiddleware(WebApplication app, bool isDevelopment, bool dis
 
     app.ApplyUseSwagger();
     app.MapControllers();
+}
+
+public class AllowAllConnectionsFilter : IDashboardAuthorizationFilter
+{
+    /// <summary>
+    /// </summary>
+    /// <param name="context"></param>
+    /// <returns></returns>
+    public bool Authorize(DashboardContext context)
+    {
+        return true;
+    }
 }
