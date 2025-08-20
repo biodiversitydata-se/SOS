@@ -130,57 +130,37 @@ static async Task ConfigureServicesAsync(
         options.KnownNetworks.Clear();
         options.KnownProxies.Clear();
     });
-
+    /*Settings.RedisConfiguration.EndPoint = "localhost";
+    Settings.RedisConfiguration.Password = "redispass";
+    Settings.RedisConfiguration.ServiceName = "mymaster";*/
     if (!string.IsNullOrEmpty(Settings.RedisConfiguration?.EndPoint))
     {
         const int maxAttempts = 5;
-        var redisConfiguration = new ConfigurationOptions
+         var redisConfiguration = new ConfigurationOptions
+         {
+             AbortOnConnectFail = false,
+             AllowAdmin = true,
+             CommandMap = CommandMap.Default,
+             ConnectRetry = maxAttempts,
+             EndPoints = { $"{Settings.RedisConfiguration.EndPoint}:{Settings.RedisConfiguration.Port}" },
+             IncludeDetailInExceptions = true,
+             Password = Settings.RedisConfiguration.Password,
+             ServiceName = Settings.RedisConfiguration.ServiceName 
+         };
+
+        try
         {
-            AbortOnConnectFail = false,
-            AllowAdmin = true,
-            CommandMap = CommandMap.Sentinel,
-            ConnectRetry = maxAttempts,
-            EndPoints = { $"{Settings.RedisConfiguration.EndPoint}:{Settings.RedisConfiguration.Port}" },
-            IncludeDetailInExceptions = true,
-            Password = Settings.RedisConfiguration.Password,
-            ServiceName = Settings.RedisConfiguration.ServiceName 
-        };
-        
-        var passwordLength = Settings.RedisConfiguration.Password?.Length ?? 0;
-        Log.Logger.Information("Connecting to Redis at {Host}:{Port}:({passwordLength})", Settings.RedisConfiguration.EndPoint, Settings.RedisConfiguration.Port, passwordLength);
-        ConnectionMultiplexer redisConnection = null;
-        
-        var attempts = 0;
-        while (!redisConnection?.IsConnected ?? true)
-        {
-            try
-            {
-
-                attempts++;
-                Log.Logger.Information("Connecting to Redis attempt: {attempts}", attempts);
-                redisConnection = await ConnectionMultiplexer.ConnectAsync(redisConfiguration);
-                if (redisConnection.IsConnected)
-                {
-                    Log.Logger.Information("Connected to Redis successfully.");
-                    break;
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.Logger.Warning(ex, "Failed to connect to Redis on attempt {Attempts}", attempts);
-            }
-
-            if (attempts >= maxAttempts)
-            {
-                Log.Logger.Fatal("Exceeded maximum Redis connection attempts ({MaxAttempts}).", maxAttempts);
-                throw new Exception($"Could not connect to Redis after {maxAttempts} attempts.");
-            }
-
-            await Task.Delay(1000); // Use async-friendly delay instead of Thread.Sleep
+            //var redisConnection = await ConnectionMultiplexer.ConnectAsync(redisConfiguration);
+           var redisConnection = await ConnectionMultiplexer.ConnectAsync(ConfigurationOptions.Parse($"{Settings.RedisConfiguration.EndPoint}:{Settings.RedisConfiguration.Port},password={Settings.RedisConfiguration.Password},serviceName={Settings.RedisConfiguration.ServiceName},allowAdmin=true"));
+            services.AddDataProtection()
+                .PersistKeysToStackExchangeRedis(redisConnection, "DataProtection-Keys")
+                .SetApplicationName("SOSAdminAPI");
         }
-        services.AddDataProtection()
-            .PersistKeysToStackExchangeRedis(redisConnection, "DataProtection-Keys")
-            .SetApplicationName("SOSAdminAPI");
+        catch(Exception e)
+        {
+            
+            Log.Fatal(e, "Failed to connect to Redis");
+        }
     }   
    
     services.AddAuthentication(options =>
