@@ -151,7 +151,6 @@ static async Task ConfigureServicesAsync(
             options.Authority = Settings.AuthenticationConfiguration.Authority;
             options.ClientId = Settings.AuthenticationConfiguration.ClientId;
             options.ResponseType = "code";
-            options.ResponseMode = "query";
             options.SaveTokens = true;
             options.Scope.Add("openid");
             options.Scope.Add("profile");
