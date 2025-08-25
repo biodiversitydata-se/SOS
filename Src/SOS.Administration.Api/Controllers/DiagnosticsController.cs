@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using CSharpFunctionalExtensions;
+using Microsoft.Extensions.Logging;
 using SOS.Administration.Api.Controllers.Interfaces;
 using SOS.Administration.Api.Managers;
 using SOS.Harvest.Harvesters.Interfaces;
@@ -133,14 +134,15 @@ namespace SOS.Administration.Api.Controllers
                 LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
                 var dwcTaxa = await _taxonService.GetTaxaAsync();
                 var taxa = dwcTaxa.ToProcessedTaxa();
-                var taxonTree = TaxonTreeFactory.CreateTaxonTree(taxa);
+                Lib.Models.TaxonTree.TaxonTree<Lib.Models.Interfaces.IBasicTaxon> taxonTree = TaxonTreeFactory.CreateTaxonTree(taxa);
 
-                string strGraphviz = null;
+                Result<string> strGraphviz = null;
                 if (diagramFormat == DiagramFormat.GraphViz)
                 {
                     strGraphviz = TaxonRelationDiagramHelper.CreateGraphvizFormatRepresentation(
                         taxonTree,
                         taxonIds,
+                        null,
                         treeIterationMode,
                         includeSecondaryRelations);
                 }
@@ -149,9 +151,12 @@ namespace SOS.Administration.Api.Controllers
                     strGraphviz = TaxonRelationDiagramHelper.CreateMermaidFormatRepresentation(
                         taxonTree,
                         taxonIds,
+                        null,
                         treeIterationMode,
                         includeSecondaryRelations);
                 }
+
+                if (strGraphviz.IsFailure) return BadRequest(strGraphviz.Error);
 
                 return Ok(strGraphviz);
                 //return File(System.Text.Encoding.UTF8.GetBytes(strGraphviz),"text/plain", "TaxonCategory Diagram.gv");

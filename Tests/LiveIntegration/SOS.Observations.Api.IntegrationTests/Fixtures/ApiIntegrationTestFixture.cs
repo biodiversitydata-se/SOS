@@ -214,6 +214,7 @@ namespace SOS.Observations.Api.LiveIntegrationTests.Fixtures
             TaxonRepository = new TaxonRepository(processClient, new NullLogger<TaxonRepository>());
             var taxonManager = CreateTaxonManager(processClient, TaxonRepository, memoryCache);
             var processedConfigurationCache = new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>()), new MemoryCache(new MemoryCacheOptions()), new NullLogger<ProcessedConfigurationCache>());
+            var vocabularyCache = new VocabularyCache(new VocabularyRepository(processClient, new NullLogger<VocabularyRepository>()), new MemoryCache(new MemoryCacheOptions()), new NullLogger<VocabularyCache>());
             var clusterHealthCache = new ClassCache<ConcurrentDictionary<string, HealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<string, HealthResponse>>>());
             ProcessedObservationRepository = CreateProcessedObservationRepository(elasticConfiguration, elasticClientManager, processedConfigurationCache, taxonManager, processClient, memoryCache);
             EventRepository = new EventRepository(elasticClientManager, elasticConfiguration, processedConfigurationCache, new ClassCache<ConcurrentDictionary<string, HealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<string, HealthResponse>>>()), new MemoryCache(new MemoryCacheOptions()), new NullLogger<EventRepository>());
@@ -293,7 +294,8 @@ namespace SOS.Observations.Api.LiveIntegrationTests.Fixtures
             AzureSearchHealthCheck = new AzureSearchHealthCheck(healthCheckConfiguration, new NullLogger<AzureSearchHealthCheck>());
             var devOpsService = new DevOpsService(new HttpClientService(new NullLogger<HttpClientService>()), new DevOpsConfiguration(), new NullLogger<DevOpsService>());
             var devOpsManager = new DevOpsManager(devOpsService, new DevOpsConfiguration(), new NullLogger<DevOpsManager>());
-            SystemsController = new SystemsController(devOpsManager, processInfoManager, ProcessedObservationRepository, elasticConfiguration, dataProviderCache, new NullLogger<SystemsController>());
+            SystemsController = new SystemsController(devOpsManager, processInfoManager, ProcessedObservationRepository, elasticConfiguration, dataProviderCache, taxonManager,
+                vocabularyCache, new NullLogger<SystemsController>());
             _userManager = new UserManager(userService, areaCache, new NullLogger<UserManager>());
             UserController = new UserController(_userManager, new NullLogger<UserController>());
             SersObservationVerbatimRepository = new SersObservationVerbatimRepository(importClient, new NullLogger<SersObservationVerbatimRepository>());

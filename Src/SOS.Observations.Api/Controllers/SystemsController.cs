@@ -1,11 +1,16 @@
-﻿using Elastic.Clients.Elasticsearch;
+﻿using CSharpFunctionalExtensions;
+using Elastic.Clients.Elasticsearch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Shared;
+using SOS.Lib.Enums;
+using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
+using SOS.Lib.Managers.Interfaces;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Swagger;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Repositories.Interfaces;
@@ -17,7 +22,6 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
-using SOS.Lib.Extensions;
 
 namespace SOS.Observations.Api.Controllers
 {
@@ -32,6 +36,8 @@ namespace SOS.Observations.Api.Controllers
         private readonly IProcessInfoManager _processInfoManager;
         private readonly IProcessedObservationRepository _processedObservationRepository;
         private readonly IDataProviderCache _dataProviderCache;
+        private readonly ITaxonManager _taxonManager;
+        private readonly ICache<VocabularyId, Vocabulary> _vocabularyCache;
         private MongoClient _mongoClient;
         private ElasticsearchClient _elasticClient;
         private string _mongoSuffix = "";
@@ -46,6 +52,8 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="processedObservationRepository"></param>
         /// <param name="elasticConfiguration"></param>
         /// <param name="dataProviderCache"></param>
+        /// <param name="taxonManager"></param>
+        /// <param name="vocabularyCache"></param>
         /// <param name="logger"></param>
         /// <exception cref="ArgumentNullException"></exception>
         public SystemsController(
@@ -54,12 +62,16 @@ namespace SOS.Observations.Api.Controllers
             IProcessedObservationRepository processedObservationRepository,
             ElasticSearchConfiguration elasticConfiguration, 
             IDataProviderCache dataProviderCache,
+            ITaxonManager taxonManager,
+            ICache<VocabularyId, Vocabulary> vocabularyCache,
             ILogger<SystemsController> logger)
         {
             _processInfoManager = processInfoManager ?? throw new ArgumentNullException(nameof(processInfoManager));
             _processedObservationRepository = processedObservationRepository ??
                                               throw new ArgumentNullException(nameof(processedObservationRepository));
             _devOpsManager = devOpsManager ?? throw new ArgumentNullException(nameof(devOpsManager));
+            _taxonManager = taxonManager ?? throw new ArgumentNullException(nameof(taxonManager));
+            _vocabularyCache = vocabularyCache ?? throw new ArgumentNullException(nameof(vocabularyCache));
             _mongoClient = new MongoClient(Settings.ProcessDbConfiguration.GetMongoDbSettings());
             _mongoConfiguration = Settings.ProcessDbConfiguration;
             if (_mongoConfiguration.DatabaseName.EndsWith("-st"))
@@ -250,7 +262,58 @@ namespace SOS.Observations.Api.Controllers
             var processSummary = GetProcessSummary(processInfos, activeInstance);
             return processSummary;
         }
-        
+
+        /// <summary>
+        ///     Get Taxon relations as diagram.
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("TaxonRelationsDiagram")]
+        //[ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public async Task<IActionResult> GetTaxonRelationsDiagram(
+            [FromQuery] int[] taxonIds,
+            [FromQuery] TaxonRelationDiagramHelper.TaxonRelationsTreeIterationMode treeIterationMode = TaxonRelationDiagramHelper.TaxonRelationsTreeIterationMode.BothParentsAndChildren,
+            [FromQuery] bool includeSecondaryRelations = false,
+            [FromQuery] DiagramFormat diagramFormat = DiagramFormat.Mermaid,
+            [FromQuery] string translationCultureCode = "sv-SE")
+        {
+            try
+            {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
+                IEnumerable<Vocabulary> vocabularies = await _vocabularyCache.GetAllAsync();
+                var taxonCategoryVocabulary = vocabularies?.FirstOrDefault(v => v.Id == VocabularyId.TaxonCategory);
+                Dictionary<int, string> taxonCategoryById = taxonCategoryVocabulary.CreateValueDictionary(CultureCodeHelper.GetCultureCode(translationCultureCode));
+                var taxonTree = await _taxonManager.GetTaxonTreeAsync();
+                Result<string> strGraphRepresentation = null;
+                if (diagramFormat == DiagramFormat.GraphViz)
+                {
+                    strGraphRepresentation = TaxonRelationDiagramHelper.CreateGraphvizFormatRepresentation(
+                        taxonTree,
+                        taxonIds,
+                        taxonCategoryById,
+                        treeIterationMode,
+                        includeSecondaryRelations);
+                }
+                else if (diagramFormat == DiagramFormat.Mermaid)
+                {
+                    strGraphRepresentation = TaxonRelationDiagramHelper.CreateMermaidFormatRepresentation(
+                        taxonTree,
+                        taxonIds,
+                        taxonCategoryById,
+                        treeIterationMode,
+                        includeSecondaryRelations);
+                }
+
+                if (strGraphRepresentation.IsFailure) return BadRequest(strGraphRepresentation.Error);
+                return Ok(strGraphRepresentation.Value);
+           }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "{@methodName}() failed", MethodBase.GetCurrentMethod()?.Name);
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
         private ProcessSummaryDto GetProcessSummary(IEnumerable<MongoDbProcessInfoDto>? processInfos, ActiveInstanceInfoDto? activeInstanceInfo)
         {
             MongoDbProcessInfoDto activeInfos = processInfos.FirstOrDefault(m => int.Parse(m.Id.Last().ToString()) == activeInstanceInfo.ActiveInstance);

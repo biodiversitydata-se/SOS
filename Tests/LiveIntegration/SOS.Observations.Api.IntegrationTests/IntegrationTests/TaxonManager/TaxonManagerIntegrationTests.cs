@@ -129,13 +129,14 @@ namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.TaxonManage
             var strGraphviz = TaxonRelationDiagramHelper.CreateGraphvizFormatRepresentation(
                 taxonTree,
                 taxonIds,
+                null,
                 TaxonRelationDiagramHelper.TaxonRelationsTreeIterationMode.BothParentsAndChildren,
                 true);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            strGraphviz.Should().NotBeNullOrEmpty();
+            strGraphviz.Value.Should().NotBeNullOrEmpty();
         }
 
         [Fact]
@@ -155,13 +156,14 @@ namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.TaxonManage
             var strMermaid = TaxonRelationDiagramHelper.CreateMermaidFormatRepresentation(
                 taxonTree,
                 taxonIds,
+                null,
                 TaxonRelationDiagramHelper.TaxonRelationsTreeIterationMode.BothParentsAndChildren,
                 true);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
-            strMermaid.Should().NotBeNullOrEmpty();
+            strMermaid.Value.Should().NotBeNullOrEmpty();
         }
     }
 }
