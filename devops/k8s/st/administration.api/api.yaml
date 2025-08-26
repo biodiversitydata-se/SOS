@@ -137,9 +137,9 @@ spec:
           resources:
             requests:
               cpu: 11m
-              memory: 230M
+              memory: 1G
             limits:
-              memory: 230M
+              memory: 1G
       restartPolicy: Always
       imagePullSecrets:
         - name: regcred
