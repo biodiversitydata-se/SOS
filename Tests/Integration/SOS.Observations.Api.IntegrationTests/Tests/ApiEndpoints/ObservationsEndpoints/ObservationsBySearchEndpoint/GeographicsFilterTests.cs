@@ -1,10 +1,11 @@
 ﻿using FizzWare.NBuilder;
-using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
+using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Observations.Api.IntegrationTests.Setup;
+using SOS.Observations.Api.IntegrationTests.Setup.Stubs;
 using SOS.Observations.Api.IntegrationTests.TestData;
 using SOS.Observations.Api.IntegrationTests.TestData.Factories;
 using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
@@ -325,6 +326,9 @@ namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsE
             // Arrange
             //-----------------------------------------------------------------------------------------------------------
             var uppsala = Geometries.UppsalaMunicipality();
+            var wgs86Approx1M = 0.00001;
+            var maxX = uppsala.Coordinates.Max(c => c.X); 
+            var maxY = uppsala.Coordinates.Max(c => c.Y);
             var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
                .All().HaveValuesFromPredefinedObservations()
                .TheFirst(30).HaveCoordinatesInGeometry(uppsala, 10)
@@ -355,6 +359,90 @@ namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsE
             response.StatusCode.Should().Be(HttpStatusCode.OK);
             result!.TotalCount.Should().Be(60,
                 because: "60 observations added to Elasticsearch are in the municipality Uppsala.");
+        }
+
+        [Fact]
+        public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_ConsiderAuthorizationBuffer()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            const int bufferSize = 1000;
+            var uppsala = Geometries.UppsalaMunicipality();
+            var uppsalaWithBuffer = uppsala.Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM).Buffer(bufferSize).Transform(CoordinateSys.SWEREF99_TM, CoordinateSys.WGS84);
+            var buffer = uppsalaWithBuffer.Difference(uppsala);
+            var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+                .All()
+                    .HaveValuesFromPredefinedObservations()
+                    .HaveTaxonSensitivityCategory(4)
+                .TheFirst(30).HaveCoordinatesInGeometry(uppsala, 10)
+                .TheNext(30).HaveCoordinatesInGeometry(buffer, 10)
+                .TheNext(40).HaveCoordinatesOusideGeometry(uppsalaWithBuffer, 10)
+                .Build();
+            
+            await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
+            var userServiceStub = UserServiceStubFactory.CreateWithMunicipalitySightingIndicationAuthority(maxProtectionLevel: 5, "380"/*Uppsala*/, bufferSize);
+            var apiClient = TestFixture.CreateApiClientWithReplacedService(userServiceStub);
+            var searchFilter = new SearchFilterDto
+            {
+                Geographics = new GeographicsFilterDto
+                {
+                    ConsiderAuthorizationBuffer = true
+                }
+            };
+            var jsonSerializerOptions = new JsonSerializerOptions();
+            jsonSerializerOptions.Converters.Add(new NetTopologySuite.IO.Converters.GeoJsonConverterFactory());
+
+            // Act
+            var response = await apiClient.PostAsync($"/observations/search?sensitiveObservations=true", JsonContent.Create(searchFilter, options: jsonSerializerOptions));
+            var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+
+            // Assert
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
+            result!.TotalCount.Should().Be(60,
+                because: $"60 observations added to Elasticsearch are in the municipality Uppsala or max {bufferSize}m outside.");
+        }
+
+        [Fact]
+        public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_DontConsiderAuthorizationBuffer()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            const int bufferSize = 1000;
+            var uppsala = Geometries.UppsalaMunicipality();
+            var uppsalaWithBuffer = uppsala.Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM).Buffer(bufferSize).Transform(CoordinateSys.SWEREF99_TM, CoordinateSys.WGS84);
+            var buffer = uppsalaWithBuffer.Difference(uppsala);
+            var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+                .All()
+                    .HaveValuesFromPredefinedObservations()
+                    .HaveTaxonSensitivityCategory(4)
+                .TheFirst(30).HaveCoordinatesInGeometry(uppsala, 10).HaveAreaFeatureIds("Province1", "County1", "380") // Uppsala
+                .TheNext(30).HaveCoordinatesInGeometry(buffer, 10).HaveAreaFeatureIds("Province1", "County1", "381") // Enköping
+                .TheNext(40).HaveCoordinatesOusideGeometry(uppsalaWithBuffer, 10).HaveAreaFeatureIds("Province2", "County2", "382") // Östhammar
+                .Build();
+
+            await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
+            var userServiceStub = UserServiceStubFactory.CreateWithMunicipalitySightingIndicationAuthority(maxProtectionLevel: 5, "380"/*Uppsala*/, bufferSize);
+            var apiClient = TestFixture.CreateApiClientWithReplacedService(userServiceStub);
+            var searchFilter = new SearchFilterDto
+            {
+                Geographics = new GeographicsFilterDto
+                {
+                    ConsiderAuthorizationBuffer = false
+                }
+            };
+            var jsonSerializerOptions = new JsonSerializerOptions();
+            jsonSerializerOptions.Converters.Add(new NetTopologySuite.IO.Converters.GeoJsonConverterFactory());
+
+            // Act
+            var response = await apiClient.PostAsync($"/observations/search?sensitiveObservations=true", JsonContent.Create(searchFilter, options: jsonSerializerOptions));
+            var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+
+            // Assert
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
+            result!.TotalCount.Should().Be(30,
+                because: $"30 observations added to Elasticsearch are in the municipality Uppsala");
         }
     }
 }

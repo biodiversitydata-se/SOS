@@ -6,9 +6,9 @@ namespace SOS.TestHelpers.Helpers.Builders
 {
     public class UserAuthorizationTestBuilder : BuilderBase<UserAuthorizationTestBuilder, AuthorityModel>
     {
-        public UserAuthorizationTestBuilder WithAreaAccess(AreaType areaType, string featureId)
+        public UserAuthorizationTestBuilder WithAreaAccess(AreaType areaType, string featureId, int? buffer = null)
         {
-            return With(entity => entity.Areas.Add(new AreaModel { AreaTypeId = (int)areaType, FeatureId = featureId }));
+            return With(entity => entity.Areas.Add(new AreaModel { AreaTypeId = (int)areaType, FeatureId = featureId, Buffer = buffer }));
         }
 
         public UserAuthorizationTestBuilder WithAreaAccess(AreaModel area)

@@ -256,6 +256,7 @@ namespace SOS.Shared.Api.Extensions.Dto
                     MaxDistanceFromPoint = filter.MaxDistanceFromPoint,
                     UseDisturbanceRadius = filter.ConsiderDisturbanceRadius,
                     UsePointAccuracy = filter.ConsiderObservationAccuracy,
+                    UseAuthorizationBuffer = filter.ConsiderAuthorizationBuffer
                 },
                 LocationIds = filter.LocationIds,
                 NameFilter = filter.LocationNameFilter,
@@ -414,6 +415,7 @@ namespace SOS.Shared.Api.Extensions.Dto
                             MaxDistanceFromPoint = searchFilterDto.Geographics.MaxDistanceFromPoint,
                             UseDisturbanceRadius = searchFilterDto.Geographics.ConsiderDisturbanceRadius,
                             UsePointAccuracy = searchFilterDto.Geographics.ConsiderObservationAccuracy,
+                            UseAuthorizationBuffer = searchFilterDto.Geographics.ConsiderAuthorizationBuffer
                         },
                     MaxAccuracy = searchFilterDto.Geographics?.MaxAccuracy
                 },

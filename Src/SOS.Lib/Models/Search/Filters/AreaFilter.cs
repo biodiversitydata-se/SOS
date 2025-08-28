@@ -8,6 +8,11 @@ namespace SOS.Lib.Models.Search.Filters
     public class AreaFilter
     {
         /// <summary>
+        /// Area buffer
+        /// </summary>
+        public int? Buffer { get; set; }
+
+        /// <summary>
         ///     Type of area
         /// </summary>
         public AreaType AreaType { get; set; }

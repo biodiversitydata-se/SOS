@@ -62,6 +62,7 @@ namespace SOS.Shared.Api.Extensions.Dto
             return new UserAreaDto
             {
                 AreaType = (AreaTypeDto)userArea.AreaType,
+                Buffer = userArea.Buffer,
                 FeatureId = userArea.FeatureId,
                 Name = userArea.Name
             };

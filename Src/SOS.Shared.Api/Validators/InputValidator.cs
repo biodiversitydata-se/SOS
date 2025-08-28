@@ -273,7 +273,7 @@ namespace SOS.Shared.Api.Validators
             {
                 foreach (var geoemtry in geometries)
                 {
-                    if (!geoemtry.IsValid)
+                    if (!geoemtry?.IsValid ?? true)
                     {
                         throw new Exception("Invalid geometry");
                     }

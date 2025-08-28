@@ -52,4 +52,28 @@ internal static class UserServiceStubFactory
 
         return userServiceMock;
     }
+
+    public static IUserService CreateWithMunicipalitySightingIndicationAuthority(int maxProtectionLevel, string municipalityFeatureId, int? buffer)
+    {
+        return CreateWithMunicipalitySightingIndicationAuthority(TestAuthHandler.DefaultTestUserId, maxProtectionLevel, municipalityFeatureId, buffer);
+    }
+
+    public static IUserService CreateWithMunicipalitySightingIndicationAuthority(int userId, int maxProtectionLevel, string municipalityFeatureId, int? buffer)
+    {
+        var authorityBuilder = new UserAuthorizationTestBuilder();
+        var authority = authorityBuilder
+            .WithAuthorityIdentity("Sighting")
+            .WithMaxProtectionLevel(maxProtectionLevel)
+            .WithAreaAccess(Lib.Enums.AreaType.Municipality, municipalityFeatureId, buffer)
+            .Build();
+        var authorities = new List<AuthorityModel> { authority };
+
+        UserModel user = new UserModel();
+        user.Id = userId;
+        IUserService userServiceMock = Substitute.For<IUserService>();
+        userServiceMock.GetUserAsync().Returns(user);
+        userServiceMock.GetUserAuthoritiesAsync(userId, Arg.Any<string>(), Arg.Any<string>()).Returns(authorities);
+
+        return userServiceMock;
+    }
 }

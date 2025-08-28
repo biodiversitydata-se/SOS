@@ -66,6 +66,11 @@ namespace SOS.Lib.Models.Search.Filters
         }
 
         /// <summary>
+        /// If true, use buffer that can be set to an area in the permission system  
+        /// </summary>
+        public bool? UseAuthorizationBuffer { get; set; }
+
+        /// <summary>
         /// If true, use Point accuracy when searching
         /// </summary>
         public bool UsePointAccuracy { get; set; }
