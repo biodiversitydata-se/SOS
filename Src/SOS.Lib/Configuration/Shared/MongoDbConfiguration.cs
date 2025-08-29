@@ -1,4 +1,5 @@
 ﻿using MongoDB.Driver;
+using System;
 using System.Linq;
 using System.Security.Authentication;
 using System.Text;
@@ -93,6 +94,10 @@ namespace SOS.Lib.Configuration.Shared
                 mongoSettings.ReplicaSetName = ReplicaSetName;
                 mongoSettings.ReadPreference = ReadPreference.SecondaryPreferred;
             }
+           
+            //mongoSettings.ConnectTimeout = TimeSpan.FromSeconds(10); // How long we try to open socket/connection
+            //mongoSettings.SocketTimeout = TimeSpan.FromSeconds(30);  // How long we wait for network I/O before giving up
+            //mongoSettings.ServerSelectionTimeout = TimeSpan.FromSeconds(5); // How long we look for a server in cluster before throwing error
 
             return mongoSettings;
         }

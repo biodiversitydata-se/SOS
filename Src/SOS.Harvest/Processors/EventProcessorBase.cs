@@ -136,8 +136,8 @@ namespace SOS.Harvest.Processors
                 throw;
             }
             finally
-            {
-                ProcessManager.Release();
+            {                
+                ProcessManager.Release($"{dataProvider}, Batch={startId}-{endId}");
             }
         }
 
@@ -197,9 +197,25 @@ namespace SOS.Harvest.Processors
 
             while (startId <= maxId)
             {
-                await ProcessManager.WaitAsync();
-
                 var batchEndId = startId + 1000 - 1;
+                const int maxRetries = 3;
+                int retryCount = 0;
+                while (retryCount < maxRetries)
+                {
+                    if (await ProcessManager.WaitAsync($"{dataProvider}, Batch={startId}-{batchEndId}"))
+                    {
+                        break;
+                    }
+
+                    retryCount++;
+                    Logger.LogWarning("Attempt {retryCount} failed for {dataProvider} event batch {startId}-{batchEndId}. Retrying...", dataProvider, retryCount, startId, batchEndId);
+                    if (retryCount == maxRetries)
+                    {
+                        Logger.LogError("Failed to process {dataProvider} event batch {startId}-{batchEndId} after {maxRetries} attempts.", dataProvider, startId, batchEndId, maxRetries);
+                        throw new InvalidOperationException($"Failed to process event batch {startId}-{batchEndId} after {maxRetries} attempts.");
+                    }
+                }
+                
                 processBatchTasks.Add(ProcessBatchAsync(
                     dataProvider,
                     startId,
@@ -211,7 +227,16 @@ namespace SOS.Harvest.Processors
             }
 
             await Task.WhenAll(processBatchTasks);
-            return (processBatchTasks.Sum(t => t.Result.publicCount), 0, processBatchTasks.Sum(t => t.Result.failedCount));
+            var results = processBatchTasks
+                .Where(t => t.Status == TaskStatus.RanToCompletion)
+                .Select(t => t.Result)
+                .ToList();
+
+            return (
+                results.Sum(r => r.publicCount),
+                0,
+                results.Sum(r => r.failedCount)
+            );
         }
 
         protected async Task<(int publicCount, int protectedCount, int failedCount)> ValidateAndStoreEvents(DataProvider dataProvider, ICollection<Event> events, string batchId)
