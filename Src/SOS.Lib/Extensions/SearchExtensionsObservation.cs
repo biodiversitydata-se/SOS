@@ -139,6 +139,7 @@ namespace SOS.Lib
                 queries.TryAddTermsCriteria("artportalenInternal.sightingPublishTypeIds", internalFilter.PublishTypeIdsFilter);
                 queries.TryAddTermsCriteria("artportalenInternal.triggeredObservationRuleFrequencyId", internalFilter.TriggeredObservationRuleFrequencyIds);
                 queries.TryAddTermsCriteria("artportalenInternal.triggeredObservationRuleReproductionId", internalFilter.TriggeredObservationRuleReproductionIds);
+                queries.TryAddTermsCriteria("artportalenInternal.invasiveSpeciesTreatment.id", internalFilter.InvasiveSpeciesTreatmentIds);
                 queries.TryAddTermsCriteria("event.discoveryMethod.id", internalFilter.DiscoveryMethodIds);
                 queries.TryAddTermsCriteria("identification.verificationStatus.id", internalFilter.VerificationStatusIds);
                 queries.TryAddTermCriteria("institutionId", internalFilter.InstitutionId);

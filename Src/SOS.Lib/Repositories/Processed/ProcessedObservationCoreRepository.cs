@@ -186,6 +186,12 @@ namespace SOS.Lib.Repositories.Processed
                             .NumberVal(n => n.ArtportalenInternal.SightingSpeciesCollectionItemId, IndexSetting.None, NumberType.Integer)
                             .NumberVal(n => n.ArtportalenInternal.DiffusionId, IndexSetting.None, NumberType.Integer)
                             .NumberVal(n => n.ArtportalenInternal.IncludedByLocationId, IndexSetting.None, NumberType.Integer)
+                            .Object(n => n.ArtportalenInternal.InvasiveSpeciesTreatment, c => c
+                                .Properties(ps => ps
+                                        .KeywordVal(kwlc => kwlc.ArtportalenInternal.InvasiveSpeciesTreatment.Value, IndexSetting.SearchOnly)
+                                        .NumberVal(nr => nr.ArtportalenInternal.InvasiveSpeciesTreatment.Id, IndexSetting.SearchSortAggregate, NumberType.Integer)
+                                    )
+                            )
                             .Object(o => o.ArtportalenInternal.OccurrenceRecordedByInternal, n => n
                                 .Properties(ps => ps
                                     .KeywordVal(kwlc => kwlc.ArtportalenInternal.OccurrenceRecordedByInternal.First().UserAlias, IndexSetting.None)

@@ -3,7 +3,7 @@
 namespace SOS.Lib.Models.Search.Filters
 {
     /// <summary>
-    /// Area filter.
+    /// Taxon filter.
     /// </summary>
     public class TaxonFilter
     {

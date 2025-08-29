@@ -5131,5 +5131,29 @@
     "DwcIdentifier": "",
     "DependsOn": "ArtportalenInternal.SightingBarcodeURL",
     "FieldSet": ""
+  },
+  {
+    "PropertyName": "InvasiveSpeciesTreatment",
+    "PropertyPath": "ArtportalenInternal.InvasiveSpeciesTreatment",
+    "SwedishTitle": "Invasiva arter åtgärd",
+    "EnglishTitle": "Invasive species treatment",
+    "DataType": "String",
+    "DataTypeIsNullable": false,
+    "DwcName": "",
+    "DwcIdentifier": "",
+    "DependsOn": "ArtportalenInternal.InvasiveSpeciesTreatment",
+    "FieldSet": ""
+  },
+  {
+    "PropertyName": "InvasiveSpeciesTreatmentId",
+    "PropertyPath": "ArtportalenInternal.InvasiveSpeciesTreatment.Id",
+    "SwedishTitle": "Invasiva arter åtgärd id",
+    "EnglishTitle": "Invasive species treatment ID",
+    "DataType": "Int32",
+    "DataTypeIsNullable": false,
+    "DwcName": "",
+    "DwcIdentifier": "",
+    "DependsOn": "ArtportalenInternal.InvasiveSpeciesTreatment.Id",
+    "FieldSet": ""
   }
 ]

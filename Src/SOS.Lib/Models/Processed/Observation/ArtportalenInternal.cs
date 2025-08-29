@@ -238,5 +238,13 @@ namespace SOS.Lib.Models.Processed.Observation
         /// </summary>
         [SwaggerExclude]
         public bool? TriggeredObservationRuleUnspontaneous { get; set; }
+
+        /// <summary>
+        /// Invasive species treatment.
+        /// </summary>
+        /// <remarks>
+        /// This field uses a controlled vocabulary.
+        /// </remarks>
+        public VocabularyValue InvasiveSpeciesTreatment { get; set; }
     }
 }

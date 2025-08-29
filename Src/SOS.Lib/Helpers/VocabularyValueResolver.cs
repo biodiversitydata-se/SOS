@@ -138,6 +138,13 @@ namespace SOS.Lib.Helpers
                     ResolveVocabularyMappedValue(taxonAttributesObject, nameof(Observation.Taxon.Attributes.TaxonCategory), valueMappingDictionaries[VocabularyId.TaxonCategory]);
                 }
             }
+
+            // ArtportalenInternal
+            var artportalenInternalObject = obs["artportalenInternal"];
+            if (artportalenInternalObject != null)
+            {
+                ResolveVocabularyMappedValue(artportalenInternalObject, nameof(Observation.ArtportalenInternal.InvasiveSpeciesTreatment), valueMappingDictionaries[VocabularyId.InvasiveSpeciesTreatment]);                
+            }
         }
 
         private void ResolveVocabularyMappedValue(
@@ -244,6 +251,8 @@ namespace SOS.Lib.Helpers
                     valueMappingDictionaries[VocabularyId.SensitivityCategory]);
                 ResolveVocabularyMappedValue(observation.Taxon?.Attributes.TaxonCategory,
                     valueMappingDictionaries[VocabularyId.TaxonCategory]);
+                ResolveVocabularyMappedValue(observation.ArtportalenInternal?.InvasiveSpeciesTreatment,
+                    valueMappingDictionaries[VocabularyId.InvasiveSpeciesTreatment]);
             }
         }
 

@@ -30,6 +30,7 @@ namespace SOS.Shared.Api.Dtos.Vocabulary
         ValidationStatus = 26,
         [Obsolete]
         TaxonProtectionLevel = 27,   */
-        TaxonCategory = 28
+        TaxonCategory = 28,
+        InvasiveSpeciesTreatment = 29
     }
 }
