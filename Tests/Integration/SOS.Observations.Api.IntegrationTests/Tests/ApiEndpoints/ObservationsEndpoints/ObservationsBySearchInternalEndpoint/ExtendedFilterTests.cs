@@ -1364,6 +1364,55 @@ public class ExtendedFilterTests : TestBase
     }
 
     [Fact]
+    public async Task GetObservationsWithTypeFilterDefault()
+    {
+        // Arrange
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+           .All()
+               .HaveValuesFromPredefinedObservations()
+            .TheFirst(60)
+                .With(o => o.SightingTypeSearchGroupId = (int)Lib.Enums.Artportalen.SightingTypeSearchGroup.AggregatedChild)
+            .TheNext(20)
+                 .With(o => o.SightingTypeSearchGroupId = (int)Lib.Enums.Artportalen.SightingTypeSearchGroup.Aggregated)
+            .TheNext(20)
+                .With(o => o.SightingTypeSearchGroupId = (int)Lib.Enums.Artportalen.SightingTypeSearchGroup.ReplacementChild)
+           .Build();
+
+        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
+        var apiClient = TestFixture.CreateApiClient();
+        var searchFilter = new SearchFilterInternalDto
+        {
+            ExtendedFilter = new ExtendedFilterDto
+            {
+                TypeFilter = ExtendedFilterDto.SightingTypeFilterDto.Default
+            }
+        };
+
+        // Act
+        var response = await apiClient.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter));
+        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        result!.TotalCount.Should().Be(60);
+
+
+        // Arrange - Don't set type filter should give the same result
+        searchFilter = new SearchFilterInternalDto
+        {
+            
+        };
+
+        // Act
+        response = await apiClient.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter));
+        result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        result!.TotalCount.Should().Be(60);
+    }
+
+    [Fact]
     public async Task GetObservationsWithUnspontaneousFilterNotUnspontaneous()
     {
         // Arrange

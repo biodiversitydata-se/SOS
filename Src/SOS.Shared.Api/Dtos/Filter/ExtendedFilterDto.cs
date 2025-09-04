@@ -8,7 +8,8 @@
             ShowOnlyMerged,
             ShowBoth,
             DoNotShowSightingsInMerged,
-            DoNotShowMergedIncludeReplacementChilds
+            DoNotShowMergedIncludeReplacementChilds,
+            Default
         }
 
         public enum SightingUnspontaneousFilterDto
@@ -94,7 +95,7 @@
 
         public DateTime? ReportedDateFrom { get; set; }
         public DateTime? ReportedDateTo { get; set; }
-        public SightingTypeFilterDto TypeFilter { get; set; } = SightingTypeFilterDto.DoNotShowMerged;
+        public SightingTypeFilterDto TypeFilter { get; set; } = SightingTypeFilterDto.Default;
 
         public bool UsePeriodForAllYears { get; set; } = false;
         public IEnumerable<int>? Months { get; set; }
