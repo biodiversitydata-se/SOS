@@ -33,7 +33,7 @@ try
     bool isDevelopment = new[] { "local", "dev", "st" }.Contains(env?.ToLower(), StringComparer.CurrentCultureIgnoreCase);
     bool disableHangfireInit = Environment.GetEnvironmentVariable("DISABLE_HANGFIRE_INIT").GetBoolean();
     bool useLocalHangfire = Environment.GetEnvironmentVariable("USE_LOCAL_HANGFIRE").GetBoolean();
-    bool disableHealthCheckInit = Environment.GetEnvironmentVariable("DISABLE_HEALTHCHECK_INIT").GetBoolean();
+    bool disableHealthCheckInit = false; //Environment.GetEnvironmentVariable("DISABLE_HEALTHCHECK_INIT").GetBoolean();
     bool disableCachedTaxonSumAggregationInit = Environment.GetEnvironmentVariable("DISABLE_CACHED_TAXON_SUM_INIT").GetBoolean();
 
     // Setup logging

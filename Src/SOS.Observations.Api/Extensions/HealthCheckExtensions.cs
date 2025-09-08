@@ -48,7 +48,8 @@ namespace SOS.Shared.Api.Extensions.Dto
                     //.AddCheck<DuplicateHealthCheck>("Duplicate observations", tags: new[] { "elasticsearch", "harvest" })
                     .AddCheck<ElasticsearchHealthCheck>("Elasticsearch", tags: new[] { "database", "elasticsearch" })
                     .AddCheck<DependenciesHealthCheck>("Dependencies", tags: new[] { "dependencies" })                    
-                    .AddCheck<HealthCheck>("CustomHealthCheck", tags: new[] { "k8s" });
+                    .AddCheck<HealthCheck>("CustomHealthCheck", tags: new[] { "k8s" })
+                    .AddCheck<IncrementalHarvestHealthCheck>("Incremental harvest", tags: new[] { "harvest" });
 
                 if (isProductionEnvironment)
                 {
