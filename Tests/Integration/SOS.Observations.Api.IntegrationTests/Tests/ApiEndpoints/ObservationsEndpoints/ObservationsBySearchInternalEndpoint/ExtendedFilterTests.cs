@@ -7,6 +7,7 @@ using SOS.Shared.Api.Dtos.Filter;
 using SOS.Observations.Api.IntegrationTests.Setup;
 using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
 using SOS.Observations.Api.IntegrationTests.Helpers;
+using SOS.Lib.Enums.VocabularyValues;
 
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsEndpoints.ObservationsBySearchInternalEndpoint;
 
@@ -1363,6 +1364,55 @@ public class ExtendedFilterTests : TestBase
     }
 
     [Fact]
+    public async Task GetObservationsWithTypeFilterDefault()
+    {
+        // Arrange
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+           .All()
+               .HaveValuesFromPredefinedObservations()
+            .TheFirst(60)
+                .With(o => o.SightingTypeSearchGroupId = (int)Lib.Enums.Artportalen.SightingTypeSearchGroup.AggregatedChild)
+            .TheNext(20)
+                 .With(o => o.SightingTypeSearchGroupId = (int)Lib.Enums.Artportalen.SightingTypeSearchGroup.Aggregated)
+            .TheNext(20)
+                .With(o => o.SightingTypeSearchGroupId = (int)Lib.Enums.Artportalen.SightingTypeSearchGroup.ReplacementChild)
+           .Build();
+
+        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
+        var apiClient = TestFixture.CreateApiClient();
+        var searchFilter = new SearchFilterInternalDto
+        {
+            ExtendedFilter = new ExtendedFilterDto
+            {
+                TypeFilter = ExtendedFilterDto.SightingTypeFilterDto.Default
+            }
+        };
+
+        // Act
+        var response = await apiClient.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter));
+        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        result!.TotalCount.Should().Be(60);
+
+
+        // Arrange - Don't set type filter should give the same result
+        searchFilter = new SearchFilterInternalDto
+        {
+            
+        };
+
+        // Act
+        response = await apiClient.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter));
+        result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        result!.TotalCount.Should().Be(60);
+    }
+
+    [Fact]
     public async Task GetObservationsWithUnspontaneousFilterNotUnspontaneous()
     {
         // Arrange
@@ -1958,5 +2008,62 @@ public class ExtendedFilterTests : TestBase
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         result!.TotalCount.Should().Be(60);
+    }
+
+    [Fact]
+    public async Task ObservationsBySearchInternalEndpoint_ReturnsExpectedObservations_WhenFilteringByInvasiveSpeciesTreatmentIds()
+    {
+        // Arrange
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+            .All().HaveValuesFromPredefinedObservations()
+            .TheFirst(20).With(o => o.Projects = new[] { new Lib.Models.Verbatim.Artportalen.Project() { Id = 1 } })
+             .TheNext(20).With(o => o.Projects = new[] { new Lib.Models.Verbatim.Artportalen.Project() { Id = 2 } })
+             .TheNext(20).With(o => o.Projects = null)
+             .TheNext(20).With(o => o.Projects = new[] { new Lib.Models.Verbatim.Artportalen.Project() { Id = 5865,
+                 ProjectParameters = new List<Lib.Models.Verbatim.Artportalen.ProjectParameter>
+                 {
+                     new Lib.Models.Verbatim.Artportalen.ProjectParameter { Id = 1, Name = "Åtgärd", Value = "Uppföljning" },
+                     new Lib.Models.Verbatim.Artportalen.ProjectParameter { Id = 2, Name = "Kemisk åtgärd", Value = "Ja" }
+                 } 
+             }})
+            .TheLast(20).With(o => o.Projects = new[] { new Lib.Models.Verbatim.Artportalen.Project() { Id = 5444 } })
+            .Build();
+        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
+        var apiClient = TestFixture.CreateApiClient();
+        var searchFilter = new SearchFilterInternalDto
+        {
+            ExtendedFilter = new ExtendedFilterDto
+            {
+                InvasiveSpeciesTreatmentIds = new[] { (int)InvasiveSpeciesTreatmentId.FollowUpChemical }
+            }
+        };
+
+        // Act
+        var response = await apiClient.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter));
+        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        result!.TotalCount.Should().Be(20,
+            because: "20 observations has InvasiveSpeciesTreatment with value FollowUpChemical");
+
+
+        // Arrange test with different search criteria
+        searchFilter = new SearchFilterInternalDto
+        {
+            ExtendedFilter = new ExtendedFilterDto
+            {
+                InvasiveSpeciesTreatmentIds = new[] { (int)InvasiveSpeciesTreatmentId.FollowUpChemical, (int)InvasiveSpeciesTreatmentId.TreatmentAccordingToComment }
+            }
+        };
+
+        // Act
+        response = await apiClient.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter));
+        result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        result!.TotalCount.Should().Be(40,
+            because: "40 observations has InvasiveSpeciesTreatment with value FollowUpChemical or TreatmentAccordingToComment");
     }
 }

@@ -130,7 +130,7 @@ namespace SOS.Process.LiveIntegrationTests.Processors.Artportalen
                 new AreaConfiguration(),
                 new AreaRepository(processClient, new NullLogger<AreaRepository>()));
             var diffusionManager = new DiffusionManager(areaHelper, new NullLogger<DiffusionManager>());
-            var processManager = new ProcessManager(processConfiguration);
+            var processManager = new ProcessManager(processConfiguration, new NullLogger<ProcessManager>());
             var processTimeManager = new ProcessTimeManager(processConfiguration);
             var artportalenConfiguration = GetArtportalenConfiguration();
             var artportalenDataService = new ArtportalenDataService(artportalenConfiguration, new NullLogger<ArtportalenDataService>());

@@ -1,0 +1,268 @@
+{
+  "Id": 29,
+  "Name": "InvasiveSpeciesTreatmentVocabulary",
+  "Localized": true,
+  "Values": [
+    {
+      "Id": 0,
+      "Value": "treatment (biological)",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "Åtgärd (Biologisk)"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "Treatment (Biological)"
+        }
+      ]
+    },
+    {
+      "Id": 1,
+      "Value": "treatment (mechanical)",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "Åtgärd (Mekanisk)"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "Treatment (Mechanical)"
+        }
+      ]
+    },
+    {
+      "Id": 2,
+      "Value": "treatment (chemical)",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "Åtgärd (Kemisk)"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "Treatment (Chemical)"
+        }
+      ]
+    },
+    {
+      "Id": 3,
+      "Value": "treatment (other)",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "Åtgärd (annan åtgärd)"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "Treatment (Other)"
+        }
+      ]
+    },
+    {
+      "Id": 4,
+      "Value": "treatment (according to comment)",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "Åtgärd (enligt kommentar)"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "Treatment (According to Comment)"
+        }
+      ]
+    },
+    {
+      "Id": 5,
+      "Value": "follow-up (biological)",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "Uppföljning (Biologisk)"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "Follow-up (Biological)"
+        }
+      ]
+    },
+    {
+      "Id": 6,
+      "Value": "follow-up (mechanical)",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "Uppföljning (Mekanisk)"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "Follow-up (Mechanical)"
+        }
+      ]
+    },
+    {
+      "Id": 7,
+      "Value": "follow-up (chemical)",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "Uppföljning (Kemisk)"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "Follow-up (Chemical)"
+        }
+      ]
+    },
+    {
+      "Id": 8,
+      "Value": "follow-up (none/other)",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "Uppföljning (ingen/annan åtgärd)"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "Follow-up (None/Other)"
+        }
+      ]
+    },
+    {
+      "Id": 9,
+      "Value": "follow-up and restoration (biological)",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "Uppföljning och återställande (Biologisk)"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "Follow-up and Restoration (Biological)"
+        }
+      ]
+    },
+    {
+      "Id": 10,
+      "Value": "follow-up and restoration (mechanical)",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "Uppföljning och återställande (Mekanisk)"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "Follow-up and Restoration (Mechanical)"
+        }
+      ]
+    },
+    {
+      "Id": 11,
+      "Value": "follow-up and restoration (chemical)",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "Uppföljning och återställande (Kemisk)"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "Follow-up and Restoration (Chemical)"
+        }
+      ]
+    },
+    {
+      "Id": 12,
+      "Value": "follow-up and restoration (other)",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "Uppföljning och återställande (annan)"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "Follow-up and Restoration (Other)"
+        }
+      ]
+    }
+  ],
+  "ExternalSystemsMapping": [
+    {
+      "Id": 0,
+      "Name": "Artportalen",
+      "Mappings": [
+        {
+          "Key": "Id",
+          "Description": "Id field mapping",
+          "Values": [
+            {
+              "Value": 0,
+              "SosId": 0
+            },
+            {
+              "Value": 1,
+              "SosId": 1
+            },
+            {
+              "Value": 2,
+              "SosId": 2
+            },
+            {
+              "Value": 3,
+              "SosId": 3
+            },
+            {
+              "Value": 4,
+              "SosId": 4
+            },
+            {
+              "Value": 5,
+              "SosId": 5
+            },
+            {
+              "Value": 6,
+              "SosId": 6
+            },
+            {
+              "Value": 7,
+              "SosId": 7
+            },
+            {
+              "Value": 8,
+              "SosId": 8
+            },
+            {
+              "Value": 9,
+              "SosId": 9
+            },
+            {
+              "Value": 10,
+              "SosId": 10
+            },
+            {
+              "Value": 11,
+              "SosId": 11
+            },
+            {
+              "Value": 12,
+              "SosId": 12
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

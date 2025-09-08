@@ -8,7 +8,8 @@
             ShowOnlyMerged,
             ShowBoth,
             DoNotShowSightingsInMerged,
-            DoNotShowMergedIncludeReplacementChilds
+            DoNotShowMergedIncludeReplacementChilds,
+            Default
         }
 
         public enum SightingUnspontaneousFilterDto
@@ -69,6 +70,13 @@
         public IEnumerable<int>? SexIds { get; set; }
 
         /// <summary>
+        /// Ids of InvasiveSpeciesTreatment to match. 
+        /// If null or empty, no filtering is done.
+        /// Queryable values are available in InvasiveSpeciesTreatment vocabulary.
+        /// </summary>
+        public IEnumerable<int>? InvasiveSpeciesTreatmentIds { get; set; }
+
+        /// <summary>
         /// Only include hits with media associated
         /// </summary>
         public bool OnlyWithMedia { get; set; } = false;
@@ -87,7 +95,7 @@
 
         public DateTime? ReportedDateFrom { get; set; }
         public DateTime? ReportedDateTo { get; set; }
-        public SightingTypeFilterDto TypeFilter { get; set; } = SightingTypeFilterDto.DoNotShowMerged;
+        public SightingTypeFilterDto TypeFilter { get; set; } = SightingTypeFilterDto.Default;
 
         public bool UsePeriodForAllYears { get; set; } = false;
         public IEnumerable<int>? Months { get; set; }

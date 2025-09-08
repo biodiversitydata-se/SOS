@@ -430,6 +430,9 @@ namespace SOS.Lib.Models.Processed.Observation
         public string Project2Values => _observation?.ProjectsSummary?.Project2Values;
         public string DatasetIdentifier => _observation?.DataStewardship?.DatasetIdentifier;
         public string DatasetTitle => _observation?.DataStewardship?.DatasetTitle;
+        public string InvasiveSpeciesTreatment => _observation?.ArtportalenInternal?.InvasiveSpeciesTreatment?.ToString();
+        public int? InvasiveSpeciesTreatmentId => _observation?.ArtportalenInternal?.InvasiveSpeciesTreatment?.Id;
+        public string InvasiveSpeciesTreatmentValue => _observation?.ArtportalenInternal?.InvasiveSpeciesTreatment?.Value;
 
         public string TaxonSecondaryParentDyntaxaTaxonIds => _observation?.Taxon?.SecondaryParentDyntaxaTaxonIds == null
             ? null
@@ -764,6 +767,9 @@ namespace SOS.Lib.Models.Processed.Observation
                 "organism.previousidentifications" => OrganismPreviousIdentifications,
                 "organism.organismremarks" => OrganismOrganismRemarks,
                 "location.pointradiusspatialfit" => _observation?.Location?.PointRadiusSpatialFit,
+                "artportaleninternal.invasivespeciestreatment" => InvasiveSpeciesTreatment,
+                "artportaleninternal.invasivespeciestreatment.id" => InvasiveSpeciesTreatmentId,
+                "artportaleninternal.invasivespeciestreatment.value" => InvasiveSpeciesTreatmentValue,
                 _ => propertyField.IsDynamicCreated ? null! : throw new ArgumentException($"Field is not mapped: \"{propertyField.PropertyPath}\"")
             };
         }

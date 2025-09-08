@@ -183,7 +183,7 @@ namespace SOS.ElasticSearch.Proxy.Extensions
             // Only Artportalen observations with specified default sightingTypeSearchGroupId
             sightingTypeQuery.Add(new Dictionary<string, object>() { { "terms",
                 new Dictionary<string, object>() { { "artportalenInternal.sightingTypeSearchGroupId",
-                    new[] { 1, 4, 16, 32, 128 } } } } }
+                    new[] { 1, 8, 16, 32, 128 } } } } }
             );// Non AP observations don't have sightingTypeSearchGroupId, get them as well
             sightingTypeQuery.Add(
                 new Dictionary<string, object>() { { "bool",

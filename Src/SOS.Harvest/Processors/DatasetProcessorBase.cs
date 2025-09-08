@@ -138,8 +138,8 @@ namespace SOS.Harvest.Processors
                 throw;
             }
             finally
-            {
-                ProcessManager.Release();
+            {                
+                ProcessManager.Release($"{dataProvider}, Batch={startId}-{endId}");
             }
         }
 
@@ -173,9 +173,9 @@ namespace SOS.Harvest.Processors
 
             while (startId <= maxId)
             {
-                await ProcessManager.WaitAsync();
+                var batchEndId = startId + 1000 - 1;                
 
-                var batchEndId = startId + 1000 - 1;
+                await ProcessManager.WaitAsync($"{dataProvider}, Batch={startId}-{batchEndId}");
                 processBatchTasks.Add(ProcessBatchAsync(
                     dataProvider,
                     startId,

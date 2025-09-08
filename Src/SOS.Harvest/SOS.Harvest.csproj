@@ -104,6 +104,9 @@
 		<None Update="Resources\Vocabularies\SensitivityCategoryVocabulary.json">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
+		<None Update="Resources\Vocabularies\InvasiveSpeciesTreatmentVocabulary.json">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
 		<None Update="Resources\Vocabularies\SexVocabulary.json">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>

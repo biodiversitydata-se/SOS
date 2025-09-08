@@ -6,12 +6,12 @@
         /// Release Thread
         /// </summary>
         /// <returns></returns>
-        int Release();
+        int Release(string context);
 
         /// <summary>
         /// Wait for thread to finish
         /// </summary>
         /// <returns></returns>
-        Task WaitAsync();
+        Task<bool> WaitAsync(string context);
     }
 }

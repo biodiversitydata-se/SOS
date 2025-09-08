@@ -119,7 +119,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
             }
             finally
             {
-                ProcessManager.Release();
+                ProcessManager.Release($"{dataProvider}, Batch={startId}-{endId}");
             }
         }
 

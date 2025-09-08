@@ -319,7 +319,7 @@ namespace SOS.Harvest.Processors.Artportalen
                 obs.OwnerInstitutionCode = verbatimObservation.OwnerOrganization?.Translate(Cultures.en_GB, Cultures.sv_SE) ?? "SLU Artdatabanken";
                 obs.PrivateCollection = verbatimObservation.PrivateCollection;
                 obs.Projects = verbatimObservation.Projects?.Select(ArtportalenFactoryHelper.CreateProcessedProject);
-                obs.ProjectsSummary = ArtportalenFactoryHelper.CreateProjectsSummary(obs.Projects);
+                obs.ProjectsSummary = ArtportalenFactoryHelper.CreateProjectsSummary(obs.Projects);                
                 obs.PublicCollection = verbatimObservation.PublicCollection?.Translate(Cultures.en_GB, Cultures.sv_SE);
                 obs.RightsHolder = verbatimObservation.RightsHolder ?? verbatimObservation.OwnerOrganization?.Translate(Cultures.en_GB, Cultures.sv_SE) ?? "Data saknas";
                 obs.RightsHolder = obs.RightsHolder?.Clean();
@@ -491,6 +491,7 @@ namespace SOS.Harvest.Processors.Artportalen
                 obs.ArtportalenInternal.TriggeredObservationRuleReproductionId = verbatimObservation.TriggeredObservationRuleReproductionId;
                 obs.ArtportalenInternal.TriggeredObservationRuleStatusRuleId = verbatimObservation.TriggeredObservationRuleStatusRuleId;
                 obs.ArtportalenInternal.TriggeredObservationRuleUnspontaneous = verbatimObservation.TriggeredObservationRuleUnspontaneous;
+                obs.ArtportalenInternal.InvasiveSpeciesTreatment = GetInvasiveSpeciesTreatment(obs.Projects, verbatimObservation.Projects);
 
                 if (verbatimObservation.Media?.Any() ?? false)
                 {
@@ -584,6 +585,93 @@ namespace SOS.Harvest.Processors.Artportalen
             {
                 throw new Exception($"Error when processing Artportalen verbatim observation with Id={verbatimObservation.Id}, SightingId={verbatimObservation.SightingId}", e);
             }
+        }
+
+        private VocabularyValue? GetInvasiveSpeciesTreatment(IEnumerable<Lib.Models.Processed.Observation.Project>? projects1, IEnumerable<Project>? projects2)
+        {
+            if (projects1 == null || !projects1.Any() || projects2 == null || !projects2.Any()) return null;
+            var iasProject1 = projects1.FirstOrDefault(m => m.Id == 5865); // Naturvårdsdatabasen IAS åtgärder
+            var iasProject2 = projects1.FirstOrDefault(m => m.Id == 5444); // IAS åtgärd
+            if (iasProject1 == null && iasProject2 == null) return null;
+            
+            if (iasProject2 != null)
+            {
+                return new VocabularyValue { Id = (int)InvasiveSpeciesTreatmentId.TreatmentAccordingToComment };
+            }
+
+            if (iasProject1 != null)
+            {
+                var treatmentParameter = iasProject1.ProjectParameters.FirstOrDefault(m => m.Name.Equals("Åtgärd", StringComparison.OrdinalIgnoreCase));
+                var treatmentBiologicalParameter = iasProject1.ProjectParameters.FirstOrDefault(m => m.Name.Equals("Biologisk åtgärd", StringComparison.OrdinalIgnoreCase));
+                var treatmentMechanicalParameter = iasProject1.ProjectParameters.FirstOrDefault(m => m.Name.Equals("Mekanisk åtgärd", StringComparison.OrdinalIgnoreCase));
+                var treatmentChemicalParameter = iasProject1.ProjectParameters.FirstOrDefault(m => m.Name.Equals("Kemisk åtgärd", StringComparison.OrdinalIgnoreCase));
+
+                if (treatmentParameter == null)
+                    return null;                
+
+                switch (treatmentParameter.Value.ToLowerInvariant())
+                {
+                    case "åtgärd":
+                        if (treatmentBiologicalParameter?.Value?.Equals("Ja", StringComparison.OrdinalIgnoreCase) == true)
+                        {
+                            return new VocabularyValue { Id = (int)InvasiveSpeciesTreatmentId.TreatmentBiological };
+                        }
+                        else if (treatmentMechanicalParameter?.Value?.Equals("Ja", StringComparison.OrdinalIgnoreCase) == true)
+                        {
+                            return new VocabularyValue { Id = (int)InvasiveSpeciesTreatmentId.TreatmentMechanical };
+                        }
+                        else if (treatmentChemicalParameter?.Value?.Equals("Ja", StringComparison.OrdinalIgnoreCase) == true)
+                        {
+                            return new VocabularyValue { Id = (int)InvasiveSpeciesTreatmentId.TreatmentChemical };
+                        }
+                        else
+                        {
+                            return new VocabularyValue { Id = (int)InvasiveSpeciesTreatmentId.TreatmentOther };
+                        }
+
+                    case "uppföljning":
+                        if (treatmentBiologicalParameter?.Value?.Equals("Ja", StringComparison.OrdinalIgnoreCase) == true)
+                        {
+                            return new VocabularyValue { Id = (int)InvasiveSpeciesTreatmentId.FollowUpBiological };
+                        }
+                        else if (treatmentMechanicalParameter?.Value?.Equals("Ja", StringComparison.OrdinalIgnoreCase) == true)
+                        {
+                            return new VocabularyValue { Id = (int)InvasiveSpeciesTreatmentId.FollowUpMechanical };
+                        }
+                        else if (treatmentChemicalParameter?.Value?.Equals("Ja", StringComparison.OrdinalIgnoreCase) == true)
+                        {
+                            return new VocabularyValue { Id = (int)InvasiveSpeciesTreatmentId.FollowUpChemical };
+                        }
+                        else
+                        {
+                            return new VocabularyValue { Id = (int)InvasiveSpeciesTreatmentId.FollowUpOther };
+                        }
+
+                    case "uppföljning och återställande":
+                        if (treatmentBiologicalParameter?.Value?.Equals("Ja", StringComparison.OrdinalIgnoreCase) == true)
+                        {
+                            return new VocabularyValue { Id = (int)InvasiveSpeciesTreatmentId.FollowUpAndRestorationBiological };
+                        }
+                        else if (treatmentMechanicalParameter?.Value?.Equals("Ja", StringComparison.OrdinalIgnoreCase) == true)
+                        {
+                            return new VocabularyValue { Id = (int)InvasiveSpeciesTreatmentId.FollowUpAndRestorationMechanical };
+                        }
+                        else if (treatmentChemicalParameter?.Value?.Equals("Ja", StringComparison.OrdinalIgnoreCase) == true)
+                        {
+                            return new VocabularyValue { Id = (int)InvasiveSpeciesTreatmentId.FollowUpAndRestorationChemical };
+                        }
+                        else
+                        {
+                            return new VocabularyValue { Id = (int)InvasiveSpeciesTreatmentId.FollowUpAndRestorationOther };
+                        }
+
+                    default:
+                        return null;
+                }
+
+            }
+
+            return null;
         }
 
         public static int GetDiffusionCoordinateUncertainty(int length)

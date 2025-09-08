@@ -40,7 +40,8 @@ namespace SOS.Lib.Models.Search.Filters
             ShowOnlyMerged,
             ShowBoth,
             DoNotShowSightingsInMerged,
-            DoNotShowMergedIncludeReplacementChilds
+            DoNotShowMergedIncludeReplacementChilds,
+            Default
         }
 
 
@@ -165,7 +166,7 @@ namespace SOS.Lib.Models.Search.Filters
         /// </summary>
         public TaxonFilter Taxa { get; set; }
 
-        public SightingTypeFilter TypeFilter { get; set; } = SightingTypeFilter.DoNotShowMerged;
+        public SightingTypeFilter TypeFilter { get; set; } = SightingTypeFilter.Default;
 
         /// <summary>
         ///     True to return only validated sightings.

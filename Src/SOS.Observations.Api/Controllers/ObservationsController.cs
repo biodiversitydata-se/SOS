@@ -2006,7 +2006,7 @@ namespace SOS.Observations.Api.Controllers
         /// </param>
         /// <returns></returns>
         [HttpPost("Internal/SignalSearch")]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(bool), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.ServiceUnavailable)]

@@ -92,6 +92,13 @@ namespace SOS.Lib.Models.Search.Filters
         public bool? IncludeRealCount { get; set; }
 
         /// <summary>
+        /// Ids of InvasiveSpeciesTreatment to match. 
+        /// If null or empty, no filtering is done.
+        /// Queryable values are available in InvasiveSpeciesTreatment vocabulary.
+        /// </summary>
+        public IEnumerable<int>? InvasiveSpeciesTreatmentIds { get; set; }
+
+        /// <summary>
         /// Only include hits with media associated
         /// </summary>
         public bool OnlyWithMedia { get; set; }
