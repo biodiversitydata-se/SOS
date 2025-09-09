@@ -11,7 +11,6 @@ using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.TaxonTree;
 using SOS.Lib.Repositories.Resource.Interfaces;
-using SOS.Lib.Services.Interfaces;
 
 namespace SOS.Harvest.Processors.Taxon
 {
@@ -348,9 +347,9 @@ namespace SOS.Harvest.Processors.Taxon
                 _logger.LogDebug("Start getting taxa");
                 var dwcTaxa = await _taxonService.GetTaxaAsync();
                 _logger.LogDebug("Finish getting taxa");
-                _logger.LogDebug("Start adding taxon attributes");
+              /*  _logger.LogDebug("Start adding taxon attributes");
                 await AddTaxonAttributesAsync(dwcTaxa);
-                _logger.LogDebug("Finish adding taxon attributes");
+                _logger.LogDebug("Finish adding taxon attributes");*/
                 var taxa = dwcTaxa.ToProcessedTaxa();
 
                 var taxonCount = await _processedTaxonRepository.CountAllDocumentsAsync();

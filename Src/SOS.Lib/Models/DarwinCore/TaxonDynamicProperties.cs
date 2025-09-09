@@ -33,6 +33,11 @@ namespace SOS.Lib.Models.DarwinCore
         public bool? BirdDirective { get; set; }
 
         /// <summary>
+        /// County occurrence status
+        /// </summary>
+        public ICollection<CountyOccurrence> CountyOccurrences { get; set; }
+
+        /// <summary>
         ///     Radius of disturbance
         /// </summary>
         public int DisturbanceRadius { get; set; }
@@ -41,6 +46,16 @@ namespace SOS.Lib.Models.DarwinCore
         /// Id of taxon in GBIF
         /// </summary>
         public int? GbifTaxonId { get; set; }
+
+        /// <summary>
+        /// Organism Label 1
+        /// </summary>
+        public string? OrganismLabel1 { get; set; }
+
+        /// <summary>
+        /// Organism Label 2
+        /// </summary>
+        public string? OrganismLabel2 { get; set; }
 
         /// <summary>
         /// True if alien in sweden according to EU Regulation 1143/2014

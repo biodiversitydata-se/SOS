@@ -30,6 +30,7 @@ using System.Threading.Tasks;
 using System.IO;
 using System.IO.Compression;
 using SOS.Lib.Managers.Interfaces;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace SOS.Observations.Api.Controllers
 {
@@ -123,6 +124,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="confirmEncryptPassword"></param>
         /// <param name="roleId"></param>
         /// <param name="applicationIdentifier"></param>
+        /// <param name="skipMatchCount"></param>
         /// <returns></returns>
         private async Task<(IActionResult Result, long? Count)> OrderValidateAsync(
             SearchFilterBaseDto filter,
@@ -134,7 +136,8 @@ namespace SOS.Observations.Api.Controllers
             string encryptPassword,
             string confirmEncryptPassword,
             int? roleId,
-            string applicationIdentifier)
+            string applicationIdentifier,
+            bool skipMaxCount = false)
         {
             var validationResults = Result.Combine(
                 validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(filter, allowObjectInOutputFields: false)) : Result.Success(),
@@ -151,17 +154,23 @@ namespace SOS.Observations.Api.Controllers
             }
 
             var exportFilter = filter.ToSearchFilter(this.GetUserId(), protectionFilter ?? ProtectionFilterDto.Public, "en-GB");
-            var matchCount = await _observationManager.GetMatchCountAsync(roleId, applicationIdentifier, exportFilter.Clone());
-            if (matchCount == 0)
-            {
-                return (Result: NoContent(), Count: 0);
-            }
+            
+                var matchCount = await _observationManager.GetMatchCountAsync(roleId, applicationIdentifier, exportFilter.Clone());
+                if (matchCount == 0)
+                {
+                    return (Result: NoContent(), Count: 0);
+                }
 
-            if (matchCount > _orderExportObservationsLimit)
+            if (!skipMaxCount)
             {
-                return (Result: BadRequest($"Query exceeds limit of {_orderExportObservationsLimit} observations."), Count: matchCount);
+                if (matchCount > _orderExportObservationsLimit)
+                {
+                    return (Result: BadRequest($"Query exceeds limit of {_orderExportObservationsLimit} observations."), Count: matchCount);
+                }
             }
             this.LogObservationCount(matchCount);
+            
+           
             return (Result: new OkObjectResult(exportFilter), Count: matchCount);            
         }
 
@@ -1770,6 +1779,50 @@ namespace SOS.Observations.Api.Controllers
 
                 userExports.Jobs.Add(exportJobInfo);
                 await UpdateUserExportsAsync(userExports);
+
+                return new OkObjectResult(jobId);
+            }
+            catch (AuthenticationRequiredException)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Running export failed");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+        }
+
+        [HttpPost("Internal/Order/CountyOccurenceReport")]
+        [Authorize]
+        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [InternalApi, AzureInternalApi]
+        public async Task<IActionResult> CreateAndSendCountyOccurrenceReportAsync(
+            [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
+            [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
+            [FromBody] IEnumerable<int> taxonIds,
+            [FromQuery] string description,
+            [FromQuery] string encryptPassword = "",
+            [FromQuery] string confirmEncryptPassword = "")
+        {
+            try
+            {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
+
+                var userInfo = await _userManager.GetBasicUserInformationAsync();
+                var validateResult = _inputValidator.ValidateEncryptPassword(encryptPassword, confirmEncryptPassword, ProtectionFilterDto.BothPublicAndSensitive);
+                if (validateResult.IsFailure)
+                {
+                    return BadRequest(validateResult.Error);
+                }
+               
+                var encryptedPassword = await _cryptoService.EncryptAsync(encryptPassword);
+                var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
+                    job.CreateAndSendCountyOccurrenceReportAsync(userInfo.Id, roleId, authorizationApplicationIdentifier, userInfo.Email, description, encryptedPassword, null, taxonIds, JobCancellationToken.Null));
 
                 return new OkObjectResult(jobId);
             }

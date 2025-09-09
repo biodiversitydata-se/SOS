@@ -81,4 +81,12 @@ namespace SOS.Lib.Enums
             }.Contains(aggregationType);
         }
     }
+
+    public enum AggregationTypes
+    {
+        None,
+        Avg,
+        Min,
+        Max
+    }
 }
