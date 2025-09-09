@@ -95,7 +95,7 @@
 
         public DateTime? ReportedDateFrom { get; set; }
         public DateTime? ReportedDateTo { get; set; }
-        public SightingTypeFilterDto TypeFilter { get; set; } = SightingTypeFilterDto.Default;
+        public SightingTypeFilterDto TypeFilter { get; set; } = SightingTypeFilterDto.DoNotShowMerged;
 
         public bool UsePeriodForAllYears { get; set; } = false;
         public IEnumerable<int>? Months { get; set; }
