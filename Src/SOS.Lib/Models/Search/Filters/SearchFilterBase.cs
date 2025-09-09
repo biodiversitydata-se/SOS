@@ -41,7 +41,7 @@ namespace SOS.Lib.Models.Search.Filters
             ShowBoth,
             DoNotShowSightingsInMerged,
             DoNotShowMergedIncludeReplacementChilds,
-            Default
+            ShowChildrenAndReplacements
         }
 
 

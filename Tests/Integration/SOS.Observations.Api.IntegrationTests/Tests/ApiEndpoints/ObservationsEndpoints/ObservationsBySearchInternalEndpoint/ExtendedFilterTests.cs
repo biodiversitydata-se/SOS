@@ -1364,7 +1364,7 @@ public class ExtendedFilterTests : TestBase
     }
 
     [Fact]
-    public async Task GetObservationsWithTypeFilterDefault()
+    public async Task GetObservationsWithTypeFilterShowChildrenAndReplacements()
     {
         // Arrange
         var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
@@ -1384,7 +1384,7 @@ public class ExtendedFilterTests : TestBase
         {
             ExtendedFilter = new ExtendedFilterDto
             {
-                TypeFilter = ExtendedFilterDto.SightingTypeFilterDto.Default
+                TypeFilter = ExtendedFilterDto.SightingTypeFilterDto.ShowChildrenAndReplacements
             }
         };
 

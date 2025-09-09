@@ -9,7 +9,7 @@
             ShowBoth,
             DoNotShowSightingsInMerged,
             DoNotShowMergedIncludeReplacementChilds,
-            Default
+            ShowChildrenAndReplacements
         }
 
         public enum SightingUnspontaneousFilterDto
