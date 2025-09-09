@@ -166,7 +166,7 @@ namespace SOS.Lib.Models.Search.Filters
         /// </summary>
         public TaxonFilter Taxa { get; set; }
 
-        public SightingTypeFilter TypeFilter { get; set; } = SightingTypeFilter.Default;
+        public SightingTypeFilter TypeFilter { get; set; } = SightingTypeFilter.DoNotShowMerged;
 
         /// <summary>
         ///     True to return only validated sightings.
