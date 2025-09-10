@@ -655,13 +655,19 @@ namespace SOS.Lib
                             (int)SightingTypeSearchGroup.AssessmentChild,
                             (int)SightingTypeSearchGroup.Replacement,
                             (int)SightingTypeSearchGroup.OwnBreedingAssessment },
-                        _ => new[] { // 1, 8, 16, 32, 128 Default
+                        SearchFilterBase.SightingTypeFilter.ShowChildrenAndReplacements => new[] { // 1, 8, 16, 32, 256 ShowChildrenAndReplacements
                             (int)SightingTypeSearchGroup.Ordinary,
                             (int)SightingTypeSearchGroup.AggregatedChild,
                             (int)SightingTypeSearchGroup.AssessmentChild,
                             (int)SightingTypeSearchGroup.Replacement,
-                            (int)SightingTypeSearchGroup.OwnBreedingAssessment }
-                        };
+                            (int)SightingTypeSearchGroup.OwnBreedingAssessmentChild },
+                        _ => new[] { // Default to DoNotShowMerged
+                            (int)SightingTypeSearchGroup.Ordinary,
+                            (int)SightingTypeSearchGroup.Aggregated,
+                            (int)SightingTypeSearchGroup.AssessmentChild,
+                            (int)SightingTypeSearchGroup.Replacement,
+                            (int)SightingTypeSearchGroup.OwnBreedingAssessment },
+                    };
 
             var sightingTypeQueries = new List<Action<QueryDescriptor<TQueryDescriptor>>>();
             sightingTypeQueries.TryAddTermsCriteria("artportalenInternal.sightingTypeSearchGroupId", sightingTypeSearchGroupFilter);
