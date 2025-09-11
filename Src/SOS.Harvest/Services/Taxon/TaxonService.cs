@@ -164,9 +164,7 @@ namespace SOS.Harvest.Services.Taxon
             .Map(t => t.Natura2000HabitatsDirectiveArticle5, 26)
             .Map(t => t.ProtectedByLaw, 27)
             .Map(t => t.SwedishOccurrence, 28)
-            .Map(t => t.SwedishHistory, 29)
-            .Map(t => t.SwedishHistoryId, 30)
-            .Map(t => t.SwedishHistoryCategory, 31);
+            .Map(t => t.SwedishHistory, 29);
 
         private IVariableLengthReaderBuilder<DarwinCoreTaxonName> TaxonNamePropertiesMapping =>
             new VariableLengthReaderBuilder<DarwinCoreTaxonName>()
@@ -393,17 +391,14 @@ namespace SOS.Harvest.Services.Taxon
                     RedlistCategory = m.RedlistCategory,
                     RiskLista = m.RiskLista,
                     ScientificName = m.ScientificName,
-                    SortOrder = m.SortOrder,
                     SwedishHistory = m.SwedishHistory,
-                    SwedishHistoryId = m.SwedishHistoryId,
-                    SwedishHistoryCategory = m.SwedishHistoryCategory,
                     SwedishOccurrence = m.SwedishOccurrence, 
                     TaxonCategoryId = m.TaxonCategoryId,
                     TaxonCategorySwedishName = m.TaxonCategorySwedishName,
                     TaxonCategoryEnglishName = m.TaxonCategoryEnglishName,
                     TaxonCategoryDarwinCoreName = m.TaxonCategoryDarwinCoreName,
-                    TaxonId = GetTaxonIdfromDyntaxaGuid(m.TaxonId),
-                    VernacularName = m.VernacularName
+                    SortOrder = m.SortOrder,
+                    TaxonId = GetTaxonIdfromDyntaxaGuid(m.TaxonId)
                 });
             csvFileHelper.FinishRead();
             var taxonPropertiesById = allTaxonProperties
@@ -413,25 +408,22 @@ namespace SOS.Harvest.Services.Taxon
             {
                 if (taxonPropertiesById.TryGetValue(taxon.DynamicProperties.DyntaxaTaxonId, out var taxonProperties))
                 {
-                    taxon.DynamicProperties.ActionPlan = taxonProperties.ActionPlan;
-                    taxon.DynamicProperties.BirdDirective = taxonProperties.BirdDirective;
-                    taxon.DynamicProperties.DisturbanceRadius = taxonProperties.DisturbanceRadius ?? 0;
-                    taxon.DynamicProperties.IsEURegulation_1143_2014 = taxonProperties.EuRegulation_1143_2014;
                     taxon.DynamicProperties.IsInvasiveInSweden = taxonProperties.IsInvasiveInSweden;
+                    taxon.DynamicProperties.BirdDirective = taxonProperties.BirdDirective;
                     taxon.DynamicProperties.GbifTaxonId = taxonProperties.GbifTaxonId;
+                    taxon.DynamicProperties.ActionPlan = string.IsNullOrEmpty(taxonProperties.ActionPlan) ? null : taxonProperties.ActionPlan;
+                    taxon.DynamicProperties.DisturbanceRadius = taxonProperties.DisturbanceRadius.GetValueOrDefault(0);
+                    taxon.DynamicProperties.OrganismGroup = string.IsNullOrEmpty(taxonProperties.OrganismLabel1) ? null : taxonProperties.OrganismLabel1;
+                    taxon.DynamicProperties.InvasiveRiskAssessmentCategory = string.IsNullOrEmpty(taxonProperties.InvasiveRiskAssessmentCategory) ? null : taxonProperties.InvasiveRiskAssessmentCategory;
                     taxon.DynamicProperties.Natura2000HabitatsDirectiveArticle2 = taxonProperties.Natura2000HabitatsDirectiveArticle2;
                     taxon.DynamicProperties.Natura2000HabitatsDirectiveArticle4 = taxonProperties.Natura2000HabitatsDirectiveArticle4;
                     taxon.DynamicProperties.Natura2000HabitatsDirectiveArticle5 = taxonProperties.Natura2000HabitatsDirectiveArticle5;
-                    taxon.DynamicProperties.OrganismGroup = taxonProperties.OrganismLabel1;
-                    taxon.DynamicProperties.OrganismLabel1 = taxonProperties.OrganismLabel1;
-                    taxon.DynamicProperties.OrganismLabel2 = taxonProperties.OrganismLabel2;
+                    taxon.DynamicProperties.ProtectionLevel = taxonProperties.ProtectionLevel.GetValueOrDefault();
+                    taxon.DynamicProperties.IsEURegulation_1143_2014 = taxonProperties.EuRegulation_1143_2014;
+                    taxon.DynamicProperties.RedlistCategory = string.IsNullOrEmpty(taxonProperties.RedlistCategory) ? null : taxonProperties.RedlistCategory.Substring(0,2);
+                    taxon.DynamicProperties.SwedishOccurrence = string.IsNullOrEmpty(taxonProperties.SwedishOccurrence) ? null : taxonProperties.SwedishOccurrence;
+                    taxon.DynamicProperties.SwedishHistory = string.IsNullOrEmpty(taxonProperties.SwedishHistory) ? null : taxonProperties.SwedishHistory;
                     taxon.DynamicProperties.ProtectedByLaw = taxonProperties.ProtectedByLaw;
-                    taxon.DynamicProperties.ProtectionLevel = taxonProperties.ProtectionLevel?.ToString();
-                    taxon.DynamicProperties.RedlistCategory = taxonProperties.RedlistCategory;
-                    taxon.DynamicProperties.SwedishHistory = taxonProperties.SwedishHistory;
-                    taxon.DynamicProperties.SwedishHistoryId = taxonProperties.SwedishHistoryId;
-                    taxon.DynamicProperties.SwedishHistoryCategory = taxonProperties.SwedishHistoryCategory;
-                    taxon.DynamicProperties.SwedishOccurrence = taxonProperties.SwedishOccurrence;
                     taxon.DynamicProperties.TaxonCategoryId = taxonProperties.TaxonCategoryId;
                     taxon.DynamicProperties.TaxonCategorySwedishName = taxonProperties.TaxonCategorySwedishName;
                     taxon.DynamicProperties.TaxonCategoryEnglishName = taxonProperties.TaxonCategoryEnglishName;

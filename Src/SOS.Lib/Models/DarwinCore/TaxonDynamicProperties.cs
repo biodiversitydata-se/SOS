@@ -48,16 +48,6 @@ namespace SOS.Lib.Models.DarwinCore
         public int? GbifTaxonId { get; set; }
 
         /// <summary>
-        /// Organism Label 1
-        /// </summary>
-        public string? OrganismLabel1 { get; set; }
-
-        /// <summary>
-        /// Organism Label 2
-        /// </summary>
-        public string? OrganismLabel2 { get; set; }
-
-        /// <summary>
         /// True if alien in sweden according to EU Regulation 1143/2014
         /// </summary>
         public bool IsEURegulation_1143_2014 { get; set; }
@@ -66,6 +56,11 @@ namespace SOS.Lib.Models.DarwinCore
         /// True if in EU list or in risk list and classified as severe or high risk
         /// </summary>
         public bool IsInvasiveInSweden { get; set; }
+
+        /// <summary>
+        /// Risk classification
+        /// </summary>
+        public string InvasiveRiskAssessmentCategory { get; set; }
 
         /// <summary>
         ///     part of Habitats directive article 2
@@ -95,7 +90,7 @@ namespace SOS.Lib.Models.DarwinCore
         /// <summary>
         ///     True if taxon is protected by law
         /// </summary>
-        public string ProtectionLevel { get; set; }
+        public int ProtectionLevel { get; set; }
 
         /// <summary>
         ///     Redlist category
