@@ -9,7 +9,6 @@ using SOS.Lib.Database;
 using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Repositories.Verbatim;
-using SOS.Lib.Services;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -40,15 +39,10 @@ namespace SOS.Process.LiveIntegrationTests.Jobs
                 BaseAddress = "https://taxonapi.artdata.slu.se/darwincore/download?version=custom"
             };
             var taxonService = new TaxonService(new TaxonServiceProxy(), taxonServiceConfiguration, new NullLogger<TaxonService>());
-            var taxonAttributeService = new TaxonAttributeService(new HttpClientService(new NullLogger<HttpClientService>()), new TaxonAttributeServiceConfiguration()
-            {
-                AcceptHeaderContentType = "application/json",
-                BaseAddress = "https://taxonattributeservice.artdata.slu.se/api"
-            }, new NullLogger<TaxonAttributeService>());
             var processedTaxonRepositoryMock = new Mock<ITaxonRepository>();
             var apTaxonRepositoryMock = new Mock<Harvest.Repositories.Source.Artportalen.Interfaces.ITaxonRepository>();
             var processConfiguration = new ProcessConfiguration() { NoOfThreads = 1 };
-            var taxonProcessor = new TaxonProcessor(taxonService, taxonAttributeService, processedTaxonRepositoryMock.Object, apTaxonRepositoryMock.Object,  processConfiguration, new NullLogger<TaxonProcessor>());
+            var taxonProcessor = new TaxonProcessor(taxonService, processedTaxonRepositoryMock.Object, apTaxonRepositoryMock.Object,  processConfiguration, new NullLogger<TaxonProcessor>());
 
             var harvestInfoRepository =
                 new HarvestInfoRepository(verbatimClient, new NullLogger<HarvestInfoRepository>());
