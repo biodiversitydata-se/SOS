@@ -103,6 +103,7 @@ public static class DependencyInjectionExtensions
         services.AddSingleton<IDataProviderCache, DataProviderCache>();
         services.AddSingleton<ICache<int, ProjectInfo>, ProjectCache>();
         services.AddSingleton<ICache<VocabularyId, Vocabulary>, VocabularyCache>();
+        services.AddSingleton<ICache<int, Taxon>, TaxonCache>();
         services.AddSingleton<ICache<int, TaxonList>, TaxonListCache>();
         services.AddSingleton<ICache<string, ProcessedConfiguration>, ProcessedConfigurationCache>();
         services.AddSingleton<IClassCache<TaxonTree<IBasicTaxon>>, ClassCache<TaxonTree<IBasicTaxon>>>();

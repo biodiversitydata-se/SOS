@@ -296,6 +296,52 @@ namespace SOS.Export.Managers
         }
 
         /// <inheritdoc />
+        public async Task<ZendToResponse> CreateAndSendCountyOccurrenceReportAsync(
+            int? roleId,
+            string authorizationApplicationIdentifier,
+            string email,
+            string description,
+            string password,
+            PerformContext context,
+            IEnumerable<int> taxonIds,
+            IJobCancellationToken cancellationToken)
+        {
+            FileExportResult fileExportResult = null;
+            var exportPath = Path.Combine(_exportPath, Guid.NewGuid().ToString());
+            try
+            {
+                var fileName = $"County occurrence {DateTime.Now.ToString("yyyy-MM-dd HH.mm")}";
+                fileExportResult = await _csvWriter.CreateCountyOccurrenceReportAsync(
+                    roleId,
+                    authorizationApplicationIdentifier,
+                    fileName,
+                    exportPath,
+                    taxonIds,
+                    cancellationToken);
+
+                // zend file to user
+                return await _zendToService.SendFile(
+                    email,
+                    description,
+                    fileExportResult.FilePath,
+                    ExportFormat.Csv,
+                    true,
+                    true,
+                    true,
+                    password);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to create county occurrence report");
+                return new ZendToResponse();
+            }
+            finally
+            {
+                _fileService.DeleteDirectory(exportPath);
+            }
+        }
+
+        /// <inheritdoc />
         public async Task<ZendToResponse> ExportAndSendAsync(
             int? roleId,
             string authorizationApplicationIdentifier,
@@ -520,6 +566,6 @@ namespace SOS.Export.Managers
             {
                 _fileService.DeleteDirectory(exportPath);
             }
-        }
+        } 
     }
 }

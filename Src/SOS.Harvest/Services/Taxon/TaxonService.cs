@@ -75,7 +75,8 @@ namespace SOS.Harvest.Services.Taxon
                     "Taxon.csv",
                     "TaxonNameProperties.csv",
                     "TaxonRelations.csv",
-                    "TaxonProperties.csv" }
+                    "TaxonProperties.csv",
+                    "TaxonCountyOccurrence.csv"}
                 .Where(f => !zipArchive.Entries.Select(e => e.Name).Contains(f, StringComparer.CurrentCultureIgnoreCase))
                 .Select(f => f);
 
@@ -90,6 +91,7 @@ namespace SOS.Harvest.Services.Taxon
                 AddNames(taxa, zipArchive, csvFieldDelimiter);
                 AddTaxonRelations(taxa, zipArchive, csvFieldDelimiter);
                 AddTaxonProperties(taxa, zipArchive, csvFieldDelimiter);
+                AddCountyOccurrence(taxa, zipArchive, csvFieldDelimiter);
                 return taxa.Values;
             }
             catch (Exception e)
@@ -125,6 +127,12 @@ namespace SOS.Harvest.Services.Taxon
         private IVariableLengthReaderBuilder<TaxonSortOrder<string>> TaxonSortOrderMapping => new VariableLengthReaderBuilder<TaxonSortOrder<string>>()
             .Map(t => t.TaxonId, indexColumn: 0)
             .Map(t => t.SortOrder, 1);
+
+        private IVariableLengthReaderBuilder<TaxonCountyOccurrence<string>> TaxonCountyOccurrenceMapping => new VariableLengthReaderBuilder<TaxonCountyOccurrence<string>>()
+            .Map(t => t.TaxonId, indexColumn: 0)
+            .Map(t => t.CountyId, 1)
+            .Map(t => t.County, 2)
+            .Map(t => t.Status, 3);
 
         private IVariableLengthReaderBuilder<TaxonProperties<string>> TaxonPropertiesMapping => new VariableLengthReaderBuilder<TaxonProperties<string>>()
             .Map(t => t.TaxonId, indexColumn: 0)
@@ -362,15 +370,35 @@ namespace SOS.Harvest.Services.Taxon
                 .GetRecords(TaxonPropertiesMapping)
                 .Select(m => new TaxonProperties<int>
                 {
+                    ActionPlan = m.ActionPlan,
+                    BannedForReporting = m.BannedForReporting,
+                    BirdDirective = m.BirdDirective,
+                    DisturbanceRadius = m.DisturbanceRadius,
+                    EuRegulation_1143_2014 = m.EuRegulation_1143_2014,
+                    ExcludeFromReportingSystem = m.ExcludeFromReportingSystem,
+                    InvasiveRiskAssessmentCategory = m.InvasiveRiskAssessmentCategory,
                     IsInvasiveInSweden = m.IsInvasiveInSweden,
+                    IucnRedlistCategory = m.IucnRedlistCategory,
+                    IucnRedlistCategoryDerived = m.IucnRedlistCategoryDerived,
                     GbifTaxonId = m.GbifTaxonId,
+                    Natura2000HabitatsDirectiveArticle2 = m.Natura2000HabitatsDirectiveArticle2,
+                    Natura2000HabitatsDirectiveArticle4 = m.Natura2000HabitatsDirectiveArticle4,
+                    Natura2000HabitatsDirectiveArticle5 = m.Natura2000HabitatsDirectiveArticle5,
+                    OrganismLabel1 = m.OrganismLabel1,
+                    OrganismLabel2 = m.OrganismLabel2,
                     ProtectedByLaw = m.ProtectedByLaw,
+                    ProtectionLevel = m.ProtectionLevel,
+                    RedlistCategory = m.RedlistCategory,
+                    RiskLista = m.RiskLista,
+                    ScientificName = m.ScientificName,
+                    SwedishHistory = m.SwedishHistory,
+                    SwedishOccurrence = m.SwedishOccurrence, 
                     TaxonCategoryId = m.TaxonCategoryId,
                     TaxonCategorySwedishName = m.TaxonCategorySwedishName,
                     TaxonCategoryEnglishName = m.TaxonCategoryEnglishName,
                     TaxonCategoryDarwinCoreName = m.TaxonCategoryDarwinCoreName,
                     SortOrder = m.SortOrder,
-                    TaxonId = GetTaxonIdfromDyntaxaGuid(m.TaxonId),
+                    TaxonId = GetTaxonIdfromDyntaxaGuid(m.TaxonId)
                 });
             csvFileHelper.FinishRead();
             var taxonPropertiesById = allTaxonProperties
@@ -381,8 +409,21 @@ namespace SOS.Harvest.Services.Taxon
                 if (taxonPropertiesById.TryGetValue(taxon.DynamicProperties.DyntaxaTaxonId, out var taxonProperties))
                 {
                     taxon.DynamicProperties.IsInvasiveInSweden = taxonProperties.IsInvasiveInSweden;
-                    taxon.DynamicProperties.ProtectedByLaw = taxonProperties.ProtectedByLaw;
+                    taxon.DynamicProperties.BirdDirective = taxonProperties.BirdDirective;
                     taxon.DynamicProperties.GbifTaxonId = taxonProperties.GbifTaxonId;
+                    taxon.DynamicProperties.ActionPlan = string.IsNullOrEmpty(taxonProperties.ActionPlan) ? null : taxonProperties.ActionPlan;
+                    taxon.DynamicProperties.DisturbanceRadius = taxonProperties.DisturbanceRadius.GetValueOrDefault(0);
+                    taxon.DynamicProperties.OrganismGroup = string.IsNullOrEmpty(taxonProperties.OrganismLabel1) ? null : taxonProperties.OrganismLabel1;
+                    taxon.DynamicProperties.InvasiveRiskAssessmentCategory = string.IsNullOrEmpty(taxonProperties.InvasiveRiskAssessmentCategory) ? null : taxonProperties.InvasiveRiskAssessmentCategory;
+                    taxon.DynamicProperties.Natura2000HabitatsDirectiveArticle2 = taxonProperties.Natura2000HabitatsDirectiveArticle2;
+                    taxon.DynamicProperties.Natura2000HabitatsDirectiveArticle4 = taxonProperties.Natura2000HabitatsDirectiveArticle4;
+                    taxon.DynamicProperties.Natura2000HabitatsDirectiveArticle5 = taxonProperties.Natura2000HabitatsDirectiveArticle5;
+                    taxon.DynamicProperties.ProtectionLevel = taxonProperties.ProtectionLevel.GetValueOrDefault();
+                    taxon.DynamicProperties.IsEURegulation_1143_2014 = taxonProperties.EuRegulation_1143_2014;
+                    taxon.DynamicProperties.RedlistCategory = string.IsNullOrEmpty(taxonProperties.RedlistCategory) ? null : taxonProperties.RedlistCategory.Substring(0,2);
+                    taxon.DynamicProperties.SwedishOccurrence = string.IsNullOrEmpty(taxonProperties.SwedishOccurrence) ? null : taxonProperties.SwedishOccurrence;
+                    taxon.DynamicProperties.SwedishHistory = string.IsNullOrEmpty(taxonProperties.SwedishHistory) ? null : taxonProperties.SwedishHistory;
+                    taxon.DynamicProperties.ProtectedByLaw = taxonProperties.ProtectedByLaw;
                     taxon.DynamicProperties.TaxonCategoryId = taxonProperties.TaxonCategoryId;
                     taxon.DynamicProperties.TaxonCategorySwedishName = taxonProperties.TaxonCategorySwedishName;
                     taxon.DynamicProperties.TaxonCategoryEnglishName = taxonProperties.TaxonCategoryEnglishName;
@@ -393,6 +434,53 @@ namespace SOS.Harvest.Services.Taxon
             _logger.LogDebug("Finish adding taxon properties to taxon");
         }
 
+        
+        private void AddCountyOccurrence(
+            Dictionary<string, DarwinCoreTaxon> taxa,
+            ZipArchive zipArchive,
+            string csvFieldDelimiter)
+        {
+            _logger.LogDebug("Start adding county occurrence to taxon");
+            // Try to get TaxonCountyOccurrence.csv
+            var countyOccurrencesFile = zipArchive.Entries.FirstOrDefault(f =>
+                f.Name.Equals("TaxonCountyOccurrence.csv", StringComparison.CurrentCultureIgnoreCase));
+
+            if (countyOccurrencesFile == null)
+            {
+                _logger.LogError("Failed to open TaxonCountyOccurrence.csv");
+                return; // If no county occurrence file found, we can't do anything more
+            }
+            // Read taxon properties data
+            using var csvFileHelper = new CsvFileHelper();
+            csvFileHelper.InitializeRead(countyOccurrencesFile.Open(), csvFieldDelimiter);
+
+            // Get taxon properties by guid
+            var allCountyOccurrences = csvFileHelper
+                .GetRecords(TaxonCountyOccurrenceMapping)
+                .Select(m => new TaxonCountyOccurrence<string>
+                {
+                    CountyId = m.CountyId,
+                    County = m.County,
+                    Status = m.Status,
+                    TaxonId = m.TaxonId
+                });
+            csvFileHelper.FinishRead();
+
+            foreach (var countyOccurrence in allCountyOccurrences)
+            {
+                if (taxa.TryGetValue(countyOccurrence.TaxonId, out var taxon))
+                {
+                    taxon.DynamicProperties ??= new TaxonDynamicProperties();
+                    taxon.DynamicProperties.CountyOccurrences ??= new List<CountyOccurrence>();
+                    taxon.DynamicProperties.CountyOccurrences.Add(new CountyOccurrence { 
+                        County = countyOccurrence.County,
+                        Id = countyOccurrence.CountyId,
+                        Status = countyOccurrence.Status
+                    });
+                }
+            }
+            _logger.LogDebug("Finish adding county occurrence to taxon");
+        }
 
         /// <summary>
         /// Reads vernacular names from zip file and adds them to taxa.

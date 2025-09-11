@@ -33,6 +33,11 @@ namespace SOS.Lib.Models.DarwinCore
         public bool? BirdDirective { get; set; }
 
         /// <summary>
+        /// County occurrence status
+        /// </summary>
+        public ICollection<CountyOccurrence> CountyOccurrences { get; set; }
+
+        /// <summary>
         ///     Radius of disturbance
         /// </summary>
         public int DisturbanceRadius { get; set; }
@@ -51,6 +56,11 @@ namespace SOS.Lib.Models.DarwinCore
         /// True if in EU list or in risk list and classified as severe or high risk
         /// </summary>
         public bool IsInvasiveInSweden { get; set; }
+
+        /// <summary>
+        /// Risk classification
+        /// </summary>
+        public string InvasiveRiskAssessmentCategory { get; set; }
 
         /// <summary>
         ///     part of Habitats directive article 2
@@ -80,7 +90,7 @@ namespace SOS.Lib.Models.DarwinCore
         /// <summary>
         ///     True if taxon is protected by law
         /// </summary>
-        public string ProtectionLevel { get; set; }
+        public int ProtectionLevel { get; set; }
 
         /// <summary>
         ///     Redlist category

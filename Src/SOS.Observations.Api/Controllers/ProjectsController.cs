@@ -46,8 +46,7 @@ namespace SOS.Observations.Api.Controllers
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<ProjectDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        [AzureApi, AzureInternalApi]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]        
         public async Task<IActionResult> GetProjectsAsync(
             [FromQuery] string filter)
         {
@@ -74,9 +73,8 @@ namespace SOS.Observations.Api.Controllers
         [HttpPost]
         [ProducesResponseType(typeof(IEnumerable<ProjectDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        [AzureApi, AzureInternalApi]
-        public async Task<IActionResult> GetProjectsGetProjectesByIdAsync(
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]        
+        public async Task<IActionResult> GetProjectsByIdsAsync(
             [FromBody] int[] ids)
         {
             try
@@ -106,8 +104,7 @@ namespace SOS.Observations.Api.Controllers
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(ProjectDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        [AzureApi, AzureInternalApi]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]        
         public async Task<IActionResult> GetProjectAsync(
             [FromRoute] int id)
         {

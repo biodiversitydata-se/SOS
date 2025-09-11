@@ -138,6 +138,53 @@ namespace SOS.Observations.Api.Managers
             }
         }
 
+        private async Task<(Stream stream, string filename)> CreateDwcExportInMemoryAsync(
+            SearchFilter filter,
+            IJobCancellationToken cancellationToken,
+            bool eventDwC = false)
+        {
+            try
+            {
+                var processInfo = await _processInfoRepository.GetAsync(_processedObservationRepository.PublicIndexName);
+
+                if (eventDwC)
+                {
+                    filter.Output.SortOrders = new[] { new SortOrderFilter { SortBy = "event.eventId", SortOrder = SearchSortOrder.Asc } };
+                    return await _dwcArchiveEventFileWriter.CreateEventDwcArchiveFileInMemoryAsync(
+                       DataProvider.FilterSubsetDataProvider,
+                       filter,
+                       _processedObservationRepository,
+                       processInfo,
+                       cancellationToken);
+                }
+                else
+                {
+                    var propertyFields =
+                       ObservationPropertyFieldDescriptionHelper.GetExportFieldsFromOutputFields(filter?.Output?.Fields);
+                    var fieldDescriptions = FieldDescriptionHelper.GetAllDwcOccurrenceCoreFieldDescriptions().
+                       Where(fd => propertyFields.Select(pf => pf?.DwcIdentifier?.ToLower()).Contains(fd?.DwcIdentifier?.ToLower()));
+
+                    return await _dwcArchiveFileWriter.CreateDwcArchiveFileInMemoryAsync(
+                        DataProvider.FilterSubsetDataProvider,
+                        filter,
+                        _processedObservationRepository,
+                        fieldDescriptions,
+                        processInfo,
+                        cancellationToken);
+                }
+            }
+            catch (JobAbortedException)
+            {
+                _logger.LogInformation("Export sightings was canceled.");
+                throw;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to export sightings");
+                throw;
+            }
+        }
+
         /// <summary>
         /// Create an Excel file
         /// </summary>
@@ -359,51 +406,6 @@ namespace SOS.Observations.Api.Managers
             }
         }
 
-        private async Task<(Stream stream, string filename)> CreateDwcExportInMemoryAsync(
-            SearchFilter filter,             
-            IJobCancellationToken cancellationToken,
-            bool eventDwC = false)
-        {
-            try
-            {
-                var processInfo = await _processInfoRepository.GetAsync(_processedObservationRepository.PublicIndexName);
-
-                if (eventDwC)
-                {
-                    filter.Output.SortOrders = new[] { new SortOrderFilter { SortBy = "event.eventId", SortOrder = SearchSortOrder.Asc } };
-                    return await _dwcArchiveEventFileWriter.CreateEventDwcArchiveFileInMemoryAsync(
-                       DataProvider.FilterSubsetDataProvider,
-                       filter,
-                       _processedObservationRepository,
-                       processInfo,
-                       cancellationToken);                    
-                }
-                else
-                {
-                    var propertyFields =
-                       ObservationPropertyFieldDescriptionHelper.GetExportFieldsFromOutputFields(filter?.Output?.Fields);
-                    var fieldDescriptions = FieldDescriptionHelper.GetAllDwcOccurrenceCoreFieldDescriptions().
-                       Where(fd => propertyFields.Select(pf => pf?.DwcIdentifier?.ToLower()).Contains(fd?.DwcIdentifier?.ToLower()));
-
-                    return await _dwcArchiveFileWriter.CreateDwcArchiveFileInMemoryAsync(
-                        DataProvider.FilterSubsetDataProvider,
-                        filter,
-                        _processedObservationRepository,
-                        fieldDescriptions,
-                        processInfo,
-                        cancellationToken);
-                }
-            }
-            catch (JobAbortedException)
-            {
-                _logger.LogInformation("Export sightings was canceled.");
-                throw;
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Failed to export sightings");
-                throw;
-            }
-        }
+        
     }
 }

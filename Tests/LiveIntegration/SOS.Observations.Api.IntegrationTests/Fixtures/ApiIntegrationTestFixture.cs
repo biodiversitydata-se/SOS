@@ -230,8 +230,7 @@ namespace SOS.Observations.Api.LiveIntegrationTests.Fixtures
             var fileService = new FileService();
             VocabularyValueResolver = new VocabularyValueResolver(vocabularyRepository, new VocabularyConfiguration { ResolveValues = true, LocalizationCultureCode = "sv-SE" });
             var generalizationResolverMock = new Mock<GeneralizationResolver>();
-            var csvFileWriter = new CsvFileWriter(ProcessedObservationRepository, fileService,
-                VocabularyValueResolver, generalizationResolverMock.Object, new NullLogger<CsvFileWriter>());
+            
             var dwcArchiveFileWriter = CreateDwcArchiveFileWriter(VocabularyValueResolver, processClient);
             var dwcArchiveEventFileWriter = CreateDwcArchiveEventFileWriter(VocabularyValueResolver, processClient);
             var excelFileWriter = new ExcelFileWriter(ProcessedObservationRepository,
@@ -245,6 +244,8 @@ namespace SOS.Observations.Api.LiveIntegrationTests.Fixtures
             var userService = CreateUserService();
             var filterManager = new FilterManager(taxonManager, userService, areaCache, dataProviderCache);
             FilterManager = filterManager;
+            var taxonCache = new TaxonCache(TaxonRepository, new MemoryCache(new MemoryCacheOptions()), new NullLogger<TaxonCache>());
+            var csvFileWriter = new CsvFileWriter(ProcessedObservationRepository, fileService, filterManager, VocabularyValueResolver, generalizationResolverMock.Object, areaCache, taxonCache, new NullLogger<CsvFileWriter>());
             ObservationManager = CreateObservationManager(areaManager, (ProcessedObservationRepository)ProcessedObservationRepository, VocabularyValueResolver, processClient, filterManager);
             var taxonSearchManager = CreateTaxonSearchManager(processedTaxonRepository, filterManager);
             var inputValaidationConfiguration = GetInputValaidationConfiguration();

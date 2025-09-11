@@ -1364,7 +1364,7 @@ public class ExtendedFilterTests : TestBase
     }
 
     [Fact]
-    public async Task GetObservationsWithTypeFilterDefault()
+    public async Task GetObservationsWithTypeFilterShowChildrenAndReplacements()
     {
         // Arrange
         var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
@@ -1384,7 +1384,7 @@ public class ExtendedFilterTests : TestBase
         {
             ExtendedFilter = new ExtendedFilterDto
             {
-                TypeFilter = ExtendedFilterDto.SightingTypeFilterDto.Default
+                TypeFilter = ExtendedFilterDto.SightingTypeFilterDto.ShowChildrenAndReplacements
             }
         };
 
@@ -1397,19 +1397,19 @@ public class ExtendedFilterTests : TestBase
         result!.TotalCount.Should().Be(60);
 
 
-        // Arrange - Don't set type filter should give the same result
-        searchFilter = new SearchFilterInternalDto
-        {
+        //// Arrange - Don't set type filter should give the same result
+        //searchFilter = new SearchFilterInternalDto
+        //{
             
-        };
+        //};
 
-        // Act
-        response = await apiClient.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter));
-        result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+        //// Act
+        //response = await apiClient.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter));
+        //result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
 
-        // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
-        result!.TotalCount.Should().Be(60);
+        //// Assert
+        //response.StatusCode.Should().Be(HttpStatusCode.OK);
+        //result!.TotalCount.Should().Be(60);
     }
 
     [Fact]

@@ -1,4 +1,5 @@
 ﻿using SOS.Lib.Enums;
+using SOS.Lib.Models.DarwinCore;
 using System;
 using System.Collections.Generic;
 
@@ -9,7 +10,7 @@ namespace SOS.Lib.Models.Processed.Observation
     /// </summary>
     public class TaxonAttributes
     {
-        private static HashSet<string> _redlistCategories = new HashSet<string>() { "cr", "en", "vu", "nt" };
+        private static readonly HashSet<string> _redlistCategories = new HashSet<string>() { "cr", "en", "vu", "nt" };
 
         /// <summary>
         /// Constructor
@@ -26,6 +27,11 @@ namespace SOS.Lib.Models.Processed.Observation
         public string ActionPlan { get; set; }
 
         /// <summary>
+        /// County occurrence status
+        /// </summary>
+        public ICollection<CountyOccurrence> CountyOccurrences { get; set; }
+
+        /// <summary>
         /// Disturbance radius.
         /// </summary>
         public int? DisturbanceRadius { get; set; }
@@ -39,6 +45,16 @@ namespace SOS.Lib.Models.Processed.Observation
         /// Id for taxon in GBIF
         /// </summary>
         public int? GbifTaxonId { get; set; }
+
+        /// <summary>
+        /// Organism Label 1
+        /// </summary>
+        public string? OrganismLabel1 { get; set; }
+
+        /// <summary>
+        /// Organism Label 2
+        /// </summary>
+        public string? OrganismLabel2 { get; set; }
 
         /// <summary>
         /// True if invasive in sweden according to EU Regulation 1143/2014.

@@ -391,5 +391,20 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
             IReadOnlyDictionary<string, FieldValue>? afterKey = null,
             int? take = 10,
             bool? useScript = true);
+
+        /// <summary>
+        /// Aggregate on taxon id + one more field, optional to avg, min, max on another field
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="aggregationField"></param>
+        /// <param name="size">Max buckets created</param>
+        /// <param name="subAggreagtionField"></param>
+        /// <param name="subAggregationType"></param>
+        /// <returns></returns>
+        Task<SearchResponse<dynamic>> GenericTermsAggregationAsync(SearchFilter filter,
+            string aggregationField,
+            int size,
+            string? subAggreagtionField = null,
+            AggregationTypes subAggregationType = AggregationTypes.None);
     }
 }

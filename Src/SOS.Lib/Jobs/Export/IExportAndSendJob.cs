@@ -14,6 +14,36 @@ namespace SOS.Lib.Jobs.Export
     public interface IExportAndSendJob
     {
         /// <summary>
+        /// Create a county occurrence report and send it to user
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="roleId"></param>
+        /// <param name="authorizationApplicationIdentifier"></param>
+        /// <param name="email"></param>
+        /// <param name="description"></param>
+        /// <param name="encryptedPassword"></param>
+        /// <param name="context"></param>
+        /// <param name="taxonIds"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        [JobDisplayName("County occurrence report. Email={3}, Description={4}")]
+        [AutomaticRetry(Attempts = 2, LogEvents = false, OnAttemptsExceeded = AttemptsExceededAction.Fail)]
+        [Queue("low")]
+        [PreserveOriginalQueue]
+        [OneAtTheTime(MaxAttempts = 0, RetryInSeconds = 60)]
+        [HandleFileExportFailure]
+        Task<bool> CreateAndSendCountyOccurrenceReportAsync(
+            int userId,
+            int? roleId,
+            string authorizationApplicationIdentifier,
+            string email,
+            string description,
+            string encryptedPassword,
+            PerformContext context,
+            IEnumerable<int> taxonIds,
+            IJobCancellationToken cancellationToken);
+
+        /// <summary>
         /// Run export job
         /// </summary>
         /// <param name="filter"></param>
@@ -145,5 +175,5 @@ namespace SOS.Lib.Jobs.Export
             string encryptedPassword,
             PerformContext context,
             IJobCancellationToken cancellationToken);
-    }
-}
+    }   
+ }

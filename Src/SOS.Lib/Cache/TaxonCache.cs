@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Models.Processed.Observation;
-using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using System;
 

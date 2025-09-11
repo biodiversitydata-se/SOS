@@ -5,6 +5,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
+using NetTopologySuite.IO;
 using SOS.Export.Managers;
 using SOS.Export.Services.Interfaces;
 using SOS.Lib.Cache;
@@ -91,14 +92,17 @@ namespace SOS.Export.LiveIntegrationTests.Managers
                 new NullLogger<ExcelFileWriter>());
             var geoJsonlWriter = new GeoJsonFileWriter(processedObservationRepository, new FileService(), vocabularyValueResolver, generalizationResolverMock.Object,
                 new NullLogger<GeoJsonFileWriter>());
-            var csvWriter = new CsvFileWriter(processedObservationRepository, new FileService(), vocabularyValueResolver, generalizationResolverMock.Object,
-                new NullLogger<CsvFileWriter>());
-
+           
             var filterManager = new Mock<IFilterManager>();
             filterManager
                 .Setup(us => us
                     .PrepareFilterAsync(0, null, new SearchFilter(0, ProtectionFilter.Public), "Sighting", 0, false, false, true, false)
                 );
+            var areaRepository = new AreaRepository(processClient, new NullLogger<AreaRepository>());
+            var taxonRepository = new TaxonRepository(processClient, new NullLogger<TaxonRepository>());
+            var areaCache = new AreaCache(areaRepository, new MemoryCache(new MemoryCacheOptions()), new NullLogger<AreaCache>());
+            var taxonCache = new TaxonCache(taxonRepository, new MemoryCache(new MemoryCacheOptions()), new NullLogger<TaxonCache>());
+            var csvWriter = new CsvFileWriter(processedObservationRepository, new FileService(), filterManager.Object, vocabularyValueResolver, generalizationResolverMock.Object, areaCache, taxonCache, new NullLogger<CsvFileWriter>());
             var zendToService = new Mock<IZendToService>();
             zendToService.Setup(zs => zs.SendFile(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<ExportFormat>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<string>()))
                 .ReturnsAsync(new Models.ZendTo.ZendToResponse { Status = "OK" });
@@ -242,6 +246,28 @@ namespace SOS.Export.LiveIntegrationTests.Managers
                     null,
                     false,
                     JobCancellationToken.Null); ;
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Assert
+            //-----------------------------------------------------------------------------------------------------------
+            result.Success.Should().BeTrue();
+        }
+
+        [Fact]
+        [Trait("Category", "Integration")]
+        [Trait("Category", "DwcArchiveIntegration")]
+        public async Task Create_County_occurrence_report()
+        {
+            //-----------------------------------------------------------------------------------------------------------
+            // Arrange
+            //-----------------------------------------------------------------------------------------------------------
+            var observationManager = CreateObservationManager();
+
+            //-----------------------------------------------------------------------------------------------------------
+            // Act
+            //-----------------------------------------------------------------------------------------------------------
+            var result =
+                await observationManager.CreateAndSendCountyOccurrenceReportAsync(null, null, "mats.lindgren@slu.se", "Test", "MyPassword", null, [293, 777, 1136, 100571, 232475, 259206, 6037532, 6037534, 232267, 100407, 121, 1863], JobCancellationToken.Null); ;
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert
