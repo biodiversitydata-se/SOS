@@ -117,6 +117,20 @@ namespace SOS.Observations.Api.Controllers
                        }
                     )
                 );
+                var incrermentalCheck = healthCheck.Entries?.Where(e => e.Key.Equals("Incremental harvest"))?.Select(e => e.Value)?.FirstOrDefault();
+                var incrermentalStatus = incrermentalCheck.Value.Status.Equals(HealthStatus.Unhealthy) ? "Not running" : "Running";
+                entries.Add("Incremental harvest", new HealthReportEntry(
+                    incrermentalCheck.Value.Status,
+                    incrermentalStatus,
+                    incrermentalCheck.Value.Duration,
+                    null,
+                    new Dictionary<string, object>()
+                       {
+                           { "Status", incrermentalStatus }
+                       }
+                    )
+                );
+
                 //var processInfo = await _processInfoManager.GetProcessInfoAsync(_processedObservationRepository.UniquePublicIndexName);
                 //var processingEnd = processInfo?.End.ToLocalTime().ToString("yyyy-MM-dd hh:mm:ss");
                 //entries.Add("Latest Full harvest", new HealthReportEntry(
