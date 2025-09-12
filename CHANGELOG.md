@@ -3,7 +3,7 @@
 ## [2025.09.11]
 
 ### `Added`
-- New search filter `TaxonFilterDto.IsInvasiveInSweden`. [Search filter documentation](SearchFilter.md#search-for-invasive-species-in-sweden).
+- New search filter `TaxonFilterDto.IsInvasiveInSweden`. [Search filter documentation](Docs/SearchFilter.md#search-for-invasive-species-in-sweden).
 - Support for extended authorization buffer in geographic area searches. New search filter is used by default `GeographicsFilterDto.ConsiderAuthorizationBuffer`.
 - New property `ArtportalenInternal.InvasiveSpeciesTreatment` and search filter `ExtendedFilterDto.InvasiveSpeciesTreatmentIds`.
 - New enum value for `ExtendedFilterDto.TypeFilter`: `SightingTypeFilterDto.ShowChildrenAndReplacements`.
