@@ -1,5 +1,17 @@
 # Changelog
 
+## [2025.09.11]
+
+### `Added`
+- New search filter `TaxonFilterDto.IsInvasiveInSweden`. [Search filter documentation](SearchFilter.md#search-for-invasive-species-in-sweden).
+- Support for extended authorization buffer in geographic area searches. New search filter is used by default `GeographicsFilterDto.ConsiderAuthorizationBuffer`.
+- New property `ArtportalenInternal.InvasiveSpeciesTreatment` and search filter `ExtendedFilterDto.InvasiveSpeciesTreatmentIds`.
+- New enum value for `ExtendedFilterDto.TypeFilter`: `SightingTypeFilterDto.ShowChildrenAndReplacements`.
+
+### `Changed`
+- All taxon attributes is now harvested from Dyntaxa custom DwC-A file.
+
+
 ## [2025.05.30]
 
 ### `Changed`
