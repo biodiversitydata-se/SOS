@@ -4,6 +4,7 @@ using SOS.Lib.Enums;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
+using System.Diagnostics;
 
 namespace SOS.Harvest.Harvesters
 {
@@ -39,10 +40,17 @@ namespace SOS.Harvest.Harvesters
         {
             Logger.LogInformation($"Start harvesting observations for {_provider} data provider");
 
+            Stopwatch sp = Stopwatch.StartNew();
             // Get current document count from permanent index
             VerbatimRepository.TempMode = false;
             var preHarvestCount = await VerbatimRepository.CountAllDocumentsAsync();
             VerbatimRepository.TempMode = useTempMode;
+            sp.Stop();
+            if (sp.Elapsed > TimeSpan.FromMinutes(10))
+            {
+                Logger.LogWarning($"Getting pre-harvest count for {_provider} verbatim took {sp.Elapsed}");
+            }
+
             // Make sure we have an empty collection.
             Logger.LogInformation($"Start empty collection for {_provider} verbatim collection");
             await VerbatimRepository.DeleteCollectionAsync();

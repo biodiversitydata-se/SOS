@@ -23,8 +23,8 @@ namespace SOS.Lib.Repositories
     public class RepositoryBase<TEntity, TKey> : IRepositoryBase<TEntity, TKey> where TEntity : IEntity<TKey>
     {
         private readonly string _collectionName;
-        private readonly TimeSpan _serverTimeout = TimeSpan.FromMinutes(10); // Server-side timeout for operations
-        private readonly TimeSpan _clientTimeout = TimeSpan.FromMinutes(10); // Client-side timeout for operations
+        private readonly TimeSpan _serverTimeout = TimeSpan.FromMinutes(120); // Server-side timeout for operations
+        private readonly TimeSpan _clientTimeout = TimeSpan.FromMinutes(120); // Client-side timeout for operations
 
         /// <summary>
         ///     Disposed
@@ -259,7 +259,7 @@ namespace SOS.Lib.Repositories
             if (timeout == null) timeout = TimeSpan.FromMinutes(10);
             var sleepTime = TimeSpan.FromSeconds(5);
             int nrIterations = (int)(Math.Ceiling(timeout.Value.TotalSeconds / sleepTime.TotalSeconds));
-            long docCount = await CountAllDocumentsAsync();
+            long docCount = await CountAllDocumentsAsync(estimateCount: false);
             var iterations = 0;
 
             // Compare number of documents retrieved with actually db count
@@ -268,7 +268,7 @@ namespace SOS.Lib.Repositories
             {
                 iterations++; // Safety to prevent infinite loop.                                
                 await Task.Delay(sleepTime);
-                docCount = await CountAllDocumentsAsync();
+                docCount = await CountAllDocumentsAsync(estimateCount: false);
             }
 
             if (iterations == nrIterations)
@@ -536,13 +536,13 @@ namespace SOS.Lib.Repositories
         }
 
         /// <inheritdoc />
-        public virtual async Task<long> CountAllDocumentsAsync()
+        public virtual async Task<long> CountAllDocumentsAsync(bool estimateCount = true)
         {
-            return await CountAllDocumentsAsync(MongoCollection);
+            return await CountAllDocumentsAsync(MongoCollection, estimateCount);
         }
 
         /// <inheritdoc />
-        public async Task<long> CountAllDocumentsAsync(IMongoCollection<TEntity> mongoCollection)
+        public async Task<long> CountAllDocumentsAsync(IMongoCollection<TEntity> mongoCollection, bool estimateCount = true)
         {            
             try
             {        
@@ -553,6 +553,14 @@ namespace SOS.Lib.Repositories
 
                 using (var cancellationTokenSource = new CancellationTokenSource(_clientTimeout)) // Client-side timeout
                 {
+                    if (estimateCount)
+                    {
+                        return await mongoCollection.EstimatedDocumentCountAsync(new EstimatedDocumentCountOptions
+                        {
+                            MaxTime = _serverTimeout
+                        }, cancellationTokenSource.Token);
+                    }
+
                     return await MongoCollection.CountDocumentsAsync(FilterDefinition<TEntity>.Empty, options, cancellationTokenSource.Token);
                 }
             }

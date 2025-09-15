@@ -146,7 +146,7 @@ namespace SOS.Harvest.Processors.Taxon
                 _logger.LogDebug("Finish getting taxa");
                 var taxa = dwcTaxa.ToProcessedTaxa();
 
-                var taxonCount = await _processedTaxonRepository.CountAllDocumentsAsync();
+                var taxonCount = await _processedTaxonRepository.CountAllDocumentsAsync(estimateCount: false);
                 var useCurrentCollection = false;
                 if (!taxa?.Any() ?? true)
                 {
