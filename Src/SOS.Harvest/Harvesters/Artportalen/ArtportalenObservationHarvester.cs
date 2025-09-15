@@ -296,11 +296,35 @@ namespace SOS.Harvest.Harvesters.Artportalen
         {
             try
             {
-                var verbatimObservations = await GetVerbatimBatchAsync(harvestFactory, getChunkTask, batchIndex);
+                List<ArtportalenObservationVerbatim>? verbatimObservations = (await GetVerbatimBatchAsync(harvestFactory, getChunkTask, batchIndex))?.ToList();
 
                 if (!verbatimObservations?.Any() ?? true)
                 {
                     return 0;
+                }
+
+                // Check for duplicates in batch (should not happen, but just in case)
+                var duplicates = verbatimObservations!
+                    .GroupBy(o => o.SightingId)
+                    .Where(g => g.Count() > 1)
+                    .ToList();
+
+                if (duplicates.Any())
+                {
+                    Logger.LogWarning("Found {NoOfDuplicateGroups} duplicate groups in verbatim batch {BatchIndex}",
+                        duplicates.Count, batchIndex);
+                    foreach (var dupGroup in duplicates)
+                    {
+                        // Keep the first, remove the rest
+                        List<ArtportalenObservationVerbatim> toRemove = dupGroup.Skip(1).ToList();
+
+                        foreach (var obs in toRemove)
+                        {
+                            verbatimObservations!.Remove(obs);
+                            Logger.LogWarning("Removed duplicate observation with SightingId {SightingId} (EditDate: {EditDate})",
+                                obs.SightingId, obs.EditDate);
+                        }
+                    }
                 }
 
                 Logger.LogDebug($"Start storing batch ({batchIndex})");
