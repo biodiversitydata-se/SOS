@@ -165,61 +165,62 @@ namespace SOS.Harvest.Harvesters.Artportalen
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         private async Task<int> HarvestIncrementalAsync(JobRunModes mode, DateTime? fromDate, ArtportalenHarvestFactory harvestFactory,
-            IJobCancellationToken cancellationToken)
+    IJobCancellationToken cancellationToken)
         {
-            Logger.LogInformation($"Start Artportalen HarvestIncrementalAsync()");
-            Logger.LogDebug($"Start getting Artportalen sightings ({mode})");
+            Logger.LogInformation("Start Artportalen HarvestIncrementalAsync()");
+            Logger.LogDebug("Start getting Artportalen sightings ({Mode})", mode);
 
-            // If no from date is passed, we start from last harvested sighting 
+            // If no from date is passed, we start from last harvested sighting
             var harvestFromDate = fromDate ?? (await _processedObservationRepository.GetLatestModifiedDateForProviderAsync(1));
-            
+
             // Don't harvest too many days
             if (_artportalenConfiguration.MaxNumberOfDaysHarvested.HasValue)
             {
                 int daysToHarvest = (DateTime.Now - harvestFromDate).Days;
                 if (daysToHarvest > _artportalenConfiguration.MaxNumberOfDaysHarvested.Value)
                 {
-                    Logger.LogWarning($"Artportalen incremental harvest cancelled. harvestFromDate is too old: {harvestFromDate.ToLongDateString()}. Limit is {_artportalenConfiguration.MaxNumberOfDaysHarvested.Value} days");
+                    Logger.LogWarning("Artportalen incremental harvest cancelled. harvestFromDate is too old: {HarvestFromDate}. Limit is {Limit} days",
+                        harvestFromDate.ToLongDateString(),
+                        _artportalenConfiguration.MaxNumberOfDaysHarvested.Value);
                     return 0;
                 }
             }
 
-            // Get list of id's to Make sure we don't harvest more than #limit
             var harvestIds = new HashSet<int>();
-            NewAndEditedSightingId[]? idBatch = (await _sightingRepository.GetModifiedIdsAsync(harvestFromDate, _artportalenConfiguration.IncrementalChunkSize))?.ToArray();
-            idBatch = GetDistinctBatch(harvestIds, idBatch);            
+            var idBatch = (await _sightingRepository.GetModifiedIdsAsync(harvestFromDate, _artportalenConfiguration.IncrementalChunkSize))?.ToArray();
             var batchCount = 0;
             var nrSightingsHarvested = 0;
+
             while ((idBatch?.Length ?? 0) != 0)
             {
                 cancellationToken?.ThrowIfCancellationRequested();
                 batchCount++;
+
                 var idsToHarvest = idBatch!.Select(m => m.Id);
                 var getObservationsTask = _sightingRepository.GetChunkAsync(idsToHarvest);
+
                 await _semaphore.WaitAsync();
-                var observationCount = await HarvestBatchAsync(harvestFactory, getObservationsTask, batchCount);
+                var observationCount = await HarvestBatchAsync(harvestFactory, getObservationsTask, batchCount, harvestIds);
                 nrSightingsHarvested += observationCount;
 
                 // Delete observations we can't find
-                var deletedIds = idsToHarvest!.Where(i => !getObservationsTask?.Result?.Select(o => o.Id).Contains(i) ?? true).Select(i => i);
-                if (deletedIds?.Any() ?? false)
+                var deletedIds = idsToHarvest!.Where(i => !getObservationsTask?.Result?.Any(o => o.Id == i) ?? true);
+                if (deletedIds.Any())
                 {
-                    await _processedObservationRepository.DeleteByOccurrenceIdAsync(deletedIds.Select(i => $"urn:lsid:artportalen.se:sighting:{i}"), false);
-                    await _processedObservationRepository.DeleteByOccurrenceIdAsync(deletedIds.Select(i => $"urn:lsid:artportalen.se:sighting:{i}"), true);
+                    var occIds = deletedIds.Select(i => $"urn:lsid:artportalen.se:sighting:{i}");
+                    await _processedObservationRepository.DeleteByOccurrenceIdAsync(occIds, false);
+                    await _processedObservationRepository.DeleteByOccurrenceIdAsync(occIds, true);
                 }
 
                 if (observationCount == 0 || nrSightingsHarvested >= _artportalenConfiguration.CatchUpLimit)
-                {
                     break;
-                }
-                
-                var nextHarvestDate = DateTime.SpecifyKind(idBatch!.Last().EditDate, DateTimeKind.Local);
+
+                var nextHarvestDate = DateTime.SpecifyKind(idBatch.Last().EditDate, DateTimeKind.Local);
                 idBatch = (await _sightingRepository.GetModifiedIdsAsync(nextHarvestDate, _artportalenConfiguration.IncrementalChunkSize))?.ToArray();
-                idBatch = GetDistinctBatch(harvestIds, idBatch);
             }
 
-            Logger.LogDebug($"Finish getting Artportalen sightings ({mode}) (NrSightingsHarvested={nrSightingsHarvested:N0})");
-            Logger.LogInformation("Finish {@dataProvider} HarvestIncrementalAsync(). NrSightingsHarvested={@nrSightingsHarvested:N0}", "Artportalen", nrSightingsHarvested);
+            Logger.LogDebug("Finish getting Artportalen sightings ({Mode}) (NrSightingsHarvested={NrSightingsHarvested:N0})", mode, nrSightingsHarvested);
+            Logger.LogInformation("Finish {@DataProvider} HarvestIncrementalAsync(). NrSightingsHarvested={@NrSightingsHarvested:N0}", "Artportalen", nrSightingsHarvested);
             return nrSightingsHarvested;
         }
         #endregion Incremental        
@@ -291,66 +292,57 @@ namespace SOS.Harvest.Harvesters.Artportalen
         private async Task<int> HarvestBatchAsync(
             ArtportalenHarvestFactory harvestFactory,
             Task<IEnumerable<SightingEntity>?> getChunkTask,
-            int batchIndex
-        )
+            int batchIndex,
+            HashSet<int>? globalIds = null)
         {
             try
             {
-                List<ArtportalenObservationVerbatim>? verbatimObservations = (await GetVerbatimBatchAsync(harvestFactory, getChunkTask, batchIndex))?.ToList();
-
-                if (!verbatimObservations?.Any() ?? true)
-                {
+                var verbatimObservations = (await GetVerbatimBatchAsync(harvestFactory, getChunkTask, batchIndex))?.ToList();
+                if (verbatimObservations == null || !verbatimObservations.Any())
                     return 0;
-                }
 
-                // Check for duplicates in batch (should not happen, but just in case)
-                var duplicates = verbatimObservations!
-                    .GroupBy(o => o.SightingId)
-                    .Where(g => g.Count() > 1)
-                    .ToList();
-
-                if (duplicates.Any())
+                // Deduplicate within batch & against globalIds
+                var deduped = new List<ArtportalenObservationVerbatim>();
+                foreach (var obs in verbatimObservations)
                 {
-                    Logger.LogWarning("Found {NoOfDuplicateGroups} duplicate groups in verbatim batch {BatchIndex}",
-                        duplicates.Count, batchIndex);
-                    foreach (var dupGroup in duplicates)
+                    if (globalIds != null && !globalIds.Add(obs.SightingId))
                     {
-                        // Keep the first, remove the rest
-                        List<ArtportalenObservationVerbatim> toRemove = dupGroup.Skip(1).ToList();
-
-                        foreach (var obs in toRemove)
-                        {
-                            verbatimObservations!.Remove(obs);
-                            Logger.LogWarning("Removed duplicate observation with SightingId {SightingId} (EditDate: {EditDate})",
-                                obs.SightingId, obs.EditDate);
-                        }
+                        Logger.LogWarning("Skipped duplicate observation across batches: SightingId {SightingId} (Batch {BatchIndex})",
+                            obs.SightingId, batchIndex);
+                        continue;
                     }
+
+                    if (deduped.Any(o => o.SightingId == obs.SightingId))
+                    {
+                        Logger.LogWarning("Removed duplicate within batch: SightingId {SightingId} (Batch {BatchIndex})",
+                            obs.SightingId, batchIndex);
+                        continue;
+                    }
+
+                    deduped.Add(obs);
                 }
 
-                Logger.LogDebug($"Start storing batch ({batchIndex})");
-                if (!await VerbatimRepository.AddManyAsync(verbatimObservations))
-                {
+                if (!deduped.Any())
+                    return 0;
+
+                Logger.LogDebug("Start storing batch ({BatchIndex})", batchIndex);
+                if (!await VerbatimRepository.AddManyAsync(deduped))
                     throw new Exception($"Failed to store verbatims batch: {batchIndex}.");
-                }
 
-                // If sleep is required to free resources to other systems
                 if (_artportalenConfiguration.SleepAfterBatch > 0)
-                {
                     Thread.Sleep(_artportalenConfiguration.SleepAfterBatch);
-                }
 
-                Logger.LogDebug($"Finish storing batch ({batchIndex})");
+                Logger.LogDebug("Finish storing batch ({BatchIndex})", batchIndex);
 
-                return verbatimObservations!.Count();
+                return deduped.Count;
             }
             catch (Exception e)
             {
-                Logger.LogError(e, "Harvest Artportalen sightings batch ({@batchIndex}) failed", batchIndex);
+                Logger.LogError(e, "Harvest Artportalen sightings batch ({BatchIndex}) failed", batchIndex);
                 throw;
             }
             finally
             {
-                // Release semaphore in order to let next thread start getting data from source db 
                 _semaphore.Release();
             }
         }
