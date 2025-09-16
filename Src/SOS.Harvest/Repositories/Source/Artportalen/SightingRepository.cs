@@ -178,6 +178,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
                 if ((result?.Count() ?? 0) == 0)
                 {
                     Logger.LogInformation($"Artportalen SightingRepository.GetChunkAsync returned no sightings. Live={Live}, sightingIds.Count()={sightingIds!.Count()}.\n,The first five SightingIds used in @tvp are: {string.Join(", ", sightingIds!.Take(5))}");
+                    Logger.LogDebug(query);
                 }
 
                 return result;
