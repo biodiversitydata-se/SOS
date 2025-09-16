@@ -133,7 +133,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<int>> GetFrequentlyUsedIdsAsync()
+        public async Task<IEnumerable<int>> GetFrequentlyUsedIdsAsync(bool isIncrementalHarvest)
         {
             try
             {
@@ -144,7 +144,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
                         FROM
                             {SightingsFromBasics}
                         WHERE
-                            {SightingWhereBasics}
+                            {GetSightingWhereBasics(isIncrementalHarvest)}
                         GROUP BY
 	                        s.SiteId
                         HAVING COUNT (s.SiteId) > 20");

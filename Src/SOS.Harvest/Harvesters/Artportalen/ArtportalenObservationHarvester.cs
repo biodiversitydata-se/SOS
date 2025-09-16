@@ -98,14 +98,14 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 Logger.LogDebug("Start adding test sightings");
                 await _semaphore.WaitAsync();
                 await HarvestBatchAsync(harvestFactory,
-                       _sightingRepository.GetChunkAsync(_artportalenConfiguration.AddTestSightingIds),
+                       _sightingRepository.GetChunkAsync(_artportalenConfiguration.AddTestSightingIds, isIncrementalHarvest: false),
                         0);
 
                 Logger.LogDebug("Finish adding test sightings");
             }
 
             // Get source min and max id
-            var (minId, maxId) = await _sightingRepository.GetIdSpanAsync();
+            var (minId, maxId) = await _sightingRepository.GetIdSpanAsync(isIncrementalHarvest: false);
 
             // MaxNumberOfSightingsHarvested is a debug feature. If it's set calculate minid to get last sightings.
             // This make it easier to test incremental harvest since it has a max limit from last modified
@@ -133,7 +133,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
 
                     // Add batch task to list
                     harvestBatchTasks.Add(HarvestBatchAsync(harvestFactory,
-                        _sightingRepository.GetChunkAsync(currentId, _artportalenConfiguration.ChunkSize),
+                        _sightingRepository.GetChunkAsync(currentId, _artportalenConfiguration.ChunkSize, isIncrementalHarvest: false),
                         batchIndex));
 
                     // Calculate start of next chunk
@@ -164,8 +164,11 @@ namespace SOS.Harvest.Harvesters.Artportalen
         /// <param name="harvestFactory"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        private async Task<int> HarvestIncrementalAsync(JobRunModes mode, DateTime? fromDate, ArtportalenHarvestFactory harvestFactory,
-    IJobCancellationToken cancellationToken)
+        private async Task<int> HarvestIncrementalAsync(
+            JobRunModes mode, 
+            DateTime? fromDate, 
+            ArtportalenHarvestFactory harvestFactory,
+            IJobCancellationToken cancellationToken)
         {
             Logger.LogInformation("Start Artportalen HarvestIncrementalAsync()");
             Logger.LogDebug("Start getting Artportalen sightings ({Mode})", mode);
@@ -197,7 +200,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 batchCount++;
 
                 var idsToHarvest = idBatch!.Select(m => m.Id);
-                var getObservationsTask = _sightingRepository.GetChunkAsync(idsToHarvest);
+                var getObservationsTask = _sightingRepository.GetChunkAsync(idsToHarvest, isIncrementalHarvest: true);
 
                 await _semaphore.WaitAsync();
                 var observationCount = await HarvestBatchAsync(harvestFactory, getObservationsTask, batchCount, harvestIds);
@@ -440,7 +443,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
 
                 if (mode == JobRunModes.Full)
                 {
-                    dataLastModified = await _sightingRepository.GetLastModifiedDateAsyc();
+                    dataLastModified = await _sightingRepository.GetLastModifiedDateAsyc(isIncrementalHarvest: false);
 
                     var lastBackupDate = await _metadataRepository.GetLastBackupDateAsync();
                     notes = lastBackupDate.HasValue ? $"Database backup restore: {lastBackupDate}" : null;
@@ -480,7 +483,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
                 using var harvestFactory = await PrepareHarvestAsync(mode, cancellationToken);
 
                 return await GetVerbatimBatchAsync(harvestFactory,
-                    _sightingRepository.GetChunkAsync(ids),
+                    _sightingRepository.GetChunkAsync(ids, isIncrementalHarvest: false),
                     1);
             }
             catch (JobAbortedException e)

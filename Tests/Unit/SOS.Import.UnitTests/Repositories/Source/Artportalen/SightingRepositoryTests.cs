@@ -48,7 +48,7 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
             //-----------------------------------------------------------------------------------------------------------
             Func<Task> act = async () =>
             {
-                var result = await TestObject.GetChunkAsync(0, 10);
+                var result = await TestObject.GetChunkAsync(0, 10, isIncrementalHarvest: false);
             };
 
             //-----------------------------------------------------------------------------------------------------------
@@ -77,7 +77,7 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.GetChunkAsync(0, 10);
+            var result = await TestObject.GetChunkAsync(0, 10, isIncrementalHarvest: false);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
@@ -100,7 +100,7 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
             //-----------------------------------------------------------------------------------------------------------
             Func<Task> act = async () =>
             {
-                var result = await TestObject.GetIdSpanAsync();
+                var result = await TestObject.GetIdSpanAsync(isIncrementalHarvest: false);
             };
 
             //-----------------------------------------------------------------------------------------------------------
@@ -124,7 +124,7 @@ namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.GetIdSpanAsync();
+            var result = await TestObject.GetIdSpanAsync(isIncrementalHarvest: false);
             //-----------------------------------------------------------------------------------------------------------
             // Assert
             //-----------------------------------------------------------------------------------------------------------
