@@ -552,7 +552,7 @@ This filter will only return observations where `observation.occurrence.isNotRed
     "notRecoveredFilter": "OnlyNotRecovered"
 }
 ```
-This filter will return observations where `observation.occurrence.isNotRediscoveredObservation=true` and `observation.occurrence.isNotRediscoveredObservation=true`. 
+This filter will return observations where `observation.occurrence.isNotRediscoveredObservation=false` and `observation.occurrence.isNotRediscoveredObservation=true`. 
 ```json
 {
     "notRecoveredFilter": "IncludeNotRecovered"
