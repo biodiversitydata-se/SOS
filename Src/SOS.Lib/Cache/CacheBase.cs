@@ -111,6 +111,7 @@ namespace SOS.Lib.Cache
         public async Task ClearAsync()
         {
             var cache = await GetCacheAsync();
+            Logger.LogInformation($"{GetType().Name}.ClearAsync(). Count before Clear={cache?.Count}.");
             cache.Clear();
             _initialized = false;
             Logger.LogDebug($"{GetType().Name}.ClearAsync()");
@@ -151,7 +152,7 @@ namespace SOS.Lib.Cache
                     {
                         Stopwatch sp = Stopwatch.StartNew();
                         var entities = await Repository.GetAllAsync();
-
+                        Logger.LogInformation($"{GetType().Name}.GetAllAsync(). Repository.GetAllAsync() returned items. Count={entities?.Count}.");
                         if (entities != null)
                         {
                             await ClearAsync();
@@ -159,19 +160,28 @@ namespace SOS.Lib.Cache
                             {
                                 cache.TryAdd(entity.Id, entity);
                             }
+                            Logger.LogInformation($"{GetType().Name}.GetAllAsync(). Count after init={cache?.Count}.");
                             _initialized = true;
                         }
 
                         sp.Stop();
-                        Logger.LogDebug(
+                        Logger.LogInformation(
                             $"CacheBase.GetAllAsync updated cache for type={GetType().Name}, Time elapsed={sp.ElapsedMilliseconds}ms"
                         );
+                    }
+                    else
+                    {
+                        Logger.LogInformation($"{GetType().Name}.GetAllAsync(). Cache already initialized after semaphore is used. Cache count={cache?.Count}");
                     }
                 }
                 finally
                 {
                     _getAllSemaphore.Release();
                 }
+            }
+            else
+            {
+                Logger.LogInformation($"{GetType().Name}.GetAllAsync(). Cache already initialized. Cache count={cache?.Values?.Count}");
             }
 
             return cache.Values;
