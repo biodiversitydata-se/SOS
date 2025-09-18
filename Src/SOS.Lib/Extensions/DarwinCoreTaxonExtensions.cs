@@ -3,7 +3,6 @@ using SOS.Lib.Models.Processed.Observation;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 
 namespace SOS.Lib.Extensions
 {
@@ -12,8 +11,6 @@ namespace SOS.Lib.Extensions
     /// </summary>
     public static class DarwinCoreTaxonExtensions
     {
-        private static IDictionary<int, VocabularyValue> _protectionLevelCache =
-            new ConcurrentDictionary<int, VocabularyValue>();
         private static HashSet<string> _redlistCategories = new HashSet<string>() { "cr", "en", "vu", "nt" };
 
         /// <summary>
@@ -103,6 +100,8 @@ namespace SOS.Lib.Extensions
             taxon.Attributes.DisturbanceRadius = sourceTaxon.DynamicProperties?.DisturbanceRadius;
             taxon.Attributes.DyntaxaTaxonId = sourceTaxon.DynamicProperties?.DyntaxaTaxonId ?? 0;
             taxon.Attributes.GbifTaxonId = sourceTaxon.DynamicProperties.GbifTaxonId;
+            taxon.Attributes.OrganismLabel1 = sourceTaxon.DynamicProperties.OrganismLabel1;
+            taxon.Attributes.OrganismLabel2 = sourceTaxon.DynamicProperties.OrganismLabel2;
             taxon.Attributes.Natura2000HabitatsDirectiveArticle2 = sourceTaxon.DynamicProperties?.Natura2000HabitatsDirectiveArticle2 == null ? false : sourceTaxon.DynamicProperties.Natura2000HabitatsDirectiveArticle2.GetValueOrDefault();
             taxon.Attributes.Natura2000HabitatsDirectiveArticle4 = sourceTaxon.DynamicProperties?.Natura2000HabitatsDirectiveArticle4 == null ? false : sourceTaxon.DynamicProperties.Natura2000HabitatsDirectiveArticle4.GetValueOrDefault();
             taxon.Attributes.Natura2000HabitatsDirectiveArticle5 = sourceTaxon.DynamicProperties?.Natura2000HabitatsDirectiveArticle5 == null ? false : sourceTaxon.DynamicProperties.Natura2000HabitatsDirectiveArticle5.GetValueOrDefault();
@@ -112,8 +111,8 @@ namespace SOS.Lib.Extensions
             taxon.Attributes.ProtectedByLaw = sourceTaxon.DynamicProperties?.ProtectedByLaw ?? false;
             taxon.Attributes.IsInvasiveAccordingToEuRegulation = sourceTaxon.DynamicProperties?.IsEURegulation_1143_2014 ?? false;
             taxon.Attributes.IsInvasiveInSweden = sourceTaxon.DynamicProperties?.IsInvasiveInSweden ?? false;
-            taxon.Attributes.InvasiveRiskAssessmentCategory = sourceTaxon.DynamicProperties?.InvasiveRiskAssessmentCategory;
-            taxon.Attributes.RedlistCategory = sourceTaxon.DynamicProperties?.RedlistCategory;
+            taxon.Attributes.InvasiveRiskAssessmentCategory = (sourceTaxon.DynamicProperties?.SwedishHistoryCategory?.Length ?? 0) < 2 ? string.Empty : sourceTaxon.DynamicProperties?.SwedishHistoryCategory?.Substring(0, 2);
+            taxon.Attributes.RedlistCategory = (sourceTaxon.DynamicProperties?.RedlistCategory?.Length ?? 0) < 2 ? string.Empty : sourceTaxon.DynamicProperties?.RedlistCategory?.Substring(0, 2);
             taxon.Attributes.ScientificNames = sourceTaxon.ScientificNames?.ToTaxonScientificNames();
             taxon.Attributes.SortOrder = sourceTaxon.SortOrder;
             taxon.Attributes.SwedishHistory = sourceTaxon.DynamicProperties?.SwedishHistory;
@@ -128,7 +127,7 @@ namespace SOS.Lib.Extensions
             taxon.TaxonomicStatus = sourceTaxon.TaxonomicStatus;
             taxon.VernacularName = sourceTaxon.VernacularName;
             taxon.VerbatimTaxonRank = sourceTaxon.VerbatimTaxonRank;
-            
+
             var displayName = taxon.ScientificName?.Trim();
             if (!string.IsNullOrEmpty(taxon.ScientificNameAuthorship))
             {
@@ -219,7 +218,7 @@ namespace SOS.Lib.Extensions
         /// <param name="protectionLevel"></param>
         /// <returns></returns>
         private static VocabularyValue ToProtectionLevel(
-            this int protectionLevel)
+            this int? protectionLevel)
         {
             switch (protectionLevel)
             {
