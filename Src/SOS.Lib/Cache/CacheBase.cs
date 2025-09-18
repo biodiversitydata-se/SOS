@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Cache.Interfaces;
-using SOS.Lib.Enums;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Repositories.Interfaces;
 using System;
@@ -50,7 +49,7 @@ namespace SOS.Lib.Cache
 
         private void OnCacheEviction(object key, object value, EvictionReason reason, object state)
         {
-            Logger.LogDebug($"{GetType().Name}.OnCacheEviction() raised, Reason={reason}");
+            Logger.LogInformation($"{GetType().Name}.OnCacheEviction() raised, Reason={reason}");
             _initialized = false; // force reload next time
         }
 
@@ -62,7 +61,7 @@ namespace SOS.Lib.Cache
 
             // sen i cache
             _cache[entity.Id] = entity;
-            Logger.LogDebug($"{GetType().Name}.AddOrUpdateAsync()");
+            Logger.LogInformation($"{GetType().Name}.AddOrUpdateAsync()");
             return true;
         }
 
@@ -70,7 +69,7 @@ namespace SOS.Lib.Cache
         {
             _cache.Clear();
             _initialized = false;
-            Logger.LogDebug($"{GetType().Name}.Clear()");
+            Logger.LogInformation($"{GetType().Name}.Clear()");
         }
 
         public async Task ClearAsync()
@@ -89,7 +88,7 @@ namespace SOS.Lib.Cache
                 _cache[key] = entity;
 
             sp.Stop();
-            Logger.LogDebug($"{GetType().Name}.GetAsync() updated cache, Time elapsed={sp.ElapsedMilliseconds}ms");
+            Logger.LogInformation($"{GetType().Name}.GetAsync() updated cache, Time elapsed={sp.ElapsedMilliseconds}ms");
             return entity;
         }
 
