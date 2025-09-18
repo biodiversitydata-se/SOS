@@ -97,7 +97,7 @@ namespace SOS.Lib.Cache
             // Om cache redan finns och är initierad → returnera direkt
             if (_initialized && !_cache.IsEmpty)
             {
-                Logger.LogInformation($"{GetType().Name}.GetAllAsync(). Already initialized. Count={_cache?.Count}.");
+                Logger.LogTrace($"{GetType().Name}.GetAllAsync(). Already initialized. Count={_cache?.Count}.");
                 return _cache.Values;
             }
 
