@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
-using SOS.Lib.Cache.HybridCacheLibrary;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Interfaces;
