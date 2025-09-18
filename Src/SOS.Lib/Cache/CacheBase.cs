@@ -30,7 +30,8 @@ namespace SOS.Lib.Cache
         protected readonly IRepositoryBase<TEntity, TKey> Repository;
 
         protected readonly IMemoryCache MemoryCache;
-        private SemaphoreSlim semaphore = new SemaphoreSlim(1, 1);
+        private SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
+        private SemaphoreSlim _getAllSemaphore = new SemaphoreSlim(1, 1);
 
         protected readonly ILogger<CacheBase<TKey, TEntity>> Logger;
 
@@ -56,7 +57,7 @@ namespace SOS.Lib.Cache
         protected async Task<ConcurrentDictionary<TKey, TEntity>> GetCacheAsync()
         {
             ConcurrentDictionary<TKey, TEntity> dictionary;
-            await semaphore.WaitAsync();
+            await _semaphore.WaitAsync();
             try
             {
                 MemoryCache.TryGetValue(_cacheKey, out dictionary);
@@ -72,7 +73,7 @@ namespace SOS.Lib.Cache
             }            
             finally
             {
-                semaphore.Release();
+                _semaphore.Release();
             }
 
             return dictionary;
@@ -142,20 +143,35 @@ namespace SOS.Lib.Cache
 
             if (!_initialized || cache.IsEmpty)
             {
-                Stopwatch sp = Stopwatch.StartNew();
-                var entities = await Repository.GetAllAsync();
-
-                if (entities != null)
+                await _getAllSemaphore.WaitAsync();
+                try
                 {
-                    await ClearAsync();
-                    foreach (var entity in entities)
+                    // dubbelkolla efter låset (någon annan kan ha hunnit ladda klart)
+                    if (!_initialized || cache.IsEmpty)
                     {
-                        cache.TryAdd(entity.Id, entity);
+                        Stopwatch sp = Stopwatch.StartNew();
+                        var entities = await Repository.GetAllAsync();
+
+                        if (entities != null)
+                        {
+                            await ClearAsync();
+                            foreach (var entity in entities)
+                            {
+                                cache.TryAdd(entity.Id, entity);
+                            }
+                            _initialized = true;
+                        }
+
+                        sp.Stop();
+                        Logger.LogDebug(
+                            $"CacheBase.GetAllAsync updated cache for type={GetType().Name}, Time elapsed={sp.ElapsedMilliseconds}ms"
+                        );
                     }
-                    _initialized = true;
                 }
-                sp.Stop();
-                Logger.LogDebug($"CacheBase.GetAllAsync updated cache for type={GetType().Name}, Time elapsed={sp.ElapsedMilliseconds}ms");
+                finally
+                {
+                    _getAllSemaphore.Release();
+                }
             }
 
             return cache.Values;

@@ -23,8 +23,6 @@ namespace SOS.Lib.Repositories
     public class RepositoryBase<TEntity, TKey> : IRepositoryBase<TEntity, TKey> where TEntity : IEntity<TKey>
     {
         private readonly string _collectionName;
-        private readonly TimeSpan _serverTimeout = TimeSpan.FromMinutes(120); // Server-side timeout for operations
-        private readonly TimeSpan _clientTimeout = TimeSpan.FromMinutes(120); // Client-side timeout for operations
 
         /// <summary>
         ///     Disposed
@@ -151,7 +149,7 @@ namespace SOS.Lib.Repositories
             ILogger logger
         ) : this(client, typeof(TEntity).Name, logger)
         {
-           
+
         }
 
         /// <summary>
@@ -164,7 +162,7 @@ namespace SOS.Lib.Repositories
             IMongoDbClient client,
             string collectionName,
             ILogger logger
-        ) 
+        )
         {
             BsonNetTopologySuiteSerializers.Register();
 
@@ -178,7 +176,7 @@ namespace SOS.Lib.Repositories
 
             // Clean name from non alfa numeric chats
             _collectionName = collectionName.UntilNonAlfanumeric();
-        } 
+        }
 
 
         /// <summary>
@@ -226,7 +224,8 @@ namespace SOS.Lib.Repositories
             try
             {
                 // Create the collection
-                await Database.CreateCollectionAsync(collectionName, new CreateCollectionOptions { 
+                await Database.CreateCollectionAsync(collectionName, new CreateCollectionOptions
+                {
                     Collation = new Collation(locale: "sv", strength: CollationStrength.Primary),
                     IndexOptionDefaults = new IndexOptionDefaults()
                 });
@@ -320,10 +319,10 @@ namespace SOS.Lib.Repositories
             {
                 var bulkOps = new List<WriteModel<TEntity>>();
                 if (comparisonField != "_id")
-                {                    
+                {
                     // Fetch all existing documents from MongoDB based on comparisonField
                     var comparisonValues = items.Select(i => typeof(TEntity).GetProperty(comparisonField)?.GetValue(i)).Where(v => v != null).ToList();
-                    var existingDocs = await mongoCollection.Find(Builders<TEntity>.Filter.In(comparisonField, comparisonValues)).ToListAsync();                    
+                    var existingDocs = await mongoCollection.Find(Builders<TEntity>.Filter.In(comparisonField, comparisonValues)).ToListAsync();
                     var existingDocsDict = existingDocs.ToDictionary(doc => typeof(TEntity).GetProperty(comparisonField)?.GetValue(doc));
 
                     // Update the batch objects with correct _id if they already exist in the database
@@ -344,7 +343,7 @@ namespace SOS.Lib.Repositories
                 }
 
                 foreach (var item in items)
-                {                    
+                {
                     var comparisonValue = typeof(TEntity).GetProperty(comparisonField)?.GetValue(item);
                     if (comparisonValue == null)
                         throw new ArgumentException($"Field '{comparisonField}' not found or has null value.");
@@ -454,37 +453,15 @@ namespace SOS.Lib.Repositories
         /// <inheritdoc />
         public async Task<bool> CheckIfCollectionExistsAsync(string collectionName)
         {
-            try
-            {
-                var options = new ListCollectionNamesOptions
-                {
-                    Filter = new BsonDocument("name", collectionName)
-                };
+            //filter by collection name
+            var exists = await (await Database
+                    .ListCollectionNamesAsync(new ListCollectionNamesOptions
+                    {
+                        Filter = new BsonDocument("name", collectionName)
+                    }))
+                .AnyAsync();
 
-                using (var cancellationTokenSource = new CancellationTokenSource(_clientTimeout)) // Client-side timeout
-                {
-                    var exists = await (await Database
-                            .ListCollectionNamesAsync(options, cancellationTokenSource.Token))
-                        .AnyAsync(cancellationTokenSource.Token);
-
-                    return exists;
-                }
-            }
-            catch (OperationCanceledException)
-            {
-                Logger.LogError("MongoDB operation was canceled due to client-side timeout.");
-                throw;
-            }
-            catch (MongoExecutionTimeoutException)
-            {
-                Logger.LogError("MongoDB operation exceeded the server-side timeout.");
-                throw;
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e, "Failed to check if collection exists with timeout.");
-                throw;
-            }
+            return exists;
         }
 
         /// <inheritdoc />
@@ -543,44 +520,21 @@ namespace SOS.Lib.Repositories
 
         /// <inheritdoc />
         public async Task<long> CountAllDocumentsAsync(IMongoCollection<TEntity> mongoCollection, bool estimateCount = true)
-        {            
+        {
             try
-            {        
-                var options = new CountOptions
+            {
+                if (estimateCount)
                 {
-                    MaxTime = _serverTimeout // Server-side timeout
-                };
-
-                using (var cancellationTokenSource = new CancellationTokenSource(_clientTimeout)) // Client-side timeout
-                {
-                    if (estimateCount)
-                    {
-                        return await mongoCollection.EstimatedDocumentCountAsync(new EstimatedDocumentCountOptions
-                        {
-                            MaxTime = _serverTimeout
-                        }, cancellationTokenSource.Token);
-                    }
-
-                    return await MongoCollection.CountDocumentsAsync(FilterDefinition<TEntity>.Empty, options, cancellationTokenSource.Token);
+                    return await mongoCollection.EstimatedDocumentCountAsync();                   
                 }
+
+                return await mongoCollection.CountDocumentsAsync(FilterDefinition<TEntity>.Empty);
             }
-            catch (OperationCanceledException)
+            catch
             {
-                Logger.LogError("MongoDB operation was canceled due to client-side timeout.");
-                throw;
-            }
-            catch (MongoExecutionTimeoutException)
-            {
-                Logger.LogError("MongoDB operation exceeded the server-side timeout.");
-                throw;
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e, "Failed to count documents with timeout.");
-                //throw;
                 return 0;
             }
-        }         
+        }        
 
         /// <inheritdoc />
         public virtual async Task<bool> DeleteManyAsync(IEnumerable<TKey> ids)
@@ -627,28 +581,8 @@ namespace SOS.Lib.Repositories
             try
             {
                 var searchFilter = Builders<TEntity>.Filter.Eq("_id", id);
-                var options = new FindOptions
-                {                    
-                    MaxTime = _serverTimeout // Server-side timeout
-                };
-
-                using (var cancellationTokenSource = new CancellationTokenSource(_clientTimeout)) // Client-side timeout
-                {
-                    var result = await MongoCollection
-                        .Find(searchFilter, options)                        
-                        .FirstOrDefaultAsync(cancellationTokenSource.Token);
-                    return result;
-                }
-            }
-            catch (OperationCanceledException)
-            {
-                Logger.LogError("MongoDB operation was canceled due to client-side timeout.");
-                throw;
-            }
-            catch (MongoExecutionTimeoutException)
-            {
-                Logger.LogError("MongoDB operation exceeded the server-side timeout.");
-                throw;
+                var result = await MongoCollection.FindSync(searchFilter).FirstOrDefaultAsync();
+                return result;
             }
             catch (Exception e)
             {
@@ -662,30 +596,12 @@ namespace SOS.Lib.Repositories
         {
             try
             {
-                var options = new FindOptions<TEntity>
-                {
-                    MaxTime = _serverTimeout
-                };
-
-                using (var cancellationTokenSource = new CancellationTokenSource(_clientTimeout))
-                {
-                    var cursor = await MongoCollection.FindAsync(x => ids.Contains(x.Id), options, cancellationTokenSource.Token);
-                    return await cursor.ToListAsync(cancellationTokenSource.Token);
-                }
-            }
-            catch (OperationCanceledException)
-            {
-                Logger.LogError("MongoDB operation was canceled due to client-side timeout.");
-                throw;
-            }
-            catch (MongoExecutionTimeoutException)
-            {
-                Logger.LogError("MongoDB operation exceeded the server-side timeout.");
-                throw;
+                return await MongoCollection.Find(x => ids.Contains(x.Id)).ToListAsync();
             }
             catch (Exception e)
             {
-                Logger.LogError(e, "Failed to get many by id's with timeout.");
+                Logger.LogError(e, "Failed to get many by id's");
+
                 throw;
             }
         }
@@ -696,40 +612,24 @@ namespace SOS.Lib.Repositories
             return await GetBatchAsync(skip, MongoCollection);
         }
 
+        /// <inheritdoc />
         public async Task<IEnumerable<TEntity>> GetBatchAsync(int skip, IMongoCollection<TEntity> mongoCollection)
         {
             try
             {
-                var options = new FindOptions
-                {
-                    MaxTime = _serverTimeout // Server-side timeout
-                };
+                var res = await mongoCollection
+                    .Find(FilterDefinition<TEntity>.Empty)
+                    //.Sort(Builders<TEntity>.Sort.Descending("id"))
+                    .Skip(skip)
+                    .Limit(BatchSizeRead)
+                    .ToListAsync();
 
-                using (var cancellationTokenSource = new CancellationTokenSource(_clientTimeout)) // Client-side timeout
-                {
-                    var res = await mongoCollection
-                        .Find(FilterDefinition<TEntity>.Empty, options)
-                        //.Sort(Builders<TEntity>.Sort.Descending("id"))
-                        .Skip(skip)
-                        .Limit(BatchSizeRead)
-                        .ToListAsync(cancellationTokenSource.Token);
-
-                    return res;
-                }
-            }
-            catch (OperationCanceledException)
-            {
-                Logger.LogError("MongoDB operation was canceled due to client-side timeout.");
-                throw;
-            }
-            catch (MongoExecutionTimeoutException)
-            {
-                Logger.LogError("MongoDB operation exceeded the server-side timeout.");
-                throw;
+                return res;
             }
             catch (Exception e)
             {
                 Logger.LogError(e, "Failed to get batch");
+
                 throw;
             }
         }
@@ -743,34 +643,9 @@ namespace SOS.Lib.Repositories
         /// <inheritdoc />
         public async Task<List<TEntity>> GetAllAsync(IMongoCollection<TEntity> mongoCollection)
         {
-            try
-            {
-                var options = new FindOptions<TEntity>
-                {
-                    MaxTime = _serverTimeout // Server-side timeout
-                };
+            var res = await mongoCollection.AsQueryable().ToListAsync();
 
-                using (var cancellationTokenSource = new CancellationTokenSource(_clientTimeout)) // Client-side timeout
-                {
-                    var cursor = await mongoCollection.FindAsync(FilterDefinition<TEntity>.Empty, options, cancellationTokenSource.Token);
-                    return await cursor.ToListAsync(cancellationTokenSource.Token);
-                }
-            }
-            catch (OperationCanceledException)
-            {
-                Logger.LogError("MongoDB operation was canceled due to client-side timeout.");
-                throw;
-            }
-            catch (MongoExecutionTimeoutException)
-            {
-                Logger.LogError("MongoDB operation exceeded the server-side timeout.");
-                throw;
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e, "Failed to retrieve all documents with timeout.");
-                throw;
-            }
+            return res;
         }
 
         /// <inheritdoc />
@@ -784,7 +659,7 @@ namespace SOS.Lib.Repositories
             bool noCursorTimeout = false)
         {
             return await mongoCollection.FindAsync(FilterDefinition<TEntity>.Empty,
-                new FindOptions<TEntity, TEntity> { MaxTime = _serverTimeout, NoCursorTimeout = noCursorTimeout, BatchSize = BatchSizeRead, AllowPartialResults = true, CursorType = CursorType.NonTailable });
+                new FindOptions<TEntity, TEntity> { NoCursorTimeout = noCursorTimeout, BatchSize = BatchSizeRead, AllowPartialResults = true, CursorType = CursorType.NonTailable });
         }
 
         /// <inheritdoc />
@@ -834,7 +709,7 @@ namespace SOS.Lib.Repositories
             bool noCursorTimeout = false)
         {
             return await mongoCollection.FindAsync(filterDefinition,
-                new FindOptions<TEntity, TProjection> { MaxTime = _serverTimeout, NoCursorTimeout = noCursorTimeout, BatchSize = BatchSizeRead, AllowPartialResults = true, CursorType = CursorType.NonTailable, Projection = projectionDefinition });
+                new FindOptions<TEntity, TProjection> { NoCursorTimeout = noCursorTimeout, BatchSize = BatchSizeRead, AllowPartialResults = true, CursorType = CursorType.NonTailable, Projection = projectionDefinition });
         }
 
         /// <inheritdoc />
@@ -855,31 +730,16 @@ namespace SOS.Lib.Repositories
                     Builders<TEntity>.Filter.Lte(d => d.Id, endId)
                 };
 
-                var options = new FindOptions<TEntity>
-                {
-                    MaxTime = _serverTimeout
-                };
+                var res = await mongoCollection
+                    .Find(Builders<TEntity>.Filter.And(filters))
+                    .ToListAsync();
 
-                using (var cancellationTokenSource = new CancellationTokenSource(_clientTimeout))
-                {
-                    var cursor = await mongoCollection
-                        .FindAsync(Builders<TEntity>.Filter.And(filters), options, cancellationTokenSource.Token);
-                    return await cursor.ToListAsync(cancellationTokenSource.Token);
-                }
-            }
-            catch (OperationCanceledException)
-            {
-                Logger.LogError("MongoDB operation was canceled due to client-side timeout.");
-                throw;
-            }
-            catch (MongoExecutionTimeoutException)
-            {
-                Logger.LogError("MongoDB operation exceeded the server-side timeout.");
-                throw;
+                return res;
             }
             catch (Exception e)
             {
-                Logger.LogError(e, "Failed to get batch with timeout.");
+                Logger.LogError(e, "Failed to get batch");
+
                 throw;
             }
         }
@@ -896,37 +756,19 @@ namespace SOS.Lib.Repositories
             try
             {
                 Logger.LogDebug($"Try to get max id for ({mongoCollection.CollectionNamespace})");
+                var max = await mongoCollection
+                    .Find(FilterDefinition<TEntity>.Empty)
+                    .Project(d => d.Id)
+                    .Sort(Builders<TEntity>.Sort.Descending("_id"))
+                    .Limit(1)
+                    .FirstOrDefaultAsync();
 
-                var options = new FindOptions
-                {
-                    MaxTime = _serverTimeout // Server-side timeout
-                };
-
-                using (var cancellationTokenSource = new CancellationTokenSource(_clientTimeout)) // Client-side timeout
-                {
-                    var max = await mongoCollection
-                        .Find(FilterDefinition<TEntity>.Empty, options)
-                        .Project(d => d.Id)
-                        .Sort(Builders<TEntity>.Sort.Descending("_id"))
-                        .Limit(1)
-                        .FirstOrDefaultAsync(cancellationTokenSource.Token);
-
-                    return max;
-                }
-            }
-            catch (OperationCanceledException)
-            {
-                Logger.LogError("MongoDB operation was canceled due to client-side timeout.");
-                throw;
-            }
-            catch (MongoExecutionTimeoutException)
-            {
-                Logger.LogError("MongoDB operation exceeded the server-side timeout.");
-                throw;
+                return max;
             }
             catch (Exception e)
             {
                 Logger.LogError(e, "Failed to get max id");
+
                 throw;
             }
         }
@@ -954,29 +796,16 @@ namespace SOS.Lib.Repositories
                     })
                 };
 
-                using (var cancellationTokenSource = new CancellationTokenSource(_clientTimeout)) // Apply timeout
+                var result = await mongoCollection.Aggregate<BsonDocument>(pipeline).FirstOrDefaultAsync();
+
+                if (result != null && result.Contains("_id") && result.Contains(fieldName))
                 {
-                    var result = await mongoCollection.Aggregate<BsonDocument>(pipeline, cancellationToken: cancellationTokenSource.Token).FirstOrDefaultAsync();
-
-                    if (result != null && result.Contains("_id") && result.Contains(fieldName))
-                    {
-                        int id = result["_id"].AsInt32;
-                        T fieldValue = ConvertToType<T>(result[fieldName]);
-                        return (id, fieldValue);
-                    }
-
-                    return default;
+                    int id = result["_id"].AsInt32;
+                    T fieldValue = ConvertToType<T>(result[fieldName]);
+                    return (id, fieldValue);
                 }
-            }
-            catch (OperationCanceledException)
-            {
-                Logger.LogError("MongoDB operation was canceled due to client-side timeout.");
-                throw;
-            }
-            catch (MongoExecutionTimeoutException)
-            {
-                Logger.LogError("MongoDB operation exceeded the server-side timeout.");
-                throw;
+
+                return default;
             }
             catch (Exception e)
             {
@@ -993,6 +822,139 @@ namespace SOS.Lib.Repositories
             return (T)Convert.ChangeType(bsonValue.ToString(), typeof(T)); // Konvertera till T
         }
 
+        //public async Task<BsonDocument> GetMaxValueWithIdAsync(
+        //    IMongoCollection<BsonDocument> mongoCollection,
+        //    string fieldName)
+        //{
+        //    try
+        //    {
+        //        Logger.LogDebug($"Trying to get max value for field '{fieldName}' in ({mongoCollection.CollectionNamespace})");
+
+        //        var pipeline = new[]
+        //        {
+        //            new BsonDocument("$sort", new BsonDocument(fieldName, -1)), // Sortera fallande
+        //            new BsonDocument("$limit", 1), // Ta endast det första dokumentet
+        //            new BsonDocument("$project", new BsonDocument
+        //            {
+        //                { "_id", 1 },
+        //                { fieldName, 1 }
+        //            }) // Behåll endast _id och det angivna fältet
+        //        };
+
+        //        var result = await mongoCollection.Aggregate<BsonDocument>(pipeline).FirstOrDefaultAsync();
+
+        //        return result ?? new BsonDocument(); // Returnera tomt dokument om inget hittas
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        Logger.LogError(e, $"Failed to get max value for field '{fieldName}'");
+        //        throw;
+        //    }
+        //}
+
+
+        //public record MaxFieldResult<TId, TValue>(TId Id, TValue MaxValue);
+
+        //public async Task<MaxFieldResult<TId, TValue>> GetMaxFieldValueAsync<TId, TValue>(
+        //    IMongoCollection<TEntity> mongoCollection, Expression<Func<TEntity, TValue>> fieldSelector)
+        //{
+        //    try
+        //    {
+        //        var fieldName = ((MemberExpression)fieldSelector.Body).Member.Name;
+        //        Logger.LogDebug($"Trying to get max value for field '{fieldName}' in ({mongoCollection.CollectionNamespace})");
+
+        //        var result = await mongoCollection
+        //            .Find(FilterDefinition<TEntity>.Empty)
+        //            .Sort(Builders<TEntity>.Sort.Descending(fieldSelector)) // Sortera på valt fält
+        //            .Limit(1) // Ta bara första träffen
+        //            .Project(d => new { Id = d.Id, MaxValue = fieldSelector.Compile().Invoke(d) }) // Projicera korrekt
+        //            .FirstOrDefaultAsync();
+
+        //        if (result == null)
+        //            return new MaxFieldResult<TId, TValue>(default!, default!);
+
+        //        return new MaxFieldResult<TId, TValue>(result.Id, result.MaxValue);
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        Logger.LogError(e, "Failed to get max value");
+        //        throw;
+        //    }
+        //}
+
+
+
+        //public async Task<int> GetMaxFieldValueAsync(IMongoCollection<TEntity> mongoCollection, string fieldName)
+        //{
+        //    try
+        //    {
+        //        Logger.LogDebug($"Trying to get max value for field '{fieldName}' in ({mongoCollection.CollectionNamespace})");
+
+        //        var result = await mongoCollection.Aggregate()
+        //            .Group(new BsonDocument
+        //            {
+        //                { "_id", BsonNull.Value },
+        //                { "maxValue", new BsonDocument("$max", $"${fieldName}") }
+        //            })
+        //            .FirstOrDefaultAsync();
+
+        //        return result == null ? 0 : result["maxValue"].AsInt32;
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        Logger.LogError(e, $"Failed to get max value for field '{fieldName}'");
+        //        throw;
+        //    }
+        //}
+
+
+        //public async Task<int> GetMaxObservationIdAsync(IMongoCollection<TEntity> mongoCollection)
+        //{
+        //    try
+        //    {
+        //        Logger.LogDebug($"Trying to get max ObservationId for ({mongoCollection.CollectionNamespace})");
+
+        //        var maxObservationId = await mongoCollection
+        //            .Find(FilterDefinition<TEntity>.Empty)
+        //            .Sort(Builders<TEntity>.Sort.Descending("ObservationId"))
+        //            .Limit(1)
+        //            .Project(d => d.ObservationId)
+        //            .FirstOrDefaultAsync();
+
+        //        return maxObservationId;
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        Logger.LogError(e, "Failed to get max ObservationId");
+        //        throw;
+        //    }
+        //}
+
+
+        //public async Task<int> GetMaxObservationIdAsync(IMongoCollection<TEntity> mongoCollection, string field)
+        //{
+        //    try
+        //    {
+        //        Logger.LogDebug($"Trying to get max {field} for ({mongoCollection.CollectionNamespace})");
+
+        //        var result = await mongoCollection.Aggregate()
+        //            .Group(new BsonDocument
+        //            {
+        //        { "_id", BsonNull.Value }, // Grupp utan faktisk gruppering
+        //        { "maxObservationId", new BsonDocument("$max", "$ObservationId") }
+        //            })
+        //            .FirstOrDefaultAsync();
+
+        //        return result == null ? 0 : result["maxObservationId"].AsInt32;
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        Logger.LogError(e, "Failed to get max ObservationId");
+        //        throw;
+        //    }
+        //}
+
+
         public async Task<TKey> GetMaxIdAsync(string collectionName)
         {
             var collection = GetMongoCollection(collectionName);
@@ -1004,36 +966,18 @@ namespace SOS.Lib.Repositories
         {
             try
             {
-                var options = new FindOptions
+                var document = await mongoCollection
+                    .Find(FilterDefinition<TEntity>.Empty)
+                    .Sort(Builders<TEntity>.Sort.Descending("_id"))
+                    .Limit(1)
+                    .FirstOrDefaultAsync();
+
+                if (document == null)
                 {
-                    MaxTime = _serverTimeout // Server-side timeout
-                };
-
-                using (var cancellationTokenSource = new CancellationTokenSource(_clientTimeout)) // Client-side timeout
-                {
-                    var document = await mongoCollection
-                        .Find(FilterDefinition<TEntity>.Empty, options)
-                        .Sort(Builders<TEntity>.Sort.Descending("_id"))
-                        .Limit(1)
-                        .FirstOrDefaultAsync(cancellationTokenSource.Token);
-
-                    if (document == null)
-                    {
-                        Logger.LogWarning($"No document found in collection {mongoCollection}.");
-                    }
-
-                    return document;
+                    Logger.LogWarning($"No document found in collection {mongoCollection}.");
                 }
-            }
-            catch (OperationCanceledException)
-            {
-                Logger.LogError("MongoDB operation was canceled due to client-side timeout.");
-                throw;
-            }
-            catch (MongoExecutionTimeoutException)
-            {
-                Logger.LogError("MongoDB operation exceeded the server-side timeout.");
-                throw;
+
+                return document;
             }
             catch (Exception e)
             {
@@ -1050,27 +994,9 @@ namespace SOS.Lib.Repositories
         {
             try
             {
-                var options = new FindOptions
-                {
-                    MaxTime = _serverTimeout // Server-side timeout
-                };
-
-                using (var cancellationTokenSource = new CancellationTokenSource(_clientTimeout)) // Client-side timeout
-                {
-                    return await MongoCollection
-                        .Find(filter, options)
-                        .ToListAsync(cancellationTokenSource.Token);
-                }
-            }
-            catch (OperationCanceledException)
-            {
-                Logger.LogError("MongoDB operation was canceled due to client-side timeout.");
-                throw;
-            }
-            catch (MongoExecutionTimeoutException)
-            {
-                Logger.LogError("MongoDB operation exceeded the server-side timeout.");
-                throw;
+                return await MongoCollection
+                    .Find(filter)
+                    .ToListAsync();
             }
             catch (Exception e)
             {
