@@ -70,7 +70,7 @@ namespace SOS.Export.Jobs
             try
             {
                 var userExport = await _userExportRepository.GetAsync(userId);
-                var jobInfo = userExport.Jobs.FirstOrDefault(m => m.Id == jobId);
+                var jobInfo = userExport?.Jobs?.FirstOrDefault(m => m.Id == jobId);
                 if (jobInfo == null) return;
                 jobInfo.ProcessEndDate = DateTime.UtcNow;
                 jobInfo.Status = ExportJobStatus.Succeeded;

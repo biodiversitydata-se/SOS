@@ -332,7 +332,7 @@ namespace SOS.Lib.IO.Excel
                                 taxon.Attributes?.RedlistCategory,
                                 reportRow.County,
                                 reportRow.CountyId.ToString(),
-                                countyOccurrence?.Status ?? "saknas",
+                                countyOccurrence?.Status ?? "Saknas",
                                 reportRow.ObservationCountAllDatasets.ToString(),
                                 reportRow.ObservationCountArtportalen.ToString(),
                                 reportRow.ObservationCountArtportalenVerified.ToString(),
