@@ -103,7 +103,7 @@ namespace SOS.Lib.Cache
         public async Task<IEnumerable<Area>> GetAreasAsync(
             IEnumerable<(AreaType areaType, string featureId)> areaKeys)
         {
-            var cache = await GetCacheAsync();
+            var cache = GetCache();
             if (!areaKeys?.Any() ?? true)
             {
                 return null;

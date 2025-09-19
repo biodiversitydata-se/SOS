@@ -49,10 +49,12 @@ namespace SOS.Harvest.Harvesters.Artportalen
             if (mode == JobRunModes.Full || !_artportalenMetadataContainer.IsInitialized)
             {
                 await _artportalenMetadataContainer.InitializeAsync();
+                Logger.LogInformation($"PrepareHarvestAsync(): After InitializeAsync()");
                 cancellationToken?.ThrowIfCancellationRequested();
+                Logger.LogInformation($"PrepareHarvestAsync(): After ThrowIfCancellationRequested()");
             }
 
-            Logger.LogDebug("Start creating factory");
+            Logger.LogDebug("Start creating ArtportalenHarvestFactory");
             var harvestFactory = new ArtportalenHarvestFactory(
                 _mediaRepository,
                 _projectRepository,
@@ -69,9 +71,9 @@ namespace SOS.Harvest.Harvesters.Artportalen
 
             if (mode.Equals(JobRunModes.Full))
             {
-                Logger.LogDebug("Start caching sites");
+                Logger.LogInformation("Start caching sites");
                 await harvestFactory.CacheFreqventlyUsedSitesAsync();
-                Logger.LogDebug("Finish caching sites");
+                Logger.LogInformation("Finish caching sites");
             }
 
             return harvestFactory;
@@ -429,9 +431,11 @@ namespace SOS.Harvest.Harvesters.Artportalen
             (DateTime startDate, long preHarvestCount) initValues = (DateTime.Now, 0);
             try
             {
+                Logger.LogInformation($"Artportalen harvest before PrepareHarvestAsync()");
                 using var harvestFactory = await PrepareHarvestAsync(mode, cancellationToken);
+                Logger.LogInformation($"Artportalen harvest after PrepareHarvestAsync()");
                 initValues.preHarvestCount = await InitializeHarvestAsync(false);
-
+                Logger.LogInformation($"Artportalen harvest after InitializeHarvestAsync()");
                 harvestCount = mode == JobRunModes.Full ?
                     await HarvestAllAsync(harvestFactory, cancellationToken)
                     :
