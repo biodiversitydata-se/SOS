@@ -51,7 +51,7 @@ namespace SOS.Export.Jobs
                 var userExport = await _userExportRepository.GetAsync(userId);
                 RemoveExpiredJobs(userExport);
 
-                var jobInfo = userExport.Jobs.FirstOrDefault(m => m.Id == jobId);
+                var jobInfo = userExport?.Jobs?.FirstOrDefault(m => m.Id == jobId);
                 if (jobInfo == null) return;
 
                 jobInfo.ProcessStartDate = DateTime.UtcNow;

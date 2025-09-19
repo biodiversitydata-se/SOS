@@ -4,7 +4,7 @@ namespace SOS.Lib.Models.Reports
 {
     internal class CountyOccurrenceReportRow
     {
-        public long CountyId { get; set; }
+        public int CountyId { get; set; }
         public string County { get; set; }
         public DateTime? LastRecorded { get; set; }
         public long ObservationCountAllDatasets { get; set; }

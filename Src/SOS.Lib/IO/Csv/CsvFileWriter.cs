@@ -316,10 +316,11 @@ namespace SOS.Lib.IO.Excel
                             Id = taxonId,
                             ScientificName = "Missing taxon"
                         };
+                        var taxonCountryOccurrences = taxon.Attributes?.CountyOccurrences?.ToDictionary(co => co.Id, co => co) ?? new Dictionary<int, Models.DarwinCore.CountyOccurrence>();
                         foreach (var reportRow in taxonData.Values)
                         {
-                            var countyOccurrence = taxon.Attributes?.CountyOccurrences?.FirstOrDefault(co => co.Id.Equals(reportRow.CountyId));
-                           
+                            taxonCountryOccurrences.TryGetValue(reportRow.CountyId, out var countyOccurrence);
+                              
                             csvFileHelper.WriteRow([
                                 taxon.Id.ToString(),
                                 taxon.ScientificName,
@@ -344,7 +345,7 @@ namespace SOS.Lib.IO.Excel
                                 reportRow.LastRecorded?.ToString("yyyy-MM-dd")
                            ]);
                         }
-                        await Task.Delay(5000); // sleep 5 sec to give Elastic some rest
+                        await Task.Delay(2500); // sleep 2,5 sec to give Elastic some rest
                     }
                     csvFileHelper.FinishWrite();
                     await csvFileHelper.FlushAsync();
