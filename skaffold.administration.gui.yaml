@@ -20,7 +20,7 @@ deploy:
   # helm:
   #   releases:
   #   - name: redis
-  #    remoteChart: oci://reg.app.slu.se/oci-charts/redis-standalone
-  #    valuesFiles:
-  #      - ./devops/helm/local/redis/values.yaml
-  #    version: 0.2.1
+  #     remoteChart: oci://reg.app.slu.se/oci-charts/redis-standalone
+  #     valuesFiles:
+  #       - ./devops/helm/local/redis/values.yaml
+  #     version: 0.2.1
