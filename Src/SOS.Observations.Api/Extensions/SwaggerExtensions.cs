@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
-using NetTopologySuite.Geometries;
 using SOS.Lib.ActionFilters;
 using SOS.Lib.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -99,7 +98,6 @@ public static class SwaggerExtensions
                         (isInternalDocument || !isInternalApi)
                     );
                 });
-
                 options.AddSecurityDefinition("Bearer", //Name the security scheme
                     new OpenApiSecurityScheme
                     {
@@ -184,8 +182,8 @@ public static class SwaggerExtensions
             foreach (var description in provider.ApiVersionDescriptions)
             {
                 options.SwaggerDoc(
-                       $"InternalSosObservations{description.GroupName}",
-                       new OpenApiInfo()
+                       $"InternalSosObservations{description.GroupName}", 
+                       new OpenApiInfo
                        {
                            Title = $"SOS Observations API (Internal) {description.GroupName.ToUpperInvariant()}",
                            Version = description.ApiVersion.ToString(),
@@ -193,7 +191,7 @@ public static class SwaggerExtensions
                        });
                 options.SwaggerDoc(
                     $"PublicSosObservations{description.GroupName}",
-                    new OpenApiInfo()
+                    new OpenApiInfo
                     {
                         Title = $"SOS Observations API (Public) {description.GroupName.ToUpperInvariant()}",
                         Version = description.ApiVersion.ToString(),
@@ -201,7 +199,7 @@ public static class SwaggerExtensions
                     });
                 options.SwaggerDoc(
                        $"AzureInternalSosObservations{description.GroupName}",
-                       new OpenApiInfo()
+                       new OpenApiInfo
                        {
                            Title = $"SOS Observations API (Internal - Azure) {description.GroupName.ToUpperInvariant()}",
                            Version = description.ApiVersion.ToString(),
@@ -209,7 +207,7 @@ public static class SwaggerExtensions
                        });
                 options.SwaggerDoc(
                     $"AzurePublicSosObservations{description.GroupName}",
-                    new OpenApiInfo()
+                    new OpenApiInfo
                     {
                         Title = $"SOS Observations API (Public - Azure) {description.GroupName.ToUpperInvariant()}",
                         Version = description.ApiVersion.ToString(),

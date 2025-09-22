@@ -22,159 +22,143 @@ namespace SOS.Lib.Cache
         /// <summary>
         /// Flag indicating that the cache has been fully populated
         /// </summary>
-        private bool _initialized;        
+        private bool _initialized;
 
         /// <summary>
         /// Data repository
         /// </summary>
         protected readonly IRepositoryBase<TEntity, TKey> Repository;
-
         protected readonly IMemoryCache MemoryCache;
-        private SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
-        private SemaphoreSlim _getAllSemaphore = new SemaphoreSlim(1, 1);
-
         protected readonly ILogger<CacheBase<TKey, TEntity>> Logger;
+
+        private readonly SemaphoreSlim _reloadSemaphore = new SemaphoreSlim(1, 1);
+        private ConcurrentDictionary<TKey, TEntity> _cache = new ConcurrentDictionary<TKey, TEntity>();
 
         public TimeSpan CacheDuration { get; set; } = TimeSpan.FromMinutes(10);
 
-        private string _cacheKey = "Cache";
-        
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="repository"></param>
-        /// <param name="memoryCache"></param>
-        /// <param name="logger"></param>
+        private readonly string _cacheKey;
+
         protected CacheBase(IRepositoryBase<TEntity, TKey> repository, IMemoryCache memoryCache, ILogger<CacheBase<TKey, TEntity>> logger)
         {
             Repository = repository ?? throw new ArgumentNullException(nameof(repository));
             MemoryCache = memoryCache;
             Logger = logger;
-            _cacheKey = GetType().Name + "-" + Guid.NewGuid().ToString();
+            _cacheKey = GetType().Name + "-" + Guid.NewGuid();
             Logger.LogInformation($"Cache created. Type={GetType().Name}");
-        }
-
-        protected async Task<ConcurrentDictionary<TKey, TEntity>> GetCacheAsync()
-        {
-            ConcurrentDictionary<TKey, TEntity> dictionary;
-            await _semaphore.WaitAsync();
-            try
-            {
-                MemoryCache.TryGetValue(_cacheKey, out dictionary);
-                if (dictionary == null)
-                {
-                    dictionary = new ConcurrentDictionary<TKey, TEntity>();                    
-                    var cacheEntryOptions = new MemoryCacheEntryOptions()
-                        .SetAbsoluteExpiration(CacheDuration)                        
-                        .RegisterPostEvictionCallback(callback: OnCacheEviction, state: this);
-                    MemoryCache.Set(_cacheKey, dictionary, cacheEntryOptions);
-                    Logger.LogInformation($"Cache set. Type={GetType().Name}");
-                }
-            }            
-            finally
-            {
-                _semaphore.Release();
-            }
-
-            return dictionary;
         }
 
         private void OnCacheEviction(object key, object value, EvictionReason reason, object state)
         {
-            Logger.LogDebug($"{GetType().Name}.OnCacheEviction() raised, Reason={reason}");            
+            Logger.LogInformation($"{GetType().Name}.OnCacheEviction() raised, Reason={reason}");
+            _initialized = false; // force reload next time
         }
 
-        /// <inheritdoc />
         public async Task<bool> AddOrUpdateAsync(TEntity entity)
         {
-            var cache = await GetCacheAsync();
+            // uppdatera i repository först
             if (!await Repository.AddOrUpdateAsync(entity))
-            {
                 return false;
-            }
 
-            cache.TryRemove(entity.Id, out var deletedEntity);
-            cache.TryAdd(entity.Id, entity);
-            Logger.LogDebug($"{GetType().Name}.AddOrUpdateAsync()");
+            // sen i cache
+            _cache[entity.Id] = entity;
+            Logger.LogInformation($"{GetType().Name}.AddOrUpdateAsync()");
             return true;
         }
 
-        /// <inheritdoc />
         public void Clear()
         {
-            var cache = GetCacheAsync().Result;
-            cache.Clear();
+            _cache.Clear();
             _initialized = false;
-            Logger.LogDebug($"{GetType().Name}.Clear()");
+            Logger.LogInformation($"{GetType().Name}.Clear()");
         }
 
         public async Task ClearAsync()
         {
-            var cache = await GetCacheAsync();
-            cache.Clear();
-            _initialized = false;
-            Logger.LogDebug($"{GetType().Name}.ClearAsync()");
+            await Task.Run(() => Clear());
         }
 
-        /// <inheritdoc />
         public virtual async Task<TEntity> GetAsync(TKey key)
         {
-            var cache = await GetCacheAsync();
-            if (cache.TryGetValue(key, out var entity))
-            {
+            if (_cache.TryGetValue(key, out var entity))
                 return entity;
-            }
 
             Stopwatch sp = Stopwatch.StartNew();
             entity = await Repository.GetAsync(key);
             if (entity != null)
-            {
-                cache.TryAdd(key, entity);
-            }
+                _cache[key] = entity;
+
             sp.Stop();
-            Logger.LogDebug($"{GetType().Name}.GetAsync() updated cache, Time elapsed={sp.ElapsedMilliseconds}ms");
+            Logger.LogInformation($"{GetType().Name}.GetAsync() updated cache, Time elapsed={sp.ElapsedMilliseconds}ms");
             return entity;
         }
 
-        /// <inheritdoc />
         public async Task<IEnumerable<TEntity>> GetAllAsync()
         {
-            var cache = await GetCacheAsync();
-
-            if (!_initialized || cache.IsEmpty)
+            // Om cache redan finns och är initierad → returnera direkt
+            if (_initialized && !_cache.IsEmpty)
             {
-                await _getAllSemaphore.WaitAsync();
-                try
-                {
-                    // dubbelkolla efter låset (någon annan kan ha hunnit ladda klart)
-                    if (!_initialized || cache.IsEmpty)
-                    {
-                        Stopwatch sp = Stopwatch.StartNew();
-                        var entities = await Repository.GetAllAsync();
-
-                        if (entities != null)
-                        {
-                            await ClearAsync();
-                            foreach (var entity in entities)
-                            {
-                                cache.TryAdd(entity.Id, entity);
-                            }
-                            _initialized = true;
-                        }
-
-                        sp.Stop();
-                        Logger.LogDebug(
-                            $"CacheBase.GetAllAsync updated cache for type={GetType().Name}, Time elapsed={sp.ElapsedMilliseconds}ms"
-                        );
-                    }
-                }
-                finally
-                {
-                    _getAllSemaphore.Release();
-                }
+                Logger.LogTrace($"{GetType().Name}.GetAllAsync(). Already initialized. Count={_cache?.Count}.");
+                return _cache.Values;
             }
 
-            return cache.Values;
+            await _reloadSemaphore.WaitAsync();
+            try
+            {
+                // dubbelkolla efter låset (någon annan kan ha hunnit ladda)
+                if (_initialized && !_cache.IsEmpty)
+                    return _cache.Values;
+
+                Stopwatch sp = Stopwatch.StartNew();
+                var entities = await Repository.GetAllAsync();
+                Logger.LogInformation($"{GetType().Name}.GetAllAsync(). Repository.GetAllAsync().Count={entities?.Count}.");
+                if (entities == null || entities.Count == 0)
+                {
+                    Logger.LogError($"{GetType().Name}.GetAllAsync() repository returned no entities, keeping old cache.");
+                    return _cache.Values; // fallback
+                }
+
+                var newCache = new ConcurrentDictionary<TKey, TEntity>();
+                foreach (var entity in entities)
+                    newCache[entity.Id] = entity;
+
+                // byt referens atomärt
+                _cache = newCache;
+                _initialized = true;
+                RegisterInMemoryCache();
+
+                sp.Stop();
+                Logger.LogInformation($"CacheBase.GetAllAsync() updated cache for type={GetType().Name}, Count={_cache.Count}, Time={sp.ElapsedMilliseconds}ms");
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, $"{GetType().Name}.GetAllAsync() failed, keeping old cache.");
+            }
+            finally
+            {
+                _reloadSemaphore.Release();
+            }
+
+            return _cache.Values;
+        }
+
+        protected ConcurrentDictionary<TKey, TEntity> GetCache()
+        {
+            if (_cache == null)
+            {
+                _cache = new ConcurrentDictionary<TKey, TEntity>();
+                RegisterInMemoryCache();
+            }
+            return _cache;
+        }
+
+        private void RegisterInMemoryCache()
+        {
+            var cacheEntryOptions = new MemoryCacheEntryOptions()
+                .SetAbsoluteExpiration(CacheDuration)
+                .RegisterPostEvictionCallback(OnCacheEviction, this);
+
+            MemoryCache.Set(_cacheKey, _cache, cacheEntryOptions);
+            Logger.LogInformation($"Cache registered in MemoryCache. Type={GetType().Name}");
         }
     }
 }
