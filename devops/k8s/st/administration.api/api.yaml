@@ -135,7 +135,7 @@ spec:
           - name: RedisConfiguration
             value: |
                 {
-                    "EndPoint": "redis.redis-common-dev.svc.cluster.local", 
+                    "EndPoint": "redis.redis-common-st.svc.cluster.local", 
                     "Port": 26379, 
                     "Password": 
                     "SECRET_PLACEHOLDER", 
