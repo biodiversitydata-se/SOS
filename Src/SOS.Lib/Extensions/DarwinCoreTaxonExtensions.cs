@@ -111,7 +111,7 @@ namespace SOS.Lib.Extensions
             taxon.Attributes.ProtectedByLaw = sourceTaxon.DynamicProperties?.ProtectedByLaw ?? false;
             taxon.Attributes.IsInvasiveAccordingToEuRegulation = sourceTaxon.DynamicProperties?.IsEURegulation_1143_2014 ?? false;
             taxon.Attributes.IsInvasiveInSweden = sourceTaxon.DynamicProperties?.IsInvasiveInSweden ?? false;
-            taxon.Attributes.InvasiveRiskAssessmentCategory = (sourceTaxon.DynamicProperties?.SwedishHistoryCategory?.Length ?? 0) < 2 ? string.Empty : sourceTaxon.DynamicProperties?.SwedishHistoryCategory?.Substring(0, 2);
+            taxon.Attributes.InvasiveRiskAssessmentCategory = sourceTaxon.DynamicProperties?.InvasiveRiskAssessmentCategory;
             taxon.Attributes.RedlistCategory = (sourceTaxon.DynamicProperties?.RedlistCategory?.Length ?? 0) < 2 ? string.Empty : sourceTaxon.DynamicProperties?.RedlistCategory?.Substring(0, 2);
             taxon.Attributes.ScientificNames = sourceTaxon.ScientificNames?.ToTaxonScientificNames();
             taxon.Attributes.SortOrder = sourceTaxon.SortOrder;

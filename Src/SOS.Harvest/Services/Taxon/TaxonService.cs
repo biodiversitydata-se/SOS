@@ -416,6 +416,7 @@ namespace SOS.Harvest.Services.Taxon
                     taxon.DynamicProperties.ActionPlan = taxonProperties.ActionPlan;
                     taxon.DynamicProperties.BirdDirective = taxonProperties.BirdDirective;
                     taxon.DynamicProperties.DisturbanceRadius = taxonProperties.DisturbanceRadius ?? 0;
+                    taxon.DynamicProperties.InvasiveRiskAssessmentCategory = string.IsNullOrEmpty(taxonProperties.InvasiveRiskAssessmentCategory) ? null : taxonProperties.InvasiveRiskAssessmentCategory;
                     taxon.DynamicProperties.IsEURegulation_1143_2014 = taxonProperties.EuRegulation_1143_2014;
                     taxon.DynamicProperties.IsInvasiveInSweden = taxonProperties.IsInvasiveInSweden;
                     taxon.DynamicProperties.GbifTaxonId = taxonProperties.GbifTaxonId;
