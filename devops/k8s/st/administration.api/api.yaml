@@ -137,8 +137,7 @@ spec:
                 {
                     "EndPoint": "redis.redis-common-st.svc.cluster.local", 
                     "Port": 26379, 
-                    "Password": 
-                    "SECRET_PLACEHOLDER", 
+                    "Password": "SECRET_PLACEHOLDER", 
                     "ServiceName": "mymaster"
                 }
           - name: UserServiceConfiguration
