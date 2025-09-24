@@ -7,47 +7,35 @@ pr: none
 parameters:
   - name: imagetag
     type: string
-
+    
 variables:
   # deploy settings
+  imageName: 'sosadmingui' # the image name to use
   environment: st # deploy environment
 
-  # skip unneeded tasks
-  deployApi: true # set to false to skip executing API deploy task
-  deployWeb: true # set to false to skip executing WEB deploy task
-
   # pipeline settings
-  Parameters.ImageTag: '${{ parameters.imagetag }}'
+  tag: '${{ parameters.imagetag }}'
   kubernetesServiceEndpoint: 'TEST-rke2'
 
 resources:
   repositories:
-    - repository: pipeline-templates
-      type: git
-      name: pipeline-templates
+  - repository: pipeline-templates
+    type: git
+    name: pipeline-templates
 
 pool:
   name: linux
 
-jobs:
-  # API
-  - job: DeployAPI
-    displayName: Deploying API to ${{ upper(variables.environment) }}
+stages:
+- stage: Deploy
+  displayName: Deploy to ${{ upper(variables.environment) }}
+  jobs:
+  - job: Deploy
+    displayName: Deploying application
+    workspace:
+      clean: all
     steps:
-      - ${{ if eq(variables.deployApi, true) }}:
-        - template: adb-kubernetes-deploy.yaml@pipeline-templates
-          parameters:
-            kubernetesServiceEndpoint: $(kubernetesServiceEndpoint)
-            environment: $(environment)/administration.gui
-            manifest: 'api.yaml'
-
-  # WEB
-  - job: DeployWEB
-    displayName: Deploying WEB to ${{ upper(variables.environment) }}
-    steps:
-      - ${{ if eq(variables.deployWeb, true) }}:
-        - template: adb-kubernetes-deploy.yaml@pipeline-templates
-          parameters:
-            kubernetesServiceEndpoint: $(kubernetesServiceEndpoint)
-            environment: $(environment)/administration.gui
-            manifest: 'web.yaml'
+    - template: adb-kubernetes-deploy-kustomize.yaml@pipeline-templates
+      parameters:
+        kubernetesServiceEndpoint: $(kubernetesServiceEndpoint)
+        environment: $(imageName)-$(environment)

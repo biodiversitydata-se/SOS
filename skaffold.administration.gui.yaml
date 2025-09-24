@@ -11,8 +11,9 @@ build:
     docker:
       dockerfile: Dockerfile
 manifests:
-  rawYaml:
-  - ./devops/k8s/local/administration.gui/*.yaml
+  kustomize:
+    paths:
+    - ./devops/k8s/local/administration.gui
 deploy:
   statusCheck: false
   kubeContext: docker-desktop

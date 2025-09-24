@@ -7,8 +7,9 @@ build:
     docker:
       dockerfile: Dockerfile.datastewardship
 manifests:
-  rawYaml:
-  - ./devops/k8s/local/datastewardship/*.yaml
+  kustomize:
+    paths:
+    - ./devops/k8s/local/datastewardship
 deploy:
   statusCheck: false
   kubeContext: docker-desktop

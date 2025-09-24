@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: $(imageName)-api
+spec:
+  template:
+    spec:
+      containers:
+      - env:
+        - name: AreaConfiguration
+          value: '{"SwedenExtentBufferKm": 200}'
+        - name: UserServiceConfiguration
+          value: '{ "UserAdmin2ApiBaseAddress": "https://useradmin2-api-dev.wt.artdata.slu.se", "ClientId": "SOS", "ClientSecret": "SECRET_PLACEHOLDER", "Scope": "useradmin.api SOS.Observations.Protected openid", "TokenUrl": "https://useradmin2-auth-dev.wt.artdata.slu.se/connect/token", "TokenExpirationBufferInSeconds": 300, "IdentityProvider": {"Authority": "https://useradmin2-auth-dev.wt.artdata.slu.se", "Audience": "https://sos-analysis-dev.wt.artdata.slu.se", "RequireHttpsMetadata": false}}'
+        - name: SearchDbConfiguration
+          value: '{"UserName": "SECRET_PLACEHOLDER", "Password": "SECRET_PLACEHOLDER", "Clusters": [{"Hosts": ["https://artsearch2-1-test.artdata.slu.se:9200"]}],"DebugMode": true,"IndexPrefix": "sos-dev","IndexSettings": [{"Name": "observation","NumberOfReplicas": 0,"NumberOfShards": 1,"NumberOfShardsProtected": 1,"ReadBatchSize": 10000,"WriteBatchSize": 1000,"RequestTimeout": 300,"ScrollBatchSize": 5000,"ScrollTimeout": "300s"}, {"Name": "dataset", "NumberOfReplicas": 0,"NumberOfShards": 1, "ReadBatchSize": 10000, "WriteBatchSize": 1000, "RequestTimeout": 300, "ScrollBatchSize": 5000, "ScrollTimeout": "300s"}, {"Name": "event", "NumberOfReplicas": 0, "NumberOfShards": 1, "ReadBatchSize": 10000, "WriteBatchSize": 1000, "RequestTimeout": 300, "ScrollBatchSize": 5000, "ScrollTimeout": "300s"}]}'
+        name: $(imageName)-api
+        resources:
+          requests:
+            cpu: 11m
+            memory: 1600M
+          limits:
+            memory: 1600M

@@ -7,8 +7,9 @@ build:
     docker:
       dockerfile: Dockerfile.observations
 manifests:
-  rawYaml:
-  - ./devops/k8s/local/observations/*.yaml
+  kustomize:
+    paths:
+    - ./devops/k8s/local/observations
 deploy:
   statusCheck: false
   kubeContext: docker-desktop

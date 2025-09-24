@@ -114,7 +114,7 @@ spec:
             value: '{"UserName": "SECRET_PLACEHOLDER", "Password": "SECRET_PLACEHOLDER", "Hosts": [{"Name": "artmongo-1.artdata.slu.se", "Port": 27017}, {"Name": "artmongo-2.artdata.slu.se", "Port": 27017}, {"Name": "artmongo-3.artdata.slu.se", "Port": 27017}], "ReplicaSetName": "mongo-prod", "DatabaseName": "sos", "UseTls": false, "AuthenticationDb": "admin", "ReadBatchSize": 10000, "WriteBatchSize": 10000}'
           - name: HangfireDbConfiguration
             value: '{"UserName": "SECRET_PLACEHOLDER", "Password": "SECRET_PLACEHOLDER", "Hosts": [{"Name": "artmongo-1.artdata.slu.se", "Port": 27017}, {"Name": "artmongo-2.artdata.slu.se", "Port": 27017}, {"Name": "artmongo-3.artdata.slu.se", "Port": 27017}], "ReplicaSetName": "mongo-prod", "DatabaseName": "sos-hangfire", "UseTls": false, "AuthenticationDb": "admin", "JobExpirationDays": 7}'
-          image: adbpocreg.azurecr.io/sos-analysis-api:$(Parameters.ImageTag)
+          image: reg.app.slu.se/k1003-1/sos-analysis-api:$(Parameters.ImageTag)
           name: sos-analysis-api
           imagePullPolicy: IfNotPresent
           ports:
@@ -134,4 +134,4 @@ spec:
           resources: {}
       restartPolicy: Always
       imagePullSecrets:
-        - name: regcred
+        - name: reg.app.slu.se-k1003-1-regcred
