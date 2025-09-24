@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: $(imageName)-api
+spec:
+  template:
+    spec:
+      containers:
+      - name: $(imageName)-api
+        env:
+        - name: AuthenticationConfiguration
+          value: |
+              {
+                  "Authority": "https://useradmin2-auth-dev.wt.artdata.slu.se", 
+                  "ClientId": "sos.admin.api"
+              }
+        - name: RedisConfiguration
+          value: |
+              {
+                  "EndPoint": "redis.redis-common-dev.svc.cluster.local", 
+                  "Port": 26379, 
+                  "Password": "SECRET_PLACEHOLDER", 
+                  "ServiceName": "mymaster"
+              }
+        - name: UserServiceConfiguration
+          value: |
+              {
+                  "BaseAddress": "https://artdatauser-dev.artdata.slu.se/api", 
+                  "AcceptHeaderContentType": "application/json", 
+                  "UserAdmin2ApiBaseAddress": "https://useradmin2-api-dev.wt.artdata.slu.se", 
+                  "ClientId": "SOS", 
+                  "ClientSecret": "SECRET_PLACEHOLDER", 
+                  "Scope": "useradmin.api SOS.Observations.Protected openid", 
+                  "TokenUrl": "http://useradmin2-auth-dev.wt.artdata.slu.se/connect/token", 
+                  "TokenExpirationBufferInSeconds": 300, 
+                  "IdentityProvider": {
+                      "Authority": "https://useradmin2-auth-dev.wt.artdata.slu.se", 
+                      "Audience": "https://sos-search-dev.artdata.slu.se", 
+                      "RequireHttpsMetadata ": false
+                  }
+              }
+        - name: ImportConfiguration
+          value: |
+              {
+                  "ArtportalenConfiguration": {
+                      "ConnectionStringBackup": "Server=SpeciesObservationSwe_test.db.slu.se;Database=SpeciesObservationSwe_test;Integrated Security=sspi;MultipleActiveResultSets=true;Pooling=true;Max Pool Size=1000;Min Pool Size=0;Persist Security Info=false;TrustServerCertificate=true;ApplicationIntent=ReadOnly;Connection Timeout=30;Connection Lifetime=0;",
+                      "ConnectionStringLive": "Server=SpeciesObservationSwe_test.db.slu.se;Database=SpeciesObservationSwe_test;Integrated Security=sspi;MultipleActiveResultSets=true;Pooling=true;Max Pool Size=1000;Min Pool Size=0;Persist Security Info=false;TrustServerCertificate=true;ApplicationIntent=ReadOnly;Connection Timeout=30;Connection Lifetime=0;",
+                      "ChunkSize": 50000,
+                      "MaxNumberOfSightingsHarvested": null,
+                      "AddTestSightings": false
+                  },
+                  "AreaHarvestConfiguration": {
+                      "UseGeoRegionApiHarvest": true
+                  },
+                  "DwcaConfiguration": {
+                      "ImportPath": "\\\\storage-ua.slu.se\\ARTSOS_TEST$\\SOS\\Temp"
+                  },
+                  "GeoRegionApiConfiguration": {
+                      "ApiUrl": "https://georegionapi.artdata.slu.se/"
+                  }
+              }
+        - name: VerbatimDbConfiguration
+          value: |
+              {
+                  "UserName": "SECRET_PLACEHOLDER", 
+                  "Password": "SECRET_PLACEHOLDER", 
+                  "Hosts": [
+                      {
+                          "Name": "artmongo-t-1.artdata.slu.se",
+                          "Port": 27017
+                      }
+                  ], 
+                  "ReplicaSetName": null, 
+                  "DatabaseName": "sos-harvest-dev", 
+                  "UseTls": false, 
+                  "AuthenticationDb": "admin", 
+                  "ReadBatchSize": 10000, 
+                  "WriteBatchSize": 10000
+              }
+        resources: {}

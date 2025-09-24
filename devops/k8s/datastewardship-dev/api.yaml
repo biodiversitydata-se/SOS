@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: $(imageName)-api
+spec:
+  template:
+    spec:
+      containers:
+      - name: $(imageName)-api
+        env:
+        - name: ASPNETCORE_ENVIRONMENT
+          value: k8s-dev
+        - name: IdentityServer
+          value: '{"Authority": "https://login-test.artdata.slu.se", "Audience": "SOS.Observations", "RequireHttpsMetadata": false}'
+        - name: UserServiceConfiguration
+          value: '{"BaseAddress": "https://artdatauser-st.artdata.slu.se/api","AcceptHeaderContentType": "application/json"}'
+        resources:
+          requests:
+            cpu: 35m
+            memory: 3G
+          limits:
+            memory: 3G

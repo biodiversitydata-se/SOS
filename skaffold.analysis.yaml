@@ -7,8 +7,9 @@ build:
     docker:
       dockerfile: Dockerfile.analysis
 manifests:
-  rawYaml:
-  - ./devops/k8s/local/analysis/*.yaml
+  kustomize:
+    paths:
+    - ./devops/k8s/local/analysis
 deploy:
   statusCheck: false
   kubeContext: docker-desktop

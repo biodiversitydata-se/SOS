@@ -1,82 +1,43 @@
 trigger: none
-
-# no PR triggers
 pr: none
 
 variables:
-  # build/deploy settings
-  imageName: 'sosadminapi' # the image name to use
-  environment: dev # deploy environment
+# same for every application: artifact group, kubernetesServiceEndpoint and tag variables, and path to migrations Dockerfile
+- template: build-variables.yaml@pipeline-templates 
 
-  # skip unneeded tasks
-  buildDeployApi: true # set to false to skip executing API build/push/deploy tasks
-  runUnitTests: false # set to false to skip executing build/run unit tests task
-
-  # we check if a dockerfile exists before executing build/push/deploy tasks and skip tasks if the dockerfile is missing
-  # check pipeline log for potential error messages
-  pathDockerfileApi: '$(Build.SourcesDirectory)/Src/Dockerfile.administration.api'
-  pathDockerfileUnitTests: '$(Build.SourcesDirectory)/api/unittests.Dockerfile'
-  
-  # pipeline settings
-  tag: $(Build.BuildId) # how we tag images
-  kubernetesServiceEndpoint: 'TEST-rke2'
-  containerRegistry: 'azure container registry (ADBPOCREG)'
-  repository: 'adbpocreg.azurecr.io'
+# build/deploy settings
+- name: imageName
+  value: 'sosadminapi'
+- name: environment
+  value: dev
 
 resources:
   repositories:
-    - repository: pipeline-templates
-      type: git
-      name: pipeline-templates
+  - repository: pipeline-templates
+    type: git
+    name: pipeline-templates
 
 pool:
   name: linux
 
 stages:
-  - stage: Test
-    displayName: Run unit tests
-    jobs:
-      # unit tests
-      - job: RunUnitTests
-        displayName: Running unit tests
-        steps:
-          - ${{ if eq(variables.runUnitTests, true) }}:
-            - template: adb-docker-build.yaml@pipeline-templates
-              parameters:
-                repository: '$(repository)/${{ lower(variables.imageName) }}-api-unittests'
-                dockerfile: '$(pathDockerfileUnitTests)' # we check if dockerfile exists before executing the task
-                tags: |
-                  $(tag)
 
-  - stage: BuildPush
-    displayName: Build/push images to repo ${{ variables.repository }}
-    jobs:
-      # API
-      - job: BuildPushAPI
-        displayName: Building/pushing API
-        steps:
-          - ${{ if eq(variables.buildDeployApi, true) }}:
-            - template: adb-docker-build-push.yaml@pipeline-templates
-              parameters:
-                containerRegistry: $(containerRegistry)
-                repository: $(repository)
-                imageName: '${{ lower(variables.imageName) }}-api'
-                dockerfile: '$(pathDockerfileApi)' # we check if dockerfile exists before executing the task
-                tags: |
-                  $(tag)
-                  latest
+- template: build-stage-template.yaml@pipeline-templates
+  parameters:
+    imageName: $(imageName)
+    tag: $(tag) # from variable template
+    # only include what you want to build:
+    pathDockerfileApi: '$(Build.SourcesDirectory)/Src/Dockerfile.administration.api' # full filename
 
-  - stage: Deploy
-    displayName: Deploy to ${{ upper(variables.environment) }}
-    jobs:
-      # API
-      - job: DeployAPI
-        displayName: Deploying API
-        steps:
-          - ${{ if eq(variables.buildDeployApi, true) }}:
-            - template: adb-kubernetes-deploy-with-file-check.yaml@pipeline-templates
-              parameters:
-                kubernetesServiceEndpoint: $(kubernetesServiceEndpoint)
-                environment: $(environment)/administration.api
-                manifest: 'api.yaml'
-                dockerfile: '$(pathDockerfileApi)' # we check if dockerfile exists before executing the task
+- stage: Deploy
+  displayName: Deploy to ${{ upper(variables.environment) }}
+  jobs:
+  - job: Deploy
+    displayName: Deploying application
+    workspace:
+      clean: all
+    steps:
+    - template: adb-kubernetes-deploy-kustomize.yaml@pipeline-templates
+      parameters:
+        kubernetesServiceEndpoint: $(kubernetesServiceEndpoint)
+        environment: $(imageName)-$(environment)

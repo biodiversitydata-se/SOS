@@ -75,7 +75,7 @@ spec:
               value: '{"UserName": "SECRET_PLACEHOLDER", "Password": "SECRET_PLACEHOLDER", "Hosts": [{"Name": "artmongo2-1.artdata.slu.se", "Port": 27017}, {"Name": "artmongo2-2.artdata.slu.se", "Port": 27017}, {"Name": "artmongo2-3.artdata.slu.se", "Port": 27017}], "ReplicaSetName": "mongo-prod", "DatabaseName": "sos", "UseTls": false, "AuthenticationDb": "admin"}'
             - name: SearchDbConfiguration
               value: '{"UserName": "SECRET_PLACEHOLDER", "Password": "SECRET_PLACEHOLDER", "Clusters": [{"Hosts": ["https://artsosdata2-1.artdata.slu.se:9200", "https://artsosdata2-2.artdata.slu.se:9200", "https://artsosdata2-3.artdata.slu.se:9200"]}, {"Hosts": ["https://artsosdata2-4.artdata.slu.se:9200", "https://artsosdata2-5.artdata.slu.se:9200", "https://artsosdata2-6.artdata.slu.se:9200"]}], "IndexPrefix": "sos", "IndexSettings": [{"Name": "observation", "RequestTimeout": 60}]}'
-          image: adbpocreg.azurecr.io/sos-proxy-api:$(Parameters.ImageTag)
+          image: reg.app.slu.se/k1003-1/sos-proxy-api:$(Parameters.ImageTag)
           name: sos-proxy-api
           imagePullPolicy: IfNotPresent
           ports:
@@ -95,4 +95,4 @@ spec:
           resources: {}
       restartPolicy: Always
       imagePullSecrets:
-        - name: regcred
+        - name: reg.app.slu.se-k1003-1-regcred

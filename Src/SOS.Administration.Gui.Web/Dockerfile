@@ -1,6 +1,8 @@
-FROM reg.app.slu.se/hub/node:20.11 AS build
+FROM reg.app.slu.se/hub/node:22-bookworm-slim AS build
 WORKDIR /usr/src/app
 COPY package.json package-lock.json ./
+# {NpmConfigSnippet}
+
 RUN npm install
 COPY . .
 
@@ -9,7 +11,7 @@ RUN npm run build
 # make sure entrypoint.sh has correct line endings
 RUN apt-get update && apt-get install -y dos2unix && dos2unix ./entrypoint.sh && chmod +x entrypoint.sh
 
-FROM reg.app.slu.se/hub/nginx:1.25.3-alpine as runtime
+FROM reg.app.slu.se/hub/nginx:1.27.2-alpine AS runtime
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /usr/src/app/dist /var/share/nginx/html
 

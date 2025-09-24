@@ -7,8 +7,9 @@ build:
     docker:
       dockerfile: Dockerfile.elasticsearch.proxy
 manifests:
-  rawYaml:
-  - ./devops/k8s/local/proxy/*.yaml
+  kustomize:
+    paths:
+    - ./devops/k8s/local/proxy
 deploy:
   statusCheck: false
   kubeContext: docker-desktop

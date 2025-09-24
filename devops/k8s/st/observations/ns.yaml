@@ -1,6 +1,0 @@
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: sos-observations-st
-  labels:
-    name: sos-observations-st

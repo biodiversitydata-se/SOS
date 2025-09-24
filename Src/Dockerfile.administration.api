@@ -1,11 +1,9 @@
 FROM reg.app.slu.se/mcr/dotnet/sdk:9.0 AS build-env
 WORKDIR /app
 
-# copy csproj and restore as distinct layers
-COPY SOS.Administration.Api/SOS.Administration.Api.csproj .
-RUN dotnet restore
+# {NugetConfigSnippet}
+# {NugetRunCommandSnippet}
 
-# copy everything else and build
 COPY . .
 RUN dotnet publish SOS.Administration.Api/SOS.Administration.Api.csproj -c Release -o out
 

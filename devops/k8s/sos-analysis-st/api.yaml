@@ -1,0 +1,18 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: $(imageName)-api
+spec:
+  template:
+    spec:
+      containers:
+      - name: $(imageName)-api
+        env:
+        - name: UserServiceConfiguration
+          value: '{ "UserAdmin2ApiBaseAddress": "https://useradmin2-api-st.wt.artdata.slu.se", "ClientId": "SOS", "ClientSecret": "SECRET_PLACEHOLDER", "Scope": "useradmin.api SOS.Observations.Protected openid", "TokenUrl": "https://useradmin2-auth-st.wt.artdata.slu.se/connect/token", "TokenExpirationBufferInSeconds": 300, "IdentityProvider": {"Authority": "https://useradmin2-auth-st.wt.artdata.slu.se", "Audience": "https://sos-analysis-st.wt.artdata.slu.se", "RequireHttpsMetadata": false}}'
+        resources:
+          requests:
+            cpu: 11m
+            memory: 3600M
+          limits:
+            memory: 3600M

@@ -243,7 +243,7 @@ spec:
                     "AuthenticationDb": "admin", 
                     "JobExpirationDays": 7
                 }
-          image: adbpocreg.azurecr.io/sosadminapi-api:$(Parameters.ImageTag)
+          image: reg.app.slu.se/k1003-1/sosadminapi-api:$(Parameters.ImageTag)
           name: sosadminapi-api
           imagePullPolicy: IfNotPresent
           ports:
@@ -263,4 +263,4 @@ spec:
           resources: {}
       restartPolicy: Always
       imagePullSecrets:
-        - name: regcred
+        - name: reg.app.slu.se-k1003-1-regcred
