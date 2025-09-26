@@ -1,4 +1,5 @@
 ﻿using Hangfire;
+using Hangfire.Server;
 using SOS.Export.Models.ZendTo;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Search.Filters;
@@ -12,6 +13,28 @@ namespace SOS.Export.Managers.Interfaces
     /// </summary>
     public interface IObservationManager
     {
+        /// <summary>
+        /// Create and send taxon county occurrence report
+        /// </summary>
+        /// <param name="roleId"></param>
+        /// <param name="authorizationApplicationIdentifier"></param>
+        /// <param name="email"></param>
+        /// <param name="description"></param>
+        /// <param name="password"></param>
+        /// <param name="context"></param>
+        /// <param name="taxonIds"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task<ZendToResponse> CreateAndSendCountyOccurrenceReportAsync(
+            int? roleId,
+            string authorizationApplicationIdentifier,
+            string email,
+            string description,
+            string password,
+            PerformContext context,
+            IEnumerable<int> taxonIds,
+            IJobCancellationToken cancellationToken);
+
         /// <summary>
         ///  Create a export file and use ZendTo to send it to user
         /// </summary>

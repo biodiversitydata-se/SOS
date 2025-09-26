@@ -51,7 +51,7 @@ namespace SOS.Export.Jobs
                 var userExport = await _userExportRepository.GetAsync(userId);
                 RemoveExpiredJobs(userExport);
 
-                var jobInfo = userExport.Jobs.FirstOrDefault(m => m.Id == jobId);
+                var jobInfo = userExport?.Jobs?.FirstOrDefault(m => m.Id == jobId);
                 if (jobInfo == null) return;
 
                 jobInfo.ProcessStartDate = DateTime.UtcNow;
@@ -70,7 +70,7 @@ namespace SOS.Export.Jobs
             try
             {
                 var userExport = await _userExportRepository.GetAsync(userId);
-                var jobInfo = userExport.Jobs.FirstOrDefault(m => m.Id == jobId);
+                var jobInfo = userExport?.Jobs?.FirstOrDefault(m => m.Id == jobId);
                 if (jobInfo == null) return;
                 jobInfo.ProcessEndDate = DateTime.UtcNow;
                 jobInfo.Status = ExportJobStatus.Succeeded;
@@ -117,6 +117,51 @@ namespace SOS.Export.Jobs
                 userExportRepository ?? throw new ArgumentNullException(nameof(userExportRepository));
             _cryptoService = cryptoService ?? throw new ArgumentNullException(nameof(cryptoService));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        }
+
+        /// <inheritdoc />
+        public async Task<bool> CreateAndSendCountyOccurrenceReportAsync(
+            int userId,
+            int? roleId,
+            string authorizationApplicationIdentifier,
+            string email,
+            string description,
+            string encryptedPassword,
+            PerformContext context,
+            IEnumerable<int> taxonIds,
+            IJobCancellationToken cancellationToken)
+        {
+            try
+            {
+                _logger.LogInformation("Start creating county occurrence report send job");
+                Thread.Sleep(TimeSpan.FromSeconds(1)); // wait for job info to be inserted in MongoDb.
+                await UpdateJobInfoStartProcessing(userId, context?.BackgroundJob?.Id);
+                var password = await _cryptoService.DecryptAsync(encryptedPassword);
+                var response = await _observationManager.CreateAndSendCountyOccurrenceReportAsync(
+                    roleId,
+                    authorizationApplicationIdentifier,
+                    email,
+                    description,
+                    password,
+                    context,
+                    taxonIds,
+                    cancellationToken);
+                _logger.LogInformation($"End county occurrence report send job. Success: {response.Success}");
+                await UpdateJobInfoEndProcessing(userId, context?.BackgroundJob?.Id, response);
+                return response.Success ? true : throw new Exception("County occurrence report send job failed");
+            }
+            catch (JobAbortedException)
+            {
+                await UpdateJobInfoError(userId, context?.BackgroundJob?.Id, "County occurrence report send job was cancelled.");
+                _logger.LogInformation("County occurrence report send job was cancelled.");
+                return false;
+            }
+            catch (Exception ex)
+            {
+                await UpdateJobInfoError(userId, context?.BackgroundJob?.Id, ex.Message);
+                _logger.LogError(ex, "County occurrence report send job failure.");
+                throw;
+            }
         }
 
         /// <inheritdoc />

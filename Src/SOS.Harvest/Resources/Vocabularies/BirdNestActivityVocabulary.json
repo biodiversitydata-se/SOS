@@ -128,17 +128,17 @@
       "Value": "egg shells",
       "Localized": true,
       "Category": {
-        "Id": 6,
-        "Name": "Trace",
+        "Id": 1,
+        "Name": "Reproduction confirmed",
         "Localized": true,
         "Translations": [
           {
             "CultureCode": "sv-SE",
-            "Value": "Spår"
+            "Value": "Säkerställd reproduktion"
           },
           {
             "CultureCode": "en-GB",
-            "Value": "Trace"
+            "Value": "Reproduction confirmed"
           }
         ]
       },

@@ -8,7 +8,7 @@ public static class Settings
 {
     // For config objects
     public static ApiTestConfiguration ApiTestConfiguration { get; set; } = new();
-    public static AuthenticationConfiguration AuthenticationConfiguration { get; set; } = new();
+    public static SOS.Administration.Gui.AuthenticationConfiguration AuthenticationConfiguration { get; set; } = new();
     public static ApplicationInsightsConfiguration ApplicationInsightsConfiguration { get; set; } = new();
     public static MongoDbConfiguration ProcessDbConfiguration { get; set; } = new();
     public static ElasticSearchConfiguration SearchDbConfiguration { get; set; } = new();
@@ -71,7 +71,7 @@ public static class Settings
 
     private static void SetupAuthConfig(IConfiguration configuration, ILogger logger)
     {
-        AuthenticationConfiguration = GetConfigSection<AuthenticationConfiguration>("AuthenticationConfiguration", configuration, logger, sensitiveSetting: true);
+        AuthenticationConfiguration = GetConfigSection<SOS.Administration.Gui.AuthenticationConfiguration>("AuthenticationConfiguration", configuration, logger, sensitiveSetting: true);
         AuthSecretKey = GetConfigValueString("AuthSecretKey", configuration, logger, sensitiveSetting: true, required: false);
         if (AuthenticationConfiguration.SecretKey == "SECRET_PLACEHOLDER")
         {

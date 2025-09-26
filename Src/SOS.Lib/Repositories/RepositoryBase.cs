@@ -149,7 +149,7 @@ namespace SOS.Lib.Repositories
             ILogger logger
         ) : this(client, typeof(TEntity).Name, logger)
         {
-           
+
         }
 
         /// <summary>
@@ -162,7 +162,7 @@ namespace SOS.Lib.Repositories
             IMongoDbClient client,
             string collectionName,
             ILogger logger
-        ) 
+        )
         {
             BsonNetTopologySuiteSerializers.Register();
 
@@ -176,7 +176,7 @@ namespace SOS.Lib.Repositories
 
             // Clean name from non alfa numeric chats
             _collectionName = collectionName.UntilNonAlfanumeric();
-        } 
+        }
 
 
         /// <summary>
@@ -224,7 +224,8 @@ namespace SOS.Lib.Repositories
             try
             {
                 // Create the collection
-                await Database.CreateCollectionAsync(collectionName, new CreateCollectionOptions { 
+                await Database.CreateCollectionAsync(collectionName, new CreateCollectionOptions
+                {
                     Collation = new Collation(locale: "sv", strength: CollationStrength.Primary),
                     IndexOptionDefaults = new IndexOptionDefaults()
                 });
@@ -257,7 +258,7 @@ namespace SOS.Lib.Repositories
             if (timeout == null) timeout = TimeSpan.FromMinutes(10);
             var sleepTime = TimeSpan.FromSeconds(5);
             int nrIterations = (int)(Math.Ceiling(timeout.Value.TotalSeconds / sleepTime.TotalSeconds));
-            long docCount = await CountAllDocumentsAsync();
+            long docCount = await CountAllDocumentsAsync(estimateCount: false);
             var iterations = 0;
 
             // Compare number of documents retrieved with actually db count
@@ -266,7 +267,7 @@ namespace SOS.Lib.Repositories
             {
                 iterations++; // Safety to prevent infinite loop.                                
                 await Task.Delay(sleepTime);
-                docCount = await CountAllDocumentsAsync();
+                docCount = await CountAllDocumentsAsync(estimateCount: false);
             }
 
             if (iterations == nrIterations)
@@ -318,10 +319,10 @@ namespace SOS.Lib.Repositories
             {
                 var bulkOps = new List<WriteModel<TEntity>>();
                 if (comparisonField != "_id")
-                {                    
+                {
                     // Fetch all existing documents from MongoDB based on comparisonField
                     var comparisonValues = items.Select(i => typeof(TEntity).GetProperty(comparisonField)?.GetValue(i)).Where(v => v != null).ToList();
-                    var existingDocs = await mongoCollection.Find(Builders<TEntity>.Filter.In(comparisonField, comparisonValues)).ToListAsync();                    
+                    var existingDocs = await mongoCollection.Find(Builders<TEntity>.Filter.In(comparisonField, comparisonValues)).ToListAsync();
                     var existingDocsDict = existingDocs.ToDictionary(doc => typeof(TEntity).GetProperty(comparisonField)?.GetValue(doc));
 
                     // Update the batch objects with correct _id if they already exist in the database
@@ -342,7 +343,7 @@ namespace SOS.Lib.Repositories
                 }
 
                 foreach (var item in items)
-                {                    
+                {
                     var comparisonValue = typeof(TEntity).GetProperty(comparisonField)?.GetValue(item);
                     if (comparisonValue == null)
                         throw new ArgumentException($"Field '{comparisonField}' not found or has null value.");
@@ -512,24 +513,28 @@ namespace SOS.Lib.Repositories
         }
 
         /// <inheritdoc />
-        public virtual async Task<long> CountAllDocumentsAsync()
+        public virtual async Task<long> CountAllDocumentsAsync(bool estimateCount = true)
         {
-            return await CountAllDocumentsAsync(MongoCollection);
+            return await CountAllDocumentsAsync(MongoCollection, estimateCount);
         }
 
         /// <inheritdoc />
-        public async Task<long> CountAllDocumentsAsync(IMongoCollection<TEntity> mongoCollection)
+        public async Task<long> CountAllDocumentsAsync(IMongoCollection<TEntity> mongoCollection, bool estimateCount = true)
         {
             try
             {
+                if (estimateCount)
+                {
+                    return await mongoCollection.EstimatedDocumentCountAsync();                   
+                }
+
                 return await mongoCollection.CountDocumentsAsync(FilterDefinition<TEntity>.Empty);
             }
             catch
             {
                 return 0;
             }
-
-        }
+        }        
 
         /// <inheritdoc />
         public virtual async Task<bool> DeleteManyAsync(IEnumerable<TKey> ids)
@@ -747,7 +752,7 @@ namespace SOS.Lib.Repositories
 
         /// <inheritdoc />
         public async Task<TKey> GetMaxIdAsync(IMongoCollection<TEntity> mongoCollection)
-        {            
+        {
             try
             {
                 Logger.LogDebug($"Try to get max id for ({mongoCollection.CollectionNamespace})");

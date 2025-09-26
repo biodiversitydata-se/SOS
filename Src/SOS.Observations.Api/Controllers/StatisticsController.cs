@@ -43,7 +43,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
-        [ProducesResponseType((int)HttpStatusCode.RequestTimeout)]
+        [ProducesResponseType((int)HttpStatusCode.ServiceUnavailable)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [InternalApi]
         public async Task<IActionResult> GetNvStatisticsAsync(
@@ -76,7 +76,7 @@ namespace SOS.Observations.Api.Controllers
             }
             catch (TimeoutException)
             {
-                return new StatusCodeResult((int)HttpStatusCode.RequestTimeout);
+                return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
             }
             catch (Exception e)
             {

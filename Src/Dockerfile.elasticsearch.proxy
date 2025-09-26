@@ -1,11 +1,9 @@
 FROM reg.app.slu.se/mcr/dotnet/sdk:9.0 AS build-env
 WORKDIR /app
 
-# copy csproj and restore as distinct layers
-COPY . .
-RUN dotnet restore SOS.ElasticSearch.Proxy/SOS.ElasticSearch.Proxy.csproj
+# {NugetConfigSnippet}
+# {NugetRunCommandSnippet}
 
-# copy everything else and build
 COPY  . .
 RUN dotnet publish SOS.ElasticSearch.Proxy/SOS.ElasticSearch.Proxy.csproj -c Release -o out
 

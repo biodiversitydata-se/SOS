@@ -6,12 +6,12 @@
       "launchUrl": "swagger",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "local",
-        "DISABLE_HANGFIRE_INIT": "true",
+        "DISABLE_HANGFIRE_INIT": "false",
         "USE_LOCAL_HANGFIRE": "true",
         "DISABLE_HEALTHCHECK_INIT": "true",
         "DISABLE_CACHED_TAXON_SUM_INIT": "true"
       },
-      "applicationUrl": "http://localhost:5000"
+      "applicationUrl": "http://localhost:5005"
     },
     "SOS.Observations.Api (Dev)": {
       "commandName": "Project",

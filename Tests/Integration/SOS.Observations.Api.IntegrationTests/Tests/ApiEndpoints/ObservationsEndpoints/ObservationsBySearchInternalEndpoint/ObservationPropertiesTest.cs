@@ -51,6 +51,7 @@ public class ObservationPropertiesTest : TestBase
                 IncludedByLocationId = 3,
                 IncrementalHarvested = true,
                 LocationPresentationNameParishRegion = "Socken",
+                InvasiveSpeciesTreatment = new VocabularyValue { Id = 1, Value = "S" },
                 NoteOfInterest = true,
                 OccurrenceRecordedByInternal = new[] {
                     new UserInternal {
@@ -556,6 +557,7 @@ public class ObservationPropertiesTest : TestBase
         obs.ArtportalenInternal.HasAnyTriggeredVerificationRuleWithWarning.Should().Be(observation.ArtportalenInternal.HasAnyTriggeredVerificationRuleWithWarning);
         obs.ArtportalenInternal.HasTriggeredVerificationRules.Should().Be(observation.ArtportalenInternal.HasTriggeredVerificationRules);
         obs.ArtportalenInternal.HasUserComments.Should().Be(observation.ArtportalenInternal.HasUserComments);
+        obs.ArtportalenInternal.InvasiveSpeciesTreatment.Should().Be(observation.ArtportalenInternal.InvasiveSpeciesTreatment);
         obs.ArtportalenInternal.IncludedByLocationId.Should().Be(observation.ArtportalenInternal.IncludedByLocationId);
         obs.ArtportalenInternal.IncrementalHarvested.Should().Be(observation.ArtportalenInternal.IncrementalHarvested);
         obs.ArtportalenInternal.LocationPresentationNameParishRegion.Should().Be(observation.ArtportalenInternal.LocationPresentationNameParishRegion);

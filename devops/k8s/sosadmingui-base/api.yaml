@@ -1,0 +1,16 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: $(imageName)-api
+spec:
+  replicas: 2
+  template:
+    spec:
+      containers:
+      - name: $(imageName)-api
+        envFrom:
+        - secretRef:
+            name: $(imageName)-secret
+        env:
+        - name: ApplicationInsightsConfiguration
+          value: '{"BaseAddress": "https://api.applicationinsights.io/v1", "AcceptHeaderContentType": "application/json", "InstrumentationKey": "SECRET_PLACEHOLDER", "ApiKey": "SECRET_PLACEHOLDER", "ApplicationId": "SECRET_PLACEHOLDER"}'

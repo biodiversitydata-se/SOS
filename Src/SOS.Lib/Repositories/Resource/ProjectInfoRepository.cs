@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using MongoDB.Bson;
 using MongoDB.Driver;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
@@ -46,7 +45,7 @@ namespace SOS.Lib.Repositories.Resource
         {
             var filters = new[] {
                 Builders<ProjectInfo>.Filter.Or(
-                    Builders<ProjectInfo>.Filter.Eq(p => p.IsPublic, true),
+                    Builders<ProjectInfo>.Filter.Eq(p => p.IsHidden, false),
                     Builders<ProjectInfo>.Filter.Eq(p => p.UserServiceUserId, userId),
                     Builders<ProjectInfo>.Filter.Eq(p => p.MemberIds.Contains(userId), true)
                 ),

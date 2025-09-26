@@ -139,6 +139,7 @@ namespace SOS.Lib
                 queries.TryAddTermsCriteria("artportalenInternal.sightingPublishTypeIds", internalFilter.PublishTypeIdsFilter);
                 queries.TryAddTermsCriteria("artportalenInternal.triggeredObservationRuleFrequencyId", internalFilter.TriggeredObservationRuleFrequencyIds);
                 queries.TryAddTermsCriteria("artportalenInternal.triggeredObservationRuleReproductionId", internalFilter.TriggeredObservationRuleReproductionIds);
+                queries.TryAddTermsCriteria("artportalenInternal.invasiveSpeciesTreatment.id", internalFilter.InvasiveSpeciesTreatmentIds);
                 queries.TryAddTermsCriteria("event.discoveryMethod.id", internalFilter.DiscoveryMethodIds);
                 queries.TryAddTermsCriteria("identification.verificationStatus.id", internalFilter.VerificationStatusIds);
                 queries.TryAddTermCriteria("institutionId", internalFilter.InstitutionId);
@@ -628,32 +629,44 @@ namespace SOS.Lib
                     sightingTypeFilter switch
                     {
                         SearchFilterBase.SightingTypeFilter.DoNotShowMergedIncludeReplacementChilds => new[] { // 1, 4, 16, 64, 128
-                        (int)SightingTypeSearchGroup.Ordinary,
-                        (int)SightingTypeSearchGroup.Aggregated,
-                        (int)SightingTypeSearchGroup.AssessmentChild,
-                        (int)SightingTypeSearchGroup.ReplacementChild,
-                        (int)SightingTypeSearchGroup.OwnBreedingAssessment },
+                            (int)SightingTypeSearchGroup.Ordinary,
+                            (int)SightingTypeSearchGroup.Aggregated,
+                            (int)SightingTypeSearchGroup.AssessmentChild,
+                            (int)SightingTypeSearchGroup.ReplacementChild,
+                            (int)SightingTypeSearchGroup.OwnBreedingAssessment },
                         SearchFilterBase.SightingTypeFilter.DoNotShowSightingsInMerged => new[] { // 1, 2, 4, 32, 128
-                        (int)SightingTypeSearchGroup.Ordinary,
-                        (int)SightingTypeSearchGroup.Assessment,
-                        (int)SightingTypeSearchGroup.Aggregated,
-                        (int)SightingTypeSearchGroup.Replacement,
-                        (int)SightingTypeSearchGroup.OwnBreedingAssessment },
+                            (int)SightingTypeSearchGroup.Ordinary,
+                            (int)SightingTypeSearchGroup.Assessment,
+                            (int)SightingTypeSearchGroup.Aggregated,
+                            (int)SightingTypeSearchGroup.Replacement,
+                            (int)SightingTypeSearchGroup.OwnBreedingAssessment },
                         SearchFilterBase.SightingTypeFilter.ShowBoth => new[] { // 1, 2, 4, 16, 32, 128
-                        (int)SightingTypeSearchGroup.Ordinary,
-                        (int)SightingTypeSearchGroup.Assessment,
-                        (int)SightingTypeSearchGroup.Aggregated,
-                        (int)SightingTypeSearchGroup.AssessmentChild,
-                        (int)SightingTypeSearchGroup.Replacement,
-                        (int)SightingTypeSearchGroup.OwnBreedingAssessment },
+                            (int)SightingTypeSearchGroup.Ordinary,
+                            (int)SightingTypeSearchGroup.Assessment,
+                            (int)SightingTypeSearchGroup.Aggregated,
+                            (int)SightingTypeSearchGroup.AssessmentChild,
+                            (int)SightingTypeSearchGroup.Replacement,
+                            (int)SightingTypeSearchGroup.OwnBreedingAssessment },
                         SearchFilterBase.SightingTypeFilter.ShowOnlyMerged =>
                             new[] { (int)SightingTypeSearchGroup.Assessment }, // 2
-                        _ => new[] { // 1, 4, 16, 32, 128 Default DoNotShowMerged
-                        (int)SightingTypeSearchGroup.Ordinary,
-                        (int)SightingTypeSearchGroup.Aggregated,
-                        (int)SightingTypeSearchGroup.AssessmentChild,
-                        (int)SightingTypeSearchGroup.Replacement,
-                        (int)SightingTypeSearchGroup.OwnBreedingAssessment }
+                        SearchFilterBase.SightingTypeFilter.DoNotShowMerged => new[] { // 1, 4, 16, 32, 128 DoNotShowMerged
+                            (int)SightingTypeSearchGroup.Ordinary,
+                            (int)SightingTypeSearchGroup.Aggregated,
+                            (int)SightingTypeSearchGroup.AssessmentChild,
+                            (int)SightingTypeSearchGroup.Replacement,
+                            (int)SightingTypeSearchGroup.OwnBreedingAssessment },
+                        SearchFilterBase.SightingTypeFilter.ShowChildrenAndReplacements => new[] { // 1, 8, 16, 32, 256 ShowChildrenAndReplacements
+                            (int)SightingTypeSearchGroup.Ordinary,
+                            (int)SightingTypeSearchGroup.AggregatedChild,
+                            (int)SightingTypeSearchGroup.AssessmentChild,
+                            (int)SightingTypeSearchGroup.Replacement,
+                            (int)SightingTypeSearchGroup.OwnBreedingAssessmentChild },
+                        _ => new[] { // Default to DoNotShowMerged
+                            (int)SightingTypeSearchGroup.Ordinary,
+                            (int)SightingTypeSearchGroup.Aggregated,
+                            (int)SightingTypeSearchGroup.AssessmentChild,
+                            (int)SightingTypeSearchGroup.Replacement,
+                            (int)SightingTypeSearchGroup.OwnBreedingAssessment },
                     };
 
             var sightingTypeQueries = new List<Action<QueryDescriptor<TQueryDescriptor>>>();

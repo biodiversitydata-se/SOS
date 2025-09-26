@@ -1,12 +1,10 @@
 FROM reg.app.slu.se/mcr/dotnet/sdk:9.0 AS build-env
 WORKDIR /app
 
-# copy csproj and restore as distinct layers
-COPY . .
-RUN dotnet restore SOS.Observations.Api/SOS.Observations.Api.csproj
+# {NugetConfigSnippet}
+# {NugetRunCommandSnippet}
 
-# copy everything else and build
-COPY  . .
+COPY . .
 RUN dotnet publish SOS.Observations.Api/SOS.Observations.Api.csproj -c Release -o out
 
 #build runtime image

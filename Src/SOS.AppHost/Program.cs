@@ -8,7 +8,8 @@ var env = new
     UseLocalHangfireDb = GetBoolEnv("USE_LOCAL_HANGFIRE"),
     DisableHangfireInit = GetBoolEnv("DISABLE_HANGFIRE_INIT"),
     DisableHealthcheckInit = GetBoolEnv("DISABLE_HEALTHCHECK_INIT"),
-    DisableCachedTaxonSumInit = GetBoolEnv("DISABLE_CACHED_TAXON_SUM_INIT")
+    DisableCachedTaxonSumInit = GetBoolEnv("DISABLE_CACHED_TAXON_SUM_INIT"),
+    excludeParishGeometries = GetBoolEnv("EXCLUDE_PARISH_GEOMETRIES")
 };
 
 // Configure Hangfire db
@@ -69,6 +70,7 @@ builder.AddProject<Projects.SOS_Hangfire_JobServer>("sos-hangfire-jobserver", co
     .WithHttpEndpoint()
     .WithEnvironment("ASPNETCORE_ENVIRONMENT", env.AspNetCoreEnvironment)
     .WithEnvironment("USE_LOCAL_HANGFIRE", env.UseLocalHangfireDb.ToString())
+    .WithEnvironment("EXCLUDE_PARISH_GEOMETRIES", env.excludeParishGeometries.ToString())
     .WithReference(hangfireDb)
     .WaitFor(hangfireDb);
 

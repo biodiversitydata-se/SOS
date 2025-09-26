@@ -21,6 +21,7 @@ This page provides information about how to use the search filter parameters.
   * [Search for observations of a specific taxon](#search-for-observations-of-a-specific-taxon)
   * [Include underlying taxa in search](#include-underlying-taxa-in-search)
   * [Search for observations with red list categories](#search-for-observations-with-red-list-categories)
+  * [Search for invasive species in Sweden](#search-for-invasive-species-in-sweden)
   * [Taxon lists](#taxon-lists)
   * [Search for observations with taxon lists - merge](#search-for-observations-with-taxon-lists---merge)
   * [Search for observations with taxon lists - filter](#search-for-observations-with-taxon-lists---filter)
@@ -393,6 +394,16 @@ This filter will return observation of species classified as critically endanger
 | LC | Least concern |
 | NA | Not applicable |
 | NE | Not evaluated |
+
+### Search for invasive species in Sweden
+This filter will return observation of species classified as `Severe risk` or `High risk`.
+```json
+{        
+    "taxon" : {
+        "isInvasiveInSweden": true
+    }
+}
+```
 
 
 ### Taxon lists

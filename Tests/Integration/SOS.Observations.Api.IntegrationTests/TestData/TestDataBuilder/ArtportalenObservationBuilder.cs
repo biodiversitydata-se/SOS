@@ -27,6 +27,12 @@ namespace SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder
             (6, 0.05f)
         };
 
+        private static double GetRandomDoubleInRange(double min, double max)
+        {
+            var random = new Random();
+            return random.NextDouble() * (max - min) + min;
+        }
+
         public static List<ArtportalenObservationVerbatim>? VerbatimArtportalenObservationsFromJsonFile(bool sensitive)
         {
             if (_verbatimArtportalenObservationsFromJsonFile == null || !sensitive.Equals(_sensitiveLoaded))
@@ -452,6 +458,68 @@ namespace SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder
                 obs.Site.YCoord = (int)webMercatorPoint.Coordinate.Y;
                 obs.Site.Point = wgs84Point?.ToGeoJson();
                 obs.Site.PointWithBuffer = wgs84Point.ToCircle(accuracy)?.ToGeoJson();
+                obs.Site.Accuracy = accuracy;
+
+            });
+            return operable;
+        }
+
+        public static IOperable<ArtportalenObservationVerbatim> HaveCoordinatesInGeometry(this IOperable<ArtportalenObservationVerbatim> operable,
+           Geometry geometry,
+           int accuracy)
+        {
+            var builder = ((IDeclaration<ArtportalenObservationVerbatim>)operable).ObjectBuilder;
+            
+            var xMin = geometry.Coordinates.Min(c => c.X);
+            var xMax = geometry.Coordinates.Max(c => c.X);
+            var yMin = geometry.Coordinates.Min(c => c.Y);
+            var yMax = geometry.Coordinates.Max(c => c.Y);
+
+            var rndX = GetRandomDoubleInRange(xMin, xMax);
+            var rndY = GetRandomDoubleInRange(yMin, yMax);
+            var point = new Point(new Coordinate(rndX, rndY));
+
+            while (!geometry.Contains(point)){
+                rndX = GetRandomDoubleInRange(xMin, xMax);
+                rndY = GetRandomDoubleInRange(yMin, yMax);
+                point = new Point(new Coordinate(rndX, rndY));
+            }
+
+            builder.With((obs, index) =>
+            {
+                var webMercatorPoint = point.Transform(CoordinateSys.WGS84, CoordinateSys.WebMercator);
+                obs.Site.XCoord = (int)webMercatorPoint!.Coordinate.X;
+                obs.Site.YCoord = (int)webMercatorPoint.Coordinate.Y;
+                obs.Site.Point = point?.ToGeoJson();
+                obs.Site.PointWithBuffer = point.ToCircle(accuracy)?.ToGeoJson();
+                obs.Site.Accuracy = accuracy;
+
+            });
+            return operable;
+        }
+
+        public static IOperable<ArtportalenObservationVerbatim> HaveCoordinatesOusideGeometry(this IOperable<ArtportalenObservationVerbatim> operable,
+           Geometry geometry,
+           int accuracy)
+        {
+            var builder = ((IDeclaration<ArtportalenObservationVerbatim>)operable).ObjectBuilder;
+
+            var xMin = geometry.Coordinates.Min(c => c.X);
+            var xMax = geometry.Coordinates.Max(c => c.X);
+            var yMin = geometry.Coordinates.Min(c => c.Y);
+            var yMax = geometry.Coordinates.Max(c => c.Y);
+
+            var rndX = GetRandomDoubleInRange(xMax+0.1, xMax+1);
+            var rndY = GetRandomDoubleInRange(yMin-1, yMin-0.1);
+            var point = new Point(new Coordinate(rndX, rndY));
+
+            builder.With((obs, index) =>
+            {
+                var webMercatorPoint = point.Transform(CoordinateSys.WGS84, CoordinateSys.WebMercator);
+                obs.Site.XCoord = (int)webMercatorPoint!.Coordinate.X;
+                obs.Site.YCoord = (int)webMercatorPoint.Coordinate.Y;
+                obs.Site.Point = point?.ToGeoJson();
+                obs.Site.PointWithBuffer = point.ToCircle(accuracy)?.ToGeoJson();
                 obs.Site.Accuracy = accuracy;
 
             });

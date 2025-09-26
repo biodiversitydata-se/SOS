@@ -17,43 +17,17 @@ namespace SOS.Lib.Managers
         private readonly ILogger<IProjectManager> _logger;
         private readonly ICache<int, ProjectInfo> _projectCache;
 
-        /// <summary>
-        ///     Constructor
-        /// </summary>
-        /// <param name="projectCache"></param>
-        /// <param name="logger"></param>
-        public ProjectManager(
-            ICache<int, ProjectInfo> projectCache,
-            ILogger<IProjectManager> logger)
+        private async Task<IEnumerable<ProjectInfo>> GetPermittedAsync(string filter, int? userId)
         {
-            _projectCache = projectCache ?? throw new ArgumentNullException(nameof(projectCache));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        }
-
-        /// <inheritdoc/>
-        public async Task<IEnumerable<ProjectInfo>> GetAllAsync()
-        {
-            return await _projectCache.GetAllAsync();
-        }
-
-        /// <inheritdoc/>
-        public async Task<IEnumerable<ProjectInfo>> GetAsync(IEnumerable<int> projectIds, int? userId = null)
-        {
-            if (!projectIds?.Any() ?? true)
+            if ((userId ?? 0).Equals(0))
             {
-                return null!;
+                userId = -1; // UserServiceUserId equals 0 if not found, set userid = -1 to not match them
             }
-            return (await GetAllAsync()).Where(p => projectIds.Contains(p.Id) && (userId == null || p.IsPublic || p.UserServiceUserId == userId));
-        }
-
-        /// <inheritdoc/>
-        public async Task<IEnumerable<ProjectInfo>> GetAsync(string filter, int? userId)
-        {
             try
             {
-                return (await GetAllAsync()).Where(p => 
+                return (await _projectCache.GetAllAsync())?.Where(p =>
                     (
-                        p.IsPublic || 
+                        !p.IsHidden ||
                         p.UserServiceUserId == userId ||
                         p.MemberIds.Contains(userId ?? 0)
                     ) &&
@@ -72,20 +46,45 @@ namespace SOS.Lib.Managers
             }
         }
 
+        /// <summary>
+        ///     Constructor
+        /// </summary>
+        /// <param name="projectCache"></param>
+        /// <param name="logger"></param>
+        public ProjectManager(
+            ICache<int, ProjectInfo> projectCache,
+            ILogger<IProjectManager> logger)
+        {
+            _projectCache = projectCache ?? throw new ArgumentNullException(nameof(projectCache));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        }
+
+        /// <inheritdoc/>
+        public async Task<IEnumerable<ProjectInfo>> GetAllAsync(bool includeHidden = false)
+        {
+            return (await _projectCache.GetAllAsync())?.Where(p => !p.IsHidden || includeHidden);
+        }
+
+        /// <inheritdoc/>
+        public async Task<IEnumerable<ProjectInfo>> GetAsync(IEnumerable<int> projectIds, int? userId = null)
+        {
+            if (!projectIds?.Any() ?? true)
+            {
+                return null!;
+            }
+            return (await GetPermittedAsync(null, userId)).Where(p => projectIds.Contains(p.Id));
+        }
+
+        /// <inheritdoc/>
+        public async Task<IEnumerable<ProjectInfo>> GetAsync(string filter, int? userId)
+        {
+            return await GetPermittedAsync(filter, userId);
+        }
+
         /// <inheritdoc/>
         public async Task<ProjectInfo> GetAsync(int id, int? userId)
         {
-            try
-            {
-                return (await GetAllAsync()).FirstOrDefault(p =>
-                    (p.IsPublic || p.UserServiceUserId == userId) && p.Id.Equals(id)
-               );
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, $"Failed to get project: {id}");
-                return null;
-            }
+            return (await GetPermittedAsync(null, userId)).FirstOrDefault(p => p.Id.Equals(id));
         }
     }
 }

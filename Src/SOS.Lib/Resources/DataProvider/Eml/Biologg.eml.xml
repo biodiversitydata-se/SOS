@@ -65,6 +65,9 @@
 			<para>
 				The app is developed and managed by the software company Overstellar Solutions AB.
 			</para>
+			<para>
+				The app has been in use and data have been recorded during years 2019 to 2024. The app has been discontinued 2024-11-20.
+			</para>
 		</abstract>
 		<keywordSet>
 			<keyword>Occurrence</keyword>
@@ -95,7 +98,7 @@
 				<sos:TemporalCoverageType>date range</sos:TemporalCoverageType>
 				<sos:LivingTimePeriod>NA</sos:LivingTimePeriod>
 				<sos:StartDate>2019</sos:StartDate>
-				<sos:EndDate>current</sos:EndDate>
+				<sos:EndDate>2024</sos:EndDate>
 			</temporalCoverage>
 			<taxonomicCoverage>
 				<sos:TaxonomicDescription>All taxa occuring in Sweden.</sos:TaxonomicDescription>

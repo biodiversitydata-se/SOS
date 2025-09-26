@@ -60,6 +60,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(DsDatasetDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType((int)HttpStatusCode.ServiceUnavailable)]
         public async Task<IActionResult> GetDatasetByIdAsync(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
@@ -86,7 +87,7 @@ namespace SOS.Observations.Api.Controllers
             }
             catch (TimeoutException)
             {
-                return new StatusCodeResult((int)HttpStatusCode.RequestTimeout);
+                return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
             }
             catch (Exception e)
             {
@@ -111,6 +112,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(IEnumerable<DsDatasetDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType((int)HttpStatusCode.ServiceUnavailable)]
         public async Task<IActionResult> GetDatasetsBySearchAsync(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
@@ -157,7 +159,7 @@ namespace SOS.Observations.Api.Controllers
             }
             catch (TimeoutException)
             {
-                return new StatusCodeResult((int)HttpStatusCode.RequestTimeout);
+                return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
             }
             catch (Exception e)
             {
@@ -178,7 +180,8 @@ namespace SOS.Observations.Api.Controllers
         [HttpGet("events/{id}")]
         [ProducesResponseType(typeof(DsEventDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)] 
+        [ProducesResponseType((int)HttpStatusCode.ServiceUnavailable)]
         public async Task<IActionResult> GetEventByIdAsync(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
@@ -206,7 +209,7 @@ namespace SOS.Observations.Api.Controllers
             }
             catch (TimeoutException)
             {
-                return new StatusCodeResult((int)HttpStatusCode.RequestTimeout);
+                return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
             }
             catch (Exception e)
             {
@@ -231,6 +234,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(IEnumerable<DsEventDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType((int)HttpStatusCode.ServiceUnavailable)]
         public async Task<IActionResult> GetEventsBySearchAsync(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
@@ -271,7 +275,7 @@ namespace SOS.Observations.Api.Controllers
             }
             catch (TimeoutException)
             {
-                return new StatusCodeResult((int)HttpStatusCode.RequestTimeout);
+                return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
             }
             catch (Exception e)
             {
@@ -292,7 +296,8 @@ namespace SOS.Observations.Api.Controllers
         [HttpGet("occurrences/{id}")]
         [ProducesResponseType(typeof(DsOccurrenceDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)] 
+        [ProducesResponseType((int)HttpStatusCode.ServiceUnavailable)]
         public async Task<IActionResult> GetOccurrenceByIdAsync(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
@@ -320,7 +325,7 @@ namespace SOS.Observations.Api.Controllers
             }
             catch (TimeoutException)
             {
-                return new StatusCodeResult((int)HttpStatusCode.RequestTimeout);
+                return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
             }
             catch (Exception e)
             {
@@ -345,6 +350,7 @@ namespace SOS.Observations.Api.Controllers
         [ProducesResponseType(typeof(IEnumerable<DsOccurrenceDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [ProducesResponseType((int)HttpStatusCode.ServiceUnavailable)]
         public async Task<IActionResult> GetOccurrencesBySearchAsync(
             [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
@@ -385,7 +391,7 @@ namespace SOS.Observations.Api.Controllers
             }
             catch (TimeoutException)
             {
-                return new StatusCodeResult((int)HttpStatusCode.RequestTimeout);
+                return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
             }
             catch (Exception e)
             {

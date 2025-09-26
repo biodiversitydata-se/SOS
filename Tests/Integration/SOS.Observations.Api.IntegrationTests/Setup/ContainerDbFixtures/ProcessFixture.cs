@@ -142,7 +142,7 @@ public class ProcessFixture : IProcessFixture
         serviceCollection.AddSingleton<IProcessedObservationCoreRepository, ProcessedObservationCoreRepository>();
         var elasticConfiguration = CreateElasticSearchConfiguration();
         serviceCollection.AddSingleton(elasticConfiguration);
-        serviceCollection.AddSingleton(new AreaConfiguration());
+        serviceCollection.AddSingleton(new AreaConfiguration() { ExcludeParishGeometries = true });
         serviceCollection.AddSingleton<ICache<string, ProcessedConfiguration>, ProcessedConfigurationCache>();
         serviceCollection.AddSingleton<IProcessedConfigurationRepository, ProcessedConfigurationRepository>();
         serviceCollection.AddSingleton<IVocabularyValueResolver, VocabularyValueResolver>();
@@ -307,7 +307,7 @@ public class ProcessFixture : IProcessFixture
         if (_darwinCoreFactory == null)
         {
             var dataProvider = new DataProvider() { Id = 1, Identifier = "Artportalen" };
-            _areaHelper = new AreaHelper(new AreaConfiguration(), new AreaRepository(_processClient, new NullLogger<AreaRepository>()));
+            _areaHelper = new AreaHelper(new AreaConfiguration() { ExcludeParishGeometries = true }, new AreaRepository(_processClient, new NullLogger<AreaRepository>()));
             _darwinCoreFactory = CreateDarwinCoreFactoryAsync(dataProvider).Result;
         }
 
@@ -324,7 +324,7 @@ public class ProcessFixture : IProcessFixture
         if (_iNaturalistFactory == null)
         {
             var dataProvider = new DataProvider() { Id = 19, Identifier = "iNaturalist" };
-            _areaHelper = new AreaHelper(new AreaConfiguration(), new AreaRepository(_processClient, new NullLogger<AreaRepository>()));
+            _areaHelper = new AreaHelper(new AreaConfiguration() { ExcludeParishGeometries = true }, new AreaRepository(_processClient, new NullLogger<AreaRepository>()));
             _iNaturalistFactory = new iNaturalistObservationFactory(
                 dataProvider, 
                 _taxaById, 

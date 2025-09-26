@@ -152,6 +152,7 @@ namespace SOS.Lib.Managers
             return new UserArea
             {
                 AreaType = areaType,
+                Buffer = areaModel.Buffer,
                 FeatureId = areaModel.FeatureId,
                 Name = areaInfo.Name
             };

@@ -1,38 +1,9 @@
-# auth:
-#   enabled: true
-#   password: endastILokalUtveckling
-# master:
-#   persistence:
-#     enabled: false
-#   topologySpreadConstraints:
-#     - maxSkew: 1
-#       topologyKey: kubernetes.io/hostname
-#       whenUnsatisfiable: DoNotSchedule
-#       labelSelector:
-#         matchLabels:
-#           app.kubernetes.io/name: redis
-# replica:
-#   persistence:
-#     enabled: false
-#   topologySpreadConstraints:
-#     - maxSkew: 1
-#       topologyKey: kubernetes.io/hostname
-#       whenUnsatisfiable: DoNotSchedule
-#       labelSelector:
-#         matchLabels:
-#           app.kubernetes.io/name: redis
-# sentinel:
-#   enabled: true
-
-# Above is how we run Redis (Sentinel) in our test and production cluster
-# Locally we run a standalone setup
-
 auth:
   enabled: true
   password: endastILokalUtveckling
-master:
-  service:
-    type: LoadBalancer
-  persistence:
-    enabled: false
-architecture: standalone
+service:
+  type: LoadBalancer
+  port: 6379
+persistence:
+  enabled: false
+fullnameOverride: redis-master

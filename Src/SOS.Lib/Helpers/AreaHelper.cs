@@ -218,7 +218,7 @@ namespace SOS.Lib.Helpers
         public async Task InitializeAsync()
         {
             // If tree already initialized, return
-            if (IsInitialized) return;
+            if (IsInitialized) return;            
 
             try
             {
@@ -230,7 +230,21 @@ namespace SOS.Lib.Helpers
                     var areas = await _processedAreaRepository.GetAsync(_areaTypesInStrTree);
                     foreach (var area in areas)
                     {
-                        var geometry = await _processedAreaRepository.GetGeometryAsync(area.AreaType, area.FeatureId);
+                        if (_areaConfiguration.ExcludeParishGeometries && area.AreaType == AreaType.Parish)
+                        {
+                            // Skip parish when running tests in order to speed up initialization.
+                            continue;
+                        }
+
+                        Geometry geometry;
+                        if (area.AreaType == AreaType.Atlas5x5 || area.AreaType == AreaType.Atlas10x10)
+                        {
+                            geometry = area.GridGeometry;
+                        }
+                        else
+                        {
+                            geometry = await _processedAreaRepository.GetGeometryAsync(area.AreaType, area.FeatureId);
+                        }
 
                         var attributes = new Dictionary<string, object>();
                         attributes.Add("name", area.Name);
@@ -244,7 +258,7 @@ namespace SOS.Lib.Helpers
                             geometry = sweref99TmGeom.Transform(CoordinateSys.SWEREF99_TM, CoordinateSys.WGS84, false);
                         }
 
-                        var feature = geometry.ToFeature(attributes);                        
+                        var feature = geometry.ToFeature(attributes);
                         _strTree.Insert(feature.Geometry.EnvelopeInternal, feature);
                     }
 
@@ -253,7 +267,7 @@ namespace SOS.Lib.Helpers
                 }
             }
             finally
-            {
+            {                
                 _initializeSemaphoreSlim.Release();
             }
         }

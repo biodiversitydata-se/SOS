@@ -199,6 +199,7 @@ namespace SOS.Shared.Api.Extensions.Dto
                     internalFilter.Taxa ??= new TaxonFilter();
                     internalFilter.Taxa.SexIds = searchFilterInternalDto.ExtendedFilter.SexIds;
                 }
+                internalFilter.InvasiveSpeciesTreatmentIds = searchFilterInternalDto.ExtendedFilter.InvasiveSpeciesTreatmentIds;
                 internalFilter.Years = searchFilterInternalDto.ExtendedFilter.Years;
                 internalFilter.YearsComparison = (DateFilterComparison)searchFilterInternalDto.ExtendedFilter.YearsComparison;
             }
@@ -256,6 +257,7 @@ namespace SOS.Shared.Api.Extensions.Dto
                     MaxDistanceFromPoint = filter.MaxDistanceFromPoint,
                     UseDisturbanceRadius = filter.ConsiderDisturbanceRadius,
                     UsePointAccuracy = filter.ConsiderObservationAccuracy,
+                    UseAuthorizationBuffer = filter.ConsiderAuthorizationBuffer
                 },
                 LocationIds = filter.LocationIds,
                 NameFilter = filter.LocationNameFilter,
@@ -414,6 +416,7 @@ namespace SOS.Shared.Api.Extensions.Dto
                             MaxDistanceFromPoint = searchFilterDto.Geographics.MaxDistanceFromPoint,
                             UseDisturbanceRadius = searchFilterDto.Geographics.ConsiderDisturbanceRadius,
                             UsePointAccuracy = searchFilterDto.Geographics.ConsiderObservationAccuracy,
+                            UseAuthorizationBuffer = searchFilterDto.Geographics.ConsiderAuthorizationBuffer
                         },
                     MaxAccuracy = searchFilterDto.Geographics?.MaxAccuracy
                 },

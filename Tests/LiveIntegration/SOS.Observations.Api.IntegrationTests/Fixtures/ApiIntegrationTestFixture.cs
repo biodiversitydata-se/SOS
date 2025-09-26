@@ -214,6 +214,7 @@ namespace SOS.Observations.Api.LiveIntegrationTests.Fixtures
             TaxonRepository = new TaxonRepository(processClient, new NullLogger<TaxonRepository>());
             var taxonManager = CreateTaxonManager(processClient, TaxonRepository, memoryCache);
             var processedConfigurationCache = new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>()), new MemoryCache(new MemoryCacheOptions()), new NullLogger<ProcessedConfigurationCache>());
+            var vocabularyCache = new VocabularyCache(new VocabularyRepository(processClient, new NullLogger<VocabularyRepository>()), new MemoryCache(new MemoryCacheOptions()), new NullLogger<VocabularyCache>());
             var clusterHealthCache = new ClassCache<ConcurrentDictionary<string, HealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<string, HealthResponse>>>());
             ProcessedObservationRepository = CreateProcessedObservationRepository(elasticConfiguration, elasticClientManager, processedConfigurationCache, taxonManager, processClient, memoryCache);
             EventRepository = new EventRepository(elasticClientManager, elasticConfiguration, processedConfigurationCache, new ClassCache<ConcurrentDictionary<string, HealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<string, HealthResponse>>>()), new MemoryCache(new MemoryCacheOptions()), new NullLogger<EventRepository>());
@@ -229,8 +230,7 @@ namespace SOS.Observations.Api.LiveIntegrationTests.Fixtures
             var fileService = new FileService();
             VocabularyValueResolver = new VocabularyValueResolver(vocabularyRepository, new VocabularyConfiguration { ResolveValues = true, LocalizationCultureCode = "sv-SE" });
             var generalizationResolverMock = new Mock<GeneralizationResolver>();
-            var csvFileWriter = new CsvFileWriter(ProcessedObservationRepository, fileService,
-                VocabularyValueResolver, generalizationResolverMock.Object, new NullLogger<CsvFileWriter>());
+            
             var dwcArchiveFileWriter = CreateDwcArchiveFileWriter(VocabularyValueResolver, processClient);
             var dwcArchiveEventFileWriter = CreateDwcArchiveEventFileWriter(VocabularyValueResolver, processClient);
             var excelFileWriter = new ExcelFileWriter(ProcessedObservationRepository,
@@ -244,6 +244,8 @@ namespace SOS.Observations.Api.LiveIntegrationTests.Fixtures
             var userService = CreateUserService();
             var filterManager = new FilterManager(taxonManager, userService, areaCache, dataProviderCache);
             FilterManager = filterManager;
+            var taxonCache = new TaxonCache(TaxonRepository, new MemoryCache(new MemoryCacheOptions()), new NullLogger<TaxonCache>());
+            var csvFileWriter = new CsvFileWriter(ProcessedObservationRepository, fileService, filterManager, VocabularyValueResolver, generalizationResolverMock.Object, areaCache, taxonCache, new NullLogger<CsvFileWriter>());
             ObservationManager = CreateObservationManager(areaManager, (ProcessedObservationRepository)ProcessedObservationRepository, VocabularyValueResolver, processClient, filterManager);
             var taxonSearchManager = CreateTaxonSearchManager(processedTaxonRepository, filterManager);
             var inputValaidationConfiguration = GetInputValaidationConfiguration();
@@ -293,7 +295,8 @@ namespace SOS.Observations.Api.LiveIntegrationTests.Fixtures
             AzureSearchHealthCheck = new AzureSearchHealthCheck(healthCheckConfiguration, new NullLogger<AzureSearchHealthCheck>());
             var devOpsService = new DevOpsService(new HttpClientService(new NullLogger<HttpClientService>()), new DevOpsConfiguration(), new NullLogger<DevOpsService>());
             var devOpsManager = new DevOpsManager(devOpsService, new DevOpsConfiguration(), new NullLogger<DevOpsManager>());
-            SystemsController = new SystemsController(devOpsManager, processInfoManager, ProcessedObservationRepository, elasticConfiguration, dataProviderCache, new NullLogger<SystemsController>());
+            SystemsController = new SystemsController(devOpsManager, processInfoManager, ProcessedObservationRepository, elasticConfiguration, dataProviderCache, taxonManager,
+                vocabularyCache, new NullLogger<SystemsController>());
             _userManager = new UserManager(userService, areaCache, new NullLogger<UserManager>());
             UserController = new UserController(_userManager, new NullLogger<UserController>());
             SersObservationVerbatimRepository = new SersObservationVerbatimRepository(importClient, new NullLogger<SersObservationVerbatimRepository>());

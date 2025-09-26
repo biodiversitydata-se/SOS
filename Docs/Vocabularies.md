@@ -23,6 +23,7 @@ All vocabularies used in SOS are listed on this page. The vocabularies can be do
 - [unit](#unit)
 - [verificationStatus](#verificationstatus)
 - [taxonCategory](#taxonCategory)
+- [invasiveSpeciesTreatment](#invasivespeciestreatment)
 
 ## accessRights
 | Id | Value |
@@ -41,7 +42,7 @@ All vocabularies used in SOS are listed on this page. The vocabularies can be do
 | 2 | bo, hörda ungar | nest with chick heard | Säkerställd reproduktion | Reproduction confirmed
 | 3 | misslyckad häckning | breeding failed | Säkerställd reproduktion | Reproduction confirmed
 | 4 | ruvande | incubating | Säkerställd reproduktion | Reproduction confirmed
-| 5 | äggskal | egg shells | Spår | Trace
+| 5 | äggskal | egg shells | Säkerställd reproduktion | Reproduction confirmed
 | 6 | föda åt ungar | carrying food for young | Säkerställd reproduktion | Reproduction confirmed
 | 7 | bär exkrementsäck | carrying faecal sac | Säkerställd reproduktion | Reproduction confirmed
 | 8 | besöker bebott bo | visiting occupied nest | Säkerställd reproduktion | Reproduction confirmed
@@ -138,6 +139,9 @@ All vocabularies used in SOS are listed on this page. The vocabularies can be do
 | 101 | yngelplats med ungar | breeding ground or offspring | Säkerställd reproduktion | Reproduction confirmed
 | 102 | dödad av olja | killed by oil | Död | Dead
 | 103 | spår från klättring | tracks from climbing | Spår | Trace
+| 104 | övernattning | overnight stay | Stationär | Stationary
+| 105 | aktiv | active | Stationär | Stationary
+| 106 | gående/springande | walking/running | Stationär | Stationary
 
 ## areaType
 | Id | Value (Swedish) | Value (English) |
@@ -1090,7 +1094,7 @@ All vocabularies used in SOS are listed on this page. The vocabularies can be do
 | 2 | bo, hörda ungar | nest with chick heard | Säkerställd reproduktion | Reproduction confirmed
 | 3 | misslyckad häckning | breeding failed | Säkerställd reproduktion | Reproduction confirmed
 | 4 | ruvande | incubating | Säkerställd reproduktion | Reproduction confirmed
-| 5 | äggskal | egg shells | Spår | Trace
+| 5 | äggskal | egg shells | Säkerställd reproduktion | Reproduction confirmed
 | 6 | föda åt ungar | carrying food for young | Säkerställd reproduktion | Reproduction confirmed
 | 7 | bär exkrementsäck | carrying faecal sac | Säkerställd reproduktion | Reproduction confirmed
 | 8 | besöker bebott bo | visiting occupied nest | Säkerställd reproduktion | Reproduction confirmed
@@ -1365,7 +1369,7 @@ All vocabularies used in SOS are listed on this page. The vocabularies can be do
 | 294 | Naturcentrum AB |
 | 295 | Pro Natura |
 | 296 | Regionmuseet Kristianstad |
-| 297 | Lund-Botaniska/Zoologiska museet |
+| 297 | Biologiska Museet, Lunds Universitet |
 | 298 | Göteborgs naturhistoriska museum (GNM) |
 | 299 | Göteborg-Herbarium GB |
 | 300 | Stockholm-Naturhistoriska riksmuseet |
@@ -1670,7 +1674,7 @@ All vocabularies used in SOS are listed on this page. The vocabularies can be do
 | 600 | Svensk kärnbränslehantering (SKB) |
 | 601 | Flitiga myran |
 | 602 | Nationell valideringsgrupp (NVG) tvåvingar |
-| 603 | Birdlife Sverige |
+| 603 | IAS |
 | 604 | Floraväktarna |
 | 605 | Svenska Jägareförbundet |
 | 606 | Greensway AB |
@@ -1686,6 +1690,85 @@ All vocabularies used in SOS are listed on this page. The vocabularies can be do
 | 616 | Naturum Sommen |
 | 617 | Nationell valideringsgrupp (NVG) Gastropoda |
 | 618 | Oxelösunds kommun |
+| 619 | Malung-Sälens kommun |
+| 620 | Melica |
+| 621 | Test Artporjekt test |
+| 622 | Nationell valideringsgrupp (NVG) groddjur |
+| 623 | Faunaväkteri |
+| 624 | Nationell valideringsgrupp (NVG) marina däggdjur |
+| 625 | Test AP Project |
+| 626 | Norrbottens flora |
+| 627 | Insjöfåglar RMÖ/GDP |
+| 628 | Kumla kommun |
+| 629 | Täby kommun |
+| 630 | Borlänge kommun |
+| 631 | Berg kommun |
+| 632 | Härjedalens kommun |
+| 633 | Tromsö museum |
+| 634 | Landskrona kommun |
+| 635 | Upplands ornitologiska förening (UOF) |
+| 636 | Naturvårdsverket |
+| 637 | Hofors kommun |
+| 638 | Hagströms vattenvård & miljörätt AB |
+| 639 | Rappen (HaV) |
+| 640 | Hofors kommun |
+| 641 | Sandvikens kommun |
+| 642 | Nacka kommun |
+| 643 | Kinnekulle-floran |
+| 644 | Örnsköldsviks kommun |
+| 645 | Lidköpings kommun |
+| 646 | Västkuststiftelsen |
+| 647 | Åre kommun |
+| 648 | Ängelholms kommun |
+| 649 | Nationell valideringsgrupp (NVG) däggdjur |
+| 650 | Nationell valideringsgrupp (NVG) svampar |
+| 651 | Natur- & skogstjänst AB |
+| 652 | Projekt sydlig kärrsnäppa |
+| 653 | Nationell valideringsgrupp (NVG) steklar |
+| 654 | Boxholms Skogar AB |
+| 655 | Nationell valideringsgrupp (NVG) skinnbaggar |
+| 656 | Naturskyddsföreningen Gnosjö |
+| 657 | Öckerö kommun |
+| 658 | Nationell Valideringsgrupp (NVG) Lavar |
+| 659 | Fungaväktarna |
+| 660 | Naturskyddsföreningen Lerum |
+| 661 | Vellinge kommun |
+| 662 | Rappen (HaV) |
+| 663 | Skyddsvärda arter (NV) |
+| 664 | Nationell valideringsgrupp (NVG) skalbaggar |
+| 665 | Nationell valideringsgrupp (NVG) kräldjur |
+| 666 | Pelagia Nature & Environment AB |
+| 667 | Smålands ornitologiska förening (SmOF) |
+| 668 | Lunds universitet |
+| 669 | Ekologigruppen AB |
+| 670 | Nationell valideringsgrupp (NVG) trollsländor |
+| 671 | Insamlingsstiftelsen Framtidens Natur & Kulturarv |
+| 672 | Nationell verifieringsgrupp (NVG) nattsländor |
+| 673 | Nationell verifieringsgrupp (NVG) alger |
+| 674 | Mark- och miljödomstolen vid Vänersborgs tingsrätt |
+| 675 | Skogforsk |
+| 5001 | SLU Swedish Species Information Centre |
+| 5002 | Department of Aquatic Resources (SLU Aqua) |
+| 5003 | Environmental data MVM, SLU |
+| 5004 | Umeå University |
+| 5005 | Swedish Meteorological and Hydrological Institute (SMHI) |
+| 5006 | Swedish Museum of Natural History |
+| 5007 | Station Linné |
+| 5008 | Department of Biology, Lund University |
+| 5009 | Overstellar Solutions AB |
+| 5010 | iNaturalist.org |
+| 5011 | Swedish Board of Agriculture |
+| 5012 | Department of Forest Resource Management, SLU |
+| 5013 | Gothenburg Natural History Museum |
+| 5014 | Lund University |
+| 5015 | Biologg |
+| 5016 | NRM |
+| 5017 | MZLU |
+| 5018 | SJV |
+| 5019 | iNaturalist |
+| 5020 | GNM |
+| 5021 | GBIF-SE:GNM |
+| 5022 | Swedish National Forest Inventory, Department of Forest Resource Management, SLU |
 
 ## lifeStage
 | Id | Value (Swedish) | Value (English) |
@@ -1972,6 +2055,7 @@ All vocabularies used in SOS are listed on this page. The vocabularies can be do
 |:---	|:---	|:---	|
 | 0 | Validerad | Verified |
 | 1 | Rapporterad av expert | Reported by expert |
+| 2 | Godkänd baserat på communitykonsensus | Approved based on community consensus |
 | 10 | Ovaliderad | Unvalidated |
 | 12 | Validering efterfrågas | Validation requested |
 | 13 | Dialog hos rapportör, dolt fynd | Dialogue at reporter, hidden sighting |
@@ -2037,3 +2121,20 @@ All vocabularies used in SOS are listed on this page. The vocabularies can be do
 | 52 | Ranglös | Unranked |
 | 75 | Namn Över Släktesnivå | Suprageneric Name |
 | 95 | Forma Specialis | Forma Specialis |
+
+## invasiveSpeciesTreatment
+| Id | Value (Swedish) | Value (English) |
+|:---	|:---	|:---	|
+| 0 | Åtgärd (Biologisk) | Treatment (Biological) |
+| 1 | Åtgärd (Mekanisk) | Treatment (Mechanical) |
+| 2 | Åtgärd (Kemisk) | Treatment (Chemical) |
+| 3 | Åtgärd (annan åtgärd) | Treatment (Other) |
+| 4 | Åtgärd (enligt kommentar) | Treatment (According to Comment) |
+| 5 | Uppföljning (Biologisk) | Follow-up (Biological) |
+| 6 | Uppföljning (Mekanisk) | Follow-up (Mechanical) |
+| 7 | Uppföljning (Kemisk) | Follow-up (Chemical) |
+| 8 | Uppföljning (ingen/annan åtgärd) | Follow-up (None/Other) |
+| 9 | Uppföljning och återställande (Biologisk) | Follow-up and Restoration (Biological) |
+| 10 | Uppföljning och återställande (Mekanisk) | Follow-up and Restoration (Mechanical) |
+| 11 | Uppföljning och återställande (Kemisk) | Follow-up and Restoration (Chemical) |
+| 12 | Uppföljning och återställande (annan) | Follow-up and Restoration (Other) |

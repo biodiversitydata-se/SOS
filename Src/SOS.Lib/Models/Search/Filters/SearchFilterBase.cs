@@ -40,7 +40,8 @@ namespace SOS.Lib.Models.Search.Filters
             ShowOnlyMerged,
             ShowBoth,
             DoNotShowSightingsInMerged,
-            DoNotShowMergedIncludeReplacementChilds
+            DoNotShowMergedIncludeReplacementChilds,
+            ShowChildrenAndReplacements
         }
 
 

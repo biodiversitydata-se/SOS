@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.JsonWebTokens;
+using Serilog.Core;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.UserService;
@@ -64,7 +65,9 @@ namespace SOS.Lib.Services
 
                 var response = await _httpClientService.GetDataAsync<ResponseModel<UserModel>>(
                     new Uri($"{_userServiceConfiguration.UserAdmin2ApiBaseAddress}/Users/Current?artdataFormat=true"),
-                    new Dictionary<string, string> { { "Authorization", authorizationHeader } });
+                    new Dictionary<string, string> { { "Authorization", authorizationHeader } },
+                    TimeSpan.FromSeconds(3),
+                    5);
 
                 return response?.Success ?? false
                     ? response.Result
@@ -90,7 +93,9 @@ namespace SOS.Lib.Services
                 await InvalidateAccessTokenAsync();
                 var response = await _httpClientService.GetDataAsync<ResponseModel<UserModel>>(
                     new Uri($"{_userServiceConfiguration.UserAdmin2ApiBaseAddress}/Users/{userId}?artdataFormat=true"),
-                    new Dictionary<string, string> { { "Authorization", $"Bearer {_jsonWebToken.EncodedToken}" } });
+                    new Dictionary<string, string> { { "Authorization", $"Bearer {_jsonWebToken.EncodedToken}" } },
+                    TimeSpan.FromSeconds(3),
+                    5);
 
                 return response.Success
                     ? response.Result
@@ -112,7 +117,9 @@ namespace SOS.Lib.Services
                 await InvalidateAccessTokenAsync();
                 var response = await _httpClientService.GetDataAsync<ResponseModel<IEnumerable<AuthorityModel>>>(
                     new Uri($"{_userServiceConfiguration.UserAdmin2ApiBaseAddress}/Users/{userId}/permissions?applicationIdentifier={authorizationApplicationIdentifier ?? "artportalen"}&lang={cultureCode}&artdataFormat=true"),
-                    new Dictionary<string, string> { { "Authorization", $"Bearer {_jsonWebToken.EncodedToken}" } });
+                    new Dictionary<string, string> { { "Authorization", $"Bearer {_jsonWebToken.EncodedToken}" } },
+                    TimeSpan.FromSeconds(3),
+                    5);
 
                 return response.Success
                     ? response.Result
@@ -135,7 +142,9 @@ namespace SOS.Lib.Services
                 var cultureId = CultureCodeHelper.GetCultureId(cultureCode);
                 var response = await _httpClientService.GetDataAsync<ResponseModel<IEnumerable<RoleModel>>>(
                     new Uri($"{_userServiceConfiguration.UserAdmin2ApiBaseAddress}/Users/{userId}/roles?applicationIdentifier={authorizationApplicationIdentifier ?? "artportalen"}&localeId={cultureId}&artdataFormat=true"),
-                    new Dictionary<string, string> { { "Authorization", $"Bearer {_jsonWebToken.EncodedToken}" } });
+                    new Dictionary<string, string> { { "Authorization", $"Bearer {_jsonWebToken.EncodedToken}" } },
+                    TimeSpan.FromSeconds(3),
+                    5);
 
                 return response?.Success ?? false
                     ? response.Result
@@ -157,7 +166,9 @@ namespace SOS.Lib.Services
                 await InvalidateAccessTokenAsync();
                 var response = await _httpClientService.GetDataAsync<ResponseModel<PersonModel>>(
                     new Uri($"{_userServiceConfiguration.UserAdmin2ApiBaseAddress}/Persons/{personId}?lang={cultureCode}&artdataFormat=true"),
-                    new Dictionary<string, string> { { "Authorization", $"Bearer {_jsonWebToken.EncodedToken}" } });
+                    new Dictionary<string, string> { { "Authorization", $"Bearer {_jsonWebToken.EncodedToken}" } },
+                    TimeSpan.FromSeconds(3),
+                    5);
 
                 return response?.Success ?? false
                     ? response.Result
@@ -187,14 +198,47 @@ namespace SOS.Lib.Services
             if (response.IsSuccessStatusCode)
             {
                 var jsonResponse = await response.Content.ReadAsStringAsync();
-                TokenResponse tokenResponse = JsonSerializer.Deserialize<TokenResponse>(jsonResponse);
-                var handler = new JsonWebTokenHandler();
-                JsonWebToken token = handler.ReadJsonWebToken(tokenResponse.access_token);   
-                return token;
+                try
+                {
+                    var tokenResponse = JsonSerializer.Deserialize<TokenResponse>(jsonResponse);
+
+                    if (tokenResponse == null || string.IsNullOrWhiteSpace(tokenResponse.access_token))
+                    {
+                        _logger.LogError("Token response was null or missing access_token. Response: {JsonResponse}", jsonResponse);
+                        throw new Exception("Token response did not contain an access_token.");
+                    }
+
+                    var handler = new JsonWebTokenHandler();
+                    var token = handler.ReadJsonWebToken(tokenResponse.access_token);
+
+                    return token;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex,
+                        "Failed to parse access token from successful response. JsonResponse={JsonResponse}",
+                        jsonResponse);
+                    throw;
+                }
             }
             else
             {
-                throw new Exception("Failed to get access token: " + response.StatusCode);
+                string secretPreview = string.IsNullOrEmpty(_userServiceConfiguration.ClientSecret)
+                    ? "<empty>"
+                    : _userServiceConfiguration.ClientSecret.Substring(0, Math.Min(4, _userServiceConfiguration.ClientSecret.Length));
+
+                _logger.LogError("Failed to get access token. " +
+                                "StatusCode={StatusCode}, TokenUrl={TokenUrl}, ClientId={ClientId}, Scope={Scope}, ClientSecretPreview={SecretPreview}",
+                                response.StatusCode,
+                                _userServiceConfiguration.TokenUrl,
+                                _userServiceConfiguration.ClientId,
+                                _userServiceConfiguration.Scope,
+                                secretPreview);
+
+                var errorContent = await response.Content.ReadAsStringAsync();
+                _logger.LogError("Response content: {ErrorContent}", errorContent);
+
+                throw new Exception($"Failed to get access token: {response.StatusCode}");
             }
         }
 

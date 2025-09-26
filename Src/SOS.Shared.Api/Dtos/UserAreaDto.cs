@@ -8,6 +8,11 @@ namespace SOS.Shared.Api.Dtos
     public class UserAreaDto
     {
         /// <summary>
+        /// Area buffer in meters
+        /// </summary>
+        public int? Buffer { get; set; }
+
+        /// <summary>
         /// Area type.
         /// </summary>
         public AreaTypeDto AreaType { get; set; }

@@ -39,7 +39,7 @@ namespace SOS.Import.LiveIntegrationTests.Repositories
             //-----------------------------------------------------------------------------------------------------------
             // Act
             //-----------------------------------------------------------------------------------------------------------
-            var result = await sightingRepository.GetChunkAsync(sightingIds);
+            var result = await sightingRepository.GetChunkAsync(sightingIds, isIncrementalHarvest: false);
 
             //-----------------------------------------------------------------------------------------------------------
             // Assert

@@ -136,7 +136,7 @@ namespace SOS.Observations.Api.Repositories
                 bucket.Key["county"].TryGetString(out var county);
                 bucket.Key["id"].TryGetString(out var id);
                 bucket.Key["latitude"].TryGetDouble(out var latitude);
-                bucket.Key["longitude"].TryGetLong(out var longitude);
+                bucket.Key["longitude"].TryGetDouble(out var longitude);
                 bucket.Key["municipality"].TryGetString(out var municipality);
                 bucket.Key["name"].TryGetString(out var name);
                 bucket.Key["parish"].TryGetString(out var parish);

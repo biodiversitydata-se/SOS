@@ -1,0 +1,97 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: $(imageName)-api
+spec:
+  replicas: 2
+  template:
+    spec:
+      containers:
+      - name: $(imageName)-api
+        envFrom: # remove this if there is no ES resource (es.yaml) = no local $(imageName)-secret generated 
+        - secretRef:
+              name: $(imageName)-secret
+        env:
+        - name: ASPNETCORE_ENVIRONMENT
+          value: st
+        - name: CorsAllowAny
+          value: "true"
+        - name: AreaConfiguration
+          value: '{"SwedenExtentBufferKm": 200}'
+        - name: InputValaidationConfiguration
+          value: '{"CountFactor": 1.1, "ElasticSearchMaxRecordsInternal": 100000, "ElasticSearchMaxRecordsPublic": 50000, "MaxBatchSize": 1000, "MaxNrElasticSearchAggregationBuckets": 65535, "SignalSearchTaxonListIds": [ 1, 7, 8, 17, 18 ], "TilesLimitInternal": 350000, "TilesLimitPublic": 65535}'
+        - name: CryptoConfiguration
+          value: '{"Password": "SECRET_PLACEHOLDER", "Salt": "SECRET_PLACEHOLDER"}'
+        - name: ApplicationInsights
+          value: |
+              {
+                  "InstrumentationKey": "SECRET_PLACEHOLDER", 
+                  "EnableRequestBodyLogging": false,
+                  "EnableSearchResponseCountLogging": false
+              }
+        - name: SearchDbConfiguration
+          value: '{"UserName": "SECRET_PLACEHOLDER", "Password": "SECRET_PLACEHOLDER", "Clusters": [{"Hosts": ["https://artsearch2-1-test.artdata.slu.se:9200"]}], "DebugMode": true, "IndexPrefix": "sos-st", "IndexSettings": [{"Name": "observation", "NumberOfReplicas": 0, "NumberOfShards": 9, "NumberOfShardsProtected": 1, "ReadBatchSize": 10000, "WriteBatchSize": 1000, "RequestTimeout": 300, "ScrollBatchSize": 5000, "ScrollTimeout": "600s"}, {"Name": "dataset", "NumberOfReplicas": 0, "NumberOfShards": 1, "ReadBatchSize": 10000, "WriteBatchSize": 1000, "RequestTimeout": 300, "ScrollBatchSize": 5000, "ScrollTimeout": "600s"}, {"Name": "event", "NumberOfReplicas": 0, "NumberOfShards": 1, "ReadBatchSize": 10000, "WriteBatchSize": 1000, "RequestTimeout": 300, "ScrollBatchSize": 5000, "ScrollTimeout": "600s"}]}'
+        - name: ProcessDbConfiguration
+          value: |
+              {
+                  "UserName": "SECRET_PLACEHOLDER", 
+                  "Password": "SECRET_PLACEHOLDER", 
+                  "Hosts": [
+                      {
+                          "Name": "artmongo-t-1.artdata.slu.se",
+                          "Port": 27017
+                      }
+                  ], 
+                  "ReplicaSetName": null, 
+                  "DatabaseName": "sos-st", 
+                  "UseTls": false, 
+                  "AuthenticationDb": "admin", 
+                  "ReadBatchSize": 10000, 
+                  "WriteBatchSize": 10000
+              }
+        - name: HangfireDbConfiguration
+          value: |
+              {
+                  "UserName": "SECRET_PLACEHOLDER", 
+                  "Password": "SECRET_PLACEHOLDER", 
+                  "Hosts": [
+                      {
+                          "Name": "artmongo-t-1.artdata.slu.se",
+                          "Port": 27017
+                      }
+                  ], 
+                  "ReplicaSetName": null, 
+                  "DatabaseName": "sos-hangfire-st", 
+                  "UseTls": false, 
+                  "AuthenticationDb": "admin", 
+                  "JobExpirationDays": 3
+              }
+        - name: SosApiConfiguration
+          value: |
+              {
+                  "ObservationsApiAddresses": [ 
+                      "https://sos-search-st.wt.artdata.slu.se/" 
+                  ], 
+                  "ElasticSearchProxyAddresses": [ 
+                      "https://sos-proxy-st.wt.artdata.slu.se/" 
+                  ], 
+                  "AnalysisApiAddresses": [ 
+                      "https://sos-analysis-st.wt.artdata.slu.se/" 
+                  ], 
+                  "DataStewardshipApiAddresses": [ 
+                      "https://datastewardship-st.wt.artdata.slu.se/"
+                  ]
+              }
+        - name: ProcessConfiguration
+          value: |
+              {
+                  "TaxonAttributeServiceConfiguration": {
+                      "BaseAddress": "https://taxonattributeservice.artdata.slu.se/api", 
+                      "AcceptHeaderContentType": "application/json"
+                  }, 
+                  "TaxonServiceConfiguration": {
+                      "BaseAddress": "https://taxonservice.artdata.slu.se/DarwinCore/DarwinCoreArchiveFile?version=custom", 
+                      "AcceptHeaderContentType": "application/text", 
+                      "TaxonApiAddress": "https://taxonapi-st.wt.artdata.slu.se/darwincore/download?version=custom"
+                  }
+              }

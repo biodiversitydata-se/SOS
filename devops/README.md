@@ -53,9 +53,9 @@ gå till ```http://localhost:5000/swagger``` i din webbläsare
 
 ## Hemligheter (när du kör skaffold run)
 
-Om vi har hemligheter (API nycklar, connectionstring till central databas etc m.m.) som vi måste använda vid lokal utveckling - men inte vill ska hamna i git - så lägger vi dessa i en fil som heter ```not-for-git.secret.yaml``` i devops/k8s/local. (alternativt 1 fil per hemliget, typ: api-key-st.secret.yaml, connectionstring-to-st.secret.yaml osv). 
+Om vi har hemligheter (API nycklar, connectionstring till central databas etc m.m.) som vi måste använda vid lokal utveckling - men inte vill ska hamna i git - så lägger vi dessa i en fil som heter ```base.secret.yaml``` i devops/k8s/local/base/api.
 
-Du kan kopiera hela filinnehållet från **[https://vault-test.artdata.slu.se](https://vault-test.artdata.slu.se)**, gå in på applikationens secret path, mappen ```local```.   
+Du kan kopiera hela filinnehållet från **[https://vault-test.artdata.slu.se](https://vault-test.artdata.slu.se)**, gå in på secret path ```kv2/sos-observations```, mappen ```skaffold```. Kopiera och klistra in i en fil enligt instruktionen ovan.   
 ```*.secret.yaml``` är med i vår .gitignore.
 
 Såhär ser innehållet ut i en *.secret.yaml fil:

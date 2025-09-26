@@ -113,14 +113,15 @@ namespace SOS.Lib.Repositories.Interfaces
         /// Count the number of documents in the collection.
         /// </summary>
         /// <returns></returns>
-        Task<long> CountAllDocumentsAsync();
+        Task<long> CountAllDocumentsAsync(bool estimateCount = true);
 
         /// <summary>
         /// Count the number of documents in the collection.
         /// </summary>
         /// <param name="mongoCollection"></param>
+        /// <param name="estimateCount"></param>
         /// <returns></returns>
-        Task<long> CountAllDocumentsAsync(IMongoCollection<TEntity> mongoCollection);
+        Task<long> CountAllDocumentsAsync(IMongoCollection<TEntity> mongoCollection, bool estimateCount = true);
 
         /// <summary>
         ///     Remove

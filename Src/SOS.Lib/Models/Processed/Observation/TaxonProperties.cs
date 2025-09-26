@@ -35,5 +35,7 @@
         public bool ProtectedByLaw { get; set; }
         public string SwedishOccurrence { get; set; }
         public string SwedishHistory { get; set; }
+        public string SwedishHistoryId { get; set; }
+        public string SwedishHistoryCategory { get; set; }
     }
 }

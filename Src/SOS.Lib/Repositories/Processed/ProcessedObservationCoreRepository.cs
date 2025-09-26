@@ -56,7 +56,7 @@ namespace SOS.Lib.Repositories.Processed
                 .Settings(s => s
                     .NumberOfShards(protectedIndex ? NumberOfShardsProtected : NumberOfShards)
                     .NumberOfReplicas(NumberOfReplicas)
-                    .MaxTermsCount(110000)
+                    .MaxTermsCount(120000)
                     .MaxResultWindow(100000)
                 )
                 .Mappings(map => map
@@ -186,6 +186,12 @@ namespace SOS.Lib.Repositories.Processed
                             .NumberVal(n => n.ArtportalenInternal.SightingSpeciesCollectionItemId, IndexSetting.None, NumberType.Integer)
                             .NumberVal(n => n.ArtportalenInternal.DiffusionId, IndexSetting.None, NumberType.Integer)
                             .NumberVal(n => n.ArtportalenInternal.IncludedByLocationId, IndexSetting.None, NumberType.Integer)
+                            .Object(n => n.ArtportalenInternal.InvasiveSpeciesTreatment, c => c
+                                .Properties(ps => ps
+                                        .KeywordVal(kwlc => kwlc.ArtportalenInternal.InvasiveSpeciesTreatment.Value, IndexSetting.SearchOnly)
+                                        .NumberVal(nr => nr.ArtportalenInternal.InvasiveSpeciesTreatment.Id, IndexSetting.SearchSortAggregate, NumberType.Integer)
+                                    )
+                            )
                             .Object(o => o.ArtportalenInternal.OccurrenceRecordedByInternal, n => n
                                 .Properties(ps => ps
                                     .KeywordVal(kwlc => kwlc.ArtportalenInternal.OccurrenceRecordedByInternal.First().UserAlias, IndexSetting.None)
@@ -464,7 +470,7 @@ namespace SOS.Lib.Repositories.Processed
                                     .BooleanVal(b => b.Location.Attributes.IsPrivate, IndexSetting.None)
                                     .NumberVal(n => n.Location.Attributes.ProjectId, IndexSetting.SearchOnly, NumberType.Integer)
                                     .KeywordVal(kwlc => kwlc.Location.Attributes.ExternalId, IndexSetting.SearchOnly)
-                                    .KeywordVal(kwlc => kwlc.Location.Attributes.CountyPartIdByCoordinate, IndexSetting.SearchOnly)
+                                    .KeywordVal(kwlc => kwlc.Location.Attributes.CountyPartIdByCoordinate, IndexSetting.SearchSortAggregate)
                                     .KeywordVal(kwlc => kwlc.Location.Attributes.ProvincePartIdByCoordinate, IndexSetting.SearchOnly)
                                     .KeywordVal(kwlc => kwlc.Location.Attributes.VerbatimMunicipality, IndexSetting.None)
                                     .KeywordVal(kwlc => kwlc.Location.Attributes.VerbatimProvince, IndexSetting.None)
@@ -2443,6 +2449,67 @@ namespace SOS.Lib.Repositories.Processed
                             }
                         )?.ToArray()
             };
+        }
+
+        /// <inheritdoc />
+        public async Task<SearchResponse<dynamic>> GenericTermsAggregationAsync(SearchFilter filter,
+            string aggregationField,
+            int size,
+            string? subAggreagtionField = null,
+            AggregationTypes subAggregationType = AggregationTypes.None)
+        {
+            var indexNames = GetCurrentIndex(filter, true);
+            var (queries, excludeQueries) = GetCoreQueries<dynamic>(filter, true);
+
+            var searchResponse =
+                await Client.SearchAsync<dynamic>(s => s
+                .Indices(indexNames)
+                .Query(q => q
+                    .Bool(b => b
+                        .MustNot(excludeQueries.ToArray())
+                        .Filter(queries.ToArray())
+                    )
+                )
+                .Aggregations(a => a
+                    .Add(aggregationField, a => a
+                        .Terms(t => t
+                            .Field(aggregationField)
+                            .Size(size)
+                        )
+                        .Aggregations(a =>
+                        {
+                            if (!string.IsNullOrEmpty(subAggreagtionField))
+                            {
+                                return subAggregationType switch
+                                {
+                                    AggregationTypes.Avg => a.Add("avg", m => m
+                                        .Avg(a => a
+                                            .Field(subAggreagtionField)
+                                            )
+                                    ),
+                                    AggregationTypes.Max => a.Add("max", m => m
+                                        .Max(a => a
+                                            .Field(subAggreagtionField)
+                                        )
+                                    ),
+                                    AggregationTypes.Min => a.Add("min", m => m
+                                        .Min(a => a
+                                            .Field(subAggreagtionField)
+                                        )
+                                    ),
+                                    _ => throw new Exception("Not a supported aggreagation type")
+                                };
+                            }
+                            return a;
+                        })
+                    )
+                )
+                .AddDefaultAggrigationSettings()
+            );
+
+            searchResponse.ThrowIfInvalid();
+
+            return searchResponse;
         }
     }
 }

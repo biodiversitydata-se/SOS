@@ -44,11 +44,11 @@ spec:
         - env:
             - name: SPAENVIRONMENT
               value: prod # st environment => SPA (window.env) will be loaded with assets/_configs/st/config.js
-          image: adbpocreg.azurecr.io/sosadmingui-web:$(Parameters.ImageTag)
+          image: reg.app.slu.se/k1003-1/sosadmingui-web:$(Parameters.ImageTag)
           name: sosadmingui-web
           ports:
             - containerPort: 4200
           resources: {}
       restartPolicy: Always
       imagePullSecrets:
-        - name: regcred
+        - name: reg.app.slu.se-k1003-1-regcred

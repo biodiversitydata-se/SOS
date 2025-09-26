@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Polly;
 using SOS.Lib.Services.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -153,21 +154,55 @@ namespace SOS.Lib.Services
         }
 
         /// <inheritdoc />
-        public async Task<T> GetDataAsync<T>(Uri requestUri, IDictionary<string, string> headerData)
+        public async Task<T> GetDataAsync<T>(
+            Uri requestUri,
+            IDictionary<string, string> headerData,
+            TimeSpan? timeout = null,
+            int? retryCount = null)
         {
             var httpClient = GetClient(headerData);
-
             var responsePhrase = string.Empty;
+
             try
             {
-                var httpResponseMessage = await httpClient.GetAsync(requestUri);
-                responsePhrase = httpResponseMessage.ReasonPhrase;
-                httpResponseMessage.EnsureSuccessStatusCode();
-                return await JsonSerializer.DeserializeAsync<T>(await httpResponseMessage.Content.ReadAsStreamAsync(), JsonSerializationHelper.SerializerOptions);
+                HttpResponseMessage response;
+
+                if (timeout.HasValue || retryCount.HasValue)
+                {                    
+                    var effectiveTimeout = timeout ?? TimeSpan.FromSeconds(30);
+                    var effectiveRetryCount = retryCount ?? 0;
+                    var timeoutPolicy = Policy.TimeoutAsync<HttpResponseMessage>(effectiveTimeout);
+                    var retryPolicy = Policy
+                        .Handle<Exception>()
+                        .WaitAndRetryAsync(effectiveRetryCount,
+                            retryAttempt => TimeSpan.FromSeconds(retryAttempt), // 1s, 2s, 3s, ...
+                            (exception, timeSpan, retry, context) =>
+                            {
+                                _logger.LogWarning(exception, "Retry {Retry} after {Delay}s for request {Uri}", retry, timeSpan.TotalSeconds, requestUri);
+                            });
+                    var policyWrap = retryPolicy.WrapAsync(timeoutPolicy);
+                    response = await policyWrap.ExecuteAsync(async ct =>
+                    {
+                        var request = new HttpRequestMessage(HttpMethod.Get, requestUri);
+                        return await httpClient.SendAsync(request, ct);
+                    }, CancellationToken.None);
+                }
+                else
+                {
+                    // No resilience
+                    response = await httpClient.GetAsync(requestUri);
+                }
+
+                responsePhrase = response.ReasonPhrase;
+                response.EnsureSuccessStatusCode();
+
+                return await JsonSerializer.DeserializeAsync<T>(
+                    await response.Content.ReadAsStreamAsync(),
+                    JsonSerializationHelper.SerializerOptions);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "HtppClient.GetDataAsync() failed. RequestUri={@requestUri}", requestUri.AbsolutePath);
+                _logger.LogError(ex, "HttpClient.GetDataAsync() failed. RequestUri={@requestUri}", requestUri.AbsolutePath);
             }
             finally
             {

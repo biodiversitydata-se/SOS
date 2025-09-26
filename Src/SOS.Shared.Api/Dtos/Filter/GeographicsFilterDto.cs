@@ -36,6 +36,11 @@ namespace SOS.Shared.Api.Dtos.Filter
         public bool ConsiderObservationAccuracy { get; set; } = false;
 
         /// <summary>
+        /// If true, use the buffer (if any) that can be applied to extend the area where the user has permission to search for sensitive observations  
+        /// </summary>
+        public bool? ConsiderAuthorizationBuffer { get; set; } = null;
+
+        /// <summary>
         /// If Geometries is of point type, this property must be set to a value greater than 0.
         /// Observations inside circle (center=point, radius=MaxDistanceFromPoint) will be returned.
         /// </summary>

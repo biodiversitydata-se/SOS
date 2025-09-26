@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api
+spec:
+  template:
+    spec:
+      containers:
+      - name: api
+        envFrom:
+        - secretRef:
+            name: base-secret
+        env:
+        - name: ApplicationInsights
+          value: |
+              {
+                  "InstrumentationKey": "SECRET_PLACEHOLDER", 
+                  "EnableRequestBodyLogging": false,
+                  "EnableSearchResponseCountLogging": false
+              }
+        - name: SosApiConfiguration
+          value: |
+              {
+                  "ObservationsApiAddresses": [ 
+                      "https://sos-search-dev.wt.artdata.slu.se/" 
+                  ],
+                  "ElasticSearchProxyAddresses": [ 
+                      "https://sos-proxy-dev.wt.artdata.slu.se/" 
+                  ],
+                  "AnalysisApiAddresses": [ 
+                      "https://sos-analysis-dev.wt.artdata.slu.se/" 
+                  ],
+                  "DataStewardshipApiAddresses": [ 
+                      "https://datastewardship-dev.wt.artdata.slu.se/" 
+                  ]
+              }
+        - name: CryptoConfiguration
+          value: '{"Password": "SECRET_PLACEHOLDER", "Salt": "SECRET_PLACEHOLDER"}'
+        - name: UserServiceConfiguration
+          value: '{ "UserAdmin2ApiBaseAddress": "https://useradmin2-api-st.wt.artdata.slu.se", "ClientId": "SOS", "ClientSecret": "SECRET_PLACEHOLDER", "Scope": "useradmin.api SOS.Observations.Protected openid", "TokenUrl": "https://useradmin2-auth-st.wt.artdata.slu.se/connect/token", "TokenExpirationBufferInSeconds": 300, "IdentityProvider": {"Authority": "https://useradmin2-auth-st.wt.artdata.slu.se", "Audience": "http://api:5000", "RequireHttpsMetadata": false}}'          
+        - name: SearchDbConfiguration
+          value: '{"UserName": "SECRET_PLACEHOLDER", "Password": "SECRET_PLACEHOLDER", "Clusters": [{"Hosts": ["https://artsearch2-1-test.artdata.slu.se:9200"]}],"DebugMode": true,"IndexPrefix": "sos-dev","IndexSettings": [{"Name": "observation","NumberOfReplicas": 0,"NumberOfShards": 1,"NumberOfShardsProtected": 1,"ReadBatchSize": 10000,"WriteBatchSize": 1000,"RequestTimeout": 300,"ScrollBatchSize": 5000,"ScrollTimeout": "300s"}, {"Name": "dataset", "NumberOfReplicas": 0,"NumberOfShards": 1, "ReadBatchSize": 10000, "WriteBatchSize": 1000, "RequestTimeout": 300, "ScrollBatchSize": 5000, "ScrollTimeout": "300s"}, {"Name": "event", "NumberOfReplicas": 0, "NumberOfShards": 1, "ReadBatchSize": 10000, "WriteBatchSize": 1000, "RequestTimeout": 300, "ScrollBatchSize": 5000, "ScrollTimeout": "300s"}]}'
+        - name: ProcessDbConfiguration
+          value: |
+              {
+                  "UserName": "SECRET_PLACEHOLDER", 
+                  "Password": "SECRET_PLACEHOLDER", 
+                  "Hosts": [
+                      {
+                          "Name": "artmongo-t-1.artdata.slu.se","Port": 27017
+                      }
+                  ], 
+                  "ReplicaSetName": null, 
+                  "DatabaseName": "sos-dev", 
+                  "UseTls": false, 
+                  "AuthenticationDb": "admin", 
+                  "ReadBatchSize": 10000, 
+                  "WriteBatchSize": 10000
+              }
+        - name: HangfireDbConfiguration
+          value: |
+              {
+                  "UserName": "SECRET_PLACEHOLDER", 
+                  "Password": "SECRET_PLACEHOLDER", 
+                  "Hosts": [
+                      {
+                          "Name": "artmongo-t-1.artdata.slu.se",
+                          "Port": 27017
+                      }
+                  ],
+                  "DatabaseName": "sos-hangfire-dev", 
+                  "UseTls": false, 
+                  "AuthenticationDb": "admin", 
+                  "JobExpirationDays": 3
+              }

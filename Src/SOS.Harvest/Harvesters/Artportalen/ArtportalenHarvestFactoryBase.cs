@@ -376,7 +376,7 @@ namespace SOS.Harvest.Harvesters.Artportalen
             // Should only be called once
             if (!_cachedSites.Any())
             {
-                var siteIds = await _siteRepository.GetFrequentlyUsedIdsAsync();
+                var siteIds = await _siteRepository.GetFrequentlyUsedIdsAsync(isIncrementalHarvest: false);
                 await CacheSitesAsync(siteIds);
             }
         }

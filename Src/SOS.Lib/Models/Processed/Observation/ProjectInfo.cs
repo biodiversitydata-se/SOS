@@ -18,6 +18,11 @@ namespace SOS.Lib.Models.Processed.Observation
         }
 
         /// <summary>
+        /// Only available to owner and members
+        /// </summary>
+        public bool IsHidden { get; set; }
+
+        /// <summary>
         ///     Indicates if species observations that are reported in
         ///     a project are publicly available or not.
         /// </summary>

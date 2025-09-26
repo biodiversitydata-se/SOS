@@ -1,7 +1,4 @@
-﻿using Autofac;
-using Autofac.Extensions.DependencyInjection;
-using Elastic.Clients.Elasticsearch.Cluster;
-using Hangfire;
+﻿using Hangfire;
 using Hangfire.Mongo;
 using Hangfire.Mongo.Migration.Strategies;
 using Hangfire.Mongo.Migration.Strategies.Backup;
@@ -12,29 +9,20 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
 using Newtonsoft.Json.Converters;
 using NLog.Web;
-using SOS.Export.IoC.Modules;
 using SOS.Hangfire.JobServer.Configuration;
+using SOS.Hangfire.JobServer.Extensions;
 using SOS.Hangfire.JobServer.ServiceBus.Consumers;
-using SOS.Harvest.IoC.Modules;
-using SOS.Lib.Cache;
-using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Export;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Context;
 using SOS.Lib.Managers;
-using SOS.Lib.Managers.Interfaces;
-using SOS.Lib.Models.Interfaces;
-using SOS.Lib.Models.TaxonListService;
-using SOS.Lib.Models.TaxonTree;
 using System;
-using System.Collections.Concurrent;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -50,8 +38,7 @@ namespace SOS.Hangfire.JobServer
     {
         private static string _env;
         private static ApiManagementServiceConfiguration _apiManagementServiceConfiguration;
-        private static CryptoConfiguration _cryptoConfiguration;
-        private static HangfireDbConfiguration _localHangfireDbConfiguration;
+        private static CryptoConfiguration _cryptoConfiguration;        
         private static MongoDbConfiguration _verbatimDbConfiguration;
         private static MongoDbConfiguration _processDbConfiguration;
         private static ElasticSearchConfiguration _searchDbConfiguration;
@@ -67,6 +54,7 @@ namespace SOS.Hangfire.JobServer
         private static HangfireDbConfiguration _hangfireDbConfiguration;
         private static bool _useLocalHangfire;
         private static string? _hangfireDbConnectionString = null;
+        private static bool _excludeParishGeometries = false; // Exclude parish geometries when running tests in order to improve performance.
 
         /// <summary>
         ///     Application entry point
@@ -79,6 +67,7 @@ namespace SOS.Hangfire.JobServer
                 ? args[0].ToLower()
                 : Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")?.ToLower();
             _useLocalHangfire = GetEnvironmentBool(environmentVariable: "USE_LOCAL_HANGFIRE");
+            _excludeParishGeometries = GetEnvironmentBool(environmentVariable: "EXCLUDE_PARISH_GEOMETRIES");
             Console.WriteLine("Starting up in environment:" + _env);
 
 
@@ -129,23 +118,30 @@ namespace SOS.Hangfire.JobServer
             var culture = new CultureInfo("sv-SE");
             CultureInfo.DefaultThreadCurrentCulture = culture;
             CultureInfo.DefaultThreadCurrentUICulture = culture;
-
             var services = builder.Services;
 
-            services.AddMemoryCache();
-            services.AddSingleton<IClassCache<TaxonTree<IBasicTaxon>>, ClassCache<TaxonTree<IBasicTaxon>>>();
-            services.AddSingleton<IClassCache<TaxonListSetsById>, ClassCache<TaxonListSetsById>>();
-            var clusterHealthCache = new ClassCache<ConcurrentDictionary<string, HealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<string, HealthResponse>>>()) { CacheDuration = TimeSpan.FromMinutes(2) };
-            services.AddSingleton<IClassCache<ConcurrentDictionary<string, HealthResponse>>>(clusterHealthCache);
-
-            var configuration = builder.Configuration;
-
+            ConfigurationManager configuration = builder.Configuration;
+            _apiManagementServiceConfiguration = configuration.GetSection("ApiManagementServiceConfiguration").Get<ApiManagementServiceConfiguration>();
+            _cryptoConfiguration = configuration.GetSection("CryptoConfiguration").Get<CryptoConfiguration>();
+            _verbatimDbConfiguration = configuration.GetSection("VerbatimDbConfiguration").Get<MongoDbConfiguration>();
+            _processDbConfiguration = configuration.GetSection("ProcessDbConfiguration").Get<MongoDbConfiguration>();
+            _searchDbConfiguration = configuration.GetSection("SearchDbConfiguration").Get<ElasticSearchConfiguration>();
+            _importConfiguration = configuration.GetSection(nameof(ImportConfiguration)).Get<ImportConfiguration>();
+            _processConfiguration = configuration.GetSection(nameof(ProcessConfiguration)).Get<ProcessConfiguration>();
+            _exportConfiguration = configuration.GetSection(nameof(ExportConfiguration)).Get<ExportConfiguration>();
+            _blobStorageConfiguration = configuration.GetSection(nameof(BlobStorageConfiguration)).Get<BlobStorageConfiguration>();
+            _dataCiteServiceConfiguration = configuration.GetSection(nameof(DataCiteServiceConfiguration)).Get<DataCiteServiceConfiguration>();
+            _applicationInsightsConfiguration = configuration.GetSection(nameof(ApplicationInsightsConfiguration)).Get<ApplicationInsightsConfiguration>();
+            _sosApiConfiguration = configuration.GetSection(nameof(SosApiConfiguration)).Get<SosApiConfiguration>();
+            _userServiceConfiguration = configuration.GetSection(nameof(UserServiceConfiguration)).Get<UserServiceConfiguration>();
+            _areaConfiguration = configuration.GetSection(nameof(AreaConfiguration)).Get<AreaConfiguration>();
             _hangfireDbConnectionString = builder.Configuration.GetConnectionString("hangfire-mongodb");
             var hangfireDbConfig = configuration.GetSection("HangfireDbConfiguration").Get<HangfireDbConfiguration>();
-            var _localHangfireDbConfiguration = configuration.GetSection("LocalHangfireDbConfiguration").Get<HangfireDbConfiguration>();
+            var localHangfireDbConfiguration = configuration.GetSection("LocalHangfireDbConfiguration").Get<HangfireDbConfiguration>();
+            _areaConfiguration.ExcludeParishGeometries = _excludeParishGeometries;
 
             _hangfireDbConfiguration = _useLocalHangfire
-                ? _localHangfireDbConfiguration
+                ? localHangfireDbConfiguration
                 : hangfireDbConfig;
 
             var mongoClientSettings = !string.IsNullOrEmpty(_hangfireDbConnectionString)
@@ -199,26 +195,7 @@ namespace SOS.Hangfire.JobServer
                             new IgnoreExtraElementsConvention(true),
                             new IgnoreIfNullConvention(true)
                 },
-                t => true);
-
-            // Get configuration
-            _apiManagementServiceConfiguration = configuration.GetSection("ApiManagementServiceConfiguration").Get<ApiManagementServiceConfiguration>();
-            _cryptoConfiguration = configuration.GetSection("CryptoConfiguration").Get<CryptoConfiguration>();
-            _verbatimDbConfiguration = configuration.GetSection("VerbatimDbConfiguration").Get<MongoDbConfiguration>();
-            _processDbConfiguration = configuration.GetSection("ProcessDbConfiguration").Get<MongoDbConfiguration>();
-            _searchDbConfiguration = configuration.GetSection("SearchDbConfiguration").Get<ElasticSearchConfiguration>();
-            _importConfiguration = configuration.GetSection(nameof(ImportConfiguration)).Get<ImportConfiguration>();
-            _processConfiguration = configuration.GetSection(nameof(ProcessConfiguration)).Get<ProcessConfiguration>();
-            _exportConfiguration = configuration.GetSection(nameof(ExportConfiguration)).Get<ExportConfiguration>();
-            _blobStorageConfiguration = configuration.GetSection(nameof(BlobStorageConfiguration)).Get<BlobStorageConfiguration>();
-            _dataCiteServiceConfiguration = configuration.GetSection(nameof(DataCiteServiceConfiguration)).Get<DataCiteServiceConfiguration>();
-            _applicationInsightsConfiguration = configuration.GetSection(nameof(ApplicationInsightsConfiguration)).Get<ApplicationInsightsConfiguration>();
-            _sosApiConfiguration = configuration.GetSection(nameof(SosApiConfiguration)).Get<SosApiConfiguration>();
-            _userServiceConfiguration = configuration.GetSection(nameof(UserServiceConfiguration)).Get<UserServiceConfiguration>();
-            _areaConfiguration = configuration.GetSection(nameof(AreaConfiguration)).Get<AreaConfiguration>();
-
-            services.AddSingleton(_searchDbConfiguration);
-            services.AddSingleton<IElasticClientManager, ElasticClientManager>(p => new ElasticClientManager(_searchDbConfiguration));
+                t => true);            
 
             var jobServerConfiguration = configuration.GetSection("JobServerConfiguration").Get<JobServerConfiguration>();
             if (jobServerConfiguration.EnableBusHarvest)
@@ -239,12 +216,8 @@ namespace SOS.Hangfire.JobServer
                 });
             }
 
-            builder.Host.UseServiceProviderFactory(hostContext => new AutofacServiceProviderFactory(builder =>
-                builder
-                    .RegisterModule(new HarvestModule { Configurations = (_importConfiguration, _apiManagementServiceConfiguration, _verbatimDbConfiguration, _processConfiguration, _processDbConfiguration, _applicationInsightsConfiguration, _sosApiConfiguration, _userServiceConfiguration, _areaConfiguration) })
-                    .RegisterModule(new ExportModule { Configurations = (_exportConfiguration, _processDbConfiguration, _blobStorageConfiguration, _cryptoConfiguration, _dataCiteServiceConfiguration, _userServiceConfiguration, _areaConfiguration) })
-            ));
-
+            services.AddDependencyInjectionServices(configuration, _excludeParishGeometries);
+   
             builder.Host.UseNLog();
             return builder;
         }

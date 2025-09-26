@@ -1,6 +1,7 @@
 ﻿using MongoDB.Driver;
 using SOS.Harvest.Managers.Interfaces;
 using SOS.Harvest.Processors.Kul;
+using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers.Interfaces;
@@ -31,8 +32,10 @@ namespace SOS.Harvest.Factories.Validation
             ITaxonRepository processedTaxonRepository,
             IKulObservationVerbatimRepository kulObservationVerbatimRepository,
             IProcessTimeManager processTimeManager,
-            ProcessConfiguration processConfiguration)
-            : base(processedVocabularyRepository, validationManager, areaHelper, vocabularyValueResolver, processedTaxonRepository, processTimeManager, processConfiguration)
+            ProcessConfiguration processConfiguration,
+            ICache<int, Taxon> taxonCache,
+            ICache<VocabularyId, Vocabulary> vocabularyCache)
+            : base(processedVocabularyRepository, validationManager, areaHelper, vocabularyValueResolver, processedTaxonRepository, processTimeManager, processConfiguration, taxonCache, vocabularyCache)
         {
             _kulObservationVerbatimRepository = kulObservationVerbatimRepository;
         }

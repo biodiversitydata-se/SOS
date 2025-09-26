@@ -29,6 +29,7 @@
         BirdNestActivity = 25,
         // ValidationStatus = 26, // Obsolete
         // TaxonProtectionLevel = 27, // Obsolete
-        TaxonCategory = 28
+        TaxonCategory = 28,
+        InvasiveSpeciesTreatment = 29
     }
 }

@@ -1,4 +1,6 @@
-﻿using SOS.Lib.Models.TaxonTree;
+﻿using CSharpFunctionalExtensions;
+using SOS.Lib.Models.Interfaces;
+using SOS.Lib.Models.TaxonTree;
 using System.Collections.Generic;
 using System.Text;
 
@@ -36,12 +38,14 @@ namespace SOS.Lib.Helpers
         /// <typeparam name="T"></typeparam>
         /// <param name="taxonTree"></param>
         /// <param name="taxonIds"></param>
+        /// <param name="taxonCategoryById"></param>
         /// <param name="treeIterationMode"></param>
         /// <param name="includeSecondaryRelations"></param>
         /// <returns></returns>
-        public static string CreateGraphvizFormatRepresentation<T>(
-            TaxonTree<T> taxonTree,
+        public static Result<string> CreateGraphvizFormatRepresentation(
+            TaxonTree<IBasicTaxon> taxonTree,
             IEnumerable<int> taxonIds,
+            Dictionary<int, string> taxonCategoryById,
             TaxonRelationsTreeIterationMode treeIterationMode,
             bool includeSecondaryRelations = true)
         {
@@ -51,36 +55,50 @@ namespace SOS.Lib.Helpers
                 treeIterationMode,
                 includeSecondaryRelations);
 
-            string str = CreateGraphvizFormatRepresentation(edges);
+            const int maxEdges = 100;
+            if (edges.Count > maxEdges)
+            {
+                return Result.Failure<string>($"Too many edges. Your graph contains {edges.Count} edges. Limit is: {maxEdges}");
+            }
+
+            string str = CreateGraphvizFormatRepresentation(edges, taxonCategoryById);
             return str;
         }
 
         /// <summary>
-        /// Create a taxon relation GraphViz diagram.
+        /// Create a taxon relation Mermaid diagram.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="taxonTree"></param>
         /// <param name="taxonIds"></param>
+        /// <param name="taxonCategoryById"></param>
         /// <param name="treeIterationMode"></param>
         /// <param name="includeSecondaryRelations"></param>
         /// <returns></returns>
-        public static string CreateMermaidFormatRepresentation<T>(
-            TaxonTree<T> taxonTree,
+        public static Result<string> CreateMermaidFormatRepresentation(
+            TaxonTree<IBasicTaxon> taxonTree,
             IEnumerable<int> taxonIds,
+            Dictionary<int, string> taxonCategoryById,
             TaxonRelationsTreeIterationMode treeIterationMode,
             bool includeSecondaryRelations = true)
         {
             var taxonTreeNodes = taxonTree.GetTreeNodes(taxonIds);
-            var edges = GetAllEdges(
+            ICollection<TaxonTreeEdge<IBasicTaxon>> edges = GetAllEdges(
                 taxonTreeNodes,
                 treeIterationMode,
                 includeSecondaryRelations);
 
-            string str = CreateMermaidFormatRepresentation(edges);
+            const int maxEdges = 100;
+            if (edges.Count > maxEdges)
+            {
+                return Result.Failure<string>($"Too many edges. Your graph contains {edges.Count} edges. Limit is: {maxEdges}");
+            }
+
+            string str = CreateMermaidFormatRepresentation(edges, taxonCategoryById);
             return str;
         }
 
-        private static string CreateGraphvizFormatRepresentation<T>(ICollection<TaxonTreeEdge<T>> edges)
+        private static string CreateGraphvizFormatRepresentation<T>(ICollection<TaxonTreeEdge<T>> edges, Dictionary<int, string> taxonCategoryById)
         {
             HashSet<TaxonTreeNode<T>> nodes = new HashSet<TaxonTreeNode<T>>();
             foreach (var edge in edges)
@@ -126,9 +144,9 @@ namespace SOS.Lib.Helpers
             return sb.ToString();
         }
 
-        private static string CreateMermaidFormatRepresentation<T>(ICollection<TaxonTreeEdge<T>> edges)
+        private static string CreateMermaidFormatRepresentation(ICollection<TaxonTreeEdge<IBasicTaxon>> edges, Dictionary<int, string> taxonCategoryById)
         {
-            HashSet<TaxonTreeNode<T>> nodes = new HashSet<TaxonTreeNode<T>>();
+            HashSet<TaxonTreeNode<IBasicTaxon>> nodes = new HashSet<TaxonTreeNode<IBasicTaxon>>();
             foreach (var edge in edges)
             {
                 nodes.Add(edge.Parent);
@@ -143,7 +161,26 @@ namespace SOS.Lib.Helpers
             //-------------------
             foreach (var node in nodes)
             {
-                string label = $"{node.ScientificName.Replace("/", "")}<br/>{node.TaxonId}";
+                string label;
+                string taxonCategory;
+                if (node.Data.Attributes?.TaxonCategory?.Id != null && taxonCategoryById.TryGetValue(node.Data.Attributes.TaxonCategory.Id, out var categoryName))
+                {
+                    taxonCategory = categoryName;
+                }
+                else
+                {
+                    taxonCategory = null;
+                }
+
+                if (!string.IsNullOrEmpty(taxonCategory))
+                {
+                    label = $"{node.ScientificName.Replace("/", "")}<br/>[{taxonCategory}]<br/>{node.TaxonId}";
+                }
+                else
+                {
+                    label = $"{node.ScientificName.Replace("/", "")}<br/>{node.TaxonId}";
+                }
+                
                 sb.AppendLine($"    node_{node.TaxonId}(\"{label}\")");
             }
 

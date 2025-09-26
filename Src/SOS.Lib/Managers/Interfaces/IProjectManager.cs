@@ -10,10 +10,11 @@ namespace SOS.Lib.Managers.Interfaces
     public interface IProjectManager
     {
         /// <summary>
-        ///     Get projects.
+        /// Get projects.
         /// </summary>
+        /// <param name="includeHidden"></param>
         /// <returns></returns>
-        Task<IEnumerable<ProjectInfo>> GetAllAsync();
+        Task<IEnumerable<ProjectInfo>> GetAllAsync(bool includeHidden);
 
         /// <summary>
         /// Get projects by id

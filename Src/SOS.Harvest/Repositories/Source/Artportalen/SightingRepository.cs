@@ -9,7 +9,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
 {
     public class SightingRepository : BaseRepository<ISightingRepository>, ISightingRepository
     {
-        private string GetSightingQuery(int top, string where) => GetSightingQuery(top, null!, where);
+        private string GetSightingQuery(int top, string where, bool isIncrementalHarvest) => GetSightingQuery(top, null!, where, isIncrementalHarvest);
 
 
         /// <summary>
@@ -18,7 +18,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
         /// <param name="top"></param>
         /// <param name="where"></param>
         /// <returns></returns>
-        private string GetSightingQuery(int top, string join, string where)
+        private string GetSightingQuery(int top, string join, string where, bool isIncrementalHarvest)
         {
             var topCount = "";
 
@@ -123,7 +123,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
                     LEFT JOIN SightingDatasource sdc ON sdc.SightingId = si.Id 
                     LEFT JOIN (SELECT SightingId FROM SightingComment GROUP BY SightingId) sic ON sic.SightingId = si.Id 
                 WHERE
-	                {SightingWhereBasics}
+	                {GetSightingWhereBasics(isIncrementalHarvest)}
                     {where} ";
 
             return query;
@@ -141,11 +141,11 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<SightingEntity>?> GetChunkAsync(int startId, int maxRows)
+        public async Task<IEnumerable<SightingEntity>?> GetChunkAsync(int startId, int maxRows, bool isIncrementalHarvest)
         {
             try
             {
-                var query = GetSightingQuery(0, "AND si.Id BETWEEN @StartId AND @EndId");
+                var query = GetSightingQuery(0, "AND si.Id BETWEEN @StartId AND @EndId", isIncrementalHarvest);
 
                 var result = (await QueryAsync<SightingEntity>(query, new { StartId = startId, EndId = startId + maxRows - 1 }))?.ToArray();
                 if ((result?.Count() ?? 0) == 0)
@@ -164,7 +164,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<SightingEntity>?> GetChunkAsync(IEnumerable<int> sightingIds)
+        public async Task<IEnumerable<SightingEntity>?> GetChunkAsync(IEnumerable<int> sightingIds, bool isIncrementalHarvest)
         {
             try
             {
@@ -172,12 +172,13 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
                 {
                     return null;
                 }
-                var query = GetSightingQuery(sightingIds?.Count() ?? 0, "INNER JOIN @tvp t ON si.Id = t.Id", null!);
+                var query = GetSightingQuery(sightingIds?.Count() ?? 0, "INNER JOIN @tvp t ON si.Id = t.Id", null!, isIncrementalHarvest);
 
                 var result = (await QueryAsync<SightingEntity>(query, new { tvp = sightingIds.ToSqlRecords().AsTableValuedParameter("dbo.IdValueTable") }))?.ToArray();
                 if ((result?.Count() ?? 0) == 0)
                 {
                     Logger.LogInformation($"Artportalen SightingRepository.GetChunkAsync returned no sightings. Live={Live}, sightingIds.Count()={sightingIds!.Count()}.\n,The first five SightingIds used in @tvp are: {string.Join(", ", sightingIds!.Take(5))}");
+                    Logger.LogDebug(query);
                 }
 
                 return result;
@@ -191,11 +192,11 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<SightingEntity>?> GetChunkAsync(DateTime modifiedSince, int maxRows)
+        public async Task<IEnumerable<SightingEntity>?> GetChunkAsync(DateTime modifiedSince, int maxRows, bool isIncrementalHarvest)
         {
             try
             {
-                var query = GetSightingQuery(maxRows, "AND s.EditDate > @modifiedSince");
+                var query = GetSightingQuery(maxRows, "AND s.EditDate > @modifiedSince", isIncrementalHarvest);
 
                 var result = (await QueryAsync<SightingEntity>(query, new { modifiedSince = modifiedSince.ToLocalTime() }))?.ToArray();
                 if (!result?.Any() ?? true)
@@ -249,7 +250,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
         }
 
         /// <inheritdoc />
-        public async Task<(int minId, int maxId)> GetIdSpanAsync()
+        public async Task<(int minId, int maxId)> GetIdSpanAsync(bool isIncrementalHarvest)
         {
             try
             {
@@ -260,7 +261,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
 		        FROM 
 		            {SightingsFromBasics}
                 WHERE 
-                    {SightingWhereBasics}";
+                    {GetSightingWhereBasics(isIncrementalHarvest)}";
 
                 return (await QueryAsync<(int minId, int maxId)>(query, null!)).FirstOrDefault();
             }
@@ -273,7 +274,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
         }
 
         /// <inheritdoc />
-        public async Task<DateTime?> GetLastModifiedDateAsyc()
+        public async Task<DateTime?> GetLastModifiedDateAsyc(bool isIncrementalHarvest)
         {
             try
             {
@@ -283,7 +284,7 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
                 FROM 
 	               {SightingsFromBasics}
                 WHERE
-                    {SightingWhereBasics}";
+                    {GetSightingWhereBasics(isIncrementalHarvest)}";
 
                 return (await QueryAsync<DateTime?>(query, null!)).FirstOrDefault();
             }

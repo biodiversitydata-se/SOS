@@ -1,4 +1,5 @@
-﻿using SOS.Lib.Enums;
+﻿using Elastic.Clients.Elasticsearch;
+using SOS.Lib.Enums;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Repositories.Processed.Interfaces;

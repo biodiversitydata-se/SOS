@@ -46,9 +46,8 @@ namespace SOS.Observations.Api.Controllers
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<ProjectDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        [AzureApi, AzureInternalApi]
-        public async Task<IActionResult> GetProjectes(
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]        
+        public async Task<IActionResult> GetProjectsAsync(
             [FromQuery] string filter)
         {
             try
@@ -74,9 +73,8 @@ namespace SOS.Observations.Api.Controllers
         [HttpPost]
         [ProducesResponseType(typeof(IEnumerable<ProjectDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        [AzureApi, AzureInternalApi]
-        public async Task<IActionResult> GetProjectesById(
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]        
+        public async Task<IActionResult> GetProjectsByIdsAsync(
             [FromBody] int[] ids)
         {
             try
@@ -106,9 +104,8 @@ namespace SOS.Observations.Api.Controllers
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(ProjectDto), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        [AzureApi, AzureInternalApi]
-        public async Task<IActionResult> GetProjecte(
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]        
+        public async Task<IActionResult> GetProjectAsync(
             [FromRoute] int id)
         {
             try
@@ -116,7 +113,6 @@ namespace SOS.Observations.Api.Controllers
                 LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
 
                 var project = await _projectManager.GetAsync(id, base.User?.GetUserId());
-
                 if (project == null)
                 {
                     return new StatusCodeResult((int)HttpStatusCode.NoContent);

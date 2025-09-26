@@ -14,7 +14,7 @@ namespace SOS.Lib.Jobs.Import
         /// <param name="fromDate"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        [JobExpirationTimeout(Minutes = 0)] // Prevent jobs to be stored to long in success 
+        [JobExpirationTimeout(Minutes = 1)] // Prevent jobs to be stored to long in success 
         [SkipWhenPreviousJobIsRunning]
         [AutomaticRetry(Attempts = 0, LogEvents = false, OnAttemptsExceeded = AttemptsExceededAction.Delete)]
         [JobDisplayName("Incremental Harvest Observations, active instance")]

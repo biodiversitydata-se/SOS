@@ -26,8 +26,6 @@ using OfficeOpenXml;
 using SOS.Lib.Models.Search.Enums;
 using NetTopologySuite.Geometries;
 using System.Text.Json.Nodes;
-using NetTopologySuite.Features;
-using SOS.Shared.Api.Dtos.Enum;
 using System.Collections.Concurrent;
 
 namespace SOS.Observations.Api.Managers
