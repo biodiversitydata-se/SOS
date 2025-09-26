@@ -3,6 +3,7 @@
 @inherits LayoutComponentBase
 @inject NavigationManager Navigation
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IAppEnvironment AppEnvironment
 
 @* Required *@
 <MudThemeProvider @ref="@_mudThemeProvider" Theme="_themeManager.Theme" />
@@ -113,13 +114,21 @@
 
     private string GetRenderModeDescription()
     {
-        return this.RendererInfo.Name switch  
-        {  
-            "WebAssembly" => "🌐 WebAssembly",
-            "Server" => "💻 Server",
-            "Static" => "📄 Static",  
-            _ => "❓ Unknown"  
+        // return this.RendererInfo.Name switch  
+        // {  
+        //     "WebAssembly" => "🌐 WebAssembly",
+        //     "Server" => "💻 Server",
+        //     "Static" => "📄 Static",  
+        //     _ => "❓ Unknown"
+        // };
+        return this.RendererInfo.Name switch
+        {
+            "WebAssembly" => $"🌐 WebAssembly - {AppEnvironment.EnvironmentName}",
+            "Server" => $"💻 Server - {AppEnvironment.EnvironmentName}",
+            "Static" => $"📄 Static - {AppEnvironment.EnvironmentName}",
+            _ => $"❓ Unknown - {AppEnvironment.EnvironmentName}"
         };
+
         //return OperatingSystem.IsBrowser() ? "🌐 WebAssembly" : "🖥 Server";
     }
 

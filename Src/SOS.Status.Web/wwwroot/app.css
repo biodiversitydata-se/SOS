@@ -101,3 +101,12 @@ button.bg-danger:focus {
 .data-provider-table .selected > td .mud-input {
     color: white !important;
 }
+
+.no-last-row-scroll .mud-table-container {
+    position: relative;
+    padding-bottom: 16px;  /* extra space for last row */
+}
+
+.no-last-row-scroll .mud-table-container .mud-table-body {
+    overflow-y: hidden; /* removes vertical scrollbar */
+}

@@ -4,6 +4,7 @@ using MudBlazor;
 using MudBlazor.Services;
 using SOS.Status.Web.Client.Abstractions;
 using SOS.Status.Web.Client.HttpClients;
+using SOS.Status.Web.Client.Models;
 using SOS.Status.Web.Client.Models.BlazorSamples;
 using System.Globalization;
 
@@ -22,6 +23,7 @@ builder.Services.AddScoped<IStatusInfoService, StatusInfoApiClient>();
 builder.Services.AddScoped<ITaxonDiagramService, TaxonDiagramApiClient>();
 builder.Services.AddScoped<IObservationSearchService, ObservationsSearchApiClient>();
 builder.Services.AddScoped<AppState>();
+builder.Services.AddSingleton<IAppEnvironment>(sp => new AppEnvironment(builder.HostEnvironment.Environment));
 
 // Authentication and Authorization
 builder.Services.AddAuthorizationCore();

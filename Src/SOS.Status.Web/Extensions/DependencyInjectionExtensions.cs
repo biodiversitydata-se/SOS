@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server;
+using Microsoft.Extensions.DependencyInjection;
 using SOS.Status.Web.Client.Abstractions;
 using SOS.Status.Web.Client.Models.BlazorSamples;
 using SOS.Status.Web.HttpClients;
@@ -15,6 +16,21 @@ public static class DependencyInjectionExtensions
         {
             client.BaseAddress = new Uri(Settings.HttpClientsConfiguration.SosObservationsApi.BaseAddress);
         }).AddHttpMessageHandler<TokenHandler>();
+
+        // Use this when no standard resilience handler is configured        
+        //var sosObservationsHttpClientBuilder = services.AddHttpClient<SosObservationsApiClient>(client =>
+        //{
+        //    client.BaseAddress = new Uri(Settings.HttpClientsConfiguration.SosObservationsApi.BaseAddress);
+        //});
+        //sosObservationsHttpClientBuilder.AddStandardResilienceHandler(o =>
+        //{
+        //    o.CircuitBreaker.SamplingDuration = TimeSpan.FromSeconds(240);
+        //    o.TotalRequestTimeout.Timeout = TimeSpan.FromSeconds(240);
+        //    o.AttemptTimeout.Timeout = TimeSpan.FromSeconds(120);
+        //    o.Retry.MaxDelay = TimeSpan.FromSeconds(120);
+        //});
+        //sosObservationsHttpClientBuilder.AddHttpMessageHandler<TokenHandler>();
+
         services.AddHttpClient<SosAdministrationApiClient>(client =>
         {
             client.BaseAddress = new Uri(Settings.HttpClientsConfiguration.SosAdministrationApi.BaseAddress);

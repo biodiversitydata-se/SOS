@@ -1,4 +1,7 @@
-﻿<MudNavMenu>
+﻿@using Microsoft.AspNetCore.Components.WebAssembly.Hosting
+@inject IAppEnvironment AppEnvironment
+
+<MudNavMenu>
     <!-- Status -->    
     <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Outlined.CheckCircle">Status</MudNavLink>    
 
@@ -11,13 +14,15 @@
     <!-- Claims (Auth) -->    
     <MudNavLink Href="claims" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Outlined.Lock">Claims (Auth)</MudNavLink>    
 
-    <!-- Dev -->
-    <MudNavGroup Title="Dev" Expanded="false" Icon="@Icons.Material.Outlined.Build">
-        <!-- Blazor samples -->
-        <MudNavLink Href="blazorsamples?id=5" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Outlined.Code">Blazor samples</MudNavLink>        
-    </MudNavGroup>
+    @if (AppEnvironment.IsLocalOrDev())
+    {
+        <!-- Dev -->
+        <MudNavGroup Title="Dev" Expanded="false" Icon="@Icons.Material.Outlined.Build">
+            <!-- Blazor samples -->
+            <MudNavLink Href="blazorsamples?id=5" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Outlined.Code">Blazor samples</MudNavLink>        
+        </MudNavGroup>
+    }
 </MudNavMenu>
-
 
 @* <MudNavLink Href="counter" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Search">Fynd</MudNavLink>
     <MudNavLink Href="counter" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Functions">Statistik</MudNavLink>

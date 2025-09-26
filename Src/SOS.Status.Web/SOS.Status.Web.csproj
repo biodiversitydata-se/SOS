@@ -20,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\SOS.ServiceDefaults\SOS.ServiceDefaults.csproj" />
     <ProjectReference Include="..\SOS.Shared.Api\SOS.Shared.Api.csproj" />
     <ProjectReference Include="..\SOS.Status.Web.Client\SOS.Status.Web.Client.csproj" />
   </ItemGroup>

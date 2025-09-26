@@ -20,9 +20,16 @@
                        StartIcon="@Icons.Material.Outlined.Search"
                        Color="Color.Primary"
                        OnClick="OnSearchObservationsAsync"
-                       Disabled="@string.IsNullOrWhiteSpace(searchFilter)"
+                       Disabled="@(string.IsNullOrWhiteSpace(searchFilter) || isLoading)"
                        Class="mt-2">
-                Search
+                @if (showSpinner)
+                {
+                    <MudProgressCircular Color="Color.Primary" Indeterminate="true" Size="Size.Small" Class="mr-2" />
+                }
+                else
+                {
+                    <span>Search</span>
+                }
             </MudButton>
 
             <MudSelect T="int?" Label="Load example" Variant="Variant.Outlined" ValueChanged="LoadExample" Dense="true" Margin="Margin.Dense" FitContent="true">

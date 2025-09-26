@@ -8,6 +8,8 @@ namespace SOS.Status.Web.Client.Pages;
 
 public partial class ObservationsSearch
 {
+    private bool showSpinner = false;
+    private bool isLoading = false;
     private string searchFilter = "";
     private int activeTabIndex = 0;
     private RealTimeMap? realTimeMap; // reference to map control   
@@ -79,6 +81,20 @@ public partial class ObservationsSearch
 
         try
         {
+            isLoading = true;
+            showSpinner = false;
+            StateHasChanged();
+
+            _ = Task.Run(async () =>
+            {
+                await Task.Delay(250); // Show spinner after 250 milliseconds
+                if (isLoading)
+                {
+                    showSpinner = true;
+                    await InvokeAsync(StateHasChanged); // Update UI from UI thread
+                }
+            });
+
             observationSearchResult = await searchService.SearchObservations(searchFilterInternal, 0, 10);
             await AddMapResultAsync();
             activeTabIndex = 1;
@@ -87,6 +103,12 @@ public partial class ObservationsSearch
         {
             Snackbar.Add($"Error when calling search service. {ex.Message}");
             return;
+        }
+        finally
+        {
+            isLoading = false;
+            showSpinner = false;
+            StateHasChanged();
         }
     }
 

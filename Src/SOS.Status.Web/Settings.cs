@@ -1,4 +1,5 @@
 using SOS.Lib.Configuration.Shared;
+using SOS.Lib.Helpers;
 using SOS.Status.Web.Client.Models;
 using System.Text.Json;
 
@@ -24,6 +25,22 @@ public static class Settings
 
         BlazorRenderMode = GetConfigValueString("BlazorRenderMode", configuration, logger, sensitiveSetting: false, required: false);
         HttpClientsConfiguration = GetConfigSection<HttpClientsConfiguration>("HttpClients", configuration, logger, sensitiveSetting: false);
+        
+        var observationApiUrl = NetAspireHelper.GetServiceEndpoint("sos-observations-api", "http"); // Get Observation API url from .Net Aspire configuration.
+        if (!string.IsNullOrEmpty(observationApiUrl))
+        {
+            HttpClientsConfiguration.SosObservationsApi.BaseAddress = observationApiUrl;            
+        }
+        var analysisApiUrl = NetAspireHelper.GetServiceEndpoint("sos-analysis-api", "http"); // Get Analysis API url from .Net Aspire configuration.
+        if (!string.IsNullOrEmpty(analysisApiUrl))
+        {
+            HttpClientsConfiguration.SosAnalysisApi.BaseAddress = analysisApiUrl;
+        }
+        var adminApiUrl = NetAspireHelper.GetServiceEndpoint("sos-administration-api", "http"); // Get Admin API url from .Net Aspire configuration.
+        if (!string.IsNullOrEmpty(adminApiUrl))
+        {
+            HttpClientsConfiguration.SosAdministrationApi.BaseAddress = adminApiUrl;
+        }
 
         // User service config
         UserServiceConfiguration = GetConfigSection<UserServiceConfiguration>("UserServiceConfiguration", configuration, logger, sensitiveSetting: false);

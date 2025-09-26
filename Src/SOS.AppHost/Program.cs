@@ -24,7 +24,7 @@ var observationApi = builder.AddProject<Projects.SOS_Observations_Api>("sos-obse
     .WithEnvironment("ASPNETCORE_ENVIRONMENT", env.AspNetCoreEnvironment)
     .WithEnvironment("USE_LOCAL_HANGFIRE", env.UseLocalHangfireDb.ToString())
     .WithEnvironment("DISABLE_HANGFIRE_INIT", env.DisableHangfireInit.ToString())
-    .WithEnvironment("DISABLE_HEALTHCHECK_INIT", env.DisableHealthcheckInit.ToString())
+    .WithEnvironment("DISABLE_HEALTHCHECK_INIT", env.DisableHealthcheckInit.ToString())    
     .WithEnvironment("DISABLE_CACHED_TAXON_SUM_INIT", env.DisableCachedTaxonSumInit.ToString())
     .WithHttpEndpoint(name: "http", port: 5000)
     .WithUrl("http://localhost:5000/swagger", "Observations API (Swagger)")
@@ -73,6 +73,23 @@ builder.AddProject<Projects.SOS_Hangfire_JobServer>("sos-hangfire-jobserver", co
     .WithEnvironment("EXCLUDE_PARISH_GEOMETRIES", env.excludeParishGeometries.ToString())
     .WithReference(hangfireDb)
     .WaitFor(hangfireDb);
+
+// SOS.Status.Web
+builder.AddProject<Projects.SOS_Status_Web>("sos-status-web", configure: static project =>
+    {
+        project.ExcludeLaunchProfile = true;
+    })
+    .WithEnvironment("ASPNETCORE_ENVIRONMENT", env.AspNetCoreEnvironment)    
+    .WithHttpEndpoint(name: "http", port: 5006)
+    .WithUrl("http://localhost:5006", "SOS.Status.Web")    
+    .WithHttpHealthCheck("/healthz")
+    .WithReference(observationApi)
+    .WithReference(analysisApi)
+    .WithReference(adminApi)
+    .WaitFor(observationApi)
+    .WaitFor(analysisApi)
+    .WaitFor(adminApi);
+
 
 // Configure Admin GUI BFF
 var adminGuiBff = builder.AddProject<Projects.SOS_Administration_Gui>("sos-admin-gui-bff", configure: static project =>

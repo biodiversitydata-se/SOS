@@ -13,7 +13,7 @@
         "DOTNET_RESOURCE_SERVICE_ENDPOINT_URL": "https://localhost:22144",
         "DISABLE_HANGFIRE_INIT": "false",
         "USE_LOCAL_HANGFIRE": "true",
-        "DISABLE_HEALTHCHECK_INIT": "true",
+        "DISABLE_HEALTHCHECK_INIT": "false",
         "DISABLE_CACHED_TAXON_SUM_INIT": "true",
         "USE_LOCAL_OBSERVATION_API": "true",
         "EXCLUDE_PARISH_GEOMETRIES": "true"
@@ -31,7 +31,7 @@
         "DOTNET_RESOURCE_SERVICE_ENDPOINT_URL": "https://localhost:22144",
         "DISABLE_HANGFIRE_INIT": "false",
         "USE_LOCAL_HANGFIRE": "true",
-        "DISABLE_HEALTHCHECK_INIT": "true",
+        "DISABLE_HEALTHCHECK_INIT": "false",
         "DISABLE_CACHED_TAXON_SUM_INIT": "true",
         "USE_LOCAL_OBSERVATION_API": "true",
         "EXCLUDE_PARISH_GEOMETRIES": "true"
@@ -49,27 +49,10 @@
         "DOTNET_RESOURCE_SERVICE_ENDPOINT_URL": "https://localhost:22144",
         "DISABLE_HANGFIRE_INIT": "false",
         "USE_LOCAL_HANGFIRE": "true",
-        "DISABLE_HEALTHCHECK_INIT": "true",
+        "DISABLE_HEALTHCHECK_INIT": "false",
         "DISABLE_CACHED_TAXON_SUM_INIT": "true",
         "EXCLUDE_PARISH_GEOMETRIES": "true"
       }
-    },
-    "AppHost http (local)": {
-      "commandName": "Project",
-      "dotnetRunMessages": true,
-      "launchBrowser": true,
-      "applicationUrl": "http://localhost:15009",
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "local",
-        "DOTNET_ENVIRONMENT": "local",
-        "DOTNET_DASHBOARD_OTLP_ENDPOINT_URL": "http://localhost:19060",
-        "DOTNET_RESOURCE_SERVICE_ENDPOINT_URL": "http://localhost:20068",
-        "DISABLE_HANGFIRE_INIT": "false",
-        "USE_LOCAL_HANGFIRE": "true",
-        "DISABLE_HEALTHCHECK_INIT": "true",
-        "DISABLE_CACHED_TAXON_SUM_INIT": "true",
-        "EXCLUDE_PARISH_GEOMETRIES": "true"
-      }
-    }
+    }    
   }
 }

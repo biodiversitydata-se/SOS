@@ -4,7 +4,10 @@ using Microsoft.AspNetCore.Hosting.StaticWebAssets;
 using MudBlazor;
 using MudBlazor.Services;
 using Serilog;
+using SOS.Lib.Helpers;
+using SOS.Status.Web.Client.Abstractions;
 using SOS.Status.Web.Client.JsonConverters;
+using SOS.Status.Web.Client.Models;
 using SOS.Status.Web.Components;
 using SOS.Status.Web.Endpoints;
 using SOS.Status.Web.Extensions;
@@ -19,7 +22,13 @@ try
     bool isLocalDevelopment = new[] { "local", "development", "k8s" }.Contains(env?.ToLower(), StringComparer.CurrentCultureIgnoreCase);
     bool isDevelopment = new[] { "local", "development", "dev", "st" }.Contains(env?.ToLower(), StringComparer.CurrentCultureIgnoreCase);
 
+    // Setup logging
+    SerilogExtensions.SetupSerilog(isDevelopment);
+    Log.Logger.Information("Starting Service");
+
     var builder = WebApplication.CreateBuilder(args);
+    builder.AddServiceDefaults();
+    SeriLogHelper.ConfigureSerilog(builder);
     var configurationRoot = BuildConfiguration(builder, isDevelopment);
     Settings.Init(configurationRoot);
     builder.Services.AddMudServices();
@@ -37,11 +46,12 @@ try
     //});
 
     builder.Services.AddDependencyInjectionServices(configurationRoot);
+    builder.Services.AddSingleton<IAppEnvironment>(sp => new AppEnvironment(builder.Environment.EnvironmentName));
     builder.Services.SetupAuthentication();
     builder.Services.AddAuthorization();    
     builder.Logging.AddConsole();
     builder.Logging.SetMinimumLevel(LogLevel.Debug);
-    builder.Services.AddHealthChecks();
+    builder.Services.AddHealthChecks();    
     builder.Services.AddCors(options =>
     {
         options.AddPolicy("AllowBlazorClient", policy =>
@@ -66,6 +76,7 @@ try
         options.SerializerOptions.Converters.Add(new GeoJsonConverter());
     });
     var app = builder.Build();
+    app.MapDefaultEndpoints();
 
     // Use Swedish culture
     var culture = new CultureInfo("sv-SE");
@@ -92,7 +103,7 @@ try
     app.UseRouting();
     app.UseAuthentication();
     app.UseAuthorization();
-
+    app.ApplyUseSerilogRequestLogging();
     app.UseAntiforgery();
     StaticWebAssetsLoader.UseStaticWebAssets(builder.Environment, builder.Configuration);
     app.UseStaticFiles();

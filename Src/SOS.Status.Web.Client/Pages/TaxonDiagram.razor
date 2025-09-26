@@ -45,15 +45,22 @@
                 </MudStack>
             </MudStack>
         </MudItem>
-    </MudGrid>
-    <MudButton OnClick="GetDiagram"
-               Variant="Variant.Filled"
-               Color="Color.Primary"
-               Class="mt-4"
-               Disabled="@string.IsNullOrWhiteSpace(taxonIdsInput)">
-        Create diagram
+    </MudGrid>    
+   <MudButton OnClick="GetDiagram"
+           Variant="Variant.Filled"
+           Color="Color.Primary"
+           Class="mt-4"
+           Disabled="@(string.IsNullOrWhiteSpace(taxonIdsInput) || isLoading)">
+        @if (showSpinner)
+        {
+            <MudProgressCircular Color="Color.Primary" Indeterminate="true" Size="Size.Small" Class="mr-2" />
+        }
+        else
+        {
+            <span>Create diagram</span>
+        }
     </MudButton>
-   
+
     @if (!string.IsNullOrWhiteSpace(diagramResult))
     {
         <MudTabs Class="mt-2" @bind-ActivePanelIndex="activeTabIndex" Outlined="true" Border="true" ApplyEffectsToContainer="true">
@@ -80,6 +87,8 @@
 </MudPaper>
 
 @code {
+    private bool showSpinner = false;
+    private bool isLoading = false;
     private string taxonIdsInput = "";
     private int activeTabIndex = 0;
     private TaxonRelationsTreeIterationMode treeIterationMode = TaxonRelationsTreeIterationMode.BothParentsAndChildren;
@@ -97,13 +106,41 @@
 
     private async Task GetDiagram()
     {
-        var taxonIds = taxonIdsInput
-            .Split(new[] { '\r', '\n', ',' }, StringSplitOptions.RemoveEmptyEntries)
-            .Select(id => int.Parse(id.Trim()))
-            .ToArray();
+        try
+        {
+            isLoading = true;
+            showSpinner = false;
+            StateHasChanged();
 
-        var result = await taxonDiagramService.GetTaxonRelationsDiagramAsync(taxonIds, treeIterationMode, includeSecondaryRelations, translationCultureCode);
-        diagramResult = result;               
+            _ = Task.Run(async () =>
+            {
+                await Task.Delay(250); // Show spinner after 250 milliseconds
+                if (isLoading)
+                {
+                    showSpinner = true;
+                    await InvokeAsync(StateHasChanged); // Update UI from UI thread
+                }
+            });
+
+            var taxonIds = taxonIdsInput
+                .Split(new[] { '\r', '\n', ',' }, StringSplitOptions.RemoveEmptyEntries)
+                .Select(id => int.Parse(id.Trim()))
+                .ToArray();
+
+            var result = await taxonDiagramService.GetTaxonRelationsDiagramAsync(
+                taxonIds,
+                treeIterationMode,
+                includeSecondaryRelations,
+                translationCultureCode);
+
+            diagramResult = result;
+        }
+        finally
+        {
+            isLoading = false;
+            showSpinner = false;
+            StateHasChanged();
+        }
     }    
 
     private async Task CopyDiagramToClipboard()
