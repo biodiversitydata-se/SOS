@@ -185,7 +185,7 @@ namespace SOS.Lib.IO.Excel
                     const string subAggregationField = "event.startDate";
                     foreach (var taxonId in taxonIds)
                     {
-                        var filter = new SearchFilter
+                        var preparedFilter = new SearchFilter
                         {
                             DataProviderIds = [],
                             Date = new DateFilter
@@ -196,11 +196,13 @@ namespace SOS.Lib.IO.Excel
                             },
                             DiffusionStatuses = [DiffusionStatus.NotDiffused],
                             ExtendedAuthorization = new ExtendedAuthorizationFilter { ProtectionFilter = ProtectionFilter.BothPublicAndSensitive },
+                            NotRecoveredFilter = SightingNotRecoveredFilter.DontIncludeNotRecovered,
+                            PositiveSightings = true,
                             Taxa = new TaxonFilter { Ids = [taxonId], IncludeUnderlyingTaxa = true },
                             VerificationStatus = SearchFilterBase.StatusVerification.BothVerifiedAndNotVerified
                         };
-                        await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
-                        
+                        await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, preparedFilter);
+                        var filter = preparedFilter.Clone(); // preparedFilter contain all default params
                         var searchTasks = new Task<SearchResponse<dynamic>>[9];
                         searchTasks[0] = _processedObservationRepository.GenericTermsAggregationAsync(filter, aggregationField, maxCounties, subAggregationField, AggregationTypes.Max);
                         filter = filter.Clone();
@@ -209,8 +211,7 @@ namespace SOS.Lib.IO.Excel
                         filter = filter.Clone();
                         filter.VerificationStatus = SearchFilterBase.StatusVerification.Verified;
                         searchTasks[2] = _processedObservationRepository.GenericTermsAggregationAsync(filter, aggregationField, maxCounties);
-                        filter = filter.Clone();
-                        filter.DataProviderIds = [];
+                        filter = preparedFilter.Clone(); // Use preparedFilter to get default providers
                         filter.Date.StartDate = DateTime.MinValue;
                         filter.Date.EndDate = new DateTime(2018, 12, 31, 23, 59, 59);
                         filter.VerificationStatus = SearchFilterBase.StatusVerification.BothVerifiedAndNotVerified;
@@ -221,8 +222,7 @@ namespace SOS.Lib.IO.Excel
                         filter = filter.Clone();
                         filter.VerificationStatus = SearchFilterBase.StatusVerification.Verified;
                         searchTasks[5] = _processedObservationRepository.GenericTermsAggregationAsync(filter, aggregationField, maxCounties);
-                        filter = filter.Clone();
-                        filter.DataProviderIds = [];
+                        filter = preparedFilter.Clone(); // Use preparedFilter to get default providers
                         filter.Date.StartDate = new DateTime(2019, 01, 01);
                         filter.Date.EndDate = DateTime.Now;
                         filter.VerificationStatus = SearchFilterBase.StatusVerification.BothVerifiedAndNotVerified;
