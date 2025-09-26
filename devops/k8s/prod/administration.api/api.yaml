@@ -85,28 +85,165 @@ spec:
                   key: VerbatimDbUserName
                   name: sosadminapi-secret
           - name: ApplicationInsights
-            value: '{"InstrumentationKey": "SECRET_PLACEHOLDER", "EnableRequestBodyLogging": false, "EnableSearchResponseCountLogging": false}'
+            value: |
+                {
+                    "InstrumentationKey": "SECRET_PLACEHOLDER", 
+                    "EnableRequestBodyLogging": false, 
+                    "EnableSearchResponseCountLogging": false
+                }
           - name: AllowedOrigins
             value: '*' 
           - name: AuthenticationConfiguration
-            value: '{"Authority": "https://useradmin-auth.slu.se", "ClientId": "sos.admin.api"}'
+            value: |
+                {
+                    "Authority": "https://useradmin-auth.slu.se", 
+                    "ClientId": "sos.admin.api"
+                }
           - name: SosApiConfiguration
-            value: '{"ObservationsApiAddresses": [ "http://172.23.1.9:83/", "http://172.23.1.10:83/" ], "ElasticSearchProxyAddresses": [ "http://172.23.1.41:83/", "http://172.23.1.42:83/" ], "AnalysisApiAddresses": [ "http://172.23.1.9:84/", "http://172.23.1.10:84/" ], "DataStewardshipApiAddresses": [ "http://172.23.1.9:85/", "http://172.23.1.10:85/" ]}'
+            value: |
+                {
+                    "ObservationsApiAddresses": [ 
+                        "http://172.23.1.9:83/", 
+                        "http://172.23.1.10:83/" 
+                    ], 
+                    "ElasticSearchProxyAddresses": [ 
+                        "http://172.23.1.41:83/", 
+                        "http://172.23.1.42:83/" 
+                    ], 
+                    "AnalysisApiAddresses": [ 
+                        "http://172.23.1.9:84/", 
+                        "http://172.23.1.10:84/" 
+                    ], 
+                    "DataStewardshipApiAddresses": [ 
+                        "http://172.23.1.9:85/", 
+                        "http://172.23.1.10:85/" 
+                    ]
+                }
           - name: ProcessConfiguration
-            value: '{"TaxonAttributeServiceConfiguration": {"BaseAddress": "https://taxonattributeservice.artdata.slu.se/api", "AcceptHeaderContentType": "application/json"}, "TaxonServiceConfiguration": {"BaseAddress": "https://taxonservice.artdata.slu.se/DarwinCore/DarwinCoreArchiveFile?version=custom", "AcceptHeaderContentType": "application/text", "TaxonApiAddress": "https://taxonapi.artdata.slu.se/darwincore/download?version=custom"}}'
+            value: |
+                {
+                    "TaxonAttributeServiceConfiguration": {
+                        "BaseAddress": "https://taxonattributeservice.artdata.slu.se/api", 
+                        "AcceptHeaderContentType": "application/json"
+                    }, 
+                    "TaxonServiceConfiguration": {
+                        "BaseAddress": "https://taxonservice.artdata.slu.se/DarwinCore/DarwinCoreArchiveFile?version=custom", 
+                        "AcceptHeaderContentType": "application/text", 
+                        "TaxonApiAddress": "https://taxonapi.artdata.slu.se/darwincore/download?version=custom"
+                    }
+                }
           - name: RedisConfiguration
-            value: '{"EndPoint": "redis.redis.svc.cluster.local", "Port": 26379, "Password": "SECRET_PLACEHOLDER", "ServiceName": "mymaster"}'
+            value: |
+                {
+                    "EndPoint": "redis.redis-common.svc.cluster.local", 
+                    "Port": 26379, 
+                    "Password": "SECRET_PLACEHOLDER", 
+                    "ServiceName": "mymaster"
+                }
           - name: UserServiceConfiguration
-            value: '{"AcceptHeaderContentType": "application/json", "UserAdmin2ApiBaseAddress": "https://useradmin-api.slu.se", "ClientId": "SOS", "ClientSecret": "SECRET_PLACEHOLDER", "Scope": "useradmin.api SOS.Observations.Protected openid", "TokenUrl": "https://useradmin-auth.slu.se/connect/token", "TokenExpirationBufferInSeconds": 300, "IdentityProvider": {"Authority": "https://useradmin-auth.slu.se", "Audience": "https://sos-search.artdata.slu.se", "RequireHttpsMetadata ": false}}'
+            value: |
+                {
+                    "AcceptHeaderContentType": "application/json", 
+                    "UserAdmin2ApiBaseAddress": "https://useradmin-api.slu.se", 
+                    "ClientId": "SOS", 
+                    "ClientSecret": "SECRET_PLACEHOLDER", 
+                    "Scope": "useradmin.api SOS.Observations.Protected openid", 
+                    "TokenUrl": "https://useradmin-auth.slu.se/connect/token", 
+                    "TokenExpirationBufferInSeconds": 300, 
+                    "IdentityProvider": {
+                        "Authority": "https://useradmin-auth.slu.se", 
+                        "Audience": "https://sos-search.artdata.slu.se", 
+                        "RequireHttpsMetadata ": false
+                    }
+                }
           - name: ImportConfiguration
-            value: '{"ArtportalenConfiguration": {"ConnectionStringBackup": "Server=artsql2-12-test.ad.slu.se;Database=SpeciesObservationSwe_Backup;Integrated Security=sspi;MultipleActiveResultSets=true;Pooling=true;Max Pool Size=1000;Min Pool Size=0;Persist Security Info=false;TrustServerCertificate=true;ApplicationIntent=ReadOnly;Connection Timeout=30;Connection Lifetime=0;", "ConnectionStringLive": "Server=sql-artsql2-9\\inst1;Database=SpeciesObservationSwe;Integrated Security=sspi;MultipleActiveResultSets=true;Pooling=true;Max Pool Size=1000;Min Pool Size=0;Persist Security Info=false;TrustServerCertificate=true;ApplicationIntent=ReadOnly;Connection Timeout=30;Connection Lifetime=0;", "ChunkSize": 50000, "MaxNumberOfSightingsHarvested": null, "AddTestSightings": false}, "AreaHarvestConfiguration": {"UseGeoRegionApiHarvest": true}, "DwcaConfiguration": {"ImportPath": "\\\\storage-ua.slu.se\\ARTSOS_PROD$\\SOS\\Temp"}, "GeoRegionApiConfiguration": {"ApiUrl": "https://georegionapi.artdata.slu.se/"}}'
+            value: |
+                {
+                    "ArtportalenConfiguration": {
+                        "ConnectionStringBackup": "Server=artsql2-12-test.ad.slu.se;Database=SpeciesObservationSwe_Backup;Integrated Security=sspi;MultipleActiveResultSets=true;Pooling=true;Max Pool Size=1000;Min Pool Size=0;Persist Security Info=false;TrustServerCertificate=true;ApplicationIntent=ReadOnly;Connection Timeout=30;Connection Lifetime=0;", 
+                        "ConnectionStringLive": "Server=sql-artsql2-9\\inst1;Database=SpeciesObservationSwe;Integrated Security=sspi;MultipleActiveResultSets=true;Pooling=true;Max Pool Size=1000;Min Pool Size=0;Persist Security Info=false;TrustServerCertificate=true;ApplicationIntent=ReadOnly;Connection Timeout=30;Connection Lifetime=0;", 
+                        "ChunkSize": 50000, 
+                        "MaxNumberOfSightingsHarvested": null, 
+                        "AddTestSightings": false
+                    }, 
+                    "AreaHarvestConfiguration": {
+                        "UseGeoRegionApiHarvest": true
+                    }, 
+                    "DwcaConfiguration": {
+                        "ImportPath": "\\\\storage-ua.slu.se\\ARTSOS_PROD$\\SOS\\Temp"
+                    }, 
+                    "GeoRegionApiConfiguration": {
+                        "ApiUrl": "https://georegionapi.artdata.slu.se/"
+                    }
+                }
           - name: VerbatimDbConfiguration
-            value: '{"UserName": "SECRET_PLACEHOLDER", "Password": "SECRET_PLACEHOLDER", "Hosts": [{"Name": "artsosagg2-2.ad.slu.se","Port": 27017}], "DatabaseName": "sos-harvest", "UseTls": false, "AuthenticationDb": "admin", "ReadBatchSize": 10000, "WriteBatchSize": 10000}'
+            value: |
+                {
+                    "UserName": "SECRET_PLACEHOLDER", 
+                    "Password": "SECRET_PLACEHOLDER", 
+                    "Hosts": [
+                        {
+                            "Name": "artsosagg2-2.ad.slu.se","Port": 27017
+                        }
+                    ], 
+                    "DatabaseName": "sos-harvest", 
+                    "UseTls": false, 
+                    "AuthenticationDb": "admin", 
+                    "ReadBatchSize": 10000, 
+                    "WriteBatchSize": 10000
+                }
           - name: ProcessDbConfiguration
-            value: '{"UserName": "SECRET_PLACEHOLDER", "Password": "SECRET_PLACEHOLDER", "Hosts": [{"Name": "artmongo-1.artdata.slu.se", "Port": 27017}, {"Name": "artmongo-2.artdata.slu.se", "Port": 27017}, {"Name": "artmongo-3.artdata.slu.se", "Port": 27017}], "ReplicaSetName": "mongo-prod", "DatabaseName": "sos", "UseTls": false, "AuthenticationDb": "admin", "ReadBatchSize": 10000, "WriteBatchSize": 10000}'
+            value: |
+                {
+                    "UserName": "SECRET_PLACEHOLDER", 
+                    "Password": "SECRET_PLACEHOLDER", 
+                    "Hosts": [
+                        {
+                            "Name": "artmongo-1.artdata.slu.se", 
+                            "Port": 27017
+                        }, 
+                        {
+                            "Name": "artmongo-2.artdata.slu.se", 
+                            "Port": 27017
+                        }, 
+                        {
+                            "Name": "artmongo-3.artdata.slu.se", 
+                            "Port": 27017
+                        }
+                    ], 
+                    "ReplicaSetName": "mongo-prod", 
+                    "DatabaseName": "sos", 
+                    "UseTls": false, 
+                    "AuthenticationDb": "admin", 
+                    "ReadBatchSize": 10000, 
+                    "WriteBatchSize": 10000
+                }
           - name: HangfireDbConfiguration
-            value: '{"UserName": "SECRET_PLACEHOLDER", "Password": "SECRET_PLACEHOLDER", "Hosts": [{"Name": "artmongo-1.artdata.slu.se", "Port": 27017}, {"Name": "artmongo-2.artdata.slu.se", "Port": 27017}, {"Name": "artmongo-3.artdata.slu.se", "Port": 27017}], "ReplicaSetName": "mongo-prod", "DatabaseName": "sos-hangfire", "UseTls": false, "AuthenticationDb": "admin", "JobExpirationDays": 7}'
-          image: adbpocreg.azurecr.io/sosadminapi-api:$(Parameters.ImageTag)
+            value: |
+                {
+                    "UserName": "SECRET_PLACEHOLDER", 
+                    "Password": "SECRET_PLACEHOLDER", 
+                    "Hosts": [
+                        {
+                            "Name": "artmongo-1.artdata.slu.se", 
+                            "Port": 27017
+                        }, 
+                        {
+                            "Name": "artmongo-2.artdata.slu.se", 
+                            "Port": 27017
+                        }, 
+                        {
+                            "Name": "artmongo-3.artdata.slu.se", 
+                            "Port": 27017
+                        }
+                    ], 
+                    "ReplicaSetName": "mongo-prod", 
+                    "DatabaseName": "sos-hangfire", 
+                    "UseTls": false, 
+                    "AuthenticationDb": "admin", 
+                    "JobExpirationDays": 7
+                }
+          image: reg.app.slu.se/k1003-1/sosadminapi-api:$(Parameters.ImageTag)
           name: sosadminapi-api
           imagePullPolicy: IfNotPresent
           ports:
@@ -126,4 +263,4 @@ spec:
           resources: {}
       restartPolicy: Always
       imagePullSecrets:
-        - name: regcred
+        - name: reg.app.slu.se-k1003-1-regcred

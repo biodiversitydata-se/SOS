@@ -111,7 +111,7 @@ spec:
                   name: sos-observations-secret
           - name: CorsAllowAny
             value: "false"
-          image: adbpocreg.azurecr.io/sos-observations-api:$(Parameters.ImageTag)
+          image: reg.app.slu.se/k1003-1/sos-observations-api:$(Parameters.ImageTag)
           name: sos-observations-api
           imagePullPolicy: IfNotPresent
           ports:
@@ -132,4 +132,4 @@ spec:
       priorityClassName: high-priority
       restartPolicy: Always
       imagePullSecrets:
-        - name: regcred
+        - name: reg.app.slu.se-k1003-1-regcred

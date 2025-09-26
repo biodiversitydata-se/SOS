@@ -113,7 +113,7 @@ spec:
             value: '{"UserName": "SECRET_PLACEHOLDER", "Password": "SECRET_PLACEHOLDER", "Clusters": [{"Hosts": ["https://artsosdata2-1.artdata.slu.se:9200", "https://artsosdata2-2.artdata.slu.se:9200", "https://artsosdata2-3.artdata.slu.se:9200"]}, {"Hosts": ["https://artsosdata2-4.artdata.slu.se:9200", "https://artsosdata2-5.artdata.slu.se:9200", "https://artsosdata2-6.artdata.slu.se:9200"]}], "DebugMode": false, "IndexPrefix": "sos", "IndexSettings": [{"Name": "observation", "ReadBatchSize": 10000, "RequestTimeout": 60, "ScrollBatchSize": 5000, "ScrollTimeout": "300s"}]}'
           - name: SearchDbTestConfiguration
             value: '{"UserName": "SECRET_PLACEHOLDER", "Password": "SECRET_PLACEHOLDER", "Clusters": [{"Hosts": ["https://artsosdata2-1.artdata.slu.se:9200", "https://artsosdata2-2.artdata.slu.se:9200", "https://artsosdata2-3.artdata.slu.se:9200"]}, {"Hosts": ["https://artsosdata2-4.artdata.slu.se:9200", "https://artsosdata2-5.artdata.slu.se:9200", "https://artsosdata2-6.artdata.slu.se:9200"]}], "DebugMode": false, "IndexPrefix": "sos-st", "IndexSettings": [{"Name": "observation", "ReadBatchSize": 10000, "RequestTimeout": 60, "ScrollBatchSize": 5000, "ScrollTimeout": "300s"}]}'
-          image: adbpocreg.azurecr.io/sosadmingui-api:$(Parameters.ImageTag)
+          image: reg.app.slu.se/k1003-1/sosadmingui-api:$(Parameters.ImageTag)
           name: sosadmingui-api
           imagePullPolicy: IfNotPresent
           ports:
@@ -133,4 +133,4 @@ spec:
           resources: {}
       restartPolicy: Always
       imagePullSecrets:
-        - name: regcred
+        - name: reg.app.slu.se-k1003-1-regcred

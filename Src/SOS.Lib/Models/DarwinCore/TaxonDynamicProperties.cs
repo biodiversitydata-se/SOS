@@ -63,6 +63,11 @@ namespace SOS.Lib.Models.DarwinCore
         public bool IsEURegulation_1143_2014 { get; set; }
 
         /// <summary>
+        /// Invasive Risk Assessment Category
+        /// </summary>
+        public string InvasiveRiskAssessmentCategory { get; set; }
+
+        /// <summary>
         /// True if in EU list or in risk list and classified as severe or high risk
         /// </summary>
         public bool IsInvasiveInSweden { get; set; }

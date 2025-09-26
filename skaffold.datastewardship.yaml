@@ -7,8 +7,9 @@ build:
     docker:
       dockerfile: Dockerfile.datastewardship
 manifests:
-  rawYaml:
-  - ./devops/k8s/local/datastewardship/*.yaml
+  kustomize:
+    paths:
+    - ./devops/k8s/local/datastewardship
 deploy:
   statusCheck: false
   kubeContext: docker-desktop
@@ -16,6 +17,7 @@ deploy:
   # helm:
   #   releases:
   #   - name: redis
-  #     remoteChart: bitnami/redis
-  #     version: 17.3.15
-  #     valuesFiles: ["./devops/helm/local/redis/values.yaml"]
+  #     remoteChart: oci://reg.app.slu.se/oci-charts/redis-standalone
+  #     valuesFiles:
+  #       - ./devops/helm/local/redis/values.yaml
+  #     version: 0.2.1

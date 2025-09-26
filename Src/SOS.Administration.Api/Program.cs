@@ -28,7 +28,6 @@ using System.Text.Json.Serialization;
 try
 {
     var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-    bool isLocalDevelopment = new[] { "local", "k8s" }.Contains(env?.ToLower(), StringComparer.CurrentCultureIgnoreCase);
     bool isDevelopment = new[] { "local", "dev", "st" }.Contains(env?.ToLower(), StringComparer.CurrentCultureIgnoreCase);
     bool disableHangfireInit = Environment.GetEnvironmentVariable("DISABLE_HANGFIRE_INIT").GetBoolean();
     bool useLocalHangfire = Environment.GetEnvironmentVariable("USE_LOCAL_HANGFIRE").GetBoolean();
@@ -67,7 +66,7 @@ try
 
     // Start the application    
     string aspnetCoreUrls = Environment.GetEnvironmentVariable("ASPNETCORE_URLS");
-    await app.RunAsync(aspnetCoreUrls ?? "http://*:5005");
+    await app.RunAsync(aspnetCoreUrls ?? "http://*:5000");
 }
 catch (Exception ex)
 {
