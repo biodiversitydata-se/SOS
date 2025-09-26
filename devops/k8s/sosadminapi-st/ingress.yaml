@@ -27,4 +27,4 @@ spec:
           service:
             name: sosadminapi-api
             port:
-              number: 5005
+              number: 5000
