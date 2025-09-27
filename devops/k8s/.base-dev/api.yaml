@@ -15,8 +15,6 @@ spec:
         - secretRef:
             name: $(imageName)-secret
         env:
-        - name: ASPNETCORE_ENVIRONMENT
-          value: dev
         - name: CorsAllowAny
           value: "true"
         - name: AreaConfiguration

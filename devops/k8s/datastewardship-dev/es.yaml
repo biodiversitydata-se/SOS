@@ -1,8 +1,0 @@
-apiVersion: external-secrets.io/v1beta1
-kind: ExternalSecret
-metadata:
-  name: $(imageName)-es
-spec:
-  dataFrom:
-  - extract:
-      key: kv2/$(imageName)/dev
