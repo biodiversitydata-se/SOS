@@ -8,8 +8,6 @@ spec:
       containers:
       - name: $(imageName)-api
         env:
-        - name: ASPNETCORE_ENVIRONMENT
-          value: k8s-dev
         - name: AllowedOrigins
           value: https://sosadmingui-dev.wt.artdata.slu.se
         - name: ApiTestConfiguration
