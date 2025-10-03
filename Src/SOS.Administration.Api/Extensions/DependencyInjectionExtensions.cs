@@ -112,6 +112,10 @@ public static class DependencyInjectionExtensions
         services.AddSingleton(new ArtportalenConfiguration());
         services.AddSingleton(new ApiManagementServiceConfiguration());
         services.AddSingleton(new TaxonServiceConfiguration() { BaseAddress = "https://taxonapi.artdata.slu.se/darwincore/download?version=custom" });
+        if (Settings.ApplicationInsightsConfiguration != null)
+            services.AddSingleton(Settings.ApplicationInsightsConfiguration);
+        else
+            services.AddSingleton(new ApplicationInsightsConfiguration());
 
         // Caches
         services.AddSingleton<ICache<string, ProcessedConfiguration>, ProcessedConfigurationCache>();
