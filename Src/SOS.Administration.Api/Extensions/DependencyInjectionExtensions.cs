@@ -46,11 +46,12 @@ public static class DependencyInjectionExtensions
         services.AddScoped<IReportManager, ReportManager>();
         services.AddScoped<ICacheManager, CacheManager>();
         services.AddScoped<DiagnosticsManager>();
-        services.AddSingleton<IApiUsageStatisticsManager, ApiUsageStatisticsManager>();
+        services.AddScoped<IApiUsageStatisticsManager, ApiUsageStatisticsManager>();
         services.AddScoped<IDataProviderManager, DataProviderManager>();
         services.AddScoped<IIptManager, IptManager>();
 
         // Add repositories
+        services.AddScoped<IApiUsageStatisticsRepository, ApiUsageStatisticsRepository>();
         services.AddScoped<IReportRepository, ReportRepository>();
         services.AddScoped<IVocabulariesDiffHelper, VocabulariesDiffHelper>();
         services.AddScoped<IDataProviderRepository, DataProviderRepository>();
