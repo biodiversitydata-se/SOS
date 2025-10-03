@@ -7,8 +7,8 @@ metadata:
   namespace: sosadminapi
 spec:
   ports:
-    - port: 5005
-      targetPort: 5005
+    - port: 5000
+      targetPort: 5000
   selector:
     app: sosadminapi-api
 ---
@@ -247,11 +247,11 @@ spec:
           name: sosadminapi-api
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 5005
+            - containerPort: 5000
           readinessProbe: # ready to accept traffic, failure = stops routing traffic to this pod but does not restart the pod!
             httpGet:
               path: /healthz
-              port: 5005
+              port: 5000
               httpHeaders:
               - name: Host
                 value: KubernetesReadinessProbe
