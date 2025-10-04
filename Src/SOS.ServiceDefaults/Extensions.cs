@@ -30,7 +30,7 @@ public static class Extensions
                 o.CircuitBreaker.SamplingDuration = TimeSpan.FromSeconds(240);
                 o.TotalRequestTimeout.Timeout = TimeSpan.FromSeconds(240);
                 o.AttemptTimeout.Timeout = TimeSpan.FromSeconds(120);
-                o.Retry.MaxDelay = TimeSpan.FromSeconds(120);                
+                o.Retry.MaxDelay = TimeSpan.FromSeconds(120);
             });
 
             // Turn on service discovery by default

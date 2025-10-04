@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
-using System.Threading.Tasks;
-using SOS.Lib.Helpers;
-using DnsClient.Internal;
 using Microsoft.Extensions.Logging;
+using SOS.Lib.Helpers;
+using System;
+using System.Threading.Tasks;
 
 namespace SOS.Observations.Api.Middleware;
 
@@ -18,17 +18,21 @@ public class LogApiUserTypeMiddleware
     }
 
     public async Task Invoke(HttpContext context)
-    {
+    {       
         try
         {
             var userType = UserTypeHelper.GetUserType(context.Request);
             context.Items["ApiUserType"] = userType;
-
             await _next(context);
         }
-        catch (TaskCanceledException e)
-        {
-             _logger.LogWarning(e, "Request was canceled by client.");
+        catch (TaskCanceledException) when (context.RequestAborted.IsCancellationRequested)
+        {            
+            _logger.LogInformation("Request was cancelled by client. Path: {Path}", context.Request?.Path);            
+        }
+        catch (Exception ex)
+        {            
+            _logger.LogError(ex, "Unexpected error in request pipeline. Path: {Path}", context.Request?.Path);
+            throw;
         }
     }
 }

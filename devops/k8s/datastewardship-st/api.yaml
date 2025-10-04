@@ -8,8 +8,6 @@ spec:
       containers:
       - name: $(imageName)-api
         env:
-        - name: ASPNETCORE_ENVIRONMENT
-          value: k8s-st
         - name: IdentityServer
           value: '{"Authority": "https://login-test.artdata.slu.se","Audience": "SOS.Observations","RequireHttpsMetadata ": false}'
         - name: UserServiceConfiguration

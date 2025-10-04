@@ -194,6 +194,7 @@ namespace SOS.Lib.IO.Excel
                                 EndDate = DateTime.Now,
                                 DateFilterType = DateFilter.DateRangeFilterType.OverlappingStartDateAndEndDate
                             },
+                            DeterminationFilter = SightingDeterminationFilter.NotUnsureDetermination,
                             DiffusionStatuses = [DiffusionStatus.NotDiffused],
                             ExtendedAuthorization = new ExtendedAuthorizationFilter { ProtectionFilter = ProtectionFilter.BothPublicAndSensitive },
                             NotRecoveredFilter = SightingNotRecoveredFilter.DontIncludeNotRecovered,

@@ -7,6 +7,5 @@ resources:
 
 patches:
 - path: api.yaml
-- path: es.yaml
 
 namespace: $(imageName)-dev
