@@ -9,7 +9,7 @@ build:
 manifests:
   kustomize:
     paths:
-    - ./devops/k8s/local/status.web  
+    - ./devops/k8s/local/status.web.original  
 deploy:
   statusCheck: false
   kubeContext: docker-desktop

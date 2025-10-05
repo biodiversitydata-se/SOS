@@ -2,7 +2,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: sosadmingui-ingress
-  namespace: sosadmingui-st
+  namespace: sosadmingui-dev
   annotations:
     cert-manager.io/cluster-issuer: vault-slu.se-cluster-issuer
     nginx.ingress.kubernetes.io/proxy-body-size: 20m
@@ -10,11 +10,10 @@ spec:
   ingressClassName: nginx
   tls:
     - hosts:
-      - sosadmingui-st.wt.artdata.slu.se
-      - sosadmingui-bff-st.wt.artdata.slu.se
+      - sosadmingui-dev.wt.artdata.slu.se      
       secretName: private-star.artdata.slu.se-tls
   rules:
-  - host: sosadmingui-st.wt.artdata.slu.se
+  - host: sosadmingui-dev.wt.artdata.slu.se
     http:
       paths:
       - path: /
@@ -24,13 +23,3 @@ spec:
             name: sosadmingui-web
             port:
               number: 4200
-  - host: sosadmingui-bff-st.wt.artdata.slu.se
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: sosadmingui-api
-            port:
-              number: 5000

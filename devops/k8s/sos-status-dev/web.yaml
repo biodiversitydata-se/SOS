@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: $(imageName)-web
+spec:
+  template:
+    spec:
+      containers:
+      - name: $(imageName)-web
+        env:
+        - name: AllowedOrigins
+          value: https://sosadmingui-dev.wt.artdata.slu.se
+        - name: ApiTestConfiguration
+          value: '{"ApiUrl": "https://sos-search-st.wt.artdata.slu.se/", "HangfireUrl": "https://sosadminapi-dev.wt.artdata.slu.se/hangfire"}'
+        - name: AuthenticationConfiguration
+          value: '{"SecretKey": "SECRET_PLACEHOLDER", "SecretPassword": "SECRET_PLACEHOLDER", "Issuer": "https://sosadmingui-dev.wt.artdata.slu.se"}'
+        - name: ProcessDbConfiguration
+          value: '{"UserName": "SECRET_PLACEHOLDER", "Password": "SECRET_PLACEHOLDER", "Hosts": [{"Name": "artmongo-t-1.artdata.slu.se","Port": 27017}], "ReplicaSetName": null, "DatabaseName": "sos-dev", "UseTls": false, "AuthenticationDb": "admin", "ReadBatchSize": 10000, "WriteBatchSize": 10000}'
+        - name: SearchDbConfiguration
+          value: '{"UserName": "SECRET_PLACEHOLDER", "Password": "SECRET_PLACEHOLDER", "Clusters": [{"Hosts": ["https://artsearch2-1-test.artdata.slu.se:9200"]}], "DebugMode": true, "IndexPrefix": "sos-dev", "IndexSettings": [{"Name": "observation", "ReadBatchSize": 10000, "RequestTimeout": 300, "ScrollBatchSize": 5000, "ScrollTimeout": "300s"}]}'
+        - name: SearchDbTestConfiguration
+          value: '{"UserName": "SECRET_PLACEHOLDER", "Password": "SECRET_PLACEHOLDER", "Clusters": [{"Hosts": ["https://artsearch2-1-test.artdata.slu.se:9200"]}], "DebugMode": true, "IndexPrefix": "sos-st", "IndexSettings": [{"Name": "observation", "ReadBatchSize": 10000, "RequestTimeout": 300, "ScrollBatchSize": 5000, "ScrollTimeout": "300s"}]}'
+        resources:
+          requests:
+            cpu: 11m
+            memory: 230M
+          limits:
+            memory: 230M
