@@ -71,6 +71,7 @@ public static class DependencyInjectionExtensions
         services.AddScoped<IHttpClientService, HttpClientService>();
         services.AddScoped<IArtportalenDataService, ArtportalenDataService>();
         services.AddScoped<IApiManagementUserService, ApiManagementUserService>();
+        services.AddScoped<IUserService, UserService>();
 
         // Add Vocabulary Factories
         services.AddScoped<AccessRightsVocabularyFactory>();
@@ -117,7 +118,8 @@ public static class DependencyInjectionExtensions
             services.AddSingleton(Settings.ApplicationInsightsConfiguration);
         else
             services.AddSingleton(new ApplicationInsightsConfiguration());
-
+        services.AddSingleton(Settings.UserServiceConfiguration);
+        
         // Caches
         services.AddSingleton<ICache<string, ProcessedConfiguration>, ProcessedConfigurationCache>();
         services.AddSingleton<ICache<int, ProjectInfo>, ProjectCache>();
