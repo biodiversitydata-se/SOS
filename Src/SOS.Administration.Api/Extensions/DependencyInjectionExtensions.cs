@@ -69,7 +69,8 @@ public static class DependencyInjectionExtensions
         services.AddSingleton<IApplicationInsightsService, ApplicationInsightsService>();
         services.AddScoped<IFileDownloadService, FileDownloadService>();
         services.AddScoped<IHttpClientService, HttpClientService>();
-        services.AddScoped<IArtportalenDataService, ArtportalenDataService>();        
+        services.AddScoped<IArtportalenDataService, ArtportalenDataService>();
+        services.AddScoped<IApiManagementUserService, ApiManagementUserService>();
 
         // Add Vocabulary Factories
         services.AddScoped<AccessRightsVocabularyFactory>();
