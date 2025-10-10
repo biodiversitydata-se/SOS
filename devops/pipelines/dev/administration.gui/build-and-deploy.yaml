@@ -7,7 +7,7 @@ variables:
 
 # build/deploy settings
 - name: imageName
-  value: 'sos-status'
+  value: 'sosadmingui'
 - name: environment
   value: dev
 
@@ -27,8 +27,9 @@ stages:
     imageName: $(imageName)
     tag: $(tag) # from variable template
     # only include what you want to build:
-    # pathDockerfileApi: '$(Build.SourcesDirectory)/Src/Dockerfile.administration.gui' # full filename
-    pathDockerfileWeb: '$(Build.SourcesDirectory)/Src/Dockerfile.status.web'
+    pathDockerfileApi: '$(Build.SourcesDirectory)/Src/Dockerfile.administration.gui' # full filename
+    #pathDockerfileWeb: '$(Build.SourcesDirectory)/Src/SOS.Administration.Gui.Web/Dockerfile'
+    #pathDockerfileApi: '$(Build.SourcesDirectory)/Src/Dockerfile.status.web' # full filename
 
 - stage: Deploy
   displayName: Deploy to ${{ upper(variables.environment) }}

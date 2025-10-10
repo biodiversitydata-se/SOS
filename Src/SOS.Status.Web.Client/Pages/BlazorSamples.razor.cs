@@ -103,16 +103,19 @@ Responsibilities
     }
 
     protected override async Task OnInitializedAsync()
-    {
-        jsModule = await JsRuntime.InvokeAsync<IJSObjectReference>(
-            "import", "./Pages/BlazorSamples.razor.js");                         
+    {                              
         State.OnChange += MyStateHasChanged;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
+        if (jsModule is null)
         {
+            jsModule = await JsRuntime.InvokeAsync<IJSObjectReference>("import", "./Pages/BlazorSamples.razor.js");            
+        }
+
+        if (firstRender)
+        {           
             string? result = await LocalStorage.GetItemAsync<string>("myNameKey");
             State.SetUsername(result);
 

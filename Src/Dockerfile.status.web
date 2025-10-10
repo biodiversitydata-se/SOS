@@ -1,9 +1,8 @@
 FROM reg.app.slu.se/mcr/dotnet/sdk:9.0 AS build-env
 WORKDIR /app
 
-# copy csproj and restore as distinct layers
-COPY . .
-RUN dotnet restore SOS.Status.Web/SOS.Status.Web.csproj
+# {NugetConfigSnippet}
+# {NugetRunCommandSnippet}
 
 # copy everything else and build
 COPY  . .

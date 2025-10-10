@@ -1,15 +1,11 @@
 apiVersion: skaffold/v4beta5
 kind: Config
 build:
-  artifacts:
+  artifacts: 
   - image: api
     context: ./Src
     docker:
       dockerfile: Dockerfile.administration.gui
-  - image: web
-    context: ./Src/SOS.Administration.Gui.Web/
-    docker:
-      dockerfile: Dockerfile
 manifests:
   kustomize:
     paths:

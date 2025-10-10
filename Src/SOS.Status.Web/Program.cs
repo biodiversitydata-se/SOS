@@ -1,6 +1,7 @@
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting.StaticWebAssets;
+using Microsoft.AspNetCore.HttpOverrides;
 using MudBlazor;
 using MudBlazor.Services;
 using Serilog;
@@ -75,7 +76,18 @@ try
         options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
         options.SerializerOptions.Converters.Add(new GeoJsonConverter());
     });
+
+    builder.Services.Configure<ForwardedHeadersOptions>(options =>
+    {
+        options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+        options.RequireHeaderSymmetry = false;
+        options.ForwardLimit = null;
+        options.KnownNetworks.Clear();
+        options.KnownProxies.Clear();
+    });
+
     var app = builder.Build();
+    app.UseForwardedHeaders();
     app.MapDefaultEndpoints();
 
     // Use Swedish culture
@@ -125,7 +137,7 @@ try
 
     // Start the application
     string? aspnetCoreUrls = Environment.GetEnvironmentVariable("ASPNETCORE_URLS");
-    await app.RunAsync(aspnetCoreUrls ?? "http://*:4200");
+    await app.RunAsync(aspnetCoreUrls ?? "http://*:5000");
 }
 catch (Exception ex)
 {
