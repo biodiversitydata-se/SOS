@@ -744,7 +744,7 @@ namespace SOS.Observations.Api.Managers
                         },
                         Taxa = new TaxonFilter
                         {
-                            ListIds = [3]
+                            IsInvasiveInSweden = true                            
                         },
                         VerificationStatus = SearchFilterBase.StatusVerification.BothVerifiedAndNotVerified,
                         ExtendedAuthorization = new ExtendedAuthorizationFilter
@@ -827,7 +827,7 @@ namespace SOS.Observations.Api.Managers
                             },
                             Taxa = new TaxonFilter
                             {
-                                ListIds = [3]
+                                IsInvasiveInSweden = true,                                
                             },
                             VerificationStatus = SearchFilterBase.StatusVerification.BothVerifiedAndNotVerified,
                             ExtendedAuthorization = new ExtendedAuthorizationFilter
