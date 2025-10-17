@@ -27,7 +27,7 @@ namespace SOS.Lib.Cache
         public override async Task<ProcessedConfiguration> GetAsync(string key)
         {
             ProcessedConfiguration result = await base.GetAsync(key);
-            Logger.LogWarning($"ProcessedConfiguration retrieved from cache. Value={result?.ActiveInstance}");
+            Logger.LogDebug($"ProcessedConfiguration retrieved from cache. Value={result?.ActiveInstance}");
             return result;
         }
     }
