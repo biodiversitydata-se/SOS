@@ -40,6 +40,18 @@ namespace SOS.Observations.Api.Repositories.Interfaces
             bool sumUnderlyingTaxa = false);
 
         /// <summary>
+        /// Aggregate observations by taxon using approximate counting, i.e. Elasticsearch aggregation. Sort by observation count descending.
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="skip"></param>
+        /// <param name="take"></param>
+        /// <returns></returns>
+        Task<Result<PagedResult<TaxonAggregationItem>>> GetTaxonAggregationApproximateAsync(
+            SearchFilter filter,
+            int? skip,
+            int? take);
+
+        /// <summary>
         /// Get taxon sum aggregation. Including underlying taxa and province count.
         /// </summary>
         /// <param name="filter"></param>

@@ -307,10 +307,12 @@ namespace SOS.Observations.Api.Managers
             try
             {
                 await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
-                return await _processedTaxonRepository.GetTaxonAggregationAsync(filter,
+                var result = await _processedTaxonRepository.GetTaxonAggregationAsync(filter,
                     skip,
                     take,
                     sumUnderlyingTaxa);
+
+                return result;
             }
             catch (TimeoutException e)
             {
@@ -322,7 +324,7 @@ namespace SOS.Observations.Api.Managers
                 _logger.LogError(e, "Failed to get taxon aggregation");
                 throw;
             }
-        }
+        }        
 
         /// <inheritdoc />
         public async Task<IEnumerable<TaxonAggregationItemDto>> GetTaxonExistsIndicationAsync(

@@ -2,7 +2,6 @@
 using Elastic.Clients.Elasticsearch;
 using Elastic.Clients.Elasticsearch.Aggregations;
 using Elastic.Clients.Elasticsearch.Cluster;
-using Elastic.Clients.Elasticsearch.Fluent;
 using Elastic.Clients.Elasticsearch.QueryDsl;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
@@ -537,6 +536,108 @@ namespace SOS.Observations.Api.Repositories
             return observationCountByTaxonId;
         }
 
+        private async Task<(Dictionary<int, (int, DateTime?, DateTime?)>, int)> TaxaTermsAggregationWithTotalCountAsync(
+            string indexName,
+            ICollection<Action<QueryDescriptor<dynamic>>> queries,
+            ICollection<Action<QueryDescriptor<dynamic>>> excludeQueries,
+            int size)
+        {
+            var searchResponse = await Client.SearchAsync<dynamic>(s => s
+                .Index(indexName)
+                .Query(q => q
+                    .Bool(b => b
+                        .MustNot(excludeQueries.ToArray())
+                        .Filter(queries.ToArray())
+                    )
+                )
+                .Aggregations(a => a
+                    .Add("uniqueTaxaCount", aa => aa
+                        .Cardinality(c => c.Field("taxon.id"))
+                    )
+                    .Add("taxa", a => a
+                        .Terms(t => t
+                            .Field("taxon.id")
+                            .Size(size)
+                            .ShardSize(size * 5)
+                            .ValueType("long")
+                        )
+                        .Aggregations(a => a
+                            .Add("firstSighting", a => a
+                                .Min(m => m
+                                    .Field("event.startDate")
+                                )
+                            )
+                            .Add("lastSighting", a => a
+                                .Max(m => m
+                                    .Field("event.startDate")
+                                )
+                            )
+                        )
+                    )
+                )
+                .AddDefaultAggrigationSettings()
+            );
+
+            searchResponse.ThrowIfInvalid();
+
+            var uniqueTaxaCountAgg = searchResponse.Aggregations.GetCardinality("uniqueTaxaCount");
+            var observationCountByTaxonId = new Dictionary<int, (int, DateTime?, DateTime?)>();
+            foreach (var bucket in searchResponse.Aggregations.GetLongTerms("taxa").Buckets)
+            {
+                observationCountByTaxonId.Add((int)bucket.Key,
+                    (
+                        (int)bucket.DocCount,
+                        DateTime.Parse(bucket.Aggregations.GetMin("firstSighting").ValueAsString),
+                        DateTime.Parse(bucket.Aggregations.GetMax("lastSighting").ValueAsString)
+                    )
+                );
+            }
+
+            return (observationCountByTaxonId, (int)uniqueTaxaCountAgg.Value);
+        }
+
+        private async Task<(Dictionary<int, int>, int)> TaxaTermsAggregationOnlyTaxaAsync(
+            string indexName,
+            ICollection<Action<QueryDescriptor<dynamic>>> queries,
+            ICollection<Action<QueryDescriptor<dynamic>>> excludeQueries,
+            int size)
+        {
+            var searchResponse = await Client.SearchAsync<dynamic>(s => s
+                .Index(indexName)
+                .Query(q => q
+                    .Bool(b => b
+                        .MustNot(excludeQueries.ToArray())
+                        .Filter(queries.ToArray())
+                    )
+                )
+                .Aggregations(a => a
+                    .Add("uniqueTaxaCount", aa => aa
+                        .Cardinality(c => c.Field("taxon.id"))
+                    )
+                    .Add("taxa", a => a
+                        .Terms(t => t
+                            .Field("taxon.id")
+                            .Size(size)
+                            .ShardSize(size * 5)
+                            .ValueType("long")
+                        )
+                    )
+                )
+                .AddDefaultAggrigationSettings()
+            );
+
+            searchResponse.ThrowIfInvalid();
+
+            var uniqueTaxaCountAgg = searchResponse.Aggregations.GetCardinality("uniqueTaxaCount");
+            var observationCountByTaxonId = new Dictionary<int, int>();
+            foreach (var bucket in searchResponse.Aggregations.GetLongTerms("taxa").Buckets)
+            {
+                observationCountByTaxonId.Add((int)bucket.Key,(int)bucket.DocCount);
+            }
+
+            return (observationCountByTaxonId, (int)uniqueTaxaCountAgg.Value);
+        }
+
         /// <summary>
         /// Constructor used in public mode
         /// </summary>
@@ -672,6 +773,11 @@ namespace SOS.Observations.Api.Repositories
             }
             else
             {
+                if (take != null && take + skip.GetValueOrDefault() < 1000)
+                {
+                    return await GetTaxonAggregationApproximateAsync(filter, skip, take);
+                }
+
                 observationCountByTaxonId = await GetTaxonAggregationAsync(filter);
             }
 
@@ -717,6 +823,42 @@ namespace SOS.Observations.Api.Repositories
             };
 
             return Result.Success(pagedResult);
+        }
+
+        public async Task<Result<PagedResult<TaxonAggregationItem>>> GetTaxonAggregationApproximateAsync(
+            SearchFilter filter,
+            int? skip,
+            int? take)
+        {
+            skip ??= 0;
+            take ??= 100;
+
+            var indexName = GetCurrentIndex(filter);
+            var (query, excludeQuery) = GetCoreQueries<dynamic>(filter);
+            var result = await TaxaTermsAggregationWithTotalCountAsync(indexName, query, excludeQuery, skip.Value + take.Value);
+
+            var observationCountByTaxonId = result.Item1;
+            var uniqueTaxaCount = result.Item2;
+
+            var taxaResult = observationCountByTaxonId
+                .Select(b => TaxonAggregationItem.Create(
+                    b.Key,
+                    b.Value.Item1,
+                    b.Value.Item2,
+                    b.Value.Item3))
+                .OrderByDescending(m => m.ObservationCount)
+                .ThenBy(m => m.TaxonId)
+                .Skip(skip.Value)
+                .Take(take.Value)
+                .ToList();
+
+            return Result.Success(new PagedResult<TaxonAggregationItem>
+            {
+                Records = taxaResult,
+                Skip = skip.Value,
+                Take = take.Value,
+                TotalCount = uniqueTaxaCount
+            });
         }
 
         /// <summary>
