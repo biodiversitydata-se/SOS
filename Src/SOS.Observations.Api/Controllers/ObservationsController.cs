@@ -850,7 +850,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
         /// <param name="filter">The search filter.</param>
         /// <param name="skip">Start index of returned records. If null, skip will be set to 0.</param>
-        /// <param name="take">Max number of taxa to return. If null, all taxa will be returned. If not null, max number of records is 1000.</param>
+        /// <param name="take">Max number of taxa to return. If null, all taxa will be returned. If not null, max number of records is 1000.</param>        
         /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
         /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
         /// <param name="sensitiveObservations">If true, only sensitive (protected) observations will be searched (this requires authentication and authorization). If false, public available observations will be searched.</param>
@@ -867,7 +867,7 @@ namespace SOS.Observations.Api.Controllers
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
             [FromBody] SearchFilterAggregationDto filter,
             [FromQuery] int? skip = null,
-            [FromQuery] int? take = null,
+            [FromQuery] int? take = null,            
             [FromQuery] bool validateSearchFilter = false,
             [FromQuery] string translationCultureCode = "sv-SE",
             [FromQuery] bool sensitiveObservations = false)
@@ -903,8 +903,7 @@ namespace SOS.Observations.Api.Controllers
                     _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
                     _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries),
                     _inputValidator.ValidateTranslationCultureCode(translationCultureCode),
-                    _inputValidator.ValidateTaxonAggregationPagingArguments(skip, take),
-                    await _inputValidator.ValidateTilesLimitAsync(boundingBox, 1, _observationManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, searchFilter))
+                    _inputValidator.ValidateTaxonAggregationPagingArguments(skip, take)
                 );
 
                 if (validationResult.IsFailure)
@@ -2093,7 +2092,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
         /// <param name="filter">The search filter.</param>
         /// <param name="skip">Start index of returned records. If null, skip will be set to 0.</param>
-        /// <param name="take">Max number of taxa to return. If null, all taxa will be returned. If not null, max number of records is 1000.</param>
+        /// <param name="take">Max number of taxa to return. If null, all taxa will be returned. If not null, max number of records is 1000.</param>        
         /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
         /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
         /// <param name="sensitiveObservations">If true, only sensitive (protected) observations will be searched (this requires authentication and authorization). If false, public available observations will be searched.</param>
@@ -2112,7 +2111,7 @@ namespace SOS.Observations.Api.Controllers
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
             [FromBody] SearchFilterAggregationInternalDto filter,
             [FromQuery] int? skip = null,
-            [FromQuery] int? take = null,
+            [FromQuery] int? take = null,            
             [FromQuery] bool validateSearchFilter = false,
             [FromQuery] string translationCultureCode = "sv-SE",
             [FromQuery] bool sensitiveObservations = false,
@@ -2170,8 +2169,7 @@ namespace SOS.Observations.Api.Controllers
                     _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
                     _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries),
                     _inputValidator.ValidateTranslationCultureCode(translationCultureCode),
-                    _inputValidator.ValidateTaxonAggregationPagingArguments(skip, take),
-                    await _inputValidator.ValidateTilesLimitAsync(boundingBox, 1, _observationManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, searchFilter), true)
+                    _inputValidator.ValidateTaxonAggregationPagingArguments(skip, take)                    
                     );
 
                 if (validationResult.IsFailure)
