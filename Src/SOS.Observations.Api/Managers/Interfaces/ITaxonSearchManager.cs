@@ -92,6 +92,17 @@ namespace SOS.Observations.Api.Managers.Interfaces
             string sortBy,
             SearchSortOrder sortOrder);
 
+        Task<Result<List<int>>> GetObservedTaxaAsync(
+            int? roleId,
+            string authorizationApplicationIdentifier,
+            SearchFilter filter);
+
+        Task<Dictionary<int, TaxonAreaAgg>> GetTaxonAreaAggregationAsync(
+            int? roleId,
+            string authorizationApplicationIdentifier,
+            SearchFilter filter,
+            AreaTypeAggregate? areaType);
+
         /// <summary>
         /// Get a indication if taxon exist in specified area
         /// </summary>

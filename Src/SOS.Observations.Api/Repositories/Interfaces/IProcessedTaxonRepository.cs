@@ -1,4 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
+using SOS.Lib.Enums;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Filters;
@@ -50,6 +51,10 @@ namespace SOS.Observations.Api.Repositories.Interfaces
             SearchFilter filter,
             int? skip,
             int? take);
+
+        Task<Result<List<int>>> GetObservedTaxaAsync(SearchFilter filter);
+
+        Task<Dictionary<int, TaxonAreaAgg>> GetTaxonAreaAggregationAsync(SearchFilter filter, AreaTypeAggregate? areaType);
 
         /// <summary>
         /// Get taxon sum aggregation. Including underlying taxa and province count.

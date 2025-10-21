@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using MongoDB.Driver.Linq;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Shared;
+using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Gis;
@@ -49,7 +50,7 @@ namespace SOS.Observations.Api.Repositories
             public Dictionary<string, int> ObservationCountByProvinceId { get; set; } = new Dictionary<string, int>();
             public int ObservationCount { get; set; }
         }
-
+        
         private class TaxonAggregationTreeNodeSum
         {
             public DateTime? FirstSighting { get; set; }
@@ -470,6 +471,106 @@ namespace SOS.Observations.Api.Repositories
                         )
                     )
                 )
+                .AddDefaultAggrigationSettings()
+                .RequestConfiguration(r => r
+                    .RequestTimeout(TimeSpan.FromMinutes(5)) // 5 minutes timeout
+                )
+            );
+
+            searchResponse.ThrowIfInvalid();
+
+            return searchResponse;
+        }
+
+        public async Task<Dictionary<int, TaxonAreaAgg>> GetTaxonAreaAggregationAsync(SearchFilter filter, AreaTypeAggregate? areaType)
+        {
+            var index = GetCurrentIndex(filter);
+            var (query, excludeQuery) = GetCoreQueries<dynamic>(filter);
+            var sources = GetAreaAggregationSources(areaType);            
+            var itemsByTaxonId = new Dictionary<int, TaxonAreaAgg>();
+            IReadOnlyDictionary<Field, FieldValue> nextPageKey = null;            
+            var pageTaxaAsyncTake = MaxNrElasticSearchAggregationBuckets;
+            do
+            {
+                var searchResponse = await TaxonAreaCompositeAggregationAsync(index, query, excludeQuery, nextPageKey, sources, pageTaxaAsyncTake);
+                var compositeTaxonAgg = searchResponse.Aggregations.GetComposite("taxonComposite");                
+
+                foreach (var bucket in compositeTaxonAgg.Buckets)
+                {
+                    bucket.Key["taxonId"].TryGetLong(out var taxonId);
+                    var observationCount = Convert.ToInt32(bucket.DocCount);
+                    if (!itemsByTaxonId.TryGetValue((int)taxonId, out var itemsForTaxon))
+                    {
+                        itemsForTaxon = new TaxonAreaAgg();
+                        itemsByTaxonId.Add((int)taxonId, itemsForTaxon);
+                    }
+
+                    itemsForTaxon.ObservationCount += observationCount;
+                    if (bucket.Key.TryGetValue("featureId", out var featureIdFieldValue))
+                    {
+                        featureIdFieldValue.TryGetString(out var featureId);
+                        if (itemsForTaxon.ObservationCountByAreaFeatureId == null)
+                        {
+                            itemsForTaxon.ObservationCountByAreaFeatureId = new Dictionary<string, int>();
+                        }
+                        itemsForTaxon.ObservationCountByAreaFeatureId.TryAdd(featureId, observationCount);
+                    }
+                }
+
+                nextPageKey = compositeTaxonAgg.Buckets.Count >= pageTaxaAsyncTake ? compositeTaxonAgg.AfterKey?.ToDictionary(ak => ak.Key.ToField(), ak => ak.Value) : null;
+            } while (nextPageKey != null);
+
+            return itemsByTaxonId;
+        }
+
+        private ICollection<IDictionary<string, CompositeAggregationSource>> GetAreaAggregationSources(AreaTypeAggregate? areaType)
+        {
+            var sources = new List<IDictionary<string, CompositeAggregationSource>>
+            {
+                CreateCompositeTermsAggregationSource(("taxonId", "taxon.id", SortOrder.Asc))
+            };
+
+            if (areaType is null)
+                return sources;
+
+            var path = areaType switch
+            {
+                AreaTypeAggregate.County => "location.county.featureId",
+                AreaTypeAggregate.Province => "location.province.featureId",
+                AreaTypeAggregate.Municipality => "location.municipality.featureId",
+                AreaTypeAggregate.CountryRegion => "location.countryRegion.featureId",
+                _ => throw new ArgumentException($"{areaType} area type is not supported", nameof(areaType))
+            };
+
+            sources.Add(CreateCompositeTermsAggregationSource(("featureId", path, SortOrder.Asc)));
+            return sources;
+        }
+
+        private async Task<SearchResponse<dynamic>> TaxonAreaCompositeAggregationAsync(
+            string indexName,
+            ICollection<Action<QueryDescriptor<dynamic>>> queries,
+            ICollection<Action<QueryDescriptor<dynamic>>> excludeQueries,
+            IReadOnlyDictionary<Field, FieldValue> nextPage,
+            ICollection<IDictionary<string, CompositeAggregationSource>> sources,
+            int take)
+        {            
+            var searchResponse = await Client.SearchAsync<dynamic>(s => s
+                .Index(indexName)
+                .Query(q => q
+                    .Bool(b => b
+                        .MustNot(excludeQueries.ToArray())
+                        .Filter(queries.ToArray())
+                    )
+                )
+                .Aggregations(a => a
+                    .Add("taxonComposite", a => a
+                         .Composite(c => c
+                            .Size(take)
+                            .After(a => nextPage?.ToFluentDictionary())
+                            .Sources(sources)
+                        )
+                    )
+                )                                 
                 .AddDefaultAggrigationSettings()
                 .RequestConfiguration(r => r
                     .RequestTimeout(TimeSpan.FromMinutes(5)) // 5 minutes timeout
@@ -980,6 +1081,55 @@ namespace SOS.Observations.Api.Repositories
             return result;
         }
 
+        public async Task<Result<List<int>>> GetObservedTaxaAsync(SearchFilter filter)
+        {
+            var index = GetCurrentIndex(filter);
+            var (query, excludeQuery) = GetCoreQueries<dynamic>(filter);
+            var allIds = new HashSet<int>();            
+            IReadOnlyDictionary<Field, FieldValue> nextPage = null;            
+
+            do
+            {                
+                var response = await Client.SearchAsync<dynamic>(s => s
+                    .Index(index)
+                    .Size(0)
+                    .Query(q => q
+                        .Bool(b => b
+                            .MustNot(excludeQuery.ToArray())
+                            .Filter(query.ToArray())
+                        )
+                    )
+                    .Aggregations(a => a
+                        .Add("taxonComposite", a => a
+                            .Composite(c => c
+                                .After(a => nextPage?.ToFluentDictionary())                                
+                                .Size(MaxNrElasticSearchAggregationBuckets)
+                                .Sources(
+                                    [
+                                        CreateCompositeTermsAggregationSource(
+                                            ("taxon_id", "taxon.id", SortOrder.Asc)
+                                        )
+                                    ]
+                                )
+                            )
+
+                    
+                        )
+                    )
+                );
+
+                var compositeAgg = response.Aggregations.GetComposite("taxonComposite");
+                if (compositeAgg == null)
+                    break;
+
+                foreach (var bucket in compositeAgg.Buckets)
+                    allIds.Add(Convert.ToInt32(bucket.Key["taxon_id"].Value));                
+                nextPage = compositeAgg.AfterKey?.ToDictionary(ak => ak.Key.ToField(), ak => ak.Value);                
+            }
+            while (nextPage != null);
+            
+            return Result.Success(allIds.ToList());
+        }     
 
         /// <inheritdoc />
         public async Task<IEnumerable<TaxonAggregationItem>> GetTaxonExistsIndicationAsync(

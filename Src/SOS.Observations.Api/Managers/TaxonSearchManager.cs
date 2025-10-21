@@ -3,22 +3,22 @@ using Microsoft.Extensions.Logging;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Exceptions;
+using SOS.Lib.Extensions;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
-using SOS.Shared.Api.Dtos;
-using SOS.Shared.Api.Extensions.Dto;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Repositories.Interfaces;
+using SOS.Shared.Api.Dtos;
+using SOS.Shared.Api.Extensions.Dto;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Collections.Concurrent;
-using SOS.Lib.Extensions;
 
 namespace SOS.Observations.Api.Managers
 {
@@ -322,6 +322,55 @@ namespace SOS.Observations.Api.Managers
             catch (Exception e)
             {
                 _logger.LogError(e, "Failed to get taxon aggregation");
+                throw;
+            }
+        }
+
+        public async Task<Result<List<int>>> GetObservedTaxaAsync(
+            int? roleId,
+            string authorizationApplicationIdentifier,
+            SearchFilter filter)
+        {
+            try
+            {
+                await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
+                var result = await _processedTaxonRepository.GetObservedTaxaAsync(filter);
+
+                return result;
+            }
+            catch (TimeoutException e)
+            {
+                _logger.LogError(e, "Get observed taxa timeout");
+                throw;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to get observed taxa");
+                throw;
+            }
+        }
+
+        public async Task<Dictionary<int, TaxonAreaAgg>> GetTaxonAreaAggregationAsync(
+            int? roleId,
+            string authorizationApplicationIdentifier,
+            SearchFilter filter,
+            AreaTypeAggregate? areaType)
+        {
+            try
+            {
+                await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
+                var result = await _processedTaxonRepository.GetTaxonAreaAggregationAsync(filter, areaType);
+
+                return result;
+            }
+            catch (TimeoutException e)
+            {
+                _logger.LogError(e, "Get taxon area aggregation timeout");
+                throw;
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Failed to get taxon area aggregation");
                 throw;
             }
         }        
