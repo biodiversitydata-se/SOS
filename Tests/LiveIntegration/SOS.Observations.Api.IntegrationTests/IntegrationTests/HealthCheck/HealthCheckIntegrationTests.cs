@@ -5,7 +5,7 @@ using Xunit;
 
 namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.HealthCheck
 {
-    [Collection(Collections.ApiIntegrationTestsCollection)]
+    [Collection(Fixtures.Collections.ApiIntegrationTestsCollection)]
     public class HealthCheckIntegrationTests
     {
         private readonly ApiIntegrationTestFixture _fixture;

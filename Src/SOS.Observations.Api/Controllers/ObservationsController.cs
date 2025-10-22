@@ -2326,10 +2326,12 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="filter">The search filter.</param>
         /// <param name="areaType">The area type to aggregate by (e.g. County, Province).</param>
         /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
-        /// <param name="sensitiveObservations">If true, only sensitive (protected) observations will be searched (this requires authentication and authorization). If false, public available observations will be searched.</param>        
+        /// <param name="sensitiveObservations">If true, only sensitive (protected) observations will be searched (this requires authentication and authorization). If false, public available observations will be searched.</param>
+        /// <param name="sumTaxaTree">If true, all taxa will be returned with observation count sum.</param>
+        /// <param name="pruneTaxaTree">If true and sumTaxaTree is true, the result will be pruned to remove nodes with no observations.</param>
         /// <returns></returns>
         [HttpPost("Internal/TaxonAreaAggregation")]
-        [ProducesResponseType(typeof(Dictionary<int, TaxonAreaAggDto>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(Dictionary<int, TaxonAreaAggregation>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.ServiceUnavailable)]
@@ -2341,7 +2343,9 @@ namespace SOS.Observations.Api.Controllers
             [FromBody] SearchFilterAggregationInternalDto filter,
             [FromQuery] AreaTypeAggregate? areaType = null,
             [FromQuery] bool validateSearchFilter = false,            
-            [FromQuery] bool sensitiveObservations = false)
+            [FromQuery] bool sensitiveObservations = false,
+            [FromQuery] bool sumTaxaTree = false,
+            [FromQuery] bool pruneTaxaTree = false)
         {
             ApiUserType userType = this.GetApiUserType();
             SemaphoreResult semaphoreResult = null;
@@ -2383,9 +2387,15 @@ namespace SOS.Observations.Api.Controllers
                     searchFilter,
                     areaType);
 
-                var dto = result.ToDto();
-
-                return new OkObjectResult(dto);
+                if (sumTaxaTree)
+                {                    
+                    await _taxonSearchManager.CreateTaxonAreaSumWithLowMemoryAsync(
+                        result, 
+                        aggregateArea: areaType.HasValue, 
+                        pruneTaxaTree);
+                }
+                
+                return new OkObjectResult(result);
             }
             catch (AuthenticationRequiredException e)
             {

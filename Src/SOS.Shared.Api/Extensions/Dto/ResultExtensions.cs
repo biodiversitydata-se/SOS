@@ -8,23 +8,7 @@ using System.Text.Json.Nodes;
 namespace SOS.Shared.Api.Extensions.Dto
 {
     public static class ResultExtensions
-    {
-        public static Dictionary<int, TaxonAreaAggDto> ToDto(this Dictionary<int, TaxonAreaAgg> dictionary)
-        {
-            return dictionary.ToDictionary(
-                kvp => kvp.Key,
-                kvp => kvp.Value.ToDto());
-        }    
-
-        public static TaxonAreaAggDto ToDto(this TaxonAreaAgg agg)
-        {
-            return new TaxonAreaAggDto
-            {
-                ObservationCount = agg.ObservationCount,
-                ObservationCountByAreaFeatureId = agg.ObservationCountByAreaFeatureId
-            };
-        }
-
+    {        
         public static GeoGridResultDto ToGeoGridResultDto(this GeoGridTileResult geoGridTileResult, long totalGridCellCount)
         {
             return new GeoGridResultDto

@@ -8,7 +8,7 @@ using Xunit;
 
 namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.DataProvidersController
 {
-    [Collection(Collections.ApiIntegrationTestsCollection)]
+    [Collection(Fixtures.Collections.ApiIntegrationTestsCollection)]
     public class DataProvidersIntegrationTests
     {
         private readonly ApiIntegrationTestFixture _fixture;

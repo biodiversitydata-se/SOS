@@ -8,7 +8,7 @@ using Xunit;
 
 namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.TaxonManager
 {
-    [Collection(Collections.ApiIntegrationTestsCollection)]
+    [Collection(Fixtures.Collections.ApiIntegrationTestsCollection)]
     public class TaxonManagerIntegrationTests
     {
         private readonly ApiIntegrationTestFixture _fixture;

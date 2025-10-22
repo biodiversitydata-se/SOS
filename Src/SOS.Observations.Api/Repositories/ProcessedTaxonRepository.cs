@@ -482,43 +482,78 @@ namespace SOS.Observations.Api.Repositories
             return searchResponse;
         }
 
-        public async Task<Dictionary<int, TaxonAreaAgg>> GetTaxonAreaAggregationAsync(SearchFilter filter, AreaTypeAggregate? areaType)
+        public async Task<Dictionary<int, TaxonAreaAggregation>> GetTaxonAreaAggregationAsync(
+            SearchFilter filter,
+            AreaTypeAggregate? areaType)
         {
             var index = GetCurrentIndex(filter);
             var (query, excludeQuery) = GetCoreQueries<dynamic>(filter);
-            var sources = GetAreaAggregationSources(areaType);            
-            var itemsByTaxonId = new Dictionary<int, TaxonAreaAgg>();
-            IReadOnlyDictionary<Field, FieldValue> nextPageKey = null;            
-            var pageTaxaAsyncTake = MaxNrElasticSearchAggregationBuckets;
+            var sources = GetAreaAggregationSources(areaType);
+
+            var itemsByTaxonId = new Dictionary<int, TaxonAreaAggregation>(capacity: 10_000);
+            IReadOnlyDictionary<Field, FieldValue>? nextPageKey = null;
+            var pageTake = MaxNrElasticSearchAggregationBuckets;           
+
             do
             {
-                var searchResponse = await TaxonAreaCompositeAggregationAsync(index, query, excludeQuery, nextPageKey, sources, pageTaxaAsyncTake);
-                var compositeTaxonAgg = searchResponse.Aggregations.GetComposite("taxonComposite");                
+                var searchResponse = await TaxonAreaCompositeAggregationAsync(
+                    index, query, excludeQuery, nextPageKey, sources, pageTake);
+
+                var compositeTaxonAgg = searchResponse.Aggregations.GetComposite("taxonComposite");
 
                 foreach (var bucket in compositeTaxonAgg.Buckets)
                 {
-                    bucket.Key["taxonId"].TryGetLong(out var taxonId);
-                    var observationCount = Convert.ToInt32(bucket.DocCount);
-                    if (!itemsByTaxonId.TryGetValue((int)taxonId, out var itemsForTaxon))
+                    if (!bucket.Key.TryGetValue("taxonId", out var taxonFieldValue))
+                        continue;
+
+                    if (!taxonFieldValue.TryGetLong(out var taxonIdLong))
+                        continue;
+
+                    var taxonId = (int)taxonIdLong;
+                    var observationCount = (int)bucket.DocCount;
+
+                    if (!itemsByTaxonId.TryGetValue(taxonId, out var taxonAgg))
                     {
-                        itemsForTaxon = new TaxonAreaAgg();
-                        itemsByTaxonId.Add((int)taxonId, itemsForTaxon);
+                        taxonAgg = new TaxonAreaAggregation
+                        {
+                            ObservationCount = observationCount
+                        };
+                        itemsByTaxonId.Add(taxonId, taxonAgg);
+                    }
+                    else
+                    {
+                        taxonAgg.ObservationCount += observationCount;
                     }
 
-                    itemsForTaxon.ObservationCount += observationCount;
-                    if (bucket.Key.TryGetValue("featureId", out var featureIdFieldValue))
+                    // Avoid unnecessary dictionary allocation
+                    if (bucket.Key.TryGetValue("featureId", out var featureFieldValue) &&
+                        featureFieldValue.TryGetString(out var featureId))
                     {
-                        featureIdFieldValue.TryGetString(out var featureId);
-                        if (itemsForTaxon.ObservationCountByAreaFeatureId == null)
-                        {
-                            itemsForTaxon.ObservationCountByAreaFeatureId = new Dictionary<string, int>();
-                        }
-                        itemsForTaxon.ObservationCountByAreaFeatureId.TryAdd(featureId, observationCount);
+                        var dict = taxonAgg.ObservationCountByAreaFeatureId
+                            ??= new Dictionary<string, int>(capacity: 4);
+
+                        // Faster than TryAdd + re-calculation
+                        if (dict.TryGetValue(featureId, out var existing))
+                            dict[featureId] = existing + observationCount;
+                        else
+                            dict[featureId] = observationCount;
                     }
                 }
 
-                nextPageKey = compositeTaxonAgg.Buckets.Count >= pageTaxaAsyncTake ? compositeTaxonAgg.AfterKey?.ToDictionary(ak => ak.Key.ToField(), ak => ak.Value) : null;
-            } while (nextPageKey != null);
+                // Avoid .ToDictionary() → don't allocate new every time
+                if (compositeTaxonAgg.Buckets.Count >= pageTake && compositeTaxonAgg.AfterKey is not null)
+                {
+                    var afterKey = new Dictionary<Field, FieldValue>(2);
+                    foreach (var kv in compositeTaxonAgg.AfterKey)
+                        afterKey[kv.Key.ToField()] = kv.Value;
+                    nextPageKey = afterKey;
+                }
+                else
+                {
+                    nextPageKey = null;
+                }
+
+            } while (nextPageKey is not null);
 
             return itemsByTaxonId;
         }

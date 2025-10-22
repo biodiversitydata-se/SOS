@@ -247,7 +247,7 @@ namespace SOS.Observations.Api.LiveIntegrationTests.Fixtures
             var taxonCache = new TaxonCache(TaxonRepository, new NullLogger<TaxonCache>());
             var csvFileWriter = new CsvFileWriter(ProcessedObservationRepository, fileService, filterManager, VocabularyValueResolver, generalizationResolverMock.Object, areaCache, taxonCache, new NullLogger<CsvFileWriter>());
             ObservationManager = CreateObservationManager(areaManager, (ProcessedObservationRepository)ProcessedObservationRepository, VocabularyValueResolver, processClient, filterManager);
-            var taxonSearchManager = CreateTaxonSearchManager(processedTaxonRepository, filterManager);
+            var taxonSearchManager = CreateTaxonSearchManager(processedTaxonRepository, filterManager, taxonManager);
             var inputValaidationConfiguration = GetInputValaidationConfiguration();
             var exportManager = new ExportManager(csvFileWriter, dwcArchiveFileWriter, dwcArchiveEventFileWriter, excelFileWriter, geojsonFileWriter,
                 ProcessedObservationRepository, processInfoRepository, filterManager, new NullLogger<ExportManager>());
@@ -397,11 +397,13 @@ namespace SOS.Observations.Api.LiveIntegrationTests.Fixtures
 
         private TaxonSearchManager CreateTaxonSearchManager(
             ProcessedTaxonRepository processedTaxonRepository,
-            FilterManager filterManager)
+            FilterManager filterManager,
+            ITaxonManager taxonManager)
         {
             var taxonSearchManager = new TaxonSearchManager(processedTaxonRepository,
-                filterManager,
+                filterManager,                
                 new ClassCache<ConcurrentDictionary<int, TaxonSumAggregationItem>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<int, TaxonSumAggregationItem>>>()) { CacheDuration = TimeSpan.FromHours(4) },
+                taxonManager,
                 new NullLogger<TaxonSearchManager>());
 
             return taxonSearchManager;

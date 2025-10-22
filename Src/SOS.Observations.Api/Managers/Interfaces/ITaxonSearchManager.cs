@@ -97,7 +97,7 @@ namespace SOS.Observations.Api.Managers.Interfaces
             string authorizationApplicationIdentifier,
             SearchFilter filter);
 
-        Task<Dictionary<int, TaxonAreaAgg>> GetTaxonAreaAggregationAsync(
+        Task<Dictionary<int, TaxonAreaAggregation>> GetTaxonAreaAggregationAsync(
             int? roleId,
             string authorizationApplicationIdentifier,
             SearchFilter filter,
@@ -115,5 +115,8 @@ namespace SOS.Observations.Api.Managers.Interfaces
             string authorizationApplicationIdentifier,
             SearchFilter filter);
 
+        Task<Dictionary<int, TaxonAreaAggregation>> CreateTaxonAreaSumAsync(Dictionary<int, TaxonAreaAggregation> taxonAreaAggByTaxonId);
+        Task<Dictionary<int, TaxonAreaAggregation>> CreateTaxonAreaSumUsingLowMemoryAsync(Dictionary<int, TaxonAreaAggregation> taxonAreaAggByTaxonId);
+        Task CreateTaxonAreaSumWithLowMemoryAsync(Dictionary<int, TaxonAreaAggregation> taxonAreaAggByTaxonId, bool aggregateArea, bool pruneTaxaTree = false);
     }
 }

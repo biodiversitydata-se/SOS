@@ -52,9 +52,9 @@ namespace SOS.Observations.Api.Repositories.Interfaces
             int? skip,
             int? take);
 
-        Task<Result<List<int>>> GetObservedTaxaAsync(SearchFilter filter);
+        Task<Result<List<int>>> GetObservedTaxaAsync(SearchFilter filter);        
 
-        Task<Dictionary<int, TaxonAreaAgg>> GetTaxonAreaAggregationAsync(SearchFilter filter, AreaTypeAggregate? areaType);
+        Task<Dictionary<int, TaxonAreaAggregation>> GetTaxonAreaAggregationAsync(SearchFilter filter, AreaTypeAggregate? areaType);
 
         /// <summary>
         /// Get taxon sum aggregation. Including underlying taxa and province count.
