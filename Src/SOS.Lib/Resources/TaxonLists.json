@@ -5,7 +5,7 @@
         "Names": [
             {
                 "CultureCode": "en-GB",
-                "Value": "Protected by law species"
+                "Value": "Species protected by law"
             },
             {
                 "CultureCode": "sv-SE",
@@ -465,7 +465,7 @@
             },
             {
                 "CultureCode": "sv-SE",
-                "Value": "Habitatdirektivet 2023"
+                "Value": "Habitatdirektivet arter 2023"
             }
         ],
         "TaxonIds": []
@@ -477,7 +477,7 @@
         "Names": [
             {
                 "CultureCode": "en-GB",
-                "Value": "Preservation status"
+                "Value": "Conservation status"
             },
             {
                 "CultureCode": "sv-SE",
@@ -493,11 +493,11 @@
         "Names": [
             {
                 "CultureCode": "en-GB",
-                "Value": "Prosperous Preservation Status"
+                "Value": "Favourable Conservation Status"
             },
             {
                 "CultureCode": "sv-SE",
-                "Value": "Gynnsamma bevarandestatus"
+                "Value": "Gynnsam bevarandestatus"
             }
         ],
         "TaxonIds": []
@@ -509,7 +509,7 @@
         "Names": [
             {
                 "CultureCode": "en-GB",
-                "Value": "Unsatisfactory Preservation Status"
+                "Value": "Unsatisfactory Conservation Status"
             },
             {
                 "CultureCode": "sv-SE",
@@ -525,7 +525,7 @@
         "Names": [
             {
                 "CultureCode": "en-GB",
-                "Value": "Bad Preservation Status"
+                "Value": "Poor Conservation Status"
             },
             {
                 "CultureCode": "sv-SE",
@@ -541,7 +541,7 @@
         "Names": [
             {
                 "CultureCode": "en-GB",
-                "Value": "Unknown Preservation Status"
+                "Value": "Unknown Conservation Status"
             },
             {
                 "CultureCode": "sv-SE",
@@ -557,11 +557,11 @@
         "Names": [
             {
                 "CultureCode": "en-GB",
-                "Value": "Trend"
+                "Value": "Trend Conservation Status"
             },
             {
                 "CultureCode": "sv-SE",
-                "Value": "Trend"
+                "Value": "Trend bevarandestatus"
             }
         ],
         "TaxonIds": []
@@ -573,11 +573,11 @@
         "Names": [
             {
                 "CultureCode": "en-GB",
-                "Value": "Positiv"
+                "Value": "Positive Trend"
             },
             {
                 "CultureCode": "sv-SE",
-                "Value": "Positiv"
+                "Value": "Positiv trend"
             }
         ],
         "TaxonIds": []
@@ -589,11 +589,11 @@
         "Names": [
             {
                 "CultureCode": "en-GB",
-                "Value": "Negativ"
+                "Value": "Negative Trend"
             },
             {
                 "CultureCode": "sv-SE",
-                "Value": "Negativ"
+                "Value": "Negativ trend"
             }
         ],
         "TaxonIds": []
@@ -605,11 +605,11 @@
         "Names": [
             {
                 "CultureCode": "en-GB",
-                "Value": "Stable"
+                "Value": "Stable Trend"
             },
             {
                 "CultureCode": "sv-SE",
-                "Value": "Stabil"
+                "Value": "Stabil trend"
             }
         ],
         "TaxonIds": []
@@ -621,11 +621,11 @@
         "Names": [
             {
                 "CultureCode": "en-GB",
-                "Value": "Unknown"
+                "Value": "Unknown Trend"
             },
             {
                 "CultureCode": "sv-SE",
-                "Value": "Okänd"
+                "Value": "Okänd trend"
             }
         ],
         "TaxonIds": []
@@ -637,11 +637,11 @@
         "Names": [
             {
                 "CultureCode": "en-GB",
-                "Value": "Unsure"
+                "Value": "Uncertain Trend"
             },
             {
                 "CultureCode": "sv-SE",
-                "Value": "Osäker"
+                "Value": "Osäker trend"
             }
         ],
         "TaxonIds": [],
