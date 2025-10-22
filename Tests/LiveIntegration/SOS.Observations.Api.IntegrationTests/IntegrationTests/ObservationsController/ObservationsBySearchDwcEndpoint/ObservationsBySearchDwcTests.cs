@@ -9,7 +9,7 @@ using Xunit;
 
 namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.ObservationsController.ObservationsBySearchDwcEndpoint
 {
-    [Collection(Collections.ApiIntegrationTestsCollection)]
+    [Collection(Fixtures.Collections.ApiIntegrationTestsCollection)]
     public class ObservationsBySearchDwcTests
     {
         private readonly ApiIntegrationTestFixture _fixture;

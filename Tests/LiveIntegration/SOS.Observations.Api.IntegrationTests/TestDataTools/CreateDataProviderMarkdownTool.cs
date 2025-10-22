@@ -11,7 +11,7 @@ using Xunit;
 
 namespace SOS.Observations.Api.LiveIntegrationTests.TestDataTools
 {
-    [Collection(Collections.ApiIntegrationTestsCollection)]
+    [Collection(Fixtures.Collections.ApiIntegrationTestsCollection)]
     public class CreateDataProviderMarkdownTool
     {
         private readonly ApiIntegrationTestFixture _fixture;

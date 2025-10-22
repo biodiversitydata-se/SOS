@@ -7,7 +7,7 @@ using Xunit;
 
 namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.VocabulariesController
 {
-    [Collection(Collections.ApiIntegrationTestsCollection)]
+    [Collection(Fixtures.Collections.ApiIntegrationTestsCollection)]
     public class VocabularyIntegrationTests
     {
         private readonly ApiIntegrationTestFixture _fixture;

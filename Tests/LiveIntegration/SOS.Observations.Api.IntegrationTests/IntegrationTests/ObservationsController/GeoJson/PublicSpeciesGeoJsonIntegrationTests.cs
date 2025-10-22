@@ -12,7 +12,7 @@ using Xunit;
 
 namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.ObservationsController.GeoJson
 {
-    [Collection(Collections.ApiIntegrationTestsCollection)]
+    [Collection(Fixtures.Collections.ApiIntegrationTestsCollection)]
     public class PublicSpeciesGeoJsonIntegrationTests
     {
         private readonly ApiIntegrationTestFixture _fixture;

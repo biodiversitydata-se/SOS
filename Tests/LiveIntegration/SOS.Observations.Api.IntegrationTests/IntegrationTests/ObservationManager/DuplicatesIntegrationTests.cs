@@ -6,7 +6,7 @@ using Xunit;
 
 namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.ObservationManager
 {
-    [Collection(Collections.ApiIntegrationTestsCollection)]
+    [Collection(Fixtures.Collections.ApiIntegrationTestsCollection)]
     public class DuplicatesIntegrationTests
     {
         private readonly ApiIntegrationTestFixture _fixture;

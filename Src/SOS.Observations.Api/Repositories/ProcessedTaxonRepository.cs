@@ -2,13 +2,13 @@
 using Elastic.Clients.Elasticsearch;
 using Elastic.Clients.Elasticsearch.Aggregations;
 using Elastic.Clients.Elasticsearch.Cluster;
-using Elastic.Clients.Elasticsearch.Fluent;
 using Elastic.Clients.Elasticsearch.QueryDsl;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver.Linq;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Shared;
+using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Gis;
@@ -50,7 +50,7 @@ namespace SOS.Observations.Api.Repositories
             public Dictionary<string, int> ObservationCountByProvinceId { get; set; } = new Dictionary<string, int>();
             public int ObservationCount { get; set; }
         }
-
+        
         private class TaxonAggregationTreeNodeSum
         {
             public DateTime? FirstSighting { get; set; }
@@ -482,6 +482,141 @@ namespace SOS.Observations.Api.Repositories
             return searchResponse;
         }
 
+        public async Task<Dictionary<int, TaxonAreaAggregation>> GetTaxonAreaAggregationAsync(
+            SearchFilter filter,
+            AreaTypeAggregate? areaType)
+        {
+            var index = GetCurrentIndex(filter);
+            var (query, excludeQuery) = GetCoreQueries<dynamic>(filter);
+            var sources = GetAreaAggregationSources(areaType);
+
+            var itemsByTaxonId = new Dictionary<int, TaxonAreaAggregation>(capacity: 10_000);
+            IReadOnlyDictionary<Field, FieldValue>? nextPageKey = null;
+            var pageTake = MaxNrElasticSearchAggregationBuckets;           
+
+            do
+            {
+                var searchResponse = await TaxonAreaCompositeAggregationAsync(
+                    index, query, excludeQuery, nextPageKey, sources, pageTake);
+
+                var compositeTaxonAgg = searchResponse.Aggregations.GetComposite("taxonComposite");
+
+                foreach (var bucket in compositeTaxonAgg.Buckets)
+                {
+                    if (!bucket.Key.TryGetValue("taxonId", out var taxonFieldValue))
+                        continue;
+
+                    if (!taxonFieldValue.TryGetLong(out var taxonIdLong))
+                        continue;
+
+                    var taxonId = (int)taxonIdLong;
+                    var observationCount = (int)bucket.DocCount;
+
+                    if (!itemsByTaxonId.TryGetValue(taxonId, out var taxonAgg))
+                    {
+                        taxonAgg = new TaxonAreaAggregation
+                        {
+                            ObservationCount = observationCount
+                        };
+                        itemsByTaxonId.Add(taxonId, taxonAgg);
+                    }
+                    else
+                    {
+                        taxonAgg.ObservationCount += observationCount;
+                    }
+
+                    // Avoid unnecessary dictionary allocation
+                    if (bucket.Key.TryGetValue("featureId", out var featureFieldValue) &&
+                        featureFieldValue.TryGetString(out var featureId))
+                    {
+                        var dict = taxonAgg.ObservationCountByAreaFeatureId
+                            ??= new Dictionary<string, int>(capacity: 4);
+
+                        // Faster than TryAdd + re-calculation
+                        if (dict.TryGetValue(featureId, out var existing))
+                            dict[featureId] = existing + observationCount;
+                        else
+                            dict[featureId] = observationCount;
+                    }
+                }
+
+                // Avoid .ToDictionary() → don't allocate new every time
+                if (compositeTaxonAgg.Buckets.Count >= pageTake && compositeTaxonAgg.AfterKey is not null)
+                {
+                    var afterKey = new Dictionary<Field, FieldValue>(2);
+                    foreach (var kv in compositeTaxonAgg.AfterKey)
+                        afterKey[kv.Key.ToField()] = kv.Value;
+                    nextPageKey = afterKey;
+                }
+                else
+                {
+                    nextPageKey = null;
+                }
+
+            } while (nextPageKey is not null);
+
+            return itemsByTaxonId;
+        }
+
+        private ICollection<IDictionary<string, CompositeAggregationSource>> GetAreaAggregationSources(AreaTypeAggregate? areaType)
+        {
+            var sources = new List<IDictionary<string, CompositeAggregationSource>>
+            {
+                CreateCompositeTermsAggregationSource(("taxonId", "taxon.id", SortOrder.Asc))
+            };
+
+            if (areaType is null)
+                return sources;
+
+            var path = areaType switch
+            {
+                AreaTypeAggregate.County => "location.county.featureId",
+                AreaTypeAggregate.Province => "location.province.featureId",
+                AreaTypeAggregate.Municipality => "location.municipality.featureId",
+                AreaTypeAggregate.CountryRegion => "location.countryRegion.featureId",
+                _ => throw new ArgumentException($"{areaType} area type is not supported", nameof(areaType))
+            };
+
+            sources.Add(CreateCompositeTermsAggregationSource(("featureId", path, SortOrder.Asc)));
+            return sources;
+        }
+
+        private async Task<SearchResponse<dynamic>> TaxonAreaCompositeAggregationAsync(
+            string indexName,
+            ICollection<Action<QueryDescriptor<dynamic>>> queries,
+            ICollection<Action<QueryDescriptor<dynamic>>> excludeQueries,
+            IReadOnlyDictionary<Field, FieldValue> nextPage,
+            ICollection<IDictionary<string, CompositeAggregationSource>> sources,
+            int take)
+        {            
+            var searchResponse = await Client.SearchAsync<dynamic>(s => s
+                .Index(indexName)
+                .Query(q => q
+                    .Bool(b => b
+                        .MustNot(excludeQueries.ToArray())
+                        .Filter(queries.ToArray())
+                    )
+                )
+                .Aggregations(a => a
+                    .Add("taxonComposite", a => a
+                         .Composite(c => c
+                            .Size(take)
+                            .After(a => nextPage?.ToFluentDictionary())
+                            .Sources(sources)
+                        )
+                    )
+                )                                 
+                .AddDefaultAggrigationSettings()
+                .RequestConfiguration(r => r
+                    .RequestTimeout(TimeSpan.FromMinutes(5)) // 5 minutes timeout
+                )
+            );
+
+            searchResponse.ThrowIfInvalid();
+
+            return searchResponse;
+        }
+
         private async Task<Dictionary<int, (int, DateTime?, DateTime?)>> TaxaTermsAggregationAsync(
             string indexName,
             ICollection<Action<QueryDescriptor<dynamic>>> queries,
@@ -535,6 +670,108 @@ namespace SOS.Observations.Api.Repositories
             }
 
             return observationCountByTaxonId;
+        }
+
+        private async Task<(Dictionary<int, (int, DateTime?, DateTime?)>, int)> TaxaTermsAggregationWithTotalCountAsync(
+            string indexName,
+            ICollection<Action<QueryDescriptor<dynamic>>> queries,
+            ICollection<Action<QueryDescriptor<dynamic>>> excludeQueries,
+            int size)
+        {
+            var searchResponse = await Client.SearchAsync<dynamic>(s => s
+                .Index(indexName)
+                .Query(q => q
+                    .Bool(b => b
+                        .MustNot(excludeQueries.ToArray())
+                        .Filter(queries.ToArray())
+                    )
+                )
+                .Aggregations(a => a
+                    .Add("uniqueTaxaCount", aa => aa
+                        .Cardinality(c => c.Field("taxon.id"))
+                    )
+                    .Add("taxa", a => a
+                        .Terms(t => t
+                            .Field("taxon.id")
+                            .Size(size)
+                            .ShardSize(size * 5)
+                            .ValueType("long")
+                        )
+                        .Aggregations(a => a
+                            .Add("firstSighting", a => a
+                                .Min(m => m
+                                    .Field("event.startDate")
+                                )
+                            )
+                            .Add("lastSighting", a => a
+                                .Max(m => m
+                                    .Field("event.startDate")
+                                )
+                            )
+                        )
+                    )
+                )
+                .AddDefaultAggrigationSettings()
+            );
+
+            searchResponse.ThrowIfInvalid();
+
+            var uniqueTaxaCountAgg = searchResponse.Aggregations.GetCardinality("uniqueTaxaCount");
+            var observationCountByTaxonId = new Dictionary<int, (int, DateTime?, DateTime?)>();
+            foreach (var bucket in searchResponse.Aggregations.GetLongTerms("taxa").Buckets)
+            {
+                observationCountByTaxonId.Add((int)bucket.Key,
+                    (
+                        (int)bucket.DocCount,
+                        DateTime.Parse(bucket.Aggregations.GetMin("firstSighting").ValueAsString),
+                        DateTime.Parse(bucket.Aggregations.GetMax("lastSighting").ValueAsString)
+                    )
+                );
+            }
+
+            return (observationCountByTaxonId, (int)uniqueTaxaCountAgg.Value);
+        }
+
+        private async Task<(Dictionary<int, int>, int)> TaxaTermsAggregationOnlyTaxaAsync(
+            string indexName,
+            ICollection<Action<QueryDescriptor<dynamic>>> queries,
+            ICollection<Action<QueryDescriptor<dynamic>>> excludeQueries,
+            int size)
+        {
+            var searchResponse = await Client.SearchAsync<dynamic>(s => s
+                .Index(indexName)
+                .Query(q => q
+                    .Bool(b => b
+                        .MustNot(excludeQueries.ToArray())
+                        .Filter(queries.ToArray())
+                    )
+                )
+                .Aggregations(a => a
+                    .Add("uniqueTaxaCount", aa => aa
+                        .Cardinality(c => c.Field("taxon.id"))
+                    )
+                    .Add("taxa", a => a
+                        .Terms(t => t
+                            .Field("taxon.id")
+                            .Size(size)
+                            .ShardSize(size * 5)
+                            .ValueType("long")
+                        )
+                    )
+                )
+                .AddDefaultAggrigationSettings()
+            );
+
+            searchResponse.ThrowIfInvalid();
+
+            var uniqueTaxaCountAgg = searchResponse.Aggregations.GetCardinality("uniqueTaxaCount");
+            var observationCountByTaxonId = new Dictionary<int, int>();
+            foreach (var bucket in searchResponse.Aggregations.GetLongTerms("taxa").Buckets)
+            {
+                observationCountByTaxonId.Add((int)bucket.Key,(int)bucket.DocCount);
+            }
+
+            return (observationCountByTaxonId, (int)uniqueTaxaCountAgg.Value);
         }
 
         /// <summary>
@@ -672,6 +909,11 @@ namespace SOS.Observations.Api.Repositories
             }
             else
             {
+                if (take != null && take + skip.GetValueOrDefault() < 1000)
+                {
+                    return await GetTaxonAggregationApproximateAsync(filter, skip, take);
+                }
+
                 observationCountByTaxonId = await GetTaxonAggregationAsync(filter);
             }
 
@@ -717,6 +959,42 @@ namespace SOS.Observations.Api.Repositories
             };
 
             return Result.Success(pagedResult);
+        }
+
+        public async Task<Result<PagedResult<TaxonAggregationItem>>> GetTaxonAggregationApproximateAsync(
+            SearchFilter filter,
+            int? skip,
+            int? take)
+        {
+            skip ??= 0;
+            take ??= 100;
+
+            var indexName = GetCurrentIndex(filter);
+            var (query, excludeQuery) = GetCoreQueries<dynamic>(filter);
+            var result = await TaxaTermsAggregationWithTotalCountAsync(indexName, query, excludeQuery, skip.Value + take.Value);
+
+            var observationCountByTaxonId = result.Item1;
+            var uniqueTaxaCount = result.Item2;
+
+            var taxaResult = observationCountByTaxonId
+                .Select(b => TaxonAggregationItem.Create(
+                    b.Key,
+                    b.Value.Item1,
+                    b.Value.Item2,
+                    b.Value.Item3))
+                .OrderByDescending(m => m.ObservationCount)
+                .ThenBy(m => m.TaxonId)
+                .Skip(skip.Value)
+                .Take(take.Value)
+                .ToList();
+
+            return Result.Success(new PagedResult<TaxonAggregationItem>
+            {
+                Records = taxaResult,
+                Skip = skip.Value,
+                Take = take.Value,
+                TotalCount = uniqueTaxaCount
+            });
         }
 
         /// <summary>
@@ -838,6 +1116,55 @@ namespace SOS.Observations.Api.Repositories
             return result;
         }
 
+        public async Task<Result<List<int>>> GetObservedTaxaAsync(SearchFilter filter)
+        {
+            var index = GetCurrentIndex(filter);
+            var (query, excludeQuery) = GetCoreQueries<dynamic>(filter);
+            var allIds = new HashSet<int>();            
+            IReadOnlyDictionary<Field, FieldValue> nextPage = null;            
+
+            do
+            {                
+                var response = await Client.SearchAsync<dynamic>(s => s
+                    .Index(index)
+                    .Size(0)
+                    .Query(q => q
+                        .Bool(b => b
+                            .MustNot(excludeQuery.ToArray())
+                            .Filter(query.ToArray())
+                        )
+                    )
+                    .Aggregations(a => a
+                        .Add("taxonComposite", a => a
+                            .Composite(c => c
+                                .After(a => nextPage?.ToFluentDictionary())                                
+                                .Size(MaxNrElasticSearchAggregationBuckets)
+                                .Sources(
+                                    [
+                                        CreateCompositeTermsAggregationSource(
+                                            ("taxon_id", "taxon.id", SortOrder.Asc)
+                                        )
+                                    ]
+                                )
+                            )
+
+                    
+                        )
+                    )
+                );
+
+                var compositeAgg = response.Aggregations.GetComposite("taxonComposite");
+                if (compositeAgg == null)
+                    break;
+
+                foreach (var bucket in compositeAgg.Buckets)
+                    allIds.Add(Convert.ToInt32(bucket.Key["taxon_id"].Value));                
+                nextPage = compositeAgg.AfterKey?.ToDictionary(ak => ak.Key.ToField(), ak => ak.Value);                
+            }
+            while (nextPage != null);
+            
+            return Result.Success(allIds.ToList());
+        }     
 
         /// <inheritdoc />
         public async Task<IEnumerable<TaxonAggregationItem>> GetTaxonExistsIndicationAsync(

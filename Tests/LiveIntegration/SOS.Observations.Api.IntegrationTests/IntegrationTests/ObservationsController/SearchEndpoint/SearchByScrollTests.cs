@@ -14,7 +14,7 @@ using Xunit;
 
 namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.ObservationsController.SearchEndpoint
 {
-    [Collection(Collections.ApiIntegrationTestsCollection)]
+    [Collection(Fixtures.Collections.ApiIntegrationTestsCollection)]
     public class SearchByScrollTests
     {
         private readonly ApiIntegrationTestFixture _fixture;

@@ -5,7 +5,7 @@ using Xunit;
 
 namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.Processing
 {
-    [Collection(Collections.ApiIntegrationTestsCollection)]
+    [Collection(Fixtures.Collections.ApiIntegrationTestsCollection)]
     public class SersIntegrationTests
     {
         private readonly ApiIntegrationTestFixture _fixture;

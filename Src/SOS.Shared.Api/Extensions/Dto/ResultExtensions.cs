@@ -8,7 +8,7 @@ using System.Text.Json.Nodes;
 namespace SOS.Shared.Api.Extensions.Dto
 {
     public static class ResultExtensions
-    {
+    {        
         public static GeoGridResultDto ToGeoGridResultDto(this GeoGridTileResult geoGridTileResult, long totalGridCellCount)
         {
             return new GeoGridResultDto

@@ -11,7 +11,7 @@ using Xunit;
 
 namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.LocationsController
 {
-    [Collection(Collections.ApiIntegrationTestsCollection)]
+    [Collection(Fixtures.Collections.ApiIntegrationTestsCollection)]
     public class LocationsControllerTests
     {
         private readonly ApiIntegrationTestFixture _fixture;
