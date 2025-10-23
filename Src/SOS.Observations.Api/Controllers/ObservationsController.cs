@@ -2329,6 +2329,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="sensitiveObservations">If true, only sensitive (protected) observations will be searched (this requires authentication and authorization). If false, public available observations will be searched.</param>
         /// <param name="sumTaxaTree">If true, all taxa will be returned with observation count sum.</param>
         /// <param name="pruneTaxaTree">If true and sumTaxaTree is true, the result will be pruned to remove nodes with no observations.</param>
+        /// <param name="createFile">If true, the result will be returned as JSON file.</param>
         /// <returns></returns>
         [HttpPost("Internal/TaxonAreaAggregation")]
         [ProducesResponseType(typeof(Dictionary<int, TaxonAreaAggregation>), (int)HttpStatusCode.OK)]
@@ -2345,7 +2346,8 @@ namespace SOS.Observations.Api.Controllers
             [FromQuery] bool validateSearchFilter = false,            
             [FromQuery] bool sensitiveObservations = false,
             [FromQuery] bool sumTaxaTree = false,
-            [FromQuery] bool pruneTaxaTree = false)
+            [FromQuery] bool pruneTaxaTree = false,
+            [FromQuery] bool createFile = false)
         {
             ApiUserType userType = this.GetApiUserType();
             SemaphoreResult semaphoreResult = null;
@@ -2394,7 +2396,14 @@ namespace SOS.Observations.Api.Controllers
                         aggregateArea: areaType.HasValue, 
                         pruneTaxaTree);
                 }
-                
+
+                if (createFile)
+                {
+                    var json = JsonSerializer.Serialize(result);
+                    var bytes = Encoding.UTF8.GetBytes(json);
+                    return File(bytes, "application/json", "taxon-area-aggregation.json");
+                }
+
                 return new OkObjectResult(result);
             }
             catch (AuthenticationRequiredException e)
