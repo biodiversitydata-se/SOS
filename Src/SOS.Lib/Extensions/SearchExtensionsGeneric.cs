@@ -203,7 +203,7 @@ namespace SOS.Lib.Extensions
                 }
                 else if (filter.DateFilterType == DateFilter.DateRangeFilterType.OnlyStartDate)
                 {
-                    if (filter.StartDate.HasValue && filter.EndDate.HasValue)
+                    if (filter.StartDate.HasValue || filter.EndDate.HasValue)
                     {
                         queries.Add(q => q.Range(new DateRangeQuery(startDateField)
                         {
@@ -214,7 +214,7 @@ namespace SOS.Lib.Extensions
                 }
                 else if (filter.DateFilterType == DateFilter.DateRangeFilterType.OnlyEndDate)
                 {
-                    if (filter.StartDate.HasValue && filter.EndDate.HasValue)
+                    if (filter.StartDate.HasValue || filter.EndDate.HasValue)
                     {
                         queries.Add(q => q.Range(new DateRangeQuery(endDateField)
                         {

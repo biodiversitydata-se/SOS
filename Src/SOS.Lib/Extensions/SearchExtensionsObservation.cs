@@ -147,8 +147,15 @@ namespace SOS.Lib
                 queries.TryAddTermsCriteria("occurrence.activity.id", internalFilter.ActivityIds);
                 queries.TryAddTermCriteria("occurrence.biotope.id", internalFilter.BiotopeId);
                 queries.TryAddTermsCriteria("occurrence.lifeStage.id", internalFilter.LifeStageIds);
-                queries.TryAddDateRangeCriteria("occurrence.reportedDate", internalFilter.ReportedDateFrom, RangeTypes.GreaterThanOrEquals);
-                queries.TryAddDateRangeCriteria("occurrence.reportedDate", internalFilter.ReportedDateTo, RangeTypes.LessThanOrEquals);
+                if (internalFilter.ReportedDateFrom.HasValue || internalFilter.ReportedDateTo.HasValue)
+                {
+                    queries.Add(q => q.Range(new DateRangeQuery("occurrence.reportedDate")
+                    {
+                        Gte = internalFilter.ReportedDateFrom?.ToUniversalTime(),
+                        Lte = internalFilter.ReportedDateTo?.ToUniversalTime()
+                    }));
+                }
+
                 queries.TryAddTermCriteria("occurrence.substrate.id", internalFilter.SubstrateId);
                 queries.TryAddTermCriteria("occurrence.substrate.speciesId", internalFilter.SubstrateSpeciesId);
                 queries.TryAddTermCriteria("privateCollection", internalFilter.PrivateCollection);
@@ -480,8 +487,14 @@ namespace SOS.Lib
         {
             if (filter != null)
             {
-                queries.TryAddDateRangeCriteria("modified", filter.From, RangeTypes.GreaterThanOrEquals);
-                queries.TryAddDateRangeCriteria("modified", filter.To, RangeTypes.LessThanOrEquals);
+                if (filter.From.HasValue || filter.To.HasValue)
+                {
+                    queries.Add(q => q.Range(new DateRangeQuery("modified")
+                    {
+                        Gte = filter.From?.ToUniversalTime(),
+                        Lte = filter.To?.ToUniversalTime()
+                    }));
+                }
             }
         }
 

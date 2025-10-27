@@ -34,6 +34,7 @@ public static class SeriLogHelper
                 .MinimumLevel.Override("Microsoft.AspNetCore.Mvc.Infrastructure", Serilog.Events.LogEventLevel.Warning)
                 .MinimumLevel.Override("Microsoft.AspNetCore.Cors.Infrastructure", Serilog.Events.LogEventLevel.Warning)
                 .Filter.ByExcluding(Matching.WithProperty<string>("RequestPath", p => p == "/healthz"))
+                .Filter.ByExcluding(Matching.WithProperty<string>("RequestPath", p => p == "/metrics"))
             .CreateLogger();
 
         return logger;
@@ -125,6 +126,7 @@ public static class SeriLogHelper
                 .MinimumLevel.Override("Microsoft.AspNetCore.Mvc.Infrastructure", Serilog.Events.LogEventLevel.Warning)
                 .MinimumLevel.Override("Microsoft.AspNetCore.Cors.Infrastructure", Serilog.Events.LogEventLevel.Warning)
                 .Filter.ByExcluding(Matching.WithProperty<string>("RequestPath", p => p == "/healthz"))
+                .Filter.ByExcluding(Matching.WithProperty<string>("RequestPath", p => p == "/metrics"))
                 .ReadFrom.Configuration(ctx.Configuration)
             );
         }
