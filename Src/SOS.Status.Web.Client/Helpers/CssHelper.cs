@@ -22,14 +22,18 @@ public static class CssHelper
             return "bg-danger";
     }
 
-    public static string GetStatusCellDiffStyle(int activeValue, int inactiveValue, bool noColorWhenPositiveDiff = false)
+    public static string GetStatusCellDiffStyle(int activeValue, int inactiveValue, ColorMode colorMode = ColorMode.Default)
     {
         int diff = activeValue - inactiveValue;
         string bgColor;
 
         if (diff >= 0)
         {
-            if (noColorWhenPositiveDiff)
+            if (colorMode == ColorMode.NoColorWhenPositiveDiff)
+            {
+                return "";
+            }
+            if (colorMode == ColorMode.NoColorWhenNoChange && diff == 0)
             {
                 return "";
             }
@@ -49,5 +53,12 @@ public static class CssHelper
         //    bgColor = CustomTheme.MyCustomTheme.PaletteLight.Error.Value;
 
         return $"background-color: {bgColor};";
+    }
+
+    public enum ColorMode
+    {
+        Default,
+        NoColorWhenPositiveDiff,
+        NoColorWhenNoChange
     }
 }

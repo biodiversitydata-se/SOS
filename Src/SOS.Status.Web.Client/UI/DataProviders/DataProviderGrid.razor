@@ -17,19 +17,13 @@
         @* <PropertyColumn Property="x => x.ProcessedPerSecondActive" Title="Process/second" Format="N0" Sortable="false" /> *@
     </Columns>
     <ChildRowContent>        
-        <MudSimpleTable Bordered="true" Striped="true" Dense="true">
-            <colgroup>
-                <col style="width:1%; white-space:nowrap;" /> <!-- Property -->
-                <col style="width: 1%; min-width:100px; white-space:nowrap;" /> <!-- Active -->
-                <col style="width: 1%; min-width:100px; white-space:nowrap;" /> <!-- Inactive -->
-                <col /> <!-- Diff -->
-            </colgroup>
+        <MudSimpleTable Bordered="true" Striped="true" Dense="true">            
             <thead>
                 <tr>
                     <th>Property</th>
                     <th>Active</th>
                     <th>Inactive</th>
-                    <th>Diff</th>
+                    <th>Diff</th>                    
                 </tr>
             </thead>
             <tbody>
@@ -37,19 +31,25 @@
                     <td>Public</td>
                     <td>@context.Item.PublicActive.ToString("N0")</td>
                     <td>@context.Item.PublicInactive.ToString("N0")</td>
-                    <td>@(context.Item.PublicDiff != 0 ? context.Item.PublicDiff.ToString("N0") : "")</td>
+                    <td style="@CssHelper.GetStatusCellDiffStyle(context.Item.PublicActive, context.Item.PublicInactive, CssHelper.ColorMode.NoColorWhenNoChange)">
+                        @(context.Item.PublicDiff != 0 ? context.Item.PublicDiff.ToString("N0") : "")
+                    </td>                                        
                 </tr>
                 <tr>
                     <td>Protected</td>
                     <td>@context.Item.ProtectedActive.ToString("N0")</td>
                     <td>@context.Item.ProtectedInactive.ToString("N0")</td>
-                    <td>@(context.Item.ProtectedDiff != 0 ? context.Item.ProtectedDiff.ToString("N0") : "")</td>
+                    <td style="@CssHelper.GetStatusCellDiffStyle(context.Item.ProtectedActive, context.Item.ProtectedInactive, CssHelper.ColorMode.NoColorWhenNoChange)">                    
+                        @(context.Item.ProtectedDiff != 0 ? context.Item.ProtectedDiff.ToString("N0") : "")
+                    </td>                    
                 </tr>
                 <tr>
                     <td>Invalid</td>
                     <td>@context.Item.InvalidActive.ToString("N0")</td>
                     <td>@context.Item.InvalidInactive.ToString("N0")</td>
-                    <td>@(context.Item.InvalidDiff != 0 ? context.Item.InvalidDiff.ToString("N0") : "")</td>
+                    <td style="@CssHelper.GetStatusCellDiffStyle(context.Item.InvalidInactive, context.Item.InvalidActive, CssHelper.ColorMode.NoColorWhenNoChange)">                                        
+                        @(context.Item.InvalidDiff != 0 ? context.Item.InvalidDiff.ToString("N0") : "")
+                    </td>                    
                 </tr>
                 <tr>
                     <td>Harvest</td>
