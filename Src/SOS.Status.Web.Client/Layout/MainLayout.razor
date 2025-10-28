@@ -36,27 +36,32 @@
             </NotAuthorized>
         </AuthorizeView>
 
-        <MudIconButton Icon="@Icons.Material.Filled.Palette"
-                       OnClick="@((e) => OnOpenThemeManager(true))"
-                       Color="Color.Inherit"
-                        />
-        @* <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End" /> *@
-        <MudIconButton Icon="@GetDrawerIcon()"
-                       OnClick="@OnToggleRightDrawer"
-                       Color="Color.Inherit"
-                       Edge="Edge.End"
-                       Title="Open/close right panel" />
+        @if (!AppEnvironment.IsProduction())
+        {
+            <MudIconButton 
+                Icon="@Icons.Material.Filled.Palette"
+                OnClick="@((e) => OnOpenThemeManager(true))"
+                Color="Color.Inherit"
+            />
+            @* <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End" /> *@
+            <MudIconButton 
+                Icon="@GetDrawerIcon()"
+                OnClick="@OnToggleRightDrawer"
+                Color="Color.Inherit"
+                Edge="Edge.End"
+                Title="Open/close right panel" />
+        }
     </MudAppBar> 
     
     <MudDrawer @bind-Open="leftDrawerOpen" ClipMode="_themeManager.DrawerClipMode" Elevation="_themeManager.DrawerElevation">
         <NavMenu />        
     </MudDrawer> 
-    
+
     <MudDrawer Anchor="Anchor.End"
-                Open="@rightDrawerOpen"
-                Elevation="1"
-                ClipMode="DrawerClipMode.Always"
-                Variant="DrawerVariant.Persistent">
+    Open="@rightDrawerOpen"
+    Elevation="1"
+    ClipMode="DrawerClipMode.Always"
+    Variant="DrawerVariant.Persistent">
         <MudDrawerHeader>
             <MudText Typo="Typo.h6">Search filter</MudText>
         </MudDrawerHeader>

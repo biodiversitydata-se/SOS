@@ -16,4 +16,10 @@ public class AppEnvironment : IAppEnvironment
         var env = EnvironmentName.ToLowerInvariant();
         return env == "local" || env == "dev";
     }
+
+    public bool IsProduction()
+    {
+        var env = EnvironmentName.ToLowerInvariant();
+        return env == "prod";
+    }
 }
