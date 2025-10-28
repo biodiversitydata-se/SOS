@@ -13,7 +13,7 @@ using Xunit;
 
 namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.ExportsController
 {
-    [Collection(Collections.ApiIntegrationTestsCollection)]
+    [Collection(Fixtures.Collections.ApiIntegrationTestsCollection)]
     public class ExportToGeoJsonInternalIntegrationTests
     {
         private readonly ApiIntegrationTestFixture _fixture;

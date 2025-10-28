@@ -12,6 +12,7 @@ using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Enums;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Swagger;
 using SOS.Observations.Api.Configuration;
 using SOS.Observations.Api.Helpers;
@@ -850,7 +851,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
         /// <param name="filter">The search filter.</param>
         /// <param name="skip">Start index of returned records. If null, skip will be set to 0.</param>
-        /// <param name="take">Max number of taxa to return. If null, all taxa will be returned. If not null, max number of records is 1000.</param>
+        /// <param name="take">Max number of taxa to return. If null, all taxa will be returned. If not null, max number of records is 1000.</param>        
         /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
         /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
         /// <param name="sensitiveObservations">If true, only sensitive (protected) observations will be searched (this requires authentication and authorization). If false, public available observations will be searched.</param>
@@ -867,7 +868,7 @@ namespace SOS.Observations.Api.Controllers
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
             [FromBody] SearchFilterAggregationDto filter,
             [FromQuery] int? skip = null,
-            [FromQuery] int? take = null,
+            [FromQuery] int? take = null,            
             [FromQuery] bool validateSearchFilter = false,
             [FromQuery] string translationCultureCode = "sv-SE",
             [FromQuery] bool sensitiveObservations = false)
@@ -903,8 +904,7 @@ namespace SOS.Observations.Api.Controllers
                     _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
                     _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries),
                     _inputValidator.ValidateTranslationCultureCode(translationCultureCode),
-                    _inputValidator.ValidateTaxonAggregationPagingArguments(skip, take),
-                    await _inputValidator.ValidateTilesLimitAsync(boundingBox, 1, _observationManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, searchFilter))
+                    _inputValidator.ValidateTaxonAggregationPagingArguments(skip, take)
                 );
 
                 if (validationResult.IsFailure)
@@ -2093,7 +2093,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
         /// <param name="filter">The search filter.</param>
         /// <param name="skip">Start index of returned records. If null, skip will be set to 0.</param>
-        /// <param name="take">Max number of taxa to return. If null, all taxa will be returned. If not null, max number of records is 1000.</param>
+        /// <param name="take">Max number of taxa to return. If null, all taxa will be returned. If not null, max number of records is 1000.</param>        
         /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
         /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
         /// <param name="sensitiveObservations">If true, only sensitive (protected) observations will be searched (this requires authentication and authorization). If false, public available observations will be searched.</param>
@@ -2112,7 +2112,7 @@ namespace SOS.Observations.Api.Controllers
             [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
             [FromBody] SearchFilterAggregationInternalDto filter,
             [FromQuery] int? skip = null,
-            [FromQuery] int? take = null,
+            [FromQuery] int? take = null,            
             [FromQuery] bool validateSearchFilter = false,
             [FromQuery] string translationCultureCode = "sv-SE",
             [FromQuery] bool sensitiveObservations = false,
@@ -2170,8 +2170,7 @@ namespace SOS.Observations.Api.Controllers
                     _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
                     _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries),
                     _inputValidator.ValidateTranslationCultureCode(translationCultureCode),
-                    _inputValidator.ValidateTaxonAggregationPagingArguments(skip, take),
-                    await _inputValidator.ValidateTilesLimitAsync(boundingBox, 1, _observationManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, searchFilter), true)
+                    _inputValidator.ValidateTaxonAggregationPagingArguments(skip, take)                    
                     );
 
                 if (validationResult.IsFailure)
@@ -2226,6 +2225,207 @@ namespace SOS.Observations.Api.Controllers
             finally
             {
                 semaphoreResult.Semaphore.Release();
+            }
+        }
+
+        /// <summary>
+        /// Get observed taxa ids matching the provided search filter.
+        /// </summary>
+        /// <param name="roleId">Limit user authorization too specified role</param>
+        /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
+        /// <param name="filter">The search filter.</param>
+        /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
+        /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
+        /// <param name="sensitiveObservations">If true, only sensitive (protected) observations will be searched (this requires authentication and authorization). If false, public available observations will be searched.</param>
+        /// <returns></returns>
+        [HttpPost("Internal/ObservedTaxa")]
+        [ProducesResponseType(typeof(List<int>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.ServiceUnavailable)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [InternalApi]
+        public async Task<IActionResult> ObservedTaxaInternal(
+            [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
+            [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
+            [FromBody] SearchFilterAggregationInternalDto filter,            
+            [FromQuery] bool validateSearchFilter = false,
+            [FromQuery] string translationCultureCode = "sv-SE",
+            [FromQuery] bool sensitiveObservations = false)
+        {
+            ApiUserType userType = this.GetApiUserType();
+            var semaphoreResult = await _semaphoreLimitManager.GetSemaphoreAsync(SemaphoreType.Aggregation, userType, this.GetEndpointName(ControllerContext));
+            LogHelper.AddSemaphoreHttpContextItems(semaphoreResult, HttpContext);
+            if (semaphoreResult.Semaphore == null) return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
+
+            try
+            {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
+
+                // sensitiveObservations is preserved for backward compability
+                filter.ProtectionFilter ??= (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
+                this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, filter.ProtectionFilter);
+
+                filter = await _searchFilterUtility.InitializeSearchFilterAsync(filter);
+                var boundingBox = filter.Geographics.BoundingBox.ToEnvelope();
+                var searchFilter = filter.ToSearchFilterInternal(this.GetUserId(), translationCultureCode);
+                translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
+
+                var validationResult = Result.Combine(
+                    validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(filter)) : Result.Success(),
+                    _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
+                    _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries),
+                    _inputValidator.ValidateTranslationCultureCode(translationCultureCode)
+                    );
+
+                if (validationResult.IsFailure)
+                {
+                    return BadRequest(validationResult.Error);
+                }
+
+
+                var result = await _taxonSearchManager.GetObservedTaxaAsync(roleId,
+                    authorizationApplicationIdentifier,
+                    searchFilter);
+
+                if (result.IsFailure)
+                {
+                    return BadRequest(result.Error);
+                }               
+
+                return new OkObjectResult(result.Value);
+            }
+            catch (AuthenticationRequiredException e)
+            {
+                _logger.LogInformation(e, e.Message);
+                _logger.LogInformation($"Unauthorized. X-Authorization-Application-Identifier={authorizationApplicationIdentifier ?? "[null]"}");
+                _logger.LogInformation($"Unauthorized. X-Authorization-Role-Id={roleId?.ToString() ?? "[null]"}");
+                LogUserInformation();
+                return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
+            }
+            catch (TimeoutException)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "TaxonAggregation error.");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+            finally
+            {
+                semaphoreResult.Semaphore.Release();
+            }
+        }
+
+        /// <summary>
+        /// Aggregates observations by taxon and area. If areaType is null aggregation by taxon is used.
+        /// </summary>
+        /// <param name="roleId">Limit user authorization too specified role</param>
+        /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
+        /// <param name="filter">The search filter.</param>
+        /// <param name="areaType">The area type to aggregate by (e.g. County, Province).</param>
+        /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
+        /// <param name="sensitiveObservations">If true, only sensitive (protected) observations will be searched (this requires authentication and authorization). If false, public available observations will be searched.</param>
+        /// <param name="sumTaxaTree">If true, all taxa will be returned with observation count sum.</param>
+        /// <param name="pruneTaxaTree">If true and sumTaxaTree is true, the result will be pruned to remove nodes with no observations.</param>
+        /// <param name="createFile">If true, the result will be returned as JSON file.</param>
+        /// <returns></returns>
+        [HttpPost("Internal/TaxonAreaAggregation")]
+        [ProducesResponseType(typeof(Dictionary<int, TaxonAreaAggregation>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.ServiceUnavailable)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        [InternalApi]
+        public async Task<IActionResult> TaxonAreaAggregationInternal(
+            [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
+            [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
+            [FromBody] SearchFilterAggregationInternalDto filter,
+            [FromQuery] AreaTypeAggregate? areaType = null,
+            [FromQuery] bool validateSearchFilter = false,            
+            [FromQuery] bool sensitiveObservations = false,
+            [FromQuery] bool sumTaxaTree = false,
+            [FromQuery] bool pruneTaxaTree = false,
+            [FromQuery] bool createFile = false)
+        {
+            ApiUserType userType = this.GetApiUserType();
+            SemaphoreResult semaphoreResult = null;
+            if (userType != ApiUserType.Artfakta && userType != ApiUserType.ArtdataInternal) // let Artfakta and ArtdataInternal users bypass semaphore limit
+            {
+                semaphoreResult = await _semaphoreLimitManager.GetSemaphoreAsync(SemaphoreType.Aggregation, userType, this.GetEndpointName(ControllerContext));
+                LogHelper.AddSemaphoreHttpContextItems(semaphoreResult, HttpContext);
+                if (semaphoreResult.Semaphore == null) return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
+            }
+
+            try
+            {
+                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
+                string translationCultureCode = "sv-SE";
+
+                // sensitiveObservations is preserved for backward compability
+                filter.ProtectionFilter ??= (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
+                this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, filter.ProtectionFilter);
+
+                filter = await _searchFilterUtility.InitializeSearchFilterAsync(filter);
+                var boundingBox = filter.Geographics.BoundingBox.ToEnvelope();
+                var searchFilter = filter.ToSearchFilterInternal(this.GetUserId(), translationCultureCode);
+                translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
+
+                var validationResult = Result.Combine(
+                    validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(filter)) : Result.Success(),
+                    _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
+                    _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries),
+                    _inputValidator.ValidateTranslationCultureCode(translationCultureCode)
+                    );
+
+                if (validationResult.IsFailure)
+                {
+                    return BadRequest(validationResult.Error);
+                }
+
+                var result = await _taxonSearchManager.GetTaxonAreaAggregationAsync(roleId,
+                    authorizationApplicationIdentifier,
+                    searchFilter,
+                    areaType);
+
+                if (sumTaxaTree)
+                {                    
+                    await _taxonSearchManager.CreateTaxonAreaSumWithLowMemoryAsync(
+                        result, 
+                        aggregateArea: areaType.HasValue, 
+                        pruneTaxaTree);
+                }
+
+                if (createFile)
+                {
+                    var json = JsonSerializer.Serialize(result);
+                    var bytes = Encoding.UTF8.GetBytes(json);
+                    return File(bytes, "application/json", "taxon-area-aggregation.json");
+                }
+
+                return new OkObjectResult(result);
+            }
+            catch (AuthenticationRequiredException e)
+            {
+                _logger.LogInformation(e, e.Message);
+                _logger.LogInformation($"Unauthorized. X-Authorization-Application-Identifier={authorizationApplicationIdentifier ?? "[null]"}");
+                _logger.LogInformation($"Unauthorized. X-Authorization-Role-Id={roleId?.ToString() ?? "[null]"}");
+                LogUserInformation();
+                return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
+            }
+            catch (TimeoutException)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "TaxonAggregation error.");
+                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+            }
+            finally
+            {
+                semaphoreResult?.Semaphore?.Release();
             }
         }
 

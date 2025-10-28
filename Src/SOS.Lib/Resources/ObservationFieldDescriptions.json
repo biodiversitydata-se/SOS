@@ -708,8 +708,8 @@
   {
     "PropertyName": "TaxonIsInvasiveInSweden",
     "PropertyPath": "Taxon.Attributes.IsInvasiveInSweden",
-    "SwedishTitle": "Främmande i Sverige",
-    "EnglishTitle": "Alien in Sweden",
+    "SwedishTitle": "Invasiv",
+    "EnglishTitle": "Invasive",
     "DataType": "Boolean",
     "DataTypeIsNullable": false,
     "DwcName": "",

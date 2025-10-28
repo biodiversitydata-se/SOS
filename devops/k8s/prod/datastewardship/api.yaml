@@ -86,7 +86,7 @@ spec:
             - containerPort: 5000
           readinessProbe: # ready to accept traffic, failure = stops routing traffic to this pod but does not restart the pod!
             httpGet:
-              path: /health
+              path: /healthz
               port: 5000
               httpHeaders:
               - name: Host

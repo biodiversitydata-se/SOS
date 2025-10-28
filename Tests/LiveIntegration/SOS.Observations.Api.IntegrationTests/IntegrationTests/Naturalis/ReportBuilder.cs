@@ -12,7 +12,7 @@ using Xunit;
 
 namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.Naturalis
 {
-    [Collection(Collections.ApiIntegrationTestsCollection)]
+    [Collection(Fixtures.Collections.ApiIntegrationTestsCollection)]
     public class ReportBuilder
     {
         private readonly ApiIntegrationTestFixture _fixture;

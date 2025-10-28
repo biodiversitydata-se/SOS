@@ -17,7 +17,7 @@ using Xunit;
 
 namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.ObservationsController.MetricGridAggregationEndpoint
 {
-    [Collection(Collections.ApiIntegrationTestsCollection)]
+    [Collection(Fixtures.Collections.ApiIntegrationTestsCollection)]
     public class MetricGridAggregationIntegrationTests
     {
         private readonly ApiIntegrationTestFixture _fixture;

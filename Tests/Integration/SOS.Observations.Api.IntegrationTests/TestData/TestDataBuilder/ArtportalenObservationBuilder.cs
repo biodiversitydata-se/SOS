@@ -589,6 +589,43 @@ namespace SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder
             return operable;
         }
 
+        public static IOperable<ArtportalenObservationVerbatim> WithStartDate(this IOperable<ArtportalenObservationVerbatim> operable, string strDate)
+        {            
+            var builder = ((IDeclaration<ArtportalenObservationVerbatim>)operable).ObjectBuilder;
+
+            builder.With((obs, index) =>
+            {
+                obs.StartDate = DateTime.SpecifyKind(DateTime.Parse(strDate), DateTimeKind.Local);
+            });
+
+            return operable;
+        }
+
+        public static IOperable<ArtportalenObservationVerbatim> WithEndDate(this IOperable<ArtportalenObservationVerbatim> operable, string strDate)
+        {
+            var builder = ((IDeclaration<ArtportalenObservationVerbatim>)operable).ObjectBuilder;
+
+            builder.With((obs, index) =>
+            {
+                obs.EndDate = DateTime.SpecifyKind(DateTime.Parse(strDate), DateTimeKind.Local);
+            });
+            
+            return operable;
+        }
+
+        public static IOperable<ArtportalenObservationVerbatim> WithStartEndDate(this IOperable<ArtportalenObservationVerbatim> operable, string strStartDate, string strEndDate)
+        {
+            var builder = ((IDeclaration<ArtportalenObservationVerbatim>)operable).ObjectBuilder;
+
+            builder.With((obs, index) =>
+            {
+                obs.StartDate = DateTime.SpecifyKind(DateTime.Parse(strStartDate), DateTimeKind.Local);
+                obs.EndDate = DateTime.SpecifyKind(DateTime.Parse(strEndDate), DateTimeKind.Local);
+            });
+
+            return operable;
+        }
+
         public static IOperable<ArtportalenObservationVerbatim> IsInDateSpan(this IOperable<ArtportalenObservationVerbatim> operable, string strSpanStartDate, string strSpanEndDate)
         {
             var spanStartDate = DateTime.SpecifyKind(DateTime.Parse(strSpanStartDate), DateTimeKind.Local);

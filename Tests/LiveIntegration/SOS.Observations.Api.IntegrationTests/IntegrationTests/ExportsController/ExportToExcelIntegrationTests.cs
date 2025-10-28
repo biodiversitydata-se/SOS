@@ -16,7 +16,7 @@ using NetTopologySuite.Geometries;
 
 namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.ExportsController
 {
-    [Collection(Collections.ApiIntegrationTestsCollection)]
+    [Collection(Fixtures.Collections.ApiIntegrationTestsCollection)]
     public class ExportToExcelIntegrationTests
     {
         private readonly ApiIntegrationTestFixture _fixture;

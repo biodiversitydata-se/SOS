@@ -78,7 +78,7 @@ public class UserStatisticsIntegrationTestFixture : FixtureBase, IDisposable
         var taxonManager = CreateTaxonManager(processClient, taxonRepository, memoryCache);
         var userStatisticsProcessedObservationRepository = CreateUserStatisticsProcessedObservationRepository(elasticConfiguration, elasticClientManager, memoryCache, processClient);
 
-        var processedConfigurationCache = new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>()), memoryCache, new NullLogger<CacheBase<string, ProcessedConfiguration>>());
+        var processedConfigurationCache = new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>()), new NullLogger<CacheBase<string, ProcessedConfiguration>>());
         var userStatisticsObservationRepository = new UserStatisticsObservationRepository(elasticClientManager, elasticConfiguration, processedConfigurationCache, 
             new ClassCache<ConcurrentDictionary<string, HealthResponse>>(memoryCache, 
             new NullLogger<ClassCache<ConcurrentDictionary<string, HealthResponse>>>()),
@@ -86,7 +86,7 @@ public class UserStatisticsIntegrationTestFixture : FixtureBase, IDisposable
         var userService = CreateUserService();
         UserStatisticsProcessedObservationRepository = userStatisticsProcessedObservationRepository;
         var areaRepository = new AreaRepository(processClient, new NullLogger<AreaRepository>());
-        var areaCache = new AreaCache(areaRepository, memoryCache, new NullLogger<CacheBase<string, Area>>());
+        var areaCache = new AreaCache(areaRepository, new NullLogger<CacheBase<string, Area>>());
         _userManager = new UserManager(userService, areaCache, new NullLogger<UserManager>());
         var userStatisticsCacheManager = new UserStatisticsCacheManager(new MemoryCache(new MemoryCacheOptions()));
         UserStatisticsManager = new UserStatisticsManager(userStatisticsCacheManager, userStatisticsObservationRepository, userStatisticsProcessedObservationRepository, new NullLogger<UserStatisticsManager>());
@@ -121,7 +121,7 @@ public class UserStatisticsIntegrationTestFixture : FixtureBase, IDisposable
         var userStatisticsProcessedObservationRepository = new UserStatisticsProcessedObservationRepository(
             elasticClientManager,
             elasticConfiguration,
-            new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>()), memoryCache, new NullLogger<CacheBase<string, ProcessedConfiguration>>() ),
+            new ProcessedConfigurationCache(new ProcessedConfigurationRepository(processClient, new NullLogger<ProcessedConfigurationRepository>()), new NullLogger<CacheBase<string, ProcessedConfiguration>>() ),
             new Mock<ITaxonManager>().Object,
             new ClassCache<ConcurrentDictionary<string, HealthResponse>>(memoryCache, new NullLogger<ClassCache<ConcurrentDictionary<string, HealthResponse>>>()),
             memoryCache,

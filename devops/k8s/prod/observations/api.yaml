@@ -20,7 +20,7 @@ metadata:
   name: sos-observations-api
   namespace: sos-observations
 spec:
-  replicas: 3
+  replicas: 2
   selector:
     matchLabels:
       app: sos-observations-api

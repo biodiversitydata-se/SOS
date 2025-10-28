@@ -5,7 +5,7 @@
         "Names": [
             {
                 "CultureCode": "en-GB",
-                "Value": "Protected by law species"
+                "Value": "Species protected by law"
             },
             {
                 "CultureCode": "sv-SE",
@@ -35,7 +35,7 @@
         "Names": [
             {
                 "CultureCode": "en-GB",
-                "Value": "Invasive species"
+                "Value": "Alien species"
             },
             {
                 "CultureCode": "sv-SE",
@@ -51,7 +51,7 @@
         "Names": [
             {
                 "CultureCode": "en-GB",
-                "Value": "Invasive species in Sweden"
+                "Value": "Alien species in Sweden"
             },
             {
                 "CultureCode": "sv-SE",
@@ -67,11 +67,11 @@
         "Names": [
             {
                 "CultureCode": "en-GB",
-                "Value": "EU regulation 1143/2014"
+                "Value": "Invasive Alien Species EU regulation 1143/2014"
             },
             {
                 "CultureCode": "sv-SE",
-                "Value": "EU-förordning 1143/2014"
+                "Value": "EU-förordning 1143/2014, invasiva främmande arter"
             }
         ],
         "TaxonIds": []
@@ -113,7 +113,7 @@
         "Names": [
             {
                 "CultureCode": "en-GB",
-                "Value": "Habitats directive species"
+                "Value": "Habitats Directive species"
             },
             {
                 "CultureCode": "sv-SE",
@@ -129,7 +129,7 @@
         "Names": [
             {
                 "CultureCode": "en-GB",
-                "Value": "Habitats directive Annex 2"
+                "Value": "Habitats Directive Annex 2"
             },
             {
                 "CultureCode": "sv-SE",
@@ -145,7 +145,7 @@
         "Names": [
             {
                 "CultureCode": "en-GB",
-                "Value": "Habitats directive Annex 2, priority species"
+                "Value": "Habitats Directive Annex 2, priority species"
             },
             {
                 "CultureCode": "sv-SE",
@@ -161,7 +161,7 @@
         "Names": [
             {
                 "CultureCode": "en-GB",
-                "Value": "Habitats directive Annex 4"
+                "Value": "Habitats Directive Annex 4"
             },
             {
                 "CultureCode": "sv-SE",
@@ -177,7 +177,7 @@
         "Names": [
             {
                 "CultureCode": "en-GB",
-                "Value": "Habitats directive Annex 5"
+                "Value": "Habitats Directive Annex 5"
             },
             {
                 "CultureCode": "sv-SE",
@@ -192,11 +192,11 @@
         "Names": [
             {
                 "CultureCode": "en-GB",
-                "Value": "Birds Directive"
+                "Value": "Birds, lists"
             },
             {
                 "CultureCode": "sv-SE",
-                "Value": "Fågeldirektivet"
+                "Value": "Fåglar, listor"
             }
         ],
         "TaxonIds": []
@@ -208,11 +208,11 @@
         "Names": [
             {
                 "CultureCode": "en-GB",
-                "Value": "Priority birds"
+                "Value": "Priority birds in the Forestry Act"
             },
             {
                 "CultureCode": "sv-SE",
-                "Value": "Prioriterade fåglar"
+                "Value": "Prioriterade fåglar i Skogsvårdslagen"
             }
         ],
         "TaxonIds": []
@@ -224,7 +224,7 @@
         "Names": [
             {
                 "CultureCode": "en-GB",
-                "Value": "Birds directive - Annex 1"
+                "Value": "Birds Directive - Annex 1"
             },
             {
                 "CultureCode": "sv-SE",
@@ -240,7 +240,7 @@
         "Names": [
             {
                 "CultureCode": "en-GB",
-                "Value": "Birds directive - Annex 2"
+                "Value": "Birds Directive - Annex 2"
             },
             {
                 "CultureCode": "sv-SE",
@@ -286,7 +286,7 @@
         "Names": [
             {
                 "CultureCode": "en-GB",
-                "Value": "Risk assessment - Severe impact"
+                "Value": "Risk assessment - Severe risk"
             },
             {
                 "CultureCode": "sv-SE",
@@ -302,7 +302,7 @@
         "Names": [
             {
                 "CultureCode": "en-GB",
-                "Value": "Risk assessment - High impact"
+                "Value": "Risk assessment - High risk"
             },
             {
                 "CultureCode": "sv-SE",
@@ -318,7 +318,7 @@
         "Names": [
             {
                 "CultureCode": "en-GB",
-                "Value": "Risk assessment - Potentially high impact"
+                "Value": "Risk assessment - Potentially high risk"
             },
             {
                 "CultureCode": "sv-SE",
@@ -334,7 +334,7 @@
         "Names": [
             {
                 "CultureCode": "en-GB",
-                "Value": "Risk assessment - Low impact"
+                "Value": "Risk assessment - Low risk"
             },
             {
                 "CultureCode": "sv-SE",
@@ -350,7 +350,7 @@
         "Names": [
             {
                 "CultureCode": "en-GB",
-                "Value": "Risk assessment - No known impact"
+                "Value": "Risk assessment - No known risk"
             },
             {
                 "CultureCode": "sv-SE",
@@ -461,11 +461,11 @@
         "Names": [
             {
                 "CultureCode": "en-GB",
-                "Value": "Habitats directive species 2023"
+                "Value": "Habitats Directive Species 2023"
             },
             {
                 "CultureCode": "sv-SE",
-                "Value": "Habitatdirektivet 2023"
+                "Value": "Habitatdirektivet arter 2023"
             }
         ],
         "TaxonIds": []
@@ -477,7 +477,7 @@
         "Names": [
             {
                 "CultureCode": "en-GB",
-                "Value": "Preservation status"
+                "Value": "Conservation status"
             },
             {
                 "CultureCode": "sv-SE",
@@ -493,11 +493,11 @@
         "Names": [
             {
                 "CultureCode": "en-GB",
-                "Value": "Prosperous Preservation Status"
+                "Value": "Favourable Conservation Status"
             },
             {
                 "CultureCode": "sv-SE",
-                "Value": "Gynnsamma bevarandestatus"
+                "Value": "Gynnsam bevarandestatus"
             }
         ],
         "TaxonIds": []
@@ -509,7 +509,7 @@
         "Names": [
             {
                 "CultureCode": "en-GB",
-                "Value": "Unsatisfactory Preservation Status"
+                "Value": "Unsatisfactory Conservation Status"
             },
             {
                 "CultureCode": "sv-SE",
@@ -525,7 +525,7 @@
         "Names": [
             {
                 "CultureCode": "en-GB",
-                "Value": "Bad Preservation Status"
+                "Value": "Poor Conservation Status"
             },
             {
                 "CultureCode": "sv-SE",
@@ -541,7 +541,7 @@
         "Names": [
             {
                 "CultureCode": "en-GB",
-                "Value": "Unknown Preservation Status"
+                "Value": "Unknown Conservation Status"
             },
             {
                 "CultureCode": "sv-SE",
@@ -557,11 +557,11 @@
         "Names": [
             {
                 "CultureCode": "en-GB",
-                "Value": "Trend"
+                "Value": "Trend Conservation Status"
             },
             {
                 "CultureCode": "sv-SE",
-                "Value": "Trend"
+                "Value": "Trend bevarandestatus"
             }
         ],
         "TaxonIds": []
@@ -573,11 +573,11 @@
         "Names": [
             {
                 "CultureCode": "en-GB",
-                "Value": "Positiv"
+                "Value": "Positive Trend"
             },
             {
                 "CultureCode": "sv-SE",
-                "Value": "Positiv"
+                "Value": "Positiv trend"
             }
         ],
         "TaxonIds": []
@@ -589,11 +589,11 @@
         "Names": [
             {
                 "CultureCode": "en-GB",
-                "Value": "Negativ"
+                "Value": "Negative Trend"
             },
             {
                 "CultureCode": "sv-SE",
-                "Value": "Negativ"
+                "Value": "Negativ trend"
             }
         ],
         "TaxonIds": []
@@ -605,11 +605,11 @@
         "Names": [
             {
                 "CultureCode": "en-GB",
-                "Value": "Stable"
+                "Value": "Stable Trend"
             },
             {
                 "CultureCode": "sv-SE",
-                "Value": "Stabil"
+                "Value": "Stabil trend"
             }
         ],
         "TaxonIds": []
@@ -621,11 +621,11 @@
         "Names": [
             {
                 "CultureCode": "en-GB",
-                "Value": "Unknown"
+                "Value": "Unknown Trend"
             },
             {
                 "CultureCode": "sv-SE",
-                "Value": "Okänd"
+                "Value": "Okänd trend"
             }
         ],
         "TaxonIds": []
@@ -637,11 +637,11 @@
         "Names": [
             {
                 "CultureCode": "en-GB",
-                "Value": "Unsure"
+                "Value": "Uncertain Trend"
             },
             {
                 "CultureCode": "sv-SE",
-                "Value": "Osäker"
+                "Value": "Osäker trend"
             }
         ],
         "TaxonIds": [],

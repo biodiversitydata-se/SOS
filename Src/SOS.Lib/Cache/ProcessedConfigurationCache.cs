@@ -12,15 +12,16 @@ namespace SOS.Lib.Cache
     /// </summary>
     public class ProcessedConfigurationCache : CacheBase<string, ProcessedConfiguration>
     {
+        public override TimeSpan CacheDuration { get; set; } = TimeSpan.FromSeconds(30);
+
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="processedConfigurationRepository"></param>
-        /// <param name="memoryCache"></param>
         /// <param name="logger"></param>
-        public ProcessedConfigurationCache(IProcessedConfigurationRepository processedConfigurationRepository, IMemoryCache memoryCache, ILogger<CacheBase<string, ProcessedConfiguration>> logger) : base(processedConfigurationRepository, memoryCache, logger)
-        {
-            CacheDuration = TimeSpan.FromSeconds(30);
+        public ProcessedConfigurationCache(IProcessedConfigurationRepository processedConfigurationRepository, ILogger<CacheBase<string, ProcessedConfiguration>> logger) 
+            : base(processedConfigurationRepository, logger)
+        {            
         }
 
         public override async Task<ProcessedConfiguration> GetAsync(string key)

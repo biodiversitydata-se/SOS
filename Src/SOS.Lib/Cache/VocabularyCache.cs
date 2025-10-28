@@ -14,15 +14,16 @@ namespace SOS.Lib.Cache
     public class VocabularyCache : CacheBase<VocabularyId, Vocabulary>
     {
 
+        public override TimeSpan CacheDuration { get; set; } = TimeSpan.FromMinutes(10);
+
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="vocabularyRepository"></param>
-        /// <param name="memoryCache"></param>
+        /// <param name="vocabularyRepository"></param>        
         /// <param name="logger"></param>
-        public VocabularyCache(IVocabularyRepository vocabularyRepository, IMemoryCache memoryCache, ILogger<CacheBase<VocabularyId, Vocabulary>> logger) : base(vocabularyRepository, memoryCache, logger)
+        public VocabularyCache(IVocabularyRepository vocabularyRepository, ILogger<CacheBase<VocabularyId, Vocabulary>> logger) : base(vocabularyRepository, logger)
         {
-            CacheDuration = TimeSpan.FromMinutes(10);
+            
         }
     }
 }

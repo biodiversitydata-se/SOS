@@ -69,17 +69,17 @@ namespace SOS.Lib.Cache
 
         private (AreaType AreaType, string FeatureId) NormalizeKey((AreaType AreaType, string FeatureId) key) => (key.AreaType, key.FeatureId?.ToLower());
 
+        public override TimeSpan CacheDuration { get; set; } = TimeSpan.FromMinutes(10);
+
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="areaRepository"></param>
-        /// <param name="memoryCache"></param>
         /// <param name="logger"></param>
-        public AreaCache(IAreaRepository areaRepository, IMemoryCache memoryCache, ILogger<CacheBase<string, Area>> logger) : base(areaRepository, memoryCache, logger)
+        public AreaCache(IAreaRepository areaRepository, ILogger<CacheBase<string, Area>> logger) : base(areaRepository, logger)
         {
             _areaRepository = areaRepository;
-            _geometryCache = new ConcurrentDictionary<(AreaType, string), Geometry>();
-            CacheDuration = TimeSpan.FromMinutes(10);
+            _geometryCache = new ConcurrentDictionary<(AreaType, string), Geometry>();            
             var processorCount = Environment.ProcessorCount;
             _semaphore = new SemaphoreSlim(processorCount, processorCount);
         }

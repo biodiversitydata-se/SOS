@@ -8,7 +8,7 @@ using Xunit;
 
 namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.ObservationRepository
 {
-    [Collection(Collections.ApiIntegrationTestsCollection)]
+    [Collection(Fixtures.Collections.ApiIntegrationTestsCollection)]
     public class EventIdsAggregationTests
     {
         private readonly ApiIntegrationTestFixture _fixture;
