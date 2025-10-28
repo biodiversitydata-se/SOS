@@ -14,7 +14,6 @@ variables:
   
   # skip unneeded tasks
   deployApi: true # set to false to skip executing API deploy task
-  deployWeb: true # set to false to skip executing WEB deploy task
 
   # pipeline settings
   Parameters.ImageTag: '${{ parameters.imagetag }}'
@@ -40,14 +39,3 @@ jobs:
             kubernetesServiceEndpoint: $(kubernetesServiceEndpoint)
             environment: $(environment)/administration.gui
             manifest: 'api.yaml'
-
-  # WEB
-  - job: DeployWEB
-    displayName: Deploying WEB to ${{ upper(variables.environment) }}
-    steps:
-      - ${{ if eq(variables.deployWeb, true) }}:
-        - template: adb-kubernetes-deploy.yaml@pipeline-templates
-          parameters:
-            kubernetesServiceEndpoint: $(kubernetesServiceEndpoint)
-            environment: $(environment)/administration.gui
-            manifest: 'web.yaml'
