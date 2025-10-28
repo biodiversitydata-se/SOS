@@ -7,8 +7,9 @@
         "ASPNETCORE_ENVIRONMENT": "local"
       },
       "dotnetRunMessages": true,
+      //"inspectUri": "{wsProtocol}://{url.hostname}:{url.port}/_framework/debug/ws-proxy?browser={browserInspectUri}",
       "applicationUrl": "http://localhost:5006"
-    },   
+    },
     "SOS.Status.Web (Dev)": {
       "commandName": "Project",
       "launchBrowser": true,
@@ -16,6 +17,7 @@
         "ASPNETCORE_ENVIRONMENT": "Dev"
       },
       "dotnetRunMessages": true,
+      //"inspectUri": "{wsProtocol}://{url.hostname}:{url.port}/_framework/debug/ws-proxy?browser={browserInspectUri}",
       "applicationUrl": "http://localhost:5006"
     },
     "SOS.Status.Web (ST)": {
@@ -25,6 +27,7 @@
         "ASPNETCORE_ENVIRONMENT": "ST"
       },
       "dotnetRunMessages": true,
+      //"inspectUri": "{wsProtocol}://{url.hostname}:{url.port}/_framework/debug/ws-proxy?browser={browserInspectUri}",
       "applicationUrl": "http://localhost:5006"
     },
     "SOS.Status.Web (Prod)": {
@@ -34,6 +37,7 @@
         "ASPNETCORE_ENVIRONMENT": "Prod"
       },
       "dotnetRunMessages": true,
+      //"inspectUri": "{wsProtocol}://{url.hostname}:{url.port}/_framework/debug/ws-proxy?browser={browserInspectUri}",
       "applicationUrl": "http://localhost:5006"
     },
     "Container (Dockerfile)": {
