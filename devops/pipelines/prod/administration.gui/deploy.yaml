@@ -32,6 +32,8 @@ jobs:
   # API
   - job: DeployAPI
     displayName: Deploying API to ${{ upper(variables.environment) }}
+    workspace:
+        clean: all
     steps:
       - ${{ if eq(variables.deployApi, true) }}:
         - template: adb-kubernetes-deploy.yaml@pipeline-templates
