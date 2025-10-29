@@ -31,7 +31,8 @@ public static class SerilogExtensions
                .MinimumLevel.Override("Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware", Serilog.Events.LogEventLevel.Warning)
                .MinimumLevel.Override("Microsoft.AspNetCore.Mvc.Infrastructure", Serilog.Events.LogEventLevel.Warning)
                .MinimumLevel.Override("Microsoft.AspNetCore.Cors.Infrastructure", Serilog.Events.LogEventLevel.Warning)
-               .Filter.ByExcluding(Matching.WithProperty<string>("RequestPath", p => p == "/healthz"))               
+               .Filter.ByExcluding(Matching.WithProperty<string>("RequestPath", p => p == "/healthz"))
+               .Filter.ByExcluding(Matching.WithProperty<string>("RequestPath", p => p == "/metrics"))
            .CreateLogger();
     }
 

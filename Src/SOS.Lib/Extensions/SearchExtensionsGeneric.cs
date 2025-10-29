@@ -1,5 +1,5 @@
-﻿using MongoDB.Driver;
-using Elastic.Clients.Elasticsearch;
+﻿using Elastic.Clients.Elasticsearch;
+using Elastic.Clients.Elasticsearch.IndexManagement;
 using Elastic.Clients.Elasticsearch.QueryDsl;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.DataStewardship.Dataset;
@@ -12,8 +12,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-
-using Elastic.Clients.Elasticsearch.IndexManagement;
 
 
 namespace SOS.Lib.Extensions
@@ -205,22 +203,28 @@ namespace SOS.Lib.Extensions
                 }
                 else if (filter.DateFilterType == DateFilter.DateRangeFilterType.OnlyStartDate)
                 {
-                    if (filter.StartDate.HasValue && filter.EndDate.HasValue)
+                    if (filter.StartDate.HasValue || filter.EndDate.HasValue)
                     {
-                        queries.TryAddDateRangeCriteria(startDateField, filter.StartDate, RangeTypes.GreaterThanOrEquals);
-                        queries.TryAddDateRangeCriteria(startDateField, filter.EndDate, RangeTypes.LessThanOrEquals);
+                        queries.Add(q => q.Range(new DateRangeQuery(startDateField)
+                        {
+                            Gte = filter.StartDate?.ToUniversalTime(),
+                            Lte = filter.EndDate?.ToUniversalTime()                            
+                        }));
                     }
                 }
                 else if (filter.DateFilterType == DateFilter.DateRangeFilterType.OnlyEndDate)
                 {
-                    if (filter.StartDate.HasValue && filter.EndDate.HasValue)
+                    if (filter.StartDate.HasValue || filter.EndDate.HasValue)
                     {
-                        queries.TryAddDateRangeCriteria(endDateField, filter.StartDate, RangeTypes.GreaterThanOrEquals);
-                        queries.TryAddDateRangeCriteria(endDateField, filter.EndDate, RangeTypes.LessThanOrEquals);
+                        queries.Add(q => q.Range(new DateRangeQuery(endDateField)
+                        {
+                            Gte = filter.StartDate?.ToUniversalTime(),
+                            Lte = filter.EndDate?.ToUniversalTime()                            
+                        }));
                     }
                 }
             }
-        }
+        }              
 
         public static void TryAddGeneralizationsCriteria<TQueryDescriptor>(
             this ICollection<Action<QueryDescriptor<TQueryDescriptor>>> queries, bool? includeSensitiveGeneralizedObservations, bool? isGeneralized) where TQueryDescriptor : class

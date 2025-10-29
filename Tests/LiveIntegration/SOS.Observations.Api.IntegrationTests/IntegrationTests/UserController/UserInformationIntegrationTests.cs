@@ -7,7 +7,7 @@ using Xunit;
 
 namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.UserController
 {
-    [Collection(Collections.ApiIntegrationTestsCollection)]
+    [Collection(Fixtures.Collections.ApiIntegrationTestsCollection)]
     public class UserInformationIntegrationTests
     {
         private readonly ApiIntegrationTestFixture _fixture;

@@ -9,7 +9,7 @@ using SOS.Shared.Api.Dtos.Vocabulary;
 
 namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.ProjectsController
 {
-    [Collection(Collections.ApiIntegrationTestsCollection)]
+    [Collection(Fixtures.Collections.ApiIntegrationTestsCollection)]
     public class ProjectControllerTests
     {
         private readonly ApiIntegrationTestFixture _fixture;

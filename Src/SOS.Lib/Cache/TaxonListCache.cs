@@ -11,15 +11,16 @@ namespace SOS.Lib.Cache
     /// </summary>
     public class TaxonListCache : CacheBase<int, TaxonList>
     {
+        public override TimeSpan CacheDuration { get; set; } = TimeSpan.FromMinutes(10);
+
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="taxonListRepository"></param>
-        /// <param name="memoryCache"></param>
         /// <param name="logger"></param>
-        public TaxonListCache(ITaxonListRepository taxonListRepository, IMemoryCache memoryCache, ILogger<CacheBase<int, TaxonList>> logger) : base(taxonListRepository, memoryCache, logger)
+        public TaxonListCache(ITaxonListRepository taxonListRepository,  ILogger<CacheBase<int, TaxonList>> logger) : base(taxonListRepository, logger)
         {
-            CacheDuration = TimeSpan.FromMinutes(10);
+            
         }
     }
 }

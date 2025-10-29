@@ -14,7 +14,7 @@ using NetTopologySuite.Geometries;
 
 namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.ObservationsController.GeoGridAggregationEndpoint
 {
-    [Collection(Collections.ApiIntegrationTestsCollection)]
+    [Collection(Fixtures.Collections.ApiIntegrationTestsCollection)]
     public class GeoGridAggregationIntegrationTests
     {
         private readonly ApiIntegrationTestFixture _fixture;

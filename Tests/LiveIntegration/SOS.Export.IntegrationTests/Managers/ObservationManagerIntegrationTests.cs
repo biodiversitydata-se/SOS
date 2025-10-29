@@ -78,13 +78,13 @@ namespace SOS.Export.LiveIntegrationTests.Managers
             var processedObservationRepository = new ProcessedObservationCoreRepository(
                 elasticClientManager,
                 elasticConfiguration,
-                new ProcessedConfigurationCache(processedConfigurationRepository, new MemoryCache(new MemoryCacheOptions()), new NullLogger<ProcessedConfigurationCache>()),
+                new ProcessedConfigurationCache(processedConfigurationRepository, new NullLogger<ProcessedConfigurationCache>()),
                 new Mock<ITaxonManager>().Object,
                 new ClassCache<ConcurrentDictionary<string, HealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<string, HealthResponse>>>()),
                 new MemoryCache(new MemoryCacheOptions()),
                 new Mock<ILogger<ProcessedObservationCoreRepository>>().Object);
             var projectInfoRepository = new ProjectInfoRepository(processClient, new NullLogger<ProjectInfoRepository>());
-            var projectInfoCache = new ProjectCache(projectInfoRepository, new MemoryCache(new MemoryCacheOptions()), new NullLogger<ProjectCache>());
+            var projectInfoCache = new ProjectCache(projectInfoRepository, new NullLogger<ProjectCache>());
             var projectManager = new ProjectManager(projectInfoCache, new NullLogger<ProjectManager>());
             var excelWriter = new ExcelFileWriter(processedObservationRepository,
                 projectManager,
@@ -100,8 +100,8 @@ namespace SOS.Export.LiveIntegrationTests.Managers
                 );
             var areaRepository = new AreaRepository(processClient, new NullLogger<AreaRepository>());
             var taxonRepository = new TaxonRepository(processClient, new NullLogger<TaxonRepository>());
-            var areaCache = new AreaCache(areaRepository, new MemoryCache(new MemoryCacheOptions()), new NullLogger<AreaCache>());
-            var taxonCache = new TaxonCache(taxonRepository, new MemoryCache(new MemoryCacheOptions()), new NullLogger<TaxonCache>());
+            var areaCache = new AreaCache(areaRepository, new NullLogger<AreaCache>());
+            var taxonCache = new TaxonCache(taxonRepository, new NullLogger<TaxonCache>());
             var csvWriter = new CsvFileWriter(processedObservationRepository, new FileService(), filterManager.Object, vocabularyValueResolver, generalizationResolverMock.Object, areaCache, taxonCache, new NullLogger<CsvFileWriter>());
             var zendToService = new Mock<IZendToService>();
             zendToService.Setup(zs => zs.SendFile(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<ExportFormat>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<string>()))

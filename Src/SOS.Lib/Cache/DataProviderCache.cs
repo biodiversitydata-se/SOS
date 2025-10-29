@@ -17,15 +17,15 @@ namespace SOS.Lib.Cache
     public class DataProviderCache : CacheBase<int, DataProvider>, IDataProviderCache
     {
 
+        public override TimeSpan CacheDuration { get; set; } = TimeSpan.FromMinutes(5);
+
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="dataProviderRepository"></param>
-        /// <param name="memoryCache"></param>
+        /// <param name="dataProviderRepository"></param>        
         /// <param name="logger"></param>
-        public DataProviderCache(IDataProviderRepository dataProviderRepository, IMemoryCache memoryCache, ILogger<CacheBase<int, DataProvider>> logger) : base(dataProviderRepository, memoryCache, logger)
-        {
-            CacheDuration = TimeSpan.FromMinutes(5);
+        public DataProviderCache(IDataProviderRepository dataProviderRepository, ILogger<CacheBase<int, DataProvider>> logger) : base(dataProviderRepository, logger)
+        {            
         }
 
         public async Task<IEnumerable<int>> GetDefaultIdsAsync()

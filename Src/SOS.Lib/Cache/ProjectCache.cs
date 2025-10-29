@@ -11,15 +11,16 @@ namespace SOS.Lib.Cache
     /// </summary>
     public class ProjectCache : CacheBase<int, ProjectInfo>
     {
+        public override TimeSpan CacheDuration { get; set; } = TimeSpan.FromMinutes(10);
+
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="projectInfoRepository"></param>
-        /// <param name="memoryCache"></param>
+        /// <param name="projectInfoRepository"></param>       
         /// <param name="logger"></param>
-        public ProjectCache(IProjectInfoRepository projectInfoRepository, IMemoryCache memoryCache, ILogger<CacheBase<int, ProjectInfo>> logger) : base(projectInfoRepository, memoryCache, logger)
+        public ProjectCache(IProjectInfoRepository projectInfoRepository, ILogger<CacheBase<int, ProjectInfo>> logger) : base(projectInfoRepository, logger)
         {
-            CacheDuration = TimeSpan.FromMinutes(10);
+            
         }
     }
 }

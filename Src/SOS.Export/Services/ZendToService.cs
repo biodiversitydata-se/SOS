@@ -20,24 +20,28 @@ namespace SOS.Export.Services
     {
         private readonly ZendToConfiguration _configuration;
         private readonly ILogger<ZendToService> _logger;
-        /// <summary>
-        ///     Constructor
-        /// </summary>
+        private const int ChunkSizeBytes = 50 * 1024 * 1024; // 50 MB
+
         public ZendToService(ZendToConfiguration configuration, ILogger<ZendToService> logger)
         {
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        /// <inheritdoc />
-        public async Task<ZendToResponse> SendFile(string emailAddress, string description, string filePath, ExportFormat exportFormat,
-            bool informRecipients = true, bool informPasscode = true, bool encryptFile = false, string encryptPassword = null)
+        public async Task<ZendToResponse> SendFile(
+            string emailAddress,
+            string description,
+            string filePath,
+            ExportFormat exportFormat,
+            bool informRecipients = true,
+            bool informPasscode = true,
+            bool encryptFile = false,
+            string encryptPassword = null)
         {
             double? fileSizeMb = null;
-
+            var fileInfo = new FileInfo(filePath);
             try
             {
-                var fileInfo = new FileInfo(filePath);
                 fileSizeMb = fileInfo.Length / (1024.0 * 1024.0);
             }
             catch (Exception ex)
@@ -49,8 +53,14 @@ namespace SOS.Export.Services
                 "{filePath} is being sent to ZendTo with email address: {emailAddress}, exportFormat: {exportFormat}, fileSizeMB: {fileSizeMb}",
                 filePath, emailAddress, exportFormat, fileSizeMb.HasValue ? fileSizeMb.Value.ToString("F2") : "N/A");
 
+            // Create chunkName for complete file
+            string chunkName = Guid.NewGuid().ToString("N");
+
+            // Upload chunks
+            int totalChunks = await UploadChunksAsync(filePath, chunkName);
+
+            // When all chunks are done, make the dropoff call
             using var form = new MultipartFormDataContent();
-            //    form.Headers.ContentType = MediaTypeHeaderValue.Parse("multipart/form-data"); //new MediaTypeHeaderValue("application/x-www-form-urlencoded");
             DateTime fileCreationDate = File.GetCreationTime(filePath);
             string message = GetMessage(_configuration.Message, fileCreationDate);
             if (string.IsNullOrWhiteSpace(description))
@@ -60,39 +70,46 @@ namespace SOS.Export.Services
 
             var formData = new[]
             {
-            new KeyValuePair<string, string>("Action", "dropoff"),
-            new KeyValuePair<string, string>("uname", _configuration.UserName),
-            new KeyValuePair<string, string>("password", _configuration.Password),
-            new KeyValuePair<string, string>("senderName", _configuration.SenderName),
-            new KeyValuePair<string, string>("senderEmail", _configuration.SenderEmail),
-            new KeyValuePair<string, string>("senderOrganization", _configuration.SenderOrganization),
-            new KeyValuePair<string, string>("subject", _configuration.EmailSubject),
-            new KeyValuePair<string, string>("note", message),
-            new KeyValuePair<string, string>("confirmDelivery", "0"),
-            new KeyValuePair<string, string>("informRecipients", informRecipients ? "1" : "0"),
-            new KeyValuePair<string, string>("informPasscode", informPasscode ? "1" : "0"),
-            new KeyValuePair<string, string>("checksumFiles", "0"),
-            new KeyValuePair<string, string>("encryptFiles", encryptFile ? "1" : "0"),
-            new KeyValuePair<string, string>("encryptPassword", encryptPassword),
-            new KeyValuePair<string, string>("recipient_1", "1"),
-            new KeyValuePair<string, string>("recipEmail_1", emailAddress),
-            new KeyValuePair<string, string>("desc_1", description)
-        };
+                new KeyValuePair<string, string>("Action", "dropoff"),
+                new KeyValuePair<string, string>("uname", _configuration.UserName),
+                new KeyValuePair<string, string>("password", _configuration.Password),
+                new KeyValuePair<string, string>("senderName", _configuration.SenderName),
+                new KeyValuePair<string, string>("senderEmail", _configuration.SenderEmail),
+                new KeyValuePair<string, string>("senderOrganization", _configuration.SenderOrganization),
+                new KeyValuePair<string, string>("subject", _configuration.EmailSubject),
+                new KeyValuePair<string, string>("note", message),
+                new KeyValuePair<string, string>("confirmDelivery", "0"),
+                new KeyValuePair<string, string>("informRecipients", informRecipients ? "1" : "0"),
+                new KeyValuePair<string, string>("informPasscode", informPasscode ? "1" : "0"),
+                new KeyValuePair<string, string>("checksumFiles", "0"),
+                new KeyValuePair<string, string>("encryptFiles", encryptFile ? "1" : "0"),
+                new KeyValuePair<string, string>("encryptPassword", encryptPassword),
+                new KeyValuePair<string, string>("recipient_1", "1"),
+                new KeyValuePair<string, string>("recipEmail_1", emailAddress),
+                new KeyValuePair<string, string>("desc_1", description),                
+                new KeyValuePair<string, string>("chunkName", chunkName),                
+                new KeyValuePair<string, string>("sentInChunks", "1"),                
+            };
 
-            // Add form data to form
             foreach (var item in formData)
             {
-                form.Add(new StringContent(item.Value ?? String.Empty, Encoding.Default), item.Key);
+                form.Add(new StringContent(item.Value ?? string.Empty, Encoding.Default), item.Key);
             }
 
-            await using var fileStream = File.OpenRead(filePath);
-            using var fileContent = new StreamContent(File.OpenRead(filePath));
-            fileContent.Headers.ContentType = MediaTypeHeaderValue.Parse("application/octet-stream");
-           // string fileName = GetFilename(exportFormat, fileCreationDate);
-            var fileName = filePath.Substring(filePath.LastIndexOf(@"\") + 1);
-            form.Add(fileContent, "file_1", fileName);
+            // JSON metadata about the file
+            string metadata = JsonSerializer.Serialize(new
+            {
+                name = Path.GetFileName(filePath),
+                type = "application/octet-stream",
+                size = fileInfo.Length.ToString(),
+                tmp_name = "1",
+                error = 0
+            });
+            form.Add(new StringContent(metadata, Encoding.UTF8, "application/json"), "file_1");            
 
-            // Post form to ZendTo
+            string fileName = Path.GetFileName(filePath);
+            form.Add(new StringContent(fileName, Encoding.UTF8), "fileName_1");
+
             using var client = new HttpClient();
             using var response = await client.PostAsync("https://zendto.slu.se/dropoff.php", form);
             response.Headers.TryGetValues("X-ZendTo-Response", out var responseStrings);
@@ -103,14 +120,16 @@ namespace SOS.Export.Services
                 {
                     try
                     {
-                        var zendToResponse = JsonSerializer.Deserialize<ZendToResponse>(responseString, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                        var zendToResponse = JsonSerializer.Deserialize<ZendToResponse>(
+                            responseString,
+                            new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
                         if (!zendToResponse.Success)
                         {
                             _logger.LogError("Failed to send file with ZendTo. Response: {@responseString}. Email: {emailAddress}, ExportFormat: {exportFormat}, FileSizeMB: {fileSizeMb}", responseString, emailAddress, exportFormat, fileSizeMb);
                         }
 
-                        _logger.LogInformation("{filePath} has successfully being sent to ZendTo with email address: {emailAddress}, exportFormat: {exportFormat}, fileSizeMB: {fileSizeMb}",
+                        _logger.LogInformation("{filePath} has successfully been sent to ZendTo with email address: {emailAddress}, exportFormat: {exportFormat}, fileSizeMB: {fileSizeMb}",
                             filePath, emailAddress, exportFormat, fileSizeMb.HasValue ? fileSizeMb.Value.ToString("F2") : "N/A");
                         return zendToResponse;
                     }
@@ -126,12 +145,47 @@ namespace SOS.Export.Services
             return new ZendToResponse();
         }
 
+        private async Task<int> UploadChunksAsync(string filePath, string chunkName)
+        {
+            int chunkIndex = 0;
+            using var fs = File.OpenRead(filePath);
+            byte[] buffer = new byte[ChunkSizeBytes];
+
+            using var client = new HttpClient();
+
+            while (true)
+            {
+                int bytesRead = await fs.ReadAsync(buffer, 0, buffer.Length);
+                if (bytesRead <= 0)
+                    break;
+
+                using var content = new MultipartFormDataContent
+                {
+                    { new StringContent(chunkName), "chunkName" },
+                    { new StringContent("1"), "chunkOf" },
+                    { new StringContent(_configuration.UserName), "uname" },
+                    { new StringContent(_configuration.Password), "password" }
+                };
+
+                var byteContent = new ByteArrayContent(buffer, 0, bytesRead);
+                byteContent.Headers.ContentType = MediaTypeHeaderValue.Parse("application/octet-stream");                
+                content.Add(byteContent, "chunkData", "blob");
+
+                var resp = await client.PostAsync("https://zendto.slu.se/savechunk", content);
+                resp.Headers.TryGetValues("X-ZendTo-Response", out var responseStrings);
+                resp.EnsureSuccessStatusCode();
+                _logger.LogInformation("UploadChunkAsync succeeded. chunkName={chunkName}, chunkIndex={chunkIndex}", chunkName, chunkIndex);
+                chunkIndex++;
+            }
+
+            return chunkIndex;
+        }
+
         private string GetMessage(string template, DateTime fileCreationDate)
         {
             string str = template
                 .Replace("{swedishDate}", fileCreationDate.ToString("g", new CultureInfo("sv")))
                 .Replace("{englishDate}", fileCreationDate.ToString("g", new CultureInfo("en")));
-
             return str;
         }
 
@@ -140,4 +194,5 @@ namespace SOS.Export.Services
             return FilenameHelper.CreateFilenameWithDate($"records-{exportFormat}", "zip", fileCreationDate);
         }
     }
+
 }

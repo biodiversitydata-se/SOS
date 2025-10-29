@@ -10,7 +10,7 @@ using Xunit;
 
 namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.DwcArchiveFileWriter
 {
-    [Collection(Collections.ApiIntegrationTestsCollection)]
+    [Collection(Fixtures.Collections.ApiIntegrationTestsCollection)]
     public class DwcArchiveFileWriterTests
     {
         private readonly ApiIntegrationTestFixture _fixture;

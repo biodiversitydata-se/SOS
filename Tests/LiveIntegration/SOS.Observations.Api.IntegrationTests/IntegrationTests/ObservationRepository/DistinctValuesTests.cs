@@ -7,7 +7,7 @@ using Xunit;
 
 namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.ObservationRepository
 {
-    [Collection(Collections.ApiIntegrationTestsCollection)]
+    [Collection(Fixtures.Collections.ApiIntegrationTestsCollection)]
     public class DistinctValuesTests
     {
         private readonly ApiIntegrationTestFixture _fixture;

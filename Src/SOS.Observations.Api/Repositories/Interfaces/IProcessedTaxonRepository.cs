@@ -1,4 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
+using SOS.Lib.Enums;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Filters;
@@ -38,6 +39,22 @@ namespace SOS.Observations.Api.Repositories.Interfaces
             int? skip,
             int? take,
             bool sumUnderlyingTaxa = false);
+
+        /// <summary>
+        /// Aggregate observations by taxon using approximate counting, i.e. Elasticsearch aggregation. Sort by observation count descending.
+        /// </summary>
+        /// <param name="filter"></param>
+        /// <param name="skip"></param>
+        /// <param name="take"></param>
+        /// <returns></returns>
+        Task<Result<PagedResult<TaxonAggregationItem>>> GetTaxonAggregationApproximateAsync(
+            SearchFilter filter,
+            int? skip,
+            int? take);
+
+        Task<Result<List<int>>> GetObservedTaxaAsync(SearchFilter filter);        
+
+        Task<Dictionary<int, TaxonAreaAggregation>> GetTaxonAreaAggregationAsync(SearchFilter filter, AreaTypeAggregate? areaType);
 
         /// <summary>
         /// Get taxon sum aggregation. Including underlying taxa and province count.

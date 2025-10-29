@@ -12,7 +12,7 @@ using NetTopologySuite.Geometries;
 
 namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.ObservationsController.SearchEndpoint
 {
-    [Collection(Collections.ApiIntegrationTestsCollection)]
+    [Collection(Fixtures.Collections.ApiIntegrationTestsCollection)]
     public class SignalSearchIntegrationTests
     {
         private readonly ApiIntegrationTestFixture _fixture;

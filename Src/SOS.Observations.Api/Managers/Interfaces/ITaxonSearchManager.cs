@@ -92,6 +92,17 @@ namespace SOS.Observations.Api.Managers.Interfaces
             string sortBy,
             SearchSortOrder sortOrder);
 
+        Task<Result<List<int>>> GetObservedTaxaAsync(
+            int? roleId,
+            string authorizationApplicationIdentifier,
+            SearchFilter filter);
+
+        Task<Dictionary<int, TaxonAreaAggregation>> GetTaxonAreaAggregationAsync(
+            int? roleId,
+            string authorizationApplicationIdentifier,
+            SearchFilter filter,
+            AreaTypeAggregate? areaType);
+
         /// <summary>
         /// Get a indication if taxon exist in specified area
         /// </summary>
@@ -104,5 +115,8 @@ namespace SOS.Observations.Api.Managers.Interfaces
             string authorizationApplicationIdentifier,
             SearchFilter filter);
 
+        Task<Dictionary<int, TaxonAreaAggregation>> CreateTaxonAreaSumAsync(Dictionary<int, TaxonAreaAggregation> taxonAreaAggByTaxonId);
+        Task<Dictionary<int, TaxonAreaAggregation>> CreateTaxonAreaSumUsingLowMemoryAsync(Dictionary<int, TaxonAreaAggregation> taxonAreaAggByTaxonId);
+        Task CreateTaxonAreaSumWithLowMemoryAsync(Dictionary<int, TaxonAreaAggregation> taxonAreaAggByTaxonId, bool aggregateArea, bool pruneTaxaTree = false);
     }
 }

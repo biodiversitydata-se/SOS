@@ -12,7 +12,7 @@ using Xunit;
 
 namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.ObservationsController.CountEndpoint
 {
-    [Collection(Collections.ApiIntegrationTestsCollection)]
+    [Collection(Fixtures.Collections.ApiIntegrationTestsCollection)]
     public class ProtectedSpeciesCountIntegrationTests
     {
         private readonly ApiIntegrationTestFixture _fixture;

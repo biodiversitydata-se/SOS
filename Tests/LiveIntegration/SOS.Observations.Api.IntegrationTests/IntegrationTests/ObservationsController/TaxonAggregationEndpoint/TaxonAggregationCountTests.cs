@@ -14,7 +14,7 @@ using Xunit;
 
 namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.ObservationsController.TaxonAggregationEndpoint
 {
-    [Collection(Collections.ApiIntegrationTestsCollection)]
+    [Collection(Fixtures.Collections.ApiIntegrationTestsCollection)]
     public class TaxonAggregationCountTests
     {
         private readonly ApiIntegrationTestFixture _fixture;

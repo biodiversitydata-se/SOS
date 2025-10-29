@@ -46,11 +46,12 @@ public static class DependencyInjectionExtensions
         services.AddScoped<IReportManager, ReportManager>();
         services.AddScoped<ICacheManager, CacheManager>();
         services.AddScoped<DiagnosticsManager>();
-        services.AddSingleton<IApiUsageStatisticsManager, ApiUsageStatisticsManager>();
+        services.AddScoped<IApiUsageStatisticsManager, ApiUsageStatisticsManager>();
         services.AddScoped<IDataProviderManager, DataProviderManager>();
         services.AddScoped<IIptManager, IptManager>();
 
         // Add repositories
+        services.AddScoped<IApiUsageStatisticsRepository, ApiUsageStatisticsRepository>();
         services.AddScoped<IReportRepository, ReportRepository>();
         services.AddScoped<IVocabulariesDiffHelper, VocabulariesDiffHelper>();
         services.AddScoped<IDataProviderRepository, DataProviderRepository>();
@@ -68,7 +69,9 @@ public static class DependencyInjectionExtensions
         services.AddSingleton<IApplicationInsightsService, ApplicationInsightsService>();
         services.AddScoped<IFileDownloadService, FileDownloadService>();
         services.AddScoped<IHttpClientService, HttpClientService>();
-        services.AddScoped<IArtportalenDataService, ArtportalenDataService>();        
+        services.AddScoped<IArtportalenDataService, ArtportalenDataService>();
+        services.AddScoped<IApiManagementUserService, ApiManagementUserService>();
+        services.AddScoped<IUserService, UserService>();
 
         // Add Vocabulary Factories
         services.AddScoped<AccessRightsVocabularyFactory>();
@@ -111,7 +114,12 @@ public static class DependencyInjectionExtensions
         services.AddSingleton(new ArtportalenConfiguration());
         services.AddSingleton(new ApiManagementServiceConfiguration());
         services.AddSingleton(new TaxonServiceConfiguration() { BaseAddress = "https://taxonapi.artdata.slu.se/darwincore/download?version=custom" });
-
+        if (Settings.ApplicationInsightsConfiguration != null)
+            services.AddSingleton(Settings.ApplicationInsightsConfiguration);
+        else
+            services.AddSingleton(new ApplicationInsightsConfiguration());
+        services.AddSingleton(Settings.UserServiceConfiguration);
+        
         // Caches
         services.AddSingleton<ICache<string, ProcessedConfiguration>, ProcessedConfigurationCache>();
         services.AddSingleton<ICache<int, ProjectInfo>, ProjectCache>();

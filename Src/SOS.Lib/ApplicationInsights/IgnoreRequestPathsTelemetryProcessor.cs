@@ -9,7 +9,7 @@ namespace SOS.Lib.ApplicationInsights
     public class IgnoreRequestPathsTelemetryProcessor : ITelemetryProcessor
     {
         private readonly ITelemetryProcessor _next;
-        private readonly string[] _ignorePaths = { "swagger", ".", "healthz" };
+        private readonly string[] _ignorePaths = { "swagger", ".", "healthz", "/metrics" };
 
         /// <summary>
         /// Constructor
@@ -28,7 +28,7 @@ namespace SOS.Lib.ApplicationInsights
             {
                 if (_ignorePaths.Any(ignorePath => requestTelemetry.Url.AbsolutePath.Contains(ignorePath, StringComparison.CurrentCultureIgnoreCase)))
                 { 
-                    return;                    
+                    return;
                 }
             }
 

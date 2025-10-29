@@ -16,7 +16,7 @@ using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.ObservationsController.SearchEndpoint
 {
-    [Collection(Collections.ApiIntegrationTestsCollection)]
+    [Collection(Fixtures.Collections.ApiIntegrationTestsCollection)]
     public class SearchFromJsonTests
     {
         private readonly ApiIntegrationTestFixture _fixture;

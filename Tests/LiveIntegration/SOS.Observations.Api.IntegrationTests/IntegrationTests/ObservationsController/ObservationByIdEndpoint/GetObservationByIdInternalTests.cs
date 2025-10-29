@@ -7,7 +7,7 @@ using Xunit;
 
 namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.ObservationsController.ObservationByIdEndpoint
 {
-    [Collection(Collections.ApiIntegrationTestsCollection)]
+    [Collection(Fixtures.Collections.ApiIntegrationTestsCollection)]
     public class GetObservationByIdInternalTests
     {
         private readonly ApiIntegrationTestFixture _fixture;

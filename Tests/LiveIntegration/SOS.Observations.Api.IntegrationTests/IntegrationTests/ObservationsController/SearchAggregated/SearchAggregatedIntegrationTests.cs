@@ -13,7 +13,7 @@ using Xunit;
 
 namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.ObservationsController.SearchAggregated
 {
-    [Collection(Collections.ApiIntegrationTestsCollection)]
+    [Collection(Fixtures.Collections.ApiIntegrationTestsCollection)]
     public class SearchAggregatedIntegrationTests
     {
         private readonly ApiIntegrationTestFixture _fixture;

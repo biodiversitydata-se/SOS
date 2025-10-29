@@ -15,7 +15,7 @@ using FeatureCollection = NetTopologySuite.Features.FeatureCollection;
 
 namespace SOS.Observations.Api.LiveIntegrationTests.IntegrationTests.Diffusion
 {
-    [Collection(Collections.ApiIntegrationTestsCollection)]
+    [Collection(Fixtures.Collections.ApiIntegrationTestsCollection)]
     public class CreateDiffusedFiles
     {
         private readonly ApiIntegrationTestFixture _fixture;
