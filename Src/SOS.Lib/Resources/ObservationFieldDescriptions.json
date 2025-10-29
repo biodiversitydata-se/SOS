@@ -705,18 +705,18 @@
     "DependsOn": "Taxon.Attributes.IsInvasiveAccordingToEuRegulation",
     "FieldSet": "Extended"
   },
-  {
-    "PropertyName": "TaxonIsInvasiveInSweden",
-    "PropertyPath": "Taxon.Attributes.IsInvasiveInSweden",
-    "SwedishTitle": "Främmande i Sverige",
-    "EnglishTitle": "Alien in Sweden",
-    "DataType": "Boolean",
-    "DataTypeIsNullable": false,
-    "DwcName": "",
-    "DwcIdentifier": "",
-    "DependsOn": "Taxon.Attributes.IsInvasiveInSweden",
-    "FieldSet": "Extended"
-  },
+    {
+        "PropertyName": "TaxonIsInvasiveInSweden",
+        "PropertyPath": "Taxon.Attributes.IsInvasiveInSweden",
+        "SwedishTitle": "Invasiv",
+        "EnglishTitle": "Invasive",
+        "DataType": "Boolean",
+        "DataTypeIsNullable": false,
+        "DwcName": "",
+        "DwcIdentifier": "",
+        "DependsOn": "Taxon.Attributes.IsInvasiveInSweden",
+        "FieldSet": "Extended"
+    },
   {
     "PropertyName": "TaxonInvasiveRiskCategory",
     "PropertyPath": "Taxon.Attributes.InvasiveRiskAssessmentCategory",
