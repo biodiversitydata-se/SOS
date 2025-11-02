@@ -27,7 +27,8 @@ var observationApi = builder.AddProject<Projects.SOS_Observations_Api>("sos-obse
     .WithEnvironment("DISABLE_HEALTHCHECK_INIT", env.DisableHealthcheckInit.ToString())    
     .WithEnvironment("DISABLE_CACHED_TAXON_SUM_INIT", env.DisableCachedTaxonSumInit.ToString())
     .WithHttpEndpoint(name: "http", port: 5000)
-    .WithUrl("http://localhost:5000/swagger", "Observations API (Swagger)")
+    .WithUrlForEndpoint("http", endpoint =>  { endpoint.DisplayLocation = UrlDisplayLocation.DetailsOnly; })
+    .WithUrl("http://localhost:5000/swagger", "Observations API")
     .WithHttpHealthCheck("/healthz")
     .WithReference(hangfireDb)
     .WaitFor(hangfireDb);
@@ -42,7 +43,8 @@ var analysisApi = builder.AddProject<Projects.SOS_Observations_Api>("sos-analysi
     .WithEnvironment("DISABLE_HANGFIRE_INIT", env.DisableHangfireInit.ToString())
     .WithEnvironment("DISABLE_HEALTHCHECK_INIT", env.DisableHealthcheckInit.ToString())    
     .WithHttpEndpoint(name: "http", port: 5001)
-    .WithUrl("http://localhost:5001/swagger", "Analysis API (Swagger)")
+    .WithUrlForEndpoint("http", endpoint => { endpoint.DisplayLocation = UrlDisplayLocation.DetailsOnly; })
+    .WithUrl("http://localhost:5001/swagger", "Analysis API")
     .WithHttpHealthCheck("/healthz")
     .WithReference(hangfireDb)
     .WaitFor(hangfireDb);
@@ -56,7 +58,8 @@ var adminApi = builder.AddProject<Projects.SOS_Administration_Api>(name: "sos-ad
     .WithEnvironment("USE_LOCAL_HANGFIRE", env.UseLocalHangfireDb.ToString())
     .WithEnvironment("DISABLE_HANGFIRE_INIT", env.DisableHangfireInit.ToString())
     .WithHttpEndpoint(name: "http", port: 5005)
-    .WithUrl("http://localhost:5005/swagger", "Administration API (Swagger)")
+    .WithUrlForEndpoint("http", endpoint => { endpoint.DisplayLocation = UrlDisplayLocation.DetailsOnly; })
+    .WithUrl("http://localhost:5005/swagger", "Administration API")
     .WithUrl("http://localhost:5005/hangfire/jobs/processing", "Hangfire dashboard")
     .WithHttpHealthCheck("/healthz")
     .WithReference(hangfireDb)
@@ -68,6 +71,7 @@ builder.AddProject<Projects.SOS_Hangfire_JobServer>("sos-hangfire-jobserver", co
         project.ExcludeLaunchProfile = true;
     })
     .WithHttpEndpoint()
+    .WithUrlForEndpoint("http", endpoint => { endpoint.DisplayLocation = UrlDisplayLocation.DetailsOnly; })
     .WithEnvironment("ASPNETCORE_ENVIRONMENT", env.AspNetCoreEnvironment)
     .WithEnvironment("USE_LOCAL_HANGFIRE", env.UseLocalHangfireDb.ToString())
     .WithEnvironment("EXCLUDE_PARISH_GEOMETRIES", env.excludeParishGeometries.ToString())
@@ -81,7 +85,8 @@ builder.AddProject<Projects.SOS_Status_Web>("sos-status-web", configure: static 
     })
     .WithEnvironment("ASPNETCORE_ENVIRONMENT", env.AspNetCoreEnvironment)    
     .WithHttpEndpoint(name: "http", port: 5006)
-    .WithUrl("http://localhost:5006", "SOS.Status.Web")    
+    .WithUrlForEndpoint("http", endpoint => { endpoint.DisplayLocation = UrlDisplayLocation.DetailsOnly; })
+    .WithUrl("http://localhost:5006", "Status UI")    
     .WithHttpHealthCheck("/healthz")
     .WithReference(observationApi)
     .WithReference(analysisApi)
@@ -91,30 +96,30 @@ builder.AddProject<Projects.SOS_Status_Web>("sos-status-web", configure: static 
     .WaitFor(adminApi);
 
 
-// Configure Admin GUI BFF
-var adminGuiBff = builder.AddProject<Projects.SOS_Administration_Gui>("sos-admin-gui-bff", configure: static project =>
-    {
-        project.ExcludeLaunchProfile = true;
-    })
-    .WithEnvironment("ASPNETCORE_ENVIRONMENT", env.AspNetCoreEnvironment)
-    .WithEnvironment("USE_LOCAL_OBSERVATION_API", env.UseLocalObservationApi.ToString())
-    .WithHttpEndpoint(name: "http", port: 5050)
-    .WithReference(observationApi)
-    .WithHttpHealthCheck("/healthz")
-    .WaitFor(observationApi)
-    .WithExplicitStart();
+//// Configure Admin GUI BFF
+//var adminGuiBff = builder.AddProject<Projects.SOS_Administration_Gui>("sos-admin-gui-bff", configure: static project =>
+//    {
+//        project.ExcludeLaunchProfile = true;
+//    })
+//    .WithEnvironment("ASPNETCORE_ENVIRONMENT", env.AspNetCoreEnvironment)
+//    .WithEnvironment("USE_LOCAL_OBSERVATION_API", env.UseLocalObservationApi.ToString())
+//    .WithHttpEndpoint(name: "http", port: 5050)
+//    .WithReference(observationApi)
+//    .WithHttpHealthCheck("/healthz")
+//    .WaitFor(observationApi)
+//    .WithExplicitStart();
 
-// Configure Admin GUI (Angular)
-var adminGui = builder.AddNpmApp("sos-admin-gui-angular", "../SOS.Administration.Gui.Web")
-    .WithReference(adminGuiBff)
-    .WaitFor(adminGuiBff)
-    .WithHttpEndpoint(name: "angular-ui", env: "PORT")
-    .WithUrlForEndpoint("angular-ui", endpoint =>
-    {
-        endpoint.Url = "http://localhost:4200";
-        endpoint.DisplayText = $"Admin GUI (http://localhost:4200)";
-    })
-    .WithExplicitStart();
+//// Configure Admin GUI (Angular)
+//var adminGui = builder.AddNpmApp("sos-admin-gui-angular", "../SOS.Administration.Gui.Web")
+//    .WithReference(adminGuiBff)
+//    .WaitFor(adminGuiBff)
+//    .WithHttpEndpoint(name: "angular-ui", env: "PORT")
+//    .WithUrlForEndpoint("angular-ui", endpoint =>
+//    {
+//        endpoint.Url = "http://localhost:4200";
+//        endpoint.DisplayText = $"Admin GUI (http://localhost:4200)";
+//    })
+//    .WithExplicitStart();
 
 // Healthcheck UI
 //builder.AddHealthChecksUI("healthchecksui")
