@@ -5,15 +5,15 @@
         <HierarchyColumn T="DataProviderStatusDto" />
         <PropertyColumn Property="x => x.Id" Title="Id" Sortable="false" />
         <PropertyColumn Property="x => x.Identifier" Title="Dataset" Sortable="false" />
-        <PropertyColumn Property="x => x.PublicActive" Title="Public" Format="N0" Sortable="false" />
+        <PropertyColumn Property="x => x.PublicActive" Title="Public" Format="N0" Sortable="true" />
         @* <PropertyColumn Property="x => x.PublicActiveWithDiff" Title="Public" Sortable="false" CellStyleFunc="@CssHelper.PublicObservationCellStyleFunc2" /> *@
         <PropertyColumn Property="x => x.PublicDiff" Title="Diff" CellStyleFunc="@CssHelper.PublicObservationCellStyleFunc" Format="N0" Sortable="false" />        
-        <PropertyColumn Property="x => x.ProtectedActive" Title="Protected" Format="N0" Sortable="false" />
+        <PropertyColumn Property="x => x.ProtectedActive" Title="Protected" Format="N0" Sortable="true" />
         <PropertyColumn Property="x => x.ProtectedDiff" Title="Diff" CellStyleFunc="@CssHelper.ProtectedObservationCellStyleFunc" Format="N0" Sortable="false" />
-        <PropertyColumn Property="x => x.InvalidActive" Title="Invalid" Format="N0" Sortable="false" />
+        <PropertyColumn Property="x => x.InvalidActive" Title="Invalid" Format="N0" Sortable="true" />
         <PropertyColumn Property="x => x.InvalidDiff" Title="Diff" CellStyleFunc="@CssHelper.InvalidObservationCellStyleFunc" Format="N0" Sortable="false" />
         @* <PropertyColumn Property="x => DateTimeHelper.FormatTimeSpan(x.HarvestTimeActive)" Title="Harvest time" Sortable="false" /> *@
-        <PropertyColumn Property="x => DateTimeHelper.FormatTimeSpan(x.ProcessTimeActive, null)" Title="Process time" Sortable="false" />
+        @* <PropertyColumn Property="x => DateTimeHelper.FormatTimeSpan(x.ProcessTimeActive, null)" Title="Process time" Sortable="false" /> *@
         @* <PropertyColumn Property="x => x.ProcessedPerSecondActive" Title="Process/second" Format="N0" Sortable="false" /> *@
     </Columns>
     <ChildRowContent>        
@@ -52,13 +52,13 @@
                     </td>                    
                 </tr>
                 <tr>
-                    <td>Harvest</td>
+                    <td>Harvest time</td>
                     <td>@DateTimeHelper.FormatTimeSpan(context.Item.HarvestTimeActive)</td>
                     <td>@DateTimeHelper.FormatTimeSpan(context.Item.HarvestTimeInactive)</td>
                     <td>@DateTimeHelper.FormatTimeSpan(context.Item.HarvestTimeDiff, minThreshold: TimeSpan.FromMinutes(1))</td>
                 </tr>
                 <tr>
-                    <td>Process</td>
+                    <td>Process time</td>
                     <td>@DateTimeHelper.FormatTimeSpan(context.Item.ProcessTimeActive)</td>
                     <td>@DateTimeHelper.FormatTimeSpan(context.Item.ProcessTimeInactive)</td>
                     <td>@DateTimeHelper.FormatTimeSpan(context.Item.ProcessTimeDiff, minThreshold: TimeSpan.FromMinutes(1))</td>
@@ -72,7 +72,7 @@
                 @if (context.Item.Id == 1) // Artportalen
                 {
                     <tr>
-                        <td>Incremental</td>
+                        <td>Incremental time</td>
                         <td colspan="3">@DateTimeHelper.FormatTimeSpan(context.Item.LatestIncrementalTime)</td>
                     </tr>
                 }

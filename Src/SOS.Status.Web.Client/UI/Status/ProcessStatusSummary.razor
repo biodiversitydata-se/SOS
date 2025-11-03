@@ -3,6 +3,8 @@
 <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
     @if (ProcessSummary?.ActiveProcessStatus != null)
     {
+        <MudText Typo="Typo.body2">@DateTime.Now.ToString("yyyy-MM-dd HH:mm")</MudText>        
+        <MudText>|</MudText>
         <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
             <MudIcon Icon="@Icons.Material.Filled.Circle" Style="@GetProcessStatusCircleStyle(ProcessSummary.ActiveProcessStatus.Status)" />
             <MudText Typo="Typo.body2">@ProcessSummary.ActiveProcessStatus.Name (active)</MudText>
@@ -21,7 +23,7 @@
                 <MudText Typo="Typo.body2">Artportalen incremental count: @artportalenLastIncrementalText</MudText>
                 <MudText Typo="Typo.body2"><b>(@artportalenMinutesAgoText)</b></MudText>
             </MudStack>
-        }
+        }        
     }
 </MudStack>
 
