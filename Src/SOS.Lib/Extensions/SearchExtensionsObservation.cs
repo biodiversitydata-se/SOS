@@ -709,7 +709,7 @@ namespace SOS.Lib
             this SearchFilterBase filter) where TQueryDescriptor : class
         {
             var queries = filter.ToQuery<TQueryDescriptor>();
-            queries.AddMustExistsCriteria("occurrence.media");
+            queries.TryAddExistsCriteria("occurrence.media", true);
             return queries;
         }
 
@@ -717,7 +717,7 @@ namespace SOS.Lib
             this SearchFilterBase filter) where TQueryDescriptor : class
         {
             var queries = filter.ToQuery<TQueryDescriptor>();
-            queries.AddMustExistsCriteria("measurementOrFacts");
+            queries.TryAddExistsCriteria("measurementOrFacts", true);
             return queries;
         }
 
