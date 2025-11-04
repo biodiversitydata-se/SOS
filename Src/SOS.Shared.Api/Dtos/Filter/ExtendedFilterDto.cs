@@ -70,6 +70,13 @@
         public IEnumerable<int>? SexIds { get; set; }
 
         /// <summary>
+        /// If true, only records with InvasiveSpeciesTreatment are included.
+        /// If false, only records with no InvasiveSpeciesTreatment are included.
+        /// If null, no filtering is applied.
+        /// </summary>
+        public bool? HasInvasiveSpeciesTreatment { get; set; }
+
+        /// <summary>
         /// Ids of InvasiveSpeciesTreatment to match. 
         /// If null or empty, no filtering is done.
         /// Queryable values are available in InvasiveSpeciesTreatment vocabulary.

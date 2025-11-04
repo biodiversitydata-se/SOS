@@ -200,6 +200,7 @@ namespace SOS.Shared.Api.Extensions.Dto
                     internalFilter.Taxa.SexIds = searchFilterInternalDto.ExtendedFilter.SexIds;
                 }
                 internalFilter.InvasiveSpeciesTreatmentIds = searchFilterInternalDto.ExtendedFilter.InvasiveSpeciesTreatmentIds;
+                internalFilter.HasInvasiveSpeciesTreatment = searchFilterInternalDto.ExtendedFilter.HasInvasiveSpeciesTreatment;
                 internalFilter.Years = searchFilterInternalDto.ExtendedFilter.Years;
                 internalFilter.YearsComparison = (DateFilterComparison)searchFilterInternalDto.ExtendedFilter.YearsComparison;
             }

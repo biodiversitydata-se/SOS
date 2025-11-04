@@ -2066,4 +2066,78 @@ public class ExtendedFilterTests : TestBase
         result!.TotalCount.Should().Be(40,
             because: "40 observations has InvasiveSpeciesTreatment with value FollowUpChemical or TreatmentAccordingToComment");
     }
+
+    [Fact]
+    public async Task ObservationsBySearchInternalEndpoint_ReturnsExpectedObservations_WhenFilteringByHasInvasiveSpeciesTreatment()
+    {
+        // Arrange
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+            .All().HaveValuesFromPredefinedObservations()
+            .TheFirst(20).With(o => o.Projects = new[] { new Lib.Models.Verbatim.Artportalen.Project() { Id = 1 } })
+             .TheNext(20).With(o => o.Projects = new[] { new Lib.Models.Verbatim.Artportalen.Project() { Id = 2 } })
+             .TheNext(20).With(o => o.Projects = null)
+             .TheNext(20).With(o => o.Projects = new[] { new Lib.Models.Verbatim.Artportalen.Project() { Id = 5865,
+                 ProjectParameters = new List<Lib.Models.Verbatim.Artportalen.ProjectParameter>
+                 {
+                     new Lib.Models.Verbatim.Artportalen.ProjectParameter { Id = 1, Name = "Åtgärd", Value = "Uppföljning" },
+                     new Lib.Models.Verbatim.Artportalen.ProjectParameter { Id = 2, Name = "Kemisk åtgärd", Value = "Ja" }
+                 }
+             }})
+            .TheLast(20).With(o => o.Projects = new[] { new Lib.Models.Verbatim.Artportalen.Project() { Id = 5444 } })
+            .Build();
+        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
+        var apiClient = TestFixture.CreateApiClient();
+        var searchFilter = new SearchFilterInternalDto
+        {
+            ExtendedFilter = new ExtendedFilterDto
+            {
+                HasInvasiveSpeciesTreatment = true
+            }
+        };
+
+        // Act
+        var response = await apiClient.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter));
+        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        result!.TotalCount.Should().Be(40,
+            because: "40 observations has InvasiveSpeciesTreatment");
+
+
+        // Arrange test with different search criteria
+        searchFilter = new SearchFilterInternalDto
+        {
+            ExtendedFilter = new ExtendedFilterDto
+            {
+                HasInvasiveSpeciesTreatment = false
+            }
+        };
+
+        // Act
+        response = await apiClient.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter));
+        result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        result!.TotalCount.Should().Be(60,
+            because: "60 observations doesn't have InvasiveSpeciesTreatment");
+
+        // Arrange test with different search criteria
+        searchFilter = new SearchFilterInternalDto
+        {
+            ExtendedFilter = new ExtendedFilterDto
+            {
+                HasInvasiveSpeciesTreatment = null
+            }
+        };
+
+        // Act
+        response = await apiClient.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter));
+        result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        result!.TotalCount.Should().Be(100);
+    }
 }

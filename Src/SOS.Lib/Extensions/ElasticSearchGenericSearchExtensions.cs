@@ -134,6 +134,22 @@ namespace SOS.Lib.Extensions
             );
         }
 
+        public static void TryAddExistsCriteria<TQueryDescriptor>(
+            this ICollection<Action<QueryDescriptor<TQueryDescriptor>>> queries, string field, bool? exists) where TQueryDescriptor : class
+        {
+            if (exists.HasValue)
+            {
+                if (exists.Value == true)
+                {
+                    queries.Add(q => q.Exists(e => e.Field(field)));
+                }
+                else
+                {
+                    queries.Add(q => q.Bool(b => b.MustNot(mn => mn.Exists(e => e.Field(field)))));
+                }                
+            }
+        }
+
         /// <summary>
         ///  Add numeric filter with relation operator
         /// </summary>
