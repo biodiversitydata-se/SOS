@@ -79,6 +79,7 @@ namespace SOS.Harvest.Processors.Artportalen
                     var events = new List<Event>();
                     foreach (var observation in observations)
                     {
+                        observation.Location.IsInEconomicZoneOfSweden = true; // all Artportalen observations are in Sweden
                         string eventId = observation.Event.EventId.ToLower();
                         if (occurrenceIdsByEventId.TryGetValue(eventId, out var occurrenceIds))
                         {
