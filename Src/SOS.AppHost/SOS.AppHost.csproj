@@ -20,7 +20,6 @@
   <ItemGroup>
     <ProjectReference Include="..\SOS.Observations.Api\SOS.Observations.Api.csproj" />
 	<ProjectReference Include="..\SOS.Administration.Api\SOS.Administration.Api.csproj" />
-	<ProjectReference Include="..\SOS.Administration.Gui\SOS.Administration.Gui.csproj" />
 	<ProjectReference Include="..\SOS.Hangfire.JobServer\SOS.Hangfire.JobServer.csproj" />
 	<ProjectReference Include="..\SOS.Status.Web\SOS.Status.Web.csproj" />
   </ItemGroup>
