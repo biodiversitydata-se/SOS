@@ -252,6 +252,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SOS.Status.Web.Client", "Sr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SOS.DataStewardship.Api", "Src\SOS.DataStewardship.Api\SOS.DataStewardship.Api.csproj", "{96673EFC-5CC9-1F6A-2072-14240009C476}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SOS.DataStewardship.Api.IntegrationTests", "Tests\Integration\SOS.DataStewardship.Api.IntegrationTests\SOS.DataStewardship.Api.IntegrationTests.csproj", "{8D968979-9B32-A2A7-7C3D-C7B47D136E93}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -378,6 +380,10 @@ Global
 		{96673EFC-5CC9-1F6A-2072-14240009C476}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{96673EFC-5CC9-1F6A-2072-14240009C476}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{96673EFC-5CC9-1F6A-2072-14240009C476}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8D968979-9B32-A2A7-7C3D-C7B47D136E93}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8D968979-9B32-A2A7-7C3D-C7B47D136E93}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8D968979-9B32-A2A7-7C3D-C7B47D136E93}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8D968979-9B32-A2A7-7C3D-C7B47D136E93}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -449,6 +455,7 @@ Global
 		{B2957095-7878-B30E-A34F-44E2D58CA81F} = {9CE4D24E-E3E4-4053-AC0D-E27135B6634A}
 		{880B12BB-8C61-D55B-83A9-B0448895F7AD} = {9CE4D24E-E3E4-4053-AC0D-E27135B6634A}
 		{96673EFC-5CC9-1F6A-2072-14240009C476} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{8D968979-9B32-A2A7-7C3D-C7B47D136E93} = {A3C5E4A0-5599-48B7-BE17-07E19D585ACE}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7CBCE6ED-CC4F-4B55-913F-1231086E92FE}

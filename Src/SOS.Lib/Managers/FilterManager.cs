@@ -477,7 +477,7 @@ namespace SOS.Lib.Managers
                     filter.Location.Geometries?.UsePointAccuracy ?? false, 
                     filter.Location.Geometries?.UseDisturbanceRadius ?? false,
                     false,
-                    filter.Location?.Geometries.UseAuthorizationBuffer);
+                    filter.Location?.Geometries?.UseAuthorizationBuffer ?? false);
             }
 
             await PrepareTaxonFilterAsync(filter.Taxa);
