@@ -399,6 +399,7 @@ namespace SOS.Harvest.Processors.DarwinCoreArchive
                 case (int)ValidationStatusId.ApprovedBasedOnReportersOldRarityForm:
                 case (int)ValidationStatusId.ApprovedBasedOnReportersRarityForm:
                 case (int)ValidationStatusId.ApprovedSpecimenCheckedByValidator:
+                case (int)ValidationStatusId.ApprovedBasedOnReference:
                     return true;
             }
 

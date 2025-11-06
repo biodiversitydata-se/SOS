@@ -132,6 +132,12 @@
         ApprovedBasedOnReportersOldRarityForm = 65,
 
         /// <summary>
+        ///     Approved, based on reference.
+        ///     (Godkänd, baserat på referens)
+        /// </summary>
+        ApprovedBasedOnReference = 66,
+
+        /// <summary>
         ///     Not able to validate.
         ///     (Ej möjlig att validera)
         /// </summary>

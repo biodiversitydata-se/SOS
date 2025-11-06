@@ -104,7 +104,7 @@ public class GeneralFilterTests : TestBase
     public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_WhenFilteringByVerifiedObservations()
     {
         // Arrange
-        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(110)
             .All()
             .HaveValuesFromPredefinedObservations()
             .TheFirst(10).With(o => o.ValidationStatus = new Metadata<int>((int)ValidationStatusId.ApprovedBasedOnReportersDocumentation))
@@ -113,6 +113,7 @@ public class GeneralFilterTests : TestBase
              .TheNext(10).With(o => o.ValidationStatus = new Metadata<int>((int)ValidationStatusId.ApprovedBasedOnReportersRarityForm))
              .TheNext(10).With(o => o.ValidationStatus = new Metadata<int>((int)ValidationStatusId.ApprovedBasedOnDeterminatorsVerification))
              .TheNext(10).With(o => o.ValidationStatus = new Metadata<int>((int)ValidationStatusId.ApprovedBasedOnReportersOldRarityForm))
+             .TheNext(10).With(o => o.ValidationStatus = new Metadata<int>((int)ValidationStatusId.ApprovedBasedOnReference))
 
              .TheNext(5).With(o => o.ValidationStatus = new Metadata<int>((int)ValidationStatusId.DescriptionRequiredForTheNationalRaritiesCommittee))
              .TheNext(5).With(o => o.ValidationStatus = new Metadata<int>((int)ValidationStatusId.DescriptionRequiredForTheRegionalRecordsCommittee))
@@ -133,8 +134,8 @@ public class GeneralFilterTests : TestBase
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        result!.TotalCount.Should().Be(60,
-            because: "60 observations added to Elasticsearch have verified status.");
+        result!.TotalCount.Should().Be(70,
+            because: "70 observations added to Elasticsearch have verified status.");
     }
 
     [Fact]

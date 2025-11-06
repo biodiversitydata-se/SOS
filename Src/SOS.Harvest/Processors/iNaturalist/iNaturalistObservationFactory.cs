@@ -216,6 +216,7 @@ namespace SOS.Harvest.Processors.iNaturalist
                 case (int)ValidationStatusId.ApprovedBasedOnReportersOldRarityForm:
                 case (int)ValidationStatusId.ApprovedBasedOnReportersRarityForm:
                 case (int)ValidationStatusId.ApprovedSpecimenCheckedByValidator:
+                case (int)ValidationStatusId.ApprovedBasedOnReference:
                     return true;
             }
 

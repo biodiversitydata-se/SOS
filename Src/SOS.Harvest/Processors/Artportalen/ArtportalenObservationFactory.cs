@@ -30,14 +30,15 @@ namespace SOS.Harvest.Processors.Artportalen
         private readonly IDictionary<int, DatasetMapping> _datasetByProjectId;
         private readonly bool _incrementalMode;
         private readonly string _artPortalenUrl;
-        private int[] _validationStatusIdIds = new[] {
+        private int[] _validationStatusIdIds = [
             (int) ValidationStatusId.ApprovedBasedOnReportersDocumentation,
             (int) ValidationStatusId.ApprovedSpecimenCheckedByValidator,
             (int) ValidationStatusId.ApprovedBasedOnImageSoundOrVideoRecording,
             (int) ValidationStatusId.ApprovedBasedOnReportersRarityForm,
             (int) ValidationStatusId.ApprovedBasedOnDeterminatorsVerification,
-            (int) ValidationStatusId.ApprovedBasedOnReportersOldRarityForm
-        };
+            (int) ValidationStatusId.ApprovedBasedOnReportersOldRarityForm,
+            (int) ValidationStatusId.ApprovedBasedOnReference
+        ];
 
         /// Cast verbatim area to processed area
         /// </summary>

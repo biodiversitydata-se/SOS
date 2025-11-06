@@ -304,6 +304,21 @@
       ]
     },
     {
+      "Id": 66,
+      "Value": "Approved, based on reference",
+      "Localized": true,
+      "Translations": [
+        {
+          "CultureCode": "sv-SE",
+          "Value": "Godkänd, baserat på referens"
+        },
+        {
+          "CultureCode": "en-GB",
+          "Value": "Approved, based on reference"
+        }
+      ]
+    },
+    {
       "Id": 70,
       "Value": "Not able to validate",
       "Localized": true,
@@ -395,6 +410,10 @@
             {
               "Value": 65,
               "SosId": 65
+            },
+            {
+              "Value": 66,
+              "SosId": 66
             },
             {
               "Value": 70,
@@ -576,6 +595,14 @@
             {
               "Value": "Approved based on reporters old rarity form",
               "SosId": 65
+            },
+            {
+              "Value": "Godkänd, baserat på referens",
+              "SosId": 66
+            },
+            {
+              "Value": "Approved, based on reference",
+              "SosId": 66
             },
             {
               "Value": "Ej möjlig att validera",

@@ -2073,6 +2073,7 @@ All vocabularies used in SOS are listed on this page. The vocabularies can be do
 | 63 | Godkänd baserat på raritetsblankett | Approved based on reporters rarity form |
 | 64 | Godkänd baserat på determinatörs verifiering | Approved based on determinators verification |
 | 65 | Godkänd baserat på äldre raritetsblankett | Approved based on reporters old rarity form |
+| 66 | Godkänd, baserat på referens | Approved, based on reference |
 | 70 | Ej möjlig att validera | Not able to validate |
 
 ## taxonCategory
