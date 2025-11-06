@@ -37,6 +37,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SOS.Lib\SOS.Lib.csproj" />
+    <ProjectReference Include="..\SOS.ServiceDefaults\SOS.ServiceDefaults.csproj" />
   </ItemGroup>
 
 </Project>

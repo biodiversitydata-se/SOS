@@ -9,6 +9,7 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Dev",
         "DOTNET_ENVIRONMENT": "Dev",
+        "ASPNETCORE_PREVENTHOSTINGSTARTUP": "true",
         "DOTNET_DASHBOARD_OTLP_ENDPOINT_URL": "https://localhost:21056",
         "DOTNET_RESOURCE_SERVICE_ENDPOINT_URL": "https://localhost:22144",
         "DISABLE_HANGFIRE_INIT": "false",
@@ -27,6 +28,7 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "ST",
         "DOTNET_ENVIRONMENT": "ST",
+        "ASPNETCORE_PREVENTHOSTINGSTARTUP": "true",
         "DOTNET_DASHBOARD_OTLP_ENDPOINT_URL": "https://localhost:21056",
         "DOTNET_RESOURCE_SERVICE_ENDPOINT_URL": "https://localhost:22144",
         "DISABLE_HANGFIRE_INIT": "false",
@@ -45,6 +47,7 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "local",
         "DOTNET_ENVIRONMENT": "local",
+        "ASPNETCORE_PREVENTHOSTINGSTARTUP": "true",
         "DOTNET_DASHBOARD_OTLP_ENDPOINT_URL": "https://localhost:21056",
         "DOTNET_RESOURCE_SERVICE_ENDPOINT_URL": "https://localhost:22144",
         "DISABLE_HANGFIRE_INIT": "false",

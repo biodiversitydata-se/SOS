@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "API (Local)": {
+    "SOS.DataStewardship.Api (Local)": {
       "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "swagger",
@@ -10,7 +10,7 @@
       "dotnetRunMessages": true,
       "applicationUrl": "http://localhost:5000"
     },
-    "API (Dev)": {
+    "SOS.DataStewardship.Api (Dev)": {
       "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "swagger",
@@ -20,7 +20,7 @@
       "dotnetRunMessages": true,
       "applicationUrl": "http://localhost:5000"
     },
-    "API (ST)": {
+    "SOS.DataStewardship.Api (ST)": {
       "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "swagger",
@@ -29,17 +29,7 @@
       },
       "dotnetRunMessages": true,
       "applicationUrl": "http://localhost:5000"
-    },
-    "WSL": {
-      "commandName": "WSL2",
-      "launchBrowser": true,
-      "launchUrl": "http://localhost:5000/swagger",
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "local",
-        "ASPNETCORE_URLS": "http://localhost:5000"
-      },
-      "distributionName": ""
-    }
+    }    
   },
   "$schema": "https://json.schemastore.org/launchsettings.json"
 }

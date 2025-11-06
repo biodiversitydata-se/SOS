@@ -7,6 +7,7 @@ using Serilog.Filters;
 using Serilog.Formatting.Compact;
 using SOS.DataStewardship.Api.Endpoints;
 using SOS.DataStewardship.Api.Extensions;
+using SOS.Lib.Helpers;
 using System.Text.Json.Serialization;
 
 // human readable in the terminal when developing, not all json
@@ -40,10 +41,9 @@ try
 {
     Log.Information("Starting up");
     var builder = WebApplication.CreateBuilder(args);
-
-    // we register serilog with DI here so that we can use it in our application endpoints/handlers/services etc..
-    builder.Host.UseSerilog(isDevelopment ? localDevConfig : inClusterConfig);
-
+    builder.AddServiceDefaults();
+    SeriLogHelper.ConfigureSerilog(builder);
+    
     builder.Services.AddMemoryCache();
     builder.SetupUserSecrets();
 
@@ -75,7 +75,7 @@ try
     builder.Services.Configure<TelemetryConfiguration>(x => x.DisableTelemetry = true);
 #endif
     var app = builder.Build();
-
+    app.MapDefaultEndpoints();
     app.ConfigureExceptionHandler(isDevelopment);
     app.UseEndpointDefinitions();
 
@@ -108,7 +108,8 @@ try
         };
     });
 
-    app.Run("http://*:5000");
+    string? aspnetCoreUrls = Environment.GetEnvironmentVariable("ASPNETCORE_URLS");
+    await app.RunAsync(aspnetCoreUrls ?? "http://*:5000");    
 }
 catch (Exception ex)
 {

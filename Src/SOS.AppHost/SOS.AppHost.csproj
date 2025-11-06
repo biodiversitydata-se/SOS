@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\SOS.DataStewardship.Api\SOS.DataStewardship.Api.csproj" />
     <ProjectReference Include="..\SOS.Observations.Api\SOS.Observations.Api.csproj" />
 	<ProjectReference Include="..\SOS.Administration.Api\SOS.Administration.Api.csproj" />
 	<ProjectReference Include="..\SOS.Hangfire.JobServer\SOS.Hangfire.JobServer.csproj" />

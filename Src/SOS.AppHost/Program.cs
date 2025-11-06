@@ -49,6 +49,18 @@ var analysisApi = builder.AddProject<Projects.SOS_Observations_Api>("sos-analysi
     .WithReference(hangfireDb)
     .WaitFor(hangfireDb);
 
+// Configure Data stewardship API
+var dataStewardshipApi = builder.AddProject<Projects.SOS_DataStewardship_Api>("sos-datastewardship-api", configure: static project =>
+    {
+        project.ExcludeLaunchProfile = true;
+    })
+    .WithEnvironment("ASPNETCORE_ENVIRONMENT", env.AspNetCoreEnvironment)
+    .WithEnvironment("DISABLE_HEALTHCHECK_INIT", env.DisableHealthcheckInit.ToString())
+    .WithHttpEndpoint(name: "http", port: 5002)
+    .WithUrlForEndpoint("http", endpoint => { endpoint.DisplayLocation = UrlDisplayLocation.DetailsOnly; })
+    .WithUrl("http://localhost:5002/swagger", "Data Stewardship API")
+    .WithHttpHealthCheck("/healthz");    
+
 // Configure Administration API
 var adminApi = builder.AddProject<Projects.SOS_Administration_Api>(name: "sos-administration-api", configure: static project =>
     {
