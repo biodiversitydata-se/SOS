@@ -1,6 +1,7 @@
 ﻿using SOS.Harvest.Processors.DarwinCoreArchive;
 using SOS.Harvest.Processors.iNaturalist;
 using SOS.Lib.Enums;
+using SOS.Lib.Models.Processed;
 using SOS.Lib.Models.Processed.Checklist;
 using SOS.Lib.Models.Processed.DataStewardship.Dataset;
 using SOS.Lib.Models.Processed.Observation;
@@ -15,12 +16,12 @@ public interface IProcessFixture
     List<Taxon> Taxa { get; }
     IDictionary<VocabularyId, IDictionary<object, int>> DwcaVocabularyById { get; }
     Dictionary<int, Taxon> TaxonById { get; }
-    Task AddDatasetsToElasticsearchAsync(IEnumerable<Dataset> datasets, bool clearExistingObservations = true, int delayInMs = 1000);
+    Task AddDatasetsToElasticsearchAsync(IEnumerable<Dataset> datasets, bool clearExistingObservations = true);
     Task AddDataToElasticsearchAsync(IEnumerable<Lib.Models.Processed.DataStewardship.Event.Event> events, IEnumerable<Observation> observations, bool clearExistingObservations = true);
     Task AddDataToElasticsearchAsync(List<Dataset> datasets, List<Lib.Models.Processed.DataStewardship.Event.Event> events, List<Observation> observations, bool clearExistingObservations = true);
     Task AddDataToElasticsearchAsync(TestDatas.TestDataSet testDataSet, bool clearExistingObservations = true);
-    Task AddEventsToElasticsearchAsync(IEnumerable<Lib.Models.Processed.DataStewardship.Event.Event> events, bool clearExistingObservations = true, int delayInMs = 1000);
-    Task AddObservationsToElasticsearchAsync(IEnumerable<Observation> observations, bool clearExistingObservations = true, int delayInMs = 100);
+    Task AddEventsToElasticsearchAsync(IEnumerable<Lib.Models.Processed.DataStewardship.Event.Event> events, bool clearExistingObservations = true);
+    Task AddObservationsToElasticsearchAsync(IEnumerable<Observation> observations, bool clearExistingObservations = true);
     Task<DwcaObservationFactory> CreateDarwinCoreFactoryAsync(DataProvider dataProvider);
     DwcaObservationFactory GetDarwinCoreFactory(bool initAreaHelper);
     iNaturalistObservationFactory GetiNaturalistFactory(bool initAreaHelper);
@@ -37,7 +38,8 @@ public interface IProcessFixture
     Task CleanElasticsearchIndices();
     Task ProcessAndAddChecklistsToElasticSearch(IEnumerable<ArtportalenChecklistVerbatim> verbatimChecklists);
     Task<List<Observation>> ProcessAndAddObservationsToElasticSearch(IEnumerable<ArtportalenObservationVerbatim> verbatimObservations);
-    //Task<List<Observation>> ProcessAndAddObservationsToElasticSearchUsingObservationProcessor(IEnumerable<ArtportalenObservationVerbatim> verbatimObservations);
+    Task<ProcessingStatus> ProcessAndAddArtportalenEventsToElasticSearch(bool clearExistingObservations = true);
+    Task<int> ProcessAndAddDatasetsToElasticSearch(IEnumerable<ArtportalenDatasetMetadata> verbatimDatasets, bool clearExistingObservations = true);    
     List<Checklist> ProcessChecklists(IEnumerable<ArtportalenChecklistVerbatim> verbatimChecklists);
     List<Observation> ProcessObservations(IEnumerable<ArtportalenObservationVerbatim> verbatimObservations, bool enableDiffusion = false);
     List<Observation> ProcessObservations(IEnumerable<DwcObservationVerbatim> verbatimObservations, bool initAreaHelper = false);

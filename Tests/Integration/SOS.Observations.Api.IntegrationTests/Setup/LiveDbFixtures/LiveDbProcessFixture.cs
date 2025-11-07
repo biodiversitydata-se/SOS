@@ -23,6 +23,7 @@ using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Managers;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Interfaces;
+using SOS.Lib.Models.Processed;
 using SOS.Lib.Models.Processed.Checklist;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Processed.DataStewardship.Dataset;
@@ -346,7 +347,7 @@ public class LiveDbProcessFixture : IProcessFixture
         var processedObservations = dwcObservations
             .Select(m => observationFactory.CreateProcessedObservation(m, false))
             .ToList();
-        await AddObservationsToElasticsearchAsync(processedObservations!);
+        await AddObservationsToElasticsearchAsync(processedObservations!, true, 100);
         output.WriteLine($"Processed observations count= {processedObservations.Count}");
     }
 
@@ -362,21 +363,21 @@ public class LiveDbProcessFixture : IProcessFixture
             .Occurrences!
             .Select(m => observationFactory.CreateProcessedObservation(m, false))
             .ToList();
-        await AddObservationsToElasticsearchAsync(processedObservations!);
+        await AddObservationsToElasticsearchAsync(processedObservations!, true, 100);
         output.WriteLine($"Processed observations count= {processedObservations.Count}");
 
         var processedEvents = parsedDwcaFile
             .Events!
             .Select(m => eventFactory.CreateEventObservation(m))
             .ToList();
-        await AddEventsToElasticsearchAsync(processedEvents);
+        await AddEventsToElasticsearchAsync(processedEvents, true, 100);
         output.WriteLine($"Processed events count= {processedEvents.Count}");
 
         var processedDatasets = parsedDwcaFile
             .Datasets!
             .Select(m => datasetFactory.CreateProcessedDataset(m))
             .ToList();
-        await AddDatasetsToElasticsearchAsync(processedDatasets!);
+        await AddDatasetsToElasticsearchAsync(processedDatasets!, true, 100);
         output.WriteLine($"Processed datasets count= {processedDatasets.Count}");
     }
 
@@ -644,6 +645,31 @@ public class LiveDbProcessFixture : IProcessFixture
     }
 
     public iNaturalistObservationFactory GetiNaturalistFactory(bool initAreaHelper)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task AddDatasetsToElasticsearchAsync(IEnumerable<Dataset> datasets, bool clearExistingObservations = true)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task AddEventsToElasticsearchAsync(IEnumerable<Lib.Models.Processed.DataStewardship.Event.Event> events, bool clearExistingObservations = true)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task AddObservationsToElasticsearchAsync(IEnumerable<Observation> observations, bool clearExistingObservations = true)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<ProcessingStatus> ProcessAndAddArtportalenEventsToElasticSearch(bool clearExistingObservations = true)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<int> ProcessAndAddDatasetsToElasticSearch(IEnumerable<ArtportalenDatasetMetadata> verbatimDatasets, bool clearExistingObservations = true)
     {
         throw new NotImplementedException();
     }

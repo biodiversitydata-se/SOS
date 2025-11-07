@@ -216,7 +216,7 @@ namespace SOS.Lib.Repositories.Processed
             try
             {
                 var res = await Client.DeleteByQueryAsync<TEntity>(indexName, d => d
-                    .Query(q => q.MatchAll(ma => ma.Boost(1)))
+                    .Query(q => q.MatchAll(new Elastic.Clients.Elasticsearch.QueryDsl.MatchAllQuery()))
                     .Refresh(waitForCompletion)
                     .WaitForCompletion(waitForCompletion)
                 );
@@ -394,7 +394,7 @@ namespace SOS.Lib.Repositories.Processed
             var indexState = new IndexState() { Settings = new IndexSettings() };
             indexState.Settings.RefreshInterval = duration;
             var setResponse = await Client.Indices.PutSettingsAsync<TEntity>(indexState.Settings, index);
-
+            
             return setResponse.IsValidResponse;
         }
 
@@ -549,6 +549,12 @@ namespace SOS.Lib.Repositories.Processed
         public async Task<bool> DeleteCollectionAsync()
         {
             return await DeleteCollectionAsync(IndexName);
+        }
+
+        public async Task RefreshIndexAsync()
+        {            
+            await Client.Indices.FlushAsync(IndexName);
+            await Client.Indices.RefreshAsync(IndexName);            
         }
 
         /// <inheritdoc />

@@ -298,8 +298,8 @@ namespace SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder
                 obs.HasAnyTriggeredValidationRuleWithWarning = sourceObservation.HasAnyTriggeredValidationRuleWithWarning;
                 obs.NoteOfInterest = sourceObservation.NoteOfInterest;
                 obs.HasUserComments = sourceObservation.HasUserComments;
-                obs.NotRecovered = sourceObservation.NotRecovered;
-                obs.ProtectedBySystem = sourceObservation.ProtectedBySystem;
+                obs.NotRecovered = sourceObservation.NotRecovered;                
+                obs.ProtectedBySystem = false;
                 obs.RightsHolder = sourceObservation.RightsHolder;
                 obs.VerifiedByInternal = sourceObservation.VerifiedByInternal;
                 obs.VerifiedBy = sourceObservation.VerifiedBy;
@@ -329,8 +329,8 @@ namespace SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder
                 obs.DeterminationYear = sourceObservation.DeterminationYear;
                 obs.StartTime = sourceObservation.StartTime;
                 obs.EndTime = sourceObservation.EndTime;
-                obs.HasUserComments = sourceObservation.HasUserComments;
-                obs.HiddenByProvider = sourceObservation.HiddenByProvider;
+                obs.HasUserComments = sourceObservation.HasUserComments;                
+                obs.HiddenByProvider = null;
                 obs.Label = sourceObservation.Label;
                 obs.Length = sourceObservation.Length;
                 obs.MaxDepth = sourceObservation.MaxDepth;

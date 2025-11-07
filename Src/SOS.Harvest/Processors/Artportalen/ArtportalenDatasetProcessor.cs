@@ -7,6 +7,7 @@ using SOS.Lib.Configuration.Process;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Processed.DataStewardship.Dataset;
+using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
@@ -49,6 +50,12 @@ namespace SOS.Harvest.Processors.Artportalen
             _datasetRepository = datasetRepository;
         }
 
+        public async Task<int> ProcessDatasetsAsync(DataProvider dataProvider, IEnumerable<ArtportalenDatasetMetadata> verbatimDatasets)
+        {
+            int nrAddedDatasets = await AddDatasetsAsync(dataProvider, verbatimDatasets.ToList());
+            return nrAddedDatasets;
+        }
+
         /// <inheritdoc />
         protected override async Task<int> ProcessDatasetsAsync(
             DataProvider dataProvider,
@@ -59,7 +66,7 @@ namespace SOS.Harvest.Processors.Artportalen
             return nrAddedDatasets;
         }
 
-        private async Task<int> AddDatasetsAsync(DataProvider dataProvider, List<Lib.Models.Processed.Observation.ArtportalenDatasetMetadata> verbatimDatasets)
+        private async Task<int> AddDatasetsAsync(DataProvider dataProvider, List<ArtportalenDatasetMetadata> verbatimDatasets)
         {
             try
             {

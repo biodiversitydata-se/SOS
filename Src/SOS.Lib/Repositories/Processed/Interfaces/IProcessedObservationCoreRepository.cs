@@ -406,5 +406,7 @@ namespace SOS.Lib.Repositories.Processed.Interfaces
             int size,
             string? subAggreagtionField = null,
             AggregationTypes subAggregationType = AggregationTypes.None);
+
+        Task RefreshIndicesAsync();
     }
 }

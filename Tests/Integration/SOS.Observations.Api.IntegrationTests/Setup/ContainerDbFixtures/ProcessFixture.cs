@@ -1,7 +1,9 @@
 ﻿using DwC_A;
 using Elastic.Clients.Elasticsearch.Cluster;
+using Hangfire;
 using Microsoft.ApplicationInsights;
 using Microsoft.Extensions.Caching.Memory;
+using NSubstitute;
 using SOS.Harvest.DarwinCore;
 using SOS.Harvest.DarwinCore.Interfaces;
 using SOS.Harvest.Managers;
@@ -23,6 +25,7 @@ using SOS.Lib.Managers;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Cache;
 using SOS.Lib.Models.Interfaces;
+using SOS.Lib.Models.Processed;
 using SOS.Lib.Models.Processed.Checklist;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Processed.DataStewardship.Dataset;
@@ -65,12 +68,16 @@ public class ProcessFixture : IProcessFixture
     private List<Taxon>? _taxa;
     private IDatasetRepository _datasetRepository;
     private IEventRepository _eventRepository;
+    private IProcessManager _processManager;
+    private IValidationManager _validationManager;
     private IProcessedObservationCoreRepository _processedObservationCoreRepository;
     private ArtportalenObservationFactory? _artportalenObservationFactory;
     private IVocabularyValueResolver _vocabularyValueResolver;
     private IArtportalenDatasetMetadataRepository _artportalenDatasetMetadataRepository;
     private ArtportalenChecklistFactory? _artportalenChecklistFactory;
     private IProcessedChecklistRepository _processedChecklistRepository { get; set; }
+    private ArtportalenDatasetProcessor _artportalenDatasetProcessor { get; set; }
+    private ArtportalenEventProcessor _artportalenEventProcessor { get; set; }
     private DataProvider _testDataProvider = new DataProvider { Id = 1, Identifier = "TestDataProvider" };
 
     public List<Taxon> Taxa => _taxa!;
@@ -86,12 +93,16 @@ public class ProcessFixture : IProcessFixture
         IVocabularyRepository vocabularyRepository,
         ITaxonRepository taxonRepository,
         IProcessTimeManager processTimeManager,
+        IProcessManager processManager,
+        IValidationManager validationManager,
         ProcessConfiguration processConfiguration,
         IDatasetRepository observationDatasetRepository,
         IEventRepository observationEventRepository,
         IProcessedObservationCoreRepository processedObservationCoreRepository,
         IVocabularyValueResolver vocabularyValueResolver,
         IArtportalenDatasetMetadataRepository artportalenDatasetMetadataRepository,
+        ArtportalenDatasetProcessor artportalenDatasetProcessor,
+        ArtportalenEventProcessor artportalenEventProcessor,
         IProcessedChecklistRepository processedChecklistRepository)
     {
         _processClient = processClient;
@@ -99,6 +110,8 @@ public class ProcessFixture : IProcessFixture
         _vocabularyRepository = vocabularyRepository;
         _taxonRepository = taxonRepository;
         _processTimeManager = processTimeManager;
+        _processManager = processManager;
+        _validationManager = validationManager;
         _processConfiguration = processConfiguration;
 
         _datasetRepository = observationDatasetRepository;
@@ -107,6 +120,8 @@ public class ProcessFixture : IProcessFixture
         _vocabularyValueResolver = vocabularyValueResolver;
         _artportalenDatasetMetadataRepository = artportalenDatasetMetadataRepository;
         _processedChecklistRepository = processedChecklistRepository;
+        _artportalenDatasetProcessor = artportalenDatasetProcessor;
+        _artportalenEventProcessor = artportalenEventProcessor;        
 
         InitializeAsync().Wait();
     }
@@ -147,8 +162,9 @@ public class ProcessFixture : IProcessFixture
         serviceCollection.AddSingleton<IProcessedConfigurationRepository, ProcessedConfigurationRepository>();
         serviceCollection.AddSingleton<IVocabularyValueResolver, VocabularyValueResolver>();
         serviceCollection.AddSingleton<IArtportalenDatasetMetadataRepository, ArtportalenDatasetMetadataRepository>();
-        serviceCollection.AddSingleton<IVocabularyRepository, VocabularyRepository>();
-        serviceCollection.AddSingleton<IVocabularyRepository, VocabularyRepository>();
+        serviceCollection.AddSingleton<ArtportalenDatasetProcessor>();
+        serviceCollection.AddSingleton<ArtportalenEventProcessor>();
+        serviceCollection.AddSingleton<IVocabularyRepository, VocabularyRepository>();        
         serviceCollection.AddSingleton<IProcessedChecklistRepository, ProcessedChecklistRepository>();
         VocabularyConfiguration vocabularyConfiguration = new VocabularyConfiguration()
         {
@@ -199,13 +215,14 @@ public class ProcessFixture : IProcessFixture
         _dwcaVocabularyById = VocabularyHelper.GetVocabulariesDictionary(
                 ExternalSystemId.DarwinCore,
                 vocabularies.ToArray(),
-                true);        
+                true);
 
+        var datasetRepoMock = CreateArtportalenDatasetMetadataRepositoryMock();
         _artportalenObservationFactory = await ArtportalenObservationFactory.CreateAsync(
             new DataProvider { Id = 1 },
             _taxaById,
             _vocabularyRepository,
-            _artportalenDatasetMetadataRepository,
+            datasetRepoMock,
             false,
             "https://www.artportalen.se",
             _processTimeManager,
@@ -244,7 +261,7 @@ public class ProcessFixture : IProcessFixture
         var processedObservations = publicObservations.Values.Concat(sensitiveObservations.Values).ToList();
         _vocabularyValueResolver.ResolveVocabularyMappedValues(processedObservations, true);
         //var processedObservations = ProcessObservations(verbatimObservations, enableDiffusion);
-        await AddObservationsToElasticsearchAsync(processedObservations, true, 0);
+        await AddObservationsToElasticsearchAsync(processedObservations, true);
         return processedObservations;
     }
 
@@ -442,20 +459,18 @@ public class ProcessFixture : IProcessFixture
         List<Observation> observations,
         bool clearExistingObservations = true)
     {
-        await AddDatasetsToElasticsearchAsync(datasets, clearExistingObservations, 0);
-        await AddEventsToElasticsearchAsync(events, clearExistingObservations, 0);
-        await AddObservationsToElasticsearchAsync(observations, clearExistingObservations, 0);
-        await Task.Delay(1000);
+        await AddDatasetsToElasticsearchAsync(datasets, clearExistingObservations);
+        await AddEventsToElasticsearchAsync(events, clearExistingObservations);
+        await AddObservationsToElasticsearchAsync(observations, clearExistingObservations);        
     }
 
     public async Task AddDataToElasticsearchAsync(
         TestDatas.TestDataSet testDataSet,
         bool clearExistingObservations = true)
     {
-        await AddDatasetsToElasticsearchAsync(testDataSet.Datasets!, clearExistingObservations, 0);
-        await AddEventsToElasticsearchAsync(testDataSet.Events!, clearExistingObservations, 0);
-        await AddObservationsToElasticsearchAsync(testDataSet.Observations!, clearExistingObservations, 0);
-        await Task.Delay(1000);
+        await AddDatasetsToElasticsearchAsync(testDataSet.Datasets!, clearExistingObservations);
+        await AddEventsToElasticsearchAsync(testDataSet.Events!, clearExistingObservations);
+        await AddObservationsToElasticsearchAsync(testDataSet.Observations!, clearExistingObservations);
     }
 
     public async Task AddDataToElasticsearchAsync(
@@ -463,13 +478,12 @@ public class ProcessFixture : IProcessFixture
         IEnumerable<Observation> observations,
         bool clearExistingObservations = true)
     {
-        await AddEventsToElasticsearchAsync(events, clearExistingObservations, 0);
-        await AddObservationsToElasticsearchAsync(observations, clearExistingObservations, 0);
-        await Task.Delay(1000);
+        await AddEventsToElasticsearchAsync(events, clearExistingObservations);
+        await AddObservationsToElasticsearchAsync(observations, clearExistingObservations);
     }
 
 
-    public async Task AddDatasetsToElasticsearchAsync(IEnumerable<Dataset> datasets, bool clearExistingObservations = true, int delayInMs = 1000)
+    public async Task AddDatasetsToElasticsearchAsync(IEnumerable<Dataset> datasets, bool clearExistingObservations = true)
     {
         if (clearExistingObservations)
         {
@@ -478,10 +492,10 @@ public class ProcessFixture : IProcessFixture
         await _datasetRepository.DisableIndexingAsync();
         await _datasetRepository.AddManyAsync(datasets);
         await _datasetRepository.EnableIndexingAsync();
-        await Task.Delay(delayInMs);
+        await _datasetRepository.RefreshIndexAsync();
     }
 
-    public async Task AddEventsToElasticsearchAsync(IEnumerable<Lib.Models.Processed.DataStewardship.Event.Event> events, bool clearExistingObservations = true, int delayInMs = 1000)
+    public async Task AddEventsToElasticsearchAsync(IEnumerable<Lib.Models.Processed.DataStewardship.Event.Event> events, bool clearExistingObservations = true)
     {
         if (clearExistingObservations)
         {
@@ -490,10 +504,10 @@ public class ProcessFixture : IProcessFixture
         await _eventRepository.DisableIndexingAsync();
         await _eventRepository.AddManyAsync(events);
         await _eventRepository.EnableIndexingAsync();
-        await Task.Delay(delayInMs);
+        await _eventRepository.RefreshIndexAsync();
     }
 
-    public async Task AddObservationsToElasticsearchAsync(IEnumerable<Observation> observations, bool clearExistingObservations = true, int delayInMs = 100)
+    public async Task AddObservationsToElasticsearchAsync(IEnumerable<Observation> observations, bool clearExistingObservations = true)
     {
         var publicObservations = new List<Observation>();
         var protectedObservations = new List<Observation>();
@@ -511,9 +525,8 @@ public class ProcessFixture : IProcessFixture
         }
 
         await AddObservationsBatchToElasticsearchAsync(publicObservations, false, clearExistingObservations);
-        await AddObservationsBatchToElasticsearchAsync(protectedObservations, true, clearExistingObservations);
-
-        await Task.Delay(delayInMs);
+        await AddObservationsBatchToElasticsearchAsync(protectedObservations, true, clearExistingObservations);        
+        await _processedObservationCoreRepository.RefreshIndicesAsync();
     }
 
     private async Task AddObservationsBatchToElasticsearchAsync(IEnumerable<Observation> observations,
@@ -524,6 +537,7 @@ public class ProcessFixture : IProcessFixture
         {
             await _processedObservationCoreRepository.DeleteAllDocumentsAsync(protectedIndex);
         }
+
         await _processedObservationCoreRepository.AddManyAsync(observations, protectedIndex, true);
     }
 
@@ -602,7 +616,7 @@ public class ProcessFixture : IProcessFixture
         await _processedChecklistRepository.AddManyAsync(checklists);
         await _processedChecklistRepository.EnableIndexingAsync();
 
-        Thread.Sleep(1000);
+        await Task.Delay(1000);        
     }
 
     private void InitAreaHelper()
@@ -674,5 +688,36 @@ public class ProcessFixture : IProcessFixture
             IndexPrefix = "",
             Clusters = null
         };
+    }
+
+    public async Task<ProcessingStatus> ProcessAndAddArtportalenEventsToElasticSearch(bool clearExistingObservations = true)
+    {
+        if (clearExistingObservations)
+        {
+            await _eventRepository.DeleteAllDocumentsAsync();
+        }
+        
+        var result = await _artportalenEventProcessor.ProcessAsync(_testDataProvider, JobCancellationToken.Null);
+        await _eventRepository.RefreshIndexAsync();
+        return result;
+    }    
+
+    public async Task<int> ProcessAndAddDatasetsToElasticSearch(IEnumerable<ArtportalenDatasetMetadata> verbatimDatasets, bool clearExistingObservations = true)
+    {
+        if (clearExistingObservations)
+        {
+            await _datasetRepository.DeleteAllDocumentsAsync(true);
+        }
+
+        var res = await _artportalenDatasetProcessor.ProcessDatasetsAsync(_testDataProvider, verbatimDatasets);
+        await _datasetRepository.RefreshIndexAsync();
+        return res;
+    }    
+
+    private IArtportalenDatasetMetadataRepository CreateArtportalenDatasetMetadataRepositoryMock()
+    {
+        var mockRepo = Substitute.For<IArtportalenDatasetMetadataRepository>();        
+        mockRepo.GetAllAsync().Returns(Task.FromResult(ArtportalenDatasetProjects.Mapping.Instance.DatasetByIdentifier.Values.ToList()));
+        return mockRepo;
     }
 }

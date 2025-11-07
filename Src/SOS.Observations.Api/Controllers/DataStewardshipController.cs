@@ -13,10 +13,10 @@ using SOS.Shared.Api.Validators.Interfaces;
 using SOS.Shared.Api.Extensions.Controller;
 using Result = CSharpFunctionalExtensions.Result;
 using System;
-using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using SOS.Lib.Helpers;
+using SOS.Shared.Api.Dtos;
 
 namespace SOS.Observations.Api.Controllers
 {
@@ -109,7 +109,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="exportMode">The export mode.</param>
         /// <returns></returns>
         [HttpPost("datasets")]
-        [ProducesResponseType(typeof(IEnumerable<DsDatasetDto>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(PagedResultDto<DsDatasetDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [ProducesResponseType((int)HttpStatusCode.ServiceUnavailable)]
@@ -231,7 +231,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="exportMode">The export mode.</param>
         /// <returns></returns>
         [HttpPost("events")]
-        [ProducesResponseType(typeof(IEnumerable<DsEventDto>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(PagedResultDto<DsEventDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [ProducesResponseType((int)HttpStatusCode.ServiceUnavailable)]
@@ -347,7 +347,7 @@ namespace SOS.Observations.Api.Controllers
         /// <param name="exportMode">The export mode.</param>
         /// <returns></returns>
         [HttpPost("occurrences")]
-        [ProducesResponseType(typeof(IEnumerable<DsOccurrenceDto>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(PagedResultDto<DsOccurrenceDto>), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NoContent)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         [ProducesResponseType((int)HttpStatusCode.ServiceUnavailable)]

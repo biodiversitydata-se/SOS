@@ -4,18 +4,18 @@ using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Repositories.Processed;
+using SOS.Lib.Repositories.Processed.Interfaces;
+using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Shared.Api.Dtos;
 using SOS.Shared.Api.Dtos.DataStewardship;
-using SOS.Observations.Api.Managers.Interfaces;
+using SOS.Shared.Api.Dtos.DataStewardship.Extensions;
+using SOS.Shared.Api.Extensions.Dto;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using SOS.Shared.Api.Dtos.DataStewardship.Extensions;
-using SOS.Shared.Api.Extensions.Dto;
-using SOS.Lib.Repositories.Processed.Interfaces;
 
 namespace SOS.Observations.Api.Managers
 {
@@ -319,19 +319,16 @@ namespace SOS.Observations.Api.Managers
             {
                 IsPartOfDataStewardshipDataset = true
             };
-            filter.Output.Fields = _observationOccurrenceOutputFields?.ToList();
-
-            IEnumerable<dynamic> observations = await _processedObservationCoreRepository.GetObservationAsync<dynamic>(id, filter, true);
-            var observation = observations?.FirstOrDefault();
+            filter.Output.Fields = _observationOccurrenceOutputFields?.ToList();            
+            var observation = await _processedObservationCoreRepository.GetObservationAsync<Observation>(id, filter, true);
 
             if (observation == null)
             {
                 _logger.LogInformation($"Could not find occurrence with id: {id}.");
                 return null!;
             }
-
-            Observation obs = CastDynamicToObservation(observation);
-            var occurrence = obs.ToDto(responseCoordinateSystem);
+            
+            var occurrence = observation.ToDto(responseCoordinateSystem);
             return occurrence;
         }
 

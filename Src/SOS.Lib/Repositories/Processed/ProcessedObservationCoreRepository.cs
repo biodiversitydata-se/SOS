@@ -1202,6 +1202,14 @@ namespace SOS.Lib.Repositories.Processed
             return await AddManyAsync(items, protectedIndex ? ProtectedIndexName : PublicIndexName, refreshIndex);
         }
 
+        public async Task RefreshIndicesAsync()
+        {            
+            await Client.Indices.FlushAsync(PublicIndexName);
+            await Client.Indices.FlushAsync(ProtectedIndexName);
+            await Client.Indices.RefreshAsync(PublicIndexName);
+            await Client.Indices.RefreshAsync(ProtectedIndexName);            
+        }
+
         /// <inheritdoc />
         public async Task<bool> ClearCollectionAsync(bool protectedIndex)
         {

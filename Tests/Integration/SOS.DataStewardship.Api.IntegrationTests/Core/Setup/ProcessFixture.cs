@@ -152,7 +152,6 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup
             await AddDatasetsToElasticsearchAsync(datasets, clearExistingObservations, 0);
             await AddEventsToElasticsearchAsync(events, clearExistingObservations, 0);
             await AddObservationsToElasticsearchAsync(observations, protectedIndex, clearExistingObservations, 0);
-            await Task.Delay(1000);
         }
 
         public async Task AddDataToElasticsearchAsync(
@@ -163,7 +162,6 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup
             await AddDatasetsToElasticsearchAsync(testDataSet.Datasets, clearExistingObservations, 0);
             await AddEventsToElasticsearchAsync(testDataSet.Events, clearExistingObservations, 0);
             await AddObservationsToElasticsearchAsync(testDataSet.Observations, protectedIndex, clearExistingObservations, 0);
-            await Task.Delay(1000);
         }        
 
         public async Task AddDataToElasticsearchAsync(
@@ -174,7 +172,6 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup
         {
             await AddEventsToElasticsearchAsync(events, clearExistingObservations, 0);
             await AddObservationsToElasticsearchAsync(observations, protectedIndex, clearExistingObservations, 0);
-            await Task.Delay(1000);
         }
 
 
@@ -187,7 +184,7 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup
             await _datasetRepository.DisableIndexingAsync();
             await _datasetRepository.AddManyAsync(datasets);
             await _datasetRepository.EnableIndexingAsync();
-            await Task.Delay(delayInMs);
+            await _datasetRepository.RefreshIndexAsync();
         }
 
         public async Task AddEventsToElasticsearchAsync(IEnumerable<Lib.Models.Processed.DataStewardship.Event.Event> events, bool clearExistingObservations = true, int delayInMs = 1000)
@@ -199,7 +196,7 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup
             await _eventRepository.DisableIndexingAsync();
             await _eventRepository.AddManyAsync(events);
             await _eventRepository.EnableIndexingAsync();
-            await Task.Delay(delayInMs);
+            await _eventRepository.RefreshIndexAsync();
         }
 
         public async Task AddObservationsToElasticsearchAsync(IEnumerable<Observation> observations, bool protectedIndex = false, bool clearExistingObservations = true, int delayInMs = 1000)
@@ -208,10 +205,11 @@ namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup
             {
                 await _processedObservationCoreRepository.DeleteAllDocumentsAsync(protectedIndex);
             }
+            
             await _processedObservationCoreRepository.DisableIndexingAsync(protectedIndex);
             await _processedObservationCoreRepository.AddManyAsync(observations, protectedIndex);
             await _processedObservationCoreRepository.EnableIndexingAsync(protectedIndex);
-            await Task.Delay(delayInMs);
+            await _processedObservationCoreRepository.RefreshIndicesAsync();            
         }
 
         public DwcaObservationFactory GetDwcaObservationFactory(bool initAreaHelper)
