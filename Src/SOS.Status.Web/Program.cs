@@ -81,8 +81,8 @@ try
     {
         options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
         options.RequireHeaderSymmetry = false;
-        options.ForwardLimit = null;
-        options.KnownNetworks.Clear();
+        options.ForwardLimit = null;        
+        options.KnownIPNetworks.Clear();
         options.KnownProxies.Clear();
     });
 

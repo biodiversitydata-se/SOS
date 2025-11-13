@@ -1,4 +1,4 @@
-﻿using Microsoft.OpenApi.Models;
+﻿using Microsoft.OpenApi;
 using System;
 
 namespace SOS.Lib.Swagger
@@ -34,10 +34,10 @@ namespace SOS.Lib.Swagger
         {
             Schema = schema switch
             {
-                SchemaDataType.Date => new OpenApiSchema { Type = "string", Format = "date", Description = description },
-                SchemaDataType.DateTime => new OpenApiSchema { Type = "string", Format = "date-time", Description = description },
-                SchemaDataType.Integer => new OpenApiSchema { Type = "integer", Format = "int32", Description = description },
-                _ => new OpenApiSchema { Type = "string", Format = "string", Description = description }
+                SchemaDataType.Date => new OpenApiSchema { Type = JsonSchemaType.String, Format = "date", Description = description },
+                SchemaDataType.DateTime => new OpenApiSchema { Type = JsonSchemaType.String, Format = "date-time", Description = description },
+                SchemaDataType.Integer => new OpenApiSchema { Type = JsonSchemaType.Integer, Format = "int32", Description = description },
+                _ => new OpenApiSchema { Type = JsonSchemaType.String, Format = "string", Description = description }
             };
         }
     }

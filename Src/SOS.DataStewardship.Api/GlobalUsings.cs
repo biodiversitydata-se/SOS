@@ -2,7 +2,6 @@
 global using Microsoft.AspNetCore.Diagnostics;
 global using Microsoft.AspNetCore.Mvc;
 global using Microsoft.Extensions.Caching.Memory;
-global using Microsoft.OpenApi.Models;
 global using SOS.Lib.Cache;
 global using SOS.Lib.Cache.Interfaces;
 global using SOS.Lib.Configuration.Shared;

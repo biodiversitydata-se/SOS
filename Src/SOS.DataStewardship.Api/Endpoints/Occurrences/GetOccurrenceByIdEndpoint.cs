@@ -1,5 +1,4 @@
-﻿using Swashbuckle.AspNetCore.Annotations;
-using SOS.DataStewardship.Api.Extensions;
+﻿using SOS.DataStewardship.Api.Extensions;
 using SOS.DataStewardship.Api.Application.Managers.Interfaces;
 using SOS.DataStewardship.Api.Contracts.Enums;
 
@@ -10,20 +9,27 @@ public class GetOccurrenceByIdEndpoint : IEndpointDefinition
     public void DefineEndpoint(WebApplication app)
     {
         app.MapGet("/occurrences/{id}", GetOccurrenceByIdAsync)
+            .WithName("GetOccurrenceById")
+            .WithTags("Occurrences")
             .Produces<Contracts.Models.Occurrence>(StatusCodes.Status200OK, "application/json")
             .Produces<ProblemDetails>(StatusCodes.Status404NotFound)
             .Produces<HttpValidationProblemDetails>(StatusCodes.Status400BadRequest)
             .Produces<ProblemDetails>(StatusCodes.Status500InternalServerError);
     }
 
-    [SwaggerOperation(
-        Description = "Get occurrence by Id. Example: urn:lsid:artportalen.se:sighting:98571689",
-        OperationId = "GetOccurrenceById",
-        Tags = new[] { "Occurrences" })]
+    /// <summary>
+    /// Get occurrence by Id
+    /// </summary>
+    /// <remarks>Example: "urn:lsid:artportalen.se:sighting:98571689"</remarks>
+    /// <param name="dataStewardshipManager"></param>
+    /// <param name="id">The occurrence id.</param>
+    /// <param name="exportMode">The export mode.</param>
+    /// <param name="responseCoordinateSystem">The response coordinate system.</param>
+    /// <returns></returns>
     private async Task<IResult> GetOccurrenceByIdAsync(IDataStewardshipManager dataStewardshipManager,
-        [FromRoute, SwaggerParameter("The occurrence id", Required = true)] string id,
-        [FromQuery, SwaggerParameter("The export mode")] ExportMode exportMode = ExportMode.Json,
-        [FromQuery, SwaggerParameter("The response coordinate system")] CoordinateSystem responseCoordinateSystem = CoordinateSystem.EPSG4326)
+        [FromRoute] string id,
+        [FromQuery] ExportMode exportMode = ExportMode.Json,
+        [FromQuery] CoordinateSystem responseCoordinateSystem = CoordinateSystem.EPSG4326)
     {
         var occurrenceModel = await dataStewardshipManager.GetOccurrenceByIdAsync(id, responseCoordinateSystem);
         if (occurrenceModel == null) return NotFoundResult(id);

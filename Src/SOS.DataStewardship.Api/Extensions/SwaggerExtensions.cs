@@ -1,4 +1,5 @@
-﻿using SOS.Lib.Swagger;
+﻿using Microsoft.OpenApi;
+using SOS.Lib.Swagger;
 
 namespace SOS.DataStewardship.Api.Extensions;
 
@@ -19,20 +20,10 @@ public static class SwaggerExtensions
                         Scheme = "bearer" //The name of the HTTP Authorization scheme to be used in the Authorization header. In this case "bearer".
                     });
 
-                options.AddSecurityRequirement(new OpenApiSecurityRequirement{
-                    {
-                        new OpenApiSecurityScheme{
-                            Scheme = "bearer",
-                            Name = "Bearer",
-                            In = ParameterLocation.Header,
-                            Reference = new OpenApiReference{
-                                Id = "Bearer", //The name of the previously defined security scheme.
-                                Type = ReferenceType.SecurityScheme
-                            }
-                        },
-                        new List<string>()
-                    }
-                });
+                options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
+                {
+                    [new OpenApiSecuritySchemeReference("Bearer", document)] = []
+                });                
 
                 //var schemaHelper = new SwashbuckleSchemaHelper();
                 //options.CustomSchemaIds(type => schemaHelper.GetSchemaId(type));
@@ -49,5 +40,23 @@ public static class SwaggerExtensions
         webApplicationBuilder.Services.AddEndpointsApiExplorer();
 
         return webApplicationBuilder;
+    }
+
+    public static WebApplication PreventSwaggerCaching(this WebApplication app)
+    {
+        //  Prevent caching on Swagger UI and swagger.json
+        app.Use(async (context, next) =>
+        {            
+            if (context.Request.Path.StartsWithSegments("/swagger", StringComparison.OrdinalIgnoreCase))
+            {
+                context.Response.Headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0";
+                context.Response.Headers["Pragma"] = "no-cache";
+                context.Response.Headers["Expires"] = "0";
+            }
+
+            await next();            
+        });
+
+        return app;
     }
 }

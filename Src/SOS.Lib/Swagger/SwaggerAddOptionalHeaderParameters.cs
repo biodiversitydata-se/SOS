@@ -1,4 +1,4 @@
-﻿using Microsoft.OpenApi.Models;
+﻿using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Collections.Generic;
 
@@ -16,7 +16,7 @@ namespace SOS.Lib.Swagger
         /// <param name="context"></param>
         public void Apply(OpenApiOperation operation, OperationFilterContext context)
         {
-            operation.Parameters ??= new List<OpenApiParameter>();
+            operation.Parameters ??= new List<IOpenApiParameter>();
 
             operation.Parameters.Add(new OpenApiParameter()
             {
@@ -26,7 +26,7 @@ namespace SOS.Lib.Swagger
                 Required = false,
                 Schema = new OpenApiSchema()
                 {
-                    Type = "string"
+                    Type = JsonSchemaType.String
                 }
             });
         }

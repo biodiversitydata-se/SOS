@@ -1,4 +1,4 @@
-﻿using Microsoft.OpenApi.Models;
+﻿using Microsoft.OpenApi;
 using SOS.Lib.Extensions;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Linq;
@@ -16,7 +16,7 @@ namespace SOS.Lib.Swagger
         /// </summary>
         /// <param name="schema"></param>
         /// <param name="context"></param>
-        public void Apply(OpenApiSchema schema, SchemaFilterContext context)
+        public void Apply(IOpenApiSchema schema, SchemaFilterContext context)
         {
             var propertyInfos = context.Type?.GetProperties(BindingFlags.Public | BindingFlags.Instance)
                .Where(p => p.GetCustomAttribute<UseSchema>() != null);

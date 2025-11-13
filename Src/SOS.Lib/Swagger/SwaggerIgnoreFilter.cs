@@ -1,4 +1,4 @@
-﻿using Microsoft.OpenApi.Models;
+﻿using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System;
 using System.Linq;
@@ -17,7 +17,7 @@ namespace SOS.Lib.Swagger
         /// </summary>
         /// <param name="schema"></param>
         /// <param name="context"></param>
-        public void Apply(OpenApiSchema schema, SchemaFilterContext context)
+        public void Apply(IOpenApiSchema schema, SchemaFilterContext context)
         {
             var excludeProperties = context.Type?.GetProperties(BindingFlags.Public | BindingFlags.Instance)
                 .Where(p => (p.GetCustomAttributes(typeof(JsonIgnoreAttribute), true)?.Any() == true) || p.GetCustomAttribute<SwaggerExcludeAttribute>() != null);
@@ -26,7 +26,7 @@ namespace SOS.Lib.Swagger
                 foreach (var property in excludeProperties)
                 {
                     var propertyName = $"{property.Name.Substring(0, 1).ToLower()}{property.Name.Substring(1)}";
-                    if (schema.Properties.ContainsKey(propertyName))
+                    if (schema.Properties != null && schema.Properties.ContainsKey(propertyName))
                     {
                         schema.Properties.Remove(propertyName);
                     }
@@ -70,6 +70,6 @@ namespace SOS.Lib.Swagger
             }
 
             return type.Name;
-        }
+        }        
     }
 }

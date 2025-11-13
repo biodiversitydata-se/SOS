@@ -1,37 +1,34 @@
 ﻿using System.Collections.Generic;
 using Swashbuckle.AspNetCore.SwaggerGen;
-using Microsoft.OpenApi.Models;
 using NetTopologySuite.Geometries;
-using Microsoft.OpenApi.Any;
+using Microsoft.OpenApi;
+using System.Text.Json.Nodes;
 
 namespace SOS.Lib.Swagger;
 
 public class PointSchemaFilter : ISchemaFilter
 {
-    public void Apply(OpenApiSchema schema, SchemaFilterContext context)
+    public void Apply(IOpenApiSchema schema, SchemaFilterContext context)
     {
-        if (context.Type == typeof(Point))
+        if (schema is OpenApiSchema openApiSchema && context.Type == typeof(Point))
         {
-            schema.Type = "object";
-            schema.Required = new HashSet<string> { "type", "coordinates" };
+            openApiSchema.Type = JsonSchemaType.Object;
+            openApiSchema.Required = new HashSet<string> { "type", "coordinates" };
 
-            schema.Properties = new Dictionary<string, OpenApiSchema>
+            openApiSchema.Properties = new Dictionary<string, IOpenApiSchema>
             {
                 ["type"] = new OpenApiSchema
                 {
-                    Type = "string",
-                    Enum = new List<IOpenApiAny>
-                    {
-                        new OpenApiString("Point"),                        
-                    }
+                    Type = JsonSchemaType.String,
+                    Enum = new List<JsonNode> { JsonNode.Parse("\"Point\"") },          
                 },
                 ["coordinates"] = new OpenApiSchema
                 {
-                    Type = "array",
-                    Items = new OpenApiSchema { Type = "number" },
+                    Type = JsonSchemaType.Array,
+                    Items = new OpenApiSchema { Type = JsonSchemaType.Number },
                     MinItems = 2
                 }
-            };
+            };            
         }
     }
 }

@@ -159,10 +159,15 @@ static void ConfigureServices(
 static void ConfigureMiddleware(WebApplication app, bool isDevelopment, bool disableHangfireInit)
 {
     app.ApplyUseExceptionHandler();
-    if (Settings.CorsAllowAny)
-        app.UseCors("AllowAll");
     if (Settings.AnalysisConfiguration.EnableResponseCompression)
         app.UseResponseCompression();
+    app.UseStaticFiles();
+    app.UseRouting();
+    app.ApplyMapHealthChecks();
+
+    if (Settings.CorsAllowAny)
+        app.UseCors("AllowAll");
+    
     if (!disableHangfireInit)
         app.UseHangfireDashboard();
 
@@ -178,15 +183,13 @@ static void ConfigureMiddleware(WebApplication app, bool isDevelopment, bool dis
         app.UseMiddleware<EnableRequestBufferingMiddelware>();
         app.UseMiddleware<StoreRequestBodyMiddleware>();
     }    
-    app.UseStaticFiles();
-    app.UseRouting();
     app.UseAuthentication();
     app.UseAuthorization();
-    app.ApplyUseSerilogRequestLogging();    
-    app.ApplyMapHealthChecks();
+    app.ApplyUseSerilogRequestLogging();        
+    app.PreventSwaggerCaching();
     app.UseSwagger();
     app.ApplyUseSwaggerUI();
-    app.MapControllers();
+    app.MapControllers();    
 }
 
 // Namespace declaration for integration tests

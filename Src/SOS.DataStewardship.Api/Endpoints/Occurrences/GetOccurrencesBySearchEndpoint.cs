@@ -1,5 +1,4 @@
-﻿using Swashbuckle.AspNetCore.Annotations;
-using SOS.DataStewardship.Api.Extensions;
+﻿using SOS.DataStewardship.Api.Extensions;
 using SOS.DataStewardship.Api.Filters;
 using SOS.DataStewardship.Api.Validators;
 using SOS.DataStewardship.Api.Application.Managers.Interfaces;
@@ -13,6 +12,8 @@ public class GetOccurrencesBySearchEndpoint : IEndpointDefinition
     public void DefineEndpoint(WebApplication app)
     {
         app.MapPost("/occurrences", GetOccurrencesBySearchAsync)
+            .WithName("GetOccurrencesBySearch")
+            .WithTags("Occurrences")
             .Produces<Contracts.Models.PagedResult<Contracts.Models.Occurrence>>(StatusCodes.Status200OK)
             .Produces<HttpValidationProblemDetails>(StatusCodes.Status400BadRequest)
             .Produces<ProblemDetails>(StatusCodes.Status500InternalServerError)
@@ -20,16 +21,22 @@ public class GetOccurrencesBySearchEndpoint : IEndpointDefinition
             .AddEndpointFilter(ValidatePagingParametersAsync);
     }
 
-    [SwaggerOperation(
-        Description = "Get occurrences by search.",
-        OperationId = "GetOccurrencesBySearch",
-        Tags = new[] { "Occurrences" })]
+    /// <summary>
+    /// Get occurrences by search.
+    /// </summary>
+    /// <param name="dataStewardshipManager"></param>
+    /// <param name="filter">The search filter.</param>
+    /// <param name="skip">Pagination start index.</param>
+    /// <param name="take">Number of items to return. 1000 items is the max to return in one request.</param>
+    /// <param name="exportMode">The export mode.</param>
+    /// <param name="responseCoordinateSystem">The response coordinate system.</param>
+    /// <returns></returns>
     internal async Task<IResult> GetOccurrencesBySearchAsync(IDataStewardshipManager dataStewardshipManager,
-        [FromBody, SwaggerRequestBody("The search filter")] OccurrenceFilter filter,
-        [FromQuery, SwaggerParameter("Pagination start index.")] int? skip,
-        [FromQuery, SwaggerParameter("Number of items to return. 1000 items is the max to return in one call.")] int? take,
-        [FromQuery, SwaggerParameter("The export mode")] ExportMode exportMode = ExportMode.Json,
-        [FromQuery, SwaggerParameter("The response coordinate system")] CoordinateSystem responseCoordinateSystem = CoordinateSystem.EPSG4326)
+        [FromBody] OccurrenceFilter filter,
+        [FromQuery] int? skip,
+        [FromQuery] int? take,
+        [FromQuery] ExportMode exportMode = ExportMode.Json,
+        [FromQuery] CoordinateSystem responseCoordinateSystem = CoordinateSystem.EPSG4326)
     {
         var occurrences = await dataStewardshipManager.GetOccurrencesBySearchAsync(filter,
             skip.GetValueOrDefault(0),

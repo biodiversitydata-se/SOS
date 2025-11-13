@@ -1,5 +1,4 @@
-﻿using Swashbuckle.AspNetCore.Annotations;
-using SOS.Lib.Models.ApiInfo;
+﻿using SOS.Lib.Models.ApiInfo;
 
 namespace SOS.DataStewardship.Api.Endpoints.ApiInfo;
 
@@ -15,13 +14,16 @@ public class GetApiInfoEndpoint : IEndpointDefinition
     public void DefineEndpoint(WebApplication app)
     {
         app.MapGet("/api_info", GetApiInfo)
+            .WithName("GetApiInfo")
+            .WithTags("ApiInfo")
             .Produces<ApiInformation>(StatusCodes.Status200OK, "application/json");
     }
 
-    [SwaggerOperation(
-        Description = "Get API information",
-        OperationId = "GetApiInfo",
-        Tags = new[] { "ApiInfo" })]    
+    /// <summary>
+    /// Get API information
+    /// </summary>
+    /// <remarks>Get information about the API: Name, Status, Version, Documentation, Change log, Release date.</remarks>
+    /// <returns></returns>
     private IResult GetApiInfo()
     {
         var buildDate = Assembly.GetExecutingAssembly().GetBuildDate();

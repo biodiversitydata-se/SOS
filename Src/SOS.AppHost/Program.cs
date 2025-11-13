@@ -1,3 +1,5 @@
+using Microsoft.Extensions.Options;
+
 var builder = DistributedApplication.CreateBuilder(args);
 
 // Get environment variables
@@ -34,7 +36,7 @@ var observationApi = builder.AddProject<Projects.SOS_Observations_Api>("sos-obse
     .WaitFor(hangfireDb);
 
 // Configure Analysis API
-var analysisApi = builder.AddProject<Projects.SOS_Observations_Api>("sos-analysis-api", configure: static project =>
+var analysisApi = builder.AddProject<Projects.SOS_Analysis_Api>("sos-analysis-api", configure: static project =>
     {
         project.ExcludeLaunchProfile = true;
     })

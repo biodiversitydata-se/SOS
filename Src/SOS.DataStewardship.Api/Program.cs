@@ -90,6 +90,7 @@ try
         ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
     });
 
+    app.PreventSwaggerCaching();
     app.UseSwagger();        
     app.UseSwaggerUI(options =>
     {            

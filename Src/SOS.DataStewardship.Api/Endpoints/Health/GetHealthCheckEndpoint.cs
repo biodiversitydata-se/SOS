@@ -1,15 +1,30 @@
-﻿using Swashbuckle.AspNetCore.Annotations;
-using SOS.DataStewardship.Api.Contracts.Models;
+﻿using SOS.DataStewardship.Api.Contracts.Models;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 namespace SOS.DataStewardship.Api.Endpoints.External;
 
 public class GetHealthCheckEndpoint : IEndpointDefinition
 {
-    [SwaggerOperation(
-        Description = "Get current system health status",
-        OperationId = "GetHealthCheckExternal",
-        Tags = new[] { "Health" })]
+    /// <summary>
+    /// Define end point
+    /// </summary>
+    /// <param name="app"></param>
+    public void DefineEndpoint(WebApplication app)
+    {
+        app.MapGet("/health/external", GetExternalHealthCheckAsync)
+            .WithName("GetHealthCheckExternal")
+            .WithTags("Health")
+            .Produces<Dataset>(StatusCodes.Status200OK, "application/json")
+            .Produces<Dataset>(StatusCodes.Status200OK, "text/csv")
+            .Produces<HttpValidationProblemDetails>(StatusCodes.Status400BadRequest)
+            .Produces<ProblemDetails>(StatusCodes.Status500InternalServerError);
+    }
+
+    /// <summary>
+    /// Get current system health status.
+    /// </summary>
+    /// <param name="healthCheckService"></param>
+    /// <returns></returns>
     private async Task<IResult> GetExternalHealthCheckAsync(HealthCheckService healthCheckService)
     {
         try
@@ -52,18 +67,5 @@ public class GetHealthCheckEndpoint : IEndpointDefinition
         {
             return Results.StatusCode((int)HttpStatusCode.InternalServerError);
         }
-    }
-
-    /// <summary>
-    /// Define end point
-    /// </summary>
-    /// <param name="app"></param>
-    public void DefineEndpoint(WebApplication app)
-    {
-        app.MapGet("/health/external", GetExternalHealthCheckAsync)
-            .Produces<Dataset>(StatusCodes.Status200OK, "application/json")
-            .Produces<Dataset>(StatusCodes.Status200OK, "text/csv")
-            .Produces<HttpValidationProblemDetails>(StatusCodes.Status400BadRequest)
-            .Produces<ProblemDetails>(StatusCodes.Status500InternalServerError);
-    }
+    }    
 }

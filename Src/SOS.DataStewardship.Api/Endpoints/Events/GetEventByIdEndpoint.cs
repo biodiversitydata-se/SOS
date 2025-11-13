@@ -10,21 +10,28 @@ public class GetEventByIdEndpoint : IEndpointDefinition
     public void DefineEndpoint(WebApplication app)
     {
         app.MapGet("/events/{id}", GetEventByIdAsync)
+            .WithName("GetEventById")
+            .WithTags("Events")
             .Produces<Contracts.Models.Event>(StatusCodes.Status200OK, "application/json")
             .Produces<ProblemDetails>(StatusCodes.Status404NotFound)
             .Produces<HttpValidationProblemDetails>(StatusCodes.Status400BadRequest)
             .Produces<ProblemDetails>(StatusCodes.Status500InternalServerError);
     }
 
-    [SwaggerOperation(
-        Description = "Get event by Id. Example: urn:lsid:swedishlifewatch.se:dataprovider:Artportalen:event:10002293427000658739",
-        OperationId = "GetEventById",
-        Tags = new[] { "Events" })]
+    /// <summary>
+    /// Get event by Id.
+    /// </summary>
+    /// <remarks>Example: "urn:lsid:swedishlifewatch.se:dataprovider:Artportalen:event:10002293427000658739"</remarks>
+    /// <param name="dataStewardshipManager"></param>
+    /// <param name="id">The event id.</param>
+    /// <param name="exportMode">The export mode.</param>
+    /// <param name="responseCoordinateSystem">The response coordinate system.</param>
+    /// <returns></returns>
     [SwaggerResponse(404, "Not Found - The requested event doesn't exist")]
     private async Task<IResult> GetEventByIdAsync(IDataStewardshipManager dataStewardshipManager,
-        [FromRoute, SwaggerParameter("The event id", Required = true)] string id,
-        [FromQuery, SwaggerParameter("The export mode")] ExportMode exportMode = ExportMode.Json,
-        [FromQuery, SwaggerParameter("The response coordinate system")] CoordinateSystem responseCoordinateSystem = CoordinateSystem.EPSG4326)
+        [FromRoute] string id,
+        [FromQuery] ExportMode exportMode = ExportMode.Json,
+        [FromQuery] CoordinateSystem responseCoordinateSystem = CoordinateSystem.EPSG4326)
     {
         var eventModel = await dataStewardshipManager.GetEventByIdAsync(id, responseCoordinateSystem);
         if (eventModel == null) return NotFoundResult(id);

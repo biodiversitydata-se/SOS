@@ -1,4 +1,4 @@
-FROM reg.app.slu.se/mcr/dotnet/sdk:9.0 AS build-env
+FROM reg.app.slu.se/mcr/dotnet/sdk:10.0 AS build-env
 WORKDIR /app
 
 # {NugetConfigSnippet}
@@ -8,7 +8,7 @@ COPY  . .
 RUN dotnet publish SOS.Analysis.Api/SOS.Analysis.Api.csproj -c Release -o out
 
 #build runtime image
-FROM reg.app.slu.se/mcr/dotnet/aspnet:9.0-alpine
+FROM reg.app.slu.se/mcr/dotnet/aspnet:10.0-alpine
 
 # Install necessary libraries, configure timezone, and create a non-root user in one layer
 RUN apk add --no-cache icu-libs icu-data-full tzdata && \

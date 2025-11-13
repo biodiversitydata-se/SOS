@@ -10,7 +10,7 @@
 	</PropertyGroup>
 	
     <PropertyGroup>
-	    <TargetFramework>net9.0</TargetFramework>
+	    <TargetFramework>net10.0</TargetFramework>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <UserSecretsId>92cd2cdb-499c-480d-9f04-feaf7a68f89c</UserSecretsId>
     </PropertyGroup>
@@ -53,19 +53,19 @@
 	    <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="10.0.0" />
 	    <PackageReference Include="CSharpFunctionalExtensions" Version="3.6.0" />
 	    <PackageReference Include="Microsoft.AspNetCore.Authentication.Cookies" Version="2.3.0" />
-	    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="9.0.9" />
-		<PackageReference Include="Microsoft.AspNetCore.DataProtection.StackExchangeRedis" Version="9.0.9" />
+	    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="10.0.0" />
+		<PackageReference Include="Microsoft.AspNetCore.DataProtection.StackExchangeRedis" Version="10.0.0" />
 		<PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
 		<PackageReference Include="Serilog.Formatting.Compact" Version="3.0.0" />
-	    <PackageReference Include="HangFire" Version="1.8.21" />
+	    <PackageReference Include="HangFire" Version="1.8.22" />
 	    <PackageReference Include="HangFire.Autofac" Version="2.7.0" />
-	    <PackageReference Include="HangFire.Mongo" Version="1.12.0" />
-	    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="9.0.9" />
+	    <PackageReference Include="HangFire.Mongo" Version="1.12.2" />
+	    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="10.0.0" />
 		<PackageReference Include="NetTopologySuite" Version="2.6.0" />
 		<PackageReference Include="NetTopologySuite.IO.GeoJSON" Version="4.0.0" />
 		<PackageReference Include="NetTopologySuite.IO.GeoJSON4STJ" Version="4.0.0" />
-	    <PackageReference Include="Quartz" Version="3.15.0" />
-	    <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.4" />
+	    <PackageReference Include="Quartz" Version="3.15.1" />
+	    <PackageReference Include="Swashbuckle.AspNetCore" Version="10.0.0" />
     </ItemGroup>
 
     <ItemGroup>

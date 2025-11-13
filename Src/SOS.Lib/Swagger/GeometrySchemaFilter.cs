@@ -1,48 +1,51 @@
-﻿using Microsoft.OpenApi.Any;
-using Microsoft.OpenApi.Models;
-using Swashbuckle.AspNetCore.SwaggerGen;
+﻿using Swashbuckle.AspNetCore.SwaggerGen;
 using NetTopologySuite.Geometries;
 using System.Collections.Generic;
+using Microsoft.OpenApi;
+using System.Text.Json.Nodes;
 
 namespace SOS.Lib.Swagger;
 public class GeometrySchemaFilter : ISchemaFilter
 {
-    public void Apply(OpenApiSchema schema, SchemaFilterContext context)
+    public void Apply(IOpenApiSchema schema, SchemaFilterContext context)
     {
-        if (context.Type == typeof(Geometry))
+        if (schema is OpenApiSchema openApiSchema)
         {
-            schema.OneOf = new List<OpenApiSchema>
+            if (context.Type == typeof(Geometry))
             {
-                CreatePointSchema(),
-                CreateLineStringSchema(),
-                CreatePolygonSchema(),
-                CreateMultiPointSchema(),
-                CreateMultiLineStringSchema(),
-                CreateMultiPolygonSchema(),
-                CreateGeometryCollectionSchema()
-            };
+                openApiSchema.OneOf = new List<IOpenApiSchema>
+                {
+                    CreatePointSchema(),
+                    CreateLineStringSchema(),
+                    CreatePolygonSchema(),
+                    CreateMultiPointSchema(),
+                    CreateMultiLineStringSchema(),
+                    CreateMultiPolygonSchema(),
+                    CreateGeometryCollectionSchema()
+                };
 
-            schema.Properties.Clear();
-            schema.Type = null;
+                openApiSchema.Properties?.Clear();
+                openApiSchema.Type = null; //JsonSchemaType.Null;
+            }
         }
     }
 
     private OpenApiSchema CreatePointSchema() =>
         new OpenApiSchema
         {
-            Type = "object",
+            Type = JsonSchemaType.Object,
             Required = new HashSet<string> { "type", "coordinates" },
-            Properties = new Dictionary<string, OpenApiSchema>
+            Properties = new Dictionary<string, IOpenApiSchema>
             {
                 ["type"] = new OpenApiSchema
                 {
-                    Type = "string",
-                    Enum = new List<IOpenApiAny> { new OpenApiString("Point") }
+                    Type = JsonSchemaType.String,
+                    Enum = new List<JsonNode> { JsonNode.Parse("\"Point\"") },
                 },
                 ["coordinates"] = new OpenApiSchema
                 {
-                    Type = "array",
-                    Items = new OpenApiSchema { Type = "number" },
+                    Type = JsonSchemaType.Array,
+                    Items = new OpenApiSchema { Type = JsonSchemaType.Number },
                     MinItems = 2
                 }
             }
@@ -51,22 +54,22 @@ public class GeometrySchemaFilter : ISchemaFilter
     private OpenApiSchema CreateLineStringSchema() =>
         new OpenApiSchema
         {
-            Type = "object",
+            Type = JsonSchemaType.Object,
             Required = new HashSet<string> { "type", "coordinates" },
-            Properties = new Dictionary<string, OpenApiSchema>
+            Properties = new Dictionary<string, IOpenApiSchema>
             {
                 ["type"] = new OpenApiSchema
                 {
-                    Type = "string",
-                    Enum = new List<IOpenApiAny> { new OpenApiString("LineString") }
+                    Type = JsonSchemaType.String,                    
+                    Enum = new List<JsonNode> { JsonNode.Parse("\"LineString\"") },
                 },
                 ["coordinates"] = new OpenApiSchema
                 {
-                    Type = "array",
+                    Type = JsonSchemaType.Array,
                     Items = new OpenApiSchema
                     {
-                        Type = "array",
-                        Items = new OpenApiSchema { Type = "number" },
+                        Type = JsonSchemaType.Array,
+                        Items = new OpenApiSchema { Type = JsonSchemaType.Number },
                         MinItems = 2
                     }
                 }
@@ -76,25 +79,25 @@ public class GeometrySchemaFilter : ISchemaFilter
     private OpenApiSchema CreatePolygonSchema() =>
         new OpenApiSchema
         {
-            Type = "object",
+            Type = JsonSchemaType.Object,
             Required = new HashSet<string> { "type", "coordinates" },
-            Properties = new Dictionary<string, OpenApiSchema>
+            Properties = new Dictionary<string, IOpenApiSchema>
             {
                 ["type"] = new OpenApiSchema
                 {
-                    Type = "string",
-                    Enum = new List<IOpenApiAny> { new OpenApiString("Polygon") }
+                    Type = JsonSchemaType.String,
+                    Enum = new List<JsonNode> { JsonNode.Parse("\"Polygon\"") },
                 },
                 ["coordinates"] = new OpenApiSchema
                 {
-                    Type = "array",
+                    Type = JsonSchemaType.Array,
                     Items = new OpenApiSchema
                     {
-                        Type = "array",
+                        Type = JsonSchemaType.Array,
                         Items = new OpenApiSchema
                         {
-                            Type = "array",
-                            Items = new OpenApiSchema { Type = "number" }
+                            Type = JsonSchemaType.Array,
+                            Items = new OpenApiSchema { Type = JsonSchemaType.Number }
                         }
                     }
                 }
@@ -104,22 +107,22 @@ public class GeometrySchemaFilter : ISchemaFilter
     private OpenApiSchema CreateMultiPointSchema() =>
         new OpenApiSchema
         {
-            Type = "object",
+            Type = JsonSchemaType.Object,
             Required = new HashSet<string> { "type", "coordinates" },
-            Properties = new Dictionary<string, OpenApiSchema>
+            Properties = new Dictionary<string, IOpenApiSchema>
             {
                 ["type"] = new OpenApiSchema
                 {
-                    Type = "string",
-                    Enum = new List<IOpenApiAny> { new OpenApiString("MultiPoint") }
+                    Type = JsonSchemaType.String,
+                    Enum = new List<JsonNode> { JsonNode.Parse("\"MultiPoint\"") },
                 },
                 ["coordinates"] = new OpenApiSchema
                 {
-                    Type = "array",
+                    Type = JsonSchemaType.Array,
                     Items = new OpenApiSchema
                     {
-                        Type = "array",
-                        Items = new OpenApiSchema { Type = "number" }
+                        Type = JsonSchemaType.Array,
+                        Items = new OpenApiSchema { Type = JsonSchemaType.Number }
                     }
                 }
             }
@@ -128,25 +131,25 @@ public class GeometrySchemaFilter : ISchemaFilter
     private OpenApiSchema CreateMultiLineStringSchema() =>
         new OpenApiSchema
         {
-            Type = "object",
+            Type = JsonSchemaType.Object,
             Required = new HashSet<string> { "type", "coordinates" },
-            Properties = new Dictionary<string, OpenApiSchema>
+            Properties = new Dictionary<string, IOpenApiSchema>
             {
                 ["type"] = new OpenApiSchema
                 {
-                    Type = "string",
-                    Enum = new List<IOpenApiAny> { new OpenApiString("MultiLineString") }
+                    Type = JsonSchemaType.String,
+                    Enum = new List<JsonNode> { JsonNode.Parse("\"MultiLineString\"") },
                 },
                 ["coordinates"] = new OpenApiSchema
                 {
-                    Type = "array",
+                    Type = JsonSchemaType.Array,
                     Items = new OpenApiSchema
                     {
-                        Type = "array",
+                        Type = JsonSchemaType.Array,
                         Items = new OpenApiSchema
                         {
-                            Type = "array",
-                            Items = new OpenApiSchema { Type = "number" }
+                            Type = JsonSchemaType.Array,
+                            Items = new OpenApiSchema { Type = JsonSchemaType.Number }
                         }
                     }
                 }
@@ -156,28 +159,28 @@ public class GeometrySchemaFilter : ISchemaFilter
     private OpenApiSchema CreateMultiPolygonSchema() =>
         new OpenApiSchema
         {
-            Type = "object",
+            Type = JsonSchemaType.Object,
             Required = new HashSet<string> { "type", "coordinates" },
-            Properties = new Dictionary<string, OpenApiSchema>
+            Properties = new Dictionary<string, IOpenApiSchema>
             {
                 ["type"] = new OpenApiSchema
                 {
-                    Type = "string",
-                    Enum = new List<IOpenApiAny> { new OpenApiString("MultiPolygon") }
+                    Type = JsonSchemaType.String,
+                    Enum = new List<JsonNode> { JsonNode.Parse("\"MultiPolygon\"") },
                 },
                 ["coordinates"] = new OpenApiSchema
                 {
-                    Type = "array",
+                    Type = JsonSchemaType.Array,
                     Items = new OpenApiSchema
                     {
-                        Type = "array",
+                        Type = JsonSchemaType.Array,
                         Items = new OpenApiSchema
                         {
-                            Type = "array",
+                            Type = JsonSchemaType.Array,
                             Items = new OpenApiSchema
                             {
-                                Type = "array",
-                                Items = new OpenApiSchema { Type = "number" }
+                                Type = JsonSchemaType.Array,
+                                Items = new OpenApiSchema { Type = JsonSchemaType.Number }
                             }
                         }
                     }
@@ -188,19 +191,19 @@ public class GeometrySchemaFilter : ISchemaFilter
     private OpenApiSchema CreateGeometryCollectionSchema() =>
         new OpenApiSchema
         {
-            Type = "object",
+            Type = JsonSchemaType.Object,
             Required = new HashSet<string> { "type", "geometries" },
-            Properties = new Dictionary<string, OpenApiSchema>
+            Properties = new Dictionary<string, IOpenApiSchema>
             {
                 ["type"] = new OpenApiSchema
                 {
-                    Type = "string",
-                    Enum = new List<IOpenApiAny> { new OpenApiString("GeometryCollection") }
+                    Type = JsonSchemaType.String,
+                    Enum = new List<JsonNode> { JsonNode.Parse("\"GeometryCollection\"") },                    
                 },
                 ["geometries"] = new OpenApiSchema
                 {
-                    Type = "array",
-                    Items = new OpenApiSchema { Reference = new OpenApiReference { Id = "Geometry", Type = ReferenceType.Schema } }
+                    Type = JsonSchemaType.Array,                    
+                    Items = new OpenApiSchema { DynamicRef = "#/components/schemas/Geometry" } //  Reference = new OpenApiReference { Id = "Geometry", Type = ReferenceType.Schema } } 
                 }
             }
         };

@@ -238,11 +238,11 @@ static void ConfigureMiddleware(WebApplication app, bool isDevelopment, bool dis
     });*/
     app.UseHttpsRedirection();
     app.UseRouting();
+    app.ApplyMapHealthChecks();
     app.UseAuthentication();
     app.UseAuthorization();
 
-    app.ApplyUseSerilogRequestLogging();
-    app.ApplyMapHealthChecks();
+    app.ApplyUseSerilogRequestLogging();    
 
     app.MapGet("/login", async context =>
     {
@@ -281,6 +281,7 @@ static void ConfigureMiddleware(WebApplication app, bool isDevelopment, bool dis
     else
         app.UseHsts();
 
+    app.PreventSwaggerCaching();
     app.ApplyUseSwagger();
     app.MapControllers();
 }

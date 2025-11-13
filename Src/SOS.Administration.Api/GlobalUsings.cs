@@ -1,6 +1,5 @@
 ﻿global using Microsoft.AspNetCore.Mvc;
 global using Microsoft.Extensions.Caching.Memory;
-global using Microsoft.OpenApi.Models;
 global using SOS.Lib.Configuration.Shared;
 global using SOS.Lib.Enums;
 global using SOS.Lib.Extensions;

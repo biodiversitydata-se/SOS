@@ -1,7 +1,9 @@
-﻿using Microsoft.OpenApi.Any;
-using Microsoft.OpenApi.Models;
+﻿using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using System;
 using System.Linq;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace SOS.Lib.Swagger
 {
@@ -28,19 +30,27 @@ namespace SOS.Lib.Swagger
             // REF: https://github.com/domaindrivendev/Swashbuckle.AspNetCore/pull/413
             foreach (var parameter in operation.Parameters)
             {
-                var description = context.ApiDescription.ParameterDescriptions.First(p => p.Name == parameter.Name);
-
-                if (parameter.Description == null)
+                if (parameter is OpenApiParameter openApiParameter)
                 {
-                    parameter.Description = description.ModelMetadata?.Description;
-                }
+                    var description = context.ApiDescription.ParameterDescriptions.First(p => p.Name == parameter.Name);
 
-                if (parameter.Schema.Default == null && description.DefaultValue != null)
-                {
-                    parameter.Schema.Default = new OpenApiString(description.DefaultValue.ToString());
-                }
+                    if (openApiParameter.Description == null)
+                    {
+                        openApiParameter.Description = description.ModelMetadata?.Description;
+                    }
 
-                parameter.Required |= description.IsRequired;
+                    if (openApiParameter.Schema.Default == null && description.DefaultValue != null)
+                    {
+                        Console.WriteLine($"Setting default value for parameter '{openApiParameter.Name}' to '{description.DefaultValue}'");
+                        if (openApiParameter.Schema is OpenApiSchema openApiSchema)
+                        {
+                            var json = JsonSerializer.Serialize(description.DefaultValue);
+                            openApiSchema.Default = JsonNode.Parse(json);
+                        }                                              
+                    }
+                    
+                    openApiParameter.Required |= description.IsRequired;
+                }               
             }
         }
     }

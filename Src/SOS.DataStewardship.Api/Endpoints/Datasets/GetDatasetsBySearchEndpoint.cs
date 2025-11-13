@@ -1,5 +1,4 @@
-﻿using Swashbuckle.AspNetCore.Annotations;
-using SOS.DataStewardship.Api.Extensions;
+﻿using SOS.DataStewardship.Api.Extensions;
 using SOS.DataStewardship.Api.Filters;
 using SOS.DataStewardship.Api.Application.Managers.Interfaces;
 using SOS.DataStewardship.Api.Contracts.Enums;
@@ -11,22 +10,28 @@ public class GetDatasetsBySearchEndpoint : IEndpointDefinition
 {
     public void DefineEndpoint(WebApplication app)
     {
-        app.MapPost("/datasets", GetDatasetsBySearchAsync)            
+        app.MapPost("/datasets", GetDatasetsBySearchAsync)
+            .WithName("GetDatasetsBySearch")
+            .WithTags("Datasets")
             .Produces<Contracts.Models.PagedResult<Dataset>>(StatusCodes.Status200OK)
             .Produces<HttpValidationProblemDetails>(StatusCodes.Status400BadRequest)            
             .Produces<ProblemDetails>(StatusCodes.Status500InternalServerError)
             .AddEndpointFilter<ValidatorFilter<DatasetFilter>>()
             .AddEndpointFilter<ValidatorFilter<PagingParameters>>();
     }
-    
-    [SwaggerOperation(
-        Description = "Get datasets by search.",
-        OperationId = "GetDatasetsBySearch",
-        Tags = new[] { "Datasets" })]
+
+    /// <summary>
+    /// Get datasets by search.
+    /// </summary>
+    /// <param name="dataStewardshipManager"></param>
+    /// <param name="filter">The search filter.</param>
+    /// <param name="pagingParameters"></param>
+    /// <param name="exportMode">The export mode.</param>
+    /// <returns></returns>
     private async Task<IResult> GetDatasetsBySearchAsync(IDataStewardshipManager dataStewardshipManager,
-        [FromBody, SwaggerRequestBody("The search filter")] DatasetFilter filter,
+        [FromBody] DatasetFilter filter,
         [AsParameters] PagingParameters pagingParameters,        
-        [FromQuery, SwaggerParameter("The export mode")] ExportMode exportMode = ExportMode.Json)
+        [FromQuery] ExportMode exportMode = ExportMode.Json)
     {
         var datasets = await dataStewardshipManager
             .GetDatasetsBySearchAsync(filter, pagingParameters.Skip.GetValueOrDefault(0), pagingParameters.Take.GetValueOrDefault(20));            
