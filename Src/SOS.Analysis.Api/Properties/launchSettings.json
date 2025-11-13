@@ -9,7 +9,7 @@
         "DISABLE_HANGFIRE_INIT": "true"
       },
       "dotnetRunMessages": true,
-      "applicationUrl": "http://localhost:5000"
+      "applicationUrl": "http://localhost:5001"
     },
     "SOS.Analysis.Api (Dev)": {
       "commandName": "Project",
@@ -20,7 +20,7 @@
         "DISABLE_HANGFIRE_INIT": "true",
         "USE_LOCAL_HANGFIRE": "true"
       },
-      "applicationUrl": "http://localhost:5000"
+      "applicationUrl": "http://localhost:5001"
     },
     "SOS.Analysis.Api (ST)": {
       "commandName": "Project",
@@ -31,7 +31,7 @@
         "DISABLE_HANGFIRE_INIT": "true",
         "USE_LOCAL_HANGFIRE": "true"
       },
-      "applicationUrl": "http://localhost:5000"
+      "applicationUrl": "http://localhost:5001"
     }
   },
   "iisSettings": {

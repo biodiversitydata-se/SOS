@@ -212,7 +212,7 @@ static void ConfigureMiddleware(WebApplication app, bool isDevelopment, bool dis
     app.ApplyUseSerilogRequestLogging();    
     app.ApplyMapHealthChecks(disableHealthCheckInit);
 
-    app.PreventSwaggerCaching();
+    //app.PreventSwaggerCaching();
     app.UseSwagger();
     app.ApplyUseSwaggerUI();
     app.MapControllers();

@@ -186,7 +186,7 @@ static void ConfigureMiddleware(WebApplication app, bool isDevelopment, bool dis
     app.UseAuthentication();
     app.UseAuthorization();
     app.ApplyUseSerilogRequestLogging();        
-    app.PreventSwaggerCaching();
+    //app.PreventSwaggerCaching();
     app.UseSwagger();
     app.ApplyUseSwaggerUI();
     app.MapControllers();    

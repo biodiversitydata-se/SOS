@@ -281,7 +281,7 @@ static void ConfigureMiddleware(WebApplication app, bool isDevelopment, bool dis
     else
         app.UseHsts();
 
-    app.PreventSwaggerCaching();
+    //app.PreventSwaggerCaching();
     app.ApplyUseSwagger();
     app.MapControllers();
 }

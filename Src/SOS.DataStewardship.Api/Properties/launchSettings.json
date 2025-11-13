@@ -8,7 +8,7 @@
         "ASPNETCORE_ENVIRONMENT": "local"
       },
       "dotnetRunMessages": true,
-      "applicationUrl": "http://localhost:5000"
+      "applicationUrl": "http://localhost:5002"
     },
     "SOS.DataStewardship.Api (Dev)": {
       "commandName": "Project",
@@ -18,7 +18,7 @@
         "ASPNETCORE_ENVIRONMENT": "dev"
       },
       "dotnetRunMessages": true,
-      "applicationUrl": "http://localhost:5000"
+      "applicationUrl": "http://localhost:5002"
     },
     "SOS.DataStewardship.Api (ST)": {
       "commandName": "Project",
@@ -28,7 +28,7 @@
         "ASPNETCORE_ENVIRONMENT": "st"
       },
       "dotnetRunMessages": true,
-      "applicationUrl": "http://localhost:5000"
+      "applicationUrl": "http://localhost:5002"
     }    
   },
   "$schema": "https://json.schemastore.org/launchsettings.json"
