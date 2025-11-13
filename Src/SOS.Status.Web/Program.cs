@@ -100,9 +100,12 @@ try
     app.MapObservationSearchEndpoints();
 
 #if DEBUG
+    Log.Logger.Information("In DEBUG mode: enabling WebAssembly debugging");
     app.UseWebAssemblyDebugging();
+#else
+    Log.Logger.Information("In RELEASE mode: WebAssembly debugging is disabled");
 #endif
-    
+
     // Configure the HTTP request pipeline.    
     if (!isDevelopment)
     {
