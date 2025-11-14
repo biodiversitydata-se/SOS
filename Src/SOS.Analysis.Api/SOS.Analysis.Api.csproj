@@ -18,7 +18,7 @@
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.0" />
 		<PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
 		<PackageReference Include="Serilog.Formatting.Compact" Version="3.0.0" />
-		<PackageReference Include="Swashbuckle.AspNetCore" Version="10.0.0" />
+		<PackageReference Include="Swashbuckle.AspNetCore" Version="10.0.1" />
 		<PackageReference Include="HangFire" Version="1.8.22" />		
 		<PackageReference Include="HangFire.Mongo" Version="1.12.2" />
 	</ItemGroup>
