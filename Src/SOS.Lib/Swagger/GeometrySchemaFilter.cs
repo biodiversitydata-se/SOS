@@ -39,8 +39,8 @@ public class GeometrySchemaFilter : ISchemaFilter
             {
                 ["type"] = new OpenApiSchema
                 {
-                    Type = JsonSchemaType.String,
-                    Enum = new List<JsonNode> { JsonNode.Parse("\"Point\"") },
+                    Type = JsonSchemaType.String,                    
+                    Enum = new List<JsonNode> { JsonValue.Create("Point") }
                 },
                 ["coordinates"] = new OpenApiSchema
                 {
@@ -60,8 +60,8 @@ public class GeometrySchemaFilter : ISchemaFilter
             {
                 ["type"] = new OpenApiSchema
                 {
-                    Type = JsonSchemaType.String,                    
-                    Enum = new List<JsonNode> { JsonNode.Parse("\"LineString\"") },
+                    Type = JsonSchemaType.String,
+                    Enum = new List<JsonNode> { JsonValue.Create("LineString") }                    
                 },
                 ["coordinates"] = new OpenApiSchema
                 {
@@ -86,7 +86,7 @@ public class GeometrySchemaFilter : ISchemaFilter
                 ["type"] = new OpenApiSchema
                 {
                     Type = JsonSchemaType.String,
-                    Enum = new List<JsonNode> { JsonNode.Parse("\"Polygon\"") },
+                    Enum = new List<JsonNode> { JsonValue.Create("Polygon") }
                 },
                 ["coordinates"] = new OpenApiSchema
                 {
@@ -114,7 +114,7 @@ public class GeometrySchemaFilter : ISchemaFilter
                 ["type"] = new OpenApiSchema
                 {
                     Type = JsonSchemaType.String,
-                    Enum = new List<JsonNode> { JsonNode.Parse("\"MultiPoint\"") },
+                    Enum = new List<JsonNode> { JsonValue.Create("MultiPoint") }
                 },
                 ["coordinates"] = new OpenApiSchema
                 {
@@ -138,7 +138,7 @@ public class GeometrySchemaFilter : ISchemaFilter
                 ["type"] = new OpenApiSchema
                 {
                     Type = JsonSchemaType.String,
-                    Enum = new List<JsonNode> { JsonNode.Parse("\"MultiLineString\"") },
+                    Enum = new List<JsonNode> { JsonValue.Create("MultiLineString") }
                 },
                 ["coordinates"] = new OpenApiSchema
                 {
@@ -166,7 +166,7 @@ public class GeometrySchemaFilter : ISchemaFilter
                 ["type"] = new OpenApiSchema
                 {
                     Type = JsonSchemaType.String,
-                    Enum = new List<JsonNode> { JsonNode.Parse("\"MultiPolygon\"") },
+                    Enum = new List<JsonNode> { JsonValue.Create("MultiPolygon") }
                 },
                 ["coordinates"] = new OpenApiSchema
                 {
@@ -198,7 +198,7 @@ public class GeometrySchemaFilter : ISchemaFilter
                 ["type"] = new OpenApiSchema
                 {
                     Type = JsonSchemaType.String,
-                    Enum = new List<JsonNode> { JsonNode.Parse("\"GeometryCollection\"") },                    
+                    Enum = new List<JsonNode> { JsonValue.Create("GeometryCollection") }
                 },
                 ["geometries"] = new OpenApiSchema
                 {

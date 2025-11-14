@@ -20,7 +20,7 @@ public class PointSchemaFilter : ISchemaFilter
                 ["type"] = new OpenApiSchema
                 {
                     Type = JsonSchemaType.String,
-                    Enum = new List<JsonNode> { JsonNode.Parse("\"Point\"") },          
+                    Enum = new List<JsonNode> { JsonValue.Create("Point") }
                 },
                 ["coordinates"] = new OpenApiSchema
                 {
