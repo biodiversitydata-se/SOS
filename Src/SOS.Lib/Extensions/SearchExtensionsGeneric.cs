@@ -166,13 +166,12 @@ public static class SearchExtensionsGeneric
     {
         /// <summary>
         /// Try add date filter criteria
-        /// </summary>
-        /// <typeparam name="TQueryDescriptor"></typeparam>
+        /// </summary>        
         /// <param name="eventField"></param>
         /// <param name="filter"></param>
         /// <returns></returns>
         public void TryAddEventDateCritera(
-    string eventField, DateFilter filter)
+            string eventField, DateFilter filter)
         {
             if (filter != null)
             {
@@ -185,8 +184,7 @@ public static class SearchExtensionsGeneric
 
         /// <summary>
         /// Add date range query to filter
-        /// </summary>
-        /// <typeparam name="TQueryDescriptor"></typeparam>
+        /// </summary>        
         /// <param name="filter"></param>
         /// <param name="startDateField"></param>
         /// <param name="endDateField"></param>
@@ -280,7 +278,6 @@ public static class SearchExtensionsGeneric
         /// <summary>
         /// Add time range filters
         /// </summary>
-        /// <typeparam name="TQueryDescriptor"></typeparam>
         /// <param name="filter"></param>
         /// <param name="field"></param>
         public void TryAddTimeRangeFilters(DateFilter filter, string field)

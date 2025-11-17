@@ -242,7 +242,7 @@ public class DwcaObservationFactory : ObservationFactoryBase, IObservationFactor
             geometry = _wktReader.Read(wkt);
             return true;
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             return false;
         }

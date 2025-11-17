@@ -140,7 +140,7 @@ public class GeneralizationFilterTests : TestBase
         // Assert - diffused observation without user access
         diffusedObsWithoutAccess.Processed.IsGeneralized.Should().BeTrue();
         diffusedObsWithoutAccess.Processed.Location.CoordinateUncertaintyInMeters.Should().Be(ArtportalenObservationFactory.GetDiffusionCoordinateUncertainty(diffusedObsWithoutAccess.Verbatim.Site.DiffusionId), because: "the user has not access to the real coordinates");
-        var point = new Point(diffusedObsWithoutAccess.Verbatim.Site.XCoordDiffused.Value, diffusedObsWithoutAccess.Verbatim.Site.YCoordDiffused.Value);
+        var point = new Point(diffusedObsWithoutAccess.Verbatim.Site.XCoordDiffused!.Value, diffusedObsWithoutAccess.Verbatim.Site.YCoordDiffused!.Value);
         var transformedPoint = point.Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84);
         diffusedObsWithoutAccess.Processed.Location.DecimalLongitude.Should().BeApproximately(transformedPoint.X, 0.1);
         diffusedObsWithoutAccess.Processed.Location.DecimalLatitude.Should().BeApproximately(transformedPoint.Y, 0.1);

@@ -446,19 +446,16 @@ public static class ArtportalenObservationBuilder
             var random = new Random();
             builder.With((obs, index) =>
             {
-                Point? wgs84Point = null;
-                if (longitude > 0 && latitude > 0)
-                {
-                    wgs84Point = new Point(longitude, latitude);
-                }
+                if (longitude <= 0 || latitude <= 0)
+                    return;
 
+                Point wgs84Point = new Point(longitude, latitude);
                 var webMercatorPoint = wgs84Point.Transform(CoordinateSys.WGS84, CoordinateSys.WebMercator);
                 obs.Site.XCoord = (int)webMercatorPoint!.Coordinate.X;
                 obs.Site.YCoord = (int)webMercatorPoint.Coordinate.Y;
                 obs.Site.Point = wgs84Point?.ToGeoJson();
                 obs.Site.PointWithBuffer = wgs84Point.ToCircle(accuracy)?.ToGeoJson();
                 obs.Site.Accuracy = accuracy;
-
             });
             return operable;
         }

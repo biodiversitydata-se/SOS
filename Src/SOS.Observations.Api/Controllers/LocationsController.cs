@@ -123,7 +123,12 @@ public class LocationsController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
     [AzureApi, AzureInternalApi]
-    public async Task<IActionResult> SearchAsync([FromBody] GeographicsFilterDto filter, [FromQuery] int skip = 0, [FromQuery] int take = 100, [FromQuery] bool sensitiveObservations = false, [FromQuery] int? roleId = null,
+    public async Task<IActionResult> SearchAsync(
+        [FromBody] GeographicsFilterDto? filter, 
+        [FromQuery] int skip = 0, 
+        [FromQuery] int take = 100, 
+        [FromQuery] bool sensitiveObservations = false, 
+        [FromQuery] int? roleId = null,
         [FromQuery] string authorizationApplicationIdentifier = null)
     {
         ApiUserType userType = this.GetApiUserType();

@@ -15,7 +15,6 @@ public interface ISearchFilterUtility
     /// <summary>
     /// Initialize search filter internal
     /// </summary>
-    /// <typeparam name="T"></typeparam>
     /// <param name="filter"></param>
     /// <returns></returns>
     Task<SearchFilterInternalDto> InitializeSearchFilterAsync(SearchFilterInternalDto filter);

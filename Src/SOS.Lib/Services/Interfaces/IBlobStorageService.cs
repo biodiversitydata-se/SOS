@@ -1,4 +1,5 @@
 ﻿using SOS.Lib.Models.Misc;
+using File = SOS.Lib.Models.Misc.File;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 

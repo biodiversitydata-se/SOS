@@ -45,7 +45,6 @@ public static class ElasticSearchGenericSearchExtensions
         /// <summary>
         /// Get default settings for aggregations
         /// </summary>
-        /// <typeparam name="T"></typeparam>
         /// <param name="size"></param>
         /// <param name="trackHits"></param>
         /// <returns></returns>
@@ -62,7 +61,6 @@ public static class ElasticSearchGenericSearchExtensions
         /// <summary>
         /// Add existsing critera
         /// </summary>
-        /// <typeparam name="TQueryDescriptor"></typeparam>
         /// <param name="field"></param>
         /// <returns></returns>
         public void AddExistsCriteria(
@@ -78,7 +76,6 @@ public static class ElasticSearchGenericSearchExtensions
         /// <summary>
         /// Add field must exists criteria
         /// </summary>
-        /// <typeparam name="TQueryDescriptor"></typeparam>
         /// <param name="field"></param>
         public void AddMustExistsCriteria(
     string field)
@@ -94,7 +91,6 @@ public static class ElasticSearchGenericSearchExtensions
         /// <summary>
         /// Add nested must exists criteria
         /// </summary>
-        /// <typeparam name="TQueryDescriptor"></typeparam>
         /// <param name="nestedPath"></param>
         public void AddNestedMustExistsCriteria(
     string nestedPath)
@@ -118,7 +114,6 @@ public static class ElasticSearchGenericSearchExtensions
         /// <summary>
         /// Add field not exists criteria
         /// </summary>
-        /// <typeparam name="TQueryDescriptor"></typeparam>
         /// <param name="field"></param>
         public void AddNotExistsCriteria(
     string field)
@@ -153,7 +148,6 @@ public static class ElasticSearchGenericSearchExtensions
         /// <summary>
         ///  Add numeric filter with relation operator
         /// </summary>
-        /// <typeparam name="TQueryDescriptor"></typeparam>
         /// <param name="fieldName"></param>
         /// <param name="value"></param>
         /// <param name="relationalOperator"></param>
@@ -207,7 +201,6 @@ public static class ElasticSearchGenericSearchExtensions
         /// <summary>
         ///  Add script source
         /// </summary>
-        /// <typeparam name="TQueryDescriptor"></typeparam>
         /// <param name="source"></param>
         public void TryAddScript(string source)
         {
@@ -226,7 +219,6 @@ public static class ElasticSearchGenericSearchExtensions
         /// <summary>
         /// Try to add bounding box criteria
         /// </summary>
-        /// <typeparam name="TQueryDescriptor"></typeparam>
         /// <param name="field"></param>
         /// <param name="boundingBox"></param>
         public void TryAddBoundingBoxCriteria(
@@ -255,7 +247,6 @@ public static class ElasticSearchGenericSearchExtensions
         /// <summary>
         /// Try to add nested term criteria
         /// </summary>
-        /// <typeparam name="TQueryDescriptor"></typeparam>
         /// <typeparam name="TValue"></typeparam>
         /// <param name="nestedPath"></param>
         /// <param name="field"></param>
@@ -282,7 +273,6 @@ public static class ElasticSearchGenericSearchExtensions
         /// <summary>
         /// Try to add nested terms criteria
         /// </summary>
-        /// <typeparam name="TQueryDescriptor"></typeparam>
         /// <typeparam name="TValue"></typeparam>
         /// <param name="nestedPath"></param>
         /// <param name="field"></param>
@@ -309,7 +299,6 @@ public static class ElasticSearchGenericSearchExtensions
         /// <summary>
         ///  Add numeric range criteria if value is not null 
         /// </summary>
-        /// <typeparam name="TQueryDescriptor"></typeparam>
         /// <param name="field"></param>
         /// <param name="value"></param>
         /// <param name="type"></param>
@@ -366,7 +355,6 @@ public static class ElasticSearchGenericSearchExtensions
         /// <summary>
         /// Try add date range criteria
         /// </summary>
-        /// <typeparam name="TQueryDescriptor"></typeparam>
         /// <param name="field"></param>
         /// <param name="dateTime"></param>
         /// <param name="type"></param>
@@ -423,7 +411,6 @@ public static class ElasticSearchGenericSearchExtensions
         /// <summary>
         /// Add geo distance criteria
         /// </summary>
-        /// <typeparam name="TQueryDescriptor"></typeparam>
         /// <param name="field"></param>
         /// <param name="point"></param>
         /// <param name="distanceType"></param>
@@ -447,7 +434,6 @@ public static class ElasticSearchGenericSearchExtensions
         /// <summary>
         ///  Add geo shape criteria
         /// </summary>
-        /// <typeparam name="TQueryDescriptor"></typeparam>
         /// <param name="field"></param>
         /// <param name="geometry"></param>
         /// <param name="relation"></param>
@@ -514,7 +500,6 @@ public static class ElasticSearchGenericSearchExtensions
         /// <summary>
         /// 
         /// </summary>
-        /// <typeparam name="TQueryDescriptor"></typeparam>
         /// <typeparam name="TTerms"></typeparam>
         /// <param name="field"></param>
         /// <param name="terms"></param>
@@ -594,7 +579,6 @@ public static class ElasticSearchGenericSearchExtensions
         /// <summary>
         ///  Try to add query criteria
         /// </summary>
-        /// <typeparam name="TQueryDescriptor"></typeparam>
         /// <typeparam name="TValue"></typeparam>
         /// <param name="field"></param>
         /// <param name="value"></param>
@@ -672,7 +656,6 @@ public static class ElasticSearchGenericSearchExtensions
         /// <summary>
         /// Try to add query criteria where property must match a specified value
         /// </summary>
-        /// <typeparam name="TQueryDescriptor"></typeparam>
         /// <typeparam name="TValue"></typeparam>
         /// <param name="field"></param>
         /// <param name="value"></param>

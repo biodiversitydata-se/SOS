@@ -27,7 +27,6 @@ internal static class ElasticSearchGenericMappingExtensions
         /// <summary>
         /// Map boolean property
         /// </summary>
-        /// <typeparam name="T"></typeparam>
         /// <typeparam name="TValue"></typeparam>
         /// <param name="propertyName"></param>
         /// <param name="indexSetting"></param>
@@ -46,7 +45,6 @@ internal static class ElasticSearchGenericMappingExtensions
         /// <summary>
         /// Map date property
         /// </summary>
-        /// <typeparam name="T"></typeparam>
         /// <typeparam name="TValue"></typeparam>
         /// <param name="propertyName"></param>
         /// <param name="indexSetting"></param>
@@ -65,7 +63,6 @@ internal static class ElasticSearchGenericMappingExtensions
         /// <summary>
         /// Map keword property
         /// </summary>
-        /// <typeparam name="T"></typeparam>
         /// <typeparam name="TValue"></typeparam>
         /// <param name="propertyName"></param>
         /// <param name="indexSetting"></param>
@@ -91,7 +88,6 @@ internal static class ElasticSearchGenericMappingExtensions
         /// <summary>
         /// Map number property
         /// </summary>
-        /// <typeparam name="T"></typeparam>
         /// <typeparam name="TValue"></typeparam>
         /// <param name="propertyName"></param>
         /// <param name="indexSetting"></param>
@@ -140,7 +136,6 @@ internal static class ElasticSearchGenericMappingExtensions
         /// <summary>
         /// Map text field
         /// </summary>
-        /// <typeparam name="T"></typeparam>
         /// <typeparam name="TValue"></typeparam>
         /// <param name="propertyName"></param>
         /// <param name="index"></param>

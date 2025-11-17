@@ -567,8 +567,6 @@ public abstract class ObservationProcessorBase<TClass, TVerbatim, TVerbatimRepos
 
     private void LogInvalidObservations(DataProvider dataProvider, ICollection<Lib.Models.Processed.Validation.InvalidObservation> invalidObservations)
     {
-        const int maxChars = 5000;
-
         try
         {
             if (invalidObservations == null) return;

@@ -124,6 +124,7 @@ public class ExportsController : ControllerBase
     /// <param name="confirmEncryptPassword"></param>
     /// <param name="roleId"></param>
     /// <param name="applicationIdentifier"></param>
+    /// <param name="skipMaxCount"></param>
     /// <returns></returns>
     private async Task<(IActionResult Result, long? Count)> OrderValidateAsync(
         SearchFilterBaseDto filter,
@@ -401,7 +402,7 @@ public class ExportsController : ControllerBase
     [AzureApi, AzureInternalApi]
     public async Task<IActionResult> DownloadCsvAsync(
         [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
-        [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
+        [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
         [FromBody] SearchFilterDto filter,
         [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.None,
         [FromQuery] bool validateSearchFilter = false,
@@ -490,7 +491,7 @@ public class ExportsController : ControllerBase
     [AzureApi, AzureInternalApi]
     public async Task<IActionResult> DownloadDwCAsync(
         [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
-        [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
+        [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
         [FromBody] SearchFilterDto filter,
         [FromQuery] bool eventBased = false,
         [FromQuery] bool validateSearchFilter = false,
@@ -570,7 +571,7 @@ public class ExportsController : ControllerBase
     [AzureApi, AzureInternalApi]
     public async Task<IActionResult> DownloadExcelAsync(
         [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
-        [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
+        [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
         [FromBody] SearchFilterDto filter,
         [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.None,
         [FromQuery] bool validateSearchFilter = false,
@@ -654,7 +655,7 @@ public class ExportsController : ControllerBase
     [AzureApi, AzureInternalApi]
     public async Task<IActionResult> DownloadGeoJsonAsync(
         [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
-        [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
+        [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
         [FromBody] SearchFilterDto filter,
         [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.None,
         [FromQuery] bool validateSearchFilter = false,
@@ -755,7 +756,7 @@ public class ExportsController : ControllerBase
     [AzureApi, AzureInternalApi]
     public async Task<IActionResult> OrderCsvAsync(
         [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
-        [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
+        [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
         [FromBody] SearchFilterDto filter,
         [FromQuery] string description,
         [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.None,
@@ -843,7 +844,7 @@ public class ExportsController : ControllerBase
     [AzureApi, AzureInternalApi]
     public async Task<IActionResult> OrderDwCAsync(
         [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
-        [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
+        [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
         [FromBody] SearchFilterDto filter,
         [FromQuery] string description,
         [FromQuery] bool eventBased = false,
@@ -931,7 +932,7 @@ public class ExportsController : ControllerBase
     [AzureApi, AzureInternalApi]
     public async Task<IActionResult> OrderExcelAsync(
         [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
-        [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
+        [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
         [FromBody] SearchFilterDto filter,
         [FromQuery] string description,
         [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.None,
@@ -1026,7 +1027,7 @@ public class ExportsController : ControllerBase
     [AzureApi, AzureInternalApi]
     public async Task<IActionResult> OrderGeoJsonAsync(
         [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
-        [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
+        [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
         [FromBody] SearchFilterDto filter,
         [FromQuery] string description,
         [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.None,
@@ -1111,7 +1112,7 @@ public class ExportsController : ControllerBase
     [InternalApi, AzureInternalApi]
     public async Task<IActionResult> DownloadCsvInternalAsync(
         [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
-        [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
+        [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
         [FromBody] SearchFilterInternalDto filter,
         [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.None,
         [FromQuery] bool validateSearchFilter = false,
@@ -1198,7 +1199,7 @@ public class ExportsController : ControllerBase
     [InternalApi, AzureInternalApi]
     public async Task<IActionResult> DownloadDwCInternalAsync(
         [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
-        [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
+        [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
         [FromBody] SearchFilterInternalDto filter,
         [FromQuery] bool eventBased = false,
         [FromQuery] bool validateSearchFilter = false,
@@ -1277,7 +1278,7 @@ public class ExportsController : ControllerBase
     [InternalApi, AzureInternalApi]
     public async Task<IActionResult> DownloadExcelInternalAsync(
         [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
-        [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
+        [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
         [FromBody] SearchFilterInternalDto filter,
         [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.None,
         [FromQuery] bool validateSearchFilter = false,
@@ -1360,7 +1361,7 @@ public class ExportsController : ControllerBase
     [InternalApi, AzureInternalApi]
     public async Task<IActionResult> DownloadGeoJsonInternalAsync(
         [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
-        [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
+        [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
         [FromBody] SearchFilterInternalDto filter,
         [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.None,
         [FromQuery] bool validateSearchFilter = false,
@@ -1460,7 +1461,7 @@ public class ExportsController : ControllerBase
     [InternalApi, AzureInternalApi]
     public async Task<IActionResult> OrderCsvInternalAsync(
         [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
-        [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
+        [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
         [FromBody] SearchFilterInternalDto filter,
         [FromQuery] string description,
         [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.None,
@@ -1548,7 +1549,7 @@ public class ExportsController : ControllerBase
     [InternalApi, AzureInternalApi]
     public async Task<IActionResult> OrderDwCInternalAsync(
         [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
-        [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
+        [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
         [FromBody] SearchFilterInternalDto filter,
         [FromQuery] string description,
         [FromQuery] bool eventBased = false,
@@ -1635,7 +1636,7 @@ public class ExportsController : ControllerBase
     [InternalApi, AzureInternalApi]
     public async Task<IActionResult> OrderExcelInternalAsync(
         [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
-        [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
+        [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
         [FromBody] SearchFilterInternalDto filter,
         [FromQuery] string description,
         [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.None,
@@ -1728,7 +1729,7 @@ public class ExportsController : ControllerBase
     [InternalApi, AzureInternalApi]
     public async Task<IActionResult> OrderGeoJsonInternalAsync(
         [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
-        [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
+        [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
         [FromBody] SearchFilterInternalDto filter,
         [FromQuery] string description,
         [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.None,
@@ -1801,7 +1802,7 @@ public class ExportsController : ControllerBase
     [InternalApi]
     public async Task<IActionResult> CreateAndSendCountyOccurrenceReportAsync(
         [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
-        [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
+        [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
         [FromBody] IEnumerable<int> taxonIds,
         [FromQuery] string description,
         [FromQuery] string encryptPassword = "",

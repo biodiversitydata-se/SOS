@@ -60,7 +60,7 @@ public class GeoJsonPolygonCoordinates
 
     public GeoJsonPolygonCoordinates(
         GeoJsonLinearRingCoordinates exterior,
-        IEnumerable<GeoJsonLinearRingCoordinates> holes = null)
+        IEnumerable<GeoJsonLinearRingCoordinates>? holes = null)
     {
         Exterior = exterior;
         Holes = holes?.ToList() ?? new List<GeoJsonLinearRingCoordinates>();

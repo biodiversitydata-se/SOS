@@ -538,7 +538,7 @@ public class AnalysisController : ControllerBase, IAnalysisController
 
             var validationResult = Result.Combine(
                 maxDistance > 0 ? Result.Success() : Result.Failure("You must state max distance"),
-                _inputValidator.ValidateInt(maxDistance.Value, minLimit: 1000, maxLimit: 50000, "Max distance in meters"),
+                _inputValidator.ValidateInt(maxDistance.GetValueOrDefault(), minLimit: 1000, maxLimit: 50000, "Max distance in meters"),
                 validateFilter ?? false ? (await _inputValidator.ValidateSearchFilterAsync(searchFilter!)) : Result.Success(),
                 _inputValidator.ValidateInt(gridCellSizeInMeters!.Value, minLimit: 1000, maxLimit: 100000, "Grid cell size in meters"),
                 await _inputValidator.ValidateTilesLimitMetricAsync(

@@ -35,7 +35,6 @@ public class TaxonRelationDiagramHelper
     /// <summary>
     /// Create a taxon relation GraphViz diagram.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
     /// <param name="taxonTree"></param>
     /// <param name="taxonIds"></param>
     /// <param name="taxonCategoryById"></param>
@@ -68,7 +67,6 @@ public class TaxonRelationDiagramHelper
     /// <summary>
     /// Create a taxon relation Mermaid diagram.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
     /// <param name="taxonTree"></param>
     /// <param name="taxonIds"></param>
     /// <param name="taxonCategoryById"></param>

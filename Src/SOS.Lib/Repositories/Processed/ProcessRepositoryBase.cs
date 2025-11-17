@@ -287,7 +287,7 @@ public abstract class ProcessRepositoryBase<TEntity, TKey> : IProcessRepositoryB
     /// </summary>
     /// <param name="indexName"></param>
     /// <returns></returns>
-    protected async Task<long> IndexCountAsync(string indexName)
+    protected virtual async Task<long> IndexCountAsync(string indexName)
     {
         try
         {
@@ -590,7 +590,7 @@ public abstract class ProcessRepositoryBase<TEntity, TKey> : IProcessRepositoryB
     }
 
     /// <inheritdoc />
-    public async Task<long> IndexCountAsync()
+    public virtual async Task<long> IndexCountAsync()
     {
         return await IndexCountAsync(IndexName);
     }

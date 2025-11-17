@@ -5,6 +5,7 @@ using SOS.Observations.Api.Managers.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using File = SOS.Lib.Models.Misc.File;
 
 namespace SOS.Observations.Api.Managers;
 

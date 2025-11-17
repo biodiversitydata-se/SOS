@@ -8,7 +8,7 @@ namespace SOS.DataStewardship.Api.Contracts.Enums;
 public enum Visibility
 {
     /// <summary>
-    /// dimma, <1 km
+    /// dimma, less than 1 km
     /// </summary>
     [EnumMember(Value = "dimma, <1 km")]
     Dimma1Km = 0,

@@ -27,14 +27,14 @@ public class PersonSightingFactoryTests
         "  confirmatorText  ", 2018,
         "Art Vandelay determinerText 2019 # determinerDescription # Conf. Kel Varnsen confirmatorText 2018")]
     public void TestConcatenateVerifiedByString(
-        string determinerName,
-        string determinerText,
+        string? determinerName,
+        string? determinerText,
         int? determinerYear,
-        string determinationDescription,
-        string confirmatorName,
-        string confirmatorText,
+        string? determinationDescription,
+        string? confirmatorName,
+        string? confirmatorText,
         int? confirmatorYear,
-        string expected)
+        string? expected)
     {
         //-----------------------------------------------------------------------------------------------------------
         // Act

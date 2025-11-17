@@ -72,7 +72,7 @@ public class DataProvidersController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
     [AzureApi, AzureInternalApi]
     public async Task<IActionResult> GetDataProvidersAsync(
-        [FromQuery] IEnumerable<DataProviderCategory> categories,
+        [FromQuery] IEnumerable<DataProviderCategory>? categories,
         [FromQuery] string cultureCode = "sv-SE",
         [FromQuery] bool includeProvidersWithNoObservations = false)
     {

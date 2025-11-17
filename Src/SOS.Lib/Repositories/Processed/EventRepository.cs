@@ -590,7 +590,7 @@ public class EventRepository : ProcessRepositoryBase<Event, string>,
         }
     }
 
-    public async Task<long> IndexCountAsync()
+    public override async Task<long> IndexCountAsync()
     {
         try
         {

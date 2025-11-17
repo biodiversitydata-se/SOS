@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.AspNetCore.Mvc;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Exceptions;
@@ -25,17 +23,13 @@ using SOS.Shared.Api.Extensions.Controller;
 using SOS.Shared.Api.Extensions.Dto;
 using SOS.Shared.Api.Utilities.Objects.Interfaces;
 using SOS.Shared.Api.Validators.Interfaces;
-using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 using Result = CSharpFunctionalExtensions.Result;
 
 namespace SOS.Observations.Api.Controllers;
@@ -128,9 +122,9 @@ public class ObservationsController : ControllerBase
     [AzureApi, AzureInternalApi]
     public async Task<IActionResult> GetObservationById(
         [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
-        [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
-        [FromRoute] string id,
-        [FromQuery] string occurrenceId,
+        [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
+        [FromRoute] string? id,
+        [FromQuery] string? occurrenceId,
         [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.Minimum,
         [FromQuery] string translationCultureCode = "sv-SE",
         [FromQuery] bool sensitiveObservations = false,
@@ -190,8 +184,8 @@ public class ObservationsController : ControllerBase
     [AzureApi, AzureInternalApi]
     public async Task<IActionResult> Count(
         [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
-        [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
-        [FromBody] SearchFilterBaseDto filter,
+        [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
+        [FromBody] SearchFilterBaseDto? filter,
         [FromQuery] bool validateSearchFilter = false,
         [FromQuery] bool sensitiveObservations = false)
     {
@@ -287,8 +281,8 @@ public class ObservationsController : ControllerBase
     [AzureApi, AzureInternalApi]
     public async Task<IActionResult> GeogridAggregation(
         [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
-        [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
-        [FromBody] SearchFilterAggregationDto filter,
+        [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
+        [FromBody] SearchFilterAggregationDto? filter,
         [FromQuery] int zoom = 1,
         [FromQuery] bool validateSearchFilter = false,
         [FromQuery] string translationCultureCode = "sv-SE",
@@ -446,8 +440,8 @@ public class ObservationsController : ControllerBase
     [AzureApi, AzureInternalApi]
     public async Task<IActionResult> MetricGridAggregationAsync(
         [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
-        [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
-        [FromBody] SearchFilterAggregationDto filter,
+        [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
+        [FromBody] SearchFilterAggregationDto? filter,
         [FromQuery] int gridCellSizeInMeters = 100000,
         [FromQuery] bool validateSearchFilter = false,
         [FromQuery] bool sensitiveObservations = false)
@@ -550,8 +544,8 @@ public class ObservationsController : ControllerBase
     [AzureApi, AzureInternalApi]
     public async Task<IActionResult> ObservationsBySearch(
         [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
-        [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
-        [FromBody] SearchFilterDto filter,
+        [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
+        [FromBody] SearchFilterDto? filter,
         [FromQuery] int skip = 0,
         [FromQuery] int take = 100,
         [FromQuery] string sortBy = "",
@@ -646,22 +640,22 @@ public class ObservationsController : ControllerBase
     [AzureApi, AzureInternalApi]
     public async Task<IActionResult> ObservationsBySearchDwc(
         [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
-        [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
-        [FromQuery] string kingdom,
-        [FromQuery] string identificationVerificationStatus,
-        [FromQuery] string license,
-        [FromQuery] string scientificName,
+        [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
+        [FromQuery] string? kingdom,
+        [FromQuery] string? identificationVerificationStatus,
+        [FromQuery] string? license,
+        [FromQuery] string? scientificName,
         [FromQuery] int? taxonKey,
-        [FromQuery] string issue,
-        [FromQuery] string has,
+        [FromQuery] string? issue,
+        [FromQuery] string? has,
         [FromQuery] DateTime? minEventDate,
         [FromQuery] DateTime? maxEventDate,
-        [FromQuery] string dataProviderIds = null,
+        [FromQuery] string? dataProviderIds = null,
         [FromQuery] string translationCultureCode = "en-GB",
         [FromQuery] bool sensitiveObservations = false,
         [FromQuery] int skip = 0,
         [FromQuery] int take = 100,
-        [FromQuery] string sortBy = null!,
+        [FromQuery] string? sortBy = null,
         [FromQuery] SearchSortOrder sortOrder = SearchSortOrder.Asc)
     {
         ApiUserType userType = this.GetApiUserType();
@@ -798,7 +792,7 @@ public class ObservationsController : ControllerBase
     [AzureApi, AzureInternalApi]
     public async Task<IActionResult> ObservationByIdDwc(
         [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
-        [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
+        [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
         [FromRoute] string id,
         [FromQuery] string translationCultureCode = "sv-SE",
         [FromQuery] bool sensitiveObservations = false)
@@ -865,8 +859,8 @@ public class ObservationsController : ControllerBase
     [AzureApi, AzureInternalApi]
     public async Task<IActionResult> TaxonAggregation(
         [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
-        [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
-        [FromBody] SearchFilterAggregationDto filter,
+        [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
+        [FromBody] SearchFilterAggregationDto? filter,
         [FromQuery] int? skip = null,
         [FromQuery] int? take = null,            
         [FromQuery] bool validateSearchFilter = false,
@@ -970,9 +964,9 @@ public class ObservationsController : ControllerBase
     [InternalApi, AzureInternalApi]
     public async Task<IActionResult> GetObservationByIdInternal(
         [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
-        [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
-        [FromRoute] string id,
-        [FromQuery] string occurrenceId,
+        [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
+        [FromRoute] string? id,
+        [FromQuery] string? occurrenceId,
         [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.Minimum,
         [FromQuery] string translationCultureCode = "sv-SE",
         [FromQuery] bool sensitiveObservations = false,
@@ -1033,8 +1027,8 @@ public class ObservationsController : ControllerBase
     [InternalApi, AzureInternalApi]
     public async Task<IActionResult> CountInternal(
         [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
-        [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
-        [FromBody] SearchFilterInternalBaseDto filter,
+        [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
+        [FromBody] SearchFilterInternalBaseDto? filter,
         [FromQuery] bool validateSearchFilter = false,
         [FromQuery] bool sensitiveObservations = false)
     {
@@ -1188,8 +1182,8 @@ public class ObservationsController : ControllerBase
     [InternalApi, AzureInternalApi]
     public async Task<IActionResult> GeogridAggregationInternal(
         [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
-        [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
-        [FromBody] SearchFilterAggregationInternalDto filter,
+        [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
+        [FromBody] SearchFilterAggregationInternalDto? filter,
         [FromQuery] int zoom = 1,
         [FromQuery] bool validateSearchFilter = false,
         [FromQuery] string translationCultureCode = "sv-SE",
@@ -1286,8 +1280,8 @@ public class ObservationsController : ControllerBase
     [InternalApi, AzureInternalApi]
     public async Task<IActionResult> GeogridAggregationAsGeoJsonInternal(
         [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
-        [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
-        [FromBody] SearchFilterAggregationInternalDto filter,
+        [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
+        [FromBody] SearchFilterAggregationInternalDto? filter,
         [FromQuery] int zoom = 1,
         [FromQuery] bool validateSearchFilter = false,
         [FromQuery] string translationCultureCode = "sv-SE",
@@ -1323,10 +1317,8 @@ public class ObservationsController : ControllerBase
             {
                 return BadRequest(validationResult.Error);
             }
-
            
-            var result = await _observationManager.GetGeogridTileAggregationAsync(roleId, authorizationApplicationIdentifier, searchFilter, zoom);
-         
+            var result = await _observationManager.GetGeogridTileAggregationAsync(roleId, authorizationApplicationIdentifier, searchFilter, zoom);         
             string strJson = result.GetFeatureCollectionGeoJson();
             var bytes = Encoding.UTF8.GetBytes(strJson);
             return File(bytes, "application/json", "grid.geojson");
@@ -1410,8 +1402,8 @@ public class ObservationsController : ControllerBase
     [InternalApi, AzureInternalApi]
     public async Task<IActionResult> GeogridTaxaAggregationInternal(
         [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
-        [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
-        [FromBody] SearchFilterAggregationInternalDto filter,
+        [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
+        [FromBody] SearchFilterAggregationInternalDto? filter,
         [FromQuery] int zoom = 1,
         [FromQuery] string geoTilePage = null,
         [FromQuery] int? taxonIdPage = null,
@@ -1446,7 +1438,6 @@ public class ObservationsController : ControllerBase
             {
                 return BadRequest(validationResult.Error);
             }
-
 
             var result = await _taxonSearchManager.GetPageGeoTileTaxaAggregationAsync(roleId, authorizationApplicationIdentifier, searchFilter, zoom, geoTilePage, taxonIdPage);
             if (result.IsFailure)
@@ -1494,8 +1485,8 @@ public class ObservationsController : ControllerBase
     [InternalApi, AzureInternalApi]
     public async Task<IActionResult> MetricGridAggregationInternalAsync(
         [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
-        [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
-        [FromBody] SearchFilterAggregationInternalDto filter,
+        [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
+        [FromBody] SearchFilterAggregationInternalDto? filter,
         [FromQuery] int gridCellSizeInMeters = 10000,
         [FromQuery] bool validateSearchFilter = false,
         [FromQuery] bool sensitiveObservations = false,
@@ -1606,8 +1597,8 @@ public class ObservationsController : ControllerBase
     [InternalApi, AzureInternalApi]
     public async Task<IActionResult> ObservationsBySearchInternal(
         [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
-        [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
-        [FromBody] SearchFilterInternalDto filter,
+        [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
+        [FromBody] SearchFilterInternalDto? filter,
         [FromQuery] int skip = 0,
         [FromQuery] int take = 100,
         [FromQuery] string sortBy = "",
@@ -1755,8 +1746,8 @@ public class ObservationsController : ControllerBase
     [InternalApi, AzureInternalApi]
     public async Task<IActionResult> SearchAggregatedInternal(
         [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
-        [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
-        [FromBody] SearchFilterAggregationInternalDto filter,
+        [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
+        [FromBody] SearchFilterAggregationInternalDto? filter,
         [FromQuery] AggregationType aggregationType,
         [FromQuery] int skip = 0,
         [FromQuery] int take = 100,
@@ -1843,8 +1834,8 @@ public class ObservationsController : ControllerBase
     [InternalApi, AzureInternalApi]
     public async Task<IActionResult> TimeSeriesHistogramInternal(
         [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
-        [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
-        [FromBody] SearchFilterAggregationInternalDto filter,
+        [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
+        [FromBody] SearchFilterAggregationInternalDto? filter,
         [FromQuery] TimeSeriesTypeDto timeSeriesType,
         [FromQuery] bool validateSearchFilter = false,
         [FromQuery] bool sensitiveObservations = false)
@@ -1928,8 +1919,8 @@ public class ObservationsController : ControllerBase
     [InternalApi, AzureInternalApi]
     public async Task<IActionResult> ObservationsScroll(
         [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
-        [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
-        [FromBody] SearchFilterDto filter,
+        [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
+        [FromBody] SearchFilterDto? filter,
         [FromQuery] string scrollId,
         [FromQuery] int take = 5000,
         [FromQuery] string sortBy = "",
@@ -2014,8 +2005,8 @@ public class ObservationsController : ControllerBase
     [InternalApi, AzureInternalApi]
     public async Task<IActionResult> SignalSearchInternal(
         [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
-        [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
-        [FromBody] SignalFilterDto filter,
+        [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
+        [FromBody] SignalFilterDto? filter,
         [FromQuery] bool validateSearchFilter = false, // if false, only mandatory requirements will be validated
         [FromQuery] int areaBuffer = 0,
         [FromQuery] bool onlyAboveMyClearance = true,
@@ -2109,8 +2100,8 @@ public class ObservationsController : ControllerBase
     [InternalApi, AzureInternalApi]
     public async Task<IActionResult> TaxonAggregationInternal(
         [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
-        [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
-        [FromBody] SearchFilterAggregationInternalDto filter,
+        [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
+        [FromBody] SearchFilterAggregationInternalDto? filter,
         [FromQuery] int? skip = null,
         [FromQuery] int? take = null,            
         [FromQuery] bool validateSearchFilter = false,
@@ -2247,8 +2238,8 @@ public class ObservationsController : ControllerBase
     [InternalApi]
     public async Task<IActionResult> ObservedTaxaInternal(
         [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
-        [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
-        [FromBody] SearchFilterAggregationInternalDto filter,            
+        [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
+        [FromBody] SearchFilterAggregationInternalDto? filter,            
         [FromQuery] bool validateSearchFilter = false,
         [FromQuery] string translationCultureCode = "sv-SE",
         [FromQuery] bool sensitiveObservations = false)
@@ -2340,8 +2331,8 @@ public class ObservationsController : ControllerBase
     [InternalApi]
     public async Task<IActionResult> TaxonAreaAggregationInternal(
         [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
-        [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
-        [FromBody] SearchFilterAggregationInternalDto filter,
+        [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
+        [FromBody] SearchFilterAggregationInternalDto? filter,
         [FromQuery] AreaTypeAggregate? areaType = null,
         [FromQuery] bool validateSearchFilter = false,            
         [FromQuery] bool sensitiveObservations = false,
@@ -2449,7 +2440,7 @@ public class ObservationsController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
     [InternalApi, AzureInternalApi]
     public async Task<IActionResult> TaxonSumAggregationInternal(
-        [FromBody] TaxonFilterDto taxonFilter,
+        [FromBody] TaxonFilterDto? taxonFilter,
         [FromQuery] int? skip = null,
         [FromQuery] int? take = null,
         [FromQuery] string sortBy = "SumObservationCount",
@@ -2527,8 +2518,8 @@ public class ObservationsController : ControllerBase
     [InternalApi, AzureInternalApi]
     public async Task<IActionResult> TaxonExistsIndicationInternal(
         [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
-        [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
-        [FromBody] SearchFilterAggregationInternalDto filter,
+        [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
+        [FromBody] SearchFilterAggregationInternalDto? filter,
         [FromQuery] bool validateSearchFilter = false,
         [FromQuery] bool sensitiveObservations = false)
     {
@@ -2593,7 +2584,7 @@ public class ObservationsController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
     [InternalApi]
     public async Task<IActionResult> GetUserYearCountAsync(
-        [FromBody] SearchFilterAggregationInternalDto filter,
+        [FromBody] SearchFilterAggregationInternalDto? filter,
         [FromQuery] bool validateSearchFilter = false)
     {
         try
@@ -2651,7 +2642,7 @@ public class ObservationsController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
     [InternalApi]
     public async Task<IActionResult> GetUserYearMonthCountAsync(
-        [FromBody] SearchFilterAggregationInternalDto filter,
+        [FromBody] SearchFilterAggregationInternalDto? filter,
         [FromQuery] bool validateSearchFilter = false)
     {
         try
@@ -2710,7 +2701,7 @@ public class ObservationsController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
     [InternalApi]
     public async Task<IActionResult> GetUserYearMonthDayCountAsync(
-        [FromBody] SearchFilterAggregationInternalDto filter,
+        [FromBody] SearchFilterAggregationInternalDto? filter,
         [FromQuery] int skip = 0,
         [FromQuery] int take = 20,
         [FromQuery] bool validateSearchFilter = false)

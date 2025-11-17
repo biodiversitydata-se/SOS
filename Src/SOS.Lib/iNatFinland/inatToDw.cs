@@ -144,13 +144,7 @@ public class inatToDw
             { "licenseId", GetLicenseUrl(photo.photo.license_code) },
             { "mediaType", "IMAGE" }
         };
-    }
-
-    // Checks if a value is not NaN
-    public static bool HasValue(dynamic val)
-    {
-        return val == val;
-    }    
+    }     
 
     private static Dictionary<string, object> GetImageData(Dictionary<string, Dictionary<string, object>> photo, string observer)
     {

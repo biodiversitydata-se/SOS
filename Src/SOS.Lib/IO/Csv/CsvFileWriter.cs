@@ -134,6 +134,7 @@ public class CsvFileWriter : FileWriterBase, ICsvFileWriter
     /// <param name="filterManager"></param>
     /// <param name="vocabularyValueResolver"></param>
     /// <param name="generalizationResolver"></param>
+    /// <param name="areaCache"></param>
     /// <param name="taxonCache"></param>
     /// <param name="logger"></param>
     /// <exception cref="ArgumentNullException"></exception>

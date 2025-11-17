@@ -2,7 +2,6 @@
 using SOS.Lib.Models.Statistics;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Shared.Api.Dtos.Filter;
-using SOS.Lib.Models.Statistics;
 using SOS.Observations.Api.IntegrationTests.Setup;
 using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
 

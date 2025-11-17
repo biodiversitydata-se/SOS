@@ -63,7 +63,7 @@ public class DataStewardshipController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.ServiceUnavailable)]
     public async Task<IActionResult> GetDatasetByIdAsync(
         [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
-        [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
+        [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
         [FromRoute] string id,
         [FromQuery] DsExportMode exportMode = DsExportMode.Json
     )
@@ -115,7 +115,7 @@ public class DataStewardshipController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.ServiceUnavailable)]
     public async Task<IActionResult> GetDatasetsBySearchAsync(
         [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
-        [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
+        [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
         [FromBody] SearchFilterBaseDto filter,
         [FromQuery] bool includeEventIds = false,
         [FromQuery] bool validateSearchFilter = false,
@@ -184,7 +184,7 @@ public class DataStewardshipController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.ServiceUnavailable)]
     public async Task<IActionResult> GetEventByIdAsync(
         [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
-        [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
+        [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
         [FromRoute] string id,
         [FromQuery] CoordinateSys responseCoordinateSystem = CoordinateSys.WGS84,
         [FromQuery] DsExportMode exportMode = DsExportMode.Json
@@ -237,7 +237,7 @@ public class DataStewardshipController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.ServiceUnavailable)]
     public async Task<IActionResult> GetEventsBySearchAsync(
         [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
-        [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
+        [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
         [FromBody] SearchFilterBaseDto filter,
         [FromQuery] bool validateSearchFilter = false,
         [FromQuery] int skip = 0,
@@ -300,7 +300,7 @@ public class DataStewardshipController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.ServiceUnavailable)]
     public async Task<IActionResult> GetOccurrenceByIdAsync(
         [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
-        [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
+        [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
         [FromRoute] string id,
         [FromQuery] CoordinateSys responseCoordinateSystem = CoordinateSys.WGS84,
         [FromQuery] DsExportMode exportMode = DsExportMode.Json
@@ -353,7 +353,7 @@ public class DataStewardshipController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.ServiceUnavailable)]
     public async Task<IActionResult> GetOccurrencesBySearchAsync(
         [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
-        [FromHeader(Name = "X-Authorization-Application-Identifier")] string authorizationApplicationIdentifier,
+        [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
         [FromBody] SearchFilterBaseDto filter,
         [FromQuery] bool validateSearchFilter = false,
         [FromQuery] int skip = 0,

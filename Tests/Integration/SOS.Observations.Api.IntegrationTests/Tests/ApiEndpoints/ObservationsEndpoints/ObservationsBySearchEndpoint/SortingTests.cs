@@ -104,9 +104,9 @@ public class SortingTests : TestBase
         {
             if (previousDate != null)
             {
-                obs.Modified.Value.Should().BeOnOrAfter(previousDate.Value);
+                obs.Modified!.Value.Should().BeOnOrAfter(previousDate.Value);
             }
-            previousDate = obs.Modified.Value;
+            previousDate = obs.Modified!.Value;
         }
     }
 

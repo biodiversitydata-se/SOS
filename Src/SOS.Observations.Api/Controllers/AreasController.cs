@@ -49,8 +49,11 @@ public class AreasController : ControllerBase
     [ProducesResponseType(typeof(PagedResult<AreaBaseDto>), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
     [AzureApi, AzureInternalApi]
-    public async Task<IActionResult> GetAreas([FromQuery] IEnumerable<AreaTypeDto> areaTypes = null,
-        [FromQuery] string searchString = null, [FromQuery] int skip = 0, [FromQuery] int take = 100)
+    public async Task<IActionResult> GetAreas(
+        [FromQuery] IEnumerable<AreaTypeDto> areaTypes = null,
+        [FromQuery] string searchString = null, 
+        [FromQuery] int skip = 0, 
+        [FromQuery] int take = 100)
     {
         try
         {
@@ -74,7 +77,9 @@ public class AreasController : ControllerBase
     [ProducesResponseType(typeof(AreaBaseDto), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
     [AzureApi, AzureInternalApi]
-    public async Task<IActionResult> GetArea([FromRoute] AreaTypeDto areaType, [FromRoute] string featureId)
+    public async Task<IActionResult> GetArea(
+        [FromRoute] AreaTypeDto areaType, 
+        [FromRoute] string featureId)
     {
         try
         {

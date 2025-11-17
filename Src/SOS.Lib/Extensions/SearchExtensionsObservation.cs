@@ -519,7 +519,6 @@ public static class SearchExtensionsObservation
         /// <summary>
         /// Try to add taxon search criteria
         /// </summary>
-        /// <typeparam name="TQueryDescriptor"></typeparam>
         /// <param name="filter"></param>
         private void TryAddTaxonCriteria(
     TaxonFilter filter)

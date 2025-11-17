@@ -326,7 +326,6 @@ public class GeographicsFilterTests : TestBase
         // Arrange
         //-----------------------------------------------------------------------------------------------------------
         var uppsala = Geometries.UppsalaMunicipality();
-        var wgs86Approx1M = 0.00001;
         var maxX = uppsala.Coordinates.Max(c => c.X); 
         var maxY = uppsala.Coordinates.Max(c => c.Y);
         var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)

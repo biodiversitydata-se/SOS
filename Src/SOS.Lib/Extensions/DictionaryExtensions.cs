@@ -11,9 +11,7 @@ public static class DictionaryExtensions
     {
         /// <summary>
         /// Get a value from dictionary or default if the key didn't exist.
-        /// </summary>
-        /// <typeparam name="TK"></typeparam>
-        /// <typeparam name="TV"></typeparam>
+        /// </summary>        
         /// <param name="key"></param>
         /// <param name="defaultValue"></param>
         /// <returns></returns>

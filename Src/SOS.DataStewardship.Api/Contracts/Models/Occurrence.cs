@@ -28,7 +28,8 @@ public class Occurrence
     public DateTime? ObservationTime { get; set; }
 
     /// <summary>
-    /// Date and Time for when the survey started (local time).        
+    /// Date and Time for when the survey started (local time).
+    /// </summary>
     public DateTime? EventStartDate { get; set; }
 
     /// <summary>

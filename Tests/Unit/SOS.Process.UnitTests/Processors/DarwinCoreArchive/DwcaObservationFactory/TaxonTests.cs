@@ -49,8 +49,8 @@ public class TaxonTests : IClassFixture<DwcaObservationFactoryFixture>
     [InlineData("equus asinus", null, 233622)] // find by scientific name
     //[InlineData("Felis lynx", null, 100057)] // find by synonyme (synonyms aren't yet included in test data)
     public async Task Succeeds_to_parse_taxon_from_taxonId_and_scientific_name(
-        string scientificName,
-        string taxonId,
+        string? scientificName,
+        string? taxonId,
         int expectedParsedTaxonId)
     {
         //-----------------------------------------------------------------------------------------------------------
@@ -84,8 +84,8 @@ public class TaxonTests : IClassFixture<DwcaObservationFactoryFixture>
     [InlineData(null, "TaxonId_text_with_id_that_doesnt_exist_9999999")] // taxon id that doesn't exist
     [InlineData(null, "TaxonId_text_with_id_that_is_larger_than_max_integer_9999999000000000000")] // integer larger than int.max
     public void Fails_to_parse_taxon_from_taxonId_and_scientific_name(
-        string scientificName,
-        string taxonId)
+        string? scientificName,
+        string? taxonId)
     {
         //-----------------------------------------------------------------------------------------------------------
         // Arrange

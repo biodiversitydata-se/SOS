@@ -19,7 +19,6 @@ public static class SearchExtensionsChecklist
         /// <summary>
         /// Add geometry filter to query
         /// </summary>
-        /// <typeparam name="TQueryDescriptor"></typeparam>
         /// <param name="geographicsFilter"></param>
         private void TryAddGeometryFilters(
             GeographicsFilter geographicsFilter)
@@ -95,7 +94,6 @@ public static class SearchExtensionsChecklist
         /// <summary>
         /// Try to add geographical filter
         /// </summary>
-        /// <typeparam name="TQueryDescriptor"></typeparam>
         /// <param name="geographicAreasFilter"></param>
         private ICollection<Action<QueryDescriptor<TQueryDescriptor>>> TryAddGeographicFilter(GeographicAreasFilter geographicAreasFilter)
         {

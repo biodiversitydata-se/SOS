@@ -88,7 +88,7 @@ public class ProcessFixture
 
         var processedObservations = parsedDwcaFile
             .Occurrences
-            .Select(m => observationFactory.CreateProcessedObservation(m, false))
+            .Select(m => observationFactory.CreateProcessedObservation(m, false)!)
             .ToList();
         await AddObservationsToElasticsearchAsync(processedObservations);
         output.WriteLine($"Processed observations count= {processedObservations.Count}");
@@ -102,7 +102,7 @@ public class ProcessFixture
 
         var processedDatasets = parsedDwcaFile
             .Datasets
-            .Select(m => datasetFactory.CreateProcessedDataset(m))
+            .Select(m => datasetFactory.CreateProcessedDataset(m)!)
             .ToList();
         await AddDatasetsToElasticsearchAsync(processedDatasets);
         output.WriteLine($"Processed datasets count= {processedDatasets.Count}");

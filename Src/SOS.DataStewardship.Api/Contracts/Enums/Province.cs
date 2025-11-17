@@ -82,7 +82,7 @@ public enum Province
     /// </summary>
     [EnumMember(Value = "Lycksele lappmark")]
     Lycksele_lappmark = 26,
-    // <summary>
+    /// <summary>
     /// Medelpad
     /// </summary>
     [EnumMember(Value = "Medelpad")]

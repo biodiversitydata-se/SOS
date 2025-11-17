@@ -116,6 +116,7 @@ public interface IInputValidator
     /// Validate serach filter
     /// </summary>
     /// <param name="filter"></param>
+    /// <param name="allowObjectInOutputFields"></param>
     /// <param name="bboxMandatory"></param>
     /// <returns></returns>
     Task<Result> ValidateSearchFilterAsync(SearchFilterBaseDto filter, bool allowObjectInOutputFields = true, bool bboxMandatory = false);

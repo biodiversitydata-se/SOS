@@ -65,8 +65,8 @@ public class TestContainersFixture : IAsyncLifetime
     public ServiceCollection GetServiceCollection()
     {
         var serviceCollection = new ServiceCollection();
-        serviceCollection.AddSingleton(TestSubstitutes.ProcessClient);
-        serviceCollection.AddSingleton(TestSubstitutes.ElasticClient);
+        serviceCollection.AddSingleton(TestSubstitutes.ProcessClient!);
+        serviceCollection.AddSingleton(TestSubstitutes.ElasticClient!);
 
         return serviceCollection;
     }

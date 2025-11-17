@@ -70,7 +70,7 @@ public class GeoGridAggregationInternalTests : TestBase
         };
 
         // Act
-        var response = await apiClient.PostAsync($"/observations/internal/geogridaggregation", JsonContent.Create(searchFilter));
+        var response = await apiClient.PostAsync($"/observations/internal/geogridaggregation", JsonContent.Create(searchFilter));        
         var result = await response.Content.ReadFromJsonAsync<GeoGridResultDto>();
 
         // Assert

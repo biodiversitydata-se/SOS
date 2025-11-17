@@ -143,7 +143,6 @@ public static class ObjectExtensions
         /// <summary>
         ///     Set object property by reflection
         /// </summary>
-        /// <typeparam name="T"></typeparam>
         /// <param name="propertyName"></param>
         /// <param name="value"></param>
         public void SetProperty(string propertyName, object value)
@@ -182,7 +181,6 @@ public static class ObjectExtensions
         /// <summary>
         /// Creates a deep copy of an object.
         /// </summary>
-        /// <typeparam name="T">Object type.</typeparam>
         /// <returns></returns>
         public T Clone()
         {

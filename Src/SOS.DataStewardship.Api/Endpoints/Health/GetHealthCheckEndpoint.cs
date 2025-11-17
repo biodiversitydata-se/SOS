@@ -63,7 +63,7 @@ public class GetHealthCheckEndpoint : IEndpointDefinition
 
             return Results.Ok(new HealthReport(entries, DateTime.Now - start));
         }
-        catch (Exception e)
+        catch (Exception)
         {
             return Results.StatusCode((int)HttpStatusCode.InternalServerError);
         }
