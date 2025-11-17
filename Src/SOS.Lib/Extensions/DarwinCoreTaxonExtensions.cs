@@ -55,183 +55,202 @@ public static class DarwinCoreTaxonExtensions
         return taxa;
     }
 
-    public static IDictionary<int, Taxon> ToProcessedTaxa(this IEnumerable<DarwinCoreTaxon> sourceTaxa)
+    extension(IEnumerable<DarwinCoreTaxon> sourceTaxa)
     {
-        var taxa = sourceTaxa?.Select(t => t.ToProcessedTaxon());
-        return PopulateDeriviedRedListCategory(taxa?.ToDictionary(t => t.Id, t => t));
-    }
-
-    public static Taxon ToProcessedTaxon(this DarwinCoreTaxon sourceTaxon)
-    {
-        var taxon = new Taxon();
-        taxon.SecondaryParentDyntaxaTaxonIds = sourceTaxon.DynamicProperties?.SecondaryParentDyntaxaTaxonIds;
-        taxon.AcceptedNameUsage = sourceTaxon.AcceptedNameUsage;
-        taxon.AcceptedNameUsageId = sourceTaxon.AcceptedNameUsageID;
-        taxon.BirdDirective = sourceTaxon.DynamicProperties?.BirdDirective == null ? false : sourceTaxon.DynamicProperties.BirdDirective.GetValueOrDefault();
-        taxon.Class = sourceTaxon.Class;
-        taxon.Family = sourceTaxon.Family;
-        taxon.Genus = sourceTaxon.Genus;
-        taxon.HigherClassification = sourceTaxon.HigherClassification;
-        taxon.Id = sourceTaxon.Id;
-        taxon.InfraspecificEpithet = sourceTaxon.InfraspecificEpithet;
-        taxon.Kingdom = sourceTaxon.Kingdom?.Clean();
-        taxon.NameAccordingTo = sourceTaxon.NameAccordingTo;
-        taxon.NameAccordingToId = sourceTaxon.NameAccordingToID;
-        taxon.NamePublishedIn = sourceTaxon.NamePublishedIn;
-        taxon.NamePublishedInId = sourceTaxon.NamePublishedInID;
-        taxon.NamePublishedInYear = sourceTaxon.NamePublishedInYear;
-        taxon.NomenclaturalCode = sourceTaxon.NomenclaturalCode;
-        taxon.NomenclaturalStatus = sourceTaxon.NomenclaturalStatus;
-        taxon.Order = sourceTaxon.Order;
-        taxon.OriginalNameUsage = sourceTaxon.OriginalNameUsage;
-        taxon.OriginalNameUsageId = sourceTaxon.OriginalNameUsageID;
-        taxon.ParentNameUsage = sourceTaxon.ParentNameUsage;
-        taxon.ParentNameUsageId = sourceTaxon.ParentNameUsageID;
-        taxon.Phylum = sourceTaxon.Phylum;
-        taxon.ScientificName = sourceTaxon.ScientificName;
-        taxon.ScientificNameAuthorship = sourceTaxon.ScientificNameAuthorship;
-        taxon.ScientificNameId = sourceTaxon.ScientificNameID;
-        taxon.SpecificEpithet = sourceTaxon.SpecificEpithet;
-        taxon.Subgenus = sourceTaxon.Subgenus;
-        taxon.TaxonConceptId = sourceTaxon.TaxonConceptID;
-        taxon.Attributes = new TaxonAttributes();
-        taxon.Attributes.ActionPlan = sourceTaxon.DynamicProperties?.ActionPlan;
-        taxon.Attributes.CountyOccurrences = sourceTaxon.DynamicProperties?.CountyOccurrences;
-        taxon.Attributes.DisturbanceRadius = sourceTaxon.DynamicProperties?.DisturbanceRadius;
-        taxon.Attributes.DyntaxaTaxonId = sourceTaxon.DynamicProperties?.DyntaxaTaxonId ?? 0;
-        taxon.Attributes.GbifTaxonId = sourceTaxon.DynamicProperties.GbifTaxonId;
-        taxon.Attributes.OrganismLabel1 = sourceTaxon.DynamicProperties.OrganismLabel1;
-        taxon.Attributes.OrganismLabel2 = sourceTaxon.DynamicProperties.OrganismLabel2;
-        taxon.Attributes.Natura2000HabitatsDirectiveArticle2 = sourceTaxon.DynamicProperties?.Natura2000HabitatsDirectiveArticle2 == null ? false : sourceTaxon.DynamicProperties.Natura2000HabitatsDirectiveArticle2.GetValueOrDefault();
-        taxon.Attributes.Natura2000HabitatsDirectiveArticle4 = sourceTaxon.DynamicProperties?.Natura2000HabitatsDirectiveArticle4 == null ? false : sourceTaxon.DynamicProperties.Natura2000HabitatsDirectiveArticle4.GetValueOrDefault();
-        taxon.Attributes.Natura2000HabitatsDirectiveArticle5 = sourceTaxon.DynamicProperties?.Natura2000HabitatsDirectiveArticle5 == null ? false : sourceTaxon.DynamicProperties.Natura2000HabitatsDirectiveArticle5.GetValueOrDefault();
-        taxon.Attributes.OrganismGroup = sourceTaxon.DynamicProperties?.OrganismGroup;
-        taxon.Attributes.ParentDyntaxaTaxonId = sourceTaxon.DynamicProperties?.ParentDyntaxaTaxonId;
-        taxon.Attributes.SensitivityCategory = sourceTaxon.DynamicProperties?.ProtectionLevel.ToProtectionLevel();
-        taxon.Attributes.ProtectedByLaw = sourceTaxon.DynamicProperties?.ProtectedByLaw ?? false;
-        taxon.Attributes.IsInvasiveAccordingToEuRegulation = sourceTaxon.DynamicProperties?.IsEURegulation_1143_2014 ?? false;
-        taxon.Attributes.IsInvasiveInSweden = sourceTaxon.DynamicProperties?.IsInvasiveInSweden ?? false;
-        taxon.Attributes.InvasiveRiskAssessmentCategory = sourceTaxon.DynamicProperties?.InvasiveRiskAssessmentCategory;
-        taxon.Attributes.RedlistCategory = (sourceTaxon.DynamicProperties?.RedlistCategory?.Length ?? 0) < 2 ? string.Empty : sourceTaxon.DynamicProperties?.RedlistCategory?.Substring(0, 2);
-        taxon.Attributes.ScientificNames = sourceTaxon.ScientificNames?.ToTaxonScientificNames();
-        taxon.Attributes.SortOrder = sourceTaxon.SortOrder;
-        taxon.Attributes.SwedishHistory = sourceTaxon.DynamicProperties?.SwedishHistory;
-        taxon.Attributes.SwedishOccurrence = sourceTaxon.DynamicProperties?.SwedishOccurrence;
-        taxon.Attributes.Synonyms = sourceTaxon.Synonyms?.ToTaxonSynonymNames();
-        taxon.Attributes.TaxonCategory = VocabularyValue.Create(sourceTaxon.DynamicProperties?.TaxonCategoryId);
-        taxon.Attributes.VernacularNames = sourceTaxon.VernacularNames?.ToTaxonVernacularNames();
-
-        taxon.TaxonId = sourceTaxon.TaxonID;
-        taxon.TaxonRank = sourceTaxon.TaxonRank;
-        taxon.TaxonRemarks = sourceTaxon.TaxonRemarks?.Clean();
-        taxon.TaxonomicStatus = sourceTaxon.TaxonomicStatus;
-        taxon.VernacularName = sourceTaxon.VernacularName;
-        taxon.VerbatimTaxonRank = sourceTaxon.VerbatimTaxonRank;
-
-        var displayName = taxon.ScientificName?.Trim();
-        if (!string.IsNullOrEmpty(taxon.ScientificNameAuthorship))
+        public IDictionary<int, Taxon> ToProcessedTaxa()
         {
-            var authorship = taxon.ScientificNameAuthorship.Trim();
-            displayName += $" {(authorship.StartsWith('(') ? "" : "(")}{taxon.ScientificNameAuthorship.Trim()}{(authorship.EndsWith(')') ? "" : ")")}";
+            var taxa = sourceTaxa?.Select(t => t.ToProcessedTaxon());
+            return PopulateDeriviedRedListCategory(taxa?.ToDictionary(t => t.Id, t => t));
         }
-        if (!string.IsNullOrEmpty(taxon.VernacularName))
+    }
+
+    extension(DarwinCoreTaxon sourceTaxon)
+    {
+        public Taxon ToProcessedTaxon()
         {
-            displayName += $", {taxon.VernacularName.Trim()}";
+            var taxon = new Taxon();
+            taxon.SecondaryParentDyntaxaTaxonIds = sourceTaxon.DynamicProperties?.SecondaryParentDyntaxaTaxonIds;
+            taxon.AcceptedNameUsage = sourceTaxon.AcceptedNameUsage;
+            taxon.AcceptedNameUsageId = sourceTaxon.AcceptedNameUsageID;
+            taxon.BirdDirective = sourceTaxon.DynamicProperties?.BirdDirective == null ? false : sourceTaxon.DynamicProperties.BirdDirective.GetValueOrDefault();
+            taxon.Class = sourceTaxon.Class;
+            taxon.Family = sourceTaxon.Family;
+            taxon.Genus = sourceTaxon.Genus;
+            taxon.HigherClassification = sourceTaxon.HigherClassification;
+            taxon.Id = sourceTaxon.Id;
+            taxon.InfraspecificEpithet = sourceTaxon.InfraspecificEpithet;
+            taxon.Kingdom = sourceTaxon.Kingdom?.Clean();
+            taxon.NameAccordingTo = sourceTaxon.NameAccordingTo;
+            taxon.NameAccordingToId = sourceTaxon.NameAccordingToID;
+            taxon.NamePublishedIn = sourceTaxon.NamePublishedIn;
+            taxon.NamePublishedInId = sourceTaxon.NamePublishedInID;
+            taxon.NamePublishedInYear = sourceTaxon.NamePublishedInYear;
+            taxon.NomenclaturalCode = sourceTaxon.NomenclaturalCode;
+            taxon.NomenclaturalStatus = sourceTaxon.NomenclaturalStatus;
+            taxon.Order = sourceTaxon.Order;
+            taxon.OriginalNameUsage = sourceTaxon.OriginalNameUsage;
+            taxon.OriginalNameUsageId = sourceTaxon.OriginalNameUsageID;
+            taxon.ParentNameUsage = sourceTaxon.ParentNameUsage;
+            taxon.ParentNameUsageId = sourceTaxon.ParentNameUsageID;
+            taxon.Phylum = sourceTaxon.Phylum;
+            taxon.ScientificName = sourceTaxon.ScientificName;
+            taxon.ScientificNameAuthorship = sourceTaxon.ScientificNameAuthorship;
+            taxon.ScientificNameId = sourceTaxon.ScientificNameID;
+            taxon.SpecificEpithet = sourceTaxon.SpecificEpithet;
+            taxon.Subgenus = sourceTaxon.Subgenus;
+            taxon.TaxonConceptId = sourceTaxon.TaxonConceptID;
+            taxon.Attributes = new TaxonAttributes();
+            taxon.Attributes.ActionPlan = sourceTaxon.DynamicProperties?.ActionPlan;
+            taxon.Attributes.CountyOccurrences = sourceTaxon.DynamicProperties?.CountyOccurrences;
+            taxon.Attributes.DisturbanceRadius = sourceTaxon.DynamicProperties?.DisturbanceRadius;
+            taxon.Attributes.DyntaxaTaxonId = sourceTaxon.DynamicProperties?.DyntaxaTaxonId ?? 0;
+            taxon.Attributes.GbifTaxonId = sourceTaxon.DynamicProperties.GbifTaxonId;
+            taxon.Attributes.OrganismLabel1 = sourceTaxon.DynamicProperties.OrganismLabel1;
+            taxon.Attributes.OrganismLabel2 = sourceTaxon.DynamicProperties.OrganismLabel2;
+            taxon.Attributes.Natura2000HabitatsDirectiveArticle2 = sourceTaxon.DynamicProperties?.Natura2000HabitatsDirectiveArticle2 == null ? false : sourceTaxon.DynamicProperties.Natura2000HabitatsDirectiveArticle2.GetValueOrDefault();
+            taxon.Attributes.Natura2000HabitatsDirectiveArticle4 = sourceTaxon.DynamicProperties?.Natura2000HabitatsDirectiveArticle4 == null ? false : sourceTaxon.DynamicProperties.Natura2000HabitatsDirectiveArticle4.GetValueOrDefault();
+            taxon.Attributes.Natura2000HabitatsDirectiveArticle5 = sourceTaxon.DynamicProperties?.Natura2000HabitatsDirectiveArticle5 == null ? false : sourceTaxon.DynamicProperties.Natura2000HabitatsDirectiveArticle5.GetValueOrDefault();
+            taxon.Attributes.OrganismGroup = sourceTaxon.DynamicProperties?.OrganismGroup;
+            taxon.Attributes.ParentDyntaxaTaxonId = sourceTaxon.DynamicProperties?.ParentDyntaxaTaxonId;
+            taxon.Attributes.SensitivityCategory = sourceTaxon.DynamicProperties?.ProtectionLevel.ToProtectionLevel();
+            taxon.Attributes.ProtectedByLaw = sourceTaxon.DynamicProperties?.ProtectedByLaw ?? false;
+            taxon.Attributes.IsInvasiveAccordingToEuRegulation = sourceTaxon.DynamicProperties?.IsEURegulation_1143_2014 ?? false;
+            taxon.Attributes.IsInvasiveInSweden = sourceTaxon.DynamicProperties?.IsInvasiveInSweden ?? false;
+            taxon.Attributes.InvasiveRiskAssessmentCategory = sourceTaxon.DynamicProperties?.InvasiveRiskAssessmentCategory;
+            taxon.Attributes.RedlistCategory = (sourceTaxon.DynamicProperties?.RedlistCategory?.Length ?? 0) < 2 ? string.Empty : sourceTaxon.DynamicProperties?.RedlistCategory?.Substring(0, 2);
+            taxon.Attributes.ScientificNames = sourceTaxon.ScientificNames?.ToTaxonScientificNames();
+            taxon.Attributes.SortOrder = sourceTaxon.SortOrder;
+            taxon.Attributes.SwedishHistory = sourceTaxon.DynamicProperties?.SwedishHistory;
+            taxon.Attributes.SwedishOccurrence = sourceTaxon.DynamicProperties?.SwedishOccurrence;
+            taxon.Attributes.Synonyms = sourceTaxon.Synonyms?.ToTaxonSynonymNames();
+            taxon.Attributes.TaxonCategory = VocabularyValue.Create(sourceTaxon.DynamicProperties?.TaxonCategoryId);
+            taxon.Attributes.VernacularNames = sourceTaxon.VernacularNames?.ToTaxonVernacularNames();
+
+            taxon.TaxonId = sourceTaxon.TaxonID;
+            taxon.TaxonRank = sourceTaxon.TaxonRank;
+            taxon.TaxonRemarks = sourceTaxon.TaxonRemarks?.Clean();
+            taxon.TaxonomicStatus = sourceTaxon.TaxonomicStatus;
+            taxon.VernacularName = sourceTaxon.VernacularName;
+            taxon.VerbatimTaxonRank = sourceTaxon.VerbatimTaxonRank;
+
+            var displayName = taxon.ScientificName?.Trim();
+            if (!string.IsNullOrEmpty(taxon.ScientificNameAuthorship))
+            {
+                var authorship = taxon.ScientificNameAuthorship.Trim();
+                displayName += $" {(authorship.StartsWith('(') ? "" : "(")}{taxon.ScientificNameAuthorship.Trim()}{(authorship.EndsWith(')') ? "" : ")")}";
+            }
+            if (!string.IsNullOrEmpty(taxon.VernacularName))
+            {
+                displayName += $", {taxon.VernacularName.Trim()}";
+            }
+            taxon.DisplayName = displayName;
+
+            return taxon;
         }
-        taxon.DisplayName = displayName;
-
-        return taxon;
     }
 
-    private static IEnumerable<TaxonScientificName> ToTaxonScientificNames(
-        this IEnumerable<DarwinCoreTaxonName> darwinCoreScientificNames)
+    extension(IEnumerable<DarwinCoreTaxonName> darwinCoreScientificNames)
     {
-        return darwinCoreScientificNames?.Select(n => new TaxonScientificName
+        private IEnumerable<TaxonScientificName> ToTaxonScientificNames(
+)
         {
-            Author = n.Author,
-            IsPreferredName = n.IsPreferredName,
-            Name = n.Name,
-            ValidForSighting = n.ValidForSighting
-        });
+            return darwinCoreScientificNames?.Select(n => new TaxonScientificName
+            {
+                Author = n.Author,
+                IsPreferredName = n.IsPreferredName,
+                Name = n.Name,
+                ValidForSighting = n.ValidForSighting
+            });
+        }
     }
 
-    /// <summary>
-    ///     Cast DarwinCoreVernacularNames to TaxonVernacularNames.
-    /// </summary>
-    /// <param name="darwinCoreVernacularNames"></param>
-    /// <returns></returns>
-    private static IEnumerable<TaxonVernacularName> ToTaxonVernacularNames(
-        this IEnumerable<DarwinCoreTaxonName> darwinCoreVernacularNames)
+    extension(IEnumerable<DarwinCoreTaxonName> darwinCoreVernacularNames)
     {
-        return darwinCoreVernacularNames?.Select(m => m.ToTaxonVernacularName());
-    }
-
-    /// <summary>
-    ///     Cast DarwinCoreVernacularName object to TaxonVernacularName.
-    /// </summary>
-    /// <param name="darwinCoreVernacularName"></param>
-    /// <returns></returns>
-    private static TaxonVernacularName ToTaxonVernacularName(this DarwinCoreTaxonName darwinCoreVernacularName)
-    {
-        return new TaxonVernacularName
+        /// <summary>
+        ///     Cast DarwinCoreVernacularNames to TaxonVernacularNames.
+        /// </summary>
+        /// <returns></returns>
+        private IEnumerable<TaxonVernacularName> ToTaxonVernacularNames(
+    )
         {
-            CountryCode = darwinCoreVernacularName.CountryCode,
-            IsPreferredName = darwinCoreVernacularName.IsPreferredName,
-            Language = darwinCoreVernacularName.Language,
-            Name = darwinCoreVernacularName.Name,
-            ValidForSighting = darwinCoreVernacularName.ValidForSighting
-        };
+            return darwinCoreVernacularNames?.Select(m => m.ToTaxonVernacularName());
+        }
     }
 
-    /// <summary>
-    ///     Cast DarwinCoreSynonymNames to TaxonSynonymNames.
-    /// </summary>
-    /// <param name="synonyms"></param>
-    /// <returns></returns>
-    private static IEnumerable<TaxonSynonymName> ToTaxonSynonymNames(
-        this IEnumerable<DarwinCoreSynonymName> synonyms)
+    extension(DarwinCoreTaxonName darwinCoreVernacularName)
     {
-        return synonyms?.Select(m => m.ToTaxonSynonymName());
-    }
-
-    /// <summary>
-    ///     Cast DarwinCoreSynonymName object to TaxonSynonymName.
-    /// </summary>
-    /// <param name="synonym"></param>
-    /// <returns></returns>
-    private static TaxonSynonymName ToTaxonSynonymName(this DarwinCoreSynonymName synonym)
-    {
-        return new TaxonSynonymName()
+        /// <summary>
+        ///     Cast DarwinCoreVernacularName object to TaxonVernacularName.
+        /// </summary>
+        /// <returns></returns>
+        private TaxonVernacularName ToTaxonVernacularName()
         {
-            Name = synonym.ScientificName?.Clean(),
-            Author = synonym.ScientificNameAuthorship?.Clean(),
-            NomenclaturalStatus = synonym.NomenclaturalStatus,
-            TaxonomicStatus = synonym.TaxonomicStatus,
-            //NameId = synonyme.NameId, // probably not needed
-            //Remarks = synonyme.TaxonRemarks // probably not needed
-        };
+            return new TaxonVernacularName
+            {
+                CountryCode = darwinCoreVernacularName.CountryCode,
+                IsPreferredName = darwinCoreVernacularName.IsPreferredName,
+                Language = darwinCoreVernacularName.Language,
+                Name = darwinCoreVernacularName.Name,
+                ValidForSighting = darwinCoreVernacularName.ValidForSighting
+            };
+        }
     }
 
-    /// <summary>
-    /// Try to parse int as protection level object
-    /// </summary>
-    /// <param name="protectionLevel"></param>
-    /// <returns></returns>
-    private static VocabularyValue ToProtectionLevel(
-        this int? protectionLevel)
+    extension(IEnumerable<DarwinCoreSynonymName> synonyms)
     {
-        switch (protectionLevel)
+        /// <summary>
+        ///     Cast DarwinCoreSynonymNames to TaxonSynonymNames.
+        /// </summary>
+        /// <returns></returns>
+        private IEnumerable<TaxonSynonymName> ToTaxonSynonymNames(
+    )
         {
-            case 1:
-                return new VocabularyValue { Id = 1, Value = "Fullständig åtkomst och fri användning för alla" };
-            case 3:
-                return new VocabularyValue { Id = 3, Value = "Maximal upplösning 5*5 km för allmänheten" };
-            case 4:
-                return new VocabularyValue { Id = 4, Value = "Maximal upplösning 25*25 km för allmänheten" };
-            case 5:
-                return new VocabularyValue { Id = 5, Value = "Maximal upplösning 5*5 mil för allmänheten" };
-            default:
-                return null;
+            return synonyms?.Select(m => m.ToTaxonSynonymName());
+        }
+    }
+
+    extension(DarwinCoreSynonymName synonym)
+    {
+        /// <summary>
+        ///     Cast DarwinCoreSynonymName object to TaxonSynonymName.
+        /// </summary>
+        /// <returns></returns>
+        private TaxonSynonymName ToTaxonSynonymName()
+        {
+            return new TaxonSynonymName()
+            {
+                Name = synonym.ScientificName?.Clean(),
+                Author = synonym.ScientificNameAuthorship?.Clean(),
+                NomenclaturalStatus = synonym.NomenclaturalStatus,
+                TaxonomicStatus = synonym.TaxonomicStatus,
+                //NameId = synonyme.NameId, // probably not needed
+                //Remarks = synonyme.TaxonRemarks // probably not needed
+            };
+        }
+    }
+
+    extension(int? protectionLevel)
+    {
+        /// <summary>
+        /// Try to parse int as protection level object
+        /// </summary>
+        /// <returns></returns>
+        private VocabularyValue ToProtectionLevel(
+    )
+        {
+            switch (protectionLevel)
+            {
+                case 1:
+                    return new VocabularyValue { Id = 1, Value = "Fullständig åtkomst och fri användning för alla" };
+                case 3:
+                    return new VocabularyValue { Id = 3, Value = "Maximal upplösning 5*5 km för allmänheten" };
+                case 4:
+                    return new VocabularyValue { Id = 4, Value = "Maximal upplösning 25*25 km för allmänheten" };
+                case 5:
+                    return new VocabularyValue { Id = 5, Value = "Maximal upplösning 5*5 mil för allmänheten" };
+                default:
+                    return null;
+            }
         }
     }
 }

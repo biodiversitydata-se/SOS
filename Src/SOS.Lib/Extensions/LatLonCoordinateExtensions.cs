@@ -5,20 +5,27 @@ namespace SOS.Lib.Extensions;
 
 public static class LatLonCoordinateExtensions
 {
-    public static LatLonGeoLocation ToGeoLocation(this LatLonCoordinate coordinate)
+    extension(LatLonCoordinate coordinate)
     {
-        return new LatLonGeoLocation
+        public LatLonGeoLocation ToGeoLocation()
         {
-            Lat = coordinate.Latitude,
-            Lon = coordinate.Longitude
-        };
+            return new LatLonGeoLocation
+            {
+                Lat = coordinate.Latitude,
+                Lon = coordinate.Longitude
+            };
+        }
     }
-    public static GeoBounds ToGeoBounds(this LatLonBoundingBox bbox)
+
+    extension(LatLonBoundingBox bbox)
     {
-        return new TopLeftBottomRightGeoBounds
+        public GeoBounds ToGeoBounds()
         {
-            BottomRight = bbox.BottomRight.ToGeoLocation(),
-            TopLeft = bbox.TopLeft.ToGeoLocation()
-        };
+            return new TopLeftBottomRightGeoBounds
+            {
+                BottomRight = bbox.BottomRight.ToGeoLocation(),
+                TopLeft = bbox.TopLeft.ToGeoLocation()
+            };
+        }
     }
 }

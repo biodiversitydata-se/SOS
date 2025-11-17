@@ -26,17 +26,20 @@ internal static class EventsBuilderFactory
         return eventsBuilder;
     }
 
-    public static IOperable<Event> HaveDatasetIds(this IOperable<Event> operable, IEnumerable<string> datasetIds)
+    extension(IOperable<Event> operable)
     {
-        var builder = ((IDeclaration<Event>)operable).ObjectBuilder;
-        var datasetsIdsList = datasetIds.ToList();
-        builder.With((ev, index) =>
+        public IOperable<Event> HaveDatasetIds(IEnumerable<string> datasetIds)
         {
-            var datasetIdsIndex = index % datasetsIdsList.Count;
-            var datasetId = datasetsIdsList[datasetIdsIndex];
-            ev.DataStewardship.DatasetIdentifier = datasetId;
-        });
+            var builder = ((IDeclaration<Event>)operable).ObjectBuilder;
+            var datasetsIdsList = datasetIds.ToList();
+            builder.With((ev, index) =>
+            {
+                var datasetIdsIndex = index % datasetsIdsList.Count;
+                var datasetId = datasetsIdsList[datasetIdsIndex];
+                ev.DataStewardship.DatasetIdentifier = datasetId;
+            });
 
-        return operable;
+            return operable;
+        }
     }
 }

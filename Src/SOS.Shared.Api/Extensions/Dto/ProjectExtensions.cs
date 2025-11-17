@@ -8,43 +8,47 @@ namespace SOS.Shared.Api.Extensions.Dto;
 /// </summary>
 public static class ProjectExtensions
 {
-  
-    /// <summary>
-    /// Cast object to dto
-    /// </summary>
-    /// <param name="projectInfo"></param>
-    /// <returns></returns>
-    public static ProjectDto ToDto(this ProjectInfo projectInfo)
-    {
-        if (projectInfo == null)
-        {
-            return null!;
-        }
 
-        return new ProjectDto
+    extension(ProjectInfo projectInfo)
+    {
+        /// <summary>
+        /// Cast object to dto
+        /// </summary>
+        /// <returns></returns>
+        public ProjectDto ToDto()
         {
-            Id = projectInfo.Id,
-            Name = projectInfo.Name,
-            StartDate = projectInfo.StartDate,
-            EndDate = projectInfo.EndDate,
-            Category = projectInfo.Category,
-            CategorySwedish = projectInfo.CategorySwedish,
-            Description = projectInfo.Description,
-            IsPublic = projectInfo.IsPublic,
-            Owner = projectInfo.Owner,
-            ProjectURL = projectInfo.ProjectURL,
-            SurveyMethod = projectInfo.SurveyMethod,
-            SurveyMethodUrl = projectInfo.SurveyMethodUrl
-        };
+            if (projectInfo == null)
+            {
+                return null!;
+            }
+
+            return new ProjectDto
+            {
+                Id = projectInfo.Id,
+                Name = projectInfo.Name,
+                StartDate = projectInfo.StartDate,
+                EndDate = projectInfo.EndDate,
+                Category = projectInfo.Category,
+                CategorySwedish = projectInfo.CategorySwedish,
+                Description = projectInfo.Description,
+                IsPublic = projectInfo.IsPublic,
+                Owner = projectInfo.Owner,
+                ProjectURL = projectInfo.ProjectURL,
+                SurveyMethod = projectInfo.SurveyMethod,
+                SurveyMethodUrl = projectInfo.SurveyMethodUrl
+            };
+        }
     }
 
-    /// <summary>
-    /// Cast multiple project objects to dto's
-    /// </summary>
-    /// <param name="projectInfos"></param>
-    /// <returns></returns>
-    public static IEnumerable<ProjectDto> ToProjectDtos(this IEnumerable<ProjectInfo> projectInfos)
+    extension(IEnumerable<ProjectInfo> projectInfos)
     {
-        return projectInfos.Select(vocabulary => vocabulary.ToDto());
+        /// <summary>
+        /// Cast multiple project objects to dto's
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<ProjectDto> ToProjectDtos()
+        {
+            return projectInfos.Select(vocabulary => vocabulary.ToDto());
+        }
     }
 }

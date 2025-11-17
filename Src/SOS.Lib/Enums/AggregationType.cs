@@ -42,43 +42,46 @@ public enum AggregationType
 
 public static class AggregationTypeExtension
 {
-    public static bool IsDateHistogram(this AggregationType aggregationType)
+    extension(AggregationType aggregationType)
     {
-        return new List<AggregationType>
+        public bool IsDateHistogram()
+        {
+            return new List<AggregationType>
         {
             AggregationType.QuantityPerWeek,
             AggregationType.QuantityPerYear,
             AggregationType.SightingsPerWeek,
             AggregationType.SightingsPerYear
         }.Contains(aggregationType);
-    }
+        }
 
-    public static bool IsYearHistogram(this AggregationType aggregationType)
-    {
-        return new List<AggregationType>
+        public bool IsYearHistogram()
+        {
+            return new List<AggregationType>
         {
             AggregationType.QuantityPerYear,
             AggregationType.SightingsPerYear
         }.Contains(aggregationType);
-    }
+        }
 
-    public static bool IsWeekHistogram(this AggregationType aggregationType)
-    {
-        return new List<AggregationType>
+        public bool IsWeekHistogram()
+        {
+            return new List<AggregationType>
         {
             AggregationType.QuantityPerWeek,
             AggregationType.SightingsPerWeek,
             AggregationType.SightingsPerWeek48
         }.Contains(aggregationType);
-    }
+        }
 
-    public static bool IsSpeciesSightingsList(this AggregationType aggregationType)
-    {
-        return new List<AggregationType>
+        public bool IsSpeciesSightingsList()
+        {
+            return new List<AggregationType>
         {
             AggregationType.SpeciesSightingsList,
             AggregationType.SpeciesSightingsListTaxonCount
         }.Contains(aggregationType);
+        }
     }
 }
 

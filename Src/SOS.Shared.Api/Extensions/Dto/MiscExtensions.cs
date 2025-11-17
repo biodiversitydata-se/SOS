@@ -5,17 +5,23 @@ namespace SOS.Shared.Api.Extensions.Dto;
 
 public static class MiscExtensions
 {
-    public static IEnumerable<IdNameDto<T>> ToDtos<T>(this IEnumerable<IdName<T>> idNames)
+    extension<T>(IEnumerable<IdName<T>> idNames)
     {
-        return idNames.Select(item => item.ToDto());
+        public IEnumerable<IdNameDto<T>> ToDtos()
+        {
+            return idNames.Select(item => item.ToDto());
+        }
     }
 
-    public static IdNameDto<T> ToDto<T>(this IdName<T> idName)
+    extension<T>(IdName<T> idName)
     {
-        return new IdNameDto<T>
+        public IdNameDto<T> ToDto()
         {
-            Id = idName.Id,
-            Name = idName.Name
-        };
+            return new IdNameDto<T>
+            {
+                Id = idName.Id,
+                Name = idName.Name
+            };
+        }
     }
 }

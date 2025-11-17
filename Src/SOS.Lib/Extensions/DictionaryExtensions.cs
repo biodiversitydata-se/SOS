@@ -7,18 +7,20 @@ namespace SOS.Lib.Extensions;
 /// </summary>
 public static class DictionaryExtensions
 {
-    /// <summary>
-    /// Get a value from dictionary or default if the key didn't exist.
-    /// </summary>
-    /// <typeparam name="TK"></typeparam>
-    /// <typeparam name="TV"></typeparam>
-    /// <param name="dict"></param>
-    /// <param name="key"></param>
-    /// <param name="defaultValue"></param>
-    /// <returns></returns>
-    public static TV GetValue<TK, TV>(this IDictionary<TK, TV> dict, TK key, TV defaultValue = default(TV))
+    extension<TK, TV>(IDictionary<TK, TV> dict)
     {
-        TV value;
-        return dict.TryGetValue(key, out value) ? value : defaultValue;
+        /// <summary>
+        /// Get a value from dictionary or default if the key didn't exist.
+        /// </summary>
+        /// <typeparam name="TK"></typeparam>
+        /// <typeparam name="TV"></typeparam>
+        /// <param name="key"></param>
+        /// <param name="defaultValue"></param>
+        /// <returns></returns>
+        public TV GetValue(TK key, TV defaultValue = default(TV))
+        {
+            TV value;
+            return dict.TryGetValue(key, out value) ? value : defaultValue;
+        }
     }
 }

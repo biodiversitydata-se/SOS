@@ -5,43 +5,49 @@ namespace SOS.Shared.Api.Extensions.Controller;
 
 public static class ControllerExtensions
 {
-    public static void LogObservationCount(this ControllerBase controller, long observationCount)
+    extension(ControllerBase controller)
     {
-        if (controller?.HttpContext == null)
+        public void LogObservationCount(long observationCount)
         {
-            return;
+            if (controller?.HttpContext == null)
+            {
+                return;
+            }
+
+            controller.HttpContext.Items.TryAdd("Observation-count", observationCount);
         }
 
-        controller.HttpContext.Items.TryAdd("Observation-count", observationCount);
-    }
-
-    public static void LogUserType(this ControllerBase controller, ApiUserType userType)
-    {
-        if (controller?.HttpContext == null)
+        public void LogUserType(ApiUserType userType)
         {
-            return;
+            if (controller?.HttpContext == null)
+            {
+                return;
+            }
+
+            controller.HttpContext.Items.TryAdd("ApiUserType", userType);
         }
 
-        controller.HttpContext.Items.TryAdd("ApiUserType", userType);
-    }
-
-    public static string? GetEndpointName(this ControllerBase controller, ControllerContext controllerContext)
-    {
-        return $"/{controllerContext?.ActionDescriptor?.AttributeRouteInfo?.Template}";
-    }
-
-    public static string? GetEndpointName(this ControllerContext controllerContext)
-    {
-        return $"/{controllerContext?.ActionDescriptor?.AttributeRouteInfo?.Template}";
-    }
-
-    public static ApiUserType GetApiUserType(this ControllerBase controller)
-    {
-        if (controller.HttpContext.Items.TryGetValue("ApiUserType", out var userTypeObj) && userTypeObj is ApiUserType userType)
+        public string? GetEndpointName(ControllerContext controllerContext)
         {
-            return userType;
+            return $"/{controllerContext?.ActionDescriptor?.AttributeRouteInfo?.Template}";
         }
 
-        return ApiUserType.Unknown;
+        public ApiUserType GetApiUserType()
+        {
+            if (controller.HttpContext.Items.TryGetValue("ApiUserType", out var userTypeObj) && userTypeObj is ApiUserType userType)
+            {
+                return userType;
+            }
+
+            return ApiUserType.Unknown;
+        }
+    }
+
+    extension(ControllerContext controllerContext)
+    {
+        public string? GetEndpointName()
+        {
+            return $"/{controllerContext?.ActionDescriptor?.AttributeRouteInfo?.Template}";
+        }
     }
 }

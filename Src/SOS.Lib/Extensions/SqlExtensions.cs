@@ -7,23 +7,25 @@ namespace SOS.Lib.Extensions;
 
 public static class SqlExtensions
 {
-    /// <summary>
-    /// Cast list of integers to list of SqlDataRecords
-    /// </summary>
-    /// <param name="list"></param>
-    /// <returns></returns>
-    public static IEnumerable<SqlDataRecord> ToSqlRecords(this IEnumerable<int> list)
+    extension(IEnumerable<int> list)
     {
-        if (!list?.Any() ?? true)
+        /// <summary>
+        /// Cast list of integers to list of SqlDataRecords
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<SqlDataRecord> ToSqlRecords()
         {
-            yield break;
-        }
-        var record = new SqlDataRecord(new SqlMetaData("Value", SqlDbType.Int));
+            if (!list?.Any() ?? true)
+            {
+                yield break;
+            }
+            var record = new SqlDataRecord(new SqlMetaData("Value", SqlDbType.Int));
 
-        foreach (var item in list)
-        {
-            record.SetInt32(0, item);
-            yield return record;
+            foreach (var item in list)
+            {
+                record.SetInt32(0, item);
+                yield return record;
+            }
         }
     }
 }

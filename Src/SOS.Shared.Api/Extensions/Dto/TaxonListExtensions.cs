@@ -5,14 +5,17 @@ namespace SOS.Shared.Api.Extensions.Dto;
 
 public static class TaxonListExtensions
 {
-    public static TaxonListTaxonInformationDto ToTaxonListTaxonInformationDto(
-        this TaxonListTaxonInformation taxonInformation)
+    extension(TaxonListTaxonInformation taxonInformation)
     {
-        return new TaxonListTaxonInformationDto
+        public TaxonListTaxonInformationDto ToTaxonListTaxonInformationDto(
+)
         {
-            Id = taxonInformation.Id,
-            ScientificName = taxonInformation.ScientificName,
-            SwedishName = taxonInformation.SwedishName
-        };
+            return new TaxonListTaxonInformationDto
+            {
+                Id = taxonInformation.Id,
+                ScientificName = taxonInformation.ScientificName,
+                SwedishName = taxonInformation.SwedishName
+            };
+        }
     }
 }

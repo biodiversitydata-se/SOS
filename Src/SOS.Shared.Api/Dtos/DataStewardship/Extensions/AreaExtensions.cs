@@ -4,51 +4,63 @@ namespace SOS.Shared.Api.Dtos.DataStewardship.Extensions;
 
 public static class AreaExtensions
 {
-    public static DsCounty? GetCounty(this string countyId)
+    extension(string countyId)
     {
-        if (string.IsNullOrEmpty(countyId)) return null;
-
-        if (!int.TryParse(countyId, out var id))
+        public DsCounty? GetCounty()
         {
-            return null;
-        }
+            if (string.IsNullOrEmpty(countyId)) return null;
 
-        return (DsCounty)id;
+            if (!int.TryParse(countyId, out var id))
+            {
+                return null;
+            }
+
+            return (DsCounty)id;
+        }
     }
 
-    public static Municipality? GetMunicipality(this string municipalityId)
+    extension(string municipalityId)
     {
-        if (string.IsNullOrEmpty(municipalityId)) return null;
-
-        if (!int.TryParse(municipalityId, out var id))
+        public Municipality? GetMunicipality()
         {
-            return null;
-        }
+            if (string.IsNullOrEmpty(municipalityId)) return null;
 
-        return (Municipality)id;
+            if (!int.TryParse(municipalityId, out var id))
+            {
+                return null;
+            }
+
+            return (Municipality)id;
+        }
     }
 
-    public static DsParish? GetParish(this string parishId)
+    extension(string parishId)
     {
-        if (string.IsNullOrEmpty(parishId)) return null;
-
-        if (!int.TryParse(parishId, out var id))
+        public DsParish? GetParish()
         {
-            return null;
-        }
+            if (string.IsNullOrEmpty(parishId)) return null;
 
-        return (DsParish)id;
+            if (!int.TryParse(parishId, out var id))
+            {
+                return null;
+            }
+
+            return (DsParish)id;
+        }
     }
 
-    public static DsProvince? GetProvince(this string provinceId)
+    extension(string provinceId)
     {
-        if (string.IsNullOrEmpty(provinceId)) return null;
-
-        if (!int.TryParse(provinceId, out var id))
+        public DsProvince? GetProvince()
         {
-            return null;
-        }
+            if (string.IsNullOrEmpty(provinceId)) return null;
 
-        return (DsProvince)id;
+            if (!int.TryParse(provinceId, out var id))
+            {
+                return null;
+            }
+
+            return (DsProvince)id;
+        }
     }
 }

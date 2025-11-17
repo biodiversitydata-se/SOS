@@ -7,37 +7,45 @@ namespace SOS.Analysis.Api.Extensions;
 
 public static class HealthCheckExtensions
 {
-    /// <summary>
-    /// Create health check result
-    /// </summary>
-    /// <param name="healthStatus"></param>
-    /// <param name="description"></param>
-    /// <returns></returns>
-    public static HealthCheckResult ToHealthCheckResult(this HealthStatus healthStatus, string description = null)
+    extension(HealthStatus healthStatus)
     {
-        return new HealthCheckResult(healthStatus, description);
+        /// <summary>
+        /// Create health check result
+        /// </summary>
+        /// <param name="description"></param>
+        /// <returns></returns>
+        public HealthCheckResult ToHealthCheckResult(string description = null)
+        {
+            return new HealthCheckResult(healthStatus, description);
+        }
     }
 
-    public static IServiceCollection SetupHealthchecks(this IServiceCollection services)
+    extension(IServiceCollection services)
     {
-        services.AddHealthChecks()
-            .AddCheck<HealthCheck>("CustomHealthCheck", tags: ["k8s"])
-            .AddCheck<AggregateHealthCheck>("AggregateHealthCheck", tags: ["Analysis.API"]);
+        public IServiceCollection SetupHealthchecks()
+        {
+            services.AddHealthChecks()
+                .AddCheck<HealthCheck>("CustomHealthCheck", tags: ["k8s"])
+                .AddCheck<AggregateHealthCheck>("AggregateHealthCheck", tags: ["Analysis.API"]);
 
-        return services;
+            return services;
+        }
     }
 
-    public static WebApplication ApplyMapHealthChecks(this WebApplication app)
+    extension(WebApplication app)
     {
-        app.MapHealthChecks("/healthz", new HealthCheckOptions()
+        public WebApplication ApplyMapHealthChecks()
         {
-            Predicate = r => r.Tags.Contains("k8s")
-        });
-        app.MapHealthChecks("/health", new HealthCheckOptions()
-        {
-            ResponseWriter = (context, _) => UIResponseWriter.WriteHealthCheckUIResponse(context, _)
-        });
+            app.MapHealthChecks("/healthz", new HealthCheckOptions()
+            {
+                Predicate = r => r.Tags.Contains("k8s")
+            });
+            app.MapHealthChecks("/health", new HealthCheckOptions()
+            {
+                ResponseWriter = (context, _) => UIResponseWriter.WriteHealthCheckUIResponse(context, _)
+            });
 
-        return app;
+            return app;
+        }
     }
 }

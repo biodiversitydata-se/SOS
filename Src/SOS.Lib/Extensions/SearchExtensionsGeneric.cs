@@ -24,9 +24,11 @@ public static class SearchExtensionsGeneric
     private static ConcurrentDictionary<string, IReadOnlyDictionary<IndexName, TypeFieldMappings>> indicesByKey = new ConcurrentDictionary<string, IReadOnlyDictionary<IndexName, TypeFieldMappings>>();
 
 
-    public static ICollection<KeyValuePair<Field, SortOrder>> GetTermsOrder(this AggregationSortOrder sortOrder)
+    extension(AggregationSortOrder sortOrder)
     {
-        return new List<KeyValuePair<Field, SortOrder>> { 
+        public ICollection<KeyValuePair<Field, SortOrder>> GetTermsOrder()
+        {
+            return new List<KeyValuePair<Field, SortOrder>> {
             sortOrder switch
             {
                 AggregationSortOrder.CountAscending => new KeyValuePair<Field, SortOrder>(Field.CountField, SortOrder.Asc),
@@ -37,8 +39,9 @@ public static class SearchExtensionsGeneric
                 _ => new KeyValuePair<Field, SortOrder>(Field.CountField, SortOrder.Desc)
             }
         };
+        }
     }
-    
+
     private static string GetDefaultSortPropertyName(Type type)
     {
         return type switch
@@ -50,244 +53,244 @@ public static class SearchExtensionsGeneric
         };
     }
 
-    /// <summary>
-    /// Get sort descriptor
-    /// </summary>
-    /// <typeparam name="TQueryDescriptor"></typeparam>
-    /// <param name="client"></param>
-    /// <param name="indexName"></param>
-    /// <param name="sortings"></param>
-    /// <returns></returns>
-    public static async Task<ICollection<Action<SortOptionsDescriptor<TQueryDescriptor>>>> GetSortDescriptorAsync<TQueryDescriptor, TEntity>(this ElasticsearchClient client, string indexName, IEnumerable<SortOrderFilter> sortings) where TQueryDescriptor : class where TEntity : class
+    extension(ElasticsearchClient client)
     {
-        if (!sortings?.Any() ?? true)
+        /// <summary>
+        /// Get sort descriptor
+        /// </summary>
+        /// <typeparam name="TQueryDescriptor"></typeparam>
+        /// <param name="indexName"></param>
+        /// <param name="sortings"></param>
+        /// <returns></returns>
+        public async Task<ICollection<Action<SortOptionsDescriptor<TQueryDescriptor>>>> GetSortDescriptorAsync<TQueryDescriptor, TEntity>(string indexName, IEnumerable<SortOrderFilter> sortings) where TQueryDescriptor : class where TEntity : class
         {
-            return null;
-        }
-
-        // make sure that the ordering will be unique.
-        var adjustedSortings = sortings.ToList();
-        string defaultSortProperty = GetDefaultSortPropertyName(typeof(TEntity));
-        if (!string.IsNullOrEmpty(defaultSortProperty) && !sortings.Select(m => m.SortBy?.ToLower().Trim()).Contains(defaultSortProperty))
-        {
-            adjustedSortings.Add(new SortOrderFilter
+            if (!sortings?.Any() ?? true)
             {
-                SortBy = defaultSortProperty,
-                SortOrder = SearchSortOrder.Asc
-            });
-        }
-
-        var sortDescriptor = new List<Action<SortOptionsDescriptor<TQueryDescriptor>>>();
-        foreach (var sorting in adjustedSortings)
-        {
-            var sortBy = sorting.SortBy;
-            var sortOrder = sorting.SortOrder;
-
-            // Split sort string 
-            var propertyNames = sortBy.Split('.');
-            // Create a object of current class
-            var parent = Activator.CreateInstance(typeof(TEntity));
-            var targetProperty = (PropertyInfo)null;
-
-            // Loop throw all levels in passed sort string
-            for (var i = 0; i < propertyNames.Length; i++)
-            {
-                // Get property info for current property
-                targetProperty = parent?.GetProperty(propertyNames[i]);
-
-                // Update property name to make sure it's in the correct case
-                if (targetProperty != null)
-                {
-                    propertyNames[i] = targetProperty.Name.ToCamelCase();
-                }
-
-                // As long it's not the last property, it must be a sub object. Create a instance of it since it's the new parent
-                if (i != propertyNames.Length - 1)
-                {
-                    parent = Activator.CreateInstance(targetProperty.GetPropertyType());
-                }
+                return null;
             }
 
-            // Target property found, get it's type
-            var propertyType = targetProperty?.GetPropertyType();
-
-            // If it's a string, add keyword in order to make the sorting work
-            if (propertyType == typeof(string))
+            // make sure that the ordering will be unique.
+            var adjustedSortings = sortings.ToList();
+            string defaultSortProperty = GetDefaultSortPropertyName(typeof(TEntity));
+            if (!string.IsNullOrEmpty(defaultSortProperty) && !sortings.Select(m => m.SortBy?.ToLower().Trim()).Contains(defaultSortProperty))
             {
-                // GetFieldMappingAsync is case sensitive on field names, use updated property names to avoid errors
-                sortBy = string.Join('.', propertyNames);
-                string key = $"{indexName}-{sortBy}";
-                IReadOnlyDictionary<IndexName, TypeFieldMappings> fieldMappings = null;
-                if (!indicesByKey.TryGetValue(key, out fieldMappings))
+                adjustedSortings.Add(new SortOrderFilter
                 {
-                    var response = await client.Indices.GetFieldMappingAsync(new GetFieldMappingRequest(indexName, sortBy));
-                    if (response.IsValidResponse)
+                    SortBy = defaultSortProperty,
+                    SortOrder = SearchSortOrder.Asc
+                });
+            }
+
+            var sortDescriptor = new List<Action<SortOptionsDescriptor<TQueryDescriptor>>>();
+            foreach (var sorting in adjustedSortings)
+            {
+                var sortBy = sorting.SortBy;
+                var sortOrder = sorting.SortOrder;
+
+                // Split sort string 
+                var propertyNames = sortBy.Split('.');
+                // Create a object of current class
+                var parent = Activator.CreateInstance(typeof(TEntity));
+                var targetProperty = (PropertyInfo)null;
+
+                // Loop throw all levels in passed sort string
+                for (var i = 0; i < propertyNames.Length; i++)
+                {
+                    // Get property info for current property
+                    targetProperty = parent?.GetProperty(propertyNames[i]);
+
+                    // Update property name to make sure it's in the correct case
+                    if (targetProperty != null)
                     {
-                        fieldMappings = response.FieldMappings;
-                        indicesByKey.TryAdd(key, fieldMappings);
+                        propertyNames[i] = targetProperty.Name.ToCamelCase();
+                    }
+
+                    // As long it's not the last property, it must be a sub object. Create a instance of it since it's the new parent
+                    if (i != propertyNames.Length - 1)
+                    {
+                        parent = Activator.CreateInstance(targetProperty.GetPropertyType());
                     }
                 }
-                /*
-                if (fieldMappings?.Values != null)
-                {       
-                    var x = fieldMappings?.Values.Where(tfm => tfm
-                        .Mappings.Keys.Where(k => k.Name.Equals(sortBy) && k.Property.)
+
+                // Target property found, get it's type
+                var propertyType = targetProperty?.GetPropertyType();
+
+                // If it's a string, add keyword in order to make the sorting work
+                if (propertyType == typeof(string))
+                {
+                    // GetFieldMappingAsync is case sensitive on field names, use updated property names to avoid errors
+                    sortBy = string.Join('.', propertyNames);
+                    string key = $"{indexName}-{sortBy}";
+                    IReadOnlyDictionary<IndexName, TypeFieldMappings> fieldMappings = null;
+                    if (!indicesByKey.TryGetValue(key, out fieldMappings))
+                    {
+                        var response = await client.Indices.GetFieldMappingAsync(new GetFieldMappingRequest(indexName, sortBy));
+                        if (response.IsValidResponse)
+                        {
+                            fieldMappings = response.FieldMappings;
+                            indicesByKey.TryAdd(key, fieldMappings);
+                        }
+                    }
+                    /*
+                    if (fieldMappings?.Values != null)
+                    {       
+                        var x = fieldMappings?.Values.Where(tfm => tfm
+                            .Mappings.Keys.Where(k => k.Name.Equals(sortBy) && k.Property.)
+                        )
+
+                        var hasKeyword = indices
+                            .FirstOrDefault().Value.Mappings
+                            .FirstOrDefault().Value?.Mapping?.Values?
+                            .Select(s => s as TextProperty)?
+                            .Where(p => p?.Fields?.ContainsKey("keyword") ?? false)?
+                            .Any() ?? false;
+                        if (hasKeyword)
+                        {
+                            sortBy = $"{sortBy}.keyword";
+                        }
+                    }*/
+                }
+                sortDescriptor.Add(s => s
+                    .Field(sortBy.ToField(), c => c
+                        .Order(sortOrder == SearchSortOrder.Desc ? SortOrder.Desc : SortOrder.Asc)
+                        .Missing(sortOrder == SearchSortOrder.Desc ? "_last" : "_first")
                     )
+                );
+            }
 
-                    var hasKeyword = indices
-                        .FirstOrDefault().Value.Mappings
-                        .FirstOrDefault().Value?.Mapping?.Values?
-                        .Select(s => s as TextProperty)?
-                        .Where(p => p?.Fields?.ContainsKey("keyword") ?? false)?
-                        .Any() ?? false;
-                    if (hasKeyword)
+            return sortDescriptor;
+        }
+    }
+
+    extension<TQueryDescriptor>(ICollection<Action<QueryDescriptor<TQueryDescriptor>>> queries) where TQueryDescriptor : class
+    {
+        /// <summary>
+        /// Try add date filter criteria
+        /// </summary>
+        /// <typeparam name="TQueryDescriptor"></typeparam>
+        /// <param name="eventField"></param>
+        /// <param name="filter"></param>
+        /// <returns></returns>
+        public void TryAddEventDateCritera(
+    string eventField, DateFilter filter)
+        {
+            if (filter != null)
+            {
+                queries.TryAddDateRangeFilters(filter, $"{eventField}.startDate", $"{eventField}.endDate");
+                queries.TryAddTimeRangeFilters(filter, $"{eventField}.startDate");
+
+            }
+        }
+
+
+        /// <summary>
+        /// Add date range query to filter
+        /// </summary>
+        /// <typeparam name="TQueryDescriptor"></typeparam>
+        /// <param name="filter"></param>
+        /// <param name="startDateField"></param>
+        /// <param name="endDateField"></param>
+        public void TryAddDateRangeFilters(DateFilter filter, string startDateField, string endDateField)
+        {
+            if (filter != null)
+            {
+                if (filter.DateFilterType == DateFilter.DateRangeFilterType.BetweenStartDateAndEndDate)
+                {
+                    queries.TryAddDateRangeCriteria(startDateField, filter.StartDate, RangeTypes.GreaterThanOrEquals);
+                    queries.TryAddDateRangeCriteria(endDateField, filter.EndDate, RangeTypes.LessThanOrEquals);
+                }
+                else if (filter.DateFilterType == DateFilter.DateRangeFilterType.OverlappingStartDateAndEndDate)
+                {
+                    queries.TryAddDateRangeCriteria(startDateField, filter.EndDate, RangeTypes.LessThanOrEquals);
+                    queries.TryAddDateRangeCriteria(endDateField, filter.StartDate, RangeTypes.GreaterThanOrEquals);
+
+                }
+                else if (filter.DateFilterType == DateFilter.DateRangeFilterType.OnlyStartDate)
+                {
+                    if (filter.StartDate.HasValue || filter.EndDate.HasValue)
                     {
-                        sortBy = $"{sortBy}.keyword";
+                        queries.Add(q => q.Range(new DateRangeQuery(startDateField)
+                        {
+                            Gte = filter.StartDate?.ToUniversalTime(),
+                            Lte = filter.EndDate?.ToUniversalTime()
+                        }));
                     }
-                }*/
-            }
-            sortDescriptor.Add(s => s
-                .Field(sortBy.ToField(), c => c
-                    .Order(sortOrder == SearchSortOrder.Desc ? SortOrder.Desc : SortOrder.Asc)
-                    .Missing(sortOrder == SearchSortOrder.Desc ? "_last" : "_first")
-                )
-            );
-        }
-
-        return sortDescriptor;
-    }
-
-
-    /// <summary>
-    /// Try add date filter criteria
-    /// </summary>
-    /// <typeparam name="TQueryDescriptor"></typeparam>
-    /// <param name="queries"></param>
-    /// <param name="eventField"></param>
-    /// <param name="filter"></param>
-    /// <returns></returns>
-    public static void TryAddEventDateCritera<TQueryDescriptor>(
-       this ICollection<Action<QueryDescriptor<TQueryDescriptor>>> queries, string eventField, DateFilter filter) where TQueryDescriptor : class
-    {
-        if (filter != null)
-        {
-            queries.TryAddDateRangeFilters(filter, $"{eventField}.startDate", $"{eventField}.endDate");
-            queries.TryAddTimeRangeFilters(filter, $"{eventField}.startDate");
-            
-        }
-    }
-
-
-    /// <summary>
-    /// Add date range query to filter
-    /// </summary>
-    /// <typeparam name="TQueryDescriptor"></typeparam>
-    /// <param name="queries"></param>
-    /// <param name="filter"></param>
-    /// <param name="startDateField"></param>
-    /// <param name="endDateField"></param>
-    public static void TryAddDateRangeFilters<TQueryDescriptor>(this ICollection<Action<QueryDescriptor<TQueryDescriptor>>> queries, DateFilter filter, string startDateField, string endDateField) where TQueryDescriptor : class
-    {
-        if (filter != null)
-        {
-            if (filter.DateFilterType == DateFilter.DateRangeFilterType.BetweenStartDateAndEndDate)
-            {
-                queries.TryAddDateRangeCriteria(startDateField, filter.StartDate, RangeTypes.GreaterThanOrEquals);
-                queries.TryAddDateRangeCriteria(endDateField, filter.EndDate, RangeTypes.LessThanOrEquals);
-            }
-            else if (filter.DateFilterType == DateFilter.DateRangeFilterType.OverlappingStartDateAndEndDate)
-            {
-                queries.TryAddDateRangeCriteria(startDateField, filter.EndDate, RangeTypes.LessThanOrEquals);
-                queries.TryAddDateRangeCriteria(endDateField, filter.StartDate, RangeTypes.GreaterThanOrEquals);
-
-            }
-            else if (filter.DateFilterType == DateFilter.DateRangeFilterType.OnlyStartDate)
-            {
-                if (filter.StartDate.HasValue || filter.EndDate.HasValue)
-                {
-                    queries.Add(q => q.Range(new DateRangeQuery(startDateField)
-                    {
-                        Gte = filter.StartDate?.ToUniversalTime(),
-                        Lte = filter.EndDate?.ToUniversalTime()                            
-                    }));
                 }
-            }
-            else if (filter.DateFilterType == DateFilter.DateRangeFilterType.OnlyEndDate)
-            {
-                if (filter.StartDate.HasValue || filter.EndDate.HasValue)
+                else if (filter.DateFilterType == DateFilter.DateRangeFilterType.OnlyEndDate)
                 {
-                    queries.Add(q => q.Range(new DateRangeQuery(endDateField)
+                    if (filter.StartDate.HasValue || filter.EndDate.HasValue)
                     {
-                        Gte = filter.StartDate?.ToUniversalTime(),
-                        Lte = filter.EndDate?.ToUniversalTime()                            
-                    }));
+                        queries.Add(q => q.Range(new DateRangeQuery(endDateField)
+                        {
+                            Gte = filter.StartDate?.ToUniversalTime(),
+                            Lte = filter.EndDate?.ToUniversalTime()
+                        }));
+                    }
                 }
             }
         }
-    }              
 
-    public static void TryAddGeneralizationsCriteria<TQueryDescriptor>(
-        this ICollection<Action<QueryDescriptor<TQueryDescriptor>>> queries, bool? includeSensitiveGeneralizedObservations, bool? isGeneralized) where TQueryDescriptor : class
-    {
-        if (includeSensitiveGeneralizedObservations.HasValue)
+        public void TryAddGeneralizationsCriteria(
+    bool? includeSensitiveGeneralizedObservations, bool? isGeneralized)
         {
-            queries.Add(q => q 
-                .Bool(p => p
-                    .Should(s => s
-                        .Term(t => t
-                            .Field("hasGeneralizedObservationInOtherIndex")
-                            .Value(FieldValue.Boolean(includeSensitiveGeneralizedObservations.Value))),
-                        s => s
-                        .Bool(t => t
-                            .MustNot(s => s
-                                .Exists(e => 
-                                e.Field("hasGeneralizedObservationInOtherIndex")                                
+            if (includeSensitiveGeneralizedObservations.HasValue)
+            {
+                queries.Add(q => q
+                    .Bool(p => p
+                        .Should(s => s
+                            .Term(t => t
+                                .Field("hasGeneralizedObservationInOtherIndex")
+                                .Value(FieldValue.Boolean(includeSensitiveGeneralizedObservations.Value))),
+                            s => s
+                            .Bool(t => t
+                                .MustNot(s => s
+                                    .Exists(e =>
+                                    e.Field("hasGeneralizedObservationInOtherIndex")
+                                    )
+                                    )
                                 )
+                            )
+                        )
+                    );
+            }
+
+            if (isGeneralized.HasValue)
+            {
+                queries.Add(q => q
+                    .Bool(p => p
+                        .Should(s => s
+                            .Term(t => t
+                                .Field("isGeneralized")
+                                .Value(FieldValue.Boolean(isGeneralized.Value))),
+                            s => s
+                            .Bool(t => t
+                                .MustNot(s => s
+                                    .Exists(e =>
+                                        e.Field("isGeneralized")
+                                    )
                                 )
                             )
                         )
                     )
                 );
+            }
+
         }
 
-        if (isGeneralized.HasValue)
+        /// <summary>
+        /// Add time range filters
+        /// </summary>
+        /// <typeparam name="TQueryDescriptor"></typeparam>
+        /// <param name="filter"></param>
+        /// <param name="field"></param>
+        public void TryAddTimeRangeFilters(DateFilter filter, string field)
         {
-            queries.Add(q => q
-                .Bool(p => p
-                    .Should(s => s
-                        .Term(t => t
-                            .Field("isGeneralized")
-                            .Value(FieldValue.Boolean(isGeneralized.Value))),
-                        s => s
-                        .Bool(t => t
-                            .MustNot(s => s
-                                .Exists(e =>
-                                    e.Field("isGeneralized")
-                                )
-                            )
-                        )
-                    )
-                )
-            );
-        }
-
-    }
-
-    /// <summary>
-    /// Add time range filters
-    /// </summary>
-    /// <typeparam name="TQueryDescriptor"></typeparam>
-    /// <param name="queries"></param>
-    /// <param name="filter"></param>
-    /// <param name="field"></param>
-    public static void TryAddTimeRangeFilters<TQueryDescriptor>(this ICollection<Action<QueryDescriptor<TQueryDescriptor>>> queries, DateFilter filter, string field) where TQueryDescriptor : class
-    {
-        if (filter?.TimeRanges?.Any() ?? false)
-        {
-            var timeRangeContainers = new List<Action<QueryDescriptor<TQueryDescriptor>>>();
-            foreach (var timeRange in filter.TimeRanges)
+            if (filter?.TimeRanges?.Any() ?? false)
             {
-                timeRangeContainers.TryAddScript(timeRange switch
+                var timeRangeContainers = new List<Action<QueryDescriptor<TQueryDescriptor>>>();
+                foreach (var timeRange in filter.TimeRanges)
+                {
+                    timeRangeContainers.TryAddScript(timeRange switch
                     {
                         DateFilter.TimeRange.Morning => $@"[4, 5, 6, 7, 8].contains(doc['{field}'].value.getHour())",
                         DateFilter.TimeRange.Forenoon => $@"[9, 10, 11, 12].contains(doc['{field}'].value.getHour())",
@@ -295,13 +298,14 @@ public static class SearchExtensionsGeneric
                         DateFilter.TimeRange.Evening => $@"[18, 19, 20, 21, 22].contains(doc['{field}'].value.getHour())",
                         _ => $@"[23, 0, 1, 2, 3].contains(doc['{field}'].value.getHour())"
                     });
-            }
+                }
 
-            queries.Add(q => q
-                .Bool(b => b
-                    .Should(timeRangeContainers.ToArray())
-                )
-            );  
-        }  
+                queries.Add(q => q
+                    .Bool(b => b
+                        .Should(timeRangeContainers.ToArray())
+                    )
+                );
+            }
+        }
     }
 }

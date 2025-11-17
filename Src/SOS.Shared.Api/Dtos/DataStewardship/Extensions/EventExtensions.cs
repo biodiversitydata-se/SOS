@@ -9,37 +9,40 @@ namespace SOS.Shared.Api.Dtos.DataStewardship.Extensions;
 
 public static class EventExtensions
 {
-    /// <summary>
-    /// Cast event model to csv
-    /// </summary>
-    /// <param name="event"></param>
-    /// <returns></returns>
-    public static byte[] ToCsv(this DsEventDto @event)
+    extension(DsEventDto @event)
     {
-        if (@event == null)
+        /// <summary>
+        /// Cast event model to csv
+        /// </summary>
+        /// <returns></returns>
+        public byte[] ToCsv()
         {
-            return null!;
-        }
+            if (@event == null)
+            {
+                return null!;
+            }
 
-        return new[] { @event }.ToCsv();
+            return new[] { @event }.ToCsv();
+        }
     }
 
-    /// <summary>
-    /// Caste event models to csv
-    /// </summary>
-    /// <param name="events"></param>
-    /// <returns></returns>
-    public static byte[] ToCsv(this IEnumerable<DsEventDto> events)
+    extension(IEnumerable<DsEventDto> events)
     {
-        if (!events?.Any() ?? true)
+        /// <summary>
+        /// Caste event models to csv
+        /// </summary>
+        /// <returns></returns>
+        public byte[] ToCsv()
         {
-            return null!;
-        }
+            if (!events?.Any() ?? true)
+            {
+                return null!;
+            }
 
-        using var stream = new MemoryStream();
-        using var csvFileHelper = new CsvFileHelper();
-        csvFileHelper.InitializeWrite(stream, "\t");
-        csvFileHelper.WriteRow(new[] {
+            using var stream = new MemoryStream();
+            using var csvFileHelper = new CsvFileHelper();
+            csvFileHelper.InitializeWrite(stream, "\t");
+            csvFileHelper.WriteRow(new[] {
             "event id",
             "type",
             "parent id",
@@ -56,9 +59,9 @@ public static class EventExtensions
             "occurrence id's"
         });
 
-        foreach (var evt in events)
-        {
-            csvFileHelper.WriteRow(new[] {
+            foreach (var evt in events)
+            {
+                csvFileHelper.WriteRow(new[] {
                 evt.EventID,
                 evt.EventType,
                 evt.ParentEventID,
@@ -74,44 +77,47 @@ public static class EventExtensions
                 evt.Dataset?.Identifier,
                 evt.OccurrenceIds?.Concat(10)
             });
+            }
+
+            csvFileHelper.Flush();
+            stream.Position = 0;
+            var csv = stream.ToArray();
+            csvFileHelper.FinishWrite();
+
+            return csv;
         }
-
-        csvFileHelper.Flush();
-        stream.Position = 0;
-        var csv = stream.ToArray();
-        csvFileHelper.FinishWrite();
-
-        return csv;
     }
 
-    public static DsEventDto ToEventDto(this Lib.Models.Processed.Observation.Observation observation, IEnumerable<string> occurrenceIds, CoordinateSys responseCoordinateSystem)
+    extension(Lib.Models.Processed.Observation.Observation observation)
     {
-        if (observation == null) return null;
-        var ev = new DsEventDto();
-        ev.EventID = observation.Event.EventId;
-        ev.ParentEventID = observation.Event.ParentEventId;
-        ev.EventRemarks = observation.Event.EventRemarks;
-        ev.AssociatedMedia = observation.Event.Media.ToDtos();
-        ev.Dataset = new DsDatasetInfoDto
+        public DsEventDto ToEventDto(IEnumerable<string> occurrenceIds, CoordinateSys responseCoordinateSystem)
         {
-            Identifier = observation.DataStewardship?.DatasetIdentifier
-            //Title = // need to lookup this from ObservationDataset index or store this information in Observation/Event
-        };
+            if (observation == null) return null;
+            var ev = new DsEventDto();
+            ev.EventID = observation.Event.EventId;
+            ev.ParentEventID = observation.Event.ParentEventId;
+            ev.EventRemarks = observation.Event.EventRemarks;
+            ev.AssociatedMedia = observation.Event.Media.ToDtos();
+            ev.Dataset = new DsDatasetInfoDto
+            {
+                Identifier = observation.DataStewardship?.DatasetIdentifier
+                //Title = // need to lookup this from ObservationDataset index or store this information in Observation/Event
+            };
 
-        ev.EventStartDate = observation.Event.StartDate;
-        ev.EventEndDate = observation.Event.EndDate;
-        ev.SamplingProtocol = observation.Event.SamplingProtocol;
-        ev.SurveyLocation = observation.Location.ToDto(responseCoordinateSystem);
-        //ev.LocationProtected = ?
-        //ev.EventType = ?
-        //ev.Weather = ?
-        ev.RecorderCode = new List<string>
+            ev.EventStartDate = observation.Event.StartDate;
+            ev.EventEndDate = observation.Event.EndDate;
+            ev.SamplingProtocol = observation.Event.SamplingProtocol;
+            ev.SurveyLocation = observation.Location.ToDto(responseCoordinateSystem);
+            //ev.LocationProtected = ?
+            //ev.EventType = ?
+            //ev.Weather = ?
+            ev.RecorderCode = new List<string>
         {
             observation.Occurrence.RecordedBy
         };
-        if (observation?.InstitutionCode?.Value != null || !string.IsNullOrEmpty(observation.InstitutionId))
-        {
-            ev.RecorderOrganisation = new List<DsOrganisationDto>
+            if (observation?.InstitutionCode?.Value != null || !string.IsNullOrEmpty(observation.InstitutionId))
+            {
+                ev.RecorderOrganisation = new List<DsOrganisationDto>
             {
                 new DsOrganisationDto
                 {
@@ -119,40 +125,44 @@ public static class EventExtensions
                     OrganisationCode = observation?.InstitutionCode?.Value
                 }
             };
+            }
+
+            ev.OccurrenceIds = occurrenceIds?.ToList();
+            ev.NoObservations = ev.OccurrenceIds == null || !ev.OccurrenceIds.Any();
+
+            return ev;
         }
-
-        ev.OccurrenceIds = occurrenceIds?.ToList();
-        ev.NoObservations = ev.OccurrenceIds == null || !ev.OccurrenceIds.Any();
-
-        return ev;
     }
 
-    public static DsEventDto ToEventDto(this Event observationEvent, CoordinateSys responseCoordinateSystem)
+    extension(Event observationEvent)
     {
-        if (observationEvent == null) return null;
+        public DsEventDto ToEventDto(CoordinateSys responseCoordinateSystem)
+        {
+            if (observationEvent == null) return null;
 
-        var ev = new DsEventDto();
-        ev.EventID = observationEvent.EventId;
-        ev.ParentEventID = observationEvent.ParentEventId;
-        ev.EventRemarks = observationEvent.EventRemarks;
-        ev.AssociatedMedia = observationEvent.Media.ToDtos();
-        ev.Dataset = observationEvent?.DataStewardship.ToDto();
-        ev.EventStartDate = observationEvent.StartDate;
-        ev.EventEndDate = observationEvent.EndDate;
-        ev.PlainStartDate = observationEvent.PlainStartDate;
-        ev.PlainEndDate = observationEvent.PlainEndDate;
-        ev.PlainStartTime = observationEvent.PlainStartTime;
-        ev.PlainEndTime = observationEvent.PlainEndTime;
-        ev.SamplingProtocol = observationEvent.SamplingProtocol;
-        ev.SurveyLocation = observationEvent?.Location?.ToDto(responseCoordinateSystem);
-        ev.EventType = observationEvent?.EventType;
-        ev.LocationProtected = observationEvent?.LocationProtected;
-        ev.Weather = observationEvent?.Weather?.ToDto();
-        ev.RecorderCode = observationEvent.RecorderCode;
-        ev.RecorderOrganisation = observationEvent?.RecorderOrganisation?.Select(m => m.ToDto()).ToList();
-        ev.OccurrenceIds = observationEvent?.OccurrenceIds;
-        ev.NoObservations = ev.OccurrenceIds == null || !ev.OccurrenceIds.Any();
+            var ev = new DsEventDto();
+            ev.EventID = observationEvent.EventId;
+            ev.ParentEventID = observationEvent.ParentEventId;
+            ev.EventRemarks = observationEvent.EventRemarks;
+            ev.AssociatedMedia = observationEvent.Media.ToDtos();
+            ev.Dataset = observationEvent?.DataStewardship.ToDto();
+            ev.EventStartDate = observationEvent.StartDate;
+            ev.EventEndDate = observationEvent.EndDate;
+            ev.PlainStartDate = observationEvent.PlainStartDate;
+            ev.PlainEndDate = observationEvent.PlainEndDate;
+            ev.PlainStartTime = observationEvent.PlainStartTime;
+            ev.PlainEndTime = observationEvent.PlainEndTime;
+            ev.SamplingProtocol = observationEvent.SamplingProtocol;
+            ev.SurveyLocation = observationEvent?.Location?.ToDto(responseCoordinateSystem);
+            ev.EventType = observationEvent?.EventType;
+            ev.LocationProtected = observationEvent?.LocationProtected;
+            ev.Weather = observationEvent?.Weather?.ToDto();
+            ev.RecorderCode = observationEvent.RecorderCode;
+            ev.RecorderOrganisation = observationEvent?.RecorderOrganisation?.Select(m => m.ToDto()).ToList();
+            ev.OccurrenceIds = observationEvent?.OccurrenceIds;
+            ev.NoObservations = ev.OccurrenceIds == null || !ev.OccurrenceIds.Any();
 
-        return ev;
+            return ev;
+        }
     }
 }

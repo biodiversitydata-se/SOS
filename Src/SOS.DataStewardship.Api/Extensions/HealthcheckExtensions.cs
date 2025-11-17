@@ -4,17 +4,19 @@ namespace SOS.DataStewardship.Api.Extensions;
 
 internal static class HealthcheckExtensions
 {
-    /// <summary>
-    /// Configure health checks
-    /// </summary>
-    /// <param name="webApplicationBuilder"></param>
-    /// <param name="processedDbConfiguration"></param>
-    internal static void SetupHealthChecks(this WebApplicationBuilder webApplicationBuilder, MongoDbConfiguration processedDbConfiguration)
+    extension(WebApplicationBuilder webApplicationBuilder)
     {
-        webApplicationBuilder.Services.AddHealthChecks()
-           // .AddMongoDb(processedDbConfiguration.GetConnectionString(), tags: new[] { "database", "mongodb" }) not working with MongoDbdriver 3.0.0
-            .AddCheck<DatasetHealthCheck>("Dataset", tags: new[] { "database", "elasticsearch", "query" })
-            .AddCheck<EventHealthCheck>("Event", tags: new[] { "database", "elasticsearch", "query" })
-            .AddCheck<OccurrenceHealthCheck>("Occurrence", tags: new[] { "database", "elasticsearch", "query" });
+        /// <summary>
+        /// Configure health checks
+        /// </summary>
+        /// <param name="processedDbConfiguration"></param>
+        internal void SetupHealthChecks(MongoDbConfiguration processedDbConfiguration)
+        {
+            webApplicationBuilder.Services.AddHealthChecks()
+                // .AddMongoDb(processedDbConfiguration.GetConnectionString(), tags: new[] { "database", "mongodb" }) not working with MongoDbdriver 3.0.0
+                .AddCheck<DatasetHealthCheck>("Dataset", tags: new[] { "database", "elasticsearch", "query" })
+                .AddCheck<EventHealthCheck>("Event", tags: new[] { "database", "elasticsearch", "query" })
+                .AddCheck<OccurrenceHealthCheck>("Occurrence", tags: new[] { "database", "elasticsearch", "query" });
+        }
     }
 }

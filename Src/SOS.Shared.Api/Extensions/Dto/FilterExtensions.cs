@@ -292,179 +292,211 @@ public static class FilterExtensions
         return filter;
     }
 
-    private static ProtectionFilter ToFilter(this ProtectionFilterDto? protectionFilter)
+    extension(ProtectionFilterDto? protectionFilter)
     {
-        return protectionFilter switch
+        private ProtectionFilter ToFilter()
         {
-            ProtectionFilterDto.BothPublicAndSensitive => ProtectionFilter.BothPublicAndSensitive,
-            ProtectionFilterDto.Sensitive => ProtectionFilter.Sensitive,
-            _ => ProtectionFilter.Public
-        };
+            return protectionFilter switch
+            {
+                ProtectionFilterDto.BothPublicAndSensitive => ProtectionFilter.BothPublicAndSensitive,
+                ProtectionFilterDto.Sensitive => ProtectionFilter.Sensitive,
+                _ => ProtectionFilter.Public
+            };
+        }
     }
 
-    public static SearchFilter ToSearchFilter(this SearchFilterBaseDto searchFilterDto, int userId, ProtectionFilterDto? protectionFilterDto, string translationCultureCode)
+    extension(SearchFilterBaseDto searchFilterDto)
     {
-        return (SearchFilter)PopulateFilter(searchFilterDto, userId, protectionFilterDto, translationCultureCode);
+        public SearchFilter ToSearchFilter(int userId, ProtectionFilterDto? protectionFilterDto, string translationCultureCode)
+        {
+            return (SearchFilter)PopulateFilter(searchFilterDto, userId, protectionFilterDto, translationCultureCode);
+        }
     }
 
-    public static SearchFilter ToSearchFilter(this SearchFilterDto searchFilterDto, int userId, ProtectionFilterDto? protectionFilterDto, string translationCultureCode,
+    extension(SearchFilterDto searchFilterDto)
+    {
+        public SearchFilter ToSearchFilter(int userId, ProtectionFilterDto? protectionFilterDto, string translationCultureCode,
         string sortBy, SearchSortOrder sortOrder)
-    {
-        var searchFilter = (SearchFilter)PopulateFilter(searchFilterDto, userId, protectionFilterDto, translationCultureCode);
-
-        if (!string.IsNullOrEmpty(sortBy))
         {
-            searchFilter ??= new SearchFilter(userId, (ProtectionFilter)protectionFilterDto!);
-            searchFilter.Output ??= new OutputFilter();
-            searchFilter.Output.SortOrders = new[] { new SortOrderFilter { SortBy = sortBy, SortOrder = sortOrder } };
-        }
-        return searchFilter;
-    }
+            var searchFilter = (SearchFilter)PopulateFilter(searchFilterDto, userId, protectionFilterDto, translationCultureCode);
 
-    public static SearchFilterInternal ToSearchFilterInternal(this SearchFilterInternalBaseDto searchFilterDto,
-        int userId, string translationCultureCode)
-    {
-        return (SearchFilterInternal)PopulateFilter(searchFilterDto, userId, searchFilterDto.ProtectionFilter, translationCultureCode);
-    }
-
-    public static SearchFilterInternal ToSearchFilterInternal(this SearchFilterInternalDto searchFilterDto,
-        int userId, string translationCultureCode, string sortBy, SearchSortOrder sortOrder)
-    {
-        // User sort order passed the old way if not any other sort order is passed 
-        if (!string.IsNullOrEmpty(sortBy) && (!searchFilterDto?.Output?.SortOrders?.Any() ?? true))
-        {
-            searchFilterDto ??= new SearchFilterInternalDto();
-            searchFilterDto.Output ??= new OutputFilterExtendedDto();
-            searchFilterDto.Output.SortOrders = new[] { new SortOrderDto { SortBy = sortBy, SortOrder = sortOrder } };
-        }
-
-        return (SearchFilterInternal)PopulateFilter(searchFilterDto!, userId, searchFilterDto?.ProtectionFilter, translationCultureCode);
-    }
-
-    public static SearchFilter ToSearchFilter(this SearchFilterAggregationDto searchFilterDto, int userId, ProtectionFilterDto protectionFilterDto, string translationCultureCode)
-    {
-        return (SearchFilter)PopulateFilter(searchFilterDto, userId, protectionFilterDto, translationCultureCode);
-    }
-
-    public static TaxonFilter ToTaxonFilterFilter(this TaxonFilterDto taxonFilterDto)
-    {
-        return PopulateTaxa(taxonFilterDto);            
-    }
-
-    public static SearchFilterInternal ToSearchFilterInternal(this SearchFilterAggregationInternalDto searchFilterDto, int userId, string translationCultureCode)
-    {
-
-        return (SearchFilterInternal)PopulateFilter(searchFilterDto, userId, searchFilterDto.ProtectionFilter, translationCultureCode);
-    }
-
-    public static SearchFilter ToSearchFilter(this ExportFilterDto searchFilterDto, int userId, ProtectionFilterDto protectionFilterDto, string translationCultureCode)
-    {
-        return (SearchFilter)PopulateFilter(searchFilterDto, userId, protectionFilterDto, translationCultureCode);
-    }
-
-    public static (SearchFilter, ChecklistSearchFilter) ToSearchFilters(this CalculateTrendFilterDto searchFilterDto)
-    {
-        var dateFilter = PopulateDateFilter(searchFilterDto.Date);
-        var taxonFilter = new TaxonFilter { Ids = new[] { searchFilterDto.TaxonId } };
-        var locationFilter = PopulateLocationFilter(searchFilterDto.Geographics);
-        // todo - add this in next version
-        //var observationFilter = new SearchFilter
-        //{
-        //    DataProviderIds = searchFilterDto.Observation?.DataProvider?.Ids,
-        //    Date = PopulateDateFilter(searchFilterDto.Date),
-        //    Taxa = new TaxonFilter { Ids = new[] { searchFilterDto.TaxonId } },
-        //    VerificationStatus = (SearchFilterBase.StatusVerification)(searchFilterDto?.Observation?.VerificationStatus ?? StatusVerificationDto.BothVerifiedAndNotVerified)
-        //};
-        //observationFilter.Location = PopulateLocationFilter(searchFilterDto.Geographics);
-        var checklistFilter = new ChecklistSearchFilter
-        {
-            DataProviderIds = searchFilterDto.Checklist?.DataProvider?.Ids,
-            Date = dateFilter as ChecklistDateFilter,
-            Location = locationFilter,
-            Taxa = taxonFilter
-        };
-
-        if (TimeSpan.TryParse(searchFilterDto.Checklist?.MinEffortTime, out var minEffortTime))
-        {
-            checklistFilter.Date ??= new ChecklistDateFilter();
-            checklistFilter.Date.MinEffortTime = minEffortTime;
-        }
-
-        return (null!, checklistFilter);
-        //return (observationFilter, checklistFilter);
-    }
-
-    public static SearchFilterInternal ToSearchFilterInternal(this SignalFilterDto searchFilterDto, int userId, bool sensitiveObservations)
-    {
-        if (searchFilterDto == null)
-        {
-            return null!;
-        }
-
-        var searchFilter = new SearchFilterInternal(userId, sensitiveObservations ? ProtectionFilter.Sensitive : ProtectionFilter.Public)
-        {
-            BirdNestActivityLimit = searchFilterDto.BirdNestActivityLimit,
-            DataProviderIds = searchFilterDto.DataProvider?.Ids?.ToList(),
-            Location = new LocationFilter
+            if (!string.IsNullOrEmpty(sortBy))
             {
-                Areas = searchFilterDto.Geographics?.Areas?.Select(a => new AreaFilter { FeatureId = a.FeatureId, AreaType = (AreaType)a.AreaType }).ToList(),
-                Geometries = searchFilterDto.Geographics == null
-                    ? null
-                    : new GeographicsFilter
-                    {
-                        BoundingBox = searchFilterDto.Geographics.BoundingBox?.ToLatLonBoundingBox(),
-                        Geometries = searchFilterDto.Geographics.Geometries?.ToList(),
-                        MaxDistanceFromPoint = searchFilterDto.Geographics.MaxDistanceFromPoint,
-                        UseDisturbanceRadius = searchFilterDto.Geographics.ConsiderDisturbanceRadius,
-                        UsePointAccuracy = searchFilterDto.Geographics.ConsiderObservationAccuracy,
-                        UseAuthorizationBuffer = searchFilterDto.Geographics.ConsiderAuthorizationBuffer
-                    },
-                MaxAccuracy = searchFilterDto.Geographics?.MaxAccuracy
-            },
-            NotPresentFilter = SightingNotPresentFilter.DontIncludeNotPresent,
-            NotRecoveredFilter = SightingNotRecoveredFilter.DontIncludeNotRecovered,
-            PositiveSightings = true,
-            Date = searchFilterDto.StartDate.HasValue ? new DateFilter
-            {
-                StartDate = searchFilterDto.StartDate
-            } : null,
-            Taxa = searchFilterDto.Taxon?.ToTaxonFilter(),
-            UnspontaneousFilter = SightingUnspontaneousFilter.NotUnspontaneous
-        };
-
-        return searchFilter;
+                searchFilter ??= new SearchFilter(userId, (ProtectionFilter)protectionFilterDto!);
+                searchFilter.Output ??= new OutputFilter();
+                searchFilter.Output.SortOrders = new[] { new SortOrderFilter { SortBy = sortBy, SortOrder = sortOrder } };
+            }
+            return searchFilter;
+        }
     }
 
-    /// <summary>
-    /// Cast taxon filter dto to taxon filter
-    /// </summary>
-    /// <param name="filterDto"></param>
-    /// <returns></returns>
-    public static TaxonFilter ToTaxonFilter(this TaxonFilterBaseDto filterDto)
+    extension(SearchFilterInternalBaseDto searchFilterDto)
     {
-        if (filterDto == null)
+        public SearchFilterInternal ToSearchFilterInternal(int userId, string translationCultureCode)
         {
-            return null!;
+            return (SearchFilterInternal)PopulateFilter(searchFilterDto, userId, searchFilterDto.ProtectionFilter, translationCultureCode);
         }
-
-        var filter = new TaxonFilter
-        {
-            Ids = filterDto.Ids,
-            IncludeUnderlyingTaxa = filterDto.IncludeUnderlyingTaxa ?? false,
-            IsInvasiveInSweden = filterDto.IsInvasiveInSweden,
-            ListIds = filterDto.TaxonListIds,
-            TaxonListOperator = TaxonFilter.TaxonListOp.Merge,
-        };
-
-        if (filterDto is TaxonFilterDto taxonFilterDto)
-        {
-            filter.RedListCategories = taxonFilterDto.RedListCategories;
-            filter.TaxonListOperator =
-                (TaxonFilter.TaxonListOp)(taxonFilterDto?.TaxonListOperator).GetValueOrDefault();
-            filter.TaxonCategories = taxonFilterDto?.TaxonCategories!;
-        }
-
-        return filter;
     }
 
+    extension(SearchFilterInternalDto searchFilterDto)
+    {
+        public SearchFilterInternal ToSearchFilterInternal(int userId, string translationCultureCode, string sortBy, SearchSortOrder sortOrder)
+        {
+            // User sort order passed the old way if not any other sort order is passed 
+            if (!string.IsNullOrEmpty(sortBy) && (!searchFilterDto?.Output?.SortOrders?.Any() ?? true))
+            {
+                searchFilterDto ??= new SearchFilterInternalDto();
+                searchFilterDto.Output ??= new OutputFilterExtendedDto();
+                searchFilterDto.Output.SortOrders = new[] { new SortOrderDto { SortBy = sortBy, SortOrder = sortOrder } };
+            }
+
+            return (SearchFilterInternal)PopulateFilter(searchFilterDto!, userId, searchFilterDto?.ProtectionFilter, translationCultureCode);
+        }
+    }
+
+    extension(SearchFilterAggregationDto searchFilterDto)
+    {
+        public SearchFilter ToSearchFilter(int userId, ProtectionFilterDto protectionFilterDto, string translationCultureCode)
+        {
+            return (SearchFilter)PopulateFilter(searchFilterDto, userId, protectionFilterDto, translationCultureCode);
+        }
+    }
+
+    extension(TaxonFilterDto taxonFilterDto)
+    {
+        public TaxonFilter ToTaxonFilterFilter()
+        {
+            return PopulateTaxa(taxonFilterDto);
+        }
+    }
+
+    extension(SearchFilterAggregationInternalDto searchFilterDto)
+    {
+        public SearchFilterInternal ToSearchFilterInternal(int userId, string translationCultureCode)
+        {
+
+            return (SearchFilterInternal)PopulateFilter(searchFilterDto, userId, searchFilterDto.ProtectionFilter, translationCultureCode);
+        }
+    }
+
+    extension(ExportFilterDto searchFilterDto)
+    {
+        public SearchFilter ToSearchFilter(int userId, ProtectionFilterDto protectionFilterDto, string translationCultureCode)
+        {
+            return (SearchFilter)PopulateFilter(searchFilterDto, userId, protectionFilterDto, translationCultureCode);
+        }
+    }
+
+    extension(CalculateTrendFilterDto searchFilterDto)
+    {
+        public (SearchFilter, ChecklistSearchFilter) ToSearchFilters()
+        {
+            var dateFilter = PopulateDateFilter(searchFilterDto.Date);
+            var taxonFilter = new TaxonFilter { Ids = new[] { searchFilterDto.TaxonId } };
+            var locationFilter = PopulateLocationFilter(searchFilterDto.Geographics);
+            // todo - add this in next version
+            //var observationFilter = new SearchFilter
+            //{
+            //    DataProviderIds = searchFilterDto.Observation?.DataProvider?.Ids,
+            //    Date = PopulateDateFilter(searchFilterDto.Date),
+            //    Taxa = new TaxonFilter { Ids = new[] { searchFilterDto.TaxonId } },
+            //    VerificationStatus = (SearchFilterBase.StatusVerification)(searchFilterDto?.Observation?.VerificationStatus ?? StatusVerificationDto.BothVerifiedAndNotVerified)
+            //};
+            //observationFilter.Location = PopulateLocationFilter(searchFilterDto.Geographics);
+            var checklistFilter = new ChecklistSearchFilter
+            {
+                DataProviderIds = searchFilterDto.Checklist?.DataProvider?.Ids,
+                Date = dateFilter as ChecklistDateFilter,
+                Location = locationFilter,
+                Taxa = taxonFilter
+            };
+
+            if (TimeSpan.TryParse(searchFilterDto.Checklist?.MinEffortTime, out var minEffortTime))
+            {
+                checklistFilter.Date ??= new ChecklistDateFilter();
+                checklistFilter.Date.MinEffortTime = minEffortTime;
+            }
+
+            return (null!, checklistFilter);
+            //return (observationFilter, checklistFilter);
+        }
+    }
+
+    extension(SignalFilterDto searchFilterDto)
+    {
+        public SearchFilterInternal ToSearchFilterInternal(int userId, bool sensitiveObservations)
+        {
+            if (searchFilterDto == null)
+            {
+                return null!;
+            }
+
+            var searchFilter = new SearchFilterInternal(userId, sensitiveObservations ? ProtectionFilter.Sensitive : ProtectionFilter.Public)
+            {
+                BirdNestActivityLimit = searchFilterDto.BirdNestActivityLimit,
+                DataProviderIds = searchFilterDto.DataProvider?.Ids?.ToList(),
+                Location = new LocationFilter
+                {
+                    Areas = searchFilterDto.Geographics?.Areas?.Select(a => new AreaFilter { FeatureId = a.FeatureId, AreaType = (AreaType)a.AreaType }).ToList(),
+                    Geometries = searchFilterDto.Geographics == null
+                        ? null
+                        : new GeographicsFilter
+                        {
+                            BoundingBox = searchFilterDto.Geographics.BoundingBox?.ToLatLonBoundingBox(),
+                            Geometries = searchFilterDto.Geographics.Geometries?.ToList(),
+                            MaxDistanceFromPoint = searchFilterDto.Geographics.MaxDistanceFromPoint,
+                            UseDisturbanceRadius = searchFilterDto.Geographics.ConsiderDisturbanceRadius,
+                            UsePointAccuracy = searchFilterDto.Geographics.ConsiderObservationAccuracy,
+                            UseAuthorizationBuffer = searchFilterDto.Geographics.ConsiderAuthorizationBuffer
+                        },
+                    MaxAccuracy = searchFilterDto.Geographics?.MaxAccuracy
+                },
+                NotPresentFilter = SightingNotPresentFilter.DontIncludeNotPresent,
+                NotRecoveredFilter = SightingNotRecoveredFilter.DontIncludeNotRecovered,
+                PositiveSightings = true,
+                Date = searchFilterDto.StartDate.HasValue ? new DateFilter
+                {
+                    StartDate = searchFilterDto.StartDate
+                } : null,
+                Taxa = searchFilterDto.Taxon?.ToTaxonFilter(),
+                UnspontaneousFilter = SightingUnspontaneousFilter.NotUnspontaneous
+            };
+
+            return searchFilter;
+        }
+    }
+
+    extension(TaxonFilterBaseDto filterDto)
+    {
+        /// <summary>
+        /// Cast taxon filter dto to taxon filter
+        /// </summary>
+        /// <returns></returns>
+        public TaxonFilter ToTaxonFilter()
+        {
+            if (filterDto == null)
+            {
+                return null!;
+            }
+
+            var filter = new TaxonFilter
+            {
+                Ids = filterDto.Ids,
+                IncludeUnderlyingTaxa = filterDto.IncludeUnderlyingTaxa ?? false,
+                IsInvasiveInSweden = filterDto.IsInvasiveInSweden,
+                ListIds = filterDto.TaxonListIds,
+                TaxonListOperator = TaxonFilter.TaxonListOp.Merge,
+            };
+
+            if (filterDto is TaxonFilterDto taxonFilterDto)
+            {
+                filter.RedListCategories = taxonFilterDto.RedListCategories;
+                filter.TaxonListOperator =
+                    (TaxonFilter.TaxonListOp)(taxonFilterDto?.TaxonListOperator).GetValueOrDefault();
+                filter.TaxonCategories = taxonFilterDto?.TaxonCategories!;
+            }
+
+            return filter;
+        }
+    }
 }

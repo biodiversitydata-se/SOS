@@ -35,87 +35,90 @@ public static class SerilogExtensions
             .CreateLogger();
     }
 
-    public static WebApplication ApplyUseSerilogRequestLogging(this WebApplication app)
+    extension(WebApplication app)
     {
-        app.UseSerilogRequestLogging(options =>
+        public WebApplication ApplyUseSerilogRequestLogging()
         {
-            options.EnrichDiagnosticContext = (diagnosticContext, httpContext) =>
+            app.UseSerilogRequestLogging(options =>
             {
-                if (httpContext.Items.TryGetValue("UserId", out var userId) && userId != null)
+                options.EnrichDiagnosticContext = (diagnosticContext, httpContext) =>
                 {
-                    diagnosticContext.Set("UserId", userId);
-                }
-
-                if (httpContext.Items.TryGetValue("Email", out var email) && email != null)
-                {
-                    diagnosticContext.Set("Email", email);
-                }
-
-                if (httpContext.Items.TryGetValue("Endpoint", out var endpoint) && endpoint != null)
-                {
-                    diagnosticContext.Set("Endpoint", endpoint);
-                }
-
-                if (httpContext.Items.TryGetValue("QueryString", out var queryString) && queryString != null)
-                {
-                    diagnosticContext.Set("QueryString", queryString);
-                }
-
-                if (httpContext.Items.TryGetValue("Handler", out var handler) && handler != null)
-                {
-                    diagnosticContext.Set("Handler", handler);
-                }
-
-                if (httpContext.Items.TryGetValue("ApiUserType", out var apiUserType) && apiUserType != null)
-                {
-                    diagnosticContext.Set("ApiUserType", apiUserType);
-                }
-
-                if (httpContext.Items.TryGetValue("SemaphoreStatus", out var semaphoreStatus) && semaphoreStatus != null)
-                {
-                    diagnosticContext.Set("SemaphoreStatus", semaphoreStatus);
-                }
-
-                if (httpContext.Items.TryGetValue("SemaphoreWaitSeconds", out var semaphoreWaitSeconds) && semaphoreWaitSeconds != null)
-                {
-                    diagnosticContext.Set("SemaphoreWaitSeconds", semaphoreWaitSeconds);
-                }
-
-                try
-                {
-                    var authHeader = httpContext.Request.Headers["Authorization"].FirstOrDefault();
-                    if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+                    if (httpContext.Items.TryGetValue("UserId", out var userId) && userId != null)
                     {
-                        string token = authHeader["Bearer ".Length..]; // enklare än Replace
-                        var jsonWebTokenHandler = new JsonWebTokenHandler();
-                        var jwt = jsonWebTokenHandler.ReadJsonWebToken(token);
-
-                        if (jwt != null)
-                        {
-                            // Sätt ClientId om den finns
-                            var clientId = jwt.Claims.FirstOrDefault(c => c.Type == "client_id")?.Value;
-                            if (!string.IsNullOrEmpty(clientId))
-                                diagnosticContext.Set("ClientId", clientId);
-
-                            // Sätt Name om den finns
-                            var name = jwt.Claims.FirstOrDefault(c => c.Type == "name")?.Value;
-                            if (!string.IsNullOrEmpty(name))
-                                diagnosticContext.Set("Name", name);
-
-                            // Sätt Subject om den finns
-                            if (!string.IsNullOrEmpty(jwt.Subject))
-                                diagnosticContext.Set("Subject", jwt.Subject);
-                        }
+                        diagnosticContext.Set("UserId", userId);
                     }
 
-                }
-                catch (Exception ex)
-                {
-                    Log.Logger.Error(ex, "Error when deserializing JWT.");
-                }
-            };
-        });
+                    if (httpContext.Items.TryGetValue("Email", out var email) && email != null)
+                    {
+                        diagnosticContext.Set("Email", email);
+                    }
 
-        return app;
+                    if (httpContext.Items.TryGetValue("Endpoint", out var endpoint) && endpoint != null)
+                    {
+                        diagnosticContext.Set("Endpoint", endpoint);
+                    }
+
+                    if (httpContext.Items.TryGetValue("QueryString", out var queryString) && queryString != null)
+                    {
+                        diagnosticContext.Set("QueryString", queryString);
+                    }
+
+                    if (httpContext.Items.TryGetValue("Handler", out var handler) && handler != null)
+                    {
+                        diagnosticContext.Set("Handler", handler);
+                    }
+
+                    if (httpContext.Items.TryGetValue("ApiUserType", out var apiUserType) && apiUserType != null)
+                    {
+                        diagnosticContext.Set("ApiUserType", apiUserType);
+                    }
+
+                    if (httpContext.Items.TryGetValue("SemaphoreStatus", out var semaphoreStatus) && semaphoreStatus != null)
+                    {
+                        diagnosticContext.Set("SemaphoreStatus", semaphoreStatus);
+                    }
+
+                    if (httpContext.Items.TryGetValue("SemaphoreWaitSeconds", out var semaphoreWaitSeconds) && semaphoreWaitSeconds != null)
+                    {
+                        diagnosticContext.Set("SemaphoreWaitSeconds", semaphoreWaitSeconds);
+                    }
+
+                    try
+                    {
+                        var authHeader = httpContext.Request.Headers["Authorization"].FirstOrDefault();
+                        if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+                        {
+                            string token = authHeader["Bearer ".Length..]; // enklare än Replace
+                            var jsonWebTokenHandler = new JsonWebTokenHandler();
+                            var jwt = jsonWebTokenHandler.ReadJsonWebToken(token);
+
+                            if (jwt != null)
+                            {
+                                // Sätt ClientId om den finns
+                                var clientId = jwt.Claims.FirstOrDefault(c => c.Type == "client_id")?.Value;
+                                if (!string.IsNullOrEmpty(clientId))
+                                    diagnosticContext.Set("ClientId", clientId);
+
+                                // Sätt Name om den finns
+                                var name = jwt.Claims.FirstOrDefault(c => c.Type == "name")?.Value;
+                                if (!string.IsNullOrEmpty(name))
+                                    diagnosticContext.Set("Name", name);
+
+                                // Sätt Subject om den finns
+                                if (!string.IsNullOrEmpty(jwt.Subject))
+                                    diagnosticContext.Set("Subject", jwt.Subject);
+                            }
+                        }
+
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Logger.Error(ex, "Error when deserializing JWT.");
+                    }
+                };
+            });
+
+            return app;
+        }
     }
 }

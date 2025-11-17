@@ -46,7 +46,6 @@ public interface IAreaRepository : IRepositoryBase<Area, string>
     /// <summary>
     /// Get areas by id
     /// </summary>
-    /// <param name="areaIds"></param>
     /// <param name="skip"></param>
     /// <param name="take"></param>
     /// <returns></returns>

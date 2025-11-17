@@ -10,6 +10,9 @@ public static class DebuggingExtensions
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase
     };
 
-    public static string ToJson(this object? obj)
+    extension(object? obj)
+    {
+        public string ToJson()
         => JsonSerializer.Serialize(obj, options);
+    }
 }

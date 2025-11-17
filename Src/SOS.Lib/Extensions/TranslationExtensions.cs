@@ -10,16 +10,18 @@ namespace SOS.Lib.Extensions;
 /// </summary>
 public static class TranslationExtensions
 {
-    /// <summary>
-    /// Translate 
-    /// </summary>
-    /// <param name="translations"></param>
-    /// <param name="cultureCode"></param>
-    /// <returns></returns>
-    public static string Translate(this IEnumerable<VocabularyValueTranslation> translations, string cultureCode)
+    extension(IEnumerable<VocabularyValueTranslation> translations)
     {
-        return translations
-            ?.FirstOrDefault(t => t.CultureCode.Equals(cultureCode, StringComparison.CurrentCultureIgnoreCase))
-            ?.Value ?? string.Empty;
+        /// <summary>
+        /// Translate 
+        /// </summary>
+        /// <param name="cultureCode"></param>
+        /// <returns></returns>
+        public string Translate(string cultureCode)
+        {
+            return translations
+                ?.FirstOrDefault(t => t.CultureCode.Equals(cultureCode, StringComparison.CurrentCultureIgnoreCase))
+                ?.Value ?? string.Empty;
+        }
     }
 }

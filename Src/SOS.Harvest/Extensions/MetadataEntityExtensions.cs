@@ -6,35 +6,44 @@ namespace SOS.Harvest.Extensions;
 
 public static class MetadataEntityExtensions
 {
-    public static void TrimValues(this IEnumerable<MetadataEntity<int>> metadataEntities)
+    extension(IEnumerable<MetadataEntity<int>> metadataEntities)
     {
-        foreach (var metadataEntity in metadataEntities)
+        public void TrimValues()
         {
-            metadataEntity.TrimValue();
+            foreach (var metadataEntity in metadataEntities)
+            {
+                metadataEntity.TrimValue();
+            }
         }
     }
 
-    public static void TrimValue(this MetadataEntity<int> metadataEntity)
+    extension(MetadataEntity<int> metadataEntity)
     {
-        metadataEntity.Translation = metadataEntity.Translation?.Trim();
+        public void TrimValue()
+        {
+            metadataEntity.Translation = metadataEntity.Translation?.Trim();
+        }
     }
 
-    public static Project ToVerbatim(this ProjectEntity entity)
+    extension(ProjectEntity entity)
     {
-        return new Project
+        public Project ToVerbatim()
         {
-            Category = entity.Category,
-            CategorySwedish = entity.CategorySwedish,
-            Description = entity.Description?.Clean(),
-            EndDate = entity.EndDate,
-            Id = entity.Id,
-            IsPublic = entity.IsPublic,
-            Name = entity.Name,
-            Owner = entity.Owner,
-            StartDate = entity.StartDate,
-            ProjectURL = entity.ProjectURL,
-            SurveyMethod = entity.SurveyMethod,
-            SurveyMethodUrl = entity.SurveyMethodUrl
-        };
+            return new Project
+            {
+                Category = entity.Category,
+                CategorySwedish = entity.CategorySwedish,
+                Description = entity.Description?.Clean(),
+                EndDate = entity.EndDate,
+                Id = entity.Id,
+                IsPublic = entity.IsPublic,
+                Name = entity.Name,
+                Owner = entity.Owner,
+                StartDate = entity.StartDate,
+                ProjectURL = entity.ProjectURL,
+                SurveyMethod = entity.SurveyMethod,
+                SurveyMethodUrl = entity.SurveyMethodUrl
+            };
+        }
     }
 }

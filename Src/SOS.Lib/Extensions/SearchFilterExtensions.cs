@@ -20,49 +20,53 @@ public static class SearchFilterExtensions
         Converters = { new JsonStringEnumConverter() }
     };
 
-    /// <summary>
-    /// Get filter as json string.
-    /// </summary>
-    /// <param name="filter"></param>
-    /// <returns></returns>
-    public static string GetFilterAsJson(this SearchFilterBase filter)
+    extension(SearchFilterBase filter)
     {
-        try
+        /// <summary>
+        /// Get filter as json string.
+        /// </summary>
+        /// <returns></returns>
+        public string GetFilterAsJson()
         {
-            return JsonSerializer.Serialize(filter, _serializeOptions);
-        }
-        catch
-        {
-            return "";
+            try
+            {
+                return JsonSerializer.Serialize(filter, _serializeOptions);
+            }
+            catch
+            {
+                return "";
+            }
         }
     }
 
-    /// <summary>
-    /// Populate output fields based on property set
-    /// </summary>
-    /// <param name="filter"></param>
-    /// <param name="outputFieldSet"></param>
-    public static void PopulateFields(this OutputFilter filter, OutputFieldSet? outputFieldSet)
+    extension(OutputFilter filter)
     {
-        if (filter?.Fields?.Any() == true && outputFieldSet == null) return;
-
-        const OutputFieldSet defaultFieldSet = OutputFieldSet.Minimum;
-        var fieldSet = outputFieldSet ?? defaultFieldSet;
-        if (fieldSet == OutputFieldSet.AllWithValues || fieldSet == OutputFieldSet.All)
+        /// <summary>
+        /// Populate output fields based on property set
+        /// </summary>
+        /// <param name="outputFieldSet"></param>
+        public void PopulateFields(OutputFieldSet? outputFieldSet)
         {
-            filter.Fields = null;
-            return;
-        }
+            if (filter?.Fields?.Any() == true && outputFieldSet == null) return;
 
-        var propertyFieldsDependencySet =
-            ObservationPropertyFieldDescriptionHelper.JsonFormatDependencyByFieldSet[fieldSet];
-        List<string> outputFields = propertyFieldsDependencySet.ToList();
+            const OutputFieldSet defaultFieldSet = OutputFieldSet.Minimum;
+            var fieldSet = outputFieldSet ?? defaultFieldSet;
+            if (fieldSet == OutputFieldSet.AllWithValues || fieldSet == OutputFieldSet.All)
+            {
+                filter.Fields = null;
+                return;
+            }
 
-        if (filter.Fields?.Any() ?? false)
-        {
-            outputFields.AddRange(filter.Fields.Where(of => !outputFields.Contains(of, StringComparer.CurrentCultureIgnoreCase)));
+            var propertyFieldsDependencySet =
+                ObservationPropertyFieldDescriptionHelper.JsonFormatDependencyByFieldSet[fieldSet];
+            List<string> outputFields = propertyFieldsDependencySet.ToList();
+
+            if (filter.Fields?.Any() ?? false)
+            {
+                outputFields.AddRange(filter.Fields.Where(of => !outputFields.Contains(of, StringComparer.CurrentCultureIgnoreCase)));
+            }
+
+            filter.Fields = outputFields;
         }
-        
-        filter.Fields = outputFields;                        
     }
 }

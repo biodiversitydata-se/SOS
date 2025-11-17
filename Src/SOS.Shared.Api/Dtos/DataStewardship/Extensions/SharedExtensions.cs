@@ -5,18 +5,21 @@ namespace SOS.Shared.Api.Dtos.DataStewardship.Extensions;
 
 public static class SharedExtensions
 {
-    public static string Concat(this IEnumerable<string> values, int maxCount = 0)
+    extension(IEnumerable<string> values)
     {
-        if (!values?.Any() ?? true)
+        public string Concat(int maxCount = 0)
         {
-            return null!;
-        }
+            if (!values?.Any() ?? true)
+            {
+                return null!;
+            }
 
-        if (values.Count() > maxCount)
-        {
-            return $"{string.Join(',', values.Take(maxCount))}...";
-        }
+            if (values.Count() > maxCount)
+            {
+                return $"{string.Join(',', values.Take(maxCount))}...";
+            }
 
-        return string.Join(',', values);
+            return string.Join(',', values);
+        }
     }
 }

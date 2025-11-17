@@ -6,53 +6,59 @@ namespace SOS.DataStewardship.Api.Extensions;
 
 public static class CsvExtensions
 {
-    private static string Concat(this IEnumerable<string> values, int maxCount = 0)
+    extension(IEnumerable<string> values)
     {
-        if (!values?.Any() ?? true)
+        private string Concat(int maxCount = 0)
         {
-            return null!;
-        }
-       
-        if (values.Count() > maxCount)
-        {
-            return $"{string.Join(',', values.Take(maxCount))}...";
-        }
+            if (!values?.Any() ?? true)
+            {
+                return null!;
+            }
 
-        return string.Join(',', values);
+            if (values.Count() > maxCount)
+            {
+                return $"{string.Join(',', values.Take(maxCount))}...";
+            }
+
+            return string.Join(',', values);
+        }
     }
 
-    #region dataset
-    /// <summary>
-    /// Cast data set to csv
-    /// </summary>
-    /// <param name="dataset"></param>
-    /// <returns></returns>
-    public static byte[] ToCsv(this Dataset dataset)
+    extension(Dataset dataset)
     {
-        if (dataset == null)
+        #region dataset
+        /// <summary>
+        /// Cast data set to csv
+        /// </summary>
+        /// <returns></returns>
+        public byte[] ToCsv()
         {
-            return null!;
-        }
+            if (dataset == null)
+            {
+                return null!;
+            }
 
-        return new[] { dataset }.ToCsv(); 
+            return new[] { dataset }.ToCsv();
+        }
     }
 
-    /// <summary>
-    /// Caste data sets to csv
-    /// </summary>
-    /// <param name="datasets"></param>
-    /// <returns></returns>
-    public static byte[] ToCsv(this IEnumerable<Dataset> datasets)
+    extension(IEnumerable<Dataset> datasets)
     {
-        if (!datasets?.Any() ?? true)
+        /// <summary>
+        /// Caste data sets to csv
+        /// </summary>
+        /// <returns></returns>
+        public byte[] ToCsv()
         {
-            return null!;
-        }
+            if (!datasets?.Any() ?? true)
+            {
+                return null!;
+            }
 
-        using var stream = new MemoryStream();
-        using var csvFileHelper = new CsvFileHelper();
-        csvFileHelper.InitializeWrite(stream, "\t");
-        csvFileHelper.WriteRow(new[] {
+            using var stream = new MemoryStream();
+            using var csvFileHelper = new CsvFileHelper();
+            csvFileHelper.InitializeWrite(stream, "\t");
+            csvFileHelper.WriteRow(new[] {
             "identifier",
             "license",
             "title",
@@ -70,15 +76,15 @@ public static class CsvExtensions
             "start date",
             "end date",
             "spatial",
-            "access rights",                                
+            "access rights",
             "metadata language",
             "language",
             "event id/s"
         });
-       
-        foreach(var dataset in datasets)
-        {
-            csvFileHelper.WriteRow(new[] {
+
+            foreach (var dataset in datasets)
+            {
+                csvFileHelper.WriteRow(new[] {
                 dataset.Identifier,
                 dataset.License,
                 dataset.Title,
@@ -95,53 +101,58 @@ public static class CsvExtensions
                 dataset.StartDate.HasValue ? dataset.StartDate.Value.ToLongDateString() : string.Empty,
                 dataset.EndDate.HasValue ? dataset.EndDate.Value.ToLongDateString() : string.Empty,
                 dataset.Spatial,
-                dataset.AccessRights?.ToString(),                    
+                dataset.AccessRights?.ToString(),
                 dataset.Metadatalanguage,
                 dataset.Language,
                 dataset.EventIds?.Concat(10)
             });
+            }
+            csvFileHelper.Flush();
+            stream.Position = 0;
+            var csv = stream.ToArray();
+            csvFileHelper.FinishWrite();
+
+            return csv;
         }
-        csvFileHelper.Flush();
-        stream.Position = 0;
-        var csv = stream.ToArray();
-        csvFileHelper.FinishWrite();
-
-        return csv;
-    }
-    #endregion dataset
-
-    #region event
-    /// <summary>
-    /// Cast event model to csv
-    /// </summary>
-    /// <param name="event"></param>
-    /// <returns></returns>
-    public static byte[] ToCsv(this Contracts.Models.Event @event)
-    {
-        if (@event == null)
-        {
-            return null!;
-        }
-
-        return new[] { @event }.ToCsv();
     }
 
-    /// <summary>
-    /// Caste event models to csv
-    /// </summary>
-    /// <param name="datasets"></param>
-    /// <returns></returns>
-    public static byte[] ToCsv(this IEnumerable<Contracts.Models.Event> events)
+    extension(Contracts.Models.Event @event)
     {
-        if (!events?.Any() ?? true)
-        {
-            return null!;
-        }
+        #endregion dataset
 
-        using var stream = new MemoryStream();
-        using var csvFileHelper = new CsvFileHelper();
-        csvFileHelper.InitializeWrite(stream, "\t");
-        csvFileHelper.WriteRow(new[] {
+        #region event
+        /// <summary>
+        /// Cast event model to csv
+        /// </summary>
+        /// <returns></returns>
+        public byte[] ToCsv()
+        {
+            if (@event == null)
+            {
+                return null!;
+            }
+
+            return new[] { @event }.ToCsv();
+        }
+    }
+
+    extension(IEnumerable<Contracts.Models.Event> events)
+    {
+        /// <summary>
+        /// Caste event models to csv
+        /// </summary>
+        /// <returns></returns>
+        public byte[] ToCsv()
+        {
+            if (!events?.Any() ?? true)
+            {
+                return null!;
+            }
+
+            using var stream = new MemoryStream();
+            using var csvFileHelper = new CsvFileHelper();
+            csvFileHelper.InitializeWrite(stream, "\t");
+            csvFileHelper.WriteRow(new[] {
             "event id",
             "type",
             "parent id",
@@ -162,9 +173,9 @@ public static class CsvExtensions
             "occurrence id's"
         });
 
-        foreach (var evt in events)
-        {
-            csvFileHelper.WriteRow(new[] {
+            foreach (var evt in events)
+            {
+                csvFileHelper.WriteRow(new[] {
                 evt.EventID,
                 evt.EventType,
                 evt.ParentEventID,
@@ -184,49 +195,54 @@ public static class CsvExtensions
                 evt.Dataset?.Identifier,
                 evt.OccurrenceIds?.Concat(10)
             });
+            }
+
+            csvFileHelper.Flush();
+            stream.Position = 0;
+            var csv = stream.ToArray();
+            csvFileHelper.FinishWrite();
+
+            return csv;
         }
-
-        csvFileHelper.Flush();
-        stream.Position = 0;
-        var csv = stream.ToArray();
-        csvFileHelper.FinishWrite();
-
-        return csv;
-    }
-    #endregion event
-
-    #region occurrence
-    /// <summary>
-    /// Cast event model to csv
-    /// </summary>
-    /// <param name="event"></param>
-    /// <returns></returns>
-    public static byte[] ToCsv(this Contracts.Models.Occurrence occurrence)
-    {
-        if (occurrence == null)
-        {
-            return null!;
-        }
-
-        return new[] { occurrence }.ToCsv();
     }
 
-    /// <summary>
-    /// Caste event models to csv
-    /// </summary>
-    /// <param name="datasets"></param>
-    /// <returns></returns>
-    public static byte[] ToCsv(this IEnumerable<Contracts.Models.Occurrence> occurrences)
+    extension(Contracts.Models.Occurrence occurrence)
     {
-        if (!occurrences?.Any() ?? true)
-        {
-            return null!;
-        }
+        #endregion event
 
-        using var stream = new MemoryStream();
-        using var csvFileHelper = new CsvFileHelper();
-        csvFileHelper.InitializeWrite(stream, "\t");
-        csvFileHelper.WriteRow(new[] {
+        #region occurrence
+        /// <summary>
+        /// Cast event model to csv
+        /// </summary>
+        /// <returns></returns>
+        public byte[] ToCsv()
+        {
+            if (occurrence == null)
+            {
+                return null!;
+            }
+
+            return new[] { occurrence }.ToCsv();
+        }
+    }
+
+    extension(IEnumerable<Contracts.Models.Occurrence> occurrences)
+    {
+        /// <summary>
+        /// Caste event models to csv
+        /// </summary>
+        /// <returns></returns>
+        public byte[] ToCsv()
+        {
+            if (!occurrences?.Any() ?? true)
+            {
+                return null!;
+            }
+
+            using var stream = new MemoryStream();
+            using var csvFileHelper = new CsvFileHelper();
+            csvFileHelper.InitializeWrite(stream, "\t");
+            csvFileHelper.WriteRow(new[] {
             "occurrence id",
             "basis of record",
             "observation time",
@@ -247,13 +263,13 @@ public static class CsvExtensions
             "dataset identifier"
         });
 
-        foreach (var occurrence in occurrences)
-        {
-            var point = occurrence.ObservationPoint;
-            var lon = point?.Coordinate.X;
-            var lat = point?.Coordinate.Y;
+            foreach (var occurrence in occurrences)
+            {
+                var point = occurrence.ObservationPoint;
+                var lon = point?.Coordinate.X;
+                var lat = point?.Coordinate.Y;
 
-            csvFileHelper.WriteRow(new[] {
+                csvFileHelper.WriteRow(new[] {
                 occurrence.OccurrenceID,
                 occurrence.BasisOfRecord?.ToString(),
                 occurrence.ObservationTime?.ToLongDateString(),
@@ -273,14 +289,15 @@ public static class CsvExtensions
                occurrence.EventID,
                occurrence.Dataset?.Identifier
             });
+            }
+
+            csvFileHelper.Flush();
+            stream.Position = 0;
+            var csv = stream.ToArray();
+            csvFileHelper.FinishWrite();
+
+            return csv;
         }
-
-        csvFileHelper.Flush();
-        stream.Position = 0;
-        var csv = stream.ToArray();
-        csvFileHelper.FinishWrite();
-
-        return csv;
     }
     #endregion occurrence
 }

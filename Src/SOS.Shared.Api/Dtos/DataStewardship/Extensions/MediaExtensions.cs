@@ -23,22 +23,28 @@ public static class MediaExtensions
         return AssociatedMediaType.Bild; // default
     }
 
-    public static List<DsAssociatedMediaDto> ToDtos(this IEnumerable<Multimedia> multimedias)
+    extension(IEnumerable<Multimedia> multimedias)
     {
-        if (multimedias == null || !multimedias.Any()) return null;
-        return multimedias.Select(m => m.ToDto()).ToList();
+        public List<DsAssociatedMediaDto> ToDtos()
+        {
+            if (multimedias == null || !multimedias.Any()) return null;
+            return multimedias.Select(m => m.ToDto()).ToList();
+        }
     }
 
-    public static DsAssociatedMediaDto ToDto(this Multimedia multimedia)
+    extension(Multimedia multimedia)
     {
-        if (multimedia == null) return null;
-        return new DsAssociatedMediaDto
+        public DsAssociatedMediaDto ToDto()
         {
-            AssociatedMediaName = multimedia.Title,
-            AssociatedMediaType = GetAssociatedMediaTypeEnum(multimedia.Format),
-            AssociatedMediaLink = multimedia.Identifier,
-            License = multimedia.License,
-            RightsHolder = multimedia.RightsHolder
-        };
+            if (multimedia == null) return null;
+            return new DsAssociatedMediaDto
+            {
+                AssociatedMediaName = multimedia.Title,
+                AssociatedMediaType = GetAssociatedMediaTypeEnum(multimedia.Format),
+                AssociatedMediaLink = multimedia.Identifier,
+                License = multimedia.License,
+                RightsHolder = multimedia.RightsHolder
+            };
+        }
     }
 }

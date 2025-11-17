@@ -3,12 +3,15 @@
 namespace SOS.Observations.Api.IntegrationTests.Extensions;
 internal static class StringExtensions
 {
-    public static string GetAbsoluteFilePath(this string filePath)
+    extension(string filePath)
     {
-        if (Path.IsPathFullyQualified(filePath)) return filePath;
+        public string GetAbsoluteFilePath()
+        {
+            if (Path.IsPathFullyQualified(filePath)) return filePath;
 
-        var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-        var absolutePath = Path.Combine(assemblyPath!, filePath);
-        return absolutePath;
+            var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            var absolutePath = Path.Combine(assemblyPath!, filePath);
+            return absolutePath;
+        }
     }
 }

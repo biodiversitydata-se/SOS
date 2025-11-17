@@ -10,140 +10,170 @@ namespace SOS.DataStewardship.Api.Extensions;
 
 public static class DtoExtensions
 {
-    public static List<Dataset> ToDatasets(this IEnumerable<ProcessedDataStewardship.Dataset.Dataset> datasets)
+    extension(IEnumerable<ProcessedDataStewardship.Dataset.Dataset> datasets)
     {
-        if (datasets == null || !datasets.Any()) return null;             
-        return datasets.Select(m => m.ToDataset()).ToList();
-    }
-
-    public static Dataset ToDataset(this ProcessedDataStewardship.Dataset.Dataset dataset)
-    {
-        if (dataset == null) return null;
-                        
-        return new Dataset
+        public List<Dataset> ToDatasets()
         {
-            AccessRights = dataset.AccessRights.ToDatasetAccessRightsEnum(),
-            DescriptionAccessRights= dataset.DescriptionAccessRights,
-            Assigner = dataset.Assigner.ToOrganisation(),
-            Creator = dataset?.Creator?.Select(m => m.ToOrganisation())?.ToList(),
-            DataStewardship = dataset.DataStewardship,
-            Description = dataset.Description,
-            EndDate = dataset.EndDate?.ToLocalTime(),
-            EventIds = dataset.EventIds,
-            Identifier = dataset.Identifier,
-            Language = dataset.Language,
-            Metadatalanguage = dataset.Metadatalanguage,
-            Methodology = dataset.Methodology.ToMethodologies(),
-            OwnerinstitutionCode = dataset.OwnerinstitutionCode.ToOrganisation(),
-            Project = dataset.Project?.Select(m => m.ToProject())?.ToList(),
-            ProgrammeArea = dataset.ProgrammeArea.ToProgrammeAreaEnum(),
-            Publisher = dataset.Publisher.ToOrganisation(),
-            Purpose = dataset.Purpose.ToDatasetPurposeEnum(),
-            Spatial = dataset.Spatial,
-            StartDate = dataset.StartDate?.ToLocalTime(),
-            Title = dataset.Title
-        };
+            if (datasets == null || !datasets.Any()) return null;
+            return datasets.Select(m => m.ToDataset()).ToList();
+        }
     }
 
-    public static Contracts.Models.Project ToProject(this ProcessedDataStewardship.Common.Project project)
+    extension(ProcessedDataStewardship.Dataset.Dataset dataset)
     {
-        if (project == null) return null;
-        return new Contracts.Models.Project
+        public Dataset ToDataset()
         {
-            ProjectCode= project.ProjectCode,
-            ProjectID = project.ProjectId,
-            ProjectType = project.ProjectType == null ? null : (ProjectType)project.ProjectType
-        };
+            if (dataset == null) return null;
+
+            return new Dataset
+            {
+                AccessRights = dataset.AccessRights.ToDatasetAccessRightsEnum(),
+                DescriptionAccessRights = dataset.DescriptionAccessRights,
+                Assigner = dataset.Assigner.ToOrganisation(),
+                Creator = dataset?.Creator?.Select(m => m.ToOrganisation())?.ToList(),
+                DataStewardship = dataset.DataStewardship,
+                Description = dataset.Description,
+                EndDate = dataset.EndDate?.ToLocalTime(),
+                EventIds = dataset.EventIds,
+                Identifier = dataset.Identifier,
+                Language = dataset.Language,
+                Metadatalanguage = dataset.Metadatalanguage,
+                Methodology = dataset.Methodology.ToMethodologies(),
+                OwnerinstitutionCode = dataset.OwnerinstitutionCode.ToOrganisation(),
+                Project = dataset.Project?.Select(m => m.ToProject())?.ToList(),
+                ProgrammeArea = dataset.ProgrammeArea.ToProgrammeAreaEnum(),
+                Publisher = dataset.Publisher.ToOrganisation(),
+                Purpose = dataset.Purpose.ToDatasetPurposeEnum(),
+                Spatial = dataset.Spatial,
+                StartDate = dataset.StartDate?.ToLocalTime(),
+                Title = dataset.Title
+            };
+        }
     }
 
-    public static Purpose? ToDatasetPurposeEnum(this ProcessedDataStewardship.Enums.Purpose? purposeEnum)
+    extension(ProcessedDataStewardship.Common.Project project)
     {
-        if (purposeEnum == null) return null;
-        return (Purpose)purposeEnum;
-    }
-
-    public static ProgrammeArea? ToProgrammeAreaEnum(this ProcessedDataStewardship.Enums.ProgrammeArea? programmeArea)
-    {
-        if (programmeArea == null) return null;
-        return (ProgrammeArea)programmeArea;
-    }
-
-    public static AccessRights? ToDatasetAccessRightsEnum(this ProcessedDataStewardship.Enums.AccessRights? accessRightsEnum)
-    {
-        if (accessRightsEnum == null) return null;
-        return (AccessRights)accessRightsEnum;
-    }
-
-    public static SOS.DataStewardship.Api.Contracts.Models.Organisation ToOrganisation(this ProcessedDataStewardship.Common.Organisation organisation)
-    {
-        if (organisation == null) return null;
-        return new SOS.DataStewardship.Api.Contracts.Models.Organisation
+        public Contracts.Models.Project ToProject()
         {
-            OrganisationID = organisation.OrganisationID,
-            OrganisationCode = organisation.OrganisationCode
-        };
+            if (project == null) return null;
+            return new Contracts.Models.Project
+            {
+                ProjectCode = project.ProjectCode,
+                ProjectID = project.ProjectId,
+                ProjectType = project.ProjectType == null ? null : (ProjectType)project.ProjectType
+            };
+        }
     }
 
-    public static List<Methodology> ToMethodologies(this IEnumerable<ProcessedDataStewardship.Dataset.Methodology> methodologies)
+    extension(ProcessedDataStewardship.Enums.Purpose? purposeEnum)
     {
-        if (methodologies == null || !methodologies.Any()) return null;
-        return methodologies.Select(m => m.ToMethodology()).ToList();
-    }
-
-    public static Methodology ToMethodology(this ProcessedDataStewardship.Dataset.Methodology methodology)
-    {
-        if (methodology == null) return null;
-        return new Methodology
+        public Purpose? ToDatasetPurposeEnum()
         {
-            MethodologyDescription = methodology.MethodologyDescription,
-            MethodologyLink = methodology.MethodologyLink,
-            MethodologyName = methodology.MethodologyName,
-            SpeciesList = methodology.SpeciesList
-        };
+            if (purposeEnum == null) return null;
+            return (Purpose)purposeEnum;
+        }
     }
 
-    public static Contracts.Models.Event ToEventModel(this ProcessedDataStewardship.Event.Event observationEvent, CoordinateSystem responseCoordinateSystem)
+    extension(ProcessedDataStewardship.Enums.ProgrammeArea? programmeArea)
     {
-        if (observationEvent == null) return null;
-        
-        GetEventDates(
-            observationEvent.StartDate.Value,
-            observationEvent.EndDate.Value,
-            observationEvent.PlainStartDate,
-            observationEvent.PlainEndDate,
-            observationEvent.PlainStartTime,
-            observationEvent.PlainEndTime,
-            out DateOnly startDate, 
-            out DateOnly endDate, 
-            out TimeOnly? startTime, 
-            out TimeOnly? endTime);
-
-        var ev = new Contracts.Models.Event();
-        ev.EventID = observationEvent.EventId;
-        ev.ParentEventID = observationEvent.ParentEventId;
-        ev.EventRemarks = observationEvent.EventRemarks;
-        ev.AssociatedMedia = observationEvent.Media?.ToAssociatedMedias();
-        ev.Dataset = observationEvent?.DataStewardship?.ToDatasetInfo();
-        ev.EventStartDateTime = observationEvent.StartDate.Value.ToLocalTime();
-        ev.EventEndDateTime = observationEvent.EndDate.Value.ToLocalTime();
-        ev.EventStartDate = startDate;
-        ev.EventEndDate = endDate;
-        ev.EventStartTime = startTime;
-        ev.EventEndTime = endTime;
-        ev.SamplingProtocol = observationEvent.SamplingProtocol;
-        ev.SurveyLocation = observationEvent?.Location?.ToLocation(responseCoordinateSystem);
-        ev.EventType = observationEvent?.EventType;
-        ev.LocationProtected = observationEvent.LocationProtected.GetValueOrDefault(false);
-        ev.Weather = observationEvent?.Weather?.ToWeatherVariable();
-        ev.RecorderCode = observationEvent.RecorderCode;
-        ev.RecorderOrganisation = observationEvent?.RecorderOrganisation?.Select(m => m.ToOrganisation()).ToList();
-
-        ev.OccurrenceIds = observationEvent?.OccurrenceIds;
-        ev.NoObservations = ev.OccurrenceIds == null || !ev.OccurrenceIds.Any();
-
-        return ev;
+        public ProgrammeArea? ToProgrammeAreaEnum()
+        {
+            if (programmeArea == null) return null;
+            return (ProgrammeArea)programmeArea;
+        }
     }
-    
+
+    extension(ProcessedDataStewardship.Enums.AccessRights? accessRightsEnum)
+    {
+        public AccessRights? ToDatasetAccessRightsEnum()
+        {
+            if (accessRightsEnum == null) return null;
+            return (AccessRights)accessRightsEnum;
+        }
+    }
+
+    extension(ProcessedDataStewardship.Common.Organisation organisation)
+    {
+        public SOS.DataStewardship.Api.Contracts.Models.Organisation ToOrganisation()
+        {
+            if (organisation == null) return null;
+            return new SOS.DataStewardship.Api.Contracts.Models.Organisation
+            {
+                OrganisationID = organisation.OrganisationID,
+                OrganisationCode = organisation.OrganisationCode
+            };
+        }
+    }
+
+    extension(IEnumerable<ProcessedDataStewardship.Dataset.Methodology> methodologies)
+    {
+        public List<Methodology> ToMethodologies()
+        {
+            if (methodologies == null || !methodologies.Any()) return null;
+            return methodologies.Select(m => m.ToMethodology()).ToList();
+        }
+    }
+
+    extension(ProcessedDataStewardship.Dataset.Methodology methodology)
+    {
+        public Methodology ToMethodology()
+        {
+            if (methodology == null) return null;
+            return new Methodology
+            {
+                MethodologyDescription = methodology.MethodologyDescription,
+                MethodologyLink = methodology.MethodologyLink,
+                MethodologyName = methodology.MethodologyName,
+                SpeciesList = methodology.SpeciesList
+            };
+        }
+    }
+
+    extension(ProcessedDataStewardship.Event.Event observationEvent)
+    {
+        public Contracts.Models.Event ToEventModel(CoordinateSystem responseCoordinateSystem)
+        {
+            if (observationEvent == null) return null;
+
+            GetEventDates(
+                observationEvent.StartDate.Value,
+                observationEvent.EndDate.Value,
+                observationEvent.PlainStartDate,
+                observationEvent.PlainEndDate,
+                observationEvent.PlainStartTime,
+                observationEvent.PlainEndTime,
+                out DateOnly startDate,
+                out DateOnly endDate,
+                out TimeOnly? startTime,
+                out TimeOnly? endTime);
+
+            var ev = new Contracts.Models.Event();
+            ev.EventID = observationEvent.EventId;
+            ev.ParentEventID = observationEvent.ParentEventId;
+            ev.EventRemarks = observationEvent.EventRemarks;
+            ev.AssociatedMedia = observationEvent.Media?.ToAssociatedMedias();
+            ev.Dataset = observationEvent?.DataStewardship?.ToDatasetInfo();
+            ev.EventStartDateTime = observationEvent.StartDate.Value.ToLocalTime();
+            ev.EventEndDateTime = observationEvent.EndDate.Value.ToLocalTime();
+            ev.EventStartDate = startDate;
+            ev.EventEndDate = endDate;
+            ev.EventStartTime = startTime;
+            ev.EventEndTime = endTime;
+            ev.SamplingProtocol = observationEvent.SamplingProtocol;
+            ev.SurveyLocation = observationEvent?.Location?.ToLocation(responseCoordinateSystem);
+            ev.EventType = observationEvent?.EventType;
+            ev.LocationProtected = observationEvent.LocationProtected.GetValueOrDefault(false);
+            ev.Weather = observationEvent?.Weather?.ToWeatherVariable();
+            ev.RecorderCode = observationEvent.RecorderCode;
+            ev.RecorderOrganisation = observationEvent?.RecorderOrganisation?.Select(m => m.ToOrganisation()).ToList();
+
+            ev.OccurrenceIds = observationEvent?.OccurrenceIds;
+            ev.NoObservations = ev.OccurrenceIds == null || !ev.OccurrenceIds.Any();
+
+            return ev;
+        }
+    }
+
     private static void GetEventDates(
         DateTime startDate,
         DateTime endDate,
@@ -207,127 +237,159 @@ public static class DtoExtensions
         }            
     }
 
-    public static WeatherVariable ToWeatherVariable(this ProcessedDataStewardship.Event.WeatherVariable source)
-    {            
-        if (source == null) return null;
-
-        return new WeatherVariable
+    extension(ProcessedDataStewardship.Event.WeatherVariable source)
+    {
+        public WeatherVariable ToWeatherVariable()
         {
+            if (source == null) return null;
 
-            SnowCover = source.SnowCover?.ToSnowCover(),
-            Sunshine = source.Sunshine?.ToWeatherMeasuring(),
-            AirTemperature = source.AirTemperature?.ToWeatherMeasuring(),
-            WindDirectionCompass = source.WindDirectionCompass?.ToWindDirectionCompass(),
-            WindDirectionDegrees = source.WindDirectionDegrees?.ToWeatherMeasuring(),
-            WindSpeed = source.WindDirectionDegrees?.ToWeatherMeasuring(),
-            WindStrength = source.WindStrength?.ToWindStrength(),
-            Precipitation = source.Precipitation?.ToPrecipitation(),
-            Visibility = source.Visibility?.ToVisibility(),
-            Cloudiness = source.Cloudiness?.ToCloudiness()
-        };
+            return new WeatherVariable
+            {
+
+                SnowCover = source.SnowCover?.ToSnowCover(),
+                Sunshine = source.Sunshine?.ToWeatherMeasuring(),
+                AirTemperature = source.AirTemperature?.ToWeatherMeasuring(),
+                WindDirectionCompass = source.WindDirectionCompass?.ToWindDirectionCompass(),
+                WindDirectionDegrees = source.WindDirectionDegrees?.ToWeatherMeasuring(),
+                WindSpeed = source.WindDirectionDegrees?.ToWeatherMeasuring(),
+                WindStrength = source.WindStrength?.ToWindStrength(),
+                Precipitation = source.Precipitation?.ToPrecipitation(),
+                Visibility = source.Visibility?.ToVisibility(),
+                Cloudiness = source.Cloudiness?.ToCloudiness()
+            };
+        }
     }
 
-    private static Cloudiness ToCloudiness(this ProcessedDataStewardship.Enums.Cloudiness source)
+    extension(ProcessedDataStewardship.Enums.Cloudiness source)
     {
-        return (Cloudiness)source;
-    }
-
-    private static Visibility ToVisibility(this ProcessedDataStewardship.Enums.Visibility source)
-    {
-        return (Visibility)source;
-    }
-
-    private static Precipitation ToPrecipitation(this ProcessedDataStewardship.Enums.Precipitation source)
-    {
-        return (Precipitation)source;
-    }
-
-    private static WindStrength ToWindStrength(this ProcessedDataStewardship.Enums.WindStrength source)
-    {
-        return (WindStrength)source;
-    }
-
-    private static WindDirectionCompass ToWindDirectionCompass(this ProcessedDataStewardship.Enums.WindDirectionCompass source)
-    {
-        return (WindDirectionCompass)source;
-    }        
-
-    private static Contracts.Enums.Unit ToUnit(this ProcessedDataStewardship.Enums.Unit source)
-    {
-        return (Contracts.Enums.Unit)source;
-    }
-
-    private static SnowCover ToSnowCover(this ProcessedDataStewardship.Enums.SnowCover source)
-    {            
-        return (SnowCover)source;
-    }
-
-    public static WeatherMeasuring ToWeatherMeasuring(this ProcessedDataStewardship.Event.WeatherMeasuring source)
-    {
-        if (source == null) return null;
-
-        return new WeatherMeasuring
+        private Cloudiness ToCloudiness()
         {
-            Unit = source.Unit?.ToUnit(),
-            WeatherMeasure = source.WeatherMeasure
-        };
+            return (Cloudiness)source;
+        }
     }
 
-    public static DatasetInfo ToDatasetInfo(this DataStewardshipInfo source)
+    extension(ProcessedDataStewardship.Enums.Visibility source)
     {
-        if (source == null) return null;
-        return new DatasetInfo
+        private Visibility ToVisibility()
         {
-            Identifier = source.DatasetIdentifier,
-            Title = source.DatasetTitle,
-        };
+            return (Visibility)source;
+        }
     }
 
-    public static Contracts.Models.Event ToEventModel(this Observation observation, IEnumerable<string> occurrenceIds, CoordinateSystem responseCoordinateSystem)
+    extension(ProcessedDataStewardship.Enums.Precipitation source)
     {
-        if (observation == null) return null;
-
-        GetEventDates(
-            observation.Event.StartDate.Value,
-            observation.Event.EndDate.Value,
-            observation.Event.PlainStartDate,
-            observation.Event.PlainEndDate,
-            observation.Event.PlainStartTime,
-            observation.Event.PlainEndTime,
-            out DateOnly startDate,
-            out DateOnly endDate,
-            out TimeOnly? startTime,
-            out TimeOnly? endTime);
-
-        var ev = new Contracts.Models.Event();
-        ev.EventID = observation.Event.EventId;
-        ev.ParentEventID = observation.Event.ParentEventId;
-        ev.EventRemarks = observation.Event.EventRemarks;
-        ev.AssociatedMedia = observation.Event.Media.ToAssociatedMedias();
-        ev.Dataset = new DatasetInfo
+        private Precipitation ToPrecipitation()
         {
-            Identifier = observation.DataStewardship?.DatasetIdentifier,
-            Title = observation.DataStewardship?.DatasetTitle                
-        };
+            return (Precipitation)source;
+        }
+    }
 
-        ev.EventStartDateTime = observation.Event.StartDate.Value;
-        ev.EventEndDateTime = observation.Event.EndDate.Value;
-        ev.EventStartDate = startDate;
-        ev.EventEndDate = endDate;
-        ev.EventStartTime = startTime;
-        ev.EventEndTime = endTime;
-        ev.SamplingProtocol = observation.Event.SamplingProtocol;
-        ev.SurveyLocation = observation.Location.ToLocation(responseCoordinateSystem);            
-        //ev.LocationProtected = ?
-        //ev.EventType = ?
-        //ev.Weather = ?
-        ev.RecorderCode = new List<string>
+    extension(ProcessedDataStewardship.Enums.WindStrength source)
+    {
+        private WindStrength ToWindStrength()
+        {
+            return (WindStrength)source;
+        }
+    }
+
+    extension(ProcessedDataStewardship.Enums.WindDirectionCompass source)
+    {
+        private WindDirectionCompass ToWindDirectionCompass()
+        {
+            return (WindDirectionCompass)source;
+        }
+    }
+
+    extension(ProcessedDataStewardship.Enums.Unit source)
+    {
+        private Contracts.Enums.Unit ToUnit()
+        {
+            return (Contracts.Enums.Unit)source;
+        }
+    }
+
+    extension(ProcessedDataStewardship.Enums.SnowCover source)
+    {
+        private SnowCover ToSnowCover()
+        {
+            return (SnowCover)source;
+        }
+    }
+
+    extension(ProcessedDataStewardship.Event.WeatherMeasuring source)
+    {
+        public WeatherMeasuring ToWeatherMeasuring()
+        {
+            if (source == null) return null;
+
+            return new WeatherMeasuring
+            {
+                Unit = source.Unit?.ToUnit(),
+                WeatherMeasure = source.WeatherMeasure
+            };
+        }
+    }
+
+    extension(DataStewardshipInfo source)
+    {
+        public DatasetInfo ToDatasetInfo()
+        {
+            if (source == null) return null;
+            return new DatasetInfo
+            {
+                Identifier = source.DatasetIdentifier,
+                Title = source.DatasetTitle,
+            };
+        }
+    }
+
+    extension(Observation observation)
+    {
+        public Contracts.Models.Event ToEventModel(IEnumerable<string> occurrenceIds, CoordinateSystem responseCoordinateSystem)
+        {
+            if (observation == null) return null;
+
+            GetEventDates(
+                observation.Event.StartDate.Value,
+                observation.Event.EndDate.Value,
+                observation.Event.PlainStartDate,
+                observation.Event.PlainEndDate,
+                observation.Event.PlainStartTime,
+                observation.Event.PlainEndTime,
+                out DateOnly startDate,
+                out DateOnly endDate,
+                out TimeOnly? startTime,
+                out TimeOnly? endTime);
+
+            var ev = new Contracts.Models.Event();
+            ev.EventID = observation.Event.EventId;
+            ev.ParentEventID = observation.Event.ParentEventId;
+            ev.EventRemarks = observation.Event.EventRemarks;
+            ev.AssociatedMedia = observation.Event.Media.ToAssociatedMedias();
+            ev.Dataset = new DatasetInfo
+            {
+                Identifier = observation.DataStewardship?.DatasetIdentifier,
+                Title = observation.DataStewardship?.DatasetTitle
+            };
+
+            ev.EventStartDateTime = observation.Event.StartDate.Value;
+            ev.EventEndDateTime = observation.Event.EndDate.Value;
+            ev.EventStartDate = startDate;
+            ev.EventEndDate = endDate;
+            ev.EventStartTime = startTime;
+            ev.EventEndTime = endTime;
+            ev.SamplingProtocol = observation.Event.SamplingProtocol;
+            ev.SurveyLocation = observation.Location.ToLocation(responseCoordinateSystem);
+            //ev.LocationProtected = ?
+            //ev.EventType = ?
+            //ev.Weather = ?
+            ev.RecorderCode = new List<string>
         {
             observation.Occurrence.RecordedBy
         };
-        if (observation?.InstitutionCode?.Value != null || !string.IsNullOrEmpty(observation.InstitutionId))
-        {
-            ev.RecorderOrganisation = new List<Contracts.Models.Organisation>
+            if (observation?.InstitutionCode?.Value != null || !string.IsNullOrEmpty(observation.InstitutionId))
+            {
+                ev.RecorderOrganisation = new List<Contracts.Models.Organisation>
             {
                 new Contracts.Models.Organisation
                 {
@@ -335,33 +397,74 @@ public static class DtoExtensions
                     OrganisationCode = observation?.InstitutionCode?.Value
                 }
             };
+            }
+
+            ev.OccurrenceIds = occurrenceIds?.ToList();
+            ev.NoObservations = ev.OccurrenceIds == null || !ev.OccurrenceIds.Any();
+
+            return ev;
         }
 
-        ev.OccurrenceIds = occurrenceIds?.ToList();
-        ev.NoObservations = ev.OccurrenceIds == null || !ev.OccurrenceIds.Any();
+        public Contracts.Models.Occurrence ToOccurrenceModel(CoordinateSystem responseCoordinateSystem)
+        {
+            var occurrence = new Contracts.Models.Occurrence();
+            occurrence.AssociatedMedia = observation.Occurrence?.Media.ToAssociatedMedias();
+            if (observation?.BasisOfRecord?.Id != null)
+            {
+                occurrence.BasisOfRecord = GetBasisOfRecordEnum((BasisOfRecordId)observation.BasisOfRecord.Id);
+            }
 
-        return ev;
+            occurrence.EventID = observation.Event.EventId;
+            occurrence.Dataset = observation?.DataStewardship?.ToDatasetInfo();
+            occurrence.IdentificationVerificationStatus = observation?.Identification?.VerificationStatus?.Value;
+            occurrence.ObservationCertainty = observation?.Location?.CoordinateUncertaintyInMeters == null ? null : Convert.ToDouble(observation.Location.CoordinateUncertaintyInMeters);
+            occurrence.ObservationPoint = observation?.Location?.Point.Transform(CoordinateSys.WGS84, responseCoordinateSystem.ToCoordinateSys());
+            occurrence.EventStartDate = observation.Event.StartDate?.ToLocalTime();
+            occurrence.EventEndDate = observation.Event.EndDate?.ToLocalTime();
+            occurrence.ObservationTime = observation.Event.StartDate == observation.Event.EndDate ? observation.Event.StartDate?.ToLocalTime() : null;
+            occurrence.OccurrenceID = observation.Occurrence.OccurrenceId;
+            occurrence.OccurrenceRemarks = observation.Occurrence.OccurrenceRemarks;
+            occurrence.OccurrenceStatus = observation.Occurrence.IsPositiveObservation ? OccurrenceStatus.Observerad : OccurrenceStatus.InteObserverad;
+            occurrence.Quantity = observation.Occurrence.OrganismQuantityInt != null ? Convert.ToDouble(observation.Occurrence.OrganismQuantityInt) : 0;
+            if (observation?.Occurrence?.OrganismQuantityUnit?.Id != null)
+            {
+                occurrence.QuantityVariable = GetQuantityVariableEnum((UnitId)observation.Occurrence.OrganismQuantityUnit.Id);
+            }
+            occurrence.Taxon = observation?.Taxon?.ToTaxonModel();
+            //occurrence.Unit = ?
+            occurrence.Organism = new OrganismVariable
+            {
+                Sex = observation?.Occurrence?.Sex?.Id == null ? null : GetSexEnum((SexId)observation.Occurrence.Sex.Id),
+                Activity = observation?.Occurrence?.Activity?.Id == null ? null : GetActivityEnum((ActivityId)observation.Occurrence.Activity.Id),
+                LifeStage = observation?.Occurrence?.LifeStage?.Id == null ? null : GetLifeStageEnum((LifeStageId)observation.Occurrence.LifeStage.Id),
+            };
+
+            return occurrence;
+        }
     }
 
-    public static Contracts.Models.Location ToLocation(this Lib.Models.Processed.Observation.Location location, CoordinateSystem responseCoordinateSystem)
+    extension(Lib.Models.Processed.Observation.Location location)
     {
-        County? county = location?.County?.FeatureId?.GetCounty();
-        Municipality? municipality = location?.Municipality?.FeatureId?.GetMunicipality();
-        Parish? parish = location?.Parish?.FeatureId?.GetParish();
-        Province? province = location?.Province?.FeatureId?.GetProvince();            
-        return new Contracts.Models.Location()
+        public Contracts.Models.Location ToLocation(CoordinateSystem responseCoordinateSystem)
         {
-            County = county.Value,
-            Province = province.Value,
-            Municipality = municipality.Value,
-            Parish = parish.Value,
-            Locality = location?.Locality,
-            LocationID = location?.LocationId,
-            LocationRemarks = location.LocationRemarks,
-            LocationType = GetLocationType(location),
-            CoordinateUncertaintyInMeters = location?.CoordinateUncertaintyInMeters,
-            Emplacement = location?.Point.Transform(CoordinateSys.WGS84, responseCoordinateSystem.ToCoordinateSys()), // todo - decide if to use Point or PointWithBuffer                
-        };
+            County? county = location?.County?.FeatureId?.GetCounty();
+            Municipality? municipality = location?.Municipality?.FeatureId?.GetMunicipality();
+            Parish? parish = location?.Parish?.FeatureId?.GetParish();
+            Province? province = location?.Province?.FeatureId?.GetProvince();
+            return new Contracts.Models.Location()
+            {
+                County = county.Value,
+                Province = province.Value,
+                Municipality = municipality.Value,
+                Parish = parish.Value,
+                Locality = location?.Locality,
+                LocationID = location?.LocationId,
+                LocationRemarks = location.LocationRemarks,
+                LocationType = GetLocationType(location),
+                CoordinateUncertaintyInMeters = location?.CoordinateUncertaintyInMeters,
+                Emplacement = location?.Point.Transform(CoordinateSys.WGS84, responseCoordinateSystem.ToCoordinateSys()), // todo - decide if to use Point or PointWithBuffer                
+            };
+        }
     }
 
     private static Contracts.Enums.LocationType GetLocationType(Lib.Models.Processed.Observation.Location location)
@@ -377,23 +480,29 @@ public static class DtoExtensions
         }
     }
 
-    public static List<AssociatedMedia> ToAssociatedMedias(this IEnumerable<Multimedia> multimedias)
+    extension(IEnumerable<Multimedia> multimedias)
     {
-        if (multimedias == null || !multimedias.Any()) return null;
-        return multimedias.Select(m => m.ToAssociatedMedia()).ToList();
+        public List<AssociatedMedia> ToAssociatedMedias()
+        {
+            if (multimedias == null || !multimedias.Any()) return null;
+            return multimedias.Select(m => m.ToAssociatedMedia()).ToList();
+        }
     }
 
-    public static AssociatedMedia ToAssociatedMedia(this Multimedia multimedia)
+    extension(Multimedia multimedia)
     {
-        if (multimedia == null) return null;
-        return new AssociatedMedia
+        public AssociatedMedia ToAssociatedMedia()
         {
-            AssociatedMediaName = multimedia.Title,
-            AssociatedMediaType = GetAssociatedMediaTypeEnum(multimedia.Format),
-            AssociatedMediaLink = multimedia.Identifier,
-            License = multimedia.License,
-            RightsHolder = multimedia.RightsHolder
-        };
+            if (multimedia == null) return null;
+            return new AssociatedMedia
+            {
+                AssociatedMediaName = multimedia.Title,
+                AssociatedMediaType = GetAssociatedMediaTypeEnum(multimedia.Format),
+                AssociatedMediaLink = multimedia.Identifier,
+                License = multimedia.License,
+                RightsHolder = multimedia.RightsHolder
+            };
+        }
     }
 
     public static AssociatedMediaType GetAssociatedMediaTypeEnum(string format)
@@ -410,43 +519,6 @@ public static class DtoExtensions
             return AssociatedMediaType.Film;
 
         return AssociatedMediaType.Bild; // default
-    }
-
-    public static Contracts.Models.Occurrence ToOccurrenceModel(this Observation observation, CoordinateSystem responseCoordinateSystem)
-    {
-        var occurrence = new Contracts.Models.Occurrence();
-        occurrence.AssociatedMedia = observation.Occurrence?.Media.ToAssociatedMedias();
-        if (observation?.BasisOfRecord?.Id != null)
-        {
-            occurrence.BasisOfRecord = GetBasisOfRecordEnum((BasisOfRecordId)observation.BasisOfRecord.Id);
-        }
-
-        occurrence.EventID = observation.Event.EventId;
-        occurrence.Dataset = observation?.DataStewardship?.ToDatasetInfo();
-        occurrence.IdentificationVerificationStatus = observation?.Identification?.VerificationStatus?.Value;
-        occurrence.ObservationCertainty = observation?.Location?.CoordinateUncertaintyInMeters == null ? null : Convert.ToDouble(observation.Location.CoordinateUncertaintyInMeters);
-        occurrence.ObservationPoint = observation?.Location?.Point.Transform(CoordinateSys.WGS84, responseCoordinateSystem.ToCoordinateSys());
-        occurrence.EventStartDate = observation.Event.StartDate?.ToLocalTime();
-        occurrence.EventEndDate = observation.Event.EndDate?.ToLocalTime();
-        occurrence.ObservationTime = observation.Event.StartDate == observation.Event.EndDate ? observation.Event.StartDate?.ToLocalTime() : null;            
-        occurrence.OccurrenceID = observation.Occurrence.OccurrenceId;
-        occurrence.OccurrenceRemarks = observation.Occurrence.OccurrenceRemarks;
-        occurrence.OccurrenceStatus = observation.Occurrence.IsPositiveObservation ? OccurrenceStatus.Observerad : OccurrenceStatus.InteObserverad;
-        occurrence.Quantity = observation.Occurrence.OrganismQuantityInt != null ? Convert.ToDouble(observation.Occurrence.OrganismQuantityInt) : 0;
-        if (observation?.Occurrence?.OrganismQuantityUnit?.Id != null)
-        {
-            occurrence.QuantityVariable = GetQuantityVariableEnum((UnitId)observation.Occurrence.OrganismQuantityUnit.Id);
-        }
-        occurrence.Taxon = observation?.Taxon?.ToTaxonModel();
-        //occurrence.Unit = ?
-        occurrence.Organism = new OrganismVariable
-        {
-            Sex = observation?.Occurrence?.Sex?.Id == null ? null : GetSexEnum((SexId)observation.Occurrence.Sex.Id),
-            Activity = observation?.Occurrence?.Activity?.Id == null ? null : GetActivityEnum((ActivityId)observation.Occurrence.Activity.Id),
-            LifeStage = observation?.Occurrence?.LifeStage?.Id == null ? null : GetLifeStageEnum((LifeStageId)observation.Occurrence.LifeStage.Id),
-        };
-
-        return occurrence;            
     }
 
     public static BasisOfRecord GetBasisOfRecordEnum(BasisOfRecordId? basisOfRecordId)
@@ -476,17 +548,20 @@ public static class DtoExtensions
         };
     }
 
-    public static Contracts.Models.Taxon ToTaxonModel(this Lib.Models.Processed.Observation.Taxon taxon)
+    extension(Lib.Models.Processed.Observation.Taxon taxon)
     {
-        return new Contracts.Models.Taxon
+        public Contracts.Models.Taxon ToTaxonModel()
         {
-            ScientificName = taxon.ScientificName,
-            TaxonID = taxon.Id.ToString(),
-            TaxonRank = taxon.TaxonRank,
-            VernacularName = taxon.VernacularName,
-            VerbatimTaxonID = taxon.VerbatimId,
-            VerbatimName = taxon.VerbatimName
-        };
+            return new Contracts.Models.Taxon
+            {
+                ScientificName = taxon.ScientificName,
+                TaxonID = taxon.Id.ToString(),
+                TaxonRank = taxon.TaxonRank,
+                VernacularName = taxon.VernacularName,
+                VerbatimTaxonID = taxon.VerbatimId,
+                VerbatimName = taxon.VerbatimName
+            };
+        }
     }
 
     public static Sex? GetSexEnum(SexId? sexId)
@@ -619,201 +694,219 @@ public static class DtoExtensions
         };
     }
 
-    public static SearchFilter ToSearchFilter(this DatasetFilter datasetFilter)
+    extension(DatasetFilter datasetFilter)
     {
-        if (datasetFilter == null) return null;
-
-        var filter = new SearchFilter(0);
-        filter.DataStewardshipDatasetIds = datasetFilter.DatasetIds ?? datasetFilter.DatasetList;
-        filter.IsPartOfDataStewardshipDataset = true;
-        if (datasetFilter.Taxon?.Ids != null && datasetFilter.Taxon.Ids.Any())
+        public SearchFilter ToSearchFilter()
         {
-            filter.Taxa = new Lib.Models.Search.Filters.TaxonFilter
-            {
-                Ids = datasetFilter.Taxon.Ids,
-                IncludeUnderlyingTaxa = false
-            };
-        }
+            if (datasetFilter == null) return null;
 
-        if (datasetFilter.DateFilter != null)
-        {
-            filter.Date = new Lib.Models.Search.Filters.DateFilter
+            var filter = new SearchFilter(0);
+            filter.DataStewardshipDatasetIds = datasetFilter.DatasetIds ?? datasetFilter.DatasetList;
+            filter.IsPartOfDataStewardshipDataset = true;
+            if (datasetFilter.Taxon?.Ids != null && datasetFilter.Taxon.Ids.Any())
             {
-                StartDate = datasetFilter.DateFilter.StartDate,
-                EndDate = datasetFilter.DateFilter.EndDate,
-                DateFilterType = datasetFilter.DateFilter.DateFilterType.ToDateRangeFilterType()
-            };
-        }
-        else if (datasetFilter.Datum != null)
-        {
-            filter.Date = new Lib.Models.Search.Filters.DateFilter
+                filter.Taxa = new Lib.Models.Search.Filters.TaxonFilter
+                {
+                    Ids = datasetFilter.Taxon.Ids,
+                    IncludeUnderlyingTaxa = false
+                };
+            }
+
+            if (datasetFilter.DateFilter != null)
             {
-                StartDate = datasetFilter.Datum.StartDate,
-                EndDate = datasetFilter.Datum.EndDate,
-                DateFilterType = datasetFilter.Datum.DateFilterType.ToDateRangeFilterType()
-            };
+                filter.Date = new Lib.Models.Search.Filters.DateFilter
+                {
+                    StartDate = datasetFilter.DateFilter.StartDate,
+                    EndDate = datasetFilter.DateFilter.EndDate,
+                    DateFilterType = datasetFilter.DateFilter.DateFilterType.ToDateRangeFilterType()
+                };
+            }
+            else if (datasetFilter.Datum != null)
+            {
+                filter.Date = new Lib.Models.Search.Filters.DateFilter
+                {
+                    StartDate = datasetFilter.Datum.StartDate,
+                    EndDate = datasetFilter.Datum.EndDate,
+                    DateFilterType = datasetFilter.Datum.DateFilterType.ToDateRangeFilterType()
+                };
+            }
+
+            filter.Location = datasetFilter.Area?.ToLocationFilter();
+
+            return filter;
         }
-
-        filter.Location = datasetFilter.Area?.ToLocationFilter();
-
-        return filter;
     }
 
-    public static SearchFilter ToSearchFilter(this EventsFilter eventsFilter)
+    extension(EventsFilter eventsFilter)
     {
-        if (eventsFilter == null) return null;
+        public SearchFilter ToSearchFilter()
+        {
+            if (eventsFilter == null) return null;
 
-        var filter = new SearchFilter(0);
-        filter.DataStewardshipDatasetIds = eventsFilter.DatasetIds ?? eventsFilter.DatasetList;
-        filter.Event = new EventFilter
-        {
-            Ids = eventsFilter.EventIds
-        };
-        filter.IsPartOfDataStewardshipDataset = true;
-        if (eventsFilter.Taxon?.Ids?.Any() ?? false)
-        {
-            filter.Taxa = new Lib.Models.Search.Filters.TaxonFilter
+            var filter = new SearchFilter(0);
+            filter.DataStewardshipDatasetIds = eventsFilter.DatasetIds ?? eventsFilter.DatasetList;
+            filter.Event = new EventFilter
             {
-                Ids = eventsFilter.Taxon.Ids,
-                IncludeUnderlyingTaxa = false
+                Ids = eventsFilter.EventIds
             };
-        }
+            filter.IsPartOfDataStewardshipDataset = true;
+            if (eventsFilter.Taxon?.Ids?.Any() ?? false)
+            {
+                filter.Taxa = new Lib.Models.Search.Filters.TaxonFilter
+                {
+                    Ids = eventsFilter.Taxon.Ids,
+                    IncludeUnderlyingTaxa = false
+                };
+            }
 
-        if (eventsFilter.DateFilter != null)
-        {
-            filter.Date = new Lib.Models.Search.Filters.DateFilter
+            if (eventsFilter.DateFilter != null)
             {
-                StartDate = eventsFilter.DateFilter.StartDate,
-                EndDate = eventsFilter.DateFilter.EndDate,
-                DateFilterType = eventsFilter.DateFilter.DateFilterType.ToDateRangeFilterType()
-            };
-        }
-        else if (eventsFilter.Datum != null)
-        {
-            filter.Date = new Lib.Models.Search.Filters.DateFilter
+                filter.Date = new Lib.Models.Search.Filters.DateFilter
+                {
+                    StartDate = eventsFilter.DateFilter.StartDate,
+                    EndDate = eventsFilter.DateFilter.EndDate,
+                    DateFilterType = eventsFilter.DateFilter.DateFilterType.ToDateRangeFilterType()
+                };
+            }
+            else if (eventsFilter.Datum != null)
             {
-                StartDate = eventsFilter.Datum.StartDate,
-                EndDate = eventsFilter.Datum.EndDate,
-                DateFilterType = eventsFilter.Datum.DateFilterType.ToDateRangeFilterType()
-            };
-        }
-       
-        filter.Location = eventsFilter.Area?.ToLocationFilter();
+                filter.Date = new Lib.Models.Search.Filters.DateFilter
+                {
+                    StartDate = eventsFilter.Datum.StartDate,
+                    EndDate = eventsFilter.Datum.EndDate,
+                    DateFilterType = eventsFilter.Datum.DateFilterType.ToDateRangeFilterType()
+                };
+            }
 
-        return filter;
+            filter.Location = eventsFilter.Area?.ToLocationFilter();
+
+            return filter;
+        }
     }
 
-    public static SearchFilter ToSearchFilter(this OccurrenceFilter occurrenceFilter)
+    extension(OccurrenceFilter occurrenceFilter)
     {
-        if (occurrenceFilter == null) return null;
-
-        var filter = new SearchFilter(0);
-        filter.Event = new EventFilter { Ids = occurrenceFilter.EventIds };
-        filter.DataStewardshipDatasetIds = occurrenceFilter.DatasetIds ?? occurrenceFilter.DatasetList;
-        filter.IsPartOfDataStewardshipDataset = true;
-        if (occurrenceFilter.Taxon?.Ids != null && occurrenceFilter.Taxon.Ids.Any())
+        public SearchFilter ToSearchFilter()
         {
-            filter.Taxa = new Lib.Models.Search.Filters.TaxonFilter
+            if (occurrenceFilter == null) return null;
+
+            var filter = new SearchFilter(0);
+            filter.Event = new EventFilter { Ids = occurrenceFilter.EventIds };
+            filter.DataStewardshipDatasetIds = occurrenceFilter.DatasetIds ?? occurrenceFilter.DatasetList;
+            filter.IsPartOfDataStewardshipDataset = true;
+            if (occurrenceFilter.Taxon?.Ids != null && occurrenceFilter.Taxon.Ids.Any())
             {
-                Ids = occurrenceFilter.Taxon.Ids,
-                IncludeUnderlyingTaxa = false
+                filter.Taxa = new Lib.Models.Search.Filters.TaxonFilter
+                {
+                    Ids = occurrenceFilter.Taxon.Ids,
+                    IncludeUnderlyingTaxa = false
+                };
+            }
+
+            if (occurrenceFilter.DateFilter != null)
+            {
+                filter.Date = new Lib.Models.Search.Filters.DateFilter
+                {
+                    StartDate = occurrenceFilter.DateFilter.StartDate,
+                    EndDate = occurrenceFilter.DateFilter.EndDate,
+                    DateFilterType = occurrenceFilter.DateFilter.DateFilterType.ToDateRangeFilterType()
+                };
+            }
+            else if (occurrenceFilter.Datum != null)
+            {
+                filter.Date = new Lib.Models.Search.Filters.DateFilter
+                {
+                    StartDate = occurrenceFilter.Datum.StartDate,
+                    EndDate = occurrenceFilter.Datum.EndDate,
+                    DateFilterType = occurrenceFilter.Datum.DateFilterType.ToDateRangeFilterType()
+                };
+            }
+
+            filter.Location = occurrenceFilter.Area?.ToLocationFilter();
+
+            return filter;
+        }
+    }
+
+    extension(Contracts.Models.GeographicsFilter geographicsFilter)
+    {
+        public LocationFilter ToLocationFilter()
+        {
+            if (geographicsFilter == null) return null;
+            var locationFilter = new LocationFilter();
+            var areaFilter = new List<AreaFilter>();
+
+            // County
+            if (geographicsFilter.County != null)
+            {
+                areaFilter.Add(new AreaFilter
+                {
+                    AreaType = AreaType.County,
+                    FeatureId = ((int)geographicsFilter.County.Value).ToString()
+                });
+            }
+
+            if (geographicsFilter.Municipality != null)
+            {
+                areaFilter.Add(new AreaFilter
+                {
+                    AreaType = AreaType.Municipality,
+                    FeatureId = ((int)geographicsFilter.Municipality.Value).ToString()
+                });
+            }
+
+            if (geographicsFilter.Parish != null)
+            {
+                areaFilter.Add(new AreaFilter
+                {
+                    AreaType = AreaType.Parish,
+                    FeatureId = ((int)geographicsFilter.Parish.Value).ToString()
+                });
+            }
+
+            if (geographicsFilter.Province != null)
+            {
+                areaFilter.Add(new AreaFilter
+                {
+                    AreaType = AreaType.Province,
+                    FeatureId = ((int)geographicsFilter.Province.Value).ToString()
+                });
+            }
+
+            locationFilter.Geometries = geographicsFilter.Geometry?.ToGeographicsFilter() ?? geographicsFilter.Area?.ToGeographicsFilter();
+            locationFilter.Areas = areaFilter;
+            return locationFilter;
+        }
+    }
+
+    extension(GeometryFilter geographicsFilterArea)
+    {
+        public SOS.Lib.Models.Search.Filters.GeographicsFilter ToGeographicsFilter()
+        {
+            if (geographicsFilterArea == null) return null;
+            var geographicsFilter = new SOS.Lib.Models.Search.Filters.GeographicsFilter();
+            geographicsFilter.MaxDistanceFromPoint = geographicsFilterArea.MaxDistanceFromGeometries;
+            if (geographicsFilterArea.GeographicArea != null)
+            {
+                geographicsFilter.Geometries = new() { geographicsFilterArea.GeographicArea }; // todo - change filter type to List<IGeoShape>?
+            }
+
+            return geographicsFilter;
+        }
+    }
+
+    extension(DateFilterType dateFilterType)
+    {
+        public Lib.Models.Search.Filters.DateFilter.DateRangeFilterType ToDateRangeFilterType()
+        {
+            return dateFilterType switch
+            {
+                DateFilterType.OnlyStartDate => Lib.Models.Search.Filters.DateFilter.DateRangeFilterType.OnlyStartDate,
+                DateFilterType.OnlyEndDate => Lib.Models.Search.Filters.DateFilter.DateRangeFilterType.OnlyEndDate,
+                DateFilterType.OverlappingStartDateAndEndDate => Lib.Models.Search.Filters.DateFilter.DateRangeFilterType.OverlappingStartDateAndEndDate,
+                DateFilterType.BetweenStartDateAndEndDate => Lib.Models.Search.Filters.DateFilter.DateRangeFilterType.BetweenStartDateAndEndDate,
+                _ => Lib.Models.Search.Filters.DateFilter.DateRangeFilterType.OverlappingStartDateAndEndDate
             };
         }
-        
-        if (occurrenceFilter.DateFilter != null)
-        {
-            filter.Date = new Lib.Models.Search.Filters.DateFilter
-            {
-                StartDate = occurrenceFilter.DateFilter.StartDate,
-                EndDate = occurrenceFilter.DateFilter.EndDate,
-                DateFilterType = occurrenceFilter.DateFilter.DateFilterType.ToDateRangeFilterType()
-            };                
-        }
-        else if (occurrenceFilter.Datum != null)
-        {
-            filter.Date = new Lib.Models.Search.Filters.DateFilter
-            {
-                StartDate = occurrenceFilter.Datum.StartDate,
-                EndDate = occurrenceFilter.Datum.EndDate,
-                DateFilterType = occurrenceFilter.Datum.DateFilterType.ToDateRangeFilterType()
-            };
-        }
-
-        filter.Location = occurrenceFilter.Area?.ToLocationFilter();
-
-        return filter;
-    }
-
-    public static LocationFilter ToLocationFilter(this Contracts.Models.GeographicsFilter geographicsFilter)
-    {
-        if (geographicsFilter == null) return null;
-        var locationFilter = new LocationFilter();
-        var areaFilter = new List<AreaFilter>();
-
-        // County
-        if (geographicsFilter.County != null)
-        {
-            areaFilter.Add(new AreaFilter {
-                AreaType = AreaType.County,
-                FeatureId = ((int)geographicsFilter.County.Value).ToString()
-            });                                        
-        }
-
-        if (geographicsFilter.Municipality != null)
-        {
-            areaFilter.Add(new AreaFilter
-            {
-                AreaType = AreaType.Municipality,
-                FeatureId = ((int)geographicsFilter.Municipality.Value).ToString()
-            });
-        }
-
-        if (geographicsFilter.Parish != null)
-        {
-            areaFilter.Add(new AreaFilter
-            {
-                AreaType = AreaType.Parish,
-                FeatureId = ((int)geographicsFilter.Parish.Value).ToString()
-            });
-        }
-
-        if (geographicsFilter.Province != null)
-        {
-            areaFilter.Add(new AreaFilter
-            {
-                AreaType = AreaType.Province,
-                FeatureId = ((int)geographicsFilter.Province.Value).ToString()
-            });
-        }
-
-        locationFilter.Geometries = geographicsFilter.Geometry?.ToGeographicsFilter() ?? geographicsFilter.Area?.ToGeographicsFilter();
-        locationFilter.Areas = areaFilter;
-        return locationFilter;
-    }
-
-    public static SOS.Lib.Models.Search.Filters.GeographicsFilter ToGeographicsFilter(this GeometryFilter geographicsFilterArea)
-    {
-        if (geographicsFilterArea == null) return null;
-        var geographicsFilter = new SOS.Lib.Models.Search.Filters.GeographicsFilter();
-        geographicsFilter.MaxDistanceFromPoint = geographicsFilterArea.MaxDistanceFromGeometries;
-        if (geographicsFilterArea.GeographicArea != null)
-        {
-            geographicsFilter.Geometries = new () { geographicsFilterArea.GeographicArea }; // todo - change filter type to List<IGeoShape>?
-        }
-
-        return geographicsFilter;
-    }
-
-
-    public static Lib.Models.Search.Filters.DateFilter.DateRangeFilterType ToDateRangeFilterType(this DateFilterType dateFilterType)
-    {
-        return dateFilterType switch
-        {
-            DateFilterType.OnlyStartDate => Lib.Models.Search.Filters.DateFilter.DateRangeFilterType.OnlyStartDate,
-            DateFilterType.OnlyEndDate => Lib.Models.Search.Filters.DateFilter.DateRangeFilterType.OnlyEndDate,
-            DateFilterType.OverlappingStartDateAndEndDate => Lib.Models.Search.Filters.DateFilter.DateRangeFilterType.OverlappingStartDateAndEndDate,
-            DateFilterType.BetweenStartDateAndEndDate => Lib.Models.Search.Filters.DateFilter.DateRangeFilterType.BetweenStartDateAndEndDate,
-            _ =>  Lib.Models.Search.Filters.DateFilter.DateRangeFilterType.OverlappingStartDateAndEndDate
-        };
     }
 }

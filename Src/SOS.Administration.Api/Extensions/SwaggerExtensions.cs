@@ -8,70 +8,76 @@ using System.Linq;
 namespace SOS.Administration.Api.Extensions;
 
 public static class SwaggerExtensions
-{    
-    public static IServiceCollection SetupSwagger(this IServiceCollection services)
-    {       
-        services.AddSwaggerGen(
-            options =>
-            {
-                options.SwaggerDoc("v1",
-                    new OpenApiInfo
-                    {
-                        Title = "SOS.Administration.Api",
-                        Version = "v1",
-                        Description = "An API to handle various processing jobs" //,
-                        //TermsOfService = "None"
-                    });
-                // Set the comments path for the Swagger JSON and UI.
-                var currentAssembly = Assembly.GetExecutingAssembly();
-                var xmlDocs = currentAssembly.GetReferencedAssemblies()
-                    .Union(new AssemblyName[] { currentAssembly.GetName() })
-                    .Select(a => Path.Combine(Path.GetDirectoryName(currentAssembly.Location), $"{a.Name}.xml"))
-                    .Where(f => File.Exists(f)).ToArray();
-
-                Array.ForEach(xmlDocs, (d) =>
+{
+    extension(IServiceCollection services)
+    {
+        public IServiceCollection SetupSwagger()
+        {
+            services.AddSwaggerGen(
+                options =>
                 {
-                    options.IncludeXmlComments(d);
+                    options.SwaggerDoc("v1",
+                        new OpenApiInfo
+                        {
+                            Title = "SOS.Administration.Api",
+                            Version = "v1",
+                            Description = "An API to handle various processing jobs" //,
+                                                                                     //TermsOfService = "None"
+                        });
+                    // Set the comments path for the Swagger JSON and UI.
+                    var currentAssembly = Assembly.GetExecutingAssembly();
+                    var xmlDocs = currentAssembly.GetReferencedAssemblies()
+                        .Union(new AssemblyName[] { currentAssembly.GetName() })
+                        .Select(a => Path.Combine(Path.GetDirectoryName(currentAssembly.Location), $"{a.Name}.xml"))
+                        .Where(f => File.Exists(f)).ToArray();
+
+                    Array.ForEach(xmlDocs, (d) =>
+                    {
+                        options.IncludeXmlComments(d);
+                    });
                 });
+
+            return services;
+        }
+    }
+
+    extension(WebApplication app)
+    {
+        public WebApplication ApplyUseSwagger()
+        {
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "ObservationProcessingJobs API, version 1");
             });
 
-        return services;
-    }
+            return app;
+        }
 
-    public static WebApplication ApplyUseSwagger(this WebApplication app)
-    {
-        app.UseSwagger();
-        app.UseSwaggerUI(c =>
+        public WebApplication PreventSwaggerCaching()
         {
-            c.SwaggerEndpoint("/swagger/v1/swagger.json", "ObservationProcessingJobs API, version 1");
-        });
-
-        return app;
-    }
-
-    public static WebApplication PreventSwaggerCaching(this WebApplication app)
-    {
-        //  Prevent caching on Swagger UI and swagger.json
-        app.Use(async (context, next) =>
-        {
-            try
+            //  Prevent caching on Swagger UI and swagger.json
+            app.Use(async (context, next) =>
             {
-                if (context.Request.Path.StartsWithSegments("/swagger", StringComparison.OrdinalIgnoreCase))
+                try
                 {
-                    context.Response.Headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0";
-                    context.Response.Headers["Pragma"] = "no-cache";
-                    context.Response.Headers["Expires"] = "0";
+                    if (context.Request.Path.StartsWithSegments("/swagger", StringComparison.OrdinalIgnoreCase))
+                    {
+                        context.Response.Headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0";
+                        context.Response.Headers["Pragma"] = "no-cache";
+                        context.Response.Headers["Expires"] = "0";
+                    }
+
+                    await next();
                 }
+                catch (TaskCanceledException) { }
+                catch (Exception)
+                {
+                    throw;
+                }
+            });
 
-                await next();
-            }
-            catch (TaskCanceledException) { }
-            catch (Exception)
-            {                
-                throw;
-            }
-        });
-
-        return app;
+            return app;
+        }
     }
 }

@@ -21,27 +21,36 @@ public static class ElasticSearchResponseExtensions
         throw new InvalidOperationException(debugInformation);
     }
 
-    public static void ThrowIfInvalid<T>(this SearchResponse<T> response) where T : class
+    extension<T>(SearchResponse<T> response) where T : class
     {
-        if (!response?.IsValidResponse ?? true)
+        public void ThrowIfInvalid()
         {
-            ThrowException(response.ElasticsearchServerError, response.DebugInformation);
+            if (!response?.IsValidResponse ?? true)
+            {
+                ThrowException(response.ElasticsearchServerError, response.DebugInformation);
+            }
         }
     }
 
-    public static void ThrowIfInvalid(this CountResponse response)
+    extension(CountResponse response)
     {
-        if (!response.IsValidResponse)
+        public void ThrowIfInvalid()
         {
-            ThrowException(response.ElasticsearchServerError, response.DebugInformation);
+            if (!response.IsValidResponse)
+            {
+                ThrowException(response.ElasticsearchServerError, response.DebugInformation);
+            }
         }
     }
 
-    public static void ThrowIfInvalid(this OpenPointInTimeResponse response)
+    extension(OpenPointInTimeResponse response)
     {
-        if (!response?.IsValidResponse ?? true)
+        public void ThrowIfInvalid()
         {
-            ThrowException(response.ElasticsearchServerError, response.DebugInformation);
+            if (!response?.IsValidResponse ?? true)
+            {
+                ThrowException(response.ElasticsearchServerError, response.DebugInformation);
+            }
         }
     }
 }

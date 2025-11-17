@@ -6,38 +6,44 @@ namespace SOS.Shared.Api.Extensions.Dto;
 
 public static class AnalysisExtensions
 {
-    public static PagedAggregationResultDto<UserAggregationResponseDto> ToDto(this PagedAggregationResult<UserAggregationResponse> result)
+    extension(PagedAggregationResult<UserAggregationResponse> result)
     {
-        if (result == null)
+        public PagedAggregationResultDto<UserAggregationResponseDto> ToDto()
         {
-            return null!;
-        }
-
-        return new PagedAggregationResultDto<UserAggregationResponseDto>
-        {
-            AfterKey = result.AfterKey,
-            Records = result.Records?.Select(r => new UserAggregationResponseDto
+            if (result == null)
             {
-                AggregationField = r.AggregationField,
-                Count = r.Count,
-                UniqueTaxon = r.UniqueTaxon,
-                OrganismQuantity = r.OrganismQuantity
-            })
-        };
+                return null!;
+            }
+
+            return new PagedAggregationResultDto<UserAggregationResponseDto>
+            {
+                AfterKey = result.AfterKey,
+                Records = result.Records?.Select(r => new UserAggregationResponseDto
+                {
+                    AggregationField = r.AggregationField,
+                    Count = r.Count,
+                    UniqueTaxon = r.UniqueTaxon,
+                    OrganismQuantity = r.OrganismQuantity
+                })
+            };
+        }
     }
 
-    public static IEnumerable<AggregationItemOrganismQuantityDto> ToDto(this IEnumerable<AggregationItem> result)
+    extension(IEnumerable<AggregationItem> result)
     {
-        if (result == null)
+        public IEnumerable<AggregationItemOrganismQuantityDto> ToDto()
         {
-            return null!;
-        }
+            if (result == null)
+            {
+                return null!;
+            }
 
-        return result.Select(item => new AggregationItemOrganismQuantityDto
-        {
-            AggregationKey = item.AggregationKey,
-            DocCount = item.DocCount,
-            OrganismQuantity = item.OrganismQuantity
-        });
+            return result.Select(item => new AggregationItemOrganismQuantityDto
+            {
+                AggregationKey = item.AggregationKey,
+                DocCount = item.DocCount,
+                OrganismQuantity = item.OrganismQuantity
+            });
+        }
     }
 }

@@ -124,7 +124,6 @@ public class ExportsController : ControllerBase
     /// <param name="confirmEncryptPassword"></param>
     /// <param name="roleId"></param>
     /// <param name="applicationIdentifier"></param>
-    /// <param name="skipMatchCount"></param>
     /// <returns></returns>
     private async Task<(IActionResult Result, long? Count)> OrderValidateAsync(
         SearchFilterBaseDto filter,
@@ -236,7 +235,6 @@ public class ExportsController : ControllerBase
     /// Return file
     /// </summary>
     /// <param name="filePath"></param>
-    /// <param name="fileName"></param>
     /// <param name="contentType"></param>
     /// <returns></returns>
     private IActionResult GetFile(string filePath, string contentType)

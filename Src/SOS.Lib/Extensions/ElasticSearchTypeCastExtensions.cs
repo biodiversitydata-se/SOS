@@ -8,131 +8,155 @@ namespace SOS.Lib.Extensions;
 
 public static class ElasticSearchTypeCastExtensions
 {
-    /// Cast Readonly dictionary to fluent dictionary
-    public static FluentDictionary<TKey, TValue> ToFluentDictionary<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> readOnlyDictionary)
+    extension<TKey, TValue>(IReadOnlyDictionary<TKey, TValue> readOnlyDictionary)
     {
-        if ((readOnlyDictionary?.Count ?? 0) == 0)
+        /// Cast Readonly dictionary to fluent dictionary
+        public FluentDictionary<TKey, TValue> ToFluentDictionary()
         {
-            return null;
-        }
+            if ((readOnlyDictionary?.Count ?? 0) == 0)
+            {
+                return null;
+            }
 
-        var fluentDictionary = new FluentDictionary<TKey, TValue>();
-        foreach (var item in readOnlyDictionary)
+            var fluentDictionary = new FluentDictionary<TKey, TValue>();
+            foreach (var item in readOnlyDictionary)
+            {
+                fluentDictionary.Add(item.Key, item.Value);
+            }
+
+            return fluentDictionary;
+        }
+    }
+
+    extension(IReadOnlyDictionary<string, FieldValue> readOnlyDictionary)
+    {
+        public FluentDictionary<Field, FieldValue> ToFluentFieldDictionary()
         {
-            fluentDictionary.Add(item.Key, item.Value);
-        }
+            if ((readOnlyDictionary?.Count ?? 0) == 0)
+            {
+                return null;
+            }
 
-        return fluentDictionary;
+            var fluentDictionary = new FluentDictionary<Field, FieldValue>();
+            foreach (var item in readOnlyDictionary)
+            {
+                fluentDictionary.Add(item.Key, item.Value);
+            }
+
+            return fluentDictionary;
+        }
     }
 
-    public static FluentDictionary<Field, FieldValue> ToFluentFieldDictionary(this IReadOnlyDictionary<string, FieldValue> readOnlyDictionary)
+    extension(IEnumerable<bool> termList)
     {
-        if ((readOnlyDictionary?.Count ?? 0) == 0)
+        #region To Elastic Types
+        /// <summary>
+        /// Cast list of boolean to TermsQueryField
+        /// </summary>
+        /// <returns></returns>
+        public TermsQueryField ToTermsQueryField()
         {
-            return null;
+            return new TermsQueryField(termList?.Select(v => FieldValue.Boolean(v)).ToArray());
         }
+    }
 
-        var fluentDictionary = new FluentDictionary<Field, FieldValue>();
-        foreach (var item in readOnlyDictionary)
+    extension(IEnumerable<double> termList)
+    {
+        /// <summary>
+        /// Cast list of double to TermsQueryField
+        /// </summary>
+        /// <returns></returns>
+        public TermsQueryField ToTermsQueryField()
         {
-            fluentDictionary.Add(item.Key, item.Value);
+            return new TermsQueryField(termList?.Select(v => FieldValue.Double(v)).ToArray());
         }
-
-        return fluentDictionary;
     }
 
-    #region To Elastic Types
-    /// <summary>
-    /// Cast list of boolean to TermsQueryField
-    /// </summary>
-    /// <param name="termList"></param>
-    /// <returns></returns>
-    public static TermsQueryField ToTermsQueryField(this IEnumerable<bool> termList)
+    extension(IEnumerable<long> termList)
     {
-        return new TermsQueryField(termList?.Select(v => FieldValue.Boolean(v)).ToArray());
-    }
-
-    /// <summary>
-    /// Cast list of double to TermsQueryField
-    /// </summary>
-    /// <param name="termList"></param>
-    /// <returns></returns>
-    public static TermsQueryField ToTermsQueryField(this IEnumerable<double> termList)
-    {
-        return new TermsQueryField(termList?.Select(v => FieldValue.Double(v)).ToArray());
-    }
-
-    /// <summary>
-    /// Cast list of long to TermsQueryField
-    /// </summary>
-    /// <param name="termList"></param>
-    /// <returns></returns>
-    public static TermsQueryField ToTermsQueryField(this IEnumerable<long> termList)
-    {
-        return new TermsQueryField(termList?.Select(v => FieldValue.Long(v)).ToArray());
-    }
-
-    /// <summary>
-    /// Cast list of string to TermsQueryField
-    /// </summary>
-    /// <param name="termList"></param>
-    /// <returns></returns>
-    public static TermsQueryField ToTermsQueryField(this IEnumerable<string> termList)
-    {
-        return new TermsQueryField(termList?.Select(v => FieldValue.String(v)).ToArray());
-    }
-    
-
-    /// <summary>
-    /// Cast property to field
-    /// </summary>
-    /// <param name="property"></param>
-    /// <returns></returns>
-    public static Field ToField(this string property)
-    {
-        return new Field(string.Join('.', property.Split('.').Select(p => p
-            .ToCamelCase()
-        )));
-    }
-
-    public static Fields ToFields(this IEnumerable<string> properties)
-    {
-        return Fields.FromFields(properties?.Select(s => s.ToField())?.ToArray());
-    }
-
-    public static FieldValue ToFieldValue<TValue>(this TValue value)
-    {
-        if (value == null)
+        /// <summary>
+        /// Cast list of long to TermsQueryField
+        /// </summary>
+        /// <returns></returns>
+        public TermsQueryField ToTermsQueryField()
         {
-            return null;
+            return new TermsQueryField(termList?.Select(v => FieldValue.Long(v)).ToArray());
         }
-        var boolValue = value as bool?;
-        if (boolValue ?? false)
-        {
-            return FieldValue.Boolean(boolValue ?? false);
-        }
-        var doubleValue = value as double?;
-        if (doubleValue != null)
-        {
-            return FieldValue.Double(doubleValue ?? 0);
-        }
-        var longValue = value as long?;
-        var intValue = value as int?;
-        var shortValue = value as long?;
-        var byteValue = value as long?;
-        if (longValue != null ||
-            intValue != null ||
-            shortValue != null ||
-            byteValue != null)
-        {
-            return FieldValue.Long(longValue ?? intValue ?? shortValue ?? byteValue ?? 0);
-        }
-        return FieldValue.String(value?.ToString());
     }
 
-    public static IReadOnlyCollection<FieldValue> ToFieldValues<TValue>(this IEnumerable<TValue> values)
+    extension(IEnumerable<string> termList)
     {
-        return values?.Select(v => v.ToFieldValue()).ToList();
+        /// <summary>
+        /// Cast list of string to TermsQueryField
+        /// </summary>
+        /// <returns></returns>
+        public TermsQueryField ToTermsQueryField()
+        {
+            return new TermsQueryField(termList?.Select(v => FieldValue.String(v)).ToArray());
+        }
+    }
+
+    extension(string property)
+    {
+        /// <summary>
+        /// Cast property to field
+        /// </summary>
+        /// <returns></returns>
+        public Field ToField()
+        {
+            return new Field(string.Join('.', property.Split('.').Select(p => p
+                .ToCamelCase()
+            )));
+        }
+    }
+
+    extension(IEnumerable<string> properties)
+    {
+        public Fields ToFields()
+        {
+            return Fields.FromFields(properties?.Select(s => s.ToField())?.ToArray());
+        }
+    }
+
+    extension<TValue>(TValue value)
+    {
+        public FieldValue ToFieldValue()
+        {
+            if (value == null)
+            {
+                return null;
+            }
+            var boolValue = value as bool?;
+            if (boolValue ?? false)
+            {
+                return FieldValue.Boolean(boolValue ?? false);
+            }
+            var doubleValue = value as double?;
+            if (doubleValue != null)
+            {
+                return FieldValue.Double(doubleValue ?? 0);
+            }
+            var longValue = value as long?;
+            var intValue = value as int?;
+            var shortValue = value as long?;
+            var byteValue = value as long?;
+            if (longValue != null ||
+                intValue != null ||
+                shortValue != null ||
+                byteValue != null)
+            {
+                return FieldValue.Long(longValue ?? intValue ?? shortValue ?? byteValue ?? 0);
+            }
+            return FieldValue.String(value?.ToString());
+        }
+    }
+
+    extension<TValue>(IEnumerable<TValue> values)
+    {
+        public IReadOnlyCollection<FieldValue> ToFieldValues()
+        {
+            return values?.Select(v => v.ToFieldValue()).ToList();
+        }
     }
 
     #endregion To Elastic Types

@@ -4,30 +4,36 @@ namespace SOS.DataStewardship.Api.Extensions;
 
 public static class EndpointDefinitionExtensions
 {
-    public static void AddEndpointDefinitions(
-        this IServiceCollection services, params Type[] scanMarkers)
+    extension(IServiceCollection services)
     {
-        var endpointDefinitions = new List<IEndpointDefinition>();
-
-        foreach (var marker in scanMarkers)
+        public void AddEndpointDefinitions(
+params Type[] scanMarkers)
         {
-            endpointDefinitions.AddRange(
-                marker.Assembly.ExportedTypes
-                    .Where(x => typeof(IEndpointDefinition).IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract)
-                    .Select(Activator.CreateInstance).Cast<IEndpointDefinition>()
-                );
-        }
+            var endpointDefinitions = new List<IEndpointDefinition>();
 
-        services.AddSingleton(endpointDefinitions as IReadOnlyCollection<IEndpointDefinition>);
+            foreach (var marker in scanMarkers)
+            {
+                endpointDefinitions.AddRange(
+                    marker.Assembly.ExportedTypes
+                        .Where(x => typeof(IEndpointDefinition).IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract)
+                        .Select(Activator.CreateInstance).Cast<IEndpointDefinition>()
+                    );
+            }
+
+            services.AddSingleton(endpointDefinitions as IReadOnlyCollection<IEndpointDefinition>);
+        }
     }
 
-    public static void UseEndpointDefinitions(this WebApplication app)
+    extension(WebApplication app)
     {
-        var definitions = app.Services.GetRequiredService<IReadOnlyCollection<IEndpointDefinition>>();
-
-        foreach (var endpointDefinition in definitions)
+        public void UseEndpointDefinitions()
         {
-            endpointDefinition.DefineEndpoint(app);
+            var definitions = app.Services.GetRequiredService<IReadOnlyCollection<IEndpointDefinition>>();
+
+            foreach (var endpointDefinition in definitions)
+            {
+                endpointDefinition.DefineEndpoint(app);
+            }
         }
     }
 }

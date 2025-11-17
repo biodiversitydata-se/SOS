@@ -2,33 +2,36 @@
 
 internal static class ExceptionMiddlewareExtension
 {
-    internal static void ConfigureExceptionHandler(this IApplicationBuilder app, bool isDevelopment)
+    extension(IApplicationBuilder app)
     {
-        app.UseExceptionHandler(error =>
+        internal void ConfigureExceptionHandler(bool isDevelopment)
         {
-            error.Run(async context =>
+            app.UseExceptionHandler(error =>
             {
-                var errorAsString = string.Empty;
-                var contextFeature = context.Features.Get<IExceptionHandlerPathFeature>();
-                if (contextFeature != null)
+                error.Run(async context =>
                 {
-                    var exception = contextFeature.Error;
-                    context.Response.ContentType = "application/json";
-                    context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                    errorAsString = exception.Message;
-                    Log.Logger.Error(exception, errorAsString);
-                }
-                else
-                {
-                    errorAsString = "An error occurred";
-                }
-                                                
-                await Results.Problem(
-                    title: "An error occurred while processing your request.",
-                    detail: isDevelopment ? errorAsString : string.Empty,
-                    type: "https://tools.ietf.org/html/rfc7231#section-6.6.1",
-                    statusCode: 500).ExecuteAsync(context);
+                    var errorAsString = string.Empty;
+                    var contextFeature = context.Features.Get<IExceptionHandlerPathFeature>();
+                    if (contextFeature != null)
+                    {
+                        var exception = contextFeature.Error;
+                        context.Response.ContentType = "application/json";
+                        context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                        errorAsString = exception.Message;
+                        Log.Logger.Error(exception, errorAsString);
+                    }
+                    else
+                    {
+                        errorAsString = "An error occurred";
+                    }
+
+                    await Results.Problem(
+                        title: "An error occurred while processing your request.",
+                        detail: isDevelopment ? errorAsString : string.Empty,
+                        type: "https://tools.ietf.org/html/rfc7231#section-6.6.1",
+                        statusCode: 500).ExecuteAsync(context);
+                });
             });
-        });
+        }
     }
 }

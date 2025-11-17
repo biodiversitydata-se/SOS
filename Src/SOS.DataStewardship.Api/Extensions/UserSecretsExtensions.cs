@@ -2,9 +2,12 @@
 
 public static class UserSecretsExtensions
 {
-    public static WebApplicationBuilder SetupUserSecrets(this WebApplicationBuilder webApplicationBuilder)
+    extension(WebApplicationBuilder webApplicationBuilder)
     {
-        webApplicationBuilder.Configuration.AddUserSecrets(Assembly.GetExecutingAssembly(), true);
-        return webApplicationBuilder;
+        public WebApplicationBuilder SetupUserSecrets()
+        {
+            webApplicationBuilder.Configuration.AddUserSecrets(Assembly.GetExecutingAssembly(), true);
+            return webApplicationBuilder;
+        }
     }
 }

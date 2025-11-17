@@ -33,77 +33,80 @@ public static class SerilogExtensions
             .CreateLogger();
     }
 
-    public static WebApplication ApplyUseSerilogRequestLogging(this WebApplication app)
+    extension(WebApplication app)
     {
-        app.UseSerilogRequestLogging(options =>
+        public WebApplication ApplyUseSerilogRequestLogging()
         {
-            options.EnrichDiagnosticContext = (diagnosticContext, httpContext) =>
+            app.UseSerilogRequestLogging(options =>
             {
-                if (httpContext.Items.TryGetValue("UserId", out var userId))
+                options.EnrichDiagnosticContext = (diagnosticContext, httpContext) =>
                 {
-                    diagnosticContext.Set("UserId", userId);
-                }
-
-                if (httpContext.Items.TryGetValue("Email", out var email))
-                {
-                    diagnosticContext.Set("Email", email);
-                }
-
-                if (httpContext.Items.TryGetValue("Endpoint", out var endpoint))
-                {
-                    diagnosticContext.Set("Endpoint", endpoint);
-                }
-
-                if (httpContext.Items.TryGetValue("QueryString", out var queryString))
-                {
-                    diagnosticContext.Set("QueryString", queryString);
-                }
-
-                if (httpContext.Items.TryGetValue("Handler", out var handler))
-                {
-                    diagnosticContext.Set("Handler", handler);
-                }
-
-                if (httpContext.Items.TryGetValue("ApiUserType", out var apiUserType))
-                {
-                    diagnosticContext.Set("ApiUserType", apiUserType);
-                }
-
-                if (httpContext.Items.TryGetValue("SemaphoreStatus", out var semaphoreStatus))
-                {
-                    diagnosticContext.Set("SemaphoreStatus", semaphoreStatus);
-                }
-
-                if (httpContext.Items.TryGetValue("SemaphoreWaitSeconds", out var semaphoreWaitSeconds))
-                {
-                    diagnosticContext.Set("SemaphoreWaitSeconds", semaphoreWaitSeconds);
-                }
-
-                try
-                {
-                    var authHeader = httpContext.Request.Headers["Authorization"].FirstOrDefault();
-                    if (authHeader != null && authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+                    if (httpContext.Items.TryGetValue("UserId", out var userId))
                     {
-                        string token = authHeader.Replace("Bearer ", "", StringComparison.OrdinalIgnoreCase);
-                        var jsonWebTokenHandler = new JsonWebTokenHandler();
-                        var jwt = jsonWebTokenHandler.ReadJsonWebToken(token);
-                        if (jwt != null)
+                        diagnosticContext.Set("UserId", userId);
+                    }
+
+                    if (httpContext.Items.TryGetValue("Email", out var email))
+                    {
+                        diagnosticContext.Set("Email", email);
+                    }
+
+                    if (httpContext.Items.TryGetValue("Endpoint", out var endpoint))
+                    {
+                        diagnosticContext.Set("Endpoint", endpoint);
+                    }
+
+                    if (httpContext.Items.TryGetValue("QueryString", out var queryString))
+                    {
+                        diagnosticContext.Set("QueryString", queryString);
+                    }
+
+                    if (httpContext.Items.TryGetValue("Handler", out var handler))
+                    {
+                        diagnosticContext.Set("Handler", handler);
+                    }
+
+                    if (httpContext.Items.TryGetValue("ApiUserType", out var apiUserType))
+                    {
+                        diagnosticContext.Set("ApiUserType", apiUserType);
+                    }
+
+                    if (httpContext.Items.TryGetValue("SemaphoreStatus", out var semaphoreStatus))
+                    {
+                        diagnosticContext.Set("SemaphoreStatus", semaphoreStatus);
+                    }
+
+                    if (httpContext.Items.TryGetValue("SemaphoreWaitSeconds", out var semaphoreWaitSeconds))
+                    {
+                        diagnosticContext.Set("SemaphoreWaitSeconds", semaphoreWaitSeconds);
+                    }
+
+                    try
+                    {
+                        var authHeader = httpContext.Request.Headers["Authorization"].FirstOrDefault();
+                        if (authHeader != null && authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
                         {
-                            string? clientId = jwt.Claims.FirstOrDefault(c => c.Type == "client_id")?.Value;
-                            if (clientId != null) diagnosticContext.Set("ClientId", clientId);
-                            string? name = jwt.Claims.FirstOrDefault(c => c.Type == "name")?.Value;
-                            if (name != null) diagnosticContext.Set("Name", name);
-                            if (jwt.Subject != null) diagnosticContext.Set("Subject", jwt.Subject);
+                            string token = authHeader.Replace("Bearer ", "", StringComparison.OrdinalIgnoreCase);
+                            var jsonWebTokenHandler = new JsonWebTokenHandler();
+                            var jwt = jsonWebTokenHandler.ReadJsonWebToken(token);
+                            if (jwt != null)
+                            {
+                                string? clientId = jwt.Claims.FirstOrDefault(c => c.Type == "client_id")?.Value;
+                                if (clientId != null) diagnosticContext.Set("ClientId", clientId);
+                                string? name = jwt.Claims.FirstOrDefault(c => c.Type == "name")?.Value;
+                                if (name != null) diagnosticContext.Set("Name", name);
+                                if (jwt.Subject != null) diagnosticContext.Set("Subject", jwt.Subject);
+                            }
                         }
                     }
-                }
-                catch (Exception ex)
-                {
-                    Log.Logger.Error(ex, "Error when deserializing JWT.");
-                }
-            };
-        });
+                    catch (Exception ex)
+                    {
+                        Log.Logger.Error(ex, "Error when deserializing JWT.");
+                    }
+                };
+            });
 
-        return app;
+            return app;
+        }
     }
 }

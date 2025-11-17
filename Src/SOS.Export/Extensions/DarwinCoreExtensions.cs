@@ -11,49 +11,55 @@ namespace SOS.Export.Extensions;
 /// </summary>
 public static class DarwinCoreExtensions
 {
-    /// <summary>
-    ///     Cast processed Darwin Core object to Darwin Core Archive
-    /// </summary>
-    /// <param name="processedDarwinCore"></param>
-    /// <returns></returns>
-    public static DwC ToDarwinCoreArchive(this DarwinCore processedDarwinCore)
+    extension(DarwinCore processedDarwinCore)
     {
-        if (processedDarwinCore == null)
+        /// <summary>
+        ///     Cast processed Darwin Core object to Darwin Core Archive
+        /// </summary>
+        /// <param name="processedDarwinCore"></param>
+        /// <returns></returns>
+        public DwC ToDarwinCoreArchive()
         {
-            return null;
-        }
+            if (processedDarwinCore == null)
+            {
+                return null;
+            }
 
-        return new DwC
-        {
-            AccessRights = processedDarwinCore.AccessRights,
-            BasisOfRecord = processedDarwinCore.BasisOfRecord,
-            BibliographicCitation = processedDarwinCore.BibliographicCitation,
-            CollectionCode = processedDarwinCore.CollectionCode,
-            CollectionID = processedDarwinCore.CollectionID,
-            DataGeneralizations = processedDarwinCore.DataGeneralizations,
-            DatasetID = processedDarwinCore.DatasetID,
-            DatasetName = processedDarwinCore.DatasetName,
-            DynamicProperties = JsonConvert.SerializeObject(processedDarwinCore.DynamicProperties),
-            InformationWithheld = processedDarwinCore.InformationWithheld,
-            InstitutionCode = processedDarwinCore.InstitutionCode,
-            InstitutionID = processedDarwinCore.InstitutionID,
-            Language = processedDarwinCore.Language,
-            Modified = processedDarwinCore.Modified,
-            References = processedDarwinCore.References,
-            Rights = processedDarwinCore.Rights,
-            RightsHolder = processedDarwinCore.RightsHolder,
-            Type = processedDarwinCore.Type
-        };
+            return new DwC
+            {
+                AccessRights = processedDarwinCore.AccessRights,
+                BasisOfRecord = processedDarwinCore.BasisOfRecord,
+                BibliographicCitation = processedDarwinCore.BibliographicCitation,
+                CollectionCode = processedDarwinCore.CollectionCode,
+                CollectionID = processedDarwinCore.CollectionID,
+                DataGeneralizations = processedDarwinCore.DataGeneralizations,
+                DatasetID = processedDarwinCore.DatasetID,
+                DatasetName = processedDarwinCore.DatasetName,
+                DynamicProperties = JsonConvert.SerializeObject(processedDarwinCore.DynamicProperties),
+                InformationWithheld = processedDarwinCore.InformationWithheld,
+                InstitutionCode = processedDarwinCore.InstitutionCode,
+                InstitutionID = processedDarwinCore.InstitutionID,
+                Language = processedDarwinCore.Language,
+                Modified = processedDarwinCore.Modified,
+                References = processedDarwinCore.References,
+                Rights = processedDarwinCore.Rights,
+                RightsHolder = processedDarwinCore.RightsHolder,
+                Type = processedDarwinCore.Type
+            };
+        }
     }
 
-    /// <summary>
-    ///     Cast processed Darwin Core objects to Darwin Core
-    /// </summary>
-    /// <param name="processedDarwinCore"></param>
-    /// <returns></returns>
-    public static IEnumerable<DwC> ToDarwinCoreArchive(
-        this IEnumerable<DarwinCore> processedDarwinCore)
+    extension(IEnumerable<DarwinCore> processedDarwinCore)
     {
-        return processedDarwinCore?.Select(m => m.ToDarwinCoreArchive());
+        /// <summary>
+        ///     Cast processed Darwin Core objects to Darwin Core
+        /// </summary>
+        /// <param name="processedDarwinCore"></param>
+        /// <returns></returns>
+        public IEnumerable<DwC> ToDarwinCoreArchive(
+    )
+        {
+            return processedDarwinCore?.Select(m => m.ToDarwinCoreArchive());
+        }
     }
 }

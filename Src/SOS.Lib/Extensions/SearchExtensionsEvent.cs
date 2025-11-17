@@ -11,37 +11,39 @@ namespace SOS.Lib;
 /// </summary>
 public static class SearchExtensionsEvent
 {
-    /// <summary>
-    ///     Create search filter
-    /// </summary>
-    /// <param name="filter"></param>
-    /// <returns></returns>
-    public static ICollection<Action<QueryDescriptor<TQueryDescriptor>>> ToQuery<TQueryDescriptor>(
-        this EventSearchFilter filter) where TQueryDescriptor : class
+    extension(EventSearchFilter filter)
     {
-        var queries = new List<Action<QueryDescriptor<TQueryDescriptor>>>();
-        if (filter == null) return queries;
-
-        queries.TryAddTermsCriteria("dataProviderId", filter.DataProviderIds);
-        queries.TryAddTermsCriteria("eventId", filter.EventIds);
-        queries.TryAddTermsCriteria("dataStewardship.datasetIdentifier", filter.DatasetIds);
-       
-        if (filter.IsPartOfDataStewardshipDataset.GetValueOrDefault(false))
+        /// <summary>
+        ///     Create search filter
+        /// </summary>
+        /// <returns></returns>
+        public ICollection<Action<QueryDescriptor<TQueryDescriptor>>> ToQuery<TQueryDescriptor>(
+    ) where TQueryDescriptor : class
         {
-            queries.AddExistsCriteria("dataStewardship");
+            var queries = new List<Action<QueryDescriptor<TQueryDescriptor>>>();
+            if (filter == null) return queries;
+
+            queries.TryAddTermsCriteria("dataProviderId", filter.DataProviderIds);
+            queries.TryAddTermsCriteria("eventId", filter.EventIds);
+            queries.TryAddTermsCriteria("dataStewardship.datasetIdentifier", filter.DatasetIds);
+
+            if (filter.IsPartOfDataStewardshipDataset.GetValueOrDefault(false))
+            {
+                queries.AddExistsCriteria("dataStewardship");
+            }
+
+            return queries;
         }
 
-        return queries;
-    }
-
-    public static ICollection<Action<QueryDescriptor<TQueryDescriptor>>> ToExcludeQuery<TQueryDescriptor>(this EventSearchFilter filter) where TQueryDescriptor : class
-    {
-        if (filter == null)
+        public ICollection<Action<QueryDescriptor<TQueryDescriptor>>> ToExcludeQuery<TQueryDescriptor>() where TQueryDescriptor : class
         {
-            return null;
-        }
+            if (filter == null)
+            {
+                return null;
+            }
 
-        var queries = new List<Action<QueryDescriptor<TQueryDescriptor>>>();
-        return queries;
+            var queries = new List<Action<QueryDescriptor<TQueryDescriptor>>>();
+            return queries;
+        }
     }
 }

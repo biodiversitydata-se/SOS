@@ -9,49 +9,52 @@ namespace SOS.Lib.Extensions;
 /// Enumerable extensions.
 /// </summary>
 public static class EnumerableExtensions
-{
-    /// <summary>
-    /// Check if enumerable has any values
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="source"></param>
-    /// <returns></returns>
-    public static bool HasItems<T>(this IEnumerable<T> source)
+{    
+    extension<T>(IEnumerable<T> source)
     {
-        return (source?.Any() ?? false);
-    }
-
-    /// <summary>
-    /// Check if enumerable has duplicates
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="source"></param>
-    /// <returns></returns>
-    public static bool HasDuplicates<T>(this IEnumerable<T> source)
-    {
-        var hs = new HashSet<T>();
-
-        foreach (var item in source)
+        /// <summary>
+        /// Check if enumerable has any values
+        /// </summary>        
+        /// <returns></returns>
+        public bool HasItems()
         {
-            if (!hs.Add(item)) return true;
+            return (source?.Any() ?? false);
         }
 
-        return false;
+        /// <summary>
+        /// Check if enumerable has duplicates
+        /// </summary>
+        /// <returns></returns>
+        public bool HasDuplicates()
+        {
+            var hs = new HashSet<T>();
+
+            foreach (var item in source)
+            {
+                if (!hs.Add(item)) return true;
+            }
+
+            return false;
+        }
     }
 
-    /// <summary>
-    /// Cast IEnumerable to read only collection
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="enumerable"></param>
-    /// <returns></returns>
-    public static IReadOnlyCollection<T> ToReadOnlyCollection<T>(this IEnumerable<T> enumerable)
+    extension<T>(IEnumerable<T> enumerable)
     {
-        return new ReadOnlyCollection<T>(enumerable?.ToList());
+        /// <summary>
+        /// Cast IEnumerable to read only collection
+        /// </summary>        
+        /// <returns></returns>
+        public IReadOnlyCollection<T> ToReadOnlyCollection()
+        {
+            return new ReadOnlyCollection<T>(enumerable?.ToList());
+        }
     }
 
-    public static ICollection<T> ToCollection<T>(this IReadOnlyCollection<T> collection)
+    extension<T>(IReadOnlyCollection<T> collection)
     {
-        return new Collection<T>(collection?.ToList());
+        public ICollection<T> ToCollection()
+        {
+            return new Collection<T>(collection?.ToList());
+        }
     }
 }

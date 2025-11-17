@@ -7,30 +7,35 @@ namespace SOS.Lib.Extensions;
 
 public static class ProcessedTaxonExtensions
 {
-    /// <summary>
-    ///     Cast ProcessedTaxon objects to ProcessedBasicTaxon objects.
-    /// </summary>
-    /// <returns></returns>
-    public static IEnumerable<IBasicTaxon> ToProcessedBasicTaxa(this IEnumerable<Taxon> sourceTaxa)
+    extension(IEnumerable<Taxon> sourceTaxa)
     {
-        return sourceTaxa?.Select(m => m.ToProcessedBasicTaxon());
+        /// <summary>
+        ///     Cast ProcessedTaxon objects to ProcessedBasicTaxon objects.
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<IBasicTaxon> ToProcessedBasicTaxa()
+        {
+            return sourceTaxa?.Select(m => m.ToProcessedBasicTaxon());
+        }
     }
 
-    /// <summary>
-    ///     Cast ProcessedTaxon object to ProcessedBasicTaxon object.
-    /// </summary>
-    /// <param name="sourceTaxon"></param>
-    /// <returns></returns>
-    public static IBasicTaxon ToProcessedBasicTaxon(this Taxon sourceTaxon)
+    extension(Taxon sourceTaxon)
     {
-        return new BasicTaxon
+        /// <summary>
+        ///     Cast ProcessedTaxon object to ProcessedBasicTaxon object.
+        /// </summary>
+        /// <returns></returns>
+        public IBasicTaxon ToProcessedBasicTaxon()
         {
-            Attributes = sourceTaxon.Attributes,
-            SecondaryParentDyntaxaTaxonIds = sourceTaxon.SecondaryParentDyntaxaTaxonIds,
-            Id = sourceTaxon.Id,
-            ScientificName = sourceTaxon.ScientificName,
-            ScientificNameAuthorship = sourceTaxon.ScientificNameAuthorship,
-            VernacularName = sourceTaxon.VernacularName
-        };
+            return new BasicTaxon
+            {
+                Attributes = sourceTaxon.Attributes,
+                SecondaryParentDyntaxaTaxonIds = sourceTaxon.SecondaryParentDyntaxaTaxonIds,
+                Id = sourceTaxon.Id,
+                ScientificName = sourceTaxon.ScientificName,
+                ScientificNameAuthorship = sourceTaxon.ScientificNameAuthorship,
+                VernacularName = sourceTaxon.VernacularName
+            };
+        }
     }
 }

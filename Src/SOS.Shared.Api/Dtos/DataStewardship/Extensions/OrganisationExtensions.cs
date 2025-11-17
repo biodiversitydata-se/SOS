@@ -4,13 +4,16 @@ namespace SOS.Shared.Api.Dtos.DataStewardship.Extensions;
 
 public static class OrganisationExtensions
 {
-    public static DsOrganisationDto ToDto(this Organisation organisation)
+    extension(Organisation organisation)
     {
-        if (organisation == null) return null;
-        return new DsOrganisationDto
+        public DsOrganisationDto ToDto()
         {
-            OrganisationID = organisation.OrganisationID,
-            OrganisationCode = organisation.OrganisationCode
-        };
+            if (organisation == null) return null;
+            return new DsOrganisationDto
+            {
+                OrganisationID = organisation.OrganisationID,
+                OrganisationCode = organisation.OrganisationCode
+            };
+        }
     }
 }

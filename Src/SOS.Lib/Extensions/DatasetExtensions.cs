@@ -6,81 +6,105 @@ namespace SOS.Lib.Extensions;
 
 public static class DatasetExtensions
 {
-    public static Dataset ToDataset(this ArtportalenDatasetMetadata apDataset)
+    extension(ArtportalenDatasetMetadata apDataset)
     {
-        var dataset = new Dataset()
+        public Dataset ToDataset()
         {
-            Identifier = apDataset.Identifier,
-            Metadatalanguage = apDataset.Metadatalanguage?.Clean(),
-            Language = apDataset.Language?.Clean(),
-            AccessRights = apDataset.DatasetAccessRights?.ToAccessRights(),
-            DescriptionAccessRights = apDataset.DescriptionAccessRights?.Clean(),
-            Purpose = apDataset.DatasetPurpose?.ToPurpose(),
-            Assigner = apDataset.Assigner?.ToOrganisation(),
-            Creator = apDataset.Creators?.Select(m => m.ToOrganisation()).ToList(),
-            Methodology = apDataset.Methodologies?.Select(m => m.ToMethodology()).ToList(),
-            OwnerinstitutionCode = apDataset.OwnerInstitution?.ToOrganisation(),
-            Publisher = apDataset.Publisher?.ToOrganisation(),
-            DataStewardship = apDataset.DataStewardship,
-            StartDate = apDataset.StartDate,
-            EndDate = apDataset.EndDate,
-            Description = apDataset.Description?.Clean(),
-            Title = apDataset.Title?.Clean(),
-            Spatial = apDataset.Spatial?.Clean(),
-            ProgrammeArea = apDataset.DatasetProgrammeArea?.ToProgrammeArea(),
-            Project = apDataset.Projects?.Select(m => m.ToProject()).ToList()
-        };
+            var dataset = new Dataset()
+            {
+                Identifier = apDataset.Identifier,
+                Metadatalanguage = apDataset.Metadatalanguage?.Clean(),
+                Language = apDataset.Language?.Clean(),
+                AccessRights = apDataset.DatasetAccessRights?.ToAccessRights(),
+                DescriptionAccessRights = apDataset.DescriptionAccessRights?.Clean(),
+                Purpose = apDataset.DatasetPurpose?.ToPurpose(),
+                Assigner = apDataset.Assigner?.ToOrganisation(),
+                Creator = apDataset.Creators?.Select(m => m.ToOrganisation()).ToList(),
+                Methodology = apDataset.Methodologies?.Select(m => m.ToMethodology()).ToList(),
+                OwnerinstitutionCode = apDataset.OwnerInstitution?.ToOrganisation(),
+                Publisher = apDataset.Publisher?.ToOrganisation(),
+                DataStewardship = apDataset.DataStewardship,
+                StartDate = apDataset.StartDate,
+                EndDate = apDataset.EndDate,
+                Description = apDataset.Description?.Clean(),
+                Title = apDataset.Title?.Clean(),
+                Spatial = apDataset.Spatial?.Clean(),
+                ProgrammeArea = apDataset.DatasetProgrammeArea?.ToProgrammeArea(),
+                Project = apDataset.Projects?.Select(m => m.ToProject()).ToList()
+            };
 
-        return dataset;
+            return dataset;
+        }
     }
 
-    public static Models.Processed.DataStewardship.Enums.AccessRights ToAccessRights(this ArtportalenDatasetMetadata.AccessRights accessRights)
+    extension(ArtportalenDatasetMetadata.AccessRights accessRights)
     {
-        return accessRights.Id.ToEnum<Models.Processed.DataStewardship.Enums.AccessRights>();
-    }
-
-    public static Models.Processed.DataStewardship.Enums.Purpose ToPurpose(this ArtportalenDatasetMetadata.Purpose purpose)
-    {
-        return purpose.Id.ToEnum<Models.Processed.DataStewardship.Enums.Purpose>();
-    }
-
-    public static Methodology ToMethodology(this ArtportalenDatasetMetadata.Methodology apMethodology)
-    {
-        return new Methodology
+        public Models.Processed.DataStewardship.Enums.AccessRights ToAccessRights()
         {
-            MethodologyName = apMethodology.Name,
-            MethodologyDescription = apMethodology.Description?.Clean(),
-            MethodologyLink = apMethodology.Link,
-            SpeciesList = apMethodology.SpeciesList?.Clean()
-        };
+            return accessRights.Id.ToEnum<Models.Processed.DataStewardship.Enums.AccessRights>();
+        }
     }
 
-    public static Models.Processed.DataStewardship.Common.Organisation ToOrganisation(this ArtportalenDatasetMetadata.Organisation apOrganisation)
+    extension(ArtportalenDatasetMetadata.Purpose purpose)
     {
-        return new Models.Processed.DataStewardship.Common.Organisation
+        public Models.Processed.DataStewardship.Enums.Purpose ToPurpose()
         {
-            OrganisationCode = apOrganisation.Code,
-            OrganisationID = apOrganisation.Identifier
-        };
+            return purpose.Id.ToEnum<Models.Processed.DataStewardship.Enums.Purpose>();
+        }
     }
 
-    public static Models.Processed.DataStewardship.Common.Project ToProject(this ArtportalenDatasetMetadata.Project apProject)
+    extension(ArtportalenDatasetMetadata.Methodology apMethodology)
     {
-        return new Models.Processed.DataStewardship.Common.Project
+        public Methodology ToMethodology()
         {
-            ProjectId = apProject.ProjectId,
-            ProjectCode = apProject.ProjectCode,
-            ProjectType = apProject.ProjectType?.ToProjectType()
-        };
+            return new Methodology
+            {
+                MethodologyName = apMethodology.Name,
+                MethodologyDescription = apMethodology.Description?.Clean(),
+                MethodologyLink = apMethodology.Link,
+                SpeciesList = apMethodology.SpeciesList?.Clean()
+            };
+        }
     }
 
-    public static Models.Processed.DataStewardship.Enums.ProgrammeArea ToProgrammeArea(this ArtportalenDatasetMetadata.ProgrammeArea programmeArea)
+    extension(ArtportalenDatasetMetadata.Organisation apOrganisation)
     {
-        return programmeArea.Id.ToEnum<Models.Processed.DataStewardship.Enums.ProgrammeArea>();
+        public Models.Processed.DataStewardship.Common.Organisation ToOrganisation()
+        {
+            return new Models.Processed.DataStewardship.Common.Organisation
+            {
+                OrganisationCode = apOrganisation.Code,
+                OrganisationID = apOrganisation.Identifier
+            };
+        }
     }
 
-    public static Models.Processed.DataStewardship.Enums.ProjectType ToProjectType(this ArtportalenDatasetMetadata.ProjectType projectType)
+    extension(ArtportalenDatasetMetadata.Project apProject)
     {
-        return projectType.Id.ToEnum<Models.Processed.DataStewardship.Enums.ProjectType>();
+        public Models.Processed.DataStewardship.Common.Project ToProject()
+        {
+            return new Models.Processed.DataStewardship.Common.Project
+            {
+                ProjectId = apProject.ProjectId,
+                ProjectCode = apProject.ProjectCode,
+                ProjectType = apProject.ProjectType?.ToProjectType()
+            };
+        }
+    }
+
+    extension(ArtportalenDatasetMetadata.ProgrammeArea programmeArea)
+    {
+        public Models.Processed.DataStewardship.Enums.ProgrammeArea ToProgrammeArea()
+        {
+            return programmeArea.Id.ToEnum<Models.Processed.DataStewardship.Enums.ProgrammeArea>();
+        }
+    }
+
+    extension(ArtportalenDatasetMetadata.ProjectType projectType)
+    {
+        public Models.Processed.DataStewardship.Enums.ProjectType ToProjectType()
+        {
+            return projectType.Id.ToEnum<Models.Processed.DataStewardship.Enums.ProjectType>();
+        }
     }
 }

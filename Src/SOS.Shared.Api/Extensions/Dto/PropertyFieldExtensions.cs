@@ -6,30 +6,36 @@ namespace SOS.Shared.Api.Extensions.Dto;
 
 public static class PropertyFieldExtensions
 {
-    public static PropertyFieldDescriptionDto ToPropertyFieldDescriptionDto(this PropertyFieldDescription fieldDescription)
+    extension(PropertyFieldDescription fieldDescription)
     {
-        if (fieldDescription == null)
+        public PropertyFieldDescriptionDto ToPropertyFieldDescriptionDto()
         {
-            return null!;
-        }
+            if (fieldDescription == null)
+            {
+                return null!;
+            }
 
-        return new PropertyFieldDescriptionDto
-        {
-            PropertyPath = fieldDescription.PropertyPath,
-            DataType = fieldDescription.DataTypeEnum,
-            DataTypeNullable = fieldDescription.DataTypeIsNullable.GetValueOrDefault(false),
-            DwcIdentifier = fieldDescription.DwcIdentifier,
-            DwcName = fieldDescription.DwcName,
-            EnglishTitle = fieldDescription.GetEnglishTitle(),
-            SwedishTitle = fieldDescription.GetSwedishTitle(),
-            Name = fieldDescription.PropertyName,
-            FieldSet = fieldDescription.FieldSetEnum,
-            PartOfFieldSets = fieldDescription.FieldSets
-        };
+            return new PropertyFieldDescriptionDto
+            {
+                PropertyPath = fieldDescription.PropertyPath,
+                DataType = fieldDescription.DataTypeEnum,
+                DataTypeNullable = fieldDescription.DataTypeIsNullable.GetValueOrDefault(false),
+                DwcIdentifier = fieldDescription.DwcIdentifier,
+                DwcName = fieldDescription.DwcName,
+                EnglishTitle = fieldDescription.GetEnglishTitle(),
+                SwedishTitle = fieldDescription.GetSwedishTitle(),
+                Name = fieldDescription.PropertyName,
+                FieldSet = fieldDescription.FieldSetEnum,
+                PartOfFieldSets = fieldDescription.FieldSets
+            };
+        }
     }
 
-    public static List<PropertyFieldDescriptionDto> ToPropertyFieldDescriptionDtos(this IEnumerable<PropertyFieldDescription> fieldDescriptions)
+    extension(IEnumerable<PropertyFieldDescription> fieldDescriptions)
     {
-        return fieldDescriptions.Select(fieldDescription => fieldDescription.ToPropertyFieldDescriptionDto()).ToList();
+        public List<PropertyFieldDescriptionDto> ToPropertyFieldDescriptionDtos()
+        {
+            return fieldDescriptions.Select(fieldDescription => fieldDescription.ToPropertyFieldDescriptionDto()).ToList();
+        }
     }
 }

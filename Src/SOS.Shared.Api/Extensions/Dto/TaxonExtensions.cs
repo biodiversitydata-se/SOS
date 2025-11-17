@@ -5,19 +5,25 @@ namespace SOS.Shared.Api.Extensions.Dto;
 
 public static class TaxonExtensions
 {
-    public static IEnumerable<TaxonAggregationItemDto> ToTaxonAggregationItemDtos(this IEnumerable<TaxonAggregationItem> taxonAggregationItems)
+    extension(IEnumerable<TaxonAggregationItem> taxonAggregationItems)
     {
-        return taxonAggregationItems.Select(item => item.ToTaxonAggregationItemDto());
+        public IEnumerable<TaxonAggregationItemDto> ToTaxonAggregationItemDtos()
+        {
+            return taxonAggregationItems.Select(item => item.ToTaxonAggregationItemDto());
+        }
     }
 
-    public static TaxonAggregationItemDto ToTaxonAggregationItemDto(this TaxonAggregationItem taxonAggregationItem)
+    extension(TaxonAggregationItem taxonAggregationItem)
     {
-        return new TaxonAggregationItemDto
+        public TaxonAggregationItemDto ToTaxonAggregationItemDto()
         {
-            FirstSighting = taxonAggregationItem.FirstSighting,
-            LastSighting = taxonAggregationItem.LastSighting,
-            TaxonId = taxonAggregationItem.TaxonId,
-            ObservationCount = taxonAggregationItem.ObservationCount
-        };
+            return new TaxonAggregationItemDto
+            {
+                FirstSighting = taxonAggregationItem.FirstSighting,
+                LastSighting = taxonAggregationItem.LastSighting,
+                TaxonId = taxonAggregationItem.TaxonId,
+                ObservationCount = taxonAggregationItem.ObservationCount
+            };
+        }
     }
 }

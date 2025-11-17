@@ -5,14 +5,17 @@ namespace SOS.Shared.Api.Dtos.DataStewardship.Extensions;
 
 public static class ProjectExtensions
 {
-    public static DsProjectDto ToDto(this Project project)
+    extension(Project project)
     {
-        if (project == null) return null;
-        return new DsProjectDto
+        public DsProjectDto ToDto()
         {
-            ProjectCode = project.ProjectCode,
-            ProjectID = project.ProjectId,
-            ProjectType = project.ProjectType == null ? null : (DsProjectType)project.ProjectType
-        };
+            if (project == null) return null;
+            return new DsProjectDto
+            {
+                ProjectCode = project.ProjectCode,
+                ProjectID = project.ProjectId,
+                ProjectType = project.ProjectType == null ? null : (DsProjectType)project.ProjectType
+            };
+        }
     }
 }

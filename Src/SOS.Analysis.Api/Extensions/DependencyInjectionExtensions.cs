@@ -34,80 +34,83 @@ namespace SOS.Analysis.Api.Extensions;
 
 public static class DependencyInjectionExtensions
 {
-    public static IServiceCollection AddDependencyInjectionServices(this IServiceCollection services, IConfigurationRoot configuration)
+    extension(IServiceCollection services)
     {
-        // Add application insights.
-        services.AddApplicationInsightsTelemetry(options =>
+        public IServiceCollection AddDependencyInjectionServices(IConfigurationRoot configuration)
         {
-            options.ConnectionString = Settings.ApplicationInsights.ConnectionString;
-        });        
-        services.AddApplicationInsightsTelemetryProcessor<IgnoreRequestPathsTelemetryProcessor>();
-        services.AddSingleton(Settings.ApplicationInsights!);
-        services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-        services.AddSingleton<ITelemetryInitializer, TelemetryInitializer>();
+            // Add application insights.
+            services.AddApplicationInsightsTelemetry(options =>
+            {
+                options.ConnectionString = Settings.ApplicationInsights.ConnectionString;
+            });
+            services.AddApplicationInsightsTelemetryProcessor<IgnoreRequestPathsTelemetryProcessor>();
+            services.AddSingleton(Settings.ApplicationInsights!);
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddSingleton<ITelemetryInitializer, TelemetryInitializer>();
 
-        // Elasticsearch configuration
-        var elasticConfiguration = Settings.SearchDbConfiguration;
-        services.AddSingleton<IElasticClientManager, ElasticClientManager>(p => new ElasticClientManager(elasticConfiguration));
-        services.AddSingleton(elasticConfiguration!);
+            // Elasticsearch configuration
+            var elasticConfiguration = Settings.SearchDbConfiguration;
+            services.AddSingleton<IElasticClientManager, ElasticClientManager>(p => new ElasticClientManager(elasticConfiguration));
+            services.AddSingleton(elasticConfiguration!);
 
-        // Processed Mongo Db
-        var processedDbConfiguration = Settings.ProcessDbConfiguration;
-        if (processedDbConfiguration == null)
-        {
-            throw new Exception("Failed to get ProcessDbConfiguration");
+            // Processed Mongo Db
+            var processedDbConfiguration = Settings.ProcessDbConfiguration;
+            if (processedDbConfiguration == null)
+            {
+                throw new Exception("Failed to get ProcessDbConfiguration");
+            }
+            var processedSettings = processedDbConfiguration.GetMongoDbSettings();
+            services.AddScoped<IProcessClient, ProcessClient>(p => new ProcessClient(processedSettings, processedDbConfiguration.DatabaseName,
+                processedDbConfiguration.ReadBatchSize, processedDbConfiguration.WriteBatchSize));
+
+            // Add configuration
+            services.AddSingleton(Settings.AnalysisConfiguration!);
+            services.AddSingleton(Settings.InputValaidationConfiguration!);
+            services.AddSingleton(Settings.UserServiceConfiguration!);
+            services.AddSingleton(Settings.AreaConfiguration!);
+            services.AddSingleton(Settings.CryptoConfiguration!);
+
+            // Add security
+            services.AddScoped<IAuthorizationProvider, CurrentUserAuthorization>();
+
+            // Add Caches
+            services.AddSingleton<IAreaCache, AreaCache>();
+            services.AddSingleton<IDataProviderCache, DataProviderCache>();
+            services.AddSingleton<ICache<string, ProcessedConfiguration>, ProcessedConfigurationCache>();
+            services.AddSingleton<IClassCache<TaxonListSetsById>, ClassCache<TaxonListSetsById>>();
+            services.AddSingleton<IClassCache<TaxonTree<IBasicTaxon>>, ClassCache<TaxonTree<IBasicTaxon>>>();
+            var clusterHealthCache = new ClassCache<ConcurrentDictionary<string, HealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<string, HealthResponse>>>()) { CacheDuration = TimeSpan.FromMinutes(2) };
+            services.AddSingleton<IClassCache<ConcurrentDictionary<string, HealthResponse>>>(clusterHealthCache);
+            services.AddSingleton<SortableFieldsCache>();
+
+            // Add managers            
+            services.AddScoped<IAnalysisManager, AnalysisManager>();
+            services.AddScoped<IFilterManager, FilterManager>();
+            services.AddSingleton<ITaxonManager, TaxonManager>();
+
+            // Add repositories
+            services.AddScoped<IAreaRepository, AreaRepository>();
+            services.AddScoped<IDataProviderRepository, DataProviderRepository>();
+            services.AddScoped<IProcessedConfigurationRepository, ProcessedConfigurationRepository>();
+            services.AddScoped<IProcessedObservationRepository, ProcessedObservationRepository>();
+            services.AddScoped<IProcessedObservationCoreRepository, ProcessedObservationCoreRepository>();
+            services.AddScoped<ITaxonRepository, TaxonRepository>();
+            services.AddScoped<ITaxonListRepository, TaxonListRepository>();
+            services.AddScoped<IUserExportRepository, UserExportRepository>();
+
+            // Add services
+            services.AddSingleton<IHttpClientService, HttpClientService>();
+            services.AddScoped<IUserService, UserService>();
+            services.AddSingleton<ICryptoService, CryptoService>();
+            services.AddSingleton<IFileService, FileService>();
+
+            // Add Utilites
+            services.AddSingleton<ISearchFilterUtility, SearchFilterUtility>();
+
+            // Add Validators
+            services.AddScoped<IInputValidator, InputValidator>();
+
+            return services;
         }
-        var processedSettings = processedDbConfiguration.GetMongoDbSettings();
-        services.AddScoped<IProcessClient, ProcessClient>(p => new ProcessClient(processedSettings, processedDbConfiguration.DatabaseName,
-            processedDbConfiguration.ReadBatchSize, processedDbConfiguration.WriteBatchSize));
-
-        // Add configuration
-        services.AddSingleton(Settings.AnalysisConfiguration!);
-        services.AddSingleton(Settings.InputValaidationConfiguration!);
-        services.AddSingleton(Settings.UserServiceConfiguration!);
-        services.AddSingleton(Settings.AreaConfiguration!);
-        services.AddSingleton(Settings.CryptoConfiguration!);
-
-        // Add security
-        services.AddScoped<IAuthorizationProvider, CurrentUserAuthorization>();
-
-        // Add Caches
-        services.AddSingleton<IAreaCache, AreaCache>();
-        services.AddSingleton<IDataProviderCache, DataProviderCache>();
-        services.AddSingleton<ICache<string, ProcessedConfiguration>, ProcessedConfigurationCache>();
-        services.AddSingleton<IClassCache<TaxonListSetsById>, ClassCache<TaxonListSetsById>>();
-        services.AddSingleton<IClassCache<TaxonTree<IBasicTaxon>>, ClassCache<TaxonTree<IBasicTaxon>>>();
-        var clusterHealthCache = new ClassCache<ConcurrentDictionary<string, HealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<string, HealthResponse>>>()) { CacheDuration = TimeSpan.FromMinutes(2) };
-        services.AddSingleton<IClassCache<ConcurrentDictionary<string, HealthResponse>>>(clusterHealthCache);
-        services.AddSingleton<SortableFieldsCache>();
-
-        // Add managers            
-        services.AddScoped<IAnalysisManager, AnalysisManager>();
-        services.AddScoped<IFilterManager, FilterManager>();
-        services.AddSingleton<ITaxonManager, TaxonManager>();
-
-        // Add repositories
-        services.AddScoped<IAreaRepository, AreaRepository>();
-        services.AddScoped<IDataProviderRepository, DataProviderRepository>();
-        services.AddScoped<IProcessedConfigurationRepository, ProcessedConfigurationRepository>();
-        services.AddScoped<IProcessedObservationRepository, ProcessedObservationRepository>();
-        services.AddScoped<IProcessedObservationCoreRepository, ProcessedObservationCoreRepository>();
-        services.AddScoped<ITaxonRepository, TaxonRepository>();
-        services.AddScoped<ITaxonListRepository, TaxonListRepository>();
-        services.AddScoped<IUserExportRepository, UserExportRepository>();
-
-        // Add services
-        services.AddSingleton<IHttpClientService, HttpClientService>();
-        services.AddScoped<IUserService, UserService>();
-        services.AddSingleton<ICryptoService, CryptoService>();
-        services.AddSingleton<IFileService, FileService>();
-
-        // Add Utilites
-        services.AddSingleton<ISearchFilterUtility, SearchFilterUtility>();
-
-        // Add Validators
-        services.AddScoped<IInputValidator, InputValidator>();     
-
-        return services;
-    }  
+    }
 }

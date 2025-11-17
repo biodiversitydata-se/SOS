@@ -165,37 +165,40 @@ public static class OccurrenceExtensions
         };
     }
 
-    /// <summary>
-    /// Cast event model to csv
-    /// </summary>
-    /// <param name="occurrence"></param>
-    /// <returns></returns>
-    public static byte[] ToCsv(this DsOccurrenceDto occurrence)
+    extension(DsOccurrenceDto occurrence)
     {
-        if (occurrence == null)
+        /// <summary>
+        /// Cast event model to csv
+        /// </summary>
+        /// <returns></returns>
+        public byte[] ToCsv()
         {
-            return null!;
-        }
+            if (occurrence == null)
+            {
+                return null!;
+            }
 
-        return new[] { occurrence }.ToCsv();
+            return new[] { occurrence }.ToCsv();
+        }
     }
 
-    /// <summary>
-    /// Caste event models to csv
-    /// </summary>
-    /// <param name="occurrences"></param>
-    /// <returns></returns>
-    public static byte[] ToCsv(this IEnumerable<DsOccurrenceDto> occurrences)
+    extension(IEnumerable<DsOccurrenceDto> occurrences)
     {
-        if (!occurrences?.Any() ?? true)
+        /// <summary>
+        /// Caste event models to csv
+        /// </summary>
+        /// <returns></returns>
+        public byte[] ToCsv()
         {
-            return null!;
-        }
+            if (!occurrences?.Any() ?? true)
+            {
+                return null!;
+            }
 
-        using var stream = new MemoryStream();
-        using var csvFileHelper = new CsvFileHelper();
-        csvFileHelper.InitializeWrite(stream, "\t");
-        csvFileHelper.WriteRow(new[] {
+            using var stream = new MemoryStream();
+            using var csvFileHelper = new CsvFileHelper();
+            csvFileHelper.InitializeWrite(stream, "\t");
+            csvFileHelper.WriteRow(new[] {
             "occurrence id",
             "basis of record",
             "observation time",
@@ -216,13 +219,13 @@ public static class OccurrenceExtensions
             "dataset identifier"
         });
 
-        foreach (var occurrence in occurrences)
-        {
-            var point = occurrence.ObservationPoint;
-            var lon = point?.Coordinate.X;
-            var lat = point?.Coordinate.Y;
+            foreach (var occurrence in occurrences)
+            {
+                var point = occurrence.ObservationPoint;
+                var lon = point?.Coordinate.X;
+                var lat = point?.Coordinate.Y;
 
-            csvFileHelper.WriteRow(new[] {
+                csvFileHelper.WriteRow(new[] {
                 occurrence.OccurrenceID,
                 occurrence.BasisOfRecord?.ToString(),
                 occurrence.ObservationTime?.ToLongDateString(),
@@ -242,52 +245,56 @@ public static class OccurrenceExtensions
                occurrence.EventID,
                occurrence.Dataset?.Identifier
             });
+            }
+
+            csvFileHelper.Flush();
+            stream.Position = 0;
+            var csv = stream.ToArray();
+            csvFileHelper.FinishWrite();
+
+            return csv;
         }
-
-        csvFileHelper.Flush();
-        stream.Position = 0;
-        var csv = stream.ToArray();
-        csvFileHelper.FinishWrite();
-
-        return csv;
     }
 
-    public static DsOccurrenceDto ToDto(this Lib.Models.Processed.Observation.Observation observation, CoordinateSys responseCoordinateSystem)
+    extension(Lib.Models.Processed.Observation.Observation observation)
     {
-        var occurrence = new DsOccurrenceDto();
-        occurrence.AssociatedMedia = observation.Occurrence?.Media.ToDtos();
-        if (observation?.BasisOfRecord?.Id != null)
+        public DsOccurrenceDto ToDto(CoordinateSys responseCoordinateSystem)
         {
-            occurrence.BasisOfRecord = GetBasisOfRecordEnum((BasisOfRecordId)observation.BasisOfRecord.Id);
+            var occurrence = new DsOccurrenceDto();
+            occurrence.AssociatedMedia = observation.Occurrence?.Media.ToDtos();
+            if (observation?.BasisOfRecord?.Id != null)
+            {
+                occurrence.BasisOfRecord = GetBasisOfRecordEnum((BasisOfRecordId)observation.BasisOfRecord.Id);
+            }
+
+            occurrence.EventID = observation.Event.EventId;
+            occurrence.Dataset ??= new DsDatasetInfoDto();
+            occurrence.Dataset.Identifier = observation?.DataStewardship?.DatasetIdentifier;
+            occurrence.IdentificationVerificationStatus = observation?.Identification?.VerificationStatus?.Value;
+            occurrence.ObservationCertainty = observation?.Location?.CoordinateUncertaintyInMeters == null ? null : Convert.ToDouble(observation.Location.CoordinateUncertaintyInMeters);
+            occurrence.ObservationPoint = observation?.Location?.Point.Transform(CoordinateSys.WGS84, responseCoordinateSystem);
+            occurrence.EventStartDate = observation.Event.StartDate;
+            occurrence.EventEndDate = observation.Event.EndDate;
+            occurrence.ObservationTime = observation.Event.StartDate == observation.Event.EndDate ? observation.Event.StartDate : null;
+            occurrence.OccurrenceID = observation.Occurrence.OccurrenceId;
+            occurrence.OccurrenceRemarks = observation.Occurrence.OccurrenceRemarks;
+            occurrence.OccurrenceStatus = observation.Occurrence.IsPositiveObservation ? DsOccurrenceStatus.Observerad : DsOccurrenceStatus.InteObserverad;
+            occurrence.Quantity = Convert.ToDouble(observation.Occurrence.OrganismQuantityInt);
+            if (observation?.Occurrence?.OrganismQuantityUnit?.Id != null)
+            {
+                occurrence.QuantityVariable = GetQuantityVariableEnum((UnitId)observation.Occurrence.OrganismQuantityUnit.Id);
+            }
+            occurrence.Taxon = observation?.Taxon?.ToDto();
+
+            //occurrence.Unit = ?
+            occurrence.Organism = new DsOrganismVariableDto
+            {
+                Sex = observation?.Occurrence?.Sex?.Id == null ? null : GetSexEnum((SexId)observation.Occurrence.Sex.Id),
+                Activity = observation?.Occurrence?.Activity?.Id == null ? null : GetActivityEnum((ActivityId)observation.Occurrence.Activity.Id),
+                LifeStage = observation?.Occurrence?.LifeStage?.Id == null ? null : GetLifeStageEnum((LifeStageId)observation.Occurrence.LifeStage.Id),
+            };
+
+            return occurrence;
         }
-
-        occurrence.EventID = observation.Event.EventId;
-        occurrence.Dataset ??= new DsDatasetInfoDto();
-        occurrence.Dataset.Identifier = observation?.DataStewardship?.DatasetIdentifier;
-        occurrence.IdentificationVerificationStatus = observation?.Identification?.VerificationStatus?.Value;
-        occurrence.ObservationCertainty = observation?.Location?.CoordinateUncertaintyInMeters == null ? null : Convert.ToDouble(observation.Location.CoordinateUncertaintyInMeters);
-        occurrence.ObservationPoint = observation?.Location?.Point.Transform(CoordinateSys.WGS84, responseCoordinateSystem);
-        occurrence.EventStartDate = observation.Event.StartDate;
-        occurrence.EventEndDate = observation.Event.EndDate;
-        occurrence.ObservationTime = observation.Event.StartDate == observation.Event.EndDate ? observation.Event.StartDate : null;
-        occurrence.OccurrenceID = observation.Occurrence.OccurrenceId;
-        occurrence.OccurrenceRemarks = observation.Occurrence.OccurrenceRemarks;
-        occurrence.OccurrenceStatus = observation.Occurrence.IsPositiveObservation ? DsOccurrenceStatus.Observerad : DsOccurrenceStatus.InteObserverad;
-        occurrence.Quantity = Convert.ToDouble(observation.Occurrence.OrganismQuantityInt);
-        if (observation?.Occurrence?.OrganismQuantityUnit?.Id != null)
-        {
-            occurrence.QuantityVariable = GetQuantityVariableEnum((UnitId)observation.Occurrence.OrganismQuantityUnit.Id);
-        }
-        occurrence.Taxon = observation?.Taxon?.ToDto();
-
-        //occurrence.Unit = ?
-        occurrence.Organism = new DsOrganismVariableDto
-        {
-            Sex = observation?.Occurrence?.Sex?.Id == null ? null : GetSexEnum((SexId)observation.Occurrence.Sex.Id),
-            Activity = observation?.Occurrence?.Activity?.Id == null ? null : GetActivityEnum((ActivityId)observation.Occurrence.Activity.Id),
-            LifeStage = observation?.Occurrence?.LifeStage?.Id == null ? null : GetLifeStageEnum((LifeStageId)observation.Occurrence.LifeStage.Id),
-        };
-
-        return occurrence;
     }
 }

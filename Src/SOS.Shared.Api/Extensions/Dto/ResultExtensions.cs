@@ -8,101 +8,110 @@ using System.Text.Json.Nodes;
 namespace SOS.Shared.Api.Extensions.Dto;
 
 public static class ResultExtensions
-{        
-    public static GeoGridResultDto ToGeoGridResultDto(this GeoGridTileResult geoGridTileResult, long totalGridCellCount)
+{
+    extension(GeoGridTileResult geoGridTileResult)
     {
-        return new GeoGridResultDto
+        public GeoGridResultDto ToGeoGridResultDto(long totalGridCellCount)
         {
-            Zoom = geoGridTileResult.Zoom,
-            GridCellCount = geoGridTileResult.GridCellTileCount,
-            BoundingBox = geoGridTileResult.BoundingBox.ToLatLonBoundingBoxDto(),
-            GridCells = geoGridTileResult.GridCellTiles.Select(cell => cell.ToGeoGridCellDto()),
-            TotalGridCellCount = geoGridTileResult.GridCellTileCount > totalGridCellCount ? geoGridTileResult.GridCellTileCount : totalGridCellCount
-        };
+            return new GeoGridResultDto
+            {
+                Zoom = geoGridTileResult.Zoom,
+                GridCellCount = geoGridTileResult.GridCellTileCount,
+                BoundingBox = geoGridTileResult.BoundingBox.ToLatLonBoundingBoxDto(),
+                GridCells = geoGridTileResult.GridCellTiles.Select(cell => cell.ToGeoGridCellDto()),
+                TotalGridCellCount = geoGridTileResult.GridCellTileCount > totalGridCellCount ? geoGridTileResult.GridCellTileCount : totalGridCellCount
+            };
+        }
     }
 
-    public static GeoGridMetricResultDto ToDto(this GeoGridMetricResult geoGridMetricResult)
+    extension(GeoGridMetricResult geoGridMetricResult)
     {
-        return new GeoGridMetricResultDto
+        public GeoGridMetricResultDto ToDto()
         {
-            BoundingBox = geoGridMetricResult.BoundingBox.ToLatLonBoundingBoxDto(),
-            GridCellCount = geoGridMetricResult.GridCellCount,
-            GridCellSizeInMeters = geoGridMetricResult.GridCellSizeInMeters,
-            GridCells = geoGridMetricResult.GridCells.Select(cell => cell.ToGridCellDto(geoGridMetricResult.GridCellSizeInMeters)),
-            Sweref99TmBoundingBox = geoGridMetricResult.BoundingBox.ToXYBoundingBoxDto()
-        };
+            return new GeoGridMetricResultDto
+            {
+                BoundingBox = geoGridMetricResult.BoundingBox.ToLatLonBoundingBoxDto(),
+                GridCellCount = geoGridMetricResult.GridCellCount,
+                GridCellSizeInMeters = geoGridMetricResult.GridCellSizeInMeters,
+                GridCells = geoGridMetricResult.GridCells.Select(cell => cell.ToGridCellDto(geoGridMetricResult.GridCellSizeInMeters)),
+                Sweref99TmBoundingBox = geoGridMetricResult.BoundingBox.ToXYBoundingBoxDto()
+            };
+        }
     }
 
-    public static IEnumerable<YearCountResultDto> ToDtos(this IEnumerable<YearCountResult> yearMonthResults)
+    extension(IEnumerable<YearCountResult> yearMonthResults)
     {
-        return yearMonthResults.Select(item => item.ToDto());
-    }
-
-    public static YearCountResultDto ToDto(this YearCountResult yearCountResult)
-    {
-        return new YearCountResultDto
+        public IEnumerable<YearCountResultDto> ToDtos()
         {
-            Count = yearCountResult.Count,
-            TaxonCount = yearCountResult.TaxonCount,
-            Year = yearCountResult.Year
-        };
+            return yearMonthResults.Select(item => item.ToDto());
+        }
     }
 
-    public static IEnumerable<YearMonthCountResultDto> ToDtos(this IEnumerable<YearMonthCountResult> yearMonthCountResults)
+    extension(YearCountResult yearCountResult)
     {
-        return yearMonthCountResults.Select(item => item.ToDto());
-    }
-
-    public static YearMonthCountResultDto ToDto(this YearMonthCountResult yearMonthCountResult)
-    {
-        return new YearMonthCountResultDto
+        public YearCountResultDto ToDto()
         {
-            Count = yearMonthCountResult.Count,
-            Month = yearMonthCountResult.Month,
-            TaxonCount = yearMonthCountResult.TaxonCount,
-            Year = yearMonthCountResult.Year
-        };
+            return new YearCountResultDto
+            {
+                Count = yearCountResult.Count,
+                TaxonCount = yearCountResult.TaxonCount,
+                Year = yearCountResult.Year
+            };
+        }
     }
 
-    public static IEnumerable<YearMonthDayCountResultDto> ToDtos(this IEnumerable<YearMonthDayCountResult> yearMonthDayCountResults)
+    extension(IEnumerable<YearMonthCountResult> yearMonthCountResults)
     {
-        return yearMonthDayCountResults.Select(item => item.ToDto());
-    }
-
-    public static YearMonthDayCountResultDto ToDto(this YearMonthDayCountResult yearMonthDayCountResult)
-    {
-        return new YearMonthDayCountResultDto
+        public IEnumerable<YearMonthCountResultDto> ToDtos()
         {
-            Count = yearMonthDayCountResult.Count,
-            Day = yearMonthDayCountResult.Day,
-            Month = yearMonthDayCountResult.Month,
-            Localities = yearMonthDayCountResult.Localities?.ToDtos()!,
-            TaxonCount = yearMonthDayCountResult.TaxonCount,
-            Year = yearMonthDayCountResult.Year
-        };
+            return yearMonthCountResults.Select(item => item.ToDto());
+        }
     }
 
-    public static PagedResultDto<TRecordDto> ToPagedResultDto<TRecord, TRecordDto>(
-        this PagedResult<TRecord> pagedResult,
+    extension(YearMonthCountResult yearMonthCountResult)
+    {
+        public YearMonthCountResultDto ToDto()
+        {
+            return new YearMonthCountResultDto
+            {
+                Count = yearMonthCountResult.Count,
+                Month = yearMonthCountResult.Month,
+                TaxonCount = yearMonthCountResult.TaxonCount,
+                Year = yearMonthCountResult.Year
+            };
+        }
+    }
+
+    extension(IEnumerable<YearMonthDayCountResult> yearMonthDayCountResults)
+    {
+        public IEnumerable<YearMonthDayCountResultDto> ToDtos()
+        {
+            return yearMonthDayCountResults.Select(item => item.ToDto());
+        }
+    }
+
+    extension(YearMonthDayCountResult yearMonthDayCountResult)
+    {
+        public YearMonthDayCountResultDto ToDto()
+        {
+            return new YearMonthDayCountResultDto
+            {
+                Count = yearMonthDayCountResult.Count,
+                Day = yearMonthDayCountResult.Day,
+                Month = yearMonthDayCountResult.Month,
+                Localities = yearMonthDayCountResult.Localities?.ToDtos()!,
+                TaxonCount = yearMonthDayCountResult.TaxonCount,
+                Year = yearMonthDayCountResult.Year
+            };
+        }
+    }
+
+    extension<TRecord>(PagedResult<TRecord> pagedResult)
+    {
+        public PagedResultDto<TRecordDto> ToPagedResultDto<TRecordDto>(
         IEnumerable<TRecordDto> records)
-    {
-        return new PagedResultDto<TRecordDto>
         {
-            Records = records,
-            Skip = pagedResult.Skip,
-            Take = pagedResult.Take,
-            TotalCount = pagedResult.TotalCount,
-        };
-    }
-
-    public static GeoPagedResultDto<TRecordDto> ToGeoPagedResultDto<TRecord, TRecordDto>(
-        this PagedResult<TRecord> pagedResult,
-        IEnumerable<TRecordDto> records,
-        OutputFormatDto outputFormat = OutputFormatDto.Json)
-    {
-        if (outputFormat == OutputFormatDto.Json)
-        {
-            return new GeoPagedResultDto<TRecordDto>
+            return new PagedResultDto<TRecordDto>
             {
                 Records = records,
                 Skip = pagedResult.Skip,
@@ -110,47 +119,72 @@ public static class ResultExtensions
                 TotalCount = pagedResult.TotalCount,
             };
         }
-        
-        var jsonRecords = records.Cast<JsonObject>();
-        bool flattenProperties = outputFormat == OutputFormatDto.GeoJsonFlat;
-        string geoJson = GeoJsonHelper.GetFeatureCollectionString(jsonRecords, flattenProperties);
-        return new GeoPagedResultDto<TRecordDto>
+
+        public GeoPagedResultDto<TRecordDto> ToGeoPagedResultDto<TRecordDto>(
+            IEnumerable<TRecordDto> records,
+            OutputFormatDto outputFormat = OutputFormatDto.Json)
         {
-            Skip = pagedResult.Skip,
-            Take = pagedResult.Take,
-            TotalCount = pagedResult.TotalCount,
-            GeoJson = geoJson
-        };
+            if (outputFormat == OutputFormatDto.Json)
+            {
+                return new GeoPagedResultDto<TRecordDto>
+                {
+                    Records = records,
+                    Skip = pagedResult.Skip,
+                    Take = pagedResult.Take,
+                    TotalCount = pagedResult.TotalCount,
+                };
+            }
+
+            var jsonRecords = records.Cast<JsonObject>();
+            bool flattenProperties = outputFormat == OutputFormatDto.GeoJsonFlat;
+            string geoJson = GeoJsonHelper.GetFeatureCollectionString(jsonRecords, flattenProperties);
+            return new GeoPagedResultDto<TRecordDto>
+            {
+                Skip = pagedResult.Skip,
+                Take = pagedResult.Take,
+                TotalCount = pagedResult.TotalCount,
+                GeoJson = geoJson
+            };
+        }
     }
 
-    public static ScrollResultDto<TRecordDto> ToScrollResultDto<TRecord, TRecordDto>(this ScrollResult<TRecord> scrollResult, IEnumerable<TRecordDto> records)
+    extension<TRecord>(ScrollResult<TRecord> scrollResult)
     {
-        return new ScrollResultDto<TRecordDto>
+        public ScrollResultDto<TRecordDto> ToScrollResultDto<TRecordDto>(IEnumerable<TRecordDto> records)
         {
-            Records = records,
-            ScrollId = scrollResult.ScrollId,
-            HasMorePages = scrollResult.ScrollId != null,
-            Take = scrollResult.Take,
-            TotalCount = scrollResult.TotalCount
-        };
+            return new ScrollResultDto<TRecordDto>
+            {
+                Records = records,
+                ScrollId = scrollResult.ScrollId,
+                HasMorePages = scrollResult.ScrollId != null,
+                Take = scrollResult.Take,
+                TotalCount = scrollResult.TotalCount
+            };
+        }
     }
 
-    public static IEnumerable<TimeSeriesHistogramResultDto> ToTimeSeriesHistogramResultDtos(
-        this IEnumerable<TimeSeriesHistogramResult> result)
+    extension(IEnumerable<TimeSeriesHistogramResult> result)
     {
-        return result.Select(item => item.ToTimeSeriesHistogramResultDto());
+        public IEnumerable<TimeSeriesHistogramResultDto> ToTimeSeriesHistogramResultDtos(
+)
+        {
+            return result.Select(item => item.ToTimeSeriesHistogramResultDto());
+        }
     }
 
-    public static TimeSeriesHistogramResultDto ToTimeSeriesHistogramResultDto(
-        this TimeSeriesHistogramResult result)
+    extension(TimeSeriesHistogramResult result)
     {
-        return new TimeSeriesHistogramResultDto
+        public TimeSeriesHistogramResultDto ToTimeSeriesHistogramResultDto(
+)
         {
-            Type = (TimeSeriesTypeDto)(int)result.Type,
-            Period = result.Period,
-            Observations = result.Observations,
-            Quantity = result.Quantity,
-            Taxa = result.Taxa
-        };
+            return new TimeSeriesHistogramResultDto
+            {
+                Type = (TimeSeriesTypeDto)(int)result.Type,
+                Period = result.Period,
+                Observations = result.Observations,
+                Quantity = result.Quantity,
+                Taxa = result.Taxa
+            };
+        }
     }
 }

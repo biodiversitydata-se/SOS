@@ -94,10 +94,13 @@ public static class FieldDescriptionHelper
         return MandatoryDwcFields.Union(fieldDescriptions);
     }
 
-    public static IEnumerable<FieldDescriptionId> AddMandatoryFieldDescriptionIdsFirst(
-        this IEnumerable<FieldDescriptionId> fieldDescriptions)
+    extension(IEnumerable<FieldDescriptionId> fieldDescriptions)
     {
-        return MandatoryDwcFields.Union(fieldDescriptions);
+        public IEnumerable<FieldDescriptionId> AddMandatoryFieldDescriptionIdsFirst(
+)
+        {
+            return MandatoryDwcFields.Union(fieldDescriptions);
+        }
     }
 
     public static FieldDescription GetFieldDescription(FieldDescriptionId fieldDescriptionId)

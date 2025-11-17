@@ -32,31 +32,34 @@ public static class ArtportalenChecklistBuilder
     }
     private static List<ArtportalenChecklistVerbatim>? _verbatimArtportalenChecklistsFromJsonFile;
 
-    public static IOperable<ArtportalenChecklistVerbatim> HaveValuesFromPredefinedChecklists(this IOperable<ArtportalenChecklistVerbatim> operable)
+    extension(IOperable<ArtportalenChecklistVerbatim> operable)
     {
-        var builder = ((IDeclaration<ArtportalenChecklistVerbatim>)operable).ObjectBuilder;
-        builder.With((checklist, index) =>
+        public IOperable<ArtportalenChecklistVerbatim> HaveValuesFromPredefinedChecklists()
         {
-            var sourceChecklist = Pick<ArtportalenChecklistVerbatim>.RandomItemFrom(VerbatimArtportalenChecklistsFromJsonFile).Clone();
-            checklist.Id = _faker.IndexVariable++;
-            checklist.ControllingUser = sourceChecklist.ControllingUser;
-            checklist.ControllingUserId = sourceChecklist.ControllingUserId;
-            checklist.EditDate = sourceChecklist.EditDate;
-            checklist.EndDate = sourceChecklist.EndDate;
-            checklist.Name = sourceChecklist.Name;
-            checklist.OccurrenceRange = sourceChecklist.OccurrenceRange;
-            checklist.OccurrenceXCoord = sourceChecklist.OccurrenceXCoord;
-            checklist.OccurrenceYCoord = sourceChecklist.OccurrenceYCoord;
-            checklist.ParentTaxonId = sourceChecklist.ParentTaxonId;
-            checklist.Project = sourceChecklist.Project;
-            checklist.RegisterDate = sourceChecklist.RegisterDate;
-            checklist.SightingIds = sourceChecklist.SightingIds;
-            checklist.Site = sourceChecklist.Site;
-            checklist.StartDate = sourceChecklist.StartDate;
-            checklist.TaxonIds = sourceChecklist.TaxonIds;
-            checklist.TaxonIdsFound = sourceChecklist.TaxonIdsFound;
-        });
+            var builder = ((IDeclaration<ArtportalenChecklistVerbatim>)operable).ObjectBuilder;
+            builder.With((checklist, index) =>
+            {
+                var sourceChecklist = Pick<ArtportalenChecklistVerbatim>.RandomItemFrom(VerbatimArtportalenChecklistsFromJsonFile).Clone();
+                checklist.Id = _faker.IndexVariable++;
+                checklist.ControllingUser = sourceChecklist.ControllingUser;
+                checklist.ControllingUserId = sourceChecklist.ControllingUserId;
+                checklist.EditDate = sourceChecklist.EditDate;
+                checklist.EndDate = sourceChecklist.EndDate;
+                checklist.Name = sourceChecklist.Name;
+                checklist.OccurrenceRange = sourceChecklist.OccurrenceRange;
+                checklist.OccurrenceXCoord = sourceChecklist.OccurrenceXCoord;
+                checklist.OccurrenceYCoord = sourceChecklist.OccurrenceYCoord;
+                checklist.ParentTaxonId = sourceChecklist.ParentTaxonId;
+                checklist.Project = sourceChecklist.Project;
+                checklist.RegisterDate = sourceChecklist.RegisterDate;
+                checklist.SightingIds = sourceChecklist.SightingIds;
+                checklist.Site = sourceChecklist.Site;
+                checklist.StartDate = sourceChecklist.StartDate;
+                checklist.TaxonIds = sourceChecklist.TaxonIds;
+                checklist.TaxonIdsFound = sourceChecklist.TaxonIdsFound;
+            });
 
-        return operable;
+            return operable;
+        }
     }
 }
