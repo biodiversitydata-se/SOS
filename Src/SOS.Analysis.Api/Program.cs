@@ -12,6 +12,7 @@ using SOS.Lib.Helpers;
 using SOS.Lib.JsonConverters;
 using SOS.Lib.Middleware;
 using System.Globalization;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 // --- Program startup ---
@@ -129,9 +130,13 @@ static void ConfigureServices(
     services.AddControllers()
         .AddJsonOptions(options =>
         {
+            options.JsonSerializerOptions.AllowTrailingCommas = true;
+            options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.Never;
+            options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+            options.JsonSerializerOptions.ReadCommentHandling = JsonCommentHandling.Skip;
+            options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
             options.JsonSerializerOptions.Converters.Add(new GeometryConverter());
             options.JsonSerializerOptions.Converters.Add(new NetTopologySuite.IO.Converters.GeoJsonConverterFactory());
-            options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
         });
     services.SetupAuthentication();
     services.SetupSwagger();

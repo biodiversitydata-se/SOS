@@ -1,0 +1,161 @@
+<Solution>
+  <Folder Name="/Docs/">
+    <File Path="CHANGELOG.md" />
+    <File Path="Docs/Areas.md" />
+    <File Path="Docs/Authentication.md" />
+    <File Path="Docs/Checklists.md" />
+    <File Path="Docs/ClientDevelopment.md" />
+    <File Path="Docs/Dataflow.md" />
+    <File Path="Docs/DataProviders.md" />
+    <File Path="Docs/Endpoints.md" />
+    <File Path="Docs/Exports.md" />
+    <File Path="Docs/ExtendedFilter.md" />
+    <File Path="Docs/FAQ.md" />
+    <File Path="Docs/FieldSets.md" />
+    <File Path="Docs/FlatObservation.md" />
+    <File Path="Docs/GeoServerInfrastructure.md" />
+    <File Path="Docs/Harvest.md" />
+    <File Path="Docs/index.md" />
+    <File Path="Docs/Install.md" />
+    <File Path="Docs/Locations.md" />
+    <File Path="Docs/Observation.md" />
+    <File Path="Docs/ObsoleteProperties.md" />
+    <File Path="Docs/SearchFilter.md" />
+    <File Path="Docs/TaxaMatch.md" />
+    <File Path="Docs/TrunkBasedBranchingStrategy.md" />
+    <File Path="Docs/Vocabularies.md" />
+    <File Path="Docs/WfsService.md" />
+    <File Path="Docs/WfsServiceGetStarted.md" />
+    <File Path="Docs/WmsService.md" />
+    <File Path="LICENSE" />
+    <File Path="README.md" />
+    <File Path="_config.yml" />
+  </Folder>
+  <Folder Name="/Docs/Dev/">
+    <File Path="Docs/Dev/Vocabularies.md" />
+  </Folder>
+  <Folder Name="/Docs/Diagrams/">
+    <File Path="Documentation/Diagrams/ArtportalenHarvestJob - SequenceDiagram.puml" />
+    <File Path="Documentation/Diagrams/Job Server Component Diagram.puml" />
+    <File Path="Documentation/Diagrams/KulHarvestJob - SequenceDiagram.puml" />
+    <File Path="Documentation/Diagrams/Observation API Component Diagram.puml" />
+    <File Path="Documentation/Diagrams/SOS Container Diagram.puml" />
+  </Folder>
+  <Folder Name="/k8s/">
+    <File Path="Src/Dockerfile.administration.api" />
+    <File Path="Src/Dockerfile.administration.gui" />
+    <File Path="Src/Dockerfile.analysis" />
+    <File Path="Src/Dockerfile.elasticsearch.proxy" />
+    <File Path="Src/Dockerfile.observations" />
+  </Folder>
+  <Folder Name="/k8s/dev/" />
+  <Folder Name="/k8s/dev/administration.api/">
+    <File Path="devops/k8s/dev/administration.api/api.yaml" />
+  </Folder>
+  <Folder Name="/k8s/dev/administration.gui/">
+    <File Path="devops/k8s/dev/administration.gui/api.yaml" />
+  </Folder>
+  <Folder Name="/k8s/dev/analysis/">
+    <File Path="devops/k8s/dev/analysis/api.yaml" />
+  </Folder>
+  <Folder Name="/k8s/dev/observations/">
+    <File Path="devops/k8s/dev/observations/api.yaml" />
+  </Folder>
+  <Folder Name="/k8s/dev/proxy/">
+    <File Path="devops/k8s/dev/proxy/api.yaml" />
+  </Folder>
+  <Folder Name="/k8s/local/" />
+  <Folder Name="/k8s/local/administration.api/">
+    <File Path="devops/k8s/local/administration.api/api.yaml" />
+  </Folder>
+  <Folder Name="/k8s/local/administration.gui/">
+    <File Path="devops/k8s/local/administration.gui/api.yaml" />
+  </Folder>
+  <Folder Name="/k8s/local/analysis/">
+    <File Path="devops/k8s/local/analysis/api.yaml" />
+  </Folder>
+  <Folder Name="/k8s/local/observations/">
+    <File Path="devops/k8s/local/observations/api.yaml" />
+  </Folder>
+  <Folder Name="/k8s/local/proxy/">
+    <File Path="devops/k8s/local/proxy/api.yaml" />
+  </Folder>
+  <Folder Name="/k8s/prod/" />
+  <Folder Name="/k8s/prod/administration.api/">
+    <File Path="devops/k8s/prod/administration.api/api.yaml" />
+  </Folder>
+  <Folder Name="/k8s/prod/administration.gui/">
+    <File Path="devops/k8s/prod/administration.gui/api.yaml" />
+  </Folder>
+  <Folder Name="/k8s/prod/analysis/">
+    <File Path="devops/k8s/prod/analysis/api.yaml" />
+  </Folder>
+  <Folder Name="/k8s/prod/observations/">
+    <File Path="devops/k8s/prod/observations/api.yaml" />
+  </Folder>
+  <Folder Name="/k8s/prod/proxy/">
+    <File Path="devops/k8s/prod/proxy/api.yaml" />
+  </Folder>
+  <Folder Name="/k8s/st/" />
+  <Folder Name="/k8s/st/administration.api/">
+    <File Path="devops/k8s/st/administration.api/api.yaml" />
+  </Folder>
+  <Folder Name="/k8s/st/administration.gui/">
+    <File Path="devops/k8s/st/administration.gui/api.yaml" />
+  </Folder>
+  <Folder Name="/k8s/st/analysis/">
+    <File Path="devops/k8s/st/analysis/api.yaml" />
+  </Folder>
+  <Folder Name="/k8s/st/observations/">
+    <File Path="devops/k8s/st/observations/api.yaml" />
+  </Folder>
+  <Folder Name="/k8s/st/proxy/">
+    <File Path="devops/k8s/st/proxy/api.yaml" />
+  </Folder>
+  <Folder Name="/Src/">
+    <Project Path="Src/SOS.AppHost/SOS.AppHost.csproj" />
+    <Project Path="Src/SOS.ServiceDefaults/SOS.ServiceDefaults.csproj" />
+  </Folder>
+  <Folder Name="/Src/Api/">
+    <Project Path="Src/SOS.Administration.Api/SOS.Administration.Api.csproj" />
+    <Project Path="Src/SOS.Analysis.Api/SOS.Analysis.Api.csproj" />
+    <Project Path="Src/SOS.DataStewardship.Api/SOS.DataStewardship.Api.csproj" />
+    <Project Path="Src/SOS.ElasticSearch.Proxy/SOS.ElasticSearch.Proxy.csproj" />
+    <Project Path="Src/SOS.Observations.Api/SOS.Observations.Api.csproj" />
+  </Folder>
+  <Folder Name="/Src/Lib/">
+    <Project Path="Src/SOS.Export/SOS.Export.csproj" />
+    <Project Path="Src/SOS.Harvest/SOS.Harvest.csproj" />
+    <Project Path="Src/SOS.Lib/SOS.Lib.csproj" />
+    <Project Path="Src/SOS.Shared.Api/SOS.Shared.Api.csproj" />
+  </Folder>
+  <Folder Name="/Src/Lib/External/">
+    <Project Path="Src/External/DwC-A_dotnet/DwC-A_dotnet.csproj" />
+  </Folder>
+  <Folder Name="/Src/Service/">
+    <Project Path="Src/SOS.Hangfire.JobServer/SOS.Hangfire.JobServer.csproj" />
+  </Folder>
+  <Folder Name="/Src/Web/">
+    <Project Path="Src/SOS.DOI/SOS.DOI.csproj" />
+    <Project Path="Src/SOS.Status.Web.Client/SOS.Status.Web.Client.csproj" />
+    <Project Path="Src/SOS.Status.Web/SOS.Status.Web.csproj" />
+  </Folder>
+  <Folder Name="/Tests/" />
+  <Folder Name="/Tests/EndToEnd/" />
+  <Folder Name="/Tests/Helpers/">
+    <Project Path="Tests/TestHelpers/SOS.TestHelpers/SOS.TestHelpers.csproj" />
+  </Folder>
+  <Folder Name="/Tests/Integration/">
+    <Project Path="Tests/Integration/SOS.DataStewardship.Api.IntegrationTests/SOS.DataStewardship.Api.IntegrationTests.csproj" />
+    <Project Path="Tests/Integration/SOS.Observations.Api.IntegrationTests/SOS.Observations.Api.IntegrationTests.csproj" />
+  </Folder>
+  <Folder Name="/Tests/LiveIntegration/" />
+  <Folder Name="/Tests/Unit/">
+    <Project Path="Tests/Unit/SOS.ElasticSearch.Proxy.UnitTests/SOS.ElasticSearch.Proxy.UnitTests.csproj" />
+    <Project Path="Tests/Unit/SOS.Export.UnitTests/SOS.Export.UnitTests.csproj" />
+    <Project Path="Tests/Unit/SOS.Import.UnitTests/SOS.Import.UnitTests.csproj" />
+    <Project Path="Tests/Unit/SOS.Lib.UnitTests/SOS.Lib.UnitTests.csproj" />
+    <Project Path="Tests/Unit/SOS.Observations.Api.UnitTests/SOS.Observations.Api.UnitTests.csproj" />
+    <Project Path="Tests/Unit/SOS.Process.UnitTests/SOS.Process.UnitTests.csproj" />
+  </Folder>
+</Solution>
