@@ -4,32 +4,31 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Linq;
 using System.Reflection;
 
-namespace SOS.Lib.Swagger
+namespace SOS.Lib.Swagger;
+
+/// <summary>
+///     Swagger ignore filter
+/// </summary>
+public class SwaggerForceSchemaFilter : ISchemaFilter
 {
     /// <summary>
-    ///     Swagger ignore filter
+    ///     Apply filter
     /// </summary>
-    public class SwaggerForceSchemaFilter : ISchemaFilter
+    /// <param name="schema"></param>
+    /// <param name="context"></param>
+    public void Apply(IOpenApiSchema schema, SchemaFilterContext context)
     {
-        /// <summary>
-        ///     Apply filter
-        /// </summary>
-        /// <param name="schema"></param>
-        /// <param name="context"></param>
-        public void Apply(IOpenApiSchema schema, SchemaFilterContext context)
-        {
-            var propertyInfos = context.Type?.GetProperties(BindingFlags.Public | BindingFlags.Instance)
-               .Where(p => p.GetCustomAttribute<UseSchema>() != null);
+        var propertyInfos = context.Type?.GetProperties(BindingFlags.Public | BindingFlags.Instance)
+           .Where(p => p.GetCustomAttribute<UseSchema>() != null);
 
-            if (propertyInfos != null)
+        if (propertyInfos != null)
+        {
+            foreach (var propertyInfo in propertyInfos)
             {
-                foreach (var propertyInfo in propertyInfos)
+                var propertyName = propertyInfo.Name.ToCamelCase();
+                if (schema.Properties.ContainsKey(propertyName))
                 {
-                    var propertyName = propertyInfo.Name.ToCamelCase();
-                    if (schema.Properties.ContainsKey(propertyName))
-                    {
-                        schema.Properties[propertyName] = propertyInfo?.GetCustomAttribute<UseSchema>()?.Schema;
-                    }
+                    schema.Properties[propertyName] = propertyInfo?.GetCustomAttribute<UseSchema>()?.Schema;
                 }
             }
         }

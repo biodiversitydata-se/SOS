@@ -1,10 +1,9 @@
-﻿namespace SOS.Shared.Api.Dtos.Enum
+﻿namespace SOS.Shared.Api.Dtos.Enum;
+
+public enum SightingNotRecoveredFilterDto
 {
-    public enum SightingNotRecoveredFilterDto
-    {
-        NoFilter,
-        OnlyNotRecovered,
-        DontIncludeNotRecovered,
-        IncludeNotRecovered
-    }
+    NoFilter,
+    OnlyNotRecovered,
+    DontIncludeNotRecovered,
+    IncludeNotRecovered
 }

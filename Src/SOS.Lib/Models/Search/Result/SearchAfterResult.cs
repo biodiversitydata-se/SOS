@@ -1,22 +1,21 @@
 ﻿using System.Collections.Generic;
 
-namespace SOS.Lib.Models.Search.Result
+namespace SOS.Lib.Models.Search.Result;
+
+public class SearchAfterResult<TRecord, TSearchAfter>
 {
-    public class SearchAfterResult<TRecord, TSearchAfter>
-    {
-        /// <summary>
-        /// Point in time id
-        /// </summary>
-        public string PointInTimeId { get; set; }
+    /// <summary>
+    /// Point in time id
+    /// </summary>
+    public string PointInTimeId { get; set; }
 
-        /// <summary>
-        /// Returned records
-        /// </summary>
-        public IEnumerable<TRecord> Records { get; set; }
+    /// <summary>
+    /// Returned records
+    /// </summary>
+    public IEnumerable<TRecord> Records { get; set; }
 
-        /// <summary>
-        /// Search after objects
-        /// </summary>
-        public TSearchAfter SearchAfter { get; set; }
-    }
+    /// <summary>
+    /// Search after objects
+    /// </summary>
+    public TSearchAfter SearchAfter { get; set; }
 }

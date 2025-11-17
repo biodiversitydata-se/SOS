@@ -7,116 +7,115 @@ using System;
 using System.Net;
 using System.Threading.Tasks;
 
-namespace SOS.DOI.Controllers
+namespace SOS.DOI.Controllers;
+
+[Route("api/[controller]")]
+[ApiController]
+public class DoiController : ControllerBase, IDoiController
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class DoiController : ControllerBase, IDoiController
+    private readonly IDataCiteService _dataCiteService;
+    private readonly IBlobStorageService _blobStorageService;
+    private readonly ILogger<DoiController> _logger;
+
+    /// <summary>
+    ///  Constructor
+    /// </summary>
+    /// <param name="dataCiteService"></param>
+    /// <param name="blobStorageService"></param>
+    /// <param name="logger"></param>
+    public DoiController(
+        IDataCiteService dataCiteService,
+        IBlobStorageService blobStorageService,
+        ILogger<DoiController> logger)
     {
-        private readonly IDataCiteService _dataCiteService;
-        private readonly IBlobStorageService _blobStorageService;
-        private readonly ILogger<DoiController> _logger;
+        _dataCiteService = dataCiteService ?? throw new ArgumentNullException(nameof(dataCiteService));
+        _blobStorageService = blobStorageService ?? throw new ArgumentException(nameof(blobStorageService));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    }
 
-        /// <summary>
-        ///  Constructor
-        /// </summary>
-        /// <param name="dataCiteService"></param>
-        /// <param name="blobStorageService"></param>
-        /// <param name="logger"></param>
-        public DoiController(
-            IDataCiteService dataCiteService,
-            IBlobStorageService blobStorageService,
-            ILogger<DoiController> logger)
+    [HttpGet]
+    [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+    public async Task<IActionResult> GetBatchAsync([FromQuery] int take = 10, [FromQuery] int page = 1, [FromQuery] string orderBy = "created", [FromQuery] SearchSortOrder sortOrder = SearchSortOrder.Desc)
+    {
+        try
         {
-            _dataCiteService = dataCiteService ?? throw new ArgumentNullException(nameof(dataCiteService));
-            _blobStorageService = blobStorageService ?? throw new ArgumentException(nameof(blobStorageService));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            var metadata = await _dataCiteService.GetBatchAsync(take, page, orderBy, sortOrder);
+
+            return new OkObjectResult(metadata);
         }
-
-        [HttpGet]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetBatchAsync([FromQuery] int take = 10, [FromQuery] int page = 1, [FromQuery] string orderBy = "created", [FromQuery] SearchSortOrder sortOrder = SearchSortOrder.Desc)
+        catch (Exception e)
         {
-            try
-            {
-                var metadata = await _dataCiteService.GetBatchAsync(take, page, orderBy, sortOrder);
-
-                return new OkObjectResult(metadata);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Getting DOI metadata failed");
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
-            }
+            _logger.LogError(e, "Getting DOI metadata failed");
+            return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
         }
+    }
 
-        /// <inheritdoc />
-        [HttpGet("{prefix}/{suffix}/URL")]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public IActionResult GetDOIFileUrl([FromRoute] string prefix, [FromRoute] string suffix)
+    /// <inheritdoc />
+    [HttpGet("{prefix}/{suffix}/URL")]
+    [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+    public IActionResult GetDOIFileUrl([FromRoute] string prefix, [FromRoute] string suffix)
+    {
+        try
         {
-            try
-            {
-                var downloadUrl = _blobStorageService.GetDOIDownloadUrl(prefix, suffix);
+            var downloadUrl = _blobStorageService.GetDOIDownloadUrl(prefix, suffix);
 
-                return new OkObjectResult(downloadUrl);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Error getting DOI file");
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
-            }
+            return new OkObjectResult(downloadUrl);
         }
-
-        /// <inheritdoc />
-        [HttpGet("{prefix}/{suffix}")]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetMetadata([FromRoute] string prefix, [FromRoute] string suffix)
+        catch (Exception e)
         {
-            try
-            {
-                if (string.IsNullOrEmpty(suffix))
-                {
-                    return BadRequest("You must provide a doi");
-                }
-
-                var metadata = await _dataCiteService.GetMetadataAsync(prefix, suffix);
-
-                return new OkObjectResult(metadata);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Getting DOI metadata failed");
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
-            }
+            _logger.LogError(e, "Error getting DOI file");
+            return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
         }
+    }
 
-        [HttpGet("search")]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> SearchMetadata([FromQuery] string searchFor)
+    /// <inheritdoc />
+    [HttpGet("{prefix}/{suffix}")]
+    [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+    [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+    public async Task<IActionResult> GetMetadata([FromRoute] string prefix, [FromRoute] string suffix)
+    {
+        try
         {
-            try
+            if (string.IsNullOrEmpty(suffix))
             {
-                if (string.IsNullOrEmpty(searchFor))
-                {
-                    return BadRequest("You must provide something to search for");
-                }
-
-                var metadata = await _dataCiteService.SearchMetadataAsync(searchFor);
-
-                return new OkObjectResult(metadata);
+                return BadRequest("You must provide a doi");
             }
-            catch (Exception e)
+
+            var metadata = await _dataCiteService.GetMetadataAsync(prefix, suffix);
+
+            return new OkObjectResult(metadata);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Getting DOI metadata failed");
+            return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+        }
+    }
+
+    [HttpGet("search")]
+    [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+    [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+    public async Task<IActionResult> SearchMetadata([FromQuery] string searchFor)
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(searchFor))
             {
-                _logger.LogError(e, "Getting DOI metadata failed");
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+                return BadRequest("You must provide something to search for");
             }
+
+            var metadata = await _dataCiteService.SearchMetadataAsync(searchFor);
+
+            return new OkObjectResult(metadata);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Getting DOI metadata failed");
+            return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
         }
     }
 }

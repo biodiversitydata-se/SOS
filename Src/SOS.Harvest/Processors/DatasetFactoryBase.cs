@@ -2,21 +2,20 @@
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Models.Shared;
 
-namespace SOS.Harvest.Processors
+namespace SOS.Harvest.Processors;
+
+/// <summary>
+/// Base class for dataset factories
+/// </summary>
+public class DatasetFactoryBase : FactoryBase
 {
     /// <summary>
-    /// Base class for dataset factories
+    /// Constructor
     /// </summary>
-    public class DatasetFactoryBase : FactoryBase
+    /// <param name="dataProvider"></param>
+    /// <exception cref="ArgumentNullException"></exception>
+    protected DatasetFactoryBase(DataProvider dataProvider, IProcessTimeManager processTimeManager, ProcessConfiguration processConfiguration) : base(dataProvider, processTimeManager, processConfiguration)
     {
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="dataProvider"></param>
-        /// <exception cref="ArgumentNullException"></exception>
-        protected DatasetFactoryBase(DataProvider dataProvider, IProcessTimeManager processTimeManager, ProcessConfiguration processConfiguration) : base(dataProvider, processTimeManager, processConfiguration)
-        {
 
-        }
     }
 }

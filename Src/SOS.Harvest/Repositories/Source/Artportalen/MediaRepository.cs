@@ -5,34 +5,34 @@ using SOS.Harvest.Repositories.Source.Artportalen.Interfaces;
 using SOS.Harvest.Services.Interfaces;
 using SOS.Lib.Extensions;
 
-namespace SOS.Harvest.Repositories.Source.Artportalen
+namespace SOS.Harvest.Repositories.Source.Artportalen;
+
+/// <summary>
+///     Area repository
+/// </summary>
+public class MediaRepository : BaseRepository<MediaRepository>, IMediaRepository
 {
     /// <summary>
-    ///     Area repository
+    ///     Constructor
     /// </summary>
-    public class MediaRepository : BaseRepository<MediaRepository>, IMediaRepository
+    /// <param name="artportalenDataService"></param>
+    /// <param name="logger"></param>
+    public MediaRepository(IArtportalenDataService artportalenDataService, ILogger<MediaRepository> logger) : base(
+        artportalenDataService, logger)
     {
-        /// <summary>
-        ///     Constructor
-        /// </summary>
-        /// <param name="artportalenDataService"></param>
-        /// <param name="logger"></param>
-        public MediaRepository(IArtportalenDataService artportalenDataService, ILogger<MediaRepository> logger) : base(
-            artportalenDataService, logger)
-        {
-        }
+    }
 
-        /// <inheritdoc />
-        public async Task<IEnumerable<MediaEntity>> GetAsync(IEnumerable<int> sightingIds)
+    /// <inheritdoc />
+    public async Task<IEnumerable<MediaEntity>> GetAsync(IEnumerable<int> sightingIds)
+    {
+        try
         {
-            try
+            if (!sightingIds?.Any() ?? true)
             {
-                if (!sightingIds?.Any() ?? true)
-                {
-                    return null!;
-                }
+                return null!;
+            }
 
-                var query = @" 
+            var query = @" 
                 SELECT          
                     mf.Id,
 	                mf.SightingID,
@@ -56,15 +56,14 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
 					LEFT JOIN [User] mu ON mfc.UserId = mu.Id
 	                LEFT JOIN Person mp ON mu.PersonId = mp.Id";
 
-                return await QueryAsync<MediaEntity>(query,
-                    new { tvp = sightingIds.ToSqlRecords().AsTableValuedParameter("dbo.IdValueTable") });
+            return await QueryAsync<MediaEntity>(query,
+                new { tvp = sightingIds.ToSqlRecords().AsTableValuedParameter("dbo.IdValueTable") });
 
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e, "Error getting media files");
-                throw;
-            }
+        }
+        catch (Exception e)
+        {
+            Logger.LogError(e, "Error getting media files");
+            throw;
         }
     }
 }

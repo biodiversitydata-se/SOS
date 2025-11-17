@@ -4,34 +4,33 @@ using SOS.Lib.Enums;
 using SOS.Lib.Models.Gis;
 using System.Collections.Generic;
 
-namespace SOS.Lib.Models.Search.Result
+namespace SOS.Lib.Models.Search.Result;
+
+public class GeoGridTileResult
 {
-    public class GeoGridTileResult
+    public LatLonBoundingBox BoundingBox { get; set; }
+    public int Zoom { get; set; }
+    public int GridCellTileCount { get; set; }
+    public IEnumerable<GridCellTile> GridCellTiles { get; set; }
+
+    public FeatureCollection GetFeatureCollection(CoordinateSys coordinateSystem = CoordinateSys.WGS84)
     {
-        public LatLonBoundingBox BoundingBox { get; set; }
-        public int Zoom { get; set; }
-        public int GridCellTileCount { get; set; }
-        public IEnumerable<GridCellTile> GridCellTiles { get; set; }
+        var featureCollection = new FeatureCollection();
 
-        public FeatureCollection GetFeatureCollection(CoordinateSys coordinateSystem = CoordinateSys.WGS84)
+        foreach (var gridCellTile in GridCellTiles)
         {
-            var featureCollection = new FeatureCollection();
-
-            foreach (var gridCellTile in GridCellTiles)
-            {
-                var feature = gridCellTile.GetFeature(coordinateSystem);
-                featureCollection.Add(feature);
-            }
-
-            return featureCollection;
+            var feature = gridCellTile.GetFeature(coordinateSystem);
+            featureCollection.Add(feature);
         }
 
-        public string GetFeatureCollectionGeoJson(CoordinateSys coordinateSystem = CoordinateSys.WGS84)
-        {
-            var featureCollection = GetFeatureCollection(coordinateSystem);
-            var geoJsonWriter = new GeoJsonWriter();
-            var strJson = geoJsonWriter.Write(featureCollection);
-            return strJson;
-        }
+        return featureCollection;
+    }
+
+    public string GetFeatureCollectionGeoJson(CoordinateSys coordinateSystem = CoordinateSys.WGS84)
+    {
+        var featureCollection = GetFeatureCollection(coordinateSystem);
+        var geoJsonWriter = new GeoJsonWriter();
+        var strJson = geoJsonWriter.Write(featureCollection);
+        return strJson;
     }
 }

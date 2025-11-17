@@ -1,6 +1,5 @@
-﻿namespace SOS.Lib.Configuration.Import
+﻿namespace SOS.Lib.Configuration.Import;
+
+public class SersServiceConfiguration : AquaSupportConfiguration
 {
-    public class SersServiceConfiguration : AquaSupportConfiguration
-    {
-    }
 }

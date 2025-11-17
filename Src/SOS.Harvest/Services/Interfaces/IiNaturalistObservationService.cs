@@ -1,14 +1,13 @@
 ﻿using SOS.Lib.Models.Verbatim.DarwinCore;
 
-namespace SOS.Harvest.Services.Interfaces
+namespace SOS.Harvest.Services.Interfaces;
+
+public interface IiNaturalistObservationService
 {
-    public interface IiNaturalistObservationService
-    {
-        /// <summary>
-        ///  Get iNaturalist observations 
-        /// </summary>
-        /// <param name="changeId"></param>
-        /// <returns></returns>
-        Task<IEnumerable<DwcObservationVerbatim>> GetAsync(DateTime fromDate, DateTime toDate);
-    }
+    /// <summary>
+    ///  Get iNaturalist observations 
+    /// </summary>
+    /// <param name="changeId"></param>
+    /// <returns></returns>
+    Task<IEnumerable<DwcObservationVerbatim>> GetAsync(DateTime fromDate, DateTime toDate);
 }

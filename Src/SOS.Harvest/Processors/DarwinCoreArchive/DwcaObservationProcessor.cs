@@ -14,75 +14,74 @@ using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Verbatim;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
 
-namespace SOS.Harvest.Processors.DarwinCoreArchive
+namespace SOS.Harvest.Processors.DarwinCoreArchive;
+
+/// <summary>
+///     DwC-A observation processor.
+/// </summary>
+public class DwcaObservationProcessor : ObservationProcessorBase<DwcaObservationProcessor, DwcObservationVerbatim, IDarwinCoreArchiveVerbatimRepository>,
+    IDwcaObservationProcessor
 {
-    /// <summary>
-    ///     DwC-A observation processor.
-    /// </summary>
-    public class DwcaObservationProcessor : ObservationProcessorBase<DwcaObservationProcessor, DwcObservationVerbatim, IDarwinCoreArchiveVerbatimRepository>,
-        IDwcaObservationProcessor
+    private readonly IVerbatimClient _verbatimClient;
+    private readonly IAreaHelper _areaHelper;        
+
+    protected override async Task<(int publicCount, int protectedCount, int failedCount)> ProcessObservationsAsync(
+        DataProvider dataProvider,
+        IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
+        IDictionary<VocabularyId, IDictionary<object, int>> dwcaVocabularyById,
+        JobRunModes mode,
+        IJobCancellationToken cancellationToken)
     {
-        private readonly IVerbatimClient _verbatimClient;
-        private readonly IAreaHelper _areaHelper;        
+        using var dwcCollectionRepository = new DwcCollectionRepository(dataProvider, _verbatimClient, Logger);
 
-        protected override async Task<(int publicCount, int protectedCount, int failedCount)> ProcessObservationsAsync(
-            DataProvider dataProvider,
-            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
-            IDictionary<VocabularyId, IDictionary<object, int>> dwcaVocabularyById,
-            JobRunModes mode,
-            IJobCancellationToken cancellationToken)
-        {
-            using var dwcCollectionRepository = new DwcCollectionRepository(dataProvider, _verbatimClient, Logger);
+        var observationFactory = await DwcaObservationFactory.CreateAsync(
+            dataProvider,
+            taxa,
+            dwcaVocabularyById,
+            _areaHelper,
+            TimeManager,
+            ProcessConfiguration);
 
-            var observationFactory = await DwcaObservationFactory.CreateAsync(
-                dataProvider,
-                taxa,
-                dwcaVocabularyById,
-                _areaHelper,
-                TimeManager,
-                ProcessConfiguration);
-
-            return await base.ProcessObservationsAsync(
-                dataProvider,
-                mode,
-                observationFactory,
-                dwcCollectionRepository.OccurrenceRepository,
-                cancellationToken); 
-        }
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="verbatimClient"></param>
-        /// <param name="processedObservationRepository"></param>
-        /// <param name="vocabularyValueResolver"></param>
-        /// <param name="areaHelper"></param>
-        /// <param name="dwcArchiveFileWriterCoordinator"></param>
-        /// <param name="processManager"></param>
-        /// <param name="validationManager"></param>
-        /// <param name="diffusionManager"></param>
-        /// <param name="processTimeManager"></param>
-        /// <param name="processConfiguration"></param>
-        /// <param name="logger"></param>
-        /// <exception cref="ArgumentNullException"></exception>
-        public DwcaObservationProcessor(
-            IVerbatimClient verbatimClient,
-            IProcessedObservationCoreRepository processedObservationRepository,            
-            IVocabularyValueResolver vocabularyValueResolver,
-            IAreaHelper areaHelper,
-            IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
-            IProcessManager processManager,
-            IValidationManager validationManager,
-            IDiffusionManager diffusionManager,
-            IProcessTimeManager processTimeManager,
-            ProcessConfiguration processConfiguration,
-            ILogger<DwcaObservationProcessor> logger) :
-                base(processedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, processManager, validationManager, diffusionManager, processTimeManager, null, processConfiguration, logger)
-        {
-            _verbatimClient = verbatimClient ?? throw new ArgumentNullException(nameof(verbatimClient));           
-            _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
-        }
-
-        public override DataProviderType Type => DataProviderType.DwcA;
+        return await base.ProcessObservationsAsync(
+            dataProvider,
+            mode,
+            observationFactory,
+            dwcCollectionRepository.OccurrenceRepository,
+            cancellationToken); 
     }
+
+    /// <summary>
+    /// Constructor
+    /// </summary>
+    /// <param name="verbatimClient"></param>
+    /// <param name="processedObservationRepository"></param>
+    /// <param name="vocabularyValueResolver"></param>
+    /// <param name="areaHelper"></param>
+    /// <param name="dwcArchiveFileWriterCoordinator"></param>
+    /// <param name="processManager"></param>
+    /// <param name="validationManager"></param>
+    /// <param name="diffusionManager"></param>
+    /// <param name="processTimeManager"></param>
+    /// <param name="processConfiguration"></param>
+    /// <param name="logger"></param>
+    /// <exception cref="ArgumentNullException"></exception>
+    public DwcaObservationProcessor(
+        IVerbatimClient verbatimClient,
+        IProcessedObservationCoreRepository processedObservationRepository,            
+        IVocabularyValueResolver vocabularyValueResolver,
+        IAreaHelper areaHelper,
+        IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
+        IProcessManager processManager,
+        IValidationManager validationManager,
+        IDiffusionManager diffusionManager,
+        IProcessTimeManager processTimeManager,
+        ProcessConfiguration processConfiguration,
+        ILogger<DwcaObservationProcessor> logger) :
+            base(processedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, processManager, validationManager, diffusionManager, processTimeManager, null, processConfiguration, logger)
+    {
+        _verbatimClient = verbatimClient ?? throw new ArgumentNullException(nameof(verbatimClient));           
+        _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
+    }
+
+    public override DataProviderType Type => DataProviderType.DwcA;
 }

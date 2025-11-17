@@ -5,40 +5,39 @@ using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
 using System.Threading.Tasks;
 
-namespace SOS.Lib.Repositories.Verbatim
+namespace SOS.Lib.Repositories.Verbatim;
+
+/// <summary>
+///     Species data service
+/// </summary>
+public class ArtportalenVerbatimRepository : VerbatimRepositoryBase<ArtportalenObservationVerbatim, int>,
+    IArtportalenVerbatimRepository
 {
     /// <summary>
-    ///     Species data service
+    ///     Constructor
     /// </summary>
-    public class ArtportalenVerbatimRepository : VerbatimRepositoryBase<ArtportalenObservationVerbatim, int>,
-        IArtportalenVerbatimRepository
+    /// <param name="importClient"></param>
+    /// <param name="logger"></param>
+    public ArtportalenVerbatimRepository(
+        IVerbatimClient importClient,
+        ILogger<ArtportalenVerbatimRepository> logger) : base(importClient, logger)
     {
-        /// <summary>
-        ///     Constructor
-        /// </summary>
-        /// <param name="importClient"></param>
-        /// <param name="logger"></param>
-        public ArtportalenVerbatimRepository(
-            IVerbatimClient importClient,
-            ILogger<ArtportalenVerbatimRepository> logger) : base(importClient, logger)
+    }
+
+    public override async Task<bool> AddCollectionAsync()
+    {
+        var added = await base.AddCollectionAsync();
+        if (!added) return false;
+
+        var indexModels = new[]
         {
-        }
+            // Add index to prevent duplicate entries
+            new CreateIndexModel<ArtportalenObservationVerbatim>(
+                Builders<ArtportalenObservationVerbatim>.IndexKeys.Ascending(io => io.SightingId),
+                new CreateIndexOptions { Unique = true })
+        };
 
-        public override async Task<bool> AddCollectionAsync()
-        {
-            var added = await base.AddCollectionAsync();
-            if (!added) return false;
-
-            var indexModels = new[]
-            {
-                // Add index to prevent duplicate entries
-                new CreateIndexModel<ArtportalenObservationVerbatim>(
-                    Builders<ArtportalenObservationVerbatim>.IndexKeys.Ascending(io => io.SightingId),
-                    new CreateIndexOptions { Unique = true })
-            };
-
-            await AddIndexes(indexModels);
-            return true;
-        }
+        await AddIndexes(indexModels);
+        return true;
     }
 }

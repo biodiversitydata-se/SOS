@@ -1,19 +1,18 @@
-﻿namespace SOS.Lib.Configuration.Process
+﻿namespace SOS.Lib.Configuration.Process;
+
+/// <summary>
+///     Vocabulary process configuration.
+/// </summary>
+public class VocabularyConfiguration
 {
     /// <summary>
-    ///     Vocabulary process configuration.
+    ///     Decides whether vocabulary values should be resolved
+    ///     (for debugging purpose) when processing observations.
     /// </summary>
-    public class VocabularyConfiguration
-    {
-        /// <summary>
-        ///     Decides whether vocabulary values should be resolved
-        ///     (for debugging purpose) when processing observations.
-        /// </summary>
-        public bool ResolveValues { get; set; } = false;
+    public bool ResolveValues { get; set; } = false;
 
-        /// <summary>
-        ///     Culture code for localized vocabulary fields.
-        /// </summary>
-        public string LocalizationCultureCode { get; set; } = "en-GB";
-    }
+    /// <summary>
+    ///     Culture code for localized vocabulary fields.
+    /// </summary>
+    public string LocalizationCultureCode { get; set; } = "en-GB";
 }

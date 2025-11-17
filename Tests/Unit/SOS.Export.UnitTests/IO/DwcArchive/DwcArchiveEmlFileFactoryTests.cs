@@ -7,35 +7,34 @@ using System.Xml;
 using System.Xml.XPath;
 using Xunit;
 
-namespace SOS.Export.UnitTests.IO.DwcArchive
+namespace SOS.Export.UnitTests.IO.DwcArchive;
+
+public class DwcArchiveEmlFileFactoryTests
 {
-    public class DwcArchiveEmlFileFactoryTests
+    [Fact]
+    [Trait("Category", "Unit")]
+    [Trait("Category", "DwcArchiveUnit")]
+    public async Task CreateEmlXmlFile_Success()
     {
-        [Fact]
-        [Trait("Category", "Unit")]
-        [Trait("Category", "DwcArchiveUnit")]
-        public async Task CreateEmlXmlFile_Success()
-        {
-            //-----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
+        //-----------------------------------------------------------------------------------------------------------
+        // Arrange
+        //-----------------------------------------------------------------------------------------------------------
 
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var xmlDocument = await DwCArchiveEmlFileFactory.CreateEmlXmlFileAsync(DataProvider.FilterSubsetDataProvider);
+        //-----------------------------------------------------------------------------------------------------------
+        // Act
+        //-----------------------------------------------------------------------------------------------------------
+        var xmlDocument = await DwCArchiveEmlFileFactory.CreateEmlXmlFileAsync(DataProvider.FilterSubsetDataProvider);
 
-            ////-----------------------------------------------------------------------------------------------------------
-            //// Assert - Read XML
-            ////-----------------------------------------------------------------------------------------------------------
-            var namespaceManager = new XmlNamespaceManager(new NameTable());
-            namespaceManager.AddNamespace("eml", "eml://ecoinformatics.org/eml-2.1.1");
-            var pubDate = xmlDocument.XPathSelectElement("/eml:eml/dataset/pubDate", namespaceManager);
+        ////-----------------------------------------------------------------------------------------------------------
+        //// Assert - Read XML
+        ////-----------------------------------------------------------------------------------------------------------
+        var namespaceManager = new XmlNamespaceManager(new NameTable());
+        namespaceManager.AddNamespace("eml", "eml://ecoinformatics.org/eml-2.1.1");
+        var pubDate = xmlDocument.XPathSelectElement("/eml:eml/dataset/pubDate", namespaceManager);
 
-            ////-----------------------------------------------------------------------------------------------------------
-            //// Assert
-            ////-----------------------------------------------------------------------------------------------------------
-            pubDate.Value.Should().Be(DateTime.Now.ToString("yyyy-MM-dd"));
-        }
+        ////-----------------------------------------------------------------------------------------------------------
+        //// Assert
+        ////-----------------------------------------------------------------------------------------------------------
+        pubDate.Value.Should().Be(DateTime.Now.ToString("yyyy-MM-dd"));
     }
 }

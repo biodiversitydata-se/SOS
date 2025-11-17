@@ -1,15 +1,14 @@
-﻿namespace SOS.Shared.Api.Dtos
-{
-    public class IdNameDto<T>
-    {
-        /// <summary>
-        ///     Id
-        /// </summary>
-        public T Id { get; set; }
+﻿namespace SOS.Shared.Api.Dtos;
 
-        /// <summary>
-        ///     Name of area
-        /// </summary>
-        public string Name { get; set; }
-    }
+public class IdNameDto<T>
+{
+    /// <summary>
+    ///     Id
+    /// </summary>
+    public T Id { get; set; }
+
+    /// <summary>
+    ///     Name of area
+    /// </summary>
+    public string Name { get; set; }
 }

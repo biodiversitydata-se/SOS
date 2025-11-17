@@ -10,161 +10,160 @@ using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
 
-namespace SOS.Administration.Api.Controllers
+namespace SOS.Administration.Api.Controllers;
+
+/// <summary>
+///     Reports controller.
+/// </summary>
+[ApiController]
+[Route("[controller]")]
+public class ReportsController : ControllerBase
 {
+    private readonly IReportManager _reportManager;
+    private readonly ILogger<ReportsController> _logger;
+
     /// <summary>
-    ///     Reports controller.
+    ///     Constructor
     /// </summary>
-    [ApiController]
-    [Route("[controller]")]
-    public class ReportsController : ControllerBase
+    /// <param name="reportManager"></param>
+    /// <param name="logger"></param>
+    public ReportsController(
+        IReportManager reportManager,
+        ILogger<ReportsController> logger)
     {
-        private readonly IReportManager _reportManager;
-        private readonly ILogger<ReportsController> _logger;
+        _reportManager = reportManager ?? throw new ArgumentNullException(nameof(reportManager));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    }
 
-        /// <summary>
-        ///     Constructor
-        /// </summary>
-        /// <param name="reportManager"></param>
-        /// <param name="logger"></param>
-        public ReportsController(
-            IReportManager reportManager,
-            ILogger<ReportsController> logger)
+    /// <summary>
+    /// Delete reports and their associated files older than the specified number of days.
+    /// </summary>
+    /// <param name="nrOfDays">Delete reports and files older than this number of days.</param>
+    /// <returns></returns>
+    [HttpDelete("DeleteOld")]
+    [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+    public async Task<IActionResult> DeleteOldReportsAndFilesAsync([FromQuery] int nrOfDays = 30)
+    {
+        try
         {
-            _reportManager = reportManager ?? throw new ArgumentNullException(nameof(reportManager));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
+            if (nrOfDays < 0 || nrOfDays > 10000) return BadRequest($"nrOfDays is not in supported range 0-10000");
+            var result = await _reportManager.DeleteOldReportsAndFilesAsync(TimeSpan.FromDays(nrOfDays));
+            if (result.IsFailure) return BadRequest(result.Error);
+            if (result.Value == 0) return Ok($"No reports found that is older than {nrOfDays} days.");
+            return Ok($"Ok. {result.Value} reports deleted.");
         }
-
-        /// <summary>
-        /// Delete reports and their associated files older than the specified number of days.
-        /// </summary>
-        /// <param name="nrOfDays">Delete reports and files older than this number of days.</param>
-        /// <returns></returns>
-        [HttpDelete("DeleteOld")]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> DeleteOldReportsAndFilesAsync([FromQuery] int nrOfDays = 30)
+        catch (Exception e)
         {
-            try
-            {
-                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
-                if (nrOfDays < 0 || nrOfDays > 10000) return BadRequest($"nrOfDays is not in supported range 0-10000");
-                var result = await _reportManager.DeleteOldReportsAndFilesAsync(TimeSpan.FromDays(nrOfDays));
-                if (result.IsFailure) return BadRequest(result.Error);
-                if (result.Value == 0) return Ok($"No reports found that is older than {nrOfDays} days.");
-                return Ok($"Ok. {result.Value} reports deleted.");
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "{@methodName}() failed", MethodBase.GetCurrentMethod()?.Name);                
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
-            }
+            _logger.LogError(e, "{@methodName}() failed", MethodBase.GetCurrentMethod()?.Name);                
+            return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
         }
+    }
 
-        /// <summary>
-        /// Delete a specific report and its associated file.
-        /// </summary>
-        /// <param name="reportId">The reportId.</param>
-        /// <returns></returns>
-        [HttpDelete("Delete/{reportId}")]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> DeleteReportAndFileAsync([FromRoute] string reportId)
+    /// <summary>
+    /// Delete a specific report and its associated file.
+    /// </summary>
+    /// <param name="reportId">The reportId.</param>
+    /// <returns></returns>
+    [HttpDelete("Delete/{reportId}")]
+    [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+    public async Task<IActionResult> DeleteReportAndFileAsync([FromRoute] string reportId)
+    {
+        try
         {
-            try
+            LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
+            var report = await _reportManager.GetReportAsync(reportId);
+            if (report == null)
             {
-                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
-                var report = await _reportManager.GetReportAsync(reportId);
-                if (report == null)
-                {
-                    return NotFound($"reportId \"{reportId}\" not found");
-                }
+                return NotFound($"reportId \"{reportId}\" not found");
+            }
 
-                await _reportManager.DeleteReportAsync(reportId);
-                return Ok($"Ok. Report With Id \"{reportId}\" was deleted.");
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "{@methodName}() failed", MethodBase.GetCurrentMethod()?.Name);                
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
-            }
+            await _reportManager.DeleteReportAsync(reportId);
+            return Ok($"Ok. Report With Id \"{reportId}\" was deleted.");
         }
-
-        /// <summary>
-        /// Get all reports sorted by date.
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet("")]
-        [ProducesResponseType(typeof(IEnumerable<Report>), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetReportsAsync()
+        catch (Exception e)
         {
-            try
-            {
-                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
-                var reports = await _reportManager.GetAllReportsAsync();
-                reports = reports.OrderByDescending(m => m.CreatedDate).ToList();
-                return new OkObjectResult(reports);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Error getting report files");
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
-            }
+            _logger.LogError(e, "{@methodName}() failed", MethodBase.GetCurrentMethod()?.Name);                
+            return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
         }
+    }
 
-        /// <summary>
-        /// Get information about a specific report.
-        /// </summary>
-        /// <param name="reportId"></param>
-        /// <returns></returns>
-        [HttpGet("{reportId}")]
-        [ProducesResponseType(typeof(Report), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetReportAsync([FromRoute] string reportId)
+    /// <summary>
+    /// Get all reports sorted by date.
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet("")]
+    [ProducesResponseType(typeof(IEnumerable<Report>), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+    public async Task<IActionResult> GetReportsAsync()
+    {
+        try
         {
-            try
-            {
-                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
-                var report = await _reportManager.GetReportAsync(reportId);
-                if (report == null)
-                {
-                    return NotFound($"reportId \"{reportId}\" not found");
-                }
-                return new OkObjectResult(report);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Error getting report");
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
-            }
+            LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
+            var reports = await _reportManager.GetAllReportsAsync();
+            reports = reports.OrderByDescending(m => m.CreatedDate).ToList();
+            return new OkObjectResult(reports);
         }
-
-        /// <summary>
-        /// Get the file for a specific report.
-        /// </summary>
-        /// <param name="reportId"></param>
-        /// <returns></returns>
-        [HttpGet("{reportId}/File")]
-        [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetFileAsync([FromRoute] string reportId)
+        catch (Exception e)
         {
-            try
+            _logger.LogError(e, "Error getting report files");
+            return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+        }
+    }
+
+    /// <summary>
+    /// Get information about a specific report.
+    /// </summary>
+    /// <param name="reportId"></param>
+    /// <returns></returns>
+    [HttpGet("{reportId}")]
+    [ProducesResponseType(typeof(Report), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+    public async Task<IActionResult> GetReportAsync([FromRoute] string reportId)
+    {
+        try
+        {
+            LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
+            var report = await _reportManager.GetReportAsync(reportId);
+            if (report == null)
             {
-                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
-                var report = await _reportManager.GetReportAsync(reportId);
-                if (report == null) return NotFound($"reportId \"{reportId}\" not found");
-                var reportFileResult = await _reportManager.GetReportFileAsync(reportId);
-                if (reportFileResult.IsFailure) return BadRequest(reportFileResult.Error);
-                var reportFile = reportFileResult.Value;
-                return File(reportFile.File, reportFile.ContentType, reportFile.Filename);
+                return NotFound($"reportId \"{reportId}\" not found");
             }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Error getting file");
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
-            }
+            return new OkObjectResult(report);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error getting report");
+            return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+        }
+    }
+
+    /// <summary>
+    /// Get the file for a specific report.
+    /// </summary>
+    /// <param name="reportId"></param>
+    /// <returns></returns>
+    [HttpGet("{reportId}/File")]
+    [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+    public async Task<IActionResult> GetFileAsync([FromRoute] string reportId)
+    {
+        try
+        {
+            LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
+            var report = await _reportManager.GetReportAsync(reportId);
+            if (report == null) return NotFound($"reportId \"{reportId}\" not found");
+            var reportFileResult = await _reportManager.GetReportFileAsync(reportId);
+            if (reportFileResult.IsFailure) return BadRequest(reportFileResult.Error);
+            var reportFile = reportFileResult.Value;
+            return File(reportFile.File, reportFile.ContentType, reportFile.Filename);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error getting file");
+            return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
         }
     }
 }

@@ -1,16 +1,15 @@
 ﻿using SOS.Lib.Models.Verbatim.Shared;
 
-namespace SOS.Harvest.Harvesters.Interfaces
+namespace SOS.Harvest.Harvesters.Interfaces;
+
+/// <summary>
+///     Area harvester
+/// </summary>
+public interface IAreaHarvester
 {
     /// <summary>
-    ///     Area harvester
+    ///     Aggregate all areas
     /// </summary>
-    public interface IAreaHarvester
-    {
-        /// <summary>
-        ///     Aggregate all areas
-        /// </summary>
-        /// <returns></returns>
-        Task<HarvestInfo> HarvestAreasAsync();
-    }
+    /// <returns></returns>
+    Task<HarvestInfo> HarvestAreasAsync();
 }

@@ -1,18 +1,17 @@
-﻿namespace SOS.Lib.Enums
+﻿namespace SOS.Lib.Enums;
+
+/// <summary>
+/// Diagram format
+/// </summary>
+public enum DiagramFormat
 {
     /// <summary>
-    /// Diagram format
+    /// GraphViz format.
     /// </summary>
-    public enum DiagramFormat
-    {
-        /// <summary>
-        /// GraphViz format.
-        /// </summary>
-        GraphViz = 0,
+    GraphViz = 0,
 
-        /// <summary>
-        /// Mermaid format.
-        /// </summary>
-        Mermaid = 1
-    }
+    /// <summary>
+    /// Mermaid format.
+    /// </summary>
+    Mermaid = 1
 }

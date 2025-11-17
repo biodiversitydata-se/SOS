@@ -13,158 +13,157 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace SOS.Lib.IO.DwcArchive
+namespace SOS.Lib.IO.DwcArchive;
+
+public class ExtendedMeasurementOrFactCsvWriter : IExtendedMeasurementOrFactCsvWriter
 {
-    public class ExtendedMeasurementOrFactCsvWriter : IExtendedMeasurementOrFactCsvWriter
+    private readonly ILogger<ExtendedMeasurementOrFactCsvWriter> _logger;
+
+    public ExtendedMeasurementOrFactCsvWriter(ILogger<ExtendedMeasurementOrFactCsvWriter> logger)
     {
-        private readonly ILogger<ExtendedMeasurementOrFactCsvWriter> _logger;
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    }
 
-        public ExtendedMeasurementOrFactCsvWriter(ILogger<ExtendedMeasurementOrFactCsvWriter> logger)
+    /// <summary>
+    /// Writes Emof rows to file.
+    /// </summary>
+    /// <param name="filter"></param>
+    /// <param name="stream"></param>
+    /// <param name="processedObservationRepository"></param>
+    /// <param name="cancellationToken"></param>
+    /// <param name="isEventCore"></param>
+    /// <returns></returns>
+    public async Task<bool> CreateCsvFileAsync(
+        SearchFilterBase filter,
+        Stream stream,
+        IProcessedObservationCoreRepository processedObservationRepository,
+        IJobCancellationToken cancellationToken,
+        bool isEventCore = false)
+    {
+        try
         {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        }
+            var searchResult = await processedObservationRepository.GetMeasurementOrFactsBySearchAfterAsync(filter);
+            if (!searchResult?.Records?.Any() ?? true) return false;
 
-        /// <summary>
-        /// Writes Emof rows to file.
-        /// </summary>
-        /// <param name="filter"></param>
-        /// <param name="stream"></param>
-        /// <param name="processedObservationRepository"></param>
-        /// <param name="cancellationToken"></param>
-        /// <param name="isEventCore"></param>
-        /// <returns></returns>
-        public async Task<bool> CreateCsvFileAsync(
-            SearchFilterBase filter,
-            Stream stream,
-            IProcessedObservationCoreRepository processedObservationRepository,
-            IJobCancellationToken cancellationToken,
-            bool isEventCore = false)
-        {
-            try
+            using var csvFileHelper = new CsvFileHelper();
+            csvFileHelper.InitializeWrite(stream, "\t");
+
+            // Write header row
+            WriteHeaderRow(csvFileHelper, isEventCore);
+
+            while (searchResult.Records.Any())
             {
-                var searchResult = await processedObservationRepository.GetMeasurementOrFactsBySearchAfterAsync(filter);
-                if (!searchResult?.Records?.Any() ?? true) return false;
+                cancellationToken?.ThrowIfCancellationRequested();
+                var searchResultTask = processedObservationRepository.GetMeasurementOrFactsBySearchAfterAsync(filter, searchResult.PointInTimeId, searchResult.SearchAfter);
 
-                using var csvFileHelper = new CsvFileHelper();
-                csvFileHelper.InitializeWrite(stream, "\t");
+                // Fetch observations from ElasticSearch.
+                var emofRows = searchResult.Records.ToArray();
 
-                // Write header row
-                WriteHeaderRow(csvFileHelper, isEventCore);
-
-                while (searchResult.Records.Any())
+                // Write occurrence rows to CSV file.
+                foreach (var emofRow in emofRows)
                 {
-                    cancellationToken?.ThrowIfCancellationRequested();
-                    var searchResultTask = processedObservationRepository.GetMeasurementOrFactsBySearchAfterAsync(filter, searchResult.PointInTimeId, searchResult.SearchAfter);
-
-                    // Fetch observations from ElasticSearch.
-                    var emofRows = searchResult.Records.ToArray();
-
-                    // Write occurrence rows to CSV file.
-                    foreach (var emofRow in emofRows)
-                    {
-                        WriteEmofRow(csvFileHelper, emofRow, isEventCore);
-                    }
-                    await csvFileHelper.FlushAsync();
-
-                    // Get next batch of data.
-                    searchResult = await searchResultTask;
+                    WriteEmofRow(csvFileHelper, emofRow, isEventCore);
                 }
+                await csvFileHelper.FlushAsync();
 
-                csvFileHelper.FinishWrite();
-                return true;
+                // Get next batch of data.
+                searchResult = await searchResultTask;
             }
-            catch (JobAbortedException)
-            {
-                _logger.LogInformation($"{nameof(CreateCsvFileAsync)} was canceled.");
-                throw;
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Failed to create EMOF CSV file.");
-                throw;
-            }
+
+            csvFileHelper.FinishWrite();
+            return true;
         }
-
-        public async Task WriteHeaderlessEmofCsvFileAsync(
-            IEnumerable<ExtendedMeasurementOrFactRow> emofRows,
-            StreamWriter streamWriter,
-            bool writeEventId = false)
+        catch (JobAbortedException)
         {
-            try
-            {
-                if (!emofRows?.Any() ?? true)
-                {
-                    return;
-                }
-
-                await Task.Run(() =>
-                {
-                    using var csvFileHelper = new CsvFileHelper();
-                    csvFileHelper.InitializeWrite(streamWriter, "\t");
-
-                    // Write Emof rows to CSV file.
-                    foreach (var emofRow in emofRows)
-                    {
-                        WriteEmofRow(csvFileHelper, emofRow, writeEventId);
-                    }
-
-                    csvFileHelper.FinishWrite();
-                });
-
-
-                //_logger.LogInformation($"Occurrence CSV file created. Total time elapsed: {stopwatch.Elapsed.Duration()}. Elapsed time for CSV writing: {csvWritingStopwatch.Elapsed.Duration()}. Elapsed time for reading data from ElasticSearch: {elasticRetrievalStopwatch.Elapsed.Duration()}");
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Failed to create Emof txt file.");
-                throw;
-            }
+            _logger.LogInformation($"{nameof(CreateCsvFileAsync)} was canceled.");
+            throw;
         }
-
-        public void WriteHeaderRow(CsvFileHelper csvFileHelper, bool isEventCore = false)
+        catch (Exception e)
         {
-            var emofExtensionMetadata = ExtensionMetadata.EmofFactory.Create(isEventCore);
-            foreach (var emofField in emofExtensionMetadata.Fields.OrderBy(field => field.Index))
-            {
-                csvFileHelper.WriteField(emofField.CSVColumnName);
-            }
-
-            csvFileHelper.NextRecord();
+            _logger.LogError(e, "Failed to create EMOF CSV file.");
+            throw;
         }
+    }
 
-        /// <summary>
-        /// Write Emof record to CSV file.
-        /// </summary>
-        /// <param name="csvFileHelper"></param>
-        /// <param name="emofRow"></param>
-        /// <param name="writeEventId"></param>
-        /// <remarks>The fields must be written in correct order. FieldDescriptionId sorted ascending.</remarks>
-        private static void WriteEmofRow(
-            CsvFileHelper csvFileHelper,
-            ExtendedMeasurementOrFactRow emofRow,
-            bool writeEventId = false)
+    public async Task WriteHeaderlessEmofCsvFileAsync(
+        IEnumerable<ExtendedMeasurementOrFactRow> emofRows,
+        StreamWriter streamWriter,
+        bool writeEventId = false)
+    {
+        try
         {
-            if (emofRow == null)
+            if (!emofRows?.Any() ?? true)
             {
                 return;
             }
 
-            if (writeEventId) csvFileHelper.WriteField(emofRow.EventId);
-            csvFileHelper.WriteField(emofRow.OccurrenceID);
-            csvFileHelper.WriteField(emofRow.MeasurementID);
-            csvFileHelper.WriteField(emofRow.MeasurementType);
-            csvFileHelper.WriteField(emofRow.MeasurementTypeID);
-            csvFileHelper.WriteField(emofRow.MeasurementValue);
-            csvFileHelper.WriteField(emofRow.MeasurementValueID);
-            csvFileHelper.WriteField(emofRow.MeasurementAccuracy);
-            csvFileHelper.WriteField(emofRow.MeasurementUnit);
-            csvFileHelper.WriteField(emofRow.MeasurementUnitID);
-            csvFileHelper.WriteField(emofRow.MeasurementDeterminedDate);
-            csvFileHelper.WriteField(emofRow.MeasurementDeterminedBy);
-            csvFileHelper.WriteField(emofRow.MeasurementRemarks);
-            csvFileHelper.WriteField(emofRow.MeasurementMethod);
+            await Task.Run(() =>
+            {
+                using var csvFileHelper = new CsvFileHelper();
+                csvFileHelper.InitializeWrite(streamWriter, "\t");
 
-            csvFileHelper.NextRecord();
+                // Write Emof rows to CSV file.
+                foreach (var emofRow in emofRows)
+                {
+                    WriteEmofRow(csvFileHelper, emofRow, writeEventId);
+                }
+
+                csvFileHelper.FinishWrite();
+            });
+
+
+            //_logger.LogInformation($"Occurrence CSV file created. Total time elapsed: {stopwatch.Elapsed.Duration()}. Elapsed time for CSV writing: {csvWritingStopwatch.Elapsed.Duration()}. Elapsed time for reading data from ElasticSearch: {elasticRetrievalStopwatch.Elapsed.Duration()}");
         }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Failed to create Emof txt file.");
+            throw;
+        }
+    }
+
+    public void WriteHeaderRow(CsvFileHelper csvFileHelper, bool isEventCore = false)
+    {
+        var emofExtensionMetadata = ExtensionMetadata.EmofFactory.Create(isEventCore);
+        foreach (var emofField in emofExtensionMetadata.Fields.OrderBy(field => field.Index))
+        {
+            csvFileHelper.WriteField(emofField.CSVColumnName);
+        }
+
+        csvFileHelper.NextRecord();
+    }
+
+    /// <summary>
+    /// Write Emof record to CSV file.
+    /// </summary>
+    /// <param name="csvFileHelper"></param>
+    /// <param name="emofRow"></param>
+    /// <param name="writeEventId"></param>
+    /// <remarks>The fields must be written in correct order. FieldDescriptionId sorted ascending.</remarks>
+    private static void WriteEmofRow(
+        CsvFileHelper csvFileHelper,
+        ExtendedMeasurementOrFactRow emofRow,
+        bool writeEventId = false)
+    {
+        if (emofRow == null)
+        {
+            return;
+        }
+
+        if (writeEventId) csvFileHelper.WriteField(emofRow.EventId);
+        csvFileHelper.WriteField(emofRow.OccurrenceID);
+        csvFileHelper.WriteField(emofRow.MeasurementID);
+        csvFileHelper.WriteField(emofRow.MeasurementType);
+        csvFileHelper.WriteField(emofRow.MeasurementTypeID);
+        csvFileHelper.WriteField(emofRow.MeasurementValue);
+        csvFileHelper.WriteField(emofRow.MeasurementValueID);
+        csvFileHelper.WriteField(emofRow.MeasurementAccuracy);
+        csvFileHelper.WriteField(emofRow.MeasurementUnit);
+        csvFileHelper.WriteField(emofRow.MeasurementUnitID);
+        csvFileHelper.WriteField(emofRow.MeasurementDeterminedDate);
+        csvFileHelper.WriteField(emofRow.MeasurementDeterminedBy);
+        csvFileHelper.WriteField(emofRow.MeasurementRemarks);
+        csvFileHelper.WriteField(emofRow.MeasurementMethod);
+
+        csvFileHelper.NextRecord();
     }
 }

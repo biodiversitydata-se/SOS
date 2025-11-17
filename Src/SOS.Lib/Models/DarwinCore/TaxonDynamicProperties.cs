@@ -1,150 +1,149 @@
 ﻿using System.Collections.Generic;
 
-namespace SOS.Lib.Models.DarwinCore
+namespace SOS.Lib.Models.DarwinCore;
+
+/// <summary>
+///     Taxon dynamic properties.
+/// </summary>
+public class TaxonDynamicProperties
 {
     /// <summary>
-    ///     Taxon dynamic properties.
+    ///     Dyntaxa taxon id.
     /// </summary>
-    public class TaxonDynamicProperties
-    {
-        /// <summary>
-        ///     Dyntaxa taxon id.
-        /// </summary>
-        public int DyntaxaTaxonId { get; set; }
+    public int DyntaxaTaxonId { get; set; }
 
-        /// <summary>
-        ///     Main parent Dyntaxa taxon id.
-        /// </summary>
-        public int? ParentDyntaxaTaxonId { get; set; }
+    /// <summary>
+    ///     Main parent Dyntaxa taxon id.
+    /// </summary>
+    public int? ParentDyntaxaTaxonId { get; set; }
 
-        /// <summary>
-        ///     Secondary parents dyntaxa taxon ids.
-        /// </summary>
-        public IEnumerable<int> SecondaryParentDyntaxaTaxonIds { get; set; }
+    /// <summary>
+    ///     Secondary parents dyntaxa taxon ids.
+    /// </summary>
+    public IEnumerable<int> SecondaryParentDyntaxaTaxonIds { get; set; }
 
-        /// <summary>
-        ///     Action plan
-        /// </summary>
-        public string ActionPlan { get; set; }
+    /// <summary>
+    ///     Action plan
+    /// </summary>
+    public string ActionPlan { get; set; }
 
-        /// <summary>
-        ///     Part of bird directive?
-        /// </summary>
-        public bool? BirdDirective { get; set; }
+    /// <summary>
+    ///     Part of bird directive?
+    /// </summary>
+    public bool? BirdDirective { get; set; }
 
-        /// <summary>
-        /// County occurrence status
-        /// </summary>
-        public ICollection<CountyOccurrence> CountyOccurrences { get; set; }
+    /// <summary>
+    /// County occurrence status
+    /// </summary>
+    public ICollection<CountyOccurrence> CountyOccurrences { get; set; }
 
-        /// <summary>
-        ///     Radius of disturbance
-        /// </summary>
-        public int DisturbanceRadius { get; set; }
+    /// <summary>
+    ///     Radius of disturbance
+    /// </summary>
+    public int DisturbanceRadius { get; set; }
 
-        /// <summary>
-        /// Id of taxon in GBIF
-        /// </summary>
-        public int? GbifTaxonId { get; set; }
+    /// <summary>
+    /// Id of taxon in GBIF
+    /// </summary>
+    public int? GbifTaxonId { get; set; }
 
-        /// <summary>
-        /// Organism Label 1
-        /// </summary>
-        public string? OrganismLabel1 { get; set; }
+    /// <summary>
+    /// Organism Label 1
+    /// </summary>
+    public string? OrganismLabel1 { get; set; }
 
-        /// <summary>
-        /// Organism Label 2
-        /// </summary>
-        public string? OrganismLabel2 { get; set; }
+    /// <summary>
+    /// Organism Label 2
+    /// </summary>
+    public string? OrganismLabel2 { get; set; }
 
-        /// <summary>
-        /// True if alien in sweden according to EU Regulation 1143/2014
-        /// </summary>
-        public bool IsEURegulation_1143_2014 { get; set; }
+    /// <summary>
+    /// True if alien in sweden according to EU Regulation 1143/2014
+    /// </summary>
+    public bool IsEURegulation_1143_2014 { get; set; }
 
-        /// <summary>
-        /// Invasive Risk Assessment Category
-        /// </summary>
-        public string InvasiveRiskAssessmentCategory { get; set; }
+    /// <summary>
+    /// Invasive Risk Assessment Category
+    /// </summary>
+    public string InvasiveRiskAssessmentCategory { get; set; }
 
-        /// <summary>
-        /// True if in EU list or in risk list and classified as severe or high risk
-        /// </summary>
-        public bool IsInvasiveInSweden { get; set; }
+    /// <summary>
+    /// True if in EU list or in risk list and classified as severe or high risk
+    /// </summary>
+    public bool IsInvasiveInSweden { get; set; }
 
-        /// <summary>
-        ///     part of Habitats directive article 2
-        /// </summary>
-        public bool? Natura2000HabitatsDirectiveArticle2 { get; set; }
+    /// <summary>
+    ///     part of Habitats directive article 2
+    /// </summary>
+    public bool? Natura2000HabitatsDirectiveArticle2 { get; set; }
 
-        /// <summary>
-        ///     part of Habitats directive article 2
-        /// </summary>
-        public bool? Natura2000HabitatsDirectiveArticle4 { get; set; }
+    /// <summary>
+    ///     part of Habitats directive article 2
+    /// </summary>
+    public bool? Natura2000HabitatsDirectiveArticle4 { get; set; }
 
-        /// <summary>
-        ///     part of Habitats directive article 2
-        /// </summary>
-        public bool? Natura2000HabitatsDirectiveArticle5 { get; set; }
+    /// <summary>
+    ///     part of Habitats directive article 2
+    /// </summary>
+    public bool? Natura2000HabitatsDirectiveArticle5 { get; set; }
 
-        /// <summary>
-        ///     Organism group
-        /// </summary>
-        public string OrganismGroup { get; set; }
+    /// <summary>
+    ///     Organism group
+    /// </summary>
+    public string OrganismGroup { get; set; }
 
-        /// <summary>
-        ///     True if taxon is protected by law according to Artskyddsförordningen (SFS 2007:845)
-        /// </summary>
-        public bool ProtectedByLaw { get; set; }
+    /// <summary>
+    ///     True if taxon is protected by law according to Artskyddsförordningen (SFS 2007:845)
+    /// </summary>
+    public bool ProtectedByLaw { get; set; }
 
-        /// <summary>
-        ///     Taxon protection level
-        /// </summary>
-        public int? ProtectionLevel { get; set; }
+    /// <summary>
+    ///     Taxon protection level
+    /// </summary>
+    public int? ProtectionLevel { get; set; }
 
-        /// <summary>
-        ///     Redlist category
-        /// </summary>
-        public string RedlistCategory { get; set; }
+    /// <summary>
+    ///     Redlist category
+    /// </summary>
+    public string RedlistCategory { get; set; }
 
-        /// <summary>
-        ///     Do taxon occur in sweden
-        /// </summary>
-        public string SwedishHistory { get; set; }
+    /// <summary>
+    ///     Do taxon occur in sweden
+    /// </summary>
+    public string SwedishHistory { get; set; }
 
-        /// <summary>
-        /// Id of swedish history enum
-        /// </summary>
-        public string SwedishHistoryId { get; set; }
+    /// <summary>
+    /// Id of swedish history enum
+    /// </summary>
+    public string SwedishHistoryId { get; set; }
 
-        /// <summary>
-        /// Category if alien in Sweden
-        /// </summary>
-        public string SwedishHistoryCategory { get; set; }
+    /// <summary>
+    /// Category if alien in Sweden
+    /// </summary>
+    public string SwedishHistoryCategory { get; set; }
 
-        /// <summary>
-        ///     Do taxon occur in sweden
-        /// </summary>
-        public string SwedishOccurrence { get; set; }
+    /// <summary>
+    ///     Do taxon occur in sweden
+    /// </summary>
+    public string SwedishOccurrence { get; set; }
 
-        /// <summary>
-        /// Dyntaxa taxon category id.
-        /// </summary>
-        public int? TaxonCategoryId { get; set; }
+    /// <summary>
+    /// Dyntaxa taxon category id.
+    /// </summary>
+    public int? TaxonCategoryId { get; set; }
 
-        /// <summary>
-        /// Dyntaxa taxon category swedish name.
-        /// </summary>
-        public string TaxonCategorySwedishName { get; set; }
+    /// <summary>
+    /// Dyntaxa taxon category swedish name.
+    /// </summary>
+    public string TaxonCategorySwedishName { get; set; }
 
-        /// <summary>
-        /// Dyntaxa taxon category english name.
-        /// </summary>
-        public string TaxonCategoryEnglishName { get; set; }
+    /// <summary>
+    /// Dyntaxa taxon category english name.
+    /// </summary>
+    public string TaxonCategoryEnglishName { get; set; }
 
-        /// <summary>
-        /// Darwin Core taxon category name.
-        /// </summary>
-        public string TaxonCategoryDarwinCoreName { get; set; }
-    }
+    /// <summary>
+    /// Darwin Core taxon category name.
+    /// </summary>
+    public string TaxonCategoryDarwinCoreName { get; set; }
 }

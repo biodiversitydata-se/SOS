@@ -1,11 +1,10 @@
-﻿namespace SOS.Lib.Models.DarwinCore.Vocabulary
+﻿namespace SOS.Lib.Models.DarwinCore.Vocabulary;
+
+public static class EstablishmentMeans
 {
-    public static class EstablishmentMeans
-    {
-        public static readonly string Native = "Native";
-        public static readonly string Introduced = "Introduced";
-        public static readonly string Naturalised = "Naturalised";
-        public static readonly string Invasive = "Invasive";
-        public static readonly string Managed = "Managed";
-    }
+    public static readonly string Native = "Native";
+    public static readonly string Introduced = "Introduced";
+    public static readonly string Naturalised = "Naturalised";
+    public static readonly string Invasive = "Invasive";
+    public static readonly string Managed = "Managed";
 }

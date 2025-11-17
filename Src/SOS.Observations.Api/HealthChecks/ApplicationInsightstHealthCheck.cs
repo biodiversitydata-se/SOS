@@ -4,60 +4,59 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SOS.Observations.Api.HealthChecks
+namespace SOS.Observations.Api.HealthChecks;
+
+/// <summary>
+/// Health check by checking number of documents in index 
+/// </summary>
+public class ApplicationInsightstHealthCheck : IHealthCheck
 {
+    private readonly IApiUsageStatisticsRepository _apiUsageStatisticsRepository;
+
     /// <summary>
-    /// Health check by checking number of documents in index 
+    /// Constructor
     /// </summary>
-    public class ApplicationInsightstHealthCheck : IHealthCheck
+    /// <param name="apiUsageStatisticsRepository"></param>
+    public ApplicationInsightstHealthCheck(IApiUsageStatisticsRepository apiUsageStatisticsRepository)
     {
-        private readonly IApiUsageStatisticsRepository _apiUsageStatisticsRepository;
+        _apiUsageStatisticsRepository = apiUsageStatisticsRepository ?? throw new ArgumentNullException(nameof(apiUsageStatisticsRepository));
+    }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="apiUsageStatisticsRepository"></param>
-        public ApplicationInsightstHealthCheck(IApiUsageStatisticsRepository apiUsageStatisticsRepository)
+    /// <summary>
+    /// Make health check
+    /// </summary>
+    /// <param name="context"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    public async Task<HealthCheckResult> CheckHealthAsync(
+    HealthCheckContext context,
+    CancellationToken cancellationToken = default(CancellationToken))
+    {
+        try
         {
-            _apiUsageStatisticsRepository = apiUsageStatisticsRepository ?? throw new ArgumentNullException(nameof(apiUsageStatisticsRepository));
-        }
+            var latestHarvestDate = await _apiUsageStatisticsRepository.GetLatestHarvestDate();
 
-        /// <summary>
-        /// Make health check
-        /// </summary>
-        /// <param name="context"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        public async Task<HealthCheckResult> CheckHealthAsync(
-        HealthCheckContext context,
-        CancellationToken cancellationToken = default(CancellationToken))
-        {
-            try
+            if (latestHarvestDate.HasValue)
             {
-                var latestHarvestDate = await _apiUsageStatisticsRepository.GetLatestHarvestDate();
-
-                if (latestHarvestDate.HasValue)
+                var lastHarvestMessage = $"Last ApplicationInsights harvest: {latestHarvestDate.Value.ToShortDateString()}";
+                if ((DateTime.Now - latestHarvestDate.Value).Days > 30)
                 {
-                    var lastHarvestMessage = $"Last ApplicationInsights harvest: {latestHarvestDate.Value.ToShortDateString()}";
-                    if ((DateTime.Now - latestHarvestDate.Value).Days > 30)
-                    {
-                        return new HealthCheckResult(HealthStatus.Degraded, lastHarvestMessage);
-                    }
-
-                    if ((DateTime.Now - latestHarvestDate.Value).Days > 25)
-                    {
-                        return new HealthCheckResult(HealthStatus.Degraded, lastHarvestMessage);
-                    }
-
-                    return new HealthCheckResult(HealthStatus.Healthy, lastHarvestMessage);
+                    return new HealthCheckResult(HealthStatus.Degraded, lastHarvestMessage);
                 }
 
-                return new HealthCheckResult(HealthStatus.Degraded, "No ApplicationInsights harvest has been done");
+                if ((DateTime.Now - latestHarvestDate.Value).Days > 25)
+                {
+                    return new HealthCheckResult(HealthStatus.Degraded, lastHarvestMessage);
+                }
+
+                return new HealthCheckResult(HealthStatus.Healthy, lastHarvestMessage);
             }
-            catch (Exception)
-            {
-                return new HealthCheckResult(HealthStatus.Degraded, "ApplicationInsights health check failed");
-            }
+
+            return new HealthCheckResult(HealthStatus.Degraded, "No ApplicationInsights harvest has been done");
+        }
+        catch (Exception)
+        {
+            return new HealthCheckResult(HealthStatus.Degraded, "ApplicationInsights health check failed");
         }
     }
 }

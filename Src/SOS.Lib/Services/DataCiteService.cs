@@ -7,146 +7,145 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace SOS.Lib.Services
+namespace SOS.Lib.Services;
+
+/// <summary>
+///     Species data service
+/// </summary>
+public class DataCiteService : IDataCiteService
 {
-    /// <summary>
-    ///     Species data service
-    /// </summary>
-    public class DataCiteService : IDataCiteService
+    private readonly IHttpClientService _httpClientService;
+    private readonly DataCiteServiceConfiguration _dataCiteServiceConfiguration;
+    private readonly ILogger<DataCiteService> _logger;
+
+    private Dictionary<string, string> GetBasciAuthenticationHeader()
     {
-        private readonly IHttpClientService _httpClientService;
-        private readonly DataCiteServiceConfiguration _dataCiteServiceConfiguration;
-        private readonly ILogger<DataCiteService> _logger;
-
-        private Dictionary<string, string> GetBasciAuthenticationHeader()
+        return new Dictionary<string, string>
         {
-            return new Dictionary<string, string>
-            {
-                { "userName", _dataCiteServiceConfiguration.UserName },
-                { "password", _dataCiteServiceConfiguration.Password }
-            };
+            { "userName", _dataCiteServiceConfiguration.UserName },
+            { "password", _dataCiteServiceConfiguration.Password }
+        };
+    }
+
+    /// <summary>
+    /// Constructor
+    /// </summary>
+    /// <param name="httpClientService"></param>
+    /// <param name="dataCiteServiceConfiguration"></param>
+    /// <param name="logger"></param>
+    public DataCiteService(
+        IHttpClientService httpClientService,
+        DataCiteServiceConfiguration dataCiteServiceConfiguration,
+        ILogger<DataCiteService> logger)
+    {
+        _httpClientService = httpClientService ?? throw new ArgumentNullException(nameof(httpClientService));
+        _dataCiteServiceConfiguration = dataCiteServiceConfiguration ??
+                                        throw new ArgumentNullException(nameof(dataCiteServiceConfiguration));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    }
+
+    /// <inheritdoc />
+    public async Task<DOIMetadata> CreateDoiDraftAsync(DOIMetadata data)
+    {
+        if (data == null)
+        {
+            return null;
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="httpClientService"></param>
-        /// <param name="dataCiteServiceConfiguration"></param>
-        /// <param name="logger"></param>
-        public DataCiteService(
-            IHttpClientService httpClientService,
-            DataCiteServiceConfiguration dataCiteServiceConfiguration,
-            ILogger<DataCiteService> logger)
+        if (data.Attributes == null)
         {
-            _httpClientService = httpClientService ?? throw new ArgumentNullException(nameof(httpClientService));
-            _dataCiteServiceConfiguration = dataCiteServiceConfiguration ??
-                                            throw new ArgumentNullException(nameof(dataCiteServiceConfiguration));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            data.Attributes = new DOIAttributes();
         }
 
-        /// <inheritdoc />
-        public async Task<DOIMetadata> CreateDoiDraftAsync(DOIMetadata data)
+        // Create a DOI 
+        data.Attributes.DOI = $"{_dataCiteServiceConfiguration.DoiPrefix}/{(string.IsNullOrEmpty(data.Attributes.Suffix) ? Guid.NewGuid().ToString() : data.Attributes.Suffix)}";
+
+        var doiRequest = new DOI<DOIMetadata>
         {
-            if (data == null)
-            {
-                return null;
-            }
+            Data = data
+        };
 
-            if (data.Attributes == null)
-            {
-                data.Attributes = new DOIAttributes();
-            }
+        // Validate creators, title, publisher, publicationYear, resourceTypeGeneral
+        var doi = await _httpClientService.PostDataAsync<DOI<DOIMetadata>>(
+            new Uri($"{_dataCiteServiceConfiguration.BaseAddress}/dois"), doiRequest, GetBasciAuthenticationHeader(), "application/vnd.api+json");
 
-            // Create a DOI 
-            data.Attributes.DOI = $"{_dataCiteServiceConfiguration.DoiPrefix}/{(string.IsNullOrEmpty(data.Attributes.Suffix) ? Guid.NewGuid().ToString() : data.Attributes.Suffix)}";
+        return doi?.Data;
+    }
+
+    /// <inheritdoc />
+    public async Task<DOI<IEnumerable<DOIMetadata>>> GetBatchAsync(int take, int page, string orderBy, SearchSortOrder sortOrder)
+    {
+        try
+        {
+            var response = await _httpClientService.GetDataAsync<DOI<IEnumerable<DOIMetadata>>>(
+                new Uri($"{_dataCiteServiceConfiguration.BaseAddress}/dois?client-id={_dataCiteServiceConfiguration.ClientId.ToLower()}&page[size]={take}&page[number]={page}&sort={orderBy}:{(sortOrder == SearchSortOrder.Asc ? "asc" : "desc")}"));
+
+            return response;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Failed to get DOI batch");
+        }
+
+        return null;
+    }
+
+    /// <inheritdoc />
+    public async Task<DOIMetadata> GetMetadataAsync(string prefix, string suffix)
+    {
+        try
+        {
+            return (await _httpClientService.GetDataAsync<DOI<DOIMetadata>>(
+                new Uri($"{_dataCiteServiceConfiguration.BaseAddress}/dois/{prefix}/{suffix}"))).Data;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Failed to get metadata");
+        }
+
+        return null;
+    }
+
+    /// <inheritdoc />
+    public async Task<bool> PublishDoiAsync(DOIMetadata data)
+    {
+        try
+        {
+            data.Attributes.Event = "publish";
 
             var doiRequest = new DOI<DOIMetadata>
             {
                 Data = data
             };
 
-            // Validate creators, title, publisher, publicationYear, resourceTypeGeneral
-            var doi = await _httpClientService.PostDataAsync<DOI<DOIMetadata>>(
-                new Uri($"{_dataCiteServiceConfiguration.BaseAddress}/dois"), doiRequest, GetBasciAuthenticationHeader(), "application/vnd.api+json");
+            await _httpClientService.PutDataAsync<DOI<DOIMetadata>>(
+                 new Uri($"{_dataCiteServiceConfiguration.BaseAddress}/dois/{data.Id}"), doiRequest, GetBasciAuthenticationHeader(), "application/vnd.api+json");
 
-            return doi?.Data;
+            return true;
         }
-
-        /// <inheritdoc />
-        public async Task<DOI<IEnumerable<DOIMetadata>>> GetBatchAsync(int take, int page, string orderBy, SearchSortOrder sortOrder)
+        catch (Exception e)
         {
-            try
-            {
-                var response = await _httpClientService.GetDataAsync<DOI<IEnumerable<DOIMetadata>>>(
-                    new Uri($"{_dataCiteServiceConfiguration.BaseAddress}/dois?client-id={_dataCiteServiceConfiguration.ClientId.ToLower()}&page[size]={take}&page[number]={page}&sort={orderBy}:{(sortOrder == SearchSortOrder.Asc ? "asc" : "desc")}"));
-
-                return response;
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Failed to get DOI batch");
-            }
-
-            return null;
+            _logger.LogError(e, "Failed to publish DOI");
         }
 
-        /// <inheritdoc />
-        public async Task<DOIMetadata> GetMetadataAsync(string prefix, string suffix)
+        return false;
+    }
+
+    /// <inheritdoc />
+    public async Task<DOI<IEnumerable<DOIMetadata>>> SearchMetadataAsync(string searchFor)
+    {
+        try
         {
-            try
-            {
-                return (await _httpClientService.GetDataAsync<DOI<DOIMetadata>>(
-                    new Uri($"{_dataCiteServiceConfiguration.BaseAddress}/dois/{prefix}/{suffix}"))).Data;
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Failed to get metadata");
-            }
+            var response = await _httpClientService.GetDataAsync<DOI<IEnumerable<DOIMetadata>>>(
+                 new Uri($"{_dataCiteServiceConfiguration.BaseAddress}/dois?client-id={_dataCiteServiceConfiguration.ClientId.ToLower()}&query=+{searchFor.Replace(" ", "+")}&sort=created:desc"));
 
-            return null;
+            return response;
         }
-
-        /// <inheritdoc />
-        public async Task<bool> PublishDoiAsync(DOIMetadata data)
+        catch (Exception e)
         {
-            try
-            {
-                data.Attributes.Event = "publish";
-
-                var doiRequest = new DOI<DOIMetadata>
-                {
-                    Data = data
-                };
-
-                await _httpClientService.PutDataAsync<DOI<DOIMetadata>>(
-                     new Uri($"{_dataCiteServiceConfiguration.BaseAddress}/dois/{data.Id}"), doiRequest, GetBasciAuthenticationHeader(), "application/vnd.api+json");
-
-                return true;
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Failed to publish DOI");
-            }
-
-            return false;
+            _logger.LogError(e, "Failed to search DOI's");
         }
 
-        /// <inheritdoc />
-        public async Task<DOI<IEnumerable<DOIMetadata>>> SearchMetadataAsync(string searchFor)
-        {
-            try
-            {
-                var response = await _httpClientService.GetDataAsync<DOI<IEnumerable<DOIMetadata>>>(
-                     new Uri($"{_dataCiteServiceConfiguration.BaseAddress}/dois?client-id={_dataCiteServiceConfiguration.ClientId.ToLower()}&query=+{searchFor.Replace(" ", "+")}&sort=created:desc"));
-
-                return response;
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Failed to search DOI's");
-            }
-
-            return null;
-        }
+        return null;
     }
 }

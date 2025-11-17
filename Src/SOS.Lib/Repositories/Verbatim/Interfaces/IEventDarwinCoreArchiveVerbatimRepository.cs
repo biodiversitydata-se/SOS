@@ -4,32 +4,30 @@ using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 
-namespace SOS.Lib.Repositories.Verbatim.Interfaces
+namespace SOS.Lib.Repositories.Verbatim.Interfaces;
+
+public interface IEventDarwinCoreArchiveVerbatimRepository : IVerbatimRepositoryBase<DwcEventVerbatim, int>
 {
-    public interface IEventDarwinCoreArchiveVerbatimRepository : IVerbatimRepositoryBase<DwcEventVerbatim, int>
-    {
-        /// <summary>
-        /// Count distinct values
-        /// </summary>
-        /// <param name="expression"></param>
-        /// <param name="limit"></param>
-        /// <returns></returns>
-        IEnumerable<DistinictValueCount<string>> GetDistinctValuesCount(
-            Expression<Func<DwcEventVerbatim, DistinctValueObject<string>>> expression,
-            int limit);
-    }
+    /// <summary>
+    /// Count distinct values
+    /// </summary>
+    /// <param name="expression"></param>
+    /// <param name="limit"></param>
+    /// <returns></returns>
+    IEnumerable<DistinictValueCount<string>> GetDistinctValuesCount(
+        Expression<Func<DwcEventVerbatim, DistinctValueObject<string>>> expression,
+        int limit);
+}
 
-    public interface IEventOccurrenceDarwinCoreArchiveVerbatimRepository : IVerbatimRepositoryBase<DwcEventOccurrenceVerbatim, int>
-    {
-        /// <summary>
-        /// Count distinct values
-        /// </summary>
-        /// <param name="expression"></param>
-        /// <param name="limit"></param>
-        /// <returns></returns>
-        IEnumerable<DistinictValueCount<string>> GetDistinctValuesCount(
-            Expression<Func<DwcEventOccurrenceVerbatim, DistinctValueObject<string>>> expression,
-            int limit);
-    }
-
+public interface IEventOccurrenceDarwinCoreArchiveVerbatimRepository : IVerbatimRepositoryBase<DwcEventOccurrenceVerbatim, int>
+{
+    /// <summary>
+    /// Count distinct values
+    /// </summary>
+    /// <param name="expression"></param>
+    /// <param name="limit"></param>
+    /// <returns></returns>
+    IEnumerable<DistinictValueCount<string>> GetDistinctValuesCount(
+        Expression<Func<DwcEventOccurrenceVerbatim, DistinctValueObject<string>>> expression,
+        int limit);
 }

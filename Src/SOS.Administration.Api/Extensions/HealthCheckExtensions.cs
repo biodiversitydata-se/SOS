@@ -1,23 +1,22 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace SOS.Administration.Api.Extensions
-{
-    public static class HealthCheckExtensions
-    {        
-        public static IServiceCollection SetupHealthchecks(this IServiceCollection services)
-        {
-            services.AddHealthChecks().AddCheck<HealthCheck>("CustomHealthCheck");
+namespace SOS.Administration.Api.Extensions;
 
-            return services;
-        }
+public static class HealthCheckExtensions
+{        
+    public static IServiceCollection SetupHealthchecks(this IServiceCollection services)
+    {
+        services.AddHealthChecks().AddCheck<HealthCheck>("CustomHealthCheck");
 
-        public static WebApplication ApplyMapHealthChecks(this WebApplication app)
-        {            
-            //app.UseHealthChecks("/healthz");
-            app.MapHealthChecks("/healthz").AllowAnonymous();
+        return services;
+    }
 
-            return app;
-        }
+    public static WebApplication ApplyMapHealthChecks(this WebApplication app)
+    {            
+        //app.UseHealthChecks("/healthz");
+        app.MapHealthChecks("/healthz").AllowAnonymous();
+
+        return app;
     }
 }

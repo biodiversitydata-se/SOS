@@ -1,8 +1,7 @@
-﻿namespace SOS.Shared.Api.Dtos.Status
+﻿namespace SOS.Shared.Api.Dtos.Status;
+
+public class MongoDbInfoDto
 {
-    public class MongoDbInfoDto
-    {
-        public string DiskUsed { get; set; }
-        public string DiskTotal { get; set; }
-    }
+    public string DiskUsed { get; set; }
+    public string DiskTotal { get; set; }
 }

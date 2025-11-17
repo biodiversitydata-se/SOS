@@ -7,44 +7,43 @@ using SOS.Lib.Models.Processed.Observation;
 using System.Collections.Generic;
 using Xunit;
 
-namespace SOS.Lib.UnitTests.Models.Processed.Observation
+namespace SOS.Lib.UnitTests.Models.Processed.Observation;
+
+public class FlatObservationTests
 {
-    public class FlatObservationTests
+    [Fact]
+    public void Test_FlatObservation_Mappings()
     {
-        [Fact]
-        public void Test_FlatObservation_Mappings()
+        //-----------------------------------------------------------------------------------------------------------
+        // Arrange
+        //-----------------------------------------------------------------------------------------------------------            
+        var propertyFields = ObservationPropertyFieldDescriptionHelper.FieldsByFieldSet[OutputFieldSet.All];
+        var observation = AutoFaker.Generate<Lib.Models.Processed.Observation.Observation>();
+        var flatObservation = new FlatObservation(observation);
+
+        //-----------------------------------------------------------------------------------------------------------
+        // Act
+        //-----------------------------------------------------------------------------------------------------------
+        var stringValueByProperty = new Dictionary<string, string>();
+        var propertiesWithErrors = new List<PropertyFieldDescription>();
+        foreach (var field in propertyFields)
         {
-            //-----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------            
-            var propertyFields = ObservationPropertyFieldDescriptionHelper.FieldsByFieldSet[OutputFieldSet.All];
-            var observation = AutoFaker.Generate<Lib.Models.Processed.Observation.Observation>();
-            var flatObservation = new FlatObservation(observation);
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var stringValueByProperty = new Dictionary<string, string>();
-            var propertiesWithErrors = new List<PropertyFieldDescription>();
-            foreach (var field in propertyFields)
+            try
             {
-                try
-                {
-                    string stringValue = flatObservation.GetStringValue(field);
-                    stringValueByProperty.Add(field.PropertyPath, stringValue);
-                }
-                catch
-                {
-                    propertiesWithErrors.Add(field);
-                }
+                string stringValue = flatObservation.GetStringValue(field);
+                stringValueByProperty.Add(field.PropertyPath, stringValue);
             }
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------            
-            //string mappingCode = string.Join(",\r\n", propertiesWithErrors.Select(m => $"\"{m.PropertyPath.ToLower()}\" => \"N/A\""));
-            propertiesWithErrors.Should().BeEmpty();
-            stringValueByProperty.Should().NotBeEmpty();
+            catch
+            {
+                propertiesWithErrors.Add(field);
+            }
         }
+
+        //-----------------------------------------------------------------------------------------------------------
+        // Assert
+        //-----------------------------------------------------------------------------------------------------------            
+        //string mappingCode = string.Join(",\r\n", propertiesWithErrors.Select(m => $"\"{m.PropertyPath.ToLower()}\" => \"N/A\""));
+        propertiesWithErrors.Should().BeEmpty();
+        stringValueByProperty.Should().NotBeEmpty();
     }
 }

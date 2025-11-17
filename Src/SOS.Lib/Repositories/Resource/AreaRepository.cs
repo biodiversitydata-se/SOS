@@ -16,198 +16,197 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace SOS.Lib.Repositories.Resource
+namespace SOS.Lib.Repositories.Resource;
+
+/// <summary>
+///     Area repository
+/// </summary>
+public class AreaRepository : RepositoryBase<Area, string>, IAreaRepository
 {
+    private readonly GridFSBucket _gridFSBucket;
+    private readonly JsonSerializerOptions _jsonSerializerOptions;
+
     /// <summary>
-    ///     Area repository
+    ///     Constructor
     /// </summary>
-    public class AreaRepository : RepositoryBase<Area, string>, IAreaRepository
+    /// <param name="processClient"></param>
+    /// <param name="logger"></param>
+    public AreaRepository(
+        IProcessClient processClient,
+        ILogger<AreaRepository> logger) : base(processClient, logger)
     {
-        private readonly GridFSBucket _gridFSBucket;
-        private readonly JsonSerializerOptions _jsonSerializerOptions;
+        _jsonSerializerOptions = new JsonSerializerOptions();
+        _jsonSerializerOptions.Converters.Add(new NetTopologySuite.IO.Converters.GeoJsonConverterFactory());
 
-        /// <summary>
-        ///     Constructor
-        /// </summary>
-        /// <param name="processClient"></param>
-        /// <param name="logger"></param>
-        public AreaRepository(
-            IProcessClient processClient,
-            ILogger<AreaRepository> logger) : base(processClient, logger)
+        if (Database != null)
         {
-            _jsonSerializerOptions = new JsonSerializerOptions();
-            _jsonSerializerOptions.Converters.Add(new NetTopologySuite.IO.Converters.GeoJsonConverterFactory());
-
-            if (Database != null)
-            {
-                _gridFSBucket = new GridFSBucket(Database, new GridFSBucketOptions { BucketName = nameof(Area) });
-            }
+            _gridFSBucket = new GridFSBucket(Database, new GridFSBucketOptions { BucketName = nameof(Area) });
         }
+    }
 
-        /// <inheritdoc />
-        public async Task CreateIndexAsync()
+    /// <inheritdoc />
+    public async Task CreateIndexAsync()
+    {
+        var indexModels = new[]
         {
-            var indexModels = new[]
+            new CreateIndexModel<Area>(
+                Builders<Area>.IndexKeys.Ascending(a => a.Name)),
+            new CreateIndexModel<Area>(
+                Builders<Area>.IndexKeys.Ascending(a => a.AreaType)),
+            new CreateIndexModel<Area>(
+                Builders<Area>.IndexKeys.Ascending(a => a.FeatureId)),
+            new CreateIndexModel<Area>(
+                Builders<Area>.IndexKeys.Ascending(a => a.AreaType).Ascending(a => a.FeatureId))
+        };
+
+        Logger.LogDebug("Start creating Area indexes");
+        await MongoCollection.Indexes.CreateManyAsync(indexModels);
+        Logger.LogDebug("Finish creating Area indexes");
+    }
+
+    /// <inheritdoc />
+    public async Task DropGeometriesAsync()
+    {
+        await _gridFSBucket.DropAsync();
+    }
+
+    /// <inheritdoc />
+    public async Task<Geometry> GetGeometryAsync(AreaType areaType, string featureId)
+    {
+        try
+        {
+            var areaId = areaType.ToAreaId(featureId);
+            //var bytes = await _gridFSBucket.DownloadAsBytesByNameAsync(areaId); // Is case sensitive, Problem with agggregation methods and fields using lower case normalizer
+            
+            // Handle case insensitive
+            var filter = Builders<GridFSFileInfo>.Filter.Regex("filename", new BsonRegularExpression($"^{areaId}$", "i"));
+            var files = await _gridFSBucket.FindAsync(filter);
+            var fileInfo = await files.FirstOrDefaultAsync();
+
+            if (fileInfo != null)
             {
-                new CreateIndexModel<Area>(
-                    Builders<Area>.IndexKeys.Ascending(a => a.Name)),
-                new CreateIndexModel<Area>(
-                    Builders<Area>.IndexKeys.Ascending(a => a.AreaType)),
-                new CreateIndexModel<Area>(
-                    Builders<Area>.IndexKeys.Ascending(a => a.FeatureId)),
-                new CreateIndexModel<Area>(
-                    Builders<Area>.IndexKeys.Ascending(a => a.AreaType).Ascending(a => a.FeatureId))
-            };
+                var bytes = await _gridFSBucket.DownloadAsBytesAsync(fileInfo.Id);
+                var utfString = Encoding.UTF8.GetString(bytes, 0, bytes.Length);
 
-            Logger.LogDebug("Start creating Area indexes");
-            await MongoCollection.Indexes.CreateManyAsync(indexModels);
-            Logger.LogDebug("Finish creating Area indexes");
-        }
-
-        /// <inheritdoc />
-        public async Task DropGeometriesAsync()
-        {
-            await _gridFSBucket.DropAsync();
-        }
-
-        /// <inheritdoc />
-        public async Task<Geometry> GetGeometryAsync(AreaType areaType, string featureId)
-        {
-            try
-            {
-                var areaId = areaType.ToAreaId(featureId);
-                //var bytes = await _gridFSBucket.DownloadAsBytesByNameAsync(areaId); // Is case sensitive, Problem with agggregation methods and fields using lower case normalizer
-                
-                // Handle case insensitive
-                var filter = Builders<GridFSFileInfo>.Filter.Regex("filename", new BsonRegularExpression($"^{areaId}$", "i"));
-                var files = await _gridFSBucket.FindAsync(filter);
-                var fileInfo = await files.FirstOrDefaultAsync();
-
-                if (fileInfo != null)
-                {
-                    var bytes = await _gridFSBucket.DownloadAsBytesAsync(fileInfo.Id);
-                    var utfString = Encoding.UTF8.GetString(bytes, 0, bytes.Length);
-
-                    return JsonSerializer.Deserialize<Geometry>(utfString, _jsonSerializerOptions);
-                }
-
-                return null;
-            }
-            catch
-            {
-                return null;
-            }
-        }
-
-        public async Task<List<Area>> GetAsync(AreaType[] areaTypes)
-        {
-            var filter = Builders<Area>.Filter.In(y => y.AreaType, areaTypes);
-            var res = await (await MongoCollection.FindAsync(filter)).ToListAsync();
-            return res;
-        }
-
-        /// <inheritdoc />
-        public async Task<Area> GetAsync(AreaType areaType, string feature)
-        {
-            var filters = new[] {
-                Builders<Area>.Filter.Eq(a => a.AreaType, areaType),
-                Builders<Area>.Filter.Eq(a => a.FeatureId, feature)
-            };
-
-            var res = await (await MongoCollection.FindAsync(Builders<Area>.Filter.And(filters))).FirstOrDefaultAsync();
-            return res;
-        }
-
-
-        /// <inheritdoc />
-        public async Task<PagedResult<Area>> GetAreasAsync(IEnumerable<AreaType> areaTypes, string searchString,
-            int skip, int take)
-        {
-            var filters = new List<FilterDefinition<Area>>();
-
-            if (areaTypes?.Any() ?? false)
-            {
-                filters.Add(Builders<Area>.Filter.In(a => a.AreaType, areaTypes));
-            }
-            else
-            {
-                // Make sure economic zone of sweden is NOT matched
-                filters.Add(Builders<Area>.Filter.In(a => a.AreaType, ((AreaType[])Enum.GetValues(typeof(AreaType))).Where(at => at != AreaType.EconomicZoneOfSweden)));
+                return JsonSerializer.Deserialize<Geometry>(utfString, _jsonSerializerOptions);
             }
 
-            if (!string.IsNullOrEmpty(searchString))
-            {
-                filters.Add(Builders<Area>.Filter
-                    .Where(f => f
-                        .Name.ToLower()
-                        .Contains(searchString.ToLower())));
-            }
+            return null;
+        }
+        catch
+        {
+            return null;
+        }
+    }
 
-            var filter = filters.Count == 0 ? Builders<Area>.Filter.Empty : Builders<Area>.Filter.And(filters);
+    public async Task<List<Area>> GetAsync(AreaType[] areaTypes)
+    {
+        var filter = Builders<Area>.Filter.In(y => y.AreaType, areaTypes);
+        var res = await (await MongoCollection.FindAsync(filter)).ToListAsync();
+        return res;
+    }
 
-            var total = await MongoCollection
+    /// <inheritdoc />
+    public async Task<Area> GetAsync(AreaType areaType, string feature)
+    {
+        var filters = new[] {
+            Builders<Area>.Filter.Eq(a => a.AreaType, areaType),
+            Builders<Area>.Filter.Eq(a => a.FeatureId, feature)
+        };
+
+        var res = await (await MongoCollection.FindAsync(Builders<Area>.Filter.And(filters))).FirstOrDefaultAsync();
+        return res;
+    }
+
+
+    /// <inheritdoc />
+    public async Task<PagedResult<Area>> GetAreasAsync(IEnumerable<AreaType> areaTypes, string searchString,
+        int skip, int take)
+    {
+        var filters = new List<FilterDefinition<Area>>();
+
+        if (areaTypes?.Any() ?? false)
+        {
+            filters.Add(Builders<Area>.Filter.In(a => a.AreaType, areaTypes));
+        }
+        else
+        {
+            // Make sure economic zone of sweden is NOT matched
+            filters.Add(Builders<Area>.Filter.In(a => a.AreaType, ((AreaType[])Enum.GetValues(typeof(AreaType))).Where(at => at != AreaType.EconomicZoneOfSweden)));
+        }
+
+        if (!string.IsNullOrEmpty(searchString))
+        {
+            filters.Add(Builders<Area>.Filter
+                .Where(f => f
+                    .Name.ToLower()
+                    .Contains(searchString.ToLower())));
+        }
+
+        var filter = filters.Count == 0 ? Builders<Area>.Filter.Empty : Builders<Area>.Filter.And(filters);
+
+        var total = await MongoCollection
+            .Find(filter)
+            .CountDocumentsAsync();
+
+        var result = await MongoCollection
+            .Find(filter)
+            .Skip(skip)
+            .Limit(take)
+            .ToListAsync();
+
+        return new PagedResult<Area>
+        {
+            Records = result,
+            Skip = skip,
+            Take = take,
+            TotalCount = total
+        };
+    }
+
+    /// <inheritdoc />
+    public async Task<PagedResult<Area>> GetAreasAsync(
+        IEnumerable<(AreaType AreaType, string FeatureId)> areaKeys,
+        int skip, 
+        int take)
+    {
+        var filters = new List<FilterDefinition<Area>>();
+        IEnumerable<Area> result = null;
+        var total = 0L;
+        if (areaKeys?.Any() ?? false)
+        {
+            var filter = Builders<Area>.Filter.In("_id", areaKeys.Select(ak => ak.AreaType.ToAreaId(ak.FeatureId)));
+            total = await MongoCollection
                 .Find(filter)
                 .CountDocumentsAsync();
-
-            var result = await MongoCollection
+            result = await MongoCollection
                 .Find(filter)
                 .Skip(skip)
                 .Limit(take)
                 .ToListAsync();
-
-            return new PagedResult<Area>
-            {
-                Records = result,
-                Skip = skip,
-                Take = take,
-                TotalCount = total
-            };
         }
 
-        /// <inheritdoc />
-        public async Task<PagedResult<Area>> GetAreasAsync(
-            IEnumerable<(AreaType AreaType, string FeatureId)> areaKeys,
-            int skip, 
-            int take)
+        return new PagedResult<Area>
         {
-            var filters = new List<FilterDefinition<Area>>();
-            IEnumerable<Area> result = null;
-            var total = 0L;
-            if (areaKeys?.Any() ?? false)
-            {
-                var filter = Builders<Area>.Filter.In("_id", areaKeys.Select(ak => ak.AreaType.ToAreaId(ak.FeatureId)));
-                total = await MongoCollection
-                    .Find(filter)
-                    .CountDocumentsAsync();
-                result = await MongoCollection
-                    .Find(filter)
-                    .Skip(skip)
-                    .Limit(take)
-                    .ToListAsync();
-            }
+            Records = result,
+            Skip = skip,
+            Take = take,
+            TotalCount = total
+        };
+    }
 
-            return new PagedResult<Area>
-            {
-                Records = result,
-                Skip = skip,
-                Take = take,
-                TotalCount = total
-            };
-        }
-
-        /// <inheritdoc />
-        public async Task<bool> StoreGeometriesAsync(IDictionary<string, Geometry> areaGeometries)
+    /// <inheritdoc />
+    public async Task<bool> StoreGeometriesAsync(IDictionary<string, Geometry> areaGeometries)
+    {
+        foreach (var geometry in areaGeometries)
         {
-            foreach (var geometry in areaGeometries)
-            {
-                var fileName = geometry.Key;
-                var geometryString = JsonSerializer.Serialize(geometry.Value, _jsonSerializerOptions);
-                var byteArray = Encoding.UTF8.GetBytes(geometryString);
+            var fileName = geometry.Key;
+            var geometryString = JsonSerializer.Serialize(geometry.Value, _jsonSerializerOptions);
+            var byteArray = Encoding.UTF8.GetBytes(geometryString);
 
-                await _gridFSBucket.UploadFromBytesAsync(fileName, byteArray);
-            }
-
-            return true;
+            await _gridFSBucket.UploadFromBytesAsync(fileName, byteArray);
         }
+
+        return true;
     }
 }

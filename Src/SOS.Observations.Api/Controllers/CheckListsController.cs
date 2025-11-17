@@ -15,123 +15,122 @@ using System.Net;
 using System.Threading.Tasks;
 using SOS.Lib.Helpers;
 
-namespace SOS.Observations.Api.Controllers
+namespace SOS.Observations.Api.Controllers;
+
+/// <summary>
+///     Checklists controller
+/// </summary>
+[Route("[controller]")]
+[ApiController]
+public class ChecklistsController : ControllerBase
 {
-    /// <summary>
-    ///     Checklists controller
-    /// </summary>
-    [Route("[controller]")]
-    [ApiController]
-    public class ChecklistsController : ControllerBase
+    private readonly IChecklistManager _checklistManager;
+    private readonly ITaxonManager _taxonManager;
+    private readonly ILogger<ChecklistsController> _logger;
+
+    private async Task<Result> ValidateTaxaAsync(IEnumerable<int> taxonIds)
     {
-        private readonly IChecklistManager _checklistManager;
-        private readonly ITaxonManager _taxonManager;
-        private readonly ILogger<ChecklistsController> _logger;
+        var taxonTree = await _taxonManager.GetTaxonTreeAsync();
+        var missingTaxa = taxonIds?
+            .Where(tid => !taxonTree.TreeNodeById.ContainsKey(tid))
+            .Select(tid => $"TaxonId doesn't exist ({tid})");
 
-        private async Task<Result> ValidateTaxaAsync(IEnumerable<int> taxonIds)
+        return missingTaxa?.Any() ?? false ?
+            Result.Failure(string.Join(". ", missingTaxa))
+            :
+            Result.Success();
+    }
+
+    /// <summary>
+    /// Constructor
+    /// </summary>
+    /// <param name="checklistManager"></param>
+    /// <param name="taxonManager"></param>
+    /// <param name="logger"></param>
+    public ChecklistsController(
+        IChecklistManager checklistManager,
+        ITaxonManager taxonManager,
+        ILogger<ChecklistsController> logger)
+    {
+        _checklistManager = checklistManager ?? throw new ArgumentNullException(nameof(checklistManager));
+        _taxonManager = taxonManager ?? throw new ArgumentNullException(nameof(taxonManager));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    }
+
+    /// <summary>
+    /// Calculate species trend as a quotient. Species trend = (Number of present observations) / (Number of present and absent observations)
+    /// </summary>
+    /// <param name="filter">The search filter.</param>
+    /// <returns></returns>
+    [HttpPost("CalculateTrend")]
+    [ProducesResponseType(typeof(TaxonTrendResult), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+    [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+    public async Task<IActionResult> CalculateTrendAsync([FromBody] CalculateTrendFilterDto filter)
+    {
+        try
         {
-            var taxonTree = await _taxonManager.GetTaxonTreeAsync();
-            var missingTaxa = taxonIds?
-                .Where(tid => !taxonTree.TreeNodeById.ContainsKey(tid))
-                .Select(tid => $"TaxonId doesn't exist ({tid})");
+            LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
+            var taxaValidation = await ValidateTaxaAsync(filter?.TaxonId == null ? new int[0] : new[] { filter.TaxonId });
 
-            return missingTaxa?.Any() ?? false ?
-                Result.Failure(string.Join(". ", missingTaxa))
-                :
-                Result.Success();
+            if (taxaValidation.IsFailure)
+            {
+                return BadRequest(taxaValidation.Error);
+            }
+            var (observationFilter, checklistFilter) = filter.ToSearchFilters();
+            var trend = await _checklistManager.CalculateTrendAsync(observationFilter, checklistFilter);
+
+            return new OkObjectResult(trend);
         }
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="checklistManager"></param>
-        /// <param name="taxonManager"></param>
-        /// <param name="logger"></param>
-        public ChecklistsController(
-            IChecklistManager checklistManager,
-            ITaxonManager taxonManager,
-            ILogger<ChecklistsController> logger)
+        catch (Exception e)
         {
-            _checklistManager = checklistManager ?? throw new ArgumentNullException(nameof(checklistManager));
-            _taxonManager = taxonManager ?? throw new ArgumentNullException(nameof(taxonManager));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _logger.LogError(e, "Error calculating trend");
+            return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
         }
+    }
 
-        /// <summary>
-        /// Calculate species trend as a quotient. Species trend = (Number of present observations) / (Number of present and absent observations)
-        /// </summary>
-        /// <param name="filter">The search filter.</param>
-        /// <returns></returns>
-        [HttpPost("CalculateTrend")]
-        [ProducesResponseType(typeof(TaxonTrendResult), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> CalculateTrendAsync([FromBody] CalculateTrendFilterDto filter)
+    /// <summary>
+    /// Get a checklist by eventId.
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    [HttpGet]
+    [ProducesResponseType(typeof(ChecklistDto), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+    public async Task<IActionResult> GetChecklistByIdAsync([FromQuery] string id)
+    {
+        try
         {
-            try
-            {
-                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
-                var taxaValidation = await ValidateTaxaAsync(filter?.TaxonId == null ? new int[0] : new[] { filter.TaxonId });
-
-                if (taxaValidation.IsFailure)
-                {
-                    return BadRequest(taxaValidation.Error);
-                }
-                var (observationFilter, checklistFilter) = filter.ToSearchFilters();
-                var trend = await _checklistManager.CalculateTrendAsync(observationFilter, checklistFilter);
-
-                return new OkObjectResult(trend);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Error calculating trend");
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
-            }
+            LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
+            return new OkObjectResult(await _checklistManager.GetChecklistAsync(id));
         }
-
-        /// <summary>
-        /// Get a checklist by eventId.
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        [HttpGet]
-        [ProducesResponseType(typeof(ChecklistDto), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetChecklistByIdAsync([FromQuery] string id)
+        catch (Exception e)
         {
-            try
-            {
-                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
-                return new OkObjectResult(await _checklistManager.GetChecklistAsync(id));
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Error getting checklist");
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
-            }
+            _logger.LogError(e, "Error getting checklist");
+            return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
         }
+    }
 
-        /// <summary>
-        /// Get a checklist by eventId.
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        [HttpGet("internal")]
-        [ProducesResponseType(typeof(ChecklistInternalDto), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        [InternalApi]
-        public async Task<IActionResult> GetChecklistByIdInternalAsync([FromQuery] string id)
+    /// <summary>
+    /// Get a checklist by eventId.
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    [HttpGet("internal")]
+    [ProducesResponseType(typeof(ChecklistInternalDto), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+    [InternalApi]
+    public async Task<IActionResult> GetChecklistByIdInternalAsync([FromQuery] string id)
+    {
+        try
         {
-            try
-            {
-                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
-                return new OkObjectResult(await _checklistManager.GetChecklistInternalAsync(id));
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Error getting checklist");
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
-            }
+            LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
+            return new OkObjectResult(await _checklistManager.GetChecklistInternalAsync(id));
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error getting checklist");
+            return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
         }
     }
 }

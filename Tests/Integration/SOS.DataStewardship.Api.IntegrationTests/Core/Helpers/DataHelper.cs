@@ -1,20 +1,19 @@
-﻿namespace SOS.DataStewardship.Api.IntegrationTests.Core.Helpers
+﻿namespace SOS.DataStewardship.Api.IntegrationTests.Core.Helpers;
+
+internal static class DataHelper
 {
-    internal static class DataHelper
+    private static Random _random = new Random();
+    internal static string RandomString(int length, IEnumerable<string> blackList = null!)
     {
-        private static Random _random = new Random();
-        internal static string RandomString(int length, IEnumerable<string> blackList = null!)
+        const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZÅÄÖ0123456789";
+        var value = new string(Enumerable.Repeat(chars, length)
+            .Select(s => s[_random.Next(s.Length)]).ToArray());
+
+        if (blackList?.Contains(value, StringComparer.CurrentCultureIgnoreCase) ?? false)
         {
-            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZÅÄÖ0123456789";
-            var value = new string(Enumerable.Repeat(chars, length)
-                .Select(s => s[_random.Next(s.Length)]).ToArray());
-
-            if (blackList?.Contains(value, StringComparer.CurrentCultureIgnoreCase) ?? false)
-            {
-                return RandomString(length, blackList);
-            }
-
-            return value;
+            return RandomString(length, blackList);
         }
+
+        return value;
     }
 }

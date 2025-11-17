@@ -1,26 +1,25 @@
 ﻿using System.Runtime.Serialization;
 
-namespace SOS.Shared.Api.Dtos.DataStewardship.Enums
+namespace SOS.Shared.Api.Dtos.DataStewardship.Enums;
+
+/// <summary>
+/// The purpose of the data collection (e.g. national or regional environmental monitoring).
+/// </summary>
+public enum DsPurpose
 {
     /// <summary>
-    /// The purpose of the data collection (e.g. national or regional environmental monitoring).
+    /// Nationell miljöövervakning
     /// </summary>
-    public enum DsPurpose
-    {
-        /// <summary>
-        /// Nationell miljöövervakning
-        /// </summary>
-        [EnumMember(Value = "nationell miljöövervakning")]
-        NationellMiljöövervakning = 0,
-        /// <summary>
-        /// Regional miljöövervakning
-        /// </summary>
-        [EnumMember(Value = "regional miljöövervakning")]
-        RegionalMiljöövervakning = 1,
-        /// <summary>
-        /// Biogeografisk uppföljning
-        /// </summary>
-        [EnumMember(Value = "biogeografisk uppföljning")]
-        BiogeografiskUppföljning = 2
-    }
+    [EnumMember(Value = "nationell miljöövervakning")]
+    NationellMiljöövervakning = 0,
+    /// <summary>
+    /// Regional miljöövervakning
+    /// </summary>
+    [EnumMember(Value = "regional miljöövervakning")]
+    RegionalMiljöövervakning = 1,
+    /// <summary>
+    /// Biogeografisk uppföljning
+    /// </summary>
+    [EnumMember(Value = "biogeografisk uppföljning")]
+    BiogeografiskUppföljning = 2
 }

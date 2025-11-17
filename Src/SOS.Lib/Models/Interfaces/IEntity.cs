@@ -1,21 +1,20 @@
-﻿namespace SOS.Lib.Models.Interfaces
+﻿namespace SOS.Lib.Models.Interfaces;
+
+/// <summary>
+///     IEntity interface
+/// </summary>
+/// <typeparam name="TKey"></typeparam>
+public interface IEntity<TKey>
 {
     /// <summary>
-    ///     IEntity interface
+    ///     Id
     /// </summary>
-    /// <typeparam name="TKey"></typeparam>
-    public interface IEntity<TKey>
-    {
-        /// <summary>
-        ///     Id
-        /// </summary>
-        TKey Id { get; set; }
-    }
+    TKey Id { get; set; }
+}
 
-    /// <summary>
-    ///     IEntity interface
-    /// </summary>
-    public interface IEntity : IEntity<string>
-    {
-    }
+/// <summary>
+///     IEntity interface
+/// </summary>
+public interface IEntity : IEntity<string>
+{
 }

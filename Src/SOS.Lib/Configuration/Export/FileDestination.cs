@@ -1,13 +1,12 @@
-﻿namespace SOS.Lib.Configuration.Export
+﻿namespace SOS.Lib.Configuration.Export;
+
+/// <summary>
+///     Root config
+/// </summary>
+public class FileDestination
 {
     /// <summary>
-    ///     Root config
+    ///     File path
     /// </summary>
-    public class FileDestination
-    {
-        /// <summary>
-        ///     File path
-        /// </summary>
-        public string Path { get; set; }
-    }
+    public string Path { get; set; }
 }

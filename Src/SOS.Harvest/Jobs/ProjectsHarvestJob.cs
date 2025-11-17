@@ -4,51 +4,50 @@ using SOS.Lib.Enums;
 using SOS.Lib.Jobs.Import;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
 
-namespace SOS.Harvest.Jobs
+namespace SOS.Harvest.Jobs;
+
+/// <summary>
+///     Projects harvest job.
+/// </summary>
+public class ProjectsHarvestJob : IProjectsHarvestJob
 {
+
+    private readonly IProjectHarvester _projectHarvester;
+    private readonly IHarvestInfoRepository _harvestInfoRepository;
+    private readonly ILogger<ProjectsHarvestJob> _logger;
+
     /// <summary>
-    ///     Projects harvest job.
+    ///     Constructor
     /// </summary>
-    public class ProjectsHarvestJob : IProjectsHarvestJob
+    /// <param name="vocabularyHarvester"></param>
+    /// <param name="projectHarvester"></param>
+    /// <param name="harvestInfoRepository"></param>
+    /// <param name="logger"></param>
+    public ProjectsHarvestJob(
+        IProjectHarvester projectHarvester,
+        IHarvestInfoRepository harvestInfoRepository,
+        ILogger<ProjectsHarvestJob> logger)
     {
+        _projectHarvester = projectHarvester ?? throw new ArgumentNullException(nameof(projectHarvester));
+        _harvestInfoRepository =
+            harvestInfoRepository ?? throw new ArgumentNullException(nameof(harvestInfoRepository));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    }
 
-        private readonly IProjectHarvester _projectHarvester;
-        private readonly IHarvestInfoRepository _harvestInfoRepository;
-        private readonly ILogger<ProjectsHarvestJob> _logger;
+    /// <inheritdoc />
+    public async Task<bool> RunHarvestProjectsAsync()
+    {
+        _logger.LogInformation("Start harvest projects job");
 
-        /// <summary>
-        ///     Constructor
-        /// </summary>
-        /// <param name="vocabularyHarvester"></param>
-        /// <param name="projectHarvester"></param>
-        /// <param name="harvestInfoRepository"></param>
-        /// <param name="logger"></param>
-        public ProjectsHarvestJob(
-            IProjectHarvester projectHarvester,
-            IHarvestInfoRepository harvestInfoRepository,
-            ILogger<ProjectsHarvestJob> logger)
-        {
-            _projectHarvester = projectHarvester ?? throw new ArgumentNullException(nameof(projectHarvester));
-            _harvestInfoRepository =
-                harvestInfoRepository ?? throw new ArgumentNullException(nameof(harvestInfoRepository));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        }
+        var result = await _projectHarvester.HarvestProjectsAsync();
 
-        /// <inheritdoc />
-        public async Task<bool> RunHarvestProjectsAsync()
-        {
-            _logger.LogInformation("Start harvest projects job");
+        _logger.LogInformation($"End harvest projects job. Result: {result.Status == RunStatus.Success}");
 
-            var result = await _projectHarvester.HarvestProjectsAsync();
+        // Save harvest info
+        await _harvestInfoRepository.AddOrUpdateAsync(result);
 
-            _logger.LogInformation($"End harvest projects job. Result: {result.Status == RunStatus.Success}");
-
-            // Save harvest info
-            await _harvestInfoRepository.AddOrUpdateAsync(result);
-
-            return result.Status == RunStatus.Success && result.Count > 0
-                ? true
-                : throw new Exception("Harvest projects job failed");
-        }
+        return result.Status == RunStatus.Success && result.Count > 0
+            ? true
+            : throw new Exception("Harvest projects job failed");
     }
 }

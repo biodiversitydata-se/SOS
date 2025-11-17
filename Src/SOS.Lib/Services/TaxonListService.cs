@@ -6,67 +6,66 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace SOS.Lib.Services
+namespace SOS.Lib.Services;
+
+/// <summary>
+/// Taxon list service
+/// </summary>
+public class TaxonListService : ITaxonListService
 {
+    private readonly IHttpClientService _httpClientService;
+    private readonly TaxonListServiceConfiguration _taxonListServiceConfiguration;
+    private readonly ILogger<TaxonListService> _logger;
+
     /// <summary>
-    /// Taxon list service
+    /// Constructor
     /// </summary>
-    public class TaxonListService : ITaxonListService
+    /// <param name="httpClientService"></param>
+    /// <param name="taxonListServiceConfiguration"></param>
+    /// <param name="logger"></param>
+    public TaxonListService(
+        IHttpClientService httpClientService,
+        TaxonListServiceConfiguration taxonListServiceConfiguration,
+        ILogger<TaxonListService> logger)
     {
-        private readonly IHttpClientService _httpClientService;
-        private readonly TaxonListServiceConfiguration _taxonListServiceConfiguration;
-        private readonly ILogger<TaxonListService> _logger;
+        _httpClientService = httpClientService ?? throw new ArgumentNullException(nameof(httpClientService));
+        _taxonListServiceConfiguration = taxonListServiceConfiguration ??
+                                         throw new ArgumentNullException(nameof(taxonListServiceConfiguration));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="httpClientService"></param>
-        /// <param name="taxonListServiceConfiguration"></param>
-        /// <param name="logger"></param>
-        public TaxonListService(
-            IHttpClientService httpClientService,
-            TaxonListServiceConfiguration taxonListServiceConfiguration,
-            ILogger<TaxonListService> logger)
+    public async Task<List<ConservationList>> GetDefinitionsAsync()
+    {
+        try
         {
-            _httpClientService = httpClientService ?? throw new ArgumentNullException(nameof(httpClientService));
-            _taxonListServiceConfiguration = taxonListServiceConfiguration ??
-                                             throw new ArgumentNullException(nameof(taxonListServiceConfiguration));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            var response = await _httpClientService.GetDataAsync<ConservationListsResult>(
+                new Uri($"{_taxonListServiceConfiguration.BaseAddress}/definitions"));
+
+            return response.ConservationLists;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Failed to get conservation lists definition");
         }
 
-        public async Task<List<ConservationList>> GetDefinitionsAsync()
+        return null;
+    }
+
+    public async Task<List<NatureConservationListTaxa>> GetTaxaAsync(IEnumerable<int> conservationListIds)
+    {
+        try
         {
-            try
-            {
-                var response = await _httpClientService.GetDataAsync<ConservationListsResult>(
-                    new Uri($"{_taxonListServiceConfiguration.BaseAddress}/definitions"));
+            var response = await _httpClientService.PostDataAsync<NatureConservationListTaxaResult>(
+                new Uri($"{_taxonListServiceConfiguration.BaseAddress}/taxa"),
+                    new { conservationListIds, outputFields = new[] { "id", "scientificname", "swedishname" } });
 
-                return response.ConservationLists;
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Failed to get conservation lists definition");
-            }
-
-            return null;
+            return response.NatureConservationListTaxa;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Failed to get conservation lists taxa");
         }
 
-        public async Task<List<NatureConservationListTaxa>> GetTaxaAsync(IEnumerable<int> conservationListIds)
-        {
-            try
-            {
-                var response = await _httpClientService.PostDataAsync<NatureConservationListTaxaResult>(
-                    new Uri($"{_taxonListServiceConfiguration.BaseAddress}/taxa"),
-                        new { conservationListIds, outputFields = new[] { "id", "scientificname", "swedishname" } });
-
-                return response.NatureConservationListTaxa;
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Failed to get conservation lists taxa");
-            }
-
-            return null;
-        }
+        return null;
     }
 }

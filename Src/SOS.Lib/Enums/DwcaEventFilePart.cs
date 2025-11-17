@@ -1,13 +1,12 @@
-﻿namespace SOS.Lib.Enums
+﻿namespace SOS.Lib.Enums;
+
+/// <summary>
+/// DwC-A event file parts.
+/// </summary>
+public enum DwcaEventFilePart
 {
-    /// <summary>
-    /// DwC-A event file parts.
-    /// </summary>
-    public enum DwcaEventFilePart
-    {
-        Event,
-        Occurrence,
-        Emof,
-        Multimedia
-    }
+    Event,
+    Occurrence,
+    Emof,
+    Multimedia
 }

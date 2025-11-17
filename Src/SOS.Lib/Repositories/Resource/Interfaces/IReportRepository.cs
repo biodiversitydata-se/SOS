@@ -3,15 +3,14 @@ using SOS.Lib.Repositories.Interfaces;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace SOS.Lib.Repositories.Resource.Interfaces
+namespace SOS.Lib.Repositories.Resource.Interfaces;
+
+/// <summary>
+/// </summary>
+public interface IReportRepository : IRepositoryBase<Report, string>
 {
-    /// <summary>
-    /// </summary>
-    public interface IReportRepository : IRepositoryBase<Report, string>
-    {
-        Task<bool> StoreFileAsync(string filename, byte[] file);
-        Task<byte[]> GetFileAsync(string filename);
-        Task<bool> DeleteFileAsync(string filename);
-        Task<bool> DeleteFilesAsync(IEnumerable<string> filenames);
-    }
+    Task<bool> StoreFileAsync(string filename, byte[] file);
+    Task<byte[]> GetFileAsync(string filename);
+    Task<bool> DeleteFileAsync(string filename);
+    Task<bool> DeleteFilesAsync(IEnumerable<string> filenames);
 }

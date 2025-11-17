@@ -3,25 +3,24 @@ using Hangfire.States;
 using Hangfire.Storage;
 using System;
 
-namespace SOS.Hangfire.JobServer.Configuration
+namespace SOS.Hangfire.JobServer.Configuration;
+
+public class HangfireJobExpirationTimeAttribute : JobFilterAttribute, IApplyStateFilter
 {
-    public class HangfireJobExpirationTimeAttribute : JobFilterAttribute, IApplyStateFilter
+    private readonly int _nrDays;
+
+    public HangfireJobExpirationTimeAttribute(int nrDays)
     {
-        private readonly int _nrDays;
+        _nrDays = nrDays;
+    }
 
-        public HangfireJobExpirationTimeAttribute(int nrDays)
-        {
-            _nrDays = nrDays;
-        }
+    public void OnStateUnapplied(ApplyStateContext context, IWriteOnlyTransaction transaction)
+    {
+        context.JobExpirationTimeout = TimeSpan.FromDays(_nrDays);
+    }
 
-        public void OnStateUnapplied(ApplyStateContext context, IWriteOnlyTransaction transaction)
-        {
-            context.JobExpirationTimeout = TimeSpan.FromDays(_nrDays);
-        }
-
-        public void OnStateApplied(ApplyStateContext context, IWriteOnlyTransaction transaction)
-        {
-            context.JobExpirationTimeout = TimeSpan.FromDays(_nrDays);
-        }
+    public void OnStateApplied(ApplyStateContext context, IWriteOnlyTransaction transaction)
+    {
+        context.JobExpirationTimeout = TimeSpan.FromDays(_nrDays);
     }
 }

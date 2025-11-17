@@ -1,8 +1,7 @@
 ﻿using SOS.Lib.Configuration.Shared;
 
-namespace SOS.Lib.Configuration.Import
+namespace SOS.Lib.Configuration.Import;
+
+public class TaxonListServiceConfiguration : RestServiceConfiguration
 {
-    public class TaxonListServiceConfiguration : RestServiceConfiguration
-    {
-    }
 }

@@ -6,39 +6,38 @@ using SOS.Lib.Models.Processed.Validation;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using System.Threading.Tasks;
 
-namespace SOS.Lib.Repositories.Processed
+namespace SOS.Lib.Repositories.Processed;
+
+/// <summary>
+///     Invalid event repository
+/// </summary>
+public class InvalidEventRepository : MongoDbProcessedRepositoryBase<InvalidEvent, ObjectId>,
+    IInvalidEventRepository
 {
     /// <summary>
-    ///     Invalid event repository
+    ///     Constructor
     /// </summary>
-    public class InvalidEventRepository : MongoDbProcessedRepositoryBase<InvalidEvent, ObjectId>,
-        IInvalidEventRepository
+    /// <param name="client"></param>
+    /// <param name="logger"></param>
+    public InvalidEventRepository(
+        IProcessClient client,
+        ILogger<InvalidEventRepository> logger
+    ) : base(client, true, logger)
     {
-        /// <summary>
-        ///     Constructor
-        /// </summary>
-        /// <param name="client"></param>
-        /// <param name="logger"></param>
-        public InvalidEventRepository(
-            IProcessClient client,
-            ILogger<InvalidEventRepository> logger
-        ) : base(client, true, logger)
-        {
-        }
+    }
 
-        /// <inheritdoc />
-        public async Task CreateIndexAsync()
+    /// <inheritdoc />
+    public async Task CreateIndexAsync()
+    {
+        var indexModels = new[]
         {
-            var indexModels = new[]
-            {
-                new CreateIndexModel<InvalidEvent>(
-                    Builders<InvalidEvent>.IndexKeys.Ascending(io => io.DatasetName)),
-                new CreateIndexModel<InvalidEvent>(
-                    Builders<InvalidEvent>.IndexKeys.Ascending(io => io.EventID))
-            };
+            new CreateIndexModel<InvalidEvent>(
+                Builders<InvalidEvent>.IndexKeys.Ascending(io => io.DatasetName)),
+            new CreateIndexModel<InvalidEvent>(
+                Builders<InvalidEvent>.IndexKeys.Ascending(io => io.EventID))
+        };
 
-            Logger.LogDebug("Creating InvalidEvent indexes");
-            await MongoCollection.Indexes.CreateManyAsync(indexModels);
-        }
+        Logger.LogDebug("Creating InvalidEvent indexes");
+        await MongoCollection.Indexes.CreateManyAsync(indexModels);
     }
 }

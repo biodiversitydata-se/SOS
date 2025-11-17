@@ -1,13 +1,12 @@
-﻿namespace SOS.Lib.Enums
+﻿namespace SOS.Lib.Enums;
+
+/// <summary>
+///     Status used when running different tasks
+/// </summary>
+public enum RunStatus
 {
-    /// <summary>
-    ///     Status used when running different tasks
-    /// </summary>
-    public enum RunStatus
-    {
-        Canceled,
-        CanceledSuccess,
-        Failed,
-        Success
-    }
+    Canceled,
+    CanceledSuccess,
+    Failed,
+    Success
 }

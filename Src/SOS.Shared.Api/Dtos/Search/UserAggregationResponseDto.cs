@@ -1,27 +1,24 @@
-﻿namespace SOS.Shared.Api.Dtos.Search
+﻿namespace SOS.Shared.Api.Dtos.Search;
+
+public class UserAggregationResponseDto
 {
-    public class UserAggregationResponseDto
-    {
-        /// <summary>
-        /// Aggregated field
-        /// </summary>
-        public object? AggregationField { get; set; }
+    /// <summary>
+    /// Aggregated field
+    /// </summary>
+    public object? AggregationField { get; set; }
 
-        /// <summary>
-        /// Document count
-        /// </summary>
-        public int Count { get; set; }
+    /// <summary>
+    /// Document count
+    /// </summary>
+    public int Count { get; set; }
 
-        /// <summary>
-        /// Unique taxon count
-        /// </summary>
-        public int UniqueTaxon { get; set; }
+    /// <summary>
+    /// Unique taxon count
+    /// </summary>
+    public int UniqueTaxon { get; set; }
 
-        /// <summary>
-        /// Organism quantity
-        /// </summary>
-        public int OrganismQuantity { get; set; }
-    }
-
-
+    /// <summary>
+    /// Organism quantity
+    /// </summary>
+    public int OrganismQuantity { get; set; }
 }

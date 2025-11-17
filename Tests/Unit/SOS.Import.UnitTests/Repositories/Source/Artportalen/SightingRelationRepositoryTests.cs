@@ -9,81 +9,80 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
+namespace SOS.Import.UnitTests.Repositories.Source.Artportalen;
+
+/// <summary>
+///     SightingRelation tests
+/// </summary>
+public class SightingRelationRepositoryTests
 {
     /// <summary>
-    ///     SightingRelation tests
+    ///     Constructor
     /// </summary>
-    public class SightingRelationRepositoryTests
+    public SightingRelationRepositoryTests()
     {
-        /// <summary>
-        ///     Constructor
-        /// </summary>
-        public SightingRelationRepositoryTests()
+        _artportalenDataServiceMock = new Mock<IArtportalenDataService>();
+        _loggerMock = new Mock<ILogger<SightingRelationRepository>>();
+    }
+
+    private readonly Mock<IArtportalenDataService> _artportalenDataServiceMock;
+    private readonly Mock<ILogger<SightingRelationRepository>> _loggerMock;
+
+    private SightingRelationRepository TestObject => new SightingRelationRepository(
+        _artportalenDataServiceMock.Object,
+        _loggerMock.Object);
+
+    /// <summary>
+    ///     Test get projects fail
+    /// </summary>
+    /// <returns></returns>
+    [Fact]
+    public async Task GetAsyncException()
+    {
+        _artportalenDataServiceMock.Setup(spds =>
+                spds.QueryAsync<SightingRelationEntity>(It.IsAny<string>(), It.IsAny<object>(), false, System.Data.CommandType.Text))
+            .Throws<Exception>();
+
+        //-----------------------------------------------------------------------------------------------------------
+        // Act
+        //-----------------------------------------------------------------------------------------------------------
+        Func<Task> act = async () =>
         {
-            _artportalenDataServiceMock = new Mock<IArtportalenDataService>();
-            _loggerMock = new Mock<ILogger<SightingRelationRepository>>();
-        }
-
-        private readonly Mock<IArtportalenDataService> _artportalenDataServiceMock;
-        private readonly Mock<ILogger<SightingRelationRepository>> _loggerMock;
-
-        private SightingRelationRepository TestObject => new SightingRelationRepository(
-            _artportalenDataServiceMock.Object,
-            _loggerMock.Object);
-
-        /// <summary>
-        ///     Test get projects fail
-        /// </summary>
-        /// <returns></returns>
-        [Fact]
-        public async Task GetAsyncException()
-        {
-            _artportalenDataServiceMock.Setup(spds =>
-                    spds.QueryAsync<SightingRelationEntity>(It.IsAny<string>(), It.IsAny<object>(), false, System.Data.CommandType.Text))
-                .Throws<Exception>();
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            Func<Task> act = async () =>
-            {
-                var result = await TestObject.GetAsync(new[] { 1, 2 });
-            };
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-            await act.Should().ThrowAsync<Exception>();
-        }
-
-
-        /// <summary>
-        ///     Test get projects success
-        /// </summary>
-        /// <returns></returns>
-        [Fact]
-        public async Task GetAsyncSuccess()
-        {
-            IEnumerable<SightingRelationEntity> sightingRelations = new[]
-            {
-                new SightingRelationEntity {Id = 1},
-                new SightingRelationEntity {Id = 2}
-            };
-
-            _artportalenDataServiceMock.Setup(spds =>
-                    spds.QueryAsync<SightingRelationEntity>(It.IsAny<string>(), It.IsAny<object>(), false, System.Data.CommandType.Text))
-                .ReturnsAsync(sightingRelations);
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //----------------------------------------------------------------------------------------------------------
             var result = await TestObject.GetAsync(new[] { 1, 2 });
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
+        };
 
-            result.Should().HaveCount(2);
-        }
+        //-----------------------------------------------------------------------------------------------------------
+        // Assert
+        //-----------------------------------------------------------------------------------------------------------
+        await act.Should().ThrowAsync<Exception>();
+    }
+
+
+    /// <summary>
+    ///     Test get projects success
+    /// </summary>
+    /// <returns></returns>
+    [Fact]
+    public async Task GetAsyncSuccess()
+    {
+        IEnumerable<SightingRelationEntity> sightingRelations = new[]
+        {
+            new SightingRelationEntity {Id = 1},
+            new SightingRelationEntity {Id = 2}
+        };
+
+        _artportalenDataServiceMock.Setup(spds =>
+                spds.QueryAsync<SightingRelationEntity>(It.IsAny<string>(), It.IsAny<object>(), false, System.Data.CommandType.Text))
+            .ReturnsAsync(sightingRelations);
+
+        //-----------------------------------------------------------------------------------------------------------
+        // Act
+        //----------------------------------------------------------------------------------------------------------
+        var result = await TestObject.GetAsync(new[] { 1, 2 });
+        //-----------------------------------------------------------------------------------------------------------
+        // Assert
+        //-----------------------------------------------------------------------------------------------------------
+
+        result.Should().HaveCount(2);
     }
 }

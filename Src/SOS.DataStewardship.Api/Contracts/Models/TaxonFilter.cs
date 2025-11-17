@@ -4,16 +4,15 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 
-namespace SOS.DataStewardship.Api.Contracts.Models
+namespace SOS.DataStewardship.Api.Contracts.Models;
+
+/// <summary>
+/// Taxon filter.
+/// </summary>
+public class TaxonFilter
 {
     /// <summary>
-    /// Taxon filter.
+    /// Dyntaxa taxon ids to match.
     /// </summary>
-    public class TaxonFilter
-    {
-        /// <summary>
-        /// Dyntaxa taxon ids to match.
-        /// </summary>
-        public List<int> Ids { get; set; }
-    }
+    public List<int> Ids { get; set; }
 }

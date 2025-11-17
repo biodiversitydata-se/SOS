@@ -1,29 +1,28 @@
 ﻿using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
 
-namespace SOS.Harvest.Factories.Vocabularies
+namespace SOS.Harvest.Factories.Vocabularies;
+
+/// <summary>
+///     Class for creating Country vocabulary.
+/// </summary>
+public class CountryVocabularyFactory : DwcVocabularyFactoryBase
 {
-    /// <summary>
-    ///     Class for creating Country vocabulary.
-    /// </summary>
-    public class CountryVocabularyFactory : DwcVocabularyFactoryBase
+    protected override VocabularyId FieldId => VocabularyId.Country;
+    protected override bool Localized => false;
+
+    protected override ICollection<VocabularyValueInfo> GetVocabularyValues()
     {
-        protected override VocabularyId FieldId => VocabularyId.Country;
-        protected override bool Localized => false;
-
-        protected override ICollection<VocabularyValueInfo> GetVocabularyValues()
+        var vocabularyValues = new List<VocabularyValueInfo>
         {
-            var vocabularyValues = new List<VocabularyValueInfo>
-            {
-                new VocabularyValueInfo {Id = 0, Value = "Sweden"}
-            };
+            new VocabularyValueInfo {Id = 0, Value = "Sweden"}
+        };
 
-            return vocabularyValues;
-        }
+        return vocabularyValues;
+    }
 
-        protected override Dictionary<string, int>? GetMappingSynonyms()
-        {
-            return null;
-        }
+    protected override Dictionary<string, int>? GetMappingSynonyms()
+    {
+        return null;
     }
 }

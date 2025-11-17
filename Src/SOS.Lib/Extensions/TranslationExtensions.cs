@@ -3,24 +3,23 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SOS.Lib.Extensions
+namespace SOS.Lib.Extensions;
+
+/// <summary>
+/// Translation extensions
+/// </summary>
+public static class TranslationExtensions
 {
     /// <summary>
-    /// Translation extensions
+    /// Translate 
     /// </summary>
-    public static class TranslationExtensions
+    /// <param name="translations"></param>
+    /// <param name="cultureCode"></param>
+    /// <returns></returns>
+    public static string Translate(this IEnumerable<VocabularyValueTranslation> translations, string cultureCode)
     {
-        /// <summary>
-        /// Translate 
-        /// </summary>
-        /// <param name="translations"></param>
-        /// <param name="cultureCode"></param>
-        /// <returns></returns>
-        public static string Translate(this IEnumerable<VocabularyValueTranslation> translations, string cultureCode)
-        {
-            return translations
-                ?.FirstOrDefault(t => t.CultureCode.Equals(cultureCode, StringComparison.CurrentCultureIgnoreCase))
-                ?.Value ?? string.Empty;
-        }
+        return translations
+            ?.FirstOrDefault(t => t.CultureCode.Equals(cultureCode, StringComparison.CurrentCultureIgnoreCase))
+            ?.Value ?? string.Empty;
     }
 }

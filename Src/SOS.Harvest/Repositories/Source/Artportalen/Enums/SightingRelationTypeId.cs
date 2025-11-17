@@ -1,12 +1,11 @@
-﻿namespace SOS.Harvest.Repositories.Source.Artportalen.Enums
+﻿namespace SOS.Harvest.Repositories.Source.Artportalen.Enums;
+
+public enum SightingRelationTypeId
 {
-    public enum SightingRelationTypeId
-    {
-        Reporter = 1,
-        Observer = 2,
-        Determiner = 3,
-        Validator = 4,
-        Confirmator = 5,
-        Protector = 6
-    }
+    Reporter = 1,
+    Observer = 2,
+    Determiner = 3,
+    Validator = 4,
+    Confirmator = 5,
+    Protector = 6
 }

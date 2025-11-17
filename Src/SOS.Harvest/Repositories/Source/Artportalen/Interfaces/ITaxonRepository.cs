@@ -1,9 +1,8 @@
 ﻿using SOS.Harvest.Entities.Artportalen;
 
-namespace SOS.Harvest.Repositories.Source.Artportalen.Interfaces
+namespace SOS.Harvest.Repositories.Source.Artportalen.Interfaces;
+
+public interface ITaxonRepository : IBaseRepository<ITaxonRepository>
 {
-    public interface ITaxonRepository : IBaseRepository<ITaxonRepository>
-    {
-        Task<IEnumerable<TaxonEntity>> GetAsync();
-    }
+    Task<IEnumerable<TaxonEntity>> GetAsync();
 }

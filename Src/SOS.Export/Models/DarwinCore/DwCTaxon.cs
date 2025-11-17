@@ -1,15 +1,14 @@
 ﻿using SOS.Lib.Models.DarwinCore;
 
-namespace SOS.Export.Models.DarwinCore
+namespace SOS.Export.Models.DarwinCore;
+
+/// <summary>
+///     Darwin core location used for csv
+/// </summary>
+public class DwCTaxon : DarwinCoreTaxon
 {
     /// <summary>
-    ///     Darwin core location used for csv
+    ///     Pointer to core object
     /// </summary>
-    public class DwCTaxon : DarwinCoreTaxon
-    {
-        /// <summary>
-        ///     Pointer to core object
-        /// </summary>
-        public string CoreID { get; set; }
-    }
+    public string CoreID { get; set; }
 }

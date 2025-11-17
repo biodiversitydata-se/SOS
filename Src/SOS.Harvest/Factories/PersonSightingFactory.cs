@@ -4,290 +4,260 @@ using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using System.Text;
 
-namespace SOS.Harvest.Factories
+namespace SOS.Harvest.Factories;
+
+public static class PersonSightingFactory
 {
-    public static class PersonSightingFactory
+    public static Dictionary<int, PersonSighting>? CreatePersonSightingDictionary(
+        ISet<int> sightingIds,
+        IDictionary<int, Person>? personsByUserId,
+        IDictionary<int, Metadata<int>>? organizations,
+        IDictionary<int, ICollection<SpeciesCollectionItemEntity>> speciesCollectionItemsBySightingId,
+        IEnumerable<SightingRelation>? sightingRelations)
     {
-        public static Dictionary<int, PersonSighting>? CreatePersonSightingDictionary(
-            ISet<int> sightingIds,
-            IDictionary<int, Person>? personsByUserId,
-            IDictionary<int, Metadata<int>>? organizations,
-            IDictionary<int, ICollection<SpeciesCollectionItemEntity>> speciesCollectionItemsBySightingId,
-            IEnumerable<SightingRelation>? sightingRelations)
+        if (!sightingIds?.Any() ?? true)
         {
-            if (!sightingIds?.Any() ?? true)
-            {
-                return null;
-            }
-
-            var personSightingBySightingId = new Dictionary<int, PersonSighting>();
-
-            if (speciesCollectionItemsBySightingId?.Any() ?? false)
-            {
-                //------------------------------------------------------------------------------
-                // Add SpeciesCollection values
-                //------------------------------------------------------------------------------
-                var speciesCollectionBySightingId = CreateSpeciesCollectionDictionary(personsByUserId,
-                    organizations,
-                    speciesCollectionItemsBySightingId);
-
-                if (speciesCollectionBySightingId?.Any() ?? false)
-                {
-                    foreach (var pair in speciesCollectionBySightingId)
-                    {
-                        personSightingBySightingId.Add(pair.Key, new PersonSighting { SpeciesCollection = pair.Value });
-                    }
-                }
-
-                //------------------------------------------------------------------------------
-                // Add VerifiedBy values
-                //------------------------------------------------------------------------------
-                var verifiedByStringBySightingId = CreateVerifiedByStringDictionary(personsByUserId,
-                    speciesCollectionItemsBySightingId,
-                    sightingRelations!);
-
-                if (verifiedByStringBySightingId?.Any() ?? false)
-                {
-                    foreach (var pair in verifiedByStringBySightingId)
-                    {
-                        var users = new List<UserInternal>();
-                        if (pair.Value.determiner != null)
-                        {
-                            users.Add(pair.Value.determiner);
-                        }
-
-                        if (pair.Value.confirmator != null)
-                        {
-                            users.Add(pair.Value.confirmator);
-                        }
-
-                        if (!personSightingBySightingId.TryGetValue(pair.Key, out var personSighting))
-                        {
-                            personSighting = new PersonSighting();
-                            personSightingBySightingId.Add(pair.Key, personSighting);
-                        }
-
-                        personSighting.VerifiedBy = pair.Value.names;
-                        personSighting.VerifiedByInternal = users;
-                    }
-                }
-            }
-
-            //------------------------------------------------------------------------------
-            // Add ConfirmedBy, DeterminedBy, Observers and ReportedBy
-            //------------------------------------------------------------------------------
-            PopulateRelations(
-                personSightingBySightingId,
-                sightingRelations!,
-                personsByUserId);
-            
-            //------------------------------------------------------------------------------
-            // Set Observers to ReportedBy when Observers value is null
-            //------------------------------------------------------------------------------
-            foreach (var pair in personSightingBySightingId)
-            {
-                if (string.IsNullOrEmpty(pair.Value.Observers) && !string.IsNullOrEmpty(pair.Value.ReportedBy))
-                {
-                    pair.Value.Observers = "Via " + pair.Value.ReportedBy;
-                }
-            }
-
-            return personSightingBySightingId;
+            return null;
         }
 
-        private static Dictionary<int, string> CreateSpeciesCollectionDictionary(
-            IDictionary<int, Person>? personsByUserId,
-            IDictionary<int, Metadata<int>>? organizations,
-            IDictionary<int, ICollection<SpeciesCollectionItemEntity>>? speciesCollectionItemsBySightingId)
+        var personSightingBySightingId = new Dictionary<int, PersonSighting>();
+
+        if (speciesCollectionItemsBySightingId?.Any() ?? false)
         {
-            var speciesCollectionBySightingId = new Dictionary<int, string>();
-            if (!speciesCollectionItemsBySightingId?.Any() ?? true)
-            {
-                return speciesCollectionBySightingId;
-            }
+            //------------------------------------------------------------------------------
+            // Add SpeciesCollection values
+            //------------------------------------------------------------------------------
+            var speciesCollectionBySightingId = CreateSpeciesCollectionDictionary(personsByUserId,
+                organizations,
+                speciesCollectionItemsBySightingId);
 
-            foreach (var item in speciesCollectionItemsBySightingId!)
+            if (speciesCollectionBySightingId?.Any() ?? false)
             {
-                foreach (var speciesCollectionItem in item.Value)
+                foreach (var pair in speciesCollectionBySightingId)
                 {
-                    // Collection is collector
-                    if ((personsByUserId?.Any() ?? false) && speciesCollectionItem.CollectorId.HasValue &&
-                        personsByUserId.TryGetValue(speciesCollectionItem.CollectorId.Value, out var person))
-                    {
-                        if (speciesCollectionBySightingId.ContainsKey(speciesCollectionItem.SightingId))
-                        {
-                            speciesCollectionBySightingId[speciesCollectionItem.SightingId] = person.FullName;
-                        }
-                        else
-                        {
-                            speciesCollectionBySightingId.Add(speciesCollectionItem.SightingId, person.FullName);
-                        }
-                    }
-
-                    // Collection is Organization
-                    if ((organizations?.Any() ?? false) && speciesCollectionItem.OrganizationId.HasValue &&
-                        organizations.TryGetValue(speciesCollectionItem.OrganizationId.Value, out var organization))
-                    {
-                        var name = organization?.Translations?.FirstOrDefault()?.Value ?? "";
-                        if (speciesCollectionBySightingId.ContainsKey(speciesCollectionItem.SightingId))
-                        {
-                            speciesCollectionBySightingId[speciesCollectionItem.SightingId] = name;
-                        }
-                        else
-                        {
-                            speciesCollectionBySightingId.Add(speciesCollectionItem.SightingId, name);
-                        }
-                    }
+                    personSightingBySightingId.Add(pair.Key, new PersonSighting { SpeciesCollection = pair.Value });
                 }
             }
 
+            //------------------------------------------------------------------------------
+            // Add VerifiedBy values
+            //------------------------------------------------------------------------------
+            var verifiedByStringBySightingId = CreateVerifiedByStringDictionary(personsByUserId,
+                speciesCollectionItemsBySightingId,
+                sightingRelations!);
+
+            if (verifiedByStringBySightingId?.Any() ?? false)
+            {
+                foreach (var pair in verifiedByStringBySightingId)
+                {
+                    var users = new List<UserInternal>();
+                    if (pair.Value.determiner != null)
+                    {
+                        users.Add(pair.Value.determiner);
+                    }
+
+                    if (pair.Value.confirmator != null)
+                    {
+                        users.Add(pair.Value.confirmator);
+                    }
+
+                    if (!personSightingBySightingId.TryGetValue(pair.Key, out var personSighting))
+                    {
+                        personSighting = new PersonSighting();
+                        personSightingBySightingId.Add(pair.Key, personSighting);
+                    }
+
+                    personSighting.VerifiedBy = pair.Value.names;
+                    personSighting.VerifiedByInternal = users;
+                }
+            }
+        }
+
+        //------------------------------------------------------------------------------
+        // Add ConfirmedBy, DeterminedBy, Observers and ReportedBy
+        //------------------------------------------------------------------------------
+        PopulateRelations(
+            personSightingBySightingId,
+            sightingRelations!,
+            personsByUserId);
+        
+        //------------------------------------------------------------------------------
+        // Set Observers to ReportedBy when Observers value is null
+        //------------------------------------------------------------------------------
+        foreach (var pair in personSightingBySightingId)
+        {
+            if (string.IsNullOrEmpty(pair.Value.Observers) && !string.IsNullOrEmpty(pair.Value.ReportedBy))
+            {
+                pair.Value.Observers = "Via " + pair.Value.ReportedBy;
+            }
+        }
+
+        return personSightingBySightingId;
+    }
+
+    private static Dictionary<int, string> CreateSpeciesCollectionDictionary(
+        IDictionary<int, Person>? personsByUserId,
+        IDictionary<int, Metadata<int>>? organizations,
+        IDictionary<int, ICollection<SpeciesCollectionItemEntity>>? speciesCollectionItemsBySightingId)
+    {
+        var speciesCollectionBySightingId = new Dictionary<int, string>();
+        if (!speciesCollectionItemsBySightingId?.Any() ?? true)
+        {
             return speciesCollectionBySightingId;
         }
 
-        private static void PopulateRelations(
-            IDictionary<int, PersonSighting> personSightingBySightingId,
-            IEnumerable<SightingRelation>? sightingRelations,
-            IDictionary<int, Person>? personsByUserId)
+        foreach (var item in speciesCollectionItemsBySightingId!)
         {
-
-            if ((!sightingRelations?.Any() ?? true) || (!personsByUserId?.Any() ?? true))
+            foreach (var speciesCollectionItem in item.Value)
             {
-                return;
-            }
-
-            foreach (var sightingRelation in sightingRelations!)
-            {
-                if (personsByUserId!.TryGetValue(sightingRelation.UserId, out var person))
+                // Collection is collector
+                if ((personsByUserId?.Any() ?? false) && speciesCollectionItem.CollectorId.HasValue &&
+                    personsByUserId.TryGetValue(speciesCollectionItem.CollectorId.Value, out var person))
                 {
-                    if (!personSightingBySightingId.TryGetValue(sightingRelation.SightingId, out var personSighting))
+                    if (speciesCollectionBySightingId.ContainsKey(speciesCollectionItem.SightingId))
                     {
-                        personSighting = new PersonSighting();
-                        personSightingBySightingId.Add(sightingRelation.SightingId, personSighting);
+                        speciesCollectionBySightingId[speciesCollectionItem.SightingId] = person.FullName;
                     }
-
-                    switch ((SightingRelationTypeId)sightingRelation.SightingRelationTypeId)
+                    else
                     {
-                        case SightingRelationTypeId.Confirmator:
-                            personSighting.ConfirmedBy = person.FullName;
-                            personSighting.ConfirmationYear = sightingRelation.DeterminationYear;
-                            break;
-                        case SightingRelationTypeId.Determiner:
-                            personSighting.DeterminedBy = person.FullName;
-                            personSighting.DeterminationYear = sightingRelation.DeterminationYear;
-                            break;
-                        case SightingRelationTypeId.Observer:
-                            if (!personSighting.ObserversInternal?.Any() ?? true)
-                            {
-                                personSighting.ObserversInternal = new List<UserInternal>();
-                            }
-                            personSighting.ObserversInternal!.Add(new UserInternal
-                            {
-                                Discover = sightingRelation.Discover,
-                                Id = person.UserId,
-                                PersonId = person.Id,
-                                UserServiceUserId = person.UserServiceUserId,
-                                UserAlias = person.Alias,
-                                ViewAccess = true
-                            });
+                        speciesCollectionBySightingId.Add(speciesCollectionItem.SightingId, person.FullName);
+                    }
+                }
 
-                            if ((personSighting.Observers?.Length ?? 0) < 256)
-                            {
-                                personSighting.Observers += $"{(string.IsNullOrEmpty(personSighting.Observers) ? "" : ", ")}{person.FullName}";
-                            }
-
-                            break;
-                        case SightingRelationTypeId.Reporter:
-                            personSighting.ReportedBy = person.FullName;
-                            personSighting.ReportedByUserId = person.UserId;
-                            personSighting.ReportedByUserServiceUserId = person.UserServiceUserId;
-                            personSighting.ReportedByUserAlias = person.Alias;
-                            break;
+                // Collection is Organization
+                if ((organizations?.Any() ?? false) && speciesCollectionItem.OrganizationId.HasValue &&
+                    organizations.TryGetValue(speciesCollectionItem.OrganizationId.Value, out var organization))
+                {
+                    var name = organization?.Translations?.FirstOrDefault()?.Value ?? "";
+                    if (speciesCollectionBySightingId.ContainsKey(speciesCollectionItem.SightingId))
+                    {
+                        speciesCollectionBySightingId[speciesCollectionItem.SightingId] = name;
+                    }
+                    else
+                    {
+                        speciesCollectionBySightingId.Add(speciesCollectionItem.SightingId, name);
                     }
                 }
             }
         }
 
-        private static Dictionary<int, (string? names, UserInternal? determiner, UserInternal? confirmator)>?
-            CreateVerifiedByStringDictionary(
-                IDictionary<int, Person>? personsByUserId,
-                IDictionary<int, ICollection<SpeciesCollectionItemEntity>>? speciesCollectionItemsBySightingId,
-                IEnumerable<SightingRelation>? sightingRelations
-            )
-        {
-            var verifiedByDataSightingId = CreateVerifiedByDataDictionary(
-                personsByUserId,
-                speciesCollectionItemsBySightingId,
-                sightingRelations);
+        return speciesCollectionBySightingId;
+    }
 
-            return verifiedByDataSightingId?.ToDictionary(x => x.Key,
-                x => (ConcatenateVerifiedByString(x.Value), x.Value.DeterminerInternal, x.Value.ConfirmatorInternal))!;
+    private static void PopulateRelations(
+        IDictionary<int, PersonSighting> personSightingBySightingId,
+        IEnumerable<SightingRelation>? sightingRelations,
+        IDictionary<int, Person>? personsByUserId)
+    {
+
+        if ((!sightingRelations?.Any() ?? true) || (!personsByUserId?.Any() ?? true))
+        {
+            return;
         }
 
-        private static Dictionary<int, VerifiedByData> CreateVerifiedByDataDictionary(
-            IDictionary<int, Person>? personsByUserId,
-            IDictionary<int, ICollection<SpeciesCollectionItemEntity>>? speciesCollectionItemsBySightingId,
-            IEnumerable<SightingRelation>? sightingRelations)
+        foreach (var sightingRelation in sightingRelations!)
         {
-            var verifiedByDataSightingId = new Dictionary<int, VerifiedByData>();
-
-            if (!sightingRelations?.Any() ?? true)
+            if (personsByUserId!.TryGetValue(sightingRelation.UserId, out var person))
             {
-                return verifiedByDataSightingId;
-            }
-
-            var determinerQuery = sightingRelations!.Where(x =>
-                x.SightingRelationTypeId == (int)SightingRelationTypeId.Determiner
-                && x.Sort == 0);
-
-            foreach (var determinerRelation in determinerQuery)
-            {
-                var vbd = new VerifiedByData
+                if (!personSightingBySightingId.TryGetValue(sightingRelation.SightingId, out var personSighting))
                 {
-                    SightingId = determinerRelation.SightingId,
-                    SightingRelationDeterminationYear = determinerRelation.DeterminationYear
-                };
-
-                if (!verifiedByDataSightingId.ContainsKey(determinerRelation.SightingId))
-                {
-                    verifiedByDataSightingId.Add(determinerRelation.SightingId, vbd);
+                    personSighting = new PersonSighting();
+                    personSightingBySightingId.Add(sightingRelation.SightingId, personSighting);
                 }
 
-                if (personsByUserId?.Any() ?? false)
+                switch ((SightingRelationTypeId)sightingRelation.SightingRelationTypeId)
                 {
-                    if (personsByUserId.TryGetValue(determinerRelation.UserId, out var person))
-                    {
-                        vbd.DeterminerName = person.FullName;
-                        vbd.DeterminerInternal = new UserInternal
+                    case SightingRelationTypeId.Confirmator:
+                        personSighting.ConfirmedBy = person.FullName;
+                        personSighting.ConfirmationYear = sightingRelation.DeterminationYear;
+                        break;
+                    case SightingRelationTypeId.Determiner:
+                        personSighting.DeterminedBy = person.FullName;
+                        personSighting.DeterminationYear = sightingRelation.DeterminationYear;
+                        break;
+                    case SightingRelationTypeId.Observer:
+                        if (!personSighting.ObserversInternal?.Any() ?? true)
                         {
+                            personSighting.ObserversInternal = new List<UserInternal>();
+                        }
+                        personSighting.ObserversInternal!.Add(new UserInternal
+                        {
+                            Discover = sightingRelation.Discover,
                             Id = person.UserId,
                             PersonId = person.Id,
+                            UserServiceUserId = person.UserServiceUserId,
                             UserAlias = person.Alias,
-                            UserServiceUserId = person.UserServiceUserId
-                        };
-                    }
+                            ViewAccess = true
+                        });
+
+                        if ((personSighting.Observers?.Length ?? 0) < 256)
+                        {
+                            personSighting.Observers += $"{(string.IsNullOrEmpty(personSighting.Observers) ? "" : ", ")}{person.FullName}";
+                        }
+
+                        break;
+                    case SightingRelationTypeId.Reporter:
+                        personSighting.ReportedBy = person.FullName;
+                        personSighting.ReportedByUserId = person.UserId;
+                        personSighting.ReportedByUserServiceUserId = person.UserServiceUserId;
+                        personSighting.ReportedByUserAlias = person.Alias;
+                        break;
                 }
             }
+        }
+    }
 
-            var confirmatorQuery = sightingRelations!.Where(x =>
-                x.SightingRelationTypeId == (int)SightingRelationTypeId.Confirmator
-                && x.Sort == 0);
+    private static Dictionary<int, (string? names, UserInternal? determiner, UserInternal? confirmator)>?
+        CreateVerifiedByStringDictionary(
+            IDictionary<int, Person>? personsByUserId,
+            IDictionary<int, ICollection<SpeciesCollectionItemEntity>>? speciesCollectionItemsBySightingId,
+            IEnumerable<SightingRelation>? sightingRelations
+        )
+    {
+        var verifiedByDataSightingId = CreateVerifiedByDataDictionary(
+            personsByUserId,
+            speciesCollectionItemsBySightingId,
+            sightingRelations);
 
-            foreach (var confirmatorRelation in confirmatorQuery)
+        return verifiedByDataSightingId?.ToDictionary(x => x.Key,
+            x => (ConcatenateVerifiedByString(x.Value), x.Value.DeterminerInternal, x.Value.ConfirmatorInternal))!;
+    }
+
+    private static Dictionary<int, VerifiedByData> CreateVerifiedByDataDictionary(
+        IDictionary<int, Person>? personsByUserId,
+        IDictionary<int, ICollection<SpeciesCollectionItemEntity>>? speciesCollectionItemsBySightingId,
+        IEnumerable<SightingRelation>? sightingRelations)
+    {
+        var verifiedByDataSightingId = new Dictionary<int, VerifiedByData>();
+
+        if (!sightingRelations?.Any() ?? true)
+        {
+            return verifiedByDataSightingId;
+        }
+
+        var determinerQuery = sightingRelations!.Where(x =>
+            x.SightingRelationTypeId == (int)SightingRelationTypeId.Determiner
+            && x.Sort == 0);
+
+        foreach (var determinerRelation in determinerQuery)
+        {
+            var vbd = new VerifiedByData
             {
-                if (!verifiedByDataSightingId.TryGetValue(confirmatorRelation.SightingId, out var vbd))
-                {
-                    vbd = new VerifiedByData
-                    {
-                        SightingId = confirmatorRelation.SightingId,
-                        SightingRelationConfirmationYear = confirmatorRelation.DeterminationYear
-                    };
-                    verifiedByDataSightingId.Add(confirmatorRelation.SightingId, vbd);
-                }
+                SightingId = determinerRelation.SightingId,
+                SightingRelationDeterminationYear = determinerRelation.DeterminationYear
+            };
 
-                if (personsByUserId?.TryGetValue(confirmatorRelation.UserId, out var person) ?? false)
+            if (!verifiedByDataSightingId.ContainsKey(determinerRelation.SightingId))
+            {
+                verifiedByDataSightingId.Add(determinerRelation.SightingId, vbd);
+            }
+
+            if (personsByUserId?.Any() ?? false)
+            {
+                if (personsByUserId.TryGetValue(determinerRelation.UserId, out var person))
                 {
-                    vbd.ConfirmatorName = person.FullName;
-                    vbd.ConfirmatorInternal = new UserInternal
+                    vbd.DeterminerName = person.FullName;
+                    vbd.DeterminerInternal = new UserInternal
                     {
                         Id = person.UserId,
                         PersonId = person.Id,
@@ -296,118 +266,147 @@ namespace SOS.Harvest.Factories
                     };
                 }
             }
+        }
 
-            if (speciesCollectionItemsBySightingId?.Any() ?? false)
+        var confirmatorQuery = sightingRelations!.Where(x =>
+            x.SightingRelationTypeId == (int)SightingRelationTypeId.Confirmator
+            && x.Sort == 0);
+
+        foreach (var confirmatorRelation in confirmatorQuery)
+        {
+            if (!verifiedByDataSightingId.TryGetValue(confirmatorRelation.SightingId, out var vbd))
             {
-                foreach (var item in speciesCollectionItemsBySightingId)
+                vbd = new VerifiedByData
                 {
-                    if (!verifiedByDataSightingId.TryGetValue(item.Key, out var vbd))
+                    SightingId = confirmatorRelation.SightingId,
+                    SightingRelationConfirmationYear = confirmatorRelation.DeterminationYear
+                };
+                verifiedByDataSightingId.Add(confirmatorRelation.SightingId, vbd);
+            }
+
+            if (personsByUserId?.TryGetValue(confirmatorRelation.UserId, out var person) ?? false)
+            {
+                vbd.ConfirmatorName = person.FullName;
+                vbd.ConfirmatorInternal = new UserInternal
+                {
+                    Id = person.UserId,
+                    PersonId = person.Id,
+                    UserAlias = person.Alias,
+                    UserServiceUserId = person.UserServiceUserId
+                };
+            }
+        }
+
+        if (speciesCollectionItemsBySightingId?.Any() ?? false)
+        {
+            foreach (var item in speciesCollectionItemsBySightingId)
+            {
+                if (!verifiedByDataSightingId.TryGetValue(item.Key, out var vbd))
+                {
+                    var speciesCollectionItem = item.Value.First();
+                    vbd = new VerifiedByData
                     {
-                        var speciesCollectionItem = item.Value.First();
-                        vbd = new VerifiedByData
-                        {
-                            SightingId = speciesCollectionItem.SightingId,
-                            DeterminerText = speciesCollectionItem.DeterminerText,
-                            SpeciesCollectionItemDeterminerYear = speciesCollectionItem.DeterminerYear,
-                            DeterminationDescription = speciesCollectionItem.Description,
-                            ConfirmatorText = speciesCollectionItem.ConfirmatorText,
-                            SpeciesCollectionItemConfirmatorYear = speciesCollectionItem.ConfirmatorYear
-                        };
-                        verifiedByDataSightingId.Add(speciesCollectionItem.SightingId, vbd);
-                    }
+                        SightingId = speciesCollectionItem.SightingId,
+                        DeterminerText = speciesCollectionItem.DeterminerText,
+                        SpeciesCollectionItemDeterminerYear = speciesCollectionItem.DeterminerYear,
+                        DeterminationDescription = speciesCollectionItem.Description,
+                        ConfirmatorText = speciesCollectionItem.ConfirmatorText,
+                        SpeciesCollectionItemConfirmatorYear = speciesCollectionItem.ConfirmatorYear
+                    };
+                    verifiedByDataSightingId.Add(speciesCollectionItem.SightingId, vbd);
                 }
             }
-
-            return verifiedByDataSightingId;
         }
 
-        private static string? ConcatenateVerifiedByString(VerifiedByData vbd)
+        return verifiedByDataSightingId;
+    }
+
+    private static string? ConcatenateVerifiedByString(VerifiedByData vbd)
+    {
+        return vbd == null ? null : ConcatenateVerifiedByString(
+            vbd.DeterminerName,
+            vbd.DeterminerText,
+            vbd.DeterminerYear,
+            vbd.DeterminationDescription,
+            vbd.ConfirmatorName,
+            vbd.ConfirmatorText,
+            vbd.ConfirmatorYear);
+    }
+
+    public static string? ConcatenateVerifiedByString(
+        string determinerName,
+        string determinerText,
+        int? determinerYear,
+        string determinationDescription,
+        string confirmatorName,
+        string confirmatorText,
+        int? confirmatorYear)
+    {
+        var sb = new StringBuilder();
+
+        //----------------------------------------------------------------------
+        // Set determiner text
+        //----------------------------------------------------------------------
+        var determinerNameTrimmed = determinerName?.Trim();
+        var determinerTextTrimmed = determinerText?.Trim();
+        var determinationDescriptionTrimmed = determinationDescription?.Trim();
+
+        if (!string.IsNullOrEmpty(determinerNameTrimmed))
         {
-            return vbd == null ? null : ConcatenateVerifiedByString(
-                vbd.DeterminerName,
-                vbd.DeterminerText,
-                vbd.DeterminerYear,
-                vbd.DeterminationDescription,
-                vbd.ConfirmatorName,
-                vbd.ConfirmatorText,
-                vbd.ConfirmatorYear);
+            sb.Append(determinerNameTrimmed);
         }
 
-        public static string? ConcatenateVerifiedByString(
-            string determinerName,
-            string determinerText,
-            int? determinerYear,
-            string determinationDescription,
-            string confirmatorName,
-            string confirmatorText,
-            int? confirmatorYear)
+        if (!string.IsNullOrEmpty(determinerTextTrimmed))
         {
-            var sb = new StringBuilder();
-
-            //----------------------------------------------------------------------
-            // Set determiner text
-            //----------------------------------------------------------------------
-            var determinerNameTrimmed = determinerName?.Trim();
-            var determinerTextTrimmed = determinerText?.Trim();
-            var determinationDescriptionTrimmed = determinationDescription?.Trim();
-
-            if (!string.IsNullOrEmpty(determinerNameTrimmed))
-            {
-                sb.Append(determinerNameTrimmed);
-            }
-
-            if (!string.IsNullOrEmpty(determinerTextTrimmed))
-            {
-                if (sb.Length > 0) sb.Append(" ");
-                sb.Append(determinerTextTrimmed);
-            }
-
-            if (determinerYear.HasValue)
-            {
-                if (sb.Length > 0) sb.Append(" ");
-                sb.Append(determinerYear.Value);
-            }
-
-            if (!string.IsNullOrEmpty(determinationDescriptionTrimmed))
-            {
-                if (sb.Length > 0) sb.Append(" # ");
-                sb.Append(determinationDescriptionTrimmed);
-            }
-
-            //----------------------------------------------------------------------
-            // Set confirmator text
-            //----------------------------------------------------------------------
-            var confirmatorNameTrimmed = confirmatorName?.Trim();
-            var confirmatorTextTrimmed = confirmatorText?.Trim();
-
-            if (!string.IsNullOrEmpty(confirmatorNameTrimmed)
-                || !string.IsNullOrEmpty(confirmatorTextTrimmed))
-            {
-                sb.Append($"{(sb.Length > 0 ? " # " : "")}Conf.");
-
-                if (!string.IsNullOrEmpty(confirmatorNameTrimmed))
-                {
-                    sb.Append(" ");
-                    sb.Append(confirmatorNameTrimmed);
-                }
-
-                if (!string.IsNullOrEmpty(confirmatorTextTrimmed))
-                {
-                    sb.Append(" ");
-                    sb.Append(confirmatorTextTrimmed);
-                }
-
-                if (confirmatorYear.HasValue)
-                {
-                    sb.Append(" ");
-                    sb.Append(confirmatorYear.Value);
-                }
-            }
-
-            //----------------------------------------------------------------------
-            // Return result
-            //----------------------------------------------------------------------
-            return sb.Length == 0 ? null : sb.ToString();
+            if (sb.Length > 0) sb.Append(" ");
+            sb.Append(determinerTextTrimmed);
         }
+
+        if (determinerYear.HasValue)
+        {
+            if (sb.Length > 0) sb.Append(" ");
+            sb.Append(determinerYear.Value);
+        }
+
+        if (!string.IsNullOrEmpty(determinationDescriptionTrimmed))
+        {
+            if (sb.Length > 0) sb.Append(" # ");
+            sb.Append(determinationDescriptionTrimmed);
+        }
+
+        //----------------------------------------------------------------------
+        // Set confirmator text
+        //----------------------------------------------------------------------
+        var confirmatorNameTrimmed = confirmatorName?.Trim();
+        var confirmatorTextTrimmed = confirmatorText?.Trim();
+
+        if (!string.IsNullOrEmpty(confirmatorNameTrimmed)
+            || !string.IsNullOrEmpty(confirmatorTextTrimmed))
+        {
+            sb.Append($"{(sb.Length > 0 ? " # " : "")}Conf.");
+
+            if (!string.IsNullOrEmpty(confirmatorNameTrimmed))
+            {
+                sb.Append(" ");
+                sb.Append(confirmatorNameTrimmed);
+            }
+
+            if (!string.IsNullOrEmpty(confirmatorTextTrimmed))
+            {
+                sb.Append(" ");
+                sb.Append(confirmatorTextTrimmed);
+            }
+
+            if (confirmatorYear.HasValue)
+            {
+                sb.Append(" ");
+                sb.Append(confirmatorYear.Value);
+            }
+        }
+
+        //----------------------------------------------------------------------
+        // Return result
+        //----------------------------------------------------------------------
+        return sb.Length == 0 ? null : sb.ToString();
     }
 }

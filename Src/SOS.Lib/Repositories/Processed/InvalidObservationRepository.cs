@@ -6,39 +6,38 @@ using SOS.Lib.Models.Processed.Validation;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using System.Threading.Tasks;
 
-namespace SOS.Lib.Repositories.Processed
+namespace SOS.Lib.Repositories.Processed;
+
+/// <summary>
+///     Invalid observation repository
+/// </summary>
+public class InvalidObservationRepository : MongoDbProcessedRepositoryBase<InvalidObservation, ObjectId>,
+    IInvalidObservationRepository
 {
     /// <summary>
-    ///     Invalid observation repository
+    ///     Constructor
     /// </summary>
-    public class InvalidObservationRepository : MongoDbProcessedRepositoryBase<InvalidObservation, ObjectId>,
-        IInvalidObservationRepository
+    /// <param name="client"></param>
+    /// <param name="logger"></param>
+    public InvalidObservationRepository(
+        IProcessClient client,
+        ILogger<InvalidObservationRepository> logger
+    ) : base(client, true, logger)
     {
-        /// <summary>
-        ///     Constructor
-        /// </summary>
-        /// <param name="client"></param>
-        /// <param name="logger"></param>
-        public InvalidObservationRepository(
-            IProcessClient client,
-            ILogger<InvalidObservationRepository> logger
-        ) : base(client, true, logger)
-        {
-        }
+    }
 
-        /// <inheritdoc />
-        public async Task CreateIndexAsync()
+    /// <inheritdoc />
+    public async Task CreateIndexAsync()
+    {
+        var indexModels = new[]
         {
-            var indexModels = new[]
-            {
-                new CreateIndexModel<InvalidObservation>(
-                    Builders<InvalidObservation>.IndexKeys.Ascending(io => io.DatasetName)),
-                new CreateIndexModel<InvalidObservation>(
-                    Builders<InvalidObservation>.IndexKeys.Ascending(io => io.OccurrenceID))
-            };
+            new CreateIndexModel<InvalidObservation>(
+                Builders<InvalidObservation>.IndexKeys.Ascending(io => io.DatasetName)),
+            new CreateIndexModel<InvalidObservation>(
+                Builders<InvalidObservation>.IndexKeys.Ascending(io => io.OccurrenceID))
+        };
 
-            Logger.LogDebug("Creating InvalidObservation indexes");
-            await MongoCollection.Indexes.CreateManyAsync(indexModels);
-        }
+        Logger.LogDebug("Creating InvalidObservation indexes");
+        await MongoCollection.Indexes.CreateManyAsync(indexModels);
     }
 }

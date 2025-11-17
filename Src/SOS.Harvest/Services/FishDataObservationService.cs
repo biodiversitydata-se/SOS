@@ -4,45 +4,44 @@ using SOS.Lib.Configuration.Import;
 using System.Xml.Linq;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
-namespace SOS.Harvest.Services
+namespace SOS.Harvest.Services;
+
+public class FishDataObservationService : IFishDataObservationService
 {
-    public class FishDataObservationService : IFishDataObservationService
+    private readonly IAquaSupportRequestService _aquaSupportRequestService;
+    private readonly FishDataServiceConfiguration _fishDataServiceConfiguration;
+    private readonly ILogger<FishDataObservationService> _logger;
+
+    /// <summary>
+    ///  Constructor
+    /// </summary>
+    /// <param name="aquaSupportRequestService"></param>
+    /// <param name="fishDataServiceConfiguration"></param>
+    /// <param name="logger"></param>
+    /// <exception cref="ArgumentNullException"></exception>
+    public FishDataObservationService(
+        IAquaSupportRequestService aquaSupportRequestService,
+        FishDataServiceConfiguration fishDataServiceConfiguration,
+        ILogger<FishDataObservationService> logger)
     {
-        private readonly IAquaSupportRequestService _aquaSupportRequestService;
-        private readonly FishDataServiceConfiguration _fishDataServiceConfiguration;
-        private readonly ILogger<FishDataObservationService> _logger;
+        _aquaSupportRequestService = aquaSupportRequestService ?? throw new ArgumentNullException(nameof(aquaSupportRequestService));
+        _fishDataServiceConfiguration = fishDataServiceConfiguration ??
+                                   throw new ArgumentNullException(nameof(fishDataServiceConfiguration));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    }
 
-        /// <summary>
-        ///  Constructor
-        /// </summary>
-        /// <param name="aquaSupportRequestService"></param>
-        /// <param name="fishDataServiceConfiguration"></param>
-        /// <param name="logger"></param>
-        /// <exception cref="ArgumentNullException"></exception>
-        public FishDataObservationService(
-            IAquaSupportRequestService aquaSupportRequestService,
-            FishDataServiceConfiguration fishDataServiceConfiguration,
-            ILogger<FishDataObservationService> logger)
+    /// <inheritdoc />
+    public async Task<XDocument> GetAsync(DateTime startDate, DateTime endDate, long changeId)
+    {
+        try
         {
-            _aquaSupportRequestService = aquaSupportRequestService ?? throw new ArgumentNullException(nameof(aquaSupportRequestService));
-            _fishDataServiceConfiguration = fishDataServiceConfiguration ??
-                                       throw new ArgumentNullException(nameof(fishDataServiceConfiguration));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            return await _aquaSupportRequestService.GetAsync($"{_fishDataServiceConfiguration.BaseAddress}/api/v1/FishDataSpeciesObservation?token={_fishDataServiceConfiguration.Token}",
+                startDate, endDate, changeId);
         }
-
-        /// <inheritdoc />
-        public async Task<XDocument> GetAsync(DateTime startDate, DateTime endDate, long changeId)
+        catch (Exception e)
         {
-            try
-            {
-                return await _aquaSupportRequestService.GetAsync($"{_fishDataServiceConfiguration.BaseAddress}/api/v1/FishDataSpeciesObservation?token={_fishDataServiceConfiguration.Token}",
-                    startDate, endDate, changeId);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Failed to get data from {@dataProvider}", "Fishdata2");
-                throw;
-            }
+            _logger.LogError(e, "Failed to get data from {@dataProvider}", "Fishdata2");
+            throw;
         }
     }
 }

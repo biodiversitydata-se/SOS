@@ -4,25 +4,24 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace SOS.Lib.Repositories.Processed.Interfaces
+namespace SOS.Lib.Repositories.Processed.Interfaces;
+
+/// <summary>
+///     Processed data class
+/// </summary>
+public interface IProtectedLogRepository : IMongoDbProcessedRepositoryBase<ProtectedLog, ObjectId>
 {
     /// <summary>
-    ///     Processed data class
+    ///     Create index
     /// </summary>
-    public interface IProtectedLogRepository : IMongoDbProcessedRepositoryBase<ProtectedLog, ObjectId>
-    {
-        /// <summary>
-        ///     Create index
-        /// </summary>
-        /// <returns></returns>
-        Task CreateIndexAsync();
+    /// <returns></returns>
+    Task CreateIndexAsync();
 
-        /// <summary>
-        /// Search log
-        /// </summary>
-        /// <param name="from"></param>
-        /// <param name="to"></param>
-        /// <returns></returns>
-        Task<IEnumerable<ProtectedLog>> SearchAsync(DateTime from, DateTime to);
-    }
+    /// <summary>
+    /// Search log
+    /// </summary>
+    /// <param name="from"></param>
+    /// <param name="to"></param>
+    /// <returns></returns>
+    Task<IEnumerable<ProtectedLog>> SearchAsync(DateTime from, DateTime to);
 }

@@ -6,248 +6,247 @@ using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.DataStewardship.Dataset;
 using SOS.Lib.Models.Verbatim.DarwinCore;
 
-namespace SOS.Harvest.DarwinCore
+namespace SOS.Harvest.DarwinCore;
+
+/// <summary>
+///     DwC-A reader for occurrence based DwC-A.
+/// </summary>
+public class DwcOccurrenceArchiveReader : IDwcArchiveReaderAsDwcObservation
 {
+    private int _idCounter;
+    private int NextId => Interlocked.Increment(ref _idCounter);
+
     /// <summary>
-    ///     DwC-A reader for occurrence based DwC-A.
+    /// Constructor
     /// </summary>
-    public class DwcOccurrenceArchiveReader : IDwcArchiveReaderAsDwcObservation
+    /// <param name="logger"></param>
+    /// <param name="idInitValue"></param>
+    /// <exception cref="ArgumentNullException"></exception>
+    public DwcOccurrenceArchiveReader(int idInitValue = 0)
     {
-        private int _idCounter;
-        private int NextId => Interlocked.Increment(ref _idCounter);
+        _idCounter = idInitValue;
+    }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="logger"></param>
-        /// <param name="idInitValue"></param>
-        /// <exception cref="ArgumentNullException"></exception>
-        public DwcOccurrenceArchiveReader(int idInitValue = 0)
+    /// <summary>
+    ///     Reads a occurrence based DwC-A, and returns observations in batches.
+    /// </summary>
+    /// <param name="archiveReader"></param>
+    /// <param name="idIdentifierTuple"></param>
+    /// <param name="batchSize"></param>
+    /// <returns></returns>
+    public async IAsyncEnumerable<List<DwcObservationVerbatim>> ReadArchiveInBatchesAsync(
+        ArchiveReader archiveReader,
+        IIdIdentifierTuple idIdentifierTuple,
+        int batchSize)
+    {
+        var occurrenceFileReader = archiveReader.GetAsyncCoreFile();
+        var idIndex = occurrenceFileReader.GetIdIndex();
+        var occurrenceRecords = new List<DwcObservationVerbatim>();
+
+        await foreach (var row in occurrenceFileReader.GetDataRowsAsync())
         {
-            _idCounter = idInitValue;
+            var occurrenceRecord = DwcObservationVerbatimFactory.Create(NextId, row, idIdentifierTuple, idIndex);
+            occurrenceRecords.Add(occurrenceRecord);
+
+            if (occurrenceRecords.Count % batchSize == 0)
+            {
+                await AddDataFromExtensionsAsync(archiveReader, occurrenceRecords);
+                yield return occurrenceRecords;
+                occurrenceRecords.Clear();
+            }
         }
 
-        /// <summary>
-        ///     Reads a occurrence based DwC-A, and returns observations in batches.
-        /// </summary>
-        /// <param name="archiveReader"></param>
-        /// <param name="idIdentifierTuple"></param>
-        /// <param name="batchSize"></param>
-        /// <returns></returns>
-        public async IAsyncEnumerable<List<DwcObservationVerbatim>> ReadArchiveInBatchesAsync(
-            ArchiveReader archiveReader,
-            IIdIdentifierTuple idIdentifierTuple,
-            int batchSize)
+        await AddDataFromExtensionsAsync(archiveReader, occurrenceRecords);
+        yield return occurrenceRecords;
+    }
+
+    public async Task<List<DwcObservationVerbatim>> ReadArchiveAsync(
+        ArchiveReader archiveReader,
+        IIdIdentifierTuple idIdentifierTuple)
+    {
+        const int batchSize = 100000;
+        var observationsBatches = ReadArchiveInBatchesAsync(
+            archiveReader,
+            idIdentifierTuple,
+            batchSize);
+        var observations = new List<DwcObservationVerbatim>();
+        await foreach (var observationsBatch in observationsBatches)
         {
-            var occurrenceFileReader = archiveReader.GetAsyncCoreFile();
-            var idIndex = occurrenceFileReader.GetIdIndex();
-            var occurrenceRecords = new List<DwcObservationVerbatim>();
+            observations.AddRange(observationsBatch);
+        }
 
-            await foreach (var row in occurrenceFileReader.GetDataRowsAsync())
+        return observations;
+    }
+
+    /// <inheritdoc />
+    public async Task<IEnumerable<DwcEventOccurrenceVerbatim>?> ReadEvents(ArchiveReader archiveReader,
+        IIdIdentifierTuple idIdentifierTuple)
+    {
+        await Task.Run(() =>
+        {
+            throw new NotImplementedException("Not implemented for this reader");
+        });
+        return null; ;
+    }
+
+    /// <summary>
+    ///     Add data from DwC-A extensions.
+    /// </summary>
+    /// <param name="archiveReader"></param>
+    /// <param name="occurrenceRecords"></param>
+    /// <returns></returns>
+    private async Task AddDataFromExtensionsAsync(ArchiveReader archiveReader,
+        List<DwcObservationVerbatim> occurrenceRecords)
+    {
+        await AddEmofExtensionDataAsync(occurrenceRecords, archiveReader);
+        await AddMofExtensionDataAsync(occurrenceRecords, archiveReader);
+        await AddMultimediaExtensionDataAsync(occurrenceRecords, archiveReader);
+        await AddAudubonMediaExtensionDataAsync(occurrenceRecords, archiveReader);
+    }
+
+    private async Task AddMultimediaExtensionDataAsync(List<DwcObservationVerbatim> occurrenceRecords,
+        ArchiveReader archiveReader)
+    {
+        var multimediaFileReader = archiveReader.GetAsyncFileReader(RowTypes.Multimedia);
+        if (multimediaFileReader == null) return;
+        var idIndex = multimediaFileReader.GetIdIndex();
+        var observationByRecordId = occurrenceRecords.ToDictionary(v => v.RecordId, v => v);
+        await foreach (var row in multimediaFileReader.GetDataRowsAsync())
+        {
+            var id = row[idIndex];
+            if (observationByRecordId.TryGetValue(id, out var obs))
             {
-                var occurrenceRecord = DwcObservationVerbatimFactory.Create(NextId, row, idIdentifierTuple, idIndex);
-                occurrenceRecords.Add(occurrenceRecord);
-
-                if (occurrenceRecords.Count % batchSize == 0)
+                if (obs.ObservationMultimedia == null)
                 {
-                    await AddDataFromExtensionsAsync(archiveReader, occurrenceRecords);
-                    yield return occurrenceRecords;
-                    occurrenceRecords.Clear();
+                    obs.ObservationMultimedia = new List<DwcMultimedia>();
                 }
+
+                var multimediaItem = DwcMultimediaFactory.Create(row);
+                obs.ObservationMultimedia.Add(multimediaItem);
             }
-
-            await AddDataFromExtensionsAsync(archiveReader, occurrenceRecords);
-            yield return occurrenceRecords;
         }
+    }
 
-        public async Task<List<DwcObservationVerbatim>> ReadArchiveAsync(
-            ArchiveReader archiveReader,
-            IIdIdentifierTuple idIdentifierTuple)
+    private async Task AddAudubonMediaExtensionDataAsync(List<DwcObservationVerbatim> occurrenceRecords,
+        ArchiveReader archiveReader)
+    {
+        var audubonFileReader = archiveReader.GetAsyncFileReader(RowTypes.AudubonMediaDescription);
+        if (audubonFileReader == null) return;
+        var idIndex = audubonFileReader.GetIdIndex();
+        var observationByRecordId = occurrenceRecords.ToDictionary(v => v.RecordId, v => v);
+        await foreach (var row in audubonFileReader.GetDataRowsAsync())
         {
-            const int batchSize = 100000;
-            var observationsBatches = ReadArchiveInBatchesAsync(
-                archiveReader,
-                idIdentifierTuple,
-                batchSize);
-            var observations = new List<DwcObservationVerbatim>();
-            await foreach (var observationsBatch in observationsBatches)
+            var id = row[idIndex];
+            if (observationByRecordId.TryGetValue(id, out var obs))
             {
-                observations.AddRange(observationsBatch);
-            }
-
-            return observations;
-        }
-
-        /// <inheritdoc />
-        public async Task<IEnumerable<DwcEventOccurrenceVerbatim>?> ReadEvents(ArchiveReader archiveReader,
-            IIdIdentifierTuple idIdentifierTuple)
-        {
-            await Task.Run(() =>
-            {
-                throw new NotImplementedException("Not implemented for this reader");
-            });
-            return null; ;
-        }
-
-        /// <summary>
-        ///     Add data from DwC-A extensions.
-        /// </summary>
-        /// <param name="archiveReader"></param>
-        /// <param name="occurrenceRecords"></param>
-        /// <returns></returns>
-        private async Task AddDataFromExtensionsAsync(ArchiveReader archiveReader,
-            List<DwcObservationVerbatim> occurrenceRecords)
-        {
-            await AddEmofExtensionDataAsync(occurrenceRecords, archiveReader);
-            await AddMofExtensionDataAsync(occurrenceRecords, archiveReader);
-            await AddMultimediaExtensionDataAsync(occurrenceRecords, archiveReader);
-            await AddAudubonMediaExtensionDataAsync(occurrenceRecords, archiveReader);
-        }
-
-        private async Task AddMultimediaExtensionDataAsync(List<DwcObservationVerbatim> occurrenceRecords,
-            ArchiveReader archiveReader)
-        {
-            var multimediaFileReader = archiveReader.GetAsyncFileReader(RowTypes.Multimedia);
-            if (multimediaFileReader == null) return;
-            var idIndex = multimediaFileReader.GetIdIndex();
-            var observationByRecordId = occurrenceRecords.ToDictionary(v => v.RecordId, v => v);
-            await foreach (var row in multimediaFileReader.GetDataRowsAsync())
-            {
-                var id = row[idIndex];
-                if (observationByRecordId.TryGetValue(id, out var obs))
+                if (obs.ObservationAudubonMedia == null)
                 {
-                    if (obs.ObservationMultimedia == null)
-                    {
-                        obs.ObservationMultimedia = new List<DwcMultimedia>();
-                    }
-
-                    var multimediaItem = DwcMultimediaFactory.Create(row);
-                    obs.ObservationMultimedia.Add(multimediaItem);
+                    obs.ObservationAudubonMedia = new List<DwcAudubonMedia>();
                 }
+
+                var audubonItem = DwcAudubonMediaFactory.Create(row);
+                obs.ObservationAudubonMedia.Add(audubonItem);
             }
         }
+    }
 
-        private async Task AddAudubonMediaExtensionDataAsync(List<DwcObservationVerbatim> occurrenceRecords,
-            ArchiveReader archiveReader)
+    private async Task AddMofExtensionDataAsync(List<DwcObservationVerbatim> occurrenceRecords,
+        ArchiveReader archiveReader)
+    {
+        var mofFileReader = archiveReader.GetAsyncFileReader(RowTypes.MeasurementOrFact);
+        if (mofFileReader == null) return;
+        var idIndex = mofFileReader.GetIdIndex();
+        var observationByRecordId = occurrenceRecords.ToDictionary(v => v.RecordId, v => v);
+        await foreach (var row in mofFileReader.GetDataRowsAsync())
         {
-            var audubonFileReader = archiveReader.GetAsyncFileReader(RowTypes.AudubonMediaDescription);
-            if (audubonFileReader == null) return;
-            var idIndex = audubonFileReader.GetIdIndex();
-            var observationByRecordId = occurrenceRecords.ToDictionary(v => v.RecordId, v => v);
-            await foreach (var row in audubonFileReader.GetDataRowsAsync())
+            var id = row[idIndex];
+            if (observationByRecordId.TryGetValue(id, out var obs))
             {
-                var id = row[idIndex];
-                if (observationByRecordId.TryGetValue(id, out var obs))
+                if (obs.ObservationMeasurementOrFacts == null)
                 {
-                    if (obs.ObservationAudubonMedia == null)
-                    {
-                        obs.ObservationAudubonMedia = new List<DwcAudubonMedia>();
-                    }
-
-                    var audubonItem = DwcAudubonMediaFactory.Create(row);
-                    obs.ObservationAudubonMedia.Add(audubonItem);
+                    obs.ObservationMeasurementOrFacts = new List<DwcMeasurementOrFact>();
                 }
+
+                var mofItem = DwcMeasurementOrFactFactory.Create(row);
+                obs.ObservationMeasurementOrFacts.Add(mofItem);
             }
         }
+    }
 
-        private async Task AddMofExtensionDataAsync(List<DwcObservationVerbatim> occurrenceRecords,
-            ArchiveReader archiveReader)
+    /// <summary>
+    ///     Add Extended Measurement Or Fact data
+    /// </summary>
+    /// <param name="occurrenceRecords"></param>
+    /// <param name="archiveReader"></param>
+    /// <returns></returns>
+    private async Task AddEmofExtensionDataAsync(List<DwcObservationVerbatim> occurrenceRecords,
+        ArchiveReader archiveReader)
+    {
+        var emofFileReader = archiveReader.GetAsyncFileReader(RowTypes.ExtendedMeasurementOrFact);
+        if (emofFileReader == null) return;
+        var idIndex = emofFileReader.GetIdIndex();
+
+        var observationByRecordId = occurrenceRecords.ToDictionary(v => v.RecordId, v => v);
+        await foreach (var row in emofFileReader.GetDataRowsAsync())
         {
-            var mofFileReader = archiveReader.GetAsyncFileReader(RowTypes.MeasurementOrFact);
-            if (mofFileReader == null) return;
-            var idIndex = mofFileReader.GetIdIndex();
-            var observationByRecordId = occurrenceRecords.ToDictionary(v => v.RecordId, v => v);
-            await foreach (var row in mofFileReader.GetDataRowsAsync())
+            var id = row[idIndex];
+            if (observationByRecordId.TryGetValue(id, out var obs))
             {
-                var id = row[idIndex];
-                if (observationByRecordId.TryGetValue(id, out var obs))
+                if (obs.ObservationExtendedMeasurementOrFacts == null)
                 {
-                    if (obs.ObservationMeasurementOrFacts == null)
-                    {
-                        obs.ObservationMeasurementOrFacts = new List<DwcMeasurementOrFact>();
-                    }
-
-                    var mofItem = DwcMeasurementOrFactFactory.Create(row);
-                    obs.ObservationMeasurementOrFacts.Add(mofItem);
+                    obs.ObservationExtendedMeasurementOrFacts = new List<DwcExtendedMeasurementOrFact>();
                 }
+
+                var emofItem = DwcExtendedMeasurementOrFactFactory.Create(row);
+                obs.ObservationExtendedMeasurementOrFacts.Add(emofItem);
             }
         }
+    }
 
-        /// <summary>
-        ///     Add Extended Measurement Or Fact data
-        /// </summary>
-        /// <param name="occurrenceRecords"></param>
-        /// <param name="archiveReader"></param>
-        /// <returns></returns>
-        private async Task AddEmofExtensionDataAsync(List<DwcObservationVerbatim> occurrenceRecords,
-            ArchiveReader archiveReader)
+    /// <summary>
+    /// Read data stewardship datasets.
+    /// </summary>
+    /// <param name="archiveReader"></param>
+    /// <returns></returns>
+    public async Task<List<DwcVerbatimDataset>?> ReadDatasetsAsync(ArchiveReader archiveReader)
+    {
+        return await Task.Run(() => null as List<DwcVerbatimDataset>);
+    }
+
+    public async Task<List<DwcVerbatimDataset>?> ReadDatasetsAsync(ArchiveReaderContext archiveReaderContext)
+    {
+        return await Task.Run(() => null as List<DwcVerbatimDataset>);
+    }
+
+    public async IAsyncEnumerable<List<DwcObservationVerbatim>?> ReadOccurrencesInBatchesAsync(ArchiveReaderContext archiveReaderContext)
+    {
+        if (archiveReaderContext == null)
         {
-            var emofFileReader = archiveReader.GetAsyncFileReader(RowTypes.ExtendedMeasurementOrFact);
-            if (emofFileReader == null) return;
-            var idIndex = emofFileReader.GetIdIndex();
+            yield return null;
+        }
+        var occurrenceFileReader = archiveReaderContext!.ArchiveReader!.GetAsyncCoreFile();
+        var idIndex = occurrenceFileReader.GetIdIndex();
+        var occurrenceRecords = new List<DwcObservationVerbatim>();
 
-            var observationByRecordId = occurrenceRecords.ToDictionary(v => v.RecordId, v => v);
-            await foreach (var row in emofFileReader.GetDataRowsAsync())
+        await foreach (var row in occurrenceFileReader.GetDataRowsAsync())
+        {
+            var occurrenceRecord = DwcObservationVerbatimFactory.Create(NextId, row, archiveReaderContext.DataProvider, idIndex);
+            occurrenceRecords.Add(occurrenceRecord);
+
+            if (occurrenceRecords.Count % archiveReaderContext.BatchSize == 0)
             {
-                var id = row[idIndex];
-                if (observationByRecordId.TryGetValue(id, out var obs))
-                {
-                    if (obs.ObservationExtendedMeasurementOrFacts == null)
-                    {
-                        obs.ObservationExtendedMeasurementOrFacts = new List<DwcExtendedMeasurementOrFact>();
-                    }
-
-                    var emofItem = DwcExtendedMeasurementOrFactFactory.Create(row);
-                    obs.ObservationExtendedMeasurementOrFacts.Add(emofItem);
-                }
+                await AddDataFromExtensionsAsync(archiveReaderContext.ArchiveReader, occurrenceRecords);
+                yield return occurrenceRecords;
+                occurrenceRecords.Clear();
             }
         }
 
-        /// <summary>
-        /// Read data stewardship datasets.
-        /// </summary>
-        /// <param name="archiveReader"></param>
-        /// <returns></returns>
-        public async Task<List<DwcVerbatimDataset>?> ReadDatasetsAsync(ArchiveReader archiveReader)
-        {
-            return await Task.Run(() => null as List<DwcVerbatimDataset>);
-        }
+        await AddDataFromExtensionsAsync(archiveReaderContext.ArchiveReader, occurrenceRecords);
+        yield return occurrenceRecords;
+    }
 
-        public async Task<List<DwcVerbatimDataset>?> ReadDatasetsAsync(ArchiveReaderContext archiveReaderContext)
-        {
-            return await Task.Run(() => null as List<DwcVerbatimDataset>);
-        }
-
-        public async IAsyncEnumerable<List<DwcObservationVerbatim>?> ReadOccurrencesInBatchesAsync(ArchiveReaderContext archiveReaderContext)
-        {
-            if (archiveReaderContext == null)
-            {
-                yield return null;
-            }
-            var occurrenceFileReader = archiveReaderContext!.ArchiveReader!.GetAsyncCoreFile();
-            var idIndex = occurrenceFileReader.GetIdIndex();
-            var occurrenceRecords = new List<DwcObservationVerbatim>();
-
-            await foreach (var row in occurrenceFileReader.GetDataRowsAsync())
-            {
-                var occurrenceRecord = DwcObservationVerbatimFactory.Create(NextId, row, archiveReaderContext.DataProvider, idIndex);
-                occurrenceRecords.Add(occurrenceRecord);
-
-                if (occurrenceRecords.Count % archiveReaderContext.BatchSize == 0)
-                {
-                    await AddDataFromExtensionsAsync(archiveReaderContext.ArchiveReader, occurrenceRecords);
-                    yield return occurrenceRecords;
-                    occurrenceRecords.Clear();
-                }
-            }
-
-            await AddDataFromExtensionsAsync(archiveReaderContext.ArchiveReader, occurrenceRecords);
-            yield return occurrenceRecords;
-        }
-
-        public async Task<IEnumerable<DwcEventOccurrenceVerbatim>?> ReadEvents(ArchiveReaderContext archiveReaderContext)
-        {
-            return await Task.Run(Array.Empty<DwcEventOccurrenceVerbatim>);
-        }
+    public async Task<IEnumerable<DwcEventOccurrenceVerbatim>?> ReadEvents(ArchiveReaderContext archiveReaderContext)
+    {
+        return await Task.Run(Array.Empty<DwcEventOccurrenceVerbatim>);
     }
 }

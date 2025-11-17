@@ -6,102 +6,101 @@ using System.Linq;
 using System.Text.Json.Serialization;
 using System.Text.Json;
 
-namespace SOS.Lib.Helpers
+namespace SOS.Lib.Helpers;
+
+/// <summary>
+/// Helper class for serializing objects to JSON.
+/// </summary>
+public static class JsonHelper
 {
     /// <summary>
-    /// Helper class for serializing objects to JSON.
+    /// Serialize to JSON and remove properties containing default values.
     /// </summary>
-    public static class JsonHelper
+    /// <param name="obj"></param>
+    /// <param name="deleteProperties">Properties that should be excluded.</param>
+    /// <param name="keepPropertyNames">Properties that should be kept even if they have default value.</param>
+    /// <returns></returns>
+    public static string SerializeToMinimalJson(object obj, IList<string> deleteProperties = null, IList<string> keepPropertyNames = null)
     {
-        /// <summary>
-        /// Serialize to JSON and remove properties containing default values.
-        /// </summary>
-        /// <param name="obj"></param>
-        /// <param name="deleteProperties">Properties that should be excluded.</param>
-        /// <param name="keepPropertyNames">Properties that should be kept even if they have default value.</param>
-        /// <returns></returns>
-        public static string SerializeToMinimalJson(object obj, IList<string> deleteProperties = null, IList<string> keepPropertyNames = null)
+        var jToken = JToken.FromObject(obj).RemoveEmptyChildren(keepPropertyNames);
+        if (deleteProperties != null)
         {
-            var jToken = JToken.FromObject(obj).RemoveEmptyChildren(keepPropertyNames);
-            if (deleteProperties != null)
+            foreach (var deleteProperty in deleteProperties)
             {
-                foreach (var deleteProperty in deleteProperties)
+                jToken.SelectTokens($"{deleteProperty}").ToList().ForEach(attr => attr.Parent.Remove());
+            }
+        }
+
+        return jToken.ToString(Formatting.Indented);
+    }
+
+
+    private static JToken RemoveEmptyChildren(this JToken token, IList<string> keepPropertyNames = null)
+    {
+        if (token.Type == JTokenType.Object)
+        {
+            var copy = new JObject();
+            foreach (var prop in token.Children<JProperty>())
+            {
+                var child = prop.Value;
+                if (child.HasValues)
                 {
-                    jToken.SelectTokens($"{deleteProperty}").ToList().ForEach(attr => attr.Parent.Remove());
+                    child = child.RemoveEmptyChildren(keepPropertyNames);
+                }
+
+                if (!child.IsEmptyOrDefault(keepPropertyNames))
+                {
+                    copy.Add(prop.Name, child);
                 }
             }
 
-            return jToken.ToString(Formatting.Indented);
+            return copy;
         }
 
-
-        private static JToken RemoveEmptyChildren(this JToken token, IList<string> keepPropertyNames = null)
+        if (token.Type == JTokenType.Array)
         {
-            if (token.Type == JTokenType.Object)
+            var copy = new JArray();
+            foreach (var item in token.Children())
             {
-                var copy = new JObject();
-                foreach (var prop in token.Children<JProperty>())
+                var child = item;
+                if (child.HasValues)
                 {
-                    var child = prop.Value;
-                    if (child.HasValues)
-                    {
-                        child = child.RemoveEmptyChildren(keepPropertyNames);
-                    }
-
-                    if (!child.IsEmptyOrDefault(keepPropertyNames))
-                    {
-                        copy.Add(prop.Name, child);
-                    }
+                    child = child.RemoveEmptyChildren(keepPropertyNames);
                 }
 
-                return copy;
-            }
-
-            if (token.Type == JTokenType.Array)
-            {
-                var copy = new JArray();
-                foreach (var item in token.Children())
+                if (!child.IsEmptyOrDefault(keepPropertyNames))
                 {
-                    var child = item;
-                    if (child.HasValues)
-                    {
-                        child = child.RemoveEmptyChildren(keepPropertyNames);
-                    }
-
-                    if (!child.IsEmptyOrDefault(keepPropertyNames))
-                    {
-                        copy.Add(child);
-                    }
+                    copy.Add(child);
                 }
-
-                return copy;
             }
 
-            return token;
+            return copy;
         }
 
-        private static bool IsEmptyOrDefault(this JToken token, IList<string> keepPropertyNames = null)
-        {
-            if (AlwaysKeepProperty(token, keepPropertyNames)) return false;
-            return token.Type == JTokenType.Array && !token.HasValues ||
-                   token.Type == JTokenType.Object && !token.HasValues ||
-                   token.Type == JTokenType.String && token.ToString() == string.Empty ||
-                   token.Type == JTokenType.Boolean && token.Value<bool>() == false ||
-                   token.Type == JTokenType.Integer && token.Value<int>() == 0 ||
-                   token.Type == JTokenType.Float && Math.Abs(token.Value<double>()) < 0.001 ||
-                   token.Type == JTokenType.Null;
+        return token;
+    }
 
-            // Use the following code if you want to honor the [DefaultValue] attribute:
-            // return (token.Type == JTokenType.Array && !token.HasValues) ||
-            //        (token.Type == JTokenType.Object && !token.HasValues);
-        }
+    private static bool IsEmptyOrDefault(this JToken token, IList<string> keepPropertyNames = null)
+    {
+        if (AlwaysKeepProperty(token, keepPropertyNames)) return false;
+        return token.Type == JTokenType.Array && !token.HasValues ||
+               token.Type == JTokenType.Object && !token.HasValues ||
+               token.Type == JTokenType.String && token.ToString() == string.Empty ||
+               token.Type == JTokenType.Boolean && token.Value<bool>() == false ||
+               token.Type == JTokenType.Integer && token.Value<int>() == 0 ||
+               token.Type == JTokenType.Float && Math.Abs(token.Value<double>()) < 0.001 ||
+               token.Type == JTokenType.Null;
 
-        private static bool AlwaysKeepProperty(JToken token, IList<string> keepPropertyNames)
-        {
-            if (keepPropertyNames == null) return false;
-            if (token.Parent == null) return false;
-            if (!(token.Parent is JProperty parent)) return false;
-            return keepPropertyNames.Contains(parent.Name);
-        }
+        // Use the following code if you want to honor the [DefaultValue] attribute:
+        // return (token.Type == JTokenType.Array && !token.HasValues) ||
+        //        (token.Type == JTokenType.Object && !token.HasValues);
+    }
+
+    private static bool AlwaysKeepProperty(JToken token, IList<string> keepPropertyNames)
+    {
+        if (keepPropertyNames == null) return false;
+        if (token.Parent == null) return false;
+        if (!(token.Parent is JProperty parent)) return false;
+        return keepPropertyNames.Contains(parent.Name);
     }
 }

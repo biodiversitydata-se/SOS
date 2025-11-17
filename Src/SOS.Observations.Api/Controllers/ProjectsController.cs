@@ -12,119 +12,118 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 
-namespace SOS.Observations.Api.Controllers
+namespace SOS.Observations.Api.Controllers;
+
+/// <summary>
+///     Observation controller
+/// </summary>
+[Route("[controller]")]
+[ApiController]
+public class ProjectsController : ControllerBase
 {
+    private readonly IProjectManager _projectManager;
+    private readonly ILogger<ProjectsController> _logger;
+
     /// <summary>
-    ///     Observation controller
+    /// Constructor
     /// </summary>
-    [Route("[controller]")]
-    [ApiController]
-    public class ProjectsController : ControllerBase
+    /// <param name="projectManager"></param>
+    /// <param name="logger"></param>
+    /// <exception cref="ArgumentNullException"></exception>
+    public ProjectsController(
+        IProjectManager projectManager,
+        ILogger<ProjectsController> logger) 
     {
-        private readonly IProjectManager _projectManager;
-        private readonly ILogger<ProjectsController> _logger;
+        _projectManager = projectManager ?? throw new ArgumentNullException(nameof(projectManager));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="projectManager"></param>
-        /// <param name="logger"></param>
-        /// <exception cref="ArgumentNullException"></exception>
-        public ProjectsController(
-            IProjectManager projectManager,
-            ILogger<ProjectsController> logger) 
+    /// <summary>
+    /// Get projects matching passed filter
+    /// </summary>
+    /// <param name="filter">Limit project list by this filter</param>
+    /// <returns></returns>
+    [HttpGet]
+    [ProducesResponseType(typeof(IEnumerable<ProjectDto>), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.NoContent)]
+    [ProducesResponseType((int)HttpStatusCode.InternalServerError)]        
+    public async Task<IActionResult> GetProjectsAsync(
+        [FromQuery] string filter)
+    {
+        try
         {
-            _projectManager = projectManager ?? throw new ArgumentNullException(nameof(projectManager));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
+
+            var projects = await _projectManager.GetAsync(filter, base.User?.GetUserId());
+
+            if ((projects?.Count() ?? 0) == 0)
+            {
+                return new StatusCodeResult((int)HttpStatusCode.NoContent);
+            }
+            return new OkObjectResult(projects.Select(p => p.ToDto()));
         }
-
-        /// <summary>
-        /// Get projects matching passed filter
-        /// </summary>
-        /// <param name="filter">Limit project list by this filter</param>
-        /// <returns></returns>
-        [HttpGet]
-        [ProducesResponseType(typeof(IEnumerable<ProjectDto>), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]        
-        public async Task<IActionResult> GetProjectsAsync(
-            [FromQuery] string filter)
+        catch (Exception e)
         {
-            try
-            {
-                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
-
-                var projects = await _projectManager.GetAsync(filter, base.User?.GetUserId());
-
-                if ((projects?.Count() ?? 0) == 0)
-                {
-                    return new StatusCodeResult((int)HttpStatusCode.NoContent);
-                }
-                return new OkObjectResult(projects.Select(p => p.ToDto()));
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Error getting projects");
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
-            }
+            _logger.LogError(e, "Error getting projects");
+            return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
         }
+    }
 
 
-        [HttpPost]
-        [ProducesResponseType(typeof(IEnumerable<ProjectDto>), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]        
-        public async Task<IActionResult> GetProjectsByIdsAsync(
-            [FromBody] int[] ids)
+    [HttpPost]
+    [ProducesResponseType(typeof(IEnumerable<ProjectDto>), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.NoContent)]
+    [ProducesResponseType((int)HttpStatusCode.InternalServerError)]        
+    public async Task<IActionResult> GetProjectsByIdsAsync(
+        [FromBody] int[] ids)
+    {
+        try
         {
-            try
-            {
-                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
+            LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
 
-                var projects = await _projectManager.GetAsync(ids, base.User?.GetUserId());
+            var projects = await _projectManager.GetAsync(ids, base.User?.GetUserId());
 
-                if ((projects?.Count() ?? 0) == 0)
-                {
-                    return new StatusCodeResult((int)HttpStatusCode.NoContent);
-                }
-                return new OkObjectResult(projects.Select(p => p.ToDto()));
-            }
-            catch (Exception e)
+            if ((projects?.Count() ?? 0) == 0)
             {
-                _logger.LogError(e, "Error getting projects");
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+                return new StatusCodeResult((int)HttpStatusCode.NoContent);
             }
+            return new OkObjectResult(projects.Select(p => p.ToDto()));
         }
-
-        /// <summary>
-        /// Get project by id
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        [HttpGet("{id}")]
-        [ProducesResponseType(typeof(ProjectDto), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]        
-        public async Task<IActionResult> GetProjectAsync(
-            [FromRoute] int id)
+        catch (Exception e)
         {
-            try
-            {
-                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
+            _logger.LogError(e, "Error getting projects");
+            return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+        }
+    }
 
-                var project = await _projectManager.GetAsync(id, base.User?.GetUserId());
-                if (project == null)
-                {
-                    return new StatusCodeResult((int)HttpStatusCode.NoContent);
-                }
+    /// <summary>
+    /// Get project by id
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    [HttpGet("{id}")]
+    [ProducesResponseType(typeof(ProjectDto), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.NoContent)]
+    [ProducesResponseType((int)HttpStatusCode.InternalServerError)]        
+    public async Task<IActionResult> GetProjectAsync(
+        [FromRoute] int id)
+    {
+        try
+        {
+            LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
 
-                return new OkObjectResult(project.ToDto());
-            }
-            catch (Exception e)
+            var project = await _projectManager.GetAsync(id, base.User?.GetUserId());
+            if (project == null)
             {
-                _logger.LogError(e, $"Error getting project: {id}");
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+                return new StatusCodeResult((int)HttpStatusCode.NoContent);
             }
+
+            return new OkObjectResult(project.ToDto());
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, $"Error getting project: {id}");
+            return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
         }
     }
 }

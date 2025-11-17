@@ -1,7 +1,6 @@
-﻿namespace SOS.Lib.Configuration.Import
-{
-    public class KulServiceConfiguration : AquaSupportConfiguration
-    {
+﻿namespace SOS.Lib.Configuration.Import;
 
-    }
+public class KulServiceConfiguration : AquaSupportConfiguration
+{
+
 }

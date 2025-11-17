@@ -1,11 +1,10 @@
-﻿namespace SOS.Lib.Models.Search.Enums
-{
-    public enum SignalSearchResult
-    {
+﻿namespace SOS.Lib.Models.Search.Enums;
 
-        NoPermissions = 0, 
-        PartialNoPermissions,
-        No,
-        Yes
-    }
+public enum SignalSearchResult
+{
+
+    NoPermissions = 0, 
+    PartialNoPermissions,
+    No,
+    Yes
 }

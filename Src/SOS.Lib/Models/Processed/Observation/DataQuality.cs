@@ -1,13 +1,12 @@
-﻿namespace SOS.Lib.Models.Processed.Observation
+﻿namespace SOS.Lib.Models.Processed.Observation;
+
+/// <summary>
+/// Class related to data quality
+/// </summary>
+public class DataQuality
 {
     /// <summary>
-    /// Class related to data quality
+    /// Hashed key created from observation date + taxon id + position
     /// </summary>
-    public class DataQuality
-    {
-        /// <summary>
-        /// Hashed key created from observation date + taxon id + position
-        /// </summary>
-        public string UniqueKey { get; set; }
-    }
+    public string UniqueKey { get; set; }
 }

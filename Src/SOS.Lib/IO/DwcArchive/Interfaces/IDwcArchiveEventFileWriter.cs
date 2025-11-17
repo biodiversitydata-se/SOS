@@ -10,58 +10,57 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace SOS.Lib.IO.DwcArchive.Interfaces
+namespace SOS.Lib.IO.DwcArchive.Interfaces;
+
+public interface IDwcArchiveEventFileWriter
 {
-    public interface IDwcArchiveEventFileWriter
-    {
-        /// <summary>
-        ///  Write part of DwC-A event CSV files to disk.
-        /// </summary>
-        /// <param name="dataProvider"></param>
-        /// <param name="dwcObservations"></param>
-        /// <param name="eventFilePathByFilePart"></param>
-        /// <param name="writtenEventsData"></param>
-        /// <param name="checkForIllegalCharacters"></param>
-        /// <returns></returns>
-        Task<DwcaWriteResult> WriteHeaderlessEventDwcaFilesAsync(
-            DataProvider dataProvider,
-            ICollection<Observation> dwcObservations,
-            Dictionary<DwcaEventFilePart, string> eventFilePathByFilePart,
-            WrittenEventSets writtenEventsData,
-            bool checkForIllegalCharacters = false);
+    /// <summary>
+    ///  Write part of DwC-A event CSV files to disk.
+    /// </summary>
+    /// <param name="dataProvider"></param>
+    /// <param name="dwcObservations"></param>
+    /// <param name="eventFilePathByFilePart"></param>
+    /// <param name="writtenEventsData"></param>
+    /// <param name="checkForIllegalCharacters"></param>
+    /// <returns></returns>
+    Task<DwcaWriteResult> WriteHeaderlessEventDwcaFilesAsync(
+        DataProvider dataProvider,
+        ICollection<Observation> dwcObservations,
+        Dictionary<DwcaEventFilePart, string> eventFilePathByFilePart,
+        WrittenEventSets writtenEventsData,
+        bool checkForIllegalCharacters = false);
 
-        Task<string> CreateEventDwcArchiveFileAsync(
-            DataProvider dataProvider,
-            string exportFolderPath,
-            DwcaFilePartsInfo dwcaFilePartsInfo);
+    Task<string> CreateEventDwcArchiveFileAsync(
+        DataProvider dataProvider,
+        string exportFolderPath,
+        DwcaFilePartsInfo dwcaFilePartsInfo);
 
-        /// <summary>
-        ///     Creates a Darwin Core Archive file where the specified fields in fieldDescriptions are used.
-        ///     The file is stored in a random generated name in the exportPath folder.
-        ///     The full path is returned by this function.
-        /// </summary>
-        /// <param name="dataProvider"></param>
-        /// <param name="filter"></param>
-        /// <param name="fileName"></param>
-        /// <param name="processedObservationRepository">The repository to read observation data from.</param>
-        /// <param name="processInfo"></param>
-        /// <param name="exportFolderPath">The export folder path where the file will be stored.</param>
-        /// <param name="cancellationToken">Cancellation token that can be used to cancel this function.</param>
-        /// <returns>The file path to the generated DwC-A file.</returns>
-        Task<FileExportResult> CreateEventDwcArchiveFileAsync(
-            DataProvider dataProvider,
-            SearchFilter filter,
-            string fileName,
-            IProcessedObservationCoreRepository processedObservationRepository,
-            ProcessInfo processInfo,
-            string exportFolderPath,
-            IJobCancellationToken cancellationToken);
+    /// <summary>
+    ///     Creates a Darwin Core Archive file where the specified fields in fieldDescriptions are used.
+    ///     The file is stored in a random generated name in the exportPath folder.
+    ///     The full path is returned by this function.
+    /// </summary>
+    /// <param name="dataProvider"></param>
+    /// <param name="filter"></param>
+    /// <param name="fileName"></param>
+    /// <param name="processedObservationRepository">The repository to read observation data from.</param>
+    /// <param name="processInfo"></param>
+    /// <param name="exportFolderPath">The export folder path where the file will be stored.</param>
+    /// <param name="cancellationToken">Cancellation token that can be used to cancel this function.</param>
+    /// <returns>The file path to the generated DwC-A file.</returns>
+    Task<FileExportResult> CreateEventDwcArchiveFileAsync(
+        DataProvider dataProvider,
+        SearchFilter filter,
+        string fileName,
+        IProcessedObservationCoreRepository processedObservationRepository,
+        ProcessInfo processInfo,
+        string exportFolderPath,
+        IJobCancellationToken cancellationToken);
 
-        Task<(Stream stream, string filename)> CreateEventDwcArchiveFileInMemoryAsync(
-            DataProvider dataProvider,
-            SearchFilter filter,
-            IProcessedObservationCoreRepository processedObservationRepository,
-            ProcessInfo processInfo,
-            IJobCancellationToken cancellationToken);
-    }
+    Task<(Stream stream, string filename)> CreateEventDwcArchiveFileInMemoryAsync(
+        DataProvider dataProvider,
+        SearchFilter filter,
+        IProcessedObservationCoreRepository processedObservationRepository,
+        ProcessInfo processInfo,
+        IJobCancellationToken cancellationToken);
 }

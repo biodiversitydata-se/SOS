@@ -1,12 +1,11 @@
-﻿namespace SOS.Lib.Models.Search.Enums
+﻿namespace SOS.Lib.Models.Search.Enums;
+
+public enum AggregationSortOrder
 {
-    public enum AggregationSortOrder
-    {
-        CountDescending,
-        CountAscending,
-        KeyAscending,
-        KeyDescending,
-        OrganismQuantityAscending,
-        OrganismQuantityDescending
-    }
+    CountDescending,
+    CountAscending,
+    KeyAscending,
+    KeyDescending,
+    OrganismQuantityAscending,
+    OrganismQuantityDescending
 }

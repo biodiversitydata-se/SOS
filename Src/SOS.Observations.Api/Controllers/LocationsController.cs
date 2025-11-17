@@ -24,144 +24,143 @@ using System.Threading;
 using Microsoft.AspNetCore.Http;
 using SOS.Lib.Models.Shared;
 
-namespace SOS.Observations.Api.Controllers
+namespace SOS.Observations.Api.Controllers;
+
+/// <summary>
+///     Observation controller
+/// </summary>
+[Route("[controller]")]
+[ApiController]
+public class LocationsController : ControllerBase
 {
+    private readonly ILocationManager _locationManager;
+    private readonly IInputValidator _inputValidator;
+    private readonly ObservationApiConfiguration _observationApiConfiguration;
+    private readonly SemaphoreLimitManager _semaphoreLimitManager;
+    private readonly ILogger<LocationsController> _logger;
+
     /// <summary>
-    ///     Observation controller
+    /// Constructor
     /// </summary>
-    [Route("[controller]")]
-    [ApiController]
-    public class LocationsController : ControllerBase
+    /// <param name="locationManager"></param>
+    /// <param name="inputValidator"></param>
+    /// <param name="observationApiConfiguration"></param>
+    /// <param name="semaphoreLimitManager"></param>
+    /// <param name="logger"></param>
+    /// <exception cref="ArgumentNullException"></exception>
+    public LocationsController(
+        ILocationManager locationManager,
+        IInputValidator inputValidator,
+        ObservationApiConfiguration observationApiConfiguration,
+        SemaphoreLimitManager semaphoreLimitManager,
+        ILogger<LocationsController> logger)
     {
-        private readonly ILocationManager _locationManager;
-        private readonly IInputValidator _inputValidator;
-        private readonly ObservationApiConfiguration _observationApiConfiguration;
-        private readonly SemaphoreLimitManager _semaphoreLimitManager;
-        private readonly ILogger<LocationsController> _logger;
+        _locationManager = locationManager ??
+                              throw new ArgumentNullException(nameof(locationManager));
+        _inputValidator = inputValidator ?? throw new ArgumentNullException(nameof(inputValidator));
+        _observationApiConfiguration = observationApiConfiguration ?? throw new ArgumentNullException(nameof(observationApiConfiguration));
+        _semaphoreLimitManager = semaphoreLimitManager ?? throw new ArgumentNullException(nameof(semaphoreLimitManager));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="locationManager"></param>
-        /// <param name="inputValidator"></param>
-        /// <param name="observationApiConfiguration"></param>
-        /// <param name="semaphoreLimitManager"></param>
-        /// <param name="logger"></param>
-        /// <exception cref="ArgumentNullException"></exception>
-        public LocationsController(
-            ILocationManager locationManager,
-            IInputValidator inputValidator,
-            ObservationApiConfiguration observationApiConfiguration,
-            SemaphoreLimitManager semaphoreLimitManager,
-            ILogger<LocationsController> logger)
+    /// <summary>
+    /// Get locations by id
+    /// </summary>
+    /// <param name="locationIds"></param>
+    /// <returns></returns>
+    [HttpPost]
+    [ProducesResponseType(typeof(List<LocationDto>), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+    [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+    [AzureApi, AzureInternalApi]
+    public async Task<IActionResult> GetLocationsByIds([FromBody] IEnumerable<string> locationIds)
+    {
+        ApiUserType userType = this.GetApiUserType();
+        var semaphoreResult = await _semaphoreLimitManager.GetSemaphoreAsync(SemaphoreType.Aggregation, userType, this.GetEndpointName(ControllerContext));
+        LogHelper.AddSemaphoreHttpContextItems(semaphoreResult, HttpContext);
+        if (semaphoreResult?.Semaphore == null) return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
+
+        try
         {
-            _locationManager = locationManager ??
-                                  throw new ArgumentNullException(nameof(locationManager));
-            _inputValidator = inputValidator ?? throw new ArgumentNullException(nameof(inputValidator));
-            _observationApiConfiguration = observationApiConfiguration ?? throw new ArgumentNullException(nameof(observationApiConfiguration));
-            _semaphoreLimitManager = semaphoreLimitManager ?? throw new ArgumentNullException(nameof(semaphoreLimitManager));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
+            if (!locationIds?.Any() ?? true)
+            {
+                return BadRequest("You have to provide at least one location id");
+            }
+
+            if (locationIds.Count() > 10000)
+            {
+                return BadRequest("You can't provide more than 10000 location id's at a time");
+            }
+
+            var locations = await _locationManager.GetLocationsAsync(locationIds);
+
+            return new OkObjectResult(locations);
         }
-
-        /// <summary>
-        /// Get locations by id
-        /// </summary>
-        /// <param name="locationIds"></param>
-        /// <returns></returns>
-        [HttpPost]
-        [ProducesResponseType(typeof(List<LocationDto>), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        [AzureApi, AzureInternalApi]
-        public async Task<IActionResult> GetLocationsByIds([FromBody] IEnumerable<string> locationIds)
+        catch (Exception e)
         {
-            ApiUserType userType = this.GetApiUserType();
-            var semaphoreResult = await _semaphoreLimitManager.GetSemaphoreAsync(SemaphoreType.Aggregation, userType, this.GetEndpointName(ControllerContext));
-            LogHelper.AddSemaphoreHttpContextItems(semaphoreResult, HttpContext);
-            if (semaphoreResult?.Semaphore == null) return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
-
-            try
-            {
-                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
-                if (!locationIds?.Any() ?? true)
-                {
-                    return BadRequest("You have to provide at least one location id");
-                }
-
-                if (locationIds.Count() > 10000)
-                {
-                    return BadRequest("You can't provide more than 10000 location id's at a time");
-                }
-
-                var locations = await _locationManager.GetLocationsAsync(locationIds);
-
-                return new OkObjectResult(locations);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Failed to get locations");
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
-            }
-            finally
-            {
-                semaphoreResult.Semaphore.Release();
-            }
+            _logger.LogError(e, "Failed to get locations");
+            return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
         }
-
-        /// <summary>
-        /// Search for locations
-        /// </summary>
-        /// <param name="filter">The search filter.</param>
-        /// <param name="skip">Pagination start index.</param>
-        /// <param name="take">Number of items to return.</param>
-        /// <param name="sensitiveObservations">If true, only sensitive (protected) observations will be searched (this requires authentication and authorization). If false, public available observations will be searched.</param>
-        /// <param name="roleId">Limit user authorization too specified role.</param>
-        /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
-        /// <returns></returns>
-        [HttpPost("search")]
-        [ProducesResponseType(typeof(IEnumerable<LocationSearchResultDto>), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        [AzureApi, AzureInternalApi]
-        public async Task<IActionResult> SearchAsync([FromBody] GeographicsFilterDto filter, [FromQuery] int skip = 0, [FromQuery] int take = 100, [FromQuery] bool sensitiveObservations = false, [FromQuery] int? roleId = null,
-            [FromQuery] string authorizationApplicationIdentifier = null)
+        finally
         {
-            ApiUserType userType = this.GetApiUserType();
-            var semaphoreResult = await _semaphoreLimitManager.GetSemaphoreAsync(SemaphoreType.Aggregation, userType, this.GetEndpointName(ControllerContext));
-            LogHelper.AddSemaphoreHttpContextItems(semaphoreResult, HttpContext);
-            if (semaphoreResult?.Semaphore == null) return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
+            semaphoreResult.Semaphore.Release();
+        }
+    }
 
-            try
+    /// <summary>
+    /// Search for locations
+    /// </summary>
+    /// <param name="filter">The search filter.</param>
+    /// <param name="skip">Pagination start index.</param>
+    /// <param name="take">Number of items to return.</param>
+    /// <param name="sensitiveObservations">If true, only sensitive (protected) observations will be searched (this requires authentication and authorization). If false, public available observations will be searched.</param>
+    /// <param name="roleId">Limit user authorization too specified role.</param>
+    /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
+    /// <returns></returns>
+    [HttpPost("search")]
+    [ProducesResponseType(typeof(IEnumerable<LocationSearchResultDto>), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+    [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+    [AzureApi, AzureInternalApi]
+    public async Task<IActionResult> SearchAsync([FromBody] GeographicsFilterDto filter, [FromQuery] int skip = 0, [FromQuery] int take = 100, [FromQuery] bool sensitiveObservations = false, [FromQuery] int? roleId = null,
+        [FromQuery] string authorizationApplicationIdentifier = null)
+    {
+        ApiUserType userType = this.GetApiUserType();
+        var semaphoreResult = await _semaphoreLimitManager.GetSemaphoreAsync(SemaphoreType.Aggregation, userType, this.GetEndpointName(ControllerContext));
+        LogHelper.AddSemaphoreHttpContextItems(semaphoreResult, HttpContext);
+        if (semaphoreResult?.Semaphore == null) return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
+
+        try
+        {
+            LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
+            var protectionFilter = sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public;
+            this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope, protectionFilter);
+
+            var searchFilter = new SearchFilterBaseDto { Geographics = filter };
+            var validationResult = Result.Combine(
+                (await _inputValidator.ValidateSearchFilterAsync(searchFilter)),
+                _inputValidator.ValidateBoundingBox(filter?.BoundingBox, false),
+                _inputValidator.ValidateSearchPagingArguments(skip, take)
+            );
+
+            if (validationResult.IsFailure)
             {
-                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
-                var protectionFilter = sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public;
-                this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope, protectionFilter);
-
-                var searchFilter = new SearchFilterBaseDto { Geographics = filter };
-                var validationResult = Result.Combine(
-                    (await _inputValidator.ValidateSearchFilterAsync(searchFilter)),
-                    _inputValidator.ValidateBoundingBox(filter?.BoundingBox, false),
-                    _inputValidator.ValidateSearchPagingArguments(skip, take)
-                );
-
-                if (validationResult.IsFailure)
-                {
-                    return BadRequest(validationResult.Error);
-                }
-
-                var locations = await _locationManager.SearchAsync(roleId, authorizationApplicationIdentifier, searchFilter.ToSearchFilter(this.GetUserId(), protectionFilter, "sv-SE"), skip, take);
-
-                return new OkObjectResult(locations);
+                return BadRequest(validationResult.Error);
             }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Failed to get locations");
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
-            }
-            finally
-            {
-                semaphoreResult.Semaphore.Release();
-            }
+
+            var locations = await _locationManager.SearchAsync(roleId, authorizationApplicationIdentifier, searchFilter.ToSearchFilter(this.GetUserId(), protectionFilter, "sv-SE"), skip, take);
+
+            return new OkObjectResult(locations);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Failed to get locations");
+            return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+        }
+        finally
+        {
+            semaphoreResult.Semaphore.Release();
         }
     }
 }

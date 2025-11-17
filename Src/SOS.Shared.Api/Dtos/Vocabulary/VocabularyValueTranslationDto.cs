@@ -1,15 +1,14 @@
-﻿namespace SOS.Shared.Api.Dtos.Vocabulary
-{
-    public class VocabularyValueTranslationDto
-    {
-        /// <summary>
-        ///     Culture code. I.e. en-GB, sv-SE
-        /// </summary>
-        public string CultureCode { get; set; }
+﻿namespace SOS.Shared.Api.Dtos.Vocabulary;
 
-        /// <summary>
-        ///     Translation
-        /// </summary>
-        public string Value { get; set; }
-    }
+public class VocabularyValueTranslationDto
+{
+    /// <summary>
+    ///     Culture code. I.e. en-GB, sv-SE
+    /// </summary>
+    public string CultureCode { get; set; }
+
+    /// <summary>
+    ///     Translation
+    /// </summary>
+    public string Value { get; set; }
 }

@@ -1,23 +1,22 @@
-﻿namespace SOS.Shared.Api.Dtos
+﻿namespace SOS.Shared.Api.Dtos;
+
+/// <summary>
+/// Export format for area.
+/// </summary>
+public enum AreaExportFormatDto
 {
     /// <summary>
-    /// Export format for area.
+    /// JSON.
     /// </summary>
-    public enum AreaExportFormatDto
-    {
-        /// <summary>
-        /// JSON.
-        /// </summary>
-        Json,
+    Json,
 
-        /// <summary>
-        /// GeoJSON.
-        /// </summary>
-        GeoJson,
+    /// <summary>
+    /// GeoJSON.
+    /// </summary>
+    GeoJson,
 
-        /// <summary>
-        /// WKT.
-        /// </summary>
-        Wkt
-    }
+    /// <summary>
+    /// WKT.
+    /// </summary>
+    Wkt
 }

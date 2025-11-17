@@ -1,19 +1,18 @@
 ﻿
-namespace SOS.Lib.Configuration.Shared
+namespace SOS.Lib.Configuration.Shared;
+
+/// <summary>
+/// Configuration for authtentication
+/// </summary>
+public class AuthenticationConfiguration
 {
     /// <summary>
-    /// Configuration for authtentication
+    /// Authentication authority
     /// </summary>
-    public class AuthenticationConfiguration
-    {
-        /// <summary>
-        /// Authentication authority
-        /// </summary>
-        public string Authority { get; set; }
+    public string Authority { get; set; }
 
-        /// <summary>
-        /// Client id
-        /// </summary>
-        public string ClientId { get; set; }
-    }
+    /// <summary>
+    /// Client id
+    /// </summary>
+    public string ClientId { get; set; }
 }

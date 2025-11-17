@@ -12,96 +12,95 @@ using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SOS.Observations.Api.HealthChecks
+namespace SOS.Observations.Api.HealthChecks;
+
+public class SearchDataProvidersHealthCheck : IHealthCheck
 {
-    public class SearchDataProvidersHealthCheck : IHealthCheck
+    private readonly IObservationManager _observationManager;
+    private readonly IDataProviderCache _dataProviderCache;
+
+    private async Task<(int NumberOfProviders, int SuccessfulProviders, string Msg, HealthStatus Status)> SearchByProviderAsync()
     {
-        private readonly IObservationManager _observationManager;
-        private readonly IDataProviderCache _dataProviderCache;
+        var providers = (await _dataProviderCache.GetAllAsync())?.
+            Where(p => p.IsActive && p.IncludeInHealthCheck);
 
-        private async Task<(int NumberOfProviders, int SuccessfulProviders, string Msg, HealthStatus Status)> SearchByProviderAsync()
+        if (!providers?.Any() ?? true)
         {
-            var providers = (await _dataProviderCache.GetAllAsync())?.
-                Where(p => p.IsActive && p.IncludeInHealthCheck);
+            return (NumberOfProviders: 0, SuccessfulProviders: 0, Msg: "No providers found", Status: HealthStatus.Unhealthy);
+        }
 
-            if (!providers?.Any() ?? true)
+        var providerSearchTasks = new Dictionary<DataProvider, Task<PagedResult<JsonObject>>>();
+
+        foreach (var provider in providers)
+        {
+            var searchFilter = new SearchFilter(0, ProtectionFilter.Public)
             {
-                return (NumberOfProviders: 0, SuccessfulProviders: 0, Msg: "No providers found", Status: HealthStatus.Unhealthy);
-            }
-
-            var providerSearchTasks = new Dictionary<DataProvider, Task<PagedResult<JsonObject>>>();
-
-            foreach (var provider in providers)
-            {
-                var searchFilter = new SearchFilter(0, ProtectionFilter.Public)
+                DataProviderIds = new List<int> { provider.Id },
+                Output = new OutputFilter
                 {
-                    DataProviderIds = new List<int> { provider.Id },
-                    Output = new OutputFilter
-                    {
-                        Fields = new List<string> { "taxon.id" }
-                    }
-                };
-                providerSearchTasks.Add(provider, _observationManager.GetChunkAsync(0, null, searchFilter, 0, 1));
-            }
-
-            await Task.WhenAll(providerSearchTasks.Values);
-
-            var providerCount = providers.Count();
-            var successfulProviders = providerSearchTasks.Count(t => (t.Value.Result?.TotalCount ?? 0) > 0);
-
-            // More than 75% successful. Allow some data providers to contain zero observations.
-            if (successfulProviders > providerCount * 0.75)
-            {
-                return (NumberOfProviders: providerCount, SuccessfulProviders: successfulProviders, Msg: $"{successfulProviders} of {providerCount} data providers returned observations", Status: HealthStatus.Healthy);
-            }
-
-            // More than 50% successful
-            if (successfulProviders > providerCount * 0.50)
-            {
-                return (NumberOfProviders: providerCount, SuccessfulProviders: successfulProviders, Msg: $"{successfulProviders} of {providerCount} data providers returned observations", Status: HealthStatus.Degraded);
-            }
-
-            return (NumberOfProviders: providerCount, SuccessfulProviders: successfulProviders, Msg: $"{successfulProviders} of {providerCount} data providers returned observations", Status: HealthStatus.Unhealthy);
+                    Fields = new List<string> { "taxon.id" }
+                }
+            };
+            providerSearchTasks.Add(provider, _observationManager.GetChunkAsync(0, null, searchFilter, 0, 1));
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="observationManager"></param>
-        /// <param name="dataProviderCache"></param>
-        public SearchDataProvidersHealthCheck(IObservationManager observationManager,
-            IDataProviderCache dataProviderCache)
+        await Task.WhenAll(providerSearchTasks.Values);
+
+        var providerCount = providers.Count();
+        var successfulProviders = providerSearchTasks.Count(t => (t.Value.Result?.TotalCount ?? 0) > 0);
+
+        // More than 75% successful. Allow some data providers to contain zero observations.
+        if (successfulProviders > providerCount * 0.75)
         {
-            _observationManager = observationManager ?? throw new ArgumentNullException(nameof(observationManager));
-            _dataProviderCache = dataProviderCache ?? throw new ArgumentNullException(nameof(dataProviderCache));
+            return (NumberOfProviders: providerCount, SuccessfulProviders: successfulProviders, Msg: $"{successfulProviders} of {providerCount} data providers returned observations", Status: HealthStatus.Healthy);
         }
 
-        /// <summary>
-        /// Make health check
-        /// </summary>
-        /// <param name="context"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        public async Task<HealthCheckResult> CheckHealthAsync(
-        HealthCheckContext context,
-        CancellationToken cancellationToken = default(CancellationToken))
+        // More than 50% successful
+        if (successfulProviders > providerCount * 0.50)
         {
-            try
-            {
-                var result = await SearchByProviderAsync();
-                return new HealthCheckResult(
-                    result.Status,
-                    result.Msg,
-                    null,
-                    new Dictionary<string, object> {
-                        { "SuccessfulProviders", result.SuccessfulProviders },
-                        { "NumberOfProviders", result.NumberOfProviders }
-                    });
-            }
-            catch (Exception e)
-            {
-                return new HealthCheckResult(HealthStatus.Unhealthy, "Health check failed", e);
-            }
+            return (NumberOfProviders: providerCount, SuccessfulProviders: successfulProviders, Msg: $"{successfulProviders} of {providerCount} data providers returned observations", Status: HealthStatus.Degraded);
+        }
+
+        return (NumberOfProviders: providerCount, SuccessfulProviders: successfulProviders, Msg: $"{successfulProviders} of {providerCount} data providers returned observations", Status: HealthStatus.Unhealthy);
+    }
+
+    /// <summary>
+    /// Constructor
+    /// </summary>
+    /// <param name="observationManager"></param>
+    /// <param name="dataProviderCache"></param>
+    public SearchDataProvidersHealthCheck(IObservationManager observationManager,
+        IDataProviderCache dataProviderCache)
+    {
+        _observationManager = observationManager ?? throw new ArgumentNullException(nameof(observationManager));
+        _dataProviderCache = dataProviderCache ?? throw new ArgumentNullException(nameof(dataProviderCache));
+    }
+
+    /// <summary>
+    /// Make health check
+    /// </summary>
+    /// <param name="context"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    public async Task<HealthCheckResult> CheckHealthAsync(
+    HealthCheckContext context,
+    CancellationToken cancellationToken = default(CancellationToken))
+    {
+        try
+        {
+            var result = await SearchByProviderAsync();
+            return new HealthCheckResult(
+                result.Status,
+                result.Msg,
+                null,
+                new Dictionary<string, object> {
+                    { "SuccessfulProviders", result.SuccessfulProviders },
+                    { "NumberOfProviders", result.NumberOfProviders }
+                });
+        }
+        catch (Exception e)
+        {
+            return new HealthCheckResult(HealthStatus.Unhealthy, "Health check failed", e);
         }
     }
 }

@@ -1,28 +1,27 @@
-﻿namespace SOS.Lib.Configuration.Shared
+﻿namespace SOS.Lib.Configuration.Shared;
+
+/// <summary>
+///     Configuration parameters for a Redis
+/// </summary>
+public class RedisConfiguration 
 {
     /// <summary>
-    ///     Configuration parameters for a Redis
+    /// Address for the service
     /// </summary>
-    public class RedisConfiguration 
-    {
-        /// <summary>
-        /// Address for the service
-        /// </summary>
-        public string EndPoint { get; set; }
+    public string EndPoint { get; set; }
 
-        /// <summary>
-        /// Password
-        /// </summary>
-        public string Password { get; set; }
+    /// <summary>
+    /// Password
+    /// </summary>
+    public string Password { get; set; }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public int Port { get; set; }
+    /// <summary>
+    /// 
+    /// </summary>
+    public int Port { get; set; }
 
-        /// <summary>
-        /// ServiceName
-        /// </summary>
-        public string ServiceName { get; set; }
-    }
+    /// <summary>
+    /// ServiceName
+    /// </summary>
+    public string ServiceName { get; set; }
 }

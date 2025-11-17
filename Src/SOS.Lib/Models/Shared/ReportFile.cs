@@ -1,9 +1,8 @@
-﻿namespace SOS.Lib.Models.Shared
+﻿namespace SOS.Lib.Models.Shared;
+
+public class ReportFile
 {
-    public class ReportFile
-    {
-        public byte[] File { get; set; }
-        public string Filename { get; set; }
-        public string ContentType { get; set; }
-    }
+    public byte[] File { get; set; }
+    public string Filename { get; set; }
+    public string ContentType { get; set; }
 }

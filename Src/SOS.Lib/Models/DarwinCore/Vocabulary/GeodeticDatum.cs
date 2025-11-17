@@ -1,7 +1,6 @@
-﻿namespace SOS.Lib.Models.DarwinCore.Vocabulary
+﻿namespace SOS.Lib.Models.DarwinCore.Vocabulary;
+
+public static class GeodeticDatum
 {
-    public static class GeodeticDatum
-    {
-        public static readonly string Wgs84 = "EPSG:4326";
-    }
+    public static readonly string Wgs84 = "EPSG:4326";
 }

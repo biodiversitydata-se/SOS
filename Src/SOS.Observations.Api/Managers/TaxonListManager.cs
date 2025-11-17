@@ -6,33 +6,32 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace SOS.Observations.Api.Managers
+namespace SOS.Observations.Api.Managers;
+
+/// <summary>
+///     Taxon list manager.
+/// </summary>
+public class TaxonListManager : ITaxonListManager
 {
+    private readonly ILogger<TaxonListManager> _logger;
+    private readonly ICache<int, TaxonList> _taxonListCache;
+
     /// <summary>
-    ///     Taxon list manager.
+    ///     Constructor
     /// </summary>
-    public class TaxonListManager : ITaxonListManager
+    /// <param name="taxonListCache"></param>
+    /// <param name="logger"></param>
+    public TaxonListManager(
+        ICache<int, TaxonList> taxonListCache,
+        ILogger<TaxonListManager> logger)
     {
-        private readonly ILogger<TaxonListManager> _logger;
-        private readonly ICache<int, TaxonList> _taxonListCache;
+        _taxonListCache = taxonListCache ??
+                          throw new ArgumentNullException(nameof(taxonListCache));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    }
 
-        /// <summary>
-        ///     Constructor
-        /// </summary>
-        /// <param name="taxonListCache"></param>
-        /// <param name="logger"></param>
-        public TaxonListManager(
-            ICache<int, TaxonList> taxonListCache,
-            ILogger<TaxonListManager> logger)
-        {
-            _taxonListCache = taxonListCache ??
-                              throw new ArgumentNullException(nameof(taxonListCache));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        }
-
-        public async Task<IEnumerable<TaxonList>> GetTaxonListsAsync()
-        {
-            return await _taxonListCache.GetAllAsync();
-        }
+    public async Task<IEnumerable<TaxonList>> GetTaxonListsAsync()
+    {
+        return await _taxonListCache.GetAllAsync();
     }
 }

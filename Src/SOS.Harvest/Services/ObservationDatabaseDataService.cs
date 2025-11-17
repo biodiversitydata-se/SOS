@@ -4,62 +4,61 @@ using SOS.Harvest.Services.Interfaces;
 using SOS.Lib.Configuration.Import;
 using System.Data;
 
-namespace SOS.Harvest.Services
+namespace SOS.Harvest.Services;
+
+/// <summary>
+///     Artportalen data service
+/// </summary>
+public class ObservationDatabaseDataService : IObservationDatabaseDataService
 {
     /// <summary>
-    ///     Artportalen data service
+    /// Create new db connection
     /// </summary>
-    public class ObservationDatabaseDataService : IObservationDatabaseDataService
+    /// <param name="live"></param>
+    /// <returns></returns>
+    private IDbConnection Connection => new SqlConnection(Configuration.ConnectionString);
+
+    /// <summary>
+    ///     Constructor
+    /// </summary>
+    public ObservationDatabaseDataService(ObservationDatabaseConfiguration observationDatabaseConfiguration)
     {
-        /// <summary>
-        /// Create new db connection
-        /// </summary>
-        /// <param name="live"></param>
-        /// <returns></returns>
-        private IDbConnection Connection => new SqlConnection(Configuration.ConnectionString);
+        Configuration = observationDatabaseConfiguration ??
+                        throw new ArgumentNullException(nameof(observationDatabaseConfiguration));
+    }
 
-        /// <summary>
-        ///     Constructor
-        /// </summary>
-        public ObservationDatabaseDataService(ObservationDatabaseConfiguration observationDatabaseConfiguration)
+    /// <inheritdoc />
+    public ObservationDatabaseConfiguration Configuration { get; }
+
+    /// <inheritdoc />
+    public async Task<IEnumerable<T>> QueryAsync<T>(string query, dynamic? parameters = null)
+    {
+        using var conn = Connection;
+        conn.Open();
+
+        var transaction = conn.BeginTransaction(IsolationLevel.ReadUncommitted);
+
+        IEnumerable<T> result = null!;
+        try
         {
-            Configuration = observationDatabaseConfiguration ??
-                            throw new ArgumentNullException(nameof(observationDatabaseConfiguration));
+            result = (await conn.QueryAsync<T>(
+                new CommandDefinition(
+                    query,
+                    parameters,
+                    transaction,
+                    5 * 60, // 5 minutes
+                    CommandType.Text,
+                    CommandFlags.NoCache
+                )
+            )).ToArray();
+
+            transaction.Commit();
+        }
+        catch
+        {
+            transaction.Rollback();
         }
 
-        /// <inheritdoc />
-        public ObservationDatabaseConfiguration Configuration { get; }
-
-        /// <inheritdoc />
-        public async Task<IEnumerable<T>> QueryAsync<T>(string query, dynamic? parameters = null)
-        {
-            using var conn = Connection;
-            conn.Open();
-
-            var transaction = conn.BeginTransaction(IsolationLevel.ReadUncommitted);
-
-            IEnumerable<T> result = null!;
-            try
-            {
-                result = (await conn.QueryAsync<T>(
-                    new CommandDefinition(
-                        query,
-                        parameters,
-                        transaction,
-                        5 * 60, // 5 minutes
-                        CommandType.Text,
-                        CommandFlags.NoCache
-                    )
-                )).ToArray();
-
-                transaction.Commit();
-            }
-            catch
-            {
-                transaction.Rollback();
-            }
-
-            return result;
-        }
+        return result;
     }
 }

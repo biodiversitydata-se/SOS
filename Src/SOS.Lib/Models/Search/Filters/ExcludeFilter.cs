@@ -1,12 +1,11 @@
 ﻿using System.Collections.Generic;
 
-namespace SOS.Lib.Models.Search.Filters
+namespace SOS.Lib.Models.Search.Filters;
+
+public class ExcludeFilter
 {
-    public class ExcludeFilter
-    {
-        /// <summary>
-        /// Exclude observations with listed occurrence id's
-        /// </summary>
-        public IEnumerable<string> OccurrenceIds { get; set; }
-    }
+    /// <summary>
+    /// Exclude observations with listed occurrence id's
+    /// </summary>
+    public IEnumerable<string> OccurrenceIds { get; set; }
 }

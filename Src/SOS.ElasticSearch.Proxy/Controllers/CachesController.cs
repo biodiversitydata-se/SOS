@@ -5,59 +5,58 @@ using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Configuration;
 using System.Net;
 
-namespace SOS.ElasticSearch.Proxy.Controllers
+namespace SOS.ElasticSearch.Proxy.Controllers;
+
+/// <summary>
+///     Caches controller
+/// </summary>
+[Route("[controller]")]
+[ApiController]
+public class CachesController : ControllerBase, ICachesController
 {
+    private readonly ICache<string, ProcessedConfiguration> _processedConfigurationCache;
+    private readonly ILogger<CachesController> _logger;
+
     /// <summary>
-    ///     Caches controller
+    /// Constructor
     /// </summary>
-    [Route("[controller]")]
-    [ApiController]
-    public class CachesController : ControllerBase, ICachesController
+    /// <param name="processedConfigurationCache"></param>
+    /// <param name="logger"></param>
+    /// <exception cref="ArgumentNullException"></exception>
+    public CachesController(
+        ICache<string, ProcessedConfiguration> processedConfigurationCache,
+        ILogger<CachesController> logger)
     {
-        private readonly ICache<string, ProcessedConfiguration> _processedConfigurationCache;
-        private readonly ILogger<CachesController> _logger;
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="processedConfigurationCache"></param>
-        /// <param name="logger"></param>
-        /// <exception cref="ArgumentNullException"></exception>
-        public CachesController(
-            ICache<string, ProcessedConfiguration> processedConfigurationCache,
-            ILogger<CachesController> logger)
+        _processedConfigurationCache = processedConfigurationCache ?? throw new ArgumentNullException(nameof(processedConfigurationCache));
+
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    }
+
+    /// <inheritdoc />
+    [HttpDelete("{cache}")]
+    [ProducesResponseType(typeof(bool), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+    public async Task<IActionResult> DeleteCache([FromRoute] Cache cache)
+    {
+        try
         {
+            if (cache == Cache.ProcessedConfiguration)
+            {
+                await _processedConfigurationCache.ClearAsync();
+                _logger.LogInformation($"The {cache} cache was cleared");
+            }
+            else
+            {
+                _logger.LogInformation($"The {cache} cache was requested to be cleared, but there is no implementation.");
+            }
 
-            _processedConfigurationCache = processedConfigurationCache ?? throw new ArgumentNullException(nameof(processedConfigurationCache));
-
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            return Ok(true);
         }
-
-        /// <inheritdoc />
-        [HttpDelete("{cache}")]
-        [ProducesResponseType(typeof(bool), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> DeleteCache([FromRoute] Cache cache)
+        catch (Exception e)
         {
-            try
-            {
-                if (cache == Cache.ProcessedConfiguration)
-                {
-                    await _processedConfigurationCache.ClearAsync();
-                    _logger.LogInformation($"The {cache} cache was cleared");
-                }
-                else
-                {
-                    _logger.LogInformation($"The {cache} cache was requested to be cleared, but there is no implementation.");
-                }
-
-                return Ok(true);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Error clearing the {@cacheName} cache", cache);
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
-            }
+            _logger.LogError(e, "Error clearing the {@cacheName} cache", cache);
+            return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
         }
     }
 }

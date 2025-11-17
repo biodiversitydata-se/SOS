@@ -23,374 +23,373 @@ using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
 
-namespace SOS.Observations.Api.Controllers
+namespace SOS.Observations.Api.Controllers;
+
+/// <summary>
+///     Sighting controller
+/// </summary>
+[Route("[controller]")]
+[ApiController]
+public class SystemsController : ControllerBase
 {
+    private readonly IDevOpsManager _devOpsManager;
+    private readonly IProcessInfoManager _processInfoManager;
+    private readonly IProcessedObservationRepository _processedObservationRepository;
+    private readonly IDataProviderCache _dataProviderCache;
+    private readonly ITaxonManager _taxonManager;
+    private readonly ICache<VocabularyId, Vocabulary> _vocabularyCache;
+    private MongoClient _mongoClient;
+    private ElasticsearchClient _elasticClient;
+    private string _mongoSuffix = "";
+    private MongoDbConfiguration _mongoConfiguration;
+    private readonly ILogger<SystemsController> _logger;
+
     /// <summary>
-    ///     Sighting controller
+    /// Constructor
     /// </summary>
-    [Route("[controller]")]
-    [ApiController]
-    public class SystemsController : ControllerBase
+    /// <param name="devOpsManager"></param>
+    /// <param name="processInfoManager"></param>
+    /// <param name="processedObservationRepository"></param>
+    /// <param name="elasticConfiguration"></param>
+    /// <param name="dataProviderCache"></param>
+    /// <param name="taxonManager"></param>
+    /// <param name="vocabularyCache"></param>
+    /// <param name="logger"></param>
+    /// <exception cref="ArgumentNullException"></exception>
+    public SystemsController(
+        IDevOpsManager devOpsManager,
+        IProcessInfoManager processInfoManager,
+        IProcessedObservationRepository processedObservationRepository,
+        ElasticSearchConfiguration elasticConfiguration, 
+        IDataProviderCache dataProviderCache,
+        ITaxonManager taxonManager,
+        ICache<VocabularyId, Vocabulary> vocabularyCache,
+        ILogger<SystemsController> logger)
     {
-        private readonly IDevOpsManager _devOpsManager;
-        private readonly IProcessInfoManager _processInfoManager;
-        private readonly IProcessedObservationRepository _processedObservationRepository;
-        private readonly IDataProviderCache _dataProviderCache;
-        private readonly ITaxonManager _taxonManager;
-        private readonly ICache<VocabularyId, Vocabulary> _vocabularyCache;
-        private MongoClient _mongoClient;
-        private ElasticsearchClient _elasticClient;
-        private string _mongoSuffix = "";
-        private MongoDbConfiguration _mongoConfiguration;
-        private readonly ILogger<SystemsController> _logger;
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="devOpsManager"></param>
-        /// <param name="processInfoManager"></param>
-        /// <param name="processedObservationRepository"></param>
-        /// <param name="elasticConfiguration"></param>
-        /// <param name="dataProviderCache"></param>
-        /// <param name="taxonManager"></param>
-        /// <param name="vocabularyCache"></param>
-        /// <param name="logger"></param>
-        /// <exception cref="ArgumentNullException"></exception>
-        public SystemsController(
-            IDevOpsManager devOpsManager,
-            IProcessInfoManager processInfoManager,
-            IProcessedObservationRepository processedObservationRepository,
-            ElasticSearchConfiguration elasticConfiguration, 
-            IDataProviderCache dataProviderCache,
-            ITaxonManager taxonManager,
-            ICache<VocabularyId, Vocabulary> vocabularyCache,
-            ILogger<SystemsController> logger)
+        _processInfoManager = processInfoManager ?? throw new ArgumentNullException(nameof(processInfoManager));
+        _processedObservationRepository = processedObservationRepository ??
+                                          throw new ArgumentNullException(nameof(processedObservationRepository));
+        _devOpsManager = devOpsManager ?? throw new ArgumentNullException(nameof(devOpsManager));
+        _taxonManager = taxonManager ?? throw new ArgumentNullException(nameof(taxonManager));
+        _vocabularyCache = vocabularyCache ?? throw new ArgumentNullException(nameof(vocabularyCache));
+        _mongoClient = new MongoClient(Settings.ProcessDbConfiguration.GetMongoDbSettings());
+        _mongoConfiguration = Settings.ProcessDbConfiguration;
+        if (_mongoConfiguration.DatabaseName.EndsWith("-st"))
         {
-            _processInfoManager = processInfoManager ?? throw new ArgumentNullException(nameof(processInfoManager));
-            _processedObservationRepository = processedObservationRepository ??
-                                              throw new ArgumentNullException(nameof(processedObservationRepository));
-            _devOpsManager = devOpsManager ?? throw new ArgumentNullException(nameof(devOpsManager));
-            _taxonManager = taxonManager ?? throw new ArgumentNullException(nameof(taxonManager));
-            _vocabularyCache = vocabularyCache ?? throw new ArgumentNullException(nameof(vocabularyCache));
-            _mongoClient = new MongoClient(Settings.ProcessDbConfiguration.GetMongoDbSettings());
-            _mongoConfiguration = Settings.ProcessDbConfiguration;
-            if (_mongoConfiguration.DatabaseName.EndsWith("-st"))
-            {
-                _mongoSuffix = "-st";
-            }
-            else if (_mongoConfiguration.DatabaseName.EndsWith("-dev"))
-            {
-                _mongoSuffix = "-dev";
-            }
-            _elasticClient = elasticConfiguration.GetClients().FirstOrDefault();
-            _dataProviderCache = dataProviderCache ?? throw new System.ArgumentNullException(nameof(dataProviderCache));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _mongoSuffix = "-st";
         }
-        /*
-        /// <inheritdoc />
-        [HttpGet("BuildInfo")]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetBuildInfoAsync()
+        else if (_mongoConfiguration.DatabaseName.EndsWith("-dev"))
         {
-            try
-            {
-                var buildInfo = await _devOpsManager.GetBuildInfoAsync();
-                return new OkObjectResult(buildInfo);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Error getting copyright");
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
-            }
+            _mongoSuffix = "-dev";
         }
-        */
-
-        /// <summary>
-        /// Get copyright including system build time
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet("Copyright")]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        [InternalApi]
-        public IActionResult Copyright()
+        _elasticClient = elasticConfiguration.GetClients().FirstOrDefault();
+        _dataProviderCache = dataProviderCache ?? throw new System.ArgumentNullException(nameof(dataProviderCache));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    }
+    /*
+    /// <inheritdoc />
+    [HttpGet("BuildInfo")]
+    [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+    public async Task<IActionResult> GetBuildInfoAsync()
+    {
+        try
         {
-            try
-            {
-                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
-                var fileVersionInfo = System.Diagnostics.FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly().Location);
-                return new OkObjectResult(fileVersionInfo.LegalCopyright);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Error getting copyright");
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
-            }
+            var buildInfo = await _devOpsManager.GetBuildInfoAsync();
+            return new OkObjectResult(buildInfo);
         }
-
-        /// <summary>
-        /// Get information about observation processing
-        /// </summary>
-        /// <param name="active">True: get information about last processing, false get information about previous processing</param>
-        /// <returns>Meta data about processing. E.g, Start time, end time, number of observations processed...</returns>
-        [HttpGet("ProcessInformation")]
-        [ProducesResponseType(typeof(ProcessInfoDto), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        [AzureApi, AzureInternalApi]
-        public async Task<IActionResult> GetProcessInfo([FromQuery] bool active)
+        catch (Exception e)
         {
-            try
-            {
-                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
-                return new OkObjectResult(await _processInfoManager.GetProcessInfoAsync(_processedObservationRepository.UniquePublicIndexName));
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Error getting process information");
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
-            }
+            _logger.LogError(e, "Error getting copyright");
+            return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
         }
+    }
+    */
 
-        [HttpGet]
-        [Route("harvest")]
-        [InternalApi]
-        public IEnumerable<HarvestInfoDto> GetHarvestInfo()
+    /// <summary>
+    /// Get copyright including system build time
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet("Copyright")]
+    [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+    [InternalApi]
+    public IActionResult Copyright()
+    {
+        try
         {
-            var database = _mongoClient.GetDatabase("sos-harvest" + _mongoSuffix);
-            var collection = database.GetCollection<HarvestInfoDto>("HarvestInfo");
-            var providers = collection.Find(new BsonDocument());
-            return providers.ToList();
+            LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
+            var fileVersionInfo = System.Diagnostics.FileVersionInfo.GetVersionInfo(Assembly.GetEntryAssembly().Location);
+            return new OkObjectResult(fileVersionInfo.LegalCopyright);
         }
-
-        [HttpGet]
-        [Route("processmongodb")]
-        [InternalApi]
-        public IEnumerable<MongoDbProcessInfoDto> GetMongoDbProcessInfo()
+        catch (Exception e)
         {
-            var database = _mongoClient.GetDatabase(_mongoConfiguration.DatabaseName);
-            var queryBuilder = Builders<MongoDbProcessInfoDto>.Filter;
-            var query = queryBuilder.Regex(pi => pi.Id, @"observation-\d");
-            var processInfos = database.GetCollection<MongoDbProcessInfoDto>("ProcessInfo")
-            .Find(query)
-            .SortByDescending(p => p.End);
-
-            return processInfos?.ToList();
+            _logger.LogError(e, "Error getting copyright");
+            return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
         }
+    }
 
-        [HttpGet]
-        [Route("activeinstance")]
-        [InternalApi]
-        public ActiveInstanceInfoDto GetActiveInstance()
+    /// <summary>
+    /// Get information about observation processing
+    /// </summary>
+    /// <param name="active">True: get information about last processing, false get information about previous processing</param>
+    /// <returns>Meta data about processing. E.g, Start time, end time, number of observations processed...</returns>
+    [HttpGet("ProcessInformation")]
+    [ProducesResponseType(typeof(ProcessInfoDto), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+    [AzureApi, AzureInternalApi]
+    public async Task<IActionResult> GetProcessInfo([FromQuery] bool active)
+    {
+        try
         {
-            var database = _mongoClient.GetDatabase(_mongoConfiguration.DatabaseName);
-            var collection = database.GetCollection<ActiveInstanceInfoDto>("ProcessedConfiguration");
-            var instance = collection.Find(new BsonDocument())?.ToList();
-            return instance.FirstOrDefault(i => i.Id.Equals("Observation", System.StringComparison.CurrentCultureIgnoreCase));
+            LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
+            return new OkObjectResult(await _processInfoManager.GetProcessInfoAsync(_processedObservationRepository.UniquePublicIndexName));
         }
-
-        [HttpGet]
-        [Route("processing")]
-        [InternalApi]
-        public IEnumerable<HangfireJobDto> GetProcessing()
+        catch (Exception e)
         {
-            var database = _mongoClient.GetDatabase("sos-hangfire" + _mongoSuffix);
-            var collection = database.GetCollection<HangfireJobDto>("hangfire.jobGraph");
-            var filter = Builders<HangfireJobDto>.Filter.Eq(p => p.StateName, "Processing");
-            var jobs = collection.Find(filter).ToList();
-            return jobs;
+            _logger.LogError(e, "Error getting process information");
+            return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
         }
+    }
 
-        [HttpGet]
-        [Route("searchindex")]
-        [InternalApi]
-        public async Task<SearchIndexInfoDto> GetSearchIndexInfo()
+    [HttpGet]
+    [Route("harvest")]
+    [InternalApi]
+    public IEnumerable<HarvestInfoDto> GetHarvestInfo()
+    {
+        var database = _mongoClient.GetDatabase("sos-harvest" + _mongoSuffix);
+        var collection = database.GetCollection<HarvestInfoDto>("HarvestInfo");
+        var providers = collection.Find(new BsonDocument());
+        return providers.ToList();
+    }
+
+    [HttpGet]
+    [Route("processmongodb")]
+    [InternalApi]
+    public IEnumerable<MongoDbProcessInfoDto> GetMongoDbProcessInfo()
+    {
+        var database = _mongoClient.GetDatabase(_mongoConfiguration.DatabaseName);
+        var queryBuilder = Builders<MongoDbProcessInfoDto>.Filter;
+        var query = queryBuilder.Regex(pi => pi.Id, @"observation-\d");
+        var processInfos = database.GetCollection<MongoDbProcessInfoDto>("ProcessInfo")
+        .Find(query)
+        .SortByDescending(p => p.End);
+
+        return processInfos?.ToList();
+    }
+
+    [HttpGet]
+    [Route("activeinstance")]
+    [InternalApi]
+    public ActiveInstanceInfoDto GetActiveInstance()
+    {
+        var database = _mongoClient.GetDatabase(_mongoConfiguration.DatabaseName);
+        var collection = database.GetCollection<ActiveInstanceInfoDto>("ProcessedConfiguration");
+        var instance = collection.Find(new BsonDocument())?.ToList();
+        return instance.FirstOrDefault(i => i.Id.Equals("Observation", System.StringComparison.CurrentCultureIgnoreCase));
+    }
+
+    [HttpGet]
+    [Route("processing")]
+    [InternalApi]
+    public IEnumerable<HangfireJobDto> GetProcessing()
+    {
+        var database = _mongoClient.GetDatabase("sos-hangfire" + _mongoSuffix);
+        var collection = database.GetCollection<HangfireJobDto>("hangfire.jobGraph");
+        var filter = Builders<HangfireJobDto>.Filter.Eq(p => p.StateName, "Processing");
+        var jobs = collection.Find(filter).ToList();
+        return jobs;
+    }
+
+    [HttpGet]
+    [Route("searchindex")]
+    [InternalApi]
+    public async Task<SearchIndexInfoDto> GetSearchIndexInfo()
+    {
+        var diskUsage = new Dictionary<string, int>();
+        var response = await _elasticClient.Nodes.StatsAsync(stats => stats.Metric(new Metrics("fs")));
+        var info = new SearchIndexInfoDto();
+
+        if (!response.IsValidResponse)
         {
-            var diskUsage = new Dictionary<string, int>();
-            var response = await _elasticClient.Nodes.StatsAsync(stats => stats.Metric(new Metrics("fs")));
-            var info = new SearchIndexInfoDto();
-
-            if (!response.IsValidResponse)
-            {
-                return info;
-            }
-
-            var allocations = new List<SearchIndexInfoDto.AllocationInfo>();
-            foreach (var node in response.Nodes)
-            {
-                foreach (var data in node.Value.Fs.Data)
-                {
-                    allocations.Add(new SearchIndexInfoDto.AllocationInfo()
-                    {
-                        Node = data.Path,
-                        DiskAvailable = data.FreeInBytes?.ToString(),
-                        DiskTotal = data.TotalInBytes?.ToString(),
-                        DiskUsed = (data.TotalInBytes ?? 0 - data.FreeInBytes ?? 0).ToString(),
-                        Percentage = (int)((data.FreeInBytes ?? 0) / (data.TotalInBytes ?? 1))
-                    });
-                }
-            }
-            info.Allocations = allocations;
             return info;
         }
 
-        [HttpGet]
-        [Route("mongoinfo")]
-        [InternalApi]
-        public MongoDbInfoDto GetMongoDatabaseInfo()
+        var allocations = new List<SearchIndexInfoDto.AllocationInfo>();
+        foreach (var node in response.Nodes)
         {
-            var db = _mongoClient.GetDatabase("sos-hangfire" + _mongoSuffix);
-            var command = new BsonDocument { { "dbStats", 1 }, { "scale", 1000 } };
-            var result = db.RunCommand<BsonDocument>(command);
-            var usedSize = result.GetValue("fsUsedSize");
-            var totalSize = result.GetValue("fsTotalSize");
-            var info = new MongoDbInfoDto()
+            foreach (var data in node.Value.Fs.Data)
             {
-                DiskTotal = totalSize.ToString(),
-                DiskUsed = usedSize.ToString()
-            };
-            return info;
-        }
-
-        [HttpGet]
-        [Route("process-summary")]
-        [InternalApi]
-        public ProcessSummaryDto GetProcessSummary()
-        {
-            var activeInstance = GetActiveInstance();
-            var processInfos = GetMongoDbProcessInfo();
-            var processSummary = GetProcessSummary(processInfos, activeInstance);
-            return processSummary;
-        }
-
-        /// <summary>
-        ///     Get Taxon relations as diagram.
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet("TaxonRelationsDiagram")]
-        //[ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetTaxonRelationsDiagram(
-            [FromQuery] int[] taxonIds,
-            [FromQuery] TaxonRelationDiagramHelper.TaxonRelationsTreeIterationMode treeIterationMode = TaxonRelationDiagramHelper.TaxonRelationsTreeIterationMode.BothParentsAndChildren,
-            [FromQuery] bool includeSecondaryRelations = false,
-            [FromQuery] DiagramFormat diagramFormat = DiagramFormat.Mermaid,
-            [FromQuery] string translationCultureCode = "sv-SE")
-        {
-            try
-            {
-                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
-                IEnumerable<Vocabulary> vocabularies = await _vocabularyCache.GetAllAsync();
-                var taxonCategoryVocabulary = vocabularies?.FirstOrDefault(v => v.Id == VocabularyId.TaxonCategory);
-                Dictionary<int, string> taxonCategoryById = taxonCategoryVocabulary.CreateValueDictionary(CultureCodeHelper.GetCultureCode(translationCultureCode));
-                var taxonTree = await _taxonManager.GetTaxonTreeAsync();
-                Result<string> strGraphRepresentation = null;
-                if (diagramFormat == DiagramFormat.GraphViz)
+                allocations.Add(new SearchIndexInfoDto.AllocationInfo()
                 {
-                    strGraphRepresentation = TaxonRelationDiagramHelper.CreateGraphvizFormatRepresentation(
-                        taxonTree,
-                        taxonIds,
-                        taxonCategoryById,
-                        treeIterationMode,
-                        includeSecondaryRelations);
-                }
-                else if (diagramFormat == DiagramFormat.Mermaid)
-                {
-                    strGraphRepresentation = TaxonRelationDiagramHelper.CreateMermaidFormatRepresentation(
-                        taxonTree,
-                        taxonIds,
-                        taxonCategoryById,
-                        treeIterationMode,
-                        includeSecondaryRelations);
-                }
-
-                if (strGraphRepresentation.IsFailure) return BadRequest(strGraphRepresentation.Error);
-                return Ok(strGraphRepresentation.Value);
-           }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "{@methodName}() failed", MethodBase.GetCurrentMethod()?.Name);
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+                    Node = data.Path,
+                    DiskAvailable = data.FreeInBytes?.ToString(),
+                    DiskTotal = data.TotalInBytes?.ToString(),
+                    DiskUsed = (data.TotalInBytes ?? 0 - data.FreeInBytes ?? 0).ToString(),
+                    Percentage = (int)((data.FreeInBytes ?? 0) / (data.TotalInBytes ?? 1))
+                });
             }
         }
-        private ProcessSummaryDto GetProcessSummary(IEnumerable<MongoDbProcessInfoDto>? processInfos, ActiveInstanceInfoDto? activeInstanceInfo)
+        info.Allocations = allocations;
+        return info;
+    }
+
+    [HttpGet]
+    [Route("mongoinfo")]
+    [InternalApi]
+    public MongoDbInfoDto GetMongoDatabaseInfo()
+    {
+        var db = _mongoClient.GetDatabase("sos-hangfire" + _mongoSuffix);
+        var command = new BsonDocument { { "dbStats", 1 }, { "scale", 1000 } };
+        var result = db.RunCommand<BsonDocument>(command);
+        var usedSize = result.GetValue("fsUsedSize");
+        var totalSize = result.GetValue("fsTotalSize");
+        var info = new MongoDbInfoDto()
         {
-            MongoDbProcessInfoDto activeInfos = processInfos.FirstOrDefault(m => int.Parse(m.Id.Last().ToString()) == activeInstanceInfo.ActiveInstance);
-            var inactiveInfos = processInfos.FirstOrDefault(m => int.Parse(m.Id.Last().ToString()) != activeInstanceInfo.ActiveInstance);
-            var processSummary = new ProcessSummaryDto
-            {
-                ActiveProcessStatus = CreateProcessStatus(activeInfos),
-                InactiveProcessStatus = CreateProcessStatus(inactiveInfos),
-                DataProviderStatuses = GetDataProviderStatuses(activeInfos, inactiveInfos)
-            };
+            DiskTotal = totalSize.ToString(),
+            DiskUsed = usedSize.ToString()
+        };
+        return info;
+    }
 
-            return processSummary;
-        }
+    [HttpGet]
+    [Route("process-summary")]
+    [InternalApi]
+    public ProcessSummaryDto GetProcessSummary()
+    {
+        var activeInstance = GetActiveInstance();
+        var processInfos = GetMongoDbProcessInfo();
+        var processSummary = GetProcessSummary(processInfos, activeInstance);
+        return processSummary;
+    }
 
-        private ProcessStatusDto CreateProcessStatus(MongoDbProcessInfoDto processInfo)
+    /// <summary>
+    ///     Get Taxon relations as diagram.
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet("TaxonRelationsDiagram")]
+    //[ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+    public async Task<IActionResult> GetTaxonRelationsDiagram(
+        [FromQuery] int[] taxonIds,
+        [FromQuery] TaxonRelationDiagramHelper.TaxonRelationsTreeIterationMode treeIterationMode = TaxonRelationDiagramHelper.TaxonRelationsTreeIterationMode.BothParentsAndChildren,
+        [FromQuery] bool includeSecondaryRelations = false,
+        [FromQuery] DiagramFormat diagramFormat = DiagramFormat.Mermaid,
+        [FromQuery] string translationCultureCode = "sv-SE")
+    {
+        try
         {
-            return new ProcessStatusDto
+            LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
+            IEnumerable<Vocabulary> vocabularies = await _vocabularyCache.GetAllAsync();
+            var taxonCategoryVocabulary = vocabularies?.FirstOrDefault(v => v.Id == VocabularyId.TaxonCategory);
+            Dictionary<int, string> taxonCategoryById = taxonCategoryVocabulary.CreateValueDictionary(CultureCodeHelper.GetCultureCode(translationCultureCode));
+            var taxonTree = await _taxonManager.GetTaxonTreeAsync();
+            Result<string> strGraphRepresentation = null;
+            if (diagramFormat == DiagramFormat.GraphViz)
             {
-                Name = processInfo.Id,
-                Status = processInfo.Status,
-                PublicCount = processInfo.PublicCount,
-                ProtectedCount = processInfo.ProtectedCount,
-                InvalidCount = processInfo.ProcessFailCount,
-                Start = processInfo.Start,
-                End = processInfo.End
-            };
-        }
-
-        private List<DataProviderStatusDto> GetDataProviderStatuses(MongoDbProcessInfoDto activeInfos, MongoDbProcessInfoDto inactiveInfos)
-        {
-            List<DataProviderStatusDto> rows = new();
-            var inactiveProvidersById = inactiveInfos.ProvidersInfo
-                            .ToDictionary(m => m.DataProviderId!.Value, m => m);
-
-            var dataProviderById = _dataProviderCache.GetAllAsync().Result.ToDictionary(m => m.Id, m => m);
-            foreach (var activeProvider in activeInfos.ProvidersInfo.OrderBy(m => m.DataProviderId))
+                strGraphRepresentation = TaxonRelationDiagramHelper.CreateGraphvizFormatRepresentation(
+                    taxonTree,
+                    taxonIds,
+                    taxonCategoryById,
+                    treeIterationMode,
+                    includeSecondaryRelations);
+            }
+            else if (diagramFormat == DiagramFormat.Mermaid)
             {
-                var dataProvider = dataProviderById[activeProvider.DataProviderId.GetValueOrDefault()];
-                var inactiveProvider = inactiveProvidersById.GetValueOrDefault(activeProvider.DataProviderId!.Value, null);
-                var activeHarvestTime = (activeProvider.HarvestEnd ?? DateTime.UtcNow) - (activeProvider.HarvestStart ?? DateTime.UtcNow);
-                var inactiveHarvestTime = (inactiveProvider?.HarvestEnd ?? DateTime.UtcNow) - (inactiveProvider?.HarvestStart ?? DateTime.UtcNow);
-                var activeProcessTime = (activeProvider.ProcessEnd ?? DateTime.UtcNow) - (activeProvider.ProcessStart ?? DateTime.UtcNow);
-                var inactiveProcessTime = (inactiveProvider?.ProcessEnd ?? DateTime.UtcNow) - (inactiveProvider?.ProcessStart ?? DateTime.UtcNow);
-                
-                var row = new DataProviderStatusDto
-                {
-                    Id = activeProvider.DataProviderId ?? 0,
-                    Identifier = activeProvider.DataProviderIdentifier,
-                    Name = dataProvider.Names.Translate("en-GB"),
-                    SwedishName = dataProvider.Names.Translate("sv-SE"),
-                    PublicActive = activeProvider?.PublicProcessCount ?? 0,
-                    PublicInactive = inactiveProvider?.PublicProcessCount ?? 0,
-                    PublicDiff = (activeProvider?.PublicProcessCount ?? 0) - (inactiveProvider?.PublicProcessCount ?? 0),
-                    ProtectedActive = activeProvider?.ProtectedProcessCount ?? 0,
-                    ProtectedInactive = inactiveProvider?.ProtectedProcessCount ?? 0,
-                    ProtectedDiff = (activeProvider?.ProtectedProcessCount ?? 0) - (inactiveProvider?.ProtectedProcessCount ?? 0),                    
-                    InvalidActive = activeProvider?.ProcessFailCount.GetValueOrDefault(0) ?? 0,
-                    InvalidInactive = inactiveProvider?.ProcessFailCount.GetValueOrDefault(0) ?? 0,
-                    InvalidDiff = (activeProvider?.ProcessFailCount.GetValueOrDefault(0) ?? 0) - (inactiveProvider?.ProcessFailCount.GetValueOrDefault(0) ?? 0),
-                    HarvestTimeActive = activeHarvestTime,
-                    HarvestTimeInactive = inactiveHarvestTime,
-                    HarvestTimeDiff = activeHarvestTime - inactiveHarvestTime,
-                    ProcessTimeActive = activeProcessTime,
-                    ProcessTimeInactive = inactiveProcessTime,
-                    ProcessTimeDiff = activeProcessTime - inactiveProcessTime,
-                    HarvestStatusActive = activeProvider.HarvestStatus,
-                    HarvestStatusInactive = inactiveProvider?.HarvestStatus ?? "Unknown",
-                    LatestIncrementalPublicCount = activeProvider.LatestIncrementalPublicCount,
-                    LatestIncrementalProtectedCount = activeProvider.LatestIncrementalProtectedCount,
-                    LatestIncrementalEnd = activeProvider.LatestIncrementalEnd,
-                    LatestIncrementalTime = (activeProvider.LatestIncrementalEnd ?? DateTime.UtcNow) - (activeProvider.LatestIncrementalStart ?? DateTime.UtcNow),        
-                };
-
-                rows.Add(row);
+                strGraphRepresentation = TaxonRelationDiagramHelper.CreateMermaidFormatRepresentation(
+                    taxonTree,
+                    taxonIds,
+                    taxonCategoryById,
+                    treeIterationMode,
+                    includeSecondaryRelations);
             }
 
-            return rows.OrderBy(r => r.Id).ToList();
+            if (strGraphRepresentation.IsFailure) return BadRequest(strGraphRepresentation.Error);
+            return Ok(strGraphRepresentation.Value);
+       }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "{@methodName}() failed", MethodBase.GetCurrentMethod()?.Name);
+            return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
         }
+    }
+    private ProcessSummaryDto GetProcessSummary(IEnumerable<MongoDbProcessInfoDto>? processInfos, ActiveInstanceInfoDto? activeInstanceInfo)
+    {
+        MongoDbProcessInfoDto activeInfos = processInfos.FirstOrDefault(m => int.Parse(m.Id.Last().ToString()) == activeInstanceInfo.ActiveInstance);
+        var inactiveInfos = processInfos.FirstOrDefault(m => int.Parse(m.Id.Last().ToString()) != activeInstanceInfo.ActiveInstance);
+        var processSummary = new ProcessSummaryDto
+        {
+            ActiveProcessStatus = CreateProcessStatus(activeInfos),
+            InactiveProcessStatus = CreateProcessStatus(inactiveInfos),
+            DataProviderStatuses = GetDataProviderStatuses(activeInfos, inactiveInfos)
+        };
+
+        return processSummary;
+    }
+
+    private ProcessStatusDto CreateProcessStatus(MongoDbProcessInfoDto processInfo)
+    {
+        return new ProcessStatusDto
+        {
+            Name = processInfo.Id,
+            Status = processInfo.Status,
+            PublicCount = processInfo.PublicCount,
+            ProtectedCount = processInfo.ProtectedCount,
+            InvalidCount = processInfo.ProcessFailCount,
+            Start = processInfo.Start,
+            End = processInfo.End
+        };
+    }
+
+    private List<DataProviderStatusDto> GetDataProviderStatuses(MongoDbProcessInfoDto activeInfos, MongoDbProcessInfoDto inactiveInfos)
+    {
+        List<DataProviderStatusDto> rows = new();
+        var inactiveProvidersById = inactiveInfos.ProvidersInfo
+                        .ToDictionary(m => m.DataProviderId!.Value, m => m);
+
+        var dataProviderById = _dataProviderCache.GetAllAsync().Result.ToDictionary(m => m.Id, m => m);
+        foreach (var activeProvider in activeInfos.ProvidersInfo.OrderBy(m => m.DataProviderId))
+        {
+            var dataProvider = dataProviderById[activeProvider.DataProviderId.GetValueOrDefault()];
+            var inactiveProvider = inactiveProvidersById.GetValueOrDefault(activeProvider.DataProviderId!.Value, null);
+            var activeHarvestTime = (activeProvider.HarvestEnd ?? DateTime.UtcNow) - (activeProvider.HarvestStart ?? DateTime.UtcNow);
+            var inactiveHarvestTime = (inactiveProvider?.HarvestEnd ?? DateTime.UtcNow) - (inactiveProvider?.HarvestStart ?? DateTime.UtcNow);
+            var activeProcessTime = (activeProvider.ProcessEnd ?? DateTime.UtcNow) - (activeProvider.ProcessStart ?? DateTime.UtcNow);
+            var inactiveProcessTime = (inactiveProvider?.ProcessEnd ?? DateTime.UtcNow) - (inactiveProvider?.ProcessStart ?? DateTime.UtcNow);
+            
+            var row = new DataProviderStatusDto
+            {
+                Id = activeProvider.DataProviderId ?? 0,
+                Identifier = activeProvider.DataProviderIdentifier,
+                Name = dataProvider.Names.Translate("en-GB"),
+                SwedishName = dataProvider.Names.Translate("sv-SE"),
+                PublicActive = activeProvider?.PublicProcessCount ?? 0,
+                PublicInactive = inactiveProvider?.PublicProcessCount ?? 0,
+                PublicDiff = (activeProvider?.PublicProcessCount ?? 0) - (inactiveProvider?.PublicProcessCount ?? 0),
+                ProtectedActive = activeProvider?.ProtectedProcessCount ?? 0,
+                ProtectedInactive = inactiveProvider?.ProtectedProcessCount ?? 0,
+                ProtectedDiff = (activeProvider?.ProtectedProcessCount ?? 0) - (inactiveProvider?.ProtectedProcessCount ?? 0),                    
+                InvalidActive = activeProvider?.ProcessFailCount.GetValueOrDefault(0) ?? 0,
+                InvalidInactive = inactiveProvider?.ProcessFailCount.GetValueOrDefault(0) ?? 0,
+                InvalidDiff = (activeProvider?.ProcessFailCount.GetValueOrDefault(0) ?? 0) - (inactiveProvider?.ProcessFailCount.GetValueOrDefault(0) ?? 0),
+                HarvestTimeActive = activeHarvestTime,
+                HarvestTimeInactive = inactiveHarvestTime,
+                HarvestTimeDiff = activeHarvestTime - inactiveHarvestTime,
+                ProcessTimeActive = activeProcessTime,
+                ProcessTimeInactive = inactiveProcessTime,
+                ProcessTimeDiff = activeProcessTime - inactiveProcessTime,
+                HarvestStatusActive = activeProvider.HarvestStatus,
+                HarvestStatusInactive = inactiveProvider?.HarvestStatus ?? "Unknown",
+                LatestIncrementalPublicCount = activeProvider.LatestIncrementalPublicCount,
+                LatestIncrementalProtectedCount = activeProvider.LatestIncrementalProtectedCount,
+                LatestIncrementalEnd = activeProvider.LatestIncrementalEnd,
+                LatestIncrementalTime = (activeProvider.LatestIncrementalEnd ?? DateTime.UtcNow) - (activeProvider.LatestIncrementalStart ?? DateTime.UtcNow),        
+            };
+
+            rows.Add(row);
+        }
+
+        return rows.OrderBy(r => r.Id).ToList();
     }
 }

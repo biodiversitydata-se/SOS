@@ -13,284 +13,284 @@ using SOS.Shared.Api.Dtos;
 using SOS.Shared.Api.Dtos.Enum;
 using SOS.Shared.Api.Dtos.Filter;
 
-namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsEndpoints.ObservationsBySearchEndpoint
+namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsEndpoints.ObservationsBySearchEndpoint;
+
+[Collection(TestCollection.Name)]
+public class GeographicsFilterTests : TestBase
 {
-    [Collection(TestCollection.Name)]
-    public class GeographicsFilterTests : TestBase
+    public GeographicsFilterTests(TestFixture testFixture, ITestOutputHelper output) : base(testFixture, output)
     {
-        public GeographicsFilterTests(TestFixture testFixture, ITestOutputHelper output) : base(testFixture, output)
+    }
+
+    [Fact]
+    public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_WhenFilteringByMunicipality()
+    {
+        // Arrange
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+            .All().HaveValuesFromPredefinedObservations()
+            .TheFirst(60).HaveAreaFeatureIds("Province1", "County1", "Municipality1")
+             .TheNext(20).HaveAreaFeatureIds("Province1", "County1", "Municipality2")
+             .TheNext(20).HaveAreaFeatureIds("Province1", "County1", "Municipality3")
+            .Build();
+        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
+        var apiClient = TestFixture.CreateApiClient();
+        var searchFilter = SearchFilterDtoFactory.CreateWithMunicipalityFeatureIds("Municipality1");
+
+        // Act
+        var response = await apiClient.PostAsync($"/observations/search", JsonContent.Create(searchFilter));
+        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        result!.TotalCount.Should().Be(60,
+            because: "60 observations added to Elasticsearch are in the municipality Municipality1.");
+    }
+
+    [Fact]
+    public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_WhenFilteringByMultipleMunicipalities()
+    {
+        // Arrange
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+            .All().HaveValuesFromPredefinedObservations()
+            .TheFirst(30).HaveAreaFeatureIds("Province1", "County1", "Municipality1")
+             .TheNext(30).HaveAreaFeatureIds("Province1", "County1", "Municipality2")
+             .TheNext(20).HaveAreaFeatureIds("Province1", "County1", "Municipality3")
+             .TheNext(20).HaveAreaFeatureIds("Province1", "County1", "Municipality4")
+            .Build();
+        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
+        var apiClient = TestFixture.CreateApiClient();
+        var searchFilter = SearchFilterDtoFactory.CreateWithMunicipalityFeatureIds("Municipality1", "Municipality2");
+
+        // Act
+        var response = await apiClient.PostAsync($"/observations/search", JsonContent.Create(searchFilter));
+        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        result!.TotalCount.Should().Be(60,
+            because: "60 observations added to Elasticsearch are in the municipality Municipality1 OR Municipality2.");
+    }
+
+    [Fact]
+    public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_WhenFilteringByProvinceAndMunicipality()
+    {
+        // Arrange
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+            .All().HaveValuesFromPredefinedObservations()
+            .TheFirst(60).HaveAreaFeatureIds("Province1", "County1", "Municipality1")
+             .TheNext(20).HaveAreaFeatureIds("Province1", "County1", "Municipality2")
+             .TheNext(20).HaveAreaFeatureIds("Province1", "County1", "Municipality3")
+            .Build();
+        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
+        var apiClient = TestFixture.CreateApiClient();
+        var searchFilter = new SearchFilterDto
         {
-        }
-
-        [Fact]
-        public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_WhenFilteringByMunicipality()
-        {
-            // Arrange
-            var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
-                .All().HaveValuesFromPredefinedObservations()
-                .TheFirst(60).HaveAreaFeatureIds("Province1", "County1", "Municipality1")
-                 .TheNext(20).HaveAreaFeatureIds("Province1", "County1", "Municipality2")
-                 .TheNext(20).HaveAreaFeatureIds("Province1", "County1", "Municipality3")
-                .Build();
-            await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
-            var apiClient = TestFixture.CreateApiClient();
-            var searchFilter = SearchFilterDtoFactory.CreateWithMunicipalityFeatureIds("Municipality1");
-
-            // Act
-            var response = await apiClient.PostAsync($"/observations/search", JsonContent.Create(searchFilter));
-            var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
-
-            // Assert
-            response.StatusCode.Should().Be(HttpStatusCode.OK);
-            result!.TotalCount.Should().Be(60,
-                because: "60 observations added to Elasticsearch are in the municipality Municipality1.");
-        }
-
-        [Fact]
-        public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_WhenFilteringByMultipleMunicipalities()
-        {
-            // Arrange
-            var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
-                .All().HaveValuesFromPredefinedObservations()
-                .TheFirst(30).HaveAreaFeatureIds("Province1", "County1", "Municipality1")
-                 .TheNext(30).HaveAreaFeatureIds("Province1", "County1", "Municipality2")
-                 .TheNext(20).HaveAreaFeatureIds("Province1", "County1", "Municipality3")
-                 .TheNext(20).HaveAreaFeatureIds("Province1", "County1", "Municipality4")
-                .Build();
-            await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
-            var apiClient = TestFixture.CreateApiClient();
-            var searchFilter = SearchFilterDtoFactory.CreateWithMunicipalityFeatureIds("Municipality1", "Municipality2");
-
-            // Act
-            var response = await apiClient.PostAsync($"/observations/search", JsonContent.Create(searchFilter));
-            var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
-
-            // Assert
-            response.StatusCode.Should().Be(HttpStatusCode.OK);
-            result!.TotalCount.Should().Be(60,
-                because: "60 observations added to Elasticsearch are in the municipality Municipality1 OR Municipality2.");
-        }
-
-        [Fact]
-        public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_WhenFilteringByProvinceAndMunicipality()
-        {
-            // Arrange
-            var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
-                .All().HaveValuesFromPredefinedObservations()
-                .TheFirst(60).HaveAreaFeatureIds("Province1", "County1", "Municipality1")
-                 .TheNext(20).HaveAreaFeatureIds("Province1", "County1", "Municipality2")
-                 .TheNext(20).HaveAreaFeatureIds("Province1", "County1", "Municipality3")
-                .Build();
-            await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
-            var apiClient = TestFixture.CreateApiClient();
-            var searchFilter = new SearchFilterDto
+            Geographics = new GeographicsFilterDto
             {
-                Geographics = new GeographicsFilterDto
-                {
-                    Areas = new[] {
-                        new AreaFilterDto { AreaType = AreaTypeDto.Province, FeatureId = "Province1" },
-                        new AreaFilterDto { AreaType = AreaTypeDto.Municipality, FeatureId = "Municipality1" }
-                    }
+                Areas = new[] {
+                    new AreaFilterDto { AreaType = AreaTypeDto.Province, FeatureId = "Province1" },
+                    new AreaFilterDto { AreaType = AreaTypeDto.Municipality, FeatureId = "Municipality1" }
                 }
-            };
-           
-            // Act
-            var response = await apiClient.PostAsync($"/observations/search", JsonContent.Create(searchFilter));
-            var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+            }
+        };
+       
+        // Act
+        var response = await apiClient.PostAsync($"/observations/search", JsonContent.Create(searchFilter));
+        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
 
-            // Assert
-            response.StatusCode.Should().Be(HttpStatusCode.OK);
-            result!.TotalCount.Should().Be(60,
-                because: "60 observations added to Elasticsearch are in the province Province1 AND in Municipality1.");
-        }
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        result!.TotalCount.Should().Be(60,
+            because: "60 observations added to Elasticsearch are in the province Province1 AND in Municipality1.");
+    }
 
-        [Fact]
-        public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_WhenFilteringByPolygon()
+    [Fact]
+    public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_WhenFilteringByPolygon()
+    {
+        // Arrange
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+            .All().HaveValuesFromPredefinedObservations()
+            .TheFirst(60).HaveCoordinatesInSpan(11.50001, 11.50009, 68.00001, 68.00009, 10)
+            .TheNext(20).HaveCoordinatesInSpan(11.00001, 11.00009, 68.00001, 68.00009, 10)
+            .TheNext(20).HaveCoordinatesInSpan(11.50001, 11.50009, 68.50001, 68.50009, 10)
+            .Build();
+        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
+        var apiClient = TestFixture.CreateApiClient();
+        var searchFilter = new SearchFilterDto
         {
-            // Arrange
-            var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
-                .All().HaveValuesFromPredefinedObservations()
-                .TheFirst(60).HaveCoordinatesInSpan(11.50001, 11.50009, 68.00001, 68.00009, 10)
-                .TheNext(20).HaveCoordinatesInSpan(11.00001, 11.00009, 68.00001, 68.00009, 10)
-                .TheNext(20).HaveCoordinatesInSpan(11.50001, 11.50009, 68.50001, 68.50009, 10)
-                .Build();
-            await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
-            var apiClient = TestFixture.CreateApiClient();
-            var searchFilter = new SearchFilterDto
+            Geographics = new GeographicsFilterDto
             {
-                Geographics = new GeographicsFilterDto
-                {
-                    Geometries = new[] {
-                        new Point(11.50005, 68.00004).ToCircle(10)
-                    }
+                Geometries = new[] {
+                    new Point(11.50005, 68.00004).ToCircle(10)
                 }
-            };
+            }
+        };
 
-            // Act            
-            var response = await apiClient.PostAsync($"/observations/search", JsonContent.Create(searchFilter, null, JsonSerializerOptions));
-            var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+        // Act            
+        var response = await apiClient.PostAsync($"/observations/search", JsonContent.Create(searchFilter, null, JsonSerializerOptions));
+        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
 
-            // Assert
-            response.StatusCode.Should().Be(HttpStatusCode.OK);
-            result!.TotalCount.Should().Be(60,
-                because: "60 observations added to Elasticsearch are located inside the circle polygon used in the filter.");
-        }
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        result!.TotalCount.Should().Be(60,
+            because: "60 observations added to Elasticsearch are located inside the circle polygon used in the filter.");
+    }
 
-        [Fact]
-        public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_WhenFilteringByPolygonAndMaxAccuracy()
+    [Fact]
+    public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_WhenFilteringByPolygonAndMaxAccuracy()
+    {
+        // Arrange
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+            .All().HaveValuesFromPredefinedObservations()
+            .TheFirst(60).HaveCoordinatesInSpan(11.50001, 11.50009, 68.00001, 68.00009, 10)
+             .TheNext(20).HaveCoordinatesInSpan(11.50001, 11.50009, 68.00001, 68.00009, 20)
+             .TheNext(20).HaveCoordinatesInSpan(11.50001, 11.50009, 69.00001, 69.00009, 10)
+            .Build();
+        var apiClient = TestFixture.CreateApiClient();
+        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
+        var searchFilter = new SearchFilterDto
         {
-            // Arrange
-            var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
-                .All().HaveValuesFromPredefinedObservations()
-                .TheFirst(60).HaveCoordinatesInSpan(11.50001, 11.50009, 68.00001, 68.00009, 10)
-                 .TheNext(20).HaveCoordinatesInSpan(11.50001, 11.50009, 68.00001, 68.00009, 20)
-                 .TheNext(20).HaveCoordinatesInSpan(11.50001, 11.50009, 69.00001, 69.00009, 10)
-                .Build();
-            var apiClient = TestFixture.CreateApiClient();
-            await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
-            var searchFilter = new SearchFilterDto
+            Geographics = new GeographicsFilterDto
             {
-                Geographics = new GeographicsFilterDto
-                {
-                    Geometries = new[] {
-                        new Point(11.50005, 68.00004).ToCircle(10)
-                    },
-                    MaxAccuracy = 15
-                }
-            };
+                Geometries = new[] {
+                    new Point(11.50005, 68.00004).ToCircle(10)
+                },
+                MaxAccuracy = 15
+            }
+        };
 
-            // Act            
-            var response = await apiClient.PostAsync($"/observations/search", JsonContent.Create(searchFilter, null, JsonSerializerOptions));
-            var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+        // Act            
+        var response = await apiClient.PostAsync($"/observations/search", JsonContent.Create(searchFilter, null, JsonSerializerOptions));
+        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
 
-            // Assert
-            response.StatusCode.Should().Be(HttpStatusCode.OK);
-            result!.TotalCount.Should().Be(60,
-                because: "60 observations added to Elasticsearch are located inside the circle polygon used in the filter " +
-                         "and also with accuracy <= 15 meter.");
-        }
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        result!.TotalCount.Should().Be(60,
+            because: "60 observations added to Elasticsearch are located inside the circle polygon used in the filter " +
+                     "and also with accuracy <= 15 meter.");
+    }
 
-        [Fact]
-        public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_WhenFilteringByPolygonAndConsiderAccuracy()
+    [Fact]
+    public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_WhenFilteringByPolygonAndConsiderAccuracy()
+    {
+        // Arrange
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+            .All().HaveValuesFromPredefinedObservations()
+            .TheFirst(30).HaveCoordinatesInSpan(11.50001, 11.50009, 68.00001, 68.00009, 10)
+             .TheNext(30).HaveCoordinatesInSpan(11.50100, 11.50900, 68.00001, 68.00009, 1000)
+             .TheNext(20).HaveCoordinatesInSpan(12.00001, 12.00009, 68.00001, 68.00009, 10)
+             .TheNext(20).HaveCoordinatesInSpan(14.00001, 16.00009, 56.00001, 56.00009, 10)
+            .Build();
+        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
+        var apiClient = TestFixture.CreateApiClient();
+        var searchFilter = new SearchFilterDto
         {
-            // Arrange
-            var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
-                .All().HaveValuesFromPredefinedObservations()
-                .TheFirst(30).HaveCoordinatesInSpan(11.50001, 11.50009, 68.00001, 68.00009, 10)
-                 .TheNext(30).HaveCoordinatesInSpan(11.50100, 11.50900, 68.00001, 68.00009, 1000)
-                 .TheNext(20).HaveCoordinatesInSpan(12.00001, 12.00009, 68.00001, 68.00009, 10)
-                 .TheNext(20).HaveCoordinatesInSpan(14.00001, 16.00009, 56.00001, 56.00009, 10)
-                .Build();
-            await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
-            var apiClient = TestFixture.CreateApiClient();
-            var searchFilter = new SearchFilterDto
+            Geographics = new GeographicsFilterDto
             {
-                Geographics = new GeographicsFilterDto
-                {
-                    Geometries = new[] {
-                        new Point(11.50005, 68.00004).ToCircle(10)
-                    },
-                    ConsiderObservationAccuracy = true
-                }
-            };
+                Geometries = new[] {
+                    new Point(11.50005, 68.00004).ToCircle(10)
+                },
+                ConsiderObservationAccuracy = true
+            }
+        };
 
-            // Act            
-            var response = await apiClient.PostAsync($"/observations/search", JsonContent.Create(searchFilter, null, JsonSerializerOptions));
-            var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+        // Act            
+        var response = await apiClient.PostAsync($"/observations/search", JsonContent.Create(searchFilter, null, JsonSerializerOptions));
+        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
 
-            // Assert
-            response.StatusCode.Should().Be(HttpStatusCode.OK);
-            result!.TotalCount.Should().Be(60,
-                because: "60 observations added to Elasticsearch are located inside the circle polygon used in the filter " +
-                         "when observation accuracy is considered");
-        }
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        result!.TotalCount.Should().Be(60,
+            because: "60 observations added to Elasticsearch are located inside the circle polygon used in the filter " +
+                     "when observation accuracy is considered");
+    }
 
-        [Fact]
-        public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_WhenFilteringByPolygonAndConsiderDisturbanceRadius()
+    [Fact]
+    public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_WhenFilteringByPolygonAndConsiderDisturbanceRadius()
+    {
+        // Arrange
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+            .All().HaveValuesFromPredefinedObservations()
+            .TheFirst(30).HaveCoordinatesInSpan(11.50001, 11.50009, 68.00001, 68.00009, 10)
+                         .With(o => o.TaxonId = 100011) // Disturbance radius: 2000m
+             .TheNext(30).HaveCoordinatesInSpan(11.50100, 11.50900, 68.00001, 68.00009, 10)
+                         .With(o => o.TaxonId = 100009) // Disturbance radius: 1000m
+             .TheNext(20).HaveCoordinatesInSpan(12.00001, 12.00009, 68.00001, 68.00009, 10)
+                         .With(o => o.TaxonId = 102933) // Disturbance radius: 0m
+             .TheNext(20).HaveCoordinatesInSpan(14.50100, 16.50900, 56.00001, 56.00009, 10)
+                         .With(o => o.TaxonId = 100009) // Disturbance radius: 1000m
+            .Build();
+
+        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
+        var searchFilter = new SearchFilterDto
         {
-            // Arrange
-            var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
-                .All().HaveValuesFromPredefinedObservations()
-                .TheFirst(30).HaveCoordinatesInSpan(11.50001, 11.50009, 68.00001, 68.00009, 10)
-                             .With(o => o.TaxonId = 100011) // Disturbance radius: 2000m
-                 .TheNext(30).HaveCoordinatesInSpan(11.50100, 11.50900, 68.00001, 68.00009, 10)
-                             .With(o => o.TaxonId = 100009) // Disturbance radius: 1000m
-                 .TheNext(20).HaveCoordinatesInSpan(12.00001, 12.00009, 68.00001, 68.00009, 10)
-                             .With(o => o.TaxonId = 102933) // Disturbance radius: 0m
-                 .TheNext(20).HaveCoordinatesInSpan(14.50100, 16.50900, 56.00001, 56.00009, 10)
-                             .With(o => o.TaxonId = 100009) // Disturbance radius: 1000m
-                .Build();
-
-            await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
-            var searchFilter = new SearchFilterDto
+            Geographics = new GeographicsFilterDto
             {
-                Geographics = new GeographicsFilterDto
-                {
-                    Geometries = new[] {
-                        new Point(11.50005, 68.00004).ToCircle(10)
-                    },
-                    ConsiderDisturbanceRadius = true
-                }
-            };
-            var apiClient = TestFixture.CreateApiClient();
+                Geometries = new[] {
+                    new Point(11.50005, 68.00004).ToCircle(10)
+                },
+                ConsiderDisturbanceRadius = true
+            }
+        };
+        var apiClient = TestFixture.CreateApiClient();
 
-            // Act            
-            var response = await apiClient.PostAsync($"/observations/search", JsonContent.Create(searchFilter, null, JsonSerializerOptions));
-            var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+        // Act            
+        var response = await apiClient.PostAsync($"/observations/search", JsonContent.Create(searchFilter, null, JsonSerializerOptions));
+        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
 
-            // Assert
-            response.StatusCode.Should().Be(HttpStatusCode.OK);
-            result!.TotalCount.Should().Be(60,
-                because: "60 observations added to Elasticsearch are located inside the circle polygon used in the filter " +
-                         "when disturbance radius is considered");
-        }
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        result!.TotalCount.Should().Be(60,
+            because: "60 observations added to Elasticsearch are located inside the circle polygon used in the filter " +
+                     "when disturbance radius is considered");
+    }
 
-        [Fact]
-        public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_WhenFilteringByBoundingBox()
+    [Fact]
+    public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_WhenFilteringByBoundingBox()
+    {
+        //-----------------------------------------------------------------------------------------------------------
+        // Arrange - Create verbatim observations
+        //-----------------------------------------------------------------------------------------------------------            
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+            .All().HaveValuesFromPredefinedObservations()
+            .TheFirst(60).HaveCoordinatesInSpan(11.50001, 11.50009, 68.00001, 68.00009, 10)
+            .TheNext(20).HaveCoordinatesInSpan(12.00001, 12.00009, 68.00001, 68.00009, 10)
+            .TheNext(20).HaveCoordinatesInSpan(14.50100, 16.50900, 56.00001, 56.00009, 10)
+            .Build();
+        var apiClient = TestFixture.CreateApiClient();
+        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
+        var searchFilter = new SearchFilterDto
         {
-            //-----------------------------------------------------------------------------------------------------------
-            // Arrange - Create verbatim observations
-            //-----------------------------------------------------------------------------------------------------------            
-            var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
-                .All().HaveValuesFromPredefinedObservations()
-                .TheFirst(60).HaveCoordinatesInSpan(11.50001, 11.50009, 68.00001, 68.00009, 10)
-                .TheNext(20).HaveCoordinatesInSpan(12.00001, 12.00009, 68.00001, 68.00009, 10)
-                .TheNext(20).HaveCoordinatesInSpan(14.50100, 16.50900, 56.00001, 56.00009, 10)
-                .Build();
-            var apiClient = TestFixture.CreateApiClient();
-            await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
-            var searchFilter = new SearchFilterDto
+            Geographics = new GeographicsFilterDto
             {
-                Geographics = new GeographicsFilterDto
+                BoundingBox = new LatLonBoundingBoxDto
                 {
-                    BoundingBox = new LatLonBoundingBoxDto
-                    {
-                        BottomRight = new LatLonCoordinateDto { Latitude = 68.00001, Longitude = 11.50009 },
-                        TopLeft = new LatLonCoordinateDto { Latitude = 68.00009, Longitude = 11.50001 }
-                    }
+                    BottomRight = new LatLonCoordinateDto { Latitude = 68.00001, Longitude = 11.50009 },
+                    TopLeft = new LatLonCoordinateDto { Latitude = 68.00009, Longitude = 11.50001 }
                 }
-            };
+            }
+        };
 
-            // Act            
-            var response = await apiClient.PostAsync($"/observations/search", JsonContent.Create(searchFilter, null, JsonSerializerOptions));
-            var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+        // Act            
+        var response = await apiClient.PostAsync($"/observations/search", JsonContent.Create(searchFilter, null, JsonSerializerOptions));
+        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
 
-            // Assert
-            response.StatusCode.Should().Be(HttpStatusCode.OK);
-            result!.TotalCount.Should().Be(60,
-                because: "60 observations added to Elasticsearch are located inside bounding box used in the filter.");
-        }
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        result!.TotalCount.Should().Be(60,
+            because: "60 observations added to Elasticsearch are located inside bounding box used in the filter.");
+    }
 
-        [Fact]
-        public async Task ObservationsBySearchEndpoint_ReturnsBadRequest_WhenFilteringByInvalidPolygon()
-        {
-            //-----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------                        
-            var apiClient = TestFixture.CreateApiClient();
+    [Fact]
+    public async Task ObservationsBySearchEndpoint_ReturnsBadRequest_WhenFilteringByInvalidPolygon()
+    {
+        //-----------------------------------------------------------------------------------------------------------
+        // Arrange
+        //-----------------------------------------------------------------------------------------------------------                        
+        var apiClient = TestFixture.CreateApiClient();
 
-            // Create polygon where end coordinate differs from start coordinate.
-            var json = @"
+        // Create polygon where end coordinate differs from start coordinate.
+        var json = @"
             {
                 ""geographics"": {
                     ""geometries"": [
@@ -310,139 +310,138 @@ namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsE
                 }
             }";
 
-            // Act            
-            var response = await apiClient.PostAsync("/observations/search", new StringContent(json, Encoding.UTF8, "application/json"));
-            var result = await response.Content.ReadAsStringAsync();
+        // Act            
+        var response = await apiClient.PostAsync("/observations/search", new StringContent(json, Encoding.UTF8, "application/json"));
+        var result = await response.Content.ReadAsStringAsync();
 
-            // Assert
-            response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-            result!.Should().Be("Invalid JSON in request body. Geometry - points must form a closed linestring");
-        }
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        result!.Should().Be("Invalid JSON in request body. Geometry - points must form a closed linestring");
+    }
 
-        [Fact]
-        public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_WhenFilteringByMunicipalityPolygon()
+    [Fact]
+    public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_WhenFilteringByMunicipalityPolygon()
+    {
+        //-----------------------------------------------------------------------------------------------------------
+        // Arrange
+        //-----------------------------------------------------------------------------------------------------------
+        var uppsala = Geometries.UppsalaMunicipality();
+        var wgs86Approx1M = 0.00001;
+        var maxX = uppsala.Coordinates.Max(c => c.X); 
+        var maxY = uppsala.Coordinates.Max(c => c.Y);
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+           .All().HaveValuesFromPredefinedObservations()
+           .TheFirst(30).HaveCoordinatesInGeometry(uppsala, 10)
+            .TheNext(30).HaveCoordinatesInGeometry(uppsala, 1000)
+            .TheNext(20).HaveCoordinatesOusideGeometry(uppsala, 10)
+            .TheNext(20).HaveCoordinatesOusideGeometry(uppsala, 10)
+           .Build();
+        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
+        var apiClient = TestFixture.CreateApiClient();
+        var searchFilter = new SearchFilterDto
         {
-            //-----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            var uppsala = Geometries.UppsalaMunicipality();
-            var wgs86Approx1M = 0.00001;
-            var maxX = uppsala.Coordinates.Max(c => c.X); 
-            var maxY = uppsala.Coordinates.Max(c => c.Y);
-            var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
-               .All().HaveValuesFromPredefinedObservations()
-               .TheFirst(30).HaveCoordinatesInGeometry(uppsala, 10)
-                .TheNext(30).HaveCoordinatesInGeometry(uppsala, 1000)
-                .TheNext(20).HaveCoordinatesOusideGeometry(uppsala, 10)
-                .TheNext(20).HaveCoordinatesOusideGeometry(uppsala, 10)
-               .Build();
-            await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
-            var apiClient = TestFixture.CreateApiClient();
-            var searchFilter = new SearchFilterDto
+            Geographics = new GeographicsFilterDto
             {
-                Geographics = new GeographicsFilterDto
-                {
-                    Geometries = [uppsala]
-                    
-                }
-            };
-           // var geoJsonConverterFactory = new NetTopologySuite.IO.Converters.GeoJsonConverterFactory();
-           // var geometryConverter = geoJsonConverterFactory.CreateConverter(typeof(Geometry), null);
-            var jsonSerializerOptions = new JsonSerializerOptions();
-            jsonSerializerOptions.Converters.Add(new NetTopologySuite.IO.Converters.GeoJsonConverterFactory());
+                Geometries = [uppsala]
+                
+            }
+        };
+       // var geoJsonConverterFactory = new NetTopologySuite.IO.Converters.GeoJsonConverterFactory();
+       // var geometryConverter = geoJsonConverterFactory.CreateConverter(typeof(Geometry), null);
+        var jsonSerializerOptions = new JsonSerializerOptions();
+        jsonSerializerOptions.Converters.Add(new NetTopologySuite.IO.Converters.GeoJsonConverterFactory());
 
-            // Act
-            var response = await apiClient.PostAsync($"/observations/search", JsonContent.Create(searchFilter, options: jsonSerializerOptions));
-            var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+        // Act
+        var response = await apiClient.PostAsync($"/observations/search", JsonContent.Create(searchFilter, options: jsonSerializerOptions));
+        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
 
-            // Assert
-            response.StatusCode.Should().Be(HttpStatusCode.OK);
-            result!.TotalCount.Should().Be(60,
-                because: "60 observations added to Elasticsearch are in the municipality Uppsala.");
-        }
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        result!.TotalCount.Should().Be(60,
+            because: "60 observations added to Elasticsearch are in the municipality Uppsala.");
+    }
 
-        [Fact]
-        public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_ConsiderAuthorizationBuffer()
+    [Fact]
+    public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_ConsiderAuthorizationBuffer()
+    {
+        //-----------------------------------------------------------------------------------------------------------
+        // Arrange
+        //-----------------------------------------------------------------------------------------------------------
+        const int bufferSize = 1000;
+        var uppsala = Geometries.UppsalaMunicipality();
+        var uppsalaWithBuffer = uppsala.Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM).Buffer(bufferSize).Transform(CoordinateSys.SWEREF99_TM, CoordinateSys.WGS84);
+        var buffer = uppsalaWithBuffer.Difference(uppsala);
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+            .All()
+                .HaveValuesFromPredefinedObservations()
+                .HaveTaxonSensitivityCategory(4)
+            .TheFirst(30).HaveCoordinatesInGeometry(uppsala, 10)
+            .TheNext(30).HaveCoordinatesInGeometry(buffer, 10)
+            .TheNext(40).HaveCoordinatesOusideGeometry(uppsalaWithBuffer, 10)
+            .Build();
+        
+        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
+        var userServiceStub = UserServiceStubFactory.CreateWithMunicipalitySightingIndicationAuthority(maxProtectionLevel: 5, "380"/*Uppsala*/, bufferSize);
+        var apiClient = TestFixture.CreateApiClientWithReplacedService(userServiceStub);
+        var searchFilter = new SearchFilterDto
         {
-            //-----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            const int bufferSize = 1000;
-            var uppsala = Geometries.UppsalaMunicipality();
-            var uppsalaWithBuffer = uppsala.Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM).Buffer(bufferSize).Transform(CoordinateSys.SWEREF99_TM, CoordinateSys.WGS84);
-            var buffer = uppsalaWithBuffer.Difference(uppsala);
-            var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
-                .All()
-                    .HaveValuesFromPredefinedObservations()
-                    .HaveTaxonSensitivityCategory(4)
-                .TheFirst(30).HaveCoordinatesInGeometry(uppsala, 10)
-                .TheNext(30).HaveCoordinatesInGeometry(buffer, 10)
-                .TheNext(40).HaveCoordinatesOusideGeometry(uppsalaWithBuffer, 10)
-                .Build();
-            
-            await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
-            var userServiceStub = UserServiceStubFactory.CreateWithMunicipalitySightingIndicationAuthority(maxProtectionLevel: 5, "380"/*Uppsala*/, bufferSize);
-            var apiClient = TestFixture.CreateApiClientWithReplacedService(userServiceStub);
-            var searchFilter = new SearchFilterDto
+            Geographics = new GeographicsFilterDto
             {
-                Geographics = new GeographicsFilterDto
-                {
-                    ConsiderAuthorizationBuffer = true
-                }
-            };
-            var jsonSerializerOptions = new JsonSerializerOptions();
-            jsonSerializerOptions.Converters.Add(new NetTopologySuite.IO.Converters.GeoJsonConverterFactory());
+                ConsiderAuthorizationBuffer = true
+            }
+        };
+        var jsonSerializerOptions = new JsonSerializerOptions();
+        jsonSerializerOptions.Converters.Add(new NetTopologySuite.IO.Converters.GeoJsonConverterFactory());
 
-            // Act
-            var response = await apiClient.PostAsync($"/observations/search?sensitiveObservations=true", JsonContent.Create(searchFilter, options: jsonSerializerOptions));
-            var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+        // Act
+        var response = await apiClient.PostAsync($"/observations/search?sensitiveObservations=true", JsonContent.Create(searchFilter, options: jsonSerializerOptions));
+        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
 
-            // Assert
-            response.StatusCode.Should().Be(HttpStatusCode.OK);
-            result!.TotalCount.Should().Be(60,
-                because: $"60 observations added to Elasticsearch are in the municipality Uppsala or max {bufferSize}m outside.");
-        }
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        result!.TotalCount.Should().Be(60,
+            because: $"60 observations added to Elasticsearch are in the municipality Uppsala or max {bufferSize}m outside.");
+    }
 
-        [Fact]
-        public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_DontConsiderAuthorizationBuffer()
+    [Fact]
+    public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_DontConsiderAuthorizationBuffer()
+    {
+        //-----------------------------------------------------------------------------------------------------------
+        // Arrange
+        //-----------------------------------------------------------------------------------------------------------
+        const int bufferSize = 1000;
+        var uppsala = Geometries.UppsalaMunicipality();
+        var uppsalaWithBuffer = uppsala.Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM).Buffer(bufferSize).Transform(CoordinateSys.SWEREF99_TM, CoordinateSys.WGS84);
+        var buffer = uppsalaWithBuffer.Difference(uppsala);
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+            .All()
+                .HaveValuesFromPredefinedObservations()
+                .HaveTaxonSensitivityCategory(4)
+            .TheFirst(30).HaveCoordinatesInGeometry(uppsala, 10).HaveAreaFeatureIds("Province1", "County1", "380") // Uppsala
+            .TheNext(30).HaveCoordinatesInGeometry(buffer, 10).HaveAreaFeatureIds("Province1", "County1", "381") // Enköping
+            .TheNext(40).HaveCoordinatesOusideGeometry(uppsalaWithBuffer, 10).HaveAreaFeatureIds("Province2", "County2", "382") // Östhammar
+            .Build();
+
+        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
+        var userServiceStub = UserServiceStubFactory.CreateWithMunicipalitySightingIndicationAuthority(maxProtectionLevel: 5, "380"/*Uppsala*/, bufferSize);
+        var apiClient = TestFixture.CreateApiClientWithReplacedService(userServiceStub);
+        var searchFilter = new SearchFilterDto
         {
-            //-----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            const int bufferSize = 1000;
-            var uppsala = Geometries.UppsalaMunicipality();
-            var uppsalaWithBuffer = uppsala.Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM).Buffer(bufferSize).Transform(CoordinateSys.SWEREF99_TM, CoordinateSys.WGS84);
-            var buffer = uppsalaWithBuffer.Difference(uppsala);
-            var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
-                .All()
-                    .HaveValuesFromPredefinedObservations()
-                    .HaveTaxonSensitivityCategory(4)
-                .TheFirst(30).HaveCoordinatesInGeometry(uppsala, 10).HaveAreaFeatureIds("Province1", "County1", "380") // Uppsala
-                .TheNext(30).HaveCoordinatesInGeometry(buffer, 10).HaveAreaFeatureIds("Province1", "County1", "381") // Enköping
-                .TheNext(40).HaveCoordinatesOusideGeometry(uppsalaWithBuffer, 10).HaveAreaFeatureIds("Province2", "County2", "382") // Östhammar
-                .Build();
-
-            await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
-            var userServiceStub = UserServiceStubFactory.CreateWithMunicipalitySightingIndicationAuthority(maxProtectionLevel: 5, "380"/*Uppsala*/, bufferSize);
-            var apiClient = TestFixture.CreateApiClientWithReplacedService(userServiceStub);
-            var searchFilter = new SearchFilterDto
+            Geographics = new GeographicsFilterDto
             {
-                Geographics = new GeographicsFilterDto
-                {
-                    ConsiderAuthorizationBuffer = false
-                }
-            };
-            var jsonSerializerOptions = new JsonSerializerOptions();
-            jsonSerializerOptions.Converters.Add(new NetTopologySuite.IO.Converters.GeoJsonConverterFactory());
+                ConsiderAuthorizationBuffer = false
+            }
+        };
+        var jsonSerializerOptions = new JsonSerializerOptions();
+        jsonSerializerOptions.Converters.Add(new NetTopologySuite.IO.Converters.GeoJsonConverterFactory());
 
-            // Act
-            var response = await apiClient.PostAsync($"/observations/search?sensitiveObservations=true", JsonContent.Create(searchFilter, options: jsonSerializerOptions));
-            var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+        // Act
+        var response = await apiClient.PostAsync($"/observations/search?sensitiveObservations=true", JsonContent.Create(searchFilter, options: jsonSerializerOptions));
+        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
 
-            // Assert
-            response.StatusCode.Should().Be(HttpStatusCode.OK);
-            result!.TotalCount.Should().Be(30,
-                because: $"30 observations added to Elasticsearch are in the municipality Uppsala");
-        }
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        result!.TotalCount.Should().Be(30,
+            because: $"30 observations added to Elasticsearch are in the municipality Uppsala");
     }
 }

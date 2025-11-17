@@ -1,55 +1,54 @@
 ﻿using SOS.Shared.Api.Dtos.DataStewardship.Enums;
 
-namespace SOS.Shared.Api.Dtos.DataStewardship.Extensions
+namespace SOS.Shared.Api.Dtos.DataStewardship.Extensions;
+
+public static class AreaExtensions
 {
-    public static class AreaExtensions
+    public static DsCounty? GetCounty(this string countyId)
     {
-        public static DsCounty? GetCounty(this string countyId)
+        if (string.IsNullOrEmpty(countyId)) return null;
+
+        if (!int.TryParse(countyId, out var id))
         {
-            if (string.IsNullOrEmpty(countyId)) return null;
-
-            if (!int.TryParse(countyId, out var id))
-            {
-                return null;
-            }
-
-            return (DsCounty)id;
+            return null;
         }
 
-        public static Municipality? GetMunicipality(this string municipalityId)
+        return (DsCounty)id;
+    }
+
+    public static Municipality? GetMunicipality(this string municipalityId)
+    {
+        if (string.IsNullOrEmpty(municipalityId)) return null;
+
+        if (!int.TryParse(municipalityId, out var id))
         {
-            if (string.IsNullOrEmpty(municipalityId)) return null;
-
-            if (!int.TryParse(municipalityId, out var id))
-            {
-                return null;
-            }
-
-            return (Municipality)id;
+            return null;
         }
 
-        public static DsParish? GetParish(this string parishId)
+        return (Municipality)id;
+    }
+
+    public static DsParish? GetParish(this string parishId)
+    {
+        if (string.IsNullOrEmpty(parishId)) return null;
+
+        if (!int.TryParse(parishId, out var id))
         {
-            if (string.IsNullOrEmpty(parishId)) return null;
-
-            if (!int.TryParse(parishId, out var id))
-            {
-                return null;
-            }
-
-            return (DsParish)id;
+            return null;
         }
 
-        public static DsProvince? GetProvince(this string provinceId)
+        return (DsParish)id;
+    }
+
+    public static DsProvince? GetProvince(this string provinceId)
+    {
+        if (string.IsNullOrEmpty(provinceId)) return null;
+
+        if (!int.TryParse(provinceId, out var id))
         {
-            if (string.IsNullOrEmpty(provinceId)) return null;
-
-            if (!int.TryParse(provinceId, out var id))
-            {
-                return null;
-            }
-
-            return (DsProvince)id;
+            return null;
         }
+
+        return (DsProvince)id;
     }
 }

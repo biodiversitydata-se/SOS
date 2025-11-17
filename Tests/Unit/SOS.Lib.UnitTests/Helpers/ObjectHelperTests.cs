@@ -5,43 +5,42 @@ using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 
-namespace SOS.Lib.UnitTests.Helpers
+namespace SOS.Lib.UnitTests.Helpers;
+
+public class ObjectHelperTests
 {
-    public class ObjectHelperTests
+    [Fact]
+    public void TestIdentifyGarbageChars()
     {
-        [Fact]
-        public void TestIdentifyGarbageChars()
+        //-----------------------------------------------------------------------------------------------------------
+        // Arrange
+        //-----------------------------------------------------------------------------------------------------------
+        var objectHelper = new ObjectHelper();
+        var observation = new Observation
         {
-            //-----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            var objectHelper = new ObjectHelper();
-            var observation = new Observation
+            Projects = new List<Project>
             {
-                Projects = new List<Project>
+                new Project
                 {
-                    new Project
+                    ProjectParameters = new List<ProjectParameter>
                     {
-                        ProjectParameters = new List<ProjectParameter>
+                        new ProjectParameter
                         {
-                            new ProjectParameter
-                            {
-                                Value = "test\twith tab"
-                            }
+                            Value = "test\twith tab"
                         }
                     }
                 }
-            };
+            }
+        };
 
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var result = objectHelper.GetPropertiesWithGarbageChars(observation);
+        //-----------------------------------------------------------------------------------------------------------
+        // Act
+        //-----------------------------------------------------------------------------------------------------------
+        var result = objectHelper.GetPropertiesWithGarbageChars(observation);
 
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-            result.First().Should().Be("Projects.ProjectParameters.Value", "because that property contains a tab character");
-        }
+        //-----------------------------------------------------------------------------------------------------------
+        // Assert
+        //-----------------------------------------------------------------------------------------------------------
+        result.First().Should().Be("Projects.ProjectParameters.Value", "because that property contains a tab character");
     }
 }

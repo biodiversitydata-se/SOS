@@ -9,79 +9,78 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace SOS.Import.UnitTests.Repositories.Source.Artportalen
+namespace SOS.Import.UnitTests.Repositories.Source.Artportalen;
+
+/// <summary>
+///     Person tests
+/// </summary>
+public class PersonRepositoryTests
 {
     /// <summary>
-    ///     Person tests
+    ///     Constructor
     /// </summary>
-    public class PersonRepositoryTests
+    public PersonRepositoryTests()
     {
-        /// <summary>
-        ///     Constructor
-        /// </summary>
-        public PersonRepositoryTests()
+        _artportalenDataServiceMock = new Mock<IArtportalenDataService>();
+        _loggerMock = new Mock<ILogger<PersonRepository>>();
+    }
+
+    private readonly Mock<IArtportalenDataService> _artportalenDataServiceMock;
+    private readonly Mock<ILogger<PersonRepository>> _loggerMock;
+
+    private PersonRepository TestObject => new PersonRepository(
+        _artportalenDataServiceMock.Object,
+        _loggerMock.Object);
+
+    /// <summary>
+    ///     Test get projects fail
+    /// </summary>
+    /// <returns></returns>
+    [Fact]
+    public async Task GetAsyncException()
+    {
+        _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<PersonEntity>(It.IsAny<string>(), null, false, System.Data.CommandType.Text))
+            .Throws<Exception>();
+
+        //-----------------------------------------------------------------------------------------------------------
+        // Act
+        //-----------------------------------------------------------------------------------------------------------
+        Func<Task> act = async () =>
         {
-            _artportalenDataServiceMock = new Mock<IArtportalenDataService>();
-            _loggerMock = new Mock<ILogger<PersonRepository>>();
-        }
-
-        private readonly Mock<IArtportalenDataService> _artportalenDataServiceMock;
-        private readonly Mock<ILogger<PersonRepository>> _loggerMock;
-
-        private PersonRepository TestObject => new PersonRepository(
-            _artportalenDataServiceMock.Object,
-            _loggerMock.Object);
-
-        /// <summary>
-        ///     Test get projects fail
-        /// </summary>
-        /// <returns></returns>
-        [Fact]
-        public async Task GetAsyncException()
-        {
-            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<PersonEntity>(It.IsAny<string>(), null, false, System.Data.CommandType.Text))
-                .Throws<Exception>();
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            Func<Task> act = async () =>
-            {
-                var result = await TestObject.GetAsync();
-            };
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-            await act.Should().ThrowAsync<Exception>();
-        }
-
-
-        /// <summary>
-        ///     Test get projects success
-        /// </summary>
-        /// <returns></returns>
-        [Fact]
-        public async Task GetAsyncSuccess()
-        {
-            IEnumerable<PersonEntity> persons = new[]
-            {
-                new PersonEntity {Id = 1},
-                new PersonEntity {Id = 2}
-            };
-
-            _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<PersonEntity>(It.IsAny<string>(), null, false, System.Data.CommandType.Text))
-                .ReturnsAsync(persons);
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //----------------------------------------------------------------------------------------------------------
             var result = await TestObject.GetAsync();
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
+        };
 
-            result.Should().HaveCount(2);
-        }
+        //-----------------------------------------------------------------------------------------------------------
+        // Assert
+        //-----------------------------------------------------------------------------------------------------------
+        await act.Should().ThrowAsync<Exception>();
+    }
+
+
+    /// <summary>
+    ///     Test get projects success
+    /// </summary>
+    /// <returns></returns>
+    [Fact]
+    public async Task GetAsyncSuccess()
+    {
+        IEnumerable<PersonEntity> persons = new[]
+        {
+            new PersonEntity {Id = 1},
+            new PersonEntity {Id = 2}
+        };
+
+        _artportalenDataServiceMock.Setup(spds => spds.QueryAsync<PersonEntity>(It.IsAny<string>(), null, false, System.Data.CommandType.Text))
+            .ReturnsAsync(persons);
+
+        //-----------------------------------------------------------------------------------------------------------
+        // Act
+        //----------------------------------------------------------------------------------------------------------
+        var result = await TestObject.GetAsync();
+        //-----------------------------------------------------------------------------------------------------------
+        // Assert
+        //-----------------------------------------------------------------------------------------------------------
+
+        result.Should().HaveCount(2);
     }
 }

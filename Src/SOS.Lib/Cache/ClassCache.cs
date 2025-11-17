@@ -15,198 +15,197 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading;
 
-namespace SOS.Lib.Cache
+namespace SOS.Lib.Cache;
+
+/// <inheritdoc />
+public class ClassCache<TClass> : IClassCache<TClass>
 {
-    /// <inheritdoc />
-    public class ClassCache<TClass> : IClassCache<TClass>
+    private static readonly object InitLock = new object();
+    private readonly IMemoryCache _memoryCache;
+    private readonly string _cacheKey;
+    protected readonly ILogger<ClassCache<TClass>> Logger;
+
+    private JsonSerializerOptions _cacheKeyJsonSerializerOptions;
+    private JsonSerializerOptions _cacheDataJsonSerializerOptions;
+    private int _maxNumberOfItems = 50000;
+    private Timer _renewalTimer;
+
+    private void OnCacheEviction(object key, object value, EvictionReason reason, object state)
     {
-        private static readonly object InitLock = new object();
-        private readonly IMemoryCache _memoryCache;
-        private readonly string _cacheKey;
-        protected readonly ILogger<ClassCache<TClass>> Logger;
-
-        private JsonSerializerOptions _cacheKeyJsonSerializerOptions;
-        private JsonSerializerOptions _cacheDataJsonSerializerOptions;
-        private int _maxNumberOfItems = 50000;
-        private Timer _renewalTimer;
-
-        private void OnCacheEviction(object key, object value, EvictionReason reason, object state)
+        // Sometimes event is raised even if entity exists in cache.
+        // In order to not bubble event when not needed, check if entity exists in cache
+        if (CacheReleased == null || _memoryCache.TryGetValue(_cacheKey, out var entity))
         {
-            // Sometimes event is raised even if entity exists in cache.
-            // In order to not bubble event when not needed, check if entity exists in cache
-            if (CacheReleased == null || _memoryCache.TryGetValue(_cacheKey, out var entity))
+            return;
+        }
+        
+        Logger.LogInformation($"Cache evicted. Key=\"{key}\", Reason={reason}");
+        if (reason == EvictionReason.Expired || reason == EvictionReason.TokenExpired)
+        {
+            CacheReleased.Invoke(this, EventArgs.Empty);
+        }
+    }
+
+    public ClassCache()
+    {
+
+    }
+
+    /// <summary>
+    /// Constructor
+    /// </summary>
+    /// <param name="memoryCache"></param>
+    /// <param name="logger"></param>
+    public ClassCache(IMemoryCache memoryCache, ILogger<ClassCache<TClass>> logger)
+    {
+        _memoryCache = memoryCache ?? throw new ArgumentNullException(nameof(memoryCache));
+        _cacheKey = typeof(TClass).GetFormattedName();
+        Logger = logger;
+
+        _cacheKeyJsonSerializerOptions = _cacheDataJsonSerializerOptions = new JsonSerializerOptions
+        {
+            AllowTrailingCommas = true,
+            DefaultIgnoreCondition = JsonIgnoreCondition.Never,
+            PropertyNameCaseInsensitive = true,
+            ReadCommentHandling = JsonCommentHandling.Skip,
+            Converters =
             {
-                return;
+                new JsonStringEnumConverter(),
+                new GeoJsonConverterFactory()
             }
-            
-            Logger.LogInformation($"Cache evicted. Key=\"{key}\", Reason={reason}");
-            if (reason == EvictionReason.Expired || reason == EvictionReason.TokenExpired)
-            {
-                CacheReleased.Invoke(this, EventArgs.Empty);
-            }
-        }
+        };
+    }
 
-        public ClassCache()
+    /// <summary>
+    /// Cache duration.
+    /// </summary>
+    public TimeSpan CacheDuration { get; set; } = TimeSpan.FromMinutes(10);
+    public TimeSpan CacheExpireSoonTimeSpan { get; set; } = TimeSpan.FromMinutes(1);
+
+    /// <inheritdoc />
+    public event EventHandler CacheReleased;
+
+    public event EventHandler CacheExpireSoon;
+
+    /// <inheritdoc />
+    public TClass Get()
+    {
+        _memoryCache.TryGetValue(_cacheKey, out var entity);
+        return (TClass)entity;
+    }
+
+    /// <inheritdoc />
+    public void Set(TClass entity)
+    {
+        lock (InitLock)
+        {                
+            _renewalTimer?.Dispose();
+            var expirationToken = new CancellationChangeToken(
+                new CancellationTokenSource(CacheDuration).Token);
+            var cacheEntryOptions = new MemoryCacheEntryOptions()
+                .SetPriority(CacheItemPriority.NeverRemove)
+                .AddExpirationToken(expirationToken)
+                .RegisterPostEvictionCallback(callback: OnCacheEviction, state: this);
+            _memoryCache.Set(_cacheKey, entity, cacheEntryOptions);
+            Logger.LogInformation($"Cache set. Key=\"{_cacheKey}\"");
+            var expirationTime = CacheDuration - CacheExpireSoonTimeSpan;
+            _renewalTimer = new Timer(OnRenewalTimerElapsed, null, expirationTime, Timeout.InfiniteTimeSpan);
+        }
+    }
+
+    private void OnRenewalTimerElapsed(object state)
+    {
+        if (CacheExpireSoon == null)
         {
-
+            return;
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="memoryCache"></param>
-        /// <param name="logger"></param>
-        public ClassCache(IMemoryCache memoryCache, ILogger<ClassCache<TClass>> logger)
+        Logger.LogInformation($"Cache expiration approaching. Key=\"{_cacheKey}\".");
+        CacheExpireSoon.Invoke(this, EventArgs.Empty);
+    }
+
+    public void CheckCacheSize<T>(Dictionary<string, CacheEntry<T>> dictionary)
+    {
+        if (dictionary.Count >= _maxNumberOfItems)
         {
-            _memoryCache = memoryCache ?? throw new ArgumentNullException(nameof(memoryCache));
-            _cacheKey = typeof(TClass).GetFormattedName();
-            Logger = logger;
-
-            _cacheKeyJsonSerializerOptions = _cacheDataJsonSerializerOptions = new JsonSerializerOptions
-            {
-                AllowTrailingCommas = true,
-                DefaultIgnoreCondition = JsonIgnoreCondition.Never,
-                PropertyNameCaseInsensitive = true,
-                ReadCommentHandling = JsonCommentHandling.Skip,
-                Converters =
-                {
-                    new JsonStringEnumConverter(),
-                    new GeoJsonConverterFactory()
-                }
-            };
+            RemoveLeastUsedItems(ref dictionary);
         }
+    }
 
-        /// <summary>
-        /// Cache duration.
-        /// </summary>
-        public TimeSpan CacheDuration { get; set; } = TimeSpan.FromMinutes(10);
-        public TimeSpan CacheExpireSoonTimeSpan { get; set; } = TimeSpan.FromMinutes(1);
-
-        /// <inheritdoc />
-        public event EventHandler CacheReleased;
-
-        public event EventHandler CacheExpireSoon;
-
-        /// <inheritdoc />
-        public TClass Get()
+    public void CheckCacheSize<T>(ConcurrentDictionary<string, CacheEntry<T>> dictionary)
+    {
+        if (dictionary.Count >= _maxNumberOfItems)
         {
-            _memoryCache.TryGetValue(_cacheKey, out var entity);
-            return (TClass)entity;
+            RemoveLeastUsedItems(ref dictionary);
         }
+    }
 
-        /// <inheritdoc />
-        public void Set(TClass entity)
+    private void RemoveLeastUsedItems<T>(ref Dictionary<string, CacheEntry<T>> dictionary)
+    {
+        var itemsToRemove = dictionary.OrderBy(entry => entry.Value.Count)
+                                  .Take(Convert.ToInt32(_maxNumberOfItems * 0.1))
+                                  .Select(entry => entry.Key)
+                                  .ToList();
+
+        dictionary = dictionary.Where(kvp => !itemsToRemove.Contains(kvp.Key))
+                        .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+    }
+
+    private void RemoveLeastUsedItems<T>(ref ConcurrentDictionary<string, CacheEntry<T>> dictionary)
+    {
+        var itemsToRemove = dictionary.OrderBy(entry => entry.Value.Count)
+                                  .Take(Convert.ToInt32(_maxNumberOfItems * 0.1))
+                                  .Select(entry => entry.Key)
+                                  .ToList();
+
+        dictionary = dictionary.Where(kvp => !itemsToRemove.Contains(kvp.Key))
+                        .ToConcurrentDictionary(kvp => kvp.Key, kvp => kvp.Value);
+    }
+
+    public CacheEntry<T> CreateCacheEntry<T>(T item)
+    {
+        if (item == null)
+            throw new ArgumentNullException(nameof(item));
+
+        using var memoryStream = new MemoryStream();
+        JsonSerializer.Serialize(memoryStream, item, _cacheDataJsonSerializerOptions);
+        byte[] byteArray = memoryStream.ToArray();
+        return new CacheEntry<T>
         {
-            lock (InitLock)
-            {                
-                _renewalTimer?.Dispose();
-                var expirationToken = new CancellationChangeToken(
-                    new CancellationTokenSource(CacheDuration).Token);
-                var cacheEntryOptions = new MemoryCacheEntryOptions()
-                    .SetPriority(CacheItemPriority.NeverRemove)
-                    .AddExpirationToken(expirationToken)
-                    .RegisterPostEvictionCallback(callback: OnCacheEviction, state: this);
-                _memoryCache.Set(_cacheKey, entity, cacheEntryOptions);
-                Logger.LogInformation($"Cache set. Key=\"{_cacheKey}\"");
-                var expirationTime = CacheDuration - CacheExpireSoonTimeSpan;
-                _renewalTimer = new Timer(OnRenewalTimerElapsed, null, expirationTime, Timeout.InfiniteTimeSpan);
-            }
-        }
+            Count = 1,
+            Data = Compress(byteArray)
+        };
+    }
 
-        private void OnRenewalTimerElapsed(object state)
+    public T GetCacheEntryValue<T>(CacheEntry<T> entry)
+    {
+        if (entry.Data == null)
+            throw new ArgumentNullException(nameof(entry.Data));
+
+        entry.Count++;
+        var byteArray = Decompress(entry.Data);
+        using var memoryStream = new MemoryStream(byteArray);
+        return JsonSerializer.Deserialize<T>(memoryStream, _cacheDataJsonSerializerOptions);
+    }
+
+    private byte[] Compress(byte[] data)
+    {
+        using var output = new MemoryStream();
+        using (var zip = new GZipStream(output, CompressionMode.Compress))
         {
-            if (CacheExpireSoon == null)
-            {
-                return;
-            }
-
-            Logger.LogInformation($"Cache expiration approaching. Key=\"{_cacheKey}\".");
-            CacheExpireSoon.Invoke(this, EventArgs.Empty);
+            zip.Write(data, 0, data.Length);
         }
+        return output.ToArray();
+    }
 
-        public void CheckCacheSize<T>(Dictionary<string, CacheEntry<T>> dictionary)
+    private byte[] Decompress(byte[] compressedData)
+    {
+        using var input = new MemoryStream(compressedData);
+        using var output = new MemoryStream();
+        using (var zip = new GZipStream(input, CompressionMode.Decompress))
         {
-            if (dictionary.Count >= _maxNumberOfItems)
-            {
-                RemoveLeastUsedItems(ref dictionary);
-            }
+            zip.CopyTo(output);
         }
-
-        public void CheckCacheSize<T>(ConcurrentDictionary<string, CacheEntry<T>> dictionary)
-        {
-            if (dictionary.Count >= _maxNumberOfItems)
-            {
-                RemoveLeastUsedItems(ref dictionary);
-            }
-        }
-
-        private void RemoveLeastUsedItems<T>(ref Dictionary<string, CacheEntry<T>> dictionary)
-        {
-            var itemsToRemove = dictionary.OrderBy(entry => entry.Value.Count)
-                                      .Take(Convert.ToInt32(_maxNumberOfItems * 0.1))
-                                      .Select(entry => entry.Key)
-                                      .ToList();
-
-            dictionary = dictionary.Where(kvp => !itemsToRemove.Contains(kvp.Key))
-                            .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
-        }
-
-        private void RemoveLeastUsedItems<T>(ref ConcurrentDictionary<string, CacheEntry<T>> dictionary)
-        {
-            var itemsToRemove = dictionary.OrderBy(entry => entry.Value.Count)
-                                      .Take(Convert.ToInt32(_maxNumberOfItems * 0.1))
-                                      .Select(entry => entry.Key)
-                                      .ToList();
-
-            dictionary = dictionary.Where(kvp => !itemsToRemove.Contains(kvp.Key))
-                            .ToConcurrentDictionary(kvp => kvp.Key, kvp => kvp.Value);
-        }
-
-        public CacheEntry<T> CreateCacheEntry<T>(T item)
-        {
-            if (item == null)
-                throw new ArgumentNullException(nameof(item));
-
-            using var memoryStream = new MemoryStream();
-            JsonSerializer.Serialize(memoryStream, item, _cacheDataJsonSerializerOptions);
-            byte[] byteArray = memoryStream.ToArray();
-            return new CacheEntry<T>
-            {
-                Count = 1,
-                Data = Compress(byteArray)
-            };
-        }
-
-        public T GetCacheEntryValue<T>(CacheEntry<T> entry)
-        {
-            if (entry.Data == null)
-                throw new ArgumentNullException(nameof(entry.Data));
-
-            entry.Count++;
-            var byteArray = Decompress(entry.Data);
-            using var memoryStream = new MemoryStream(byteArray);
-            return JsonSerializer.Deserialize<T>(memoryStream, _cacheDataJsonSerializerOptions);
-        }
-
-        private byte[] Compress(byte[] data)
-        {
-            using var output = new MemoryStream();
-            using (var zip = new GZipStream(output, CompressionMode.Compress))
-            {
-                zip.Write(data, 0, data.Length);
-            }
-            return output.ToArray();
-        }
-
-        private byte[] Decompress(byte[] compressedData)
-        {
-            using var input = new MemoryStream(compressedData);
-            using var output = new MemoryStream();
-            using (var zip = new GZipStream(input, CompressionMode.Decompress))
-            {
-                zip.CopyTo(output);
-            }
-            return output.ToArray();
-        }
+        return output.ToArray();
     }
 }

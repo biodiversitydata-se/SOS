@@ -2,14 +2,13 @@
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 
-namespace SOS.Harvest.Factories.Validation.Interfaces
+namespace SOS.Harvest.Factories.Validation.Interfaces;
+
+public interface IDataValidationReportFactory
 {
-    public interface IDataValidationReportFactory
-    {
-        public Task<DataValidationReport<object, Observation>> CreateDataValidationSummary(
-            DataProvider dataProvider,
-            int maxNrObservationsToRead = 100000,
-            int nrValidObservationsInReport = 10,
-            int nrInvalidObservationsInReport = 100);
-    }
+    public Task<DataValidationReport<object, Observation>> CreateDataValidationSummary(
+        DataProvider dataProvider,
+        int maxNrObservationsToRead = 100000,
+        int nrValidObservationsInReport = 10,
+        int nrInvalidObservationsInReport = 100);
 }

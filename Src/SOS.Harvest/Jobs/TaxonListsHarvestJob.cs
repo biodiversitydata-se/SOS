@@ -4,49 +4,48 @@ using SOS.Lib.Enums;
 using SOS.Lib.Jobs.Import;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
 
-namespace SOS.Harvest.Jobs
+namespace SOS.Harvest.Jobs;
+
+/// <summary>
+///     Taxon lists harvest job.
+/// </summary>
+public class TaxonListsHarvestJob : ITaxonListsHarvestJob
 {
+    private readonly ITaxonListHarvester _taxonListHarvester;
+    private readonly IHarvestInfoRepository _harvestInfoRepository;
+    private readonly ILogger<TaxonListsHarvestJob> _logger;
+
     /// <summary>
-    ///     Taxon lists harvest job.
+    ///     Constructor
     /// </summary>
-    public class TaxonListsHarvestJob : ITaxonListsHarvestJob
+    /// <param name="taxonListHarvester"></param>
+    /// <param name="harvestInfoRepository"></param>
+    /// <param name="logger"></param>
+    public TaxonListsHarvestJob(
+        ITaxonListHarvester taxonListHarvester,
+        IHarvestInfoRepository harvestInfoRepository,
+        ILogger<TaxonListsHarvestJob> logger)
     {
-        private readonly ITaxonListHarvester _taxonListHarvester;
-        private readonly IHarvestInfoRepository _harvestInfoRepository;
-        private readonly ILogger<TaxonListsHarvestJob> _logger;
+        _taxonListHarvester = taxonListHarvester ?? throw new ArgumentNullException(nameof(taxonListHarvester));
+        _harvestInfoRepository =
+            harvestInfoRepository ?? throw new ArgumentNullException(nameof(harvestInfoRepository));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    }
 
-        /// <summary>
-        ///     Constructor
-        /// </summary>
-        /// <param name="taxonListHarvester"></param>
-        /// <param name="harvestInfoRepository"></param>
-        /// <param name="logger"></param>
-        public TaxonListsHarvestJob(
-            ITaxonListHarvester taxonListHarvester,
-            IHarvestInfoRepository harvestInfoRepository,
-            ILogger<TaxonListsHarvestJob> logger)
-        {
-            _taxonListHarvester = taxonListHarvester ?? throw new ArgumentNullException(nameof(taxonListHarvester));
-            _harvestInfoRepository =
-                harvestInfoRepository ?? throw new ArgumentNullException(nameof(harvestInfoRepository));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        }
+    /// <inheritdoc />
+    public async Task<bool> RunHarvestTaxonListsAsync()
+    {
+        _logger.LogInformation("Start harvest taxon lists job");
 
-        /// <inheritdoc />
-        public async Task<bool> RunHarvestTaxonListsAsync()
-        {
-            _logger.LogInformation("Start harvest taxon lists job");
+        var result = await _taxonListHarvester.HarvestTaxonListsAsync();
 
-            var result = await _taxonListHarvester.HarvestTaxonListsAsync();
+        _logger.LogInformation($"End harvest taxon lists job. Result: {result.Status == RunStatus.Success}");
 
-            _logger.LogInformation($"End harvest taxon lists job. Result: {result.Status == RunStatus.Success}");
+        // Save harvest info
+        await _harvestInfoRepository.AddOrUpdateAsync(result);
 
-            // Save harvest info
-            await _harvestInfoRepository.AddOrUpdateAsync(result);
-
-            return result.Status == RunStatus.Success && result.Count > 0
-                ? true
-                : throw new Exception("Harvest taxon lists job failed");
-        }
+        return result.Status == RunStatus.Success && result.Count > 0
+            ? true
+            : throw new Exception("Harvest taxon lists job failed");
     }
 }

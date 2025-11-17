@@ -1,13 +1,12 @@
-﻿namespace SOS.Lib.Enums.VocabularyValues
+﻿namespace SOS.Lib.Enums.VocabularyValues;
+
+/// <summary>
+///     Enumeration of Organization.
+/// </summary>
+public enum OrganizationId
 {
     /// <summary>
-    ///     Enumeration of Organization.
+    ///     ArtDatabanken.
     /// </summary>
-    public enum OrganizationId
-    {
-        /// <summary>
-        ///     ArtDatabanken.
-        /// </summary>
-        ArtDatabanken = 165
-    }
+    ArtDatabanken = 165
 }

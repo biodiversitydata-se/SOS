@@ -1,18 +1,17 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SOS.Lib.Enums;
 
-namespace SOS.ElasticSearch.Proxy.Controllers.Interfaces
+namespace SOS.ElasticSearch.Proxy.Controllers.Interfaces;
+
+/// <summary>
+///     Caches controller interface
+/// </summary>
+public interface ICachesController
 {
     /// <summary>
-    ///     Caches controller interface
+    /// Clear a cache
     /// </summary>
-    public interface ICachesController
-    {
-        /// <summary>
-        /// Clear a cache
-        /// </summary>
-        /// <param name="cache"></param>
-        /// <returns></returns>
-        Task<IActionResult> DeleteCache(Cache cache);
-    }
+    /// <param name="cache"></param>
+    /// <returns></returns>
+    Task<IActionResult> DeleteCache(Cache cache);
 }

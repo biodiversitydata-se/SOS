@@ -1,22 +1,21 @@
 ﻿using System.Runtime.Serialization;
 
-namespace SOS.Shared.Api.Dtos.DataStewardship.Enums
+namespace SOS.Shared.Api.Dtos.DataStewardship.Enums;
+
+/// <summary>
+/// json or csv
+/// </summary>
+/// <value>json or csv</value>        
+public enum DsExportMode
 {
     /// <summary>
-    /// json or csv
+    /// Enum JsonEnum for json
     /// </summary>
-    /// <value>json or csv</value>        
-    public enum DsExportMode
-    {
-        /// <summary>
-        /// Enum JsonEnum for json
-        /// </summary>
-        [EnumMember(Value = "json")]
-        Json = 0,
-        /// <summary>
-        /// Enum CsvEnum for csv
-        /// </summary>
-        [EnumMember(Value = "csv")]
-        Csv = 1
-    }
+    [EnumMember(Value = "json")]
+    Json = 0,
+    /// <summary>
+    /// Enum CsvEnum for csv
+    /// </summary>
+    [EnumMember(Value = "csv")]
+    Csv = 1
 }

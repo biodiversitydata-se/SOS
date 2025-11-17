@@ -12,70 +12,69 @@ using SOS.Lib.Models.Verbatim.Nors;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
 
-namespace SOS.Harvest.Processors.Nors
+namespace SOS.Harvest.Processors.Nors;
+
+/// <summary>
+///     Process factory class
+/// </summary>
+public class NorsObservationProcessor :
+    ObservationProcessorBase<NorsObservationProcessor, NorsObservationVerbatim, INorsObservationVerbatimRepository>,
+    INorsObservationProcessor
 {
-    /// <summary>
-    ///     Process factory class
-    /// </summary>
-    public class NorsObservationProcessor :
-        ObservationProcessorBase<NorsObservationProcessor, NorsObservationVerbatim, INorsObservationVerbatimRepository>,
-        INorsObservationProcessor
+    private readonly IAreaHelper _areaHelper;
+    private readonly INorsObservationVerbatimRepository _norsObservationVerbatimRepository;
+
+    /// <inheritdoc />
+    protected override async Task<(int publicCount, int protectedCount, int failedCount)> ProcessObservationsAsync(
+        DataProvider dataProvider,
+        IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
+        IDictionary<VocabularyId, IDictionary<object, int>> dwcaVocabularyById,
+        JobRunModes mode,
+        IJobCancellationToken cancellationToken)
     {
-        private readonly IAreaHelper _areaHelper;
-        private readonly INorsObservationVerbatimRepository _norsObservationVerbatimRepository;
+        var observationFactory = new NorsObservationFactory(dataProvider, taxa, dwcaVocabularyById, _areaHelper, TimeManager, ProcessConfiguration);
 
-        /// <inheritdoc />
-        protected override async Task<(int publicCount, int protectedCount, int failedCount)> ProcessObservationsAsync(
-            DataProvider dataProvider,
-            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
-            IDictionary<VocabularyId, IDictionary<object, int>> dwcaVocabularyById,
-            JobRunModes mode,
-            IJobCancellationToken cancellationToken)
-        {
-            var observationFactory = new NorsObservationFactory(dataProvider, taxa, dwcaVocabularyById, _areaHelper, TimeManager, ProcessConfiguration);
-
-            return await base.ProcessObservationsAsync(
-                dataProvider,
-                mode,
-                observationFactory,
-                _norsObservationVerbatimRepository,
-                cancellationToken);
-        }
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="norsObservationVerbatimRepository"></param>
-        /// <param name="areaHelper"></param>
-        /// <param name="processedObservationRepository"></param>
-        /// <param name="vocabularyValueResolver"></param>
-        /// <param name="dwcArchiveFileWriterCoordinator"></param>
-        /// <param name="processManager"></param>
-        /// <param name="validationManager"></param>
-        /// <param name="diffusionManager"></param>
-        /// <param name="processTimeManager"></param>
-        /// <param name="processConfiguration"></param>
-        /// <param name="logger"></param>
-        /// <exception cref="ArgumentNullException"></exception>
-        public NorsObservationProcessor(INorsObservationVerbatimRepository norsObservationVerbatimRepository,
-            IAreaHelper areaHelper,
-            IProcessedObservationCoreRepository processedObservationRepository,
-            IVocabularyValueResolver vocabularyValueResolver,
-            IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
-            IProcessManager processManager,
-            IValidationManager validationManager,
-            IDiffusionManager diffusionManager,
-            IProcessTimeManager processTimeManager,
-            ProcessConfiguration processConfiguration,
-            ILogger<NorsObservationProcessor> logger) :
-            base(processedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, processManager, validationManager, diffusionManager, processTimeManager, null, processConfiguration, logger)
-        {
-            _norsObservationVerbatimRepository = norsObservationVerbatimRepository ??
-                                                 throw new ArgumentNullException(
-                                                     nameof(norsObservationVerbatimRepository));
-            _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
-        }
-
-        public override DataProviderType Type => DataProviderType.NorsObservations;
+        return await base.ProcessObservationsAsync(
+            dataProvider,
+            mode,
+            observationFactory,
+            _norsObservationVerbatimRepository,
+            cancellationToken);
     }
+
+    /// <summary>
+    /// Constructor
+    /// </summary>
+    /// <param name="norsObservationVerbatimRepository"></param>
+    /// <param name="areaHelper"></param>
+    /// <param name="processedObservationRepository"></param>
+    /// <param name="vocabularyValueResolver"></param>
+    /// <param name="dwcArchiveFileWriterCoordinator"></param>
+    /// <param name="processManager"></param>
+    /// <param name="validationManager"></param>
+    /// <param name="diffusionManager"></param>
+    /// <param name="processTimeManager"></param>
+    /// <param name="processConfiguration"></param>
+    /// <param name="logger"></param>
+    /// <exception cref="ArgumentNullException"></exception>
+    public NorsObservationProcessor(INorsObservationVerbatimRepository norsObservationVerbatimRepository,
+        IAreaHelper areaHelper,
+        IProcessedObservationCoreRepository processedObservationRepository,
+        IVocabularyValueResolver vocabularyValueResolver,
+        IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
+        IProcessManager processManager,
+        IValidationManager validationManager,
+        IDiffusionManager diffusionManager,
+        IProcessTimeManager processTimeManager,
+        ProcessConfiguration processConfiguration,
+        ILogger<NorsObservationProcessor> logger) :
+        base(processedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, processManager, validationManager, diffusionManager, processTimeManager, null, processConfiguration, logger)
+    {
+        _norsObservationVerbatimRepository = norsObservationVerbatimRepository ??
+                                             throw new ArgumentNullException(
+                                                 nameof(norsObservationVerbatimRepository));
+        _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
+    }
+
+    public override DataProviderType Type => DataProviderType.NorsObservations;
 }

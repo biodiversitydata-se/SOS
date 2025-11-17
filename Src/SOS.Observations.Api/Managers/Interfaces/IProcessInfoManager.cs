@@ -1,17 +1,16 @@
 ﻿using System.Threading.Tasks;
 using SOS.Shared.Api.Dtos;
 
-namespace SOS.Observations.Api.Managers.Interfaces
+namespace SOS.Observations.Api.Managers.Interfaces;
+
+/// <summary>
+///     Process information manager
+/// </summary>
+public interface IProcessInfoManager
 {
     /// <summary>
-    ///     Process information manager
+    ///     Get process information
     /// </summary>
-    public interface IProcessInfoManager
-    {
-        /// <summary>
-        ///     Get process information
-        /// </summary>
-        /// <returns></returns>
-        Task<ProcessInfoDto> GetProcessInfoAsync(string id);
-    }
+    /// <returns></returns>
+    Task<ProcessInfoDto> GetProcessInfoAsync(string id);
 }

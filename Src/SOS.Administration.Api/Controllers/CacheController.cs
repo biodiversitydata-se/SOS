@@ -10,48 +10,47 @@ using System;
 using System.Net;
 using System.Threading.Tasks;
 
-namespace SOS.Administration.Api.Controllers
+namespace SOS.Administration.Api.Controllers;
+
+/// <summary>
+///     Import job controller
+/// </summary>
+[ApiController]
+[Route("[controller]")]
+public class CachesController : ControllerBase, ICachesController
 {
+    private readonly ICacheManager _cacheManager;
+    private readonly ILogger<CachesController> _logger;
+
     /// <summary>
-    ///     Import job controller
+    /// Constructor
     /// </summary>
-    [ApiController]
-    [Route("[controller]")]
-    public class CachesController : ControllerBase, ICachesController
+    /// <param name="cacheManager"></param>
+    /// <param name="logger"></param>
+    public CachesController(ICacheManager cacheManager, ILogger<CachesController> logger)
     {
-        private readonly ICacheManager _cacheManager;
-        private readonly ILogger<CachesController> _logger;
+        _cacheManager = cacheManager ?? throw new ArgumentNullException(nameof(cacheManager));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="cacheManager"></param>
-        /// <param name="logger"></param>
-        public CachesController(ICacheManager cacheManager, ILogger<CachesController> logger)
-        {
-            _cacheManager = cacheManager ?? throw new ArgumentNullException(nameof(cacheManager));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        }
-
-        /// <inheritdoc />
-        [HttpDelete("{cache}")]
-        // [ProducesResponseType(typeof(bool), (int)HttpStatusCode.OK)]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> ClearAsync([FromRoute] Cache cache)
-        {
-            LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
-            return new OkObjectResult("THIS ENDPOINT IS TEMPORARILY DISABLED");
-            // try
-            // {
-            //     BackgroundJob.Enqueue<IClearCacheJob>(job => job.RunAsync(new[] { cache }));
-            //     return new OkObjectResult(await _cacheManager.ClearAsync(cache));
-            // }
-            // catch (Exception e)
-            // {
-            //     _logger.LogError(e, $"Failed to clear {cache} cache");
-            //     return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
-            // }
-        }
+    /// <inheritdoc />
+    [HttpDelete("{cache}")]
+    // [ProducesResponseType(typeof(bool), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+    public async Task<IActionResult> ClearAsync([FromRoute] Cache cache)
+    {
+        LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
+        return new OkObjectResult("THIS ENDPOINT IS TEMPORARILY DISABLED");
+        // try
+        // {
+        //     BackgroundJob.Enqueue<IClearCacheJob>(job => job.RunAsync(new[] { cache }));
+        //     return new OkObjectResult(await _cacheManager.ClearAsync(cache));
+        // }
+        // catch (Exception e)
+        // {
+        //     _logger.LogError(e, $"Failed to clear {cache} cache");
+        //     return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+        // }
     }
 }

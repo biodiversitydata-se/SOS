@@ -7,137 +7,136 @@ using SOS.Process.UnitTests.TestHelpers;
 using System.Collections.Generic;
 using Xunit;
 
-namespace SOS.Process.UnitTests.Processors.Artportalen
+namespace SOS.Process.UnitTests.Processors.Artportalen;
+
+[CollectionDefinition("ArtportalenObservationFactory collection")]
+public class ArtportalenVocabularyMappingTests : IClassFixture<ArtportalenObservationFactoryFixture>
 {
-    [CollectionDefinition("ArtportalenObservationFactory collection")]
-    public class ArtportalenVocabularyMappingTests : IClassFixture<ArtportalenObservationFactoryFixture>
+    private readonly ArtportalenObservationFactoryFixture _fixture;
+
+    public ArtportalenVocabularyMappingTests(ArtportalenObservationFactoryFixture fixture)
     {
-        private readonly ArtportalenObservationFactoryFixture _fixture;
+        _fixture = fixture;
+    }
 
-        public ArtportalenVocabularyMappingTests(ArtportalenObservationFactoryFixture fixture)
+    [Fact]
+    public void Get_ValidationStatus_that_exists_in_vocabulary()
+    {
+        //-----------------------------------------------------------------------------------------------------------
+        // Arrange
+        //-----------------------------------------------------------------------------------------------------------
+        var activity = new Metadata<int>((int)ValidationStatusId.DialogueWithReporter);
+
+        //-----------------------------------------------------------------------------------------------------------
+        // Act
+        //-----------------------------------------------------------------------------------------------------------
+        var result = _fixture.ArtportalenObservationFactory.GetSosIdFromMetadata(activity, VocabularyId.VerificationStatus);
+
+        //-----------------------------------------------------------------------------------------------------------
+        // Assert
+        //-----------------------------------------------------------------------------------------------------------
+        result.Id.Should().Be((int)ValidationStatusId.DialogueWithReporter);
+    }
+
+    [Fact]
+    public void Get_organization_that_doesnt_exist_in_vocabulary()
+    {
+        //-----------------------------------------------------------------------------------------------------------
+        // Arrange
+        //-----------------------------------------------------------------------------------------------------------
+        var ownerOrganization = new Metadata<int>(-1)
         {
-            _fixture = fixture;
-        }
-
-        [Fact]
-        public void Get_ValidationStatus_that_exists_in_vocabulary()
-        {
-            //-----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            var activity = new Metadata<int>((int)ValidationStatusId.DialogueWithReporter);
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var result = _fixture.ArtportalenObservationFactory.GetSosIdFromMetadata(activity, VocabularyId.VerificationStatus);
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-            result.Id.Should().Be((int)ValidationStatusId.DialogueWithReporter);
-        }
-
-        [Fact]
-        public void Get_organization_that_doesnt_exist_in_vocabulary()
-        {
-            //-----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            var ownerOrganization = new Metadata<int>(-1)
+            Translations = new List<MetadataTranslation>
             {
-                Translations = new List<MetadataTranslation>
-                {
-                    new MetadataTranslation {Culture = Cultures.sv_SE, Value = "Test"}
-                }
-            };
+                new MetadataTranslation {Culture = Cultures.sv_SE, Value = "Test"}
+            }
+        };
 
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var result = _fixture.ArtportalenObservationFactory.GetSosIdFromMetadata(ownerOrganization, VocabularyId.Institution);
+        //-----------------------------------------------------------------------------------------------------------
+        // Act
+        //-----------------------------------------------------------------------------------------------------------
+        var result = _fixture.ArtportalenObservationFactory.GetSosIdFromMetadata(ownerOrganization, VocabularyId.Institution);
 
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-            result.Id.Should().Be(VocabularyConstants.NoMappingFoundCustomValueIsUsedId);
-            result.Value.Should().Be("Test");
-        }
+        //-----------------------------------------------------------------------------------------------------------
+        // Assert
+        //-----------------------------------------------------------------------------------------------------------
+        result.Id.Should().Be(VocabularyConstants.NoMappingFoundCustomValueIsUsedId);
+        result.Value.Should().Be("Test");
+    }
 
-        [Fact]
-        public void Get_ReproductiveCondition_that_exists_in_vocabulary()
-        {
-            //-----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            var activity = new Metadata<int>((int)ActivityId.BroodPatch);
+    [Fact]
+    public void Get_ReproductiveCondition_that_exists_in_vocabulary()
+    {
+        //-----------------------------------------------------------------------------------------------------------
+        // Arrange
+        //-----------------------------------------------------------------------------------------------------------
+        var activity = new Metadata<int>((int)ActivityId.BroodPatch);
 
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var result = _fixture.ArtportalenObservationFactory.GetSosIdFromMetadata(activity, VocabularyId.ReproductiveCondition);
+        //-----------------------------------------------------------------------------------------------------------
+        // Act
+        //-----------------------------------------------------------------------------------------------------------
+        var result = _fixture.ArtportalenObservationFactory.GetSosIdFromMetadata(activity, VocabularyId.ReproductiveCondition);
 
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-            result.Id.Should().Be((int)ReproductiveConditionId.BroodPatch);
-        }
+        //-----------------------------------------------------------------------------------------------------------
+        // Assert
+        //-----------------------------------------------------------------------------------------------------------
+        result.Id.Should().Be((int)ReproductiveConditionId.BroodPatch);
+    }
 
-        [Fact]
-        public void Get_ReproductiveCondition_that_doesnt_exists_in_vocabulary()
-        {
-            //-----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            var activity = new Metadata<int>((int)ActivityId.NestBuilding);
+    [Fact]
+    public void Get_ReproductiveCondition_that_doesnt_exists_in_vocabulary()
+    {
+        //-----------------------------------------------------------------------------------------------------------
+        // Arrange
+        //-----------------------------------------------------------------------------------------------------------
+        var activity = new Metadata<int>((int)ActivityId.NestBuilding);
 
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var result = _fixture.ArtportalenObservationFactory.GetSosIdFromMetadata(activity, VocabularyId.ReproductiveCondition, null, true);
+        //-----------------------------------------------------------------------------------------------------------
+        // Act
+        //-----------------------------------------------------------------------------------------------------------
+        var result = _fixture.ArtportalenObservationFactory.GetSosIdFromMetadata(activity, VocabularyId.ReproductiveCondition, null, true);
 
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-            result.Should().Be(null);
-        }
+        //-----------------------------------------------------------------------------------------------------------
+        // Assert
+        //-----------------------------------------------------------------------------------------------------------
+        result.Should().Be(null);
+    }
 
-        [Fact]
-        public void Get_Behavior_that_exists_in_vocabulary()
-        {
-            //-----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            var activity = new Metadata<int>((int)ActivityId.DisplayOrSong);
+    [Fact]
+    public void Get_Behavior_that_exists_in_vocabulary()
+    {
+        //-----------------------------------------------------------------------------------------------------------
+        // Arrange
+        //-----------------------------------------------------------------------------------------------------------
+        var activity = new Metadata<int>((int)ActivityId.DisplayOrSong);
 
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var result = _fixture.ArtportalenObservationFactory.GetSosIdFromMetadata(activity, VocabularyId.Behavior);
+        //-----------------------------------------------------------------------------------------------------------
+        // Act
+        //-----------------------------------------------------------------------------------------------------------
+        var result = _fixture.ArtportalenObservationFactory.GetSosIdFromMetadata(activity, VocabularyId.Behavior);
 
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-            result.Id.Should().Be((int)BehaviorId.DisplayOrSong);
-        }
+        //-----------------------------------------------------------------------------------------------------------
+        // Assert
+        //-----------------------------------------------------------------------------------------------------------
+        result.Id.Should().Be((int)BehaviorId.DisplayOrSong);
+    }
 
-        [Fact]
-        public void Get_Behavior_that_doesnt_exists_in_vocabulary()
-        {
-            //-----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            var activity = new Metadata<int>((int)ActivityId.BroodPatch);
+    [Fact]
+    public void Get_Behavior_that_doesnt_exists_in_vocabulary()
+    {
+        //-----------------------------------------------------------------------------------------------------------
+        // Arrange
+        //-----------------------------------------------------------------------------------------------------------
+        var activity = new Metadata<int>((int)ActivityId.BroodPatch);
 
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var result = _fixture.ArtportalenObservationFactory.GetSosIdFromMetadata(activity, VocabularyId.Behavior, null, true);
+        //-----------------------------------------------------------------------------------------------------------
+        // Act
+        //-----------------------------------------------------------------------------------------------------------
+        var result = _fixture.ArtportalenObservationFactory.GetSosIdFromMetadata(activity, VocabularyId.Behavior, null, true);
 
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-            result.Should().Be(null);
-        }
+        //-----------------------------------------------------------------------------------------------------------
+        // Assert
+        //-----------------------------------------------------------------------------------------------------------
+        result.Should().Be(null);
     }
 }

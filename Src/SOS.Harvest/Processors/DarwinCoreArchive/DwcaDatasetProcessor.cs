@@ -15,206 +15,205 @@ using SOS.Lib.Repositories.Verbatim;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
 using System.Collections.Concurrent;
 
-namespace SOS.Harvest.Processors.DarwinCoreArchive
+namespace SOS.Harvest.Processors.DarwinCoreArchive;
+
+/// <summary>
+///     DwC-A dataset processor.
+/// </summary>
+public class DwcaDatasetProcessor : DatasetProcessorBase<DwcaDatasetProcessor, DwcVerbatimDataset, IVerbatimRepositoryBase<DwcVerbatimDataset, int>>,
+    IDwcaDatasetProcessor
 {
+    private readonly IVerbatimClient _verbatimClient;
+    private readonly IEventRepository _eventRepository;
+
+    public override DataProviderType Type => DataProviderType.DwcA;
+
+
     /// <summary>
-    ///     DwC-A dataset processor.
+    /// Constructor
     /// </summary>
-    public class DwcaDatasetProcessor : DatasetProcessorBase<DwcaDatasetProcessor, DwcVerbatimDataset, IVerbatimRepositoryBase<DwcVerbatimDataset, int>>,
-        IDwcaDatasetProcessor
+    /// <param name="verbatimClient"></param>
+    /// <param name="processedDatasetsRepository"></param>
+    /// <param name="processManager"></param>
+    /// <param name="processTimeManager"></param>        
+    /// <param name="logger"></param>
+    /// <exception cref="ArgumentNullException"></exception>
+    public DwcaDatasetProcessor(
+        IVerbatimClient verbatimClient,
+        IEventRepository observationEventRepository,
+        IDatasetRepository processedDatasetsRepository,
+        IProcessManager processManager,
+        IProcessTimeManager processTimeManager,
+        ProcessConfiguration processConfiguration,
+        ILogger<DwcaDatasetProcessor> logger) :
+            base(processedDatasetsRepository, processManager, processTimeManager, processConfiguration, logger)
     {
-        private readonly IVerbatimClient _verbatimClient;
-        private readonly IEventRepository _eventRepository;
+        _verbatimClient = verbatimClient ?? throw new ArgumentNullException(nameof(verbatimClient));
+        _eventRepository = observationEventRepository ?? throw new ArgumentNullException(nameof(observationEventRepository));
+    }
 
-        public override DataProviderType Type => DataProviderType.DwcA;
+    /// <inheritdoc />
+    protected override async Task<int> ProcessDatasetsAsync(
+        DataProvider dataProvider,
+        IJobCancellationToken cancellationToken)
+    {
+        using var dwcCollectionRepository = new DwcCollectionRepository(
+            dataProvider,
+            _verbatimClient,
+            Logger);
 
+        var datasetFactory = new DwcaDatasetFactory(dataProvider, TimeManager, ProcessConfiguration);
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="verbatimClient"></param>
-        /// <param name="processedDatasetsRepository"></param>
-        /// <param name="processManager"></param>
-        /// <param name="processTimeManager"></param>        
-        /// <param name="logger"></param>
-        /// <exception cref="ArgumentNullException"></exception>
-        public DwcaDatasetProcessor(
-            IVerbatimClient verbatimClient,
-            IEventRepository observationEventRepository,
-            IDatasetRepository processedDatasetsRepository,
-            IProcessManager processManager,
-            IProcessTimeManager processTimeManager,
-            ProcessConfiguration processConfiguration,
-            ILogger<DwcaDatasetProcessor> logger) :
-                base(processedDatasetsRepository, processManager, processTimeManager, processConfiguration, logger)
+        return await base.ProcessDatasetsAsync(
+            dataProvider,
+            datasetFactory,
+            dwcCollectionRepository.DatasetRepository,
+            cancellationToken);
+    }
+
+    protected override async Task<int> ProcessBatchAsync(
+        DataProvider dataProvider,
+        int startId,
+        int endId, IDatasetFactory<DwcVerbatimDataset> datasetFactory,
+        IVerbatimRepositoryBase<DwcVerbatimDataset, int> datasetVerbatimRepository,
+        IJobCancellationToken cancellationToken)
+    {
+        try
         {
-            _verbatimClient = verbatimClient ?? throw new ArgumentNullException(nameof(verbatimClient));
-            _eventRepository = observationEventRepository ?? throw new ArgumentNullException(nameof(observationEventRepository));
-        }
+            cancellationToken?.ThrowIfCancellationRequested();
+            Logger.LogDebug("Datasets - Start fetching {@dataProvider} batch ({@batchStartId}-{@batchEndId})", dataProvider.Identifier, startId, endId);
+            var datasetsBatch = await datasetVerbatimRepository.GetBatchAsync(startId, endId);
+            Logger.LogDebug("Datasets - Finish fetching {@dataProvider} batch ({@batchStartId}-{@batchEndId})", dataProvider.Identifier, startId, endId);
 
-        /// <inheritdoc />
-        protected override async Task<int> ProcessDatasetsAsync(
-            DataProvider dataProvider,
-            IJobCancellationToken cancellationToken)
-        {
-            using var dwcCollectionRepository = new DwcCollectionRepository(
-                dataProvider,
-                _verbatimClient,
-                Logger);
-
-            var datasetFactory = new DwcaDatasetFactory(dataProvider, TimeManager, ProcessConfiguration);
-
-            return await base.ProcessDatasetsAsync(
-                dataProvider,
-                datasetFactory,
-                dwcCollectionRepository.DatasetRepository,
-                cancellationToken);
-        }
-
-        protected override async Task<int> ProcessBatchAsync(
-            DataProvider dataProvider,
-            int startId,
-            int endId, IDatasetFactory<DwcVerbatimDataset> datasetFactory,
-            IVerbatimRepositoryBase<DwcVerbatimDataset, int> datasetVerbatimRepository,
-            IJobCancellationToken cancellationToken)
-        {
-            try
+            if (!datasetsBatch?.Any() ?? true)
             {
-                cancellationToken?.ThrowIfCancellationRequested();
-                Logger.LogDebug("Datasets - Start fetching {@dataProvider} batch ({@batchStartId}-{@batchEndId})", dataProvider.Identifier, startId, endId);
-                var datasetsBatch = await datasetVerbatimRepository.GetBatchAsync(startId, endId);
-                Logger.LogDebug("Datasets - Finish fetching {@dataProvider} batch ({@batchStartId}-{@batchEndId})", dataProvider.Identifier, startId, endId);
+                return 0;
+            }
 
-                if (!datasetsBatch?.Any() ?? true)
+            Logger.LogDebug("Dataset - Start processing {@dataProvider} batch ({@batchStartId}-{@batchEndId})", dataProvider.Identifier, startId, endId);
+            var datasets = new ConcurrentDictionary<string, Dataset>();
+
+            foreach (var verbatimDataset in datasetsBatch!)
+            {
+                var dataset = datasetFactory.CreateProcessedDataset(verbatimDataset);
+                CheckData(verbatimDataset, dataset, dataProvider);
+                if (dataset == null)
                 {
-                    return 0;
+                    continue;
                 }
 
-                Logger.LogDebug("Dataset - Start processing {@dataProvider} batch ({@batchStartId}-{@batchEndId})", dataProvider.Identifier, startId, endId);
-                var datasets = new ConcurrentDictionary<string, Dataset>();
+                // Add dataset
+                datasets.TryAdd(dataset.Identifier.ToString(), dataset);
+            }
 
-                foreach (var verbatimDataset in datasetsBatch!)
-                {
-                    var dataset = datasetFactory.CreateProcessedDataset(verbatimDataset);
-                    CheckData(verbatimDataset, dataset, dataProvider);
-                    if (dataset == null)
-                    {
-                        continue;
-                    }
-
-                    // Add dataset
-                    datasets.TryAdd(dataset.Identifier.ToString(), dataset);
-                }
-
-                await UpdateDatasetEventsAsync(datasets, dataProvider);
-                Logger.LogDebug("Dataset - Finish processing {@dataProvider} batch ({@batchStartId}-{@batchEndId})", dataProvider.Identifier, startId, endId);
-                return await ValidateAndStoreDatasets(dataProvider, datasets.Values, $"{startId}-{endId}");
-            }
-            catch (JobAbortedException)
-            {
-                // Throw cancelation again to let function above handle it
-                throw;
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e, "Datasets - Process {@dataProvider} datasets from id: {@batchStartId} to id: {@batchEndId} failed", dataProvider.Identifier, startId, endId);
-                throw;
-            }
-            finally
-            {
-                ProcessManager.Release($"{dataProvider}, Batch={startId}-{endId}");                
-            }
+            await UpdateDatasetEventsAsync(datasets, dataProvider);
+            Logger.LogDebug("Dataset - Finish processing {@dataProvider} batch ({@batchStartId}-{@batchEndId})", dataProvider.Identifier, startId, endId);
+            return await ValidateAndStoreDatasets(dataProvider, datasets.Values, $"{startId}-{endId}");
         }
-
-        private void CheckData(DwcVerbatimDataset verbatimDataset, Dataset? dataset, DataProvider dataProvider)
+        catch (JobAbortedException)
         {
-            try
+            // Throw cancelation again to let function above handle it
+            throw;
+        }
+        catch (Exception e)
+        {
+            Logger.LogError(e, "Datasets - Process {@dataProvider} datasets from id: {@batchStartId} to id: {@batchEndId} failed", dataProvider.Identifier, startId, endId);
+            throw;
+        }
+        finally
+        {
+            ProcessManager.Release($"{dataProvider}, Batch={startId}-{endId}");                
+        }
+    }
+
+    private void CheckData(DwcVerbatimDataset verbatimDataset, Dataset? dataset, DataProvider dataProvider)
+    {
+        try
+        {
+            if (verbatimDataset == null) Logger.LogWarning("verbatimDataset is null for {@dataProvider}", dataProvider.Identifier);
+            if (dataset == null) Logger.LogWarning("dataset is null for {@dataProvider}", dataProvider.Identifier);
+
+            if (verbatimDataset != null)
             {
-                if (verbatimDataset == null) Logger.LogWarning("verbatimDataset is null for {@dataProvider}", dataProvider.Identifier);
-                if (dataset == null) Logger.LogWarning("dataset is null for {@dataProvider}", dataProvider.Identifier);
-
-                if (verbatimDataset != null)
+                if (verbatimDataset.EventIds == null || verbatimDataset.EventIds.Count == 0)
                 {
-                    if (verbatimDataset.EventIds == null || verbatimDataset.EventIds.Count == 0)
-                    {
-                        Logger.LogWarning("verbatimDataset contains no eventIds for {@dataProvider}", dataProvider.Identifier);
-                    }
-                }
-
-                if (dataset != null)
-                {
-                    if (dataset.EventIds == null || dataset.EventIds.Count == 0)
-                    {
-                        Logger.LogWarning("dataset contains no eventIds for {@dataProvider}", dataProvider.Identifier);
-                    }
+                    Logger.LogWarning("verbatimDataset contains no eventIds for {@dataProvider}", dataProvider.Identifier);
                 }
             }
-            catch { }
-        }
 
-        private async Task UpdateDatasetEventsAsync(ConcurrentDictionary<string, Dataset> processedDatasets, DataProvider dataProvider)
-        {
-            var processedEventsByDatasetId = await GetDatasetEventsDictionaryAsync(processedDatasets, dataProvider);
-            foreach (var datasetPair in processedDatasets)
+            if (dataset != null)
             {
-                if (processedEventsByDatasetId.TryGetValue(datasetPair.Key.ToLower(), out var eventIds))
+                if (dataset.EventIds == null || dataset.EventIds.Count == 0)
                 {
-                    datasetPair.Value.VerbatimEventIds = datasetPair.Value.EventIds;
-                    datasetPair.Value.EventIds = eventIds;
+                    Logger.LogWarning("dataset contains no eventIds for {@dataProvider}", dataProvider.Identifier);
                 }
             }
         }
+        catch { }
+    }
 
-        private async Task<Dictionary<string, List<string>>> GetDatasetEventsDictionaryAsync(ConcurrentDictionary<string, Dataset> processedDatasets, DataProvider dataProvider)
+    private async Task UpdateDatasetEventsAsync(ConcurrentDictionary<string, Dataset> processedDatasets, DataProvider dataProvider)
+    {
+        var processedEventsByDatasetId = await GetDatasetEventsDictionaryAsync(processedDatasets, dataProvider);
+        foreach (var datasetPair in processedDatasets)
         {
-            var filter = new EventSearchFilter();
-            filter.DatasetIds = processedDatasets.Keys.ToList();
-            var datasetEventIds = await _eventRepository.GetAllAggregationItemsListAsync<string, string>(filter, "dataStewardship.datasetIdentifier", "eventId");
-            Dictionary<string, List<string>> eventIdsByDatasetId = datasetEventIds.ToDictionary(m => m.AggregationKey.ToLower(), m => m.Items);
-            DebugLogEventIdsByDatasetId(processedDatasets, eventIdsByDatasetId, _eventRepository.IndexName);
-
-            foreach (var datasetPair in processedDatasets)
+            if (processedEventsByDatasetId.TryGetValue(datasetPair.Key.ToLower(), out var eventIds))
             {
-                if (eventIdsByDatasetId.TryGetValue(datasetPair.Key.ToLower(), out var eventIds))
-                {
-                    if (eventIds != null && datasetPair.Value.EventIds != null && eventIds.Count != datasetPair.Value.EventIds.Count)
-                        Logger.LogInformation("Dataset.EventIds differs. #Verbatim={@verbatimEventIdsCount}, #Processed={@eventIdsCount}, DatasetId={@datasetId}, DataProvider={@dataProvider}", 
-                            datasetPair.Value.EventIds.Count, eventIds.Count, datasetPair.Key, dataProvider.Identifier);
-                    datasetPair.Value.EventIds = eventIds;
-                }
-                else
-                {
-                    eventIdsByDatasetId.Add(datasetPair.Key, new List<string>());
-                    if (datasetPair.Value.EventIds != null && datasetPair.Value.EventIds.Count > 0)
-                        Logger.LogInformation("Dataset.EventIds differs. #Verbatim={@verbatimEventIdsCount}, #Processed=0, DatasetId={@datasetId}, DataProvider={@dataProvider}", 
-                            datasetPair.Value.EventIds.Count, datasetPair.Key, dataProvider.Identifier);
-                    datasetPair.Value.EventIds = null;
-                }
+                datasetPair.Value.VerbatimEventIds = datasetPair.Value.EventIds;
+                datasetPair.Value.EventIds = eventIds;
             }
-
-            return eventIdsByDatasetId;
         }
+    }
 
-        private void DebugLogEventIdsByDatasetId(ConcurrentDictionary<string, Dataset> processedDatasets, Dictionary<string, List<string>> eventIdsByDatasetId, string indexName)
+    private async Task<Dictionary<string, List<string>>> GetDatasetEventsDictionaryAsync(ConcurrentDictionary<string, Dataset> processedDatasets, DataProvider dataProvider)
+    {
+        var filter = new EventSearchFilter();
+        filter.DatasetIds = processedDatasets.Keys.ToList();
+        var datasetEventIds = await _eventRepository.GetAllAggregationItemsListAsync<string, string>(filter, "dataStewardship.datasetIdentifier", "eventId");
+        Dictionary<string, List<string>> eventIdsByDatasetId = datasetEventIds.ToDictionary(m => m.AggregationKey.ToLower(), m => m.Items);
+        DebugLogEventIdsByDatasetId(processedDatasets, eventIdsByDatasetId, _eventRepository.IndexName);
+
+        foreach (var datasetPair in processedDatasets)
         {
-            Logger.LogDebug($"GetDatasetEventsDictionaryAsync() executed GetAllAggregationItemsListAsync() with the following parameters: IndexName={indexName}, DatasetIds filter: {string.Join(", ", processedDatasets.Keys.ToList())}");
-            if (eventIdsByDatasetId == null)
+            if (eventIdsByDatasetId.TryGetValue(datasetPair.Key.ToLower(), out var eventIds))
             {
-                Logger.LogWarning($"eventIdsByDatasetId is null");
+                if (eventIds != null && datasetPair.Value.EventIds != null && eventIds.Count != datasetPair.Value.EventIds.Count)
+                    Logger.LogInformation("Dataset.EventIds differs. #Verbatim={@verbatimEventIdsCount}, #Processed={@eventIdsCount}, DatasetId={@datasetId}, DataProvider={@dataProvider}", 
+                        datasetPair.Value.EventIds.Count, eventIds.Count, datasetPair.Key, dataProvider.Identifier);
+                datasetPair.Value.EventIds = eventIds;
             }
             else
             {
-                Logger.LogDebug("eventIdsByDatasetId have the following values:");
+                eventIdsByDatasetId.Add(datasetPair.Key, new List<string>());
+                if (datasetPair.Value.EventIds != null && datasetPair.Value.EventIds.Count > 0)
+                    Logger.LogInformation("Dataset.EventIds differs. #Verbatim={@verbatimEventIdsCount}, #Processed=0, DatasetId={@datasetId}, DataProvider={@dataProvider}", 
+                        datasetPair.Value.EventIds.Count, datasetPair.Key, dataProvider.Identifier);
+                datasetPair.Value.EventIds = null;
+            }
+        }
 
-                foreach (var pair in eventIdsByDatasetId)
+        return eventIdsByDatasetId;
+    }
+
+    private void DebugLogEventIdsByDatasetId(ConcurrentDictionary<string, Dataset> processedDatasets, Dictionary<string, List<string>> eventIdsByDatasetId, string indexName)
+    {
+        Logger.LogDebug($"GetDatasetEventsDictionaryAsync() executed GetAllAggregationItemsListAsync() with the following parameters: IndexName={indexName}, DatasetIds filter: {string.Join(", ", processedDatasets.Keys.ToList())}");
+        if (eventIdsByDatasetId == null)
+        {
+            Logger.LogWarning($"eventIdsByDatasetId is null");
+        }
+        else
+        {
+            Logger.LogDebug("eventIdsByDatasetId have the following values:");
+
+            foreach (var pair in eventIdsByDatasetId)
+            {
+                string strVal = "null";
+                if (pair.Value != null)
                 {
-                    string strVal = "null";
-                    if (pair.Value != null)
-                    {
-                        strVal = $"{pair.Value.Count} items";
-                    }
-                    Logger.LogDebug($"Key=\"{pair.Key}\", Value={strVal}");
+                    strVal = $"{pair.Value.Count} items";
                 }
+                Logger.LogDebug($"Key=\"{pair.Key}\", Value={strVal}");
             }
         }
     }

@@ -4,35 +4,34 @@ using Microsoft.ApplicationInsights.Extensibility;
 using System;
 using System.Linq;
 
-namespace SOS.Lib.ApplicationInsights
+namespace SOS.Lib.ApplicationInsights;
+
+public class IgnoreRequestPathsTelemetryProcessor : ITelemetryProcessor
 {
-    public class IgnoreRequestPathsTelemetryProcessor : ITelemetryProcessor
+    private readonly ITelemetryProcessor _next;
+    private readonly string[] _ignorePaths = { "swagger", ".", "healthz", "/metrics" };
+
+    /// <summary>
+    /// Constructor
+    /// </summary>
+    /// <param name="next"></param>
+    public IgnoreRequestPathsTelemetryProcessor(ITelemetryProcessor next)
     {
-        private readonly ITelemetryProcessor _next;
-        private readonly string[] _ignorePaths = { "swagger", ".", "healthz", "/metrics" };
+        _next = next;
+    }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="next"></param>
-        public IgnoreRequestPathsTelemetryProcessor(ITelemetryProcessor next)
+    public void Process(ITelemetry item)
+    {
+        var requestTelemetry = item as RequestTelemetry;
+
+        if (requestTelemetry != null)
         {
-            _next = next;
-        }
-
-        public void Process(ITelemetry item)
-        {
-            var requestTelemetry = item as RequestTelemetry;
-
-            if (requestTelemetry != null)
-            {
-                if (_ignorePaths.Any(ignorePath => requestTelemetry.Url.AbsolutePath.Contains(ignorePath, StringComparison.CurrentCultureIgnoreCase)))
-                { 
-                    return;
-                }
+            if (_ignorePaths.Any(ignorePath => requestTelemetry.Url.AbsolutePath.Contains(ignorePath, StringComparison.CurrentCultureIgnoreCase)))
+            { 
+                return;
             }
-
-            _next.Process(item);
         }
+
+        _next.Process(item);
     }
 }

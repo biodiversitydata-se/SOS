@@ -1,8 +1,7 @@
 ﻿using SOS.Lib.Models.Verbatim.Kul;
 
-namespace SOS.Lib.Repositories.Verbatim.Interfaces
+namespace SOS.Lib.Repositories.Verbatim.Interfaces;
+
+public interface IKulObservationVerbatimRepository : IVerbatimRepositoryBase<KulObservationVerbatim, int>
 {
-    public interface IKulObservationVerbatimRepository : IVerbatimRepositoryBase<KulObservationVerbatim, int>
-    {
-    }
 }

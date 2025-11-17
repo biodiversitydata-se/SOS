@@ -4,26 +4,26 @@ using SOS.Harvest.Repositories.Source.Artportalen.Interfaces;
 using SOS.Harvest.Services.Interfaces;
 using SOS.Lib.Enums;
 
-namespace SOS.Harvest.Repositories.Source.Artportalen
-{
-    public class MetadataRepository : BaseRepository<MetadataRepository>, IMetadataRepository
-    {
-        /// <summary>
-        ///     Constructor
-        /// </summary>
-        /// <param name="artportalenDataService"></param>
-        /// <param name="logger"></param>
-        public MetadataRepository(IArtportalenDataService artportalenDataService, ILogger<MetadataRepository> logger) :
-            base(artportalenDataService, logger)
-        {
-        }
+namespace SOS.Harvest.Repositories.Source.Artportalen;
 
-        /// <inheritdoc />
-        public async Task<IEnumerable<MetadataWithCategoryEntity<int>>> GetActivitiesAsync()
+public class MetadataRepository : BaseRepository<MetadataRepository>, IMetadataRepository
+{
+    /// <summary>
+    ///     Constructor
+    /// </summary>
+    /// <param name="artportalenDataService"></param>
+    /// <param name="logger"></param>
+    public MetadataRepository(IArtportalenDataService artportalenDataService, ILogger<MetadataRepository> logger) :
+        base(artportalenDataService, logger)
+    {
+    }
+
+    /// <inheritdoc />
+    public async Task<IEnumerable<MetadataWithCategoryEntity<int>>> GetActivitiesAsync()
+    {
+        try
         {
-            try
-            {
-                const string query = @"
+            const string query = @"
                 SELECT 
 	                a.Id, 
 	                t.Value AS Translation,
@@ -44,21 +44,21 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
 					a.Id,
 					gc.CultureCode";
 
-                return await QueryAsync<MetadataWithCategoryEntity<int>>(query);
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e, "Error getting activities");
-                throw;
-            }
+            return await QueryAsync<MetadataWithCategoryEntity<int>>(query);
         }
-
-        /// <inheritdoc />
-        public async Task<IEnumerable<MetadataEntity<int>>> GetBiotopesAsync()
+        catch (Exception e)
         {
-            try
-            {
-                const string query = @"
+            Logger.LogError(e, "Error getting activities");
+            throw;
+        }
+    }
+
+    /// <inheritdoc />
+    public async Task<IEnumerable<MetadataEntity<int>>> GetBiotopesAsync()
+    {
+        try
+        {
+            const string query = @"
                     SELECT 
 	                    b.Id, 
 	                    t.Value AS Translation,
@@ -74,21 +74,21 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
 						b.Id,
 						gc.CultureCode";
 
-                return await QueryAsync<MetadataEntity<int>>(query);
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e, "Error getting biotopes");
-                throw;
-            }
+            return await QueryAsync<MetadataEntity<int>>(query);
         }
-
-        /// <inheritdoc />
-        public async Task<IEnumerable<MetadataEntity<int>>> GetGendersAsync()
+        catch (Exception e)
         {
-            try
-            {
-                const string query = @"
+            Logger.LogError(e, "Error getting biotopes");
+            throw;
+        }
+    }
+
+    /// <inheritdoc />
+    public async Task<IEnumerable<MetadataEntity<int>>> GetGendersAsync()
+    {
+        try
+        {
+            const string query = @"
                     SELECT 
 	                    g.Id, 
 	                    t.Value AS Translation,
@@ -104,21 +104,21 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
 						g.Id,
 						gc.CultureCode";
 
-                return await QueryAsync<MetadataEntity<int>>(query);
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e, "Error getting genders");
-                throw;
-            }
+            return await QueryAsync<MetadataEntity<int>>(query);
         }
-
-        /// <inheritdoc />
-        public async Task<IEnumerable<MetadataEntity<int>>> GetOrganizationsAsync()
+        catch (Exception e)
         {
-            try
-            {
-                const string query = @"
+            Logger.LogError(e, "Error getting genders");
+            throw;
+        }
+    }
+
+    /// <inheritdoc />
+    public async Task<IEnumerable<MetadataEntity<int>>> GetOrganizationsAsync()
+    {
+        try
+        {
+            const string query = @"
                     SELECT 
 	                    Id,
 	                    Name AS Translation,
@@ -126,21 +126,21 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
                     FROM 
                       Organization";
 
-                return await QueryAsync<MetadataEntity<int>>(query);
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e, "Error getting organizations");
-                throw;
-            }
+            return await QueryAsync<MetadataEntity<int>>(query);
         }
-
-        /// <inheritdoc />
-        public async Task<IEnumerable<MetadataEntity<int>>> GetStagesAsync()
+        catch (Exception e)
         {
-            try
-            {
-                const string query = @"
+            Logger.LogError(e, "Error getting organizations");
+            throw;
+        }
+    }
+
+    /// <inheritdoc />
+    public async Task<IEnumerable<MetadataEntity<int>>> GetStagesAsync()
+    {
+        try
+        {
+            const string query = @"
                 SELECT 
 					s.Id, 
 					t.Value AS Translation,
@@ -156,21 +156,21 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
 					s.Id,
 					gc.CultureCode";
 
-                return await QueryAsync<MetadataEntity<int>>(query);
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e, "Error getting stages");
-                throw;
-            }
+            return await QueryAsync<MetadataEntity<int>>(query);
         }
-
-        /// <inheritdoc />
-        public async Task<IEnumerable<MetadataEntity<int>>> GetSubstratesAsync()
+        catch (Exception e)
         {
-            try
-            {
-                const string query = @"
+            Logger.LogError(e, "Error getting stages");
+            throw;
+        }
+    }
+
+    /// <inheritdoc />
+    public async Task<IEnumerable<MetadataEntity<int>>> GetSubstratesAsync()
+    {
+        try
+        {
+            const string query = @"
                     SELECT 
 	                    s.Id, 
 	                    t.Value AS Translation,
@@ -186,21 +186,21 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
 						s.Id,
 						gc.CultureCode";
 
-                return await QueryAsync<MetadataEntity<int>>(query);
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e, "Error getting substrates");
-                throw;
-            }
+            return await QueryAsync<MetadataEntity<int>>(query);
         }
-
-        /// <inheritdoc />
-        public async Task<IEnumerable<MetadataEntity<int>>> GetUnitsAsync()
+        catch (Exception e)
         {
-            try
-            {
-                const string query = @"
+            Logger.LogError(e, "Error getting substrates");
+            throw;
+        }
+    }
+
+    /// <inheritdoc />
+    public async Task<IEnumerable<MetadataEntity<int>>> GetUnitsAsync()
+    {
+        try
+        {
+            const string query = @"
                     SELECT 
 	                    u.Id, 
 	                    t.Value AS Translation,
@@ -216,21 +216,21 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
 						u.Id,
 						gc.CultureCode";
 
-                return await QueryAsync<MetadataEntity<int>>(query);
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e, "Error getting unite");
-                throw;
-            }
+            return await QueryAsync<MetadataEntity<int>>(query);
         }
-
-        /// <inheritdoc />
-        public async Task<IEnumerable<MetadataEntity<int>>> GetValidationStatusAsync()
+        catch (Exception e)
         {
-            try
-            {
-                const string query = @"
+            Logger.LogError(e, "Error getting unite");
+            throw;
+        }
+    }
+
+    /// <inheritdoc />
+    public async Task<IEnumerable<MetadataEntity<int>>> GetValidationStatusAsync()
+    {
+        try
+        {
+            const string query = @"
                     SELECT 
 	                    vs.Id, 
 	                    t.Value AS Translation,
@@ -246,21 +246,21 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
 						vs.Id,
 						gc.CultureCode";
 
-                return await QueryAsync<MetadataEntity<int>>(query);
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e, "Error getting validation status");
-                throw;
-            }
+            return await QueryAsync<MetadataEntity<int>>(query);
         }
-
-        /// <inheritdoc />
-        public async Task<IEnumerable<MetadataEntity<int>>> GetAreaTypesAsync()
+        catch (Exception e)
         {
-            try
-            {
-                const string query = @"
+            Logger.LogError(e, "Error getting validation status");
+            throw;
+        }
+    }
+
+    /// <inheritdoc />
+    public async Task<IEnumerable<MetadataEntity<int>>> GetAreaTypesAsync()
+    {
+        try
+        {
+            const string query = @"
                     SELECT 
                         Id,
                         Name AS Translation,
@@ -279,22 +279,22 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
                     WHERE 
                         CountryIsoCode = 752 AND Id IN @AreaTypes";
 
-                var areaTypes = (int[])Enum.GetValues(typeof(AreaType));
-                return await QueryAsync<MetadataEntity<int>>(query, new { AreaTypes = areaTypes });
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e, "Error getting area types status");
-                throw;
-            }
+            var areaTypes = (int[])Enum.GetValues(typeof(AreaType));
+            return await QueryAsync<MetadataEntity<int>>(query, new { AreaTypes = areaTypes });
         }
-
-        /// <inheritdoc />
-        public async Task<IEnumerable<MetadataEntity<int>>> GetDiscoveryMethodsAsync()
+        catch (Exception e)
         {
-            try
-            {
-                const string query = @"
+            Logger.LogError(e, "Error getting area types status");
+            throw;
+        }
+    }
+
+    /// <inheritdoc />
+    public async Task<IEnumerable<MetadataEntity<int>>> GetDiscoveryMethodsAsync()
+    {
+        try
+        {
+            const string query = @"
                     SELECT 
                         dm.Id, 
                         t.Value AS Translation,
@@ -310,21 +310,21 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
 	                    dm.Id,
 	                    gc.CultureCode";
 
-                return await QueryAsync<MetadataEntity<int>>(query);
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e, "Error getting discovery methods");
-                throw;
-            }
+            return await QueryAsync<MetadataEntity<int>>(query);
         }
-
-        /// <inheritdoc />
-        public async Task<IEnumerable<MetadataEntity<int>>> GetDeterminationMethodsAsync()
+        catch (Exception e)
         {
-            try
-            {
-                const string query = @"
+            Logger.LogError(e, "Error getting discovery methods");
+            throw;
+        }
+    }
+
+    /// <inheritdoc />
+    public async Task<IEnumerable<MetadataEntity<int>>> GetDeterminationMethodsAsync()
+    {
+        try
+        {
+            const string query = @"
                     SELECT 
                         dm.Id, 
                         t.Value AS Translation,
@@ -340,20 +340,20 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
 	                    dm.Id,
 	                    gc.CultureCode";
 
-                return await QueryAsync<MetadataEntity<int>>(query);
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e, "Error getting determination methods");
-                throw;
-            }
+            return await QueryAsync<MetadataEntity<int>>(query);
         }
-
-        public async Task<IEnumerable<MetadataEntity<string>>> GetResourcesAsync(string prefix)
+        catch (Exception e)
         {
-            try
-            {
-                string query = @$"
+            Logger.LogError(e, "Error getting determination methods");
+            throw;
+        }
+    }
+
+    public async Task<IEnumerable<MetadataEntity<string>>> GetResourcesAsync(string prefix)
+    {
+        try
+        {
+            string query = @$"
                     SELECT
                         r.Label AS Id,
                         t.Value AS Translation,
@@ -369,23 +369,23 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
 	                    r.Label,
 	                    gc.CultureCode";
 
-                return await QueryAsync<MetadataEntity<string>>(query);
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e, "Error getting resources");
-                throw;
-            }
+            return await QueryAsync<MetadataEntity<string>>(query);
         }
-
-
-
-        /// <inheritdoc />
-        public async Task<DateTime?> GetLastBackupDateAsync()
+        catch (Exception e)
         {
-            try
-            {
-                string query = @$"
+            Logger.LogError(e, "Error getting resources");
+            throw;
+        }
+    }
+
+
+
+    /// <inheritdoc />
+    public async Task<DateTime?> GetLastBackupDateAsync()
+    {
+        try
+        {
+            string query = @$"
                     SELECT
 	                    MAX(ISNULL(r.[restore_date], d.create_date))
                     FROM 
@@ -396,13 +396,12 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
                     GROUP BY         
 	                    r.destination_database_name";
 
-                return (await QueryAsync<DateTime?>(query)).FirstOrDefault();
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e, "Error getting latest backup date");
-                throw;
-            }
+            return (await QueryAsync<DateTime?>(query)).FirstOrDefault();
+        }
+        catch (Exception e)
+        {
+            Logger.LogError(e, "Error getting latest backup date");
+            throw;
         }
     }
 }

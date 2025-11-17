@@ -2,28 +2,27 @@
 using SOS.Lib.Enums;
 using System.Threading.Tasks;
 
-namespace SOS.Administration.Api.Controllers.Interfaces
+namespace SOS.Administration.Api.Controllers.Interfaces;
+
+/// <summary>
+///     Interface for vocabularies controller
+/// </summary>
+public interface IVocabulariesController
 {
     /// <summary>
-    ///     Interface for vocabularies controller
     /// </summary>
-    public interface IVocabulariesController
-    {
-        /// <summary>
-        /// </summary>
-        /// <returns></returns>
-        Task<IActionResult> CreateAllVocabulariesFilesAsync();
+    /// <returns></returns>
+    Task<IActionResult> CreateAllVocabulariesFilesAsync();
 
-        /// <summary>
-        /// </summary>
-        /// <param name="vocabularyId"></param>
-        /// <returns></returns>
-        Task<IActionResult> CreateSingleVocabularyFileAsync(VocabularyId vocabularyId);
+    /// <summary>
+    /// </summary>
+    /// <param name="vocabularyId"></param>
+    /// <returns></returns>
+    Task<IActionResult> CreateSingleVocabularyFileAsync(VocabularyId vocabularyId);
 
-        /// <summary>
-        ///     Run import vocabularies.
-        /// </summary>
-        /// <returns></returns>
-        IActionResult RunImportVocabulariesJob();
-    }
+    /// <summary>
+    ///     Run import vocabularies.
+    /// </summary>
+    /// <returns></returns>
+    IActionResult RunImportVocabulariesJob();
 }

@@ -3,25 +3,24 @@ using SOS.TestHelpers.Helpers;
 using System;
 using System.Collections.Generic;
 
-namespace SOS.Lib.UnitTests.TestHelpers.Fixtures
+namespace SOS.Lib.UnitTests.TestHelpers.Fixtures;
+
+/// <summary>
+///     Reads a file created by the MessagePack library, that contains only the necessary fields
+///     for creating a taxon tree. Fields: DyntaxaTaxonId, ParentId, SecondaryParentIds, ScientificName
+/// </summary>
+public class ProcessedBasicTaxaFixture : IDisposable
 {
-    /// <summary>
-    ///     Reads a file created by the MessagePack library, that contains only the necessary fields
-    ///     for creating a taxon tree. Fields: DyntaxaTaxonId, ParentId, SecondaryParentIds, ScientificName
-    /// </summary>
-    public class ProcessedBasicTaxaFixture : IDisposable
+    public ProcessedBasicTaxaFixture()
     {
-        public ProcessedBasicTaxaFixture()
-        {
-            Taxa = MessagePackHelper.CreateListFromMessagePackFile<IBasicTaxon>(
-                @"Resources/AllProcessedBasicTaxa.msgpck");
-        }
+        Taxa = MessagePackHelper.CreateListFromMessagePackFile<IBasicTaxon>(
+            @"Resources/AllProcessedBasicTaxa.msgpck");
+    }
 
-        public IEnumerable<IBasicTaxon> Taxa { get; private set; }
+    public IEnumerable<IBasicTaxon> Taxa { get; private set; }
 
-        public void Dispose()
-        {
-            Taxa = null;
-        }
+    public void Dispose()
+    {
+        Taxa = null;
     }
 }

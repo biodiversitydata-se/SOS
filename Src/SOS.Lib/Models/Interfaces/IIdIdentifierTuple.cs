@@ -1,11 +1,10 @@
-﻿namespace SOS.Lib.Models.Interfaces
+﻿namespace SOS.Lib.Models.Interfaces;
+
+/// <summary>
+///     Data provider id and identifier.
+/// </summary>
+public interface IIdIdentifierTuple
 {
-    /// <summary>
-    ///     Data provider id and identifier.
-    /// </summary>
-    public interface IIdIdentifierTuple
-    {
-        int Id { get; }
-        string Identifier { get; }
-    }
+    int Id { get; }
+    string Identifier { get; }
 }

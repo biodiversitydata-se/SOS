@@ -9,66 +9,65 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace SOS.Observations.Api.Repositories.Interfaces
+namespace SOS.Observations.Api.Repositories.Interfaces;
+
+/// <summary>
+/// </summary>
+public interface IProcessedTaxonRepository : IProcessRepositoryBase<Observation, string>
 {
+
+    Task<Result<IEnumerable<GeoGridTileTaxaCell>>> GetCompleteGeoTileTaxaAggregationAsync(
+        SearchFilter filter,
+        int zoom);
+
+    Task<Result<GeoGridTileTaxonPageResult>> GetPageGeoTileTaxaAggregationAsync(
+        SearchFilter filter,
+        int zoom,
+        string geoTilePage,
+        int? taxonIdPage);
+
     /// <summary>
+    /// Aggregate observations by taxon. Sort by observation count descending.
     /// </summary>
-    public interface IProcessedTaxonRepository : IProcessRepositoryBase<Observation, string>
-    {
+    /// <param name="filter"></param>
+    /// <param name="skip"></param>
+    /// <param name="take"></param>
+    /// <param name="sumUnderlyingTaxa"></param>
+    /// <returns></returns>
+    Task<Result<PagedResult<TaxonAggregationItem>>> GetTaxonAggregationAsync(
+        SearchFilter filter,
+        int? skip,
+        int? take,
+        bool sumUnderlyingTaxa = false);
 
-        Task<Result<IEnumerable<GeoGridTileTaxaCell>>> GetCompleteGeoTileTaxaAggregationAsync(
-            SearchFilter filter,
-            int zoom);
+    /// <summary>
+    /// Aggregate observations by taxon using approximate counting, i.e. Elasticsearch aggregation. Sort by observation count descending.
+    /// </summary>
+    /// <param name="filter"></param>
+    /// <param name="skip"></param>
+    /// <param name="take"></param>
+    /// <returns></returns>
+    Task<Result<PagedResult<TaxonAggregationItem>>> GetTaxonAggregationApproximateAsync(
+        SearchFilter filter,
+        int? skip,
+        int? take);
 
-        Task<Result<GeoGridTileTaxonPageResult>> GetPageGeoTileTaxaAggregationAsync(
-            SearchFilter filter,
-            int zoom,
-            string geoTilePage,
-            int? taxonIdPage);
+    Task<Result<List<int>>> GetObservedTaxaAsync(SearchFilter filter);        
 
-        /// <summary>
-        /// Aggregate observations by taxon. Sort by observation count descending.
-        /// </summary>
-        /// <param name="filter"></param>
-        /// <param name="skip"></param>
-        /// <param name="take"></param>
-        /// <param name="sumUnderlyingTaxa"></param>
-        /// <returns></returns>
-        Task<Result<PagedResult<TaxonAggregationItem>>> GetTaxonAggregationAsync(
-            SearchFilter filter,
-            int? skip,
-            int? take,
-            bool sumUnderlyingTaxa = false);
+    Task<Dictionary<int, TaxonAreaAggregation>> GetTaxonAreaAggregationAsync(SearchFilter filter, AreaTypeAggregate? areaType);
 
-        /// <summary>
-        /// Aggregate observations by taxon using approximate counting, i.e. Elasticsearch aggregation. Sort by observation count descending.
-        /// </summary>
-        /// <param name="filter"></param>
-        /// <param name="skip"></param>
-        /// <param name="take"></param>
-        /// <returns></returns>
-        Task<Result<PagedResult<TaxonAggregationItem>>> GetTaxonAggregationApproximateAsync(
-            SearchFilter filter,
-            int? skip,
-            int? take);
+    /// <summary>
+    /// Get taxon sum aggregation. Including underlying taxa and province count.
+    /// </summary>
+    /// <param name="filter"></param>
+    /// <returns></returns>
+    Task<ConcurrentDictionary<int, TaxonSumAggregationItem>> GetTaxonSumAggregationAsync(SearchFilter filter);
 
-        Task<Result<List<int>>> GetObservedTaxaAsync(SearchFilter filter);        
-
-        Task<Dictionary<int, TaxonAreaAggregation>> GetTaxonAreaAggregationAsync(SearchFilter filter, AreaTypeAggregate? areaType);
-
-        /// <summary>
-        /// Get taxon sum aggregation. Including underlying taxa and province count.
-        /// </summary>
-        /// <param name="filter"></param>
-        /// <returns></returns>
-        Task<ConcurrentDictionary<int, TaxonSumAggregationItem>> GetTaxonSumAggregationAsync(SearchFilter filter);
-
-        /// <summary>
-        /// Get indication if taxa exists in specified area
-        /// </summary>
-        /// <param name="filter"></param>
-        /// <returns></returns>
-        Task<IEnumerable<TaxonAggregationItem>> GetTaxonExistsIndicationAsync(
-            SearchFilter filter);
-    }
+    /// <summary>
+    /// Get indication if taxa exists in specified area
+    /// </summary>
+    /// <param name="filter"></param>
+    /// <returns></returns>
+    Task<IEnumerable<TaxonAggregationItem>> GetTaxonExistsIndicationAsync(
+        SearchFilter filter);
 }

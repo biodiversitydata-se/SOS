@@ -1,23 +1,22 @@
-﻿namespace SOS.Lib.Models.ApiManagement
+﻿namespace SOS.Lib.Models.ApiManagement;
+
+/// <summary>
+/// User info for API management user
+/// </summary>
+public class ApiManagementUser
 {
     /// <summary>
-    /// User info for API management user
+    /// User email
     /// </summary>
-    public class ApiManagementUser
-    {
-        /// <summary>
-        /// User email
-        /// </summary>
-        public string Email { get; set; }
+    public string Email { get; set; }
 
-        /// <summary>
-        /// User first name
-        /// </summary>
-        public string FirstName { get; set; }
+    /// <summary>
+    /// User first name
+    /// </summary>
+    public string FirstName { get; set; }
 
-        /// <summary>
-        /// User last name
-        /// </summary>
-        public string LastName { get; set; }
-    }
+    /// <summary>
+    /// User last name
+    /// </summary>
+    public string LastName { get; set; }
 }

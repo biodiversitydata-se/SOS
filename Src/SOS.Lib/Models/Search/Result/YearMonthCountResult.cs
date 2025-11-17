@@ -1,13 +1,12 @@
-﻿namespace SOS.Lib.Models.Search.Result
+﻿namespace SOS.Lib.Models.Search.Result;
+
+/// <summary>
+///     Result returned year month aggregation
+/// </summary>
+public class YearMonthCountResult : YearCountResult
 {
     /// <summary>
-    ///     Result returned year month aggregation
+    ///     Month
     /// </summary>
-    public class YearMonthCountResult : YearCountResult
-    {
-        /// <summary>
-        ///     Month
-        /// </summary>
-        public int Month { get; set; }
-    }
+    public int Month { get; set; }
 }

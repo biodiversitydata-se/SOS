@@ -1,18 +1,17 @@
-﻿namespace SOS.Lib.Models.Export
+﻿namespace SOS.Lib.Models.Export;
+
+/// <summary>
+/// File export result.
+/// </summary>
+public class FileExportResult
 {
     /// <summary>
-    /// File export result.
+    /// Number of observations in the file.
     /// </summary>
-    public class FileExportResult
-    {
-        /// <summary>
-        /// Number of observations in the file.
-        /// </summary>
-        public int NrObservations { get; set; }
+    public int NrObservations { get; set; }
 
-        /// <summary>
-        /// File path.
-        /// </summary>
-        public string FilePath { get; set; }
-    }
+    /// <summary>
+    /// File path.
+    /// </summary>
+    public string FilePath { get; set; }
 }

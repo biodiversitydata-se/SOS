@@ -5,75 +5,74 @@ using SOS.Harvest.Services.Interfaces;
 using SOS.Lib.Configuration.Import;
 using System.Data;
 
-namespace SOS.Harvest.Services
+namespace SOS.Harvest.Services;
+
+/// <summary>
+///     Artportalen data service
+/// </summary>
+public class ArtportalenDataService : IArtportalenDataService
 {
     /// <summary>
-    ///     Artportalen data service
+    /// Create new db connection
     /// </summary>
-    public class ArtportalenDataService : IArtportalenDataService
+    /// <param name="live"></param>
+    /// <returns></returns>
+    private IDbConnection Connection(bool live) => new SqlConnection(live ? Configuration.ConnectionStringLive : Configuration.ConnectionStringBackup);
+    private readonly ILogger<ArtportalenDataService> _logger;
+
+    /// <summary>
+    ///     Constructor
+    /// </summary>
+    public ArtportalenDataService(ArtportalenConfiguration artportalenConfiguration, ILogger<ArtportalenDataService> logger)
     {
-        /// <summary>
-        /// Create new db connection
-        /// </summary>
-        /// <param name="live"></param>
-        /// <returns></returns>
-        private IDbConnection Connection(bool live) => new SqlConnection(live ? Configuration.ConnectionStringLive : Configuration.ConnectionStringBackup);
-        private readonly ILogger<ArtportalenDataService> _logger;
+        Configuration = artportalenConfiguration ??
+                        throw new ArgumentNullException(nameof(artportalenConfiguration));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    }
 
-        /// <summary>
-        ///     Constructor
-        /// </summary>
-        public ArtportalenDataService(ArtportalenConfiguration artportalenConfiguration, ILogger<ArtportalenDataService> logger)
+    /// <inheritdoc />
+    public string BackUpDatabaseName
+    {
+        get
         {
-            Configuration = artportalenConfiguration ??
-                            throw new ArgumentNullException(nameof(artportalenConfiguration));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            var builder = new SqlConnectionStringBuilder(Configuration.ConnectionStringBackup);
+
+            return builder.InitialCatalog;
         }
+    }
 
-        /// <inheritdoc />
-        public string BackUpDatabaseName
+    /// <inheritdoc />
+    public ArtportalenConfiguration Configuration { get; }
+
+
+    /// <inheritdoc />
+    public async Task<IEnumerable<T>> QueryAsync<T>(string query, dynamic? parameters = null, bool live = false, CommandType commandType = CommandType.Text)
+    {
+        try
         {
-            get
-            {
-                var builder = new SqlConnectionStringBuilder(Configuration.ConnectionStringBackup);
+            using var conn = Connection(live);
+            conn.Open();
+            using var transaction = conn.BeginTransaction(IsolationLevel.ReadUncommitted);
 
-                return builder.InitialCatalog;
-            }
+            var result = (await conn.QueryAsync<T>(
+                new CommandDefinition(
+                    query,
+                    parameters,
+                    transaction,
+                    10 * 60, // 10 minutes. Test environemt is slow. Querys taking < 30 sek in prod can take +5 min in test
+                    commandType,
+                    CommandFlags.NoCache
+                )
+            )).ToArray();
+
+            transaction.Commit();
+            return result;
         }
-
-        /// <inheritdoc />
-        public ArtportalenConfiguration Configuration { get; }
-
-
-        /// <inheritdoc />
-        public async Task<IEnumerable<T>> QueryAsync<T>(string query, dynamic? parameters = null, bool live = false, CommandType commandType = CommandType.Text)
+        catch (Exception e)
         {
-            try
-            {
-                using var conn = Connection(live);
-                conn.Open();
-                using var transaction = conn.BeginTransaction(IsolationLevel.ReadUncommitted);
-
-                var result = (await conn.QueryAsync<T>(
-                    new CommandDefinition(
-                        query,
-                        parameters,
-                        transaction,
-                        10 * 60, // 10 minutes. Test environemt is slow. Querys taking < 30 sek in prod can take +5 min in test
-                        commandType,
-                        CommandFlags.NoCache
-                    )
-                )).ToArray();
-
-                transaction.Commit();
-                return result;
-            }
-            catch (Exception e)
-            {
-                string? connectionString = live ? Configuration?.ConnectionStringLive : Configuration?.ConnectionStringBackup;
-                _logger.LogError(e, "Error when executing {@dataProvider} QueryAsync(...). ConnectionString=" +connectionString, "Artportalen");
-                throw;
-            }
+            string? connectionString = live ? Configuration?.ConnectionStringLive : Configuration?.ConnectionStringBackup;
+            _logger.LogError(e, "Error when executing {@dataProvider} QueryAsync(...). ConnectionString=" +connectionString, "Artportalen");
+            throw;
         }
     }
 }

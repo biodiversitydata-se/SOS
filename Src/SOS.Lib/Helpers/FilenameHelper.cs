@@ -1,84 +1,83 @@
 ﻿using System;
 using System.IO;
 
-namespace SOS.Lib.Helpers
+namespace SOS.Lib.Helpers;
+
+/// <summary>
+///     Contains functions for generating file names that contain today's date and time.
+/// </summary>
+public static class FilenameHelper
 {
     /// <summary>
-    ///     Contains functions for generating file names that contain today's date and time.
+    ///     Creates a filename by joining: name, file extension and current date and time.
     /// </summary>
-    public static class FilenameHelper
+    /// <param name="name">The name part of the filename.</param>
+    /// <param name="fileExtension">The file extension.</param>
+    /// <returns>A valid filename.</returns>
+    public static string CreateFilenameWithDate(string name, string fileExtension)
     {
-        /// <summary>
-        ///     Creates a filename by joining: name, file extension and current date and time.
-        /// </summary>
-        /// <param name="name">The name part of the filename.</param>
-        /// <param name="fileExtension">The file extension.</param>
-        /// <returns>A valid filename.</returns>
-        public static string CreateFilenameWithDate(string name, string fileExtension)
+        return CreateFilenameWithDate(name, fileExtension, DateTime.Now);
+    }
+
+    /// <summary>
+    /// Remove illegal characters from filename
+    /// </summary>
+    /// <param name="fileName"></param>
+    /// <param name="replaceChar"></param>
+    /// <returns></returns>
+    public static string GetSafeFileName(string fileName, char replaceChar)
+    {            
+        foreach (char c in Path.GetInvalidFileNameChars())
         {
-            return CreateFilenameWithDate(name, fileExtension, DateTime.Now);
+            fileName = fileName.Replace(c, replaceChar);
         }
 
-        /// <summary>
-        /// Remove illegal characters from filename
-        /// </summary>
-        /// <param name="fileName"></param>
-        /// <param name="replaceChar"></param>
-        /// <returns></returns>
-        public static string GetSafeFileName(string fileName, char replaceChar)
-        {            
-            foreach (char c in Path.GetInvalidFileNameChars())
-            {
-                fileName = fileName.Replace(c, replaceChar);
-            }
+        return fileName;
+    }
 
-            return fileName;
-        }
-
-        /// <summary>
-        ///     Creates a filename by joining: name and current date and time. File extension is excluded.
-        /// </summary>
-        /// <param name="name">The name part of the filename.</param>
-        /// <param name="preserveFileExtension">If true, the file extension will be preserved.</param>
-        /// <returns>A valid filename.</returns>
-        public static string CreateFilenameWithDate(string name, bool preserveFileExtension = false)
+    /// <summary>
+    ///     Creates a filename by joining: name and current date and time. File extension is excluded.
+    /// </summary>
+    /// <param name="name">The name part of the filename.</param>
+    /// <param name="preserveFileExtension">If true, the file extension will be preserved.</param>
+    /// <returns>A valid filename.</returns>
+    public static string CreateFilenameWithDate(string name, bool preserveFileExtension = false)
+    {
+        string fileExtension = System.IO.Path.GetExtension(name);
+        if (preserveFileExtension && !string.IsNullOrEmpty(fileExtension))
         {
-            string fileExtension = System.IO.Path.GetExtension(name);
-            if (preserveFileExtension && !string.IsNullOrEmpty(fileExtension))
-            {
-                var dateFilenamePart = GenerateDateFilenamePart(DateTime.Now);
-                var nameWithoutExtension = System.IO.Path.GetFileNameWithoutExtension(name);
-                return $"{nameWithoutExtension}-{dateFilenamePart}{fileExtension}";
-                //return System.IO.Path.Combine($"{nameWithoutExtension}-{dateFilenamePart}", fileExtension.Replace(".",""));
-            }
-            else
-            {
-                var dateFilenamePart = GenerateDateFilenamePart(DateTime.Now);
-                return $"{name}-{dateFilenamePart}";
-            }
+            var dateFilenamePart = GenerateDateFilenamePart(DateTime.Now);
+            var nameWithoutExtension = System.IO.Path.GetFileNameWithoutExtension(name);
+            return $"{nameWithoutExtension}-{dateFilenamePart}{fileExtension}";
+            //return System.IO.Path.Combine($"{nameWithoutExtension}-{dateFilenamePart}", fileExtension.Replace(".",""));
         }
-
-        /// <summary>
-        ///     Creates a filename.
-        /// </summary>
-        /// <param name="name">The name part of the filename.</param>
-        /// <param name="fileExtension">The file extension.</param>
-        /// <param name="date">The date that will be used to generate the date part of the filename.</param>
-        /// <returns>A valid filename.</returns>
-        public static string CreateFilenameWithDate(string name, string fileExtension, DateTime date)
+        else
         {
-            var dateFilenamePart = GenerateDateFilenamePart(date);
-            return $"{name}-{dateFilenamePart}.{fileExtension}";
+            var dateFilenamePart = GenerateDateFilenamePart(DateTime.Now);
+            return $"{name}-{dateFilenamePart}";
         }
+    }
 
-        /// <summary>
-        ///     Generates the date filename part.
-        /// </summary>
-        /// <param name="date">The date.</param>
-        /// <returns>Date part in a filename.</returns>
-        private static string GenerateDateFilenamePart(DateTime date)
-        {
-            return $"{date:yyyy-MM-dd}-{date.Hour:00}-{date.Minute:00}-{date.Second:00}";
-        }
+    /// <summary>
+    ///     Creates a filename.
+    /// </summary>
+    /// <param name="name">The name part of the filename.</param>
+    /// <param name="fileExtension">The file extension.</param>
+    /// <param name="date">The date that will be used to generate the date part of the filename.</param>
+    /// <returns>A valid filename.</returns>
+    public static string CreateFilenameWithDate(string name, string fileExtension, DateTime date)
+    {
+        var dateFilenamePart = GenerateDateFilenamePart(date);
+        return $"{name}-{dateFilenamePart}.{fileExtension}";
+    }
+
+    /// <summary>
+    ///     Generates the date filename part.
+    /// </summary>
+    /// <param name="date">The date.</param>
+    /// <returns>Date part in a filename.</returns>
+    private static string GenerateDateFilenamePart(DateTime date)
+    {
+        return $"{date:yyyy-MM-dd}-{date.Hour:00}-{date.Minute:00}-{date.Second:00}";
     }
 }

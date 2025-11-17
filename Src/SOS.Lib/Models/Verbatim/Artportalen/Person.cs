@@ -1,43 +1,42 @@
-﻿namespace SOS.Lib.Models.Verbatim.Artportalen
+﻿namespace SOS.Lib.Models.Verbatim.Artportalen;
+
+/// <summary>
+///     Represents a person
+/// </summary>
+public class Person
 {
     /// <summary>
-    ///     Represents a person
+    ///     Id of person
     /// </summary>
-    public class Person
-    {
-        /// <summary>
-        ///     Id of person
-        /// </summary>
-        public int Id { get; set; }
+    public int Id { get; set; }
 
-        /// <summary>
-        ///     The user Id.
-        /// </summary>
-        public int UserId { get; set; }
+    /// <summary>
+    ///     The user Id.
+    /// </summary>
+    public int UserId { get; set; }
 
-        /// <summary>
-        /// User Service id
-        /// </summary>
-        public int? UserServiceUserId { get; set; }
+    /// <summary>
+    /// User Service id
+    /// </summary>
+    public int? UserServiceUserId { get; set; }
 
-        /// <summary>
-        ///     First name of person
-        /// </summary>
-        public string FirstName { get; set; }
+    /// <summary>
+    ///     First name of person
+    /// </summary>
+    public string FirstName { get; set; }
 
-        /// <summary>
-        ///     Last name of person
-        /// </summary>
-        public string LastName { get; set; }
+    /// <summary>
+    ///     Last name of person
+    /// </summary>
+    public string LastName { get; set; }
 
-        /// <summary>
-        ///     User alias
-        /// </summary>
-        public string Alias { get; set; }
+    /// <summary>
+    ///     User alias
+    /// </summary>
+    public string Alias { get; set; }
 
-        /// <summary>
-        ///     The full name of the person.
-        /// </summary>
-        public string FullName => $"{FirstName ?? string.Empty} {LastName ?? string.Empty}";
-    }
+    /// <summary>
+    ///     The full name of the person.
+    /// </summary>
+    public string FullName => $"{FirstName ?? string.Empty} {LastName ?? string.Empty}";
 }

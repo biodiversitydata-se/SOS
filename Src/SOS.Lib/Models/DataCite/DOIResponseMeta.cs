@@ -1,13 +1,12 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace SOS.Lib.Models.DataCite
+namespace SOS.Lib.Models.DataCite;
+
+public class DOIResponseMeta
 {
-    public class DOIResponseMeta
-    {
-        /// <summary>
-        /// Total number of hits
-        /// </summary>
-        [JsonPropertyName("total")]
-        public int Total { get; set; }
-    }
+    /// <summary>
+    /// Total number of hits
+    /// </summary>
+    [JsonPropertyName("total")]
+    public int Total { get; set; }
 }

@@ -7,51 +7,50 @@ using System;
 using System.Net;
 using System.Threading.Tasks;
 
-namespace SOS.Observations.Api.Controllers
+namespace SOS.Observations.Api.Controllers;
+
+/// <summary>
+///     Data quality controller
+/// </summary>
+[Route("[controller]")]
+[ApiController]
+public class DataQualityController : ControllerBase
 {
+    private readonly IDataQualityManager _dataQualityManager;
+    private readonly ILogger<DataQualityController> _logger;
+
     /// <summary>
-    ///     Data quality controller
+    ///     Constructor
     /// </summary>
-    [Route("[controller]")]
-    [ApiController]
-    public class DataQualityController : ControllerBase
+    /// <param name="dataQualityManager"></param>
+    /// <param name="logger"></param>
+    public DataQualityController(
+        IDataQualityManager dataQualityManager,
+        ILogger<DataQualityController> logger)
     {
-        private readonly IDataQualityManager _dataQualityManager;
-        private readonly ILogger<DataQualityController> _logger;
+        _dataQualityManager = dataQualityManager ?? throw new ArgumentNullException(nameof(dataQualityManager));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    }
 
-        /// <summary>
-        ///     Constructor
-        /// </summary>
-        /// <param name="dataQualityManager"></param>
-        /// <param name="logger"></param>
-        public DataQualityController(
-            IDataQualityManager dataQualityManager,
-            ILogger<DataQualityController> logger)
+    /// <summary>
+    /// Data quality report.
+    /// </summary>
+    /// <param name="organismGroup">Organism group filter.</param>
+    /// <returns>List of observations that can be duplicates</returns>
+    [HttpGet("report/{organismGroup}")]
+    [ProducesResponseType(typeof(DataQualityReport), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+    public async Task<IActionResult> GetReport([FromRoute] string organismGroup)
+    {
+        try
         {
-            _dataQualityManager = dataQualityManager ?? throw new ArgumentNullException(nameof(dataQualityManager));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
+            return new OkObjectResult(await _dataQualityManager.GetReportAsync(organismGroup));
         }
-
-        /// <summary>
-        /// Data quality report.
-        /// </summary>
-        /// <param name="organismGroup">Organism group filter.</param>
-        /// <returns>List of observations that can be duplicates</returns>
-        [HttpGet("report/{organismGroup}")]
-        [ProducesResponseType(typeof(DataQualityReport), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> GetReport([FromRoute] string organismGroup)
+        catch (Exception e)
         {
-            try
-            {
-                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
-                return new OkObjectResult(await _dataQualityManager.GetReportAsync(organismGroup));
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Error getting data quality report");
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
-            }
+            _logger.LogError(e, "Error getting data quality report");
+            return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
         }
     }
 }

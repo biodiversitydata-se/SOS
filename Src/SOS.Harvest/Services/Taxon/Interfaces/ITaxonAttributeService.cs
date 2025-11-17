@@ -1,23 +1,22 @@
 ﻿using SOS.Lib.Models.TaxonAttributeService;
 
-namespace SOS.Harvest.Services.Taxon.Interfaces
+namespace SOS.Harvest.Services.Taxon.Interfaces;
+
+/// <summary>
+///     Species data service
+/// </summary>
+public interface ITaxonAttributeService
 {
     /// <summary>
-    ///     Species data service
+    ///     Get Current red list period id
     /// </summary>
-    public interface ITaxonAttributeService
-    {
-        /// <summary>
-        ///     Get Current red list period id
-        /// </summary>
-        /// <returns></returns>
-        Task<int> GetCurrentRedlistPeriodIdAsync();
+    /// <returns></returns>
+    Task<int> GetCurrentRedlistPeriodIdAsync();
 
-        /// <summary>
-        ///     Get taxon attributes
-        /// </summary>
-        /// <returns></returns>
-        Task<TaxonAttributeResponse> GetTaxonAttributesAsync(IEnumerable<int> taxonIds,
-            IEnumerable<int> factorIds, IEnumerable<int> periodIds);
-    }
+    /// <summary>
+    ///     Get taxon attributes
+    /// </summary>
+    /// <returns></returns>
+    Task<TaxonAttributeResponse> GetTaxonAttributesAsync(IEnumerable<int> taxonIds,
+        IEnumerable<int> factorIds, IEnumerable<int> periodIds);
 }

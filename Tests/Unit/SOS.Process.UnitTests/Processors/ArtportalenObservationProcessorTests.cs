@@ -21,173 +21,172 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace SOS.Process.UnitTests.Processors
+namespace SOS.Process.UnitTests.Processors;
+
+/// <summary>
+///     Tests for Artportalen processor
+/// </summary>
+public class ArtportalenObservationProcessorTests
 {
     /// <summary>
-    ///     Tests for Artportalen processor
+    ///     Constructor
     /// </summary>
-    public class ArtportalenObservationProcessorTests
+    public ArtportalenObservationProcessorTests()
     {
-        /// <summary>
-        ///     Constructor
-        /// </summary>
-        public ArtportalenObservationProcessorTests()
+        _artportalenVerbatimRepository = new Mock<IArtportalenVerbatimRepository>();
+        _processedObservationRepositoryMock = new Mock<IProcessedObservationCoreRepository>();
+        _userObservationRepositoryMock = new Mock<IUserObservationRepository>();
+        _vocabularyRepositoryMock = new Mock<IVocabularyRepository>();
+        _artportalenDatasetRepositoryMock = new Mock<IArtportalenDatasetMetadataRepository>();
+        _vocabularyResolverMock = new Mock<IVocabularyValueResolver>();
+        _processConfiguration = new ProcessConfiguration() { ArtportalenUrl = "https://www.artportalen.se" };
+        _dwcArchiveFileWriterCoordinatorMock = new Mock<IDwcArchiveFileWriterCoordinator>();
+        _diffusionManagerMock = new Mock<IDiffusionManager>();
+        _processManagerMock = new Mock<IProcessManager>();
+        _processTimeManagerMock = new Mock<IProcessTimeManager>();
+        _validationManagerMock = new Mock<IValidationManager>();
+        _sightingRepository = new Mock<ISightingRepository>();
+        _loggerMock = new Mock<ILogger<ArtportalenObservationProcessor>>();
+    }
+
+    private readonly Mock<IArtportalenVerbatimRepository> _artportalenVerbatimRepository;
+    private readonly Mock<IProcessedObservationCoreRepository> _processedObservationRepositoryMock;
+    private readonly Mock<IUserObservationRepository> _userObservationRepositoryMock;
+    private readonly Mock<IVocabularyRepository> _vocabularyRepositoryMock;
+    private readonly Mock<IArtportalenDatasetMetadataRepository> _artportalenDatasetRepositoryMock;
+    private readonly Mock<IVocabularyValueResolver> _vocabularyResolverMock;
+    private readonly ProcessConfiguration _processConfiguration;
+    private readonly Mock<IDwcArchiveFileWriterCoordinator> _dwcArchiveFileWriterCoordinatorMock;
+    private readonly Mock<IProcessManager> _processManagerMock;
+    private readonly Mock<IValidationManager> _validationManagerMock;
+    private readonly Mock<ILogger<ArtportalenObservationProcessor>> _loggerMock;
+    private readonly Mock<IDiffusionManager> _diffusionManagerMock;
+    private readonly Mock<IProcessTimeManager> _processTimeManagerMock;
+    private readonly Mock<ISightingRepository> _sightingRepository;
+
+    private ArtportalenObservationProcessor TestObject => new ArtportalenObservationProcessor(
+        _artportalenVerbatimRepository.Object,
+        _processedObservationRepositoryMock.Object,
+        _vocabularyRepositoryMock.Object,
+        _artportalenDatasetRepositoryMock.Object,
+        _vocabularyResolverMock.Object,
+        _dwcArchiveFileWriterCoordinatorMock.Object,
+        _processManagerMock.Object,
+        _validationManagerMock.Object,
+        _diffusionManagerMock.Object,
+        _processTimeManagerMock.Object,
+        _sightingRepository.Object,
+        _userObservationRepositoryMock.Object,
+        _processConfiguration,
+        _loggerMock.Object);
+
+    /// <summary>
+    ///     Test processing fail
+    /// </summary>
+    /// <returns></returns>
+    [Fact]
+    public async Task AggregateAsyncFail()
+    {
+        // -----------------------------------------------------------------------------------------------------------
+        // Arrange
+        //-----------------------------------------------------------------------------------------------------------
+        var dataProvider = new DataProvider
         {
-            _artportalenVerbatimRepository = new Mock<IArtportalenVerbatimRepository>();
-            _processedObservationRepositoryMock = new Mock<IProcessedObservationCoreRepository>();
-            _userObservationRepositoryMock = new Mock<IUserObservationRepository>();
-            _vocabularyRepositoryMock = new Mock<IVocabularyRepository>();
-            _artportalenDatasetRepositoryMock = new Mock<IArtportalenDatasetMetadataRepository>();
-            _vocabularyResolverMock = new Mock<IVocabularyValueResolver>();
-            _processConfiguration = new ProcessConfiguration() { ArtportalenUrl = "https://www.artportalen.se" };
-            _dwcArchiveFileWriterCoordinatorMock = new Mock<IDwcArchiveFileWriterCoordinator>();
-            _diffusionManagerMock = new Mock<IDiffusionManager>();
-            _processManagerMock = new Mock<IProcessManager>();
-            _processTimeManagerMock = new Mock<IProcessTimeManager>();
-            _validationManagerMock = new Mock<IValidationManager>();
-            _sightingRepository = new Mock<ISightingRepository>();
-            _loggerMock = new Mock<ILogger<ArtportalenObservationProcessor>>();
-        }
+            Names = new[] { new VocabularyValueTranslation { CultureCode = "en-GB", Value = "Artportalen" } },
+            Type = DataProviderType.ArtportalenObservations
+        };
 
-        private readonly Mock<IArtportalenVerbatimRepository> _artportalenVerbatimRepository;
-        private readonly Mock<IProcessedObservationCoreRepository> _processedObservationRepositoryMock;
-        private readonly Mock<IUserObservationRepository> _userObservationRepositoryMock;
-        private readonly Mock<IVocabularyRepository> _vocabularyRepositoryMock;
-        private readonly Mock<IArtportalenDatasetMetadataRepository> _artportalenDatasetRepositoryMock;
-        private readonly Mock<IVocabularyValueResolver> _vocabularyResolverMock;
-        private readonly ProcessConfiguration _processConfiguration;
-        private readonly Mock<IDwcArchiveFileWriterCoordinator> _dwcArchiveFileWriterCoordinatorMock;
-        private readonly Mock<IProcessManager> _processManagerMock;
-        private readonly Mock<IValidationManager> _validationManagerMock;
-        private readonly Mock<ILogger<ArtportalenObservationProcessor>> _loggerMock;
-        private readonly Mock<IDiffusionManager> _diffusionManagerMock;
-        private readonly Mock<IProcessTimeManager> _processTimeManagerMock;
-        private readonly Mock<ISightingRepository> _sightingRepository;
+        //-----------------------------------------------------------------------------------------------------------
+        // Act
+        //-----------------------------------------------------------------------------------------------------------
+        var result = await TestObject.ProcessAsync(dataProvider, null, null, JobRunModes.Full, JobCancellationToken.Null);
 
-        private ArtportalenObservationProcessor TestObject => new ArtportalenObservationProcessor(
-            _artportalenVerbatimRepository.Object,
-            _processedObservationRepositoryMock.Object,
-            _vocabularyRepositoryMock.Object,
-            _artportalenDatasetRepositoryMock.Object,
-            _vocabularyResolverMock.Object,
-            _dwcArchiveFileWriterCoordinatorMock.Object,
-            _processManagerMock.Object,
-            _validationManagerMock.Object,
-            _diffusionManagerMock.Object,
-            _processTimeManagerMock.Object,
-            _sightingRepository.Object,
-            _userObservationRepositoryMock.Object,
-            _processConfiguration,
-            _loggerMock.Object);
+        //-----------------------------------------------------------------------------------------------------------
+        // Assert
+        //-----------------------------------------------------------------------------------------------------------
+        result.Status.Should().Be(RunStatus.Failed);
+    }
 
-        /// <summary>
-        ///     Test processing fail
-        /// </summary>
-        /// <returns></returns>
-        [Fact]
-        public async Task AggregateAsyncFail()
+    /// <summary>
+    ///     Test processing exception
+    /// </summary>
+    /// <returns></returns>
+    [Fact]
+    public async Task ProcessAsyncException()
+    {
+        //-----------------------------------------------------------------------------------------------------------
+        // Arrange
+        //-----------------------------------------------------------------------------------------------------------
+        var dataProvider = new DataProvider
         {
-            // -----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            var dataProvider = new DataProvider
+            Names = new[] { new VocabularyValueTranslation { CultureCode = "en-GB", Value = "Artportalen" } },
+            Type = DataProviderType.ArtportalenObservations
+        };
+
+        _artportalenVerbatimRepository.Setup(r => r.GetBatchAsync(0, 0))
+            .ThrowsAsync(new Exception("Failed"));
+
+        //-----------------------------------------------------------------------------------------------------------
+        // Act
+        //-----------------------------------------------------------------------------------------------------------
+        var result = await TestObject.ProcessAsync(dataProvider, null, null, JobRunModes.Full, JobCancellationToken.Null);
+        //-----------------------------------------------------------------------------------------------------------
+        // Assert
+        //-----------------------------------------------------------------------------------------------------------
+
+        result.Status.Should().Be(RunStatus.Failed);
+    }
+
+    /// <summary>
+    ///     Make a successful test of processing
+    /// </summary>
+    /// <returns></returns>
+    [Fact(Skip = "Not working")]
+    public async Task ProcessAsyncSuccess()
+    {
+        // -----------------------------------------------------------------------------------------------------------
+        // Arrange
+        //-----------------------------------------------------------------------------------------------------------
+        _processedObservationRepositoryMock.Setup(por => por.DeleteProviderDataAsync(It.IsAny<DataProvider>(), It.IsAny<bool>()))
+            .ReturnsAsync(true);
+        _artportalenVerbatimRepository.Setup(r => r.GetBatchAsync(0, 0))
+            .ReturnsAsync(new[]
             {
-                Names = new[] { new VocabularyValueTranslation { CultureCode = "en-GB", Value = "Artportalen" } },
-                Type = DataProviderType.ArtportalenObservations
-            };
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.ProcessAsync(dataProvider, null, null, JobRunModes.Full, JobCancellationToken.Null);
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-            result.Status.Should().Be(RunStatus.Failed);
-        }
-
-        /// <summary>
-        ///     Test processing exception
-        /// </summary>
-        /// <returns></returns>
-        [Fact]
-        public async Task ProcessAsyncException()
-        {
-            //-----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            var dataProvider = new DataProvider
-            {
-                Names = new[] { new VocabularyValueTranslation { CultureCode = "en-GB", Value = "Artportalen" } },
-                Type = DataProviderType.ArtportalenObservations
-            };
-
-            _artportalenVerbatimRepository.Setup(r => r.GetBatchAsync(0, 0))
-                .ThrowsAsync(new Exception("Failed"));
-
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.ProcessAsync(dataProvider, null, null, JobRunModes.Full, JobCancellationToken.Null);
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-
-            result.Status.Should().Be(RunStatus.Failed);
-        }
-
-        /// <summary>
-        ///     Make a successful test of processing
-        /// </summary>
-        /// <returns></returns>
-        [Fact(Skip = "Not working")]
-        public async Task ProcessAsyncSuccess()
-        {
-            // -----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            _processedObservationRepositoryMock.Setup(por => por.DeleteProviderDataAsync(It.IsAny<DataProvider>(), It.IsAny<bool>()))
-                .ReturnsAsync(true);
-            _artportalenVerbatimRepository.Setup(r => r.GetBatchAsync(0, 0))
-                .ReturnsAsync(new[]
+                new ArtportalenObservationVerbatim
                 {
-                    new ArtportalenObservationVerbatim
-                    {
-                        Id = 1
-                    }
-                });
+                    Id = 1
+                }
+            });
 
-            _processedObservationRepositoryMock
-                .Setup(r => r.AddManyAsync(It.IsAny<ICollection<Observation>>(), It.IsAny<bool>(), It.IsAny<bool>()))
-                .ReturnsAsync(1);
+        _processedObservationRepositoryMock
+            .Setup(r => r.AddManyAsync(It.IsAny<ICollection<Observation>>(), It.IsAny<bool>(), It.IsAny<bool>()))
+            .ReturnsAsync(1);
 
-            var dataProvider = new DataProvider
-            {
-                Names = new[] { new VocabularyValueTranslation { CultureCode = "en-GB", Value = "Artportalen" } },
-                Type = DataProviderType.ArtportalenObservations
-            };
+        var dataProvider = new DataProvider
+        {
+            Names = new[] { new VocabularyValueTranslation { CultureCode = "en-GB", Value = "Artportalen" } },
+            Type = DataProviderType.ArtportalenObservations
+        };
 
-            var taxa = new Dictionary<int, Taxon>
-            {
-                {0, new Taxon {Id = 0, TaxonId = "0", ScientificName = "Biota"}}
-            };
+        var taxa = new Dictionary<int, Taxon>
+        {
+            {0, new Taxon {Id = 0, TaxonId = "0", ScientificName = "Biota"}}
+        };
 
-            var vocabularyById = new Dictionary<int, Vocabulary>
-            {
-                {0, new Vocabulary {Id = 0, Name = "ActivityId"}}
-            };
+        var vocabularyById = new Dictionary<int, Vocabulary>
+        {
+            {0, new Vocabulary {Id = 0, Name = "ActivityId"}}
+        };
 
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var result = await TestObject.ProcessAsync(dataProvider, taxa, null, JobRunModes.Full, JobCancellationToken.Null);
+        //-----------------------------------------------------------------------------------------------------------
+        // Act
+        //-----------------------------------------------------------------------------------------------------------
+        var result = await TestObject.ProcessAsync(dataProvider, taxa, null, JobRunModes.Full, JobCancellationToken.Null);
 
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
+        //-----------------------------------------------------------------------------------------------------------
+        // Assert
+        //-----------------------------------------------------------------------------------------------------------
 
-            result.Status.Should().Be(RunStatus.Success);
-        }
+        result.Status.Should().Be(RunStatus.Success);
     }
 }

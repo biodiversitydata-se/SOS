@@ -5,457 +5,456 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace SOS.Lib.Extensions
+namespace SOS.Lib.Extensions;
+
+public static class StringExtensions
 {
-    public static class StringExtensions
+    private static readonly Regex RxFromNonAlfanumeric = new Regex(@"\w+$", RegexOptions.Compiled);
+    private static readonly Regex RxUntilNonAlfanumeric = new Regex(@"\w+", RegexOptions.Compiled);
+    private static readonly Regex RxNewLineTab = new Regex(@"\r\n?|\n|\t", RegexOptions.Compiled);
+    private static readonly Regex RxIllegalCharacters = new Regex(@"\p{C}+", RegexOptions.Compiled); // Match all control characters and other non-printable characters
+    private static readonly Regex RxEnlosingQuotes = new Regex(@"^\"".*\""$", RegexOptions.Compiled);
+
+    private static string CleanEnclosingQuotes(this string value)
     {
-        private static readonly Regex RxFromNonAlfanumeric = new Regex(@"\w+$", RegexOptions.Compiled);
-        private static readonly Regex RxUntilNonAlfanumeric = new Regex(@"\w+", RegexOptions.Compiled);
-        private static readonly Regex RxNewLineTab = new Regex(@"\r\n?|\n|\t", RegexOptions.Compiled);
-        private static readonly Regex RxIllegalCharacters = new Regex(@"\p{C}+", RegexOptions.Compiled); // Match all control characters and other non-printable characters
-        private static readonly Regex RxEnlosingQuotes = new Regex(@"^\"".*\""$", RegexOptions.Compiled);
-
-        private static string CleanEnclosingQuotes(this string value)
+        if ((value?.Length ?? 0) < 2)
         {
-            if ((value?.Length ?? 0) < 2)
-            {
-                return value;
-            }
-
-            if (RxEnlosingQuotes.IsMatch(value))
-            {
-                value = value.Substring(1, value.Length - 2);
-            }
-
             return value;
         }
-        /// <summary>
-        /// Remove unprintable characters 
-        /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public static string Clean(this string value)
-        {
-            if (string.IsNullOrEmpty(value))
-            {
-                return value;
-            }
 
-            return RxIllegalCharacters.Replace(value, match => // Slower, but handles new line and tab correctly.
-            {
-                if (RxNewLineTab.IsMatch(match.Value))
-                    return " ";
-                else
-                    return "";
-            }).CleanEnclosingQuotes().Trim();
+        if (RxEnlosingQuotes.IsMatch(value))
+        {
+            value = value.Substring(1, value.Length - 2);
         }
 
-        public static string CleanNewLineTab(this string value)
+        return value;
+    }
+    /// <summary>
+    /// Remove unprintable characters 
+    /// </summary>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public static string Clean(this string value)
+    {
+        if (string.IsNullOrEmpty(value))
         {
-            if (string.IsNullOrEmpty(value))
-            {
-                return value;
-            }
-
-            return RxNewLineTab.Replace(value, match => // Slower, but handles new line and tab correctly.
-            {
-                return "";
-            }).CleanEnclosingQuotes().RemoveWhiteSpace().Trim();
+            return value;
         }
 
-        /// <summary>
-        /// Checks if the string contains unprintable characters.
-        /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public static bool ContainsIllegalCharacters(this string value)
+        return RxIllegalCharacters.Replace(value, match => // Slower, but handles new line and tab correctly.
         {
-            if (string.IsNullOrEmpty(value)) return false;
-
-            return RxIllegalCharacters.IsMatch(value);
-        }
-
-        public static string FromNonAlfanumeric(this string value)
-        {
-            if (string.IsNullOrEmpty(value))
-            {
-                return value;
-            }
-
-            return RxFromNonAlfanumeric.Match(value).Value;
-        }
-
-        public static string UntilNonAlfanumeric(this string value)
-        {
-            if (string.IsNullOrEmpty(value))
-            {
-                return value;
-            }
-
-            return RxUntilNonAlfanumeric.Match(value).Value;
-        }
-
-        /// <summary>
-        ///     Truncates a string to a specific length.
-        /// </summary>
-        /// <param name="value">The string.</param>
-        /// <param name="maxLength">The max length.</param>
-        /// <returns>A truncated string.</returns>
-        public static string WithMaxLength(this string value, int maxLength)
-        {
-            if (value == null)
-            {
-                return null;
-            }
-
-            if (maxLength < 0)
-            {
-                return "";
-            }
-
-            return value.Substring(0, Math.Min(value.Length, maxLength));
-        }
-
-        public static bool ContainsAny(this string strValue, StringComparison stringComparison, params string[] list)
-        {
-            return list.Any(s => s.Equals(strValue, stringComparison));
-        }
-
-        public static bool ContainsAny(this string strValue, params string[] list)
-        {
-            return list.Any(s => s.Equals(strValue, StringComparison.OrdinalIgnoreCase));
-        }
-
-        /// <summary>
-        ///     Parse a Double value.
-        /// </summary>
-        /// <param name='value'>Double value to convert to a string.</param>
-        /// <param name="trim">If true the value string will be trimmed.</param>
-        /// <returns>The Double value.</returns>
-        public static double? ParseDouble(this string value, bool trim = true)
-        {
-            return TryParseDouble(value, out var result, trim) ? (double?)result : null;
-        }
-
-        /// <summary>
-        ///     Validates a Double value.
-        /// </summary>
-        /// <param name='value'>String Double value to validate</param>
-        /// <param name="trim">If true the value string will be trimmed.</param>
-        /// <returns>True if the value is a Double</returns>
-        public static bool IsDouble(this string value, bool trim = true)
-        {
-            return TryParseDouble(value, out var _, trim);
-        }
-
-        /// <summary>
-        ///     Try parse a Double value.
-        /// </summary>
-        /// <param name='value'>Double string value to parse</param>
-        /// <param name="result">The parsed value.</param>
-        /// <param name="trim">If true the value string will be trimmed.</param>
-        /// <returns>True if the value is a Double</returns>
-        public static bool TryParseDouble(this string value, out double result, bool trim = true)
-        {
-            if (value == null)
-            {
-                result = double.NaN;
-                return false;
-            }
-
-            const NumberStyles styles = NumberStyles.AllowDecimalPoint | NumberStyles.AllowExponent |
-                                        NumberStyles.AllowLeadingSign;
-            if (trim)
-            {
-                return double.TryParse(value.Trim().Replace(",", "."), styles,
-                    CultureInfo.CreateSpecificCulture("en-GB"), out result);
-            }
-
-            return double.TryParse(value.Replace(",", "."), styles, CultureInfo.CreateSpecificCulture("en-GB"),
-                out result);
-        }
-
-        public static bool GetBoolean(this string? value, bool defaultValue = false)
-        {
-            if (value != null)
-            {
-                if (bool.TryParse(value, out var boolValue))
-                {
-                    return boolValue;
-                }
-                return defaultValue;
-            }
+            if (RxNewLineTab.IsMatch(match.Value))
+                return " ";
             else
-            {
-                return defaultValue;
-            }
+                return "";
+        }).CleanEnclosingQuotes().Trim();
+    }
+
+    public static string CleanNewLineTab(this string value)
+    {
+        if (string.IsNullOrEmpty(value))
+        {
+            return value;
         }
 
-        /// <summary>
-        ///     Parse a Boolean value.
-        /// </summary>
-        /// <param name='value'>String Boolean value to parse.</param>
-        /// <param name="trim">If true the value string will be trimmed.</param>
-        /// <returns>The Boolean value.</returns>
-        public static bool? ParseBoolean(this string value, bool trim = true)
+        return RxNewLineTab.Replace(value, match => // Slower, but handles new line and tab correctly.
         {
-            return TryParseBoolean(value, out var result, trim) ? (bool?)result : null;
+            return "";
+        }).CleanEnclosingQuotes().RemoveWhiteSpace().Trim();
+    }
+
+    /// <summary>
+    /// Checks if the string contains unprintable characters.
+    /// </summary>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public static bool ContainsIllegalCharacters(this string value)
+    {
+        if (string.IsNullOrEmpty(value)) return false;
+
+        return RxIllegalCharacters.IsMatch(value);
+    }
+
+    public static string FromNonAlfanumeric(this string value)
+    {
+        if (string.IsNullOrEmpty(value))
+        {
+            return value;
         }
 
-        /// <summary>
-        ///     Validates a Boolean value.
-        /// </summary>
-        /// <param name='value'>Boolean string value to validate</param>
-        /// <param name="trim">If true the value string will be trimmed.</param>
-        /// <returns>True if the value is a Boolean</returns>
-        public static bool IsBoolean(this string value, bool trim = true)
+        return RxFromNonAlfanumeric.Match(value).Value;
+    }
+
+    public static string UntilNonAlfanumeric(this string value)
+    {
+        if (string.IsNullOrEmpty(value))
         {
-            return TryParseBoolean(value, out var _, trim);
+            return value;
         }
 
-        /// <summary>
-        ///     Parse a Boolean value.
-        /// </summary>
-        /// <param name='value'>String Boolean value to parse.</param>
-        /// <param name="result">The parsed value.</param>
-        /// <param name="trim">If true the value string will be trimmed.</param>
-        /// <returns>True if the Boolean value could be parsed.</returns>
-        public static bool TryParseBoolean(this string value, out bool result, bool trim = true)
+        return RxUntilNonAlfanumeric.Match(value).Value;
+    }
+
+    /// <summary>
+    ///     Truncates a string to a specific length.
+    /// </summary>
+    /// <param name="value">The string.</param>
+    /// <param name="maxLength">The max length.</param>
+    /// <returns>A truncated string.</returns>
+    public static string WithMaxLength(this string value, int maxLength)
+    {
+        if (value == null)
         {
-            if (value == null)
-            {
-                result = default;
-                return false;
-            }
-
-            if (trim)
-            {
-                return bool.TryParse(value.Trim(), out result);
-            }
-
-            return bool.TryParse(value, out result);
-        }
-
-        /// <summary>
-        ///     Parse a DateTime value.
-        /// </summary>
-        /// <param name='value'>String DateTime value to parse.</param>
-        /// <param name="trim">If true the value string will be trimmed.</param>
-        /// <returns>The DateTime value.</returns>
-        public static DateTime? ParseDateTime(this string value, bool trim = true)
-        {
-            return TryParseDateTime(value, out var result, trim) ? (DateTime?)result : null;
-        }
-
-        /// <summary>
-        ///     Validates a DateTime value.
-        /// </summary>
-        /// <param name='value'>DateTime string value to validate</param>
-        /// <param name="trim">If true the value string will be trimmed.</param>
-        /// <returns>True if the value is a DateTime</returns>
-        public static bool IsDateTime(this string value, bool trim = true)
-        {
-            return TryParseDateTime(value, out var _, trim);
-        }
-
-        /// <summary>
-        ///     Parse a DateTime value.
-        /// </summary>
-        /// <param name='value'>String DateTime value to parse.</param>
-        /// <param name="result">The parsed value.</param>
-        /// <param name="trim">If true the value string will be trimmed.</param>
-        /// <returns>True if the DateTime could be parsed.</returns>
-        public static bool TryParseDateTime(this string value, out DateTime result, bool trim = true)
-        {
-            if (value == null)
-            {
-                result = default;
-                return false;
-            }
-
-            if (trim)
-            {
-                return DateTime.TryParse(value.Trim(), out result);
-            }
-
-            return DateTime.TryParse(value, out result);
-        }
-
-        /// <summary>
-        /// Parses the value as Double and then converts it to Int32.
-        /// </summary>
-        /// <param name="value"></param>
-        /// <param name="trim"></param>
-        /// <returns></returns>
-        public static int? ParseDoubleConvertToInt(this string value, bool trim = true)
-        {
-            if (TryParseDouble(value, out double result, trim))
-            {
-                return Convert.ToInt32(result);
-            }
-
             return null;
         }
 
-        /// <summary>
-        ///     Parse a Int32 value.
-        /// </summary>
-        /// <param name='value'>String Int32 value to parse.</param>
-        /// <param name="trim">If true the value string will be trimmed.</param>
-        /// <returns>The Int32 value.</returns>
-        public static int? ParseInt(this string value, bool trim = true)
+        if (maxLength < 0)
         {
-            return TryParseInt(value, out var result, trim) ? (int?)result : null;
+            return "";
         }
 
-        /// <summary>
-        ///     Validates a Int32 value.
-        /// </summary>
-        /// <param name='value'>Int32 string value to validate</param>
-        /// <param name="trim">If true the value string will be trimmed.</param>
-        /// <returns>True if the value is a Int32</returns>
-        public static bool IsInt(this string value, bool trim = true)
+        return value.Substring(0, Math.Min(value.Length, maxLength));
+    }
+
+    public static bool ContainsAny(this string strValue, StringComparison stringComparison, params string[] list)
+    {
+        return list.Any(s => s.Equals(strValue, stringComparison));
+    }
+
+    public static bool ContainsAny(this string strValue, params string[] list)
+    {
+        return list.Any(s => s.Equals(strValue, StringComparison.OrdinalIgnoreCase));
+    }
+
+    /// <summary>
+    ///     Parse a Double value.
+    /// </summary>
+    /// <param name='value'>Double value to convert to a string.</param>
+    /// <param name="trim">If true the value string will be trimmed.</param>
+    /// <returns>The Double value.</returns>
+    public static double? ParseDouble(this string value, bool trim = true)
+    {
+        return TryParseDouble(value, out var result, trim) ? (double?)result : null;
+    }
+
+    /// <summary>
+    ///     Validates a Double value.
+    /// </summary>
+    /// <param name='value'>String Double value to validate</param>
+    /// <param name="trim">If true the value string will be trimmed.</param>
+    /// <returns>True if the value is a Double</returns>
+    public static bool IsDouble(this string value, bool trim = true)
+    {
+        return TryParseDouble(value, out var _, trim);
+    }
+
+    /// <summary>
+    ///     Try parse a Double value.
+    /// </summary>
+    /// <param name='value'>Double string value to parse</param>
+    /// <param name="result">The parsed value.</param>
+    /// <param name="trim">If true the value string will be trimmed.</param>
+    /// <returns>True if the value is a Double</returns>
+    public static bool TryParseDouble(this string value, out double result, bool trim = true)
+    {
+        if (value == null)
         {
-            return TryParseInt(value, out var _, trim);
+            result = double.NaN;
+            return false;
         }
 
-        /// <summary>
-        ///     Parse a Int32 value.
-        /// </summary>
-        /// <param name='value'>String Int32 value to parse.</param>
-        /// <param name="result">The parsed value.</param>
-        /// <param name="trim">If true the value string will be trimmed.</param>
-        /// <returns>True if the Int32 could be parsed.</returns>
-        public static bool TryParseInt(this string value, out int result, bool trim = true)
+        const NumberStyles styles = NumberStyles.AllowDecimalPoint | NumberStyles.AllowExponent |
+                                    NumberStyles.AllowLeadingSign;
+        if (trim)
         {
-            if (value == null)
+            return double.TryParse(value.Trim().Replace(",", "."), styles,
+                CultureInfo.CreateSpecificCulture("en-GB"), out result);
+        }
+
+        return double.TryParse(value.Replace(",", "."), styles, CultureInfo.CreateSpecificCulture("en-GB"),
+            out result);
+    }
+
+    public static bool GetBoolean(this string? value, bool defaultValue = false)
+    {
+        if (value != null)
+        {
+            if (bool.TryParse(value, out var boolValue))
             {
-                result = default;
-                return false;
+                return boolValue;
             }
-
-            if (trim)
-            {
-                return int.TryParse(value.Trim(), out result);
-            }
-
-            return int.TryParse(value, out result);
+            return defaultValue;
         }
-
-        /// <summary>
-        ///     Parse a Int64 value.
-        /// </summary>
-        /// <param name='value'>String Int64 value to parse.</param>
-        /// <param name="trim">If true the value string will be trimmed.</param>
-        /// <returns>The Int64 value.</returns>
-        public static long? ParseLong(this string value, bool trim = true)
+        else
         {
-            return TryParseLong(value, out var result, trim) ? (long?)result : null;
+            return defaultValue;
         }
+    }
 
-        /// <summary>
-        ///     Validates a Int64 value.
-        /// </summary>
-        /// <param name='value'>Int64 string value to validate</param>
-        /// <param name="trim">If true the value string will be trimmed.</param>
-        /// <returns>True if the value is a Int64</returns>
-        public static bool IsLong(this string value, bool trim = true)
+    /// <summary>
+    ///     Parse a Boolean value.
+    /// </summary>
+    /// <param name='value'>String Boolean value to parse.</param>
+    /// <param name="trim">If true the value string will be trimmed.</param>
+    /// <returns>The Boolean value.</returns>
+    public static bool? ParseBoolean(this string value, bool trim = true)
+    {
+        return TryParseBoolean(value, out var result, trim) ? (bool?)result : null;
+    }
+
+    /// <summary>
+    ///     Validates a Boolean value.
+    /// </summary>
+    /// <param name='value'>Boolean string value to validate</param>
+    /// <param name="trim">If true the value string will be trimmed.</param>
+    /// <returns>True if the value is a Boolean</returns>
+    public static bool IsBoolean(this string value, bool trim = true)
+    {
+        return TryParseBoolean(value, out var _, trim);
+    }
+
+    /// <summary>
+    ///     Parse a Boolean value.
+    /// </summary>
+    /// <param name='value'>String Boolean value to parse.</param>
+    /// <param name="result">The parsed value.</param>
+    /// <param name="trim">If true the value string will be trimmed.</param>
+    /// <returns>True if the Boolean value could be parsed.</returns>
+    public static bool TryParseBoolean(this string value, out bool result, bool trim = true)
+    {
+        if (value == null)
         {
-            return TryParseLong(value, out var _, trim);
+            result = default;
+            return false;
         }
 
-        /// <summary>
-        ///     Parse a Int64 value.
-        /// </summary>
-        /// <param name='value'>String Int64 value to parse.</param>
-        /// <param name="result">The parsed value.</param>
-        /// <param name="trim">If true the value string will be trimmed.</param>
-        /// <returns>True if the Int64 could be parsed.</returns>
-        public static bool TryParseLong(this string value, out long result, bool trim = true)
+        if (trim)
         {
-            if (value == null)
-            {
-                result = default;
-                return false;
-            }
-
-            if (trim)
-            {
-                return long.TryParse(value.Trim(), out result);
-            }
-
-            return long.TryParse(value, out result);
+            return bool.TryParse(value.Trim(), out result);
         }
 
-        /// <summary>
-        ///     Returns a boolean indicating whether the string has a value, returns false if it's null or empty
-        /// </summary>
-        /// <param name="value">The string to check</param>
-        /// <returns>A boolean indicating whether the string has a value</returns>
-        public static bool HasValue(this string value)
+        return bool.TryParse(value, out result);
+    }
+
+    /// <summary>
+    ///     Parse a DateTime value.
+    /// </summary>
+    /// <param name='value'>String DateTime value to parse.</param>
+    /// <param name="trim">If true the value string will be trimmed.</param>
+    /// <returns>The DateTime value.</returns>
+    public static DateTime? ParseDateTime(this string value, bool trim = true)
+    {
+        return TryParseDateTime(value, out var result, trim) ? (DateTime?)result : null;
+    }
+
+    /// <summary>
+    ///     Validates a DateTime value.
+    /// </summary>
+    /// <param name='value'>DateTime string value to validate</param>
+    /// <param name="trim">If true the value string will be trimmed.</param>
+    /// <returns>True if the value is a DateTime</returns>
+    public static bool IsDateTime(this string value, bool trim = true)
+    {
+        return TryParseDateTime(value, out var _, trim);
+    }
+
+    /// <summary>
+    ///     Parse a DateTime value.
+    /// </summary>
+    /// <param name='value'>String DateTime value to parse.</param>
+    /// <param name="result">The parsed value.</param>
+    /// <param name="trim">If true the value string will be trimmed.</param>
+    /// <returns>True if the DateTime could be parsed.</returns>
+    public static bool TryParseDateTime(this string value, out DateTime result, bool trim = true)
+    {
+        if (value == null)
         {
-            return !string.IsNullOrWhiteSpace(value);
+            result = default;
+            return false;
         }
 
-
-        /// <summary>
-        /// Make sure first char is lower case
-        /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public static string ToCamelCase(this string value)
+        if (trim)
         {
-            return string.IsNullOrEmpty(value) ? string.Empty : char.ToLower(value[0]) + value.Substring(1);
+            return DateTime.TryParse(value.Trim(), out result);
         }
 
-        /// <summary>
-        /// Returns the input string with the first character converted to uppercase
-        /// </summary>
-        public static string ToUpperFirst(this string s)
+        return DateTime.TryParse(value, out result);
+    }
+
+    /// <summary>
+    /// Parses the value as Double and then converts it to Int32.
+    /// </summary>
+    /// <param name="value"></param>
+    /// <param name="trim"></param>
+    /// <returns></returns>
+    public static int? ParseDoubleConvertToInt(this string value, bool trim = true)
+    {
+        if (TryParseDouble(value, out double result, trim))
         {
-            if (string.IsNullOrEmpty(s)) return string.Empty;
-            Span<char> a = stackalloc char[s.Length];
-            s.AsSpan(1).CopyTo(a.Slice(1));
-            a[0] = char.ToUpper(s[0]);
-            return new string(a);
+            return Convert.ToInt32(result);
         }
 
-        /// <summary>
-        /// Returns the input string with the first character converted to lowercase
-        /// </summary>
-        public static string ToLowerFirst(this string s)
+        return null;
+    }
+
+    /// <summary>
+    ///     Parse a Int32 value.
+    /// </summary>
+    /// <param name='value'>String Int32 value to parse.</param>
+    /// <param name="trim">If true the value string will be trimmed.</param>
+    /// <returns>The Int32 value.</returns>
+    public static int? ParseInt(this string value, bool trim = true)
+    {
+        return TryParseInt(value, out var result, trim) ? (int?)result : null;
+    }
+
+    /// <summary>
+    ///     Validates a Int32 value.
+    /// </summary>
+    /// <param name='value'>Int32 string value to validate</param>
+    /// <param name="trim">If true the value string will be trimmed.</param>
+    /// <returns>True if the value is a Int32</returns>
+    public static bool IsInt(this string value, bool trim = true)
+    {
+        return TryParseInt(value, out var _, trim);
+    }
+
+    /// <summary>
+    ///     Parse a Int32 value.
+    /// </summary>
+    /// <param name='value'>String Int32 value to parse.</param>
+    /// <param name="result">The parsed value.</param>
+    /// <param name="trim">If true the value string will be trimmed.</param>
+    /// <returns>True if the Int32 could be parsed.</returns>
+    public static bool TryParseInt(this string value, out int result, bool trim = true)
+    {
+        if (value == null)
         {
-            if (string.IsNullOrEmpty(s)) return string.Empty;
-            Span<char> a = stackalloc char[s.Length];
-            s.AsSpan(1).CopyTo(a.Slice(1));
-            a[0] = char.ToLower(s[0]);
-            return new string(a);
+            result = default;
+            return false;
         }
 
-        /// <summary>
-        /// Compute unique hash of string
-        /// </summary>
-        /// <param name="source"></param>
-        /// <returns></returns>
-        public static string ToHash(this string source)
+        if (trim)
         {
-            if (string.IsNullOrEmpty(source))
-            {
-                return null;
-            }
-
-            byte[] data = Encoding.UTF8.GetBytes(source);
-            return $"{xxHash3.ComputeHash(data, data.Length)}";
+            return int.TryParse(value.Trim(), out result);
         }
 
-        /// <summary>
-        /// Remove white spaces.
-        /// </summary>
-        /// <param name="self"></param>
-        /// <returns></returns>
-        public static string RemoveWhiteSpace(this string self)
+        return int.TryParse(value, out result);
+    }
+
+    /// <summary>
+    ///     Parse a Int64 value.
+    /// </summary>
+    /// <param name='value'>String Int64 value to parse.</param>
+    /// <param name="trim">If true the value string will be trimmed.</param>
+    /// <returns>The Int64 value.</returns>
+    public static long? ParseLong(this string value, bool trim = true)
+    {
+        return TryParseLong(value, out var result, trim) ? (long?)result : null;
+    }
+
+    /// <summary>
+    ///     Validates a Int64 value.
+    /// </summary>
+    /// <param name='value'>Int64 string value to validate</param>
+    /// <param name="trim">If true the value string will be trimmed.</param>
+    /// <returns>True if the value is a Int64</returns>
+    public static bool IsLong(this string value, bool trim = true)
+    {
+        return TryParseLong(value, out var _, trim);
+    }
+
+    /// <summary>
+    ///     Parse a Int64 value.
+    /// </summary>
+    /// <param name='value'>String Int64 value to parse.</param>
+    /// <param name="result">The parsed value.</param>
+    /// <param name="trim">If true the value string will be trimmed.</param>
+    /// <returns>True if the Int64 could be parsed.</returns>
+    public static bool TryParseLong(this string value, out long result, bool trim = true)
+    {
+        if (value == null)
         {
-            return new string(self.Where(c => !Char.IsWhiteSpace(c)).ToArray());
+            result = default;
+            return false;
         }
+
+        if (trim)
+        {
+            return long.TryParse(value.Trim(), out result);
+        }
+
+        return long.TryParse(value, out result);
+    }
+
+    /// <summary>
+    ///     Returns a boolean indicating whether the string has a value, returns false if it's null or empty
+    /// </summary>
+    /// <param name="value">The string to check</param>
+    /// <returns>A boolean indicating whether the string has a value</returns>
+    public static bool HasValue(this string value)
+    {
+        return !string.IsNullOrWhiteSpace(value);
+    }
+
+
+    /// <summary>
+    /// Make sure first char is lower case
+    /// </summary>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public static string ToCamelCase(this string value)
+    {
+        return string.IsNullOrEmpty(value) ? string.Empty : char.ToLower(value[0]) + value.Substring(1);
+    }
+
+    /// <summary>
+    /// Returns the input string with the first character converted to uppercase
+    /// </summary>
+    public static string ToUpperFirst(this string s)
+    {
+        if (string.IsNullOrEmpty(s)) return string.Empty;
+        Span<char> a = stackalloc char[s.Length];
+        s.AsSpan(1).CopyTo(a.Slice(1));
+        a[0] = char.ToUpper(s[0]);
+        return new string(a);
+    }
+
+    /// <summary>
+    /// Returns the input string with the first character converted to lowercase
+    /// </summary>
+    public static string ToLowerFirst(this string s)
+    {
+        if (string.IsNullOrEmpty(s)) return string.Empty;
+        Span<char> a = stackalloc char[s.Length];
+        s.AsSpan(1).CopyTo(a.Slice(1));
+        a[0] = char.ToLower(s[0]);
+        return new string(a);
+    }
+
+    /// <summary>
+    /// Compute unique hash of string
+    /// </summary>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    public static string ToHash(this string source)
+    {
+        if (string.IsNullOrEmpty(source))
+        {
+            return null;
+        }
+
+        byte[] data = Encoding.UTF8.GetBytes(source);
+        return $"{xxHash3.ComputeHash(data, data.Length)}";
+    }
+
+    /// <summary>
+    /// Remove white spaces.
+    /// </summary>
+    /// <param name="self"></param>
+    /// <returns></returns>
+    public static string RemoveWhiteSpace(this string self)
+    {
+        return new string(self.Where(c => !Char.IsWhiteSpace(c)).ToArray());
     }
 }

@@ -1,13 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace SOS.Analysis.Api.Controllers.Interfaces
+namespace SOS.Analysis.Api.Controllers.Interfaces;
+
+public interface IApiInfoController
 {
-    public interface IApiInfoController
-    {
-        /// <summary>
-        /// Get api information
-        /// </summary>
-        /// <returns></returns>
-        IActionResult GetApiInfoAsync();
-    }
+    /// <summary>
+    /// Get api information
+    /// </summary>
+    /// <returns></returns>
+    IActionResult GetApiInfoAsync();
 }

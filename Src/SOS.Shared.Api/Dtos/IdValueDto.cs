@@ -1,19 +1,18 @@
-﻿namespace SOS.Shared.Api.Dtos
+﻿namespace SOS.Shared.Api.Dtos;
+
+/// <summary>
+/// Id value dto
+/// </summary>
+/// <typeparam name="T"></typeparam>
+public class IdValueDto<T>
 {
     /// <summary>
-    /// Id value dto
+    /// Id of item
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    public class IdValueDto<T>
-    {
-        /// <summary>
-        /// Id of item
-        /// </summary>
-        public T Id { get; set; }
+    public T Id { get; set; }
 
-        /// <summary>
-        /// The value.
-        /// </summary>
-        public string Value { get; set; }
-    }
+    /// <summary>
+    /// The value.
+    /// </summary>
+    public string Value { get; set; }
 }

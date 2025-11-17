@@ -13,143 +13,142 @@ using SOS.Lib.Repositories.Verbatim.Interfaces;
 using System.Text;
 using System.Xml.Linq;
 
-namespace SOS.Harvest.Harvesters.AquaSupport.FishData
+namespace SOS.Harvest.Harvesters.AquaSupport.FishData;
+
+public class FishDataObservationHarvester : ObservationHarvesterBase<FishDataObservationVerbatim, int>, IFishDataObservationHarvester
 {
-    public class FishDataObservationHarvester : ObservationHarvesterBase<FishDataObservationVerbatim, int>, IFishDataObservationHarvester
+    private readonly IFishDataObservationService _fishDataObservationService;
+    private readonly FishDataServiceConfiguration _fishDataServiceConfiguration;
+
+    private string GetFishDataHarvestSettingsInfoString()
     {
-        private readonly IFishDataObservationService _fishDataObservationService;
-        private readonly FishDataServiceConfiguration _fishDataServiceConfiguration;
-
-        private string GetFishDataHarvestSettingsInfoString()
+        var sb = new StringBuilder();
+        sb.AppendLine("Fish Data Harvest settings:");
+        sb.AppendLine($"Start Harvest Year: {_fishDataServiceConfiguration.StartHarvestYear}");
+        if (_fishDataServiceConfiguration.MaxNumberOfSightingsHarvested.HasValue)
         {
-            var sb = new StringBuilder();
-            sb.AppendLine("Fish Data Harvest settings:");
-            sb.AppendLine($"Start Harvest Year: {_fishDataServiceConfiguration.StartHarvestYear}");
-            if (_fishDataServiceConfiguration.MaxNumberOfSightingsHarvested.HasValue)
-            {
-                sb.AppendLine(
-                    $"  Max Number Of Sightings Harvested: {_fishDataServiceConfiguration.MaxNumberOfSightingsHarvested}");
-            }
-            return sb.ToString();
+            sb.AppendLine(
+                $"  Max Number Of Sightings Harvested: {_fishDataServiceConfiguration.MaxNumberOfSightingsHarvested}");
         }
+        return sb.ToString();
+    }
 
-        /// <summary>
-        ///     Constructor
-        /// </summary>
-        /// <param name="fishDataObservationService"></param>
-        /// <param name="fishDataObservationVerbatimRepository"></param>
-        /// <param name="fishDataServiceConfiguration"></param>
-        /// <param name="logger"></param>
-        public FishDataObservationHarvester(
-            IFishDataObservationService fishDataObservationService,
-            IFishDataObservationVerbatimRepository fishDataObservationVerbatimRepository,
-            FishDataServiceConfiguration fishDataServiceConfiguration,
-            ILogger<FishDataObservationHarvester> logger) : base("FishData2", fishDataObservationVerbatimRepository, logger)
+    /// <summary>
+    ///     Constructor
+    /// </summary>
+    /// <param name="fishDataObservationService"></param>
+    /// <param name="fishDataObservationVerbatimRepository"></param>
+    /// <param name="fishDataServiceConfiguration"></param>
+    /// <param name="logger"></param>
+    public FishDataObservationHarvester(
+        IFishDataObservationService fishDataObservationService,
+        IFishDataObservationVerbatimRepository fishDataObservationVerbatimRepository,
+        FishDataServiceConfiguration fishDataServiceConfiguration,
+        ILogger<FishDataObservationHarvester> logger) : base("FishData2", fishDataObservationVerbatimRepository, logger)
+    {
+        _fishDataObservationService =
+            fishDataObservationService ?? throw new ArgumentNullException(nameof(fishDataObservationService));
+
+        _fishDataServiceConfiguration = fishDataServiceConfiguration ??
+                                   throw new ArgumentNullException(nameof(fishDataServiceConfiguration));
+    }      
+
+    /// inheritdoc />
+    public async Task<HarvestInfo> HarvestObservationsAsync(DataProvider dataProvider,
+        JobRunModes mode,
+        DateTime? fromDate, IJobCancellationToken cancellationToken)
+    {
+        await Task.Run(() =>
         {
-            _fishDataObservationService =
-                fishDataObservationService ?? throw new ArgumentNullException(nameof(fishDataObservationService));
+            throw new NotImplementedException("Not implemented for this provider");
+        });
+        return null!;
+    }
 
-            _fishDataServiceConfiguration = fishDataServiceConfiguration ??
-                                       throw new ArgumentNullException(nameof(fishDataServiceConfiguration));
-        }      
-
-        /// inheritdoc />
-        public async Task<HarvestInfo> HarvestObservationsAsync(DataProvider dataProvider,
-            JobRunModes mode,
-            DateTime? fromDate, IJobCancellationToken cancellationToken)
+    /// inheritdoc />
+    public async Task<HarvestInfo> HarvestObservationsAsync(DataProvider provider, IJobCancellationToken cancellationToken)
+    {
+        var runStatus = RunStatus.Success;
+        var harvestCount = 0;
+        (DateTime startDate, long preHarvestCount) initValues = (DateTime.Now, 0);
+        try
         {
-            await Task.Run(() =>
+            initValues.preHarvestCount = await InitializeHarvestAsync(true);
+            Logger.LogInformation(GetFishDataHarvestSettingsInfoString());
+
+            var ns = (XNamespace)"http://schemas.datacontract.org/2004/07/ArtDatabanken.WebService.Data";
+            var verbatimFactory = new AquaSupportHarvestFactory<FishDataObservationVerbatim>();
+            var startDate = new DateTime(_fishDataServiceConfiguration.StartHarvestYear, 1, 1);
+            var endDate = DateTime.Now;
+            var changeId = 0L;
+            var dataLastModified = DateTime.MinValue;
+
+            var xmlDocument = await _fishDataObservationService.GetAsync(startDate, endDate, changeId);
+            changeId = long.Parse(xmlDocument?.Descendants(ns + "MaxChangeId")?.FirstOrDefault()?.Value ?? "0");
+
+            // Loop until all sightings are fetched.
+            while (changeId != 0)
             {
-                throw new NotImplementedException("Not implemented for this provider");
-            });
-            return null!;
-        }
+                var lastRequesetTime = DateTime.Now;
 
-        /// inheritdoc />
-        public async Task<HarvestInfo> HarvestObservationsAsync(DataProvider provider, IJobCancellationToken cancellationToken)
-        {
-            var runStatus = RunStatus.Success;
-            var harvestCount = 0;
-            (DateTime startDate, long preHarvestCount) initValues = (DateTime.Now, 0);
-            try
-            {
-                initValues.preHarvestCount = await InitializeHarvestAsync(true);
-                Logger.LogInformation(GetFishDataHarvestSettingsInfoString());
+                Logger.LogDebug(
+                    $"Fetching Fish data observations between dates {startDate.ToString("yyyy-MM-dd")} and {endDate.ToString("yyyy-MM-dd")}, changeid: {changeId}");
 
-                var ns = (XNamespace)"http://schemas.datacontract.org/2004/07/ArtDatabanken.WebService.Data";
-                var verbatimFactory = new AquaSupportHarvestFactory<FishDataObservationVerbatim>();
-                var startDate = new DateTime(_fishDataServiceConfiguration.StartHarvestYear, 1, 1);
-                var endDate = DateTime.Now;
-                var changeId = 0L;
-                var dataLastModified = DateTime.MinValue;
-
-                var xmlDocument = await _fishDataObservationService.GetAsync(startDate, endDate, changeId);
-                changeId = long.Parse(xmlDocument?.Descendants(ns + "MaxChangeId")?.FirstOrDefault()?.Value ?? "0");
-
-                // Loop until all sightings are fetched.
-                while (changeId != 0)
+                var verbatims = await verbatimFactory.CastEntitiesToVerbatimsAsync(xmlDocument!);
+                if (verbatims?.Any() ?? false)
                 {
-                    var lastRequesetTime = DateTime.Now;
+                    // Clean up
+                    xmlDocument = null;
 
-                    Logger.LogDebug(
-                        $"Fetching Fish data observations between dates {startDate.ToString("yyyy-MM-dd")} and {endDate.ToString("yyyy-MM-dd")}, changeid: {changeId}");
+                    // Add sightings to MongoDb
+                    await VerbatimRepository.AddManyAsync(verbatims);
 
-                    var verbatims = await verbatimFactory.CastEntitiesToVerbatimsAsync(xmlDocument!);
-                    if (verbatims?.Any() ?? false)
+                    harvestCount += verbatims?.Count() ?? 0;
+
+                    Logger.LogDebug($"{harvestCount} Fish data observations harvested");
+
+                    var batchDataLastModified = verbatims!.Select(a => a.Modified).Max();
+
+                    if (batchDataLastModified.HasValue && batchDataLastModified.Value > dataLastModified)
                     {
-                        // Clean up
-                        xmlDocument = null;
-
-                        // Add sightings to MongoDb
-                        await VerbatimRepository.AddManyAsync(verbatims);
-
-                        harvestCount += verbatims?.Count() ?? 0;
-
-                        Logger.LogDebug($"{harvestCount} Fish data observations harvested");
-
-                        var batchDataLastModified = verbatims!.Select(a => a.Modified).Max();
-
-                        if (batchDataLastModified.HasValue && batchDataLastModified.Value > dataLastModified)
-                        {
-                            dataLastModified = batchDataLastModified.Value;
-                        }
-
-                        cancellationToken?.ThrowIfCancellationRequested();
-                        if (_fishDataServiceConfiguration.MaxNumberOfSightingsHarvested.HasValue &&
-                            harvestCount >= _fishDataServiceConfiguration.MaxNumberOfSightingsHarvested)
-                        {
-                            Logger.LogInformation("Max Fish data observations reached");
-                            break;
-                        }
+                        dataLastModified = batchDataLastModified.Value;
                     }
 
-                    var timeSinceLastCall = (DateTime.Now - lastRequesetTime).Milliseconds;
-                    if (timeSinceLastCall < 2000)
+                    cancellationToken?.ThrowIfCancellationRequested();
+                    if (_fishDataServiceConfiguration.MaxNumberOfSightingsHarvested.HasValue &&
+                        harvestCount >= _fishDataServiceConfiguration.MaxNumberOfSightingsHarvested)
                     {
-                        Thread.Sleep(2000 - timeSinceLastCall);
+                        Logger.LogInformation("Max Fish data observations reached");
+                        break;
                     }
-
-                    xmlDocument = await _fishDataObservationService.GetAsync(startDate, endDate, changeId);
-                    changeId = long.Parse(xmlDocument?.Descendants(ns + "MaxChangeId")?.FirstOrDefault()?.Value ?? "0");
                 }
-            }
-            catch (JobAbortedException)
-            {
-                Logger.LogInformation("Fish Data harvest was cancelled.");
-                runStatus = RunStatus.Canceled;
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e, "Failed to harvest Fish Data");
-                runStatus = RunStatus.Failed;
-            }
 
-            return await FinishHarvestAsync(initValues, runStatus, harvestCount, provider.PreviousProcessLimit.GetValueOrDefault(80));
+                var timeSinceLastCall = (DateTime.Now - lastRequesetTime).Milliseconds;
+                if (timeSinceLastCall < 2000)
+                {
+                    Thread.Sleep(2000 - timeSinceLastCall);
+                }
+
+                xmlDocument = await _fishDataObservationService.GetAsync(startDate, endDate, changeId);
+                changeId = long.Parse(xmlDocument?.Descendants(ns + "MaxChangeId")?.FirstOrDefault()?.Value ?? "0");
+            }
         }
-
-        public Task<HarvestInfo> HarvestAllObservationsSlowlyAsync(DataProvider provider, IJobCancellationToken cancellationToken)
+        catch (JobAbortedException)
         {
-            throw new NotImplementedException();
+            Logger.LogInformation("Fish Data harvest was cancelled.");
+            runStatus = RunStatus.Canceled;
         }
+        catch (Exception e)
+        {
+            Logger.LogError(e, "Failed to harvest Fish Data");
+            runStatus = RunStatus.Failed;
+        }
+
+        return await FinishHarvestAsync(initValues, runStatus, harvestCount, provider.PreviousProcessLimit.GetValueOrDefault(80));
+    }
+
+    public Task<HarvestInfo> HarvestAllObservationsSlowlyAsync(DataProvider provider, IJobCancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
     }
 }

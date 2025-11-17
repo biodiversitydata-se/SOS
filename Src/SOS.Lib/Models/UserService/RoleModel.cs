@@ -1,46 +1,45 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace SOS.Lib.Models.UserService
+namespace SOS.Lib.Models.UserService;
+
+public class RoleModel
 {
-    public class RoleModel
-    {
-        public int Id { get; set; }
+    public int Id { get; set; }
 
-        public string Guid { get; set; }
+    public string Guid { get; set; }
 
-        public string RoleName { get; set; }
+    public string RoleName { get; set; }
 
-        public string ShortName { get; set; }
+    public string ShortName { get; set; }
 
-        public string Description { get; set; }
+    public string Description { get; set; }
 
-        public int? AdministrationRoleId { get; set; }
+    public int? AdministrationRoleId { get; set; }
 
-        public int? UserAdministrationRoleId { get; set; }
+    public int? UserAdministrationRoleId { get; set; }
 
-        public DateTime CreatedDate { get; set; }
+    public DateTime CreatedDate { get; set; }
 
-        public int? CreatedBy { get; set; }
+    public int? CreatedBy { get; set; }
 
-        public DateTime ModifiedDate { get; set; }
+    public DateTime ModifiedDate { get; set; }
 
-        public int? ModifiedBy { get; set; }
+    public int? ModifiedBy { get; set; }
 
-        public DateTime? ValidFromDate { get; set; }
+    public DateTime? ValidFromDate { get; set; }
 
-        public DateTime? ValidToDate { get; set; }
+    public DateTime? ValidToDate { get; set; }
 
-        public int? OrganizationId { get; set; }
+    public int? OrganizationId { get; set; }
 
-        public string Identifier { get; set; }
+    public string Identifier { get; set; }
 
-        public bool IsActivationRequired { get; set; }
+    public bool IsActivationRequired { get; set; }
 
-        public int? MessageTypeId { get; set; }
+    public int? MessageTypeId { get; set; }
 
-        public bool IsUserAdministrationRole { get; set; }
+    public bool IsUserAdministrationRole { get; set; }
 
-        public IEnumerable<AuthorityModel> Authorities { get; set; }
-    }
+    public IEnumerable<AuthorityModel> Authorities { get; set; }
 }

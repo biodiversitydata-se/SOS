@@ -14,237 +14,236 @@ using System.Reflection;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
-namespace SOS.Lib.Managers
+namespace SOS.Lib.Managers;
+
+public class DataProviderManager : IDataProviderManager
 {
-    public class DataProviderManager : IDataProviderManager
+    private readonly IDataProviderRepository _dataProviderRepository;
+    private readonly ILogger<DataProviderManager> _logger;
+
+    private DataProvider GetDataProviderByIdOrIdentifier(string dataProviderIdOrIdentifier,
+        List<DataProvider> allDataProviders)
     {
-        private readonly IDataProviderRepository _dataProviderRepository;
-        private readonly ILogger<DataProviderManager> _logger;
-
-        private DataProvider GetDataProviderByIdOrIdentifier(string dataProviderIdOrIdentifier,
-            List<DataProvider> allDataProviders)
+        if (int.TryParse(dataProviderIdOrIdentifier, out var id))
         {
-            if (int.TryParse(dataProviderIdOrIdentifier, out var id))
+            return allDataProviders.FirstOrDefault(provider => provider.Id == id);
+        }
+
+        return allDataProviders.FirstOrDefault(provider =>
+            provider.Identifier.Equals(dataProviderIdOrIdentifier, StringComparison.OrdinalIgnoreCase));
+    }
+
+    public DataProviderManager(
+        IDataProviderRepository dataProviderRepository,
+        ILogger<DataProviderManager> logger)
+    {
+        _dataProviderRepository =
+            dataProviderRepository ?? throw new ArgumentNullException(nameof(dataProviderRepository));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    }
+
+    public async Task<bool> AddDataProvider(DataProvider dataProvider)
+    {
+        return await _dataProviderRepository.AddOrUpdateAsync(dataProvider);
+    }
+
+    public async Task<bool> DeleteDataProvider(int id)
+    {
+        return await _dataProviderRepository.DeleteAsync(id);
+    }
+
+    public async Task<bool> UpdateDataProvider(int id, DataProvider dataProvider)
+    {
+        return await _dataProviderRepository.UpdateAsync(id, dataProvider);
+    }
+
+    /// <inheritdoc />
+    public async Task<Result<string>> InitDefaultDataProviders(bool forceOverwriteIfCollectionExist)
+    {
+        try
+        {
+            var collectionExists = await _dataProviderRepository.CheckIfCollectionExistsAsync();
+            if (collectionExists && !forceOverwriteIfCollectionExist)
             {
-                return allDataProviders.FirstOrDefault(provider => provider.Id == id);
+                return Result.Failure<string>(
+                    "The DataProvider collection already exists. Set forceOverwriteIfCollectionExist to true if you want to overwrite this collection with default data.");
             }
 
-            return allDataProviders.FirstOrDefault(provider =>
-                provider.Identifier.Equals(dataProviderIdOrIdentifier, StringComparison.OrdinalIgnoreCase));
-        }
-
-        public DataProviderManager(
-            IDataProviderRepository dataProviderRepository,
-            ILogger<DataProviderManager> logger)
-        {
-            _dataProviderRepository =
-                dataProviderRepository ?? throw new ArgumentNullException(nameof(dataProviderRepository));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        }
-
-        public async Task<bool> AddDataProvider(DataProvider dataProvider)
-        {
-            return await _dataProviderRepository.AddOrUpdateAsync(dataProvider);
-        }
-
-        public async Task<bool> DeleteDataProvider(int id)
-        {
-            return await _dataProviderRepository.DeleteAsync(id);
-        }
-
-        public async Task<bool> UpdateDataProvider(int id, DataProvider dataProvider)
-        {
-            return await _dataProviderRepository.UpdateAsync(id, dataProvider);
-        }
-
-        /// <inheritdoc />
-        public async Task<Result<string>> InitDefaultDataProviders(bool forceOverwriteIfCollectionExist)
-        {
-            try
-            {
-                var collectionExists = await _dataProviderRepository.CheckIfCollectionExistsAsync();
-                if (collectionExists && !forceOverwriteIfCollectionExist)
-                {
-                    return Result.Failure<string>(
-                        "The DataProvider collection already exists. Set forceOverwriteIfCollectionExist to true if you want to overwrite this collection with default data.");
-                }
-
-                var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-                var filePath = Path.Combine(assemblyPath, @"Resources/DataProvider/DefaultDataProviders.json");
-                var dataProviders =
-                   JsonConvert.DeserializeObject<List<DataProvider>>(await File.ReadAllTextAsync(filePath));
-                await _dataProviderRepository.DeleteCollectionAsync();
-                await _dataProviderRepository.AddCollectionAsync();
-                await _dataProviderRepository.AddManyAsync(dataProviders);
-
-                var returnDescription = collectionExists
-                    ? "DataProvider collection was created and initialized with default data providers. Existing data were overwritten."
-                    : "DataProvider collection was created and initialized with default data providers.";
-                return Result.Success(returnDescription);
-            }
-            catch (Exception e)
-            {
-                return Result.Failure<string>(e.Message);
-            }
-        }
-
-        public async Task<Result<string>> InitDefaultDataProvider(string dataProviderIdOrIdentifier)
-        {
-            if (string.IsNullOrWhiteSpace(dataProviderIdOrIdentifier)) return Result.Failure<string>("dataProviderIdOrIdentifier is empty");
             var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             var filePath = Path.Combine(assemblyPath, @"Resources/DataProvider/DefaultDataProviders.json");
             var dataProviders =
-                JsonConvert.DeserializeObject<List<DataProvider>>(await File.ReadAllTextAsync(filePath));
+               JsonConvert.DeserializeObject<List<DataProvider>>(await File.ReadAllTextAsync(filePath));
+            await _dataProviderRepository.DeleteCollectionAsync();
+            await _dataProviderRepository.AddCollectionAsync();
+            await _dataProviderRepository.AddManyAsync(dataProviders);
 
-            DataProvider dataProvider = null;
-            if (int.TryParse(dataProviderIdOrIdentifier, out var providerId))
-            {
-                dataProvider = dataProviders.FirstOrDefault(m => m.Id == providerId);
-            }
-            else
-            {
-                dataProvider = dataProviders.FirstOrDefault(m => m.Identifier == dataProviderIdOrIdentifier);
-            }
+            var returnDescription = collectionExists
+                ? "DataProvider collection was created and initialized with default data providers. Existing data were overwritten."
+                : "DataProvider collection was created and initialized with default data providers.";
+            return Result.Success(returnDescription);
+        }
+        catch (Exception e)
+        {
+            return Result.Failure<string>(e.Message);
+        }
+    }
 
-            if (dataProvider == null) return Result.Failure<string>($"DataProvider information doesn't exist for {dataProviderIdOrIdentifier}");
-            var existingProvider = await _dataProviderRepository.GetAsync(dataProvider.Id);
-            if (existingProvider != null)
-            {
-                await _dataProviderRepository.DeleteAsync(dataProvider.Id);
-            }
-            await _dataProviderRepository.AddAsync(dataProvider);
+    public async Task<Result<string>> InitDefaultDataProvider(string dataProviderIdOrIdentifier)
+    {
+        if (string.IsNullOrWhiteSpace(dataProviderIdOrIdentifier)) return Result.Failure<string>("dataProviderIdOrIdentifier is empty");
+        var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        var filePath = Path.Combine(assemblyPath, @"Resources/DataProvider/DefaultDataProviders.json");
+        var dataProviders =
+            JsonConvert.DeserializeObject<List<DataProvider>>(await File.ReadAllTextAsync(filePath));
 
-            return Result.Success($"DataProvider {dataProvider.Identifier} was added");
+        DataProvider dataProvider = null;
+        if (int.TryParse(dataProviderIdOrIdentifier, out var providerId))
+        {
+            dataProvider = dataProviders.FirstOrDefault(m => m.Id == providerId);
+        }
+        else
+        {
+            dataProvider = dataProviders.FirstOrDefault(m => m.Identifier == dataProviderIdOrIdentifier);
         }
 
-        /// <inheritdoc />
-        public async Task<Result<string>> InitDefaultEml(IEnumerable<int> datproviderIds)
+        if (dataProvider == null) return Result.Failure<string>($"DataProvider information doesn't exist for {dataProviderIdOrIdentifier}");
+        var existingProvider = await _dataProviderRepository.GetAsync(dataProvider.Id);
+        if (existingProvider != null)
         {
-            var message = string.Empty;
-            var providers = await _dataProviderRepository.GetAllAsync();
+            await _dataProviderRepository.DeleteAsync(dataProvider.Id);
+        }
+        await _dataProviderRepository.AddAsync(dataProvider);
 
-            if (datproviderIds?.Any() ?? false)
+        return Result.Success($"DataProvider {dataProvider.Identifier} was added");
+    }
+
+    /// <inheritdoc />
+    public async Task<Result<string>> InitDefaultEml(IEnumerable<int> datproviderIds)
+    {
+        var message = string.Empty;
+        var providers = await _dataProviderRepository.GetAllAsync();
+
+        if (datproviderIds?.Any() ?? false)
+        {
+            providers = providers?.Where(p => datproviderIds.Contains(p.Id))?.ToList();
+        }
+
+        if (!(datproviderIds?.Any() ?? true) || datproviderIds.Contains(-1))
+        {
+            providers.Add(DataProvider.CompleteSosDataProvider);
+        }
+
+        if (!(datproviderIds?.Any() ?? true) || datproviderIds.Contains(-2))
+        {
+            providers.Add(DataProvider.FilterSubsetDataProvider);
+        }
+
+        if (!providers?.Any() ?? true)
+        {
+            message = "No providers found";
+            _logger.LogWarning(message);
+            return Result.Failure<string>(message);
+        }
+
+        var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+        var emlDirectory = Path.Combine(assemblyPath, @"Resources/DataProvider/Eml");
+
+        foreach (var provider in providers)
+        {
+            var filePath = Path.Combine(emlDirectory, $"{provider.Identifier}.eml.xml");
+            XDocument emlFile;
+            try
             {
-                providers = providers?.Where(p => datproviderIds.Contains(p.Id))?.ToList();
+                emlFile = XDocument.Load(filePath);
+            }
+            catch
+            {
+                emlFile = await DwCArchiveEmlFileFactory.CreateEmlXmlFileAsync(provider);
             }
 
-            if (!(datproviderIds?.Any() ?? true) || datproviderIds.Contains(-1))
+            if (emlFile == null)
             {
-                providers.Add(DataProvider.CompleteSosDataProvider);
-            }
-
-            if (!(datproviderIds?.Any() ?? true) || datproviderIds.Contains(-2))
-            {
-                providers.Add(DataProvider.FilterSubsetDataProvider);
-            }
-
-            if (!providers?.Any() ?? true)
-            {
-                message = "No providers found";
+                message = $"Failed to initialize default eml for provider: {provider.Identifier}";
                 _logger.LogWarning(message);
                 return Result.Failure<string>(message);
             }
 
-            var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            var emlDirectory = Path.Combine(assemblyPath, @"Resources/DataProvider/Eml");
-
-            foreach (var provider in providers)
+            if (!await _dataProviderRepository.StoreEmlAsync(provider.Id, emlFile))
             {
-                var filePath = Path.Combine(emlDirectory, $"{provider.Identifier}.eml.xml");
-                XDocument emlFile;
-                try
-                {
-                    emlFile = XDocument.Load(filePath);
-                }
-                catch
-                {
-                    emlFile = await DwCArchiveEmlFileFactory.CreateEmlXmlFileAsync(provider);
-                }
-
-                if (emlFile == null)
-                {
-                    message = $"Failed to initialize default eml for provider: {provider.Identifier}";
-                    _logger.LogWarning(message);
-                    return Result.Failure<string>(message);
-                }
-
-                if (!await _dataProviderRepository.StoreEmlAsync(provider.Id, emlFile))
-                {
-                    message = $"Failed to store eml for provider: {provider.Identifier}";
-                    _logger.LogWarning(message);
-                    return Result.Failure<string>(message);
-                }
+                message = $"Failed to store eml for provider: {provider.Identifier}";
+                _logger.LogWarning(message);
+                return Result.Failure<string>(message);
             }
-
-            return Result.Success("Default eml initialized");
-        }
-        public async Task<DataProvider> GetDataProviderByIdAsync(int id)
-        {
-            var dataProviders = await _dataProviderRepository.GetAllAsync();
-            var dataProvider = dataProviders.FirstOrDefault(provider => provider.Id == id);
-            return dataProvider;
         }
 
-        public async Task<List<DataProvider>> GetAllDataProvidersAsync()
-        {
-            return await _dataProviderRepository.GetAllAsync();
-        }
+        return Result.Success("Default eml initialized");
+    }
+    public async Task<DataProvider> GetDataProviderByIdAsync(int id)
+    {
+        var dataProviders = await _dataProviderRepository.GetAllAsync();
+        var dataProvider = dataProviders.FirstOrDefault(provider => provider.Id == id);
+        return dataProvider;
+    }
 
-        public async Task<DataProvider> GetDataProviderByIdOrIdentifier(string dataProviderIdOrIdentifier)
-        {
-            var allDataProviders = await _dataProviderRepository.GetAllAsync();
-            return GetDataProviderByIdOrIdentifier(dataProviderIdOrIdentifier, allDataProviders);
-        }
+    public async Task<List<DataProvider>> GetAllDataProvidersAsync()
+    {
+        return await _dataProviderRepository.GetAllAsync();
+    }
 
-        public async Task<DataProvider> GetDataProviderByIdentifier(string identifier)
-        {
-            var allDataProviders = await _dataProviderRepository.GetAllAsync();
-            return allDataProviders.FirstOrDefault(provider =>
-                provider.Identifier.Equals(identifier, StringComparison.OrdinalIgnoreCase));
-        }
+    public async Task<DataProvider> GetDataProviderByIdOrIdentifier(string dataProviderIdOrIdentifier)
+    {
+        var allDataProviders = await _dataProviderRepository.GetAllAsync();
+        return GetDataProviderByIdOrIdentifier(dataProviderIdOrIdentifier, allDataProviders);
+    }
 
-        public async Task<DataProvider> GetDataProviderByType(DataProviderType type)
-        {
-            if (type == DataProviderType.DwcA)
-                throw new ArgumentException(
-                    "Can't decide which data provider to return because there exists multiple data providers of DwC-A type.");
-            var allDataProviders = await _dataProviderRepository.GetAllAsync();
-            var dataProvider = allDataProviders.Single(provider => provider.Type == type);
-            return dataProvider;
-        }
+    public async Task<DataProvider> GetDataProviderByIdentifier(string identifier)
+    {
+        var allDataProviders = await _dataProviderRepository.GetAllAsync();
+        return allDataProviders.FirstOrDefault(provider =>
+            provider.Identifier.Equals(identifier, StringComparison.OrdinalIgnoreCase));
+    }
 
-        public async Task<List<Result<DataProvider>>> GetDataProvidersByIdOrIdentifier(
-            List<string> dataProviderIdOrIdentifiers)
+    public async Task<DataProvider> GetDataProviderByType(DataProviderType type)
+    {
+        if (type == DataProviderType.DwcA)
+            throw new ArgumentException(
+                "Can't decide which data provider to return because there exists multiple data providers of DwC-A type.");
+        var allDataProviders = await _dataProviderRepository.GetAllAsync();
+        var dataProvider = allDataProviders.Single(provider => provider.Type == type);
+        return dataProvider;
+    }
+
+    public async Task<List<Result<DataProvider>>> GetDataProvidersByIdOrIdentifier(
+        List<string> dataProviderIdOrIdentifiers)
+    {
+        var parsedDataProviders = new List<Result<DataProvider>>();
+        var allDataProviders = await _dataProviderRepository.GetAllAsync();
+        foreach (var dataProviderIdOrIdentifier in dataProviderIdOrIdentifiers)
         {
-            var parsedDataProviders = new List<Result<DataProvider>>();
-            var allDataProviders = await _dataProviderRepository.GetAllAsync();
-            foreach (var dataProviderIdOrIdentifier in dataProviderIdOrIdentifiers)
+            var dataProvider = GetDataProviderByIdOrIdentifier(dataProviderIdOrIdentifier, allDataProviders);
+            if (dataProvider != null)
             {
-                var dataProvider = GetDataProviderByIdOrIdentifier(dataProviderIdOrIdentifier, allDataProviders);
-                if (dataProvider != null)
-                {
-                    parsedDataProviders.Add(Result.Success(dataProvider));
-                }
-                else
-                {
-                    parsedDataProviders.Add(Result.Failure<DataProvider>(
-                        $"There is no data provider that has Id or Identifier = \"{dataProviderIdOrIdentifier}\""));
-                }
+                parsedDataProviders.Add(Result.Success(dataProvider));
             }
-
-            return parsedDataProviders;
+            else
+            {
+                parsedDataProviders.Add(Result.Failure<DataProvider>(
+                    $"There is no data provider that has Id or Identifier = \"{dataProviderIdOrIdentifier}\""));
+            }
         }
 
-        /// <inheritdoc />
-        public async Task<XDocument> GetEmlMetadataAsync(int dataProviderId)
-        {
-            return await _dataProviderRepository.GetEmlAsync(dataProviderId);
-        }
+        return parsedDataProviders;
+    }
 
-        /// <inheritdoc />
-        public async Task<bool> SetEmlMetadataAsync(int dataProviderId, XDocument xmlDocument)
-        {
-            return await _dataProviderRepository.StoreEmlAsync(dataProviderId, xmlDocument);
-        }
+    /// <inheritdoc />
+    public async Task<XDocument> GetEmlMetadataAsync(int dataProviderId)
+    {
+        return await _dataProviderRepository.GetEmlAsync(dataProviderId);
+    }
+
+    /// <inheritdoc />
+    public async Task<bool> SetEmlMetadataAsync(int dataProviderId, XDocument xmlDocument)
+    {
+        return await _dataProviderRepository.StoreEmlAsync(dataProviderId, xmlDocument);
     }
 }

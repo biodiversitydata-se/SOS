@@ -12,112 +12,111 @@ using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
 
-namespace SOS.Administration.Api.Controllers
+namespace SOS.Administration.Api.Controllers;
+
+/// <summary>
+///     Term dictionary controller.
+/// </summary>
+[ApiController]
+[Route("[controller]")]
+public class VocabulariesController : ControllerBase, IVocabulariesController
 {
+    private readonly IVocabularyHarvester _vocabularyHarvester;
+    private readonly ILogger<VocabulariesController> _logger;
+
     /// <summary>
-    ///     Term dictionary controller.
+    ///     Constructor
     /// </summary>
-    [ApiController]
-    [Route("[controller]")]
-    public class VocabulariesController : ControllerBase, IVocabulariesController
+    /// <param name="vocabularyHarvester"></param>
+    /// <param name="logger"></param>
+    public VocabulariesController(
+        IVocabularyHarvester vocabularyHarvester,
+        ILogger<VocabulariesController> logger)
     {
-        private readonly IVocabularyHarvester _vocabularyHarvester;
-        private readonly ILogger<VocabulariesController> _logger;
+        _vocabularyHarvester =
+            vocabularyHarvester ?? throw new ArgumentNullException(nameof(vocabularyHarvester));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    }
 
-        /// <summary>
-        ///     Constructor
-        /// </summary>
-        /// <param name="vocabularyHarvester"></param>
-        /// <param name="logger"></param>
-        public VocabulariesController(
-            IVocabularyHarvester vocabularyHarvester,
-            ILogger<VocabulariesController> logger)
+
+    /// <inheritdoc />
+    [HttpPost("All/Create")]
+    [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+    public async Task<IActionResult> CreateAllVocabulariesFilesAsync()
+    {
+        try
         {
-            _vocabularyHarvester =
-                vocabularyHarvester ?? throw new ArgumentNullException(nameof(vocabularyHarvester));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
+            var vocabularyIds = Enum.GetValues(typeof(VocabularyId)).Cast<VocabularyId>();
+            var zipBytes = await _vocabularyHarvester.CreateVocabulariesZipFileAsync(vocabularyIds);
+            return File(zipBytes, "application/zip", "AllVocabularies.zip");
         }
-
-
-        /// <inheritdoc />
-        [HttpPost("All/Create")]
-        [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> CreateAllVocabulariesFilesAsync()
+        catch (Exception e)
         {
-            try
-            {
-                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
-                var vocabularyIds = Enum.GetValues(typeof(VocabularyId)).Cast<VocabularyId>();
-                var zipBytes = await _vocabularyHarvester.CreateVocabulariesZipFileAsync(vocabularyIds);
-                return File(zipBytes, "application/zip", "AllVocabularies.zip");
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "{@methodName}() failed", MethodBase.GetCurrentMethod()?.Name);
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
-            }
+            _logger.LogError(e, "{@methodName}() failed", MethodBase.GetCurrentMethod()?.Name);
+            return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
         }
+    }
 
-        /// <inheritdoc />
-        [HttpPost("Single/Create")]
-        [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> CreateSingleVocabularyFileAsync(VocabularyId vocabularyId)
+    /// <inheritdoc />
+    [HttpPost("Single/Create")]
+    [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+    public async Task<IActionResult> CreateSingleVocabularyFileAsync(VocabularyId vocabularyId)
+    {
+        try
         {
-            try
-            {
-                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
-                var vocabularyFileTuple =
-                    await _vocabularyHarvester.CreateVocabularyFileAsync(vocabularyId);
-                return File(vocabularyFileTuple.Bytes, "application/json", vocabularyFileTuple.Filename);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "{@methodName}() failed", MethodBase.GetCurrentMethod()?.Name);
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
-            }
+            LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
+            var vocabularyFileTuple =
+                await _vocabularyHarvester.CreateVocabularyFileAsync(vocabularyId);
+            return File(vocabularyFileTuple.Bytes, "application/json", vocabularyFileTuple.Filename);
         }
-
-        /// <inheritdoc />
-        [HttpPost("Import")]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public IActionResult RunImportVocabulariesJob()
+        catch (Exception e)
         {
-            try
-            {
-                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
-                BackgroundJob.Enqueue<IVocabulariesImportJob>(job => job.RunAsync());
-                return new OkObjectResult("Import vocabularies job was enqueued to Hangfire.");
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Enqueuing import vocabularies job failed");
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
-            }
+            _logger.LogError(e, "{@methodName}() failed", MethodBase.GetCurrentMethod()?.Name);
+            return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
         }
+    }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        [HttpPost("HarvestProjects/Run")]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public IActionResult RunHarvestProjectsJob()
+    /// <inheritdoc />
+    [HttpPost("Import")]
+    [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+    public IActionResult RunImportVocabulariesJob()
+    {
+        try
         {
-            try
-            {
-                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
-                BackgroundJob.Enqueue<IProjectsHarvestJob>(job => job.RunHarvestProjectsAsync());
-                return new OkObjectResult("Projects harvest job was enqueued to Hangfire.");
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Enqueuing Projects harvest job failed");
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
-            }
+            LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
+            BackgroundJob.Enqueue<IVocabulariesImportJob>(job => job.RunAsync());
+            return new OkObjectResult("Import vocabularies job was enqueued to Hangfire.");
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Enqueuing import vocabularies job failed");
+            return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+        }
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
+    [HttpPost("HarvestProjects/Run")]
+    [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+    public IActionResult RunHarvestProjectsJob()
+    {
+        try
+        {
+            LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
+            BackgroundJob.Enqueue<IProjectsHarvestJob>(job => job.RunHarvestProjectsAsync());
+            return new OkObjectResult("Projects harvest job was enqueued to Hangfire.");
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Enqueuing Projects harvest job failed");
+            return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
         }
     }
 }

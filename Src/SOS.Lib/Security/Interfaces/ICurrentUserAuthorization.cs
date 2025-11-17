@@ -1,12 +1,11 @@
 ﻿
-namespace SOS.Lib.Security.Interfaces
+namespace SOS.Lib.Security.Interfaces;
+
+public interface IAuthorizationProvider
 {
-    public interface IAuthorizationProvider
-    {
-        /// <summary>
-        /// Create authorization header string.
-        /// </summary>
-        /// <returns>Auth header string.</returns>
-        string GetAuthHeader();
-    }
+    /// <summary>
+    /// Create authorization header string.
+    /// </summary>
+    /// <returns>Auth header string.</returns>
+    string GetAuthHeader();
 }

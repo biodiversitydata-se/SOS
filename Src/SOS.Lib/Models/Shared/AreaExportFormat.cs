@@ -1,12 +1,11 @@
-﻿namespace SOS.Lib.Models.Shared
+﻿namespace SOS.Lib.Models.Shared;
+
+/// <summary>
+/// Export format for area.
+/// </summary>
+public enum AreaExportFormat
 {
-    /// <summary>
-    /// Export format for area.
-    /// </summary>
-    public enum AreaExportFormat
-    {
-        Json,
-        GeoJson,
-        Wkt
-    }
+    Json,
+    GeoJson,
+    Wkt
 }

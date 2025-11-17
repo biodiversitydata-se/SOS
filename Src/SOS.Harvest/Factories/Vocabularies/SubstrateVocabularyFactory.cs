@@ -3,38 +3,37 @@ using SOS.Harvest.Repositories.Source.Artportalen.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
 
-namespace SOS.Harvest.Factories.Vocabularies
+namespace SOS.Harvest.Factories.Vocabularies;
+
+/// <summary>
+///     Class for creating substrate vocabulary.
+/// </summary>
+public class SubstrateVocabularyFactory : ArtportalenVocabularyFactoryBase
 {
+    private readonly IMetadataRepository _artportalenMetadataRepository;
+    private readonly ILogger<SubstrateVocabularyFactory> _logger;
+
     /// <summary>
-    ///     Class for creating substrate vocabulary.
+    ///     Constructor
     /// </summary>
-    public class SubstrateVocabularyFactory : ArtportalenVocabularyFactoryBase
+    /// <param name="artportalenMetadataRepository"></param>
+    /// <param name="logger"></param>
+    public SubstrateVocabularyFactory(
+        IMetadataRepository artportalenMetadataRepository,
+        ILogger<SubstrateVocabularyFactory> logger)
     {
-        private readonly IMetadataRepository _artportalenMetadataRepository;
-        private readonly ILogger<SubstrateVocabularyFactory> _logger;
+        _artportalenMetadataRepository = artportalenMetadataRepository ??
+                                         throw new ArgumentNullException(nameof(artportalenMetadataRepository));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    }
 
-        /// <summary>
-        ///     Constructor
-        /// </summary>
-        /// <param name="artportalenMetadataRepository"></param>
-        /// <param name="logger"></param>
-        public SubstrateVocabularyFactory(
-            IMetadataRepository artportalenMetadataRepository,
-            ILogger<SubstrateVocabularyFactory> logger)
-        {
-            _artportalenMetadataRepository = artportalenMetadataRepository ??
-                                             throw new ArgumentNullException(nameof(artportalenMetadataRepository));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        }
+    protected override VocabularyId FieldId => VocabularyId.Substrate;
+    protected override bool Localized => true;
 
-        protected override VocabularyId FieldId => VocabularyId.Substrate;
-        protected override bool Localized => true;
-
-        protected override async Task<ICollection<VocabularyValueInfo>?> GetVocabularyValues()
-        {
-            var substrates = await _artportalenMetadataRepository.GetSubstratesAsync();
-            var vocabularyValues = base.ConvertToLocalizedVocabularyValues(substrates.ToArray());
-            return vocabularyValues;
-        }
+    protected override async Task<ICollection<VocabularyValueInfo>?> GetVocabularyValues()
+    {
+        var substrates = await _artportalenMetadataRepository.GetSubstratesAsync();
+        var vocabularyValues = base.ConvertToLocalizedVocabularyValues(substrates.ToArray());
+        return vocabularyValues;
     }
 }

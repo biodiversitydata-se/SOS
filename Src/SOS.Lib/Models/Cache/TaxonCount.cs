@@ -1,18 +1,17 @@
-﻿namespace SOS.Lib.Models.Cache
+﻿namespace SOS.Lib.Models.Cache;
+
+/// <summary>
+/// Cached taxon count.
+/// </summary>
+public class TaxonCount
 {
     /// <summary>
-    /// Cached taxon count.
+    /// Observation count.
     /// </summary>
-    public class TaxonCount
-    {
-        /// <summary>
-        /// Observation count.
-        /// </summary>
-        public int ObservationCount { get; set; }
+    public int ObservationCount { get; set; }
 
-        /// <summary>
-        /// Province count.
-        /// </summary>
-        public int ProvinceCount { get; set; }
-    }
+    /// <summary>
+    /// Province count.
+    /// </summary>
+    public int ProvinceCount { get; set; }
 }

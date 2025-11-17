@@ -1,7 +1,6 @@
-﻿namespace SOS.Lib.Models.DarwinCore.Vocabulary
+﻿namespace SOS.Lib.Models.DarwinCore.Vocabulary;
+
+public static class Country
 {
-    public static class Country
-    {
-        public static readonly string Sweden = "Sweden";
-    }
+    public static readonly string Sweden = "Sweden";
 }

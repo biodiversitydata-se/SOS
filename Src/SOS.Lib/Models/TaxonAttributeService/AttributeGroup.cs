@@ -1,22 +1,21 @@
 ﻿using System.Collections.Generic;
 
-namespace SOS.Lib.Models.TaxonAttributeService
+namespace SOS.Lib.Models.TaxonAttributeService;
+
+public class AttributeGroup
 {
-    public class AttributeGroup
-    {
-        /// <summary>
-        /// Attributes
-        /// </summary>
-        public IEnumerable<Attribute> Attributes { get; set; }
+    /// <summary>
+    /// Attributes
+    /// </summary>
+    public IEnumerable<Attribute> Attributes { get; set; }
 
-        /// <summary>
-        /// Attribute types
-        /// </summary>
-        public IEnumerable<AttributeType> AttributeTypes { get; set; }
+    /// <summary>
+    /// Attribute types
+    /// </summary>
+    public IEnumerable<AttributeType> AttributeTypes { get; set; }
 
-        /// <summary>
-        ///     Attribute group id
-        /// </summary>
-        public int Id { get; set; }
-    }
+    /// <summary>
+    ///     Attribute group id
+    /// </summary>
+    public int Id { get; set; }
 }

@@ -11,54 +11,53 @@ using System.Text.Json.Serialization;
 using System.Text.Unicode;
 using Xunit;
 
-namespace SOS.Lib.UnitTests.Helpers
+namespace SOS.Lib.UnitTests.Helpers;
+
+public class ObservationPropertyFieldDescriptionHelperTool
 {
-    public class ObservationPropertyFieldDescriptionHelperTool
+    [Fact(Skip = "Intended to run on demand")]
+    [Trait("Category", "Tool")]
+    public void ReOrderProperties()
     {
-        [Fact(Skip = "Intended to run on demand")]
-        [Trait("Category", "Tool")]
-        public void ReOrderProperties()
+        // Arrange
+        string json = File.ReadAllText("c:/temp/2023-09-10/sortorder2.json");
+        var sortOrders = System.Text.Json.JsonSerializer.Deserialize<List<FieldSortOrder>>(json);
+        var allFields = new List<PropertyFieldDescription>(ObservationPropertyFieldDescriptionHelper.AllFields);
+        var newOrder = new List<PropertyFieldDescription>();
+        string strJsonOutput1 = JsonSerializer.Serialize(allFields, JsonSerializerOptions);
+
+        // Act
+        foreach (var field in sortOrders)
         {
-            // Arrange
-            string json = File.ReadAllText("c:/temp/2023-09-10/sortorder2.json");
-            var sortOrders = System.Text.Json.JsonSerializer.Deserialize<List<FieldSortOrder>>(json);
-            var allFields = new List<PropertyFieldDescription>(ObservationPropertyFieldDescriptionHelper.AllFields);
-            var newOrder = new List<PropertyFieldDescription>();
-            string strJsonOutput1 = JsonSerializer.Serialize(allFields, JsonSerializerOptions);
-
-            // Act
-            foreach (var field in sortOrders)
-            {
-                var item = allFields.Single(m => m.PropertyPath == field.PropertyPath);
-                allFields.Remove(item);
-                newOrder.Add(item);
-            }
-            newOrder.AddRange(allFields);
-
-            string strJsonOutput = System.Text.Json.JsonSerializer.Serialize(newOrder, JsonSerializerOptions);
-            File.WriteAllText("c:/temp/2023-09-10/newsortorder2.json", strJsonOutput);
-
-            // Assert
-            strJsonOutput.Should().NotBeNull();
+            var item = allFields.Single(m => m.PropertyPath == field.PropertyPath);
+            allFields.Remove(item);
+            newOrder.Add(item);
         }
+        newOrder.AddRange(allFields);
 
-        private class FieldSortOrder
-        {
-            public string Order { get; set; }
-            public int SortOrder => int.Parse(Order);
-            public string PropertyName { get; set; }
-            public string PropertyPath { get; set; }
-        }
+        string strJsonOutput = System.Text.Json.JsonSerializer.Serialize(newOrder, JsonSerializerOptions);
+        File.WriteAllText("c:/temp/2023-09-10/newsortorder2.json", strJsonOutput);
 
-        private JsonSerializerOptions JsonSerializerOptions => new JsonSerializerOptions
-        {
-            WriteIndented = true,
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-            Converters =
-            {
-                new JsonStringEnumConverter()
-            },
-            Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.Latin1Supplement)
-        };
+        // Assert
+        strJsonOutput.Should().NotBeNull();
     }
+
+    private class FieldSortOrder
+    {
+        public string Order { get; set; }
+        public int SortOrder => int.Parse(Order);
+        public string PropertyName { get; set; }
+        public string PropertyPath { get; set; }
+    }
+
+    private JsonSerializerOptions JsonSerializerOptions => new JsonSerializerOptions
+    {
+        WriteIndented = true,
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+        Converters =
+        {
+            new JsonStringEnumConverter()
+        },
+        Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.Latin1Supplement)
+    };
 }

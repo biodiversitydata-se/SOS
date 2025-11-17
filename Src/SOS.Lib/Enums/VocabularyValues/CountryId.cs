@@ -1,13 +1,12 @@
-﻿namespace SOS.Lib.Enums.VocabularyValues
+﻿namespace SOS.Lib.Enums.VocabularyValues;
+
+/// <summary>
+///     Enumeration of Country.
+/// </summary>
+public enum CountryId
 {
     /// <summary>
-    ///     Enumeration of Country.
+    ///     Sweden.
     /// </summary>
-    public enum CountryId
-    {
-        /// <summary>
-        ///     Sweden.
-        /// </summary>
-        Sweden = 0
-    }
+    Sweden = 0
 }

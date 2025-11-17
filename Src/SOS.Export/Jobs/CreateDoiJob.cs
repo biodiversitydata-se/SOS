@@ -17,134 +17,133 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace SOS.Export.Jobs
+namespace SOS.Export.Jobs;
+
+/// <summary>
+///     Artportalen harvest
+/// </summary>
+public class CreateDoiJob : ICreateDoiJob
 {
+    private readonly IObservationManager _observationManager;
+    private readonly IDataCiteService _dataCiteService;
+    private readonly IDataProviderRepository _dataProviderRepository;
+    private readonly string _doiContainer;
+    private readonly DOIConfiguration _doiConfiguration;
+    private readonly ILogger<ExportToDoiJob> _logger;
+
     /// <summary>
-    ///     Artportalen harvest
+    /// Constructor
     /// </summary>
-    public class CreateDoiJob : ICreateDoiJob
+    /// <param name="observationManager"></param>
+    /// <param name="dataCiteService"></param>
+    /// <param name="dataProviderRepository"></param>
+    /// <param name="configuration"></param>
+    /// <param name="doiConfiguration"></param>
+    /// <param name="logger"></param>
+    public CreateDoiJob(IObservationManager observationManager,
+        IDataCiteService dataCiteService,
+        IDataProviderRepository dataProviderRepository,
+        BlobStorageConfiguration configuration,
+        DOIConfiguration doiConfiguration,
+        ILogger<ExportToDoiJob> logger)
     {
-        private readonly IObservationManager _observationManager;
-        private readonly IDataCiteService _dataCiteService;
-        private readonly IDataProviderRepository _dataProviderRepository;
-        private readonly string _doiContainer;
-        private readonly DOIConfiguration _doiConfiguration;
-        private readonly ILogger<ExportToDoiJob> _logger;
+        _observationManager = observationManager ?? throw new ArgumentNullException(nameof(observationManager));
+        _dataCiteService = dataCiteService ?? throw new ArgumentNullException(nameof(dataCiteService));
+        _dataProviderRepository = dataProviderRepository ?? throw new ArgumentNullException(nameof(dataProviderRepository));
+        _doiContainer = configuration?.Containers["doi"] ?? throw new ArgumentNullException(nameof(configuration));
+        _doiConfiguration = doiConfiguration ?? throw new ArgumentNullException(nameof(doiConfiguration));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="observationManager"></param>
-        /// <param name="dataCiteService"></param>
-        /// <param name="dataProviderRepository"></param>
-        /// <param name="configuration"></param>
-        /// <param name="doiConfiguration"></param>
-        /// <param name="logger"></param>
-        public CreateDoiJob(IObservationManager observationManager,
-            IDataCiteService dataCiteService,
-            IDataProviderRepository dataProviderRepository,
-            BlobStorageConfiguration configuration,
-            DOIConfiguration doiConfiguration,
-            ILogger<ExportToDoiJob> logger)
+    /// <inheritdoc />
+    public async Task<bool> RunAsync(SearchFilter filter, string emailAddress, IJobCancellationToken cancellationToken)
+    {
+        try
         {
-            _observationManager = observationManager ?? throw new ArgumentNullException(nameof(observationManager));
-            _dataCiteService = dataCiteService ?? throw new ArgumentNullException(nameof(dataCiteService));
-            _dataProviderRepository = dataProviderRepository ?? throw new ArgumentNullException(nameof(dataProviderRepository));
-            _doiContainer = configuration?.Containers["doi"] ?? throw new ArgumentNullException(nameof(configuration));
-            _doiConfiguration = doiConfiguration ?? throw new ArgumentNullException(nameof(doiConfiguration));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        }
+            _logger.LogInformation("Start creating DOI job");
 
-        /// <inheritdoc />
-        public async Task<bool> RunAsync(SearchFilter filter, string emailAddress, IJobCancellationToken cancellationToken)
-        {
-            try
+            var descriptions = _doiConfiguration.Descriptions as List<DOIDescription> ?? new List<DOIDescription>();
+            descriptions.Add(new DOIDescription
             {
-                _logger.LogInformation("Start creating DOI job");
+                Description = $"Search query {JsonSerializer.Serialize(filter, new JsonSerializerOptions { DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull })}",
+                DescriptionType = DescriptionType.Other
+            });
 
-                var descriptions = _doiConfiguration.Descriptions as List<DOIDescription> ?? new List<DOIDescription>();
-                descriptions.Add(new DOIDescription
-                {
-                    Description = $"Search query {JsonSerializer.Serialize(filter, new JsonSerializerOptions { DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull })}",
-                    DescriptionType = DescriptionType.Other
-                });
+            var dataProviders = (await _dataProviderRepository.GetAllAsync())?.Where(dp => dp.IsActive);
+            if (filter.DataProviderIds?.Any() ?? false)
+            {
+                dataProviders = dataProviders?.Where(dp => dp.IsActive && filter.DataProviderIds.Contains(dp.Id)).ToList();
+            }
 
-                var dataProviders = (await _dataProviderRepository.GetAllAsync())?.Where(dp => dp.IsActive);
-                if (filter.DataProviderIds?.Any() ?? false)
+            var metaData = new DOIMetadata
+            {
+                Attributes = new DOIAttributes
                 {
-                    dataProviders = dataProviders?.Where(dp => dp.IsActive && filter.DataProviderIds.Contains(dp.Id)).ToList();
-                }
-
-                var metaData = new DOIMetadata
-                {
-                    Attributes = new DOIAttributes
+                    Contributors = dataProviders?.Select(dp => new DOIContributor
                     {
-                        Contributors = dataProviders?.Select(dp => new DOIContributor
-                        {
-                            ContributorType = ContributorType.DataCollector,
-                            Name = dp.Names.Translate("en-GB"),
-                            NameType = NameType.Organizational
-                        }),
-                        Creators = new[]
-                        {
-                            _doiConfiguration.Creator
-                        },
-                        Descriptions = descriptions,
-                        Formats = _doiConfiguration.Formats,
-                        PublicationYear = DateTime.Now.Year,
-                        Titles = new[] { new DOITitle { Title = $"Occurrence records download on {DateTime.Now.ToString("yyyy-MM-dd")}" } },
-                        Publisher = _doiConfiguration.Publisher,
-                        Subjects = _doiConfiguration.Subjects,
-                        Types = _doiConfiguration.Types
+                        ContributorType = ContributorType.DataCollector,
+                        Name = dp.Names.Translate("en-GB"),
+                        NameType = NameType.Organizational
+                    }),
+                    Creators = new[]
+                    {
+                        _doiConfiguration.Creator
                     },
-                    Type = "dois"
-                };
+                    Descriptions = descriptions,
+                    Formats = _doiConfiguration.Formats,
+                    PublicationYear = DateTime.Now.Year,
+                    Titles = new[] { new DOITitle { Title = $"Occurrence records download on {DateTime.Now.ToString("yyyy-MM-dd")}" } },
+                    Publisher = _doiConfiguration.Publisher,
+                    Subjects = _doiConfiguration.Subjects,
+                    Types = _doiConfiguration.Types
+                },
+                Type = "dois"
+            };
 
-                _logger.LogDebug("Start creating DOI draft");
-                metaData = await _dataCiteService.CreateDoiDraftAsync(metaData);
-                _logger.LogDebug("Finish creating DOI draft");
+            _logger.LogDebug("Start creating DOI draft");
+            metaData = await _dataCiteService.CreateDoiDraftAsync(metaData);
+            _logger.LogDebug("Finish creating DOI draft");
 
-                var success = false;
+            var success = false;
 
-                if (metaData != null)
+            if (metaData != null)
+            {
+                _logger.LogDebug($"Start creating DOI file ({metaData.Id})");
+                success = await _observationManager.ExportAndStoreAsync(filter, _doiContainer, metaData.Id,
+                    emailAddress, "DwC-A file", cancellationToken);
+                _logger.LogDebug($"Finish creating DOI file ({metaData.Id})");
+
+                if (success)
                 {
-                    _logger.LogDebug($"Start creating DOI file ({metaData.Id})");
-                    success = await _observationManager.ExportAndStoreAsync(filter, _doiContainer, metaData.Id,
-                        emailAddress, "DwC-A file", cancellationToken);
-                    _logger.LogDebug($"Finish creating DOI file ({metaData.Id})");
-
-                    if (success)
+                    metaData.Attributes.Url = $"{_doiConfiguration.Url}/{metaData.Id}";
+                    metaData.Attributes.Identifiers = new[]
                     {
-                        metaData.Attributes.Url = $"{_doiConfiguration.Url}/{metaData.Id}";
-                        metaData.Attributes.Identifiers = new[]
+                        new DOIIdentifier
                         {
-                            new DOIIdentifier
-                            {
-                                Identifier = $"https://doi.org/{metaData.Id}",
-                                IdentifierType = "DOI"
-                            }
-                        };
+                            Identifier = $"https://doi.org/{metaData.Id}",
+                            IdentifierType = "DOI"
+                        }
+                    };
 
-                        _logger.LogDebug($"Start publishing DOI ({metaData.Id})");
-                        success = await _dataCiteService.PublishDoiAsync(metaData);
-                        _logger.LogDebug($"Finish publishing DOI ({metaData.Id})");
-                    }
+                    _logger.LogDebug($"Start publishing DOI ({metaData.Id})");
+                    success = await _dataCiteService.PublishDoiAsync(metaData);
+                    _logger.LogDebug($"Finish publishing DOI ({metaData.Id})");
                 }
-                _logger.LogInformation($"Finish creating DOI job. Success: {success}");
+            }
+            _logger.LogInformation($"Finish creating DOI job. Success: {success}");
 
-                return success ? true : throw new Exception("Creating DOI job failed");
-            }
-            catch (JobAbortedException)
-            {
-                _logger.LogInformation("Creating DOI job was cancelled.");
-            }
-            catch (Exception e)
-            {
-                _logger.LogInformation(e, "Failed to create DOI.");
-                throw;
-            }
-
-            return false;
+            return success ? true : throw new Exception("Creating DOI job failed");
         }
+        catch (JobAbortedException)
+        {
+            _logger.LogInformation("Creating DOI job was cancelled.");
+        }
+        catch (Exception e)
+        {
+            _logger.LogInformation(e, "Failed to create DOI.");
+            throw;
+        }
+
+        return false;
     }
 }

@@ -10,97 +10,96 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace SOS.Observations.Api.Managers
+namespace SOS.Observations.Api.Managers;
+
+/// <summary>
+///     Data provider manager.
+/// </summary>
+public class DataProviderManager : IDataProviderManager
 {
+    private readonly IDataProviderCache _dataProviderCache;
+    private readonly IProcessInfoManager _processInfoManager;
+    private readonly IProcessedObservationRepository _processedObservationRepository;
+    private readonly ILogger<DataProviderManager> _logger;
+
     /// <summary>
-    ///     Data provider manager.
+    /// Constructor
     /// </summary>
-    public class DataProviderManager : IDataProviderManager
+    /// <param name="dataProviderCache"></param>
+    /// <param name="processInfoManager"></param>
+    /// <param name="processedObservationRepository"></param>
+    /// <param name="logger"></param>
+    /// <exception cref="ArgumentNullException"></exception>
+    public DataProviderManager(
+        IDataProviderCache dataProviderCache,
+        IProcessInfoManager processInfoManager,
+        IProcessedObservationRepository processedObservationRepository,
+        ILogger<DataProviderManager> logger)
     {
-        private readonly IDataProviderCache _dataProviderCache;
-        private readonly IProcessInfoManager _processInfoManager;
-        private readonly IProcessedObservationRepository _processedObservationRepository;
-        private readonly ILogger<DataProviderManager> _logger;
+        _dataProviderCache =
+            dataProviderCache ?? throw new ArgumentNullException(nameof(dataProviderCache));
+        _processInfoManager = processInfoManager ?? throw new ArgumentNullException(nameof(processInfoManager));
+        _processedObservationRepository = processedObservationRepository ??
+                                          throw new ArgumentNullException(nameof(processedObservationRepository));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="dataProviderCache"></param>
-        /// <param name="processInfoManager"></param>
-        /// <param name="processedObservationRepository"></param>
-        /// <param name="logger"></param>
-        /// <exception cref="ArgumentNullException"></exception>
-        public DataProviderManager(
-            IDataProviderCache dataProviderCache,
-            IProcessInfoManager processInfoManager,
-            IProcessedObservationRepository processedObservationRepository,
-            ILogger<DataProviderManager> logger)
+    /// <inheritdoc />
+    public async Task<IEnumerable<DataProviderDto>> GetDataProvidersAsync(bool includeInactive, string cultureCode, bool includeProvidersWithNoObservations = true, IEnumerable<DataProviderCategory> categories = null)
+    {
+        var dataProviderDtos = new List<DataProviderDto>();
+        var processInfosActive = await _processInfoManager.GetProcessInfoAsync(_processedObservationRepository.UniquePublicIndexName);
+        var allDataProviders = await _dataProviderCache.GetAllAsync();
+        var selectedDataProviders = includeInactive
+            ? allDataProviders
+            : allDataProviders.Where(provider => provider.IsActive).ToList();
+
+        // Add process data
+        foreach (var dataProvider in selectedDataProviders)
         {
-            _dataProviderCache =
-                dataProviderCache ?? throw new ArgumentNullException(nameof(dataProviderCache));
-            _processInfoManager = processInfoManager ?? throw new ArgumentNullException(nameof(processInfoManager));
-            _processedObservationRepository = processedObservationRepository ??
-                                              throw new ArgumentNullException(nameof(processedObservationRepository));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        }
+            var providerInfo =
+                processInfosActive?.ProvidersInfo?.FirstOrDefault(provider => provider.DataProviderId == dataProvider.Id);
 
-        /// <inheritdoc />
-        public async Task<IEnumerable<DataProviderDto>> GetDataProvidersAsync(bool includeInactive, string cultureCode, bool includeProvidersWithNoObservations = true, IEnumerable<DataProviderCategory> categories = null)
-        {
-            var dataProviderDtos = new List<DataProviderDto>();
-            var processInfosActive = await _processInfoManager.GetProcessInfoAsync(_processedObservationRepository.UniquePublicIndexName);
-            var allDataProviders = await _dataProviderCache.GetAllAsync();
-            var selectedDataProviders = includeInactive
-                ? allDataProviders
-                : allDataProviders.Where(provider => provider.IsActive).ToList();
-
-            // Add process data
-            foreach (var dataProvider in selectedDataProviders)
+            if (providerInfo != null)
             {
-                var providerInfo =
-                    processInfosActive?.ProvidersInfo?.FirstOrDefault(provider => provider.DataProviderId == dataProvider.Id);
-
-                if (providerInfo != null)
+                if (!includeProvidersWithNoObservations &&
+                    providerInfo.PublicProcessCount.GetValueOrDefault(0) == 0 &&
+                    providerInfo.ProtectedProcessCount.GetValueOrDefault(0) == 0)
                 {
-                    if (!includeProvidersWithNoObservations &&
-                        providerInfo.PublicProcessCount.GetValueOrDefault(0) == 0 &&
-                        providerInfo.ProtectedProcessCount.GetValueOrDefault(0) == 0)
-                    {
-                        continue;
-                    }
-                    if ((categories?.Any() ?? false) && !(dataProvider.Categories?.Any(c => categories.Contains(c)) ?? true))
-                    {
-                        continue;
-                    }
-
-                    dataProviderDtos.Add(DataProviderDto.Create(
-                        dataProvider,
-                        providerInfo.PublicProcessCount.GetValueOrDefault(0),
-                        providerInfo.ProtectedProcessCount.GetValueOrDefault(0),
-                        providerInfo.HarvestEnd,
-                        providerInfo.HarvestNotes,
-                        providerInfo.ProcessEnd,
-                        providerInfo.LatestIncrementalEnd,
-                        cultureCode));
+                    continue;
                 }
-                else
+                if ((categories?.Any() ?? false) && !(dataProvider.Categories?.Any(c => categories.Contains(c)) ?? true))
                 {
-                    dataProviderDtos.Add(DataProviderDto.Create(dataProvider, cultureCode));
+                    continue;
                 }
+
+                dataProviderDtos.Add(DataProviderDto.Create(
+                    dataProvider,
+                    providerInfo.PublicProcessCount.GetValueOrDefault(0),
+                    providerInfo.ProtectedProcessCount.GetValueOrDefault(0),
+                    providerInfo.HarvestEnd,
+                    providerInfo.HarvestNotes,
+                    providerInfo.ProcessEnd,
+                    providerInfo.LatestIncrementalEnd,
+                    cultureCode));
             }
-
-            return dataProviderDtos;
-        }
-
-        public async Task<byte[]> GetEmlFileAsync(int providerId)
-        {
-            var eml = await _dataProviderCache.GetEmlAsync(providerId);
-            if (eml == null)
+            else
             {
-                return Array.Empty<byte>();
+                dataProviderDtos.Add(DataProviderDto.Create(dataProvider, cultureCode));
             }
-
-            return await eml?.ToBytesAsync();
         }
+
+        return dataProviderDtos;
+    }
+
+    public async Task<byte[]> GetEmlFileAsync(int providerId)
+    {
+        var eml = await _dataProviderCache.GetEmlAsync(providerId);
+        if (eml == null)
+        {
+            return Array.Empty<byte>();
+        }
+
+        return await eml?.ToBytesAsync();
     }
 }

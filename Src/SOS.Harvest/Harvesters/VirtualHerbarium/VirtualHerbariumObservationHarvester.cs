@@ -12,126 +12,125 @@ using SOS.Lib.Repositories.Verbatim.Interfaces;
 using System.Globalization;
 using System.Xml.Linq;
 
-namespace SOS.Harvest.Harvesters.VirtualHerbarium
+namespace SOS.Harvest.Harvesters.VirtualHerbarium;
+
+public class VirtualHerbariumObservationHarvester : ObservationHarvesterBase<VirtualHerbariumObservationVerbatim, int>, IVirtualHerbariumObservationHarvester
 {
-    public class VirtualHerbariumObservationHarvester : ObservationHarvesterBase<VirtualHerbariumObservationVerbatim, int>, IVirtualHerbariumObservationHarvester
+    private readonly IVirtualHerbariumObservationService _virtualHerbariumObservationService;
+    private readonly VirtualHerbariumServiceConfiguration _virtualHerbariumServiceConfiguration;
+
+    /// <summary>
+    ///     Constructor
+    /// </summary>
+    /// <param name="virtualHerbariumObservationService"></param>
+    /// <param name="virtualHerbariumObservationVerbatimRepository"></param>
+    /// <param name="virtualHerbariumServiceConfiguration"></param>
+    /// <param name="logger"></param>
+    public VirtualHerbariumObservationHarvester(
+        IVirtualHerbariumObservationService virtualHerbariumObservationService,
+        IVirtualHerbariumObservationVerbatimRepository virtualHerbariumObservationVerbatimRepository,
+        VirtualHerbariumServiceConfiguration virtualHerbariumServiceConfiguration,
+        ILogger<VirtualHerbariumObservationHarvester> logger) : base("Virtual Herbarium", virtualHerbariumObservationVerbatimRepository, logger)
     {
-        private readonly IVirtualHerbariumObservationService _virtualHerbariumObservationService;
-        private readonly VirtualHerbariumServiceConfiguration _virtualHerbariumServiceConfiguration;
+        _virtualHerbariumObservationService = virtualHerbariumObservationService ??
+                                              throw new ArgumentNullException(
+                                                  nameof(virtualHerbariumObservationService));
+        _virtualHerbariumServiceConfiguration = virtualHerbariumServiceConfiguration ??
+                                                throw new ArgumentNullException(
+                                                    nameof(virtualHerbariumServiceConfiguration));
+    }
 
-        /// <summary>
-        ///     Constructor
-        /// </summary>
-        /// <param name="virtualHerbariumObservationService"></param>
-        /// <param name="virtualHerbariumObservationVerbatimRepository"></param>
-        /// <param name="virtualHerbariumServiceConfiguration"></param>
-        /// <param name="logger"></param>
-        public VirtualHerbariumObservationHarvester(
-            IVirtualHerbariumObservationService virtualHerbariumObservationService,
-            IVirtualHerbariumObservationVerbatimRepository virtualHerbariumObservationVerbatimRepository,
-            VirtualHerbariumServiceConfiguration virtualHerbariumServiceConfiguration,
-            ILogger<VirtualHerbariumObservationHarvester> logger) : base("Virtual Herbarium", virtualHerbariumObservationVerbatimRepository, logger)
-        {
-            _virtualHerbariumObservationService = virtualHerbariumObservationService ??
-                                                  throw new ArgumentNullException(
-                                                      nameof(virtualHerbariumObservationService));
-            _virtualHerbariumServiceConfiguration = virtualHerbariumServiceConfiguration ??
-                                                    throw new ArgumentNullException(
-                                                        nameof(virtualHerbariumServiceConfiguration));
-        }
+    public Task<HarvestInfo> HarvestAllObservationsSlowlyAsync(DataProvider provider, IJobCancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
 
-        public Task<HarvestInfo> HarvestAllObservationsSlowlyAsync(DataProvider provider, IJobCancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
+    /// inheritdoc />
+    public async Task<HarvestInfo> HarvestObservationsAsync(DataProvider dataProvider,
+        JobRunModes mode,
+        DateTime? fromDate, IJobCancellationToken cancellationToken)
+    {
+        await Task.Run(() => throw new NotImplementedException("Not implemented for this provider"));
+        return null!;
+    }
 
-        /// inheritdoc />
-        public async Task<HarvestInfo> HarvestObservationsAsync(DataProvider dataProvider,
-            JobRunModes mode,
-            DateTime? fromDate, IJobCancellationToken cancellationToken)
+    /// inheritdoc />
+    public async Task<HarvestInfo> HarvestObservationsAsync(DataProvider provider, IJobCancellationToken cancellationToken)
+    {
+        var occurrenceIdsSet = new HashSet<string>();
+        var runStatus = RunStatus.Success;
+        var harvestCount = 0;
+        (DateTime startDate, long preHarvestCount) initValues = (DateTime.Now, 0);
+        try
         {
-            await Task.Run(() => throw new NotImplementedException("Not implemented for this provider"));
-            return null!;
-        }
+            initValues.preHarvestCount = await InitializeHarvestAsync(true);
 
-        /// inheritdoc />
-        public async Task<HarvestInfo> HarvestObservationsAsync(DataProvider provider, IJobCancellationToken cancellationToken)
-        {
-            var occurrenceIdsSet = new HashSet<string>();
-            var runStatus = RunStatus.Success;
-            var harvestCount = 0;
-            (DateTime startDate, long preHarvestCount) initValues = (DateTime.Now, 0);
-            try
+            Logger.LogDebug($"Start getting Localities for Virtual Herbarium");
+            var localitiesXml = await _virtualHerbariumObservationService.GetLocalitiesAsync();
+            Logger.LogDebug($"Finish getting Localities for Virtual Herbarium");
+
+            var verbatimFactory = new VirtualHerbariumHarvestFactory(localitiesXml!);
+            var pageIndex = 1;
+            var fromDate = new DateTime(1628, 1, 1);
+
+            while (true)
             {
-                initValues.preHarvestCount = await InitializeHarvestAsync(true);
+                Logger.LogDebug($"Start getting Virtual Herbarium observations page: {pageIndex}");
+                var observations = await _virtualHerbariumObservationService.GetAsync(fromDate, pageIndex, _virtualHerbariumServiceConfiguration.MaxReturnedChangesInOnePage);
+                Logger.LogDebug($"Finish getting Virtual Herbarium observations page: {pageIndex}");
 
-                Logger.LogDebug($"Start getting Localities for Virtual Herbarium");
-                var localitiesXml = await _virtualHerbariumObservationService.GetLocalitiesAsync();
-                Logger.LogDebug($"Finish getting Localities for Virtual Herbarium");
+                cancellationToken?.ThrowIfCancellationRequested();
+                Logger.LogDebug($"Start casting Virtual Herbarium observations page: {pageIndex}");
+                var verbatims = (await verbatimFactory.CastEntitiesToVerbatimsAsync(observations!))?.ToArray();
+                observations = null;
+                Logger.LogDebug($"Finish casting Virtual Herbarium observations page: {pageIndex}");
 
-                var verbatimFactory = new VirtualHerbariumHarvestFactory(localitiesXml!);
-                var pageIndex = 1;
-                var fromDate = new DateTime(1628, 1, 1);
-
-                while (true)
+                if ((verbatims?.Length ?? 0) == 0)
                 {
-                    Logger.LogDebug($"Start getting Virtual Herbarium observations page: {pageIndex}");
-                    var observations = await _virtualHerbariumObservationService.GetAsync(fromDate, pageIndex, _virtualHerbariumServiceConfiguration.MaxReturnedChangesInOnePage);
-                    Logger.LogDebug($"Finish getting Virtual Herbarium observations page: {pageIndex}");
-
-                    cancellationToken?.ThrowIfCancellationRequested();
-                    Logger.LogDebug($"Start casting Virtual Herbarium observations page: {pageIndex}");
-                    var verbatims = (await verbatimFactory.CastEntitiesToVerbatimsAsync(observations!))?.ToArray();
-                    observations = null;
-                    Logger.LogDebug($"Finish casting Virtual Herbarium observations page: {pageIndex}");
-
-                    if ((verbatims?.Length ?? 0) == 0)
-                    {
-                        break;
-                    }
-
-                    harvestCount += verbatims!.Count();
-
-                    // Remove duplicates
-                    var distinctVerbatims = new HashSet<VirtualHerbariumObservationVerbatim>();
-                    foreach (var verbatim in verbatims!)
-                    {
-                        var occurrenceId = $"{verbatim.InstitutionCode}#{verbatim.AccessionNo}#{verbatim.DyntaxaId.ToString(CultureInfo.InvariantCulture)}";
-                        if (occurrenceIdsSet.Contains(occurrenceId))
-                        {
-                            Logger.LogWarning("Duplicate observation found in {@dataProvider}: {occurrenceId}", "VirtualHerbarium", occurrenceId);
-                            continue;
-                        }
-
-                        occurrenceIdsSet.Add(occurrenceId);
-                        distinctVerbatims.Add(verbatim);
-                    }
-                    Logger.LogDebug($"Start storing Virtual Herbarium observations page: {pageIndex}");
-                    // Add sightings to MongoDb
-                    await VerbatimRepository.AddManyAsync(distinctVerbatims);
-                    Logger.LogDebug($"Finish storing Virtual Herbarium observations page: {pageIndex}");
-
-                    if (_virtualHerbariumServiceConfiguration.MaxNumberOfSightingsHarvested.HasValue &&
-                        harvestCount >= _virtualHerbariumServiceConfiguration.MaxNumberOfSightingsHarvested)
-                    {
-                        break;
-                    }
-
-                    pageIndex++;
+                    break;
                 }
-            }
-            catch (JobAbortedException)
-            {
-                Logger.LogInformation("Virtual Herbarium harvest was cancelled.");
-                runStatus = RunStatus.Canceled;
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e, "Failed to harvest Virtual Herbarium");
-                runStatus = RunStatus.Failed;
-            }
 
-            return await FinishHarvestAsync(initValues, runStatus, harvestCount, provider.PreviousProcessLimit.GetValueOrDefault(80));
+                harvestCount += verbatims!.Count();
+
+                // Remove duplicates
+                var distinctVerbatims = new HashSet<VirtualHerbariumObservationVerbatim>();
+                foreach (var verbatim in verbatims!)
+                {
+                    var occurrenceId = $"{verbatim.InstitutionCode}#{verbatim.AccessionNo}#{verbatim.DyntaxaId.ToString(CultureInfo.InvariantCulture)}";
+                    if (occurrenceIdsSet.Contains(occurrenceId))
+                    {
+                        Logger.LogWarning("Duplicate observation found in {@dataProvider}: {occurrenceId}", "VirtualHerbarium", occurrenceId);
+                        continue;
+                    }
+
+                    occurrenceIdsSet.Add(occurrenceId);
+                    distinctVerbatims.Add(verbatim);
+                }
+                Logger.LogDebug($"Start storing Virtual Herbarium observations page: {pageIndex}");
+                // Add sightings to MongoDb
+                await VerbatimRepository.AddManyAsync(distinctVerbatims);
+                Logger.LogDebug($"Finish storing Virtual Herbarium observations page: {pageIndex}");
+
+                if (_virtualHerbariumServiceConfiguration.MaxNumberOfSightingsHarvested.HasValue &&
+                    harvestCount >= _virtualHerbariumServiceConfiguration.MaxNumberOfSightingsHarvested)
+                {
+                    break;
+                }
+
+                pageIndex++;
+            }
         }
+        catch (JobAbortedException)
+        {
+            Logger.LogInformation("Virtual Herbarium harvest was cancelled.");
+            runStatus = RunStatus.Canceled;
+        }
+        catch (Exception e)
+        {
+            Logger.LogError(e, "Failed to harvest Virtual Herbarium");
+            runStatus = RunStatus.Failed;
+        }
+
+        return await FinishHarvestAsync(initValues, runStatus, harvestCount, provider.PreviousProcessLimit.GetValueOrDefault(80));
     }
 }

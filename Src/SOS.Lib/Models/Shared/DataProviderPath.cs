@@ -1,20 +1,19 @@
 ﻿using System.Collections.Generic;
 
-namespace SOS.Lib.Models.Shared
+namespace SOS.Lib.Models.Shared;
+
+/// <summary>
+/// Class for data provider path
+/// </summary>
+public class DataProviderPath
 {
     /// <summary>
-    /// Class for data provider path
+    /// Culture code i.e. sv-SE
     /// </summary>
-    public class DataProviderPath
-    {
-        /// <summary>
-        /// Culture code i.e. sv-SE
-        /// </summary>
-        public string CultureCode { get; set; }
+    public string CultureCode { get; set; }
 
-        /// <summary>
-        /// Localized path
-        /// </summary>
-        public IEnumerable<string> Path { get; set; }
-    }
+    /// <summary>
+    /// Localized path
+    /// </summary>
+    public IEnumerable<string> Path { get; set; }
 }

@@ -3,45 +3,44 @@ using SOS.Harvest.Services.Interfaces;
 using SOS.Lib.Configuration.Import;
 using System.Xml.Linq;
 
-namespace SOS.Harvest.Services
+namespace SOS.Harvest.Services;
+
+public class SersObservationService : ISersObservationService
 {
-    public class SersObservationService : ISersObservationService
+    private readonly IAquaSupportRequestService _aquaSupportRequestService;
+    private readonly ILogger<SersObservationService> _logger;
+    private readonly SersServiceConfiguration _sersServiceConfiguration;
+
+    /// <summary>
+    ///  Constructor
+    /// </summary>
+    /// <param name="aquaSupportRequestService"></param>
+    /// <param name="sersServiceConfiguration"></param>
+    /// <param name="logger"></param>
+    /// <exception cref="ArgumentNullException"></exception>
+    public SersObservationService(
+        IAquaSupportRequestService aquaSupportRequestService,
+        SersServiceConfiguration sersServiceConfiguration,
+        ILogger<SersObservationService> logger)
     {
-        private readonly IAquaSupportRequestService _aquaSupportRequestService;
-        private readonly ILogger<SersObservationService> _logger;
-        private readonly SersServiceConfiguration _sersServiceConfiguration;
+        _aquaSupportRequestService = aquaSupportRequestService ?? throw new ArgumentNullException(nameof(aquaSupportRequestService));
+        _sersServiceConfiguration = sersServiceConfiguration ??
+                                    throw new ArgumentNullException(nameof(sersServiceConfiguration));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    }
 
-        /// <summary>
-        ///  Constructor
-        /// </summary>
-        /// <param name="aquaSupportRequestService"></param>
-        /// <param name="sersServiceConfiguration"></param>
-        /// <param name="logger"></param>
-        /// <exception cref="ArgumentNullException"></exception>
-        public SersObservationService(
-            IAquaSupportRequestService aquaSupportRequestService,
-            SersServiceConfiguration sersServiceConfiguration,
-            ILogger<SersObservationService> logger)
+    /// <inheritdoc />
+    public async Task<XDocument> GetAsync(DateTime startDate, DateTime endDate, long changeId)
+    {
+        try
         {
-            _aquaSupportRequestService = aquaSupportRequestService ?? throw new ArgumentNullException(nameof(aquaSupportRequestService));
-            _sersServiceConfiguration = sersServiceConfiguration ??
-                                        throw new ArgumentNullException(nameof(sersServiceConfiguration));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            return await _aquaSupportRequestService.GetAsync($"{_sersServiceConfiguration.BaseAddress}/api/v1/SersSpeciesObservation?token={_sersServiceConfiguration.Token}",
+                startDate, endDate, changeId);
         }
-
-        /// <inheritdoc />
-        public async Task<XDocument> GetAsync(DateTime startDate, DateTime endDate, long changeId)
+        catch (Exception e)
         {
-            try
-            {
-                return await _aquaSupportRequestService.GetAsync($"{_sersServiceConfiguration.BaseAddress}/api/v1/SersSpeciesObservation?token={_sersServiceConfiguration.Token}",
-                    startDate, endDate, changeId);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Failed to get data from {@dataProvider}", "SERS");
-                throw;
-            }
+            _logger.LogError(e, "Failed to get data from {@dataProvider}", "SERS");
+            throw;
         }
     }
 }

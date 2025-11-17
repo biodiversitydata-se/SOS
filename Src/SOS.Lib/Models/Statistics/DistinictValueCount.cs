@@ -1,8 +1,7 @@
-﻿namespace SOS.Lib.Models.Statistics
+﻿namespace SOS.Lib.Models.Statistics;
+
+public class DistinictValueCount<T>
 {
-    public class DistinictValueCount<T>
-    {
-        public T Value { get; set; }
-        public int Count { get; set; }
-    }
+    public T Value { get; set; }
+    public int Count { get; set; }
 }

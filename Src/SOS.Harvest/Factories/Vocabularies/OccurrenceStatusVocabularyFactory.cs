@@ -1,30 +1,29 @@
 ﻿using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
 
-namespace SOS.Harvest.Factories.Vocabularies
+namespace SOS.Harvest.Factories.Vocabularies;
+
+/// <summary>
+///     Class for creating Occurrence Status vocabulary.
+/// </summary>
+public class OccurrenceStatusVocabularyFactory : DwcVocabularyFactoryBase
 {
-    /// <summary>
-    ///     Class for creating Occurrence Status vocabulary.
-    /// </summary>
-    public class OccurrenceStatusVocabularyFactory : DwcVocabularyFactoryBase
+    protected override VocabularyId FieldId => VocabularyId.OccurrenceStatus;
+    protected override bool Localized => false;
+
+    protected override ICollection<VocabularyValueInfo> GetVocabularyValues()
     {
-        protected override VocabularyId FieldId => VocabularyId.OccurrenceStatus;
-        protected override bool Localized => false;
-
-        protected override ICollection<VocabularyValueInfo> GetVocabularyValues()
+        var vocabularyValues = new List<VocabularyValueInfo>
         {
-            var vocabularyValues = new List<VocabularyValueInfo>
-            {
-                new VocabularyValueInfo {Id = 0, Value = "present"},
-                new VocabularyValueInfo {Id = 1, Value = "absent"}
-            };
+            new VocabularyValueInfo {Id = 0, Value = "present"},
+            new VocabularyValueInfo {Id = 1, Value = "absent"}
+        };
 
-            return vocabularyValues;
-        }
+        return vocabularyValues;
+    }
 
-        protected override Dictionary<string, int>? GetMappingSynonyms()
-        {
-            return null;
-        }
+    protected override Dictionary<string, int>? GetMappingSynonyms()
+    {
+        return null;
     }
 }

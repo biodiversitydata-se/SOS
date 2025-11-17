@@ -2,22 +2,21 @@
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Models.Verbatim.Artportalen;
 
-namespace SOS.Lib.Repositories.Verbatim
+namespace SOS.Lib.Repositories.Verbatim;
+
+/// <summary>
+///    Repository for checklist verbatim
+/// </summary>
+public class ArtportalenChecklistVerbatimRepository : VerbatimRepositoryBase<ArtportalenChecklistVerbatim, int>
 {
     /// <summary>
-    ///    Repository for checklist verbatim
+    ///     Constructor
     /// </summary>
-    public class ArtportalenChecklistVerbatimRepository : VerbatimRepositoryBase<ArtportalenChecklistVerbatim, int>
+    /// <param name="importClient"></param>
+    /// <param name="logger"></param>
+    public ArtportalenChecklistVerbatimRepository(
+        IVerbatimClient importClient,
+        ILogger<ArtportalenChecklistVerbatimRepository> logger) : base(importClient, logger)
     {
-        /// <summary>
-        ///     Constructor
-        /// </summary>
-        /// <param name="importClient"></param>
-        /// <param name="logger"></param>
-        public ArtportalenChecklistVerbatimRepository(
-            IVerbatimClient importClient,
-            ILogger<ArtportalenChecklistVerbatimRepository> logger) : base(importClient, logger)
-        {
-        }
     }
 }

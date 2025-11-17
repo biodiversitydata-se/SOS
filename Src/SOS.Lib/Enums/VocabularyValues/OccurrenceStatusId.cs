@@ -1,18 +1,17 @@
-﻿namespace SOS.Lib.Enums.VocabularyValues
+﻿namespace SOS.Lib.Enums.VocabularyValues;
+
+/// <summary>
+///     Enumeration of OccurrenceStatus.
+/// </summary>
+public enum OccurrenceStatusId
 {
     /// <summary>
-    ///     Enumeration of OccurrenceStatus.
+    ///     Present.
     /// </summary>
-    public enum OccurrenceStatusId
-    {
-        /// <summary>
-        ///     Present.
-        /// </summary>
-        Present = 0,
+    Present = 0,
 
-        /// <summary>
-        ///     Absent.
-        /// </summary>
-        Absent = 1
-    }
+    /// <summary>
+    ///     Absent.
+    /// </summary>
+    Absent = 1
 }

@@ -1,8 +1,7 @@
-﻿namespace SOS.Lib.Models.Gis
+﻿namespace SOS.Lib.Models.Gis;
+
+public class XYBoundingBox
 {
-    public class XYBoundingBox
-    {
-        public XYCoordinate BottomRight { get; set; }
-        public XYCoordinate TopLeft { get; set; }
-    }
+    public XYCoordinate BottomRight { get; set; }
+    public XYCoordinate TopLeft { get; set; }
 }

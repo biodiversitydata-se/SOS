@@ -10,61 +10,60 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace SOS.Process.UnitTests.Services
+namespace SOS.Process.UnitTests.Services;
+
+public class iNaturalistApiObservationServiceTests
 {
-    public class iNaturalistApiObservationServiceTests
+    public iNaturalistApiObservationServiceTests()
     {
-        public iNaturalistApiObservationServiceTests()
+    }
+
+    [Fact(Skip = "Intended to run on demand when needed")]
+    public async Task GetINaturalistObservations_SpecificPage()
+    {
+        // Arrange
+        var iNatService = new iNaturalistApiObservationService(new HttpClientService(new Mock<ILogger<HttpClientService>>().Object), new NullLogger<iNaturalistApiObservationService>());
+
+        // Act
+        var result = await iNatService.GetAsync(null, null, 1);
+
+        // Assert
+        result.Should().NotBeNull();
+    }
+
+    [Fact(Skip = "Intended to run on demand when needed")]        
+    public async Task GetINaturalistObservations_IterateByIdAbove()
+    {
+        // Arrange
+        var iNatService = new iNaturalistApiObservationService(new HttpClientService(new Mock<ILogger<HttpClientService>>().Object), new NullLogger<iNaturalistApiObservationService>());
+        long idAbove = 236000000;
+
+        // Act
+        var observations = new List<iNaturalistVerbatimObservation>();
+        await foreach (var pageResult in iNatService.GetByIterationAsync(idAbove))
         {
+            observations.AddRange(pageResult.Observations);
         }
 
-        [Fact(Skip = "Intended to run on demand when needed")]
-        public async Task GetINaturalistObservations_SpecificPage()
+        // Assert
+        observations.Should().NotBeNull();
+    }
+
+    [Fact(Skip = "Intended to run on demand when needed")]
+    public async Task GetINaturalistObservations_IterateByUpdatedFromDate()
+    {
+        // Arrange
+        var iNatService = new iNaturalistApiObservationService(new HttpClientService(new Mock<ILogger<HttpClientService>>().Object), new NullLogger<iNaturalistApiObservationService>());
+        DateTime updatedFromDate = DateTime.Now - TimeSpan.FromDays(1);
+
+        // Act
+        var observations = new List<iNaturalistVerbatimObservation>();
+        await foreach (var pageResult in iNatService.GetByIterationAsync(updatedFromDate))
         {
-            // Arrange
-            var iNatService = new iNaturalistApiObservationService(new HttpClientService(new Mock<ILogger<HttpClientService>>().Object), new NullLogger<iNaturalistApiObservationService>());
-
-            // Act
-            var result = await iNatService.GetAsync(null, null, 1);
-
-            // Assert
-            result.Should().NotBeNull();
+            observations.AddRange(pageResult.Observations);
         }
 
-        [Fact(Skip = "Intended to run on demand when needed")]        
-        public async Task GetINaturalistObservations_IterateByIdAbove()
-        {
-            // Arrange
-            var iNatService = new iNaturalistApiObservationService(new HttpClientService(new Mock<ILogger<HttpClientService>>().Object), new NullLogger<iNaturalistApiObservationService>());
-            long idAbove = 236000000;
-
-            // Act
-            var observations = new List<iNaturalistVerbatimObservation>();
-            await foreach (var pageResult in iNatService.GetByIterationAsync(idAbove))
-            {
-                observations.AddRange(pageResult.Observations);
-            }
-
-            // Assert
-            observations.Should().NotBeNull();
-        }
-
-        [Fact(Skip = "Intended to run on demand when needed")]
-        public async Task GetINaturalistObservations_IterateByUpdatedFromDate()
-        {
-            // Arrange
-            var iNatService = new iNaturalistApiObservationService(new HttpClientService(new Mock<ILogger<HttpClientService>>().Object), new NullLogger<iNaturalistApiObservationService>());
-            DateTime updatedFromDate = DateTime.Now - TimeSpan.FromDays(1);
-
-            // Act
-            var observations = new List<iNaturalistVerbatimObservation>();
-            await foreach (var pageResult in iNatService.GetByIterationAsync(updatedFromDate))
-            {
-                observations.AddRange(pageResult.Observations);
-            }
-
-            // Assert
-            observations.Should().NotBeNull();
-        }
+        // Assert
+        observations.Should().NotBeNull();
     }
 }

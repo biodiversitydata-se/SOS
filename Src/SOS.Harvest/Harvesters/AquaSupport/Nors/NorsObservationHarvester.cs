@@ -14,144 +14,143 @@ using SOS.Lib.Repositories.Verbatim.Interfaces;
 using System.Text;
 using System.Xml.Linq;
 
-namespace SOS.Harvest.Harvesters.AquaSupport.Nors
+namespace SOS.Harvest.Harvesters.AquaSupport.Nors;
+
+public class NorsObservationHarvester : ObservationHarvesterBase<NorsObservationVerbatim, int>, INorsObservationHarvester
 {
-    public class NorsObservationHarvester : ObservationHarvesterBase<NorsObservationVerbatim, int>, INorsObservationHarvester
+    private readonly INorsObservationService _norsObservationService;
+    private readonly NorsServiceConfiguration _norsServiceConfiguration;
+
+    private string GetNorsHarvestSettingsInfoString()
     {
-        private readonly INorsObservationService _norsObservationService;
-        private readonly NorsServiceConfiguration _norsServiceConfiguration;
-
-        private string GetNorsHarvestSettingsInfoString()
+        var sb = new StringBuilder();
+        sb.AppendLine("NORS Harvest settings:");
+        sb.AppendLine($"  Start Harvest Year: {_norsServiceConfiguration.StartHarvestYear}");
+        if (_norsServiceConfiguration.MaxNumberOfSightingsHarvested.HasValue)
         {
-            var sb = new StringBuilder();
-            sb.AppendLine("NORS Harvest settings:");
-            sb.AppendLine($"  Start Harvest Year: {_norsServiceConfiguration.StartHarvestYear}");
-            if (_norsServiceConfiguration.MaxNumberOfSightingsHarvested.HasValue)
-            {
-                sb.AppendLine(
-                    $"  Max Number Of Sightings Harvested: {_norsServiceConfiguration.MaxNumberOfSightingsHarvested}");
-            }
-            return sb.ToString();
+            sb.AppendLine(
+                $"  Max Number Of Sightings Harvested: {_norsServiceConfiguration.MaxNumberOfSightingsHarvested}");
         }
+        return sb.ToString();
+    }
 
-        /// <summary>
-        ///     Constructor
-        /// </summary>
-        /// <param name="norsObservationService"></param>
-        /// <param name="norsObservationVerbatimRepository"></param>
-        /// <param name="norsServiceConfiguration"></param>
-        /// <param name="logger"></param>
-        public NorsObservationHarvester(
-            INorsObservationService norsObservationService,
-            INorsObservationVerbatimRepository norsObservationVerbatimRepository,
-            NorsServiceConfiguration norsServiceConfiguration,
-            ILogger<NorsObservationHarvester> logger) : base("Nors", norsObservationVerbatimRepository, logger)
-        {
-            _norsObservationService =
-                norsObservationService ?? throw new ArgumentNullException(nameof(norsObservationService));
-            _norsServiceConfiguration = norsServiceConfiguration ??
-                                        throw new ArgumentNullException(nameof(norsServiceConfiguration));
-        }
+    /// <summary>
+    ///     Constructor
+    /// </summary>
+    /// <param name="norsObservationService"></param>
+    /// <param name="norsObservationVerbatimRepository"></param>
+    /// <param name="norsServiceConfiguration"></param>
+    /// <param name="logger"></param>
+    public NorsObservationHarvester(
+        INorsObservationService norsObservationService,
+        INorsObservationVerbatimRepository norsObservationVerbatimRepository,
+        NorsServiceConfiguration norsServiceConfiguration,
+        ILogger<NorsObservationHarvester> logger) : base("Nors", norsObservationVerbatimRepository, logger)
+    {
+        _norsObservationService =
+            norsObservationService ?? throw new ArgumentNullException(nameof(norsObservationService));
+        _norsServiceConfiguration = norsServiceConfiguration ??
+                                    throw new ArgumentNullException(nameof(norsServiceConfiguration));
+    }
 
-        /// inheritdoc />
-        public async Task<HarvestInfo> HarvestObservationsAsync(DataProvider dataProvider,
-            JobRunModes mode,
-            DateTime? fromDate, IJobCancellationToken cancellationToken)
+    /// inheritdoc />
+    public async Task<HarvestInfo> HarvestObservationsAsync(DataProvider dataProvider,
+        JobRunModes mode,
+        DateTime? fromDate, IJobCancellationToken cancellationToken)
+    {
+        await Task.Run(() =>
         {
-            await Task.Run(() =>
+            throw new NotImplementedException("Not implemented for this provider");
+        });
+        return null!;
+    }
+
+    /// inheritdoc />
+    public async Task<HarvestInfo> HarvestObservationsAsync(DataProvider provider, IJobCancellationToken cancellationToken)
+    {
+        var runStatus = RunStatus.Success;
+        var harvestCount = 0;
+        (DateTime startDate, long preHarvestCount) initValues = (DateTime.Now, 0);
+
+        try
+        {
+            initValues.preHarvestCount = await InitializeHarvestAsync(true);
+            Logger.LogInformation(GetNorsHarvestSettingsInfoString());
+
+            var ns = (XNamespace)"http://schemas.datacontract.org/2004/07/ArtDatabanken.WebService.Data";
+            var verbatimFactory = new AquaSupportHarvestFactory<NorsObservationVerbatim>();
+            var startDate = new DateTime(_norsServiceConfiguration.StartHarvestYear, 1, 1);
+            var endDate = startDate.AddYears(1).AddDays(-1);
+            var changeId = 0L;
+            var dataLastModified = DateTime.MinValue;
+
+            var xmlDocument = await _norsObservationService.GetAsync(startDate, endDate, changeId);
+            changeId = long.Parse(xmlDocument?.Descendants(ns + "MaxChangeId")?.FirstOrDefault()?.Value ?? "0");
+
+            // Loop until all sightings are fetched.
+            while (changeId != 0)
             {
-                throw new NotImplementedException("Not implemented for this provider");
-            });
-            return null!;
-        }
+                var lastRequesetTime = DateTime.Now;
 
-        /// inheritdoc />
-        public async Task<HarvestInfo> HarvestObservationsAsync(DataProvider provider, IJobCancellationToken cancellationToken)
-        {
-            var runStatus = RunStatus.Success;
-            var harvestCount = 0;
-            (DateTime startDate, long preHarvestCount) initValues = (DateTime.Now, 0);
+                Logger.LogDebug(
+                        $"Fetching NORS observations between dates {startDate.ToString("yyyy-MM-dd")} and {endDate.ToString("yyyy-MM-dd")}, changeid: {changeId}");
 
-            try
-            {
-                initValues.preHarvestCount = await InitializeHarvestAsync(true);
-                Logger.LogInformation(GetNorsHarvestSettingsInfoString());
+                var verbatims = await verbatimFactory.CastEntitiesToVerbatimsAsync(xmlDocument!);
 
-                var ns = (XNamespace)"http://schemas.datacontract.org/2004/07/ArtDatabanken.WebService.Data";
-                var verbatimFactory = new AquaSupportHarvestFactory<NorsObservationVerbatim>();
-                var startDate = new DateTime(_norsServiceConfiguration.StartHarvestYear, 1, 1);
-                var endDate = startDate.AddYears(1).AddDays(-1);
-                var changeId = 0L;
-                var dataLastModified = DateTime.MinValue;
-
-                var xmlDocument = await _norsObservationService.GetAsync(startDate, endDate, changeId);
-                changeId = long.Parse(xmlDocument?.Descendants(ns + "MaxChangeId")?.FirstOrDefault()?.Value ?? "0");
-
-                // Loop until all sightings are fetched.
-                while (changeId != 0)
+                if (verbatims?.Any() ?? false)
                 {
-                    var lastRequesetTime = DateTime.Now;
+                    // Clean up
+                    xmlDocument = null;
 
-                    Logger.LogDebug(
-                            $"Fetching NORS observations between dates {startDate.ToString("yyyy-MM-dd")} and {endDate.ToString("yyyy-MM-dd")}, changeid: {changeId}");
+                    // Add sightings to MongoDb
+                    await VerbatimRepository.AddManyAsync(verbatims);
 
-                    var verbatims = await verbatimFactory.CastEntitiesToVerbatimsAsync(xmlDocument!);
+                    harvestCount += verbatims?.Count() ?? 0;
 
-                    if (verbatims?.Any() ?? false)
+                    Logger.LogDebug($"{harvestCount} NORS observations harvested");
+
+                    var batchDataLastModified = verbatims!.Select(a => a.Modified).Max();
+
+                    if (batchDataLastModified.HasValue && batchDataLastModified.Value > dataLastModified)
                     {
-                        // Clean up
-                        xmlDocument = null;
-
-                        // Add sightings to MongoDb
-                        await VerbatimRepository.AddManyAsync(verbatims);
-
-                        harvestCount += verbatims?.Count() ?? 0;
-
-                        Logger.LogDebug($"{harvestCount} NORS observations harvested");
-
-                        var batchDataLastModified = verbatims!.Select(a => a.Modified).Max();
-
-                        if (batchDataLastModified.HasValue && batchDataLastModified.Value > dataLastModified)
-                        {
-                            dataLastModified = batchDataLastModified.Value;
-                        }
-
-                        cancellationToken?.ThrowIfCancellationRequested();
-                        if (_norsServiceConfiguration.MaxNumberOfSightingsHarvested.HasValue &&
-                            harvestCount >= _norsServiceConfiguration.MaxNumberOfSightingsHarvested)
-                        {
-                            Logger.LogInformation("Max NORS observations reached");
-                            break;
-                        }
+                        dataLastModified = batchDataLastModified.Value;
                     }
 
-                    var timeSinceLastCall = (DateTime.Now - lastRequesetTime).Milliseconds;
-                    if (timeSinceLastCall < 2000)
+                    cancellationToken?.ThrowIfCancellationRequested();
+                    if (_norsServiceConfiguration.MaxNumberOfSightingsHarvested.HasValue &&
+                        harvestCount >= _norsServiceConfiguration.MaxNumberOfSightingsHarvested)
                     {
-                        Thread.Sleep(2000 - timeSinceLastCall);
+                        Logger.LogInformation("Max NORS observations reached");
+                        break;
                     }
-
-                    xmlDocument = await _norsObservationService.GetAsync(startDate, endDate, changeId);
-                    changeId = long.Parse(xmlDocument?.Descendants(ns + "MaxChangeId")?.FirstOrDefault()?.Value ?? "0");
                 }
-            }
-            catch (JobAbortedException)
-            {
-                Logger.LogInformation("NORS harvest was cancelled.");
-                runStatus = RunStatus.Canceled;
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e, "Failed to harvest NORS");
-                runStatus = RunStatus.Failed;
-            }
 
-            return await FinishHarvestAsync(initValues, runStatus, harvestCount, provider.PreviousProcessLimit.GetValueOrDefault(80));
+                var timeSinceLastCall = (DateTime.Now - lastRequesetTime).Milliseconds;
+                if (timeSinceLastCall < 2000)
+                {
+                    Thread.Sleep(2000 - timeSinceLastCall);
+                }
+
+                xmlDocument = await _norsObservationService.GetAsync(startDate, endDate, changeId);
+                changeId = long.Parse(xmlDocument?.Descendants(ns + "MaxChangeId")?.FirstOrDefault()?.Value ?? "0");
+            }
         }
-
-        public Task<HarvestInfo> HarvestAllObservationsSlowlyAsync(DataProvider provider, IJobCancellationToken cancellationToken)
+        catch (JobAbortedException)
         {
-            throw new NotImplementedException();
+            Logger.LogInformation("NORS harvest was cancelled.");
+            runStatus = RunStatus.Canceled;
         }
+        catch (Exception e)
+        {
+            Logger.LogError(e, "Failed to harvest NORS");
+            runStatus = RunStatus.Failed;
+        }
+
+        return await FinishHarvestAsync(initValues, runStatus, harvestCount, provider.PreviousProcessLimit.GetValueOrDefault(80));
+    }
+
+    public Task<HarvestInfo> HarvestAllObservationsSlowlyAsync(DataProvider provider, IJobCancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
     }
 }

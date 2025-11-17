@@ -4,27 +4,26 @@ using Hangfire.Storage;
 using SOS.Lib.Managers;
 using System;
 
-namespace SOS.Lib.HangfireAttributes
+namespace SOS.Lib.HangfireAttributes;
+
+/// <summary>
+/// Zero set job expiration timeout to minimize time in success log
+/// </summary>
+public class JobExpirationTimeout : JobFilterAttribute, IApplyStateFilter
 {
     /// <summary>
-    /// Zero set job expiration timeout to minimize time in success log
+    /// Job Expiration Timeout
     /// </summary>
-    public class JobExpirationTimeout : JobFilterAttribute, IApplyStateFilter
+    public int Minutes { get; set; }
+
+    public void OnStateApplied(ApplyStateContext context, IWriteOnlyTransaction transaction)
     {
-        /// <summary>
-        /// Job Expiration Timeout
-        /// </summary>
-        public int Minutes { get; set; }
+        context.JobExpirationTimeout = TimeSpan.FromMinutes(Minutes);
+    }
 
-        public void OnStateApplied(ApplyStateContext context, IWriteOnlyTransaction transaction)
-        {
-            context.JobExpirationTimeout = TimeSpan.FromMinutes(Minutes);
-        }
-
-        public void OnStateUnapplied(
-            ApplyStateContext context,
-            IWriteOnlyTransaction transaction)
-        {
-        }
+    public void OnStateUnapplied(
+        ApplyStateContext context,
+        IWriteOnlyTransaction transaction)
+    {
     }
 }

@@ -1,13 +1,12 @@
 ﻿using SOS.Lib.Models.Interfaces;
 
-namespace SOS.Lib.Models.Shared
+namespace SOS.Lib.Models.Shared;
+
+/// <summary>
+///     Id and identifier for data provider.
+/// </summary>
+public class IdIdentifierTuple : IIdIdentifierTuple
 {
-    /// <summary>
-    ///     Id and identifier for data provider.
-    /// </summary>
-    public class IdIdentifierTuple : IIdIdentifierTuple
-    {
-        public int Id { get; set; }
-        public string Identifier { get; set; }
-    }
+    public int Id { get; set; }
+    public string Identifier { get; set; }
 }

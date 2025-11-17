@@ -1,18 +1,17 @@
-﻿namespace SOS.Lib.Models.Verbatim.Artportalen
+﻿namespace SOS.Lib.Models.Verbatim.Artportalen;
+
+/// <summary>
+///     Represents a area
+/// </summary>
+public class GeographicalArea
 {
     /// <summary>
-    ///     Represents a area
+    ///     Id of area
     /// </summary>
-    public class GeographicalArea
-    {
-        /// <summary>
-        ///     Id of area
-        /// </summary>
-        public string FeatureId { get; set; }
+    public string FeatureId { get; set; }
 
-        /// <summary>
-        ///     Name of area
-        /// </summary>
-        public string Name { get; set; }
-    }
+    /// <summary>
+    ///     Name of area
+    /// </summary>
+    public string Name { get; set; }
 }

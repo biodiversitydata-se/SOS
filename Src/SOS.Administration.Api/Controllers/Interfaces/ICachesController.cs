@@ -2,18 +2,17 @@
 using SOS.Lib.Enums;
 using System.Threading.Tasks;
 
-namespace SOS.Administration.Api.Controllers.Interfaces
+namespace SOS.Administration.Api.Controllers.Interfaces;
+
+/// <summary>
+///     Cache controller
+/// </summary>
+public interface ICachesController
 {
     /// <summary>
-    ///     Cache controller
+    /// Clear requested cache
     /// </summary>
-    public interface ICachesController
-    {
-        /// <summary>
-        /// Clear requested cache
-        /// </summary>
-        /// <param name="cache"></param>
-        /// <returns></returns>
-        Task<IActionResult> ClearAsync(Cache cache);
-    }
+    /// <param name="cache"></param>
+    /// <returns></returns>
+    Task<IActionResult> ClearAsync(Cache cache);
 }

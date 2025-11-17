@@ -8,96 +8,95 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace SOS.Lib.Managers
+namespace SOS.Lib.Managers;
+
+/// <summary>
+///     Report manager
+/// </summary>
+public class ReportManager : IReportManager
 {
+    private readonly ILogger<ReportManager> _logger;
+    private readonly IReportRepository _reportRepository;
+
     /// <summary>
-    ///     Report manager
+    ///     Constructor
     /// </summary>
-    public class ReportManager : IReportManager
+    /// <param name="reportRepository"></param>
+    /// <param name="logger"></param>
+    public ReportManager(
+        IReportRepository reportRepository,
+        ILogger<ReportManager> logger)
     {
-        private readonly ILogger<ReportManager> _logger;
-        private readonly IReportRepository _reportRepository;
+        _reportRepository = reportRepository ?? throw new ArgumentNullException(nameof(reportRepository));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    }
 
-        /// <summary>
-        ///     Constructor
-        /// </summary>
-        /// <param name="reportRepository"></param>
-        /// <param name="logger"></param>
-        public ReportManager(
-            IReportRepository reportRepository,
-            ILogger<ReportManager> logger)
+    public async Task AddReportAsync(Report report, byte[] file)
+    {
+        await _reportRepository.AddAsync(report);
+        await _reportRepository.StoreFileAsync(report.Id, file);
+    }
+
+    public async Task<Result<ReportFile>> GetReportFileAsync(string reportId)
+    {
+        var report = await GetReportAsync(reportId);
+        if (report == null)
         {
-            _reportRepository = reportRepository ?? throw new ArgumentNullException(nameof(reportRepository));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            return Result.Failure<ReportFile>($"Report with reportId \"{reportId}\" not found");
         }
 
-        public async Task AddReportAsync(Report report, byte[] file)
+        var file = await _reportRepository.GetFileAsync(reportId);
+        if (file == null || file.Length == 0)
         {
-            await _reportRepository.AddAsync(report);
-            await _reportRepository.StoreFileAsync(report.Id, file);
+            return Result.Failure<ReportFile>($"File for reportId \"{reportId}\" not found");
         }
 
-        public async Task<Result<ReportFile>> GetReportFileAsync(string reportId)
+        var filename = FilenameHelper.CreateFilenameWithDate($"{report.Type}-{report.Name}", report.FileExtension, report.CreatedDate);
+        var reportFileDownload = new ReportFile
         {
-            var report = await GetReportAsync(reportId);
-            if (report == null)
+            Filename = filename,
+            File = file,
+            ContentType = "application/zip"
+        };
+
+        return reportFileDownload;
+    }
+
+    public async Task<Report> GetReportAsync(string reportId)
+    {
+        return await _reportRepository.GetAsync(reportId);
+    }
+
+    public async Task<IEnumerable<Report>> GetAllReportsAsync()
+    {
+        return await _reportRepository.GetAllAsync();
+    }
+
+    public async Task DeleteReportAsync(string reportId)
+    {
+        await _reportRepository.DeleteAsync(reportId);
+        await _reportRepository.DeleteFileAsync(reportId);
+    }
+
+    public async Task<Result<int>> DeleteOldReportsAndFilesAsync(TimeSpan timeSpan)
+    {
+        DateTime date = DateTime.UtcNow - timeSpan;
+        List<string> deleteReportIds = new List<string>();
+        var allReports = await GetAllReportsAsync();
+        foreach (var reportFile in allReports)
+        {
+            if (reportFile.CreatedDate < date)
             {
-                return Result.Failure<ReportFile>($"Report with reportId \"{reportId}\" not found");
+                deleteReportIds.Add(reportFile.Id);
             }
-
-            var file = await _reportRepository.GetFileAsync(reportId);
-            if (file == null || file.Length == 0)
-            {
-                return Result.Failure<ReportFile>($"File for reportId \"{reportId}\" not found");
-            }
-
-            var filename = FilenameHelper.CreateFilenameWithDate($"{report.Type}-{report.Name}", report.FileExtension, report.CreatedDate);
-            var reportFileDownload = new ReportFile
-            {
-                Filename = filename,
-                File = file,
-                ContentType = "application/zip"
-            };
-
-            return reportFileDownload;
         }
 
-        public async Task<Report> GetReportAsync(string reportId)
+        if (deleteReportIds.Count > 0)
         {
-            return await _reportRepository.GetAsync(reportId);
+            await _reportRepository.DeleteManyAsync(deleteReportIds);
+            await _reportRepository.DeleteFilesAsync(deleteReportIds);
         }
 
-        public async Task<IEnumerable<Report>> GetAllReportsAsync()
-        {
-            return await _reportRepository.GetAllAsync();
-        }
-
-        public async Task DeleteReportAsync(string reportId)
-        {
-            await _reportRepository.DeleteAsync(reportId);
-            await _reportRepository.DeleteFileAsync(reportId);
-        }
-
-        public async Task<Result<int>> DeleteOldReportsAndFilesAsync(TimeSpan timeSpan)
-        {
-            DateTime date = DateTime.UtcNow - timeSpan;
-            List<string> deleteReportIds = new List<string>();
-            var allReports = await GetAllReportsAsync();
-            foreach (var reportFile in allReports)
-            {
-                if (reportFile.CreatedDate < date)
-                {
-                    deleteReportIds.Add(reportFile.Id);
-                }
-            }
-
-            if (deleteReportIds.Count > 0)
-            {
-                await _reportRepository.DeleteManyAsync(deleteReportIds);
-                await _reportRepository.DeleteFilesAsync(deleteReportIds);
-            }
-
-            return Result.Success(deleteReportIds.Count);
-        }
+        return Result.Success(deleteReportIds.Count);
     }
 }

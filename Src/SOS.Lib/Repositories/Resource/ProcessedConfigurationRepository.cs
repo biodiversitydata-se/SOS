@@ -3,25 +3,24 @@ using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Repositories.Resource.Interfaces;
 
-namespace SOS.Lib.Repositories.Resource
+namespace SOS.Lib.Repositories.Resource;
+
+/// <summary>
+///     Base class for cosmos db repositories
+/// </summary>
+public class ProcessedConfigurationRepository : RepositoryBase<ProcessedConfiguration, string>, IProcessedConfigurationRepository
 {
     /// <summary>
-    ///     Base class for cosmos db repositories
+    /// Constructor
     /// </summary>
-    public class ProcessedConfigurationRepository : RepositoryBase<ProcessedConfiguration, string>, IProcessedConfigurationRepository
+    /// <param name="client"></param>
+    /// <param name="logger"></param>
+    public ProcessedConfigurationRepository(
+        IProcessClient client,
+        ILogger<ProcessedConfigurationRepository> logger
+    ) : base(client, logger)
     {
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="client"></param>
-        /// <param name="logger"></param>
-        public ProcessedConfigurationRepository(
-            IProcessClient client,
-            ILogger<ProcessedConfigurationRepository> logger
-        ) : base(client, logger)
-        {
-
-        }
 
     }
+
 }

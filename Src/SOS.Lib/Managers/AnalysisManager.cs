@@ -33,993 +33,992 @@ using SOS.Lib.Models.Search.Result;
 using Elastic.Clients.Elasticsearch;
 using System.Collections.ObjectModel;
 
-namespace SOS.Lib.Managers
+namespace SOS.Lib.Managers;
+
+public class AnalysisManager : IAnalysisManager
 {
-    public class AnalysisManager : IAnalysisManager
+    private readonly IProcessedObservationCoreRepository _processedObservationRepository;
+    private readonly ITaxonManager _taxonManager;
+    private readonly IFilterManager _filterManager;
+    private readonly IAreaCache _areaCache;
+    private readonly IFileService _fileService;
+    private readonly ILogger<AnalysisManager> _logger;
+
+    /// <summary>
+    /// Add geometries to features using bound box
+    /// </summary>
+    /// <param name="areaType"></param>
+    /// <param name="features"></param>
+    /// <returns></returns>
+    private async Task AddGridGeometriesAsync(AreaTypeAggregate areaType, IDictionary<string, Feature> features)
     {
-        private readonly IProcessedObservationCoreRepository _processedObservationRepository;
-        private readonly ITaxonManager _taxonManager;
-        private readonly IFilterManager _filterManager;
-        private readonly IAreaCache _areaCache;
-        private readonly IFileService _fileService;
-        private readonly ILogger<AnalysisManager> _logger;
-
-        /// <summary>
-        /// Add geometries to features using bound box
-        /// </summary>
-        /// <param name="areaType"></param>
-        /// <param name="features"></param>
-        /// <returns></returns>
-        private async Task AddGridGeometriesAsync(AreaTypeAggregate areaType, IDictionary<string, Feature> features)
+        if ((features?.Count() ?? 0) == 0)
         {
-            if ((features?.Count() ?? 0) == 0)
-            {
-                return;
-            }
-            var results = await _areaCache.GetGeometriesAsync(features.Select(f => ((AreaType)areaType, f.Key)));
-            if ((results?.Count() ?? 0) == 0)
-            {
-                return;
-            }
+            return;
+        }
+        var results = await _areaCache.GetGeometriesAsync(features.Select(f => ((AreaType)areaType, f.Key)));
+        if ((results?.Count() ?? 0) == 0)
+        {
+            return;
+        }
 
-            foreach(var result in results)
+        foreach(var result in results)
+        {
+            if (features.TryGetValue(result.Key.featureId, out var feature))
             {
-                if (features.TryGetValue(result.Key.featureId, out var feature))
-                {
-                    var geometry = result.Value;
-                    feature.Geometry = geometry;
-                }
+                var geometry = result.Value;
+                feature.Geometry = geometry;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Calculate some metadata for grid cells
+    /// </summary>
+    /// <param name="gridCells"></param>
+    /// <returns></returns>
+    private (long ObservationsCount, double MinX, double MaxX, double MinY, double MaxY) CalculateMetadata(IEnumerable<GridCell> gridCells)
+    {
+        double? minX = null, minY = null, maxX = null, maxY = null;
+        var observationsCount = 0L;
+        foreach (var gridCell in gridCells)
+        {
+            observationsCount += gridCell.ObservationsCount ?? 0;
+            if (minY == null || gridCell.MetricBoundingBox.BottomRight.Y < minY)
+            {
+                minY = gridCell.MetricBoundingBox.BottomRight.Y;
+            }
+            if (maxX == null || gridCell.MetricBoundingBox.BottomRight.X > maxX)
+            {
+                maxX = gridCell.MetricBoundingBox.BottomRight.X;
+            }
+            if (maxY == null || gridCell.MetricBoundingBox.TopLeft.Y > maxY)
+            {
+                maxY = gridCell.MetricBoundingBox.TopLeft.Y;
+            }
+            if (minX == null || gridCell.MetricBoundingBox.TopLeft.X < minX)
+            {
+                minX = gridCell.MetricBoundingBox.TopLeft.X;
             }
         }
 
-        /// <summary>
-        /// Calculate some metadata for grid cells
-        /// </summary>
-        /// <param name="gridCells"></param>
-        /// <returns></returns>
-        private (long ObservationsCount, double MinX, double MaxX, double MinY, double MaxY) CalculateMetadata(IEnumerable<GridCell> gridCells)
-        {
-            double? minX = null, minY = null, maxX = null, maxY = null;
-            var observationsCount = 0L;
-            foreach (var gridCell in gridCells)
-            {
-                observationsCount += gridCell.ObservationsCount ?? 0;
-                if (minY == null || gridCell.MetricBoundingBox.BottomRight.Y < minY)
-                {
-                    minY = gridCell.MetricBoundingBox.BottomRight.Y;
-                }
-                if (maxX == null || gridCell.MetricBoundingBox.BottomRight.X > maxX)
-                {
-                    maxX = gridCell.MetricBoundingBox.BottomRight.X;
-                }
-                if (maxY == null || gridCell.MetricBoundingBox.TopLeft.Y > maxY)
-                {
-                    maxY = gridCell.MetricBoundingBox.TopLeft.Y;
-                }
-                if (minX == null || gridCell.MetricBoundingBox.TopLeft.X < minX)
-                {
-                    minX = gridCell.MetricBoundingBox.TopLeft.X;
-                }
-            }
+        return (observationsCount, minX ?? 0.0, maxX ?? 0.0, minY ?? 0.0, maxY ?? 0.0);
+    }
 
-            return (observationsCount, minX ?? 0.0, maxX ?? 0.0, minY ?? 0.0, maxY ?? 0.0);
+
+    private (string Id, Feature Feature) CreateAreaFeature(
+        dynamic record,
+        AreaTypeAggregate areaType,
+        bool? aggregateOrganismQuantity,
+        CoordinateSys? coordinateSys)
+    {
+        var featureId = record.AggregationField;
+        var observationsCount = record.DocCount;
+        var organismQuantity = record.OrganismQuantity;
+        var taxaCount = record.UniqueTaxon;
+
+        var attributes = new Dictionary<string, object>
+        {
+            { "id", featureId },
+            { "observationsCount", observationsCount },
+            { "taxaCount", taxaCount },
+            { "metricCRS", coordinateSys.ToString() }
+        };
+        if (aggregateOrganismQuantity ?? false)
+        {
+            attributes.Add("organismQuantity", organismQuantity);
+        }
+        return (
+            Id: featureId ?? "",
+            Feature: new Feature
+            {
+                Attributes = new AttributesTable(attributes)
+            }
+        );
+    }
+
+
+    /// <summary>
+    /// Get grid cells
+    /// </summary>
+    /// <param name="roleId"></param>
+    /// <param name="authorizationApplicationIdentifier"></param>
+    /// <param name="filter"></param>
+    /// <param name="gridCellsInMeters"></param>
+    /// <param name="metricCoordinateSys"></param>
+    /// <param name="timeout"></param>
+    /// <returns></returns>
+    private async Task<IEnumerable<GridCell>> GetGridCellsAync(int? roleId,
+        string authorizationApplicationIdentifier,
+        SearchFilter filter,
+        int gridCellsInMeters,
+        MetricCoordinateSys metricCoordinateSys,
+        TimeSpan? timeout = null)
+    {            
+        await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
+        var gridCells = new List<GridCell>();
+        const int pageSize = 10000;
+        var stopwatch = Stopwatch.StartNew();
+        var result = await _processedObservationRepository.GetMetricGridAggregationAsync(filter, gridCellsInMeters, metricCoordinateSys, false, pageSize, null, timeout);
+        
+        while ((result?.GridCellCount ?? 0) > 0)
+        {
+            stopwatch.Stop();
+            var delayMs = stopwatch.ElapsedMilliseconds / 10;                
+            await Task.Delay(TimeSpan.FromMilliseconds(delayMs));                
+            stopwatch = Stopwatch.StartNew();
+            gridCells.AddRange(result!.GridCells);
+            result = await _processedObservationRepository.GetMetricGridAggregationAsync(filter, gridCellsInMeters, metricCoordinateSys, false, pageSize, result.AfterKey, timeout);
         }
 
+        return gridCells;
+    }
 
-        private (string Id, Feature Feature) CreateAreaFeature(
-            dynamic record,
-            AreaTypeAggregate areaType,
-            bool? aggregateOrganismQuantity,
-            CoordinateSys? coordinateSys)
+    /// <summary>
+    /// Constructor
+    /// </summary>
+    /// <param name="filterManager"></param>
+    /// <param name="processedObservationRepository"></param>
+    /// <param name="areaCache"></param>
+    /// <param name="fileService"></param>
+    /// <param name="taxonManager"></param>
+    /// <param name="logger"></param>
+    /// <exception cref="ArgumentNullException"></exception>
+    public AnalysisManager(
+        IFilterManager filterManager,
+        IProcessedObservationCoreRepository processedObservationRepository,
+        IAreaCache areaCache,
+        IFileService fileService,
+        ITaxonManager taxonManager,
+        ILogger<AnalysisManager> logger)
+    {
+        _filterManager = filterManager ?? throw new ArgumentNullException(nameof(filterManager));
+        _processedObservationRepository = processedObservationRepository ?? throw new ArgumentNullException(nameof(processedObservationRepository));
+        _areaCache = areaCache ?? throw new ArgumentNullException(nameof(areaCache));
+        _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
+        _taxonManager = taxonManager ?? throw new ArgumentNullException(nameof(taxonManager));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+       
+    }
+
+    /// <inheritdoc/>
+    public async Task<PagedAggregationResult<UserAggregationResponse>> AggregateByUserFieldAsync(
+        int? roleId,
+        string authorizationApplicationIdentifier,
+        SearchFilter filter,            
+        string aggregationField,
+        bool aggregateOrganismQuantity,
+        int? precisionThreshold,
+        string afterKey,
+        int? take)
+    {
+        await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
+        var result = await _processedObservationRepository.AggregateByUserFieldAsync(filter, aggregationField, aggregateOrganismQuantity, precisionThreshold, 
+            string.IsNullOrEmpty(afterKey) ? null :
+            new ReadOnlyDictionary<string, FieldValue>(new Dictionary<string, FieldValue>
+            {
+                { aggregationField, afterKey.ToFieldValue() }
+            }), take);
+
+        return new PagedAggregationResult<UserAggregationResponse>
         {
-            var featureId = record.AggregationField;
-            var observationsCount = record.DocCount;
-            var organismQuantity = record.OrganismQuantity;
-            var taxaCount = record.UniqueTaxon;
+            AfterKey = result.SearchAfter,
+            Records = result?.Records?.Select(r => new UserAggregationResponse
+            {
+                AggregationField = r.AggregationField,
+                Count = (int)r.DocCount,
+                UniqueTaxon = (int)r.UniqueTaxon,
+                OrganismQuantity = (int)r.OrganismQuantity
+            })!
+        };
+    }
 
-            var attributes = new Dictionary<string, object>
-            {
-                { "id", featureId },
-                { "observationsCount", observationsCount },
-                { "taxaCount", taxaCount },
-                { "metricCRS", coordinateSys.ToString() }
-            };
-            if (aggregateOrganismQuantity ?? false)
-            {
-                attributes.Add("organismQuantity", organismQuantity);
-            }
-            return (
-                Id: featureId ?? "",
-                Feature: new Feature
-                {
-                    Attributes = new AttributesTable(attributes)
-                }
-            );
+    /// <inheritdoc/>
+    public async Task<IEnumerable<AggregationItem>?> AggregateByUserFieldAsync(
+        int? roleId,
+        string authorizationApplicationIdentifier,
+        SearchFilter filter,
+        string aggregationField,
+        bool aggregateOrganismQuantity,
+        int? precisionThreshold,
+        int take,
+        AggregationSortOrder sortOrder = AggregationSortOrder.CountDescending)
+    {
+        await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
+      /*  if (aggregateOrganismQuantity)
+        {
+            var resultIncludingOrganismQuantity = await _processedObservationRepository.GetAggregationItemsAggregateOrganismQuantityAsync(filter, aggregationField, precisionThreshold ?? 40000, take, sortOrder);
+            return resultIncludingOrganismQuantity;
         }
+        */
+        var result = await _processedObservationRepository.GetAggregationItemsAsync(filter, aggregationField, 0, take, precisionThreshold ?? 40000, sortOrder, false, false, aggregateOrganismQuantity);
+        return result?.Records;
+    }
 
+    /// <inheritdoc/>
+    public async Task<FeatureCollection> AreaAggregateAsync(
+        int? roleId,
+        string authorizationApplicationIdentifier,
+        SearchFilter filter,
+        AreaTypeAggregate areaType,
+        int? precisionThreshold,
+        bool? aggregateOrganismQuantity,
+        CoordinateSys? coordinateSys)
+    {
+        var areaTypeProperty = areaType switch
+        {
+            AreaTypeAggregate.Atlas10x10 => "location.atlas10x10.featureId",
+            AreaTypeAggregate.Atlas5x5 => "location.atlas5x5.featureId",
+            AreaTypeAggregate.CountryRegion => "location.countryRegion.featureId",
+            AreaTypeAggregate.County => "location.county.featureId",
+            AreaTypeAggregate.Municipality => "location.municipality.featureId",
+           // AreaTypeAggregate.Parish => "location.parish.featureId",
+            _ => "location.province.featureId"
+        };
 
-        /// <summary>
-        /// Get grid cells
-        /// </summary>
-        /// <param name="roleId"></param>
-        /// <param name="authorizationApplicationIdentifier"></param>
-        /// <param name="filter"></param>
-        /// <param name="gridCellsInMeters"></param>
-        /// <param name="metricCoordinateSys"></param>
-        /// <param name="timeout"></param>
-        /// <returns></returns>
-        private async Task<IEnumerable<GridCell>> GetGridCellsAync(int? roleId,
-            string authorizationApplicationIdentifier,
-            SearchFilter filter,
-            int gridCellsInMeters,
-            MetricCoordinateSys metricCoordinateSys,
-            TimeSpan? timeout = null)
-        {            
-            await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
-            var gridCells = new List<GridCell>();
-            const int pageSize = 10000;
-            var stopwatch = Stopwatch.StartNew();
-            var result = await _processedObservationRepository.GetMetricGridAggregationAsync(filter, gridCellsInMeters, metricCoordinateSys, false, pageSize, null, timeout);
+        try
+        {
+            await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);   
+            var result = await _processedObservationRepository.AggregateByUserFieldAsync(filter, areaTypeProperty, aggregateOrganismQuantity ?? false, precisionThreshold, null, 5000, false);
+            var featureCollection = new FeatureCollection();
+            var addGeometryTasks = new HashSet<Task>();
+            var features = new Dictionary<string, Feature>();
             
-            while ((result?.GridCellCount ?? 0) > 0)
+            
+            while (result?.Records?.Count() != 0)
             {
-                stopwatch.Stop();
-                var delayMs = stopwatch.ElapsedMilliseconds / 10;                
-                await Task.Delay(TimeSpan.FromMilliseconds(delayMs));                
-                stopwatch = Stopwatch.StartNew();
-                gridCells.AddRange(result!.GridCells);
-                result = await _processedObservationRepository.GetMetricGridAggregationAsync(filter, gridCellsInMeters, metricCoordinateSys, false, pageSize, result.AfterKey, timeout);
-            }
-
-            return gridCells;
-        }
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="filterManager"></param>
-        /// <param name="processedObservationRepository"></param>
-        /// <param name="areaCache"></param>
-        /// <param name="fileService"></param>
-        /// <param name="taxonManager"></param>
-        /// <param name="logger"></param>
-        /// <exception cref="ArgumentNullException"></exception>
-        public AnalysisManager(
-            IFilterManager filterManager,
-            IProcessedObservationCoreRepository processedObservationRepository,
-            IAreaCache areaCache,
-            IFileService fileService,
-            ITaxonManager taxonManager,
-            ILogger<AnalysisManager> logger)
-        {
-            _filterManager = filterManager ?? throw new ArgumentNullException(nameof(filterManager));
-            _processedObservationRepository = processedObservationRepository ?? throw new ArgumentNullException(nameof(processedObservationRepository));
-            _areaCache = areaCache ?? throw new ArgumentNullException(nameof(areaCache));
-            _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
-            _taxonManager = taxonManager ?? throw new ArgumentNullException(nameof(taxonManager));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-           
-        }
-
-        /// <inheritdoc/>
-        public async Task<PagedAggregationResult<UserAggregationResponse>> AggregateByUserFieldAsync(
-            int? roleId,
-            string authorizationApplicationIdentifier,
-            SearchFilter filter,            
-            string aggregationField,
-            bool aggregateOrganismQuantity,
-            int? precisionThreshold,
-            string afterKey,
-            int? take)
-        {
-            await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
-            var result = await _processedObservationRepository.AggregateByUserFieldAsync(filter, aggregationField, aggregateOrganismQuantity, precisionThreshold, 
-                string.IsNullOrEmpty(afterKey) ? null :
-                new ReadOnlyDictionary<string, FieldValue>(new Dictionary<string, FieldValue>
-                {
-                    { aggregationField, afterKey.ToFieldValue() }
-                }), take);
-
-            return new PagedAggregationResult<UserAggregationResponse>
-            {
-                AfterKey = result.SearchAfter,
-                Records = result?.Records?.Select(r => new UserAggregationResponse
-                {
-                    AggregationField = r.AggregationField,
-                    Count = (int)r.DocCount,
-                    UniqueTaxon = (int)r.UniqueTaxon,
-                    OrganismQuantity = (int)r.OrganismQuantity
-                })!
-            };
-        }
-
-        /// <inheritdoc/>
-        public async Task<IEnumerable<AggregationItem>?> AggregateByUserFieldAsync(
-            int? roleId,
-            string authorizationApplicationIdentifier,
-            SearchFilter filter,
-            string aggregationField,
-            bool aggregateOrganismQuantity,
-            int? precisionThreshold,
-            int take,
-            AggregationSortOrder sortOrder = AggregationSortOrder.CountDescending)
-        {
-            await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
-          /*  if (aggregateOrganismQuantity)
-            {
-                var resultIncludingOrganismQuantity = await _processedObservationRepository.GetAggregationItemsAggregateOrganismQuantityAsync(filter, aggregationField, precisionThreshold ?? 40000, take, sortOrder);
-                return resultIncludingOrganismQuantity;
-            }
-            */
-            var result = await _processedObservationRepository.GetAggregationItemsAsync(filter, aggregationField, 0, take, precisionThreshold ?? 40000, sortOrder, false, false, aggregateOrganismQuantity);
-            return result?.Records;
-        }
-
-        /// <inheritdoc/>
-        public async Task<FeatureCollection> AreaAggregateAsync(
-            int? roleId,
-            string authorizationApplicationIdentifier,
-            SearchFilter filter,
-            AreaTypeAggregate areaType,
-            int? precisionThreshold,
-            bool? aggregateOrganismQuantity,
-            CoordinateSys? coordinateSys)
-        {
-            var areaTypeProperty = areaType switch
-            {
-                AreaTypeAggregate.Atlas10x10 => "location.atlas10x10.featureId",
-                AreaTypeAggregate.Atlas5x5 => "location.atlas5x5.featureId",
-                AreaTypeAggregate.CountryRegion => "location.countryRegion.featureId",
-                AreaTypeAggregate.County => "location.county.featureId",
-                AreaTypeAggregate.Municipality => "location.municipality.featureId",
-               // AreaTypeAggregate.Parish => "location.parish.featureId",
-                _ => "location.province.featureId"
-            };
-
-            try
-            {
-                await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);   
-                var result = await _processedObservationRepository.AggregateByUserFieldAsync(filter, areaTypeProperty, aggregateOrganismQuantity ?? false, precisionThreshold, null, 5000, false);
-                var featureCollection = new FeatureCollection();
-                var addGeometryTasks = new HashSet<Task>();
-                var features = new Dictionary<string, Feature>();
+                // Start getting next batch while we getting the geometries
+                var nextBatchTask = _processedObservationRepository.AggregateByUserFieldAsync(filter, areaTypeProperty, false, precisionThreshold, result.SearchAfter, 1000, false);
                 
-                
-                while (result?.Records?.Count() != 0)
+                foreach (var record in result.Records)
                 {
-                    // Start getting next batch while we getting the geometries
-                    var nextBatchTask = _processedObservationRepository.AggregateByUserFieldAsync(filter, areaTypeProperty, false, precisionThreshold, result.SearchAfter, 1000, false);
-                    
-                    foreach (var record in result.Records)
+                    var response = CreateAreaFeature(record, areaType, aggregateOrganismQuantity, coordinateSys);
+                    var featureId = response.Item1;
+                    if (!string.IsNullOrEmpty(featureId))
                     {
-                        var response = CreateAreaFeature(record, areaType, aggregateOrganismQuantity, coordinateSys);
-                        var featureId = response.Item1;
-                        if (!string.IsNullOrEmpty(featureId))
+                        var feature = response.Item2;
+                        featureCollection.Add(feature);
+                        features.Add(featureId, feature);
+                    }
+                }
+               
+                await AddGridGeometriesAsync(areaType, features);
+                
+                result = await nextBatchTask;
+            }
+            
+            return featureCollection; 
+        }
+        catch (ArgumentOutOfRangeException e)
+        {
+            _logger.LogError(e, $"Failed to aggregate on {areaTypeProperty}. To many buckets");
+            throw;
+        }
+        catch (TimeoutException e)
+        {
+            _logger.LogError(e, $"Aggregate on {areaTypeProperty} timeout");
+            throw;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, $"Failed to aggregate on {areaTypeProperty}.");
+            throw;
+        }
+    }
+
+    /// <inheritdoc/>
+    public async Task<(FeatureCollection FeatureCollection, List<AooEooItem> AooEooItems)?> CalculateAooAndEooAsync(
+        int? roleId,
+        string authorizationApplicationIdentifier,
+        SearchFilter filter,
+        int gridCellsInMeters,
+        bool useCenterPoint,
+        IEnumerable<double> alphaValues,
+        bool useEdgeLengthRatio,
+        bool allowHoles,
+        bool returnGridCells,
+        bool includeEmptyCells,
+        MetricCoordinateSys metricCoordinateSys,
+        CoordinateSys coordinateSystem,
+        TimeSpan? timeout = null)
+    {
+        try
+        {
+            var aooEooItems = new List<AooEooItem>();
+            var gridCells = await GetGridCellsAync(roleId, authorizationApplicationIdentifier, filter, gridCellsInMeters, metricCoordinateSys, timeout);
+            if (!gridCells.Any())
+            {
+                return null!;
+            }
+
+            var metaData = CalculateMetadata(gridCells);
+            var featureCollection = new FeatureCollection
+            {
+                BoundingBox = new Envelope(new Coordinate(metaData.MinX, metaData.MaxY), new Coordinate(metaData.MaxX, metaData.MinY)).Transform((CoordinateSys)metricCoordinateSys, coordinateSystem)
+            };
+
+            // We need features to return later so we create them now 
+            var gridCellFeaturesMetric = gridCells.Select(gc => gc.MetricBoundingBox
+                .ToPolygon()
+                .ToFeature(new Dictionary<string, object>()
+                {
+                    {  "id", GeoJsonHelper.GetGridCellId(gridCellsInMeters, (int)gc.MetricBoundingBox.TopLeft.X, (int)gc.MetricBoundingBox.BottomRight.Y) },
+                    {  "observationsCount", gc.ObservationsCount! },
+                    {  "taxaCount", gc.TaxaCount! }
+                })
+            ).ToDictionary(f => (string)f.Attributes["id"], f => f);
+
+            var metricEooGeometries = new Dictionary<double, Geometry>();
+            foreach (var alphaValue in alphaValues)
+            {
+                Geometry eooGeometry = null;
+                try
+                {
+                    eooGeometry = gridCellFeaturesMetric
+                        .Select(f => f.Value.Geometry as Polygon)
+                            .ToArray()
+                                .ConcaveHull(useCenterPoint, alphaValue, useEdgeLengthRatio, allowHoles);
+                }
+                catch (Exception ex)
+                {
+                    // There is a bug in Nettopologysuite, try useCentPoint=false instead.
+                    _logger.LogError(ex, $"Error when calculating ConcaveHull(). Taxa filter: {string.Join(", ", filter?.Taxa?.Ids ?? Enumerable.Empty<int>())}");
+                    if (useCenterPoint)
+                    {
+                        _logger.LogInformation("Try calculate ConcaveHull() with useCenterPoint=false");
+                        try
                         {
-                            var feature = response.Item2;
-                            featureCollection.Add(feature);
-                            features.Add(featureId, feature);
+                            eooGeometry = gridCellFeaturesMetric
+                                .Select(f => f.Value.Geometry as Polygon)
+                                    .ToArray()
+                                        .ConcaveHull(false, alphaValue, useEdgeLengthRatio, allowHoles);
+                        }
+                        catch(Exception e)
+                        {
+                            _logger.LogError(e, $"Error when calculating ConcaveHull() with useCenterPoint=false.");
                         }
                     }
-                   
-                    await AddGridGeometriesAsync(areaType, features);
-                    
-                    result = await nextBatchTask;
                 }
                 
-                return featureCollection; 
-            }
-            catch (ArgumentOutOfRangeException e)
-            {
-                _logger.LogError(e, $"Failed to aggregate on {areaTypeProperty}. To many buckets");
-                throw;
-            }
-            catch (TimeoutException e)
-            {
-                _logger.LogError(e, $"Aggregate on {areaTypeProperty} timeout");
-                throw;
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, $"Failed to aggregate on {areaTypeProperty}.");
-                throw;
-            }
-        }
-
-        /// <inheritdoc/>
-        public async Task<(FeatureCollection FeatureCollection, List<AooEooItem> AooEooItems)?> CalculateAooAndEooAsync(
-            int? roleId,
-            string authorizationApplicationIdentifier,
-            SearchFilter filter,
-            int gridCellsInMeters,
-            bool useCenterPoint,
-            IEnumerable<double> alphaValues,
-            bool useEdgeLengthRatio,
-            bool allowHoles,
-            bool returnGridCells,
-            bool includeEmptyCells,
-            MetricCoordinateSys metricCoordinateSys,
-            CoordinateSys coordinateSystem,
-            TimeSpan? timeout = null)
-        {
-            try
-            {
-                var aooEooItems = new List<AooEooItem>();
-                var gridCells = await GetGridCellsAync(roleId, authorizationApplicationIdentifier, filter, gridCellsInMeters, metricCoordinateSys, timeout);
-                if (!gridCells.Any())
+                if (eooGeometry == null)
                 {
                     return null!;
                 }
+                metricEooGeometries.Add(alphaValue, eooGeometry);
 
-                var metaData = CalculateMetadata(gridCells);
-                var featureCollection = new FeatureCollection
-                {
-                    BoundingBox = new Envelope(new Coordinate(metaData.MinX, metaData.MaxY), new Coordinate(metaData.MaxX, metaData.MinY)).Transform((CoordinateSys)metricCoordinateSys, coordinateSystem)
-                };
-
-                // We need features to return later so we create them now 
-                var gridCellFeaturesMetric = gridCells.Select(gc => gc.MetricBoundingBox
-                    .ToPolygon()
-                    .ToFeature(new Dictionary<string, object>()
-                    {
-                        {  "id", GeoJsonHelper.GetGridCellId(gridCellsInMeters, (int)gc.MetricBoundingBox.TopLeft.X, (int)gc.MetricBoundingBox.BottomRight.Y) },
-                        {  "observationsCount", gc.ObservationsCount! },
-                        {  "taxaCount", gc.TaxaCount! }
-                    })
-                ).ToDictionary(f => (string)f.Attributes["id"], f => f);
-
-                var metricEooGeometries = new Dictionary<double, Geometry>();
-                foreach (var alphaValue in alphaValues)
-                {
-                    Geometry eooGeometry = null;
-                    try
-                    {
-                        eooGeometry = gridCellFeaturesMetric
-                            .Select(f => f.Value.Geometry as Polygon)
-                                .ToArray()
-                                    .ConcaveHull(useCenterPoint, alphaValue, useEdgeLengthRatio, allowHoles);
-                    }
-                    catch (Exception ex)
-                    {
-                        // There is a bug in Nettopologysuite, try useCentPoint=false instead.
-                        _logger.LogError(ex, $"Error when calculating ConcaveHull(). Taxa filter: {string.Join(", ", filter?.Taxa?.Ids ?? Enumerable.Empty<int>())}");
-                        if (useCenterPoint)
-                        {
-                            _logger.LogInformation("Try calculate ConcaveHull() with useCenterPoint=false");
-                            try
-                            {
-                                eooGeometry = gridCellFeaturesMetric
-                                    .Select(f => f.Value.Geometry as Polygon)
-                                        .ToArray()
-                                            .ConcaveHull(false, alphaValue, useEdgeLengthRatio, allowHoles);
-                            }
-                            catch(Exception e)
-                            {
-                                _logger.LogError(e, $"Error when calculating ConcaveHull() with useCenterPoint=false.");
-                            }
-                        }
-                    }
-                    
-                    if (eooGeometry == null)
-                    {
-                        return null!;
-                    }
-                    metricEooGeometries.Add(alphaValue, eooGeometry);
-
-                    var gridCellArea = gridCellsInMeters * gridCellsInMeters / 1000000; //Calculate area in km2
-                    var aoo = Math.Round((double)gridCells.Count() * gridCellArea, 0);
-                    var eoo = Math.Round(eooGeometry.Area / 1000000, 0);
-                    var aooEooItem = new AooEooItem
-                    {
-                        Id = $"eoo-{alphaValue.ToString(CultureInfo.InvariantCulture).Replace(',', '.')}",
-                        AlphaValue = alphaValue,
-                        Aoo = (int)aoo,
-                        Eoo = (int)eoo,
-                        GridCellArea = gridCellArea,
-                        GridCellAreaUnit = "km2",
-                        ObservationsCount = (int)metaData.ObservationsCount
-                    };
-                    aooEooItems.Add(aooEooItem);
-
-                    featureCollection.Add(new Feature(
-                        eooGeometry.Transform((CoordinateSys)metricCoordinateSys, coordinateSystem),
-                        new AttributesTable(new Dictionary<string, object>
-                            {
-                                { "id", aooEooItem.Id },
-                                { "aoo", aooEooItem.Aoo },
-                                { "eoo", aooEooItem.Eoo },
-                                { "gridCellArea", aooEooItem.GridCellArea },
-                                { "gridCellAreaUnit", aooEooItem.GridCellAreaUnit },
-                                { "observationsCount", aooEooItem.ObservationsCount }
-                            }
-                        )
-                    ));
-                }
-
-                if (!returnGridCells)
-                {
-                    return (featureCollection, aooEooItems);
-                }
-
-                // Add empty grid cell where no observation was found too complete grid
-                if (includeEmptyCells && !useEdgeLengthRatio)
-                {
-                    GeoJsonHelper.FillInBlanks(
-                        gridCellFeaturesMetric,
-                        metricEooGeometries,
-                        gridCellsInMeters, new[] {
-                            new KeyValuePair<string, object>("observationsCount", 0),
-                            new KeyValuePair<string, object>("taxaCount", 0)
-                        },
-                        useCenterPoint
-                    );
-                }
-
-                // Add all grid cells features
-                foreach (var gridCellFeatureMetric in gridCellFeaturesMetric.OrderBy(gc => gc.Key).Select(f => f.Value))
-                {
-                    gridCellFeatureMetric.Geometry = gridCellFeatureMetric.Geometry.Transform((CoordinateSys)metricCoordinateSys, coordinateSystem);
-                    featureCollection.Add(gridCellFeatureMetric);
-                }
-
-                return (featureCollection, aooEooItems);
-            }
-            catch (ArgumentOutOfRangeException e)
-            {
-                _logger.LogError(e, $"Failed to calculate AOO/EOO. To many buckets. Taxa filter: {string.Join(", ", filter?.Taxa?.Ids ?? Enumerable.Empty<int>())}");
-                throw;
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, $"Failed to calculate AOO/EOO. Taxa filter: {string.Join(", ", filter?.Taxa?.Ids ?? Enumerable.Empty<int>())}");
-                throw;
-            }
-        }
-
-        /// <inheritdoc/>
-        public async Task<(FeatureCollection FeatureCollection, AooEooItem AooEooItem)?> CalculateAooAndEooArticle17Async(
-           int? roleId,
-           string authorizationApplicationIdentifier,
-           SearchFilter filter,
-           int gridCellsInMeters,
-           int maxDistance,
-           MetricCoordinateSys metricCoordinateSys,
-           CoordinateSys coordinateSystem,
-           TimeSpan? timeout = null)
-        {
-            try
-            {
-                var gridCellsMetric = await GetGridCellsAync(roleId, authorizationApplicationIdentifier, filter, gridCellsInMeters, metricCoordinateSys, timeout);
-                if (!gridCellsMetric.Any())
-                {
-                    return null!;
-                }
-
-                // We need features to return later so we create them now and don't need to create the polygon more than once
-                var gridCellFeaturesMetric = gridCellsMetric.Select(gc => gc.MetricBoundingBox
-                    .ToPolygon()
-                    .ToFeature(new Dictionary<string, object>()
-                    {
-                        {  "id", GeoJsonHelper.GetGridCellId(gridCellsInMeters, (int)gc.MetricBoundingBox.TopLeft.X, (int)gc.MetricBoundingBox.BottomRight.Y) },
-                        {  "observationsCount", gc.ObservationsCount! },
-                        {  "taxaCount", gc.TaxaCount! }
-                    })
-                ).ToDictionary(f => (string)f.Attributes["id"], f => f);
-
-                var metaData = CalculateMetadata(gridCellsMetric);
-                var featureCollection = new FeatureCollection
-                {
-                    BoundingBox = new Envelope(new Coordinate(metaData.MinX, metaData.MaxY), new Coordinate(metaData.MaxX, metaData.MinY)).Transform((CoordinateSys)metricCoordinateSys, coordinateSystem)
-                };
-
-                var triangels = gridCellsMetric
-                    .Select(gc => new XYBoundingBox()
-                    {
-                        BottomRight = new XYCoordinate(gc.MetricBoundingBox.BottomRight.X, gc.MetricBoundingBox.BottomRight.Y),
-                        TopLeft = new XYCoordinate(gc.MetricBoundingBox.TopLeft.X, gc.MetricBoundingBox.TopLeft.Y)
-                    }
-                    .ToPolygon())
-                        .ToArray()
-                            .CalculateTraiangels(true);
-
-                var polygonsInRange = new HashSet<Polygon>();
-                if (triangels != null)
-                {
-                    foreach (var triangle in triangels)
-                    {
-                        foreach (var corrdinate in triangle.Coordinates)
-                        {
-                            // Save triangels and sides shorter than alpha value
-                            var sidesAdded = 0;
-                            if (triangle.Coordinates[0].Distance(triangle.Coordinates[1]) <= maxDistance)
-                            {
-                                polygonsInRange.Add(new Polygon(new LinearRing(new Coordinate[] { triangle.Coordinates[0], triangle.Coordinates[1], triangle.Coordinates[0] })));
-                                sidesAdded++;
-                            }
-                            if (triangle.Coordinates[1].Distance(triangle.Coordinates[2]) <= maxDistance)
-                            {
-                                polygonsInRange.Add(new Polygon(new LinearRing(new Coordinate[] { triangle.Coordinates[1], triangle.Coordinates[2], triangle.Coordinates[1] })));
-                                sidesAdded++;
-                            }
-                            if (triangle.Coordinates[2].Distance(triangle.Coordinates[3]) <= maxDistance)
-                            {
-                                polygonsInRange.Add(new Polygon(new LinearRing(new Coordinate[] { triangle.Coordinates[2], triangle.Coordinates[3], triangle.Coordinates[2] })));
-                                sidesAdded++;
-                            }
-                            if (sidesAdded == 3)
-                            {
-                                polygonsInRange.Add((Polygon)triangle);
-                            }
-                        }
-                    }
-                }
-
-                // Create a multipolygon showing matching polygons
-                var inRangeGeometry = new MultiPolygon(polygonsInRange.ToArray());
-
-                // Add empty cells
-                GeoJsonHelper.FillInBlanks(
-                   gridCellFeaturesMetric,
-                   gridCellsInMeters, new[] {
-                            new KeyValuePair<string, object>("observationsCount", 0),
-                            new KeyValuePair<string, object>("taxaCount", 0)
-                   }
-               );
-
-                // Add all intersections gridcells to feature collection. Add nagative buffer when intersect to prevent gridcell touching corner match
-                var eooGridCellFeaturesMetric = gridCellFeaturesMetric.Where(gc =>
-                    long.Parse(gc.Value?.Attributes["observationsCount"]?.ToString() ?? "0") > 0 ||
-                    gc.Value!.Geometry.Intersects(inRangeGeometry)).Select(f => f.Value);
-                var eooGeometry = new MultiPolygon(eooGridCellFeaturesMetric.Select(f => f.Geometry as Polygon).ToArray());
-
-                var gridCellArea = gridCellsInMeters * (long)gridCellsInMeters / 1000000; //Calculate area in km2
-                var aoo = Math.Round((double)gridCellsMetric.Count() * gridCellArea, 0);
+                var gridCellArea = gridCellsInMeters * gridCellsInMeters / 1000000; //Calculate area in km2
+                var aoo = Math.Round((double)gridCells.Count() * gridCellArea, 0);
                 var eoo = Math.Round(eooGeometry.Area / 1000000, 0);
-
-                featureCollection.Add(new Feature(
-                    eooGeometry,
-                    new AttributesTable(new KeyValuePair<string, object>[] {
-                        new KeyValuePair<string, object>("id", "eoo"),
-                        new KeyValuePair<string, object>("aoo", (int)aoo),
-                        new KeyValuePair<string, object>("eoo", (int)eoo),
-                        new KeyValuePair<string, object>("gridCellArea", gridCellArea),
-                        new KeyValuePair<string, object>("gridCellAreaUnit", "km2"),
-                        new KeyValuePair<string, object>("observationsCount", metaData.ObservationsCount)
-                        }
-                    )
-                ));
-
-                // Add aoo features to collection
-                eooGridCellFeaturesMetric
-                    .Where(f => long.Parse(f.Attributes["observationsCount"]?.ToString() ?? "0") > 0)
-                        .ForEach(f => featureCollection.Add(f!));
-
-                // Make sure all geometries is in requested coordinate system
-                foreach (var feature in featureCollection)
-                {
-                    feature.Geometry = feature.Geometry.Transform((CoordinateSys)metricCoordinateSys, coordinateSystem);
-                }
-
                 var aooEooItem = new AooEooItem
                 {
-                    Id = $"eoo",                    
+                    Id = $"eoo-{alphaValue.ToString(CultureInfo.InvariantCulture).Replace(',', '.')}",
+                    AlphaValue = alphaValue,
                     Aoo = (int)aoo,
                     Eoo = (int)eoo,
-                    GridCellArea = (int)gridCellArea,
+                    GridCellArea = gridCellArea,
                     GridCellAreaUnit = "km2",
                     ObservationsCount = (int)metaData.ObservationsCount
                 };
-                return (featureCollection, aooEooItem);
+                aooEooItems.Add(aooEooItem);
+
+                featureCollection.Add(new Feature(
+                    eooGeometry.Transform((CoordinateSys)metricCoordinateSys, coordinateSystem),
+                    new AttributesTable(new Dictionary<string, object>
+                        {
+                            { "id", aooEooItem.Id },
+                            { "aoo", aooEooItem.Aoo },
+                            { "eoo", aooEooItem.Eoo },
+                            { "gridCellArea", aooEooItem.GridCellArea },
+                            { "gridCellAreaUnit", aooEooItem.GridCellAreaUnit },
+                            { "observationsCount", aooEooItem.ObservationsCount }
+                        }
+                    )
+                ));
             }
-            catch (ArgumentOutOfRangeException e)
+
+            if (!returnGridCells)
             {
-                _logger.LogError(e, "Failed to calculate AOO/EOO. To many buckets");
-                throw;
+                return (featureCollection, aooEooItems);
             }
-            catch (Exception e)
+
+            // Add empty grid cell where no observation was found too complete grid
+            if (includeEmptyCells && !useEdgeLengthRatio)
             {
-                _logger.LogError(e, "Failed to calculate AOO/EOO.");
-                throw;
+                GeoJsonHelper.FillInBlanks(
+                    gridCellFeaturesMetric,
+                    metricEooGeometries,
+                    gridCellsInMeters, new[] {
+                        new KeyValuePair<string, object>("observationsCount", 0),
+                        new KeyValuePair<string, object>("taxaCount", 0)
+                    },
+                    useCenterPoint
+                );
             }
-        }
 
-        /// <inheritdoc />
-        public async Task<long> GetMatchCountAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilterBase filter)
-        {
-            await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
-            return await _processedObservationRepository.GetMatchCountAsync(filter);
-        }
-
-        public async Task<int> GetNumberOfTaxaInFilterAsync(SearchFilterBase filter)
-        {
-            await _filterManager.PrepareFilterAsync(null, null, filter);
-            return filter?.Taxa?.Ids != null ? filter.Taxa.Ids.Count() : 0;
-        }
-
-        public async Task<FileExportResult> CreateAooEooExportAsync(
-            int? roleId,
-            string authorizationApplicationIdentifier,
-            SearchFilter filter,
-            int gridCellsInMeters,
-            bool useCenterPoint,
-            IEnumerable<double> alphaValues,
-            bool useEdgeLengthRatio,
-            bool allowHoles,
-            bool returnGridCells,
-            bool includeEmptyCells,
-            MetricCoordinateSys metricCoordinateSys,
-            CoordinateSys coordinateSystem,
-            string exportPath,
-            string fileName,            
-            IJobCancellationToken cancellationToken)
-        {
-            var temporaryZipExportFolderPath = Path.Combine(exportPath, "zip");
-            TimeSpan timeout = TimeSpan.FromMinutes(10);
-
-            try
+            // Add all grid cells features
+            foreach (var gridCellFeatureMetric in gridCellFeaturesMetric.OrderBy(gc => gc.Key).Select(f => f.Value))
             {
-                var geoJsonWriter = new GeoJsonWriter();
-                var originalTaxaList = filter.Taxa.Ids.ToList();
-                var aooEooItems = new List<AooEooItem>();
-                _fileService.CreateDirectory(temporaryZipExportFolderPath);
-                await StoreFilterAsync(temporaryZipExportFolderPath, filter);
-                await StoreSettingsAsync(temporaryZipExportFolderPath, new
+                gridCellFeatureMetric.Geometry = gridCellFeatureMetric.Geometry.Transform((CoordinateSys)metricCoordinateSys, coordinateSystem);
+                featureCollection.Add(gridCellFeatureMetric);
+            }
+
+            return (featureCollection, aooEooItems);
+        }
+        catch (ArgumentOutOfRangeException e)
+        {
+            _logger.LogError(e, $"Failed to calculate AOO/EOO. To many buckets. Taxa filter: {string.Join(", ", filter?.Taxa?.Ids ?? Enumerable.Empty<int>())}");
+            throw;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, $"Failed to calculate AOO/EOO. Taxa filter: {string.Join(", ", filter?.Taxa?.Ids ?? Enumerable.Empty<int>())}");
+            throw;
+        }
+    }
+
+    /// <inheritdoc/>
+    public async Task<(FeatureCollection FeatureCollection, AooEooItem AooEooItem)?> CalculateAooAndEooArticle17Async(
+       int? roleId,
+       string authorizationApplicationIdentifier,
+       SearchFilter filter,
+       int gridCellsInMeters,
+       int maxDistance,
+       MetricCoordinateSys metricCoordinateSys,
+       CoordinateSys coordinateSystem,
+       TimeSpan? timeout = null)
+    {
+        try
+        {
+            var gridCellsMetric = await GetGridCellsAync(roleId, authorizationApplicationIdentifier, filter, gridCellsInMeters, metricCoordinateSys, timeout);
+            if (!gridCellsMetric.Any())
+            {
+                return null!;
+            }
+
+            // We need features to return later so we create them now and don't need to create the polygon more than once
+            var gridCellFeaturesMetric = gridCellsMetric.Select(gc => gc.MetricBoundingBox
+                .ToPolygon()
+                .ToFeature(new Dictionary<string, object>()
                 {
-                    GridcellsInMeters = gridCellsInMeters,
-                    UseCenterPoint = useCenterPoint,
-                    AlphaValues = alphaValues,
-                    UseEdgeLengthRatio = useEdgeLengthRatio,
-                    AllowHoles = allowHoles,
-                    IncludeEmptyCells = includeEmptyCells,
-                    MetricCoordinateSys = metricCoordinateSys,
-                    CoordinateSystem = coordinateSystem,
-                    RoleId = roleId,
-                    AuthorizationApplicationIdentifier = authorizationApplicationIdentifier,
+                    {  "id", GeoJsonHelper.GetGridCellId(gridCellsInMeters, (int)gc.MetricBoundingBox.TopLeft.X, (int)gc.MetricBoundingBox.BottomRight.Y) },
+                    {  "observationsCount", gc.ObservationsCount! },
+                    {  "taxaCount", gc.TaxaCount! }
+                })
+            ).ToDictionary(f => (string)f.Attributes["id"], f => f);
+
+            var metaData = CalculateMetadata(gridCellsMetric);
+            var featureCollection = new FeatureCollection
+            {
+                BoundingBox = new Envelope(new Coordinate(metaData.MinX, metaData.MaxY), new Coordinate(metaData.MaxX, metaData.MinY)).Transform((CoordinateSys)metricCoordinateSys, coordinateSystem)
+            };
+
+            var triangels = gridCellsMetric
+                .Select(gc => new XYBoundingBox()
+                {
+                    BottomRight = new XYCoordinate(gc.MetricBoundingBox.BottomRight.X, gc.MetricBoundingBox.BottomRight.Y),
+                    TopLeft = new XYCoordinate(gc.MetricBoundingBox.TopLeft.X, gc.MetricBoundingBox.TopLeft.Y)
+                }
+                .ToPolygon())
+                    .ToArray()
+                        .CalculateTraiangels(true);
+
+            var polygonsInRange = new HashSet<Polygon>();
+            if (triangels != null)
+            {
+                foreach (var triangle in triangels)
+                {
+                    foreach (var corrdinate in triangle.Coordinates)
+                    {
+                        // Save triangels and sides shorter than alpha value
+                        var sidesAdded = 0;
+                        if (triangle.Coordinates[0].Distance(triangle.Coordinates[1]) <= maxDistance)
+                        {
+                            polygonsInRange.Add(new Polygon(new LinearRing(new Coordinate[] { triangle.Coordinates[0], triangle.Coordinates[1], triangle.Coordinates[0] })));
+                            sidesAdded++;
+                        }
+                        if (triangle.Coordinates[1].Distance(triangle.Coordinates[2]) <= maxDistance)
+                        {
+                            polygonsInRange.Add(new Polygon(new LinearRing(new Coordinate[] { triangle.Coordinates[1], triangle.Coordinates[2], triangle.Coordinates[1] })));
+                            sidesAdded++;
+                        }
+                        if (triangle.Coordinates[2].Distance(triangle.Coordinates[3]) <= maxDistance)
+                        {
+                            polygonsInRange.Add(new Polygon(new LinearRing(new Coordinate[] { triangle.Coordinates[2], triangle.Coordinates[3], triangle.Coordinates[2] })));
+                            sidesAdded++;
+                        }
+                        if (sidesAdded == 3)
+                        {
+                            polygonsInRange.Add((Polygon)triangle);
+                        }
+                    }
+                }
+            }
+
+            // Create a multipolygon showing matching polygons
+            var inRangeGeometry = new MultiPolygon(polygonsInRange.ToArray());
+
+            // Add empty cells
+            GeoJsonHelper.FillInBlanks(
+               gridCellFeaturesMetric,
+               gridCellsInMeters, new[] {
+                        new KeyValuePair<string, object>("observationsCount", 0),
+                        new KeyValuePair<string, object>("taxaCount", 0)
+               }
+           );
+
+            // Add all intersections gridcells to feature collection. Add nagative buffer when intersect to prevent gridcell touching corner match
+            var eooGridCellFeaturesMetric = gridCellFeaturesMetric.Where(gc =>
+                long.Parse(gc.Value?.Attributes["observationsCount"]?.ToString() ?? "0") > 0 ||
+                gc.Value!.Geometry.Intersects(inRangeGeometry)).Select(f => f.Value);
+            var eooGeometry = new MultiPolygon(eooGridCellFeaturesMetric.Select(f => f.Geometry as Polygon).ToArray());
+
+            var gridCellArea = gridCellsInMeters * (long)gridCellsInMeters / 1000000; //Calculate area in km2
+            var aoo = Math.Round((double)gridCellsMetric.Count() * gridCellArea, 0);
+            var eoo = Math.Round(eooGeometry.Area / 1000000, 0);
+
+            featureCollection.Add(new Feature(
+                eooGeometry,
+                new AttributesTable(new KeyValuePair<string, object>[] {
+                    new KeyValuePair<string, object>("id", "eoo"),
+                    new KeyValuePair<string, object>("aoo", (int)aoo),
+                    new KeyValuePair<string, object>("eoo", (int)eoo),
+                    new KeyValuePair<string, object>("gridCellArea", gridCellArea),
+                    new KeyValuePair<string, object>("gridCellAreaUnit", "km2"),
+                    new KeyValuePair<string, object>("observationsCount", metaData.ObservationsCount)
+                    }
+                )
+            ));
+
+            // Add aoo features to collection
+            eooGridCellFeaturesMetric
+                .Where(f => long.Parse(f.Attributes["observationsCount"]?.ToString() ?? "0") > 0)
+                    .ForEach(f => featureCollection.Add(f!));
+
+            // Make sure all geometries is in requested coordinate system
+            foreach (var feature in featureCollection)
+            {
+                feature.Geometry = feature.Geometry.Transform((CoordinateSys)metricCoordinateSys, coordinateSystem);
+            }
+
+            var aooEooItem = new AooEooItem
+            {
+                Id = $"eoo",                    
+                Aoo = (int)aoo,
+                Eoo = (int)eoo,
+                GridCellArea = (int)gridCellArea,
+                GridCellAreaUnit = "km2",
+                ObservationsCount = (int)metaData.ObservationsCount
+            };
+            return (featureCollection, aooEooItem);
+        }
+        catch (ArgumentOutOfRangeException e)
+        {
+            _logger.LogError(e, "Failed to calculate AOO/EOO. To many buckets");
+            throw;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Failed to calculate AOO/EOO.");
+            throw;
+        }
+    }
+
+    /// <inheritdoc />
+    public async Task<long> GetMatchCountAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilterBase filter)
+    {
+        await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
+        return await _processedObservationRepository.GetMatchCountAsync(filter);
+    }
+
+    public async Task<int> GetNumberOfTaxaInFilterAsync(SearchFilterBase filter)
+    {
+        await _filterManager.PrepareFilterAsync(null, null, filter);
+        return filter?.Taxa?.Ids != null ? filter.Taxa.Ids.Count() : 0;
+    }
+
+    public async Task<FileExportResult> CreateAooEooExportAsync(
+        int? roleId,
+        string authorizationApplicationIdentifier,
+        SearchFilter filter,
+        int gridCellsInMeters,
+        bool useCenterPoint,
+        IEnumerable<double> alphaValues,
+        bool useEdgeLengthRatio,
+        bool allowHoles,
+        bool returnGridCells,
+        bool includeEmptyCells,
+        MetricCoordinateSys metricCoordinateSys,
+        CoordinateSys coordinateSystem,
+        string exportPath,
+        string fileName,            
+        IJobCancellationToken cancellationToken)
+    {
+        var temporaryZipExportFolderPath = Path.Combine(exportPath, "zip");
+        TimeSpan timeout = TimeSpan.FromMinutes(10);
+
+        try
+        {
+            var geoJsonWriter = new GeoJsonWriter();
+            var originalTaxaList = filter.Taxa.Ids.ToList();
+            var aooEooItems = new List<AooEooItem>();
+            _fileService.CreateDirectory(temporaryZipExportFolderPath);
+            await StoreFilterAsync(temporaryZipExportFolderPath, filter);
+            await StoreSettingsAsync(temporaryZipExportFolderPath, new
+            {
+                GridcellsInMeters = gridCellsInMeters,
+                UseCenterPoint = useCenterPoint,
+                AlphaValues = alphaValues,
+                UseEdgeLengthRatio = useEdgeLengthRatio,
+                AllowHoles = allowHoles,
+                IncludeEmptyCells = includeEmptyCells,
+                MetricCoordinateSys = metricCoordinateSys,
+                CoordinateSystem = coordinateSystem,
+                RoleId = roleId,
+                AuthorizationApplicationIdentifier = authorizationApplicationIdentifier,
+            });
+            var totalFilePath = Path.Combine(temporaryZipExportFolderPath, "Total.geojson");
+
+            var aooEooResult = await CalculateAooAndEooAsync(
+                roleId,
+                authorizationApplicationIdentifier, 
+                filter, 
+                gridCellsInMeters, 
+                useCenterPoint, 
+                alphaValues, 
+                useEdgeLengthRatio,
+                allowHoles, 
+                returnGridCells, 
+                includeEmptyCells, 
+                metricCoordinateSys, 
+                coordinateSystem,
+                timeout);
+
+            if (aooEooResult == null)
+            {
+                aooEooItems.Add(new AooEooItem
+                {             
+                    TaxonIdCaption = "-",
+                    TaxonNameCaption = "Total"
                 });
-                var totalFilePath = Path.Combine(temporaryZipExportFolderPath, "Total.geojson");
-
-                var aooEooResult = await CalculateAooAndEooAsync(
-                    roleId,
-                    authorizationApplicationIdentifier, 
-                    filter, 
-                    gridCellsInMeters, 
-                    useCenterPoint, 
-                    alphaValues, 
-                    useEdgeLengthRatio,
-                    allowHoles, 
-                    returnGridCells, 
-                    includeEmptyCells, 
-                    metricCoordinateSys, 
-                    coordinateSystem,
-                    timeout);
-
-                if (aooEooResult == null)
+            }
+            else
+            {
+                foreach (var item in aooEooResult.Value.AooEooItems)
                 {
-                    aooEooItems.Add(new AooEooItem
-                    {             
-                        TaxonIdCaption = "-",
-                        TaxonNameCaption = "Total"
-                    });
+                    item.TaxonIdCaption = "-";
+                    item.TaxonNameCaption = "Total";
                 }
-                else
+
+                aooEooItems.AddRange(aooEooResult.Value.AooEooItems);
+                string geoJson = geoJsonWriter.Write(aooEooResult);
+                File.WriteAllText(totalFilePath, geoJson);
+            }
+
+            if (originalTaxaList != null && originalTaxaList.Count > 1)
+            {
+                foreach (var taxonId in originalTaxaList)
                 {
-                    foreach (var item in aooEooResult.Value.AooEooItems)
+                    filter.Taxa.Ids = new List<int>() { taxonId };
+                    var taxonTree = await _taxonManager.GetTaxonTreeAsync();
+                    var treeNode = taxonTree.GetTreeNode(taxonId);
+                    if (treeNode == null)
                     {
-                        item.TaxonIdCaption = "-";
-                        item.TaxonNameCaption = "Total";
+                        _logger.LogWarning("Can't find taxon tree node with TaxonId={@taxonId}", taxonId);
+                        continue;
+                    }
+                    Models.Interfaces.IBasicTaxon taxon = treeNode.Data;
+                    string taxonName = !string.IsNullOrEmpty(taxon.VernacularName) ? $"{taxon.ScientificName} ({taxon.VernacularName})" : taxon.ScientificName;
+                    string taxonFileName = FilenameHelper.GetSafeFileName(taxonName, '-');
+                    var taxonFilePath = Path.Combine(temporaryZipExportFolderPath, $"{taxon.Id}-{taxonFileName}.geojson");
+
+                    aooEooResult = await CalculateAooAndEooAsync(
+                        roleId,
+                        authorizationApplicationIdentifier,
+                        filter,
+                        gridCellsInMeters,
+                        useCenterPoint,
+                        alphaValues,
+                        useEdgeLengthRatio,
+                        allowHoles,
+                        returnGridCells,
+                        includeEmptyCells,
+                        metricCoordinateSys,
+                        coordinateSystem,
+                        timeout);
+
+                    if (aooEooResult == null)
+                    {
+                        aooEooItems.Add(new AooEooItem
+                        {
+                            TaxonId = taxon.Id,
+                            VernacularName = taxon.VernacularName,
+                            ScientificName = taxon.ScientificName,
+                            TaxonIdCaption = taxon.Id.ToString(),
+                            TaxonNameCaption = taxonName
+                        });
+                    }
+                    else
+                    {
+                        foreach (var item in aooEooResult.Value.AooEooItems)
+                        {
+                            item.TaxonId = taxon.Id;
+                            item.ScientificName = taxon.ScientificName;
+                            item.VernacularName = taxon.VernacularName;
+                            item.TaxonIdCaption = taxon.Id.ToString();
+                            item.TaxonNameCaption = taxonName;
+                            aooEooItems.Add(item);
+                        }
+
+                        string geoJson = geoJsonWriter.Write(aooEooResult);
+                        geoJson = geoJsonWriter.Write(aooEooResult);
+                        File.WriteAllText(taxonFilePath, geoJson);
                     }
 
-                    aooEooItems.AddRange(aooEooResult.Value.AooEooItems);
-                    string geoJson = geoJsonWriter.Write(aooEooResult);
-                    File.WriteAllText(totalFilePath, geoJson);
+                    await Task.Delay(200); // wait 200ms
                 }
-
-                if (originalTaxaList != null && originalTaxaList.Count > 1)
-                {
-                    foreach (var taxonId in originalTaxaList)
-                    {
-                        filter.Taxa.Ids = new List<int>() { taxonId };
-                        var taxonTree = await _taxonManager.GetTaxonTreeAsync();
-                        var treeNode = taxonTree.GetTreeNode(taxonId);
-                        if (treeNode == null)
-                        {
-                            _logger.LogWarning("Can't find taxon tree node with TaxonId={@taxonId}", taxonId);
-                            continue;
-                        }
-                        Models.Interfaces.IBasicTaxon taxon = treeNode.Data;
-                        string taxonName = !string.IsNullOrEmpty(taxon.VernacularName) ? $"{taxon.ScientificName} ({taxon.VernacularName})" : taxon.ScientificName;
-                        string taxonFileName = FilenameHelper.GetSafeFileName(taxonName, '-');
-                        var taxonFilePath = Path.Combine(temporaryZipExportFolderPath, $"{taxon.Id}-{taxonFileName}.geojson");
-
-                        aooEooResult = await CalculateAooAndEooAsync(
-                            roleId,
-                            authorizationApplicationIdentifier,
-                            filter,
-                            gridCellsInMeters,
-                            useCenterPoint,
-                            alphaValues,
-                            useEdgeLengthRatio,
-                            allowHoles,
-                            returnGridCells,
-                            includeEmptyCells,
-                            metricCoordinateSys,
-                            coordinateSystem,
-                            timeout);
-
-                        if (aooEooResult == null)
-                        {
-                            aooEooItems.Add(new AooEooItem
-                            {
-                                TaxonId = taxon.Id,
-                                VernacularName = taxon.VernacularName,
-                                ScientificName = taxon.ScientificName,
-                                TaxonIdCaption = taxon.Id.ToString(),
-                                TaxonNameCaption = taxonName
-                            });
-                        }
-                        else
-                        {
-                            foreach (var item in aooEooResult.Value.AooEooItems)
-                            {
-                                item.TaxonId = taxon.Id;
-                                item.ScientificName = taxon.ScientificName;
-                                item.VernacularName = taxon.VernacularName;
-                                item.TaxonIdCaption = taxon.Id.ToString();
-                                item.TaxonNameCaption = taxonName;
-                                aooEooItems.Add(item);
-                            }
-
-                            string geoJson = geoJsonWriter.Write(aooEooResult);
-                            geoJson = geoJsonWriter.Write(aooEooResult);
-                            File.WriteAllText(taxonFilePath, geoJson);
-                        }
-
-                        await Task.Delay(200); // wait 200ms
-                    }
-                }
-
-                await CreateAooEooCsvFile(Path.Combine(temporaryZipExportFolderPath, "AooEooExport.csv"), aooEooItems, alphaValues.Count() > 1);
-                var zipFilePath = Path.Join(exportPath, $"{fileName}.zip");
-                _fileService.CompressDirectory(temporaryZipExportFolderPath, zipFilePath);
-                return new FileExportResult
-                {
-                    NrObservations = 0,
-                    FilePath = zipFilePath
-                };
             }
-            catch (Exception e)
+
+            await CreateAooEooCsvFile(Path.Combine(temporaryZipExportFolderPath, "AooEooExport.csv"), aooEooItems, alphaValues.Count() > 1);
+            var zipFilePath = Path.Join(exportPath, $"{fileName}.zip");
+            _fileService.CompressDirectory(temporaryZipExportFolderPath, zipFilePath);
+            return new FileExportResult
             {
-                _logger.LogError(e, "Failed to create AOO EOO File.");
-                throw;
-            }
-            finally
-            {
-                _fileService.DeleteDirectory(temporaryZipExportFolderPath);
-            }
+                NrObservations = 0,
+                FilePath = zipFilePath
+            };
         }
-
-        public async Task<FileExportResult> CreateAooAndEooArticle17ExportAsync(
-            int? roleId,
-            string authorizationApplicationIdentifier,
-            SearchFilter filter,
-            int gridCellsInMeters,
-            int maxDistance,
-            MetricCoordinateSys metricCoordinateSys,
-            CoordinateSys coordinateSystem,           
-            string exportPath,
-            string fileName,
-            IJobCancellationToken cancellationToken)
+        catch (Exception e)
         {
-            var temporaryZipExportFolderPath = Path.Combine(exportPath, "zip");
-            TimeSpan timeout = TimeSpan.FromMinutes(10);
+            _logger.LogError(e, "Failed to create AOO EOO File.");
+            throw;
+        }
+        finally
+        {
+            _fileService.DeleteDirectory(temporaryZipExportFolderPath);
+        }
+    }
 
-            try
+    public async Task<FileExportResult> CreateAooAndEooArticle17ExportAsync(
+        int? roleId,
+        string authorizationApplicationIdentifier,
+        SearchFilter filter,
+        int gridCellsInMeters,
+        int maxDistance,
+        MetricCoordinateSys metricCoordinateSys,
+        CoordinateSys coordinateSystem,           
+        string exportPath,
+        string fileName,
+        IJobCancellationToken cancellationToken)
+    {
+        var temporaryZipExportFolderPath = Path.Combine(exportPath, "zip");
+        TimeSpan timeout = TimeSpan.FromMinutes(10);
+
+        try
+        {
+            var geoJsonWriter = new GeoJsonWriter();
+            var originalTaxaList = filter.Taxa.Ids.ToList();
+            var aooEooItems = new List<AooEooItem>();
+            _fileService.CreateDirectory(temporaryZipExportFolderPath);
+            await StoreFilterAsync(temporaryZipExportFolderPath, filter);
+            await StoreSettingsAsync(temporaryZipExportFolderPath, new
             {
-                var geoJsonWriter = new GeoJsonWriter();
-                var originalTaxaList = filter.Taxa.Ids.ToList();
-                var aooEooItems = new List<AooEooItem>();
-                _fileService.CreateDirectory(temporaryZipExportFolderPath);
-                await StoreFilterAsync(temporaryZipExportFolderPath, filter);
-                await StoreSettingsAsync(temporaryZipExportFolderPath, new
+                GridcellsInMeters = gridCellsInMeters,
+                MaxDistance = maxDistance,                    
+                MetricCoordinateSys = metricCoordinateSys,
+                CoordinateSystem = coordinateSystem,
+                RoleId = roleId,
+                AuthorizationApplicationIdentifier = authorizationApplicationIdentifier,
+            });
+            var totalFilePath = Path.Combine(temporaryZipExportFolderPath, "Total.geojson");
+
+            var aooEooResult = await CalculateAooAndEooArticle17Async(
+                roleId,
+                authorizationApplicationIdentifier,
+                filter,
+                gridCellsInMeters,
+                maxDistance,
+                metricCoordinateSys,
+                coordinateSystem,
+                timeout);
+
+            if (aooEooResult == null)
+            {
+                aooEooItems.Add(new AooEooItem
                 {
-                    GridcellsInMeters = gridCellsInMeters,
-                    MaxDistance = maxDistance,                    
-                    MetricCoordinateSys = metricCoordinateSys,
-                    CoordinateSystem = coordinateSystem,
-                    RoleId = roleId,
-                    AuthorizationApplicationIdentifier = authorizationApplicationIdentifier,
+                    TaxonIdCaption = "-",
+                    TaxonNameCaption = "Total"
                 });
-                var totalFilePath = Path.Combine(temporaryZipExportFolderPath, "Total.geojson");
+            }
+            else
+            {
+                aooEooResult.Value.AooEooItem.TaxonIdCaption = "-";
+                aooEooResult.Value.AooEooItem.TaxonNameCaption = "Total";
+                aooEooItems.Add(aooEooResult.Value.AooEooItem);
+                string geoJson = geoJsonWriter.Write(aooEooResult);
+                File.WriteAllText(totalFilePath, geoJson);
+            }
 
-                var aooEooResult = await CalculateAooAndEooArticle17Async(
-                    roleId,
-                    authorizationApplicationIdentifier,
-                    filter,
-                    gridCellsInMeters,
-                    maxDistance,
-                    metricCoordinateSys,
-                    coordinateSystem,
-                    timeout);
-
-                if (aooEooResult == null)
+            if (originalTaxaList != null && originalTaxaList.Count > 1)
+            {
+                foreach (var taxonId in originalTaxaList)
                 {
-                    aooEooItems.Add(new AooEooItem
+                    filter.Taxa.Ids = new List<int>() { taxonId };
+                    var taxonTree = await _taxonManager.GetTaxonTreeAsync();
+                    var treeNode = taxonTree.GetTreeNode(taxonId);
+                    if (treeNode == null)
                     {
-                        TaxonIdCaption = "-",
-                        TaxonNameCaption = "Total"
-                    });
-                }
-                else
-                {
-                    aooEooResult.Value.AooEooItem.TaxonIdCaption = "-";
-                    aooEooResult.Value.AooEooItem.TaxonNameCaption = "Total";
-                    aooEooItems.Add(aooEooResult.Value.AooEooItem);
-                    string geoJson = geoJsonWriter.Write(aooEooResult);
-                    File.WriteAllText(totalFilePath, geoJson);
-                }
-
-                if (originalTaxaList != null && originalTaxaList.Count > 1)
-                {
-                    foreach (var taxonId in originalTaxaList)
-                    {
-                        filter.Taxa.Ids = new List<int>() { taxonId };
-                        var taxonTree = await _taxonManager.GetTaxonTreeAsync();
-                        var treeNode = taxonTree.GetTreeNode(taxonId);
-                        if (treeNode == null)
-                        {
-                            _logger.LogWarning("Can't find taxon tree node with TaxonId={@taxonId}", taxonId);
-                            continue;
-                        }
-                        Models.Interfaces.IBasicTaxon taxon = treeNode.Data;
-                        string taxonName = !string.IsNullOrEmpty(taxon.VernacularName) ? $"{taxon.ScientificName} ({taxon.VernacularName})" : taxon.ScientificName;
-                        string taxonFileName = FilenameHelper.GetSafeFileName(taxonName, '-');
-                        var taxonFilePath = Path.Combine(temporaryZipExportFolderPath, $"{taxon.Id}-{taxonFileName}.geojson");
-                        aooEooResult = await CalculateAooAndEooArticle17Async(
-                            roleId,
-                            authorizationApplicationIdentifier,
-                            filter,
-                            gridCellsInMeters,
-                            maxDistance,
-                            metricCoordinateSys,
-                            coordinateSystem,
-                            timeout);
-
-                        if (aooEooResult == null)
-                        {
-                            aooEooItems.Add(new AooEooItem
-                            {
-                                TaxonId = taxon.Id,
-                                VernacularName = taxon.VernacularName,
-                                ScientificName = taxon.ScientificName,
-                                TaxonIdCaption = taxon.Id.ToString(),
-                                TaxonNameCaption = taxonName
-                            });
-                        }
-                        else
-                        {
-                            aooEooResult.Value.AooEooItem.TaxonId = taxon.Id;
-                            aooEooResult.Value.AooEooItem.ScientificName = taxon.ScientificName;
-                            aooEooResult.Value.AooEooItem.VernacularName = taxon.VernacularName;
-                            aooEooResult.Value.AooEooItem.TaxonIdCaption = taxon.Id.ToString();
-                            aooEooResult.Value.AooEooItem.TaxonNameCaption = taxonName;
-                            aooEooItems.Add(aooEooResult.Value.AooEooItem);
-                            string geoJson = geoJsonWriter.Write(aooEooResult);
-                            geoJson = geoJsonWriter.Write(aooEooResult);
-                            File.WriteAllText(taxonFilePath, geoJson);
-                        }
-
-                        await Task.Delay(200); // wait 200ms
+                        _logger.LogWarning("Can't find taxon tree node with TaxonId={@taxonId}", taxonId);
+                        continue;
                     }
+                    Models.Interfaces.IBasicTaxon taxon = treeNode.Data;
+                    string taxonName = !string.IsNullOrEmpty(taxon.VernacularName) ? $"{taxon.ScientificName} ({taxon.VernacularName})" : taxon.ScientificName;
+                    string taxonFileName = FilenameHelper.GetSafeFileName(taxonName, '-');
+                    var taxonFilePath = Path.Combine(temporaryZipExportFolderPath, $"{taxon.Id}-{taxonFileName}.geojson");
+                    aooEooResult = await CalculateAooAndEooArticle17Async(
+                        roleId,
+                        authorizationApplicationIdentifier,
+                        filter,
+                        gridCellsInMeters,
+                        maxDistance,
+                        metricCoordinateSys,
+                        coordinateSystem,
+                        timeout);
+
+                    if (aooEooResult == null)
+                    {
+                        aooEooItems.Add(new AooEooItem
+                        {
+                            TaxonId = taxon.Id,
+                            VernacularName = taxon.VernacularName,
+                            ScientificName = taxon.ScientificName,
+                            TaxonIdCaption = taxon.Id.ToString(),
+                            TaxonNameCaption = taxonName
+                        });
+                    }
+                    else
+                    {
+                        aooEooResult.Value.AooEooItem.TaxonId = taxon.Id;
+                        aooEooResult.Value.AooEooItem.ScientificName = taxon.ScientificName;
+                        aooEooResult.Value.AooEooItem.VernacularName = taxon.VernacularName;
+                        aooEooResult.Value.AooEooItem.TaxonIdCaption = taxon.Id.ToString();
+                        aooEooResult.Value.AooEooItem.TaxonNameCaption = taxonName;
+                        aooEooItems.Add(aooEooResult.Value.AooEooItem);
+                        string geoJson = geoJsonWriter.Write(aooEooResult);
+                        geoJson = geoJsonWriter.Write(aooEooResult);
+                        File.WriteAllText(taxonFilePath, geoJson);
+                    }
+
+                    await Task.Delay(200); // wait 200ms
                 }
+            }
 
-                await CreateAooEooCsvFile(Path.Combine(temporaryZipExportFolderPath, "AooEooExport.csv"), aooEooItems, false);
-                var zipFilePath = Path.Join(exportPath, $"{fileName}.zip");
-                _fileService.CompressDirectory(temporaryZipExportFolderPath, zipFilePath);
-                return new FileExportResult
-                {
-                    NrObservations = 0,
-                    FilePath = zipFilePath
-                };
-            }
-            catch (Exception e)
+            await CreateAooEooCsvFile(Path.Combine(temporaryZipExportFolderPath, "AooEooExport.csv"), aooEooItems, false);
+            var zipFilePath = Path.Join(exportPath, $"{fileName}.zip");
+            _fileService.CompressDirectory(temporaryZipExportFolderPath, zipFilePath);
+            return new FileExportResult
             {
-                _logger.LogError(e, "Failed to create AOO EOO Article 17 File.");
-                throw;
-            }
-            finally
-            {
-                _fileService.DeleteDirectory(temporaryZipExportFolderPath);
-            }
+                NrObservations = 0,
+                FilePath = zipFilePath
+            };
         }
-
-        private async Task CreateAooEooCsvFile(string filePath, IEnumerable<AooEooItem> aooEooItems, bool writeAlphaValue)
+        catch (Exception e)
         {
-            using var streamWriter = new StreamWriter(filePath, false, new UTF8Encoding(true));
-            var csvWriter = new CsvWriter(streamWriter, ";");
+            _logger.LogError(e, "Failed to create AOO EOO Article 17 File.");
+            throw;
+        }
+        finally
+        {
+            _fileService.DeleteDirectory(temporaryZipExportFolderPath);
+        }
+    }
 
-            // Header
-            csvWriter.WriteField("Id");
-            csvWriter.WriteField("Caption");
-            csvWriter.WriteField("Observation count");
-            csvWriter.WriteField("AOO (km2)");
-            csvWriter.WriteField("EOO (km2)");
-            if (writeAlphaValue) csvWriter.WriteField("Alpha value");
+    private async Task CreateAooEooCsvFile(string filePath, IEnumerable<AooEooItem> aooEooItems, bool writeAlphaValue)
+    {
+        using var streamWriter = new StreamWriter(filePath, false, new UTF8Encoding(true));
+        var csvWriter = new CsvWriter(streamWriter, ";");
+
+        // Header
+        csvWriter.WriteField("Id");
+        csvWriter.WriteField("Caption");
+        csvWriter.WriteField("Observation count");
+        csvWriter.WriteField("AOO (km2)");
+        csvWriter.WriteField("EOO (km2)");
+        if (writeAlphaValue) csvWriter.WriteField("Alpha value");
+        csvWriter.NextRecord();
+
+        foreach (var item in aooEooItems)
+        {
+            csvWriter.WriteField(item.TaxonIdCaption);
+            csvWriter.WriteField(item.TaxonNameCaption);
+            csvWriter.WriteField(item.ObservationsCount.ToString());
+            csvWriter.WriteField(item.Aoo.ToString());
+            csvWriter.WriteField(item.Eoo.ToString());
+            if (writeAlphaValue) csvWriter.WriteField(item.AlphaValue.ToString());
+
             csvWriter.NextRecord();
-
-            foreach (var item in aooEooItems)
-            {
-                csvWriter.WriteField(item.TaxonIdCaption);
-                csvWriter.WriteField(item.TaxonNameCaption);
-                csvWriter.WriteField(item.ObservationsCount.ToString());
-                csvWriter.WriteField(item.Aoo.ToString());
-                csvWriter.WriteField(item.Eoo.ToString());
-                if (writeAlphaValue) csvWriter.WriteField(item.AlphaValue.ToString());
-
-                csvWriter.NextRecord();
-            }
-            
-            await streamWriter.FlushAsync();
         }
+        
+        await streamWriter.FlushAsync();
+    }
 
-        /// <summary>
-        /// Store filter in folder o zip
-        /// </summary>
-        /// <param name="temporaryZipExportFolderPath"></param>
-        /// <param name="filter"></param>
-        /// <returns></returns>
-        protected async Task StoreFilterAsync(string temporaryZipExportFolderPath, SearchFilter filter)
+    /// <summary>
+    /// Store filter in folder o zip
+    /// </summary>
+    /// <param name="temporaryZipExportFolderPath"></param>
+    /// <param name="filter"></param>
+    /// <returns></returns>
+    protected async Task StoreFilterAsync(string temporaryZipExportFolderPath, SearchFilter filter)
+    {
+        try
         {
-            try
-            {
-                await using var fileStream = File.Create(Path.Combine(temporaryZipExportFolderPath, "filter.json"));
-                await using var streamWriter = new StreamWriter(fileStream, Encoding.UTF8);
-                var serializeOptions = new JsonSerializerOptions {
-                    WriteIndented = true,
-                    Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.Latin1Supplement), // Display å,ä,ö e.t.c. properly
-                    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull 
-                };
-                serializeOptions.Converters.Add(new JsonStringEnumConverter());
+            await using var fileStream = File.Create(Path.Combine(temporaryZipExportFolderPath, "filter.json"));
+            await using var streamWriter = new StreamWriter(fileStream, Encoding.UTF8);
+            var serializeOptions = new JsonSerializerOptions {
+                WriteIndented = true,
+                Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.Latin1Supplement), // Display å,ä,ö e.t.c. properly
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull 
+            };
+            serializeOptions.Converters.Add(new JsonStringEnumConverter());
 
-                var filterString = JsonSerializer.Serialize(filter, serializeOptions);
-                await streamWriter.WriteAsync(filterString);
-                streamWriter.Close();
-                fileStream.Close();
-            }
-            catch
-            {
-                return;
-            }
+            var filterString = JsonSerializer.Serialize(filter, serializeOptions);
+            await streamWriter.WriteAsync(filterString);
+            streamWriter.Close();
+            fileStream.Close();
         }
-
-        /// <summary>
-        /// Store settings in folder o zip
-        /// </summary>
-        /// <param name="temporaryZipExportFolderPath"></param>
-        /// <param name="settings"></param>
-        /// <returns></returns>
-        protected async Task StoreSettingsAsync(string temporaryZipExportFolderPath, object settings)
+        catch
         {
-            try
-            {
-                await using var fileStream = File.Create(Path.Combine(temporaryZipExportFolderPath, "settings.json"));
-                await using var streamWriter = new StreamWriter(fileStream, Encoding.UTF8);                
-                var serializeOptions = new JsonSerializerOptions
-                {
-                    WriteIndented = true,
-                    Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.Latin1Supplement), // Display å,ä,ö e.t.c. properly
-                    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-                };
-                serializeOptions.Converters.Add(new JsonStringEnumConverter());
+            return;
+        }
+    }
 
-                var settingsString = JsonSerializer.Serialize(settings, serializeOptions);
-                await streamWriter.WriteAsync(settingsString);
-                streamWriter.Close();
-                fileStream.Close();
-            }
-            catch
+    /// <summary>
+    /// Store settings in folder o zip
+    /// </summary>
+    /// <param name="temporaryZipExportFolderPath"></param>
+    /// <param name="settings"></param>
+    /// <returns></returns>
+    protected async Task StoreSettingsAsync(string temporaryZipExportFolderPath, object settings)
+    {
+        try
+        {
+            await using var fileStream = File.Create(Path.Combine(temporaryZipExportFolderPath, "settings.json"));
+            await using var streamWriter = new StreamWriter(fileStream, Encoding.UTF8);                
+            var serializeOptions = new JsonSerializerOptions
             {
-                return;
-            }
+                WriteIndented = true,
+                Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.Latin1Supplement), // Display å,ä,ö e.t.c. properly
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+            };
+            serializeOptions.Converters.Add(new JsonStringEnumConverter());
+
+            var settingsString = JsonSerializer.Serialize(settings, serializeOptions);
+            await streamWriter.WriteAsync(settingsString);
+            streamWriter.Close();
+            fileStream.Close();
+        }
+        catch
+        {
+            return;
         }
     }
 }

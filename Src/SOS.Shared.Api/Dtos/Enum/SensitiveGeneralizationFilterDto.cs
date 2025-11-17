@@ -1,23 +1,22 @@
-﻿namespace SOS.Shared.Api.Dtos.Enum
+﻿namespace SOS.Shared.Api.Dtos.Enum;
+
+/// <summary>
+/// Sensitive observations generalization filter.
+/// </summary>
+public enum SensitiveGeneralizationFilterDto
 {
     /// <summary>
-    /// Sensitive observations generalization filter.
+    /// Dont include sensitive observations that also has generalized public observation.
     /// </summary>
-    public enum SensitiveGeneralizationFilterDto
-    {
-        /// <summary>
-        /// Dont include sensitive observations that also has generalized public observation.
-        /// </summary>
-        DontIncludeGeneralizedObservations = 0,
+    DontIncludeGeneralizedObservations = 0,
 
-        /// <summary>
-        /// Include sensitive observations that also has generalized public observation.
-        /// </summary>
-        IncludeGeneralizedObservations = 1,
+    /// <summary>
+    /// Include sensitive observations that also has generalized public observation.
+    /// </summary>
+    IncludeGeneralizedObservations = 1,
 
-        /// <summary>
-        /// Only include sensitive observations that also has generalized public observation.
-        /// </summary>
-        OnlyGeneralizedObservations = 2
-    }
+    /// <summary>
+    /// Only include sensitive observations that also has generalized public observation.
+    /// </summary>
+    OnlyGeneralizedObservations = 2
 }

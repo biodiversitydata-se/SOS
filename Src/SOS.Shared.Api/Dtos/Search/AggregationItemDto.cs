@@ -1,8 +1,7 @@
-﻿namespace SOS.Shared.Api.Dtos.Search
+﻿namespace SOS.Shared.Api.Dtos.Search;
+
+public class AggregationItemDto
 {
-    public class AggregationItemDto
-    {
-        public string? AggregationKey { get; set; }
-        public int DocCount { get; set; }
-    }
+    public string? AggregationKey { get; set; }
+    public int DocCount { get; set; }
 }

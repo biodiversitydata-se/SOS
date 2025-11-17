@@ -1,12 +1,11 @@
 ﻿using System.Collections.Generic;
 
-namespace SOS.Shared.Api.Dtos.Filter
+namespace SOS.Shared.Api.Dtos.Filter;
+
+public class DataStewardshipFilterDto
 {
-    public class DataStewardshipFilterDto
-    {
-        /// <summary>
-        /// Dataset filter
-        /// </summary>
-        public IEnumerable<string>? DatasetIdentifiers { get; set; }
-    }
+    /// <summary>
+    /// Dataset filter
+    /// </summary>
+    public IEnumerable<string>? DatasetIdentifiers { get; set; }
 }

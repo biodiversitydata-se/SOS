@@ -1,31 +1,30 @@
 ﻿using System.Runtime.Serialization;
 
-namespace SOS.Shared.Api.Dtos.DataStewardship.Enums
+namespace SOS.Shared.Api.Dtos.DataStewardship.Enums;
+
+/// <summary>
+/// The type of species observation the record deals with (e.g. human observation, material sample etc.)
+/// </summary>
+public enum DsBasisOfRecord
 {
     /// <summary>
-    /// The type of species observation the record deals with (e.g. human observation, material sample etc.)
+    /// fysiskt prov
     /// </summary>
-    public enum DsBasisOfRecord
-    {
-        /// <summary>
-        /// fysiskt prov
-        /// </summary>
-        [EnumMember(Value = "fysiskt prov")]
-        FysisktProv = 0,
-        /// <summary>
-        /// maskinell observation
-        /// </summary>
-        [EnumMember(Value = "maskinell observation")]
-        MaskinellObservation = 1,
-        /// <summary>
-        /// mänsklig observation
-        /// </summary>
-        [EnumMember(Value = "mänsklig observation")]
-        MänskligObservation = 2,
-        /// <summary>
-        /// okänt
-        /// </summary>
-        [EnumMember(Value = "okänt")]
-        Okänt = 3
-    }
+    [EnumMember(Value = "fysiskt prov")]
+    FysisktProv = 0,
+    /// <summary>
+    /// maskinell observation
+    /// </summary>
+    [EnumMember(Value = "maskinell observation")]
+    MaskinellObservation = 1,
+    /// <summary>
+    /// mänsklig observation
+    /// </summary>
+    [EnumMember(Value = "mänsklig observation")]
+    MänskligObservation = 2,
+    /// <summary>
+    /// okänt
+    /// </summary>
+    [EnumMember(Value = "okänt")]
+    Okänt = 3
 }

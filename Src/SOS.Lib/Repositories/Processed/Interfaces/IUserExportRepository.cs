@@ -1,12 +1,11 @@
 ﻿using SOS.Lib.Models.Export;
 
 
-namespace SOS.Lib.Repositories.Processed.Interfaces
+namespace SOS.Lib.Repositories.Processed.Interfaces;
+
+/// <summary>
+///     Processed data class
+/// </summary>
+public interface IUserExportRepository : IMongoDbProcessedRepositoryBase<UserExport, int>
 {
-    /// <summary>
-    ///     Processed data class
-    /// </summary>
-    public interface IUserExportRepository : IMongoDbProcessedRepositoryBase<UserExport, int>
-    {
-    }
 }

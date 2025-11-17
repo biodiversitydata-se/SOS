@@ -4,45 +4,44 @@ using SOS.Lib.Models.Search.Filters;
 using System;
 using System.Collections.Generic;
 
-namespace SOS.Lib
+namespace SOS.Lib;
+
+/// <summary>
+/// Observation specific search related extensions
+/// </summary>
+public static class SearchExtensionsEvent
 {
     /// <summary>
-    /// Observation specific search related extensions
+    ///     Create search filter
     /// </summary>
-    public static class SearchExtensionsEvent
+    /// <param name="filter"></param>
+    /// <returns></returns>
+    public static ICollection<Action<QueryDescriptor<TQueryDescriptor>>> ToQuery<TQueryDescriptor>(
+        this EventSearchFilter filter) where TQueryDescriptor : class
     {
-        /// <summary>
-        ///     Create search filter
-        /// </summary>
-        /// <param name="filter"></param>
-        /// <returns></returns>
-        public static ICollection<Action<QueryDescriptor<TQueryDescriptor>>> ToQuery<TQueryDescriptor>(
-            this EventSearchFilter filter) where TQueryDescriptor : class
+        var queries = new List<Action<QueryDescriptor<TQueryDescriptor>>>();
+        if (filter == null) return queries;
+
+        queries.TryAddTermsCriteria("dataProviderId", filter.DataProviderIds);
+        queries.TryAddTermsCriteria("eventId", filter.EventIds);
+        queries.TryAddTermsCriteria("dataStewardship.datasetIdentifier", filter.DatasetIds);
+       
+        if (filter.IsPartOfDataStewardshipDataset.GetValueOrDefault(false))
         {
-            var queries = new List<Action<QueryDescriptor<TQueryDescriptor>>>();
-            if (filter == null) return queries;
-
-            queries.TryAddTermsCriteria("dataProviderId", filter.DataProviderIds);
-            queries.TryAddTermsCriteria("eventId", filter.EventIds);
-            queries.TryAddTermsCriteria("dataStewardship.datasetIdentifier", filter.DatasetIds);
-           
-            if (filter.IsPartOfDataStewardshipDataset.GetValueOrDefault(false))
-            {
-                queries.AddExistsCriteria("dataStewardship");
-            }
-
-            return queries;
+            queries.AddExistsCriteria("dataStewardship");
         }
 
-        public static ICollection<Action<QueryDescriptor<TQueryDescriptor>>> ToExcludeQuery<TQueryDescriptor>(this EventSearchFilter filter) where TQueryDescriptor : class
-        {
-            if (filter == null)
-            {
-                return null;
-            }
+        return queries;
+    }
 
-            var queries = new List<Action<QueryDescriptor<TQueryDescriptor>>>();
-            return queries;
+    public static ICollection<Action<QueryDescriptor<TQueryDescriptor>>> ToExcludeQuery<TQueryDescriptor>(this EventSearchFilter filter) where TQueryDescriptor : class
+    {
+        if (filter == null)
+        {
+            return null;
         }
+
+        var queries = new List<Action<QueryDescriptor<TQueryDescriptor>>>();
+        return queries;
     }
 }

@@ -1,6 +1,5 @@
-﻿namespace SOS.Lib.Configuration.Shared
+﻿namespace SOS.Lib.Configuration.Shared;
+
+public class ArtportalenApiServiceConfiguration : RestServiceConfiguration
 {
-    public class ArtportalenApiServiceConfiguration : RestServiceConfiguration
-    {
-    }
 }

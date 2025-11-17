@@ -1,7 +1,6 @@
-﻿namespace SOS.Lib.Configuration.Import
+﻿namespace SOS.Lib.Configuration.Import;
+
+public class GeoRegionApiConfiguration
 {
-    public class GeoRegionApiConfiguration
-    {
-        public string ApiUrl { get; set; }
-    }
+    public string ApiUrl { get; set; }
 }

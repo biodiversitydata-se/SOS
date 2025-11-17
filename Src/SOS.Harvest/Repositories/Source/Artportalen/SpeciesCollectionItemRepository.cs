@@ -5,28 +5,28 @@ using SOS.Harvest.Repositories.Source.Artportalen.Interfaces;
 using SOS.Harvest.Services.Interfaces;
 using SOS.Lib.Extensions;
 
-namespace SOS.Harvest.Repositories.Source.Artportalen
+namespace SOS.Harvest.Repositories.Source.Artportalen;
+
+public class SpeciesCollectionItemRepository : BaseRepository<SpeciesCollectionItemRepository>,
+    ISpeciesCollectionItemRepository
 {
-    public class SpeciesCollectionItemRepository : BaseRepository<SpeciesCollectionItemRepository>,
-        ISpeciesCollectionItemRepository
+    public SpeciesCollectionItemRepository(
+        IArtportalenDataService artportalenDataService,
+        ILogger<SpeciesCollectionItemRepository> logger) : base(artportalenDataService, logger)
     {
-        public SpeciesCollectionItemRepository(
-            IArtportalenDataService artportalenDataService,
-            ILogger<SpeciesCollectionItemRepository> logger) : base(artportalenDataService, logger)
+    }
+
+    ///<inheritdoc />
+    public async Task<IEnumerable<SpeciesCollectionItemEntity>?> GetBySightingAsync(IEnumerable<int> sightingIds)
+    {
+        if (!sightingIds?.Any() ?? true)
         {
+            return null;
         }
 
-        ///<inheritdoc />
-        public async Task<IEnumerable<SpeciesCollectionItemEntity>?> GetBySightingAsync(IEnumerable<int> sightingIds)
+        try
         {
-            if (!sightingIds?.Any() ?? true)
-            {
-                return null;
-            }
-
-            try
-            {
-                const string query = @"
+            const string query = @"
                 SELECT
                     ssci.CollectorId,
                     ssci.ConfirmatorText,
@@ -41,13 +41,12 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
                 FROM [SightingSpeciesCollectionItem] ssci
                 INNER JOIN @tvp t ON ssci.SightingId = t.Id";
 
-                return await QueryAsync<SpeciesCollectionItemEntity>(query, new { tvp = sightingIds.ToSqlRecords().AsTableValuedParameter("dbo.IdValueTable") });
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e, "Error getting Species Collection Items");
-                throw;
-            }
+            return await QueryAsync<SpeciesCollectionItemEntity>(query, new { tvp = sightingIds.ToSqlRecords().AsTableValuedParameter("dbo.IdValueTable") });
+        }
+        catch (Exception e)
+        {
+            Logger.LogError(e, "Error getting Species Collection Items");
+            throw;
         }
     }
 }

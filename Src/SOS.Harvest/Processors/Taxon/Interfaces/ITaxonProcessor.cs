@@ -1,7 +1,6 @@
-﻿namespace SOS.Harvest.Processors.Taxon.Interfaces
+﻿namespace SOS.Harvest.Processors.Taxon.Interfaces;
+
+public interface ITaxonProcessor
 {
-    public interface ITaxonProcessor
-    {
-        Task<int> ProcessTaxaAsync();
-    }
+    Task<int> ProcessTaxaAsync();
 }

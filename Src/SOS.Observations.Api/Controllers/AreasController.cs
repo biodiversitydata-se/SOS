@@ -12,116 +12,115 @@ using System.Net;
 using System.Threading.Tasks;
 using SOS.Lib.Helpers;
 
-namespace SOS.Observations.Api.Controllers
+namespace SOS.Observations.Api.Controllers;
+
+/// <summary>
+///     Area controller
+/// </summary>
+[Route("[controller]")]
+[ApiController]
+public class AreasController : ControllerBase
 {
+    private readonly IAreaManager _areaManager;
+    private readonly ILogger<AreasController> _logger;
+
     /// <summary>
-    ///     Area controller
+    ///     Constructor
     /// </summary>
-    [Route("[controller]")]
-    [ApiController]
-    public class AreasController : ControllerBase
+    /// <param name="areaManager"></param>
+    /// <param name="logger"></param>
+    public AreasController(
+        IAreaManager areaManager,
+        ILogger<AreasController> logger)
     {
-        private readonly IAreaManager _areaManager;
-        private readonly ILogger<AreasController> _logger;
+        _areaManager = areaManager ?? throw new ArgumentNullException(nameof(areaManager));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    }
 
-        /// <summary>
-        ///     Constructor
-        /// </summary>
-        /// <param name="areaManager"></param>
-        /// <param name="logger"></param>
-        public AreasController(
-            IAreaManager areaManager,
-            ILogger<AreasController> logger)
+    /// <summary>
+    ///     Search for areas (regions).
+    /// </summary>
+    /// <param name="areaTypes">Filter used to limit number of areas returned</param>
+    /// <param name="searchString">Filter used to limit number of areas returned</param>
+    /// <param name="skip">Start index of returned areas</param>
+    /// <param name="take">Number of areas to return</param>
+    /// <returns>List of areas</returns>
+    [HttpGet()]
+    [ProducesResponseType(typeof(PagedResult<AreaBaseDto>), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+    [AzureApi, AzureInternalApi]
+    public async Task<IActionResult> GetAreas([FromQuery] IEnumerable<AreaTypeDto> areaTypes = null,
+        [FromQuery] string searchString = null, [FromQuery] int skip = 0, [FromQuery] int take = 100)
+    {
+        try
         {
-            _areaManager = areaManager ?? throw new ArgumentNullException(nameof(areaManager));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
+            return new OkObjectResult(await _areaManager.GetAreasAsync(areaTypes, searchString, skip, take));
         }
-
-        /// <summary>
-        ///     Search for areas (regions).
-        /// </summary>
-        /// <param name="areaTypes">Filter used to limit number of areas returned</param>
-        /// <param name="searchString">Filter used to limit number of areas returned</param>
-        /// <param name="skip">Start index of returned areas</param>
-        /// <param name="take">Number of areas to return</param>
-        /// <returns>List of areas</returns>
-        [HttpGet()]
-        [ProducesResponseType(typeof(PagedResult<AreaBaseDto>), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        [AzureApi, AzureInternalApi]
-        public async Task<IActionResult> GetAreas([FromQuery] IEnumerable<AreaTypeDto> areaTypes = null,
-            [FromQuery] string searchString = null, [FromQuery] int skip = 0, [FromQuery] int take = 100)
+        catch (Exception e)
         {
-            try
-            {
-                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
-                return new OkObjectResult(await _areaManager.GetAreasAsync(areaTypes, searchString, skip, take));
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Error getting areas");
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
-            }
+            _logger.LogError(e, "Error getting areas");
+            return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
         }
+    }
 
-        /// <summary>
-        /// Get a single area
-        /// </summary>
-        /// <param name="areaType">The area type.</param>
-        /// <param name="featureId">The feature id.</param>
-        /// <returns></returns>
-        [HttpGet("{areaType}/{featureId}")]
-        [ProducesResponseType(typeof(AreaBaseDto), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        [AzureApi, AzureInternalApi]
-        public async Task<IActionResult> GetArea([FromRoute] AreaTypeDto areaType, [FromRoute] string featureId)
+    /// <summary>
+    /// Get a single area
+    /// </summary>
+    /// <param name="areaType">The area type.</param>
+    /// <param name="featureId">The feature id.</param>
+    /// <returns></returns>
+    [HttpGet("{areaType}/{featureId}")]
+    [ProducesResponseType(typeof(AreaBaseDto), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+    [AzureApi, AzureInternalApi]
+    public async Task<IActionResult> GetArea([FromRoute] AreaTypeDto areaType, [FromRoute] string featureId)
+    {
+        try
         {
-            try
-            {
-                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
-                return new OkObjectResult(await _areaManager.GetAreaAsync(areaType, featureId));
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Error getting area {@areaType} {@featureId}", areaType, featureId);
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
-            }
+            LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
+            return new OkObjectResult(await _areaManager.GetAreaAsync(areaType, featureId));
         }
-
-        /// <summary>
-        ///     Get an area as a zipped JSON file including its polygon.
-        /// </summary>
-        /// <param name="areaType">The area type.</param>
-        /// <param name="featureId">The FeatureId.</param>
-        /// <param name="format">Export format.</param>
-        /// <returns></returns>
-        [HttpGet("{areaType}/{featureId}/Export")]
-        [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        [ProducesResponseType((int)HttpStatusCode.NoContent)]
-        [AzureApi, AzureInternalApi]
-        public async Task<IActionResult> GetExport(
-            [FromRoute] AreaTypeDto areaType,
-            [FromRoute] string featureId,
-            [FromQuery] AreaExportFormatDto format = AreaExportFormatDto.Json)
+        catch (Exception e)
         {
-            try
-            {
-                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
-                var zipBytes = await _areaManager.GetZippedAreaAsync(areaType, featureId, (AreaExportFormat)format);
+            _logger.LogError(e, "Error getting area {@areaType} {@featureId}", areaType, featureId);
+            return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+        }
+    }
 
-                if (zipBytes == null)
-                {
-                    return new StatusCodeResult((int)HttpStatusCode.NoContent);
-                }
+    /// <summary>
+    ///     Get an area as a zipped JSON file including its polygon.
+    /// </summary>
+    /// <param name="areaType">The area type.</param>
+    /// <param name="featureId">The FeatureId.</param>
+    /// <param name="format">Export format.</param>
+    /// <returns></returns>
+    [HttpGet("{areaType}/{featureId}/Export")]
+    [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+    [ProducesResponseType((int)HttpStatusCode.NoContent)]
+    [AzureApi, AzureInternalApi]
+    public async Task<IActionResult> GetExport(
+        [FromRoute] AreaTypeDto areaType,
+        [FromRoute] string featureId,
+        [FromQuery] AreaExportFormatDto format = AreaExportFormatDto.Json)
+    {
+        try
+        {
+            LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
+            var zipBytes = await _areaManager.GetZippedAreaAsync(areaType, featureId, (AreaExportFormat)format);
 
-                return File(zipBytes, "application/zip", $"Area{areaType:G}:{featureId}.zip");
-            }
-            catch (Exception e)
+            if (zipBytes == null)
             {
-                _logger.LogError(e, "Error getting areas");
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+                return new StatusCodeResult((int)HttpStatusCode.NoContent);
             }
+
+            return File(zipBytes, "application/zip", $"Area{areaType:G}:{featureId}.zip");
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error getting areas");
+            return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
         }
     }
 }

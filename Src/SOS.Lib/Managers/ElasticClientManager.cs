@@ -2,23 +2,22 @@
 using SOS.Lib.Managers.Interfaces;
 using Elastic.Clients.Elasticsearch;
 
-namespace SOS.Lib.Managers
+namespace SOS.Lib.Managers;
+
+/// <summary>
+/// Elastic client manager
+/// </summary>
+public class ElasticClientManager : IElasticClientManager
 {
     /// <summary>
-    /// Elastic client manager
+    /// Constructor
     /// </summary>
-    public class ElasticClientManager : IElasticClientManager
+    /// <param name="elasticSearchConfiguration"></param>        
+    public ElasticClientManager(ElasticSearchConfiguration elasticSearchConfiguration)
     {
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="elasticSearchConfiguration"></param>        
-        public ElasticClientManager(ElasticSearchConfiguration elasticSearchConfiguration)
-        {
-            Clients = elasticSearchConfiguration.GetClients();
-        }
-
-        /// <inheritdoc />
-        public ElasticsearchClient[] Clients { get; }
+        Clients = elasticSearchConfiguration.GetClients();
     }
+
+    /// <inheritdoc />
+    public ElasticsearchClient[] Clients { get; }
 }

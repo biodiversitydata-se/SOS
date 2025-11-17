@@ -1,10 +1,9 @@
-﻿namespace SOS.Lib.Models.Interfaces
+﻿namespace SOS.Lib.Models.Interfaces;
+
+public interface IElasticEntity
 {
-    public interface IElasticEntity
-    {
-        /// <summary>
-        /// Elasticsearch Id.
-        /// </summary>
-        string ElasticsearchId { get; }
-    }
+    /// <summary>
+    /// Elasticsearch Id.
+    /// </summary>
+    string ElasticsearchId { get; }
 }

@@ -7,378 +7,377 @@ using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using System.Collections.Concurrent;
 
-namespace SOS.Harvest.Harvesters.Artportalen
+namespace SOS.Harvest.Harvesters.Artportalen;
+
+internal class ArtportalenHarvestFactoryBase : HarvestBaseFactory, IDisposable
 {
-    internal class ArtportalenHarvestFactoryBase : HarvestBaseFactory, IDisposable
+    private const int SITE_BATCH_SIZE = 10000;
+    private readonly IAreaHelper _areaHelper;
+    private readonly ConcurrentDictionary<int, Site> _cachedSites;
+    private readonly SemaphoreSlim _semaphore;
+    private readonly ISiteRepository _siteRepository;
+
+    #region IDisposable
+
+    private bool _disposed;
+
+    public void Dispose()
     {
-        private const int SITE_BATCH_SIZE = 10000;
-        private readonly IAreaHelper _areaHelper;
-        private readonly ConcurrentDictionary<int, Site> _cachedSites;
-        private readonly SemaphoreSlim _semaphore;
-        private readonly ISiteRepository _siteRepository;
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
 
-        #region IDisposable
-
-        private bool _disposed;
-
-        public void Dispose()
+    protected virtual void Dispose(bool disposing)
+    {
+        if (_disposed)
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
+            return;
         }
 
-        protected virtual void Dispose(bool disposing)
+        if (disposing)
         {
-            if (_disposed)
-            {
-                return;
-            }
-
-            if (disposing)
-            {
-                _cachedSites.Clear();
-            }
-
-            _disposed = true;
+            _cachedSites.Clear();
         }
 
-        ~ArtportalenHarvestFactoryBase()
+        _disposed = true;
+    }
+
+    ~ArtportalenHarvestFactoryBase()
+    {
+        Dispose(false);
+    }
+
+    #endregion
+
+    #region Site
+    /// <summary>
+    /// Try to add missing sites from live data
+    /// </summary>
+    /// <param name="siteIds"></param>
+    /// <returns></returns>
+    private async Task CacheSitesAsync(IEnumerable<int>? siteIds)
+    {
+        if (!siteIds?.Any() ?? true)
         {
-            Dispose(false);
+            return;
         }
 
-        #endregion
+        var skip = 0;
+        var siteIdBatch = siteIds!.Take(SITE_BATCH_SIZE);
 
-        #region Site
-        /// <summary>
-        /// Try to add missing sites from live data
-        /// </summary>
-        /// <param name="siteIds"></param>
-        /// <returns></returns>
-        private async Task CacheSitesAsync(IEnumerable<int>? siteIds)
+        while (siteIdBatch.Any())
         {
-            if (!siteIds?.Any() ?? true)
+            await _semaphore.WaitAsync();
+            var siteBatch = await GetSiteChunkAsync(siteIdBatch);
+
+            if (siteBatch?.Any() ?? false)
             {
-                return;
-            }
-
-            var skip = 0;
-            var siteIdBatch = siteIds!.Take(SITE_BATCH_SIZE);
-
-            while (siteIdBatch.Any())
-            {
-                await _semaphore.WaitAsync();
-                var siteBatch = await GetSiteChunkAsync(siteIdBatch);
-
-                if (siteBatch?.Any() ?? false)
+                foreach (var site in siteBatch)
                 {
-                    foreach (var site in siteBatch)
-                    {
-                        _cachedSites.TryAdd(site.Id, site);
-                    }
-                }
-
-                skip += SITE_BATCH_SIZE;
-                siteIdBatch = siteIds!.Skip(skip).Take(SITE_BATCH_SIZE);
-            }
-        }
-
-        /// <summary>
-        /// Cast multiple sites entities to models by continuously decreasing the siteEntities input list.
-        ///     This saves about 500MB RAM when casting Artportalen sites (3 millions).
-        /// </summary>
-        /// <param name="siteEntities"></param>
-        /// <param name="sitesAreas"></param>
-        /// <param name="sitesGeometry"></param>
-        /// <returns></returns>
-        private IEnumerable<Site> CastSiteEntitiesToVerbatim(IEnumerable<SiteEntity>? siteEntities, IDictionary<int, ICollection<AreaEntityBase>>? sitesAreas, IDictionary<int, string>? sitesGeometry)
-        {
-            var sites = new HashSet<Site>();
-
-            if (!siteEntities?.Any() ?? true)
-            {
-                return sites;
-            }
-
-            // Make sure metadata are initialized
-            sitesAreas ??= new Dictionary<int, ICollection<AreaEntityBase>>();
-            sitesGeometry ??= new Dictionary<int, string>();
-
-            foreach (var siteEntity in siteEntities!)
-            {
-                sitesAreas.TryGetValue(siteEntity.Id, out var siteAreas);
-                sitesGeometry.TryGetValue(siteEntity.Id, out var geometryWkt);
-
-                var site = CastSiteEntityToVerbatim(siteEntity, siteAreas, geometryWkt);
-
-                if (site != null)
-                {
-                    sites.Add(site);
+                    _cachedSites.TryAdd(site.Id, site);
                 }
             }
 
+            skip += SITE_BATCH_SIZE;
+            siteIdBatch = siteIds!.Skip(skip).Take(SITE_BATCH_SIZE);
+        }
+    }
+
+    /// <summary>
+    /// Cast multiple sites entities to models by continuously decreasing the siteEntities input list.
+    ///     This saves about 500MB RAM when casting Artportalen sites (3 millions).
+    /// </summary>
+    /// <param name="siteEntities"></param>
+    /// <param name="sitesAreas"></param>
+    /// <param name="sitesGeometry"></param>
+    /// <returns></returns>
+    private IEnumerable<Site> CastSiteEntitiesToVerbatim(IEnumerable<SiteEntity>? siteEntities, IDictionary<int, ICollection<AreaEntityBase>>? sitesAreas, IDictionary<int, string>? sitesGeometry)
+    {
+        var sites = new HashSet<Site>();
+
+        if (!siteEntities?.Any() ?? true)
+        {
             return sites;
         }
 
-        /// <summary>
-        /// Cast site itemEntity to aggregate
-        /// </summary>
-        /// <param name="entity"></param>
-        /// <param name="areas"></param>
-        /// <param name="geometryWkt"></param>
-        /// <returns></returns>
-        private Site? CastSiteEntityToVerbatim(SiteEntity? entity, ICollection<AreaEntityBase>? areas, string? geometryWkt)
+        // Make sure metadata are initialized
+        sitesAreas ??= new Dictionary<int, ICollection<AreaEntityBase>>();
+        sitesGeometry ??= new Dictionary<int, string>();
+
+        foreach (var siteEntity in siteEntities!)
         {
-            if (entity == null)
+            sitesAreas.TryGetValue(siteEntity.Id, out var siteAreas);
+            sitesGeometry.TryGetValue(siteEntity.Id, out var geometryWkt);
+
+            var site = CastSiteEntityToVerbatim(siteEntity, siteAreas, geometryWkt);
+
+            if (site != null)
             {
-                return null;
+                sites.Add(site);
             }
+        }
 
-            Point? wgs84Point = null;
-            Point? wgs84PointDiffused = null;
-            const int defaultAccuracy = 100;
+        return sites;
+    }
 
-            if (entity.TrueXCoord > 0 && entity.TrueYCoord > 0)
-            {
-                // We process point here since site is added to observation verbatim. One site can have multiple observations and by 
-                // doing it here we only have to convert the point once
-                var webMercatorPoint = new Point(entity.TrueXCoord, entity.TrueYCoord);
-                wgs84Point = (Point)webMercatorPoint.Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84);
-            }
+    /// <summary>
+    /// Cast site itemEntity to aggregate
+    /// </summary>
+    /// <param name="entity"></param>
+    /// <param name="areas"></param>
+    /// <param name="geometryWkt"></param>
+    /// <returns></returns>
+    private Site? CastSiteEntityToVerbatim(SiteEntity? entity, ICollection<AreaEntityBase>? areas, string? geometryWkt)
+    {
+        if (entity == null)
+        {
+            return null;
+        }
 
-            if (entity.DiffusionId > 0 && entity.XCoord > 0 && entity.YCoord > 0)
-            {
-                // We process point here since site is added to observation verbatim. One site can have multiple observations and by 
-                // doing it here we only have to convert the point once
-                var webMercatorPoint = new Point(entity.XCoord, entity.YCoord);
-                wgs84PointDiffused = (Point)webMercatorPoint.Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84);
-            }
+        Point? wgs84Point = null;
+        Point? wgs84PointDiffused = null;
+        const int defaultAccuracy = 100;
 
-            Geometry? siteGeometry = null;
-            if (!string.IsNullOrEmpty(geometryWkt))
-            {
-                siteGeometry = geometryWkt.ToGeometry()
-                    .Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84).TryMakeValid();
-            }
+        if (entity.TrueXCoord > 0 && entity.TrueYCoord > 0)
+        {
+            // We process point here since site is added to observation verbatim. One site can have multiple observations and by 
+            // doing it here we only have to convert the point once
+            var webMercatorPoint = new Point(entity.TrueXCoord, entity.TrueYCoord);
+            wgs84Point = (Point)webMercatorPoint.Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84);
+        }
 
-            var accuracy = entity.Accuracy > 0 ? entity.Accuracy : defaultAccuracy; // If Artportalen site accuracy is <= 0, this is due to an old import. Set the accuracy to 100.
-            var site = new Site
-            {
-                Accuracy = accuracy,
-                DiffusionId = entity.DiffusionId,
-                ExternalId = entity.ExternalId,
-                HasGeometry = siteGeometry?.IsValid() ?? false,
-                Id = entity.Id,
-                IncludedBySiteId = entity.IncludedBySiteId,
-                IsPrivate = entity.IsPrivate,
-                PresentationNameParishRegion = entity.PresentationNameParishRegion,
-                Point = wgs84Point?.ToGeoJson(),
-                PointDiffused = wgs84PointDiffused?.ToGeoJson(),
-                PointWithBuffer = (siteGeometry?.IsValid() ?? false ? siteGeometry : wgs84Point.ToCircle(accuracy))?.ToGeoJson(),
-                PointWithBufferDiffused = wgs84PointDiffused?.ToCircle(accuracy)?.ToGeoJson(),
-                Name = entity.Name,
-                ParentSiteId = entity.ParentSiteId,
-                ParentSiteName = entity.ParentSiteName,
-                ProjectId = entity.ProjectId,
-                XCoord = entity.TrueXCoord,
-                XCoordDiffused = entity.XCoord,
-                YCoord = entity.TrueYCoord,
-                YCoordDiffused = entity.YCoord,
-                VerbatimCoordinateSystem = CoordinateSys.WebMercator
-            };
+        if (entity.DiffusionId > 0 && entity.XCoord > 0 && entity.YCoord > 0)
+        {
+            // We process point here since site is added to observation verbatim. One site can have multiple observations and by 
+            // doing it here we only have to convert the point once
+            var webMercatorPoint = new Point(entity.XCoord, entity.YCoord);
+            wgs84PointDiffused = (Point)webMercatorPoint.Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84);
+        }
 
-            if (!areas?.Any() ?? true)
-            {
-                return site;
-            }
+        Geometry? siteGeometry = null;
+        if (!string.IsNullOrEmpty(geometryWkt))
+        {
+            siteGeometry = geometryWkt.ToGeometry()
+                .Transform(CoordinateSys.WebMercator, CoordinateSys.WGS84).TryMakeValid();
+        }
 
-            foreach (var area in areas!)
-            {
-                switch (area.AreaDatasetId)
-                {
-                    case 24: // AreaType.Atlas5x5
-                        site.Atlas5x5 = new GeographicalArea { FeatureId = area.FeatureId, Name = area.Name };
-                        break;
-                    case 25: // AreaType.Atlas10x10
-                        site.Atlas10x10 = new GeographicalArea { FeatureId = area.FeatureId, Name = area.Name };
-                        break;
-                    case (int)AreaType.BirdValidationArea:
-                        (site.BirdValidationAreaIds ??= new List<string>()).Add(area.FeatureId);
-                        break;
-                    case (int)AreaType.CountryRegion:
-                        site.CountryRegion = new GeographicalArea { FeatureId = area.FeatureId, Name = area.Name };
-                        break;
-                    case (int)AreaType.County:
-                        site.County = new GeographicalArea { FeatureId = area.FeatureId, Name = area.Name };
-                        break;
-                    case (int)AreaType.Municipality:
-                        site.Municipality = new GeographicalArea { FeatureId = area.FeatureId, Name = area.Name };
-                        break;
-                    case (int)AreaType.Parish:
-                        site.Parish = new GeographicalArea { FeatureId = area.FeatureId, Name = area.Name };
-                        break;
-                    case (int)AreaType.Province:
-                        site.Province = new GeographicalArea { FeatureId = area.FeatureId, Name = area.Name };
-                        break;
-                }
-            }
+        var accuracy = entity.Accuracy > 0 ? entity.Accuracy : defaultAccuracy; // If Artportalen site accuracy is <= 0, this is due to an old import. Set the accuracy to 100.
+        var site = new Site
+        {
+            Accuracy = accuracy,
+            DiffusionId = entity.DiffusionId,
+            ExternalId = entity.ExternalId,
+            HasGeometry = siteGeometry?.IsValid() ?? false,
+            Id = entity.Id,
+            IncludedBySiteId = entity.IncludedBySiteId,
+            IsPrivate = entity.IsPrivate,
+            PresentationNameParishRegion = entity.PresentationNameParishRegion,
+            Point = wgs84Point?.ToGeoJson(),
+            PointDiffused = wgs84PointDiffused?.ToGeoJson(),
+            PointWithBuffer = (siteGeometry?.IsValid() ?? false ? siteGeometry : wgs84Point.ToCircle(accuracy))?.ToGeoJson(),
+            PointWithBufferDiffused = wgs84PointDiffused?.ToCircle(accuracy)?.ToGeoJson(),
+            Name = entity.Name,
+            ParentSiteId = entity.ParentSiteId,
+            ParentSiteName = entity.ParentSiteName,
+            ProjectId = entity.ProjectId,
+            XCoord = entity.TrueXCoord,
+            XCoordDiffused = entity.XCoord,
+            YCoord = entity.TrueYCoord,
+            YCoordDiffused = entity.YCoord,
+            VerbatimCoordinateSystem = CoordinateSys.WebMercator
+        };
 
-            _areaHelper.AddAreaDataToSite(site);
-
+        if (!areas?.Any() ?? true)
+        {
             return site;
         }
 
-        /// <summary>
-        /// Get sites and related metadata and create site objects
-        /// </summary>
-        /// <param name="siteIds"></param>
-        /// <returns></returns>
-        private async Task<IEnumerable<Site>?> GetSitesAsync(IEnumerable<int>? siteIds)
+        foreach (var area in areas!)
         {
-            if (!siteIds?.Any() ?? true)
+            switch (area.AreaDatasetId)
             {
-                return null;
+                case 24: // AreaType.Atlas5x5
+                    site.Atlas5x5 = new GeographicalArea { FeatureId = area.FeatureId, Name = area.Name };
+                    break;
+                case 25: // AreaType.Atlas10x10
+                    site.Atlas10x10 = new GeographicalArea { FeatureId = area.FeatureId, Name = area.Name };
+                    break;
+                case (int)AreaType.BirdValidationArea:
+                    (site.BirdValidationAreaIds ??= new List<string>()).Add(area.FeatureId);
+                    break;
+                case (int)AreaType.CountryRegion:
+                    site.CountryRegion = new GeographicalArea { FeatureId = area.FeatureId, Name = area.Name };
+                    break;
+                case (int)AreaType.County:
+                    site.County = new GeographicalArea { FeatureId = area.FeatureId, Name = area.Name };
+                    break;
+                case (int)AreaType.Municipality:
+                    site.Municipality = new GeographicalArea { FeatureId = area.FeatureId, Name = area.Name };
+                    break;
+                case (int)AreaType.Parish:
+                    site.Parish = new GeographicalArea { FeatureId = area.FeatureId, Name = area.Name };
+                    break;
+                case (int)AreaType.Province:
+                    site.Province = new GeographicalArea { FeatureId = area.FeatureId, Name = area.Name };
+                    break;
+            }
+        }
+
+        _areaHelper.AddAreaDataToSite(site);
+
+        return site;
+    }
+
+    /// <summary>
+    /// Get sites and related metadata and create site objects
+    /// </summary>
+    /// <param name="siteIds"></param>
+    /// <returns></returns>
+    private async Task<IEnumerable<Site>?> GetSitesAsync(IEnumerable<int>? siteIds)
+    {
+        if (!siteIds?.Any() ?? true)
+        {
+            return null;
+        }
+
+        var skip = 0;
+        var siteIdBatch = siteIds!.Take(SITE_BATCH_SIZE);
+        var sites = new List<Site>();
+
+        while (siteIdBatch.Any())
+        {
+            await _semaphore.WaitAsync();
+            var siteBatch = await GetSiteChunkAsync(siteIdBatch);
+
+            if (siteBatch?.Any() ?? false)
+            {
+                sites.AddRange(siteBatch);
             }
 
-            var skip = 0;
-            var siteIdBatch = siteIds!.Take(SITE_BATCH_SIZE);
-            var sites = new List<Site>();
+            skip += SITE_BATCH_SIZE;
+            siteIdBatch = siteIds!.Skip(skip).Take(SITE_BATCH_SIZE);
+        }
 
-            while (siteIdBatch.Any())
-            {
-                await _semaphore.WaitAsync();
-                var siteBatch = await GetSiteChunkAsync(siteIdBatch);
+        return sites;
+    }
 
-                if (siteBatch?.Any() ?? false)
-                {
-                    sites.AddRange(siteBatch);
-                }
+    private async Task<IEnumerable<Site>> GetSiteChunkAsync(IEnumerable<int>? siteIds)
+    {
+        if (!siteIds?.Any() ?? true)
+        {
+            return null!;
+        }
 
-                skip += SITE_BATCH_SIZE;
-                siteIdBatch = siteIds!.Skip(skip).Take(SITE_BATCH_SIZE);
-            }
+        try
+        {
+            var getSitesTask = _siteRepository.GetByIdsAsync(siteIds!);
+            var getSitesAreasTask = _siteRepository.GetSitesAreas(siteIds!);
+            var getSitesGeometriesTask = _siteRepository.GetSitesGeometry(siteIds!);
 
+            var siteEntities = await getSitesTask;
+            var siteAreas = await getSitesAreasTask;
+            var sitesGeometry = await getSitesGeometriesTask; // It's faster to get geometries in separate query than join it in site query
+
+            return CastSiteEntitiesToVerbatim(siteEntities?.ToArray(), siteAreas, sitesGeometry);
+        }
+        catch
+        {
+            throw;
+        }
+        finally
+        {
+            _semaphore.Release();
+        }
+    }
+
+    /// <summary>
+    /// Get sites used in current batch
+    /// </summary>
+    /// <param name="siteIds"></param>
+    /// <returns></returns>
+    protected async Task<IDictionary<int, Site>> GetBatchSitesAsync(IEnumerable<int>? siteIds)
+    {
+        var sites = new Dictionary<int, Site>();
+
+        if (!siteIds?.Any() ?? true)
+        {
             return sites;
         }
 
-        private async Task<IEnumerable<Site>> GetSiteChunkAsync(IEnumerable<int>? siteIds)
+        var missingSiteIds = new HashSet<int>();
+
+        // Try to get sites from cache
+        foreach (var siteId in siteIds!)
         {
-            if (!siteIds?.Any() ?? true)
+            if (_cachedSites.TryGetValue(siteId, out var site))
             {
-                return null!;
+                sites.Add(siteId, site);
+                continue;
             }
-
-            try
-            {
-                var getSitesTask = _siteRepository.GetByIdsAsync(siteIds!);
-                var getSitesAreasTask = _siteRepository.GetSitesAreas(siteIds!);
-                var getSitesGeometriesTask = _siteRepository.GetSitesGeometry(siteIds!);
-
-                var siteEntities = await getSitesTask;
-                var siteAreas = await getSitesAreasTask;
-                var sitesGeometry = await getSitesGeometriesTask; // It's faster to get geometries in separate query than join it in site query
-
-                return CastSiteEntitiesToVerbatim(siteEntities?.ToArray(), siteAreas, sitesGeometry);
-            }
-            catch
-            {
-                throw;
-            }
-            finally
-            {
-                _semaphore.Release();
-            }
+            missingSiteIds.Add(siteId);
         }
 
-        /// <summary>
-        /// Get sites used in current batch
-        /// </summary>
-        /// <param name="siteIds"></param>
-        /// <returns></returns>
-        protected async Task<IDictionary<int, Site>> GetBatchSitesAsync(IEnumerable<int>? siteIds)
+        // Get sites that not exists in cache from db
+        if (missingSiteIds.Any())
         {
-            var sites = new Dictionary<int, Site>();
+            var missingSites = await GetSitesAsync(missingSiteIds);
 
-            if (!siteIds?.Any() ?? true)
+            if (missingSites?.Any() ?? false)
             {
-                return sites;
-            }
-
-            var missingSiteIds = new HashSet<int>();
-
-            // Try to get sites from cache
-            foreach (var siteId in siteIds!)
-            {
-                if (_cachedSites.TryGetValue(siteId, out var site))
+                foreach (var site in missingSites)
                 {
-                    sites.Add(siteId, site);
-                    continue;
-                }
-                missingSiteIds.Add(siteId);
-            }
-
-            // Get sites that not exists in cache from db
-            if (missingSiteIds.Any())
-            {
-                var missingSites = await GetSitesAsync(missingSiteIds);
-
-                if (missingSites?.Any() ?? false)
-                {
-                    foreach (var site in missingSites)
-                    {
-                        sites.TryAdd(site.Id, site);
-                    }
+                    sites.TryAdd(site.Id, site);
                 }
             }
-
-            return sites;
         }
 
-        /// <summary>
-        /// Check if site exists in cache
-        /// </summary>
-        /// <param name="siteId"></param>
-        /// <returns></returns>
-        protected bool IsSiteLoaded(int siteId) => _cachedSites.ContainsKey(siteId);
+        return sites;
+    }
 
-        protected Site? TryGetSite(int siteId)
+    /// <summary>
+    /// Check if site exists in cache
+    /// </summary>
+    /// <param name="siteId"></param>
+    /// <returns></returns>
+    protected bool IsSiteLoaded(int siteId) => _cachedSites.ContainsKey(siteId);
+
+    protected Site? TryGetSite(int siteId)
+    {
+        _cachedSites.TryGetValue(siteId, out var site);
+
+        return site;
+    }
+    #endregion Site
+
+    /// <summary>
+    /// Constructor
+    /// </summary>
+    /// <param name="siteRepository"></param>
+    /// <param name="areaHelper"></param>
+    /// <param name="live"></param>
+    /// <param name="noOfThreads"></param>
+    public ArtportalenHarvestFactoryBase(
+        ISiteRepository siteRepository,
+        IAreaHelper areaHelper,
+        int noOfThreads) : base()
+    {
+        _siteRepository = siteRepository;
+        _areaHelper = areaHelper;
+        _cachedSites = new ConcurrentDictionary<int, Site>();
+        _semaphore = new SemaphoreSlim(noOfThreads, noOfThreads);
+    }
+
+    /// <summary>
+    /// Cache sites used multiple times
+    /// </summary>
+    /// <returns></returns>
+    public async Task CacheFreqventlyUsedSitesAsync()
+    {
+        // Should only be called once
+        if (!_cachedSites.Any())
         {
-            _cachedSites.TryGetValue(siteId, out var site);
-
-            return site;
-        }
-        #endregion Site
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="siteRepository"></param>
-        /// <param name="areaHelper"></param>
-        /// <param name="live"></param>
-        /// <param name="noOfThreads"></param>
-        public ArtportalenHarvestFactoryBase(
-            ISiteRepository siteRepository,
-            IAreaHelper areaHelper,
-            int noOfThreads) : base()
-        {
-            _siteRepository = siteRepository;
-            _areaHelper = areaHelper;
-            _cachedSites = new ConcurrentDictionary<int, Site>();
-            _semaphore = new SemaphoreSlim(noOfThreads, noOfThreads);
-        }
-
-        /// <summary>
-        /// Cache sites used multiple times
-        /// </summary>
-        /// <returns></returns>
-        public async Task CacheFreqventlyUsedSitesAsync()
-        {
-            // Should only be called once
-            if (!_cachedSites.Any())
-            {
-                var siteIds = await _siteRepository.GetFrequentlyUsedIdsAsync(isIncrementalHarvest: false);
-                await CacheSitesAsync(siteIds);
-            }
+            var siteIds = await _siteRepository.GetFrequentlyUsedIdsAsync(isIncrementalHarvest: false);
+            await CacheSitesAsync(siteIds);
         }
     }
 }

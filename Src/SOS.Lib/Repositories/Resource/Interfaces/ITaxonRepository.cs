@@ -4,27 +4,26 @@ using SOS.Lib.Repositories.Interfaces;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace SOS.Lib.Repositories.Resource.Interfaces
+namespace SOS.Lib.Repositories.Resource.Interfaces;
+
+/// <summary>
+///     Repository for retrieving processd taxa.
+/// </summary>
+public interface ITaxonRepository : IRepositoryBase<Taxon, int>
 {
     /// <summary>
-    ///     Repository for retrieving processd taxa.
+    ///     Get chunk of ProcessedBasicTaxon objects from repository.
     /// </summary>
-    public interface ITaxonRepository : IRepositoryBase<Taxon, int>
-    {
-        /// <summary>
-        ///     Get chunk of ProcessedBasicTaxon objects from repository.
-        /// </summary>
-        /// <param name="skip"></param>
-        /// <param name="take"></param>
-        /// <returns></returns>
-        Task<IEnumerable<IBasicTaxon>> GetBasicTaxonChunkAsync(int skip, int take);
+    /// <param name="skip"></param>
+    /// <param name="take"></param>
+    /// <returns></returns>
+    Task<IEnumerable<IBasicTaxon>> GetBasicTaxonChunkAsync(int skip, int take);
 
-        /// <summary>
-        ///     Get chunk of objects from repository
-        /// </summary>
-        /// <param name="skip"></param>
-        /// <param name="take"></param>
-        /// <returns></returns>
-        Task<IEnumerable<Taxon>> GetChunkAsync(int skip, int take);
-    }
+    /// <summary>
+    ///     Get chunk of objects from repository
+    /// </summary>
+    /// <param name="skip"></param>
+    /// <param name="take"></param>
+    /// <returns></returns>
+    Task<IEnumerable<Taxon>> GetChunkAsync(int skip, int take);
 }

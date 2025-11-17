@@ -4,37 +4,36 @@ using SOS.Lib.UnitTests.TestHelpers.Fixtures;
 using System.Linq;
 using Xunit;
 
-namespace SOS.Lib.UnitTests.Models.TaxonTree
+namespace SOS.Lib.UnitTests.Models.TaxonTree;
+
+public class TaxonTreeTests : IClassFixture<ProcessedBasicTaxaFixture>
 {
-    public class TaxonTreeTests : IClassFixture<ProcessedBasicTaxaFixture>
+    public TaxonTreeTests(ProcessedBasicTaxaFixture fixture)
     {
-        public TaxonTreeTests(ProcessedBasicTaxaFixture fixture)
-        {
-            _fixture = fixture;
-        }
+        _fixture = fixture;
+    }
 
-        private readonly ProcessedBasicTaxaFixture _fixture;
+    private readonly ProcessedBasicTaxaFixture _fixture;
 
-        [Fact(Skip = "Not working with current msgpck file")]
-        public void Ichthyaetus_genus_has_5_underlying_taxa()
-        {
-            //-----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            const int ichthyaetusTaxonId = 6011885;
-            int[] expectedUnderlyingTaxonIds = { 266836, 103067, 266238, 267106, 266835 };
-            var sut = TaxonTreeFactory.CreateTaxonTree(_fixture.Taxa.ToDictionary(t => t.Id, t => t));
+    [Fact(Skip = "Not working with current msgpck file")]
+    public void Ichthyaetus_genus_has_5_underlying_taxa()
+    {
+        //-----------------------------------------------------------------------------------------------------------
+        // Arrange
+        //-----------------------------------------------------------------------------------------------------------
+        const int ichthyaetusTaxonId = 6011885;
+        int[] expectedUnderlyingTaxonIds = { 266836, 103067, 266238, 267106, 266835 };
+        var sut = TaxonTreeFactory.CreateTaxonTree(_fixture.Taxa.ToDictionary(t => t.Id, t => t));
 
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var underlyingTaxa = sut.GetUnderlyingTaxonIds(ichthyaetusTaxonId, false).ToArray();
+        //-----------------------------------------------------------------------------------------------------------
+        // Act
+        //-----------------------------------------------------------------------------------------------------------
+        var underlyingTaxa = sut.GetUnderlyingTaxonIds(ichthyaetusTaxonId, false).ToArray();
 
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
-            underlyingTaxa.Should().HaveCount(5);
-            underlyingTaxa.Should().BeEquivalentTo(expectedUnderlyingTaxonIds);
-        }
+        //-----------------------------------------------------------------------------------------------------------
+        // Assert
+        //-----------------------------------------------------------------------------------------------------------
+        underlyingTaxa.Should().HaveCount(5);
+        underlyingTaxa.Should().BeEquivalentTo(expectedUnderlyingTaxonIds);
     }
 }

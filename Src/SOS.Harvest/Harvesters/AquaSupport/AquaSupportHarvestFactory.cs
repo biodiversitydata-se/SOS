@@ -4,70 +4,69 @@ using SOS.Lib.Extensions;
 using SOS.Lib.Models.Interfaces;
 using System.Xml.Linq;
 
-namespace SOS.Harvesters.AquaSupport
+namespace SOS.Harvesters.AquaSupport;
+
+public class AquaSupportHarvestFactory<T> : HarvestBaseFactory, IHarvestFactory<XDocument, T> where T : IEntity<int>
 {
-    public class AquaSupportHarvestFactory<T> : HarvestBaseFactory, IHarvestFactory<XDocument, T> where T : IEntity<int>
+    /// <inheritdoc />
+    public async Task<IEnumerable<T>?> CastEntitiesToVerbatimsAsync(XDocument xmlDocument)
     {
-        /// <inheritdoc />
-        public async Task<IEnumerable<T>?> CastEntitiesToVerbatimsAsync(XDocument xmlDocument)
+        return await Task.Run(() =>
         {
-            return await Task.Run(() =>
+            if (xmlDocument?.Root == null)
             {
-                if (xmlDocument?.Root == null)
+                return null;
+            }
+
+            var ns = (XNamespace)"http://schemas.datacontract.org/2004/07/ArtDatabanken.WebService.Data";
+            var verbatims = new List<T>();
+
+            foreach (var observatioElement in xmlDocument!.Root!
+                .Element(ns + "CreatedSpeciesObservations")!
+                .Elements(ns + "WebSpeciesObservation"))
+            {
+                var verbatim = (IEntity<int>)Activator.CreateInstance(typeof(T))!;
+
+                if (verbatim == null)
                 {
-                    return null;
+                    throw new NullReferenceException(nameof(verbatim));
                 }
 
-                var ns = (XNamespace)"http://schemas.datacontract.org/2004/07/ArtDatabanken.WebService.Data";
-                var verbatims = new List<T>();
-
-                foreach (var observatioElement in xmlDocument!.Root!
-                    .Element(ns + "CreatedSpeciesObservations")!
-                    .Elements(ns + "WebSpeciesObservation"))
+                verbatim.Id = NextId;
+                foreach (var fieldElement in observatioElement
+                    .Elements(ns + "Fields")
+                    .Elements(ns + "WebSpeciesObservationField"))
                 {
-                    var verbatim = (IEntity<int>)Activator.CreateInstance(typeof(T))!;
 
-                    if (verbatim == null)
-                    {
-                        throw new NullReferenceException(nameof(verbatim));
-                    }
+                    var property = fieldElement!.Element(ns + "Property")!.Value;
+                    var value = fieldElement!.Element(ns + "Value")!.Value;
 
-                    verbatim.Id = NextId;
-                    foreach (var fieldElement in observatioElement
-                        .Elements(ns + "Fields")
-                        .Elements(ns + "WebSpeciesObservationField"))
-                    {
-
-                        var property = fieldElement!.Element(ns + "Property")!.Value;
-                        var value = fieldElement!.Element(ns + "Value")!.Value;
-
-                        verbatim.SetProperty(property, value);
-                    }
-
-                    verbatims.Add((T)verbatim);
+                    verbatim.SetProperty(property, value);
                 }
 
-                foreach (var observatioElement in xmlDocument!.Root!
-                    .Element(ns + "UpdatedSpeciesObservations")!
-                    .Elements(ns + "WebSpeciesObservation"))
+                verbatims.Add((T)verbatim);
+            }
+
+            foreach (var observatioElement in xmlDocument!.Root!
+                .Element(ns + "UpdatedSpeciesObservations")!
+                .Elements(ns + "WebSpeciesObservation"))
+            {
+                var verbatim = Activator.CreateInstance(typeof(T));
+                foreach (var fieldElement in observatioElement
+                    .Elements(ns + "Fields")
+                    .Elements(ns + "WebSpeciesObservationField"))
                 {
-                    var verbatim = Activator.CreateInstance(typeof(T));
-                    foreach (var fieldElement in observatioElement
-                        .Elements(ns + "Fields")
-                        .Elements(ns + "WebSpeciesObservationField"))
-                    {
 
-                        var property = fieldElement!.Element(ns + "Property")!.Value;
-                        var value = fieldElement!.Element(ns + "Value")!.Value;
+                    var property = fieldElement!.Element(ns + "Property")!.Value;
+                    var value = fieldElement!.Element(ns + "Value")!.Value;
 
-                        verbatim.SetProperty(property, value);
-                    }
-
-                    verbatims.Add((T)verbatim!);
+                    verbatim.SetProperty(property, value);
                 }
 
-                return verbatims;
-            });
-        }
+                verbatims.Add((T)verbatim!);
+            }
+
+            return verbatims;
+        });
     }
 }

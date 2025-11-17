@@ -1,7 +1,6 @@
-﻿namespace SOS.Lib.Configuration.Import
-{
-    public class FishDataServiceConfiguration : AquaSupportConfiguration
-    {
+﻿namespace SOS.Lib.Configuration.Import;
 
-    }
+public class FishDataServiceConfiguration : AquaSupportConfiguration
+{
+
 }

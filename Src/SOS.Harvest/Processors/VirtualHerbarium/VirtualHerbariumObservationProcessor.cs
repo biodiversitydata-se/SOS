@@ -12,72 +12,71 @@ using SOS.Lib.Models.Verbatim.VirtualHerbarium;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
 
-namespace SOS.Harvest.Processors.VirtualHerbarium
+namespace SOS.Harvest.Processors.VirtualHerbarium;
+
+/// <summary>
+///     Process factory class
+/// </summary>
+public class VirtualHerbariumObservationProcessor :
+    ObservationProcessorBase<VirtualHerbariumObservationProcessor, VirtualHerbariumObservationVerbatim, IVirtualHerbariumObservationVerbatimRepository>,
+    IVirtualHerbariumObservationProcessor
 {
-    /// <summary>
-    ///     Process factory class
-    /// </summary>
-    public class VirtualHerbariumObservationProcessor :
-        ObservationProcessorBase<VirtualHerbariumObservationProcessor, VirtualHerbariumObservationVerbatim, IVirtualHerbariumObservationVerbatimRepository>,
-        IVirtualHerbariumObservationProcessor
+    private readonly IAreaHelper _areaHelper;
+    private readonly IVirtualHerbariumObservationVerbatimRepository _virtualHerbariumObservationVerbatimRepository;
+
+    /// <inheritdoc />
+    protected override async Task<(int publicCount, int protectedCount, int failedCount)> ProcessObservationsAsync(
+        DataProvider dataProvider,
+        IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
+        IDictionary<VocabularyId, IDictionary<object, int>> dwcaVocabularyById,
+        JobRunModes mode,
+        IJobCancellationToken cancellationToken)
     {
-        private readonly IAreaHelper _areaHelper;
-        private readonly IVirtualHerbariumObservationVerbatimRepository _virtualHerbariumObservationVerbatimRepository;
+        var observationFactory = new VirtualHerbariumObservationFactory(dataProvider, taxa, dwcaVocabularyById, _areaHelper, TimeManager, ProcessConfiguration);
+        await observationFactory.InitializeAsync();
 
-        /// <inheritdoc />
-        protected override async Task<(int publicCount, int protectedCount, int failedCount)> ProcessObservationsAsync(
-            DataProvider dataProvider,
-            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
-            IDictionary<VocabularyId, IDictionary<object, int>> dwcaVocabularyById,
-            JobRunModes mode,
-            IJobCancellationToken cancellationToken)
-        {
-            var observationFactory = new VirtualHerbariumObservationFactory(dataProvider, taxa, dwcaVocabularyById, _areaHelper, TimeManager, ProcessConfiguration);
-            await observationFactory.InitializeAsync();
-
-            return await base.ProcessObservationsAsync(
-                dataProvider,
-                mode,
-                observationFactory,
-                _virtualHerbariumObservationVerbatimRepository,
-                cancellationToken);
-        }
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="virtualHerbariumObservationVerbatimRepository"></param>
-        /// <param name="areaHelper"></param>
-        /// <param name="processedObservationRepository"></param>
-        /// <param name="vocabularyValueResolver"></param>
-        /// <param name="dwcArchiveFileWriterCoordinator"></param>
-        /// <param name="processManager"></param>
-        /// <param name="validationManager"></param>
-        /// <param name="diffusionManager"></param>
-        /// <param name="processTimeManager"></param>
-        /// <param name="processConfiguration"></param>
-        /// <param name="logger"></param>
-        /// <exception cref="ArgumentNullException"></exception>
-        public VirtualHerbariumObservationProcessor(
-            IVirtualHerbariumObservationVerbatimRepository virtualHerbariumObservationVerbatimRepository,
-            IAreaHelper areaHelper,
-            IProcessedObservationCoreRepository processedObservationRepository,
-            IVocabularyValueResolver vocabularyValueResolver,
-            IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
-            IProcessManager processManager,
-            IValidationManager validationManager,
-            IDiffusionManager diffusionManager,
-            IProcessTimeManager processTimeManager,
-            ProcessConfiguration processConfiguration,
-            ILogger<VirtualHerbariumObservationProcessor> logger) :
-            base(processedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, processManager, validationManager, diffusionManager, processTimeManager, null, processConfiguration, logger)
-        {
-            _virtualHerbariumObservationVerbatimRepository = virtualHerbariumObservationVerbatimRepository ??
-                                                             throw new ArgumentNullException(
-                                                                 nameof(virtualHerbariumObservationVerbatimRepository));
-            _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
-        }
-
-        public override DataProviderType Type => DataProviderType.VirtualHerbariumObservations;
+        return await base.ProcessObservationsAsync(
+            dataProvider,
+            mode,
+            observationFactory,
+            _virtualHerbariumObservationVerbatimRepository,
+            cancellationToken);
     }
+
+    /// <summary>
+    /// Constructor
+    /// </summary>
+    /// <param name="virtualHerbariumObservationVerbatimRepository"></param>
+    /// <param name="areaHelper"></param>
+    /// <param name="processedObservationRepository"></param>
+    /// <param name="vocabularyValueResolver"></param>
+    /// <param name="dwcArchiveFileWriterCoordinator"></param>
+    /// <param name="processManager"></param>
+    /// <param name="validationManager"></param>
+    /// <param name="diffusionManager"></param>
+    /// <param name="processTimeManager"></param>
+    /// <param name="processConfiguration"></param>
+    /// <param name="logger"></param>
+    /// <exception cref="ArgumentNullException"></exception>
+    public VirtualHerbariumObservationProcessor(
+        IVirtualHerbariumObservationVerbatimRepository virtualHerbariumObservationVerbatimRepository,
+        IAreaHelper areaHelper,
+        IProcessedObservationCoreRepository processedObservationRepository,
+        IVocabularyValueResolver vocabularyValueResolver,
+        IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
+        IProcessManager processManager,
+        IValidationManager validationManager,
+        IDiffusionManager diffusionManager,
+        IProcessTimeManager processTimeManager,
+        ProcessConfiguration processConfiguration,
+        ILogger<VirtualHerbariumObservationProcessor> logger) :
+        base(processedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, processManager, validationManager, diffusionManager, processTimeManager, null, processConfiguration, logger)
+    {
+        _virtualHerbariumObservationVerbatimRepository = virtualHerbariumObservationVerbatimRepository ??
+                                                         throw new ArgumentNullException(
+                                                             nameof(virtualHerbariumObservationVerbatimRepository));
+        _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
+    }
+
+    public override DataProviderType Type => DataProviderType.VirtualHerbariumObservations;
 }

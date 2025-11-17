@@ -6,40 +6,39 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace SOS.Observations.Api.Managers
+namespace SOS.Observations.Api.Managers;
+
+/// <summary>
+///     Area manager
+/// </summary>
+public class BlobStorageManager : IBlobStorageManager
 {
+    private readonly IBlobStorageService _blobStorageService;
+    private readonly ILogger<BlobStorageManager> _logger;
+
     /// <summary>
-    ///     Area manager
+    ///     Constructor
     /// </summary>
-    public class BlobStorageManager : IBlobStorageManager
+    /// <param name="blobStorageService"></param>
+    /// <param name="logger"></param>
+    public BlobStorageManager(
+        IBlobStorageService blobStorageService,
+        ILogger<BlobStorageManager> logger)
     {
-        private readonly IBlobStorageService _blobStorageService;
-        private readonly ILogger<BlobStorageManager> _logger;
+        _blobStorageService = blobStorageService ??
+                              throw new ArgumentNullException(nameof(blobStorageService));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    }
 
-        /// <summary>
-        ///     Constructor
-        /// </summary>
-        /// <param name="blobStorageService"></param>
-        /// <param name="logger"></param>
-        public BlobStorageManager(
-            IBlobStorageService blobStorageService,
-            ILogger<BlobStorageManager> logger)
-        {
-            _blobStorageService = blobStorageService ??
-                                  throw new ArgumentNullException(nameof(blobStorageService));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        }
+    /// <inheritdoc />
+    public string GetExportDownloadUrl(string fileName)
+    {
+        return _blobStorageService.GetExportDownloadUrl(fileName);
+    }
 
-        /// <inheritdoc />
-        public string GetExportDownloadUrl(string fileName)
-        {
-            return _blobStorageService.GetExportDownloadUrl(fileName);
-        }
-
-        /// <inheritdoc />
-        public async Task<IEnumerable<File>> GetExportFilesAsync()
-        {
-            return await _blobStorageService.GetExportFilesAsync();
-        }
+    /// <inheritdoc />
+    public async Task<IEnumerable<File>> GetExportFilesAsync()
+    {
+        return await _blobStorageService.GetExportFilesAsync();
     }
 }

@@ -1,8 +1,7 @@
 ﻿using SOS.Harvest.Harvesters.Interfaces;
 
-namespace SOS.Harvest.Harvesters.iNaturalist.Interfaces
+namespace SOS.Harvest.Harvesters.iNaturalist.Interfaces;
+
+public interface IiNaturalistObservationHarvester : IObservationHarvester
 {
-    public interface IiNaturalistObservationHarvester : IObservationHarvester
-    {
-    }
 }

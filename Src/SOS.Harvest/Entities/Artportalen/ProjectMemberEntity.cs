@@ -1,11 +1,10 @@
-﻿namespace SOS.Harvest.Entities.Artportalen
+﻿namespace SOS.Harvest.Entities.Artportalen;
+
+/// <summary>
+///     Project parameter entity
+/// </summary>
+public class ProjectMemberEntity
 {
-    /// <summary>
-    ///     Project parameter entity
-    /// </summary>
-    public class ProjectMemberEntity
-    {
-        public int ProjectId { get; set; }
-        public int UserServiceUserId { get; set; }
-    }
+    public int ProjectId { get; set; }
+    public int UserServiceUserId { get; set; }
 }

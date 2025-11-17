@@ -7,54 +7,53 @@ using SOS.Shared.Api.Dtos.Enum;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace SOS.Observations.Api.Managers.Interfaces
+namespace SOS.Observations.Api.Managers.Interfaces;
+
+/// <summary>
+///     Area manager
+/// </summary>
+public interface IAreaManager
 {
     /// <summary>
-    ///     Area manager
+    /// Get areas by id
     /// </summary>
-    public interface IAreaManager
-    {
-        /// <summary>
-        /// Get areas by id
-        /// </summary>
-        /// <param name="areaKeys"></param>
-        /// <returns></returns>
-        Task<IEnumerable<AreaBaseDto>> GetAreasAsync(IEnumerable<(AreaTypeDto, string)> areaKeys);
+    /// <param name="areaKeys"></param>
+    /// <returns></returns>
+    Task<IEnumerable<AreaBaseDto>> GetAreasAsync(IEnumerable<(AreaTypeDto, string)> areaKeys);
 
-        /// <summary>
-        ///     Get areas matching provided filter
-        /// </summary>
-        /// <param name="areaTypes"></param>
-        /// <param name="searchString"></param>
-        /// <param name="skip"></param>
-        /// <param name="take"></param>
-        /// <returns></returns>
-        Task<PagedResult<AreaBaseDto>> GetAreasAsync(IEnumerable<AreaTypeDto> areaTypes, string searchString,
-            int skip, int take);
+    /// <summary>
+    ///     Get areas matching provided filter
+    /// </summary>
+    /// <param name="areaTypes"></param>
+    /// <param name="searchString"></param>
+    /// <param name="skip"></param>
+    /// <param name="take"></param>
+    /// <returns></returns>
+    Task<PagedResult<AreaBaseDto>> GetAreasAsync(IEnumerable<AreaTypeDto> areaTypes, string searchString,
+        int skip, int take);
 
-        /// <summary>
-        /// Get a single area
-        /// </summary>
-        /// <param name="areaType"></param>
-        /// <param name="featureId"></param>
-        /// <returns></returns>
-        Task<AreaBaseDto> GetAreaAsync(AreaTypeDto areaType, string featureId);
+    /// <summary>
+    /// Get a single area
+    /// </summary>
+    /// <param name="areaType"></param>
+    /// <param name="featureId"></param>
+    /// <returns></returns>
+    Task<AreaBaseDto> GetAreaAsync(AreaTypeDto areaType, string featureId);
 
-        /// <summary>
-        /// Get area as zip file in specified format.
-        /// </summary>
-        /// <param name="areaType"></param>
-        /// <param name="featureId"></param>
-        /// <param name="format"></param>
-        /// <returns></returns>
-        Task<byte[]> GetZippedAreaAsync(AreaTypeDto areaType, string featureId, AreaExportFormat format);
+    /// <summary>
+    /// Get area as zip file in specified format.
+    /// </summary>
+    /// <param name="areaType"></param>
+    /// <param name="featureId"></param>
+    /// <param name="format"></param>
+    /// <returns></returns>
+    Task<byte[]> GetZippedAreaAsync(AreaTypeDto areaType, string featureId, AreaExportFormat format);
 
-        /// <summary>
-        /// Get geometry
-        /// </summary>
-        /// <param name="areaType"></param>
-        /// <param name="featureId"></param>
-        /// <returns></returns>
-        Task<Geometry> GetGeometryAsync(AreaType areaType, string featureId);
-    }
+    /// <summary>
+    /// Get geometry
+    /// </summary>
+    /// <param name="areaType"></param>
+    /// <param name="featureId"></param>
+    /// <returns></returns>
+    Task<Geometry> GetGeometryAsync(AreaType areaType, string featureId);
 }

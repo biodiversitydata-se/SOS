@@ -2,14 +2,13 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
-namespace SOS.Administration.Api.Controllers.Interfaces
+namespace SOS.Administration.Api.Controllers.Interfaces;
+
+public interface IIptController
 {
-    public interface IIptController
-    {
-        /// <summary>
-        /// Get all resources
-        /// </summary>
-        /// <returns></returns>
-        Task<IActionResult> GetResourcesAsync();
-    }
+    /// <summary>
+    /// Get all resources
+    /// </summary>
+    /// <returns></returns>
+    Task<IActionResult> GetResourcesAsync();
 }

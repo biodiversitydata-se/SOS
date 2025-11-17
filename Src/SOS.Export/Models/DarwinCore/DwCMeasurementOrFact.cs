@@ -1,15 +1,14 @@
 ﻿using SOS.Lib.Models.DarwinCore;
 
-namespace SOS.Export.Models.DarwinCore
+namespace SOS.Export.Models.DarwinCore;
+
+/// <summary>
+///     Darwin core Measurement Or Fact used for csv
+/// </summary>
+public class DwCMeasurementOrFact : DarwinCoreMeasurementOrFact
 {
     /// <summary>
-    ///     Darwin core Measurement Or Fact used for csv
+    ///     Pointer to core object
     /// </summary>
-    public class DwCMeasurementOrFact : DarwinCoreMeasurementOrFact
-    {
-        /// <summary>
-        ///     Pointer to core object
-        /// </summary>
-        public string CoreID { get; set; }
-    }
+    public string CoreID { get; set; }
 }

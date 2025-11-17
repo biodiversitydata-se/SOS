@@ -20,2613 +20,2611 @@
 #pragma warning disable 8625 // Disable "CS8625 Cannot convert null literal to non-nullable reference type"
 #pragma warning disable 8765 // Disable "CS8765 Nullability of type of parameter doesn't match overridden member (possibly because of nullability attributes)."
 
-namespace SOS.Lib.Models.Verbatim.INaturalist.Service
+namespace SOS.Lib.Models.Verbatim.INaturalist.Service;
+
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record AutocompleteTaxon : CoreTaxon
 {
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record AutocompleteTaxon : CoreTaxon
-    {
 
-        [System.Text.Json.Serialization.JsonPropertyName("default_photo")]
-        public TaxonPhoto Default_photo { get; set; }
+    [System.Text.Json.Serialization.JsonPropertyName("default_photo")]
+    public TaxonPhoto Default_photo { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("matched_term")]
-        public string Matched_term { get; set; }
+    [System.Text.Json.Serialization.JsonPropertyName("matched_term")]
+    public string Matched_term { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("observations_count")]
-        public int? Observations_count { get; set; }
+    [System.Text.Json.Serialization.JsonPropertyName("observations_count")]
+    public int? Observations_count { get; set; }
 
-    }
+}
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record BaseResponse
-    {
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record BaseResponse
+{
 
-        [System.Text.Json.Serialization.JsonPropertyName("total_results")]
-        public int? Total_results { get; set; }
+    [System.Text.Json.Serialization.JsonPropertyName("total_results")]
+    public int? Total_results { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("page")]
-        public int? Page { get; set; }
+    [System.Text.Json.Serialization.JsonPropertyName("page")]
+    public int? Page { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("per_page")]
-        public int? Per_page { get; set; } 
-    }
+    [System.Text.Json.Serialization.JsonPropertyName("per_page")]
+    public int? Per_page { get; set; } 
+}
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record Color
-    {
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record Color
+{
 
-        [System.Text.Json.Serialization.JsonPropertyName("id")]
-        public int? Id { get; set; }
+    [System.Text.Json.Serialization.JsonPropertyName("id")]
+    public int? Id { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("value")]
-        public string Value { get; set; }
+    [System.Text.Json.Serialization.JsonPropertyName("value")]
+    public string Value { get; set; }
 
-    }
+}
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record Comment
-    {
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record Comment
+{
 
-        [System.Text.Json.Serialization.JsonPropertyName("id")]
-        public int? Id { get; set; }
+    [System.Text.Json.Serialization.JsonPropertyName("id")]
+    public int? Id { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("created_at")]
-        public System.DateTimeOffset? Created_at { get; set; }
+    [System.Text.Json.Serialization.JsonPropertyName("created_at")]
+    public System.DateTimeOffset? Created_at { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("created_at_details")]
-        public DateDetails Created_at_details { get; set; }
+    [System.Text.Json.Serialization.JsonPropertyName("created_at_details")]
+    public DateDetails Created_at_details { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("user")]
-        public User User { get; set; }
+    [System.Text.Json.Serialization.JsonPropertyName("user")]
+    public User User { get; set; }
 
-    }
+}
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record PostAnnotation
-    {
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record PostAnnotation
+{
 
-        [System.Text.Json.Serialization.JsonPropertyName("annotation")]
-        public Annotation Annotation { get; set; }
+    [System.Text.Json.Serialization.JsonPropertyName("annotation")]
+    public Annotation Annotation { get; set; }
 
-    }
+}
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record PostComment
-    {
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record PostComment
+{
 
-        [System.Text.Json.Serialization.JsonPropertyName("comment")]
-        public Comment2 Comment { get; set; }
+    [System.Text.Json.Serialization.JsonPropertyName("comment")]
+    public Comment2 Comment { get; set; }
 
-    }
+}
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record PostFlag
-    {
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record PostFlag
+{
 
-        [System.Text.Json.Serialization.JsonPropertyName("flag")]
-        public Flag Flag { get; set; }
+    [System.Text.Json.Serialization.JsonPropertyName("flag")]
+    public Flag Flag { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("flag_explanation")]
-        public string Flag_explanation { get; set; }
+    [System.Text.Json.Serialization.JsonPropertyName("flag_explanation")]
+    public string Flag_explanation { get; set; }
 
-    }
+}
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record PostIdentification
-    {
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record PostIdentification
+{
 
-        [System.Text.Json.Serialization.JsonPropertyName("identification")]
-        public Identification2 Identification { get; set; }
+    [System.Text.Json.Serialization.JsonPropertyName("identification")]
+    public Identification2 Identification { get; set; }
 
-    }
+}
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record PostMessage
-    {
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record PostMessage
+{
 
-        [System.Text.Json.Serialization.JsonPropertyName("message")]
-        public Message2 Message { get; set; }
+    [System.Text.Json.Serialization.JsonPropertyName("message")]
+    public Message2 Message { get; set; }
 
-    }
+}
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record PostPost
-    {
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record PostPost
+{
 
-        [System.Text.Json.Serialization.JsonPropertyName("commit")]
-        public string Commit { get; set; }
+    [System.Text.Json.Serialization.JsonPropertyName("commit")]
+    public string Commit { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("post")]
-        public Post Post { get; set; }
+    [System.Text.Json.Serialization.JsonPropertyName("post")]
+    public Post Post { get; set; }
 
-    }
+}
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record PostObservation
-    {
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record PostObservation
+{
 
-        [System.Text.Json.Serialization.JsonPropertyName("observation")]
-        public Observation2 Observation { get; set; }
+    [System.Text.Json.Serialization.JsonPropertyName("observation")]
+    public Observation2 Observation { get; set; }
 
-    }
+}
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record PostObservationFieldValue
-    {
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record PostObservationFieldValue
+{
 
-        [System.Text.Json.Serialization.JsonPropertyName("observation_field_value")]
-        public Observation_field_value Observation_field_value { get; set; }
+    [System.Text.Json.Serialization.JsonPropertyName("observation_field_value")]
+    public Observation_field_value Observation_field_value { get; set; }
 
-    }
+}
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record PostObservationPhoto
-    {
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record PostObservationPhoto
+{
 
-        [System.Text.Json.Serialization.JsonPropertyName("observation_photo")]
-        public Observation_photo Observation_photo { get; set; }
+    [System.Text.Json.Serialization.JsonPropertyName("observation_photo")]
+    public Observation_photo Observation_photo { get; set; }
 
-    }
+}
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record PostObservationVote
-    {
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record PostObservationVote
+{
 
-        [System.Text.Json.Serialization.JsonPropertyName("vote")]
-        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public PostObservationVoteVote? Vote { get; set; }
+    [System.Text.Json.Serialization.JsonPropertyName("vote")]
+    [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+    public PostObservationVoteVote? Vote { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("scope")]
-        public PostObservationVoteScope? Scope { get; set; }
+    [System.Text.Json.Serialization.JsonPropertyName("scope")]
+    public PostObservationVoteScope? Scope { get; set; }
 
-    }
+}
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record PostProjectAdd
-    {
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record PostProjectAdd
+{
 
-        [System.Text.Json.Serialization.JsonPropertyName("observation_id")]
-        public int? Observation_id { get; set; }
+    [System.Text.Json.Serialization.JsonPropertyName("observation_id")]
+    public int? Observation_id { get; set; }
 
-    }
+}
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record PostProjectObservation
-    {
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record PostProjectObservation
+{
 
-        [System.Text.Json.Serialization.JsonPropertyName("project_id")]
-        public int? Project_id { get; set; }
+    [System.Text.Json.Serialization.JsonPropertyName("project_id")]
+    public int? Project_id { get; set; }
 
-        [System.Text.Json.Serialization.JsonPropertyName("observation_id")]
-        public int? Observation_id { get; set; }
+    [System.Text.Json.Serialization.JsonPropertyName("observation_id")]
+    public int? Observation_id { get; set; }
 
-    }
+}
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record UpdateProjectObservation
-    {
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record UpdateProjectObservation
+{
 
-        [System.Text.Json.Serialization.JsonPropertyName("project_observation")]
-        public Project_observation Project_observation { get; set; }
+    [System.Text.Json.Serialization.JsonPropertyName("project_observation")]
+    public Project_observation Project_observation { get; set; }
 
-    }
+}
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record PostQuality
-    {
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record PostQuality
+{
 
-        [System.Text.Json.Serialization.JsonPropertyName("agree")]
-        public bool? Agree { get; set; }
+    [System.Text.Json.Serialization.JsonPropertyName("agree")]
+    public bool? Agree { get; set; }
 
-    }
+}
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record PostVote
-    {
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record PostVote
+{
 
-        [System.Text.Json.Serialization.JsonPropertyName("vote")]
-        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public PostVoteVote? Vote { get; set; }
+    [System.Text.Json.Serialization.JsonPropertyName("vote")]
+    [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+    public PostVoteVote? Vote { get; set; }
 
-    }
+}
 
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record PostUser
-    {
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record PostUser
+{
 
-        [System.Text.Json.Serialization.JsonPropertyName("user")]
-        public User2 User { get; set; }
-
-        /// <summary>
-        /// Set to true to remove the current user icon.
-        /// </summary>
-
-        [System.Text.Json.Serialization.JsonPropertyName("icon_delete")]
-        public bool? Icon_delete { get; set; } = false;
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record PostUserUpdateSession
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("preferred_taxon_page_ancestors_shown")]
-        public bool? Preferred_taxon_page_ancestors_shown { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("preferred_taxon_page_place_id")]
-        public int? Preferred_taxon_page_place_id { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("preferred_taxon_page_tab")]
-        public string Preferred_taxon_page_tab { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("prefers_skip_coarer_id_modal")]
-        public bool? Prefers_skip_coarer_id_modal { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("prefers_hide_obs_show_annotations")]
-        public bool? Prefers_hide_obs_show_annotations { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("prefers_hide_obs_show_projects")]
-        public bool? Prefers_hide_obs_show_projects { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("prefers_hide_obs_show_tags")]
-        public bool? Prefers_hide_obs_show_tags { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("prefers_hide_obs_show_observation_fields")]
-        public bool? Prefers_hide_obs_show_observation_fields { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("prefers_hide_obs_show_identifiers")]
-        public bool? Prefers_hide_obs_show_identifiers { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("prefers_hide_obs_show_copyright")]
-        public bool? Prefers_hide_obs_show_copyright { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("prefers_hide_obs_show_quality_metrics")]
-        public bool? Prefers_hide_obs_show_quality_metrics { get; set; }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record PutFlag
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("flag")]
-        public Flag2 Flag { get; set; }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record ConservationStatus
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("place_id")]
-        public int? Place_id { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("place")]
-        public CorePlace Place { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("status")]
-        public string Status { get; set; }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record CorePlace
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("id")]
-        public int? Id { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("name")]
-        public string Name { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("display_name")]
-        public string Display_name { get; set; }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record CoreTaxon
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("id")]
-        public int? Id { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("iconic_taxon_id")]
-        public int? Iconic_taxon_id { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("iconic_taxon_name")]
-        public string Iconic_taxon_name { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("is_active")]
-        public bool? Is_active { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("name")]
-        public string Name { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("preferred_common_name")]
-        public string Preferred_common_name { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("rank")]
-        public string Rank { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("rank_level")]
-        public double? Rank_level { get; set; }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record DateDetails
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("date")]
-        [System.Text.Json.Serialization.JsonConverter(typeof(DateFormatConverter))]
-        public System.DateTimeOffset? Date { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("day")]
-        public int? Day { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("hour")]
-        public int? Hour { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("month")]
-        public int? Month { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("week")]
-        public int? Week { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("year")]
-        public int? Year { get; set; }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record EstablishmentMeans
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("establishment_means")]
-        public string Establishment_means { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("place")]
-        public CorePlace Place { get; set; }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record Fave
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("id")]
-        public int? Id { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("votable_id")]
-        public int? Votable_id { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("created_at")]
-        public System.DateTimeOffset? Created_at { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("user")]
-        public User User { get; set; }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record FieldValue
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("name")]
-        public string Name { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("value")]
-        public string Value { get; set; }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record Identification
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("id")]
-        public int? Id { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("observation_id")]
-        public int? Observation_id { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("body")]
-        public string Body { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("created_at")]
-        public System.DateTimeOffset? Created_at { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("updated_at")]
-        public System.DateTimeOffset? Updated_at { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("current")]
-        public bool? Current { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("taxon")]
-        public ObservationTaxon Taxon { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("user")]
-        public User User { get; set; }
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record Message
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("id")]
-        public int? Id { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("subject")]
-        public string Subject { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("body")]
-        public string Body { get; set; }
-
-        /// <summary>
-        /// ID of the user to whom this message belongs. Messages work like email,
-        /// <br/>so the sender gets a copy and the recipient gets a copy of each
-        /// <br/>message. This is always the authenticated user, so there's no real
-        /// <br/>need for a full user object.
-        /// <br/>
-        /// </summary>
-
-        [System.Text.Json.Serialization.JsonPropertyName("user_id")]
-        public int? User_id { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("to_user")]
-        public User To_user { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("from_user")]
-        public User From_user { get; set; }
-
-        /// <summary>
-        /// Identifier for the message thread, generally the ID of the sender's
-        /// <br/>copy of the first message
-        /// <br/>
-        /// </summary>
-
-        [System.Text.Json.Serialization.JsonPropertyName("thread_id")]
-        public int? Thread_id { get; set; }
-
-        /// <summary>
-        /// Number of messages in this thread. Only included when threads=true
-        /// <br/>
-        /// </summary>
-
-        [System.Text.Json.Serialization.JsonPropertyName("thread_messages_count")]
-        public int? Thread_messages_count { get; set; }
-
-        /// <summary>
-        /// Array of flags on messages in this thread. Only included when
-        /// <br/>threads=true
-        /// <br/>
-        /// </summary>
-
-        [System.Text.Json.Serialization.JsonPropertyName("thread_flags")]
-        public System.Collections.Generic.ICollection<object> Thread_flags { get; set; }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record NonOwnerIdentification
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("id")]
-        public int? Id { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("body")]
-        public string Body { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("created_at")]
-        public System.DateTimeOffset? Created_at { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("created_at_details")]
-        public DateDetails Created_at_details { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("user")]
-        public User User { get; set; }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record iNaturalistVerbatimObservation : IEntity<int>
-    {
-        /// <summary>
-        /// Unique id
-        /// </summary>
-        [System.Text.Json.Serialization.JsonPropertyName("id")]
-        public int Id { get; set; }
-        
-        public long ObservationId { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("annotations")]
-        public System.Collections.Generic.ICollection<Annotation> Annotations { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("identifications")]
-        public System.Collections.Generic.ICollection<Identification> Identifications { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("positional_accuracy")]
-        public int? PositionalAccuracy { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("public_positional_accuracy")]
-        public int? PublicPositionalAccuracy { get; set; }        
-         
-        [System.Text.Json.Serialization.JsonPropertyName("cached_votes_total")]
-        public int? Cached_votes_total { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("captive")]
-        public bool? Captive { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("comments")]
-        public System.Collections.Generic.ICollection<Comment> Comments { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("comments_count")]
-        public int? Comments_count { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("created_at")]
-        public System.DateTimeOffset? Created_at { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("created_at_details")]
-        public DateDetails Created_at_details { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("created_time_zone")]
-        public string Created_time_zone { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("description")]
-        public string Description { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("faves_count")]
-        public int? Faves_count { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("geojson")]
-        public PointGeoJson Geojson { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("geoprivacy")]
-        public string Geoprivacy { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("taxon_geoprivacy")]
-        public string Taxon_geoprivacy { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("id_please")]
-        public bool? Id_please { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("identifications_count")]
-        public int? Identifications_count { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("identifications_most_agree")]
-        public bool? Identifications_most_agree { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("identifications_most_disagree")]
-        public bool? Identifications_most_disagree { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("identifications_some_agree")]
-        public bool? Identifications_some_agree { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("license_code")]
-        public string License_code { get; set; }
-
-        /// <summary>
-        /// in the format "lat,lng"
-        /// </summary>
-
-        [System.Text.Json.Serialization.JsonPropertyName("location")]
-        public string Location { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("mappable")]
-        public bool? Mappable { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("non_owner_ids")]
-        public System.Collections.Generic.ICollection<NonOwnerIdentification> Non_owner_ids { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("num_identification_agreements")]
-        public int? Num_identification_agreements { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("num_identification_disagreements")]
-        public int? Num_identification_disagreements { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("obscured")]
-        public bool? Obscured { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("observed_on")]
-        public System.DateTimeOffset? Observed_on { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("observed_on_details")]
-        public DateDetails Observed_on_details { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("observed_on_string")]
-        public string Observed_on_string { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("observed_time_zone")]
-        public string Observed_time_zone { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("ofvs")]
-        public System.Collections.Generic.ICollection<FieldValue> Ofvs { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("out_of_range")]
-        public bool? Out_of_range { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("photos")]
-        public System.Collections.Generic.ICollection<Photo> Photos { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("place_guess")]
-        public string Place_guess { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("place_ids")]
-        public System.Collections.Generic.ICollection<int> Place_ids { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("project_ids")]
-        public System.Collections.Generic.ICollection<int> Project_ids { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("project_ids_with_curator_id")]
-        public System.Collections.Generic.ICollection<int> Project_ids_with_curator_id { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("project_ids_without_curator_id")]
-        public System.Collections.Generic.ICollection<int> Project_ids_without_curator_id { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("quality_grade")]
-        public string Quality_grade { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("reviewed_by")]
-        public System.Collections.Generic.ICollection<int> Reviewed_by { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("site_id")]
-        public int? Site_id { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("sounds")]
-        public System.Collections.Generic.ICollection<Sound> Sounds { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("species_guess")]
-        public string Species_guess { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("tags")]
-        public System.Collections.Generic.ICollection<string> Tags { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("taxon")]
-        public ObservationTaxon Taxon { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("time_observed_at")]
-        public System.DateTimeOffset? Time_observed_at { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("time_zone_offset")]
-        public string Time_zone_offset { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("updated_at")]
-        public System.DateTimeOffset? Updated_at { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("uri")]
-        public string Uri { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("user")]
-        public User User { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("verifiable")]
-        public bool? Verifiable { get; set; }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record ObservationTaxon : CoreTaxon
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("ancestor_ids")]
-        public System.Collections.Generic.ICollection<int> Ancestor_ids { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("ancestry")]
-        public string Ancestry { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("conservation_status")]
-        public RawConservationStatus Conservation_status { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("endemic")]
-        public bool? Endemic { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("establishment_means")]
-        public EstablishmentMeans Establishment_means { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("introduced")]
-        public bool? Introduced { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("native")]
-        public bool? Native { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("threatened")]
-        public bool? Threatened { get; set; }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record Photo
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("id")]
-        public int? Id { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("attribution")]
-        public string Attribution { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("license_code")]
-        public string License_code { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("url")]
-        public string Url { get; set; }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record PointGeoJson
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("type")]
-        public string Type { get; set; }
-
-        /// <summary>
-        /// an array of [long, lat]
-        /// </summary>
-
-        [System.Text.Json.Serialization.JsonPropertyName("coordinates")]
-        public System.Collections.Generic.ICollection<double> Coordinates { get; set; }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record PolygonGeoJson
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("type")]
-        public string Type { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("coordinates")]
-        public System.Collections.Generic.ICollection<System.Collections.Generic.ICollection<System.Collections.Generic.ICollection<double>>> Coordinates { get; set; }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record Project
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("id")]
-        public int? Id { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("title")]
-        public string Title { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("description")]
-        public string Description { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("slug")]
-        public string Slug { get; set; }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record ProjectMember
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("id")]
-        public int? Id { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("project_id")]
-        public int? Project_id { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("created_at")]
-        public System.DateTimeOffset? Created_at { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("updated_at")]
-        public System.DateTimeOffset? Updated_at { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("role")]
-        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public ProjectMemberRole? Role { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("observations_count")]
-        public int? Observations_count { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("taxa_count")]
-        public int? Taxa_count { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("user")]
-        public User User { get; set; }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record RawConservationStatus
-    {
-        /// <summary>
-        /// Identifier for the iNat source record associated with this status,
-        /// <br/>retrievable via https://www.inaturalist.org/sources/:id.json
-        /// <br/>(this endpoint is not a part of our public API and is thus subject to
-        /// <br/>change or removal)
-        /// <br/>
-        /// </summary>
-
-        [System.Text.Json.Serialization.JsonPropertyName("source_id")]
-        public int? Source_id { get; set; }
-
-        /// <summary>
-        /// Organization that declared this status
-        /// <br/>
-        /// </summary>
-
-        [System.Text.Json.Serialization.JsonPropertyName("authority")]
-        public string Authority { get; set; }
-
-        /// <summary>
-        /// Body of the status, often coded, particularly when the status comes
-        /// <br/>from the IUCN or NatureServe. Consult the authority and/or the
-        /// <br/>status URL for details about the meanings of codes.
-        /// <br/>
-        /// </summary>
-
-        [System.Text.Json.Serialization.JsonPropertyName("status")]
-        public string Status { get; set; }
-
-        /// <summary>
-        /// Human-readable name of the status if it was coded.
-        /// <br/>
-        /// </summary>
-
-        [System.Text.Json.Serialization.JsonPropertyName("status_name")]
-        public string Status_name { get; set; }
-
-        /// <summary>
-        /// Coded value representing the equivalent IUCN status. Mappings:
-        /// <br/>NOT_EVALUATED = 0, DATA_DEFICIENT = 5, LEAST_CONCERN = 10,
-        /// <br/>NEAR_THREATENED = 20, VULNERABLE = 30, ENDANGERED = 40,
-        /// <br/>CRITICALLY_ENDANGERED = 50, EXTINCT_IN_THE_WILD = 60, EXTINCT = 70
-        /// <br/>
-        /// </summary>
-
-        [System.Text.Json.Serialization.JsonPropertyName("iucn")]
-        public int? Iucn { get; set; }
-
-        /// <summary>
-        /// Default geoprivacy for observations of this taxon in the status's place.
-        /// <br/>
-        /// </summary>
-
-        [System.Text.Json.Serialization.JsonPropertyName("geoprivacy")]
-        public string Geoprivacy { get; set; }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record TaxonConservationStatus : RawConservationStatus
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("place")]
-        public CorePlace Place { get; set; }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record ShowObservation : iNaturalistVerbatimObservation
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("identifications")]
-        public System.Collections.Generic.ICollection<Identification> Identifications { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("faves")]
-        public System.Collections.Generic.ICollection<Fave> Faves { get; set; }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record ShowPlace : CorePlace
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("admin_level")]
-        public int? Admin_level { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("ancestor_place_ids")]
-        public System.Collections.Generic.ICollection<int> Ancestor_place_ids { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("bbox_area")]
-        public double? Bbox_area { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("geometry_geojson")]
-        public PolygonGeoJson Geometry_geojson { get; set; }
-
-        /// <summary>
-        /// in the format "lat,lng"
-        /// </summary>
-
-        [System.Text.Json.Serialization.JsonPropertyName("location")]
-        public string Location { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("name")]
-        public string Name { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("place_type")]
-        public int? Place_type { get; set; }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record ShowTaxon : CoreTaxon
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("ancestor_ids")]
-        public System.Collections.Generic.ICollection<int> Ancestor_ids { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("colors")]
-        public System.Collections.Generic.ICollection<Color> Colors { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("conservation_status")]
-        public ConservationStatus Conservation_status { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("conservation_statuses")]
-        public System.Collections.Generic.ICollection<TaxonConservationStatus> Conservation_statuses { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("default_photo")]
-        public TaxonPhoto Default_photo { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("establishment_means")]
-        public EstablishmentMeans Establishment_means { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("observations_count")]
-        public int? Observations_count { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("preferred_establishment_means")]
-        public string Preferred_establishment_means { get; set; }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record Sound
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("id")]
-        public int? Id { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("attribution")]
-        public string Attribution { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("license_code")]
-        public string License_code { get; set; }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record TaxonPhoto : Photo
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("medium_url")]
-        public string Medium_url { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("square_url")]
-        public string Square_url { get; set; }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record User
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("id")]
-        public int? Id { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("icon_content_type")]
-        public string Icon_content_type { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("suspended")]
-        public bool? Suspended { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("icon_file_name")]
-        public string Icon_file_name { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("icon")]
-        public string Icon { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("icon_url")]
-        public string Icon_url { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("login")]
-        public string Login { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("name")]
-        public string Name { get; set; }
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record MessagesResponse : BaseResponse
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("results")]
-        [System.ComponentModel.DataAnnotations.Required]
-        public System.Collections.Generic.ICollection<Message> Results { get; set; } = new System.Collections.ObjectModel.Collection<Message>();
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record NearbyPlacesResponse : BaseResponse
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("results")]
-        [System.ComponentModel.DataAnnotations.Required]
-        public Results Results { get; set; } = new Results();
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record ObservationsResponse : BaseResponse
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("results")]
-        [System.ComponentModel.DataAnnotations.Required]
-        public System.Collections.Generic.ICollection<iNaturalistVerbatimObservation> Results { get; set; } = new System.Collections.ObjectModel.Collection<iNaturalistVerbatimObservation>();
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record ObservationsShowResponse : BaseResponse
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("results")]
-        [System.ComponentModel.DataAnnotations.Required]
-        public System.Collections.Generic.ICollection<ShowObservation> Results { get; set; } = new System.Collections.ObjectModel.Collection<ShowObservation>();
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record UserCountsResponse : BaseResponse
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("results")]
-        [System.ComponentModel.DataAnnotations.Required]
-        public System.Collections.Generic.ICollection<results> Results { get; set; } = new System.Collections.ObjectModel.Collection<results>();
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record ObservationsObserversResponse : BaseResponse
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("results")]
-        [System.ComponentModel.DataAnnotations.Required]
-        public System.Collections.Generic.ICollection<results2> Results { get; set; } = new System.Collections.ObjectModel.Collection<results2>();
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record SpeciesCountsResponse : BaseResponse
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("results")]
-        [System.ComponentModel.DataAnnotations.Required]
-        public System.Collections.Generic.ICollection<results3> Results { get; set; } = new System.Collections.ObjectModel.Collection<results3>();
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record PlacesResponse : BaseResponse
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("results")]
-        [System.ComponentModel.DataAnnotations.Required]
-        public System.Collections.Generic.ICollection<ShowPlace> Results { get; set; } = new System.Collections.ObjectModel.Collection<ShowPlace>();
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record ProjectMembersResponse : BaseResponse
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("results")]
-        [System.ComponentModel.DataAnnotations.Required]
-        public System.Collections.Generic.ICollection<ProjectMember> Results { get; set; } = new System.Collections.ObjectModel.Collection<ProjectMember>();
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record ProjectsResponse : BaseResponse
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("results")]
-        [System.ComponentModel.DataAnnotations.Required]
-        public System.Collections.Generic.ICollection<Project> Results { get; set; } = new System.Collections.ObjectModel.Collection<Project>();
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record TaxaAutocompleteResponse : BaseResponse
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("results")]
-        [System.ComponentModel.DataAnnotations.Required]
-        public System.Collections.Generic.ICollection<AutocompleteTaxon> Results { get; set; } = new System.Collections.ObjectModel.Collection<AutocompleteTaxon>();
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record TaxaShowResponse : BaseResponse
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("results")]
-        [System.ComponentModel.DataAnnotations.Required]
-        public System.Collections.Generic.ICollection<ShowTaxon> Results { get; set; } = new System.Collections.ObjectModel.Collection<ShowTaxon>();
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record UTFGridResponse
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("grid")]
-        public System.Collections.Generic.ICollection<string> Grid { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("keys")]
-        public System.Collections.Generic.ICollection<string> Keys { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("data")]
-        public object Data { get; set; }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record IdentificationsResponse : BaseResponse
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("results")]
-        [System.ComponentModel.DataAnnotations.Required]
-        public System.Collections.Generic.ICollection<Identification> Results { get; set; } = new System.Collections.ObjectModel.Collection<Identification>();
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record Error
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("code")]
-        public int? Code { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("message")]
-        public string Message { get; set; }
-
-    }
+    [System.Text.Json.Serialization.JsonPropertyName("user")]
+    public User2 User { get; set; }
 
     /// <summary>
-    /// ID taxon must have this rank or higher
+    /// Set to true to remove the current user icon.
     /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum Lrank
-    {
 
-        [System.Runtime.Serialization.EnumMember(Value = @"kingdom")]
-        Kingdom = 0,
+    [System.Text.Json.Serialization.JsonPropertyName("icon_delete")]
+    public bool? Icon_delete { get; set; } = false;
 
-        [System.Runtime.Serialization.EnumMember(Value = @"phylum")]
-        Phylum = 1,
+}
 
-        [System.Runtime.Serialization.EnumMember(Value = @"subphylum")]
-        Subphylum = 2,
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record PostUserUpdateSession
+{
 
-        [System.Runtime.Serialization.EnumMember(Value = @"superclass")]
-        Superclass = 3,
+    [System.Text.Json.Serialization.JsonPropertyName("preferred_taxon_page_ancestors_shown")]
+    public bool? Preferred_taxon_page_ancestors_shown { get; set; }
 
-        [System.Runtime.Serialization.EnumMember(Value = @"class")]
-        Class = 4,
+    [System.Text.Json.Serialization.JsonPropertyName("preferred_taxon_page_place_id")]
+    public int? Preferred_taxon_page_place_id { get; set; }
 
-        [System.Runtime.Serialization.EnumMember(Value = @"subclass")]
-        Subclass = 5,
+    [System.Text.Json.Serialization.JsonPropertyName("preferred_taxon_page_tab")]
+    public string Preferred_taxon_page_tab { get; set; }
 
-        [System.Runtime.Serialization.EnumMember(Value = @"superorder")]
-        Superorder = 6,
+    [System.Text.Json.Serialization.JsonPropertyName("prefers_skip_coarer_id_modal")]
+    public bool? Prefers_skip_coarer_id_modal { get; set; }
 
-        [System.Runtime.Serialization.EnumMember(Value = @"order")]
-        Order = 7,
+    [System.Text.Json.Serialization.JsonPropertyName("prefers_hide_obs_show_annotations")]
+    public bool? Prefers_hide_obs_show_annotations { get; set; }
 
-        [System.Runtime.Serialization.EnumMember(Value = @"suborder")]
-        Suborder = 8,
+    [System.Text.Json.Serialization.JsonPropertyName("prefers_hide_obs_show_projects")]
+    public bool? Prefers_hide_obs_show_projects { get; set; }
 
-        [System.Runtime.Serialization.EnumMember(Value = @"infraorder")]
-        Infraorder = 9,
+    [System.Text.Json.Serialization.JsonPropertyName("prefers_hide_obs_show_tags")]
+    public bool? Prefers_hide_obs_show_tags { get; set; }
 
-        [System.Runtime.Serialization.EnumMember(Value = @"superfamily")]
-        Superfamily = 10,
+    [System.Text.Json.Serialization.JsonPropertyName("prefers_hide_obs_show_observation_fields")]
+    public bool? Prefers_hide_obs_show_observation_fields { get; set; }
 
-        [System.Runtime.Serialization.EnumMember(Value = @"epifamily")]
-        Epifamily = 11,
+    [System.Text.Json.Serialization.JsonPropertyName("prefers_hide_obs_show_identifiers")]
+    public bool? Prefers_hide_obs_show_identifiers { get; set; }
 
-        [System.Runtime.Serialization.EnumMember(Value = @"family")]
-        Family = 12,
+    [System.Text.Json.Serialization.JsonPropertyName("prefers_hide_obs_show_copyright")]
+    public bool? Prefers_hide_obs_show_copyright { get; set; }
 
-        [System.Runtime.Serialization.EnumMember(Value = @"subfamily")]
-        Subfamily = 13,
+    [System.Text.Json.Serialization.JsonPropertyName("prefers_hide_obs_show_quality_metrics")]
+    public bool? Prefers_hide_obs_show_quality_metrics { get; set; }
 
-        [System.Runtime.Serialization.EnumMember(Value = @"supertribe")]
-        Supertribe = 14,
+}
 
-        [System.Runtime.Serialization.EnumMember(Value = @"tribe")]
-        Tribe = 15,
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record PutFlag
+{
 
-        [System.Runtime.Serialization.EnumMember(Value = @"subtribe")]
-        Subtribe = 16,
+    [System.Text.Json.Serialization.JsonPropertyName("flag")]
+    public Flag2 Flag { get; set; }
 
-        [System.Runtime.Serialization.EnumMember(Value = @"genus")]
-        Genus = 17,
+}
 
-        [System.Runtime.Serialization.EnumMember(Value = @"genushybrid")]
-        Genushybrid = 18,
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record ConservationStatus
+{
 
-        [System.Runtime.Serialization.EnumMember(Value = @"species")]
-        Species = 19,
+    [System.Text.Json.Serialization.JsonPropertyName("place_id")]
+    public int? Place_id { get; set; }
 
-        [System.Runtime.Serialization.EnumMember(Value = @"hybrid")]
-        Hybrid = 20,
+    [System.Text.Json.Serialization.JsonPropertyName("place")]
+    public CorePlace Place { get; set; }
 
-        [System.Runtime.Serialization.EnumMember(Value = @"subspecies")]
-        Subspecies = 21,
+    [System.Text.Json.Serialization.JsonPropertyName("status")]
+    public string Status { get; set; }
 
-        [System.Runtime.Serialization.EnumMember(Value = @"variety")]
-        Variety = 22,
+}
 
-        [System.Runtime.Serialization.EnumMember(Value = @"form")]
-        Form = 23,
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record CorePlace
+{
 
-    }
+    [System.Text.Json.Serialization.JsonPropertyName("id")]
+    public int? Id { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("name")]
+    public string Name { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("display_name")]
+    public string Display_name { get; set; }
+
+}
+
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record CoreTaxon
+{
+
+    [System.Text.Json.Serialization.JsonPropertyName("id")]
+    public int? Id { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("iconic_taxon_id")]
+    public int? Iconic_taxon_id { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("iconic_taxon_name")]
+    public string Iconic_taxon_name { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("is_active")]
+    public bool? Is_active { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("name")]
+    public string Name { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("preferred_common_name")]
+    public string Preferred_common_name { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("rank")]
+    public string Rank { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("rank_level")]
+    public double? Rank_level { get; set; }
+
+}
+
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record DateDetails
+{
+
+    [System.Text.Json.Serialization.JsonPropertyName("date")]
+    [System.Text.Json.Serialization.JsonConverter(typeof(DateFormatConverter))]
+    public System.DateTimeOffset? Date { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("day")]
+    public int? Day { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("hour")]
+    public int? Hour { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("month")]
+    public int? Month { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("week")]
+    public int? Week { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("year")]
+    public int? Year { get; set; }
+
+}
+
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record EstablishmentMeans
+{
+
+    [System.Text.Json.Serialization.JsonPropertyName("establishment_means")]
+    public string Establishment_means { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("place")]
+    public CorePlace Place { get; set; }
+
+}
+
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record Fave
+{
+
+    [System.Text.Json.Serialization.JsonPropertyName("id")]
+    public int? Id { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("votable_id")]
+    public int? Votable_id { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("created_at")]
+    public System.DateTimeOffset? Created_at { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("user")]
+    public User User { get; set; }
+
+}
+
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record FieldValue
+{
+
+    [System.Text.Json.Serialization.JsonPropertyName("name")]
+    public string Name { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("value")]
+    public string Value { get; set; }
+
+}
+
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record Identification
+{
+
+    [System.Text.Json.Serialization.JsonPropertyName("id")]
+    public int? Id { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("observation_id")]
+    public int? Observation_id { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("body")]
+    public string Body { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("created_at")]
+    public System.DateTimeOffset? Created_at { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("updated_at")]
+    public System.DateTimeOffset? Updated_at { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("current")]
+    public bool? Current { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("taxon")]
+    public ObservationTaxon Taxon { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("user")]
+    public User User { get; set; }
+}
+
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record Message
+{
+
+    [System.Text.Json.Serialization.JsonPropertyName("id")]
+    public int? Id { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("subject")]
+    public string Subject { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("body")]
+    public string Body { get; set; }
 
     /// <summary>
-    /// ID taxon must have this rank or lower
-    /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum Hrank
-    {
-
-        [System.Runtime.Serialization.EnumMember(Value = @"kingdom")]
-        Kingdom = 0,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"phylum")]
-        Phylum = 1,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"subphylum")]
-        Subphylum = 2,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"superclass")]
-        Superclass = 3,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"class")]
-        Class = 4,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"subclass")]
-        Subclass = 5,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"superorder")]
-        Superorder = 6,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"order")]
-        Order = 7,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"suborder")]
-        Suborder = 8,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"infraorder")]
-        Infraorder = 9,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"superfamily")]
-        Superfamily = 10,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"epifamily")]
-        Epifamily = 11,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"family")]
-        Family = 12,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"subfamily")]
-        Subfamily = 13,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"supertribe")]
-        Supertribe = 14,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"tribe")]
-        Tribe = 15,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"subtribe")]
-        Subtribe = 16,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"genus")]
-        Genus = 17,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"genushybrid")]
-        Genushybrid = 18,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"species")]
-        Species = 19,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"hybrid")]
-        Hybrid = 20,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"subspecies")]
-        Subspecies = 21,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"variety")]
-        Variety = 22,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"form")]
-        Form = 23,
-
-    }
-
-    /// <summary>
-    /// Observation taxon must have this rank or higher
-    /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum Observation_lrank
-    {
-
-        [System.Runtime.Serialization.EnumMember(Value = @"kingdom")]
-        Kingdom = 0,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"phylum")]
-        Phylum = 1,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"subphylum")]
-        Subphylum = 2,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"superclass")]
-        Superclass = 3,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"class")]
-        Class = 4,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"subclass")]
-        Subclass = 5,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"superorder")]
-        Superorder = 6,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"order")]
-        Order = 7,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"suborder")]
-        Suborder = 8,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"infraorder")]
-        Infraorder = 9,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"superfamily")]
-        Superfamily = 10,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"epifamily")]
-        Epifamily = 11,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"family")]
-        Family = 12,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"subfamily")]
-        Subfamily = 13,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"supertribe")]
-        Supertribe = 14,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"tribe")]
-        Tribe = 15,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"subtribe")]
-        Subtribe = 16,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"genus")]
-        Genus = 17,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"genushybrid")]
-        Genushybrid = 18,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"species")]
-        Species = 19,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"hybrid")]
-        Hybrid = 20,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"subspecies")]
-        Subspecies = 21,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"variety")]
-        Variety = 22,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"form")]
-        Form = 23,
-
-    }
-
-    /// <summary>
-    /// Observation taxon must have this rank or lower
-    /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum Observation_hrank
-    {
-
-        [System.Runtime.Serialization.EnumMember(Value = @"kingdom")]
-        Kingdom = 0,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"phylum")]
-        Phylum = 1,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"subphylum")]
-        Subphylum = 2,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"superclass")]
-        Superclass = 3,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"class")]
-        Class = 4,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"subclass")]
-        Subclass = 5,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"superorder")]
-        Superorder = 6,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"order")]
-        Order = 7,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"suborder")]
-        Suborder = 8,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"infraorder")]
-        Infraorder = 9,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"superfamily")]
-        Superfamily = 10,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"epifamily")]
-        Epifamily = 11,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"family")]
-        Family = 12,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"subfamily")]
-        Subfamily = 13,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"supertribe")]
-        Supertribe = 14,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"tribe")]
-        Tribe = 15,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"subtribe")]
-        Subtribe = 16,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"genus")]
-        Genus = 17,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"genushybrid")]
-        Genushybrid = 18,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"species")]
-        Species = 19,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"hybrid")]
-        Hybrid = 20,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"subspecies")]
-        Subspecies = 21,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"variety")]
-        Variety = 22,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"form")]
-        Form = 23,
-
-    }
-
-    /// <summary>
-    /// Sort order
-    /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum Order
-    {
-
-        [System.Runtime.Serialization.EnumMember(Value = @"desc")]
-        Desc = 0,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"asc")]
-        Asc = 1,
-
-    }
-
-    /// <summary>
-    /// Sort field
-    /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum Order_by
-    {
-
-        [System.Runtime.Serialization.EnumMember(Value = @"created_at")]
-        Created_at = 0,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"id")]
-        Id = 1,
-
-    }
-
-    /// <summary>
-    /// Source of the taxon for counting
-    /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum Taxon_of
-    {
-
-        [System.Runtime.Serialization.EnumMember(Value = @"identification")]
-        Identification = 0,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"observation")]
-        Observation = 1,
-
-    }
-
-    /// <summary>
-    /// Taxon must have this rank or lower
-    /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum Hrank2
-    {
-
-        [System.Runtime.Serialization.EnumMember(Value = @"kingdom")]
-        Kingdom = 0,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"phylum")]
-        Phylum = 1,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"subphylum")]
-        Subphylum = 2,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"superclass")]
-        Superclass = 3,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"class")]
-        Class = 4,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"subclass")]
-        Subclass = 5,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"superorder")]
-        Superorder = 6,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"order")]
-        Order = 7,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"suborder")]
-        Suborder = 8,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"infraorder")]
-        Infraorder = 9,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"superfamily")]
-        Superfamily = 10,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"epifamily")]
-        Epifamily = 11,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"family")]
-        Family = 12,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"subfamily")]
-        Subfamily = 13,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"supertribe")]
-        Supertribe = 14,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"tribe")]
-        Tribe = 15,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"subtribe")]
-        Subtribe = 16,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"genus")]
-        Genus = 17,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"genushybrid")]
-        Genushybrid = 18,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"species")]
-        Species = 19,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"hybrid")]
-        Hybrid = 20,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"subspecies")]
-        Subspecies = 21,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"variety")]
-        Variety = 22,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"form")]
-        Form = 23,
-
-    }
-
-    /// <summary>
-    /// Taxon must have this rank or higher
-    /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum Lrank2
-    {
-
-        [System.Runtime.Serialization.EnumMember(Value = @"kingdom")]
-        Kingdom = 0,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"phylum")]
-        Phylum = 1,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"subphylum")]
-        Subphylum = 2,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"superclass")]
-        Superclass = 3,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"class")]
-        Class = 4,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"subclass")]
-        Subclass = 5,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"superorder")]
-        Superorder = 6,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"order")]
-        Order = 7,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"suborder")]
-        Suborder = 8,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"infraorder")]
-        Infraorder = 9,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"superfamily")]
-        Superfamily = 10,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"epifamily")]
-        Epifamily = 11,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"family")]
-        Family = 12,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"subfamily")]
-        Subfamily = 13,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"supertribe")]
-        Supertribe = 14,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"tribe")]
-        Tribe = 15,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"subtribe")]
-        Subtribe = 16,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"genus")]
-        Genus = 17,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"genushybrid")]
-        Genushybrid = 18,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"species")]
-        Species = 19,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"hybrid")]
-        Hybrid = 20,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"subspecies")]
-        Subspecies = 21,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"variety")]
-        Variety = 22,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"form")]
-        Form = 23,
-
-    }
-
-    /// <summary>
-    /// Identifications must meet these criteria
-    /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum Identifications
-    {
-
-        [System.Runtime.Serialization.EnumMember(Value = @"most_agree")]
-        Most_agree = 0,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"most_disagree")]
-        Most_disagree = 1,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"some_agree")]
-        Some_agree = 2,
-
-    }
-
-    /// <summary>
-    /// Properties to search on, when combined with `q`.
-    /// <br/>Searches across all properties by default
+    /// ID of the user to whom this message belongs. Messages work like email,
+    /// <br/>so the sender gets a copy and the recipient gets a copy of each
+    /// <br/>message. This is always the authenticated user, so there's no real
+    /// <br/>need for a full user object.
     /// <br/>
     /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum Search_on
-    {
 
-        [System.Runtime.Serialization.EnumMember(Value = @"names")]
-        Names = 0,
+    [System.Text.Json.Serialization.JsonPropertyName("user_id")]
+    public int? User_id { get; set; }
 
-        [System.Runtime.Serialization.EnumMember(Value = @"tags")]
-        Tags = 1,
+    [System.Text.Json.Serialization.JsonPropertyName("to_user")]
+    public User To_user { get; set; }
 
-        [System.Runtime.Serialization.EnumMember(Value = @"description")]
-        Description = 2,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"place")]
-        Place = 3,
-
-    }
+    [System.Text.Json.Serialization.JsonPropertyName("from_user")]
+    public User From_user { get; set; }
 
     /// <summary>
-    /// Must have this quality grade
-    /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum Quality_grade
-    {
-
-        [System.Runtime.Serialization.EnumMember(Value = @"casual")]
-        Casual = 0,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"needs_id")]
-        Needs_id = 1,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"research")]
-        Research = 2,
-
-    }
-
-    /// <summary>
-    /// Whether to view messages the user has received (default) or messages the user has sent
-    /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum Box
-    {
-
-        [System.Runtime.Serialization.EnumMember(Value = @"inbox")]
-        Inbox = 0,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"sent")]
-        Sent = 1,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"any")]
-        Any = 2,
-
-    }
-
-    /// <summary>
-    /// Data quality category
-    /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum Metric
-    {
-
-        [System.Runtime.Serialization.EnumMember(Value = @"date")]
-        Date = 0,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"location")]
-        Location = 1,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"wild")]
-        Wild = 2,
-
-    }
-
-    /// <summary>
-    /// Sort field
-    /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum Order_by2
-    {
-
-        [System.Runtime.Serialization.EnumMember(Value = @"observed_on")]
-        Observed_on = 0,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"species_guess")]
-        Species_guess = 1,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"votes")]
-        Votes = 2,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"id")]
-        Id = 3,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"created_at")]
-        Created_at = 4,
-
-    }
-
-    /// <summary>
-    /// Histogram basis: when the observation was created or observed
+    /// Identifier for the message thread, generally the ID of the sender's
+    /// <br/>copy of the first message
     /// <br/>
     /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum Date_field
-    {
 
-        [System.Runtime.Serialization.EnumMember(Value = @"created")]
-        Created = 0,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"observed")]
-        Observed = 1,
-
-    }
+    [System.Text.Json.Serialization.JsonPropertyName("thread_id")]
+    public int? Thread_id { get; set; }
 
     /// <summary>
-    /// Time interval for histogram, with groups starting on or contained within
-    /// <br/>the group value. The year, month, week, day, and hour options will set
-    /// <br/>default values for `d1` or `created_d1` depending on the value of
-    /// <br/>`date_field`, to limit the number of groups returned. You can override
-    /// <br/>those values if you want data from a longer or shorter time span. The
-    /// <br/>`hour` interval only works with `date_field=created`, and this you
-    /// <br/>should filter dates with `created_d[1,2]`
+    /// Number of messages in this thread. Only included when threads=true
     /// <br/>
     /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum Interval
-    {
 
-        [System.Runtime.Serialization.EnumMember(Value = @"year")]
-        Year = 0,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"month")]
-        Month = 1,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"week")]
-        Week = 2,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"day")]
-        Day = 3,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"hour")]
-        Hour = 4,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"month_of_year")]
-        Month_of_year = 5,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"week_of_year")]
-        Week_of_year = 6,
-
-    }
+    [System.Text.Json.Serialization.JsonPropertyName("thread_messages_count")]
+    public int? Thread_messages_count { get; set; }
 
     /// <summary>
-    /// Only show updates on observations owned by the currently authenticated
-    /// <br/>user or on observations the authenticated user is following but does not
-    /// <br/>own.
+    /// Array of flags on messages in this thread. Only included when
+    /// <br/>threads=true
     /// <br/>
     /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum Observations_by
-    {
 
-        [System.Runtime.Serialization.EnumMember(Value = @"owner")]
-        Owner = 0,
+    [System.Text.Json.Serialization.JsonPropertyName("thread_flags")]
+    public System.Collections.Generic.ICollection<object> Thread_flags { get; set; }
 
-        [System.Runtime.Serialization.EnumMember(Value = @"following")]
-        Following = 1,
+}
 
-    }
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record NonOwnerIdentification
+{
 
+    [System.Text.Json.Serialization.JsonPropertyName("id")]
+    public int? Id { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("body")]
+    public string Body { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("created_at")]
+    public System.DateTimeOffset? Created_at { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("created_at_details")]
+    public DateDetails Created_at_details { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("user")]
+    public User User { get; set; }
+
+}
+
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record iNaturalistVerbatimObservation : IEntity<int>
+{
     /// <summary>
-    /// Sort field
+    /// Unique id
     /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum Order_by3
-    {
+    [System.Text.Json.Serialization.JsonPropertyName("id")]
+    public int Id { get; set; }
+    
+    public long ObservationId { get; set; }
 
-        [System.Runtime.Serialization.EnumMember(Value = @"area")]
-        Area = 0,
+    [System.Text.Json.Serialization.JsonPropertyName("annotations")]
+    public System.Collections.Generic.ICollection<Annotation> Annotations { get; set; }
 
-    }
+    [System.Text.Json.Serialization.JsonPropertyName("identifications")]
+    public System.Collections.Generic.ICollection<Identification> Identifications { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("positional_accuracy")]
+    public int? PositionalAccuracy { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("public_positional_accuracy")]
+    public int? PublicPositionalAccuracy { get; set; }        
+     
+    [System.Text.Json.Serialization.JsonPropertyName("cached_votes_total")]
+    public int? Cached_votes_total { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("captive")]
+    public bool? Captive { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("comments")]
+    public System.Collections.Generic.ICollection<Comment> Comments { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("comments_count")]
+    public int? Comments_count { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("created_at")]
+    public System.DateTimeOffset? Created_at { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("created_at_details")]
+    public DateDetails Created_at_details { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("created_time_zone")]
+    public string Created_time_zone { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("description")]
+    public string Description { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("faves_count")]
+    public int? Faves_count { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("geojson")]
+    public PointGeoJson Geojson { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("geoprivacy")]
+    public string Geoprivacy { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("taxon_geoprivacy")]
+    public string Taxon_geoprivacy { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("id_please")]
+    public bool? Id_please { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("identifications_count")]
+    public int? Identifications_count { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("identifications_most_agree")]
+    public bool? Identifications_most_agree { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("identifications_most_disagree")]
+    public bool? Identifications_most_disagree { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("identifications_some_agree")]
+    public bool? Identifications_some_agree { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("license_code")]
+    public string License_code { get; set; }
 
     /// <summary>
-    /// Must be marked featured for the relevant site
+    /// in the format "lat,lng"
     /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum Featured
-    {
 
-        [System.Runtime.Serialization.EnumMember(Value = @"True")]
-        True = 0,
+    [System.Text.Json.Serialization.JsonPropertyName("location")]
+    public string Location { get; set; }
 
-    }
+    [System.Text.Json.Serialization.JsonPropertyName("mappable")]
+    public bool? Mappable { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("non_owner_ids")]
+    public System.Collections.Generic.ICollection<NonOwnerIdentification> Non_owner_ids { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("num_identification_agreements")]
+    public int? Num_identification_agreements { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("num_identification_disagreements")]
+    public int? Num_identification_disagreements { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("obscured")]
+    public bool? Obscured { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("observed_on")]
+    public System.DateTimeOffset? Observed_on { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("observed_on_details")]
+    public DateDetails Observed_on_details { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("observed_on_string")]
+    public string Observed_on_string { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("observed_time_zone")]
+    public string Observed_time_zone { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("ofvs")]
+    public System.Collections.Generic.ICollection<FieldValue> Ofvs { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("out_of_range")]
+    public bool? Out_of_range { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("photos")]
+    public System.Collections.Generic.ICollection<Photo> Photos { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("place_guess")]
+    public string Place_guess { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("place_ids")]
+    public System.Collections.Generic.ICollection<int> Place_ids { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("project_ids")]
+    public System.Collections.Generic.ICollection<int> Project_ids { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("project_ids_with_curator_id")]
+    public System.Collections.Generic.ICollection<int> Project_ids_with_curator_id { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("project_ids_without_curator_id")]
+    public System.Collections.Generic.ICollection<int> Project_ids_without_curator_id { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("quality_grade")]
+    public string Quality_grade { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("reviewed_by")]
+    public System.Collections.Generic.ICollection<int> Reviewed_by { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("site_id")]
+    public int? Site_id { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("sounds")]
+    public System.Collections.Generic.ICollection<Sound> Sounds { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("species_guess")]
+    public string Species_guess { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("tags")]
+    public System.Collections.Generic.ICollection<string> Tags { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("taxon")]
+    public ObservationTaxon Taxon { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("time_observed_at")]
+    public System.DateTimeOffset? Time_observed_at { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("time_zone_offset")]
+    public string Time_zone_offset { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("updated_at")]
+    public System.DateTimeOffset? Updated_at { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("uri")]
+    public string Uri { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("user")]
+    public User User { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("verifiable")]
+    public bool? Verifiable { get; set; }
+
+}
+
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record ObservationTaxon : CoreTaxon
+{
+
+    [System.Text.Json.Serialization.JsonPropertyName("ancestor_ids")]
+    public System.Collections.Generic.ICollection<int> Ancestor_ids { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("ancestry")]
+    public string Ancestry { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("conservation_status")]
+    public RawConservationStatus Conservation_status { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("endemic")]
+    public bool? Endemic { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("establishment_means")]
+    public EstablishmentMeans Establishment_means { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("introduced")]
+    public bool? Introduced { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("native")]
+    public bool? Native { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("threatened")]
+    public bool? Threatened { get; set; }
+
+}
+
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record Photo
+{
+
+    [System.Text.Json.Serialization.JsonPropertyName("id")]
+    public int? Id { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("attribution")]
+    public string Attribution { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("license_code")]
+    public string License_code { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("url")]
+    public string Url { get; set; }
+
+}
+
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record PointGeoJson
+{
+
+    [System.Text.Json.Serialization.JsonPropertyName("type")]
+    public string Type { get; set; }
 
     /// <summary>
-    /// Must be marked noteworthy for the relevant site
+    /// an array of [long, lat]
     /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum Noteworthy
-    {
 
-        [System.Runtime.Serialization.EnumMember(Value = @"True")]
-        True = 0,
+    [System.Text.Json.Serialization.JsonPropertyName("coordinates")]
+    public System.Collections.Generic.ICollection<double> Coordinates { get; set; }
 
-    }
+}
 
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record PolygonGeoJson
+{
+
+    [System.Text.Json.Serialization.JsonPropertyName("type")]
+    public string Type { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("coordinates")]
+    public System.Collections.Generic.ICollection<System.Collections.Generic.ICollection<System.Collections.Generic.ICollection<double>>> Coordinates { get; set; }
+
+}
+
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record Project
+{
+
+    [System.Text.Json.Serialization.JsonPropertyName("id")]
+    public int? Id { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("title")]
+    public string Title { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("description")]
+    public string Description { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("slug")]
+    public string Slug { get; set; }
+
+}
+
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record ProjectMember
+{
+
+    [System.Text.Json.Serialization.JsonPropertyName("id")]
+    public int? Id { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("project_id")]
+    public int? Project_id { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("created_at")]
+    public System.DateTimeOffset? Created_at { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("updated_at")]
+    public System.DateTimeOffset? Updated_at { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("role")]
+    [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+    public ProjectMemberRole? Role { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("observations_count")]
+    public int? Observations_count { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("taxa_count")]
+    public int? Taxa_count { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("user")]
+    public User User { get; set; }
+
+}
+
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record RawConservationStatus
+{
     /// <summary>
-    /// Return more information about project rules, for example return a full
-    /// <br/>taxon object instead of simply an ID
+    /// Identifier for the iNat source record associated with this status,
+    /// <br/>retrievable via https://www.inaturalist.org/sources/:id.json
+    /// <br/>(this endpoint is not a part of our public API and is thus subject to
+    /// <br/>change or removal)
     /// <br/>
     /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum Rule_details
-    {
 
-        [System.Runtime.Serialization.EnumMember(Value = @"True")]
-        True = 0,
-
-    }
+    [System.Text.Json.Serialization.JsonPropertyName("source_id")]
+    public int? Source_id { get; set; }
 
     /// <summary>
-    /// Sort field
-    /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum Order_by4
-    {
-
-        [System.Runtime.Serialization.EnumMember(Value = @"recent_posts")]
-        Recent_posts = 0,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"created")]
-        Created = 1,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"updated")]
-        Updated = 2,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"distance")]
-        Distance = 3,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"featured")]
-        Featured = 4,
-
-    }
-
-    /// <summary>
-    /// Membership role
-    /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum Role
-    {
-
-        [System.Runtime.Serialization.EnumMember(Value = @"curator")]
-        Curator = 0,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"manager")]
-        Manager = 1,
-
-    }
-
-    /// <summary>
-    /// Sort field
-    /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum Order_by5
-    {
-
-        [System.Runtime.Serialization.EnumMember(Value = @"id")]
-        Id = 0,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"created_at")]
-        Created_at = 1,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"observations_count")]
-        Observations_count = 2,
-
-    }
-
-    /// <summary>
-    /// Specify the type of project to return
+    /// Organization that declared this status
     /// <br/>
     /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum Project_type
+
+    [System.Text.Json.Serialization.JsonPropertyName("authority")]
+    public string Authority { get; set; }
+
+    /// <summary>
+    /// Body of the status, often coded, particularly when the status comes
+    /// <br/>from the IUCN or NatureServe. Consult the authority and/or the
+    /// <br/>status URL for details about the meanings of codes.
+    /// <br/>
+    /// </summary>
+
+    [System.Text.Json.Serialization.JsonPropertyName("status")]
+    public string Status { get; set; }
+
+    /// <summary>
+    /// Human-readable name of the status if it was coded.
+    /// <br/>
+    /// </summary>
+
+    [System.Text.Json.Serialization.JsonPropertyName("status_name")]
+    public string Status_name { get; set; }
+
+    /// <summary>
+    /// Coded value representing the equivalent IUCN status. Mappings:
+    /// <br/>NOT_EVALUATED = 0, DATA_DEFICIENT = 5, LEAST_CONCERN = 10,
+    /// <br/>NEAR_THREATENED = 20, VULNERABLE = 30, ENDANGERED = 40,
+    /// <br/>CRITICALLY_ENDANGERED = 50, EXTINCT_IN_THE_WILD = 60, EXTINCT = 70
+    /// <br/>
+    /// </summary>
+
+    [System.Text.Json.Serialization.JsonPropertyName("iucn")]
+    public int? Iucn { get; set; }
+
+    /// <summary>
+    /// Default geoprivacy for observations of this taxon in the status's place.
+    /// <br/>
+    /// </summary>
+
+    [System.Text.Json.Serialization.JsonPropertyName("geoprivacy")]
+    public string Geoprivacy { get; set; }
+
+}
+
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record TaxonConservationStatus : RawConservationStatus
+{
+
+    [System.Text.Json.Serialization.JsonPropertyName("place")]
+    public CorePlace Place { get; set; }
+
+}
+
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record ShowObservation : iNaturalistVerbatimObservation
+{
+
+    [System.Text.Json.Serialization.JsonPropertyName("identifications")]
+    public System.Collections.Generic.ICollection<Identification> Identifications { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("faves")]
+    public System.Collections.Generic.ICollection<Fave> Faves { get; set; }
+
+}
+
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record ShowPlace : CorePlace
+{
+
+    [System.Text.Json.Serialization.JsonPropertyName("admin_level")]
+    public int? Admin_level { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("ancestor_place_ids")]
+    public System.Collections.Generic.ICollection<int> Ancestor_place_ids { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("bbox_area")]
+    public double? Bbox_area { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("geometry_geojson")]
+    public PolygonGeoJson Geometry_geojson { get; set; }
+
+    /// <summary>
+    /// in the format "lat,lng"
+    /// </summary>
+
+    [System.Text.Json.Serialization.JsonPropertyName("location")]
+    public string Location { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("name")]
+    public string Name { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("place_type")]
+    public int? Place_type { get; set; }
+
+}
+
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record ShowTaxon : CoreTaxon
+{
+
+    [System.Text.Json.Serialization.JsonPropertyName("ancestor_ids")]
+    public System.Collections.Generic.ICollection<int> Ancestor_ids { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("colors")]
+    public System.Collections.Generic.ICollection<Color> Colors { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("conservation_status")]
+    public ConservationStatus Conservation_status { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("conservation_statuses")]
+    public System.Collections.Generic.ICollection<TaxonConservationStatus> Conservation_statuses { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("default_photo")]
+    public TaxonPhoto Default_photo { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("establishment_means")]
+    public EstablishmentMeans Establishment_means { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("observations_count")]
+    public int? Observations_count { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("preferred_establishment_means")]
+    public string Preferred_establishment_means { get; set; }
+
+}
+
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record Sound
+{
+
+    [System.Text.Json.Serialization.JsonPropertyName("id")]
+    public int? Id { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("attribution")]
+    public string Attribution { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("license_code")]
+    public string License_code { get; set; }
+
+}
+
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record TaxonPhoto : Photo
+{
+
+    [System.Text.Json.Serialization.JsonPropertyName("medium_url")]
+    public string Medium_url { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("square_url")]
+    public string Square_url { get; set; }
+
+}
+
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record User
+{
+
+    [System.Text.Json.Serialization.JsonPropertyName("id")]
+    public int? Id { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("icon_content_type")]
+    public string Icon_content_type { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("suspended")]
+    public bool? Suspended { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("icon_file_name")]
+    public string Icon_file_name { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("icon")]
+    public string Icon { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("icon_url")]
+    public string Icon_url { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("login")]
+    public string Login { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("name")]
+    public string Name { get; set; }
+}
+
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record MessagesResponse : BaseResponse
+{
+
+    [System.Text.Json.Serialization.JsonPropertyName("results")]
+    [System.ComponentModel.DataAnnotations.Required]
+    public System.Collections.Generic.ICollection<Message> Results { get; set; } = new System.Collections.ObjectModel.Collection<Message>();
+
+}
+
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record NearbyPlacesResponse : BaseResponse
+{
+
+    [System.Text.Json.Serialization.JsonPropertyName("results")]
+    [System.ComponentModel.DataAnnotations.Required]
+    public Results Results { get; set; } = new Results();
+
+}
+
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record ObservationsResponse : BaseResponse
+{
+
+    [System.Text.Json.Serialization.JsonPropertyName("results")]
+    [System.ComponentModel.DataAnnotations.Required]
+    public System.Collections.Generic.ICollection<iNaturalistVerbatimObservation> Results { get; set; } = new System.Collections.ObjectModel.Collection<iNaturalistVerbatimObservation>();
+
+}
+
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record ObservationsShowResponse : BaseResponse
+{
+
+    [System.Text.Json.Serialization.JsonPropertyName("results")]
+    [System.ComponentModel.DataAnnotations.Required]
+    public System.Collections.Generic.ICollection<ShowObservation> Results { get; set; } = new System.Collections.ObjectModel.Collection<ShowObservation>();
+
+}
+
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record UserCountsResponse : BaseResponse
+{
+
+    [System.Text.Json.Serialization.JsonPropertyName("results")]
+    [System.ComponentModel.DataAnnotations.Required]
+    public System.Collections.Generic.ICollection<results> Results { get; set; } = new System.Collections.ObjectModel.Collection<results>();
+
+}
+
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record ObservationsObserversResponse : BaseResponse
+{
+
+    [System.Text.Json.Serialization.JsonPropertyName("results")]
+    [System.ComponentModel.DataAnnotations.Required]
+    public System.Collections.Generic.ICollection<results2> Results { get; set; } = new System.Collections.ObjectModel.Collection<results2>();
+
+}
+
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record SpeciesCountsResponse : BaseResponse
+{
+
+    [System.Text.Json.Serialization.JsonPropertyName("results")]
+    [System.ComponentModel.DataAnnotations.Required]
+    public System.Collections.Generic.ICollection<results3> Results { get; set; } = new System.Collections.ObjectModel.Collection<results3>();
+
+}
+
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record PlacesResponse : BaseResponse
+{
+
+    [System.Text.Json.Serialization.JsonPropertyName("results")]
+    [System.ComponentModel.DataAnnotations.Required]
+    public System.Collections.Generic.ICollection<ShowPlace> Results { get; set; } = new System.Collections.ObjectModel.Collection<ShowPlace>();
+
+}
+
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record ProjectMembersResponse : BaseResponse
+{
+
+    [System.Text.Json.Serialization.JsonPropertyName("results")]
+    [System.ComponentModel.DataAnnotations.Required]
+    public System.Collections.Generic.ICollection<ProjectMember> Results { get; set; } = new System.Collections.ObjectModel.Collection<ProjectMember>();
+
+}
+
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record ProjectsResponse : BaseResponse
+{
+
+    [System.Text.Json.Serialization.JsonPropertyName("results")]
+    [System.ComponentModel.DataAnnotations.Required]
+    public System.Collections.Generic.ICollection<Project> Results { get; set; } = new System.Collections.ObjectModel.Collection<Project>();
+
+}
+
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record TaxaAutocompleteResponse : BaseResponse
+{
+
+    [System.Text.Json.Serialization.JsonPropertyName("results")]
+    [System.ComponentModel.DataAnnotations.Required]
+    public System.Collections.Generic.ICollection<AutocompleteTaxon> Results { get; set; } = new System.Collections.ObjectModel.Collection<AutocompleteTaxon>();
+
+}
+
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record TaxaShowResponse : BaseResponse
+{
+
+    [System.Text.Json.Serialization.JsonPropertyName("results")]
+    [System.ComponentModel.DataAnnotations.Required]
+    public System.Collections.Generic.ICollection<ShowTaxon> Results { get; set; } = new System.Collections.ObjectModel.Collection<ShowTaxon>();
+
+}
+
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record UTFGridResponse
+{
+
+    [System.Text.Json.Serialization.JsonPropertyName("grid")]
+    public System.Collections.Generic.ICollection<string> Grid { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("keys")]
+    public System.Collections.Generic.ICollection<string> Keys { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("data")]
+    public object Data { get; set; }
+
+}
+
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record IdentificationsResponse : BaseResponse
+{
+
+    [System.Text.Json.Serialization.JsonPropertyName("results")]
+    [System.ComponentModel.DataAnnotations.Required]
+    public System.Collections.Generic.ICollection<Identification> Results { get; set; } = new System.Collections.ObjectModel.Collection<Identification>();
+
+}
+
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record Error
+{
+
+    [System.Text.Json.Serialization.JsonPropertyName("code")]
+    public int? Code { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("message")]
+    public string Message { get; set; }
+
+}
+
+/// <summary>
+/// ID taxon must have this rank or higher
+/// </summary>
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public enum Lrank
+{
+
+    [System.Runtime.Serialization.EnumMember(Value = @"kingdom")]
+    Kingdom = 0,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"phylum")]
+    Phylum = 1,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"subphylum")]
+    Subphylum = 2,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"superclass")]
+    Superclass = 3,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"class")]
+    Class = 4,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"subclass")]
+    Subclass = 5,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"superorder")]
+    Superorder = 6,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"order")]
+    Order = 7,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"suborder")]
+    Suborder = 8,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"infraorder")]
+    Infraorder = 9,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"superfamily")]
+    Superfamily = 10,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"epifamily")]
+    Epifamily = 11,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"family")]
+    Family = 12,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"subfamily")]
+    Subfamily = 13,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"supertribe")]
+    Supertribe = 14,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"tribe")]
+    Tribe = 15,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"subtribe")]
+    Subtribe = 16,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"genus")]
+    Genus = 17,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"genushybrid")]
+    Genushybrid = 18,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"species")]
+    Species = 19,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"hybrid")]
+    Hybrid = 20,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"subspecies")]
+    Subspecies = 21,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"variety")]
+    Variety = 22,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"form")]
+    Form = 23,
+
+}
+
+/// <summary>
+/// ID taxon must have this rank or lower
+/// </summary>
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public enum Hrank
+{
+
+    [System.Runtime.Serialization.EnumMember(Value = @"kingdom")]
+    Kingdom = 0,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"phylum")]
+    Phylum = 1,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"subphylum")]
+    Subphylum = 2,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"superclass")]
+    Superclass = 3,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"class")]
+    Class = 4,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"subclass")]
+    Subclass = 5,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"superorder")]
+    Superorder = 6,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"order")]
+    Order = 7,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"suborder")]
+    Suborder = 8,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"infraorder")]
+    Infraorder = 9,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"superfamily")]
+    Superfamily = 10,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"epifamily")]
+    Epifamily = 11,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"family")]
+    Family = 12,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"subfamily")]
+    Subfamily = 13,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"supertribe")]
+    Supertribe = 14,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"tribe")]
+    Tribe = 15,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"subtribe")]
+    Subtribe = 16,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"genus")]
+    Genus = 17,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"genushybrid")]
+    Genushybrid = 18,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"species")]
+    Species = 19,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"hybrid")]
+    Hybrid = 20,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"subspecies")]
+    Subspecies = 21,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"variety")]
+    Variety = 22,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"form")]
+    Form = 23,
+
+}
+
+/// <summary>
+/// Observation taxon must have this rank or higher
+/// </summary>
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public enum Observation_lrank
+{
+
+    [System.Runtime.Serialization.EnumMember(Value = @"kingdom")]
+    Kingdom = 0,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"phylum")]
+    Phylum = 1,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"subphylum")]
+    Subphylum = 2,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"superclass")]
+    Superclass = 3,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"class")]
+    Class = 4,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"subclass")]
+    Subclass = 5,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"superorder")]
+    Superorder = 6,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"order")]
+    Order = 7,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"suborder")]
+    Suborder = 8,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"infraorder")]
+    Infraorder = 9,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"superfamily")]
+    Superfamily = 10,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"epifamily")]
+    Epifamily = 11,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"family")]
+    Family = 12,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"subfamily")]
+    Subfamily = 13,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"supertribe")]
+    Supertribe = 14,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"tribe")]
+    Tribe = 15,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"subtribe")]
+    Subtribe = 16,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"genus")]
+    Genus = 17,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"genushybrid")]
+    Genushybrid = 18,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"species")]
+    Species = 19,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"hybrid")]
+    Hybrid = 20,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"subspecies")]
+    Subspecies = 21,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"variety")]
+    Variety = 22,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"form")]
+    Form = 23,
+
+}
+
+/// <summary>
+/// Observation taxon must have this rank or lower
+/// </summary>
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public enum Observation_hrank
+{
+
+    [System.Runtime.Serialization.EnumMember(Value = @"kingdom")]
+    Kingdom = 0,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"phylum")]
+    Phylum = 1,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"subphylum")]
+    Subphylum = 2,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"superclass")]
+    Superclass = 3,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"class")]
+    Class = 4,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"subclass")]
+    Subclass = 5,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"superorder")]
+    Superorder = 6,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"order")]
+    Order = 7,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"suborder")]
+    Suborder = 8,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"infraorder")]
+    Infraorder = 9,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"superfamily")]
+    Superfamily = 10,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"epifamily")]
+    Epifamily = 11,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"family")]
+    Family = 12,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"subfamily")]
+    Subfamily = 13,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"supertribe")]
+    Supertribe = 14,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"tribe")]
+    Tribe = 15,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"subtribe")]
+    Subtribe = 16,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"genus")]
+    Genus = 17,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"genushybrid")]
+    Genushybrid = 18,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"species")]
+    Species = 19,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"hybrid")]
+    Hybrid = 20,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"subspecies")]
+    Subspecies = 21,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"variety")]
+    Variety = 22,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"form")]
+    Form = 23,
+
+}
+
+/// <summary>
+/// Sort order
+/// </summary>
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public enum Order
+{
+
+    [System.Runtime.Serialization.EnumMember(Value = @"desc")]
+    Desc = 0,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"asc")]
+    Asc = 1,
+
+}
+
+/// <summary>
+/// Sort field
+/// </summary>
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public enum Order_by
+{
+
+    [System.Runtime.Serialization.EnumMember(Value = @"created_at")]
+    Created_at = 0,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"id")]
+    Id = 1,
+
+}
+
+/// <summary>
+/// Source of the taxon for counting
+/// </summary>
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public enum Taxon_of
+{
+
+    [System.Runtime.Serialization.EnumMember(Value = @"identification")]
+    Identification = 0,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"observation")]
+    Observation = 1,
+
+}
+
+/// <summary>
+/// Taxon must have this rank or lower
+/// </summary>
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public enum Hrank2
+{
+
+    [System.Runtime.Serialization.EnumMember(Value = @"kingdom")]
+    Kingdom = 0,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"phylum")]
+    Phylum = 1,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"subphylum")]
+    Subphylum = 2,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"superclass")]
+    Superclass = 3,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"class")]
+    Class = 4,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"subclass")]
+    Subclass = 5,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"superorder")]
+    Superorder = 6,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"order")]
+    Order = 7,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"suborder")]
+    Suborder = 8,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"infraorder")]
+    Infraorder = 9,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"superfamily")]
+    Superfamily = 10,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"epifamily")]
+    Epifamily = 11,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"family")]
+    Family = 12,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"subfamily")]
+    Subfamily = 13,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"supertribe")]
+    Supertribe = 14,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"tribe")]
+    Tribe = 15,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"subtribe")]
+    Subtribe = 16,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"genus")]
+    Genus = 17,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"genushybrid")]
+    Genushybrid = 18,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"species")]
+    Species = 19,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"hybrid")]
+    Hybrid = 20,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"subspecies")]
+    Subspecies = 21,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"variety")]
+    Variety = 22,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"form")]
+    Form = 23,
+
+}
+
+/// <summary>
+/// Taxon must have this rank or higher
+/// </summary>
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public enum Lrank2
+{
+
+    [System.Runtime.Serialization.EnumMember(Value = @"kingdom")]
+    Kingdom = 0,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"phylum")]
+    Phylum = 1,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"subphylum")]
+    Subphylum = 2,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"superclass")]
+    Superclass = 3,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"class")]
+    Class = 4,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"subclass")]
+    Subclass = 5,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"superorder")]
+    Superorder = 6,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"order")]
+    Order = 7,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"suborder")]
+    Suborder = 8,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"infraorder")]
+    Infraorder = 9,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"superfamily")]
+    Superfamily = 10,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"epifamily")]
+    Epifamily = 11,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"family")]
+    Family = 12,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"subfamily")]
+    Subfamily = 13,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"supertribe")]
+    Supertribe = 14,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"tribe")]
+    Tribe = 15,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"subtribe")]
+    Subtribe = 16,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"genus")]
+    Genus = 17,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"genushybrid")]
+    Genushybrid = 18,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"species")]
+    Species = 19,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"hybrid")]
+    Hybrid = 20,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"subspecies")]
+    Subspecies = 21,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"variety")]
+    Variety = 22,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"form")]
+    Form = 23,
+
+}
+
+/// <summary>
+/// Identifications must meet these criteria
+/// </summary>
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public enum Identifications
+{
+
+    [System.Runtime.Serialization.EnumMember(Value = @"most_agree")]
+    Most_agree = 0,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"most_disagree")]
+    Most_disagree = 1,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"some_agree")]
+    Some_agree = 2,
+
+}
+
+/// <summary>
+/// Properties to search on, when combined with `q`.
+/// <br/>Searches across all properties by default
+/// <br/>
+/// </summary>
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public enum Search_on
+{
+
+    [System.Runtime.Serialization.EnumMember(Value = @"names")]
+    Names = 0,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"tags")]
+    Tags = 1,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"description")]
+    Description = 2,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"place")]
+    Place = 3,
+
+}
+
+/// <summary>
+/// Must have this quality grade
+/// </summary>
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public enum Quality_grade
+{
+
+    [System.Runtime.Serialization.EnumMember(Value = @"casual")]
+    Casual = 0,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"needs_id")]
+    Needs_id = 1,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"research")]
+    Research = 2,
+
+}
+
+/// <summary>
+/// Whether to view messages the user has received (default) or messages the user has sent
+/// </summary>
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public enum Box
+{
+
+    [System.Runtime.Serialization.EnumMember(Value = @"inbox")]
+    Inbox = 0,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"sent")]
+    Sent = 1,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"any")]
+    Any = 2,
+
+}
+
+/// <summary>
+/// Data quality category
+/// </summary>
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public enum Metric
+{
+
+    [System.Runtime.Serialization.EnumMember(Value = @"date")]
+    Date = 0,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"location")]
+    Location = 1,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"wild")]
+    Wild = 2,
+
+}
+
+/// <summary>
+/// Sort field
+/// </summary>
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public enum Order_by2
+{
+
+    [System.Runtime.Serialization.EnumMember(Value = @"observed_on")]
+    Observed_on = 0,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"species_guess")]
+    Species_guess = 1,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"votes")]
+    Votes = 2,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"id")]
+    Id = 3,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"created_at")]
+    Created_at = 4,
+
+}
+
+/// <summary>
+/// Histogram basis: when the observation was created or observed
+/// <br/>
+/// </summary>
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public enum Date_field
+{
+
+    [System.Runtime.Serialization.EnumMember(Value = @"created")]
+    Created = 0,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"observed")]
+    Observed = 1,
+
+}
+
+/// <summary>
+/// Time interval for histogram, with groups starting on or contained within
+/// <br/>the group value. The year, month, week, day, and hour options will set
+/// <br/>default values for `d1` or `created_d1` depending on the value of
+/// <br/>`date_field`, to limit the number of groups returned. You can override
+/// <br/>those values if you want data from a longer or shorter time span. The
+/// <br/>`hour` interval only works with `date_field=created`, and this you
+/// <br/>should filter dates with `created_d[1,2]`
+/// <br/>
+/// </summary>
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public enum Interval
+{
+
+    [System.Runtime.Serialization.EnumMember(Value = @"year")]
+    Year = 0,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"month")]
+    Month = 1,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"week")]
+    Week = 2,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"day")]
+    Day = 3,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"hour")]
+    Hour = 4,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"month_of_year")]
+    Month_of_year = 5,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"week_of_year")]
+    Week_of_year = 6,
+
+}
+
+/// <summary>
+/// Only show updates on observations owned by the currently authenticated
+/// <br/>user or on observations the authenticated user is following but does not
+/// <br/>own.
+/// <br/>
+/// </summary>
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public enum Observations_by
+{
+
+    [System.Runtime.Serialization.EnumMember(Value = @"owner")]
+    Owner = 0,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"following")]
+    Following = 1,
+
+}
+
+/// <summary>
+/// Sort field
+/// </summary>
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public enum Order_by3
+{
+
+    [System.Runtime.Serialization.EnumMember(Value = @"area")]
+    Area = 0,
+
+}
+
+/// <summary>
+/// Must be marked featured for the relevant site
+/// </summary>
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public enum Featured
+{
+
+    [System.Runtime.Serialization.EnumMember(Value = @"True")]
+    True = 0,
+
+}
+
+/// <summary>
+/// Must be marked noteworthy for the relevant site
+/// </summary>
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public enum Noteworthy
+{
+
+    [System.Runtime.Serialization.EnumMember(Value = @"True")]
+    True = 0,
+
+}
+
+/// <summary>
+/// Return more information about project rules, for example return a full
+/// <br/>taxon object instead of simply an ID
+/// <br/>
+/// </summary>
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public enum Rule_details
+{
+
+    [System.Runtime.Serialization.EnumMember(Value = @"True")]
+    True = 0,
+
+}
+
+/// <summary>
+/// Sort field
+/// </summary>
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public enum Order_by4
+{
+
+    [System.Runtime.Serialization.EnumMember(Value = @"recent_posts")]
+    Recent_posts = 0,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"created")]
+    Created = 1,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"updated")]
+    Updated = 2,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"distance")]
+    Distance = 3,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"featured")]
+    Featured = 4,
+
+}
+
+/// <summary>
+/// Membership role
+/// </summary>
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public enum Role
+{
+
+    [System.Runtime.Serialization.EnumMember(Value = @"curator")]
+    Curator = 0,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"manager")]
+    Manager = 1,
+
+}
+
+/// <summary>
+/// Sort field
+/// </summary>
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public enum Order_by5
+{
+
+    [System.Runtime.Serialization.EnumMember(Value = @"id")]
+    Id = 0,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"created_at")]
+    Created_at = 1,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"observations_count")]
+    Observations_count = 2,
+
+}
+
+/// <summary>
+/// Specify the type of project to return
+/// <br/>
+/// </summary>
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public enum Project_type
+{
+
+    [System.Runtime.Serialization.EnumMember(Value = @"traditional")]
+    Traditional = 0,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"collection")]
+    Collection = 1,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"umbrella")]
+    Umbrella = 2,
+
+}
+
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record Response
+{
+    /// <summary>
+    /// User to reply to
+    /// </summary>
+
+    [System.Text.Json.Serialization.JsonPropertyName("reply_to_user")]
+    public User Reply_to_user { get; set; }
+
+    /// <summary>
+    /// Identifier for this thread
+    /// </summary>
+
+    [System.Text.Json.Serialization.JsonPropertyName("thread_id")]
+    public int? Thread_id { get; set; }
+
+    /// <summary>
+    /// Identifier for the message that should be flagged if the user
+    /// <br/>chooses to flag this thread
+    /// <br/>
+    /// </summary>
+
+    [System.Text.Json.Serialization.JsonPropertyName("flaggable_message_id")]
+    public int? Flaggable_message_id { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("results")]
+    public System.Collections.Generic.ICollection<Message> Results { get; set; }
+
+}
+
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record Response2
+{
+    /// <summary>
+    /// Number of unread messages
+    /// </summary>
+
+    [System.Text.Json.Serialization.JsonPropertyName("count")]
+    public int? Count { get; set; }
+
+}
+
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record Annotation
+{
+
+    [System.Text.Json.Serialization.JsonPropertyName("resource_type")]
+    [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+    public AnnotationResource_type? Resource_type { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("resource_id")]
+    public int? Resource_id { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("concatenated_attr_val")]
+    public string? Concatenated_attr_val { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("controlled_attribute_id")]
+    public int? Controlled_attribute_id { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("controlled_value_id")]
+    public int? Controlled_value_id { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("user_id")]
+    public int UserId { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("user")]
+    public User User { get; set; }
+}
+
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record Comment2
+{
+
+    [System.Text.Json.Serialization.JsonPropertyName("parent_type")]
+    [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+    public Comment2Parent_type? Parent_type { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("parent_id")]
+    public int? Parent_id { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("body")]
+    public string Body { get; set; }
+
+}
+
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record Flag
+{
+
+    [System.Text.Json.Serialization.JsonPropertyName("flaggable_type")]
+    [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+    public Flaggable_type? Flaggable_type { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("flaggable_id")]
+    public int? Flaggable_id { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("flag")]
+    public Flag1? Flag1 { get; set; }
+
+}
+
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record Identification2
+{
+
+    [System.Text.Json.Serialization.JsonPropertyName("observation_id")]
+    public int? Observation_id { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("taxon_id")]
+    public int? Taxon_id { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("current")]
+    public bool? Current { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("body")]
+    public string Body { get; set; }
+
+}
+
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record Message2
+{
+    /// <summary>
+    /// User ID of the recipient
+    /// </summary>
+
+    [System.Text.Json.Serialization.JsonPropertyName("to_user_id")]
+    public int? To_user_id { get; set; }
+
+    /// <summary>
+    /// Identifier for the thread. Should be blank for new threads,
+    /// <br/>but when replying to an existing message, it should be set to
+    /// <br/>the thread_id of the message being replied to.
+    /// <br/>
+    /// </summary>
+
+    [System.Text.Json.Serialization.JsonPropertyName("thread_id")]
+    public int? Thread_id { get; set; }
+
+    /// <summary>
+    /// Subject of the message
+    /// </summary>
+
+    [System.Text.Json.Serialization.JsonPropertyName("subject")]
+    public string Subject { get; set; }
+
+    /// <summary>
+    /// Body of the message
+    /// </summary>
+
+    [System.Text.Json.Serialization.JsonPropertyName("body")]
+    public string Body { get; set; }
+
+}
+
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record Post
+{
+
+    [System.Text.Json.Serialization.JsonPropertyName("title")]
+    public string Title { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("body")]
+    public string Body { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("preferred_formatting")]
+    public string Preferred_formatting { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("user_id")]
+    public double? User_id { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("parent_id")]
+    public double? Parent_id { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("parent_type")]
+    public string Parent_type { get; set; }
+
+}
+
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record Observation2
+{
+
+    [System.Text.Json.Serialization.JsonPropertyName("species_guess")]
+    public string Species_guess { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("taxon_id")]
+    public int? Taxon_id { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("description")]
+    public string Description { get; set; }
+
+}
+
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record Observation_field_value
+{
+
+    [System.Text.Json.Serialization.JsonPropertyName("observation_id")]
+    public int? Observation_id { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("observation_field_id")]
+    public int? Observation_field_id { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("value")]
+    public string Value { get; set; }
+
+}
+
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record Observation_photo
+{
+
+    [System.Text.Json.Serialization.JsonPropertyName("observation_id")]
+    public int? Observation_id { get; set; }
+
+}
+
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public enum PostObservationVoteVote
+{
+
+    [System.Runtime.Serialization.EnumMember(Value = @"up")]
+    Up = 0,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"down")]
+    Down = 1,
+
+}
+
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public enum PostObservationVoteScope
+{
+
+    [System.Runtime.Serialization.EnumMember(Value = @"needs_id")]
+    Needs_id = 0,
+
+}
+
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record Project_observation
+{
+
+    [System.Text.Json.Serialization.JsonPropertyName("project_id")]
+    public int? Project_id { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("observation_id")]
+    public int? Observation_id { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("prefers_curator_coordinate_access")]
+    public bool? Prefers_curator_coordinate_access { get; set; }
+
+}
+
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public enum PostVoteVote
+{
+
+    [System.Runtime.Serialization.EnumMember(Value = @"up")]
+    Up = 0,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"down")]
+    Down = 1,
+
+}
+
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record User2
+{
+
+    [System.Text.Json.Serialization.JsonPropertyName("login")]
+    public string Login { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("email")]
+    public string Email { get; set; }
+
+    /// <summary>
+    /// Display name for this user
+    /// </summary>
+
+    [System.Text.Json.Serialization.JsonPropertyName("name")]
+    public string Name { get; set; }
+
+    /// <summary>
+    /// Locale code for language/region localization. See
+    /// <br/>https://github.com/inaturalist/inaturalist/tree/master/config/locales
+    /// <br/>for available locales. Valid strings can be derived from file
+    /// <br/>names, e.g. `es-MX` from `es-MX.yml`.
+    /// <br/>
+    /// </summary>
+
+    [System.Text.Json.Serialization.JsonPropertyName("locale")]
+    public string Locale { get; set; }
+
+    /// <summary>
+    /// Default time zone for the user's observations. See
+    /// <br/>http://api.rubyonrails.org/classes/ActiveSupport/TimeZone.html
+    /// <br/>for a list of values.
+    /// <br/>
+    /// </summary>
+
+    [System.Text.Json.Serialization.JsonPropertyName("time_zone")]
+    public string Time_zone { get; set; }
+
+    /// <summary>
+    /// ID of the place for this user, customizes some common names and
+    /// <br/>default search parameters
+    /// <br/>
+    /// </summary>
+
+    [System.Text.Json.Serialization.JsonPropertyName("place_id")]
+    public int? Place_id { get; set; }
+
+    /// <summary>
+    /// User profile description
+    /// </summary>
+
+    [System.Text.Json.Serialization.JsonPropertyName("description")]
+    public string Description { get; set; }
+
+    /// <summary>
+    /// User's profile pic. Requires POST/PUT as a multipart request.
+    /// <br/>
+    /// </summary>
+
+    [System.Text.Json.Serialization.JsonPropertyName("icon")]
+    public object Icon { get; set; }
+
+}
+
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record Flag2
+{
+
+    [System.Text.Json.Serialization.JsonPropertyName("resolved")]
+    public bool? Resolved { get; set; }
+
+}
+
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public enum ProjectMemberRole
+{
+
+    [System.Runtime.Serialization.EnumMember(Value = @"curator")]
+    Curator = 0,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"manager")]
+    Manager = 1,
+
+}
+
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record Results
+{
+
+    [System.Text.Json.Serialization.JsonPropertyName("standard")]
+    public System.Collections.Generic.ICollection<ShowPlace> Standard { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("community")]
+    public System.Collections.Generic.ICollection<ShowPlace> Community { get; set; }
+
+}
+
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record results
+{
+
+    [System.Text.Json.Serialization.JsonPropertyName("count")]
+    public int? Count { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("user")]
+    public User User { get; set; }
+
+}
+
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record results2
+{
+
+    [System.Text.Json.Serialization.JsonPropertyName("observation_count")]
+    public int? Observation_count { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("species_count")]
+    public int? Species_count { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("user")]
+    public User User { get; set; }
+
+}
+
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial record results3
+{
+
+    [System.Text.Json.Serialization.JsonPropertyName("count")]
+    public int? Count { get; set; }
+
+    [System.Text.Json.Serialization.JsonPropertyName("taxon")]
+    public ShowTaxon Taxon { get; set; }
+
+}
+
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public enum AnnotationResource_type
+{
+
+    [System.Runtime.Serialization.EnumMember(Value = @"Observation")]
+    Observation = 0,
+
+}
+
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public enum Comment2Parent_type
+{
+
+    [System.Runtime.Serialization.EnumMember(Value = @"Observation")]
+    Observation = 0,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"ListedTaxon")]
+    ListedTaxon = 1,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"AssessmentSection")]
+    AssessmentSection = 2,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"ObservationField")]
+    ObservationField = 3,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"Post")]
+    Post = 4,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"TaxonChange")]
+    TaxonChange = 5,
+
+}
+
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public enum Flaggable_type
+{
+
+    [System.Runtime.Serialization.EnumMember(Value = @"Comment")]
+    Comment = 0,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"Identification")]
+    Identification = 1,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"Message")]
+    Message = 2,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"Observation")]
+    Observation = 3,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"Post")]
+    Post = 4,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"Taxon")]
+    Taxon = 5,
+
+}
+
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public enum Flag1
+{
+
+    [System.Runtime.Serialization.EnumMember(Value = @"spam")]
+    Spam = 0,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"inappropriate")]
+    Inappropriate = 1,
+
+    [System.Runtime.Serialization.EnumMember(Value = @"other")]
+    Other = 2,
+
+}
+
+[System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+internal class DateFormatConverter : System.Text.Json.Serialization.JsonConverter<System.DateTimeOffset>
+{
+    public override System.DateTimeOffset Read(ref System.Text.Json.Utf8JsonReader reader, System.Type typeToConvert, System.Text.Json.JsonSerializerOptions options)
     {
-
-        [System.Runtime.Serialization.EnumMember(Value = @"traditional")]
-        Traditional = 0,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"collection")]
-        Collection = 1,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"umbrella")]
-        Umbrella = 2,
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record Response
-    {
-        /// <summary>
-        /// User to reply to
-        /// </summary>
-
-        [System.Text.Json.Serialization.JsonPropertyName("reply_to_user")]
-        public User Reply_to_user { get; set; }
-
-        /// <summary>
-        /// Identifier for this thread
-        /// </summary>
-
-        [System.Text.Json.Serialization.JsonPropertyName("thread_id")]
-        public int? Thread_id { get; set; }
-
-        /// <summary>
-        /// Identifier for the message that should be flagged if the user
-        /// <br/>chooses to flag this thread
-        /// <br/>
-        /// </summary>
-
-        [System.Text.Json.Serialization.JsonPropertyName("flaggable_message_id")]
-        public int? Flaggable_message_id { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("results")]
-        public System.Collections.Generic.ICollection<Message> Results { get; set; }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record Response2
-    {
-        /// <summary>
-        /// Number of unread messages
-        /// </summary>
-
-        [System.Text.Json.Serialization.JsonPropertyName("count")]
-        public int? Count { get; set; }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record Annotation
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("resource_type")]
-        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public AnnotationResource_type? Resource_type { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("resource_id")]
-        public int? Resource_id { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("concatenated_attr_val")]
-        public string? Concatenated_attr_val { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("controlled_attribute_id")]
-        public int? Controlled_attribute_id { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("controlled_value_id")]
-        public int? Controlled_value_id { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("user_id")]
-        public int UserId { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("user")]
-        public User User { get; set; }
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record Comment2
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("parent_type")]
-        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public Comment2Parent_type? Parent_type { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("parent_id")]
-        public int? Parent_id { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("body")]
-        public string Body { get; set; }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record Flag
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("flaggable_type")]
-        [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-        public Flaggable_type? Flaggable_type { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("flaggable_id")]
-        public int? Flaggable_id { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("flag")]
-        public Flag1? Flag1 { get; set; }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record Identification2
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("observation_id")]
-        public int? Observation_id { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("taxon_id")]
-        public int? Taxon_id { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("current")]
-        public bool? Current { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("body")]
-        public string Body { get; set; }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record Message2
-    {
-        /// <summary>
-        /// User ID of the recipient
-        /// </summary>
-
-        [System.Text.Json.Serialization.JsonPropertyName("to_user_id")]
-        public int? To_user_id { get; set; }
-
-        /// <summary>
-        /// Identifier for the thread. Should be blank for new threads,
-        /// <br/>but when replying to an existing message, it should be set to
-        /// <br/>the thread_id of the message being replied to.
-        /// <br/>
-        /// </summary>
-
-        [System.Text.Json.Serialization.JsonPropertyName("thread_id")]
-        public int? Thread_id { get; set; }
-
-        /// <summary>
-        /// Subject of the message
-        /// </summary>
-
-        [System.Text.Json.Serialization.JsonPropertyName("subject")]
-        public string Subject { get; set; }
-
-        /// <summary>
-        /// Body of the message
-        /// </summary>
-
-        [System.Text.Json.Serialization.JsonPropertyName("body")]
-        public string Body { get; set; }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record Post
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("title")]
-        public string Title { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("body")]
-        public string Body { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("preferred_formatting")]
-        public string Preferred_formatting { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("user_id")]
-        public double? User_id { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("parent_id")]
-        public double? Parent_id { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("parent_type")]
-        public string Parent_type { get; set; }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record Observation2
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("species_guess")]
-        public string Species_guess { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("taxon_id")]
-        public int? Taxon_id { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("description")]
-        public string Description { get; set; }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record Observation_field_value
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("observation_id")]
-        public int? Observation_id { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("observation_field_id")]
-        public int? Observation_field_id { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("value")]
-        public string Value { get; set; }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record Observation_photo
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("observation_id")]
-        public int? Observation_id { get; set; }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum PostObservationVoteVote
-    {
-
-        [System.Runtime.Serialization.EnumMember(Value = @"up")]
-        Up = 0,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"down")]
-        Down = 1,
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum PostObservationVoteScope
-    {
-
-        [System.Runtime.Serialization.EnumMember(Value = @"needs_id")]
-        Needs_id = 0,
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record Project_observation
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("project_id")]
-        public int? Project_id { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("observation_id")]
-        public int? Observation_id { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("prefers_curator_coordinate_access")]
-        public bool? Prefers_curator_coordinate_access { get; set; }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum PostVoteVote
-    {
-
-        [System.Runtime.Serialization.EnumMember(Value = @"up")]
-        Up = 0,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"down")]
-        Down = 1,
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record User2
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("login")]
-        public string Login { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("email")]
-        public string Email { get; set; }
-
-        /// <summary>
-        /// Display name for this user
-        /// </summary>
-
-        [System.Text.Json.Serialization.JsonPropertyName("name")]
-        public string Name { get; set; }
-
-        /// <summary>
-        /// Locale code for language/region localization. See
-        /// <br/>https://github.com/inaturalist/inaturalist/tree/master/config/locales
-        /// <br/>for available locales. Valid strings can be derived from file
-        /// <br/>names, e.g. `es-MX` from `es-MX.yml`.
-        /// <br/>
-        /// </summary>
-
-        [System.Text.Json.Serialization.JsonPropertyName("locale")]
-        public string Locale { get; set; }
-
-        /// <summary>
-        /// Default time zone for the user's observations. See
-        /// <br/>http://api.rubyonrails.org/classes/ActiveSupport/TimeZone.html
-        /// <br/>for a list of values.
-        /// <br/>
-        /// </summary>
-
-        [System.Text.Json.Serialization.JsonPropertyName("time_zone")]
-        public string Time_zone { get; set; }
-
-        /// <summary>
-        /// ID of the place for this user, customizes some common names and
-        /// <br/>default search parameters
-        /// <br/>
-        /// </summary>
-
-        [System.Text.Json.Serialization.JsonPropertyName("place_id")]
-        public int? Place_id { get; set; }
-
-        /// <summary>
-        /// User profile description
-        /// </summary>
-
-        [System.Text.Json.Serialization.JsonPropertyName("description")]
-        public string Description { get; set; }
-
-        /// <summary>
-        /// User's profile pic. Requires POST/PUT as a multipart request.
-        /// <br/>
-        /// </summary>
-
-        [System.Text.Json.Serialization.JsonPropertyName("icon")]
-        public object Icon { get; set; }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record Flag2
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("resolved")]
-        public bool? Resolved { get; set; }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum ProjectMemberRole
-    {
-
-        [System.Runtime.Serialization.EnumMember(Value = @"curator")]
-        Curator = 0,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"manager")]
-        Manager = 1,
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record Results
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("standard")]
-        public System.Collections.Generic.ICollection<ShowPlace> Standard { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("community")]
-        public System.Collections.Generic.ICollection<ShowPlace> Community { get; set; }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record results
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("count")]
-        public int? Count { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("user")]
-        public User User { get; set; }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record results2
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("observation_count")]
-        public int? Observation_count { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("species_count")]
-        public int? Species_count { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("user")]
-        public User User { get; set; }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial record results3
-    {
-
-        [System.Text.Json.Serialization.JsonPropertyName("count")]
-        public int? Count { get; set; }
-
-        [System.Text.Json.Serialization.JsonPropertyName("taxon")]
-        public ShowTaxon Taxon { get; set; }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum AnnotationResource_type
-    {
-
-        [System.Runtime.Serialization.EnumMember(Value = @"Observation")]
-        Observation = 0,
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum Comment2Parent_type
-    {
-
-        [System.Runtime.Serialization.EnumMember(Value = @"Observation")]
-        Observation = 0,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"ListedTaxon")]
-        ListedTaxon = 1,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"AssessmentSection")]
-        AssessmentSection = 2,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"ObservationField")]
-        ObservationField = 3,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"Post")]
-        Post = 4,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"TaxonChange")]
-        TaxonChange = 5,
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum Flaggable_type
-    {
-
-        [System.Runtime.Serialization.EnumMember(Value = @"Comment")]
-        Comment = 0,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"Identification")]
-        Identification = 1,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"Message")]
-        Message = 2,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"Observation")]
-        Observation = 3,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"Post")]
-        Post = 4,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"Taxon")]
-        Taxon = 5,
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum Flag1
-    {
-
-        [System.Runtime.Serialization.EnumMember(Value = @"spam")]
-        Spam = 0,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"inappropriate")]
-        Inappropriate = 1,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"other")]
-        Other = 2,
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    internal class DateFormatConverter : System.Text.Json.Serialization.JsonConverter<System.DateTimeOffset>
-    {
-        public override System.DateTimeOffset Read(ref System.Text.Json.Utf8JsonReader reader, System.Type typeToConvert, System.Text.Json.JsonSerializerOptions options)
+        var dateTime = reader.GetString();
+        if (dateTime == null)
         {
-            var dateTime = reader.GetString();
-            if (dateTime == null)
-            {
-                throw new System.Text.Json.JsonException("Unexpected JsonTokenType.Null");
-            }
-
-            return System.DateTimeOffset.Parse(dateTime);
+            throw new System.Text.Json.JsonException("Unexpected JsonTokenType.Null");
         }
 
-        public override void Write(System.Text.Json.Utf8JsonWriter writer, System.DateTimeOffset value, System.Text.Json.JsonSerializerOptions options)
-        {
-            writer.WriteStringValue(value.ToString("yyyy-MM-dd"));
-        }
+        return System.DateTimeOffset.Parse(dateTime);
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NSwag", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class FileParameter
+    public override void Write(System.Text.Json.Utf8JsonWriter writer, System.DateTimeOffset value, System.Text.Json.JsonSerializerOptions options)
     {
-        public FileParameter(System.IO.Stream data)
-            : this(data, null, null)
-        {
-        }
-
-        public FileParameter(System.IO.Stream data, string fileName)
-            : this(data, fileName, null)
-        {
-        }
-
-        public FileParameter(System.IO.Stream data, string fileName, string contentType)
-        {
-            Data = data;
-            FileName = fileName;
-            ContentType = contentType;
-        }
-
-        public System.IO.Stream Data { get; private set; }
-
-        public string FileName { get; private set; }
-
-        public string ContentType { get; private set; }
+        writer.WriteStringValue(value.ToString("yyyy-MM-dd"));
     }
+}
 
-    [System.CodeDom.Compiler.GeneratedCode("NSwag", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class FileResponse : System.IDisposable
+[System.CodeDom.Compiler.GeneratedCode("NSwag", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial class FileParameter
+{
+    public FileParameter(System.IO.Stream data)
+        : this(data, null, null)
     {
-        private System.IDisposable _client;
-        private System.IDisposable _response;
-
-        public int StatusCode { get; private set; }
-
-        public System.Collections.Generic.IReadOnlyDictionary<string, System.Collections.Generic.IEnumerable<string>> Headers { get; private set; }
-
-        public System.IO.Stream Stream { get; private set; }
-
-        public bool IsPartial
-        {
-            get { return StatusCode == 206; }
-        }
-
-        public FileResponse(int statusCode, System.Collections.Generic.IReadOnlyDictionary<string, System.Collections.Generic.IEnumerable<string>> headers, System.IO.Stream stream, System.IDisposable client, System.IDisposable response)
-        {
-            StatusCode = statusCode;
-            Headers = headers;
-            Stream = stream;
-            _client = client;
-            _response = response;
-        }
-
-        public void Dispose()
-        {
-            Stream.Dispose();
-            if (_response != null)
-                _response.Dispose();
-            if (_client != null)
-                _client.Dispose();
-        }
     }
 
-
-    [System.CodeDom.Compiler.GeneratedCode("NSwag", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ApiException : System.Exception
+    public FileParameter(System.IO.Stream data, string fileName)
+        : this(data, fileName, null)
     {
-        public int StatusCode { get; private set; }
-
-        public string Response { get; private set; }
-
-        public System.Collections.Generic.IReadOnlyDictionary<string, System.Collections.Generic.IEnumerable<string>> Headers { get; private set; }
-
-        public ApiException(string message, int statusCode, string response, System.Collections.Generic.IReadOnlyDictionary<string, System.Collections.Generic.IEnumerable<string>> headers, System.Exception innerException)
-            : base(message + "\n\nStatus: " + statusCode + "\nResponse: \n" + ((response == null) ? "(null)" : response.Substring(0, response.Length >= 512 ? 512 : response.Length)), innerException)
-        {
-            StatusCode = statusCode;
-            Response = response;
-            Headers = headers;
-        }
-
-        public override string ToString()
-        {
-            return string.Format("HTTP Response: \n\n{0}\n\n{1}", Response, base.ToString());
-        }
     }
 
-    [System.CodeDom.Compiler.GeneratedCode("NSwag", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class ApiException<TResult> : ApiException
+    public FileParameter(System.IO.Stream data, string fileName, string contentType)
     {
-        public TResult Result { get; private set; }
-
-        public ApiException(string message, int statusCode, string response, System.Collections.Generic.IReadOnlyDictionary<string, System.Collections.Generic.IEnumerable<string>> headers, TResult result, System.Exception innerException)
-            : base(message, statusCode, response, headers, innerException)
-        {
-            Result = result;
-        }
+        Data = data;
+        FileName = fileName;
+        ContentType = contentType;
     }
 
+    public System.IO.Stream Data { get; private set; }
+
+    public string FileName { get; private set; }
+
+    public string ContentType { get; private set; }
+}
+
+[System.CodeDom.Compiler.GeneratedCode("NSwag", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial class FileResponse : System.IDisposable
+{
+    private System.IDisposable _client;
+    private System.IDisposable _response;
+
+    public int StatusCode { get; private set; }
+
+    public System.Collections.Generic.IReadOnlyDictionary<string, System.Collections.Generic.IEnumerable<string>> Headers { get; private set; }
+
+    public System.IO.Stream Stream { get; private set; }
+
+    public bool IsPartial
+    {
+        get { return StatusCode == 206; }
+    }
+
+    public FileResponse(int statusCode, System.Collections.Generic.IReadOnlyDictionary<string, System.Collections.Generic.IEnumerable<string>> headers, System.IO.Stream stream, System.IDisposable client, System.IDisposable response)
+    {
+        StatusCode = statusCode;
+        Headers = headers;
+        Stream = stream;
+        _client = client;
+        _response = response;
+    }
+
+    public void Dispose()
+    {
+        Stream.Dispose();
+        if (_response != null)
+            _response.Dispose();
+        if (_client != null)
+            _client.Dispose();
+    }
+}
+
+
+[System.CodeDom.Compiler.GeneratedCode("NSwag", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial class ApiException : System.Exception
+{
+    public int StatusCode { get; private set; }
+
+    public string Response { get; private set; }
+
+    public System.Collections.Generic.IReadOnlyDictionary<string, System.Collections.Generic.IEnumerable<string>> Headers { get; private set; }
+
+    public ApiException(string message, int statusCode, string response, System.Collections.Generic.IReadOnlyDictionary<string, System.Collections.Generic.IEnumerable<string>> headers, System.Exception innerException)
+        : base(message + "\n\nStatus: " + statusCode + "\nResponse: \n" + ((response == null) ? "(null)" : response.Substring(0, response.Length >= 512 ? 512 : response.Length)), innerException)
+    {
+        StatusCode = statusCode;
+        Response = response;
+        Headers = headers;
+    }
+
+    public override string ToString()
+    {
+        return string.Format("HTTP Response: \n\n{0}\n\n{1}", Response, base.ToString());
+    }
+}
+
+[System.CodeDom.Compiler.GeneratedCode("NSwag", "14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))")]
+public partial class ApiException<TResult> : ApiException
+{
+    public TResult Result { get; private set; }
+
+    public ApiException(string message, int statusCode, string response, System.Collections.Generic.IReadOnlyDictionary<string, System.Collections.Generic.IEnumerable<string>> headers, TResult result, System.Exception innerException)
+        : base(message, statusCode, response, headers, innerException)
+    {
+        Result = result;
+    }
 }
 
 #pragma warning restore 108

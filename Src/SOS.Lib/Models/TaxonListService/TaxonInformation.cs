@@ -1,9 +1,8 @@
-﻿namespace SOS.Lib.Models.TaxonListService
+﻿namespace SOS.Lib.Models.TaxonListService;
+
+public class TaxonInformation
 {
-    public class TaxonInformation
-    {
-        public int Id { get; set; }
-        public string ScientificName { get; set; }
-        public string SwedishName { get; set; }
-    }
+    public int Id { get; set; }
+    public string ScientificName { get; set; }
+    public string SwedishName { get; set; }
 }

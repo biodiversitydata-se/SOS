@@ -3,29 +3,29 @@ using SOS.Harvest.Entities.Artportalen;
 using SOS.Harvest.Repositories.Source.Artportalen.Interfaces;
 using SOS.Harvest.Services.Interfaces;
 
-namespace SOS.Harvest.Repositories.Source.Artportalen
+namespace SOS.Harvest.Repositories.Source.Artportalen;
+
+/// <summary>
+///     Area repository
+/// </summary>
+public class DiaryEntryRepository : BaseRepository<DiaryEntryRepository>, IDiaryEntryRepository
 {
     /// <summary>
-    ///     Area repository
+    ///     Constructor
     /// </summary>
-    public class DiaryEntryRepository : BaseRepository<DiaryEntryRepository>, IDiaryEntryRepository
+    /// <param name="artportalenDataService"></param>
+    /// <param name="logger"></param>
+    public DiaryEntryRepository(IArtportalenDataService artportalenDataService, ILogger<DiaryEntryRepository> logger) : base(
+        artportalenDataService, logger)
     {
-        /// <summary>
-        ///     Constructor
-        /// </summary>
-        /// <param name="artportalenDataService"></param>
-        /// <param name="logger"></param>
-        public DiaryEntryRepository(IArtportalenDataService artportalenDataService, ILogger<DiaryEntryRepository> logger) : base(
-            artportalenDataService, logger)
-        {
-        }
+    }
 
-        /// <inheritdoc />
-        public async Task<IEnumerable<DiaryEntryEntity>> GetAsync()
+    /// <inheritdoc />
+    public async Task<IEnumerable<DiaryEntryEntity>> GetAsync()
+    {
+        try
         {
-            try
-            {
-                var query = @"
+            var query = @"
 				SELECT 
 					CloudinessId,
 					ControlingOrganisationId,
@@ -94,13 +94,12 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
 				WHERE 
 					RowNumber = 1";
 
-                return await QueryAsync<DiaryEntryEntity>(query);
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e, "Error getting diary entries");
-                throw;
-            }
+            return await QueryAsync<DiaryEntryEntity>(query);
+        }
+        catch (Exception e)
+        {
+            Logger.LogError(e, "Error getting diary entries");
+            throw;
         }
     }
 }

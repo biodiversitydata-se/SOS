@@ -1,12 +1,11 @@
-﻿namespace SOS.Lib.Models.DarwinCore
+﻿namespace SOS.Lib.Models.DarwinCore;
+
+/// <summary>
+///     Taxon county occurrence
+/// </summary>
+public class CountyOccurrence
 {
-    /// <summary>
-    ///     Taxon county occurrence
-    /// </summary>
-    public class CountyOccurrence
-    {
-        public int Id { get; set; }
-        public string County { get; set; }
-        public string Status { get; set; }
-    }
+    public int Id { get; set; }
+    public string County { get; set; }
+    public string Status { get; set; }
 }

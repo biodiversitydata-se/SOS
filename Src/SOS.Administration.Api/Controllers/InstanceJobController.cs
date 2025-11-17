@@ -8,55 +8,54 @@ using SOS.Lib.Managers.Interfaces;
 using System;
 using System.Net;
 
-namespace SOS.Administration.Api.Controllers
+namespace SOS.Administration.Api.Controllers;
+
+/// <summary>
+///     Instance job controller
+/// </summary>
+[ApiController]
+[Route("[controller]")]
+public class InstanceJobController : ControllerBase, IInstanceJobController
 {
+    private readonly IDataProviderManager _dataProviderManager;
+    private readonly ILogger<InstanceJobController> _logger;
+
     /// <summary>
-    ///     Instance job controller
+    ///     Constructor
     /// </summary>
-    [ApiController]
-    [Route("[controller]")]
-    public class InstanceJobController : ControllerBase, IInstanceJobController
+    /// <param name="dataProviderManager"></param>
+    /// <param name="logger"></param>
+    public InstanceJobController(
+        IDataProviderManager dataProviderManager,
+        ILogger<InstanceJobController> logger)
     {
-        private readonly IDataProviderManager _dataProviderManager;
-        private readonly ILogger<InstanceJobController> _logger;
+        _dataProviderManager = dataProviderManager ?? throw new ArgumentNullException(nameof(dataProviderManager));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    }
 
-        /// <summary>
-        ///     Constructor
-        /// </summary>
-        /// <param name="dataProviderManager"></param>
-        /// <param name="logger"></param>
-        public InstanceJobController(
-            IDataProviderManager dataProviderManager,
-            ILogger<InstanceJobController> logger)
+    /// <inheritdoc />
+    [HttpPost("Activate")]
+    [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+    [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+    public IActionResult RunSetActivateInstanceJob([FromQuery] byte instance)
+    {
+        try
         {
-            _dataProviderManager = dataProviderManager ?? throw new ArgumentNullException(nameof(dataProviderManager));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
+            if (instance < 0 || instance > 1)
+            {
+                _logger.LogError("Instance must be 0 or 1");
+                return new StatusCodeResult((int)HttpStatusCode.BadRequest);
+            }
+
+            BackgroundJob.Enqueue<IActivateInstanceJob>(job => job.RunAsync(instance));
+            return new OkObjectResult("Activate instance job was enqueued to Hangfire.");
         }
-
-        /// <inheritdoc />
-        [HttpPost("Activate")]
-        [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public IActionResult RunSetActivateInstanceJob([FromQuery] byte instance)
+        catch (Exception e)
         {
-            try
-            {
-                LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
-                if (instance < 0 || instance > 1)
-                {
-                    _logger.LogError("Instance must be 0 or 1");
-                    return new StatusCodeResult((int)HttpStatusCode.BadRequest);
-                }
-
-                BackgroundJob.Enqueue<IActivateInstanceJob>(job => job.RunAsync(instance));
-                return new OkObjectResult("Activate instance job was enqueued to Hangfire.");
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Enqueuing Activate instance failed");
-                return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
-            }
+            _logger.LogError(e, "Enqueuing Activate instance failed");
+            return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
         }
     }
 }

@@ -5,15 +5,15 @@ using SOS.Harvest.Repositories.Source.Artportalen.Interfaces;
 using SOS.Harvest.Services.Interfaces;
 using SOS.Lib.Extensions;
 
-namespace SOS.Harvest.Repositories.Source.Artportalen
-{
-    /// <summary>
+namespace SOS.Harvest.Repositories.Source.Artportalen;
+
+/// <summary>
 	///     Site repository
 	/// </summary>
 	public class SiteRepository : BaseRepository<SiteRepository>, ISiteRepository
-    {
-        private string GetSiteQuery(string join) =>
-            $@"
+{
+    private string GetSiteQuery(string join) =>
+        $@"
                 SELECT 
 	                s.Id,
 	                ISNULL(s.PresentationName, s.Name) AS Name,
@@ -36,54 +36,54 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
                     LEFT JOIN Site ps ON s.ParentId = ps.Id";
 
 
-        /// <summary>
-        /// Get sites by id's, Up to 3 attempts will be made if call fails
-        /// </summary>
-        /// <param name="ids"></param>
-        /// <param name="attempt"></param>
-        /// <returns></returns>
-        private async Task<IEnumerable<SiteEntity>> GetByIdsAsync(IEnumerable<int> ids, int attempt)
+    /// <summary>
+    /// Get sites by id's, Up to 3 attempts will be made if call fails
+    /// </summary>
+    /// <param name="ids"></param>
+    /// <param name="attempt"></param>
+    /// <returns></returns>
+    private async Task<IEnumerable<SiteEntity>> GetByIdsAsync(IEnumerable<int> ids, int attempt)
+    {
+        try
         {
-            try
-            {
-                return await QueryAsync<SiteEntity>(GetSiteQuery(
-                        $"INNER JOIN @tvp t ON s.Id = t.Id"),
-                    new { tvp = ids.ToSqlRecords().AsTableValuedParameter("dbo.IdValueTable") });
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e, "Error getting sites by id");
+            return await QueryAsync<SiteEntity>(GetSiteQuery(
+                    $"INNER JOIN @tvp t ON s.Id = t.Id"),
+                new { tvp = ids.ToSqlRecords().AsTableValuedParameter("dbo.IdValueTable") });
+        }
+        catch (Exception e)
+        {
+            Logger.LogError(e, "Error getting sites by id");
 
-                if (attempt < 2)
-                {
-                    return await GetByIdsAsync(ids, ++attempt);
-                }
-
-                throw;
+            if (attempt < 2)
+            {
+                return await GetByIdsAsync(ids, ++attempt);
             }
+
+            throw;
+        }
+    }
+
+    /// <summary>
+    ///     Constructor
+    /// </summary>
+    /// <param name="artportalenDataService"></param>
+    /// <param name="logger"></param>
+    public SiteRepository(IArtportalenDataService artportalenDataService, ILogger<SiteRepository> logger) : base(
+        artportalenDataService, logger)
+    {
+    }
+
+    /// <inheritdoc />
+    public async Task<IDictionary<int, ICollection<AreaEntityBase>>?> GetSitesAreas(IEnumerable<int> siteIds)
+    {
+        if (!siteIds?.Any() ?? true)
+        {
+            return null;
         }
 
-        /// <summary>
-        ///     Constructor
-        /// </summary>
-        /// <param name="artportalenDataService"></param>
-        /// <param name="logger"></param>
-        public SiteRepository(IArtportalenDataService artportalenDataService, ILogger<SiteRepository> logger) : base(
-            artportalenDataService, logger)
+        try
         {
-        }
-
-        /// <inheritdoc />
-        public async Task<IDictionary<int, ICollection<AreaEntityBase>>?> GetSitesAreas(IEnumerable<int> siteIds)
-        {
-            if (!siteIds?.Any() ?? true)
-            {
-                return null;
-            }
-
-            try
-            {
-                const string query = @"
+            const string query = @"
                 SELECT 
                     sa.SiteId,
                     a.AreaDatasetId,
@@ -96,49 +96,49 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
                 WHERE
                     a.AreaDatasetId IN (1, 13, 16, 18, 19, 21, 24, 25)";
 
-                var siteAreaEntities = (await QueryAsync<SiteAreaEntity>(query,
-                    new { sid = siteIds.ToSqlRecords().AsTableValuedParameter("dbo.IdValueTable") }))?.ToArray();
+            var siteAreaEntities = (await QueryAsync<SiteAreaEntity>(query,
+                new { sid = siteIds.ToSqlRecords().AsTableValuedParameter("dbo.IdValueTable") }))?.ToArray();
 
-                var siteAreas = new Dictionary<int, ICollection<AreaEntityBase>>();
-                if (siteAreaEntities?.Any() ?? false)
+            var siteAreas = new Dictionary<int, ICollection<AreaEntityBase>>();
+            if (siteAreaEntities?.Any() ?? false)
+            {
+                foreach (var siteAreaEntity in siteAreaEntities)
                 {
-                    foreach (var siteAreaEntity in siteAreaEntities)
+                    if (!siteAreas.TryGetValue(siteAreaEntity.SiteId, out var areas))
                     {
-                        if (!siteAreas.TryGetValue(siteAreaEntity.SiteId, out var areas))
-                        {
-                            areas = new List<AreaEntityBase>();
-                            siteAreas.Add(siteAreaEntity.SiteId, areas);
-                        }
-                        areas.Add(siteAreaEntity);
+                        areas = new List<AreaEntityBase>();
+                        siteAreas.Add(siteAreaEntity.SiteId, areas);
                     }
+                    areas.Add(siteAreaEntity);
                 }
-                return siteAreas;
             }
-            catch (Exception e)
-            {
-                Logger.LogError(e, "Error getting sites areas");
-                throw;
-            }
+            return siteAreas;
+        }
+        catch (Exception e)
+        {
+            Logger.LogError(e, "Error getting sites areas");
+            throw;
+        }
+    }
+
+    /// <inheritdoc />
+    public async Task<IEnumerable<SiteEntity>?> GetByIdsAsync(IEnumerable<int> ids)
+    {
+        if (!ids?.Any() ?? true)
+        {
+            return null;
         }
 
-        /// <inheritdoc />
-        public async Task<IEnumerable<SiteEntity>?> GetByIdsAsync(IEnumerable<int> ids)
-        {
-            if (!ids?.Any() ?? true)
-            {
-                return null;
-            }
+        return await GetByIdsAsync(ids!, 0);
+    }
 
-            return await GetByIdsAsync(ids!, 0);
-        }
-
-        /// <inheritdoc />
-        public async Task<IEnumerable<int>> GetFrequentlyUsedIdsAsync(bool isIncrementalHarvest)
+    /// <inheritdoc />
+    public async Task<IEnumerable<int>> GetFrequentlyUsedIdsAsync(bool isIncrementalHarvest)
+    {
+        try
         {
-            try
-            {
-                return await QueryAsync<int>(
-                        @$"
+            return await QueryAsync<int>(
+                    @$"
                         SELECT
                             s.SiteId
                         FROM
@@ -148,25 +148,25 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
                         GROUP BY
 	                        s.SiteId
                         HAVING COUNT (s.SiteId) > 20");
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e, "Error getting frequently used sites");
-                throw;
-            }
+        }
+        catch (Exception e)
+        {
+            Logger.LogError(e, "Error getting frequently used sites");
+            throw;
+        }
+    }
+
+    /// <inheritdoc />
+    public async Task<IDictionary<int, string>?> GetSitesGeometry(IEnumerable<int> siteIds)
+    {
+        if (!siteIds?.Any() ?? true)
+        {
+            return null;
         }
 
-        /// <inheritdoc />
-        public async Task<IDictionary<int, string>?> GetSitesGeometry(IEnumerable<int> siteIds)
+        try
         {
-            if (!siteIds?.Any() ?? true)
-            {
-                return null;
-            }
-
-            try
-            {
-                const string query = @"
+            const string query = @"
                 SELECT
 	                lg.SiteId,
 	                lg.Geometry.STAsText() AS GeometryWKT
@@ -182,16 +182,15 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
                 WHERE 
 	                lg.rn = 1";
 
-                var sitesGeometry = (await QueryAsync<(int SiteId, string GeometryWKT)>(query,
-                    new { sid = siteIds.ToSqlRecords().AsTableValuedParameter("dbo.IdValueTable") }))?.ToArray();
+            var sitesGeometry = (await QueryAsync<(int SiteId, string GeometryWKT)>(query,
+                new { sid = siteIds.ToSqlRecords().AsTableValuedParameter("dbo.IdValueTable") }))?.ToArray();
 
-                return sitesGeometry?.ToDictionary(sg => sg.SiteId, sg => sg.GeometryWKT);
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e, "Error getting sites geometry");
-                throw;
-            }
+            return sitesGeometry?.ToDictionary(sg => sg.SiteId, sg => sg.GeometryWKT);
+        }
+        catch (Exception e)
+        {
+            Logger.LogError(e, "Error getting sites geometry");
+            throw;
         }
     }
 }

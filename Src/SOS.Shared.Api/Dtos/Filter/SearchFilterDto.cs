@@ -1,13 +1,12 @@
-﻿namespace SOS.Shared.Api.Dtos.Filter
+﻿namespace SOS.Shared.Api.Dtos.Filter;
+
+/// <summary>
+/// Search filter.
+/// </summary>
+public class SearchFilterDto : SearchFilterBaseDto
 {
     /// <summary>
-    /// Search filter.
+    /// Response output settings
     /// </summary>
-    public class SearchFilterDto : SearchFilterBaseDto
-    {
-        /// <summary>
-        /// Response output settings
-        /// </summary>
-        public OutputFilterDto? Output { get; set; }
-    }
+    public OutputFilterDto? Output { get; set; }
 }

@@ -1,10 +1,9 @@
-﻿namespace SOS.Harvest.Entities.Artportalen
+﻿namespace SOS.Harvest.Entities.Artportalen;
+
+public class SiteAreaEntity : AreaEntityBase
 {
-    public class SiteAreaEntity : AreaEntityBase
-    {
-        /// <summary>
-        ///     Site Id.
-        /// </summary>
-        public int SiteId { get; set; }
-    }
+    /// <summary>
+    ///     Site Id.
+    /// </summary>
+    public int SiteId { get; set; }
 }

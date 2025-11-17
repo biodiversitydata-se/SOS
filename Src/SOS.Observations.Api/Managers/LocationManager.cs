@@ -11,63 +11,62 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace SOS.Observations.Api.Managers
+namespace SOS.Observations.Api.Managers;
+
+/// <summary>
+///     Observation manager class
+/// </summary>
+public class LocationManager : ILocationManager
 {
+    private readonly IProcessedLocationRepository _processedLocationRepository;
+    private readonly IFilterManager _filterManager;
+    private readonly ILogger<LocationManager> _logger;
+
     /// <summary>
-    ///     Observation manager class
+    /// Constructor
     /// </summary>
-    public class LocationManager : ILocationManager
+    /// <param name="processedLocationRepository"></param>
+    /// <param name="filterManager"></param>
+    /// <param name="logger"></param>
+    /// <exception cref="ArgumentNullException"></exception>
+    public LocationManager(
+        IProcessedLocationRepository processedLocationRepository,
+        IFilterManager filterManager,
+        ILogger<LocationManager> logger)
     {
-        private readonly IProcessedLocationRepository _processedLocationRepository;
-        private readonly IFilterManager _filterManager;
-        private readonly ILogger<LocationManager> _logger;
+        _processedLocationRepository = processedLocationRepository ??
+                                          throw new ArgumentNullException(nameof(processedLocationRepository));
+        _filterManager = filterManager ?? throw new ArgumentNullException(nameof(filterManager));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="processedLocationRepository"></param>
-        /// <param name="filterManager"></param>
-        /// <param name="logger"></param>
-        /// <exception cref="ArgumentNullException"></exception>
-        public LocationManager(
-            IProcessedLocationRepository processedLocationRepository,
-            IFilterManager filterManager,
-            ILogger<LocationManager> logger)
+        // Make sure we are working with live data
+        _processedLocationRepository.LiveMode = true;
+    }
+
+
+    /// <inheritdoc />
+    public async Task<IEnumerable<LocationDto>> GetLocationsAsync(IEnumerable<string> locationIds)
+    {
+        var locations = await _processedLocationRepository.GetLocationsAsync(locationIds);
+
+        return locations?.Select(l => l.ToDto());
+    }
+
+    /// <inheritdoc />
+    public async Task<IEnumerable<LocationSearchResultDto>> SearchAsync(int? roleId, string authorizationApplicationIdentifier,
+        SearchFilter filter, int skip, int take)
+    {
+        try
         {
-            _processedLocationRepository = processedLocationRepository ??
-                                              throw new ArgumentNullException(nameof(processedLocationRepository));
-            _filterManager = filterManager ?? throw new ArgumentNullException(nameof(filterManager));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
+            var result = await _processedLocationRepository.SearchAsync(filter, skip, take);
 
-            // Make sure we are working with live data
-            _processedLocationRepository.LiveMode = true;
+            return result?.Select(l => l.ToDto());
         }
-
-
-        /// <inheritdoc />
-        public async Task<IEnumerable<LocationDto>> GetLocationsAsync(IEnumerable<string> locationIds)
+        catch (Exception e)
         {
-            var locations = await _processedLocationRepository.GetLocationsAsync(locationIds);
-
-            return locations?.Select(l => l.ToDto());
-        }
-
-        /// <inheritdoc />
-        public async Task<IEnumerable<LocationSearchResultDto>> SearchAsync(int? roleId, string authorizationApplicationIdentifier,
-            SearchFilter filter, int skip, int take)
-        {
-            try
-            {
-                await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
-                var result = await _processedLocationRepository.SearchAsync(filter, skip, take);
-
-                return result?.Select(l => l.ToDto());
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Failed to search for locations.");
-                throw;
-            }
+            _logger.LogError(e, "Failed to search for locations.");
+            throw;
         }
     }
 }

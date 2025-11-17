@@ -1,13 +1,12 @@
-﻿namespace SOS.Shared.Api.Dtos
+﻿namespace SOS.Shared.Api.Dtos;
+
+/// <summary>
+/// Result returned year month aggregation
+/// </summary>
+public class YearMonthCountResultDto : YearCountResultDto
 {
     /// <summary>
-    /// Result returned year month aggregation
+    ///     Month
     /// </summary>
-    public class YearMonthCountResultDto : YearCountResultDto
-    {
-        /// <summary>
-        ///     Month
-        /// </summary>
-        public int Month { get; set; }
-    }
+    public int Month { get; set; }
 }

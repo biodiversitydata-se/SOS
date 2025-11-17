@@ -1,9 +1,8 @@
 ﻿using SOS.Lib.Models.Verbatim.Shared;
 
-namespace SOS.Harvest.Harvesters.Interfaces
+namespace SOS.Harvest.Harvesters.Interfaces;
+
+public interface IArtportalenDatasetMetadataHarvester
 {
-    public interface IArtportalenDatasetMetadataHarvester
-    {
-        public Task<HarvestInfo> HarvestDatasetsAsync();
-    }
+    public Task<HarvestInfo> HarvestDatasetsAsync();
 }

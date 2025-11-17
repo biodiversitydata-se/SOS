@@ -11,122 +11,121 @@ using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
 using System.Text;
 
-namespace SOS.Harvest.Harvesters.Mvm
+namespace SOS.Harvest.Harvesters.Mvm;
+
+public class MvmObservationHarvester : ObservationHarvesterBase<MvmObservationVerbatim, int>, IMvmObservationHarvester
 {
-    public class MvmObservationHarvester : ObservationHarvesterBase<MvmObservationVerbatim, int>, IMvmObservationHarvester
+    private readonly IMvmObservationService _mvmObservationService;
+    private readonly MvmServiceConfiguration _mvmServiceConfiguration;
+
+    private string GetMvmHarvestSettingsInfoString()
     {
-        private readonly IMvmObservationService _mvmObservationService;
-        private readonly MvmServiceConfiguration _mvmServiceConfiguration;
+        var sb = new StringBuilder();
+        sb.AppendLine("MVM Harvest settings:");
+        sb.AppendLine($"  Page size: {_mvmServiceConfiguration.MaxReturnedChangesInOnePage}");
+        sb.AppendLine(
+            $"  Max Number Of Sightings Harvested: {_mvmServiceConfiguration.MaxNumberOfSightingsHarvested}");
+        return sb.ToString();
+    }
 
-        private string GetMvmHarvestSettingsInfoString()
-        {
-            var sb = new StringBuilder();
-            sb.AppendLine("MVM Harvest settings:");
-            sb.AppendLine($"  Page size: {_mvmServiceConfiguration.MaxReturnedChangesInOnePage}");
-            sb.AppendLine(
-                $"  Max Number Of Sightings Harvested: {_mvmServiceConfiguration.MaxNumberOfSightingsHarvested}");
-            return sb.ToString();
-        }
+    /// <summary>
+    ///     Constructor
+    /// </summary>
+    /// <param name="mvmObservationService"></param>
+    /// <param name="mvmObservationVerbatimRepository"></param>
+    /// <param name="mvmServiceConfiguration"></param>
+    /// <param name="logger"></param>
+    public MvmObservationHarvester(
+        IMvmObservationService mvmObservationService,
+        IMvmObservationVerbatimRepository mvmObservationVerbatimRepository,
+        MvmServiceConfiguration mvmServiceConfiguration,
+        ILogger<MvmObservationHarvester> logger) : base("Mvm", mvmObservationVerbatimRepository, logger)
+    {
+        _mvmObservationService =
+            mvmObservationService ?? throw new ArgumentNullException(nameof(mvmObservationService));
+        _mvmServiceConfiguration = mvmServiceConfiguration ??
+                                   throw new ArgumentNullException(nameof(mvmServiceConfiguration));
+    }
 
-        /// <summary>
-        ///     Constructor
-        /// </summary>
-        /// <param name="mvmObservationService"></param>
-        /// <param name="mvmObservationVerbatimRepository"></param>
-        /// <param name="mvmServiceConfiguration"></param>
-        /// <param name="logger"></param>
-        public MvmObservationHarvester(
-            IMvmObservationService mvmObservationService,
-            IMvmObservationVerbatimRepository mvmObservationVerbatimRepository,
-            MvmServiceConfiguration mvmServiceConfiguration,
-            ILogger<MvmObservationHarvester> logger) : base("Mvm", mvmObservationVerbatimRepository, logger)
+    /// inheritdoc />
+    public async Task<HarvestInfo> HarvestObservationsAsync(DataProvider dataProvider,
+        JobRunModes mode,
+        DateTime? fromDate, IJobCancellationToken cancellationToken)
+    {
+        await Task.Run(() =>
         {
-            _mvmObservationService =
-                mvmObservationService ?? throw new ArgumentNullException(nameof(mvmObservationService));
-            _mvmServiceConfiguration = mvmServiceConfiguration ??
-                                       throw new ArgumentNullException(nameof(mvmServiceConfiguration));
-        }
+            throw new NotImplementedException("Not implemented for this provider");
+        });
+        return null!;
+    }
 
-        /// inheritdoc />
-        public async Task<HarvestInfo> HarvestObservationsAsync(DataProvider dataProvider,
-            JobRunModes mode,
-            DateTime? fromDate, IJobCancellationToken cancellationToken)
+    /// inheritdoc />
+    public async Task<HarvestInfo> HarvestObservationsAsync(DataProvider provider, IJobCancellationToken cancellationToken)
+    {
+        var runStatus = RunStatus.Success;
+        var harvestCount = 0;
+        (DateTime startDate, long preHarvestCount) initValues = (DateTime.Now, 0);
+        try
         {
-            await Task.Run(() =>
+            initValues.preHarvestCount = await InitializeHarvestAsync(true);
+            Logger.LogInformation(GetMvmHarvestSettingsInfoString());
+
+            var result = await _mvmObservationService.GetAsync(0);
+
+            var dataLastModified = DateTime.MinValue;
+            var verbatimFactory = new MvmHarvestFactory();
+
+            // Loop until all sightings are fetched.
+            while (result.MaxChangeId != 0)
             {
-                throw new NotImplementedException("Not implemented for this provider");
-            });
-            return null!;
-        }
+                cancellationToken?.ThrowIfCancellationRequested();
 
-        /// inheritdoc />
-        public async Task<HarvestInfo> HarvestObservationsAsync(DataProvider provider, IJobCancellationToken cancellationToken)
-        {
-            var runStatus = RunStatus.Success;
-            var harvestCount = 0;
-            (DateTime startDate, long preHarvestCount) initValues = (DateTime.Now, 0);
-            try
-            {
-                initValues.preHarvestCount = await InitializeHarvestAsync(true);
-                Logger.LogInformation(GetMvmHarvestSettingsInfoString());
+                var verbatims = (await verbatimFactory.CastEntitiesToVerbatimsAsync(result.Observations))?.ToArray();
 
-                var result = await _mvmObservationService.GetAsync(0);
-
-                var dataLastModified = DateTime.MinValue;
-                var verbatimFactory = new MvmHarvestFactory();
-
-                // Loop until all sightings are fetched.
-                while (result.MaxChangeId != 0)
+                if (verbatims?.Any() ?? false)
                 {
-                    cancellationToken?.ThrowIfCancellationRequested();
+                    result.Observations = null!;
 
-                    var verbatims = (await verbatimFactory.CastEntitiesToVerbatimsAsync(result.Observations))?.ToArray();
+                    harvestCount += verbatims.Length;
 
-                    if (verbatims?.Any() ?? false)
+                    // Add sightings to MongoDb
+                    await VerbatimRepository.AddManyAsync(verbatims);
+
+                    var batchDataLastModified = verbatims.Select(a => a.Modified).Max();
+
+                    if (batchDataLastModified.HasValue && batchDataLastModified.Value > dataLastModified)
                     {
-                        result.Observations = null!;
-
-                        harvestCount += verbatims.Length;
-
-                        // Add sightings to MongoDb
-                        await VerbatimRepository.AddManyAsync(verbatims);
-
-                        var batchDataLastModified = verbatims.Select(a => a.Modified).Max();
-
-                        if (batchDataLastModified.HasValue && batchDataLastModified.Value > dataLastModified)
-                        {
-                            dataLastModified = batchDataLastModified.Value;
-                        }
-
-                        if (_mvmServiceConfiguration.MaxNumberOfSightingsHarvested.HasValue &&
-                            harvestCount >= _mvmServiceConfiguration.MaxNumberOfSightingsHarvested)
-                        {
-                            break;
-                        }
+                        dataLastModified = batchDataLastModified.Value;
                     }
 
-                    // Give target service some slack
-                    Thread.Sleep(1000);
-                    result = await _mvmObservationService.GetAsync(result.MaxChangeId + 1);
+                    if (_mvmServiceConfiguration.MaxNumberOfSightingsHarvested.HasValue &&
+                        harvestCount >= _mvmServiceConfiguration.MaxNumberOfSightingsHarvested)
+                    {
+                        break;
+                    }
                 }
-            }
-            catch (JobAbortedException)
-            {
-                Logger.LogInformation("MVM harvest was cancelled.");
-                runStatus = RunStatus.Canceled;
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e, "Failed to harvest MVM");
-                runStatus = RunStatus.Failed;
-            }
 
-            return await FinishHarvestAsync(initValues, runStatus, harvestCount, provider.PreviousProcessLimit.GetValueOrDefault(80));
+                // Give target service some slack
+                Thread.Sleep(1000);
+                result = await _mvmObservationService.GetAsync(result.MaxChangeId + 1);
+            }
         }
-
-        public Task<HarvestInfo> HarvestAllObservationsSlowlyAsync(DataProvider provider, IJobCancellationToken cancellationToken)
+        catch (JobAbortedException)
         {
-            throw new NotImplementedException();
+            Logger.LogInformation("MVM harvest was cancelled.");
+            runStatus = RunStatus.Canceled;
         }
+        catch (Exception e)
+        {
+            Logger.LogError(e, "Failed to harvest MVM");
+            runStatus = RunStatus.Failed;
+        }
+
+        return await FinishHarvestAsync(initValues, runStatus, harvestCount, provider.PreviousProcessLimit.GetValueOrDefault(80));
+    }
+
+    public Task<HarvestInfo> HarvestAllObservationsSlowlyAsync(DataProvider provider, IJobCancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
     }
 }

@@ -1,28 +1,27 @@
-﻿namespace SOS.Lib.Enums
+﻿namespace SOS.Lib.Enums;
+
+/// <summary>
+/// Different types of harvest/processing
+/// </summary>
+public enum JobRunModes
 {
     /// <summary>
-    /// Different types of harvest/processing
+    /// Full harvest, processing to inactive instance
     /// </summary>
-    public enum JobRunModes
-    {
-        /// <summary>
-        /// Full harvest, processing to inactive instance
-        /// </summary>
-        Full,
+    Full,
 
-        /// <summary>
-        /// Incremental harvest, processing to inactive instance
-        /// </summary>
-        IncrementalInactiveInstance,
+    /// <summary>
+    /// Incremental harvest, processing to inactive instance
+    /// </summary>
+    IncrementalInactiveInstance,
 
-        /// <summary>
-        /// Incremental harvest, processing to active instance
-        /// </summary>
-        IncrementalActiveInstance,
+    /// <summary>
+    /// Incremental harvest, processing to active instance
+    /// </summary>
+    IncrementalActiveInstance,
 
-        /// <summary>
-        /// Full harvest with delay in order to avoid source rate limits
-        /// </summary>
-        FullWithDelay
-    }
+    /// <summary>
+    /// Full harvest with delay in order to avoid source rate limits
+    /// </summary>
+    FullWithDelay
 }

@@ -5,36 +5,36 @@ using SOS.Harvest.Repositories.Source.Artportalen.Interfaces;
 using SOS.Harvest.Services.Interfaces;
 using SOS.Lib.Extensions;
 
-namespace SOS.Harvest.Repositories.Source.Artportalen
+namespace SOS.Harvest.Repositories.Source.Artportalen;
+
+public class SightingRepository : BaseRepository<ISightingRepository>, ISightingRepository
 {
-    public class SightingRepository : BaseRepository<ISightingRepository>, ISightingRepository
+    private string GetSightingQuery(int top, string where, bool isIncrementalHarvest) => GetSightingQuery(top, null!, where, isIncrementalHarvest);
+
+
+    /// <summary>
+    /// Create sighting query
+    /// </summary>
+    /// <param name="top"></param>
+    /// <param name="where"></param>
+    /// <returns></returns>
+    private string GetSightingQuery(int top, string join, string where, bool isIncrementalHarvest)
     {
-        private string GetSightingQuery(int top, string where, bool isIncrementalHarvest) => GetSightingQuery(top, null!, where, isIncrementalHarvest);
+        var topCount = "";
 
-
-        /// <summary>
-        /// Create sighting query
-        /// </summary>
-        /// <param name="top"></param>
-        /// <param name="where"></param>
-        /// <returns></returns>
-        private string GetSightingQuery(int top, string join, string where, bool isIncrementalHarvest)
+        // Adding TOP increases the performance
+        if (top > 0)
         {
-            var topCount = "";
+            topCount = $"TOP {top}";
+        }
 
-            // Adding TOP increases the performance
-            if (top > 0)
-            {
-                topCount = $"TOP {top}";
-            }
-
-            var triggerRuleSelect = "svr.RegionalSightingStateId";
-            var triggerRuleFrom = @"LEFT JOIN TriggeredValidationRule tvr on tvr.SightingId = si.Id 
+        var triggerRuleSelect = "svr.RegionalSightingStateId";
+        var triggerRuleFrom = @"LEFT JOIN TriggeredValidationRule tvr on tvr.SightingId = si.Id 
                     LEFT JOIN StatusValidationRule svr ON svr.Id = tvr.StatusValidationRuleId ";
 
-            if (DataService.Configuration?.UseTriggeredObservationRule ?? false)
-            {
-                triggerRuleSelect = @"tor.ActivityRuleId AS TriggeredObservationRuleActivityRuleId,
+        if (DataService.Configuration?.UseTriggeredObservationRule ?? false)
+        {
+            triggerRuleSelect = @"tor.ActivityRuleId AS TriggeredObservationRuleActivityRuleId,
                 tor.FrequencyId AS TriggeredObservationRuleFrequencyId,
                 tor.PeriodRuleId AS TriggeredObservationRulePeriodRuleId,
                 tor.PromptRuleId AS TriggeredObservationRulePromptRuleId,
@@ -43,11 +43,11 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
                 tor.ReproductionId AS TriggeredObservationRuleReproductionId,
                 tor.StatusRuleId AS TriggeredObservationRuleStatusRuleId,
                 tor.Unspontaneous AS TriggeredObservationRuleUnspontaneous";
-                //ISNULL(tor.RegionalSightingState, 0) AS TriggeredObservationRuleRegionalSightingState";
-                triggerRuleFrom = @"LEFT JOIN TriggeredObservationRule tor ON tor.SightingId = si.Id ";
-            }
+            //ISNULL(tor.RegionalSightingState, 0) AS TriggeredObservationRuleRegionalSightingState";
+            triggerRuleFrom = @"LEFT JOIN TriggeredObservationRule tor ON tor.SightingId = si.Id ";
+        }
 
-            var query = $@"
+        var query = $@"
                 SELECT {topCount} 
                     si.Id, 
                     s.ActivityId,
@@ -126,98 +126,98 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
 	                {GetSightingWhereBasics(isIncrementalHarvest)}
                     {where} ";
 
-            return query;
-        }
+        return query;
+    }
 
 
-        /// <summary>
-        ///     Constructor
-        /// </summary>
-        /// <param name="artportalenDataService"></param>
-        /// <param name="logger"></param>
-        public SightingRepository(IArtportalenDataService artportalenDataService, ILogger<SightingRepository> logger) :
-            base(artportalenDataService, logger)
+    /// <summary>
+    ///     Constructor
+    /// </summary>
+    /// <param name="artportalenDataService"></param>
+    /// <param name="logger"></param>
+    public SightingRepository(IArtportalenDataService artportalenDataService, ILogger<SightingRepository> logger) :
+        base(artportalenDataService, logger)
+    {
+    }
+
+    /// <inheritdoc />
+    public async Task<IEnumerable<SightingEntity>?> GetChunkAsync(int startId, int maxRows, bool isIncrementalHarvest)
+    {
+        try
         {
+            var query = GetSightingQuery(0, "AND si.Id BETWEEN @StartId AND @EndId", isIncrementalHarvest);
+
+            var result = (await QueryAsync<SightingEntity>(query, new { StartId = startId, EndId = startId + maxRows - 1 }))?.ToArray();
+            if ((result?.Count() ?? 0) == 0)
+            {
+                Logger.LogDebug($"Artportalen SightingRepository.GetChunkAsync returned no sightings. Live={Live}, startId={startId}, maxRows={maxRows}");
+            }
+
+            return result?.DistinctBy(s => s.Id);
         }
-
-        /// <inheritdoc />
-        public async Task<IEnumerable<SightingEntity>?> GetChunkAsync(int startId, int maxRows, bool isIncrementalHarvest)
+        catch (Exception e)
         {
-            try
-            {
-                var query = GetSightingQuery(0, "AND si.Id BETWEEN @StartId AND @EndId", isIncrementalHarvest);
+            Logger.LogError(e, "Error getting sightings");
 
-                var result = (await QueryAsync<SightingEntity>(query, new { StartId = startId, EndId = startId + maxRows - 1 }))?.ToArray();
-                if ((result?.Count() ?? 0) == 0)
-                {
-                    Logger.LogDebug($"Artportalen SightingRepository.GetChunkAsync returned no sightings. Live={Live}, startId={startId}, maxRows={maxRows}");
-                }
-
-                return result?.DistinctBy(s => s.Id);
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e, "Error getting sightings");
-
-                throw;
-            }
+            throw;
         }
+    }
 
-        /// <inheritdoc />
-        public async Task<IEnumerable<SightingEntity>?> GetChunkAsync(IEnumerable<int> sightingIds, bool isIncrementalHarvest)
+    /// <inheritdoc />
+    public async Task<IEnumerable<SightingEntity>?> GetChunkAsync(IEnumerable<int> sightingIds, bool isIncrementalHarvest)
+    {
+        try
         {
-            try
+            if (!sightingIds?.Any() ?? true)
             {
-                if (!sightingIds?.Any() ?? true)
-                {
-                    return null;
-                }
-                var query = GetSightingQuery(sightingIds?.Count() ?? 0, "INNER JOIN @tvp t ON si.Id = t.Id", null!, isIncrementalHarvest);
-
-                var result = (await QueryAsync<SightingEntity>(query, new { tvp = sightingIds.ToSqlRecords().AsTableValuedParameter("dbo.IdValueTable") }))?.ToArray();
-                if ((result?.Count() ?? 0) == 0)
-                {
-                    Logger.LogInformation($"Artportalen SightingRepository.GetChunkAsync returned no sightings. Live={Live}, sightingIds.Count()={sightingIds!.Count()}.\n,The first five SightingIds used in @tvp are: {string.Join(", ", sightingIds!.Take(5))}");
-                    Logger.LogDebug(query);
-                }
-
-                return result;
+                return null;
             }
-            catch (Exception e)
+            var query = GetSightingQuery(sightingIds?.Count() ?? 0, "INNER JOIN @tvp t ON si.Id = t.Id", null!, isIncrementalHarvest);
+
+            var result = (await QueryAsync<SightingEntity>(query, new { tvp = sightingIds.ToSqlRecords().AsTableValuedParameter("dbo.IdValueTable") }))?.ToArray();
+            if ((result?.Count() ?? 0) == 0)
             {
-                Logger.LogError(e, "Error getting sightings");
-
-                throw;
+                Logger.LogInformation($"Artportalen SightingRepository.GetChunkAsync returned no sightings. Live={Live}, sightingIds.Count()={sightingIds!.Count()}.\n,The first five SightingIds used in @tvp are: {string.Join(", ", sightingIds!.Take(5))}");
+                Logger.LogDebug(query);
             }
+
+            return result;
         }
-
-        /// <inheritdoc />
-        public async Task<IEnumerable<SightingEntity>?> GetChunkAsync(DateTime modifiedSince, int maxRows, bool isIncrementalHarvest)
+        catch (Exception e)
         {
-            try
-            {
-                var query = GetSightingQuery(maxRows, "AND s.EditDate > @modifiedSince", isIncrementalHarvest);
+            Logger.LogError(e, "Error getting sightings");
 
-                var result = (await QueryAsync<SightingEntity>(query, new { modifiedSince = modifiedSince.ToLocalTime() }))?.ToArray();
-                if (!result?.Any() ?? true)
-                {
-                    Logger.LogDebug($"Artportalen SightingRepository.GetChunkAsync returned no sightings. Live={Live}, modifiedSince={modifiedSince}, maxRows={maxRows}");
-                }
-
-                return result?.DistinctBy(s => s.Id);
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e, "Error getting sightings");
-
-                throw;
-            }
+            throw;
         }
+    }
 
-        /// <inheritdoc />
-        public async Task<IEnumerable<int>> GetDeletedIdsAsync(DateTime from)
+    /// <inheritdoc />
+    public async Task<IEnumerable<SightingEntity>?> GetChunkAsync(DateTime modifiedSince, int maxRows, bool isIncrementalHarvest)
+    {
+        try
         {
-            string query = @$"
+            var query = GetSightingQuery(maxRows, "AND s.EditDate > @modifiedSince", isIncrementalHarvest);
+
+            var result = (await QueryAsync<SightingEntity>(query, new { modifiedSince = modifiedSince.ToLocalTime() }))?.ToArray();
+            if (!result?.Any() ?? true)
+            {
+                Logger.LogDebug($"Artportalen SightingRepository.GetChunkAsync returned no sightings. Live={Live}, modifiedSince={modifiedSince}, maxRows={maxRows}");
+            }
+
+            return result?.DistinctBy(s => s.Id);
+        }
+        catch (Exception e)
+        {
+            Logger.LogError(e, "Error getting sightings");
+
+            throw;
+        }
+    }
+
+    /// <inheritdoc />
+    public async Task<IEnumerable<int>> GetDeletedIdsAsync(DateTime from)
+    {
+        string query = @$"
             SELECT 
 	            st.SightingId 
             FROM 
@@ -232,12 +232,12 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
 			FROM 
 				TemporaryRemovedSightingIds";
 
-            return await QueryAsync<int>(query, null!);
-        }
+        return await QueryAsync<int>(query, null!);
+    }
 
-        public async Task<IEnumerable<int>> GetRejectedIdsAsync(DateTime modifiedSince)
-        {
-            string query = @$"
+    public async Task<IEnumerable<int>> GetRejectedIdsAsync(DateTime modifiedSince)
+    {
+        string query = @$"
             SELECT 
 	            s.Id 
             FROM 
@@ -246,15 +246,15 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
                 s.ValidationStatusId = 50
 	            AND s.EditDate > '{modifiedSince.ToLocalTime().ToString("yyyy-MM-dd hh:mm")}'";
 
-            return await QueryAsync<int>(query, null!);
-        }
+        return await QueryAsync<int>(query, null!);
+    }
 
-        /// <inheritdoc />
-        public async Task<(int minId, int maxId)> GetIdSpanAsync(bool isIncrementalHarvest)
+    /// <inheritdoc />
+    public async Task<(int minId, int maxId)> GetIdSpanAsync(bool isIncrementalHarvest)
+    {
+        try
         {
-            try
-            {
-                string query = $@"
+            string query = $@"
                 SELECT 
                     MIN(s.SightingId) AS minId,
                     MAX(s.SightingId) AS maxId
@@ -263,22 +263,22 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
                 WHERE 
                     {GetSightingWhereBasics(isIncrementalHarvest)}";
 
-                return (await QueryAsync<(int minId, int maxId)>(query, null!)).FirstOrDefault();
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e, "Error getting min and max id");
-
-                throw;
-            }
+            return (await QueryAsync<(int minId, int maxId)>(query, null!)).FirstOrDefault();
         }
-
-        /// <inheritdoc />
-        public async Task<DateTime?> GetLastModifiedDateAsyc(bool isIncrementalHarvest)
+        catch (Exception e)
         {
-            try
-            {
-                string query = $@"
+            Logger.LogError(e, "Error getting min and max id");
+
+            throw;
+        }
+    }
+
+    /// <inheritdoc />
+    public async Task<DateTime?> GetLastModifiedDateAsyc(bool isIncrementalHarvest)
+    {
+        try
+        {
+            string query = $@"
                 SELECT 
 	                MAX(s.EditDate)
                 FROM 
@@ -286,45 +286,45 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
                 WHERE
                     {GetSightingWhereBasics(isIncrementalHarvest)}";
 
-                return (await QueryAsync<DateTime?>(query, null!)).FirstOrDefault();
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e, "Error getting last modified date");
-
-                throw;
-            }
+            return (await QueryAsync<DateTime?>(query, null!)).FirstOrDefault();
         }
-
-        /// <inheritdoc />
-        public async Task<IEnumerable<NewAndEditedSightingId>> GetModifiedIdsAsync(DateTime modifiedSince, int limit)
+        catch (Exception e)
         {
-            try
-            {
-                var result = await QueryAsync<NewAndEditedSightingId>("GetNewAndEditedSightingIds", new { modifiedSince = modifiedSince.ToLocalTime(), maxReturnRows = limit }, System.Data.CommandType.StoredProcedure);
+            Logger.LogError(e, "Error getting last modified date");
 
-                Logger.LogInformation($"GetModifiedIdsAsync({modifiedSince.ToLocalTime()}, {limit}, Live={Live}) returned {result?.Count() ?? 0} sightingIds.");
-                if (!result?.Any() ?? true)
-                {
-                    Logger.LogInformation($"Artportalen SightingRepository.GetModifiedIdsAsync(DateTime modifiedSince, int limit) returned no sightings. modifiedSince={modifiedSince}, modifiedSinceLocalTime={modifiedSince.ToLocalTime()}, limit={limit}");
-                    return null!;
-                }
-                return result!.DistinctBy(m => m.Id);                
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e, "Error getting modified id's");
-
-                throw;
-            }
+            throw;
         }
+    }
 
-        /// <inheritdoc />
-        public async Task<IEnumerable<(int SightingId, int ProjectId)>> GetSightingProjectIdsAsync(IEnumerable<int> sightingIds)
+    /// <inheritdoc />
+    public async Task<IEnumerable<NewAndEditedSightingId>> GetModifiedIdsAsync(DateTime modifiedSince, int limit)
+    {
+        try
         {
-            try
+            var result = await QueryAsync<NewAndEditedSightingId>("GetNewAndEditedSightingIds", new { modifiedSince = modifiedSince.ToLocalTime(), maxReturnRows = limit }, System.Data.CommandType.StoredProcedure);
+
+            Logger.LogInformation($"GetModifiedIdsAsync({modifiedSince.ToLocalTime()}, {limit}, Live={Live}) returned {result?.Count() ?? 0} sightingIds.");
+            if (!result?.Any() ?? true)
             {
-                var query = $@"
+                Logger.LogInformation($"Artportalen SightingRepository.GetModifiedIdsAsync(DateTime modifiedSince, int limit) returned no sightings. modifiedSince={modifiedSince}, modifiedSinceLocalTime={modifiedSince.ToLocalTime()}, limit={limit}");
+                return null!;
+            }
+            return result!.DistinctBy(m => m.Id);                
+        }
+        catch (Exception e)
+        {
+            Logger.LogError(e, "Error getting modified id's");
+
+            throw;
+        }
+    }
+
+    /// <inheritdoc />
+    public async Task<IEnumerable<(int SightingId, int ProjectId)>> GetSightingProjectIdsAsync(IEnumerable<int> sightingIds)
+    {
+        try
+        {
+            var query = $@"
                 SELECT 
                     ps.SightingId AS SightingId,
 	                ps.ProjectId AS ProjectId
@@ -332,21 +332,21 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
 	                ProjectSighting ps 
                     INNER JOIN @tvp t ON ps.SightingId = t.Id";
 
-                return await QueryAsync<(int SightingId, int ProjectId)>(
-                    query,
-                    new { tvp = sightingIds.ToSqlRecords().AsTableValuedParameter("dbo.IdValueTable") });
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e, "Error getting sighting/project connections");
-                throw;
-            }
+            return await QueryAsync<(int SightingId, int ProjectId)>(
+                query,
+                new { tvp = sightingIds.ToSqlRecords().AsTableValuedParameter("dbo.IdValueTable") });
         }
-
-        /// <inheritdoc />
-        public async Task<IDictionary<int, ICollection<(int sightingId, int taxonId)>>> GetSightingsAndTaxonIdsForChecklistsAsync(IEnumerable<int> checklistIds)
+        catch (Exception e)
         {
-            var query = $@"
+            Logger.LogError(e, "Error getting sighting/project connections");
+            throw;
+        }
+    }
+
+    /// <inheritdoc />
+    public async Task<IDictionary<int, ICollection<(int sightingId, int taxonId)>>> GetSightingsAndTaxonIdsForChecklistsAsync(IEnumerable<int> checklistIds)
+    {
+        var query = $@"
 	        SELECT 
 		        s.ChecklistId,
 		        s.[Id] AS SightingId,
@@ -355,27 +355,26 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
 		        Sighting s
                 INNER JOIN @tvp t ON s.ChecklistId = t.Id";
 
-            var result = await QueryAsync<(int checklistId, int sightingId, int taxonId)>(query,
-                new { tvp = checklistIds.ToSqlRecords().AsTableValuedParameter("dbo.IdValueTable") });
+        var result = await QueryAsync<(int checklistId, int sightingId, int taxonId)>(query,
+            new { tvp = checklistIds.ToSqlRecords().AsTableValuedParameter("dbo.IdValueTable") });
 
-            if (!result?.Any() ?? true)
-            {
-                return null!;
-            }
-
-            var checklistsData = new Dictionary<int, ICollection<(int sightingId, int taxonId)>>();
-
-            foreach (var item in result!)
-            {
-                if (!checklistsData.TryGetValue(item.checklistId, out var checklistData))
-                {
-                    checklistData = new List<(int sightingId, int taxonId)>();
-                    checklistsData.Add(item.checklistId, checklistData);
-                }
-                checklistData.Add((item.sightingId, item.taxonId));
-            }
-
-            return checklistsData;
+        if (!result?.Any() ?? true)
+        {
+            return null!;
         }
+
+        var checklistsData = new Dictionary<int, ICollection<(int sightingId, int taxonId)>>();
+
+        foreach (var item in result!)
+        {
+            if (!checklistsData.TryGetValue(item.checklistId, out var checklistData))
+            {
+                checklistData = new List<(int sightingId, int taxonId)>();
+                checklistsData.Add(item.checklistId, checklistData);
+            }
+            checklistData.Add((item.sightingId, item.taxonId));
+        }
+
+        return checklistsData;
     }
 }

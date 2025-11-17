@@ -1,10 +1,9 @@
-﻿namespace SOS.Hangfire.JobServer.Configuration
+﻿namespace SOS.Hangfire.JobServer.Configuration;
+
+internal class JobServerConfiguration
 {
-    internal class JobServerConfiguration
-    {
-        /// <summary>
-        /// Enable bus harvest if true
-        /// </summary>
-        public bool EnableBusHarvest { get; set; }
-    }
+    /// <summary>
+    /// Enable bus harvest if true
+    /// </summary>
+    public bool EnableBusHarvest { get; set; }
 }

@@ -1,9 +1,8 @@
-﻿namespace SOS.Shared.Api.Dtos.Enum
+﻿namespace SOS.Shared.Api.Dtos.Enum;
+
+public enum SightingDeterminationFilterDto
 {
-    public enum SightingDeterminationFilterDto
-    {
-        NoFilter,
-        NotUnsureDetermination,
-        OnlyUnsureDetermination
-    }
+    NoFilter,
+    NotUnsureDetermination,
+    OnlyUnsureDetermination
 }

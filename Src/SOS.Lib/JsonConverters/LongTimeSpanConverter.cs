@@ -4,48 +4,47 @@ using System.Buffers.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace SOS.Lib.JsonConverters
+namespace SOS.Lib.JsonConverters;
+
+/// <summary>
+/// Converter for nullable TimeSpan.
+/// </summary>
+public class LongTimeSpanConverter : JsonConverter<TimeSpan?>
 {
     /// <summary>
-    /// Converter for nullable TimeSpan.
+    /// Read nullable TimeSpan from long.
     /// </summary>
-    public class LongTimeSpanConverter : JsonConverter<TimeSpan?>
+    /// <param name="reader"></param>
+    /// <param name="type"></param>
+    /// <param name="options"></param>
+    /// <returns></returns>
+    public override TimeSpan? Read(ref Utf8JsonReader reader, Type type, JsonSerializerOptions options)
     {
-        /// <summary>
-        /// Read nullable TimeSpan from long.
-        /// </summary>
-        /// <param name="reader"></param>
-        /// <param name="type"></param>
-        /// <param name="options"></param>
-        /// <returns></returns>
-        public override TimeSpan? Read(ref Utf8JsonReader reader, Type type, JsonSerializerOptions options)
+        if (reader.TokenType == JsonTokenType.Number)
         {
-            if (reader.TokenType == JsonTokenType.Number)
+            var span = reader.HasValueSequence ? reader.ValueSequence.ToArray() : reader.ValueSpan;
+            if (Utf8Parser.TryParse(span, out long number, out var bytesConsumed) && span.Length == bytesConsumed)
             {
-                var span = reader.HasValueSequence ? reader.ValueSequence.ToArray() : reader.ValueSpan;
-                if (Utf8Parser.TryParse(span, out long number, out var bytesConsumed) && span.Length == bytesConsumed)
-                {
-                    return TimeSpan.FromTicks(number);
-                }
-
-                return null;
+                return TimeSpan.FromTicks(number);
             }
 
             return null;
         }
 
-        /// <summary>
-        /// Write to json
-        /// </summary>
-        /// <param name="writer"></param>
-        /// <param name="value"></param>
-        /// <param name="options"></param>
-        public override void Write(Utf8JsonWriter writer, TimeSpan? value, JsonSerializerOptions options)
+        return null;
+    }
+
+    /// <summary>
+    /// Write to json
+    /// </summary>
+    /// <param name="writer"></param>
+    /// <param name="value"></param>
+    /// <param name="options"></param>
+    public override void Write(Utf8JsonWriter writer, TimeSpan? value, JsonSerializerOptions options)
+    {
+        if (value.HasValue)
         {
-            if (value.HasValue)
-            {
-                writer.WriteNumberValue(value.Value.Ticks);
-            }
+            writer.WriteNumberValue(value.Value.Ticks);
         }
     }
 }

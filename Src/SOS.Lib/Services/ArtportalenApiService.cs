@@ -6,66 +6,65 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace SOS.Lib.Services
+namespace SOS.Lib.Services;
+
+/// <summary>
+/// Artportalen API service.
+/// </summary>
+public class ArtportalenApiService : IArtportalenApiService
 {
+    private readonly IHttpClientService _httpClientService;
+    private readonly ArtportalenApiServiceConfiguration _artportalenApiServiceConfiguration;
+    private readonly ILogger<ArtportalenApiService> _logger;
+
     /// <summary>
-    /// Artportalen API service.
+    /// Constructor
     /// </summary>
-    public class ArtportalenApiService : IArtportalenApiService
+    /// <param name="httpClientService"></param>
+    /// <param name="artportalenApiServiceConfiguration"></param>
+    /// <param name="logger"></param>
+    public ArtportalenApiService(
+        IHttpClientService httpClientService,
+        ArtportalenApiServiceConfiguration artportalenApiServiceConfiguration,
+        ILogger<ArtportalenApiService> logger)
     {
-        private readonly IHttpClientService _httpClientService;
-        private readonly ArtportalenApiServiceConfiguration _artportalenApiServiceConfiguration;
-        private readonly ILogger<ArtportalenApiService> _logger;
+        _httpClientService = httpClientService ?? throw new ArgumentNullException(nameof(httpClientService));
+        _artportalenApiServiceConfiguration = artportalenApiServiceConfiguration ??
+                                    throw new ArgumentNullException(nameof(artportalenApiServiceConfiguration));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="httpClientService"></param>
-        /// <param name="artportalenApiServiceConfiguration"></param>
-        /// <param name="logger"></param>
-        public ArtportalenApiService(
-            IHttpClientService httpClientService,
-            ArtportalenApiServiceConfiguration artportalenApiServiceConfiguration,
-            ILogger<ArtportalenApiService> logger)
+    public async Task<SightingOutput> GetSightingByIdAsync(int sightingId)
+    {
+        try
         {
-            _httpClientService = httpClientService ?? throw new ArgumentNullException(nameof(httpClientService));
-            _artportalenApiServiceConfiguration = artportalenApiServiceConfiguration ??
-                                        throw new ArgumentNullException(nameof(artportalenApiServiceConfiguration));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            var sighting = await _httpClientService.GetDataAsync<SightingOutput>(
+                new Uri($"{_artportalenApiServiceConfiguration.BaseAddress}/sightings/{sightingId}"));
+
+            return sighting;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Failed to get sighting with sightingId={@sightingId} from Artportalen API", sightingId);
         }
 
-        public async Task<SightingOutput> GetSightingByIdAsync(int sightingId)
+        return null;
+    }
+
+    public async Task<List<MediaFile>> GetMediaBySightingIdAsync(int sightingId)
+    {
+        try
         {
-            try
-            {
-                var sighting = await _httpClientService.GetDataAsync<SightingOutput>(
-                    new Uri($"{_artportalenApiServiceConfiguration.BaseAddress}/sightings/{sightingId}"));
+            var media = await _httpClientService.GetDataAsync<List<MediaFile>>(
+                new Uri($"{_artportalenApiServiceConfiguration.BaseAddress}/sightings/{sightingId}/media"));
 
-                return sighting;
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Failed to get sighting with sightingId={@sightingId} from Artportalen API", sightingId);
-            }
-
-            return null;
+            return media;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Failed to get media for sightingId={@sightingId} from Artportalen API", sightingId);
         }
 
-        public async Task<List<MediaFile>> GetMediaBySightingIdAsync(int sightingId)
-        {
-            try
-            {
-                var media = await _httpClientService.GetDataAsync<List<MediaFile>>(
-                    new Uri($"{_artportalenApiServiceConfiguration.BaseAddress}/sightings/{sightingId}/media"));
-
-                return media;
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Failed to get media for sightingId={@sightingId} from Artportalen API", sightingId);
-            }
-
-            return null;
-        }
+        return null;
     }
 }

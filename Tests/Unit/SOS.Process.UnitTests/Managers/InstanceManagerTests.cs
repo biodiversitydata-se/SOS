@@ -7,106 +7,105 @@ using System;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace SOS.Process.UnitTests.Managers
+namespace SOS.Process.UnitTests.Managers;
+
+/// <summary>
+///     Tests for Instance manager
+/// </summary>
+public class InstanceManagerTests
 {
     /// <summary>
-    ///     Tests for Instance manager
+    ///     Constructor
     /// </summary>
-    public class InstanceManagerTests
+    public InstanceManagerTests()
     {
-        /// <summary>
-        ///     Constructor
-        /// </summary>
-        public InstanceManagerTests()
-        {
-            _processedObservationRepositoryMock = new Mock<IProcessedObservationCoreRepository>();
-            _loggerMock = new Mock<ILogger<InstanceManager>>();
-        }
+        _processedObservationRepositoryMock = new Mock<IProcessedObservationCoreRepository>();
+        _loggerMock = new Mock<ILogger<InstanceManager>>();
+    }
 
-        private readonly Mock<IProcessedObservationCoreRepository> _processedObservationRepositoryMock;
-        private readonly Mock<ILogger<InstanceManager>> _loggerMock;
+    private readonly Mock<IProcessedObservationCoreRepository> _processedObservationRepositoryMock;
+    private readonly Mock<ILogger<InstanceManager>> _loggerMock;
 
-        /// <summary>
-        ///     Test processing exception
-        /// </summary>
-        /// <returns></returns>
-        [Fact]
-        public async Task SetActiveInstanceAsyncException()
-        {
-            // -----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            _processedObservationRepositoryMock.Setup(r => r.SetActiveInstanceAsync(It.IsAny<byte>()))
-                .ThrowsAsync(new Exception("Failed"));
+    /// <summary>
+    ///     Test processing exception
+    /// </summary>
+    /// <returns></returns>
+    [Fact]
+    public async Task SetActiveInstanceAsyncException()
+    {
+        // -----------------------------------------------------------------------------------------------------------
+        // Arrange
+        //-----------------------------------------------------------------------------------------------------------
+        _processedObservationRepositoryMock.Setup(r => r.SetActiveInstanceAsync(It.IsAny<byte>()))
+            .ThrowsAsync(new Exception("Failed"));
 
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var instanceManager = new InstanceManager(
-                _processedObservationRepositoryMock.Object,
-                _loggerMock.Object);
+        //-----------------------------------------------------------------------------------------------------------
+        // Act
+        //-----------------------------------------------------------------------------------------------------------
+        var instanceManager = new InstanceManager(
+            _processedObservationRepositoryMock.Object,
+            _loggerMock.Object);
 
-            var result = await instanceManager.SetActiveInstanceAsync(0);
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
+        var result = await instanceManager.SetActiveInstanceAsync(0);
+        //-----------------------------------------------------------------------------------------------------------
+        // Assert
+        //-----------------------------------------------------------------------------------------------------------
 
-            result.Should().BeFalse();
-        }
+        result.Should().BeFalse();
+    }
 
-        /// <summary>
-        ///     Copy provider data fail
-        /// </summary>
-        /// <returns></returns>
-        [Fact]
-        public async Task SetActiveInstanceAsyncFail()
-        {
-            // -----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
+    /// <summary>
+    ///     Copy provider data fail
+    /// </summary>
+    /// <returns></returns>
+    [Fact]
+    public async Task SetActiveInstanceAsyncFail()
+    {
+        // -----------------------------------------------------------------------------------------------------------
+        // Arrange
+        //-----------------------------------------------------------------------------------------------------------
 
 
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var instanceManager = new InstanceManager(
-                _processedObservationRepositoryMock.Object,
-                _loggerMock.Object);
+        //-----------------------------------------------------------------------------------------------------------
+        // Act
+        //-----------------------------------------------------------------------------------------------------------
+        var instanceManager = new InstanceManager(
+            _processedObservationRepositoryMock.Object,
+            _loggerMock.Object);
 
-            var result = await instanceManager.SetActiveInstanceAsync(0);
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
+        var result = await instanceManager.SetActiveInstanceAsync(0);
+        //-----------------------------------------------------------------------------------------------------------
+        // Assert
+        //-----------------------------------------------------------------------------------------------------------
 
-            result.Should().BeFalse();
-        }
+        result.Should().BeFalse();
+    }
 
-        /// <summary>
-        ///     Make a successful test of copy provider data
-        /// </summary>
-        /// <returns></returns>
-        [Fact]
-        public async Task SetActiveInstanceAsyncSuccess()
-        {
-            // -----------------------------------------------------------------------------------------------------------
-            // Arrange
-            //-----------------------------------------------------------------------------------------------------------
-            _processedObservationRepositoryMock.Setup(r => r.SetActiveInstanceAsync(It.IsAny<byte>()))
-                .ReturnsAsync(true);
+    /// <summary>
+    ///     Make a successful test of copy provider data
+    /// </summary>
+    /// <returns></returns>
+    [Fact]
+    public async Task SetActiveInstanceAsyncSuccess()
+    {
+        // -----------------------------------------------------------------------------------------------------------
+        // Arrange
+        //-----------------------------------------------------------------------------------------------------------
+        _processedObservationRepositoryMock.Setup(r => r.SetActiveInstanceAsync(It.IsAny<byte>()))
+            .ReturnsAsync(true);
 
-            //-----------------------------------------------------------------------------------------------------------
-            // Act
-            //-----------------------------------------------------------------------------------------------------------
-            var instanceManager = new InstanceManager(
-                _processedObservationRepositoryMock.Object,
-                _loggerMock.Object);
+        //-----------------------------------------------------------------------------------------------------------
+        // Act
+        //-----------------------------------------------------------------------------------------------------------
+        var instanceManager = new InstanceManager(
+            _processedObservationRepositoryMock.Object,
+            _loggerMock.Object);
 
-            var result = await instanceManager.SetActiveInstanceAsync(0);
-            //-----------------------------------------------------------------------------------------------------------
-            // Assert
-            //-----------------------------------------------------------------------------------------------------------
+        var result = await instanceManager.SetActiveInstanceAsync(0);
+        //-----------------------------------------------------------------------------------------------------------
+        // Assert
+        //-----------------------------------------------------------------------------------------------------------
 
-            result.Should().BeTrue();
-        }
+        result.Should().BeTrue();
     }
 }

@@ -2,33 +2,32 @@
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Collections.Generic;
 
-namespace SOS.Lib.Swagger
+namespace SOS.Lib.Swagger;
+
+/// <summary>
+/// Add optional headers to swagger
+/// </summary>
+public class SwaggerAddOptionalHeaderParameters : IOperationFilter
 {
     /// <summary>
-    /// Add optional headers to swagger
+    /// Apply headers
     /// </summary>
-    public class SwaggerAddOptionalHeaderParameters : IOperationFilter
+    /// <param name="operation"></param>
+    /// <param name="context"></param>
+    public void Apply(OpenApiOperation operation, OperationFilterContext context)
     {
-        /// <summary>
-        /// Apply headers
-        /// </summary>
-        /// <param name="operation"></param>
-        /// <param name="context"></param>
-        public void Apply(OpenApiOperation operation, OperationFilterContext context)
-        {
-            operation.Parameters ??= new List<IOpenApiParameter>();
+        operation.Parameters ??= new List<IOpenApiParameter>();
 
-            operation.Parameters.Add(new OpenApiParameter()
+        operation.Parameters.Add(new OpenApiParameter()
+        {
+            Name = "X-Requesting-System",
+            Description = "Name of system doing the request",
+            In = ParameterLocation.Header,
+            Required = false,
+            Schema = new OpenApiSchema()
             {
-                Name = "X-Requesting-System",
-                Description = "Name of system doing the request",
-                In = ParameterLocation.Header,
-                Required = false,
-                Schema = new OpenApiSchema()
-                {
-                    Type = JsonSchemaType.String
-                }
-            });
-        }
+                Type = JsonSchemaType.String
+            }
+        });
     }
 }

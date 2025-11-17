@@ -12,70 +12,69 @@ using SOS.Lib.Models.Verbatim.FishData;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
 
-namespace SOS.Harvest.Processors.FishData
+namespace SOS.Harvest.Processors.FishData;
+
+/// <summary>
+///     Process factory class
+/// </summary>
+public class FishDataObservationProcessor :
+    ObservationProcessorBase<FishDataObservationProcessor, FishDataObservationVerbatim, IFishDataObservationVerbatimRepository>, IFishDataObservationProcessor
 {
-    /// <summary>
-    ///     Process factory class
-    /// </summary>
-    public class FishDataObservationProcessor :
-        ObservationProcessorBase<FishDataObservationProcessor, FishDataObservationVerbatim, IFishDataObservationVerbatimRepository>, IFishDataObservationProcessor
+    private readonly IAreaHelper _areaHelper;
+    private readonly IFishDataObservationVerbatimRepository _fishDataObservationVerbatimRepository;
+
+    /// <inheritdoc />
+    protected override async Task<(int publicCount, int protectedCount, int failedCount)> ProcessObservationsAsync(
+        DataProvider dataProvider,
+        IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
+        IDictionary<VocabularyId, IDictionary<object, int>> dwcaVocabularyById,
+        JobRunModes mode,
+        IJobCancellationToken cancellationToken)
     {
-        private readonly IAreaHelper _areaHelper;
-        private readonly IFishDataObservationVerbatimRepository _fishDataObservationVerbatimRepository;
+        var observationFactory = new FishDataObservationFactory(dataProvider, taxa, dwcaVocabularyById, _areaHelper, TimeManager, ProcessConfiguration);
 
-        /// <inheritdoc />
-        protected override async Task<(int publicCount, int protectedCount, int failedCount)> ProcessObservationsAsync(
-            DataProvider dataProvider,
-            IDictionary<int, Lib.Models.Processed.Observation.Taxon> taxa,
-            IDictionary<VocabularyId, IDictionary<object, int>> dwcaVocabularyById,
-            JobRunModes mode,
-            IJobCancellationToken cancellationToken)
-        {
-            var observationFactory = new FishDataObservationFactory(dataProvider, taxa, dwcaVocabularyById, _areaHelper, TimeManager, ProcessConfiguration);
-
-            return await base.ProcessObservationsAsync(
-                dataProvider,
-                mode,
-                observationFactory,
-                _fishDataObservationVerbatimRepository,
-                cancellationToken);
-        }
-
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="fishDataObservationVerbatimRepository"></param>
-        /// <param name="areaHelper"></param>
-        /// <param name="processedObservationRepository"></param>
-        /// <param name="vocabularyValueResolver"></param>
-        /// <param name="dwcArchiveFileWriterCoordinator"></param>
-        /// <param name="processManager"></param>
-        /// <param name="validationManager"></param>
-        /// <param name="diffusionManager"></param>
-        /// <param name="processTimeManager"></param>
-        /// <param name="processConfiguration"></param>
-        /// <param name="logger"></param>
-        /// <exception cref="ArgumentNullException"></exception>
-        public FishDataObservationProcessor(
-            IFishDataObservationVerbatimRepository fishDataObservationVerbatimRepository,
-            IAreaHelper areaHelper,
-            IProcessedObservationCoreRepository processedObservationRepository,
-            IVocabularyValueResolver vocabularyValueResolver,
-            IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
-            IProcessManager processManager,
-            IValidationManager validationManager,
-            IDiffusionManager diffusionManager,
-            IProcessTimeManager processTimeManager,
-            ProcessConfiguration processConfiguration,
-            ILogger<FishDataObservationProcessor> logger) :
-            base(processedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, processManager, validationManager, diffusionManager, processTimeManager, null, processConfiguration, logger)
-        {
-            _fishDataObservationVerbatimRepository = fishDataObservationVerbatimRepository ??
-                                                     throw new ArgumentNullException(
-                                                         nameof(fishDataObservationVerbatimRepository));
-            _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
-        }
-
-        public override DataProviderType Type => DataProviderType.FishDataObservations;
+        return await base.ProcessObservationsAsync(
+            dataProvider,
+            mode,
+            observationFactory,
+            _fishDataObservationVerbatimRepository,
+            cancellationToken);
     }
+
+    /// <summary>
+    /// Constructor
+    /// </summary>
+    /// <param name="fishDataObservationVerbatimRepository"></param>
+    /// <param name="areaHelper"></param>
+    /// <param name="processedObservationRepository"></param>
+    /// <param name="vocabularyValueResolver"></param>
+    /// <param name="dwcArchiveFileWriterCoordinator"></param>
+    /// <param name="processManager"></param>
+    /// <param name="validationManager"></param>
+    /// <param name="diffusionManager"></param>
+    /// <param name="processTimeManager"></param>
+    /// <param name="processConfiguration"></param>
+    /// <param name="logger"></param>
+    /// <exception cref="ArgumentNullException"></exception>
+    public FishDataObservationProcessor(
+        IFishDataObservationVerbatimRepository fishDataObservationVerbatimRepository,
+        IAreaHelper areaHelper,
+        IProcessedObservationCoreRepository processedObservationRepository,
+        IVocabularyValueResolver vocabularyValueResolver,
+        IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
+        IProcessManager processManager,
+        IValidationManager validationManager,
+        IDiffusionManager diffusionManager,
+        IProcessTimeManager processTimeManager,
+        ProcessConfiguration processConfiguration,
+        ILogger<FishDataObservationProcessor> logger) :
+        base(processedObservationRepository, vocabularyValueResolver, dwcArchiveFileWriterCoordinator, processManager, validationManager, diffusionManager, processTimeManager, null, processConfiguration, logger)
+    {
+        _fishDataObservationVerbatimRepository = fishDataObservationVerbatimRepository ??
+                                                 throw new ArgumentNullException(
+                                                     nameof(fishDataObservationVerbatimRepository));
+        _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
+    }
+
+    public override DataProviderType Type => DataProviderType.FishDataObservations;
 }

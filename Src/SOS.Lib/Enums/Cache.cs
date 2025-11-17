@@ -1,12 +1,11 @@
-﻿namespace SOS.Lib.Enums
+﻿namespace SOS.Lib.Enums;
+
+public enum Cache
 {
-    public enum Cache
-    {
-        Area,
-        DataProviders,
-        ProcessedConfiguration,
-        Projects,
-        TaxonLists,
-        Vocabulary
-    }
+    Area,
+    DataProviders,
+    ProcessedConfiguration,
+    Projects,
+    TaxonLists,
+    Vocabulary
 }

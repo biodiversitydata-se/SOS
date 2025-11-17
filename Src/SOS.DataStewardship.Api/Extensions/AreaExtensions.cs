@@ -1,55 +1,54 @@
 ﻿using SOS.DataStewardship.Api.Contracts.Enums;
 
-namespace SOS.DataStewardship.Api.Extensions
+namespace SOS.DataStewardship.Api.Extensions;
+
+public static class AreaExtensions
 {
-    public static class AreaExtensions
+    public static County? GetCounty(this string countyId)
     {
-        public static County? GetCounty(this string countyId)
+        if (string.IsNullOrEmpty(countyId)) return null;
+
+        if (!int.TryParse(countyId, out var id))
         {
-            if (string.IsNullOrEmpty(countyId)) return null;
-
-            if (!int.TryParse(countyId, out var id))
-            {
-                return null;
-            }
-
-            return (County)id;
+            return null;
         }
 
-        public static Municipality? GetMunicipality(this string municipalityId)
+        return (County)id;
+    }
+
+    public static Municipality? GetMunicipality(this string municipalityId)
+    {
+        if (string.IsNullOrEmpty(municipalityId)) return null;
+
+        if (!int.TryParse(municipalityId, out var id))
         {
-            if (string.IsNullOrEmpty(municipalityId)) return null;
-
-            if (!int.TryParse(municipalityId, out var id))
-            {
-                return null;
-            }
-
-            return (Municipality)id;
+            return null;
         }
 
-        public static Parish? GetParish(this string parishId)
+        return (Municipality)id;
+    }
+
+    public static Parish? GetParish(this string parishId)
+    {
+        if (string.IsNullOrEmpty(parishId)) return null;
+
+        if (!int.TryParse(parishId, out var id))
         {
-            if (string.IsNullOrEmpty(parishId)) return null;
-
-            if (!int.TryParse(parishId, out var id))
-            {
-                return null;
-            }
-
-            return (Parish)id;
+            return null;
         }
 
-        public static Province? GetProvince(this string provinceId)
+        return (Parish)id;
+    }
+
+    public static Province? GetProvince(this string provinceId)
+    {
+        if (string.IsNullOrEmpty(provinceId)) return null;
+
+        if (!int.TryParse(provinceId, out var id))
         {
-            if (string.IsNullOrEmpty(provinceId)) return null;
-
-            if (!int.TryParse(provinceId, out var id))
-            {
-                return null;
-            }
-
-            return (Province)id;
+            return null;
         }
+
+        return (Province)id;
     }
 }

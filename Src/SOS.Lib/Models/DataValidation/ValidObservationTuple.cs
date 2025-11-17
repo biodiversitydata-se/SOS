@@ -1,23 +1,22 @@
 ﻿using SOS.Lib.Models.DarwinCore;
 using System.Collections.Generic;
 
-namespace SOS.Lib.Models.DataValidation
+namespace SOS.Lib.Models.DataValidation;
+
+public class ValidObservationTuple<TVerbatim, TProcessed>
 {
-    public class ValidObservationTuple<TVerbatim, TProcessed>
-    {
-        public TVerbatim VerbatimObservation { get; set; }
-        public TProcessed ProcessedObservation { get; set; }
-        public DwcExport DwcExport { get; set; }
-    }
+    public TVerbatim VerbatimObservation { get; set; }
+    public TProcessed ProcessedObservation { get; set; }
+    public DwcExport DwcExport { get; set; }
+}
 
-    public class DwcExport
-    {
-        public DarwinCore.DarwinCore Observation { get; set; }
-        public DwcExportExtensions Extensions { get; set; }
-    }
+public class DwcExport
+{
+    public DarwinCore.DarwinCore Observation { get; set; }
+    public DwcExportExtensions Extensions { get; set; }
+}
 
-    public class DwcExportExtensions
-    {
-        public IEnumerable<ExtendedMeasurementOrFactRow> ExtendedMeasurementOrFacts { get; set; }
-    }
+public class DwcExportExtensions
+{
+    public IEnumerable<ExtendedMeasurementOrFactRow> ExtendedMeasurementOrFacts { get; set; }
 }

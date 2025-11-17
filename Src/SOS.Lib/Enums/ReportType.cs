@@ -1,13 +1,12 @@
-﻿namespace SOS.Lib.Enums
+﻿namespace SOS.Lib.Enums;
+
+/// <summary>
+///     Report types.
+/// </summary>
+public enum ReportType
 {
-    /// <summary>
-    ///     Report types.
-    /// </summary>
-    public enum ReportType
-    {
-        Unknown = 0,
-        DataValidationReport = 1,
-        ApiUsageStatistics = 2,
-        InvalidObservations = 3
-    }
+    Unknown = 0,
+    DataValidationReport = 1,
+    ApiUsageStatistics = 2,
+    InvalidObservations = 3
 }

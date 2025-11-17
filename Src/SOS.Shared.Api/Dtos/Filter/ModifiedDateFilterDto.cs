@@ -1,20 +1,19 @@
 ﻿using System;
 
-namespace SOS.Shared.Api.Dtos.Filter
+namespace SOS.Shared.Api.Dtos.Filter;
+
+/// <summary>
+/// Filter for observation Modified date
+/// </summary>
+public class ModifiedDateFilterDto
 {
     /// <summary>
-    /// Filter for observation Modified date
+    /// Changed from
     /// </summary>
-    public class ModifiedDateFilterDto
-    {
-        /// <summary>
-        /// Changed from
-        /// </summary>
-        public DateTime? From { get; set; }
+    public DateTime? From { get; set; }
 
-        /// <summary>
-        /// Changed tp
-        /// </summary>
-        public DateTime? To { get; set; }
-    }
+    /// <summary>
+    /// Changed tp
+    /// </summary>
+    public DateTime? To { get; set; }
 }

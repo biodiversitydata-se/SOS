@@ -1,25 +1,24 @@
 ﻿using System.Collections.Generic;
 
-namespace SOS.Lib.Extensions
+namespace SOS.Lib.Extensions;
+
+/// <summary>
+/// Dictionary extensions.
+/// </summary>
+public static class DictionaryExtensions
 {
     /// <summary>
-    /// Dictionary extensions.
+    /// Get a value from dictionary or default if the key didn't exist.
     /// </summary>
-    public static class DictionaryExtensions
+    /// <typeparam name="TK"></typeparam>
+    /// <typeparam name="TV"></typeparam>
+    /// <param name="dict"></param>
+    /// <param name="key"></param>
+    /// <param name="defaultValue"></param>
+    /// <returns></returns>
+    public static TV GetValue<TK, TV>(this IDictionary<TK, TV> dict, TK key, TV defaultValue = default(TV))
     {
-        /// <summary>
-        /// Get a value from dictionary or default if the key didn't exist.
-        /// </summary>
-        /// <typeparam name="TK"></typeparam>
-        /// <typeparam name="TV"></typeparam>
-        /// <param name="dict"></param>
-        /// <param name="key"></param>
-        /// <param name="defaultValue"></param>
-        /// <returns></returns>
-        public static TV GetValue<TK, TV>(this IDictionary<TK, TV> dict, TK key, TV defaultValue = default(TV))
-        {
-            TV value;
-            return dict.TryGetValue(key, out value) ? value : defaultValue;
-        }
+        TV value;
+        return dict.TryGetValue(key, out value) ? value : defaultValue;
     }
 }

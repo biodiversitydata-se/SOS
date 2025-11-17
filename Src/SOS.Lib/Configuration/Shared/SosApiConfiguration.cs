@@ -1,18 +1,17 @@
 ﻿using System.Collections.Generic;
 
-namespace SOS.Lib.Configuration.Shared
+namespace SOS.Lib.Configuration.Shared;
+
+public class SosApiConfiguration
 {
-    public class SosApiConfiguration
-    {
-        /// <summary>
-        /// Observations API address.
-        /// </summary>
-        public IEnumerable<string> ObservationsApiAddresses { get; set; }
+    /// <summary>
+    /// Observations API address.
+    /// </summary>
+    public IEnumerable<string> ObservationsApiAddresses { get; set; }
 
-        public IEnumerable<string> ElasticSearchProxyAddresses { get; set; }
+    public IEnumerable<string> ElasticSearchProxyAddresses { get; set; }
 
-        public IEnumerable<string> AnalysisApiAddresses { get; set; }
+    public IEnumerable<string> AnalysisApiAddresses { get; set; }
 
-        public IEnumerable<string> DataStewardshipApiAddresses { get; set; }
-    }
+    public IEnumerable<string> DataStewardshipApiAddresses { get; set; }
 }

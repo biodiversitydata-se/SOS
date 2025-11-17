@@ -1,7 +1,6 @@
-﻿namespace SOS.DataStewardship.Api.IntegrationTests.Core
+﻿namespace SOS.DataStewardship.Api.IntegrationTests.Core;
+
+public static class Constants
 {
-    public static class Constants
-    {
-        public const string IntegrationTestsCollectionName = "IntegrationTestsCollection";
-    }
+    public const string IntegrationTestsCollectionName = "IntegrationTestsCollection";
 }

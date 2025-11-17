@@ -7,136 +7,135 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SOS.Lib
+namespace SOS.Lib;
+
+/// <summary>
+/// Observation specific search related extensions
+/// </summary>
+public static class SearchExtensionsChecklist
 {
     /// <summary>
-    /// Observation specific search related extensions
+    /// Add geometry filter to query
     /// </summary>
-    public static class SearchExtensionsChecklist
+    /// <typeparam name="TQueryDescriptor"></typeparam>
+    /// <param name="queries"></param>
+    /// <param name="geographicsFilter"></param>
+    private static void TryAddGeometryFilters<TQueryDescriptor>(
+        this ICollection<Action<QueryDescriptor<TQueryDescriptor>>> queries,
+        GeographicsFilter geographicsFilter) where TQueryDescriptor : class
     {
-        /// <summary>
-        /// Add geometry filter to query
-        /// </summary>
-        /// <typeparam name="TQueryDescriptor"></typeparam>
-        /// <param name="queries"></param>
-        /// <param name="geographicsFilter"></param>
-        private static void TryAddGeometryFilters<TQueryDescriptor>(
-            this ICollection<Action<QueryDescriptor<TQueryDescriptor>>> queries,
-            GeographicsFilter geographicsFilter) where TQueryDescriptor : class
+        if (geographicsFilter == null)
         {
-            if (geographicsFilter == null)
-            {
-                return;
-            }
+            return;
+        }
 
-            var boundingBoxContainers = new List<Action<QueryDescriptor<TQueryDescriptor>>>();
-            if (!(!geographicsFilter.UsePointAccuracy && geographicsFilter.UseDisturbanceRadius))
-            {
-                boundingBoxContainers.TryAddBoundingBoxCriteria(
-                        $"location.{(geographicsFilter.UsePointAccuracy ? "pointWithBuffer" : "point")}",
-                        geographicsFilter.BoundingBox);
-            }
+        var boundingBoxContainers = new List<Action<QueryDescriptor<TQueryDescriptor>>>();
+        if (!(!geographicsFilter.UsePointAccuracy && geographicsFilter.UseDisturbanceRadius))
+        {
+            boundingBoxContainers.TryAddBoundingBoxCriteria(
+                    $"location.{(geographicsFilter.UsePointAccuracy ? "pointWithBuffer" : "point")}",
+                    geographicsFilter.BoundingBox);
+        }
 
-            if (geographicsFilter.UseDisturbanceRadius)
-            {
-                // Add both point and pointWithDisturbanceBuffer, since pointWithDisturbanceBuffer can be null if no dist buffer exists
-                boundingBoxContainers.TryAddBoundingBoxCriteria("location.point", geographicsFilter.BoundingBox);
-                boundingBoxContainers.TryAddBoundingBoxCriteria("location.pointWithDisturbanceBuffer", geographicsFilter.BoundingBox);
-            }
+        if (geographicsFilter.UseDisturbanceRadius)
+        {
+            // Add both point and pointWithDisturbanceBuffer, since pointWithDisturbanceBuffer can be null if no dist buffer exists
+            boundingBoxContainers.TryAddBoundingBoxCriteria("location.point", geographicsFilter.BoundingBox);
+            boundingBoxContainers.TryAddBoundingBoxCriteria("location.pointWithDisturbanceBuffer", geographicsFilter.BoundingBox);
+        }
 
-            if (boundingBoxContainers.Any())
-            {
-                queries.Add(q => q
-                    .Bool(b => b
-                        .Should(boundingBoxContainers.ToArray())
-                    )
-                );
-            }
-
-            if (!geographicsFilter?.IsValid ?? true)
-            {
-                return;
-            }
-            var geometryContainers = new List<Action<QueryDescriptor<TQueryDescriptor>>>();
-
-            foreach (var geom in geographicsFilter.Geometries)
-            {
-                switch (geom.OgcGeometryType)
-                {
-                    case OgcGeometryType.Point:
-                        geometryContainers.TryAddGeoDistanceCriteria($"location.{(geographicsFilter.UsePointAccuracy ? "pointWithBuffer" : "point")}", geom.Centroid, GeoDistanceType.Arc, geographicsFilter.MaxDistanceFromPoint ?? 0);
-
-                        if (!geographicsFilter.UseDisturbanceRadius)
-                        {
-                            continue;
-                        }
-                        geometryContainers.TryAddGeoDistanceCriteria("location.pointWithDisturbanceBuffer", geom.Centroid, GeoDistanceType.Arc, geographicsFilter.MaxDistanceFromPoint ?? 0);
-                        break;
-                    case OgcGeometryType.Polygon:
-                    case OgcGeometryType.MultiPolygon:
-                        var vaildGeometry = geom.TryMakeValid();
-                        geometryContainers.TryAddGeoShapeCriteria($"location.{(geographicsFilter.UsePointAccuracy ? "pointWithBuffer" : "point")}", vaildGeometry, geographicsFilter.UsePointAccuracy ? GeoShapeRelation.Intersects : GeoShapeRelation.Within);
-                        if (!geographicsFilter.UseDisturbanceRadius)
-                        {
-                            continue;
-                        }
-                        geometryContainers.TryAddGeoShapeCriteria("location.pointWithDisturbanceBuffer", vaildGeometry, GeoShapeRelation.Intersects);
-                        break;
-                }
-            }
-
+        if (boundingBoxContainers.Any())
+        {
             queries.Add(q => q
                 .Bool(b => b
-                    .Should(geometryContainers.ToArray())
+                    .Should(boundingBoxContainers.ToArray())
                 )
             );
         }
 
-        /// <summary>
-        /// Try to add geographical filter
-        /// </summary>
-        /// <typeparam name="TQueryDescriptor"></typeparam>
-        /// <param name="queries"></param>
-        /// <param name="geographicAreasFilter"></param>
-        private static ICollection<Action<QueryDescriptor<TQueryDescriptor>>> TryAddGeographicFilter<TQueryDescriptor>(this ICollection<Action<QueryDescriptor<TQueryDescriptor>>> queries,
-            GeographicAreasFilter geographicAreasFilter) where TQueryDescriptor : class
+        if (!geographicsFilter?.IsValid ?? true)
         {
-            if (geographicAreasFilter != null)
-            {
-                queries.TryAddTermsCriteria("location.countryRegion.featureId", geographicAreasFilter.CountryRegionIds);
-                queries.TryAddTermsCriteria("location.county.featureId", geographicAreasFilter.CountyIds);
-                queries.TryAddTermsCriteria("location.municipality.featureId", geographicAreasFilter.MunicipalityIds);
-                queries.TryAddTermsCriteria("location.parish.featureId", geographicAreasFilter.ParishIds);
-                queries.TryAddTermsCriteria("location.province.featureId", geographicAreasFilter.ProvinceIds);
-                queries.TryAddGeometryFilters(geographicAreasFilter.GeometryFilter);
-            }
+            return;
+        }
+        var geometryContainers = new List<Action<QueryDescriptor<TQueryDescriptor>>>();
 
-            return queries;
+        foreach (var geom in geographicsFilter.Geometries)
+        {
+            switch (geom.OgcGeometryType)
+            {
+                case OgcGeometryType.Point:
+                    geometryContainers.TryAddGeoDistanceCriteria($"location.{(geographicsFilter.UsePointAccuracy ? "pointWithBuffer" : "point")}", geom.Centroid, GeoDistanceType.Arc, geographicsFilter.MaxDistanceFromPoint ?? 0);
+
+                    if (!geographicsFilter.UseDisturbanceRadius)
+                    {
+                        continue;
+                    }
+                    geometryContainers.TryAddGeoDistanceCriteria("location.pointWithDisturbanceBuffer", geom.Centroid, GeoDistanceType.Arc, geographicsFilter.MaxDistanceFromPoint ?? 0);
+                    break;
+                case OgcGeometryType.Polygon:
+                case OgcGeometryType.MultiPolygon:
+                    var vaildGeometry = geom.TryMakeValid();
+                    geometryContainers.TryAddGeoShapeCriteria($"location.{(geographicsFilter.UsePointAccuracy ? "pointWithBuffer" : "point")}", vaildGeometry, geographicsFilter.UsePointAccuracy ? GeoShapeRelation.Intersects : GeoShapeRelation.Within);
+                    if (!geographicsFilter.UseDisturbanceRadius)
+                    {
+                        continue;
+                    }
+                    geometryContainers.TryAddGeoShapeCriteria("location.pointWithDisturbanceBuffer", vaildGeometry, GeoShapeRelation.Intersects);
+                    break;
+            }
         }
 
+        queries.Add(q => q
+            .Bool(b => b
+                .Should(geometryContainers.ToArray())
+            )
+        );
+    }
 
-        /// <summary>
-        /// Create search filter
-        /// </summary>
-        /// <param name="filter"></param>
-        /// <returns></returns>
-        public static ICollection<Action<QueryDescriptor<TQueryDescriptor>>> ToQuery<TQueryDescriptor>(
-            this ChecklistSearchFilter filter) where TQueryDescriptor : class
+    /// <summary>
+    /// Try to add geographical filter
+    /// </summary>
+    /// <typeparam name="TQueryDescriptor"></typeparam>
+    /// <param name="queries"></param>
+    /// <param name="geographicAreasFilter"></param>
+    private static ICollection<Action<QueryDescriptor<TQueryDescriptor>>> TryAddGeographicFilter<TQueryDescriptor>(this ICollection<Action<QueryDescriptor<TQueryDescriptor>>> queries,
+        GeographicAreasFilter geographicAreasFilter) where TQueryDescriptor : class
+    {
+        if (geographicAreasFilter != null)
         {
-            var queries = new List<Action<QueryDescriptor<TQueryDescriptor>>>();
-
-            if (filter != null)
-            {
-                queries.TryAddTermsCriteria("dataProviderId", filter.DataProviderIds);
-                queries.TryAddScript((filter.Date?.MinEffortTime ?? TimeSpan.Zero) > TimeSpan.Zero ? $"return doc['event.endDate'].value.getMillis() - doc['event.startDate'].value.getMillis() >= {filter.Date.MinEffortTime.TotalMilliseconds}L;" : null);
-                queries.TryAddTermsCriteria("taxonIds", filter.Taxa?.Ids);
-                queries.TryAddTermsCriteria("projects.id", filter.ProjectIds);
-                queries.TryAddEventDateCritera("event", filter.Date);
-                queries.TryAddGeographicFilter(filter.Location?.AreaGeographic);
-                queries.TryAddGeometryFilters(filter.Location?.Geometries);
-            }
-
-            return queries;
+            queries.TryAddTermsCriteria("location.countryRegion.featureId", geographicAreasFilter.CountryRegionIds);
+            queries.TryAddTermsCriteria("location.county.featureId", geographicAreasFilter.CountyIds);
+            queries.TryAddTermsCriteria("location.municipality.featureId", geographicAreasFilter.MunicipalityIds);
+            queries.TryAddTermsCriteria("location.parish.featureId", geographicAreasFilter.ParishIds);
+            queries.TryAddTermsCriteria("location.province.featureId", geographicAreasFilter.ProvinceIds);
+            queries.TryAddGeometryFilters(geographicAreasFilter.GeometryFilter);
         }
+
+        return queries;
+    }
+
+
+    /// <summary>
+    /// Create search filter
+    /// </summary>
+    /// <param name="filter"></param>
+    /// <returns></returns>
+    public static ICollection<Action<QueryDescriptor<TQueryDescriptor>>> ToQuery<TQueryDescriptor>(
+        this ChecklistSearchFilter filter) where TQueryDescriptor : class
+    {
+        var queries = new List<Action<QueryDescriptor<TQueryDescriptor>>>();
+
+        if (filter != null)
+        {
+            queries.TryAddTermsCriteria("dataProviderId", filter.DataProviderIds);
+            queries.TryAddScript((filter.Date?.MinEffortTime ?? TimeSpan.Zero) > TimeSpan.Zero ? $"return doc['event.endDate'].value.getMillis() - doc['event.startDate'].value.getMillis() >= {filter.Date.MinEffortTime.TotalMilliseconds}L;" : null);
+            queries.TryAddTermsCriteria("taxonIds", filter.Taxa?.Ids);
+            queries.TryAddTermsCriteria("projects.id", filter.ProjectIds);
+            queries.TryAddEventDateCritera("event", filter.Date);
+            queries.TryAddGeographicFilter(filter.Location?.AreaGeographic);
+            queries.TryAddGeometryFilters(filter.Location?.Geometries);
+        }
+
+        return queries;
     }
 }

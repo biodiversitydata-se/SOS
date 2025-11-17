@@ -1,18 +1,17 @@
 ﻿using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.DataStewardship.Dataset;
 
-namespace SOS.Harvest.Processors.Interfaces
+namespace SOS.Harvest.Processors.Interfaces;
+
+/// <summary>
+/// Interface for dataset factory
+/// </summary>
+public interface IDatasetFactory<TEntity> where TEntity : IEntity<int>
 {
     /// <summary>
-    /// Interface for dataset factory
+    /// Create processed dataset.
     /// </summary>
-    public interface IDatasetFactory<TEntity> where TEntity : IEntity<int>
-    {
-        /// <summary>
-        /// Create processed dataset.
-        /// </summary>
-        /// <param name="verbatim"></param>
-        /// <returns></returns>
-        Dataset? CreateProcessedDataset(TEntity verbatim);
-    }
+    /// <param name="verbatim"></param>
+    /// <returns></returns>
+    Dataset? CreateProcessedDataset(TEntity verbatim);
 }

@@ -1,8 +1,7 @@
-﻿namespace SOS.Shared.Api.Dtos
+﻿namespace SOS.Shared.Api.Dtos;
+
+public class GeoGridTileTaxonObservationCountDto
 {
-    public class GeoGridTileTaxonObservationCountDto
-    {
-        public int TaxonId { get; set; }
-        public int ObservationCount { get; set; }
-    }
+    public int TaxonId { get; set; }
+    public int ObservationCount { get; set; }
 }

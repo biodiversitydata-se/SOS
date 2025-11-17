@@ -5,80 +5,79 @@ using SOS.Lib.Jobs.Shared;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Shared;
 
-namespace SOS.Harvest.Jobs
+namespace SOS.Harvest.Jobs;
+
+/// <summary>
+///     Artportalen harvest
+/// </summary>
+public class ClearCacheJob : IClearCacheJob
 {
+    private readonly IAreaCache _areaCache;
+    private readonly IDataProviderCache _dataProviderCache;
+    private readonly ICache<string, ProcessedConfiguration> _processedConfigurationCache;
+    private readonly ICache<int, TaxonList> _taxonListCache;
+    private readonly ICache<VocabularyId, Vocabulary> _vocabularyCache;
+    private readonly ILogger<ClearCacheJob> _logger;
+
     /// <summary>
-    ///     Artportalen harvest
+    /// Constructor
     /// </summary>
-    public class ClearCacheJob : IClearCacheJob
+    /// <param name="areaCache"></param>
+    /// <param name="dataProviderCache"></param>
+    /// <param name="processedConfigurationCache"></param>
+    /// <param name="taxonListCache"></param>
+    /// <param name="vocabularyCache"></param>
+    /// <param name="logger"></param>
+    /// <exception cref="ArgumentNullException"></exception>
+    public ClearCacheJob(
+        IAreaCache areaCache,
+        IDataProviderCache dataProviderCache,
+        ICache<string, ProcessedConfiguration> processedConfigurationCache,
+        ICache<int, TaxonList> taxonListCache,
+        ICache<VocabularyId, Vocabulary> vocabularyCache,
+        ILogger<ClearCacheJob> logger)
     {
-        private readonly IAreaCache _areaCache;
-        private readonly IDataProviderCache _dataProviderCache;
-        private readonly ICache<string, ProcessedConfiguration> _processedConfigurationCache;
-        private readonly ICache<int, TaxonList> _taxonListCache;
-        private readonly ICache<VocabularyId, Vocabulary> _vocabularyCache;
-        private readonly ILogger<ClearCacheJob> _logger;
+        _areaCache = areaCache ?? throw new ArgumentNullException(nameof(areaCache));
+        _dataProviderCache = dataProviderCache ?? throw new ArgumentNullException(nameof(dataProviderCache));
+        _processedConfigurationCache = processedConfigurationCache ?? throw new ArgumentNullException(nameof(processedConfigurationCache));
+        _taxonListCache = taxonListCache ?? throw new ArgumentNullException(nameof(taxonListCache));
+        _vocabularyCache = vocabularyCache ?? throw new ArgumentNullException(nameof(vocabularyCache));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="areaCache"></param>
-        /// <param name="dataProviderCache"></param>
-        /// <param name="processedConfigurationCache"></param>
-        /// <param name="taxonListCache"></param>
-        /// <param name="vocabularyCache"></param>
-        /// <param name="logger"></param>
-        /// <exception cref="ArgumentNullException"></exception>
-        public ClearCacheJob(
-            IAreaCache areaCache,
-            IDataProviderCache dataProviderCache,
-            ICache<string, ProcessedConfiguration> processedConfigurationCache,
-            ICache<int, TaxonList> taxonListCache,
-            ICache<VocabularyId, Vocabulary> vocabularyCache,
-            ILogger<ClearCacheJob> logger)
+    /// <inheritdoc />
+    public async Task RunAsync(IEnumerable<Cache> caches)
+    {
+        if (!caches?.Any() ?? true)
         {
-            _areaCache = areaCache ?? throw new ArgumentNullException(nameof(areaCache));
-            _dataProviderCache = dataProviderCache ?? throw new ArgumentNullException(nameof(dataProviderCache));
-            _processedConfigurationCache = processedConfigurationCache ?? throw new ArgumentNullException(nameof(processedConfigurationCache));
-            _taxonListCache = taxonListCache ?? throw new ArgumentNullException(nameof(taxonListCache));
-            _vocabularyCache = vocabularyCache ?? throw new ArgumentNullException(nameof(vocabularyCache));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            return;
         }
 
-        /// <inheritdoc />
-        public async Task RunAsync(IEnumerable<Cache> caches)
+        if (caches?.Any(c => c == Cache.Area) ?? false)
         {
-            if (!caches?.Any() ?? true)
-            {
-                return;
-            }
-
-            if (caches?.Any(c => c == Cache.Area) ?? false)
-            {
-                await _areaCache.ClearAsync();
-            }
-
-            if (caches?.Any(c => c == Cache.DataProviders) ?? false)
-            {
-                await _dataProviderCache.ClearAsync();
-            }
-
-            if (caches?.Any(c => c == Cache.ProcessedConfiguration) ?? false)
-            {
-                await _processedConfigurationCache.ClearAsync();
-            }
-
-            if (caches?.Any(c => c == Cache.TaxonLists) ?? false)
-            {
-                await _taxonListCache.ClearAsync();
-            }
-
-            if (caches?.Any(c => c == Cache.Vocabulary) ?? false)
-            {
-                await _vocabularyCache.ClearAsync();
-            }
-
-            _logger.LogInformation($"Cache/s cleared ({string.Join(',', caches!)})");
+            await _areaCache.ClearAsync();
         }
+
+        if (caches?.Any(c => c == Cache.DataProviders) ?? false)
+        {
+            await _dataProviderCache.ClearAsync();
+        }
+
+        if (caches?.Any(c => c == Cache.ProcessedConfiguration) ?? false)
+        {
+            await _processedConfigurationCache.ClearAsync();
+        }
+
+        if (caches?.Any(c => c == Cache.TaxonLists) ?? false)
+        {
+            await _taxonListCache.ClearAsync();
+        }
+
+        if (caches?.Any(c => c == Cache.Vocabulary) ?? false)
+        {
+            await _vocabularyCache.ClearAsync();
+        }
+
+        _logger.LogInformation($"Cache/s cleared ({string.Join(',', caches!)})");
     }
 }

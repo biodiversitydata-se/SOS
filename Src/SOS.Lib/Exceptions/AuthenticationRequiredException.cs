@@ -1,27 +1,26 @@
 ﻿using System;
 
-namespace SOS.Lib.Exceptions
+namespace SOS.Lib.Exceptions;
+
+/// <summary>
+/// Thrown when authentication is required, used when accessing protected observations
+/// </summary>
+public class AuthenticationRequiredException : Exception
 {
     /// <summary>
-    /// Thrown when authentication is required, used when accessing protected observations
+    /// Standard constructor
     /// </summary>
-    public class AuthenticationRequiredException : Exception
+    /// <param name="message"></param>
+    public AuthenticationRequiredException(string message) : base(message)
     {
-        /// <summary>
-        /// Standard constructor
-        /// </summary>
-        /// <param name="message"></param>
-        public AuthenticationRequiredException(string message) : base(message)
-        {
-        }
+    }
 
-        /// <summary>
-        ///  Standard constructor
-        /// </summary>
-        /// <param name="message"></param>
-        /// <param name="innerException"></param>
-        public AuthenticationRequiredException(string message, Exception innerException) : base(message, innerException)
-        {
-        }
+    /// <summary>
+    ///  Standard constructor
+    /// </summary>
+    /// <param name="message"></param>
+    /// <param name="innerException"></param>
+    public AuthenticationRequiredException(string message, Exception innerException) : base(message, innerException)
+    {
     }
 }

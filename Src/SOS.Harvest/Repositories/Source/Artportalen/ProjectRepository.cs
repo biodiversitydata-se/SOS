@@ -5,14 +5,14 @@ using SOS.Harvest.Repositories.Source.Artportalen.Interfaces;
 using SOS.Harvest.Services.Interfaces;
 using SOS.Lib.Extensions;
 
-namespace SOS.Harvest.Repositories.Source.Artportalen
+namespace SOS.Harvest.Repositories.Source.Artportalen;
+
+/// <summary>
+///     Project repository
+/// </summary>
+public class ProjectRepository : BaseRepository<ProjectRepository>, IProjectRepository
 {
-    /// <summary>
-    ///     Project repository
-    /// </summary>
-    public class ProjectRepository : BaseRepository<ProjectRepository>, IProjectRepository
-    {
-        private string SelectSql => @"
+    private string SelectSql => @"
                 SELECT 
                     p.ControlingOrganisationId,
                     p.ControlingUserId,
@@ -45,15 +45,15 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
 	                LEFT JOIN [User] u ON p.ControlingUserId = u.Id
 	                LEFT JOIN Person pn ON u.PersonId = pn.Id";
 
-        private async Task AddProjectMembers(IEnumerable<ProjectEntity> projects)
+    private async Task AddProjectMembers(IEnumerable<ProjectEntity> projects)
+    {
+        if (!projects?.Any() ?? true)
         {
-            if (!projects?.Any() ?? true)
-            {
-                return;
-            }
+            return;
+        }
 
-            var projectDictionary = projects!.ToDictionary(p => p.Id, p => p);
-            var query = @"
+        var projectDictionary = projects!.ToDictionary(p => p.Id, p => p);
+        var query = @"
                 SELECT 
                     pm.ProjectId, u.UserServiceUserId
                 FROM
@@ -63,34 +63,34 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
                 WHERE
                     u.UserServiceUserId > 0";
 
-            var projectMembers = await QueryAsync<ProjectMemberEntity>(
-                    query,
-                    new { tvp = projects!.Select(p => p.Id).ToSqlRecords().AsTableValuedParameter("dbo.IdValueTable") });
+        var projectMembers = await QueryAsync<ProjectMemberEntity>(
+                query,
+                new { tvp = projects!.Select(p => p.Id).ToSqlRecords().AsTableValuedParameter("dbo.IdValueTable") });
 
-            if (!projectMembers?.Any() ?? true)
-            {
-                return;
-            }
-
-            foreach (var projectMember in projectMembers!)
-            {
-                if (projectDictionary.TryGetValue(projectMember.ProjectId, out var project))
-                {
-                    project.MembersIds ??= new HashSet<int>();
-                    project.MembersIds!.Add(projectMember.UserServiceUserId);
-                }
-            }
+        if (!projectMembers?.Any() ?? true)
+        {
+            return;
         }
 
-        private async Task AddProjectParameters(IEnumerable<ProjectEntity> projects)
+        foreach (var projectMember in projectMembers!)
         {
-            if (!projects?.Any() ?? true)
+            if (projectDictionary.TryGetValue(projectMember.ProjectId, out var project))
             {
-                return;
+                project.MembersIds ??= new HashSet<int>();
+                project.MembersIds!.Add(projectMember.UserServiceUserId);
             }
+        }
+    }
 
-            var projectDictionary = projects.ToDictionary(p => p.Id, p => p);
-            var query = @"SELECT 
+    private async Task AddProjectParameters(IEnumerable<ProjectEntity> projects)
+    {
+        if (!projects?.Any() ?? true)
+        {
+            return;
+        }
+
+        var projectDictionary = projects.ToDictionary(p => p.Id, p => p);
+        var query = @"SELECT 
 	                    pp.Id,
 	                    pp.ProjectId,
 	                    pp.Name,
@@ -107,88 +107,88 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
                     WHERE
 	                    pp.IsDeleted = 0";
 
-            var projectParams = await QueryAsync<ProjectParameterProjectEntity>(
-                    query,
-                    new { tvp = projects!.Select(p => p.Id).ToSqlRecords().AsTableValuedParameter("dbo.IdValueTable") });
+        var projectParams = await QueryAsync<ProjectParameterProjectEntity>(
+                query,
+                new { tvp = projects!.Select(p => p.Id).ToSqlRecords().AsTableValuedParameter("dbo.IdValueTable") });
 
-            if (!projectParams?.Any() ?? true)
+        if (!projectParams?.Any() ?? true)
+        {
+            return;
+        }
+       
+        foreach(var projectParam in projectParams!)
+        {
+            if(projectDictionary.TryGetValue(projectParam.ProjectId, out var project))
             {
-                return;
-            }
-           
-            foreach(var projectParam in projectParams!)
-            {
-                if(projectDictionary.TryGetValue(projectParam.ProjectId, out var project))
+                if (!project.Parameters?.Any() ?? true)
                 {
-                    if (!project.Parameters?.Any() ?? true)
-                    {
-                        project.Parameters = new HashSet<ProjectParameterEntity>();
-                    }
-                    project.Parameters!.Add(projectParam);
+                    project.Parameters = new HashSet<ProjectParameterEntity>();
                 }
-            }
-
-        }
-
-        /// <summary>
-        ///     Constructor
-        /// </summary>
-        /// <param name="artportalenDataService"></param>
-        /// <param name="logger"></param>
-        public ProjectRepository(IArtportalenDataService artportalenDataService, ILogger<ProjectRepository> logger) :
-            base(artportalenDataService, logger)
-        {
-        }
-
-        /// <inheritdoc />
-        public async Task<IEnumerable<ProjectEntity>?> GetProjectsAsync()
-        {
-            try
-            {
-                var projects = await QueryAsync<ProjectEntity>(SelectSql, null!);
-                await AddProjectParameters(projects);
-                await AddProjectMembers(projects);
-
-                return projects;
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e, "Error getting projects");
-                throw;
+                project.Parameters!.Add(projectParam);
             }
         }
 
-        /// <inheritdoc />
-        public async Task<ProjectEntity?> GetProjectAsync(int projectId)
+    }
+
+    /// <summary>
+    ///     Constructor
+    /// </summary>
+    /// <param name="artportalenDataService"></param>
+    /// <param name="logger"></param>
+    public ProjectRepository(IArtportalenDataService artportalenDataService, ILogger<ProjectRepository> logger) :
+        base(artportalenDataService, logger)
+    {
+    }
+
+    /// <inheritdoc />
+    public async Task<IEnumerable<ProjectEntity>?> GetProjectsAsync()
+    {
+        try
         {
-            try
-            {
-                var query = $@"{SelectSql} WHERE p.Id = @ProjectId";
+            var projects = await QueryAsync<ProjectEntity>(SelectSql, null!);
+            await AddProjectParameters(projects);
+            await AddProjectMembers(projects);
 
-                var projects = await QueryAsync<ProjectEntity>(query, new { ProjectId = projectId });
-                await AddProjectParameters(projects);
-                await AddProjectMembers(projects);
-
-                return projects?.FirstOrDefault();
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e, $"Error getting project: {projectId}");
-                throw;
-            }
+            return projects;
         }
-
-        /// <inheritdoc />
-        public async Task<IEnumerable<ProjectParameterSightingEntity>?> GetSightingProjectParametersAsync(IEnumerable<int> sightingIds)
+        catch (Exception e)
         {
-            try
-            {
-                if (!sightingIds?.Any() ?? true)
-                {
-                    return null;
-                }
+            Logger.LogError(e, "Error getting projects");
+            throw;
+        }
+    }
 
-                var query = $@"
+    /// <inheritdoc />
+    public async Task<ProjectEntity?> GetProjectAsync(int projectId)
+    {
+        try
+        {
+            var query = $@"{SelectSql} WHERE p.Id = @ProjectId";
+
+            var projects = await QueryAsync<ProjectEntity>(query, new { ProjectId = projectId });
+            await AddProjectParameters(projects);
+            await AddProjectMembers(projects);
+
+            return projects?.FirstOrDefault();
+        }
+        catch (Exception e)
+        {
+            Logger.LogError(e, $"Error getting project: {projectId}");
+            throw;
+        }
+    }
+
+    /// <inheritdoc />
+    public async Task<IEnumerable<ProjectParameterSightingEntity>?> GetSightingProjectParametersAsync(IEnumerable<int> sightingIds)
+    {
+        try
+        {
+            if (!sightingIds?.Any() ?? true)
+            {
+                return null;
+            }
+
+            var query = $@"
                 SELECT 
                     pp.Id, 
                     ss.SightingId AS SightingId, 
@@ -221,15 +221,14 @@ namespace SOS.Harvest.Repositories.Source.Artportalen
 		            AND pp.IsDeleted = 0 
 		            AND p.IsHideAll = 0";
 
-                return await QueryAsync<ProjectParameterSightingEntity>(
-                    query,
-                    new { tvp = sightingIds.ToSqlRecords().AsTableValuedParameter("dbo.IdValueTable") });
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e, "Error getting project parameters");
-                throw;
-            }
+            return await QueryAsync<ProjectParameterSightingEntity>(
+                query,
+                new { tvp = sightingIds.ToSqlRecords().AsTableValuedParameter("dbo.IdValueTable") });
+        }
+        catch (Exception e)
+        {
+            Logger.LogError(e, "Error getting project parameters");
+            throw;
         }
     }
 }

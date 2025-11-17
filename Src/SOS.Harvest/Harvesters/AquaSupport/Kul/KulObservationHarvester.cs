@@ -13,136 +13,135 @@ using SOS.Lib.Repositories.Verbatim.Interfaces;
 using System.Text;
 using System.Xml.Linq;
 
-namespace SOS.Harvest.Harvesters.AquaSupport.Kul
+namespace SOS.Harvest.Harvesters.AquaSupport.Kul;
+
+public class KulObservationHarvester : ObservationHarvesterBase<KulObservationVerbatim, int>, IKulObservationHarvester
 {
-    public class KulObservationHarvester : ObservationHarvesterBase<KulObservationVerbatim, int>, IKulObservationHarvester
+    private readonly IKulObservationService _kulObservationService;
+    private readonly KulServiceConfiguration _kulServiceConfiguration;
+
+    private string GetKulHarvestSettingsInfoString()
     {
-        private readonly IKulObservationService _kulObservationService;
-        private readonly KulServiceConfiguration _kulServiceConfiguration;
-
-        private string GetKulHarvestSettingsInfoString()
+        var sb = new StringBuilder();
+        sb.AppendLine("KUL Harvest settings:");
+        sb.AppendLine($"  Start Harvest Year: {_kulServiceConfiguration.StartHarvestYear}");
+        if (_kulServiceConfiguration.MaxNumberOfSightingsHarvested.HasValue)
         {
-            var sb = new StringBuilder();
-            sb.AppendLine("KUL Harvest settings:");
-            sb.AppendLine($"  Start Harvest Year: {_kulServiceConfiguration.StartHarvestYear}");
-            if (_kulServiceConfiguration.MaxNumberOfSightingsHarvested.HasValue)
-            {
-                sb.AppendLine(
-                    $"  Max Number Of Sightings Harvested: {_kulServiceConfiguration.MaxNumberOfSightingsHarvested}");
-            }
-            return sb.ToString();
+            sb.AppendLine(
+                $"  Max Number Of Sightings Harvested: {_kulServiceConfiguration.MaxNumberOfSightingsHarvested}");
         }
+        return sb.ToString();
+    }
 
-        /// <summary>
-        ///     Constructor
-        /// </summary>
-        /// <param name="kulObservationService"></param>
-        /// <param name="kulObservationVerbatimRepository"></param>
-        /// <param name="kulServiceConfiguration"></param>
-        /// <param name="logger"></param>
-        public KulObservationHarvester(
-            IKulObservationService kulObservationService,
-            IKulObservationVerbatimRepository kulObservationVerbatimRepository,
-            KulServiceConfiguration kulServiceConfiguration,
-            ILogger<KulObservationHarvester> logger) : base("Kul", kulObservationVerbatimRepository, logger)
-        {
-            _kulObservationService =
-                kulObservationService ?? throw new ArgumentNullException(nameof(kulObservationService));
-            _kulServiceConfiguration = kulServiceConfiguration ??
-                                       throw new ArgumentNullException(nameof(kulServiceConfiguration));
-        }       
+    /// <summary>
+    ///     Constructor
+    /// </summary>
+    /// <param name="kulObservationService"></param>
+    /// <param name="kulObservationVerbatimRepository"></param>
+    /// <param name="kulServiceConfiguration"></param>
+    /// <param name="logger"></param>
+    public KulObservationHarvester(
+        IKulObservationService kulObservationService,
+        IKulObservationVerbatimRepository kulObservationVerbatimRepository,
+        KulServiceConfiguration kulServiceConfiguration,
+        ILogger<KulObservationHarvester> logger) : base("Kul", kulObservationVerbatimRepository, logger)
+    {
+        _kulObservationService =
+            kulObservationService ?? throw new ArgumentNullException(nameof(kulObservationService));
+        _kulServiceConfiguration = kulServiceConfiguration ??
+                                   throw new ArgumentNullException(nameof(kulServiceConfiguration));
+    }       
 
-        /// inheritdoc />
-        public async Task<HarvestInfo> HarvestObservationsAsync(DataProvider dataProvider,
-            JobRunModes mode,
-            DateTime? fromDate, IJobCancellationToken cancellationToken)
+    /// inheritdoc />
+    public async Task<HarvestInfo> HarvestObservationsAsync(DataProvider dataProvider,
+        JobRunModes mode,
+        DateTime? fromDate, IJobCancellationToken cancellationToken)
+    {
+        await Task.Run(() =>
         {
-            await Task.Run(() =>
+            throw new NotImplementedException("Not implemented for this provider");
+        });
+        return null!;
+    }
+
+    /// inheritdoc />
+    public async Task<HarvestInfo> HarvestObservationsAsync(DataProvider provider, IJobCancellationToken cancellationToken)
+    {
+        var runStatus = RunStatus.Success;
+        var harvestCount = 0;
+        (DateTime startDate, long preHarvestCount) initValues = (DateTime.Now, 0);
+        try
+        {
+            initValues.preHarvestCount = await InitializeHarvestAsync(true);
+            Logger.LogInformation(GetKulHarvestSettingsInfoString());
+
+            var ns = (XNamespace)"http://schemas.datacontract.org/2004/07/ArtDatabanken.WebService.Data";
+            var verbatimFactory = new AquaSupportHarvestFactory<KulObservationVerbatim>();
+
+            var startDate = new DateTime(_kulServiceConfiguration.StartHarvestYear, 1, 1);
+            var endDate = DateTime.Now;
+            var changeId = 0L;
+
+            var xmlDocument = await _kulObservationService.GetAsync(startDate, endDate, changeId);
+            changeId = long.Parse(xmlDocument?.Descendants(ns + "MaxChangeId")?.FirstOrDefault()?.Value ?? "0");
+
+            // Loop until all sightings are fetched.
+            while (changeId != 0)
             {
-                throw new NotImplementedException("Not implemented for this provider");
-            });
-            return null!;
-        }
+                var lastRequesetTime = DateTime.Now;
 
-        /// inheritdoc />
-        public async Task<HarvestInfo> HarvestObservationsAsync(DataProvider provider, IJobCancellationToken cancellationToken)
-        {
-            var runStatus = RunStatus.Success;
-            var harvestCount = 0;
-            (DateTime startDate, long preHarvestCount) initValues = (DateTime.Now, 0);
-            try
-            {
-                initValues.preHarvestCount = await InitializeHarvestAsync(true);
-                Logger.LogInformation(GetKulHarvestSettingsInfoString());
+                Logger.LogDebug(
+                    $"Fetching KUL observations between dates {startDate.ToString("yyyy-MM-dd")} and {endDate.ToString("yyyy-MM-dd")}, changeid: {changeId}");
 
-                var ns = (XNamespace)"http://schemas.datacontract.org/2004/07/ArtDatabanken.WebService.Data";
-                var verbatimFactory = new AquaSupportHarvestFactory<KulObservationVerbatim>();
+                var verbatims = await verbatimFactory.CastEntitiesToVerbatimsAsync(xmlDocument!);
 
-                var startDate = new DateTime(_kulServiceConfiguration.StartHarvestYear, 1, 1);
-                var endDate = DateTime.Now;
-                var changeId = 0L;
-
-                var xmlDocument = await _kulObservationService.GetAsync(startDate, endDate, changeId);
-                changeId = long.Parse(xmlDocument?.Descendants(ns + "MaxChangeId")?.FirstOrDefault()?.Value ?? "0");
-
-                // Loop until all sightings are fetched.
-                while (changeId != 0)
+                if (verbatims?.Any() ?? false)
                 {
-                    var lastRequesetTime = DateTime.Now;
+                    // Clean up
+                    xmlDocument = null;
 
-                    Logger.LogDebug(
-                        $"Fetching KUL observations between dates {startDate.ToString("yyyy-MM-dd")} and {endDate.ToString("yyyy-MM-dd")}, changeid: {changeId}");
+                    // Add sightings to MongoDb
+                    await VerbatimRepository.AddManyAsync(verbatims);
 
-                    var verbatims = await verbatimFactory.CastEntitiesToVerbatimsAsync(xmlDocument!);
+                    harvestCount += verbatims?.Count() ?? 0;
 
-                    if (verbatims?.Any() ?? false)
+                    Logger.LogDebug($"{harvestCount} KUL observations harvested");
+
+                    cancellationToken?.ThrowIfCancellationRequested();
+                    if (_kulServiceConfiguration.MaxNumberOfSightingsHarvested.HasValue &&
+                        harvestCount >= _kulServiceConfiguration.MaxNumberOfSightingsHarvested)
                     {
-                        // Clean up
-                        xmlDocument = null;
-
-                        // Add sightings to MongoDb
-                        await VerbatimRepository.AddManyAsync(verbatims);
-
-                        harvestCount += verbatims?.Count() ?? 0;
-
-                        Logger.LogDebug($"{harvestCount} KUL observations harvested");
-
-                        cancellationToken?.ThrowIfCancellationRequested();
-                        if (_kulServiceConfiguration.MaxNumberOfSightingsHarvested.HasValue &&
-                            harvestCount >= _kulServiceConfiguration.MaxNumberOfSightingsHarvested)
-                        {
-                            Logger.LogInformation("Max KUL observations reached");
-                            break;
-                        }
+                        Logger.LogInformation("Max KUL observations reached");
+                        break;
                     }
-
-                    var timeSinceLastCall = (DateTime.Now - lastRequesetTime).Milliseconds;
-                    if (timeSinceLastCall < 2000)
-                    {
-                        Thread.Sleep(2000 - timeSinceLastCall);
-                    }
-
-                    xmlDocument = await _kulObservationService.GetAsync(startDate, endDate, changeId);
-                    changeId = long.Parse(xmlDocument?.Descendants(ns + "MaxChangeId")?.FirstOrDefault()?.Value ?? "0");
                 }
-            }
-            catch (JobAbortedException)
-            {
-                Logger.LogInformation("KUL harvest was cancelled.");
-                runStatus = RunStatus.Canceled;
-            }
-            catch (Exception e)
-            {
-                Logger.LogError(e, "Failed to harvest KUL");
-                runStatus = RunStatus.Failed;
-            }
 
-            return await FinishHarvestAsync(initValues, runStatus, harvestCount, provider.PreviousProcessLimit.GetValueOrDefault(80));
+                var timeSinceLastCall = (DateTime.Now - lastRequesetTime).Milliseconds;
+                if (timeSinceLastCall < 2000)
+                {
+                    Thread.Sleep(2000 - timeSinceLastCall);
+                }
+
+                xmlDocument = await _kulObservationService.GetAsync(startDate, endDate, changeId);
+                changeId = long.Parse(xmlDocument?.Descendants(ns + "MaxChangeId")?.FirstOrDefault()?.Value ?? "0");
+            }
         }
-
-        public Task<HarvestInfo> HarvestAllObservationsSlowlyAsync(DataProvider provider, IJobCancellationToken cancellationToken)
+        catch (JobAbortedException)
         {
-            throw new NotImplementedException();
+            Logger.LogInformation("KUL harvest was cancelled.");
+            runStatus = RunStatus.Canceled;
         }
+        catch (Exception e)
+        {
+            Logger.LogError(e, "Failed to harvest KUL");
+            runStatus = RunStatus.Failed;
+        }
+
+        return await FinishHarvestAsync(initValues, runStatus, harvestCount, provider.PreviousProcessLimit.GetValueOrDefault(80));
+    }
+
+    public Task<HarvestInfo> HarvestAllObservationsSlowlyAsync(DataProvider provider, IJobCancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
     }
 }

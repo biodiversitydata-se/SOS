@@ -1,8 +1,7 @@
-﻿namespace SOS.Shared.Api.Dtos
+﻿namespace SOS.Shared.Api.Dtos;
+
+public class XYCoordinateDto
 {
-    public class XYCoordinateDto
-    {
-        public double X { get; set; }
-        public double Y { get; set; }
-    }
+    public double X { get; set; }
+    public double Y { get; set; }
 }

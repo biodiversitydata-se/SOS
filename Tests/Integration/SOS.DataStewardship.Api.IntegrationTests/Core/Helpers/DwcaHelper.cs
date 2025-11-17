@@ -2,37 +2,36 @@
 using SOS.Harvest.DarwinCore;
 using SOS.Lib.Models.Shared;
 
-namespace SOS.DataStewardship.Api.IntegrationTests.Core.Helpers
+namespace SOS.DataStewardship.Api.IntegrationTests.Core.Helpers;
+
+internal static class DwcaHelper
 {
-    internal static class DwcaHelper
+    public static async Task<DwcaComposite> ReadDwcaFileAsync(string filePath, DataProvider dataProvider)
     {
-        public static async Task<DwcaComposite> ReadDwcaFileAsync(string filePath, DataProvider dataProvider)
+        filePath = filePath.GetAbsoluteFilePath();            
+        var dwcArchiveReader = new DwcArchiveReader(dataProvider, 0);
+        string outputPath = Path.GetTempPath();
+        using var archiveReader = new ArchiveReader(filePath, outputPath); // @"C:\Temp\DwcaImport");
+        var archiveReaderContext = ArchiveReaderContext.Create(archiveReader, dataProvider);
+
+        var datasets = await dwcArchiveReader.ReadDatasetsAsync(archiveReaderContext);
+        var occurrences = (await dwcArchiveReader.ReadOccurrencesAsync(archiveReaderContext)).ToList();
+        var events = await dwcArchiveReader.ReadEventsAsync(archiveReaderContext);
+        var absentOccurrences = events.SelectMany(m => m.CreateAbsentObservations()).ToList();
+        occurrences.AddRange(absentOccurrences);
+
+        return new DwcaComposite
         {
-            filePath = filePath.GetAbsoluteFilePath();            
-            var dwcArchiveReader = new DwcArchiveReader(dataProvider, 0);
-            string outputPath = Path.GetTempPath();
-            using var archiveReader = new ArchiveReader(filePath, outputPath); // @"C:\Temp\DwcaImport");
-            var archiveReaderContext = ArchiveReaderContext.Create(archiveReader, dataProvider);
+            Datasets = datasets == null ? new List<DwcVerbatimDataset>() : datasets,
+            Events = events,
+            Occurrences = occurrences
+        };
+    }
 
-            var datasets = await dwcArchiveReader.ReadDatasetsAsync(archiveReaderContext);
-            var occurrences = (await dwcArchiveReader.ReadOccurrencesAsync(archiveReaderContext)).ToList();
-            var events = await dwcArchiveReader.ReadEventsAsync(archiveReaderContext);
-            var absentOccurrences = events.SelectMany(m => m.CreateAbsentObservations()).ToList();
-            occurrences.AddRange(absentOccurrences);
-
-            return new DwcaComposite
-            {
-                Datasets = datasets == null ? new List<DwcVerbatimDataset>() : datasets,
-                Events = events,
-                Occurrences = occurrences
-            };
-        }
-
-        public class DwcaComposite
-        {
-            public List<DwcVerbatimDataset> Datasets { get; set; }
-            public IEnumerable<Lib.Models.Verbatim.DarwinCore.DwcEventOccurrenceVerbatim> Events { get; set; }
-            public IEnumerable<Lib.Models.Verbatim.DarwinCore.DwcObservationVerbatim> Occurrences { get; set; }
-        }
+    public class DwcaComposite
+    {
+        public List<DwcVerbatimDataset> Datasets { get; set; }
+        public IEnumerable<Lib.Models.Verbatim.DarwinCore.DwcEventOccurrenceVerbatim> Events { get; set; }
+        public IEnumerable<Lib.Models.Verbatim.DarwinCore.DwcObservationVerbatim> Occurrences { get; set; }
     }
 }

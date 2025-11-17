@@ -1,8 +1,7 @@
-﻿namespace SOS.Shared.Api.Dtos
+﻿namespace SOS.Shared.Api.Dtos;
+
+public class XYBoundingBoxDto
 {
-    public class XYBoundingBoxDto
-    {
-        public XYCoordinateDto BottomRight { get; set; }
-        public XYCoordinateDto TopLeft { get; set; }
-    }
+    public XYCoordinateDto BottomRight { get; set; }
+    public XYCoordinateDto TopLeft { get; set; }
 }

@@ -3,47 +3,47 @@ using SOS.Harvest.Entities.ObservationsDatabase;
 using SOS.Harvest.Repositories.Source.ObservationsDatabase.Interfaces;
 using SOS.Harvest.Services.Interfaces;
 
-namespace SOS.Harvest.Repositories.Source.ObservationsDatabase
+namespace SOS.Harvest.Repositories.Source.ObservationsDatabase;
+
+public class ObservationDatabaseRepository : IObservationDatabaseRepository
 {
-    public class ObservationDatabaseRepository : IObservationDatabaseRepository
+    /// <summary>
+    ///     Logger
+    /// </summary>
+    private readonly ILogger<ObservationDatabaseRepository> _logger;
+
+    /// <summary>
+    /// Date service
+    /// </summary>
+    private readonly IObservationDatabaseDataService _observationDatabaseDataService;
+
+
+    private async Task<IEnumerable<E>> QueryAsync<E>(string query, dynamic? parameters = null)
     {
-        /// <summary>
-        ///     Logger
-        /// </summary>
-        private readonly ILogger<ObservationDatabaseRepository> _logger;
+        return await _observationDatabaseDataService.QueryAsync<E>(query, parameters);
+    }
 
-        /// <summary>
-        /// Date service
-        /// </summary>
-        private readonly IObservationDatabaseDataService _observationDatabaseDataService;
+    /// <summary>
+    ///     Constructor
+    /// </summary>
+    /// <param name="observationDatabaseDataService"></param>
+    /// <param name="logger"></param>
+    public ObservationDatabaseRepository(IObservationDatabaseDataService observationDatabaseDataService, ILogger<ObservationDatabaseRepository> logger)
+    {
+        _observationDatabaseDataService = observationDatabaseDataService ??
+                                          throw new ArgumentNullException(nameof(observationDatabaseDataService));
+
+        _logger = logger ??
+                  throw new ArgumentNullException(nameof(logger));
+    }
 
 
-        private async Task<IEnumerable<E>> QueryAsync<E>(string query, dynamic? parameters = null)
+    /// <inheritdoc />
+    public async Task<IEnumerable<ObservationEntity>> GetChunkAsync(int startId, int maxRows)
+    {
+        try
         {
-            return await _observationDatabaseDataService.QueryAsync<E>(query, parameters);
-        }
-
-        /// <summary>
-        ///     Constructor
-        /// </summary>
-        /// <param name="observationDatabaseDataService"></param>
-        /// <param name="logger"></param>
-        public ObservationDatabaseRepository(IObservationDatabaseDataService observationDatabaseDataService, ILogger<ObservationDatabaseRepository> logger)
-        {
-            _observationDatabaseDataService = observationDatabaseDataService ??
-                                              throw new ArgumentNullException(nameof(observationDatabaseDataService));
-
-            _logger = logger ??
-                      throw new ArgumentNullException(nameof(logger));
-        }
-
-
-        /// <inheritdoc />
-        public async Task<IEnumerable<ObservationEntity>> GetChunkAsync(int startId, int maxRows)
-        {
-            try
-            {
-                var query = $@"
+            var query = $@"
                 SELECT 
 	                h.ArtDataIDNR AS Id,
 	                h.artnr	AS TaxonId,
@@ -89,57 +89,56 @@ namespace SOS.Harvest.Repositories.Source.ObservationsDatabase
 	                h.ArtDataIDNR BETWEEN @StartId AND @EndId
 	                AND h.Forekomststatus IN('A', 'R', 'U', 'X1', 'X2')";
 
-                return await QueryAsync<ObservationEntity>(query, new { StartId = startId, EndId = startId + maxRows - 1 });
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Error getting observations");
-
-                throw;
-            }
+            return await QueryAsync<ObservationEntity>(query, new { StartId = startId, EndId = startId + maxRows - 1 });
         }
-
-        /// <inheritdoc />
-        public async Task<(int minId, int maxId)> GetIdSpanAsync()
+        catch (Exception e)
         {
-            try
-            {
-                string query = $@"
+            _logger.LogError(e, "Error getting observations");
+
+            throw;
+        }
+    }
+
+    /// <inheritdoc />
+    public async Task<(int minId, int maxId)> GetIdSpanAsync()
+    {
+        try
+        {
+            string query = $@"
                  SELECT 
                     MIN(h.ArtDataIDNR) AS minId,
                     MAX(h.ArtDataIDNR) AS maxId
                 FROM 
 	                HUVUDTABELL h";
 
-                return (await QueryAsync<(int minId, int maxId)>(query, null)).FirstOrDefault();
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Error getting min and max id");
-
-                return default;
-            }
+            return (await QueryAsync<(int minId, int maxId)>(query, null)).FirstOrDefault();
         }
-
-        /// <inheritdoc />
-        public async Task<DateTime?> GetLastModifiedDateAsyc()
+        catch (Exception e)
         {
-            try
-            {
-                string query = $@"
+            _logger.LogError(e, "Error getting min and max id");
+
+            return default;
+        }
+    }
+
+    /// <inheritdoc />
+    public async Task<DateTime?> GetLastModifiedDateAsyc()
+    {
+        try
+        {
+            string query = $@"
                 SELECT 
 	                MAX(h.UpdatedDate)
                 FROM 
 	               HUVUDTABELL h";
 
-                return (await QueryAsync<DateTime?>(query)).FirstOrDefault();
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, "Error getting last modified date");
+            return (await QueryAsync<DateTime?>(query)).FirstOrDefault();
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error getting last modified date");
 
-                return null;
-            }
+            return null;
         }
     }
 }

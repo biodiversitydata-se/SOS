@@ -16,147 +16,146 @@ using SOS.Lib.Models.Verbatim.DarwinCore;
 using SOS.Lib.Repositories.Verbatim;
 using System.Text;
 
-namespace SOS.Harvest.Jobs
+namespace SOS.Harvest.Jobs;
+
+/// <summary>
+///     Create Dwc-A data validation report job.
+/// </summary>
+public class CreateDwcaDataValidationReportJob : ICreateDwcaDataValidationReportJob
 {
+    private readonly IDwcaDataValidationReportManager _dwcaDataValidationReportManager;
+    private readonly DwcaConfiguration _dwcaConfiguration;
+    private readonly IVerbatimClient _verbatimClient;
+    private readonly IReportManager _reportManager;
+    private readonly ILogger<CreateDwcaDataValidationReportJob> _logger;
+
     /// <summary>
-    ///     Create Dwc-A data validation report job.
+    ///     Constructor.
     /// </summary>
-    public class CreateDwcaDataValidationReportJob : ICreateDwcaDataValidationReportJob
+    /// <param name="dwcaDataValidationReportManager"></param>
+    /// <param name="dwcaConfiguration"></param>
+    /// <param name="verbatimClient"></param>
+    /// <param name="reportManager"></param>
+    /// <param name="logger"></param>
+    public CreateDwcaDataValidationReportJob(
+        IDwcaDataValidationReportManager dwcaDataValidationReportManager,
+        DwcaConfiguration dwcaConfiguration,
+        IVerbatimClient verbatimClient,
+        IReportManager reportManager,
+        ILogger<CreateDwcaDataValidationReportJob> logger)
     {
-        private readonly IDwcaDataValidationReportManager _dwcaDataValidationReportManager;
-        private readonly DwcaConfiguration _dwcaConfiguration;
-        private readonly IVerbatimClient _verbatimClient;
-        private readonly IReportManager _reportManager;
-        private readonly ILogger<CreateDwcaDataValidationReportJob> _logger;
+        _dwcaDataValidationReportManager = dwcaDataValidationReportManager ?? throw new ArgumentNullException(nameof(dwcaDataValidationReportManager));
+        _dwcaConfiguration = dwcaConfiguration ?? throw new ArgumentNullException(nameof(dwcaConfiguration));
+        _verbatimClient = verbatimClient ?? throw new ArgumentNullException(nameof(verbatimClient));
+        _reportManager = reportManager ?? throw new ArgumentNullException(nameof(reportManager));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    }
 
-        /// <summary>
-        ///     Constructor.
-        /// </summary>
-        /// <param name="dwcaDataValidationReportManager"></param>
-        /// <param name="dwcaConfiguration"></param>
-        /// <param name="verbatimClient"></param>
-        /// <param name="reportManager"></param>
-        /// <param name="logger"></param>
-        public CreateDwcaDataValidationReportJob(
-            IDwcaDataValidationReportManager dwcaDataValidationReportManager,
-            DwcaConfiguration dwcaConfiguration,
-            IVerbatimClient verbatimClient,
-            IReportManager reportManager,
-            ILogger<CreateDwcaDataValidationReportJob> logger)
+    public async Task<Report> RunAsync(
+        string reportId,
+        string createdBy,
+        int maxNrObservationsToRead,
+        int nrValidObservationsInReport,
+        int nrInvalidObservationsInReport,
+        int nrTaxaInTaxonStatistics,
+        IJobCancellationToken cancellationToken)
+    {
+        string archivePath = "";
+        try
         {
-            _dwcaDataValidationReportManager = dwcaDataValidationReportManager ?? throw new ArgumentNullException(nameof(dwcaDataValidationReportManager));
-            _dwcaConfiguration = dwcaConfiguration ?? throw new ArgumentNullException(nameof(dwcaConfiguration));
-            _verbatimClient = verbatimClient ?? throw new ArgumentNullException(nameof(verbatimClient));
-            _reportManager = reportManager ?? throw new ArgumentNullException(nameof(reportManager));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        }
+            var darwinCoreArchiveVerbatimRepository = new DarwinCoreArchiveVerbatimRepository(reportId, _verbatimClient, _logger);
+            archivePath = Path.Combine(_dwcaConfiguration.ImportPath, $"{reportId}.zip");
+            await FileSystemHelper.SaveStreamAsync(archivePath, await darwinCoreArchiveVerbatimRepository.GetReportSourceFileAsync());
 
-        public async Task<Report> RunAsync(
-            string reportId,
-            string createdBy,
-            int maxNrObservationsToRead,
-            int nrValidObservationsInReport,
-            int nrInvalidObservationsInReport,
-            int nrTaxaInTaxonStatistics,
-            IJobCancellationToken cancellationToken)
-        {
-            string archivePath = "";
-            try
+            _logger.LogInformation($"Start DwC-A Test Import Job: {archivePath}");
+            using var archiveReader = new ArchiveReader(archivePath, _dwcaConfiguration.ImportPath);
+            var dataValidationSummary = await _dwcaDataValidationReportManager.CreateDataValidationSummary(
+                archiveReader,
+                maxNrObservationsToRead,
+                nrValidObservationsInReport,
+                nrInvalidObservationsInReport,
+                nrTaxaInTaxonStatistics);
+
+            // Serialize and save compact JSON file
+            var compactJsonSettings = CreateCompactJsonSerializerSettings();
+            var compactJson = JsonConvert.SerializeObject(dataValidationSummary, Formatting.Indented, compactJsonSettings);
+            var compactJsonFile = Encoding.UTF8.GetBytes(compactJson);
+
+            // Serialize and save verbose JSON file
+            var verboseJsonSettings = CreateVerboseJsonSerializerSettings();
+            var verboseJson = JsonConvert.SerializeObject(dataValidationSummary, Formatting.Indented, verboseJsonSettings);
+            var verboseJsonFile = Encoding.UTF8.GetBytes(verboseJson);
+
+            var zipFile = ZipFileHelper.CreateZipFile(new[]
             {
-                var darwinCoreArchiveVerbatimRepository = new DarwinCoreArchiveVerbatimRepository(reportId, _verbatimClient, _logger);
-                archivePath = Path.Combine(_dwcaConfiguration.ImportPath, $"{reportId}.zip");
-                await FileSystemHelper.SaveStreamAsync(archivePath, await darwinCoreArchiveVerbatimRepository.GetReportSourceFileAsync());
+                (Filename: "Validation Report [Compact].json", Bytes: compactJsonFile),
+                (Filename: "Validation Report [Verbose].json", Bytes: verboseJsonFile)
+            });
 
-                _logger.LogInformation($"Start DwC-A Test Import Job: {archivePath}");
-                using var archiveReader = new ArchiveReader(archivePath, _dwcaConfiguration.ImportPath);
-                var dataValidationSummary = await _dwcaDataValidationReportManager.CreateDataValidationSummary(
-                    archiveReader,
-                    maxNrObservationsToRead,
-                    nrValidObservationsInReport,
-                    nrInvalidObservationsInReport,
-                    nrTaxaInTaxonStatistics);
-
-                // Serialize and save compact JSON file
-                var compactJsonSettings = CreateCompactJsonSerializerSettings();
-                var compactJson = JsonConvert.SerializeObject(dataValidationSummary, Formatting.Indented, compactJsonSettings);
-                var compactJsonFile = Encoding.UTF8.GetBytes(compactJson);
-
-                // Serialize and save verbose JSON file
-                var verboseJsonSettings = CreateVerboseJsonSerializerSettings();
-                var verboseJson = JsonConvert.SerializeObject(dataValidationSummary, Formatting.Indented, verboseJsonSettings);
-                var verboseJsonFile = Encoding.UTF8.GetBytes(verboseJson);
-
-                var zipFile = ZipFileHelper.CreateZipFile(new[]
-                {
-                    (Filename: "Validation Report [Compact].json", Bytes: compactJsonFile),
-                    (Filename: "Validation Report [Verbose].json", Bytes: verboseJsonFile)
-                });
-
-                var report = new Report(reportId)
-                {
-                    Type = ReportType.DataValidationReport,
-                    Name = Path.GetFileNameWithoutExtension(archivePath),
-                    FileExtension = "zip",
-                    CreatedBy = createdBy ?? "",
-                    FileSizeInKb = zipFile.Length / 1024
-                };
-
-                // Export to file system
-                //string zipExportPath = Path.Combine(_dwcaConfiguration.ImportPath, $"{reportId}.zip");
-                //await File.WriteAllBytesAsync(zipExportPath, zipFile);
-                await _reportManager.AddReportAsync(report, zipFile);
-                return report;
-            }
-            finally
+            var report = new Report(reportId)
             {
-                if (File.Exists(archivePath)) File.Delete(archivePath);
-            }
-        }
-
-        private JsonSerializerSettings CreateCompactJsonSerializerSettings()
-        {
-            // Exclude some properties.
-            var jsonResolver = new IgnorableSerializerContractResolver { SetStringPropertyDefaultsToEmptyString = true }
-                .Ignore<Observation>(obs => obs.Location.Point)
-                .Ignore<Observation>(obs => obs.Location.PointWithBuffer)
-                .Ignore<Observation>(obs => obs.Location.IsInEconomicZoneOfSweden)
-                .Ignore<DwcObservationVerbatim>(obs => obs.RecordId)
-                .Ignore<DwcObservationVerbatim>(obs => obs.Id)
-                .Ignore<DwcObservationVerbatim>(obs => obs.DataProviderId)
-                .Ignore<DwcObservationVerbatim>(obs => obs.DataProviderIdentifier)
-                .KeepTypeWithDefaultValue(typeof(VocabularyValue));
-
-            var jsonSettings = new JsonSerializerSettings()
-            {
-                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-                ContractResolver = jsonResolver,
-                DefaultValueHandling = DefaultValueHandling.Ignore,
-                NullValueHandling = NullValueHandling.Ignore
+                Type = ReportType.DataValidationReport,
+                Name = Path.GetFileNameWithoutExtension(archivePath),
+                FileExtension = "zip",
+                CreatedBy = createdBy ?? "",
+                FileSizeInKb = zipFile.Length / 1024
             };
 
-            return jsonSettings;
+            // Export to file system
+            //string zipExportPath = Path.Combine(_dwcaConfiguration.ImportPath, $"{reportId}.zip");
+            //await File.WriteAllBytesAsync(zipExportPath, zipFile);
+            await _reportManager.AddReportAsync(report, zipFile);
+            return report;
         }
-
-        private JsonSerializerSettings CreateVerboseJsonSerializerSettings()
+        finally
         {
-            // Exclude some properties.
-            var jsonResolver = new IgnorableSerializerContractResolver()
-                .Ignore<Observation>(obs => obs.Location.Point)
-                .Ignore<Observation>(obs => obs.Location.PointWithBuffer)
-                .Ignore<Observation>(obs => obs.Location.IsInEconomicZoneOfSweden)
-                .Ignore<DwcObservationVerbatim>(obs => obs.RecordId)
-                .Ignore<DwcObservationVerbatim>(obs => obs.Id)
-                .Ignore<DwcObservationVerbatim>(obs => obs.DataProviderId)
-                .Ignore<DwcObservationVerbatim>(obs => obs.DataProviderIdentifier)
-                .KeepTypeWithDefaultValue(typeof(VocabularyValue));
-
-            var jsonSettings = new JsonSerializerSettings()
-            {
-                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-                ContractResolver = jsonResolver
-            };
-
-            return jsonSettings;
+            if (File.Exists(archivePath)) File.Delete(archivePath);
         }
+    }
+
+    private JsonSerializerSettings CreateCompactJsonSerializerSettings()
+    {
+        // Exclude some properties.
+        var jsonResolver = new IgnorableSerializerContractResolver { SetStringPropertyDefaultsToEmptyString = true }
+            .Ignore<Observation>(obs => obs.Location.Point)
+            .Ignore<Observation>(obs => obs.Location.PointWithBuffer)
+            .Ignore<Observation>(obs => obs.Location.IsInEconomicZoneOfSweden)
+            .Ignore<DwcObservationVerbatim>(obs => obs.RecordId)
+            .Ignore<DwcObservationVerbatim>(obs => obs.Id)
+            .Ignore<DwcObservationVerbatim>(obs => obs.DataProviderId)
+            .Ignore<DwcObservationVerbatim>(obs => obs.DataProviderIdentifier)
+            .KeepTypeWithDefaultValue(typeof(VocabularyValue));
+
+        var jsonSettings = new JsonSerializerSettings()
+        {
+            ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+            ContractResolver = jsonResolver,
+            DefaultValueHandling = DefaultValueHandling.Ignore,
+            NullValueHandling = NullValueHandling.Ignore
+        };
+
+        return jsonSettings;
+    }
+
+    private JsonSerializerSettings CreateVerboseJsonSerializerSettings()
+    {
+        // Exclude some properties.
+        var jsonResolver = new IgnorableSerializerContractResolver()
+            .Ignore<Observation>(obs => obs.Location.Point)
+            .Ignore<Observation>(obs => obs.Location.PointWithBuffer)
+            .Ignore<Observation>(obs => obs.Location.IsInEconomicZoneOfSweden)
+            .Ignore<DwcObservationVerbatim>(obs => obs.RecordId)
+            .Ignore<DwcObservationVerbatim>(obs => obs.Id)
+            .Ignore<DwcObservationVerbatim>(obs => obs.DataProviderId)
+            .Ignore<DwcObservationVerbatim>(obs => obs.DataProviderIdentifier)
+            .KeepTypeWithDefaultValue(typeof(VocabularyValue));
+
+        var jsonSettings = new JsonSerializerSettings()
+        {
+            ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+            ContractResolver = jsonResolver
+        };
+
+        return jsonSettings;
     }
 }
