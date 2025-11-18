@@ -40,11 +40,5 @@ public interface IVerbatimRepositoryBase<TEntity, TKey> : IRepositoryBase<TEntit
     /// <summary>
     /// Set repository in temp mode
     /// </summary>
-    bool TempMode { get; set; }
-
-    Task<bool> RenameCollectionAsync(string currentCollectionName, string newCollectionName);
-    Task<bool> CopyCollectionAsync(string sourceCollectionName, string targetCollectionName, bool overwriteExistingTargetCollection = true);
-    Task<bool> PermanentizeCollectionAsync(string tempCollectionName, string targetCollectionName);
-    Task<bool> PermanentizeCollectionAsync(IMongoCollection<TEntity> tempCollection, IMongoCollection<TEntity> targetCollection);
-    Task<bool> CheckDuplicatesAsync(string field, IMongoCollection<TEntity> mongoCollection);
+    bool TempMode { get; set; }       
 }

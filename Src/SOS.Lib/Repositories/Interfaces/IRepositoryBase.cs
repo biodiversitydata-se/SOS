@@ -354,4 +354,10 @@ public interface IRepositoryBase<TEntity, TKey> : IDisposable where TEntity : IE
     Task WaitForDataInsert(long expectedRecordsCount, TimeSpan? timeout = null);
 
     IMongoCollection<TEntity> GetMongoCollection(string collectionName);
+
+    Task<bool> PermanentizeCollectionAsync(string tempCollectionName, string targetCollectionName);
+    Task<bool> PermanentizeCollectionAsync(IMongoCollection<TEntity> tempCollection, IMongoCollection<TEntity> targetCollection);
+    Task<bool> RenameCollectionAsync(string currentCollectionName, string newCollectionName);
+    Task<bool> CopyCollectionAsync(string sourceCollectionName, string targetCollectionName, bool overwriteExistingTargetCollection = true);
+    Task<bool> CheckDuplicatesAsync(string field, IMongoCollection<TEntity> mongoCollection);
 }

@@ -1038,4 +1038,116 @@ public class RepositoryBase<TEntity, TKey> : IRepositoryBase<TEntity, TKey> wher
     {
         return await DeleteCollectionAsync(mongoCollection.CollectionNamespace.CollectionName);
     }
+
+    public async Task<bool> CheckDuplicatesAsync(string field, IMongoCollection<TEntity> mongoCollection)
+    {
+        try
+        {
+            var pipeline = new[]
+            {
+                new BsonDocument("$group", new BsonDocument
+                {
+                    { "_id", $"${field}" },
+                    { "count", new BsonDocument("$sum", 1) }
+                }),
+                new BsonDocument("$match", new BsonDocument
+                {
+                    { "count", new BsonDocument("$gt", 1) }
+                })
+            };
+
+            var result = await mongoCollection.Aggregate<BsonDocument>(pipeline).FirstOrDefaultAsync();
+
+            return result != null;
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, $"Error checking duplicates for field {field}: {ex.Message}");
+            throw;
+        }
+    }
+
+    public virtual async Task<bool> PermanentizeCollectionAsync(IMongoCollection<TEntity> tempCollection, IMongoCollection<TEntity> targetCollection)
+    {
+        if (!await CheckIfCollectionExistsAsync(tempCollection.CollectionNamespace.CollectionName)) return false;
+        if (await CountAllDocumentsAsync(tempCollection) == 0) return false;
+
+        // Check if permanent collection exists
+        if (await CheckIfCollectionExistsAsync(targetCollection.CollectionNamespace.CollectionName))
+        {
+            // Delete permanent collection
+            await DeleteCollectionAsync(targetCollection.CollectionNamespace.CollectionName);
+        }
+
+        await Database.RenameCollectionAsync(tempCollection.CollectionNamespace.CollectionName, targetCollection.CollectionNamespace.CollectionName);
+        return true;
+    }
+
+    public virtual async Task<bool> PermanentizeCollectionAsync(string tempCollectionName, string targetCollectionName)
+    {
+        if (!await CheckIfCollectionExistsAsync(tempCollectionName)) return false;
+        var tempCollection = GetMongoCollection(tempCollectionName);
+        if (await CountAllDocumentsAsync(tempCollection) == 0) return false;
+
+        // Check if permanent collection exists
+        if (await CheckIfCollectionExistsAsync(targetCollectionName))
+        {
+            // Delete permanent collection
+            await DeleteCollectionAsync(targetCollectionName);
+        }
+
+        await Database.RenameCollectionAsync(tempCollectionName, targetCollectionName);
+        return true;
+    }
+
+    public async Task<bool> RenameCollectionAsync(string currentCollectionName, string newCollectionName)
+    {
+        try
+        {
+            await Database.RenameCollectionAsync(currentCollectionName, newCollectionName);
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    public async Task<bool> CopyCollectionAsync(string sourceCollectionName, string targetCollectionName, bool overwriteExistingTargetCollection = true)
+    {
+        try
+        {
+            if (!await CheckIfCollectionExistsAsync(sourceCollectionName))
+            {
+                return false;
+            }
+            if (overwriteExistingTargetCollection && await CheckIfCollectionExistsAsync(targetCollectionName))
+            {
+                await DeleteCollectionAsync(targetCollectionName);
+            }
+
+            const int batchSize = 10000;
+            var sourceCollection = Database.GetCollection<BsonDocument>(sourceCollectionName);
+            var targetCollection = Database.GetCollection<BsonDocument>(targetCollectionName);
+            var options = new FindOptions<BsonDocument> { BatchSize = batchSize };
+            using (var cursor = await sourceCollection.FindAsync(new BsonDocument(), options))
+            {
+                while (await cursor.MoveNextAsync())
+                {
+                    var batch = cursor.Current.ToList();
+                    if (batch.Count > 0)
+                    {
+                        await targetCollection.InsertManyAsync(batch);
+                    }
+                }
+            }
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, $"Error copying collection: {ex.Message}");
+            return false;
+        }
+    }
 }
