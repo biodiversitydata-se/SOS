@@ -6,6 +6,7 @@ using MongoDB.NetTopologySuite.Serialization;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
+using SOS.Lib.Models;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Repositories.Interfaces;
 using System;
@@ -101,7 +102,8 @@ public class RepositoryBase<TEntity, TKey> : IRepositoryBase<TEntity, TKey> wher
     /// <summary>
     /// Name of collection
     /// </summary>
-    protected virtual string CollectionName => $"{_collectionName}{(Mode == JobRunModes.IncrementalActiveInstance ? "_incrementalActive" : Mode == JobRunModes.IncrementalInactiveInstance ? "_incrementalInactive" : "")}";
+    public virtual string CollectionName => $"{_collectionName}{(Mode == JobRunModes.IncrementalActiveInstance ? "_incrementalActive" : Mode == JobRunModes.IncrementalInactiveInstance ? "_incrementalInactive" : "")}";
+    public virtual string RawCollectionName => _collectionName;
 
     protected readonly IMongoDbClient Client;
 
@@ -114,6 +116,19 @@ public class RepositoryBase<TEntity, TKey> : IRepositoryBase<TEntity, TKey> wher
     ///     Logger
     /// </summary>
     protected readonly ILogger Logger;
+
+    public virtual CollectionSession<TEntity> CreateSession()
+    {
+        var raw = RawCollectionName;
+        var temp = $"{raw}_temp";
+
+        return new CollectionSession<TEntity>(
+            raw,
+            temp,
+            GetMongoCollection(raw),
+            GetMongoCollection(temp)
+        );
+    }
 
     public IMongoCollection<TEntity> GetMongoCollection(string collectionName)
     {
@@ -1038,4 +1053,121 @@ public class RepositoryBase<TEntity, TKey> : IRepositoryBase<TEntity, TKey> wher
     {
         return await DeleteCollectionAsync(mongoCollection.CollectionNamespace.CollectionName);
     }
+
+    public async Task<bool> CheckDuplicatesAsync(string field, IMongoCollection<TEntity> mongoCollection)
+    {
+        try
+        {
+            var pipeline = new[]
+            {
+                new BsonDocument("$group", new BsonDocument
+                {
+                    { "_id", $"${field}" },
+                    { "count", new BsonDocument("$sum", 1) }
+                }),
+                new BsonDocument("$match", new BsonDocument
+                {
+                    { "count", new BsonDocument("$gt", 1) }
+                })
+            };
+
+            var result = await mongoCollection.Aggregate<BsonDocument>(pipeline).FirstOrDefaultAsync();
+
+            return result != null;
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, $"Error checking duplicates for field {field}: {ex.Message}");
+            throw;
+        }
+    }
+
+    public virtual async Task<bool> PermanentizeCollectionAsync(CollectionSession<TEntity> session)
+    {
+        return await PermanentizeCollectionAsync(session.TempCollection, session.Collection);
+    }
+
+    public virtual async Task<bool> PermanentizeCollectionAsync(IMongoCollection<TEntity> tempCollection, IMongoCollection<TEntity> targetCollection)
+    {
+        if (!await CheckIfCollectionExistsAsync(tempCollection.CollectionNamespace.CollectionName)) return false;
+        if (await CountAllDocumentsAsync(tempCollection) == 0) return false;
+
+        // Check if permanent collection exists
+        if (await CheckIfCollectionExistsAsync(targetCollection.CollectionNamespace.CollectionName))
+        {
+            // Delete permanent collection
+            await DeleteCollectionAsync(targetCollection.CollectionNamespace.CollectionName);
+        }
+
+        await Database.RenameCollectionAsync(tempCollection.CollectionNamespace.CollectionName, targetCollection.CollectionNamespace.CollectionName);
+        return true;
+    }
+
+    public virtual async Task<bool> PermanentizeCollectionAsync(string tempCollectionName, string targetCollectionName)
+    {
+        if (!await CheckIfCollectionExistsAsync(tempCollectionName)) return false;
+        var tempCollection = GetMongoCollection(tempCollectionName);
+        if (await CountAllDocumentsAsync(tempCollection) == 0) return false;
+
+        // Check if permanent collection exists
+        if (await CheckIfCollectionExistsAsync(targetCollectionName))
+        {
+            // Delete permanent collection
+            await DeleteCollectionAsync(targetCollectionName);
+        }
+
+        await Database.RenameCollectionAsync(tempCollectionName, targetCollectionName);
+        return true;
+    }
+
+    public async Task<bool> RenameCollectionAsync(string currentCollectionName, string newCollectionName)
+    {
+        try
+        {
+            await Database.RenameCollectionAsync(currentCollectionName, newCollectionName);
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    public async Task<bool> CopyCollectionAsync(string sourceCollectionName, string targetCollectionName, bool overwriteExistingTargetCollection = true)
+    {
+        try
+        {
+            if (!await CheckIfCollectionExistsAsync(sourceCollectionName))
+            {
+                return false;
+            }
+            if (overwriteExistingTargetCollection && await CheckIfCollectionExistsAsync(targetCollectionName))
+            {
+                await DeleteCollectionAsync(targetCollectionName);
+            }
+
+            const int batchSize = 10000;
+            var sourceCollection = Database.GetCollection<BsonDocument>(sourceCollectionName);
+            var targetCollection = Database.GetCollection<BsonDocument>(targetCollectionName);
+            var options = new FindOptions<BsonDocument> { BatchSize = batchSize };
+            using (var cursor = await sourceCollection.FindAsync(new BsonDocument(), options))
+            {
+                while (await cursor.MoveNextAsync())
+                {
+                    var batch = cursor.Current.ToList();
+                    if (batch.Count > 0)
+                    {
+                        await targetCollection.InsertManyAsync(batch);
+                    }
+                }
+            }
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, $"Error copying collection: {ex.Message}");
+            return false;
+        }
+    }    
 }

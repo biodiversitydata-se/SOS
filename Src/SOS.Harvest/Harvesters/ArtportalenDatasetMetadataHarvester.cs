@@ -53,20 +53,18 @@ public class ArtportalenDatasetMetadataHarvester : IArtportalenDatasetMetadataHa
             var datasets = CastToArtportalenDatasetVerbatims(datasetEntities);
             _logger.LogDebug("Finish getting Artportalen datasets metadata");
 
-            if (await _artportalenDatasetMetadataRepository.DeleteCollectionAsync())
-            {
-                if (await _artportalenDatasetMetadataRepository.AddCollectionAsync())
-                {
-                    await _artportalenDatasetMetadataRepository.AddManyAsync(datasets);
+            var session = _artportalenDatasetMetadataRepository.CreateSession();
+            if (await _artportalenDatasetMetadataRepository.DeleteCollectionAsync(session.TempCollection))
+            {                
+                await _artportalenDatasetMetadataRepository.AddManyAsync(datasets, session.TempCollection);
 
-                    // Update harvest info
-                    harvestInfo.End = DateTime.Now;
-                    harvestInfo.Status = RunStatus.Success;
-                    harvestInfo.Count = datasets?.Count() ?? 0;
-
-                    _logger.LogDebug("Adding Artportalen datasets metadata succeeded");
-                    return harvestInfo;
-                }
+                // Update harvest info
+                harvestInfo.End = DateTime.Now;
+                harvestInfo.Status = RunStatus.Success;
+                harvestInfo.Count = datasets?.Count() ?? 0;
+                await _artportalenDatasetMetadataRepository.PermanentizeCollectionAsync(session);
+                _logger.LogInformation("Adding Artportalen datasets metadata succeeded");
+                return harvestInfo;                
             }
 
             _logger.LogDebug("Failed harvest of Artportalen datasets metadata");

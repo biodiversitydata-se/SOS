@@ -1,5 +1,6 @@
 ﻿using MongoDB.Driver;
 using SOS.Lib.Enums;
+using SOS.Lib.Models;
 using SOS.Lib.Models.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -14,6 +15,10 @@ namespace SOS.Lib.Repositories.Interfaces;
 /// <typeparam name="TKey"></typeparam>
 public interface IRepositoryBase<TEntity, TKey> : IDisposable where TEntity : IEntity<TKey>
 {
+    string CollectionName { get; }
+    string RawCollectionName { get; }
+    CollectionSession<TEntity> CreateSession();
+
     /// <summary>
     ///     Add entity.
     /// </summary>
@@ -354,4 +359,11 @@ public interface IRepositoryBase<TEntity, TKey> : IDisposable where TEntity : IE
     Task WaitForDataInsert(long expectedRecordsCount, TimeSpan? timeout = null);
 
     IMongoCollection<TEntity> GetMongoCollection(string collectionName);
+
+    Task<bool> PermanentizeCollectionAsync(CollectionSession<TEntity> session);
+    Task<bool> PermanentizeCollectionAsync(string tempCollectionName, string targetCollectionName);
+    Task<bool> PermanentizeCollectionAsync(IMongoCollection<TEntity> tempCollection, IMongoCollection<TEntity> targetCollection);
+    Task<bool> RenameCollectionAsync(string currentCollectionName, string newCollectionName);
+    Task<bool> CopyCollectionAsync(string sourceCollectionName, string targetCollectionName, bool overwriteExistingTargetCollection = true);
+    Task<bool> CheckDuplicatesAsync(string field, IMongoCollection<TEntity> mongoCollection);
 }

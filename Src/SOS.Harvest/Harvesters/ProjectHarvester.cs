@@ -60,26 +60,24 @@ public class ProjectHarvester : IProjectHarvester
                 .OrderBy(m => m.Id);
             _logger.LogDebug("Finish getting projects");
 
-            if (await _projectInfoRepository.DeleteCollectionAsync())
-            {
-                if (await _projectInfoRepository.AddCollectionAsync())
-                {
-                    //Todo fix index creation await _projectInfoRepository.CreateIndexesAsync();
-                    await _projectInfoRepository.AddManyAsync(projects);
-                    // Clear observation api cache
-                    await _cacheManager.ClearAsync(Cache.Projects);
+            var session = _projectInfoRepository.CreateSession();
+            if (await _projectInfoRepository.DeleteCollectionAsync(session.TempCollection))
+            {                
+                //Todo fix index creation await _projectInfoRepository.CreateIndexesAsync();
+                await _projectInfoRepository.AddManyAsync(projects, session.TempCollection);
+                // Clear observation api cache
+                await _cacheManager.ClearAsync(Cache.Projects);
 
-                    // Update harvest info
-                    harvestInfo.End = DateTime.Now;
-                    harvestInfo.Status = RunStatus.Success;
-                    harvestInfo.Count = projects?.Count() ?? 0;
-
-                    _logger.LogDebug("Adding projects succeeded");
-                    return harvestInfo;
-                }
+                // Update harvest info
+                harvestInfo.End = DateTime.Now;
+                harvestInfo.Status = RunStatus.Success;
+                harvestInfo.Count = projects?.Count() ?? 0;
+                await _projectInfoRepository.PermanentizeCollectionAsync(session);
+                _logger.LogInformation("Adding projects succeeded");
+                return harvestInfo;
             }
 
-            _logger.LogDebug("Failed harvest of projects");
+            _logger.LogError("Failed harvest of projects");
             harvestInfo.Status = RunStatus.Failed;
         }
         catch (Exception e)

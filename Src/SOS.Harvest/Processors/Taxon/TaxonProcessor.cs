@@ -199,19 +199,19 @@ public class TaxonProcessor : ITaxonProcessor
             _logger.LogDebug("Finish validating taxa");
 
             _logger.LogDebug("Start deleting processed taxa");
-            if (!await _processedTaxonRepository.DeleteCollectionAsync())
+
+            var session = _processedTaxonRepository.CreateSession();
+            if (!await _processedTaxonRepository.DeleteCollectionAsync(session.TempCollection))
             {
                 _logger.LogError("Failed to delete processed taxa");
                 return -1;
             }
+            var success = await _processedTaxonRepository.AddManyAsync(taxa!.Values, session.TempCollection);
+            await _processedTaxonRepository.PermanentizeCollectionAsync(session);
 
-            _logger.LogDebug("Finish deleting processed taxa");
-
-            _logger.LogDebug("Start saving processed taxa");
-            var success = await _processedTaxonRepository.AddManyAsync(taxa!.Values);
             await _processedTaxonRepository.WaitForDataInsert(taxa!.Values.Count, TimeSpan.FromMinutes(5));
             await Task.Delay(TimeSpan.FromSeconds(15)); // Extra wait security.
-            _logger.LogDebug("Finish saving processed taxa");
+            _logger.LogInformation("Finish saving processed taxa");
 
             return success ? taxa.Count : -1;
         }
