@@ -26,7 +26,7 @@ public class DarwinCoreArchiveVerbatimRepository : VerbatimRepositoryBase<DwcObs
     /// <summary>
     /// Mongodb collection name
     /// </summary>
-    protected override string CollectionName => $"DwcaOccurrence_{_dataProvider.Id:D3}_{_dataProvider.Identifier}{(TempMode ? "_temp" : "")}";
+    public override string CollectionName => $"DwcaOccurrence_{_dataProvider.Id:D3}_{_dataProvider.Identifier}{(TempMode ? "_temp" : "")}";
 
     /// <inheritdoc />
     public IEnumerable<DistinictValueCount<string>> GetDistinctValuesCount(

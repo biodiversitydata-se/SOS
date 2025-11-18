@@ -97,9 +97,10 @@ public class TaxonListHarvester : ITaxonListHarvester
                 return harvestInfo;
             }
 
-            await _taxonListRepository.DeleteCollectionAsync();
-            await _taxonListRepository.AddCollectionAsync();
-            await _taxonListRepository.AddManyAsync(taxonLists);
+            var session = _taxonListRepository.CreateSession();
+            await _taxonListRepository.DeleteCollectionAsync(session.TempCollection);            
+            await _taxonListRepository.AddManyAsync(taxonLists, session.TempCollection);
+            await _taxonListRepository.PermanentizeCollectionAsync(session);
             // Clear observation api cache
             await _cacheManager.ClearAsync(Cache.TaxonLists);
 
@@ -108,7 +109,7 @@ public class TaxonListHarvester : ITaxonListHarvester
             harvestInfo.Status = RunStatus.Success;
             harvestInfo.Count = taxonLists?.Count() ?? 0;
 
-            _logger.LogDebug("Adding taxon lists succeeded");
+            _logger.LogInformation("Adding taxon lists succeeded");
             return harvestInfo;
         }
         catch (Exception e)

@@ -129,7 +129,7 @@ public class VerbatimRepositoryBase<TEntity, TKey> : RepositoryBase<TEntity, TKe
     /// <summary>
     /// Name of collection
     /// </summary>
-    protected override string CollectionName => $"{base.CollectionName}{(TempMode ? "_temp" : "")}";
+    public override string CollectionName => $"{base.CollectionName}{(TempMode ? "_temp" : "")}";
 
     public virtual async Task<bool> PermanentizeCollectionAsync()
     {

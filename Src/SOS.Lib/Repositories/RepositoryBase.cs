@@ -6,6 +6,7 @@ using MongoDB.NetTopologySuite.Serialization;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
+using SOS.Lib.Models;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Repositories.Interfaces;
 using System;
@@ -101,7 +102,8 @@ public class RepositoryBase<TEntity, TKey> : IRepositoryBase<TEntity, TKey> wher
     /// <summary>
     /// Name of collection
     /// </summary>
-    protected virtual string CollectionName => $"{_collectionName}{(Mode == JobRunModes.IncrementalActiveInstance ? "_incrementalActive" : Mode == JobRunModes.IncrementalInactiveInstance ? "_incrementalInactive" : "")}";
+    public virtual string CollectionName => $"{_collectionName}{(Mode == JobRunModes.IncrementalActiveInstance ? "_incrementalActive" : Mode == JobRunModes.IncrementalInactiveInstance ? "_incrementalInactive" : "")}";
+    public virtual string RawCollectionName => _collectionName;
 
     protected readonly IMongoDbClient Client;
 
@@ -114,6 +116,19 @@ public class RepositoryBase<TEntity, TKey> : IRepositoryBase<TEntity, TKey> wher
     ///     Logger
     /// </summary>
     protected readonly ILogger Logger;
+
+    public virtual CollectionSession<TEntity> CreateSession()
+    {
+        var raw = RawCollectionName;
+        var temp = $"{raw}_temp";
+
+        return new CollectionSession<TEntity>(
+            raw,
+            temp,
+            GetMongoCollection(raw),
+            GetMongoCollection(temp)
+        );
+    }
 
     public IMongoCollection<TEntity> GetMongoCollection(string collectionName)
     {
@@ -1067,6 +1082,11 @@ public class RepositoryBase<TEntity, TKey> : IRepositoryBase<TEntity, TKey> wher
         }
     }
 
+    public virtual async Task<bool> PermanentizeCollectionAsync(CollectionSession<TEntity> session)
+    {
+        return await PermanentizeCollectionAsync(session.TempCollection, session.Collection);
+    }
+
     public virtual async Task<bool> PermanentizeCollectionAsync(IMongoCollection<TEntity> tempCollection, IMongoCollection<TEntity> targetCollection)
     {
         if (!await CheckIfCollectionExistsAsync(tempCollection.CollectionNamespace.CollectionName)) return false;
@@ -1149,5 +1169,5 @@ public class RepositoryBase<TEntity, TKey> : IRepositoryBase<TEntity, TKey> wher
             Logger.LogError(ex, $"Error copying collection: {ex.Message}");
             return false;
         }
-    }
+    }    
 }

@@ -118,7 +118,7 @@ public class DatasetVerbatimRepository : VerbatimRepositoryBase<DwcVerbatimDatas
     /// <summary>
     /// Mongodb collection name
     /// </summary>
-    protected override string CollectionName => $"DwcaCollection_{_dataProvider.Id:D3}_{_dataProvider.Identifier}_Datasets{(TempMode ? "_temp" : "")}";
+    public override string CollectionName => $"DwcaCollection_{_dataProvider.Id:D3}_{_dataProvider.Identifier}_Datasets{(TempMode ? "_temp" : "")}";
 
     /// <inheritdoc />
     public IEnumerable<DistinictValueCount<string>> GetDistinctValuesCount(
@@ -203,7 +203,7 @@ public class EventVerbatimRepository : VerbatimRepositoryBase<DwcEventOccurrence
     /// <summary>
     /// Mongodb collection name
     /// </summary>
-    protected override string CollectionName => GetCollectionName(TempMode);
+    public override string CollectionName => GetCollectionName(TempMode);
 
     protected override string GetCollectionName(bool? tempMode)
     {
@@ -319,7 +319,7 @@ public class OccurrenceVerbatimRepository : VerbatimRepositoryBase<DwcObservatio
     /// <summary>
     /// Mongodb collection name
     /// </summary>
-    protected override string CollectionName => GetCollectionName(TempMode);
+    public override string CollectionName => GetCollectionName(TempMode);
 
     protected override string GetCollectionName(bool? tempMode)
     {

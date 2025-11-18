@@ -24,7 +24,7 @@ public class EventDarwinCoreArchiveVerbatimRepository : VerbatimRepositoryBase<D
     /// <summary>
     /// Mongodb collection name
     /// </summary>
-    protected override string CollectionName => $"DwcaEvent_{_dataProvider.Id:D3}_{_dataProvider.Identifier}{(TempMode ? "_temp" : "")}";
+    public override string CollectionName => $"DwcaEvent_{_dataProvider.Id:D3}_{_dataProvider.Identifier}{(TempMode ? "_temp" : "")}";
 
     /// <inheritdoc />
     public IEnumerable<DistinictValueCount<string>> GetDistinctValuesCount(
@@ -69,7 +69,7 @@ public class EventOccurrenceDarwinCoreArchiveVerbatimRepository : VerbatimReposi
     /// <summary>
     /// Mongodb collection name
     /// </summary>
-    protected override string CollectionName => $"DwcaEventOccurrence_{_dataProvider.Id:D3}_{_dataProvider.Identifier}{(TempMode ? "_temp" : "")}";
+    public override string CollectionName => $"DwcaEventOccurrence_{_dataProvider.Id:D3}_{_dataProvider.Identifier}{(TempMode ? "_temp" : "")}";
 
     private string CollectionNameObservations => $"DwcaEventOccurrence_{_dataProvider.Id:D3}_{_dataProvider.Identifier}_Obs{(TempMode ? "_temp" : "")}";
 
