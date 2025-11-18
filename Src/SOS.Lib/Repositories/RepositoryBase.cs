@@ -1100,6 +1100,7 @@ public class RepositoryBase<TEntity, TKey> : IRepositoryBase<TEntity, TKey> wher
         }
 
         await Database.RenameCollectionAsync(tempCollection.CollectionNamespace.CollectionName, targetCollection.CollectionNamespace.CollectionName);
+        Logger.LogInformation($"Permanentized collection from {tempCollection.CollectionNamespace.CollectionName} to {targetCollection.CollectionNamespace.CollectionName}");
         return true;
     }
 
