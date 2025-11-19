@@ -1085,24 +1085,104 @@ public class RepositoryBase<TEntity, TKey> : IRepositoryBase<TEntity, TKey> wher
     public virtual async Task<bool> PermanentizeCollectionAsync(CollectionSession<TEntity> session)
     {
         return await PermanentizeCollectionAsync(session.TempCollection, session.Collection);
-    }
+    }   
 
-    public virtual async Task<bool> PermanentizeCollectionAsync(IMongoCollection<TEntity> tempCollection, IMongoCollection<TEntity> targetCollection)
+    public virtual async Task<bool> PermanentizeCollectionAsync(
+        IMongoCollection<TEntity> tempCollection,
+        IMongoCollection<TEntity> targetCollection)
     {
-        if (!await CheckIfCollectionExistsAsync(tempCollection.CollectionNamespace.CollectionName)) return false;
-        if (await CountAllDocumentsAsync(tempCollection) == 0) return false;
+        var dbName = Database.DatabaseNamespace.DatabaseName;
+        var tempName = tempCollection.CollectionNamespace.CollectionName;
+        var targetName = targetCollection.CollectionNamespace.CollectionName;
 
-        // Check if permanent collection exists
-        if (await CheckIfCollectionExistsAsync(targetCollection.CollectionNamespace.CollectionName))
+        var majorityDb = Database.Client.GetDatabase(
+            dbName,
+            new MongoDatabaseSettings
+            {
+                WriteConcern = WriteConcern.WMajority,
+                ReadConcern = ReadConcern.Majority
+            });
+
+        Logger.LogInformation($"[Permanentize] Starting: {tempName} → {targetName}");
+
+        // Check: temp collection exists
+        if (!await CheckIfCollectionExistsAsync(tempName))
         {
-            // Delete permanent collection
-            await DeleteCollectionAsync(targetCollection.CollectionNamespace.CollectionName);
+            Logger.LogWarning($"[Permanentize] Temp collection '{tempName}' does not exist.");
+            return false;
         }
 
-        await Database.RenameCollectionAsync(tempCollection.CollectionNamespace.CollectionName, targetCollection.CollectionNamespace.CollectionName);
-        Logger.LogInformation($"Permanentized collection from {tempCollection.CollectionNamespace.CollectionName} to {targetCollection.CollectionNamespace.CollectionName}");
-        return true;
+        // Check: temp collection has documents
+        var tempCount = await CountAllDocumentsAsync(tempCollection);
+        if (tempCount == 0)
+        {
+            Logger.LogWarning($"[Permanentize] Temp collection '{tempName}' is empty.");
+            return false;
+        }
+
+        Logger.LogInformation($"[Permanentize] Temp collection '{tempName}' contains {tempCount} documents.");
+
+        // If target already exists → delete with Majority
+        if (await CheckIfCollectionExistsAsync(targetName))
+        {
+            Logger.LogInformation($"[Permanentize] Deleting existing target collection '{targetName}'...");
+
+            await majorityDb.DropCollectionAsync(targetName);
+
+            // Verify delete
+            if (await CheckIfCollectionExistsAsync(targetName))
+            {
+                Logger.LogError($"[Permanentize] Failed to delete target '{targetName}' after DropCollectionAsync.");
+                return false;
+            }
+
+            Logger.LogInformation($"[Permanentize] Target collection '{targetName}' deleted successfully.");
+        }
+
+        // Rename: retry up to 3 times in case of replica stepdown
+        var options = new RenameCollectionOptions { DropTarget = false };
+        var attempt = 0;
+        const int maxAttempts = 3;
+
+        while (true)
+        {
+            attempt++;
+
+            try
+            {
+                Logger.LogInformation($"[Permanentize] Attempt {attempt}: Renaming '{tempName}' → '{targetName}' with WriteConcern.WMajority...");
+
+                await majorityDb.RenameCollectionAsync(tempName, targetName, options);
+
+                // Double verify rename
+                bool tempExists = await CheckIfCollectionExistsAsync(tempName);
+                bool targetExists = await CheckIfCollectionExistsAsync(targetName);
+
+                if (!tempExists && targetExists)
+                {
+                    Logger.LogInformation($"[Permanentize] Rename SUCCESS: '{tempName}' → '{targetName}'.");
+                    return true;
+                }
+
+                Logger.LogError($"[Permanentize] Rename operation completed but verification failed. TempExists={tempExists}, TargetExists={targetExists}");
+                return false;
+            }
+            catch (MongoException ex)
+            {
+                Logger.LogWarning(ex, $"[Permanentize] Rename attempt {attempt} failed.");
+
+                if (attempt >= maxAttempts)
+                {
+                    Logger.LogError($"[Permanentize] Giving up after {maxAttempts} rename attempts.");
+                    throw;
+                }
+
+                Logger.LogInformation("[Permanentize] Waiting 1s before retry (primary stepdown or lock conflict).");
+                await Task.Delay(1000);
+            }
+        }
     }
+
 
     public virtual async Task<bool> PermanentizeCollectionAsync(string tempCollectionName, string targetCollectionName)
     {
