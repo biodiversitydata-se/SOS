@@ -129,8 +129,8 @@ public class iNaturalistObservationHarvester : IiNaturalistObservationHarvester
 
             // Update harvest info
             harvestInfo.End = DateTime.Now;
-            var tempDocCount = await _iNaturalistVerbatimRepository.CountAllDocumentsAsync(incrementalTempMongoCollection);
-            var currentDocCount = await _iNaturalistVerbatimRepository.CountAllDocumentsAsync(incrementalMongoCollection);
+            var tempDocCount = await _iNaturalistVerbatimRepository.CountAllDocumentsAsync(incrementalTempMongoCollection, useMajorityCollection: false);
+            var currentDocCount = await _iNaturalistVerbatimRepository.CountAllDocumentsAsync(incrementalMongoCollection, useMajorityCollection: false);
             harvestInfo.Count = (int)tempDocCount;
             if (tempDocCount >= currentDocCount * 0.8)
             {
@@ -170,7 +170,7 @@ public class iNaturalistObservationHarvester : IiNaturalistObservationHarvester
             var completeMongoCollection = _iNaturalistVerbatimRepository.GetMongoCollection(FullCollectionName);
             var completeTempMongoCollection = _iNaturalistVerbatimRepository.GetMongoCollection(FullTempCollectionName);
             long idAbove = _iNaturalistServiceConfiguration.HarvestCompleteStartId;
-            var currentDocCount = await _iNaturalistVerbatimRepository.CountAllDocumentsAsync(completeMongoCollection);
+            var currentDocCount = await _iNaturalistVerbatimRepository.CountAllDocumentsAsync(completeMongoCollection, useMajorityCollection: false);
             int documentId = 0;
             (bool collectionsExists, int? maxId, long? maxObservationId) = await GetMongoCollectionMaxIdsAsync(_iNaturalistVerbatimRepository, completeTempMongoCollection);
             if (collectionsExists)
@@ -209,7 +209,7 @@ public class iNaturalistObservationHarvester : IiNaturalistObservationHarvester
 
             // Update harvest info
             harvestInfo.End = DateTime.Now;                
-            var tempDocCount = await _iNaturalistVerbatimRepository.CountAllDocumentsAsync(completeTempMongoCollection);
+            var tempDocCount = await _iNaturalistVerbatimRepository.CountAllDocumentsAsync(completeTempMongoCollection, useMajorityCollection: false);
             harvestInfo.Count = (int)tempDocCount;                
             if (tempDocCount >= currentDocCount * 0.8)
             {

@@ -132,7 +132,7 @@ public class EventOccurrenceDarwinCoreArchiveVerbatimRepository : VerbatimReposi
     }
 
     /// <inheritdoc />
-    public override async Task<bool> AddManyAsync(IEnumerable<DwcEventOccurrenceVerbatim> eventRecords)
+    public override async Task<bool> AddManyAsync(IEnumerable<DwcEventOccurrenceVerbatim> eventRecords, bool useMajorityCollection = false)
     {
         if (!eventRecords?.Any() ?? true)
         {
@@ -142,11 +142,11 @@ public class EventOccurrenceDarwinCoreArchiveVerbatimRepository : VerbatimReposi
         // Store observations in own collection
         foreach (var eventRecord in eventRecords)
         {
-            await _observationsRepository.AddManyAsync(eventRecord.Observations);
+            await _observationsRepository.AddManyAsync(eventRecord.Observations, useMajorityCollection);
             eventRecord.Observations = null;
         }
 
-        return await AddManyAsync(eventRecords, MongoCollection);
+        return await AddManyAsync(eventRecords, MongoCollection, useMajorityCollection);
     }
 
     /// <inheritdoc />

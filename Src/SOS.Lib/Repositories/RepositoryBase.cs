@@ -200,6 +200,22 @@ public class RepositoryBase<TEntity, TKey> : IRepositoryBase<TEntity, TKey> wher
     /// <returns></returns>
     protected IMongoCollection<TEntity> MongoCollection => GetMongoCollection(CollectionName);
 
+    protected IMongoDatabase GetMajorityDatabase()
+    {
+        return Database.Client.GetDatabase(
+            Database.DatabaseNamespace.DatabaseName,
+            new MongoDatabaseSettings
+            {
+                WriteConcern = WriteConcern.WMajority,
+                ReadConcern = ReadConcern.Majority
+            });
+    }
+
+    protected IMongoCollection<TEntity> GetMajorityCollection(string collectionName)
+    {
+        return GetMajorityDatabase().GetCollection<TEntity>(collectionName);
+    }
+
     /// <inheritdoc />
     public virtual async Task<bool> AddAsync(TEntity item)
     {
@@ -262,39 +278,46 @@ public class RepositoryBase<TEntity, TKey> : IRepositoryBase<TEntity, TKey> wher
     }
 
     /// <inheritdoc />
-    public virtual async Task<bool> AddManyAsync(IEnumerable<TEntity> items)
+    public virtual async Task<bool> AddManyAsync(IEnumerable<TEntity> items, bool useMajorityCollection = false)
     {
-        return await AddManyAsync(items, MongoCollection);
+        return await AddManyAsync(items, MongoCollection, useMajorityCollection);
     }
 
     public async Task WaitForDataInsert(long expectedRecordsCount, TimeSpan? timeout = null)
     {
-        Logger.LogInformation($"Begin waiting for MongoDB data. Collection={MongoCollection}, ExpectedRecordsCount={expectedRecordsCount}, Timeout={timeout}");
-        if (timeout == null) timeout = TimeSpan.FromMinutes(10);
-        var sleepTime = TimeSpan.FromSeconds(5);
-        int nrIterations = (int)(Math.Ceiling(timeout.Value.TotalSeconds / sleepTime.TotalSeconds));
-        long docCount = await CountAllDocumentsAsync(estimateCount: false);
-        var iterations = 0;
+        Logger.LogInformation(
+            $"Begin waiting for MongoDB data. Collection={MongoCollection}, ExpectedRecordsCount={expectedRecordsCount}, Timeout={timeout}");
 
-        // Compare number of documents retrieved with actually db count
-        // If docCount is less than process count, indexing is not ready yet
+        if (timeout == null) timeout = TimeSpan.FromMinutes(10);
+        var sleepTime = TimeSpan.FromSeconds(2);
+        int nrIterations = (int)(Math.Ceiling(timeout.Value.TotalSeconds / sleepTime.TotalSeconds));
+        
+        var majorityCollection = GetMajorityCollection(MongoCollection.CollectionNamespace.CollectionName);
+
+        long docCount = await majorityCollection.CountDocumentsAsync(FilterDefinition<TEntity>.Empty);
+        int iterations = 0;
+
         while (docCount < expectedRecordsCount && iterations < nrIterations)
         {
-            iterations++; // Safety to prevent infinite loop.                                
+            iterations++;
             await Task.Delay(sleepTime);
-            docCount = await CountAllDocumentsAsync(estimateCount: false);
+            docCount = await majorityCollection.CountDocumentsAsync(FilterDefinition<TEntity>.Empty);
         }
 
         if (iterations == nrIterations)
         {
-            Logger.LogError("Failed waiting for index creation due to timeout. Collection={@mongoCollection}. ExpectedRecordsCount={@expectedRecordsCount}, DocCount={@docCount}",
-                MongoCollection, expectedRecordsCount, docCount);
+            Logger.LogError(
+                "Failed waiting for MongoDB majority read. Collection={Collection}. Expected={Expected}, DocCount={DocCount}",
+                MongoCollection.CollectionNamespace.CollectionName, expectedRecordsCount, docCount);
         }
         else
         {
-            Logger.LogInformation("Finish waiting for index creation. Collection={@mongoCollection}.", MongoCollection);
+            Logger.LogInformation(
+                "Majority read confirmed. Collection {Collection} now has expected records.",
+                MongoCollection.CollectionNamespace.CollectionName);
         }
     }
+
 
     public async Task<bool> UpsertManyAsync(IEnumerable<TEntity> items, string comparisionField = "_id")
     {
@@ -411,12 +434,16 @@ public class RepositoryBase<TEntity, TKey> : IRepositoryBase<TEntity, TKey> wher
 
 
     /// <inheritdoc />
-    public async Task<bool> AddManyAsync(IEnumerable<TEntity> items, IMongoCollection<TEntity> mongoCollection)
+    public async Task<bool> AddManyAsync(IEnumerable<TEntity> items, IMongoCollection<TEntity> mongoCollection, bool useMajorityCollection = false)
     {
         if (!items?.Any() ?? true)
         {
             return true;
         }
+
+        var collection = useMajorityCollection
+            ? GetMajorityCollection(mongoCollection.CollectionNamespace.CollectionName)
+            : mongoCollection;
 
         var success = true;
         var count = 0;
@@ -425,7 +452,7 @@ public class RepositoryBase<TEntity, TKey> : IRepositoryBase<TEntity, TKey> wher
 
         while (batch?.Any() ?? false)
         {
-            success = success && await AddBatchAsync(batch, mongoCollection);
+            success = success && await AddBatchAsync(batch, collection);
             count++;
             batch = entities.Skip(BatchSizeWrite * count).Take(BatchSizeWrite)?.ToArray();
         }
@@ -460,24 +487,20 @@ public class RepositoryBase<TEntity, TKey> : IRepositoryBase<TEntity, TKey> wher
     public int BatchSizeWrite { get; set; }
 
     /// <inheritdoc />
-    public virtual async Task<bool> CheckIfCollectionExistsAsync()
+    public virtual async Task<bool> CheckIfCollectionExistsAsync(bool useMajority = false)
     {
         return await CheckIfCollectionExistsAsync(CollectionName);
     }
 
     /// <inheritdoc />
-    public async Task<bool> CheckIfCollectionExistsAsync(string collectionName)
+    public async Task<bool> CheckIfCollectionExistsAsync(string collectionName, bool useMajority = false)
     {
-        //filter by collection name
-        var exists = await (await Database
-                .ListCollectionNamesAsync(new ListCollectionNamesOptions
-                {
-                    Filter = new BsonDocument("name", collectionName)
-                }))
-            .AnyAsync();
-
-        return exists;
+        IMongoDatabase db = useMajority ? GetMajorityDatabase() : Database;
+        var filter = new BsonDocument("name", collectionName);
+        var collections = await db.ListCollectionsAsync(new ListCollectionsOptions { Filter = filter });
+        return await collections.AnyAsync();
     }
+
 
     /// <inheritdoc />
     public virtual async Task<bool> DeleteAsync(TKey id)
@@ -507,43 +530,57 @@ public class RepositoryBase<TEntity, TKey> : IRepositoryBase<TEntity, TKey> wher
     public virtual async Task<bool> DeleteCollectionAsync()
     {
         return await DeleteCollectionAsync(CollectionName);
-    }
+    }   
 
-    /// <inheritdoc />
     public async Task<bool> DeleteCollectionAsync(string collectionName)
     {
         try
         {
-            // Create the collection
-            await Database.DropCollectionAsync(collectionName);
-            Logger.LogInformation($"The following MongoDB collection was deleted: [{collectionName}]");
+            var majorityDb = GetMajorityDatabase();
 
+            Logger.LogInformation($"[DeleteCollection] Dropping collection '{collectionName}' with WriteConcern.WMajority...");
+
+            await majorityDb.DropCollectionAsync(collectionName);
+
+            // Verify delete actually happened on majority
+            if (await CheckIfCollectionExistsAsync(collectionName))
+            {
+                Logger.LogError($"[DeleteCollection] Verification failed: '{collectionName}' still exists after DropCollectionAsync.");
+                return false;
+            }
+
+            Logger.LogInformation($"[DeleteCollection] Collection '{collectionName}' deleted successfully.");
             return true;
         }
         catch (Exception e)
         {
-            Logger.LogError(e, "Failed to delete collection");
+            Logger.LogError(e, $"[DeleteCollection] Failed to delete collection '{collectionName}'.");
             throw;
         }
     }
 
+
     /// <inheritdoc />
-    public virtual async Task<long> CountAllDocumentsAsync(bool estimateCount = true)
+    public virtual async Task<long> CountAllDocumentsAsync(bool useMajorityCollection = false, bool estimateCount = true)
     {
-        return await CountAllDocumentsAsync(MongoCollection, estimateCount);
+        return await CountAllDocumentsAsync(MongoCollection, useMajorityCollection, estimateCount);
     }
 
     /// <inheritdoc />
-    public async Task<long> CountAllDocumentsAsync(IMongoCollection<TEntity> mongoCollection, bool estimateCount = true)
+    public async Task<long> CountAllDocumentsAsync(IMongoCollection<TEntity> mongoCollection, bool useMajorityCollection = false, bool estimateCount = true)
     {
         try
         {
+            var collection = useMajorityCollection
+                ? GetMajorityCollection(mongoCollection.CollectionNamespace.CollectionName)
+                : mongoCollection;
+
             if (estimateCount)
             {
-                return await mongoCollection.EstimatedDocumentCountAsync();                   
+                return await collection.EstimatedDocumentCountAsync();                   
             }
 
-            return await mongoCollection.CountDocumentsAsync(FilterDefinition<TEntity>.Empty);
+            return await collection.CountDocumentsAsync(FilterDefinition<TEntity>.Empty);
         }
         catch
         {
@@ -1095,25 +1132,19 @@ public class RepositoryBase<TEntity, TKey> : IRepositoryBase<TEntity, TKey> wher
         var tempName = tempCollection.CollectionNamespace.CollectionName;
         var targetName = targetCollection.CollectionNamespace.CollectionName;
 
-        var majorityDb = Database.Client.GetDatabase(
-            dbName,
-            new MongoDatabaseSettings
-            {
-                WriteConcern = WriteConcern.WMajority,
-                ReadConcern = ReadConcern.Majority
-            });
+        var majorityDb = GetMajorityDatabase();
 
         Logger.LogInformation($"[Permanentize] Starting: {tempName} → {targetName}");
 
         // Check: temp collection exists
-        if (!await CheckIfCollectionExistsAsync(tempName))
+        if (!await CheckIfCollectionExistsAsync(tempName, useMajority: true))
         {
             Logger.LogWarning($"[Permanentize] Temp collection '{tempName}' does not exist.");
             return false;
         }
 
         // Check: temp collection has documents
-        var tempCount = await CountAllDocumentsAsync(tempCollection);
+        var tempCount = await CountAllDocumentsAsync(tempCollection, useMajorityCollection: true);
         if (tempCount == 0)
         {
             Logger.LogWarning($"[Permanentize] Temp collection '{tempName}' is empty.");
@@ -1123,14 +1154,14 @@ public class RepositoryBase<TEntity, TKey> : IRepositoryBase<TEntity, TKey> wher
         Logger.LogInformation($"[Permanentize] Temp collection '{tempName}' contains {tempCount} documents.");
 
         // If target already exists → delete with Majority
-        if (await CheckIfCollectionExistsAsync(targetName))
+        if (await CheckIfCollectionExistsAsync(targetName, useMajority: true))
         {
             Logger.LogInformation($"[Permanentize] Deleting existing target collection '{targetName}'...");
 
             await majorityDb.DropCollectionAsync(targetName);
 
             // Verify delete
-            if (await CheckIfCollectionExistsAsync(targetName))
+            if (await CheckIfCollectionExistsAsync(targetName, useMajority: true))
             {
                 Logger.LogError($"[Permanentize] Failed to delete target '{targetName}' after DropCollectionAsync.");
                 return false;
@@ -1155,8 +1186,8 @@ public class RepositoryBase<TEntity, TKey> : IRepositoryBase<TEntity, TKey> wher
                 await majorityDb.RenameCollectionAsync(tempName, targetName, options);
 
                 // Double verify rename
-                bool tempExists = await CheckIfCollectionExistsAsync(tempName);
-                bool targetExists = await CheckIfCollectionExistsAsync(targetName);
+                bool tempExists = await CheckIfCollectionExistsAsync(tempName, useMajority: true);
+                bool targetExists = await CheckIfCollectionExistsAsync(targetName, useMajority: true);
 
                 if (!tempExists && targetExists)
                 {
@@ -1188,7 +1219,7 @@ public class RepositoryBase<TEntity, TKey> : IRepositoryBase<TEntity, TKey> wher
     {
         if (!await CheckIfCollectionExistsAsync(tempCollectionName)) return false;
         var tempCollection = GetMongoCollection(tempCollectionName);
-        if (await CountAllDocumentsAsync(tempCollection) == 0) return false;
+        if (await CountAllDocumentsAsync(tempCollection, false) == 0) return false;
 
         // Check if permanent collection exists
         if (await CheckIfCollectionExistsAsync(targetCollectionName))

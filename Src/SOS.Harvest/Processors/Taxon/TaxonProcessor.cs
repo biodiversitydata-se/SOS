@@ -206,7 +206,7 @@ public class TaxonProcessor : ITaxonProcessor
                 _logger.LogError("Failed to delete processed taxa");
                 return -1;
             }
-            var success = await _processedTaxonRepository.AddManyAsync(taxa!.Values, session.TempCollection);
+            var success = await _processedTaxonRepository.AddManyAsync(taxa!.Values, session.TempCollection, useMajorityCollection: true);
             await _processedTaxonRepository.PermanentizeCollectionAsync(session);
 
             await _processedTaxonRepository.WaitForDataInsert(taxa!.Values.Count, TimeSpan.FromMinutes(5));
