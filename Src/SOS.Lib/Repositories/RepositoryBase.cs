@@ -1144,7 +1144,7 @@ public class RepositoryBase<TEntity, TKey> : IRepositoryBase<TEntity, TKey> wher
         }
 
         // Check: temp collection has documents
-        var tempCount = await CountAllDocumentsAsync(tempCollection, useMajorityCollection: true);
+        var tempCount = await CountAllDocumentsAsync(tempCollection, useMajorityCollection: true, estimateCount: false);
         if (tempCount == 0)
         {
             Logger.LogWarning($"[Permanentize] Temp collection '{tempName}' is empty.");
