@@ -291,7 +291,7 @@ public class RepositoryBase<TEntity, TKey> : IRepositoryBase<TEntity, TKey> wher
     public async Task WaitForDataInsert(long expectedRecordsCount, IMongoCollection<TEntity> mongoCollection, TimeSpan? timeout = null)
     {
         Logger.LogInformation(
-            $"Begin waiting for MongoDB data. Collection={mongoCollection}, ExpectedRecordsCount={expectedRecordsCount}, Timeout={timeout}");
+            $"Begin waiting for MongoDB data. Collection={mongoCollection.CollectionNamespace.CollectionName}, ExpectedRecordsCount={expectedRecordsCount}, Timeout={timeout}");
 
         if (timeout == null) timeout = TimeSpan.FromMinutes(10);
         var sleepTime = TimeSpan.FromSeconds(2);
