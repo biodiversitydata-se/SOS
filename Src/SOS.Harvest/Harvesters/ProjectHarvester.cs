@@ -73,7 +73,7 @@ public class ProjectHarvester : IProjectHarvester
                 harvestInfo.End = DateTime.Now;
                 harvestInfo.Status = RunStatus.Success;
                 harvestInfo.Count = projects?.Count() ?? 0;
-                await _projectInfoRepository.PermanentizeCollectionAsync(session);
+                await _projectInfoRepository.PermanentizeCollectionAsync(session, projects?.Count() ?? 0);
                 _logger.LogInformation("Adding projects succeeded");
                 return harvestInfo;
             }

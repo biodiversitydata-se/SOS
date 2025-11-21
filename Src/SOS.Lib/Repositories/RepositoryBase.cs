@@ -285,14 +285,19 @@ public class RepositoryBase<TEntity, TKey> : IRepositoryBase<TEntity, TKey> wher
 
     public async Task WaitForDataInsert(long expectedRecordsCount, TimeSpan? timeout = null)
     {
+        await WaitForDataInsert(expectedRecordsCount, MongoCollection, timeout);
+    }
+
+    public async Task WaitForDataInsert(long expectedRecordsCount, IMongoCollection<TEntity> mongoCollection, TimeSpan? timeout = null)
+    {
         Logger.LogInformation(
-            $"Begin waiting for MongoDB data. Collection={MongoCollection}, ExpectedRecordsCount={expectedRecordsCount}, Timeout={timeout}");
+            $"Begin waiting for MongoDB data. Collection={mongoCollection}, ExpectedRecordsCount={expectedRecordsCount}, Timeout={timeout}");
 
         if (timeout == null) timeout = TimeSpan.FromMinutes(10);
         var sleepTime = TimeSpan.FromSeconds(2);
         int nrIterations = (int)(Math.Ceiling(timeout.Value.TotalSeconds / sleepTime.TotalSeconds));
         
-        var majorityCollection = GetMajorityCollection(MongoCollection.CollectionNamespace.CollectionName);
+        var majorityCollection = GetMajorityCollection(mongoCollection.CollectionNamespace.CollectionName);
 
         long docCount = await majorityCollection.CountDocumentsAsync(FilterDefinition<TEntity>.Empty);
         int iterations = 0;
@@ -308,16 +313,15 @@ public class RepositoryBase<TEntity, TKey> : IRepositoryBase<TEntity, TKey> wher
         {
             Logger.LogError(
                 "Failed waiting for MongoDB majority read. Collection={Collection}. Expected={Expected}, DocCount={DocCount}",
-                MongoCollection.CollectionNamespace.CollectionName, expectedRecordsCount, docCount);
+                mongoCollection.CollectionNamespace.CollectionName, expectedRecordsCount, docCount);
         }
         else
         {
             Logger.LogInformation(
                 "Majority read confirmed. Collection {Collection} now has expected records.",
-                MongoCollection.CollectionNamespace.CollectionName);
+                mongoCollection.CollectionNamespace.CollectionName);
         }
     }
-
 
     public async Task<bool> UpsertManyAsync(IEnumerable<TEntity> items, string comparisionField = "_id")
     {
@@ -455,6 +459,17 @@ public class RepositoryBase<TEntity, TKey> : IRepositoryBase<TEntity, TKey> wher
             success = success && await AddBatchAsync(batch, collection);
             count++;
             batch = entities.Skip(BatchSizeWrite * count).Take(BatchSizeWrite)?.ToArray();
+        }
+
+        if (success)
+        {
+            Logger.LogInformation(
+                $"Added {entities.Length} items to MongoDB collection ({collection.CollectionNamespace}) using {(useMajorityCollection ? "majority" : "normal")} write concern.");
+        }
+        else
+        {
+            Logger.LogError(
+                $"Failed to add all items to MongoDB collection ({collection.CollectionNamespace}) using {(useMajorityCollection ? "majority" : "normal")} write concern.");
         }
 
         return success;
@@ -1119,14 +1134,15 @@ public class RepositoryBase<TEntity, TKey> : IRepositoryBase<TEntity, TKey> wher
         }
     }
 
-    public virtual async Task<bool> PermanentizeCollectionAsync(CollectionSession<TEntity> session)
+    public virtual async Task<bool> PermanentizeCollectionAsync(CollectionSession<TEntity> session, int? expectedCount = null)
     {
-        return await PermanentizeCollectionAsync(session.TempCollection, session.Collection);
+        return await PermanentizeCollectionAsync(session.TempCollection, session.Collection, expectedCount);
     }   
 
     public virtual async Task<bool> PermanentizeCollectionAsync(
         IMongoCollection<TEntity> tempCollection,
-        IMongoCollection<TEntity> targetCollection)
+        IMongoCollection<TEntity> targetCollection,
+        int? expectedCount = null)
     {
         var dbName = Database.DatabaseNamespace.DatabaseName;
         var tempName = tempCollection.CollectionNamespace.CollectionName;
@@ -1141,6 +1157,11 @@ public class RepositoryBase<TEntity, TKey> : IRepositoryBase<TEntity, TKey> wher
         {
             Logger.LogWarning($"[Permanentize] Temp collection '{tempName}' does not exist.");
             return false;
+        }
+        
+        if (expectedCount.HasValue)
+        {
+            await WaitForDataInsert(expectedCount.Value, tempCollection, TimeSpan.FromMinutes(2));
         }
 
         // Check: temp collection has documents
@@ -1281,5 +1302,5 @@ public class RepositoryBase<TEntity, TKey> : IRepositoryBase<TEntity, TKey> wher
             Logger.LogError(ex, $"Error copying collection: {ex.Message}");
             return false;
         }
-    }    
+    }
 }

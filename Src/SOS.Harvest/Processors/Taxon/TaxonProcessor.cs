@@ -207,7 +207,7 @@ public class TaxonProcessor : ITaxonProcessor
                 return -1;
             }
             var success = await _processedTaxonRepository.AddManyAsync(taxa!.Values, session.TempCollection, useMajorityCollection: true);
-            await _processedTaxonRepository.PermanentizeCollectionAsync(session);
+            await _processedTaxonRepository.PermanentizeCollectionAsync(session, taxa!.Values.Count);
 
             await _processedTaxonRepository.WaitForDataInsert(taxa!.Values.Count, TimeSpan.FromMinutes(5));
             await Task.Delay(TimeSpan.FromSeconds(15)); // Extra wait security.

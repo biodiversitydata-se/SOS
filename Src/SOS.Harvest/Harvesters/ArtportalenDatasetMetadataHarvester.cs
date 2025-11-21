@@ -62,7 +62,7 @@ public class ArtportalenDatasetMetadataHarvester : IArtportalenDatasetMetadataHa
                 harvestInfo.End = DateTime.Now;
                 harvestInfo.Status = RunStatus.Success;
                 harvestInfo.Count = datasets?.Count() ?? 0;
-                await _artportalenDatasetMetadataRepository.PermanentizeCollectionAsync(session);
+                await _artportalenDatasetMetadataRepository.PermanentizeCollectionAsync(session, datasets?.Count() ?? 0);
                 _logger.LogInformation("Adding Artportalen datasets metadata succeeded");
                 return harvestInfo;
             }
