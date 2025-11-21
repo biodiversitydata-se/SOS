@@ -60,17 +60,19 @@ public interface IRepositoryBase<TEntity, TKey> : IDisposable where TEntity : IE
     ///     Add many items
     /// </summary>
     /// <param name="items"></param>
+    /// <param name="useMajorityCollection"></param>
     /// <remarks>Uses typeof(TEntity).Name as MongoDb collection name.</remarks>
     /// <returns></returns>
-    Task<bool> AddManyAsync(IEnumerable<TEntity> items);
+    Task<bool> AddManyAsync(IEnumerable<TEntity> items, bool useMajorityCollection = false);
 
     /// <summary>
     ///     Add many items
     /// </summary>
     /// <param name="items"></param>
     /// <param name="mongoCollection"></param>
+    /// <param name="useMajorityCollection"></param>
     /// <returns></returns>
-    Task<bool> AddManyAsync(IEnumerable<TEntity> items, IMongoCollection<TEntity> mongoCollection);
+    Task<bool> AddManyAsync(IEnumerable<TEntity> items, IMongoCollection<TEntity> mongoCollection, bool useMajorityCollection = false);
 
     Task<bool> UpsertManyAsync(IEnumerable<TEntity> items, string comparisionField = "_id");
     Task<bool> UpsertManyAsync(IEnumerable<TEntity> items, IMongoCollection<TEntity> mongoCollection, string comparisionField = "_id");
@@ -105,28 +107,30 @@ public interface IRepositoryBase<TEntity, TKey> : IDisposable where TEntity : IE
     ///     Checks if the collection exists.
     /// </summary>
     /// <returns></returns>
-    Task<bool> CheckIfCollectionExistsAsync();
+    Task<bool> CheckIfCollectionExistsAsync(bool useMajority = false);
 
     /// <summary>
     ///     Checks if the specified collection exists.
     /// </summary>
     /// <param name="collectionName"></param>
+    /// <param name="useMajority"></param>
     /// <returns></returns>
-    Task<bool> CheckIfCollectionExistsAsync(string collectionName);
+    Task<bool> CheckIfCollectionExistsAsync(string collectionName, bool useMajority = false);
 
     /// <summary>
     /// Count the number of documents in the collection.
     /// </summary>
     /// <returns></returns>
-    Task<long> CountAllDocumentsAsync(bool estimateCount = true);
+    Task<long> CountAllDocumentsAsync(bool useMajorityCollection = false, bool estimateCount = true);
 
     /// <summary>
     /// Count the number of documents in the collection.
     /// </summary>
     /// <param name="mongoCollection"></param>
-    /// <param name="estimateCount"></param>
+    /// <param name="useMajorityCollection"></param>
     /// <returns></returns>
-    Task<long> CountAllDocumentsAsync(IMongoCollection<TEntity> mongoCollection, bool estimateCount = true);
+    /// <param name="estimateCount"></param>
+    Task<long> CountAllDocumentsAsync(IMongoCollection<TEntity> mongoCollection, bool useMajorityCollection = false, bool estimateCount = true);
 
     /// <summary>
     ///     Remove
@@ -357,12 +361,13 @@ public interface IRepositoryBase<TEntity, TKey> : IDisposable where TEntity : IE
     Task<bool> UpdateAsync(TKey id, TEntity entity, IMongoCollection<TEntity> mongoCollection);
 
     Task WaitForDataInsert(long expectedRecordsCount, TimeSpan? timeout = null);
+    Task WaitForDataInsert(long expectedRecordsCount, IMongoCollection<TEntity> mongoCollection, TimeSpan? timeout = null);
 
     IMongoCollection<TEntity> GetMongoCollection(string collectionName);
 
-    Task<bool> PermanentizeCollectionAsync(CollectionSession<TEntity> session);
+    Task<bool> PermanentizeCollectionAsync(CollectionSession<TEntity> session, int? expectedCount = null);
     Task<bool> PermanentizeCollectionAsync(string tempCollectionName, string targetCollectionName);
-    Task<bool> PermanentizeCollectionAsync(IMongoCollection<TEntity> tempCollection, IMongoCollection<TEntity> targetCollection);
+    Task<bool> PermanentizeCollectionAsync(IMongoCollection<TEntity> tempCollection, IMongoCollection<TEntity> targetCollection, int? expectedCount = null);
     Task<bool> RenameCollectionAsync(string currentCollectionName, string newCollectionName);
     Task<bool> CopyCollectionAsync(string sourceCollectionName, string targetCollectionName, bool overwriteExistingTargetCollection = true);
     Task<bool> CheckDuplicatesAsync(string field, IMongoCollection<TEntity> mongoCollection);

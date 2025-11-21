@@ -64,7 +64,8 @@ public class ProjectHarvester : IProjectHarvester
             if (await _projectInfoRepository.DeleteCollectionAsync(session.TempCollection))
             {                
                 //Todo fix index creation await _projectInfoRepository.CreateIndexesAsync();
-                await _projectInfoRepository.AddManyAsync(projects, session.TempCollection);
+                await _projectInfoRepository.AddManyAsync(projects, session.TempCollection, useMajorityCollection: true);
+                
                 // Clear observation api cache
                 await _cacheManager.ClearAsync(Cache.Projects);
 
@@ -72,7 +73,7 @@ public class ProjectHarvester : IProjectHarvester
                 harvestInfo.End = DateTime.Now;
                 harvestInfo.Status = RunStatus.Success;
                 harvestInfo.Count = projects?.Count() ?? 0;
-                await _projectInfoRepository.PermanentizeCollectionAsync(session);
+                await _projectInfoRepository.PermanentizeCollectionAsync(session, projects?.Count() ?? 0);
                 _logger.LogInformation("Adding projects succeeded");
                 return harvestInfo;
             }

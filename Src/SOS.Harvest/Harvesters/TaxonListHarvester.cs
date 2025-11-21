@@ -99,8 +99,8 @@ public class TaxonListHarvester : ITaxonListHarvester
 
             var session = _taxonListRepository.CreateSession();
             await _taxonListRepository.DeleteCollectionAsync(session.TempCollection);            
-            await _taxonListRepository.AddManyAsync(taxonLists, session.TempCollection);
-            await _taxonListRepository.PermanentizeCollectionAsync(session);
+            await _taxonListRepository.AddManyAsync(taxonLists, session.TempCollection, useMajorityCollection: true);
+            await _taxonListRepository.PermanentizeCollectionAsync(session, taxonLists!.Count);
             // Clear observation api cache
             await _cacheManager.ClearAsync(Cache.TaxonLists);
 

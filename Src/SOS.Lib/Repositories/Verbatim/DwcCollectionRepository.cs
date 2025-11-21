@@ -167,14 +167,14 @@ public class DatasetVerbatimRepository : VerbatimRepositoryBase<DwcVerbatimDatas
     }
 
     /// <inheritdoc />
-    public override async Task<bool> AddManyAsync(IEnumerable<DwcVerbatimDataset> datasetRecords)
+    public override async Task<bool> AddManyAsync(IEnumerable<DwcVerbatimDataset> datasetRecords, bool useMajorityCollection = false)
     {
         if (!datasetRecords?.Any() ?? true)
         {
             return true;
         }
 
-        return await AddManyAsync(datasetRecords, MongoCollection);
+        return await AddManyAsync(datasetRecords, MongoCollection, useMajorityCollection);
     }
 
     /// <inheritdoc />
@@ -263,14 +263,14 @@ public class EventVerbatimRepository : VerbatimRepositoryBase<DwcEventOccurrence
     }
 
     /// <inheritdoc />
-    public override async Task<bool> AddManyAsync(IEnumerable<DwcEventOccurrenceVerbatim> eventRecords)
+    public override async Task<bool> AddManyAsync(IEnumerable<DwcEventOccurrenceVerbatim> eventRecords, bool useMajorityCollection = false)
     {
         if (!eventRecords?.Any() ?? true)
         {
             return true;
         }
 
-        return await AddManyAsync(eventRecords, MongoCollection);
+        return await AddManyAsync(eventRecords, MongoCollection, useMajorityCollection);
     }
 
     public async Task<bool> AddManyAsync(IEnumerable<DwcEventOccurrenceVerbatim> eventRecords, bool? tempMode = true)
@@ -378,14 +378,14 @@ public class OccurrenceVerbatimRepository : VerbatimRepositoryBase<DwcObservatio
     }
 
     /// <inheritdoc />
-    public override async Task<bool> AddManyAsync(IEnumerable<DwcObservationVerbatim> occurrenceRecords)
+    public override async Task<bool> AddManyAsync(IEnumerable<DwcObservationVerbatim> occurrenceRecords, bool useMajorityCollection = false)
     {
         if (!occurrenceRecords?.Any() ?? true)
         {
             return true;
         }
 
-        return await AddManyAsync(occurrenceRecords, MongoCollection);
+        return await AddManyAsync(occurrenceRecords, MongoCollection, useMajorityCollection);
     }
 
     /// <inheritdoc />
