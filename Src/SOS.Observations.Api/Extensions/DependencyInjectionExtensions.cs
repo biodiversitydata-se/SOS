@@ -175,6 +175,7 @@ public static class DependencyInjectionExtensions
             // Add Utilites
             services.AddSingleton<ISearchFilterUtility, SearchFilterUtility>();
             services.AddScoped<IGeneralizationResolver, GeneralizationResolver>();
+            services.AddSingleton<IGeoJsonFileWriter, GeoJsonFileWriter>();
 
             // Add Validators
             services.AddScoped<IInputValidator, InputValidator>();

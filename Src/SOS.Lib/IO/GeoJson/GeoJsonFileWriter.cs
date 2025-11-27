@@ -1,4 +1,5 @@
-﻿using Elastic.Clients.Elasticsearch;
+﻿using CSharpFunctionalExtensions;
+using Elastic.Clients.Elasticsearch;
 using Hangfire;
 using Microsoft.Extensions.Logging;
 using NetTopologySuite.Features;
@@ -87,7 +88,7 @@ public class GeoJsonFileWriter : FileWriterBase, IGeoJsonFileWriter
         };
     }
 
-    private Geometry GetFeatureGeometryFromJsonNode(JsonNode record)
+    private static Geometry GetFeatureGeometryFromJsonNode(JsonNode record)
     {
         double? decimalLatitude = null;
         double? decimalLongitude = null;
@@ -103,7 +104,7 @@ public class GeoJsonFileWriter : FileWriterBase, IGeoJsonFileWriter
         return geometry;
     }
 
-    private string GetOccurrenceIdFromJsonNode(JsonNode record)
+    private static string GetOccurrenceIdFromJsonNode(JsonNode record)
     {
         string occurrenceId = null;
 
@@ -116,7 +117,7 @@ public class GeoJsonFileWriter : FileWriterBase, IGeoJsonFileWriter
         return occurrenceId;
     }
 
-    private Geometry GetFeatureGeometry(FlatObservation flatObservation)
+    private static Geometry GetFeatureGeometry(FlatObservation flatObservation)
     {
         double? decimalLatitude = flatObservation.LocationDecimalLatitude;
         double? decimalLongitude = flatObservation.LocationDecimalLongitude;
@@ -125,7 +126,16 @@ public class GeoJsonFileWriter : FileWriterBase, IGeoJsonFileWriter
         return geometry;
     }
 
-    private async Task WriteFeature(
+    private static Geometry GetFeatureGeometry(Observation observation)
+    {
+        double? decimalLatitude = observation.Location.DecimalLatitude;
+        double? decimalLongitude = observation.Location.DecimalLongitude;
+        if (decimalLatitude == null || decimalLongitude == null) return null;
+        Geometry geometry = new Point(decimalLongitude.Value, decimalLatitude.Value);
+        return geometry;
+    }
+
+    private static async Task WriteFeature(
         IEnumerable<PropertyFieldDescription> propertyFields,
         JsonNode record,
         bool excludeNullValues,
@@ -203,7 +213,7 @@ public class GeoJsonFileWriter : FileWriterBase, IGeoJsonFileWriter
     {
         jsonWriter.WriteStartObject();        
         foreach (var kvp in record.AsObject())
-        {            
+        {
             JsonNode node = kvp.Value;
             if (excludeNullValues && node is null)
                 continue;
@@ -239,6 +249,29 @@ public class GeoJsonFileWriter : FileWriterBase, IGeoJsonFileWriter
         jsonWriter.WriteEndObject();
     }
 
+    private static void WriteFeature(        
+        Observation observation,
+        Dictionary<PropertyFieldDescription, string> propertyLabels,
+        bool excludeNullValues,
+        string id,
+        Utf8JsonWriter jsonWriter,
+        JsonSerializerOptions jsonSerializerOptions)
+    {
+        var geometry = GetFeatureGeometry(observation);
+        jsonWriter.WriteStartObject();
+        jsonWriter.WriteString("type", "Feature");
+        if (!string.IsNullOrEmpty(id))
+        {
+            jsonWriter.WriteString("id", id);
+        }
+        jsonWriter.WritePropertyName("geometry");
+
+        JsonSerializer.Serialize(jsonWriter, geometry, jsonSerializerOptions);
+        jsonWriter.WritePropertyName("properties");
+        JsonSerializer.Serialize(jsonWriter, observation, jsonSerializerOptions);       
+        jsonWriter.WriteEndObject();
+    }
+
     private static void WriteProperties(        
         FlatObservation flatObservation,
         Dictionary<PropertyFieldDescription, string> propertyLabels,
@@ -253,7 +286,7 @@ public class GeoJsonFileWriter : FileWriterBase, IGeoJsonFileWriter
             var value = flatObservation.GetValue(pair.Key);
             if (excludeNullValues && (value == null || IsNullOrEmptyValue(value)))
                 continue;            
-            jsonWriter.WritePropertyName(pair.Value);
+            jsonWriter.WritePropertyName(pair.Value);            
             JsonSerializer.Serialize(jsonWriter, value, jsonSerializerOptions);
         }
 
@@ -481,5 +514,58 @@ public class GeoJsonFileWriter : FileWriterBase, IGeoJsonFileWriter
         }
 
         return nrObservations;
+    }
+
+    public async Task WriteGeoJsonFeatureCollection(
+        IEnumerable<JsonObject> records,
+        ICollection<string> outputFields,
+        bool flatOut,
+        PropertyLabelType propertyLabelType,
+        bool excludeNullValues,
+        Stream stream)
+    {
+        using var ms = new MemoryStream();
+        List<PropertyFieldDescription> propertyFields =
+            ObservationPropertyFieldDescriptionHelper.GetExportFieldsFromOutputFields(outputFields, true);
+        Dictionary<PropertyFieldDescription, string> propertyLabels = propertyFields.ToDictionary(
+            x => x,
+            x => ObservationPropertyFieldDescriptionHelper.GetPropertyLabel(x, propertyLabelType));
+        JsonSerializerOptions jsonSerializerOptions = CreateJsonSerializerOptions();
+        var jsonWriterOptions = new JsonWriterOptions()
+        {
+            //To be able to display å,ä,ö e.t.c. properly we need to add the range Latin1Supplement to the list of characters which should not be displayed as UTF8 encoded values (\uxxxx).
+            Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.Latin1Supplement),
+            SkipValidation = true
+        };
+        await using var jsonWriter = new Utf8JsonWriter(ms, jsonWriterOptions);
+        jsonWriter.WriteStartObject();
+        jsonWriter.WriteString("type", "FeatureCollection");
+        jsonWriter.WriteString("crs", "EPSG:4326");
+        jsonWriter.WritePropertyName("features");
+        jsonWriter.WriteStartArray();
+
+        if (flatOut)
+        {
+            var observations = records.ToObservationsArray();
+            foreach (var observation in observations)
+            {
+                var flatObservation = new FlatObservation(observation);
+                await WriteFeature(flatObservation, propertyLabels, excludeNullValues, jsonWriter, jsonSerializerOptions);
+            }
+        }
+        else
+        {
+            foreach (var record in records)
+            {
+                await WriteFeature(propertyFields, record, excludeNullValues, jsonWriter, jsonSerializerOptions);
+            }
+        }
+
+        jsonWriter.WriteEndArray();
+        jsonWriter.WriteEndObject();
+        await jsonWriter.FlushAsync();
+        
+        ms.Position = 0;
+        await ms.CopyToAsync(stream);
     }
 }

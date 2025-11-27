@@ -2,8 +2,7 @@
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Export;
 using SOS.Lib.Models.Search.Filters;
-using System.IO;
-using System.Threading.Tasks;
+using System.Text.Json.Nodes;
 
 namespace SOS.Lib.IO.GeoJson.Interfaces;
 
@@ -40,4 +39,12 @@ public interface IGeoJsonFileWriter
         PropertyLabelType propertyLabelType,
         bool excludeNullValues,
         IJobCancellationToken cancellationToken);
+
+    Task WriteGeoJsonFeatureCollection(
+        IEnumerable<JsonObject> records,
+        ICollection<string> outputFields,        
+        bool flatOut,
+        PropertyLabelType propertyLabelType,
+        bool excludeNullValues,
+        Stream stream);
 }

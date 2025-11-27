@@ -4,6 +4,7 @@ using SOS.Lib.Enums;
 using SOS.Lib.Exceptions;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
+using SOS.Lib.IO.GeoJson.Interfaces;
 using SOS.Lib.Managers;
 using SOS.Lib.Models.Cache;
 using SOS.Lib.Models.Processed.Observation;
@@ -49,6 +50,7 @@ public class ObservationsController : ControllerBase
     private readonly IClassCache<ConcurrentDictionary<string, CacheEntry<GeoGridResultDto>>> _geogridAggregationCache;
     private readonly IClassCache<ConcurrentDictionary<string, CacheEntry<PagedResultDto<TaxonAggregationItemDto>>>> _taxonAggregationInternalCache;
     private readonly SemaphoreLimitManager _semaphoreLimitManager;
+    private readonly IGeoJsonFileWriter _geoJsonFileWriter;
     private readonly ILogger<ObservationsController> _logger;
 
     private JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions
@@ -75,6 +77,7 @@ public class ObservationsController : ControllerBase
     /// <param name="geogridAggregationCache"></param>
     /// <param name="taxonAggregationInternalCache"></param>
     /// <param name="semaphoreLimitManager"></param>
+    /// <param name="geoJsonFileWriter"></param>
     /// <param name="logger"></param>
     /// <exception cref="ArgumentNullException"></exception>
     public ObservationsController(
@@ -86,6 +89,7 @@ public class ObservationsController : ControllerBase
         IClassCache<ConcurrentDictionary<string, CacheEntry<GeoGridResultDto>>> geogridAggregationCache,
         IClassCache<ConcurrentDictionary<string, CacheEntry<PagedResultDto<TaxonAggregationItemDto>>>> taxonAggregationInternalCache,
         SemaphoreLimitManager semaphoreLimitManager,
+        IGeoJsonFileWriter geoJsonFileWriter,
         ILogger<ObservationsController> logger) 
     {
         _observationManager = observationManager ?? throw new ArgumentNullException(nameof(observationManager));
@@ -96,6 +100,7 @@ public class ObservationsController : ControllerBase
         _geogridAggregationCache = geogridAggregationCache ?? throw new ArgumentNullException(nameof(geogridAggregationCache));
         _taxonAggregationInternalCache = taxonAggregationInternalCache ?? throw new ArgumentNullException(nameof(taxonAggregationInternalCache));
         _semaphoreLimitManager = semaphoreLimitManager ?? throw new ArgumentNullException(nameof(semaphoreLimitManager));
+        _geoJsonFileWriter = geoJsonFileWriter ?? throw new ArgumentNullException(nameof(geoJsonFileWriter));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
@@ -523,6 +528,9 @@ public class ObservationsController : ControllerBase
     /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
     /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB).</param>
     /// <param name="sensitiveObservations">If true, only sensitive (protected) observations will be searched (this requires authentication and authorization). If false, public available observations will be searched.</param>
+    /// <param name="outputFormat">Determines the format of the response data. JSON returns a standard paged JSON response. GeoJSONFlat or GeoJSONNested returns a GeoJSON FeatureCollection.</param>
+    /// <param name="geoJsonPropertyLabelType">Determines how property names in the GeoJSON "properties" object are labeled.    
+    /// <param name="geoJsonExcludeNullValues">If true, properties with null values will be omitted from the GeoJSON output.</param>
     /// <returns>List of observations matching the provided search filter.</returns>
     /// <example>
     ///     Get all observations within 100m of provided point
@@ -552,7 +560,10 @@ public class ObservationsController : ControllerBase
         [FromQuery] SearchSortOrder sortOrder = SearchSortOrder.Asc,
         [FromQuery] bool validateSearchFilter = false,
         [FromQuery] string translationCultureCode = "sv-SE",
-        [FromQuery] bool sensitiveObservations = false)
+        [FromQuery] bool sensitiveObservations = false,
+        [FromQuery] OutputFormatDto outputFormat = OutputFormatDto.Json,
+        [FromQuery] PropertyLabelType geoJsonPropertyLabelType = PropertyLabelType.PropertyPath,
+        [FromQuery] bool geoJsonExcludeNullValues = false)
     {
         ApiUserType userType = this.GetApiUserType();
         var semaphoreResult = await _semaphoreLimitManager.GetSemaphoreAsync(SemaphoreType.Observation, userType, this.GetEndpointName(ControllerContext));
@@ -581,10 +592,28 @@ public class ObservationsController : ControllerBase
                 sortBy = sortFieldValidationResult.Value.First();
             }
             SearchFilter searchFilter = filter.ToSearchFilter(this.GetUserId(), protectionFilter, translationCultureCode, sortBy, sortOrder);
-            var result = await _observationManager.GetChunkAsync(roleId, authorizationApplicationIdentifier, searchFilter, skip, take);
-            var dto = result?.ToPagedResultDto(result.Records);
-            this.LogObservationCount(dto?.Records?.Count() ?? 0);
-            return new OkObjectResult(dto);
+            PagedResult<JsonObject> result = await _observationManager.GetChunkAsync(roleId, authorizationApplicationIdentifier, searchFilter, skip, take);
+            if (outputFormat == OutputFormatDto.Json)
+            {
+                var dto = result?.ToPagedResultDto(result.Records);
+                this.LogObservationCount(dto?.Records?.Count() ?? 0);
+                return new OkObjectResult(dto);
+            }
+            
+            // Return GeoJSON
+            Response.Headers.Append("X-Pagination-Skip", result.Skip.ToString());
+            Response.Headers.Append("X-Pagination-Take", result.Take.ToString());
+            Response.Headers.Append("X-Pagination-TotalCount", result.TotalCount.ToString());
+            Response.ContentType = "application/geo+json; charset=utf-8";
+            await _geoJsonFileWriter.WriteGeoJsonFeatureCollection(
+                result?.Records,
+                searchFilter.Output?.Fields,
+                flatOut: outputFormat == OutputFormatDto.GeoJsonFlat,
+                geoJsonPropertyLabelType,
+                geoJsonExcludeNullValues,
+                Response.Body);
+                        
+            return new EmptyResult();          
         }
         catch (AuthenticationRequiredException e)
         {

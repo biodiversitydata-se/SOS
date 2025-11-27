@@ -2,6 +2,7 @@
 using SOS.Lib.Models.Processed.Observation;
 using System.Collections.Generic;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace SOS.Lib.Extensions;
 
@@ -52,6 +53,37 @@ public static class ObservationExtensions
             }
 
             return JsonSerializer.Deserialize<Observation[]>(JsonSerializer.Serialize(dynamicObjects), jsonSerializerOptions);
+        }
+    }
+
+    extension(IEnumerable<JsonObject> jsonObjects)
+    {
+        /// <summary>
+        /// Cast dynamic to observation
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<Observation> ToObservations()
+        {
+            if (jsonObjects == null)
+            {
+                return null;
+            }
+
+            return JsonSerializer.Deserialize<IEnumerable<Observation>>(JsonSerializer.Serialize(jsonObjects), jsonSerializerOptions);
+        }
+
+        /// <summary>
+        /// Cast dynamic to observations array.
+        /// </summary>
+        /// <returns></returns>
+        public Observation[] ToObservationsArray()
+        {
+            if (jsonObjects == null)
+            {
+                return null;
+            }
+
+            return JsonSerializer.Deserialize<Observation[]>(JsonSerializer.Serialize(jsonObjects), jsonSerializerOptions);
         }
     }
 }
