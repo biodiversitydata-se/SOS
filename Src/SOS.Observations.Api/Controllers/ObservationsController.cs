@@ -1798,7 +1798,7 @@ public class ObservationsController : ControllerBase
     /// </param>
     /// <param name="geoJsonPropertyLabelType">Determines how properties are labeled in the GeoJSON (e.g. simple names or full property paths).</param>
     /// <param name="outputFormat">Determines the format of the response data. JSON returns a standard JSON response. GeoJSONFlat or GeoJSONNested returns a GeoJSON FeatureCollection.</param>    
-    /// <param name="excludeNullValues">If <c>true</c>, properties with null values are omitted from the output to reduce payload size.</param>    
+    /// <param name="excludeNullValues">If true, properties with null values are omitted from the output to reduce payload size.</param>    
     /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
     /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB).</param>
     /// <param name="sensitiveObservations">If true, only sensitive (protected) observations will be searched (this requires authentication and authorization). If false, public available observations will be searched.</param>

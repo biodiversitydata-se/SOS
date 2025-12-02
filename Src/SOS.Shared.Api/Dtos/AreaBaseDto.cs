@@ -11,6 +11,11 @@ public class AreaBaseDto
     public AreaTypeDto AreaType { get; set; }
 
     /// <summary>
+    /// Area type id
+    /// </summary>
+    public int AreaTypeId => (int)AreaType;
+
+    /// <summary>
     /// Area bounding box
     /// </summary>
     public LatLonBoundingBox BoundingBox { get; set; }

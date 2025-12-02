@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using NetTopologySuite.Features;
+﻿using NetTopologySuite.Features;
 using NetTopologySuite.IO;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Enums;
@@ -11,16 +10,11 @@ using SOS.Lib.Models.Shared;
 using SOS.Shared.Api.Dtos;
 using SOS.Shared.Api.Dtos.Enum;
 using SOS.Observations.Api.Managers.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.IO;
 using System.IO.Compression;
-using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 using ArgumentException = System.ArgumentException;
 using NetTopologySuite.Geometries;
 
@@ -61,7 +55,7 @@ public class AreaManager : IAreaManager
             var geometry = await _areaCache.GetGeometryAsync(area.AreaType, area.FeatureId);
             var externalArea = new AreaDto
             {
-                AreaType = (AreaTypeDto)area.AreaType,
+                AreaType = (AreaTypeDto)area.AreaType,                
                 FeatureId = area.FeatureId,
                 BoundingBox = area.BoundingBox,
                 Geometry = geometry.ToGeoJson(),
