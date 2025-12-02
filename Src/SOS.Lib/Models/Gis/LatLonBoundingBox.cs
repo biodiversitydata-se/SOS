@@ -40,6 +40,11 @@ public class LatLonBoundingBox
         return webMercatorPolygon;
     }
 
+    public Envelope ToEnvelope()
+    {
+        return new Envelope(TopLeft.Longitude, BottomRight.Longitude, BottomRight.Latitude, TopLeft.Latitude);
+    }
+
     public static LatLonBoundingBox Create(Envelope envelope)
     {
         return Create(envelope?.MinX, envelope?.MaxY, envelope?.MaxX, envelope?.MinY);

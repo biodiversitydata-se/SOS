@@ -1,14 +1,10 @@
-﻿using NetTopologySuite.Features;
-using SOS.Lib.Enums;
+﻿using SOS.Lib.Enums;
+using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Search.Enums;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
 using SOS.Shared.Api.Dtos;
-using SOS.Shared.Api.Dtos.Enum;
-using System;
-using System.Collections.Generic;
 using System.Text.Json.Nodes;
-using System.Threading.Tasks;
 using static SOS.Observations.Api.Managers.ObservationManager;
 
 namespace SOS.Observations.Api.Managers.Interfaces;
@@ -131,6 +127,12 @@ public interface IObservationManager
     Task<long> GetMatchCountAsync(
         int? roleId,
         string authorizationApplicationIdentifier, 
+        SearchFilterBase filter,
+        bool skipAuthorizationFilters = false);
+
+    Task<(long Count, LatLonBoundingBox? Extent)> GetCountAndExtentAsync(
+        int? roleId,
+        string authorizationApplicationIdentifier,
         SearchFilterBase filter,
         bool skipAuthorizationFilters = false);
 

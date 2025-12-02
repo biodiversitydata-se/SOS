@@ -7,6 +7,7 @@ using SOS.Lib.Helpers;
 using SOS.Lib.IO.GeoJson.Interfaces;
 using SOS.Lib.Managers;
 using SOS.Lib.Models.Cache;
+using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Enums;
 using SOS.Lib.Models.Search.Filters;
@@ -555,7 +556,7 @@ public class ObservationsController : ControllerBase
         [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
         [FromBody] SearchFilterDto? filter,
         [FromQuery] int skip = 0,
-        [FromQuery] int take = 100,
+        [FromQuery] int take = 100,        
         [FromQuery] string sortBy = "",
         [FromQuery] SearchSortOrder sortOrder = SearchSortOrder.Asc,
         [FromQuery] bool validateSearchFilter = false,
@@ -591,7 +592,19 @@ public class ObservationsController : ControllerBase
             {
                 sortBy = sortFieldValidationResult.Value.First();
             }
+            if (outputFormat == OutputFormatDto.GeoJson || outputFormat == OutputFormatDto.GeoJsonFlat)
+            {
+                var outPutFields = EnsureCoordinatesIsRetrievedFromDb(filter?.Output?.Fields);
+
+                if (outPutFields?.Any() ?? false)
+                {
+                    filter.Output ??= new OutputFilterExtendedDto();
+                    filter.Output.Fields = EnsureCoordinatesIsRetrievedFromDb(filter?.Output?.Fields);
+                }
+            }
             SearchFilter searchFilter = filter.ToSearchFilter(this.GetUserId(), protectionFilter, translationCultureCode, sortBy, sortOrder);
+            
+
             PagedResult<JsonObject> result = await _observationManager.GetChunkAsync(roleId, authorizationApplicationIdentifier, searchFilter, skip, take);
             if (outputFormat == OutputFormatDto.Json)
             {
@@ -611,7 +624,8 @@ public class ObservationsController : ControllerBase
                 flatOut: outputFormat == OutputFormatDto.GeoJsonFlat,
                 geoJsonPropertyLabelType,
                 geoJsonExcludeNullValues,
-                Response.Body);
+                Response.Body,
+                null);
                         
             return new EmptyResult();          
         }
@@ -1682,6 +1696,222 @@ public class ObservationsController : ControllerBase
             GeoPagedResultDto<JsonObject> dto = result.ToGeoPagedResultDto(result.Records, outputFormat);
             this.LogObservationCount(dto?.Records?.Count() ?? 0);
             return new OkObjectResult(dto);
+        }
+        catch (AuthenticationRequiredException e)
+        {
+            _logger.LogInformation(e, e.Message);
+            _logger.LogInformation($"Unauthorized. X-Authorization-Application-Identifier={authorizationApplicationIdentifier ?? "[null]"}");
+            _logger.LogInformation($"Unauthorized. X-Authorization-Role-Id={roleId?.ToString() ?? "[null]"}");
+            LogUserInformation();
+            return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
+        }
+        catch (TimeoutException)
+        {
+            return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "SearchInternal error");
+            return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+        }
+        finally
+        {
+            semaphoreResult.Semaphore.Release();
+        }
+    }
+
+    /// <summary>
+    /// Performs an adaptive search that returns either JSON or GeoJSON depending on <paramref name="outputFormat"/>.
+    /// </summary>
+    /// <remarks>
+    /// The response adapts based on the total number of matching observations relative to the <paramref name="observationsLimit"/>.
+    /// <br/><br/>
+    /// <b>Case 1 (Small result set):</b>
+    /// If the total count is less than or equal to <paramref name="observationsLimit"/>, 
+    /// individual observations are returned as Point features.
+    /// <br/><br/>
+    /// <b>Case 2 (Large result set):</b>
+    /// If the total count exceeds <paramref name="observationsLimit"/>, 
+    /// the result is aggregated into a grid (Geotile) and returned as Polygon features (grid cells) containing counts.<br/>    
+    /// <b>Response Headers:</b>
+    /// The response includes specific headers to indicate the result type:    
+    /// - <b>X-Result-Type</b>: Either "observations" or "geogrid".
+    /// - <b>X-Observations-TotalCount</b>: Total number of matching observations in the database.
+    /// - <b>X-Result-Count</b>: Number of features (points or grid cells) in the returned GeoJSON.
+    /// - <b>X-Zoom</b>: (Grid only) The calculated zoom level used for aggregation.    
+    /// <br/>
+    /// 
+    /// <b>Grid Cell Sizes:</b>
+    /// The following table shows the approximate grid cell size (width) in different
+    /// coordinate systems for the different zoom levels used when aggregation is active.
+    /// <br/><br/>
+    /// <table border="1" cellpadding="5">
+    ///   <thead>
+    ///     <tr>
+    ///       <th>Zoom level</th>
+    ///       <th>WGS84</th>
+    ///       <th>Web Mercator</th>
+    ///       <th>SWEREF99TM (S)</th>
+    ///       <th>SWEREF99TM (N)</th>
+    ///     </tr>
+    ///   </thead>
+    ///   <tbody>
+    ///     <tr><td>1</td><td>180°</td><td>20 000 km</td><td>8 000 km</td><td>12 000 km</td></tr>
+    ///     <tr><td>2</td><td>90°</td><td>10 000 km</td><td>4 000 km</td><td>6 000 km</td></tr>
+    ///     <tr><td>3</td><td>45°</td><td>5 000 km</td><td>2 000 km</td><td>3 000 km</td></tr>
+    ///     <tr><td>4</td><td>22.5°</td><td>2 500 km</td><td>1 000 km</td><td>1 500 km</td></tr>
+    ///     <tr><td>5</td><td>11.25°</td><td>1 250 km</td><td>500 km</td><td>750 km</td></tr>
+    ///     <tr><td>6</td><td>5.625°</td><td>600 km</td><td>250 km</td><td>360 km</td></tr>
+    ///     <tr><td>7</td><td>2.8125°</td><td>300 km</td><td>120 km</td><td>180 km</td></tr>
+    ///     <tr><td>8</td><td>1.406°</td><td>150 km</td><td>60 km</td><td>90 km</td></tr>
+    ///     <tr><td>9</td><td>0.703°</td><td>80 km</td><td>30 km</td><td>45 km</td></tr>
+    ///     <tr><td>10</td><td>0.352°</td><td>40 km</td><td>15 km</td><td>23 km</td></tr>
+    ///     <tr><td>11</td><td>0.176°</td><td>20 km</td><td>8 km</td><td>11 km</td></tr>
+    ///     <tr><td>12</td><td>0.088°</td><td>10 km</td><td>4 km</td><td>6 km</td></tr>
+    ///     <tr><td>13</td><td>0.044°</td><td>5 km</td><td>2 km</td><td>3 km</td></tr>
+    ///     <tr><td>14</td><td>0.022°</td><td>2 500 m</td><td>1 000 m</td><td>1 400 m</td></tr>
+    ///     <tr><td>15</td><td>0.011°</td><td>1 200 m</td><td>500 m</td><td>700 m</td></tr>
+    ///     <tr><td>16</td><td>0.005°</td><td>600 m</td><td>240 m</td><td>350 m</td></tr>
+    ///     <tr><td>17</td><td>0.003°</td><td>300 m</td><td>120 m</td><td>180 m</td></tr>
+    ///     <tr><td>18</td><td>0.001°</td><td>150 m</td><td>60 m</td><td>90 m</td></tr>
+    ///     <tr><td>19</td><td>0.0007°</td><td>80 m</td><td>30 m</td><td>45 m</td></tr>
+    ///     <tr><td>20</td><td>0.0003°</td><td>40 m</td><td>15 m</td><td>22 m</td></tr>
+    ///     <tr><td>21</td><td>0.0002°</td><td>19 m</td><td>7 m</td><td>11 m</td></tr>
+    ///   </tbody>
+    /// </table>
+    /// </remarks>
+    /// <param name="roleId">Limit user authorization to specified role.</param>
+    /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
+    /// <param name="filter">The search filter criteria containing spatial, temporal, and taxonomic constraints.</param>
+    /// <param name="observationsLimit">
+    /// The threshold that determines if individual observations or a grid aggregation is returned. 
+    /// If the total number of matching observations exceeds this value, a grid aggregation is performed. 
+    /// If below, individual observations are returned (up to this limit). Valid values are 0 to 10,000.
+    /// </param>
+    /// <param name="maxZoom">
+    /// The maximum allowed zoom level (precision) for the grid aggregation. 
+    /// This caps the precision even if <paramref name="maxGridCells"/> would allow for a higher zoom. Valid values are 1 to 21.
+    /// </param>
+    /// <param name="maxGridCells">
+    /// The target maximum number of grid cells to generate when aggregating. 
+    /// The system calculates the optimal zoom level to try to stay within this limit given the bounding box of the result. Valid values are 1 to 10,000.
+    /// </param>
+    /// <param name="geoJsonPropertyLabelType">Determines how properties are labeled in the GeoJSON (e.g. simple names or full property paths).</param>
+    /// <param name="outputFormat">Determines the format of the response data. JSON returns a standard JSON response. GeoJSONFlat or GeoJSONNested returns a GeoJSON FeatureCollection.</param>    
+    /// <param name="excludeNullValues">If <c>true</c>, properties with null values are omitted from the output to reduce payload size.</param>    
+    /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
+    /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB).</param>
+    /// <param name="sensitiveObservations">If true, only sensitive (protected) observations will be searched (this requires authentication and authorization). If false, public available observations will be searched.</param>
+    /// <returns>
+    /// Depending on <paramref name="outputFormat"/>:
+    /// <br/>
+    /// - <b>JSON</b>: A typed JSON response containing either observations or a grid aggregation.<br/>
+    /// - <b>GeoJSON</b>: A FeatureCollection containing <c>Point</c> features (observations) or <c>Polygon</c> features (grid cells).
+    /// </returns>
+    [HttpPost("Internal/AdaptiveSearch")]
+    [ProducesResponseType(typeof(AdaptiveSearchResultDto<Observation>), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+    [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+    [ProducesResponseType((int)HttpStatusCode.ServiceUnavailable)]
+    [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+    [InternalApi, AzureInternalApi]    
+    public async Task<IActionResult> AdaptiveSearchInternal(
+        [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
+        [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
+        [FromBody] SearchFilterInternalDto? filter,        
+        [FromQuery] int observationsLimit = 10000,
+        [FromQuery] int maxZoom = 21,
+        [FromQuery] int maxGridCells = 10000,
+        [FromQuery] PropertyLabelType geoJsonPropertyLabelType = PropertyLabelType.PropertyPath,
+        [FromQuery] OutputFormatDto outputFormat = OutputFormatDto.GeoJsonFlat,
+        [FromQuery] bool excludeNullValues = false,
+        [FromQuery] bool validateSearchFilter = false,
+        [FromQuery] string translationCultureCode = "sv-SE",
+        [FromQuery] bool sensitiveObservations = false)
+    {
+        string sortBy = "";
+        SearchSortOrder sortOrder = SearchSortOrder.Asc;
+        ApiUserType userType = this.GetApiUserType();
+        var semaphoreResult = await _semaphoreLimitManager.GetSemaphoreAsync(SemaphoreType.Observation, userType, this.GetEndpointName(ControllerContext));
+        LogHelper.AddSemaphoreHttpContextItems(semaphoreResult, HttpContext);
+        if (semaphoreResult.Semaphore == null) return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
+
+        try
+        {
+            LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
+            // sensitiveObservations is preserved for backward compability
+            filter.ProtectionFilter ??= (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
+            this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, filter.ProtectionFilter);
+            filter = await _searchFilterUtility.InitializeSearchFilterAsync(filter);
+            translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
+            var validationResult = Result.Combine(                
+                _inputValidator.ValidateInt(observationsLimit, 0, 10000, nameof(observationsLimit)),
+                _inputValidator.ValidateInt(maxZoom, 1, 21, nameof(maxZoom)),
+                _inputValidator.ValidateInt(maxGridCells, 1, 10000, nameof(maxGridCells)),
+                _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
+                _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries),
+                _inputValidator.ValidateTranslationCultureCode(translationCultureCode));
+
+            if (validationResult.IsFailure) return BadRequest(validationResult.Error);
+            var outPutFields = EnsureCoordinatesIsRetrievedFromDb(filter?.Output?.Fields);
+            if (outPutFields?.Any() ?? false)
+            {
+                filter.Output ??= new OutputFilterExtendedDto();
+                filter.Output.Fields = EnsureCoordinatesIsRetrievedFromDb(filter?.Output?.Fields);
+            }
+                       
+            var searchFilter = filter.ToSearchFilterInternal(this.GetUserId(), translationCultureCode, sortBy, sortOrder);
+            (long Count, LatLonBoundingBox? Extent) countAndExtentResult = await _observationManager.GetCountAndExtentAsync(roleId, authorizationApplicationIdentifier, searchFilter);
+            if (countAndExtentResult.Count > observationsLimit)
+            {                
+                // Calculate grids and return GeoJSON
+                var zoom = GeoTileHelper.CalculateGeotileZoom(countAndExtentResult.Extent, maxGridCells, maxZoom);
+                var res = await _observationManager.GetGeogridTileAggregationAsync(roleId, authorizationApplicationIdentifier, searchFilter, zoom);
+                if (outputFormat == OutputFormatDto.Json)
+                {
+                    var geogridResult = res.ToGeoGridResultDto(countAndExtentResult.Extent.ToEnvelope().CalculateNumberOfTiles(zoom));
+                    var adaptiveResultDto = AdaptiveSearchResultDto<JsonObject>.CreateGeoGridResult(countAndExtentResult.Extent.ToLatLonBoundingBoxDto(), (int)countAndExtentResult.Count, geogridResult);
+                    return new OkObjectResult(adaptiveResultDto);
+                }
+
+                string strJson = res.GetFeatureCollectionGeoJson(CoordinateSys.WGS84, countAndExtentResult.Extent);
+                Response.Headers.Append("X-Observations-TotalCount", countAndExtentResult.Count.ToString());
+                Response.Headers.Append("X-Result-Count", res.GridCellTileCount.ToString());
+                Response.Headers.Append("X-Zoom", zoom.ToString());
+                Response.Headers.Append("X-Result-Type", "geogrid");
+                Response.ContentType = "application/geo+json; charset=utf-8";
+                var bytes = Encoding.UTF8.GetBytes(strJson);
+                await Response.Body.WriteAsync(bytes);
+                await Response.Body.FlushAsync();
+                return new OkResult();
+            }
+
+            // Return observations as GeoJSON
+            var result = await _observationManager.GetChunkAsync(roleId, authorizationApplicationIdentifier, searchFilter, 0, observationsLimit);
+            if (result == null)
+            {
+                throw new Exception("Something went wrong when your query was executed. Make sure your filter is correct.");
+            }
+            if (outputFormat == OutputFormatDto.Json)
+            {
+                var adaptiveResultDto = AdaptiveSearchResultDto<JsonObject>.CreateObservationsResult(countAndExtentResult.Extent.ToLatLonBoundingBoxDto(), (int)countAndExtentResult.Count, result.Records);
+                return new OkObjectResult(adaptiveResultDto);
+            }
+
+            Response.Headers.Append("X-Observations-TotalCount", result.TotalCount.ToString());
+            Response.Headers.Append("X-Result-Type", "observations");
+            Response.Headers.Append("X-Result-Count", result?.Records?.Count().ToString() ?? "0");
+            Response.ContentType = "application/geo+json; charset=utf-8";
+            await _geoJsonFileWriter.WriteGeoJsonFeatureCollection(
+                result?.Records,
+                searchFilter.Output?.Fields,
+                flatOut: outputFormat == OutputFormatDto.GeoJsonFlat,
+                geoJsonPropertyLabelType,
+                excludeNullValues,
+                Response.Body,
+                countAndExtentResult.Extent);
+            
+            return new OkResult();
         }
         catch (AuthenticationRequiredException e)
         {

@@ -2,14 +2,12 @@
 using SOS.Lib.Enums;
 using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.DataQuality;
+using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Enums;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Models.Shared;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace SOS.Lib.Repositories.Processed.Interfaces;
 
@@ -134,6 +132,8 @@ public interface IProcessedObservationCoreRepository : IProcessRepositoryBase<Ob
     /// <param name="skipAuthorizationFilters"></param>
     /// <returns></returns>
     Task<long> GetMatchCountAsync(SearchFilterBase filter, bool skipAuthorizationFilters = false);
+
+    Task<(long Count, LatLonBoundingBox? Extent)> GetCountAndExtentAsync(SearchFilterBase filter, bool skipAuthorizationFilters = false);
 
     /// <summary>
     /// Get observations by their occurrence id's

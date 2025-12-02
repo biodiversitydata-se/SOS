@@ -13,9 +13,13 @@ public class GeoGridTileResult
     public int GridCellTileCount { get; set; }
     public IEnumerable<GridCellTile> GridCellTiles { get; set; }
 
-    public FeatureCollection GetFeatureCollection(CoordinateSys coordinateSystem = CoordinateSys.WGS84)
+    public FeatureCollection GetFeatureCollection(CoordinateSys coordinateSystem = CoordinateSys.WGS84, LatLonBoundingBox? bbox = null)
     {
         var featureCollection = new FeatureCollection();
+        if (bbox != null)
+        {
+            featureCollection.BoundingBox = bbox.ToEnvelope();
+        }
 
         foreach (var gridCellTile in GridCellTiles)
         {
@@ -26,9 +30,9 @@ public class GeoGridTileResult
         return featureCollection;
     }
 
-    public string GetFeatureCollectionGeoJson(CoordinateSys coordinateSystem = CoordinateSys.WGS84)
+    public string GetFeatureCollectionGeoJson(CoordinateSys coordinateSystem = CoordinateSys.WGS84, LatLonBoundingBox? bbox = null)
     {
-        var featureCollection = GetFeatureCollection(coordinateSystem);
+        var featureCollection = GetFeatureCollection(coordinateSystem, bbox);
         var geoJsonWriter = new GeoJsonWriter();
         var strJson = geoJsonWriter.Write(featureCollection);
         return strJson;

@@ -11,6 +11,7 @@ using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.IO.GeoJson.Interfaces;
 using SOS.Lib.Models;
 using SOS.Lib.Models.Export;
+using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
@@ -522,7 +523,8 @@ public class GeoJsonFileWriter : FileWriterBase, IGeoJsonFileWriter
         bool flatOut,
         PropertyLabelType propertyLabelType,
         bool excludeNullValues,
-        Stream stream)
+        Stream stream,
+        LatLonBoundingBox? bbox)
     {
         using var ms = new MemoryStream();
         List<PropertyFieldDescription> propertyFields =
@@ -541,6 +543,17 @@ public class GeoJsonFileWriter : FileWriterBase, IGeoJsonFileWriter
         jsonWriter.WriteStartObject();
         jsonWriter.WriteString("type", "FeatureCollection");
         jsonWriter.WriteString("crs", "EPSG:4326");
+        if (bbox != null)
+        {
+            jsonWriter.WritePropertyName("bbox");
+            jsonWriter.WriteStartArray();
+            jsonWriter.WriteNumberValue(bbox.TopLeft.Longitude);
+            jsonWriter.WriteNumberValue(bbox.BottomRight.Latitude);
+            jsonWriter.WriteNumberValue(bbox.BottomRight.Longitude);
+            jsonWriter.WriteNumberValue(bbox.TopLeft.Latitude);
+            jsonWriter.WriteEndArray();
+        }
+
         jsonWriter.WritePropertyName("features");
         jsonWriter.WriteStartArray();
 

@@ -1832,6 +1832,63 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
 
         return countResponse.Count;
     }
+    
+    public async Task<(long Count, LatLonBoundingBox? Extent)> GetCountAndExtentAsync(SearchFilterBase filter, bool skipAuthorizationFilters = false)
+    {
+        var indexNames = GetCurrentIndex(filter, skipAuthorizationFilters);
+        var (query, excludeQuery) = GetCoreQueries<dynamic>(filter, skipAuthorizationFilters);
+        
+        var geoFieldName = "location.pointLocation";
+        var aggName = "countAndExtentAgg";
+
+        var searchResponse = await Client.SearchAsync<dynamic>(s => s
+            .Index(indexNames)
+            .Size(0) 
+            .TrackTotalHits(new TrackHits(true))
+            .Query(q => q
+                .Bool(b => b
+                    .MustNot(excludeQuery.ToArray())
+                    .Filter(query?.ToArray())
+                )
+            )
+            .Aggregations(a => a  
+                .Add(aggName, a => a
+                    .GeoBounds(gb => gb
+                        .Field(geoFieldName)
+                        .WrapLongitude(true)
+                    )
+                )
+                //.Add(aggName + "_count", a => a
+                //    .ValueCount(vc => vc
+                //        .Field("occurrence.occurrenceId")
+                //    )
+                //)
+            )
+        );        
+
+        searchResponse.ThrowIfInvalid();
+        
+        var count = searchResponse.Total;        
+        GeoBoundsAggregate? extentAgg = searchResponse.Aggregations?.GetGeoBounds(aggName);        
+        LatLonBoundingBox? extentResult = null;        
+        if (extentAgg != null)
+        {
+            if (extentAgg.Bounds.TryGetTopLeftBottomRight(out var topLeftBottomRight))
+            {
+                if (topLeftBottomRight.TopLeft.TryGetLatitudeLongitude(out var topLeftLatLon) &&
+                    topLeftBottomRight.BottomRight.TryGetLatitudeLongitude(out var bottomRightLatLon))
+                {
+                    extentResult = new LatLonBoundingBox
+                    {
+                        TopLeft = new LatLonCoordinate(topLeftLatLon.Lat, topLeftLatLon.Lon),
+                        BottomRight = new LatLonCoordinate(bottomRightLatLon.Lat, bottomRightLatLon.Lon)
+                    };
+                }                
+            }          
+        }
+
+        return (count, extentResult);
+    }
 
     /// <inheritdoc />
     public async Task<GeoGridMetricResult> GetMetricGridAggregationAsync(

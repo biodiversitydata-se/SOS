@@ -1,6 +1,7 @@
 ﻿using Hangfire;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Export;
+using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Search.Filters;
 using System.Text.Json.Nodes;
 
@@ -46,5 +47,6 @@ public interface IGeoJsonFileWriter
         bool flatOut,
         PropertyLabelType propertyLabelType,
         bool excludeNullValues,
-        Stream stream);
+        Stream stream,
+        LatLonBoundingBox? bbox);
 }

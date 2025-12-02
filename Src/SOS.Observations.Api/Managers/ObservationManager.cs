@@ -1,6 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
+using NetTopologySuite.Geometries;
+using OfficeOpenXml;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Exceptions;
@@ -9,24 +9,19 @@ using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Cache;
+using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Log;
 using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.Search.Enums;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Repositories.Processed.Interfaces;
-using SOS.Shared.Api.Dtos;
-using SOS.Shared.Api.Extensions.Dto;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Repositories.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using OfficeOpenXml;
-using SOS.Lib.Models.Search.Enums;
-using NetTopologySuite.Geometries;
-using System.Text.Json.Nodes;
+using SOS.Shared.Api.Dtos;
+using SOS.Shared.Api.Extensions.Dto;
 using System.Collections.Concurrent;
+using System.Text.Json.Nodes;
 
 namespace SOS.Observations.Api.Managers;
 
@@ -328,6 +323,13 @@ public class ObservationManager : IObservationManager
     {
         await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
         return await _processedObservationRepository.GetMatchCountAsync(filter, skipAuthorizationFilters);
+    }
+
+    public async Task<(long Count, LatLonBoundingBox? Extent)> GetCountAndExtentAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilterBase filter, bool skipAuthorizationFilters = false)
+    {
+        await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
+        (long Count, LatLonBoundingBox ? Extent) result = await _processedObservationRepository.GetCountAndExtentAsync(filter, skipAuthorizationFilters);        
+        return result;
     }
 
     public async Task<IEnumerable<TaxonObservationCountDto>> GetCachedCountAsync(SearchFilterBase filter, TaxonObservationCountSearch taxonObservationCountSearch)
