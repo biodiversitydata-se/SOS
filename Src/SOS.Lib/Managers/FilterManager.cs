@@ -1,14 +1,14 @@
-﻿using SOS.Lib.Cache.Interfaces;
+﻿using MongoDB.Driver;
+using NetTopologySuite.Features;
+using NetTopologySuite.Geometries;
+using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Search.Filters;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.UserService;
 using SOS.Lib.Services.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace SOS.Lib.Managers;
 
@@ -390,6 +390,56 @@ public class FilterManager : IFilterManager
                 UseDisturbanceRadius = useDisturbanceRadius,
                 UsePointAccuracy = usePointAccuracy
             }).Geometries.Add(geometry);
+        }
+    }
+
+    public async Task<List<Feature>?> GetAreaFiltersAsGeoJsonFeaturesAsync(IEnumerable<AreaFilter>? areaFilters)
+    {
+        if (areaFilters == null || !areaFilters.Any()) return null;
+        List<Feature> features = new List<Feature>();
+        var areaTuples = await GetAreaFiltersAsAreaTuplesAsync(areaFilters);
+
+        foreach (var areaTuple in areaTuples)
+        {
+            var area = areaTuple.area;
+            var attributesTable = new AttributesTable
+            {
+                { "AreaType", area.AreaType.ToString() },
+                { "FeatureId", area.FeatureId },
+                { "Name", area.Name },
+                { "BoundingBox", area.BoundingBox }
+            };
+
+            var feature = areaTuple.geometry.ToFeature(attributesTable);
+        }
+
+        return features;
+    }
+
+    public async Task<List<(Area area, Geometry geometry)>?> GetAreaFiltersAsAreaTuplesAsync(IEnumerable<AreaFilter>? areaFilters)
+    {
+        if (areaFilters == null || !areaFilters.Any()) return null;
+        List<(Area area, Geometry geometry)> areas = new List<(Area area, Geometry geometry)>();
+        List<(AreaType areaType, string featureId)> areaKeys = GetAreaKeysFromFilter(areaFilters, excludeEconomicZone: true).ToList();
+        IDictionary<(AreaType areaType, string featureId), Geometry> geometriesDict = await _areaCache.GetGeometriesAsync(areaKeys);        
+        IDictionary<(AreaType areaType, string featureId), Area> areasDict = (await _areaCache.GetAreasAsync(geometriesDict.Keys))
+            .ToDictionary(m => (m.AreaType, m.FeatureId), m => m);
+
+        foreach (var pair in geometriesDict)
+        {
+            areas.Add((areasDict[pair.Key], pair.Value));
+        }
+
+        return areas;
+    }
+
+    private IEnumerable<(AreaType areaType, string featureId)> GetAreaKeysFromFilter(IEnumerable<AreaFilter>? areaFilters, bool excludeEconomicZone = true)
+    {
+        if (areaFilters == null || !areaFilters.Any()) yield break;
+        foreach (var areaFilter in areaFilters)
+        {
+            if (excludeEconomicZone && areaFilter.AreaType == AreaType.EconomicZoneOfSweden) continue;
+            yield return (areaFilter.AreaType, areaFilter.FeatureId);
         }
     }
 

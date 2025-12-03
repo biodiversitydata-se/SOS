@@ -1825,6 +1825,7 @@ public class ObservationsController : ControllerBase
         [FromQuery] PropertyLabelType geoJsonPropertyLabelType = PropertyLabelType.PropertyPath,
         [FromQuery] OutputFormatDto outputFormat = OutputFormatDto.GeoJsonFlat,
         [FromQuery] bool excludeNullValues = false,
+        //[FromQuery] bool includeFilterAreasInResult = true,
         [FromQuery] bool validateSearchFilter = false,
         [FromQuery] string translationCultureCode = "sv-SE",
         [FromQuery] bool sensitiveObservations = false)
@@ -1875,15 +1876,16 @@ public class ObservationsController : ControllerBase
                 }
 
                 string strJson = res.GetFeatureCollectionGeoJson(CoordinateSys.WGS84, countAndExtentResult.Extent);
+                Response.StatusCode = (int)HttpStatusCode.OK;
                 Response.Headers.Append("X-Observations-TotalCount", countAndExtentResult.Count.ToString());
                 Response.Headers.Append("X-Result-Count", res.GridCellTileCount.ToString());
                 Response.Headers.Append("X-Zoom", zoom.ToString());
                 Response.Headers.Append("X-Result-Type", "geogrid");
                 Response.ContentType = "application/geo+json; charset=utf-8";
-                var bytes = Encoding.UTF8.GetBytes(strJson);
+                var bytes = Encoding.UTF8.GetBytes(strJson);                
                 await Response.Body.WriteAsync(bytes);
                 await Response.Body.FlushAsync();
-                return new OkResult();
+                return new EmptyResult();
             }
 
             // Return observations as GeoJSON
@@ -1898,10 +1900,12 @@ public class ObservationsController : ControllerBase
                 return new OkObjectResult(adaptiveResultDto);
             }
 
+            Response.StatusCode = (int)HttpStatusCode.OK;
             Response.Headers.Append("X-Observations-TotalCount", result.TotalCount.ToString());
             Response.Headers.Append("X-Result-Type", "observations");
             Response.Headers.Append("X-Result-Count", result?.Records?.Count().ToString() ?? "0");
             Response.ContentType = "application/geo+json; charset=utf-8";
+            
             await _geoJsonFileWriter.WriteGeoJsonFeatureCollection(
                 result?.Records,
                 searchFilter.Output?.Fields,
@@ -1911,7 +1915,7 @@ public class ObservationsController : ControllerBase
                 Response.Body,
                 countAndExtentResult.Extent);
             
-            return new OkResult();
+            return new EmptyResult();
         }
         catch (AuthenticationRequiredException e)
         {
