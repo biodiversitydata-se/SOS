@@ -612,8 +612,9 @@ public class ObservationsController : ControllerBase
                 this.LogObservationCount(dto?.Records?.Count() ?? 0);
                 return new OkObjectResult(dto);
             }
-            
+
             // Return GeoJSON
+            Response.StatusCode = (int)HttpStatusCode.OK;
             Response.Headers.Append("X-Pagination-Skip", result.Skip.ToString());
             Response.Headers.Append("X-Pagination-Take", result.Take.ToString());
             Response.Headers.Append("X-Pagination-TotalCount", result.TotalCount.ToString());
