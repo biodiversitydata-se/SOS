@@ -5,10 +5,6 @@ using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.UserService;
 using SOS.Lib.Services.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace SOS.Lib.Managers;
 
@@ -454,11 +450,15 @@ public class FilterManager : IFilterManager
 
                 if (fields?.Any() ?? false)
                 {
+                    searchFilter.Output ??= new OutputFilter();
                     if (!fields.Any(f => f.Equals("occurrence", StringComparison.CurrentCultureIgnoreCase)) &&
                         !fields.Any(f => f.Equals("occurrence.occurrenceId", StringComparison.CurrentCultureIgnoreCase)))
                     {
-                        searchFilter.Output ??= new OutputFilter();
                         searchFilter.Output.Fields.Add("occurrence.occurrenceId");
+                    }
+                    if (!fields.Any(f => f.Equals("sensitive", StringComparison.CurrentCultureIgnoreCase)))
+                    {
+                        searchFilter.Output.Fields.Add("sensitive");
                     }
                 }
             }

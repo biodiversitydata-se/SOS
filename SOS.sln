@@ -140,6 +140,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "observations", "observations", "{5631EB28-47D6-4F84-981B-BA799A5453C7}"
 	ProjectSection(SolutionItems) = preProject
 		devops\k8s\dev\observations\api.yaml = devops\k8s\dev\observations\api.yaml
+		devops\k8s\sos-observations-dev\api.yaml = devops\k8s\sos-observations-dev\api.yaml
+		devops\k8s\sos-observations-dev\kustomization.yaml = devops\k8s\sos-observations-dev\kustomization.yaml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "administration.api", "administration.api", "{A4C3FF83-18CB-478E-9477-0603AE91AD04}"
