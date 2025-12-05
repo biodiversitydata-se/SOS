@@ -29,7 +29,7 @@ spec:
   template:
     metadata:
       annotations:
-        logging: "true"
+        slu.se/id: "1003_1"
       labels:
         app: sosadmingui-api
     spec:

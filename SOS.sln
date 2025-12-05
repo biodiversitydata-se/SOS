@@ -124,7 +124,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "prod", "prod", "{BCD9308C-6
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "administration.api", "administration.api", "{699E5164-7934-4EF6-9FF1-56AF263EADB2}"
 	ProjectSection(SolutionItems) = preProject
-		devops\k8s\dev\administration.api\api.yaml = devops\k8s\dev\administration.api\api.yaml
+		devops\k8s\sosadminapi-dev\api.yaml = devops\k8s\sosadminapi-dev\api.yaml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "administration.gui", "administration.gui", "{CEEE9D79-44E6-4B97-8F93-C33F9677EE5E}"
@@ -241,6 +241,23 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SOS.DataStewardship.Api", "Src\SOS.DataStewardship.Api\SOS.DataStewardship.Api.csproj", "{96673EFC-5CC9-1F6A-2072-14240009C476}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SOS.DataStewardship.Api.IntegrationTests", "Tests\Integration\SOS.DataStewardship.Api.IntegrationTests\SOS.DataStewardship.Api.IntegrationTests.csproj", "{8D968979-9B32-A2A7-7C3D-C7B47D136E93}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dataStewardship", "dataStewardship", "{E021C5A8-6E38-4F33-91DE-D29235030E56}"
+	ProjectSection(SolutionItems) = preProject
+		devops\k8s\datastewardship-dev\api.yaml = devops\k8s\datastewardship-dev\api.yaml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dataStewardship", "dataStewardship", "{8B8CC3CA-BD63-49EC-8E4F-672A3CAB275D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dataStewardship", "dataStewardship", "{48814679-A471-45E8-A1F5-36FD45525111}"
+	ProjectSection(SolutionItems) = preProject
+		devops\k8s\prod\datastewardship\api.yaml = devops\k8s\prod\datastewardship\api.yaml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dataStewardship", "dataStewardship", "{BF4F729F-D296-4C4C-9F7B-1B9FF5463C52}"
+	ProjectSection(SolutionItems) = preProject
+		devops\k8s\datastewardship-st\api.yaml = devops\k8s\datastewardship-st\api.yaml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -414,6 +431,10 @@ Global
 		{880B12BB-8C61-D55B-83A9-B0448895F7AD} = {9CE4D24E-E3E4-4053-AC0D-E27135B6634A}
 		{96673EFC-5CC9-1F6A-2072-14240009C476} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{8D968979-9B32-A2A7-7C3D-C7B47D136E93} = {A3C5E4A0-5599-48B7-BE17-07E19D585ACE}
+		{E021C5A8-6E38-4F33-91DE-D29235030E56} = {381F6625-C59F-4255-92ED-BE4FE3DD2431}
+		{8B8CC3CA-BD63-49EC-8E4F-672A3CAB275D} = {2A9DE856-4794-410A-A187-F220A45B2EAD}
+		{48814679-A471-45E8-A1F5-36FD45525111} = {BCD9308C-6F24-4B9D-97A6-94C2195982C6}
+		{BF4F729F-D296-4C4C-9F7B-1B9FF5463C52} = {2DB6DB3D-E156-4975-AF5D-742C8AF7B43F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7CBCE6ED-CC4F-4B55-913F-1231086E92FE}
