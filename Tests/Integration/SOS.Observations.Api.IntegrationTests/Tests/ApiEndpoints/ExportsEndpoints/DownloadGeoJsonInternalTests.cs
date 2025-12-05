@@ -39,6 +39,27 @@ public class DownloadGeoJsonInternalTests : TestBase
     }
 
     [Fact]
+    public async Task DownloadGeoJsonFileEndpoint_ReturnsHierarchicalJsonProperties_WhenFlatIsFalse()
+    {
+        // Arrange
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+            .All().HaveValuesFromPredefinedObservations()
+            .Build();
+        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
+        var apiClient = TestFixture.CreateApiClient();
+        var searchFilter = new SearchFilterDto { Output = new OutputFilterDto { FieldSet = OutputFieldSet.Minimum } };
+
+        // Act
+        var response = await apiClient.PostAsync($"/exports/internal/download/geojson?gzip=false&flat=false&excludeNullValues=true", JsonContent.Create(searchFilter));
+        byte[] contentBytes = await response.Content.ReadAsByteArrayAsync();
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var fileEntries = GeoJsonHelper.ReadGeoJsonFile(contentBytes);
+        fileEntries.Count.Should().Be(100, because: "100 observations were added and no filter was used.");
+    }
+
+    [Fact]
     public async Task DownloadGeoJsonFileEndpoint_ReturnsExpectedObservations_WhenSearchingForSensitiveObservations_GivenTheUserHasAccessRights()
     {
         // Arrange

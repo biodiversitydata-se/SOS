@@ -498,8 +498,7 @@ public static class SearchExtensionsObservation
         /// Try to add not recovered filter
         /// </summary>
         /// <param name="filter"></param>
-        private void TryAddNotRecoveredFilter(
-    SearchFilterBase filter)
+        private void TryAddNotRecoveredFilter(SearchFilterBase filter)
         {
             if (filter != null)
             {
@@ -520,8 +519,7 @@ public static class SearchExtensionsObservation
         /// Try to add taxon search criteria
         /// </summary>
         /// <param name="filter"></param>
-        private void TryAddTaxonCriteria(
-    TaxonFilter filter)
+        private void TryAddTaxonCriteria(TaxonFilter filter)
         {
             if (filter == null)
             {
@@ -661,7 +659,7 @@ public static class SearchExtensionsObservation
         /// <param name="extendedAuthorizations"></param>
         /// <param name="onlyAboveMyClearance"></param>
         public void AddSignalSearchCriteria(
-    IEnumerable<ExtendedAuthorizationAreaFilter> extendedAuthorizations, bool onlyAboveMyClearance)
+            IEnumerable<ExtendedAuthorizationAreaFilter> extendedAuthorizations, bool onlyAboveMyClearance)
         {
             var protectedQuerys = new List<Action<QueryDescriptor<TQueryDescriptor>>>();
             if (extendedAuthorizations?.Any() ?? false)
@@ -735,16 +733,14 @@ public static class SearchExtensionsObservation
         /// Create multimedia query
         /// </summary>
         /// <returns></returns>
-        public ICollection<Action<QueryDescriptor<TQueryDescriptor>>> ToMultimediaQuery<TQueryDescriptor>(
-    ) where TQueryDescriptor : class
+        public ICollection<Action<QueryDescriptor<TQueryDescriptor>>> ToMultimediaQuery<TQueryDescriptor>() where TQueryDescriptor : class
         {
             var queries = filter.ToQuery<TQueryDescriptor>();
             queries.TryAddExistsCriteria("occurrence.media", true);
             return queries;
         }
 
-        public ICollection<Action<QueryDescriptor<TQueryDescriptor>>> ToMeasurementOrFactsQuery<TQueryDescriptor>(
-    ) where TQueryDescriptor : class
+        public ICollection<Action<QueryDescriptor<TQueryDescriptor>>> ToMeasurementOrFactsQuery<TQueryDescriptor>() where TQueryDescriptor : class
         {
             var queries = filter.ToQuery<TQueryDescriptor>();
             queries.TryAddExistsCriteria("measurementOrFacts", true);
@@ -758,7 +754,7 @@ public static class SearchExtensionsObservation
         /// <param name="skipAuthorizationFilters"></param>
         /// <returns></returns>
         public ICollection<Action<QueryDescriptor<TQueryDescriptor>>> ToQuery<TQueryDescriptor>(
-    bool skipSightingTypeFilters = false, bool skipAuthorizationFilters = false) where TQueryDescriptor : class
+            bool skipSightingTypeFilters = false, bool skipAuthorizationFilters = false) where TQueryDescriptor : class
         {
             var queries = new List<Action<QueryDescriptor<TQueryDescriptor>>>();
 
@@ -855,18 +851,19 @@ public static class SearchExtensionsObservation
             bool isInternal)
         {
             var excludes = new List<string>() {
-            "defects",
-            "event.endDayOfYear",
-            "event.startDayOfYear",
-            "event.endHistogramWeek",
-            "event.startHistogramWeek",
-            "location.attributes.isPrivate",
-            "location.point",
-            "location.pointLocation",
-            "location.pointWithBuffer",
-            "location.pointWithDisturbanceBuffer",
-            "location.isInEconomicZoneOfSweden"
-        };
+                "defects",
+                "event.endDayOfYear",
+                "event.startDayOfYear",
+                "event.endHistogramWeek",
+                "event.startHistogramWeek",
+                "location.attributes.isPrivate",
+                "location.point",
+                "location.pointLocation",
+                "location.pointWithBuffer",
+                "location.pointWithDisturbanceBuffer",
+                "location.isInEconomicZoneOfSweden",
+                "taxon.attributes.countyOccurrences"
+            };
 
             if (isInternal)
             {

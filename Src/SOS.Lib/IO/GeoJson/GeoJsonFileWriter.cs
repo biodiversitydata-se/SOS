@@ -15,17 +15,12 @@ using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Services.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.IO;
 using System.IO.Compression;
-using System.Linq;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Unicode;
-using System.Threading.Tasks;
 
 namespace SOS.Lib.IO.GeoJson;
 
@@ -74,7 +69,7 @@ public class GeoJsonFileWriter : FileWriterBase, IGeoJsonFileWriter
         foreach (var propertyField in propertyFields)
         {
             var value = flatObservation.GetValue(propertyField);
-            if (excludeNullValues && (value == null || string.IsNullOrEmpty(value.ToString()))) continue;
+            if (excludeNullValues && (value is null || IsNullOrEmptyValue(value))) continue;
             var label = ObservationPropertyFieldDescriptionHelper.GetPropertyLabel(propertyField, propertyLabelType);
             attributesTable.Add(label, value);
         }
@@ -82,7 +77,17 @@ public class GeoJsonFileWriter : FileWriterBase, IGeoJsonFileWriter
         return attributesTable;
     }
 
-    private Geometry GetFeatureGeometryFromDictionary(JsonNode record)
+    private static bool IsNullOrEmptyValue(object value)
+    {
+        return value switch
+        {
+            null => true,
+            string s => string.IsNullOrEmpty(s),
+            _ => false
+        };
+    }
+
+    private Geometry GetFeatureGeometryFromJsonNode(JsonNode record)
     {
         double? decimalLatitude = null;
         double? decimalLongitude = null;
@@ -98,7 +103,7 @@ public class GeoJsonFileWriter : FileWriterBase, IGeoJsonFileWriter
         return geometry;
     }
 
-    private string GetOccurrenceIdFromDictionary(JsonNode record)
+    private string GetOccurrenceIdFromJsonNode(JsonNode record)
     {
         string occurrenceId = null;
 
@@ -127,53 +132,132 @@ public class GeoJsonFileWriter : FileWriterBase, IGeoJsonFileWriter
         Utf8JsonWriter jsonWriter,
         JsonSerializerOptions jsonSerializerOptions)
     {
-        Geometry geometry = GetFeatureGeometryFromDictionary(record);
+        Geometry geometry = GetFeatureGeometryFromJsonNode(record);
         if (geometry == null) return;
-
-        var data = JsonSerializer.Deserialize<Dictionary<string, object>>(record);
         
-        var attributesTable = new AttributesTable(data);
-        string id = GetOccurrenceIdFromDictionary(record);
-        await WriteFeature(geometry, attributesTable, id, jsonWriter, jsonSerializerOptions);
-    }
+        string id = GetOccurrenceIdFromJsonNode(record);
+        WriteFeature(geometry, record, excludeNullValues, id, jsonWriter, jsonSerializerOptions);
+    }    
 
-    private async Task WriteFeature(
-        IEnumerable<PropertyFieldDescription> propertyFields,
+    private async Task WriteFeature(        
         FlatObservation flatObservation,
-        PropertyLabelType propertyLabelType,
+        Dictionary<PropertyFieldDescription, string> propertyLabels,
         bool excludeNullValues,
         Utf8JsonWriter utf8JsonWriter,
         JsonSerializerOptions jsonSerializerOptions)
     {
         Geometry geometry = GetFeatureGeometry(flatObservation);
         if (geometry == null) return;
-        AttributesTable attributesTable = GetFeatureAttributesTable(flatObservation, propertyFields, propertyLabelType, excludeNullValues);
         string id = flatObservation.OccurrenceId;
-        await WriteFeature(geometry, attributesTable, id, utf8JsonWriter, jsonSerializerOptions);
+        WriteFeature(geometry, flatObservation, propertyLabels, excludeNullValues, id, utf8JsonWriter, jsonSerializerOptions);
     }
 
-    private async Task WriteFeature(
+    private static void WriteFeature(
         Geometry geometry,
         AttributesTable attributesTable,
         string id,
         Utf8JsonWriter jsonWriter,
         JsonSerializerOptions jsonSerializerOptions)
-    {
-        await Task.Run(() =>
+    {        
+        jsonWriter.WriteStartObject();
+        jsonWriter.WriteString("type", "Feature");
+        if (!string.IsNullOrEmpty(id))
         {
-            jsonWriter.WriteStartObject();
-            jsonWriter.WriteString("type", "Feature");
-            if (!string.IsNullOrEmpty(id))
-            {
-                jsonWriter.WriteString("id", id);
-            }
-            jsonWriter.WritePropertyName("geometry");
+            jsonWriter.WriteString("id", id);
+        }
+        jsonWriter.WritePropertyName("geometry");
+        
+        JsonSerializer.Serialize(jsonWriter, geometry, jsonSerializerOptions);
+        jsonWriter.WritePropertyName("properties");
+        JsonSerializer.Serialize(jsonWriter, attributesTable, jsonSerializerOptions);
+        jsonWriter.WriteEndObject();
+    }
 
-            JsonSerializer.Serialize(jsonWriter, geometry, jsonSerializerOptions);
-            jsonWriter.WritePropertyName("properties");
-            JsonSerializer.Serialize(jsonWriter, attributesTable, jsonSerializerOptions);
-            jsonWriter.WriteEndObject();
-        });
+    private static void WriteFeature(
+        Geometry geometry,
+        JsonNode record,
+        bool excludeNullValues,
+        string id,
+        Utf8JsonWriter jsonWriter,
+        JsonSerializerOptions jsonSerializerOptions)
+    {
+        jsonWriter.WriteStartObject();
+        jsonWriter.WriteString("type", "Feature");
+        if (!string.IsNullOrEmpty(id))
+        {
+            jsonWriter.WriteString("id", id);
+        }
+        jsonWriter.WritePropertyName("geometry");
+
+        JsonSerializer.Serialize(jsonWriter, geometry, jsonSerializerOptions);
+        jsonWriter.WritePropertyName("properties");
+        WritePropertiesFromJsonNode(record, excludeNullValues, jsonWriter, jsonSerializerOptions);
+        jsonWriter.WriteEndObject();
+    }
+
+    private static void WritePropertiesFromJsonNode(
+        JsonNode record,
+        bool excludeNullValues,
+        Utf8JsonWriter jsonWriter,
+        JsonSerializerOptions jsonSerializerOptions)
+    {
+        jsonWriter.WriteStartObject();        
+        foreach (var kvp in record.AsObject())
+        {            
+            JsonNode node = kvp.Value;
+            if (excludeNullValues && node is null)
+                continue;
+
+            jsonWriter.WritePropertyName(kvp.Key);
+            JsonSerializer.Serialize(jsonWriter, node, jsonSerializerOptions);
+        }
+
+        jsonWriter.WriteEndObject();
+    }
+
+
+    private static void WriteFeature(
+        Geometry geometry,        
+        FlatObservation flatObservation,
+        Dictionary<PropertyFieldDescription, string> propertyLabels,
+        bool excludeNullValues,
+        string id,
+        Utf8JsonWriter jsonWriter,
+        JsonSerializerOptions jsonSerializerOptions)
+    {
+        jsonWriter.WriteStartObject();
+        jsonWriter.WriteString("type", "Feature");
+        if (!string.IsNullOrEmpty(id))
+        {
+            jsonWriter.WriteString("id", id);
+        }
+        jsonWriter.WritePropertyName("geometry");
+
+        JsonSerializer.Serialize(jsonWriter, geometry, jsonSerializerOptions);
+        jsonWriter.WritePropertyName("properties");        
+        WriteProperties(flatObservation, propertyLabels, excludeNullValues, jsonWriter, jsonSerializerOptions);
+        jsonWriter.WriteEndObject();
+    }
+
+    private static void WriteProperties(        
+        FlatObservation flatObservation,
+        Dictionary<PropertyFieldDescription, string> propertyLabels,
+        bool excludeNullValues,
+        Utf8JsonWriter jsonWriter,
+        JsonSerializerOptions jsonSerializerOptions)
+    {        
+        jsonWriter.WriteStartObject();
+
+        foreach (var pair in propertyLabels)
+        {
+            var value = flatObservation.GetValue(pair.Key);
+            if (excludeNullValues && (value == null || IsNullOrEmptyValue(value)))
+                continue;            
+            jsonWriter.WritePropertyName(pair.Value);
+            JsonSerializer.Serialize(jsonWriter, value, jsonSerializerOptions);
+        }
+
+        jsonWriter.WriteEndObject();
     }
 
     /// <summary>
@@ -296,7 +380,7 @@ public class GeoJsonFileWriter : FileWriterBase, IGeoJsonFileWriter
             if (memoryStream != null) memoryStream.Dispose();
             throw;
         }
-    }
+    }    
 
     private async Task<int> WriteGeoJsonFile(
         SearchFilter filter, 
@@ -312,13 +396,17 @@ public class GeoJsonFileWriter : FileWriterBase, IGeoJsonFileWriter
         var nrObservations = 0;
         var propertyFields =
             ObservationPropertyFieldDescriptionHelper.GetExportFieldsFromOutputFields(filter.Output?.Fields, true);
+        Dictionary<PropertyFieldDescription, string> propertyLabels = propertyFields.ToDictionary(
+            x => x,
+            x => ObservationPropertyFieldDescriptionHelper.GetPropertyLabel(x, propertyLabelType));
         EnsureCoordinatesAreRetrievedFromDb(filter.Output);
         JsonSerializerOptions jsonSerializerOptions = CreateJsonSerializerOptions();
 
         var jsonWriterOptions = new JsonWriterOptions()
         {
             //To be able to display å,ä,ö e.t.c. properly we need to add the range Latin1Supplement to the list of characters which should not be displayed as UTF8 encoded values (\uxxxx).
-            Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.Latin1Supplement)
+            Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.Latin1Supplement),
+            SkipValidation = true
         };
         await using var jsonWriter = new Utf8JsonWriter(stream, jsonWriterOptions);
         jsonWriter.WriteStartObject();
@@ -352,7 +440,7 @@ public class GeoJsonFileWriter : FileWriterBase, IGeoJsonFileWriter
                 foreach (var observation in processedObservations)
                 {
                     var flatObservation = new FlatObservation(observation);
-                    await WriteFeature(propertyFields, flatObservation, propertyLabelType, excludeNullValues, jsonWriter, jsonSerializerOptions);
+                    await WriteFeature(flatObservation, propertyLabels, excludeNullValues, jsonWriter, jsonSerializerOptions);
                 }
 
                 processedObservations = null;

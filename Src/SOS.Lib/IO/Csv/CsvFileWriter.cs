@@ -67,9 +67,7 @@ public class CsvFileWriter : FileWriterBase, ICsvFileWriter
         else
         {
             searchResult = await _processedObservationRepository.GetObservationsBySearchAfterAsync<Observation>(filter);
-        }
-
-        var fields = new List<string>(propertyFields.Count);
+        }        
 
         while ((useFastSearch && (fastSearchResult?.Records?.Any() ?? false)) || (!useFastSearch && (searchResult?.Records?.Any() ?? false)))
         {
@@ -91,14 +89,14 @@ public class CsvFileWriter : FileWriterBase, ICsvFileWriter
             await _generalizationResolver.ResolveGeneralizedObservationsAsync(filter, processedObservations);
 
             // Write occurrence rows to CSV file.
+            var fields = new string[propertyFields.Count];
             foreach (var observation in processedObservations)
             {
                 var flatObservation = new FlatObservation(observation);
-                fields.Clear();
 
-                foreach (var propertyField in propertyFields)
+                for (int i = 0; i < propertyFields.Count; i++)
                 {
-                    fields.Add(flatObservation.GetStringValue(propertyField));
+                    fields[i] = flatObservation.GetStringValue(propertyFields[i]);
                 }
 
                 csvFileHelper.WriteRow(fields);
