@@ -416,7 +416,11 @@ public class FilterManager : IFilterManager
         {
             var attributesTable = new AttributesTable
             {
-                { "FeatureType", "FilterArea.Polygon"}                
+                { "FeatureType", "FilterArea.OwnPolygon"},
+                { "AreaType", "Own" },
+                { "AreaTypeId", -1 },
+                { "FeatureId", -1 },
+                { "Name", "Own polygon" },
             };
             var feature = geometry.ToFeature(attributesTable);
             features.Add(feature);
@@ -438,7 +442,7 @@ public class FilterManager : IFilterManager
             {
                 { "FeatureType", "FilterArea.Area"},
                 { "AreaType", area.AreaType.ToString() },
-                { "AreaTypeId", area.AreaTypeId.ToString() },
+                { "AreaTypeId", area.AreaTypeId },
                 { "FeatureId", area.FeatureId },
                 { "Name", area.Name },
                 //{ "BoundingBox", area.BoundingBox }
