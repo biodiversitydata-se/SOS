@@ -1,4 +1,5 @@
-﻿using SOS.Lib.Enums;
+﻿using NetTopologySuite.Geometries;
+using SOS.Lib.Enums;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Search.Enums;
 using SOS.Lib.Models.Search.Filters;
@@ -211,4 +212,9 @@ public interface IObservationManager
     Task<Dictionary<string, ObservationStatistics>> CalculateObservationStatisticsAsync(DateTime fromDate, DateTime toDate);
 
     Task<byte[]> CreateObservationStatisticsSummaryExcelFileAsync(DateTime fromDate, DateTime toDate);
+
+    Task<List<NetTopologySuite.Features.Feature>?> GetAreaFiltersAsGeoJsonFeaturesAsync(IEnumerable<AreaFilter>? areaFilters);
+    Task<List<NetTopologySuite.Features.Feature>?> GetGeoGraphicsFiltersAsGeoJsonFeaturesAsync(SearchFilter searchFilter);
+    Task<List<(Lib.Models.Shared.Area area, Geometry geometry)>?> GetAreaFiltersAsAreaTuplesAsync(IEnumerable<AreaFilter>? areaFilters);
+    Task<List<(Lib.Models.Shared.Area area, Geometry geometry)>?> GetGeographicsFiltersAsAreaTuplesAsync(SearchFilter searchFilter);
 }

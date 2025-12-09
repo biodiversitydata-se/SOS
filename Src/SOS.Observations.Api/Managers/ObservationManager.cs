@@ -1,4 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
+using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
 using OfficeOpenXml;
 using SOS.Lib.Cache.Interfaces;
@@ -969,6 +970,38 @@ public class ObservationManager : IObservationManager
         }
     }
 
+    public async Task<List<Feature>?> GetAreaFiltersAsGeoJsonFeaturesAsync(IEnumerable<AreaFilter>? areaFilters)
+    {
+        return await _filterManager.GetAreaFiltersAsGeoJsonFeaturesAsync(areaFilters);
+    }
+
+    public async Task<List<(Lib.Models.Shared.Area area, Geometry geometry)>?> GetAreaFiltersAsAreaTuplesAsync(IEnumerable<AreaFilter>? areaFilters)
+    {
+        return await _filterManager.GetAreaFiltersAsAreaTuplesAsync(areaFilters);
+    }
+
+    public async Task<List<(Lib.Models.Shared.Area area, Geometry geometry)>?> GetGeographicsFiltersAsAreaTuplesAsync(SearchFilter searchFilter)
+    {        
+        return await _filterManager.GetAreaFiltersAsAreaTuplesAsync(searchFilter?.Location?.Areas);
+    }
+
+    public async Task<List<Feature>?> GetGeoGraphicsFiltersAsGeoJsonFeaturesAsync(SearchFilter searchFilter)
+    {
+        var geographicsFilterFeatures = await _filterManager.GetGeographicsFilterAsGeoJsonFeaturesAsync(searchFilter?.Location?.Geometries);
+        var areaFilterFeatures = await _filterManager.GetAreaFiltersAsGeoJsonFeaturesAsync(searchFilter?.Location?.Areas);        
+        var combinedFeatures = new List<Feature>();        
+        if (geographicsFilterFeatures != null)
+        {
+            combinedFeatures.AddRange(geographicsFilterFeatures);
+        }        
+        if (areaFilterFeatures != null)
+        {
+            combinedFeatures.AddRange(areaFilterFeatures);
+        }
+
+        return combinedFeatures;
+    }
+
     public class ObservationStatistics
     {
         public int TotalCount { get; set; }
@@ -1061,5 +1094,5 @@ public class ObservationManager : IObservationManager
             worksheet.Cells[worksheet.Dimension.Address].AutoFitColumns();
             return worksheet;
         }
-    }
+    }    
 }

@@ -524,7 +524,8 @@ public class GeoJsonFileWriter : FileWriterBase, IGeoJsonFileWriter
         PropertyLabelType propertyLabelType,
         bool excludeNullValues,
         Stream stream,
-        LatLonBoundingBox? bbox)
+        LatLonBoundingBox? bbox,
+        List<Feature> geographicAreas)
     {
         using var ms = new MemoryStream();
         List<PropertyFieldDescription> propertyFields =
@@ -555,7 +556,21 @@ public class GeoJsonFileWriter : FileWriterBase, IGeoJsonFileWriter
         }
 
         jsonWriter.WritePropertyName("features");
-        jsonWriter.WriteStartArray();
+        jsonWriter.WriteStartArray();        
+
+        if (geographicAreas != null && geographicAreas.Any())
+        {
+            foreach (var feature in geographicAreas)
+            {
+                jsonWriter.WriteStartObject();
+                jsonWriter.WriteString("type", "Feature");
+                jsonWriter.WritePropertyName("geometry");
+                JsonSerializer.Serialize(jsonWriter, feature.Geometry, jsonSerializerOptions);
+                jsonWriter.WritePropertyName("properties");
+                JsonSerializer.Serialize(jsonWriter, feature.Attributes, jsonSerializerOptions);
+                jsonWriter.WriteEndObject();
+            }
+        }        
 
         if (flatOut)
         {

@@ -1,4 +1,7 @@
-﻿using SOS.Lib.Models.Search.Filters;
+﻿using NetTopologySuite.Features;
+using NetTopologySuite.Geometries;
+using SOS.Lib.Models.Search.Filters;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Services.Interfaces;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -58,4 +61,10 @@ public interface IFilterManager
     /// <param name="filter">The taxon filter.</param>
     /// <returns></returns>
     Task<HashSet<int>> GetTaxonIdsFromFilterAsync(TaxonFilter filter);
+
+    Task<List<Feature>?> GetAreaFiltersAsGeoJsonFeaturesAsync(IEnumerable<AreaFilter>? areaFilters);
+
+    Task<List<(Area area, Geometry geometry)>?> GetAreaFiltersAsAreaTuplesAsync(IEnumerable<AreaFilter>? areaFilters);
+
+    Task<List<Feature>?> GetGeographicsFilterAsGeoJsonFeaturesAsync(GeographicsFilter geographicsFilter);
 }

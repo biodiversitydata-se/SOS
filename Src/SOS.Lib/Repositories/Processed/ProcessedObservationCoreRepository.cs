@@ -1871,7 +1871,7 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
         var count = searchResponse.Total;        
         GeoBoundsAggregate? extentAgg = searchResponse.Aggregations?.GetGeoBounds(aggName);        
         LatLonBoundingBox? extentResult = null;        
-        if (extentAgg != null)
+        if (extentAgg != null && extentAgg.Bounds != null)
         {
             if (extentAgg.Bounds.TryGetTopLeftBottomRight(out var topLeftBottomRight))
             {
@@ -2283,7 +2283,7 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
                 PopulateSortableFields(value.Mappings.Properties, ref sortableFields, "");
             }
         }
-
+        
         return sortableFields;
     }
 

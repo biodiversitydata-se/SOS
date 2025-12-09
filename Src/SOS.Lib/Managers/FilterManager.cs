@@ -393,6 +393,38 @@ public class FilterManager : IFilterManager
         }
     }
 
+    public async Task<List<Feature>?> GetGeographicsFilterAsGeoJsonFeaturesAsync(GeographicsFilter geographicsFilter)
+    {
+        if (geographicsFilter == null || geographicsFilter.Geometries == null) return null;
+        if (!geographicsFilter.Geometries.Any() && (!geographicsFilter.MaxDistanceFromPoint.HasValue || geographicsFilter.MaxDistanceFromPoint.Value == 0)) return null;
+
+        List<Feature> features = new List<Feature>();
+        if (geographicsFilter.MaxDistanceFromPoint.HasValue  && geographicsFilter.MaxDistanceFromPoint.Value > 0 && geographicsFilter.Geometries.Any() && geographicsFilter.Geometries.First().GeometryType == "Point")
+        {
+            Point point = (NetTopologySuite.Geometries.Point)geographicsFilter.Geometries.First();
+            var polygon = point.ToCircle(Convert.ToInt32(geographicsFilter.MaxDistanceFromPoint.Value));            
+            var attributesTable = new AttributesTable
+            {
+                { "FeatureType", "FilterArea.Polygon"}
+            };
+            features.Add(polygon.ToFeature(attributesTable));
+                                           
+            return features;
+        }
+        
+        foreach (var geometry in geographicsFilter.Geometries)
+        {
+            var attributesTable = new AttributesTable
+            {
+                { "FeatureType", "FilterArea.Polygon"}                
+            };
+            var feature = geometry.ToFeature(attributesTable);
+            features.Add(feature);
+        }
+
+        return features;
+    }
+
     public async Task<List<Feature>?> GetAreaFiltersAsGeoJsonFeaturesAsync(IEnumerable<AreaFilter>? areaFilters)
     {
         if (areaFilters == null || !areaFilters.Any()) return null;
@@ -404,13 +436,16 @@ public class FilterManager : IFilterManager
             var area = areaTuple.area;
             var attributesTable = new AttributesTable
             {
+                { "FeatureType", "FilterArea.Area"},
                 { "AreaType", area.AreaType.ToString() },
+                { "AreaTypeId", area.AreaTypeId.ToString() },
                 { "FeatureId", area.FeatureId },
                 { "Name", area.Name },
-                { "BoundingBox", area.BoundingBox }
+                //{ "BoundingBox", area.BoundingBox }
             };
 
             var feature = areaTuple.geometry.ToFeature(attributesTable);
+            features.Add(feature);
         }
 
         return features;

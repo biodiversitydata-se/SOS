@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using NetTopologySuite.Features;
+using NetTopologySuite.Geometries;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Exceptions;
@@ -623,10 +625,11 @@ public class ObservationsController : ControllerBase
                 result?.Records,
                 searchFilter.Output?.Fields,
                 flatOut: outputFormat == OutputFormatDto.GeoJsonFlat,
-                geoJsonPropertyLabelType,
-                geoJsonExcludeNullValues,
-                Response.Body,
-                null);
+                propertyLabelType: geoJsonPropertyLabelType,
+                excludeNullValues: geoJsonExcludeNullValues,
+                stream: Response.Body,
+                bbox: null,
+                geographicAreas: null);
                         
             return new EmptyResult();          
         }
@@ -1799,7 +1802,8 @@ public class ObservationsController : ControllerBase
     /// </param>
     /// <param name="geoJsonPropertyLabelType">Determines how properties are labeled in the GeoJSON (e.g. simple names or full property paths).</param>
     /// <param name="outputFormat">Determines the format of the response data. JSON returns a standard JSON response. GeoJSONFlat or GeoJSONNested returns a GeoJSON FeatureCollection.</param>    
-    /// <param name="excludeNullValues">If true, properties with null values are omitted from the output to reduce payload size.</param>    
+    /// <param name="excludeNullValues">If true, properties with null values are omitted from the output to reduce payload size.</param>
+    /// <param name="includeFilterAreasInResult">If true and the search filter contains area ids, the area polygons will be included in the result.</param>
     /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
     /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB).</param>
     /// <param name="sensitiveObservations">If true, only sensitive (protected) observations will be searched (this requires authentication and authorization). If false, public available observations will be searched.</param>
@@ -1826,7 +1830,7 @@ public class ObservationsController : ControllerBase
         [FromQuery] PropertyLabelType geoJsonPropertyLabelType = PropertyLabelType.PropertyPath,
         [FromQuery] OutputFormatDto outputFormat = OutputFormatDto.GeoJsonFlat,
         [FromQuery] bool excludeNullValues = false,
-        //[FromQuery] bool includeFilterAreasInResult = true,
+        [FromQuery] bool includeFilterAreasInResult = false,
         [FromQuery] bool validateSearchFilter = false,
         [FromQuery] string translationCultureCode = "sv-SE",
         [FromQuery] bool sensitiveObservations = false)
@@ -1861,7 +1865,9 @@ public class ObservationsController : ControllerBase
                 filter.Output ??= new OutputFilterExtendedDto();
                 filter.Output.Fields = EnsureCoordinatesIsRetrievedFromDb(filter?.Output?.Fields);
             }
-                       
+
+            List<Feature>? geoJsonGeographicAreas = null;
+            List<(Lib.Models.Shared.Area area, Geometry geometry)>? geographicAreas = null;
             var searchFilter = filter.ToSearchFilterInternal(this.GetUserId(), translationCultureCode, sortBy, sortOrder);
             (long Count, LatLonBoundingBox? Extent) countAndExtentResult = await _observationManager.GetCountAndExtentAsync(roleId, authorizationApplicationIdentifier, searchFilter);
             if (countAndExtentResult.Count > observationsLimit)
@@ -1869,14 +1875,22 @@ public class ObservationsController : ControllerBase
                 // Calculate grids and return GeoJSON
                 var zoom = GeoTileHelper.CalculateGeotileZoom(countAndExtentResult.Extent, maxGridCells, maxZoom);
                 var res = await _observationManager.GetGeogridTileAggregationAsync(roleId, authorizationApplicationIdentifier, searchFilter, zoom);
+                
+                
                 if (outputFormat == OutputFormatDto.Json)
                 {
                     var geogridResult = res.ToGeoGridResultDto(countAndExtentResult.Extent.ToEnvelope().CalculateNumberOfTiles(zoom));
-                    var adaptiveResultDto = AdaptiveSearchResultDto<JsonObject>.CreateGeoGridResult(countAndExtentResult.Extent.ToLatLonBoundingBoxDto(), (int)countAndExtentResult.Count, geogridResult);
+                    geographicAreas = includeFilterAreasInResult ? await _observationManager.GetGeographicsFiltersAsAreaTuplesAsync(searchFilter) : null;
+                    var adaptiveResultDto = AdaptiveSearchResultDto<JsonObject>.CreateGeoGridResult(
+                        countAndExtentResult.Extent.ToLatLonBoundingBoxDto(),
+                        (int)countAndExtentResult.Count,
+                        geogridResult,
+                        geographicAreas);
                     return new OkObjectResult(adaptiveResultDto);
                 }
 
-                string strJson = res.GetFeatureCollectionGeoJson(CoordinateSys.WGS84, countAndExtentResult.Extent);
+                geoJsonGeographicAreas = includeFilterAreasInResult ? await _observationManager.GetGeoGraphicsFiltersAsGeoJsonFeaturesAsync(searchFilter) : null;
+                string strJson = res.GetFeatureCollectionGeoJson(CoordinateSys.WGS84, countAndExtentResult.Extent, geoJsonGeographicAreas);
                 Response.StatusCode = (int)HttpStatusCode.OK;
                 Response.Headers.Append("X-Observations-TotalCount", countAndExtentResult.Count.ToString());
                 Response.Headers.Append("X-Result-Count", res.GridCellTileCount.ToString());
@@ -1891,16 +1905,24 @@ public class ObservationsController : ControllerBase
 
             // Return observations as GeoJSON
             var result = await _observationManager.GetChunkAsync(roleId, authorizationApplicationIdentifier, searchFilter, 0, observationsLimit);
+            List<(Lib.Models.Shared.Area area, Geometry geometry)> geographicAreas2 = await _observationManager.GetGeographicsFiltersAsAreaTuplesAsync(searchFilter);
+            
             if (result == null)
             {
                 throw new Exception("Something went wrong when your query was executed. Make sure your filter is correct.");
             }
             if (outputFormat == OutputFormatDto.Json)
             {
-                var adaptiveResultDto = AdaptiveSearchResultDto<JsonObject>.CreateObservationsResult(countAndExtentResult.Extent.ToLatLonBoundingBoxDto(), (int)countAndExtentResult.Count, result.Records);
+                geographicAreas = includeFilterAreasInResult ? await _observationManager.GetGeographicsFiltersAsAreaTuplesAsync(searchFilter) : null;
+                var adaptiveResultDto = AdaptiveSearchResultDto<JsonObject>.CreateObservationsResult(
+                    countAndExtentResult.Extent.ToLatLonBoundingBoxDto(),
+                    (int)countAndExtentResult.Count,
+                    result.Records,
+                    geographicAreas);
                 return new OkObjectResult(adaptiveResultDto);
             }
 
+            geoJsonGeographicAreas = includeFilterAreasInResult ? await _observationManager.GetGeoGraphicsFiltersAsGeoJsonFeaturesAsync(searchFilter) : null;
             Response.StatusCode = (int)HttpStatusCode.OK;
             Response.Headers.Append("X-Observations-TotalCount", result.TotalCount.ToString());
             Response.Headers.Append("X-Result-Type", "observations");
@@ -1911,10 +1933,11 @@ public class ObservationsController : ControllerBase
                 result?.Records,
                 searchFilter.Output?.Fields,
                 flatOut: outputFormat == OutputFormatDto.GeoJsonFlat,
-                geoJsonPropertyLabelType,
-                excludeNullValues,
-                Response.Body,
-                countAndExtentResult.Extent);
+                propertyLabelType: geoJsonPropertyLabelType,
+                excludeNullValues: excludeNullValues,
+                stream: Response.Body,
+                bbox: countAndExtentResult.Extent,
+                geographicAreas: geoJsonGeographicAreas);
             
             return new EmptyResult();
         }

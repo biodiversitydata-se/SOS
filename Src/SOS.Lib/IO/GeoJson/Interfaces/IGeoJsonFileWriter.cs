@@ -43,10 +43,11 @@ public interface IGeoJsonFileWriter
 
     Task WriteGeoJsonFeatureCollection(
         IEnumerable<JsonObject> records,
-        ICollection<string> outputFields,        
+        ICollection<string> outputFields,
         bool flatOut,
         PropertyLabelType propertyLabelType,
         bool excludeNullValues,
         Stream stream,
-        LatLonBoundingBox? bbox);
+        LatLonBoundingBox? bbox,
+        List<NetTopologySuite.Features.Feature> geographicAreas);
 }

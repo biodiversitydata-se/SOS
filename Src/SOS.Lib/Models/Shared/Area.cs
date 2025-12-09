@@ -24,6 +24,7 @@ public class Area : IEntity<string>
     ///     Type of area
     /// </summary>
     public AreaType AreaType { get; set; }
+    public int AreaTypeId => (int)AreaType;
 
     public LatLonBoundingBox BoundingBox { get; set; }
 
