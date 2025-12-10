@@ -10,11 +10,8 @@ using ProjNet.CoordinateSystems;
 using ProjNet.CoordinateSystems.Transformations;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Gis;
-using System;
 using System.Collections;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace SOS.Lib.Extensions;
 
@@ -97,6 +94,38 @@ public static class GISExtensions
             seq.SetX(i, x);
             seq.SetY(i, y);
             seq.SetZ(i, z);
+        }
+    }
+
+    extension(IEnumerable<Geometry>? geometries)
+    {
+        public Envelope? CalculateBbox()
+        {            
+            if (geometries == null || !geometries.Any())
+                return null;
+
+            var combinedEnvelope = new Envelope();
+            foreach (var geom in geometries)
+            {
+                if (geom == null) continue;
+                combinedEnvelope.ExpandToInclude(geom.EnvelopeInternal);
+            }
+
+            if (combinedEnvelope.IsNull)
+                return null;
+
+            return combinedEnvelope;
+        }
+    }
+
+    extension(IEnumerable<Feature>? features)
+    {
+        public Envelope? CalculateBbox()
+        {
+            if (features == null) return null;
+            
+            var geometries = features.Select(f => f?.Geometry);
+            return geometries.CalculateBbox();
         }
     }
 
@@ -296,6 +325,11 @@ public static class GISExtensions
             var maxTilesTot = (long)(maxLonTiles * maxLatTiles);
 
             return maxTilesTot;
+        }
+
+        public LatLonBoundingBox ToLatLonBoundingBox()
+        {            
+            return LatLonBoundingBox.Create(envelope);
         }
 
         public Envelope Transform(

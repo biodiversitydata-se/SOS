@@ -546,13 +546,11 @@ public class GeoJsonFileWriter : FileWriterBase, IGeoJsonFileWriter
         jsonWriter.WriteString("crs", "EPSG:4326");
         if (bbox != null)
         {
-            jsonWriter.WritePropertyName("bbox");
-            jsonWriter.WriteStartArray();
-            jsonWriter.WriteNumberValue(bbox.TopLeft.Longitude);
-            jsonWriter.WriteNumberValue(bbox.BottomRight.Latitude);
-            jsonWriter.WriteNumberValue(bbox.BottomRight.Longitude);
-            jsonWriter.WriteNumberValue(bbox.TopLeft.Latitude);
-            jsonWriter.WriteEndArray();
+            WriteBbox(jsonWriter, bbox);            
+        }
+        else if (geographicAreas != null && geographicAreas.Any())
+        {
+            WriteBbox(jsonWriter, geographicAreas.CalculateBbox()?.ToLatLonBoundingBox());            
         }
 
         jsonWriter.WritePropertyName("features");
@@ -595,5 +593,19 @@ public class GeoJsonFileWriter : FileWriterBase, IGeoJsonFileWriter
         
         ms.Position = 0;
         await ms.CopyToAsync(stream);
+    }
+
+    private void WriteBbox(Utf8JsonWriter jsonWriter, LatLonBoundingBox? bbox)
+    {
+        if (bbox != null)
+        {
+            jsonWriter.WritePropertyName("bbox");
+            jsonWriter.WriteStartArray();
+            jsonWriter.WriteNumberValue(bbox.TopLeft.Longitude);
+            jsonWriter.WriteNumberValue(bbox.BottomRight.Latitude);
+            jsonWriter.WriteNumberValue(bbox.BottomRight.Longitude);
+            jsonWriter.WriteNumberValue(bbox.TopLeft.Latitude);
+            jsonWriter.WriteEndArray();           
+        }   
     }
 }

@@ -2,6 +2,7 @@
 using NetTopologySuite.IO;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Gis;
+using SOS.Lib.Extensions;
 using System.Collections.Generic;
 
 namespace SOS.Lib.Models.Search.Result;
@@ -13,12 +14,16 @@ public class GeoGridTileResult
     public int GridCellTileCount { get; set; }
     public IEnumerable<GridCellTile> GridCellTiles { get; set; }
 
-    public FeatureCollection GetFeatureCollection(CoordinateSys coordinateSystem = CoordinateSys.WGS84, LatLonBoundingBox? bbox = null, List<Feature> geoJsonGeographicAreas = null, List<Feature> geoJsonGeographicAreas3 = null)
+    public FeatureCollection GetFeatureCollection(CoordinateSys coordinateSystem = CoordinateSys.WGS84, LatLonBoundingBox? bbox = null, List<Feature> geoJsonGeographicAreas = null)
     {
         var featureCollection = new FeatureCollection();
         if (bbox != null)
         {
             featureCollection.BoundingBox = bbox.ToEnvelope();
+        }
+        else if (geoJsonGeographicAreas != null && geoJsonGeographicAreas.Any())
+        {
+            featureCollection.BoundingBox = geoJsonGeographicAreas.CalculateBbox();
         }
 
         if (geoJsonGeographicAreas != null)
