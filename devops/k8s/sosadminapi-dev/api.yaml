@@ -77,4 +77,9 @@ spec:
                   "ReadBatchSize": 10000, 
                   "WriteBatchSize": 10000
               }
-        resources: {}
+        resources:
+            requests:
+                cpu: 11m
+                memory: 2G
+            limits:
+                memory: 2G

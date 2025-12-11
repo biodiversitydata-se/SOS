@@ -543,11 +543,15 @@ public class FilterManager : IFilterManager
 
                 if (fields?.Any() ?? false)
                 {
+                    searchFilter.Output ??= new OutputFilter();
                     if (!fields.Any(f => f.Equals("occurrence", StringComparison.CurrentCultureIgnoreCase)) &&
                         !fields.Any(f => f.Equals("occurrence.occurrenceId", StringComparison.CurrentCultureIgnoreCase)))
                     {
-                        searchFilter.Output ??= new OutputFilter();
                         searchFilter.Output.Fields.Add("occurrence.occurrenceId");
+                    }
+                    if (!fields.Any(f => f.Equals("sensitive", StringComparison.CurrentCultureIgnoreCase)))
+                    {
+                        searchFilter.Output.Fields.Add("sensitive");
                     }
                 }
             }

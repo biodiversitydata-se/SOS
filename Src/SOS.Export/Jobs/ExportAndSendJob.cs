@@ -5,16 +5,10 @@ using SOS.Export.Managers.Interfaces;
 using SOS.Export.Models.ZendTo;
 using SOS.Lib.Enums;
 using SOS.Lib.Jobs.Export;
-using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Export;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Services.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace SOS.Export.Jobs;
 
@@ -25,7 +19,6 @@ public class ExportAndSendJob : IExportAndSendJob
 {
     private readonly ICryptoService _cryptoService;
     private readonly IObservationManager _observationManager;
-    private readonly IAnalysisManager _analysisManager;
     private readonly IUserExportRepository _userExportRepository;
     private readonly ILogger<ExportAndSendJob> _logger;
 

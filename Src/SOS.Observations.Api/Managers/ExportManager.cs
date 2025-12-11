@@ -1,6 +1,5 @@
 ﻿using Hangfire;
 using Hangfire.Server;
-using Microsoft.Extensions.Logging;
 using SOS.Lib.Enums;
 using SOS.Lib.Exceptions;
 using SOS.Lib.Helpers;
@@ -14,11 +13,6 @@ using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Repositories.Interfaces;
-using System;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace SOS.Observations.Api.Managers;
 

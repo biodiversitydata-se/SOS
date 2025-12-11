@@ -31,14 +31,12 @@ namespace SOS.Observations.Api.Managers;
 /// </summary>
 public class ObservationManager : IObservationManager
 {
-    private readonly IAreaManager _areaManager;
     private readonly IProcessedObservationRepository _processedObservationRepository;
     private readonly IProtectedLogRepository _protectedLogRepository;
     private readonly IFilterManager _filterManager;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IVocabularyValueResolver _vocabularyValueResolver;
     private readonly ITaxonObservationCountCache _taxonObservationCountCache;
-    private readonly IClassCache<ConcurrentDictionary<int, TaxonSumAggregationItem>> _taxonSumAggregationCache;
     private readonly IGeneralizationResolver _generalizationResolver;
     private readonly IDataProviderCache _dataProviderCache;
     private readonly ILogger<ObservationManager> _logger;
@@ -72,9 +70,9 @@ public class ObservationManager : IObservationManager
                     sensitive.HasValue &&
                     occurrenceObject != null)
                 {
-                    if (((bool)sensitive) && occurrenceObject is IDictionary<string, object> occurrenceDictionary && occurrenceDictionary.TryGetValue("occurrenceId", out var occurenceId))
+                    if (((bool)sensitive) && occurrenceObject is JsonObject jsonObject && jsonObject.ContainsKey("occurrenceId"))
                     {
-                        occurenceIds.Add(occurenceId as string);
+                        occurenceIds.Add(jsonObject["occurrenceId"]?.ToString());
                     }
                 }
             }
@@ -116,31 +114,26 @@ public class ObservationManager : IObservationManager
     /// <summary>
     /// Constructor
     /// </summary>
-    /// <param name="areaManager"></param>
     /// <param name="processedObservationRepository"></param>
     /// <param name="protectedLogRepository"></param>
     /// <param name="vocabularyValueResolver"></param>
     /// <param name="filterManager"></param>
     /// <param name="httpContextAccessor"></param>
     /// <param name="taxonObservationCountCache"></param>
-    /// <param name="taxonSumAggregationCache"></param>
     /// <param name="generalizationResolver"></param>
     /// <param name="dataProviderCache"></param>
     /// <param name="logger"></param>
     public ObservationManager(
-        IAreaManager areaManager,
         IProcessedObservationRepository processedObservationRepository,
         IProtectedLogRepository protectedLogRepository,
         IVocabularyValueResolver vocabularyValueResolver,
         IFilterManager filterManager,
         IHttpContextAccessor httpContextAccessor,
         ITaxonObservationCountCache taxonObservationCountCache,
-        IClassCache<ConcurrentDictionary<int, TaxonSumAggregationItem>> taxonSumAggregationCache,
         IGeneralizationResolver generalizationResolver,
         IDataProviderCache dataProviderCache,
         ILogger<ObservationManager> logger)
     {
-        _areaManager = areaManager ?? throw new ArgumentNullException(nameof(areaManager));
         _processedObservationRepository = processedObservationRepository ??
                                           throw new ArgumentNullException(nameof(processedObservationRepository));
         _protectedLogRepository =
@@ -149,7 +142,6 @@ public class ObservationManager : IObservationManager
         _filterManager = filterManager ?? throw new ArgumentNullException(nameof(filterManager));
         _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
         _taxonObservationCountCache = taxonObservationCountCache ?? throw new ArgumentNullException(nameof(taxonObservationCountCache));
-        _taxonSumAggregationCache = taxonSumAggregationCache ?? throw new ArgumentNullException(nameof(taxonSumAggregationCache));
         _generalizationResolver = generalizationResolver ?? throw new ArgumentNullException(nameof(generalizationResolver));
         _dataProviderCache = dataProviderCache ?? throw new ArgumentNullException(nameof(dataProviderCache));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
