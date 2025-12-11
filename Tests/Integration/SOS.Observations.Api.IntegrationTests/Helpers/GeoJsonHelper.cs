@@ -11,4 +11,11 @@ internal static class GeoJsonHelper
         var featureCollection = reader.Read<FeatureCollection>(geoJsonString);
         return featureCollection;
     }
+
+    public static FeatureCollection ReadGeoJsonFromString(string geoJsonString)
+    {      
+        var reader = new NetTopologySuite.IO.GeoJsonReader();
+        var featureCollection = reader.Read<FeatureCollection>(geoJsonString);
+        return featureCollection;
+    }
 }
