@@ -49,7 +49,7 @@ public class ObservationsController : ControllerBase
     private readonly ITaxonSearchManager _taxonSearchManager;
     private readonly ISearchFilterUtility _searchFilterUtility;
     private readonly IInputValidator _inputValidator;
-    private readonly ObservationApiConfiguration _observationApiConfiguration;
+    private readonly ObservationApiConfiguration _observationApiConfiguration;    
     private readonly IClassCache<ConcurrentDictionary<string, CacheEntry<GeoGridResultDto>>> _geogridAggregationCache;
     private readonly IClassCache<ConcurrentDictionary<string, CacheEntry<PagedResultDto<TaxonAggregationItemDto>>>> _taxonAggregationInternalCache;
     private readonly SemaphoreLimitManager _semaphoreLimitManager;
@@ -88,7 +88,7 @@ public class ObservationsController : ControllerBase
         ITaxonSearchManager taxonSearchManager,
         ISearchFilterUtility searchFilterUtility,
         IInputValidator inputValidator,
-        ObservationApiConfiguration observationApiConfiguration,
+        ObservationApiConfiguration observationApiConfiguration,        
         IClassCache<ConcurrentDictionary<string, CacheEntry<GeoGridResultDto>>> geogridAggregationCache,
         IClassCache<ConcurrentDictionary<string, CacheEntry<PagedResultDto<TaxonAggregationItemDto>>>> taxonAggregationInternalCache,
         SemaphoreLimitManager semaphoreLimitManager,
@@ -1845,6 +1845,25 @@ public class ObservationsController : ControllerBase
         try
         {
             LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
+
+            // Log cache key in order to be able to decide if cache is needed
+            var parameters = new[]
+            {
+                $"roleId={roleId}",
+                $"authorizationApplicationIdentifier={authorizationApplicationIdentifier}",
+                $"observationsLimit={observationsLimit}",
+                $"maxZoom={maxZoom}",
+                $"maxGridCells={maxGridCells}",
+                $"geoJsonPropertyLabelType={geoJsonPropertyLabelType}",
+                $"outputFormat={outputFormat}",
+                $"excludeNullValues={excludeNullValues}",
+                $"includeFilterAreasInResult={includeFilterAreasInResult}",
+                $"translationCultureCode={translationCultureCode}",
+                $"sensitiveObservations={sensitiveObservations}"
+            };
+            string cacheKey = CreateCacheKey(string.Join("&", parameters), filter);
+            HttpContext.Items.TryAdd("CacheKey", cacheKey);
+
             // sensitiveObservations is preserved for backward compability
             filter.ProtectionFilter ??= (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
             this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, filter.ProtectionFilter);
