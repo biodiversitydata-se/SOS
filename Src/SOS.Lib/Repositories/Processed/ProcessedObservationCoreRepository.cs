@@ -174,7 +174,7 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
                         .NumberVal(n => n.ArtportalenInternal.TriggeredObservationRuleActivityRuleId, IndexSetting.None, NumberType.Integer)
                         .NumberVal(n => n.ArtportalenInternal.TriggeredObservationRulePeriodRuleId, IndexSetting.None, NumberType.Integer)
                         .NumberVal(n => n.ArtportalenInternal.TriggeredObservationRulePromptRuleId, IndexSetting.None, NumberType.Integer)
-                        .NumberVal(n => n.ArtportalenInternal.TriggeredObservationRuleRegionalSightingState, IndexSetting.None, NumberType.Integer)
+                        .NumberVal(n => n.ArtportalenInternal.TriggeredObservationRuleRegionalSightingState, IndexSetting.SearchSortAggregate, NumberType.Integer)
                         .NumberVal(n => n.ArtportalenInternal.TriggeredObservationRuleStatusRuleId, IndexSetting.None, NumberType.Integer)
                         .NumberVal(n => n.ArtportalenInternal.ActivityCategoryId, IndexSetting.None, NumberType.Integer)
                         .BooleanVal(b => b.ArtportalenInternal.TriggeredObservationRulePrompts, IndexSetting.None)
