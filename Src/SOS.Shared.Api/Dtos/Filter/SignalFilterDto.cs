@@ -1,4 +1,6 @@
 ﻿
+using static SOS.Shared.Api.Dtos.Filter.ExtendedFilterDto;
+
 namespace SOS.Shared.Api.Dtos.Filter;
 
 /// <summary>
@@ -34,4 +36,6 @@ public class SignalFilterDto
     /// Taxon filter.
     /// </summary>
     public TaxonFilterBaseDto? Taxon { get; set; }
+
+    public SightingTypeFilterDto ArtportalenTypeFilter { get; set; } = SightingTypeFilterDto.DoNotShowMerged;
 }

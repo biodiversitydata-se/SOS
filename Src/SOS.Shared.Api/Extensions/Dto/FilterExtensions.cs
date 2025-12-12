@@ -4,6 +4,7 @@ using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Shared.Api.Dtos.Enum;
 using SOS.Shared.Api.Dtos.Filter;
+using static SOS.Lib.Models.Search.Filters.SearchFilterBase;
 
 namespace SOS.Shared.Api.Extensions.Dto;
 
@@ -459,7 +460,8 @@ public static class FilterExtensions
                     StartDate = searchFilterDto.StartDate
                 } : null,
                 Taxa = searchFilterDto.Taxon?.ToTaxonFilter(),
-                UnspontaneousFilter = SightingUnspontaneousFilter.NotUnspontaneous
+                UnspontaneousFilter = SightingUnspontaneousFilter.NotUnspontaneous,
+                TypeFilter = (SightingTypeFilter)searchFilterDto.ArtportalenTypeFilter
             };
 
             return searchFilter;
