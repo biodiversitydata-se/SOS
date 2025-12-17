@@ -24,7 +24,7 @@ public interface IAnalysisController
     Task<IActionResult> AggregateAsync(
         int? roleId,
         string? authorizationApplicationIdentifier,
-        SearchFilterInternalDto searchFilter,
+        SearchFilterAggregationInternalDto searchFilter,
         bool? validateFilter,
         string aggregationField,
         bool? aggregateOrganismQuantity,
@@ -48,7 +48,7 @@ public interface IAnalysisController
     Task<IActionResult> AggregateByUserFieldAsync(
         int? roleId,
         string? authorizationApplicationIdentifier,
-        SearchFilterInternalDto filter,
+        SearchFilterAggregationInternalDto filter,
         bool? validateFilter,
         string aggregationField,
         bool? aggregateOrganismQuantity,
@@ -71,7 +71,7 @@ public interface IAnalysisController
     Task<IActionResult> AreaAggregateAsync(
         int? roleId,
         string? authorizationApplicationIdentifier,
-        SearchFilterInternalDto searchFilter,
+        SearchFilterAggregationInternalDto searchFilter,
         AreaTypeAggregate areaType,
         CoordinateSys? coordinateSys,
         int? precisionThreshold,
@@ -105,7 +105,7 @@ public interface IAnalysisController
     Task<IActionResult> CalculateAooAndEooInternalAsync(
         int? roleId,
         string? authorizationApplicationIdentifier,
-        SearchFilterInternalDto searchFilter,
+        SearchFilterAggregationInternalDto searchFilter,
         bool? validateFilter,
         double[] alphaValues,
         int? gridCellSizeInMeters = 2000,
@@ -136,7 +136,7 @@ public interface IAnalysisController
     Task<IActionResult> CalculateAooAndEooArticle17InternalAsync(
         int? roleId,
         string? authorizationApplicationIdentifier,
-        SearchFilterInternalDto searchFilter,
+        SearchFilterAggregationInternalDto searchFilter,
         bool? validateFilter,
         int? maxDistance = 50000,
         int? gridCellSizeInMeters = 2000,

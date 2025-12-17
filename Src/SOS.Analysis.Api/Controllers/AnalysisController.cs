@@ -85,7 +85,7 @@ public class AnalysisController : ControllerBase, IAnalysisController
     public async Task<IActionResult> AggregateAsync(
         [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
         [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
-        [FromBody] SearchFilterInternalDto? searchFilter,
+        [FromBody] SearchFilterAggregationInternalDto? searchFilter,
         [FromQuery] bool? validateFilter,
         [FromQuery] string aggregationField,
         [FromQuery] bool? aggregateOrganismQuantity,
@@ -143,7 +143,7 @@ public class AnalysisController : ControllerBase, IAnalysisController
     public async Task<IActionResult> AggregateByUserFieldAsync(
         [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
         [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
-        [FromBody] SearchFilterInternalDto? searchFilter,
+        [FromBody] SearchFilterAggregationInternalDto? searchFilter,
         [FromQuery] bool? validateFilter,
         [FromQuery] string aggregationField,
         [FromQuery] bool? aggregateOrganismQuantity,
@@ -207,7 +207,7 @@ public class AnalysisController : ControllerBase, IAnalysisController
     public async Task<IActionResult> AreaAggregateAsync(
         [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
         [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
-        [FromBody] SearchFilterInternalDto? searchFilter,
+        [FromBody] SearchFilterAggregationInternalDto? searchFilter,
         [FromQuery] AreaTypeAggregate areaType,
         [FromQuery] CoordinateSys? coordinateSys,
         [FromQuery] int? precisionThreshold,
@@ -281,7 +281,7 @@ public class AnalysisController : ControllerBase, IAnalysisController
     public async Task<IActionResult> CalculateAooAndEooInternalAsync(
         [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
         [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
-        [FromBody] SearchFilterInternalDto? searchFilter,
+        [FromBody] SearchFilterAggregationInternalDto? searchFilter,
         [FromQuery] bool? validateFilter,
         [FromQuery] double[]? alphaValues,
         [FromQuery] int? gridCellSizeInMeters = 2000,
@@ -396,7 +396,7 @@ public class AnalysisController : ControllerBase, IAnalysisController
         [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
         [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
         [FromQuery] string description,            
-        [FromBody] SearchFilterInternalDto? searchFilter,
+        [FromBody] SearchFilterAggregationInternalDto? searchFilter,
         [FromQuery] bool? validateFilter,
         [FromQuery] double[]? alphaValues,
         [FromQuery] int? gridCellSizeInMeters = 2000,
@@ -522,7 +522,7 @@ public class AnalysisController : ControllerBase, IAnalysisController
     public async Task<IActionResult> CalculateAooAndEooArticle17InternalAsync(
         [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
         [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
-        [FromBody] SearchFilterInternalDto? searchFilter,
+        [FromBody] SearchFilterAggregationInternalDto? searchFilter,
         [FromQuery] bool? validateFilter,
         [FromQuery] int? maxDistance = 50000,
         [FromQuery] int? gridCellSizeInMeters = 2000,
@@ -606,7 +606,7 @@ public class AnalysisController : ControllerBase, IAnalysisController
         [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
         [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
         [FromQuery] string description,
-        [FromBody] SearchFilterInternalDto? searchFilter,
+        [FromBody] SearchFilterAggregationInternalDto? searchFilter,
         [FromQuery] bool? validateFilter,
         [FromQuery] int? maxDistance = 50000,
         [FromQuery] int? gridCellSizeInMeters = 2000,
