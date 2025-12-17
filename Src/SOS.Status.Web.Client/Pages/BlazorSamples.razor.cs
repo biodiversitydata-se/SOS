@@ -20,6 +20,10 @@ public partial class BlazorSamples
     private string diagramDef = def2;
     private IJSObjectReference jsModule;
 
+    [PersistentState]
+    public int CurrentCountWithPersistence { get; set; }
+    public int CurrentCount { get; set; }
+
     const string def1 = @"
         flowchart LR
         A --> B
@@ -125,6 +129,17 @@ Responsibilities
                 await jsModule.InvokeVoidAsync("set", inputElement);
             }
         }
+    }
+
+    private void IncrementCount()
+    {
+        CurrentCountWithPersistence++;
+        CurrentCount++;
+    }
+
+    private async Task PauseCircuitAsync()
+    {
+        await jsModule!.InvokeVoidAsync("pauseCircuit");
     }
 
     public class LocationItem

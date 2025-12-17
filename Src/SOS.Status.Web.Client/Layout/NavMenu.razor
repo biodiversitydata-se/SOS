@@ -12,14 +12,15 @@
     <MudNavLink Href="taxondiagram" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Outlined.PieChartOutline">Taxon diagram</MudNavLink>
 
     <!-- Claims (Auth) -->    
-    <MudNavLink Href="claims" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Outlined.Lock">Claims (Auth)</MudNavLink>    
+    <MudNavLink Href="claims" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Outlined.Lock">Claims (Auth)</MudNavLink>
 
     @if (AppEnvironment.IsLocalOrDev())
     {
         <!-- Dev -->
         <MudNavGroup Title="Dev" Expanded="false" Icon="@Icons.Material.Outlined.Build">
             <!-- Blazor samples -->
-            <MudNavLink Href="blazorsamples?id=5" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Outlined.Code">Blazor samples</MudNavLink>        
+            <MudNavLink Href="blazorsamples?id=5" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Outlined.Code">Blazor samples</MudNavLink>      
+            <MudNavLink Href="counter" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Outlined.Numbers">Persistent state</MudNavLink>
         </MudNavGroup>
     }
 </MudNavMenu>

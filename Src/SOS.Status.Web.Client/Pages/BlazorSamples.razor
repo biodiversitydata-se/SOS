@@ -77,14 +77,28 @@
         </MudTabs>
     </MudTabPanel>
     <MudTabPanel Text="State">
-        <p>This page uses local storage</p>
-        <MudText Typo="Typo.body1" Class="pt-4">Welcome @State.Username!</MudText>
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" @onclick="@(() => ChangeNameAsync("Sara"))">Byt namn 1</MudButton>
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" @onclick="@(e => ChangeNameAsync("Martin"))"> Byt namn 2</MudButton>        
-        <div>
-            <MudText Typo="Typo.h6" Class="pt-4">State as JSON for debugging purpose</MudText>            
-            <pre>@(State?.ToJson() ?? "State is null")</pre>
-        </div>
+        <MudTabs Outlined="true" Elevation="0" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-2">
+            <MudTabPanel Text="Persistent state">
+                <p>State is persisted for properties marked with [PersistentState] when resuming circuit.</p>
+                <MudStack AlignItems="AlignItems.Start" Spacing="2">
+                    <MudText Typo="Typo.body1">Current count with persistence: @CurrentCountWithPersistence</MudText>
+                    <MudText Typo="Typo.body1">Current count without persistence: @CurrentCount</MudText>
+
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" @onclick="IncrementCount">Increment</MudButton>
+                    <MudButton Variant="Variant.Filled" Color="Color.Secondary" Size="Size.Small" @onclick="PauseCircuitAsync">Pause circuit</MudButton>
+                </MudStack>
+            </MudTabPanel>
+            <MudTabPanel Text="Local storage">
+                <p>This page uses local storage</p>
+                <MudText Typo="Typo.body1" Class="pt-4">Welcome @State.Username!</MudText>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" @onclick="@(() => ChangeNameAsync("Sara"))">Byt namn 1</MudButton>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" @onclick="@(e => ChangeNameAsync("Martin"))"> Byt namn 2</MudButton>        
+                <div>
+                    <MudText Typo="Typo.h6" Class="pt-4">State as JSON for debugging purpose</MudText>            
+                    <pre>@(State?.ToJson() ?? "State is null")</pre>
+                </div>
+            </MudTabPanel>
+        </MudTabs>
     </MudTabPanel>    
     <MudTabPanel Text="JavaScript">
         <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" @onclick="TestJavaScriptAsync">Test JavaScript</MudButton>        

@@ -1,0 +1,42 @@
+﻿@page "/counter"
+@inject IJSRuntime JS
+
+<PageTitle>Counter</PageTitle>
+<MudText Typo="Typo.h4" Class="pt-4">Counter</MudText>
+
+<MudStack AlignItems="AlignItems.Start" Spacing="2">
+<MudText Typo="Typo.body1">Current count with persistence: @CurrentCountWithPersistence</MudText>
+<MudText Typo="Typo.body1">Current count without persistence: @CurrentCount</MudText>
+
+<MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" @onclick="IncrementCount">Increment</MudButton>
+<MudButton Variant="Variant.Filled" Color="Color.Secondary" Size="Size.Small" @onclick="PauseAsync">Pause circuit</MudButton>
+</MudStack>
+
+@code {
+    private IJSObjectReference? _module;
+
+    [PersistentState]
+    public int CurrentCountWithPersistence { get; set; }
+    
+    public int CurrentCount { get; set; }
+
+    private void IncrementCount()
+    {
+        CurrentCountWithPersistence++;
+        CurrentCount++;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _module = await JS.InvokeAsync<IJSObjectReference>(
+                "import", "./Pages/Counter.razor.js");
+        }
+    }
+
+    private async Task PauseAsync()
+    {
+        await _module!.InvokeVoidAsync("pauseCircuit");
+    }    
+}

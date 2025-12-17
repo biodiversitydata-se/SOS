@@ -1,4 +1,5 @@
 using Blazored.LocalStorage;
+using Microsoft.AspNetCore.Components.Server.Circuits;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting.StaticWebAssets;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -6,6 +7,7 @@ using MudBlazor;
 using MudBlazor.Services;
 using Serilog;
 using SOS.Lib.Helpers;
+using SOS.Status.Web;
 using SOS.Status.Web.Client.Abstractions;
 using SOS.Status.Web.Client.JsonConverters;
 using SOS.Status.Web.Client.Models;
@@ -34,10 +36,20 @@ try
     Settings.Init(configurationRoot);
     builder.Services.AddMudServices();
     builder.Services.AddMudMarkdownServices();
-
+    //builder.Services.AddSingleton<CircuitHandler, LoggingCircuitHandler>();
     // Add services to the container.
     builder.Services.AddRazorComponents()
-        .AddInteractiveServerComponents()
+        .AddInteractiveServerComponents(options =>
+        {
+            options.DisconnectedCircuitRetentionPeriod = TimeSpan.FromMinutes(10);
+            options.JSInteropDefaultCallTimeout = TimeSpan.FromMinutes(1);
+            options.PersistedCircuitInMemoryMaxRetained = 100;
+            options.PersistedCircuitInMemoryRetentionPeriod = TimeSpan.FromHours(8);
+        })
+        .AddCircuitOptions(options =>
+        {
+            options.DetailedErrors = isDevelopment;
+        })        
         .AddInteractiveWebAssemblyComponents()
         .AddAuthenticationStateSerialization(options => options.SerializeAllClaims = true);
 
