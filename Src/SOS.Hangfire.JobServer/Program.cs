@@ -112,7 +112,7 @@ public class Program
 
         builder.Logging.ClearProviders();
         builder.Logging.AddConfiguration(builder.Configuration.GetSection("Logging"));
-        builder.Logging.AddNLog($"NLog.{env}.config");
+        builder.Logging.AddNLogWeb($"NLog.{env}.config");
 
         // Use Swedish culture info.
         var culture = new CultureInfo("sv-SE");
@@ -209,7 +209,7 @@ public class Program
                     cfg.Host($"Endpoint={busConfiguration.Host};SharedAccessKeyName={busConfiguration.SharedAccessKeyName};SharedAccessKey={busConfiguration.SharedAccessKey}");
                     cfg.ReceiveEndpoint(busConfiguration.Queue, e =>
                     {
-                        e.MaxConcurrentCalls = 1;
+                        e.ConcurrentMessageLimit = 1;
                         e.ConfigureConsumer<ArtportalenConsumer>(context);
                     });
                 });
