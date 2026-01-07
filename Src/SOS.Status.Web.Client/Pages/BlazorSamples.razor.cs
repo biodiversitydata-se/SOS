@@ -22,6 +22,9 @@ public partial class BlazorSamples
 
     [PersistentState]
     public int CurrentCountWithPersistence { get; set; }
+
+    [PersistentState]
+    public int ActiveTabIndex {  get; set; }
     public int CurrentCount { get; set; }
 
     const string def1 = @"

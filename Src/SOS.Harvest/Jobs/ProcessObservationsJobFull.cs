@@ -163,7 +163,7 @@ public class ProcessObservationsJobFull : ProcessObservationsJobBase, IProcessOb
         var healthStatus = await _processedObservationRepository.GetHealthStatusAsync(HealthStatus.Green, 1);
         if (healthStatus == HealthStatus.Red)
         {
-            _logger.LogError("Elastich health status: Red");
+            _logger.LogError("Elasticsearch health status: Red");
             return false;
         }
 

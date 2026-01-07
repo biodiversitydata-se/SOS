@@ -9,7 +9,7 @@
 
 <PageTitle>Blazor samples</PageTitle>
 <MudText Typo="Typo.h4">Blazor samples</MudText>
-<MudTabs Class="mt-2" Outlined="true" Elevation="1" Rounded="true" Border="true" ApplyEffectsToContainer="true" PanelClass="pa-6">
+<MudTabs Class="mt-2" Outlined="true" Elevation="1" Rounded="true" Border="true" ApplyEffectsToContainer="true" PanelClass="pa-6" @bind-ActivePanelIndex="ActiveTabIndex">
     <MudTabPanel Text="Components">
         <MudTabs Outlined="true" Elevation="0" Rounded="true" Border="true" ApplyEffectsToContainer="true" PanelClass="pa-3">
             <MudTabPanel Text="Component in C#">

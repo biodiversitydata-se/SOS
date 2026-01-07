@@ -2,10 +2,12 @@
 using CSharpFunctionalExtensions;
 using Elastic.Clients.Elasticsearch;
 using Elastic.Clients.Elasticsearch.Aggregations;
-using Elastic.Clients.Elasticsearch.Core.Search;
 using Elastic.Clients.Elasticsearch.Cluster;
+using Elastic.Clients.Elasticsearch.Core.Search;
+using Elastic.Clients.Elasticsearch.Fluent;
 using Elastic.Clients.Elasticsearch.Mapping;
 using Elastic.Clients.Elasticsearch.QueryDsl;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Shared;
@@ -25,9 +27,8 @@ using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using System.Collections.Concurrent;
+using System.Text;
 using System.Text.Json;
-using Elastic.Clients.Elasticsearch.Fluent;
-using Microsoft.Extensions.Caching.Memory;
 
 namespace SOS.Lib.Repositories.Processed;
 
@@ -1782,7 +1783,7 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
     public async Task<HealthStatus> GetHealthStatusAsync(HealthStatus waitForStatus, int waitForSeconds)
     {
         try
-        {
+        {                        
             var response = await Client.Cluster
                     .HealthAsync(new[] { Indices.Index(PublicIndexName), Indices.Index(ProtectedIndexName) }, chr => chr
                         .Level(Level.Indices)
@@ -1790,14 +1791,59 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
                         .WaitForStatus(waitForStatus)
                     );
 
-            return response.IsValidResponse ? response.Status : HealthStatus.Red;
+            if (!response.IsValidResponse)
+            {
+                Logger.LogError($"Elasticsearch health check failed explicitly. Debug info: {response.DebugInformation}");
+                return HealthStatus.Red;
+            }
+            
+            if (response.Status == HealthStatus.Red)
+            {
+                var errorDetails = GetRedClusterDetails(response);
+                Logger.LogError($"Elasticsearch status is RED. Details:\n{errorDetails}");
+
+                return HealthStatus.Red;
+            }
+
+            return response.Status;
         }
         catch (Exception e)
         {
-            Logger.LogError(e, "Failed to get ElasticSearch health");
+            Logger.LogError(e, "Failed to get ElasticSearch health due to exception.");
             return HealthStatus.Red;
         }
     }
+    private string GetRedClusterDetails(HealthResponse response)
+    {
+        var sb = new StringBuilder();
+        sb.AppendLine($"Cluster Name: {response.ClusterName}");
+        sb.AppendLine($"Unassigned Shards: {response.UnassignedShards}");
+        sb.AppendLine($"Active Primary Shards: {response.ActivePrimaryShards}");
+        
+        if (response.Indices != null)
+        {
+            foreach (var index in response.Indices)
+            {                
+                if (index.Value.Status != HealthStatus.Green)
+                {
+                    sb.AppendLine($"--- Index: {index.Key} ---");
+                    sb.AppendLine($"   Status: {index.Value.Status}");
+                    sb.AppendLine($"   Active Shards: {index.Value.ActiveShards}");
+                    sb.AppendLine($"   Active Primary Shards: {index.Value.ActivePrimaryShards}");
+                    sb.AppendLine($"   Relocating Shards: {index.Value.RelocatingShards}");
+                    sb.AppendLine($"   Initializing Shards: {index.Value.InitializingShards}");
+                    sb.AppendLine($"   Unassigned Shards: {index.Value.UnassignedShards}");
+                }
+            }
+        }
+        else
+        {
+            sb.AppendLine("No detailed index information available (Did you set Level.Indices?).");
+        }
+
+        return sb.ToString();
+    }
+
 
     /// <inheritdoc />
     public async Task<DateTime> GetLatestModifiedDateForProviderAsync(int providerId)
