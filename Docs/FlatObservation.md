@@ -77,7 +77,7 @@ All fields in the Minimum field set, and also the following fields:
 | Behavior | Occurrence.Behavior | Beteende | Behaviour | String | Extended |
 | Biotope | Occurrence.Biotope | Biotop | Biotope | String | Extended |
 | BiotopeDescription | Occurrence.BiotopeDescription | Biotopbeskrivning | Biotope description | String | Extended |
-| AssociatedMedia | Occurrence.AssociatedMedia | Associerad media | Associated media | String | Extended |
+| AssociatedMedia ⚠️ **DEPRECATED** – This field is no longer used. | Occurrence.AssociatedMedia | Associerad media | Associated media | String | Extended |
 | LifeStage | Occurrence.LifeStage | Stadium | Life stage | String | Extended |
 | ReproductiveCondition | Occurrence.ReproductiveCondition | Reproduktionsstatus | Reproductive condition | String | Extended |
 | Sex | Occurrence.Sex | Kön | Sex | String | Extended |

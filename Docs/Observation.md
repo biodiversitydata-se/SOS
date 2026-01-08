@@ -71,7 +71,7 @@ All fields that are part of an observation are listed on this page.
 | occurrence.reproductiveCondition 	| VocabularyValue[\<reproductiveCondition\>](Vocabularies.md#reproductiveCondition)	| \{ "id":13, "value":"ruvfläckar" \}	| The reproductive condition of the biological individual(s) represented in   the Occurrence. 	| https://dwc.tdwg.org/terms/#dwc:reproductiveCondition 	|
 | occurrence.sex 	| VocabularyValue[\<sex\>](Vocabularies.md#sex)	| \{ "id":2, "value":"hona" \}	| The sex of the biological individual(s) represented in the Occurrence. 	| https://dwc.tdwg.org/terms/#dwc:sex 	|
 | occurrence.biotopeDescription 	| string 	| "havsstrandäng med låga kullar och fuktdrag" 	| Description of biotope.    	|  	|
-| occurrence.associatedMedia 	| string 	| http://www.artportalen.se/Image/744511 	| A list of identifiers of media associated with the Occurrence.    	| https://dwc.tdwg.org/terms/#dwc:associatedMedia 	|
+| occurrence.associatedMedia ⚠️	| string 	| http://www.artportalen.se/Image/744511 	| **DEPRECATED** – This field is no longer used.    	| https://dwc.tdwg.org/terms/#dwc:associatedMedia 	|
 | occurrence.associatedReferences 	| string 	| "urn:lsid:artportalen.se:Sighting:PlantAndMushroom.4518773" 	| A list of identifiers of literature associated with the Occurrence.    	| https://dwc.tdwg.org/terms/#dwc:associatedReferences 	|
 | occurrence.birdNestActivityId 	| int32    	| 4 	| Bird nest activity id. 0 if not a   bird. Bird occurrences without an activity gets the value 1000000. Use   birdNestActivityLimit filter when searching.    	|  	|
 | occurrence.individualCount 	| string 	| "1" 	| The number of individuals represented present at the time of the   Occurrence.    	| https://dwc.tdwg.org/terms/#dwc:occurrence.individualCount 	|

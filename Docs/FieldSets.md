@@ -65,7 +65,7 @@ Several endpoints supports specifying which fields in an observation you want to
 | &nbsp;&nbsp;occurrence.organismQuantityInt | int32 | 1 |
 | &nbsp;&nbsp;occurrence.organismQuantityUnit | VocabularyValue[\<unit\>](Vocabularies.md#unit) | \{ "id":1, "value":"plantor/tuvor" \} |
 | &nbsp;&nbsp;occurrence.url | string | "http://www.artportalen.se/sighting/474560" |
-| &nbsp;&nbsp;occurrence.associatedMedia | string | http://www.artportalen.se/Image/744511 |
+| &nbsp;&nbsp;occurrence.associatedMedia ⚠️ **DEPRECATED** – This field is no longer used.  | string | http://www.artportalen.se/Image/744511 |
 | &nbsp;&nbsp;occurrence.occurrenceRemarks | string | "Floraundersökning   kalkeffekter åt länsstyrelsen ej kalkat" |
 | &nbsp;&nbsp;occurrence.activity | VocabularyValue[\<activity\>](Vocabularies.md#activity) | \{ "id":25, "value":"födosökande" \} |
 | &nbsp;&nbsp;occurrence.behavior | VocabularyValue[\<behavior\>](Vocabularies.md#behavior) | \{ "id":17, "value":"permanent revir" \} |
