@@ -40,6 +40,8 @@ This page provides information about how to use the search filter parameters.
 
 
 ## Data provider filter
+The data provider filter allows specifying dataset from which to return observations. By default, searching observations will return observations from most [datasets and data providers](https://github.com/biodiversitydata-se/SOS/blob/master/Docs/DataProviders.md#datasets-from-different-data-providers).
+
 This filter will return observations only from Artportalen and MVM.
 ```json
 {    
@@ -485,6 +487,8 @@ This filter will return observations for species belonging to birds (Aves, Taxon
 ```
 
 ## Projects filter
+The projects filter allows specifying projects in the *Artportalen* dataset from which to return observations. In *Artportalen* projects define subsets of records that have been collected with a specific porpose.
+
 This filter will return observations in the project ArtArken
 ```json
 {
@@ -494,14 +498,14 @@ This filter will return observations in the project ArtArken
 
 
 ## Occurrence status filter
-This filter will return observations with occurrenceStatus "present"
+This filter will return observations with occurrenceStatus "present" (observed)
 ```json
 {
     "occurrenceStatus": "present"
 }
 ```
 
-This filter will return observations with occurrenceStatus "absent"
+This filter will return observations with occurrenceStatus "absent" (not observed, meaning a species that was looked for could not be observed at the time of the inventory, note that this does not necessarily mean that the species was truly absent)
 ```json
 {
     "occurrenceStatus": "absent"
@@ -509,7 +513,9 @@ This filter will return observations with occurrenceStatus "absent"
 ```
 
 ## Verification status filter
-This filter will return only verified observations.
+The verification filter allows specifying whether to return only verified observations. Note that verification process differs between datasets and that within one dataset rarley all records undergo manyal verification. Records in the *Artportalen* dataset are verified largely by volunteers, primarily aiming to verify records of rare species that may be difficult to identify and records of species important for nature conservation ([principle for verification in Artportalen](https://www.slu.se/artdatabanken/rapportering-och-fynd/fynduppgifter-och-skyddsklassade-arter/verifiering-av-fynduppgifter/grundprinciper-for-verifiering-i-artportalen/)). The amount of records beeing verified differs among different organism groups. Unverified records are basically unreviewed observation records that have to be judged by the user.
+
+ This filter will return only verified observations.
 ```json
 {
     "verificationStatus": "Verified"
@@ -524,6 +530,8 @@ This filter will return only non verified observations.
 ```
 
 ## Determination filter
+The determination filter can be applied to records that underwent taxonomic determination (normally specimen samples for which the assignement to a taxon has been examined by an taxonomist).
+
 This filter will only return observations where `observation.identification.uncertainIdentification=false`.
 ```json
 {
@@ -539,6 +547,8 @@ This filter will only return observations where `observation.identification.unce
 ```
 
 ## NotRecovered filter
+The notrecovered filter allows specifying whether to include records of species that were not recovered (a species formerly known to be present at a location could not be observed at the time of the inventory). This type of record applies only to records from the *Artportalen* dataset.
+
 This filter will only return observations where `observation.occurrence.isNotRediscoveredObservation=false`.
 ```json
 {
@@ -568,7 +578,9 @@ Don't apply this filter (default)
 `occurrence.isNotRediscoveredObservation` - *Indicates if this observation is a not rediscovered observation. "Not rediscovered observation" is an observation that says that the specified species was not found in a location where it has previously been observed.*
 
 ## BirdNestActivityLimit filter
-This filter returns observations where `observation.occurrence.birdNestActivityId` is lower than or equal to the filter value.
+This BirdNestActivityLimit filter applies only to records from the *Artportalen* dataset where 'breeding criteria' are a subset of activities (behaviours, tracks or traces observed) that can be applied to observations of birds to indicate the likelihood of a species breeding in a given area. 
+
+This filter returns observations where `observation.occurrence.birdNestActivityId` is lower than or equal to the filter value. (Lower Id numbers refer to criteria of higher likelyhood of breeding.)
 ```json
 {
     "birdNestActivityLimit": 10
