@@ -413,7 +413,7 @@ public class ProcessObservationsJobFull : ProcessObservationsJobBase, IProcessOb
             {
                 if (!await HarvestIncremetalInactiveInstance(cancellationToken))
                 {
-                    throw new Exception("Failed to harvest incremetal inactive instance");
+                    throw new Exception("Failed to harvest incremental inactive instance");
                 }
             }
 
@@ -514,15 +514,27 @@ public class ProcessObservationsJobFull : ProcessObservationsJobBase, IProcessOb
             // Get on going job id's
             var onGoingJobIds = GetOnGoingJobIds("ICreateDoiJob", "IExportAndSendJob", "IExportAndStoreJob");
 
+            //---------------------------------------------------------------
+            // 12. Start harvest of Artportalen observations that has been
+            //     added since processing of events, datasets, dwc-a files started
+            //---------------------------------------------------------------
+            if (_processConfiguration.RunIncrementalAfterFull)
+            {
+                if (!await HarvestIncremetalInactiveInstance(cancellationToken))
+                {
+                    throw new Exception("Failed to harvest incremental inactive instance");
+                }
+            }
+
             //---------------------------------------------------------
-            // 12. Toggle active instance when full processing is done
+            // 13. Toggle active instance when full processing is done
             //---------------------------------------------------------
             _logger.LogInformation("Toggle instance {@activeInstance} => {@inactiveInstance}", _processedObservationRepository.ActiveInstance, _processedObservationRepository.InActiveInstance);
             await _processedObservationRepository.SetActiveInstanceAsync(_processedObservationRepository
                 .InActiveInstance);
 
             //-------------------------------------------------------------------------
-            // 13. Clear ProcessedConfiguration cache in all dependent services (APIs)
+            // 14. Clear ProcessedConfiguration cache in all dependent services (APIs)
             //-------------------------------------------------------------------------
             _logger.LogInformation($"Start clear processed configuration cache at search api");
             await _cacheManager.ClearAsync(Cache.ProcessedConfiguration);
