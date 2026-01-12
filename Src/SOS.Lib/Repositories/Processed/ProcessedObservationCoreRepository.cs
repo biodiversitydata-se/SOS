@@ -1813,6 +1813,79 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
             return HealthStatus.Red;
         }
     }
+
+    public async Task<HealthStatus> WaitForHealthyClusterAsync(
+        HealthStatus waitForStatus,
+        int maxAttempts = 12,
+        TimeSpan? delayBetweenAttempts = null,
+        CancellationToken cancellationToken = default)
+    {
+        delayBetweenAttempts ??= TimeSpan.FromMinutes(5);
+
+        for (var attempt = 1; attempt <= maxAttempts; attempt++)
+        {
+            try
+            {
+                Logger.LogInformation(
+                    "Elasticsearch health check attempt {Attempt}/{MaxAttempts}",
+                    attempt, maxAttempts);
+
+                var response = await Client.Cluster.HealthAsync(
+                    new[]
+                    {
+                    Indices.Index(PublicIndexName),
+                    Indices.Index(ProtectedIndexName)
+                    },
+                    chr => chr
+                        .Level(Level.Indices)
+                        .WaitForStatus(waitForStatus)
+                        .Timeout(TimeSpan.FromSeconds(30)),
+                    cancellationToken
+                );
+
+                if (response.IsValidResponse)
+                {
+                    if (response.Status == waitForStatus)
+                    {
+                        Logger.LogInformation(
+                            "Elasticsearch cluster reached status {Status} on attempt {Attempt}",
+                            response.Status, attempt);
+
+                        return response.Status;
+                    }
+
+                    Logger.LogWarning(
+                        "Elasticsearch cluster status {Status} (attempt {Attempt})",
+                        response.Status, attempt);
+                }
+                else
+                {
+                    Logger.LogWarning(
+                        "Invalid Elasticsearch response (attempt {Attempt}): {Debug}",
+                        attempt, response.DebugInformation);
+                }
+            }
+            catch (Exception ex) when (!cancellationToken.IsCancellationRequested)
+            {
+                Logger.LogWarning(
+                    ex,
+                    "Elasticsearch health check failed on attempt {Attempt}",
+                    attempt);
+            }
+
+            if (attempt < maxAttempts)
+            {
+                await Task.Delay(delayBetweenAttempts.Value, cancellationToken);
+            }
+        }
+
+        Logger.LogError(
+            "Elasticsearch cluster did not reach status {Status} after {Attempts} attempts",
+            waitForStatus, maxAttempts);
+
+        return HealthStatus.Red;
+    }
+
     private string GetRedClusterDetails(HealthResponse response)
     {
         var sb = new StringBuilder();

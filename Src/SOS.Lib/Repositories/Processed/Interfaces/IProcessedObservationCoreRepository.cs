@@ -117,7 +117,13 @@ public interface IProcessedObservationCoreRepository : IProcessRepositoryBase<Ob
     /// <param name="waitForSeconds"></param>
     /// <returns></returns>
     Task<HealthStatus> GetHealthStatusAsync(HealthStatus waitForStatus, int waitForSeconds);
-    
+
+    Task<HealthStatus> WaitForHealthyClusterAsync(
+        HealthStatus waitForStatus,
+        int maxAttempts = 12,
+        TimeSpan? delayBetweenAttempts = null,
+        CancellationToken cancellationToken = default);
+
     /// <summary>
     /// Get latest data modified date for passed provider 
     /// </summary>

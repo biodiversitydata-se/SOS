@@ -159,8 +159,12 @@ public class ProcessObservationsJobFull : ProcessObservationsJobBase, IProcessOb
     /// <param name="mode"></param>
     /// <returns></returns>
     private async Task<bool> ValidateIndexesAsync()
-    {
-        var healthStatus = await _processedObservationRepository.GetHealthStatusAsync(HealthStatus.Green, 60 * 60); // wait max 1 hour for green status.
+    {        
+        var healthStatus = await _processedObservationRepository.WaitForHealthyClusterAsync(
+            HealthStatus.Green,
+            12,
+            TimeSpan.FromMinutes(5),
+            CancellationToken.None);
         if (healthStatus == HealthStatus.Red)
         {
             _logger.LogError("Elasticsearch health status: Red");
