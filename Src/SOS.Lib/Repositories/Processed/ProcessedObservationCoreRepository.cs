@@ -395,7 +395,7 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
                         )
                         .Object(o => o.Identification.VerificationStatus, c => c
                             .Properties(ps => ps
-                                .KeywordVal(kwlc => kwlc.Identification.VerificationStatus.Value, IndexSetting.SearchOnly)
+                                .KeywordVal(kwlc => kwlc.Identification.VerificationStatus.Value, IndexSetting.SearchSortAggregate)
                                 .NumberVal(nr => nr.Identification.VerificationStatus.Id, IndexSetting.SearchSortAggregate, NumberType.Byte)
                             )
                         )
@@ -592,13 +592,13 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
                         )
                         .Object(o => o.Occurrence.OccurrenceStatus, c => c
                             .Properties(ps => ps
-                                .KeywordVal(kwlc => kwlc.Occurrence.OccurrenceStatus.Value, IndexSetting.None)
+                                .KeywordVal(kwlc => kwlc.Occurrence.OccurrenceStatus.Value, IndexSetting.SearchSortAggregate)
                                 .NumberVal(nr => nr.Occurrence.OccurrenceStatus.Id, IndexSetting.None, NumberType.Byte)
                             )
                         )
                         .Object(o => o.Occurrence.Activity, c => c
                         .Properties(ps => ps
-                                .KeywordVal(kwlc => kwlc.Occurrence.Activity.Value, IndexSetting.SearchOnly)
+                                .KeywordVal(kwlc => kwlc.Occurrence.Activity.Value, IndexSetting.SearchSortAggregate)
                                 .NumberVal(nr => nr.Occurrence.Activity.Id, IndexSetting.SearchSortAggregate, NumberType.Integer)
                             )
                         )
@@ -622,7 +622,7 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
                         )
                         .Object(o => o.Occurrence.LifeStage, c => c
                             .Properties(ps => ps
-                                .KeywordVal(kwlc => kwlc.Occurrence.LifeStage.Value, IndexSetting.SearchOnly)
+                                .KeywordVal(kwlc => kwlc.Occurrence.LifeStage.Value, IndexSetting.SearchSortAggregate)
                                 .NumberVal(nr => nr.Occurrence.LifeStage.Id, IndexSetting.SearchSortAggregate, NumberType.Integer)
                             )
                         )
@@ -640,7 +640,7 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
                         )
                         .Object(o => o.Occurrence.Sex, c => c
                         .Properties(ps => ps
-                                .KeywordVal(kwlc => kwlc.Occurrence.Sex.Value, IndexSetting.SearchOnly)
+                                .KeywordVal(kwlc => kwlc.Occurrence.Sex.Value, IndexSetting.SearchSortAggregate)
                                 .NumberVal(nr => nr.Occurrence.Sex.Id, IndexSetting.SearchSortAggregate, NumberType.Integer)
                             )
                         )
