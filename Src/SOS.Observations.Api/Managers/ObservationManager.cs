@@ -185,6 +185,37 @@ public class ObservationManager : IObservationManager
         }
     }
 
+    /// <inheritdoc />    
+    public async Task<SearchAfterResult<JsonObject, string>> GetChunkBySearchAfterAsync(
+        int? roleId,
+        string authorizationApplicationIdentifier,
+        SearchFilter filter,
+        int take,
+        string? searchAfter)
+    {
+        try
+        {
+            await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
+            var response = await _processedObservationRepository.GetChunkBySearchAfterAsync<JsonObject>(filter, take, searchAfter);
+            response.Records = await PostProcessObservationsAsync(filter, filter.ExtendedAuthorization.ProtectionFilter, response.Records, filter.FieldTranslationCultureCode);
+            return response;
+        }
+        catch (AuthenticationRequiredException)
+        {
+            throw;
+        }
+        catch (TimeoutException e)
+        {
+            _logger.LogError(e, "Get chunk of observations by search_after timeout");
+            throw;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Failed to get chunk of observations by search_after");
+            return null;
+        }
+    }
+
     /// <inheritdoc />
     public async Task<ScrollResult<JsonObject>> GetObservationsByScrollAsync(
         int? roleId,

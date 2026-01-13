@@ -6,6 +6,7 @@ using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Repositories.Processed;
 using SOS.Shared.Api.Configuration;
 using SOS.Shared.Api.Dtos.Enum;
 using SOS.Shared.Api.Dtos.Filter;
@@ -547,6 +548,19 @@ public class InputValidator : IInputValidator
             return Result.Failure("Unknown FieldTranslationCultureCode. Supported culture codes, sv-SE, en-GB");
         }
 
+        return Result.Success();
+    }
+
+    public Result ValidateCursor(string searchAfter)
+    {
+        if (string.IsNullOrWhiteSpace(searchAfter)) return Result.Success();
+        
+        var searchAfterObj = SearchAfterCoder.Decode(searchAfter);
+        if (searchAfterObj == null || !searchAfterObj.Any())
+        {
+            return Result.Failure("Invalid search after cursor");
+        }
+        
         return Result.Success();
     }
 

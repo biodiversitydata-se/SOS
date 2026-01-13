@@ -212,4 +212,6 @@ public interface IInputValidator
     /// <param name="translationCultureCode"></param>
     /// <returns></returns>
     Result ValidateTranslationCultureCode(string translationCultureCode);
+
+    Result ValidateCursor(string searchAfter);
 }

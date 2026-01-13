@@ -657,6 +657,126 @@ public class ObservationsController : ControllerBase
     }
 
     /// <summary>
+    ///     Get observations matching the provided search filter using Elasticsearch search_after function for deep pagination.
+    ///     The results are sorted by the specified field and the cursor value from the previous response
+    ///     should be passed to get the next page.
+    /// </summary>
+    /// <remarks>
+    /// This is an experimental endpoint for deep pagination using Elasticsearch search_after function.
+    /// If it requires too much resources, it may be disabled or rate limited in the future.
+    /// 
+    /// **Important**: To use search_after pagination effectively:
+    /// 1. You MUST use the same sort field (sortBy parameter) in each request.
+    /// 2. For the first request, don't provide cursor value.
+    /// 3. For subsequent requests, pass the cursor value from the previous response.
+    /// 4. The cursor value is the sort values from the last document in the previous page. This value is base64-encoded.
+    /// 5. If the result cursor value is null or empty, there are no more pages to retrieve.
+    /// 6. You are only allowed to paginate results with Total count lower or equal to 2,000,000. If the total count exceeds this limit, a bad request response will be returned.
+    ///
+    /// **Note**: search_after provides a "live" view of the data.
+    /// Documents added or removed between requests may affect pagination consistency. Your application need to handle duplicate or missing documents accordingly.
+    /// </remarks>
+    /// <param name="roleId">Limit user authorization to specified role.</param>
+    /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
+    /// <param name="filter">Filter used to limit the search.</param>
+    /// <param name="take">Max number of observations to return. Max is 2,500 observations in each request.</param>
+    /// <param name="cursor">Sort values from the last document in the previous page. Pass null or omit for the first request. This value is base64-encoded.</param>
+    /// <param name="sortBy">Field to sort by. Required for consistent pagination.</param>
+    /// <param name="sortOrder">Sort order (Asc, Desc).</param>
+    /// <param name="validateSearchFilter">If true, validation of search filter values will be made.</param>
+    /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB).</param>
+    /// <param name="sensitiveObservations">If true, only sensitive (protected) observations will be searched.</param>
+    /// <returns>List of observations and cursor value for the next page.</returns>
+    [HttpPost("SearchByCursor")]
+    [ProducesResponseType(typeof(SearchByCursorResultDto<Observation>), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+    [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+    [ProducesResponseType((int)HttpStatusCode.ServiceUnavailable)]
+    [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+    [AzureApi, AzureInternalApi]
+    public async Task<IActionResult> ObservationsByCursor(
+        [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
+        [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
+        [FromBody] SearchFilterDto? filter,
+        [FromQuery] int take = 1000,
+        [FromQuery] string? cursor = null,
+        [FromQuery] string sortBy = "",
+        [FromQuery] SearchSortOrder sortOrder = SearchSortOrder.Asc,
+        [FromQuery] bool validateSearchFilter = false,
+        [FromQuery] string translationCultureCode = "sv-SE",
+        [FromQuery] bool sensitiveObservations = false)
+    {
+        ApiUserType userType = this.GetApiUserType();
+        var semaphoreResult = await _semaphoreLimitManager.GetSemaphoreAsync(SemaphoreType.Observation, userType, this.GetEndpointName(ControllerContext));
+        LogHelper.AddSemaphoreHttpContextItems(semaphoreResult, HttpContext);
+        if (semaphoreResult.Semaphore == null) return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
+
+        try
+        {
+            LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
+            var protectionFilter = sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public;
+            this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, protectionFilter);
+            filter = await _searchFilterUtility.InitializeSearchFilterAsync(filter);
+            translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
+
+            var validationResult = Result.Combine(
+                take <= 2500 ? Result.Success() : Result.Failure("You can't take more than 2,500 at a time."),
+                string.IsNullOrEmpty(sortBy) ? Result.Success() : (await _inputValidator.ValidateSortFieldsAsync(new[] { sortBy })),
+                _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
+                _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries),
+                _inputValidator.ValidateTranslationCultureCode(translationCultureCode),
+                _inputValidator.ValidateCursor(cursor));
+
+            if (validationResult.IsFailure) return BadRequest(validationResult.Error);
+
+            var sortFieldValidationResult = string.IsNullOrEmpty(sortBy) ? Result.Success<List<string>>(null) : (await _inputValidator.ValidateSortFieldsAsync(new[] { sortBy }));
+            if (sortFieldValidationResult.IsFailure) return BadRequest(sortFieldValidationResult.Error);
+            if (sortFieldValidationResult.Value != null && sortFieldValidationResult.Value.Any())
+            {
+                sortBy = sortFieldValidationResult.Value.First();
+            }
+
+            var searchFilter = filter.ToSearchFilter(this.GetUserId(), protectionFilter, translationCultureCode, sortBy, sortOrder);
+            var result = await _observationManager.GetChunkBySearchAfterAsync(roleId, authorizationApplicationIdentifier, searchFilter, take, cursor);
+
+            if (result == null)
+            {
+                throw new Exception("Something went wrong when your query was executed. Make sure your filter is correct.");
+            }
+
+            if (result.TotalCount > 2_000_000 && !string.IsNullOrWhiteSpace(cursor))
+            {
+                return BadRequest($"You are only allowed to paginate results with Total count lower or equal to 2,000,000. Your total count is: {result.TotalCount}");
+            }
+
+            SearchByCursorResultDto<JsonObject> dto = result.ToSearchByCursorResultDto(result.Records, take);
+            this.LogObservationCount(dto?.Records?.Count() ?? 0);
+            return new OkObjectResult(dto);
+        }
+        catch (AuthenticationRequiredException e)
+        {
+            _logger.LogInformation(e, e.Message);
+            _logger.LogInformation($"Unauthorized. X-Authorization-Application-Identifier={authorizationApplicationIdentifier ?? "[null]"}");
+            _logger.LogInformation($"Unauthorized. X-Authorization-Role-Id={roleId?.ToString() ?? "[null]"}");
+            LogUserInformation();
+            return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
+        }
+        catch (TimeoutException)
+        {
+            return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "SearchByCursor error");
+            return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+        }
+        finally
+        {
+            semaphoreResult.Semaphore.Release();
+        }
+    }
+
+    /// <summary>
     /// Search observations and return in Darwin Core format.
     /// </summary>
     /// <param name="roleId">Limit user authorization too specified role</param>

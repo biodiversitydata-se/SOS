@@ -76,6 +76,7 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
                 .KeywordVal(kwlc => kwlc.References, IndexSetting.None)
                 .KeywordVal(kwlc => kwlc.RightsHolder, IndexSetting.None)
                 .KeywordVal(kwlc => kwlc.SpeciesCollectionLabel, IndexSetting.SearchOnly)
+                .Date(d => d.Modified, c => c.Index(true).DocValues(true))
                 .ByteNumber(b => b.DiffusionStatus, c => c.Index(true))
                 .BooleanVal(b => b.HasGeneralizedObservationInOtherIndex, IndexSetting.SearchOnly)
                 .BooleanVal(b => b.IsGeneralized, IndexSetting.SearchOnly)
@@ -2690,5 +2691,50 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
         searchResponse.ThrowIfInvalid();
 
         return searchResponse;
+    }
+       
+    public async Task<SearchAfterResult<T, string>> GetChunkBySearchAfterAsync<T>(
+        SearchFilter filter,
+        int take,
+        string? searchAfter,
+        bool getAllFields = false) where T : class
+    {
+        var indexNames = GetCurrentIndex(filter);
+        var (query, excludeQuery) = GetCoreQueries<T>(filter);
+        var sortDescriptor = await Client.GetSortDescriptorAsync<T, Observation>(indexNames, filter?.Output?.SortOrders);
+        ICollection<FieldValue>? searchAfterObj = SearchAfterCoder.Decode(searchAfter);
+        
+        var searchResponse = await Client.SearchAsync<T>(s =>        
+            s.Indices(indexNames)
+                .Source(getAllFields ? new SourceConfig(true) : filter.Output?.Fields.ToProjection(filter is SearchFilterInternal))
+                .Size(take)
+                .Query(q => q
+                    .Bool(b => b
+                        .MustNot(excludeQuery.ToArray())
+                        .Filter(query.ToArray())
+                    )
+                )
+                .Sort(sortDescriptor.ToArray())
+                .SearchAfter(searchAfterObj)
+                .TrackTotalHits(new TrackHits(true))
+        );
+
+        searchResponse.ThrowIfInvalid();        
+        var totalCount = searchResponse.Total;
+
+        // Extract searchAfter values from the last hit        
+        string? nextSearchAfter = null;
+        var lastHit = searchResponse.Hits?.LastOrDefault();
+        if (lastHit?.Sort != null && searchResponse.Documents.Any())
+        {            
+            nextSearchAfter = SearchAfterCoder.Encode(lastHit.Sort);            
+        }
+
+        return new SearchAfterResult<T, string>
+        {
+            Records = searchResponse.Documents,
+            SearchAfter = nextSearchAfter,
+            TotalCount = totalCount
+        };
     }
 }

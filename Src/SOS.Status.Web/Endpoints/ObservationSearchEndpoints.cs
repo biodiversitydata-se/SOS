@@ -41,6 +41,35 @@ public static class ObservationSearchEndpoints
                     }
                 });
 
+            app.MapPost("/api/observations/searchbycursor",
+                async ([FromServices] ObservationSearchService service,
+                       [FromBody] SearchFilterInternalDto filter,
+                       [FromQuery] int take = 1000,
+                       [FromQuery] string? cursor = null,
+                       [FromQuery] string sortBy = "taxon.id",
+                       [FromQuery] string sortOrder = "Asc",
+                       [FromQuery] bool validateSearchFilter = false,
+                       [FromQuery] string translationCultureCode = "sv-SE",
+                       [FromQuery] bool sensitiveObservations = false) =>
+                {
+                    var result = await service.SearchObservationsByCursor(
+                        filter,
+                        take,
+                        cursor,
+                        sortBy,
+                        sortOrder,
+                        validateSearchFilter,
+                        translationCultureCode,
+                        sensitiveObservations);
+
+                    if (result.IsFailure)
+                    {
+                        return Results.BadRequest(new { error = result.Error });
+                    }
+
+                    return Results.Ok(result.Value);
+                });
+
             return app;
         }
     }
