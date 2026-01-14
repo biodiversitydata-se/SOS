@@ -1,6 +1,4 @@
 ﻿using SOS.Lib.Helpers;
-using System;
-using System.Collections.Generic;
 using System.Globalization;
 
 namespace SOS.Lib.Models.Processed.Observation;
@@ -24,6 +22,48 @@ public class Event
         date = date.Value.ToLocalTime();
         var cal = new GregorianCalendar();
         return ((date.Value.Month - 1) * 4) + (int)Math.Ceiling(date.Value.Day / Math.Round((double)cal.GetDaysInMonth(date.Value.Year, date.Value.Month) / 4));
+    }
+
+    private void Initialize(DateTime? startDate, DateTime? endDate)
+    {
+        if (startDate.HasValue && startDate.Value.Kind == DateTimeKind.Unspecified)
+        {
+            startDate = DateTime.SpecifyKind(startDate.Value, DateTimeKind.Local);
+        }
+        if (endDate.HasValue && endDate.Value.Kind == DateTimeKind.Unspecified)
+        {
+            endDate = DateTime.SpecifyKind(endDate.Value, DateTimeKind.Local);
+        }
+
+        VerbatimEventDate = DwcFormatter.CreateDateIntervalString(startDate?.ToLocalTime(), endDate?.ToLocalTime());
+
+        if (startDate.HasValue)
+        {
+            StartDate = startDate.Value.ToUniversalTime();
+
+            var startDateLocal = startDate.Value.ToLocalTime();
+            PlainStartDate = startDateLocal.ToString("yyyy-MM-dd");
+            PlainStartTime = startDateLocal.ToString("HH\\:mm");
+            StartYear = startDateLocal.Year;
+            StartMonth = startDateLocal.Month;
+            StartDay = startDateLocal.Day;
+            StartDayOfYear = startDateLocal.DayOfYear;
+            StartHistogramWeek = CalculateHistogramWeek(startDateLocal);
+        }
+
+        if (endDate.HasValue)
+        {
+            EndDate = endDate.Value.ToUniversalTime();
+           
+            var endDateLocal = endDate.Value.ToLocalTime();
+            PlainEndDate = endDateLocal.ToString("yyyy-MM-dd");
+            PlainEndTime = endDateLocal.ToString("HH\\:mm");
+            EndYear = endDateLocal.Year;
+            EndMonth = endDateLocal.Month;
+            EndDay = endDateLocal.Day;
+            EndDayOfYear = endDateLocal.DayOfYear;
+            EndHistogramWeek = CalculateHistogramWeek(endDateLocal);
+        }
     }
 
     /// <summary>
@@ -53,38 +93,7 @@ public class Event
     /// <param name="endDate"></param>
     public Event(DateTime? startDate, DateTime? endDate)
     {
-        if (startDate.HasValue && startDate.Value.Kind == DateTimeKind.Unspecified)
-        {
-            startDate = DateTime.SpecifyKind(startDate.Value, DateTimeKind.Local);
-        }
-        if (endDate.HasValue && endDate.Value.Kind == DateTimeKind.Unspecified)
-        {
-            endDate = DateTime.SpecifyKind(endDate.Value, DateTimeKind.Local);
-        }
-
-        EndDate = endDate?.ToUniversalTime();
-        StartDate = startDate?.ToUniversalTime();
-        VerbatimEventDate = DwcFormatter.CreateDateIntervalString(startDate?.ToLocalTime(), endDate?.ToLocalTime());
-
-        if (startDate != null)
-        {
-            var startDateLocal = startDate.Value.ToLocalTime();
-            PlainStartDate = startDateLocal.ToString("yyyy-MM-dd");
-            PlainStartTime = startDateLocal.ToString("HH\\:mm");
-            StartYear = startDateLocal.Year;
-            StartMonth = startDateLocal.Month;
-            StartDay = startDateLocal.Day;
-        }
-
-        if (endDate != null)
-        {
-            var endDateLocal = endDate.Value.ToLocalTime();
-            PlainEndDate = endDateLocal.ToString("yyyy-MM-dd");
-            PlainEndTime = endDateLocal.ToString("HH\\:mm");
-            EndYear = endDateLocal.Year;
-            EndMonth = endDateLocal.Month;
-            EndDay = endDateLocal.Day;
-        }
+        Initialize(startDate, endDate);
     }
 
     /// <summary>
@@ -94,21 +103,18 @@ public class Event
     /// <param name="startTime"></param>
     /// <param name="endDate"></param>
     /// <param name="endTime"></param>
-    public Event(DateTime? startDate, TimeSpan? startTime, DateTime? endDate, TimeSpan? endTime) : this(startDate, endDate)
+    public Event(DateTime? startDate, TimeSpan? startTime, DateTime? endDate, TimeSpan? endTime) 
     {
-        // Override start/end time 
-        if (startDate.HasValue && startDate.Value.Kind == DateTimeKind.Unspecified)
+        if (startDate.HasValue && startDate.Value.Hour == 0 && startDate.Value.Minute == 0 && startDate.Value.Second == 0 && startTime.HasValue)
         {
-            startDate = DateTime.SpecifyKind(startDate.Value, DateTimeKind.Local);
+            startDate = startDate + startTime;
         }
-        if (endDate.HasValue && endDate.Value.Kind == DateTimeKind.Unspecified)
+        if (endDate.HasValue && endDate.Value.Hour == 0 && endDate.Value.Minute == 0 && endDate.Value.Second == 0 && endTime.HasValue)
         {
-            endDate = DateTime.SpecifyKind(endDate.Value, DateTimeKind.Local);
+            endDate = endDate + endTime;
         }
 
-        PlainStartTime = startTime?.ToString("hh\\:mm");
-        PlainEndTime = endTime?.ToString("hh\\:mm");
-        VerbatimEventDate = DwcFormatter.CreateDateIntervalString(startDate?.ToLocalTime(), startTime, endDate?.ToLocalTime(), endTime);
+        Initialize(startDate, endDate);
     }
 
     /// <summary>
@@ -124,12 +130,12 @@ public class Event
     /// <summary>
     /// Start day of year
     /// </summary>
-    public int StartDayOfYear => StartDate.HasValue ? StartDate.Value.DayOfYear : 0;
+    public int StartDayOfYear { get; private set; }
 
     /// <summary>
     /// Divide year in 48 "weeks"
     /// </summary>
-    public int? StartHistogramWeek => CalculateHistogramWeek(StartDate);
+    public int? StartHistogramWeek { get; private set; }
 
     /// <summary>
     /// Start year of the event, Swedish localization
@@ -154,12 +160,12 @@ public class Event
     /// <summary>
     /// Start day of year
     /// </summary>
-    public int EndDayOfYear => EndDate.HasValue ? EndDate.Value.DayOfYear : 0;
+    public int EndDayOfYear { get; private set; }
 
     /// <summary>
     /// Divide year in 48 weeks 
     /// </summary>
-    public int? EndHistogramWeek => CalculateHistogramWeek(EndDate);
+    public int? EndHistogramWeek { get; private set; }
 
     /// <summary>
     /// End year of the event, Swedish localization
