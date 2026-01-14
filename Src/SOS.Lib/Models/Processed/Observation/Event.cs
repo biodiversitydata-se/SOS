@@ -93,7 +93,46 @@ public class Event
     /// <param name="endDate"></param>
     public Event(DateTime? startDate, DateTime? endDate)
     {
-        Initialize(startDate, endDate);
+        if (startDate.HasValue && startDate.Value.Kind == DateTimeKind.Unspecified)
+        {
+            startDate = DateTime.SpecifyKind(startDate.Value, DateTimeKind.Local);
+        }
+        if (endDate.HasValue && endDate.Value.Kind == DateTimeKind.Unspecified)
+        {
+            endDate = DateTime.SpecifyKind(endDate.Value, DateTimeKind.Local);
+        }
+
+        EndDate = endDate?.ToUniversalTime();
+        StartDate = startDate?.ToUniversalTime();
+        VerbatimEventDate = DwcFormatter.CreateDateIntervalString(startDate?.ToLocalTime(), endDate?.ToLocalTime());
+
+        if (startDate.HasValue)
+        {
+            StartDate = startDate.Value.ToUniversalTime();
+
+            var startDateLocal = startDate.Value.ToLocalTime();
+            PlainStartDate = startDateLocal.ToString("yyyy-MM-dd");
+            PlainStartTime = startDateLocal.ToString("HH\\:mm");
+            StartYear = startDateLocal.Year;
+            StartMonth = startDateLocal.Month;
+            StartDay = startDateLocal.Day;
+            StartDayOfYear = startDateLocal.DayOfYear;
+            StartHistogramWeek = CalculateHistogramWeek(startDateLocal);
+        }
+
+        if (endDate.HasValue)
+        {
+            EndDate = endDate.Value.ToUniversalTime();
+
+            var endDateLocal = endDate.Value.ToLocalTime();
+            PlainEndDate = endDateLocal.ToString("yyyy-MM-dd");
+            PlainEndTime = endDateLocal.ToString("HH\\:mm");
+            EndYear = endDateLocal.Year;
+            EndMonth = endDateLocal.Month;
+            EndDay = endDateLocal.Day;
+            EndDayOfYear = endDateLocal.DayOfYear;
+            EndHistogramWeek = CalculateHistogramWeek(endDateLocal);
+        }
     }
 
     /// <summary>
@@ -103,18 +142,21 @@ public class Event
     /// <param name="startTime"></param>
     /// <param name="endDate"></param>
     /// <param name="endTime"></param>
-    public Event(DateTime? startDate, TimeSpan? startTime, DateTime? endDate, TimeSpan? endTime) 
+    public Event(DateTime? startDate, TimeSpan? startTime, DateTime? endDate, TimeSpan? endTime) : this(startDate, endDate)
     {
-        if (startDate.HasValue && startDate.Value.Hour == 0 && startDate.Value.Minute == 0 && startDate.Value.Second == 0 && startTime.HasValue)
+        // Override start/end time 
+        if (startDate.HasValue && startDate.Value.Kind == DateTimeKind.Unspecified)
         {
-            startDate = startDate + startTime;
+            startDate = DateTime.SpecifyKind(startDate.Value, DateTimeKind.Local);
         }
-        if (endDate.HasValue && endDate.Value.Hour == 0 && endDate.Value.Minute == 0 && endDate.Value.Second == 0 && endTime.HasValue)
+        if (endDate.HasValue && endDate.Value.Kind == DateTimeKind.Unspecified)
         {
-            endDate = endDate + endTime;
+            endDate = DateTime.SpecifyKind(endDate.Value, DateTimeKind.Local);
         }
 
-        Initialize(startDate, endDate);
+        PlainStartTime = startTime?.ToString("hh\\:mm");
+        PlainEndTime = endTime?.ToString("hh\\:mm");
+        VerbatimEventDate = DwcFormatter.CreateDateIntervalString(startDate?.ToLocalTime(), startTime, endDate?.ToLocalTime(), endTime);
     }
 
     /// <summary>

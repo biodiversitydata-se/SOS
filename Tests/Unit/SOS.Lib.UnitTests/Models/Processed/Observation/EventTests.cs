@@ -1,8 +1,6 @@
 ﻿using FluentAssertions;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Processed.Observation;
-using System;
-using System.Collections.Generic;
 using Xunit;
 
 namespace SOS.Lib.UnitTests.Models.Processed.Observation;
