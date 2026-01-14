@@ -1,4 +1,5 @@
-﻿using SOS.Shared.Api.Dtos.Status;
+﻿using CSharpFunctionalExtensions;
+using SOS.Shared.Api.Dtos.Status;
 using SOS.Status.Web.Client.Dtos;
 using SOS.Status.Web.Client.JsonConverters;
 using SOS.Status.Web.Client.Models;
@@ -40,6 +41,50 @@ public class SosObservationsApiClient
         var response = await _httpClient.PostAsJsonAsync(url, filter, _jsonSerializerOptions);
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadFromJsonAsync<SOS.Status.Web.Client.Dtos.SosObsApi.PagedResultDto<SOS.Status.Web.Client.Dtos.SosObsApi.Observation>>();
+    }
+
+    public async Task<Result<Client.Dtos.SosObsApi.SearchByCursorResultDto<Client.Dtos.SosObsApi.Observation>?>> SearchObservationsByCursorAsync(
+        Client.Dtos.SosObsApi.SearchFilterInternalDto filter,
+        int take = 1000,
+        string? cursor = null,
+        string sortBy = "taxon.id",
+        string sortOrder = "Asc",
+        bool validateSearchFilter = false,
+        string translationCultureCode = "sv-SE",
+        bool sensitiveObservations = false)
+    {
+        try
+        {
+            var url = $"/observations/searchbycursor?take={take}&sortBy={Uri.EscapeDataString(sortBy)}&sortOrder={sortOrder}&validateSearchFilter={validateSearchFilter}&translationCultureCode={translationCultureCode}&sensitiveObservations={sensitiveObservations}";
+            if (!string.IsNullOrEmpty(cursor))
+            {
+                url += $"&cursor={cursor}";
+            }        
+            var response = await _httpClient.PostAsJsonAsync(url, filter, _jsonSerializerOptions);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                var errorMessage = $"HTTP {(int)response.StatusCode} ({response.StatusCode}): {errorContent}";
+                _logger.LogError("SearchByCursor request failed: {ErrorMessage}", errorMessage);
+                return Result.Failure<Client.Dtos.SosObsApi.SearchByCursorResultDto<Client.Dtos.SosObsApi.Observation>?>(errorMessage);
+            }
+
+            var result = await response.Content.ReadFromJsonAsync<Client.Dtos.SosObsApi.SearchByCursorResultDto<Client.Dtos.SosObsApi.Observation>>(_jsonSerializerOptions);
+            return Result.Success(result);
+        }
+        catch (HttpRequestException ex)
+        {
+            var errorMessage = $"HTTP request failed: {ex.Message}";
+            _logger.LogError(ex, "SearchByCursor HTTP request exception: {ErrorMessage}", errorMessage);
+            return Result.Failure<Client.Dtos.SosObsApi.SearchByCursorResultDto<Client.Dtos.SosObsApi.Observation>?>(errorMessage);
+        }
+        catch (Exception ex)
+        {
+            var errorMessage = $"Unexpected error: {ex.Message}";
+            _logger.LogError(ex, "SearchByCursor unexpected exception: {ErrorMessage}", errorMessage);
+            return Result.Failure<Client.Dtos.SosObsApi.SearchByCursorResultDto<Client.Dtos.SosObsApi.Observation>?>(errorMessage);
+        }
     }
 
     public async Task<Client.Dtos.ProcessSummaryDto?> GetProcessSummary()
@@ -210,3 +255,4 @@ public class SosObservationsApiClient
         }
     }
 }
+

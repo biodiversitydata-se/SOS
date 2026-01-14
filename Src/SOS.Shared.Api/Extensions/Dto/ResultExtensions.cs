@@ -163,10 +163,25 @@ public static class ResultExtensions
         }
     }
 
+    extension<TRecord, TSearchAfter>(SearchAfterResult<TRecord, TSearchAfter> searchAfterResult)
+    {
+        public SearchByCursorResultDto<TRecordDto> ToSearchByCursorResultDto<TRecordDto>(
+            IEnumerable<TRecordDto> records,
+            int take)
+        {            
+            return new SearchByCursorResultDto<TRecordDto>
+            {
+                Records = records,
+                NextCursor = searchAfterResult.SearchAfter as string,
+                Take = take,
+                TotalCount = searchAfterResult.TotalCount
+            };
+        }
+    }
+
     extension(IEnumerable<TimeSeriesHistogramResult> result)
     {
-        public IEnumerable<TimeSeriesHistogramResultDto> ToTimeSeriesHistogramResultDtos(
-)
+        public IEnumerable<TimeSeriesHistogramResultDto> ToTimeSeriesHistogramResultDtos()
         {
             return result.Select(item => item.ToTimeSeriesHistogramResultDto());
         }
@@ -174,8 +189,7 @@ public static class ResultExtensions
 
     extension(TimeSeriesHistogramResult result)
     {
-        public TimeSeriesHistogramResultDto ToTimeSeriesHistogramResultDto(
-)
+        public TimeSeriesHistogramResultDto ToTimeSeriesHistogramResultDto()
         {
             return new TimeSeriesHistogramResultDto
             {

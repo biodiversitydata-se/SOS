@@ -18,4 +18,9 @@ public class SearchAfterResult<TRecord, TSearchAfter>
     /// Search after objects
     /// </summary>
     public TSearchAfter SearchAfter { get; set; }
+
+    /// <summary>
+    /// Total number of records matching the query
+    /// </summary>
+    public long TotalCount { get; set; }
 }

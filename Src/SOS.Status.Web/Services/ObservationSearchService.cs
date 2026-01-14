@@ -1,4 +1,5 @@
-﻿using SOS.Status.Web.Client.Abstractions;
+﻿using CSharpFunctionalExtensions;
+using SOS.Status.Web.Client.Abstractions;
 using SOS.Status.Web.Client.Dtos.SosObsApi;
 using SOS.Status.Web.HttpClients;
 
@@ -41,5 +42,40 @@ public class ObservationSearchService : IObservationSearchService
             sensitiveObservations);
 
         return pageResult!;
+    }
+
+    public async Task<Result<SearchByCursorResultDto<Observation>>> SearchObservationsByCursor(
+        SearchFilterInternalDto filter,
+        int take = 1000,
+        string? cursor = null,
+        string sortBy = "taxon.id",
+        string sortOrder = "Asc",
+        bool validateSearchFilter = false,
+        string translationCultureCode = "sv-SE",
+        bool sensitiveObservations = false)
+    {
+        var result = await _observationsApiClient.SearchObservationsByCursorAsync(
+            filter,
+            take,
+            cursor,
+            sortBy,
+            sortOrder,
+            validateSearchFilter,
+            translationCultureCode,
+            sensitiveObservations);
+
+        if (result.IsFailure)
+        {
+            return Result.Failure<SearchByCursorResultDto<Observation>>(result.Error);
+        }
+
+        var dto = result.Value;
+        return Result.Success(new SearchByCursorResultDto<Observation>
+        {
+            NextCursor = dto?.NextCursor,
+            Take = dto?.Take ?? 0,
+            TotalCount = dto?.TotalCount ?? 0,
+            Records = dto?.Records
+        });
     }
 }

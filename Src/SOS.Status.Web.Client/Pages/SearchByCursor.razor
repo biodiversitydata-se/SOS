@@ -1,0 +1,212 @@
+@page "/searchbycursor"
+@using SOS.Status.Web.Client.Abstractions
+@using SOS.Status.Web.Client.Dtos.SosObsApi
+@inject IObservationSearchService SearchService
+@inject ISnackbar Snackbar
+
+<PageTitle>SearchByCursor Test</PageTitle>
+<MudText Typo="Typo.h4">SearchByCursor Endpoint Test</MudText>
+<MudText Typo="Typo.body1" Class="mb-4">
+    This page tests the SearchByCursor endpoint by iterating through all results and checking for duplicate occurrenceIds.
+    The first and last 10 observations are saved and can be downloaded.
+</MudText>
+
+<MudPaper Class="pa-4 mb-4">
+    <MudGrid>
+        <MudItem xs="12" md="4">
+            <MudNumericField @bind-Value="take" Label="Take per page" Variant="Variant.Outlined" Min="1" Max="10000" />
+        </MudItem>
+        <MudItem xs="12" md="4">
+            <MudTextField @bind-Value="sortBy" Label="Sort by field" Variant="Variant.Outlined" Placeholder="e.g. taxon.id" />
+        </MudItem>
+        <MudItem xs="12" md="4">
+            <MudNumericField @bind-Value="maxObservations" 
+                             Label="Max observations to fetch" 
+                             Variant="Variant.Outlined" 
+                             Min="0" 
+                             Max="1000000"
+                             HelperText="Set to 0 to fetch all observations" />
+        </MudItem>
+        <MudItem xs="12">
+            <MudTextField @bind-Value="searchFilterJson" 
+                          Label="Search Filter (JSON)" 
+                          Variant="Variant.Outlined" 
+                          Lines="5"
+                          Placeholder='{"occurrenceStatus": "Present"}' />
+        </MudItem>
+    </MudGrid>
+
+    <MudStack Row="true" Class="mt-4">
+        <MudButton Variant="Variant.Filled" 
+                   Color="Color.Primary" 
+                   OnClick="RunTestAsync" 
+                   Disabled="@isRunning"
+                   StartIcon="@Icons.Material.Filled.PlayArrow">
+            @if (isRunning)
+            {
+                <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mr-2" />
+                <span>Running...</span>
+            }
+            else
+            {
+                <span>Run Test</span>
+            }
+        </MudButton>
+        <MudButton Variant="Variant.Outlined" 
+                   Color="Color.Secondary" 
+                   OnClick="CancelTest" 
+                   Disabled="@(!isRunning)"
+                   StartIcon="@Icons.Material.Filled.Stop">
+            Cancel
+        </MudButton>
+        <MudButton Variant="Variant.Outlined" 
+                   Color="Color.Default" 
+                   OnClick="ClearResults"
+                   StartIcon="@Icons.Material.Filled.Clear">
+            Clear
+        </MudButton>
+    </MudStack>
+</MudPaper>
+
+@if (testResult != null || isRunning)
+{
+    <MudPaper Class="pa-4 mb-4">
+        <MudText Typo="Typo.h6">Progress</MudText>
+        <MudProgressLinear Value="@progressPercent" Color="@progressColor" Striped="@isRunning" Class="my-2" />
+        <MudText Typo="Typo.body2">
+            Page @currentPage | Fetched @fetchedCount
+            @if (effectiveTotalCount > 0)
+            {
+                <text> of @effectiveTotalCount</text>
+            }
+            observations (@progressPercent.ToString("F1")%)
+            @if (maxObservations > 0 && maxObservations < totalCount)
+            {
+                <text> (Total available: @totalCount)</text>
+            }
+        </MudText>
+        @if (!string.IsNullOrEmpty(statusMessage))
+        {
+            <MudText Typo="Typo.body2" Color="@statusColor" Class="mt-2">@statusMessage</MudText>
+        }
+    </MudPaper>
+}
+
+@if (testResult != null)
+{
+    <MudPaper Class="pa-4 mb-4">
+        <MudText Typo="Typo.h6">Results</MudText>
+        <MudSimpleTable Dense="true" Hover="true" Class="mt-2">
+            <tbody>
+                <tr>
+                    <td><strong>Total observations fetched</strong></td>
+                    <td>@testResult.TotalFetched</td>
+                </tr>
+                <tr>
+                    <td><strong>Unique occurrenceIds</strong></td>
+                    <td>@testResult.UniqueCount</td>
+                </tr>
+                <tr>
+                    <td><strong>Duplicate count</strong></td>
+                    <td>
+                        <MudText Color="@(testResult.DuplicateCount > 0 ? Color.Error : Color.Success)">
+                            @testResult.DuplicateCount
+                        </MudText>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>Pages fetched</strong></td>
+                    <td>@testResult.PagesFetched</td>
+                </tr>
+                <tr>
+                    <td><strong>Elapsed time</strong></td>
+                    <td>@testResult.ElapsedTime.ToString(@"hh\:mm\:ss\.fff")</td>
+                </tr>
+                <tr>
+                    <td><strong>Observations stored</strong></td>
+                    <td>First @firstObservations.Count + Last @lastObservations.Count</td>
+                </tr>
+                @if (testResult.LimitReached)
+                {
+                    <tr>
+                        <td><strong>Limit status</strong></td>
+                        <td>
+                            <MudChip T="string" Color="Color.Warning" Size="Size.Small">Limit reached - Stopped at @testResult.MaxObservationsLimit observations</MudChip>
+                        </td>
+                    </tr>
+                }
+                <tr>
+                    <td><strong>Status</strong></td>
+                    <td>
+                        @if (testResult.Success)
+                        {
+                            <MudChip T="string" Color="Color.Success" Size="Size.Small">Success - No duplicates</MudChip>
+                        }
+                        else if (testResult.Cancelled)
+                        {
+                            <MudChip T="string" Color="Color.Warning" Size="Size.Small">Cancelled</MudChip>
+                        }
+                        else if (testResult.DuplicateCount > 0)
+                        {
+                            <MudChip T="string" Color="Color.Error" Size="Size.Small">Failed - Duplicates found</MudChip>
+                        }
+                        else
+                        {
+                            <MudChip T="string" Color="Color.Error" Size="Size.Small">Error</MudChip>
+                        }
+                    </td>
+                </tr>
+                @if (!string.IsNullOrEmpty(testResult.ErrorMessage))
+                {
+                    <tr>
+                        <td><strong>Error</strong></td>
+                        <td><MudText Color="Color.Error">@testResult.ErrorMessage</MudText></td>
+                    </tr>
+                }
+            </tbody>
+        </MudSimpleTable>
+
+        @if (firstObservations.Any() || lastObservations.Any())
+        {
+            <MudStack Row="true" Class="mt-4">
+                <MudButton Variant="Variant.Filled" 
+                           Color="Color.Info" 
+                           OnClick="DownloadAsJsonAsync"
+                           StartIcon="@Icons.Material.Filled.Download">
+                    Download JSON
+                </MudButton>
+                <MudButton Variant="Variant.Filled" 
+                           Color="Color.Info" 
+                           OnClick="DownloadAsCsvAsync"
+                           StartIcon="@Icons.Material.Filled.Download">
+                    Download CSV
+                </MudButton>
+            </MudStack>
+        }
+    </MudPaper>
+}
+
+@if (testResult?.Duplicates?.Any() == true)
+{
+    <MudPaper Class="pa-4">
+        <MudText Typo="Typo.h6" Color="Color.Error">Duplicate OccurrenceIds (@testResult.Duplicates.Count)</MudText>
+        <MudText Typo="Typo.body2" Class="mb-2">These occurrences appeared on consecutive pages, indicating pagination issues.</MudText>
+        <MudTable Items="@testResult.Duplicates" Dense="true" Hover="true" Class="mt-2" Striped="true">
+            <HeaderContent>
+                <MudTh>OccurrenceId</MudTh>
+                <MudTh>Count</MudTh>
+                <MudTh>First Seen (Page)</MudTh>
+                <MudTh>Last Seen (Page)</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="OccurrenceId">@context.OccurrenceId</MudTd>
+                <MudTd DataLabel="Count">@context.Count</MudTd>
+                <MudTd DataLabel="First Seen">@context.FirstSeenOnPage</MudTd>
+                <MudTd DataLabel="Last Seen">@context.LastSeenOnPage</MudTd>
+            </RowTemplate>
+            <PagerContent>
+                <MudTablePager PageSizeOptions="new int[] { 10, 25, 50, 100 }" />
+            </PagerContent>
+        </MudTable>
+    </MudPaper>
+}

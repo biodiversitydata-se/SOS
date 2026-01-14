@@ -352,7 +352,22 @@ public interface IProcessedObservationCoreRepository : IProcessRepositoryBase<Ob
     /// <param name="take"></param>
     /// <param name="getAllFields">If true all observation fields will be retrieved.</param>
     /// <returns></returns>
-    Task<PagedResult<T>> GetChunkAsync<T>(SearchFilter filter, int skip, int take, bool getAllFields = false) where T : class;
+    Task<PagedResult<T>> GetChunkAsync<T>(SearchFilter filter, int skip, int take, bool getAllFields = false) where T : class;    
+
+    /// <summary>
+    ///     Get chunk of objects from repository using search_after for deep pagination.    
+    /// </summary>
+    /// <typeparam name="T">The type of records to return.</typeparam>
+    /// <param name="filter">Filter used to limit the search.</param>
+    /// <param name="take">Max number of observations to return.</param>
+    /// <param name="searchAfter">Sort values from the previous page's last document. Pass null for the first request. This value is base64-encoded.</param>
+    /// <param name="getAllFields">If true all observation fields will be retrieved.</param>
+    /// <returns>A result containing the records and the searchAfter values for the next page.</returns>
+    Task<SearchAfterResult<T, string>> GetChunkBySearchAfterAsync<T>(
+        SearchFilter filter,
+        int take,
+        string? searchAfter,
+        bool getAllFields = false) where T : class;
 
     /// <summary>
     /// Gets a single observation

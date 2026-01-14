@@ -41,6 +41,26 @@ public interface IObservationManager
     Task<PagedResult<JsonObject>> GetChunkAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilter filter, int skip, int take);
 
     /// <summary>
+    /// Get chunk of sightings using search_after for deep pagination.  
+    /// </summary>
+    /// <remarks>
+    /// This function doesn't use point in time (PIT) for the search in order to use minimal server resources. 
+    /// Therefore, it is not suitable for cases where data consistency is required
+    /// </remarks>
+    /// <param name="roleId">Limit user authorization to specified role.</param>
+    /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
+    /// <param name="filter">Filter used to limit the search.</param>
+    /// <param name="take">Max number of observations to return.</param>
+    /// <param name="searchAfter">Base64-encoded sort values from the previous page's last document. Pass null for the first request.</param>
+    /// <returns>A result containing the records and the searchAfter values for the next page.</returns>
+    Task<SearchAfterResult<JsonObject, string>> GetChunkBySearchAfterAsync(
+        int? roleId,
+        string authorizationApplicationIdentifier,
+        SearchFilter filter,
+        int take,
+        string? searchAfter);
+
+    /// <summary>
     /// Get observations by scroll
     /// </summary>
     /// <param name="roleId"></param>
