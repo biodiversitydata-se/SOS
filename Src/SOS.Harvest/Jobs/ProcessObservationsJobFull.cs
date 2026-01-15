@@ -162,7 +162,7 @@ public class ProcessObservationsJobFull : ProcessObservationsJobBase, IProcessOb
     {        
         var healthStatus = await _processedObservationRepository.WaitForHealthyClusterAsync(
             HealthStatus.Green,
-            12,
+            30,
             TimeSpan.FromMinutes(5),
             CancellationToken.None);
         if (healthStatus == HealthStatus.Red)
