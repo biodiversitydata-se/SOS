@@ -1,0 +1,42 @@
+# NO auto-trigger CI/CD for ST
+trigger: none 
+
+# no PR triggers
+pr: none
+
+parameters:
+  - name: imagetag
+    type: string
+    
+variables:
+  # deploy settings
+  imageName: 'sos-status' # the image name to use
+  environment: prod # deploy environment
+
+  # pipeline settings
+  tag: '${{ parameters.imagetag }}'
+  kubernetesServiceEndpoint: 'PROD-rke2'
+
+resources:
+  repositories:
+  - repository: pipeline-templates
+    type: git
+    name: pipeline-templates
+    ref: refs/heads/poc-new-remote
+
+pool:
+  name: linux
+
+stages:
+- stage: Deploy
+  displayName: Deploy to ${{ upper(variables.environment) }}
+  jobs:
+  - job: Deploy
+    displayName: Deploying application
+    workspace:
+      clean: all
+    steps:
+    - template: adb-kubernetes-deploy-kustomize.yaml@pipeline-templates
+      parameters:
+        kubernetesServiceEndpoint: $(kubernetesServiceEndpoint)
+        environment: $(imageName)-$(environment)

@@ -1,0 +1,27 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: sos-status-ingress
+  annotations:
+    cert-manager.io/cluster-issuer: vault-slu.se-cluster-issuer
+    nginx.ingress.kubernetes.io/proxy-body-size: 20m
+    nginx.ingress.kubernetes.io/proxy-buffering: "on"
+    nginx.ingress.kubernetes.io/proxy-buffer-size: "128k"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+      - sos-admin.artdata.slu.se
+      # - sos-admin-bff.artdata.slu.se
+      secretName: wildcard.artdata.slu.se-tls
+  rules:
+  - host: sos-admin.artdata.slu.se
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: sos-status-app
+            port:
+              number: 5000

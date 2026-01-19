@@ -11,7 +11,7 @@
         "DISABLE_HEALTHCHECK_INIT": "true",
         "DISABLE_CACHED_TAXON_SUM_INIT": "true"
       },
-      "applicationUrl": "http://localhost:5000"
+      "applicationUrl": "http://localhost:5005"
     },
     "SOS.Observations.Api (Dev)": {
       "commandName": "Project",
@@ -24,7 +24,7 @@
         "DISABLE_HEALTHCHECK_INIT": "true",
         "DISABLE_CACHED_TAXON_SUM_INIT": "true"
       },
-      "applicationUrl": "http://localhost:5000"
+      "applicationUrl": "http://localhost:5005"
     },
     "SOS.Observations.Api (ST)": {
       "commandName": "Project",
@@ -37,7 +37,7 @@
         "DISABLE_HEALTHCHECK_INIT": "true",
         "DISABLE_CACHED_TAXON_SUM_INIT": "true"
       },
-      "applicationUrl": "http://localhost:5000"
+      "applicationUrl": "http://localhost:5005"
     },
     "SOS.Observations.Api (Prod)": {
       "commandName": "Project",
@@ -50,7 +50,7 @@
         "DISABLE_HEALTHCHECK_INIT": "true",
         "DISABLE_CACHED_TAXON_SUM_INIT": "true"
       },
-      "applicationUrl": "http://localhost:5000"
+      "applicationUrl": "http://localhost:5005"
     },
     "WSL": {
       "commandName": "WSL2",
@@ -58,7 +58,7 @@
       "launchUrl": "https://localhost:5001/swagger",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "ST",
-        "ASPNETCORE_URLS": "https://localhost:5001;http://localhost:5000"
+        "ASPNETCORE_URLS": "https://localhost:5001;http://localhost:5005"
       },
       "distributionName": "Ubuntu"
     }

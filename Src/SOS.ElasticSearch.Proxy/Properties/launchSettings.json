@@ -6,7 +6,7 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "local"
       },
-      "applicationUrl": "http://localhost:5000",
+      "applicationUrl": "http://localhost:5005",
       "dotnetRunMessages": true
     },
     "SOS.ElasticSearch.Proxy (ST)": {
@@ -15,7 +15,7 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "ST"
       },
-      "applicationUrl": "http://localhost:5000",
+      "applicationUrl": "http://localhost:5005",
       "dotnetRunMessages": true
     }
   }

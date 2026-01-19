@@ -41,7 +41,7 @@ try
     ConfigureMiddleware(app, isDevelopment);
 
     // Start the application
-    await app.RunAsync("http://*:5000");
+    await app.RunAsync("http://*:5005");
 }
 catch (Exception ex)
 {

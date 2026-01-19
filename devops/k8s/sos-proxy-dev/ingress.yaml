@@ -22,4 +22,4 @@ spec:
           service:
             name: sos-proxy-api
             port:
-              number: 5000
+              number: 5005

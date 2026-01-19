@@ -19,13 +19,13 @@ spec:
         startupProbe: 
           httpGet:
             path: /healthz
-            port: 5000
+            port: 5005
           failureThreshold: 5
           periodSeconds: 10
         readinessProbe: 
           httpGet:
             path: /healthz
-            port: 5000
+            port: 5005
             httpHeaders:
             - name: Host
               value: KubernetesReadinessProbe
@@ -35,6 +35,6 @@ spec:
         livenessProbe: 
           httpGet:
             path: /healthz
-            port: 5000
+            port: 5005
           failureThreshold: 3
           periodSeconds: 10

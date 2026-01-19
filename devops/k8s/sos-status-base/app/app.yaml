@@ -1,0 +1,80 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: $(imageName)-app
+  name: $(imageName)-app
+spec:
+  type: ClusterIP
+  ports:
+    - port: 5000
+      targetPort: 5000
+  selector:
+    app: $(imageName)-app
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: $(imageName)-app
+  name: $(imageName)-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: $(imageName)-app
+  strategy: 
+      type: Recreate
+  template:
+    metadata:
+      annotations:
+        slu.se/id: "1003_1"
+      labels:
+        app: $(imageName)-app
+    spec:
+      securityContext:
+        runAsNonRoot: true
+      topologySpreadConstraints: # try to spread out api instances over available nodes
+      - labelSelector:
+          matchLabels:
+            app: $(imageName)-app # pods labeled app: api
+        maxSkew: 1
+        topologyKey: kubernetes.io/hostname # 1 node = 1 topology
+        whenUnsatisfiable: DoNotSchedule
+      containers:
+      - name: $(imageName)-app
+        envFrom:
+        - secretRef:
+            name: $(imageName)-secret
+        env:
+        - name: ASPNETCORE_ENVIRONMENT
+          value: $(environment)
+        - name: BlazorRenderMode
+          value: Server
+        image: reg.app.slu.se/k1003-1/$(imageName)-app:$(tag)
+        imagePullPolicy: IfNotPresent
+        ports:
+          - containerPort: 5000
+        readinessProbe: # ready to accept traffic, failure = stops routing traffic to this pod but does not restart the pod!
+          httpGet:
+            path: /healthz
+            port: 5000
+            httpHeaders:
+            - name: Host
+              value: KubernetesReadinessProbe
+          initialDelaySeconds: 10
+          timeoutSeconds: 5
+          successThreshold: 1
+          failureThreshold: 3
+          periodSeconds: 30 # runs every 30 seconds
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsUser: 1000
+          runAsGroup: 1000
+          capabilities:
+            drop:
+              - ALL
+        resources: {}
+      restartPolicy: Always
+      imagePullSecrets:
+      - name: reg.app.slu.se-k1003-1-regcred

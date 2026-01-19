@@ -28,27 +28,27 @@ web
 api
 ```
 gå till ```http://localhost:4200``` i din webbläsare   
-api finns på ```http://localhost:5000```   
+api finns på ```http://localhost:5005```   
 *kom ihåg!* kommando: ```skaffold delete -f skaffold.administration.gui.yaml``` för att ta bort allt som du nyss snurrat upp  
 
 ###  skaffold.analysis.yaml  
 kommando: ```skaffold run -f skaffold.analysis.yaml```  
-gå till ```http://localhost:5000/swagger``` i din webbläsare   
+gå till ```http://localhost:5005/swagger``` i din webbläsare   
 *kom ihåg!* kommando: ```skaffold delete -f skaffold.analysis.yaml``` för att ta bort rätt container   
 
 ###  skaffold.datastewardship.yaml  
 kommando: ```skaffold run -f skaffold.datastewardship.yaml```  
-gå till ```http://localhost:5000/swagger``` i din webbläsare   
+gå till ```http://localhost:5005/swagger``` i din webbläsare   
 *kom ihåg!* kommando: ```skaffold delete -f skaffold.datastewardship.yaml``` för att ta bort rätt container   
 
 ###  skaffold.elasticsearch.proxy.yaml  
 kommando: ```skaffold run -f skaffold.elasticsearch.proxy.yaml```  
-gå till ```http://localhost:5000``` i din webbläsare   
+gå till ```http://localhost:5005``` i din webbläsare   
 *kom ihåg!* kommando: ```skaffold delete -f skaffold.elasticsearch.proxy.yaml``` för att ta bort rätt container   
 
 ###  skaffold.observations.yaml  
 kommando: ```skaffold run -f skaffold.observations.yaml```  
-gå till ```http://localhost:5000/swagger``` i din webbläsare   
+gå till ```http://localhost:5005/swagger``` i din webbläsare   
 *kom ihåg!* kommando: ```skaffold delete -f skaffold.observations.yaml``` för att ta bort rätt container   
 
 ## Hemligheter (när du kör skaffold run)
