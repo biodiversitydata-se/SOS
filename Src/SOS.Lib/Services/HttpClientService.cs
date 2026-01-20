@@ -194,7 +194,14 @@ public class HttpClientService : IHttpClientService
             }
 
             responsePhrase = response.ReasonPhrase;
-            response.EnsureSuccessStatusCode();
+            
+            if (!response.IsSuccessStatusCode)
+            {
+                var responseBody = await response.Content.ReadAsStringAsync();
+                _logger.LogError("HttpClient.GetDataAsync() failed. RequestUri={RequestUri}, StatusCode={StatusCode}, ReasonPhrase={ReasonPhrase}, ResponseBody={ResponseBody}", 
+                    requestUri.AbsolutePath, response.StatusCode, responsePhrase, responseBody);
+                return default;
+            }
 
             return await JsonSerializer.DeserializeAsync<T>(
                 await response.Content.ReadAsStreamAsync(),
