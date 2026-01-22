@@ -11,6 +11,7 @@ using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.JsonConverters;
 using SOS.Lib.Middleware;
+using SOS.Shared.Api.Middleware;
 using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -54,6 +55,8 @@ try
 
     // Build app and configure middleware pipeline
     var app = builder.Build();
+    // Add security headers early in the pipeline
+    app.UseSecurityHeaders(includeHsts: !isLocalDevelopment);
     app.MapDefaultEndpoints();
     ConfigureMiddleware(app, isDevelopment, disableHangfireInit);
 

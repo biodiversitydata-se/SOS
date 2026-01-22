@@ -17,6 +17,7 @@ using MongoDB.Bson.Serialization.Conventions;
 using Serilog;
 using SOS.Administration.Api.Extensions;
 using SOS.Lib.Helpers;
+using SOS.Shared.Api.Middleware;
 using StackExchange.Redis;
 using System;
 using System.Globalization;
@@ -28,6 +29,7 @@ using System.Text.Json.Serialization;
 try
 {
     var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+    bool isLocalDevelopment = new[] { "local", "k8s" }.Contains(env?.ToLower(), StringComparer.CurrentCultureIgnoreCase);
     bool isDevelopment = new[] { "local", "dev", "st" }.Contains(env?.ToLower(), StringComparer.CurrentCultureIgnoreCase);
     bool disableHangfireInit = Environment.GetEnvironmentVariable("DISABLE_HANGFIRE_INIT").GetBoolean();
     bool useLocalHangfire = Environment.GetEnvironmentVariable("USE_LOCAL_HANGFIRE").GetBoolean();
@@ -61,6 +63,8 @@ try
 
     // Build app and configure middleware pipeline
     var app = builder.Build();
+    // Add security headers early in the pipeline
+    app.UseSecurityHeaders(includeHsts: !isLocalDevelopment);
     app.MapDefaultEndpoints();
     ConfigureMiddleware(app, isDevelopment, disableHangfireInit);
 

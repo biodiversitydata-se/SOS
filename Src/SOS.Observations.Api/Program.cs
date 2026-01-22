@@ -1,11 +1,6 @@
 using Hangfire;
 using Microsoft.ApplicationInsights.Extensibility;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.ResponseCompression;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using MongoDB.Bson.Serialization.Conventions;
 using Serilog;
 using SOS.Lib.Extensions;
@@ -17,12 +12,10 @@ using SOS.Observations.Api.Extensions;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Middleware;
 using SOS.Shared.Api.Extensions.Dto;
-using System;
+using SOS.Shared.Api.Middleware;
 using System.Globalization;
-using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 // --- Program startup ---
 
@@ -66,6 +59,8 @@ try
 
     // Build app and configure middleware pipeline
     var app = builder.Build();
+    // Add security headers early in the pipeline
+    app.UseSecurityHeaders(includeHsts: !isLocalDevelopment);
     app.MapDefaultEndpoints();
     ConfigureMiddleware(app, isDevelopment, disableHangfireInit, disableHealthCheckInit);
 
