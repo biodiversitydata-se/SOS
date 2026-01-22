@@ -22,5 +22,6 @@ public enum AreaType
     Atlas10x10 = 30,
     SfvDistricts = 34,
     Campus = 35,
-    Sveaskog = 36
+    Sveaskog = 36,
+    SvenskaKraftnät = 37
 }
