@@ -1,4 +1,4 @@
-# NO auto-trigger CI/CD for PROD
+# NO auto-trigger CI/CD for ST
 trigger: none 
 
 # no PR triggers
@@ -7,35 +7,36 @@ pr: none
 parameters:
   - name: imagetag
     type: string
-
+    
 variables:
   # deploy settings
+  imageName: 'sos-observations' # the image name to use
   environment: prod # deploy environment
-  
-  # skip unneeded tasks
-  deployApi: true # set to false to skip executing API deploy task
 
   # pipeline settings
-  Parameters.ImageTag: '${{ parameters.imagetag }}'
+  tag: '${{ parameters.imagetag }}'
   kubernetesServiceEndpoint: 'PROD-rke2'
 
 resources:
   repositories:
-    - repository: pipeline-templates
-      type: git
-      name: pipeline-templates
+  - repository: pipeline-templates
+    type: git
+    name: pipeline-templates
+    ref: refs/heads/poc-new-remote
 
 pool:
   name: linux
 
-jobs:
-  # API
-  - job: DeployAPI
-    displayName: Deploying API to ${{ upper(variables.environment) }}
+stages:
+- stage: Deploy
+  displayName: Deploy to ${{ upper(variables.environment) }}
+  jobs:
+  - job: Deploy
+    displayName: Deploying application
+    workspace:
+      clean: all
     steps:
-      - ${{ if eq(variables.deployApi, true) }}:
-        - template: adb-kubernetes-deploy.yaml@pipeline-templates
-          parameters:
-            kubernetesServiceEndpoint: $(kubernetesServiceEndpoint)
-            environment: $(environment)/observations
-            manifest: 'api.yaml'
+    - template: adb-kubernetes-deploy-kustomize.yaml@pipeline-templates
+      parameters:
+        kubernetesServiceEndpoint: $(kubernetesServiceEndpoint)
+        environment: $(imageName)-$(environment)

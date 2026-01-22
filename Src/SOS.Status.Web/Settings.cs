@@ -10,6 +10,7 @@ public static class Settings
     public static HttpClientsConfiguration HttpClientsConfiguration { get; set; } = new();
     public static MongoDbConfiguration ProcessDbConfiguration { get; set; } = new();
     public static ElasticSearchConfiguration SearchDbConfiguration { get; set; } = new();
+    public static string RedisConnectionString { get; set; } = "";
     public static string ClientSecret { get; set; } = "";
     public static string SearchDbUserName { get; set; } = "";
     public static string SearchDbPassword { get; set; } = "";
@@ -80,6 +81,8 @@ public static class Settings
             SearchDbConfiguration.Password = SearchDbPassword;
             logger.LogInformation("replaced SECRET_PLACEHOLDER in SearchDbConfiguration.Password with the value in SearchDbPassword");
         }
+
+        RedisConnectionString = GetConfigValueString("RedisConnectionString", configuration, logger, sensitiveSetting: true);
     }
 
     private static T GetConfigSection<T>(string key, IConfiguration configuration, ILogger logger, bool sensitiveSetting = false, bool required = true) where T : class

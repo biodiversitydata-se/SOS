@@ -1,13 +1,14 @@
 using Blazored.LocalStorage;
-using Microsoft.AspNetCore.Components.Server.Circuits;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting.StaticWebAssets;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.Extensions.Options;
 using MudBlazor;
 using MudBlazor.Services;
 using Serilog;
 using SOS.Lib.Helpers;
-using SOS.Status.Web;
+using SOS.Status.Web.Cache;
 using SOS.Status.Web.Client.Abstractions;
 using SOS.Status.Web.Client.JsonConverters;
 using SOS.Status.Web.Client.Models;
@@ -34,6 +35,10 @@ try
     SeriLogHelper.ConfigureSerilog(builder);
     var configurationRoot = BuildConfiguration(builder, isDevelopment);
     Settings.Init(configurationRoot);
+    builder.Services.AddSingleton<ITicketStore, RedisTicketStore>();
+    builder.Services.AddStackExchangeRedisCache(o => o.Configuration = Settings.RedisConnectionString);
+    builder.Services.AddTransient<IDistCache, DistCache>();
+    builder.Services.AddSingleton<IConfigureOptions<CookieAuthenticationOptions>, ConfigureCookieAuthOptions>();
     builder.Services.AddMudServices();
     builder.Services.AddMudMarkdownServices();
     //builder.Services.AddSingleton<CircuitHandler, LoggingCircuitHandler>();

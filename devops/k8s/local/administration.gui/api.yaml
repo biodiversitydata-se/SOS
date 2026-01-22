@@ -18,6 +18,6 @@ spec:
         - name: ApplicationInsightsConfiguration
           value: '{"BaseAddress": "https://api.applicationinsights.io/v1", "AcceptHeaderContentType": "application/json", "InstrumentationKey": "SECRET_PLACEHOLDER", "ApiKey": "SECRET_PLACEHOLDER", "ApplicationId": "SECRET_PLACEHOLDER"}'
         - name: AuthenticationConfiguration
-          value: '{"SecretKey": "SECRET_PLACEHOLDER", "SecretPassword": "SECRET_PLACEHOLDER", "Issuer": "http://localhost:5000"}'
+          value: '{"SecretKey": "SECRET_PLACEHOLDER", "SecretPassword": "SECRET_PLACEHOLDER", "Issuer": "http://localhost:5005"}'
         - name: SearchDbTestConfiguration
           value: '{"UserName": "SECRET_PLACEHOLDER", "Password": "SECRET_PLACEHOLDER", "Clusters": [{"Hosts": ["https://artsearch2-1-test.artdata.slu.se:9200"]}], "IndexPrefix": "sos-st", "IndexSettings": [{"Name": "observation", "ReadBatchSize": 10000, "RequestTimeout": 300, "ScrollBatchSize": 5000, "ScrollTimeout": "300s"}]}'

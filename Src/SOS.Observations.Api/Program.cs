@@ -78,7 +78,7 @@ try
 
     // Start the application
     string aspnetCoreUrls = Environment.GetEnvironmentVariable("ASPNETCORE_URLS");    
-    await app.RunAsync(aspnetCoreUrls ?? "http://*:5000");    
+    await app.RunAsync(aspnetCoreUrls ?? "http://*:5005");    
 }
 catch (Exception ex)
 {

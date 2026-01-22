@@ -1,0 +1,28 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: sos-analysis-ingress
+  namespace: sos-analysis
+  annotations:
+    cert-manager.io/cluster-issuer: vault-slu.se-cluster-issuer
+    nginx.ingress.kubernetes.io/proxy-body-size: 20m
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+      - sos-analysis.artdata.slu.se
+      secretName: wildcard.artdata.slu.se-tls
+  rules:
+  - host: sos-analysis.artdata.slu.se
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: sos-analysis-api
+            port:
+              number: 5005

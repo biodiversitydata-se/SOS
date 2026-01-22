@@ -210,7 +210,7 @@ public class UserService : IUserService
 
                 var handler = new JsonWebTokenHandler();
                 var token = handler.ReadJsonWebToken(tokenResponse.access_token);
-
+                _logger.LogInformation("Successfully obtained access token. ExpiresAt={ExpiresAt}", token.ValidTo);
                 return token;
             }
             catch (Exception ex)

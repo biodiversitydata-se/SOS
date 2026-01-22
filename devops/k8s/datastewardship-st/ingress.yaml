@@ -25,4 +25,4 @@ spec:
           service:
             name: datastewardship-api
             port:
-              number: 5000
+              number: 5005

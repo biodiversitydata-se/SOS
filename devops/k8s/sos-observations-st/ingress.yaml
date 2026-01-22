@@ -25,4 +25,4 @@ spec:
           service:
             name: sos-observations-api
             port:
-              number: 5000
+              number: 5005

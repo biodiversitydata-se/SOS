@@ -1,0 +1,30 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: sosadminapi-ingress
+  namespace: sosadminapi
+  annotations:
+    cert-manager.io/cluster-issuer: vault-slu.se-cluster-issuer
+    nginx.ingress.kubernetes.io/proxy-body-size: 20m
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-buffering: "on"
+    nginx.ingress.kubernetes.io/proxy-buffer-size: "8k"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+      - sos-hangfire.artdata.slu.se
+      secretName: wildcard.artdata.slu.se-tls
+  rules:
+  - host: sos-hangfire.artdata.slu.se
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: sosadminapi-api
+            port:
+              number: 5005
