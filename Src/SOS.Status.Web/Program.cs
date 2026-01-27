@@ -104,6 +104,10 @@ try
     });
 
     var app = builder.Build();
+
+    // Add security headers for Razor Components
+    app.AddSecurityHeaders(!isLocalDevelopment);
+
     app.UseForwardedHeaders();
     app.MapDefaultEndpoints();
 
