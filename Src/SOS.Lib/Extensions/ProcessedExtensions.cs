@@ -217,7 +217,7 @@ public static class ProcessedExtensions
         ///     Cats processed taxon to darwin core
         /// </summary>
         /// <returns></returns>
-        public DarwinCoreTaxon ToDarwinCore()
+        public DarwinCoreTaxon ToDarwinCore(bool fixSbdiArtportalenDwcObservation = false)
         {
             return new DarwinCoreTaxon
             {
@@ -252,7 +252,7 @@ public static class ProcessedExtensions
                 VernacularName = taxon.VernacularName,
                 TaxonRemarks = taxon.TaxonRemarks,
                 TaxonRank = taxon.TaxonRank,
-                TaxonomicStatus = taxon.TaxonomicStatus,
+                TaxonomicStatus = fixSbdiArtportalenDwcObservation ? "" : taxon.TaxonomicStatus,
                 VerbatimTaxonRank = taxon.VerbatimTaxonRank
             };
         }
@@ -312,7 +312,7 @@ public static class ProcessedExtensions
             dwc.Occurrence = processedObservation.Occurrence?.ToDarwinCore();
             dwc.References = processedObservation.References;
             dwc.RightsHolder = processedObservation.RightsHolder;
-            dwc.Taxon = processedObservation.Taxon.ToDarwinCore();
+            dwc.Taxon = processedObservation.Taxon.ToDarwinCore(fixSbdiArtportalenDwcObservation);
             dwc.Type = processedObservation.Type?.Value;
 
             return dwc;
