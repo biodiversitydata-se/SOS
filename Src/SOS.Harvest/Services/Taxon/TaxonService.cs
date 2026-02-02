@@ -166,7 +166,8 @@ public class TaxonService : ITaxonService
         .Map(t => t.SwedishOccurrence, 28)
         .Map(t => t.SwedishHistory, 29)
         .Map(t => t.SwedishHistoryId, 30)
-        .Map(t => t.SwedishHistoryCategory, 31);
+        .Map(t => t.SwedishHistoryCategory, 31)
+        .Map(t => t.BirdDirectiveAnnex1, 32);
 
     private IVariableLengthReaderBuilder<DarwinCoreTaxonName> TaxonNamePropertiesMapping =>
         new VariableLengthReaderBuilder<DarwinCoreTaxonName>()
@@ -375,6 +376,7 @@ public class TaxonService : ITaxonService
                 ActionPlan = m.ActionPlan,
                 BannedForReporting = m.BannedForReporting,
                 BirdDirective = m.BirdDirective,
+                BirdDirectiveAnnex1 = m.BirdDirectiveAnnex1,
                 DisturbanceRadius = m.DisturbanceRadius,
                 EuRegulation_1143_2014 = m.EuRegulation_1143_2014,
                 ExcludeFromReportingSystem = m.ExcludeFromReportingSystem,
@@ -415,6 +417,7 @@ public class TaxonService : ITaxonService
             {
                 taxon.DynamicProperties.ActionPlan = taxonProperties.ActionPlan;
                 taxon.DynamicProperties.BirdDirective = taxonProperties.BirdDirective;
+                taxon.DynamicProperties.BirdDirectiveAnnex1 = taxonProperties.BirdDirectiveAnnex1;
                 taxon.DynamicProperties.DisturbanceRadius = taxonProperties.DisturbanceRadius ?? 0;
                 taxon.DynamicProperties.InvasiveRiskAssessmentCategory = string.IsNullOrEmpty(taxonProperties.InvasiveRiskAssessmentCategory) ? null : taxonProperties.InvasiveRiskAssessmentCategory;
                 taxon.DynamicProperties.IsEURegulation_1143_2014 = taxonProperties.EuRegulation_1143_2014;

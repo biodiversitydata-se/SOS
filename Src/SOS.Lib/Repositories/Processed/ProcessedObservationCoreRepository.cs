@@ -719,6 +719,7 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
                         .NumberVal(n => n.Taxon.Id, IndexSetting.SearchSortAggregate, NumberType.Integer)
                         .NumberVal(n => n.Taxon.SecondaryParentDyntaxaTaxonIds, IndexSetting.None, NumberType.Integer)
                         .BooleanVal(b => b.Taxon.BirdDirective, IndexSetting.SearchOnly)
+                        .BooleanVal(b => b.Taxon.BirdDirectiveAnnex1, IndexSetting.SearchOnly)
                         .Object(o => o.Taxon.Attributes, a => a
                             .Properties(ps => ps
                                 .KeywordVal(kwlc => kwlc.Taxon.Attributes.ActionPlan, IndexSetting.SearchOnly) // WFS

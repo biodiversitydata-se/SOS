@@ -41,6 +41,11 @@ public class Taxon : IEntity<int>, IBasicTaxon
     /// </summary>
     public bool BirdDirective { get; set; }
 
+    /// <summary>
+    ///     Part of bird directive annex 1?
+    /// </summary>
+    public bool BirdDirectiveAnnex1 { get; set; }
+
     /// <summary>        
     ///     The full scientific name of the class in which
     ///     the taxon is classified.

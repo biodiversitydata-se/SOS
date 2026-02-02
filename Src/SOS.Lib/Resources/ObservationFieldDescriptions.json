@@ -658,6 +658,18 @@
     "FieldSet": "AllWithValues"
   },
   {
+    "PropertyName": "BirdDirectiveAnnex1",
+    "PropertyPath": "Taxon.BirdDirectiveAnnex1",
+    "SwedishTitle": "Fågeldirektivet bilaga 1",
+    "EnglishTitle": "Birds Directive Annex 1",
+    "DataType": "Boolean",
+    "DataTypeIsNullable": true,
+    "DwcName": "",
+    "DwcIdentifier": "",
+    "DependsOn": "Taxon.BirdDirectiveAnnex1",
+    "FieldSet": "AllWithValues"
+  },
+  {
     "PropertyName": "Natura2000HabitatsDirectiveArticle2",
     "PropertyPath": "Taxon.Attributes.Natura2000HabitatsDirectiveArticle2",
     "SwedishTitle": "Habitatdirektivet bilaga 2",
@@ -705,18 +717,18 @@
     "DependsOn": "Taxon.Attributes.IsInvasiveAccordingToEuRegulation",
     "FieldSet": "Extended"
   },
-    {
-        "PropertyName": "TaxonIsInvasiveInSweden",
-        "PropertyPath": "Taxon.Attributes.IsInvasiveInSweden",
-        "SwedishTitle": "Invasiv",
-        "EnglishTitle": "Invasive",
-        "DataType": "Boolean",
-        "DataTypeIsNullable": false,
-        "DwcName": "",
-        "DwcIdentifier": "",
-        "DependsOn": "Taxon.Attributes.IsInvasiveInSweden",
-        "FieldSet": "Extended"
-    },
+  {
+    "PropertyName": "TaxonIsInvasiveInSweden",
+    "PropertyPath": "Taxon.Attributes.IsInvasiveInSweden",
+    "SwedishTitle": "Invasiv",
+    "EnglishTitle": "Invasive",
+    "DataType": "Boolean",
+    "DataTypeIsNullable": false,
+    "DwcName": "",
+    "DwcIdentifier": "",
+    "DependsOn": "Taxon.Attributes.IsInvasiveInSweden",
+    "FieldSet": "Extended"
+  },
   {
     "PropertyName": "TaxonInvasiveRiskCategory",
     "PropertyPath": "Taxon.Attributes.InvasiveRiskAssessmentCategory",

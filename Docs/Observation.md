@@ -185,6 +185,7 @@ All fields that are part of an observation are listed on this page.
 | taxon.vernacularName 	| string 	| "göknycklar" 	| Vernacular name. 	| https://dwc.tdwg.org/terms/#dwc:vernacularName 	|
 | taxon.taxonRank 	| string 	| "species" 	| The taxonomic rank of the most specific name in the scientificName.    	| https://dwc.tdwg.org/terms/#dwc:taxonRank 	|
 | taxon.birdDirective 	| boolean 	| false 	| Indicates whether the taxon is part of bird directive.    	|  	|
+| taxon.birdDirectiveAnnex1 | boolean 	| false 	| Indicates whether the taxon is part of bird directive annex 1.|  	|
 | taxon.genus 	| string 	| "Anacamptis" 	| The full scientific name of the genus in which the taxon is classified.    	| https://dwc.tdwg.org/terms/#dwc:genus 	|
 | taxon.family 	| string 	| "Orchidaceae" 	| The full scientific name of the family in which the taxon is classified.    	| https://dwc.tdwg.org/terms/#dwc:family 	|
 | taxon.order 	| string 	| "Asparagales" 	| The full scientific name of the order in which the taxon is classified.    	| https://dwc.tdwg.org/terms/#dwc:order 	|

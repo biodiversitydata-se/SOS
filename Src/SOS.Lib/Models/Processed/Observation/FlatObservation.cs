@@ -212,6 +212,7 @@ public class FlatObservation
         ["taxon.acceptednameusage"] = x => x._observation?.Taxon?.AcceptedNameUsage,
         ["taxon.acceptednameusageid"] = x => x._observation?.Taxon?.AcceptedNameUsageId,
         ["taxon.birddirective"] = x => x._observation?.Taxon?.BirdDirective,
+        ["taxon.birddirectiveannex1"] = x => x._observation?.Taxon?.BirdDirectiveAnnex1,
         ["taxon.higherclassification"] = x => x._observation?.Taxon?.HigherClassification,
         ["taxon.id"] = x => x._observation?.Taxon?.Id,
         ["taxon.scientificname"] = x => x._observation?.Taxon?.ScientificName,
