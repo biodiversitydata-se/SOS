@@ -25,6 +25,7 @@ public class TaxonProperties<T>
     public bool ExcludeFromReportingSystem { get; set; }
     public string ActionPlan { get; set; }
     public bool BirdDirective { get; set; }
+    public bool BirdDirectiveAnnex1 { get; set; }
     public bool EuRegulation_1143_2014 { get; set; }
     public string RiskLista { get; set; }
     public string InvasiveRiskAssessmentCategory { get; set; }

@@ -1,4 +1,6 @@
-﻿namespace SOS.Lib.Enums;
+﻿using SOS.Lib.Attributes;
+
+namespace SOS.Lib.Enums;
 
 public enum AreaType
 {
@@ -15,6 +17,7 @@ public enum AreaType
     County = 21,
     ProtectedNature = 22,
     SwedishForestAgencyDistricts = 24,
+    [ExcludeFromSearch]
     EconomicZoneOfSweden = 25,
     Sci = 26,
     WaterArea = 27,
@@ -22,6 +25,7 @@ public enum AreaType
     Atlas10x10 = 30,
     SfvDistricts = 34,
     Campus = 35,
+    [ExcludeFromSearch]
     Sveaskog = 36,
     SvenskaKraftnät = 37
 }

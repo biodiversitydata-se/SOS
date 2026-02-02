@@ -29,4 +29,9 @@ public class AreaBaseDto
     ///     Name of area
     /// </summary>
     public string Name { get; set; }
+
+    /// <summary>
+    /// Unique key that is a combination of AreaType and FeatureId
+    /// </summary>
+    public string Key => $"{AreaType}-{FeatureId}";
 }

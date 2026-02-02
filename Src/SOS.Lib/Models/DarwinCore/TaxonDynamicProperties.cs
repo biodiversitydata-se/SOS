@@ -33,6 +33,11 @@ public class TaxonDynamicProperties
     public bool? BirdDirective { get; set; }
 
     /// <summary>
+    ///     Part of bird directive annex 1?
+    /// </summary>
+    public bool? BirdDirectiveAnnex1 { get; set; }
+
+    /// <summary>
     /// County occurrence status
     /// </summary>
     public ICollection<CountyOccurrence> CountyOccurrences { get; set; }

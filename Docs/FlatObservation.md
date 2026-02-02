@@ -173,6 +173,7 @@ All fields in the Minimum and Extended field sets, and also the following fields
 | ReportedDate | Occurrence.ReportedDate | Rapporterad (Datum) | Reported date | DateTime | AllWithValues |
 | AcceptedNameUsageId | Taxon.AcceptedNameUsageId | AcceptedNameUsageId | AcceptedNameUsageId | String | AllWithValues |
 | BirdDirective | Taxon.BirdDirective | BirdDirective | BirdDirective | Boolean | AllWithValues |
+| BirdDirectiveAnnex1 | Taxon.BirdDirectiveAnnex1 | BirdDirectiveAnnex1 | BirdDirectiveAnnex1 | Boolean | AllWithValues |
 | HigherClassification | Taxon.HigherClassification | Klassificering | Higher classification | String | AllWithValues |
 | ScientificNameAuthorship | Taxon.ScientificNameAuthorship | Auktor | Scientific name authorship | String | AllWithValues |
 | NomenclaturalStatus | Taxon.NomenclaturalStatus | Nomenklaturisk status | Nomenclatural status | String | AllWithValues |

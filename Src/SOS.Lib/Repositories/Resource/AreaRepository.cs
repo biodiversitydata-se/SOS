@@ -27,6 +27,11 @@ public class AreaRepository : RepositoryBase<Area, string>, IAreaRepository
     private readonly JsonSerializerOptions _jsonSerializerOptions;
 
     /// <summary>
+    ///     Cached area types that are excluded from search (marked with ExcludeFromSearchAttribute)
+    /// </summary>
+    private static readonly AreaType[] DisallowedAreaTypes = AreaTypeExtensions.GetExcludedAreaTypes();
+
+    /// <summary>
     ///     Constructor
     /// </summary>
     /// <param name="processClient"></param>
@@ -131,8 +136,8 @@ public class AreaRepository : RepositoryBase<Area, string>, IAreaRepository
         }
         else
         {
-            // Make sure economic zone of sweden is NOT matched
-            filters.Add(Builders<Area>.Filter.In(a => a.AreaType, ((AreaType[])Enum.GetValues(typeof(AreaType))).Where(at => at != AreaType.EconomicZoneOfSweden)));
+            // Exclude area types marked with ExcludeFromSearchAttribute (using Nin for better performance with small exclusion list)
+            filters.Add(Builders<Area>.Filter.Nin(a => a.AreaType, DisallowedAreaTypes));                    
         }
 
         if (!string.IsNullOrEmpty(searchString))

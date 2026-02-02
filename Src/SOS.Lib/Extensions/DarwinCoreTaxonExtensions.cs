@@ -73,6 +73,7 @@ public static class DarwinCoreTaxonExtensions
             taxon.AcceptedNameUsage = sourceTaxon.AcceptedNameUsage;
             taxon.AcceptedNameUsageId = sourceTaxon.AcceptedNameUsageID;
             taxon.BirdDirective = sourceTaxon.DynamicProperties?.BirdDirective == null ? false : sourceTaxon.DynamicProperties.BirdDirective.GetValueOrDefault();
+            taxon.BirdDirectiveAnnex1 = sourceTaxon.DynamicProperties?.BirdDirectiveAnnex1 == null ? false : sourceTaxon.DynamicProperties.BirdDirectiveAnnex1.GetValueOrDefault();
             taxon.Class = sourceTaxon.Class;
             taxon.Family = sourceTaxon.Family;
             taxon.Genus = sourceTaxon.Genus;
