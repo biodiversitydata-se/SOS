@@ -59,6 +59,7 @@ public class ProcessedObservationRepository : ProcessedObservationCoreRepository
                 .Add("species_count", a => a
                     .Cardinality(c => c
                         .Field("taxon.id")
+                        .PrecisionThreshold(40000) // 40 000 is max. If query returns more hits, count will not guaranteed to be accurate
                     )
                 )
             )
