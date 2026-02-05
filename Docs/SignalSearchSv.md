@@ -12,6 +12,8 @@ Signalsök är utformad för att:
 
 > **Viktigt:** Endast skyddade fynd ingår i signalsök. Publika fynd inkluderas aldrig i sökningen.
 
+Vad är skyddade fynd? Det är fynd (observationer) av arter som har bedömts innehålla känslig information som, om den offentliggörs, skulle kunna få negativa konsekvenser för det aktuella taxonet eller egenskapen (till exempel fyndplatsen) eller för en levande individ. Känslig information avser vanligtvis exakta platsangivelser för sällsynta, utrotningshotade eller kommersiellt värdefulla taxa. Därför är tillgången till observationer som klassificeras som känsliga begränsad.
+
 ---
 
 ## 2. Vad innebär ett Ja/Nej-svar?
@@ -51,13 +53,13 @@ Detta beteende styrs av parametern `returnHttp4xxWhenNoPermissions`.
 
 ### 3.3 Signalsök och skyddsklasser
 
-Signalsök söker bland alla skyddade observationer, dvs. de med skyddsklass 3,4 och 5. Den söker ej bland observationer med skyddsklass 1 (publika fynd).
+Signalsök söker bland alla skyddade observationer, dvs. de med skyddsklass 3,4 och 5. Den söker ej bland observationer med skyddsklass 1 (publika fynd). Skyddsklas 2 är utgången och används inte längre.
 
 ---
 
 ## 4. Var finns Signalsök?
 
-Signalsök-endpointen är tillgänglig för interna applikationer på SLU och externa system via API:et *Species Observation System API (Internal)* på [Artdatabankens utvecklarportal](https://api-portal.artdatabanken.se).
+Signalsök-endpointen är tillgänglig för interna applikationer på SLU och externa system via API:et *Species Observation System API (Internal)* på [Artdatabankens utvecklarportal](https://api-portal.artdatabanken.se). Signalsökning är främst avsedd att användas av myndigheter.
 
 Signalsök används i flera applikationer, till exempel:
 
@@ -106,8 +108,8 @@ Om ingen obligatorisk lista anges returneras **HTTP 400 (Bad Request)**.
 
 ### 5.4 Övriga filter (valfria)
 
-* Fågelhäckningkriterie (`BirdNestActivityLimit`)
-* Datakällor (`DataProvider`)
+* Fågelhäckningskriterie (`BirdNestActivityLimit`)
+* Dataset (`DataProvider`)
 * Artportalen-typfilter (`ArtportalenTypeFilter`)
 
 ---
