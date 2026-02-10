@@ -125,103 +125,115 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "administration.api", "administration.api", "{699E5164-7934-4EF6-9FF1-56AF263EADB2}"
 	ProjectSection(SolutionItems) = preProject
 		devops\k8s\sosadminapi-dev\api.yaml = devops\k8s\sosadminapi-dev\api.yaml
+		devops\k8s\sosadminapi-dev\ingress.yaml = devops\k8s\sosadminapi-dev\ingress.yaml
+		devops\k8s\sosadminapi-dev\kustomization.yaml = devops\k8s\sosadminapi-dev\kustomization.yaml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "administration.gui", "administration.gui", "{CEEE9D79-44E6-4B97-8F93-C33F9677EE5E}"
 	ProjectSection(SolutionItems) = preProject
-		devops\k8s\dev\administration.gui\api.yaml = devops\k8s\dev\administration.gui\api.yaml
+		devops\k8s\sos-status-dev\app-patch.yaml = devops\k8s\sos-status-dev\app-patch.yaml
+		devops\k8s\sos-status-dev\ingress.yaml = devops\k8s\sos-status-dev\ingress.yaml
+		devops\k8s\sos-status-dev\kustomization.yaml = devops\k8s\sos-status-dev\kustomization.yaml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "analysis", "analysis", "{855801E5-AFD8-42C4-B9B5-7F7A27560307}"
 	ProjectSection(SolutionItems) = preProject
-		devops\k8s\dev\analysis\api.yaml = devops\k8s\dev\analysis\api.yaml
+		devops\k8s\sos-analysis-dev\api.yaml = devops\k8s\sos-analysis-dev\api.yaml
+		devops\k8s\sos-analysis-dev\ingress.yaml = devops\k8s\sos-analysis-dev\ingress.yaml
+		devops\k8s\sos-analysis-dev\kustomization.yaml = devops\k8s\sos-analysis-dev\kustomization.yaml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "observations", "observations", "{5631EB28-47D6-4F84-981B-BA799A5453C7}"
 	ProjectSection(SolutionItems) = preProject
-		devops\k8s\dev\observations\api.yaml = devops\k8s\dev\observations\api.yaml
 		devops\k8s\sos-observations-dev\api.yaml = devops\k8s\sos-observations-dev\api.yaml
+		devops\k8s\sos-observations-dev\ingress.yaml = devops\k8s\sos-observations-dev\ingress.yaml
 		devops\k8s\sos-observations-dev\kustomization.yaml = devops\k8s\sos-observations-dev\kustomization.yaml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "administration.api", "administration.api", "{A4C3FF83-18CB-478E-9477-0603AE91AD04}"
-	ProjectSection(SolutionItems) = preProject
-		devops\k8s\local\administration.api\api.yaml = devops\k8s\local\administration.api\api.yaml
-	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "administration.api", "administration.api", "{8D6F1408-F03B-4C28-A514-377B316056D2}"
 	ProjectSection(SolutionItems) = preProject
-		devops\k8s\prod\administration.api\api.yaml = devops\k8s\prod\administration.api\api.yaml
+		devops\k8s\sosadminapi-prod\api-patch.yaml = devops\k8s\sosadminapi-prod\api-patch.yaml
+		devops\k8s\sosadminapi-prod\ingress.yaml = devops\k8s\sosadminapi-prod\ingress.yaml
+		devops\k8s\sosadminapi-prod\kustomization.yaml = devops\k8s\sosadminapi-prod\kustomization.yaml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "administration.api", "administration.api", "{27FA99AC-8A53-4791-99C5-C9F557978BBF}"
 	ProjectSection(SolutionItems) = preProject
-		devops\k8s\st\administration.api\api.yaml = devops\k8s\st\administration.api\api.yaml
+		devops\k8s\sosadminapi-st\api.yaml = devops\k8s\sosadminapi-st\api.yaml
+		devops\k8s\sosadminapi-st\ingress.yaml = devops\k8s\sosadminapi-st\ingress.yaml
+		devops\k8s\sosadminapi-st\kustomization.yaml = devops\k8s\sosadminapi-st\kustomization.yaml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "administration.gui", "administration.gui", "{69C5047E-7019-413F-8CBA-5ED7D549CDDB}"
-	ProjectSection(SolutionItems) = preProject
-		devops\k8s\local\administration.gui\api.yaml = devops\k8s\local\administration.gui\api.yaml
-	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "administration.gui", "administration.gui", "{59FEB4AF-191D-4383-BDAA-CAB77614FABF}"
 	ProjectSection(SolutionItems) = preProject
-		devops\k8s\prod\administration.gui\api.yaml = devops\k8s\prod\administration.gui\api.yaml
+		devops\k8s\sos-status-prod\app-patch.yaml = devops\k8s\sos-status-prod\app-patch.yaml
+		devops\k8s\sos-status-prod\ingress.yaml = devops\k8s\sos-status-prod\ingress.yaml
+		devops\k8s\sos-status-prod\kustomization.yaml = devops\k8s\sos-status-prod\kustomization.yaml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "administration.gui", "administration.gui", "{17EA1AE8-AEFC-4835-BDA6-116AB4BCCA6C}"
 	ProjectSection(SolutionItems) = preProject
-		devops\k8s\st\administration.gui\api.yaml = devops\k8s\st\administration.gui\api.yaml
+		devops\k8s\sos-status-st\app-patch.yaml = devops\k8s\sos-status-st\app-patch.yaml
+		devops\k8s\sos-status-st\ingress.yaml = devops\k8s\sos-status-st\ingress.yaml
+		devops\k8s\sos-status-st\kustomization.yaml = devops\k8s\sos-status-st\kustomization.yaml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "analysis", "analysis", "{3A2C48B6-A752-4088-81D8-DC3D05E038EB}"
-	ProjectSection(SolutionItems) = preProject
-		devops\k8s\local\analysis\api.yaml = devops\k8s\local\analysis\api.yaml
-	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "analysis", "analysis", "{EDB7EF56-4335-41C1-9D55-DF62BBF6D9B4}"
 	ProjectSection(SolutionItems) = preProject
-		devops\k8s\prod\analysis\api.yaml = devops\k8s\prod\analysis\api.yaml
+		devops\k8s\sos-analysis-prod\api-patch.yaml = devops\k8s\sos-analysis-prod\api-patch.yaml
+		devops\k8s\sos-analysis-prod\ingress.yaml = devops\k8s\sos-analysis-prod\ingress.yaml
+		devops\k8s\sos-analysis-prod\kustomization.yaml = devops\k8s\sos-analysis-prod\kustomization.yaml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "analysis", "analysis", "{B05D1420-83C5-4C35-A072-754E5AC4E9FB}"
 	ProjectSection(SolutionItems) = preProject
-		devops\k8s\st\analysis\api.yaml = devops\k8s\st\analysis\api.yaml
+		devops\k8s\sos-analysis-st\api.yaml = devops\k8s\sos-analysis-st\api.yaml
+		devops\k8s\sos-analysis-st\ingress.yaml = devops\k8s\sos-analysis-st\ingress.yaml
+		devops\k8s\sos-analysis-st\kustomization.yaml = devops\k8s\sos-analysis-st\kustomization.yaml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "observations", "observations", "{A18A0685-F5A9-4702-AAA0-D9C51FB2400A}"
-	ProjectSection(SolutionItems) = preProject
-		devops\k8s\local\observations\api.yaml = devops\k8s\local\observations\api.yaml
-	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "observations", "observations", "{FAC95385-CB0D-4335-A1F3-0AF0D15473B1}"
 	ProjectSection(SolutionItems) = preProject
-		devops\k8s\prod\observations\api.yaml = devops\k8s\prod\observations\api.yaml
+		devops\k8s\sos-observations-prod\ingress.yaml = devops\k8s\sos-observations-prod\ingress.yaml
+		devops\k8s\sos-observations-prod\kustomization.yaml = devops\k8s\sos-observations-prod\kustomization.yaml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "observations", "observations", "{ACC3AAD4-609E-4FEF-99EF-F8DDE6265B5F}"
 	ProjectSection(SolutionItems) = preProject
-		devops\k8s\st\observations\api.yaml = devops\k8s\st\observations\api.yaml
+		devops\k8s\sos-observations-st\api.yaml = devops\k8s\sos-observations-st\api.yaml
+		devops\k8s\sos-observations-st\ingress.yaml = devops\k8s\sos-observations-st\ingress.yaml
+		devops\k8s\sos-observations-st\kustomization.yaml = devops\k8s\sos-observations-st\kustomization.yaml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "proxy", "proxy", "{3669CB09-BB01-4EDC-9ED7-0BF18596DAC1}"
 	ProjectSection(SolutionItems) = preProject
-		devops\k8s\dev\proxy\api.yaml = devops\k8s\dev\proxy\api.yaml
+		devops\k8s\sos-proxy-dev\api.yaml = devops\k8s\sos-proxy-dev\api.yaml
+		devops\k8s\sos-proxy-dev\ingress.yaml = devops\k8s\sos-proxy-dev\ingress.yaml
+		devops\k8s\sos-proxy-dev\kustomization.yaml = devops\k8s\sos-proxy-dev\kustomization.yaml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "proxy", "proxy", "{146ACFA3-5B34-43E3-8059-7C93BDBBC43D}"
-	ProjectSection(SolutionItems) = preProject
-		devops\k8s\local\proxy\api.yaml = devops\k8s\local\proxy\api.yaml
-	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "proxy", "proxy", "{60BDF2DA-5FF7-4B68-9651-25D4D5A64738}"
 	ProjectSection(SolutionItems) = preProject
-		devops\k8s\prod\proxy\api.yaml = devops\k8s\prod\proxy\api.yaml
+		devops\k8s\sos-proxy-prod\api-patch.yaml = devops\k8s\sos-proxy-prod\api-patch.yaml
+		devops\k8s\sos-proxy-prod\ingress.yaml = devops\k8s\sos-proxy-prod\ingress.yaml
+		devops\k8s\sos-proxy-prod\kustomization.yaml = devops\k8s\sos-proxy-prod\kustomization.yaml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "proxy", "proxy", "{BCFE127C-070E-4D23-8E93-B09CE544DDDF}"
 	ProjectSection(SolutionItems) = preProject
-		devops\k8s\st\proxy\api.yaml = devops\k8s\st\proxy\api.yaml
+		devops\k8s\sos-proxy-st\api.yaml = devops\k8s\sos-proxy-st\api.yaml
+		devops\k8s\sos-proxy-st\ingress.yaml = devops\k8s\sos-proxy-st\ingress.yaml
+		devops\k8s\sos-proxy-st\kustomization.yaml = devops\k8s\sos-proxy-st\kustomization.yaml
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SOS.AppHost", "Src\SOS.AppHost\SOS.AppHost.csproj", "{6B18784B-CB2C-47CF-8916-A6E9520F9140}"
@@ -247,18 +259,24 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dataStewardship", "dataStewardship", "{E021C5A8-6E38-4F33-91DE-D29235030E56}"
 	ProjectSection(SolutionItems) = preProject
 		devops\k8s\datastewardship-dev\api.yaml = devops\k8s\datastewardship-dev\api.yaml
+		devops\k8s\datastewardship-dev\ingress.yaml = devops\k8s\datastewardship-dev\ingress.yaml
+		devops\k8s\datastewardship-dev\kustomization.yaml = devops\k8s\datastewardship-dev\kustomization.yaml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dataStewardship", "dataStewardship", "{8B8CC3CA-BD63-49EC-8E4F-672A3CAB275D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dataStewardship", "dataStewardship", "{48814679-A471-45E8-A1F5-36FD45525111}"
 	ProjectSection(SolutionItems) = preProject
-		devops\k8s\prod\datastewardship\api.yaml = devops\k8s\prod\datastewardship\api.yaml
+		devops\k8s\datastewardship-prod\api-patch.yaml = devops\k8s\datastewardship-prod\api-patch.yaml
+		devops\k8s\datastewardship-prod\ingress.yaml = devops\k8s\datastewardship-prod\ingress.yaml
+		devops\k8s\datastewardship-prod\kustomization.yaml = devops\k8s\datastewardship-prod\kustomization.yaml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dataStewardship", "dataStewardship", "{BF4F729F-D296-4C4C-9F7B-1B9FF5463C52}"
 	ProjectSection(SolutionItems) = preProject
 		devops\k8s\datastewardship-st\api.yaml = devops\k8s\datastewardship-st\api.yaml
+		devops\k8s\datastewardship-st\ingress.yaml = devops\k8s\datastewardship-st\ingress.yaml
+		devops\k8s\datastewardship-st\kustomization.yaml = devops\k8s\datastewardship-st\kustomization.yaml
 	EndProjectSection
 EndProject
 Global
