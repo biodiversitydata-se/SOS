@@ -3445,10 +3445,10 @@
           {
             "name": "sortBy",
             "in": "query",
-            "description": "Field to sort by. Required for consistent pagination.",
+            "description": "Field to sort by. Required for consistent pagination. Defaults to \"modified\" if not specified.",
             "schema": {
               "type": "string",
-              "default": ""
+              "default": "modified"
             }
           },
           {
