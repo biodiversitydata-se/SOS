@@ -5,7 +5,7 @@
 ### `Added`
 - New endpoint `Observations_SearchByCursor`. With this endpoint, you can harvest up to 2 million observations.
 - New properties in `AreaBaseDto`: 
-    - `areaTypeId`. This is like `areaType` but an integer insted of an enum string. 
+    - `areaTypeId`. This is like `areaType` but an integer instead of an enum string. 
     - `key`. A unique key for the area.
 - New property: `taxon.birdDirectiveAnnex1`. This is true if the taxon is included in the taxon list `Birds directive - Annex 1`.
 - Security headers added.
