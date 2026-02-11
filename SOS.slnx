@@ -21,6 +21,8 @@
     <File Path="Docs/Observation.md" />
     <File Path="Docs/ObsoleteProperties.md" />
     <File Path="Docs/SearchFilter.md" />
+    <File Path="Docs/SignalSearch.md" />
+    <File Path="Docs/SignalSearchSv.md" />
     <File Path="Docs/TaxaMatch.md" />
     <File Path="Docs/TrunkBasedBranchingStrategy.md" />
     <File Path="Docs/Vocabularies.md" />
