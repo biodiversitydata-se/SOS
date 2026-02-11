@@ -681,7 +681,7 @@ public class ObservationsController : ControllerBase
     /// <param name="filter">Filter used to limit the search.</param>
     /// <param name="take">Max number of observations to return. Max is 2,500 observations in each request.</param>
     /// <param name="cursor">Sort values from the last document in the previous page. Pass null or omit for the first request. This value is base64-encoded.</param>
-    /// <param name="sortBy">Field to sort by. Required for consistent pagination.</param>
+    /// <param name="sortBy">Field to sort by. Required for consistent pagination. Defaults to "modified" if not specified.</param>
     /// <param name="sortOrder">Sort order (Asc, Desc).</param>
     /// <param name="validateSearchFilter">If true, validation of search filter values will be made.</param>
     /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB).</param>
@@ -700,12 +700,13 @@ public class ObservationsController : ControllerBase
         [FromBody] SearchFilterDto? filter,
         [FromQuery] int take = 1000,
         [FromQuery] string? cursor = null,
-        [FromQuery] string sortBy = "",
+        [FromQuery] string? sortBy = "modified",
         [FromQuery] SearchSortOrder sortOrder = SearchSortOrder.Asc,
         [FromQuery] bool validateSearchFilter = false,
         [FromQuery] string translationCultureCode = "sv-SE",
         [FromQuery] bool sensitiveObservations = false)
-    {
+    {        
+        const string defaultSortBy = "modified";
         ApiUserType userType = this.GetApiUserType();
         var semaphoreResult = await _semaphoreLimitManager.GetSemaphoreAsync(SemaphoreType.Observation, userType, this.GetEndpointName(ControllerContext));
         LogHelper.AddSemaphoreHttpContextItems(semaphoreResult, HttpContext);
@@ -719,9 +720,17 @@ public class ObservationsController : ControllerBase
             filter = await _searchFilterUtility.InitializeSearchFilterAsync(filter);
             translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
 
+            // Use default sort field if not provided
+            if (string.IsNullOrWhiteSpace(sortBy))
+            {
+                sortBy = defaultSortBy;
+            }
+
+            // Validate
+            var sortFieldValidationResult = await _inputValidator.ValidateSortFieldsAsync(new[] { sortBy });
             var validationResult = Result.Combine(
+                sortFieldValidationResult,
                 take <= 2500 ? Result.Success() : Result.Failure("You can't take more than 2,500 at a time."),
-                string.IsNullOrEmpty(sortBy) ? Result.Success() : (await _inputValidator.ValidateSortFieldsAsync(new[] { sortBy })),
                 _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
                 _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries),
                 _inputValidator.ValidateTranslationCultureCode(translationCultureCode),
@@ -729,13 +738,10 @@ public class ObservationsController : ControllerBase
 
             if (validationResult.IsFailure) return BadRequest(validationResult.Error);
 
-            var sortFieldValidationResult = string.IsNullOrEmpty(sortBy) ? Result.Success<List<string>>(null) : (await _inputValidator.ValidateSortFieldsAsync(new[] { sortBy }));
-            if (sortFieldValidationResult.IsFailure) return BadRequest(sortFieldValidationResult.Error);
             if (sortFieldValidationResult.Value != null && sortFieldValidationResult.Value.Any())
             {
                 sortBy = sortFieldValidationResult.Value.First();
             }
-
             var searchFilter = filter.ToSearchFilter(this.GetUserId(), protectionFilter, translationCultureCode, sortBy, sortOrder);
             var result = await _observationManager.GetChunkBySearchAfterAsync(roleId, authorizationApplicationIdentifier, searchFilter, take, cursor);
 
