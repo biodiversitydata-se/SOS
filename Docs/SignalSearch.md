@@ -12,12 +12,14 @@ Signal Search is designed to:
 
 > **Important:** Only sensitive observations are included in Signal Search. Public observations are never included.
 
+What are sensitive observations? Those are species observation records that have been judged to contain sensitive information which if released to the public, would result in an ‘adverse effect’ on the taxon or attribute in question or to a living individual. Sensitive information commonly relates to the exact localities of rare, endangered or commercially valuable taxa. Therefore, access to observations classified as sensitive are provided with restricted access only.
+
 ---
 
 ## 2. What does a Yes/No response mean?
 
-* **Yes (true):** There is at least one protected observation that matches the search criteria.
-* **No (false):** There are no protected observations that match the search criteria.
+* **Yes (true):** There is at least one restricted access observation that matches the search criteria.
+* **No (false):** There are no restricted access observations that match the search criteria.
 
 The user is **not** informed about:
 
@@ -51,13 +53,13 @@ This behavior is controlled by the parameter `returnHttp4xxWhenNoPermissions`.
 
 ### 3.3 Signal Search and sensitivity categories
 
-Signal Search searches among all sensitive observations, i.e. those with sensitivity categories 3, 4, and 5. It does not include observations with sensitivity category 1 (public observations).
+Signal Search searches among all sensitive observations, i.e. those with sensitivity categories 3, 4, and 5. It does not include observations with sensitivity category 1 (public observations). Sensitivity category is an obsolete category not used anymore.
 
 ---
 
 ## 4. Where is Signal Search available?
 
-The Signal Search endpoint is available to internal applications at SLU and to external systems via the *Species Observation System API (Internal)* on the [Swedish Species Information Centre developer portal](https://api-portal.artdatabanken.se).
+The Signal Search endpoint is available to internal applications at SLU and to external systems via the *Species Observation System API (Internal)* on the [Swedish Species Information Centre developer portal](https://api-portal.artdatabanken.se). Signal search is meant to be used primarily by authorities.
 
 Signal Search is used in several applications, for example:
 
@@ -106,7 +108,7 @@ If no mandatory taxon list is provided, **HTTP 400 (Bad Request)** is returned.
 ### 5.4 Other filters (optional)
 
 * Bird nesting activity criterion (`BirdNestActivityLimit`)
-* Data providers (`DataProvider`)
+* Data set (`DataProvider`)
 * Artportalen type filter (`ArtportalenTypeFilter`)
 
 ---
