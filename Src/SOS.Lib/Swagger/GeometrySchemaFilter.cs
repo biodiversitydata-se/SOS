@@ -1,10 +1,10 @@
 ﻿using Swashbuckle.AspNetCore.SwaggerGen;
 using NetTopologySuite.Geometries;
-using System.Collections.Generic;
 using Microsoft.OpenApi;
 using System.Text.Json.Nodes;
 
 namespace SOS.Lib.Swagger;
+
 public class GeometrySchemaFilter : ISchemaFilter
 {
     public void Apply(IOpenApiSchema schema, SchemaFilterContext context)
@@ -21,14 +21,14 @@ public class GeometrySchemaFilter : ISchemaFilter
                     CreateMultiPointSchema(),
                     CreateMultiLineStringSchema(),
                     CreateMultiPolygonSchema(),
-                    CreateGeometryCollectionSchema()
+                    CreateGeometryCollectionSchema(context)
                 };
 
                 openApiSchema.Properties?.Clear();
-                openApiSchema.Type = null; //JsonSchemaType.Null;
+                openApiSchema.Type = null;
             }
         }
-    }
+    }   
 
     private OpenApiSchema CreatePointSchema() =>
         new OpenApiSchema
@@ -39,7 +39,7 @@ public class GeometrySchemaFilter : ISchemaFilter
             {
                 ["type"] = new OpenApiSchema
                 {
-                    Type = JsonSchemaType.String,                    
+                    Type = JsonSchemaType.String,
                     Enum = new List<JsonNode> { JsonValue.Create("Point") }
                 },
                 ["coordinates"] = new OpenApiSchema
@@ -61,7 +61,7 @@ public class GeometrySchemaFilter : ISchemaFilter
                 ["type"] = new OpenApiSchema
                 {
                     Type = JsonSchemaType.String,
-                    Enum = new List<JsonNode> { JsonValue.Create("LineString") }                    
+                    Enum = new List<JsonNode> { JsonValue.Create("LineString") }
                 },
                 ["coordinates"] = new OpenApiSchema
                 {
@@ -188,8 +188,12 @@ public class GeometrySchemaFilter : ISchemaFilter
             }
         };
 
-    private OpenApiSchema CreateGeometryCollectionSchema() =>
-        new OpenApiSchema
+    private OpenApiSchema CreateGeometryCollectionSchema(SchemaFilterContext context)
+    {        
+        // Get the reference to the Geometry schema from the SchemaRepository
+        var geometrySchemaRef = context.SchemaGenerator.GenerateSchema(typeof(Geometry), context.SchemaRepository);
+
+        return new OpenApiSchema
         {
             Type = JsonSchemaType.Object,
             Required = new HashSet<string> { "type", "geometries" },
@@ -202,9 +206,10 @@ public class GeometrySchemaFilter : ISchemaFilter
                 },
                 ["geometries"] = new OpenApiSchema
                 {
-                    Type = JsonSchemaType.Array,                    
-                    Items = new OpenApiSchema { DynamicRef = "#/components/schemas/Geometry" } //  Reference = new OpenApiReference { Id = "Geometry", Type = ReferenceType.Schema } } 
+                    Type = JsonSchemaType.Array,
+                    Items = geometrySchemaRef
                 }
             }
         };
+    }
 }
