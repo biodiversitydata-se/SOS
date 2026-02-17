@@ -142,7 +142,7 @@ Varje observation kan representeras geografiskt på följande sätt:
    En punkt som representerar observationens angivna position, tillsammans med en koordinatosäkerhet (`coordinateUncertaintyInMeters`).
 
 2. **Buffrad geometri (location.pointWithBuffer)**.
-För punktobservationer skapas en cirkulär polygon där mittpunkten är observationens punkt och radien motsvarar koordinatosäkerheten (`coordinateUncertaintyInMeters`).
+För punktobservationer skapas en cirkulär polygon där mittpunkten är observationens punkt och radien motsvarar koordinatosäkerheten (`coordinateUncertaintyInMeters`) dvs. avståndet (i meter) från den angivna punkten som beskriver den minsta cirkeln som omfattar hela fyndplatsen.
 För **polygonlokaler** lagras istället den **exakta polygonen** som beskriver observationens faktiska utbredning. Polygonlokaler omvandlas alltså inte till cirklar.
 
 3. **Störningsyta (location.pointWithDisturbanceBuffer)**.
