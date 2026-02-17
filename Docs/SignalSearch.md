@@ -141,7 +141,7 @@ Each observation can be represented geographically in the following ways:
    A point representing the reported position of the observation, together with a coordinate uncertainty (`coordinateUncertaintyInMeters`).
 
 2. **Buffered geometry (location.pointWithBuffer)**.
-For point-based observations, a circular polygon is created where the centroid is the observation point and the radius corresponds to the coordinate uncertainty (`coordinateUncertaintyInMeters`).
+For point-based observations, a circular polygon is created where the centroid is the observation point and the radius corresponds to the coordinate uncertainty (`coordinateUncertaintyInMeters`) i.e. the distance (in meters) from the given point describing the smallest circle containing the whole of the location.
 For **polygon locations**, the **exact polygon** describing the true spatial extent of the observation is stored instead. Polygon locations are therefore not converted into circles.
 
 3. **Disturbance area (location.pointWithDisturbanceBuffer)**.
