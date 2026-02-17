@@ -12,9 +12,9 @@ Signal Search is designed to:
 
 > **Important:** Only sensitive observations are included in Signal Search. Public observations are never included.
 
-What are sensitive observations? Those are species observation records that have been judged to contain sensitive information which if released to the public, would result in an ‘adverse effect’ on the taxon or attribute in question or to a living individual. Sensitive information commonly relates to the exact localities of rare, endangered or commercially valuable taxa. Therefore, access to observations classified as sensitive are provided with restricted access only. Some sensitive observations are also subject to confidentiality under the Swedish Public Access to Information and Secrecy Act (2009:400), Chapter 20, Section 1.
+What are **sensitive observations**? Those are species observation records that have been judged to contain sensitive information which if released to the public, would result in an adverse effect on the taxon or attribute in question or to a living individual. Sensitive information commonly relates to the exact localities of rare, endangered or commercially valuable taxa. Therefore, access to observations classified as sensitive are provided with restricted access only. Some sensitive observations are also subject to confidentiality under the Swedish Public Access to Information and Secrecy Act (2009:400), Chapter 20, Section 1.
 
-Further information: [Nationally protected species (SLU Artdatabanken)](https://www.slu.se/artdatabanken/rapportering-och-fynd/fynduppgifter-och-skyddsklassade-arter/skyddsklassade-arter)
+Further information: [Sensitivity of species observation data (SLU Artdatabanken)](https://www.slu.se/artdatabanken/rapportering-och-fynd/fynduppgifter-och-skyddsklassade-arter/skyddsklassade-arter) [Skyddsklassning]
 
 ---
 
@@ -57,7 +57,7 @@ This behavior is controlled by the parameter `returnHttp4xxWhenNoPermissions`.
 
 Signal Search searches among all sensitive observations, i.e. those with sensitivity categories 3, 4, and 5. It does not include observations with sensitivity category 1 (public observations). Sensitivity category 2 is an obsolete category and is no longer used.
 
-When making a request to the endpoint, it is possible to specify that signals should only be returned for observations above the user’s authorization level. For example, if a user has authorization up to sensitivity category 3, signals will then only be returned for categories 4 and 5.
+When making a request to the endpoint, it is possible to specify that a signal should only be returned for observations with sensitivity categories above the user’s authorization level. For example, if a user has authorization up to sensitivity category 3, signals will then only be returned for categories 4 and 5.
 
 It is not possible to restrict a signal search to specific sensitivity categories. The search is performed either across all sensitivity categories (3–5) or only those above the user’s authorization level.
 
@@ -108,7 +108,7 @@ There is no minimum size restriction for the search area.
 
 Signal Search taxon lists:
 
-* Protected by law species (Id 1)
+* Species protected by law (Id 1)
 * Red listed species (Id 7)
 * Habitats directive species (Id 8)
 * Action plan species (Id 17)
@@ -123,9 +123,9 @@ If no mandatory taxon list is provided, **HTTP 400 (Bad Request)** is returned.
 
 ### 5.4 Other filters (optional)
 
-* Bird nesting activity criterion (`BirdNestActivityLimit`)
+* Bird breeding status criterion (`BirdNestActivityLimit`)
 * Dataset (`DataProvider`)
-* Artportalen type filter (`ArtportalenTypeFilter`) – _Used to determine which types of observations in Artportalen should be included in the search. The default value is `DoNotShowMerged`. To include all underlying observations within a grouped observation, `ShowChildrenAndReplacements` can be used._
+* Artportalen type filter (`ArtportalenTypeFilter`) – _Used to determine which types of observations in Artportalen should be included in the search. The default value is `DoNotShowMerged` and refers to the original reported records, not including any grouped observations based on posterior assessment. To include all underlying observations within a grouped observation and including replacements (corrected observations), `ShowChildrenAndReplacements` can be used._
 
 ---
 
