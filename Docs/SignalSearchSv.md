@@ -161,6 +161,8 @@ Vilken geografisk representation som används i signalsökningen styrs av vilka 
   Sökningen görs mot störningsytan `location.pointWithDisturbanceBuffer`.
   Observationer vars mittpunkt ligger utanför sökgeometrin kan ändå inkluderas, förutsatt att någon del av observationens störningsyta skär eller överlappar sökområdet.
 
+  Störningskänslighet har klassats för ett urval av arter och anges som radien i en cirkel utifrån en punktkoordinat. Används så att man kan ta hänsyn till arter som är utanför sökområdet men ändå kan påverkas av en förhållanden eller en händelse inom sökområdet.
+
 * **considerObservationAccuracy = false** och **considerDisturbanceRadius = false**.
   Sökningen görs enbart mot observationens mittpunkt (`location.point`). Endast observationer vars punkt ligger inom sökgeometrin kan då ge träff.
 
