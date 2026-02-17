@@ -160,6 +160,8 @@ Which geographic representation is used in a signal search is determined by whic
   The search is performed against the disturbance area `location.pointWithDisturbanceBuffer`.
   Observations whose centroid lies outside the search geometry may still be included, provided that some part of the disturbance area intersects or overlaps the search area.
 
+  The disturbance sensitivity is classified for a selection of species and is approximated by the radius of a circle based on a point coordinate. It is used to be able to account for species occurrences that are outside the search area but may still be affected by conditions or events within the search area.
+
 * **considerObservationAccuracy = false** and **considerDisturbanceRadius = false**.
   The search is performed solely against the observation centroid (`location.point`). Only observations whose point lies within the search geometry can result in a match.
 
