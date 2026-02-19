@@ -7,7 +7,7 @@ Signal Search is a feature that enables searching for **sensitive observations**
 Signal Search is designed to:
 
 * Protect species and locations by not exposing sighting details.
-* Enable authorities and other authorized actors to make decisions based on occurrence information. A *Yes* response can serve as an initial indication for an employee authorised to perform signal searches, who may then contact a person with higher authorization that has access to more detailed information about the observation(s) and can decide on further actions.
+* Enable authorities and other authorized actors to make decisions based on occurrence information. A *Yes* response serves as a signal for an administrator who is not permitted full access to see that the search contains observations with a higher sensitivity category than the administrator's authorization level. When receiving a signal the administrator may then contact a person with higher authorization that has access to more detailed information about the observation(s) and can decide on further actions.
 * Ensure that only authorized users can perform searches, and only within permitted geographic areas.
 
 > **Important:** Only sensitive observations are included in Signal Search. Public observations are never included.
