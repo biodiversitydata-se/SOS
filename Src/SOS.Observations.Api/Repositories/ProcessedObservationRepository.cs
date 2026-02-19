@@ -279,7 +279,7 @@ public class ProcessedObservationRepository : ProcessedObservationCoreRepository
                 .Add("yearWeekAggregation", a => a
                     .Terms(t => t
                         .Field("yearWeek")
-                        .Size(1000)
+                        .Size(10000)
                         .Order(new[] { new KeyValuePair<Field, SortOrder>(Field.KeyField, SortOrder.Asc) })
                     )
                     .Aggregations(a => a

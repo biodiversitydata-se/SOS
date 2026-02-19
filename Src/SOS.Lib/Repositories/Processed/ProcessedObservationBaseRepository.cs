@@ -11,9 +11,7 @@ using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Filters;
-using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 
 namespace SOS.Lib.Repositories.Processed;
 
