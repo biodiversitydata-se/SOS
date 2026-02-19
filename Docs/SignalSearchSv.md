@@ -7,7 +7,7 @@ Signalsök är en funktion som möjliggör sökning efter **skyddade fynd** utan
 Signalsök är utformad för att:
 
 * Skydda arter och lokaler genom att inte exponera fynddetaljer.
-* Ge myndigheter och andra behöriga aktörer möjlighet att fatta beslut baserat på förekomstinformation. Ett Ja-svar kan fungera som en första indikation för en handläggare, som därefter kan ta kontakt med en person med högre behörighet som har tillgång till mer detaljerad information om fyndet eller fynden och kan besluta om vidare åtgärder.
+* Ge myndigheter och andra behöriga aktörer möjlighet att fatta beslut baserat på förekomstinformation. Ett Ja-svar fungerar som en signal för en handläggare som inte har full behörighet att se att sökningen omfattar fynd med högre skyddsklass än handläggarens behörighet omfattar. Vid signal kan handläggaren ta kontakt med en person med högre behörighet som har tillgång till mer detaljerad information om fyndet eller fynden och kan besluta om vidare åtgärder.
 * Säkerställa att endast behöriga användare kan utföra sökningar, och endast inom tillåtna geografiska områden.
 
 > **Viktigt:** Endast skyddade fynd ingår i signalsök. Publika fynd inkluderas aldrig i sökningen.
