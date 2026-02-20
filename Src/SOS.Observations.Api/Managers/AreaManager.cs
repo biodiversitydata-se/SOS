@@ -154,7 +154,6 @@ public class AreaManager : IAreaManager
     ILogger<AreaManager> logger)
     {
         _areaCache = areaCache ?? throw new ArgumentNullException(nameof(areaCache));
-
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 

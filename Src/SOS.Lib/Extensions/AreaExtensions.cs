@@ -1,5 +1,4 @@
 ﻿using SOS.Lib.Enums;
-using System.Linq;
 
 namespace SOS.Lib.Extensions;
 
@@ -20,7 +19,7 @@ public static class AreaExtensions
         /// <returns></returns>
         public string ToAreaId(string featureId)
         {
-            return $"{type}:{featureId}";
+            return $"{type}:{featureId?.ToLower()}";
         }
     }
 }

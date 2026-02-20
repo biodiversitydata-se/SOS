@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using NetTopologySuite.Geometries;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Enums;
@@ -7,12 +6,7 @@ using SOS.Lib.Extensions;
 using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Resource.Interfaces;
-using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace SOS.Lib.Cache;
 
@@ -119,7 +113,7 @@ public class AreaCache : CacheBase<string, Area>, IAreaCache
             {
                 foreach (var area in areas)
                 {
-                    cache.TryAdd(area.Id, area);
+                    cache.TryAdd(area.AreaType.ToAreaId(area.FeatureId), area);
                 }
             }
         }

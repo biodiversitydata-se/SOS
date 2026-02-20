@@ -458,15 +458,15 @@ public class FilterManager : IFilterManager
     public async Task<List<(Area area, Geometry geometry)>?> GetAreaFiltersAsAreaTuplesAsync(IEnumerable<AreaFilter>? areaFilters)
     {
         if (areaFilters == null || !areaFilters.Any()) return null;
-        List<(Area area, Geometry geometry)> areas = new List<(Area area, Geometry geometry)>();
-        List<(AreaType areaType, string featureId)> areaKeys = GetAreaKeysFromFilter(areaFilters, excludeEconomicZone: true).ToList();
-        IDictionary<(AreaType areaType, string featureId), Geometry> geometriesDict = await _areaCache.GetGeometriesAsync(areaKeys);        
-        IDictionary<(AreaType areaType, string featureId), Area> areasDict = (await _areaCache.GetAreasAsync(geometriesDict.Keys))
-            .ToDictionary(m => (m.AreaType, m.FeatureId), m => m);
+        var areas = new List<(Area area, Geometry geometry)>();
+        var areaKeys = GetAreaKeysFromFilter(areaFilters, excludeEconomicZone: true).ToList();
+        var geometriesDict = await _areaCache.GetGeometriesAsync(areaKeys);        
+        var areasDict = (await _areaCache.GetAreasAsync(geometriesDict.Keys))
+            .ToDictionary(m => m.AreaType.ToAreaId(m.FeatureId), m => m);
 
         foreach (var pair in geometriesDict)
         {
-            areas.Add((areasDict[pair.Key], pair.Value));
+            areas.Add((areasDict[pair.Key.areaType.ToAreaId(pair.Key.featureId)], pair.Value));
         }
 
         return areas;
