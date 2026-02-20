@@ -1,4 +1,20 @@
-# Changelog
+﻿# Changelog
+
+## [2026.02.11]
+
+### `Added`
+- New endpoint `Observations_SearchByCursor`. With this endpoint, you can harvest up to 2 million observations.
+- New properties in `AreaBaseDto`: 
+    - `areaTypeId`. This is like `areaType` but an integer instead of an enum string. 
+    - `key`. A unique key for the area.
+- New property: `taxon.birdDirectiveAnnex1`. This is true if the taxon is included in the taxon list `Birds directive - Annex 1`.
+- Security headers added.
+
+### `Changed`
+- In the `Observations_ObservationsBySearch` endpoint, it is now possible to get the result as GeoJSON by setting the query parameter `outputFormat` to `GeoJson` or `GeoJsonFlat`.
+
+### `Fixed`
+- `taxon.bidDirective` is now true if a taxon is included in either of the taxon list: `Birds directive - Annex 1` or `Birds directive - Annex 2`. Previously, `Priority birds` was also included in the result.
 
 ## [2025.09.11]
 
@@ -499,7 +515,7 @@ OutputFields är borttagen från aggregerade sökningar då den inte fyllde någ
 SearchAggregatedInternal
 SortBy, sortOrder borttagna då den inte fyllde någon funktion
 
-## [2020.11.30] - 2020-11-30
+## [2020.11.30]
 
 ### Releases
 

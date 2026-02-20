@@ -12,12 +12,16 @@ Signal Search is designed to:
 
 > **Important:** Only sensitive observations are included in Signal Search. Public observations are never included.
 
+What are sensitive observations? Those are species observation records that have been judged to contain sensitive information which if released to the public, would result in an ‘adverse effect’ on the taxon or attribute in question or to a living individual. Sensitive information commonly relates to the exact localities of rare, endangered or commercially valuable taxa. Therefore, access to observations classified as sensitive are provided with restricted access only. Some sensitive observations are also subject to confidentiality under the Swedish Public Access to Information and Secrecy Act (2009:400), Chapter 20, Section 1.
+
+Further information: [Nationally protected species (SLU Artdatabanken)](https://www.slu.se/artdatabanken/rapportering-och-fynd/fynduppgifter-och-skyddsklassade-arter/skyddsklassade-arter)
+
 ---
 
 ## 2. What does a Yes/No response mean?
 
-* **Yes (true):** There is at least one protected observation that matches the search criteria.
-* **No (false):** There are no protected observations that match the search criteria.
+* **Yes (true):** There is at least one restricted access observation that matches the search criteria.
+* **No (false):** There are no restricted access observations that match the search criteria.
 
 The user is **not** informed about:
 
@@ -51,13 +55,19 @@ This behavior is controlled by the parameter `returnHttp4xxWhenNoPermissions`.
 
 ### 3.3 Signal Search and sensitivity categories
 
-Signal Search searches among all sensitive observations, i.e. those with sensitivity categories 3, 4, and 5. It does not include observations with sensitivity category 1 (public observations).
+Signal Search searches among all sensitive observations, i.e. those with sensitivity categories 3, 4, and 5. It does not include observations with sensitivity category 1 (public observations). Sensitivity category 2 is an obsolete category and is no longer used.
+
+When making a request to the endpoint, it is possible to specify that signals should only be returned for observations above the user’s authorization level. For example, if a user has authorization up to sensitivity category 3, signals will then only be returned for categories 4 and 5.
+
+It is not possible to restrict a signal search to specific sensitivity categories. The search is performed either across all sensitivity categories (3–5) or only those above the user’s authorization level.
+
+It is not possible to restrict the search to a single taxon. At least one mandatory taxon list must be specified in the request. This design prevents identifying the exact species responsible for a signal.
 
 ---
 
 ## 4. Where is Signal Search available?
 
-The Signal Search endpoint is available to internal applications at SLU and to external systems via the *Species Observation System API (Internal)* on the [Swedish Species Information Centre developer portal](https://api-portal.artdatabanken.se).
+The Signal Search endpoint is available to internal applications at SLU and to external systems via the *Species Observation System API (Internal)* on the [Swedish Species Information Centre developer portal](https://api-portal.artdatabanken.se). Signal search is meant to be used primarily by authorities.
 
 Signal Search is used in several applications, for example:
 
@@ -83,6 +93,14 @@ The search must target a geographic area:
 * Polygon(s)
 * Bounding box
 
+A **region** is a predefined geographic area, such as a municipality or a county.
+
+A **bounding box** is a rectangular area defined by its outer coordinate limits (minimum and maximum latitude and longitude).
+
+A **polygon** is an area defined by a series of coordinates and may have any shape.
+
+There is no minimum size restriction for the search area.
+
 ### 5.2 Taxon filter (mandatory)
 
 * At least **one taxon list** must be provided.
@@ -106,16 +124,14 @@ If no mandatory taxon list is provided, **HTTP 400 (Bad Request)** is returned.
 ### 5.4 Other filters (optional)
 
 * Bird nesting activity criterion (`BirdNestActivityLimit`)
-* Data providers (`DataProvider`)
-* Artportalen type filter (`ArtportalenTypeFilter`)
+* Dataset (`DataProvider`)
+* Artportalen type filter (`ArtportalenTypeFilter`) – _Used to determine which types of observations in Artportalen should be included in the search. The default value is `DoNotShowMerged`. To include all underlying observations within a grouped observation, `ShowChildrenAndReplacements` can be used._
 
 ---
 
 ## 6. Geographic filter
 
 The geographic filter allows the user to specify how geographic information should be handled in signal searches, in order to account for positional uncertainty in observations and species sensitivity to disturbance.
-
-Observations in the database may have geographic representations at multiple levels, which affects how the search is performed.
 
 ### 6.1 How geographic information is stored
 
@@ -124,12 +140,13 @@ Each observation can be represented geographically in the following ways:
 1. **Centroid (location.point)**.
    A point representing the reported position of the observation, together with a coordinate uncertainty (`coordinateUncertaintyInMeters`).
 
-2. **Polygon area (location.pointWithBuffer)**.
-   A circular polygon where the centroid is the observation point and the radius corresponds to the coordinate uncertainty (`coordinateUncertaintyInMeters`).
-   For **polygon locations**, the **exact polygon** describing the spatial extent of the observation is stored instead.
+2. **Buffered geometry (location.pointWithBuffer)**.
+For point-based observations, a circular polygon is created where the centroid is the observation point and the radius corresponds to the coordinate uncertainty (`coordinateUncertaintyInMeters`).
+For **polygon locations**, the **exact polygon** describing the true spatial extent of the observation is stored instead. Polygon locations are therefore not converted into circles.
 
 3. **Disturbance area (location.pointWithDisturbanceBuffer)**.
-   A circular polygon where the centroid is the observation point and the radius corresponds to the taxon’s defined disturbance radius. This representation is used for species that are sensitive to disturbance.
+A polygon created from the observation centroid and the taxon’s defined disturbance radius.
+For polygon locations, the disturbance area is also based on the centroid combined with the disturbance radius.
 
 ### 6.2 How geometry is used in searches
 

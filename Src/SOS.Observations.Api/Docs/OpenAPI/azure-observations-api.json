@@ -1,5 +1,5 @@
-{
-  "openapi": "3.0.1",
+﻿{
+  "openapi": "3.0.4",
   "info": {
     "title": "Species Observation System API (Public)",
     "description": "Species Observation System API. API for data of species observations from several datasets. The <a href=\"https://github.com/biodiversitydata-se/SOS\" target=\"_blank\">Species Observation System GitHub repository</a> contains source code and documentation.",
@@ -3267,6 +3267,31 @@
             }
           },
           {
+            "name": "outputFormat",
+            "in": "query",
+            "description": "Determines the format of the response data. JSON returns a standard paged JSON response. GeoJSONFlat or GeoJSONNested returns a GeoJSON FeatureCollection.",
+            "schema": {
+              "$ref": "#/components/schemas/OutputFormatDto"
+            }
+          },
+          {
+            "name": "geoJsonPropertyLabelType",
+            "in": "query",
+            "description": "Determines how property names in the GeoJSON \"properties\" object are labeled.",
+            "schema": {
+              "$ref": "#/components/schemas/PropertyLabelType"
+            }
+          },
+          {
+            "name": "geoJsonExcludeNullValues",
+            "in": "query",
+            "description": "If true, properties with null values will be omitted from the GeoJSON output.",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
             "name": "X-Api-Version",
             "in": "header",
             "description": "The requested API version",
@@ -3321,6 +3346,201 @@
               "text/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ObservationPagedResultDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/Observations/SearchByCursor": {
+      "post": {
+        "tags": [
+          "Observations"
+        ],
+        "description": "Get observations matching the provided search filter using Elasticsearch search_after function for deep pagination.\nThe results are sorted by the specified field and the cursor value from the previous response\nshould be passed to get the next page. This is an experimental endpoint for deep pagination using Elasticsearch search_after function.\nIf it requires too much resources, it may be disabled or rate limited in the future.\n\n**Important**: To use search_after pagination effectively:\n1. You MUST use the same sort field (sortBy parameter) in each request.\n2. For the first request, don't provide cursor value.\n3. For subsequent requests, pass the cursor value from the previous response.\n4. The cursor value is the sort values from the last document in the previous page. This value is base64-encoded.\n5. If the result cursor value is null or empty, there are no more pages to retrieve.\n6. You are only allowed to paginate results with Total count lower or equal to 2,000,000. If the total count exceeds this limit, a bad request response will be returned.\n            \n**Note**: search_after provides a \"live\" view of the data.\nDocuments added or removed between requests may affect pagination consistency. Your application need to handle duplicate or missing documents accordingly.",
+        "operationId": "Observations_ObservationsByCursor",
+        "parameters": [
+          {
+            "name": "X-Authorization-Role-Id",
+            "in": "header",
+            "description": "Limit user authorization to specified role.",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "X-Authorization-Application-Identifier",
+            "in": "header",
+            "description": "Name of application used in authorization.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "take",
+            "in": "query",
+            "description": "Max number of observations to return. Max is 2,500 observations in each request.",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1000
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "description": "Sort values from the last document in the previous page. Pass null or omit for the first request. This value is base64-encoded.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sortBy",
+            "in": "query",
+            "description": "Field to sort by. Required for consistent pagination. Defaults to \"modified\" if not specified.",
+            "schema": {
+              "type": "string",
+              "default": "modified"
+            }
+          },
+          {
+            "name": "sortOrder",
+            "in": "query",
+            "description": "Sort order (Asc, Desc).",
+            "schema": {
+              "$ref": "#/components/schemas/SearchSortOrder"
+            }
+          },
+          {
+            "name": "validateSearchFilter",
+            "in": "query",
+            "description": "If true, validation of search filter values will be made.",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "translationCultureCode",
+            "in": "query",
+            "description": "Culture code used for vocabulary translation (sv-SE, en-GB).",
+            "schema": {
+              "type": "string",
+              "default": "sv-SE"
+            }
+          },
+          {
+            "name": "sensitiveObservations",
+            "in": "query",
+            "description": "If true, only sensitive (protected) observations will be searched.",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "name": "X-Api-Version",
+            "in": "header",
+            "description": "The requested API version",
+            "schema": {
+              "type": "string",
+              "default": "1.5"
+            }
+          },
+          {
+            "name": "X-Requesting-System",
+            "in": "header",
+            "description": "Name of system doing the request",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Filter used to limit the search.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SearchFilterDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SearchFilterDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SearchFilterDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObservationSearchByCursorResultDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObservationSearchByCursorResultDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObservationSearchByCursorResultDto"
                 }
               }
             }
@@ -4736,6 +4956,12 @@
           "areaType": {
             "$ref": "#/components/schemas/AreaTypeDto"
           },
+          "areaTypeId": {
+            "type": "integer",
+            "description": "Area type id",
+            "format": "int32",
+            "readOnly": true
+          },
           "boundingBox": {
             "$ref": "#/components/schemas/LatLonBoundingBox"
           },
@@ -4748,6 +4974,12 @@
             "type": "string",
             "description": "Name of area",
             "nullable": true
+          },
+          "key": {
+            "type": "string",
+            "description": "Unique key that is a combination of AreaType and FeatureId",
+            "nullable": true,
+            "readOnly": true
           }
         },
         "additionalProperties": false
@@ -8456,6 +8688,36 @@
         "additionalProperties": false,
         "description": "Result returned by paged query"
       },
+      "ObservationSearchByCursorResultDto": {
+        "type": "object",
+        "properties": {
+          "nextCursor": {
+            "type": "string",
+            "description": "The cursor value for the next page.\nPass this value in the next request to get the next page of results.\nWill be null when there are no more results.\nThis value is base64-encoded string representation of the sort values.",
+            "nullable": true
+          },
+          "take": {
+            "type": "integer",
+            "description": "Returns a sequence containing up to the specified number of items.",
+            "format": "int32"
+          },
+          "totalCount": {
+            "type": "integer",
+            "description": "Total number of records matching the query.",
+            "format": "int64"
+          },
+          "records": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Observation"
+            },
+            "description": "The records for the current page.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Result returned by search_after query for deep pagination.\nThis enables pagination beyond the 10,000 document limit of standard Elasticsearch pagination."
+      },
       "Occurrence": {
         "type": "object",
         "properties": {
@@ -8793,6 +9055,15 @@
         },
         "additionalProperties": false,
         "description": "Response output settings"
+      },
+      "OutputFormatDto": {
+        "enum": [
+          "Json",
+          "GeoJson",
+          "GeoJsonFlat"
+        ],
+        "type": "string",
+        "description": "Output format"
       },
       "Point": {
         "required": [
@@ -9758,6 +10029,10 @@
           "birdDirective": {
             "type": "boolean",
             "description": "Part of bird directive?"
+          },
+          "birdDirectiveAnnex1": {
+            "type": "boolean",
+            "description": "Part of bird directive annex 1?"
           },
           "class": {
             "type": "string",
@@ -10822,6 +11097,44 @@
   "security": [
     {
       "Bearer": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "ApiInfo"
+    },
+    {
+      "name": "Areas"
+    },
+    {
+      "name": "DataProviders"
+    },
+    {
+      "name": "Environment"
+    },
+    {
+      "name": "Exports"
+    },
+    {
+      "name": "Jobs"
+    },
+    {
+      "name": "Locations"
+    },
+    {
+      "name": "Observations"
+    },
+    {
+      "name": "Systems"
+    },
+    {
+      "name": "TaxonLists"
+    },
+    {
+      "name": "User"
+    },
+    {
+      "name": "Vocabularies"
     }
   ]
 }

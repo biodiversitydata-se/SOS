@@ -38,7 +38,7 @@ spec:
                   }
               }
         - name: ApplicationInsights
-          value: '{"InstrumentationKey": "SECRET_PLACEHOLDER", "EnableRequestBodyLogging": false, "EnableSearchResponseCountLogging": true}'
+          value: '{"InstrumentationKey": "SECRET_PLACEHOLDER", "EnableRequestBodyLogging": true, "EnableSearchResponseCountLogging": true}'
         - name: IdentityServer
           value: '{"Authority": "https://ids.artdatabanken.se", "Audience": "SOS.Observations", "RequireHttpsMetadata ": false}'
         - name: ProcessDbConfiguration
