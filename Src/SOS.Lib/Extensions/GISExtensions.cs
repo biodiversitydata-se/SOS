@@ -524,12 +524,24 @@ public static class GISExtensions
                 case OgcGeometryType.Polygon:
                     var polygon = (Polygon)geometry;
                     var shell = polygon.Shell.TryMakeRingValid();
-                    var holes = polygon.Holes?.Select(h => h.TryMakeRingValid());
-                    geometry = Geometry.DefaultFactory.CreatePolygon(shell, holes?.ToArray()).Buffer(0);
+                    var holes = polygon.Holes?
+                        .Select(h => h.TryMakeRingValid())
+                        .Where(h => h != null)
+                        .ToArray();
+                    geometry = Geometry.DefaultFactory.CreatePolygon(shell, holes).Buffer(0);
                     break;
                 case OgcGeometryType.MultiPolygon:
                     var multiPolygon = (MultiPolygon)geometry;
-                    var polygons = multiPolygon.Geometries?.Select(g => g.TryMakeValid() as Polygon)?.ToArray();
+                    var polygons = multiPolygon.Geometries
+                        .Select(g => g.TryMakeValid())
+                        .Where(g => g != null)
+                        .SelectMany(g => g switch
+                        {
+                            Polygon p => new[] { p },
+                            GeometryCollection gc => gc.Geometries.OfType<Polygon>(),
+                            _ => Enumerable.Empty<Polygon>()
+                        })
+                        .ToArray();
                     geometry = Geometry.DefaultFactory.CreateMultiPolygon(polygons);
                     break;
             }
