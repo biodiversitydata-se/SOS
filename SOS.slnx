@@ -138,12 +138,10 @@
     <Project Path="Src/SOS.Hangfire.JobServer/SOS.Hangfire.JobServer.csproj" />
   </Folder>
   <Folder Name="/Src/Web/">
-    <Project Path="Src/SOS.DOI/SOS.DOI.csproj" />
     <Project Path="Src/SOS.Status.Web.Client/SOS.Status.Web.Client.csproj" />
     <Project Path="Src/SOS.Status.Web/SOS.Status.Web.csproj" />
   </Folder>
   <Folder Name="/Tests/" />
-  <Folder Name="/Tests/EndToEnd/" />
   <Folder Name="/Tests/Helpers/">
     <Project Path="Tests/TestHelpers/SOS.TestHelpers/SOS.TestHelpers.csproj" />
   </Folder>
@@ -151,7 +149,6 @@
     <Project Path="Tests/Integration/SOS.DataStewardship.Api.IntegrationTests/SOS.DataStewardship.Api.IntegrationTests.csproj" />
     <Project Path="Tests/Integration/SOS.Observations.Api.IntegrationTests/SOS.Observations.Api.IntegrationTests.csproj" />
   </Folder>
-  <Folder Name="/Tests/LiveIntegration/" />
   <Folder Name="/Tests/Unit/">
     <Project Path="Tests/Unit/SOS.ElasticSearch.Proxy.UnitTests/SOS.ElasticSearch.Proxy.UnitTests.csproj" />
     <Project Path="Tests/Unit/SOS.Export.UnitTests/SOS.Export.UnitTests.csproj" />
