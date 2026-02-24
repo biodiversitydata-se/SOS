@@ -13,12 +13,12 @@
 	  <PackageReference Include="Blazorade.Mermaid" Version="2.0.2" />
 	  <PackageReference Include="Blazored.LocalStorage" Version="4.5.0" />
 	  <PackageReference Include="CSharpFunctionalExtensions" Version="3.6.0" />
-      <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.1" />    
-	  <PackageReference Include="LeafletForBlazor" Version="2.4.0.2" />    
-	  <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Authentication" Version="10.0.1" />
-	  <PackageReference Include="MudBlazor" Version="8.15.0" />
-	  <PackageReference Include="MudBlazor.Markdown" Version="8.11.0" />
-	  <PackageReference Include="MudBlazor.ThemeManager" Version="3.0.0" />
+      <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.3" />    
+	  <PackageReference Include="LeafletForBlazor" Version="2.4.6.26" />    
+	  <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Authentication" Version="10.0.3" />
+	  <PackageReference Include="MudBlazor" Version="9.0.0" />
+	  <PackageReference Include="MudBlazor.Markdown" Version="9.0.0" />
+	  <PackageReference Include="MudBlazor.ThemeManager" Version="4.0.0" />
   </ItemGroup>
 
 </Project>
