@@ -18,7 +18,7 @@ public static class SecurityHeadersExtensions
     {
         app.Use(async (context, next) =>
         {
-            context.Response.Headers["Content-Security-Policy"] = $"default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self' {(secure ? "https:" : "http:")} {(secure ? "wss:" : "ws:")}; object-src 'none'; frame-ancestors 'none'; upgrade-insecure-requests";
+            context.Response.Headers["Content-Security-Policy"] = $"default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com; img-src 'self' data: https://unpkg.com https://*.tile.openstreetmap.org; font-src 'self' https://fonts.gstatic.com; connect-src 'self' {(secure ? "https:" : "http:")} {(secure ? "wss:" : "ws:")} http://localhost:* ws://localhost:*; object-src 'none'; frame-ancestors 'none'; upgrade-insecure-requests";
             context.Response.Headers["Permissions-Policy"] = "geolocation=(),  camera=(),  microphone=(),  payment=(),  usb=(),  accelerometer=(),  gyroscope=(),  magnetometer=()";
             context.Response.Headers["Referrer-Policy"] = "strict-origin-when-cross-origin";
             context.Response.Headers["X-Content-Type-Options"] = "nosniff";
