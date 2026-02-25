@@ -2071,32 +2071,32 @@ A [Darwin Core](https://dwc.tdwg.org/) term.
 | 21 | registreringar | registrations |
 
 ## verificationStatus
-A status referring to the extent to which the observation record has been verified to be correct. Most values are specific to expert verification carried out for a subset of observations from the Artportalen dataset. 
+A status referring to the extent to which the observation record has been verified to be correct. Most values are specific to expert verification carried out for a subset of observations from the Artportalen dataset. Some values are specific to other datasets (see column Usage).
 Similar to the Darwin Core [identificationVerificationStatus](https://dwc.tdwg.org/terms/#dwc:identificationVerificationStatus) and [georeferenceVerificationStatus](https://dwc.tdwg.org/terms/#dwciri:georeferenceVerificationStatus).
-| Id | Value (Swedish) | Value (English) |
-|:---	|:---	|:---	|
-| 0 | Validerad | Verified |
-| 1 | Rapporterad av expert | Reported by expert |
-| 2 | Godkänd baserat på communitykonsensus | Approved based on community consensus |
-| 10 | Ovaliderad | Unvalidated |
-| 12 | Validering efterfrågas | Validation requested |
-| 13 | Dialog hos rapportör, dolt fynd | Dialogue at reporter, hidden sighting |
-| 14 | Dokumentation efterfrågas | Documentation requested |
-| 15 | Dialog hos rapportör | Dialogue with reporter |
-| 16 | Dialog hos validator | Dialogue with validator |
-| 20 | Behöver inte valideras | Need not be validated |
-| 30 | Rapport ska skrivas (för Rrk) | Description required (for the regional records committee) |
-| 35 | Rapport skriven (för Rrk) | Report written (for Regional Validation Committee) |
-| 40 | Rapport ska skrivas (för RK) | Description required (for the National Rarities Committee) |
-| 45 | Rapport behandlad av Rrk (för RK) | Report treated regional (for National Rarities Committee) |
-| 60 | Godkänd baserat på observatörens uppgifter | Approved based on reporters documentation |
-| 61 | Godkänd. Belägg granskat av validerare. | Approved. Specimen checked by validator. |
-| 62 | Godkänd. Foto (eller ljud) granskat av validerare | Approved based on image, sound or video recording |
-| 63 | Godkänd baserat på raritetsblankett | Approved based on reporters rarity form |
-| 64 | Godkänd baserat på determinatörs verifiering | Approved based on determinators verification |
-| 65 | Godkänd baserat på äldre raritetsblankett | Approved based on reporters old rarity form |
-| 66 | Godkänd, baserat på referens | Approved, based on reference |
-| 70 | Ej möjlig att validera | Not able to validate |
+| Id | Value (Swedish) | Value (English) | Description | Usage |
+|:---	|:---	|:---	|:---	|:--- |
+| 0 | Validerad | Verified |  |  |
+| 1 | Rapporterad av expert | Reported by expert |  |  |
+| 2 | Godkänd baserat på communitykonsensus | Approved based on community consensus |  | iNaturalist |
+| 10 | Ovaliderad | Unvalidated |  |  |
+| 12 | Validering efterfrågas | Validation requested |  | Artportalen expert verification |
+| 13 | Dialog hos rapportör, dolt fynd | Dialogue at reporter, hidden sighting |  | Artportalen expert verification |
+| 14 | Dokumentation efterfrågas | Documentation requested | currently under review, additional documentation for details of the observation requested | Artportalen expert verification |
+| 15 | Dialog hos rapportör | Dialogue with reporter |  | Artportalen expert verification |
+| 16 | Dialog hos validator | Dialogue with validator |  | Artportalen expert verification |
+| 20 | Behöver inte valideras | Need not be validated |  | Artportalen expert verification |
+| 30 | Rapport ska skrivas (för Rrk) | Description required (for the regional records committee) |  | Artportalen expert verification |
+| 35 | Rapport skriven (för Rrk) | Report written (for Regional Validation Committee) |  | Artportalen expert verification |
+| 40 | Rapport ska skrivas (för RK) | Description required (for the National Rarities Committee) |  | Artportalen expert verification |
+| 45 | Rapport behandlad av Rrk (för RK) | Report treated regional (for National Rarities Committee) |  | Artportalen expert verification |
+| 60 | Godkänd baserat på observatörens uppgifter | Approved based on reporters documentation |  | Artportalen expert verification |
+| 61 | Godkänd. Belägg granskat av validerare. | Approved. Specimen checked by validator. |  | Artportalen expert verification |
+| 62 | Godkänd. Foto (eller ljud) granskat av validerare | Approved based on image, sound or video recording |  | Artportalen expert verification |
+| 63 | Godkänd baserat på raritetsblankett | Approved based on reporters rarity form |  | Artportalen expert verification |
+| 64 | Godkänd baserat på determinatörs verifiering | Approved based on determinators verification |  | Artportalen expert verification |
+| 65 | Godkänd baserat på äldre raritetsblankett | Approved based on reporters old rarity form |  | Artportalen expert verification |
+| 66 | Godkänd, baserat på referens | Approved, based on reference |  | Artportalen |
+| 70 | Ej möjlig att validera | Not able to validate |  | Artportalen expert verification |
 
 ## taxonCategory
 | Id | Value (Swedish) | Value (English) |
