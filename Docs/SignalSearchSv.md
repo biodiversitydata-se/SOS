@@ -7,14 +7,14 @@ Signalsök är en funktion som möjliggör sökning efter **skyddade fynd** utan
 Signalsök är utformad för att:
 
 * Skydda arter och lokaler genom att inte exponera fynddetaljer.
-* Ge myndigheter och andra behöriga aktörer möjlighet att fatta beslut baserat på förekomstinformation. Ett Ja-svar kan fungera som en första indikation för en handläggare, som därefter kan ta kontakt med en person med högre behörighet som har tillgång till mer detaljerad information om fyndet eller fynden och kan besluta om vidare åtgärder.
+* Ge myndigheter och andra behöriga aktörer möjlighet att fatta beslut baserat på förekomstinformation. Ett Ja-svar fungerar som en signal för en handläggare som inte har full behörighet att se att sökningen omfattar fynd med högre skyddsklass än handläggarens behörighet omfattar. Vid signal kan handläggaren ta kontakt med en person med högre behörighet som har tillgång till mer detaljerad information om fyndet eller fynden och kan besluta om vidare åtgärder.
 * Säkerställa att endast behöriga användare kan utföra sökningar, och endast inom tillåtna geografiska områden.
 
 > **Viktigt:** Endast skyddade fynd ingår i signalsök. Publika fynd inkluderas aldrig i sökningen.
 
-Vad är skyddade fynd? Det är fynd (observationer) av arter som har bedömts innehålla känslig information som, om den offentliggörs, skulle kunna få negativa konsekvenser för det aktuella taxonet eller egenskapen (till exempel fyndplatsen) eller för en levande individ. Känslig information avser vanligtvis exakta platsangivelser för sällsynta, utrotningshotade eller kommersiellt värdefulla taxa. Därför är tillgången till observationer som klassificeras som känsliga begränsad. Vissa skyddsklassade fynd omfattas även av sekretess enligt offentlighets- och sekretesslagen (2009:400), 20 kap. 1 §.
+Vad är **skyddade fynd**? Det är fynd (observationer) av arter som har bedömts innehålla känslig information som, om den offentliggörs, skulle kunna få negativa konsekvenser för det aktuella taxonet eller egenskapen (till exempel fyndplatsen) eller för en levande individ. Känslig information avser vanligtvis exakta platsangivelser för sällsynta, utrotningshotade eller kommersiellt värdefulla taxa. Därför är tillgången till observationer som klassificeras som känsliga begränsad. Vissa skyddsklassade fynd omfattas även av sekretess enligt offentlighets- och sekretesslagen (2009:400), 20 kap. 1 §.
 
-Läs mer här: [Nationellt skyddsklassade arter (SLU Artdatabanken)](https://www.slu.se/artdatabanken/rapportering-och-fynd/fynduppgifter-och-skyddsklassade-arter/skyddsklassade-arter)
+Läs mer här: [Skyddsklassning (SLU Artdatabanken)](https://www.slu.se/artdatabanken/rapportering-och-fynd/fynduppgifter-och-skyddsklassade-arter/skyddsklassade-arter)
 
 ---
 
@@ -57,7 +57,7 @@ Detta beteende styrs av parametern `returnHttp4xxWhenNoPermissions`.
 
 Signalsök söker bland alla skyddade observationer, det vill säga de med skyddsklass 3, 4 och 5. Den inkluderar inte observationer med skyddsklass 1 (publika fynd). Skyddsklass 2 är en utgången klass och används inte längre.
 
-Vid anrop till endpointen kan det anges att signal endast ska returneras för fynd över användarens behörighetsnivå. Om en användare till exempel har behörighet upp till skyddsklass 3, returneras då enbart signal för skyddsklass 4 och 5.
+Vid anrop till endpointen kan det anges att signal endast ska returneras för fynd med skyddsklass över användarens behörighetsnivå. Om en användare till exempel har behörighet upp till skyddsklass 3, returneras då enbart signal för skyddsklass 4 och 5.
 
 Det går inte att begränsa signalsök till enbart vissa skyddsklasser. Sökning sker antingen bland alla skyddsklasser (3–5) eller endast bland de klasser som ligger över användarens behörighetsnivå.
 
@@ -124,9 +124,9 @@ Om ingen obligatorisk lista anges returneras **HTTP 400 (Bad Request)**.
 
 ### 5.4 Övriga filter (valfria)
 
-* Fågelhäckningskriterie (`BirdNestActivityLimit`)
+* Häckningskriterie för fåglar (`BirdNestActivityLimit`)
 * Dataset (`DataProvider`)
-* Artportalen-typfilter (`ArtportalenTypeFilter`) - _Används för att bestämma vilka typer av fynd i Artportalen som ska inkluderas i sökningen. Default är `DoNotShowMerged`. För att inkludera alla underliggande fynd till en gruppering så kan `ShowChildrenAndReplacements` användas._
+* Artportalen-typfilter (`ArtportalenTypeFilter`) - _Används för att bestämma vilka typer av fynd i Artportalen som ska inkluderas i sökningen. Default är `DoNotShowMerged` och avser original rapporterade fynd utan att inkludera grupperade fynd utifrån senare bedömning. För att inkludera alla underliggande fynd till en gruppering och ersättningsfynd (korrigerade fynd) så kan `ShowChildrenAndReplacements` användas._
 
 ---
 
@@ -142,7 +142,7 @@ Varje observation kan representeras geografiskt på följande sätt:
    En punkt som representerar observationens angivna position, tillsammans med en koordinatosäkerhet (`coordinateUncertaintyInMeters`).
 
 2. **Buffrad geometri (location.pointWithBuffer)**.
-För punktobservationer skapas en cirkulär polygon där mittpunkten är observationens punkt och radien motsvarar koordinatosäkerheten (`coordinateUncertaintyInMeters`).
+För punktobservationer skapas en cirkulär polygon där mittpunkten är observationens punkt och radien motsvarar koordinatosäkerheten (`coordinateUncertaintyInMeters`) dvs. avståndet (i meter) från den angivna punkten som beskriver den minsta cirkeln som omfattar hela fyndplatsen.
 För **polygonlokaler** lagras istället den **exakta polygonen** som beskriver observationens faktiska utbredning. Polygonlokaler omvandlas alltså inte till cirklar.
 
 3. **Störningsyta (location.pointWithDisturbanceBuffer)**.
@@ -160,6 +160,8 @@ Vilken geografisk representation som används i signalsökningen styrs av vilka 
 * **considerDisturbanceRadius = true**.
   Sökningen görs mot störningsytan `location.pointWithDisturbanceBuffer`.
   Observationer vars mittpunkt ligger utanför sökgeometrin kan ändå inkluderas, förutsatt att någon del av observationens störningsyta skär eller överlappar sökområdet.
+
+  Störningskänslighet har klassats för ett urval av arter och anges som radien i en cirkel utifrån en punktkoordinat. Används så att man kan ta hänsyn till arter som är utanför sökområdet men ändå kan påverkas av en förhållanden eller en händelse inom sökområdet.
 
 * **considerObservationAccuracy = false** och **considerDisturbanceRadius = false**.
   Sökningen görs enbart mot observationens mittpunkt (`location.point`). Endast observationer vars punkt ligger inom sökgeometrin kan då ge träff.

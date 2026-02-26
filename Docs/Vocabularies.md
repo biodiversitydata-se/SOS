@@ -1,5 +1,7 @@
 # Vocabularies
 All vocabularies used in SOS are listed on this page. The vocabularies can be downloaded using the endpoint `/Vocabularies` *(Vocabularies_GetVocabularies)*.
+
+Whether observation records contain values for a vocabulary and which values are used varies depending on the dataset the observation records originate from. Several vocabularies refer to parameters contained in the Artportalen dataset only.
 - [accessRights](#accessrights)
 - [activity](#activity)
 - [areaType](#areatype)
@@ -26,6 +28,7 @@ All vocabularies used in SOS are listed on this page. The vocabularies can be do
 - [invasiveSpeciesTreatment](#invasivespeciestreatment)
 
 ## accessRights
+A [Darwin Core](https://dwc.tdwg.org/) term.
 | Id | Value |
 |:---	|:---	|
 | 0 | Free usage |
@@ -35,6 +38,12 @@ All vocabularies used in SOS are listed on this page. The vocabularies can be do
 | 4 | CC BY-NC |
 
 ## activity
+The acticity parameter is specific to the Artportalen dataset.
+
+Species observations from some other datasets may contain variables with values describing e.g. behaviours or reproductive status that can be matched to some of the activities.
+
+The first activities (id 1 - 20) refer to bird breeding status categories [Sw: 'häckningskriterier'], derived from the categories used in the Swedish Breeding Bird Atlas (and similar to the breeding categories used in the [European Breeding Bird Atlas](https://ebba2.info/about/methodology/)). The list of activity values includes activities for all organism groups, but while some can be used generic for species from several organism groups others are specific to one organism group only.
+
 | Id | Value (Swedish) | Value (English) | Category (Swedish) | Category (English) |
 |:---	|:---	|:---	|:---	|:---	|
 | 0 |  |  |  | 
@@ -158,6 +167,7 @@ All vocabularies used in SOS are listed on this page. The vocabularies can be do
 | 27 | Vattenområde | Vattenområde |
 
 ## basisOfRecord
+A [Darwin Core](https://dwc.tdwg.org/) term.
 | Id | Value |
 |:---	|:---	|
 | 0 | HumanObservation |
@@ -173,6 +183,9 @@ All vocabularies used in SOS are listed on this page. The vocabularies can be do
 | 10 | Unknown |
 
 ## behavior
+A [Darwin Core](https://dwc.tdwg.org/) term.
+Values contain [*activity*](https://github.com/biodiversitydata-se/SOS/edit/master/Docs/Vocabularies.md#activity) values that describe the behaviour of an organism. 
+
 | Id | Value (Swedish) | Value (English) |
 |:---	|:---	|:---	|
 | 3 | misslyckad häckning | breeding failed |
@@ -1088,6 +1101,7 @@ All vocabularies used in SOS are listed on this page. The vocabularies can be do
 | 881 | Artificiell miljö med vide | Artificial ground with willow |
 
 ## birdNestActivity
+The birdNestActicity parameter is specific to the Artportalen dataset, and contains a subset of the [*activity*](https://github.com/biodiversitydata-se/SOS/edit/master/Docs/Vocabularies.md#activity) values. 
 | Id | Value (Swedish) | Value (English) | Category (Swedish) | Category (English) |
 |:---	|:---	|:---	|:---	|:---	|
 | 1 | bo, ägg/ungar | nest with egg | Säkerställd reproduktion | Reproduction confirmed
@@ -1136,6 +1150,7 @@ All vocabularies used in SOS are listed on this page. The vocabularies can be do
 | 3 | stereolupp | stereo microscope |
 
 ## discoveryMethod
+Specific for the Artportalen dataset. Values can be matched to the [Darwin Core](https://dwc.tdwg.org/) [_samplingProtocol_](https://dwc.tdwg.org/terms/#dwc:samplingProtocol) term.
 | Id | Value (Swedish) | Value (English) |
 |:---	|:---	|:---	|
 | 0 |  |  |
@@ -1845,12 +1860,15 @@ All vocabularies used in SOS are listed on this page. The vocabularies can be do
 | 69 | dormant | dormant |
 
 ## occurrenceStatus
+A [Darwin Core](https://dwc.tdwg.org/) term.
 | Id | Value |
 |:---	|:---	|
 | 0 | present |
 | 1 | absent |
 
 ## reproductiveCondition
+A [Darwin Core](https://dwc.tdwg.org/) term. 
+Values contain a subset of the Artportalen [activity](https://github.com/biodiversitydata-se/SOS/edit/master/Docs/Vocabularies.md#activity) values. 
 | Id | Value (Swedish) | Value (English) |
 |:---	|:---	|:---	|
 | 13 | ruvfläckar | brood patch |
@@ -2001,6 +2019,7 @@ All vocabularies used in SOS are listed on this page. The vocabularies can be do
 | 117 | Sågspån | Sawdust |
 
 ## sensitivityCategory
+[Sensitivity category](https://www.slu.se/artdatabanken/rapportering-och-fynd/fynduppgifter-och-skyddsklassade-arter/skyddsklassade-arter/) [Sw: skyddsklass] as judged in consultation with SLU Artdatabanken's expert committees 
 | Id | Value (Swedish) | Value (English) |
 |:---	|:---	|:---	|
 | 1 | 1. Fullständig åtkomst och fri användning för alla | 1. Full access and free use for all |
@@ -2009,6 +2028,7 @@ All vocabularies used in SOS are listed on this page. The vocabularies can be do
 | 5 | 5. Maximal upplösning 50*50 km för allmänheten | 5. Generalized to a 50*50 km grid cell for public usage |
 
 ## type
+A [Darwin Core](https://dwc.tdwg.org/) term.
 | Id | Value |
 |:---	|:---	|
 | 0 | Collection |
@@ -2051,30 +2071,32 @@ All vocabularies used in SOS are listed on this page. The vocabularies can be do
 | 21 | registreringar | registrations |
 
 ## verificationStatus
-| Id | Value (Swedish) | Value (English) |
-|:---	|:---	|:---	|
-| 0 | Validerad | Verified |
-| 1 | Rapporterad av expert | Reported by expert |
-| 2 | Godkänd baserat på communitykonsensus | Approved based on community consensus |
-| 10 | Ovaliderad | Unvalidated |
-| 12 | Validering efterfrågas | Validation requested |
-| 13 | Dialog hos rapportör, dolt fynd | Dialogue at reporter, hidden sighting |
-| 14 | Dokumentation efterfrågas | Documentation requested |
-| 15 | Dialog hos rapportör | Dialogue with reporter |
-| 16 | Dialog hos validator | Dialogue with validator |
-| 20 | Behöver inte valideras | Need not be validated |
-| 30 | Rapport ska skrivas (för Rrk) | Description required (for the regional records committee) |
-| 35 | Rapport skriven (för Rrk) | Report written (for Regional Validation Committee) |
-| 40 | Rapport ska skrivas (för RK) | Description required (for the National Rarities Committee) |
-| 45 | Rapport behandlad av Rrk (för RK) | Report treated regional (for National Rarities Committee) |
-| 60 | Godkänd baserat på observatörens uppgifter | Approved based on reporters documentation |
-| 61 | Godkänd. Belägg granskat av validerare. | Approved. Specimen checked by validator. |
-| 62 | Godkänd. Foto (eller ljud) granskat av validerare | Approved based on image, sound or video recording |
-| 63 | Godkänd baserat på raritetsblankett | Approved based on reporters rarity form |
-| 64 | Godkänd baserat på determinatörs verifiering | Approved based on determinators verification |
-| 65 | Godkänd baserat på äldre raritetsblankett | Approved based on reporters old rarity form |
-| 66 | Godkänd, baserat på referens | Approved, based on reference |
-| 70 | Ej möjlig att validera | Not able to validate |
+A status referring to the extent to which the observation record has been verified to be correct. Most values are specific to expert verification carried out for a subset of observations from the Artportalen dataset. Some values are specific to other datasets (see column Usage).
+Similar to the Darwin Core [identificationVerificationStatus](https://dwc.tdwg.org/terms/#dwc:identificationVerificationStatus) and [georeferenceVerificationStatus](https://dwc.tdwg.org/terms/#dwciri:georeferenceVerificationStatus).
+| Id | Value (Swedish) | Value (English) | Description | Usage |
+|:---	|:---	|:---	|:---	|:--- |
+| 0 | Validerad | Verified |  |  |
+| 1 | Rapporterad av expert | Reported by expert |  |  |
+| 2 | Godkänd baserat på communitykonsensus | Approved based on community consensus |  | iNaturalist |
+| 10 | Ovaliderad | Unvalidated |  |  |
+| 12 | Validering efterfrågas | Validation requested |  | Artportalen expert verification |
+| 13 | Dialog hos rapportör, dolt fynd | Dialogue at reporter, hidden sighting |  | Artportalen expert verification |
+| 14 | Dokumentation efterfrågas | Documentation requested | currently under review, additional documentation for details of the observation requested | Artportalen expert verification |
+| 15 | Dialog hos rapportör | Dialogue with reporter |  | Artportalen expert verification |
+| 16 | Dialog hos validator | Dialogue with validator |  | Artportalen expert verification |
+| 20 | Behöver inte valideras | Need not be validated |  | Artportalen expert verification |
+| 30 | Rapport ska skrivas (för Rrk) | Description required (for the regional records committee) |  | Artportalen expert verification |
+| 35 | Rapport skriven (för Rrk) | Report written (for Regional Validation Committee) |  | Artportalen expert verification |
+| 40 | Rapport ska skrivas (för RK) | Description required (for the National Rarities Committee) |  | Artportalen expert verification |
+| 45 | Rapport behandlad av Rrk (för RK) | Report treated regional (for National Rarities Committee) |  | Artportalen expert verification |
+| 60 | Godkänd baserat på observatörens uppgifter | Approved based on reporters documentation |  | Artportalen expert verification |
+| 61 | Godkänd. Belägg granskat av validerare. | Approved. Specimen checked by validator. |  | Artportalen expert verification |
+| 62 | Godkänd. Foto (eller ljud) granskat av validerare | Approved based on image, sound or video recording |  | Artportalen expert verification |
+| 63 | Godkänd baserat på raritetsblankett | Approved based on reporters rarity form |  | Artportalen expert verification |
+| 64 | Godkänd baserat på determinatörs verifiering | Approved based on determinators verification |  | Artportalen expert verification |
+| 65 | Godkänd baserat på äldre raritetsblankett | Approved based on reporters old rarity form |  | Artportalen expert verification |
+| 66 | Godkänd, baserat på referens | Approved, based on reference |  | Artportalen |
+| 70 | Ej möjlig att validera | Not able to validate |  | Artportalen expert verification |
 
 ## taxonCategory
 | Id | Value (Swedish) | Value (English) |
@@ -2124,6 +2146,7 @@ All vocabularies used in SOS are listed on this page. The vocabularies can be do
 | 95 | Forma Specialis | Forma Specialis |
 
 ## invasiveSpeciesTreatment
+Specific to obervation records reported as part of the Swedish IAS (Alien Invasive Species) monitoring, stored in a subset of the Artportalen dataset.  
 | Id | Value (Swedish) | Value (English) |
 |:---	|:---	|:---	|
 | 0 | Åtgärd (Biologisk) | Treatment (Biological) |

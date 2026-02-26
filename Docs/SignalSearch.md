@@ -7,14 +7,14 @@ Signal Search is a feature that enables searching for **sensitive observations**
 Signal Search is designed to:
 
 * Protect species and locations by not exposing sighting details.
-* Enable authorities and other authorized actors to make decisions based on occurrence information. A *Yes* response can serve as an initial indication for an employee authorised to perform signal searches, who may then contact a person with higher authorization that has access to more detailed information about the observation(s) and can decide on further actions.
+* Enable authorities and other authorized actors to make decisions based on occurrence information. A *Yes* response serves as a signal for an administrator who is not permitted full access to see that the search contains observations with a higher sensitivity category than the administrator's authorization level. When receiving a signal the administrator may then contact a person with higher authorization that has access to more detailed information about the observation(s) and can decide on further actions.
 * Ensure that only authorized users can perform searches, and only within permitted geographic areas.
 
 > **Important:** Only sensitive observations are included in Signal Search. Public observations are never included.
 
-What are sensitive observations? Those are species observation records that have been judged to contain sensitive information which if released to the public, would result in an ‘adverse effect’ on the taxon or attribute in question or to a living individual. Sensitive information commonly relates to the exact localities of rare, endangered or commercially valuable taxa. Therefore, access to observations classified as sensitive are provided with restricted access only. Some sensitive observations are also subject to confidentiality under the Swedish Public Access to Information and Secrecy Act (2009:400), Chapter 20, Section 1.
+What are **sensitive observations**? Those are species observation records that have been judged to contain sensitive information which if released to the public, would result in an adverse effect on the taxon or attribute in question or to a living individual. Sensitive information commonly relates to the exact localities of rare, endangered or commercially valuable taxa. Therefore, access to observations classified as sensitive are provided with restricted access only. Some sensitive observations are also subject to confidentiality under the Swedish Public Access to Information and Secrecy Act (2009:400), Chapter 20, Section 1.
 
-Further information: [Nationally protected species (SLU Artdatabanken)](https://www.slu.se/artdatabanken/rapportering-och-fynd/fynduppgifter-och-skyddsklassade-arter/skyddsklassade-arter)
+Further information: [Sensitivity of species observation data (SLU Artdatabanken)](https://www.slu.se/artdatabanken/rapportering-och-fynd/fynduppgifter-och-skyddsklassade-arter/skyddsklassade-arter) [Skyddsklassning]
 
 ---
 
@@ -57,7 +57,7 @@ This behavior is controlled by the parameter `returnHttp4xxWhenNoPermissions`.
 
 Signal Search searches among all sensitive observations, i.e. those with sensitivity categories 3, 4, and 5. It does not include observations with sensitivity category 1 (public observations). Sensitivity category 2 is an obsolete category and is no longer used.
 
-When making a request to the endpoint, it is possible to specify that signals should only be returned for observations above the user’s authorization level. For example, if a user has authorization up to sensitivity category 3, signals will then only be returned for categories 4 and 5.
+When making a request to the endpoint, it is possible to specify that a signal should only be returned for observations with sensitivity categories above the user’s authorization level. For example, if a user has authorization up to sensitivity category 3, signals will then only be returned for categories 4 and 5.
 
 It is not possible to restrict a signal search to specific sensitivity categories. The search is performed either across all sensitivity categories (3–5) or only those above the user’s authorization level.
 
@@ -108,7 +108,7 @@ There is no minimum size restriction for the search area.
 
 Signal Search taxon lists:
 
-* Protected by law species (Id 1)
+* Species protected by law (Id 1)
 * Red listed species (Id 7)
 * Habitats directive species (Id 8)
 * Action plan species (Id 17)
@@ -123,9 +123,9 @@ If no mandatory taxon list is provided, **HTTP 400 (Bad Request)** is returned.
 
 ### 5.4 Other filters (optional)
 
-* Bird nesting activity criterion (`BirdNestActivityLimit`)
+* Bird breeding status criterion (`BirdNestActivityLimit`)
 * Dataset (`DataProvider`)
-* Artportalen type filter (`ArtportalenTypeFilter`) – _Used to determine which types of observations in Artportalen should be included in the search. The default value is `DoNotShowMerged`. To include all underlying observations within a grouped observation, `ShowChildrenAndReplacements` can be used._
+* Artportalen type filter (`ArtportalenTypeFilter`) – _Used to determine which types of observations in Artportalen should be included in the search. The default value is `DoNotShowMerged` and refers to the original reported records, not including any grouped observations based on posterior assessment. To include all underlying observations within a grouped observation and including replacements (corrected observations), `ShowChildrenAndReplacements` can be used._
 
 ---
 
@@ -141,7 +141,7 @@ Each observation can be represented geographically in the following ways:
    A point representing the reported position of the observation, together with a coordinate uncertainty (`coordinateUncertaintyInMeters`).
 
 2. **Buffered geometry (location.pointWithBuffer)**.
-For point-based observations, a circular polygon is created where the centroid is the observation point and the radius corresponds to the coordinate uncertainty (`coordinateUncertaintyInMeters`).
+For point-based observations, a circular polygon is created where the centroid is the observation point and the radius corresponds to the coordinate uncertainty (`coordinateUncertaintyInMeters`) i.e. the distance (in meters) from the given point describing the smallest circle containing the whole of the location.
 For **polygon locations**, the **exact polygon** describing the true spatial extent of the observation is stored instead. Polygon locations are therefore not converted into circles.
 
 3. **Disturbance area (location.pointWithDisturbanceBuffer)**.
@@ -159,6 +159,8 @@ Which geographic representation is used in a signal search is determined by whic
 * **considerDisturbanceRadius = true**.
   The search is performed against the disturbance area `location.pointWithDisturbanceBuffer`.
   Observations whose centroid lies outside the search geometry may still be included, provided that some part of the disturbance area intersects or overlaps the search area.
+
+  The disturbance sensitivity is classified for a selection of species and is approximated by the radius of a circle based on a point coordinate. It is used to be able to account for species occurrences that are outside the search area but may still be affected by conditions or events within the search area.
 
 * **considerObservationAccuracy = false** and **considerDisturbanceRadius = false**.
   The search is performed solely against the observation centroid (`location.point`). Only observations whose point lies within the search geometry can result in a match.
