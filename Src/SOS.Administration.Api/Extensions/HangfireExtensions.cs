@@ -38,12 +38,11 @@ public static class HangfireExtensions
                             CheckQueuedJobsStrategy = (mongoConfiguration?.Hosts?.Length ?? 0) < 2 ? CheckQueuedJobsStrategy.TailNotificationsCollection : CheckQueuedJobsStrategy.Watch,
                             JobExpirationCheckInterval = TimeSpan.FromMinutes(10),
                             QueuePollInterval = TimeSpan.FromSeconds(10), // Deafault 15
-                            MigrationOptions = null,
-                            //MigrationOptions = new MongoMigrationOptions
-                            //{
-                            //    MigrationStrategy = new MigrateMongoMigrationStrategy(),
-                            //    BackupStrategy = new CollectionMongoBackupStrategy()
-                            //},
+                            MigrationOptions =
+                            {
+                                MigrationStrategy = new ThrowMongoMigrationStrategy(),
+                                BackupStrategy = new NoneMongoBackupStrategy()
+                            },                            
                             Prefix = "hangfire",
                             CheckConnection = true
                         })
