@@ -35,6 +35,9 @@ public static class HangfireExtensions
                         mongoConfiguration.DatabaseName,
                         new MongoStorageOptions
                         {
+                            CheckQueuedJobsStrategy = (mongoConfiguration?.Hosts?.Length ?? 0) < 2 ? CheckQueuedJobsStrategy.TailNotificationsCollection : CheckQueuedJobsStrategy.Watch,
+                            JobExpirationCheckInterval = TimeSpan.FromMinutes(10),
+                            QueuePollInterval = TimeSpan.FromSeconds(10), // Deafault 15
                             MigrationOptions = new MongoMigrationOptions
                             {
                                 MigrationStrategy = new MigrateMongoMigrationStrategy(),
