@@ -1,4 +1,4 @@
-apiVersion: apps/v1
+﻿apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: api
@@ -85,6 +85,6 @@ spec:
                   "TaxonServiceConfiguration": {
                       "BaseAddress": "https://taxonservice.artdata.slu.se/DarwinCore/DarwinCoreArchiveFile?version=custom",
                       "AcceptHeaderContentType": "application/text",
-                      "TaxonApiAddress": "https://taxonapi-dev.wt.artdata.slu.se/darwincore/download?version=custom"
+                      "TaxonApiAddress": "https://taxonapi.artdata.slu.se/darwincore/download?version=custom"
                   }
               }
