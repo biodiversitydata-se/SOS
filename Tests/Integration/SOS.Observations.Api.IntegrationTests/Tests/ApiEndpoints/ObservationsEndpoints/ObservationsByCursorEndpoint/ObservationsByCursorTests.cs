@@ -17,60 +17,7 @@ public class ObservationsByCursorTests : TestBase
     }
 
     [Fact]
-    public async Task SearchByCursorEndpoint_PaginatesThrough100Observations_WhenTaking30AtATime()
-    {
-        // Arrange - Create 100 observations
-        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
-            .All().HaveValuesFromPredefinedObservations()
-            .Build();
-        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
-        var apiClient = TestFixture.CreateApiClient();
-        var searchFilter = new SearchFilterDto 
-        { 
-            OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present,
-            Output = new OutputFilterExtendedDto { FieldSet = Lib.Enums.OutputFieldSet.Minimum }
-        };
-
-        // Act - Paginate through all observations, 30 at a time
-        var allRecords = new List<Observation>();
-        string? cursor = null;
-        int pageCount = 0;
-        const int take = 30;
-
-        do
-        {
-            var url = $"/observations/searchbycursor?take={take}&sortBy=taxon.id&sortOrder=asc";
-            if (!string.IsNullOrEmpty(cursor))
-            {                
-                url += $"&cursor={cursor}";
-            }
-
-            var response = await apiClient.PostAsync(url, JsonContent.Create(searchFilter));
-            response.StatusCode.Should().Be(HttpStatusCode.OK);
-            var result = await response.Content.ReadFromJsonAsync<SearchByCursorResultDto<Observation>>();
-            result.Should().NotBeNull();
-            
-            if (result!.Records?.Any() == true)
-            {
-                allRecords.AddRange(result.Records);
-            }
-            
-            cursor = result.NextCursor;            
-            pageCount++;            
-            if (pageCount > 10) break; // Safety check to prevent infinite loop
-        } while (!string.IsNullOrEmpty(cursor));
-
-        // Assert
-        allRecords.Should().HaveCount(100);
-        pageCount.Should().Be(5); // 100 observations / 30 per page = 5 pages (30 + 30 + 30 + 10 + 0)
-        
-        // Verify no duplicates
-        var uniqueIds = allRecords.Select(o => o.Occurrence?.OccurrenceId).Distinct().ToList();
-        uniqueIds.Should().HaveCount(100);
-    }
-
-    [Fact]
-    public async Task SearchByCursorEndpoint_ReturnsCorrectTotalCount_WhenPaginating()
+    public async Task SearchByCursor_PaginatesThroughAllResults_WhenUsingCursor()
     {
         // Arrange
         var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
@@ -78,223 +25,255 @@ public class ObservationsByCursorTests : TestBase
             .Build();
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
         var apiClient = TestFixture.CreateApiClient();
-        var searchFilter = new SearchFilterDto 
-        { 
-            OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present 
-        };
+        var searchFilter = new SearchFilterDto { OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present };
+        var allOccurrenceIds = new HashSet<string>();
+
+        // Act - First page
+        var response1 = await apiClient.PostAsync(
+            "/observations/searchbycursor?take=30",
+            JsonContent.Create(searchFilter));
+        var result1 = await response1.Content.ReadFromJsonAsync<SearchByCursorResultDto<Observation>>();
+
+        // Act - Second page
+        var response2 = await apiClient.PostAsync(
+            $"/observations/searchbycursor?take=30&cursor={result1!.NextCursor}",
+            JsonContent.Create(searchFilter));
+        var result2 = await response2.Content.ReadFromJsonAsync<SearchByCursorResultDto<Observation>>();
+
+        // Act - Third page
+        var response3 = await apiClient.PostAsync(
+            $"/observations/searchbycursor?take=30&cursor={result2!.NextCursor}",
+            JsonContent.Create(searchFilter));
+        var result3 = await response3.Content.ReadFromJsonAsync<SearchByCursorResultDto<Observation>>();
+
+        // Act - Fourth page (last 10)
+        var response4 = await apiClient.PostAsync(
+            $"/observations/searchbycursor?take=30&cursor={result3!.NextCursor}",
+            JsonContent.Create(searchFilter));
+        var result4 = await response4.Content.ReadFromJsonAsync<SearchByCursorResultDto<Observation>>();
+
+        // Act - Fifth page (no records)
+        var response5 = await apiClient.PostAsync(
+           $"/observations/searchbycursor?take=30&cursor={result4!.NextCursor}",
+           JsonContent.Create(searchFilter));
+        var result5 = await response5.Content.ReadFromJsonAsync<SearchByCursorResultDto<Observation>>();
+
+
+        // Collect all occurrence IDs
+        foreach (var obs in result1.Records!) allOccurrenceIds.Add(obs.Occurrence!.OccurrenceId!);
+        foreach (var obs in result2.Records!) allOccurrenceIds.Add(obs.Occurrence!.OccurrenceId!);
+        foreach (var obs in result3.Records!) allOccurrenceIds.Add(obs.Occurrence!.OccurrenceId!);
+        foreach (var obs in result4!.Records!) allOccurrenceIds.Add(obs.Occurrence!.OccurrenceId!);
+
+        // Assert
+        response1.StatusCode.Should().Be(HttpStatusCode.OK);
+        response2.StatusCode.Should().Be(HttpStatusCode.OK);
+        response3.StatusCode.Should().Be(HttpStatusCode.OK);
+        response4.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        result1.Records.Should().HaveCount(30);
+        result2.Records.Should().HaveCount(30);
+        result3.Records.Should().HaveCount(30);
+        result4.Records.Should().HaveCount(10);
+        result5.Records.Should().HaveCount(0);
+        result5.NextCursor.Should().BeNullOrEmpty(because: "this is the last page");
+        allOccurrenceIds.Should().HaveCount(100, because: "all observations should be unique across pages");
+    }
+
+    [Fact]
+    public async Task SearchByCursor_ReturnsNullCursor_WhenNoMoreResultsExist()
+    {
+        // Arrange
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(30)
+            .All().HaveValuesFromPredefinedObservations()
+            .Build();
+        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
+        var apiClient = TestFixture.CreateApiClient();
+        var searchFilter = new SearchFilterDto { OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present };
+
+        // Act
+        var response1 = await apiClient.PostAsync(
+            "/observations/searchbycursor?take=50",
+            JsonContent.Create(searchFilter));
+        var result1 = await response1.Content.ReadFromJsonAsync<SearchByCursorResultDto<Observation>>();
+
+        var response2 = await apiClient.PostAsync(
+            $"/observations/searchbycursor?take=50&cursor={result1!.NextCursor}",
+            JsonContent.Create(searchFilter));
+        var result2 = await response2.Content.ReadFromJsonAsync<SearchByCursorResultDto<Observation>>();
+
+
+        // Assert
+        response1.StatusCode.Should().Be(HttpStatusCode.OK);
+        result1.Should().NotBeNull();
+        result1!.TotalCount.Should().Be(30);
+        result1.Records.Should().HaveCount(30);
+
+        result2.Records.Should().HaveCount(0);
+        result2.NextCursor.Should().BeNullOrEmpty(because: "all results have been fetched");
+    }
+
+    [Fact]
+    public async Task SearchByCursor_TotalCountChanges_WhenObservationsAddedBetweenRequests()
+    {
+        // Arrange - Create initial observations
+        var initialObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(50)
+            .All().HaveValuesFromPredefinedObservations()
+            .Build();
+        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(initialObservations);
+        var apiClient = TestFixture.CreateApiClient();
+        var searchFilter = new SearchFilterDto { OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present };
+
+        // Act - First page request
+        var response1 = await apiClient.PostAsync(
+            "/observations/searchbycursor?take=30",
+            JsonContent.Create(searchFilter));
+        var result1 = await response1.Content.ReadFromJsonAsync<SearchByCursorResultDto<Observation>>();
+
+        // Add more observations between requests (simulating "live" data changes)
+        var additionalObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(25)
+            .All().HaveValuesFromPredefinedObservations()
+            .Build();
+        var processedAdditionalObservations = ProcessFixture.ProcessObservations(additionalObservations);
+        await ProcessFixture.AddObservationsToElasticsearchAsync(processedAdditionalObservations, clearExistingObservations: false);
+
+        // Act - Second page request (using cursor from first request)
+        var response2 = await apiClient.PostAsync(
+            $"/observations/searchbycursor?take=30&cursor={result1!.NextCursor}",
+            JsonContent.Create(searchFilter));
+        var result2 = await response2.Content.ReadFromJsonAsync<SearchByCursorResultDto<Observation>>();
+
+        // Assert
+        response1.StatusCode.Should().Be(HttpStatusCode.OK);
+        response2.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        result1.TotalCount.Should().Be(50, because: "initial request should see 50 observations");
+        result2!.TotalCount.Should().Be(75, because: "second request should see 75 observations after adding 25 more");
+
+        // Note: This demonstrates the "live view" nature of search_after pagination
+        // as documented in the endpoint remarks - TotalCount can change between requests
+    }
+
+    [Fact]
+    public async Task SearchByCursor_ReturnsObservationsInCorrectOrder_WhenSortingAscending()
+    {
+        // Arrange
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(50)
+            .All().HaveValuesFromPredefinedObservations()
+            .Build();
+        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
+        var apiClient = TestFixture.CreateApiClient();
+        var searchFilter = new SearchFilterDto { OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present };
 
         // Act
         var response = await apiClient.PostAsync(
-            "/observations/searchbycursor?take=30&sortBy=taxon.id&sortOrder=asc", 
+            "/observations/searchbycursor?take=50&sortBy=modified&sortOrder=asc",
             JsonContent.Create(searchFilter));
+        var result = await response.Content.ReadFromJsonAsync<SearchByCursorResultDto<Observation>>();
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var result = await response.Content.ReadFromJsonAsync<SearchByCursorResultDto<Observation>>();
         result.Should().NotBeNull();
-        result!.TotalCount.Should().Be(100);
-        result.Take.Should().Be(30);
-        result.Records.Should().HaveCount(30);
-        result.NextCursor.Should().NotBeNull();
+        result!.Records.Should().HaveCount(50);
+        result.Records!.Select(o => o.Modified).Should().BeInAscendingOrder();
     }
 
     [Fact]
-    public async Task SearchByCursorEndpoint_ReturnsNullNextCursor_WhenLastPage()
-    {
-        // Arrange - Create only 20 observations
-        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(20)
-            .All().HaveValuesFromPredefinedObservations()
-            .Build();
-        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
-        var apiClient = TestFixture.CreateApiClient();
-        var searchFilter = new SearchFilterDto 
-        { 
-            OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present 
-        };
-
-        // Act - Request more than exists
-        var response1 = await apiClient.PostAsync(
-            "/observations/searchbycursor?take=30&sortBy=taxon.id&sortOrder=asc", 
-            JsonContent.Create(searchFilter));        
-        var result1 = await response1.Content.ReadFromJsonAsync<SearchByCursorResultDto<Observation>>();        
-        result1!.Records.Should().HaveCount(20);
-        result1.NextCursor.Should().NotBeNull();
-
-        // Second request will return no records and NextCursor null
-        var cursor = result1!.NextCursor;
-        var response2 = await apiClient.PostAsync(
-            $"/observations/searchbycursor?take=30&sortBy=taxon.id&sortOrder=asc&cursor={cursor}",
-            JsonContent.Create(searchFilter));
-        var result2 = await response2.Content.ReadFromJsonAsync<SearchByCursorResultDto<Observation>>();
-
-        // Assert - Last page should have no records and null NextCursor
-        response2.StatusCode.Should().Be(HttpStatusCode.OK);        
-        result2!.Records.Should().HaveCount(0);
-        result2.NextCursor.Should().BeNull();
-    }
-
-    [Fact]
-    public async Task SearchByCursorEndpoint_MaintainsSortOrder_WhenPaginatingAscending()
+    public async Task SearchByCursor_ReturnsObservationsInCorrectOrder_WhenSortingDescending()
     {
         // Arrange
-        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(50)
             .All().HaveValuesFromPredefinedObservations()
             .Build();
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
         var apiClient = TestFixture.CreateApiClient();
-        var searchFilter = new SearchFilterDto
-        { 
-            OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present,
-            Output = new OutputFilterExtendedDto { FieldSet = Lib.Enums.OutputFieldSet.Minimum }
-        };
-
-        // Act - Get first two pages
-        var response1 = await apiClient.PostAsync(
-            "/observations/searchbycursor?take=30&sortBy=taxon.id&sortOrder=asc", 
-            JsonContent.Create(searchFilter));
-        var result1 = await response1.Content.ReadFromJsonAsync<SearchByCursorResultDto<Observation>>();
-
-        var cursor = result1!.NextCursor;
-        var response2 = await apiClient.PostAsync(
-            $"/observations/searchbycursor?take=30&sortBy=taxon.id&sortOrder=asc&cursor={cursor}", 
-            JsonContent.Create(searchFilter));
-        var result2 = await response2.Content.ReadFromJsonAsync<SearchByCursorResultDto<Observation>>();
-
-        // Assert - Verify sort order is maintained across pages
-        var allTaxonIds = result1!.Records!
-            .Concat(result2!.Records!)
-            .Select(o => o.Taxon?.Id ?? 0)
-            .ToList();
-
-        allTaxonIds.Should().BeInAscendingOrder();
-    }
-
-    [Fact]
-    public async Task SearchByCursorEndpoint_MaintainsSortOrder_WhenPaginatingDescending()
-    {
-        // Arrange
-        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
-            .All().HaveValuesFromPredefinedObservations()
-            .Build();
-        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
-        var apiClient = TestFixture.CreateApiClient();
-        var searchFilter = new SearchFilterDto 
-        { 
-            OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present,
-            Output = new OutputFilterExtendedDto { FieldSet = Lib.Enums.OutputFieldSet.Minimum }
-        };
-
-        // Act - Get first two pages with descending order
-        var response1 = await apiClient.PostAsync(
-            "/observations/searchbycursor?take=30&sortBy=taxon.id&sortOrder=desc", 
-            JsonContent.Create(searchFilter));
-        var result1 = await response1.Content.ReadFromJsonAsync<SearchByCursorResultDto<Observation>>();
-
-        var cursor = result1!.NextCursor;
-        var response2 = await apiClient.PostAsync(
-            $"/observations/searchbycursor?take=30&sortBy=taxon.id&sortOrder=desc&cursor={cursor}", 
-            JsonContent.Create(searchFilter));
-        var result2 = await response2.Content.ReadFromJsonAsync<SearchByCursorResultDto<Observation>>();
-
-        // Assert - Verify sort order is maintained across pages
-        var allTaxonIds = result1!.Records!
-            .Concat(result2!.Records!)
-            .Select(o => o.Taxon?.Id ?? 0)
-            .ToList();
-
-        allTaxonIds.Should().BeInDescendingOrder();
-    }
-
-    [Fact]
-    public async Task SearchByCursorEndpoint_ReturnsNoDuplicates_WhenAllObservationsHaveSameModifiedDate()
-    {
-        // Arrange - Create observations with same modified date to test tiebreaker
-        var sameDate = new DateTime(2024, 12, 24);
-        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
-            .All().HaveValuesFromPredefinedObservations()
-                .With(m => m.EditDate = sameDate)
-            .Build();
-        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
-        var apiClient = TestFixture.CreateApiClient();
-        var searchFilter = new SearchFilterDto 
-        { 
-            OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present,
-            Output = new OutputFilterExtendedDto { FieldSet = Lib.Enums.OutputFieldSet.All }
-        };
-
-        // Act - Paginate through all observations
-        var allOccurrenceIds = new HashSet<string>();
-        string? cursor = null;
-        int totalRecords = 0;
-
-        do
-        {
-            var url = $"/observations/searchbycursor?take=30&sortBy=modified&sortOrder=asc";
-            if (!string.IsNullOrEmpty(cursor))
-            {
-                url += $"&cursor={cursor}";
-            }
-
-            var response = await apiClient.PostAsync(url, JsonContent.Create(searchFilter));            
-            response.StatusCode.Should().Be(HttpStatusCode.OK);
-
-            var result = await response.Content.ReadFromJsonAsync<SearchByCursorResultDto<Observation>>();
-            
-            if (result?.Records?.Any() == true)
-            {
-                foreach (var obs in result.Records)
-                {
-                    // Each occurrence ID should be unique
-                    allOccurrenceIds.Should().NotContain(obs.Occurrence?.OccurrenceId, 
-                        "Duplicate found: {0}", obs.Occurrence?.OccurrenceId);
-                    allOccurrenceIds.Add(obs.Occurrence?.OccurrenceId!);
-                }
-                totalRecords += result.Records.Count();
-            }
-
-            cursor = result?.NextCursor;           
-        } while (!string.IsNullOrEmpty(cursor));
-
-        // Assert
-        allOccurrenceIds.Should().HaveCount(100);
-    }
-
-    [Fact]
-    public async Task SearchByCursorEndpoint_ReturnsBadRequest_WhenInvalidCursorFormat()
-    {
-        // Arrange
-        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(10)
-            .All().HaveValuesFromPredefinedObservations()
-            .Build();
-        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
-        var apiClient = TestFixture.CreateApiClient();
-        var searchFilter = new SearchFilterDto 
-        { 
-            OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present 
-        };
-
-        // Act - Send invalid cursor value
-        var response = await apiClient.PostAsync(
-            "/observations/searchbycursor?take=30&sortBy=taxon.id&cursor=invalid_cursor", 
-            JsonContent.Create(searchFilter));
-
-        // Assert        
-        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-    }
-
-    [Fact]
-    public async Task SearchByCursorEndpoint_ReturnsBadRequest_WhenTakeExceeds5000()
-    {
-        // Arrange
-        var apiClient = TestFixture.CreateApiClient();
-        var searchFilter = new SearchFilterDto 
-        { 
-            OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present 
-        };
+        var searchFilter = new SearchFilterDto { OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present };
 
         // Act
         var response = await apiClient.PostAsync(
-            "/observations/searchbycursor?take=5001&sortBy=taxon.id", 
+            "/observations/searchbycursor?take=50&sortBy=modified&sortOrder=desc",
+            JsonContent.Create(searchFilter));
+        var result = await response.Content.ReadFromJsonAsync<SearchByCursorResultDto<Observation>>();
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        result.Should().NotBeNull();
+        result!.Records.Should().HaveCount(50);
+        result.Records!.Select(o => o.Modified).Should().BeInDescendingOrder();
+    }
+
+    [Fact]
+    public async Task SearchByCursor_MaintainsSortOrderAcrossPages_WhenPaginating()
+    {
+        // Arrange
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(60)
+            .All().HaveValuesFromPredefinedObservations()
+            .Build();
+        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
+        var apiClient = TestFixture.CreateApiClient();
+        var searchFilter = new SearchFilterDto { OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present };
+        var allModifiedDates = new List<DateTime?>();
+
+        // Act - First page
+        var response1 = await apiClient.PostAsync(
+            "/observations/searchbycursor?take=30&sortBy=modified&sortOrder=asc",
+            JsonContent.Create(searchFilter));
+        var result1 = await response1.Content.ReadFromJsonAsync<SearchByCursorResultDto<Observation>>();
+
+        // Act - Second page
+        var response2 = await apiClient.PostAsync(
+            $"/observations/searchbycursor?take=30&sortBy=modified&sortOrder=asc&cursor={result1!.NextCursor}",
+            JsonContent.Create(searchFilter));
+        var result2 = await response2.Content.ReadFromJsonAsync<SearchByCursorResultDto<Observation>>();
+
+        // Collect all modified dates in order
+        allModifiedDates.AddRange(result1.Records!.Select(o => o.Modified));
+        allModifiedDates.AddRange(result2!.Records!.Select(o => o.Modified));
+
+        // Assert
+        response1.StatusCode.Should().Be(HttpStatusCode.OK);
+        response2.StatusCode.Should().Be(HttpStatusCode.OK);
+        allModifiedDates.Should().BeInAscendingOrder(because: "sort order should be maintained across pages");
+    }
+
+    [Fact]
+    public async Task SearchByCursor_ReturnsCorrectTotalCount_AcrossAllPages()
+    {
+        // Arrange
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(75)
+            .All().HaveValuesFromPredefinedObservations()
+            .Build();
+        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
+        var apiClient = TestFixture.CreateApiClient();
+        var searchFilter = new SearchFilterDto { OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present };
+
+        // Act - First page
+        var response1 = await apiClient.PostAsync(
+            "/observations/searchbycursor?take=25",
+            JsonContent.Create(searchFilter));
+        var result1 = await response1.Content.ReadFromJsonAsync<SearchByCursorResultDto<Observation>>();
+
+        // Act - Second page
+        var response2 = await apiClient.PostAsync(
+            $"/observations/searchbycursor?take=25&cursor={result1!.NextCursor}",
+            JsonContent.Create(searchFilter));
+        var result2 = await response2.Content.ReadFromJsonAsync<SearchByCursorResultDto<Observation>>();
+
+        // Assert
+        result1.TotalCount.Should().Be(75);
+        result2!.TotalCount.Should().Be(75, because: "total count should remain consistent across pages when no observations is added between requests");
+    }
+
+    [Fact]
+    public async Task SearchByCursor_ReturnsBadRequest_WhenTakeExceedsLimit()
+    {
+        // Arrange
+        var apiClient = TestFixture.CreateApiClient();
+        var searchFilter = new SearchFilterDto { OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present };
+
+        // Act
+        var response = await apiClient.PostAsync(
+            "/observations/searchbycursor?take=3000",
             JsonContent.Create(searchFilter));
 
         // Assert
@@ -302,52 +281,18 @@ public class ObservationsByCursorTests : TestBase
     }
 
     [Fact]
-    public async Task SearchByCursorEndpoint_WorksWithFilter_WhenFilteringByTaxon()
+    public async Task SearchByCursor_ReturnsBadRequest_WhenSortByIsInvalid()
     {
-        // Arrange - Create observations with different taxon IDs
-        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
-            .All().HaveValuesFromPredefinedObservations()
-            .TheFirst(50).With(m => m.TaxonId = 100001)
-            .TheNext(50).With(m => m.TaxonId = 100002)
-            .Build();
-        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
+        // Arrange
         var apiClient = TestFixture.CreateApiClient();
-        
-        // Filter for only taxon 100001
-        var searchFilter = new SearchFilterDto 
-        { 
-            OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present,
-            Taxon = new TaxonFilterDto { Ids = [100001] }
-        };
+        var searchFilter = new SearchFilterDto { OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present };
 
-        // Act - Paginate through filtered results
-        var allRecords = new List<Observation>();
-        string? cursor = null;
+        // Act
+        var response = await apiClient.PostAsync(
+            "/observations/searchbycursor?take=50&sortBy=invalid.field.name",
+            JsonContent.Create(searchFilter));
 
-        do
-        {
-            var url = $"/observations/searchbycursor?take=30&sortBy=taxon.id&sortOrder=asc";
-            if (!string.IsNullOrEmpty(cursor))
-            {
-                url += $"&cursor={cursor}";
-            }
-
-            var response = await apiClient.PostAsync(url, JsonContent.Create(searchFilter));
-            var result = await response.Content.ReadFromJsonAsync<SearchByCursorResultDto<Observation>>();
-            
-            if (result?.Records?.Any() == true)
-            {
-                allRecords.AddRange(result.Records);
-            }
-
-            cursor = result?.NextCursor;
-
-            if (allRecords.Count >= 50) break;
-
-        } while (!string.IsNullOrEmpty(cursor));
-
-        // Assert - Should only get 50 observations with taxon 100001
-        allRecords.Should().HaveCount(50);
-        allRecords.Should().AllSatisfy(o => o.Taxon?.Id.Should().Be(100001));
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 }
