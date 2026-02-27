@@ -11550,14 +11550,6 @@
             },
             "nullable": true
           },
-          "regionalSightingStateIdsFilter": {
-            "type": "array",
-            "items": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "nullable": true
-          },
           "triggeredObservationRuleFrequencyIds": {
             "type": "array",
             "items": {
