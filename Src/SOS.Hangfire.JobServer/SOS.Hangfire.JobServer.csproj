@@ -64,7 +64,6 @@
 		<PackageReference Include="HangFire.Mongo" Version="1.13.1" />
 		<PackageReference Include="MassTransit" Version="9.0.1" />
 		<PackageReference Include="MassTransit.Azure.ServiceBus.Core" Version="9.0.1" />
-		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="10.0.3" />
 		<PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.3" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.3" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="10.0.3" />

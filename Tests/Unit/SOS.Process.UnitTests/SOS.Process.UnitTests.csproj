@@ -29,7 +29,6 @@
 
 	<ItemGroup>
 		<PackageReference Include="FluentAssertions" Version="[7.0.0]" />
-		<PackageReference Include="Hangfire.Core" Version="1.8.23" />
 		<PackageReference Include="MessagePack" Version="3.1.4" />
 		<PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.3" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.3" />
