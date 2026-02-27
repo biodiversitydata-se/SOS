@@ -3,7 +3,6 @@ using NetTopologySuite.IO;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Extensions;
-using System.Collections.Generic;
 
 namespace SOS.Lib.Models.Search.Result;
 

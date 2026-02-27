@@ -4965,18 +4965,6 @@
     "FieldSet": ""
   },
   {
-    "PropertyName": "RegionalSightingStateId",
-    "PropertyPath": "ArtportalenInternal.RegionalSightingStateId",
-    "SwedishTitle": "Regionalt observationstillstånds-id",
-    "EnglishTitle": "Regional sighting state ID",
-    "DataType": "Int32",
-    "DataTypeIsNullable": true,
-    "DwcName": "",
-    "DwcIdentifier": "",
-    "DependsOn": "ArtportalenInternal.RegionalSightingStateId",
-    "FieldSet": ""
-  },
-  {
     "PropertyName": "SightingPublishTypeIds",
     "PropertyPath": "ArtportalenInternal.SightingPublishTypeIds",
     "SwedishTitle": "Observation publiceringstyp-id´n",

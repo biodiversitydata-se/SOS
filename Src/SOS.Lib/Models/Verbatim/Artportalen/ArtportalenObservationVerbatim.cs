@@ -368,8 +368,6 @@ public class ArtportalenObservationVerbatim : IEntity<int>
     public int SightingTypeSearchGroupId { get; set; }
     public int SightingTypeId { get; set; }
 
-    //[Obsolete("This is too be deleted")]
-    //public int? RegionalSightingStateId { get; set; }
     public IEnumerable<int> SightingPublishTypeIds { get; set; }
 
     public IEnumerable<int> SpeciesFactsIds { get; set; }

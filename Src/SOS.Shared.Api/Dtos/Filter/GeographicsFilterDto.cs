@@ -1,7 +1,5 @@
 ﻿
 using NetTopologySuite.Geometries;
-using SOS.Lib.Swagger;
-using Swashbuckle.AspNetCore.Annotations;
 using System.Text.Json.Serialization;
 
 namespace SOS.Shared.Api.Dtos.Filter;
@@ -39,6 +37,11 @@ public class GeographicsFilterDto
     /// If true, use the buffer (if any) that can be applied to extend the area where the user has permission to search for sensitive observations  
     /// </summary>
     public bool? ConsiderAuthorizationBuffer { get; set; } = null;
+
+    /// <summary>
+    /// Gets or sets a value indicating whether to include observations made outside Sweden.
+    /// </summary>
+    public bool? IncludeObservationsOutsideSweden { get; set; }
 
     /// <summary>
     /// If Geometries is of point type, this property must be set to a value greater than 0.

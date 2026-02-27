@@ -1,0 +1,142 @@
+<eml:eml
+xmlns:eml="eml://ecoinformatics.org/eml-2.1.1"
+xmlns:dc="http://purl.org/dc/terms/"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.1 http://rs.gbif.org/schema/eml-gbif-profile/1.1/eml.xsd"
+packageId="fdb329a7-1210-45ee-9a5d-33472bc179c8/v6"
+system="http://gbif.org" scope="system" xml:lang="eng">
+
+<dataset>
+    <title>SLU Aqua National coastal bottom trawl survey of fish along the Swedish west coast
+    </title>
+    <creator>
+        <individualName>
+            <surName>Data curator</surName>
+        </individualName>
+        <organizationName>Department of Aquatic Resources, Swedish University of Agricultural Sciences (SLU)</organizationName>
+        <positionName>SLU Aqua</positionName>
+        <electronicMailAddress>fiskdata2@slu.se</electronicMailAddress>
+    </creator>
+    <metadataProvider>
+        <individualName>
+            <surName>Data curator</surName>
+        </individualName>
+        <organizationName>Department of Aquatic Resources, Swedish University of Agricultural Sciences (SLU)</organizationName>
+        <positionName>SLU Aqua</positionName>
+        <electronicMailAddress>fiskdata2@slu.se</electronicMailAddress>
+    </metadataProvider>
+    <pubDate>2025-06-18</pubDate>
+    <abstract>
+        <para>
+            Yearly monitoring programme of marine benthic fish communities along the Swedish west coast from 2002-2024 and ongoing. Since year 2013 a 16 mm mesh sized bottom trawl is used, prior to 2013 a 70 mm mesh size was used. Fish are identified to species, and their total weight and a subsample of lengths of each species are measured and recorded. Total weight of a selection of crustaceans and cephalopods species are also recorded. Sampling is carried out in quarter three.
+        </para>
+        <para>
+            The monitoring programme is financed by the Swedish Agency for Marine and Water Management. Monitoring is performed by the Department of Aquatic Resources, Swedish University of Agricultural Sciences (SLU). Data is stored in the database FD2 by SLU.
+        </para>
+        <para>
+            Coastal trawling is part of SLU Aqua’s environmental monitoring along the coast: https://www.slu.se/en/about-slu/organisation/departments/aquatic-resources/environment/environmental-monitoring-and-data-collection/environmental-monitoring-along-the-coast
+        </para>
+    </abstract>
+    <keywordSet>
+        <keyword>Samplingevent</keyword>
+        <keywordThesaurus>GBIF Dataset Type Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_type.xml</keywordThesaurus>
+    </keywordSet>
+    <additionalInfo>
+        <para>Start position for the trawl haul is specified in decimalLatitude and decimalLongitude.  Stop position (or ICES rect or subdivision) is specified in dynamicProperties.
+        </para>
+    </additionalInfo>
+    <intellectualRights>
+        <para>
+            This work is licensed under the
+                <ulink url="https://creativecommons.org/licenses/by/4.0/">
+                    <citetitle>CC BY 4.0 Universal (CC BY 4.0) Public Domain Dedication</citetitle>
+                </ulink>
+            Licensees may copy, distribute, display, perform and make derivative works and remixes based on it only if they give the author or licensor the credits (attribution) in the manner specified by these.
+        </para>
+    </intellectualRights>
+    <distribution>
+        <online>
+            <url function="information">https://www.slu.se/en/about-slu/organisation/departments/aquatic-resources/databases/database-for-marine-fish</url>
+        </online>
+    </distribution>
+    <coverage>
+        <geographicCoverage>
+            <geographicDescription>Skagerrak and Kattegat (http://marineregions.org/mrgid/5694)
+            </geographicDescription>
+            <boundingCoordinates>
+                <westBoundingCoordinate>10.13716</westBoundingCoordinate>
+                <eastBoundingCoordinate>12.8825</eastBoundingCoordinate>
+                <northBoundingCoordinate>59.08567</northBoundingCoordinate>
+                <southBoundingCoordinate>55.75933</southBoundingCoordinate>
+            </boundingCoordinates>
+        </geographicCoverage>
+        <temporalCoverage>
+            <rangeOfDates>
+                <beginDate>
+                    <calendarDate>2003-05-05</calendarDate>
+                </beginDate>
+                <endDate>
+                    <calendarDate>2022-09-16</calendarDate>
+                </endDate>
+            </rangeOfDates>
+        </temporalCoverage>
+        <taxonomicCoverage>
+            <taxonomicClassification>
+               <taxonRankName>Kingdom</taxonRankName>
+               <taxonRankValue>Animalia</taxonRankValue>
+               <commonName>Animals</commonName>
+            </taxonomicClassification>
+            <taxonomicClassification>
+               <taxonRankName>Informal</taxonRankName>
+               <taxonRankValue>Pisces</taxonRankValue>
+               <commonName>Fish</commonName>
+            </taxonomicClassification>
+        </taxonomicCoverage>
+    </coverage>
+    <contact>
+        <individualName>
+            <givenName>Data curator</givenName>
+            <surName>FD2</surName>
+        </individualName>
+        <organizationName>Department of Aquatic Resources, Swedish University of Agricultural Sciences (SLU)</organizationName>
+        <positionName>Data curator</positionName>
+        <address>
+          <deliveryPoint>Institutionen för akvatiska resurser, Havsfiskelaboratoriet, SLU, Turistgatan 5</deliveryPoint>
+          <city>Lysekil</city>
+          <postalCode>453 30</postalCode>
+          <country>SE</country>
+        </address>
+        <electronicMailAddress>fiskdata2@slu.se</electronicMailAddress>
+    </contact>
+    <methods>
+        <methodStep>
+            <description>
+                <para>Methods are described in: Svensson F, Svenson A, Jacobsson P, Thorvaldsson B, Hentati-Sundberg J, Wennhage H (2019) Rapport för 2018 års kusttrålundersökning av kustnära fiskbestånd längs den svenska Västkusten. Aqua reports 2019:10, Department of Aquatic Resources, SLU (in Swedish), https://res.slu.se/id/publ/100166
+                </para>
+            </description>
+        </methodStep>
+        <sampling>
+            <studyExtent>
+                <description>The survey is made in coastal waters on the Swedish west coast.
+                </description>
+            </studyExtent>
+            <samplingDescription>
+              <para>The samples are made yearly, with a bottom trawl.
+              </para>
+            </samplingDescription>
+        </sampling>
+    </methods>
+</dataset>
+<additionalMetadata>
+    <metadata>
+        <gbif>
+          <dateStamp>2025-06-18T10:31:12</dateStamp>
+          <hierarchyLevel>dataset</hierarchyLevel>
+          <bibliography>
+            <citation>Svensson F, Svenson A, Jacobsson P, Thorvaldsson B, Hentati-Sundberg J, Wennhage H (2019) Rapport för 2018 års kusttrålundersökning av kustnära fiskbestånd längs den svenska Västkusten. Aqua reports 2019:10, Department of Aquatic Resources, SLU (in Swedish). https://res.slu.se/id/publ/100166
+            </citation>
+          </bibliography>
+        </gbif>
+    </metadata>
+</additionalMetadata>
+</eml:eml>

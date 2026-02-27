@@ -12,7 +12,7 @@ public class SearchFilterUtility : ISearchFilterUtility
 {
     private readonly IAreaCache _areaCache;
     private readonly AreaConfiguration _areaConfiguration;
-    private Envelope _swedenExtentBoundingBox;
+    private Envelope _zoneOfSosBoundingBox;
 
     /// <summary>
     /// Get bounding box
@@ -24,7 +24,7 @@ public class SearchFilterUtility : ISearchFilterUtility
         GeographicsFilterDto filter,
         bool autoAdjustBoundingBox = true)
     {            
-        Envelope swedenBoundingBox = _swedenExtentBoundingBox;
+        Envelope zoneOfSosBoundingBox = _zoneOfSosBoundingBox;
         var userBoundingBox = new Envelope([
                 new Coordinate(filter?.BoundingBox?.TopLeft?.Longitude ?? 0, filter?.BoundingBox?.TopLeft?.Latitude ?? 90),
                 new Coordinate(filter?.BoundingBox?.BottomRight?.Longitude ?? 90, filter?.BoundingBox?.TopLeft?.Latitude ?? 90),
@@ -32,7 +32,7 @@ public class SearchFilterUtility : ISearchFilterUtility
                 new Coordinate(filter?.BoundingBox?.TopLeft?.Longitude ?? 0, filter?.BoundingBox?.BottomRight?.Latitude ?? 0)
             ]
         );
-        var boundingBox = swedenBoundingBox.Intersection(userBoundingBox);
+        var boundingBox = zoneOfSosBoundingBox.Intersection(userBoundingBox);
 
         if (autoAdjustBoundingBox)
         {
@@ -42,8 +42,6 @@ public class SearchFilterUtility : ISearchFilterUtility
             if (filter?.Areas?.Any() ?? false)
             {
                 var areas = await _areaCache.GetAreasAsync(filter.Areas.Select(a => ((AreaType)a.AreaType, a.FeatureId)));
-                var areaGeometries = areas?.Select(a => a.BoundingBox.GetPolygon());
-
                 var areaPolygons = areas?.Select(a => a.BoundingBox.GetPolygon());
 
                 foreach (var areaPolygon in areaPolygons!)
@@ -96,10 +94,10 @@ public class SearchFilterUtility : ISearchFilterUtility
     {
         _areaConfiguration = areaConfiguration ?? throw new ArgumentNullException(nameof(areaConfiguration));
         _areaCache = areaCache ?? throw new ArgumentNullException(nameof(areaCache));
-        Initialize().Wait();
+        InitializeAsync().Wait();
     }
 
-    private async Task Initialize()
+    private async Task InitializeAsync()
     {
         // Get geometry of sweden economic zone
         var swedenGeometry = (await _areaCache.GetGeometryAsync(AreaType.EconomicZoneOfSweden, "1"));
@@ -110,7 +108,7 @@ public class SearchFilterUtility : ISearchFilterUtility
             swedenGeometry = sweref99TmGeom.Transform(CoordinateSys.SWEREF99_TM, CoordinateSys.WGS84, false);
         }
         
-        _swedenExtentBoundingBox = swedenGeometry.EnvelopeInternal;            
+        _zoneOfSosBoundingBox = swedenGeometry.EnvelopeInternal;            
     }
 
     /// <inheritdoc/>

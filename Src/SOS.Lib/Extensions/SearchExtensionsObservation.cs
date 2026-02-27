@@ -134,7 +134,6 @@ public static class SearchExtensionsObservation
                 queries.TryAddTermCriteria("artportalenInternal.noteOfInterest", internalFilter.OnlyWithNotesOfInterest, true);
                 queries.TryAddTermCriteria("artportalenInternal.occurrenceRecordedByInternal.id", internalFilter.ObservedByUserId);
                 queries.TryAddTermCriteria("artportalenInternal.occurrenceRecordedByInternal.userServiceUserId", internalFilter.ObservedByUserServiceUserId);
-                queries.TryAddTermsCriteria("artportalenInternal.regionalSightingStateId", internalFilter.RegionalSightingStateIdsFilter);
                 queries.TryAddTermCriteria("artportalenInternal.reportedByUserId", internalFilter.ReportedByUserId);
                 queries.TryAddTermCriteria("artportalenInternal.reportedByUserServiceUserId", internalFilter.ReportedByUserServiceUserId);
                 queries.TryAddTermsCriteria("artportalenInternal.sightingPublishTypeIds", internalFilter.PublishTypeIdsFilter);
@@ -491,6 +490,12 @@ public static class SearchExtensionsObservation
                 queries.TryAddTermsCriteria("location.locationId", filter.LocationIds);
                 queries.TryAddWildcardCriteria("location.locality", filter.NameFilter);
                 queries.TryAddNumericRangeCriteria("location.coordinateUncertaintyInMeters", filter.MaxAccuracy, RangeTypes.LessThanOrEquals);
+            }
+
+            if(!filter?.IncludeObservationsOutsideSweden ?? true)
+            {
+                // If no location filter or IncludeObservationsOutsideSweden is not true, only observations inside sweden 
+                queries.TryAddTermCriteria("location.isInEconomicZoneOfSweden", true);
             }
         }
 
@@ -862,6 +867,7 @@ public static class SearchExtensionsObservation
                 "location.pointWithBuffer",
                 "location.pointWithDisturbanceBuffer",
                 "location.isInEconomicZoneOfSweden",
+                "location.isInZoneOfSOS",
                 "taxon.attributes.countyOccurrences"
             };
 

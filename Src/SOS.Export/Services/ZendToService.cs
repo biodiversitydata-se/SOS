@@ -88,7 +88,8 @@ public class ZendToService : IZendToService
             new KeyValuePair<string, string>("recipEmail_1", emailAddress),
             new KeyValuePair<string, string>("desc_1", description),                
             new KeyValuePair<string, string>("chunkName", chunkName),                
-            new KeyValuePair<string, string>("sentInChunks", "1"),                
+            new KeyValuePair<string, string>("sentInChunks", "1"),
+            new KeyValuePair<string, string>("chunkIndex", totalChunks.ToString())
         };
 
         foreach (var item in formData)
@@ -96,18 +97,17 @@ public class ZendToService : IZendToService
             form.Add(new StringContent(item.Value ?? string.Empty, Encoding.Default), item.Key);
         }
 
+        string fileName = Path.GetFileName(filePath);
         // JSON metadata about the file
         string metadata = JsonSerializer.Serialize(new
         {
-            name = Path.GetFileName(filePath),
+            name = fileName,
             type = "application/octet-stream",
             size = fileInfo.Length.ToString(),
             tmp_name = "1",
             error = 0
         });
         form.Add(new StringContent(metadata, Encoding.UTF8, "application/json"), "file_1");            
-
-        string fileName = Path.GetFileName(filePath);
         form.Add(new StringContent(fileName, Encoding.UTF8), "fileName_1");
 
         using var client = new HttpClient();
@@ -152,13 +152,9 @@ public class ZendToService : IZendToService
         byte[] buffer = new byte[ChunkSizeBytes];
 
         using var client = new HttpClient();
-
-        while (true)
+        int bytesRead = await fs.ReadAsync(buffer, 0, buffer.Length);
+        while (bytesRead > 0)
         {
-            int bytesRead = await fs.ReadAsync(buffer, 0, buffer.Length);
-            if (bytesRead <= 0)
-                break;
-
             using var content = new MultipartFormDataContent
             {
                 { new StringContent(chunkName), "chunkName" },
@@ -176,6 +172,7 @@ public class ZendToService : IZendToService
             resp.EnsureSuccessStatusCode();
             _logger.LogInformation("UploadChunkAsync succeeded. chunkName={chunkName}, chunkIndex={chunkIndex}", chunkName, chunkIndex);
             chunkIndex++;
+            bytesRead = await fs.ReadAsync(buffer, 0, buffer.Length);
         }
 
         return chunkIndex;

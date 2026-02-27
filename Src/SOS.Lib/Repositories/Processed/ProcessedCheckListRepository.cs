@@ -195,6 +195,7 @@ public class ProcessedChecklistRepository : ProcessRepositoryBase<Checklist, str
                              .NumberVal(n => n.Location.MinimumDistanceAboveSurfaceInMeters, IndexSetting.None, NumberType.Double)
                              .NumberVal(n => n.Location.MinimumElevationInMeters, IndexSetting.None, NumberType.Double)
                              .BooleanVal(b => b.Location.IsInEconomicZoneOfSweden, IndexSetting.SearchOnly)
+                             .BooleanVal(b => b.Location.IsInZoneOfSOS, IndexSetting.SearchOnly)
                              .KeywordVal(kwlc => kwlc.Location.LocationId, IndexSetting.SearchSortAggregate)
                              .KeywordVal(kwlc => kwlc.Location.CountryCode, IndexSetting.None)
                              .KeywordVal(kwlc => kwlc.Location.FootprintSRS, IndexSetting.None)

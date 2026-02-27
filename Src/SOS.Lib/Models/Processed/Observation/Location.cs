@@ -269,9 +269,15 @@ public class Location
     /// <summary>
     ///     Internal flag used in validation. must be true to be stored in processed data
     /// </summary>
-    [JsonIgnore]
     [SwaggerExclude]
     public bool IsInEconomicZoneOfSweden { get; set; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the current location is in zone handled by SOS.
+    /// </summary>
+    [JsonIgnore]
+    [SwaggerExclude]
+    public bool IsInZoneOfSOS { get; set; }
 
     /// <summary>
     ///     The name of the island on or near which the Location occurs.

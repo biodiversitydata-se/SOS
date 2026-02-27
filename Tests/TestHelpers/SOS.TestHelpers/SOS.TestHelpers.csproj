@@ -6,8 +6,6 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="MongoDB.Driver" Version="3.6.0" />
-		<PackageReference Include="Hangfire.Core" Version="1.8.23" />
 		<PackageReference Include="MessagePack" Version="3.1.4" />
 	</ItemGroup>
 

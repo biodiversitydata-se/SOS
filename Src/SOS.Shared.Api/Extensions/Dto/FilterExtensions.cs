@@ -177,8 +177,6 @@ public static class FilterExtensions
                 (SightingNotPresentFilter)searchFilterInternalDto.ExtendedFilter.NotPresentFilter;
             internalFilter.OnlySecondHandInformation = searchFilterInternalDto.ExtendedFilter.OnlySecondHandInformation;
             internalFilter.PublishTypeIdsFilter = searchFilterInternalDto.ExtendedFilter.PublishTypeIdsFilter;
-            internalFilter.RegionalSightingStateIdsFilter =
-                searchFilterInternalDto.ExtendedFilter.RegionalSightingStateIdsFilter;
             internalFilter.TriggeredObservationRuleFrequencyIds =
                 searchFilterInternalDto.ExtendedFilter.TriggeredObservationRuleFrequencyIds;
             internalFilter.TriggeredObservationRuleReproductionIds =
@@ -261,6 +259,7 @@ public static class FilterExtensions
                 UsePointAccuracy = filter.ConsiderObservationAccuracy,
                 UseAuthorizationBuffer = filter.ConsiderAuthorizationBuffer
             },
+            IncludeObservationsOutsideSweden = filter.IncludeObservationsOutsideSweden,
             LocationIds = filter.LocationIds,
             NameFilter = filter.LocationNameFilter,
             MaxAccuracy = filter.MaxAccuracy

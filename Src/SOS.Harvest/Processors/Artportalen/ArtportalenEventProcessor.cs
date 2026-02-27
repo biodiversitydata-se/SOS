@@ -80,6 +80,7 @@ public class ArtportalenEventProcessor : EventProcessorBase<ArtportalenEventProc
                 foreach (var observation in observations)
                 {
                     observation.Location.IsInEconomicZoneOfSweden = true; // all Artportalen observations are in Sweden
+                    observation.Location.IsInZoneOfSOS = true; // all Artportalen observations are in zone of SOS
                     string eventId = observation.Event.EventId.ToLower();
                     if (occurrenceIdsByEventId.TryGetValue(eventId, out var occurrenceIds))
                     {

@@ -348,6 +348,7 @@ public class ArtportalenObservationFactory : ObservationFactoryBase, IObservatio
             // Location
             obs.Location = new Location(LocationType.Unknown);
             obs.Location.IsInEconomicZoneOfSweden = hasPosition;
+            obs.Location.IsInZoneOfSOS = hasPosition;
             obs.Location.MaximumDepthInMeters = verbatimObservation.MaxDepth;
             obs.Location.MaximumElevationInMeters = verbatimObservation.MaxHeight;
             obs.Location.MinimumDepthInMeters = verbatimObservation.MinDepth;
@@ -467,8 +468,6 @@ public class ArtportalenObservationFactory : ObservationFactoryBase, IObservatio
             obs.ArtportalenInternal.SightingId = verbatimObservation.SightingId;
             obs.ArtportalenInternal.SightingTypeId = verbatimObservation.SightingTypeId;
             obs.ArtportalenInternal.SightingTypeSearchGroupId = verbatimObservation.SightingTypeSearchGroupId;
-            /* obs.ArtportalenInternal.SpeciesGroupId = verbatimObservation.SpeciesGroupId;
-             obs.ArtportalenInternal.RegionalSightingStateId = verbatimObservation.RegionalSightingStateId;*/
             obs.ArtportalenInternal.SightingPublishTypeIds = verbatimObservation.SightingPublishTypeIds;
             obs.ArtportalenInternal.ReportedByUserId = verbatimObservation.ReportedByUserId;
             obs.ArtportalenInternal.ReportedByUserServiceUserId = verbatimObservation.ReportedByUserServiceUserId;
