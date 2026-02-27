@@ -348,6 +348,7 @@ public class ArtportalenObservationFactory : ObservationFactoryBase, IObservatio
             // Location
             obs.Location = new Location(LocationType.Unknown);
             obs.Location.IsInEconomicZoneOfSweden = hasPosition;
+            obs.Location.IsInZoneOfSOS = hasPosition;
             obs.Location.MaximumDepthInMeters = verbatimObservation.MaxDepth;
             obs.Location.MaximumElevationInMeters = verbatimObservation.MaxHeight;
             obs.Location.MinimumDepthInMeters = verbatimObservation.MinDepth;

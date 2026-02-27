@@ -148,9 +148,9 @@ public class ValidationManager : IValidationManager
         {
             AddError(errors, ObservationDefect.ObservationDefectType.GeographicsError, "Coordinates are missing");
         }
-        else if (!observation.Location.IsInEconomicZoneOfSweden)
+        else if (!observation.Location.IsInZoneOfSOS)
         {
-            AddError(errors, ObservationDefect.ObservationDefectType.LocationOutsideOfSweden, $"Sighting outside Swedish economic zone (lon: {observation.Location?.DecimalLongitude}, lat:{observation.Location?.DecimalLatitude})");
+            AddError(errors, ObservationDefect.ObservationDefectType.LocationOutsideOfSweden, $"Sighting outside zone handled by SOS (lon: {observation.Location?.DecimalLongitude}, lat:{observation.Location?.DecimalLatitude})");
         }
         else if (observation.Location?.Point == null || observation.Location?.PointLocation == null || observation.Location?.PointWithBuffer == null)
         {
@@ -269,7 +269,7 @@ public class ValidationManager : IValidationManager
             eventValidation.Defects.Add(new EventDefect(EventDefect.EventDefectType.MissingMandatoryField, "Coordinates are missing")
             );
         }
-        else if (!ev.Location.IsInEconomicZoneOfSweden)
+        else if (!ev.Location.IsInZoneOfSOS)
         {
             eventValidation.Defects.Add(new EventDefect(
                 EventDefect.EventDefectType.LocationOutsideOfSweden,

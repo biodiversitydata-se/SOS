@@ -250,6 +250,7 @@ public class ObservationPropertiesTest : TestBase
                 HigherGeography = "HG",
                 HigherGeographyId = "HGId",
                 IsInEconomicZoneOfSweden = false,
+                IsInZoneOfSOS = false,
                 Island = "I",
                 IslandGroup = "IG",
                 Locality = "L",

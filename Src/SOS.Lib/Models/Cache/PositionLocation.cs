@@ -43,4 +43,9 @@ public class PositionLocation
     ///     County property
     /// </summary>
     public bool EconomicZoneOfSweden { get; set; }
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the observation is located in zone covered by SOS.
+    /// </summary>
+    public bool ZoneOfSOS { get; set; }
 }

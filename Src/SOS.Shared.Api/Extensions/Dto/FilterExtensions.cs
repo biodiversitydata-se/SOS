@@ -261,6 +261,7 @@ public static class FilterExtensions
                 UsePointAccuracy = filter.ConsiderObservationAccuracy,
                 UseAuthorizationBuffer = filter.ConsiderAuthorizationBuffer
             },
+            IncludeObservationsOutsideSweden = filter.IncludeObservationsOutsideSweden,
             LocationIds = filter.LocationIds,
             NameFilter = filter.LocationNameFilter,
             MaxAccuracy = filter.MaxAccuracy

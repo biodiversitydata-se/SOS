@@ -94,6 +94,7 @@ public class DataValidationReportJob : IDataValidationReportJob
             .Ignore<Observation>(obs => obs.Location.Point)
             .Ignore<Observation>(obs => obs.Location.PointWithBuffer)
             .Ignore<Observation>(obs => obs.Location.IsInEconomicZoneOfSweden)
+            .Ignore<Observation>(obs => obs.Location.IsInZoneOfSOS)
             .Ignore<Observation>(obs => obs.Defects)
             .KeepTypeWithDefaultValue(typeof(VocabularyValue));
 
@@ -115,6 +116,7 @@ public class DataValidationReportJob : IDataValidationReportJob
             .Ignore<Observation>(obs => obs.Location.Point)
             .Ignore<Observation>(obs => obs.Location.PointWithBuffer)
             .Ignore<Observation>(obs => obs.Location.IsInEconomicZoneOfSweden)
+            .Ignore<Observation>(obs => obs.Location.IsInZoneOfSOS)
             .KeepTypeWithDefaultValue(typeof(VocabularyValue));
 
         var jsonSettings = new JsonSerializerSettings()

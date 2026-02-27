@@ -23,6 +23,11 @@ public class LocationFilter
     public GeographicsFilter Geometries { get; set; }
 
     /// <summary>
+    /// Gets or sets a value indicating whether to include observations made outside Sweden.
+    /// </summary>
+    public bool? IncludeObservationsOutsideSweden { get; set; }
+
+    /// <summary>
     /// Filter on location id's
     /// </summary>
     public IEnumerable<string> LocationIds { get; set; }

@@ -97,7 +97,13 @@ public class AreaHelper : IAreaHelper
                         case AreaType.Municipality: positionLocation.Municipality = area; break;
                         case AreaType.Parish: positionLocation.Parish = area; break;
                         case AreaType.Province: positionLocation.Province = area; break;
-                        case AreaType.EconomicZoneOfSweden: positionLocation.EconomicZoneOfSweden = true; break;
+                        case AreaType.EconomicZoneOfSweden: 
+                            if (featureId == "1")
+                            {
+                                positionLocation.EconomicZoneOfSweden = true;
+                            }
+                            positionLocation.ZoneOfSOS = true;
+                            break;
                     }
                 }
             }
@@ -175,6 +181,7 @@ public class AreaHelper : IAreaHelper
         processedLocation.Parish = positionLocations?.Parish;
         processedLocation.Province = positionLocations?.Province;
         processedLocation.IsInEconomicZoneOfSweden = positionLocations?.EconomicZoneOfSweden ?? false;
+        processedLocation.IsInZoneOfSOS = positionLocations?.ZoneOfSOS ?? false;
 
         processedLocation.Attributes.ProvincePartIdByCoordinate =
             GetProvincePartIdByCoordinate(processedLocation.Province?.FeatureId);
@@ -246,20 +253,26 @@ public class AreaHelper : IAreaHelper
                         geometry = await _processedAreaRepository.GetGeometryAsync(area.AreaType, area.FeatureId);
                     }
 
-                    var attributes = new Dictionary<string, object>();
-                    attributes.Add("name", area.Name);
-                    attributes.Add("areaType", area.AreaType);
-                    attributes.Add("featureId", area.FeatureId);
+                    var attributes = new Dictionary<string, object>
+                    {
+                        { "name", area.Name },
+                        { "areaType", area.AreaType },
+                        { "featureId", area.FeatureId }
+                    };
+                    var feature = geometry.ToFeature(attributes);
+                    _strTree.Insert(feature.Geometry.EnvelopeInternal, feature);
 
                     if (area.AreaType == AreaType.EconomicZoneOfSweden && _areaConfiguration.SwedenExtentBufferKm.GetValueOrDefault(0) > 0)
                     {
                         var sweref99TmGeom = geometry.Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM, false);
                         sweref99TmGeom = sweref99TmGeom.Buffer(_areaConfiguration.SwedenExtentBufferKm.Value * 1000);
-                        geometry = sweref99TmGeom.Transform(CoordinateSys.SWEREF99_TM, CoordinateSys.WGS84, false);
+                        var geometryWithBuffer = sweref99TmGeom.Transform(CoordinateSys.SWEREF99_TM, CoordinateSys.WGS84, false);
+                        var bufferGeometry = geometryWithBuffer.Difference(geometry);
+                        attributes["name"] = "ZoneOfSOS";
+                        attributes["featureId"] = "-1";
+                        var bufferFeature = bufferGeometry.ToFeature(attributes);
+                        _strTree.Insert(bufferFeature.Geometry.EnvelopeInternal, bufferFeature);
                     }
-
-                    var feature = geometry.ToFeature(attributes);
-                    _strTree.Insert(feature.Geometry.EnvelopeInternal, feature);
                 }
 
                 _strTree.Build();
@@ -302,6 +315,4 @@ public class AreaHelper : IAreaHelper
 
         return featuresContainingPoint;
     }
-
-
 }

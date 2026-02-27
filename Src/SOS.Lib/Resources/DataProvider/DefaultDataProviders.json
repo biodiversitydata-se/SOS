@@ -1031,7 +1031,7 @@
     "IncludeInHealthCheck": true,
     "IncludeInScheduledHarvest": true,
     "IncludeInSearchByDefault": true,
-    "IsActive": true,
+    "IsActive": false,
     "Names": [
       {
         "CultureCode": "en-GB",
@@ -2127,6 +2127,77 @@
     "SupportIncrementalHarvest": false,
     "Type": "DwcA",
     "Url": "https://www.slu.se/nfi",
+    "UseVerbatimFileInExport": false
+  },
+  {
+    "Categories": [
+      "RegionalInventory",
+      "Marine",
+      "Vertebrates"
+    ],
+    "ContactPerson": {
+      "FirstName": "Data",
+      "LastName": "curator",
+      "Email": "fiskdata2@slu.se"
+    },
+    "CoordinateUncertaintyInMeters": 500,
+    "CreateEventDwC": true,
+    "Descriptions": [
+      {
+        "CultureCode": "en-GB",
+        "Value": "Yearly monitoring programme of marine benthic fish communities along the Swedish west coast from 2002-2024 and ongoing. Since year 2013 a 16 mm mesh sized bottom trawl is used, prior to 2013 a 70 mm mesh size was used. Fish are identified to species, and their total weight and a subsample of lengths of each species are measured and recorded. Total weight of a selection of crustaceans and cephalopods species are also recorded. Sampling is carried out in quarter three. The monitoring programme is financed by the Swedish Agency for Marine and Water Management. Monitoring is performed by the Department of Aquatic Resources, Swedish University of Agricultural Sciences (SLU). Data is stored in the database FD2 by SLU. Coastal trawling is part of SLU Aqua’s environmental monitoring along the coast: https://www.slu.se/en/about-slu/organisation/departments/aquatic-resources/environment/environmental-monitoring-and-data-collection/environmental-monitoring-along-the-coast"
+      },
+      {
+        "CultureCode": "sv-SE",
+        "Value": "Årligt övervakningsprogram för marina bentiska fiskbestånd längs den svenska västkusten från 2002 till 2024 och pågående. Sedan 2013 används en bottentrål med en maskstorlek på 16 mm, före 2013 användes en maskstorlek på 70 mm. Fiskarna identifieras till artnivå. För en fångst registreras fiskarnas sammanlagda totala vikt. För ett delprov från varje art registreras fiskarnas längdmått. Det registreras också totalvikt för ett urval av kräftdjur och bläckfiskar. Provtagningen genomförs under tredje kvartalet. Övervakningsprogrammet finansieras av Vattenmyndigheten. Övervakningen utförs av Institutionen för akvatiska resurser, Sveriges lantbruksuniversitet (SLU). Data lagras i SLU:s databas FD2. Kusttrålning ingår i SLU Aquas miljöövervakning vid kusten: https://www.slu.se/om-slu/organisation/institutioner/akvatiska-resurser/miljoanalys/miljoovervakning-och-datainsamling/kust"
+      }
+    ],
+    "HarvestFailPreventProcessing": false,
+    "HarvestSchedule": "* * * * *",
+    "Id": 29,
+    "Identifier": "CoastalTrawling",
+    "IncludeInHealthCheck": true,
+    "IncludeInScheduledHarvest": false,
+    "IncludeInSearchByDefault": true,
+    "IsActive": true,
+    "Names": [
+      {
+        "CultureCode": "en-GB",
+        "Value": "Coastal bottom trawling"
+      },
+      {
+        "CultureCode": "sv-SE",
+        "Value": "Kusttråling"
+      }
+    ],
+    "Organizations": [
+      {
+        "CultureCode": "en-GB",
+        "Value": "Department of Aquatic Resources (SLU Aqua)"
+      },
+      {
+        "CultureCode": "sv-SE",
+        "Value": "Institutionen för akvatiska resurser, SLU"
+      }
+    ],
+    "Paths": [
+      {
+        "CultureCode": "en-GB",
+        "path": [ "Department of Aquatic Resources", "CoastalTrawling" ]
+      },
+      {
+        "CultureCode": "sv-SE",
+        "path": [ "Havsfiskelaboratoriet, Institutionen för akvatiska resurser", "CoastalTrawling" ]
+      }
+    ],
+    "DefaultVerificationStatus": "ReportedByExpert",
+    "PreviousProcessLimit": 95,
+    "SupportDatasets": false,
+    "SupportDynamicEml": false,
+    "SupportEvents": true,
+    "SupportIncrementalHarvest": false,
+    "Type": "DwcA",
+    "Url": "https://www.slu.se/en/about-slu/organisation/departments/aquatic-resources/environment/environmental-monitoring-and-data-collection/environmental-monitoring-along-the-coast",
     "UseVerbatimFileInExport": false
   }
 ]

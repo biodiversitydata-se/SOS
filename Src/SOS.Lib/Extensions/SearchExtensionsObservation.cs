@@ -492,6 +492,12 @@ public static class SearchExtensionsObservation
                 queries.TryAddWildcardCriteria("location.locality", filter.NameFilter);
                 queries.TryAddNumericRangeCriteria("location.coordinateUncertaintyInMeters", filter.MaxAccuracy, RangeTypes.LessThanOrEquals);
             }
+
+            if(!filter?.IncludeObservationsOutsideSweden ?? true)
+            {
+                // If no location filter or IncludeObservationsOutsideSweden is not true, only observations inside sweden 
+                queries.TryAddTermCriteria("location.isInEconomicZoneOfSweden", true);
+            }
         }
 
         /// <summary>
@@ -862,6 +868,7 @@ public static class SearchExtensionsObservation
                 "location.pointWithBuffer",
                 "location.pointWithDisturbanceBuffer",
                 "location.isInEconomicZoneOfSweden",
+                "location.isInZoneOfSOS",
                 "taxon.attributes.countyOccurrences"
             };
 
