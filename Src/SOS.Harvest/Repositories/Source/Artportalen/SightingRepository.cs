@@ -28,28 +28,9 @@ public class SightingRepository : BaseRepository<ISightingRepository>, ISighting
             topCount = $"TOP {top}";
         }
 
-        var triggerRuleSelect = "svr.RegionalSightingStateId";
-        var triggerRuleFrom = @"LEFT JOIN TriggeredValidationRule tvr on tvr.SightingId = si.Id 
-                    LEFT JOIN StatusValidationRule svr ON svr.Id = tvr.StatusValidationRuleId ";
-
-        if (DataService.Configuration?.UseTriggeredObservationRule ?? false)
-        {
-            triggerRuleSelect = @"tor.ActivityRuleId AS TriggeredObservationRuleActivityRuleId,
-                tor.FrequencyId AS TriggeredObservationRuleFrequencyId,
-                tor.PeriodRuleId AS TriggeredObservationRulePeriodRuleId,
-                tor.PromptRuleId AS TriggeredObservationRulePromptRuleId,
-                CASE WHEN tor.Prompts IS NULL THEN NULL WHEN LEN(tor.Prompts) = 0 THEN 0 ELSE 1 END AS TriggeredObservationRulePrompts,
-                tor.RegionalSightingState AS TriggeredObservationRuleRegionalSightingState,
-                tor.ReproductionId AS TriggeredObservationRuleReproductionId,
-                tor.StatusRuleId AS TriggeredObservationRuleStatusRuleId,
-                tor.Unspontaneous AS TriggeredObservationRuleUnspontaneous";
-            //ISNULL(tor.RegionalSightingState, 0) AS TriggeredObservationRuleRegionalSightingState";
-            triggerRuleFrom = @"LEFT JOIN TriggeredObservationRule tor ON tor.SightingId = si.Id ";
-        }
-
         var query = $@"
                 SELECT {topCount} 
-                    si.Id, 
+                    s.Id, 
                     s.ActivityId,
                     s.ChecklistId,
                     s.DiscoveryMethodId,
@@ -69,7 +50,7 @@ public class SightingRepository : BaseRepository<ISightingRepository>, ISighting
 					s.MinHeight,
 	                s.NotPresent,
 	                s.NotRecovered,
-                    s.OwnerOrganizationId,
+                    s.ControlingOrganisationId,
                     msi.PortalId AS MigrateSightingPortalId,
                     msi.obsid AS MigrateSightingObsId,
 	                s.ProtectedBySystem,
@@ -77,7 +58,7 @@ public class SightingRepository : BaseRepository<ISightingRepository>, ISighting
 					s.QuantityOfSubstrate,
                     s.RegisterDate,
 	                CASE WHEN p.Id IS NULL THEN null ELSE p.FirstName + ' ' + p.LastName END AS RightsHolder,
-                    si.SiteId,
+                    s.SiteId,
                     CASE WHEN sic.SightingId IS NULL THEN 0 ELSE 1 END AS HasUserComments,
 	                s.StageId,
 	                s.StartDate,
@@ -96,32 +77,39 @@ public class SightingRepository : BaseRepository<ISightingRepository>, ISighting
 	                s.HasTriggeredValidationRules, 
 	                s.HasAnyTriggeredValidationRuleWithWarning,
 	                s.NoteOfInterest,
-	                si.DeterminationMethodId,
+	                s.DeterminationMethodId,
                     s.SightingTypeId,
                     s.SightingTypeSearchGroupId,
                     s.FieldDiaryGroupId,
                     ssu.Summary,
                     ISNULL(ssu.FreeTextSummary, 0) AS IsFreeTextSummary,
-	                {triggerRuleSelect},
-                    (select string_agg(SightingPublishTypeId, ',') from SightingPublish sp where SightingId = si.Id group by SightingId) AS SightingPublishTypeIds,
+	                tor.ActivityRuleId AS TriggeredObservationRuleActivityRuleId,
+                    tor.FrequencyId AS TriggeredObservationRuleFrequencyId,
+                    tor.PeriodRuleId AS TriggeredObservationRulePeriodRuleId,
+                    tor.PromptRuleId AS TriggeredObservationRulePromptRuleId,
+                    CASE WHEN tor.Prompts IS NULL THEN NULL WHEN LEN(tor.Prompts) = 0 THEN 0 ELSE 1 END AS TriggeredObservationRulePrompts,
+                    tor.RegionalSightingState AS TriggeredObservationRuleRegionalSightingState,
+                    tor.ReproductionId AS TriggeredObservationRuleReproductionId,
+                    tor.StatusRuleId AS TriggeredObservationRuleStatusRuleId,
+                    tor.Unspontaneous AS TriggeredObservationRuleUnspontaneous,
+                    (select string_agg(SightingPublishTypeId, ',') from SightingPublish sp where SightingId = s.Id group by SightingId) AS SightingPublishTypeIds,
                     (select string_agg(SpeciesFactId , ',') from SpeciesFactTaxon sft where sft.TaxonId = s.TaxonId AND sft.IsSearchFilter = 1 group by sft.TaxonId) AS SpeciesFactsIds,
                     sdc.DatasourceId
                 FROM
 	                {SightingsFromBasics}
-					INNER JOIN Sighting si ON si.Id = s.SightingId
                     {join}
-	                LEFT JOIN SightingCommentPublic scp ON scp.SightingId = si.Id                                   
-	                LEFT JOIN SightingBarcode sb ON sb.SightingId = si.Id
-                    LEFT JOIN [User] u ON u.Id = s.OwnerUserId  
+	                LEFT JOIN SightingCommentPublic scp ON scp.SightingId = s.Id                                   
+	                LEFT JOIN SightingBarcode sb ON sb.SightingId = s.Id
+                    LEFT JOIN [User] u ON u.Id = s.ControlingUserId  
 	                LEFT JOIN Person p ON p.Id = u.PersonId 
-                    LEFT JOIN MigrateSightingid msi ON msi.Id = si.Id 
-					LEFT JOIN SightingDescription sdb ON sdb.Id = si.SightingBiotopeDescriptionId
-					LEFT JOIN SightingDescription sds ON sds.Id = si.SightingSubstrateDescriptionId 
-					LEFT JOIN SightingDescription sdss ON sdss.Id = si.SightingSubstrateSpeciesDescriptionId
-                    LEFT JOIN SightingSummary ssu ON ssu.Id = si.SightingSummaryId
-                    {triggerRuleFrom}
-                    LEFT JOIN SightingDatasource sdc ON sdc.SightingId = si.Id 
-                    LEFT JOIN (SELECT SightingId FROM SightingComment GROUP BY SightingId) sic ON sic.SightingId = si.Id 
+                    LEFT JOIN MigrateSightingid msi ON msi.Id = s.Id 
+					LEFT JOIN SightingDescription sdb ON sdb.Id = s.SightingBiotopeDescriptionId
+					LEFT JOIN SightingDescription sds ON sds.Id = s.SightingSubstrateDescriptionId 
+					LEFT JOIN SightingDescription sdss ON sdss.Id = s.SightingSubstrateSpeciesDescriptionId
+                    LEFT JOIN SightingSummary ssu ON ssu.Id = s.SightingSummaryId
+                    LEFT JOIN TriggeredObservationRule tor ON tor.SightingId = s.Id
+                    LEFT JOIN SightingDatasource sdc ON sdc.SightingId = s.Id 
+                    LEFT JOIN (SELECT SightingId FROM SightingComment GROUP BY SightingId) sic ON sic.SightingId = s.Id 
                 WHERE
 	                {GetSightingWhereBasics(isIncrementalHarvest)}
                     {where} ";
@@ -145,7 +133,7 @@ public class SightingRepository : BaseRepository<ISightingRepository>, ISighting
     {
         try
         {
-            var query = GetSightingQuery(0, "AND si.Id BETWEEN @StartId AND @EndId", isIncrementalHarvest);
+            var query = GetSightingQuery(0, "AND s.Id BETWEEN @StartId AND @EndId", isIncrementalHarvest);
 
             var result = (await QueryAsync<SightingEntity>(query, new { StartId = startId, EndId = startId + maxRows - 1 }))?.ToArray();
             if ((result?.Count() ?? 0) == 0)
@@ -172,7 +160,7 @@ public class SightingRepository : BaseRepository<ISightingRepository>, ISighting
             {
                 return null;
             }
-            var query = GetSightingQuery(sightingIds?.Count() ?? 0, "INNER JOIN @tvp t ON si.Id = t.Id", null!, isIncrementalHarvest);
+            var query = GetSightingQuery(sightingIds?.Count() ?? 0, "INNER JOIN @tvp t ON s.Id = t.Id", null!, isIncrementalHarvest);
 
             var result = (await QueryAsync<SightingEntity>(query, new { tvp = sightingIds.ToSqlRecords().AsTableValuedParameter("dbo.IdValueTable") }))?.ToArray();
             if ((result?.Count() ?? 0) == 0)
@@ -256,8 +244,8 @@ public class SightingRepository : BaseRepository<ISightingRepository>, ISighting
         {
             string query = $@"
                 SELECT 
-                    MIN(s.SightingId) AS minId,
-                    MAX(s.SightingId) AS maxId
+                    MIN(s.Id) AS minId,
+                    MAX(s.Id) AS maxId
 		        FROM 
 		            {SightingsFromBasics}
                 WHERE 

@@ -108,7 +108,7 @@ public class AreaBaseDtoPagedResult
     /// <summary>
     /// Paged records
     /// </summary>
-    public System.Collections.Generic.ICollection<AreaBaseDto> Records { get; set; }
+    public ICollection<AreaBaseDto> Records { get; set; }
 
     /// <summary>
     /// Ignores the specified number of items and returns a sequence starting at the item after the last skipped item (if
@@ -218,7 +218,7 @@ public class ArtportalenInternal
     /// <summary>
     /// Bird validation areas.
     /// </summary>
-    public System.Collections.Generic.ICollection<string> BirdValidationAreaIds { get; set; }
+    public ICollection<string> BirdValidationAreaIds { get; set; }
 
     /// <summary>
     /// Id of checklist
@@ -248,7 +248,7 @@ public class ArtportalenInternal
     /// <summary>
     /// Event month range start date =&gt; end date
     /// </summary>
-    public System.Collections.Generic.ICollection<int> EventMonths { get; set; }
+    public ICollection<int> EventMonths { get; set; }
 
     /// <summary>
     /// Field diary group id
@@ -273,7 +273,7 @@ public class ArtportalenInternal
     /// <summary>
     /// Media files
     /// </summary>
-    public System.Collections.Generic.ICollection<Multimedia> Media { get; set; }
+    public ICollection<Multimedia> Media { get; set; }
 
     /// <summary>
     /// Note of Interest.
@@ -303,22 +303,22 @@ public class ArtportalenInternal
     /// <summary>
     /// Ids of Species Facts connected to Taxon
     /// </summary>
-    public System.Collections.Generic.ICollection<int> SpeciesFactsIds { get; set; }
+    public ICollection<int> SpeciesFactsIds { get; set; }
 
     /// <summary>
     /// Id of publishing types.
     /// </summary>
-    public System.Collections.Generic.ICollection<int> SightingPublishTypeIds { get; set; }
+    public ICollection<int> SightingPublishTypeIds { get; set; }
 
     /// <summary>
     /// Internal field used for searches by Artportalen, contains extra user information.
     /// </summary>
-    public System.Collections.Generic.ICollection<UserInternal> OccurrenceRecordedByInternal { get; set; }
+    public ICollection<UserInternal> OccurrenceRecordedByInternal { get; set; }
 
     /// <summary>
     /// Info about users verifying the observation
     /// </summary>
-    public System.Collections.Generic.ICollection<UserInternal> OccurrenceVerifiedByInternal { get; set; }
+    public ICollection<UserInternal> OccurrenceVerifiedByInternal { get; set; }
 
     /// <summary>
     /// The original presentation name for ParishRegion from data provider.
@@ -1031,7 +1031,7 @@ public class DarwinCoreOccurrenceDto
     /// <summary>
     /// Media associated with the observation
     /// </summary>
-    public System.Collections.Generic.ICollection<Multimedia> Media { get; set; }
+    public ICollection<Multimedia> Media { get; set; }
 
     /// <summary>
     /// A list (concatenated and separated) of identifiers of other Occurrence records and their associations to this Occurrence.
@@ -1460,7 +1460,7 @@ public class DataProviderDto
     /// <summary>
     /// Paths that can be used to group and visualize a data provider as a tree in a GUI.
     /// </summary>
-    public System.Collections.Generic.ICollection<string> Path { get; set; }
+    public ICollection<string> Path { get; set; }
 
     /// <summary>
     /// URL to the data provider source.
@@ -1523,7 +1523,7 @@ public class DataProviderFilterDto
     /// <summary>
     /// Data provider id's
     /// </summary>
-    public System.Collections.Generic.ICollection<int> Ids { get; set; }
+    public ICollection<int> Ids { get; set; }
 
 }
 
@@ -1547,7 +1547,7 @@ public class DataStewardshipFilterDto
     /// <summary>
     /// Dataset filter
     /// </summary>
-    public System.Collections.Generic.ICollection<string> DatasetIdentifiers { get; set; }
+    public ICollection<string> DatasetIdentifiers { get; set; }
 
 }
 
@@ -1604,7 +1604,7 @@ public class DateFilterDto
     /// Predefined time ranges
     /// </summary>
     // TODO(system.text.json): Add string enum item converter
-    public System.Collections.Generic.ICollection<TimeRangeDto> TimeRanges { get; set; }
+    public ICollection<TimeRangeDto> TimeRanges { get; set; }
 
 }
 
@@ -1807,12 +1807,12 @@ public class Event
     /// <summary>
     /// Multimedia associated with the event.
     /// </summary>
-    public System.Collections.Generic.ICollection<Multimedia> Media { get; set; }
+    public ICollection<Multimedia> Media { get; set; }
 
     /// <summary>
     /// Measurement or facts associated with the event.
     /// </summary>
-    public System.Collections.Generic.ICollection<ExtendedMeasurementOrFact> MeasurementOrFacts { get; set; }
+    public ICollection<ExtendedMeasurementOrFact> MeasurementOrFacts { get; set; }
 
     /// <summary>
     /// An identifier for the broader Event that groups this and potentially other Events.
@@ -1860,7 +1860,7 @@ public class EventFilterDto
     /// <summary>
     /// Event id's
     /// </summary>
-    public System.Collections.Generic.ICollection<string> Ids { get; set; }
+    public ICollection<string> Ids { get; set; }
 
 }
 
@@ -1871,7 +1871,7 @@ public class ExcludeFilterDto
     /// <summary>
     /// Exclude observations with listed occurrence id's
     /// </summary>
-    public System.Collections.Generic.ICollection<string> OccurrenceIds { get; set; }
+    public ICollection<string> OccurrenceIds { get; set; }
 
 }
 
@@ -1956,7 +1956,7 @@ public class ExtendedFilterDto
     /// <summary>
     /// Field diary group Id's
     /// </summary>
-    public System.Collections.Generic.ICollection<int> FieldDiaryGroupIds { get; set; }
+    public ICollection<int> FieldDiaryGroupIds { get; set; }
 
     /// <summary>
     /// Reported by Artportalen user id.
@@ -1981,7 +1981,7 @@ public class ExtendedFilterDto
     /// <summary>
     /// Id of sex to match
     /// </summary>
-    public System.Collections.Generic.ICollection<int> SexIds { get; set; }
+    public ICollection<int> SexIds { get; set; }
 
     /// <summary>
     /// Only include hits with media associated
@@ -2011,16 +2011,16 @@ public class ExtendedFilterDto
 
     public bool UsePeriodForAllYears { get; set; }
 
-    public System.Collections.Generic.ICollection<int> Months { get; set; }
+    public ICollection<int> Months { get; set; }
 
     [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
     public DateFilterComparisonDto MonthsComparison { get; set; }
 
-    public System.Collections.Generic.ICollection<int> DiscoveryMethodIds { get; set; }
+    public ICollection<int> DiscoveryMethodIds { get; set; }
 
-    public System.Collections.Generic.ICollection<int> LifeStageIds { get; set; }
+    public ICollection<int> LifeStageIds { get; set; }
 
-    public System.Collections.Generic.ICollection<int> ActivityIds { get; set; }
+    public ICollection<int> ActivityIds { get; set; }
 
     public bool HasTriggeredVerificationRule { get; set; }
 
@@ -2038,9 +2038,9 @@ public class ExtendedFilterDto
 
     public string QuantityOperator { get; set; }
 
-    public System.Collections.Generic.ICollection<int> VerificationStatusIds { get; set; }
+    public ICollection<int> VerificationStatusIds { get; set; }
 
-    public System.Collections.Generic.ICollection<int> ExcludeVerificationStatusIds { get; set; }
+    public ICollection<int> ExcludeVerificationStatusIds { get; set; }
 
     [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
     public SightingUnspontaneousFilterDto UnspontaneousFilter { get; set; }
@@ -2062,30 +2062,28 @@ public class ExtendedFilterDto
 
     public bool OnlySecondHandInformation { get; set; }
 
-    public System.Collections.Generic.ICollection<int> PublishTypeIdsFilter { get; set; }
+    public ICollection<int> PublishTypeIdsFilter { get; set; }
 
-    public System.Collections.Generic.ICollection<int> RegionalSightingStateIdsFilter { get; set; }
+    public ICollection<int> TriggeredObservationRuleFrequencyIds { get; set; }
 
-    public System.Collections.Generic.ICollection<int> TriggeredObservationRuleFrequencyIds { get; set; }
+    public ICollection<int> TriggeredObservationRuleReproductionIds { get; set; }
 
-    public System.Collections.Generic.ICollection<int> TriggeredObservationRuleReproductionIds { get; set; }
+    public ICollection<int> SiteIds { get; set; }
 
-    public System.Collections.Generic.ICollection<int> SiteIds { get; set; }
+    public ICollection<int> SiteProjectIds { get; set; }
 
-    public System.Collections.Generic.ICollection<int> SiteProjectIds { get; set; }
-
-    public System.Collections.Generic.ICollection<int> SpeciesFactsIds { get; set; }
+    public ICollection<int> SpeciesFactsIds { get; set; }
 
     public string InstitutionId { get; set; }
 
-    public System.Collections.Generic.ICollection<int> DatasourceIds { get; set; }
+    public ICollection<int> DatasourceIds { get; set; }
 
-    public System.Collections.Generic.ICollection<int> Years { get; set; }
+    public ICollection<int> Years { get; set; }
 
     [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
     public DateFilterComparisonDto YearsComparison { get; set; }
 
-    public System.Collections.Generic.ICollection<int> SightingTypeSearchGroupIds { get; set; }
+    public ICollection<int> SightingTypeSearchGroupIds { get; set; }
 
 }
 
@@ -2198,7 +2196,7 @@ public class ExternalSystemMappingDto
 
     public string Description { get; set; }
 
-    public System.Collections.Generic.ICollection<ExternalSystemMappingFieldDto> Mappings { get; set; }
+    public ICollection<ExternalSystemMappingFieldDto> Mappings { get; set; }
 
 }
 
@@ -2213,7 +2211,7 @@ public class ExternalSystemMappingFieldDto
 
     public string Description { get; set; }
 
-    public System.Collections.Generic.ICollection<ExternalSystemMappingValueDto> Values { get; set; }
+    public ICollection<ExternalSystemMappingValueDto> Values { get; set; }
 
 }
 
@@ -2311,7 +2309,7 @@ public class GeoGridMetricResultDto
 
     public LatLonBoundingBoxDto BoundingBox { get; set; }
 
-    public System.Collections.Generic.ICollection<GridCellDto> GridCells { get; set; }
+    public ICollection<GridCellDto> GridCells { get; set; }
 
     public int GridCellCount { get; set; }
 
@@ -2331,7 +2329,7 @@ public class GeoGridResultDto
 
     public int GridCellCount { get; set; }
 
-    public System.Collections.Generic.ICollection<GeoGridCellDto> GridCells { get; set; }
+    public ICollection<GeoGridCellDto> GridCells { get; set; }
 
     public long TotalGridCellCount { get; set; }
 
@@ -2351,7 +2349,7 @@ public class GeoGridTileTaxaCellDto
 
     public int Y { get; set; }
 
-    public System.Collections.Generic.ICollection<GeoGridTileTaxonObservationCountDto> Taxa { get; set; }
+    public ICollection<GeoGridTileTaxonObservationCountDto> Taxa { get; set; }
 
 }
 
@@ -2381,7 +2379,7 @@ public class GeoGridTileTaxonPageResultDto
     /// </summary>
     public int? NextTaxonIdPage { get; set; }
 
-    public System.Collections.Generic.ICollection<GeoGridTileTaxaCellDto> GridCells { get; set; }
+    public ICollection<GeoGridTileTaxaCellDto> GridCells { get; set; }
 
 }
 
@@ -2404,7 +2402,7 @@ public class GeographicsFilterDto
     /// <summary>
     /// Area filter
     /// </summary>
-    public System.Collections.Generic.ICollection<AreaFilterDto> Areas { get; set; }
+    public ICollection<AreaFilterDto> Areas { get; set; }
 
     public LatLonBoundingBoxDto BoundingBox { get; set; }
 
@@ -2432,12 +2430,12 @@ public class GeographicsFilterDto
     /// Point or polygon geometry used for search.
     /// <br/>If the geometry is a point, then MaxDistanceFromPoint is also used in search.
     /// </summary>
-    public System.Collections.Generic.ICollection<GeoJsonGeometry> Geometries { get; set; }
+    public ICollection<GeoJsonGeometry> Geometries { get; set; }
 
     /// <summary>
     /// Filter on location id/s. Only observations with passed location id/s this will be returned
     /// </summary>
-    public System.Collections.Generic.ICollection<string> LocationIds { get; set; }
+    public ICollection<string> LocationIds { get; set; }
 
     /// <summary>
     /// Location name wild card filter
@@ -3453,7 +3451,7 @@ public class ModifiedDateFilterDto
 public class Multimedia
 {
 
-    public System.Collections.Generic.ICollection<MultimediaComment> Comments { get; set; }
+    public ICollection<MultimediaComment> Comments { get; set; }
 
     public string Type { get; set; }
 
@@ -3729,12 +3727,12 @@ public class Observation
     /// <summary>
     /// Measurement or facts associated with the observation.
     /// </summary>
-    public System.Collections.Generic.ICollection<ExtendedMeasurementOrFact> MeasurementOrFacts { get; set; }
+    public ICollection<ExtendedMeasurementOrFact> MeasurementOrFacts { get; set; }
 
     /// <summary>
     /// Projects from Artportalen associated with the observation.
     /// </summary>
-    public System.Collections.Generic.ICollection<Project> Projects { get; set; }
+    public ICollection<Project> Projects { get; set; }
 
     public ProjectsSummary ProjectsSummary { get; set; }
 
@@ -3772,7 +3770,7 @@ public class ObservationGeoPagedResultDto
     /// <summary>
     /// Paged records
     /// </summary>
-    public System.Collections.Generic.ICollection<Observation> Records { get; set; }
+    public ICollection<Observation> Records { get; set; }
 
 }
 
@@ -3801,7 +3799,7 @@ public class ObservationPagedResultDto
     /// <summary>
     /// Paged records
     /// </summary>
-    public System.Collections.Generic.ICollection<Observation> Records { get; set; }
+    public ICollection<Observation> Records { get; set; }
 
 }
 
@@ -3834,7 +3832,7 @@ public class ObservationScrollResultDto
     /// <summary>
     /// Paged records
     /// </summary>
-    public System.Collections.Generic.ICollection<Observation> Records { get; set; }
+    public ICollection<Observation> Records { get; set; }
 
 }
 
@@ -3955,7 +3953,7 @@ public class Occurrence
     /// <summary>
     /// Media associated with the observation
     /// </summary>
-    public System.Collections.Generic.ICollection<Multimedia> Media { get; set; }
+    public ICollection<Multimedia> Media { get; set; }
 
     /// <summary>
     /// An identifier for the Occurrence (as opposed to a particular digital record of the occurrence).
@@ -4148,7 +4146,7 @@ public class OutputFilterDto
     /// <br/>For example, to retrieve only basic observation data, specify:
     /// <br/>["event.startDate", "event.endDate", "location.decimalLatitude", "location.decimalLongitude", "location.municipality", "taxon.id", "taxon.scientificName", "occurrence.recordedBy", "occurrence.occurrenceStatus"].
     /// </summary>
-    public System.Collections.Generic.ICollection<string> Fields { get; set; }
+    public ICollection<string> Fields { get; set; }
 
 }
 
@@ -4167,12 +4165,12 @@ public class OutputFilterExtendedDto
     /// <br/>For example, to retrieve only basic observation data, specify:
     /// <br/>["event.startDate", "event.endDate", "location.decimalLatitude", "location.decimalLongitude", "location.municipality", "taxon.id", "taxon.scientificName", "occurrence.recordedBy", "occurrence.occurrenceStatus"].
     /// </summary>
-    public System.Collections.Generic.ICollection<string> Fields { get; set; }
+    public ICollection<string> Fields { get; set; }
 
     /// <summary>
     /// Sort result
     /// </summary>
-    public System.Collections.Generic.ICollection<SortOrderDto> SortOrders { get; set; }
+    public ICollection<SortOrderDto> SortOrders { get; set; }
 
 }
 
@@ -4206,7 +4204,7 @@ public class PolygonGeoShape
 
     public string Type { get; set; }
 
-    public System.Collections.Generic.ICollection<System.Collections.Generic.ICollection<GeoCoordinate>> Coordinates { get; set; }
+    public ICollection<ICollection<GeoCoordinate>> Coordinates { get; set; }
 
 }
 
@@ -4239,7 +4237,7 @@ public enum Precipitation
 }
 
 
-public class ProblemDetails : System.Collections.Generic.Dictionary<string, object>
+public class ProblemDetails : Dictionary<string, object>
 {
 
 }
@@ -4268,12 +4266,12 @@ public class ProcessInfoDto
     /// <summary>
     /// Provider information about meta data
     /// </summary>
-    public System.Collections.Generic.ICollection<ProcessInfoDto> MetadataInfo { get; set; }
+    public ICollection<ProcessInfoDto> MetadataInfo { get; set; }
 
     /// <summary>
     /// Information about providers
     /// </summary>
-    public System.Collections.Generic.ICollection<ProviderInfoDto> ProvidersInfo { get; set; }
+    public ICollection<ProviderInfoDto> ProvidersInfo { get; set; }
 
     /// <summary>
     /// Harvest start date and time
@@ -4344,7 +4342,7 @@ public class Project
     /// <summary>
     /// Project parameters
     /// </summary>
-    public System.Collections.Generic.ICollection<ProjectParameter> ProjectParameters { get; set; }
+    public ICollection<ProjectParameter> ProjectParameters { get; set; }
 
     /// <summary>
     /// Web address that leads to more information about the
@@ -4610,7 +4608,7 @@ public class PropertyFieldDescriptionDto
     /// The field sets this property is part of.
     /// </summary>
     // TODO(system.text.json): Add string enum item converter
-    public System.Collections.Generic.ICollection<OutputFieldSet> PartOfFieldSets { get; set; }
+    public ICollection<OutputFieldSet> PartOfFieldSets { get; set; }
 
 }
 
@@ -4774,7 +4772,7 @@ public class SearchFilterAggregationDto
     /// Filter by diffusion status.
     /// </summary>
     // TODO(system.text.json): Add string enum item converter
-    public System.Collections.Generic.ICollection<DiffusionStatusDto> DiffusionStatuses { get; set; }
+    public ICollection<DiffusionStatusDto> DiffusionStatuses { get; set; }
 
     public EventFilterDto Event { get; set; }
 
@@ -4798,7 +4796,7 @@ public class SearchFilterAggregationDto
     /// <summary>
     /// Project id's to match.
     /// </summary>
-    public System.Collections.Generic.ICollection<int> ProjectIds { get; set; }
+    public ICollection<int> ProjectIds { get; set; }
 
     /// <summary>
     /// Only get observations reported by me
@@ -4840,7 +4838,7 @@ public class SearchFilterAggregationInternalDto
     /// Filter by diffusion status.
     /// </summary>
     // TODO(system.text.json): Add string enum item converter
-    public System.Collections.Generic.ICollection<DiffusionStatusDto> DiffusionStatuses { get; set; }
+    public ICollection<DiffusionStatusDto> DiffusionStatuses { get; set; }
 
     public EventFilterDto Event { get; set; }
 
@@ -4864,7 +4862,7 @@ public class SearchFilterAggregationInternalDto
     /// <summary>
     /// Project id's to match.
     /// </summary>
-    public System.Collections.Generic.ICollection<int> ProjectIds { get; set; }
+    public ICollection<int> ProjectIds { get; set; }
 
     /// <summary>
     /// Only get observations reported by me
@@ -4913,7 +4911,7 @@ public class SearchFilterBaseDto
     /// Filter by diffusion status.
     /// </summary>
     // TODO(system.text.json): Add string enum item converter
-    public System.Collections.Generic.ICollection<DiffusionStatusDto> DiffusionStatuses { get; set; }
+    public ICollection<DiffusionStatusDto> DiffusionStatuses { get; set; }
 
     public EventFilterDto Event { get; set; }
 
@@ -4937,7 +4935,7 @@ public class SearchFilterBaseDto
     /// <summary>
     /// Project id's to match.
     /// </summary>
-    public System.Collections.Generic.ICollection<int> ProjectIds { get; set; }
+    public ICollection<int> ProjectIds { get; set; }
 
     /// <summary>
     /// Only get observations reported by me
@@ -4979,7 +4977,7 @@ public class SearchFilterDto
     /// Filter by diffusion status.
     /// </summary>
     // TODO(system.text.json): Add string enum item converter
-    public System.Collections.Generic.ICollection<DiffusionStatusDto> DiffusionStatuses { get; set; }
+    public ICollection<DiffusionStatusDto> DiffusionStatuses { get; set; }
 
     public EventFilterDto Event { get; set; }
 
@@ -5003,7 +5001,7 @@ public class SearchFilterDto
     /// <summary>
     /// Project id's to match.
     /// </summary>
-    public System.Collections.Generic.ICollection<int> ProjectIds { get; set; }
+    public ICollection<int> ProjectIds { get; set; }
 
     /// <summary>
     /// Only get observations reported by me
@@ -5047,7 +5045,7 @@ public class SearchFilterInternalBaseDto
     /// Filter by diffusion status.
     /// </summary>
     // TODO(system.text.json): Add string enum item converter
-    public System.Collections.Generic.ICollection<DiffusionStatusDto> DiffusionStatuses { get; set; }
+    public ICollection<DiffusionStatusDto> DiffusionStatuses { get; set; }
 
     public EventFilterDto Event { get; set; }
 
@@ -5071,7 +5069,7 @@ public class SearchFilterInternalBaseDto
     /// <summary>
     /// Project id's to match.
     /// </summary>
-    public System.Collections.Generic.ICollection<int> ProjectIds { get; set; }
+    public ICollection<int> ProjectIds { get; set; }
 
     /// <summary>
     /// Only get observations reported by me
@@ -5135,7 +5133,7 @@ public class SearchFilterInternalDto
     /// Filter by diffusion status.
     /// </summary>
     // TODO(system.text.json): Add string enum item converter
-    public System.Collections.Generic.ICollection<DiffusionStatusDto> DiffusionStatuses { get; set; }
+    public ICollection<DiffusionStatusDto> DiffusionStatuses { get; set; }
 
     public EventFilterDto Event { get; set; }
 
@@ -5159,7 +5157,7 @@ public class SearchFilterInternalDto
     /// <summary>
     /// Project id's to match.
     /// </summary>
-    public System.Collections.Generic.ICollection<int> ProjectIds { get; set; }
+    public ICollection<int> ProjectIds { get; set; }
 
     /// <summary>
     /// Only get observations reported by me
@@ -5654,7 +5652,7 @@ public class Taxon
     /// <summary>
     /// Secondary parents dyntaxa taxon ids.
     /// </summary>
-    public System.Collections.Generic.ICollection<int> SecondaryParentDyntaxaTaxonIds { get; set; }
+    public ICollection<int> SecondaryParentDyntaxaTaxonIds { get; set; }
 
     /// <summary>
     /// The name of the first or species epithet of
@@ -5774,7 +5772,7 @@ public class TaxonAggregationItemDtoPagedResultDto
     /// <summary>
     /// Paged records
     /// </summary>
-    public System.Collections.Generic.ICollection<TaxonAggregationItemDto> Records { get; set; }
+    public ICollection<TaxonAggregationItemDto> Records { get; set; }
 
 }
 
@@ -5900,14 +5898,14 @@ public class TaxonAttributes
     /// <summary>
     /// Scientific synonym names.
     /// </summary>
-    public System.Collections.Generic.ICollection<TaxonSynonymName> Synonyms { get; set; }
+    public ICollection<TaxonSynonymName> Synonyms { get; set; }
 
     public VocabularyValue TaxonCategory { get; set; }
 
     /// <summary>
     /// Vernacular names.
     /// </summary>
-    public System.Collections.Generic.ICollection<TaxonVernacularName> VernacularNames { get; set; }
+    public ICollection<TaxonVernacularName> VernacularNames { get; set; }
 
 }
 
@@ -5926,12 +5924,12 @@ public class TaxonFilterBaseDto
     /// <summary>
     /// Dyntaxa taxon id's to match.
     /// </summary>
-    public System.Collections.Generic.ICollection<int> Ids { get; set; }
+    public ICollection<int> Ids { get; set; }
 
     /// <summary>
     /// Add (merge) or filter taxa by using taxon lists.
     /// </summary>
-    public System.Collections.Generic.ICollection<int> TaxonListIds { get; set; }
+    public ICollection<int> TaxonListIds { get; set; }
 
 }
 
@@ -5950,23 +5948,23 @@ public class TaxonFilterDto
     /// <summary>
     /// Dyntaxa taxon id's to match.
     /// </summary>
-    public System.Collections.Generic.ICollection<int> Ids { get; set; }
+    public ICollection<int> Ids { get; set; }
 
     /// <summary>
     /// Add (merge) or filter taxa by using taxon lists.
     /// </summary>
-    public System.Collections.Generic.ICollection<int> TaxonListIds { get; set; }
+    public ICollection<int> TaxonListIds { get; set; }
 
     /// <summary>
     /// Redlist categories to match.
     /// <br/>Possible values are: "DD", "EX", "RE", "CR", "EN", "VU", "NT", "LC", "NA", "NE"
     /// </summary>
-    public System.Collections.Generic.ICollection<string> RedListCategories { get; set; }
+    public ICollection<string> RedListCategories { get; set; }
 
     /// <summary>
     /// Taxon categories to match.
     /// </summary>
-    public System.Collections.Generic.ICollection<int> TaxonCategories { get; set; }
+    public ICollection<int> TaxonCategories { get; set; }
 
     [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
     public TaxonListOperatorDto TaxonListOperator { get; set; }
@@ -6070,7 +6068,7 @@ public class TaxonSumAggregationItem
     /// <summary>
     /// Sum of observation count including underlying taxa observation count, by Province id.
     /// </summary>
-    public System.Collections.Generic.IDictionary<string, int?> SumObservationCountByProvinceId { get; set; }
+    public IDictionary<string, int?> SumObservationCountByProvinceId { get; set; }
 
 }
 
@@ -6099,7 +6097,7 @@ public class TaxonSumAggregationItemPagedResultDto
     /// <summary>
     /// Paged records
     /// </summary>
-    public System.Collections.Generic.ICollection<TaxonSumAggregationItem> Records { get; set; }
+    public ICollection<TaxonSumAggregationItem> Records { get; set; }
 
 }
 
@@ -6262,7 +6260,7 @@ public class UserAuthorityDto
     /// <summary>
     /// Authority areas.
     /// </summary>
-    public System.Collections.Generic.ICollection<UserAreaDto> Areas { get; set; }
+    public ICollection<UserAreaDto> Areas { get; set; }
 
 }
 
@@ -6310,7 +6308,7 @@ public class UserInformationDto
     /// <summary>
     /// User roles.
     /// </summary>
-    public System.Collections.Generic.ICollection<UserRoleDto> Roles { get; set; }
+    public ICollection<UserRoleDto> Roles { get; set; }
 
 }
 
@@ -6386,7 +6384,7 @@ public class UserRoleDto
     /// </summary>
     public bool HasSightingIndicationAuthority { get; set; }
 
-    public System.Collections.Generic.ICollection<UserAuthorityDto> Authorities { get; set; }
+    public ICollection<UserAuthorityDto> Authorities { get; set; }
 
 }
 
@@ -6423,9 +6421,9 @@ public class VocabularyDto
 
     public bool Localized { get; set; }
 
-    public System.Collections.Generic.ICollection<VocabularyValueInfoDto> Values { get; set; }
+    public ICollection<VocabularyValueInfoDto> Values { get; set; }
 
-    public System.Collections.Generic.ICollection<ExternalSystemMappingDto> ExternalSystemsMapping { get; set; }
+    public ICollection<ExternalSystemMappingDto> ExternalSystemsMapping { get; set; }
 
 }
 
@@ -6515,7 +6513,7 @@ public class VocabularyValueInfoCategoryDto
     /// <summary>
     /// Translations.
     /// </summary>
-    public System.Collections.Generic.ICollection<VocabularyValueTranslationDto> Translations { get; set; }
+    public ICollection<VocabularyValueTranslationDto> Translations { get; set; }
 
 }
 
@@ -6536,7 +6534,7 @@ public class VocabularyValueInfoDto
     /// <summary>
     /// Translations.
     /// </summary>
-    public System.Collections.Generic.ICollection<VocabularyValueTranslationDto> Translations { get; set; }
+    public ICollection<VocabularyValueTranslationDto> Translations { get; set; }
 
 }
 

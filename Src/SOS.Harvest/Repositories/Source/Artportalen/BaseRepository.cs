@@ -26,8 +26,8 @@ public class BaseRepository<T> : IBaseRepository<T>
     protected ILogger<T> Logger { get; }
 
     protected string SightingsFromBasics => @$"
-            SearchableSightings s WITH(NOLOCK)
-            INNER JOIN SightingState ss ON s.SightingId = ss.SightingId ";  
+        Sighting s WITH(NOLOCK)
+	    INNER JOIN SightingState ss ON s.Id = ss.SightingId ";  
 
     // Todo arguments for protected sightings       
     protected string GetSightingWhereBasics(bool isIncrementalHarvest)
@@ -55,9 +55,9 @@ public class BaseRepository<T> : IBaseRepository<T>
                         (int)SightingTypeSearchGroup.OwnBreedingAssessment,
                         (int)SightingTypeSearchGroup.OwnBreedingAssessmentChild)})
                 AND s.ValidationStatusId <> {(int)ValidationStatusId.Rejected} 
-                AND ss.IsActive = 1
-                AND ss.SightingStateTypeId = {(int)SightingStateType.Published}
-                AND s.TaxonId IS NOT NULL";
+                AND s.TaxonId IS NOT NULL 
+                AND ss.IsActive = 1 
+                AND ss.SightingStateTypeId = {(int)SightingStateType.Published}";
 
         if (!isIncrementalHarvest && (DataService?.Configuration?.HarvestStartDate.HasValue ?? false))
         {

@@ -67,7 +67,7 @@ internal class ArtportalenHarvestFactory : ArtportalenHarvestFactoryBase, IHarve
             observation.HiddenByProvider = entity.HiddenByProvider;
             observation.Id = NextId;
             observation.SightingId = entity.Id;
-            observation.OwnerOrganization = _artportalenMetadataContainer.TryGetOrganization(entity.OwnerOrganizationId);
+            observation.OwnerOrganization = _artportalenMetadataContainer.TryGetOrganization(entity.ControlingOrganisationId);
             observation.Length = entity.Length;
             observation.MaxDepth = entity.MaxDepth;
             observation.MaxHeight = entity.MaxHeight;
@@ -112,8 +112,6 @@ internal class ArtportalenHarvestFactory : ArtportalenHarvestFactoryBase, IHarve
             observation.Projects = projects;
             observation.SightingTypeId = entity.SightingTypeId;
             observation.SightingTypeSearchGroupId = entity.SightingTypeSearchGroupId;
-            
-            //observation.RegionalSightingStateId = entity.RegionalSightingStateId;
             observation.SightingPublishTypeIds = ConvertCsvStringToListOfIntegers(entity.SightingPublishTypeIds);
             observation.SpeciesFactsIds = ConvertCsvStringToListOfIntegers(entity.SpeciesFactsIds);
 

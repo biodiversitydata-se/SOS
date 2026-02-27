@@ -156,8 +156,6 @@ public class ExtendedFilterDto
 
     public IEnumerable<int>? PublishTypeIdsFilter { get; set; }
 
-    public IEnumerable<int>? RegionalSightingStateIdsFilter { get; set; }
-
     public IEnumerable<int>? TriggeredObservationRuleFrequencyIds { get; set; }
 
     public IEnumerable<int>? TriggeredObservationRuleReproductionIds { get; set; }

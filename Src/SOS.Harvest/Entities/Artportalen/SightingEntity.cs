@@ -156,7 +156,7 @@ public class SightingEntity
     /// <summary>
     ///     Owner organization
     /// </summary>
-    public int? OwnerOrganizationId { get; set; }
+    public int? ControlingOrganisationId { get; set; }
 
     /// <summary>
     ///     Protected by system flag
