@@ -150,7 +150,7 @@ Om ingen obligatorisk lista anges returneras **HTTP 400 (Bad Request)**.
 
 ### 5.3 Datum (obligatoriskt)
 
-* `StartDate` måste vara **minst ett år tillbaka i tiden**
+* `StartDate` måste vara **minst ett år tillbaka i tiden**. Ett signalsök görs endast på en period på minst ett år och alltid fram till dagens datum man söker. 
 * Nyare datum leder till valideringsfel
 
 ### 5.4 Övriga filter (valfria)
