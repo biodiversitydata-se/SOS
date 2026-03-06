@@ -2465,6 +2465,12 @@ public class ObservationsController : ControllerBase
                 return BadRequest(validationResult.Error);
             }
 
+            if (filter.Taxon != null)
+            {
+                // Make sure underlying taxa is included
+                filter.Taxon.IncludeUnderlyingTaxa = true;
+            }
+
             var searchFilter = filter.ToSearchFilterInternal(this.GetUserId(), true);
             var taxonFound = await _observationManager.SignalSearchInternalAsync(roleId, authorizationApplicationIdentifier, searchFilter, areaBuffer, onlyAboveMyClearance, returnHttp4xxWhenNoPermissions ?? false);
 
