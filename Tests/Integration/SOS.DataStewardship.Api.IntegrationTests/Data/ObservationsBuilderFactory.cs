@@ -28,7 +28,7 @@ internal static class ObservationsBuilderFactory
                     DatasetIdentifier = DataHelper.RandomString(8)
                 })
                 .With(m => m.DataProviderId = 1)
-                .With(m => m.ArtportalenInternal = null)
+                .With(m => m.ArtportalenInternal = null)                
                 .With(m => m.Sensitive = false)
                 .With(m => m.HasGeneralizedObservationInOtherIndex = false)
                 .With(m => m.Taxon = new Taxon
@@ -37,7 +37,7 @@ internal static class ObservationsBuilderFactory
                 })
                 .With(m => m.Location = new Lib.Models.Processed.Observation.Location
                 {
-
+                    IsInEconomicZoneOfSweden = true
                 });
         
         return observationsBuilder;

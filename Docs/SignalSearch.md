@@ -1,5 +1,36 @@
 ﻿# Signal Search – Documentation
 
+## Table of Contents
+
+1. [Overview](#1-overview)
+2. [What does a Yes/No response mean?](#2-what-does-a-yesno-response-mean)
+3. [Authorization and access](#3-authorization-and-access)
+   - [3.1 Basic authorization requirements](#31-basic-authorization-requirements)
+   - [3.2 Geographic authorization limitations](#32-geographic-authorization-limitations)
+   - [3.3 Signal Search and sensitivity categories](#33-signal-search-and-sensitivity-categories)
+4. [Where is Signal Search available?](#4-where-is-signal-search-available)
+5. [Search criteria (Search Filter)](#5-search-criteria-search-filter)
+   - [5.1 Geographic area (mandatory)](#51-geographic-area-mandatory)
+   - [5.2 Taxon filter (mandatory)](#52-taxon-filter-mandatory)
+   - [5.3 Date (mandatory)](#53-date-mandatory)
+   - [5.4 Other filters (optional)](#54-other-filters-optional)
+6. [Geographic filter](#6-geographic-filter)
+   - [6.1 How geographic information is stored](#61-how-geographic-information-is-stored)
+   - [6.2 How geometry is used in searches](#62-how-geometry-is-used-in-searches)
+   - [6.3 Accuracy-based limitation](#63-accuracy-based-limitation)
+7. [Logging and traceability](#7-logging-and-traceability)
+8. [Signal Search API endpoint](#8-signal-search-api-endpoint)
+   - [8.1 Endpoint](#81-endpoint)
+   - [8.2 Headers](#82-headers)
+   - [8.3 Query parameters](#83-query-parameters)
+   - [8.4 Response](#84-response)
+9. [Example requests](#9-example-requests)   
+   - [9.1 Search with polygon](#91-search-with-polygon)
+   - [9.2 Search by geographic area](#92-search-by-geographic-area)
+   - [9.3 Search with returnHttp4xxWhenNoPermissions](#93-search-with-returnhttp4xxwhennopermissions)
+
+---
+
 ## 1. Overview
 
 Signal Search is a feature that enables searching for **sensitive observations** without revealing sensitive information. The result of a signal search is a binary response: **Yes** or **No**, indicating whether there is at least one sensitive observation that matches the specified search criteria.
@@ -215,3 +246,137 @@ Observations_SignalSearchInternal
 | 401 Unauthorized | Authentication missing               |
 | 403 Forbidden    | No authorization for the region      |
 | 409 Conflict     | Partial authorization for the region |
+
+---
+
+## 9. Example requests
+
+The examples below show requests to the Signal Search endpoint. All requests are `POST` to `/observations/internal/signalsearch`.
+
+### 9.1 Search with polygon
+
+Returns `true` if there are sensitive observations within the specified polygon area. The polygon is provided as GeoJSON with coordinates in `[longitude, latitude]` order.
+
+```
+POST /observations/internal/signalsearch?onlyAboveMyClearance=true
+Content-Type: application/json
+```
+
+```json
+{
+  "startDate": "1999-01-01",
+  "geographics": {
+    "geometries": [
+      {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [17.3, 60.1],
+            [18.05, 60.1],
+            [18.05, 59.65],
+            [17.3, 59.65],
+            [17.3, 60.1]
+          ]
+        ]
+      }
+    ]
+  },
+  "taxon": {
+    "taxonListIds": [1, 7, 18]
+  }
+}
+```
+
+**Response:** `true` or `false`
+
+---
+
+### 9.2 Search by geographic area
+
+Returns `true` if there are sensitive observations within the specified county. `featureId` is the county identifier (e.g. `"3"` for Uppsala, `"6"` for Jönköping).
+
+```
+POST /observations/internal/signalsearch?onlyAboveMyClearance=true
+Content-Type: application/json
+```
+
+```json
+{
+  "startDate": "1999-01-01",
+  "geographics": {
+    "areas": [
+      {
+        "areaType": "County",
+        "featureId": "3"
+      }
+    ]
+  },
+  "taxon": {
+    "taxonListIds": [1, 7, 18]
+  }
+}
+```
+
+**Response:** `true` or `false`
+
+---
+
+### 9.3 Search with returnHttp4xxWhenNoPermissions
+
+When `returnHttp4xxWhenNoPermissions=true` is specified, the endpoint returns HTTP 403 or 409 instead of `false` when the user lacks authorization for all or part of the search area. The two scenarios below correspond to the cases described in section 3.2.
+
+**Scenario A – Search area is entirely outside the user's authorization → HTTP 403**
+
+The user has authorization for Uppsala (`featureId` `"3"`) but searches in Jönköping (`featureId` `"6"`):
+
+```
+POST /observations/internal/signalsearch?onlyAboveMyClearance=true&returnHttp4xxWhenNoPermissions=true
+Content-Type: application/json
+```
+
+```json
+{
+  "startDate": "1999-01-01",
+  "geographics": {
+    "areas": [
+      {
+        "areaType": "County",
+        "featureId": "6"
+      }
+    ]
+  },
+  "taxon": {
+    "taxonListIds": [1, 7, 18]
+  }
+}
+```
+
+**Response:** `403 Forbidden`
+
+---
+
+**Scenario B – Search area partially overlaps an area without authorization → HTTP 409**
+
+The user has authorization for Uppsala but the bounding box extends into an adjacent area without authorization:
+
+```
+POST /observations/internal/signalsearch?onlyAboveMyClearance=true&returnHttp4xxWhenNoPermissions=true
+Content-Type: application/json
+```
+
+```json
+{
+  "startDate": "1999-01-01",
+  "geographics": {
+    "boundingBox": {
+      "topLeft": { "latitude": 60.5, "longitude": 17.1 },
+      "bottomRight": { "latitude": 60.1, "longitude": 17.9 }
+    }
+  },
+  "taxon": {
+    "taxonListIds": [1, 7, 18]
+  }
+}
+```
+
+**Response:** `409 Conflict`
