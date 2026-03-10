@@ -34,10 +34,10 @@
 				iNaturalist.Se är en online-community där naturälskare över hela världen kan lära sig om arter på ett roligt sätt tillsammans. De laddar upp bilder på sina artobservationer och låter andra art- och naturintresserade hjälpa till med artbestämningen. De kan hålla koll på sina och andras fynd, läs fakta om arterna och lär sig känna igen fler arter i Sveriges natur.
 			</para>
 			<para>
-				Fynd som tillhandahålls här är både de som uppnått forskningsklass (d.v.s. att de uppfyller ett antal kriterier, varav ett är att minst 2/3 av de användare som bidrar med artbestämning är överens) och övriga (som antingen inte uppfyller kriterier, eller inte hunnits granskas). De skördas dagligen från GBIF som i sin tur får exporter från iNaturalist.org en gång per vecka.
+				Observationer som tillhandahålls här är både de som uppnått forskningsklass (d.v.s. att de uppfyller ett antal kriterier, varav ett är att minst 2/3 av de användare som bidrar med artbestämning är överens) och övriga (som antingen inte uppfyller kriterier, eller inte hunnits granskas). De skördas dagligen från iNaturalist.org.
 			</para>
 			<para>
-				I nuvarande skick kan här inte 'forskningsklass' fynd och övriga skiljas åt. En uppdelning av dataset m.a.p. fyndens klassning planeras.
+				Observationer som uppnått forskningsklass och övriga kan skiljas åt genom parametern "verifieringsstatus" där forskningsklass markerats med "Godkänd baserat på communitykonsensus".
 			</para>
 			<para>
 				Detta dataset innehåller för näravarande bara publika observationer, d.v.s. inte skyddade fynd av skyddsklassade arter.
