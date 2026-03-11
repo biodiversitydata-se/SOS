@@ -150,7 +150,7 @@ Om ingen obligatorisk lista anges returneras **HTTP 400 (Bad Request)**.
 
 ### 5.3 Datum (obligatoriskt)
 
-* `StartDate` måste vara **minst ett år tillbaka i tiden**
+* `StartDate` måste vara **minst ett år tillbaka i tiden**. Ett signalsök görs endast på en period på minst ett år och alltid fram till dagens datum man söker. 
 * Nyare datum leder till valideringsfel
 
 ### 5.4 Övriga filter (valfria)
@@ -177,7 +177,7 @@ För punktobservationer skapas en cirkulär polygon där mittpunkten är observa
 För **polygonlokaler** lagras istället den **exakta polygonen** som beskriver observationens faktiska utbredning. Polygonlokaler omvandlas alltså inte till cirklar.
 
 3. **Störningsyta (location.pointWithDisturbanceBuffer)**.
-En polygon baserad på observationens mittpunkt och taxonets definierade störningsradie.
+En polygon baserad på observationens mittpunkt och taxonets definierade störningsradie. Med störningsradie avses det avståndet på vilket en störning skulle påverka. Används som en buffert för observationer av arter som rapporterats på mycket noggrant angivna fyndplatser men är känslig för störning över större avstånd.
 För polygonlokaler används även här mittpunkten tillsammans med störningsradien för att skapa störningsytan.
 
 ### 6.2 Hur geometri används vid sökning

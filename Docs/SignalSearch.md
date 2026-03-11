@@ -149,7 +149,7 @@ If no mandatory taxon list is provided, **HTTP 400 (Bad Request)** is returned.
 
 ### 5.3 Date (mandatory)
 
-* `StartDate` must be **at least one year in the past**.
+* `StartDate` must be **at least one year in the past**. A signalsearch is performed for a period of at least one year and always up to the date of the search. 
 * More recent dates result in a validation error.
 
 ### 5.4 Other filters (optional)
@@ -176,7 +176,7 @@ For point-based observations, a circular polygon is created where the centroid i
 For **polygon locations**, the **exact polygon** describing the true spatial extent of the observation is stored instead. Polygon locations are therefore not converted into circles.
 
 3. **Disturbance area (location.pointWithDisturbanceBuffer)**.
-A polygon created from the observation centroid and the taxon’s defined disturbance radius.
+A polygon created from the observation centroid and the taxon’s defined disturbance radius. A disturbance radius is defined as the distance at which a disturbance may have affect on the organism. The disturbance radius is used as a buffer for observations of taxa that are reported with exact location (i.e. small coordinate uncertainty) but are sensitive to disturbance at greater distances.
 For polygon locations, the disturbance area is also based on the centroid combined with the disturbance radius.
 
 ### 6.2 How geometry is used in searches
