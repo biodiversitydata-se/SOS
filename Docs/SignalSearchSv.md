@@ -15,9 +15,10 @@
    - [5.3 Datum (obligatoriskt)](#53-datum-obligatoriskt)
    - [5.4 Övriga filter (valfria)](#54-övriga-filter-valfria)
 6. [Geografiskt filter](#6-geografiskt-filter)
-   - [6.1 Hur geografisk information lagras](#61-hur-geografisk-information-lagras)
-   - [6.2 Hur geometri används vid sökning](#62-hur-geometri-används-vid-sökning)
-   - [6.3 Begränsning baserat på noggrannhet](#63-begränsning-baserat-på-noggrannhet)
+   - [6.1 Lokaltyper i Artportalen](#61-lokaltyper-i-artportalen)
+   - [6.2 Hur geografisk information lagras](#62-hur-geografisk-information-lagras)
+   - [6.3 Hur geometri används vid sökning](#63-hur-geometri-används-vid-sökning)
+   - [6.4 Begränsning baserat på noggrannhet](#64-begränsning-baserat-på-noggrannhet)
 7. [Loggning och spårbarhet](#7-loggning-och-spårbarhet)
 8. [API-endpoint för Signalsök](#8-api-endpoint-för-signalsök)
    - [8.1 Endpoint](#81-endpoint)
@@ -165,39 +166,43 @@ Om ingen obligatorisk lista anges returneras **HTTP 400 (Bad Request)**.
 
 Med det geografiska filtret kan användaren specificera hur geografisk information ska hanteras vid signalsökning för att ta hänsyn till osäkerhet i observationer och arters känslighet för störning.
 
-### 6.1 Hur geografisk information lagras
+### 6.1 Lokaltyper i Artportalen
+
+När fyndplatser rapporteras i Artportalen används i huvudsak två olika typer av lokaler. Dessa avgör hur observationens geometri byggs upp och hanteras vid sökningar:
+
+* **Punktlokal:** Anges med en *mittpunkt* och en *koordinatnoggrannhet*. Observationens *fyndplatsgeometri* skapas genom att generera en cirkulär polygon där radien är densamma som koordinatnoggrannheten.
+ 
+![Illustration av punktlokal](Images/punktlokal.png)
+
+* **Polygonlokal:** Utgörs av en specifikt ritad polygon som beskriver fyndplatsens faktiska utbredning. *Koordinatnoggrannhet* används inte för dessa lokaler, utan själva polygonen utgör *fyndplatsgeometrin*.
+
+![Illustration av polygonlokal](Images/polygonlokal.png)
+
+### 6.2 Hur geografisk information lagras
 
 Varje observation kan representeras geografiskt på följande sätt:
 
 1. **Mittpunkt (location.point)**.
-   En punkt som representerar observationens angivna position, tillsammans med en koordinatnoggrannhet (`coordinateUncertaintyInMeters`).
+   En punkt som representerar den angivna positionen för fyndplatsen av en observationen, tillsammans med en koordinatnoggrannhet (`coordinateUncertaintyInMeters`).
 
-2. **Buffrad geometri (location.pointWithBuffer)**.
-För punktobservationer skapas en cirkulär polygon där mittpunkten är observationens punkt och radien motsvarar koordinatnoggrannheten (`coordinateUncertaintyInMeters`) dvs. avståndet (i meter) från den angivna punkten som beskriver den minsta cirkeln som omfattar hela fyndplatsen.
+2. **Fyndplatsgeometri (location.pointWithBuffer)**.
+För punktlokaler skapas en cirkulär polygon där mittpunkten är observationens punkt och radien motsvarar koordinatnoggrannheten (`coordinateUncertaintyInMeters`) dvs. avståndet (i meter) från den angivna punkten som beskriver den minsta cirkeln som omfattar hela fyndplatsen.
 För **polygonlokaler** lagras istället den **exakta polygonen** som beskriver observationens faktiska utbredning. Polygonlokaler omvandlas alltså inte till cirklar.
 
 3. **Störningsyta (location.pointWithDisturbanceBuffer)**.
-En polygon baserad på observationens mittpunkt och taxonets definierade störningsradie. Med störningsradie avses det avståndet på vilket en störning skulle påverka. Används som en buffert för observationer av arter som rapporterats på mycket noggrant angivna fyndplatser men är känslig för störning över större avstånd.
-För polygonlokaler används även här mittpunkten tillsammans med störningsradien för att skapa störningsytan.
+_Denna polygon skapas enbart om arten i fråga är klassad som störningskänslig_. Den används som en buffert för observationer av arter som kan påverkas av störning över större avstånd (även om de är rapporterade på en mycket exakt fyndplats). Störningsytan är en cirkulär polygon som utgår från observationens mittpunkt, där radien motsvarar taxonets definierade störningsradie (det avstånd på vilket en störning bedöms påverka arten). Detta tillvägagångssätt (mittpunkt + störningsradie) används både för punktlokaler och polygonlokaler.
 
-### 6.2 Hur geometri används vid sökning
+### 6.3 Hur geometri används vid sökning
 
 Vilken geografisk representation som används i signalsökningen styrs av vilka parametrar som är aktiverade. Dessa avgör om sökningen ska ta hänsyn till osäkerhet i observationens position och/eller artens störningskänslighet.
 
-* **considerObservationAccuracy = true**.
-  Sökningen görs mot polygonytan `location.pointWithBuffer`.
-  Observationer vars mittpunkt ligger utanför sökgeometrin kan ändå inkluderas, förutsatt att någon del av observationens polygonyta skär eller överlappar sökområdet.
+* **considerObservationAccuracy = true.** Sökningen görs mot observationens **fyndplatsgeometri**. Detta innebär att observationer vars **mittpunkt** ligger utanför sökområdet ändå kan inkluderas, förutsatt att någon del av dess **fyndplatsgeometri** överlappar sökområdet.
 
-* **considerDisturbanceRadius = true**.
-  Sökningen görs mot störningsytan `location.pointWithDisturbanceBuffer`.
-  Observationer vars mittpunkt ligger utanför sökgeometrin kan ändå inkluderas, förutsatt att någon del av observationens störningsyta skär eller överlappar sökområdet.
+* **considerDisturbanceRadius = true.** Sökningen görs mot observationens **störningsyta**. Observationer vars mittpunkt ligger utanför sökgeometrin kan ändå inkluderas, förutsatt att någon del av observationens **störningsyta** skär eller överlappar sökområdet. _(Notera: Störningskänslighet har klassats för ett urval av arter. Funktionen används för att fånga upp arter som befinner sig utanför sökområdet men som ändå kan påverkas av förhållanden eller händelser inom det)_.
 
-  Störningskänslighet har klassats för ett urval av arter och anges som radien i en cirkel utifrån en punktkoordinat. Används så att man kan ta hänsyn till arter som är utanför sökområdet men ändå kan påverkas av en förhållanden eller en händelse inom sökområdet.
+* **considerObservationAccuracy = false och considerDisturbanceRadius = false.** Sökningen görs enbart mot observationens **mittpunkt**. Endast observationer vars punkt ligger exakt inom sökområdet ger träff.
 
-* **considerObservationAccuracy = false** och **considerDisturbanceRadius = false**.
-  Sökningen görs enbart mot observationens mittpunkt (`location.point`). Endast observationer vars punkt ligger inom sökgeometrin kan då ge träff.
-
-### 6.3 Begränsning baserat på noggrannhet
+### 6.4 Begränsning baserat på noggrannhet
 
 * Om parametern **maxAccuracy** är satt inkluderas endast observationer vars koordinatnoggrannhet (`coordinateUncertaintyInMeters`) är **mindre än eller lika med** angivet värde.
 
