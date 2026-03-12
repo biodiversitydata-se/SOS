@@ -202,6 +202,12 @@ Vilken geografisk representation som används i signalsökningen styrs av vilka 
 
 * **considerObservationAccuracy = false och considerDisturbanceRadius = false.** Sökningen görs enbart mot observationens **mittpunkt**. Endast observationer vars punkt ligger exakt inom sökområdet ger träff.
 
+#### Sökexempel
+- När man söker med en polygon som motsvarar **Sökområde A**, så kommer man få träff även när `considerObservationAccuracy = false` och `considerDisturbanceRadius = false` eftersom sökområdet innehåller observationens mittpunkt.
+- När man söker med en polygon som motsvarar **Sökområde B**, så kommer man enbart få träff om `considerObservationAccuracy = true` eller `considerDisturbanceRadius = true` eftersom sökområdet inte innehåller observationens mittpunkt men överlappar observationens **fyndplatsgeometri** eller **störningsyta**.
+
+![Sökexempel](Images/search-example-sv.png)
+ 
 ### 6.4 Begränsning baserat på noggrannhet
 
 * Om parametern **maxAccuracy** är satt inkluderas endast observationer vars koordinatnoggrannhet (`coordinateUncertaintyInMeters`) är **mindre än eller lika med** angivet värde.

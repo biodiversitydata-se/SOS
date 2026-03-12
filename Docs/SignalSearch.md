@@ -197,6 +197,13 @@ Which geographic representation is used in the signal search is determined by wh
 * **considerDisturbanceRadius = true.** The search is performed against the observation's **disturbance area**. Observations whose centroid lies outside the search geometry may still be included, provided that some part of the observation's **disturbance area** intersects or overlaps the search area. *(Note: The disturbance sensitivity is classified for a selection of species and is approximated by the radius of a circle based on a point coordinate. It is used to be able to account for species occurrences that are outside the search area but may still be affected by conditions or events within the search area.).*
 * **considerObservationAccuracy = false and considerDisturbanceRadius = false.** The search is performed solely against the observation's **centroid**. Only observations whose point lies exactly within the search area will result in a match.
 
+#### Search example
+
+- When searching with a polygon corresponding to **Search area A**, a match will be returned even when `considerObservationAccuracy = false` and `considerDisturbanceRadius = false`, since the search area contains the observation's centroid.
+- When searching with a polygon corresponding to **Search area B**, a match will only be returned if `considerObservationAccuracy = true` or `considerDisturbanceRadius = true`, since the search area does not contain the observation's centroid but overlaps the observation's **observation geometry** or **disturbance area**.
+
+![Search example](Images/search-example.png)
+
 ### 6.4 Accuracy-based limitation
 
 * If the **maxAccuracy** parameter is set, only observations whose coordinate uncertainty (`coordinateUncertaintyInMeters`) is **less than or equal to** the specified value are included.
