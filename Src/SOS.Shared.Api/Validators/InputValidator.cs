@@ -483,14 +483,12 @@ public class InputValidator : IInputValidator
                 continue;
             }
 
-            var sortFieldCamelCase = sortableFieldsSet.FirstOrDefault(sf => sf.ToLower() == sortField.ToLower());
-            if (string.IsNullOrEmpty(sortFieldCamelCase))
-            {
-                errors.Add($"{sortFieldCamelCase} is not a sortable field");
+            if (sortableFieldsSet.TryGetValue(sortField.ToLower(), out var sortFieldCamelCase)) {
+                validFields.Add(sortFieldCamelCase);
             }
             else
             {
-                validFields.Add(sortFieldCamelCase);
+                errors.Add($"{sortField} is not a sortable field");
             }
         }
 

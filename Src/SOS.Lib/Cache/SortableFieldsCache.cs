@@ -23,17 +23,18 @@ public class SortableFieldsCache
     /// Get sortable fields
     /// </summary>
     /// <returns></returns>
-    public async Task<HashSet<string>> GetSortableFieldsAsync()
+    public async Task<IDictionary<string, string>> GetSortableFieldsAsync()
     {
-        if (_memoryCache.TryGetValue(_cacheKey, out HashSet<string> hashSet) && (hashSet?.Count() ?? 0) != 0) {
-            return hashSet;
+        if (_memoryCache.TryGetValue(_cacheKey, out IDictionary<string, string> sortableFields) && (sortableFields?.Count() ?? 0) != 0) {
+            return sortableFields;
         }
 
-        hashSet = await _processedObservationCoreRepository.GetSortableFieldsAsync();
+        var hashSet = await _processedObservationCoreRepository.GetSortableFieldsAsync();
+        sortableFields = hashSet?.ToDictionary(x => x.ToLower(), x => x);
         var cacheEntryOptions = new MemoryCacheEntryOptions()
                    .SetAbsoluteExpiration(TimeSpan.FromMinutes(60));
         _memoryCache.Set(_cacheKey, hashSet, cacheEntryOptions);
 
-        return hashSet;
+        return sortableFields;
     }
 }
