@@ -15,9 +15,11 @@
    - [5.3 Date (mandatory)](#53-date-mandatory)
    - [5.4 Other filters (optional)](#54-other-filters-optional)
 6. [Geographic filter](#6-geographic-filter)
-   - [6.1 How geographic information is stored](#61-how-geographic-information-is-stored)
-   - [6.2 How geometry is used in searches](#62-how-geometry-is-used-in-searches)
-   - [6.3 Accuracy-based limitation](#63-accuracy-based-limitation)
+    ### 6.1 Location types
+   - [6.1 Location types](#61-location-types)
+   - [6.2 How geographic information is stored](#62-how-geographic-information-is-stored)
+   - [6.3 How geometry is used in searches](#63-how-geometry-is-used-in-searches)
+   - [6.4 Accuracy-based limitation](#64-accuracy-based-limitation)
 7. [Logging and traceability](#7-logging-and-traceability)
 8. [Signal Search API endpoint](#8-signal-search-api-endpoint)
    - [8.1 Endpoint](#81-endpoint)
@@ -162,43 +164,43 @@ If no mandatory taxon list is provided, **HTTP 400 (Bad Request)** is returned.
 
 ## 6. Geographic filter
 
-The geographic filter allows the user to specify how geographic information should be handled in signal searches, in order to account for positional uncertainty in observations and species sensitivity to disturbance.
+The geographic filter allows the user to specify how geographic information should be handled in signal searches, in order to account for positional uncertainty in observations and species' sensitivity to disturbance.
 
-### 6.1 How geographic information is stored
+### 6.1 Location types
+
+There are two types of locations for observations. An observation always uses one of these location types, which determines how the observation's geometry is constructed and handled in geographic searches.
+
+* **Point location:** Specified with a *centroid* and a *coordinate uncertainty*. The observation's *observation geometry* is created by generating a circular polygon where the radius is the same as the coordinate uncertainty.
+
+![Point location illustration](Images/point-location.png)
+
+* **Polygon location:** Consists of a specifically drawn polygon that describes the actual spatial extent of the observation. *Coordinate uncertainty* is not used for these locations; instead, the polygon itself constitutes the *observation geometry*.
+
+![Polygon location illustration](Images/polygon-location.png)
+
+### 6.2 How geographic information is stored
 
 Each observation can be represented geographically in the following ways:
 
 1. **Centroid (location.point)**.
-   A point representing the reported position of the observation, together with a coordinate uncertainty (`coordinateUncertaintyInMeters`).
-
+A point representing the position of the observation, together with a coordinate uncertainty (`coordinateUncertaintyInMeters`).
 2. **Observation geometry (location.pointWithBuffer)**.
-For point-based observations, a circular polygon is created where the centroid is the observation point and the radius corresponds to the coordinate uncertainty (`coordinateUncertaintyInMeters`) i.e. the distance (in meters) from the given point describing the smallest circle containing the whole of the location.
-For **polygon locations**, the **exact polygon** describing the true spatial extent of the observation is stored instead. Polygon locations are therefore not converted into circles.
-
+    - For **point locations**, a circular polygon is created where the centroid is the observation point and the radius corresponds to the coordinate uncertainty (`coordinateUncertaintyInMeters`), i.e. the distance (in meters) from the given point describing the smallest circle containing the whole of the location.
+    - For **polygon locations**, the exact polygon describing the true spatial extent of the observation is stored instead. Polygon locations are therefore not converted into circles.
 3. **Disturbance area (location.pointWithDisturbanceBuffer)**.
-A polygon created from the observation centroid and the taxon’s defined disturbance radius. A disturbance radius is defined as the distance at which a disturbance may have affect on the organism. The disturbance radius is used as a buffer for observations of taxa that are reported with exact location (i.e. small coordinate uncertainty) but are sensitive to disturbance at greater distances.
-For polygon locations, the disturbance area is also based on the centroid combined with the disturbance radius.
+*This polygon is only created if the species associated with the observation has a value for disturbance radius*. It is used as a buffer for observations of species that can be affected by disturbance over greater distances (even if they are reported at a highly exact location). The disturbance area is a circular polygon originating from the observation's centroid, where the radius corresponds to the taxon's defined disturbance radius (the distance at which a disturbance is assessed to affect the species). This approach (centroid + disturbance radius) is used for both point locations and polygon locations.
 
-### 6.2 How geometry is used in searches
+### 6.3 How geometry is used in searches
 
-Which geographic representation is used in a signal search is determined by which parameters are enabled. These parameters control whether the search should take into account positional uncertainty and/or species disturbance sensitivity.
+Which geographic representation is used in the signal search is determined by which parameters are enabled. These determine whether the search should take into account positional uncertainty of the observation and/or the species' sensitivity to disturbance.
 
-* **considerObservationAccuracy = true**.
-  The search is performed against the polygon area `location.pointWithBuffer`.
-  Observations whose centroid lies outside the search geometry may still be included, provided that some part of the observation’s polygon area intersects or overlaps the search area.
+* **considerObservationAccuracy = true.** The search is performed against the observation's **observation geometry**. This means that observations whose **centroid** lies outside the search area may still be included, provided that some part of its **observation geometry** overlaps the search area.
+* **considerDisturbanceRadius = true.** The search is performed against the observation's **disturbance area**. Observations whose centroid lies outside the search geometry may still be included, provided that some part of the observation's **disturbance area** intersects or overlaps the search area. *(Note: The disturbance sensitivity is classified for a selection of species and is approximated by the radius of a circle based on a point coordinate. It is used to be able to account for species occurrences that are outside the search area but may still be affected by conditions or events within the search area.).*
+* **considerObservationAccuracy = false and considerDisturbanceRadius = false.** The search is performed solely against the observation's **centroid**. Only observations whose point lies exactly within the search area will result in a match.
 
-* **considerDisturbanceRadius = true**.
-  The search is performed against the disturbance area `location.pointWithDisturbanceBuffer`.
-  Observations whose centroid lies outside the search geometry may still be included, provided that some part of the disturbance area intersects or overlaps the search area.
+### 6.4 Accuracy-based limitation
 
-  The disturbance sensitivity is classified for a selection of species and is approximated by the radius of a circle based on a point coordinate. It is used to be able to account for species occurrences that are outside the search area but may still be affected by conditions or events within the search area.
-
-* **considerObservationAccuracy = false** and **considerDisturbanceRadius = false**.
-  The search is performed solely against the observation centroid (`location.point`). Only observations whose point lies within the search geometry can result in a match.
-
-### 6.3 Accuracy-based limitation
-
-* If the **maxAccuracy** parameter is set, only observations with a coordinate uncertainty (`coordinateUncertaintyInMeters`) **less than or equal to** the specified value are included.
+* If the **maxAccuracy** parameter is set, only observations whose coordinate uncertainty (`coordinateUncertaintyInMeters`) is **less than or equal to** the specified value are included.
 
 This limitation applies regardless of which geographic representation is otherwise used in the search.
 

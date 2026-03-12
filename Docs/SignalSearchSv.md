@@ -15,7 +15,7 @@
    - [5.3 Datum (obligatoriskt)](#53-datum-obligatoriskt)
    - [5.4 Övriga filter (valfria)](#54-övriga-filter-valfria)
 6. [Geografiskt filter](#6-geografiskt-filter)
-   - [6.1 Lokaltyper i Artportalen](#61-lokaltyper-i-artportalen)
+   - [6.1 Lokaltyper](#61-lokaltyper)
    - [6.2 Hur geografisk information lagras](#62-hur-geografisk-information-lagras)
    - [6.3 Hur geometri används vid sökning](#63-hur-geometri-används-vid-sökning)
    - [6.4 Begränsning baserat på noggrannhet](#64-begränsning-baserat-på-noggrannhet)
@@ -166,9 +166,9 @@ Om ingen obligatorisk lista anges returneras **HTTP 400 (Bad Request)**.
 
 Med det geografiska filtret kan användaren specificera hur geografisk information ska hanteras vid signalsökning för att ta hänsyn till osäkerhet i observationer och arters känslighet för störning.
 
-### 6.1 Lokaltyper i Artportalen
+### 6.1 Lokaltyper
 
-När fyndplatser rapporteras i Artportalen används i huvudsak två olika typer av lokaler. Dessa avgör hur observationens geometri byggs upp och hanteras vid sökningar:
+Det finns två typer av lokaler för fyndplatser. En observation använder alltid en av dessa lokaltyper, vilket avgör hur observationens geometri byggs upp och hanteras vid geografiska sökningar.
 
 * **Punktlokal:** Anges med en *mittpunkt* och en *koordinatnoggrannhet*. Observationens *fyndplatsgeometri* skapas genom att generera en cirkulär polygon där radien är densamma som koordinatnoggrannheten.
  
@@ -190,7 +190,7 @@ För punktlokaler skapas en cirkulär polygon där mittpunkten är observationen
 För **polygonlokaler** lagras istället den **exakta polygonen** som beskriver observationens faktiska utbredning. Polygonlokaler omvandlas alltså inte till cirklar.
 
 3. **Störningsyta (location.pointWithDisturbanceBuffer)**.
-_Denna polygon skapas enbart om arten i fråga är klassad som störningskänslig_. Den används som en buffert för observationer av arter som kan påverkas av störning över större avstånd (även om de är rapporterade på en mycket exakt fyndplats). Störningsytan är en cirkulär polygon som utgår från observationens mittpunkt, där radien motsvarar taxonets definierade störningsradie (det avstånd på vilket en störning bedöms påverka arten). Detta tillvägagångssätt (mittpunkt + störningsradie) används både för punktlokaler och polygonlokaler.
+_Denna polygon skapas enbart om arten i fråga har ett värde för störningsradie_. Den används som en buffert för observationer av arter som kan påverkas av störning över större avstånd (även om de är rapporterade på en mycket exakt fyndplats). Störningsytan är en cirkulär polygon som utgår från observationens mittpunkt, där radien motsvarar taxonets definierade störningsradie (det avstånd på vilket en störning bedöms påverka arten). Detta tillvägagångssätt (mittpunkt + störningsradie) används både för punktlokaler och polygonlokaler.
 
 ### 6.3 Hur geometri används vid sökning
 
