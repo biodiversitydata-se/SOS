@@ -472,21 +472,25 @@ public class InputValidator : IInputValidator
         {
             return Result.Success<List<string>>(null);
         }
-
         var sortableFieldsSet = await _sortableFieldsCache.GetSortableFieldsAsync();
         var errors = new List<string>();
-        var validFields = new List<string>();
+        var validFields = new HashSet<string>();
 
         foreach (var sortField in sortFields)
         {
-            string sortableField = null;
-            if (!sortableFieldsSet?.TryGetValue(sortField, out sortableField) ?? false)
+            if (string.IsNullOrEmpty(sortField))
             {
-                errors.Add($"{sortField} is not a sortable field");
+                continue;
+            }
+
+            var sortFieldCamelCase = sortableFieldsSet.FirstOrDefault(sf => sf.ToLower() == sortField.ToLower());
+            if (string.IsNullOrEmpty(sortFieldCamelCase))
+            {
+                errors.Add($"{sortFieldCamelCase} is not a sortable field");
             }
             else
             {
-                validFields.Add(sortableField);
+                validFields.Add(sortFieldCamelCase);
             }
         }
 
@@ -495,7 +499,7 @@ public class InputValidator : IInputValidator
             return Result.Failure<List<string>>(string.Join(", ", errors));
         }
 
-        return Result.Success(validFields);
+        return Result.Success(validFields.ToList());
     }
 
     /// <inheritdoc/>

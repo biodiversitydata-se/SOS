@@ -590,7 +590,7 @@ public class ObservationsController : ControllerBase
             if (validationResult.IsFailure) return BadRequest(validationResult.Error);
             var sortFieldValidationResult = string.IsNullOrEmpty(sortBy) ? Result.Success<List<string>>(null) : (await _inputValidator.ValidateSortFieldsAsync(new[] { sortBy }));
             if (sortFieldValidationResult.IsFailure) return BadRequest(sortFieldValidationResult.Error);
-            if (sortFieldValidationResult.Value != null && sortFieldValidationResult.Value.Any())
+            if (sortFieldValidationResult.Value?.Any() ?? false)
             {
                 sortBy = sortFieldValidationResult.Value.First();
             }
