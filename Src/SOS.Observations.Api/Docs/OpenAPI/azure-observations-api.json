@@ -7275,6 +7275,11 @@
             "description": "If true, use the buffer (if any) that can be applied to extend the area where the user has permission to search for sensitive observations",
             "nullable": true
           },
+          "includeObservationsOutsideSweden": {
+            "type": "boolean",
+            "description": "Gets or sets a value indicating whether to include observations made outside Sweden.",
+            "nullable": true
+          },
           "maxDistanceFromPoint": {
             "type": "number",
             "description": "If Geometries is of point type, this property must be set to a value greater than 0.\nObservations inside circle (center=point, radius=MaxDistanceFromPoint) will be returned.",
