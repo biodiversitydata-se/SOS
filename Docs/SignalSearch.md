@@ -14,8 +14,7 @@
    - [5.2 Taxon filter (mandatory)](#52-taxon-filter-mandatory)
    - [5.3 Date (mandatory)](#53-date-mandatory)
    - [5.4 Other filters (optional)](#54-other-filters-optional)
-6. [Geographic filter](#6-geographic-filter)
-    ### 6.1 Location types
+6. [Geographic filter](#6-geographic-filter)    
    - [6.1 Location types](#61-location-types)
    - [6.2 How geographic information is stored](#62-how-geographic-information-is-stored)
    - [6.3 How geometry is used in searches](#63-how-geometry-is-used-in-searches)
