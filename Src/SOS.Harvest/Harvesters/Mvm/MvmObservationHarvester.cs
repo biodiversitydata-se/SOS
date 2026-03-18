@@ -5,6 +5,7 @@ using SOS.Harvest.Harvesters.Mvm.Interfaces;
 using SOS.Harvest.Services.Interfaces;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Enums;
+using SOS.Lib.Helpers;
 using SOS.Lib.Json;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Mvm;
@@ -60,10 +61,12 @@ namespace SOS.Harvest.Harvesters.Mvm
             var runStatus = RunStatus.Success;
             var harvestCount = 0;
             (DateTime startDate, long preHarvestCount) initValues = (DateTime.Now, 0);
+            var stage = "downloading MVM source file";
+            var filePath = System.IO.Path.Combine(_mvmServiceConfiguration.FolderPath, "MVM/all-full-samples.json");
             try
             {
                 bool harvestFileResult = await HarvestMvmJsonFileAsync();
-                var filePath = System.IO.Path.Combine(_mvmServiceConfiguration.FolderPath, "MVM/all-full-samples.json");
+                stage = "validating downloaded MVM file";
                 if (!File.Exists(filePath))
                 {
                     return new HarvestInfo(_provider, initValues.startDate)
@@ -73,6 +76,7 @@ namespace SOS.Harvest.Harvesters.Mvm
                     };
                 }
 
+                stage = "initializing MVM harvest";
                 initValues.preHarvestCount = await InitializeHarvestAsync(true);
 
                 // Harvest the example file for debugging.
@@ -83,12 +87,14 @@ namespace SOS.Harvest.Harvesters.Mvm
                 {
                     PropertyNameCaseInsensitive = true
                 };
+                stage = "opening downloaded MVM file";
                 using FileStream fs = File.OpenRead(filePath);
                 var jsonStreamReader = new Utf8JsonStreamReader(fs, 512 * 1024);
                 var batchSize = 100;
                 var currentBatch = new List<MvmSampleVerbatim>(batchSize);
                 bool finished = false;
 
+                stage = "reading MVM samples";
                 while (jsonStreamReader.Read() || finished)
                 {
                     cancellationToken?.ThrowIfCancellationRequested();
@@ -111,8 +117,10 @@ namespace SOS.Harvest.Harvesters.Mvm
                                     // When batch is full or we've reached the end, save to MongoDB
                                     if (currentBatch.Count >= batchSize)
                                     {
+                                        stage = "storing MVM batch to MongoDB";
                                         VerbatimRepository.AddManyAsync(currentBatch).GetAwaiter().GetResult();
                                         currentBatch.Clear();
+                                        stage = "reading MVM samples";
                                     }
 
                                     if (_mvmServiceConfiguration.MaxNumberOfSightingsHarvested.HasValue &&
@@ -125,6 +133,7 @@ namespace SOS.Harvest.Harvesters.Mvm
                                 // Handle any remaining samples in the last batch
                                 if (currentBatch.Any())
                                 {
+                                    stage = "storing final MVM batch to MongoDB";
                                     VerbatimRepository.AddMany(currentBatch);                                    
                                     finished = true;
                                     break;
@@ -134,9 +143,14 @@ namespace SOS.Harvest.Harvesters.Mvm
                     }
                 }
             }
-            catch (JobAbortedException)
+            catch (JobAbortedException ex)
             {
-                Logger.LogInformation("MVM harvest was cancelled.");
+                Logger.LogWarning(ex,
+                    "MVM harvest was cancelled during stage '{stage}'. FilePath={filePath}, HarvestedObservations={harvestCount}, {memoryUsage}",
+                    stage,
+                    filePath,
+                    harvestCount,
+                    LogHelper.GetMemoryUsageSummary());
                 runStatus = RunStatus.Canceled;
             }
             catch (Exception e)

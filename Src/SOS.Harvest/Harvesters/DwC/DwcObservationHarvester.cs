@@ -131,9 +131,11 @@ public class DwcObservationHarvester : IDwcObservationHarvester
         var harvestInfo = new HarvestInfo(dataProvider.Identifier, DateTime.Now);
         harvestInfo.Id = dataProvider.Identifier;
         using var dwcArchiveVerbatimRepository = new DarwinCoreArchiveVerbatimRepository(dataProvider, _verbatimClient, _logger) { TempMode = true };
+        var stage = "initializing DwC-A harvest";
 
         try
         {
+            stage = "opening archive reader";
             using var archiveReader = new ArchiveReader(archivePath, _dwcaConfiguration.ImportPath);
             var dwcCollectionArchiveReaderContext = ArchiveReaderContext.Create(archiveReader, dataProvider, _dwcaConfiguration);
             var dwcCollectionRepository = new DwcCollectionRepository(dataProvider, _verbatimClient, _logger);
@@ -141,6 +143,7 @@ public class DwcObservationHarvester : IDwcObservationHarvester
 
             if (initializeTempCollection)
             {
+                stage = "initializing temp collections";
                 _logger.LogDebug("Clear DwC-A observations for {@dataProvider}", dataProvider.Identifier);
                 await dwcCollectionRepository.DeleteCollectionsAsync();
                 await dwcCollectionRepository.OccurrenceRepository.AddCollectionAsync();
@@ -148,6 +151,7 @@ public class DwcObservationHarvester : IDwcObservationHarvester
             }
 
             // Read datasets
+            stage = "reading DwC-A datasets";
             List<Lib.Models.Processed.DataStewardship.Dataset.DwcVerbatimDataset>? datasets = null;
             var dwcArchiveReader = new DwcArchiveReader(dataProvider, await dwcCollectionRepository.DatasetRepository.GetMaxIdAsync());
             try
@@ -160,6 +164,7 @@ public class DwcObservationHarvester : IDwcObservationHarvester
             }
 
             // Read observations
+            stage = "reading DwC-A occurrence batches";
             int observationCount = 0;
             dwcArchiveReader = new DwcArchiveReader(dataProvider, await dwcCollectionRepository.OccurrenceRepository.GetMaxIdAsync());
             var observationBatches = dwcArchiveReader.ReadOccurrencesInBatchesAsync(dwcCollectionArchiveReaderContext);
@@ -180,6 +185,7 @@ public class DwcObservationHarvester : IDwcObservationHarvester
             // Read events
             try
             {
+                stage = "reading DwC-A events";
                 _logger.LogInformation("Start reading DwC-A events for {@dataProvider}", dataProvider.Identifier);
                 dwcArchiveReader = new DwcArchiveReader(dataProvider, await dwcCollectionRepository.EventRepository.GetMaxIdAsync());
                 var events = (await dwcArchiveReader.ReadEventsAsync(dwcCollectionArchiveReaderContext))?.ToList();
@@ -207,6 +213,7 @@ public class DwcObservationHarvester : IDwcObservationHarvester
             // Save datasets lasts, since DataSet.EventIds could been changed after reading Events
             try
             {
+                stage = "storing DwC-A datasets";
                 if (datasets != null && datasets.Any())
                 {
                     if (initializeTempCollection)
@@ -224,6 +231,7 @@ public class DwcObservationHarvester : IDwcObservationHarvester
 
             if (permanentizeTempCollection)
             {
+                stage = "permanentizing DwC-A temp collections";
                 if (await dwcCollectionRepository.OccurrenceRepository.PermanentizeCollectionAsync())
                 {
                     _logger.LogDebug("Finish storing DwC-A observations for {@dataProvider}", dataProvider.Identifier);
@@ -242,6 +250,7 @@ public class DwcObservationHarvester : IDwcObservationHarvester
 
             if (dataProvider.UseVerbatimFileInExport && (dataProvider.Datasets?.Any() ?? false)) // If no dataset, file must have been manually uploaded and is allready stored
             {
+                stage = "storing DwC-A source file";
                 _logger.LogDebug("Start storing source file for {@dataProvider}", dataProvider.Identifier);
                 await using var fileStream = File.OpenRead(archivePath);
                 await dwcArchiveVerbatimRepository.StoreSourceFileAsync(dataProvider.Id, fileStream);
@@ -249,13 +258,21 @@ public class DwcObservationHarvester : IDwcObservationHarvester
             }
 
             // Update harvest info
+            stage = "completing DwC-A harvest";
             harvestInfo.End = DateTime.Now;
             harvestInfo.Status = RunStatus.Success;
             harvestInfo.Count = observationCount;
         }
         catch (JobAbortedException e)
         {
-            _logger.LogError(e, "Canceled harvest of DwC Archive for {@dataProvider}. {memoryUsage}", dataProvider.Identifier, LogHelper.GetMemoryUsageSummary());
+            _logger.LogWarning(e,
+                "Canceled harvest of DwC Archive for {@dataProvider} during stage '{stage}'. initializeTempCollection={initializeTempCollection}, permanentizeTempCollection={permanentizeTempCollection}, archivePath={archivePath}, {memoryUsage}",
+                dataProvider.Identifier,
+                stage,
+                initializeTempCollection,
+                permanentizeTempCollection,
+                Path.GetFileName(archivePath),
+                LogHelper.GetMemoryUsageSummary());
             harvestInfo.Status = RunStatus.Canceled;
         }
         catch (Exception e)

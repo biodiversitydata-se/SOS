@@ -29,6 +29,51 @@ public class ObservationsHarvestJobBase
     protected readonly IObservationHarvesterManager _observationHarvesterManager;
     protected readonly ILogger<ObservationsHarvestJobBase> _logger;       
 
+    private static HarvestInfo CreateSyntheticHarvestInfo(DataProvider dataProvider, RunStatus status)
+    {
+        return new HarvestInfo(dataProvider.Identifier, DateTime.Now)
+        {
+            Id = dataProvider.Identifier,
+            End = DateTime.Now,
+            Status = status
+        };
+    }
+
+    private void LogHarvestResultSummary(IEnumerable<DataProvider> dataProviders, IDictionary<DataProvider, HarvestInfo> harvestResults)
+    {
+        var providersWithoutResults = dataProviders
+            .Where(dataProvider => !harvestResults.ContainsKey(dataProvider))
+            .Select(dataProvider => dataProvider.Identifier)
+            .ToArray();
+
+        if (providersWithoutResults.Any())
+        {
+            _logger.LogWarning("Harvest completed without results for providers: {providersWithoutResults}", string.Join(", ", providersWithoutResults));
+        }
+
+        foreach (var result in harvestResults.OrderBy(result => result.Key.Identifier))
+        {
+            _logger.LogInformation(
+                "Harvest result for {dataProvider}: Status={status}, Count={count}, HarvestFailPreventProcessing={harvestFailPreventProcessing}",
+                result.Key.Identifier,
+                result.Value.Status,
+                result.Value.Count,
+                result.Key.HarvestFailPreventProcessing);
+        }
+
+        var failedMandatoryProviders = harvestResults
+            .Where(result => result.Key.HarvestFailPreventProcessing && result.Value.Status != RunStatus.Success)
+            .Select(result => $"{result.Key.Identifier}({result.Value.Status})")
+            .ToArray();
+
+        if (failedMandatoryProviders.Any())
+        {
+            _logger.LogWarning(
+                "Harvest job will be marked as failed because mandatory providers were not successful: {failedMandatoryProviders}",
+                string.Join(", ", failedMandatoryProviders));
+        }
+    }
+
     /// <summary>
     /// Constructor
     /// </summary>
@@ -164,12 +209,15 @@ public class ObservationsHarvestJobBase
 
                 var task = Task.Run(async () =>
                 {
+                    var stage = "waiting for harvest semaphore";
                     await semaphore.WaitAsync();
                     try
                     {
+                        stage = "starting provider harvest";
                         _logger.LogInformation($"Start harvest for {dataProvider.Identifier}. {LogHelper.GetMemoryUsageSummary()}");
 
                         var result = await harvestFunc();
+                        stage = $"provider harvest returned {result.Status}";
 
                         lock (harvestResults)
                         {
@@ -178,8 +226,26 @@ public class ObservationsHarvestJobBase
 
                         _logger.LogInformation($"Finished harvest for {dataProvider.Identifier}. {LogHelper.GetMemoryUsageSummary()}");
                     }
+                    catch (JobAbortedException ex)
+                    {
+                        lock (harvestResults)
+                        {
+                            harvestResults[dataProvider] = CreateSyntheticHarvestInfo(dataProvider, RunStatus.Canceled);
+                        }
+
+                        _logger.LogWarning(ex,
+                            "Harvest for {dataProvider} was aborted by Hangfire during stage '{stage}'. {memoryUsage}",
+                            dataProvider.Identifier,
+                            stage,
+                            LogHelper.GetMemoryUsageSummary());
+                    }
                     catch (Exception ex)
                     {
+                        lock (harvestResults)
+                        {
+                            harvestResults[dataProvider] = CreateSyntheticHarvestInfo(dataProvider, RunStatus.Failed);
+                        }
+
                         _logger.LogError(ex, $"Failed harvest for {dataProvider.Identifier}");
                     }
                     finally
@@ -192,6 +258,7 @@ public class ObservationsHarvestJobBase
             }
 
             await Task.WhenAll(harvestTasks);
+            LogHarvestResultSummary(dataProviders, harvestResults);
             await PostHarvestAsync(harvestResults);
 
 
