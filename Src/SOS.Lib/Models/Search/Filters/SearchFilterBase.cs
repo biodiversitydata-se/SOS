@@ -97,6 +97,11 @@ public class SearchFilterBase
     public EventFilter Event { get; set; }
 
     /// <summary>
+    /// Include filter
+    /// </summary>
+    public IncludeFilter IncludeFilter { get; set; }
+
+    /// <summary>
     /// Exclude filter
     /// </summary>
     public ExcludeFilter ExcludeFilter { get; set; }

@@ -66,24 +66,29 @@ public class DwcaDataValidationReportFactory : DataValidationReportFactoryBase<D
         return await dwcArchiveCollectionRepository.OccurrenceRepository.CountAllDocumentsAsync();
     }
 
-    protected override async Task<Observation?> CreateProcessedObservationAsync(DwcObservationVerbatim verbatimObservation, DataProvider dataProvider)
-    {
-        return await Task.Run(() =>
+        protected override Task<Observation?> CreateProcessedObservationAsync(DwcObservationVerbatim verbatimObservation, DataProvider dataProvider)
         {
             var processedObservation = GetObservationFactory(dataProvider).CreateProcessedObservation(verbatimObservation, false);
             _areaHelper.AddAreaDataToProcessedLocation(processedObservation?.Location);
-            return processedObservation;
-        });
-    }
+            return Task.FromResult(processedObservation);
+        }
 
-    protected override void ValidateVerbatimTaxon(
-        DwcObservationVerbatim verbatimObservation,
-        HashSet<string> nonMatchingTaxonIds,
-        HashSet<string> nonMatchingScientificNames)
-    {
-        nonMatchingScientificNames.Add(verbatimObservation.ScientificName);
-        nonMatchingTaxonIds.Add(verbatimObservation.TaxonID);
-    }
+        protected override Task<IEnumerable<Observation>?> CreateProcessedObservationsAsync(DwcObservationVerbatim verbatimObservation, DataProvider dataProvider)
+        {
+            var observationFactory = GetObservationFactory(dataProvider);
+            var processedObservations = observationFactory.CreateProcessedObservations(verbatimObservation, false);
+            //AddAreaDataToProcessedLocation(processedObservations);
+            return Task.FromResult(processedObservations);
+        }
+
+        protected override void ValidateVerbatimTaxon(
+            DwcObservationVerbatim verbatimObservation,
+            Observation processedObservation,
+            HashSet<string> nonMatchingTaxonIds, HashSet<string> nonMatchingScientificNames)
+        {
+            nonMatchingScientificNames.Add(verbatimObservation.ScientificName);
+            nonMatchingTaxonIds.Add(verbatimObservation.TaxonID);
+        }
 
     protected override void ValidateVerbatimData(DwcObservationVerbatim verbatimObservation, DwcaValidationRemarksBuilder validationRemarksBuilder)
     {

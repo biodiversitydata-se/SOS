@@ -122,8 +122,15 @@ public static class FilterExtensions
             filter.ExcludeFilter.OccurrenceIds = searchFilterBaseDto.ExcludeFilter.OccurrenceIds;
         }
 
-        return filter;
-    }
+            if (searchFilterBaseDto.IncludeFilter != null)
+            {                
+                filter.IncludeFilter = new IncludeFilter();
+                filter.IncludeFilter.OccurrenceIds = searchFilterBaseDto.IncludeFilter.OccurrenceIds;
+            }
+
+
+            return filter;
+        }
 
     private static void PopulateInternalBase(SearchFilterInternalBaseDto searchFilterInternalDto, SearchFilterInternal internalFilter)
     {

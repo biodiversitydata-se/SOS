@@ -1,7 +1,9 @@
 ﻿using SOS.Lib.Configuration.Shared;
 
-namespace SOS.Lib.Configuration.Import;
-
-public class MvmServiceConfiguration : ServiceConfigurationBase
+namespace SOS.Lib.Configuration.Import
 {
+    public class MvmServiceConfiguration : ServiceConfigurationBase
+    {
+        public string FolderPath { get; set; }        
+    }
 }

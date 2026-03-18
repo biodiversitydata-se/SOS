@@ -18,7 +18,7 @@ namespace SOS.Harvest.Processors.Mvm;
 /// <summary>
 ///     Process factory class
 /// </summary>
-public class MvmObservationProcessor : ObservationProcessorBase<MvmObservationProcessor, MvmObservationVerbatim, IMvmObservationVerbatimRepository>, IMvmObservationProcessor
+public class MvmObservationProcessor : ObservationProcessorBase<MvmObservationProcessor, MvmSampleVerbatim, IMvmObservationVerbatimRepository>, IMvmObservationProcessor
 {
     private readonly IAreaHelper _areaHelper;
     private readonly IMvmObservationVerbatimRepository _mvmObservationVerbatimRepository;

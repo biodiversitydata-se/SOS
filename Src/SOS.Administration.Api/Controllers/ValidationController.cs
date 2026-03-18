@@ -11,6 +11,7 @@ using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Verbatim;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Reflection;
@@ -54,6 +55,9 @@ public class ValidationController : ControllerBase, IValidationController
     /// <param name="maxNrObservationsToRead">Max number of observations to read and process.</param>
     /// <param name="nrValidObservationsInReport">Max number of valid observations to include in report.</param>
     /// <param name="nrInvalidObservationsInReport">Max number of invalid observations to include in report.</param>
+    /// <param name="createExcelFile">When true, an Excel file with all columns is created for the valid observations and included in the ZIP.</param>
+    /// <param name="excelPropertyLabelType">The type of labels to use in the Excel file.</param>
+    /// <param name="includeOccurrenceIds">Optional list of OccurrenceIds to include in the valid observations section of the report, in addition to the sampled valid observations.</param>
     /// <returns></returns>
     [HttpPost("CreateDataValidationReport/Run")]
     [DisableRequestSizeLimit]
@@ -65,7 +69,10 @@ public class ValidationController : ControllerBase, IValidationController
         [FromQuery] string createdBy,
         [FromQuery] int maxNrObservationsToRead = 100000,
         [FromQuery] int nrValidObservationsInReport = 10,
-        [FromQuery] int nrInvalidObservationsInReport = 100)
+        [FromQuery] int nrInvalidObservationsInReport = 100,
+        [FromQuery] bool createExcelFile = true,
+        [FromQuery] PropertyLabelType excelPropertyLabelType = PropertyLabelType.Swedish,
+        [FromBody] List<string>? includeOccurrenceIds = null)
     {
         try
         {
@@ -92,6 +99,9 @@ public class ValidationController : ControllerBase, IValidationController
                     maxNrObservationsToRead,
                     nrValidObservationsInReport,
                     nrInvalidObservationsInReport,
+                    includeOccurrenceIds,
+                    createExcelFile,
+                    excelPropertyLabelType,
                     JobCancellationToken.Null));
 
             return new OkObjectResult($"Create data validation report job for data provider \"{dataProvider}\" with Id \"{reportId}\" was enqueued to Hangfire.");

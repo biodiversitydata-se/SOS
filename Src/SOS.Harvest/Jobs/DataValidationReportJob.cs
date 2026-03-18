@@ -10,6 +10,7 @@ using SOS.Lib.Json;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
+using System.Collections.Generic;
 using System.Text;
 
 namespace SOS.Harvest.Jobs;
@@ -43,6 +44,9 @@ public class DataValidationReportJob : IDataValidationReportJob
         int maxNrObservationsToRead,
         int nrValidObservationsInReport,
         int nrInvalidObservationsInReport,
+        IEnumerable<string>? includeOccurrenceIds,
+        bool createExcelFile,
+        PropertyLabelType excelPropertyLabelType,
         IJobCancellationToken cancellationToken)
     {
         var dataProvider =
@@ -53,7 +57,8 @@ public class DataValidationReportJob : IDataValidationReportJob
             dataProvider,
             maxNrObservationsToRead,
             nrValidObservationsInReport,
-            nrInvalidObservationsInReport);
+            nrInvalidObservationsInReport,
+            includeOccurrenceIds);
 
         // Create compact JSON file
         var compactJsonSettings = CreateCompactJsonSerializerSettings();
@@ -65,11 +70,19 @@ public class DataValidationReportJob : IDataValidationReportJob
         var verboseJson = JsonConvert.SerializeObject(dataValidationSummary, Formatting.Indented, verboseJsonSettings);
         var verboseJsonFile = Encoding.UTF8.GetBytes(verboseJson);
 
-        var zipFile = ZipFileHelper.CreateZipFile(new[]
+        var zipEntries = new List<(string Filename, byte[] Bytes)>
         {
-            (Filename: "Validation Report [Compact].json", Bytes: compactJsonFile),
-            (Filename: "Validation Report [Verbose].json", Bytes: verboseJsonFile)
-        });
+            ("Validation Report [Compact].json", compactJsonFile),
+            ("Validation Report [Verbose].json", verboseJsonFile)
+        };
+
+        if (createExcelFile && dataValidationSummary.ValidObservations?.Any() == true)
+        {
+            var excelBytes = await ValidObservationsExcelWriter.CreateExcelFileAsync(dataValidationSummary.ValidObservations, excelPropertyLabelType);
+            zipEntries.Add(("Valid Observations.xlsx", excelBytes));
+        }
+
+        var zipFile = ZipFileHelper.CreateZipFile(zipEntries);
 
         var report = new Report(reportId)
         {
@@ -80,9 +93,6 @@ public class DataValidationReportJob : IDataValidationReportJob
             FileSizeInKb = zipFile.Length / 1024
         };
 
-        // Export to file system
-        //string zipExportPath = Path.Combine(_dwcaConfiguration.ImportPath, $"{reportId}.zip");
-        //await File.WriteAllBytesAsync(zipExportPath, zipFile);
         await _reportManager.AddReportAsync(report, zipFile);
         return report;
     }

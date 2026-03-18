@@ -63,7 +63,7 @@ public interface IRepositoryBase<TEntity, TKey> : IDisposable where TEntity : IE
     /// <param name="useMajorityCollection"></param>
     /// <remarks>Uses typeof(TEntity).Name as MongoDb collection name.</remarks>
     /// <returns></returns>
-    Task<bool> AddManyAsync(IEnumerable<TEntity> items, bool useMajorityCollection = false);
+    Task<bool> AddManyAsync(IEnumerable<TEntity> items, bool useMajorityCollection = false);    
 
     /// <summary>
     ///     Add many items
@@ -76,6 +76,7 @@ public interface IRepositoryBase<TEntity, TKey> : IDisposable where TEntity : IE
 
     Task<bool> UpsertManyAsync(IEnumerable<TEntity> items, string comparisionField = "_id");
     Task<bool> UpsertManyAsync(IEnumerable<TEntity> items, IMongoCollection<TEntity> mongoCollection, string comparisionField = "_id");
+    bool AddMany(IEnumerable<TEntity> items);
 
     /// <summary>
     ///     Add or update existing entity

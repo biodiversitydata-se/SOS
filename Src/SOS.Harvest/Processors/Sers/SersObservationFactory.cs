@@ -158,4 +158,10 @@ public class SersObservationFactory : ObservationFactoryBase, IObservationFactor
     {
         return false;
     }
+
+    public IEnumerable<Observation>? CreateProcessedObservations(SersObservationVerbatim verbatim, bool diffuseIfSupported)
+    {
+        var observation = CreateProcessedObservation(verbatim, diffuseIfSupported);
+        return observation == null ? null : [observation];
+    }
 }

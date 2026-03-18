@@ -46,10 +46,15 @@ public class SearchFilterBaseDto
     /// </summary>
     public EventFilterDto? Event { get; set; }
 
-    /// <summary>
-    /// Exclude filter
-    /// </summary>
-    public ExcludeFilterDto? ExcludeFilter { get; set; }
+        /// <summary>
+        /// Include filter
+        /// </summary>
+        public IncludeFilterDto? IncludeFilter { get; set; }
+
+        /// <summary>
+        /// Exclude filter
+        /// </summary>
+        public ExcludeFilterDto? ExcludeFilter { get; set; }
 
     /// <summary>
     /// Geographics filter 

@@ -235,17 +235,17 @@ public class DwcaObservationFactory : ObservationFactoryBase, IObservationFactor
     private bool TryGetGeometryFromWkt(string wkt, out NetTopologySuite.Geometries.Geometry? geometry)
     {
         geometry = null;
-        if (string.IsNullOrEmpty(wkt)) return false;            
-        
+        if (string.IsNullOrEmpty(wkt)) return false;
+
         try
-        {                
+        {
             geometry = _wktReader.Read(wkt);
             return true;
         }
         catch (Exception)
         {
             return false;
-        }
+        }        
     }
 
     private static void AddVerbatimObservationAsJson(Observation obs,
@@ -579,5 +579,11 @@ public class DwcaObservationFactory : ObservationFactoryBase, IObservationFactor
     public bool IsVerbatimObservationDiffusedByProvider(DwcObservationVerbatim verbatim)
     {
         return false;
+    }
+
+    public IEnumerable<Observation>? CreateProcessedObservations(DwcObservationVerbatim verbatim, bool diffuseIfSupported)
+    {
+        var observation = CreateProcessedObservation(verbatim, diffuseIfSupported);
+        return observation == null ? null : [observation];
     }
 }

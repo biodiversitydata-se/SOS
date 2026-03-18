@@ -84,6 +84,7 @@ public abstract class DataValidationReportFactoryBase<TVerbatimObservation> : ID
     protected abstract Task<IAsyncCursor<TVerbatimObservation>> GetAllObservationsByCursorAsync(DataProvider dataProvider);
     protected abstract Task<long> GetTotalObservationsCountAsync(DataProvider dataProvider);
     protected abstract Task<Observation?> CreateProcessedObservationAsync(TVerbatimObservation verbatimObservation, DataProvider dataProvider);
+    protected abstract Task<IEnumerable<Observation>?> CreateProcessedObservationsAsync(TVerbatimObservation verbatimObservation, DataProvider dataProvider);
     protected abstract void ValidateVerbatimData(TVerbatimObservation verbatimObservation, DwcaValidationRemarksBuilder validationRemarksBuilder);
     protected abstract void UpdateTermDictionaryValueSummary(
         Observation processedObservation,
@@ -92,16 +93,24 @@ public abstract class DataValidationReportFactoryBase<TVerbatimObservation> : ID
         Dictionary<VocabularyId, Dictionary<VocabularyValue, HashSet<string>>> verbatimFieldValues);
     protected abstract void ValidateVerbatimTaxon(
         TVerbatimObservation verbatimObservation,
-        HashSet<string> nonMatchingTaxonIds,
-        HashSet<string> nonMatchingScientificNames);
+        Observation processedObservation,
+        HashSet<string> nonMatchingTaxonIds, HashSet<string> nonMatchingScientificNames);
+
+    protected virtual object GetVerbatimObservationForReport(TVerbatimObservation verbatimObservation, Observation processedObservation)
+    {
+        return verbatimObservation!;
+    }
 
     public async Task<DataValidationReport<object, Observation>> CreateDataValidationSummary(
         DataProvider dataProvider,
         int maxNrObservationsToRead = 100000,
         int nrValidObservationsInReport = 100,
-        int nrInvalidObservationsInReport = 100)
+        int nrInvalidObservationsInReport = 100,
+        IEnumerable<string>? occurrenceIds = null)
     {
         var validObservations = new List<ValidObservationTuple<object, Observation>>();
+        var occurrenceIdValidObservations = new List<ValidObservationTuple<object, Observation>>();
+        var requestedOccurrenceIds = occurrenceIds?.ToHashSet(StringComparer.OrdinalIgnoreCase);
         var invalidObservations = new List<InvalidObservationTuple<object>>();
         int nrProcessedObservations = 0;
         int nrValidObservations = 0;
@@ -125,61 +134,75 @@ public abstract class DataValidationReportFactoryBase<TVerbatimObservation> : ID
             foreach (var verbatimObservation in cursor.Current)
             {
                 if (verbatimObservation == null || nrProcessedObservations >= maxNrObservationsToRead) continue;
-                var processedObservation = await CreateProcessedObservationAsync(verbatimObservation, dataProvider);
-                nrProcessedObservations++;
-                if (processedObservation == null) continue;
-                LocalDateTimeConverterHelper.ConvertToLocalTime(processedObservation);
-                _vocabularyValueResolver.ResolveVocabularyMappedValues(new List<Observation>
+                var processedObservations = await CreateProcessedObservationsAsync(verbatimObservation, dataProvider);
+                if (processedObservations == null) continue;
+                foreach (var processedObservation in processedObservations)
+                {
+                    nrProcessedObservations++;
+                    if (processedObservation == null) continue;
+                    LocalDateTimeConverterHelper.ConvertToLocalTime(processedObservation);
+                    _vocabularyValueResolver.ResolveVocabularyMappedValues(new List<Observation>
                         {processedObservation!}, true);
-                ValidateVerbatimData(verbatimObservation, validationRemarksBuilder);
-                UpdateTermDictionaryValueSummary(processedObservation!, verbatimObservation, processedFieldValues, verbatimFieldValues);
-                var observationValidation = _validationManager.ValidateObservation(processedObservation, dataProvider);
-                if (observationValidation.IsValid)
-                {
-                    nrValidObservations++;
-                    if (validObservations.Count < nrValidObservationsInReport)
+                    ValidateVerbatimData(verbatimObservation, validationRemarksBuilder);
+                    UpdateTermDictionaryValueSummary(processedObservation!, verbatimObservation, processedFieldValues, verbatimFieldValues);
+                    var observationValidation = _validationManager.ValidateObservation(processedObservation, dataProvider);
+                    if (observationValidation.IsValid)
                     {
-                        var dwcExport = CreateDwcExportObject(processedObservation!);
-                        validObservations.Add(new ValidObservationTuple<object, Observation>
+                        nrValidObservations++;
+                        var occurrenceId = processedObservation!.Occurrence?.OccurrenceId;
+                        if (requestedOccurrenceIds != null && occurrenceId != null && requestedOccurrenceIds.Contains(occurrenceId))
                         {
-                            VerbatimObservation = verbatimObservation,
-                            ProcessedObservation = processedObservation!,
-                            DwcExport = dwcExport
-                        });
-                    }
-                }
-                else
-                {
-                    nrInvalidObservations++;
-                    if (invalidObservations.Count < nrInvalidObservationsInReport)
-                    {
-                        invalidObservations.Add(new InvalidObservationTuple<object>
-                        {
-                            VerbatimObservation = verbatimObservation,
-                            ProcessedObservationDefects = observationValidation.Defects?.Select(d => d.Information).ToList()
-                        });
-                    }
-                    if (observationValidation.Defects?.Any() ?? false)
-                    {
-                        foreach (var validationDefect in observationValidation.Defects)
-                        {
-                            if (validationDefect.DefectType == ObservationDefect.ObservationDefectType.TaxonNotFound)
+                            var dwcExport = CreateDwcExportObject(processedObservation!);
+                            occurrenceIdValidObservations.Add(new ValidObservationTuple<object, Observation>
                             {
-                                ValidateVerbatimTaxon(verbatimObservation, nonMatchingTaxonIds, nonMatchingScientificNames);
-                            }
-                            if (!observationDefects.ContainsKey(validationDefect.DefectType))
+                                VerbatimObservation = GetVerbatimObservationForReport(verbatimObservation, processedObservation!),
+                                ProcessedObservation = processedObservation!,
+                                DwcExport = dwcExport
+                            });
+                        }
+                        else if (validObservations.Count < nrValidObservationsInReport)
+                        {
+                            var dwcExport = CreateDwcExportObject(processedObservation!);
+                            validObservations.Add(new ValidObservationTuple<object, Observation>
                             {
-                                observationDefects.Add(validationDefect.DefectType, 0);
-                            }
-
-                            observationDefects[validationDefect.DefectType]++;
+                                VerbatimObservation = GetVerbatimObservationForReport(verbatimObservation, processedObservation!),
+                                ProcessedObservation = processedObservation!,
+                                DwcExport = dwcExport
+                            });
                         }
                     }
+                    else
+                    {
+                        nrInvalidObservations++;
+                        if (invalidObservations.Count < nrInvalidObservationsInReport)
+                        {
+                            invalidObservations.Add(new InvalidObservationTuple<object>
+                            {
+                                VerbatimObservation = verbatimObservation,
+                                ProcessedObservationDefects = observationValidation.Defects?.Select(d => d.Information).ToList()
+                            });
+                        }
+                        if (observationValidation.Defects?.Any() ?? false)
+                        {
+                            foreach (var validationDefect in observationValidation.Defects)
+                            {
+                                if (validationDefect.DefectType == ObservationDefect.ObservationDefectType.TaxonNotFound)
+                                {
+                                    ValidateVerbatimTaxon(verbatimObservation, processedObservation, nonMatchingTaxonIds, nonMatchingScientificNames);
+                                }
+                                if (!observationDefects.ContainsKey(validationDefect.DefectType))
+                                {
+                                    observationDefects.Add(validationDefect.DefectType, 0);
+                                }
+
+                                observationDefects[validationDefect.DefectType]++;
+                            }
+                        }
+                    }
+
+                    if (nrProcessedObservations >= maxNrObservationsToRead) break;
                 }
-
-                if (nrProcessedObservations >= maxNrObservationsToRead) break;
             }
-
             if (nrProcessedObservations >= maxNrObservationsToRead) break;
         }
 
@@ -229,7 +252,7 @@ public abstract class DataValidationReportFactoryBase<TVerbatimObservation> : ID
                 NonMatchingScientificNames = nonMatchingScientificNames.Count == 0 ? null : nonMatchingScientificNames.ToList()
             },
             InvalidObservations = invalidObservations,
-            ValidObservations = validObservations,
+            ValidObservations = validObservations.Concat(occurrenceIdValidObservations).ToList(),
             DictionaryValues = distinctValuesSummaries
         };
     }
@@ -279,6 +302,17 @@ public abstract class DataValidationReportFactoryBase<TVerbatimObservation> : ID
                     verbatimFieldValues[vocabularyId].Add(vocabularyValue, new HashSet<string>());
                 }
                 verbatimFieldValues[vocabularyId][vocabularyValue].Add(verbatimValue);
+            }
+        }
+    }
+
+    protected void AddAreaDataToProcessedLocation(IEnumerable<Observation>? processedObservations)
+    {
+        if (processedObservations != null)
+        {
+            foreach (var obs in processedObservations)
+            {
+                _areaHelper.AddAreaDataToProcessedLocation(obs?.Location);
             }
         }
     }

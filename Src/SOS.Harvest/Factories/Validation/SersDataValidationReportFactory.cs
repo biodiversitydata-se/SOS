@@ -60,13 +60,22 @@ public class SersDataValidationReportFactory : DataValidationReportFactoryBase<S
         });
     }
 
-    protected override void ValidateVerbatimTaxon(
-        SersObservationVerbatim verbatimObservation,
-        HashSet<string> nonMatchingTaxonIds,
-        HashSet<string> nonMatchingScientificNames)
-    {
-        nonMatchingTaxonIds.Add(verbatimObservation.DyntaxaTaxonId.ToString());
-    }
+        protected override Task<IEnumerable<Observation>?> CreateProcessedObservationsAsync(SersObservationVerbatim verbatimObservation, DataProvider dataProvider)
+        {
+            var observationFactory = GetObservationFactory(dataProvider);
+            var processedObservations = observationFactory.CreateProcessedObservations(verbatimObservation, false);
+            //AddAreaDataToProcessedLocation(processedObservations);
+            return Task.FromResult(processedObservations);
+        }
+
+        protected override void ValidateVerbatimTaxon(
+            SersObservationVerbatim verbatimObservation,
+            Observation processedObservation,
+            HashSet<string> nonMatchingTaxonIds, 
+            HashSet<string> nonMatchingScientificNames)
+        {
+            nonMatchingTaxonIds.Add(verbatimObservation.DyntaxaTaxonId.ToString());
+        }
 
     protected override void ValidateVerbatimData(SersObservationVerbatim verbatimObservation, DwcaValidationRemarksBuilder validationRemarksBuilder)
     {

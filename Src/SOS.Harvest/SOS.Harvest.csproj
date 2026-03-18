@@ -30,7 +30,10 @@
 		<ProjectReference Include="..\SOS.Lib\SOS.Lib.csproj" />
 	</ItemGroup>
 
-	<ItemGroup>
+	<ItemGroup>		
+		<None Update="Resources\Data-examples\mvm-biology-samples.json">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
 		<None Update="Resources\Gis\swedenExtentSimplified.geojson">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>

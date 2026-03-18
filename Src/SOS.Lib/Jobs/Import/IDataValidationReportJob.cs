@@ -1,5 +1,7 @@
 ﻿using Hangfire;
+using SOS.Lib.Enums;
 using SOS.Lib.Models.Shared;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace SOS.Lib.Jobs.Import;
@@ -22,5 +24,8 @@ public interface IDataValidationReportJob
         int maxNrObservationsToRead,
         int nrValidObservationsInReport,
         int nrInvalidObservationsInReport,
+        IEnumerable<string>? occurrenceIds,
+        bool createExcelFile,
+        PropertyLabelType excelPropertyLabelType,
         IJobCancellationToken cancellationToken);
 }

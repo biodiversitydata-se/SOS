@@ -64,16 +64,25 @@ public class iNaturalistDataValidationReportFactory : DataValidationReportFactor
         });
     }
 
-    protected override void ValidateVerbatimTaxon(
-        iNaturalistVerbatimObservation verbatimObservation,
-        HashSet<string> nonMatchingTaxonIds,
-        HashSet<string> nonMatchingScientificNames)
-    {
-        if (verbatimObservation?.Taxon?.Name != null)
+        protected override Task<IEnumerable<Observation>?> CreateProcessedObservationsAsync(iNaturalistVerbatimObservation verbatimObservation, DataProvider dataProvider)
         {
-            nonMatchingScientificNames.Add(verbatimObservation.Taxon.Name);
+            var observationFactory = GetObservationFactory(dataProvider);
+            var processedObservations = observationFactory.CreateProcessedObservations(verbatimObservation, false);
+            //AddAreaDataToProcessedLocation(processedObservations);
+            return Task.FromResult(processedObservations);
         }
-    }
+
+        protected override void ValidateVerbatimTaxon(
+            iNaturalistVerbatimObservation verbatimObservation,
+            Observation processedObservation,
+            HashSet<string> nonMatchingTaxonIds, 
+            HashSet<string> nonMatchingScientificNames)
+        {
+            if (verbatimObservation?.Taxon?.Name != null)
+            {
+                nonMatchingScientificNames.Add(verbatimObservation.Taxon.Name);
+            }
+        }
 
     protected override void ValidateVerbatimData(iNaturalistVerbatimObservation verbatimObservation, DwcaValidationRemarksBuilder validationRemarksBuilder)
     {

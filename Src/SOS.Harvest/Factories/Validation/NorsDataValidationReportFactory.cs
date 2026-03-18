@@ -60,13 +60,22 @@ public class NorsDataValidationReportFactory : DataValidationReportFactoryBase<N
         });
     }
 
-    protected override void ValidateVerbatimTaxon(
-        NorsObservationVerbatim verbatimObservation,
-        HashSet<string> nonMatchingTaxonIds,
-        HashSet<string> nonMatchingScientificNames)
-    {
-        nonMatchingTaxonIds.Add(verbatimObservation.DyntaxaTaxonId.ToString());
-    }
+        protected override Task<IEnumerable<Observation>?> CreateProcessedObservationsAsync(NorsObservationVerbatim verbatimObservation, DataProvider dataProvider)
+        {
+            var observationFactory = GetObservationFactory(dataProvider);
+            var processedObservations = observationFactory.CreateProcessedObservations(verbatimObservation, false);
+            //AddAreaDataToProcessedLocation(processedObservations);
+            return Task.FromResult(processedObservations);
+        }
+
+        protected override void ValidateVerbatimTaxon(
+            NorsObservationVerbatim verbatimObservation,
+            Observation processedObservation,
+            HashSet<string> nonMatchingTaxonIds, 
+            HashSet<string> nonMatchingScientificNames)
+        {
+            nonMatchingTaxonIds.Add(verbatimObservation.DyntaxaTaxonId.ToString());
+        }
 
     protected override void ValidateVerbatimData(NorsObservationVerbatim verbatimObservation, DwcaValidationRemarksBuilder validationRemarksBuilder)
     {

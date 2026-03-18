@@ -11,7 +11,6 @@ using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.FishData;
 using SOS.Lib.Models.Verbatim.ObservationDatabase;
-using SOS.Lib.Repositories.Resource.Interfaces;
 
 namespace SOS.Harvest.Processors.ObservationDatabase;
 
@@ -55,15 +54,21 @@ public class ObservationDatabaseObservationFactory : ObservationFactoryBase, IOb
         }
     }
 
-    /// <summary>
-    /// Cast verbatim observations to processed data model
-    /// </summary>
-    /// <param name="verbatim"></param>
-    /// <param name="diffuseIfSupported"></param>
-    /// <returns></returns>
-    public Observation CreateProcessedObservation(ObservationDatabaseVerbatim verbatim, bool diffuseIfSupported)
-    {
-        var taxon = GetTaxon(verbatim.TaxonId);
+        public IEnumerable<Observation>? CreateProcessedObservations(ObservationDatabaseVerbatim verbatim, bool diffuseIfSupported)
+        {
+            var observation = CreateProcessedObservation(verbatim, diffuseIfSupported);
+            return observation == null ? null : [observation];
+        }
+
+        /// <summary>
+        /// Cast verbatim observations to processed data model
+        /// </summary>
+        /// <param name="verbatim"></param>
+        /// <param name="diffuseIfSupported"></param>
+        /// <returns></returns>
+        public Observation CreateProcessedObservation(ObservationDatabaseVerbatim verbatim, bool diffuseIfSupported)
+        {
+            var taxon = GetTaxon(verbatim.TaxonId);
 
         var obs = new Observation
         {

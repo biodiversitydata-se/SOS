@@ -61,18 +61,24 @@ public class iNaturalistObservationFactory : ObservationFactoryBase, IObservatio
         }            
     }
 
-    /// <summary>
-    /// Cast verbatim observations to processed data model
-    /// </summary>
-    /// <param name="verbatim"></param>
-    /// <param name="diffuseIfSupported"></param>
-    /// <returns></returns>
-    public Observation CreateProcessedObservation(iNaturalistVerbatimObservation verbatim, bool diffuseIfSupported)
-    {
-        if (verbatim == null)
+        public IEnumerable<Observation>? CreateProcessedObservations(iNaturalistVerbatimObservation verbatim, bool diffuseIfSupported)
         {
-            return null;
-        }  
+            var observation = CreateProcessedObservation(verbatim, diffuseIfSupported);
+            return observation == null ? null : [observation];
+        }
+
+        /// <summary>
+        /// Cast verbatim observations to processed data model
+        /// </summary>
+        /// <param name="verbatim"></param>
+        /// <param name="diffuseIfSupported"></param>
+        /// <returns></returns>
+        public Observation CreateProcessedObservation(iNaturalistVerbatimObservation verbatim, bool diffuseIfSupported)
+        {
+            if (verbatim == null)
+            {
+                return null;
+            }  
 
         var accessRights = VocabularyValue.Create((int)AccessRightsId.FreeUsage);
         var obs = new Observation

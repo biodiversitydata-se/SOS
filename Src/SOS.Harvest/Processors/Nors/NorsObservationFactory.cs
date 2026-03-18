@@ -47,55 +47,61 @@ public class NorsObservationFactory : ObservationFactoryBase, IObservationFactor
         }
     }
 
-    /// <summary>
-    /// Cast verbatim observations to processed data model
-    /// </summary>
-    /// <param name="verbatim"></param>
-    /// <param name="diffuseIfSupported"></param>
-    /// <returns></returns>
-    public Observation CreateProcessedObservation(NorsObservationVerbatim verbatim, bool diffuseIfSupported)
-    {
-        var taxon = GetTaxon(verbatim.DyntaxaTaxonId);
-        var obs = new Observation
+        public IEnumerable<Observation>? CreateProcessedObservations(NorsObservationVerbatim verbatim, bool diffuseIfSupported)
         {
-            DataProviderId = DataProvider.Id,
-            MongoDbId = verbatim.Id,
-            BasisOfRecord = new VocabularyValue { Id = (int)BasisOfRecordId.HumanObservation },
-            DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProviderIdentifiers.NORS}",
-            DatasetName = "NORS",
-            DiffusionStatus = DiffusionStatus.NotDiffused,
-            Event = new Event(verbatim.Start, null, verbatim.End, null),
-            Identification = new Identification
+            var observation = CreateProcessedObservation(verbatim, diffuseIfSupported);
+            return observation == null ? null : [observation];
+        }
+
+        /// <summary>
+        /// Cast verbatim observations to processed data model
+        /// </summary>
+        /// <param name="verbatim"></param>
+        /// <param name="diffuseIfSupported"></param>
+        /// <returns></returns>
+        public Observation CreateProcessedObservation(NorsObservationVerbatim verbatim, bool diffuseIfSupported)
+        {
+            var taxon = GetTaxon(verbatim.DyntaxaTaxonId);
+            var obs = new Observation
             {
-                UncertainIdentification = false,
-                Verified = false,
-                VerificationStatus = new VocabularyValue { Id = (int)ValidationStatusId.ReportedByExpert }
-            },
-            Location = new Location(LocationType.Point)
-            {
-                Locality = verbatim.Locality,
-                VerbatimLocality = verbatim.Locality
-            },
-            Modified = verbatim.Modified?.ToUniversalTime(),
-            Occurrence = new Occurrence
-            {
-                BirdNestActivityId = 0,
-                CatalogNumber = GetCatalogNumber(verbatim.OccurrenceId),
-                OccurrenceId = verbatim.OccurrenceId,
-                IsNaturalOccurrence = true,
-                IsNeverFoundObservation = GetIsNeverFoundObservation(verbatim.DyntaxaTaxonId),
-                IsNotRediscoveredObservation = false,
-                IsPositiveObservation = GetIsPositiveObservation(verbatim.DyntaxaTaxonId),
-                RecordedBy = verbatim.RecordedBy,
-                //ProtectionLevel = CalculateProtectionLevel(taxon),
-                SensitivityCategory = CalculateProtectionLevel(taxon),
-                ReportedBy = verbatim.ReportedBy,
-                ReportedDate = verbatim.Start.ToUniversalTime(),
-                OccurrenceStatus = GetOccurrenceStatusId(verbatim.DyntaxaTaxonId)
-            },
-            OwnerInstitutionCode = verbatim.Owner,
-            Taxon = taxon
-        };
+                DataProviderId = DataProvider.Id,
+                MongoDbId = verbatim.Id,
+                BasisOfRecord = new VocabularyValue { Id = (int)BasisOfRecordId.HumanObservation },
+                DatasetId = $"urn:lsid:swedishlifewatch.se:dataprovider:{DataProviderIdentifiers.NORS}",
+                DatasetName = "NORS",
+                DiffusionStatus = DiffusionStatus.NotDiffused,
+                Event = new Event(verbatim.Start, null, verbatim.End, null),
+                Identification = new Identification
+                {
+                    UncertainIdentification = false,
+                    Verified = false,
+                    VerificationStatus = new VocabularyValue { Id = (int)ValidationStatusId.ReportedByExpert }
+                },
+                Location = new Location(LocationType.Point)
+                {
+                    Locality = verbatim.Locality,
+                    VerbatimLocality = verbatim.Locality
+                },
+                Modified = verbatim.Modified?.ToUniversalTime(),
+                Occurrence = new Occurrence
+                {
+                    BirdNestActivityId = 0,
+                    CatalogNumber = GetCatalogNumber(verbatim.OccurrenceId),
+                    OccurrenceId = verbatim.OccurrenceId,
+                    IsNaturalOccurrence = true,
+                    IsNeverFoundObservation = GetIsNeverFoundObservation(verbatim.DyntaxaTaxonId),
+                    IsNotRediscoveredObservation = false,
+                    IsPositiveObservation = GetIsPositiveObservation(verbatim.DyntaxaTaxonId),
+                    RecordedBy = verbatim.RecordedBy,
+                    //ProtectionLevel = CalculateProtectionLevel(taxon),
+                    SensitivityCategory = CalculateProtectionLevel(taxon),
+                    ReportedBy = verbatim.ReportedBy,
+                    ReportedDate = verbatim.Start.ToUniversalTime(),
+                    OccurrenceStatus = GetOccurrenceStatusId(verbatim.DyntaxaTaxonId)
+                },
+                OwnerInstitutionCode = verbatim.Owner,
+                Taxon = taxon
+            };
 
         if (int.TryParse(obs.Occurrence.OrganismQuantity, out var quantity))
         {

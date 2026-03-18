@@ -267,6 +267,11 @@ public class VirtualHerbariumObservationFactory : ObservationFactoryBase, IObser
         return dic;
     }
 
+        public IEnumerable<Observation>? CreateProcessedObservations(VirtualHerbariumObservationVerbatim verbatim, bool diffuseIfSupported)
+        {
+            var observation = CreateProcessedObservation(verbatim, diffuseIfSupported);
+            return observation == null ? null : [observation];
+        }
 
     /// <summary>
     /// Cast verbatim observations to processed data model

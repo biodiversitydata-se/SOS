@@ -154,18 +154,19 @@ public class DwcArchiveFileWriterCoordinator : IDwcArchiveFileWriterCoordinator
                 _semaphore.Release();
             }
 
-            // Exclude sensitive species.
-            var publicObservations = processedObservations
-                .Where(observation => !(observation.AccessRights != null && (AccessRightsId)observation.AccessRights.Id == AccessRightsId.NotForPublicUsage)).ToArray();
-            var writeHeaderlessDwcaFilesTasks = new List<Task<DwcaWriteResult>>();
-            Task<DwcaWriteResult> writeOccurrenceBatchTask = _dwcArchiveFileWriter.WriteHeaderlessDwcaFiles(dataProvider, publicObservations, filePathByFilePart, dwcaFilePartsInfo, _dwcaFilesCreationConfiguration.CheckForIllegalCharacters);
-            writeHeaderlessDwcaFilesTasks.Add(writeOccurrenceBatchTask);
-            Task<DwcaWriteResult> writeEventBatchTask = null;
-            if (dataProvider.CreateEventDwC)
-            {
-                writeEventBatchTask = _dwcArchiveEventFileWriter.WriteHeaderlessEventDwcaFilesAsync(dataProvider, publicObservations, filePathByEventFilePart, _writtenEventSets, _dwcaFilesCreationConfiguration.CheckForIllegalCharacters);
-                writeHeaderlessDwcaFilesTasks.Add(writeEventBatchTask);
-            }
+                // Exclude sensitive species.
+                var publicObservations = processedObservations
+                    .Where(observation => !(observation.AccessRights != null && (AccessRightsId)observation.AccessRights.Id == AccessRightsId.NotForPublicUsage)).ToArray();
+                var writeHeaderlessDwcaFilesTasks = new List<Task<DwcaWriteResult>>();
+                Task<DwcaWriteResult> writeOccurrenceBatchTask = _dwcArchiveFileWriter.WriteHeaderlessDwcaFiles(dataProvider, publicObservations, filePathByFilePart, dwcaFilePartsInfo, _dwcaFilesCreationConfiguration.CheckForIllegalCharacters);
+                writeHeaderlessDwcaFilesTasks.Add(writeOccurrenceBatchTask);
+                Task<DwcaWriteResult> writeEventBatchTask = null;
+                if (dataProvider.CreateEventDwC)
+                {
+                    writeEventBatchTask = _dwcArchiveEventFileWriter.WriteHeaderlessEventDwcaFilesAsync(dataProvider, publicObservations, 
+                        filePathByEventFilePart, _writtenEventSets, _dwcaFilesCreationConfiguration.CheckForIllegalCharacters);
+                    writeHeaderlessDwcaFilesTasks.Add(writeEventBatchTask);
+                }
 
             DwcaWriteResult[] results = await Task.WhenAll(writeHeaderlessDwcaFilesTasks);
 
