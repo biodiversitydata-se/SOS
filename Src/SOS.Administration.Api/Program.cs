@@ -1,27 +1,19 @@
-﻿
-using Hangfire;
+﻿using Hangfire;
 using Hangfire.Dashboard;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc.Authorization;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using MongoDB.Bson.Serialization.Conventions;
 using Serilog;
 using SOS.Administration.Api.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Shared.Api.Middleware;
 using StackExchange.Redis;
-using System;
 using System.Globalization;
-using System.Linq;
 using System.Text.Json.Serialization;
 
 // --- Program startup ---
@@ -35,14 +27,13 @@ try
     bool useLocalHangfire = Environment.GetEnvironmentVariable("USE_LOCAL_HANGFIRE").GetBoolean();
 
     // Setup logging
-    SerilogExtensions.SetupSerilog(isDevelopment);
+    Log.Logger = SeriLogHelper.CreateLogger(isDevelopment);
     Log.Logger.Information("Starting Service");
 
     var builder = WebApplication.CreateBuilder(args);
-    //builder.Host.UseSerilog(Log.Logger);
+    SeriLogHelper.ConfigureSerilog(builder, "admin.api", isDevelopment);
     builder.AddServiceDefaults();
-    SeriLogHelper.ConfigureSerilog(builder);
-
+    
     // Set Swedish culture globally
     SetCulture("sv-SE");
 
@@ -63,8 +54,6 @@ try
 
     // Build app and configure middleware pipeline
     var app = builder.Build();
-    // Add security headers early in the pipeline
-    app.UseSecurityHeaders(includeHsts: !isLocalDevelopment);
     app.MapDefaultEndpoints();
     ConfigureMiddleware(app, isDevelopment, disableHangfireInit);
 
@@ -227,27 +216,35 @@ static async Task ConfigureServicesAsync(
 
 static void ConfigureMiddleware(WebApplication app, bool isDevelopment, bool disableHangfireInit)
 {
+    // 1. Exception handling FIRST
+    if (isDevelopment)
+        app.UseDeveloperExceptionPage();
+    else
+        app.UseHsts();
+
+    // 2. Serilog request logging (after exception handling, before everything else)
+    app.ApplyUseSerilogRequestLogging();
+
+    // 3. Security headers
+    app.UseSecurityHeaders(includeHsts: !isDevelopment);
+
+    // 4. Forwarded headers (important for proxies/load balancers)
     app.UseForwardedHeaders();
-    /* Extra loging
-      app.Use(async (context, next) =>
-    {
-        var method = context.Request.Method;
-        var path = context.Request.Path;
-        var contentLength = context.Request.ContentLength?.ToString() ?? "null";
-        var contentType = context.Request.ContentType ?? "null";
 
-        Log.Information($"[REQ] {method} {path} | Content-Length: {contentLength} | Content-Type: {contentType}");
-
-        await next.Invoke();
-    });*/
+    // 5. HTTPS redirection
     app.UseHttpsRedirection();
+
+    // 6. Routing
     app.UseRouting();
+
+    // 7. Health checks
     app.ApplyMapHealthChecks();
+
+    // 8. Authentication & Authorization
     app.UseAuthentication();
     app.UseAuthorization();
 
-    app.ApplyUseSerilogRequestLogging();    
-
+    // 9. Endpoints
     app.MapGet("/login", async context =>
     {
         await context.ChallengeAsync(OpenIdConnectDefaults.AuthenticationScheme, new AuthenticationProperties
@@ -255,37 +252,33 @@ static void ConfigureMiddleware(WebApplication app, bool isDevelopment, bool dis
             RedirectUri = "/hangfire"
         });
     }).AllowAnonymous();
+    
     app.MapGet("/logout", async context =>
     {
-        await context.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme); // Clear local cookie
+        await context.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
         await context.SignOutAsync(OpenIdConnectDefaults.AuthenticationScheme, new AuthenticationProperties
         {
             RedirectUri = "/hangfire"
         });
     });
+    
     app.MapGet("/error", async context =>
     {
         var message = context.Request.Query["message"].ToString();
         context.Response.ContentType = "text/plain";
         await context.Response.WriteAsync($"Authentication error:\n{message}");
-    }).AllowAnonymous(); ;
+    }).AllowAnonymous();
 
     if (!disableHangfireInit)
     {
         app.MapHangfireDashboard("/hangfire", new DashboardOptions
         {
             Authorization = new[] { new HangfireAuthorizationFilter() },
-            AppPath = "/logout", // You can use this to make the "Back to site" link go to logout
+            AppPath = "/logout",
         })
-        .RequireAuthorization("SOS_ADMIN_POLICY"); // This replaces standard authorization filter
+        .RequireAuthorization("SOS_ADMIN_POLICY");
     }
 
-    if (isDevelopment)
-        app.UseDeveloperExceptionPage();
-    else
-        app.UseHsts();
-
-    //app.PreventSwaggerCaching();
     app.ApplyUseSwagger();
     app.MapControllers();
 }
@@ -297,7 +290,7 @@ public class HangfireAuthorizationFilter : IDashboardAuthorizationFilter
     /// <param name="context"></param>
     /// <returns></returns>
     public bool Authorize(DashboardContext context)
-    {
+    {   
         return true; // Always return true since authorization is handled by SOS_ADMIN_POLICY
     }
 }

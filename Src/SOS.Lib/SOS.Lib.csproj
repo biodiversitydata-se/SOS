@@ -41,9 +41,11 @@
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.5" />
 		<PackageReference Include="QuikGraph" Version="2.5.0" />
 		<PackageReference Include="Microsoft.Extensions.ObjectPool" Version="10.0.5" />
-		<PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />
-		<PackageReference Include="Serilog.Formatting.Compact" Version="3.0.0" />
-		<PackageReference Include="Serilog.Sinks.OpenTelemetry" Version="4.2.0" />
+        <PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />
+        <PackageReference Include="Serilog.Expressions" Version="5.0.0" />
+        <PackageReference Include="Serilog.Formatting.Compact" Version="3.0.0" />
+        <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
+        <PackageReference Include="Serilog.Sinks.OpenTelemetry" Version="4.2.0" />
 	</ItemGroup>
 
 	<ItemGroup>
