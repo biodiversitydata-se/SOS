@@ -30,13 +30,13 @@ try
     bool disableCachedTaxonSumAggregationInit = Environment.GetEnvironmentVariable("DISABLE_CACHED_TAXON_SUM_INIT").GetBoolean();
 
     // Setup logging
-    SerilogExtensions.SetupSerilog(isDevelopment);
+    Log.Logger = SeriLogHelper.CreateLogger(isDevelopment);
     Log.Logger.Information("Starting Service");
 
     var builder = WebApplication.CreateBuilder(args);
-    //builder.Host.UseSerilog(Log.Logger);
+    SeriLogHelper.ConfigureSerilog(builder, "search.api", isDevelopment);
+    
     builder.AddServiceDefaults();
-    SeriLogHelper.ConfigureSerilog(builder);
 
     // Set Swedish culture globally
     SetCulture("sv-SE");
@@ -179,6 +179,7 @@ static void ConfigureServices(
 
 static void ConfigureMiddleware(WebApplication app, bool isDevelopment, bool disableHangfireInit, bool disableHealthCheckInit)
 {
+    app.ApplyUseSerilogRequestLogging();
     app.ApplyUseExceptionHandler();
     if (Settings.CorsAllowAny)
         app.UseCors("AllowAll");
@@ -204,7 +205,6 @@ static void ConfigureMiddleware(WebApplication app, bool isDevelopment, bool dis
     app.UseRouting();
     app.UseAuthentication();
     app.UseAuthorization();
-    app.ApplyUseSerilogRequestLogging();    
     app.ApplyMapHealthChecks(disableHealthCheckInit);
 
     //app.PreventSwaggerCaching();

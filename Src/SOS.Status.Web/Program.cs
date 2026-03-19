@@ -27,12 +27,13 @@ try
     bool isDevelopment = new[] { "local", "development", "dev", "st" }.Contains(env?.ToLower(), StringComparer.CurrentCultureIgnoreCase);
 
     // Setup logging
-    SerilogExtensions.SetupSerilog(isDevelopment);
+    Log.Logger = SeriLogHelper.CreateLogger(isDevelopment);
     Log.Logger.Information("Starting Service");
 
     var builder = WebApplication.CreateBuilder(args);
+    SeriLogHelper.ConfigureSerilog(builder, "status.web", isDevelopment);
     builder.AddServiceDefaults();
-    SeriLogHelper.ConfigureSerilog(builder);
+
     var configurationRoot = BuildConfiguration(builder, isDevelopment);
     Settings.Init(configurationRoot);
     builder.Services.AddSingleton<ITicketStore, RedisTicketStore>();
@@ -104,7 +105,7 @@ try
     });
 
     var app = builder.Build();
-
+    app.ApplyUseSerilogRequestLogging();
     // Add security headers for Razor Components
     app.AddSecurityHeaders(!isLocalDevelopment);
 
@@ -140,7 +141,6 @@ try
     app.UseRouting();
     app.UseAuthentication();
     app.UseAuthorization();
-    app.ApplyUseSerilogRequestLogging();
     app.UseAntiforgery();
     StaticWebAssetsLoader.UseStaticWebAssets(builder.Environment, builder.Configuration);
     app.UseStaticFiles();
