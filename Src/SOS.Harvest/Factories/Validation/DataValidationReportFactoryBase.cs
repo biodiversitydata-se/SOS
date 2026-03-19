@@ -112,6 +112,7 @@ public abstract class DataValidationReportFactoryBase<TVerbatimObservation> : ID
         var occurrenceIdValidObservations = new List<ValidObservationTuple<object, Observation>>();
         var requestedOccurrenceIds = occurrenceIds?.ToHashSet(StringComparer.OrdinalIgnoreCase);
         var invalidObservations = new List<InvalidObservationTuple<object>>();
+        var invalidObservationsByDefectType = new Dictionary<ObservationDefect.ObservationDefectType, List<InvalidObservationTuple<object>>>();
         int nrProcessedObservations = 0;
         int nrValidObservations = 0;
         int nrInvalidObservations = 0;
@@ -172,18 +173,21 @@ public abstract class DataValidationReportFactoryBase<TVerbatimObservation> : ID
                         }
                     }
                     else
-                    {
+                    {                        
                         nrInvalidObservations++;
+                        var invalidObservation = new InvalidObservationTuple<object>
+                        {
+                            VerbatimObservation = verbatimObservation,
+                            ProcessedObservationDefects = observationValidation.Defects?.Select(d => d.Information).ToList()
+                        };
+
                         if (invalidObservations.Count < nrInvalidObservationsInReport)
                         {
-                            invalidObservations.Add(new InvalidObservationTuple<object>
-                            {
-                                VerbatimObservation = verbatimObservation,
-                                ProcessedObservationDefects = observationValidation.Defects?.Select(d => d.Information).ToList()
-                            });
+                            invalidObservations.Add(invalidObservation);
                         }
                         if (observationValidation.Defects?.Any() ?? false)
                         {
+                            var addedDefectTypes = new HashSet<ObservationDefect.ObservationDefectType>();
                             foreach (var validationDefect in observationValidation.Defects)
                             {
                                 if (validationDefect.DefectType == ObservationDefect.ObservationDefectType.TaxonNotFound)
@@ -196,6 +200,22 @@ public abstract class DataValidationReportFactoryBase<TVerbatimObservation> : ID
                                 }
 
                                 observationDefects[validationDefect.DefectType]++;
+
+                                if (!addedDefectTypes.Add(validationDefect.DefectType))
+                                {
+                                    continue;
+                                }
+
+                                if (!invalidObservationsByDefectType.TryGetValue(validationDefect.DefectType, out var invalidExamplesForDefectType))
+                                {
+                                    invalidExamplesForDefectType = new List<InvalidObservationTuple<object>>();
+                                    invalidObservationsByDefectType.Add(validationDefect.DefectType, invalidExamplesForDefectType);
+                                }
+
+                                if (invalidExamplesForDefectType.Count < nrInvalidObservationsInReport)
+                                {
+                                    invalidExamplesForDefectType.Add(invalidObservation);
+                                }
                             }
                         }
                     }
@@ -236,6 +256,17 @@ public abstract class DataValidationReportFactoryBase<TVerbatimObservation> : ID
         {
             remarks.Add("No remarks.");
         }
+
+        var groupedInvalidObservations = invalidObservationsByDefectType
+            .OrderByDescending(pair => observationDefects.GetValueOrDefault(pair.Key))
+            .ThenBy(pair => pair.Key.ToString())
+            .Select(pair => new InvalidObservationsByDefectType<object>
+            {
+                ObservationDefectType = pair.Key.ToString(),
+                InvalidObservations = pair.Value
+            })
+            .ToList();
+
         return new DataValidationReport<object, Observation>
         {
             Settings = new { MaxNrObservationsToProcess = maxNrObservationsToRead, NrValidObservationsInReport = nrValidObservationsInReport, NrInvalidObservationsInReport = nrInvalidObservationsInReport },
@@ -252,6 +283,7 @@ public abstract class DataValidationReportFactoryBase<TVerbatimObservation> : ID
                 NonMatchingScientificNames = nonMatchingScientificNames.Count == 0 ? null : nonMatchingScientificNames.ToList()
             },
             InvalidObservations = invalidObservations,
+            InvalidObservationsByDefectType = groupedInvalidObservations,
             ValidObservations = validObservations.Concat(occurrenceIdValidObservations).ToList(),
             DictionaryValues = distinctValuesSummaries
         };

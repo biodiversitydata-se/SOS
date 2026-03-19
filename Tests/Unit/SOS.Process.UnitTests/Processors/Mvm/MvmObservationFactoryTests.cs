@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using Moq;
+using NetTopologySuite.Geometries;
 using SOS.Harvest.Managers;
 using SOS.Harvest.Managers.Interfaces;
 using SOS.Harvest.Processors.DarwinCoreArchive;
@@ -8,6 +9,7 @@ using SOS.Lib.Configuration.Process;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Enums;
 using SOS.Lib.Enums.VocabularyValues;
+using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
@@ -362,6 +364,52 @@ public class MvmObservationFactoryTests
         obs.DynamicProperties.Should().Contain("Blåbärssoppa ä");
         obs.DynamicProperties.Should().Contain("Fältbesök Åland");
         obs.DynamicProperties.Should().NotContain("\\u00");
+    }
+
+    [Fact]
+    public void CreateProcessedObservations_MetadataCoordinatesWithRt90_UsesRt90CoordinateSystem()
+    {
+        // Arrange
+        const double northing = 6580822;
+        const double easting = 1627548;
+        var expectedPoint = new Point(easting, northing)
+            .Transform(CoordinateSys.Rt90_25_gon_v, CoordinateSys.WGS84) as Point;
+
+        var verbatim = CreateBaseSample(241992, "2006-10-04");
+        verbatim.Observations =
+        [
+            new SampleObservation
+            {
+                ObservationId = 6273047,
+                PropertyRepresentationType = "TaxonProperty",
+                IsQualitative = "False",
+                PropertyCode = "101268",
+                ObservationValues =
+                [
+                    new SampleObservationValue(name: "Observerad", value: "1", valueType: "BooleanValue")
+                ],
+                ObservationMetadata =
+                [
+                    new Metadata { Label = "Provplatskoordinat START N/X", Value = northing.ToString() },
+                    new Metadata { Label = "Provplatskoordinat START E/Y", Value = easting.ToString() },
+                    new Metadata { Label = "Provplatskoordinat SLUT N/X", Value = northing.ToString() },
+                    new Metadata { Label = "Provplatskoordinat SLUT E/Y", Value = easting.ToString() },
+                    new Metadata { Label = "Provplatskoordinaternas koordinatsystem", Value = "RT90" }
+                ]
+            }
+        ];
+
+        // Act
+        var observations = _factory.CreateProcessedObservations(verbatim, false)?.ToList();
+
+        // Assert
+        observations.Should().HaveCount(1);
+        var obs = observations!.First();
+        obs.Location.VerbatimSRS.Should().Be(CoordinateSys.Rt90_25_gon_v.EpsgCode());
+        obs.Location.VerbatimLongitude.Should().Be(easting.ToString("0"));
+        obs.Location.VerbatimLatitude.Should().Be(northing.ToString("0"));
+        obs.Location.DecimalLongitude.Should().BeApproximately(expectedPoint!.X, 0.00001);
+        obs.Location.DecimalLatitude.Should().BeApproximately(expectedPoint.Y, 0.00001);
     }
 
     private static MvmSampleVerbatim CreateBaseSample(int sampleId, string samplingDate) =>

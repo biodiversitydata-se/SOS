@@ -492,8 +492,9 @@ public class MvmObservationFactory : ObservationFactoryBase, IObservationFactory
         double? verbatimLongitude;
         double? verbatimLatitude;
         int? coordinateUncertaintyInMeters;
+        var verbatimCoordinateSystem = CoordinateSys.SWEREF99_TM;
 
-        if (GetCoordinatesFromObservationMetadata(observation.ObservationMetadata, out verbatimLongitude, out verbatimLatitude, out coordinateUncertaintyInMeters))
+        if (GetCoordinatesFromObservationMetadata(observation.ObservationMetadata, out verbatimLongitude, out verbatimLatitude, out coordinateUncertaintyInMeters, out verbatimCoordinateSystem))
         {
             // Observation metadata contains coordinates                
         }
@@ -518,16 +519,18 @@ public class MvmObservationFactory : ObservationFactoryBase, IObservationFactory
             processedLocation,
             verbatimLongitude,
             verbatimLatitude,
-            CoordinateSys.SWEREF99_TM,
+            verbatimCoordinateSystem,
             coordinateUncertaintyInMeters,
             taxon?.Attributes?.DisturbanceRadius);
         
         _areaHelper.AddAreaDataToProcessedLocation(processedLocation);
+
         return processedLocation;
     }
 
-    private bool GetCoordinatesFromObservationMetadata(List<Metadata> metadata, out double? longitude, out double? latitude, out int? coordinateUncertaintyInMeters)
+    private bool GetCoordinatesFromObservationMetadata(List<Metadata> metadata, out double? longitude, out double? latitude, out int? coordinateUncertaintyInMeters, out CoordinateSys coordinateSystem)
     {
+        coordinateSystem = CoordinateSys.SWEREF99_TM;
         if (metadata == null || metadata.Count == 0)
         {
             longitude = null;
@@ -570,15 +573,27 @@ public class MvmObservationFactory : ObservationFactoryBase, IObservationFactory
             return false;
         }
 
+        coordinateSystem = GetObservationMetadataCoordinateSystem(metadata);        
+
         // Calculate center point between start and end coordinates
-        longitude = (xStart + xEnd) / 2;
-        latitude = (yStart + yEnd) / 2;
+        latitude = (xStart + xEnd) / 2;
+        longitude = (yStart + yEnd) / 2;
 
         // Calculate uncertainty as distance between start and end points
         var dx = Math.Abs(xStart - xEnd);
         var dy = Math.Abs(yStart - yEnd);
         coordinateUncertaintyInMeters = (int) Math.Ceiling(Math.Sqrt((dx / 2) * (dx / 2) + (dy / 2) * (dy / 2)));
         return true;
+    }
+
+    private static CoordinateSys GetObservationMetadataCoordinateSystem(List<Metadata> metadata)
+    {
+        var coordinateSystemMetadata = metadata.FirstOrDefault(m =>
+            m.Label.Equals("Provplatskoordinaternas koordinatsystem", StringComparison.OrdinalIgnoreCase));
+
+        return string.Equals(coordinateSystemMetadata?.Value, "RT90", StringComparison.OrdinalIgnoreCase)
+            ? CoordinateSys.Rt90_25_gon_v
+            : CoordinateSys.SWEREF99_TM;
     }
 
 
