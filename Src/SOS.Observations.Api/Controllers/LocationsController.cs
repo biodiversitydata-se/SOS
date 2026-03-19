@@ -10,19 +10,11 @@ using SOS.Shared.Api.Extensions.Controller;
 using SOS.Shared.Api.Extensions.Dto;
 using SOS.Shared.Api.Validators.Interfaces;
 using SOS.Observations.Api.Managers.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Threading.Tasks;
 using Result = CSharpFunctionalExtensions.Result;
 using SOS.Lib.Helpers;
 using SOS.Lib.Managers;
-using System.Diagnostics;
 using SOS.Lib.Enums;
-using System.Threading;
-using Microsoft.AspNetCore.Http;
-using SOS.Lib.Models.Shared;
 
 namespace SOS.Observations.Api.Controllers;
 

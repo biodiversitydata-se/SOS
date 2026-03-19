@@ -144,7 +144,15 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
                 .Object(o => o.DataStewardship, c => c
                     .Properties(ps => ps
                         .KeywordVal(kwlc => kwlc.DataStewardship.DatasetIdentifier, IndexSetting.SearchSortAggregate)
-                        .KeywordVal(kwlc => kwlc.DataStewardship.DatasetTitle, IndexSetting.None)
+                        .Keyword(kw => kw.DataStewardship.DatasetTitle, kw => kw
+                            .Normalizer("lowercase")
+                            .DocValues(true)
+                            .Fields(f => f
+                                .Keyword("raw", kw => kw
+                                    .DocValues(false)
+                                )
+                            )
+                        )
                     )
                 )
                 .Object(o => o.ArtportalenInternal, t => t

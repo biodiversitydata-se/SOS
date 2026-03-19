@@ -210,7 +210,8 @@ public static class FilterExtensions
         return filter == null ? null! :
             new DataStewardshipFilter
             {
-                DatasetIdentifiers = filter.DatasetIdentifiers
+                DatasetIdentifiers = filter.DatasetIdentifiers,
+                DatasetTitleFilter = filter.DatasetTitleFilter
             };
     }
 

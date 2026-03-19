@@ -1,8 +1,6 @@
 ﻿using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.DataStewardship.Common;
 using SOS.Lib.Swagger;
-using System;
-using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
 namespace SOS.Lib.Models.Processed.Observation;
