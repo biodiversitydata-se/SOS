@@ -43,76 +43,94 @@
     <File Path="Documentation/Diagrams/Observation API Component Diagram.puml" />
     <File Path="Documentation/Diagrams/SOS Container Diagram.puml" />
   </Folder>
-  <Folder Name="/k8s/">
-    <File Path="Src/Dockerfile.administration.api" />
-    <File Path="Src/Dockerfile.administration.gui" />
-    <File Path="Src/Dockerfile.analysis" />
-    <File Path="Src/Dockerfile.elasticsearch.proxy" />
-    <File Path="Src/Dockerfile.observations" />
+  <Folder Name="/k8s/" />
+  <Folder Name="/k8s/dev/">
+    <File Path="devops/k8s/.base-dev/api/api.yaml" />
+    <File Path="devops/k8s/.base-dev/api/kustomization.yaml" />
   </Folder>
-  <Folder Name="/k8s/dev/" />
   <Folder Name="/k8s/dev/administration.api/">
-    <File Path="devops/k8s/dev/administration.api/api.yaml" />
-  </Folder>
-  <Folder Name="/k8s/dev/administration.gui/">
-    <File Path="devops/k8s/dev/administration.gui/api.yaml" />
+    <File Path="devops/k8s/sosadminapi-dev/api.yaml" />
+    <File Path="devops/k8s/sosadminapi-dev/ingress.yaml" />
+    <File Path="devops/k8s/sosadminapi-dev/kustomization.yaml" />
   </Folder>
   <Folder Name="/k8s/dev/analysis/">
-    <File Path="devops/k8s/dev/analysis/api.yaml" />
+    <File Path="devops/k8s/sos-analysis-dev/api.yaml" />
+    <File Path="devops/k8s/sos-analysis-dev/ingress.yaml" />
+    <File Path="devops/k8s/sos-analysis-dev/kustomization.yaml" />
   </Folder>
   <Folder Name="/k8s/dev/observations/">
-    <File Path="devops/k8s/dev/observations/api.yaml" />
+    <File Path="devops/k8s/sos-observations-dev/api.yaml" />
+    <File Path="devops/k8s/sos-observations-dev/ingress.yaml" />
+    <File Path="devops/k8s/sos-observations-dev/kustomization.yaml" />
   </Folder>
   <Folder Name="/k8s/dev/proxy/">
-    <File Path="devops/k8s/dev/proxy/api.yaml" />
+    <File Path="devops/k8s/sos-proxy-dev/api.yaml" />
+    <File Path="devops/k8s/sos-proxy-dev/ingress.yaml" />
+    <File Path="devops/k8s/sos-proxy-dev/kustomization.yaml" />
+  </Folder>
+  <Folder Name="/k8s/dev/status/">
+    <File Path="devops/k8s/sos-status-dev/app-patch.yaml" />
+    <File Path="devops/k8s/sos-status-dev/ingress.yaml" />
+    <File Path="devops/k8s/sos-status-dev/kustomization.yaml" />
   </Folder>
   <Folder Name="/k8s/local/" />
-  <Folder Name="/k8s/local/administration.api/">
-    <File Path="devops/k8s/local/administration.api/api.yaml" />
+  <Folder Name="/k8s/prod/">
+    <File Path="devops/k8s/.base-prod/api/api.yaml" />
+    <File Path="devops/k8s/.base-prod/api/kustomization.yaml" />
   </Folder>
-  <Folder Name="/k8s/local/administration.gui/">
-    <File Path="devops/k8s/local/administration.gui/api.yaml" />
-  </Folder>
-  <Folder Name="/k8s/local/analysis/">
-    <File Path="devops/k8s/local/analysis/api.yaml" />
-  </Folder>
-  <Folder Name="/k8s/local/observations/">
-    <File Path="devops/k8s/local/observations/api.yaml" />
-  </Folder>
-  <Folder Name="/k8s/local/proxy/">
-    <File Path="devops/k8s/local/proxy/api.yaml" />
-  </Folder>
-  <Folder Name="/k8s/prod/" />
   <Folder Name="/k8s/prod/administration.api/">
-    <File Path="devops/k8s/prod/administration.api/api.yaml" />
-  </Folder>
-  <Folder Name="/k8s/prod/administration.gui/">
-    <File Path="devops/k8s/prod/administration.gui/api.yaml" />
+    <File Path="devops/k8s/sos-observations-prod/kustomization.yaml" />
+    <File Path="devops/k8s/sosadminapi-prod/api-patch.yaml" />
+    <File Path="devops/k8s/sosadminapi-prod/ingress.yaml" />
+    <File Path="devops/k8s/sosadminapi-prod/kustomization.yaml" />
   </Folder>
   <Folder Name="/k8s/prod/analysis/">
-    <File Path="devops/k8s/prod/analysis/api.yaml" />
+    <File Path="devops/k8s/sos-analysis-prod/api-patch.yaml" />
+    <File Path="devops/k8s/sos-analysis-prod/ingress.yaml" />
+    <File Path="devops/k8s/sos-analysis-prod/kustomization.yaml" />
   </Folder>
   <Folder Name="/k8s/prod/observations/">
-    <File Path="devops/k8s/prod/observations/api.yaml" />
+    <File Path="devops/k8s/sos-observations-prod/ingress.yaml" />
+    <File Path="devops/k8s/sos-observations-prod/kustomization.yaml" />
   </Folder>
   <Folder Name="/k8s/prod/proxy/">
-    <File Path="devops/k8s/prod/proxy/api.yaml" />
+    <File Path="devops/k8s/sos-proxy-prod/api-patch.yaml" />
+    <File Path="devops/k8s/sos-proxy-prod/ingress.yaml" />
+    <File Path="devops/k8s/sos-proxy-prod/kustomization.yaml" />
   </Folder>
-  <Folder Name="/k8s/st/" />
+  <Folder Name="/k8s/prod/status/">
+    <File Path="devops/k8s/sos-status-prod/app-patch.yaml" />
+    <File Path="devops/k8s/sos-status-prod/ingress.yaml" />
+    <File Path="devops/k8s/sos-status-prod/kustomization.yaml" />
+  </Folder>
+  <Folder Name="/k8s/st/">
+    <File Path="devops/k8s/.base-st/api/api.yaml" />
+    <File Path="devops/k8s/.base-st/api/kustomization.yaml" />
+  </Folder>
   <Folder Name="/k8s/st/administration.api/">
-    <File Path="devops/k8s/st/administration.api/api.yaml" />
-  </Folder>
-  <Folder Name="/k8s/st/administration.gui/">
-    <File Path="devops/k8s/st/administration.gui/api.yaml" />
+    <File Path="devops/k8s/sosadminapi-st/api.yaml" />
+    <File Path="devops/k8s/sosadminapi-st/ingress.yaml" />
+    <File Path="devops/k8s/sosadminapi-st/kustomization.yaml" />
   </Folder>
   <Folder Name="/k8s/st/analysis/">
-    <File Path="devops/k8s/st/analysis/api.yaml" />
+    <File Path="devops/k8s/sos-analysis-st/api.yaml" />
+    <File Path="devops/k8s/sos-analysis-st/ingress.yaml" />
+    <File Path="devops/k8s/sos-analysis-st/kustomization.yaml" />
   </Folder>
   <Folder Name="/k8s/st/observations/">
-    <File Path="devops/k8s/st/observations/api.yaml" />
+    <File Path="devops/k8s/sos-observations-st/api.yaml" />
+    <File Path="devops/k8s/sos-observations-st/ingress.yaml" />
+    <File Path="devops/k8s/sos-observations-st/kustomization.yaml" />
   </Folder>
   <Folder Name="/k8s/st/proxy/">
-    <File Path="devops/k8s/st/proxy/api.yaml" />
+    <File Path="devops/k8s/sos-proxy-st/api.yaml" />
+    <File Path="devops/k8s/sos-proxy-st/ingress.yaml" />
+    <File Path="devops/k8s/sos-proxy-st/kustomization.yaml" />
+  </Folder>
+  <Folder Name="/k8s/st/status/">
+    <File Path="devops/k8s/sos-status-st/app-patch.yaml" />
+    <File Path="devops/k8s/sos-status-st/ingress.yaml" />
+    <File Path="devops/k8s/sos-status-st/kustomization.yaml" />
   </Folder>
   <Folder Name="/Src/">
     <Project Path="Src/SOS.AppHost/SOS.AppHost.csproj" />
