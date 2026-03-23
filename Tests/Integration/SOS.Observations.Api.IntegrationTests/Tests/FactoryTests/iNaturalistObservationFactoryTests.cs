@@ -14,6 +14,7 @@ public class iNaturalistObservationFactoryTests : TestBase
     private string _verbatimObservationJson = """
         {
           "ObservationId": 3256,
+          "License_code": "cc by-nc",
           "Annotations": [],
           "Identifications": [
             {
@@ -121,7 +122,7 @@ public class iNaturalistObservationFactoryTests : TestBase
           "Non_owner_ids": [],
           "Num_identification_agreements": 0,
           "Num_identification_disagreements": 0,
-          "Obscured": false,
+          "Obscured": true,
           "Observed_on": "2009-08-28T00:00:00+02:00",
           "Observed_on_details": {
             "Date": "2009-08-28T00:00:00+02:00",
@@ -161,32 +162,28 @@ public class iNaturalistObservationFactoryTests : TestBase
           "Species_guess": "Baltic Gull",
           "Tags": [],
           "Taxon": {
-            "Ancestor_ids": [
-              48460,
-              1,
-              2,
-              355675,
-              3,
-              67561,
-              4342,
-              447155,
-              4343,
-              4381,
-              515475
-            ],
-            "Ancestry": "48460/1/2/355675/3/67561/4342/447155/4343/4381",
-            "Endemic": false,
-            "Introduced": false,
-            "Native": true,
-            "Threatened": false,
-            "Id": 515475,
-            "Iconic_taxon_id": 3,
-            "Iconic_taxon_name": "Aves",
+            "_id": 42048,
+            "Iconic_taxon_id": 40151,
+            "Iconic_taxon_name": "Mammalia",
             "Is_active": true,
-            "Name": "Larus fuscus fuscus",
-            "Preferred_common_name": "Baltic Gull",
-            "Rank": "subspecies",
-            "Rank_level": 5.0
+            "Name": "Canis lupus",
+            "Preferred_common_name": "Gray Wolf",
+            "Rank": "species",
+            "Rank_level": 10,
+            "Ancestor_ids": [
+                48460,
+                1,
+                2,
+                355675,
+                40151,
+                848317,
+                848320,
+                848324,
+                41573,
+                42043,
+                42044
+            ],
+            "Ancestry": "48460/1/2/355675/40151/848317/848320/848324/41573/42043/42044"
           },
           "Time_zone_offset": "+01:00",
           "Updated_at": "2018-05-26T13:21:11+02:00",
@@ -210,7 +207,10 @@ public class iNaturalistObservationFactoryTests : TestBase
         // Act
         var processedObservation = factory.CreateProcessedObservation(observation, false);
 
-        // Assert        
+        // Assert
+        processedObservation.Sensitive.Should().BeTrue();
+        processedObservation.DiffusionStatus.Should().Be(Lib.Models.Processed.Observation.DiffusionStatus.DiffusedByProvider);
+        processedObservation.IsGeneralized.Should().BeTrue();
         processedObservation.Event.PlainStartDate.Should().Be("2009-08-28");
         processedObservation.Location.Municipality.Name.Should().Be("Stockholm");
         processedObservation.Location.CoordinateUncertaintyInMeters.Should().Be(5000);
@@ -221,6 +221,35 @@ public class iNaturalistObservationFactoryTests : TestBase
         processedObservation.Occurrence.OccurrenceId.Should().Be("https://www.inaturalist.org/observations/3256");
         processedObservation.Occurrence.OccurrenceRemarks.Should().Be("Hungry and lonely Baltic lesser black backed gull circling over central Stockholm");
         processedObservation.Occurrence.RecordedBy.Should().Be("paco");
+        processedObservation.Taxon.Id.Should().Be(267320);
+        processedObservation.Taxon.Attributes.RedlistCategory.Should().Be("NA");
+        processedObservation.Taxon.Attributes.OrganismGroup.Should().Be("Däggdjur");
+        processedObservation.Taxon.VernacularName.Should().Be("varg");
+        processedObservation.Taxon.ScientificName.Should().Be("Canis lupus");
+        processedObservation.DatasetName.Should().Be("iNaturalist");
+        processedObservation.AccessRights.Id.Should().Be((int)AccessRightsId.NotForPublicUsage);
+        processedObservation.BasisOfRecord.Id.Should().Be((int)BasisOfRecordId.HumanObservation);
+
+
+        // Act - Change to not protected taxon and not obscured
+        observation.Taxon.Name = "Larus fuscus fuscus";
+        observation.Obscured = null;
+        processedObservation = factory.CreateProcessedObservation(observation, false);
+
+        // Assert
+        processedObservation.Sensitive.Should().BeFalse();
+        processedObservation.DiffusionStatus.Should().Be(Lib.Models.Processed.Observation.DiffusionStatus.NotDiffused);
+        processedObservation.IsGeneralized.Should().BeFalse();
+        processedObservation.Event.PlainStartDate.Should().Be("2009-08-28");
+        processedObservation.Location.Municipality.Name.Should().Be("Stockholm");
+        processedObservation.Location.CoordinateUncertaintyInMeters.Should().Be(5000);
+        processedObservation.Location.DecimalLatitude.Should().Be(59.31653D);
+        processedObservation.Location.DecimalLongitude.Should().Be(18.06058D);
+        processedObservation.Occurrence.CatalogNumber.Should().Be("3256");
+        processedObservation.Occurrence.IsNaturalOccurrence.Should().BeTrue();
+        processedObservation.Occurrence.OccurrenceId.Should().Be("https://www.inaturalist.org/observations/3256");
+        processedObservation.Occurrence.OccurrenceRemarks.Should().Be("Hungry and lonely Baltic lesser black backed gull circling over central Stockholm");
+        processedObservation.Occurrence.RecordedBy.Should().Be("paco");     
         processedObservation.Taxon.Id.Should().Be(100071);
         processedObservation.Taxon.Attributes.RedlistCategory.Should().Be("VU");
         processedObservation.Taxon.Attributes.OrganismGroup.Should().Be("Fåglar");
