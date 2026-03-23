@@ -4,11 +4,7 @@ using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Repositories.Resource.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.Json.Nodes;
-using System.Threading.Tasks;
 
 namespace SOS.Lib.Helpers;
 
