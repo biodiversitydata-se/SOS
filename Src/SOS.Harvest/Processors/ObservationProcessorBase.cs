@@ -175,7 +175,7 @@ public abstract class ObservationProcessorBase<TClass, TVerbatim, TVerbatimRepos
         var csvWriteTimerSessionId = TimeManager.Start(ProcessTimeManager.TimerTypes.CsvWrite);
 
         LocalDateTimeConverterHelper.ConvertToLocalTime(processedObservations);
-        vocabularyValueResolver.ResolveVocabularyMappedValues(processedObservations, Cultures.en_GB, true);
+        vocabularyValueResolver.ResolveVocabularyMappedValues(processedObservations, Cultures.en_GB, true, true);
         var success = await dwcArchiveFileWriterCoordinator.WriteHeaderlessDwcaFileParts(processedObservations, dataProvider, batchId);
 
         TimeManager.Stop(ProcessTimeManager.TimerTypes.CsvWrite, csvWriteTimerSessionId);
