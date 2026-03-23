@@ -86,7 +86,14 @@ namespace SOS.Harvest.Factories.Validation
         {
             if (!string.IsNullOrEmpty(processedObservation.Taxon.VerbatimId))
             {
-                nonMatchingTaxonIds.Add(processedObservation.Taxon.VerbatimId);
+                if (processedObservation.Taxon.VerbatimId == "-1")
+                {
+                    nonMatchingScientificNames.Add(processedObservation.Taxon.VerbatimName);
+                }
+                else
+                {
+                    nonMatchingTaxonIds.Add(processedObservation.Taxon.VerbatimId);
+                }
             }
         }
 
@@ -122,6 +129,6 @@ namespace SOS.Harvest.Factories.Validation
             }
 
             return _mvmObservationFactory;
-        }        
+        }
     }
 }

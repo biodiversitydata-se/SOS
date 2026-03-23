@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 
 var builder = DistributedApplication.CreateBuilder(args);
 
@@ -63,24 +63,8 @@ var dataStewardshipApi = builder.AddProject<Projects.SOS_DataStewardship_Api>("s
     .WithUrl("http://localhost:5002/swagger", "Data Stewardship API")
     .WithHttpHealthCheck("/healthz");    
 
-// Configure Administration API
-var adminApi = builder.AddProject<Projects.SOS_Administration_Api>(name: "sos-administration-api", configure: static project =>
-    {
-        project.ExcludeLaunchProfile = true;
-    })
-    .WithEnvironment("ASPNETCORE_ENVIRONMENT", env.AspNetCoreEnvironment)
-    .WithEnvironment("USE_LOCAL_HANGFIRE", env.UseLocalHangfireDb.ToString())
-    .WithEnvironment("DISABLE_HANGFIRE_INIT", env.DisableHangfireInit.ToString())
-    .WithHttpEndpoint(name: "http", port: 5005)
-    .WithUrlForEndpoint("http", endpoint => { endpoint.DisplayLocation = UrlDisplayLocation.DetailsOnly; })
-    .WithUrl("http://localhost:5005/swagger", "Administration API")
-    .WithUrl("http://localhost:5005/hangfire/jobs/processing", "Hangfire dashboard")
-    .WithHttpHealthCheck("/healthz")
-    .WithReference(hangfireDb)
-    .WaitFor(hangfireDb);
-
 // Configure Hangfire JobServer
-builder.AddProject<Projects.SOS_Hangfire_JobServer>("sos-hangfire-jobserver", configure: static project =>
+var jobServer = builder.AddProject<Projects.SOS_Hangfire_JobServer>("sos-hangfire-jobserver", configure: static project =>
     {
         project.ExcludeLaunchProfile = true;
     })
@@ -91,6 +75,23 @@ builder.AddProject<Projects.SOS_Hangfire_JobServer>("sos-hangfire-jobserver", co
     .WithEnvironment("EXCLUDE_PARISH_GEOMETRIES", env.excludeParishGeometries.ToString())
     .WithReference(hangfireDb)
     .WaitFor(hangfireDb);
+
+// Configure Administration API
+var adminApi = builder.AddProject<Projects.SOS_Administration_Api>(name: "sos-administration-api", configure: static project =>
+{
+    project.ExcludeLaunchProfile = true;
+})
+    .WithEnvironment("ASPNETCORE_ENVIRONMENT", env.AspNetCoreEnvironment)
+    .WithEnvironment("USE_LOCAL_HANGFIRE", env.UseLocalHangfireDb.ToString())
+    .WithEnvironment("DISABLE_HANGFIRE_INIT", env.DisableHangfireInit.ToString())
+    .WithHttpEndpoint(name: "http", port: 5005)
+    .WithUrlForEndpoint("http", endpoint => { endpoint.DisplayLocation = UrlDisplayLocation.DetailsOnly; })
+    .WithUrl("http://localhost:5005/swagger", "Administration API")
+    .WithUrl("http://localhost:5005/hangfire/jobs/processing", "Hangfire dashboard")
+    .WithHttpHealthCheck("/healthz")
+    .WithReference(hangfireDb)
+    .WaitFor(hangfireDb)
+    .WaitFor(jobServer);
 
 // SOS.Status.Web
 builder.AddProject<Projects.SOS_Status_Web>("sos-status-web", configure: static project =>

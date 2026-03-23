@@ -27,7 +27,7 @@ public class MvmObservationFactory : ObservationFactoryBase, IObservationFactory
     private readonly IAreaHelper _areaHelper;
     private string _englishOrganizationName;
     private string _englishOrganizationNameLowerCase;
-    private VocabularyValue? _institutionCodeVocabularyValue;
+    private VocabularyValue? _institutionCodeVocabularyValue;    
 
     /// <summary>
     /// Constructor
@@ -75,15 +75,29 @@ public class MvmObservationFactory : ObservationFactoryBase, IObservationFactory
         {
             return null;
         }
-        
-        List<Observation> observations = new List<Observation>();
+
+        List<Observation> observations = new List<Observation>();        
+
         var dates = ParseDates(verbatim);
+
+        if (dates.SamplingDate == null)
+        {
+            return observations;
+        }
+
         var accessRights = VocabularyValue.Create((int)AccessRightsId.FreeUsage);
 
         foreach (var verbatimObservation in verbatim.Observations)
         {
-            if (!verbatimObservation.PropertyRepresentationType.Equals("TaxonProperty", StringComparison.InvariantCultureIgnoreCase))
+            if (string.IsNullOrEmpty(verbatimObservation.PropertyRepresentationType))
+            {
                 continue;
+            }
+
+            if (!verbatimObservation.PropertyRepresentationType.Equals("TaxonProperty", StringComparison.InvariantCultureIgnoreCase))
+            {                                
+                continue;
+            }
 
             var obs = new Observation
             {
@@ -115,9 +129,8 @@ public class MvmObservationFactory : ObservationFactoryBase, IObservationFactory
             obs.Identification = CreateProcessedIdentification(verbatim);
 
             // Taxon
-            int? taxonId = int.TryParse(verbatimObservation.PropertyCode, out var parsedTaxonId) ? parsedTaxonId : null;
-            if (taxonId == null) continue;
-            var taxon = GetTaxon(taxonId.Value);
+            int? taxonId = int.TryParse(verbatimObservation.PropertyCode, out var parsedTaxonId) ? parsedTaxonId : null; 
+            var taxon = GetTaxon(taxonId.HasValue ? taxonId.Value : -1, [verbatimObservation.PropertyName]);
             obs.Taxon = taxon;
 
             // Location
