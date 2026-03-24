@@ -195,7 +195,7 @@ public class VocabularyValueResolver : Interfaces.IVocabularyValueResolver
 
         if (string.IsNullOrEmpty(cultureCode))
         {
-            cultureCode = Cultures.en_GB;
+            cultureCode = Cultures.sv_SE;
         }
 
         var valueMappingDictionaries = _valueMappingDictionariesByCultureCode[cultureCode];
@@ -264,7 +264,7 @@ public class VocabularyValueResolver : Interfaces.IVocabularyValueResolver
 
         if (string.IsNullOrEmpty(cultureCode))
         {
-            cultureCode = "en-GB";
+            cultureCode = Cultures.sv_SE;
         }
 
         foreach (var record in processedRecords)
