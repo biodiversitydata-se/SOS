@@ -10,5 +10,5 @@ public class DataStewardshipFilterDto
     /// <summary>
     /// DataStewardship title wild card filter
     /// </summary>
-    public string DatasetTitleFilter { get; set; }
+    public string? DatasetTitleFilter { get; set; }
 }

@@ -185,7 +185,8 @@ public class VocabularyValueResolver : Interfaces.IVocabularyValueResolver
 
     public void ResolveVocabularyMappedValues(IEnumerable<Observation> processedObservations,
         string cultureCode,
-        bool forceResolve = false)
+        bool forceResolve = false,
+        bool skipTaxonResolve = false)
     {
         // If culture equals swedish (default), no need to translate
         if (!forceResolve && ((cultureCode?.Equals(Cultures.sv_SE, StringComparison.CurrentCultureIgnoreCase) ?? false) || !_vocabularyConfiguration.ResolveValues))
@@ -243,10 +244,13 @@ public class VocabularyValueResolver : Interfaces.IVocabularyValueResolver
                 valueMappingDictionaries[VocabularyId.DeterminationMethod]);
             /*ResolveVocabularyMappedValue(observation.Taxon?.Attributes?.ProtectionLevel,
                 valueMappingDictionaries[VocabularyId.SensitivityCategory]);*/
-            ResolveVocabularyMappedValue(observation.Taxon?.Attributes?.SensitivityCategory,
-                valueMappingDictionaries[VocabularyId.SensitivityCategory]);
-            ResolveVocabularyMappedValue(observation.Taxon?.Attributes.TaxonCategory,
-                valueMappingDictionaries[VocabularyId.TaxonCategory]);
+            if (!skipTaxonResolve)
+            {
+                ResolveVocabularyMappedValue(observation.Taxon?.Attributes?.SensitivityCategory,
+                    valueMappingDictionaries[VocabularyId.SensitivityCategory]);
+                ResolveVocabularyMappedValue(observation.Taxon?.Attributes.TaxonCategory,
+                    valueMappingDictionaries[VocabularyId.TaxonCategory]);
+            }
             ResolveVocabularyMappedValue(observation.ArtportalenInternal?.InvasiveSpeciesTreatment,
                 valueMappingDictionaries[VocabularyId.InvasiveSpeciesTreatment]);
         }
