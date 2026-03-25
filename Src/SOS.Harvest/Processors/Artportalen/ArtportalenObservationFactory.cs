@@ -346,14 +346,9 @@ public class ArtportalenObservationFactory : ObservationFactoryBase, IObservatio
             obs.Identification.IdentificationRemarks = verbatimObservation.UnsureDetermination ? "Uncertain determination" : string.Empty;
 
             // Location
+            var isInEconomicZoneOfSweden = false;
             obs.Location = new Location(LocationType.Unknown);
-            obs.Location.IsInEconomicZoneOfSweden = hasPosition;
-            obs.Location.IsInZoneOfSOS = hasPosition;
-            obs.Location.MaximumDepthInMeters = verbatimObservation.MaxDepth;
-            obs.Location.MaximumElevationInMeters = verbatimObservation.MaxHeight;
-            obs.Location.MinimumDepthInMeters = verbatimObservation.MinDepth;
-            obs.Location.MinimumElevationInMeters = verbatimObservation.MinHeight;
-
+            
             if (verbatimObservation.Site != null)
             {
                 var site = verbatimObservation.Site;
@@ -372,6 +367,7 @@ public class ArtportalenObservationFactory : ObservationFactoryBase, IObservatio
                 obs.Location.Parish = CastToArea(site.Parish!);
                 obs.Location.Province = CastToArea(site.Province!);
                 obs.Location.Type = site.HasGeometry ? LocationType.Polygon : LocationType.Point;
+                isInEconomicZoneOfSweden = site.BirdValidationAreaIds.Any(bva => bva.Equals("100"));
 
                 AddPositionData(
                     obs.Location,
@@ -384,6 +380,13 @@ public class ArtportalenObservationFactory : ObservationFactoryBase, IObservatio
                     taxon?.Attributes?.DisturbanceRadius
                 );
             }
+            
+            obs.Location.IsInEconomicZoneOfSweden = isInEconomicZoneOfSweden;
+            obs.Location.IsInZoneOfSOS = hasPosition;
+            obs.Location.MaximumDepthInMeters = verbatimObservation.MaxDepth;
+            obs.Location.MaximumElevationInMeters = verbatimObservation.MaxHeight;
+            obs.Location.MinimumDepthInMeters = verbatimObservation.MinDepth;
+            obs.Location.MinimumElevationInMeters = verbatimObservation.MinHeight;
             obs.Location.VerbatimLocality = obs.Location.Locality.Clean();
 
             // Occurrence
