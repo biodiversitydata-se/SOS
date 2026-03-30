@@ -199,9 +199,7 @@ public class ProcessObservationsJobFull : ProcessObservationsJobBase, IProcessOb
         
 
         var validationTasks = new[]
-        {
-            _processedObservationRepository.ValidateProtectionLevelAsync(false),
-            _processedObservationRepository.ValidateProtectionLevelAsync(true),
+        {            
             ValidateDuplicatesAsync(),
             ValidateRandomObservationsAsync(),
             ValidateRandomObservationsAsync(),
