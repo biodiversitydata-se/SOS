@@ -271,14 +271,7 @@ public interface IProcessedObservationCoreRepository : IProcessRepositoryBase<Ob
     /// <summary>
     /// Unique name of protected index 
     /// </summary>
-    string UniqueProtectedIndexName { get; }
-
-    /// <summary>
-    ///  Make sure no protected observations are in public index or no public observations are in protected index
-    /// </summary>
-    /// <param name="protectedIndex"></param>
-    /// <returns></returns>
-    Task<bool> ValidateProtectionLevelAsync(bool protectedIndex);
+    string UniqueProtectedIndexName { get; }    
 
     /// <summary>
     /// Verify that collection exists

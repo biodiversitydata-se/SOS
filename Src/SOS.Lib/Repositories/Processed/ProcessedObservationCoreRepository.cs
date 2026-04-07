@@ -2460,52 +2460,7 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
     public string UniquePublicIndexName => IndexHelper.GetIndexName<Observation>(IndexPrefix, true, LiveMode ? ActiveInstance : InActiveInstance, false);
 
     /// <inheritdoc />
-    public string UniqueProtectedIndexName => IndexHelper.GetIndexName<Observation>(IndexPrefix, true, LiveMode ? ActiveInstance : InActiveInstance, true);
-
-    /// <inheritdoc />
-    public async Task<bool> ValidateProtectionLevelAsync(bool protectedIndex)
-    {
-        try
-        {
-            var countResponse = protectedIndex ?
-                await Client.CountAsync<Observation>(ProtectedIndexName, s => s
-                    .Query(q => q
-                        .Bool(b => b
-                            .MustNot(mn => mn.Term(t => t
-                                .Field(f => f.DiffusionStatus).Value(FieldValue.Long((long)DiffusionStatus.NotDiffused)))
-                            )
-                        )
-                    )
-                )
-                :
-                await Client.CountAsync<Observation>(PublicIndexName, s => s
-                .Query(q => q
-                    .Bool(b => b
-                        .Filter(f => f
-                            .Term(t => t
-                                .Field(f => f.AccessRights.Id).Value((int)AccessRightsId.NotForPublicUsage)
-                            ), f => f
-                            .Term(t => t
-                                .Field(f => f.DiffusionStatus).Value(FieldValue.Long((long)DiffusionStatus.NotDiffused)))
-                            )
-                        )
-                    )
-                );
-
-            countResponse.ThrowIfInvalid();
-
-            if (!countResponse.Count.Equals(0))
-            {
-                Logger.LogError($"Failed to validate protection level for Index: {(protectedIndex ? ProtectedIndexName : PublicIndexName)}, count of observations with protection:{protectedIndex} = {countResponse.Count}, should be 0");
-            }
-            return countResponse.Count.Equals(0);
-        }
-        catch (Exception e)
-        {
-            Logger.LogError(e.ToString());
-            return false;
-        }
-    }
+    public string UniqueProtectedIndexName => IndexHelper.GetIndexName<Observation>(IndexPrefix, true, LiveMode ? ActiveInstance : InActiveInstance, true);    
 
     /// <inheritdoc />
     public async Task<bool> VerifyCollectionAsync(bool protectedIndex)

@@ -84,8 +84,6 @@ builder.AddProject<Projects.SOS_Hangfire_JobServer>("sos-hangfire-jobserver", co
     {
         project.ExcludeLaunchProfile = true;
     })
-    .WithHttpEndpoint()
-    .WithUrlForEndpoint("http", endpoint => { endpoint.DisplayLocation = UrlDisplayLocation.DetailsOnly; })
     .WithEnvironment("ASPNETCORE_ENVIRONMENT", env.AspNetCoreEnvironment)
     .WithEnvironment("USE_LOCAL_HANGFIRE", env.UseLocalHangfireDb.ToString())
     .WithEnvironment("EXCLUDE_PARISH_GEOMETRIES", env.excludeParishGeometries.ToString())

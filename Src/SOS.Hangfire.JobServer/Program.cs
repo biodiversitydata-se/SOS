@@ -76,15 +76,12 @@ public class Program
             var builder = CreateHostBuilder(args);
 
             var host = builder.Build();
-            host.MapDefaultEndpoints();
             HangfireJobServerContext.Host = host;
             LogStartupSettings(host.Services.GetService<ILogger<Program>>());
             LogManager.Logger = host.Services.GetService<ILogger<LogManager>>();
             LogManager.LogInformation("LogManager created");
-            host.MapGet("/", () => "Hangfire worker is running.");
 
             // Start the application
-            string aspnetCoreUrls = Environment.GetEnvironmentVariable("ASPNETCORE_URLS");
             await host.RunAsync();                
         }
     }
@@ -94,9 +91,9 @@ public class Program
     /// </summary>
     /// <param name="args"></param>
     /// <returns></returns>
-    private static WebApplicationBuilder CreateHostBuilder(string[] args)
+    private static HostApplicationBuilder CreateHostBuilder(string[] args)
     {
-        WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+        HostApplicationBuilder builder = Host.CreateApplicationBuilder(args);
         builder.AddServiceDefaults();
         
         string env = args?.Any() ?? false
@@ -218,7 +215,7 @@ public class Program
 
         services.AddDependencyInjectionServices(configuration, _excludeParishGeometries);
 
-        builder.Host.UseNLog();
+        builder.UseNLog();
         return builder;
     }
 
