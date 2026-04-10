@@ -12,12 +12,9 @@ using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Processed.DataStewardship.Dataset;
 using SOS.Lib.Models.Search.Filters;
+using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Repositories.Processed.Interfaces;
-using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace SOS.Lib.Repositories.Processed;
 
@@ -46,11 +43,12 @@ public class DatasetRepository : ProcessRepositoryBase<Dataset, string>,
                     .KeywordVal(kwlc => kwlc.Id, IndexSetting.None)
                     .KeywordVal(kwlc => kwlc.Identifier)
                     .KeywordVal(kwlc => kwlc.DataStewardship)
-                    .KeywordVal(kwlc => kwlc.Title, IndexSetting.None)
+                    .KeywordVal(kwlc => kwlc.Title, IndexSetting.SearchOnly)
                     .KeywordVal(kwlc => kwlc.ProgrammeArea, IndexSetting.None)
                     .KeywordVal(kwlc => kwlc.DescriptionAccessRights, IndexSetting.None)
                     .KeywordVal(kwlc => kwlc.License, IndexSetting.None)
                     .KeywordVal(kwlc => kwlc.Description, IndexSetting.None)
+                    .KeywordVal(kwlc => kwlc.Purpose, IndexSetting.SearchOnly)
                     .KeywordVal(kwlc => kwlc.Spatial, IndexSetting.None)
                     .KeywordVal(kwlc => kwlc.Language, IndexSetting.None)
                     .KeywordVal(kwlc => kwlc.Metadatalanguage, IndexSetting.None)
@@ -75,7 +73,7 @@ public class DatasetRepository : ProcessRepositoryBase<Dataset, string>,
                     )
                     .Object(o => o.OwnerinstitutionCode, p => p
                         .Properties(ps => ps
-                            .KeywordVal(kwlc => kwlc.OwnerinstitutionCode.OrganisationCode, IndexSetting.None)
+                            .KeywordVal(kwlc => kwlc.OwnerinstitutionCode.OrganisationCode, IndexSetting.SearchOnly)
                             .KeywordVal(kwlc => kwlc.OwnerinstitutionCode.OrganisationID, IndexSetting.None)
                         )
                     )
@@ -90,6 +88,40 @@ public class DatasetRepository : ProcessRepositoryBase<Dataset, string>,
         );
 
         return createIndexResponse.Acknowledged && createIndexResponse.IsValidResponse ? true : throw new Exception($"Failed to create Dataset index. Error: {createIndexResponse.DebugInformation}");
+    }
+
+    public async Task<PagedResult<Dataset>> GetDatasetsByFilterAsync(string filter, int skip, int take, IEnumerable<string> excludeFields = null, IEnumerable<SortOrderFilter> sortOrders = null)
+    {
+        var sortDescriptor = await Client.GetSortDescriptorAsync<Dataset, Dataset>(IndexName, sortOrders);
+        var queries = new List<Action<QueryDescriptor<Dataset>>>();
+        queries.TryAddWildcardCriteria("title", filter);
+        queries.TryAddWildcardCriteria("purpose", filter);
+        queries.TryAddWildcardCriteria("ownerinstitutionCode.organisationCode", filter);
+
+        var searchResponse = await Client.SearchAsync<Dataset>(s => s
+            .Index(IndexName)
+            .Query(q => q
+                .Bool(b => b
+                    .Should(queries.ToArray())
+                )
+            )
+            .Source((Includes: Array.Empty<string>(), Excludes: excludeFields).ToProjection())
+            .From(skip)
+            .Size(take)
+            .Sort(sortDescriptor?.ToArray())
+            .TrackTotalHits(new TrackHits(false))
+        );
+
+        if (!searchResponse.IsValidResponse) throw new InvalidOperationException(searchResponse.DebugInformation);
+        var totalCount = searchResponse.Total;
+        var datasets = searchResponse.Documents.ToList();
+        return new PagedResult<Dataset>
+        {
+            Records = searchResponse.Documents,
+            Skip = skip,
+            Take = take,
+            TotalCount = totalCount
+        };
     }
 
     public async Task<List<Dataset>> GetDatasetsByIds(IEnumerable<string> ids, IEnumerable<string> excludeFields = null, IEnumerable<SortOrderFilter> sortOrders = null)

@@ -22,6 +22,15 @@ public interface IDataStewardshipManager
     /// <param name="skip"></param>
     /// <param name="take"></param>
     /// <returns></returns>
+    Task<PagedResultDto<DsDatasetDto>> GetDatasetsByFilterAsync(string filter, int skip, int take);
+
+    /// <summary>
+    /// Search for datasets
+    /// </summary>
+    /// <param name="filter"></param>
+    /// <param name="skip"></param>
+    /// <param name="take"></param>
+    /// <returns></returns>
     Task<PagedResultDto<DsDatasetDto>> GetDatasetsBySearchAsync(SearchFilter filter, int skip, int take);
 
     /// <summary>

@@ -1,8 +1,10 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using DnsClient.Protocol;
+using Microsoft.Extensions.Logging;
 using SOS.Lib.Enums;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Filters;
+using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Observations.Api.Managers.Interfaces;
@@ -252,6 +254,28 @@ public class DataStewardshipManager : IDataStewardshipManager
         var dataset = observationDataset.FirstOrDefault().ToDto();
 
         return dataset;
+    }
+
+    public async Task<PagedResultDto<DsDatasetDto>> GetDatasetsByFilterAsync(string filter, int skip, int take)
+    {
+        var sortOrders = new List<SortOrderFilter>
+        {
+            new SortOrderFilter { SortBy = "identifier", SortOrder = SearchSortOrder.Asc }
+        };
+
+        var observationDatasets = await _observationDatasetRepository.GetDatasetsByFilterAsync(
+            filter,
+            skip,
+            take,
+            sortOrders: sortOrders);
+
+        return new PagedResultDto<DsDatasetDto>()
+        {
+            Skip = observationDatasets.Skip,
+            Take = observationDatasets.Take,
+            TotalCount = observationDatasets.TotalCount,
+            Records = observationDatasets.Records?.Select(m => m.ToDto())
+        };
     }
 
     public async Task<PagedResultDto<DsDatasetDto>> GetDatasetsBySearchAsync(SearchFilter filter, int skip, int take)

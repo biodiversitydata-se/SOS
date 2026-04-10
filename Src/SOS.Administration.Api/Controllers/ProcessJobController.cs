@@ -1,15 +1,8 @@
 ﻿using CSharpFunctionalExtensions;
 using Hangfire;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using SOS.Administration.Api.Controllers.Interfaces;
 using SOS.Lib.Helpers;
 using SOS.Lib.Jobs.Process;
-using SOS.Lib.Managers.Interfaces;
-using System;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
 
 namespace SOS.Administration.Api.Controllers;
 
