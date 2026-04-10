@@ -48,7 +48,7 @@ public class DatasetRepository : ProcessRepositoryBase<Dataset, string>,
                     .KeywordVal(kwlc => kwlc.DescriptionAccessRights, IndexSetting.None)
                     .KeywordVal(kwlc => kwlc.License, IndexSetting.None)
                     .KeywordVal(kwlc => kwlc.Description, IndexSetting.None)
-                    .KeywordVal(kwlc => kwlc.Purpose, IndexSetting.SearchOnly)
+                    //.KeywordVal(kwlc => kwlc.Purpose, IndexSetting.None)
                     .KeywordVal(kwlc => kwlc.Spatial, IndexSetting.None)
                     .KeywordVal(kwlc => kwlc.Language, IndexSetting.None)
                     .KeywordVal(kwlc => kwlc.Metadatalanguage, IndexSetting.None)
@@ -95,7 +95,6 @@ public class DatasetRepository : ProcessRepositoryBase<Dataset, string>,
         var sortDescriptor = await Client.GetSortDescriptorAsync<Dataset, Dataset>(IndexName, sortOrders);
         var queries = new List<Action<QueryDescriptor<Dataset>>>();
         queries.TryAddWildcardCriteria("title", filter);
-        queries.TryAddWildcardCriteria("purpose", filter);
         queries.TryAddWildcardCriteria("ownerinstitutionCode.organisationCode", filter);
 
         var searchResponse = await Client.SearchAsync<Dataset>(s => s
@@ -105,11 +104,10 @@ public class DatasetRepository : ProcessRepositoryBase<Dataset, string>,
                     .Should(queries.ToArray())
                 )
             )
-            .Source((Includes: Array.Empty<string>(), Excludes: excludeFields).ToProjection())
+            //.Source((Includes: Array.Empty<string>(), Excludes: excludeFields).ToProjection())
             .From(skip)
             .Size(take)
             .Sort(sortDescriptor?.ToArray())
-            .TrackTotalHits(new TrackHits(false))
         );
 
         if (!searchResponse.IsValidResponse) throw new InvalidOperationException(searchResponse.DebugInformation);
