@@ -1972,6 +1972,7 @@ public class ObservationsController : ControllerBase
 
         try
         {
+            var bbox = filter?.Geographics?.BoundingBox?.ToLatLonBoundingBox();
             LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
 
             // Log cache key in order to be able to decide if cache is needed
@@ -2018,7 +2019,11 @@ public class ObservationsController : ControllerBase
             List<(Lib.Models.Shared.Area area, Geometry geometry)>? geographicAreas = null;
             var searchFilter = filter.ToSearchFilterInternal(this.GetUserId(), translationCultureCode, sortBy, sortOrder);
             (long Count, LatLonBoundingBox? Extent) countAndExtentResult = await _observationManager.GetCountAndExtentAsync(roleId, authorizationApplicationIdentifier, searchFilter);
-            var bbox = returnInputBBox && filter?.Geographics?.BoundingBox != null ? filter.Geographics.BoundingBox.ToLatLonBoundingBox() : countAndExtentResult.Extent;
+            
+            if (!returnInputBBox || bbox == null)
+            {
+                bbox = countAndExtentResult.Extent;
+            }
             if (countAndExtentResult.Count > observationsLimit)
             {                
                 // Calculate grids and return GeoJSON

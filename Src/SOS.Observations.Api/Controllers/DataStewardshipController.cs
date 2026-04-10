@@ -169,6 +169,58 @@ public class DataStewardshipController : ControllerBase
     }
 
     /// <summary>
+    /// Search for datasets
+    /// </summary>
+    /// <param name="roleId">Limit user authorization too specified role.</param>
+    /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
+    /// <param name="filter">The search filter.</param>
+    /// <param name="skip">Pagination start index.</param>
+    /// <param name="take">Number of items to return.</param>
+    /// <param name="exportMode">The export mode.</param>
+    /// <returns></returns>
+    [HttpGet("datasets")]
+    [ProducesResponseType(typeof(PagedResultDto<DsDatasetDto>), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.NoContent)]
+    [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+    [ProducesResponseType((int)HttpStatusCode.ServiceUnavailable)]
+    public async Task<IActionResult> GetDatasetsByFilterAsync(
+        [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
+        [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
+        [FromQuery] string filter,
+        [FromQuery] int skip = 0,
+        [FromQuery] int take = 100,
+        [FromQuery] DsExportMode exportMode = DsExportMode.Json
+    )
+    {
+        try
+        {
+            LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
+            
+            var result = await _dataStewardshipManager.GetDatasetsByFilterAsync(filter, skip, take);
+
+            return exportMode.Equals(DsExportMode.Csv) ?
+                File(result.Records.ToCsv(), "text/tab-separated-values", "dataset.csv") :
+                new OkObjectResult(result);
+        }
+        catch (AuthenticationRequiredException e)
+        {
+            _logger.LogInformation(e, e.Message);
+            _logger.LogInformation($"Unauthorized. X-Authorization-Application-Identifier={authorizationApplicationIdentifier ?? "[null]"}");
+            _logger.LogInformation($"Unauthorized. X-Authorization-Role-Id={roleId?.ToString() ?? "[null]"}");
+            return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
+        }
+        catch (TimeoutException)
+        {
+            return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, $"Dataset search failed");
+            return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+        }
+    }
+
+    /// <summary>
     /// Get a single event by id.
     /// </summary>
     /// <param name="roleId">Limit user authorization too specified role.</param>
