@@ -367,7 +367,7 @@ public class ArtportalenObservationFactory : ObservationFactoryBase, IObservatio
                 obs.Location.Parish = CastToArea(site.Parish!);
                 obs.Location.Province = CastToArea(site.Province!);
                 obs.Location.Type = site.HasGeometry ? LocationType.Polygon : LocationType.Point;
-                isInEconomicZoneOfSweden = site.BirdValidationAreaIds.Any(bva => bva.Equals("100"));
+                isInEconomicZoneOfSweden = site.BirdValidationAreaIds?.Any(bva => bva.Equals("100")) ?? false;
 
                 AddPositionData(
                     obs.Location,
@@ -387,7 +387,7 @@ public class ArtportalenObservationFactory : ObservationFactoryBase, IObservatio
             obs.Location.MaximumElevationInMeters = verbatimObservation.MaxHeight;
             obs.Location.MinimumDepthInMeters = verbatimObservation.MinDepth;
             obs.Location.MinimumElevationInMeters = verbatimObservation.MinHeight;
-            obs.Location.VerbatimLocality = obs.Location.Locality.Clean();
+            obs.Location.VerbatimLocality = obs.Location?.Locality?.Clean();
 
             // Occurrence
             obs.Occurrence = new Occurrence();
