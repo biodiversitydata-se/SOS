@@ -75,8 +75,8 @@ public class TaxonService : ITaxonService
                 "Taxon.csv",
                 "TaxonNameProperties.csv",
                 "TaxonRelations.csv",
-                "TaxonProperties.csv",
-                "TaxonCountyOccurrence.csv"}
+                "TaxonProperties.csv"/*,
+                "TaxonCountyOccurrence.csv"*/}
             .Where(f => !zipArchive.Entries.Select(e => e.Name).Contains(f, StringComparer.CurrentCultureIgnoreCase))
             .Select(f => f);
 
@@ -91,7 +91,7 @@ public class TaxonService : ITaxonService
             AddNames(taxa, zipArchive, csvFieldDelimiter);
             AddTaxonRelations(taxa, zipArchive, csvFieldDelimiter);
             AddTaxonProperties(taxa, zipArchive, csvFieldDelimiter);
-            AddCountyOccurrence(taxa, zipArchive, csvFieldDelimiter);
+           // AddCountyOccurrence(taxa, zipArchive, csvFieldDelimiter);
             return taxa.Values;
         }
         catch (Exception e)
