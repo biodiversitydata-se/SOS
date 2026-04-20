@@ -3,7 +3,6 @@ using Hangfire.Mongo;
 using Hangfire.Mongo.Migration.Strategies;
 using Hangfire.Mongo.Migration.Strategies.Backup;
 using MassTransit;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,12 +21,8 @@ using SOS.Lib.Configuration.Process;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Context;
 using SOS.Lib.Managers;
-using System;
 using System.Globalization;
-using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace SOS.Hangfire.JobServer;
 
@@ -36,9 +31,7 @@ namespace SOS.Hangfire.JobServer;
 /// </summary>
 public class Program
 {
-    private static string _env;
-    private static ApiManagementServiceConfiguration _apiManagementServiceConfiguration;
-    private static CryptoConfiguration _cryptoConfiguration;        
+    private static string _env;      
     private static MongoDbConfiguration _verbatimDbConfiguration;
     private static MongoDbConfiguration _processDbConfiguration;
     private static ElasticSearchConfiguration _searchDbConfiguration;
@@ -47,9 +40,6 @@ public class Program
     private static ExportConfiguration _exportConfiguration;
     private static BlobStorageConfiguration _blobStorageConfiguration;
     private static DataCiteServiceConfiguration _dataCiteServiceConfiguration;
-    private static ApplicationInsightsConfiguration _applicationInsightsConfiguration;
-    private static SosApiConfiguration _sosApiConfiguration;
-    private static UserServiceConfiguration _userServiceConfiguration;
     private static AreaConfiguration _areaConfiguration;
     private static HangfireDbConfiguration _hangfireDbConfiguration;
     private static bool _useLocalHangfire;
@@ -118,8 +108,6 @@ public class Program
         var services = builder.Services;
 
         ConfigurationManager configuration = builder.Configuration;
-        _apiManagementServiceConfiguration = configuration.GetSection("ApiManagementServiceConfiguration").Get<ApiManagementServiceConfiguration>();
-        _cryptoConfiguration = configuration.GetSection("CryptoConfiguration").Get<CryptoConfiguration>();
         _verbatimDbConfiguration = configuration.GetSection("VerbatimDbConfiguration").Get<MongoDbConfiguration>();
         _processDbConfiguration = configuration.GetSection("ProcessDbConfiguration").Get<MongoDbConfiguration>();
         _searchDbConfiguration = configuration.GetSection("SearchDbConfiguration").Get<ElasticSearchConfiguration>();
@@ -128,9 +116,6 @@ public class Program
         _exportConfiguration = configuration.GetSection(nameof(ExportConfiguration)).Get<ExportConfiguration>();
         _blobStorageConfiguration = configuration.GetSection(nameof(BlobStorageConfiguration)).Get<BlobStorageConfiguration>();
         _dataCiteServiceConfiguration = configuration.GetSection(nameof(DataCiteServiceConfiguration)).Get<DataCiteServiceConfiguration>();
-        _applicationInsightsConfiguration = configuration.GetSection(nameof(ApplicationInsightsConfiguration)).Get<ApplicationInsightsConfiguration>();
-        _sosApiConfiguration = configuration.GetSection(nameof(SosApiConfiguration)).Get<SosApiConfiguration>();
-        _userServiceConfiguration = configuration.GetSection(nameof(UserServiceConfiguration)).Get<UserServiceConfiguration>();
         _areaConfiguration = configuration.GetSection(nameof(AreaConfiguration)).Get<AreaConfiguration>();
         _hangfireDbConnectionString = builder.Configuration.GetConnectionString("hangfire-mongodb");
         var hangfireDbConfig = configuration.GetSection("HangfireDbConfiguration").Get<HangfireDbConfiguration>();
