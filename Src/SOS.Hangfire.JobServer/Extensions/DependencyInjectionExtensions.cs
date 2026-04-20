@@ -419,11 +419,11 @@ public static class DependencyInjectionExtensions
             services.AddScoped<IArtportalenDatasetMetadataHarvestJob, ArtportalenDatasetMetadataHarvestJob>();
 
             // Add Application Insights
-            if (!string.IsNullOrEmpty(applicationInsightsConfiguration?.InstrumentationKey))
+            if (!string.IsNullOrEmpty(applicationInsightsConfiguration?.InstrumentationKey) && !string.IsNullOrEmpty(applicationInsightsConfiguration?.ApplicationId))
             {
-                services.AddApplicationInsightsTelemetry(options =>
+                services.AddApplicationInsightsTelemetryWorkerService(options =>
                 {
-                    options.ConnectionString = $"InstrumentationKey={applicationInsightsConfiguration.InstrumentationKey}";
+                    options.ConnectionString = $"InstrumentationKey={applicationInsightsConfiguration.InstrumentationKey};IngestionEndpoint=https://northeurope-5.in.applicationinsights.azure.com/;LiveEndpoint=https://northeurope.livediagnostics.monitor.azure.com/;ApplicationId={applicationInsightsConfiguration.ApplicationId}";
                 });
             }
             else
