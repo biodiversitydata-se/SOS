@@ -30,8 +30,7 @@ namespace SOS.Hangfire.JobServer;
 ///     Program class
 /// </summary>
 public class Program
-{
-    private static string _env;      
+{  
     private static MongoDbConfiguration _verbatimDbConfiguration;
     private static MongoDbConfiguration _processDbConfiguration;
     private static ElasticSearchConfiguration _searchDbConfiguration;
@@ -53,15 +52,15 @@ public class Program
     /// <returns></returns>
     public static async Task Main(string[] args)
     {
-        _env = args?.Any() ?? false
+        var env = args?.Any() ?? false
             ? args[0].ToLower()
             : Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")?.ToLower();
         _useLocalHangfire = GetEnvironmentBool(environmentVariable: "USE_LOCAL_HANGFIRE");
         _excludeParishGeometries = GetEnvironmentBool(environmentVariable: "EXCLUDE_PARISH_GEOMETRIES");
-        Console.WriteLine("Starting up in environment:" + _env);
+        Console.WriteLine("Starting up in environment:" + env);
 
 
-        if (new[] { "local", "dev", "st", "prod", "at" }.Contains(_env, StringComparer.InvariantCultureIgnoreCase))
+        if (new[] { "local", "dev", "st", "prod", "at" }.Contains(env, StringComparer.InvariantCultureIgnoreCase))
         {
             var builder = CreateHostBuilder(args);
 

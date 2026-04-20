@@ -44,6 +44,7 @@ try
     var configurationRoot = BuildConfiguration(builder, isDevelopment);
     Settings.Init(configurationRoot);
 
+    Log.Logger.Information("Starting Configure Services");
     // Register services
     await ConfigureServicesAsync(
         builder,
@@ -51,14 +52,24 @@ try
         isDevelopment,
         disableHangfireInit,
         useLocalHangfire);
+    Log.Logger.Information("Finsih Configure Services");
 
+    Log.Logger.Information("Starting Build");
     // Build app and configure middleware pipeline
     var app = builder.Build();
+    Log.Logger.Information("Finish Build");
+
+    Log.Logger.Information("Start Mapping default endpoints");
     app.MapDefaultEndpoints();
+    Log.Logger.Information("Finsih Mapping default endpoints");
+
+    Log.Logger.Information("Start Configuring Middleware");
     ConfigureMiddleware(app, isDevelopment, disableHangfireInit);
+    Log.Logger.Information("Finsih Configuring Middleware");
 
     // Start the application    
     string aspnetCoreUrls = Environment.GetEnvironmentVariable("ASPNETCORE_URLS");
+    Log.Logger.Information($"Starting Application ({aspnetCoreUrls})");
     await app.RunAsync(aspnetCoreUrls ?? "http://*:5005");
 }
 catch (Exception ex)

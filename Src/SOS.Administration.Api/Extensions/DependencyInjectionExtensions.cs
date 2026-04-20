@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
-using SOS.Administration.Api.Managers;
+﻿using SOS.Administration.Api.Managers;
 using SOS.Administration.Api.Managers.Interfaces;
 using SOS.Harvest.Factories.Vocabularies;
 using SOS.Harvest.Harvesters;
