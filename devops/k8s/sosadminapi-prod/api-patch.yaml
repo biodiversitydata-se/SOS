@@ -52,8 +52,7 @@ spec:
                   }, 
                   "TaxonServiceConfiguration": {
                       "BaseAddress": "https://taxonservice.artdata.slu.se/DarwinCore/DarwinCoreArchiveFile?version=custom", 
-                      "AcceptHeaderContentType": "application/text", 
-                      "TaxonApiAddress": "https://taxonapi.artdata.slu.se/darwincore/download?version=custom"
+                      "AcceptHeaderContentType": "application/text"
                   }
               }
         - name: RedisConfiguration

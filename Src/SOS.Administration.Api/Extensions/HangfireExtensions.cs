@@ -40,8 +40,8 @@ public static class HangfireExtensions
                             QueuePollInterval = TimeSpan.FromSeconds(10), // Deafault 15
                             MigrationOptions =
                             {
-                                MigrationStrategy = new ThrowMongoMigrationStrategy(),
-                                BackupStrategy = new NoneMongoBackupStrategy()
+                                MigrationStrategy = new MigrateMongoMigrationStrategy(),
+                                BackupStrategy = new CollectionMongoBackupStrategy()
                             },                            
                             Prefix = "hangfire",
                             CheckConnection = true
