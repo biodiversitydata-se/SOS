@@ -34,12 +34,9 @@ public class DarwinCoreArchiveTests : TestBase
 
         // Act
         var response = await apiClient.PostAsync($"/exports/download/dwc?eventbased=true", JsonContent.Create(searchFilter));
-        using var contentStream = await response.Content.ReadAsStreamAsync();
-        var filePath = Path.GetTempFileName();
-        using (var fileStream = File.Create(filePath))
-        {
-            await contentStream.CopyToAsync(fileStream);
-        }
+        var fileBytes = await response.Content.ReadAsByteArrayAsync();
+        var filePath = Path.Combine(Path.GetTempPath(), $"dwca-{Guid.NewGuid()}.zip");
+        await File.WriteAllBytesAsync(filePath, fileBytes);
         var parsedDwcaFile = await DwcaHelper.ReadDwcaFileAsync(filePath, dataProvider);
 
         // Assert
