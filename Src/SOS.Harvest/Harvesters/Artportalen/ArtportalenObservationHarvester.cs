@@ -424,6 +424,7 @@ public class ArtportalenObservationHarvester : ObservationHarvesterBase<Artporta
         JobRunModes mode,
         DateTime? fromDate, IJobCancellationToken cancellationToken)
     {
+        
         var runStatus = RunStatus.Success;
         var harvestCount = 0;
         var dataLastModified = (DateTime?)null;

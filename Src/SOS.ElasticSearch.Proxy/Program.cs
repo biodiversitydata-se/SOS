@@ -5,6 +5,7 @@ using MongoDB.Bson.Serialization.Conventions;
 using Serilog;
 using SOS.ElasticSearch.Proxy.Extensions;
 using SOS.ElasticSearch.Proxy.Middleware;
+using SOS.Lib.Helpers;
 using System.Globalization;
 using System.Text.Json.Serialization;
 
@@ -14,14 +15,14 @@ try
 {
     var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
     bool isLocalDevelopment = new[] { "local", "k8s" }.Contains(env?.ToLower(), StringComparer.CurrentCultureIgnoreCase);
-    bool isDevelopment = new[] { "local", "dev", "st" }.Contains(env?.ToLower(), StringComparer.CurrentCultureIgnoreCase);    
+    bool isDevelopment = new[] { "local", "dev", "st" }.Contains(env?.ToLower(), StringComparer.CurrentCultureIgnoreCase);
 
     // Setup logging
-    SerilogExtensions.SetupSerilog(isDevelopment);
+    Log.Logger = SeriLogHelper.CreateLogger(isDevelopment);
     Log.Logger.Information("Starting Service");
 
     var builder = WebApplication.CreateBuilder(args);
-    builder.Host.UseSerilog(Log.Logger);
+    SeriLogHelper.ConfigureSerilog(builder, "proxy.api", isDevelopment);
 
     // Set Swedish culture globally
     SetCulture("sv-SE");
@@ -38,6 +39,7 @@ try
 
     // Build app and configure middleware pipeline
     var app = builder.Build();
+    
     ConfigureMiddleware(app, isDevelopment);
 
     // Start the application
@@ -106,6 +108,8 @@ static void ConfigureMiddleware(WebApplication app, bool isDevelopment)
     else
         app.UseHsts();
 
+    app.ApplyUseSerilogRequestLogging();
+
     if (!app.Environment.IsEnvironment("prod"))
     {
         var telemetryConfig = app.Services.GetRequiredService<TelemetryConfiguration>();
@@ -131,5 +135,4 @@ static void ConfigureMiddleware(WebApplication app, bool isDevelopment)
     );
 
     app.UseMiddleware<RequestMiddleware>();
-    app.ApplyUseSerilogRequestLogging();       
 }

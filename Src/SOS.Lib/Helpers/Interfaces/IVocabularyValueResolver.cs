@@ -25,7 +25,8 @@ public interface IVocabularyValueResolver
     /// <param name="processedObservations"></param>
     /// <param name="cultureCode"></param>
     /// <param name="forceResolve">Ignore configuration setting, that can prevent resolve, and force resolve of values.</param>
-    void ResolveVocabularyMappedValues(IEnumerable<Observation> processedObservations, string cultureCode, bool forceResolve = false);
+    /// <param name="skipTaxonResolve">Skip resolve taxon values. This can be useful when using shared taxon.</param>
+    void ResolveVocabularyMappedValues(IEnumerable<Observation> processedObservations, string cultureCode, bool forceResolve = false, bool skipTaxonResolve = false);
 
     /// <summary>
     ///     Resolve vocabulary mapped values.

@@ -80,7 +80,7 @@ public class iNaturalistObservationFactory : ObservationFactoryBase, IObservatio
                 return null;
             }  
 
-        var accessRights = VocabularyValue.Create((int)AccessRightsId.FreeUsage);
+        var accessRights = GetSosId(verbatim.License_code, VocabularyById[VocabularyId.AccessRights]);
         var obs = new Observation
         {
             MongoDbId = verbatim.Id,
@@ -98,7 +98,9 @@ public class iNaturalistObservationFactory : ObservationFactoryBase, IObservatio
         obs.OwnerInstitutionCode = "iNaturalist";            
         if (verbatim.Obscured.GetValueOrDefault() == true)
         {
-            obs.DataGeneralizations = "The coordinates have been obfuscated to protect sensitive information";                
+            obs.DataGeneralizations = "The coordinates have been obfuscated to protect sensitive information";
+            obs.DiffusionStatus = DiffusionStatus.DiffusedByProvider;
+            obs.IsGeneralized = true;
         }
 
         // Event
@@ -144,7 +146,7 @@ public class iNaturalistObservationFactory : ObservationFactoryBase, IObservatio
         PopulateGenericData(obs);
         obs.Occurrence.BirdNestActivityId = GetBirdNestActivityId(obs.Occurrence.Activity, obs.Taxon);
         CalculateOrganismQuantity(obs);            
-        //obs.AccessRights = GetAccessRightsFromSensitivityCategory(obs.Occurrence.SensitivityCategory);
+        obs.AccessRights = GetAccessRightsFromSensitivityCategory(obs.Occurrence.SensitivityCategory);
         return obs;
     }
 

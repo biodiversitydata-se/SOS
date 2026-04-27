@@ -3,8 +3,6 @@ using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.ResponseCompression;
 using MongoDB.Bson.Serialization.Conventions;
 using Serilog;
-using Serilog.Filters;
-using Serilog.Formatting.Compact;
 using SOS.Analysis.Api.Extensions;
 using SOS.Analysis.Api.Middleware;
 using SOS.Lib.Extensions;
@@ -27,14 +25,13 @@ try
     bool useLocalHangfire = Environment.GetEnvironmentVariable("USE_LOCAL_HANGFIRE").GetBoolean();
 
     // Setup logging
-    SerilogExtensions.SetupSerilog(isDevelopment);
+    Log.Logger = SeriLogHelper.CreateLogger(isDevelopment);
     Log.Logger.Information("Starting Service");
 
     var builder = WebApplication.CreateBuilder(args);
-    //builder.Host.UseSerilog(Log.Logger);
+    SeriLogHelper.ConfigureSerilog(builder, "analysis.api", isDevelopment);
     builder.AddServiceDefaults();
-    SeriLogHelper.ConfigureSerilog(builder);
-
+    
     // Set Swedish culture globally
     SetCulture("sv-SE");
 
@@ -55,6 +52,7 @@ try
 
     // Build app and configure middleware pipeline
     var app = builder.Build();
+
     // Add security headers early in the pipeline
     app.UseSecurityHeaders(includeHsts: !isLocalDevelopment);
     app.MapDefaultEndpoints();
@@ -166,6 +164,7 @@ static void ConfigureServices(
 
 static void ConfigureMiddleware(WebApplication app, bool isDevelopment, bool disableHangfireInit)
 {
+    app.ApplyUseSerilogRequestLogging();
     app.ApplyUseExceptionHandler();
     if (Settings.AnalysisConfiguration.EnableResponseCompression)
         app.UseResponseCompression();
@@ -192,8 +191,7 @@ static void ConfigureMiddleware(WebApplication app, bool isDevelopment, bool dis
         app.UseMiddleware<StoreRequestBodyMiddleware>();
     }    
     app.UseAuthentication();
-    app.UseAuthorization();
-    app.ApplyUseSerilogRequestLogging();        
+    app.UseAuthorization();   
     //app.PreventSwaggerCaching();
     app.UseSwagger();
     app.ApplyUseSwaggerUI();

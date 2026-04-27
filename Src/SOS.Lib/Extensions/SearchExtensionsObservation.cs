@@ -345,6 +345,7 @@ public static class SearchExtensionsObservation
             if (filter != null)
             {
                 queries.TryAddTermsCriteria("dataStewardship.datasetIdentifier", filter.DatasetIdentifiers);
+                queries.TryAddWildcardCriteria("dataStewardship.datasetTitle", filter.DatasetTitleFilter);
             }
         }
 

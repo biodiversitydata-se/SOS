@@ -46,6 +46,9 @@ public class GeneralizationResolver : Interfaces.IGeneralizationResolver
 
             List<JsonNode> generalizedObservations = GetGeneralizedObservations(observations);
             var generalizedOccurrenceIds = GetOccurrenceIds(generalizedObservations);
+            if (generalizedOccurrenceIds == null || generalizedOccurrenceIds.Count == 0) 
+                return;
+
             var protectedFilter = filter.Clone();
             protectedFilter.ExtendedAuthorization.ProtectionFilter = ProtectionFilter.Sensitive;
             protectedFilter.IncludeSensitiveGeneralizedObservations = true;
@@ -84,10 +87,13 @@ public class GeneralizationResolver : Interfaces.IGeneralizationResolver
                 return;
             }
 
+            // Only include Artportalen observations. This is the only dataset that currently supports looking up exact coordinates for generalized observations.
             List<Observation> generalizedObservations = observations
-                                                           .Where(obs => obs != null && obs.IsGeneralized)
-                                                           .ToList();
+                .Where(obs => obs != null && obs.IsGeneralized && obs.Occurrence.OccurrenceId.StartsWith("urn:lsid:artportalen"))
+                .ToList();
             var generalizedOccurrenceIds = generalizedObservations.Select(obs => obs.Occurrence.OccurrenceId).ToList();
+            if (generalizedOccurrenceIds == null || generalizedOccurrenceIds.Count == 0)
+                return;
             var protectedFilter = filter.Clone();
             protectedFilter.ExtendedAuthorization.ProtectionFilter = ProtectionFilter.Sensitive;
             protectedFilter.IncludeSensitiveGeneralizedObservations = true;
@@ -242,7 +248,11 @@ public class GeneralizationResolver : Interfaces.IGeneralizationResolver
                
                 if (!string.IsNullOrEmpty(occurrenceId))
                 {
-                    occurrenceIds.Add((string)occurrenceId);
+                    // Only include Artportalen observations. This is the only dataset that currently supports looking up exact coordinates for generalized observations.
+                    if (occurrenceId.StartsWith("urn:lsid:artportalen"))
+                    {
+                        occurrenceIds.Add((string)occurrenceId);
+                    }
                 }
             }
         }

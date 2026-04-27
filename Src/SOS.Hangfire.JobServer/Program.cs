@@ -3,7 +3,6 @@ using Hangfire.Mongo;
 using Hangfire.Mongo.Migration.Strategies;
 using Hangfire.Mongo.Migration.Strategies.Backup;
 using MassTransit;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,12 +21,8 @@ using SOS.Lib.Configuration.Process;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Context;
 using SOS.Lib.Managers;
-using System;
 using System.Globalization;
-using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace SOS.Hangfire.JobServer;
 
@@ -35,10 +30,7 @@ namespace SOS.Hangfire.JobServer;
 ///     Program class
 /// </summary>
 public class Program
-{
-    private static string _env;
-    private static ApiManagementServiceConfiguration _apiManagementServiceConfiguration;
-    private static CryptoConfiguration _cryptoConfiguration;        
+{  
     private static MongoDbConfiguration _verbatimDbConfiguration;
     private static MongoDbConfiguration _processDbConfiguration;
     private static ElasticSearchConfiguration _searchDbConfiguration;
@@ -47,9 +39,6 @@ public class Program
     private static ExportConfiguration _exportConfiguration;
     private static BlobStorageConfiguration _blobStorageConfiguration;
     private static DataCiteServiceConfiguration _dataCiteServiceConfiguration;
-    private static ApplicationInsightsConfiguration _applicationInsightsConfiguration;
-    private static SosApiConfiguration _sosApiConfiguration;
-    private static UserServiceConfiguration _userServiceConfiguration;
     private static AreaConfiguration _areaConfiguration;
     private static HangfireDbConfiguration _hangfireDbConfiguration;
     private static bool _useLocalHangfire;
@@ -63,28 +52,25 @@ public class Program
     /// <returns></returns>
     public static async Task Main(string[] args)
     {
-        _env = args?.Any() ?? false
+        var env = args?.Any() ?? false
             ? args[0].ToLower()
             : Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")?.ToLower();
         _useLocalHangfire = GetEnvironmentBool(environmentVariable: "USE_LOCAL_HANGFIRE");
         _excludeParishGeometries = GetEnvironmentBool(environmentVariable: "EXCLUDE_PARISH_GEOMETRIES");
-        Console.WriteLine("Starting up in environment:" + _env);
+        Console.WriteLine("Starting up in environment:" + env);
 
 
-        if (new[] { "local", "dev", "st", "prod", "at" }.Contains(_env, StringComparer.InvariantCultureIgnoreCase))
+        if (new[] { "local", "dev", "st", "prod", "at" }.Contains(env, StringComparer.InvariantCultureIgnoreCase))
         {
             var builder = CreateHostBuilder(args);
 
             var host = builder.Build();
-            host.MapDefaultEndpoints();
             HangfireJobServerContext.Host = host;
             LogStartupSettings(host.Services.GetService<ILogger<Program>>());
             LogManager.Logger = host.Services.GetService<ILogger<LogManager>>();
             LogManager.LogInformation("LogManager created");
-            host.MapGet("/", () => "Hangfire worker is running.");
 
             // Start the application
-            string aspnetCoreUrls = Environment.GetEnvironmentVariable("ASPNETCORE_URLS");
             await host.RunAsync();                
         }
     }
@@ -94,9 +80,9 @@ public class Program
     /// </summary>
     /// <param name="args"></param>
     /// <returns></returns>
-    private static WebApplicationBuilder CreateHostBuilder(string[] args)
+    private static HostApplicationBuilder CreateHostBuilder(string[] args)
     {
-        WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+        HostApplicationBuilder builder = Host.CreateApplicationBuilder(args);
         builder.AddServiceDefaults();
         
         string env = args?.Any() ?? false
@@ -121,8 +107,6 @@ public class Program
         var services = builder.Services;
 
         ConfigurationManager configuration = builder.Configuration;
-        _apiManagementServiceConfiguration = configuration.GetSection("ApiManagementServiceConfiguration").Get<ApiManagementServiceConfiguration>();
-        _cryptoConfiguration = configuration.GetSection("CryptoConfiguration").Get<CryptoConfiguration>();
         _verbatimDbConfiguration = configuration.GetSection("VerbatimDbConfiguration").Get<MongoDbConfiguration>();
         _processDbConfiguration = configuration.GetSection("ProcessDbConfiguration").Get<MongoDbConfiguration>();
         _searchDbConfiguration = configuration.GetSection("SearchDbConfiguration").Get<ElasticSearchConfiguration>();
@@ -131,9 +115,6 @@ public class Program
         _exportConfiguration = configuration.GetSection(nameof(ExportConfiguration)).Get<ExportConfiguration>();
         _blobStorageConfiguration = configuration.GetSection(nameof(BlobStorageConfiguration)).Get<BlobStorageConfiguration>();
         _dataCiteServiceConfiguration = configuration.GetSection(nameof(DataCiteServiceConfiguration)).Get<DataCiteServiceConfiguration>();
-        _applicationInsightsConfiguration = configuration.GetSection(nameof(ApplicationInsightsConfiguration)).Get<ApplicationInsightsConfiguration>();
-        _sosApiConfiguration = configuration.GetSection(nameof(SosApiConfiguration)).Get<SosApiConfiguration>();
-        _userServiceConfiguration = configuration.GetSection(nameof(UserServiceConfiguration)).Get<UserServiceConfiguration>();
         _areaConfiguration = configuration.GetSection(nameof(AreaConfiguration)).Get<AreaConfiguration>();
         _hangfireDbConnectionString = builder.Configuration.GetConnectionString("hangfire-mongodb");
         var hangfireDbConfig = configuration.GetSection("HangfireDbConfiguration").Get<HangfireDbConfiguration>();
@@ -218,7 +199,7 @@ public class Program
 
         services.AddDependencyInjectionServices(configuration, _excludeParishGeometries);
 
-        builder.Host.UseNLog();
+        builder.UseNLog();
         return builder;
     }
 

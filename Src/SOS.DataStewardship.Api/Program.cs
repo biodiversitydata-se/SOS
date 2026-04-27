@@ -1,49 +1,26 @@
 using FluentValidation;
 using HealthChecks.UI.Client;
 using Microsoft.ApplicationInsights.Extensibility;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
-using Serilog.Filters;
-using Serilog.Formatting.Compact;
 using SOS.DataStewardship.Api.Endpoints;
 using SOS.DataStewardship.Api.Extensions;
 using SOS.Lib.Helpers;
 using System.Text.Json.Serialization;
 
-// human readable in the terminal when developing, not all json
-var localDevConfig = new LoggerConfiguration()
-        .MinimumLevel.Debug()
-        .Enrich.FromLogContext()
-        .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {SourceContext} {Message:lj} {Properties}{NewLine}{Exception}")
-    .CreateLogger();
 
-// compact json when running in the clusters for that sweet sweet structured logging
-var inClusterConfig = new LoggerConfiguration()
-        .MinimumLevel.Information()
-        .WriteTo.Console(new RenderedCompactJsonFormatter())
-        .Enrich.FromLogContext()
-        .MinimumLevel.Override("Microsoft.EntityFrameworkCore", Serilog.Events.LogEventLevel.Warning)
-        .MinimumLevel.Override("Microsoft.AspNetCore.Http.Result", Serilog.Events.LogEventLevel.Warning)
-        .MinimumLevel.Override("Microsoft.AspNetCore.Hosting.Diagnostics", Serilog.Events.LogEventLevel.Warning)
-        .MinimumLevel.Override("Microsoft.AspNetCore.Routing.EndpointMiddleware", Serilog.Events.LogEventLevel.Warning)
-        .MinimumLevel.Override("Microsoft.AspNetCore.Http.HttpResults", Serilog.Events.LogEventLevel.Warning)
-        .MinimumLevel.Override("Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware", Serilog.Events.LogEventLevel.Warning)
-        .Filter.ByExcluding(Matching.WithProperty<string>("RequestPath", p => p == "/health"))
-    .CreateLogger();
 
 var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 var isDevelopment = new[] { "local", "dev", "st" }.Contains(env, StringComparer.CurrentCultureIgnoreCase);
 
-// we set up Log.Logger here in order to be able to log if something goes wrong in the startup process
-Log.Logger = isDevelopment ? localDevConfig : inClusterConfig;
-
 try
 {
+    // we set up Log.Logger here in order to be able to log if something goes wrong in the startup process
+    Log.Logger = SeriLogHelper.CreateLogger(isDevelopment);
     Log.Information("Starting up");
     var builder = WebApplication.CreateBuilder(args);
-    builder.AddServiceDefaults();
-    SeriLogHelper.ConfigureSerilog(builder);
+    SeriLogHelper.ConfigureSerilog(builder, "datastewardship.api", isDevelopment);
     
+    builder.AddServiceDefaults();
     builder.Services.AddMemoryCache();
     builder.SetupUserSecrets();
 
@@ -75,6 +52,7 @@ try
     builder.Services.Configure<TelemetryConfiguration>(x => x.DisableTelemetry = true);
 #endif
     var app = builder.Build();
+    app.ApplyUseSerilogRequestLogging();
     app.MapDefaultEndpoints();
     app.ConfigureExceptionHandler(isDevelopment);
     app.UseEndpointDefinitions();

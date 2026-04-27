@@ -1792,6 +1792,7 @@ public class ExportsController : ControllerBase
         }
     }
 
+    /*
     [HttpPost("Internal/Order/CountyOccurenceReport")]
     [Authorize]
     [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
@@ -1834,6 +1835,6 @@ public class ExportsController : ControllerBase
             _logger.LogError(e, "Running export failed");
             return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
         }
-    }
+    }*/
     #endregion Internal
 }

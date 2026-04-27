@@ -1,7 +1,6 @@
 ﻿using Microsoft.OpenApi;
 using SOS.Lib.Extensions;
 using Swashbuckle.AspNetCore.SwaggerGen;
-using System.Linq;
 using System.Reflection;
 
 namespace SOS.Lib.Swagger;
@@ -26,7 +25,7 @@ public class SwaggerForceSchemaFilter : ISchemaFilter
             foreach (var propertyInfo in propertyInfos)
             {
                 var propertyName = propertyInfo.Name.ToCamelCase();
-                if (schema.Properties.ContainsKey(propertyName))
+                if (schema?.Properties?.ContainsKey(propertyName) ?? false)
                 {
                     schema.Properties[propertyName] = propertyInfo?.GetCustomAttribute<UseSchema>()?.Schema;
                 }

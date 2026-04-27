@@ -144,7 +144,15 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
                 .Object(o => o.DataStewardship, c => c
                     .Properties(ps => ps
                         .KeywordVal(kwlc => kwlc.DataStewardship.DatasetIdentifier, IndexSetting.SearchSortAggregate)
-                        .KeywordVal(kwlc => kwlc.DataStewardship.DatasetTitle, IndexSetting.None)
+                        .Keyword(kw => kw.DataStewardship.DatasetTitle, kw => kw
+                            .Normalizer("lowercase")
+                            .DocValues(true)
+                            .Fields(f => f
+                                .Keyword("raw", kw => kw
+                                    .DocValues(false)
+                                )
+                            )
+                        )
                     )
                 )
                 .Object(o => o.ArtportalenInternal, t => t
@@ -565,7 +573,7 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
                         .BooleanVal(b => b.Occurrence.IsNaturalOccurrence, IndexSetting.SearchOnly)
                         .BooleanVal(b => b.Occurrence.IsNeverFoundObservation, IndexSetting.SearchOnly)
                         .BooleanVal(b => b.Occurrence.IsNotRediscoveredObservation, IndexSetting.SearchOnly)
-                        .BooleanVal(b => b.Occurrence.IsPositiveObservation, IndexSetting.SearchOnly)
+                        .BooleanVal(b => b.Occurrence.IsPositiveObservation, IndexSetting.SearchSortAggregate)
                         .Object(o => o.Occurrence.Media, n => n
                             .Properties(ps => ps
                                 .KeywordVal(kwlc => kwlc.Occurrence.Media.First().Description, IndexSetting.None)
@@ -2452,52 +2460,7 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
     public string UniquePublicIndexName => IndexHelper.GetIndexName<Observation>(IndexPrefix, true, LiveMode ? ActiveInstance : InActiveInstance, false);
 
     /// <inheritdoc />
-    public string UniqueProtectedIndexName => IndexHelper.GetIndexName<Observation>(IndexPrefix, true, LiveMode ? ActiveInstance : InActiveInstance, true);
-
-    /// <inheritdoc />
-    public async Task<bool> ValidateProtectionLevelAsync(bool protectedIndex)
-    {
-        try
-        {
-            var countResponse = protectedIndex ?
-                await Client.CountAsync<Observation>(ProtectedIndexName, s => s
-                    .Query(q => q
-                        .Bool(b => b
-                            .MustNot(mn => mn.Term(t => t
-                                .Field(f => f.DiffusionStatus).Value(FieldValue.Long((long)DiffusionStatus.NotDiffused)))
-                            )
-                        )
-                    )
-                )
-                :
-                await Client.CountAsync<Observation>(PublicIndexName, s => s
-                .Query(q => q
-                    .Bool(b => b
-                        .Filter(f => f
-                            .Term(t => t
-                                .Field(f => f.AccessRights.Id).Value((int)AccessRightsId.NotForPublicUsage)
-                            ), f => f
-                            .Term(t => t
-                                .Field(f => f.DiffusionStatus).Value(FieldValue.Long((long)DiffusionStatus.NotDiffused)))
-                            )
-                        )
-                    )
-                );
-
-            countResponse.ThrowIfInvalid();
-
-            if (!countResponse.Count.Equals(0))
-            {
-                Logger.LogError($"Failed to validate protection level for Index: {(protectedIndex ? ProtectedIndexName : PublicIndexName)}, count of observations with protection:{protectedIndex} = {countResponse.Count}, should be 0");
-            }
-            return countResponse.Count.Equals(0);
-        }
-        catch (Exception e)
-        {
-            Logger.LogError(e.ToString());
-            return false;
-        }
-    }
+    public string UniqueProtectedIndexName => IndexHelper.GetIndexName<Observation>(IndexPrefix, true, LiveMode ? ActiveInstance : InActiveInstance, true);    
 
     /// <inheritdoc />
     public async Task<bool> VerifyCollectionAsync(bool protectedIndex)

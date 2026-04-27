@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace SOS.Lib.Models.Search.Filters;
+﻿namespace SOS.Lib.Models.Search.Filters;
 
 public class DataStewardshipFilter
 {
@@ -8,4 +6,9 @@ public class DataStewardshipFilter
     /// Dataset filter
     /// </summary>
     public IEnumerable<string> DatasetIdentifiers { get; set; }
+
+    /// <summary>
+    /// DataStewardship title wild card filter
+    /// </summary>
+    public string? DatasetTitleFilter { get; set; }
 }
