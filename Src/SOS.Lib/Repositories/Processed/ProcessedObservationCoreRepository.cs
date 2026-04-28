@@ -573,7 +573,7 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
                         .BooleanVal(b => b.Occurrence.IsNaturalOccurrence, IndexSetting.SearchOnly)
                         .BooleanVal(b => b.Occurrence.IsNeverFoundObservation, IndexSetting.SearchOnly)
                         .BooleanVal(b => b.Occurrence.IsNotRediscoveredObservation, IndexSetting.SearchOnly)
-                        .BooleanVal(b => b.Occurrence.IsPositiveObservation, IndexSetting.SearchOnly)
+                        .BooleanVal(b => b.Occurrence.IsPositiveObservation, IndexSetting.SearchSortAggregate)
                         .Object(o => o.Occurrence.Media, n => n
                             .Properties(ps => ps
                                 .KeywordVal(kwlc => kwlc.Occurrence.Media.First().Description, IndexSetting.None)
