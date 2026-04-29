@@ -81,7 +81,7 @@ public static class Settings
         if (ApplicationInsightsConfiguration != null)
         {
             InstrumentationKey = GetConfigValueString("InstrumentationKey", configuration, logger, sensitiveSetting: true, required: false);
-            if (ApplicationInsightsConfiguration.InstrumentationKey.Contains("SECRET_PLACEHOLDER"))
+            if (ApplicationInsightsConfiguration.InstrumentationKey?.Contains("SECRET_PLACEHOLDER") ?? false)
             {
                 ApplicationInsightsConfiguration.InstrumentationKey = InstrumentationKey;
                 logger.LogInformation("replaced SECRET_PLACEHOLDER in ApplicationInsightsConfiguration.InstrumentationKey with the value in InstrumentationKey");

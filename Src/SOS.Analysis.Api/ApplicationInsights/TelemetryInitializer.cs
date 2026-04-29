@@ -2,6 +2,7 @@
 using Microsoft.ApplicationInsights.Channel;
 using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.Extensions.Primitives;
+using SOS.Lib.Extensions;
 
 namespace SOS.Analysis.Api.ApplicationInsights;
 
@@ -17,64 +18,71 @@ public class TelemetryInitializer : TelemetryInitializerBase
     /// <param name="telemetry"></param>
     protected override void OnInitializeTelemetry(HttpContext platformContext, RequestTelemetry requestTelemetry, ITelemetry telemetry)
     {
+        telemetry.TryAddClientIP(platformContext);
+
+        if (telemetry is not RequestTelemetry)
+        {
+            return;
+        }
+
         if (new[] { "get", "post", "put" }.Contains(platformContext.Request.Method, StringComparer.CurrentCultureIgnoreCase))
         {
-            if (platformContext.Request.Query.TryGetValue("protectedObservations", out var value) && !telemetry.Context.GlobalProperties.ContainsKey("Protected-observations"))
+            if (platformContext.Request.Query.TryGetValue("protectedObservations", out var value) && !requestTelemetry.Context.GlobalProperties.ContainsKey("Protected-observations"))
             {
-                telemetry.Context.GlobalProperties.Add("Protected-observations", value);
+                requestTelemetry.Context.GlobalProperties.Add("Protected-observations", value);
             }
 
             if (_loggRequestBody && platformContext.Items.TryGetValue("Request-body", out var requestBody))
             {
-                if (!telemetry.Context.GlobalProperties.ContainsKey("Request-body"))
+                if (!requestTelemetry.Context.GlobalProperties.ContainsKey("Request-body"))
                 {
                     var body = requestBody?.ToString();
-                    telemetry.Context.GlobalProperties.Add("Request-body", body);
+                    requestTelemetry.Context.GlobalProperties.Add("Request-body", body);
                 }
             }
 
             if (platformContext.Items.TryGetValue("ApiUserType", out object? apiUserType))
             {
-                if (apiUserType != null && !telemetry.Context.GlobalProperties.ContainsKey("ApiUserType"))
+                if (apiUserType != null && !requestTelemetry.Context.GlobalProperties.ContainsKey("ApiUserType"))
                 {
-                    telemetry.Context.GlobalProperties.Add("ApiUserType", apiUserType.ToString());
+                    requestTelemetry.Context.GlobalProperties.Add("ApiUserType", apiUserType.ToString());
                 }
             }
 
             if (platformContext.Items.TryGetValue("SemaphoreStatus", out object? semaphoreStatus))
             {
-                if (semaphoreStatus != null && !telemetry.Context.GlobalProperties.ContainsKey("SemaphoreStatus"))
+                if (semaphoreStatus != null && !requestTelemetry.Context.GlobalProperties.ContainsKey("SemaphoreStatus"))
                 {
-                    telemetry.Context.GlobalProperties.Add("SemaphoreStatus", semaphoreStatus.ToString());
+                    requestTelemetry.Context.GlobalProperties.Add("SemaphoreStatus", semaphoreStatus.ToString());
                 }
             }
 
             if (platformContext.Items.TryGetValue("SemaphoreWaitSeconds", out object? semaphoreWaitSeconds))
             {
-                if (semaphoreWaitSeconds != null && !telemetry.Context.GlobalProperties.ContainsKey("SemaphoreWaitSeconds"))
+                if (semaphoreWaitSeconds != null && !requestTelemetry.Context.GlobalProperties.ContainsKey("SemaphoreWaitSeconds"))
                 {
-                    telemetry.Context.GlobalProperties.Add("SemaphoreWaitSeconds", semaphoreWaitSeconds.ToString());
+                    requestTelemetry.Context.GlobalProperties.Add("SemaphoreWaitSeconds", semaphoreWaitSeconds.ToString());
                 }
             }
 
             if (_loggSearchResponseCount && platformContext.Items.TryGetValue("Observation-count", out var observationCount))
             {
-                if (int.TryParse(observationCount?.ToString(), out var obsCount) && !telemetry.Context.GlobalProperties.ContainsKey("Observation-count"))
+                if (int.TryParse(observationCount?.ToString(), out var obsCount) && !requestTelemetry.Context.GlobalProperties.ContainsKey("Observation-count"))
                 {
-                    telemetry.Context.GlobalProperties.Add("Observation-count", obsCount.ToString());
+                    requestTelemetry.Context.GlobalProperties.Add("Observation-count", obsCount.ToString());
                 }
             }
 
-            if (platformContext.Request.ContentLength != null && !telemetry.Context.GlobalProperties.ContainsKey("Request-length"))
+            if (platformContext.Request.ContentLength != null && !requestTelemetry.Context.GlobalProperties.ContainsKey("Request-length"))
             {
-                telemetry.Context.GlobalProperties.Add("Request-length", platformContext.Request.ContentLength.ToString());
+                requestTelemetry.Context.GlobalProperties.Add("Request-length", platformContext.Request.ContentLength.ToString());
             }
 
             if (platformContext.Items.TryGetValue("CacheKey", out object cacheKey))
             {
-                if (cacheKey != null && !telemetry.Context.GlobalProperties.ContainsKey("CacheKey"))
+                if (cacheKey != null && !requestTelemetry.Context.GlobalProperties.ContainsKey("CacheKey"))
                 {
-                    telemetry.Context.GlobalProperties.Add("CacheKey", cacheKey.ToString());
+                    requestTelemetry.Context.GlobalProperties.Add("CacheKey", cacheKey.ToString());
                 }
             }
         }
@@ -84,29 +92,16 @@ public class TelemetryInitializer : TelemetryInitializerBase
         // If we have a logged in user, use nameidentifier
         if (!string.IsNullOrEmpty(nameidentifier))
         {
-            telemetry.Context.User.AuthenticatedUserId = nameidentifier;
+            requestTelemetry.Context.User.AuthenticatedUserId = nameidentifier;
         }
 
         // If it's a call from Azure API management, we should have Azure user id in header 
         if (platformContext.Request.Headers.TryGetValue("request-user-id", out var accountId))
         {
-            telemetry.Context.User.AccountId = accountId;
+            requestTelemetry.Context.User.AccountId = accountId;
         }
 
-        if (!telemetry.Context.GlobalProperties.ContainsKey("Requesting-System"))
-        {
-            var requestingSystem = new StringValues();
-            if (!platformContext.Request.Headers.TryGetValue("X-Requesting-System", out requestingSystem))
-            {
-                if (!platformContext.Request.Headers.TryGetValue("Requesting-System", out requestingSystem))
-                {
-                    requestingSystem = new StringValues("N/A");
-                }
-            }
-            telemetry.Context.GlobalProperties.Add("Requesting-System", requestingSystem.ToString());
-        }
-
-
+        requestTelemetry.TryAddRequestingSystem(platformContext);
     }
 
     /// <summary>

@@ -1,10 +1,7 @@
 ﻿using Microsoft.ApplicationInsights.AspNetCore.TelemetryInitializers;
 using Microsoft.ApplicationInsights.Channel;
 using Microsoft.ApplicationInsights.DataContracts;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Primitives;
-using System;
-using System.Linq;
+using SOS.Lib.Extensions;
 
 namespace SOS.Observations.Api.ApplicationInsights;
 
@@ -24,13 +21,15 @@ public class TelemetryInitializer : TelemetryInitializerBase
     /// <param name="telemetry"></param>
     protected override void OnInitializeTelemetry(HttpContext platformContext, RequestTelemetry requestTelemetry, ITelemetry telemetry)
     {
+        telemetry.TryAddClientIP(platformContext);
+
         if (telemetry is not RequestTelemetry)
         {
             return;
         }
-
         if (new[] { "get", "post", "put" }.Contains(platformContext.Request.Method, StringComparer.CurrentCultureIgnoreCase))
         {
+            requestTelemetry.TryAddRequestingSystem(platformContext);
 
             if (platformContext.Request.Query.TryGetValue("protectedObservations", out var value) && !requestTelemetry.Context.GlobalProperties.ContainsKey("Protected-observations"))
             {
@@ -39,25 +38,25 @@ public class TelemetryInitializer : TelemetryInitializerBase
 
             if (platformContext.Items.TryGetValue("ApiUserType", out object apiUserType))
             {
-                if (apiUserType != null && !telemetry.Context.GlobalProperties.ContainsKey("ApiUserType"))
+                if (apiUserType != null && !requestTelemetry.Context.GlobalProperties.ContainsKey("ApiUserType"))
                 {
-                    telemetry.Context.GlobalProperties.Add("ApiUserType", apiUserType.ToString());
+                    requestTelemetry.Context.GlobalProperties.Add("ApiUserType", apiUserType.ToString());
                 }
             }
 
             if (platformContext.Items.TryGetValue("SemaphoreStatus", out object semaphoreStatus))
             {
-                if (semaphoreStatus != null && !telemetry.Context.GlobalProperties.ContainsKey("SemaphoreStatus"))
+                if (semaphoreStatus != null && !requestTelemetry.Context.GlobalProperties.ContainsKey("SemaphoreStatus"))
                 {
-                    telemetry.Context.GlobalProperties.Add("SemaphoreStatus", semaphoreStatus.ToString());
+                    requestTelemetry.Context.GlobalProperties.Add("SemaphoreStatus", semaphoreStatus.ToString());
                 }
             }
 
             if (platformContext.Items.TryGetValue("SemaphoreWaitSeconds", out object? semaphoreWaitSeconds))
             {
-                if (semaphoreWaitSeconds != null && !telemetry.Context.GlobalProperties.ContainsKey("SemaphoreWaitSeconds"))
+                if (semaphoreWaitSeconds != null && !requestTelemetry.Context.GlobalProperties.ContainsKey("SemaphoreWaitSeconds"))
                 {
-                    telemetry.Context.GlobalProperties.Add("SemaphoreWaitSeconds", semaphoreWaitSeconds.ToString());
+                    requestTelemetry.Context.GlobalProperties.Add("SemaphoreWaitSeconds", semaphoreWaitSeconds.ToString());
                 }
             }
 
@@ -85,9 +84,9 @@ public class TelemetryInitializer : TelemetryInitializerBase
 
             if (platformContext.Items.TryGetValue("CacheKey", out object cacheKey))
             {
-                if (cacheKey != null && !telemetry.Context.GlobalProperties.ContainsKey("CacheKey"))
+                if (cacheKey != null && !requestTelemetry.Context.GlobalProperties.ContainsKey("CacheKey"))
                 {
-                    telemetry.Context.GlobalProperties.Add("CacheKey", cacheKey.ToString());
+                    requestTelemetry.Context.GlobalProperties.Add("CacheKey", cacheKey.ToString());
                 }
             }
         }
@@ -104,19 +103,6 @@ public class TelemetryInitializer : TelemetryInitializerBase
         if (platformContext.Request.Headers.TryGetValue("request-user-id", out var accountId))
         {
             requestTelemetry.Context.User.AccountId = accountId;
-        }
-
-        if (!requestTelemetry.Context.GlobalProperties.ContainsKey("Requesting-System"))
-        {
-            var requestingSystem = new StringValues();
-            if (!platformContext.Request.Headers.TryGetValue("X-Requesting-System", out requestingSystem))
-            {
-                if (!platformContext.Request.Headers.TryGetValue("Requesting-System", out requestingSystem))
-                {
-                    requestingSystem = new StringValues("N/A");
-                }
-            }
-            requestTelemetry.Context.GlobalProperties.Add("Requesting-System", requestingSystem.ToString());
         }
     }
 
