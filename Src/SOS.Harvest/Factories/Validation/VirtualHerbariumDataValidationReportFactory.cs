@@ -60,13 +60,22 @@ public class VirtualHerbariumValidationReportFactory : DataValidationReportFacto
         });
     }
 
-    protected override void ValidateVerbatimTaxon(
-        VirtualHerbariumObservationVerbatim verbatimObservation,
-        HashSet<string> nonMatchingTaxonIds,
-        HashSet<string> nonMatchingScientificNames)
-    {
-        nonMatchingTaxonIds.Add(verbatimObservation.DyntaxaId.ToString());
-    }
+        protected override Task<IEnumerable<Observation>?> CreateProcessedObservationsAsync(VirtualHerbariumObservationVerbatim verbatimObservation, DataProvider dataProvider)
+        {
+            var observationFactory = GetObservationFactory(dataProvider);
+            var processedObservations = observationFactory.CreateProcessedObservations(verbatimObservation, false);
+            //AddAreaDataToProcessedLocation(processedObservations);
+            return Task.FromResult(processedObservations);
+        }
+
+        protected override void ValidateVerbatimTaxon(
+            VirtualHerbariumObservationVerbatim verbatimObservation,
+            Observation processedObservation,
+            HashSet<string> nonMatchingTaxonIds, 
+            HashSet<string> nonMatchingScientificNames)
+        {
+            nonMatchingTaxonIds.Add(verbatimObservation.DyntaxaId.ToString());
+        }
 
     protected override void ValidateVerbatimData(VirtualHerbariumObservationVerbatim verbatimObservation, DwcaValidationRemarksBuilder validationRemarksBuilder)
     {

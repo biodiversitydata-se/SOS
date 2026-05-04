@@ -897,11 +897,13 @@ public static class GISExtensions
 
         strCoordinateSystem = strCoordinateSystem.Trim();
 
-        if (strCoordinateSystem.Equals("epsg:3006", StringComparison.OrdinalIgnoreCase))
-        {
-            coordinateSystem = CoordinateSys.SWEREF99_TM;
-            return true;
-        }
+            if (strCoordinateSystem.Equals("epsg:3006", StringComparison.OrdinalIgnoreCase) ||
+                strCoordinateSystem.Equals("sweref99 tm", StringComparison.OrdinalIgnoreCase) ||
+                strCoordinateSystem.Equals("sweref99tm", StringComparison.OrdinalIgnoreCase))
+            {
+                coordinateSystem = CoordinateSys.SWEREF99_TM;
+                return true;
+            }
 
         if (strCoordinateSystem.Equals("epsg:3021", StringComparison.OrdinalIgnoreCase))
         {

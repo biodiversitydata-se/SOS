@@ -430,17 +430,22 @@ public class ArtportalenObservationHarvester : ObservationHarvesterBase<Artporta
         var dataLastModified = (DateTime?)null;
         var notes = (string?)null;
         (DateTime startDate, long preHarvestCount) initValues = (DateTime.Now, 0);
+        var stage = "preparing Artportalen harvest";
         try
         {
             Logger.LogInformation($"Artportalen harvest before PrepareHarvestAsync()");
+            stage = "PrepareHarvestAsync";
             using var harvestFactory = await PrepareHarvestAsync(mode, cancellationToken);
             Logger.LogInformation($"Artportalen harvest after PrepareHarvestAsync()");
+            stage = "InitializeHarvestAsync";
             initValues.preHarvestCount = await InitializeHarvestAsync(false);
             Logger.LogInformation($"Artportalen harvest after InitializeHarvestAsync()");
+            stage = mode == JobRunModes.Full ? "HarvestAllAsync" : "HarvestIncrementalAsync";
             harvestCount = mode == JobRunModes.Full ?
                 await HarvestAllAsync(harvestFactory, cancellationToken)
                 :
                 await HarvestIncrementalAsync(mode, fromDate, harvestFactory, cancellationToken);
+            stage = "finalizing Artportalen harvest";
             harvestFactory.Dispose();
 
             // Update harvest info
@@ -456,7 +461,12 @@ public class ArtportalenObservationHarvester : ObservationHarvesterBase<Artporta
         }
         catch (JobAbortedException e)
         {
-            Logger.LogInformation(e, $"Artportalen harvest was cancelled: {e.Message}. {LogHelper.GetMemoryUsageSummary()}");
+            Logger.LogWarning(e,
+                "Artportalen harvest was cancelled during stage '{stage}'. Mode={mode}, FromDate={fromDate}, {memoryUsage}",
+                stage,
+                mode,
+                fromDate,
+                LogHelper.GetMemoryUsageSummary());
             runStatus = RunStatus.Canceled;
         }
         catch (Exception e)

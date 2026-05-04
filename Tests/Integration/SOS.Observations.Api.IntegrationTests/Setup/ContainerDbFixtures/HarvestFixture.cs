@@ -1,10 +1,18 @@
 ﻿using Microsoft.Extensions.Logging;
+using Moq;
+using MvmService;
 using SOS.Harvest.Harvesters.DwC;
 using SOS.Harvest.Harvesters.DwC.Interfaces;
+using SOS.Harvest.Harvesters.Mvm;
+using SOS.Harvest.Harvesters.Mvm.Interfaces;
 using SOS.Harvest.Managers;
 using SOS.Harvest.Managers.Interfaces;
 using SOS.Harvest.Processors.DarwinCoreArchive;
 using SOS.Harvest.Processors.DarwinCoreArchive.Interfaces;
+using SOS.Harvest.Processors.Mvm;
+using SOS.Harvest.Processors.Mvm.Interfaces;
+using SOS.Harvest.Services;
+using SOS.Harvest.Services.Interfaces;
 using SOS.Lib.Configuration.Export;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Database.Interfaces;
@@ -63,7 +71,20 @@ public class HarvestFixture : IHarvestFixture
         serviceCollection.AddSingleton<IInvalidEventRepository, InvalidEventRepository>();
         serviceCollection.AddSingleton<IDiffusionManager, DiffusionManager>();
 
+
+        
+        var mvmServiceConfiguration = new MvmServiceConfiguration();
+        mvmServiceConfiguration.Token = "*secret*";
+        mvmServiceConfiguration.FolderPath = Path.GetTempPath();
+        var mvmService = new MvmObservationService(new Mock<ISpeciesObservationChangeService>().Object, mvmServiceConfiguration, new NullLogger<MvmObservationService>());
+        serviceCollection.AddSingleton(mvmServiceConfiguration);
+        serviceCollection.AddSingleton<IMvmObservationService>(mvmService);        
         serviceCollection.AddSingleton<IDwcObservationHarvester, DwcObservationHarvester>();
+        serviceCollection.AddSingleton<IMvmObservationHarvester, MvmObservationHarvester>();
+        serviceCollection.AddSingleton<MvmObservationHarvester>();
+        serviceCollection.AddSingleton<IMvmObservationProcessor, MvmObservationProcessor>();
+        serviceCollection.AddSingleton<IMvmObservationVerbatimRepository, MvmObservationVerbatimRepository>();
+        
         serviceCollection.AddSingleton<IArtportalenVerbatimRepository, ArtportalenVerbatimRepository>();
         serviceCollection.AddSingleton<ArtportalenChecklistVerbatimRepository>();
         serviceCollection.AddSingleton<IHarvestFixture, HarvestFixture>();

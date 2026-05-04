@@ -270,18 +270,24 @@ public class ArtportalenObservationFactory : ObservationFactoryBase, IObservatio
         return dictionary;
     }
 
-    /// <summary>
-    ///     Cast verbatim observations to processed data model
-    /// </summary>
-    /// <param name="verbatimObservation"></param>
-    /// <returns></returns>
-    public Observation CreateProcessedObservation(ArtportalenObservationVerbatim verbatimObservation, bool diffuseIfSupported)
-    {
-        try
+        public IEnumerable<Observation>? CreateProcessedObservations(ArtportalenObservationVerbatim verbatim, bool diffuseIfSupported)
         {
-            var diffuse = diffuseIfSupported && (verbatimObservation.Site?.DiffusionId ?? 0) > 0;
-            var hasPosition = (verbatimObservation.Site?.XCoord ?? 0) > 0 &&
-                              (verbatimObservation.Site?.YCoord ?? 0) > 0;
+            var observation = CreateProcessedObservation(verbatim, diffuseIfSupported);
+            return observation == null ? null : [observation];
+        }
+
+        /// <summary>
+        ///     Cast verbatim observations to processed data model
+        /// </summary>
+        /// <param name="verbatimObservation"></param>
+        /// <returns></returns>
+        public Observation CreateProcessedObservation(ArtportalenObservationVerbatim verbatimObservation, bool diffuseIfSupported)
+        {
+            try
+            {
+                var diffuse = diffuseIfSupported && (verbatimObservation.Site?.DiffusionId ?? 0) > 0;
+                var hasPosition = (verbatimObservation.Site?.XCoord ?? 0) > 0 &&
+                                  (verbatimObservation.Site?.YCoord ?? 0) > 0;
 
             DateTime? startDate, endDate;
             GetStartEndDate(verbatimObservation.StartDate,

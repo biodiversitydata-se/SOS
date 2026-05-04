@@ -1,19 +1,28 @@
 ﻿using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 
-namespace SOS.Harvest.Processors.Interfaces;
-
-/// <summary>
-/// Interface for observation factory
-/// </summary>
-public interface IObservationFactory<TEntity> where TEntity : IEntity<int>
+namespace SOS.Harvest.Processors.Interfaces
 {
     /// <summary>
-    /// Cast verbatim to observation
+    /// Interface for observation factory
     /// </summary>
-    /// <param name="verbatim"></param>
-    /// <param name="diffuseIfSupported"></param>
-    /// <returns></returns>
-    Observation? CreateProcessedObservation(TEntity verbatim, bool diffuseIfSupported);
-    bool IsVerbatimObservationDiffusedByProvider(TEntity verbatim);
+    public interface IObservationFactory<TEntity> where TEntity : IEntity<int>
+    {
+        /// <summary>
+        /// Cast verbatim to observation
+        /// </summary>
+        /// <param name="verbatim"></param>
+        /// <param name="diffuseIfSupported"></param>
+        /// <returns></returns>
+        Observation? CreateProcessedObservation(TEntity verbatim, bool diffuseIfSupported);
+        
+        /// <summary>
+        /// Create processed observations.
+        /// </summary>
+        /// <param name="verbatim"></param>
+        /// <param name="diffuseIfSupported"></param>
+        /// <returns></returns>
+        IEnumerable<Observation>? CreateProcessedObservations(TEntity verbatim, bool diffuseIfSupported);
+        bool IsVerbatimObservationDiffusedByProvider(TEntity verbatim);
+    }
 }

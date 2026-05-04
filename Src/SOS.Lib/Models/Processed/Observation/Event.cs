@@ -78,7 +78,7 @@ public class Event
     /// Constructor
     /// </summary>
     /// <param name="observationDate"></param>
-    public Event(DateTime observationDate) : this(observationDate, observationDate)
+    public Event(DateTime observationDate, bool ignoreTimePart = false) : this(observationDate, observationDate, ignoreTimePart)
     {
     }
 
@@ -91,7 +91,7 @@ public class Event
     /// </summary>
     /// <param name="startDate"></param>
     /// <param name="endDate"></param>
-    public Event(DateTime? startDate, DateTime? endDate)
+    public Event(DateTime? startDate, DateTime? endDate, bool ignoreTimePart = false)
     {
         if (startDate.HasValue && startDate.Value.Kind == DateTimeKind.Unspecified)
         {
@@ -112,7 +112,10 @@ public class Event
 
             var startDateLocal = startDate.Value.ToLocalTime();
             PlainStartDate = startDateLocal.ToString("yyyy-MM-dd");
-            PlainStartTime = startDateLocal.ToString("HH\\:mm");
+            if (!ignoreTimePart)
+            {
+                PlainStartTime = startDateLocal.ToString("HH\\:mm");
+            }            
             StartYear = startDateLocal.Year;
             StartMonth = startDateLocal.Month;
             StartDay = startDateLocal.Day;
@@ -126,7 +129,10 @@ public class Event
 
             var endDateLocal = endDate.Value.ToLocalTime();
             PlainEndDate = endDateLocal.ToString("yyyy-MM-dd");
-            PlainEndTime = endDateLocal.ToString("HH\\:mm");
+            if (!ignoreTimePart)
+            {
+                PlainEndTime = endDateLocal.ToString("HH\\:mm");
+            }            
             EndYear = endDateLocal.Year;
             EndMonth = endDateLocal.Month;
             EndDay = endDateLocal.Day;

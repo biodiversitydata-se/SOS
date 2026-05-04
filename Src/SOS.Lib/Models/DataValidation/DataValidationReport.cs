@@ -9,6 +9,7 @@ public class DataValidationReport<TVerbatim, TProcessed>
     public DataValidationReportSummary Summary { get; set; }
     public List<ValidObservationTuple<TVerbatim, TProcessed>> ValidObservations { get; set; }
     public List<InvalidObservationTuple<TVerbatim>> InvalidObservations { get; set; }
+    public List<InvalidObservationsByDefectType<TVerbatim>> InvalidObservationsByDefectType { get; set; }
     public List<DistinctValuesSummary> DictionaryValues { get; set; }
 }
 
@@ -22,7 +23,14 @@ public class DatavalidationReportDescription
     public string ObservationDefects => "Validation error information.";
     public string ValidObservations => "A listing of valid observations (default is 100). For each observation, the following is shown: VerbatimObservation = raw data. ProcessedObservation = this is what the observation looks like in the SOS database after it has been processed. DwcExport = this is what the observation looks like when the processed observation is exported to Darwin Core (DwC).";
     public string InvalidObservations => "A listing of invalid observations (default is 100). For each observation, the following is shown: VerbatimObservation = raw data. ProcessedObservationDefects = a list of defects.";
+    public string InvalidObservationsByDefectType => "Invalid observations grouped by ObservationDefectType. Each defect type can contain up to the configured number of examples from the report run.";
     public string DictionaryValues => "Some fields have a predefined dictionary in SOS, for example the fields BasisOfRecord, Sex, LifeStage, ValidationStatus, OccurrenceStatus & Municipality. This is a summary of what values that could be mapped to those dictionary entries.";
+}
+
+public class InvalidObservationsByDefectType<TVerbatim>
+{
+    public string ObservationDefectType { get; set; }
+    public List<InvalidObservationTuple<TVerbatim>> InvalidObservations { get; set; }
 }
 
 public class DataValidationReportSummary

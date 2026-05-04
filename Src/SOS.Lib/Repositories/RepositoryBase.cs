@@ -296,7 +296,7 @@ public class RepositoryBase<TEntity, TKey> : IRepositoryBase<TEntity, TKey> wher
         if (timeout == null) timeout = TimeSpan.FromMinutes(10);
         var sleepTime = TimeSpan.FromSeconds(2);
         int nrIterations = (int)(Math.Ceiling(timeout.Value.TotalSeconds / sleepTime.TotalSeconds));
-        
+
         var majorityCollection = GetMajorityCollection(mongoCollection.CollectionNamespace.CollectionName);
 
         long docCount = await majorityCollection.CountDocumentsAsync(FilterDefinition<TEntity>.Empty);
@@ -545,7 +545,7 @@ public class RepositoryBase<TEntity, TKey> : IRepositoryBase<TEntity, TKey> wher
     public virtual async Task<bool> DeleteCollectionAsync()
     {
         return await DeleteCollectionAsync(CollectionName);
-    }   
+    }
 
     public async Task<bool> DeleteCollectionAsync(string collectionName)
     {
@@ -592,7 +592,7 @@ public class RepositoryBase<TEntity, TKey> : IRepositoryBase<TEntity, TKey> wher
 
             if (estimateCount)
             {
-                return await collection.EstimatedDocumentCountAsync();                   
+                return await collection.EstimatedDocumentCountAsync();
             }
 
             return await collection.CountDocumentsAsync(FilterDefinition<TEntity>.Empty);
@@ -601,7 +601,7 @@ public class RepositoryBase<TEntity, TKey> : IRepositoryBase<TEntity, TKey> wher
         {
             return 0;
         }
-    }        
+    }
 
     /// <inheritdoc />
     public virtual async Task<bool> DeleteManyAsync(IEnumerable<TKey> ids)
@@ -1137,7 +1137,7 @@ public class RepositoryBase<TEntity, TKey> : IRepositoryBase<TEntity, TKey> wher
     public virtual async Task<bool> PermanentizeCollectionAsync(CollectionSession<TEntity> session, int? expectedCount = null)
     {
         return await PermanentizeCollectionAsync(session.TempCollection, session.Collection, expectedCount);
-    }   
+    }
 
     public virtual async Task<bool> PermanentizeCollectionAsync(
         IMongoCollection<TEntity> tempCollection,
@@ -1158,7 +1158,7 @@ public class RepositoryBase<TEntity, TKey> : IRepositoryBase<TEntity, TKey> wher
             Logger.LogWarning($"[Permanentize] Temp collection '{tempName}' does not exist.");
             return false;
         }
-        
+
         if (expectedCount.HasValue)
         {
             await WaitForDataInsert(expectedCount.Value, tempCollection, TimeSpan.FromMinutes(2));
@@ -1302,5 +1302,106 @@ public class RepositoryBase<TEntity, TKey> : IRepositoryBase<TEntity, TKey> wher
             Logger.LogError(ex, $"Error copying collection: {ex.Message}");
             return false;
         }
+    }
+
+    public virtual bool AddMany(IEnumerable<TEntity> items)
+    {
+        return AddMany(items, MongoCollection);
+    }
+
+    public bool AddMany(IEnumerable<TEntity> items, IMongoCollection<TEntity> mongoCollection)
+    {
+        if (!items?.Any() ?? true)
+        {
+            return true;
+        }
+
+        var success = true;
+        var count = 0;
+        var entities = items.ToArray();
+        var batch = entities.Skip(0).Take(BatchSizeWrite)?.ToArray();
+
+        while (batch?.Any() ?? false)
+        {
+            success = success && AddBatch(batch, mongoCollection);
+            count++;
+            batch = entities.Skip(BatchSizeWrite * count).Take(BatchSizeWrite)?.ToArray();
+        }
+
+        return success;
+    }
+
+    public async Task<bool> AddManyAsync(IEnumerable<TEntity> items, IMongoCollection<TEntity> mongoCollection)
+    {
+        if (!items?.Any() ?? true)
+        {
+            return true;
+        }
+
+        var success = true;
+        var count = 0;
+        var entities = items.ToArray();
+        var batch = entities.Skip(0).Take(BatchSizeWrite)?.ToArray();
+
+        while (batch?.Any() ?? false)
+        {
+            success = success && await AddBatchAsync(batch, mongoCollection);
+            count++;
+            batch = entities.Skip(BatchSizeWrite * count).Take(BatchSizeWrite)?.ToArray();
+        }
+
+        return success;
+    }
+
+    private bool AddBatch(IEnumerable<TEntity> batch, IMongoCollection<TEntity> mongoCollection, byte attempt = 1)
+    {
+        var items = batch?.ToArray();
+        try
+        {
+            mongoCollection.InsertMany(items,
+                new InsertManyOptions { IsOrdered = false, BypassDocumentValidation = true });
+            return true;
+        }
+        catch (MongoCommandException e)
+        {
+            switch (e.Code)
+            {
+                case 16500: //Request Rate too Large
+                            // If attempt failed, try split items in half and try again
+                    var batchCount = items.Length / 2;
+
+                    // If we are down to less than 10 items something must be wrong
+                    if (batchCount > 5)
+                    {
+                        var batch1Result = AddBatch(items.Take(batchCount));
+                        var batch2Result = AddBatch(items.Skip(batchCount));
+                        return batch1Result && batch2Result;
+                    }
+
+                    break;
+            }
+
+            Logger.LogError(e.ToString());
+
+            throw;
+        }
+        catch (Exception e)
+        {
+            if (attempt < 3)
+            {
+                Logger.LogWarning($"Add batch to mongodb collection ({MongoCollection}). Attempt {attempt} failed. Tries again...");
+                Thread.Sleep(attempt * 1000);
+                attempt++;
+                return AddBatch(items, mongoCollection, attempt);
+            }
+
+            Logger.LogError(e, "Failed to add batch to mongodb collection ({@mongoCollection})", MongoCollection);
+            throw;
+        }
+    }
+
+    private bool AddBatch(IEnumerable<TEntity> batch)
+    {
+        return AddBatch(batch, MongoCollection);
     }
 }

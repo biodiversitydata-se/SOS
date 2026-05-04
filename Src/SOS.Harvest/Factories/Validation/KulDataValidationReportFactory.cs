@@ -60,13 +60,22 @@ public class KulDataValidationReportFactory : DataValidationReportFactoryBase<Ku
         });
     }
 
-    protected override void ValidateVerbatimTaxon(
-        KulObservationVerbatim verbatimObservation,
-        HashSet<string> nonMatchingTaxonIds,
-        HashSet<string> nonMatchingScientificNames)
-    {
-        nonMatchingTaxonIds.Add(verbatimObservation.DyntaxaTaxonId.ToString());
-    }
+        protected override Task<IEnumerable<Observation>?> CreateProcessedObservationsAsync(KulObservationVerbatim verbatimObservation, DataProvider dataProvider)
+        {
+            var observationFactory = GetObservationFactory(dataProvider);
+            var processedObservations = observationFactory.CreateProcessedObservations(verbatimObservation, false);
+            //AddAreaDataToProcessedLocation(processedObservations);
+            return Task.FromResult(processedObservations);
+        }
+
+        protected override void ValidateVerbatimTaxon(
+            KulObservationVerbatim verbatimObservation,
+            Observation processedObservation,
+            HashSet<string> nonMatchingTaxonIds, 
+            HashSet<string> nonMatchingScientificNames)
+        {
+            nonMatchingTaxonIds.Add(verbatimObservation.DyntaxaTaxonId.ToString());
+        }
 
     protected override void ValidateVerbatimData(KulObservationVerbatim verbatimObservation, DwcaValidationRemarksBuilder validationRemarksBuilder)
     {

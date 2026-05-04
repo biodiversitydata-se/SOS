@@ -48,7 +48,8 @@ public class DataValidationReportManager : IDataValidationReportManager
         DataProvider dataProvider,
         int maxNrObservationsToRead = 100000,
         int nrValidObservationsInReport = 10,
-        int nrInvalidObservationsInReport = 100)
+        int nrInvalidObservationsInReport = 100,
+        IEnumerable<string>? occurrenceIds = null)
     {
         _reportCreatorByType.TryGetValue(dataProvider.Type, out var reportCreator);
         if (reportCreator == null) throw new ArgumentException($"CreateValidationReport() - No support for data provider: {dataProvider}");
@@ -57,7 +58,8 @@ public class DataValidationReportManager : IDataValidationReportManager
             dataProvider,
             maxNrObservationsToRead,
             nrValidObservationsInReport,
-            nrInvalidObservationsInReport);
+            nrInvalidObservationsInReport,
+            occurrenceIds);
 
         return dataValidationSummary;
     }

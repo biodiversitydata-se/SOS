@@ -10,5 +10,6 @@ public interface IDataValidationReportFactory
         DataProvider dataProvider,
         int maxNrObservationsToRead = 100000,
         int nrValidObservationsInReport = 10,
-        int nrInvalidObservationsInReport = 100);
+        int nrInvalidObservationsInReport = 100,
+        IEnumerable<string>? occurrenceIds = null);
 }

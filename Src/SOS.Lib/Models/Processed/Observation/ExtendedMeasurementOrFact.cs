@@ -83,8 +83,26 @@ public class ExtendedMeasurementOrFact
     /// </summary>
     public string MeasurementRemarks { get; set; }
 
+    // Unit values that should not be shown in `ToString()`.   
+    private static readonly HashSet<string> UnitsToExcludeFromToString = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "stycken",
+        "st",
+        "st.",
+        "antal",
+        "ind.",
+        "ex.",
+        "ja/nej",
+        "fritext",
+        "antal träd"
+    };
+
     public override string ToString()
     {
-        return $"[{MeasurementType}={MeasurementValue}]";
+        var unit = MeasurementUnit?.Trim();
+
+        return !string.IsNullOrWhiteSpace(unit) && !UnitsToExcludeFromToString.Contains(unit)
+            ? $"[{MeasurementType}={MeasurementValue} ({unit})]"
+            : $"[{MeasurementType}={MeasurementValue}]";
     }
 }

@@ -799,6 +799,7 @@ public static class SearchExtensionsObservation
             queries.TryAddTermsCriteria("dataStewardship.datasetIdentifier", filter.DataStewardshipDatasetIds);
             queries.TryAddTermCriteria("occurrence.isPositiveObservation", filter.PositiveSightings);
             queries.TryAddTermsCriteria("occurrence.occurrenceId", filter.OccurrenceIds);
+            queries.TryAddTermsCriteria("occurrence.occurrenceId", filter.IncludeFilter?.OccurrenceIds);
             queries.TryAddTermsCriteria("occurrence.sensitivityCategory", filter.SensitivityCategories);
             queries.TryAddTermsCriteria("projects.id", filter.ProjectIds);
             queries.TryAddTermsCriteria("taxon.kingdom", filter.Taxa?.Kingdoms); // Cos4Cloud specific
