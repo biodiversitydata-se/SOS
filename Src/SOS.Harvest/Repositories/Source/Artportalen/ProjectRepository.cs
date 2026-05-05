@@ -191,7 +191,7 @@ public class ProjectRepository : BaseRepository<ProjectRepository>, IProjectRepo
             var query = $@"
                 SELECT 
                     pp.Id, 
-                    ss.SightingId AS SightingId, 
+                    s.Id AS SightingId, 
 	                p.Id AS ProjectId, 
 	                pp.Name, 
 	                pp.Description, 
@@ -203,19 +203,19 @@ public class ProjectRepository : BaseRepository<ProjectRepository>, IProjectRepo
 		                ELSE 'string' 
                     END AS DataType               
 	            FROM 
-					SearchableSightings ss WITH (NOLOCK) 
-                    INNER JOIN @tvp tvp ON ss.SightingId = tvp.Id 
-	                INNER JOIN SightingState st ON ss.SightingId = st.SightingId 
+					Sighting s WITH (NOLOCK) 
+                    INNER JOIN @tvp tvp ON s.Id = tvp.Id 
+	                INNER JOIN SightingState st ON s.Id = st.SightingId 
 		                AND st.SightingStateTypeId = 30 
 		                AND st.IsActive = 1 
-	                INNER JOIN Taxon t ON ss.TaxonId = t.Id 
-	                INNER JOIN ProjectParameterValue ppv ON ss.SightingId = ppv.SightingId 
+	                INNER JOIN Taxon t ON s.TaxonId = t.Id 
+	                INNER JOIN ProjectParameterValue ppv ON s.Id = ppv.SightingId 
 	                INNER JOIN ProjectParameter pp ON  pp.Id = ppv.ProjectParameterId 
 	                INNER JOIN Project p ON p.Id = pp.ProjectId 
 	            WHERE 
-                    (ss.HiddenByProvider IS NULL OR ss.HiddenByProvider < getDate()) 
-		            AND (ss.SightingTypeId = 0 OR ss.SightingTypeId = 3) 
-		            AND ss.ValidationStatusId != 50 
+                    (s.HiddenByProvider IS NULL OR s.HiddenByProvider < getDate()) 
+		            AND (s.SightingTypeId = 0 OR s.SightingTypeId = 3) 
+		            AND s.ValidationStatusId != 50 
 		            AND t.ProtectionLevelId = 1  
 		            AND ISNULL(ppv.Value, '') <> '' 
 		            AND pp.IsDeleted = 0 
