@@ -1,8 +1,5 @@
 ﻿using NetTopologySuite.Geometries;
-using System;
 using System.Buffers;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -129,6 +126,68 @@ public class GeometryConverter : JsonConverter<Geometry>
         return typeof(Geometry).IsAssignableFrom(type);
     }
 
+    public override void Write(Utf8JsonWriter writer, Geometry value, JsonSerializerOptions options)
+    {
+        if (value == null)
+        {
+            return;
+        }
+
+        writer.WriteStartObject();
+
+        var type = value.GeometryType;
+
+        writer.WritePropertyName("coordinates");
+        switch (type?.ToLower())
+        {
+            case "point":
+                var point = (Point)value;
+                WritePoint(writer, point.Coordinate);
+                break;
+            case "polygon":
+                var polygon = (Polygon)value;
+                WritePolygon(writer, polygon);
+                break;
+            case "multipolygon":
+                var muliPolygon = (MultiPolygon)value;
+                writer.WriteStartArray();
+                foreach (var poly in muliPolygon.Geometries)
+                {
+                    WritePolygon(writer, (Polygon)poly);
+                }
+                writer.WriteEndArray();
+                break;
+            case "linestring":
+                var line = (LineString)value;
+                writer.WriteStartArray();
+                foreach (var c in line.Coordinates)
+                {
+                    WritePoint(writer, c);
+                }
+                writer.WriteEndArray();
+                break;
+            case "multilinestring":
+                var multiLine = (MultiLineString)value;
+                writer.WriteStartArray();
+                foreach (var l in multiLine.Geometries)
+                {
+                    var ls = (LineString)l;
+                    writer.WriteStartArray();
+                    foreach (var c in ls.Coordinates)
+                    {
+                        WritePoint(writer, c);
+                    }
+                    writer.WriteEndArray();
+                }
+                writer.WriteEndArray();
+                break;
+        }
+
+        writer.WriteString("type", type);
+
+        writer.WriteEndObject();
+    }
+
     public override Geometry Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         if (reader.TokenType != JsonTokenType.StartObject)
@@ -176,49 +235,16 @@ public class GeometryConverter : JsonConverter<Geometry>
 
                 return geomFactory.CreateMultiPolygon(muliPolygonCoordinates
                     .Select(p => CreatePolygon(geomFactory, p)).ToArray());
+            case "linestring":
+                var lineCoords = JsonSerializer.Deserialize<double[][]>(coordinateString);
+                var coords = lineCoords.Select(p => new Coordinate(p[0], p[1])).ToArray();
+                return geomFactory.CreateLineString(coords);
+            case "multilinestring":
+                var multiLineCoords = JsonSerializer.Deserialize<IEnumerable<IEnumerable<double[]>>>(coordinateString);
+                var lineStrings = multiLineCoords.Select(lc => geomFactory.CreateLineString(lc.Select(p => new Coordinate(p[0], p[1])).ToArray())).ToArray();
+                return geomFactory.CreateMultiLineString(lineStrings);
         }
 
         return null;
-    }
-
-    public override void Write(Utf8JsonWriter writer, Geometry value, JsonSerializerOptions options)
-    {
-        if (value == null)
-        {
-            return;
-        }
-
-        ;
-        writer.WriteStartObject();
-
-        var type = value.GeometryType;
-
-        writer.WritePropertyName("coordinates");
-        switch (type?.ToLower())
-        {
-            case "point":
-                var point = (Point)value;
-                WritePoint(writer, point.Coordinate);
-                break;
-            case "polygon":
-                var polygon = (Polygon)value;
-
-                WritePolygon(writer, polygon);
-                break;
-            case "multipolygon":
-                var muliPolygon = (MultiPolygon)value;
-                writer.WriteStartArray();
-                foreach (var poly in muliPolygon.Geometries)
-                {
-                    WritePolygon(writer, (Polygon)poly);
-                }
-
-                writer.WriteEndArray();
-                break;
-        }
-
-        writer.WriteString("type", type);
-
-        writer.WriteEndObject();
     }
 }

@@ -459,7 +459,10 @@ public class AnalysisManager : IAnalysisManager
             foreach (var gridCellFeatureMetric in gridCellFeaturesMetric.OrderBy(gc => gc.Key).Select(f => f.Value))
             {
                 gridCellFeatureMetric.Geometry = gridCellFeatureMetric.Geometry.Transform((CoordinateSys)metricCoordinateSys, coordinateSystem);
-                featureCollection.Add(gridCellFeatureMetric);
+                if (gridCellFeatureMetric.Geometry != null)
+                {
+                    featureCollection.Add(gridCellFeatureMetric);
+                }
             }
 
             return (featureCollection, aooEooItems);
@@ -595,9 +598,13 @@ public class AnalysisManager : IAnalysisManager
                     .ForEach(f => featureCollection.Add(f!));
 
             // Make sure all geometries is in requested coordinate system
-            foreach (var feature in featureCollection)
+            foreach (var feature in featureCollection.ToList())
             {
                 feature.Geometry = feature.Geometry.Transform((CoordinateSys)metricCoordinateSys, coordinateSystem);
+                if (feature.Geometry == null)
+                {
+                    featureCollection.Remove(feature);
+                }
             }
 
             var aooEooItem = new AooEooItem
