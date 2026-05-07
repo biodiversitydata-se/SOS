@@ -86,7 +86,7 @@ public class iNaturalistDataValidationReportFactory : DataValidationReportFactor
 
     protected override void ValidateVerbatimData(iNaturalistVerbatimObservation verbatimObservation, DwcaValidationRemarksBuilder validationRemarksBuilder)
     {
-        
+        validationRemarksBuilder.NrValidatedObservations++;
     }
 
     protected override void UpdateTermDictionaryValueSummary(

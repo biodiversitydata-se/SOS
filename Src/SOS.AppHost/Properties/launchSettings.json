@@ -1,4 +1,4 @@
-{
+﻿{
   "$schema": "https://json.schemastore.org/launchsettings.json",
   "profiles": {
     "AppHost (Dev)": {
@@ -17,7 +17,7 @@
         "DISABLE_HEALTHCHECK_INIT": "false",
         "DISABLE_CACHED_TAXON_SUM_INIT": "true",
         "USE_LOCAL_OBSERVATION_API": "true",
-        "EXCLUDE_PARISH_GEOMETRIES": "true"
+        "EXCLUDE_PARISH_GEOMETRIES": "false"
       }
     },
     "AppHost (ST)": {

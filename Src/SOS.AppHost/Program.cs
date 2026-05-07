@@ -24,6 +24,7 @@ var observationApi = builder.AddProject<Projects.SOS_Observations_Api>("sos-obse
         project.ExcludeLaunchProfile = true;
     })
     .WithEnvironment("ASPNETCORE_ENVIRONMENT", env.AspNetCoreEnvironment)
+    .WithEnvironment("RUNNING_IN_ASPIRE", "true")
     .WithEnvironment("USE_LOCAL_HANGFIRE", env.UseLocalHangfireDb.ToString())
     .WithEnvironment("DISABLE_HANGFIRE_INIT", env.DisableHangfireInit.ToString())
     .WithEnvironment("DISABLE_HEALTHCHECK_INIT", env.DisableHealthcheckInit.ToString())    
@@ -41,6 +42,7 @@ var analysisApi = builder.AddProject<Projects.SOS_Analysis_Api>("sos-analysis-ap
         project.ExcludeLaunchProfile = true;
     })
     .WithEnvironment("ASPNETCORE_ENVIRONMENT", env.AspNetCoreEnvironment)
+    .WithEnvironment("RUNNING_IN_ASPIRE", "true")
     .WithEnvironment("USE_LOCAL_HANGFIRE", env.UseLocalHangfireDb.ToString())
     .WithEnvironment("DISABLE_HANGFIRE_INIT", env.DisableHangfireInit.ToString())
     .WithEnvironment("DISABLE_HEALTHCHECK_INIT", env.DisableHealthcheckInit.ToString())    
@@ -57,22 +59,12 @@ var dataStewardshipApi = builder.AddProject<Projects.SOS_DataStewardship_Api>("s
         project.ExcludeLaunchProfile = true;
     })
     .WithEnvironment("ASPNETCORE_ENVIRONMENT", env.AspNetCoreEnvironment)
+    .WithEnvironment("RUNNING_IN_ASPIRE", "true")
     .WithEnvironment("DISABLE_HEALTHCHECK_INIT", env.DisableHealthcheckInit.ToString())
     .WithHttpEndpoint(name: "http", port: 5002)
     .WithUrlForEndpoint("http", endpoint => { endpoint.DisplayLocation = UrlDisplayLocation.DetailsOnly; })
     .WithUrl("http://localhost:5002/swagger", "Data Stewardship API")
-    .WithHttpHealthCheck("/healthz");    
-
-// Configure Hangfire JobServer
-var jobServer = builder.AddProject<Projects.SOS_Hangfire_JobServer>("sos-hangfire-jobserver", configure: static project =>
-    {
-        project.ExcludeLaunchProfile = true;
-    })
-    .WithEnvironment("ASPNETCORE_ENVIRONMENT", env.AspNetCoreEnvironment)
-    .WithEnvironment("USE_LOCAL_HANGFIRE", env.UseLocalHangfireDb.ToString())
-    .WithEnvironment("EXCLUDE_PARISH_GEOMETRIES", env.excludeParishGeometries.ToString())
-    .WithReference(hangfireDb)
-    .WaitFor(hangfireDb);
+    .WithHttpHealthCheck("/healthz");
 
 // Configure Administration API
 var adminApi = builder.AddProject<Projects.SOS_Administration_Api>(name: "sos-administration-api", configure: static project =>
@@ -80,6 +72,7 @@ var adminApi = builder.AddProject<Projects.SOS_Administration_Api>(name: "sos-ad
     project.ExcludeLaunchProfile = true;
 })
     .WithEnvironment("ASPNETCORE_ENVIRONMENT", env.AspNetCoreEnvironment)
+    .WithEnvironment("RUNNING_IN_ASPIRE", "true")
     .WithEnvironment("USE_LOCAL_HANGFIRE", env.UseLocalHangfireDb.ToString())
     .WithEnvironment("DISABLE_HANGFIRE_INIT", env.DisableHangfireInit.ToString())
     .WithHttpEndpoint(name: "http", port: 5005)
@@ -88,15 +81,27 @@ var adminApi = builder.AddProject<Projects.SOS_Administration_Api>(name: "sos-ad
     .WithUrl("http://localhost:5005/hangfire/jobs/processing", "Hangfire dashboard")
     .WithHttpHealthCheck("/healthz")
     .WithReference(hangfireDb)
-    .WaitFor(hangfireDb)
-    .WaitFor(jobServer);
+    .WaitFor(hangfireDb);
+
+// Configure Hangfire JobServer
+builder.AddProject<Projects.SOS_Hangfire_JobServer>("sos-hangfire-jobserver", configure: static project =>
+    {
+        project.ExcludeLaunchProfile = true;
+    })
+    .WithEnvironment("ASPNETCORE_ENVIRONMENT", env.AspNetCoreEnvironment)
+    .WithEnvironment("RUNNING_IN_ASPIRE", "true")
+    .WithEnvironment("USE_LOCAL_HANGFIRE", env.UseLocalHangfireDb.ToString())
+    .WithEnvironment("EXCLUDE_PARISH_GEOMETRIES", env.excludeParishGeometries.ToString())
+    .WithReference(hangfireDb)
+    .WaitFor(hangfireDb);
 
 // SOS.Status.Web
 builder.AddProject<Projects.SOS_Status_Web>("sos-status-web", configure: static project =>
     {
         project.ExcludeLaunchProfile = true;
     })
-    .WithEnvironment("ASPNETCORE_ENVIRONMENT", env.AspNetCoreEnvironment)    
+    .WithEnvironment("ASPNETCORE_ENVIRONMENT", env.AspNetCoreEnvironment)
+    .WithEnvironment("RUNNING_IN_ASPIRE", "true")
     .WithHttpEndpoint(name: "http", port: 5006)
     .WithUrlForEndpoint("http", endpoint => { endpoint.DisplayLocation = UrlDisplayLocation.DetailsOnly; })
     .WithUrl("http://localhost:5006", "Status UI")    

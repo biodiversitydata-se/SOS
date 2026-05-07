@@ -181,15 +181,18 @@ public static class SwaggerExtensions
             return app;
         }
     }
-
+    
     private static IReadOnlyList<ApiVersion> GetApiVersions(ApiDescription apiDescription)
     {
-        var apiVersionMetadata = apiDescription.ActionDescriptor.GetApiVersionMetadata();
-        var actionApiVersionModel = apiVersionMetadata.Map(ApiVersionMapping.Explicit | ApiVersionMapping.Implicit);
+        var apiVersionMetadata = apiDescription.ActionDescriptor.ApiVersionMetadata;
+
+        var actionApiVersionModel =
+            apiVersionMetadata.Map(ApiVersionMapping.Explicit | ApiVersionMapping.Implicit);
 
         var apiVersions = actionApiVersionModel.DeclaredApiVersions.Any()
             ? actionApiVersionModel.DeclaredApiVersions
             : actionApiVersionModel.ImplementedApiVersions;
+
         return apiVersions;
     }
 

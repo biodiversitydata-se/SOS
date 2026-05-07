@@ -1,0 +1,20 @@
+Province (verbatim)	District (verbatim)	Location (verbatim)	CoordinateUncertaintyInMeters	DecimalLatitude	DecimalLongitude	LocationRemarks	Count	Match
+Skåne						Provins	5936	No match
+Uppland						Provins	4459	No match
+Västerbotten	Umeå		38292	63.89959	20.15996	Sockenkoordinat för Umeå sn. Se kommentarsfält för mer exakt lokal	3182	Match
+Göteborg	Göteborg		50000	57.70458	11.96527	Koordinat för Göteborg på Gustavi domkyrka. Om bara fyndplats Göteborg är angiven går det inte att veta i vilket landskap fyndet är gjort i (Södermanland/Uppland)	2834	No match
+Södermanland	Stockholm		10000	59.31709	18.07815	Sockenkoordinat för Stockholm (Södermanland). Se kommentarsfält för mer exakt lokal	2700	Match
+Södermanland / Uppland	Stockholm	Stockholm	50000	59.32581	18.07042	Koordinat för Stockholm på Storkyrkan. Om bara fyndplats Stockholm är angiven går det inte att veta i vilket landskap fyndet är gjort i (Södermanland/Uppland)	2644	Match
+Norrbotten	Piteå		59769	65.41439	20.62801	Sockenkoordinat för Piteå sn. Se kommentarsfält för mer exakt lokal	2453	Match
+Västergötland		Kinnekulle	7000	58.59791	13.40756	Socken okänd. Koordinat mittpunkt på Kinnekulle, som ligger i Österplana och Medelplana socknar. 	2220	Match
+Östergötland		Omberg	6000	58.33411	14.66662	Socken okänd. Koordinat mittpunkt på Omberg	2071	Match
+Öland						Provins	2027	No match
+Gotland						Provins	1987	No match
+Västergötland						Provins	1889	No match
+Småland						Provins	1864	No match
+Östergötland						Provins	1714	No match
+Bohuslän						Provins	1687	No match
+Södermanland						Provins	1483	No match
+Lule lappmark						Provins	1364	No match
+Värmland						Provins	1191	No match
+Hälsingland	Los		10000	61.72652	15.17547	Sockenkoordinat för Los sn. Se kommentarsfält för mer exakt lokal	1176	Match

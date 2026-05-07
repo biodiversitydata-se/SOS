@@ -3,6 +3,8 @@ using Moq;
 using MvmService;
 using SOS.Harvest.Harvesters.DwC;
 using SOS.Harvest.Harvesters.DwC.Interfaces;
+using SOS.Harvest.Harvesters.VirtualHerbarium;
+using SOS.Harvest.Harvesters.VirtualHerbarium.Interfaces;
 using SOS.Harvest.Harvesters.Mvm;
 using SOS.Harvest.Harvesters.Mvm.Interfaces;
 using SOS.Harvest.Managers;
@@ -87,7 +89,10 @@ public class HarvestFixture : IHarvestFixture
         
         serviceCollection.AddSingleton<IArtportalenVerbatimRepository, ArtportalenVerbatimRepository>();
         serviceCollection.AddSingleton<ArtportalenChecklistVerbatimRepository>();
-        serviceCollection.AddSingleton<IHarvestFixture, HarvestFixture>();
+        serviceCollection.AddSingleton<IHarvestFixture, HarvestFixture>();        
+        serviceCollection.AddSingleton<IVirtualHerbariumObservationVerbatimRepository, VirtualHerbariumObservationVerbatimRepository>();
+        serviceCollection.AddSingleton<VirtualHerbariumObservationHarvester>();
+        serviceCollection.AddSingleton(GetVirtualHerbariumServiceConfiguration());
 
         return serviceCollection;
     }
@@ -109,6 +114,18 @@ public class HarvestFixture : IHarvestFixture
             ImportPath = Path.GetTempPath(),
             BatchSize = 10000,
             ForceHarvestUnchangedDwca = true
+        };
+    }
+
+    private static VirtualHerbariumServiceConfiguration GetVirtualHerbariumServiceConfiguration()
+    {
+        return new VirtualHerbariumServiceConfiguration
+        {
+            BaseAddress = "http://herbarium.emg.umu.se",
+            AcceptHeaderContentType = "application/xml",
+            MaxReturnedChangesInOnePage = 100,
+            MaxNumberOfSightingsHarvested = 100,
+            UseTestFile = true
         };
     }
 

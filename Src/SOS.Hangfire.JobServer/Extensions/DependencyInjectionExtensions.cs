@@ -260,7 +260,7 @@ public static class DependencyInjectionExtensions
             services.AddScoped<INorsObservationVerbatimRepository, NorsObservationVerbatimRepository>();
             services.AddScoped<IObservationDatabaseVerbatimRepository, ObservationDatabaseVerbatimRepository>();
             services.AddScoped<ISersObservationVerbatimRepository, SersObservationVerbatimRepository>();
-            services.AddScoped<ISharkObservationVerbatimRepository, SharkObservationVerbatimRepository>();
+            services.AddScoped<ISharkObservationVerbatimRepository, SharkObservationVerbatimRepository>();            
             services.AddScoped<IVirtualHerbariumObservationVerbatimRepository, VirtualHerbariumObservationVerbatimRepository>();
             services.AddScoped<IiNaturalistObservationVerbatimRepository, iNaturalistObservationVerbatimRepository>();
 
@@ -287,7 +287,7 @@ public static class DependencyInjectionExtensions
             services.AddScoped<IObservationDatabaseHarvester, ObservationDatabaseHarvester>();
             services.AddScoped<ISersObservationHarvester, SersObservationHarvester>();
             services.AddScoped<ISharkObservationHarvester, SharkObservationHarvester>();
-            services.AddScoped<Harvest.Repositories.Source.Artportalen.Interfaces.ITaxonRepository, Harvest.Repositories.Source.Artportalen.TaxonRepository>();
+            services.AddScoped<Harvest.Repositories.Source.Artportalen.Interfaces.ITaxonRepository, Harvest.Repositories.Source.Artportalen.TaxonRepository>();            
             services.AddScoped<IVirtualHerbariumObservationHarvester, VirtualHerbariumObservationHarvester>();
 
             // Add harvesters checklists
@@ -303,7 +303,7 @@ public static class DependencyInjectionExtensions
             services.AddScoped<INorsObservationProcessor, NorsObservationProcessor>();
             services.AddScoped<IObservationDatabaseProcessor, ObservationDatabaseProcessor>();
             services.AddScoped<ISersObservationProcessor, SersObservationProcessor>();
-            services.AddScoped<ISharkObservationProcessor, SharkObservationProcessor>();
+            services.AddScoped<ISharkObservationProcessor, SharkObservationProcessor>();            
             services.AddScoped<IVirtualHerbariumObservationProcessor, VirtualHerbariumObservationProcessor>();
             services.AddScoped<IiNaturalistObservationProcessor, iNaturalistObservationProcessor>();
             services.AddScoped<ITaxonProcessor, TaxonProcessor>();

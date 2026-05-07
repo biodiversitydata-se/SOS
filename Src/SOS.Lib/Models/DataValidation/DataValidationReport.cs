@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace SOS.Lib.Models.DataValidation;
 
@@ -7,10 +8,19 @@ public class DataValidationReport<TVerbatim, TProcessed>
     public object Settings { get; set; }
     public DatavalidationReportDescription Descriptions => new DatavalidationReportDescription();
     public DataValidationReportSummary Summary { get; set; }
+    public object? AdditionalSummary { get; set; }
     public List<ValidObservationTuple<TVerbatim, TProcessed>> ValidObservations { get; set; }
     public List<InvalidObservationTuple<TVerbatim>> InvalidObservations { get; set; }
     public List<InvalidObservationsByDefectType<TVerbatim>> InvalidObservationsByDefectType { get; set; }
     public List<DistinctValuesSummary> DictionaryValues { get; set; }
+
+    /// <summary>
+    ///     Additional files to include in the validation report ZIP archive.
+    ///     Not serialized to JSON.
+    /// </summary>
+    [JsonIgnore]
+    [System.Text.Json.Serialization.JsonIgnore]
+    public List<(string Filename, byte[] Bytes)>? AttachedFiles { get; set; }
 }
 
 public class DatavalidationReportDescription

@@ -1,4 +1,5 @@
-﻿using MongoDB.Driver;
+﻿using Microsoft.Extensions.Logging;
+using MongoDB.Driver;
 using SOS.Harvest.Managers.Interfaces;
 using SOS.Harvest.Processors.VirtualHerbarium;
 using SOS.Lib.Cache.Interfaces;
@@ -22,6 +23,7 @@ namespace SOS.Harvest.Factories.Validation;
 public class VirtualHerbariumValidationReportFactory : DataValidationReportFactoryBase<VirtualHerbariumObservationVerbatim>
 {
     private readonly IVirtualHerbariumObservationVerbatimRepository _virtualHerbariumObservationVerbatimRepository;
+    private readonly ILogger _logger;
     private VirtualHerbariumObservationFactory? _virtualHerbariumObservationFactory;
 
     public VirtualHerbariumValidationReportFactory(
@@ -34,10 +36,12 @@ public class VirtualHerbariumValidationReportFactory : DataValidationReportFacto
         IProcessTimeManager processTimeManager,
         ProcessConfiguration processConfiguration,
         ICache<int, Taxon> taxonCache,
-        ICache<VocabularyId, Vocabulary> vocabularyCache)
+        ICache<VocabularyId, Vocabulary> vocabularyCache,
+        ILogger<VirtualHerbariumValidationReportFactory> logger)
         : base(processedVocabularyRepository, validationManager, areaHelper, vocabularyValueResolver, processedTaxonRepository, processTimeManager, processConfiguration, taxonCache, vocabularyCache)
     {
         _virtualHerbariumObservationVerbatimRepository = virtualHerbariumObservationVerbatimRepository;
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
     protected override async Task<IAsyncCursor<VirtualHerbariumObservationVerbatim>> GetAllObservationsByCursorAsync(DataProvider dataProvider)
@@ -52,39 +56,59 @@ public class VirtualHerbariumValidationReportFactory : DataValidationReportFacto
 
     protected override async Task<Observation?> CreateProcessedObservationAsync(VirtualHerbariumObservationVerbatim verbatimObservation, DataProvider dataProvider)
     {
-        return await Task.Run(() =>
-        {
-            var processedObservation = GetObservationFactory(dataProvider).CreateProcessedObservation(verbatimObservation, false);
-            _areaHelper.AddAreaDataToProcessedLocation(processedObservation?.Location);
-            return processedObservation;
-        });
+        var factory = await GetObservationFactoryAsync(dataProvider);
+        var processedObservation = factory.CreateProcessedObservation(verbatimObservation, false);
+        _areaHelper.AddAreaDataToProcessedLocation(processedObservation?.Location);
+        return processedObservation;
     }
 
-        protected override Task<IEnumerable<Observation>?> CreateProcessedObservationsAsync(VirtualHerbariumObservationVerbatim verbatimObservation, DataProvider dataProvider)
+    public override async Task<DataValidationReport<object, Observation>> CreateDataValidationSummary(
+        DataProvider dataProvider,
+        int maxNrObservationsToRead = 100000,
+        int nrValidObservationsInReport = 10,
+        int nrInvalidObservationsInReport = 100,
+        IEnumerable<string>? occurrenceIds = null)
+    {
+        var report = await base.CreateDataValidationSummary(dataProvider, maxNrObservationsToRead, nrValidObservationsInReport, nrInvalidObservationsInReport);        
+
+        var geoRows = _virtualHerbariumObservationFactory?.GetGeoRows();
+        if (geoRows?.Count > 0)
         {
-            var observationFactory = GetObservationFactory(dataProvider);
-            var processedObservations = observationFactory.CreateProcessedObservations(verbatimObservation, false);
-            //AddAreaDataToProcessedLocation(processedObservations);
-            return Task.FromResult(processedObservations);
+            var excelBytes = VirtualHerbariumGeoExcelWriter.CreateExcelBytes(geoRows);
+            report.AttachedFiles = [(Filename: "Geo Mapping.xlsx", Bytes: excelBytes)];
         }
 
-        protected override void ValidateVerbatimTaxon(
-            VirtualHerbariumObservationVerbatim verbatimObservation,
-            Observation processedObservation,
-            HashSet<string> nonMatchingTaxonIds, 
-            HashSet<string> nonMatchingScientificNames)
+        return report;
+    }
+
+    protected override void ValidateVerbatimTaxon(
+        VirtualHerbariumObservationVerbatim verbatimObservation,
+        Observation processedObservation,
+        HashSet<string> nonMatchingTaxonIds,
+        HashSet<string> nonMatchingScientificNames)
+    {
+        if (!string.IsNullOrWhiteSpace(verbatimObservation?.TaxaName))
         {
-            nonMatchingTaxonIds.Add(verbatimObservation.DyntaxaId.ToString());
+            nonMatchingScientificNames.Add(verbatimObservation.TaxaName);
         }
+        else
+        {
+            nonMatchingScientificNames.Add("<Empty value>");
+        }            
+    }
+
+    protected override async Task<IEnumerable<Observation>?> CreateProcessedObservationsAsync(VirtualHerbariumObservationVerbatim verbatimObservation, DataProvider dataProvider)
+    {
+        var factory = await GetObservationFactoryAsync(dataProvider);
+        
+        var processedObservations = factory.CreateProcessedObservations(verbatimObservation, false);
+        //AddAreaDataToProcessedLocation(processedObservations);
+        return processedObservations;
+    }        
 
     protected override void ValidateVerbatimData(VirtualHerbariumObservationVerbatim verbatimObservation, DwcaValidationRemarksBuilder validationRemarksBuilder)
     {
         validationRemarksBuilder.NrValidatedObservations++;
-
-        if (!verbatimObservation.CoordinatePrecision.HasValue)
-        {
-            validationRemarksBuilder.NrMissingCoordinateUncertaintyInMeters++;
-        }
     }
 
     protected override void UpdateTermDictionaryValueSummary(
@@ -96,12 +120,12 @@ public class VirtualHerbariumValidationReportFactory : DataValidationReportFacto
         // Virtual Herbarium doesn't contain any vocabulary fields.
     }
 
-    private VirtualHerbariumObservationFactory GetObservationFactory(DataProvider dataProvider)
+    private async Task<VirtualHerbariumObservationFactory> GetObservationFactoryAsync(DataProvider dataProvider)
     {
         if (_virtualHerbariumObservationFactory == null)
         {
-            _virtualHerbariumObservationFactory = new VirtualHerbariumObservationFactory(dataProvider, _taxonById, _dwcaVocabularyById, _areaHelper, _processTimeManager, ProcessConfiguration);
-            Task.Run(() => _virtualHerbariumObservationFactory.InitializeAsync());
+            _virtualHerbariumObservationFactory = new VirtualHerbariumObservationFactory(dataProvider, _taxonById, _dwcaVocabularyById, _areaHelper, _processTimeManager, ProcessConfiguration, _logger);
+            await _virtualHerbariumObservationFactory.InitializeAsync();
         }
 
         return _virtualHerbariumObservationFactory;

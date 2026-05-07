@@ -12,6 +12,7 @@ using SOS.Harvest.Processors;
 using SOS.Harvest.Processors.Artportalen;
 using SOS.Harvest.Processors.DarwinCoreArchive;
 using SOS.Harvest.Processors.iNaturalist;
+using SOS.Harvest.Processors.VirtualHerbarium;
 using SOS.Lib.Cache;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Process;
@@ -164,6 +165,7 @@ public class ProcessFixture : IProcessFixture
         serviceCollection.AddSingleton<IArtportalenDatasetMetadataRepository, ArtportalenDatasetMetadataRepository>();
         serviceCollection.AddSingleton<ArtportalenDatasetProcessor>();
         serviceCollection.AddSingleton<ArtportalenEventProcessor>();
+        serviceCollection.AddSingleton<VirtualHerbariumObservationProcessor>();
         serviceCollection.AddSingleton<IVocabularyRepository, VocabularyRepository>();        
         serviceCollection.AddSingleton<IProcessedChecklistRepository, ProcessedChecklistRepository>();
         VocabularyConfiguration vocabularyConfiguration = new VocabularyConfiguration()

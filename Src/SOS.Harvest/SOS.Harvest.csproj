@@ -30,7 +30,10 @@
 		<ProjectReference Include="..\SOS.Lib\SOS.Lib.csproj" />
 	</ItemGroup>
 
-	<ItemGroup>		
+	<ItemGroup>
+		<None Update="Resources\Data-examples\sweden-occurrences-test.ndjson">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>	
 		<None Update="Resources\Data-examples\mvm-biology-samples.json">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
@@ -48,6 +51,9 @@
 		</None>
 		<None Update="Resources\Sweden-grids\Sweden_Grid_10km_Wgs84.geojson">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Resources\VirtualHerbarium\VirtualHerbariumMatch.tsv">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
 		<None Update="Resources\Vocabularies\AccessRightsVocabulary.json">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

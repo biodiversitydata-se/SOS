@@ -94,14 +94,15 @@ public abstract class DataValidationReportFactoryBase<TVerbatimObservation> : ID
     protected abstract void ValidateVerbatimTaxon(
         TVerbatimObservation verbatimObservation,
         Observation processedObservation,
-        HashSet<string> nonMatchingTaxonIds, HashSet<string> nonMatchingScientificNames);
+        HashSet<string> nonMatchingTaxonIds, 
+        HashSet<string> nonMatchingScientificNames);
 
     protected virtual object GetVerbatimObservationForReport(TVerbatimObservation verbatimObservation, Observation processedObservation)
     {
         return verbatimObservation!;
     }
 
-    public async Task<DataValidationReport<object, Observation>> CreateDataValidationSummary(
+    public virtual async Task<DataValidationReport<object, Observation>> CreateDataValidationSummary(
         DataProvider dataProvider,
         int maxNrObservationsToRead = 100000,
         int nrValidObservationsInReport = 100,
@@ -111,7 +112,7 @@ public abstract class DataValidationReportFactoryBase<TVerbatimObservation> : ID
         var validObservations = new List<ValidObservationTuple<object, Observation>>();
         var occurrenceIdValidObservations = new List<ValidObservationTuple<object, Observation>>();
         var requestedOccurrenceIds = occurrenceIds?.ToHashSet(StringComparer.OrdinalIgnoreCase);
-        var invalidObservations = new List<InvalidObservationTuple<object>>();
+        var invalidObservations = new List<InvalidObservationTuple<object>>();                
         var invalidObservationsByDefectType = new Dictionary<ObservationDefect.ObservationDefectType, List<InvalidObservationTuple<object>>>();
         int nrProcessedObservations = 0;
         int nrValidObservations = 0;

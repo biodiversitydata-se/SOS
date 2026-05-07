@@ -25,6 +25,7 @@ try
     bool isDevelopment = new[] { "local", "dev", "st" }.Contains(env?.ToLower(), StringComparer.CurrentCultureIgnoreCase);
     bool disableHangfireInit = Environment.GetEnvironmentVariable("DISABLE_HANGFIRE_INIT").GetBoolean();
     bool useLocalHangfire = Environment.GetEnvironmentVariable("USE_LOCAL_HANGFIRE").GetBoolean();
+    bool isRunningDotNetAspire = Environment.GetEnvironmentVariable("RUNNING_IN_ASPIRE").GetBoolean();
 
     // Setup logging
     Log.Logger = SeriLogHelper.CreateLogger(isDevelopment);
@@ -51,8 +52,8 @@ try
         configurationRoot,
         isDevelopment,
         disableHangfireInit,
-        useLocalHangfire);
-    Log.Logger.Information("Finsih Configure Services");
+        useLocalHangfire,
+        isRunningDotNetAspire);
 
     Log.Logger.Information("Starting Build");
     // Build app and configure middleware pipeline
@@ -120,7 +121,8 @@ static async Task ConfigureServicesAsync(
     IConfigurationRoot configuration,
     bool isDevelopment,
     bool disableHangfireInit,
-    bool useLocalHangfire)
+    bool useLocalHangfire,
+    bool isRunningDotNetAspire)
 {
     IServiceCollection services = builder.Services;
 
@@ -206,10 +208,13 @@ static async Task ConfigureServicesAsync(
     services.AddMemoryCache();
     services.AddControllers(options =>
     {
-        var policy = new AuthorizationPolicyBuilder()
-            .RequireAuthenticatedUser()
-            .Build();
-        options.Filters.Add(new AuthorizeFilter(policy));
+        if (!isRunningDotNetAspire)
+        {
+            var policy = new AuthorizationPolicyBuilder()
+                .RequireAuthenticatedUser()
+                .Build();
+            options.Filters.Add(new AuthorizeFilter(policy));
+        }
     })
     .AddJsonOptions(options =>
     {
@@ -253,9 +258,8 @@ static void ConfigureMiddleware(WebApplication app, bool isDevelopment, bool dis
 
     // 8. Authentication & Authorization
     app.UseAuthentication();
-    app.UseAuthorization();
+    app.UseAuthorization();    
 
-    // 9. Endpoints
     app.MapGet("/login", async context =>
     {
         await context.ChallengeAsync(OpenIdConnectDefaults.AuthenticationScheme, new AuthenticationProperties

@@ -72,10 +72,15 @@ public class DataValidationReportJob : IDataValidationReportJob
 
         var zipEntries = new List<(string Filename, byte[] Bytes)>
         {
-            ("Validation Report [Compact].json", compactJsonFile),
-            ("Validation Report [Verbose].json", verboseJsonFile)
+            (Filename: "Validation Report [Compact].json", Bytes: compactJsonFile),
+            (Filename: "Validation Report [Verbose].json", Bytes: verboseJsonFile)
         };
 
+        if (dataValidationSummary.AttachedFiles?.Count > 0)
+        {
+            zipEntries.AddRange(dataValidationSummary.AttachedFiles);
+        }        
+        
         if (createExcelFile && dataValidationSummary.ValidObservations?.Any() == true)
         {
             var excelBytes = await ValidObservationsExcelWriter.CreateExcelFileAsync(dataValidationSummary.ValidObservations, excelPropertyLabelType);

@@ -32,9 +32,8 @@ public class VirtualHerbariumObservationProcessor :
         JobRunModes mode,
         IJobCancellationToken cancellationToken)
     {
-        var observationFactory = new VirtualHerbariumObservationFactory(dataProvider, taxa, dwcaVocabularyById, _areaHelper, TimeManager, ProcessConfiguration);
-        await observationFactory.InitializeAsync();
-
+        var observationFactory = new VirtualHerbariumObservationFactory(dataProvider, taxa, dwcaVocabularyById, _areaHelper, TimeManager, ProcessConfiguration, Logger);
+        await observationFactory.InitializeAsync();        
         return await base.ProcessObservationsAsync(
             dataProvider,
             mode,

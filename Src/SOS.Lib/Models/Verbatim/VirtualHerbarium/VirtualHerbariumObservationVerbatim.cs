@@ -1,114 +1,195 @@
-﻿using SOS.Lib.Models.Interfaces;
+using SOS.Lib.Models.Interfaces;
+using System.Text.Json.Serialization;
 
 namespace SOS.Lib.Models.Verbatim.VirtualHerbarium;
 
 /// <summary>
-///     Verbatim from Virtual Herbarium
+///     Verbatim from Virtual Herbarium (New NDJSON format)
 /// </summary>
 public class VirtualHerbariumObservationVerbatim : IEntity<int>
 {
     /// <summary>
-    ///     Accession No
+    ///     Unique id (generated)
     /// </summary>
-    public string AccessionNo { get; set; }
-
-    /// <summary>
-    ///     Collector
-    /// </summary>
-    public string Collector { get; set; }
-
-    /// <summary>
-    /// True if coordinates are from district 
-    /// </summary>
-    public bool CoordinateOverrideDistrict { get; set; }
-
-    /// <summary>
-    ///     Coordinate Precision
-    /// </summary>
-    public int? CoordinatePrecision { get; set; }
-
-    /// <summary>
-    ///     Coordinate Source
-    /// </summary>
-    public string CoordinateSource { get; set; }
-
-    /// <summary>
-    /// Coordinate value
-    /// </summary>
-    public string CoordinateValue { get; set; }
-
-    /// <summary>
-    ///     Collector number
-    /// </summary>
-    public string Collectornumber { get; set; }
-
-    /// <summary>
-    ///     Date Collected
-    /// </summary>
-    public string DateCollected { get; set; }
-
-    /// <summary>
-    ///     Decimal Latitude
-    /// </summary>
-    public double DecimalLatitude { get; set; }
-
-    /// <summary>
-    ///     Decimal Longitude
-    /// </summary>
-    public double DecimalLongitude { get; set; }
-
-    /// <summary>
-    ///     District
-    /// </summary>
-    public string District { get; set; }
-
-    /// <summary>
-    ///     Dyntaxa taxon id
-    /// </summary>
-    public int DyntaxaId { get; set; }
-
-    /// <summary>
-    ///     File id
-    /// </summary>
-    public string FileId { get; set; }
+    public int Id { get; set; }
 
     /// <summary>
     ///     Institution Code
     /// </summary>
-    public string InstitutionCode { get; set; }
+    public string? InstCode { get; set; }
 
     /// <summary>
-    ///     Locality
+    ///     Accession Number
     /// </summary>
-    public string Locality { get; set; }
+    public string? AccessionNo { get; set; }
 
     /// <summary>
-    ///     Notes
+    ///     Day of collection
     /// </summary>
-    public string Notes { get; set; }
+    public string? Dag { get; set; }
+
+    /// <summary>
+    ///     Month of collection
+    /// </summary>
+    public string? Manad { get; set; }
+
+    /// <summary>
+    ///     Year of collection
+    /// </summary>
+    public string? Ar { get; set; }
+
+    /// <summary>
+    ///     Date collected (formatted string, e.g., "1944-06-13")
+    /// </summary>
+    public string? Datum { get; set; }
+
+    /// <summary>
+    ///     Scientific name of the taxon
+    /// </summary>
+    public string? TaxaName { get; set; }
+
+    /// <summary>
+    ///     Genus name
+    /// </summary>
+    public string? Genus { get; set; }
+
+    /// <summary>
+    ///     Species epithet
+    /// </summary>
+    public string? Species { get; set; }
+
+    /// <summary>
+    ///     Infraspecific rank (subspecies, variety, etc.)
+    /// </summary>
+    public string? InomArtsRang { get; set; }
+
+    /// <summary>
+    ///     Infraspecific epithet
+    /// </summary>
+    public string? InomArtsEpitet { get; set; }
+
+    /// <summary>
+    ///     Higher taxa
+    /// </summary>
+    public string? HigherTaxa { get; set; }
+
+    /// <summary>
+    ///     Collector name(s)
+    /// </summary>
+    public string? Collector { get; set; }
+
+    /// <summary>
+    ///     Collector number
+    /// </summary>
+    public string? CollectorNumber { get; set; }
+
+    /// <summary>
+    ///     Comments
+    /// </summary>
+    public string? Comment { get; set; }
+
+    /// <summary>
+    ///     Continent
+    /// </summary>
+    public string? Continent { get; set; }
+
+    /// <summary>
+    ///     Country
+    /// </summary>
+    public string? Country { get; set; }
+
+    /// <summary>
+    ///     Province (Swedish landskap)
+    /// </summary>
+    public string? Province { get; set; }
+
+    /// <summary>
+    ///     District (Swedish socken/kommun)
+    /// </summary>
+    public string? District { get; set; }
+
+    /// <summary>
+    ///     Location/Locality name
+    /// </summary>
+    public string? Location { get; set; }
+
+    /// <summary>
+    ///     Habitat description
+    /// </summary>
+    public string? Habitat { get; set; }
+
+    /// <summary>
+    ///     Altitude
+    /// </summary>
+    public string? Altitude { get; set; }
 
     /// <summary>
     ///     Original name
     /// </summary>
-    public string OriginalName { get; set; }
+    public string? OriginalNamn { get; set; }
+
+    /// <summary>
+    ///     Image reference
+    /// </summary>
+    public string? Image { get; set; }
 
     /// <summary>
     ///     Original text
     /// </summary>
-    public string OriginalText { get; set; }
+    public string? OriginalText { get; set; }
 
     /// <summary>
-    ///     Province
+    ///     Notes
     /// </summary>
-    public string Province { get; set; }
+    public string? Notes { get; set; }
 
     /// <summary>
-    ///     Taxon scientific name
+    ///     Rikets N coordinate (Swedish grid)
     /// </summary>
-    public string ScientificName { get; set; }
+    public string? RiketsN { get; set; }
 
     /// <summary>
-    ///     Unique id
+    ///     Rikets O coordinate (Swedish grid)
     /// </summary>
-    public int Id { get; set; }
+    public string? RiketsO { get; set; }
+
+    /// <summary>
+    ///     WGS84 Latitude
+    /// </summary>
+    public string? Wgs84_Lat { get; set; }
+
+    /// <summary>
+    ///     WGS84 Longitude
+    /// </summary>
+    public string? Wgs84_Lng { get; set; }
+
+    /// <summary>
+    ///     Rubin code
+    /// </summary>
+    public string? Rubin { get; set; }
+
+    /// <summary>
+    ///     Type status
+    /// </summary>
+    public string? TypeStatus { get; set; }
+
+    /// <summary>
+    ///     Basionym
+    /// </summary>
+    public string? Basionym { get; set; }
+
+    /// <summary>
+    ///     Type author
+    /// </summary>
+    public string? TypeAuktor { get; set; }
+
+    /// <summary>
+    ///     History/provenance
+    /// </summary>
+    public string? History { get; set; }
+
+    /// <summary>
+    ///     Hybrid name
+    /// </summary>
+    public string? HybridName { get; set; }
 }
