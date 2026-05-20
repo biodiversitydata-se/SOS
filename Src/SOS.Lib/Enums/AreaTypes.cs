@@ -29,5 +29,5 @@ public enum AreaType
     Sveaskog = 36,
     SvenskaKraftnät = 37,
     EuBiogeographicalRegions = 38,
-    EuMarineRegions = 38
+    EuMarineRegions = 39
 }
