@@ -27,5 +27,7 @@ public enum AreaType
     Campus = 35,
     [ExcludeFromSearch]
     Sveaskog = 36,
-    SvenskaKraftnät = 37
+    SvenskaKraftnät = 37,
+    EuBiogeographicalRegions = 38,
+    EuMarineRegions = 38
 }
