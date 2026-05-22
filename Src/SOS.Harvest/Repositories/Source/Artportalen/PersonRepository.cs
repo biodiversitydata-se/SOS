@@ -44,7 +44,7 @@ public class PersonRepository : BaseRepository<PersonRepository>, IPersonReposit
     {
         try
         {
-            var query = $"{_query} u.UserServiceUserId = @UserServiceUserId";
+            var query = $"{_query} WHERE u.UserServiceUserId = @UserServiceUserId";
 
             return (await QueryAsync<PersonEntity>(query, new { UserServiceUserId = id }))?.FirstOrDefault()!;
         }
