@@ -24,13 +24,13 @@ public class EventsPaginationTests : TestBase
         for (int skip = 0; skip < testDataSet.Events.Count(); skip += take)
         {
             var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Event>, EventsFilter>(
-                $"events?skip={skip}&take={take}", searchFilter, jsonSerializerOptions);
+                $"events?skip={skip}&take={take}", searchFilter, jsonSerializerOptions, TestContext.Current.CancellationToken);
             eventModels.AddRange(pageResult.Records);
         }
         
         // Act - Get all in one request
         var pageResultAll = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Event>, EventsFilter>(
-                $"events?skip=0&take={testDataSet.Events.Count()}", searchFilter, jsonSerializerOptions);
+                $"events?skip=0&take={testDataSet.Events.Count()}", searchFilter, jsonSerializerOptions, TestContext.Current.CancellationToken);
         allEventModels.AddRange(pageResultAll.Records);
 
         // Assert
@@ -54,7 +54,7 @@ public class EventsPaginationTests : TestBase
 
         // Act        
         var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Event>, EventsFilter>(
-            $"events?skip={skip}&take={take}", searchFilter, jsonSerializerOptions);
+            $"events?skip={skip}&take={take}", searchFilter, jsonSerializerOptions, TestContext.Current.CancellationToken);
 
         // Assert
         pageResult.TotalCount.Should().Be(testDataSet.Events.Count());
@@ -76,7 +76,7 @@ public class EventsPaginationTests : TestBase
 
         // Act
         var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Event>, EventsFilter>(
-            $"events?skip={skip}&take={take}", searchFilter, jsonSerializerOptions);
+            $"events?skip={skip}&take={take}", searchFilter, jsonSerializerOptions, TestContext.Current.CancellationToken);
 
         // Assert
         pageResult.TotalCount.Should().Be(testDataSet.Events.Count());
@@ -102,16 +102,16 @@ public class EventsPaginationTests : TestBase
 
         // Act
         var responseSkipNegative = await ApiClient.PostAsJsonAsync(
-            $"events?skip={skipNegative}&take={take}", searchFilter, jsonSerializerOptions);
+            $"events?skip={skipNegative}&take={take}", searchFilter, jsonSerializerOptions, TestContext.Current.CancellationToken);
 
         var responseSkipTooLarge = await ApiClient.PostAsJsonAsync(
-            $"events?skip={skipTooLarge}&take={take}", searchFilter, jsonSerializerOptions);
+            $"events?skip={skipTooLarge}&take={take}", searchFilter, jsonSerializerOptions, TestContext.Current.CancellationToken);
 
         var responseTakeNegative = await ApiClient.PostAsJsonAsync(
-            $"events?skip={skip}&take={takeNegative}", searchFilter, jsonSerializerOptions);
+            $"events?skip={skip}&take={takeNegative}", searchFilter, jsonSerializerOptions, TestContext.Current.CancellationToken);
 
         var responseTakeTooLarge = await ApiClient.PostAsJsonAsync(
-            $"events?skip={skip}&take={takeTooLarge}", searchFilter, jsonSerializerOptions);
+            $"events?skip={skip}&take={takeTooLarge}", searchFilter, jsonSerializerOptions, TestContext.Current.CancellationToken);
 
         // Assert
         responseSkipNegative.StatusCode.Should().Be(System.Net.HttpStatusCode.BadRequest);

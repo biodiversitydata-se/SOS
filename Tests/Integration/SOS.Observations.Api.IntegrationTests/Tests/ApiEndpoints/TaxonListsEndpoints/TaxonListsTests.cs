@@ -23,8 +23,8 @@ public class TaxonListsTests : TestBase
         var apiClient = TestFixture.CreateApiClient();
 
         // Act
-        var response = await apiClient.GetAsync($"/taxonlists");
-        var result = await response.Content.ReadFromJsonAsync<List<Dictionary<string, object>>>();
+        var response = await apiClient.GetAsync($"/taxonlists", TestContext.Current.CancellationToken);
+        var result = await response.Content.ReadFromJsonAsync<List<Dictionary<string, object>>>(TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);

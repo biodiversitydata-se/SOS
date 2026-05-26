@@ -75,22 +75,35 @@ public class Event
     }
 
     /// <summary>
-    /// Constructor
+    /// Initializes a new instance of the Event class for a single observation date.
     /// </summary>
-    /// <param name="observationDate"></param>
+    /// <param name="observationDate">The date and time of the observation to associate with the event.</param>
+    /// <param name="ignoreTimePart">true to ignore the time component and consider only the date; otherwise, false.</param>
     public Event(DateTime observationDate, bool ignoreTimePart = false) : this(observationDate, observationDate, ignoreTimePart)
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the Event class using the specified observation date and time.
+    /// </summary>
+    /// <param name="observationDate">The date of the observation, or null if the date is not specified.</param>
+    /// <param name="observationTime">The time of the observation, or null if the time is not specified.</param>
     public Event(DateTime? observationDate, TimeSpan? observationTime) : this(observationDate, observationTime, observationDate, observationTime)
     {
     }
 
     /// <summary>
-    /// Constructor
+    /// Initializes a new instance of the Event class using the specified start and end dates, with an option to ignore
+    /// the time component.
     /// </summary>
-    /// <param name="startDate"></param>
-    /// <param name="endDate"></param>
+    /// <remarks>If either startDate or endDate is provided with an unspecified DateTimeKind, it is assumed to
+    /// be local time. The constructor converts all dates to UTC for internal storage. When ignoreTimePart is true, time
+    /// values are omitted from the plain date and time properties.</remarks>
+    /// <param name="startDate">The start date and time of the event, or null if not specified. If the kind is unspecified, it is treated as
+    /// local time.</param>
+    /// <param name="endDate">The end date and time of the event, or null if not specified. If the kind is unspecified, it is treated as local
+    /// time.</param>
+    /// <param name="ignoreTimePart">true to ignore the time component and only use the date part; otherwise, false. The default is false.</param>
     public Event(DateTime? startDate, DateTime? endDate, bool ignoreTimePart = false)
     {
         if (startDate.HasValue && startDate.Value.Kind == DateTimeKind.Unspecified)

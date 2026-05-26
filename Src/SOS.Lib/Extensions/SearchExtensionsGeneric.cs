@@ -56,12 +56,19 @@ public static class SearchExtensionsGeneric
     extension(ElasticsearchClient client)
     {
         /// <summary>
-        /// Get sort descriptor
+        /// Generates a collection of sort descriptor actions for use with Elasticsearch queries based on the specified
+        /// sorting filters.
         /// </summary>
-        /// <typeparam name="TQueryDescriptor"></typeparam>
-        /// <param name="indexName"></param>
-        /// <param name="sortings"></param>
-        /// <returns></returns>
+        /// <remarks>If the provided sorting filters do not include the default sort property for the
+        /// entity type, it is automatically appended to ensure unique ordering. For string properties, the method may
+        /// adjust the sort field to use the keyword subfield if required by the index mapping.</remarks>
+        /// <typeparam name="TQueryDescriptor">The type of the query descriptor used to build sort options.</typeparam>
+        /// <typeparam name="TEntity">The entity type whose properties are used for sorting.</typeparam>
+        /// <param name="indexName">The name of the Elasticsearch index to which the sort descriptors will be applied.</param>
+        /// <param name="sortings">A collection of sorting filters that define the fields and order to sort by. If null or empty, no sort
+        /// descriptors are generated.</param>
+        /// <returns>A collection of actions that configure sort options for the specified query descriptor, or null if no
+        /// sorting filters are provided.</returns>
         public async Task<ICollection<Action<SortOptionsDescriptor<TQueryDescriptor>>>> GetSortDescriptorAsync<TQueryDescriptor, TEntity>(string indexName, IEnumerable<SortOrderFilter> sortings) where TQueryDescriptor : class where TEntity : class
         {
             if (!sortings?.Any() ?? true)

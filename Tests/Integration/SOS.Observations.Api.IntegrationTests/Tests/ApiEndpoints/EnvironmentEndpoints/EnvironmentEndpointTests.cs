@@ -28,8 +28,8 @@ public class EnvironmentEndpointTests : TestBase
         };
 
         // Act
-        var response = await apiClient.GetAsync($"/environment");
-        var result = await response.Content.ReadFromJsonAsync<EnvironmentInformationDto>();
+        var response = await apiClient.GetAsync($"/environment", TestContext.Current.CancellationToken);
+        var result = await response.Content.ReadFromJsonAsync<EnvironmentInformationDto>(TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);

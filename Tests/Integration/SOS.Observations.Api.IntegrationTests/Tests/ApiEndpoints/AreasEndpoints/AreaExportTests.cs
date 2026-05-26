@@ -25,12 +25,12 @@ public class AreaExportTests : TestBase
         string featureId = AreaFeatureIds.Enköping;
 
         // Act
-        var response = await apiClient.GetAsync($"/areas/municipality/{featureId}/export?format={exportFormat}");
-        using var contentStream = await response.Content.ReadAsStreamAsync();
+        var response = await apiClient.GetAsync($"/areas/municipality/{featureId}/export?format={exportFormat}", TestContext.Current.CancellationToken);
+        using var contentStream = await response.Content.ReadAsStreamAsync(TestContext.Current.CancellationToken);
         using var archive = new ZipArchive(contentStream, ZipArchiveMode.Read);
         using var entryStream = archive.Entries.Single().Open();
         using var reader = new StreamReader(entryStream);
-        string geoJsonContent = await reader.ReadToEndAsync();
+        string geoJsonContent = await reader.ReadToEndAsync(TestContext.Current.CancellationToken);
         using JsonDocument document = JsonDocument.Parse(geoJsonContent);
         JsonElement root = document.RootElement;
 
@@ -56,12 +56,12 @@ public class AreaExportTests : TestBase
         string featureId = AreaFeatureIds.Enköping;
 
         // Act
-        var response = await apiClient.GetAsync($"/areas/municipality/{featureId}/export?format={exportFormat}");
-        using var contentStream = await response.Content.ReadAsStreamAsync();
+        var response = await apiClient.GetAsync($"/areas/municipality/{featureId}/export?format={exportFormat}", TestContext.Current.CancellationToken);
+        using var contentStream = await response.Content.ReadAsStreamAsync(TestContext.Current.CancellationToken);
         using var archive = new ZipArchive(contentStream, ZipArchiveMode.Read);
         using var entryStream = archive.Entries.Single().Open();
         using var reader = new StreamReader(entryStream);
-        string jsonContent = await reader.ReadToEndAsync();
+        string jsonContent = await reader.ReadToEndAsync(TestContext.Current.CancellationToken);
         using JsonDocument document = JsonDocument.Parse(jsonContent);
         JsonElement root = document.RootElement;
 

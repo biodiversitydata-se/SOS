@@ -15,10 +15,6 @@ namespace DwC_A.Exceptions
         {
         }
 
-        protected TermNotFoundException(SerializationInfo info, StreamingContext context) : base(info, context)
-        {
-        }
-
         private static string BuildMessage(string term)
         {
             return $"Term {term} not found";

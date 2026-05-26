@@ -127,8 +127,8 @@ public class GeneralizationFilterTests : TestBase
             ProtectionFilter = ProtectionFilterDto.BothPublicAndSensitive,
             Output = new OutputFilterExtendedDto { FieldSet = OutputFieldSet.AllWithValues }
         };
-        var response = await apiClientWithAccessToUser.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter));
-        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+        var response = await apiClientWithAccessToUser.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);
         var diffusedObsWithAccess = (Verbatim: verbatimObservations.ElementAt(0), Processed: result.Records.First(m => m.Occurrence.OccurrenceId == $"urn:lsid:artportalen.se:sighting:{verbatimObservations.ElementAt(0).SightingId}"));
         var diffusedObsWithoutAccess = (Verbatim: verbatimObservations.ElementAt(1), Processed: result.Records.First(m => m.Occurrence.OccurrenceId == $"urn:lsid:artportalen.se:sighting:{verbatimObservations.ElementAt(1).SightingId}"));
         var publicObservation = (Verbatim: verbatimObservations.ElementAt(4), Processed: result.Records.First(m => m.Occurrence.OccurrenceId == $"urn:lsid:artportalen.se:sighting:{verbatimObservations.ElementAt(4).SightingId}"));
@@ -190,8 +190,8 @@ public class GeneralizationFilterTests : TestBase
 
         // Act, Assert - Get public observations (with user access to one observation)
         var verbatimDiffusedObsWithAccess = verbatimObservations.ElementAt(0);
-        var response = await apiClientWithAccessToUser.GetAsync($"/observations/internal?occurrenceId=urn:lsid:artportalen.se:sighting:{verbatimDiffusedObsWithAccess.SightingId}&resolveGeneralizedObservations=true");
-        var diffusedObsWithAccess = await response.Content.ReadFromJsonAsync<Observation>();
+        var response = await apiClientWithAccessToUser.GetAsync($"/observations/internal?occurrenceId=urn:lsid:artportalen.se:sighting:{verbatimDiffusedObsWithAccess.SightingId}&resolveGeneralizedObservations=true", TestContext.Current.CancellationToken);
+        var diffusedObsWithAccess = await response.Content.ReadFromJsonAsync<Observation>(TestContext.Current.CancellationToken);
         diffusedObsWithAccess!.IsGeneralized.Should().BeFalse();
         diffusedObsWithAccess.Location.CoordinateUncertaintyInMeters.Should().Be(verbatimDiffusedObsWithAccess.Site.Accuracy, because: "the user has access to the real coordinates");
         var point = new Point(verbatimDiffusedObsWithAccess.Site.XCoord, verbatimDiffusedObsWithAccess.Site.YCoord);
@@ -200,8 +200,8 @@ public class GeneralizationFilterTests : TestBase
         diffusedObsWithAccess.Location.DecimalLatitude.Should().BeApproximately(transformedPoint.Y, 0.1);
 
         // Act, Assert - Get public observations (with user access to one observation) - no resolve
-        response = await apiClientWithAccessToUser.GetAsync($"/observations/internal?occurrenceId=urn:lsid:artportalen.se:sighting:{verbatimDiffusedObsWithAccess.SightingId}&resolveGeneralizedObservations=false");
-        var diffusedObsWithAccessNoResolve = await response.Content.ReadFromJsonAsync<Observation>();
+        response = await apiClientWithAccessToUser.GetAsync($"/observations/internal?occurrenceId=urn:lsid:artportalen.se:sighting:{verbatimDiffusedObsWithAccess.SightingId}&resolveGeneralizedObservations=false", TestContext.Current.CancellationToken);
+        var diffusedObsWithAccessNoResolve = await response.Content.ReadFromJsonAsync<Observation>(TestContext.Current.CancellationToken);
         diffusedObsWithAccessNoResolve!.IsGeneralized.Should().BeFalse();
         diffusedObsWithAccessNoResolve.Location.CoordinateUncertaintyInMeters.Should().Be(ArtportalenObservationFactory.GetDiffusionCoordinateUncertainty(verbatimDiffusedObsWithAccess.Site.DiffusionId), because: "the user has access to the real coordinates");
         point = new Point(verbatimDiffusedObsWithAccess.Site.XCoordDiffused!.Value, verbatimDiffusedObsWithAccess.Site.YCoordDiffused!.Value);
@@ -211,8 +211,8 @@ public class GeneralizationFilterTests : TestBase
 
         // Act, Assert - diffused observation without user access
         var verbatimDiffusedObsWithoutAccess = verbatimObservations.ElementAt(1);
-        response = await apiClientWithAccessToUser.GetAsync($"/observations/internal?occurrenceId=urn:lsid:artportalen.se:sighting:{verbatimDiffusedObsWithoutAccess.SightingId}&resolveGeneralizedObservations=true");
-        var diffusedObsWithoutAccess = await response.Content.ReadFromJsonAsync<Observation>();
+        response = await apiClientWithAccessToUser.GetAsync($"/observations/internal?occurrenceId=urn:lsid:artportalen.se:sighting:{verbatimDiffusedObsWithoutAccess.SightingId}&resolveGeneralizedObservations=true", TestContext.Current.CancellationToken);
+        var diffusedObsWithoutAccess = await response.Content.ReadFromJsonAsync<Observation>(TestContext.Current.CancellationToken);
         diffusedObsWithoutAccess!.IsGeneralized.Should().BeTrue();
         diffusedObsWithoutAccess.Location.CoordinateUncertaintyInMeters.Should().Be(ArtportalenObservationFactory.GetDiffusionCoordinateUncertainty(verbatimDiffusedObsWithoutAccess.Site.DiffusionId), because: "the user has not access to the real coordinates");
         point = new Point(verbatimDiffusedObsWithoutAccess.Site.XCoordDiffused!.Value, verbatimDiffusedObsWithoutAccess.Site.YCoordDiffused!.Value);
@@ -257,8 +257,8 @@ public class GeneralizationFilterTests : TestBase
         };       
 
         // Act
-        var response = await apiClientWithAccessToUser.PostAsync($"/exports/internal/download/csv?gzip=false", JsonContent.Create(searchFilter));
-        byte[] contentBytes = await response.Content.ReadAsByteArrayAsync();
+        var response = await apiClientWithAccessToUser.PostAsync($"/exports/internal/download/csv?gzip=false", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        byte[] contentBytes = await response.Content.ReadAsByteArrayAsync(TestContext.Current.CancellationToken);
 
         // Assert
         var verbatimDiffusedObsWithAccess = verbatimObservations.ElementAt(0);
@@ -286,8 +286,8 @@ public class GeneralizationFilterTests : TestBase
             ProtectionFilter = ProtectionFilterDto.Sensitive,
             Output = new OutputFilterExtendedDto { FieldSet = Lib.Enums.OutputFieldSet.AllWithValues }
         };
-        var response = await apiClientWithAccessToUser.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter));
-        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();        
+        var response = await apiClientWithAccessToUser.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);        
         result!.TotalCount.Should().Be(14 + 20);
         var generalizedObservationsCount = result.Records.Count(m => m.IsGeneralized);
         generalizedObservationsCount.Should().Be(0);
@@ -302,8 +302,8 @@ public class GeneralizationFilterTests : TestBase
                 SensitiveGeneralizationFilter = SensitiveGeneralizationFilterDto.IncludeGeneralizedObservations
             }            
         };
-        response = await apiClientWithAccessToUser.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter));
-        result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+        response = await apiClientWithAccessToUser.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);
         result!.TotalCount.Should().Be(11 + 14 + 20);
         generalizedObservationsCount = result.Records.Count(m => m.IsGeneralized);
         generalizedObservationsCount.Should().Be(0);
@@ -318,8 +318,8 @@ public class GeneralizationFilterTests : TestBase
                 SensitiveGeneralizationFilter = SensitiveGeneralizationFilterDto.OnlyGeneralizedObservations
             }            
         };
-        response = await apiClientWithAccessToUser.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter));
-        result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+        response = await apiClientWithAccessToUser.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);
         result!.TotalCount.Should().Be(11);
         generalizedObservationsCount = result.Records.Count(m => m.IsGeneralized);
         generalizedObservationsCount.Should().Be(0);
@@ -338,8 +338,8 @@ public class GeneralizationFilterTests : TestBase
                 SensitiveGeneralizationFilter = SensitiveGeneralizationFilterDto.DontIncludeGeneralizedObservations
             }
         };
-        response = await apiClientWithAccessToLevel3.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter));
-        result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+        response = await apiClientWithAccessToLevel3.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);
         result!.TotalCount.Should().Be(14 + 7 + 20 + 9);
         generalizedObservationsCount = result.Records.Count(m => m.IsGeneralized);
         generalizedObservationsCount.Should().Be(0);
@@ -354,8 +354,8 @@ public class GeneralizationFilterTests : TestBase
                 SensitiveGeneralizationFilter = SensitiveGeneralizationFilterDto.IncludeGeneralizedObservations
             }
         };
-        response = await apiClientWithAccessToLevel3.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter));
-        result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+        response = await apiClientWithAccessToLevel3.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);
         result!.TotalCount.Should().Be(11 + 14 + 18 + 7 + 20 + 9);
         generalizedObservationsCount = result.Records.Count(m => m.IsGeneralized);
         generalizedObservationsCount.Should().Be(0);        
@@ -381,8 +381,8 @@ public class GeneralizationFilterTests : TestBase
                 SensitiveGeneralizationFilter = SensitiveGeneralizationFilterDto.DontIncludeGeneralizedObservations
             }
         };
-        var response = await apiClientWithAccessToLevel3.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter));
-        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();            
+        var response = await apiClientWithAccessToLevel3.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);            
         result!.TotalCount.Should().Be(14 + 7 + 20 + 9);
         var generalizedObservationsCount = result.Records.Count(m => m.IsGeneralized);
         generalizedObservationsCount.Should().Be(0);
@@ -397,8 +397,8 @@ public class GeneralizationFilterTests : TestBase
                 SensitiveGeneralizationFilter = SensitiveGeneralizationFilterDto.IncludeGeneralizedObservations
             }
         };
-        response = await apiClientWithAccessToLevel3.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter));
-        result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();            
+        response = await apiClientWithAccessToLevel3.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);            
         result!.TotalCount.Should().Be(11 + 14 + 18 + 7 + 20 + 9);
         generalizedObservationsCount = result.Records.Count(m => m.IsGeneralized);
         generalizedObservationsCount.Should().Be(0);
@@ -420,8 +420,8 @@ public class GeneralizationFilterTests : TestBase
             ProtectionFilter = ProtectionFilterDto.Public,
             Output = new OutputFilterExtendedDto { FieldSet = Lib.Enums.OutputFieldSet.AllWithValues }
         };
-        var response = await apiClientWithAccessToUser.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter));
-        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+        var response = await apiClientWithAccessToUser.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);
         result!.TotalCount.Should().Be(11 + 18 + 21);
         int generalizedObservationsCount = result.Records.Count(m => m.IsGeneralized);
         generalizedObservationsCount.Should().Be(11 + 18);
@@ -436,8 +436,8 @@ public class GeneralizationFilterTests : TestBase
                 SensitiveGeneralizationFilter = SensitiveGeneralizationFilterDto.OnlyGeneralizedObservations
             }
         };
-        response = await apiClientWithAccessToUser.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter));
-        result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+        response = await apiClientWithAccessToUser.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);
         result!.TotalCount.Should().Be(11 + 18 + 21, because: "The generalization filter is only applied when searching sensitive observations");
         generalizedObservationsCount = result.Records.Count(m => m.IsGeneralized);
         generalizedObservationsCount.Should().Be(11 + 18);
@@ -460,8 +460,8 @@ public class GeneralizationFilterTests : TestBase
             ProtectionFilter = ProtectionFilterDto.BothPublicAndSensitive,
             Output = new OutputFilterExtendedDto { FieldSet = Lib.Enums.OutputFieldSet.AllWithValues }
         };
-        var response = await apiClientWithAccessToUser.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter));
-        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+        var response = await apiClientWithAccessToUser.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);
         result!.TotalCount.Should().Be(11 + 18 + 14 + 20 + 21, because: "Observations that is in both public and sensitive index, will only return observations from public index.");
         var generalizedObservationsCount = result.Records.Count(m => m.IsGeneralized);
         generalizedObservationsCount.Should().Be(18, because: "11 generalized observations will be resolved and 18 not");
@@ -491,8 +491,8 @@ public class GeneralizationFilterTests : TestBase
                 SensitiveGeneralizationFilter = SensitiveGeneralizationFilterDto.OnlyGeneralizedObservations
             }
         };
-        var response = await apiClientWithAccessToUser.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter));
-        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+        var response = await apiClientWithAccessToUser.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);
         var realObservation = result.Records.First();
 
         // 2. Get generalized observation
@@ -501,8 +501,8 @@ public class GeneralizationFilterTests : TestBase
             ProtectionFilter = ProtectionFilterDto.Public,
             Output = new OutputFilterExtendedDto { FieldSet = Lib.Enums.OutputFieldSet.AllWithValues }
         };
-        response = await apiClientWithAccessToUser.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter));
-        result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+        response = await apiClientWithAccessToUser.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);
         var generalizedObservation = result.Records.First(m => m.Occurrence.OccurrenceId == realObservation.Occurrence.OccurrenceId);
 
         realObservation.Location.DecimalLongitude.Should().NotBe(generalizedObservation.Location.DecimalLongitude);
@@ -522,8 +522,8 @@ public class GeneralizationFilterTests : TestBase
                 PublicGeneralizationFilter = PublicGeneralizationFilterDto.OnlyGeneralized
             }
         };
-        response = await apiClientWithAccessToUser.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter));
-        result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+        response = await apiClientWithAccessToUser.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);
         generalizedObservation = result.Records.First();
 
         // 2. Get real observation
@@ -536,8 +536,8 @@ public class GeneralizationFilterTests : TestBase
                 SensitiveGeneralizationFilter = SensitiveGeneralizationFilterDto.IncludeGeneralizedObservations
             }
         };
-        response = await apiClientWithAccessToUser.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter));
-        result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+        response = await apiClientWithAccessToUser.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);
         realObservation = result.Records.First(m => m.Occurrence.OccurrenceId == realObservation.Occurrence.OccurrenceId);
 
         realObservation.Location.DecimalLongitude.Should().NotBe(generalizedObservation.Location.DecimalLongitude);

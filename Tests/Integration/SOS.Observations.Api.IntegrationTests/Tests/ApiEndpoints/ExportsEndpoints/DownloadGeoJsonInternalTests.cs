@@ -29,8 +29,8 @@ public class DownloadGeoJsonInternalTests : TestBase
         var searchFilter = new SearchFilterDto { Output = new OutputFilterDto { FieldSet = OutputFieldSet.Minimum } };
 
         // Act
-        var response = await apiClient.PostAsync($"/exports/internal/download/geojson?gzip=false", JsonContent.Create(searchFilter));
-        byte[] contentBytes = await response.Content.ReadAsByteArrayAsync();
+        var response = await apiClient.PostAsync($"/exports/internal/download/geojson?gzip=false", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        byte[] contentBytes = await response.Content.ReadAsByteArrayAsync(TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -50,8 +50,8 @@ public class DownloadGeoJsonInternalTests : TestBase
         var searchFilter = new SearchFilterDto { Output = new OutputFilterDto { FieldSet = OutputFieldSet.Minimum } };
 
         // Act
-        var response = await apiClient.PostAsync($"/exports/internal/download/geojson?gzip=false&flat=false&excludeNullValues=true", JsonContent.Create(searchFilter));
-        byte[] contentBytes = await response.Content.ReadAsByteArrayAsync();
+        var response = await apiClient.PostAsync($"/exports/internal/download/geojson?gzip=false&flat=false&excludeNullValues=true", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        byte[] contentBytes = await response.Content.ReadAsByteArrayAsync(TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -74,8 +74,8 @@ public class DownloadGeoJsonInternalTests : TestBase
         var searchFilter = new SearchFilterInternalDto { OccurrenceStatus = OccurrenceStatusFilterValuesDto.BothPresentAndAbsent };
 
         // Act
-        var response = await apiClient.PostAsync($"/exports/internal/download/geojson?gzip=false&sensitiveObservations=true", JsonContent.Create(searchFilter));
-        byte[] contentBytes = await response.Content.ReadAsByteArrayAsync();
+        var response = await apiClient.PostAsync($"/exports/internal/download/geojson?gzip=false&sensitiveObservations=true", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        byte[] contentBytes = await response.Content.ReadAsByteArrayAsync(TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -101,8 +101,8 @@ public class DownloadGeoJsonInternalTests : TestBase
         };
 
         // Act
-        var response = await apiClient.PostAsync($"/exports/internal/download/geojson?gzip=false&sensitiveObservations=true", JsonContent.Create(searchFilter));
-        byte[] contentBytes = await response.Content.ReadAsByteArrayAsync();
+        var response = await apiClient.PostAsync($"/exports/internal/download/geojson?gzip=false&sensitiveObservations=true", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        byte[] contentBytes = await response.Content.ReadAsByteArrayAsync(TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);

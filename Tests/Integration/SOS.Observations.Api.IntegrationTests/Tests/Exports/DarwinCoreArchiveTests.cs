@@ -33,10 +33,10 @@ public class DarwinCoreArchiveTests : TestBase
         var searchFilter = new SearchFilterDto();
 
         // Act
-        var response = await apiClient.PostAsync($"/exports/download/dwc?eventbased=true", JsonContent.Create(searchFilter));
-        var fileBytes = await response.Content.ReadAsByteArrayAsync();
+        var response = await apiClient.PostAsync($"/exports/download/dwc?eventbased=true", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var fileBytes = await response.Content.ReadAsByteArrayAsync(TestContext.Current.CancellationToken);
         var filePath = Path.Combine(Path.GetTempPath(), $"dwca-{Guid.NewGuid()}.zip");
-        await File.WriteAllBytesAsync(filePath, fileBytes);
+        await File.WriteAllBytesAsync(filePath, fileBytes, TestContext.Current.CancellationToken);
         var parsedDwcaFile = await DwcaHelper.ReadDwcaFileAsync(filePath, dataProvider);
 
         // Assert

@@ -31,10 +31,10 @@ public class SortingTests : TestBase
         var searchFilter = new SearchFilterDto { OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present};
 
         // Act
-        var responseAsc = await apiClient.PostAsync($"/observations/search?sortBy=taxon.id&sortOrder=asc", JsonContent.Create(searchFilter));
-        var resultAsc = await responseAsc.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
-        var responseDesc = await apiClient.PostAsync($"/observations/search?sortBy=taxon.id&sortOrder=desc", JsonContent.Create(searchFilter));
-        var resultDesc = await responseDesc.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+        var responseAsc = await apiClient.PostAsync($"/observations/search?sortBy=taxon.id&sortOrder=asc", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var resultAsc = await responseAsc.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);
+        var responseDesc = await apiClient.PostAsync($"/observations/search?sortBy=taxon.id&sortOrder=desc", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var resultDesc = await responseDesc.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);
 
         // Assert
         responseAsc.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -56,10 +56,10 @@ public class SortingTests : TestBase
         var searchFilter = new SearchFilterDto { OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present, Output = new OutputFilterDto { FieldSet = Lib.Enums.OutputFieldSet.All } };
 
         // Act - paginate
-        var responseAsc1 = await apiClient.PostAsync($"/observations/search?sortBy=modified&sortOrder=asc&skip=0&take=50", JsonContent.Create(searchFilter));
-        var resultAsc1 = await responseAsc1.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
-        var responseAsc2 = await apiClient.PostAsync($"/observations/search?sortBy=modified&sortOrder=asc&skip=50&take=50", JsonContent.Create(searchFilter));
-        var resultAsc2 = await responseAsc2.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+        var responseAsc1 = await apiClient.PostAsync($"/observations/search?sortBy=modified&sortOrder=asc&skip=0&take=50", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var resultAsc1 = await responseAsc1.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);
+        var responseAsc2 = await apiClient.PostAsync($"/observations/search?sortBy=modified&sortOrder=asc&skip=50&take=50", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var resultAsc2 = await responseAsc2.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);
 
         // Assert
         HashSet<string> occurrenceIds = new HashSet<string>();
@@ -93,10 +93,10 @@ public class SortingTests : TestBase
         var searchFilter = new SearchFilterDto { OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present, Output = new OutputFilterDto { Fields = ["modified"] } };
 
         // Act - paginate
-        var responseAsc1 = await apiClient.PostAsync($"/observations/search?sortBy=modified&sortOrder=asc&skip=0&take=50", JsonContent.Create(searchFilter));
-        var resultAsc1 = await responseAsc1.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
-        var responseAsc2 = await apiClient.PostAsync($"/observations/search?sortBy=modified&sortOrder=asc&skip=50&take=50", JsonContent.Create(searchFilter));
-        var resultAsc2 = await responseAsc2.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+        var responseAsc1 = await apiClient.PostAsync($"/observations/search?sortBy=modified&sortOrder=asc&skip=0&take=50", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var resultAsc1 = await responseAsc1.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);
+        var responseAsc2 = await apiClient.PostAsync($"/observations/search?sortBy=modified&sortOrder=asc&skip=50&take=50", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var resultAsc2 = await responseAsc2.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);
 
         // Assert
         DateTime? previousDate = null;
@@ -122,10 +122,10 @@ public class SortingTests : TestBase
         var searchFilter = new SearchFilterDto { OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present };
 
         // Act
-        var responseAsc = await apiClient.PostAsync($"/observations/search?sortBy=taxon.id&sortOrder=asc", JsonContent.Create(searchFilter));
-        var resultAsc = await responseAsc.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
-        var responseDesc = await apiClient.PostAsync($"/observations/search?sortBy=taxon.id&sortOrder=desc", JsonContent.Create(searchFilter));
-        var resultDesc = await responseDesc.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+        var responseAsc = await apiClient.PostAsync($"/observations/search?sortBy=taxon.id&sortOrder=asc", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var resultAsc = await responseAsc.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);
+        var responseDesc = await apiClient.PostAsync($"/observations/search?sortBy=taxon.id&sortOrder=desc", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var resultDesc = await responseDesc.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);
 
         // Assert
         responseAsc.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -146,7 +146,7 @@ public class SortingTests : TestBase
         var searchFilter = new SearchFilterDto { OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present };
 
         // Act
-        var responseAsc = await apiClient.PostAsync($"/observations/search?sortBy=Taxn.Id&sortOrder=asc", JsonContent.Create(searchFilter));
+        var responseAsc = await apiClient.PostAsync($"/observations/search?sortBy=Taxn.Id&sortOrder=asc", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
         
         // Assert
         responseAsc.StatusCode.Should().Be(HttpStatusCode.BadRequest);

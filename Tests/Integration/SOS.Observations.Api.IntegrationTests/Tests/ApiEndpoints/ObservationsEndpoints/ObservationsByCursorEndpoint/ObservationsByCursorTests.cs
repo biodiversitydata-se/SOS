@@ -31,32 +31,32 @@ public class ObservationsByCursorTests : TestBase
         // Act - First page
         var response1 = await apiClient.PostAsync(
             "/observations/searchbycursor?take=30",
-            JsonContent.Create(searchFilter));
-        var result1 = await response1.Content.ReadFromJsonAsync<SearchByCursorResultDto<Observation>>();
+            JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var result1 = await response1.Content.ReadFromJsonAsync<SearchByCursorResultDto<Observation>>(TestContext.Current.CancellationToken);
 
         // Act - Second page
         var response2 = await apiClient.PostAsync(
             $"/observations/searchbycursor?take=30&cursor={result1!.NextCursor}",
-            JsonContent.Create(searchFilter));
-        var result2 = await response2.Content.ReadFromJsonAsync<SearchByCursorResultDto<Observation>>();
+            JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var result2 = await response2.Content.ReadFromJsonAsync<SearchByCursorResultDto<Observation>>(TestContext.Current.CancellationToken);
 
         // Act - Third page
         var response3 = await apiClient.PostAsync(
             $"/observations/searchbycursor?take=30&cursor={result2!.NextCursor}",
-            JsonContent.Create(searchFilter));
-        var result3 = await response3.Content.ReadFromJsonAsync<SearchByCursorResultDto<Observation>>();
+            JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var result3 = await response3.Content.ReadFromJsonAsync<SearchByCursorResultDto<Observation>>(TestContext.Current.CancellationToken);
 
         // Act - Fourth page (last 10)
         var response4 = await apiClient.PostAsync(
             $"/observations/searchbycursor?take=30&cursor={result3!.NextCursor}",
-            JsonContent.Create(searchFilter));
-        var result4 = await response4.Content.ReadFromJsonAsync<SearchByCursorResultDto<Observation>>();
+            JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var result4 = await response4.Content.ReadFromJsonAsync<SearchByCursorResultDto<Observation>>(TestContext.Current.CancellationToken);
 
         // Act - Fifth page (no records)
         var response5 = await apiClient.PostAsync(
-           $"/observations/searchbycursor?take=30&cursor={result4!.NextCursor}",
-           JsonContent.Create(searchFilter));
-        var result5 = await response5.Content.ReadFromJsonAsync<SearchByCursorResultDto<Observation>>();
+           $"/observations/searchbycursor?take=30&cursor={result4!.NextCursor}",    
+           JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var result5 = await response5.Content.ReadFromJsonAsync<SearchByCursorResultDto<Observation>>(TestContext.Current.CancellationToken);
 
 
         // Collect all occurrence IDs
@@ -94,13 +94,13 @@ public class ObservationsByCursorTests : TestBase
         // Act
         var response1 = await apiClient.PostAsync(
             "/observations/searchbycursor?take=50",
-            JsonContent.Create(searchFilter));
-        var result1 = await response1.Content.ReadFromJsonAsync<SearchByCursorResultDto<Observation>>();
+            JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var result1 = await response1.Content.ReadFromJsonAsync<SearchByCursorResultDto<Observation>>(TestContext.Current.CancellationToken);
 
         var response2 = await apiClient.PostAsync(
             $"/observations/searchbycursor?take=50&cursor={result1!.NextCursor}",
-            JsonContent.Create(searchFilter));
-        var result2 = await response2.Content.ReadFromJsonAsync<SearchByCursorResultDto<Observation>>();
+            JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var result2 = await response2.Content.ReadFromJsonAsync<SearchByCursorResultDto<Observation>>(TestContext.Current.CancellationToken);
 
 
         // Assert
@@ -127,8 +127,8 @@ public class ObservationsByCursorTests : TestBase
         // Act - First page request
         var response1 = await apiClient.PostAsync(
             "/observations/searchbycursor?take=30",
-            JsonContent.Create(searchFilter));
-        var result1 = await response1.Content.ReadFromJsonAsync<SearchByCursorResultDto<Observation>>();
+            JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var result1 = await response1.Content.ReadFromJsonAsync<SearchByCursorResultDto<Observation>>(TestContext.Current.CancellationToken);
 
         // Add more observations between requests (simulating "live" data changes)
         var additionalObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(25)
@@ -140,8 +140,8 @@ public class ObservationsByCursorTests : TestBase
         // Act - Second page request (using cursor from first request)
         var response2 = await apiClient.PostAsync(
             $"/observations/searchbycursor?take=30&cursor={result1!.NextCursor}",
-            JsonContent.Create(searchFilter));
-        var result2 = await response2.Content.ReadFromJsonAsync<SearchByCursorResultDto<Observation>>();
+            JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var result2 = await response2.Content.ReadFromJsonAsync<SearchByCursorResultDto<Observation>>(TestContext.Current.CancellationToken);
 
         // Assert
         response1.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -168,8 +168,8 @@ public class ObservationsByCursorTests : TestBase
         // Act
         var response = await apiClient.PostAsync(
             "/observations/searchbycursor?take=50&sortBy=modified&sortOrder=asc",
-            JsonContent.Create(searchFilter));
-        var result = await response.Content.ReadFromJsonAsync<SearchByCursorResultDto<Observation>>();
+            JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var result = await response.Content.ReadFromJsonAsync<SearchByCursorResultDto<Observation>>(TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -192,8 +192,8 @@ public class ObservationsByCursorTests : TestBase
         // Act
         var response = await apiClient.PostAsync(
             "/observations/searchbycursor?take=50&sortBy=modified&sortOrder=desc",
-            JsonContent.Create(searchFilter));
-        var result = await response.Content.ReadFromJsonAsync<SearchByCursorResultDto<Observation>>();
+            JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var result = await response.Content.ReadFromJsonAsync<SearchByCursorResultDto<Observation>>(TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -217,14 +217,14 @@ public class ObservationsByCursorTests : TestBase
         // Act - First page
         var response1 = await apiClient.PostAsync(
             "/observations/searchbycursor?take=30&sortBy=modified&sortOrder=asc",
-            JsonContent.Create(searchFilter));
-        var result1 = await response1.Content.ReadFromJsonAsync<SearchByCursorResultDto<Observation>>();
+            JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var result1 = await response1.Content.ReadFromJsonAsync<SearchByCursorResultDto<Observation>>(TestContext.Current.CancellationToken);
 
         // Act - Second page
         var response2 = await apiClient.PostAsync(
             $"/observations/searchbycursor?take=30&sortBy=modified&sortOrder=asc&cursor={result1!.NextCursor}",
-            JsonContent.Create(searchFilter));
-        var result2 = await response2.Content.ReadFromJsonAsync<SearchByCursorResultDto<Observation>>();
+            JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var result2 = await response2.Content.ReadFromJsonAsync<SearchByCursorResultDto<Observation>>(TestContext.Current.CancellationToken);
 
         // Collect all modified dates in order
         allModifiedDates.AddRange(result1.Records!.Select(o => o.Modified));
@@ -250,14 +250,14 @@ public class ObservationsByCursorTests : TestBase
         // Act - First page
         var response1 = await apiClient.PostAsync(
             "/observations/searchbycursor?take=25",
-            JsonContent.Create(searchFilter));
-        var result1 = await response1.Content.ReadFromJsonAsync<SearchByCursorResultDto<Observation>>();
+            JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var result1 = await response1.Content.ReadFromJsonAsync<SearchByCursorResultDto<Observation>>(TestContext.Current.CancellationToken);
 
         // Act - Second page
         var response2 = await apiClient.PostAsync(
             $"/observations/searchbycursor?take=25&cursor={result1!.NextCursor}",
-            JsonContent.Create(searchFilter));
-        var result2 = await response2.Content.ReadFromJsonAsync<SearchByCursorResultDto<Observation>>();
+            JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var result2 = await response2.Content.ReadFromJsonAsync<SearchByCursorResultDto<Observation>>(TestContext.Current.CancellationToken);
 
         // Assert
         result1.TotalCount.Should().Be(75);
@@ -274,7 +274,7 @@ public class ObservationsByCursorTests : TestBase
         // Act
         var response = await apiClient.PostAsync(
             "/observations/searchbycursor?take=3000",
-            JsonContent.Create(searchFilter));
+            JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -290,7 +290,7 @@ public class ObservationsByCursorTests : TestBase
         // Act
         var response = await apiClient.PostAsync(
             "/observations/searchbycursor?take=50&sortBy=invalid.field.name",
-            JsonContent.Create(searchFilter));
+            JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);

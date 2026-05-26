@@ -37,8 +37,8 @@ public class GeographicsFilterTests : TestBase
         var searchFilter = SearchFilterDtoFactory.CreateWithMunicipalityFeatureIds("Municipality1");
 
         // Act
-        var response = await apiClient.PostAsync($"/observations/search", JsonContent.Create(searchFilter));
-        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+        var response = await apiClient.PostAsync($"/observations/search", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -62,8 +62,8 @@ public class GeographicsFilterTests : TestBase
         var searchFilter = SearchFilterDtoFactory.CreateWithMunicipalityFeatureIds("Municipality1", "Municipality2");
 
         // Act
-        var response = await apiClient.PostAsync($"/observations/search", JsonContent.Create(searchFilter));
-        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+        var response = await apiClient.PostAsync($"/observations/search", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -95,8 +95,8 @@ public class GeographicsFilterTests : TestBase
         };
        
         // Act
-        var response = await apiClient.PostAsync($"/observations/search", JsonContent.Create(searchFilter));
-        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+        var response = await apiClient.PostAsync($"/observations/search", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -127,8 +127,8 @@ public class GeographicsFilterTests : TestBase
         };
 
         // Act            
-        var response = await apiClient.PostAsync($"/observations/search", JsonContent.Create(searchFilter, null, JsonSerializerOptions));
-        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+        var response = await apiClient.PostAsync($"/observations/search", JsonContent.Create(searchFilter, null, JsonSerializerOptions), TestContext.Current.CancellationToken);
+        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -160,8 +160,8 @@ public class GeographicsFilterTests : TestBase
         };
 
         // Act            
-        var response = await apiClient.PostAsync($"/observations/search", JsonContent.Create(searchFilter, null, JsonSerializerOptions));
-        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+        var response = await apiClient.PostAsync($"/observations/search", JsonContent.Create(searchFilter, null, JsonSerializerOptions), TestContext.Current.CancellationToken);
+        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -195,8 +195,8 @@ public class GeographicsFilterTests : TestBase
         };
 
         // Act            
-        var response = await apiClient.PostAsync($"/observations/search", JsonContent.Create(searchFilter, null, JsonSerializerOptions));
-        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+        var response = await apiClient.PostAsync($"/observations/search", JsonContent.Create(searchFilter, null, JsonSerializerOptions), TestContext.Current.CancellationToken);
+        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -235,8 +235,8 @@ public class GeographicsFilterTests : TestBase
         var apiClient = TestFixture.CreateApiClient();
 
         // Act            
-        var response = await apiClient.PostAsync($"/observations/search", JsonContent.Create(searchFilter, null, JsonSerializerOptions));
-        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+        var response = await apiClient.PostAsync($"/observations/search", JsonContent.Create(searchFilter, null, JsonSerializerOptions), TestContext.Current.CancellationToken);
+        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -272,8 +272,8 @@ public class GeographicsFilterTests : TestBase
         };
 
         // Act            
-        var response = await apiClient.PostAsync($"/observations/search", JsonContent.Create(searchFilter, null, JsonSerializerOptions));
-        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+        var response = await apiClient.PostAsync($"/observations/search", JsonContent.Create(searchFilter, null, JsonSerializerOptions), TestContext.Current.CancellationToken);
+        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -311,8 +311,8 @@ public class GeographicsFilterTests : TestBase
             }";
 
         // Act            
-        var response = await apiClient.PostAsync("/observations/search", new StringContent(json, Encoding.UTF8, "application/json"));
-        var result = await response.Content.ReadAsStringAsync();
+        var response = await apiClient.PostAsync("/observations/search", new StringContent(json, Encoding.UTF8, "application/json"), TestContext.Current.CancellationToken);
+        var result = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -351,8 +351,8 @@ public class GeographicsFilterTests : TestBase
         jsonSerializerOptions.Converters.Add(new NetTopologySuite.IO.Converters.GeoJsonConverterFactory());
 
         // Act
-        var response = await apiClient.PostAsync($"/observations/search", JsonContent.Create(searchFilter, options: jsonSerializerOptions));
-        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+        var response = await apiClient.PostAsync($"/observations/search", JsonContent.Create(searchFilter, options: jsonSerializerOptions), TestContext.Current.CancellationToken);
+        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -393,8 +393,8 @@ public class GeographicsFilterTests : TestBase
         jsonSerializerOptions.Converters.Add(new NetTopologySuite.IO.Converters.GeoJsonConverterFactory());
 
         // Act
-        var response = await apiClient.PostAsync($"/observations/search?sensitiveObservations=true", JsonContent.Create(searchFilter, options: jsonSerializerOptions));
-        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+        var response = await apiClient.PostAsync($"/observations/search?sensitiveObservations=true", JsonContent.Create(searchFilter, options: jsonSerializerOptions), TestContext.Current.CancellationToken);
+        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -435,8 +435,8 @@ public class GeographicsFilterTests : TestBase
         jsonSerializerOptions.Converters.Add(new NetTopologySuite.IO.Converters.GeoJsonConverterFactory());
 
         // Act
-        var response = await apiClient.PostAsync($"/observations/search?sensitiveObservations=true", JsonContent.Create(searchFilter, options: jsonSerializerOptions));
-        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+        var response = await apiClient.PostAsync($"/observations/search?sensitiveObservations=true", JsonContent.Create(searchFilter, options: jsonSerializerOptions), TestContext.Current.CancellationToken);
+        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);

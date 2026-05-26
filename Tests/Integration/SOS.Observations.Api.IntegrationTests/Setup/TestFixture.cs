@@ -72,7 +72,7 @@ public class TestFixture : IAsyncLifetime
         return apiClient;
     }
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
         if (_processFixtureDbMode == DbHostingMode.ContainerDb)
         {
@@ -122,7 +122,7 @@ public class TestFixture : IAsyncLifetime
     /// Performs asynchronous cleanup logic after running the integration tests.    
     /// </summary>
     /// <returns>A task representing the asynchronous operation.</returns>
-    public async Task DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
         await ApiFactory.DisposeAsync();
         await AnalysisApiFactory.DisposeAsync();

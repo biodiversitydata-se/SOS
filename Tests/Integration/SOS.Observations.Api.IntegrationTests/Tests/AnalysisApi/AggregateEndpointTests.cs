@@ -32,8 +32,8 @@ public class AggregateEndpointTests : TestBase
         };
 
         // Act
-        var response = await apiClient.PostAsync($"/internal/aggregation?aggregationField=event.startYear", JsonContent.Create(searchFilter));        
-        var result = await response.Content.ReadFromJsonAsync<PagedAggregationResultDto<AggregationItemDto>>();
+        var response = await apiClient.PostAsync($"/internal/aggregation?aggregationField=event.startYear", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);        
+        var result = await response.Content.ReadFromJsonAsync<PagedAggregationResultDto<AggregationItemDto>>(TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);

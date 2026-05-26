@@ -27,17 +27,17 @@ public class DwcaImportTests : TestBase
         // Get all datasets
         var datasetSearchFilter = new DatasetFilter {  };
         var datasetsBySearchPageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Contracts.Models.Dataset>, DatasetFilter>(
-            $"datasets", datasetSearchFilter, jsonSerializerOptions);
+            $"datasets", datasetSearchFilter, jsonSerializerOptions, TestContext.Current.CancellationToken);
 
         // Get all events
         var eventsSearchFilter = new EventsFilter { };
         var eventsBySearchPageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Event>, EventsFilter>(
-            $"events", eventsSearchFilter, jsonSerializerOptions);
+            $"events", eventsSearchFilter, jsonSerializerOptions, TestContext.Current.CancellationToken);
 
         // Get all occurrences
         var occurrenceSearchFilter = new OccurrenceFilter { };
         var occurrencesBySearchPageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Occurrence>, OccurrenceFilter>(
-            $"occurrences", occurrenceSearchFilter, jsonSerializerOptions);
+            $"occurrences", occurrenceSearchFilter, jsonSerializerOptions, TestContext.Current.CancellationToken);
 
         //-----------------------------------------------------------------------------------------------------------
         // Assert
@@ -72,17 +72,17 @@ public class DwcaImportTests : TestBase
         // Get all datasets
         var datasetSearchFilter = new DatasetFilter { };
         var datasetsBySearchPageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Contracts.Models.Dataset>, DatasetFilter>(
-            $"datasets", datasetSearchFilter, jsonSerializerOptions);
+            $"datasets", datasetSearchFilter, jsonSerializerOptions, TestContext.Current.CancellationToken);
 
         // Get all events
         var eventsSearchFilter = new EventsFilter { };
         var eventsBySearchPageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Event>, EventsFilter>(
-            $"events", eventsSearchFilter, jsonSerializerOptions);
+            $"events", eventsSearchFilter, jsonSerializerOptions, TestContext.Current.CancellationToken);
 
         // Get all occurrences
         var occurrenceSearchFilter = new OccurrenceFilter { };
         var occurrencesBySearchPageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Occurrence>, OccurrenceFilter>(
-            $"occurrences", occurrenceSearchFilter, jsonSerializerOptions);
+            $"occurrences", occurrenceSearchFilter, jsonSerializerOptions, TestContext.Current.CancellationToken);
 
         //-----------------------------------------------------------------------------------------------------------
         // Assert
@@ -124,17 +124,17 @@ public class DwcaImportTests : TestBase
         // Get all datasets
         var datasetSearchFilter = new DatasetFilter { };
         var datasetsBySearchPageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Contracts.Models.Dataset>, DatasetFilter>(
-            $"datasets", datasetSearchFilter, jsonSerializerOptions);
+            $"datasets", datasetSearchFilter, jsonSerializerOptions, TestContext.Current.CancellationToken);
 
         // Get all events
         var eventsSearchFilter = new EventsFilter { };
         var eventsBySearchPageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Event>, EventsFilter>(
-            $"events", eventsSearchFilter, jsonSerializerOptions);
+            $"events", eventsSearchFilter, jsonSerializerOptions, TestContext.Current.CancellationToken);
 
         // Get all occurrences
         var occurrenceSearchFilter = new OccurrenceFilter { };
         var occurrencesBySearchPageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Occurrence>, OccurrenceFilter>(
-            $"occurrences", occurrenceSearchFilter, jsonSerializerOptions);
+            $"occurrences", occurrenceSearchFilter, jsonSerializerOptions, TestContext.Current.CancellationToken);
 
         //-----------------------------------------------------------------------------------------------------------
         // Assert
@@ -172,17 +172,17 @@ public class DwcaImportTests : TestBase
         // Get all datasets
         var datasetSearchFilter = new DatasetFilter { };
         var datasetsBySearchPageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Contracts.Models.Dataset>, DatasetFilter>(
-            $"datasets", datasetSearchFilter, jsonSerializerOptions);
+            $"datasets", datasetSearchFilter, jsonSerializerOptions, TestContext.Current.CancellationToken);
 
         // Get all events
         var eventsSearchFilter = new EventsFilter { };
         var eventsBySearchPageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Event>, EventsFilter>(
-            $"events", eventsSearchFilter, jsonSerializerOptions);
+            $"events", eventsSearchFilter, jsonSerializerOptions, TestContext.Current.CancellationToken);
 
         // Get all occurrences
         var occurrenceSearchFilter = new OccurrenceFilter { };
         var occurrencesBySearchPageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Occurrence>, OccurrenceFilter>(
-            $"occurrences?skip=0&take=100", occurrenceSearchFilter, jsonSerializerOptions);
+            $"occurrences?skip=0&take=100", occurrenceSearchFilter, jsonSerializerOptions, TestContext.Current.CancellationToken);
 
         //-----------------------------------------------------------------------------------------------------------
         // Assert

@@ -63,8 +63,8 @@ public class CountTests : TestBase
         };
 
         // Act
-        var response = await apiClient.PostAsync($"/observations/count", JsonContent.Create(searchFilter));
-        var result = await response.Content.ReadFromJsonAsync<int>();
+        var response = await apiClient.PostAsync($"/observations/count", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var result = await response.Content.ReadFromJsonAsync<int>(TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);

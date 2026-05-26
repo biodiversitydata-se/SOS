@@ -70,8 +70,8 @@ public class GeoGridTaxaAggregationInternalTests : TestBase
         };
 
         // Act
-        var response = await apiClient.PostAsync($"/observations/internal/geogridtaxaaggregation", JsonContent.Create(searchFilter));
-        var result = await response.Content.ReadFromJsonAsync<GeoGridTileTaxonPageResultDto>();
+        var response = await apiClient.PostAsync($"/observations/internal/geogridtaxaaggregation", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var result = await response.Content.ReadFromJsonAsync<GeoGridTileTaxonPageResultDto>(TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);

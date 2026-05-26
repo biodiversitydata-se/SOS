@@ -20,8 +20,8 @@ public class DatasetsNotFoundTests : TestBase
         await ProcessFixture.AddDatasetsToElasticsearchAsync(datasets);
 
         // Act
-        var response = await ApiClient.GetAsync($"datasets/{datasetId}");
-        var problemDetails = await response.Content.ReadFromJsonAsync<ProblemDetails>(jsonSerializerOptions);
+        var response = await ApiClient.GetAsync($"datasets/{datasetId}", TestContext.Current.CancellationToken);
+        var problemDetails = await response.Content.ReadFromJsonAsync<ProblemDetails>(jsonSerializerOptions, TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);
@@ -41,7 +41,7 @@ public class DatasetsNotFoundTests : TestBase
 
         // Act        
         var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Dataset>, DatasetFilter>(
-            $"datasets", searchFilter, jsonSerializerOptions);
+            $"datasets", searchFilter, jsonSerializerOptions, TestContext.Current.CancellationToken);
 
         // Assert
         pageResult.TotalCount.Should().Be(0);

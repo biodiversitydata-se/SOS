@@ -24,7 +24,7 @@ public class OccurrencesTaxonFilterTests : TestBase
         
         // Act
         var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Occurrence>, OccurrenceFilter>(
-            $"occurrences?skip=0&take=0", searchFilter, jsonSerializerOptions);
+            $"occurrences?skip=0&take=0", searchFilter, jsonSerializerOptions, TestContext.Current.CancellationToken);
 
         // Assert
         pageResult.TotalCount.Should().Be(1);

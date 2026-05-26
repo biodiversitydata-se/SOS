@@ -25,13 +25,13 @@ public class DatasetsPaginationTests : TestBase
         for (int skip = 0; skip < testDataSet.Datasets.Count(); skip += take)
         {
             var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Dataset>, DatasetFilter>(
-                $"datasets?skip={skip}&take={take}", searchFilter, jsonSerializerOptions);
+                $"datasets?skip={skip}&take={take}", searchFilter, jsonSerializerOptions, TestContext.Current.CancellationToken);
             datasetModels.AddRange(pageResult.Records);
         }
 
         // Act - Get all in one request
         var pageResultAll = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Dataset>, DatasetFilter>(
-                $"datasets?skip=0&take={testDataSet.Datasets.Count()}", searchFilter, jsonSerializerOptions);
+                $"datasets?skip=0&take={testDataSet.Datasets.Count()}", searchFilter, jsonSerializerOptions, TestContext.Current.CancellationToken);
         allDatasetModels.AddRange(pageResultAll.Records);
 
         // Assert
@@ -54,7 +54,7 @@ public class DatasetsPaginationTests : TestBase
 
         // Act        
         var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Dataset>, DatasetFilter>(
-            $"datasets?skip={skip}&take={take}", searchFilter, jsonSerializerOptions);
+            $"datasets?skip={skip}&take={take}", searchFilter, jsonSerializerOptions, TestContext.Current.CancellationToken);
 
         // Assert
         pageResult.TotalCount.Should().Be(testDataSet.Datasets.Count());
@@ -76,7 +76,7 @@ public class DatasetsPaginationTests : TestBase
 
         // Act
         var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Dataset>, DatasetFilter>(
-            $"datasets?skip={skip}&take={take}", searchFilter, jsonSerializerOptions);
+            $"datasets?skip={skip}&take={take}", searchFilter, jsonSerializerOptions, TestContext.Current.CancellationToken);
 
         // Assert
         pageResult.TotalCount.Should().Be(testDataSet.Datasets.Count());
@@ -102,16 +102,16 @@ public class DatasetsPaginationTests : TestBase
 
         // Act
         var responseSkipNegative = await ApiClient.PostAsJsonAsync(
-            $"datasets?skip={skipNegative}&take={take}", searchFilter, jsonSerializerOptions);
+            $"datasets?skip={skipNegative}&take={take}", searchFilter, jsonSerializerOptions, TestContext.Current.CancellationToken);
 
         var responseSkipTooLarge = await ApiClient.PostAsJsonAsync(
-            $"datasets?skip={skipTooLarge}&take={take}", searchFilter, jsonSerializerOptions);
+            $"datasets?skip={skipTooLarge}&take={take}", searchFilter, jsonSerializerOptions, TestContext.Current.CancellationToken);
 
         var responseTakeNegative = await ApiClient.PostAsJsonAsync(
-            $"datasets?skip={skip}&take={takeNegative}", searchFilter, jsonSerializerOptions);
+            $"datasets?skip={skip}&take={takeNegative}", searchFilter, jsonSerializerOptions, TestContext.Current.CancellationToken);
 
         var responseTakeTooLarge = await ApiClient.PostAsJsonAsync(
-            $"datasets?skip={skip}&take={takeTooLarge}", searchFilter, jsonSerializerOptions);
+            $"datasets?skip={skip}&take={takeTooLarge}", searchFilter, jsonSerializerOptions, TestContext.Current.CancellationToken);
 
         // Assert
         responseSkipNegative.StatusCode.Should().Be(System.Net.HttpStatusCode.BadRequest);

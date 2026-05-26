@@ -29,8 +29,8 @@ public class DownloadCsvTests : TestBase
         var searchFilter = new SearchFilterDto { Output = new OutputFilterDto { FieldSet = OutputFieldSet.Minimum } };
 
         // Act
-        var response = await apiClient.PostAsync($"/exports/download/csv?gzip=false", JsonContent.Create(searchFilter));
-        byte[] contentBytes = await response.Content.ReadAsByteArrayAsync();
+        var response = await apiClient.PostAsync($"/exports/download/csv?gzip=false", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        byte[] contentBytes = await response.Content.ReadAsByteArrayAsync(TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -62,8 +62,8 @@ public class DownloadCsvTests : TestBase
         };
 
         // Act
-        var response = await apiClient.PostAsync($"/exports/download/csv?gzip=false", JsonContent.Create(searchFilter));
-        byte[] contentBytes = await response.Content.ReadAsByteArrayAsync();
+        var response = await apiClient.PostAsync($"/exports/download/csv?gzip=false", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        byte[] contentBytes = await response.Content.ReadAsByteArrayAsync(TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -93,14 +93,14 @@ public class DownloadCsvTests : TestBase
         };
 
         // Act
-        var propertyNameResponse = await apiClient.PostAsync($"/exports/download/csv?propertyLabelType=propertyname&gzip=false", JsonContent.Create(searchFilter));
-        byte[] propertyNameFileBytes = await propertyNameResponse.Content.ReadAsByteArrayAsync();
-        var propertyPathResponse = await apiClient.PostAsync($"/exports/download/csv?propertyLabelType=propertypath&gzip=false", JsonContent.Create(searchFilter));
-        byte[] propertyPathFileBytes = await propertyPathResponse.Content.ReadAsByteArrayAsync();
-        var swedishResponse = await apiClient.PostAsync($"/exports/download/csv?propertyLabelType=swedish&gzip=false", JsonContent.Create(searchFilter));
-        byte[] swedishFileBytes = await swedishResponse.Content.ReadAsByteArrayAsync();
-        var englishResponse = await apiClient.PostAsync($"/exports/download/csv?propertyLabelType=english&gzip=false", JsonContent.Create(searchFilter));
-        byte[] englishFileBytes = await englishResponse.Content.ReadAsByteArrayAsync();
+        var propertyNameResponse = await apiClient.PostAsync($"/exports/download/csv?propertyLabelType=propertyname&gzip=false", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        byte[] propertyNameFileBytes = await propertyNameResponse.Content.ReadAsByteArrayAsync(TestContext.Current.CancellationToken);
+        var propertyPathResponse = await apiClient.PostAsync($"/exports/download/csv?propertyLabelType=propertypath&gzip=false", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        byte[] propertyPathFileBytes = await propertyPathResponse.Content.ReadAsByteArrayAsync(TestContext.Current.CancellationToken);
+        var swedishResponse = await apiClient.PostAsync($"/exports/download/csv?propertyLabelType=swedish&gzip=false", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        byte[] swedishFileBytes = await swedishResponse.Content.ReadAsByteArrayAsync(TestContext.Current.CancellationToken);
+        var englishResponse = await apiClient.PostAsync($"/exports/download/csv?propertyLabelType=english&gzip=false", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        byte[] englishFileBytes = await englishResponse.Content.ReadAsByteArrayAsync(TestContext.Current.CancellationToken);
 
         // Assert
         var propertyNameEntries = CsvHelper.ReadCsvFile(propertyNameFileBytes);
@@ -141,8 +141,8 @@ public class DownloadCsvTests : TestBase
         };
 
         // Act
-        var response = await apiClient.PostAsync($"/exports/download/csv?gzip=false", JsonContent.Create(searchFilter));
-        byte[] contentBytes = await response.Content.ReadAsByteArrayAsync();
+        var response = await apiClient.PostAsync($"/exports/download/csv?gzip=false", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        byte[] contentBytes = await response.Content.ReadAsByteArrayAsync(TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);

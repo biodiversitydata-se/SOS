@@ -20,8 +20,8 @@ public class EventsNotFoundTests : TestBase
         await ProcessFixture.AddEventsToElasticsearchAsync(events);
 
         // Act
-        var response = await ApiClient.GetAsync($"events/{eventId}");
-        var problemDetails = await response.Content.ReadFromJsonAsync<ProblemDetails>(jsonSerializerOptions);
+        var response = await ApiClient.GetAsync($"events/{eventId}", TestContext.Current.CancellationToken);
+        var problemDetails = await response.Content.ReadFromJsonAsync<ProblemDetails>(jsonSerializerOptions, TestContext.Current.CancellationToken);
         
         // Assert
         response.StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);
@@ -41,7 +41,7 @@ public class EventsNotFoundTests : TestBase
 
         // Act        
         var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Event>, EventsFilter>(
-            $"events", searchFilter, jsonSerializerOptions);
+            $"events", searchFilter, jsonSerializerOptions, TestContext.Current.CancellationToken);
 
         // Assert
         pageResult.TotalCount.Should().Be(0);

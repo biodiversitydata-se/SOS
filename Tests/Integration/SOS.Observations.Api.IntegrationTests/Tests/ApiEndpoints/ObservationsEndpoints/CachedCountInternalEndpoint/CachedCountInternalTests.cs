@@ -54,8 +54,8 @@ public class CachedCountInternalTests : TestBase
         var taxonId = 100012;
 
         // Act
-        var response = await apiClient.GetAsync($"/observations/internal/cachedcount?taxonId={taxonId}");
-        var result = await response.Content.ReadFromJsonAsync<TaxonSumAggregationItem>();
+        var response = await apiClient.GetAsync($"/observations/internal/cachedcount?taxonId={taxonId}", TestContext.Current.CancellationToken);
+        var result = await response.Content.ReadFromJsonAsync<TaxonSumAggregationItem>(TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);

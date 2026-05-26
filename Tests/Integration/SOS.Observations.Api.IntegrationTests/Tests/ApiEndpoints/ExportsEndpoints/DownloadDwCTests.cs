@@ -27,8 +27,8 @@ public class DownloadDwcTests : TestBase
 
         // Act
         
-        var response = await apiClient.PostAsync($"/exports/download/dwc", JsonContent.Create(searchFilter));
-        byte[] contentBytes = await response.Content.ReadAsByteArrayAsync();
+        var response = await apiClient.PostAsync($"/exports/download/dwc", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        byte[] contentBytes = await response.Content.ReadAsByteArrayAsync(TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);

@@ -27,8 +27,8 @@ public class DatasetsTests : TestBase
         var apiClient = TestFixture.CreateApiClient();        
 
         // Act
-        var response = await apiClient.GetAsync($"/DataStewardship/datasets/{ArtportalenDatasetProjects.TreeDatasetIdentifier}");        
-        var dataset = await response.Content.ReadFromJsonAsync<DsDatasetDto>(JsonSerializerOptions);
+        var response = await apiClient.GetAsync($"/DataStewardship/datasets/{ArtportalenDatasetProjects.TreeDatasetIdentifier}", TestContext.Current.CancellationToken);        
+        var dataset = await response.Content.ReadFromJsonAsync<DsDatasetDto>(JsonSerializerOptions, TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -68,8 +68,8 @@ public class DatasetsTests : TestBase
         };        
 
         // Act
-        var response = await apiClient.PostAsync($"/DataStewardship/datasets", JsonContent.Create(searchFilter));
-        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<DsDatasetDto>>(JsonSerializerOptions);
+        var response = await apiClient.PostAsync($"/DataStewardship/datasets", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<DsDatasetDto>>(JsonSerializerOptions, TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -97,8 +97,8 @@ public class DatasetsTests : TestBase
         string occurrenceId = processedObservations.First().Occurrence.OccurrenceId;
 
         // Act
-        var response = await apiClient.GetAsync($"/DataStewardship/occurrences/{occurrenceId}");
-        var occurrence = await response.Content.ReadFromJsonAsync<DsOccurrenceDto>(JsonSerializerOptions);
+        var response = await apiClient.GetAsync($"/DataStewardship/occurrences/{occurrenceId}", TestContext.Current.CancellationToken);
+        var occurrence = await response.Content.ReadFromJsonAsync<DsOccurrenceDto>(JsonSerializerOptions, TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -139,8 +139,8 @@ public class DatasetsTests : TestBase
         };
 
         // Act
-        var response = await apiClient.PostAsync($"/DataStewardship/occurrences", JsonContent.Create(searchFilter));
-        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<DsOccurrenceDto>>(JsonSerializerOptions);
+        var response = await apiClient.PostAsync($"/DataStewardship/occurrences", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<DsOccurrenceDto>>(JsonSerializerOptions, TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -182,8 +182,8 @@ public class DatasetsTests : TestBase
         };
 
         // Act
-        var response = await apiClient.PostAsync($"/DataStewardship/events", JsonContent.Create(searchFilter));
-        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<DsEventDto>>(JsonSerializerOptions);
+        var response = await apiClient.PostAsync($"/DataStewardship/events", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<DsEventDto>>(JsonSerializerOptions, TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);

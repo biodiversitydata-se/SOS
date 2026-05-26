@@ -54,8 +54,8 @@ public class MultipleCachedCountInternalTests : TestBase
         var taxonIds = new[] { 100011, 100012 };
 
         // Act
-        var response = await apiClient.PostAsync($"/observations/internal/cachedcount", JsonContent.Create(taxonIds));
-        var result = await response.Content.ReadFromJsonAsync<IEnumerable<TaxonSumAggregationItem>>();
+        var response = await apiClient.PostAsync($"/observations/internal/cachedcount", JsonContent.Create(taxonIds), TestContext.Current.CancellationToken);
+        var result = await response.Content.ReadFromJsonAsync<IEnumerable<TaxonSumAggregationItem>>(TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);

@@ -147,7 +147,7 @@ public class CacheBaseTests
         await repo.Received(1).GetAllAsync(); // Should use cache in first request
 
         // Act
-        await Task.Delay(400); // Wait longer than cache duration
+        await Task.Delay(400, TestContext.Current.CancellationToken); // Wait longer than cache duration
         await cache.GetAllAsync();
 
         // Assert
@@ -170,7 +170,7 @@ public class CacheBaseTests
 
         // Act & Assert
         repo.GetAsync("ProcessedConfiguration").Returns(new TestEntity { Id = "ProcessedConfiguration", Name = "1" });
-        await Task.Delay(400); // Wait longer than cache duration
+        await Task.Delay(400, TestContext.Current.CancellationToken); // Wait longer than cache duration
         processedConfig = await cache.GetAsync("ProcessedConfiguration");
         Assert.Equal("1", processedConfig.Name);
     }

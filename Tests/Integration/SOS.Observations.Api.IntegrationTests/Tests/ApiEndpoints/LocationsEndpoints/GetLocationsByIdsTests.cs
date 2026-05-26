@@ -29,8 +29,8 @@ public class GetLocationsByIds : TestBase
         var locationIds = new List<string> { "urn:lsid:artportalen.se:site:4060923" };
 
         // Act
-        var response = await apiClient.PostAsync($"/Locations", JsonContent.Create(locationIds));        
-        var result = await response.Content.ReadFromJsonAsync<List<LocationDto>>(JsonSerializerOptions);
+        var response = await apiClient.PostAsync($"/Locations", JsonContent.Create(locationIds), TestContext.Current.CancellationToken);        
+        var result = await response.Content.ReadFromJsonAsync<List<LocationDto>>(JsonSerializerOptions, TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);

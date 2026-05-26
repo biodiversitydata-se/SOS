@@ -70,8 +70,8 @@ public class MetricGridAggregationInternalTests : TestBase
         };
 
         // Act
-        var response = await apiClient.PostAsync($"/observations/internal/metricgridaggregation", JsonContent.Create(searchFilter));
-        var result = await response.Content.ReadFromJsonAsync<GeoGridMetricResultDto>();
+        var response = await apiClient.PostAsync($"/observations/internal/metricgridaggregation", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var result = await response.Content.ReadFromJsonAsync<GeoGridMetricResultDto>(TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);

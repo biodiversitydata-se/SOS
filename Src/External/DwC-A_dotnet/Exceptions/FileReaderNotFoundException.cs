@@ -19,11 +19,6 @@ namespace DwC_A.Exceptions
         {
         }
 
-        protected FileReaderNotFoundException(SerializationInfo info, StreamingContext context) :
-            base(info, context)
-        {
-        }
-
         private static string BuildMessage(string fileName)
         {
             return $"FileReader for file {fileName} not found";

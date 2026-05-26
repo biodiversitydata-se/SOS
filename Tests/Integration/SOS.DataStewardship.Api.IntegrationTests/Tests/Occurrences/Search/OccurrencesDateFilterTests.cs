@@ -1,6 +1,5 @@
 using SOS.DataStewardship.Api.Contracts.Enums;
 using SOS.DataStewardship.Api.Contracts.Models;
-using SOS.Lib.Helpers;
 
 namespace SOS.DataStewardship.Api.IntegrationTests.Tests.Occurrences.Search;
 
@@ -37,7 +36,7 @@ public class OccurrencesDateFilterTests : TestBase
         
         // Act
         var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Occurrence>, OccurrenceFilter>(
-            $"occurrences?skip=0&take=0", searchFilter, jsonSerializerOptions);
+            $"occurrences?skip=0&take=0", searchFilter, jsonSerializerOptions, TestContext.Current.CancellationToken);
 
         // Assert
         pageResult.TotalCount.Should().Be(6);
@@ -69,7 +68,7 @@ public class OccurrencesDateFilterTests : TestBase
 
         // Act
         var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Occurrence>, OccurrenceFilter>(
-            $"occurrences?skip=0&take=0", searchFilter, jsonSerializerOptions);
+            $"occurrences?skip=0&take=0", searchFilter, jsonSerializerOptions, TestContext.Current.CancellationToken);
 
         // Assert
         pageResult.TotalCount.Should().Be(3);
@@ -98,7 +97,7 @@ public class OccurrencesDateFilterTests : TestBase
 
         // Act
         var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Occurrence>, OccurrenceFilter>(
-            $"occurrences?skip=0&take=0", searchFilter, jsonSerializerOptions);
+            $"occurrences?skip=0&take=0", searchFilter, jsonSerializerOptions, TestContext.Current.CancellationToken);
 
         // Assert
         pageResult.TotalCount.Should().Be(2);
@@ -127,7 +126,7 @@ public class OccurrencesDateFilterTests : TestBase
 
         // Act
         var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Occurrence>, OccurrenceFilter>(
-            $"occurrences?skip=0&take=0", searchFilter, jsonSerializerOptions);
+            $"occurrences?skip=0&take=0", searchFilter, jsonSerializerOptions, TestContext.Current.CancellationToken);
 
         // Assert
         pageResult.TotalCount.Should().Be(2);

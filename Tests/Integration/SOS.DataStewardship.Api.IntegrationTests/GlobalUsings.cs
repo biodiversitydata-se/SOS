@@ -1,6 +1,5 @@
 global using Elastic.Clients.Elasticsearch;
 global using Xunit;
-global using Xunit.Abstractions;
 global using DotNet.Testcontainers.Containers;
 global using DotNet.Testcontainers.Builders;
 global using FluentAssertions;

@@ -54,8 +54,8 @@ public class TaxonSumAggregationInternalTests : TestBase
         var searchFilter = new TaxonFilterDto { Ids = new[] { 100011, 100012 } };
 
         // Act
-        var response = await apiClient.PostAsync($"/observations/internal/taxonsumaggregation", JsonContent.Create(searchFilter));
-        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+        var response = await apiClient.PostAsync($"/observations/internal/taxonsumaggregation", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);

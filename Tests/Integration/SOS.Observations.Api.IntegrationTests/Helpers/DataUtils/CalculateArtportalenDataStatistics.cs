@@ -20,7 +20,7 @@ public class CalculateArtportalenDataStatistics : TestBase
         const int NrRowsToRead = 1000;
         int nrRowsRead = 0;
         var verbatimObservations = new List<ArtportalenObservationVerbatim>();
-        while (await cursor.MoveNextAsync())
+        while (await cursor.MoveNextAsync(TestContext.Current.CancellationToken))
         {
             if (nrRowsRead >= NrRowsToRead) break;
             foreach (var row in cursor.Current)

@@ -25,7 +25,7 @@ public class CreateDarwinCoreJsonTestData : TestBase
         using var cursor = await repository.OccurrenceRepository.GetAllByCursorAsync();
         int nrObservationsAdded = 0;
         var verbatimObservations = new List<DwcObservationVerbatim>();
-        while (await cursor.MoveNextAsync())
+        while (await cursor.MoveNextAsync(TestContext.Current.CancellationToken))
         {
             if (nrObservationsAdded >= NrObservationsToAdd) break;
             foreach (var observation in cursor.Current)
@@ -47,7 +47,7 @@ public class CreateDarwinCoreJsonTestData : TestBase
         if (nrObservationsAdded < NrObservationsToAdd)
         {
             using var cursor2 = await repository.OccurrenceRepository.GetAllByCursorAsync();
-            while (await cursor2.MoveNextAsync())
+            while (await cursor2.MoveNextAsync(TestContext.Current.CancellationToken))
             {
                 if (nrObservationsAdded >= NrObservationsToAdd) break;
                 foreach (var observation in cursor2.Current)

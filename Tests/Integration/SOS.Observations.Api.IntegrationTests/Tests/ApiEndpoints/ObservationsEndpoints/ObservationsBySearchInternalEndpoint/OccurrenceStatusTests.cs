@@ -38,8 +38,8 @@ public class OccurrenceStatusTests : TestBase
                 NotPresentFilter = ExtendedFilterDto.SightingNotPresentFilterDto.DontIncludeNotPresent
             }
         };
-        var onlyPresentResponse = await apiClient.PostAsync($"/observations/internal/search", JsonContent.Create(onlyPresentSearchFilter));
-        var onlyPresentResult = await onlyPresentResponse.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+        var onlyPresentResponse = await apiClient.PostAsync($"/observations/internal/search", JsonContent.Create(onlyPresentSearchFilter), TestContext.Current.CancellationToken);
+        var onlyPresentResult = await onlyPresentResponse.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);
         onlyPresentResult!.TotalCount.Should().Be(70);
 
         // Scenario 2 - Get only not present observations (Ej noterade (inkl. ej återfunna))
@@ -52,8 +52,8 @@ public class OccurrenceStatusTests : TestBase
                 NotPresentFilter = ExtendedFilterDto.SightingNotPresentFilterDto.IncludeNotPresent
             }
         };
-        var notPresentResponse = await apiClient.PostAsync($"/observations/internal/search", JsonContent.Create(notPresentSearchFilter));
-        var notPresentResult = await notPresentResponse.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+        var notPresentResponse = await apiClient.PostAsync($"/observations/internal/search", JsonContent.Create(notPresentSearchFilter), TestContext.Current.CancellationToken);
+        var notPresentResult = await notPresentResponse.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);
         notPresentResult!.TotalCount.Should().Be(30);
 
         // Scenario 3 - Get only not recovered observations (Ej återfunna)
@@ -66,8 +66,8 @@ public class OccurrenceStatusTests : TestBase
                 NotPresentFilter = ExtendedFilterDto.SightingNotPresentFilterDto.IncludeNotPresent
             }
         };
-        var notRecoveredResponse = await apiClient.PostAsync($"/observations/internal/search", JsonContent.Create(notRecoveredSearchFilter));
-        var notRecoveredResult = await notRecoveredResponse.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+        var notRecoveredResponse = await apiClient.PostAsync($"/observations/internal/search", JsonContent.Create(notRecoveredSearchFilter), TestContext.Current.CancellationToken);
+        var notRecoveredResult = await notRecoveredResponse.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);
         notRecoveredResult!.TotalCount.Should().Be(10);
 
         // Scenario 4 - Get both present and absent (Alla)
@@ -80,8 +80,8 @@ public class OccurrenceStatusTests : TestBase
                 NotPresentFilter = ExtendedFilterDto.SightingNotPresentFilterDto.IncludeNotPresent
             }
         };
-        var allObsResponse = await apiClient.PostAsync($"/observations/internal/search", JsonContent.Create(allObsSearchFilter));
-        var allObsResult = await allObsResponse.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+        var allObsResponse = await apiClient.PostAsync($"/observations/internal/search", JsonContent.Create(allObsSearchFilter), TestContext.Current.CancellationToken);
+        var allObsResult = await allObsResponse.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);
         allObsResult!.TotalCount.Should().Be(100);
 
         //-----------------------------------------------
@@ -98,8 +98,8 @@ public class OccurrenceStatusTests : TestBase
                 NotPresentFilter = ExtendedFilterDto.SightingNotPresentFilterDto.IncludeNotPresent
             }
         };
-        var notPresentExceptRecoveredResponse = await apiClient.PostAsync($"/observations/internal/search", JsonContent.Create(notPresentExceptRecoveredSearchFilter));
-        var notPresentExceptRecoveredResult = await notPresentExceptRecoveredResponse.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+        var notPresentExceptRecoveredResponse = await apiClient.PostAsync($"/observations/internal/search", JsonContent.Create(notPresentExceptRecoveredSearchFilter), TestContext.Current.CancellationToken);
+        var notPresentExceptRecoveredResult = await notPresentExceptRecoveredResponse.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);
         notPresentExceptRecoveredResult!.TotalCount.Should().Be(20);
 
         // Scenario 6 (Not useful scenario?) - All except not recovered (Alla (exkl. ej återfunna))
@@ -112,8 +112,8 @@ public class OccurrenceStatusTests : TestBase
                 NotPresentFilter = ExtendedFilterDto.SightingNotPresentFilterDto.IncludeNotPresent
             }
         };
-        var allExceptNotRecoveredResponse = await apiClient.PostAsync($"/observations/internal/search", JsonContent.Create(allExceptNotRecoveredSearchFilter));
-        var allExceptNotRecoveredResult = await allExceptNotRecoveredResponse.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+        var allExceptNotRecoveredResponse = await apiClient.PostAsync($"/observations/internal/search", JsonContent.Create(allExceptNotRecoveredSearchFilter), TestContext.Current.CancellationToken);
+        var allExceptNotRecoveredResult = await allExceptNotRecoveredResponse.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);
         allExceptNotRecoveredResult!.TotalCount.Should().Be(90);
 
         // Scenario 7 - All except not present (Alla (exkl. ej funna))
@@ -126,8 +126,8 @@ public class OccurrenceStatusTests : TestBase
                 NotPresentFilter = ExtendedFilterDto.SightingNotPresentFilterDto.DontIncludeNotPresent
             }
         };
-        var allExceptNotPresentSearchFilterResponse = await apiClient.PostAsync($"/observations/internal/search", JsonContent.Create(allExceptNotPresentSearchFilter));
-        var allExceptNotPresentSearchFilterResult = await allExceptNotPresentSearchFilterResponse.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+        var allExceptNotPresentSearchFilterResponse = await apiClient.PostAsync($"/observations/internal/search", JsonContent.Create(allExceptNotPresentSearchFilter), TestContext.Current.CancellationToken);
+        var allExceptNotPresentSearchFilterResult = await allExceptNotPresentSearchFilterResponse.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);
         allExceptNotPresentSearchFilterResult!.TotalCount.Should().Be(80);
     }
 }

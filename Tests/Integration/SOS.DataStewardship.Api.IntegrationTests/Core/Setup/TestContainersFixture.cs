@@ -4,7 +4,6 @@ using SOS.Lib.Database;
 using Testcontainers.MongoDb;
 using Testcontainers.Elasticsearch;
 using SOS.Lib.Helpers;
-using System;
 
 namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup;
 
@@ -31,21 +30,19 @@ public class TestContainersFixture : IAsyncLifetime
     public TestContainersFixture()
     {
         UseKibanaDebug = false;
-        ElasticsearchContainer = new ElasticsearchBuilder()
-            .WithImage(ELASTIC_IMAGE_NAME)
+        ElasticsearchContainer = new ElasticsearchBuilder(ELASTIC_IMAGE_NAME)
             .WithCleanUp(true)
             .WithPassword(ELASTIC_PASSWORD)
             .Build();
    
-        MongoDbContainer = new MongoDbBuilder()
-            .WithImage(MONGODB_IMAGE_NAME)
+        MongoDbContainer = new MongoDbBuilder(MONGODB_IMAGE_NAME)
             .WithCleanUp(true)
             .WithUsername(MONGODB_USERNAME)
             .WithPassword(MONGODB_PASSWORD)
             .Build();
     }
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
         var processClient = await InitializeMongoDbAsync();
         var elasticClient = await InitializeElasticsearchAsync();
@@ -56,7 +53,7 @@ public class TestContainersFixture : IAsyncLifetime
         };
     }
 
-    public async Task DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
         await ElasticsearchContainer.DisposeAsync();
         await MongoDbContainer.DisposeAsync();
@@ -91,8 +88,7 @@ public class TestContainersFixture : IAsyncLifetime
             .WithName(Guid.NewGuid().ToString("D"))
         .Build();
 
-        ElasticsearchContainer = new ElasticsearchBuilder()
-            .WithImage(ELASTIC_IMAGE_NAME)
+        ElasticsearchContainer = new ElasticsearchBuilder(ELASTIC_IMAGE_NAME)
             .WithCleanUp(true)
             .WithPortBinding(9200, 9200)
             .WithNetwork(network)

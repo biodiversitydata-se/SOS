@@ -27,8 +27,8 @@ public class GetChecklistByIdTests : TestBase
         var apiClient = TestFixture.CreateApiClient();
 
         // Act
-        var response = await apiClient.GetAsync($"/checklists?id={eventId}");
-        var result = await response.Content.ReadFromJsonAsync<ChecklistDto>(JsonSerializerOptions);
+        var response = await apiClient.GetAsync($"/checklists?id={eventId}", TestContext.Current.CancellationToken);
+        var result = await response.Content.ReadFromJsonAsync<ChecklistDto>(JsonSerializerOptions, TestContext.Current.CancellationToken);
 
         // Assert        
         result!.Event.EventId.Should().Be(eventId);

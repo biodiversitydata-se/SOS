@@ -26,7 +26,7 @@ public class CreateArtportalenJsonTestData : TestBase
         int skipCounter = skipInterval;
         int nrObservationsAdded = 0;
         var verbatimObservations = new List<ArtportalenObservationVerbatim>();
-        while (await cursor.MoveNextAsync())
+        while (await cursor.MoveNextAsync(TestContext.Current.CancellationToken))
         {
             if (nrObservationsAdded >= NrObservationsToAdd) break;
             foreach (var observation in cursor.Current)
@@ -81,7 +81,7 @@ public class CreateArtportalenJsonTestData : TestBase
         int skipCounter = skipInterval;
         int nrChecklistsAdded = 0;
         var verbatimChecklists = new List<ArtportalenChecklistVerbatim>();
-        while (await cursor.MoveNextAsync())
+        while (await cursor.MoveNextAsync(TestContext.Current.CancellationToken))
         {
             if (nrChecklistsAdded >= NrChecklistsToAdd) break;
             foreach (var checklist in cursor.Current)

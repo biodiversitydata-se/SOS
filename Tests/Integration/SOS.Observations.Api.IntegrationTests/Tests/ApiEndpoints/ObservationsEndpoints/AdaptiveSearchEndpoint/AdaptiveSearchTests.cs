@@ -30,8 +30,8 @@ public class AdaptiveSearchTests : TestBase
         // Act
         var response = await apiClient.PostAsync(
             "/observations/internal/adaptivesearch?observationsLimit=100",
-            JsonContent.Create(searchFilter));        
-        var strGeoJson = await response.Content.ReadAsStringAsync();
+            JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);        
+        var strGeoJson = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
         FeatureCollection featureCollection = GeoJsonHelper.ReadGeoJsonFromString(strGeoJson);
 
         // Assert
@@ -56,8 +56,8 @@ public class AdaptiveSearchTests : TestBase
         // Act
         var response = await apiClient.PostAsync(
             "/observations/internal/adaptivesearch?observationsLimit=50",
-            JsonContent.Create(searchFilter));
-        var strGeoJson = await response.Content.ReadAsStringAsync();
+            JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var strGeoJson = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
         FeatureCollection featureCollection = GeoJsonHelper.ReadGeoJsonFromString(strGeoJson);
 
         // Assert

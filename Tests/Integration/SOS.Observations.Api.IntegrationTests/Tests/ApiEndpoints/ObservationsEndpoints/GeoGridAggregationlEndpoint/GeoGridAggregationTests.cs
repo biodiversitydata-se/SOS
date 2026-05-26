@@ -70,8 +70,8 @@ public class GeoGridAggregationTests : TestBase
         };
 
         // Act
-        var response = await apiClient.PostAsync($"/observations/geogridaggregation", JsonContent.Create(searchFilter));
-        var result = await response.Content.ReadFromJsonAsync<GeoGridResultDto>();
+        var response = await apiClient.PostAsync($"/observations/geogridaggregation", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var result = await response.Content.ReadFromJsonAsync<GeoGridResultDto>(TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);

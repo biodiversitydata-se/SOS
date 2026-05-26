@@ -73,8 +73,8 @@ public class TimeSeriesTypeTests : TestBase
         };
 
         // Act
-        var response = await apiClient.PostAsync($"/observations/internal/timeserieshistogram?timeSeriesType={timeSeriesType}", JsonContent.Create(searchFilter));
-        var result = await response.Content.ReadFromJsonAsync<IEnumerable<TimeSeriesHistogramResultDto>>(options);
+        var response = await apiClient.PostAsync($"/observations/internal/timeserieshistogram?timeSeriesType={timeSeriesType}", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var result = await response.Content.ReadFromJsonAsync<IEnumerable<TimeSeriesHistogramResultDto>>(options, TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -146,8 +146,8 @@ public class TimeSeriesTypeTests : TestBase
         };
 
         // Act
-        var response = await apiClient.PostAsync($"/observations/internal/timeserieshistogram?timeSeriesType={timeSeriesType}", JsonContent.Create(searchFilter));
-        var result = await response.Content.ReadFromJsonAsync<IEnumerable<TimeSeriesHistogramResultDto>>(options);
+        var response = await apiClient.PostAsync($"/observations/internal/timeserieshistogram?timeSeriesType={timeSeriesType}", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var result = await response.Content.ReadFromJsonAsync<IEnumerable<TimeSeriesHistogramResultDto>>(options, TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -225,8 +225,8 @@ public class TimeSeriesTypeTests : TestBase
         };
 
         // Act
-        var response = await apiClient.PostAsync($"/observations/internal/timeserieshistogram?timeSeriesType={timeSeriesType}", JsonContent.Create(searchFilter));
-        var result = await response.Content.ReadFromJsonAsync<IEnumerable<TimeSeriesHistogramResultDto>>(options);
+        var response = await apiClient.PostAsync($"/observations/internal/timeserieshistogram?timeSeriesType={timeSeriesType}", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var result = await response.Content.ReadFromJsonAsync<IEnumerable<TimeSeriesHistogramResultDto>>(options, TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);

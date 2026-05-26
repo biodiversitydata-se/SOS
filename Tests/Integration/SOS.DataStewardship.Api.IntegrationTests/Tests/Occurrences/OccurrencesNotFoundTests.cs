@@ -19,8 +19,8 @@ public class OccurrencesNotFoundTests : TestBase
         await ProcessFixture.AddObservationsToElasticsearchAsync(occurrences);
 
         // Act
-        var response = await ApiClient.GetAsync($"occurrences/{occurrenceId}");
-        var problemDetails = await response.Content.ReadFromJsonAsync<ProblemDetails>(jsonSerializerOptions);
+        var response = await ApiClient.GetAsync($"occurrences/{occurrenceId}", TestContext.Current.CancellationToken);
+        var problemDetails = await response.Content.ReadFromJsonAsync<ProblemDetails>(jsonSerializerOptions, TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);
@@ -40,7 +40,7 @@ public class OccurrencesNotFoundTests : TestBase
 
         // Act        
         var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Occurrence>, OccurrenceFilter>(
-            $"occurrences", searchFilter, jsonSerializerOptions);
+            $"occurrences", searchFilter, jsonSerializerOptions, TestContext.Current.CancellationToken);
 
         // Assert
         pageResult.TotalCount.Should().Be(0);

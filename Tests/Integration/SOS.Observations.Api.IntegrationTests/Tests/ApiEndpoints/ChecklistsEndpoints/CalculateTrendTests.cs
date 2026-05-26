@@ -45,8 +45,8 @@ public class CalculateTrendTests : TestBase
         };
 
         // Act
-        var response = await apiClient.PostAsync($"/checklists/calculatetrend", JsonContent.Create(calculateTrendFilter));
-        var result = await response.Content.ReadFromJsonAsync<TaxonTrendResult>();
+        var response = await apiClient.PostAsync($"/checklists/calculatetrend", JsonContent.Create(calculateTrendFilter), TestContext.Current.CancellationToken);
+        var result = await response.Content.ReadFromJsonAsync<TaxonTrendResult>(TestContext.Current.CancellationToken);
 
         // Assert
         result!.Quotient.Should().BeApproximately(60.0 / 80, 0.0001, "because there are 60 present observations and 20 absent");

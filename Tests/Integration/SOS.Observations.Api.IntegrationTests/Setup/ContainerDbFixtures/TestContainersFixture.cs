@@ -32,14 +32,14 @@ public class TestContainersFixture : IAsyncLifetime
         UseKibanaDebug = false;
     }
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
         _processClient = await InitializeMongoDbAsync();
         _verbatimClient = await InitializeMongoDbHarvestDbAsync();
         _elasticClient = await InitializeElasticsearchAsync();
     }
 
-    public async Task DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
         await _elasticsearchContainer!.DisposeAsync();
         await _mongoDbContainer!.DisposeAsync();
@@ -63,8 +63,7 @@ public class TestContainersFixture : IAsyncLifetime
             return await InitializeElasticsearchWithKibanaAsync();
         }
 
-        _elasticsearchContainer = new ElasticsearchBuilder()
-            .WithImage(ELASTIC_IMAGE_NAME)
+        _elasticsearchContainer = new ElasticsearchBuilder(ELASTIC_IMAGE_NAME)
             .WithCleanUp(true)
             .WithPassword(ELASTIC_PASSWORD)
         .Build();
@@ -83,8 +82,7 @@ public class TestContainersFixture : IAsyncLifetime
             .WithName(Guid.NewGuid().ToString("D"))
         .Build();
 
-        _elasticsearchContainer = new ElasticsearchBuilder()
-            .WithImage(ELASTIC_IMAGE_NAME)
+        _elasticsearchContainer = new ElasticsearchBuilder(ELASTIC_IMAGE_NAME)
             .WithCleanUp(true)
             .WithPortBinding(9200, 9200)
             .WithNetwork(network)
@@ -112,8 +110,7 @@ public class TestContainersFixture : IAsyncLifetime
 
     private async Task<VerbatimClient> InitializeMongoDbHarvestDbAsync()
     {
-        _mongoDbHarvestDbContainer = new MongoDbBuilder()
-            .WithImage(MONGODB_IMAGE_NAME)
+        _mongoDbHarvestDbContainer = new MongoDbBuilder(MONGODB_IMAGE_NAME)
             .WithCleanUp(true)
             .WithUsername(MONGODB_USERNAME)
             .WithPassword(MONGODB_PASSWORD)
@@ -127,8 +124,7 @@ public class TestContainersFixture : IAsyncLifetime
 
     private async Task<ProcessClient> InitializeMongoDbAsync()
     {
-        _mongoDbContainer = new MongoDbBuilder()
-            .WithImage(MONGODB_IMAGE_NAME)
+        _mongoDbContainer = new MongoDbBuilder(MONGODB_IMAGE_NAME)
             .WithCleanUp(true)
             .WithUsername(MONGODB_USERNAME)
             .WithPassword(MONGODB_PASSWORD)

@@ -60,10 +60,10 @@ public class SignalSearchTests : TestBase
         };
 
         // Act
-        var response = await apiClient.PostAsync($"/observations/internal/signalsearch?onlyAboveMyClearance=true", JsonContent.Create(searchFilter, null, JsonSerializerOptions));
+        var response = await apiClient.PostAsync($"/observations/internal/signalsearch?onlyAboveMyClearance=true", JsonContent.Create(searchFilter, null, JsonSerializerOptions), TestContext.Current.CancellationToken);
 
         // Assert
-        var result = await response.Content.ReadFromJsonAsync<bool>();
+        var result = await response.Content.ReadFromJsonAsync<bool>(TestContext.Current.CancellationToken);
         result.Should().BeTrue();
     }
 
@@ -107,10 +107,10 @@ public class SignalSearchTests : TestBase
         };
 
         // Act
-        var response = await apiClient.PostAsync($"/observations/internal/signalsearch?onlyAboveMyClearance=true", JsonContent.Create(searchFilter, null, JsonSerializerOptions));
+        var response = await apiClient.PostAsync($"/observations/internal/signalsearch?onlyAboveMyClearance=true", JsonContent.Create(searchFilter, null, JsonSerializerOptions), TestContext.Current.CancellationToken);
 
         // Assert
-        var result = await response.Content.ReadFromJsonAsync<bool>();
+        var result = await response.Content.ReadFromJsonAsync<bool>(TestContext.Current.CancellationToken);
         result.Should().BeFalse();
     }
 
@@ -147,71 +147,71 @@ public class SignalSearchTests : TestBase
             countyFeatureId: CountyId.Uppsala);
         var apiClient = TestFixture.CreateApiClientWithReplacedService(userServiceStub);
         var searchFilter = CreateSearchFilter(1999, sensitiveTaxonId, TestCoordinates.UppsalaMunicipalityBbox, usePolygon: false);
-        var response = await apiClient.PostAsync($"/observations/internal/signalsearch?onlyAboveMyClearance=true", JsonContent.Create(searchFilter, null, JsonSerializerOptions));
-        var result = await response.Content.ReadFromJsonAsync<bool>();
+        var response = await apiClient.PostAsync($"/observations/internal/signalsearch?onlyAboveMyClearance=true", JsonContent.Create(searchFilter, null, JsonSerializerOptions), TestContext.Current.CancellationToken);
+        var result = await response.Content.ReadFromJsonAsync<bool>(TestContext.Current.CancellationToken);
         result.Should().BeTrue();
 
         // Test 2 - User has permission for Uppsala county, search in Uppsala using polygon => Should return true
         searchFilter = CreateSearchFilter(1999, sensitiveTaxonId, TestCoordinates.UppsalaMunicipalityBbox, usePolygon: true);
-        response = await apiClient.PostAsync($"/observations/internal/signalsearch?onlyAboveMyClearance=true", JsonContent.Create(searchFilter, null, JsonSerializerOptions));
-        result = await response.Content.ReadFromJsonAsync<bool>();
+        response = await apiClient.PostAsync($"/observations/internal/signalsearch?onlyAboveMyClearance=true", JsonContent.Create(searchFilter, null, JsonSerializerOptions), TestContext.Current.CancellationToken);
+        result = await response.Content.ReadFromJsonAsync<bool>(TestContext.Current.CancellationToken);
         result.Should().BeTrue();
 
         // Test 3 - User has permission for Uppsala county, search in Uppsala using Area => Should return true
         searchFilter = CreateSearchFilter(1999, sensitiveTaxonId, CountyId.Uppsala);
-        response = await apiClient.PostAsync($"/observations/internal/signalsearch?onlyAboveMyClearance=true", JsonContent.Create(searchFilter, null, JsonSerializerOptions));
-        result = await response.Content.ReadFromJsonAsync<bool>();
+        response = await apiClient.PostAsync($"/observations/internal/signalsearch?onlyAboveMyClearance=true", JsonContent.Create(searchFilter, null, JsonSerializerOptions), TestContext.Current.CancellationToken);
+        result = await response.Content.ReadFromJsonAsync<bool>(TestContext.Current.CancellationToken);
         result.Should().BeTrue();
 
         // Test 4 - User has no permission for Jönköping county, search in Jönköping with bbox => Should return false        
         searchFilter = CreateSearchFilter(1999, sensitiveTaxonId, TestCoordinates.JönköpingMunicipalityBbox, usePolygon: false);
-        response = await apiClient.PostAsync($"/observations/internal/signalsearch?onlyAboveMyClearance=true", JsonContent.Create(searchFilter, null, JsonSerializerOptions));
-        result = await response.Content.ReadFromJsonAsync<bool>();
+        response = await apiClient.PostAsync($"/observations/internal/signalsearch?onlyAboveMyClearance=true", JsonContent.Create(searchFilter, null, JsonSerializerOptions), TestContext.Current.CancellationToken);
+        result = await response.Content.ReadFromJsonAsync<bool>(TestContext.Current.CancellationToken);
         result.Should().BeFalse();
 
         // Test 5 - User has no permission for Jönköping county, search in Jönköping with polygon => Should return false        
         searchFilter = CreateSearchFilter(1999, sensitiveTaxonId, TestCoordinates.JönköpingMunicipalityBbox, usePolygon: true);
-        response = await apiClient.PostAsync($"/observations/internal/signalsearch?onlyAboveMyClearance=true", JsonContent.Create(searchFilter, null, JsonSerializerOptions));
-        result = await response.Content.ReadFromJsonAsync<bool>();
+        response = await apiClient.PostAsync($"/observations/internal/signalsearch?onlyAboveMyClearance=true", JsonContent.Create(searchFilter, null, JsonSerializerOptions), TestContext.Current.CancellationToken);
+        result = await response.Content.ReadFromJsonAsync<bool>(TestContext.Current.CancellationToken);
         result.Should().BeFalse();
 
         // Test 6 - User has no permission for Jönköping county, search in Jönköping with Area => Should return false        
         searchFilter = CreateSearchFilter(1999, sensitiveTaxonId, CountyId.Jönköping);
-        response = await apiClient.PostAsync($"/observations/internal/signalsearch?onlyAboveMyClearance=true", JsonContent.Create(searchFilter, null, JsonSerializerOptions));
-        result = await response.Content.ReadFromJsonAsync<bool>();
+        response = await apiClient.PostAsync($"/observations/internal/signalsearch?onlyAboveMyClearance=true", JsonContent.Create(searchFilter, null, JsonSerializerOptions), TestContext.Current.CancellationToken);
+        result = await response.Content.ReadFromJsonAsync<bool>(TestContext.Current.CancellationToken);
         result.Should().BeFalse();
 
         // Test 7 - User has permission for Uppsala county, search in Tierp with bbox => Should return false since there are no observations in Tierp
         searchFilter = CreateSearchFilter(1999, sensitiveTaxonId, TestCoordinates.TierpCenterBbox, usePolygon: false);
-        response = await apiClient.PostAsync($"/observations/internal/signalsearch?onlyAboveMyClearance=true&returnHttp4xxWhenNoPermissions=true", JsonContent.Create(searchFilter, null, JsonSerializerOptions));
-        result = await response.Content.ReadFromJsonAsync<bool>();
+        response = await apiClient.PostAsync($"/observations/internal/signalsearch?onlyAboveMyClearance=true&returnHttp4xxWhenNoPermissions=true", JsonContent.Create(searchFilter, null, JsonSerializerOptions), TestContext.Current.CancellationToken);
+        result = await response.Content.ReadFromJsonAsync<bool>(TestContext.Current.CancellationToken);
         result.Should().BeFalse();
 
         // Test 8 - User has permission for Uppsala county, search in Tierp with polygon => Should return false since there are no observations in Tierp
         searchFilter = CreateSearchFilter(1999, sensitiveTaxonId, TestCoordinates.TierpCenterBbox, usePolygon: true);
-        response = await apiClient.PostAsync($"/observations/internal/signalsearch?onlyAboveMyClearance=true&returnHttp4xxWhenNoPermissions=true", JsonContent.Create(searchFilter, null, JsonSerializerOptions));
-        result = await response.Content.ReadFromJsonAsync<bool>();
+        response = await apiClient.PostAsync($"/observations/internal/signalsearch?onlyAboveMyClearance=true&returnHttp4xxWhenNoPermissions=true", JsonContent.Create(searchFilter, null, JsonSerializerOptions), TestContext.Current.CancellationToken);
+        result = await response.Content.ReadFromJsonAsync<bool>(TestContext.Current.CancellationToken);
         result.Should().BeFalse();
 
         // Test 9 - User has permission for Uppsala county, search in Tierp with bbox that intersects with an area where the user doesn't have access
         //       => Should return Http 409
         searchFilter = CreateSearchFilter(1999, sensitiveTaxonId, TestCoordinates.TierpMunicipalityBbox, usePolygon: false);
-        response = await apiClient.PostAsync($"/observations/internal/signalsearch?onlyAboveMyClearance=true&returnHttp4xxWhenNoPermissions=true", JsonContent.Create(searchFilter, null, JsonSerializerOptions));
+        response = await apiClient.PostAsync($"/observations/internal/signalsearch?onlyAboveMyClearance=true&returnHttp4xxWhenNoPermissions=true", JsonContent.Create(searchFilter, null, JsonSerializerOptions), TestContext.Current.CancellationToken);
         response.StatusCode.Should().Be(HttpStatusCode.Conflict);
 
         // Test 10 - User has no permissions for Jönköping county, search in Jönköping using Area => Should return http 403
         searchFilter = CreateSearchFilter(1999, sensitiveTaxonId, CountyId.Jönköping);
-        response = await apiClient.PostAsync($"/observations/internal/signalsearch?onlyAboveMyClearance=true&returnHttp4xxWhenNoPermissions=true", JsonContent.Create(searchFilter, null, JsonSerializerOptions));
+        response = await apiClient.PostAsync($"/observations/internal/signalsearch?onlyAboveMyClearance=true&returnHttp4xxWhenNoPermissions=true", JsonContent.Create(searchFilter, null, JsonSerializerOptions), TestContext.Current.CancellationToken);
         response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
 
         // Test 11 - User has no permissions for Jönköping county, search in Jönköping using bbox => Should return http 403
         searchFilter = CreateSearchFilter(1999, sensitiveTaxonId, TestCoordinates.JönköpingMunicipalityBbox, usePolygon: false);
-        response = await apiClient.PostAsync($"/observations/internal/signalsearch?onlyAboveMyClearance=true&returnHttp4xxWhenNoPermissions=true", JsonContent.Create(searchFilter, null, JsonSerializerOptions));
+        response = await apiClient.PostAsync($"/observations/internal/signalsearch?onlyAboveMyClearance=true&returnHttp4xxWhenNoPermissions=true", JsonContent.Create(searchFilter, null, JsonSerializerOptions), TestContext.Current.CancellationToken);
         response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
 
         // Test 12 - User has no permissions for Jönköping county, search in Jönköping using polygon => Should return http 403
         searchFilter = CreateSearchFilter(1999, sensitiveTaxonId, TestCoordinates.JönköpingMunicipalityBbox, usePolygon: true);
-        response = await apiClient.PostAsync($"/observations/internal/signalsearch?onlyAboveMyClearance=true&returnHttp4xxWhenNoPermissions=true", JsonContent.Create(searchFilter, null, JsonSerializerOptions));
+        response = await apiClient.PostAsync($"/observations/internal/signalsearch?onlyAboveMyClearance=true&returnHttp4xxWhenNoPermissions=true", JsonContent.Create(searchFilter, null, JsonSerializerOptions), TestContext.Current.CancellationToken);
         response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
 

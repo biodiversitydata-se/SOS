@@ -28,7 +28,7 @@ public class DatasetsDatasetIdsFilterTests : TestBase
         
         // Act
         var pageResult = await ApiClient.PostAndReturnAsJsonAsync<PagedResult<Dataset>, DatasetFilter>(
-            $"datasets?skip=0&take=1", searchFilter, jsonSerializerOptions);
+            $"datasets?skip=0&take=1", searchFilter, jsonSerializerOptions, TestContext.Current.CancellationToken);
 
         // Assert
         pageResult.TotalCount.Should().Be(1);

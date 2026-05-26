@@ -46,7 +46,7 @@ public class TestFixture : IAsyncLifetime
         _telemetryConfiguration.DisableTelemetry = true;
     }
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
         await TestContainerFixture.InitializeAsync();
         ServiceProvider = RegisterServices();
@@ -56,7 +56,7 @@ public class TestFixture : IAsyncLifetime
         await ProcessFixture!.InitializeElasticsearchIndices();
     }
 
-    public async Task DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
         await ApiFactory.DisposeAsync();
     }

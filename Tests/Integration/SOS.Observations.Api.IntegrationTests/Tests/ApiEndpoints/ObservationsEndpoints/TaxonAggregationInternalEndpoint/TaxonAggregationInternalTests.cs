@@ -60,8 +60,8 @@ public class TaxonAggregationInternalTests : TestBase
         };
 
         // Act
-        var response = await apiClient.PostAsync($"/observations/internal/taxonaggregation", JsonContent.Create(searchFilter));
-        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<dynamic>>();
+        var response = await apiClient.PostAsync($"/observations/internal/taxonaggregation", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<dynamic>>(TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
