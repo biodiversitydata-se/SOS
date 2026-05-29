@@ -1,4 +1,69 @@
-﻿[*.cs]
+﻿root = true
+
+# Default för repo: Windows/.NET-filer
+[*]
+end_of_line = crlf
+charset = utf-8-bom
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# C# / Visual Studio / MSBuild
+[*.{cs,vb,csproj,vbproj,sln,props,targets,resx,xaml,config}]
+end_of_line = crlf
+charset = utf-8-bom
+indent_style = space
+indent_size = 4
+tab_width = 4
+
+# Filer som körs eller tolkas i Linux, containers eller Kubernetes
+[*.{sh,bash}]
+end_of_line = lf
+charset = utf-8
+indent_style = space
+indent_size = 2
+
+[Dockerfile]
+end_of_line = lf
+charset = utf-8
+
+[Dockerfile.*]
+end_of_line = lf
+charset = utf-8
+
+[*.dockerfile]
+end_of_line = lf
+charset = utf-8
+
+[*.{yml,yaml}]
+end_of_line = lf
+charset = utf-8
+indent_style = space
+indent_size = 2
+
+[.env]
+end_of_line = lf
+charset = utf-8
+
+[*.env]
+end_of_line = lf
+charset = utf-8
+
+[Makefile]
+end_of_line = lf
+charset = utf-8
+indent_style = tab
+
+[*.mk]
+end_of_line = lf
+charset = utf-8
+indent_style = tab
+
+# Linux/config-filer som ofta kopieras in i images
+[*.conf]
+end_of_line = lf
+charset = utf-8
+
+[*.cs]
 
 # CS1998: Async method lacks 'await' operators and will run synchronously
 dotnet_diagnostic.CS1998.severity = suggestion
@@ -69,9 +134,11 @@ dotnet_diagnostic.S1481.severity = suggestion
 
 [*.{cs,vb}]
 dotnet_style_operator_placement_when_wrapping = beginning_of_line
+indent_style = space
 tab_width = 4
 indent_size = 4
 end_of_line = crlf
+charset = utf-8-bom
 dotnet_style_coalesce_expression = true:suggestion
 dotnet_style_null_propagation = true:suggestion
 dotnet_style_prefer_is_null_check_over_reference_equality_method = true:suggestion

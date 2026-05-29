@@ -36,7 +36,7 @@ public class GISExtensionsTests
         act.Should().NotThrow(
             $"case '{caseName}' should be handled gracefully without ArgumentException");
     }
-   
+
     public static TheoryData<string, MultiPolygon> ProblematicMultiPolygonCases()
     {
         var data = new TheoryData<string, MultiPolygon>();

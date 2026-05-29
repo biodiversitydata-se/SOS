@@ -20,7 +20,7 @@
 		<PackageReference Include="Elastic.Clients.Elasticsearch" Version="8.17.3" />
 		<PackageReference Include="EPPlus" Version="8.5.4" />
 		<PackageReference Include="Hangfire.Core" Version="1.8.23" />
-		<PackageReference Include="MailKit" Version="4.16.0" />
+		<PackageReference Include="MailKit" Version="4.16.0" />		
 		<PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.23.0" />
 		<PackageReference Include="Microsoft.Data.SqlClient" Version="7.0.1" />
 		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="10.0.8" />

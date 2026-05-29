@@ -6,6 +6,7 @@ using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
+using SOS.Lib.Gis;
 using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.IO.GeoJson.Interfaces;
@@ -23,6 +24,7 @@ using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Unicode;
+using ProcessedLocationType = SOS.Lib.Enums.LocationType;
 
 namespace SOS.Lib.IO.GeoJson;
 
@@ -58,6 +60,10 @@ public class GeoJsonFileWriter : FileWriterBase, IGeoJsonFileWriter
         JsonSerializerOptions jsonSerializerOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
         jsonSerializerOptions.Converters.Add(attributesTableConverter);
         jsonSerializerOptions.Converters.Add(geometryConverter);
+        jsonSerializerOptions.Encoder = JavaScriptEncoder.Create(
+            UnicodeRanges.BasicLatin,
+            UnicodeRanges.Latin1Supplement
+        );
         return jsonSerializerOptions;
     }
 
@@ -89,20 +95,50 @@ public class GeoJsonFileWriter : FileWriterBase, IGeoJsonFileWriter
         };
     }
 
-    private static Geometry GetFeatureGeometryFromJsonNode(JsonNode record)
+    private static Geometry GetFeatureGeometryFromJsonNode(
+        JsonNode record,
+        Dictionary<string, Geometry>? polygonLocationGeometries = null)
     {
-        double? decimalLatitude = null;
-        double? decimalLongitude = null;
-        var locationObject = record["location"];
-        if (locationObject == null)
+        if (record["location"] is not JsonObject locationObject)
         {
             return null;
         }
-        decimalLatitude = (double?)locationObject["decimalLatitude"];
-        decimalLongitude = (double?)locationObject["decimalLongitude"];
-        if (decimalLatitude == null || decimalLongitude == null) return null;
-        Geometry geometry = new Point(decimalLongitude.Value, decimalLatitude.Value);
-        return geometry;
+
+        return ResolveFeatureGeometry(
+            locationObject["locationId"]?.GetValue<string>(),
+            GetLocationType(locationObject),
+            (double?)locationObject["decimalLatitude"],
+            (double?)locationObject["decimalLongitude"],
+            (int?)locationObject["coordinateUncertaintyInMeters"],
+            polygonLocationGeometries);
+    }
+
+    private static Geometry ResolveFeatureGeometry(
+        string? locationId,
+        ProcessedLocationType? locationType,
+        double? decimalLatitude,
+        double? decimalLongitude,
+        int? coordinateUncertaintyInMeters,
+        Dictionary<string, Geometry>? polygonLocationGeometries = null)
+    {
+        if (locationType == ProcessedLocationType.Polygon &&
+            !string.IsNullOrWhiteSpace(locationId) &&
+            polygonLocationGeometries?.TryGetValue(locationId, out var polygonGeometry) == true)
+        {
+            return polygonGeometry;
+        }
+
+        if (decimalLatitude == null || decimalLongitude == null)
+        {
+            return null;
+        }
+
+        var point = new Point(decimalLongitude.Value, decimalLatitude.Value)
+        {
+            SRID = CoordinateSys.WGS84.Srid()
+        };  
+
+        return point;
     }
 
     private static string GetOccurrenceIdFromJsonNode(JsonNode record)
@@ -123,34 +159,42 @@ public class GeoJsonFileWriter : FileWriterBase, IGeoJsonFileWriter
         double? decimalLatitude = flatObservation.LocationDecimalLatitude;
         double? decimalLongitude = flatObservation.LocationDecimalLongitude;
         if (decimalLatitude == null || decimalLongitude == null) return null;
-        Geometry geometry = new Point(decimalLongitude.Value, decimalLatitude.Value);
-        return geometry;
+
+        return new Point(decimalLongitude.Value, decimalLatitude.Value)
+        {
+            SRID = CoordinateSys.WGS84.Srid()
+        };
     }
 
-    private static Geometry GetFeatureGeometry(Observation observation)
+    private static Geometry GetFeatureGeometry(
+        Observation observation,
+        Dictionary<string, Geometry>? polygonLocationGeometries = null)
     {
-        double? decimalLatitude = observation.Location.DecimalLatitude;
-        double? decimalLongitude = observation.Location.DecimalLongitude;
-        if (decimalLatitude == null || decimalLongitude == null) return null;
-        Geometry geometry = new Point(decimalLongitude.Value, decimalLatitude.Value);
-        return geometry;
+        return ResolveFeatureGeometry(
+            observation.Location?.LocationId,
+            observation.Location?.Type,
+            observation.Location?.DecimalLatitude,
+            observation.Location?.DecimalLongitude,
+            observation.Location?.CoordinateUncertaintyInMeters,
+            polygonLocationGeometries);
     }
 
-    private static async Task WriteFeature(
+    private static void WriteFeature(
         IEnumerable<PropertyFieldDescription> propertyFields,
         JsonNode record,
         bool excludeNullValues,
+        Dictionary<string, Geometry>? polygonLocationGeometries,
         Utf8JsonWriter jsonWriter,
         JsonSerializerOptions jsonSerializerOptions)
     {
-        Geometry geometry = GetFeatureGeometryFromJsonNode(record);
+        Geometry geometry = GetFeatureGeometryFromJsonNode(record, polygonLocationGeometries);
         if (geometry == null) return;
-        
+
         string id = GetOccurrenceIdFromJsonNode(record);
         WriteFeature(geometry, record, excludeNullValues, id, jsonWriter, jsonSerializerOptions);
-    }    
+    }
 
-    private async Task WriteFeature(        
+    private static void WriteFeature(
         FlatObservation flatObservation,
         Dictionary<PropertyFieldDescription, string> propertyLabels,
         bool excludeNullValues,
@@ -161,6 +205,36 @@ public class GeoJsonFileWriter : FileWriterBase, IGeoJsonFileWriter
         if (geometry == null) return;
         string id = flatObservation.OccurrenceId;
         WriteFeature(geometry, flatObservation, propertyLabels, excludeNullValues, id, utf8JsonWriter, jsonSerializerOptions);
+    }   
+
+    private static ProcessedLocationType? GetLocationType(JsonNode? locationNode)
+    {
+        if (locationNode?["type"] is not JsonValue typeValue)
+        {
+            return null;
+        }
+
+        if (typeValue.TryGetValue<int>(out var typeInt))
+        {
+            return (ProcessedLocationType)typeInt;
+        }
+
+        if (typeValue.TryGetValue<string>(out var typeString) && Enum.TryParse<ProcessedLocationType>(typeString, true, out var locationType))
+        {
+            return locationType;
+        }
+
+        return null;
+    }
+
+    private static int? GetIntFromJsonNode(JsonNode? node)
+    {
+        if (node is JsonValue jv && jv.TryGetValue<JsonElement>(out var el) && el.ValueKind == JsonValueKind.Number)
+        {
+            return el.TryGetInt32(out var value) ? value : null;
+        }
+
+        return null;
     }
 
     private static void WriteFeature(
@@ -474,7 +548,7 @@ public class GeoJsonFileWriter : FileWriterBase, IGeoJsonFileWriter
                 foreach (var observation in processedObservations)
                 {
                     var flatObservation = new FlatObservation(observation);
-                    await WriteFeature(flatObservation, propertyLabels, excludeNullValues, jsonWriter, jsonSerializerOptions);
+                    WriteFeature(flatObservation, propertyLabels, excludeNullValues, jsonWriter, jsonSerializerOptions);
                 }
 
                 processedObservations = null;
@@ -490,7 +564,7 @@ public class GeoJsonFileWriter : FileWriterBase, IGeoJsonFileWriter
                 LocalDateTimeConverterHelper.ConvertToLocalTime(processedRecords);
                 foreach (var record in processedRecords)
                 {
-                    await WriteFeature(propertyFields, record, excludeNullValues, jsonWriter, jsonSerializerOptions);
+                    WriteFeature(propertyFields, record, excludeNullValues, null, jsonWriter, jsonSerializerOptions);
                 }
             }
 
@@ -525,7 +599,9 @@ public class GeoJsonFileWriter : FileWriterBase, IGeoJsonFileWriter
         bool excludeNullValues,
         Stream stream,
         LatLonBoundingBox? bbox,
-        List<Feature> geographicAreas)
+        List<Feature> geographicAreas,
+        bool groupByLocation,
+        Dictionary<string, Geometry>? polygonLocationGeometries = null)
     {
         using var ms = new MemoryStream();
         List<PropertyFieldDescription> propertyFields =
@@ -533,13 +609,13 @@ public class GeoJsonFileWriter : FileWriterBase, IGeoJsonFileWriter
         Dictionary<PropertyFieldDescription, string> propertyLabels = propertyFields.ToDictionary(
             x => x,
             x => ObservationPropertyFieldDescriptionHelper.GetPropertyLabel(x, propertyLabelType));
-        JsonSerializerOptions jsonSerializerOptions = CreateJsonSerializerOptions();
+        JsonSerializerOptions jsonSerializerOptions = CreateJsonSerializerOptions();        
         var jsonWriterOptions = new JsonWriterOptions()
         {
             //To be able to display å,ä,ö e.t.c. properly we need to add the range Latin1Supplement to the list of characters which should not be displayed as UTF8 encoded values (\uxxxx).
             Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.Latin1Supplement),
             SkipValidation = true
-        };
+        };       
         await using var jsonWriter = new Utf8JsonWriter(ms, jsonWriterOptions);
         jsonWriter.WriteStartObject();
         jsonWriter.WriteString("type", "FeatureCollection");
@@ -568,31 +644,237 @@ public class GeoJsonFileWriter : FileWriterBase, IGeoJsonFileWriter
                 JsonSerializer.Serialize(jsonWriter, feature.Attributes, jsonSerializerOptions);
                 jsonWriter.WriteEndObject();
             }
-        }        
-
-        if (flatOut)
+        }
+        
+        if (groupByLocation)
+        {
+            WriteGroupedByLocationFeatures(records, propertyFields, propertyLabels, propertyLabelType, flatOut, excludeNullValues, jsonWriter, jsonSerializerOptions, polygonLocationGeometries);
+        }
+        else if (flatOut)
         {
             var observations = records.ToObservationsArray();
             foreach (var observation in observations)
             {
                 var flatObservation = new FlatObservation(observation);
-                await WriteFeature(flatObservation, propertyLabels, excludeNullValues, jsonWriter, jsonSerializerOptions);
+                var geometry = GetFeatureGeometry(observation, polygonLocationGeometries);
+                if (geometry == null)
+                {
+                    continue;
+                }
+
+                WriteFeature(geometry, flatObservation, propertyLabels, excludeNullValues, flatObservation.OccurrenceId, jsonWriter, jsonSerializerOptions);
             }
         }
         else
         {
             foreach (var record in records)
             {
-                await WriteFeature(propertyFields, record, excludeNullValues, jsonWriter, jsonSerializerOptions);
+                WriteFeature(propertyFields, record, excludeNullValues, polygonLocationGeometries, jsonWriter, jsonSerializerOptions);
             }
         }
 
         jsonWriter.WriteEndArray();
         jsonWriter.WriteEndObject();
         await jsonWriter.FlushAsync();
-        
+
         ms.Position = 0;
         await ms.CopyToAsync(stream);
+    }
+
+    private void WriteGroupedByLocationFeatures(
+        IEnumerable<JsonObject> records,
+        List<PropertyFieldDescription> propertyFields,
+        Dictionary<PropertyFieldDescription, string> propertyLabels,
+        PropertyLabelType propertyLabelType,
+        bool flatOut,
+        bool excludeNullValues,
+        Utf8JsonWriter jsonWriter,
+        JsonSerializerOptions jsonSerializerOptions,
+        Dictionary<string, Geometry>? polygonLocationGeometries)
+    {
+        int syntheticCounter = 0;
+        var groupedRecords = new Dictionary<string, List<JsonObject>>(StringComparer.OrdinalIgnoreCase);
+        foreach (var record in records)
+        {
+            var locationId = GetLocationIdFromRecord(record);
+            if (string.IsNullOrWhiteSpace(locationId))
+            {
+                locationId = $"synthetic-location-{++syntheticCounter}";
+            }
+
+            if (!groupedRecords.TryGetValue(locationId, out var recordsInGroup))
+            {
+                recordsInGroup = new List<JsonObject>();
+                groupedRecords[locationId] = recordsInGroup;
+            }
+
+            recordsInGroup.Add(record);
+        }
+
+        // Separate location vs non-location property labels for flat mode
+        var locationPropertyLabels = flatOut
+            ? propertyLabels.Where(p => p.Key.PropertyPath.StartsWith("Location.", StringComparison.OrdinalIgnoreCase)).ToDictionary(p => p.Key, p => p.Value)
+            : null;
+        var observationPropertyLabels = flatOut
+            ? propertyLabels.Where(p => !p.Key.PropertyPath.StartsWith("Location.", StringComparison.OrdinalIgnoreCase)).ToDictionary(p => p.Key, p => p.Value)
+            : null;
+
+        // Non-location property fields for hierarchical mode
+        var observationPropertyFields = !flatOut
+            ? propertyFields.Where(p => !p.PropertyPath.StartsWith("Location.", StringComparison.OrdinalIgnoreCase)).ToList()
+            : null;
+
+        foreach (var group in groupedRecords)
+        {
+            var groupRecords = group.Value;
+            var locationNode = GetLocationNodeFromRecord(groupRecords[0]);
+
+            var geometry = ResolveFeatureGeometry(
+                group.Key,
+                GetLocationType(locationNode),
+                GetDoubleFromJsonNode(locationNode?["decimalLatitude"]),
+                GetDoubleFromJsonNode(locationNode?["decimalLongitude"]),
+                GetIntFromJsonNode(locationNode?["coordinateUncertaintyInMeters"]),
+                polygonLocationGeometries);
+
+            if (geometry == null)
+                continue;
+
+            var taxonIds = new HashSet<int>();
+            foreach (var record in groupRecords)
+            {
+                var taxonId = GetTaxonIdFromRecord(record);
+                if (taxonId.HasValue)
+                {
+                    taxonIds.Add(taxonId.Value);
+                }
+            }
+
+            int taxaCount = taxonIds.Count;
+
+            // Write the location feature
+            jsonWriter.WriteStartObject();
+            jsonWriter.WriteString("type", "Feature");
+            jsonWriter.WriteString("id", group.Key);
+            jsonWriter.WritePropertyName("geometry");
+            JsonSerializer.Serialize(jsonWriter, geometry, jsonSerializerOptions);
+            jsonWriter.WritePropertyName("properties");
+            jsonWriter.WriteStartObject();
+
+            // Write location properties and observations
+            if (flatOut && locationPropertyLabels != null && observationPropertyLabels != null)
+            {
+                var observationsArray = groupRecords.ToObservationsArray();
+
+                // Write location properties from the first observation, grouped under "Location"
+                var firstFlatObservation = new FlatObservation(observationsArray[0]);
+                jsonWriter.WritePropertyName("Location"); // Start location property
+                jsonWriter.WriteStartObject();
+                foreach (var pair in locationPropertyLabels)
+                {
+                    var value = firstFlatObservation.GetValue(pair.Key);
+                    if (excludeNullValues && (value == null || IsNullOrEmptyValue(value)))
+                        continue;
+                    jsonWriter.WritePropertyName(pair.Value);
+                    JsonSerializer.Serialize(jsonWriter, value, jsonSerializerOptions);
+                }
+                jsonWriter.WriteEndObject(); // End location property
+
+                jsonWriter.WriteNumber("observationCount", groupRecords.Count);
+                jsonWriter.WriteNumber("taxaCount", taxaCount);
+
+                // Write observations array (without location properties)
+                jsonWriter.WritePropertyName("observations");
+                jsonWriter.WriteStartArray();
+                foreach (var observation in observationsArray)
+                {
+                    var flatObservation = new FlatObservation(observation);
+                    WriteProperties(flatObservation, observationPropertyLabels, excludeNullValues, jsonWriter, jsonSerializerOptions);
+                }
+                jsonWriter.WriteEndArray();
+            }
+            else
+            {
+                // Write location as nested object
+                if (locationNode != null)
+                {
+                    jsonWriter.WritePropertyName("location");
+                    jsonWriter.WriteStartObject();
+                    foreach (var kvp in locationNode)
+                    {
+                        if (excludeNullValues && kvp.Value is null)
+                            continue;
+                        jsonWriter.WritePropertyName(kvp.Key);
+                        JsonSerializer.Serialize(jsonWriter, kvp.Value, jsonSerializerOptions);
+                    }
+                    jsonWriter.WriteEndObject();
+                }
+
+                jsonWriter.WriteNumber("observationCount", groupRecords.Count);
+                jsonWriter.WriteNumber("taxaCount", taxaCount);
+
+                // Write observations array (without location key)
+                jsonWriter.WritePropertyName("observations");
+                jsonWriter.WriteStartArray();
+                foreach (var record in groupRecords)
+                {
+                    WritePropertiesFromJsonNodeExcludingLocation(record, excludeNullValues, jsonWriter, jsonSerializerOptions);
+                }
+                jsonWriter.WriteEndArray();
+            }
+
+            jsonWriter.WriteEndObject(); // end properties
+            jsonWriter.WriteEndObject(); // end feature
+        }
+    }
+
+    private static void WritePropertiesFromJsonNodeExcludingLocation(
+        JsonNode record,
+        bool excludeNullValues,
+        Utf8JsonWriter jsonWriter,
+        JsonSerializerOptions jsonSerializerOptions)
+    {
+        jsonWriter.WriteStartObject();
+        foreach (var kvp in record.AsObject())
+        {
+            if (kvp.Key.Equals("location", StringComparison.OrdinalIgnoreCase))
+                continue;
+
+            JsonNode node = kvp.Value;
+            if (excludeNullValues && node is null)
+                continue;
+
+            jsonWriter.WritePropertyName(kvp.Key);
+            JsonSerializer.Serialize(jsonWriter, node, jsonSerializerOptions);
+        }
+        jsonWriter.WriteEndObject();
+    }
+
+    private static JsonObject? GetLocationNodeFromRecord(JsonObject record)
+    {
+        if (record.TryGetPropertyValue("location", out var node) && node is JsonObject loc)
+            return loc;
+        return null;
+    }
+
+    private static string? GetLocationIdFromRecord(JsonObject record)
+    {
+        var locationNode = GetLocationNodeFromRecord(record);
+        return locationNode?["locationId"]?.GetValue<string>();
+    }
+
+    private static int? GetTaxonIdFromRecord(JsonObject record)
+    {
+        if (record.TryGetPropertyValue("taxon", out var taxonNode) && taxonNode is JsonObject taxonObject)
+            return taxonObject["id"]?.GetValue<int>();
+        return null;
+    }
+
+    private static double? GetDoubleFromJsonNode(JsonNode? node)
+    {
+        if (node is JsonValue jv && jv.TryGetValue<JsonElement>(out var el) && el.ValueKind == JsonValueKind.Number)
+            return el.GetDouble();
+        return null;
     }
 
     private void WriteBbox(Utf8JsonWriter jsonWriter, LatLonBoundingBox? bbox)

@@ -1,0 +1,396 @@
+﻿@page "/locationsearch"
+@using SOS.Status.Web.Client.Abstractions
+@inject IJSRuntime JsRuntime
+@inject IObservationSearchService searchService
+@inject ISnackbar Snackbar
+
+<PageTitle>Locations search</PageTitle>
+
+<MudStack Spacing="2">
+    <MudText Typo="Typo.h4">Locations search</MudText>
+
+    <MudGrid Spacing="3">
+        <MudItem xs="12" lg="8">
+            <div style="position: relative;">
+                <div @ref="_mapContainer" style="height:560px; width:100%;"></div>
+
+                @if (isLoading)
+                {
+                    <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; z-index: 20;">
+                        <div style="width: 56px; height: 56px; border-radius: 8px; background: rgba(255, 255, 255, 0.86); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18); display: flex; align-items: center; justify-content: center;">
+                            <MudProgressCircular Color="Color.Primary" Indeterminate="true" Size="Size.Large" />
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <MudStack Row="true" Spacing="2" Class="mt-2 flex-wrap" AlignItems="AlignItems.Center">
+                <MudButton Variant="Variant.Filled"
+                           StartIcon="@Icons.Material.Outlined.Search"
+                           Color="Color.Primary"
+                           OnClick="OnSearchButtonClickedAsync"
+                           Disabled="@IsSearchDisabled">
+                    @if (showSpinner)
+                    {
+                        <MudProgressCircular Color="Color.Inherit" Indeterminate="true" Size="Size.Small" Class="mr-2" />
+                    }
+                    <span>Search</span>
+                </MudButton>
+
+                <MudCheckBox T="bool"
+                             Value="@searchAutomaticallyWhenMapChanges"
+                             ValueChanged="OnSearchAutomaticallyWhenMapChangesChanged"
+                             Label="Sök automatiskt vid pan/zoom"
+                             Color="Color.Primary"
+                             Dense="true" />
+
+                <MudCheckBox @bind-Value="cluster"
+                             Label="Klustring"
+                             Color="Color.Primary"
+                             Dense="true" />
+
+                <MudCheckBox @bind-Value="createSampleObservations"
+                             Label="Exempelobs."
+                             Color="Color.Primary"
+                             Dense="true" />
+
+                <MudCheckBox @bind-Value="useCache"
+                             Label="Use cache"
+                             Color="Color.Primary"
+                             Dense="true" />
+            </MudStack>
+
+            <MudPaper Class="pa-4 mt-2" Outlined="true">
+                @if (selectedFeatures.Count == 0)
+                {
+                    <MudText Typo="Typo.body2">Inga features markerade.</MudText>
+                }
+                else
+                {
+                    <MudExpansionPanels MultiExpansion="true" Class="mt-2">
+                        <MudExpansionPanel Text="@($"Antal träffade features: {selectedFeatures.Count}")" Expanded="true">
+                            <ul class="selected-feature-hit-list">
+                                <li>
+                                    <strong>LocationIds:</strong>
+                                    <div class="selected-feature-list-text">@SelectedLocationIdsText</div>
+                                </li>
+                                <li>
+                                    <strong>Lokaler:</strong>
+                                    <div class="selected-feature-list-text">@SelectedLocalitiesText</div>
+                                </li>
+                            </ul>
+                        </MudExpansionPanel>
+
+                        @if (selectedFeatures.FirstOrDefault() is { } firstSelectedFeature)
+                        {
+                            <MudExpansionPanel Text="@($"Första markerade feature: {firstSelectedFeature.FeatureId ?? "-"}")" Expanded="true">
+                                @if (firstSelectedFeature.Properties.Count == 0)
+                                {
+                                    <MudText Typo="Typo.body2" Class="mt-2">Inga properties hittades.</MudText>
+                                }
+                                else
+                                {
+                                    <MudTable Items="GetSelectedFeatureProperties(firstSelectedFeature)" Dense="true" Hover="true" Breakpoint="Breakpoint.Sm" Class="mt-2">
+                                        <HeaderContent>
+                                            <MudTh>Namn</MudTh>
+                                            <MudTh>Värde</MudTh>
+                                        </HeaderContent>
+                                        <RowTemplate>
+                                            <MudTd DataLabel="Namn">@context.Key</MudTd>
+                                            <MudTd DataLabel="Värde">@FormatPropertyValue(context.Value)</MudTd>
+                                        </RowTemplate>
+                                    </MudTable>
+                                }
+                            </MudExpansionPanel>
+                        }
+                    </MudExpansionPanels>
+                }
+            </MudPaper>
+        </MudItem>
+
+        <MudItem xs="12" lg="4">
+            <MudExpansionPanels MultiExpansion="false" Class="mb-2">
+                <MudExpansionPanel Text="Kartinfo" Expanded="true">
+                    <MudStack Spacing="1">
+                        <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.FlexStart" Class="mb-1">
+                            <MudButton Variant="Variant.Outlined"
+                                       Color="Color.Primary"
+                                       Size="Size.Small"
+                                       StartIcon="@copyMapGeoJsonIcon"
+                                       OnClick="CopyMapGeoJsonToClipboardAsync"
+                                       Disabled="@string.IsNullOrWhiteSpace(mapGeoJson)">
+                                Kopiera JSON
+                            </MudButton>
+                        </MudStack>
+                        <MudText Typo="Typo.body2"><strong>Zoom:</strong> @currentZoomLevel.ToString("F2")</MudText>
+                        <MudText Typo="Typo.body2"><strong>Meter per pixel:</strong> @currentMetersPerPixelText</MudText>
+                        <MudText Typo="Typo.body2"><strong>BBox:</strong> @currentBboxText</MudText>                        
+                        <MudText Typo="Typo.body2"><strong>Resultat:</strong> @lastResultTypeText</MudText>
+                        <MudText Typo="Typo.body2"><strong>Cache:</strong> @lastCacheStatusText</MudText>
+                        <MudText Typo="Typo.body2"><strong>Antal observationer:</strong> @observationsTotalCountText</MudText>
+                        <MudText Typo="Typo.body2"><strong>Lokaler före klustring:</strong> @locationsBeforeClusteringText</MudText>
+                        <MudText Typo="Typo.body2"><strong>Gridrutor/lokaler:</strong> @mapFeatureCount</MudText>
+                        <MudText Typo="Typo.body2"><strong>Svarsstorlek:</strong> @lastResponseSizeText</MudText>
+                        <MudText Typo="Typo.body2"><strong>Söktid:</strong> @lastSearchDurationText</MudText>
+                        <MudText Typo="Typo.body2"><strong>Servertider:</strong> @serverTimingsText</MudText>
+                    </MudStack>
+                </MudExpansionPanel>
+
+                <MudExpansionPanel Text="Sökning">
+                    <MudStack Spacing="2">
+                        <MudSelect T="int"
+                                   @bind-Value="observationsLimit"
+                                   Label="Observationsgräns"
+                                   Variant="Variant.Outlined"
+                                   Dense="true"
+                                   Margin="Margin.Dense"
+                                   FullWidth="true">
+                            @foreach (var option in adaptiveSearchLimitOptions)
+                            {
+                                <MudSelectItem T="int" Value="@option">@option</MudSelectItem>
+                            }
+                        </MudSelect>
+
+                        <MudSelect T="int"
+                                   @bind-Value="maxGridCells"
+                                   Label="Max gridrutor"
+                                   Variant="Variant.Outlined"
+                                   Dense="true"
+                                   Margin="Margin.Dense"
+                                   FullWidth="true">
+                            @foreach (var option in adaptiveSearchLimitOptions)
+                            {
+                                <MudSelectItem T="int" Value="@option">@option</MudSelectItem>
+                            }
+                        </MudSelect>
+
+                        <MudNumericField T="int?"
+                                         @bind-Value="cutoffYear"
+                                         Label="Brytår"
+                                         Placeholder="t.ex. 2024"
+                                         Variant="Variant.Outlined"
+                                         Margin="Margin.Dense"
+                                         FullWidth="true" />
+
+                        <MudCheckBox @bind-Value="includeBoundingBoxInSearch"
+                                     Label="Skicka med bbox"
+                                     Color="Color.Primary"
+                                     Dense="true" />
+
+                        <MudSelect T="int"
+                                   @bind-Value="bboxBufferPercent"
+                                   Label="Bbox-buffer"
+                                   Variant="Variant.Outlined"
+                                   Dense="true"
+                                   Margin="Margin.Dense"
+                                   Disabled="@(!includeBoundingBoxInSearch)"
+                                   FullWidth="true">
+                            @foreach (var option in bboxBufferPercentageOptions)
+                            {
+                                <MudSelectItem T="int" Value="@option">@($"{option} %")</MudSelectItem>
+                            }
+                        </MudSelect>
+
+                        <MudSelect T="CreatePolygonsMode"
+                                   @bind-Value="createPolygonsMode"
+                                   Label="Polygoner"
+                                   Variant="Variant.Outlined"
+                                   Dense="true"
+                                   Margin="Margin.Dense"
+                                   FullWidth="true">
+                            <MudSelectItem T="CreatePolygonsMode" Value="@CreatePolygonsMode.No">No</MudSelectItem>
+                            <MudSelectItem T="CreatePolygonsMode" Value="@CreatePolygonsMode.WhenNeeded">WhenNeeded</MudSelectItem>
+                            <MudSelectItem T="CreatePolygonsMode" Value="@CreatePolygonsMode.Yes">Yes</MudSelectItem>
+                        </MudSelect>
+                    </MudStack>
+                </MudExpansionPanel>
+
+                <MudExpansionPanel Text="Klustring">
+                    <MudStack Spacing="2">
+                        <MudSelect T="string"
+                                   @bind-Value="clusteringAlgorithm"
+                                   Label="Algoritm"
+                                   Variant="Variant.Outlined"
+                                   Dense="true"
+                                   Margin="Margin.Dense"
+                                   Disabled="@(!cluster)"
+                                   FullWidth="true">
+                            @foreach (var algorithm in clusteringAlgorithms)
+                            {
+                                <MudSelectItem T="string" Value="@algorithm">@algorithm</MudSelectItem>
+                            }
+                        </MudSelect>
+
+                        <MudNumericField T="double"
+                                         @bind-Value="clusterRadiusPx"
+                                         Label="Radie (px)"
+                                         Variant="Variant.Outlined"
+                                         Margin="Margin.Dense"
+                                         Disabled="@(!cluster)"
+                                         Min="1.0"
+                                         Max="500.0"
+                                         Step="5.0"
+                                         FullWidth="true" />
+
+                        <MudNumericField T="int"
+                                         @bind-Value="minLocationsPerCluster"
+                                         Label="Min lokaler per kluster"
+                                         Variant="Variant.Outlined"
+                                         Margin="Margin.Dense"
+                                         Disabled="@(!cluster)"
+                                         Min="2"
+                                         Max="100"
+                                         Step="1"
+                                         FullWidth="true" />
+
+                        <MudNumericField T="int"
+                                         @bind-Value="minLocationCountBeforeClustering"
+                                         Label="Min lokaler innan klustring"
+                                         Variant="Variant.Outlined"
+                                         Margin="Margin.Dense"
+                                         Disabled="@(!cluster)"
+                                         Min="0"
+                                         Max="10000"
+                                         Step="10"
+                                         FullWidth="true" />
+                    </MudStack>
+                </MudExpansionPanel>
+
+                <MudExpansionPanel Text="Visning">
+                    <MudStack Spacing="2">
+                        <MudCheckBox T="bool"
+                                     Value="@showCoordinateUncertaintyCircles"
+                                     ValueChanged="OnShowCoordinateUncertaintyCirclesChanged"
+                                     Label="Visa noggrannhetscirklar"
+                                     Color="Color.Primary"
+                                     Dense="true" />
+
+                        <MudCheckBox T="bool"
+                                     Value="@showClusterRadiusCircles"
+                                     ValueChanged="OnShowClusterRadiusCirclesChanged"
+                                     Label="Visa klusterradie"
+                                     Color="Color.Primary"
+                                     Dense="true" />
+
+                        <MudCheckBox T="bool"
+                                     Value="@showClusterMinimumEnclosingCircles"
+                                     ValueChanged="OnShowClusterMinimumEnclosingCirclesChanged"
+                                     Label="Visa klusterinneslutning"
+                                     Color="Color.Primary"
+                                     Dense="true" />
+                    </MudStack>
+                </MudExpansionPanel>
+
+                <MudExpansionPanel Text="JSON search filter">
+                    <MudStack Spacing="2">
+                        <MudSelect T="int?"
+                                   Label="Load example"
+                                   Variant="Variant.Outlined"
+                                   Value="selectedExampleId"
+                                   ValueChanged="LoadExample"
+                                   Dense="true"
+                                   Margin="Margin.Dense"
+                                   FullWidth="true">
+                            @foreach (var example in TaxonSearchFilterSamples.Samples)
+                            {
+                                <MudSelectItem T="int?" Value="@example.Key">@example.Value.Name</MudSelectItem>
+                            }
+                        </MudSelect>
+
+                        <MudTextField @bind-Value="searchFilter"
+                                      Placeholder="JSON search filter"
+                                      Lines="10"
+                                      FullWidth="true"
+                                      Margin="Margin.Dense"
+                                      Variant="Variant.Outlined" />
+                    </MudStack>
+                </MudExpansionPanel>
+
+                <MudExpansionPanel Text="Teckenförklaring">
+                    <MudStack Spacing="2">
+                        <MudText Typo="Typo.subtitle2">Punktlokaler och polygonlokaler</MudText>
+                        <MudStack Spacing="1">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span style="width: 14px; height: 14px; border-radius: 50%; background: yellow; border: 1px solid rgba(0,0,0,0.55); display: inline-block;"></span>
+                                <MudText Typo="Typo.body2">Present</MudText>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span style="width: 14px; height: 14px; border-radius: 50%; background: #d7191c; border: 1px solid rgba(0,0,0,0.45); display: inline-block;"></span>
+                                <MudText Typo="Typo.body2">PresentSensitive</MudText>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span style="width: 14px; height: 14px; border-radius: 50%; background: #f97316; border: 1px solid rgba(0,0,0,0.45); display: inline-block;"></span>
+                                <MudText Typo="Typo.body2">Treated</MudText>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span style="width: 14px; height: 14px; border-radius: 50%; background: #8a8a8a; border: 1px solid rgba(0,0,0,0.45); display: inline-block;"></span>
+                                <MudText Typo="Typo.body2">NotRecovered</MudText>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span style="width: 14px; height: 14px; border-radius: 50%; background: black; border: 1px solid rgba(0,0,0,0.45); display: inline-block;"></span>
+                                <MudText Typo="Typo.body2">NotPresent</MudText>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span style="width: 14px; height: 14px; border-radius: 50%; background: #ff69b4; border: 1px solid rgba(0,0,0,0.45); display: inline-block;"></span>
+                                <MudText Typo="Typo.body2">DividedByYearUntil</MudText>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span style="width: 14px; height: 14px; border-radius: 50%; background: dodgerblue; border: 1px solid rgba(0,0,0,0.45); display: inline-block;"></span>
+                                <MudText Typo="Typo.body2">Cluster</MudText>
+                            </div>
+                        </MudStack>
+
+                        <MudDivider />
+
+                        <MudText Typo="Typo.subtitle2">Diffuserade lokaler</MudText>
+                        <MudStack Spacing="1">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span style="width: 14px; height: 14px; background: rgba(255,0,0,0.20); border: 2px solid rgba(180,0,0,0.85); display: inline-block;"></span>
+                                <MudText Typo="Typo.body2">Present</MudText>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span style="width: 14px; height: 14px; background: rgba(120,0,0,0.34); border: 2px solid rgba(95,0,0,0.90); display: inline-block;"></span>
+                                <MudText Typo="Typo.body2">PresentSensitive</MudText>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span style="width: 14px; height: 14px; background: rgba(249,115,22,0.32); border: 2px solid rgba(194,65,12,0.90); display: inline-block;"></span>
+                                <MudText Typo="Typo.body2">Treated</MudText>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span style="width: 14px; height: 14px; background: rgba(128,128,128,0.30); border: 2px solid rgba(92,92,92,0.90); display: inline-block;"></span>
+                                <MudText Typo="Typo.body2">NotRecovered</MudText>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span style="width: 14px; height: 14px; background: rgba(0,0,0,0.30); border: 2px solid rgba(0,0,0,0.90); display: inline-block;"></span>
+                                <MudText Typo="Typo.body2">NotPresent</MudText>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span style="width: 14px; height: 14px; background: rgba(255,105,180,0.30); border: 2px solid rgba(214,51,132,0.90); display: inline-block;"></span>
+                                <MudText Typo="Typo.body2">DividedByYearUntil</MudText>
+                            </div>
+                        </MudStack>
+
+                        <MudDivider />
+
+                        <MudText Typo="Typo.subtitle2">Gridrutor</MudText>
+                        <MudStack Spacing="1">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span style="width: 14px; height: 14px; background: rgba(255,213,128,0.60); border: 1px solid rgba(120,45,0,0.85); display: inline-block;"></span>
+                                <MudText Typo="Typo.body2">Få observationer</MudText>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span style="width: 14px; height: 14px; background: rgba(255,145,0,0.66); border: 1px solid rgba(120,45,0,0.85); display: inline-block;"></span>
+                                <MudText Typo="Typo.body2">Medel</MudText>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span style="width: 14px; height: 14px; background: rgba(220,38,38,0.72); border: 1px solid rgba(120,45,0,0.85); display: inline-block;"></span>
+                                <MudText Typo="Typo.body2">Många observationer</MudText>
+                            </div>
+                        </MudStack>
+                    </MudStack>
+                </MudExpansionPanel>
+            </MudExpansionPanels>
+        </MudItem>
+    </MudGrid>
+</MudStack>
+

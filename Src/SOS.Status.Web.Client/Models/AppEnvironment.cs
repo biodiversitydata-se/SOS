@@ -5,10 +5,12 @@ namespace SOS.Status.Web.Client.Models;
 public class AppEnvironment : IAppEnvironment
 {
     public string EnvironmentName { get; }
+    public bool OnlyObservationsAndStatus { get; }
 
-    public AppEnvironment(string environmentName)
+    public AppEnvironment(string environmentName, bool onlyObservationsAndStatus = false)
     {
         EnvironmentName = environmentName ?? "Production";
+        OnlyObservationsAndStatus = onlyObservationsAndStatus;
     }
 
     public bool IsLocalOrDev()

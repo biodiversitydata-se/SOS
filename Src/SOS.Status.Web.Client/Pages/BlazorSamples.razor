@@ -9,9 +9,9 @@
 
 <PageTitle>Blazor samples</PageTitle>
 <MudText Typo="Typo.h4">Blazor samples</MudText>
-<MudTabs Class="mt-2" Outlined="true" Elevation="1" Rounded="true" Border="true" ApplyEffectsToContainer="true" PanelClass="pa-6" @bind-ActivePanelIndex="ActiveTabIndex">
+<MudTabs Class="mt-2" Outlined="true" Elevation="1" Rounded="true" Border="true" ApplyEffectsToContainer="true" TabPanelsClass="pa-6" @bind-ActivePanelIndex="ActiveTabIndex">
     <MudTabPanel Text="Components">
-        <MudTabs Outlined="true" Elevation="0" Rounded="true" Border="true" ApplyEffectsToContainer="true" PanelClass="pa-3">
+        <MudTabs Outlined="true" Elevation="0" Rounded="true" Border="true" ApplyEffectsToContainer="true" TabPanelsClass="pa-3">
             <MudTabPanel Text="Component in C#">
                 <MyComponent Message="A component built in C# without .razor file." />
             </MudTabPanel>
@@ -36,7 +36,7 @@
         </MudTabs>
     </MudTabPanel>
     <MudTabPanel Text="Data binding">
-        <MudTabs Outlined="true" Elevation="0" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-3">
+        <MudTabs Outlined="true" Elevation="0" Rounded="true" ApplyEffectsToContainer="true" TabPanelsClass="pa-3">
             <MudTabPanel Text="Routing parameter">
                 <MudText Typo="Typo.body1" Class="pt-4">This Id value comes from query parameter: @Id</MudText>                
             </MudTabPanel>
@@ -53,7 +53,7 @@
         </MudTabs>
     </MudTabPanel>
     <MudTabPanel Text="Events">        
-        <MudTabs Outlined="true" Elevation="0" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-2">
+        <MudTabs Outlined="true" Elevation="0" Rounded="true" ApplyEffectsToContainer="true" TabPanelsClass="pa-2">
             <MudTabPanel Text="Event StopPropagation">
                 <div @onmousemove="OuterMouseMove">
                     <p style="height:50px;background-color:antiquewhite;">OuterMouseMove: @outerPos</p>
@@ -77,7 +77,7 @@
         </MudTabs>
     </MudTabPanel>
     <MudTabPanel Text="State">
-        <MudTabs Outlined="true" Elevation="0" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-2">
+        <MudTabs Outlined="true" Elevation="0" Rounded="true" ApplyEffectsToContainer="true" TabPanelsClass="pa-2">
             <MudTabPanel Text="Persistent state">
                 <p>State is persisted for properties marked with [PersistentState] when resuming circuit.</p>
                 <MudStack AlignItems="AlignItems.Start" Spacing="2">
@@ -105,7 +105,7 @@
     </MudTabPanel>
 
     <MudTabPanel Text="Mermaid">
-        <MudTabs Outlined="true" Elevation="0" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-2">
+        <MudTabs Outlined="true" Elevation="0" Rounded="true" ApplyEffectsToContainer="true" TabPanelsClass="pa-2">
             <MudTabPanel Text="Sample 1">
                 <h1>A Mermaid Diagram</h1>
                 <p>Below is a Mermaid diagram rendered by the <code>MermaidRender</code> component.</p>

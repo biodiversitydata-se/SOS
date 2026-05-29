@@ -1,10 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using NetTopologySuite.Features;
-using NetTopologySuite.Geometries;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Exceptions;
 using SOS.Lib.Extensions;
+using SOS.Lib.Gis;
 using SOS.Lib.Helpers;
 using SOS.Lib.IO.GeoJson.Interfaces;
 using SOS.Lib.Managers;
@@ -19,6 +18,9 @@ using SOS.Lib.Swagger;
 using SOS.Observations.Api.Configuration;
 using SOS.Observations.Api.Helpers;
 using SOS.Observations.Api.Managers.Interfaces;
+using SOS.Observations.Api.Services.AdaptiveSearch;
+using SOS.Observations.Api.Services.AdaptiveSearchLocations;
+using SOS.Observations.Api.Services.Interfaces;
 using SOS.Shared.Api.Dtos;
 using SOS.Shared.Api.Dtos.Enum;
 using SOS.Shared.Api.Dtos.Filter;
@@ -28,12 +30,15 @@ using SOS.Shared.Api.Extensions.Dto;
 using SOS.Shared.Api.Utilities.Objects.Interfaces;
 using SOS.Shared.Api.Validators.Interfaces;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Net;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
+using System.Text.Unicode;
 using Result = CSharpFunctionalExtensions.Result;
 
 namespace SOS.Observations.Api.Controllers;
@@ -45,6 +50,9 @@ namespace SOS.Observations.Api.Controllers;
 [ApiController]
 public class ObservationsController : ControllerBase
 {
+    internal const string AdaptiveSearchLocationsCacheName = "adaptive-search-locations";
+    internal const int AdaptiveSearchLocationsCacheSizeLimit = 100_000;    
+
     private readonly IObservationManager _observationManager;
     private readonly ITaxonSearchManager _taxonSearchManager;
     private readonly ISearchFilterUtility _searchFilterUtility;
@@ -53,7 +61,10 @@ public class ObservationsController : ControllerBase
     private readonly IClassCache<ConcurrentDictionary<string, CacheEntry<GeoGridResultDto>>> _geogridAggregationCache;
     private readonly IClassCache<ConcurrentDictionary<string, CacheEntry<PagedResultDto<TaxonAggregationItemDto>>>> _taxonAggregationInternalCache;
     private readonly SemaphoreLimitManager _semaphoreLimitManager;
+    private readonly ILocationManager _locationManager;    
     private readonly IGeoJsonFileWriter _geoJsonFileWriter;
+    private readonly IAdaptiveSearchService _adaptiveSearchService;
+    private readonly IAdaptiveSearchLocationsService _adaptiveSearchLocationsService;
     private readonly ILogger<ObservationsController> _logger;
 
     private JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions
@@ -80,7 +91,10 @@ public class ObservationsController : ControllerBase
     /// <param name="geogridAggregationCache"></param>
     /// <param name="taxonAggregationInternalCache"></param>
     /// <param name="semaphoreLimitManager"></param>
+    /// <param name="locationManager"></param>
     /// <param name="geoJsonFileWriter"></param>
+    /// <param name="adaptiveSearchService"></param>
+    /// <param name="adaptiveSearchLocationsService"></param>
     /// <param name="logger"></param>
     /// <exception cref="ArgumentNullException"></exception>
     public ObservationsController(
@@ -92,8 +106,11 @@ public class ObservationsController : ControllerBase
         IClassCache<ConcurrentDictionary<string, CacheEntry<GeoGridResultDto>>> geogridAggregationCache,
         IClassCache<ConcurrentDictionary<string, CacheEntry<PagedResultDto<TaxonAggregationItemDto>>>> taxonAggregationInternalCache,
         SemaphoreLimitManager semaphoreLimitManager,
+        ILocationManager locationManager,        
         IGeoJsonFileWriter geoJsonFileWriter,
-        ILogger<ObservationsController> logger) 
+        IAdaptiveSearchService adaptiveSearchService,
+        IAdaptiveSearchLocationsService adaptiveSearchLocationsService,
+        ILogger<ObservationsController> logger)
     {
         _observationManager = observationManager ?? throw new ArgumentNullException(nameof(observationManager));
          _taxonSearchManager = taxonSearchManager ?? throw new ArgumentNullException(nameof(taxonSearchManager));
@@ -103,7 +120,10 @@ public class ObservationsController : ControllerBase
         _geogridAggregationCache = geogridAggregationCache ?? throw new ArgumentNullException(nameof(geogridAggregationCache));
         _taxonAggregationInternalCache = taxonAggregationInternalCache ?? throw new ArgumentNullException(nameof(taxonAggregationInternalCache));
         _semaphoreLimitManager = semaphoreLimitManager ?? throw new ArgumentNullException(nameof(semaphoreLimitManager));
+        _locationManager = locationManager ?? throw new ArgumentNullException(nameof(locationManager));
         _geoJsonFileWriter = geoJsonFileWriter ?? throw new ArgumentNullException(nameof(geoJsonFileWriter));
+        _adaptiveSearchService = adaptiveSearchService ?? throw new ArgumentNullException(nameof(adaptiveSearchService));
+        _adaptiveSearchLocationsService = adaptiveSearchLocationsService ?? throw new ArgumentNullException(nameof(adaptiveSearchLocationsService));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
@@ -629,7 +649,8 @@ public class ObservationsController : ControllerBase
                 excludeNullValues: geoJsonExcludeNullValues,
                 stream: Response.Body,
                 bbox: null,
-                geographicAreas: null);
+                geographicAreas: null,
+                groupByLocation: false);
                         
             return new EmptyResult();          
         }
@@ -1748,7 +1769,8 @@ public class ObservationsController : ControllerBase
     /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
     /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB).</param>
     /// <param name="sensitiveObservations">If true, only sensitive (protected) observations will be searched (this requires authentication and authorization). If false, public available observations will be searched.</param>
-    /// <param name="outputFormat">Select output format: JSON, GeoJSON with hierarchical properties, GeoJSON with flattened properties.</param>        
+    /// <param name="outputFormat">Select output format: JSON, GeoJSON with hierarchical properties, GeoJSON with flattened properties.</param>
+    /// <param name="includePolygonLocations">If true, polygon location geometries will be included in the response metadata, deduplicated by LocationId.</param>
     /// <returns>List of observations matching the provided search filter.</returns>
     /// <example>
     ///     Get all observations within 100m of provided point
@@ -1762,7 +1784,7 @@ public class ObservationsController : ControllerBase
     ///     }
     /// </example>
     [HttpPost("Internal/Search")]
-    [ProducesResponseType(typeof(GeoPagedResultDto<Observation>), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(GeoPagedResultWithMetadataDto<Observation>), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
     [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
     [ProducesResponseType((int)HttpStatusCode.ServiceUnavailable)]
@@ -1779,7 +1801,8 @@ public class ObservationsController : ControllerBase
         [FromQuery] bool validateSearchFilter = false,
         [FromQuery] string translationCultureCode = "sv-SE",
         [FromQuery] bool sensitiveObservations = false,
-        [FromQuery] OutputFormatDto outputFormat = OutputFormatDto.Json)
+        [FromQuery] OutputFormatDto outputFormat = OutputFormatDto.Json,
+        [FromQuery] bool includePolygonLocations = false)
     {
         ApiUserType userType = this.GetApiUserType();
         var semaphoreResult = await _semaphoreLimitManager.GetSemaphoreAsync(SemaphoreType.Observation, userType, this.GetEndpointName(ControllerContext));
@@ -1808,22 +1831,41 @@ public class ObservationsController : ControllerBase
             {
                 sortBy = sortFieldValidationResult.Value.First();
             }
+
+            var searchFilter = filter.ToSearchFilterInternal(this.GetUserId(), translationCultureCode, sortBy, sortOrder);
+
             if (outputFormat == OutputFormatDto.GeoJson || outputFormat == OutputFormatDto.GeoJsonFlat)
             {
-                var outPutFields = EnsureCoordinatesIsRetrievedFromDb(filter?.Output?.Fields);
+                var outPutFields = EnsureCoordinatesIsRetrievedFromDb(searchFilter?.Output?.Fields);
 
                 if (outPutFields?.Any() ?? false)
                 {
-                    filter.Output ??= new OutputFilterExtendedDto();
-                    filter.Output.Fields = EnsureCoordinatesIsRetrievedFromDb(filter?.Output?.Fields);
+                    searchFilter.Output ??= new OutputFilter();
+                    searchFilter.Output.Fields = EnsureCoordinatesIsRetrievedFromDb(searchFilter?.Output?.Fields);
                 }
             }
-            var result = await _observationManager.GetChunkAsync(roleId, authorizationApplicationIdentifier, filter.ToSearchFilterInternal(this.GetUserId(), translationCultureCode, sortBy, sortOrder), skip, take);
+            if (includePolygonLocations)
+            {
+                var outputFields = EnsureLocationFieldsIsRetrievedFromDb(searchFilter?.Output?.Fields);
+                if (outputFields?.Any() ?? false)
+                {
+                    searchFilter.Output ??= new OutputFilter();
+                    searchFilter.Output.Fields = outputFields;
+                }
+            }
+            var result = await _observationManager.GetChunkAsync(roleId, authorizationApplicationIdentifier, searchFilter, skip, take);
             if (result == null)
             {
                 throw new Exception("Something went wrong when your query was executed. Make sure your filter is correct.");
             }
-            GeoPagedResultDto<JsonObject> dto = result.ToGeoPagedResultDto(result.Records, outputFormat);
+
+            SearchResultMetadataDto? metadata = null;
+            if (includePolygonLocations && result.Records?.Any() == true)
+            {
+                metadata = await GetPolygonLocationMetadataAsync(result.Records);   
+            }
+
+            GeoPagedResultWithMetadataDto<JsonObject> dto = result.ToGeoPagedResultWithMetadataDto(result.Records, outputFormat, metadata);
             this.LogObservationCount(dto?.Records?.Count() ?? 0);
             return new OkObjectResult(dto);
         }
@@ -1933,7 +1975,8 @@ public class ObservationsController : ControllerBase
     /// <param name="returnInputBBox">If true, the input bounding box from the search filter will be returned. In other case a bounding box matching the result will be returned.</param>
     /// <param name="validateSearchFilter">If true, validation of search filter values will be made. I.e. HTTP bad request response will be sent if there are invalid parameter values.</param>
     /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB).</param>
-    /// <param name="sensitiveObservations">If true, only sensitive (protected) observations will be searched (this requires authentication and authorization). If false, public available observations will be searched.</param>
+    /// <param name="sensitiveObservations">If true, only sensitive (protected) observations will be searched (this requires authentication and authorization). If false, public available observations will be searched.</param>    
+    /// <param name="createPolygons">Controls polygon location rendering. No always uses centroid points, Yes always uses polygon geometry, and WhenNeeded uses polygons only when they are large enough at the current viewport resolution.</param>
     /// <returns>
     /// Depending on <paramref name="outputFormat"/>:
     /// <br/>
@@ -1941,7 +1984,8 @@ public class ObservationsController : ControllerBase
     /// - <b>GeoJSON</b>: A FeatureCollection containing <c>Point</c> features (observations) or <c>Polygon</c> features (grid cells).
     /// </returns>
     [HttpPost("Internal/AdaptiveSearch")]
-    [ProducesResponseType(typeof(AdaptiveSearchResultDto<Observation>), (int)HttpStatusCode.OK)]
+    [Produces("application/json", "application/geo+json")]
+    [ProducesResponseType((int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
     [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
     [ProducesResponseType((int)HttpStatusCode.ServiceUnavailable)]
@@ -1961,10 +2005,9 @@ public class ObservationsController : ControllerBase
         [FromQuery] bool returnInputBBox = false,
         [FromQuery] bool validateSearchFilter = false,
         [FromQuery] string translationCultureCode = "sv-SE",
-        [FromQuery] bool sensitiveObservations = false)
+        [FromQuery] bool sensitiveObservations = false,
+        [FromQuery] CreatePolygonsMode createPolygons = CreatePolygonsMode.No)
     {
-        string sortBy = "";
-        SearchSortOrder sortOrder = SearchSortOrder.Asc;
         ApiUserType userType = this.GetApiUserType();
         var semaphoreResult = await _semaphoreLimitManager.GetSemaphoreAsync(SemaphoreType.Observation, userType, this.GetEndpointName(ControllerContext));
         LogHelper.AddSemaphoreHttpContextItems(semaphoreResult, HttpContext);
@@ -1972,7 +2015,8 @@ public class ObservationsController : ControllerBase
 
         try
         {
-            var bbox = filter?.Geographics?.BoundingBox?.ToLatLonBoundingBox();
+            var inputBbox = filter?.Geographics?.BoundingBox?.ToLatLonBoundingBox();
+            var bbox = inputBbox;
             LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
 
             // Log cache key in order to be able to decide if cache is needed
@@ -2008,90 +2052,66 @@ public class ObservationsController : ControllerBase
                 _inputValidator.ValidateTranslationCultureCode(translationCultureCode));
 
             if (validationResult.IsFailure) return BadRequest(validationResult.Error);
-            var outPutFields = EnsureCoordinatesIsRetrievedFromDb(filter?.Output?.Fields);
-            if (outPutFields?.Any() ?? false)
-            {
-                filter.Output ??= new OutputFilterExtendedDto();
-                filter.Output.Fields = EnsureCoordinatesIsRetrievedFromDb(filter?.Output?.Fields);
-            }
-
-            List<Feature>? geoJsonGeographicAreas = null;
-            List<(Lib.Models.Shared.Area area, Geometry geometry)>? geographicAreas = null;
-            var searchFilter = filter.ToSearchFilterInternal(this.GetUserId(), translationCultureCode, sortBy, sortOrder);
-            (long Count, LatLonBoundingBox? Extent) countAndExtentResult = await _observationManager.GetCountAndExtentAsync(roleId, authorizationApplicationIdentifier, searchFilter);
             
-            if (!returnInputBBox || bbox == null)
+            var result = await _adaptiveSearchService.SearchAsync(new AdaptiveSearchRequest
             {
-                bbox = countAndExtentResult.Extent;
-            }
-            if (countAndExtentResult.Count > observationsLimit)
-            {                
-                // Calculate grids and return GeoJSON
-                var zoom = GeoTileHelper.CalculateGeotileZoom(bbox, maxGridCells, maxZoom);
-                var res = await _observationManager.GetGeogridTileAggregationAsync(roleId, authorizationApplicationIdentifier, searchFilter, zoom);
-               
-                if (outputFormat == OutputFormatDto.Json)
-                {
-                    var geogridResult = res.ToGeoGridResultDto(bbox.ToEnvelope().CalculateNumberOfTiles(zoom));
-                    geographicAreas = includeFilterAreasInResult ? await _observationManager.GetGeographicsFiltersAsAreaTuplesAsync(searchFilter) : null;
-                    var adaptiveResultDto = AdaptiveSearchResultDto<JsonObject>.CreateGeoGridResult(
-                        bbox.ToLatLonBoundingBoxDto(),
-                        (int)countAndExtentResult.Count,
-                        geogridResult,
-                        geographicAreas);
-                    return new OkObjectResult(adaptiveResultDto);
-                }
+                RoleId = roleId,
+                AuthorizationApplicationIdentifier = authorizationApplicationIdentifier,
+                Filter = filter,
+                Bbox = bbox,
+                UserId = this.GetUserId(),
+                TranslationCultureCode = translationCultureCode,
+                ObservationsLimit = observationsLimit,
+                MaxZoom = maxZoom,
+                MaxGridCells = maxGridCells,
+                GeoJsonPropertyLabelType = geoJsonPropertyLabelType,
+                OutputFormat = outputFormat,
+                ExcludeNullValues = excludeNullValues,
+                IncludeFilterAreasInResult = includeFilterAreasInResult,
+                ReturnInputBBox = returnInputBBox,
+                CreatePolygons = createPolygons
+            });
 
-                geoJsonGeographicAreas = includeFilterAreasInResult ? await _observationManager.GetGeoGraphicsFiltersAsGeoJsonFeaturesAsync(searchFilter) : null;
-                string strJson = res.GetFeatureCollectionGeoJson(CoordinateSys.WGS84, bbox, geoJsonGeographicAreas);
-                Response.StatusCode = (int)HttpStatusCode.OK;
-                Response.Headers.Append("X-Observations-TotalCount", countAndExtentResult.Count.ToString());
-                Response.Headers.Append("X-Result-Count", res.GridCellTileCount.ToString());
-                Response.Headers.Append("X-Zoom", zoom.ToString());
-                Response.Headers.Append("X-Result-Type", "geogrid");
-                Response.ContentType = "application/geo+json; charset=utf-8";
-                var bytes = Encoding.UTF8.GetBytes(strJson);                
+            if (result.Kind == AdaptiveSearchResultKind.Json)
+            {
+                return new OkObjectResult(result.JsonResult);
+            }
+
+            Response.StatusCode = (int)HttpStatusCode.OK;
+            Response.Headers.Append("X-Observations-TotalCount", result.ObservationsTotalCount.ToString());
+            Response.Headers.Append("X-Result-Type", result.ResultType);
+            Response.Headers.Append("X-Result-Count", result.ResultCount.ToString());
+            if (result.Zoom.HasValue)
+            {
+                Response.Headers.Append("X-Zoom", result.Zoom.Value.ToString());
+            }
+            if (result.Kind == AdaptiveSearchResultKind.GeoJsonObservations)
+            {
+                Response.Headers.Append("X-Observations-Count", result.ResultCount.ToString()); // just for backward compatibility
+            }
+            Response.ContentType = "application/geo+json; charset=utf-8";
+
+            if (result.Kind == AdaptiveSearchResultKind.GeoJsonGrid)
+            {
+                var bytes = Encoding.UTF8.GetBytes(result.GeoJson ?? string.Empty);
                 await Response.Body.WriteAsync(bytes);
                 await Response.Body.FlushAsync();
                 return new EmptyResult();
             }
 
-            // Return observations as GeoJSON
-            var result = await _observationManager.GetChunkAsync(roleId, authorizationApplicationIdentifier, searchFilter, 0, observationsLimit);
-            List<(Lib.Models.Shared.Area area, Geometry geometry)> geographicAreas2 = await _observationManager.GetGeographicsFiltersAsAreaTuplesAsync(searchFilter);
-            
-            if (result == null)
-            {
-                throw new Exception("Something went wrong when your query was executed. Make sure your filter is correct.");
-            }
-            if (outputFormat == OutputFormatDto.Json)
-            {
-                geographicAreas = includeFilterAreasInResult ? await _observationManager.GetGeographicsFiltersAsAreaTuplesAsync(searchFilter) : null;
-                var adaptiveResultDto = AdaptiveSearchResultDto<JsonObject>.CreateObservationsResult(
-                    bbox.ToLatLonBoundingBoxDto(),
-                    (int)countAndExtentResult.Count,
-                    result.Records,
-                    geographicAreas);
-                return new OkObjectResult(adaptiveResultDto);
-            }
-
-            geoJsonGeographicAreas = includeFilterAreasInResult ? await _observationManager.GetGeoGraphicsFiltersAsGeoJsonFeaturesAsync(searchFilter) : null;
-            Response.StatusCode = (int)HttpStatusCode.OK;
-            Response.Headers.Append("X-Observations-TotalCount", result.TotalCount.ToString());
-            Response.Headers.Append("X-Result-Type", "observations");
-            Response.Headers.Append("X-Result-Count", result?.Records?.Count().ToString() ?? "0");
-            Response.ContentType = "application/geo+json; charset=utf-8";
-            
+            var observationsPayload = result.GeoJsonObservations ?? throw new InvalidOperationException("GeoJSON observations payload is missing.");
             await _geoJsonFileWriter.WriteGeoJsonFeatureCollection(
-                result?.Records,
-                searchFilter.Output?.Fields,
-                flatOut: outputFormat == OutputFormatDto.GeoJsonFlat,
-                propertyLabelType: geoJsonPropertyLabelType,
-                excludeNullValues: excludeNullValues,
+                observationsPayload.Records,
+                observationsPayload.OutputFields,
+                flatOut: observationsPayload.FlatOut,
+                propertyLabelType: observationsPayload.PropertyLabelType,
+                excludeNullValues: observationsPayload.ExcludeNullValues,
                 stream: Response.Body,
-                bbox: bbox,
-                geographicAreas: geoJsonGeographicAreas);
-            
+                bbox: observationsPayload.Bbox,
+                geographicAreas: observationsPayload.GeographicAreas,
+                groupByLocation: observationsPayload.GroupByLocation,
+                polygonLocationGeometries: observationsPayload.PolygonLocationGeometries);
+
             return new EmptyResult();
         }
         catch (AuthenticationRequiredException e)
@@ -2109,6 +2129,174 @@ public class ObservationsController : ControllerBase
         catch (Exception e)
         {
             _logger.LogError(e, "SearchInternal error");
+            return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+        }
+        finally
+        {
+            semaphoreResult.Semaphore.Release();
+        }
+    }   
+
+    /// <summary>
+    /// Adaptive location search with a bbox-aware FusionCache layer for location aggregates.
+    /// Grid aggregation responses are not cached.
+    /// </summary>
+    /// <param name="roleId">Limit user authorization too specified role.</param>
+    /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
+    /// <param name="filter">Filter used to limit the search.</param>
+    /// <param name="observationsLimit">If the total number of observations exceeds this value, a grid aggregation is returned instead of locations.</param>
+    /// <param name="maxZoom">Maximum grid zoom level used when the endpoint returns grid cells.</param>
+    /// <param name="maxGridCells">Maximum number of grid cells used when the endpoint returns grid cells.</param>
+    /// <param name="returnInputBBox">If true, the input bounding box from the search filter will be returned. Otherwise a bounding box matching the result will be returned.</param>    
+    /// <param name="sensitiveObservations">If true, only sensitive observations will be searched.</param>
+    /// <param name="cluster">If true, locations are clustered when observations are returned rather than a grid aggregation.</param>
+    /// <param name="clusteringAlgorithm">The clustering algorithm used for clustered location responses.</param>
+    /// <param name="metersPerPixel">The current map resolution in ground meters per CSS pixel. If specified, this is used instead of deriving resolution from bbox and viewport dimensions.</param>
+    /// <param name="clusterRadiusPx">The screen-space cluster radius in pixels.</param>
+    /// <param name="minLocationsPerCluster">The minimum number of distinct locations required before a result item is rendered as a cluster.</param>
+    /// <param name="minLocationCountBeforeClustering">The number of distinct locations that can be returned without clustering. Clustering starts when the distinct location count is greater than this value.</param>
+    /// <param name="createPolygons">Controls polygon location rendering. No always uses centroid points, Yes always uses polygon geometry, and WhenNeeded uses polygons only when they are large enough at the current viewport resolution.</param>
+    /// <param name="bboxQuery">Optional WGS84 bounding box query parameter using minLongitude,minLatitude,maxLongitude,maxLatitude. If provided, it overrides the filter bounding box.</param>
+    /// <param name="useCache">If true, reusable location aggregates may be read from and written to cache.</param>
+    /// <param name="createSampleObservations">If true, sample observations will be created for map symbol debugging.</param>
+    /// <param name="cutoffYear">If specified, observations are rendered differently before and after this year. Brytår på svenska.</param>
+    /// <returns>
+    /// GeoJSON FeatureCollection with either grid cells or location item features.
+    /// </returns>
+    [HttpPost("Internal/AdaptiveSearchLocations")]
+    [Produces("application/geo+json")]
+    [ProducesResponseType((int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+    [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+    [ProducesResponseType((int)HttpStatusCode.ServiceUnavailable)]
+    [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+    [InternalApi, AzureInternalApi]
+    public async Task<IActionResult> AdaptiveSearchLocationsInternal(
+        [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
+        [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
+        [FromBody] SearchFilterInternalDto? filter,
+        [FromQuery] int observationsLimit = 10000,
+        [FromQuery] int maxZoom = 21,
+        [FromQuery] int maxGridCells = 10000,
+        [FromQuery] bool returnInputBBox = false,        
+        [FromQuery] bool sensitiveObservations = false,        
+        [FromQuery] bool cluster = true,
+        [FromQuery] LocationClusteringAlgorithm clusteringAlgorithm = LocationClusteringAlgorithm.Sweref99TmFastGreedy,
+        [FromQuery] double? metersPerPixel = null,
+        [FromQuery] double clusterRadiusPx = 40.0,
+        [FromQuery] int minLocationsPerCluster = 2,
+        [FromQuery] int minLocationCountBeforeClustering = 100,
+        [FromQuery] CreatePolygonsMode createPolygons = CreatePolygonsMode.No,
+        [FromQuery(Name = "bbox")] string? bboxQuery = null,
+        [FromQuery] bool useCache = true,
+        [FromQuery] bool createSampleObservations = false,
+        [FromQuery] int? cutoffYear = null)
+    {
+        var totalStopwatch = Stopwatch.StartNew();
+        ApiUserType userType = this.GetApiUserType();
+        var semaphoreResult = await _semaphoreLimitManager.GetSemaphoreAsync(SemaphoreType.Observation, userType, this.GetEndpointName(ControllerContext));
+        LogHelper.AddSemaphoreHttpContextItems(semaphoreResult, HttpContext);
+        if (semaphoreResult.Semaphore == null) return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
+
+        try
+        {
+            filter ??= new SearchFilterInternalDto();
+            if (!BoundingBoxQueryParser.TryApply(filter, bboxQuery, out var bboxQueryError))
+            {
+                return BadRequest(bboxQueryError);
+            }
+
+            var inputBbox = filter.Geographics?.BoundingBox?.ToLatLonBoundingBox();
+            var bbox = inputBbox;
+            LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
+            filter.ProtectionFilter ??= sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public;
+            this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, filter.ProtectionFilter);            
+            filter = await _searchFilterUtility.InitializeSearchFilterAsync(filter); // todo - behövs denna? Går det att förenkla bbox-init för bättre prestanda?
+            var validationResult = Result.Combine( // todo - Behövs alla valideringar?
+                _inputValidator.ValidateInt(observationsLimit, 0, 10000, nameof(observationsLimit)),
+                _inputValidator.ValidateInt(maxZoom, 1, 21, nameof(maxZoom)),
+                _inputValidator.ValidateInt(maxGridCells, 1, 10000, nameof(maxGridCells)),
+                _inputValidator.ValidateDouble(clusterRadiusPx, 1, 500, nameof(clusterRadiusPx)),
+                _inputValidator.ValidateInt(minLocationsPerCluster, 2, 100, nameof(minLocationsPerCluster)),
+                _inputValidator.ValidateInt(minLocationCountBeforeClustering, 0, 10000, nameof(minLocationCountBeforeClustering)),
+                ValidateMetersPerPixel(metersPerPixel),
+                ValidateMetersPerPixelForPolygonMode(createPolygons, metersPerPixel),
+                //_inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
+                _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries));
+
+            if (validationResult.IsFailure) return BadRequest(validationResult.Error);            
+
+            var result = await _adaptiveSearchLocationsService.SearchAsync(new AdaptiveSearchLocationsRequest
+            {
+                RoleId = roleId,
+                AuthorizationApplicationIdentifier = authorizationApplicationIdentifier,
+                Filter = filter,
+                UserId = this.GetUserId(),
+                InputBbox = inputBbox,
+                Bbox = bbox,
+                ReturnInputBBox = returnInputBBox,
+                SensitiveObservations = sensitiveObservations,
+                ObservationsLimit = observationsLimit,
+                MaxZoom = maxZoom,
+                MaxGridCells = maxGridCells,
+                Cluster = cluster,
+                ClusteringAlgorithm = clusteringAlgorithm,
+                MetersPerPixel = metersPerPixel,
+                ClusterRadiusPx = clusterRadiusPx,
+                MinLocationsPerCluster = minLocationsPerCluster,
+                MinimumLocationCountBeforeClustering = minLocationCountBeforeClustering,
+                CreatePolygons = createPolygons,
+                UseCache = useCache,
+                CreateSampleObservations = createSampleObservations
+            });
+
+            Response.StatusCode = (int)HttpStatusCode.OK;
+            Response.Headers.Append("X-Observations-TotalCount", result.ObservationsTotalCount.ToString());
+            Response.Headers.Append("X-Result-Type", result.ResultType);
+            Response.Headers.Append("X-Feature-Count", result.FeatureCount.ToString());
+            if (result.LocationsBeforeClustering.HasValue)
+            {
+                Response.Headers.Append("X-Locations-Before-Clustering", result.LocationsBeforeClustering.Value.ToString());
+            }
+            if (result.Zoom.HasValue)
+            {
+                Response.Headers.Append("X-Zoom", result.Zoom.Value.ToString());
+            }
+            Response.Headers.Append("X-Cache", result.CacheStatus);
+            totalStopwatch.Stop();
+            Response.Headers.Append("X-AdaptiveSearch-Timings", result.Timings.ToHeaderValue(totalStopwatch.Elapsed));
+            Response.ContentType = "application/geo+json; charset=utf-8";
+
+            if (result.ResultType == "geogrid")
+            {
+                var bytes = Encoding.UTF8.GetBytes(result.GeoJson ?? string.Empty);
+                await Response.Body.WriteAsync(bytes);
+                await Response.Body.FlushAsync();
+                return new EmptyResult();
+            }
+
+            await LocationClusterItemGeoJsonWriter.WriteFeatureCollectionAsync(
+                result.LocationClusterItems ?? Array.Empty<LocationClusterItem>(),
+                result.Bbox,
+                Response,
+                cutoffYear);
+            return new EmptyResult();
+        }
+        catch (AuthenticationRequiredException e)
+        {
+            _logger.LogInformation(e, e.Message);
+            _logger.LogInformation($"Unauthorized. X-Authorization-Application-Identifier={authorizationApplicationIdentifier ?? "[null]"}");
+            _logger.LogInformation($"Unauthorized. X-Authorization-Role-Id={roleId?.ToString() ?? "[null]"}");
+            LogUserInformation();
+            return new StatusCodeResult((int)HttpStatusCode.Unauthorized);
+        }
+        catch (TimeoutException)
+        {
+            return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "AdaptiveSearchLocationsInternal error");
             return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
         }
         finally
@@ -2139,29 +2327,88 @@ public class ObservationsController : ControllerBase
 
     private ICollection<string> EnsureCoordinatesIsRetrievedFromDb(ICollection<string> outputFields)
     {
-        if (outputFields == null || !outputFields.Any())
+        return AdaptiveSearchOutputFields.EnsureCoordinates(outputFields);
+    }
+
+    private ICollection<string> EnsurePointPolygonFieldsIsRetrievedFromDb(ICollection<string> outputFields)
+    {
+        return AdaptiveSearchOutputFields.EnsurePointPolygonFields(outputFields);
+    }
+
+    private ICollection<string> EnsureLocationFieldsIsRetrievedFromDb(ICollection<string> outputFields)
+    {
+        return AdaptiveSearchOutputFields.EnsureLocationFields(outputFields);
+    }
+
+    private ICollection<string> EnsureTaxonIdIsRetrievedFromDb(ICollection<string> outputFields)
+    {
+        return AdaptiveSearchOutputFields.EnsureTaxonId(outputFields);
+    }
+
+    private static Result ValidateMetersPerPixel(double? metersPerPixel)
+    {
+        if (!metersPerPixel.HasValue)
         {
-            return outputFields;
+            return Result.Success();
         }
 
-        if (outputFields.Contains("location", StringComparer.OrdinalIgnoreCase) || (
-            outputFields.Contains("location.decimalLongitude", StringComparer.OrdinalIgnoreCase) &&
-            outputFields.Contains("location.decimalLatitude", StringComparer.OrdinalIgnoreCase)))
+        if (double.IsNaN(metersPerPixel.Value) ||
+            double.IsInfinity(metersPerPixel.Value) ||
+            metersPerPixel.Value <= 0 ||
+            metersPerPixel.Value > 10000000)
         {
-            return outputFields;
+            return Result.Failure($"{nameof(metersPerPixel)} must be a positive finite value not greater than 10000000.");
         }
 
-        var newList = new List<string>(outputFields);
-        if (!newList.Contains("location.decimalLongitude", StringComparer.OrdinalIgnoreCase))
+        return Result.Success();
+    }
+
+    private static Result ValidateMetersPerPixelForPolygonMode(CreatePolygonsMode createPolygons, double? metersPerPixel)
+    {
+        if (createPolygons == CreatePolygonsMode.WhenNeeded && !metersPerPixel.HasValue)
         {
-            newList.Add("location.decimalLongitude");
-        }
-        if (!newList.Contains("location.decimalLatitude", StringComparer.OrdinalIgnoreCase))
-        {
-            newList.Add("location.decimalLatitude");
+            return Result.Failure($"{nameof(metersPerPixel)} must be specified when {nameof(createPolygons)} is {CreatePolygonsMode.WhenNeeded}.");
         }
 
-        return newList;
+        return Result.Success();
+    }
+
+    private async Task<SearchResultMetadataDto?> GetPolygonLocationMetadataAsync(IEnumerable<JsonObject> records)
+    {
+        var polygonLocationIds = GetPolygonLocationIds(records);
+        if (polygonLocationIds.Count == 0)
+        {
+            return null;
+        }
+
+        var polygonLocations = await _locationManager.GetLocationGeometryAsync(polygonLocationIds);
+
+        if (polygonLocations?.Count == 0) return null;
+
+        return new SearchResultMetadataDto
+        {
+            PolygonLocations = polygonLocations
+        };
+    }
+
+    private static HashSet<string> GetPolygonLocationIds(IEnumerable<JsonObject> records)
+    {
+        var polygonLocationIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var record in records)
+        {
+            if (record.TryGetPropertyValue("location", out var locationNode) && locationNode is JsonObject locationObj)
+            {
+                var locationTypeInt = locationObj["type"]?.GetValue<int>();
+                var locationType = (SOS.Lib.Enums.LocationType?)locationTypeInt;
+                var locationId = locationObj["locationId"]?.GetValue<string>();
+                if (locationType == SOS.Lib.Enums.LocationType.Polygon && !string.IsNullOrEmpty(locationId))
+                {
+                    polygonLocationIds.Add(locationId);
+                }
+            }
+        }
+
+        return polygonLocationIds;
     }
 
     /// <summary>

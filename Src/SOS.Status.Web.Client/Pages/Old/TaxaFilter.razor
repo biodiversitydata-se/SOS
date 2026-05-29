@@ -51,9 +51,9 @@
 @* </MudPaper> *@
 
 @code {
-    private Taxon value1;
-    private string searchText;
-    private MudAutocomplete<Taxon> MAC;
+    private Taxon? value1;
+    private string searchText = string.Empty;
+    private MudAutocomplete<Taxon>? MAC;
 
     private List<Taxon> allTaxa = new()
     {
@@ -84,7 +84,7 @@
         return Task.FromResult(result.AsEnumerable());
     }
 
-    private async Task OnTaxonSelected(Taxon selected)
+    private Task OnTaxonSelected(Taxon? selected)
     {
         if (selected != null && !selectedTaxa.Any(t => t.Id == selected.Id))
         {
@@ -101,6 +101,7 @@
         
         // StateHasChanged();
         // Valfritt: du kan också kalla StateHasChanged om något måste uppdateras direkt
+        return Task.CompletedTask;
     }
 
     private void OnSearchTextChanged(string newText)
@@ -124,7 +125,7 @@
 
     public class AppSettingsState
     {
-        public event Action OnChange;
+        public event Action? OnChange;
 
         private List<Taxon> selectedTaxa = new();
         public IReadOnlyList<Taxon> SelectedTaxa => selectedTaxa;

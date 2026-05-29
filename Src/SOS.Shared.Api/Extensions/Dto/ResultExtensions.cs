@@ -201,4 +201,41 @@ public static class ResultExtensions
             };
         }
     }
+
+    extension<TRecord>(PagedResult<TRecord> pagedResult)
+    {
+        public GeoPagedResultWithMetadataDto<TRecordDto> ToGeoPagedResultWithMetadataDto<TRecordDto>(
+            IEnumerable<TRecordDto> records,
+            OutputFormatDto outputFormat = OutputFormatDto.Json,
+            SearchResultMetadataDto? metadata = null)
+        {
+            GeoPagedResultWithMetadataDto<TRecordDto> dto;
+            if (outputFormat == OutputFormatDto.Json)
+            {
+                dto = new GeoPagedResultWithMetadataDto<TRecordDto>
+                {
+                    Records = records,
+                    Skip = pagedResult.Skip,
+                    Take = pagedResult.Take,
+                    TotalCount = pagedResult.TotalCount,
+                };
+            }
+            else
+            {
+                var jsonRecords = records.Cast<JsonObject>();
+                bool flattenProperties = outputFormat == OutputFormatDto.GeoJsonFlat;
+                string geoJson = GeoJsonHelper.GetFeatureCollectionString(jsonRecords, flattenProperties);
+                dto = new GeoPagedResultWithMetadataDto<TRecordDto>
+                {
+                    Skip = pagedResult.Skip,
+                    Take = pagedResult.Take,
+                    TotalCount = pagedResult.TotalCount,
+                    GeoJson = geoJson
+                };
+            }
+
+            dto.Metadata = metadata;
+            return dto;
+        }
+    }
 }

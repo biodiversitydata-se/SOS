@@ -1,0 +1,14 @@
+﻿.selected-feature-hit-list {
+    margin: 10px 0 0;
+    padding-left: 22px;
+}
+
+.selected-feature-hit-list li {
+    margin-bottom: 8px;
+}
+
+.selected-feature-list-text {
+    margin-top: 2px;
+    white-space: pre-wrap;
+    word-break: break-word;
+}

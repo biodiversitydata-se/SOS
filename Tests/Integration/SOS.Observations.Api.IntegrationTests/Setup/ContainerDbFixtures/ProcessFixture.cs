@@ -304,6 +304,16 @@ public class ProcessFixture : IProcessFixture
             processedObservations.Add(processedObservation!);
         }
 
+        if (!initAreaHelper)
+        {
+            // When area helper is not initialized, the locations will not be resolved and thus we set these properties to true.
+            foreach (var processedObservation in processedObservations)
+            {
+                processedObservation.Location.IsInEconomicZoneOfSweden = true;
+                processedObservation.Location.IsInZoneOfSOS = true;
+            }
+        }
+
         return processedObservations;
     }
 

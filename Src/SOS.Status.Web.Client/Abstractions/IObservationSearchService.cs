@@ -1,5 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 using SOS.Status.Web.Client.Dtos.SosObsApi;
+using SOS.Status.Web.Client.Models;
 
 namespace SOS.Status.Web.Client.Abstractions;
 
@@ -13,7 +14,26 @@ public interface IObservationSearchService
         string sortOrder = "Asc",
         bool validateSearchFilter = false,
         string translationCultureCode = "sv-SE",
-        bool sensitiveObservations = false);
+        bool sensitiveObservations = false); 
+
+    Task<(string GeoJson, long? ObservationsTotalCount, long? FeatureCount, long? LocationsBeforeClustering, long ResponseSizeBytes, string? CacheStatus, string? ResultType, string? Timings)> AdaptiveSearchLocationItemsCachedGeoJson(
+        SearchFilterInternalDto filter,
+        int observationsLimit = 10000,
+        int maxGridCells = 10000,
+        bool cluster = true,
+        string clusteringAlgorithm = "Greedy",
+        CreatePolygonsMode createPolygons = CreatePolygonsMode.No,
+        double clusterRadiusPx = 40.0,
+        int minLocationsPerCluster = 2,
+        int minLocationCountBeforeClustering = 100,
+        bool validateSearchFilter = false,
+        string translationCultureCode = "sv-SE",
+        bool sensitiveObservations = false,
+        double? metersPerPixel = null,
+        string? bbox = null,
+        bool createSampleObservations = false,
+        bool useCache = true,
+        int? cutoffYear = null);
 
     Task<Result<SearchByCursorResultDto<Observation>>> SearchObservationsByCursor(
         SearchFilterInternalDto filter,

@@ -37,11 +37,16 @@ using SOS.Lib.Security.Interfaces;
 using SOS.Lib.Services;
 using SOS.Lib.Services.Interfaces;
 using SOS.Observations.Api.ApplicationInsights;
+using SOS.Observations.Api.Controllers;
+using SOS.Observations.Api.Helpers;
 using SOS.Observations.Api.Managers;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Repositories;
 using SOS.Observations.Api.Repositories.Interfaces;
+using SOS.Observations.Api.Services.AdaptiveSearch;
+using SOS.Observations.Api.Services.AdaptiveSearchLocations;
 using SOS.Observations.Api.Services.Interfaces;
+using SOS.Observations.Api.Services;
 using SOS.Shared.Api.Dtos;
 using SOS.Shared.Api.Utilities.Objects;
 using SOS.Shared.Api.Utilities.Objects.Interfaces;
@@ -50,6 +55,7 @@ using SOS.Shared.Api.Validators.Interfaces;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using ZiggyCreatures.Caching.Fusion;
 using DataProviderManager = SOS.Observations.Api.Managers.DataProviderManager;
 using IDataProviderManager = SOS.Observations.Api.Managers.Interfaces.IDataProviderManager;
 
@@ -101,7 +107,21 @@ public static class DependencyInjectionExtensions
 
             // Add Caches
             services.AddSingleton<IAreaCache, AreaCache>();
+            services.AddFusionCache(ProcessedLocationRepository.LocationGeometryCacheName)
+                .WithCacheKeyPrefixByCacheName()
+                .WithMemoryCache(new MemoryCache(new MemoryCacheOptions
+                {
+                    SizeLimit = ProcessedLocationRepository.MaxLocationGeometryCacheSizeUnits
+                }));
+            services.AddFusionCache(ObservationsController.AdaptiveSearchLocationsCacheName)
+                .WithCacheKeyPrefixByCacheName()
+                .WithMemoryCache(new MemoryCache(new MemoryCacheOptions
+                {
+                    SizeLimit = ObservationsController.AdaptiveSearchLocationsCacheSizeLimit
+                }));
             services.AddSingleton<ITaxonObservationCountCache, TaxonObservationCountCache>();
+            services.AddSingleton<LocationGeometryCacheMonitor>();
+            services.AddSingleton<AdaptiveSearchLocationsCacheMonitor>();
             services.AddSingleton<IDataProviderCache, DataProviderCache>();
             services.AddSingleton<ICache<int, ProjectInfo>, ProjectCache>();
             services.AddSingleton<ICache<VocabularyId, Vocabulary>, VocabularyCache>();
@@ -171,6 +191,13 @@ public static class DependencyInjectionExtensions
             services.AddSingleton<IHttpClientService, HttpClientService>();
             services.AddSingleton<IUserService, UserService>();
             services.AddSingleton<IArtportalenApiService, ArtportalenApiService>();
+            services.AddScoped<IAdaptiveSearchService, AdaptiveSearchService>();
+            services.AddScoped<ILocationGeometryLookupService, LocationGeometryLookupService>();
+            services.AddScoped<IAdaptiveSearchByLocationMapper, AdaptiveSearchByLocationMapper>();
+            services.AddScoped<IAdaptiveSearchLocationsService, AdaptiveSearchLocationsService>();
+            services.AddScoped<IAdaptiveSearchLocationsCache, AdaptiveSearchLocationsCache>();
+            services.AddScoped<IAdaptiveSearchLocationAggregator, AdaptiveSearchLocationAggregator>();
+            services.AddScoped<IAdaptiveSearchLocationClusterItemFactory, AdaptiveSearchLocationClusterItemFactory>();
 
             // Add Utilites
             services.AddSingleton<ISearchFilterUtility, SearchFilterUtility>();

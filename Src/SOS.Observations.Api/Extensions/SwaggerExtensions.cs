@@ -8,6 +8,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.OpenApi;
 using SOS.Lib.ActionFilters;
 using SOS.Lib.Swagger;
+using SOS.Observations.Api.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Swashbuckle.AspNetCore.SwaggerUI;
 using System;
@@ -69,6 +70,7 @@ public static class SwaggerExtensions
                     // add a custom operation filters
                     options.OperationFilter<SwaggerDefaultValues>();
                     options.OperationFilter<SwaggerAddOptionalHeaderParameters>();
+                    options.OperationFilter<AdaptiveSearchOperationFilter>();
 
                     options.SchemaFilter<SwaggerIgnoreFilter>();
                     options.SchemaFilter<GeometrySchemaFilter>();

@@ -60,7 +60,10 @@ public class StatusInfoService : IStatusInfoService
     public async Task<HealthReportDto?> GetObservationsApiHealthAsync()
     {
         var healthReport = await _observationsApiClient.GetHealthAsync();
-        healthReport!.Entries.Remove("self");
+        if (healthReport is null)
+            return null;
+
+        healthReport.Entries.Remove("self");
 
         var mongoDbInfo = await _observationsApiClient.GetMongoDatabaseInfo();
         var searchIndexInfo = await _observationsApiClient.GetSearchIndexInfo();
@@ -93,21 +96,21 @@ public class StatusInfoService : IStatusInfoService
     public async Task<HealthReportDto?> GetAnalysisApiHealthAsync()
     {
         var healthReport = await _analysisApiClient.GetHealthAsync();
-        healthReport!.Entries.Remove("self");
+        healthReport?.Entries.Remove("self");
         return healthReport;
     }
 
     public async Task<HealthReportDto?> GetElasticsearchProxyHealthAsync()
     {
         var healthReport = await _elasticsearchProxyClient.GetHealthAsync();
-        healthReport!.Entries.Remove("self");
+        healthReport?.Entries.Remove("self");
         return healthReport;
     }
 
     public async Task<HealthReportDto?> GetDataStewardshipApiHealthAsync()
     {
         var healthReport = await _dataStewardshipApiClient.GetHealthAsync();
-        healthReport!.Entries.Remove("self");
+        healthReport?.Entries.Remove("self");
         return healthReport;
     }
 

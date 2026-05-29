@@ -72,14 +72,14 @@
                     <MudTextField T="string"
                                   Value="@diagramResult"
                                   ReadOnly="true"
-                                  AutoGrow="true"
+                                  Sizing="InputSizing.Auto"
                                   MaxLines="30"
                                   Variant="Variant.Outlined" />
                     <MudIconButton Icon="@copyIcon"
                                    Color="Color.Primary"
                                    OnClick="CopyDiagramToClipboard"
                                    Size="Size.Medium"
-                                   AriaLabel="Copy diagram to clipboard" />
+                                    aria-label="Copy diagram to clipboard" />
                 </MudStack>
             </MudTabPanel>            
         </MudTabs>
@@ -94,7 +94,6 @@
     private TaxonRelationsTreeIterationMode treeIterationMode = TaxonRelationsTreeIterationMode.BothParentsAndChildren;
     private bool includeSecondaryRelations = true; // Default checked
     private string translationCultureCode = "sv-SE";
-    private int? selectedExampleId;
     private string? diagramResult;
     private string copyIcon = Icons.Material.Filled.ContentCopy;
 

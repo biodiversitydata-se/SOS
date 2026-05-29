@@ -694,7 +694,7 @@ public static class GISExtensions
             var circle = shapeFactory.CreateCircle();
             circle.SRID = point.SRID;
             return circle;
-        }
+        }        
 
         public LatLonGeoLocation ToGeoLocation()
         {
@@ -998,6 +998,5 @@ public static class GISExtensions
 
         private static bool AreClose(double a, double b) =>
             Math.Abs(a - b) < Tolerance;
-    }
-
+    }   
 }

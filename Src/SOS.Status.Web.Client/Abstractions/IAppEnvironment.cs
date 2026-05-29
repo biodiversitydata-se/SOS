@@ -3,6 +3,7 @@
 public interface IAppEnvironment
 {
     string EnvironmentName { get; }
+    bool OnlyObservationsAndStatus { get; }
     bool IsLocalOrDev();
     bool IsProduction();
 }

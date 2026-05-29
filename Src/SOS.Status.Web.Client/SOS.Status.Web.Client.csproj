@@ -9,7 +9,7 @@
 	<BlazorWebAssemblyLoadAllGlobalizationData>true</BlazorWebAssemblyLoadAllGlobalizationData>
   </PropertyGroup>
 
-  <ItemGroup>
+  <ItemGroup>	  
 	  <PackageReference Include="Blazorade.Mermaid" Version="2.0.2" />
 	  <PackageReference Include="Blazored.LocalStorage" Version="4.5.0" />
 	  <PackageReference Include="CSharpFunctionalExtensions" Version="3.7.0" />

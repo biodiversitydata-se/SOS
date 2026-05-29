@@ -9,6 +9,11 @@ namespace SOS.Observations.Api.Configuration;
 public class ObservationApiConfiguration
 {
     /// <summary>
+    /// Cache monitoring configuration.
+    /// </summary>
+    public CacheMonitoringConfiguration CacheMonitoring { get; set; } = new();
+
+    /// <summary>
     /// Default max ongoing export jobs for a user
     /// </summary>
     public int DefaultUserExportLimit { get; set; }
@@ -42,4 +47,25 @@ public class ObservationApiConfiguration
     /// Response compression level.
     /// </summary>
     public CompressionLevel ResponseCompressionLevel { get; set; } = CompressionLevel.Optimal;
+}
+
+/// <summary>
+/// Cache monitoring configuration.
+/// </summary>
+public class CacheMonitoringConfiguration
+{
+    /// <summary>
+    /// If true, cache monitoring is enabled.
+    /// </summary>
+    public bool Enabled { get; set; } = true;
+
+    /// <summary>
+    /// Log AdaptiveSearchLocations cache usage after this many cache writes. Set to 0 or less to disable periodic write logging.
+    /// </summary>
+    public int AdaptiveSearchLocationsLogEveryWriteCount { get; set; } = 100;
+
+    /// <summary>
+    /// Log location geometry cache usage after this many cache writes. Set to 0 or less to disable periodic write logging.
+    /// </summary>
+    public int LocationGeometryLogEveryWriteCount { get; set; } = 50;
 }

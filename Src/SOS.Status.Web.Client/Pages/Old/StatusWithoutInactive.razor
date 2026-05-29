@@ -2,6 +2,7 @@
 @using System.Diagnostics
 @using SOS.Status.Web.Client.Abstractions
 @inject IStatusInfoService statusInfoService;
+@inject IAppEnvironment AppEnvironment
 
 <PageTitle>Status info</PageTitle>
 <MudText Typo="Typo.h4">Status info</MudText>
@@ -32,7 +33,8 @@ else
                 ObservationApiHealthReport="@observationsApiHealthReport" 
                 AnalysisApiHealthReport="@analysisApiHealthReport" 
                 ElasticsearchProxyHealthReport="@elasticsearchProxyHealthReport"
-                DataStewardshipApiHealthReport="@dataStewardshipApiHealthReport" />
+                DataStewardshipApiHealthReport="@dataStewardshipApiHealthReport"
+                ShowOnlyObservationApi="@AppEnvironment.OnlyObservationsAndStatus" />
         </MudTabPanel>
         <MudTabPanel Text="Markdown" Icon="@Icons.Material.Outlined.Science">
             <MudMarkdown Value="@Value" />
@@ -72,19 +74,26 @@ else
 
     private async Task LoadTestsTabDataAsync()
     {        
-        var fetchObservationsTask = statusInfoService.GetObservationsApiHealthAsync()
-            .ContinueWith(t => observationsApiHealthReport = t.Result);
+        var fetchObservationsTask = statusInfoService.GetObservationsApiHealthAsync();
 
-        var fetchAnalysisTask = statusInfoService.GetAnalysisApiHealthAsync()
-            .ContinueWith(t => analysisApiHealthReport = t.Result);
+        if (AppEnvironment.OnlyObservationsAndStatus)
+        {
+            observationsApiHealthReport = await fetchObservationsTask;
+            testsTabBadgeColor = ColorHelper.GetHealthColor(observationsApiHealthReport?.Status);
+            await InvokeAsync(StateHasChanged);
+            return;
+        }
 
-        var fetchElasticsearchTask = statusInfoService.GetElasticsearchProxyHealthAsync()
-            .ContinueWith(t => elasticsearchProxyHealthReport = t.Result);
+        var fetchAnalysisTask = statusInfoService.GetAnalysisApiHealthAsync();
+        var fetchElasticsearchTask = statusInfoService.GetElasticsearchProxyHealthAsync();
+        var fetchDataStewardshipTask = statusInfoService.GetDataStewardshipApiHealthAsync();
 
-        var fetchDataStewardshipTask = statusInfoService.GetDataStewardshipApiHealthAsync()
-            .ContinueWith(t => dataStewardshipApiHealthReport = t.Result);
-        
         await Task.WhenAll(fetchObservationsTask, fetchAnalysisTask, fetchElasticsearchTask, fetchDataStewardshipTask);
+
+        observationsApiHealthReport = await fetchObservationsTask;
+        analysisApiHealthReport = await fetchAnalysisTask;
+        elasticsearchProxyHealthReport = await fetchElasticsearchTask;
+        dataStewardshipApiHealthReport = await fetchDataStewardshipTask;
 
         testsTabBadgeColor = ColorHelper.GetHealthColor(
             observationsApiHealthReport?.Status,

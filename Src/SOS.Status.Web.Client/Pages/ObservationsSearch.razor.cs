@@ -1,4 +1,4 @@
-using LeafletForBlazor;
+﻿using LeafletForBlazor;
 using SOS.Status.Web.Client.Dtos.SosObsApi;
 using SOS.Status.Web.Client.JsonConverters;
 using SOS.Status.Web.Client.Models;
@@ -42,7 +42,7 @@ public partial class ObservationsSearch
                 new RealTimeMap.BasemapLayer()
                 {
                     url = "http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-                    attribution = "�Open Street Map",
+                    attribution = "©Open Street Map",
                     title = "Open Street Map",
                     detectRetina = true
                 },

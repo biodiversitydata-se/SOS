@@ -12,6 +12,7 @@
 *.user
 *.userosscache
 *.sln.docstates
+favorites.json
 
 # from adb-devops-template
 *.secret.yaml
