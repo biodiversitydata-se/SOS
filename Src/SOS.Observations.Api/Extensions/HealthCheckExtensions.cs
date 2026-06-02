@@ -28,7 +28,7 @@ public static class HealthCheckExtensions
 
     extension(IServiceCollection services)
     {
-        public IServiceCollection SetupHealthchecks(bool disableHealthCheckInit, bool isProductionEnvironment)
+        public IServiceCollection SetupHealthchecks(bool disableHealthCheckInit, bool disableHangfireInit, bool isProductionEnvironment)
         {
             var healthChecks = services.AddHealthChecks();
             if (!disableHealthCheckInit)
@@ -40,9 +40,13 @@ public static class HealthCheckExtensions
                     options.Period = TimeSpan.FromSeconds(600); // Create new health check every 10 minutes and cache result
                     options.Timeout = TimeSpan.FromSeconds(60);
                 });
+                if (!disableHangfireInit)
+                {
+                    healthChecks.AddHangfire(a => a.MinimumAvailableServers = 1, "Hangfire", tags: new[] { "hangfire" });
+                }
+
                 healthChecks
                     //  .AddMongoDb(processedDbConfiguration.GetConnectionString(), tags: new[] { "database", "mongodb" })
-                    .AddHangfire(a => a.MinimumAvailableServers = 1, "Hangfire", tags: new[] { "hangfire" })
                     .AddCheck<DataAmountHealthCheck>("Data amount", tags: new[] { "database", "elasticsearch", "data" })
                     .AddCheck<SearchDataProvidersHealthCheck>("Search data providers", tags: new[] { "database", "elasticsearch", "query" })
                     //.AddCheck<SearchPerformanceHealthCheck>("Search performance", tags: new[] { "database", "elasticsearch", "query", "performance" })

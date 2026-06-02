@@ -51,7 +51,7 @@
                 OnClick="@OnToggleRightDrawer"
                 Color="Color.Inherit"
                 Edge="Edge.End"
-                Title="Open/close right panel" />
+                title="Open/close right panel" />
         }
     </MudAppBar> 
     
@@ -92,7 +92,7 @@
     private bool rightDrawerOpen = false;
     private string? firstName;
     private string? name;    
-    private MudThemeProvider _mudThemeProvider;
+    private MudThemeProvider? _mudThemeProvider;
     private ThemeManagerTheme _themeManager = new ThemeManagerTheme()
     {
         DrawerClipMode = DrawerClipMode.Always,

@@ -371,7 +371,7 @@ public static class ObservationPropertyFieldDescriptionHelper
             default:
                 return field.PropertyPath;
         }
-    }
+    }    
 
     public static bool ValidateUniquePropertyNames(bool validateSwedishName = false, bool validateEnglishName = false)
     {

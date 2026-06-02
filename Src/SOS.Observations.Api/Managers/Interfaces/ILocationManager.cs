@@ -1,4 +1,5 @@
-﻿using SOS.Lib.Models.Search.Filters;
+﻿using NetTopologySuite.Geometries;
+using SOS.Lib.Models.Search.Filters;
 using SOS.Shared.Api.Dtos;
 using SOS.Shared.Api.Dtos.Location;
 using System.Collections.Generic;
@@ -17,6 +18,13 @@ public interface ILocationManager
     /// <param name="locationIds"></param>
     /// <returns></returns>
     Task<IEnumerable<LocationDto>> GetLocationsAsync(IEnumerable<string> locationIds);
+
+    /// <summary>
+    /// Get point-with-buffer geometry by location id.
+    /// </summary>
+    /// <param name="locationIds"></param>
+    /// <returns></returns>
+    Task<Dictionary<string, Geometry>> GetLocationGeometryAsync(HashSet<string> locationIds);
 
     /// <summary>
     /// Search for locations

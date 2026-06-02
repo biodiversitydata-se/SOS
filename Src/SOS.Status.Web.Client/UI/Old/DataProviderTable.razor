@@ -1,4 +1,4 @@
-@using SOS.Status.Web.Client.Dtos
+﻿@using SOS.Status.Web.Client.Dtos
 <MudTable @ref="mudTable" Class="data-provider-table" Items="@ProcessSummary?.DataProviderStatuses" T="DataProviderStatusDto" Hover="true" Bordered="false" Striped="true" Dense="true" RowClass="cursor-pointer" RowClassFunc="@SelectedRowClassFunc" OnRowClick="RowClickEvent">
     <HeaderContent>
         <MudTh>Id</MudTh>
@@ -75,7 +75,7 @@
             selectedRowNumber = -1;
             return string.Empty;
         }
-        else if (mudTable.SelectedItem != null && mudTable.SelectedItem.Equals(element))
+        else if (mudTable?.SelectedItem != null && mudTable.SelectedItem.Equals(element))
         {
             selectedRowNumber = rowNumber;
             return "selected";

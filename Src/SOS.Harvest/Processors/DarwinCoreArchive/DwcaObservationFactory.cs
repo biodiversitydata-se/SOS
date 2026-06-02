@@ -177,6 +177,7 @@ public class DwcaObservationFactory : ObservationFactoryBase, IObservationFactor
                 }
             }
 
+            obs.Location.Type = LocationType.Polygon;
             double? decimalLongitude = verbatim.DecimalLongitude.ParseDouble() ?? verbatim.VerbatimLongitude.ParseDouble() ?? wktGeometry.Centroid.X;
             double? decimalLatitude = verbatim.DecimalLatitude.ParseDouble() ?? verbatim.VerbatimLatitude.ParseDouble() ?? wktGeometry.Centroid.Y;
 

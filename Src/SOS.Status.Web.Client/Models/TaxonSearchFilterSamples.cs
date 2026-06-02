@@ -10,7 +10,9 @@ public static class TaxonSearchFilterSamples
         {
             { 1, new SearchFilterExample() { Name = "Search with taxon", Json = _taxonSearchFilterSample } },
             { 2, new SearchFilterExample() { Name = "Search with polygon", Json = _polygonSearchFilterSample } },
-            { 3, new SearchFilterExample() { Name = "Search with redlisted taxa", Json = _fieldsetRedlistedSearchFilterSample} }
+            { 3, new SearchFilterExample() { Name = "Search with redlisted taxa", Json = _fieldsetRedlistedSearchFilterSample} },
+            { 4, new SearchFilterExample() { Name = "Search in municipality", Json = _municipalitySearchFilterSample} },
+            { 5, new SearchFilterExample() { Name = "Search in municipality Amiral", Json = _municipalityAmiralSample} }
         };
     }
 
@@ -27,6 +29,36 @@ public static class TaxonSearchFilterSamples
     "occurrenceStatus":"present"
 }
 """";
+
+    private static string _municipalitySearchFilterSample = """"
+{    
+    "geographics" : {     
+       "areas" : [
+           {
+               "areaType": "Municipality",
+               "featureId": "687"
+           }
+       ]
+   }
+}
+"""";
+
+    private static string _municipalityAmiralSample = """"
+{   
+    "taxon" : {
+        "ids":[201060],
+        "includeUnderlyingTaxa" : true
+    },
+    "geographics" : {     
+       "areas" : [
+           {
+               "areaType": "Municipality",
+               "featureId": "687"
+           }
+       ]
+   }
+}
+"""";    
 
     private static string _polygonSearchFilterSample = """"
 {
@@ -65,10 +97,7 @@ public static class TaxonSearchFilterSamples
     "taxon" : {
         "redListCategories": [ "CR", "EN", "VU" ]
     },
-    "occurrenceStatus":"present",
-    "output": {
-        "fieldSet":"extended"
-    }
+    "occurrenceStatus":"present"    
 }
 """";
 

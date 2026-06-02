@@ -1,6 +1,7 @@
 ﻿using CSharpFunctionalExtensions;
 using SOS.Status.Web.Client.Abstractions;
 using SOS.Status.Web.Client.Dtos.SosObsApi;
+using SOS.Status.Web.Client.Models;
 using SOS.Status.Web.HttpClients;
 
 namespace SOS.Status.Web.Services;
@@ -42,6 +43,70 @@ public class ObservationSearchService : IObservationSearchService
             sensitiveObservations);
 
         return pageResult!;
+    }
+
+    public async Task<(string GeoJson, long? ObservationsCount, long ResponseSizeBytes)> AdaptiveSearchGeoJsonByLocation(
+        SearchFilterInternalDto filter,
+        bool cluster = true,
+        string clusteringAlgorithm = "Greedy",
+        CreatePolygonsMode createPolygons = CreatePolygonsMode.No,
+        double clusterRadiusPx = 40.0,
+        int minLocationsPerCluster = 2,
+        bool validateSearchFilter = false,
+        string translationCultureCode = "sv-SE",
+        bool sensitiveObservations = false,
+        double? metersPerPixel = null)
+    {
+        return await _observationsApiClient.AdaptiveSearchGeoJsonByLocationAsync(
+            filter,
+            cluster,
+            clusteringAlgorithm,
+            createPolygons,
+            clusterRadiusPx,
+            minLocationsPerCluster,
+            validateSearchFilter,
+            translationCultureCode,
+            sensitiveObservations,
+            metersPerPixel);
+    }
+
+    public async Task<(string GeoJson, long? ObservationsTotalCount, long? FeatureCount, long? LocationsBeforeClustering, long ResponseSizeBytes, string? CacheStatus, string? ResultType, string? Timings)> AdaptiveSearchLocationItemsCachedGeoJson(
+        SearchFilterInternalDto filter,
+        int observationsLimit = 10000,
+        int maxGridCells = 10000,
+        bool cluster = true,
+        string clusteringAlgorithm = "Greedy",
+        CreatePolygonsMode createPolygons = CreatePolygonsMode.No,
+        double clusterRadiusPx = 40.0,
+        int minLocationsPerCluster = 2,
+        int minLocationCountBeforeClustering = 100,
+        bool validateSearchFilter = false,
+        string translationCultureCode = "sv-SE",
+        bool sensitiveObservations = false,
+        double? metersPerPixel = null,
+        string? bbox = null,
+        bool createSampleObservations = false,
+        bool useCache = true,
+        int? cutoffYear = null)
+    {
+        return await _observationsApiClient.AdaptiveSearchLocationItemsCachedGeoJsonAsync(
+            filter,
+            observationsLimit,
+            maxGridCells,
+            cluster,
+            clusteringAlgorithm,
+            createPolygons,
+            clusterRadiusPx,
+            minLocationsPerCluster,
+            minLocationCountBeforeClustering,
+            validateSearchFilter,
+            translationCultureCode,
+            sensitiveObservations,
+            metersPerPixel,
+            bbox,
+            createSampleObservations,
+            useCache,
+            cutoffYear);
     }
 
     public async Task<Result<SearchByCursorResultDto<Observation>>> SearchObservationsByCursor(

@@ -1,4 +1,4 @@
-using Blazored.LocalStorage;
+﻿using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting.StaticWebAssets;
@@ -65,7 +65,7 @@ try
     //});
 
     builder.Services.AddDependencyInjectionServices(configurationRoot);
-    builder.Services.AddSingleton<IAppEnvironment>(sp => new AppEnvironment(builder.Environment.EnvironmentName));
+    builder.Services.AddSingleton<IAppEnvironment>(sp => new AppEnvironment(builder.Environment.EnvironmentName, Settings.OnlyObservationsAndStatus));
     builder.Services.SetupAuthentication();
     builder.Services.AddAuthorization();    
     builder.Logging.AddConsole();

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using NetTopologySuite.Geometries;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Shared.Api.Dtos;
@@ -50,6 +51,12 @@ public class LocationManager : ILocationManager
         var locations = await _processedLocationRepository.GetLocationsAsync(locationIds);
 
         return locations?.Select(l => l.ToDto());
+    }
+
+    /// <inheritdoc />
+    public async Task<Dictionary<string, Geometry>> GetLocationGeometryAsync(HashSet<string> locationIds)
+    {
+        return await _processedLocationRepository.GetLocationGeometryAsync(locationIds);
     }
 
     /// <inheritdoc />

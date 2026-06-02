@@ -1,4 +1,4 @@
-using Hangfire;
+﻿using Hangfire;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.ResponseCompression;
 using MongoDB.Bson.Serialization.Conventions;
@@ -11,6 +11,8 @@ using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Observations.Api.Extensions;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Middleware;
+using SOS.Observations.Api.Services;
+using SOS.Observations.Api.Services.AdaptiveSearchLocations;
 using SOS.Shared.Api.Extensions.Dto;
 using SOS.Shared.Api.Middleware;
 using System.Globalization;
@@ -63,6 +65,8 @@ try
     app.UseSecurityHeaders(includeHsts: !isLocalDevelopment);
     app.MapDefaultEndpoints();
     ConfigureMiddleware(app, isDevelopment, disableHangfireInit, disableHealthCheckInit);
+    app.Services.GetRequiredService<LocationGeometryCacheMonitor>().StartMonitoring();
+    app.Services.GetRequiredService<AdaptiveSearchLocationsCacheMonitor>().StartMonitoring();
 
     // Ensure protected log collection and index
     await EnsureProtectedLogIndexAsync(app);
@@ -78,6 +82,7 @@ try
 catch (Exception ex)
 {
     Log.Fatal(ex, "Application terminated unexpectedly");
+    throw;
 }
 finally
 {
@@ -174,7 +179,10 @@ static void ConfigureServices(
         services.SetupHangfire(useLocalHangfire, hangfireDbConnectionString);
     }
     
-    services.SetupHealthchecks(disableHealthCheckInit, isProductionEnvironment: builder.Environment.IsEnvironment("prod"));
+    services.SetupHealthchecks(
+        disableHealthCheckInit,
+        disableHangfireInit,
+        isProductionEnvironment: builder.Environment.IsEnvironment("prod"));
 }
 
 static void ConfigureMiddleware(WebApplication app, bool isDevelopment, bool disableHangfireInit, bool disableHealthCheckInit)

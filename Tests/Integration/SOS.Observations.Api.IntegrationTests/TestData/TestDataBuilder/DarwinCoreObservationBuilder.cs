@@ -1,6 +1,7 @@
 ﻿using DotNetCore.Mapping;
 using FizzWare.NBuilder;
 using FizzWare.NBuilder.Implementation;
+using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Helpers;
 using SOS.Lib.JsonConverters;
 using SOS.Lib.Models.Verbatim.DarwinCore;
@@ -305,7 +306,7 @@ public static class DarwinCoreObservationBuilder
                 // Occurrence
                 obs.OccurrenceID = occurrenceID;
                 obs.OccurrenceRemarks = sourceObservation.OccurrenceRemarks;
-                obs.OccurrenceStatus = sourceObservation.OccurrenceStatus;
+                obs.OccurrenceStatus = OccurrenceStatusId.Present.ToString();
                 obs.CatalogNumber = sightingId.ToString();
                 obs.RecordNumber = sourceObservation.RecordNumber;
                 obs.RecordedBy = sourceObservation.RecordedBy;
@@ -373,7 +374,7 @@ public static class DarwinCoreObservationBuilder
                 obs.CoordinateUncertaintyInMeters = sourceObservation.CoordinateUncertaintyInMeters;
                 obs.Country = sourceObservation.Country;
                 obs.CountryCode = sourceObservation.CountryCode;
-                obs.County = sourceObservation.County;
+                obs.County = sourceObservation.County;                
                 obs.StateProvince = sourceObservation.StateProvince;
                 obs.Municipality = sourceObservation.Municipality;
                 obs.Locality = sourceObservation.Locality;

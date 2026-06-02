@@ -6,6 +6,7 @@ using System.Text.Json;
 public static class Settings
 {
     public static string BlazorRenderMode { get; private set; } = "Server"; // "WebAssembly", "Server" or "Auto"
+    public static bool OnlyObservationsAndStatus { get; private set; }
     public static UserServiceConfiguration UserServiceConfiguration { get; set; } = new();
     public static HttpClientsConfiguration HttpClientsConfiguration { get; set; } = new();
     public static MongoDbConfiguration ProcessDbConfiguration { get; set; } = new();
@@ -25,6 +26,7 @@ public static class Settings
         var logger = loggerFactory.CreateLogger("Settings");
 
         BlazorRenderMode = GetConfigValueString("BlazorRenderMode", configuration, logger, sensitiveSetting: false, required: false);
+        OnlyObservationsAndStatus = GetConfigValueBool("ONLY_OBSERVATIONS_AND_STATUS", configuration, logger, sensitiveSetting: false, required: false);
         HttpClientsConfiguration = GetConfigSection<HttpClientsConfiguration>("HttpClients", configuration, logger, sensitiveSetting: false);
         
         var observationApiUrl = NetAspireHelper.GetServiceEndpoint("sos-observations-api", "http"); // Get Observation API url from .Net Aspire configuration.
@@ -107,6 +109,32 @@ public static class Settings
         else
             return null!;
     }
+
+    private static bool GetConfigValueBool(string key, IConfiguration configuration, ILogger logger, bool sensitiveSetting = false, bool required = true)
+    {
+        var envValue = Environment.GetEnvironmentVariable(key);
+        if (!string.IsNullOrEmpty(envValue))
+        {
+            LogConfigValue(key, envValue, "environment variable (check /devops/k8s/<env>/<manifest.yaml>)", logger, sensitiveSetting);
+            return bool.Parse(envValue);
+        }
+
+        var confValue = configuration[key];
+        if (!string.IsNullOrEmpty(confValue))
+        {
+            LogConfigValue(key, confValue, "appsettings.<env>.json", logger, sensitiveSetting);
+            return bool.Parse(confValue);
+        }
+
+        if (required)
+        {
+            throw new Exception($"value for required {key} is null or empty!");
+        }
+
+        logger.LogInformation("Ignoring non-required config value {key}", key);
+        return false;
+    }
+
     private static string GetConfigValueString(string key, IConfiguration configuration, ILogger logger, bool sensitiveSetting = false, bool required = true)
     {
         var envValue = Environment.GetEnvironmentVariable(key);

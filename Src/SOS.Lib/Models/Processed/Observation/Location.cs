@@ -2,6 +2,7 @@
 using NetTopologySuite.Geometries;
 using SOS.Lib.Enums;
 using SOS.Lib.Swagger;
+using System.Globalization;
 using System.Text.Json.Serialization;
 using static SOS.Lib.Swagger.UseSchema;
 
@@ -318,6 +319,43 @@ public class Location
     ///     specific to the data set.
     /// </summary>
     public string LocationId { get; set; }
+
+    /// <summary>
+    /// An identifier for the distinct location, based on the combination of location type, decimalLatitude,
+    /// decimalLongitude and coordinateUncertaintyInMeters.
+    /// </summary>
+    [JsonIgnore]
+    public string DistinctLocationId => CreateDistinctLocationId(
+        Type,
+        DecimalLatitude,
+        DecimalLongitude,
+        CoordinateUncertaintyInMeters);
+
+    private static string CreateDistinctLocationId(
+        LocationType type,
+        double? decimalLatitude,
+        double? decimalLongitude,
+        int? coordinateUncertaintyInMeters)
+    {
+        var latitude = FormatCoordinate(decimalLatitude);
+        var longitude = FormatCoordinate(decimalLongitude);
+        var uncertainty = coordinateUncertaintyInMeters.HasValue
+            ? string.Create(CultureInfo.InvariantCulture, $"a{coordinateUncertaintyInMeters.Value}")
+            : "un";
+
+        return string.Create(CultureInfo.InvariantCulture, $"{type}_{latitude}_{longitude}_{uncertainty}");
+    }
+
+    private static string FormatCoordinate(double? coordinate)
+    {
+        if (!coordinate.HasValue)
+        {
+            return "x";
+        }
+
+        var scaledCoordinate = (long)Math.Round(coordinate.Value * 100000d, MidpointRounding.AwayFromZero);
+        return scaledCoordinate.ToString(CultureInfo.InvariantCulture);
+    }
 
     /// <summary>
     ///     Comments or notes about the Location.

@@ -1,4 +1,5 @@
 ﻿using DotNet.Testcontainers.Builders;
+using DotNet.Testcontainers.Configurations;
 using DotNet.Testcontainers.Containers;
 using Elastic.Clients.Elasticsearch;
 using MongoDB.Driver;
@@ -21,6 +22,7 @@ public class TestContainersFixture : IAsyncLifetime
     private const string MONGODB_IMAGE_NAME = "mongo:6.0.5";
 
     private ElasticsearchContainer? _elasticsearchContainer { get; set; }
+    private IContainer? _kibanaContainer { get; set; }
     private MongoDbContainer? _mongoDbContainer { get; set; }
     private MongoDbContainer? _mongoDbHarvestDbContainer { get; set; }
     private IProcessClient? _processClient { get; set; }
@@ -42,6 +44,7 @@ public class TestContainersFixture : IAsyncLifetime
     public async ValueTask DisposeAsync()
     {
         await _elasticsearchContainer!.DisposeAsync();
+        if (_kibanaContainer != null) await _kibanaContainer.DisposeAsync();
         await _mongoDbContainer!.DisposeAsync();
         await _mongoDbHarvestDbContainer!.DisposeAsync();
     }
@@ -88,19 +91,32 @@ public class TestContainersFixture : IAsyncLifetime
             .WithNetwork(network)
             .WithNetworkAliases("elastic-test-network")
             .WithEnvironment("xpack.security.enabled", "false")
+            .WithWaitStrategy(Wait.ForUnixContainer()
+                .UntilMessageIsLogged("started")
+                .UntilHttpRequestIsSucceeded(r => r.ForPort(9200).ForPath("/_cluster/health")))
         .Build();
 
-        var kibanaContainer = new ContainerBuilder()
+        _kibanaContainer = new ContainerBuilder()
           .WithName(Guid.NewGuid().ToString("D"))
-          .WithImage("docker.elastic.co/kibana/kibana:8.7.1")
+          .WithImage("docker.elastic.co/kibana/kibana:8.17.3")
           .WithPortBinding(5601, 5601)
           .WithNetwork(network)
-          .WithEnvironment("ELASTICSEARCH_HOSTS", $"http://elastic-test-network:9200")
+          .WithEnvironment("ELASTICSEARCH_HOSTS", "http://elastic-test-network:9200")
+          //.WithOutputConsumer(Consume.RedirectStdoutAndStderrToConsole())
         .Build();
 
         await network.CreateAsync().ConfigureAwait(false);
         await _elasticsearchContainer.StartAsync().ConfigureAwait(false);
-        await kibanaContainer.StartAsync().ConfigureAwait(false);
+
+        // Kibana is only for debug inspection – start in background so tests are not blocked.
+        Console.WriteLine("[Kibana] Starting container in background (image: docker.elastic.co/kibana/kibana:8.17.3)...");
+        _ = _kibanaContainer.StartAsync().ContinueWith(t =>
+        {
+            if (t.IsFaulted)
+                Console.Error.WriteLine($"[Kibana] Failed to start: {t.Exception?.GetBaseException().Message}");
+            else
+                Console.WriteLine("[Kibana] Container ready – open http://localhost:5601 (Kibana may still be initializing)");
+        }, TaskScheduler.Default);
 
         var elasticUri = new UriBuilder(Uri.UriSchemeHttp, _elasticsearchContainer.Hostname, _elasticsearchContainer.GetMappedPublicPort(9200));
         var elasticClientSettings = ElasticSearchHelper.GetDefaultSettings(elasticUri.Uri).EnableDebugMode();
