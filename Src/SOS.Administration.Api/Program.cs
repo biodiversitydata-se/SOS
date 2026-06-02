@@ -28,11 +28,11 @@ try
     bool isRunningDotNetAspire = Environment.GetEnvironmentVariable("RUNNING_IN_ASPIRE").GetBoolean();
 
     // Setup logging
-    Log.Logger = SeriLogHelper.CreateLogger(isDevelopment);
+    Log.Logger = SeriLogHelper.CreateLogger(isLocalDevelopment);
     Log.Logger.Information("Starting Service");
 
     var builder = WebApplication.CreateBuilder(args);
-    SeriLogHelper.ConfigureSerilog(builder, "admin.api", isDevelopment);
+    SeriLogHelper.ConfigureSerilog(builder, "admin.api", isLocalDevelopment);
     builder.AddServiceDefaults();
     
     // Set Swedish culture globally

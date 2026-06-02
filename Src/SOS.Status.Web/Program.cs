@@ -27,11 +27,11 @@ try
     bool isDevelopment = new[] { "local", "development", "dev", "st" }.Contains(env?.ToLower(), StringComparer.CurrentCultureIgnoreCase);
 
     // Setup logging
-    Log.Logger = SeriLogHelper.CreateLogger(isDevelopment);
+    Log.Logger = SeriLogHelper.CreateLogger(isLocalDevelopment);
     Log.Logger.Information("Starting Service");
 
     var builder = WebApplication.CreateBuilder(args);
-    SeriLogHelper.ConfigureSerilog(builder, "status.web", isDevelopment);
+    SeriLogHelper.ConfigureSerilog(builder, "status.web", isLocalDevelopment);
     builder.AddServiceDefaults();
 
     var configurationRoot = BuildConfiguration(builder, isDevelopment);

@@ -31,15 +31,18 @@ public static class SeriLogHelper
         {
             configuration
                 .MinimumLevel.Debug()
-                .WriteTo.Console(new ExpressionTemplate(
-                     "{ {timestamp: @t, message: @m, level: if @l is null then 'Info' else @l, exception: @x, ..@p} }\n")
-                );
+                .WriteTo.Console()
+                .WriteTo.Debug();
         }
         else
         {
             configuration
                 .MinimumLevel.Information()
+                .WriteTo.Console(new ExpressionTemplate(
+                     "{ {timestamp: @t, message: @m, level: if @l is null then 'Info' else @l, exception: @x, ..@p} }\n")
+                )
                 .MinimumLevel.Override("Microsoft.EntityFrameworkCore", Serilog.Events.LogEventLevel.Warning)
+                .MinimumLevel.Override("Microsoft.AspNetCore", Serilog.Events.LogEventLevel.Warning)
                 .MinimumLevel.Override("Microsoft.AspNetCore.Http.Result", Serilog.Events.LogEventLevel.Warning)
                 .MinimumLevel.Override("Microsoft.AspNetCore.Hosting.Diagnostics", Serilog.Events.LogEventLevel.Warning)
                 .MinimumLevel.Override("Microsoft.AspNetCore.Routing.EndpointMiddleware", Serilog.Events.LogEventLevel.Warning)
@@ -47,6 +50,8 @@ public static class SeriLogHelper
                 .MinimumLevel.Override("Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware", Serilog.Events.LogEventLevel.Warning)
                 .MinimumLevel.Override("Microsoft.AspNetCore.Mvc.Infrastructure", Serilog.Events.LogEventLevel.Warning)
                 .MinimumLevel.Override("Microsoft.AspNetCore.Cors.Infrastructure", Serilog.Events.LogEventLevel.Warning)
+                .Filter.ByExcluding(Matching.WithProperty<string>("RequestPath", p => p == "/health"))
+                .Filter.ByExcluding(Matching.WithProperty<string>("RequestPath", p => p == "/health-json"))
                 .Filter.ByExcluding(Matching.WithProperty<string>("RequestPath", p => p == "/healthz"))
                 .Filter.ByExcluding(Matching.WithProperty<string>("RequestPath", p => p == "/metrics"));
         }

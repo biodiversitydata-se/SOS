@@ -30,11 +30,11 @@ try
     bool disableCachedTaxonSumAggregationInit = Environment.GetEnvironmentVariable("DISABLE_CACHED_TAXON_SUM_INIT").GetBoolean();
 
     // Setup logging
-    Log.Logger = SeriLogHelper.CreateLogger(isDevelopment);
+    Log.Logger = SeriLogHelper.CreateLogger(isLocalDevelopment);
     Log.Logger.Information("Starting Service");
 
     var builder = WebApplication.CreateBuilder(args);
-    SeriLogHelper.ConfigureSerilog(builder, "search.api", isDevelopment);
+    SeriLogHelper.ConfigureSerilog(builder, "search.api", isLocalDevelopment);
     
     builder.AddServiceDefaults();
 

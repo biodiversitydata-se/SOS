@@ -25,11 +25,11 @@ try
     bool useLocalHangfire = Environment.GetEnvironmentVariable("USE_LOCAL_HANGFIRE").GetBoolean();
 
     // Setup logging
-    Log.Logger = SeriLogHelper.CreateLogger(isDevelopment);
+    Log.Logger = SeriLogHelper.CreateLogger(isLocalDevelopment);
     Log.Logger.Information("Starting Service");
 
     var builder = WebApplication.CreateBuilder(args);
-    SeriLogHelper.ConfigureSerilog(builder, "analysis.api", isDevelopment);
+    SeriLogHelper.ConfigureSerilog(builder, "analysis.api", isLocalDevelopment);
     builder.AddServiceDefaults();
     
     // Set Swedish culture globally

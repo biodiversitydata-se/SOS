@@ -18,11 +18,11 @@ try
     bool isDevelopment = new[] { "local", "dev", "st" }.Contains(env?.ToLower(), StringComparer.CurrentCultureIgnoreCase);
 
     // Setup logging
-    Log.Logger = SeriLogHelper.CreateLogger(isDevelopment);
+    Log.Logger = SeriLogHelper.CreateLogger(isLocalDevelopment);
     Log.Logger.Information("Starting Service");
 
     var builder = WebApplication.CreateBuilder(args);
-    SeriLogHelper.ConfigureSerilog(builder, "proxy.api", isDevelopment);
+    SeriLogHelper.ConfigureSerilog(builder, "proxy.api", isLocalDevelopment);
 
     // Set Swedish culture globally
     SetCulture("sv-SE");

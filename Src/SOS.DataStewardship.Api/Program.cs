@@ -10,15 +10,16 @@ using System.Text.Json.Serialization;
 
 
 var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+bool isLocalDevelopment = new[] { "local", "k8s" }.Contains(env?.ToLower(), StringComparer.CurrentCultureIgnoreCase);
 var isDevelopment = new[] { "local", "dev", "st" }.Contains(env, StringComparer.CurrentCultureIgnoreCase);
 
 try
 {
     // we set up Log.Logger here in order to be able to log if something goes wrong in the startup process
-    Log.Logger = SeriLogHelper.CreateLogger(isDevelopment);
+    Log.Logger = SeriLogHelper.CreateLogger(isLocalDevelopment);
     Log.Information("Starting up");
     var builder = WebApplication.CreateBuilder(args);
-    SeriLogHelper.ConfigureSerilog(builder, "datastewardship.api", isDevelopment);
+    SeriLogHelper.ConfigureSerilog(builder, "datastewardship.api", isLocalDevelopment);
     
     builder.AddServiceDefaults();
     builder.Services.AddMemoryCache();
