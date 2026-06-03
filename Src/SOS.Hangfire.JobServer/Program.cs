@@ -217,10 +217,16 @@ public class Program
 
         sb.AppendLine("Import settings:");
         sb.AppendLine("================");
-        sb.AppendLine(
-            $"[ArtportalenSettings].[ConnectionStringBackup]: {_importConfiguration.ArtportalenConfiguration.ConnectionStringBackup}");
-        sb.AppendLine(
-            $"[ArtportalenSettings].[ConnectionStringLive]: {_importConfiguration.ArtportalenConfiguration.ConnectionStringLive}");
+        var firstPartEndIndex = _importConfiguration.ArtportalenConfiguration.ConnectionStringBackup?.IndexOf(';') ?? 0;
+        if (firstPartEndIndex > 0)
+        {
+            sb.AppendLine($"[ArtportalenSettings].[ConnectionStringBackup]: {_importConfiguration.ArtportalenConfiguration.ConnectionStringBackup.Substring(0, firstPartEndIndex)}");
+        }
+        firstPartEndIndex = _importConfiguration.ArtportalenConfiguration.ConnectionStringLive?.IndexOf(';') ?? 0;
+        if (firstPartEndIndex > 0)
+        {
+            sb.AppendLine($"[ArtportalenSettings].[ConnectionStringLive]: {_importConfiguration.ArtportalenConfiguration.ConnectionStringLive.Substring(0, firstPartEndIndex)}");
+        }
         sb.AppendLine(
             $"[ArtportalenSettings].[MaxNumberOfSightingsHarvested]: {_importConfiguration.ArtportalenConfiguration.MaxNumberOfSightingsHarvested}");
         sb.AppendLine(
