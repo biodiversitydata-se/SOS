@@ -10,8 +10,8 @@ using SOS.Observations.Api.IntegrationTests.Setup;
 using SOS.Observations.Api.IntegrationTests.Setup.Stubs;
 using SOS.Observations.Api.IntegrationTests.TestData;
 using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
-using SOS.Shared.Api.Dtos.Enum;
-using SOS.Shared.Api.Dtos.Filter;
+using SOS.Lib.Dtos.Enum;
+using SOS.Lib.Dtos.Filter;
 using System.Text.Json.Nodes;
 
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsEndpoints.ObservationsBySearchEndpoint;
