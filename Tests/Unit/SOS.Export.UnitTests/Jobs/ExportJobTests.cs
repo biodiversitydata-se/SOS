@@ -1,4 +1,4 @@
-using FluentAssertions;
+﻿using FluentAssertions;
 using Hangfire;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -65,7 +65,7 @@ public class ExportAndSendJobTests
                     It.IsAny<int>(),
                     It.IsAny<string>(),
                     It.IsAny<SearchFilter>(),
-                    null,
+                    It.IsAny<List<(Stream stream, string filename)>>(),
                     It.IsAny<string>(),
                     "",
                     ExportFormat.DwC,
@@ -115,14 +115,13 @@ public class ExportAndSendJobTests
                     It.IsAny<int>(),
                     It.IsAny<string>(),
                     It.IsAny<SearchFilter>(),
-                    null,
+                    It.IsAny<List<(Stream stream, string filename)>>(),
                     It.IsAny<string>(),
                     "",
                     ExportFormat.DwC,
                     "en-GB",
                     false,
-                    PropertyLabelType.
-                    PropertyName,
+                    PropertyLabelType.PropertyName,
                     false,
                     It.IsAny<bool>(),
                     It.IsAny<bool>(),
@@ -162,7 +161,7 @@ public class ExportAndSendJobTests
                     It.IsAny<int>(),
                     It.IsAny<string>(),
                     It.IsAny<SearchFilter>(),
-                    null,
+                    It.IsAny<List<(Stream stream, string filename)>>(),
                     It.IsAny<string>(),
                     "",
                     ExportFormat.DwC,
