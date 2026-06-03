@@ -160,21 +160,25 @@ public class FilterHelper : IFilterHelper
         }
 
         TryAddList(md, ("Field DiaryGroup Id`s", 3), filter.FieldDiaryGroupIds?.Select(fdgi => fdgi.ToString()));
-        TryAddParagraph(md, "Not Present Filter", filter.NotPresentFilter switch
+        if (filter.NotPresentFilter != SightingNotPresentFilterDto.NoFilter)
         {
-            SightingNotPresentFilterDto.DontIncludeNotPresent => "Don`t Include Not Present",
-            SightingNotPresentFilterDto.IncludeNotPresent => "Include Not Present",
-            SightingNotPresentFilterDto.OnlyNotPresent => "Only Not Present",
-            _ => ""
-        });
+            TryAddParagraph(md, "Not Present Filter", filter.NotPresentFilter switch
+            {
+                SightingNotPresentFilterDto.DontIncludeNotPresent => "Don`t Include Not Present",
+                SightingNotPresentFilterDto.IncludeNotPresent => "Include Not Present",
+                SightingNotPresentFilterDto.OnlyNotPresent => "Only Not Present",
+                _ => ""
+            });
+        }
+        
         TryAddParagraph(md, "Observed By User Id", filter.ObservedByUserId.HasValue && filter.ObservedByUserId.Value != 0 ? filter.ObservedByUserId.Value.ToString() : null);
         TryAddParagraph(md, "Observed By Userservice User Id", filter.ObservedByUserServiceUserId.HasValue && filter.ObservedByUserServiceUserId.Value != 0 ? filter.ObservedByUserServiceUserId.Value.ToString() : null);
-        TryAddParagraph(md, "Only Secondhand Information", filter.OnlySecondHandInformation ? "Yes" : "No");
-        TryAddParagraph(md, "Only With Barcode", filter.OnlyWithBarcode ? "Yes" : "No");
-        TryAddParagraph(md, "Only With Media", filter.OnlyWithMedia ? "Yes" : "No");
-        TryAddParagraph(md, "Only With Notes", filter.OnlyWithNotes ? "Yes" : "No");
-        TryAddParagraph(md, "Only With Notes Of Interest", filter.OnlyWithNotesOfInterest ? "Yes" : "No");
-        TryAddParagraph(md, "Only With User Comments", filter.OnlyWithUserComments ? "Yes" : "No");
+        TryAddParagraph(md, "Only Secondhand Information", filter.OnlySecondHandInformation ? "Yes" : null);
+        TryAddParagraph(md, "Only With Barcode", filter.OnlyWithBarcode ? "Yes" : null);
+        TryAddParagraph(md, "Only With Media", filter.OnlyWithMedia ? "Yes" : null);
+        TryAddParagraph(md, "Only With Notes", filter.OnlyWithNotes ? "Yes" : null);
+        TryAddParagraph(md, "Only With Notes Of Interest", filter.OnlyWithNotesOfInterest ? "Yes" : null);
+        TryAddParagraph(md, "Only With User Comments", filter.OnlyWithUserComments ? "Yes" : null);
         TryAddParagraph(md, "Private Collection", filter.PrivateCollection);
         TryAddParagraph(md, "Public Collection", filter.PublicCollection);
         TryAddList(md, ("Publish Type Id`s", 3), filter.PublishTypeIdsFilter?.Select(pti => pti.ToString()));
@@ -247,8 +251,8 @@ public class FilterHelper : IFilterHelper
             SightingUnspontaneousFilterDto.Unspontaneous => "Unspontaneous",
             _ => ""
         });
-        TryAddParagraph(md, "Use Period For All Years", filter.UsePeriodForAllYears ? "Yes" : "No");
-        TryAddParagraph(md, "Use Period For All Years", filter.UsePeriodForAllYears ? "Yes" : "No");
+        TryAddParagraph(md, "Use Period For All Years", filter.UsePeriodForAllYears ? "Yes" : null);
+        TryAddParagraph(md, "Use Period For All Years", filter.UsePeriodForAllYears ? "Yes" : null);
         if (filter.VerificationStatusIds?.Count() > 0)
         {
             var verificationStatuses = vocabularies.FirstOrDefault(v => v.Id == VocabularyId.VerificationStatus)?.Values;
@@ -463,10 +467,10 @@ public class FilterHelper : IFilterHelper
         }
 
         AddHeader(md, "Geographics Filter", 2);
-        TryAddParagraph(md, "Consider Authorization Buffer", filter.ConsiderAuthorizationBuffer.HasValue ? filter.ConsiderAuthorizationBuffer.Value ? "Yes" : "No" : null);
-        TryAddParagraph(md, "Consider Disturbance Radius", filter.ConsiderDisturbanceRadius ? "Yes" : "No");
-        TryAddParagraph(md, "Consider Observation Accuracy", filter.ConsiderObservationAccuracy ? "Yes" : "No");
-        TryAddParagraph(md, "Include Observations Outside Sweden", filter.IncludeObservationsOutsideSweden.HasValue ? filter.IncludeObservationsOutsideSweden.Value ? "Yes" : "No" : null);
+        TryAddParagraph(md, "Consider Authorization Buffer", filter.ConsiderAuthorizationBuffer.HasValue ? filter.ConsiderAuthorizationBuffer.Value ? "Yes" : null : null);
+        TryAddParagraph(md, "Consider Disturbance Radius", filter.ConsiderDisturbanceRadius ? "Yes" : null);
+        TryAddParagraph(md, "Consider Observation Accuracy", filter.ConsiderObservationAccuracy ? "Yes" : null);
+        TryAddParagraph(md, "Include Observations Outside Sweden", filter.IncludeObservationsOutsideSweden.HasValue ? filter.IncludeObservationsOutsideSweden.Value ? "Yes" : null : null);
         TryAddParagraph(md, "Location Name Filter", filter.LocationNameFilter.HasValue() ? filter.LocationNameFilter : null);
         TryAddParagraph(md, "Location Name Filter", filter.MaxAccuracy.HasValue ? filter.MaxAccuracy.Value.ToString() : null);
         TryAddParagraph(md, "Location Name Filter", filter.MaxDistanceFromPoint.HasValue ? filter.MaxDistanceFromPoint.Value.ToString() : null);
@@ -537,8 +541,8 @@ public class FilterHelper : IFilterHelper
             return;
         }
         AddHeader(md, "Taxon Filter", 2);
-        TryAddParagraph(md, "Is Invasive In Sweden", filter.IsInvasiveInSweden.HasValue ? filter.IsInvasiveInSweden.Value ? "Yes" : "No" : null);
-        TryAddParagraph(md, "Include Underlying Taxa", filter.IncludeUnderlyingTaxa.HasValue ? filter.IncludeUnderlyingTaxa.Value ? "Yes" : "No" : null);
+        TryAddParagraph(md, "Is Invasive In Sweden", filter.IsInvasiveInSweden.HasValue ? filter.IsInvasiveInSweden.Value ? "Yes" : null : null);
+        TryAddParagraph(md, "Include Underlying Taxa", filter.IncludeUnderlyingTaxa.HasValue ? filter.IncludeUnderlyingTaxa.Value ? "Yes" : null : null);
 
         if ((filter.TaxonCategories?.Count() ?? 0) != 0)
         {
@@ -619,8 +623,8 @@ public class FilterHelper : IFilterHelper
                 StatusVerificationDto.Verified => "Verified",
                 _ => "Both Verified and not Verified"
             } : null);
-            TryAddParagraph(md, "Observed By Me", filter.ObservedByMe.HasValue ? filter.ObservedByMe.Value ? "Yes" : "No" : null);
-            TryAddParagraph(md, "Reported By Me", filter.ReportedByMe.HasValue ? filter.ReportedByMe.Value ? "Yes" : "No" : null);
+            TryAddParagraph(md, "Observed By Me", filter.ObservedByMe.HasValue ? filter.ObservedByMe.Value ? "Yes" : null : null);
+            TryAddParagraph(md, "Reported By Me", filter.ReportedByMe.HasValue ? filter.ReportedByMe.Value ? "Yes" : null : null);
             TryAddDateInfo(md, filter.Date);
             await TryAddTaxaInfoAsync(md, filter.Taxon, vocabularies.FirstOrDefault(v => v.Id == VocabularyId.TaxonCategory)?.Values);
             await TryAddGeographicsInfoAsync(md, filter.Geographics);
