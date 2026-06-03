@@ -460,13 +460,32 @@ public class FilterManager : IFilterManager
         if (areaFilters == null || !areaFilters.Any()) return null;
         var areas = new List<(Area area, Geometry geometry)>();
         var areaKeys = GetAreaKeysFromFilter(areaFilters, excludeEconomicZone: true).ToList();
-        var geometriesDict = await _areaCache.GetGeometriesAsync(areaKeys);        
-        var areasDict = (await _areaCache.GetAreasAsync(geometriesDict.Keys))
+        var geometriesDict = await _areaCache.GetGeometriesAsync(areaKeys);
+        if (geometriesDict == null || geometriesDict.Count == 0)
+        {
+            return areas;
+        }
+
+        var cachedAreas = await _areaCache.GetAreasAsync(geometriesDict.Keys);
+        if (cachedAreas == null)
+        {
+            return areas;
+        }
+
+        var areasDict = cachedAreas
             .ToDictionary(m => m.AreaType.ToAreaId(m.FeatureId), m => m);
 
         foreach (var pair in geometriesDict)
         {
-            areas.Add((areasDict[pair.Key.areaType.ToAreaId(pair.Key.featureId)], pair.Value));
+            if (pair.Value == null)
+            {
+                continue;
+            }
+
+            if (areasDict.TryGetValue(pair.Key.areaType.ToAreaId(pair.Key.featureId), out var area))
+            {
+                areas.Add((area, pair.Value));
+            }
         }
 
         return areas;
