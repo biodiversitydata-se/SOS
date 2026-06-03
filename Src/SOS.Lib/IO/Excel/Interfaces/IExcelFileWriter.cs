@@ -2,8 +2,6 @@
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Export;
 using SOS.Lib.Models.Search.Filters;
-using System.IO;
-using System.Threading.Tasks;
 
 namespace SOS.Lib.IO.Excel.Interfaces;
 
@@ -13,6 +11,7 @@ public interface IExcelFileWriter
     ///  Create export file
     /// </summary>
     /// <param name="filter"></param>
+    /// <param name="additionalFiles"></param>
     /// <param name="exportPath"></param>
     /// <param name="fileName"></param>
     /// <param name="culture"></param>
@@ -23,6 +22,7 @@ public interface IExcelFileWriter
     /// <returns></returns>
     Task<FileExportResult> CreateFileAync(
         SearchFilter filter,
+        IEnumerable<(Stream Stream, string Filename)> additionalFiles,
         string exportPath,
         string fileName,
         string culture,
@@ -33,6 +33,7 @@ public interface IExcelFileWriter
 
     Task<(Stream stream, string filename)> CreateFileInMemoryAsync(
         SearchFilter filter,
+        IEnumerable<(Stream Stream, string Filename)> additionalFiles,
         string culture,
         PropertyLabelType propertyLabelType,
         bool dynamicProjectDataFields,

@@ -4,13 +4,13 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Export.Jobs;
 using SOS.Export.Managers.Interfaces;
+using SOS.Lib.Dtos.Filter;
 using SOS.Lib.Enums;
+using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Models.Export;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Services.Interfaces;
-using System;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace SOS.Export.UnitTests.Jobs;
@@ -28,12 +28,14 @@ public class ExportAndSendJobTests
         _observationManager = new Mock<IObservationManager>();
         _userExportRepository = new Mock<IUserExportRepository>();
         _cryptoService = new Mock<ICryptoService>();
+        _filterHelper = new Mock<IFilterHelper>();
         _loggerMock = new Mock<ILogger<ExportAndSendJob>>();
     }
 
     private readonly Mock<IObservationManager> _observationManager;
     private readonly Mock<IUserExportRepository> _userExportRepository;
     private readonly Mock<ICryptoService> _cryptoService;
+    private readonly Mock<IFilterHelper> _filterHelper;
     private readonly Mock<ILogger<ExportAndSendJob>> _loggerMock;
 
     /// <summary>
@@ -43,6 +45,7 @@ public class ExportAndSendJobTests
         _observationManager.Object,
         _userExportRepository.Object,
         _cryptoService.Object,
+        _filterHelper.Object,
         _loggerMock.Object);
 
     /// <summary>
@@ -62,6 +65,7 @@ public class ExportAndSendJobTests
                     It.IsAny<int>(),
                     It.IsAny<string>(),
                     It.IsAny<SearchFilter>(),
+                    null,
                     It.IsAny<string>(),
                     "",
                     ExportFormat.DwC,
@@ -77,6 +81,7 @@ public class ExportAndSendJobTests
             .ReturnsAsync(new Models.ZendTo.ZendToResponse());
         _userExportRepository.Setup(uer => uer.GetAsync(It.IsAny<int>())).ReturnsAsync(new UserExport());
         _userExportRepository.Setup(uer => uer.AddOrUpdateAsync(It.IsAny<UserExport>())).ReturnsAsync(true);
+        _filterHelper.Setup(fh => fh.GetMarkDownAsync(It.IsAny<SearchFilterDto>(), CancellationToken.None)).ReturnsAsync((MemoryStream)null);
         //-----------------------------------------------------------------------------------------------------------
         // Act
         //-----------------------------------------------------------------------------------------------------------
@@ -84,7 +89,7 @@ public class ExportAndSendJobTests
 
         Func<Task> act = async () =>
         {
-            await observationManager.RunAsync(new SearchFilter(0), 0, "", null, "", ExportFormat.DwC, "en-GB", false, PropertyLabelType.PropertyName, false, false, false, null, false, null, JobCancellationToken.Null);
+            await observationManager.RunAsync(new SearchFilterBaseDto(), Lib.Dtos.Enum.ProtectionFilterDto.Public, 0, 0, "", null, "", ExportFormat.DwC, "en-GB", false, PropertyLabelType.PropertyName, false, false, false, null, false, null, JobCancellationToken.Null);
         };
 
         //-----------------------------------------------------------------------------------------------------------
@@ -110,6 +115,7 @@ public class ExportAndSendJobTests
                     It.IsAny<int>(),
                     It.IsAny<string>(),
                     It.IsAny<SearchFilter>(),
+                    null,
                     It.IsAny<string>(),
                     "",
                     ExportFormat.DwC,
@@ -128,12 +134,14 @@ public class ExportAndSendJobTests
 
         _userExportRepository.Setup(uer => uer.GetAsync(It.IsAny<int>())).ReturnsAsync(new UserExport());
         _userExportRepository.Setup(uer => uer.AddOrUpdateAsync(It.IsAny<UserExport>())).ReturnsAsync(true);
+        _filterHelper.Setup(fh => fh.GetMarkDownAsync(It.IsAny<SearchFilterDto>(), CancellationToken.None)).ReturnsAsync((MemoryStream)null);
+
         //-----------------------------------------------------------------------------------------------------------
         // Act
         //-----------------------------------------------------------------------------------------------------------
         var observationManager = TestObject;
 
-        var result = await observationManager.RunAsync(new SearchFilter(0), 0, "", null, "", ExportFormat.DwC, "en-GB", false, PropertyLabelType.PropertyName, false, false, false, null, false, null, JobCancellationToken.Null);
+        var result = await observationManager.RunAsync(new SearchFilterBaseDto(), Lib.Dtos.Enum.ProtectionFilterDto.Public, 0, 0, "", null, "", ExportFormat.DwC, "en-GB", false, PropertyLabelType.PropertyName, false, false, false, null, false, null, JobCancellationToken.Null);
 
         //-----------------------------------------------------------------------------------------------------------
         // Assert
@@ -154,6 +162,7 @@ public class ExportAndSendJobTests
                     It.IsAny<int>(),
                     It.IsAny<string>(),
                     It.IsAny<SearchFilter>(),
+                    null,
                     It.IsAny<string>(),
                     "",
                     ExportFormat.DwC,
@@ -170,6 +179,7 @@ public class ExportAndSendJobTests
             .Throws(new Exception());
         _userExportRepository.Setup(uer => uer.GetAsync(It.IsAny<int>())).ReturnsAsync(new UserExport());
         _userExportRepository.Setup(uer => uer.AddOrUpdateAsync(It.IsAny<UserExport>())).ReturnsAsync(true);
+        _filterHelper.Setup(fh => fh.GetMarkDownAsync(It.IsAny<SearchFilterDto>(), CancellationToken.None)).ReturnsAsync((MemoryStream)null);
         //-----------------------------------------------------------------------------------------------------------
         // Act
         //-----------------------------------------------------------------------------------------------------------
@@ -177,7 +187,7 @@ public class ExportAndSendJobTests
 
         Func<Task> act = async () =>
         {
-            await observationManager.RunAsync(new SearchFilter(0), 0, "", null, "", ExportFormat.DwC, "en-GB", false, PropertyLabelType.PropertyName, false, false, false, null, false, null, JobCancellationToken.Null);
+            await observationManager.RunAsync(new SearchFilterBaseDto(), Lib.Dtos.Enum.ProtectionFilterDto.Public, 0, 0, "", null, "", ExportFormat.DwC, "en-GB", false, PropertyLabelType.PropertyName, false, false, false, null, false, null, JobCancellationToken.Null);
         };
 
         //-----------------------------------------------------------------------------------------------------------

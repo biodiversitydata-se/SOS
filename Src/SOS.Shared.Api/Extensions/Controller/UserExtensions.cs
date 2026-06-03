@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SOS.Lib.Exceptions;
-using SOS.Shared.Api.Dtos.Enum;
+using SOS.Lib.Dtos.Enum;
 using System.Security.Claims;
 
 namespace SOS.Shared.Api.Extensions.Controller;

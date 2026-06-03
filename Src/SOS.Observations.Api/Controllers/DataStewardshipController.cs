@@ -1,22 +1,19 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using SOS.Lib.Enums;
 using SOS.Lib.Exceptions;
 using SOS.Observations.Api.Managers.Interfaces;
-using SOS.Shared.Api.Dtos.DataStewardship;
-using SOS.Shared.Api.Dtos.DataStewardship.Enums;
-using SOS.Shared.Api.Dtos.DataStewardship.Extensions;
-using SOS.Shared.Api.Dtos.Enum;
-using SOS.Shared.Api.Dtos.Filter;
-using SOS.Shared.Api.Extensions.Dto;
+using SOS.Lib.Dtos.DataStewardship;
+using SOS.Lib.Dtos.DataStewardship.Enums;
+using SOS.Lib.Dtos.DataStewardship.Extensions;
+using SOS.Lib.Dtos.Enum;
+using SOS.Lib.Dtos.Filter;
+using SOS.Lib.Extensions.Dto;
 using SOS.Shared.Api.Validators.Interfaces;
 using SOS.Shared.Api.Extensions.Controller;
 using Result = CSharpFunctionalExtensions.Result;
-using System;
 using System.Net;
-using System.Threading.Tasks;
 using SOS.Lib.Helpers;
-using SOS.Shared.Api.Dtos;
+using SOS.Lib.Dtos;
 
 namespace SOS.Observations.Api.Controllers;
 

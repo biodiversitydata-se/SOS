@@ -1,7 +1,7 @@
 ﻿using FizzWare.NBuilder;
-using SOS.Shared.Api.Dtos;
-using SOS.Shared.Api.Dtos.Enum;
-using SOS.Shared.Api.Dtos.Filter;
+using SOS.Lib.Dtos;
+using SOS.Lib.Dtos.Enum;
+using SOS.Lib.Dtos.Filter;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using MongoDB.Driver.GeoJsonObjectModel;
 using SOS.Observations.Api.IntegrationTests.Setup;

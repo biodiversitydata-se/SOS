@@ -1,21 +1,19 @@
-﻿using Hangfire;
+﻿using Elastic.Clients.Elasticsearch.SearchableSnapshots;
+using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Export.Managers.Interfaces;
 using SOS.Lib.Configuration.Export;
 using SOS.Lib.Configuration.Shared;
+using SOS.Lib.Dtos.Filter;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
+using SOS.Lib.Extensions.Dto;
 using SOS.Lib.Jobs.Export;
 using SOS.Lib.Models.DataCite;
-using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Services.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace SOS.Export.Jobs;
 
@@ -56,12 +54,12 @@ public class CreateDoiJob : ICreateDoiJob
     }
 
     /// <inheritdoc />
-    public async Task<bool> RunAsync(SearchFilter filter, string emailAddress, IJobCancellationToken cancellationToken)
+    public async Task<bool> RunAsync(int? userId, ExportFilterDto exportFilter, string emailAddress, IJobCancellationToken cancellationToken)
     {
         try
         {
             _logger.LogInformation("Start creating DOI job");
-
+            var filter = exportFilter.ToSearchFilter(userId ?? 0, Lib.Dtos.Enum.ProtectionFilterDto.Public, "en-GB");
             var descriptions = _doiConfiguration.Descriptions as List<DOIDescription> ?? new List<DOIDescription>();
             descriptions.Add(new DOIDescription
             {
@@ -109,7 +107,7 @@ public class CreateDoiJob : ICreateDoiJob
             if (metaData != null)
             {
                 _logger.LogDebug($"Start creating DOI file ({metaData.Id})");
-                success = await _observationManager.ExportAndStoreAsync(filter, _doiContainer, metaData.Id,
+                success = await _observationManager.ExportAndStoreAsync(filter, null, _doiContainer, metaData.Id,
                     emailAddress, "DwC-A file", cancellationToken);
                 _logger.LogDebug($"Finish creating DOI file ({metaData.Id})");
 

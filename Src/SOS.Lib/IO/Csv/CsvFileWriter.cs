@@ -1,28 +1,23 @@
-﻿using Hangfire;
+﻿using Elastic.Clients.Elasticsearch;
+using Hangfire;
 using Microsoft.Extensions.Logging;
+using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
-using SOS.Lib.IO.Excel.Interfaces;
+using SOS.Lib.IO.Csv.Interfaces;
+using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Export;
 using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.Reports;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Services.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.IO;
 using System.IO.Compression;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Text;
-using Elastic.Clients.Elasticsearch;
-using SOS.Lib.Managers.Interfaces;
-using SOS.Lib.Models.Reports;
-using SOS.Lib.Cache.Interfaces;
 
-namespace SOS.Lib.IO.Excel;
+namespace SOS.Lib.IO.Csv;
 
 /// <summary>
 /// Excel file writer.
@@ -374,6 +369,7 @@ public class CsvFileWriter : FileWriterBase, ICsvFileWriter
 
 
     public async Task<FileExportResult> CreateFileAync(SearchFilter filter,
+        IEnumerable<(Stream Stream, string Filename)> additionalFiles,
         string exportPath,
         string fileName,
         string culture,
@@ -398,6 +394,15 @@ public class CsvFileWriter : FileWriterBase, ICsvFileWriter
             if (gzip)
             {
                 await StoreFilterAsync(temporaryZipExportFolderPath, filter);
+
+                if ((additionalFiles?.Count() ?? 0) != 0)
+                {
+                    foreach (var additionalFile in additionalFiles)
+                    {
+                        await StoreFileAsync(temporaryZipExportFolderPath, additionalFile.Stream, additionalFile.Filename);
+                    }
+                }
+
                 var zipFilePath = Path.Join(exportPath, $"{fileName}.zip");
                 _fileService.CompressDirectory(temporaryZipExportFolderPath, zipFilePath);
                 return new FileExportResult
@@ -473,6 +478,7 @@ public class CsvFileWriter : FileWriterBase, ICsvFileWriter
     }
 
     public async Task<(Stream stream, string filename)> CreateFileInMemoryAsZipStreamAsync(SearchFilter filter,
+       IEnumerable<(Stream Stream, string Filename)> additionalFiles,
        string culture,
        PropertyLabelType propertyLabelType,           
        IJobCancellationToken cancellationToken)
@@ -497,6 +503,21 @@ public class CsvFileWriter : FileWriterBase, ICsvFileWriter
                 using (var writer = new StreamWriter(filterFileZipStream, Encoding.UTF8))
                 {
                     writer.Write(filter.GetFilterAsJson());
+                }
+
+                if ((additionalFiles?.Count() ?? 0) != 0)
+                {
+                    foreach (var additionalFile in additionalFiles)
+                    {
+                        var additionalFileEntry = zipArchive.CreateEntry(additionalFile.Filename);
+                        using (var additionalFileZipStream = additionalFileEntry.Open())
+                        {
+                            additionalFile.Stream.Seek(0, SeekOrigin.Begin);
+                            await additionalFile.Stream.CopyToAsync(additionalFileZipStream);
+                            additionalFileZipStream.Close();
+                            await additionalFileZipStream.DisposeAsync();
+                        }
+                    }
                 }
             }
             

@@ -1,23 +1,16 @@
-﻿using DnsClient.Protocol;
-using Microsoft.Extensions.Logging;
-using SOS.Lib.Enums;
+﻿using SOS.Lib.Enums;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Filters;
-using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Repositories.Processed;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Observations.Api.Managers.Interfaces;
-using SOS.Shared.Api.Dtos;
-using SOS.Shared.Api.Dtos.DataStewardship;
-using SOS.Shared.Api.Dtos.DataStewardship.Extensions;
-using SOS.Shared.Api.Extensions.Dto;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using SOS.Lib.Dtos;
+using SOS.Lib.Dtos.DataStewardship;
+using SOS.Lib.Dtos.DataStewardship.Extensions;
+using SOS.Lib.Extensions.Dto;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace SOS.Observations.Api.Managers;
 

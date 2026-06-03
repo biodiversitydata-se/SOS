@@ -4,9 +4,12 @@ using Microsoft.AspNetCore.Mvc;
 using NetTopologySuite.Features;
 using SOS.Analysis.Api.Configuration;
 using SOS.Analysis.Api.Controllers.Interfaces;
+using SOS.Lib.Dtos.Filter;
+using SOS.Lib.Dtos.Search;
 using SOS.Lib.Enums;
 using SOS.Lib.Exceptions;
 using SOS.Lib.Extensions;
+using SOS.Lib.Extensions.Dto;
 using SOS.Lib.Helpers;
 using SOS.Lib.Jobs.Export;
 using SOS.Lib.Managers.Interfaces;
@@ -16,10 +19,7 @@ using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Services.Interfaces;
 using SOS.Lib.Swagger;
-using SOS.Shared.Api.Dtos.Filter;
-using SOS.Shared.Api.Dtos.Search;
 using SOS.Shared.Api.Extensions.Controller;
-using SOS.Shared.Api.Extensions.Dto;
 using SOS.Shared.Api.Utilities.Objects.Interfaces;
 using SOS.Shared.Api.Validators.Interfaces;
 using System.Net;
@@ -430,7 +430,7 @@ public class AnalysisController : ControllerBase, IAnalysisController
                 }
             }
 
-            var filter = searchFilter?.ToSearchFilter(this.GetUserId(), searchFilter?.ProtectionFilter, "sv-SE")!;
+            //var filter = searchFilter?.ToSearchFilter(this.GetUserId(), searchFilter?.ProtectionFilter, "sv-SE")!;
 
             var validationResult = Result.Combine(
                 edgeLengthValidation,
@@ -441,7 +441,7 @@ public class AnalysisController : ControllerBase, IAnalysisController
                 await _inputValidator.ValidateTilesLimitMetricAsync(
                     searchFilter!.Geographics!.BoundingBox!.ToEnvelope().Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM),
                     gridCellSizeInMeters.Value,
-                    _analysisManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, filter),
+                    _analysisManager.GetMatchCountAsync(this.GetUserId(), roleId, authorizationApplicationIdentifier, searchFilter, searchFilter.ProtectionFilter ?? Lib.Dtos.Enum.ProtectionFilterDto.Public),
                     true,
                     4.0 // allow 4 times more tiles in file order.
                 ));
@@ -451,13 +451,15 @@ public class AnalysisController : ControllerBase, IAnalysisController
                 return BadRequest(validationResult.Error);
             }
 
-            int numberOfTaxa = await _analysisManager.GetNumberOfTaxaInFilterAsync(filter);
+            int numberOfTaxa = await _analysisManager.GetNumberOfTaxaInFilterAsync(searchFilter);
             var encryptedPassword = await _cryptoService.EncryptAsync(encryptPassword);
             var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
                 job.RunAooEooAsync(
+                    this.GetUserId(),
                     roleId,
                     authorizationApplicationIdentifier,
-                    filter,
+                    searchFilter,
+                    searchFilter.ProtectionFilter ?? Lib.Dtos.Enum.ProtectionFilterDto.Public,
                     gridCellSizeInMeters!.Value,
                     useCenterPoint!.Value,
                     alphaValues,
@@ -621,7 +623,7 @@ public class AnalysisController : ControllerBase, IAnalysisController
             LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
             this.User.CheckAuthorization(_analysisConfiguration.ProtectedScope!, searchFilter.ProtectionFilter);
             searchFilter = await _searchFilterUtility.InitializeSearchFilterAsync(searchFilter);
-            var filter = searchFilter?.ToSearchFilter(this.GetUserId(), searchFilter?.ProtectionFilter, "sv-SE")!;
+            
             var userExports = await GetUserExportsAsync();
             var validationResult = Result.Combine(
                 maxDistance > 0 ? Result.Success() : Result.Failure("You must state max distance"),
@@ -632,12 +634,12 @@ public class AnalysisController : ControllerBase, IAnalysisController
                 await _inputValidator.ValidateTilesLimitMetricAsync(
                     searchFilter!.Geographics!.BoundingBox!.ToEnvelope().Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM),
                     gridCellSizeInMeters.Value,
-                    _analysisManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, filter),
+                    _analysisManager.GetMatchCountAsync(this.GetUserId(), roleId, authorizationApplicationIdentifier, searchFilter, searchFilter.ProtectionFilter ?? Lib.Dtos.Enum.ProtectionFilterDto.Public),
                     true,
                     4.0 // allow 4 times more tiles in file order.
                 ));
             
-            int numberOfTaxa = await _analysisManager.GetNumberOfTaxaInFilterAsync(filter);
+            int numberOfTaxa = await _analysisManager.GetNumberOfTaxaInFilterAsync(searchFilter);
             if (validationResult.IsFailure)
             {
                 return BadRequest(validationResult.Error);
@@ -646,9 +648,11 @@ public class AnalysisController : ControllerBase, IAnalysisController
             var encryptedPassword = await _cryptoService.EncryptAsync(encryptPassword);
             var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
                 job.RunAooEooArticle17Async(
+                    this.GetUserId(),
                     roleId,
                     authorizationApplicationIdentifier,
-                    filter,
+                    searchFilter,
+                    searchFilter.ProtectionFilter ?? Lib.Dtos.Enum.ProtectionFilterDto.Public,
                     gridCellSizeInMeters!.Value,
                     maxDistance!.Value,
                     metricCoordinateSys!.Value,

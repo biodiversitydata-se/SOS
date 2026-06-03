@@ -1,6 +1,6 @@
 ﻿using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Statistics;
-using SOS.Shared.Api.Dtos.Checklist;
+using SOS.Lib.Dtos.Checklist;
 using System.Threading.Tasks;
 
 namespace SOS.Observations.Api.Managers.Interfaces;

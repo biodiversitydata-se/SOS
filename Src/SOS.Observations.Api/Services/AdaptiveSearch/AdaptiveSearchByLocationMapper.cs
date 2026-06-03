@@ -1,9 +1,8 @@
 ﻿using NetTopologySuite.Geometries;
+using SOS.Lib.Dtos;
+using SOS.Lib.Dtos.Filter;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
-using SOS.Lib.Gis;
-using SOS.Shared.Api.Dtos;
-using SOS.Shared.Api.Dtos.Filter;
 using System.Text.Json.Nodes;
 using ProcessedLocationType = SOS.Lib.Enums.LocationType;
 

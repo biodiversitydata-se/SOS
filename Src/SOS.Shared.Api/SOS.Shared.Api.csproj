@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Extensions\Dto\DtoExtensions.cs" />
+    <ProjectReference Include="..\SOS.Lib\SOS.Lib.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SOS.Lib\SOS.Lib.csproj" />
+    <Folder Include="Helpers\" />
   </ItemGroup>
 
 </Project>

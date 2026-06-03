@@ -2,8 +2,8 @@
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Models.Shared;
-using SOS.Shared.Api.Dtos;
-using SOS.Shared.Api.Dtos.Enum;
+using SOS.Lib.Dtos;
+using SOS.Lib.Dtos.Enum;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 

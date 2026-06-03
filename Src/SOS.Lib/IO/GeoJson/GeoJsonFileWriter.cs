@@ -395,6 +395,7 @@ public class GeoJsonFileWriter : FileWriterBase, IGeoJsonFileWriter
 
     /// <inheritdoc />
     public async Task<FileExportResult> CreateFileAync(SearchFilter filter,
+        IEnumerable<(Stream Stream, string Filename)> additionalFiles,
         string exportPath,
         string fileName,
         string culture,
@@ -418,6 +419,14 @@ public class GeoJsonFileWriter : FileWriterBase, IGeoJsonFileWriter
             if (gzip)
             {
                 await StoreFilterAsync(temporaryZipExportFolderPath, filter);
+                if ((additionalFiles?.Count() ?? 0) != 0)
+                {
+                    foreach (var additionalFile in additionalFiles)
+                    {
+                        await StoreFileAsync(temporaryZipExportFolderPath, additionalFile.Stream, additionalFile.Filename);
+                    }
+                }
+ 
                 var zipFilePath = Path.Join(exportPath, $"{fileName}.zip");
                 _fileService.CompressDirectory(temporaryZipExportFolderPath, zipFilePath);
                 return new FileExportResult
@@ -450,6 +459,7 @@ public class GeoJsonFileWriter : FileWriterBase, IGeoJsonFileWriter
 
     public async Task<(Stream stream, string filename)> CreateFileInMemoryAsZipStreamAsync(
        SearchFilter filter,
+       IEnumerable<(Stream Stream, string Filename)> additionalFiles,
        string culture,
        bool flatOut,
        PropertyLabelType propertyLabelType,
@@ -476,6 +486,21 @@ public class GeoJsonFileWriter : FileWriterBase, IGeoJsonFileWriter
                 using (var writer = new StreamWriter(filterFileZipStream, Encoding.UTF8))
                 {
                     writer.Write(filter.GetFilterAsJson());
+                }
+
+                if ((additionalFiles?.Count() ?? 0) != 0)
+                {
+                    foreach (var additionalFile in additionalFiles)
+                    {
+                        var additionalFileEntry = zipArchive.CreateEntry(additionalFile.Filename);
+                        using (var additionalFileZipStream = additionalFileEntry.Open())
+                        {
+                            additionalFile.Stream.Seek(0, SeekOrigin.Begin);
+                            await additionalFile.Stream.CopyToAsync(additionalFileZipStream);
+                            additionalFileZipStream.Close();
+                            await additionalFileZipStream.DisposeAsync();
+                        }
+                    }
                 }
             }
 

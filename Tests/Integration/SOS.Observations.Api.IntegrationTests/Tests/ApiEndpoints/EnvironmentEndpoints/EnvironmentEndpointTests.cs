@@ -1,4 +1,4 @@
-﻿using SOS.Shared.Api.Dtos;
+﻿using SOS.Lib.Dtos;
 using SOS.Observations.Api.IntegrationTests.Setup;
 
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.EnvironmentEndpoints;

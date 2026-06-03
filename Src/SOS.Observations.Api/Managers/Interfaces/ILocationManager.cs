@@ -1,7 +1,7 @@
-﻿using NetTopologySuite.Geometries;
+using NetTopologySuite.Geometries;
 using SOS.Lib.Models.Search.Filters;
-using SOS.Shared.Api.Dtos;
-using SOS.Shared.Api.Dtos.Location;
+using SOS.Lib.Dtos;
+using SOS.Lib.Dtos.Location;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 

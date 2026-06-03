@@ -8,6 +8,7 @@ using SOS.Lib.Configuration.Export;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers;
 using SOS.Lib.IO.DwcArchive.Interfaces;
+using SOS.Lib.IO.Csv.Interfaces;
 using SOS.Lib.IO.Excel.Interfaces;
 using SOS.Lib.IO.GeoJson.Interfaces;
 using SOS.Lib.Managers.Interfaces;
@@ -16,10 +17,6 @@ using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Services.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
 
 namespace SOS.Export.Managers;
 
@@ -47,6 +44,7 @@ public class ObservationManager : IObservationManager
     /// Create a csv export file
     /// </summary>
     /// <param name="filter"></param>
+    /// <param name="additionalFiles"></param>
     /// <param name="exportPath"></param>
     /// <param name="fileName"></param>
     /// <param name="culture"></param>
@@ -55,6 +53,7 @@ public class ObservationManager : IObservationManager
     /// <returns></returns>
     private async Task<FileExportResult> CreateCsvExportAsync(
         SearchFilter filter,
+        IEnumerable<(Stream Stream, string Filename)> additionalFiles,
         string exportPath,
         string fileName,
         string culture,
@@ -67,6 +66,7 @@ public class ObservationManager : IObservationManager
            
             var fileExportResult = await _csvWriter.CreateFileAync(
                 filter,
+                additionalFiles,
                 exportPath,
                 fileName,
                 culture,
@@ -92,12 +92,14 @@ public class ObservationManager : IObservationManager
     ///  Create a Darwin Core Archive file
     /// </summary>
     /// <param name="filter"></param>
+    /// <param name="additionalFiles"></param>
     /// <param name="exportPath"></param>
     /// <param name="fileName"></param>
     /// <param name="eventDwC"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    private async Task<FileExportResult> CreateDWCExportAsync(SearchFilter filter, 
+    private async Task<FileExportResult> CreateDWCExportAsync(SearchFilter filter,
+        IEnumerable<(Stream Stream, string Filename)> additionalFiles,
         string exportPath, 
         string fileName, 
         bool eventDwC,
@@ -112,6 +114,7 @@ public class ObservationManager : IObservationManager
                 return await _dwcArchiveEventFileWriter.CreateEventDwcArchiveFileAsync(
                    DataProvider.FilterSubsetDataProvider,
                    filter,
+                   additionalFiles,
                    fileName,
                    _processedObservationRepository,
                    processInfo,
@@ -123,6 +126,7 @@ public class ObservationManager : IObservationManager
             return await _dwcArchiveFileWriter.CreateDwcArchiveFileAsync(
                 DataProvider.FilterSubsetDataProvider,
                 filter,
+                additionalFiles,
                 fileName,
                 _processedObservationRepository,
                 fieldDescriptions,
@@ -146,6 +150,7 @@ public class ObservationManager : IObservationManager
     /// Create excel export
     /// </summary>
     /// <param name="filter"></param>
+    /// <param name="additionalFiles"></param>
     /// <param name="exportPath"></param>
     /// <param name="fileName"></param>
     /// <param name="culture"></param>
@@ -154,6 +159,7 @@ public class ObservationManager : IObservationManager
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     private async Task<FileExportResult> CreateExcelExportAsync(SearchFilter filter,
+        IEnumerable<(Stream Stream, string Filename)> additionalFiles,
         string exportPath,
         string fileName,
         string culture,
@@ -165,6 +171,7 @@ public class ObservationManager : IObservationManager
         {
             var fileExportResult = await _excelWriter.CreateFileAync(
                 filter,
+                additionalFiles,
                 exportPath,
                 fileName,
                 culture,
@@ -191,6 +198,7 @@ public class ObservationManager : IObservationManager
     /// Create geo json export 
     /// </summary>
     /// <param name="filter"></param>
+    /// <param name="additionalFiles"></param>
     /// <param name="exportPath"></param>
     /// <param name="fileName"></param>
     /// <param name="culture"></param>
@@ -200,6 +208,7 @@ public class ObservationManager : IObservationManager
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     private async Task<FileExportResult> CreateGeoJsonExportAsync(SearchFilter filter,
+        IEnumerable<(Stream Stream, string Filename)> additionalFiles,
         string exportPath,
         string fileName,
         string culture,
@@ -213,6 +222,7 @@ public class ObservationManager : IObservationManager
             bool gzip = true;
             var fileExportResult = await _geoJsonWriter.CreateFileAync(
                filter,
+               additionalFiles,
                exportPath,
                fileName,
                culture,
@@ -346,6 +356,7 @@ public class ObservationManager : IObservationManager
         int? roleId,
         string authorizationApplicationIdentifier,
         SearchFilter filter,
+        IEnumerable<(Stream Stream, string Filename)> additionalFiles,
         string emailAddress,
         string description,
         ExportFormat exportFormat,
@@ -365,12 +376,13 @@ public class ObservationManager : IObservationManager
         {
             await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
             var fileName = $"Observations {DateTime.Now.ToString("yyyy-MM-dd HH.mm")} SOS export";
+             
             fileExportResult = exportFormat switch
             {
-                ExportFormat.Csv => await CreateCsvExportAsync(filter, exportPath, fileName, culture, propertyLabelType, cancellationToken),
-                ExportFormat.Excel => await CreateExcelExportAsync(filter, exportPath, fileName, culture, propertyLabelType, dynamicProjectDataFields, cancellationToken),
-                ExportFormat.GeoJson => await CreateGeoJsonExportAsync(filter, exportPath, fileName, culture, flatOut, propertyLabelType, excludeNullValues, cancellationToken),
-                _ => await CreateDWCExportAsync(filter, exportPath, fileName, false, cancellationToken)
+                ExportFormat.Csv => await CreateCsvExportAsync(filter, additionalFiles, exportPath, fileName, culture, propertyLabelType, cancellationToken),
+                ExportFormat.Excel => await CreateExcelExportAsync(filter, additionalFiles, exportPath, fileName, culture, propertyLabelType, dynamicProjectDataFields, cancellationToken),
+                ExportFormat.GeoJson => await CreateGeoJsonExportAsync(filter, additionalFiles, exportPath, fileName, culture, flatOut, propertyLabelType, excludeNullValues, cancellationToken),
+                _ => await CreateDWCExportAsync(filter, additionalFiles, exportPath, fileName, false, cancellationToken)
             };
 
             // zend file to user
@@ -397,16 +409,18 @@ public class ObservationManager : IObservationManager
 
     /// <inheritdoc />
     public async Task<bool> ExportAndStoreAsync(SearchFilter filter,
+        IEnumerable<(Stream Stream, string Filename)> additionalFiles,
         string blobStorageContainer,
         string fileName,
         string description,
         IJobCancellationToken cancellationToken)
     {
-        return await ExportAndStoreAsync(filter, blobStorageContainer, fileName, null, description, cancellationToken);
+        return await ExportAndStoreAsync(filter, additionalFiles, blobStorageContainer, fileName, null, description, cancellationToken);
     }
 
     /// <inheritdoc />
     public async Task<bool> ExportAndStoreAsync(SearchFilter filter,
+        IEnumerable<(Stream Stream, string Filename)> additionalFiles,
         string blobStorageContainer,
         string fileName,
         string emailAddress,
@@ -418,7 +432,7 @@ public class ObservationManager : IObservationManager
         try
         {
             await _filterManager.PrepareFilterAsync(null, null, filter);
-            fileExportResult = await CreateDWCExportAsync(filter, exportPath, fileName, false, cancellationToken);
+            fileExportResult = await CreateDWCExportAsync(filter, additionalFiles, exportPath, fileName, false, cancellationToken);
 
             // Blob Storage Containers must be in lower case
             blobStorageContainer = blobStorageContainer?.ToLower();
@@ -452,6 +466,7 @@ public class ObservationManager : IObservationManager
         int? roleId,
         string authorizationApplicationIdentifier,
         SearchFilter filter,
+        IEnumerable<(Stream Stream, string Filename)> additionalFiles,
         int gridCellsInMeters,
         bool useCenterPoint,
         IEnumerable<double> alphaValues,
@@ -478,6 +493,7 @@ public class ObservationManager : IObservationManager
                 roleId,
                 authorizationApplicationIdentifier,
                 filter,
+                additionalFiles,
                 gridCellsInMeters,
                 useCenterPoint,
                 alphaValues,
@@ -517,6 +533,7 @@ public class ObservationManager : IObservationManager
         int? roleId,
         string authorizationApplicationIdentifier,
         SearchFilter filter,
+        IEnumerable<(Stream Stream, string Filename)> additionalFiles,
         int gridCellsInMeters,
         int maxDistance,
         MetricCoordinateSys metricCoordinateSys,
@@ -538,6 +555,7 @@ public class ObservationManager : IObservationManager
                 roleId,
                 authorizationApplicationIdentifier,
                 filter,
+                additionalFiles,
                 gridCellsInMeters,
                 maxDistance,
                 metricCoordinateSys,                    

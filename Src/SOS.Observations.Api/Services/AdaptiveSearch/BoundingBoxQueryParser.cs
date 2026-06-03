@@ -1,4 +1,4 @@
-﻿using SOS.Shared.Api.Dtos.Filter;
+﻿using SOS.Lib.Dtos.Filter;
 using System.Globalization;
 
 namespace SOS.Observations.Api.Services.AdaptiveSearch;

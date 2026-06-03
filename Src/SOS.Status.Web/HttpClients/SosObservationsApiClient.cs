@@ -1,5 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
-using SOS.Shared.Api.Dtos.Status;
+using SOS.Lib.Dtos.Status;
 using SOS.Status.Web.Client.Dtos;
 using SOS.Status.Web.Client.JsonConverters;
 using SOS.Status.Web.Client.Models;

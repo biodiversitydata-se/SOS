@@ -1,16 +1,12 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using NetTopologySuite.Geometries;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Search.Filters;
-using SOS.Shared.Api.Dtos;
-using SOS.Shared.Api.Dtos.Location;
-using SOS.Shared.Api.Extensions.Dto;
+using SOS.Lib.Dtos;
+using SOS.Lib.Dtos.Location;
+using SOS.Lib.Extensions.Dto;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Repositories.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace SOS.Observations.Api.Managers;
 

@@ -3,10 +3,13 @@ using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Export.Managers.Interfaces;
 using SOS.Export.Models.ZendTo;
+using SOS.Lib.Dtos.Enum;
+using SOS.Lib.Dtos.Filter;
 using SOS.Lib.Enums;
+using SOS.Lib.Extensions.Dto;
+using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Jobs.Export;
 using SOS.Lib.Models.Export;
-using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Services.Interfaces;
 
@@ -17,6 +20,7 @@ namespace SOS.Export.Jobs;
 /// </summary>
 public class ExportAndSendJob : IExportAndSendJob
 {
+    private readonly IFilterHelper _filterHelper;
     private readonly ICryptoService _cryptoService;
     private readonly IObservationManager _observationManager;
     private readonly IUserExportRepository _userExportRepository;
@@ -103,12 +107,13 @@ public class ExportAndSendJob : IExportAndSendJob
     /// <param name="cryptoService"></param>
     /// <param name="logger"></param>
     /// <exception cref="ArgumentNullException"></exception>
-    public ExportAndSendJob(IObservationManager observationManager, IUserExportRepository userExportRepository, ICryptoService cryptoService, ILogger<ExportAndSendJob> logger)
+    public ExportAndSendJob(IObservationManager observationManager, IUserExportRepository userExportRepository, ICryptoService cryptoService, IFilterHelper filterHelper, ILogger<ExportAndSendJob> logger)
     {
         _observationManager = observationManager ?? throw new ArgumentNullException(nameof(observationManager));
         _userExportRepository =
             userExportRepository ?? throw new ArgumentNullException(nameof(userExportRepository));
         _cryptoService = cryptoService ?? throw new ArgumentNullException(nameof(cryptoService));
+        _filterHelper = filterHelper ?? throw new ArgumentNullException(nameof(filterHelper));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
@@ -159,7 +164,9 @@ public class ExportAndSendJob : IExportAndSendJob
 
     /// <inheritdoc />
     public async Task<bool> RunAsync(
-        SearchFilter filter,
+        SearchFilterBaseDto searchFilter,
+        ProtectionFilterDto protectionFilter,
+        int userId,
         int? roleId,
         string authorizationApplicationIdentifier,
         string email,
@@ -176,15 +183,27 @@ public class ExportAndSendJob : IExportAndSendJob
         PerformContext context,
         IJobCancellationToken cancellationToken)
     {
-        var userId = filter?.ExtendedAuthorization?.UserId ?? 0;
-
         try
         {
             _logger.LogInformation("Start export and send job");
+            var filter = searchFilter.ToSearchFilter(userId, sensitiveObservations ? ProtectionFilterDto.BothPublicAndSensitive : ProtectionFilterDto.Public, culture);
             Thread.Sleep(TimeSpan.FromSeconds(1)); // wait for job info to be inserted in MongoDb.
             await UpdateJobInfoStartProcessing(userId, context?.BackgroundJob?.Id);
             var password = await _cryptoService.DecryptAsync(encryptedPassword);
-            var response = await _observationManager.ExportAndSendAsync(roleId, authorizationApplicationIdentifier, filter, email, description, exportFormat, culture, flatOut, propertyLabelType, excludeNullValues, sensitiveObservations, sendMailFromZendTo, password, dynamicProjectDataFields, cancellationToken);
+
+            var additionalFiles = new List<(Stream stream, string filename)>();
+            var filterMarkdownStream = await _filterHelper.GetMarkDownAsync(searchFilter, CancellationToken.None);
+            additionalFiles.Add((filterMarkdownStream, "filter.md"));
+            if ((searchFilter?.Geographics?.Geometries?.Count() ?? 0) != 0)
+            {
+                var geoJsonStream = _filterHelper.TryGetFeatureCollection(searchFilter.Geographics.Geometries);
+                if (geoJsonStream != null)
+                {
+                    additionalFiles.Add((geoJsonStream, "geometries.geojson"));
+                }
+            }
+           
+            var response = await _observationManager.ExportAndSendAsync(roleId, authorizationApplicationIdentifier, filter, additionalFiles, email, description, exportFormat, culture, flatOut, propertyLabelType, excludeNullValues, sensitiveObservations, sendMailFromZendTo, password, dynamicProjectDataFields, cancellationToken);
 
             _logger.LogInformation($"End export and send job. Success: {response.Success}");
             await UpdateJobInfoEndProcessing(userId, context?.BackgroundJob?.Id, response);
@@ -206,9 +225,11 @@ public class ExportAndSendJob : IExportAndSendJob
 
     /// <inheritdoc />
     public async Task<bool> RunAooEooAsync(
+        int userId,
         int? roleId,
         string authorizationApplicationIdentifier,
-        SearchFilter filter,
+        SearchFilterAggregationInternalDto searchFilter,
+        ProtectionFilterDto protectionFilter,
         int gridCellsInMeters,
         bool useCenterPoint,
         IEnumerable<double> alphaValues,
@@ -226,18 +247,45 @@ public class ExportAndSendJob : IExportAndSendJob
         PerformContext context,
         IJobCancellationToken cancellationToken)
     {
-        var userId = filter?.ExtendedAuthorization?.UserId ?? 0;
-
         try
         {
             _logger.LogInformation("Start AOO EOO export and send job");
+            var filter = searchFilter.ToSearchFilter(userId, protectionFilter, "en-GB");
             Thread.Sleep(TimeSpan.FromSeconds(1)); // wait for job info to be inserted in MongoDb.
             await UpdateJobInfoStartProcessing(userId, context?.BackgroundJob?.Id);
             var password = await _cryptoService.DecryptAsync(encryptedPassword);
+
+            
+
+            var additionalFiles = new List<(Stream stream, string filename)>();
+            using var filterMarkdownStream = await _filterHelper.GetAnalysisMarkDownAsync(
+                searchFilter,
+                alphaValues: alphaValues?.ToArray(),
+                gridCellSizeInMeters: gridCellsInMeters,
+                useCenterPoint: useCenterPoint,
+                useEdgeLengthRatio: useEdgeLengthRatio,
+                allowHoles: allowHoles,
+                returnGridCells: returnGridCells,
+                includeEmptyCells: includeEmptyCells,
+                metricCoordinateSys: metricCoordinateSys,
+                coordinateSystem: coordinateSystem,
+                cancellationToken: CancellationToken.None);
+
+            additionalFiles.Add((filterMarkdownStream, "filter.md"));
+            if ((searchFilter?.Geographics?.Geometries?.Count() ?? 0) != 0)
+            {
+                var geoJsonStream = _filterHelper.TryGetFeatureCollection(searchFilter.Geographics.Geometries);
+                if (geoJsonStream != null)
+                {
+                    additionalFiles.Add((geoJsonStream, "geometries.geojson"));
+                }
+            }
+
             var response = await _observationManager.ExportAooEooAndSendAsync(
                 roleId, 
                 authorizationApplicationIdentifier, 
                 filter,
+                additionalFiles,
                 gridCellsInMeters,
                 useCenterPoint,
                 alphaValues,
@@ -273,9 +321,11 @@ public class ExportAndSendJob : IExportAndSendJob
 
     /// <inheritdoc />
     public async Task<bool> RunAooEooArticle17Async(
+        int userId,
         int? roleId,
         string authorizationApplicationIdentifier,
-        SearchFilter filter,
+        SearchFilterBaseDto searchFilter,
+        ProtectionFilterDto protectionFilter,
         int gridCellsInMeters,
         int maxDistance,
         MetricCoordinateSys metricCoordinateSys,
@@ -288,18 +338,39 @@ public class ExportAndSendJob : IExportAndSendJob
         PerformContext context,
         IJobCancellationToken cancellationToken)
     {
-        var userId = filter?.ExtendedAuthorization?.UserId ?? 0;
+
 
         try
         {
             _logger.LogInformation("Start AOO EOO Article 17 export and send job");
+            var filter = searchFilter.ToSearchFilter(userId, protectionFilter, "en-GB");
             Thread.Sleep(TimeSpan.FromSeconds(1)); // wait for job info to be inserted in MongoDb.
             await UpdateJobInfoStartProcessing(userId, context?.BackgroundJob?.Id);
             var password = await _cryptoService.DecryptAsync(encryptedPassword);
+
+            var additionalFiles = new List<(Stream stream, string filename)>();
+            using var filterMarkdownStream = await _filterHelper.GetAnalysisMarkDownAsync(
+                 searchFilter,
+                 maxDistance: maxDistance,
+                 gridCellSizeInMeters: gridCellsInMeters,
+                 metricCoordinateSys: metricCoordinateSys,
+                 coordinateSystem: coordinateSystem,
+                 cancellationToken: CancellationToken.None);
+            additionalFiles.Add((filterMarkdownStream, "filter.md"));
+            if ((searchFilter?.Geographics?.Geometries?.Count() ?? 0) != 0)
+            {
+                var geoJsonStream = _filterHelper.TryGetFeatureCollection(searchFilter.Geographics.Geometries);
+                if (geoJsonStream != null)
+                {
+                    additionalFiles.Add((geoJsonStream, "geometries.geojson"));
+                }
+            }
+
             var response = await _observationManager.ExportAooAndEooArticle17AndSendAsync(
                 roleId,
                 authorizationApplicationIdentifier,
                 filter,
+                additionalFiles,
                 gridCellsInMeters,
                 maxDistance,
                 metricCoordinateSys,

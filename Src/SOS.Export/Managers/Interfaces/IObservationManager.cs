@@ -3,8 +3,6 @@ using Hangfire.Server;
 using SOS.Export.Models.ZendTo;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Search.Filters;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace SOS.Export.Managers.Interfaces;
 
@@ -41,6 +39,7 @@ public interface IObservationManager
     /// <param name="roleId"></param>
     /// <param name="authorizationApplicationIdentifier"></param>
     /// <param name="filter"></param>
+    /// <param name="additionalFiles"></param>
     /// <param name="emailAddress"></param>
     /// <param name="description"></param>
     /// <param name="exportFormat"></param>
@@ -58,6 +57,7 @@ public interface IObservationManager
         int? roleId,
         string authorizationApplicationIdentifier,
         SearchFilter filter,
+        IEnumerable<(Stream Stream, string Filename)> additionalFiles,
         string emailAddress,
         string description,
         ExportFormat exportFormat,
@@ -75,26 +75,28 @@ public interface IObservationManager
     ///  Export a file and store it in blob storage, 
     /// </summary>
     /// <param name="filter"></param>
+    /// <param name="additionalFiles"></param>
     /// <param name="blobStorageContainer"></param>
     /// <param name="fileName"></param>
     /// <param name="description"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<bool> ExportAndStoreAsync(SearchFilter filter, string blobStorageContainer, string fileName,
+    Task<bool> ExportAndStoreAsync(SearchFilter filter, IEnumerable<(Stream Stream, string Filename)> additionalFiles, string blobStorageContainer, string fileName,
         string description,
         IJobCancellationToken cancellationToken);
 
     /// <summary>
     /// Export a file and store it in blob storage, 
     /// </summary>
-    /// <param name="filter"></param>
+    /// <param name="filter"></param>'
+    /// <param name="additionalFiles"></param>
     /// <param name="blobStorageContainer"></param>
     /// <param name="fileName"></param>
     /// <param name="emailAddress"></param>
     /// <param name="description"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<bool> ExportAndStoreAsync(SearchFilter filter, string blobStorageContainer, string fileName,
+    Task<bool> ExportAndStoreAsync(SearchFilter filter, IEnumerable<(Stream Stream, string Filename)> additionalFiles, string blobStorageContainer, string fileName,
         string emailAddress, string description, IJobCancellationToken cancellationToken);
 
     /// <summary>
@@ -103,6 +105,7 @@ public interface IObservationManager
     /// <param name="roleId"></param>
     /// <param name="authorizationApplicationIdentifier"></param>
     /// <param name="filter"></param>
+    /// <param name="additionalFiles"></param>
     /// <param name="gridCellsInMeters"></param>
     /// <param name="useCenterPoint"></param>
     /// <param name="alphaValues"></param>
@@ -112,20 +115,18 @@ public interface IObservationManager
     /// <param name="includeEmptyCells"></param>
     /// <param name="metricCoordinateSys"></param>
     /// <param name="coordinateSystem"></param>
-    /// <param name="gzip"></param>
     /// <param name="emailAddress"></param>
     /// <param name="description"></param>
     /// <param name="exportFormat"></param>
-    /// <param name="sensitiveObservations"></param>
     /// <param name="sendMailFromZendTo"></param>
     /// <param name="encryptPassword"></param>
-    /// <param name="dynamicProjectDataFields"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     Task<ZendToResponse> ExportAooEooAndSendAsync(
         int? roleId,
         string authorizationApplicationIdentifier,
         SearchFilter filter,
+        IEnumerable<(Stream Stream, string Filename)> additionalFiles,
         int gridCellsInMeters,
         bool useCenterPoint,
         IEnumerable<double> alphaValues,
@@ -146,6 +147,7 @@ public interface IObservationManager
         int? roleId,
         string authorizationApplicationIdentifier,
         SearchFilter filter,
+        IEnumerable<(Stream Stream, string Filename)> additionalFiles,
         int gridCellsInMeters,
         int maxDistance,
         MetricCoordinateSys metricCoordinateSys,

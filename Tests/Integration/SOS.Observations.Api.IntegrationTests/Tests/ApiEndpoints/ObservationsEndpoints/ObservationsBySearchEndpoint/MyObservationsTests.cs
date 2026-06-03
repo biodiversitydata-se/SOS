@@ -2,8 +2,8 @@
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
-using SOS.Shared.Api.Dtos;
-using SOS.Shared.Api.Dtos.Filter;
+using SOS.Lib.Dtos;
+using SOS.Lib.Dtos.Filter;
 using SOS.Observations.Api.IntegrationTests.Setup;
 using SOS.Observations.Api.IntegrationTests.Setup.Stubs;
 using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;

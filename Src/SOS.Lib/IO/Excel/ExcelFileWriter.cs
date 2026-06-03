@@ -15,15 +15,10 @@ using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Services.Interfaces;
-using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Globalization;
-using System.IO;
 using System.IO.Compression;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace SOS.Lib.IO.Excel;
 
@@ -135,6 +130,7 @@ public class ExcelFileWriter : FileWriterBase, IExcelFileWriter
 
     public async Task<FileExportResult> CreateFileAync(
         SearchFilter filter,
+        IEnumerable<(Stream Stream, string Filename)> additionalFiles,
         string exportPath,
         string fileName,
         string culture,
@@ -156,6 +152,13 @@ public class ExcelFileWriter : FileWriterBase, IExcelFileWriter
             if (gzip || result.fileCount > 1)
             {
                 await StoreFilterAsync(temporaryZipExportFolderPath, filter);
+                if ((additionalFiles?.Count() ?? 0) != 0)
+                {
+                    foreach (var additionalFile in additionalFiles)
+                    {
+                        await StoreFileAsync(temporaryZipExportFolderPath, additionalFile.Stream, additionalFile.Filename);
+                    }
+                }
 
                 var zipFilePath = Path.Join(exportPath, $"{fileName}.zip");
                 _fileService.CompressDirectory(temporaryZipExportFolderPath, zipFilePath);
@@ -189,6 +192,7 @@ public class ExcelFileWriter : FileWriterBase, IExcelFileWriter
     }
 
     public async Task<(Stream stream, string filename)> CreateFileInMemoryAsync(SearchFilter filter,
+       IEnumerable<(Stream Stream, string Filename)> additionalFiles,
        string culture,
        PropertyLabelType propertyLabelType,
        bool dynamicProjectDataFields,
@@ -222,6 +226,21 @@ public class ExcelFileWriter : FileWriterBase, IExcelFileWriter
                     using (var writer = new StreamWriter(filterFileZipStream, Encoding.UTF8))
                     {
                         writer.Write(filter.GetFilterAsJson());
+                    }
+
+                    if ((additionalFiles?.Count() ?? 0) != 0)
+                    {
+                        foreach (var additionalFile in additionalFiles)
+                        {
+                            var additionalFileEntry = zipArchive.CreateEntry(additionalFile.Filename);
+                            using (var additionalFileZipStream = additionalFileEntry.Open())
+                            {
+                                additionalFile.Stream.Seek(0, SeekOrigin.Begin);
+                                await additionalFile.Stream.CopyToAsync(additionalFileZipStream);
+                                additionalFileZipStream.Close();
+                                await additionalFileZipStream.DisposeAsync();
+                            }
+                        }
                     }
                 }
 

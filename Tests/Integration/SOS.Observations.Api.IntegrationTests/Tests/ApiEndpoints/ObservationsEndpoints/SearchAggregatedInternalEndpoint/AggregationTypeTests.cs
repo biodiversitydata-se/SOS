@@ -3,9 +3,9 @@ using SOS.Lib.Enums;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Observations.Api.IntegrationTests.Setup;
 using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
-using SOS.Shared.Api.Dtos;
-using SOS.Shared.Api.Dtos.Enum;
-using SOS.Shared.Api.Dtos.Filter;
+using SOS.Lib.Dtos;
+using SOS.Lib.Dtos.Enum;
+using SOS.Lib.Dtos.Filter;
 
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsEndpoints.SearchAggregatedInternalEndpoint;
 

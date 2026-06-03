@@ -87,7 +87,7 @@ public static class Settings
                 logger.LogInformation("replaced SECRET_PLACEHOLDER in ApplicationInsightsConfiguration.InstrumentationKey with the value in InstrumentationKey");
             }
         }
-
+        
         // Blob storage
         BlobStorageConfiguration = GetConfigSection<BlobStorageConfiguration>("BlobStorageConfiguration", configuration, logger, sensitiveSetting: false);
         BlobStorageConnectionString = GetConfigValueString("BlobStorageConnectionString", configuration, logger, sensitiveSetting: true, required: false);

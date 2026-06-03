@@ -1,8 +1,6 @@
 ﻿using Elastic.Clients.Elasticsearch.Cluster;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using SOS.Lib.ApplicationInsights;
 using SOS.Lib.Cache;
@@ -12,6 +10,8 @@ using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
+using SOS.Lib.IO.Csv;
+using SOS.Lib.IO.Csv.Interfaces;
 using SOS.Lib.IO.DwcArchive;
 using SOS.Lib.IO.DwcArchive.Interfaces;
 using SOS.Lib.IO.Excel;
@@ -47,12 +47,11 @@ using SOS.Observations.Api.Services.AdaptiveSearch;
 using SOS.Observations.Api.Services.AdaptiveSearchLocations;
 using SOS.Observations.Api.Services.Interfaces;
 using SOS.Observations.Api.Services;
-using SOS.Shared.Api.Dtos;
+using SOS.Lib.Dtos;
 using SOS.Shared.Api.Utilities.Objects;
 using SOS.Shared.Api.Utilities.Objects.Interfaces;
 using SOS.Shared.Api.Validators;
 using SOS.Shared.Api.Validators.Interfaces;
-using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using ZiggyCreatures.Caching.Fusion;
@@ -221,7 +220,7 @@ public static class DependencyInjectionExtensions
 
             // Helpers, static data => single instance 
             services.AddSingleton<IVocabularyValueResolver, VocabularyValueResolver>();
-
+            services.AddSingleton<IFilterHelper, FilterHelper>();
             return services;
         }
     }

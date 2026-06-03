@@ -1,8 +1,5 @@
 ﻿using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Processed.Observation;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace SOS.Lib.Extensions;
 

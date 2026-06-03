@@ -1,7 +1,5 @@
-﻿using SOS.Lib.Extensions;
+﻿using SOS.Lib.Dtos.Filter;
 using SOS.Lib.Models.Gis;
-using SOS.Shared.Api.Dtos.Filter;
-using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;

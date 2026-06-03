@@ -1,4 +1,4 @@
-﻿using SOS.Shared.Api.Dtos.Filter;
+﻿using SOS.Lib.Dtos.Filter;
 
 namespace SOS.Shared.Api.Utilities.Objects.Interfaces;
 

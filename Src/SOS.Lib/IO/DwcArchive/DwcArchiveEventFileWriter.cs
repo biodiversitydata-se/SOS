@@ -15,13 +15,7 @@ using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Services.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.IO;
 using System.IO.Compression;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Xml.Linq;
 
 namespace SOS.Lib.IO.DwcArchive;
@@ -219,6 +213,25 @@ public class DwcArchiveEventFileWriter : IDwcArchiveEventFileWriter
 
         return filePaths;
     }
+    private async Task StoreFileAsync(string temporaryZipExportFolderPath, Stream stream, string fileName)
+    {
+        if (stream == null)
+        {
+            return;
+        }
+        try
+        {
+            await using var fileStream = File.Create(Path.Combine(temporaryZipExportFolderPath, fileName));
+            await stream.CopyToAsync(fileStream);
+
+            fileStream.Close();
+            await fileStream.DisposeAsync();
+        }
+        catch
+        {
+            return;
+        }
+    }
 
     private async Task WriteEventHeaderRow(CsvFileHelper csvFileHelper)
     {
@@ -366,6 +379,7 @@ public class DwcArchiveEventFileWriter : IDwcArchiveEventFileWriter
     public async Task<FileExportResult> CreateEventDwcArchiveFileAsync(
         DataProvider dataProvider,
         SearchFilter filter,
+        IEnumerable<(Stream Stream, string Filename)> additionalFiles,
         string fileName,
         IProcessedObservationCoreRepository processedObservationRepository,
         ProcessInfo processInfo,
@@ -478,6 +492,15 @@ public class DwcArchiveEventFileWriter : IDwcArchiveEventFileWriter
                 DwcProcessInfoFileWriter.CreateProcessInfoFile(processInfoFileStream, processInfo);
                 processInfoFileStream.Close();
             }
+
+            if ((additionalFiles?.Count() ?? 0) != 0)
+            {
+                foreach (var additionalFile in additionalFiles)
+                {
+                    await StoreFileAsync(temporaryZipExportFolderPath, additionalFile.Stream, additionalFile.Filename);
+                }
+            }
+            
             var zipFilePath = Path.Join(exportFolderPath, $"{fileName}.zip");
             _fileService.CompressDirectory(temporaryZipExportFolderPath, zipFilePath);
             return new FileExportResult
@@ -533,7 +556,8 @@ public class DwcArchiveEventFileWriter : IDwcArchiveEventFileWriter
 
     public async Task<(Stream stream, string filename)> CreateEventDwcArchiveFileInMemoryAsync(
         DataProvider dataProvider, 
-        SearchFilter filter, 
+        SearchFilter filter,
+        IEnumerable<(Stream Stream, string Filename)> additionalFiles,
         IProcessedObservationCoreRepository processedObservationRepository, 
         ProcessInfo processInfo, 
         IJobCancellationToken cancellationToken)
@@ -644,6 +668,20 @@ public class DwcArchiveEventFileWriter : IDwcArchiveEventFileWriter
                     using (var processInfoFileZipStream = processInfoFileEntry.Open())
                     {
                         DwcProcessInfoFileWriter.CreateProcessInfoFile(processInfoFileZipStream, processInfo);
+                    }
+                }
+                if ((additionalFiles?.Count() ?? 0) != 0)
+                {
+                    foreach (var additionalFile in additionalFiles)
+                    {
+                        var additionalFileEntry = zipArchive.CreateEntry(additionalFile.Filename);
+                        using (var additionalFileZipStream = additionalFileEntry.Open())
+                        {
+                            additionalFile.Stream.Seek(0, SeekOrigin.Begin);
+                            await additionalFile.Stream.CopyToAsync(additionalFileZipStream);
+                            additionalFileZipStream.Close();
+                            await additionalFileZipStream.DisposeAsync();
+                        }
                     }
                 }
             }

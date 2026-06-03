@@ -1,13 +1,13 @@
 ﻿using FizzWare.NBuilder;
 using SOS.Lib.Models.Verbatim.Artportalen;
-using SOS.Shared.Api.Dtos.Filter;
+using SOS.Lib.Dtos.Filter;
 using SOS.Observations.Api.IntegrationTests.Setup;
 using SOS.Observations.Api.IntegrationTests.Setup.Stubs;
 using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
 using SOS.TestHelpers.Gis;
 using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Helpers;
-using SOS.Shared.Api.Dtos.Enum;
+using SOS.Lib.Dtos.Enum;
 using NetTopologySuite.Geometries;
 
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsEndpoints.SignalSearchInternalEndpoint;

@@ -48,7 +48,7 @@ using SOS.Observations.Api.IntegrationTests.Setup.Stubs;
 using SOS.Observations.Api.IntegrationTests.TestData;
 using SOS.Observations.Api.Repositories;
 using SOS.Observations.Api.Repositories.Interfaces;
-using SOS.Shared.Api.Dtos;
+using SOS.Lib.Dtos;
 using System.Collections.Concurrent;
 
 namespace SOS.Observations.Api.IntegrationTests.Setup.ContainerDbFixtures;

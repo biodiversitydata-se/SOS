@@ -19,9 +19,10 @@ using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Repositories.Interfaces;
-using SOS.Shared.Api.Dtos;
-using SOS.Shared.Api.Extensions.Dto;
-using System.Collections.Concurrent;
+using SOS.Lib.Dtos;
+using SOS.Lib.Dtos.Enum;
+using SOS.Lib.Dtos.Filter;
+using SOS.Lib.Extensions.Dto;
 using System.Text.Json.Nodes;
 
 namespace SOS.Observations.Api.Managers;
@@ -343,16 +344,22 @@ public class ObservationManager : IObservationManager
     }
 
     /// <inheritdoc />
+    public async Task<long> GetMatchCountAsync(int? userId, int? roleId, string? authorizationApplicationIdentifier, SearchFilterBaseDto filter, string cultureCode, ProtectionFilterDto? protectionFilter = ProtectionFilterDto.Public, bool skipAuthorizationFilters = false)
+    {
+        var searchFilter = filter.ToSearchFilter(userId ?? 0, protectionFilter, cultureCode ?? "en-GB");
+        return await GetMatchCountAsync(roleId, authorizationApplicationIdentifier, searchFilter, skipAuthorizationFilters);
+    }
+
+    /// <inheritdoc />
     public async Task<long> GetMatchCountAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilterBase filter, bool skipAuthorizationFilters = false)
     {
         await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
         return await _processedObservationRepository.GetMatchCountAsync(filter, skipAuthorizationFilters);
     }
-
     public async Task<(long Count, LatLonBoundingBox? Extent)> GetCountAndExtentAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilterBase filter, bool skipAuthorizationFilters = false)
     {
         await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
-        (long Count, LatLonBoundingBox ? Extent) result = await _processedObservationRepository.GetCountAndExtentAsync(filter, skipAuthorizationFilters);        
+        (long Count, LatLonBoundingBox? Extent) result = await _processedObservationRepository.GetCountAndExtentAsync(filter, skipAuthorizationFilters);
         return result;
     }
 
@@ -915,24 +922,6 @@ public class ObservationManager : IObservationManager
         return result;
     }
 
-    private Dictionary<string, int> CreateDiff(Dictionary<string, int> before, Dictionary<string, int> after)
-    {
-        Dictionary<string, int> result = new Dictionary<string, int>();
-        foreach (var pair in after)
-        {
-            if (before.TryGetValue(pair.Key, out int beforeValue))
-            {
-                result.Add(pair.Key, pair.Value - beforeValue);
-            }
-            else
-            {
-                result.Add(pair.Key, pair.Value);
-            }
-        }
-
-        return result;
-    }
-
     private Dictionary<string, ObservationCountTuple> CreateDiff(Dictionary<string, ObservationCountTuple> before, Dictionary<string, ObservationCountTuple> after)
     {
         Dictionary<string, ObservationCountTuple> result = new Dictionary<string, ObservationCountTuple>();
@@ -1004,7 +993,7 @@ public class ObservationManager : IObservationManager
     }
 
     public async Task<List<(Lib.Models.Shared.Area area, Geometry geometry)>?> GetGeographicsFiltersAsAreaTuplesAsync(SearchFilter searchFilter)
-    {        
+    {
         return await _filterManager.GetAreaFiltersAsAreaTuplesAsync(searchFilter?.Location?.Areas);
     }
 

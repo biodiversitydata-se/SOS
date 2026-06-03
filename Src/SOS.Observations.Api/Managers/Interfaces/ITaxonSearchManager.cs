@@ -3,7 +3,7 @@ using SOS.Lib.Enums;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
-using SOS.Shared.Api.Dtos;
+using SOS.Lib.Dtos;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 

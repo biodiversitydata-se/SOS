@@ -1,11 +1,8 @@
 ﻿using Microsoft.Extensions.Diagnostics.HealthChecks;
-using Microsoft.Extensions.Logging;
+using SOS.Lib.Dtos.Enum;
+using SOS.Lib.Dtos.Filter;
 using SOS.Observations.Api.Configuration;
-using SOS.Shared.Api.Dtos.Filter;
-using System;
 using System.Diagnostics;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace SOS.Observations.Api.HealthChecks;
 
@@ -43,8 +40,8 @@ public partial class AzureSearchHealthCheck : IHealthCheck
                 Ids = new[] { 103032 },
                 IncludeUnderlyingTaxa = true
             },                
-            VerificationStatus = Shared.Api.Dtos.Enum.StatusVerificationDto.BothVerifiedAndNotVerified,
-            OccurrenceStatus = Shared.Api.Dtos.Enum.OccurrenceStatusFilterValuesDto.Present,
+            VerificationStatus = StatusVerificationDto.BothVerifiedAndNotVerified,
+            OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present,
             Output = new OutputFilterDto
             {
                 Fields = new[] { "taxon.id" }

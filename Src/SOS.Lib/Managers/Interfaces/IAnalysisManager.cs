@@ -1,14 +1,12 @@
 ﻿using Hangfire;
 using NetTopologySuite.Features;
+using SOS.Lib.Dtos.Filter;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Analysis;
 using SOS.Lib.Models.Export;
 using SOS.Lib.Models.Search.Enums;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace SOS.Lib.Managers.Interfaces;
 
@@ -133,6 +131,18 @@ public interface IAnalysisManager
        TimeSpan? timeout = null);
 
     /// <summary>
+    /// Asynchronously retrieves the total number of matches that satisfy the specified filters and criteria.
+    /// </summary>
+    /// <param name="userId">An optional user identifier to filter matches. If null, matches for all users are included.</param>
+    /// <param name="roleId">An optional role identifier to filter matches. If null, matches for all roles are included.</param>
+    /// <param name="authorizationApplicationIdentifier">The identifier of the authorization application used to validate access to the resource. Cannot be null.</param>
+    /// <param name="searchFilter">An object containing the search criteria to apply when counting matches. Cannot be null.</param>
+    /// <param name="protectionFilter">The protection filter to apply, determining which matches are considered based on protection criteria.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the total count of matches that meet
+    /// the specified criteria.</returns>
+    Task<long> GetMatchCountAsync(int? userId, int? roleId, string authorizationApplicationIdentifier, SearchFilterBaseDto searchFilter, Dtos.Enum.ProtectionFilterDto protectionFilter);
+
+    /// <summary>
     /// Get count of observations matching search criteria
     /// </summary>
     /// <param name="roleId"></param>
@@ -141,12 +151,13 @@ public interface IAnalysisManager
     /// <returns></returns>
     Task<long> GetMatchCountAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilterBase filter);
 
-    Task<int> GetNumberOfTaxaInFilterAsync(SearchFilterBase filter);
+    Task<int> GetNumberOfTaxaInFilterAsync(SearchFilterBaseDto filter);
 
     Task<FileExportResult> CreateAooEooExportAsync(
         int? roleId,
         string authorizationApplicationIdentifier,
         SearchFilter filter,
+        IEnumerable<(Stream Stream, string Filename)> additionalFiles,
         int gridCellsInMeters,
         bool useCenterPoint,
         IEnumerable<double> alphaValues,
@@ -164,6 +175,7 @@ public interface IAnalysisManager
         int? roleId,
         string authorizationApplicationIdentifier,
         SearchFilter filter,
+        IEnumerable<(Stream Stream, string Filename)> additionalFiles,
         int gridCellsInMeters,
         int maxDistance,
         MetricCoordinateSys metricCoordinateSys,

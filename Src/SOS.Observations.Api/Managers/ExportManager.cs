@@ -1,13 +1,17 @@
 ﻿using Hangfire;
 using Hangfire.Server;
+using SOS.Lib.Dtos.Enum;
+using SOS.Lib.Dtos.Filter;
 using SOS.Lib.Enums;
 using SOS.Lib.Exceptions;
+using SOS.Lib.Extensions.Dto;
 using SOS.Lib.Helpers;
+using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.IO.DwcArchive.Interfaces;
 using SOS.Lib.IO.Excel.Interfaces;
+using SOS.Lib.IO.Csv.Interfaces;
 using SOS.Lib.IO.GeoJson.Interfaces;
 using SOS.Lib.Managers.Interfaces;
-using SOS.Lib.Models.Export;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
@@ -22,6 +26,7 @@ namespace SOS.Observations.Api.Managers;
 public class ExportManager : IExportManager
 {
     private readonly IFilterManager _filterManager;
+    private readonly IFilterHelper _filterHelper;
     private readonly IDwcArchiveFileWriter _dwcArchiveFileWriter;
     private readonly IDwcArchiveEventFileWriter _dwcArchiveEventFileWriter;
     private readonly ICsvFileWriter _csvWriter;
@@ -32,110 +37,12 @@ public class ExportManager : IExportManager
     private readonly IProcessInfoRepository _processInfoRepository;
     private static readonly SemaphoreSlim _downloadSemaphore = new SemaphoreSlim(3, 3);
 
-    /// <summary>
-    /// Create an Csv file
-    /// </summary>
-    /// <param name="filter"></param>
-    /// <param name="exportPath"></param>
-    /// <param name="fileName"></param>
-    /// <param name="culture"></param>
-    /// <param name="propertyLabelType"></param>
-    /// <param name="gzip"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
-    private async Task<FileExportResult> CreateCsvExportAsync(SearchFilter filter,
-        string exportPath,
-        string fileName,
-        string culture,
-        PropertyLabelType propertyLabelType,
-        bool gzip,
-        IJobCancellationToken cancellationToken)
-    {
-        try
-        {
-            var fileExportResult = await _csvWriter.CreateFileAync(
-                filter,
-                exportPath,
-                fileName,
-                culture,
-                propertyLabelType,
-                gzip,
-                cancellationToken);
-
-            return fileExportResult;
-        }
-        catch (JobAbortedException)
-        {
-            _logger.LogInformation("Export sightings to Csv was canceled.");
-            throw;
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, "Failed to export sightings to Csv");
-            throw;
-        }
-    }
-
-    /// <summary>
-    /// Create a Darwin Core Archive file
-    /// </summary>
-    /// <param name="filter"></param>
-    /// <param name="exportPath"></param>
-    /// <param name="fileName"></param>
-    /// <param name="cancellationToken"></param>
-    /// <param name="eventDwC"></param>
-    /// <returns></returns>
-    private async Task<FileExportResult> CreateDWCExportAsync(SearchFilter filter, string exportPath, string fileName,
-        IJobCancellationToken cancellationToken,
-        bool eventDwC = false)
-    {
-        try
-        {
-            var processInfo = await _processInfoRepository.GetAsync(_processedObservationRepository.PublicIndexName);
-
-            if (eventDwC)
-            {
-                filter.Output.SortOrders = new[] { new SortOrderFilter { SortBy = "event.eventId", SortOrder = SearchSortOrder.Asc } };
-                return await _dwcArchiveEventFileWriter.CreateEventDwcArchiveFileAsync(
-                   DataProvider.FilterSubsetDataProvider,
-                   filter,
-                   fileName,
-                   _processedObservationRepository,
-                   processInfo,
-                   exportPath,
-                   cancellationToken);
-            }
-            var propertyFields =
-               ObservationPropertyFieldDescriptionHelper.GetExportFieldsFromOutputFields(filter?.Output?.Fields);
-            var fieldDescriptions = FieldDescriptionHelper.GetAllDwcOccurrenceCoreFieldDescriptions().
-               Where(fd => propertyFields.Select(pf => pf?.DwcIdentifier?.ToLower()).Contains(fd?.DwcIdentifier?.ToLower()));
-
-            return await _dwcArchiveFileWriter.CreateDwcArchiveFileAsync(
-                DataProvider.FilterSubsetDataProvider,
-                filter,
-                fileName,
-                _processedObservationRepository,
-                fieldDescriptions,
-                processInfo,
-                exportPath,
-                cancellationToken);
-        }
-        catch (JobAbortedException)
-        {
-            _logger.LogInformation("Export sightings was canceled.");
-            throw;
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, "Failed to export sightings");
-            throw;
-        }
-    }
 
     private async Task<(Stream stream, string filename)> CreateDwcExportInMemoryAsync(
         SearchFilter filter,
-        IJobCancellationToken cancellationToken,
-        bool eventDwC = false)
+        IEnumerable<(Stream Stream, string Filename)> additionalFiles,
+        bool eventDwC,
+        IJobCancellationToken cancellationToken)
     {
         try
         {
@@ -147,6 +54,7 @@ public class ExportManager : IExportManager
                 return await _dwcArchiveEventFileWriter.CreateEventDwcArchiveFileInMemoryAsync(
                    DataProvider.FilterSubsetDataProvider,
                    filter,
+                   additionalFiles,
                    _processedObservationRepository,
                    processInfo,
                    cancellationToken);
@@ -161,6 +69,7 @@ public class ExportManager : IExportManager
                 return await _dwcArchiveFileWriter.CreateDwcArchiveFileInMemoryAsync(
                     DataProvider.FilterSubsetDataProvider,
                     filter,
+                    additionalFiles,
                     _processedObservationRepository,
                     fieldDescriptions,
                     processInfo,
@@ -179,116 +88,22 @@ public class ExportManager : IExportManager
         }
     }
 
+    
     /// <summary>
-    /// Create an Excel file
+    /// Initializes a new instance of the ExportManager class, which coordinates the export of observation data to
+    /// various file formats and manages related export operations.
     /// </summary>
-    /// <param name="filter"></param>
-    /// <param name="exportPath"></param>
-    /// <param name="fileName"></param>
-    /// <param name="culture"></param>
-    /// <param name="propertyLabelType"></param>
-    /// <param name="dynamicProjectDataFields"></param>
-    /// <param name="gzip"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
-    private async Task<FileExportResult> CreateExcelExportAsync(SearchFilter filter,
-        string exportPath,
-        string fileName,
-        string culture,
-        PropertyLabelType propertyLabelType,
-        bool dynamicProjectDataFields,
-        bool gzip,
-        IJobCancellationToken cancellationToken)
-    {
-        try
-        {
-            var fileExportResult = await _excelWriter.CreateFileAync(
-                filter,
-                exportPath,
-                fileName,
-                culture,
-                propertyLabelType,
-                dynamicProjectDataFields,
-                gzip,
-                cancellationToken);
-
-            return fileExportResult;
-        }
-        catch (JobAbortedException)
-        {
-            _logger.LogInformation("Export sightings to Excel was canceled.");
-            throw;
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, "Failed to export sightings to Excel");
-            throw;
-        }
-    }
-
-    /// <summary>
-    /// Create a GeoJson file
-    /// </summary>
-    /// <param name="filter"></param>
-    /// <param name="exportPath"></param>
-    /// <param name="fileName"></param>
-    /// <param name="culture"></param>
-    /// <param name="flatOut"></param>
-    /// <param name="propertyLabelType"></param>
-    /// <param name="excludeNullValues"></param>
-    /// <param name="gzip"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
-    private async Task<FileExportResult> CreateGeoJsonExportAsync(SearchFilter filter,
-        string exportPath,
-        string fileName,
-        string culture,
-        bool flatOut,
-        PropertyLabelType propertyLabelType,
-        bool excludeNullValues,
-        bool gzip,
-        IJobCancellationToken cancellationToken)
-    {
-        try
-        {
-            var filePath = await _geoJsonWriter.CreateFileAync(
-               filter,
-               exportPath,
-               fileName,
-               culture,
-               flatOut,
-               propertyLabelType,
-               excludeNullValues,
-               gzip,
-               cancellationToken);
-
-            return filePath;
-        }
-        catch (JobAbortedException)
-        {
-            _logger.LogInformation("Export sightings to GeoJson was canceled.");
-            throw;
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, "Failed to export sightings to GeoJson");
-            throw;
-        }
-    }
-
-    /// <summary>
-    /// Constructor
-    /// </summary>
-    /// <param name="csvWriter"></param>
-    /// <param name="dwcArchiveFileWriter"></param>
-    /// <param name="dwcArchiveEventFileWriter"></param>
-    /// <param name="excelWriter"></param>
-    /// <param name="geoJsonWriter"></param>
-    /// <param name="processedObservationRepository"></param>
-    /// <param name="processInfoRepository"></param>
-    /// <param name="filterManager"></param>
-    /// <param name="logger"></param>
-    /// <exception cref="ArgumentNullException"></exception>
+    /// <param name="csvWriter">The CSV file writer used to generate CSV exports. Cannot be null.</param>
+    /// <param name="dwcArchiveFileWriter">The writer responsible for creating Darwin Core Archive files. Cannot be null.</param>
+    /// <param name="dwcArchiveEventFileWriter">The writer used to generate Darwin Core Archive event files. Cannot be null.</param>
+    /// <param name="excelWriter">The Excel file writer used to create Excel exports. Cannot be null.</param>
+    /// <param name="geoJsonWriter">The GeoJSON file writer used to generate GeoJSON exports. Cannot be null.</param>
+    /// <param name="processedObservationRepository">The repository for accessing processed observation data. Cannot be null.</param>
+    /// <param name="processInfoRepository">The repository for accessing process information related to exports. Cannot be null.</param>
+    /// <param name="filterManager">The filter manager used to apply and manage export filters. Cannot be null.</param>
+    /// <param name="filterHelper">The filter helper used to assist with filter operations during export. Cannot be null.</param>
+    /// <param name="logger">The logger used for logging export operations and errors. Cannot be null.</param>
+    /// <exception cref="ArgumentNullException">Thrown if any parameter is null.</exception>
     public ExportManager(
         ICsvFileWriter csvWriter,
         IDwcArchiveFileWriter dwcArchiveFileWriter,
@@ -298,6 +113,7 @@ public class ExportManager : IExportManager
         IProcessedObservationRepository processedObservationRepository,
         IProcessInfoRepository processInfoRepository,
         IFilterManager filterManager,
+        IFilterHelper filterHelper,
         ILogger<ExportManager> logger)
     {
         _csvWriter = csvWriter ?? throw new ArgumentNullException(nameof(csvWriter));
@@ -315,51 +131,18 @@ public class ExportManager : IExportManager
         _processInfoRepository =
             processInfoRepository ?? throw new ArgumentNullException(nameof(processInfoRepository));
         _filterManager = filterManager ?? throw new ArgumentNullException(nameof(filterManager));
+        _filterHelper = filterHelper ?? throw new ArgumentNullException(nameof(filterHelper));
 
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
-    /// <inheritdoc />
-    public async Task<FileExportResult> CreateExportFileAsync(
-        int? roleId,
-        string authorizationApplicationIdentifier,
-        SearchFilter filter,
-        ExportFormat exportFormat,
-        string exportPath,
-        string culture,
-        bool flatOut,
-        PropertyLabelType propertyLabelType,
-        bool excludeNullValues,
-        bool dynamicProjectDataFields,
-        bool gzip,
-        IJobCancellationToken cancellationToken)
-    {
-        try
-        {
-            await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
-            var fileName = $"Observations {DateTime.Now.ToString("yyyy-MM-dd HH.mm")} SOS export";
-            var fileExportResult = exportFormat switch
-            {
-                ExportFormat.Csv => await CreateCsvExportAsync(filter, exportPath, fileName, culture, propertyLabelType, gzip, cancellationToken),
-                ExportFormat.DwCEvent => await CreateDWCExportAsync(filter, exportPath, fileName, cancellationToken, true),
-                ExportFormat.Excel => await CreateExcelExportAsync(filter, exportPath, fileName, culture, propertyLabelType, dynamicProjectDataFields, gzip, cancellationToken),
-                ExportFormat.GeoJson => await CreateGeoJsonExportAsync(filter, exportPath, fileName, culture, flatOut, propertyLabelType, excludeNullValues, gzip, cancellationToken),
-                _ => await CreateDWCExportAsync(filter, exportPath, fileName, cancellationToken)
-            };
-
-            return fileExportResult;
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, "Failed to create export file");
-            return null;
-        }
-    }                
-
+    /// <inheritdoc/>
     public async Task<(Stream stream, string filename)> CreateExportFileInMemoryAsZipStreamAsync(
+        int? userId,
         int? roleId,
         string authorizationApplicationIdentifier,
-        SearchFilter filter,
+        SearchFilterBaseDto searchFilter,
+        ProtectionFilterDto? protectionFilter,
         ExportFormat exportFormat,
         string culture,
         bool flatOut,
@@ -376,14 +159,26 @@ public class ExportManager : IExportManager
 
         try
         {
-            await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);                
+            var filter = searchFilter.ToSearchFilter(userId ?? 0, protectionFilter, culture ?? "en-GB");
+            await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
+            var additionalFiles = new List<(Stream stream, string filename)>();
+            var filterMarkdownStream = await _filterHelper.GetMarkDownAsync(searchFilter, CancellationToken.None);
+            additionalFiles.Add((filterMarkdownStream, "filter.md"));
+            if ((searchFilter?.Geographics?.Geometries?.Count() ?? 0) != 0)
+            {
+                var geoJsonStream = _filterHelper.TryGetFeatureCollection(searchFilter.Geographics.Geometries);
+                if (geoJsonStream != null)
+                {
+                    additionalFiles.Add((geoJsonStream, "geometries.geojson"));
+                }
+            }
             var fileExportResult = exportFormat switch
             {
-                ExportFormat.Csv => await _csvWriter.CreateFileInMemoryAsZipStreamAsync(filter, culture, propertyLabelType, cancellationToken),
-                ExportFormat.DwCEvent => await CreateDwcExportInMemoryAsync(filter,cancellationToken, eventDwC: true),
-                ExportFormat.Excel => await _excelWriter.CreateFileInMemoryAsync(filter, culture, propertyLabelType, dynamicProjectDataFields, gzip, cancellationToken),
-                ExportFormat.GeoJson => await _geoJsonWriter.CreateFileInMemoryAsZipStreamAsync(filter, culture, flatOut, propertyLabelType, excludeNullValues, cancellationToken),
-                ExportFormat.DwC => await CreateDwcExportInMemoryAsync(filter, cancellationToken, eventDwC: false),
+                ExportFormat.Csv => await _csvWriter.CreateFileInMemoryAsZipStreamAsync(filter, additionalFiles, culture, propertyLabelType, cancellationToken),
+                ExportFormat.DwCEvent => await CreateDwcExportInMemoryAsync(filter, additionalFiles, eventDwC: true, cancellationToken),
+                ExportFormat.Excel => await _excelWriter.CreateFileInMemoryAsync(filter, additionalFiles, culture, propertyLabelType, dynamicProjectDataFields, gzip, cancellationToken),
+                ExportFormat.GeoJson => await _geoJsonWriter.CreateFileInMemoryAsZipStreamAsync(filter, additionalFiles, culture, flatOut, propertyLabelType, excludeNullValues, cancellationToken),
+                ExportFormat.DwC => await CreateDwcExportInMemoryAsync(filter, additionalFiles, eventDwC: false, cancellationToken),
                 _ => throw new NotImplementedException()
             };
 
@@ -400,5 +195,18 @@ public class ExportManager : IExportManager
         }
     }
 
-    
+    /// <inheritdoc/>
+    public async Task<MemoryStream> CreateFilterMarkdownAsync(SearchFilterBaseDto filter, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var filterMarkdownStream = await _filterHelper.GetMarkDownAsync(filter, cancellationToken);
+            return filterMarkdownStream;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Failed to create filter markdown");
+            throw;
+        }
+    }
 }

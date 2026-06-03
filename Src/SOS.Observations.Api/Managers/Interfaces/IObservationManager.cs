@@ -4,7 +4,9 @@ using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Search.Enums;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
-using SOS.Shared.Api.Dtos;
+using SOS.Lib.Dtos;
+using SOS.Lib.Dtos.Enum;
+using SOS.Lib.Dtos.Filter;
 using System.Text.Json.Nodes;
 using static SOS.Observations.Api.Managers.ObservationManager;
 
@@ -138,6 +140,28 @@ public interface IObservationManager
     Task<IEnumerable<TaxonObservationCountDto>> GetCachedCountAsync(SearchFilterBase filter, TaxonObservationCountSearch taxonObservationCountSearch);
 
     /// <summary>
+    /// Asynchronously retrieves the total number of matches that satisfy the specified filter criteria and
+    /// authorization constraints.
+    /// </summary>
+    /// <param name="userId">The optional user identifier used to filter matches. If null, matches for all users are included.</param>
+    /// <param name="roleId">The optional role identifier used to filter matches. If null, matches for all roles are included.</param>
+    /// <param name="authorizationApplicationIdentifier">The identifier of the authorization application used to validate access to the matches.</param>
+    /// <param name="filter">The filter criteria used to narrow down the matches. Cannot be null.</param>
+    /// <param name="cultureCode">The culture code used for localization. Defaults to "en-GB" if not specified.</param>
+    /// <param name="protectionFilter">The optional protection filter to apply to the results. Defaults to <see cref="ProtectionFilterDto.Public"/> if
+    /// not specified.</param>
+    /// <param name="skipAuthorizationFilters">Indicates whether to bypass authorization checks. Set to <see langword="true"/> to skip authorization filters.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the total count of matches that meet
+    /// the specified criteria.</returns>
+    Task<long> GetMatchCountAsync(int? userId,
+        int? roleId,
+        string? authorizationApplicationIdentifier,
+        SearchFilterBaseDto filter,
+        string? cultureCode = "en-GB",
+        ProtectionFilterDto? protectionFilter = ProtectionFilterDto.Public,
+        bool skipAuthorizationFilters = false);
+
+    /// <summary>
     /// Get number of matching observations
     /// </summary>
     /// <param name="roleId"></param>
@@ -151,11 +175,21 @@ public interface IObservationManager
         SearchFilterBase filter,
         bool skipAuthorizationFilters = false);
 
-    Task<(long Count, LatLonBoundingBox? Extent)> GetCountAndExtentAsync(
-        int? roleId,
-        string authorizationApplicationIdentifier,
-        SearchFilterBase filter,
-        bool skipAuthorizationFilters = false);
+    
+    /// <summary>
+    /// Asynchronously retrieves the total number of items and their combined geographical extent that match the
+    /// specified search criteria and authorization context.
+    /// </summary>
+    /// <param name="roleId">The optional identifier of the role used to filter the results. If null, results are not restricted by role.</param>
+    /// <param name="authorizationApplicationIdentifier">The identifier of the application context used for authorization. This value determines which items are
+    /// accessible to the caller.</param>
+    /// <param name="filter">The search criteria used to filter the items included in the count and extent calculation. Cannot be null.</param>
+    /// <param name="skipAuthorizationFilters">true to bypass authorization checks and return results regardless of access permissions; otherwise, false to
+    /// apply authorization filters.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains a tuple with the total count of
+    /// matching items and an optional bounding box representing the geographical extent of those items. The extent is
+    /// null if no items match the criteria.</returns>
+    Task<(long Count, LatLonBoundingBox? Extent)> GetCountAndExtentAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilterBase filter, bool skipAuthorizationFilters = false);
 
     /// <summary>
     /// Get single observation
@@ -225,7 +259,7 @@ public interface IObservationManager
     /// <summary>
     /// Count documents in index
     /// </summary>
-    /// <param name="protectedIndex"></param>
+    /// <param name="protectedIndex"></param>geogrid
     /// <returns></returns>
     Task<long> IndexCountAsync(bool protectedIndex = false);
 

@@ -1,7 +1,6 @@
 ﻿using SOS.Lib.Models.Interfaces;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.TaxonTree;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace SOS.Lib.Managers.Interfaces;
 
@@ -15,5 +14,13 @@ public interface ITaxonManager
     /// <summary>
     /// Get taxon lists taxon ids.
     /// </summary>
-    public Task<Dictionary<int, (HashSet<int> Taxa, HashSet<int> WithUnderlyingTaxa)>> GetTaxonListSetByIdAsync();
+    Task<Dictionary<int, (HashSet<int> Taxa, HashSet<int> WithUnderlyingTaxa)>> GetTaxonListSetByIdAsync();
+
+    /// <summary>
+    /// Asynchronously retrieves a collection of available taxon lists.
+    /// </summary>
+    /// <remarks>This method is intended to be called asynchronously and may involve network or database
+    /// operations. Ensure that the calling context can handle asynchronous execution.</remarks>
+    /// <returns>An enumerable collection of <see cref="TaxonList"/> objects representing the available taxon lists.</returns>
+    Task<IEnumerable<TaxonList>> GetTaxonListsAsync();
 }

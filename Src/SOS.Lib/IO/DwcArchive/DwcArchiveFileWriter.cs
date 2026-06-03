@@ -16,13 +16,7 @@ using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Services.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.IO;
 using System.IO.Compression;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Xml.Linq;
 
 namespace SOS.Lib.IO.DwcArchive;
@@ -130,6 +124,7 @@ public class DwcArchiveFileWriter : FileWriterBase, IDwcArchiveFileWriter
     public async Task<FileExportResult> CreateDwcArchiveFileAsync(
         DataProvider dataProvider,
         SearchFilter filter,
+        IEnumerable<(Stream Stream, string Filename)> additionalFiles,
         string fileName,
         IProcessedObservationCoreRepository processedObservationRepository,
         ProcessInfo processInfo,
@@ -141,6 +136,7 @@ public class DwcArchiveFileWriter : FileWriterBase, IDwcArchiveFileWriter
         return await CreateDwcArchiveFileAsync(
             dataProvider,
             filter,
+            additionalFiles,
             fileName,
             processedObservationRepository,
             fieldDescriptions,
@@ -153,6 +149,7 @@ public class DwcArchiveFileWriter : FileWriterBase, IDwcArchiveFileWriter
     public async Task<FileExportResult> CreateDwcArchiveFileAsync(
         DataProvider dataProvider,
         SearchFilter filter,
+        IEnumerable<(Stream Stream, string Filename)> additionalFiles,
         string fileName,
         IProcessedObservationCoreRepository processedObservationRepository,
         IEnumerable<FieldDescription> fieldDescriptions,
@@ -245,6 +242,14 @@ public class DwcArchiveFileWriter : FileWriterBase, IDwcArchiveFileWriter
                 DwcProcessInfoFileWriter.CreateProcessInfoFile(processInfoFileStream, processInfo);
                 processInfoFileStream.Close();
             }
+            if ((additionalFiles?.Count() ?? 0) != 0)
+            {
+                foreach (var additionalFile in additionalFiles)
+                {
+                    await StoreFileAsync(temporaryZipExportFolderPath, additionalFile.Stream, additionalFile.Filename);
+                }
+            }
+           
             var zipFilePath = Path.Join(exportFolderPath, $"{fileName}.zip");
             _fileService.CompressDirectory(temporaryZipExportFolderPath, zipFilePath);
 
@@ -273,6 +278,7 @@ public class DwcArchiveFileWriter : FileWriterBase, IDwcArchiveFileWriter
     public async Task<(Stream stream, string filename)> CreateDwcArchiveFileInMemoryAsync(
         DataProvider dataProvider,
         SearchFilter filter,
+        IEnumerable<(Stream Stream, string Filename)> additionalFiles,
         IProcessedObservationCoreRepository processedObservationRepository,
         IEnumerable<FieldDescription> fieldDescriptions,
         ProcessInfo processInfo,
@@ -363,6 +369,21 @@ public class DwcArchiveFileWriter : FileWriterBase, IDwcArchiveFileWriter
                     using (var processInfoFileZipStream = processInfoFileEntry.Open())
                     {
                         DwcProcessInfoFileWriter.CreateProcessInfoFile(processInfoFileZipStream, processInfo);
+                    }
+                }
+
+                if ((additionalFiles?.Count() ?? 0) != 0)
+                {
+                    foreach (var additionalFile in additionalFiles)
+                    {
+                        var additionalFileEntry = zipArchive.CreateEntry(additionalFile.Filename);
+                        using (var additionalFileZipStream = additionalFileEntry.Open())
+                        {
+                            additionalFile.Stream.Seek(0, SeekOrigin.Begin);
+                            await additionalFile.Stream.CopyToAsync(additionalFileZipStream);
+                            additionalFileZipStream.Close();
+                            await additionalFileZipStream.DisposeAsync();
+                        }
                     }
                 }
             }

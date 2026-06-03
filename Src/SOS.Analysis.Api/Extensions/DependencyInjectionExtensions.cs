@@ -1,34 +1,38 @@
-﻿using Microsoft.ApplicationInsights.Extensibility;
+﻿using Elastic.Clients.Elasticsearch.Cluster;
+using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging.Abstractions;
 using SOS.Analysis.Api.ApplicationInsights;
+using SOS.Analysis.Api.Repositories;
+using SOS.Analysis.Api.Repositories.Interfaces;
 using SOS.Lib.ApplicationInsights;
 using SOS.Lib.Cache;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Database;
 using SOS.Lib.Database.Interfaces;
+using SOS.Lib.Helpers;
+using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Managers;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.Configuration;
+using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.TaxonListService;
 using SOS.Lib.Models.TaxonTree;
+using SOS.Lib.Repositories.Processed;
+using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Resource;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Security;
 using SOS.Lib.Security.Interfaces;
 using SOS.Lib.Services;
 using SOS.Lib.Services.Interfaces;
-using SOS.Shared.Api.Utilities.Objects.Interfaces;
 using SOS.Shared.Api.Utilities.Objects;
-using SOS.Shared.Api.Validators.Interfaces;
+using SOS.Shared.Api.Utilities.Objects.Interfaces;
 using SOS.Shared.Api.Validators;
-using Microsoft.Extensions.Logging.Abstractions;
-using SOS.Lib.Repositories.Processed.Interfaces;
-using SOS.Lib.Repositories.Processed;
-using SOS.Analysis.Api.Repositories.Interfaces;
-using SOS.Analysis.Api.Repositories;
+using SOS.Shared.Api.Validators.Interfaces;
 using System.Collections.Concurrent;
-using Elastic.Clients.Elasticsearch.Cluster;
 
 namespace SOS.Analysis.Api.Extensions;
 
@@ -76,7 +80,10 @@ public static class DependencyInjectionExtensions
             // Add Caches
             services.AddSingleton<IAreaCache, AreaCache>();
             services.AddSingleton<IDataProviderCache, DataProviderCache>();
+            services.AddSingleton<ICache<int, ProjectInfo>, ProjectCache>();
             services.AddSingleton<ICache<string, ProcessedConfiguration>, ProcessedConfigurationCache>();
+            services.AddSingleton<ICache<int, Taxon>, TaxonCache>();
+            services.AddSingleton<ICache<int, TaxonList>, TaxonListCache>();
             services.AddSingleton<IClassCache<TaxonListSetsById>, ClassCache<TaxonListSetsById>>();
             services.AddSingleton<IClassCache<TaxonTree<IBasicTaxon>>, ClassCache<TaxonTree<IBasicTaxon>>>();
             var clusterHealthCache = new ClassCache<ConcurrentDictionary<string, HealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<string, HealthResponse>>>()) { CacheDuration = TimeSpan.FromMinutes(2) };
@@ -91,12 +98,14 @@ public static class DependencyInjectionExtensions
             // Add repositories
             services.AddScoped<IAreaRepository, AreaRepository>();
             services.AddScoped<IDataProviderRepository, DataProviderRepository>();
+            services.AddScoped<IDatasetRepository, DatasetRepository>();
             services.AddScoped<IProcessedConfigurationRepository, ProcessedConfigurationRepository>();
             services.AddScoped<IProcessedObservationRepository, ProcessedObservationRepository>();
             services.AddScoped<IProcessedObservationCoreRepository, ProcessedObservationCoreRepository>();
             services.AddScoped<ITaxonRepository, TaxonRepository>();
             services.AddScoped<ITaxonListRepository, TaxonListRepository>();
             services.AddScoped<IUserExportRepository, UserExportRepository>();
+            services.AddScoped<IVocabularyRepository, VocabularyRepository>();
 
             // Add services
             services.AddSingleton<IHttpClientService, HttpClientService>();
@@ -104,11 +113,15 @@ public static class DependencyInjectionExtensions
             services.AddSingleton<ICryptoService, CryptoService>();
             services.AddSingleton<IFileService, FileService>();
 
+            //Add helpers
+            services.AddSingleton<IFilterHelper, FilterHelper>();
+
             // Add Utilites
             services.AddSingleton<ISearchFilterUtility, SearchFilterUtility>();
 
             // Add Validators
             services.AddScoped<IInputValidator, InputValidator>();
+
 
             return services;
         }

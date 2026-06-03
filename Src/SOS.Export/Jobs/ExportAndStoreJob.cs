@@ -4,8 +4,6 @@ using Microsoft.Extensions.Logging;
 using SOS.Export.Managers.Interfaces;
 using SOS.Lib.Jobs.Export;
 using SOS.Lib.Models.Search.Filters;
-using System;
-using System.Threading.Tasks;
 
 namespace SOS.Export.Jobs;
 
@@ -35,7 +33,7 @@ public class ExportAndStoreJob : IExportAndStoreJob
         try
         {
             _logger.LogInformation("Start export and store job");
-            var success = await _observationManager.ExportAndStoreAsync(filter, blobStorageContainer, fileName, "DwC-A file",
+            var success = await _observationManager.ExportAndStoreAsync(filter, null, blobStorageContainer, fileName, "DwC-A file",
                 cancellationToken);
 
             _logger.LogInformation($"End export and store job. Success: {success}");

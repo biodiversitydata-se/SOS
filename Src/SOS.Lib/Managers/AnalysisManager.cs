@@ -15,15 +15,10 @@ using SOS.Lib.Models.Search.Enums;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Services.Interfaces;
-using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
-using System.Linq;
 using System.Text.Json.Serialization;
 using System.Text.Json;
 using System.Text;
-using System.Threading.Tasks;
 using NetTopologySuite.IO;
 using SOS.Lib.Models.Analysis;
 using System.Diagnostics;
@@ -32,6 +27,8 @@ using System.Text.Unicode;
 using SOS.Lib.Models.Search.Result;
 using Elastic.Clients.Elasticsearch;
 using System.Collections.ObjectModel;
+using SOS.Lib.Dtos.Filter;
+using SOS.Lib.Extensions.Dto;
 
 namespace SOS.Lib.Managers;
 
@@ -631,22 +628,31 @@ public class AnalysisManager : IAnalysisManager
     }
 
     /// <inheritdoc />
+    public async Task<long> GetMatchCountAsync(int? userId, int? roleId, string authorizationApplicationIdentifier, SearchFilterBaseDto searchFilter, Dtos.Enum.ProtectionFilterDto protectionFilter)
+    {
+        var filter = searchFilter.ToSearchFilter(userId ?? 0, protectionFilter, "sv-SE");
+        return await GetMatchCountAsync(roleId, authorizationApplicationIdentifier, filter);
+    }
+
+    /// <inheritdoc />
     public async Task<long> GetMatchCountAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilterBase filter)
     {
         await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
         return await _processedObservationRepository.GetMatchCountAsync(filter);
     }
 
-    public async Task<int> GetNumberOfTaxaInFilterAsync(SearchFilterBase filter)
+    public async Task<int> GetNumberOfTaxaInFilterAsync(SearchFilterBaseDto filter)
     {
-        await _filterManager.PrepareFilterAsync(null, null, filter);
-        return filter?.Taxa?.Ids != null ? filter.Taxa.Ids.Count() : 0;
+        var searchFilter = filter.ToSearchFilter(0, Dtos.Enum.ProtectionFilterDto.Public, "sv-SE");
+        await _filterManager.PrepareFilterAsync(null, null, searchFilter);
+        return searchFilter?.Taxa?.Ids != null ? searchFilter.Taxa.Ids.Count() : 0;
     }
 
     public async Task<FileExportResult> CreateAooEooExportAsync(
         int? roleId,
         string authorizationApplicationIdentifier,
         SearchFilter filter,
+        IEnumerable<(Stream Stream, string Filename)> additionalFiles,
         int gridCellsInMeters,
         bool useCenterPoint,
         IEnumerable<double> alphaValues,
@@ -670,6 +676,13 @@ public class AnalysisManager : IAnalysisManager
             var aooEooItems = new List<AooEooItem>();
             _fileService.CreateDirectory(temporaryZipExportFolderPath);
             await StoreFilterAsync(temporaryZipExportFolderPath, filter);
+            if ((additionalFiles?.Count() ?? 0) != 0)
+            {
+                foreach (var additionalFile in additionalFiles)
+                {
+                    await StoreFileAsync(temporaryZipExportFolderPath, additionalFile.Stream, additionalFile.Filename);
+                }
+            }
             await StoreSettingsAsync(temporaryZipExportFolderPath, new
             {
                 GridcellsInMeters = gridCellsInMeters,
@@ -809,6 +822,7 @@ public class AnalysisManager : IAnalysisManager
         int? roleId,
         string authorizationApplicationIdentifier,
         SearchFilter filter,
+        IEnumerable<(Stream Stream, string Filename)> additionalFiles,
         int gridCellsInMeters,
         int maxDistance,
         MetricCoordinateSys metricCoordinateSys,
@@ -827,6 +841,13 @@ public class AnalysisManager : IAnalysisManager
             var aooEooItems = new List<AooEooItem>();
             _fileService.CreateDirectory(temporaryZipExportFolderPath);
             await StoreFilterAsync(temporaryZipExportFolderPath, filter);
+            if ((additionalFiles?.Count() ?? 0) != 0)
+            {
+                foreach (var additionalFile in additionalFiles)
+                {
+                    await StoreFileAsync(temporaryZipExportFolderPath, additionalFile.Stream, additionalFile.Filename);
+                }
+            }
             await StoreSettingsAsync(temporaryZipExportFolderPath, new
             {
                 GridcellsInMeters = gridCellsInMeters,
@@ -990,7 +1011,36 @@ public class AnalysisManager : IAnalysisManager
             var filterString = JsonSerializer.Serialize(filter, serializeOptions);
             await streamWriter.WriteAsync(filterString);
             streamWriter.Close();
+            streamWriter.Dispose();
             fileStream.Close();
+            await fileStream.DisposeAsync();
+        }
+        catch
+        {
+            return;
+        }
+    }
+
+    /// <summary>
+    /// Save file in folder of zip
+    /// </summary>
+    /// <param name="temporaryZipExportFolderPath"></param>
+    /// <param name="stream"></param>
+    /// <param name="fileName"></param>
+    /// <returns></returns>
+    protected async Task StoreFileAsync(string temporaryZipExportFolderPath, Stream stream, string fileName)
+    {
+        if (stream == null)
+        {
+            return;
+        }
+        try
+        {
+            await using var fileStream = File.Create(Path.Combine(temporaryZipExportFolderPath, fileName));
+            await stream.CopyToAsync(fileStream);
+
+            fileStream.Close();
+            await fileStream.DisposeAsync();
         }
         catch
         {
@@ -1021,7 +1071,9 @@ public class AnalysisManager : IAnalysisManager
             var settingsString = JsonSerializer.Serialize(settings, serializeOptions);
             await streamWriter.WriteAsync(settingsString);
             streamWriter.Close();
+            streamWriter.Dispose();
             fileStream.Close();
+            await fileStream.DisposeAsync();
         }
         catch
         {

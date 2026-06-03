@@ -2,12 +2,12 @@
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Swagger;
 using SOS.Observations.Api.Configuration;
-using SOS.Shared.Api.Dtos;
-using SOS.Shared.Api.Dtos.Enum;
-using SOS.Shared.Api.Dtos.Filter;
-using SOS.Shared.Api.Dtos.Location;
+using SOS.Lib.Dtos;
+using SOS.Lib.Dtos.Enum;
+using SOS.Lib.Dtos.Filter;
+using SOS.Lib.Dtos.Location;
 using SOS.Shared.Api.Extensions.Controller;
-using SOS.Shared.Api.Extensions.Dto;
+using SOS.Lib.Extensions.Dto;
 using SOS.Shared.Api.Validators.Interfaces;
 using SOS.Observations.Api.Managers.Interfaces;
 using System.Net;

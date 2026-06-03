@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Moq;
 using SOS.Lib.JsonConverters;
 using SOS.Observations.Api.Middleware;
-using SOS.Shared.Api.Dtos.Filter;
+using SOS.Lib.Dtos.Filter;
 using System.IO;
 using System.Linq;
 using System.Text;

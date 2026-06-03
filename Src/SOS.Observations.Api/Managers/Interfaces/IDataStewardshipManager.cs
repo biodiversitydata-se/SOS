@@ -1,7 +1,7 @@
 ﻿using SOS.Lib.Enums;
 using SOS.Lib.Models.Search.Filters;
-using SOS.Shared.Api.Dtos;
-using SOS.Shared.Api.Dtos.DataStewardship;
+using SOS.Lib.Dtos;
+using SOS.Lib.Dtos.DataStewardship;
 using System.Threading.Tasks;
 
 namespace SOS.Observations.Api.Managers.Interfaces;

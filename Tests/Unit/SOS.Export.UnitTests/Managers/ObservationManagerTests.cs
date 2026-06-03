@@ -7,6 +7,7 @@ using SOS.Export.Services.Interfaces;
 using SOS.Lib.Configuration.Export;
 using SOS.Lib.Enums;
 using SOS.Lib.IO.DwcArchive.Interfaces;
+using SOS.Lib.IO.Csv.Interfaces;
 using SOS.Lib.IO.Excel.Interfaces;
 using SOS.Lib.IO.GeoJson.Interfaces;
 using SOS.Lib.Managers.Interfaces;
@@ -16,8 +17,6 @@ using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Services.Interfaces;
-using System;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace SOS.Export.UnitTests.Managers;
@@ -95,6 +94,7 @@ public class ObservationManagerTests
         _dwcArchiveFileWriterMock.Setup(daf => daf.CreateDwcArchiveFileAsync(
                 DataProvider.FilterSubsetDataProvider,
                 It.IsAny<SearchFilter>(),
+                null,
                 It.IsAny<string>(),
                 _processedObservationRepositoryMock.Object,
                 It.IsAny<ProcessInfo>(),
@@ -114,6 +114,7 @@ public class ObservationManagerTests
             It.IsAny<int>(),
             It.IsAny<string>(),
             It.IsAny<SearchFilter>(),
+            null,
             It.IsAny<string>(),
             "",
             ExportFormat.DwC,
@@ -154,6 +155,7 @@ public class ObservationManagerTests
             It.IsAny<int>(),
             It.IsAny<string>(),
             It.IsAny<SearchFilter>(),
+            null,
             It.IsAny<string>(),
             "", ExportFormat.DwC,
             "en-GB",
@@ -189,6 +191,7 @@ public class ObservationManagerTests
         _dwcArchiveFileWriterMock.Setup(daf => daf.CreateDwcArchiveFileAsync(
                 DataProvider.FilterSubsetDataProvider,
                 It.IsAny<SearchFilter>(),
+                null,
                 It.IsAny<string>(),
                 _processedObservationRepositoryMock.Object,
                 It.IsAny<ProcessInfo>(),
@@ -206,7 +209,7 @@ public class ObservationManagerTests
         //-----------------------------------------------------------------------------------------------------------
         // Act
         //-----------------------------------------------------------------------------------------------------------
-        var result = await TestObject.ExportAndStoreAsync(null, It.IsAny<string>(), It.IsAny<string>(), "",
+        var result = await TestObject.ExportAndStoreAsync(null, null, It.IsAny<string>(), It.IsAny<string>(), "",
             JobCancellationToken.Null);
         //-----------------------------------------------------------------------------------------------------------
         // Assert
@@ -232,7 +235,7 @@ public class ObservationManagerTests
         //-----------------------------------------------------------------------------------------------------------
         // Act
         //-----------------------------------------------------------------------------------------------------------
-        var result = await TestObject.ExportAndStoreAsync(null, It.IsAny<string>(), It.IsAny<string>(), "",
+        var result = await TestObject.ExportAndStoreAsync(null, null, It.IsAny<string>(), It.IsAny<string>(), "",
             JobCancellationToken.Null);
         //-----------------------------------------------------------------------------------------------------------
         // Assert

@@ -1,4 +1,4 @@
-﻿using SOS.Shared.Api.Dtos.Status;
+﻿using SOS.Lib.Dtos.Status;
 using SOS.Status.Web.Client.Abstractions;
 using SOS.Status.Web.Client.Models;
 using SOS.Status.Web.HttpClients;

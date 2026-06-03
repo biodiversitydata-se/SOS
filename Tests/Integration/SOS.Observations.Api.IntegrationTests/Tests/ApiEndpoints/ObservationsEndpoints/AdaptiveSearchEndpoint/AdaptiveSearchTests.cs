@@ -11,8 +11,8 @@ using SOS.Observations.Api.IntegrationTests.Helpers;
 using SOS.Observations.Api.IntegrationTests.Models;
 using SOS.Observations.Api.IntegrationTests.Setup;
 using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
-using SOS.Shared.Api.Dtos;
-using SOS.Shared.Api.Dtos.Filter;
+using SOS.Lib.Dtos.Filter;
+using SOS.Lib.Dtos;
 
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsEndpoints.ObservationsBySearchEndpoint;
 

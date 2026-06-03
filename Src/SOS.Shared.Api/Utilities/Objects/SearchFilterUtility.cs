@@ -3,7 +3,7 @@ using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
-using SOS.Shared.Api.Dtos.Filter;
+using SOS.Lib.Dtos.Filter;
 using SOS.Shared.Api.Utilities.Objects.Interfaces;
 
 namespace SOS.Shared.Api.Utilities.Objects;

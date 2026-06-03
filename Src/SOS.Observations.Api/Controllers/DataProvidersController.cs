@@ -8,7 +8,7 @@ using SOS.Lib.Helpers;
 using SOS.Lib.Swagger;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Repositories.Interfaces;
-using SOS.Shared.Api.Dtos;
+using SOS.Lib.Dtos;
 using System;
 using System.Collections.Generic;
 using System.Globalization;

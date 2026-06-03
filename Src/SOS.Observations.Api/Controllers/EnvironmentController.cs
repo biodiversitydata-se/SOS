@@ -8,7 +8,7 @@ using System.Net;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
-using SOS.Shared.Api.Dtos;
+using SOS.Lib.Dtos;
 using SOS.Lib.Helpers;
 
 namespace SOS.Observations.Api.Controllers;

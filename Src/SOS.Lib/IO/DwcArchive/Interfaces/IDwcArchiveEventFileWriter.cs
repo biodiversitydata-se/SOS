@@ -6,9 +6,6 @@ using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
 
 namespace SOS.Lib.IO.DwcArchive.Interfaces;
 
@@ -42,6 +39,7 @@ public interface IDwcArchiveEventFileWriter
     /// </summary>
     /// <param name="dataProvider"></param>
     /// <param name="filter"></param>
+    /// <param name="additionalFiles"></param>
     /// <param name="fileName"></param>
     /// <param name="processedObservationRepository">The repository to read observation data from.</param>
     /// <param name="processInfo"></param>
@@ -51,6 +49,7 @@ public interface IDwcArchiveEventFileWriter
     Task<FileExportResult> CreateEventDwcArchiveFileAsync(
         DataProvider dataProvider,
         SearchFilter filter,
+        IEnumerable<(Stream Stream, string Filename)> additionalFiles,
         string fileName,
         IProcessedObservationCoreRepository processedObservationRepository,
         ProcessInfo processInfo,
@@ -60,6 +59,7 @@ public interface IDwcArchiveEventFileWriter
     Task<(Stream stream, string filename)> CreateEventDwcArchiveFileInMemoryAsync(
         DataProvider dataProvider,
         SearchFilter filter,
+        IEnumerable<(Stream Stream, string Filename)> additionalFiles,
         IProcessedObservationCoreRepository processedObservationRepository,
         ProcessInfo processInfo,
         IJobCancellationToken cancellationToken);

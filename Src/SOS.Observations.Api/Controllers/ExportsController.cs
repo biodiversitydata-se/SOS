@@ -1,36 +1,29 @@
 ﻿using CSharpFunctionalExtensions;
+using Elastic.Clients.Elasticsearch.MachineLearning;
 using Hangfire;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using SOS.Lib.Constants;
+using SOS.Lib.Dtos.Enum;
+using SOS.Lib.Dtos.Export;
+using SOS.Lib.Dtos.Filter;
 using SOS.Lib.Enums;
 using SOS.Lib.Exceptions;
 using SOS.Lib.Extensions;
+using SOS.Lib.Extensions.Dto;
 using SOS.Lib.Helpers;
 using SOS.Lib.Jobs.Export;
+using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Export;
-using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Services.Interfaces;
 using SOS.Lib.Swagger;
 using SOS.Observations.Api.Configuration;
-using SOS.Shared.Api.Dtos.Export;
-using SOS.Shared.Api.Dtos.Filter;
-using SOS.Shared.Api.Dtos.Enum;
-using SOS.Shared.Api.Extensions.Controller;
-using SOS.Shared.Api.Extensions.Dto;
 using SOS.Observations.Api.Managers.Interfaces;
+using SOS.Shared.Api.Extensions.Controller;
 using SOS.Shared.Api.Validators.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
-using System.IO;
 using System.IO.Compression;
-using SOS.Lib.Managers.Interfaces;
-using Microsoft.AspNetCore.Http.HttpResults;
+using System.Net;
 
 namespace SOS.Observations.Api.Controllers;
 
@@ -46,13 +39,11 @@ public class ExportsController : ControllerBase
     private readonly ICryptoService _cryptoService;
     private readonly IExportManager _exportManager;
     private readonly IUserManager _userManager;
-    private readonly IFileService _fileService;
     private readonly IUserExportRepository _userExportRepository;
     private readonly IInputValidator _inputValidator;
     private readonly int _defaultUserExportLimit;
     private readonly long _orderExportObservationsLimit;
     private readonly long _downloadExportObservationsLimit;
-    private readonly string _exportPath;
     private readonly ObservationApiConfiguration _observationApiConfiguration;        
     private readonly ILogger<ExportsController> _logger;
 
@@ -126,7 +117,7 @@ public class ExportsController : ControllerBase
     /// <param name="applicationIdentifier"></param>
     /// <param name="skipMaxCount"></param>
     /// <returns></returns>
-    private async Task<(IActionResult Result, long? Count)> OrderValidateAsync(
+    private async Task<IActionResult> OrderValidateAsync(
         SearchFilterBaseDto filter,
         bool validateSearchFilter,
         string email,
@@ -150,28 +141,25 @@ public class ExportsController : ControllerBase
 
         if (validationResults.IsFailure)
         {
-            return (Result: BadRequest(validationResults.Error), Count: null);
+            return BadRequest(validationResults.Error);
         }
 
-        var exportFilter = filter.ToSearchFilter(this.GetUserId(), protectionFilter ?? ProtectionFilterDto.Public, "en-GB");
-        
-            var matchCount = await _observationManager.GetMatchCountAsync(roleId, applicationIdentifier, exportFilter.Clone());
-            if (matchCount == 0)
-            {
-                return (Result: NoContent(), Count: 0);
-            }
+        var matchCount = await _observationManager.GetMatchCountAsync(this.GetUserId(), roleId, applicationIdentifier, filter);
+        if (matchCount == 0)
+        {
+            return NoContent();
+        }
 
         if (!skipMaxCount)
         {
             if (matchCount > _orderExportObservationsLimit)
             {
-                return (Result: BadRequest($"Query exceeds limit of {_orderExportObservationsLimit} observations."), Count: matchCount);
+                return BadRequest($"Query exceeds limit of {_orderExportObservationsLimit} observations.");
             }
         }
         this.LogObservationCount(matchCount);
-        
-       
-        return (Result: new OkObjectResult(exportFilter), Count: matchCount);            
+
+        return Ok(matchCount);            
     }
 
     /// <summary>
@@ -184,11 +172,11 @@ public class ExportsController : ControllerBase
     /// <param name="applicationIdentifier"></param>
     /// <returns></returns>
     private async Task<IActionResult> DownloadValidateAsync(
-        SearchFilterBaseDto filter,
-        bool validateSearchFilter,
-        ProtectionFilterDto? protectionFilter,
-        int? roleId,
-        string applicationIdentifier)
+    SearchFilterBaseDto filter,
+    bool validateSearchFilter,
+    ProtectionFilterDto? protectionFilter,
+    int? roleId,
+    string applicationIdentifier)
     {
         var validationResults = Result.Combine(
             validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(filter, allowObjectInOutputFields: false)) : Result.Success(),
@@ -200,8 +188,7 @@ public class ExportsController : ControllerBase
             return BadRequest(validationResults);
         }
 
-        var exportFilter = filter.ToSearchFilter(this.GetUserId(), protectionFilter ?? ProtectionFilterDto.Public, "en-GB");            
-        var matchCount = await _observationManager.GetMatchCountAsync(roleId, applicationIdentifier, exportFilter);
+        var matchCount = await _observationManager.GetMatchCountAsync(this.GetUserId(), roleId, applicationIdentifier, filter, "en-GB", protectionFilter);
 
         if (matchCount == 0)
         {
@@ -213,7 +200,7 @@ public class ExportsController : ControllerBase
             return BadRequest($"Query exceeds limit of {_downloadExportObservationsLimit} observations.");
         }
         this.LogObservationCount(matchCount);
-        return new OkObjectResult(exportFilter);
+        return Ok();
     }
 
     /// <summary>
@@ -253,7 +240,6 @@ public class ExportsController : ControllerBase
     /// <param name="exportManager"></param>
     /// <param name="userManager"></param>
     /// <param name="cryptoService"></param>
-    /// <param name="fileService"></param>
     /// <param name="userExportRepository"></param>
     /// <param name="inputValidator"></param>
     /// <param name="configuration"></param>
@@ -265,7 +251,6 @@ public class ExportsController : ControllerBase
         IExportManager exportManager,
         IUserManager userManager,
         ICryptoService cryptoService,
-        IFileService fileService,
         IUserExportRepository userExportRepository,
         IInputValidator inputValidator,
         ObservationApiConfiguration configuration,
@@ -276,7 +261,6 @@ public class ExportsController : ControllerBase
         _exportManager = exportManager ?? throw new ArgumentNullException(nameof(exportManager));
         _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
         _cryptoService = cryptoService ?? throw new ArgumentNullException(nameof(cryptoService));
-        _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
         _userExportRepository =
             userExportRepository ?? throw new ArgumentNullException(nameof(userExportRepository));
         _inputValidator = inputValidator ?? throw new ArgumentNullException(nameof(inputValidator));
@@ -284,7 +268,6 @@ public class ExportsController : ControllerBase
         _defaultUserExportLimit = configuration?.DefaultUserExportLimit ?? throw new ArgumentNullException(nameof(configuration));
         _orderExportObservationsLimit = configuration.OrderExportObservationsLimit;
         _downloadExportObservationsLimit = configuration.DownloadExportObservationsLimit;
-        _exportPath = configuration.ExportPath;
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
@@ -383,6 +366,43 @@ public class ExportsController : ControllerBase
     }
 
     /// <summary>
+    /// Exports the specified search filter as a Markdown file for download.
+    /// </summary>
+    /// <remarks>Returns a file with content type 'text/markdown' and filename 'filter.md'. If the filter is
+    /// invalid or an error occurs during export, an appropriate error response is returned.</remarks>
+    /// <param name="filter">The search filter criteria to be exported. Cannot be null.</param>
+    /// <returns>A Markdown file containing the details of the provided search filter if the operation succeeds; otherwise, an
+    /// error response.</returns>
+    [HttpPost("Download/Filter")]
+    [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+    [AzureApi, AzureInternalApi]
+    public async Task<IActionResult> DownloadFilterAsync(
+        [FromBody] SearchFilterAggregationDto filter)
+    {
+        try
+        {
+            var validateResult = await _inputValidator.ValidateSearchFilterAsync(filter, allowObjectInOutputFields: false);
+
+            if (validateResult.IsFailure)
+            {
+                return BadRequest(validateResult);
+            }
+
+            using var fileStream = await _exportManager.CreateFilterMarkdownAsync(
+                    filter,
+                    CancellationToken.None);
+
+            return File(fileStream?.ToArray(), "text/markdown", "filter.md");
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error exporting filter file");
+            return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+        }
+    }
+
+    /// <summary>
     /// Download Csv export file. The limit is 25 000 observations. If you need to download more observations, use the OrderCsv endpoint.
     /// By default, the file is compressed (zipped) using the GZIP format, but this can be changed via the <paramref name="gzip"/> parameter.
     /// </summary>
@@ -424,17 +444,18 @@ public class ExportsController : ControllerBase
 
             var validateResult = await DownloadValidateAsync(filter, validateSearchFilter, protectionFilter, roleId, authorizationApplicationIdentifier);
 
-            if (validateResult is not OkObjectResult okResult)
+            if (validateResult is not OkResult okResult)
             {
                 return validateResult;
             }
             
-            var exportFilter = (SearchFilter)okResult.Value;
             (Stream stream, string filename) result =                        
                 await _exportManager.CreateExportFileInMemoryAsZipStreamAsync(
+                    this.GetUserId(),
                     roleId,
                     authorizationApplicationIdentifier,
-                    exportFilter,
+                    filter,
+                    protectionFilter,
                     ExportFormat.Csv,
                     cultureCode,
                     false,
@@ -453,7 +474,7 @@ public class ExportsController : ControllerBase
                 Stream fileStream = null;
                 Response.OnCompleted(async () => { await result.stream.DisposeAsync(); fileStream?.Dispose(); });
                 using var archive = new ZipArchive(result.stream, ZipArchiveMode.Read, leaveOpen: true);
-                var entry = archive.Entries.FirstOrDefault();
+                var entry = archive.Entries.FirstOrDefault(f => f.Name.EndsWith(".csv"));
                 fileStream = entry.Open();
                 return File(fileStream, "text/tab-separated-values", entry.Name);
             }
@@ -506,17 +527,18 @@ public class ExportsController : ControllerBase
             this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope, protectionFilter);
             filter.Output = new OutputFilterDto { FieldSet = OutputFieldSet.All };
             var validateResult = await DownloadValidateAsync(filter, validateSearchFilter, protectionFilter, roleId, authorizationApplicationIdentifier);
-            if (validateResult is not OkObjectResult okResult)
+            if (validateResult is not OkResult okResult)
             {
                 return validateResult;
             }
 
-            var exportFilter = (SearchFilter)okResult.Value;
             (Stream stream, string filename) result =
                 await _exportManager.CreateExportFileInMemoryAsZipStreamAsync(
+                    this.GetUserId(),
                     roleId,
                     authorizationApplicationIdentifier,
-                    exportFilter,
+                    filter,
+                    protectionFilter,
                     eventBased ? ExportFormat.DwCEvent : ExportFormat.DwC,
                     Cultures.en_GB,
                     false,
@@ -591,17 +613,18 @@ public class ExportsController : ControllerBase
             HandleOutputFieldSet(filter, outputFieldSet);
             cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
             var validateResult = await DownloadValidateAsync(filter, validateSearchFilter, protectionFilter, roleId, authorizationApplicationIdentifier);
-            if (validateResult is not OkObjectResult okResult)
+            if (validateResult is not OkResult okResult)
             {
                 return validateResult;
             }
 
-            var exportFilter = (SearchFilter)okResult.Value;
             (Stream stream, string filename) result =
                 await _exportManager.CreateExportFileInMemoryAsZipStreamAsync(
+                    this.GetUserId(),
                     roleId,
                     authorizationApplicationIdentifier,
-                    exportFilter,
+                    filter,
+                    protectionFilter,
                     ExportFormat.Excel,
                     cultureCode,
                     false,
@@ -676,17 +699,18 @@ public class ExportsController : ControllerBase
             HandleOutputFieldSet(filter, outputFieldSet);
             cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
             var validateResult = await DownloadValidateAsync(filter, validateSearchFilter, protectionFilter, roleId, authorizationApplicationIdentifier);
-            if (validateResult is not OkObjectResult okResult)
+            if (validateResult is not OkResult okResult)
             {
                 return validateResult;
             }     
 
-            var exportFilter = (SearchFilter)okResult.Value;
             (Stream stream, string filename) result =
                 await _exportManager.CreateExportFileInMemoryAsZipStreamAsync(
+                    this.GetUserId(),
                     roleId,
                     authorizationApplicationIdentifier,
-                    exportFilter,
+                    filter,
+                    protectionFilter,
                     ExportFormat.GeoJson,
                     cultureCode,
                     flat,
@@ -780,14 +804,13 @@ public class ExportsController : ControllerBase
             cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
             var validateResult = await OrderValidateAsync(filter, validateSearchFilter, userInfo.Email, userExports, protectionFilter, sendMailFromZendTo, encryptPassword, confirmEncryptPassword, roleId, authorizationApplicationIdentifier);
 
-            if (validateResult.Result is not OkObjectResult okResult)
+            if (validateResult is not OkObjectResult okResult)
             {
-                return validateResult.Result;
+                return validateResult;
             }
             var encryptedPassword = await _cryptoService.EncryptAsync(encryptPassword);
-            var exportFilter = (SearchFilter)okResult.Value;
             var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
-                job.RunAsync(exportFilter, roleId, authorizationApplicationIdentifier, userInfo.Email, description, ExportFormat.Csv, cultureCode, false,
+                job.RunAsync(filter, protectionFilter, this.GetUserId(), roleId, authorizationApplicationIdentifier, userInfo.Email, description, ExportFormat.Csv, cultureCode, false,
                     propertyLabelType, false, sensitiveObservations, sendMailFromZendTo, encryptedPassword, false, null, JobCancellationToken.Null));
 
             var exportJobInfo = new ExportJobInfo
@@ -795,7 +818,7 @@ public class ExportsController : ControllerBase
                 Id = jobId,
                 Status = ExportJobStatus.Queued,
                 CreatedDate = DateTime.UtcNow,
-                NumberOfObservations = Convert.ToInt32(validateResult.Count),
+                NumberOfObservations = Convert.ToInt32(okResult.Value),
                 Format = ExportFormat.Csv,
                 Description = description,
                 OutputFieldSet = filter?.Output?.FieldSet
@@ -864,15 +887,15 @@ public class ExportsController : ControllerBase
             var userExports = await GetUserExportsAsync();
             var validateResult = await OrderValidateAsync(filter, validateSearchFilter, userInfo.Email, userExports, protectionFilter, sendMailFromZendTo, encryptPassword, confirmEncryptPassword, roleId, authorizationApplicationIdentifier);
 
-            if (validateResult.Result is not OkObjectResult okResult)
+            if (validateResult is not OkObjectResult okResult)
             {
-                return validateResult.Result;
+                return validateResult;
             }
 
             var encryptedPassword = await _cryptoService.EncryptAsync(encryptPassword);
-            var exportFilter = (SearchFilter)okResult.Value;
+            
             var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
-                job.RunAsync(exportFilter, roleId, authorizationApplicationIdentifier, userInfo.Email, description, eventBased ? ExportFormat.DwCEvent : ExportFormat.DwC, "en-GB", false,
+                job.RunAsync(filter, protectionFilter, this.GetUserId(), roleId, authorizationApplicationIdentifier, userInfo.Email, description, eventBased ? ExportFormat.DwCEvent : ExportFormat.DwC, "en-GB", false,
                     PropertyLabelType.PropertyName, false, sensitiveObservations, sendMailFromZendTo, encryptedPassword, false, null, JobCancellationToken.Null));
 
             var exportJobInfo = new ExportJobInfo
@@ -880,7 +903,7 @@ public class ExportsController : ControllerBase
                 Id = jobId,
                 Status = ExportJobStatus.Queued,
                 CreatedDate = DateTime.UtcNow,
-                NumberOfObservations = Convert.ToInt32(validateResult.Count),
+                NumberOfObservations = Convert.ToInt32(okResult.Value),
                 Format = eventBased ? ExportFormat.DwCEvent : ExportFormat.DwC,
                 Description = description,
                 OutputFieldSet = filter?.Output?.FieldSet
@@ -957,16 +980,15 @@ public class ExportsController : ControllerBase
             cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
             var validateResult = await OrderValidateAsync(filter, validateSearchFilter, userInfo.Email, userExports, protectionFilter, sendMailFromZendTo, encryptPassword, confirmEncryptPassword, roleId, authorizationApplicationIdentifier);
 
-            if (validateResult.Result is not OkObjectResult okResult)
+            if (validateResult is not OkObjectResult okResult)
             {
-                return validateResult.Result;
+                return validateResult;
             }
 
-            var exportFilter = (SearchFilter)okResult.Value;
             var encryptedPassword = await _cryptoService.EncryptAsync(encryptPassword);
 
             var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
-                job.RunAsync(exportFilter, roleId, authorizationApplicationIdentifier, userInfo.Email, description, ExportFormat.Excel, cultureCode, false,
+                job.RunAsync(filter, protectionFilter, this.GetUserId(), roleId, authorizationApplicationIdentifier, userInfo.Email, description, ExportFormat.Excel, cultureCode, false,
                     propertyLabelType, false, sensitiveObservations, sendMailFromZendTo, encryptedPassword, dynamicProjectDataFields, null, JobCancellationToken.Null));
 
             var exportJobInfo = new ExportJobInfo
@@ -974,7 +996,7 @@ public class ExportsController : ControllerBase
                 Id = jobId,
                 Status = ExportJobStatus.Queued,
                 CreatedDate = DateTime.UtcNow,
-                NumberOfObservations = Convert.ToInt32(validateResult.Count),
+                NumberOfObservations = Convert.ToInt32(okResult.Value),
                 Format = ExportFormat.Excel,
                 Description = description,
                 OutputFieldSet = filter?.Output?.FieldSet
@@ -1053,15 +1075,14 @@ public class ExportsController : ControllerBase
             cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
             var validateResult = await OrderValidateAsync(filter, validateSearchFilter, userInfo.Email, userExports, protectionFilter, sendMailFromZendTo, encryptPassword, confirmEncryptPassword, roleId, authorizationApplicationIdentifier);
 
-            if (validateResult.Result is not OkObjectResult okResult)
+            if (validateResult is not OkObjectResult okResult)
             {
-                return validateResult.Result;
+                return validateResult;
             }
 
             var encryptedPassword = await _cryptoService.EncryptAsync(encryptPassword);
-            var exportFilter = (SearchFilter)okResult.Value;
             var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
-                job.RunAsync(exportFilter, roleId, authorizationApplicationIdentifier, userInfo.Email, description, ExportFormat.GeoJson, cultureCode,
+                job.RunAsync(filter, protectionFilter, this.GetUserId(), roleId, authorizationApplicationIdentifier, userInfo.Email, description, ExportFormat.GeoJson, cultureCode,
                     flat, propertyLabelType, excludeNullValues, sensitiveObservations, sendMailFromZendTo, encryptedPassword, false, null, JobCancellationToken.Null));
 
             var exportJobInfo = new ExportJobInfo
@@ -1069,7 +1090,7 @@ public class ExportsController : ControllerBase
                 Id = jobId,
                 Status = ExportJobStatus.Queued,
                 CreatedDate = DateTime.UtcNow,
-                NumberOfObservations = Convert.ToInt32(validateResult.Count),
+                NumberOfObservations = Convert.ToInt32(okResult.Value),
                 Format = ExportFormat.GeoJson,
                 Description = description,
                 OutputFieldSet = filter?.Output?.FieldSet
@@ -1092,6 +1113,44 @@ public class ExportsController : ControllerBase
     }
 
     #region Internal
+    /// <summary>
+    /// Generates and returns a Markdown file representing the specified internal search filter.
+    /// </summary>
+    /// <remarks>This endpoint is intended for internal use and requires appropriate authorization. The
+    /// response contains a Markdown file named 'filter.md' with the filter details, or an error response if validation
+    /// fails or an internal error occurs.</remarks>
+    /// <param name="filter">The search filter criteria to be exported as a Markdown file. Cannot be null.</param>
+    /// <returns>An IActionResult containing the generated Markdown file if the operation succeeds; otherwise, a result
+    /// indicating the error.</returns>
+    [HttpPost("Internal/Download/Filter")]
+    [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+    [InternalApi, AzureInternalApi]
+    public async Task<IActionResult> DownloadFilterInternalAsync(
+        [FromBody] SearchFilterAggregationInternalDto filter)
+    {
+        try
+        {
+            var validateResult = await _inputValidator.ValidateSearchFilterAsync(filter, allowObjectInOutputFields: false);
+
+            if (validateResult.IsFailure)
+            {
+                return BadRequest(validateResult);
+            }
+
+            using var fileStream = await _exportManager.CreateFilterMarkdownAsync(
+                    filter,
+                    CancellationToken.None);
+
+            return File(fileStream?.ToArray(), "text/markdown", "filter.md");
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error exporting filter file");
+            return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+        }
+    }
+
     /// <summary>
     /// Download Csv export file. The limit is 25 000 observations. If you need to download more observations, use the OrderCsv endpoint.
     /// By default, the file is compressed (zipped) using the GZIP format, but this can be changed via the <paramref name="gzip"/> parameter.
@@ -1132,17 +1191,18 @@ public class ExportsController : ControllerBase
 
             var validateResult = await DownloadValidateAsync(filter, validateSearchFilter, filter.ProtectionFilter, roleId, authorizationApplicationIdentifier);
 
-            if (validateResult is not OkObjectResult okResult)
+            if (validateResult is not OkResult okResult)
             {
                 return validateResult;
             }
 
-            var exportFilter = (SearchFilter)okResult.Value;
             (Stream stream, string filename) result =
                 await _exportManager.CreateExportFileInMemoryAsZipStreamAsync(
+                    this.GetUserId(),
                     roleId,
                     authorizationApplicationIdentifier,
-                    exportFilter,
+                    filter,
+                    filter.ProtectionFilter,
                     ExportFormat.Csv,
                     cultureCode,
                     false,
@@ -1213,17 +1273,18 @@ public class ExportsController : ControllerBase
             this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope, filter.ProtectionFilter);
             filter.Output = new OutputFilterExtendedDto { FieldSet = OutputFieldSet.All };
             var validateResult = await DownloadValidateAsync(filter, validateSearchFilter, filter.ProtectionFilter, roleId, authorizationApplicationIdentifier);
-            if (validateResult is not OkObjectResult okResult)
+            if (validateResult is not OkResult okResult)
             {
                 return validateResult;
             }
 
-            var exportFilter = (SearchFilter)okResult.Value;
             (Stream stream, string filename) result =
                 await _exportManager.CreateExportFileInMemoryAsZipStreamAsync(
+                    this.GetUserId(),
                     roleId,
                     authorizationApplicationIdentifier,
-                    exportFilter,
+                    filter,
+                    filter.ProtectionFilter,
                     eventBased ? ExportFormat.DwCEvent : ExportFormat.DwC,
                     Cultures.en_GB,
                     false,
@@ -1297,17 +1358,18 @@ public class ExportsController : ControllerBase
             HandleOutputFieldSet(filter, outputFieldSet);
             cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
             var validateResult = await DownloadValidateAsync(filter, validateSearchFilter, filter.ProtectionFilter, roleId, authorizationApplicationIdentifier);
-            if (validateResult is not OkObjectResult okResult)
+            if (validateResult is not OkResult okResult)
             {
                 return validateResult;
             }
 
-            var exportFilter = (SearchFilter)okResult.Value;
             (Stream stream, string filename) result =
                 await _exportManager.CreateExportFileInMemoryAsZipStreamAsync(
+                    this.GetUserId(),
                     roleId,
                     authorizationApplicationIdentifier,
-                    exportFilter,
+                    filter,
+                    filter.ProtectionFilter,
                     ExportFormat.Excel,
                     cultureCode,
                     false,
@@ -1381,17 +1443,18 @@ public class ExportsController : ControllerBase
             HandleOutputFieldSet(filter, outputFieldSet);
             cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
             var validateResult = await DownloadValidateAsync(filter, validateSearchFilter, filter.ProtectionFilter, roleId, authorizationApplicationIdentifier);
-            if (validateResult is not OkObjectResult okResult)
+            if (validateResult is not OkResult okResult)
             {
                 return validateResult;
             }
 
-            var exportFilter = (SearchFilter)okResult.Value;
             (Stream stream, string filename) result =
                 await _exportManager.CreateExportFileInMemoryAsZipStreamAsync(
+                    this.GetUserId(),
                     roleId,
                     authorizationApplicationIdentifier,
-                    exportFilter,
+                    filter,
+                    filter.ProtectionFilter,
                     ExportFormat.GeoJson,
                     cultureCode,
                     flat,
@@ -1484,15 +1547,14 @@ public class ExportsController : ControllerBase
             cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
             var validateResult = await OrderValidateAsync(filter, validateSearchFilter, userInfo.Email, userExports, filter.ProtectionFilter, sendMailFromZendTo, encryptPassword, confirmEncryptPassword, roleId, authorizationApplicationIdentifier);
 
-            if (validateResult.Result is not OkObjectResult okResult)
+            if (validateResult is not OkObjectResult okResult)
             {
-                return validateResult.Result;
+                return validateResult;
             }
 
             var encryptedPassword = await _cryptoService.EncryptAsync(encryptPassword);
-            var exportFilter = (SearchFilter)okResult.Value;
             var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
-                job.RunAsync(exportFilter, roleId, authorizationApplicationIdentifier, userInfo.Email, description, ExportFormat.Csv, cultureCode, false,
+                job.RunAsync(filter, filter.ProtectionFilter ?? ProtectionFilterDto.Public, this.GetUserId(), roleId, authorizationApplicationIdentifier, userInfo.Email, description, ExportFormat.Csv, cultureCode, false,
                     propertyLabelType, false, sensitiveObservations, sendMailFromZendTo, encryptedPassword, false, null, JobCancellationToken.Null));
 
             var exportJobInfo = new ExportJobInfo
@@ -1500,7 +1562,7 @@ public class ExportsController : ControllerBase
                 Id = jobId,
                 Status = ExportJobStatus.Queued,
                 CreatedDate = DateTime.UtcNow,
-                NumberOfObservations = Convert.ToInt32(validateResult.Count),
+                NumberOfObservations = Convert.ToInt32(okResult.Value),
                 Format = ExportFormat.Csv,
                 Description = description,
                 OutputFieldSet = filter?.Output?.FieldSet
@@ -1568,15 +1630,14 @@ public class ExportsController : ControllerBase
             var userExports = await GetUserExportsAsync();
             var validateResult = await OrderValidateAsync(filter, validateSearchFilter, userInfo.Email, userExports, filter.ProtectionFilter, sendMailFromZendTo, encryptPassword, confirmEncryptPassword, roleId, authorizationApplicationIdentifier);
 
-            if (validateResult.Result is not OkObjectResult okResult)
+            if (validateResult is not OkObjectResult okResult)
             {
-                return validateResult.Result;
+                return validateResult;
             }
 
             var encryptedPassword = await _cryptoService.EncryptAsync(encryptPassword);
-            var exportFilter = (SearchFilter)okResult.Value;
             var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
-                job.RunAsync(exportFilter, roleId, authorizationApplicationIdentifier, userInfo.Email, description, eventBased ? ExportFormat.DwCEvent : ExportFormat.DwC, "en-GB", false,
+                job.RunAsync(filter, filter.ProtectionFilter ?? ProtectionFilterDto.Public, this.GetUserId(), roleId, authorizationApplicationIdentifier, userInfo.Email, description, eventBased ? ExportFormat.DwCEvent : ExportFormat.DwC, "en-GB", false,
                     PropertyLabelType.PropertyName, false, sensitiveObservations, sendMailFromZendTo, encryptedPassword, false, null, JobCancellationToken.Null));
 
             var exportJobInfo = new ExportJobInfo
@@ -1584,7 +1645,7 @@ public class ExportsController : ControllerBase
                 Id = jobId,
                 Status = ExportJobStatus.Queued,
                 CreatedDate = DateTime.UtcNow,
-                NumberOfObservations = Convert.ToInt32(validateResult.Count),
+                NumberOfObservations = Convert.ToInt32(okResult.Value),
                 Format = eventBased ? ExportFormat.DwCEvent : ExportFormat.DwC,
                 Description = description,
                 OutputFieldSet = filter?.Output?.FieldSet
@@ -1660,15 +1721,14 @@ public class ExportsController : ControllerBase
             cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
             var validateResult = await OrderValidateAsync(filter, validateSearchFilter, userInfo.Email, userExports, filter.ProtectionFilter, sendMailFromZendTo, encryptPassword, confirmEncryptPassword, roleId, authorizationApplicationIdentifier);
 
-            if (validateResult.Result is not OkObjectResult okResult)
+            if (validateResult is not OkObjectResult okResult)
             {
-                return validateResult.Result;
+                return validateResult;
             }
 
             var encryptedPassword = await _cryptoService.EncryptAsync(encryptPassword);
-            var exportFilter = (SearchFilter)okResult.Value;
             var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
-                job.RunAsync(exportFilter, roleId, authorizationApplicationIdentifier, userInfo.Email, description, ExportFormat.Excel, cultureCode, false,
+                job.RunAsync(filter, filter.ProtectionFilter ?? ProtectionFilterDto.Public, this.GetUserId(), roleId, authorizationApplicationIdentifier, userInfo.Email, description, ExportFormat.Excel, cultureCode, false,
                     propertyLabelType, false, sensitiveObservations, sendMailFromZendTo, encryptedPassword, dynamicProjectDataFields, null, JobCancellationToken.Null));
 
             var exportJobInfo = new ExportJobInfo
@@ -1676,7 +1736,7 @@ public class ExportsController : ControllerBase
                 Id = jobId,
                 Status = ExportJobStatus.Queued,
                 CreatedDate = DateTime.UtcNow,
-                NumberOfObservations = Convert.ToInt32(validateResult.Count),
+                NumberOfObservations = Convert.ToInt32(okResult.Value),
                 Format = ExportFormat.Excel,
                 Description = description,
                 OutputFieldSet = filter?.Output?.FieldSet
@@ -1754,15 +1814,14 @@ public class ExportsController : ControllerBase
             cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
             var validateResult = await OrderValidateAsync(filter, validateSearchFilter, userInfo.Email, userExports, filter.ProtectionFilter, sendMailFromZendTo, encryptPassword, confirmEncryptPassword, roleId, authorizationApplicationIdentifier);
 
-            if (validateResult.Result is not OkObjectResult okResult)
+            if (validateResult is not OkObjectResult okResult)
             {
-                return validateResult.Result;
+                return validateResult;
             }
 
             var encryptedPassword = await _cryptoService.EncryptAsync(encryptPassword);
-            var exportFilter = (SearchFilter)okResult.Value;
             var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
-                job.RunAsync(exportFilter, roleId, authorizationApplicationIdentifier, userInfo.Email, description, ExportFormat.GeoJson, cultureCode,
+                job.RunAsync(filter, filter.ProtectionFilter ?? ProtectionFilterDto.Public, this.GetUserId(), roleId, authorizationApplicationIdentifier, userInfo.Email, description, ExportFormat.GeoJson, cultureCode,
                     flat, propertyLabelType, excludeNullValues, sensitiveObservations, sendMailFromZendTo, encryptedPassword, false, null, JobCancellationToken.Null));
 
             var exportJobInfo = new ExportJobInfo
@@ -1770,7 +1829,7 @@ public class ExportsController : ControllerBase
                 Id = jobId,
                 Status = ExportJobStatus.Queued,
                 CreatedDate = DateTime.UtcNow,
-                NumberOfObservations = Convert.ToInt32(validateResult.Count),
+                NumberOfObservations = Convert.ToInt32(okResult.Value),
                 Format = ExportFormat.GeoJson,
                 Description = description,
                 OutputFieldSet = filter?.Output?.FieldSet

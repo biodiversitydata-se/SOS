@@ -2,21 +2,16 @@
 using Hangfire;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using SOS.Lib.Enums;
 using SOS.Lib.Jobs.Export;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Services.Interfaces;
 using SOS.Observations.Api.Configuration;
-using SOS.Shared.Api.Dtos.Filter;
-using SOS.Shared.Api.Extensions.Dto;
+using SOS.Lib.Dtos.Filter;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Shared.Api.Validators.Interfaces;
 using SOS.Shared.Api.Extensions.Controller;
-using System;
-using System.Linq;
 using System.Net;
-using System.Threading.Tasks;
 using SOS.Lib.Helpers;
 
 namespace SOS.Observations.Api.Controllers;
@@ -91,8 +86,7 @@ public class DOIsController : ControllerBase
             }
 
             var creatorEmail = User?.Claims?.FirstOrDefault(c => c.Type.Contains("emailaddress", StringComparison.CurrentCultureIgnoreCase))?.Value;
-            var exportFilter = filter.ToSearchFilter(this.GetUserId(), Shared.Api.Dtos.Enum.ProtectionFilterDto.Public, "en-GB");
-            var matchCount = await _observationManager.GetMatchCountAsync(0, null, exportFilter);
+            var matchCount = await _observationManager.GetMatchCountAsync(this.GetUserId(), 0, null, filter);
 
             if (matchCount == 0)
             {
@@ -103,9 +97,9 @@ public class DOIsController : ControllerBase
             {
                 return BadRequest($"Query exceeds limit of {_exportObservationsLimit} observations.");
             }
-
+            
             var jobId = BackgroundJob.Enqueue<ICreateDoiJob>(job =>
-                job.RunAsync(exportFilter, creatorEmail, JobCancellationToken.Null));
+                job.RunAsync(this.GetUserId(), filter, creatorEmail, JobCancellationToken.Null));
 
             return new OkObjectResult(new { jobId });
         }

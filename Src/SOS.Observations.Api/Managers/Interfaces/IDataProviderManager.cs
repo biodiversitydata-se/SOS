@@ -1,7 +1,7 @@
 ﻿using SOS.Lib.Enums;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using SOS.Shared.Api.Dtos;
+using SOS.Lib.Dtos;
 
 namespace SOS.Observations.Api.Managers.Interfaces;
 

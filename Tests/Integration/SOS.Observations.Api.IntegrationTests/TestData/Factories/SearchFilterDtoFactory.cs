@@ -1,5 +1,5 @@
-﻿using SOS.Shared.Api.Dtos.Enum;
-using SOS.Shared.Api.Dtos.Filter;
+﻿using SOS.Lib.Dtos.Enum;
+using SOS.Lib.Dtos.Filter;
 
 namespace SOS.Observations.Api.IntegrationTests.TestData.Factories;
 internal static class SearchFilterDtoFactory

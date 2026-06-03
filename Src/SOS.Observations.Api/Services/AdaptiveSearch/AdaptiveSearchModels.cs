@@ -1,11 +1,10 @@
 ﻿using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
+using SOS.Lib.Dtos;
+using SOS.Lib.Dtos.Filter;
 using SOS.Lib.Enums;
 using SOS.Lib.Gis;
 using SOS.Lib.Models.Gis;
-using SOS.Shared.Api.Dtos;
-using SOS.Shared.Api.Dtos.Enum;
-using SOS.Shared.Api.Dtos.Filter;
 using System.Text.Json.Nodes;
 
 namespace SOS.Observations.Api.Services.AdaptiveSearch;

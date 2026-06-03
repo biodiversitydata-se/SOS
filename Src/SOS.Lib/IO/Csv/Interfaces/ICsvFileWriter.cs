@@ -1,13 +1,9 @@
 ﻿using Hangfire;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Export;
-using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Filters;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
 
-namespace SOS.Lib.IO.Excel.Interfaces;
+namespace SOS.Lib.IO.Csv.Interfaces;
 
 /// <summary>
 /// Csv file writer
@@ -36,6 +32,7 @@ public interface ICsvFileWriter
     ///  Create export file
     /// </summary>
     /// <param name="filter"></param>
+    /// <param name="additionalFiles"></param>
     /// <param name="exportPath"></param>
     /// <param name="fileName"></param>
     /// <param name="culture"></param>
@@ -44,6 +41,7 @@ public interface ICsvFileWriter
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     Task<FileExportResult> CreateFileAync(SearchFilter filter,
+        IEnumerable<(Stream Stream, string Filename)> additionalFiles,
         string exportPath,
         string fileName,
         string culture,
@@ -57,7 +55,9 @@ public interface ICsvFileWriter
         bool gzip,
         IJobCancellationToken cancellationToken);
 
-    Task<(Stream stream, string filename)> CreateFileInMemoryAsZipStreamAsync(SearchFilter filter,
+    Task<(Stream stream, string filename)> CreateFileInMemoryAsZipStreamAsync(
+       SearchFilter filter,
+       IEnumerable<(Stream Stream, string Filename)> additionalFiles,
        string culture,
        PropertyLabelType propertyLabelType,           
        IJobCancellationToken cancellationToken);

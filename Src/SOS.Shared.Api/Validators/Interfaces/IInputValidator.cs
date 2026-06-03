@@ -1,7 +1,7 @@
 ﻿using CSharpFunctionalExtensions;
 using NetTopologySuite.Geometries;
-using SOS.Shared.Api.Dtos.Enum;
-using SOS.Shared.Api.Dtos.Filter;
+using SOS.Lib.Dtos.Enum;
+using SOS.Lib.Dtos.Filter;
 using Result = CSharpFunctionalExtensions.Result;
 
 namespace SOS.Shared.Api.Validators.Interfaces;

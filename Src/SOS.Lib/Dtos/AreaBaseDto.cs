@@ -1,0 +1,37 @@
+﻿using SOS.Lib.Models.Gis;
+using SOS.Lib.Dtos.Enum;
+
+namespace SOS.Lib.Dtos;
+
+public class AreaBaseDto
+{
+    /// <summary>
+    ///     Type of area
+    /// </summary>
+    public AreaTypeDto AreaType { get; set; }
+
+    /// <summary>
+    /// Area type id
+    /// </summary>
+    public int AreaTypeId => (int)AreaType;
+
+    /// <summary>
+    /// Area bounding box
+    /// </summary>
+    public LatLonBoundingBox BoundingBox { get; set; }
+
+    /// <summary>
+    /// Feature id
+    /// </summary>
+    public string FeatureId { get; set; }
+
+    /// <summary>
+    ///     Name of area
+    /// </summary>
+    public string Name { get; set; }
+
+    /// <summary>
+    /// Unique key that is a combination of AreaType and FeatureId
+    /// </summary>
+    public string Key => $"{AreaType}-{FeatureId}";
+}

@@ -15,6 +15,7 @@ public interface IGeoJsonFileWriter
     /// Create export file
     /// </summary>
     /// <param name="filter"></param>
+    /// <param name="additionalFiles"></param>
     /// <param name="exportPath"></param>
     /// <param name="fileName"></param>
     /// <param name="culture"></param>
@@ -26,6 +27,7 @@ public interface IGeoJsonFileWriter
     /// <returns></returns>
     Task<FileExportResult> CreateFileAync(
         SearchFilter filter,
+        IEnumerable<(Stream Stream, string Filename)> additionalFiles,
         string exportPath,
         string fileName,
         string culture,
@@ -37,6 +39,7 @@ public interface IGeoJsonFileWriter
 
     Task<(Stream stream, string filename)> CreateFileInMemoryAsZipStreamAsync(
         SearchFilter filter,
+        IEnumerable<(Stream Stream, string Filename)> additionalFiles,
         string culture,
         bool flatOut,
         PropertyLabelType propertyLabelType,

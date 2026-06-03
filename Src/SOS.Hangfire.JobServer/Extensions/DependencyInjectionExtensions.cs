@@ -1,6 +1,4 @@
-﻿
-
-using Elastic.Clients.Elasticsearch.Cluster;
+﻿using Elastic.Clients.Elasticsearch.Cluster;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Extensions.Caching.Memory;
@@ -90,6 +88,8 @@ using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
+using SOS.Lib.IO.Csv;
+using SOS.Lib.IO.Csv.Interfaces;
 using SOS.Lib.IO.DwcArchive;
 using SOS.Lib.IO.DwcArchive.Interfaces;
 using SOS.Lib.IO.Excel;
@@ -210,6 +210,7 @@ public static class DependencyInjectionExtensions
             // Helpers, single instance since static data
             services.AddSingleton<IAreaNameMapper, AreaNameMapper>();
             services.AddSingleton<IAreaHelper, AreaHelper>();
+            services.AddSingleton<IFilterHelper, FilterHelper>();
             services.AddSingleton<IVocabulariesDiffHelper, VocabulariesDiffHelper>();
             services.AddSingleton<IVocabularyValueResolver, VocabularyValueResolver>();
 

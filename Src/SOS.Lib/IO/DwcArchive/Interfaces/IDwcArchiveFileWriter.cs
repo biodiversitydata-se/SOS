@@ -7,9 +7,6 @@ using SOS.Lib.Models.Processed.ProcessInfo;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
 
 namespace SOS.Lib.IO.DwcArchive.Interfaces;
 
@@ -22,6 +19,7 @@ public interface IDwcArchiveFileWriter
     /// </summary>
     /// <param name="dataProvider"></param>
     /// <param name="filter"></param>
+    /// <param name="additionalFiles"></param>
     /// <param name="fileName"></param>
     /// <param name="processedObservationRepository">The repository to read observation data from.</param>
     /// <param name="processInfo"></param>
@@ -31,6 +29,7 @@ public interface IDwcArchiveFileWriter
     Task<FileExportResult> CreateDwcArchiveFileAsync(
         DataProvider dataProvider,
         SearchFilter filter,
+        IEnumerable<(Stream Stream, string Filename)> additionalFiles,
         string fileName,
         IProcessedObservationCoreRepository processedObservationRepository,
         ProcessInfo processInfo,
@@ -44,6 +43,7 @@ public interface IDwcArchiveFileWriter
     /// </summary>
     /// <param name="dataProvider"></param>
     /// <param name="filter"></param>
+    /// <param name="additionalFiles"></param>
     /// <param name="fileName"></param>
     /// <param name="processedObservationRepository">The repository to read observation data from.</param>
     /// <param name="fieldDescriptions"></param>
@@ -54,6 +54,7 @@ public interface IDwcArchiveFileWriter
     Task<FileExportResult> CreateDwcArchiveFileAsync(
         DataProvider dataProvider,
         SearchFilter filter,
+        IEnumerable<(Stream Stream, string Filename)> additionalFiles,
         string fileName,
         IProcessedObservationCoreRepository processedObservationRepository,
         IEnumerable<FieldDescription> fieldDescriptions,
@@ -61,9 +62,21 @@ public interface IDwcArchiveFileWriter
         string exportFolderPath,
         IJobCancellationToken cancellationToken);
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="dataProvider"></param>
+    /// <param name="filter"></param>
+    /// <param name="additionalFiles"></param>
+    /// <param name="processedObservationRepository"></param>
+    /// <param name="fieldDescriptions"></param>
+    /// <param name="processInfo"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
     Task<(Stream stream, string filename)> CreateDwcArchiveFileInMemoryAsync(
         DataProvider dataProvider,
         SearchFilter filter,
+        IEnumerable<(Stream Stream, string Filename)> additionalFiles,
         IProcessedObservationCoreRepository processedObservationRepository,
         IEnumerable<FieldDescription> fieldDescriptions,
         ProcessInfo processInfo,

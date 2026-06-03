@@ -5,14 +5,10 @@ using SOS.Lib.Factories;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.TaxonListService;
 using SOS.Lib.Models.TaxonTree;
 using SOS.Lib.Repositories.Resource.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace SOS.Lib.Managers;
 
@@ -34,6 +30,68 @@ public class TaxonManager : ITaxonManager
         _logger.LogInformation("OnTaxonTreeCacheExpireSoon");
         var taxonTree = FetchTaxonTreeAsync().Result;
         _taxonTreeCache.Set(taxonTree);
+    }
+
+    private async Task<TaxonListSetsById> GetTaxonListSetsAsync()
+    {
+        var taxonListSetById = new TaxonListSetsById();
+        var taxonLists = await _taxonListRepository.GetAllAsync();
+        foreach (var taxonList in taxonLists)
+        {
+            var tuple = (Taxa: new HashSet<int>(), WithUnderlyingTaxa: new HashSet<int>());
+            tuple.Taxa = taxonList.Taxa.Select(m => m.Id).ToHashSet();
+            var taxonTree = await GetTaxonTreeAsync();
+            tuple.WithUnderlyingTaxa = taxonTree.GetUnderlyingTaxonIds(tuple.Taxa, true).ToHashSet();
+            taxonListSetById.TryAdd(taxonList.Id, tuple);
+        }
+
+        return taxonListSetById;
+    }
+
+    private async Task<TaxonTree<IBasicTaxon>> FetchTaxonTreeAsync()
+    {
+        try
+        {
+            _logger.LogInformation("FetchTaxonTreeAsync() - Get all taxa from MongoDB and create taxon tree");
+            var taxa = await GetBasicTaxaAsync();
+            var taxaDictionary = new Dictionary<int, IBasicTaxon>();
+            foreach (var taxon in taxa)
+            {
+                // Make sure no duplicates exists
+                taxaDictionary.TryAdd(taxon.Id, taxon);
+            }
+            return TaxonTreeFactory.CreateTaxonTree(taxaDictionary);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error in FetchTaxonTreeAsync()");
+            throw;
+        }
+    }
+
+    private async Task<IEnumerable<IBasicTaxon>> GetBasicTaxaAsync()
+    {
+        try
+        {
+            var builder = Builders<Taxon>.Projection;
+            ProjectionDefinition<Taxon, BasicTaxon> projection = builder.Expression(m => new BasicTaxon
+            {
+                Id = m.Id,
+                SecondaryParentDyntaxaTaxonIds = m.SecondaryParentDyntaxaTaxonIds,
+                ScientificName = m.ScientificName,
+                ScientificNameAuthorship = m.ScientificNameAuthorship,
+                VernacularName = m.VernacularName,
+                Attributes = m.Attributes
+            });
+
+            var taxa = await _processedTaxonRepository.GetAllAsync(projection);
+            return taxa;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Failed to get chunk of taxa");
+            return null;
+        }
     }
 
     /// <summary>
@@ -113,65 +171,9 @@ public class TaxonManager : ITaxonManager
         return taxonListSetsById;
     }
 
-    private async Task<TaxonListSetsById> GetTaxonListSetsAsync()
+    /// <inheritdoc />
+    public async Task<IEnumerable<TaxonList>> GetTaxonListsAsync()
     {
-        var taxonListSetById = new TaxonListSetsById();
-        var taxonLists = await _taxonListRepository.GetAllAsync();
-        foreach (var taxonList in taxonLists)
-        {
-            var tuple = (Taxa: new HashSet<int>(), WithUnderlyingTaxa: new HashSet<int>());
-            tuple.Taxa = taxonList.Taxa.Select(m => m.Id).ToHashSet();
-            var taxonTree = await GetTaxonTreeAsync();
-            tuple.WithUnderlyingTaxa = taxonTree.GetUnderlyingTaxonIds(tuple.Taxa, true).ToHashSet();
-            taxonListSetById.TryAdd(taxonList.Id, tuple);
-        }
-
-        return taxonListSetById;
-    }
-
-    private async Task<TaxonTree<IBasicTaxon>> FetchTaxonTreeAsync()
-    {
-        try
-        {
-            _logger.LogInformation("FetchTaxonTreeAsync() - Get all taxa from MongoDB and create taxon tree");
-            var taxa = await GetBasicTaxaAsync();
-            var taxaDictionary = new Dictionary<int, IBasicTaxon>();
-            foreach (var taxon in taxa)
-            {
-                // Make sure no duplicates exists
-                taxaDictionary.TryAdd(taxon.Id, taxon);
-            }
-            return TaxonTreeFactory.CreateTaxonTree(taxaDictionary);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error in FetchTaxonTreeAsync()");
-            throw;
-        }
-    }
-
-    private async Task<IEnumerable<IBasicTaxon>> GetBasicTaxaAsync()
-    {
-        try
-        {
-            var builder = Builders<Taxon>.Projection;
-            ProjectionDefinition<Taxon, BasicTaxon> projection = builder.Expression(m => new BasicTaxon
-            {
-                Id = m.Id,
-                SecondaryParentDyntaxaTaxonIds = m.SecondaryParentDyntaxaTaxonIds,
-                ScientificName = m.ScientificName,
-                ScientificNameAuthorship = m.ScientificNameAuthorship,
-                VernacularName = m.VernacularName,
-                Attributes = m.Attributes
-            });
-
-            var taxa = await _processedTaxonRepository.GetAllAsync(projection);
-            return taxa;
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, "Failed to get chunk of taxa");
-            return null;
-        }
+        return await _taxonListRepository.GetAllAsync();
     }
 }

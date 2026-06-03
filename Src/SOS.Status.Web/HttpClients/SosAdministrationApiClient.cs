@@ -1,5 +1,5 @@
-﻿using SOS.Shared.Api.Dtos;
-using SOS.Shared.Api.Dtos.Status;
+﻿using SOS.Lib.Dtos;
+using SOS.Lib.Dtos.Status;
 
 namespace SOS.Status.Web.HttpClients;
 

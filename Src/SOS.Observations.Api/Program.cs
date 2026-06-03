@@ -13,7 +13,7 @@ using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Middleware;
 using SOS.Observations.Api.Services;
 using SOS.Observations.Api.Services.AdaptiveSearchLocations;
-using SOS.Shared.Api.Extensions.Dto;
+using SOS.Lib.Extensions.Dto;
 using SOS.Shared.Api.Middleware;
 using System.Globalization;
 using System.Text.Json;

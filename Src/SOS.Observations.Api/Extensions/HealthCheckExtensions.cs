@@ -9,7 +9,7 @@ using SOS.Observations.Api.HealthChecks.Custom;
 using System;
 using System.Linq;
 
-namespace SOS.Shared.Api.Extensions.Dto;
+namespace SOS.Lib.Extensions.Dto;
 
 public static class HealthCheckExtensions
 {

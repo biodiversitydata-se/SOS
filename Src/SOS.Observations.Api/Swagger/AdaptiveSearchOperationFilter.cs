@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.OpenApi;
+using SOS.Lib.Dtos;
 using SOS.Lib.Models.Processed.Observation;
-using SOS.Shared.Api.Dtos;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Reflection;
 using Location = SOS.Lib.Models.Processed.Observation.Location;
