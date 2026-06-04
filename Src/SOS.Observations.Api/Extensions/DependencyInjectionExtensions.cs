@@ -53,7 +53,6 @@ using SOS.Shared.Api.Utilities.Objects.Interfaces;
 using SOS.Shared.Api.Validators;
 using SOS.Shared.Api.Validators.Interfaces;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using ZiggyCreatures.Caching.Fusion;
 using DataProviderManager = SOS.Observations.Api.Managers.DataProviderManager;
 using IDataProviderManager = SOS.Observations.Api.Managers.Interfaces.IDataProviderManager;

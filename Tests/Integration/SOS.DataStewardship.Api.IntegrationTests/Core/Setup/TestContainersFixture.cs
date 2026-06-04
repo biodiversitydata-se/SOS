@@ -96,9 +96,8 @@ public class TestContainersFixture : IAsyncLifetime
             .WithEnvironment("xpack.security.enabled", "false")
         .Build();
 
-        var kibanaContainer = new ContainerBuilder()
+        var kibanaContainer = new ContainerBuilder("docker.elastic.co/kibana/kibana:8.17.3")
           .WithName(Guid.NewGuid().ToString("D"))
-          .WithImage("docker.elastic.co/kibana/kibana:8.17.3")
           .WithPortBinding(5601, 5601)
           .WithNetwork(network)
           .WithEnvironment("ELASTICSEARCH_HOSTS", $"http://elastic-test-network:9200")

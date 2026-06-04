@@ -1,17 +1,17 @@
 ﻿using FizzWare.NBuilder;
 using MongoDB.Driver.GeoJsonObjectModel;
 using Moq;
+using SOS.Lib.Dtos.Enum;
+using SOS.Lib.Dtos.Filter;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Verbatim.Artportalen;
-using SOS.Observations.Api.Managers;
-using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.IntegrationTests.Extensions;
 using SOS.Observations.Api.IntegrationTests.Setup;
 using SOS.Observations.Api.IntegrationTests.Setup.Stubs;
 using SOS.Observations.Api.IntegrationTests.TestData;
 using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
-using SOS.Shared.Api.Dtos.Enum;
-using SOS.Shared.Api.Dtos.Filter;
+using SOS.Observations.Api.Managers;
+using SOS.Observations.Api.Managers.Interfaces;
 using System.Text.Json.Nodes;
 
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsEndpoints.ObservationsBySearchEndpoint;
@@ -39,12 +39,12 @@ public class AdaptiveSearchLocationsTests : TestBase
         // Act
         var firstResponse = await apiClient.PostAsync(
             "/observations/internal/adaptivesearchlocations?observationsLimit=100&cluster=false&returnInputBBox=true",
-            JsonContent.Create(searchFilter));
-        var firstResponseString = await firstResponse.Content.ReadAsStringAsync();
+            JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var firstResponseString = await firstResponse.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
         var secondResponse = await apiClient.PostAsync(
             "/observations/internal/adaptivesearchlocations?observationsLimit=100&cluster=false&returnInputBBox=true",
-            JsonContent.Create(searchFilter));
-        var secondResponseString = await secondResponse.Content.ReadAsStringAsync();
+            JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var secondResponseString = await secondResponse.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
         var firstFeatures = JsonNode.Parse(firstResponseString)!["features"]!.AsArray();
         var secondFeatures = JsonNode.Parse(secondResponseString)!["features"]!.AsArray();
 
@@ -79,11 +79,11 @@ public class AdaptiveSearchLocationsTests : TestBase
         // Act
         var largeResponse = await apiClient.PostAsync(
             "/observations/internal/adaptivesearchlocations?observationsLimit=100&cluster=false&returnInputBBox=true",
-            JsonContent.Create(largeFilter));
+            JsonContent.Create(largeFilter), TestContext.Current.CancellationToken);
         var containedResponse = await apiClient.PostAsync(
             "/observations/internal/adaptivesearchlocations?observationsLimit=100&cluster=false&returnInputBBox=true",
-            JsonContent.Create(containedFilter));
-        var containedResponseString = await containedResponse.Content.ReadAsStringAsync();
+            JsonContent.Create(containedFilter), TestContext.Current.CancellationToken);
+        var containedResponseString = await containedResponse.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
         var containedFeatures = JsonNode.Parse(containedResponseString)!["features"]!.AsArray();
 
         // Assert
@@ -112,7 +112,7 @@ public class AdaptiveSearchLocationsTests : TestBase
         // Act
         var response = await apiClient.PostAsync(
             "/observations/internal/adaptivesearchlocations?observationsLimit=5&cluster=false&returnInputBBox=true",
-            JsonContent.Create(searchFilter));
+            JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -141,11 +141,11 @@ public class AdaptiveSearchLocationsTests : TestBase
         // Act
         var largeResponse = await apiClient.PostAsync(
             "/observations/internal/adaptivesearchlocations?observationsLimit=100&cluster=false&returnInputBBox=true",
-            JsonContent.Create(largeFilter));
+            JsonContent.Create(largeFilter), TestContext.Current.CancellationToken);
         var countAndExtentCallsAfterLargeRequest = observationManagerProbe.CountAndExtentCalls;
         var containedResponse = await apiClient.PostAsync(
             "/observations/internal/adaptivesearchlocations?observationsLimit=100&cluster=false&returnInputBBox=true",
-            JsonContent.Create(containedFilter));
+            JsonContent.Create(containedFilter), TestContext.Current.CancellationToken);
 
         // Assert
         largeResponse.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -172,13 +172,13 @@ public class AdaptiveSearchLocationsTests : TestBase
         // Act
         var bypassResponse = await apiClient.PostAsync(
             "/observations/internal/adaptivesearchlocations?observationsLimit=100&cluster=false&returnInputBBox=true&useCache=false",
-            JsonContent.Create(searchFilter));
+            JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
         var cacheEnabledResponse = await apiClient.PostAsync(
             "/observations/internal/adaptivesearchlocations?observationsLimit=100&cluster=false&returnInputBBox=true",
-            JsonContent.Create(searchFilter));
+            JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
         var cachedResponse = await apiClient.PostAsync(
             "/observations/internal/adaptivesearchlocations?observationsLimit=100&cluster=false&returnInputBBox=true",
-            JsonContent.Create(searchFilter));
+            JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
 
         // Assert
         bypassResponse.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -206,12 +206,12 @@ public class AdaptiveSearchLocationsTests : TestBase
         // Act
         var thresholdEqualsCountResponse = await apiClient.PostAsync(
             $"{baseUrl}&minLocationCountBeforeClustering=3",
-            JsonContent.Create(searchFilter));
-        var thresholdEqualsCountResponseString = await thresholdEqualsCountResponse.Content.ReadAsStringAsync();
+            JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var thresholdEqualsCountResponseString = await thresholdEqualsCountResponse.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
         var thresholdBelowCountResponse = await apiClient.PostAsync(
             $"{baseUrl}&minLocationCountBeforeClustering=2",
-            JsonContent.Create(searchFilter));
-        var thresholdBelowCountResponseString = await thresholdBelowCountResponse.Content.ReadAsStringAsync();
+            JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var thresholdBelowCountResponseString = await thresholdBelowCountResponse.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
         var thresholdEqualsCountFeatures = JsonNode.Parse(thresholdEqualsCountResponseString)!["features"]!.AsArray();
         var thresholdBelowCountFeatures = JsonNode.Parse(thresholdBelowCountResponseString)!["features"]!.AsArray();
 
@@ -233,8 +233,8 @@ public class AdaptiveSearchLocationsTests : TestBase
         // Act
         var response = await apiClient.PostAsync(
             "/observations/internal/adaptivesearchlocations?observationsLimit=100&cluster=false&returnInputBBox=true&createPolygons=WhenNeeded",
-            JsonContent.Create(searchFilter));
-        var responseString = await response.Content.ReadAsStringAsync();
+            JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var responseString = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -257,8 +257,8 @@ public class AdaptiveSearchLocationsTests : TestBase
         // Act
         var response = await apiClient.PostAsync(
             "/observations/internal/adaptivesearchlocations?observationsLimit=100&cluster=true&returnInputBBox=true&clusteringAlgorithm=Sweref99TmFastGreedy&minLocationsPerCluster=2&minLocationCountBeforeClustering=2",
-            JsonContent.Create(searchFilter));
-        var responseString = await response.Content.ReadAsStringAsync();
+            JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var responseString = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
         var features = JsonNode.Parse(responseString)!["features"]!.AsArray();
 
         // Assert
@@ -315,8 +315,8 @@ public class AdaptiveSearchLocationsTests : TestBase
         // Act
         var response = await apiClient.PostAsync(
             "/observations/internal/adaptivesearchlocations?observationsLimit=100&cluster=false&returnInputBBox=true",
-            JsonContent.Create(searchFilter));
-        var responseString = await response.Content.ReadAsStringAsync();
+            JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var responseString = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
         var propertiesByLocationId = GetFeaturePropertiesByLocationId(responseString);
 
         // Assert
@@ -398,8 +398,8 @@ public class AdaptiveSearchLocationsTests : TestBase
         // Act
         var response = await apiClient.PostAsync(
             "/observations/internal/adaptivesearchlocations?observationsLimit=100&cluster=false&returnInputBBox=true&cutoffYear=2024",
-            JsonContent.Create(searchFilter));
-        var responseString = await response.Content.ReadAsStringAsync();
+            JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var responseString = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
         var propertiesByLocationId = GetFeaturePropertiesByLocationId(responseString);
 
         // Assert
@@ -439,10 +439,10 @@ public class AdaptiveSearchLocationsTests : TestBase
         // Act
         var cacheWarmupResponse = await apiClient.PostAsync(
             "/observations/internal/adaptivesearchlocations?observationsLimit=100&cluster=false&returnInputBBox=true",
-            JsonContent.Create(searchFilter));
+            JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
         var cutoffResponse = await apiClient.PostAsync(
             "/observations/internal/adaptivesearchlocations?observationsLimit=100&cluster=false&returnInputBBox=true&cutoffYear=2024",
-            JsonContent.Create(searchFilter));
+            JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
         var cutoffResponseString = await cutoffResponse.Content.ReadAsStringAsync();
         var propertiesByLocationId = GetFeaturePropertiesByLocationId(cutoffResponseString);
 
@@ -488,8 +488,8 @@ public class AdaptiveSearchLocationsTests : TestBase
         // Act
         var response = await apiClient.PostAsync(
             "/observations/internal/adaptivesearchlocations?observationsLimit=100&cluster=false&returnInputBBox=true&sensitiveObservations=true&cutoffYear=2024",
-            JsonContent.Create(searchFilter));
-        var responseString = await response.Content.ReadAsStringAsync();
+            JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var responseString = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
         var propertiesByLocationId = GetFeaturePropertiesByLocationId(responseString);
 
         // Assert

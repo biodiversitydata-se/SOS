@@ -1,10 +1,10 @@
 ﻿using FizzWare.NBuilder;
+using SOS.Lib.Dtos;
+using SOS.Lib.Dtos.Filter;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Verbatim.Artportalen;
-using SOS.Shared.Api.Dtos.Filter;
 using SOS.Observations.Api.IntegrationTests.Setup;
 using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
-using SOS.Lib.Dtos;
 
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsEndpoints.ObservationsBySearchInternalEndpoint;
 
@@ -35,12 +35,12 @@ public class PolygonLocationTests : TestBase
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
         var apiClient = TestFixture.CreateApiClient();
         var searchFilter = new SearchFilterInternalDto();
-
+        
         // Act
         var response = await apiClient.PostAsync(
             "/observations/internal/search?includePolygonLocations=true",
-            JsonContent.Create(searchFilter));
-        var result = await response.Content.ReadFromJsonAsync<GeoPagedResultWithMetadataDto<Observation>>(JsonSerializerOptions);
+            JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var result = await response.Content.ReadFromJsonAsync<GeoPagedResultWithMetadataDto<Observation>>(JsonSerializerOptions, TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -69,8 +69,8 @@ public class PolygonLocationTests : TestBase
         // Act
         var response = await apiClient.PostAsync(
             "/observations/internal/search",
-            JsonContent.Create(searchFilter));
-        var result = await response.Content.ReadFromJsonAsync<GeoPagedResultWithMetadataDto<Observation>>(JsonSerializerOptions);
+            JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var result = await response.Content.ReadFromJsonAsync<GeoPagedResultWithMetadataDto<Observation>>(JsonSerializerOptions, TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -94,8 +94,8 @@ public class PolygonLocationTests : TestBase
         // Act
         var response = await apiClient.PostAsync(
             "/observations/internal/search?includePolygonLocations=true",
-            JsonContent.Create(searchFilter));
-        var result = await response.Content.ReadFromJsonAsync<GeoPagedResultWithMetadataDto<Observation>>(JsonSerializerOptions);
+            JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var result = await response.Content.ReadFromJsonAsync<GeoPagedResultWithMetadataDto<Observation>>(JsonSerializerOptions, TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
