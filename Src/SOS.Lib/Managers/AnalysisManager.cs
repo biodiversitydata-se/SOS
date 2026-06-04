@@ -375,6 +375,15 @@ public class AnalysisManager : IAnalysisManager
                         .Select(f => f.Value.Geometry as Polygon)
                             .ToArray()
                                 .ConcaveHull(useCenterPoint, alphaValue, useEdgeLengthRatio, allowHoles);
+
+                    if (eooGeometry.OgcGeometryType != OgcGeometryType.Polygon)
+                    {
+                        // If it's not a polygon, set useCenterPoint = false instead.
+                        eooGeometry = gridCellFeaturesMetric
+                                .Select(f => f.Value.Geometry as Polygon)
+                                    .ToArray()
+                                        .ConcaveHull(false, alphaValue, useEdgeLengthRatio, allowHoles);
+                    }                    
                 }
                 catch (Exception ex)
                 {
