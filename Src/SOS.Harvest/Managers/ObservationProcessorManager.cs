@@ -2,12 +2,10 @@
 using SOS.Harvest.Processors.Artportalen.Interfaces;
 using SOS.Harvest.Processors.DarwinCoreArchive.Interfaces;
 using SOS.Harvest.Processors.FishData.Interfaces;
-using SOS.Harvest.Processors.iNaturalist;
 using SOS.Harvest.Processors.iNaturalist.Interfaces;
 using SOS.Harvest.Processors.Interfaces;
 using SOS.Harvest.Processors.Kul.Interfaces;
 using SOS.Harvest.Processors.Mvm.Interfaces;
-using SOS.Harvest.Processors.Nors.Interfaces;
 using SOS.Harvest.Processors.ObservationDatabase.Interfaces;
 using SOS.Harvest.Processors.Sers.Interfaces;
 using SOS.Harvest.Processors.Shark.Interfaces;
@@ -27,7 +25,6 @@ public class ObservationProcessorManager : IObservationProcessorManager
         IFishDataObservationProcessor fishDataObservationProcessor,
         IKulObservationProcessor kulObservationProcessor,
         IMvmObservationProcessor mvmObservationProcessor,
-        INorsObservationProcessor norsObservationProcessor,
         IObservationDatabaseProcessor observationDatabaseProcessor,
         ISersObservationProcessor sersObservationProcessor,
         ISharkObservationProcessor sharkObservationProcessor,
@@ -40,7 +37,6 @@ public class ObservationProcessorManager : IObservationProcessorManager
         if (fishDataObservationProcessor == null) throw new ArgumentNullException(nameof(fishDataObservationProcessor));
         if (kulObservationProcessor == null) throw new ArgumentNullException(nameof(kulObservationProcessor));
         if (mvmObservationProcessor == null) throw new ArgumentNullException(nameof(mvmObservationProcessor));
-        if (norsObservationProcessor == null) throw new ArgumentNullException(nameof(norsObservationProcessor));
         if (sersObservationProcessor == null) throw new ArgumentNullException(nameof(sersObservationProcessor));
         if (sharkObservationProcessor == null) throw new ArgumentNullException(nameof(sharkObservationProcessor));
         if (virtualHerbariumObservationProcessor == null) throw new ArgumentNullException(nameof(virtualHerbariumObservationProcessor));
@@ -54,8 +50,8 @@ public class ObservationProcessorManager : IObservationProcessorManager
             {DataProviderType.FishDataObservations, fishDataObservationProcessor},
             {DataProviderType.KULObservations, kulObservationProcessor},
             {DataProviderType.MvmObservations, mvmObservationProcessor},
-            {DataProviderType.NorsObservations, norsObservationProcessor},
             {DataProviderType.ObservationDatabase, observationDatabaseProcessor},
+            {DataProviderType.NorsObservations, dwcaObservationProcessor},
             {DataProviderType.SersObservations, sersObservationProcessor},
             {DataProviderType.SharkObservations, sharkObservationProcessor},
             {DataProviderType.VirtualHerbariumObservations, virtualHerbariumObservationProcessor},

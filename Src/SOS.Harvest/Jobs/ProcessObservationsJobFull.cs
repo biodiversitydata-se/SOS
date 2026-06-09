@@ -625,13 +625,14 @@ public class ProcessObservationsJobFull : ProcessObservationsJobBase, IProcessOb
         _datasetProcessorByType = new Dictionary<DataProviderType, IDatasetProcessor>
         {
             {DataProviderType.DwcA, dwcaDatasetProcessor},
-            {DataProviderType.ArtportalenObservations, artportalenDatasetProcessor},
+            {DataProviderType.ArtportalenObservations, artportalenDatasetProcessor}
         };
 
         _eventProcessorByType = new Dictionary<DataProviderType, IEventProcessor>
         {
             {DataProviderType.DwcA, dwcaEventProcessor},
             {DataProviderType.ArtportalenObservations, artportalenEventProcessor},
+            {DataProviderType.NorsObservations, dwcaEventProcessor}
         };
 
         _cacheManager = cacheManager ?? throw new ArgumentNullException(nameof(cacheManager));

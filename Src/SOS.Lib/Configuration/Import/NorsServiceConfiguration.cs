@@ -1,5 +1,5 @@
 ﻿namespace SOS.Lib.Configuration.Import;
 
-public class NorsServiceConfiguration : AquaSupportConfiguration
+public class NorsServiceConfiguration : AquaConfiguration
 {
 }

@@ -57,8 +57,6 @@ using SOS.Harvest.Processors.Kul;
 using SOS.Harvest.Processors.Kul.Interfaces;
 using SOS.Harvest.Processors.Mvm;
 using SOS.Harvest.Processors.Mvm.Interfaces;
-using SOS.Harvest.Processors.Nors;
-using SOS.Harvest.Processors.Nors.Interfaces;
 using SOS.Harvest.Processors.ObservationDatabase;
 using SOS.Harvest.Processors.ObservationDatabase.Interfaces;
 using SOS.Harvest.Processors.Sers;
@@ -236,8 +234,12 @@ public static class DependencyInjectionExtensions
             services.AddScoped<ISightingRelationRepository, SightingRelationRepository>();
             services.AddScoped<ISpeciesCollectionItemRepository, SpeciesCollectionItemRepository>();
 
+            // Aqua
+            services.AddScoped<Harvest.Repositories.Source.Aqua.Interfaces.INorsRepository, Harvest.Repositories.Source.Aqua.NorsRepository>();
+
             // Repositories resource
             services.AddScoped<Lib.Repositories.Resource.Interfaces.IAreaRepository, Lib.Repositories.Resource.AreaRepository>();
+           
             services.AddScoped<IDataProviderRepository, DataProviderRepository>();
             services.AddScoped<IHarvestInfoRepository, HarvestInfoRepository>();
             services.AddScoped<IInvalidObservationRepository, InvalidObservationRepository>();
@@ -301,7 +303,6 @@ public static class DependencyInjectionExtensions
             services.AddScoped<IFishDataObservationProcessor, FishDataObservationProcessor>();
             services.AddScoped<IKulObservationProcessor, KulObservationProcessor>();
             services.AddScoped<IMvmObservationProcessor, MvmObservationProcessor>();
-            services.AddScoped<INorsObservationProcessor, NorsObservationProcessor>();
             services.AddScoped<IObservationDatabaseProcessor, ObservationDatabaseProcessor>();
             services.AddScoped<ISersObservationProcessor, SersObservationProcessor>();
             services.AddScoped<ISharkObservationProcessor, SharkObservationProcessor>();            
@@ -363,7 +364,6 @@ public static class DependencyInjectionExtensions
             services.AddScoped<IiNaturalistObservationService, iNaturalistObservationService>();
             services.AddScoped<iNaturalistApiObservationService>();
             services.AddScoped<IMvmObservationService, MvmObservationService>();
-            services.AddScoped<INorsObservationService, NorsObservationService>();
             services.AddScoped<IObservationDatabaseDataService, ObservationDatabaseDataService>();
             services.AddScoped<ISersObservationService, SersObservationService>();
             services.AddScoped<ISharkObservationService, SharkObservationService>();

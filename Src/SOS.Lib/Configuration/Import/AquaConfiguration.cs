@@ -1,11 +1,16 @@
 ﻿namespace SOS.Lib.Configuration.Import;
 
-public class AquaSupportConfiguration
+public class AquaConfiguration
 {
     /// <summary>
     ///     Address for the service
     /// </summary>
     public string BaseAddress { get; set; }
+
+    /// <summary>
+    /// Gets or sets the connection string used to establish a connection to the data source.
+    /// </summary>
+    public string ConnectionString { get; set; }
 
     /// <summary>
     ///     The year to start harvest from.

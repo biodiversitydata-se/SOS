@@ -254,7 +254,12 @@ public class Program
         sb.AppendLine($"[MvmServiceConfiguration].[MaxReturnedChangesInOnePage]: {_importConfiguration.MvmServiceConfiguration.MaxReturnedChangesInOnePage}");
         sb.AppendLine("");
 
-        sb.AppendLine($"[NorsServiceConfiguration].[BaseAddress]: {_importConfiguration.NorsServiceConfiguration.BaseAddress}");
+        firstPartEndIndex = _importConfiguration.NorsServiceConfiguration.ConnectionString?.IndexOf(';') ?? 0;
+        if (firstPartEndIndex > 0)
+        {
+            sb.AppendLine($"[NorsServiceConfiguration].[ConnectionString]: {_importConfiguration.NorsServiceConfiguration.ConnectionString?.Substring(0, firstPartEndIndex)}");
+        }
+        
         sb.AppendLine($"[NorsServiceConfiguration].[MaxNumberOfSightingsHarvested]: {_importConfiguration.NorsServiceConfiguration.MaxNumberOfSightingsHarvested}");
         sb.AppendLine($"[NorsServiceConfiguration].[StartHarvestYear]: {_importConfiguration.NorsServiceConfiguration.StartHarvestYear}");
         sb.AppendLine("");

@@ -293,7 +293,7 @@
     "PreviousProcessLimit": 95,
     "SupportDatasets": false,
     "SupportDynamicEml": false,
-    "SupportEvents": false,
+    "SupportEvents": true,
     "SupportIncrementalHarvest": false,
     "Type": "NorsObservations",
     "Url": "https://www.slu.se/en/departments/aquatic-resources1/databases/national-register-of-survey-test-fishing-nors/",

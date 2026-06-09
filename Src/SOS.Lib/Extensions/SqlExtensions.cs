@@ -28,4 +28,26 @@ public static class SqlExtensions
             }
         }
     }
+
+    extension(IEnumerable<string> list)
+    {
+        /// <summary>
+        /// Cast list of strings to list of SqlDataRecords
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<SqlDataRecord> ToSqlRecords()
+        {
+            if (!list?.Any() ?? true)
+            {
+                yield break;
+            }
+            var record = new SqlDataRecord(new SqlMetaData("Value", SqlDbType.VarChar, 512));
+
+            foreach (var item in list)
+            {
+                record.SetString(0, item);
+                yield return record;
+            }
+        }
+    }
 }
