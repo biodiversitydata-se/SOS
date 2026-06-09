@@ -32,6 +32,8 @@ public class LocationObservationSummary
 
     public List<DebugObservation>? DebugObservations { get; set; }
 
+    public List<LocationObservationDisplayStatusSummary> DisplayStatusSummaries { get; set; } = new();
+
     public ObservationStatusCounts ToStatusCounts()
     {
         return new ObservationStatusCounts(
@@ -41,4 +43,19 @@ public class LocationObservationSummary
             RedlistedCount,
             InvasiveInSwedenCount);
     }
+}
+
+public class LocationObservationDisplayStatusSummary
+{
+    public bool IsPresent { get; set; }
+
+    public bool IsSensitive { get; set; }
+
+    public bool IsTreated { get; set; }
+
+    public bool IsNotRecovered { get; set; }
+
+    public int? EndYear { get; set; }
+
+    public int Count { get; set; }
 }

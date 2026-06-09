@@ -10,6 +10,8 @@ public sealed class AdaptiveSearchLocationsTimings
 
     public TimeSpan ElasticsearchObservations { get; set; }
 
+    public TimeSpan ElasticsearchRepresentativeLocations { get; set; }
+
     public TimeSpan ElasticsearchGeogrid { get; set; }
 
     public TimeSpan PolygonGeometries { get; set; }
@@ -18,7 +20,7 @@ public sealed class AdaptiveSearchLocationsTimings
 
     public string ToHeaderValue(TimeSpan total)
     {
-        var elasticsearch = ElasticsearchCountAndExtent + ElasticsearchObservations + ElasticsearchGeogrid;
+        var elasticsearch = ElasticsearchCountAndExtent + ElasticsearchObservations + ElasticsearchRepresentativeLocations + ElasticsearchGeogrid;
         var measured = CacheLookup + elasticsearch + PolygonGeometries + Clustering;
         var other = total - measured;
         if (other < TimeSpan.Zero)
@@ -32,6 +34,7 @@ public sealed class AdaptiveSearchLocationsTimings
             $"elasticsearch={Format(elasticsearch)}",
             $"countExtent={Format(ElasticsearchCountAndExtent)}",
             $"observations={Format(ElasticsearchObservations)}",
+            $"representativeLocations={Format(ElasticsearchRepresentativeLocations)}",
             $"geogrid={Format(ElasticsearchGeogrid)}",
             $"cache={Format(CacheLookup)}",
             $"polygons={Format(PolygonGeometries)}",

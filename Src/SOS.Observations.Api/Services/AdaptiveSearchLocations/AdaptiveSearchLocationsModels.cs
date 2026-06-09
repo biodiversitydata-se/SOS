@@ -4,6 +4,13 @@ using SOS.Lib.Models.Gis;
 
 namespace SOS.Observations.Api.Services.AdaptiveSearchLocations;
 
+public enum AdaptiveSearchLocationsStrategy
+{
+    ObservationsThenGrid = 1,
+    ObservationsThenLocationsThenGrid = 2,
+    LocationsThenGrid = 3
+}
+
 public sealed class AdaptiveSearchLocationsRequest
 {
     public int? RoleId { get; init; }
@@ -26,6 +33,8 @@ public sealed class AdaptiveSearchLocationsRequest
     public CreatePolygonsMode CreatePolygons { get; init; }
     public bool UseCache { get; init; }
     public bool CreateSampleObservations { get; init; }
+    public int? LocationAggregationLimit { get; init; }
+    public AdaptiveSearchLocationsStrategy AdaptiveSearchStrategy { get; init; } = AdaptiveSearchLocationsStrategy.ObservationsThenGrid;
 }
 
 public sealed class AdaptiveSearchLocationsResult
@@ -35,10 +44,13 @@ public sealed class AdaptiveSearchLocationsResult
     public IReadOnlyList<LocationClusterItem>? LocationClusterItems { get; init; }
     public LatLonBoundingBox? Bbox { get; init; }
     public long ObservationsTotalCount { get; init; }
+    public long? EstimatedLocationCount { get; init; }
     public long FeatureCount { get; init; }
     public long? LocationsBeforeClustering { get; init; }
     public int? Zoom { get; init; }
     public required string CacheStatus { get; init; }
+    public string? LocationAggregation { get; init; }
+    public bool LocationPropertiesEstimated { get; init; }
     public AdaptiveSearchLocationsTimings Timings { get; init; } = new();
 }
 
@@ -49,6 +61,7 @@ internal sealed class CachedLocationAggregate
     public List<string> LocationIds { get; init; } = new();
     public List<int> TaxonIds { get; init; } = new();
     public required LocationObservationSummary ObservationSummary { get; init; }
+    public bool IsEstimated { get; init; }
 }
 
 internal sealed record PolygonGeometryDisplayDecision(

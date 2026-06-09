@@ -38,11 +38,14 @@ public partial class LocationsSearch : IAsyncDisposable
     private bool useCache = true;
     private string clusteringAlgorithm = "Sweref99TmFastGreedy";
     private readonly string[] clusteringAlgorithms = ["Sweref99TmFastGreedy", "Sweref99TmGreedy", "DbScan"];
-    private readonly int[] adaptiveSearchLimitOptions = [500, 1000, 2000, 5000, 10000];
+    private readonly int[] adaptiveSearchLimitOptions = [250, 500, 1000, 2000, 5000, 10000];
+    private readonly int[] locationAggregationLimitOptions = [25, 50, 100, 250, 500, 1000, 2500, 5000];
     private readonly int[] bboxBufferPercentageOptions = [0, 5, 10, 25, 50];
     private string copyMapGeoJsonIcon = Icons.Material.Filled.ContentCopy;
     private int observationsLimit = 5000;
     private int maxGridCells = 1000;
+    private int? locationAggregationLimit;
+    private AdaptiveSearchLocationsStrategy adaptiveSearchStrategy = AdaptiveSearchLocationsStrategy.ObservationsThenGrid;
     private int? cutoffYear;
     private int bboxBufferPercent = 25;
     private bool includeBoundingBoxInSearch = true;
@@ -61,6 +64,7 @@ public partial class LocationsSearch : IAsyncDisposable
     private string lastSearchDurationText = "-";
     private string lastResponseSizeText = "-";
     private string observationsTotalCountText = "-";
+    private string estimatedLocationCountText = "-";
     private string locationsBeforeClusteringText = "-";
     private string lastCacheStatusText = "-";
     private string lastResultTypeText = "-";
@@ -276,6 +280,8 @@ public partial class LocationsSearch : IAsyncDisposable
                 searchFilterInternal,
                 observationsLimit,
                 maxGridCells,
+                locationAggregationLimit,
+                adaptiveSearchStrategy,
                 cluster,
                 clusteringAlgorithm,
                 createPolygonsMode,
@@ -290,6 +296,7 @@ public partial class LocationsSearch : IAsyncDisposable
 
             lastResponseSizeText = FormatResponseSize(searchResult.ResponseSizeBytes);
             observationsTotalCountText = searchResult.ObservationsTotalCount?.ToString("N0") ?? "-";
+            estimatedLocationCountText = searchResult.EstimatedLocationCount?.ToString("N0") ?? "-";
             locationsBeforeClusteringText = searchResult.LocationsBeforeClustering?.ToString("N0") ?? "-";
             lastCacheStatusText = FormatCacheStatus(searchResult.CacheStatus);
             lastResultType = NormalizeResultType(searchResult.ResultType);
@@ -530,7 +537,7 @@ public partial class LocationsSearch : IAsyncDisposable
     {
         return string.Create(
             CultureInfo.InvariantCulture,
-            $"{searchFilter}|includeBoundingBox={includeBoundingBoxInSearch}|bboxBufferPercent={(includeBoundingBoxInSearch ? bboxBufferPercent : 0)}|observationsLimit={observationsLimit}|maxGridCells={maxGridCells}|cutoffYear={cutoffYear}|cluster={cluster}|sampleObservations={createSampleObservations}|useCache={useCache}|algorithm={clusteringAlgorithm}|polygons={createPolygonsMode}|clusterRadiusPx={clusterRadiusPx}|minimalLocations={minLocationsPerCluster}|minLocationCountBeforeClustering={minLocationCountBeforeClustering}");
+            $"{searchFilter}|includeBoundingBox={includeBoundingBoxInSearch}|bboxBufferPercent={(includeBoundingBoxInSearch ? bboxBufferPercent : 0)}|observationsLimit={observationsLimit}|maxGridCells={maxGridCells}|locationAggregationLimit={locationAggregationLimit}|adaptiveSearchStrategy={adaptiveSearchStrategy}|cutoffYear={cutoffYear}|cluster={cluster}|sampleObservations={createSampleObservations}|useCache={useCache}|algorithm={clusteringAlgorithm}|polygons={createPolygonsMode}|clusterRadiusPx={clusterRadiusPx}|minimalLocations={minLocationsPerCluster}|minLocationCountBeforeClustering={minLocationCountBeforeClustering}");
     }
 
     private static MapExtentBounds ToMapExtentBounds(MapExtent extent)

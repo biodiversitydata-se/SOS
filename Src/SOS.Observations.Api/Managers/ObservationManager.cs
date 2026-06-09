@@ -186,6 +186,43 @@ public class ObservationManager : IObservationManager
         }
     }
 
+    public async Task<LocationRepresentativeResult<JsonObject>> GetLocationRepresentativeChunkAsync(
+        int? roleId,
+        string authorizationApplicationIdentifier,
+        SearchFilter filter,
+        int take,
+        string collapseField)
+    {
+        try
+        {
+            await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
+            var response = await _processedObservationRepository.GetLocationRepresentativeChunkAsync<JsonObject>(
+                filter,
+                take,
+                collapseField);
+            response.Records = await PostProcessObservationsAsync(
+                filter,
+                filter.ExtendedAuthorization.ProtectionFilter,
+                response.Records,
+                filter.FieldTranslationCultureCode);
+            return response;
+        }
+        catch (AuthenticationRequiredException)
+        {
+            throw;
+        }
+        catch (TimeoutException e)
+        {
+            _logger.LogError(e, "Get representative location observations timeout");
+            throw;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Failed to get representative location observations");
+            return null;
+        }
+    }
+
     /// <inheritdoc />    
     public async Task<SearchAfterResult<JsonObject, string>> GetChunkBySearchAfterAsync(
         int? roleId,
@@ -356,10 +393,11 @@ public class ObservationManager : IObservationManager
         await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
         return await _processedObservationRepository.GetMatchCountAsync(filter, skipAuthorizationFilters);
     }
-    public async Task<(long Count, LatLonBoundingBox? Extent)> GetCountAndExtentAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilterBase filter, bool skipAuthorizationFilters = false)
+
+    public async Task<(long Count, LatLonBoundingBox? Extent, long EstimatedLocationCount)> GetCountAndExtentAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilterBase filter, bool skipAuthorizationFilters = false)
     {
         await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
-        (long Count, LatLonBoundingBox? Extent) result = await _processedObservationRepository.GetCountAndExtentAsync(filter, skipAuthorizationFilters);
+        (long Count, LatLonBoundingBox? Extent, long EstimatedLocationCount) result = await _processedObservationRepository.GetCountAndExtentAsync(filter, skipAuthorizationFilters);        
         return result;
     }
 

@@ -1570,6 +1570,58 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
         };
     }
 
+    public async Task<LocationRepresentativeResult<T>> GetLocationRepresentativeChunkAsync<T>(
+        SearchFilter filter,
+        int take,
+        string collapseField,
+        bool getAllFields = false) where T : class
+    {
+        var indexNames = GetCurrentIndex(filter);
+        var (query, excludeQuery) = GetCoreQueries<T>(filter);
+
+        var searchResponse = await Client.SearchAsync<T>(s => s
+            .Indices(indexNames)
+            .Source(getAllFields ? new SourceConfig(true) : filter.Output?.Fields.ToProjection(filter is SearchFilterInternal))
+            .Size(take)
+            .Query(q => q
+                .Bool(b => b
+                    .MustNot(excludeQuery.ToArray())
+                    .Filter(query.ToArray())
+                )
+            )
+            .Collapse(c => c.Field(collapseField))
+            .Aggregations(a => a
+                .Add("locationObservationCounts", a => a
+                    .Terms(t => t
+                        .Field(collapseField)
+                        .Size(take)
+                    )
+                )
+            )
+            .TrackTotalHits(new TrackHits(false))
+        );
+
+        searchResponse.ThrowIfInvalid();
+
+        var observationCountByLocationId = searchResponse
+            .Aggregations
+            .GetStringTerms("locationObservationCounts")
+            .Buckets?
+            .Where(bucket => bucket.Key.Value != null)
+            .ToDictionary(
+                bucket => bucket.Key.Value!.ToString(),
+                bucket => bucket.DocCount,
+                StringComparer.OrdinalIgnoreCase) ?? new Dictionary<string, long>(StringComparer.OrdinalIgnoreCase);
+
+        return new LocationRepresentativeResult<T>
+        {
+            Records = searchResponse.Documents,
+            Take = take,
+            TotalCount = searchResponse.Documents?.Count ?? 0,
+            ObservationCountByLocationId = observationCountByLocationId
+        };
+    }
+
     /// <inheritdoc />
     public async Task<List<EventOccurrenceAggregationItem>> GetEventOccurrenceItemsAsync(SearchFilter filter)
     {
@@ -1959,13 +2011,14 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
         return countResponse.Count;
     }
     
-    public async Task<(long Count, LatLonBoundingBox? Extent)> GetCountAndExtentAsync(SearchFilterBase filter, bool skipAuthorizationFilters = false)
+    public async Task<(long Count, LatLonBoundingBox? Extent, long EstimatedLocationCount)> GetCountAndExtentAsync(SearchFilterBase filter, bool skipAuthorizationFilters = false)
     {
         var indexNames = GetCurrentIndex(filter, skipAuthorizationFilters);
         var (query, excludeQuery) = GetCoreQueries<dynamic>(filter, skipAuthorizationFilters);
-        
+
         var geoFieldName = "location.pointLocation";
-        var aggName = "countAndExtentAgg";
+        var extentAggName = "countAndExtentAgg";
+        var locationCardinalityAggName = "distinctLocationsAgg";
 
         var searchResponse = await Client.SearchAsync<dynamic>(s => s
             .Index(indexNames)
@@ -1978,24 +2031,24 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
                 )
             )
             .Aggregations(a => a  
-                .Add(aggName, a => a
+                .Add(extentAggName, a => a
                     .GeoBounds(gb => gb
                         .Field(geoFieldName)
                         .WrapLongitude(true)
                     )
                 )
-                //.Add(aggName + "_count", a => a
-                //    .ValueCount(vc => vc
-                //        .Field("occurrence.occurrenceId")
-                //    )
-                //)
+                .Add(locationCardinalityAggName, a => a
+                    .Cardinality(c => c
+                        .Field("location.locationId")
+                    )
+                )
             )
         );        
 
         searchResponse.ThrowIfInvalid();
-        
+
         var count = searchResponse.Total;        
-        GeoBoundsAggregate? extentAgg = searchResponse.Aggregations?.GetGeoBounds(aggName);        
+        GeoBoundsAggregate? extentAgg = searchResponse.Aggregations?.GetGeoBounds(extentAggName);        
         LatLonBoundingBox? extentResult = null;        
         if (extentAgg != null && extentAgg.Bounds != null)
         {
@@ -2013,7 +2066,9 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
             }          
         }
 
-        return (count, extentResult);
+        var estimatedLocationCount = searchResponse.Aggregations?.GetCardinality(locationCardinalityAggName)?.Value ?? 0;
+
+        return (count, extentResult, (long)estimatedLocationCount);
     }
 
     /// <inheritdoc />

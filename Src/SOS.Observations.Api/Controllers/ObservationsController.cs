@@ -2159,6 +2159,8 @@ public class ObservationsController : ControllerBase
     /// <param name="bboxQuery">Optional WGS84 bounding box query parameter using minLongitude,minLatitude,maxLongitude,maxLatitude. If provided, it overrides the filter bounding box.</param>
     /// <param name="useCache">If true, reusable location aggregates may be read from and written to cache.</param>
     /// <param name="createSampleObservations">If true, sample observations will be created for map symbol debugging.</param>
+    /// <param name="locationAggregationLimit">If specified, representative location aggregation is used when the estimated location count is lower than this value.</param>
+    /// <param name="adaptiveSearchStrategy">Controls whether the adaptive search tries observations, representative locations, or grid aggregation.</param>
     /// <param name="cutoffYear">If specified, observations are rendered differently before and after this year. Brytår på svenska.</param>
     /// <returns>
     /// GeoJSON FeatureCollection with either grid cells or location item features.
@@ -2190,6 +2192,8 @@ public class ObservationsController : ControllerBase
         [FromQuery(Name = "bbox")] string? bboxQuery = null,
         [FromQuery] bool useCache = true,
         [FromQuery] bool createSampleObservations = false,
+        [FromQuery] int? locationAggregationLimit = null,
+        [FromQuery] AdaptiveSearchLocationsStrategy adaptiveSearchStrategy = AdaptiveSearchLocationsStrategy.ObservationsThenGrid,
         [FromQuery] int? cutoffYear = null)
     {
         var totalStopwatch = Stopwatch.StartNew();
@@ -2219,6 +2223,7 @@ public class ObservationsController : ControllerBase
                 _inputValidator.ValidateDouble(clusterRadiusPx, 1, 500, nameof(clusterRadiusPx)),
                 _inputValidator.ValidateInt(minLocationsPerCluster, 2, 100, nameof(minLocationsPerCluster)),
                 _inputValidator.ValidateInt(minLocationCountBeforeClustering, 0, 10000, nameof(minLocationCountBeforeClustering)),
+                ValidateNullableInt(locationAggregationLimit, 1, 10000, nameof(locationAggregationLimit)),
                 ValidateMetersPerPixel(metersPerPixel),
                 ValidateMetersPerPixelForPolygonMode(createPolygons, metersPerPixel),
                 //_inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
@@ -2247,11 +2252,17 @@ public class ObservationsController : ControllerBase
                 MinimumLocationCountBeforeClustering = minLocationCountBeforeClustering,
                 CreatePolygons = createPolygons,
                 UseCache = useCache,
-                CreateSampleObservations = createSampleObservations
+                CreateSampleObservations = createSampleObservations,
+                LocationAggregationLimit = locationAggregationLimit,
+                AdaptiveSearchStrategy = adaptiveSearchStrategy
             });
 
             Response.StatusCode = (int)HttpStatusCode.OK;
             Response.Headers.Append("X-Observations-TotalCount", result.ObservationsTotalCount.ToString());
+            if (result.EstimatedLocationCount.HasValue)
+            {
+                Response.Headers.Append("X-Estimated-Location-Count", result.EstimatedLocationCount.Value.ToString());
+            }
             Response.Headers.Append("X-Result-Type", result.ResultType);
             Response.Headers.Append("X-Feature-Count", result.FeatureCount.ToString());
             if (result.LocationsBeforeClustering.HasValue)
@@ -2263,6 +2274,12 @@ public class ObservationsController : ControllerBase
                 Response.Headers.Append("X-Zoom", result.Zoom.Value.ToString());
             }
             Response.Headers.Append("X-Cache", result.CacheStatus);
+            if (result.LocationPropertiesEstimated)
+            {
+                Response.Headers.Append("X-Location-Aggregation", result.LocationAggregation ?? "representative");
+                Response.Headers.Append("X-Location-Properties-Estimated", "true");
+                Response.Headers.Append("X-Location-Aggregation-Representatives-Count", "1");
+            }
             totalStopwatch.Stop();
             Response.Headers.Append("X-AdaptiveSearch-Timings", result.Timings.ToHeaderValue(totalStopwatch.Elapsed));
             Response.ContentType = "application/geo+json; charset=utf-8";
@@ -2361,6 +2378,18 @@ public class ObservationsController : ControllerBase
         }
 
         return Result.Success();
+    }
+
+    private static Result ValidateNullableInt(int? value, int minLimit, int maxLimit, string paramName)
+    {
+        if (!value.HasValue)
+        {
+            return Result.Success();
+        }
+
+        return value.Value < minLimit || value.Value > maxLimit
+            ? Result.Failure($"{paramName} must be between {minLimit} and {maxLimit}")
+            : Result.Success();
     }
 
     private static Result ValidateMetersPerPixelForPolygonMode(CreatePolygonsMode createPolygons, double? metersPerPixel)

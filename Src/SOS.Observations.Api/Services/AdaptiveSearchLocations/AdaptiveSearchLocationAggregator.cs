@@ -9,7 +9,10 @@ namespace SOS.Observations.Api.Services.AdaptiveSearchLocations;
 
 internal interface IAdaptiveSearchLocationAggregator
 {
-    List<CachedLocationAggregate> CreateAggregates(IEnumerable<JsonObject> records);
+    List<CachedLocationAggregate> CreateAggregates(
+        IEnumerable<JsonObject> records,
+        IReadOnlyDictionary<string, long>? observationCountByLocationId = null,
+        bool isEstimated = false);
     List<JsonObject> CreateSampleObservations(IEnumerable<JsonObject>? records);
     int CountLocations(IEnumerable<JsonObject> records);
     IEnumerable<List<Observation>> GroupObservationsByLocation(IEnumerable<Observation> observations);
@@ -21,7 +24,10 @@ internal sealed class AdaptiveSearchLocationAggregator : IAdaptiveSearchLocation
     private const double SampleObservationOffsetDegrees = 0.002d;
     private static readonly int[] DiffusedObservationCoordinateUncertaintyInMetersValues = { 100, 500, 1000 };
 
-    public List<CachedLocationAggregate> CreateAggregates(IEnumerable<JsonObject> records)
+    public List<CachedLocationAggregate> CreateAggregates(
+        IEnumerable<JsonObject> records,
+        IReadOnlyDictionary<string, long>? observationCountByLocationId = null,
+        bool isEstimated = false)
     {
         var observations = records
             .ToObservationsArray() // todo - går det att undvika denna dyra operation?
@@ -30,7 +36,7 @@ internal sealed class AdaptiveSearchLocationAggregator : IAdaptiveSearchLocation
             .ToList();
 
         return GroupObservationsByLocation(observations)
-            .Select(CreateAggregate)
+            .Select(observations => CreateAggregate(observations, observationCountByLocationId, isEstimated))
             .ToList();
     }
 
@@ -120,7 +126,10 @@ internal sealed class AdaptiveSearchLocationAggregator : IAdaptiveSearchLocation
         return recordList;
     }
 
-    private static CachedLocationAggregate CreateAggregate(List<Observation> observations)
+    private static CachedLocationAggregate CreateAggregate(
+        List<Observation> observations,
+        IReadOnlyDictionary<string, long>? observationCountByLocationId = null,
+        bool isEstimated = false)
     {
         var location = observations.First().Location!;
         var locationIds = observations
@@ -135,14 +144,64 @@ internal sealed class AdaptiveSearchLocationAggregator : IAdaptiveSearchLocation
             .Distinct()
             .ToList();
 
+        var observationSummary = CreateLocationObservationSummary(observations);
+        var observationCountOverride = GetObservationCountOverride(observations, observationCountByLocationId);
+        if (observationCountOverride.HasValue)
+        {
+            ApplyRepresentativeObservationCount(observationSummary, observationCountOverride.Value);
+        }
+
         return new CachedLocationAggregate
         {
             DistinctLocationId = location.DistinctLocationId,
             Location = location,
             LocationIds = locationIds,
             TaxonIds = taxonIds,
-            ObservationSummary = CreateLocationObservationSummary(observations)
+            ObservationSummary = observationSummary,
+            IsEstimated = isEstimated
         };
+    }
+
+    private static long? GetObservationCountOverride(
+        IEnumerable<Observation> observations,
+        IReadOnlyDictionary<string, long>? observationCountByLocationId)
+    {
+        if (observationCountByLocationId == null || observationCountByLocationId.Count == 0)
+        {
+            return null;
+        }
+
+        foreach (var locationId in observations
+                     .Select(observation => observation.Location?.LocationId)
+                     .Where(locationId => !string.IsNullOrWhiteSpace(locationId))
+                     .Distinct(StringComparer.OrdinalIgnoreCase))
+        {
+            if (observationCountByLocationId.TryGetValue(locationId!, out var observationCount))
+            {
+                return observationCount;
+            }
+        }
+
+        return null;
+    }
+
+    private static void ApplyRepresentativeObservationCount(LocationObservationSummary summary, long observationCount)
+    {
+        var count = ToIntCount(observationCount);
+        if (count <= 0)
+        {
+            return;
+        }
+
+        summary.ObservationCount = count;
+        summary.DebugObservations = count <= 5 ? summary.DebugObservations : null;
+    }
+
+    private static int ToIntCount(long count)
+    {
+        return count > int.MaxValue
+            ? int.MaxValue
+            : Math.Max(0, (int)count);
     }
 
     private static LocationObservationSummary CreateLocationObservationSummary(IReadOnlyCollection<Observation> observations)
@@ -151,6 +210,7 @@ internal sealed class AdaptiveSearchLocationAggregator : IAdaptiveSearchLocation
         int? maxPresentEndYear = null;
         int? minNotRecoveredEndYear = null;
         int? maxNotRecoveredEndYear = null;
+        var displayStatusSummaries = new Dictionary<DisplayStatusSummaryKey, int>();
         var summary = new LocationObservationSummary
         {
             ObservationCount = observations.Count,
@@ -163,6 +223,8 @@ internal sealed class AdaptiveSearchLocationAggregator : IAdaptiveSearchLocation
 
         foreach (var observation in observations)
         {
+            AddDisplayStatusSummary(displayStatusSummaries, observation);
+
             if (observation.Occurrence?.IsPositiveObservation == true)
             {
                 summary.FoundCount++;
@@ -205,6 +267,17 @@ internal sealed class AdaptiveSearchLocationAggregator : IAdaptiveSearchLocation
         summary.MaxPresentEndYear = maxPresentEndYear;
         summary.MinNotRecoveredEndYear = minNotRecoveredEndYear;
         summary.MaxNotRecoveredEndYear = maxNotRecoveredEndYear;
+        summary.DisplayStatusSummaries = displayStatusSummaries
+            .Select(item => new LocationObservationDisplayStatusSummary
+            {
+                IsPresent = item.Key.IsPresent,
+                IsSensitive = item.Key.IsSensitive,
+                IsTreated = item.Key.IsTreated,
+                IsNotRecovered = item.Key.IsNotRecovered,
+                EndYear = item.Key.EndYear,
+                Count = item.Value
+            })
+            .ToList();
         return summary;
     }
 
@@ -231,6 +304,22 @@ internal sealed class AdaptiveSearchLocationAggregator : IAdaptiveSearchLocation
 
         minYear = minYear.HasValue ? Math.Min(minYear.Value, year.Value) : year.Value;
         maxYear = maxYear.HasValue ? Math.Max(maxYear.Value, year.Value) : year.Value;
+    }
+
+    private static void AddDisplayStatusSummary(
+        Dictionary<DisplayStatusSummaryKey, int> displayStatusSummaries,
+        Observation observation)
+    {
+        var key = new DisplayStatusSummaryKey(
+            observation.Occurrence?.IsPositiveObservation == true,
+            observation.Sensitive,
+            (observation.ArtportalenInternal?.InvasiveSpeciesTreatment?.Id ?? -1) >= 0,
+            observation.Occurrence?.IsNotRediscoveredObservation == true,
+            observation.Event?.EndYear ?? observation.Event?.StartYear);
+
+        displayStatusSummaries[key] = displayStatusSummaries.TryGetValue(key, out var count)
+            ? count + 1
+            : 1;
     }
 
     private static void ApplySampleLocationPriorityCases(
@@ -438,3 +527,10 @@ internal sealed class AdaptiveSearchLocationAggregator : IAdaptiveSearchLocation
             : location.DistinctLocationId;
     }
 }
+
+internal readonly record struct DisplayStatusSummaryKey(
+    bool IsPresent,
+    bool IsSensitive,
+    bool IsTreated,
+    bool IsNotRecovered,
+    int? EndYear);

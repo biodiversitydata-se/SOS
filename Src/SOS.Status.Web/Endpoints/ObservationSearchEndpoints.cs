@@ -77,6 +77,8 @@ public static class ObservationSearchEndpoints
                        [FromBody] SearchFilterInternalDto filter,
                        [FromQuery] int observationsLimit = 10000,
                        [FromQuery] int maxGridCells = 10000,
+                       [FromQuery] int? locationAggregationLimit = null,
+                       [FromQuery] AdaptiveSearchLocationsStrategy adaptiveSearchStrategy = AdaptiveSearchLocationsStrategy.ObservationsThenGrid,
                        [FromQuery] bool cluster = true,
                        [FromQuery] string clusteringAlgorithm = "Greedy",
                        [FromQuery] CreatePolygonsMode createPolygons = CreatePolygonsMode.No,
@@ -98,6 +100,8 @@ public static class ObservationSearchEndpoints
                             filter,
                             observationsLimit,
                             maxGridCells,
+                            locationAggregationLimit,
+                            adaptiveSearchStrategy,
                             cluster,
                             clusteringAlgorithm,
                             createPolygons,
@@ -116,6 +120,11 @@ public static class ObservationSearchEndpoints
                         if (result.ObservationsTotalCount.HasValue)
                         {
                             httpContext.Response.Headers["X-Observations-TotalCount"] = result.ObservationsTotalCount.Value.ToString();
+                        }
+
+                        if (result.EstimatedLocationCount.HasValue)
+                        {
+                            httpContext.Response.Headers["X-Estimated-Location-Count"] = result.EstimatedLocationCount.Value.ToString();
                         }
 
                         if (result.FeatureCount.HasValue)

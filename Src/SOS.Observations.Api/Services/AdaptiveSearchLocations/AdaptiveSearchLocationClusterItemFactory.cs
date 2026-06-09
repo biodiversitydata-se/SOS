@@ -242,7 +242,8 @@ internal sealed class AdaptiveSearchLocationClusterItemFactory : IAdaptiveSearch
             LocationIds = locationIds,
             Locations = locations,
             StatusCounts = observationSummary.ToStatusCounts(),
-            ClusterRadiusMeters = isCluster ? clusterRadiusMeters : null
+            ClusterRadiusMeters = isCluster ? clusterRadiusMeters : null,
+            IsEstimated = aggregateList.Any(aggregate => aggregate.IsEstimated) ? true : null
         };
 
         if (isCluster)
@@ -291,8 +292,35 @@ internal sealed class AdaptiveSearchLocationClusterItemFactory : IAdaptiveSearch
         summary.DebugObservations = summary.ObservationCount <= 5
             ? aggregateList.SelectMany(aggregate => aggregate.ObservationSummary.DebugObservations ?? new List<DebugObservation>()).ToList()
             : null;
+        summary.DisplayStatusSummaries = CombineDisplayStatusSummaries(aggregateList);
 
         return summary;
+    }
+
+    private static List<LocationObservationDisplayStatusSummary> CombineDisplayStatusSummaries(
+        IEnumerable<CachedLocationAggregate> aggregates)
+    {
+        return aggregates
+            .SelectMany(aggregate => aggregate.ObservationSummary.DisplayStatusSummaries)
+            .GroupBy(
+                summary => new
+                {
+                    summary.IsPresent,
+                    summary.IsSensitive,
+                    summary.IsTreated,
+                    summary.IsNotRecovered,
+                    summary.EndYear
+                })
+            .Select(group => new LocationObservationDisplayStatusSummary
+            {
+                IsPresent = group.Key.IsPresent,
+                IsSensitive = group.Key.IsSensitive,
+                IsTreated = group.Key.IsTreated,
+                IsNotRecovered = group.Key.IsNotRecovered,
+                EndYear = group.Key.EndYear,
+                Count = group.Sum(summary => summary.Count)
+            })
+            .ToList();
     }
 
     private List<LocationClusterItem> NormalizeNonClusteredLocationItems(List<LocationClusterItem> locationClusterItems)
@@ -363,7 +391,6 @@ internal sealed class AdaptiveSearchLocationClusterItemFactory : IAdaptiveSearch
 
             var location = locationClusterItem.Location;
             var pointGeometry = CreatePointGeometry(location);
-            ClearActualGeometryMetadata(locationClusterItem);
 
             if (IsDiffusedLocationItem(locationClusterItem))
             {
@@ -389,13 +416,6 @@ internal sealed class AdaptiveSearchLocationClusterItemFactory : IAdaptiveSearch
                         locationClusterItem.Geometry = polygonGeometry;
                         continue;
                     }
-
-                    locationClusterItem.ActualGeometry = polygonGeometry;
-                    locationClusterItem.ActualGeometryIsSimplifiedToPoint = true;
-                    locationClusterItem.ActualGeometrySimplificationReason = decision.SimplificationReason;
-                    locationClusterItem.ActualGeometryWidthPx = decision.WidthPx;
-                    locationClusterItem.ActualGeometryHeightPx = decision.HeightPx;
-                    locationClusterItem.ActualGeometryAreaPx = decision.AreaPx;
                 }
 
                 locationClusterItem.Geometry = pointGeometry;
@@ -458,16 +478,6 @@ internal sealed class AdaptiveSearchLocationClusterItemFactory : IAdaptiveSearch
         };
 
         return square.Transform(CoordinateSys.SWEREF99_TM, CoordinateSys.WGS84, usePointCache: false);
-    }
-
-    private static void ClearActualGeometryMetadata(LocationClusterItem locationClusterItem)
-    {
-        locationClusterItem.ActualGeometry = null;
-        locationClusterItem.ActualGeometryIsSimplifiedToPoint = null;
-        locationClusterItem.ActualGeometrySimplificationReason = null;
-        locationClusterItem.ActualGeometryWidthPx = null;
-        locationClusterItem.ActualGeometryHeightPx = null;
-        locationClusterItem.ActualGeometryAreaPx = null;
     }
 
     private static Geometry? CreatePointGeometry(SOS.Lib.Models.Processed.Observation.Location? location)

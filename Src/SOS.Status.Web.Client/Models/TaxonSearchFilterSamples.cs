@@ -8,11 +8,13 @@ public static class TaxonSearchFilterSamples
     {
         Samples = new Dictionary<int, SearchFilterExample>
         {
-            { 1, new SearchFilterExample() { Name = "Search with taxon", Json = _taxonSearchFilterSample } },
-            { 2, new SearchFilterExample() { Name = "Search with polygon", Json = _polygonSearchFilterSample } },
-            { 3, new SearchFilterExample() { Name = "Search with redlisted taxa", Json = _fieldsetRedlistedSearchFilterSample} },
-            { 4, new SearchFilterExample() { Name = "Search in municipality", Json = _municipalitySearchFilterSample} },
-            { 5, new SearchFilterExample() { Name = "Search in municipality Amiral", Json = _municipalityAmiralSample} }
+            { 1, new SearchFilterExample() { Name = "Taxon", Json = _taxonSearchFilterSample } },
+            { 2, new SearchFilterExample() { Name = "Polygon", Json = _polygonSearchFilterSample } },
+            { 3, new SearchFilterExample() { Name = "Redlisted taxa", Json = _fieldsetRedlistedSearchFilterSample} },
+            { 4, new SearchFilterExample() { Name = "Municipality", Json = _municipalitySearchFilterSample} },
+            { 5, new SearchFilterExample() { Name = "Municipality - Amiral taxon", Json = _municipalityAmiralSample} },
+            { 6, new SearchFilterExample() { Name = "Close locations", Json = _closeLocationsFilterSample} },
+            { 7, new SearchFilterExample() { Name = "Locations far apart", Json = _locationsFarApartFilterSample} }
         };
     }
 
@@ -29,6 +31,32 @@ public static class TaxonSearchFilterSamples
     "occurrenceStatus":"present"
 }
 """";
+
+    private static string _closeLocationsFilterSample = """"
+{
+    "geographics": {   
+      "locationIds": [
+        "urn:lsid:artportalen.se:site:2075304",
+        "urn:lsid:artportalen.se:site:3978105",
+        "urn:lsid:artportalen.se:site:10268619"
+      ]
+    }
+}
+"""";
+
+    private static string _locationsFarApartFilterSample = """"
+{
+    "geographics": {   
+      "locationIds": [
+        "urn:lsid:artportalen.se:site:2075304",
+        "urn:lsid:artportalen.se:site:3978105",
+        "urn:lsid:artportalen.se:site:10268619",
+        "urn:lsid:mvm.se:site:3787"
+      ]
+    }
+}
+"""";
+
 
     private static string _municipalitySearchFilterSample = """"
 {    

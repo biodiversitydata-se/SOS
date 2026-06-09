@@ -128,6 +128,7 @@
                         <MudText Typo="Typo.body2"><strong>Resultat:</strong> @lastResultTypeText</MudText>
                         <MudText Typo="Typo.body2"><strong>Cache:</strong> @lastCacheStatusText</MudText>
                         <MudText Typo="Typo.body2"><strong>Antal observationer:</strong> @observationsTotalCountText</MudText>
+                        <MudText Typo="Typo.body2"><strong>Estimerat antal lokaler:</strong> @estimatedLocationCountText</MudText>
                         <MudText Typo="Typo.body2"><strong>Lokaler före klustring:</strong> @locationsBeforeClusteringText</MudText>
                         <MudText Typo="Typo.body2"><strong>Gridrutor/lokaler:</strong> @mapFeatureCount</MudText>
                         <MudText Typo="Typo.body2"><strong>Svarsstorlek:</strong> @lastResponseSizeText</MudText>
@@ -162,6 +163,32 @@
                             {
                                 <MudSelectItem T="int" Value="@option">@option</MudSelectItem>
                             }
+                        </MudSelect>
+
+                        <MudSelect T="int?"
+                                   @bind-Value="locationAggregationLimit"
+                                   Label="Lokalaggregeringsgräns"
+                                   Variant="Variant.Outlined"
+                                   Dense="true"
+                                   Margin="Margin.Dense"
+                                   FullWidth="true">
+                            <MudSelectItem T="int?" Value="@((int?)null)">Av</MudSelectItem>
+                            @foreach (var option in locationAggregationLimitOptions)
+                            {
+                                <MudSelectItem T="int?" Value="@((int?)option)">@option</MudSelectItem>
+                            }
+                        </MudSelect>
+
+                        <MudSelect T="AdaptiveSearchLocationsStrategy"
+                                   @bind-Value="adaptiveSearchStrategy"
+                                   Label="Strategi"
+                                   Variant="Variant.Outlined"
+                                   Dense="true"
+                                   Margin="Margin.Dense"
+                                   FullWidth="true">
+                            <MudSelectItem T="AdaptiveSearchLocationsStrategy" Value="@AdaptiveSearchLocationsStrategy.ObservationsThenGrid">Observationer, grid</MudSelectItem>
+                            <MudSelectItem T="AdaptiveSearchLocationsStrategy" Value="@AdaptiveSearchLocationsStrategy.ObservationsThenLocationsThenGrid">Observationer, lokaler, grid</MudSelectItem>
+                            <MudSelectItem T="AdaptiveSearchLocationsStrategy" Value="@AdaptiveSearchLocationsStrategy.LocationsThenGrid">Lokaler, grid</MudSelectItem>
                         </MudSelect>
 
                         <MudNumericField T="int?"

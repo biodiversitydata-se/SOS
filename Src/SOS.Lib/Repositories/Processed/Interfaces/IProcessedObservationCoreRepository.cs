@@ -139,7 +139,7 @@ public interface IProcessedObservationCoreRepository : IProcessRepositoryBase<Ob
     /// <returns></returns>
     Task<long> GetMatchCountAsync(SearchFilterBase filter, bool skipAuthorizationFilters = false);
 
-    Task<(long Count, LatLonBoundingBox? Extent)> GetCountAndExtentAsync(SearchFilterBase filter, bool skipAuthorizationFilters = false);
+    Task<(long Count, LatLonBoundingBox? Extent, long EstimatedLocationCount)> GetCountAndExtentAsync(SearchFilterBase filter, bool skipAuthorizationFilters = false);
 
     /// <summary>
     /// Get observations by their occurrence id's
@@ -346,6 +346,12 @@ public interface IProcessedObservationCoreRepository : IProcessRepositoryBase<Ob
     /// <param name="getAllFields">If true all observation fields will be retrieved.</param>
     /// <returns></returns>
     Task<PagedResult<T>> GetChunkAsync<T>(SearchFilter filter, int skip, int take, bool getAllFields = false) where T : class;    
+
+    Task<LocationRepresentativeResult<T>> GetLocationRepresentativeChunkAsync<T>(
+        SearchFilter filter,
+        int take,
+        string collapseField,
+        bool getAllFields = false) where T : class;
 
     /// <summary>
     ///     Get chunk of objects from repository using search_after for deep pagination.    

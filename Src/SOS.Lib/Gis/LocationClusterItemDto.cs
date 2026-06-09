@@ -196,24 +196,23 @@ public class LocationClusterItemDto
         var locationIds = locationClusterItem.LocationIds.Count > 0
             ? locationClusterItem.LocationIds
             : null;
+        var displayStatus = observationSummary != null
+            ? CalculateLocationDisplayStatus(locationClusterItem.IsCluster, observationSummary, cutoffYear, isAllObservationsSensitive)
+            : CalculateLocationDisplayStatus(locationClusterItem, cutoffYear, isAllObservationsSensitive);
+        var displayStatusCount = observationSummary != null
+            ? CalculateDisplayStatusCount(observationSummary, cutoffYear)
+            : CalculateDisplayStatusCount(locationClusterItem.Observations, cutoffYear);
 
         return new LocationClusterItemDto
         {
             IsCluster = locationClusterItem.IsCluster,
             Location = location,
             Geometry = locationClusterItem.Geometry,
-            DisplayStatus = observationSummary != null
-                ? CalculateLocationDisplayStatus(locationClusterItem.IsCluster, observationSummary, cutoffYear, isAllObservationsSensitive)
-                : CalculateLocationDisplayStatus(locationClusterItem, cutoffYear, isAllObservationsSensitive),
+            DisplayStatus = displayStatus,
+            DisplayStatusCount = displayStatusCount,
             DebugObservations = debugObservations,
             CutoffYearStatus = cutoffYearStatus,
-            IsAllObservationsSensitive = isAllObservationsSensitive,
-            ActualGeometry = locationClusterItem.ActualGeometry,
-            ActualGeometryIsSimplifiedToPoint = locationClusterItem.ActualGeometryIsSimplifiedToPoint,
-            ActualGeometrySimplificationReason = locationClusterItem.ActualGeometrySimplificationReason,
-            ActualGeometryWidthPx = locationClusterItem.ActualGeometryWidthPx,
-            ActualGeometryHeightPx = locationClusterItem.ActualGeometryHeightPx,
-            ActualGeometryAreaPx = locationClusterItem.ActualGeometryAreaPx,
+            IsAllObservationsSensitive = isAllObservationsSensitive,            
             ObservationCount = locationClusterItem.ObservationCount,
             TaxaCount = locationClusterItem.TaxaCount,
             LocationCount = locationClusterItem.LocationCount,
@@ -229,7 +228,8 @@ public class LocationClusterItemDto
                 .Select(location => location.DistinctLocationId)
                 .Distinct(StringComparer.Ordinal)
                 .ToList(),
-            StatusCounts = locationClusterItem.StatusCounts
+            StatusCounts = locationClusterItem.StatusCounts,
+            IsEstimated = locationClusterItem.IsEstimated
         };
     }
 
@@ -257,7 +257,7 @@ public class LocationClusterItemDto
     public Geometry? Geometry { get; set; }    
 
     public LocationDisplayStatus DisplayStatus { get; set; }
-
+    public Dictionary<LocationDisplayStatus, int> DisplayStatusCount { get; set; } = new();
     public List<DebugObservation>? DebugObservations { get; set; }
 
     public CutoffStatus? CutoffYearStatus { get; set; } = null;
@@ -265,43 +265,7 @@ public class LocationClusterItemDto
     /// <summary>
     /// True, if all observations are sensitive.
     /// </summary>
-    public bool? IsAllObservationsSensitive { get; set; }
-
-    /// <summary>
-    /// The real location geometry when the feature geometry has been simplified to a point.
-    /// </summary>
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public Geometry? ActualGeometry { get; set; }
-
-    /// <summary>
-    /// Indicates that the real location geometry was simplified to a point in the GeoJSON feature geometry.
-    /// </summary>
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public bool? ActualGeometryIsSimplifiedToPoint { get; set; }
-
-    /// <summary>
-    /// Describes why the real location geometry was simplified.
-    /// </summary>
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public string? ActualGeometrySimplificationReason { get; set; }
-
-    /// <summary>
-    /// The approximate rendered width of the real location geometry in pixels.
-    /// </summary>
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public double? ActualGeometryWidthPx { get; set; }
-
-    /// <summary>
-    /// The approximate rendered height of the real location geometry in pixels.
-    /// </summary>
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public double? ActualGeometryHeightPx { get; set; }
-
-    /// <summary>
-    /// The approximate rendered area of the real location geometry in square pixels.
-    /// </summary>
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public double? ActualGeometryAreaPx { get; set; }
+    public bool? IsAllObservationsSensitive { get; set; }   
 
     /// <summary>
     /// The number of observations for this item.
@@ -356,6 +320,9 @@ public class LocationClusterItemDto
     /// diffused).
     /// </summary>
     public ObservationStatusCounts StatusCounts { get; set; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public bool? IsEstimated { get; set; }
 
     private static double? CalculateClusterRadiusMetersMin(LocationClusterItem locationClusterItem)
     {
@@ -427,6 +394,159 @@ public class LocationClusterItemDto
                 NeverFound = observation.Occurrence?.IsNeverFoundObservation
             })
             .ToList();
+    }
+
+    private static Dictionary<LocationDisplayStatus, int> CalculateDisplayStatusCount(
+        LocationObservationSummary observationSummary,
+        int? cutoffYear)
+    {
+        if (observationSummary.DisplayStatusSummaries.Count == 0)
+        {
+            var fallbackStatus = CalculateLocationDisplayStatus(false, observationSummary, cutoffYear, observationSummary.IsAllObservationsSensitive);
+            return observationSummary.ObservationCount > 0
+                ? new Dictionary<LocationDisplayStatus, int> { [fallbackStatus] = observationSummary.ObservationCount }
+                : new Dictionary<LocationDisplayStatus, int>();
+        }
+
+        var displayStatusCount = new Dictionary<LocationDisplayStatus, int>();
+        foreach (var summary in observationSummary.DisplayStatusSummaries)
+        {
+            AddDisplayStatusCount(
+                displayStatusCount,
+                CalculateObservationDisplayStatus(summary, cutoffYear),
+                summary.Count);
+        }
+
+        return SortDisplayStatusCount(displayStatusCount);
+    }
+
+    private static Dictionary<LocationDisplayStatus, int> CalculateDisplayStatusCount(
+        IReadOnlyCollection<Observation> observations,
+        int? cutoffYear)
+    {
+        var displayStatusCount = new Dictionary<LocationDisplayStatus, int>();
+        foreach (var observation in observations)
+        {
+            AddDisplayStatusCount(
+                displayStatusCount,
+                CalculateObservationDisplayStatus(observation, cutoffYear),
+                1);
+        }
+
+        return SortDisplayStatusCount(displayStatusCount);
+    }
+
+    private static void AddDisplayStatusCount(
+        Dictionary<LocationDisplayStatus, int> displayStatusCount,
+        LocationDisplayStatus displayStatus,
+        int count)
+    {
+        if (count <= 0)
+        {
+            return;
+        }
+
+        displayStatusCount[displayStatus] = displayStatusCount.TryGetValue(displayStatus, out var existingCount)
+            ? existingCount + count
+            : count;
+    }
+
+    private static Dictionary<LocationDisplayStatus, int> SortDisplayStatusCount(
+        IReadOnlyDictionary<LocationDisplayStatus, int> displayStatusCount)
+    {
+        var sortedDisplayStatusCount = new Dictionary<LocationDisplayStatus, int>();
+        foreach (var item in displayStatusCount
+            .Where(item => item.Value > 0)
+            .OrderBy(item => (int)item.Key))
+        {
+            sortedDisplayStatusCount[item.Key] = item.Value;
+        }
+
+        return sortedDisplayStatusCount;
+    }
+
+    private static LocationDisplayStatus CalculateObservationDisplayStatus(
+        LocationObservationDisplayStatusSummary summary,
+        int? cutoffYear)
+    {
+        if (cutoffYear.HasValue)
+        {
+            if (summary.IsPresent && summary.EndYear.HasValue && summary.EndYear.Value >= cutoffYear.Value)
+            {
+                return summary.IsSensitive
+                    ? LocationDisplayStatus.PresentSensitive
+                    : LocationDisplayStatus.Present;
+            }
+
+            if (summary.IsPresent && summary.EndYear.HasValue && summary.EndYear.Value < cutoffYear.Value)
+            {
+                return LocationDisplayStatus.DividedByYearUntil;
+            }
+
+            return summary.IsTreated
+                ? LocationDisplayStatus.Treated
+                : LocationDisplayStatus.NotPresent;
+        }
+
+        if (summary.IsPresent)
+        {
+            return summary.IsSensitive
+                ? LocationDisplayStatus.PresentSensitive
+                : LocationDisplayStatus.Present;
+        }
+
+        if (summary.IsTreated)
+        {
+            return LocationDisplayStatus.Treated;
+        }
+
+        return summary.IsNotRecovered
+            ? LocationDisplayStatus.NotRecovered
+            : LocationDisplayStatus.NotPresent;
+    }
+
+    private static LocationDisplayStatus CalculateObservationDisplayStatus(
+        Observation observation,
+        int? cutoffYear)
+    {
+        if (cutoffYear.HasValue)
+        {
+            if (IsPresentObservation(observation) &&
+                GetObservationEndYear(observation) is int endYear &&
+                endYear >= cutoffYear.Value)
+            {
+                return observation.Sensitive
+                    ? LocationDisplayStatus.PresentSensitive
+                    : LocationDisplayStatus.Present;
+            }
+
+            if (IsPresentObservation(observation) &&
+                GetObservationEndYear(observation) is int untilYear &&
+                untilYear < cutoffYear.Value)
+            {
+                return LocationDisplayStatus.DividedByYearUntil;
+            }
+
+            return IsTreatedObservation(observation)
+                ? LocationDisplayStatus.Treated
+                : LocationDisplayStatus.NotPresent;
+        }
+
+        if (IsPresentObservation(observation))
+        {
+            return observation.Sensitive
+                ? LocationDisplayStatus.PresentSensitive
+                : LocationDisplayStatus.Present;
+        }
+
+        if (IsTreatedObservation(observation))
+        {
+            return LocationDisplayStatus.Treated;
+        }
+
+        return IsNotRecoveredObservation(observation)
+            ? LocationDisplayStatus.NotRecovered
+            : LocationDisplayStatus.NotPresent;
     }
 
     private static LocationDisplayStatus CalculateLocationDisplayStatus(

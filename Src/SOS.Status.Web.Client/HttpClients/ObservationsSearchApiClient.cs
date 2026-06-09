@@ -186,10 +186,12 @@ public class ObservationsSearchApiClient : IObservationSearchService
         return (geoJson, observationsCount, responseSizeBytes);
     }
 
-    public async Task<(string GeoJson, long? ObservationsTotalCount, long? FeatureCount, long? LocationsBeforeClustering, long ResponseSizeBytes, string? CacheStatus, string? ResultType, string? Timings)> AdaptiveSearchLocationItemsCachedGeoJson(
+    public async Task<(string GeoJson, long? ObservationsTotalCount, long? EstimatedLocationCount, long? FeatureCount, long? LocationsBeforeClustering, long ResponseSizeBytes, string? CacheStatus, string? ResultType, string? Timings)> AdaptiveSearchLocationItemsCachedGeoJson(
         SearchFilterInternalDto filter,
         int observationsLimit = 10000,
         int maxGridCells = 10000,
+        int? locationAggregationLimit = null,
+        AdaptiveSearchLocationsStrategy adaptiveSearchStrategy = AdaptiveSearchLocationsStrategy.ObservationsThenGrid,
         bool cluster = true,
         string clusteringAlgorithm = "Greedy",
         CreatePolygonsMode createPolygons = CreatePolygonsMode.No,
@@ -209,6 +211,7 @@ public class ObservationsSearchApiClient : IObservationSearchService
         {
             $"observationsLimit={observationsLimit}",
             $"maxGridCells={maxGridCells}",
+            $"adaptiveSearchStrategy={adaptiveSearchStrategy}",
             $"cluster={cluster.ToString().ToLower()}",
             $"clusteringAlgorithm={Uri.EscapeDataString(clusteringAlgorithm)}",
             $"createPolygons={createPolygons}",
@@ -237,6 +240,11 @@ public class ObservationsSearchApiClient : IObservationSearchService
             queryParts.Add($"cutoffYear={cutoffYear.Value}");
         }
 
+        if (locationAggregationLimit.HasValue)
+        {
+            queryParts.Add($"locationAggregationLimit={locationAggregationLimit.Value}");
+        }
+
         var url = $"api/observations/adaptivesearchlocations?{string.Join("&", queryParts)}";
 
         var json = JsonSerializer.Serialize(filter, _jsonSerializerOptions);
@@ -255,6 +263,13 @@ public class ObservationsSearchApiClient : IObservationSearchService
             long.TryParse(totalCountValues.FirstOrDefault(), out var parsedObservationsTotalCount))
         {
             observationsTotalCount = parsedObservationsTotalCount;
+        }
+
+        long? estimatedLocationCount = null;
+        if (response.Headers.TryGetValues("X-Estimated-Location-Count", out var estimatedLocationCountValues) &&
+            long.TryParse(estimatedLocationCountValues.FirstOrDefault(), out var parsedEstimatedLocationCount))
+        {
+            estimatedLocationCount = parsedEstimatedLocationCount;
         }
 
         long? featureCount = null;
@@ -287,7 +302,7 @@ public class ObservationsSearchApiClient : IObservationSearchService
         var responseSizeBytes = response.Content.Headers.ContentLength ?? responseBytes.LongLength;
         var geoJson = Encoding.UTF8.GetString(responseBytes);
 
-        return (geoJson, observationsTotalCount, featureCount, locationsBeforeClustering, responseSizeBytes, cacheStatus, resultType, timings);
+        return (geoJson, observationsTotalCount, estimatedLocationCount, featureCount, locationsBeforeClustering, responseSizeBytes, cacheStatus, resultType, timings);
     }
 
     public async Task<Result<SearchByCursorResultDto<Observation>>> SearchObservationsByCursor(

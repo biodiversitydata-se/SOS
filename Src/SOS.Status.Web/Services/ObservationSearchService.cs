@@ -70,10 +70,12 @@ public class ObservationSearchService : IObservationSearchService
             metersPerPixel);
     }
 
-    public async Task<(string GeoJson, long? ObservationsTotalCount, long? FeatureCount, long? LocationsBeforeClustering, long ResponseSizeBytes, string? CacheStatus, string? ResultType, string? Timings)> AdaptiveSearchLocationItemsCachedGeoJson(
+    public async Task<(string GeoJson, long? ObservationsTotalCount, long? EstimatedLocationCount, long? FeatureCount, long? LocationsBeforeClustering, long ResponseSizeBytes, string? CacheStatus, string? ResultType, string? Timings)> AdaptiveSearchLocationItemsCachedGeoJson(
         SearchFilterInternalDto filter,
         int observationsLimit = 10000,
         int maxGridCells = 10000,
+        int? locationAggregationLimit = null,
+        AdaptiveSearchLocationsStrategy adaptiveSearchStrategy = AdaptiveSearchLocationsStrategy.ObservationsThenGrid,
         bool cluster = true,
         string clusteringAlgorithm = "Greedy",
         CreatePolygonsMode createPolygons = CreatePolygonsMode.No,
@@ -93,6 +95,8 @@ public class ObservationSearchService : IObservationSearchService
             filter,
             observationsLimit,
             maxGridCells,
+            locationAggregationLimit,
+            adaptiveSearchStrategy,
             cluster,
             clusteringAlgorithm,
             createPolygons,

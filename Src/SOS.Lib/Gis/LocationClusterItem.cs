@@ -28,37 +28,7 @@ public class LocationClusterItem
     /// Clustered locations will use the centroid point as the geometry for the cluster, which is computed as the
     /// average of member latitudes and longitudes.
     /// </summary>
-    public Geometry? Geometry { get; set; }   
-
-    /// <summary>
-    /// The real location geometry when the map feature geometry has been simplified to a point for rendering.
-    /// </summary>
-    public Geometry? ActualGeometry { get; set; }
-
-    /// <summary>
-    /// Indicates that the real location geometry was not used as the feature geometry.
-    /// </summary>
-    public bool? ActualGeometryIsSimplifiedToPoint { get; set; }
-
-    /// <summary>
-    /// Describes why the real location geometry was simplified.
-    /// </summary>
-    public string? ActualGeometrySimplificationReason { get; set; }
-
-    /// <summary>
-    /// The approximate rendered width of the real location geometry in pixels.
-    /// </summary>
-    public double? ActualGeometryWidthPx { get; set; }
-
-    /// <summary>
-    /// The approximate rendered height of the real location geometry in pixels.
-    /// </summary>
-    public double? ActualGeometryHeightPx { get; set; }
-
-    /// <summary>
-    /// The approximate rendered area of the real location geometry in square pixels.
-    /// </summary>
-    public double? ActualGeometryAreaPx { get; set; }
+    public Geometry? Geometry { get; set; }        
 
     /// <summary>
     /// The number of observations for this item.
@@ -116,6 +86,11 @@ public class LocationClusterItem
     /// diffused).
     /// </summary>
     public ObservationStatusCounts StatusCounts { get; set; }
+
+    /// <summary>
+    /// True when the item was created from representative observations instead of all observations for the location.
+    /// </summary>
+    public bool? IsEstimated { get; set; }
 
     /// <summary>
     /// Creates a clustered item.

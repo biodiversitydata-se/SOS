@@ -42,6 +42,13 @@ public interface IObservationManager
     /// <returns></returns>
     Task<PagedResult<JsonObject>> GetChunkAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilter filter, int skip, int take);
 
+    Task<LocationRepresentativeResult<JsonObject>> GetLocationRepresentativeChunkAsync(
+        int? roleId,
+        string authorizationApplicationIdentifier,
+        SearchFilter filter,
+        int take,
+        string collapseField);
+
     /// <summary>
     /// Get chunk of sightings using search_after for deep pagination.  
     /// </summary>
@@ -175,7 +182,6 @@ public interface IObservationManager
         SearchFilterBase filter,
         bool skipAuthorizationFilters = false);
 
-    
     /// <summary>
     /// Asynchronously retrieves the total number of items and their combined geographical extent that match the
     /// specified search criteria and authorization context.
@@ -186,10 +192,13 @@ public interface IObservationManager
     /// <param name="filter">The search criteria used to filter the items included in the count and extent calculation. Cannot be null.</param>
     /// <param name="skipAuthorizationFilters">true to bypass authorization checks and return results regardless of access permissions; otherwise, false to
     /// apply authorization filters.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result contains a tuple with the total count of
-    /// matching items and an optional bounding box representing the geographical extent of those items. The extent is
-    /// null if no items match the criteria.</returns>
-    Task<(long Count, LatLonBoundingBox? Extent)> GetCountAndExtentAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilterBase filter, bool skipAuthorizationFilters = false);
+    /// <returns>The total count of matching items, an optional bounding box representing the geographical extent of those items,
+    /// and an estimated count of locations. The extent is null if no items match the criteria.</returns>    
+    Task<(long Count, LatLonBoundingBox? Extent, long EstimatedLocationCount)> GetCountAndExtentAsync(
+        int? roleId,
+        string authorizationApplicationIdentifier,
+        SearchFilterBase filter,
+        bool skipAuthorizationFilters = false);
 
     /// <summary>
     /// Get single observation

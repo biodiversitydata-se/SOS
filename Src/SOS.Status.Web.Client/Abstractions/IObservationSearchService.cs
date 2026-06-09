@@ -16,10 +16,12 @@ public interface IObservationSearchService
         string translationCultureCode = "sv-SE",
         bool sensitiveObservations = false); 
 
-    Task<(string GeoJson, long? ObservationsTotalCount, long? FeatureCount, long? LocationsBeforeClustering, long ResponseSizeBytes, string? CacheStatus, string? ResultType, string? Timings)> AdaptiveSearchLocationItemsCachedGeoJson(
+    Task<(string GeoJson, long? ObservationsTotalCount, long? EstimatedLocationCount, long? FeatureCount, long? LocationsBeforeClustering, long ResponseSizeBytes, string? CacheStatus, string? ResultType, string? Timings)> AdaptiveSearchLocationItemsCachedGeoJson(
         SearchFilterInternalDto filter,
         int observationsLimit = 10000,
         int maxGridCells = 10000,
+        int? locationAggregationLimit = null,
+        AdaptiveSearchLocationsStrategy adaptiveSearchStrategy = AdaptiveSearchLocationsStrategy.ObservationsThenGrid,
         bool cluster = true,
         string clusteringAlgorithm = "Greedy",
         CreatePolygonsMode createPolygons = CreatePolygonsMode.No,

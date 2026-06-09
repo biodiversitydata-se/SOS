@@ -93,6 +93,70 @@ public class LocationClusterItemDtoTests
     }
 
     [Fact]
+    public void FromLocationClusterItem_WhenObservationsHaveMixedStatuses_FillsDisplayStatusCountAndOrder()
+    {
+        // Arrange
+        var item = LocationClusterItem.FromSingleLocation([
+            CreateObservation(isPresent: true, isSensitive: false, endYear: 2025),
+            CreateObservation(isPresent: true, isSensitive: true, endYear: 2025),
+            CreateObservation(isPresent: false, isSensitive: false, endYear: 2025, treatmentId: 0),
+            CreateObservation(isPresent: false, isSensitive: false, endYear: 2025, isNotRecovered: true),
+            CreateObservation(isPresent: false, isSensitive: false, endYear: 2025)
+        ]);
+
+        // Act
+        var dto = LocationClusterItemDto.FromLocationClusterItem(item);
+
+        // Assert
+        dto.DisplayStatusCount.Should().BeEquivalentTo(new Dictionary<LocationDisplayStatus, int>
+        {
+            [LocationDisplayStatus.Present] = 1,
+            [LocationDisplayStatus.PresentSensitive] = 1,
+            [LocationDisplayStatus.Treated] = 1,
+            [LocationDisplayStatus.NotRecovered] = 1,
+            [LocationDisplayStatus.NotPresent] = 1
+        });
+        dto.DisplayStatusCount.Keys.Should().Equal(
+            LocationDisplayStatus.Present,
+            LocationDisplayStatus.PresentSensitive,
+            LocationDisplayStatus.Treated,
+            LocationDisplayStatus.NotRecovered,
+            LocationDisplayStatus.NotPresent);
+    }
+
+    [Fact]
+    public void FromLocationClusterItem_WhenCutoffYearIsUsed_FillsDisplayStatusCountWithCutoffStatusRules()
+    {
+        // Arrange
+        var item = LocationClusterItem.FromSingleLocation([
+            CreateObservation(isPresent: true, isSensitive: false, endYear: 2025),
+            CreateObservation(isPresent: true, isSensitive: true, endYear: 2025),
+            CreateObservation(isPresent: true, isSensitive: false, endYear: 2020),
+            CreateObservation(isPresent: false, isSensitive: false, endYear: 2025, treatmentId: 0),
+            CreateObservation(isPresent: false, isSensitive: false, endYear: 2025, isNotRecovered: true)
+        ]);
+
+        // Act
+        var dto = LocationClusterItemDto.FromLocationClusterItem(item, cutoffYear: 2024);
+
+        // Assert
+        dto.DisplayStatusCount.Should().BeEquivalentTo(new Dictionary<LocationDisplayStatus, int>
+        {
+            [LocationDisplayStatus.Present] = 1,
+            [LocationDisplayStatus.PresentSensitive] = 1,
+            [LocationDisplayStatus.DividedByYearUntil] = 1,
+            [LocationDisplayStatus.Treated] = 1,
+            [LocationDisplayStatus.NotPresent] = 1
+        });
+        dto.DisplayStatusCount.Keys.Should().Equal(
+            LocationDisplayStatus.Present,
+            LocationDisplayStatus.PresentSensitive,
+            LocationDisplayStatus.Treated,
+            LocationDisplayStatus.NotPresent,
+            LocationDisplayStatus.DividedByYearUntil);
+    }
+
+    [Fact]
     public void FromLocationClusterItem_WhenCutoffYearIsUsedAndNoObservationIsPresentButOneIsTreated_SetsTreated()
     {
         // Arrange
@@ -106,6 +170,69 @@ public class LocationClusterItemDtoTests
         // Assert
         dto.DisplayStatus.Should().Be(LocationDisplayStatus.Treated);
         dto.CutoffYearStatus.Should().Be(CutoffYearStatus.AfterNotRecovered);
+    }
+
+    [Fact]
+    public void FromLocationClusterItem_WhenObservationSummaryExists_FillsDisplayStatusCountFromSummary()
+    {
+        // Arrange
+        var location = CreateLocation("cached-location", 18.0, 59.0);
+        var item = new LocationClusterItem
+        {
+            IsCluster = false,
+            Location = location,
+            Geometry = new Point(18.0, 59.0),
+            LocationCount = 1,
+            ObservationCount = 4,
+            Locations = [location],
+            ObservationSummary = new LocationObservationSummary
+            {
+                ObservationCount = 4,
+                FoundCount = 2,
+                TreatedCount = 1,
+                DisplayStatusSummaries =
+                [
+                    new LocationObservationDisplayStatusSummary
+                    {
+                        IsPresent = true,
+                        IsSensitive = false,
+                        EndYear = 2025,
+                        Count = 1
+                    },
+                    new LocationObservationDisplayStatusSummary
+                    {
+                        IsPresent = true,
+                        IsSensitive = true,
+                        EndYear = 2020,
+                        Count = 1
+                    },
+                    new LocationObservationDisplayStatusSummary
+                    {
+                        IsTreated = true,
+                        EndYear = 2025,
+                        Count = 1
+                    },
+                    new LocationObservationDisplayStatusSummary
+                    {
+                        IsNotRecovered = true,
+                        EndYear = 2025,
+                        Count = 1
+                    }
+                ]
+            }
+        };
+
+        // Act
+        var dto = LocationClusterItemDto.FromLocationClusterItem(item, cutoffYear: 2024);
+
+        // Assert
+        dto.DisplayStatusCount.Should().BeEquivalentTo(new Dictionary<LocationDisplayStatus, int>
+        {
+            [LocationDisplayStatus.Present] = 1,
+            [LocationDisplayStatus.DividedByYearUntil] = 1,
+            [LocationDisplayStatus.Treated] = 1,
+            [LocationDisplayStatus.NotPresent] = 1
+        });
     }
 
     [Fact]
