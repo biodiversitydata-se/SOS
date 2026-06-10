@@ -1,4 +1,4 @@
-﻿[
+[
   {
     "Categories": [
       "DataStewardship",
@@ -221,7 +221,7 @@
     ],
     "PreviousProcessLimit": 95,
     "SupportDatasets": false,
-    "SupportEvents": false,
+    "SupportEvents": true,
     "SupportIncrementalHarvest": false,
     "SupportDynamicEml": false,
     "Type": "MvmObservations",
