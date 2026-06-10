@@ -35,7 +35,8 @@ public interface IObservationSearchService
         string? bbox = null,
         bool createSampleObservations = false,
         bool useCache = true,
-        int? cutoffYear = null);
+        int? cutoffYear = null,
+        bool includeFilterAreasInResult = false);
 
     Task<Result<SearchByCursorResultDto<Observation>>> SearchObservationsByCursor(
         SearchFilterInternalDto filter,

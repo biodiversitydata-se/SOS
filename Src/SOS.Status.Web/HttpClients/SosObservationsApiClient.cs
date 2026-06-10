@@ -112,7 +112,8 @@ public class SosObservationsApiClient
         string? bbox = null,
         bool createSampleObservations = false,
         bool useCache = true,
-        int? cutoffYear = null)
+        int? cutoffYear = null,
+        bool includeFilterAreasInResult = false)
     {
         var queryParts = new List<string>
         {
@@ -129,6 +130,7 @@ public class SosObservationsApiClient
             $"translationCultureCode={translationCultureCode}",
             $"sensitiveObservations={sensitiveObservations.ToString().ToLower()}",
             $"createSampleObservations={createSampleObservations.ToString().ToLower()}",
+            $"includeFilterAreasInResult={includeFilterAreasInResult.ToString().ToLower()}",
             $"useCache={useCache.ToString().ToLower()}"
         };
 

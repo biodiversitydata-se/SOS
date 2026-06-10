@@ -89,7 +89,8 @@ public class ObservationSearchService : IObservationSearchService
         string? bbox = null,
         bool createSampleObservations = false,
         bool useCache = true,
-        int? cutoffYear = null)
+        int? cutoffYear = null,
+        bool includeFilterAreasInResult = false)
     {
         return await _observationsApiClient.AdaptiveSearchLocationItemsCachedGeoJsonAsync(
             filter,
@@ -110,7 +111,8 @@ public class ObservationSearchService : IObservationSearchService
             bbox,
             createSampleObservations,
             useCache,
-            cutoffYear);
+            cutoffYear,
+            includeFilterAreasInResult);
     }
 
     public async Task<Result<SearchByCursorResultDto<Observation>>> SearchObservationsByCursor(

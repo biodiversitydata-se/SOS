@@ -1,6 +1,7 @@
 ﻿using FizzWare.NBuilder;
 using MongoDB.Driver.GeoJsonObjectModel;
 using Moq;
+using NetTopologySuite.Geometries;
 using SOS.Lib.Dtos.Enum;
 using SOS.Lib.Dtos.Filter;
 using SOS.Lib.Models.Search.Filters;
@@ -119,6 +120,116 @@ public class AdaptiveSearchLocationsTests : TestBase
         response.GetHeaderValue("X-Result-Type").Should().Be("geogrid");
         response.GetHeaderValue("X-Cache").Should().Be("BYPASS");
         response.GetHeaderValue("X-Observations-TotalCount").Should().Be("12");
+    }
+
+    [Fact]
+    public async Task AdaptiveSearchLocationsInternal_IncludesFilterAreasInLocationResult_AlsoOnCacheHit()
+    {
+        // Arrange
+        var observations = CreatePointObservations(
+            1,
+            330100,
+            TaxonIds.Skata,
+            _ => (13.850, 58.380));
+        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(observations);
+        var apiClient = TestFixture.CreateApiClient();
+        var searchFilter = CreateBoundingBoxAndGeometryFilter(
+            TaxonIds.Skata,
+            bboxLeft: 13.84,
+            bboxTop: 58.40,
+            bboxRight: 13.90,
+            bboxBottom: 58.35,
+            geometryLeft: 13.84,
+            geometryTop: 58.40,
+            geometryRight: 13.90,
+            geometryBottom: 58.35);
+        const string url = "/observations/internal/adaptivesearchlocations?observationsLimit=100&cluster=false&returnInputBBox=true&includeFilterAreasInResult=true";
+
+        // Act
+        var firstResponse = await apiClient.PostAsync(url, JsonContent.Create(searchFilter, options: JsonSerializerOptions), TestContext.Current.CancellationToken);
+        var firstResponseString = await firstResponse.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
+        var secondResponse = await apiClient.PostAsync(url, JsonContent.Create(searchFilter, options: JsonSerializerOptions), TestContext.Current.CancellationToken);
+        var secondResponseString = await secondResponse.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
+
+        // Assert
+        firstResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        secondResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        firstResponse.GetHeaderValue("X-Cache").Should().Be("MISS");
+        secondResponse.GetHeaderValue("X-Cache").Should().Be("HIT");
+        firstResponse.GetHeaderValue("X-Feature-Count").Should().Be("1");
+        secondResponse.GetHeaderValue("X-Feature-Count").Should().Be("1");
+        CountFeaturesWithFeatureType(firstResponseString, "FilterArea.OwnPolygon").Should().Be(1);
+        CountFeaturesWithFeatureType(secondResponseString, "FilterArea.OwnPolygon").Should().Be(1);
+    }
+
+    [Fact]
+    public async Task AdaptiveSearchLocationsInternal_IncludesFilterAreasInGridResult()
+    {
+        // Arrange
+        var observations = CreatePointObservations(
+            12,
+            330200,
+            TaxonIds.Talgoxe,
+            index => (13.850 + index * 0.001, 58.380 + index * 0.001));
+        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(observations);
+        var apiClient = TestFixture.CreateApiClient();
+        var searchFilter = CreateBoundingBoxAndGeometryFilter(
+            TaxonIds.Talgoxe,
+            bboxLeft: 13.84,
+            bboxTop: 58.40,
+            bboxRight: 13.90,
+            bboxBottom: 58.35,
+            geometryLeft: 13.84,
+            geometryTop: 58.40,
+            geometryRight: 13.90,
+            geometryBottom: 58.35);
+
+        // Act
+        var response = await apiClient.PostAsync(
+            "/observations/internal/adaptivesearchlocations?observationsLimit=5&cluster=false&returnInputBBox=true&includeFilterAreasInResult=true",
+            JsonContent.Create(searchFilter, options: JsonSerializerOptions),
+            TestContext.Current.CancellationToken);
+        var responseString = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        response.GetHeaderValue("X-Result-Type").Should().Be("geogrid");
+        CountFeaturesWithFeatureType(responseString, "FilterArea.OwnPolygon").Should().Be(1);
+    }
+
+    [Fact]
+    public async Task AdaptiveSearchLocationsInternal_ReturnsEmptyLocations_WhenBoundingBoxAndGeometryDoNotOverlap()
+    {
+        // Arrange
+        var apiClient = TestFixture.CreateApiClient();
+        var searchFilter = CreateBoundingBoxAndGeometryFilter(
+            TaxonIds.Skata,
+            bboxLeft: 15.090691863610152,
+            bboxTop: 57.952641769832915,
+            bboxRight: 15.33645792033352,
+            bboxBottom: 57.86314388835064,
+            geometryLeft: 14.59308654959814,
+            geometryTop: 58.1518303241699,
+            geometryRight: 15.081282562776002,
+            geometryBottom: 57.92749551085515);
+
+        // Act
+        var response = await apiClient.PostAsync(
+            "/observations/internal/adaptivesearchlocations?observationsLimit=0&adaptiveSearchStrategy=LocationsThenGrid&cluster=false",
+            JsonContent.Create(searchFilter, options: JsonSerializerOptions),
+            TestContext.Current.CancellationToken);
+        var responseString = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
+        var features = JsonNode.Parse(responseString)!["features"]!.AsArray();
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        response.GetHeaderValue("X-Result-Type").Should().Be("locations");
+        response.GetHeaderValue("X-Observations-TotalCount").Should().Be("0");
+        response.GetHeaderValue("X-Estimated-Location-Count").Should().Be("0");
+        response.GetHeaderValue("X-Feature-Count").Should().Be("0");
+        response.GetHeaderValue("X-Locations-Before-Clustering").Should().Be("0");
+        response.GetHeaderValue("X-Cache").Should().Be("BYPASS");
+        features.Count.Should().Be(0);
     }
 
     [Fact]
@@ -877,6 +988,12 @@ public class AdaptiveSearchLocationsTests : TestBase
                 StringComparer.Ordinal);
     }
 
+    private static int CountFeaturesWithFeatureType(string responseString, string featureType)
+    {
+        return JsonNode.Parse(responseString)!["features"]!.AsArray()
+            .Count(feature => feature?["properties"]?["FeatureType"]?.GetValue<string>() == featureType);
+    }
+
     private static void AssertLocationFeature(
         IReadOnlyDictionary<string, JsonObject> propertiesByLocationId,
         int siteId,
@@ -975,6 +1092,33 @@ public class AdaptiveSearchLocationsTests : TestBase
                 }
             }
         };
+    }
+
+    private static SearchFilterInternalDto CreateBoundingBoxAndGeometryFilter(
+        int taxonId,
+        double bboxLeft,
+        double bboxTop,
+        double bboxRight,
+        double bboxBottom,
+        double geometryLeft,
+        double geometryTop,
+        double geometryRight,
+        double geometryBottom)
+    {
+        var searchFilter = CreateBoundingBoxFilter(taxonId, bboxLeft, bboxTop, bboxRight, bboxBottom);
+        searchFilter.Geographics!.Geometries = new[]
+        {
+            new Polygon(new LinearRing(new[]
+            {
+                new Coordinate(geometryLeft, geometryBottom),
+                new Coordinate(geometryRight, geometryBottom),
+                new Coordinate(geometryRight, geometryTop),
+                new Coordinate(geometryLeft, geometryTop),
+                new Coordinate(geometryLeft, geometryBottom)
+            }))
+        };
+
+        return searchFilter;
     }
 
     private sealed class ObservationManagerCallProbe
