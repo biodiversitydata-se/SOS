@@ -78,11 +78,22 @@ public class DwcaEventFactory : EventFactoryBase, IEventFactory<DwcEventOccurren
             processedEvent.SamplingProtocol = verbatim.SamplingProtocol?.Clean();
             processedEvent.OccurrenceIds = verbatim.OccurrenceIds?.ToList();
             processedEvent.Location = CreateLocation(verbatim);
-            processedEvent.DataStewardship = new DataStewardshipInfo
+            if (DataProvider.DataStewardship != null)
             {
-                DatasetIdentifier = verbatim.DataStewardshipDatasetId
-                //Title = // need to lookup this from Dataset index or store this information in Observation/Event
-            };
+                processedEvent.DataStewardship = new DataStewardshipInfo
+                {
+                    DatasetIdentifier = DataProvider.DataStewardship.Identifier,
+                    DatasetTitle = DataProvider.DataStewardship.Title
+                };
+            }
+            else
+            {
+                processedEvent.DataStewardship = new DataStewardshipInfo
+                {
+                    DatasetIdentifier = verbatim.DataStewardshipDatasetId
+                    //Title = // need to lookup this from Dataset index or store this information in Observation/Event
+                };
+            }
             if (!GISExtensions.TryParseCoordinateSystem(verbatim.GeodeticDatum, out var coordinateSystem))
             {
                 coordinateSystem = CoordinateSys.WGS84;

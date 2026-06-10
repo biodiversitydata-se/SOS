@@ -1,4 +1,4 @@
-[
+﻿[
   {
     "Categories": [
       "DataStewardship",
@@ -403,7 +403,7 @@
     "Id": 7,
     "Identifier": "VirtualHerbarium",
     "IncludeInHealthCheck": true,
-    "IncludeInScheduledHarvest": false,
+    "IncludeInScheduledHarvest": true,
     "IncludeInSearchByDefault": true,
     "IsActive": true,
     "Names": [
@@ -1565,6 +1565,54 @@
         "type": "Observations"
       }
     ],
+    "DataStewardship": {
+      "identifier": "lu_sft_std",
+      "title": "Svensk Fågeltaxering: Standardrutter",
+      "programmeArea": "Landskap",
+      "project": [
+        {
+          "projectID": "",
+          "projectCode": "Svensk Fågeltaxering",
+          "projectType": "Delprogram"
+        }
+      ],
+      "assigner": {
+        "organisationID": "202100-1975",
+        "organisationCode": "Naturvårdsverket"
+      },
+      "creator": [
+        {
+          "organisationID": "202100-3211",
+          "organisationCode": "Lunds Universitet"
+        }
+      ],
+      "ownerinstitutionCode": {
+        "organisationID": "202100-1975",
+        "organisationCode": "Naturvårdsverket"
+      },
+      "publisher": {
+        "organisationID": "202100-3211",
+        "organisationCode": "Lunds Universitet"
+      },
+      "dataStewardship": "Datavärdskap Naturdata: Fåglar och fjärilar",
+      "purpose": "Nationell miljöövervakning",
+      "description": "Standardrutterna är ett av flera delprogram inom Svensk Fågeltaxering. Projektet drivs av Biologiska Institutionen vid Lunds universitet, på uppdrag av Naturvårdsverket. Standardrutterna startades 1996 som en förbättrad metod för att upptäcka och rapportera förändringar i antalet fåglar (sedan 1996) och däggdjur (sedan 2011), samt deras förändring i utbredning i Sverige över tid. Genom att rutterna är jämnt fördelade över Sverige täcks landets olika levnadsmiljöer på ett representativt sätt. Eftersom fåglar och däggdjur räknas med samma metod, på samma lokaler, år efter år, erhålls goda data på antalsförändringar i tid och rum. Inventeringarna utförs av frivilliga ornitologer.",
+      "methodology": [
+        {
+          "methodologyName": "Fåglar: Linjetaxering, samt kombinerad punkt- och linjetaxering",
+          "methodologyDescription": "Standardrutterna är kvadratiska i sin form och 8 km långa. De inventeras med en kombination av punkttaxering och linjetaxering: åtta 5-minuters punktstopp och åtta km-sträckor. Alla dessa rutter ligger med en fast position. Från startpunkten går rutten 2 km norrut, 2 km österut, 2 km söderut och 2 km västerut och då är man tillbaka till startpunkten. Punkträkning sker i kvadratens hörn och mitt emellan hörnen. Linjetaxering sker längs km-sträckorna mellan punkterna. Vid punkterna skall alla hörda och sedda fåglar och däggdjur räknas under fem minuter (oberoende av vad som noterats på linje). Längs linjerna skall alla hörda och sedda fåglar och däggdjur räknas medan man går långsamt samt stannar, lyssnar och spanar efter behov. Se mer på http://www.fageltaxering.lu.se/inventera/metoder/standardrutter/metodik-standardrutter eller i övervakningsmanualen.",
+          "methodologyLink": "https://www.naturvardsverket.se/globalassets/vagledning/miljoovervakning/handledning/undersokningstyper/faglar-linjetax-o-punkt-linje-utypv-20160321.pdf"          
+        }
+      ],
+      "startDate": "1996-05-24",
+      "endDate": "2024-07-09",
+      "spatial": "Sverige",
+      "accessRights": "Begränsad",
+      "descriptionAccessRights": "Lokalernas exakta position är skyddad. Koordinater i data nedladdade från t.ex. datavärdskapets egna användargränssnitt eller från GBIF är därför diffuserade till mittpunkten av en 25x25km-ruta inom vilken lokalen finns. Arter i Artdatabankens skyddsklass 4 eller högre inkluderas inte i data nedladdade från t.ex. datavärdskapets egna användargränssnitt eller från GBIF. För närvarande gäller det följande arter: fjällgås (Anser erythropus), kungsörn (Aquila chrysaetos), havsörn (Haliaeetus albicilla), stäpphök (Circus macrourus), ängshök (Circus pygargus), pilgrimsfalk (Falco peregrinus), jaktfalk (Falco rusticolus), berguv (Bubo bubo), vitryggig hackspett (Dendrocopos leucotos), lo (Lynx lynx), varg (Canis lupus lupus), brunbjörn (Ursus arctos), järv (Gulo gulo) and fjällräv (Vulpes lagopus). Åtkomst till sanna koordinater och/eller data om skyddsklassade arter kräver inloggning med behörighet i t.ex. Artsök.",
+      "license": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "metadatalanguage": "Svenska",
+      "language": "Svenska"
+    },
     "DefaultVerificationStatus": "ReportedByExpert",
     "Descriptions": [
       {
@@ -1811,6 +1859,48 @@
         "Value": "Nationella inventeringar av landskapet i Sverige (NILS) är ett paraply för nationella miljöövervakningsprogram med ett flertal inventeringar vars syfte är att samla, analysera och presentera data om hur landskap ser ut och förändras över tid. Inventeringarna samlar in data som ligger till grund för Artikel 17 rapporteringen samt uppföljningen av miljökvalitetsmål såväl som Agenda 2030 målen. Detta dataset innehåller artförekomstdata. Arter som inventeras är ett urval av kärlväxter, mossor, fjärilar och humlor."
       }
     ],
+    "DataStewardship": {
+      "identifier": "NILS Basinventering 2003-2020",
+      "title": "NILS Basinventering 2003-2020",
+      "programmeArea": "Landskap",
+      "assigner": {
+        "organisationID": "202100-1975",
+        "organisationCode": "Naturvårdsverket"
+      },
+      "creator": [
+        {
+          "organisationCode": "SLU Landskapsanalys",
+          "organisationID": null
+        }
+      ],
+      "ownerinstitutionCode": {
+        "organisationCode": "SLU Landskapsanalys",
+        "organisationID": null
+      },
+      "publisher": {
+        "organisationCode": "SLU Landskapsanalys",
+        "organisationID": null
+      },
+      "project": null,
+      "dataStewardship": "Datavärdskap Naturdata: Arter",
+      "purpose": "Nationell miljöövervakning",
+      "description": "Målet med basinventeringen var att övervaka biologisk mångfald i alla landmiljöer i Sverige, att följa förändringar i vardagslandskapet. En viktig del i programmet var att studera förändringar i landskapskomposition och landskapsstruktur som kan påverka den biologiska mångfalden. Mellan 2003-2018 samlade programmet in, analyserade och presenterade data om tillstånd och förändringar samt påverkan av markanvändning på biologisk mångfald och natur- och kulturlandskapsvärden i hela Sverige. Åren 2019 till 2020 samlades data in enbart i fjällen.",
+      "methodology": [
+        {
+          "methodologyName": "Stickprovsinventering av landskap, naturtyper och arter",
+          "methodologyDescription": "Basinventeringens stickprov består av 639 rutor om 5x5 km vardera fördelade över Sverige. Fältinventering utfördes i 12 permanenta cirkelprovytor och 12 linjer inom varje kilometerruta (1x1 km). Varje provyta besöktes vart femte år. ",
+          "methodologyLink": "https://www.slu.se/om-slu/organisation/institutioner/skoglig-resurshushallning/miljoanalys/NILS"
+        }
+      ],
+      "startDate": "2003-01-01",
+      "endDate": "2020-12-31",
+      "spatial": "Sverige",
+      "accessRights": "Publik",
+      "descriptionAccessRights": null,
+      "license": null,
+      "metadatalanguage": "Svenska",
+      "language": "Svenska"
+    },
     "HarvestFailPreventProcessing": false,
     "HarvestSchedule": "* * * * *",
     "Id": 25,

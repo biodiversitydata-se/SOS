@@ -130,7 +130,17 @@ public class DwcaObservationFactory : ObservationFactoryBase, IObservationFactor
         obs.References = verbatim.References;
         obs.RightsHolder = verbatim.RightsHolder?.Clean();
         obs.Type = GetSosId(verbatim.Type, VocabularyById[VocabularyId.Type]);
-        if (!string.IsNullOrEmpty(verbatim.DataStewardshipDatasetId))
+
+        // Data stewardship
+        if (_dataProvider.DataStewardship != null)
+        {
+            obs.DataStewardship = new Lib.Models.Processed.DataStewardship.Common.DataStewardshipInfo
+            {
+                DatasetIdentifier = _dataProvider.DataStewardship.Identifier,
+                DatasetTitle = _dataProvider.DataStewardship.Title
+            };
+        }
+        else if (!string.IsNullOrEmpty(verbatim.DataStewardshipDatasetId))
         {
             obs.DataStewardship = new Lib.Models.Processed.DataStewardship.Common.DataStewardshipInfo
             {

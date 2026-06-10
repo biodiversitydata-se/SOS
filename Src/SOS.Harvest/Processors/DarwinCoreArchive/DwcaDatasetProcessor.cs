@@ -64,6 +64,17 @@ public class DwcaDatasetProcessor : DatasetProcessorBase<DwcaDatasetProcessor, D
 
         var datasetFactory = new DwcaDatasetFactory(dataProvider, TimeManager, ProcessConfiguration);
 
+        if (dataProvider.DataStewardship != null)
+        {            
+            Logger.LogInformation("Data stewardship metadata is available for {dataProvider} in DefaultDataProviders.json.", dataProvider.Identifier);
+
+            return await ProcessDatasetAsync(dataProvider,
+                dataProvider.DataStewardship,
+                datasetFactory,
+                dwcCollectionRepository.DatasetRepository,
+                cancellationToken);
+        }
+
         return await base.ProcessDatasetsAsync(
             dataProvider,
             datasetFactory,
@@ -126,7 +137,75 @@ public class DwcaDatasetProcessor : DatasetProcessorBase<DwcaDatasetProcessor, D
         }
     }
 
+    protected async Task<int> ProcessDatasetAsync(
+        DataProvider dataProvider,
+        Dataset? verbatimDataset,
+        IDatasetFactory<DwcVerbatimDataset> datasetFactory,
+        IVerbatimRepositoryBase<DwcVerbatimDataset, int> datasetVerbatimRepository,
+        IJobCancellationToken cancellationToken)
+    {
+        try
+        {
+            cancellationToken?.ThrowIfCancellationRequested();
+            if (verbatimDataset == null)
+            {
+                return 0;
+            }
+
+            Logger.LogDebug("Dataset - Start processing {@dataProvider}", dataProvider.Identifier);
+            var datasets = new ConcurrentDictionary<string, Dataset>();
+            var dataset = datasetFactory.CreateProcessedDataset(verbatimDataset);
+            CheckData(verbatimDataset, dataset, dataProvider);
+            if (dataset == null)
+            {
+                return 0;
+            }
+
+            // Add dataset
+            datasets.TryAdd(dataset.Identifier.ToString(), dataset);           
+            await UpdateDatasetEventsAsync(datasets, dataProvider);
+            Logger.LogDebug("Dataset - Finish processing {@dataProvider}", dataProvider.Identifier);
+            return await ValidateAndStoreDatasets(dataProvider, datasets.Values, $"1");
+        }
+        catch (JobAbortedException)
+        {
+            // Throw cancelation again to let function above handle it
+            throw;
+        }
+        catch (Exception e)
+        {
+            Logger.LogError(e, "Datasets - Process {@dataProvider} datasets failed", dataProvider.Identifier);
+            throw;
+        }
+    }
+
     private void CheckData(DwcVerbatimDataset verbatimDataset, Dataset? dataset, DataProvider dataProvider)
+    {
+        try
+        {
+            if (verbatimDataset == null) Logger.LogWarning("verbatimDataset is null for {@dataProvider}", dataProvider.Identifier);
+            if (dataset == null) Logger.LogWarning("dataset is null for {@dataProvider}", dataProvider.Identifier);
+
+            if (verbatimDataset != null)
+            {
+                if (verbatimDataset.EventIds == null || verbatimDataset.EventIds.Count == 0)
+                {
+                    Logger.LogWarning("verbatimDataset contains no eventIds for {@dataProvider}", dataProvider.Identifier);
+                }
+            }
+
+            if (dataset != null)
+            {
+                if (dataset.EventIds == null || dataset.EventIds.Count == 0)
+                {
+                    Logger.LogWarning("dataset contains no eventIds for {@dataProvider}", dataProvider.Identifier);
+                }
+            }
+        }
+        catch { }
+    }
+
+    private void CheckData(Dataset verbatimDataset, Dataset? dataset, DataProvider dataProvider)
     {
         try
         {
