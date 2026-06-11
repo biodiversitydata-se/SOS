@@ -3,8 +3,7 @@
 # Default för repo: Windows/.NET-filer
 [*]
 end_of_line = crlf
-charset = utf-8-bom
-insert_final_newline = true
+charset = utf-8
 trim_trailing_whitespace = true
 
 # C# / Visual Studio / MSBuild

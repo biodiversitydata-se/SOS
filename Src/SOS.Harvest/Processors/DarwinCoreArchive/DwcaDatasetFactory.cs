@@ -33,36 +33,89 @@ public class DwcaDatasetFactory : DatasetFactoryBase, IDatasetFactory<DwcVerbati
                 return null;
             }
 
-            var observationDataset = new Dataset
-            {
-                AccessRights = verbatimDataset.AccessRights,
-                Assigner = verbatimDataset.Assigner,
-                Creator = verbatimDataset.Creator,
-                DataStewardship = verbatimDataset.DataStewardship?.Clean(),
-                Description = verbatimDataset.Description?.Clean(),
-                EndDate = verbatimDataset.EndDate.HasValue ? verbatimDataset.EndDate.Value.ToUniversalTime() : null,
-                EventIds = verbatimDataset.EventIds,
-                Identifier = verbatimDataset.Identifier,
-                //Identifier = $"urn:lsid:{DataProvider.Identifier}:Dataset:{verbatimDataset.Identifier}",
-                Language = verbatimDataset.Language?.Clean(),
-                Metadatalanguage = verbatimDataset.Metadatalanguage?.Clean(),
-                Methodology = verbatimDataset.Methodology,
-                OwnerinstitutionCode = verbatimDataset.OwnerinstitutionCode,
-                Project = verbatimDataset.Project,
-                Publisher = verbatimDataset.Publisher,
-                Purpose = verbatimDataset.Purpose,
-                Spatial = verbatimDataset.Spatial?.Clean(),
-                StartDate = verbatimDataset.StartDate.HasValue ? verbatimDataset.StartDate.Value.ToUniversalTime() : null,
-                Title = verbatimDataset.Title?.Clean(),
-                DescriptionAccessRights = verbatimDataset.DescriptionAccessRights?.Clean(),
-                License = verbatimDataset.License?.Clean(),
-            };
-
-            return observationDataset;
+            return CleanVerbatimDataset(verbatimDataset);
         }
         catch (Exception e)
         {
             throw new Exception($"Error when processing DwC verbatim dataset with Identifier={verbatimDataset.Identifier ?? "null"}", e);
         }
+    }
+
+    public Dataset? CreateProcessedDataset(Dataset verbatimDataset)
+    {
+        try
+        {
+            return CleanDataset(verbatimDataset);
+        }
+        catch (Exception e)
+        {
+            throw new Exception($"Error when processing DwC verbatim dataset with Identifier={verbatimDataset.Identifier ?? "null"}", e);
+        }
+    }
+
+    public static Dataset? CleanDataset(Dataset? dataset)
+    {
+        if (dataset == null)
+        {
+            return null;
+        }
+
+        return new Dataset
+        {
+            AccessRights = dataset.AccessRights,
+            Assigner = dataset.Assigner,
+            Creator = dataset.Creator,
+            DataStewardship = dataset.DataStewardship?.Clean(),
+            Description = dataset.Description?.Clean(),
+            EndDate = dataset.EndDate.HasValue ? dataset.EndDate.Value.ToUniversalTime() : null,
+            EventIds = dataset.EventIds,
+            Identifier = dataset.Identifier,
+            Language = dataset.Language?.Clean(),
+            Metadatalanguage = dataset.Metadatalanguage?.Clean(),
+            Methodology = dataset.Methodology,
+            OwnerinstitutionCode = dataset.OwnerinstitutionCode,
+            Project = dataset.Project,
+            Publisher = dataset.Publisher,
+            Purpose = dataset.Purpose,
+            ProgrammeArea = dataset.ProgrammeArea,
+            Spatial = dataset.Spatial?.Clean(),
+            StartDate = dataset.StartDate.HasValue ? dataset.StartDate.Value.ToUniversalTime() : null,
+            Title = dataset.Title?.Clean(),
+            DescriptionAccessRights = dataset.DescriptionAccessRights?.Clean(),
+            License = dataset.License?.Clean(),
+        };
+    }
+
+    private static Dataset? CleanVerbatimDataset(DwcVerbatimDataset? dataset)
+    {
+        if (dataset == null)
+        {
+            return null;
+        }
+
+        return new Dataset
+        {
+            AccessRights = dataset.AccessRights,
+            Assigner = dataset.Assigner,
+            Creator = dataset.Creator,
+            DataStewardship = dataset.DataStewardship?.Clean(),
+            Description = dataset.Description?.Clean(),
+            EndDate = dataset.EndDate.HasValue ? dataset.EndDate.Value.ToUniversalTime() : null,
+            EventIds = dataset.EventIds,
+            Identifier = dataset.Identifier,
+            Language = dataset.Language?.Clean(),
+            Metadatalanguage = dataset.Metadatalanguage?.Clean(),
+            Methodology = dataset.Methodology,
+            OwnerinstitutionCode = dataset.OwnerinstitutionCode,
+            Project = dataset.Project,
+            ProgrammeArea = dataset.ProgrammeArea,
+            Publisher = dataset.Publisher,
+            Purpose = dataset.Purpose,
+            Spatial = dataset.Spatial?.Clean(),
+            StartDate = dataset.StartDate.HasValue ? dataset.StartDate.Value.ToUniversalTime() : null,
+            Title = dataset.Title?.Clean(),
+            DescriptionAccessRights = dataset.DescriptionAccessRights?.Clean(),
+            License = dataset.License?.Clean(),
+        };
     }
 }

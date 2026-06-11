@@ -39,7 +39,12 @@ internal sealed class AdaptiveSearchLocationsCache : IAdaptiveSearchLocationsCac
             AllowTrailingCommas = true,
             DefaultIgnoreCondition = JsonIgnoreCondition.Never,
             PropertyNameCaseInsensitive = true,
-            ReadCommentHandling = JsonCommentHandling.Skip
+            ReadCommentHandling = JsonCommentHandling.Skip,
+            Converters =
+            {
+                new JsonStringEnumConverter(),
+                new NetTopologySuite.IO.Converters.GeoJsonConverterFactory()
+            }
         };
     }
 
@@ -53,7 +58,7 @@ internal sealed class AdaptiveSearchLocationsCache : IAdaptiveSearchLocationsCac
             $"sensitiveObservations={sensitiveObservations}"
         };
         var cacheKeyFilter = CreateSearchFilterWithoutBoundingBox(filter);
-        return $"{CacheKeyPrefix}{CreateHash(string.Join("&", cacheKeyParameters), cacheKeyFilter)}";
+        return $"{CacheKeyPrefix}{CreateHash(string.Join("&", cacheKeyParameters), cacheKeyFilter, _jsonSerializerOptions)}";
     }
 
     public bool TryGet(string cacheKey, LatLonBoundingBox? requestedBbox, out List<CachedLocationAggregate> locations)
@@ -155,9 +160,9 @@ internal sealed class AdaptiveSearchLocationsCache : IAdaptiveSearchLocationsCac
         return clone;
     }
 
-    private static string CreateHash(string queryString, object request)
+    private static string CreateHash(string queryString, object request, JsonSerializerOptions options)
     {
-        var json = JsonSerializer.Serialize(request);
+        var json = JsonSerializer.Serialize(request, options);
         var rawKey = $"{queryString}:{json}";
         var hashBytes = SHA256.HashData(Encoding.UTF8.GetBytes(rawKey));
         return BitConverter.ToString(hashBytes).Replace("-", "").ToLowerInvariant();

@@ -1,4 +1,5 @@
 ﻿using NetTopologySuite.Geometries;
+using System.Globalization;
 
 namespace SOS.Lib.Dtos.Filter;
 
@@ -27,5 +28,12 @@ public class LatLonBoundingBoxDto
             new Coordinate(TopLeft?.Longitude ?? 0, TopLeft?.Latitude ?? 0),
             new Coordinate(BottomRight?.Longitude ?? 0, BottomRight?.Latitude ?? 0)
         );
+    }
+
+    public override string ToString()
+    {
+        return string.Create(
+            CultureInfo.InvariantCulture,
+            $"TopLeft: [{TopLeft.Longitude}, {TopLeft.Latitude}], BottomRight: [{BottomRight.Longitude}, {BottomRight.Latitude}]");
     }
 }

@@ -38,6 +38,11 @@ public class DataProvider : IEntity<int>, IIdIdentifierTuple
     public IEnumerable<DataProviderDataset> Datasets { get; set; }
 
     /// <summary>
+    /// Data stewardship metadata.
+    /// </summary>
+    public Processed.DataStewardship.Dataset.Dataset? DataStewardship { get; set; }
+
+    /// <summary>
     ///     Default verification status
     /// </summary>
     [BsonRepresentation(BsonType.String)]

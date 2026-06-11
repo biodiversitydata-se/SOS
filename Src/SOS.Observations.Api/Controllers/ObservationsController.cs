@@ -2135,7 +2135,7 @@ public class ObservationsController : ControllerBase
         {
             semaphoreResult.Semaphore.Release();
         }
-    }   
+    }
 
     /// <summary>
     /// Adaptive location search with a bbox-aware FusionCache layer for location aggregates.
@@ -2157,6 +2157,7 @@ public class ObservationsController : ControllerBase
     /// <param name="minLocationCountBeforeClustering">The number of distinct locations that can be returned without clustering. Clustering starts when the distinct location count is greater than this value.</param>
     /// <param name="createPolygons">Controls polygon location rendering. No always uses centroid points, Yes always uses polygon geometry, and WhenNeeded uses polygons only when they are large enough at the current viewport resolution.</param>
     /// <param name="bboxQuery">Optional WGS84 bounding box query parameter using minLongitude,minLatitude,maxLongitude,maxLatitude. If provided, it overrides the filter bounding box.</param>
+    /// <param name="includeFilterAreasInResult">If true and the search filter contains area ids, the area polygons will be included in the result. The filter areas will have a property "FeatureType" with value `FilterArea.Area` or `FilterArea.OwnPolygon`.</param>
     /// <param name="useCache">If true, reusable location aggregates may be read from and written to cache.</param>
     /// <param name="createSampleObservations">If true, sample observations will be created for map symbol debugging.</param>
     /// <param name="locationAggregationLimit">If specified, representative location aggregation is used when the estimated location count is lower than this value.</param>
@@ -2190,6 +2191,7 @@ public class ObservationsController : ControllerBase
         [FromQuery] int minLocationCountBeforeClustering = 100,
         [FromQuery] CreatePolygonsMode createPolygons = CreatePolygonsMode.No,
         [FromQuery(Name = "bbox")] string? bboxQuery = null,
+        [FromQuery] bool includeFilterAreasInResult = false,
         [FromQuery] bool useCache = true,
         [FromQuery] bool createSampleObservations = false,
         [FromQuery] int? locationAggregationLimit = null,
@@ -2254,50 +2256,12 @@ public class ObservationsController : ControllerBase
                 UseCache = useCache,
                 CreateSampleObservations = createSampleObservations,
                 LocationAggregationLimit = locationAggregationLimit,
-                AdaptiveSearchStrategy = adaptiveSearchStrategy
+                AdaptiveSearchStrategy = adaptiveSearchStrategy,
+                IncludeFilterAreasInResult = includeFilterAreasInResult,
+                BoundingBoxIsEmpty = IsEmptyBoundingBox(filter?.Geographics?.BoundingBox)
             });
 
-            Response.StatusCode = (int)HttpStatusCode.OK;
-            Response.Headers.Append("X-Observations-TotalCount", result.ObservationsTotalCount.ToString());
-            if (result.EstimatedLocationCount.HasValue)
-            {
-                Response.Headers.Append("X-Estimated-Location-Count", result.EstimatedLocationCount.Value.ToString());
-            }
-            Response.Headers.Append("X-Result-Type", result.ResultType);
-            Response.Headers.Append("X-Feature-Count", result.FeatureCount.ToString());
-            if (result.LocationsBeforeClustering.HasValue)
-            {
-                Response.Headers.Append("X-Locations-Before-Clustering", result.LocationsBeforeClustering.Value.ToString());
-            }
-            if (result.Zoom.HasValue)
-            {
-                Response.Headers.Append("X-Zoom", result.Zoom.Value.ToString());
-            }
-            Response.Headers.Append("X-Cache", result.CacheStatus);
-            if (result.LocationPropertiesEstimated)
-            {
-                Response.Headers.Append("X-Location-Aggregation", result.LocationAggregation ?? "representative");
-                Response.Headers.Append("X-Location-Properties-Estimated", "true");
-                Response.Headers.Append("X-Location-Aggregation-Representatives-Count", "1");
-            }
-            totalStopwatch.Stop();
-            Response.Headers.Append("X-AdaptiveSearch-Timings", result.Timings.ToHeaderValue(totalStopwatch.Elapsed));
-            Response.ContentType = "application/geo+json; charset=utf-8";
-
-            if (result.ResultType == "geogrid")
-            {
-                var bytes = Encoding.UTF8.GetBytes(result.GeoJson ?? string.Empty);
-                await Response.Body.WriteAsync(bytes);
-                await Response.Body.FlushAsync();
-                return new EmptyResult();
-            }
-
-            await LocationClusterItemGeoJsonWriter.WriteFeatureCollectionAsync(
-                result.LocationClusterItems ?? Array.Empty<LocationClusterItem>(),
-                result.Bbox,
-                Response,
-                cutoffYear);
-            return new EmptyResult();
+            return await WriteAdaptiveSearchLocationsResponseAsync(result, totalStopwatch, cutoffYear);
         }
         catch (AuthenticationRequiredException e)
         {
@@ -2320,6 +2284,66 @@ public class ObservationsController : ControllerBase
         {
             semaphoreResult.Semaphore.Release();
         }
+    }
+
+    private async Task<IActionResult> WriteAdaptiveSearchLocationsResponseAsync(
+        AdaptiveSearchLocationsResult result,
+        Stopwatch totalStopwatch,
+        int? cutoffYear)
+    {
+        Response.StatusCode = (int)HttpStatusCode.OK;
+        Response.Headers.Append("X-Observations-TotalCount", result.ObservationsTotalCount.ToString());
+        if (result.EstimatedLocationCount.HasValue)
+        {
+            Response.Headers.Append("X-Estimated-Location-Count", result.EstimatedLocationCount.Value.ToString());
+        }
+        Response.Headers.Append("X-Result-Type", result.ResultType);
+        Response.Headers.Append("X-Feature-Count", result.FeatureCount.ToString());
+        if (result.LocationsBeforeClustering.HasValue)
+        {
+            Response.Headers.Append("X-Locations-Before-Clustering", result.LocationsBeforeClustering.Value.ToString());
+        }
+        if (result.Zoom.HasValue)
+        {
+            Response.Headers.Append("X-Zoom", result.Zoom.Value.ToString());
+        }
+        Response.Headers.Append("X-Cache", result.CacheStatus);
+        if (result.LocationPropertiesEstimated)
+        {
+            Response.Headers.Append("X-Location-Aggregation", result.LocationAggregation ?? "representative");
+            Response.Headers.Append("X-Location-Properties-Estimated", "true");
+            Response.Headers.Append("X-Location-Aggregation-Representatives-Count", "1");
+        }
+        totalStopwatch.Stop();
+        Response.Headers.Append("X-AdaptiveSearch-Timings", result.Timings.ToHeaderValue(totalStopwatch.Elapsed));
+        Response.ContentType = "application/geo+json; charset=utf-8";
+
+        if (result.ResultType == "geogrid")
+        {
+            var bytes = Encoding.UTF8.GetBytes(result.GeoJson ?? string.Empty);
+            await Response.Body.WriteAsync(bytes);
+            await Response.Body.FlushAsync();
+            return new EmptyResult();
+        }
+
+        await LocationClusterItemGeoJsonWriter.WriteFeatureCollectionAsync(
+            result.LocationClusterItems ?? Array.Empty<LocationClusterItem>(),
+            result.Bbox,
+            Response,
+            cutoffYear,
+            result.GeographicAreas);
+        return new EmptyResult();
+    }
+
+    private static bool IsEmptyBoundingBox(LatLonBoundingBoxDto? boundingBox)
+    {
+        if (boundingBox?.TopLeft == null || boundingBox.BottomRight == null)
+        {
+            return false;
+        }
+
+        return boundingBox.TopLeft.Longitude >= boundingBox.BottomRight.Longitude ||
+               boundingBox.BottomRight.Latitude >= boundingBox.TopLeft.Latitude;
     }
 
     private void LogUserInformation()

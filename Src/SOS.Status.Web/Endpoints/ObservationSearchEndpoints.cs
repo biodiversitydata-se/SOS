@@ -92,7 +92,8 @@ public static class ObservationSearchEndpoints
                        [FromQuery] string? bbox = null,
                        [FromQuery] bool createSampleObservations = false,
                        [FromQuery] bool useCache = true,
-                       [FromQuery] int? cutoffYear = null) =>
+                       [FromQuery] int? cutoffYear = null,
+                       [FromQuery] bool includeFilterAreasInResult = false) =>
                 {
                     try
                     {
@@ -115,7 +116,8 @@ public static class ObservationSearchEndpoints
                             bbox,
                             createSampleObservations,
                             useCache,
-                            cutoffYear);
+                            cutoffYear,
+                            includeFilterAreasInResult);
 
                         if (result.ObservationsTotalCount.HasValue)
                         {

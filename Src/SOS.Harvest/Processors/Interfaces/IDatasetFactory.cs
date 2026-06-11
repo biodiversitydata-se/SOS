@@ -14,4 +14,6 @@ public interface IDatasetFactory<TEntity> where TEntity : IEntity<int>
     /// <param name="verbatim"></param>
     /// <returns></returns>
     Dataset? CreateProcessedDataset(TEntity verbatim);
+
+    Dataset? CreateProcessedDataset(Dataset verbatim);
 }

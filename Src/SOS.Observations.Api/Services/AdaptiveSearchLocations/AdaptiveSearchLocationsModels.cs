@@ -1,4 +1,5 @@
 ﻿using SOS.Lib.Dtos.Filter;
+using NetTopologySuite.Features;
 using SOS.Lib.Gis;
 using SOS.Lib.Models.Gis;
 
@@ -35,6 +36,8 @@ public sealed class AdaptiveSearchLocationsRequest
     public bool CreateSampleObservations { get; init; }
     public int? LocationAggregationLimit { get; init; }
     public AdaptiveSearchLocationsStrategy AdaptiveSearchStrategy { get; init; } = AdaptiveSearchLocationsStrategy.ObservationsThenGrid;
+    public bool IncludeFilterAreasInResult { get; init; }
+    public bool BoundingBoxIsEmpty { get; init; }
 }
 
 public sealed class AdaptiveSearchLocationsResult
@@ -51,6 +54,7 @@ public sealed class AdaptiveSearchLocationsResult
     public required string CacheStatus { get; init; }
     public string? LocationAggregation { get; init; }
     public bool LocationPropertiesEstimated { get; init; }
+    public List<Feature>? GeographicAreas { get; init; }
     public AdaptiveSearchLocationsTimings Timings { get; init; } = new();
 }
 

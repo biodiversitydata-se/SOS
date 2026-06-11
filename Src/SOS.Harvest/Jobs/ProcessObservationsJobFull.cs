@@ -3,6 +3,7 @@ using Hangfire;
 using Microsoft.Extensions.Logging;
 using SOS.Harvest.Managers;
 using SOS.Harvest.Managers.Interfaces;
+using SOS.Harvest.Processors.DarwinCoreArchive;
 using SOS.Harvest.Processors.Artportalen.Interfaces;
 using SOS.Harvest.Processors.DarwinCoreArchive.Interfaces;
 using SOS.Harvest.Processors.Interfaces;
@@ -42,6 +43,24 @@ public class ProcessObservationsJobFull : ProcessObservationsJobBase, IProcessOb
 
     private readonly ICacheManager _cacheManager;
     private readonly string _exportContainer;
+
+    private static void CleanDataStewardshipDatasets(IEnumerable<DataProvider> dataProviders)
+    {
+        if (dataProviders == null)
+        {
+            return;
+        }
+
+        foreach (var dataProvider in dataProviders)
+        {
+            if (dataProvider?.DataStewardship == null)
+            {
+                continue;
+            }
+
+            dataProvider.DataStewardship = DwcaDatasetFactory.CleanDataset(dataProvider.DataStewardship);
+        }
+    }
 
     private async Task DisableEsDatasetIndexingAsync()
     {
@@ -647,6 +666,7 @@ public class ProcessObservationsJobFull : ProcessObservationsJobBase, IProcessOb
         await _dataProviderCache.ClearAsync();
 
         var dataProviders = await _dataProviderCache.GetAllAsync();
+        CleanDataStewardshipDatasets(dataProviders);
         var dataProvidersToProcess = dataProviders.Where(dataProvider => dataProvider.IsActive).ToList();
         _logger.LogInformation($"Start process observations. {LogHelper.GetMemoryUsageSummary()}");
         if (dataProvidersToProcess != null)
