@@ -84,6 +84,7 @@ using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Database;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Enums;
+using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.IO.Csv;
@@ -146,6 +147,11 @@ public static class DependencyInjectionExtensions
             areaConfiguration.ExcludeParishGeometries = excludeParishGeometries;
 
             // Elasticsearch
+            bool isRunningDotNetAspire = Environment.GetEnvironmentVariable("RUNNING_IN_ASPIRE").GetBoolean();
+            if (isRunningDotNetAspire)
+            {
+                searchDbConfiguration.DebugMode = true;
+            }
             services.AddSingleton(searchDbConfiguration);
             services.AddSingleton<IElasticClientManager, ElasticClientManager>(p => new ElasticClientManager(searchDbConfiguration));
 
