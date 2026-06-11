@@ -192,7 +192,7 @@ public class ExportAndSendJob : IExportAndSendJob
             var password = await _cryptoService.DecryptAsync(encryptedPassword);
 
             var additionalFiles = new List<(Stream stream, string filename)>();
-            var filterMarkdownStream = await _filterHelper.GetMarkDownAsync(searchFilter, CancellationToken.None);
+            var filterMarkdownStream = await _filterHelper.GetMarkDownAsync(searchFilter, filter, CancellationToken.None);
             additionalFiles.Add((filterMarkdownStream, "filter.md"));
             if ((searchFilter?.Geographics?.Geometries?.Count() ?? 0) != 0)
             {
@@ -260,6 +260,7 @@ public class ExportAndSendJob : IExportAndSendJob
             var additionalFiles = new List<(Stream stream, string filename)>();
             using var filterMarkdownStream = await _filterHelper.GetAnalysisMarkDownAsync(
                 searchFilter,
+                filter,
                 alphaValues: alphaValues?.ToArray(),
                 gridCellSizeInMeters: gridCellsInMeters,
                 useCenterPoint: useCenterPoint,
@@ -351,6 +352,7 @@ public class ExportAndSendJob : IExportAndSendJob
             var additionalFiles = new List<(Stream stream, string filename)>();
             using var filterMarkdownStream = await _filterHelper.GetAnalysisMarkDownAsync(
                  searchFilter,
+                 filter,
                  maxDistance: maxDistance,
                  gridCellSizeInMeters: gridCellsInMeters,
                  metricCoordinateSys: metricCoordinateSys,

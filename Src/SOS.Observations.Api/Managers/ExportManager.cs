@@ -162,7 +162,7 @@ public class ExportManager : IExportManager
             var filter = searchFilter.ToSearchFilter(userId ?? 0, protectionFilter, culture ?? "en-GB");
             await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
             var additionalFiles = new List<(Stream stream, string filename)>();
-            var filterMarkdownStream = await _filterHelper.GetMarkDownAsync(searchFilter, CancellationToken.None);
+            var filterMarkdownStream = await _filterHelper.GetMarkDownAsync(searchFilter, filter, CancellationToken.None);
             additionalFiles.Add((filterMarkdownStream, "filter.md"));
             if ((searchFilter?.Geographics?.Geometries?.Count() ?? 0) != 0)
             {
@@ -200,7 +200,7 @@ public class ExportManager : IExportManager
     {
         try
         {
-            var filterMarkdownStream = await _filterHelper.GetMarkDownAsync(filter, cancellationToken);
+            var filterMarkdownStream = await _filterHelper.GetMarkDownAsync(filter, null, cancellationToken);
             return filterMarkdownStream;
         }
         catch (Exception e)

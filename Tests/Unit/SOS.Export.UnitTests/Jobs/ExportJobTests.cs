@@ -81,7 +81,7 @@ public class ExportAndSendJobTests
             .ReturnsAsync(new Models.ZendTo.ZendToResponse());
         _userExportRepository.Setup(uer => uer.GetAsync(It.IsAny<int>())).ReturnsAsync(new UserExport());
         _userExportRepository.Setup(uer => uer.AddOrUpdateAsync(It.IsAny<UserExport>())).ReturnsAsync(true);
-        _filterHelper.Setup(fh => fh.GetMarkDownAsync(It.IsAny<SearchFilterDto>(), CancellationToken.None)).ReturnsAsync((MemoryStream)null);
+        _filterHelper.Setup(fh => fh.GetMarkDownAsync(It.IsAny<SearchFilterDto>(), It.IsAny<SearchFilter>(), CancellationToken.None)).ReturnsAsync((MemoryStream)null);
         //-----------------------------------------------------------------------------------------------------------
         // Act
         //-----------------------------------------------------------------------------------------------------------
@@ -133,7 +133,7 @@ public class ExportAndSendJobTests
 
         _userExportRepository.Setup(uer => uer.GetAsync(It.IsAny<int>())).ReturnsAsync(new UserExport());
         _userExportRepository.Setup(uer => uer.AddOrUpdateAsync(It.IsAny<UserExport>())).ReturnsAsync(true);
-        _filterHelper.Setup(fh => fh.GetMarkDownAsync(It.IsAny<SearchFilterDto>(), CancellationToken.None)).ReturnsAsync((MemoryStream)null);
+        _filterHelper.Setup(fh => fh.GetMarkDownAsync(It.IsAny<SearchFilterDto>(), It.IsAny<SearchFilter>(), CancellationToken.None)).ReturnsAsync((MemoryStream)null);
 
         //-----------------------------------------------------------------------------------------------------------
         // Act
@@ -178,7 +178,7 @@ public class ExportAndSendJobTests
             .Throws(new Exception());
         _userExportRepository.Setup(uer => uer.GetAsync(It.IsAny<int>())).ReturnsAsync(new UserExport());
         _userExportRepository.Setup(uer => uer.AddOrUpdateAsync(It.IsAny<UserExport>())).ReturnsAsync(true);
-        _filterHelper.Setup(fh => fh.GetMarkDownAsync(It.IsAny<SearchFilterDto>(), CancellationToken.None)).ReturnsAsync((MemoryStream)null);
+        _filterHelper.Setup(fh => fh.GetMarkDownAsync(It.IsAny<SearchFilterDto>(), It.IsAny<SearchFilter>(), CancellationToken.None)).ReturnsAsync((MemoryStream)null);
         //-----------------------------------------------------------------------------------------------------------
         // Act
         //-----------------------------------------------------------------------------------------------------------

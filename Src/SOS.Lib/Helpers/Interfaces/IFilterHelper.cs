@@ -1,6 +1,7 @@
-using NetTopologySuite.Geometries;
+﻿using NetTopologySuite.Geometries;
 using SOS.Lib.Dtos.Filter;
 using SOS.Lib.Enums;
+using SOS.Lib.Models.Search.Filters;
 
 namespace SOS.Lib.Helpers.Interfaces;
 
@@ -13,13 +14,15 @@ public interface IFilterHelper
     /// <remarks>The caller is responsible for disposing the returned memory stream. The method may return an
     /// empty stream if no observations match the filter.</remarks>
     /// <param name="filter">The search criteria used to filter species observations for export. Cannot be null.</param>
+    /// <param name="searchFilter">Optional processed filter used in repository operations. Can be null.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains a memory stream with the generated
     /// Markdown content.</returns>
-    Task<MemoryStream> GetMarkDownAsync(SearchFilterBaseDto filter, CancellationToken cancellationToken);
+    Task<MemoryStream> GetMarkDownAsync(SearchFilterBaseDto filter, SearchFilter? searchFilter, CancellationToken cancellationToken);
 
     Task<Stream> GetAnalysisMarkDownAsync(
         SearchFilterAggregationInternalDto? searchFilter,
+        SearchFilter? filter,
         double[]? alphaValues,
         int? gridCellSizeInMeters,
         bool? useCenterPoint,
@@ -33,6 +36,7 @@ public interface IFilterHelper
 
     Task<Stream> GetAnalysisMarkDownAsync(
         SearchFilterBaseDto? searchFilter,
+        SearchFilter? filter,
         int? maxDistance,
         int? gridCellSizeInMeters,
         MetricCoordinateSys? metricCoordinateSys,

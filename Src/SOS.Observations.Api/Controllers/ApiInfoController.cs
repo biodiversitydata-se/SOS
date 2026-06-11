@@ -3,7 +3,6 @@ using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.ApiInfo;
 using SOS.Lib.Swagger;
-using System;
 using System.Net;
 using System.Reflection;
 

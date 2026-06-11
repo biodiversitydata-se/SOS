@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
+using SharpCompress.Compressors.Xz.Filters;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Dtos.Enum;
 using SOS.Lib.Dtos.Filter;
@@ -9,9 +10,11 @@ using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Resource.Interfaces;
+using System.Reflection;
 using System.Text.Json;
 using static SOS.Lib.Dtos.Filter.ExtendedFilterDto;
 
@@ -19,6 +22,7 @@ namespace SOS.Lib.Helpers;
 
 public class FilterHelper : IFilterHelper
 {
+    private readonly IProcessedObservationCoreRepository _processedObservationCoreRepository;
     private readonly IAreaCache _areaCache;
     private readonly IDataProviderCache _dataProviderCache;
     private readonly IDatasetRepository _datasetRepository;
@@ -43,6 +47,25 @@ public class FilterHelper : IFilterHelper
         var header = mdf.AtxHeading(text, level);
         header.GetTrailingTrivia().Add(mdf.NewLineTrivia());
         md.AppendChild(header);
+    }
+
+    /// <summary>
+    /// Adds a citation section to the specified Markdown syntax tree, providing guidelines for referencing the Fynddata tool in scientific publications and reports. The method includes recommended citation formats and examples to ensure proper acknowledgment of the data source.
+    /// </summary>
+    /// <param name="md"></param>
+    private void AddCitation(MarkdownSyntaxTree md)
+    {
+        var mdf = md.SyntaxFactory;
+        var publishYear = Assembly.GetEntryAssembly().GetBuildDate().Year;
+        string version = Assembly.GetEntryAssembly().GetVersionNumber();
+
+        AddHeader(md, "Citeringsanvisning", 2);
+        var paragraph = mdf.Paragraph();
+        paragraph.AppendChild(mdf.Text("I vetenskapliga publikationer och andra rapporter där verktyget Fynddata använts, bör man referera enligt följande:"));
+        md.AppendChild(paragraph);
+        TryAddParagraph(md, "Material och metoder", @$"Data använda i den här studien har laddats ned från SLU Artdatabankens API SOS (SLU Artdatabanken {publishYear}) den {DateTime.Now:yyyy-MM-dd}. Följande databaser har använts: [t ex Artportalen, …]", true);
+        TryAddParagraph(md, "Referenslista", @"SLU Artdatabanken (utgivningsår). SOS (Version #) [Webbapplikation]. SLU Artdatabanken. https://api-portal.artdatabanken.se/product#product=sos [åtkomstdatum YYYY-MM-DD]", true);
+        TryAddParagraph(md, "Till exempel", @$"SLU Artdatabanken ({publishYear}). SOS (Version {version}) [Webbapplikation]. SLU Artdatabanken. https://api-portal.artdatabanken.se/product#product=sos [åtkomst {DateTime.Now:yyyy-MM-dd}]", true);
     }
 
     /// <summary>
@@ -77,7 +100,7 @@ public class FilterHelper : IFilterHelper
 
     }
 
-    private void TryAddParagraph(MarkdownSyntaxTree md, string label, string value)
+    private void TryAddParagraph(MarkdownSyntaxTree md, string label, string value, bool pagebreakAfterLabel = false)
     {
         if (string.IsNullOrEmpty(value))
         {
@@ -87,7 +110,13 @@ public class FilterHelper : IFilterHelper
         var paragraph = mdf.Paragraph();
         var bold = mdf.Emphasis(Emphasis.Strong);
         bold.AppendChild(mdf.Text($"{label}:"));
-        paragraph.AppendChild(bold);
+
+        if (pagebreakAfterLabel)
+        {
+            paragraph.GetTrailingTrivia().Add(mdf.NewLineTrivia());
+        }
+
+        paragraph.AppendChild(bold);        
         paragraph.AppendChild(mdf.Whitespace());
         paragraph.AppendChild(mdf.Text($"{value}"));
         paragraph.AppendChild(mdf.Whitespace());
@@ -339,14 +368,11 @@ public class FilterHelper : IFilterHelper
     /// providers are found, the method logs a warning and does not modify the Markdown syntax tree.</remarks>
     /// <param name="md">The MarkdownSyntaxTree instance to which data provider information will be added.</param>
     /// <param name="filter">The SearchFilterBaseDto containing the data provider identifiers to process.</param>
+    /// <param name="searchFilter">Processed serach filter</param>
     /// <returns>A task that represents the asynchronous operation of adding data provider information to the Markdown syntax
     /// tree.</returns>
-    private async Task TryAddDataProviderInfoAsync(MarkdownSyntaxTree md, DataProviderFilterDto filter)
+    private async Task TryAddDataProviderInfoAsync(MarkdownSyntaxTree md, DataProviderFilterDto filter, SearchFilter? searchFilter)
     {
-        if ((filter?.Ids?.Count() ?? 0) == 0)
-        {
-            return;
-        }
         var dataProviders = await _dataProviderCache.GetAllAsync();
         if ((dataProviders?.Count() ?? 0) == 0)
         {
@@ -354,10 +380,28 @@ public class FilterHelper : IFilterHelper
             return;
         }
 
-        TryAddList(md, ("Data Providers", 2), dataProviders
-            .Where(dp => filter.Ids.Contains(dp.Id))
-            .Select(dp => dp.Identifier)
-        );
+        var providerCount = new Dictionary<int, string>();
+
+        if (searchFilter != null) {
+            var result = await _processedObservationCoreRepository.GetAggregationItemsAsync(searchFilter, "dataProviderId", 0, 100);
+            if (result?.Records?.Any() ?? false)
+            {
+                providerCount = result.Records.ToDictionary(r => int.Parse(r.AggregationKey), r => $"{dataProviders.FirstOrDefault(p => p.Id.ToString() == r.AggregationKey).Identifier ?? "-Saknas-"}, Count: {r.DocCount}");
+            }
+        }
+        
+        if ((filter?.Ids?.Count() ?? 0) != 0)
+        {
+            foreach(var provider in dataProviders.Where(dp => filter.Ids.Contains(dp.Id)))
+            {
+                if (!providerCount.ContainsKey(provider.Id))
+                {
+                    providerCount.Add(provider.Id, $"{dataProviders.FirstOrDefault(p => p.Id == provider.Id).Identifier ?? " -Saknas-"}, Count: 0");
+                }
+            }
+        }
+       
+        TryAddList(md, ("Data Providers", 2), providerCount.Values.OrderBy(p => p));
     }
 
     /// <summary>
@@ -378,7 +422,6 @@ public class FilterHelper : IFilterHelper
         var mdf = md.SyntaxFactory;
 
         TryAddList(md, ("Id´s", 3), filter.Ids);
-
     }
 
     /// <summary>
@@ -400,7 +443,6 @@ public class FilterHelper : IFilterHelper
         var mdf = md.SyntaxFactory;
 
         TryAddList(md, ("Occurrence Id´s", 3), filter.OccurrenceIds);
-
     }
 
     /// <summary>
@@ -566,7 +608,15 @@ public class FilterHelper : IFilterHelper
     }
     #endregion Filter
 
-    public FilterHelper(IAreaCache areaCache, IDataProviderCache dataProviderCache, IDatasetRepository datasetRepository, ICache<int, ProjectInfo> projectCache, ICache<int, Taxon> taxonCache, ICache<int, TaxonList> taxonListCache, IVocabularyRepository vocabularyRepository, ILogger<FilterHelper> logger)
+    public FilterHelper(IAreaCache areaCache,
+        IDataProviderCache dataProviderCache,
+        IDatasetRepository datasetRepository,
+        ICache<int, ProjectInfo> projectCache,
+        ICache<int, Taxon> taxonCache,
+        ICache<int, TaxonList> taxonListCache,
+        IProcessedObservationCoreRepository processedObservationCoreRepository,
+        IVocabularyRepository vocabularyRepository,
+        ILogger<FilterHelper> logger)
     {
         _areaCache = areaCache ?? throw new ArgumentNullException(nameof(areaCache));
         _dataProviderCache = dataProviderCache ?? throw new ArgumentNullException(nameof(dataProviderCache));
@@ -574,11 +624,12 @@ public class FilterHelper : IFilterHelper
         _projectCache = projectCache ?? throw new ArgumentNullException(nameof(projectCache));
         _taxonCache = taxonCache ?? throw new ArgumentNullException(nameof(taxonCache));
         _taxonListCache = taxonListCache ?? throw new ArgumentNullException(nameof(taxonListCache));
+        _processedObservationCoreRepository = processedObservationCoreRepository ?? throw new ArgumentNullException(nameof(processedObservationCoreRepository));
         _vocabularyRepository = vocabularyRepository ?? throw new ArgumentNullException(nameof(vocabularyRepository));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
-    public async Task<MemoryStream> GetMarkDownAsync(SearchFilterBaseDto filter, CancellationToken cancellationToken)
+    public async Task<MemoryStream> GetMarkDownAsync(SearchFilterBaseDto filter, SearchFilter searchFilter, CancellationToken cancellationToken)
     {
         try
         {
@@ -588,7 +639,7 @@ public class FilterHelper : IFilterHelper
             }
             var vocabularies = await _vocabularyRepository.GetAllAsync();
             var md = new MarkdownSyntaxTree();
-            AddHeader(md, "Filter", 1);
+            AddHeader(md, $"Filter {DateTime.Now:yyyy-MM-dd HH:mm}", 1);
 
             TryAddParagraph(md, "Occurrence Status", filter.OccurrenceStatus.HasValue ? filter.OccurrenceStatus.Value switch
             {
@@ -628,7 +679,7 @@ public class FilterHelper : IFilterHelper
             TryAddDateInfo(md, filter.Date);
             await TryAddTaxaInfoAsync(md, filter.Taxon, vocabularies.FirstOrDefault(v => v.Id == VocabularyId.TaxonCategory)?.Values);
             await TryAddGeographicsInfoAsync(md, filter.Geographics);
-            await TryAddDataProviderInfoAsync(md, filter.DataProvider);
+            await TryAddDataProviderInfoAsync(md, filter.DataProvider, searchFilter);
             await TryAddDataProjectInfoAsync(md, filter.ProjectIds);
             TryAddEventInfo(md, filter.Event);
             TryAddModifiedDateInfo(md, filter.ModifiedDate);
@@ -647,6 +698,8 @@ public class FilterHelper : IFilterHelper
                 } : null);
             }
 
+            AddCitation(md);
+
             var stream = new MemoryStream();
             md.Save(stream);
             stream.Position = 0;
@@ -661,6 +714,7 @@ public class FilterHelper : IFilterHelper
 
     public async Task<Stream> GetAnalysisMarkDownAsync(
         SearchFilterAggregationInternalDto? searchFilter,
+        SearchFilter? filter,
         double[]? alphaValues,
         int? gridCellSizeInMeters,
         bool? useCenterPoint,
@@ -757,7 +811,7 @@ public class FilterHelper : IFilterHelper
                 TryAddDateInfo(md, searchFilter.Date);
                 await TryAddTaxaInfoAsync(md, searchFilter.Taxon, vocabularies.FirstOrDefault(v => v.Id == VocabularyId.TaxonCategory)?.Values);
                 await TryAddGeographicsInfoAsync(md, searchFilter.Geographics);
-                await TryAddDataProviderInfoAsync(md, searchFilter.DataProvider);
+                await TryAddDataProviderInfoAsync(md, searchFilter.DataProvider, filter);
                 await TryAddDataProjectInfoAsync(md, searchFilter.ProjectIds);
                 TryAddEventInfo(md, searchFilter.Event);
                 TryAddModifiedDateInfo(md, searchFilter.ModifiedDate);
@@ -782,6 +836,7 @@ public class FilterHelper : IFilterHelper
     /// </summary>
     public async Task<Stream> GetAnalysisMarkDownAsync(
         SearchFilterBaseDto? searchFilter,
+        SearchFilter? filter,
         int? maxDistance,
         int? gridCellSizeInMeters,
         MetricCoordinateSys? metricCoordinateSys,
@@ -840,7 +895,7 @@ public class FilterHelper : IFilterHelper
                 TryAddDateInfo(md, searchFilter.Date);
                 await TryAddTaxaInfoAsync(md, searchFilter.Taxon, vocabularies.FirstOrDefault(v => v.Id == VocabularyId.TaxonCategory)?.Values);
                 await TryAddGeographicsInfoAsync(md, searchFilter.Geographics);
-                await TryAddDataProviderInfoAsync(md, searchFilter.DataProvider);
+                await TryAddDataProviderInfoAsync(md, searchFilter.DataProvider, filter);
                 await TryAddDataProjectInfoAsync(md, searchFilter.ProjectIds);
                 TryAddEventInfo(md, searchFilter.Event);
                 TryAddModifiedDateInfo(md, searchFilter.ModifiedDate);
