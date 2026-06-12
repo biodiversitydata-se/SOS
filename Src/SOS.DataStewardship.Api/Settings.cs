@@ -1,4 +1,4 @@
-using System.Text.Json;
+﻿using System.Text.Json;
 public interface ISettings
 {
     //string[] AllowedOrigins { get; init; }
@@ -34,7 +34,7 @@ public class Settings : ISettings
     public Settings(IConfiguration configuration) // register in DI container as singleton!
     {
         //AllowedOrigins = GetConfigValueString("AllowedOrigins", configuration).Split(",").Select(s => s.Trim()).ToArray();
-
+        bool isRunningDotNetAspire = Environment.GetEnvironmentVariable("RUNNING_IN_ASPIRE").GetBoolean();
         ApplicationInsights = GetConfigSection<ApplicationInsights>("ApplicationInsights", configuration);
         InstrumentationKey = GetConfigValueString("InstrumentationKey", configuration, sensitiveSetting: true, required: false);
         if (ApplicationInsights.InstrumentationKey.Contains("SECRET_PLACEHOLDER"))
@@ -70,6 +70,11 @@ public class Settings : ISettings
             SearchDbConfiguration.Password = SearchDbPassword;
             Log.Logger.Information("replaced SECRET_PLACEHOLDER in SearchDbConfiguration.Password with the value in SearchDbPassword");
         }
+        if (isRunningDotNetAspire)
+        {
+            SearchDbConfiguration.DebugMode = true;
+        }
+
         UserServiceConfiguration = GetConfigSection<UserServiceConfiguration>("UserServiceConfiguration", configuration);
     }
 

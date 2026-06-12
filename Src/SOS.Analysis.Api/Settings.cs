@@ -1,5 +1,6 @@
-using SOS.Analysis.Api.Configuration;
+﻿using SOS.Analysis.Api.Configuration;
 using SOS.Lib.Configuration.Shared;
+using SOS.Lib.Extensions;
 using SOS.Shared.Api.Configuration;
 using System.Text.Json;
 
@@ -34,6 +35,7 @@ public static class Settings
         using var loggerFactory = LoggerFactory.Create(loggingBuilder => loggingBuilder.SetMinimumLevel(LogLevel.Debug).AddConsole());
         var logger = loggerFactory.CreateLogger("Settings");
 
+        bool isRunningDotNetAspire = Environment.GetEnvironmentVariable("RUNNING_IN_ASPIRE").GetBoolean();
         CorsAllowAny = GetConfigValueString("CorsAllowAny", configuration, logger, sensitiveSetting: false, required: false)?.Equals("true", StringComparison.CurrentCultureIgnoreCase) ?? false;
         AnalysisConfiguration = GetConfigSection<AnalysisConfiguration>("AnalysisConfiguration", configuration, logger);
 
@@ -89,6 +91,11 @@ public static class Settings
             SearchDbConfiguration.Password = SearchDbPassword;
             logger.LogInformation("replaced SECRET_PLACEHOLDER in SearchDbConfiguration.Password with the value in SearchDbPassword");
         }
+        if (isRunningDotNetAspire)
+        {
+            SearchDbConfiguration.DebugMode = true;
+        }
+
 
         // Process db
         ProcessDbConfiguration = GetConfigSection<MongoDbConfiguration>("ProcessDbConfiguration", configuration, logger);
