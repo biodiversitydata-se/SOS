@@ -208,7 +208,7 @@ public static class DependencyInjectionExtensions
             // Helpers, single instance since static data
             services.AddSingleton<IAreaNameMapper, AreaNameMapper>();
             services.AddSingleton<IAreaHelper, AreaHelper>();
-            services.AddSingleton<IFilterHelper, FilterHelper>();
+            services.AddSingleton<IMarkdownHelper, MarkdownHelper>();
             services.AddSingleton<IVocabulariesDiffHelper, VocabulariesDiffHelper>();
             services.AddSingleton<IVocabularyValueResolver, VocabularyValueResolver>();
 

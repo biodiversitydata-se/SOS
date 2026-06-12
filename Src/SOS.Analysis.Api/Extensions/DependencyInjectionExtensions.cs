@@ -114,7 +114,7 @@ public static class DependencyInjectionExtensions
             services.AddSingleton<IFileService, FileService>();
 
             //Add helpers
-            services.AddSingleton<IFilterHelper, FilterHelper>();
+            services.AddSingleton<IMarkdownHelper, MarkdownHelper>();
 
             // Add Utilites
             services.AddSingleton<ISearchFilterUtility, SearchFilterUtility>();

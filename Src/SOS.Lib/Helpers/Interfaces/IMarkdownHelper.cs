@@ -5,8 +5,25 @@ using SOS.Lib.Models.Search.Filters;
 
 namespace SOS.Lib.Helpers.Interfaces;
 
-public interface IFilterHelper
+public interface IMarkdownHelper
 {
+    /// <summary>
+    /// Generates a Markdown-formatted citation for the specified source string.
+    /// </summary>
+    /// <param name="authorizationApplicationIdentifier">The source string to include in the citation.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <returns>A memory stream containing the generated Markdown content.</returns>
+    MemoryStream GetCitationMarkDown(string authorizationApplicationIdentifier, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Asynchronously generates a Markdown-formatted export of datasets that match the specified search filter.
+    /// </summary>
+    /// <param name="searchFilter">The search criteria used to filter datasets for export. Can be null.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains a memory stream with the generated
+    /// Markdown content.</returns>
+    Task<MemoryStream> GetDatasetsMarkDownAsync(SearchFilter? searchFilter, CancellationToken cancellationToken);
+
     /// <summary>
     /// Asynchronously generates a Markdown-formatted export of species observations that match the specified search
     /// filter.
@@ -14,15 +31,13 @@ public interface IFilterHelper
     /// <remarks>The caller is responsible for disposing the returned memory stream. The method may return an
     /// empty stream if no observations match the filter.</remarks>
     /// <param name="filter">The search criteria used to filter species observations for export. Cannot be null.</param>
-    /// <param name="searchFilter">Optional processed filter used in repository operations. Can be null.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains a memory stream with the generated
     /// Markdown content.</returns>
-    Task<MemoryStream> GetMarkDownAsync(SearchFilterBaseDto filter, SearchFilter? searchFilter, CancellationToken cancellationToken);
+    Task<MemoryStream> GetFilterMarkDownAsync(SearchFilterBaseDto filter, CancellationToken cancellationToken);
 
     Task<Stream> GetAnalysisMarkDownAsync(
         SearchFilterAggregationInternalDto? searchFilter,
-        SearchFilter? filter,
         double[]? alphaValues,
         int? gridCellSizeInMeters,
         bool? useCenterPoint,
@@ -36,7 +51,6 @@ public interface IFilterHelper
 
     Task<Stream> GetAnalysisMarkDownAsync(
         SearchFilterBaseDto? searchFilter,
-        SearchFilter? filter,
         int? maxDistance,
         int? gridCellSizeInMeters,
         MetricCoordinateSys? metricCoordinateSys,

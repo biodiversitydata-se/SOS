@@ -7,6 +7,7 @@ using SOS.Lib.Dtos.Enum;
 using SOS.Lib.Dtos.Filter;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions.Dto;
+using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Jobs.Export;
 using SOS.Lib.Models.Export;
@@ -20,7 +21,7 @@ namespace SOS.Export.Jobs;
 /// </summary>
 public class ExportAndSendJob : IExportAndSendJob
 {
-    private readonly IFilterHelper _filterHelper;
+    private readonly IMarkdownHelper _markdownHelper;
     private readonly ICryptoService _cryptoService;
     private readonly IObservationManager _observationManager;
     private readonly IUserExportRepository _userExportRepository;
@@ -107,13 +108,13 @@ public class ExportAndSendJob : IExportAndSendJob
     /// <param name="cryptoService"></param>
     /// <param name="logger"></param>
     /// <exception cref="ArgumentNullException"></exception>
-    public ExportAndSendJob(IObservationManager observationManager, IUserExportRepository userExportRepository, ICryptoService cryptoService, IFilterHelper filterHelper, ILogger<ExportAndSendJob> logger)
+    public ExportAndSendJob(IObservationManager observationManager, IUserExportRepository userExportRepository, ICryptoService cryptoService, IMarkdownHelper filterHelper, ILogger<ExportAndSendJob> logger)
     {
         _observationManager = observationManager ?? throw new ArgumentNullException(nameof(observationManager));
         _userExportRepository =
             userExportRepository ?? throw new ArgumentNullException(nameof(userExportRepository));
         _cryptoService = cryptoService ?? throw new ArgumentNullException(nameof(cryptoService));
-        _filterHelper = filterHelper ?? throw new ArgumentNullException(nameof(filterHelper));
+        _markdownHelper = filterHelper ?? throw new ArgumentNullException(nameof(filterHelper));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
@@ -192,11 +193,16 @@ public class ExportAndSendJob : IExportAndSendJob
             var password = await _cryptoService.DecryptAsync(encryptedPassword);
 
             var additionalFiles = new List<(Stream stream, string filename)>();
-            var filterMarkdownStream = await _filterHelper.GetMarkDownAsync(searchFilter, filter, CancellationToken.None);
+            var filterMarkdownStream = await _markdownHelper.GetFilterMarkDownAsync(searchFilter, CancellationToken.None);
             additionalFiles.Add((filterMarkdownStream, "filter.md"));
+            var citationMarkdownStream = _markdownHelper.GetCitationMarkDown(authorizationApplicationIdentifier, CancellationToken.None);
+            additionalFiles.Add((citationMarkdownStream, "citation.md"));
+            var datasetsMarkdownStream = await _markdownHelper.GetDatasetsMarkDownAsync(filter, CancellationToken.None);
+            additionalFiles.Add((datasetsMarkdownStream, "datasets.md"));
+
             if ((searchFilter?.Geographics?.Geometries?.Count() ?? 0) != 0)
             {
-                var geoJsonStream = _filterHelper.TryGetFeatureCollection(searchFilter.Geographics.Geometries);
+                var geoJsonStream = _markdownHelper.TryGetFeatureCollection(searchFilter.Geographics.Geometries);
                 if (geoJsonStream != null)
                 {
                     additionalFiles.Add((geoJsonStream, "geometries.geojson"));
@@ -255,12 +261,9 @@ public class ExportAndSendJob : IExportAndSendJob
             await UpdateJobInfoStartProcessing(userId, context?.BackgroundJob?.Id);
             var password = await _cryptoService.DecryptAsync(encryptedPassword);
 
-            
-
             var additionalFiles = new List<(Stream stream, string filename)>();
-            using var filterMarkdownStream = await _filterHelper.GetAnalysisMarkDownAsync(
+            using var filterMarkdownStream = await _markdownHelper.GetAnalysisMarkDownAsync(
                 searchFilter,
-                filter,
                 alphaValues: alphaValues?.ToArray(),
                 gridCellSizeInMeters: gridCellsInMeters,
                 useCenterPoint: useCenterPoint,
@@ -271,11 +274,14 @@ public class ExportAndSendJob : IExportAndSendJob
                 metricCoordinateSys: metricCoordinateSys,
                 coordinateSystem: coordinateSystem,
                 cancellationToken: CancellationToken.None);
-
             additionalFiles.Add((filterMarkdownStream, "filter.md"));
+            var citationMarkdownStream = _markdownHelper.GetCitationMarkDown(authorizationApplicationIdentifier, CancellationToken.None);
+            additionalFiles.Add((citationMarkdownStream, "citation.md"));
+            var datasetsMarkdownStream = await _markdownHelper.GetDatasetsMarkDownAsync(filter, CancellationToken.None);
+            additionalFiles.Add((datasetsMarkdownStream, "datasets.md"));
             if ((searchFilter?.Geographics?.Geometries?.Count() ?? 0) != 0)
             {
-                var geoJsonStream = _filterHelper.TryGetFeatureCollection(searchFilter.Geographics.Geometries);
+                var geoJsonStream = _markdownHelper.TryGetFeatureCollection(searchFilter.Geographics.Geometries);
                 if (geoJsonStream != null)
                 {
                     additionalFiles.Add((geoJsonStream, "geometries.geojson"));
@@ -350,18 +356,21 @@ public class ExportAndSendJob : IExportAndSendJob
             var password = await _cryptoService.DecryptAsync(encryptedPassword);
 
             var additionalFiles = new List<(Stream stream, string filename)>();
-            using var filterMarkdownStream = await _filterHelper.GetAnalysisMarkDownAsync(
+            using var filterMarkdownStream = await _markdownHelper.GetAnalysisMarkDownAsync(
                  searchFilter,
-                 filter,
                  maxDistance: maxDistance,
                  gridCellSizeInMeters: gridCellsInMeters,
                  metricCoordinateSys: metricCoordinateSys,
                  coordinateSystem: coordinateSystem,
                  cancellationToken: CancellationToken.None);
             additionalFiles.Add((filterMarkdownStream, "filter.md"));
+            var citationMarkdownStream = _markdownHelper.GetCitationMarkDown(authorizationApplicationIdentifier, CancellationToken.None);
+            additionalFiles.Add((citationMarkdownStream, "citation.md"));
+            var datasetsMarkdownStream = await _markdownHelper.GetDatasetsMarkDownAsync(filter, CancellationToken.None);
+            additionalFiles.Add((datasetsMarkdownStream, "datasets.md"));
             if ((searchFilter?.Geographics?.Geometries?.Count() ?? 0) != 0)
             {
-                var geoJsonStream = _filterHelper.TryGetFeatureCollection(searchFilter.Geographics.Geometries);
+                var geoJsonStream = _markdownHelper.TryGetFeatureCollection(searchFilter.Geographics.Geometries);
                 if (geoJsonStream != null)
                 {
                     additionalFiles.Add((geoJsonStream, "geometries.geojson"));

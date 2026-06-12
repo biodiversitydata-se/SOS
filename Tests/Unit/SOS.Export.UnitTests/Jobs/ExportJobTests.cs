@@ -28,14 +28,14 @@ public class ExportAndSendJobTests
         _observationManager = new Mock<IObservationManager>();
         _userExportRepository = new Mock<IUserExportRepository>();
         _cryptoService = new Mock<ICryptoService>();
-        _filterHelper = new Mock<IFilterHelper>();
+        _markdownHelper = new Mock<IMarkdownHelper>();
         _loggerMock = new Mock<ILogger<ExportAndSendJob>>();
     }
 
     private readonly Mock<IObservationManager> _observationManager;
     private readonly Mock<IUserExportRepository> _userExportRepository;
     private readonly Mock<ICryptoService> _cryptoService;
-    private readonly Mock<IFilterHelper> _filterHelper;
+    private readonly Mock<IMarkdownHelper> _markdownHelper;
     private readonly Mock<ILogger<ExportAndSendJob>> _loggerMock;
 
     /// <summary>
@@ -45,7 +45,7 @@ public class ExportAndSendJobTests
         _observationManager.Object,
         _userExportRepository.Object,
         _cryptoService.Object,
-        _filterHelper.Object,
+        _markdownHelper.Object,
         _loggerMock.Object);
 
     /// <summary>
@@ -81,7 +81,9 @@ public class ExportAndSendJobTests
             .ReturnsAsync(new Models.ZendTo.ZendToResponse());
         _userExportRepository.Setup(uer => uer.GetAsync(It.IsAny<int>())).ReturnsAsync(new UserExport());
         _userExportRepository.Setup(uer => uer.AddOrUpdateAsync(It.IsAny<UserExport>())).ReturnsAsync(true);
-        _filterHelper.Setup(fh => fh.GetMarkDownAsync(It.IsAny<SearchFilterDto>(), It.IsAny<SearchFilter>(), CancellationToken.None)).ReturnsAsync((MemoryStream)null);
+        _markdownHelper.Setup(fh => fh.GetFilterMarkDownAsync(It.IsAny<SearchFilterDto>(), CancellationToken.None)).ReturnsAsync((MemoryStream)null);
+        _markdownHelper.Setup(fh => fh.GetCitationMarkDown(It.IsAny<string>(), CancellationToken.None)).Returns((MemoryStream)null);
+        _markdownHelper.Setup(fh => fh.GetDatasetsMarkDownAsync(It.IsAny<SearchFilter>(), CancellationToken.None)).ReturnsAsync((MemoryStream)null);
         //-----------------------------------------------------------------------------------------------------------
         // Act
         //-----------------------------------------------------------------------------------------------------------
@@ -133,7 +135,9 @@ public class ExportAndSendJobTests
 
         _userExportRepository.Setup(uer => uer.GetAsync(It.IsAny<int>())).ReturnsAsync(new UserExport());
         _userExportRepository.Setup(uer => uer.AddOrUpdateAsync(It.IsAny<UserExport>())).ReturnsAsync(true);
-        _filterHelper.Setup(fh => fh.GetMarkDownAsync(It.IsAny<SearchFilterDto>(), It.IsAny<SearchFilter>(), CancellationToken.None)).ReturnsAsync((MemoryStream)null);
+        _markdownHelper.Setup(fh => fh.GetFilterMarkDownAsync(It.IsAny<SearchFilterDto>(), CancellationToken.None)).ReturnsAsync((MemoryStream)null);
+        _markdownHelper.Setup(fh => fh.GetCitationMarkDown(It.IsAny<string>(), CancellationToken.None)).Returns((MemoryStream)null);
+        _markdownHelper.Setup(fh => fh.GetDatasetsMarkDownAsync(It.IsAny<SearchFilter>(), CancellationToken.None)).ReturnsAsync((MemoryStream)null);  
 
         //-----------------------------------------------------------------------------------------------------------
         // Act
@@ -178,7 +182,9 @@ public class ExportAndSendJobTests
             .Throws(new Exception());
         _userExportRepository.Setup(uer => uer.GetAsync(It.IsAny<int>())).ReturnsAsync(new UserExport());
         _userExportRepository.Setup(uer => uer.AddOrUpdateAsync(It.IsAny<UserExport>())).ReturnsAsync(true);
-        _filterHelper.Setup(fh => fh.GetMarkDownAsync(It.IsAny<SearchFilterDto>(), It.IsAny<SearchFilter>(), CancellationToken.None)).ReturnsAsync((MemoryStream)null);
+        _markdownHelper.Setup(fh => fh.GetFilterMarkDownAsync(It.IsAny<SearchFilterDto>(), CancellationToken.None)).ReturnsAsync((MemoryStream)null);
+        _markdownHelper.Setup(fh => fh.GetCitationMarkDown(It.IsAny<string>(), CancellationToken.None)).Returns((MemoryStream)null);
+        _markdownHelper.Setup(fh => fh.GetDatasetsMarkDownAsync(It.IsAny<SearchFilter>(), CancellationToken.None)).ReturnsAsync((MemoryStream)null);
         //-----------------------------------------------------------------------------------------------------------
         // Act
         //-----------------------------------------------------------------------------------------------------------

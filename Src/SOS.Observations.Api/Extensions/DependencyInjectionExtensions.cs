@@ -219,7 +219,7 @@ public static class DependencyInjectionExtensions
 
             // Helpers, static data => single instance 
             services.AddSingleton<IVocabularyValueResolver, VocabularyValueResolver>();
-            services.AddSingleton<IFilterHelper, FilterHelper>();
+            services.AddSingleton<IMarkdownHelper, MarkdownHelper>();
             return services;
         }
     }

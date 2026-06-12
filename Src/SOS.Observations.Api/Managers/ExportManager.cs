@@ -26,7 +26,7 @@ namespace SOS.Observations.Api.Managers;
 public class ExportManager : IExportManager
 {
     private readonly IFilterManager _filterManager;
-    private readonly IFilterHelper _filterHelper;
+    private readonly IMarkdownHelper _markdownHelper;
     private readonly IDwcArchiveFileWriter _dwcArchiveFileWriter;
     private readonly IDwcArchiveEventFileWriter _dwcArchiveEventFileWriter;
     private readonly ICsvFileWriter _csvWriter;
@@ -101,7 +101,7 @@ public class ExportManager : IExportManager
     /// <param name="processedObservationRepository">The repository for accessing processed observation data. Cannot be null.</param>
     /// <param name="processInfoRepository">The repository for accessing process information related to exports. Cannot be null.</param>
     /// <param name="filterManager">The filter manager used to apply and manage export filters. Cannot be null.</param>
-    /// <param name="filterHelper">The filter helper used to assist with filter operations during export. Cannot be null.</param>
+    /// <param name="markdownHelper">The filter helper used to assist with filter operations during export. Cannot be null.</param>
     /// <param name="logger">The logger used for logging export operations and errors. Cannot be null.</param>
     /// <exception cref="ArgumentNullException">Thrown if any parameter is null.</exception>
     public ExportManager(
@@ -113,7 +113,7 @@ public class ExportManager : IExportManager
         IProcessedObservationRepository processedObservationRepository,
         IProcessInfoRepository processInfoRepository,
         IFilterManager filterManager,
-        IFilterHelper filterHelper,
+        IMarkdownHelper markdownHelper,
         ILogger<ExportManager> logger)
     {
         _csvWriter = csvWriter ?? throw new ArgumentNullException(nameof(csvWriter));
@@ -131,7 +131,7 @@ public class ExportManager : IExportManager
         _processInfoRepository =
             processInfoRepository ?? throw new ArgumentNullException(nameof(processInfoRepository));
         _filterManager = filterManager ?? throw new ArgumentNullException(nameof(filterManager));
-        _filterHelper = filterHelper ?? throw new ArgumentNullException(nameof(filterHelper));
+        _markdownHelper = markdownHelper ?? throw new ArgumentNullException(nameof(markdownHelper));
 
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
@@ -162,11 +162,16 @@ public class ExportManager : IExportManager
             var filter = searchFilter.ToSearchFilter(userId ?? 0, protectionFilter, culture ?? "en-GB");
             await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
             var additionalFiles = new List<(Stream stream, string filename)>();
-            var filterMarkdownStream = await _filterHelper.GetMarkDownAsync(searchFilter, filter, CancellationToken.None);
+            var filterMarkdownStream = await _markdownHelper.GetFilterMarkDownAsync(searchFilter, CancellationToken.None);
             additionalFiles.Add((filterMarkdownStream, "filter.md"));
+            var citationMarkdownStream = _markdownHelper.GetCitationMarkDown(authorizationApplicationIdentifier, CancellationToken.None);
+            additionalFiles.Add((citationMarkdownStream, "citation.md"));
+            var datasetsMarkdownStream = await _markdownHelper.GetDatasetsMarkDownAsync(filter, CancellationToken.None);
+            additionalFiles.Add((datasetsMarkdownStream, "datasets.md"));
+
             if ((searchFilter?.Geographics?.Geometries?.Count() ?? 0) != 0)
             {
-                var geoJsonStream = _filterHelper.TryGetFeatureCollection(searchFilter.Geographics.Geometries);
+                var geoJsonStream = _markdownHelper.TryGetFeatureCollection(searchFilter.Geographics.Geometries);
                 if (geoJsonStream != null)
                 {
                     additionalFiles.Add((geoJsonStream, "geometries.geojson"));
@@ -200,7 +205,7 @@ public class ExportManager : IExportManager
     {
         try
         {
-            var filterMarkdownStream = await _filterHelper.GetMarkDownAsync(filter, null, cancellationToken);
+            var filterMarkdownStream = await _markdownHelper.GetFilterMarkDownAsync(filter, cancellationToken);
             return filterMarkdownStream;
         }
         catch (Exception e)
