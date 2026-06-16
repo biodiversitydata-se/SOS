@@ -1,8 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
-using ProjNet.CoordinateSystems;
-using SharpCompress.Compressors.Xz.Filters;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Dtos.Enum;
 using SOS.Lib.Dtos.Filter;
@@ -17,6 +15,7 @@ using SOS.Lib.Repositories.Resource.Interfaces;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
+using System.Xml.Linq;
 using static SOS.Lib.Dtos.Filter.ExtendedFilterDto;
 
 namespace SOS.Lib.Helpers;
@@ -33,6 +32,8 @@ public class MarkdownHelper : IMarkdownHelper
     private readonly ICache<int, TaxonList> _taxonListCache;
     private readonly IVocabularyRepository _vocabularyRepository;
     private readonly ILogger<MarkdownHelper> _logger;
+
+    private const string BR = "  \n";
 
     /// <summary>
     /// Adds an ATX-style header to the specified Markdown syntax tree at the given heading level.
@@ -51,7 +52,7 @@ public class MarkdownHelper : IMarkdownHelper
             delimiter += "#";
         }
 
-        sb.AppendLine($"{delimiter} {text} {delimiter}  ");
+        sb.Append($"{delimiter} {text} {delimiter}{BR}");
     }
 
     /// <summary>
@@ -73,7 +74,7 @@ public class MarkdownHelper : IMarkdownHelper
         AddHeader(sb, header.Text, header.Level);
         foreach (var item in listData)
         {
-            sb.AppendLine($"* {item}  ");
+            sb.Append($"* {item}{BR}");
         }
     }
 
@@ -89,7 +90,7 @@ public class MarkdownHelper : IMarkdownHelper
             sb.Append($"**{label}**");
             if (pagebreakAfterLabel)
             {
-                sb.AppendLine("  ");
+                sb.Append(BR);
             }
             else
             {
@@ -97,7 +98,7 @@ public class MarkdownHelper : IMarkdownHelper
             }
         }
         
-        sb.AppendLine($"{value}  ");
+        sb.Append($"{value}{BR}{BR}");
     }
 
 
@@ -110,7 +111,7 @@ public class MarkdownHelper : IMarkdownHelper
        
         if (!string.IsNullOrEmpty(label))
         {
-            sb.AppendLine($"**{label}**  ");
+            sb.Append($"**{label}**{BR}");
         }
 
         sb.Append("|");
@@ -118,14 +119,14 @@ public class MarkdownHelper : IMarkdownHelper
         {
             sb.Append($" {columnLabel} |");
         }
-        sb.AppendLine("  ");
+        sb.Append(BR);
 
         sb.Append("|");
         foreach (var _ in columnLabels)
         {
             sb.Append(" ---------- |");
         }
-        sb.AppendLine("  ");
+        sb.Append(BR);
 
         foreach (var rowValues in values)
         {
@@ -134,7 +135,7 @@ public class MarkdownHelper : IMarkdownHelper
             {
                 sb.Append($" {value} |");
             }
-            sb.AppendLine("  ");
+            sb.Append(BR);
         }
     }
     #region Filter
@@ -491,7 +492,7 @@ public class MarkdownHelper : IMarkdownHelper
     /// <remarks>The method appends various geographic details to the Markdown syntax tree, including filter
     /// options, area lists, bounding box coordinates, geometries, and location identifiers, depending on the properties
     /// set in the filter. No changes are made if the filter is null.</remarks>
-    /// <param name="md">The MarkdownSyntaxTree instance to which geographic filter details will be appended.</param>
+    /// <param name="sb">The MarkdownSyntaxTree instance to which geographic filter details will be appended.</param>
     /// <param name="filter">The GeographicsFilterDto containing criteria that determine which geographic information is included. If null,
     /// no information is added.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
@@ -537,7 +538,7 @@ public class MarkdownHelper : IMarkdownHelper
     /// <remarks>If the filter is null or both From and To dates are not specified, no modifications are made
     /// to the Markdown syntax tree. When applicable, the method adds a header and paragraphs to represent the date
     /// range in a formatted manner.</remarks>
-    /// <param name="md">The MarkdownSyntaxTree instance to which the modified date filter information will be added.</param>
+    /// <param name="sb">The MarkdownSyntaxTree instance to which the modified date filter information will be added.</param>
     /// <param name="filter">The ModifiedDateFilterDto containing the date range for filtering. Must not be null, and at least one of the
     /// From or To properties must be specified.</param>
     private void TryAddModifiedDateInfo(StringBuilder sb, ModifiedDateFilterDto filter)
@@ -558,7 +559,7 @@ public class MarkdownHelper : IMarkdownHelper
     /// <remarks>This method generates sections in the Markdown document based on the filter's properties,
     /// including invasive status, taxon categories, taxa, taxon lists, and red list categories. No changes are made if
     /// the filter is null or contains no relevant criteria.</remarks>
-    /// <param name="md">The MarkdownSyntaxTree instance to which taxonomic information will be added.</param>
+    /// <param name="sb">The MarkdownSyntaxTree instance to which taxonomic information will be added.</param>
     /// <param name="filter">The TaxonFilterDto containing criteria for filtering taxonomic information, such as IDs and categories. No
     /// information is added if this parameter is null or contains no filter criteria.</param>
     /// <param name="taxonCategories">An enumerable collection of VocabularyValueInfo representing the available taxon categories to be displayed if
@@ -626,10 +627,11 @@ public class MarkdownHelper : IMarkdownHelper
     }
 
     /// <inheritdoc/>
-    public MemoryStream GetCitationMarkDown(string? authorizationApplicationIdentifier, CancellationToken cancellationToken)
+    public async Task<MemoryStream> GetCitationMarkDownAsync(string? authorizationApplicationIdentifier, IEnumerable<int> dataProviderIds, CancellationToken cancellationToken)
     {
         try
         {
+            var dataProviders = (await _dataProviderCache.GetAllAsync()).Where(dp => dataProviderIds.Contains(dp.Id)).ToDictionary(dp => dp.Id, dp => dp);
             var sb = new StringBuilder();
             AddHeader(sb, $"Citeringsanvisning {DateTime.Now:yyyy-MM-dd HH:mm}", 1);
 
@@ -638,19 +640,51 @@ public class MarkdownHelper : IMarkdownHelper
             string version = assebly.GetVersionNumber();
 
             var ingress = "I vetenskapliga publikationer och andra rapporter där data hämtad via Species Observation System använts, bör man referera enligt följande:";
-            var materialAndReferense = $"Data använda i den här studien har laddats ned från Species Observation System API (SLU Artdatabanken {publishYear}) den {DateTime.Now:yyyy-MM-dd}. Följande dataset har använts: [t ex Artportalen, …]";
-            var referenceList = $"SLU Artdatabanken ({publishYear}). Species Observation System API (Version {version}) [API]. SLU Artdatabanken. https://api-portal.artdatabanken.se/product#product=sos [åtkomst {DateTime.Now:yyyy-MM-dd}]";
+            var materialAndReferense = $"Data använda i den här studien har laddats ned från Species Observation System API (SLU Artdatabanken {publishYear}) den {DateTime.Now:yyyy-MM-dd}. Följande dataset har använts: {string.Join(", ", dataProviders?.Values?.Select(dp => dp.Identifier))}";
+            var referenceList = new List<string> { $"SLU Artdatabanken ({publishYear}). Species Observation System API (Version {version}) [API]. SLU Artdatabanken. https://api-portal.artdatabanken.se/product#product=sos [åtkomst {DateTime.Now:yyyy-MM-dd}]" };
+
             if (authorizationApplicationIdentifier?.ToLower() == "printobs")
             {
                 ingress = "I vetenskapliga publikationer och andra rapporter där verktyget Fynddata använts, bör man referera enligt följande:";
-                materialAndReferense = $"Data använda i den här studien har laddats ned från SLU Artdatabankens verktyg Fynddata (SLU Artdatabanken [utgivningsår]) den [datum]. Följande dataset har använts: [t ex Artportalen, …]";
-                referenceList = $"SLU Artdatabanken ({publishYear}). Species Observation System API (Version {version})";
+                materialAndReferense = $"Data använda i den här studien har laddats ned från SLU Artdatabankens verktyg Fynddata (SLU Artdatabanken [utgivningsår]) den {DateTime.Now:yyyy-MM-dd}. Följande dataset har använts: {string.Join(", ", dataProviders?.Values?.Select(dp => dp.Identifier))}";
+                referenceList = new List<string> { @$"SLU Artdatabanken (utgivningsår). Fynddata (Version #) [Webbapplikation]. SLU Artdatabanken. https://fynddata.artdatabanken.se [åtkomstdatum {DateTime.Now:yyyy-MM-dd}]",
+                    $"fynddata.artdatabanken.se ({DateTime.Now:yyyy-MM-dd}) SOS fynd export. [Filnamn]." };
             }
- 
+
+            if (dataProviderIds?.Any() ?? false)
+            {
+                foreach (var id in dataProviderIds)
+                {
+                    if (dataProviders.TryGetValue(id, out var dataProvider))
+                    {
+                        string? typeOfDataset = "Occurrence";
+                        var xml = await _dataProviderCache.GetEmlAsync(id);
+
+                        if (xml != null)
+                        {
+                            XNamespace eml = "eml://ecoinformatics.org/eml-2.1.1";
+                            var keyWords = new[]
+                            {
+                                "GBIF Dataset Type Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_type.xml",
+                                "GBIF Dataset Type Vocabulary: https://rs.gbif.org/vocabulary/gbif/dataset_type.xml"
+                            };
+                            
+                            typeOfDataset = xml
+                                .Descendants("keywordSet")
+                                    .Select(ks => ks.Element("keywordThesaurus"))
+                                        .Where(e => keyWords.Contains(e.Value))
+                                            .FirstOrDefault()?.Parent.Element("keyword").Value;
+                        }
+                        
+                        referenceList.Add($"{dataProvider.ContactPerson?.LastName} {dataProvider.ContactPerson?.FirstName?.Substring(0, 1)} ({DateTime.Now.Year}). {dataProvider.Names?.FirstOrDefault(n => n.CultureCode == "sv-SE")?.Value}.  {dataProvider.Organizations?.FirstOrDefault(n => n.CultureCode == "sv-SE")?.Value}. {typeOfDataset?.ToCamelCase()} hämtat via Species Observation System API version {version} {DateTime.Now:yyyy-MM-dd}");
+                    }
+                }
+            }
+            
             TryAddParagraph(sb, null, ingress);
             TryAddParagraph(sb, "Material och metoder", materialAndReferense, true);
-            TryAddParagraph(sb, "Referenslista", referenceList, true);
-            TryAddParagraph(sb, "Till exempel", @$"SLU Artdatabanken ({publishYear}). SOS (Version {version}) [Webbapplikation]. SLU Artdatabanken. https://api-portal.artdatabanken.se/product#product=sos [åtkomst {DateTime.Now:yyyy-MM-dd}]", true);
+            TryAddParagraph(sb, "Referenslista", string.Join("  \n", referenceList), true);
+            //TryAddParagraph(sb, "Till exempel", @$"SLU Artdatabanken ({publishYear}). SOS (Version {version}) [Webbapplikation]. SLU Artdatabanken. https://api-portal.artdatabanken.se/product#product=sos [åtkomst {DateTime.Now:yyyy-MM-dd}]", true);
 
             var stream = new MemoryStream(Encoding.UTF8.GetBytes(sb.ToString()));
             stream.Position = 0;
@@ -733,6 +767,8 @@ public class MarkdownHelper : IMarkdownHelper
                 } : null);
             }
 
+            TryAddParagraph(sb, "Koordinatsystem", "WGS84");
+           
             var stream = new MemoryStream(Encoding.UTF8.GetBytes(sb.ToString()));
             return stream;
         }
@@ -744,7 +780,7 @@ public class MarkdownHelper : IMarkdownHelper
     }
 
     /// <inheritdoc/>
-    public async Task<MemoryStream> GetDatasetsMarkDownAsync(SearchFilter searchFilter, CancellationToken cancellationToken)
+    public async Task<(MemoryStream FileStream, IEnumerable<int> DataProviderIds)> GetDatasetsMarkDownAsync(SearchFilter searchFilter, CancellationToken cancellationToken)
     {
         try
         {
@@ -753,24 +789,26 @@ public class MarkdownHelper : IMarkdownHelper
             if(processInfo == null)
             {
                 _logger.LogWarning("No process info found when creating dataset markdown.");
-                return new MemoryStream();
+                return (new MemoryStream(), Array.Empty<int>());
             }
 
             if (!processInfo.ProvidersInfo?.Any() ?? true)
             {
                 _logger.LogWarning("No providers info found when creating dataset markdown.");
-                return new MemoryStream();
+                return (new MemoryStream(), Array.Empty<int>());
             }
 
             var sb = new StringBuilder();
             AddHeader(sb, $"Datasets {DateTime.Now:yyyy-MM-dd HH:mm}", 1);
 
+            IEnumerable<int> dataProviderIds = Array.Empty<int>();
             var providerCount = new Dictionary<int, int>();
             if (searchFilter != null)
             {
                 var result = await _processedObservationCoreRepository.GetAggregationItemsAsync(searchFilter, "dataProviderId", 0, 100);
                 if (result?.Records?.Any() ?? false)
                 {
+                    dataProviderIds = result.Records.Select(r => int.Parse(r.AggregationKey));
                     providerCount = result.Records.ToDictionary(r => int.Parse(r.AggregationKey), r => r.DocCount);
                 }
             }
@@ -778,13 +816,13 @@ public class MarkdownHelper : IMarkdownHelper
             TryAddTable(sb, null, ["Dataset", "Antal observationer", "Publika observationer", "I denna fil"], processInfo.ProvidersInfo.OrderBy(pi => pi.DataProviderIdentifier).Select(pi => new string[] { pi.DataProviderIdentifier, $"{pi.PublicProcessCount + pi.ProtectedProcessCount}", $"{pi.PublicProcessCount}", $"{(providerCount.TryGetValue(pi.DataProviderId ?? 0, out var pc) ? pc.ToString() : 0) }" }));
 
             var stream = new MemoryStream(Encoding.UTF8.GetBytes(sb.ToString()));
-            return stream;
+            return (stream, dataProviderIds);
         }
         catch (Exception e)
         {
             _logger.LogError(e, "Failed to create datasets markdown");
         }
-        return new MemoryStream();
+        return (new MemoryStream(), Array.Empty<int>());
     }
 
     public async Task<Stream> GetAnalysisMarkDownAsync(

@@ -164,10 +164,10 @@ public class ExportManager : IExportManager
             var additionalFiles = new List<(Stream stream, string filename)>();
             var filterMarkdownStream = await _markdownHelper.GetFilterMarkDownAsync(searchFilter, CancellationToken.None);
             additionalFiles.Add((filterMarkdownStream, "filter.md"));
-            var citationMarkdownStream = _markdownHelper.GetCitationMarkDown(authorizationApplicationIdentifier, CancellationToken.None);
+            var datasetsResult = await _markdownHelper.GetDatasetsMarkDownAsync(filter, CancellationToken.None);
+            additionalFiles.Add((datasetsResult.FileStream, "datasets.md"));
+            var citationMarkdownStream = await _markdownHelper.GetCitationMarkDownAsync(authorizationApplicationIdentifier, datasetsResult.DataProviderIds, CancellationToken.None);
             additionalFiles.Add((citationMarkdownStream, "citation.md"));
-            var datasetsMarkdownStream = await _markdownHelper.GetDatasetsMarkDownAsync(filter, CancellationToken.None);
-            additionalFiles.Add((datasetsMarkdownStream, "datasets.md"));
 
             if ((searchFilter?.Geographics?.Geometries?.Count() ?? 0) != 0)
             {
