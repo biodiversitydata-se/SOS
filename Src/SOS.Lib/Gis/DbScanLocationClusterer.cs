@@ -85,31 +85,31 @@ public class DbScanLocationClusterer : ILocationClusterer
     }
 
     /// <inheritdoc />
-    public List<LocationClusterItem> ClusterLocations(List<Observation> observations, LatLonBoundingBox boundingBox, int targetItemCount)
+    public List<LocationFeature> ClusterLocations(List<Observation> observations, LatLonBoundingBox boundingBox, int targetItemCount)
     {
         var clusterRadius = ComputeMinimumClusterRadius(boundingBox, targetItemCount);
         return ClusterLocations(observations, clusterRadius);
     }
 
     /// <inheritdoc />
-    public List<LocationClusterItem> ClusterLocations(List<Observation> observations, LatLonBoundingBox boundingBox)
+    public List<LocationFeature> ClusterLocations(List<Observation> observations, LatLonBoundingBox boundingBox)
     {
         return ClusterLocations(observations, boundingBox, _maxLocationCountAfterClustering);
     }
 
     /// <inheritdoc />
-    public List<LocationClusterItem> ClusterLocations(List<Observation> observations, LatLonBoundingBox boundingBox, double metersPerPixel, double clusterRadiusPx = DefaultClusterRadiusInPixels)
+    public List<LocationFeature> ClusterLocations(List<Observation> observations, LatLonBoundingBox boundingBox, double metersPerPixel, double clusterRadiusPx = DefaultClusterRadiusInPixels)
     {
         var clusterRadius = ComputeMinimumClusterRadius(boundingBox, metersPerPixel, clusterRadiusPx);
         return ClusterLocations(observations, clusterRadius);
     }
 
-    private List<LocationClusterItem> ClusterLocations(List<Observation> observations, double minimumClusterRadiusMeters)
+    private List<LocationFeature> ClusterLocations(List<Observation> observations, double minimumClusterRadiusMeters)
     {
         var projectedLocations = ProjectLocations(observations);
         if (projectedLocations.Count == 0)
         {
-            return new List<LocationClusterItem>();
+            return new List<LocationFeature>();
         }
 
         if (projectedLocations.Count <= _minLocationCountBeforeClustering)
@@ -119,7 +119,7 @@ public class DbScanLocationClusterer : ILocationClusterer
 
         var diagonal = ComputeLocationsDiagonal(projectedLocations);
         var clusterRadius = Math.Max(diagonal / 100, minimumClusterRadiusMeters);
-        var result = new List<LocationClusterItem>();
+        var result = new List<LocationFeature>();
         var iterationCount = 0;
 
         do
@@ -133,11 +133,11 @@ public class DbScanLocationClusterer : ILocationClusterer
         return result;
     }
 
-    private List<LocationClusterItem> MakeClusterItems(List<ProjectedLocation> locations, double clusterRadius)
+    private List<LocationFeature> MakeClusterItems(List<ProjectedLocation> locations, double clusterRadius)
     {
         if (locations.Count == 0)
         {
-            return new List<LocationClusterItem>();
+            return new List<LocationFeature>();
         }
 
         if (clusterRadius <= 0)
@@ -179,10 +179,10 @@ public class DbScanLocationClusterer : ILocationClusterer
             }
         }
 
-        var result = new List<LocationClusterItem>(clusters.Count);
+        var result = new List<LocationFeature>(clusters.Count);
         foreach (var cluster in clusters.Values)
         {
-            var clusterItem = LocationClusterItem.FromCluster(cluster
+            var clusterItem = LocationFeature.FromCluster(cluster
                 .SelectMany(index => locations[index].Observations)
                 .ToList());
             clusterItem.ClusterRadiusMeters = clusterRadius;
@@ -443,10 +443,10 @@ public class DbScanLocationClusterer : ILocationClusterer
         return boundingBox.GetPolygon(CoordinateSys.SWEREF99_TM).EnvelopeInternal;
     }
 
-    private static List<LocationClusterItem> CreateSingleLocationItems(IEnumerable<ProjectedLocation> locations)
+    private static List<LocationFeature> CreateSingleLocationItems(IEnumerable<ProjectedLocation> locations)
     {
         return locations
-            .Select(location => LocationClusterItem.FromSingleLocation(location.Observations))
+            .Select(location => LocationFeature.FromSingleLocation(location.Observations))
             .ToList();
     }
 

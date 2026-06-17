@@ -6,7 +6,7 @@ namespace SOS.Lib.Gis;
 /// <summary>
 /// Represents one item in a location clustering result.
 /// </summary>
-public class LocationClusterItem
+public class LocationFeature
 {
     /// <summary>
     /// Indicates whether this result represents a cluster of multiple locations (true) or a single location (false).
@@ -90,7 +90,7 @@ public class LocationClusterItem
     /// <summary>
     /// True when the item was created from representative observations instead of all observations for the location.
     /// </summary>
-    public bool? IsEstimated { get; set; }
+    public bool? IsSummaryApproximated { get; set; }
 
     /// <summary>
     /// Creates a clustered item.
@@ -101,7 +101,7 @@ public class LocationClusterItem
     /// <returns>
     /// A clustered location item.
     /// </returns>
-    internal static LocationClusterItem FromCluster(List<Observation> observations)
+    internal static LocationFeature FromCluster(List<Observation> observations)
     {
         var locations = observations
             .Select(o => o.Location)
@@ -112,7 +112,7 @@ public class LocationClusterItem
         var centroidLongitude = locations.Average(l => l.DecimalLongitude!.Value);
         var statusCounts = CreateStatusCounts(observations);
 
-        return new LocationClusterItem
+        return new LocationFeature
         {
             IsCluster = true,
             LocationCount = locations.Count,
@@ -139,7 +139,7 @@ public class LocationClusterItem
     /// <returns>
     /// A non-clustered location item.
     /// </returns>
-    public static LocationClusterItem FromSingle(Observation observation)
+    public static LocationFeature FromSingle(Observation observation)
     {
         return FromSingleLocation(new List<Observation> { observation });
     }
@@ -153,13 +153,13 @@ public class LocationClusterItem
     /// <returns>
     /// A non-clustered location item.
     /// </returns>
-    public static LocationClusterItem FromSingleLocation(List<Observation> observations)
+    public static LocationFeature FromSingleLocation(List<Observation> observations)
     {
         var location = observations.First().Location;
         var geometry = location.Point ?? new Point(location.DecimalLongitude!.Value, location.DecimalLatitude!.Value);
         var statusCounts = CreateStatusCounts(observations);
 
-        return new LocationClusterItem
+        return new LocationFeature
         {
             IsCluster = false,
             Location = location,

@@ -1,4 +1,4 @@
-﻿.selected-feature-hit-list {
+.selected-feature-hit-list {
     margin: 10px 0 0;
     padding-left: 22px;
 }
@@ -11,4 +11,19 @@
     margin-top: 2px;
     white-space: pre-wrap;
     word-break: break-word;
+}
+
+.selected-feature-json {
+    margin: 12px 0 0;
+    max-height: 420px;
+    overflow: auto;
+    padding: 12px;
+    border: 1px solid rgba(0, 0, 0, 0.14);
+    border-radius: 4px;
+    background: #f7f7f7;
+    color: #1f1f1f;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 0.875rem;
+    line-height: 1.45;
+    white-space: pre;
 }

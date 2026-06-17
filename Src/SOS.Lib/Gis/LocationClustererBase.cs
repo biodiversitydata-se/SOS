@@ -71,20 +71,20 @@ public abstract class LocationClustererBase : ILocationClusterer
     }
 
     /// <inheritdoc />
-    public List<LocationClusterItem> ClusterLocations(List<Observation> observations, LatLonBoundingBox boundingBox, int targetItemCount)
+    public List<LocationFeature> ClusterLocations(List<Observation> observations, LatLonBoundingBox boundingBox, int targetItemCount)
     {
         var clusterRadius = ComputeMinimumClusterRadius(boundingBox, targetItemCount);
         return ClusterLocations(observations, clusterRadius);
     }
 
     /// <inheritdoc />
-    public List<LocationClusterItem> ClusterLocations(List<Observation> observations, LatLonBoundingBox boundingBox)
+    public List<LocationFeature> ClusterLocations(List<Observation> observations, LatLonBoundingBox boundingBox)
     {
         return ClusterLocations(observations, boundingBox, _maxLocationCountAfterClustering);
     }
 
     /// <inheritdoc />
-    public List<LocationClusterItem> ClusterLocations(List<Observation> observations, LatLonBoundingBox boundingBox, double metersPerPixel, double clusterRadiusPx = DefaultClusterRadiusInPixels)
+    public List<LocationFeature> ClusterLocations(List<Observation> observations, LatLonBoundingBox boundingBox, double metersPerPixel, double clusterRadiusPx = DefaultClusterRadiusInPixels)
     {
         var clusterRadius = ComputeMinimumClusterRadius(boundingBox, metersPerPixel, clusterRadiusPx);
         return ClusterLocations(observations, clusterRadius);
@@ -102,7 +102,7 @@ public abstract class LocationClustererBase : ILocationClusterer
     /// <returns>
     /// A flat list of clustered and non-clustered location items.
     /// </returns>
-    protected abstract List<LocationClusterItem> MakeClusterItems(List<Observation> observations, double clusterRadius);
+    protected abstract List<LocationFeature> MakeClusterItems(List<Observation> observations, double clusterRadius);
 
     /// <summary>
     /// Groups remaining observations by distinct location and creates non-clustered location items.
@@ -113,10 +113,10 @@ public abstract class LocationClustererBase : ILocationClusterer
     /// <returns>
     /// Non-clustered location items.
     /// </returns>
-    protected static IEnumerable<LocationClusterItem> CreateSingleLocationItems(IEnumerable<Observation> observations)
+    protected static IEnumerable<LocationFeature> CreateSingleLocationItems(IEnumerable<Observation> observations)
     {
         return GroupObservationsByLocation(observations)
-            .Select(LocationClusterItem.FromSingleLocation);
+            .Select(LocationFeature.FromSingleLocation);
     }
 
     /// <summary>
@@ -163,7 +163,7 @@ public abstract class LocationClustererBase : ILocationClusterer
         return degrees * metersPerDegree;
     }
 
-    private List<LocationClusterItem> ClusterLocations(List<Observation> observations, double minimumClusterRadius)
+    private List<LocationFeature> ClusterLocations(List<Observation> observations, double minimumClusterRadius)
     {        
         var distinctLocationCount = GetDistinctLocationCount(observations);
 
@@ -174,7 +174,7 @@ public abstract class LocationClustererBase : ILocationClusterer
 
         var diagonal = ComputeObservationsDiagonal(observations);
         var clusterRadius = Math.Max(diagonal / 100, minimumClusterRadius);
-        var result = new List<LocationClusterItem>();
+        var result = new List<LocationFeature>();
         var iterationCount = 0;
 
         do

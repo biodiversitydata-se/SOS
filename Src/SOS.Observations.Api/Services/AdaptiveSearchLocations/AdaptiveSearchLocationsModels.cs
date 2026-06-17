@@ -1,4 +1,4 @@
-﻿using SOS.Lib.Dtos.Filter;
+﻿﻿using SOS.Lib.Dtos.Filter;
 using NetTopologySuite.Features;
 using SOS.Lib.Gis;
 using SOS.Lib.Models.Gis;
@@ -44,7 +44,7 @@ public sealed class AdaptiveSearchLocationsResult
 {
     public required string ResultType { get; init; }
     public string? GeoJson { get; init; }
-    public IReadOnlyList<LocationClusterItem>? LocationClusterItems { get; init; }
+    public IReadOnlyList<LocationFeature>? LocationFeatures { get; init; }
     public LatLonBoundingBox? Bbox { get; init; }
     public long ObservationsTotalCount { get; init; }
     public long? EstimatedLocationCount { get; init; }
@@ -52,8 +52,8 @@ public sealed class AdaptiveSearchLocationsResult
     public long? LocationsBeforeClustering { get; init; }
     public int? Zoom { get; init; }
     public required string CacheStatus { get; init; }
-    public string? LocationAggregation { get; init; }
-    public bool LocationPropertiesEstimated { get; init; }
+    public string? LocationAggregationMode { get; init; }
+    public bool LocationSummaryApproximated { get; init; }
     public List<Feature>? GeographicAreas { get; init; }
     public AdaptiveSearchLocationsTimings Timings { get; init; } = new();
 }
@@ -65,7 +65,7 @@ internal sealed class CachedLocationAggregate
     public List<string> LocationIds { get; init; } = new();
     public List<int> TaxonIds { get; init; } = new();
     public required LocationObservationSummary ObservationSummary { get; init; }
-    public bool IsEstimated { get; init; }
+    public bool IsSummaryApproximated { get; init; }
 }
 
 internal sealed record PolygonGeometryDisplayDecision(

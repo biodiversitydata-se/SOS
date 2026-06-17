@@ -1,4 +1,4 @@
-﻿import * as openLayersMap from "/openLayersMap.js";
+﻿﻿import * as openLayersMap from "/openLayersMap.js";
 
 let map = null;
 let dotNetRef = null;
@@ -388,7 +388,10 @@ function getDisplayStatusStyleDefinition(displayStatusKey) {
 }
 
 function getDisplayStatusKey(feature) {
-    return normalizeDisplayStatus(getFeatureProperty(feature, "displayStatus", "DisplayStatus"));
+    const presentation = getFeatureProperty(feature, "presentation", "Presentation");
+    return normalizeDisplayStatus(
+        getObjectProperty(presentation, "status", "Status") ??
+        getFeatureProperty(feature, "displayStatus", "DisplayStatus"));
 }
 
 function normalizeDisplayStatus(value) {
@@ -472,7 +475,9 @@ function isDiffusedLocation(feature) {
         return true;
     }
 
-    const location = feature.get("location");
+    const locations = getFeatureProperty(feature, "locations", "Locations");
+    const location = getObjectProperty(locations, "location", "Location") ??
+        getFeatureProperty(feature, "location", "Location");
     return toBoolean(getObjectProperty(location, "isGeneralized", "IsGeneralized"));
 }
 

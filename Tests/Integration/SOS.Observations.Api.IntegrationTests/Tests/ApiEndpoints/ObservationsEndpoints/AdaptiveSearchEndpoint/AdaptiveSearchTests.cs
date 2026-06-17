@@ -93,10 +93,8 @@ public class AdaptiveSearchTests : TestBase
         };
 
         // Act
-        var response = await apiClient.PostAsync(
-            $"/observations/internal/adaptivesearch?observationsLimit=10&outputFormat={OutputFormatDto.GeoJsonByLocation}&createPolygons={CreatePolygonsMode.Yes}",
-            JsonContent.Create(searchFilter));
-        var responseString = await response.Content.ReadAsStringAsync();
+        var response = await apiClient.PostAsync($"/observations/internal/adaptivesearch?observationsLimit=10&outputFormat={OutputFormatDto.GeoJsonByLocation}&createPolygons={CreatePolygonsMode.Yes}", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var responseString = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
         var featureCollection = JsonSerializer.Deserialize<GeoJsonResponse<ObservationsByLocation>>(responseString, JsonSerializerOptions);
 
         // Assert
@@ -142,10 +140,8 @@ public class AdaptiveSearchTests : TestBase
         };
         
         // Act
-        var response = await apiClient.PostAsync(
-            $"/observations/internal/adaptivesearch?observationsLimit=10&outputFormat={OutputFormatDto.GeoJsonByLocationFlat}&geoJsonPropertyLabelType={PropertyLabelType.PropertyName}&createPolygons={CreatePolygonsMode.Yes}",
-            JsonContent.Create(searchFilter));
-        var responseString = await response.Content.ReadAsStringAsync();
+        var response = await apiClient.PostAsync($"/observations/internal/adaptivesearch?observationsLimit=10&outputFormat={OutputFormatDto.GeoJsonByLocationFlat}&geoJsonPropertyLabelType={PropertyLabelType.PropertyName}&createPolygons={CreatePolygonsMode.Yes}", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var responseString = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
         var featureCollection = JsonSerializer.Deserialize<GeoJsonResponse<GeoJsonFlatObservationsByLocation>>(responseString, JsonSerializerOptions);
 
         // Assert
@@ -189,10 +185,8 @@ public class AdaptiveSearchTests : TestBase
         };
 
         // Act
-        var response = await apiClient.PostAsync(
-            $"/observations/internal/adaptivesearch?observationsLimit=10&outputFormat={OutputFormatDto.Json}&geoJsonPropertyLabelType={PropertyLabelType.PropertyName}",
-            JsonContent.Create(searchFilter));
-        var responseString = await response.Content.ReadAsStringAsync();
+        var response = await apiClient.PostAsync($"/observations/internal/adaptivesearch?observationsLimit=10&outputFormat={OutputFormatDto.Json}&geoJsonPropertyLabelType={PropertyLabelType.PropertyName}", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var responseString = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
         var resultDto = JsonSerializer.Deserialize<AdaptiveSearchResultDto<Observation>>(responseString, JsonSerializerOptions);
 
         // Assert
@@ -220,10 +214,8 @@ public class AdaptiveSearchTests : TestBase
         };
 
         // Act
-        var response = await apiClient.PostAsync(
-            $"/observations/internal/adaptivesearch?observationsLimit=10&outputFormat={OutputFormatDto.JsonByLocation}&createPolygons={CreatePolygonsMode.Yes}",
-            JsonContent.Create(searchFilter));
-        var responseString = await response.Content.ReadAsStringAsync();
+        var response = await apiClient.PostAsync($"/observations/internal/adaptivesearch?observationsLimit=10&outputFormat={OutputFormatDto.JsonByLocation}&createPolygons={CreatePolygonsMode.Yes}", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var responseString = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
         var resultDto = JsonSerializer.Deserialize<AdaptiveSearchResultByLocationDto<Observation, Location>>(responseString, JsonSerializerOptions);
 
         // Assert
@@ -279,10 +271,8 @@ public class AdaptiveSearchTests : TestBase
         var searchFilter = new SearchFilterInternalDto();
 
         // Act
-         var response = await apiClient.PostAsync(
-            $"/observations/internal/adaptivesearch?observationsLimit=10&outputFormat={OutputFormatDto.GeoJsonByLocation}",
-            JsonContent.Create(searchFilter));
-        var responseString = await response.Content.ReadAsStringAsync();
+         var response = await apiClient.PostAsync($"/observations/internal/adaptivesearch?observationsLimit=10&outputFormat={OutputFormatDto.GeoJsonByLocation}", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var responseString = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
         var featureCollection = JsonSerializer.Deserialize<GeoJsonResponse<ObservationsByLocation>>(responseString, JsonSerializerOptions);        
 
         // Assert

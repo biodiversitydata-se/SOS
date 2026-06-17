@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿﻿using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using MudBlazor;
 using SOS.Status.Web.Client.Dtos.SosObsApi;
@@ -93,7 +93,8 @@ public partial class LocationsSearch : IAsyncDisposable
 
     private static readonly JsonSerializerOptions SelectedFeatureJsonSerializerOptions = new()
     {
-        Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.Latin1Supplement)
+        Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.Latin1Supplement),
+        WriteIndented = true
     };
 
     private bool IsSearchDisabled =>
@@ -730,14 +731,14 @@ public partial class LocationsSearch : IAsyncDisposable
                 "configureClusterRadiusLayer",
                 ClusterRadiusLayerId,
                 mapGeoJson,
-                "clusterRadiusMeters",
+                "cluster.radiusMeters",
                 showClusterRadiusCircles);
 
             await _mapModule.InvokeVoidAsync(
                 "configureClusterRadiusLayer",
                 ClusterMinimumEnclosingCircleLayerId,
                 mapGeoJson,
-                "clusterRadiusMetersMin",
+                "cluster.radiusMetersMin",
                 showClusterMinimumEnclosingCircles);
         }
         catch
@@ -969,12 +970,6 @@ public partial class LocationsSearch : IAsyncDisposable
         return double.IsFinite(value);
     }
 
-    private IEnumerable<KeyValuePair<string, object>> GetSelectedFeatureProperties(SelectedMapFeature feature)
-    {
-        return feature.Properties.OrderBy(property => property.Key);
-    }
-    
-
     private string SelectedLocationIdsText => selectedLocationIds.Count == 0
     ? "-"
     : string.Join(Environment.NewLine, selectedLocationIds.Select(id => $"• {id};"));
@@ -998,6 +993,14 @@ public partial class LocationsSearch : IAsyncDisposable
 
     private static IEnumerable<string> ExtractLocationIds(IReadOnlyDictionary<string, object> properties)
     {
+        if (TryGetProperty(properties, out var locationsValue, "locations", "Locations"))
+        {
+            foreach (var locationId in ExtractLocationIdsFromLocationsValue(locationsValue))
+            {
+                yield return locationId;
+            }
+        }
+
         if (TryGetProperty(properties, out var locationIdsValue, "locationIds", "LocationIds"))
         {
             foreach (var locationId in ExtractStringValues(locationIdsValue))
@@ -1017,9 +1020,83 @@ public partial class LocationsSearch : IAsyncDisposable
 
     private static IEnumerable<string> ExtractLocalities(IReadOnlyDictionary<string, object> properties)
     {
+        if (TryGetProperty(properties, out var locationsValue, "locations", "Locations"))
+        {
+            foreach (var locality in ExtractLocalitiesFromLocationsValue(locationsValue))
+            {
+                yield return locality;
+            }
+        }
+
         if (TryGetProperty(properties, out var locationValue, "location", "Location"))
         {
             foreach (var locality in ExtractLocalitiesFromLocationValue(locationValue))
+            {
+                yield return locality;
+            }
+        }
+    }
+
+    private static IEnumerable<string> ExtractLocationIdsFromLocationsValue(object? locationsValue)
+    {
+        if (locationsValue is IReadOnlyDictionary<string, object> locationsProperties)
+        {
+            if (TryGetProperty(locationsProperties, out var idsValue, "ids", "Ids"))
+            {
+                foreach (var locationId in ExtractStringValues(idsValue))
+                {
+                    yield return locationId;
+                }
+            }
+
+            if (TryGetProperty(locationsProperties, out var locationValue, "location", "Location"))
+            {
+                foreach (var locationId in ExtractLocationIdsFromLocationValue(locationValue))
+                {
+                    yield return locationId;
+                }
+            }
+        }
+
+        if (locationsValue is string locationsJson &&
+            TryParseJsonElement(locationsJson, out var locationsElement) &&
+            locationsElement.ValueKind == JsonValueKind.Object)
+        {
+            if (TryGetJsonProperty(locationsElement, out var idsElement, "ids", "Ids"))
+            {
+                foreach (var locationId in ExtractStringValues(idsElement))
+                {
+                    yield return locationId;
+                }
+            }
+
+            if (TryGetJsonProperty(locationsElement, out var locationElement, "location", "Location"))
+            {
+                foreach (var locationId in ExtractLocationIdsFromLocationValue(locationElement))
+                {
+                    yield return locationId;
+                }
+            }
+        }
+    }
+
+    private static IEnumerable<string> ExtractLocalitiesFromLocationsValue(object? locationsValue)
+    {
+        if (locationsValue is IReadOnlyDictionary<string, object> locationsProperties &&
+            TryGetProperty(locationsProperties, out var locationValue, "location", "Location"))
+        {
+            foreach (var locality in ExtractLocalitiesFromLocationValue(locationValue))
+            {
+                yield return locality;
+            }
+        }
+
+        if (locationsValue is string locationsJson &&
+            TryParseJsonElement(locationsJson, out var locationsElement) &&
+            locationsElement.ValueKind == JsonValueKind.Object &&
+            TryGetJsonProperty(locationsElement, out var locationElement, "location", "Location"))
+        {
+            foreach (var locality in ExtractLocalitiesFromLocationValue(locationElement))
             {
                 yield return locality;
             }
@@ -1182,16 +1259,9 @@ public partial class LocationsSearch : IAsyncDisposable
         }
     }
 
-    private static string FormatPropertyValue(object? value)
+    private static string FormatSelectedFeatureJson(SelectedMapFeature feature)
     {
-        return value switch
-        {
-            null => string.Empty,
-            string stringValue => stringValue,
-            IEnumerable<object> values => string.Join(", ", values.Select(FormatPropertyValue)),
-            IReadOnlyDictionary<string, object> dictionary => JsonSerializer.Serialize(dictionary, SelectedFeatureJsonSerializerOptions),
-            _ => value.ToString() ?? string.Empty
-        };
+        return JsonSerializer.Serialize(feature.Properties, SelectedFeatureJsonSerializerOptions);
     }
 
     private void LoadExample(int? id)

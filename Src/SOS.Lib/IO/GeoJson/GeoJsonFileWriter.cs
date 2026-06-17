@@ -23,6 +23,7 @@ using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
 using System.Text.Unicode;
 using ProcessedLocationType = SOS.Lib.Enums.LocationType;
 
@@ -37,6 +38,29 @@ public class GeoJsonFileWriter : FileWriterBase, IGeoJsonFileWriter
     private readonly ILogger<GeoJsonFileWriter> _logger;
     private const int FastSearchLimit = 10000;
 
+    private static readonly JavaScriptEncoder JsonEncoder =
+        JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.Latin1Supplement); //JavaScriptEncoder.UnsafeRelaxedJsonEscaping;    
+
+    private static readonly JsonSerializerOptions JsonSerializerOptions = CreateJsonSerializerOptions();
+
+    private static JsonSerializerOptions CreateJsonSerializerOptions()
+    {
+        var geoJsonConverterFactory = new NetTopologySuite.IO.Converters.GeoJsonConverterFactory();
+        var attributesTableConverter = geoJsonConverterFactory.CreateConverter(typeof(AttributesTable), null);
+        var geometryConverter = geoJsonConverterFactory.CreateConverter(typeof(Geometry), null);
+        JsonSerializerOptions jsonSerializerOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+        jsonSerializerOptions.Converters.Add(attributesTableConverter);
+        jsonSerializerOptions.Converters.Add(geometryConverter);
+        jsonSerializerOptions.Encoder = JsonEncoder;
+        return jsonSerializerOptions;
+    }
+
+    private static readonly JsonWriterOptions JsonWriterOptions = new JsonWriterOptions
+    {
+        SkipValidation = true,
+        Encoder = JsonEncoder
+    };
+
     private void EnsureCoordinatesAreRetrievedFromDb(OutputFilter outputFilter)
     {
         if (outputFilter?.Fields == null) return;
@@ -50,21 +74,6 @@ public class GeoJsonFileWriter : FileWriterBase, IGeoJsonFileWriter
         {
             outputFilter.Fields.Add("location.decimalLongitude");
         }
-    }
-
-    private static JsonSerializerOptions CreateJsonSerializerOptions()
-    {
-        var geoJsonConverterFactory = new NetTopologySuite.IO.Converters.GeoJsonConverterFactory();
-        var attributesTableConverter = geoJsonConverterFactory.CreateConverter(typeof(AttributesTable), null);
-        var geometryConverter = geoJsonConverterFactory.CreateConverter(typeof(Geometry), null);
-        JsonSerializerOptions jsonSerializerOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-        jsonSerializerOptions.Converters.Add(attributesTableConverter);
-        jsonSerializerOptions.Converters.Add(geometryConverter);
-        jsonSerializerOptions.Encoder = JavaScriptEncoder.Create(
-            UnicodeRanges.BasicLatin,
-            UnicodeRanges.Latin1Supplement
-        );
-        return jsonSerializerOptions;
     }
 
     private AttributesTable GetFeatureAttributesTable(
@@ -533,15 +542,7 @@ public class GeoJsonFileWriter : FileWriterBase, IGeoJsonFileWriter
             x => x,
             x => ObservationPropertyFieldDescriptionHelper.GetPropertyLabel(x, propertyLabelType));
         EnsureCoordinatesAreRetrievedFromDb(filter.Output);
-        JsonSerializerOptions jsonSerializerOptions = CreateJsonSerializerOptions();
-
-        var jsonWriterOptions = new JsonWriterOptions()
-        {
-            //To be able to display å,ä,ö e.t.c. properly we need to add the range Latin1Supplement to the list of characters which should not be displayed as UTF8 encoded values (\uxxxx).
-            Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.Latin1Supplement),
-            SkipValidation = true
-        };
-        await using var jsonWriter = new Utf8JsonWriter(stream, jsonWriterOptions);
+        await using var jsonWriter = new Utf8JsonWriter(stream, JsonWriterOptions);
         jsonWriter.WriteStartObject();
         jsonWriter.WriteString("type", "FeatureCollection");
         jsonWriter.WriteString("crs", "EPSG:4326");
@@ -573,7 +574,7 @@ public class GeoJsonFileWriter : FileWriterBase, IGeoJsonFileWriter
                 foreach (var observation in processedObservations)
                 {
                     var flatObservation = new FlatObservation(observation);
-                    WriteFeature(flatObservation, propertyLabels, excludeNullValues, jsonWriter, jsonSerializerOptions);
+                    WriteFeature(flatObservation, propertyLabels, excludeNullValues, jsonWriter, JsonSerializerOptions);
                 }
 
                 processedObservations = null;
@@ -581,7 +582,7 @@ public class GeoJsonFileWriter : FileWriterBase, IGeoJsonFileWriter
             else
             {
                 var processedRecords = (useFastSearch ? fastSearchResult.Records : searchResult.Records)
-                    .Select(r => JsonSerializer.SerializeToNode(r, typeof(Observation), new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase, DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull }));
+                    .Select(r => JsonSerializer.SerializeToNode(r, typeof(Observation), JsonSerializerOptions));
                 
                 nrObservations += processedRecords.Count();
                 _vocabularyValueResolver.ResolveVocabularyMappedValues(processedRecords, culture, true);
@@ -589,7 +590,7 @@ public class GeoJsonFileWriter : FileWriterBase, IGeoJsonFileWriter
                 LocalDateTimeConverterHelper.ConvertToLocalTime(processedRecords);
                 foreach (var record in processedRecords)
                 {
-                    WriteFeature(propertyFields, record, excludeNullValues, null, jsonWriter, jsonSerializerOptions);
+                    WriteFeature(propertyFields, record, excludeNullValues, null, jsonWriter, JsonSerializerOptions);
                 }
             }
 
@@ -633,15 +634,8 @@ public class GeoJsonFileWriter : FileWriterBase, IGeoJsonFileWriter
             ObservationPropertyFieldDescriptionHelper.GetExportFieldsFromOutputFields(outputFields, true);
         Dictionary<PropertyFieldDescription, string> propertyLabels = propertyFields.ToDictionary(
             x => x,
-            x => ObservationPropertyFieldDescriptionHelper.GetPropertyLabel(x, propertyLabelType));
-        JsonSerializerOptions jsonSerializerOptions = CreateJsonSerializerOptions();        
-        var jsonWriterOptions = new JsonWriterOptions()
-        {
-            //To be able to display å,ä,ö e.t.c. properly we need to add the range Latin1Supplement to the list of characters which should not be displayed as UTF8 encoded values (\uxxxx).
-            Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.Latin1Supplement),
-            SkipValidation = true
-        };       
-        await using var jsonWriter = new Utf8JsonWriter(ms, jsonWriterOptions);
+            x => ObservationPropertyFieldDescriptionHelper.GetPropertyLabel(x, propertyLabelType));        
+        await using var jsonWriter = new Utf8JsonWriter(ms, JsonWriterOptions);
         jsonWriter.WriteStartObject();
         jsonWriter.WriteString("type", "FeatureCollection");
         jsonWriter.WriteString("crs", "EPSG:4326");
@@ -664,16 +658,16 @@ public class GeoJsonFileWriter : FileWriterBase, IGeoJsonFileWriter
                 jsonWriter.WriteStartObject();
                 jsonWriter.WriteString("type", "Feature");
                 jsonWriter.WritePropertyName("geometry");
-                JsonSerializer.Serialize(jsonWriter, feature.Geometry, jsonSerializerOptions);
+                JsonSerializer.Serialize(jsonWriter, feature.Geometry, JsonSerializerOptions);
                 jsonWriter.WritePropertyName("properties");
-                JsonSerializer.Serialize(jsonWriter, feature.Attributes, jsonSerializerOptions);
+                JsonSerializer.Serialize(jsonWriter, feature.Attributes, JsonSerializerOptions);
                 jsonWriter.WriteEndObject();
             }
         }
         
         if (groupByLocation)
         {
-            WriteGroupedByLocationFeatures(records, propertyFields, propertyLabels, propertyLabelType, flatOut, excludeNullValues, jsonWriter, jsonSerializerOptions, polygonLocationGeometries);
+            WriteGroupedByLocationFeatures(records, propertyFields, propertyLabels, propertyLabelType, flatOut, excludeNullValues, jsonWriter, JsonSerializerOptions, polygonLocationGeometries);
         }
         else if (flatOut)
         {
@@ -687,14 +681,14 @@ public class GeoJsonFileWriter : FileWriterBase, IGeoJsonFileWriter
                     continue;
                 }
 
-                WriteFeature(geometry, flatObservation, propertyLabels, excludeNullValues, flatObservation.OccurrenceId, jsonWriter, jsonSerializerOptions);
+                WriteFeature(geometry, flatObservation, propertyLabels, excludeNullValues, flatObservation.OccurrenceId, jsonWriter, JsonSerializerOptions);
             }
         }
         else
         {
             foreach (var record in records)
             {
-                WriteFeature(propertyFields, record, excludeNullValues, polygonLocationGeometries, jsonWriter, jsonSerializerOptions);
+                WriteFeature(propertyFields, record, excludeNullValues, polygonLocationGeometries, jsonWriter, JsonSerializerOptions);
             }
         }
 

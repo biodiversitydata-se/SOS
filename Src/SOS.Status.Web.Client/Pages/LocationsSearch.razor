@@ -1,5 +1,4 @@
-﻿@page "/locationsearch"
-@using SOS.Status.Web.Client.Abstractions
+@page "/locationsearch"
 @inject IJSRuntime JsRuntime
 @inject IObservationSearchService searchService
 @inject ISnackbar Snackbar
@@ -90,16 +89,7 @@
                                 }
                                 else
                                 {
-                                    <MudTable Items="GetSelectedFeatureProperties(firstSelectedFeature)" Dense="true" Hover="true" Breakpoint="Breakpoint.Sm" Class="mt-2">
-                                        <HeaderContent>
-                                            <MudTh>Namn</MudTh>
-                                            <MudTh>Värde</MudTh>
-                                        </HeaderContent>
-                                        <RowTemplate>
-                                            <MudTd DataLabel="Namn">@context.Key</MudTd>
-                                            <MudTd DataLabel="Värde">@FormatPropertyValue(context.Value)</MudTd>
-                                        </RowTemplate>
-                                    </MudTable>
+                                    <pre class="selected-feature-json">@FormatSelectedFeatureJson(firstSelectedFeature)</pre>
                                 }
                             </MudExpansionPanel>
                         }

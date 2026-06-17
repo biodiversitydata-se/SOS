@@ -1,4 +1,4 @@
-﻿const originalPolygonGeometries = new WeakMap();
+﻿﻿const originalPolygonGeometries = new WeakMap();
 const centroidGeometries = new WeakMap();
 
 export function getMetersPerPixel(map) {
@@ -284,7 +284,10 @@ function getCentroidGeometry(feature, originalGeometry, map) {
         return existing.clone();
     }
 
-    const location = feature.get("location");
+    const locations = feature.get("locations") || feature.get("Locations");
+    const location = getPropertyValue(locations, "location", "Location") ||
+        feature.get("location") ||
+        feature.get("Location");
     const longitude = location && Number(location.decimalLongitude);
     const latitude = location && Number(location.decimalLatitude);
     let coordinate = null;
@@ -327,7 +330,7 @@ function parseGeoJson(geoJson) {
 function createCoordinateUncertaintyFeature(geoJsonFeature, projection) {
     const geometry = geoJsonFeature?.geometry;
     const properties = geoJsonFeature?.properties || {};
-    const location = properties.location;
+    const location = getLocationProperty(properties);
 
     if (!geometry || geometry.type !== "Point" || !location || toBoolean(properties.isCluster)) {
         return null;
@@ -369,7 +372,9 @@ function createClusterRadiusFeature(geoJsonFeature, radiusPropertyName, projecti
         return null;
     }
 
-    const radiusMeters = Number(getPropertyValue(properties, radiusPropertyName, radiusPropertyName));
+    const radiusMeters = Number(
+        getNestedPropertyValue(properties, radiusPropertyName) ??
+        getPropertyValue(properties, radiusPropertyName, radiusPropertyName));
     if (!Number.isFinite(radiusMeters) || radiusMeters <= 0) {
         return null;
     }
@@ -411,6 +416,36 @@ function getPropertyValue(source, camelName, pascalName) {
     }
 
     return null;
+}
+
+function getNestedPropertyValue(source, propertyPath) {
+    if (!source || !propertyPath || typeof propertyPath !== "string") {
+        return null;
+    }
+
+    const parts = propertyPath.split(".");
+    let current = source;
+    for (const part of parts) {
+        if (!current) {
+            return null;
+        }
+
+        current = getPropertyValue(current, part, toPascalCase(part));
+    }
+
+    return current;
+}
+
+function getLocationProperty(properties) {
+    const locations = getPropertyValue(properties, "locations", "Locations");
+    return getPropertyValue(locations, "location", "Location") ||
+        getPropertyValue(properties, "location", "Location");
+}
+
+function toPascalCase(value) {
+    return value.length === 0
+        ? value
+        : value.charAt(0).toUpperCase() + value.slice(1);
 }
 
 function toBoolean(value) {

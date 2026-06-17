@@ -325,11 +325,15 @@ public class Location
     /// decimalLongitude and coordinateUncertaintyInMeters.
     /// </summary>
     [JsonIgnore]
-    public string DistinctLocationId => CreateDistinctLocationId(
-        Type,
-        DecimalLatitude,
-        DecimalLongitude,
-        CoordinateUncertaintyInMeters);
+    public string DistinctLocationId => CreateDistinctLocationId();
+
+    //[JsonIgnore]
+    //public string DistinctLocationId => LocationId ?? CreateDistinctLocationId();
+
+    public string CreateDistinctLocationId()
+    {
+        return CreateDistinctLocationId(Type,DecimalLatitude, DecimalLongitude, CoordinateUncertaintyInMeters);
+    }
 
     private static string CreateDistinctLocationId(
         LocationType type,

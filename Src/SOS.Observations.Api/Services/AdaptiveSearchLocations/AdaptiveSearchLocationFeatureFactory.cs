@@ -1,4 +1,4 @@
-﻿using NetTopologySuite.Geometries;
+﻿﻿using NetTopologySuite.Geometries;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Gis;
@@ -9,26 +9,26 @@ using ProcessedLocationType = SOS.Lib.Enums.LocationType;
 
 namespace SOS.Observations.Api.Services.AdaptiveSearchLocations;
 
-internal interface IAdaptiveSearchLocationClusterItemFactory
+internal interface IAdaptiveSearchLocationFeatureFactory
 {
-    List<LocationClusterItem> CreateClusterItems(List<CachedLocationAggregate> locationAggregates, LatLonBoundingBox? clusteringBbox, LocationClusteringAlgorithm clusteringAlgorithm, double? metersPerPixel, double clusterRadiusPx, int minLocationsPerCluster, int minLocationCountBeforeClustering, Dictionary<string, Geometry>? polygonLocationGeometries, CreatePolygonsMode createPolygons);
-    List<LocationClusterItem> CreateUnclusteredItems(List<CachedLocationAggregate> locationAggregates, Dictionary<string, Geometry>? polygonLocationGeometries, CreatePolygonsMode createPolygons, double? metersPerPixel);
-    List<LocationClusterItem> CreateClusterItems(IEnumerable<JsonObject> records, LatLonBoundingBox? clusteringBbox, LocationClusteringAlgorithm clusteringAlgorithm, double? metersPerPixel, double clusterRadiusPx, int minLocationsPerCluster, int minLocationCountBeforeClustering, Dictionary<string, Geometry>? polygonLocationGeometries, CreatePolygonsMode createPolygons);
-    List<LocationClusterItem> CreateUnclusteredItems(IEnumerable<JsonObject> records, Dictionary<string, Geometry>? polygonLocationGeometries, CreatePolygonsMode createPolygons, double? metersPerPixel);
+    List<LocationFeature> CreateClusterItems(List<CachedLocationAggregate> locationAggregates, LatLonBoundingBox? clusteringBbox, LocationClusteringAlgorithm clusteringAlgorithm, double? metersPerPixel, double clusterRadiusPx, int minLocationsPerCluster, int minLocationCountBeforeClustering, Dictionary<string, Geometry>? polygonLocationGeometries, CreatePolygonsMode createPolygons);
+    List<LocationFeature> CreateUnclusteredItems(List<CachedLocationAggregate> locationAggregates, Dictionary<string, Geometry>? polygonLocationGeometries, CreatePolygonsMode createPolygons, double? metersPerPixel);
+    List<LocationFeature> CreateClusterItems(IEnumerable<JsonObject> records, LatLonBoundingBox? clusteringBbox, LocationClusteringAlgorithm clusteringAlgorithm, double? metersPerPixel, double clusterRadiusPx, int minLocationsPerCluster, int minLocationCountBeforeClustering, Dictionary<string, Geometry>? polygonLocationGeometries, CreatePolygonsMode createPolygons);
+    List<LocationFeature> CreateUnclusteredItems(IEnumerable<JsonObject> records, Dictionary<string, Geometry>? polygonLocationGeometries, CreatePolygonsMode createPolygons, double? metersPerPixel);
 }
 
-internal sealed class AdaptiveSearchLocationClusterItemFactory : IAdaptiveSearchLocationClusterItemFactory
+internal sealed class AdaptiveSearchLocationFeatureFactory : IAdaptiveSearchLocationFeatureFactory
 {
     private const int DefaultMaxLocationCountAfterClustering = 400;
     private const double MinimumMapPointRadiusPx = 5.0;
     private readonly IAdaptiveSearchLocationAggregator _aggregator;
 
-    public AdaptiveSearchLocationClusterItemFactory(IAdaptiveSearchLocationAggregator aggregator)
+    public AdaptiveSearchLocationFeatureFactory(IAdaptiveSearchLocationAggregator aggregator)
     {
         _aggregator = aggregator ?? throw new ArgumentNullException(nameof(aggregator));
     }
 
-    public List<LocationClusterItem> CreateClusterItems(
+    public List<LocationFeature> CreateClusterItems(
         List<CachedLocationAggregate> locationAggregates,
         LatLonBoundingBox? clusteringBbox,
         LocationClusteringAlgorithm clusteringAlgorithm,
@@ -41,18 +41,18 @@ internal sealed class AdaptiveSearchLocationClusterItemFactory : IAdaptiveSearch
     {
         if (locationAggregates.Count == 0)
         {
-            return new List<LocationClusterItem>();
+            return new List<LocationFeature>();
         }
 
         var aggregatesByDistinctLocationId = locationAggregates.ToDictionary(
             location => location.DistinctLocationId,
             StringComparer.Ordinal);
 
-        var locationClusterItems = clusteringBbox == null
+        var locationFeatures = clusteringBbox == null
             ? locationAggregates
-                .Select(location => CreateLocationClusterItemFromCachedAggregates(new[] { location }, false))
+                .Select(location => CreateLocationFeatureFromCachedAggregates(new[] { location }, false))
                 .ToList()
-            : CreateClusteredLocationItemsFromCachedAggregates(
+            : CreateLocationFeaturesFromCachedAggregates(
                 locationAggregates,
                 aggregatesByDistinctLocationId,
                 clusteringBbox,
@@ -62,26 +62,26 @@ internal sealed class AdaptiveSearchLocationClusterItemFactory : IAdaptiveSearch
                 minLocationsPerCluster,
                 minLocationCountBeforeClustering);
 
-        ApplyFallbackClusterRadiusMeters(locationClusterItems, metersPerPixel, clusterRadiusPx);
-        ApplyGeometries(locationClusterItems, polygonLocationGeometries, createPolygons, metersPerPixel);
-        return locationClusterItems;
+        ApplyFallbackClusterRadiusMeters(locationFeatures, metersPerPixel, clusterRadiusPx);
+        ApplyGeometries(locationFeatures, polygonLocationGeometries, createPolygons, metersPerPixel);
+        return locationFeatures;
     }
 
-    public List<LocationClusterItem> CreateUnclusteredItems(
+    public List<LocationFeature> CreateUnclusteredItems(
         List<CachedLocationAggregate> locationAggregates,
         Dictionary<string, Geometry>? polygonLocationGeometries,
         CreatePolygonsMode createPolygons,
         double? metersPerPixel)
     {
-        var locationClusterItems = locationAggregates
-            .Select(location => CreateLocationClusterItemFromCachedAggregates(new[] { location }, false))
+        var locationFeatures = locationAggregates
+            .Select(location => CreateLocationFeatureFromCachedAggregates(new[] { location }, false))
             .ToList();
 
-        ApplyGeometries(locationClusterItems, polygonLocationGeometries, createPolygons, metersPerPixel);
-        return locationClusterItems;
+        ApplyGeometries(locationFeatures, polygonLocationGeometries, createPolygons, metersPerPixel);
+        return locationFeatures;
     }
 
-    public List<LocationClusterItem> CreateClusterItems(
+    public List<LocationFeature> CreateClusterItems(
         IEnumerable<JsonObject> records,
         LatLonBoundingBox? clusteringBbox,
         LocationClusteringAlgorithm clusteringAlgorithm,
@@ -94,30 +94,29 @@ internal sealed class AdaptiveSearchLocationClusterItemFactory : IAdaptiveSearch
     {
         var observations = records
             .ToObservationsArray()
-            .Where(observation => observation.Location?.DecimalLatitude.HasValue == true &&
-                                  observation.Location?.DecimalLongitude.HasValue == true)
+            .Where(HasUsableLocation)
             .ToList();
         if (observations.Count == 0)
         {
-            return new List<LocationClusterItem>();
+            return new List<LocationFeature>();
         }
 
         var clusterer = CreateLocationClusterer(clusteringAlgorithm, minLocationCountBeforeClustering, minLocationsPerCluster);
-        var locationClusterItems = clusteringBbox == null
+        var locationFeatures = clusteringBbox == null
             ? _aggregator.GroupObservationsByLocation(observations)
-                .Select(LocationClusterItem.FromSingleLocation)
+                .Select(LocationFeature.FromSingleLocation)
                 .ToList()
             : metersPerPixel.HasValue
                 ? clusterer.ClusterLocations(observations, clusteringBbox, metersPerPixel.Value, clusterRadiusPx)
                 : clusterer.ClusterLocations(observations, clusteringBbox);
 
-        locationClusterItems = NormalizeNonClusteredLocationItems(locationClusterItems);
-        ApplyFallbackClusterRadiusMeters(locationClusterItems, metersPerPixel, clusterRadiusPx);
-        ApplyGeometries(locationClusterItems, polygonLocationGeometries, createPolygons, metersPerPixel);
-        return locationClusterItems;
+        locationFeatures = NormalizeNonClusteredLocationItems(locationFeatures);
+        ApplyFallbackClusterRadiusMeters(locationFeatures, metersPerPixel, clusterRadiusPx);
+        ApplyGeometries(locationFeatures, polygonLocationGeometries, createPolygons, metersPerPixel);
+        return locationFeatures;
     }
 
-    public List<LocationClusterItem> CreateUnclusteredItems(
+    public List<LocationFeature> CreateUnclusteredItems(
         IEnumerable<JsonObject> records,
         Dictionary<string, Geometry>? polygonLocationGeometries,
         CreatePolygonsMode createPolygons,
@@ -125,19 +124,18 @@ internal sealed class AdaptiveSearchLocationClusterItemFactory : IAdaptiveSearch
     {
         var observations = records
             .ToObservationsArray()
-            .Where(observation => observation.Location?.DecimalLatitude.HasValue == true &&
-                                  observation.Location?.DecimalLongitude.HasValue == true)
+            .Where(HasUsableLocation)
             .ToList();
 
-        var locationClusterItems = _aggregator.GroupObservationsByLocation(observations)
-            .Select(LocationClusterItem.FromSingleLocation)
+        var locationFeatures = _aggregator.GroupObservationsByLocation(observations)
+            .Select(LocationFeature.FromSingleLocation)
             .ToList();
 
-        ApplyGeometries(locationClusterItems, polygonLocationGeometries, createPolygons, metersPerPixel);
-        return locationClusterItems;
+        ApplyGeometries(locationFeatures, polygonLocationGeometries, createPolygons, metersPerPixel);
+        return locationFeatures;
     }
 
-    private List<LocationClusterItem> CreateClusteredLocationItemsFromCachedAggregates(
+    private List<LocationFeature> CreateLocationFeaturesFromCachedAggregates(
         List<CachedLocationAggregate> locationAggregates,
         Dictionary<string, CachedLocationAggregate> aggregatesByDistinctLocationId,
         LatLonBoundingBox clusteringBbox,
@@ -155,7 +153,7 @@ internal sealed class AdaptiveSearchLocationClusterItemFactory : IAdaptiveSearch
             ? clusterer.ClusterLocations(representativeObservations, clusteringBbox, metersPerPixel.Value, clusterRadiusPx)
             : clusterer.ClusterLocations(representativeObservations, clusteringBbox);
 
-        var result = new List<LocationClusterItem>(clusteredItems.Count);
+        var result = new List<LocationFeature>(clusteredItems.Count);
         foreach (var clusteredItem in clusteredItems)
         {
             var aggregates = GetCachedAggregatesForClusterItem(clusteredItem, aggregatesByDistinctLocationId);
@@ -164,7 +162,7 @@ internal sealed class AdaptiveSearchLocationClusterItemFactory : IAdaptiveSearch
                 continue;
             }
 
-            result.Add(CreateLocationClusterItemFromCachedAggregates(
+            result.Add(CreateLocationFeatureFromCachedAggregates(
                 aggregates,
                 clusteredItem.IsCluster,
                 clusteredItem.ClusterRadiusMeters));
@@ -174,12 +172,12 @@ internal sealed class AdaptiveSearchLocationClusterItemFactory : IAdaptiveSearch
     }
 
     private static List<CachedLocationAggregate> GetCachedAggregatesForClusterItem(
-        LocationClusterItem locationClusterItem,
+        LocationFeature locationFeature,
         Dictionary<string, CachedLocationAggregate> aggregatesByDistinctLocationId)
     {
-        var distinctLocationIds = locationClusterItem.Locations.Count > 0
-            ? locationClusterItem.Locations.Select(location => location.DistinctLocationId)
-            : locationClusterItem.Observations.Select(observation => observation.Location?.DistinctLocationId);
+        var distinctLocationIds = locationFeature.Locations.Count > 0
+            ? locationFeature.Locations.Select(location => location.DistinctLocationId)
+            : locationFeature.Observations.Select(observation => observation.Location?.DistinctLocationId);
 
         return distinctLocationIds
             .Where(distinctLocationId => !string.IsNullOrWhiteSpace(distinctLocationId))
@@ -211,7 +209,7 @@ internal sealed class AdaptiveSearchLocationClusterItemFactory : IAdaptiveSearch
         };
     }
 
-    private static LocationClusterItem CreateLocationClusterItemFromCachedAggregates(
+    private static LocationFeature CreateLocationFeatureFromCachedAggregates(
         IEnumerable<CachedLocationAggregate> aggregates,
         bool isCluster,
         double? clusterRadiusMeters = null)
@@ -231,7 +229,7 @@ internal sealed class AdaptiveSearchLocationClusterItemFactory : IAdaptiveSearch
             .Distinct()
             .Count();
 
-        var locationClusterItem = new LocationClusterItem
+        var locationFeature = new LocationFeature
         {
             IsCluster = isCluster,
             LocationCount = locations.Count,
@@ -243,27 +241,29 @@ internal sealed class AdaptiveSearchLocationClusterItemFactory : IAdaptiveSearch
             Locations = locations,
             StatusCounts = observationSummary.ToStatusCounts(),
             ClusterRadiusMeters = isCluster ? clusterRadiusMeters : null,
-            IsEstimated = aggregateList.Any(aggregate => aggregate.IsEstimated) ? true : null
+            IsSummaryApproximated = observationSummary.ObservationCount == 1
+                ? null
+                : aggregateList.Any(aggregate => aggregate.IsSummaryApproximated) ? true : null
         };
 
         if (isCluster)
         {
             var centroidLatitude = locations.Average(location => location.DecimalLatitude!.Value);
             var centroidLongitude = locations.Average(location => location.DecimalLongitude!.Value);
-            locationClusterItem.Location = new SOS.Lib.Models.Processed.Observation.Location
+            locationFeature.Location = new SOS.Lib.Models.Processed.Observation.Location
             {
                 DecimalLatitude = centroidLatitude,
                 DecimalLongitude = centroidLongitude
             };
-            locationClusterItem.Geometry = new Point(centroidLongitude, centroidLatitude);
+            locationFeature.Geometry = new Point(centroidLongitude, centroidLatitude);
         }
         else
         {
-            locationClusterItem.Location = locations[0];
-            locationClusterItem.Geometry = CreatePointGeometry(locations[0]);
+            locationFeature.Location = locations[0];
+            locationFeature.Geometry = CreatePointGeometry(locations[0]);
         }
 
-        return locationClusterItem;
+        return locationFeature;
     }
 
     private static LocationObservationSummary CombineLocationObservationSummaries(IEnumerable<CachedLocationAggregate> aggregates)
@@ -292,16 +292,16 @@ internal sealed class AdaptiveSearchLocationClusterItemFactory : IAdaptiveSearch
         summary.DebugObservations = summary.ObservationCount <= 5
             ? aggregateList.SelectMany(aggregate => aggregate.ObservationSummary.DebugObservations ?? new List<DebugObservation>()).ToList()
             : null;
-        summary.DisplayStatusSummaries = CombineDisplayStatusSummaries(aggregateList);
+        summary.PresentationStatusSummaries = CombinePresentationStatusSummaries(aggregateList);
 
         return summary;
     }
 
-    private static List<LocationObservationDisplayStatusSummary> CombineDisplayStatusSummaries(
+    private static List<LocationObservationSummary.PresentationStatusSummary> CombinePresentationStatusSummaries(
         IEnumerable<CachedLocationAggregate> aggregates)
     {
         return aggregates
-            .SelectMany(aggregate => aggregate.ObservationSummary.DisplayStatusSummaries)
+            .SelectMany(aggregate => aggregate.ObservationSummary.PresentationStatusSummaries)
             .GroupBy(
                 summary => new
                 {
@@ -311,7 +311,7 @@ internal sealed class AdaptiveSearchLocationClusterItemFactory : IAdaptiveSearch
                     summary.IsNotRecovered,
                     summary.EndYear
                 })
-            .Select(group => new LocationObservationDisplayStatusSummary
+            .Select(group => new LocationObservationSummary.PresentationStatusSummary
             {
                 IsPresent = group.Key.IsPresent,
                 IsSensitive = group.Key.IsSensitive,
@@ -323,11 +323,11 @@ internal sealed class AdaptiveSearchLocationClusterItemFactory : IAdaptiveSearch
             .ToList();
     }
 
-    private List<LocationClusterItem> NormalizeNonClusteredLocationItems(List<LocationClusterItem> locationClusterItems)
+    private List<LocationFeature> NormalizeNonClusteredLocationItems(List<LocationFeature> locationFeatures)
     {
-        var result = new List<LocationClusterItem>(locationClusterItems.Count);
+        var result = new List<LocationFeature>(locationFeatures.Count);
         var nonClusteredObservations = new List<Observation>();
-        foreach (var item in locationClusterItems)
+        foreach (var item in locationFeatures)
         {
             if (item.IsCluster)
             {
@@ -340,7 +340,7 @@ internal sealed class AdaptiveSearchLocationClusterItemFactory : IAdaptiveSearch
 
         foreach (var group in _aggregator.GroupObservationsByLocation(nonClusteredObservations))
         {
-            result.Add(LocationClusterItem.FromSingleLocation(group));
+            result.Add(LocationFeature.FromSingleLocation(group));
         }
 
         return result;
@@ -360,7 +360,7 @@ internal sealed class AdaptiveSearchLocationClusterItemFactory : IAdaptiveSearch
         };
     }
 
-    private static void ApplyFallbackClusterRadiusMeters(List<LocationClusterItem> locationClusterItems, double? metersPerPixel, double clusterRadiusPx)
+    private static void ApplyFallbackClusterRadiusMeters(List<LocationFeature> locationFeatures, double? metersPerPixel, double clusterRadiusPx)
     {
         if (!metersPerPixel.HasValue || metersPerPixel.Value <= 0)
         {
@@ -368,7 +368,7 @@ internal sealed class AdaptiveSearchLocationClusterItemFactory : IAdaptiveSearch
         }
 
         var radiusMeters = metersPerPixel.Value * (clusterRadiusPx > 0 ? clusterRadiusPx : 40.0);
-        foreach (var item in locationClusterItems)
+        foreach (var item in locationFeatures)
         {
             if (item.IsCluster && !item.ClusterRadiusMeters.HasValue)
             {
@@ -377,24 +377,24 @@ internal sealed class AdaptiveSearchLocationClusterItemFactory : IAdaptiveSearch
         }
     }
 
-    private static void ApplyGeometries(List<LocationClusterItem> locationClusterItems, Dictionary<string, Geometry>? polygonLocationGeometries, CreatePolygonsMode createPolygons, double? metersPerPixel)
+    private static void ApplyGeometries(List<LocationFeature> locationFeatures, Dictionary<string, Geometry>? polygonLocationGeometries, CreatePolygonsMode createPolygons, double? metersPerPixel)
     {
         var resolvedMetersPerPixel = createPolygons == CreatePolygonsMode.WhenNeeded ? metersPerPixel : null;
 
-        foreach (var locationClusterItem in locationClusterItems)
+        foreach (var feature in locationFeatures)
         {
-            if (locationClusterItem.IsCluster)
+            if (feature.IsCluster)
             {
-                locationClusterItem.Geometry = CreatePointGeometry(locationClusterItem.Location);
+                feature.Geometry = CreatePointGeometry(feature.Location);
                 continue;
             }
 
-            var location = locationClusterItem.Location;
+            var location = feature.Location;
             var pointGeometry = CreatePointGeometry(location);
 
-            if (IsDiffusedLocationItem(locationClusterItem))
+            if (IsDiffusedLocationItem(feature))
             {
-                locationClusterItem.Geometry = CreateDiffusedLocationSquareGeometry(location) ?? pointGeometry;
+                feature.Geometry = CreateDiffusedLocationSquareGeometry(location) ?? pointGeometry;
                 continue;
             }
 
@@ -406,30 +406,30 @@ internal sealed class AdaptiveSearchLocationClusterItemFactory : IAdaptiveSearch
                 {
                     if (createPolygons == CreatePolygonsMode.Yes)
                     {
-                        locationClusterItem.Geometry = polygonGeometry;
+                        feature.Geometry = polygonGeometry;
                         continue;
                     }
 
                     var decision = GetPolygonGeometryDisplayDecision(polygonGeometry, resolvedMetersPerPixel);
                     if (decision.UsePolygon)
                     {
-                        locationClusterItem.Geometry = polygonGeometry;
+                        feature.Geometry = polygonGeometry;
                         continue;
                     }
                 }
 
-                locationClusterItem.Geometry = pointGeometry;
+                feature.Geometry = pointGeometry;
                 continue;
             }
 
-            locationClusterItem.Geometry = pointGeometry;
+            feature.Geometry = pointGeometry;
         }
     }
 
-    private static bool IsDiffusedLocationItem(LocationClusterItem locationClusterItem)
+    private static bool IsDiffusedLocationItem(LocationFeature locationFeature)
     {
-        return locationClusterItem.ObservationSummary?.DiffusedCount > 0 ||
-               locationClusterItem.Observations.Any(observation => observation.IsGeneralized);
+        return locationFeature.ObservationSummary?.DiffusedCount > 0 ||
+               locationFeature.Observations.Any(observation => observation.IsGeneralized);
     }
 
     private static Geometry? CreateDiffusedLocationSquareGeometry(SOS.Lib.Models.Processed.Observation.Location? location)
@@ -478,6 +478,11 @@ internal sealed class AdaptiveSearchLocationClusterItemFactory : IAdaptiveSearch
         };
 
         return square.Transform(CoordinateSys.SWEREF99_TM, CoordinateSys.WGS84, usePointCache: false);
+    }
+
+    private static bool HasUsableLocation(Observation observation)
+    {
+        return !string.IsNullOrWhiteSpace(observation.Location.LocationId);
     }
 
     private static Geometry? CreatePointGeometry(SOS.Lib.Models.Processed.Observation.Location? location)

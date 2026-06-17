@@ -23,7 +23,7 @@ public interface ILocationClusterer
     /// <returns>
     /// A flat list of clustered and non-clustered location items.
     /// </returns>
-    List<LocationClusterItem> ClusterLocations(List<Observation> observations, LatLonBoundingBox boundingBox, int targetItemCount);
+    List<LocationFeature> ClusterLocations(List<Observation> observations, LatLonBoundingBox boundingBox, int targetItemCount);
 
     /// <summary>
     /// Cluster all observations using the configured default target item count for the bounding box.
@@ -37,7 +37,7 @@ public interface ILocationClusterer
     /// <returns>
     /// A flat list of clustered and non-clustered location items.
     /// </returns>
-    List<LocationClusterItem> ClusterLocations(List<Observation> observations, LatLonBoundingBox boundingBox);
+    List<LocationFeature> ClusterLocations(List<Observation> observations, LatLonBoundingBox boundingBox);
 
     /// <summary>
     /// Cluster all observations using a viewport resolution in metres per pixel.
@@ -57,5 +57,5 @@ public interface ILocationClusterer
     /// <returns>
     /// A flat list of clustered and non-clustered location items.
     /// </returns>
-    List<LocationClusterItem> ClusterLocations(List<Observation> observations, LatLonBoundingBox boundingBox, double metersPerPixel, double clusterRadiusPx = 40.0);
+    List<LocationFeature> ClusterLocations(List<Observation> observations, LatLonBoundingBox boundingBox, double metersPerPixel, double clusterRadiusPx = 40.0);
 }

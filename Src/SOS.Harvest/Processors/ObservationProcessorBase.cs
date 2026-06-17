@@ -432,7 +432,7 @@ namespace SOS.Harvest.Processors
                 else
                 {
                     observations = observationFactory.CreateProcessedObservations(verbatimObservation, false);
-                }
+                }                
 
                 if (observations == null || !observations.Any())
                 {
@@ -441,6 +441,12 @@ namespace SOS.Harvest.Processors
 
                 foreach (var observation in observations)
                 {
+                    // If LocationId is null then create a value.
+                    if (observation.Location?.LocationId == null)
+                    {                        
+                        observation.Location.LocationId = observation.Location.CreateDistinctLocationId();
+                    }
+
                     // If observation is protected
                     if (observation.ShallBeProtected())
                     {

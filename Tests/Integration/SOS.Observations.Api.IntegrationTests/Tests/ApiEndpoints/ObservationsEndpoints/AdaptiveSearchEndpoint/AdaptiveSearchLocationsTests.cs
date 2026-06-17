@@ -1,4 +1,4 @@
-﻿using FizzWare.NBuilder;
+﻿﻿using FizzWare.NBuilder;
 using MongoDB.Driver.GeoJsonObjectModel;
 using Moq;
 using NetTopologySuite.Geometries;
@@ -248,20 +248,16 @@ public class AdaptiveSearchLocationsTests : TestBase
         var searchFilter = CreateBoundingBoxFilter(TaxonIds.Duvhök, 14.00, 58.12, 14.02, 58.10);
 
         // Act
-        var defaultStrategyResponse = await apiClient.PostAsync(
-            "/observations/internal/adaptivesearchlocations?observationsLimit=1&cluster=false&returnInputBBox=true&locationAggregationLimit=2",
-            JsonContent.Create(searchFilter));
-        var explicitStrategyResponse = await apiClient.PostAsync(
-            "/observations/internal/adaptivesearchlocations?observationsLimit=1&cluster=false&returnInputBBox=true&locationAggregationLimit=2&adaptiveSearchStrategy=ObservationsThenGrid",
-            JsonContent.Create(searchFilter));
+        var defaultStrategyResponse = await apiClient.PostAsync("/observations/internal/adaptivesearchlocations?observationsLimit=1&cluster=false&returnInputBBox=true&locationAggregationLimit=2", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var explicitStrategyResponse = await apiClient.PostAsync("/observations/internal/adaptivesearchlocations?observationsLimit=1&cluster=false&returnInputBBox=true&locationAggregationLimit=2&adaptiveSearchStrategy=ObservationsThenGrid", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
 
         // Assert
         defaultStrategyResponse.StatusCode.Should().Be(HttpStatusCode.OK);
         explicitStrategyResponse.StatusCode.Should().Be(HttpStatusCode.OK);
         defaultStrategyResponse.GetHeaderValue("X-Result-Type").Should().Be("geogrid");
         explicitStrategyResponse.GetHeaderValue("X-Result-Type").Should().Be("geogrid");
-        defaultStrategyResponse.Headers.Contains("X-Location-Properties-Estimated").Should().BeFalse();
-        explicitStrategyResponse.Headers.Contains("X-Location-Properties-Estimated").Should().BeFalse();
+        defaultStrategyResponse.GetHeaderValue("X-Location-Summary-Approximated").Should().Be("false");
+        explicitStrategyResponse.GetHeaderValue("X-Location-Summary-Approximated").Should().Be("false");
     }
 
     [Fact]
@@ -281,29 +277,24 @@ public class AdaptiveSearchLocationsTests : TestBase
         var searchFilter = CreateBoundingBoxFilter(TaxonIds.ViolettGuldvinge, 14.02, 58.14, 14.04, 58.12);
 
         // Act
-        var fullLocationsResponse = await apiClient.PostAsync(
-            "/observations/internal/adaptivesearchlocations?observationsLimit=100&cluster=false&returnInputBBox=true&locationAggregationLimit=2&adaptiveSearchStrategy=ObservationsThenLocationsThenGrid",
-            JsonContent.Create(searchFilter));
-        var fullLocationsResponseString = await fullLocationsResponse.Content.ReadAsStringAsync();
+        var fullLocationsResponse = await apiClient.PostAsync("/observations/internal/adaptivesearchlocations?observationsLimit=100&cluster=false&returnInputBBox=true&locationAggregationLimit=2&adaptiveSearchStrategy=ObservationsThenLocationsThenGrid", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var fullLocationsResponseString = await fullLocationsResponse.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
         var propertiesByLocationId = GetFeaturePropertiesByLocationId(fullLocationsResponseString);
         var properties = propertiesByLocationId[CreateArtportalenSiteLocationId(siteId)];
-        var noLocationLimitResponse = await apiClient.PostAsync(
-            "/observations/internal/adaptivesearchlocations?observationsLimit=1&cluster=false&returnInputBBox=true&adaptiveSearchStrategy=ObservationsThenLocationsThenGrid",
-            JsonContent.Create(searchFilter));
+        var noLocationLimitResponse = await apiClient.PostAsync("/observations/internal/adaptivesearchlocations?observationsLimit=1&cluster=false&returnInputBBox=true&adaptiveSearchStrategy=ObservationsThenLocationsThenGrid", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
 
         // Assert
         fullLocationsResponse.StatusCode.Should().Be(HttpStatusCode.OK);
         fullLocationsResponse.GetHeaderValue("X-Result-Type").Should().Be("locations");
         fullLocationsResponse.GetHeaderValue("X-Cache").Should().Be("MISS");
-        propertiesByLocationId.Should().ContainSingle();
-        properties.ContainsKey("isEstimated").Should().BeFalse();
+        propertiesByLocationId.Should().ContainSingle();        
         properties["observationCount"]!.GetValue<int>().Should().Be(4);
-        properties["displayStatusCount"]!["Present"]!.GetValue<int>().Should().Be(4);
-        properties["statusCounts"]!["foundCount"]!.GetValue<int>().Should().Be(4);
+        GetPresentation(properties)["statusCounts"]!["Present"]!.GetValue<int>().Should().Be(4);
+        GetObservationSummary(properties)["statusCounts"]!["foundCount"]!.GetValue<int>().Should().Be(4);
 
         noLocationLimitResponse.StatusCode.Should().Be(HttpStatusCode.OK);
         noLocationLimitResponse.GetHeaderValue("X-Result-Type").Should().Be("geogrid");
-        noLocationLimitResponse.Headers.Contains("X-Location-Properties-Estimated").Should().BeFalse();
+        noLocationLimitResponse.GetHeaderValue("X-Location-Summary-Approximated").Should().Be("false");
     }
 
     [Fact]
@@ -323,10 +314,8 @@ public class AdaptiveSearchLocationsTests : TestBase
         var searchFilter = CreateBoundingBoxFilter(TaxonIds.Duvhök, 13.84, 58.40, 13.90, 58.35);
 
         // Act
-        var response = await apiClient.PostAsync(
-            "/observations/internal/adaptivesearchlocations?observationsLimit=1&cluster=false&returnInputBBox=true&locationAggregationLimit=2&adaptiveSearchStrategy=ObservationsThenLocationsThenGrid",
-            JsonContent.Create(searchFilter));
-        var responseString = await response.Content.ReadAsStringAsync();
+        var response = await apiClient.PostAsync("/observations/internal/adaptivesearchlocations?observationsLimit=1&cluster=false&returnInputBBox=true&locationAggregationLimit=2&adaptiveSearchStrategy=ObservationsThenLocationsThenGrid", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var responseString = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
         var propertiesByLocationId = GetFeaturePropertiesByLocationId(responseString);
         var properties = propertiesByLocationId[CreateArtportalenSiteLocationId(siteId)];
 
@@ -334,15 +323,46 @@ public class AdaptiveSearchLocationsTests : TestBase
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         response.GetHeaderValue("X-Result-Type").Should().Be("locations");
         response.GetHeaderValue("X-Cache").Should().Be("BYPASS");
-        response.GetHeaderValue("X-Location-Aggregation").Should().Be("representative");
-        response.GetHeaderValue("X-Location-Properties-Estimated").Should().Be("true");
-        response.GetHeaderValue("X-Location-Aggregation-Representatives-Count").Should().Be("1");
-        propertiesByLocationId.Should().ContainSingle();
-        properties["isEstimated"]!.GetValue<bool>().Should().BeTrue();
+        response.GetHeaderValue("X-Location-Aggregation-Mode").Should().Be("representative");
+        response.GetHeaderValue("X-Location-Summary-Approximated").Should().Be("true");
+        response.Headers.Contains("X-Location-Aggregation-Representatives-Count").Should().BeFalse();
+        propertiesByLocationId.Should().ContainSingle();        
+        properties["isSummaryApproximated"]!.GetValue<bool>().Should().BeTrue();
         properties["observationCount"]!.GetValue<int>().Should().Be(4);
-        properties["displayStatus"]!.GetValue<string>().Should().Be("Present");
-        properties["displayStatusCount"]!["Present"]!.GetValue<int>().Should().Be(1);
-        properties["statusCounts"]!["foundCount"]!.GetValue<int>().Should().Be(1);
+        GetPresentation(properties)["status"]!.GetValue<string>().Should().Be("Present");
+        GetPresentation(properties)["statusCounts"]!["Present"]!.GetValue<int>().Should().Be(1);
+        GetObservationSummary(properties)["statusCounts"]!["foundCount"]!.GetValue<int>().Should().Be(1);
+    }
+
+    [Fact]
+    public async Task AdaptiveSearchLocationsInternal_ObservationsThenLocationsThenGrid_DoesNotMarkSingleObservationRepresentativeAsSummaryApproximated()
+    {
+        // Arrange
+        const int siteId = 331003;
+        var observations = CreatePresentLocationObservations(
+            1,
+            siteId,
+            TaxonIds.Duvhök,
+            "Single observation representative location",
+            13.856,
+            58.384);
+        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(observations);
+        var apiClient = TestFixture.CreateApiClient();
+        var searchFilter = CreateBoundingBoxFilter(TaxonIds.Duvhök, 13.84, 58.40, 13.90, 58.35);
+
+        // Act
+        var response = await apiClient.PostAsync("/observations/internal/adaptivesearchlocations?observationsLimit=0&cluster=false&returnInputBBox=true&locationAggregationLimit=2&adaptiveSearchStrategy=ObservationsThenLocationsThenGrid", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var responseString = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
+        var propertiesByLocationId = GetFeaturePropertiesByLocationId(responseString);
+        var properties = propertiesByLocationId[CreateArtportalenSiteLocationId(siteId)];
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        response.GetHeaderValue("X-Result-Type").Should().Be("locations");
+        response.GetHeaderValue("X-Location-Summary-Approximated").Should().Be("false");
+        propertiesByLocationId.Should().ContainSingle();        
+        properties["observationCount"]!.GetValue<int>().Should().Be(1);
+        GetPresentation(properties)["statusCounts"]!["Present"]!.GetValue<int>().Should().Be(1);
     }
 
     [Fact]
@@ -369,15 +389,13 @@ public class AdaptiveSearchLocationsTests : TestBase
         var searchFilter = CreateBoundingBoxFilter(TaxonIds.ViolettGuldvinge, 13.84, 58.40, 13.90, 58.35);
 
         // Act
-        var response = await apiClient.PostAsync(
-            "/observations/internal/adaptivesearchlocations?observationsLimit=1&cluster=false&returnInputBBox=true&locationAggregationLimit=2&adaptiveSearchStrategy=ObservationsThenLocationsThenGrid",
-            JsonContent.Create(searchFilter));
+        var response = await apiClient.PostAsync("/observations/internal/adaptivesearchlocations?observationsLimit=1&cluster=false&returnInputBBox=true&locationAggregationLimit=2&adaptiveSearchStrategy=ObservationsThenLocationsThenGrid", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         response.GetHeaderValue("X-Result-Type").Should().Be("geogrid");
         response.GetHeaderValue("X-Cache").Should().Be("BYPASS");
-        response.Headers.Contains("X-Location-Properties-Estimated").Should().BeFalse();
+        response.GetHeaderValue("X-Location-Summary-Approximated").Should().Be("false");
     }
 
     [Fact]
@@ -397,10 +415,8 @@ public class AdaptiveSearchLocationsTests : TestBase
         var searchFilter = CreateBoundingBoxFilter(TaxonIds.Asknätfjäril, 14.04, 58.16, 14.06, 58.14);
 
         // Act
-        var response = await apiClient.PostAsync(
-            "/observations/internal/adaptivesearchlocations?observationsLimit=100&cluster=false&returnInputBBox=true&locationAggregationLimit=2&adaptiveSearchStrategy=LocationsThenGrid",
-            JsonContent.Create(searchFilter));
-        var responseString = await response.Content.ReadAsStringAsync();
+        var response = await apiClient.PostAsync("/observations/internal/adaptivesearchlocations?observationsLimit=100&cluster=false&returnInputBBox=true&locationAggregationLimit=2&adaptiveSearchStrategy=LocationsThenGrid", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var responseString = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
         var propertiesByLocationId = GetFeaturePropertiesByLocationId(responseString);
         var properties = propertiesByLocationId[CreateArtportalenSiteLocationId(siteId)];
 
@@ -408,11 +424,11 @@ public class AdaptiveSearchLocationsTests : TestBase
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         response.GetHeaderValue("X-Result-Type").Should().Be("locations");
         response.GetHeaderValue("X-Cache").Should().Be("BYPASS");
-        response.GetHeaderValue("X-Location-Properties-Estimated").Should().Be("true");
-        propertiesByLocationId.Should().ContainSingle();
-        properties["isEstimated"]!.GetValue<bool>().Should().BeTrue();
+        response.GetHeaderValue("X-Location-Summary-Approximated").Should().Be("true");
+        propertiesByLocationId.Should().ContainSingle();        
+        properties["isSummaryApproximated"]!.GetValue<bool>().Should().BeTrue();
         properties["observationCount"]!.GetValue<int>().Should().Be(4);
-        properties["displayStatusCount"]!["Present"]!.GetValue<int>().Should().Be(1);
+        GetPresentation(properties)["statusCounts"]!["Present"]!.GetValue<int>().Should().Be(1);
     }
 
     [Fact]
@@ -432,31 +448,75 @@ public class AdaptiveSearchLocationsTests : TestBase
         var searchFilter = CreateBoundingBoxFilter(TaxonIds.Svartmes, 14.09, 58.20, 14.11, 58.18);
 
         // Act
-        var cacheWarmupResponse = await apiClient.PostAsync(
-            "/observations/internal/adaptivesearchlocations?observationsLimit=100&cluster=false&returnInputBBox=true",
-            JsonContent.Create(searchFilter));
-        var cacheWarmupResponseString = await cacheWarmupResponse.Content.ReadAsStringAsync();
+        var cacheWarmupResponse = await apiClient.PostAsync("/observations/internal/adaptivesearchlocations?observationsLimit=100&cluster=false&returnInputBBox=true", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var cacheWarmupResponseString = await cacheWarmupResponse.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
         var cachedProperties = GetFeaturePropertiesByLocationId(cacheWarmupResponseString)[CreateArtportalenSiteLocationId(siteId)];
-        var strategyThreeResponse = await apiClient.PostAsync(
-            "/observations/internal/adaptivesearchlocations?observationsLimit=100&cluster=false&returnInputBBox=true&locationAggregationLimit=2&adaptiveSearchStrategy=LocationsThenGrid",
-            JsonContent.Create(searchFilter));
-        var strategyThreeResponseString = await strategyThreeResponse.Content.ReadAsStringAsync();
+        var strategyThreeResponse = await apiClient.PostAsync("/observations/internal/adaptivesearchlocations?observationsLimit=100&cluster=false&returnInputBBox=true&locationAggregationLimit=2&adaptiveSearchStrategy=LocationsThenGrid", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var strategyThreeResponseString = await strategyThreeResponse.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
         var strategyThreeProperties = GetFeaturePropertiesByLocationId(strategyThreeResponseString)[CreateArtportalenSiteLocationId(siteId)];
 
         // Assert
         cacheWarmupResponse.StatusCode.Should().Be(HttpStatusCode.OK);
         cacheWarmupResponse.GetHeaderValue("X-Result-Type").Should().Be("locations");
-        cacheWarmupResponse.GetHeaderValue("X-Cache").Should().Be("MISS");
-        cachedProperties.ContainsKey("isEstimated").Should().BeFalse();
-        cachedProperties["displayStatusCount"]!["Present"]!.GetValue<int>().Should().Be(4);
+        cacheWarmupResponse.GetHeaderValue("X-Cache").Should().Be("MISS");        
+        GetPresentation(cachedProperties)["statusCounts"]!["Present"]!.GetValue<int>().Should().Be(4);
 
         strategyThreeResponse.StatusCode.Should().Be(HttpStatusCode.OK);
         strategyThreeResponse.GetHeaderValue("X-Result-Type").Should().Be("locations");
         strategyThreeResponse.GetHeaderValue("X-Cache").Should().Be("BYPASS");
-        strategyThreeResponse.GetHeaderValue("X-Location-Properties-Estimated").Should().Be("true");
-        strategyThreeProperties["isEstimated"]!.GetValue<bool>().Should().BeTrue();
+        strategyThreeResponse.GetHeaderValue("X-Location-Summary-Approximated").Should().Be("true");
+        strategyThreeProperties["isSummaryApproximated"]!.GetValue<bool>().Should().BeTrue();
         strategyThreeProperties["observationCount"]!.GetValue<int>().Should().Be(4);
-        strategyThreeProperties["displayStatusCount"]!["Present"]!.GetValue<int>().Should().Be(1);
+        GetPresentation(strategyThreeProperties)["statusCounts"]!["Present"]!.GetValue<int>().Should().Be(1);
+    }   
+
+    [Fact]
+    public async Task AdaptiveSearchLocationsInternal_SumsRepresentativeObservationCounts_WhenLocationIdsShareDistinctLocationId()
+    {
+        // Arrange
+        const int firstSiteId = 331604;
+        const int secondSiteId = 331605;
+        var observations = CreatePresentLocationObservations(
+                2,
+                firstSiteId,
+                TaxonIds.Svartmes,
+                "First source location at same place",
+                14.123,
+                58.213)
+            .Concat(CreatePresentLocationObservations(
+                3,
+                secondSiteId,
+                TaxonIds.Svartmes,
+                "Second source location at same place",
+                14.123,
+                58.213))
+            .ToList();
+        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(observations);
+        var apiClient = TestFixture.CreateApiClient();
+        var searchFilter = CreateBoundingBoxFilter(TaxonIds.Svartmes, 14.11, 58.22, 14.13, 58.20);
+
+        // Act
+        var response = await apiClient.PostAsync("/observations/internal/adaptivesearchlocations?observationsLimit=0&cluster=false&returnInputBBox=true&locationAggregationLimit=10&adaptiveSearchStrategy=ObservationsThenLocationsThenGrid&useCache=false", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var responseString = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
+        var propertiesByLocationId = GetFeaturePropertiesByLocationId(responseString);
+        var properties = propertiesByLocationId.Values.Single();
+        var locationIds = properties["locations"]!["ids"]!.AsArray()
+            .Select(locationId => locationId!.GetValue<string>())
+            .ToList();
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        response.GetHeaderValue("X-Result-Type").Should().Be("locations");
+        response.GetHeaderValue("X-Location-Summary-Approximated").Should().Be("true");
+        propertiesByLocationId.Should().ContainSingle();
+        properties["isSummaryApproximated"]!.GetValue<bool>().Should().BeTrue();
+        properties["observationCount"]!.GetValue<int>().Should().Be(5);
+        locationIds.Should().BeEquivalentTo(
+            new[]
+            {
+                CreateArtportalenSiteLocationId(firstSiteId),
+                CreateArtportalenSiteLocationId(secondSiteId)
+            });
     }
 
     [Fact]
@@ -483,20 +543,16 @@ public class AdaptiveSearchLocationsTests : TestBase
         var searchFilter = CreateBoundingBoxFilter(TaxonIds.SvartfläckigBlåvinge, 14.06, 58.18, 14.09, 58.16);
 
         // Act
-        var missingLocationLimitResponse = await apiClient.PostAsync(
-            "/observations/internal/adaptivesearchlocations?observationsLimit=100&cluster=false&returnInputBBox=true&adaptiveSearchStrategy=LocationsThenGrid",
-            JsonContent.Create(searchFilter));
-        var equalLocationLimitResponse = await apiClient.PostAsync(
-            "/observations/internal/adaptivesearchlocations?observationsLimit=100&cluster=false&returnInputBBox=true&locationAggregationLimit=2&adaptiveSearchStrategy=LocationsThenGrid",
-            JsonContent.Create(searchFilter));
+        var missingLocationLimitResponse = await apiClient.PostAsync("/observations/internal/adaptivesearchlocations?observationsLimit=100&cluster=false&returnInputBBox=true&adaptiveSearchStrategy=LocationsThenGrid", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var equalLocationLimitResponse = await apiClient.PostAsync("/observations/internal/adaptivesearchlocations?observationsLimit=100&cluster=false&returnInputBBox=true&locationAggregationLimit=2&adaptiveSearchStrategy=LocationsThenGrid", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
 
         // Assert
         missingLocationLimitResponse.StatusCode.Should().Be(HttpStatusCode.OK);
         equalLocationLimitResponse.StatusCode.Should().Be(HttpStatusCode.OK);
         missingLocationLimitResponse.GetHeaderValue("X-Result-Type").Should().Be("geogrid");
         equalLocationLimitResponse.GetHeaderValue("X-Result-Type").Should().Be("geogrid");
-        missingLocationLimitResponse.Headers.Contains("X-Location-Properties-Estimated").Should().BeFalse();
-        equalLocationLimitResponse.Headers.Contains("X-Location-Properties-Estimated").Should().BeFalse();
+        missingLocationLimitResponse.GetHeaderValue("X-Location-Summary-Approximated").Should().Be("false");
+        equalLocationLimitResponse.GetHeaderValue("X-Location-Summary-Approximated").Should().Be("false");
     }
 
     [Fact]
@@ -646,7 +702,7 @@ public class AdaptiveSearchLocationsTests : TestBase
     }
 
     [Fact]
-    public async Task AdaptiveSearchLocationsInternal_DocumentsDisplayStatusesWithoutCutoffYear()
+    public async Task AdaptiveSearchLocationsInternal_DocumentsPresentationStatusesWithoutCutoffYear()
     {
         // Arrange
         const int presentSiteId = 350001;
@@ -688,7 +744,7 @@ public class AdaptiveSearchLocationsTests : TestBase
             endYear: 2025);
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(observations);
         var apiClient = TestFixture.CreateApiClient();
-        var searchFilter = CreateLocationDisplayStatusDocumentationFilter(TaxonIds.Jättebalsamin, 2025, 2025);
+        var searchFilter = CreateLocationPresentationStatusDocumentationFilter(TaxonIds.Jättebalsamin, 2025, 2025);
 
         // Act
         var response = await apiClient.PostAsync(
@@ -707,7 +763,7 @@ public class AdaptiveSearchLocationsTests : TestBase
     }
 
     [Fact]
-    public async Task AdaptiveSearchLocationsInternal_DocumentsDisplayStatusesAndCutoffYearStatusWithCutoffYear()
+    public async Task AdaptiveSearchLocationsInternal_DocumentsPresentationStatusesAndCutoffYearStatusWithCutoffYear()
     {
         // Arrange
         const int presentAfterSiteId = 360001;
@@ -771,7 +827,7 @@ public class AdaptiveSearchLocationsTests : TestBase
             endYear: 2025);
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(observations);
         var apiClient = TestFixture.CreateApiClient();
-        var searchFilter = CreateLocationDisplayStatusDocumentationFilter(TaxonIds.Jätteloka, 2020, 2025);
+        var searchFilter = CreateLocationPresentationStatusDocumentationFilter(TaxonIds.Jätteloka, 2020, 2025);
 
         // Act
         var response = await apiClient.PostAsync(
@@ -812,7 +868,7 @@ public class AdaptiveSearchLocationsTests : TestBase
             endYear: 2020);
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(observations);
         var apiClient = TestFixture.CreateApiClient();
-        var searchFilter = CreateLocationDisplayStatusDocumentationFilter(TaxonIds.Jättebalsamin, 2020, 2020);
+        var searchFilter = CreateLocationPresentationStatusDocumentationFilter(TaxonIds.Jättebalsamin, 2020, 2020);
 
         // Act
         var cacheWarmupResponse = await apiClient.PostAsync(
@@ -821,7 +877,7 @@ public class AdaptiveSearchLocationsTests : TestBase
         var cutoffResponse = await apiClient.PostAsync(
             "/observations/internal/adaptivesearchlocations?observationsLimit=100&cluster=false&returnInputBBox=true&cutoffYear=2024",
             JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
-        var cutoffResponseString = await cutoffResponse.Content.ReadAsStringAsync();
+        var cutoffResponseString = await cutoffResponse.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
         var propertiesByLocationId = GetFeaturePropertiesByLocationId(cutoffResponseString);
 
         // Assert
@@ -861,7 +917,7 @@ public class AdaptiveSearchLocationsTests : TestBase
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(observations);
         var userServiceStub = UserServiceStubFactory.CreateWithSightingAuthority(maxProtectionLevel: 3);
         var apiClient = TestFixture.CreateApiClientWithReplacedService(userServiceStub);
-        var searchFilter = CreateLocationDisplayStatusDocumentationFilter(sensitiveTaxonId, 2025, 2025);
+        var searchFilter = CreateLocationPresentationStatusDocumentationFilter(sensitiveTaxonId, 2025, 2025);
 
         // Act
         var response = await apiClient.PostAsync(
@@ -875,7 +931,7 @@ public class AdaptiveSearchLocationsTests : TestBase
         response.GetHeaderValue("X-Result-Type").Should().Be("locations");
         propertiesByLocationId.Count.Should().Be(1);
         AssertLocationFeature(propertiesByLocationId, sensitiveSiteId, "PresentSensitive", "After", expectedIsAllObservationsSensitive: true);
-        propertiesByLocationId[CreateArtportalenSiteLocationId(sensitiveSiteId)]["observationCount"]!.GetValue<int>().Should().Be(2);
+        propertiesByLocationId[CreateArtportalenSiteLocationId(sensitiveSiteId)]["observationCount"].GetValue<int>().Should().Be(2);
     }
 
     private static IList<ArtportalenObservationVerbatim> CreatePointObservations(
@@ -959,7 +1015,7 @@ public class AdaptiveSearchLocationsTests : TestBase
             new GeoJson2DCoordinates(longitude, latitude));
     }
 
-    private static SearchFilterInternalDto CreateLocationDisplayStatusDocumentationFilter(int taxonId, int startYear, int endYear)
+    private static SearchFilterInternalDto CreateLocationPresentationStatusDocumentationFilter(int taxonId, int startYear, int endYear)
     {
         var searchFilter = CreateBoundingBoxFilter(taxonId, 13.84, 58.41, 13.91, 58.35);
         searchFilter.OccurrenceStatus = OccurrenceStatusFilterValuesDto.BothPresentAndAbsent;
@@ -983,9 +1039,19 @@ public class AdaptiveSearchLocationsTests : TestBase
         return JsonNode.Parse(responseString)!["features"]!.AsArray()
             .Select(feature => feature!["properties"]!.AsObject())
             .ToDictionary(
-                properties => properties["location"]!["locationId"]!.GetValue<string>(),
+                properties => properties["locations"]!["location"]!["locationId"]!.GetValue<string>(),
                 properties => properties,
                 StringComparer.Ordinal);
+    }
+
+    private static JsonObject GetPresentation(JsonObject properties)
+    {
+        return properties["presentation"]!.AsObject();
+    }
+
+    private static JsonObject GetObservationSummary(JsonObject properties)
+    {
+        return properties["observationSummary"]!.AsObject();
     }
 
     private static int CountFeaturesWithFeatureType(string responseString, string featureType)
@@ -997,17 +1063,18 @@ public class AdaptiveSearchLocationsTests : TestBase
     private static void AssertLocationFeature(
         IReadOnlyDictionary<string, JsonObject> propertiesByLocationId,
         int siteId,
-        string expectedDisplayStatus,
+        string expectedPresentationStatus,
         string? expectedCutoffYearStatus,
         bool expectedIsAllObservationsSensitive)
     {
         var locationId = CreateArtportalenSiteLocationId(siteId);
         propertiesByLocationId.Should().ContainKey(locationId);
         var properties = propertiesByLocationId[locationId];
+        var presentation = GetPresentation(properties);
 
-        properties["displayStatus"]!.GetValue<string>().Should().Be(expectedDisplayStatus);
-        properties["cutoffYearStatus"]?.GetValue<string>().Should().Be(expectedCutoffYearStatus);
-        properties["isAllObservationsSensitive"]!.GetValue<bool>().Should().Be(expectedIsAllObservationsSensitive);
+        presentation["status"]!.GetValue<string>().Should().Be(expectedPresentationStatus);
+        presentation["cutoffYearStatus"]?.GetValue<string>().Should().Be(expectedCutoffYearStatus);
+        presentation["isAllObservationsSensitive"]!.GetValue<bool>().Should().Be(expectedIsAllObservationsSensitive);
     }
 
     private static string CreateArtportalenSiteLocationId(int siteId)

@@ -195,7 +195,7 @@ public static class DependencyInjectionExtensions
             services.AddScoped<IAdaptiveSearchLocationsService, AdaptiveSearchLocationsService>();
             services.AddScoped<IAdaptiveSearchLocationsCache, AdaptiveSearchLocationsCache>();
             services.AddScoped<IAdaptiveSearchLocationAggregator, AdaptiveSearchLocationAggregator>();
-            services.AddScoped<IAdaptiveSearchLocationClusterItemFactory, AdaptiveSearchLocationClusterItemFactory>();
+            services.AddScoped<IAdaptiveSearchLocationFeatureFactory, AdaptiveSearchLocationFeatureFactory>();
 
             // Add Utilites
             services.AddSingleton<ISearchFilterUtility, SearchFilterUtility>();

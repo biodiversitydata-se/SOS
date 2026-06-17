@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿﻿using Microsoft.AspNetCore.Mvc;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Exceptions;
@@ -2308,11 +2308,10 @@ public class ObservationsController : ControllerBase
             Response.Headers.Append("X-Zoom", result.Zoom.Value.ToString());
         }
         Response.Headers.Append("X-Cache", result.CacheStatus);
-        if (result.LocationPropertiesEstimated)
+        Response.Headers.Append("X-Location-Summary-Approximated", result.LocationSummaryApproximated ? "true" : "false");
+        if (!string.IsNullOrWhiteSpace(result.LocationAggregationMode))
         {
-            Response.Headers.Append("X-Location-Aggregation", result.LocationAggregation ?? "representative");
-            Response.Headers.Append("X-Location-Properties-Estimated", "true");
-            Response.Headers.Append("X-Location-Aggregation-Representatives-Count", "1");
+            Response.Headers.Append("X-Location-Aggregation-Mode", result.LocationAggregationMode);
         }
         totalStopwatch.Stop();
         Response.Headers.Append("X-AdaptiveSearch-Timings", result.Timings.ToHeaderValue(totalStopwatch.Elapsed));
@@ -2326,8 +2325,8 @@ public class ObservationsController : ControllerBase
             return new EmptyResult();
         }
 
-        await LocationClusterItemGeoJsonWriter.WriteFeatureCollectionAsync(
-            result.LocationClusterItems ?? Array.Empty<LocationClusterItem>(),
+        await LocationFeatureDtoGeoJsonWriter.WriteFeatureCollectionAsync(
+            result.LocationFeatures ?? Array.Empty<LocationFeature>(),
             result.Bbox,
             Response,
             cutoffYear,

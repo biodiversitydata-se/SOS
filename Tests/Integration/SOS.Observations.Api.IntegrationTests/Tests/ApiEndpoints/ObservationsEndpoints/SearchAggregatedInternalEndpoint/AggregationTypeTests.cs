@@ -69,8 +69,8 @@ public class AggregationTypeTests : TestBase
         var aggregationType = AggregationType.SightingsPerWeek48;
 
         // Act
-        var response = await apiClient.PostAsync($"/observations/internal/searchaggregated?aggregationType={aggregationType}", JsonContent.Create(searchFilter));
-        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Week48Dto>>();
+        var response = await apiClient.PostAsync($"/observations/internal/searchaggregated?aggregationType={aggregationType}", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Week48Dto>>(cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);

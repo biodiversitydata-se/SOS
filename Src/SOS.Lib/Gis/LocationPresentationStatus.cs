@@ -1,6 +1,6 @@
 ﻿namespace SOS.Lib.Gis;
 
-public enum LocationDisplayStatus
+public enum LocationPresentationStatus
 {
     /// <summary>
     /// At least one observation is present (obs.occurrence.isPositiveObservation==true).

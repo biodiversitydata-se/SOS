@@ -32,7 +32,7 @@ public class LocationObservationSummary
 
     public List<DebugObservation>? DebugObservations { get; set; }
 
-    public List<LocationObservationDisplayStatusSummary> DisplayStatusSummaries { get; set; } = new();
+    public List<PresentationStatusSummary> PresentationStatusSummaries { get; set; } = new();
 
     public ObservationStatusCounts ToStatusCounts()
     {
@@ -43,19 +43,19 @@ public class LocationObservationSummary
             RedlistedCount,
             InvasiveInSwedenCount);
     }
-}
 
-public class LocationObservationDisplayStatusSummary
-{
-    public bool IsPresent { get; set; }
+    public class PresentationStatusSummary
+    {
+        public bool IsPresent { get; set; }
 
-    public bool IsSensitive { get; set; }
+        public bool IsSensitive { get; set; }
 
-    public bool IsTreated { get; set; }
+        public bool IsTreated { get; set; }
 
-    public bool IsNotRecovered { get; set; }
+        public bool IsNotRecovered { get; set; }
 
-    public int? EndYear { get; set; }
+        public int? EndYear { get; set; }
 
-    public int Count { get; set; }
+        public int Count { get; set; }
+    }
 }

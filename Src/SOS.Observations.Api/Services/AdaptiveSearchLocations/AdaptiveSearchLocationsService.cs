@@ -25,14 +25,14 @@ internal sealed class AdaptiveSearchLocationsService : IAdaptiveSearchLocationsS
     private readonly ILocationGeometryLookupService _locationGeometryLookupService;
     private readonly IAdaptiveSearchLocationsCache _cache;
     private readonly IAdaptiveSearchLocationAggregator _aggregator;
-    private readonly IAdaptiveSearchLocationClusterItemFactory _clusterItemFactory;
+    private readonly IAdaptiveSearchLocationFeatureFactory _clusterItemFactory;
 
     public AdaptiveSearchLocationsService(
         IObservationManager observationManager,
         ILocationGeometryLookupService locationGeometryLookupService,
         IAdaptiveSearchLocationsCache cache,
         IAdaptiveSearchLocationAggregator aggregator,
-        IAdaptiveSearchLocationClusterItemFactory clusterItemFactory)
+        IAdaptiveSearchLocationFeatureFactory clusterItemFactory)
     {
         _observationManager = observationManager ?? throw new ArgumentNullException(nameof(observationManager));
         _locationGeometryLookupService = locationGeometryLookupService ?? throw new ArgumentNullException(nameof(locationGeometryLookupService));
@@ -49,7 +49,7 @@ internal sealed class AdaptiveSearchLocationsService : IAdaptiveSearchLocationsS
             return new AdaptiveSearchLocationsResult
             {
                 ResultType = "locations",
-                LocationClusterItems = Array.Empty<LocationClusterItem>(),
+                LocationFeatures = Array.Empty<LocationFeature>(),
                 Bbox = request.ReturnInputBBox ? request.InputBbox : null,
                 ObservationsTotalCount = 0,
                 EstimatedLocationCount = 0,
@@ -100,7 +100,7 @@ internal sealed class AdaptiveSearchLocationsService : IAdaptiveSearchLocationsS
                 }
 
                 var clusteringStopwatch = Stopwatch.StartNew();
-                var cachedLocationClusterItems = request.Cluster
+                var cachedLocationFeatures = request.Cluster
                     ? _clusterItemFactory.CreateClusterItems(
                         cachedLocationAggregates,
                         cachedClusteringBbox,
@@ -121,13 +121,14 @@ internal sealed class AdaptiveSearchLocationsService : IAdaptiveSearchLocationsS
                 return new AdaptiveSearchLocationsResult
                 {
                     ResultType = "locations",
-                    LocationClusterItems = cachedLocationClusterItems,
+                    LocationFeatures = cachedLocationFeatures,
                     Bbox = bbox,
                     ObservationsTotalCount = cachedObservationCount,
                     EstimatedLocationCount = cachedLocationAggregates.Count,
-                    FeatureCount = cachedLocationClusterItems.Count(item => item.Geometry != null),
+                    FeatureCount = cachedLocationFeatures.Count(item => item.Geometry != null),
                     LocationsBeforeClustering = cachedLocationAggregates.Count,
                     CacheStatus = "HIT",
+                    LocationSummaryApproximated = HasApproximatedLocationSummary(cachedLocationFeatures),
                     GeographicAreas = await GetGeoJsonGeographicAreasAsync(request),
                     Timings = timings
                 };
@@ -140,7 +141,7 @@ internal sealed class AdaptiveSearchLocationsService : IAdaptiveSearchLocationsS
             DefaultSortBy,
             DefaultSortOrder);
         searchFilter.Output ??= new OutputFilter();
-        searchFilter.Output.Fields = GetLocationClusterItemOutputFields();
+        searchFilter.Output.Fields = GetLocationFeatureOutputFields();
         searchFilter.Output.ExcludeFields = new List<string>();
 
         var countAndExtentStopwatch = Stopwatch.StartNew();
@@ -207,6 +208,7 @@ internal sealed class AdaptiveSearchLocationsService : IAdaptiveSearchLocationsS
                 FeatureCount = gridResult.GridCellTileCount,
                 Zoom = zoom,
                 CacheStatus = "BYPASS",
+                LocationSummaryApproximated = false,
                 Timings = timings
             };
         }
@@ -249,7 +251,7 @@ internal sealed class AdaptiveSearchLocationsService : IAdaptiveSearchLocationsS
         }
 
         var locationProcessingStopwatch = Stopwatch.StartNew();
-        var locationClusterItems = locationAggregates != null
+        var locationFeatures = locationAggregates != null
             ? request.Cluster
                 ? _clusterItemFactory.CreateClusterItems(
                     locationAggregates,
@@ -287,13 +289,14 @@ internal sealed class AdaptiveSearchLocationsService : IAdaptiveSearchLocationsS
         return new AdaptiveSearchLocationsResult
         {
             ResultType = "locations",
-            LocationClusterItems = locationClusterItems,
+            LocationFeatures = locationFeatures,
             Bbox = bbox,
             ObservationsTotalCount = countAndExtentResult.Count,
             EstimatedLocationCount = countAndExtentResult.EstimatedLocationCount,
-            FeatureCount = locationClusterItems.Count(item => item.Geometry != null),
+            FeatureCount = locationFeatures.Count(item => item.Geometry != null),
             LocationsBeforeClustering = locationAggregates?.Count ?? _aggregator.CountLocations(records),
             CacheStatus = cacheStatus,
+            LocationSummaryApproximated = HasApproximatedLocationSummary(locationFeatures),
             GeographicAreas = await GetGeoJsonGeographicAreasAsync(request, searchFilter),
             Timings = timings
         };
@@ -310,13 +313,14 @@ internal sealed class AdaptiveSearchLocationsService : IAdaptiveSearchLocationsS
         return new AdaptiveSearchLocationsResult
         {
             ResultType = "locations",
-            LocationClusterItems = Array.Empty<LocationClusterItem>(),
+            LocationFeatures = Array.Empty<LocationFeature>(),
             Bbox = bbox,
             ObservationsTotalCount = countAndExtentResult.Count,
             EstimatedLocationCount = countAndExtentResult.EstimatedLocationCount,
             FeatureCount = 0,
             LocationsBeforeClustering = 0,
             CacheStatus = request.UseCache ? cacheStatus : "BYPASS",
+            LocationSummaryApproximated = false,
             GeographicAreas = geographicAreas,
             Timings = timings
         };
@@ -339,7 +343,7 @@ internal sealed class AdaptiveSearchLocationsService : IAdaptiveSearchLocationsS
             var representativeLocationAggregates = _aggregator.CreateAggregates(
                 representativeLocationRecords,
                 representativeLocationsResult.ObservationCountByLocationId,
-                isEstimated: true);
+                isSummaryApproximated: true);
             if (representativeLocationAggregates.Count < request.LocationAggregationLimit.Value)
             {
                 if (!request.ReturnInputBBox || bbox == null)
@@ -356,7 +360,7 @@ internal sealed class AdaptiveSearchLocationsService : IAdaptiveSearchLocationsS
                 }
 
                 var representativeLocationProcessingStopwatch = Stopwatch.StartNew();
-                var representativeLocationClusterItems = request.Cluster
+                var representativeLocationFeatures = request.Cluster
                     ? _clusterItemFactory.CreateClusterItems(
                         representativeLocationAggregates,
                         clusteringBbox,
@@ -372,20 +376,21 @@ internal sealed class AdaptiveSearchLocationsService : IAdaptiveSearchLocationsS
                         representativePolygonLocationGeometries,
                         request.CreatePolygons,
                         request.MetersPerPixel);
+                var locationSummaryApproximated = HasApproximatedLocationSummary(representativeLocationFeatures);
                 timings.Clustering = representativeLocationProcessingStopwatch.Elapsed;
 
                 return (success: true, value: new AdaptiveSearchLocationsResult
                 {
                     ResultType = "locations",
-                    LocationClusterItems = representativeLocationClusterItems,
+                    LocationFeatures = representativeLocationFeatures,
                     Bbox = bbox,
                     ObservationsTotalCount = countAndExtentResult.Count,
                     EstimatedLocationCount = countAndExtentResult.EstimatedLocationCount,
-                    FeatureCount = representativeLocationClusterItems.Count(item => item.Geometry != null),
+                    FeatureCount = representativeLocationFeatures.Count(item => item.Geometry != null),
                     LocationsBeforeClustering = representativeLocationAggregates.Count,
                     CacheStatus = "BYPASS",
-                    LocationAggregation = "representative",
-                    LocationPropertiesEstimated = true,
+                    LocationAggregationMode = "representative",
+                    LocationSummaryApproximated = locationSummaryApproximated,
                     GeographicAreas = await GetGeoJsonGeographicAreasAsync(request, searchFilter),
                     Timings = timings
                 });
@@ -423,6 +428,11 @@ internal sealed class AdaptiveSearchLocationsService : IAdaptiveSearchLocationsS
                 estimatedLocationCount < request.LocationAggregationLimit.Value,
             _ => false
         };
+    }
+
+    private static bool HasApproximatedLocationSummary(IEnumerable<LocationFeature>? locationFeatures)
+    {
+        return locationFeatures?.Any(feature => feature.IsSummaryApproximated == true) == true;
     }
 
     private async Task<List<Feature>?> GetGeoJsonGeographicAreasAsync(
@@ -470,7 +480,7 @@ internal sealed class AdaptiveSearchLocationsService : IAdaptiveSearchLocationsS
         return root?.ToJsonString() ?? geoJson;
     }
 
-    public static ICollection<string> GetLocationClusterItemOutputFields()
+    public static ICollection<string> GetLocationFeatureOutputFields()
     {
         return new List<string>
         {

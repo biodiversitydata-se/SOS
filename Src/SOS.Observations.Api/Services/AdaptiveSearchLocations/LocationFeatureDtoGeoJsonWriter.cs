@@ -1,4 +1,4 @@
-﻿using NetTopologySuite.Geometries;
+﻿﻿using NetTopologySuite.Geometries;
 using Microsoft.AspNetCore.Http;
 using NetTopologySuite.Features;
 using SOS.Lib.Enums;
@@ -11,15 +11,18 @@ using System.Text.Unicode;
 
 namespace SOS.Observations.Api.Services.AdaptiveSearchLocations;
 
-internal static class LocationClusterItemGeoJsonWriter
+internal static class LocationFeatureDtoGeoJsonWriter
 {
+    private static readonly JavaScriptEncoder JsonEncoder =
+        JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.Latin1Supplement); //JavaScriptEncoder.UnsafeRelaxedJsonEscaping;
+
     private static readonly JsonSerializerOptions JsonSerializerOptions = new()
     {
         AllowTrailingCommas = true,
         DefaultIgnoreCondition = JsonIgnoreCondition.Never,
         PropertyNameCaseInsensitive = true,
         ReadCommentHandling = JsonCommentHandling.Skip,
-        Encoder = JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.Latin1Supplement),
+        Encoder = JsonEncoder,
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         Converters =
         {
@@ -28,18 +31,20 @@ internal static class LocationClusterItemGeoJsonWriter
         }
     };
 
+    private static readonly JsonWriterOptions JsonWriterOptions = new JsonWriterOptions
+    {
+        SkipValidation = true,
+        Encoder = JsonEncoder
+    };
+
     public static async Task WriteFeatureCollectionAsync(
-        IEnumerable<LocationClusterItem> locationClusterItems,
+        IEnumerable<LocationFeature> locationFeatures,
         LatLonBoundingBox? bbox,
         HttpResponse response,
         int? cutoffYear = null,
         List<Feature>? geographicAreas = null)
     {
-        await using var jsonWriter = new Utf8JsonWriter(response.BodyWriter, new JsonWriterOptions
-        {
-            SkipValidation = true
-        });
-
+        await using var jsonWriter = new Utf8JsonWriter(response.BodyWriter, JsonWriterOptions);
         jsonWriter.WriteStartObject();
         jsonWriter.WriteString("type", "FeatureCollection");
         jsonWriter.WriteString("crs", "EPSG:4326");
@@ -56,21 +61,26 @@ internal static class LocationClusterItemGeoJsonWriter
         }
 
         var featureIndex = 0;
-        foreach (var locationClusterItem in locationClusterItems)
+        foreach (var feature in locationFeatures)
         {
-            if (locationClusterItem.Geometry == null)
+            if (feature.Geometry == null)
             {
                 continue;
             }
 
-            var featureId = GetFeatureId(locationClusterItem, ++featureIndex);
-            var dto = LocationClusterItemDto.FromLocationClusterItem(locationClusterItem, featureId, cutoffYear);
+            var featureId = GetFeatureId(feature, ++featureIndex);
+            if (string.IsNullOrWhiteSpace(featureId))
+            {
+                continue;
+            }
+
+            var dto = LocationFeatureDto.FromLocationFeature(feature, featureId, cutoffYear);
 
             jsonWriter.WriteStartObject();
             jsonWriter.WriteString("type", "Feature");
             jsonWriter.WriteString("id", featureId);
             jsonWriter.WritePropertyName("geometry");
-            JsonSerializer.Serialize(jsonWriter, locationClusterItem.Geometry, JsonSerializerOptions);
+            JsonSerializer.Serialize(jsonWriter, feature.Geometry, JsonSerializerOptions);
             jsonWriter.WritePropertyName("properties");
             JsonSerializer.Serialize(jsonWriter, dto, JsonSerializerOptions);
             jsonWriter.WriteEndObject();
@@ -137,16 +147,15 @@ internal static class LocationClusterItemGeoJsonWriter
         }
     }
 
-    private static string GetFeatureId(LocationClusterItem locationClusterItem, int featureIndex)
+    private static string? GetFeatureId(LocationFeature locationFeature, int featureIndex)
     {
-        if (locationClusterItem.IsCluster)
+        if (locationFeature.IsCluster)
         {
             return $"cluster-{featureIndex}";
         }
 
-        return AdaptiveSearchLocationAggregator.GetLocationId(locationClusterItem.Location) ??
-               AdaptiveSearchLocationAggregator.GetLocationId(locationClusterItem.Locations.FirstOrDefault()) ??
-               $"synthetic-location-{featureIndex}";
+        return AdaptiveSearchLocationAggregator.GetLocationId(locationFeature.Location) ??
+               AdaptiveSearchLocationAggregator.GetLocationId(locationFeature.Locations.FirstOrDefault());
     }
 
     private static void WriteGeoJsonBbox(Utf8JsonWriter jsonWriter, LatLonBoundingBox? bbox)

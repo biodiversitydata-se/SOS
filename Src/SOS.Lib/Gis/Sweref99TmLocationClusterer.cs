@@ -64,32 +64,32 @@ public class Sweref99TmLocationClusterer : ILocationClusterer
     }
 
     /// <inheritdoc />
-    public List<LocationClusterItem> ClusterLocations(List<Observation> observations, LatLonBoundingBox boundingBox, int targetItemCount)
+    public List<LocationFeature> ClusterLocations(List<Observation> observations, LatLonBoundingBox boundingBox, int targetItemCount)
     {
         var clusterRadius = ComputeMinimumClusterRadius(boundingBox, targetItemCount);
         return ClusterLocations(observations, clusterRadius);
     }
 
     /// <inheritdoc />
-    public List<LocationClusterItem> ClusterLocations(List<Observation> observations, LatLonBoundingBox boundingBox)
+    public List<LocationFeature> ClusterLocations(List<Observation> observations, LatLonBoundingBox boundingBox)
     {
         return ClusterLocations(observations, boundingBox, _maxLocationCountAfterClustering);
     }
 
     /// <inheritdoc />
-    public List<LocationClusterItem> ClusterLocations(List<Observation> observations, LatLonBoundingBox boundingBox, double metersPerPixel, double clusterRadiusPx = DefaultClusterRadiusInPixels)
+    public List<LocationFeature> ClusterLocations(List<Observation> observations, LatLonBoundingBox boundingBox, double metersPerPixel, double clusterRadiusPx = DefaultClusterRadiusInPixels)
     {
         var clusterRadius = ComputeMinimumClusterRadius(boundingBox, metersPerPixel, clusterRadiusPx);
         return ClusterLocations(observations, clusterRadius);
     }
 
-    private List<LocationClusterItem> ClusterLocations(List<Observation> observations, double minimumClusterRadiusMeters)
+    private List<LocationFeature> ClusterLocations(List<Observation> observations, double minimumClusterRadiusMeters)
     {        
         var projectedObservationsToCluster = ProjectObservations(observations);
         var distinctLocationCount = GetDistinctLocationCount(projectedObservationsToCluster);
         var diagonal = ComputeObservationsDiagonal(projectedObservationsToCluster);
         var clusterRadius = Math.Max(diagonal / 100, minimumClusterRadiusMeters);
-        var result = new List<LocationClusterItem>();
+        var result = new List<LocationFeature>();
 
         if (distinctLocationCount > _minLocationCountBeforeClustering)
         {
@@ -104,7 +104,7 @@ public class Sweref99TmLocationClusterer : ILocationClusterer
         else
         {
             result = GroupObservationsByLocation(projectedObservationsToCluster)
-                .Select(group => LocationClusterItem.FromSingleLocation(group.Select(item => item.Observation).ToList()))
+                .Select(group => LocationFeature.FromSingleLocation(group.Select(item => item.Observation).ToList()))
                 .ToList();
         }
 
@@ -228,9 +228,9 @@ public class Sweref99TmLocationClusterer : ILocationClusterer
         return boundingBox.GetPolygon(CoordinateSys.SWEREF99_TM).EnvelopeInternal;
     }
 
-    private List<LocationClusterItem> MakeClusterItems(List<ProjectedObservation> observations, double clusterRadius)
+    private List<LocationFeature> MakeClusterItems(List<ProjectedObservation> observations, double clusterRadius)
     {
-        var clusteredItems = new List<LocationClusterItem>();
+        var clusteredItems = new List<LocationFeature>();
         if (observations.Count == 0)
         {
             return clusteredItems;
@@ -276,13 +276,13 @@ public class Sweref99TmLocationClusterer : ILocationClusterer
         clusters = MergeClustersWithCloseCentroids(clusters, clusterRadius);
         foreach (var cluster in clusters)
         {
-            var clusterItem = LocationClusterItem.FromCluster(cluster.Select(item => item.Observation).ToList());
+            var clusterItem = LocationFeature.FromCluster(cluster.Select(item => item.Observation).ToList());
             clusterItem.ClusterRadiusMeters = clusterRadius;
             clusteredItems.Add(clusterItem);
         }
 
         clusteredItems.AddRange(GroupObservationsByLocation(remainingObservationsToBeClustered)
-            .Select(group => LocationClusterItem.FromSingleLocation(group.Select(item => item.Observation).ToList())));
+            .Select(group => LocationFeature.FromSingleLocation(group.Select(item => item.Observation).ToList())));
         return clusteredItems;
     }
 
