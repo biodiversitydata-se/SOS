@@ -2,6 +2,8 @@
 The supported file formats in exports are: CSV, GeoJSON, Excel and Darwin Core Archive (DwC-A). 
 The observations will use a [flat observation structure](FlatObservation.md) in the formats CSV, GeoJSON and Excel (_In GeoJSON, the structure can be hierachical if the parameter flat=false_).
 
+[Darwin Core Archive (DwC-A)](https://dwc.tdwg.org/text/) is a biodiversity informatics data standard that makes use of the Darwin Core terms to produce a single, self contained dataset. The archive is a set of text files, in standard comma- or tab-delimited format, with a simple descriptor file. Fields included must conform to the Darwin Core standard, i.e. only fields with [Darwin Core terms](https://dwc.tdwg.org/terms/) are included.
+
 ## Endpoints
 | Resource URL | Name | Method | Description |
 |:---|:---|:---|:---|
