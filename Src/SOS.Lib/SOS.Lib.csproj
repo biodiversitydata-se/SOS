@@ -25,7 +25,7 @@
 		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="10.0.10" />
 		<PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.10" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.10" />		
-		<PackageReference Include="MongoDB.Driver" Version="3.9.0" />		
+		<PackageReference Include="MongoDB.Driver" Version="3.10.0" />		
 		<PackageReference Include="MongoDB.NetTopologySuite.Serialization" Version="1.0.1" />
 		<PackageReference Include="NetTopologySuite" Version="2.6.0" />
 		<PackageReference Include="NetTopologySuite.IO.GeoJSON" Version="4.0.0" />
