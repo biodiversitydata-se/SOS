@@ -144,7 +144,7 @@ public class ExportsController : ControllerBase
             return BadRequest(validationResults.Error);
         }
 
-        var matchCount = await _observationManager.GetMatchCountAsync(this.GetUserId(), roleId, applicationIdentifier, filter);
+        var matchCount = await _observationManager.GetMatchCountAsync(this.GetUserId(), roleId, applicationIdentifier, filter, protectionFilter: protectionFilter);
         if (matchCount == 0)
         {
             return NoContent();
@@ -811,7 +811,7 @@ public class ExportsController : ControllerBase
             var encryptedPassword = await _cryptoService.EncryptAsync(encryptPassword);
             var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
                 job.RunAsync(filter, protectionFilter, this.GetUserId(), roleId, authorizationApplicationIdentifier, userInfo.Email, description, ExportFormat.Csv, cultureCode, false,
-                    propertyLabelType, false, sensitiveObservations, sendMailFromZendTo, encryptedPassword, false, null, JobCancellationToken.Null));
+                    propertyLabelType, false, sendMailFromZendTo, encryptedPassword, false, null, JobCancellationToken.Null));
 
             var exportJobInfo = new ExportJobInfo
             {
@@ -896,7 +896,7 @@ public class ExportsController : ControllerBase
             
             var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
                 job.RunAsync(filter, protectionFilter, this.GetUserId(), roleId, authorizationApplicationIdentifier, userInfo.Email, description, eventBased ? ExportFormat.DwCEvent : ExportFormat.DwC, "en-GB", false,
-                    PropertyLabelType.PropertyName, false, sensitiveObservations, sendMailFromZendTo, encryptedPassword, false, null, JobCancellationToken.Null));
+                    PropertyLabelType.PropertyName, false, sendMailFromZendTo, encryptedPassword, false, null, JobCancellationToken.Null));
 
             var exportJobInfo = new ExportJobInfo
             {
@@ -989,7 +989,7 @@ public class ExportsController : ControllerBase
 
             var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
                 job.RunAsync(filter, protectionFilter, this.GetUserId(), roleId, authorizationApplicationIdentifier, userInfo.Email, description, ExportFormat.Excel, cultureCode, false,
-                    propertyLabelType, false, sensitiveObservations, sendMailFromZendTo, encryptedPassword, dynamicProjectDataFields, null, JobCancellationToken.Null));
+                    propertyLabelType, false, sendMailFromZendTo, encryptedPassword, dynamicProjectDataFields, null, JobCancellationToken.Null));
 
             var exportJobInfo = new ExportJobInfo
             {
@@ -1083,7 +1083,7 @@ public class ExportsController : ControllerBase
             var encryptedPassword = await _cryptoService.EncryptAsync(encryptPassword);
             var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
                 job.RunAsync(filter, protectionFilter, this.GetUserId(), roleId, authorizationApplicationIdentifier, userInfo.Email, description, ExportFormat.GeoJson, cultureCode,
-                    flat, propertyLabelType, excludeNullValues, sensitiveObservations, sendMailFromZendTo, encryptedPassword, false, null, JobCancellationToken.Null));
+                    flat, propertyLabelType, excludeNullValues, sendMailFromZendTo, encryptedPassword, false, null, JobCancellationToken.Null));
 
             var exportJobInfo = new ExportJobInfo
             {
@@ -1554,8 +1554,8 @@ public class ExportsController : ControllerBase
 
             var encryptedPassword = await _cryptoService.EncryptAsync(encryptPassword);
             var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
-                job.RunAsync(filter, filter.ProtectionFilter ?? ProtectionFilterDto.Public, this.GetUserId(), roleId, authorizationApplicationIdentifier, userInfo.Email, description, ExportFormat.Csv, cultureCode, false,
-                    propertyLabelType, false, sensitiveObservations, sendMailFromZendTo, encryptedPassword, false, null, JobCancellationToken.Null));
+                job.RunAsync(filter, filter.ProtectionFilter.Value, this.GetUserId(), roleId, authorizationApplicationIdentifier, userInfo.Email, description, ExportFormat.Csv, cultureCode, false,
+                    propertyLabelType, false, sendMailFromZendTo, encryptedPassword, false, null, JobCancellationToken.Null));
 
             var exportJobInfo = new ExportJobInfo
             {
@@ -1637,8 +1637,8 @@ public class ExportsController : ControllerBase
 
             var encryptedPassword = await _cryptoService.EncryptAsync(encryptPassword);
             var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
-                job.RunAsync(filter, filter.ProtectionFilter ?? ProtectionFilterDto.Public, this.GetUserId(), roleId, authorizationApplicationIdentifier, userInfo.Email, description, eventBased ? ExportFormat.DwCEvent : ExportFormat.DwC, "en-GB", false,
-                    PropertyLabelType.PropertyName, false, sensitiveObservations, sendMailFromZendTo, encryptedPassword, false, null, JobCancellationToken.Null));
+                job.RunAsync(filter, filter.ProtectionFilter.Value, this.GetUserId(), roleId, authorizationApplicationIdentifier, userInfo.Email, description, eventBased ? ExportFormat.DwCEvent : ExportFormat.DwC, "en-GB", false,
+                    PropertyLabelType.PropertyName, false, sendMailFromZendTo, encryptedPassword, false, null, JobCancellationToken.Null));
 
             var exportJobInfo = new ExportJobInfo
             {
@@ -1728,8 +1728,8 @@ public class ExportsController : ControllerBase
 
             var encryptedPassword = await _cryptoService.EncryptAsync(encryptPassword);
             var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
-                job.RunAsync(filter, filter.ProtectionFilter ?? ProtectionFilterDto.Public, this.GetUserId(), roleId, authorizationApplicationIdentifier, userInfo.Email, description, ExportFormat.Excel, cultureCode, false,
-                    propertyLabelType, false, sensitiveObservations, sendMailFromZendTo, encryptedPassword, dynamicProjectDataFields, null, JobCancellationToken.Null));
+                job.RunAsync(filter, filter.ProtectionFilter.Value, this.GetUserId(), roleId, authorizationApplicationIdentifier, userInfo.Email, description, ExportFormat.Excel, cultureCode, false,
+                    propertyLabelType, false, sendMailFromZendTo, encryptedPassword, dynamicProjectDataFields, null, JobCancellationToken.Null));
 
             var exportJobInfo = new ExportJobInfo
             {
@@ -1821,8 +1821,8 @@ public class ExportsController : ControllerBase
 
             var encryptedPassword = await _cryptoService.EncryptAsync(encryptPassword);
             var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
-                job.RunAsync(filter, filter.ProtectionFilter ?? ProtectionFilterDto.Public, this.GetUserId(), roleId, authorizationApplicationIdentifier, userInfo.Email, description, ExportFormat.GeoJson, cultureCode,
-                    flat, propertyLabelType, excludeNullValues, sensitiveObservations, sendMailFromZendTo, encryptedPassword, false, null, JobCancellationToken.Null));
+                job.RunAsync(filter, filter.ProtectionFilter.Value, this.GetUserId(), roleId, authorizationApplicationIdentifier, userInfo.Email, description, ExportFormat.GeoJson, cultureCode,
+                    flat, propertyLabelType, excludeNullValues, sendMailFromZendTo, encryptedPassword, false, null, JobCancellationToken.Null));
 
             var exportJobInfo = new ExportJobInfo
             {

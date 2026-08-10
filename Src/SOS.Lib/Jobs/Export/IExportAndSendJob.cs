@@ -58,7 +58,6 @@ public interface IExportAndSendJob
     /// <param name="flatOut">true to export data in a flat structure; otherwise, false to use a hierarchical structure.</param>
     /// <param name="propertyLabelType">Specifies the type of property labels to include in the export.</param>
     /// <param name="excludeNullValues">true to exclude properties with null values from the export; otherwise, false.</param>
-    /// <param name="sensitiveObservations">true to include sensitive observations in the export; otherwise, false.</param>
     /// <param name="sendMailFromZendTo">true to send the notification email from the ZendTo system; otherwise, false.</param>
     /// <param name="encryptedPassword">The encrypted password used for securing the exported file, if applicable.</param>
     /// <param name="dynamicProjectDataFields">true to include dynamic project data fields in the export; otherwise, false.</param>
@@ -84,7 +83,6 @@ public interface IExportAndSendJob
         bool flatOut,
         PropertyLabelType propertyLabelType,
         bool excludeNullValues,
-        bool sensitiveObservations,
         bool sendMailFromZendTo,
         string encryptedPassword,
         bool dynamicProjectDataFields,

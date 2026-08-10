@@ -7,7 +7,6 @@ using SOS.Lib.Dtos.Enum;
 using SOS.Lib.Dtos.Filter;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions.Dto;
-using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Jobs.Export;
 using SOS.Lib.Models.Export;
@@ -177,7 +176,6 @@ public class ExportAndSendJob : IExportAndSendJob
         bool flatOut,
         PropertyLabelType propertyLabelType,
         bool excludeNullValues,
-        bool sensitiveObservations,
         bool sendMailFromZendTo,
         string encryptedPassword,
         bool dynamicProjectDataFields,
@@ -187,7 +185,7 @@ public class ExportAndSendJob : IExportAndSendJob
         try
         {
             _logger.LogInformation("Start export and send job");
-            var filter = searchFilter.ToSearchFilter(userId, sensitiveObservations ? ProtectionFilterDto.BothPublicAndSensitive : ProtectionFilterDto.Public, culture);
+            var filter = searchFilter.ToSearchFilter(userId, protectionFilter, culture);
             Thread.Sleep(TimeSpan.FromSeconds(1)); // wait for job info to be inserted in MongoDb.
             await UpdateJobInfoStartProcessing(userId, context?.BackgroundJob?.Id);
             var password = await _cryptoService.DecryptAsync(encryptedPassword);
@@ -210,7 +208,7 @@ public class ExportAndSendJob : IExportAndSendJob
                 }
             }
            
-            var response = await _observationManager.ExportAndSendAsync(roleId, authorizationApplicationIdentifier, filter, additionalFiles, email, description, exportFormat, culture, flatOut, propertyLabelType, excludeNullValues, sensitiveObservations, sendMailFromZendTo, password, dynamicProjectDataFields, cancellationToken);
+            var response = await _observationManager.ExportAndSendAsync(roleId, authorizationApplicationIdentifier, filter, additionalFiles, email, description, exportFormat, culture, flatOut, propertyLabelType, excludeNullValues, protectionFilter != ProtectionFilterDto.Public, sendMailFromZendTo, password, dynamicProjectDataFields, cancellationToken);
 
             _logger.LogInformation($"End export and send job. Success: {response.Success}");
             await UpdateJobInfoEndProcessing(userId, context?.BackgroundJob?.Id, response);

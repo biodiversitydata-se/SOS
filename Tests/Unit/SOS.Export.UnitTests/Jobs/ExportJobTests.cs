@@ -91,7 +91,7 @@ public class ExportAndSendJobTests
 
         Func<Task> act = async () =>
         {
-            await observationManager.RunAsync(new SearchFilterBaseDto(), Lib.Dtos.Enum.ProtectionFilterDto.Public, 0, 0, "", null, "", ExportFormat.DwC, "en-GB", false, PropertyLabelType.PropertyName, false, false, false, null, false, null, JobCancellationToken.Null);
+            await observationManager.RunAsync(new SearchFilterBaseDto(), Lib.Dtos.Enum.ProtectionFilterDto.Public, 0, 0, "", null, "", ExportFormat.DwC, "en-GB", false, PropertyLabelType.PropertyName, false, false, null, false, null, JobCancellationToken.Null);
         };
 
         //-----------------------------------------------------------------------------------------------------------
@@ -143,7 +143,7 @@ public class ExportAndSendJobTests
         //-----------------------------------------------------------------------------------------------------------
         var observationManager = TestObject;
 
-        var result = await observationManager.RunAsync(new SearchFilterBaseDto(), Lib.Dtos.Enum.ProtectionFilterDto.Public, 0, 0, "", null, "", ExportFormat.DwC, "en-GB", false, PropertyLabelType.PropertyName, false, false, false, null, false, null, JobCancellationToken.Null);
+        var result = await observationManager.RunAsync(new SearchFilterBaseDto(), Lib.Dtos.Enum.ProtectionFilterDto.Public, 0, 0, "", null, "", ExportFormat.DwC, "en-GB", false, PropertyLabelType.PropertyName, false, false, null, false, null, JobCancellationToken.Null);
 
         //-----------------------------------------------------------------------------------------------------------
         // Assert
@@ -191,7 +191,7 @@ public class ExportAndSendJobTests
 
         Func<Task> act = async () =>
         {
-            await observationManager.RunAsync(new SearchFilterBaseDto(), Lib.Dtos.Enum.ProtectionFilterDto.Public, 0, 0, "", null, "", ExportFormat.DwC, "en-GB", false, PropertyLabelType.PropertyName, false, false, false, null, false, null, JobCancellationToken.Null);
+            await observationManager.RunAsync(new SearchFilterBaseDto(), Lib.Dtos.Enum.ProtectionFilterDto.Public, 0, 0, "", null, "", ExportFormat.DwC, "en-GB", false, PropertyLabelType.PropertyName, false, false, null, false, null, JobCancellationToken.Null);
         };
 
         //-----------------------------------------------------------------------------------------------------------
