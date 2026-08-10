@@ -733,7 +733,7 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
                             .Properties(ps => ps
                                 .KeywordVal(kwlc => kwlc.Taxon.Attributes.ActionPlan, IndexSetting.SearchOnly) // WFS
                                 .KeywordVal(kwlc => kwlc.Taxon.Attributes.OrganismGroup, IndexSetting.SearchSortAggregate) // WFS
-                                .KeywordVal(kwlc => kwlc.Taxon.Attributes.InvasiveRiskAssessmentCategory, IndexSetting.SearchOnly) // WFS
+                                .KeywordVal(kwlc => kwlc.Taxon.Attributes.InvasiveRiskAssessmentCategory, IndexSetting.SearchSortAggregate) // WFS
                                 .KeywordVal(kwlc => kwlc.Taxon.Attributes.RedlistCategory, IndexSetting.SearchSortAggregate) // WFS
                                 .KeywordVal(kwlc => kwlc.Taxon.Attributes.RedlistCategoryDerived, IndexSetting.SearchSortAggregate)
                                 .KeywordVal(kwlc => kwlc.Taxon.Attributes.SwedishOccurrence, IndexSetting.None)
