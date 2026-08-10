@@ -1,18 +1,11 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.JsonWebTokens;
-using Serilog.Core;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.UserService;
 using SOS.Lib.Security.Interfaces;
 using SOS.Lib.Services.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
 using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace SOS.Lib.Services;
 
