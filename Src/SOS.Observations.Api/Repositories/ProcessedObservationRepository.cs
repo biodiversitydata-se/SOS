@@ -368,15 +368,13 @@ public class ProcessedObservationRepository : ProcessedObservationCoreRepository
         {
             TimeSeriesType.Month => "event.startMonth",
             TimeSeriesType.Week48 => "event.startHistogramWeek",
-            TimeSeriesType.Day => "event.startDay",
-            _ => "event.startDay"
+            _ => "event.startDayOfYear"
         };
 
         var extendedBoundsMax = timeSeriesType switch
         {
             TimeSeriesType.Month => 12,
             TimeSeriesType.Week48 => 48,
-            TimeSeriesType.Day => 365,
             _ => 365
         };
 
