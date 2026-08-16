@@ -291,41 +291,41 @@ public static class SearchExtensionsObservation
                     var selector = "";
                     if (filter.Date.DateFilterType == DateFilter.DateRangeFilterType.BetweenStartDateAndEndDate)
                     {
-                        selector = "(daysOfStartYear.contains(startDayOfYear) && daysOfEndYear.contains(endDayOfYear))";
+                        selector = "(monthDays.contains(startMonthDay) && monthDays.contains(endMonthDay))";
                     }
                     else if (filter.Date.DateFilterType == DateFilter.DateRangeFilterType.OnlyStartDate)
                     {
-                        selector = "(daysOfStartYear.contains(startDayOfYear))";
+                        selector = "(monthDays.contains(startMonthDay))";
                     }
                     else if (filter.Date.DateFilterType == DateFilter.DateRangeFilterType.OnlyEndDate)
                     {
-                        selector = "(daysOfEndYear.contains(endDayOfYear))";
+                        selector = "(monthDays.contains(endMonthDay))";
                     }
                     else if (filter.Date.DateFilterType == DateFilter.DateRangeFilterType.OverlappingStartDateAndEndDate)
                     {
-                        selector = "(daysOfStartYear.contains(startDayOfYear)) || (daysOfEndYear.contains(endDayOfYear))";
+                        selector = "(monthDays.contains(startMonthDay)) || (monthDays.contains(endMonthDay))";
                     }
 
-                    // Interval can start or end in a leap year. If it's starts with a leap year and spans to a new year, add day 366.
-                    // If it's end with a leap year and spans over feb, add leap day
-                    var daysOfLeapYear = new HashSet<int>();
-                    PopulateDaysInInterval(ref daysOfLeapYear, 2000, internalFilter.Date.StartDate.Value, internalFilter.Date.EndDate.Value);
-                    PopulateDaysInInterval(ref daysOfLeapYear, 2003, internalFilter.Date.StartDate.Value, internalFilter.Date.EndDate.Value);
-
-                    var daysOfNonLeapYear = new HashSet<int>();
-                    PopulateDaysInInterval(ref daysOfNonLeapYear, 2002, internalFilter.Date.StartDate.Value, internalFilter.Date.EndDate.Value);
+                    // Encode each day of the requested calendar period as month * 100 + day (Apr 1 -> 401) and match
+                    // against the observation's month/day pair. This removes the leap/non-leap ambiguity of day-of-year
+                    // matching and handles windows spanning a year boundary naturally, with no reference years.
+                    var monthDays = new HashSet<int>();
+                    var filterDate = internalFilter.Date.StartDate.Value.Date;
+                    var filterEndDate = internalFilter.Date.EndDate.Value.Date;
+                    while (filterDate <= filterEndDate)
+                    {
+                        monthDays.Add(filterDate.Month * 100 + filterDate.Day);
+                        filterDate = filterDate.AddDays(1);
+                    }
 
                     queries.TryAddScript($@"
-                        HashSet daysOfLeapYear = new HashSet([{string.Join(',', daysOfLeapYear)}]);
-                        HashSet daysOfNonLeapYear = new HashSet([{string.Join(',', daysOfNonLeapYear)}]);
-                    
-                        int startYear = (int)doc['event.startYear'].value;
-                        HashSet daysOfStartYear = (startYear % 400 === 0 || startYear % 100 !== 0 && startYear % 4 === 0) ? daysOfLeapYear : daysOfNonLeapYear;
-                        int startDayOfYear = (int)doc['event.startDayOfYear'].value;
-                    
-                        int endYear = (int)doc['event.endYear'].value;
-                        HashSet daysOfEndYear =  (endYear % 400 === 0 || endYear % 100 !== 0 && endYear % 4 === 0) ? daysOfLeapYear : daysOfNonLeapYear;
-                        int endDayOfYear = (int)doc['event.endDayOfYear'].value;
+                        HashSet monthDays = new HashSet([{string.Join(',', monthDays.OrderBy(md => md))}]);
+
+                        if (doc['event.startMonth'].size() == 0 || doc['event.startDay'].size() == 0 || doc['event.endMonth'].size() == 0 || doc['event.endDay'].size() == 0)
+                            return false;
+
+                        int startMonthDay = (int)doc['event.startMonth'].value * 100 + (int)doc['event.startDay'].value;
+                        int endMonthDay = (int)doc['event.endMonth'].value * 100 + (int)doc['event.endDay'].value;
 
                         if({selector})
                             return true;
@@ -695,26 +695,6 @@ public static class SearchExtensionsObservation
                 );
             }
         }
-    }
-
-    private static void PopulateDaysInInterval(ref HashSet<int> daysOfYear, int startYear, DateTime startDate, DateTime endDate)
-    {
-        var filterStartDate = CreateDate(startYear, startDate.Month, startDate.Day);
-        var filterEndDate = CreateDate(startYear + endDate.Year - startDate.Year, endDate.Month, endDate.Day);
-
-        var count = 0;
-        while (filterStartDate <= filterEndDate && count < 365)
-        {
-            daysOfYear.Add(filterStartDate.DayOfYear);
-            filterStartDate = filterStartDate.AddDays(1);
-            count++;
-        }
-        daysOfYear = daysOfYear.OrderBy(d => d).ToHashSet();
-    }
-
-    private static DateTime CreateDate(int year, int month, int day)
-    {
-        return new DateTime(year, month, month.Equals(2) && day.Equals(29) && !DateTime.IsLeapYear(year) ? 28 : day);
     }
 
     extension<TQueryDescriptor>(ICollection<Action<QueryDescriptor<TQueryDescriptor>>> excludeQueries) where TQueryDescriptor : class

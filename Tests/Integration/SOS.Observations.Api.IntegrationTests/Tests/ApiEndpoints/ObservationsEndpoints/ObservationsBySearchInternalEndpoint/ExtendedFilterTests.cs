@@ -1483,15 +1483,18 @@ public class ExtendedFilterTests : TestBase
         var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
            .All()
                .HaveValuesFromPredefinedObservations()
-            .TheFirst(30)
-                .With(o => o.StartDate = new DateTime(2000, 1, 2))
-                .With(o => o.EndDate = new DateTime(2000, 1, 2))
+            .TheFirst(20)
+                .With(o => o.StartDate = new DateTime(2000, 5, 31))
+                .With(o => o.EndDate = new DateTime(2000, 5, 31))
             .TheNext(30)
-                .With(o => o.StartDate = new DateTime(2001, 1, 15))
-                .With(o => o.EndDate = new DateTime(2001, 1, 15))
-            .TheNext(40)
-                .With(o => o.StartDate = new DateTime(2000, 2, 2))
-                .With(o => o.EndDate = new DateTime(2000, 2, 2))
+                .With(o => o.StartDate = new DateTime(2000, 6, 2))
+                .With(o => o.EndDate = new DateTime(2000, 6, 2))
+            .TheNext(30)
+                .With(o => o.StartDate = new DateTime(2001, 6, 15))
+                .With(o => o.EndDate = new DateTime(2001, 6, 15))
+            .TheNext(20)
+                .With(o => o.StartDate = new DateTime(2000, 7, 2))
+                .With(o => o.EndDate = new DateTime(2000, 7, 2))
            .Build();
 
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
@@ -1500,8 +1503,8 @@ public class ExtendedFilterTests : TestBase
         {
             Date = new DateFilterDto
             {
-                StartDate = new DateTime(2000, 1, 1),
-                EndDate = new DateTime(2000, 1, 30),
+                StartDate = new DateTime(2000, 6, 1),
+                EndDate = new DateTime(2000, 6, 30),
                 DateFilterType = DateFilterTypeDto.BetweenStartDateAndEndDate
             },
             ExtendedFilter = new ExtendedFilterDto
@@ -1650,6 +1653,194 @@ public class ExtendedFilterTests : TestBase
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         result!.TotalCount.Should().Be(60);
     }
+
+    [Fact]
+    public async Task GetObservationsWithUsePeriodForAllYearsExcludesLeapYearMarch31FromAprilWindow()
+    {
+        // Arrange
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+           .All()
+               .HaveValuesFromPredefinedObservations()
+            .TheFirst(30)
+                .With(o => o.StartDate = new DateTime(2020, 3, 31)) // leap year
+                .With(o => o.EndDate = new DateTime(2020, 3, 31))
+            .TheNext(30)
+                .With(o => o.StartDate = new DateTime(2021, 3, 31)) // non-leap year
+                .With(o => o.EndDate = new DateTime(2021, 3, 31))
+            .TheNext(40)
+                .With(o => o.StartDate = new DateTime(2020, 4, 1))
+                .With(o => o.EndDate = new DateTime(2020, 4, 1))
+           .Build();
+
+        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
+        var apiClient = TestFixture.CreateApiClient();
+        var searchFilter = new SearchFilterInternalDto
+        {
+            Date = new DateFilterDto
+            {
+                StartDate = new DateTime(2000, 4, 1),
+                EndDate = new DateTime(2000, 4, 2),
+                DateFilterType = DateFilterTypeDto.OverlappingStartDateAndEndDate
+            },
+            ExtendedFilter = new ExtendedFilterDto
+            {
+                UsePeriodForAllYears = true
+            }
+        };
+
+        // Act
+        var response = await apiClient.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        result!.TotalCount.Should().Be(40);
+    }
+
+    [Fact]
+    public async Task GetObservationsWithUsePeriodForAllYearsFebruary29WindowDoesNotLeakFebruary28OrMarch1()
+    {
+        // Arrange
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+           .All()
+               .HaveValuesFromPredefinedObservations()
+            .TheFirst(30)
+                .With(o => o.StartDate = new DateTime(2020, 2, 28)) // leap year
+                .With(o => o.EndDate = new DateTime(2020, 2, 28))
+            .TheNext(30)
+                .With(o => o.StartDate = new DateTime(2021, 2, 28)) // non-leap year
+                .With(o => o.EndDate = new DateTime(2021, 2, 28))
+            .TheNext(20)
+                .With(o => o.StartDate = new DateTime(2020, 2, 29))
+                .With(o => o.EndDate = new DateTime(2020, 2, 29))
+            .TheNext(20)
+                .With(o => o.StartDate = new DateTime(2020, 3, 1))
+                .With(o => o.EndDate = new DateTime(2020, 3, 1))
+           .Build();
+
+        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
+        var apiClient = TestFixture.CreateApiClient();
+        var searchFilter = new SearchFilterInternalDto
+        {
+            Date = new DateFilterDto
+            {
+                StartDate = new DateTime(2000, 2, 29),
+                EndDate = new DateTime(2000, 2, 29),
+                DateFilterType = DateFilterTypeDto.OverlappingStartDateAndEndDate
+            },
+            ExtendedFilter = new ExtendedFilterDto
+            {
+                UsePeriodForAllYears = true
+            }
+        };
+
+        // Act
+        var response = await apiClient.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        result!.TotalCount.Should().Be(20);
+    }
+
+    [Fact]
+    public async Task GetObservationsWithUsePeriodForAllYearsIncludesAprilDaysFromLeapAndNonLeapYears()
+    {
+        // Arrange
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+           .All()
+               .HaveValuesFromPredefinedObservations()
+            .TheFirst(20)
+                .With(o => o.StartDate = new DateTime(2020, 4, 1)) // leap year
+                .With(o => o.EndDate = new DateTime(2020, 4, 1))
+            .TheNext(20)
+                .With(o => o.StartDate = new DateTime(2021, 4, 1)) // non-leap year
+                .With(o => o.EndDate = new DateTime(2021, 4, 1))
+            .TheNext(20)
+                .With(o => o.StartDate = new DateTime(2020, 4, 2)) // leap year
+                .With(o => o.EndDate = new DateTime(2020, 4, 2))
+            .TheNext(20)
+                .With(o => o.StartDate = new DateTime(2021, 4, 2)) // non-leap year
+                .With(o => o.EndDate = new DateTime(2021, 4, 2))
+            .TheNext(20)
+                .With(o => o.StartDate = new DateTime(2019, 4, 3))
+                .With(o => o.EndDate = new DateTime(2019, 4, 3))
+           .Build();
+
+        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
+        var apiClient = TestFixture.CreateApiClient();
+        var searchFilter = new SearchFilterInternalDto
+        {
+            Date = new DateFilterDto
+            {
+                StartDate = new DateTime(2000, 4, 1),
+                EndDate = new DateTime(2000, 4, 2),
+                DateFilterType = DateFilterTypeDto.OverlappingStartDateAndEndDate
+            },
+            ExtendedFilter = new ExtendedFilterDto
+            {
+                UsePeriodForAllYears = true
+            }
+        };
+
+        // Act
+        var response = await apiClient.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        result!.TotalCount.Should().Be(80);
+    }
+
+    [Fact]
+    public async Task GetObservationsWithUsePeriodForAllYearsYearBoundaryWindowReturnsObservationsFromBothSides()
+    {
+        // Arrange
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+           .All()
+               .HaveValuesFromPredefinedObservations()
+            .TheFirst(20)
+                .With(o => o.StartDate = new DateTime(2020, 12, 30))
+                .With(o => o.EndDate = new DateTime(2020, 12, 30))
+            .TheNext(20)
+                .With(o => o.StartDate = new DateTime(2021, 1, 5))
+                .With(o => o.EndDate = new DateTime(2021, 1, 5))
+            .TheNext(20)
+                .With(o => o.StartDate = new DateTime(2020, 12, 29))
+                .With(o => o.EndDate = new DateTime(2020, 12, 29))
+            .TheNext(20)
+                .With(o => o.StartDate = new DateTime(2021, 1, 6))
+                .With(o => o.EndDate = new DateTime(2021, 1, 6))
+            .TheNext(20)
+                .With(o => o.StartDate = new DateTime(2020, 6, 15))
+                .With(o => o.EndDate = new DateTime(2020, 6, 15))
+           .Build();
+
+        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
+        var apiClient = TestFixture.CreateApiClient();
+        var searchFilter = new SearchFilterInternalDto
+        {
+            Date = new DateFilterDto
+            {
+                StartDate = new DateTime(2000, 12, 30),
+                EndDate = new DateTime(2001, 1, 5),
+                DateFilterType = DateFilterTypeDto.OverlappingStartDateAndEndDate
+            },
+            ExtendedFilter = new ExtendedFilterDto
+            {
+                UsePeriodForAllYears = true
+            }
+        };
+
+        // Act
+        var response = await apiClient.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        result!.TotalCount.Should().Be(40);
+    }
+
 
     [Fact]
     public async Task GetObservationsWithNotUnspontaneous()
@@ -2008,6 +2199,56 @@ public class ExtendedFilterTests : TestBase
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         result!.TotalCount.Should().Be(60);
+    }
+
+    [Fact]
+    public async Task GetObservationsWithYearsIntervalAndDatePeriod()
+    {
+        // Arrange
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+           .All()
+               .HaveValuesFromPredefinedObservations()
+           .TheFirst(20)
+                .With(o => o.StartDate = new DateTime(2000, 1, 1))
+                .With(o => o.EndDate = new DateTime(2000, 1, 1))
+            .TheNext(20)
+                .With(o => o.StartDate = new DateTime(2001, 1, 1))
+                .With(o => o.EndDate = new DateTime(2001, 1, 31))
+            .TheNext(20)
+                .With(o => o.StartDate = new DateTime(2000, 6, 15))
+                .With(o => o.EndDate = new DateTime(2000, 6, 15))
+            .TheNext(20)
+                .With(o => o.StartDate = new DateTime(2002, 1, 30))
+                .With(o => o.EndDate = new DateTime(2002, 1, 30))
+            .TheLast(20)
+                .With(o => o.StartDate = new DateTime(2001, 1, 30))
+                .With(o => o.EndDate = new DateTime(2002, 2, 1))
+           .Build();
+
+        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
+        var apiClient = TestFixture.CreateApiClient();
+        var searchFilter = new SearchFilterInternalDto
+        {
+            Date = new DateFilterDto
+            {
+                StartDate = new DateTime(2000, 1, 1),
+                EndDate = new DateTime(2000, 1, 31)
+            },
+            ExtendedFilter = new ExtendedFilterDto
+            {
+                UsePeriodForAllYears = true,
+                Years = new[] { 2000, 2001 },
+                YearsComparison = ExtendedFilterDto.DateFilterComparisonDto.BothStartDateAndEndDate
+            }
+        };
+
+        // Act
+        var response = await apiClient.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        result!.TotalCount.Should().Be(40);
     }
 
     [Fact]
