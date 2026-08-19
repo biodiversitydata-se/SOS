@@ -138,7 +138,7 @@ public class FilterManager : IFilterManager
             filter.TaxonCategories);
     }
 
-    private async Task<List<int>> GetTaxonIdsAsync(IEnumerable<int> taxonIds,
+    public async Task<List<int>> GetTaxonIdsAsync(IEnumerable<int> taxonIds,
         bool includeUnderlyingTaxa,
         IEnumerable<int> listIds,
         TaxonFilter.TaxonListOp listOperator = TaxonFilter.TaxonListOp.Merge,

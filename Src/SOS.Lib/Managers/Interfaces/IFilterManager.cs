@@ -58,6 +58,23 @@ public interface IFilterManager
     /// <summary>
     /// Get taxon ids from filter.
     /// </summary>
+    /// <param name="taxonIds"></param>
+    /// <param name="includeUnderlyingTaxa"></param>
+    /// <param name="listIds"></param>
+    /// <param name="listOperator"></param>
+    /// <param name="taxonCategories"></param>
+    /// <param name="returnBiotaResultAsNull"></param>
+    /// <returns></returns>
+    Task<List<int>> GetTaxonIdsAsync(IEnumerable<int> taxonIds,
+        bool includeUnderlyingTaxa,
+        IEnumerable<int> listIds,
+        TaxonFilter.TaxonListOp listOperator = TaxonFilter.TaxonListOp.Merge,
+        IEnumerable<int> taxonCategories = null,
+        bool returnBiotaResultAsNull = true);
+
+    /// <summary>
+    /// Get taxon ids from filter.
+    /// </summary>
     /// <param name="filter">The taxon filter.</param>
     /// <returns></returns>
     Task<HashSet<int>> GetTaxonIdsFromFilterAsync(TaxonFilter filter);

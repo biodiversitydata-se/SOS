@@ -7,6 +7,7 @@ using SOS.Lib.Dtos.Filter;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers.Interfaces;
+using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Shared;
@@ -27,6 +28,7 @@ public class MarkdownHelper : IMarkdownHelper
     private readonly IAreaCache _areaCache;
     private readonly IDataProviderCache _dataProviderCache;
     private readonly IDatasetRepository _datasetRepository;
+    private readonly IFilterManager _filterManager;
     private readonly ICache<int, ProjectInfo> _projectCache;
     private readonly ICache<int, Taxon> _taxonCache;
     private readonly ICache<int, TaxonList> _taxonListCache;
@@ -279,7 +281,7 @@ public class MarkdownHelper : IMarkdownHelper
         }
         TryAddList(sb, ("Triggered Observation Rule Frequency Id`s", 3), filter.TriggeredObservationRuleFrequencyIds?.Select(torfi => torfi.ToString()));
         TryAddList(sb, ("Triggered Observation Rule Reproduction Id`s", 3), filter.TriggeredObservationRuleReproductionIds?.Select(torri => torri.ToString()));
-        TryAddParagraph(sb, "Not Present Filter", filter.TypeFilter switch
+        /*TryAddParagraph(sb, "Not Present Filter", filter.TypeFilter switch
         {
             SightingTypeFilterDto.DoNotShowMergedIncludeReplacementChilds => "Do Not Show Merged Include Replacement Childs",
             SightingTypeFilterDto.DoNotShowSightingsInMerged => "Do Not Show Sightings In Merged",
@@ -287,14 +289,13 @@ public class MarkdownHelper : IMarkdownHelper
             SightingTypeFilterDto.ShowChildrenAndReplacements => "Show Children And Replacements",
             SightingTypeFilterDto.ShowOnlyMerged => "Show Only Merged",
             _ => "Do Not Show Merged"
-        });
-        TryAddParagraph(sb, "Not Present Filter", filter.UnspontaneousFilter switch
+        });*/
+        TryAddParagraph(sb, "Unspontaneous Filter", filter.UnspontaneousFilter switch
         {
             SightingUnspontaneousFilterDto.NotUnspontaneous => "Not Unspontaneous",
             SightingUnspontaneousFilterDto.Unspontaneous => "Unspontaneous",
             _ => ""
         });
-        TryAddParagraph(sb, "Use Period For All Years", filter.UsePeriodForAllYears ? "Yes" : null);
         TryAddParagraph(sb, "Use Period For All Years", filter.UsePeriodForAllYears ? "Yes" : null);
         if (filter.VerificationStatusIds?.Count() > 0)
         {
@@ -567,8 +568,15 @@ public class MarkdownHelper : IMarkdownHelper
     /// <returns>A task that represents the asynchronous operation.</returns>
     private async Task TryAddTaxaInfoAsync(StringBuilder sb, TaxonFilterDto filter, IEnumerable<VocabularyValueInfo> taxonCategories)
     {
+        var taxonIds = await _filterManager.GetTaxonIdsAsync(filter.Ids,
+            filter.IncludeUnderlyingTaxa ?? false,
+            filter.TaxonListIds,
+            filter.TaxonListOperator switch { TaxonListOperatorDto.Filter => TaxonFilter.TaxonListOp.Filter, _ => TaxonFilter.TaxonListOp.Merge },
+            filter.TaxonCategories,
+            false);
+
         if (filter == null || (
-            (filter.Ids?.Count() ?? 0) == 0 &&
+            (taxonIds?.Count() ?? 0) == 0 &&
             (filter.TaxonListIds?.Count() ?? 0) == 0 &&
             (filter.RedListCategories?.Count() ?? 0) == 0 &&
             (filter.TaxonCategories?.Count() ?? 0) == 0 &&
@@ -586,10 +594,10 @@ public class MarkdownHelper : IMarkdownHelper
             TryAddList(sb, ("Taxon Categories", 3), taxonCategories?.Where(tc => filter.TaxonCategories.Contains(tc.Id)).Select(tc => tc.Value));
         }
 
-        if ((filter.Ids?.Count() ?? 0) != 0)
+        if ((taxonIds?.Count() ?? 0) != 0)
         {
             var taxa = await _taxonCache.GetAllAsync();
-            TryAddList(sb, ("Taxa", 3), taxa?.Where(t => filter.Ids.Contains(t.Id)).Select(t => $"{t.ScientificName} ({t.TaxonId})"));
+            TryAddList(sb, ("Taxa", 3), taxa?.Where(t => taxonIds.Contains(t.Id)).Select(t => $"{t.ScientificName} ({t.TaxonId})"));
         }
 
         if ((filter.TaxonListIds?.Count() ?? 0) != 0)
@@ -606,6 +614,7 @@ public class MarkdownHelper : IMarkdownHelper
     public MarkdownHelper(IAreaCache areaCache,
         IDataProviderCache dataProviderCache,
         IDatasetRepository datasetRepository,
+        IFilterManager filterManager,
         ICache<int, ProjectInfo> projectCache,
         ICache<int, Taxon> taxonCache,
         ICache<int, TaxonList> taxonListCache,
@@ -617,6 +626,7 @@ public class MarkdownHelper : IMarkdownHelper
         _areaCache = areaCache ?? throw new ArgumentNullException(nameof(areaCache));
         _dataProviderCache = dataProviderCache ?? throw new ArgumentNullException(nameof(dataProviderCache));
         _datasetRepository = datasetRepository ?? throw new ArgumentNullException(nameof(datasetRepository));
+        _filterManager = filterManager ?? throw new ArgumentNullException(nameof(filterManager));
         _projectCache = projectCache ?? throw new ArgumentNullException(nameof(projectCache));
         _taxonCache = taxonCache ?? throw new ArgumentNullException(nameof(taxonCache));
         _taxonListCache = taxonListCache ?? throw new ArgumentNullException(nameof(taxonListCache));
