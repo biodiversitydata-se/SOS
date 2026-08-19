@@ -1,8 +1,8 @@
 ﻿﻿using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using MudBlazor;
-using SOS.Status.Web.Client.Dtos.SosObsApi;
-using SOS.Status.Web.Client.JsonConverters;
+using SOS.Api.Contracts.Observations.Requests;
+using SOS.Api.Contracts.Observations.Responses;
 using SOS.Status.Web.Client.Models;
 using System.Diagnostics;
 using System.Globalization;
@@ -86,8 +86,7 @@ public partial class LocationsSearch : IAsyncDisposable
         PropertyNameCaseInsensitive = true,
         Converters =
         {
-            new JsonStringEnumConverter(),
-            new GeoJsonConverter()
+            new JsonStringEnumConverter()
         }
     };
 
@@ -1338,4 +1337,3 @@ public partial class LocationsSearch : IAsyncDisposable
         public double Height => Math.Max(0, Y2 - Y1);
     }
 }
-

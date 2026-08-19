@@ -1,4 +1,4 @@
-﻿using SOS.Status.Web.Client.Dtos.SosObsApi;
+using SOS.Api.Contracts.Observations.Responses;
 
 namespace SOS.Status.Web.Client.Models;
 

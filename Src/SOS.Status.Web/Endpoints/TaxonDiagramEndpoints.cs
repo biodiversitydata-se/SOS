@@ -25,11 +25,13 @@ public static class TaxonDiagramEndpoints
                             includeSecondaryRelations,
                             translationCultureCode);
 
-                        return Results.Ok(result);
+                        return result is null
+                            ? Results.NoContent()
+                            : Results.Text(result, "text/plain");
                     }
                     catch (ArgumentException ex)
                     {
-                        return Results.BadRequest(ex.Message);
+                        return Results.Text(ex.Message, "text/plain", statusCode: StatusCodes.Status400BadRequest);
                     }
                 });
 

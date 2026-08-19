@@ -1,6 +1,6 @@
-﻿using SOS.Status.Web.Client.Abstractions;
+﻿﻿using SOS.Status.Web.Client.Abstractions;
 using SOS.Status.Web.Client.Dtos;
-using System.Net.Http.Json;
+using System.Net;
 
 namespace SOS.Status.Web.Client.HttpClients;
 
@@ -31,12 +31,16 @@ public class TaxonDiagramApiClient : ITaxonDiagramService
         {
             var response = await _http.GetAsync(url);
 
+            if (response.StatusCode == HttpStatusCode.NoContent)
+            {
+                return null;
+            }
 
             if (response.IsSuccessStatusCode)
             {
-                return await response.Content.ReadFromJsonAsync<string>();
+                return await response.Content.ReadAsStringAsync();
             }
-            else if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+            else if (response.StatusCode == HttpStatusCode.BadRequest)
             {
                 var error = await response.Content.ReadAsStringAsync();
                 return $"Error: {error}";

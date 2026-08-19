@@ -2261,6 +2261,11 @@ public class ObservationsController : ControllerBase
                 BoundingBoxIsEmpty = IsEmptyBoundingBox(filter?.Geographics?.BoundingBox)
             });
 
+            if (result.CacheStatus == "HIT")
+            {
+                HttpContext?.Items["CacheUsed"] = true;
+            }
+
             return await WriteAdaptiveSearchLocationsResponseAsync(result, totalStopwatch, cutoffYear);
         }
         catch (AuthenticationRequiredException e)

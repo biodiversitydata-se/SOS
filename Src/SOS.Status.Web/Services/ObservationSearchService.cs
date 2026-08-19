@@ -1,28 +1,29 @@
-﻿using CSharpFunctionalExtensions;
+﻿using ClientRequests = SOS.Api.Client.Requests;
+using ApiModels = SOS.Api.Contracts.Observations.Requests;
+using ContractSearchSortOrder = SOS.Api.Contracts.Observations.Requests.SearchSortOrder;
+using OutputFilterDto = SOS.Api.Contracts.Observations.Requests.OutputFilterDto;
+using SearchFilterDto = SOS.Api.Contracts.Observations.Requests.SearchFilterDto;
+using SearchFilterInternalDto = SOS.Api.Contracts.Observations.Requests.SearchFilterInternalDto;
+using CSharpFunctionalExtensions;
+using SOS.Api.Client.Abstractions;
+using SOS.Api.Contracts.Common.Responses;
+using SOS.Api.Contracts.Observations.Responses;
 using SOS.Status.Web.Client.Abstractions;
-using SOS.Status.Web.Client.Dtos.SosObsApi;
 using SOS.Status.Web.Client.Models;
-using SOS.Status.Web.HttpClients;
+using SOS.Api.Contracts.Observations.Requests;
 
 namespace SOS.Status.Web.Services;
 
 public class ObservationSearchService : IObservationSearchService
 {
-    private readonly SosObservationsApiClient _observationsApiClient;
+    private readonly ISosObservationsClient _observationsClient;
 
-    public ObservationSearchService(
-        SosObservationsApiClient observationsApiClient)
+    public ObservationSearchService(ISosObservationsClient observationsClient)
     {
-        _observationsApiClient = observationsApiClient ?? throw new ArgumentNullException(nameof(observationsApiClient));
+        _observationsClient = observationsClient ?? throw new ArgumentNullException(nameof(observationsClient));
     }
 
-    public async Task<Client.Dtos.ProcessSummaryDto> GetProcessSummaryAsync()
-    {
-        var processSummary = await _observationsApiClient.GetProcessSummary();
-        return processSummary!;
-    }
-
-    public async Task<Client.Dtos.SosObsApi.PagedResultDto<Observation>> SearchObservations(
+    public async Task<PagedResultDto<Observation>> SearchObservations(
         SearchFilterInternalDto filter,
         int skip = 0,
         int take = 100,
@@ -32,42 +33,26 @@ public class ObservationSearchService : IObservationSearchService
         string translationCultureCode = "sv-SE",
         bool sensitiveObservations = false)
     {
-        var pageResult = await _observationsApiClient.SearchObservationsAsync(
+        var pageResult = await _observationsClient.ObservationsBySearchInternalAsync(
             filter,
-            skip,
-            take,
-            sortBy,
-            sortOrder,
-            validateSearchFilter,
-            translationCultureCode,
-            sensitiveObservations);
+            new ClientRequests.ObservationSearchOptions
+            {
+                Skip = skip,
+                Take = take,
+                SortBy = sortBy,
+                SortOrder = ParseSearchSortOrder(sortOrder),
+                ValidateSearchFilter = validateSearchFilter,
+                TranslationCultureCode = translationCultureCode,
+                SensitiveObservations = sensitiveObservations
+            });
 
-        return pageResult!;
-    }
-
-    public async Task<(string GeoJson, long? ObservationsCount, long ResponseSizeBytes)> AdaptiveSearchGeoJsonByLocation(
-        SearchFilterInternalDto filter,
-        bool cluster = true,
-        string clusteringAlgorithm = "Greedy",
-        CreatePolygonsMode createPolygons = CreatePolygonsMode.No,
-        double clusterRadiusPx = 40.0,
-        int minLocationsPerCluster = 2,
-        bool validateSearchFilter = false,
-        string translationCultureCode = "sv-SE",
-        bool sensitiveObservations = false,
-        double? metersPerPixel = null)
-    {
-        return await _observationsApiClient.AdaptiveSearchGeoJsonByLocationAsync(
-            filter,
-            cluster,
-            clusteringAlgorithm,
-            createPolygons,
-            clusterRadiusPx,
-            minLocationsPerCluster,
-            validateSearchFilter,
-            translationCultureCode,
-            sensitiveObservations,
-            metersPerPixel);
+        return new PagedResultDto<Observation>
+        {
+            Skip = pageResult.Skip,
+            Take = pageResult.Take,
+            TotalCount = pageResult.TotalCount,
+            Records = pageResult.Records.ToList()
+        };
     }
 
     public async Task<(string GeoJson, long? ObservationsTotalCount, long? EstimatedLocationCount, long? FeatureCount, long? LocationsBeforeClustering, long ResponseSizeBytes, string? CacheStatus, string? ResultType, string? Timings)> AdaptiveSearchLocationItemsCachedGeoJson(
@@ -92,27 +77,39 @@ public class ObservationSearchService : IObservationSearchService
         int? cutoffYear = null,
         bool includeFilterAreasInResult = false)
     {
-        return await _observationsApiClient.AdaptiveSearchLocationItemsCachedGeoJsonAsync(
+        var response = await _observationsClient.AdaptiveSearchLocationsInternalAsync(
             filter,
-            observationsLimit,
-            maxGridCells,
-            locationAggregationLimit,
-            adaptiveSearchStrategy,
-            cluster,
-            clusteringAlgorithm,
-            createPolygons,
-            clusterRadiusPx,
-            minLocationsPerCluster,
-            minLocationCountBeforeClustering,
-            validateSearchFilter,
-            translationCultureCode,
-            sensitiveObservations,
-            metersPerPixel,
-            bbox,
-            createSampleObservations,
-            useCache,
-            cutoffYear,
-            includeFilterAreasInResult);
+            new ClientRequests.AdaptiveSearchLocationsOptions
+            {
+                ObservationsLimit = observationsLimit,
+                MaxGridCells = maxGridCells,
+                SensitiveObservations = sensitiveObservations,
+                Cluster = cluster,
+                ClusteringAlgorithm = ParseClusteringAlgorithm(clusteringAlgorithm),
+                MetersPerPixel = metersPerPixel,
+                ClusterRadiusPx = clusterRadiusPx,
+                MinLocationsPerCluster = minLocationsPerCluster,
+                MinLocationCountBeforeClustering = minLocationCountBeforeClustering,
+                CreatePolygons = (ApiModels.CreatePolygonsMode)createPolygons,
+                BoundingBoxQuery = bbox,
+                IncludeFilterAreasInResult = includeFilterAreasInResult,
+                UseCache = useCache,
+                CreateSampleObservations = createSampleObservations,
+                LocationAggregationLimit = locationAggregationLimit,
+                AdaptiveSearchStrategy = (ApiModels.AdaptiveSearchLocationsStrategy)adaptiveSearchStrategy,
+                CutoffYear = cutoffYear
+            });
+
+        return (
+            response.GeoJson,
+            response.ObservationsTotalCount,
+            response.EstimatedLocationCount,
+            response.FeatureCount,
+            response.LocationsBeforeClustering,
+            response.ResponseSizeBytes,
+            response.CacheStatus,
+            response.ResultType,
+            response.Timings);
     }
 
     public async Task<Result<SearchByCursorResultDto<Observation>>> SearchObservationsByCursor(
@@ -125,28 +122,80 @@ public class ObservationSearchService : IObservationSearchService
         string translationCultureCode = "sv-SE",
         bool sensitiveObservations = false)
     {
-        var result = await _observationsApiClient.SearchObservationsByCursorAsync(
-            filter,
-            take,
-            cursor,
-            sortBy,
-            sortOrder,
-            validateSearchFilter,
-            translationCultureCode,
-            sensitiveObservations);
+        var response = await _observationsClient.ObservationsByCursorAsync(
+            ToSearchFilterDto(filter),
+            new ClientRequests.SearchByCursorOptions
+            {
+                Take = take,
+                Cursor = cursor,
+                SortBy = sortBy,
+                SortOrder = ParseSearchSortOrder(sortOrder),
+                ValidateSearchFilter = validateSearchFilter,
+                TranslationCultureCode = translationCultureCode,
+                SensitiveObservations = sensitiveObservations
+            });
 
-        if (result.IsFailure)
-        {
-            return Result.Failure<SearchByCursorResultDto<Observation>>(result.Error);
-        }
-
-        var dto = result.Value;
         return Result.Success(new SearchByCursorResultDto<Observation>
         {
-            NextCursor = dto?.NextCursor,
-            Take = dto?.Take ?? 0,
-            TotalCount = dto?.TotalCount ?? 0,
-            Records = dto?.Records
+            NextCursor = response.NextCursor,
+            Take = response.Take,
+            TotalCount = response.TotalCount,
+            Records = response.Records.ToList()
         });
+    }
+
+    private static ApiModels.LocationClusteringAlgorithm ParseClusteringAlgorithm(string clusteringAlgorithm)
+    {
+        if (string.Equals(clusteringAlgorithm, "Greedy", StringComparison.OrdinalIgnoreCase))
+        {
+            return ApiModels.LocationClusteringAlgorithm.Sweref99TmGreedy;
+        }
+
+        if (string.Equals(clusteringAlgorithm, "FastGreedy", StringComparison.OrdinalIgnoreCase))
+        {
+            return ApiModels.LocationClusteringAlgorithm.Sweref99TmFastGreedy;
+        }
+
+        return Enum.TryParse<ApiModels.LocationClusteringAlgorithm>(clusteringAlgorithm, ignoreCase: true, out var value)
+            ? value
+            : ApiModels.LocationClusteringAlgorithm.Sweref99TmFastGreedy;
+    }
+
+    private static ContractSearchSortOrder ParseSearchSortOrder(string sortOrder)
+    {
+        return Enum.TryParse<ContractSearchSortOrder>(sortOrder, ignoreCase: true, out var value)
+            ? value
+            : ContractSearchSortOrder.Asc;
+    }
+
+    private static SearchFilterDto ToSearchFilterDto(SearchFilterInternalDto filter)
+    {
+        return new SearchFilterDto
+        {
+            BirdNestActivityLimit = filter.BirdNestActivityLimit,
+            DataProvider = filter.DataProvider,
+            DataStewardship = filter.DataStewardship,
+            Date = filter.Date,
+            DeterminationFilter = filter.DeterminationFilter,
+            DiffusionStatuses = filter.DiffusionStatuses,
+            Event = filter.Event,
+            ExcludeFilter = filter.ExcludeFilter,
+            Geographics = filter.Geographics,
+            ModifiedDate = filter.ModifiedDate,
+            NotRecoveredFilter = filter.NotRecoveredFilter,
+            ObservedByMe = filter.ObservedByMe,
+            OccurrenceStatus = filter.OccurrenceStatus,
+            ProjectIds = filter.ProjectIds,
+            ReportedByMe = filter.ReportedByMe,
+            Taxon = filter.Taxon,
+            VerificationStatus = filter.VerificationStatus,
+            Output = filter.Output is null
+                ? null
+                : new OutputFilterDto
+                {
+                    FieldSet = filter.Output.FieldSet,
+                    Fields = filter.Output.Fields
+                }
+        };
     }
 }

@@ -21,4 +21,8 @@
 	  <PackageReference Include="MudBlazor.ThemeManager" Version="4.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\SOS.Api.Contracts\SOS.Api.Contracts.csproj" />
+  </ItemGroup>
+
 </Project>

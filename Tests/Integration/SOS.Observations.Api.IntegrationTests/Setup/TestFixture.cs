@@ -1,10 +1,12 @@
 ﻿using Microsoft.ApplicationInsights.Extensibility;
+using SOS.Api.Client.Abstractions;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Models.Search.Result;
 using SOS.Observations.Api.IntegrationTests.Extensions;
 using SOS.Observations.Api.IntegrationTests.Setup.ContainerDbFixtures;
 using SOS.Observations.Api.IntegrationTests.Setup.LiveDbFixtures;
+using SOS.Api.Client.DependencyInjection;
 using System.Collections.Concurrent;
 
 namespace SOS.Observations.Api.IntegrationTests.Setup;
@@ -19,6 +21,7 @@ public class TestFixture : IAsyncLifetime
    
     // Change this to LiveDb when creating test data.
     private DbHostingMode _harvestFixtureDbMode = DbHostingMode.ContainerDb;
+    private ServiceProvider? _sosApiClientServiceProvider;
 
     /// <summary>
     /// The <see cref="ObservationsApiWebApplicationFactory"/> used to create the API client.
@@ -58,6 +61,26 @@ public class TestFixture : IAsyncLifetime
     public HttpClient CreateAnalysisApiClient()
     {
         return AnalysisApiFactory.CreateClient();
+    }
+
+    public ISosObservationsClient CreateSosObservationsClient()
+    {
+        return GetSosApiClientServiceProvider().GetRequiredService<ISosObservationsClient>();
+    }
+
+    public ISosObservationAggregationsClient CreateSosObservationAggregationsClient()
+    {
+        return GetSosApiClientServiceProvider().GetRequiredService<ISosObservationAggregationsClient>();
+    }        
+
+    public TClient CreateSosApiClient<TClient>() where TClient : notnull
+    {
+        return GetSosApiClientServiceProvider().GetRequiredService<TClient>();
+    }
+
+    public ISosSystemsStatusInfoClient CreateSosSystemsStatusInfoClient()
+    {
+        return GetSosApiClientServiceProvider().GetRequiredService<ISosSystemsStatusInfoClient>();
     }
 
     public HttpClient CreateApiClientWithReplacedService<TService>(TService service) where TService : class
@@ -124,6 +147,7 @@ public class TestFixture : IAsyncLifetime
     /// <returns>A task representing the asynchronous operation.</returns>
     public async ValueTask DisposeAsync()
     {
+        _sosApiClientServiceProvider?.Dispose();
         await ApiFactory.DisposeAsync();
         await AnalysisApiFactory.DisposeAsync();
     }
@@ -143,6 +167,26 @@ public class TestFixture : IAsyncLifetime
         // Make sure areas are initialized
         var areaHelper = ServiceProvider.GetService<IAreaHelper>()!;
         await areaHelper.InitializeAsync();
+    }
+
+    private ServiceProvider GetSosApiClientServiceProvider()
+    {
+        if (_sosApiClientServiceProvider != null)
+        {
+            return _sosApiClientServiceProvider;
+        }
+
+        var services = new ServiceCollection();
+        services.AddSosClients(
+            options => options.ObservationsApiBaseAddress = ApiFactory.Server.BaseAddress,
+            useResilience: false,
+            configureBuilder: builder =>
+            {
+                builder.ConfigurePrimaryHttpMessageHandler(() => ApiFactory.Server.CreateHandler());
+            });
+
+        _sosApiClientServiceProvider = services.BuildServiceProvider();
+        return _sosApiClientServiceProvider;
     }
 
     private enum DbHostingMode

@@ -1,0 +1,38 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PackageId>SOS.Api.Contracts</PackageId>
+    <Title>SOS API Contracts</Title>
+    <Description>Public contracts for the SOS Observations and Analysis APIs.</Description>
+    <PackageTags>sos;api;contracts;observations;analysis;exports;data-stewardship;geojson</PackageTags>
+    <Authors>SLU Artdatabanken</Authors>
+    <Company>SLU Artdatabanken</Company>
+    <PackageProjectUrl>https://github.com/biodiversitydata-se/SOS</PackageProjectUrl>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/biodiversitydata-se/SOS</RepositoryUrl>
+    <PackageLicenseExpression>EUPL-1.2</PackageLicenseExpression>
+    <PackageVersion>0.1.0</PackageVersion>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <Deterministic>true</Deterministic>
+    <EnablePackageValidation>true</EnablePackageValidation>
+    <RootNamespace>SOS.Api.Contracts</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="GeoJSON.Text" Version="1.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="README.md" />
+    <None Include="README.md" Pack="true" PackagePath="" />
+  </ItemGroup>
+
+</Project>

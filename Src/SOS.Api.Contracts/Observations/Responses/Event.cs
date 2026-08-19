@@ -1,0 +1,169 @@
+﻿using SOS.Api.Contracts.Lookups.Responses;
+
+namespace SOS.Api.Contracts.Observations.Responses;
+/// <summary>
+/// Event information about a species observation.
+/// </summary>
+public class Event
+{
+
+    /// <summary>
+    /// An identifier for the set of information associated with an Event (something that occurs at a place and time).
+    /// </summary>
+    public string? EventId { get; set; }
+
+    /// <summary>
+    /// Start date/time of the event in W. Europe Standard Time.
+    /// </summary>
+    public System.DateTimeOffset? StartDate { get; set; }
+
+    /// <summary>
+    /// Start day of year
+    /// </summary>
+    public int StartDayOfYear { get; set; }
+
+    /// <summary>
+    /// Divide year in 48 "weeks"
+    /// </summary>
+    public int? StartHistogramWeek { get; set; }
+
+    /// <summary>
+    /// Start year of the event, Swedish localization
+    /// </summary>
+    public int? StartYear { get; set; }
+
+    /// <summary>
+    /// Start month of the event, Swedish localization
+    /// </summary>
+    public int? StartMonth { get; set; }
+
+    /// <summary>
+    /// Start day of the event, Swedish localization
+    /// </summary>
+    public int? StartDay { get; set; }
+
+    /// <summary>
+    /// End date/time of the event in W. Europe Standard Time.
+    /// </summary>
+    public System.DateTimeOffset? EndDate { get; set; }
+
+    /// <summary>
+    /// Start day of year
+    /// </summary>
+    public int EndDayOfYear { get; set; }
+
+    /// <summary>
+    /// Divide year in 48 weeks
+    /// </summary>
+    public int? EndHistogramWeek { get; set; }
+
+    /// <summary>
+    /// End year of the event, Swedish localization
+    /// </summary>
+    public int? EndYear { get; set; }
+
+    /// <summary>
+    /// End month of the event, Swedish localization
+    /// </summary>
+    public int? EndMonth { get; set; }
+
+    /// <summary>
+    /// End day of the event, Swedish localization
+    /// </summary>
+    public int? EndDay { get; set; }
+
+    /// <summary>
+    /// Start date of the event in the format yyyy-MM-dd.
+    /// </summary>
+    public string? PlainStartDate { get; set; }
+
+    /// <summary>
+    /// End date of the event in the format yyyy-MM-dd.
+    /// </summary>
+    public string? PlainEndDate { get; set; }
+
+    /// <summary>
+    /// Start time of the event in W. Europe Standard Time formatted as hh:mm.
+    /// </summary>
+    public string? PlainStartTime { get; set; }
+
+    /// <summary>
+    /// End time of the event in W. Europe Standard Time formatted as hh:mm.
+    /// </summary>
+    public string? PlainEndTime { get; set; }
+
+    public VocabularyValue? DiscoveryMethod { get; set; }
+
+    /// <summary>
+    /// Comments or notes about the Event.
+    /// </summary>
+    public string? EventRemarks { get; set; }
+
+    /// <summary>
+    /// One of a) an indicator of the existence of, b) a
+    /// <br/>reference to (publication, URI), or c) the text of
+    /// <br/>notes taken in the field about the Event.
+    /// </summary>
+    public string? FieldNotes { get; set; }
+
+    /// <summary>
+    /// An identifier given to the event in the field. Often
+    /// <br/>serves as a link between field notes and the Event.
+    /// </summary>
+    public string? FieldNumber { get; set; }
+
+    /// <summary>
+    /// A category or description of the habitat in which the Event occurred.
+    /// </summary>
+    public string? Habitat { get; set; }
+
+    /// <summary>
+    /// Multimedia associated with the event.
+    /// </summary>
+    public ICollection<Multimedia>? Media { get; set; }
+
+    /// <summary>
+    /// Measurement or facts associated with the event.
+    /// </summary>
+    public ICollection<ExtendedMeasurementOrFact>? MeasurementOrFacts { get; set; }
+
+    /// <summary>
+    /// An identifier for the broader Event that groups this and potentially other Events.
+    /// </summary>
+    public string? ParentEventId { get; set; }
+
+    /// <summary>
+    /// The amount of effort expended during an Event.
+    /// </summary>
+    public string? SamplingEffort { get; set; }
+
+    /// <summary>
+    /// The name of, reference to, or description of the
+    /// <br/>method or protocol used during an Event.
+    /// </summary>
+    public string? SamplingProtocol { get; set; }
+
+    /// <summary>
+    /// The unit of measurement of the size (time duration, length, area, or volume) of a sample in a sampling event.
+    /// <br/>A sampleSizeUnit must have a corresponding sampleSizeValue, e.g., 5 for sampleSizeValue with metre for
+    /// <br/>sampleSizeUnit.
+    /// </summary>
+    public string? SampleSizeUnit { get; set; }
+
+    /// <summary>
+    /// A numeric value for a measurement of the size (time duration, length, area, or volume) of a sample in a sampling
+    /// <br/>event.
+    /// </summary>
+    public string? SampleSizeValue { get; set; }
+
+    /// <summary>
+    /// The verbatim original representation of the date and time information for an Event.
+    /// <br/>Examples: spring 1910, Marzo 2002, 1999-03-XX, 17IV1934.
+    /// </summary>
+    public string? VerbatimEventDate { get; set; }
+
+    public Weather? Weather { get; set; }
+
+}
+
+

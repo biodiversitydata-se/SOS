@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using SOS.Status.Web.Client.Dtos.SosObsApi;
-using SOS.Status.Web.Client.Models;
+using SOS.Api.Contracts.Observations.Requests;
 using SOS.Status.Web.Services;
 
 namespace SOS.Status.Web.Endpoints;
@@ -33,7 +32,7 @@ public static class ObservationSearchEndpoints
                             validateSearchFilter,
                             translationCultureCode,
                             sensitiveObservations);
-
+                        
                         return Results.Ok(result);
                     }
                     catch (ArgumentException ex)
@@ -166,4 +165,3 @@ public static class ObservationSearchEndpoints
         }
     }
 }
-

@@ -1,4 +1,4 @@
-﻿using Blazored.LocalStorage;
+using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting.StaticWebAssets;
@@ -10,7 +10,6 @@ using Serilog;
 using SOS.Lib.Helpers;
 using SOS.Status.Web.Cache;
 using SOS.Status.Web.Client.Abstractions;
-using SOS.Status.Web.Client.JsonConverters;
 using SOS.Status.Web.Client.Models;
 using SOS.Status.Web.Components;
 using SOS.Status.Web.Endpoints;
@@ -92,7 +91,6 @@ try
     {
         options.SerializerOptions.PropertyNameCaseInsensitive = true;
         options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
-        options.SerializerOptions.Converters.Add(new GeoJsonConverter());
     });
 
     builder.Services.Configure<ForwardedHeadersOptions>(options =>

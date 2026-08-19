@@ -2,8 +2,9 @@ using CSharpFunctionalExtensions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using MudBlazor;
-using SOS.Status.Web.Client.Dtos.SosObsApi;
-using SOS.Status.Web.Client.JsonConverters;
+using SOS.Api.Contracts.Common.Responses;
+using SOS.Api.Contracts.Observations.Requests;
+using SOS.Api.Contracts.Observations.Responses;
 using System.Diagnostics;
 using System.Text;
 using System.Text.Encodings.Web;
@@ -60,8 +61,7 @@ public partial class SearchByCursor
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         Converters =
         {
-            new JsonStringEnumConverter(),
-            new GeoJsonConverter()
+            new JsonStringEnumConverter()
         }
     };
 
