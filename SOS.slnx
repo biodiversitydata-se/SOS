@@ -20,6 +20,7 @@
     <File Path="Docs/Locations.md" />
     <File Path="Docs/Observation.md" />
     <File Path="Docs/ObsoleteProperties.md" />
+    <File Path="Docs/Publishing SOS API Client NuGet package.md" />
     <File Path="Docs/SearchFilter.md" />
     <File Path="Docs/SignalSearch.md" />
     <File Path="Docs/SignalSearchSv.md" />
@@ -144,8 +145,8 @@
     <Project Path="Src/SOS.Observations.Api/SOS.Observations.Api.csproj" />
   </Folder>
   <Folder Name="/Src/Client/">
-    <Project Path="Src/SOS.Api.Contracts/SOS.Api.Contracts.csproj" />
     <Project Path="Src/Sos.Api.Client/Sos.Api.Client.csproj" Id="b7eb7a0a-227e-4b7b-b840-27c23cc0bda6" />
+    <Project Path="Src/SOS.Api.Contracts/SOS.Api.Contracts.csproj" />
   </Folder>
   <Folder Name="/Src/Lib/">
     <Project Path="Src/SOS.Export/SOS.Export.csproj" />
@@ -173,8 +174,8 @@
   </Folder>
   <Folder Name="/Tests/Unit/">
     <Project Path="Tests/Unit/Fynddata.Api.UnitTests/Fynddata.Api.UnitTests.csproj" />
-    <Project Path="Tests/Unit/SOS.Api.Contracts.UnitTests/SOS.Api.Contracts.UnitTests.csproj" />
     <Project Path="Tests/Unit/SOS.Api.Client.UnitTests/SOS.Api.Client.UnitTests.csproj" />
+    <Project Path="Tests/Unit/SOS.Api.Contracts.UnitTests/SOS.Api.Contracts.UnitTests.csproj" />
     <Project Path="Tests/Unit/SOS.ElasticSearch.Proxy.UnitTests/SOS.ElasticSearch.Proxy.UnitTests.csproj" />
     <Project Path="Tests/Unit/SOS.Export.UnitTests/SOS.Export.UnitTests.csproj" />
     <Project Path="Tests/Unit/SOS.Import.UnitTests/SOS.Import.UnitTests.csproj" />
