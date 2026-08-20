@@ -1,0 +1,127 @@
+trigger:
+  branches:
+    include:
+      - master
+  tags:
+    include:
+      - sos-api-client-v*
+
+pool:
+  name: Default
+
+variables:
+  BuildConfiguration: Release
+  PackageOutput: $(Build.ArtifactStagingDirectory)/nuget
+
+steps:
+  - checkout: self
+    fetchDepth: 0
+
+  - task: UseDotNet@2
+    displayName: Install .NET SDK
+    inputs:
+      packageType: sdk
+      version: 10.0.302
+
+  - powershell: |
+      $sourceBranch = $env:BUILD_SOURCE_BRANCH
+      $releasePattern = '^refs/tags/sos-api-client-v(?<version>\d+\.\d+\.\d+(?:-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?)$'
+
+      if ($sourceBranch -like 'refs/tags/sos-api-client-v*') {
+        if ($sourceBranch -notmatch $releasePattern) {
+          throw "Release tag '$sourceBranch' is not a valid semantic version tag."
+        }
+
+        $version = $Matches.version
+        Write-Host "Release package version: $version"
+        Write-Host "##vso[task.setvariable variable=PublishPackages]true"
+      }
+      else {
+        $version = "0.0.0-ci.$env:BUILD_BUILDID"
+        Write-Host "CI package version: $version"
+        Write-Host "##vso[task.setvariable variable=PublishPackages]false"
+      }
+
+      Write-Host "##vso[task.setvariable variable=PackageVersion]$version"
+    displayName: Determine package version
+    env:
+      BUILD_SOURCE_BRANCH: $(Build.SourceBranch)
+      BUILD_BUILDID: $(Build.BuildId)
+
+  - task: NuGetAuthenticate@1
+    displayName: Authenticate NuGet feeds
+
+  - task: DotNetCoreCLI@2
+    displayName: Restore package tests
+    inputs:
+      command: restore
+      projects: |
+        Tests/Unit/SOS.Api.Contracts.UnitTests/SOS.Api.Contracts.UnitTests.csproj
+        Tests/Unit/SOS.Api.Client.UnitTests/SOS.Api.Client.UnitTests.csproj
+      feedsToUse: select
+      vstsFeed: Home/ADB-Common
+      includeNuGetOrg: true
+
+  - task: DotNetCoreCLI@2
+    displayName: Build package tests
+    inputs:
+      command: build
+      projects: |
+        Tests/Unit/SOS.Api.Contracts.UnitTests/SOS.Api.Contracts.UnitTests.csproj
+        Tests/Unit/SOS.Api.Client.UnitTests/SOS.Api.Client.UnitTests.csproj
+      arguments: >-
+        --configuration $(BuildConfiguration)
+        --no-restore
+        --verbosity minimal
+
+  - task: DotNetCoreCLI@2
+    displayName: Run package tests
+    inputs:
+      command: test
+      projects: |
+        Tests/Unit/SOS.Api.Contracts.UnitTests/SOS.Api.Contracts.UnitTests.csproj
+        Tests/Unit/SOS.Api.Client.UnitTests/SOS.Api.Client.UnitTests.csproj
+      arguments: >-
+        --configuration $(BuildConfiguration)
+        --no-build
+        --no-restore
+        --verbosity minimal
+      publishTestResults: true
+
+  # Pack also runs for branch and PR validation so packaging errors are caught
+  # before a release tag is created. Only tag builds publish to the feed.
+  - task: DotNetCoreCLI@2
+    displayName: Pack SOS API packages
+    inputs:
+      command: custom
+      custom: pack
+      projects: |
+        Src/SOS.Api.Contracts/SOS.Api.Contracts.csproj
+        Src/Sos.Api.Client/Sos.Api.Client.csproj
+      arguments: >-
+        --configuration $(BuildConfiguration)
+        --no-restore
+        --output "$(PackageOutput)"
+        --verbosity minimal
+        -p:Version=$(PackageVersion)
+        -p:PackageVersion=$(PackageVersion)
+        -p:ContinuousIntegrationBuild=true
+        -p:RepositoryCommit=$(Build.SourceVersion)
+
+  - task: PublishBuildArtifacts@1
+    displayName: Publish NuGet package artifact
+    condition: and(succeeded(), eq(variables['PublishPackages'], 'true'))
+    inputs:
+      PathtoPublish: $(PackageOutput)
+      ArtifactName: sos-api-packages
+      publishLocation: Container
+
+  - task: DotNetCoreCLI@2
+    displayName: Push packages to ADB-Common
+    condition: and(succeeded(), eq(variables['PublishPackages'], 'true'))
+    inputs:
+      command: push
+      packagesToPush: $(PackageOutput)/*.nupkg
+      nuGetFeedType: internal
+      publishVstsFeed: Home/ADB-Common
+      publishPackageMetadata: true
