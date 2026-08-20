@@ -60,7 +60,7 @@ public class HealthExternalController : ControllerBase
         {
             LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
             var start = DateTime.Now;
-            var healthCheck = await _healthCheckService.CheckHealthAsync(new System.Threading.CancellationToken());
+            var healthCheck = await _healthCheckService.CheckHealthAsync(HttpContext.RequestAborted);
             var entries = new Dictionary<string, HealthReportEntry>();
 
             var azureApiCheck = healthCheck.Entries?.Where(e => e.Key.Equals("Azure search API health check"))?.Select(d => d.Value)?.FirstOrDefault();

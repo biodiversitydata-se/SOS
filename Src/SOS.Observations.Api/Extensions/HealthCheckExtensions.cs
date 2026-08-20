@@ -64,7 +64,7 @@ public static class HealthCheckExtensions
                     healthChecks.AddCheck<APDbRestoreHealthCheck>("Artportalen database backup restore", tags: new[] { "database", "sql server" });
                     healthChecks.AddCheck<DwcaHealthCheck>("DwC-A files", tags: new[] { "dwca", "export" });
                     healthChecks.AddCheck<ApplicationInsightstHealthCheck>("Application Insights", tags: new[] { "application insights", "harvest" });
-                    healthChecks.AddCheck<WFSHealthCheck>("WFS", tags: new[] { "wfs" }); // add this to ST environment when we have a GeoServer test environment.
+                    healthChecks.AddCheck<WFSHealthCheck>("WFS", tags: new[] { "wfs" }, timeout: TimeSpan.FromSeconds(20)); // add this to ST environment when we have a GeoServer test environment.
                 }
             }
 
