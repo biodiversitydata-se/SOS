@@ -1,18 +1,18 @@
-using FluentAssertions;
+﻿using FluentAssertions;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using MongoDB.Driver;
 using Moq;
 using SOS.Lib.Cache;
+using SOS.Lib.Enums;
 using SOS.Lib.Managers;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.TaxonListService;
 using SOS.Lib.Models.TaxonTree;
 using SOS.Lib.Repositories.Resource.Interfaces;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using SOS.Lib.Services.Interfaces;
 using Xunit;
 
 namespace SOS.Export.UnitTests.Managers;
@@ -29,11 +29,13 @@ public class TaxonManagerTests
     {
         _processedTaxonRepositoryMock = new Mock<ITaxonRepository>();
         _taxonListRepositoryMock = new Mock<ITaxonListRepository>();
+        _artportalenTaxonRepositoryMock = new Mock<IArtportalenTaxonRepository>();
         _loggerMock = new Mock<ILogger<TaxonManager>>();
     }
 
     private readonly Mock<ITaxonRepository> _processedTaxonRepositoryMock;
     private readonly Mock<ITaxonListRepository> _taxonListRepositoryMock;
+    private readonly Mock<IArtportalenTaxonRepository> _artportalenTaxonRepositoryMock;
     private readonly Mock<ILogger<TaxonManager>> _loggerMock;
 
     /// <summary>
@@ -41,9 +43,10 @@ public class TaxonManagerTests
     /// </summary>
     private TaxonManager TestObject => new TaxonManager(
         _processedTaxonRepositoryMock.Object,
-        _taxonListRepositoryMock.Object,
-        new ClassCache<TaxonTree<IBasicTaxon>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<TaxonTree<IBasicTaxon>>>()),
-        new ClassCache<TaxonListSetsById>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<TaxonListSetsById>>()),
+        _taxonListRepositoryMock.Object,        
+        new ClassCache<Dictionary<TaxonomyType, TaxonTree<IBasicTaxon>>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<Dictionary<TaxonomyType, TaxonTree<IBasicTaxon>>>>()),
+        new ClassCache<TaxonListSetsById>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<TaxonListSetsById>>() ),
+        _artportalenTaxonRepositoryMock.Object,
         _loggerMock.Object);
 
     /// <summary>

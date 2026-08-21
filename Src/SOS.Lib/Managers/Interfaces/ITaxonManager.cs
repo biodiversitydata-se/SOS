@@ -1,4 +1,5 @@
-﻿using SOS.Lib.Models.Interfaces;
+﻿using SOS.Lib.Enums;
+using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.TaxonTree;
 
@@ -9,7 +10,7 @@ namespace SOS.Lib.Managers.Interfaces;
 /// </summary>
 public interface ITaxonManager
 {        
-    Task<TaxonTree<IBasicTaxon>> GetTaxonTreeAsync();
+    Task<TaxonTree<IBasicTaxon>> GetTaxonTreeAsync(TaxonomyType taxonomyType = TaxonomyType.Dyntaxa);
 
     /// <summary>
     /// Get taxon lists taxon ids.

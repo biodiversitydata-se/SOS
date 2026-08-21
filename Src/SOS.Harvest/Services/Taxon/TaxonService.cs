@@ -3,6 +3,7 @@ using RecordParser.Builders.Reader;
 using SOS.Harvest.Services.Taxon.Interfaces;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Helpers;
+using SOS.Lib.Models.ArtportalenApiService;
 using SOS.Lib.Models.DarwinCore;
 using SOS.Lib.Models.Processed.Observation;
 using System.IO.Compression;
@@ -75,8 +76,8 @@ public class TaxonService : ITaxonService
                 "Taxon.csv",
                 "TaxonNameProperties.csv",
                 "TaxonRelations.csv",
-                "TaxonProperties.csv"/*,
-                "TaxonCountyOccurrence.csv"*/}
+                "TaxonProperties.csv",
+                "NotAcceptedTaxa.csv"}
             .Where(f => !zipArchive.Entries.Select(e => e.Name).Contains(f, StringComparer.CurrentCultureIgnoreCase))
             .Select(f => f);
 
@@ -91,7 +92,7 @@ public class TaxonService : ITaxonService
             AddNames(taxa, zipArchive, csvFieldDelimiter);
             AddTaxonRelations(taxa, zipArchive, csvFieldDelimiter);
             AddTaxonProperties(taxa, zipArchive, csvFieldDelimiter);
-           // AddCountyOccurrence(taxa, zipArchive, csvFieldDelimiter);
+            AddNotAcceptedTaxa(taxa, zipArchive, csvFieldDelimiter);
             return taxa.Values;
         }
         catch (Exception e)
@@ -133,6 +134,17 @@ public class TaxonService : ITaxonService
         .Map(t => t.CountyId, 1)
         .Map(t => t.County, 2)
         .Map(t => t.Status, 3);
+
+    private IVariableLengthReaderBuilder<NotAcceptedTaxa<string>> NotAcceptedTaxaMapping => new VariableLengthReaderBuilder<NotAcceptedTaxa<string>>()
+        .Map(t => t.TaxonId, indexColumn: 0)
+        .Map(t => t.ScientificName, 1)
+        .Map(t => t.VernacularName, 2)
+        .Map(t => t.TaxonRemarks, 3)
+        .Map(t => t.ConceptDefinition, 4)
+        .Map(t => t.TaxonCategoryId, 5)
+        .Map(t => t.TaxonCategorySwedishName, 6)
+        .Map(t => t.TaxonCategoryEnglishName, 7)
+        .Map(t => t.TaxonCategoryDarwinCoreName, 8);
 
     private IVariableLengthReaderBuilder<TaxonProperties<string>> TaxonPropertiesMapping => new VariableLengthReaderBuilder<TaxonProperties<string>>()
         .Map(t => t.TaxonId, indexColumn: 0)
@@ -492,6 +504,56 @@ public class TaxonService : ITaxonService
             }
         }
         _logger.LogDebug("Finish adding county occurrence to taxon");
+    }
+
+    private void AddNotAcceptedTaxa(
+        Dictionary<string, DarwinCoreTaxon> taxa,
+        ZipArchive zipArchive,
+        string csvFieldDelimiter)
+    {
+        _logger.LogDebug("Start adding not accepted taxa to taxon");
+        // Try to get NotAcceptedTaxa.csv
+        var notAcceptedFile = zipArchive.Entries.FirstOrDefault(f =>
+            f.Name.Equals("NotAcceptedTaxa.csv", StringComparison.CurrentCultureIgnoreCase));
+
+        if (notAcceptedFile == null)
+        {
+            _logger.LogError("Failed to open NotAcceptedTaxa.csv");
+            return; // If no file found, we can't do anything more
+        }
+        // Read taxon properties data
+        using var csvFileHelper = new CsvFileHelper();
+        csvFileHelper.InitializeRead(notAcceptedFile.Open(), csvFieldDelimiter);
+
+        // Get taxon properties by guid
+        var allNotAcceptedTaxa = csvFileHelper
+            .GetRecords(NotAcceptedTaxaMapping)
+            .Select(m => new DarwinCoreTaxon
+            {
+                Id = GetTaxonIdfromDyntaxaGuid(m.TaxonId),
+                TaxonID = m.TaxonId,
+                ScientificName = m.ScientificName,
+                VernacularName = m.VernacularName,
+                DynamicProperties = new TaxonDynamicProperties
+                {
+                    IsNotAccepted = true,
+                    DyntaxaTaxonId = GetTaxonIdfromDyntaxaGuid(m.TaxonId),
+                    TaxonCategoryId = m.TaxonCategoryId,
+                    TaxonCategorySwedishName = m.TaxonCategorySwedishName,
+                    TaxonCategoryEnglishName = m.TaxonCategoryEnglishName,
+                    TaxonCategoryDarwinCoreName = m.TaxonCategoryDarwinCoreName
+                }
+            });
+        csvFileHelper.FinishRead();
+        var notAcceptedTaxaById = allNotAcceptedTaxa
+            .ToDictionary(g => g.TaxonID, g => g);
+
+        foreach (var taxon in notAcceptedTaxaById)
+        {
+            taxa.Add(taxon.Key, taxon.Value);
+        }
+
+        _logger.LogDebug("Finish adding not accepted taxa to taxon");
     }
 
     /// <summary>

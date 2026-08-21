@@ -1,14 +1,16 @@
 ﻿using FizzWare.NBuilder;
+using SOS.Lib.Dtos;
+using SOS.Lib.Dtos.Enum;
+using SOS.Lib.Dtos.Filter;
 using SOS.Lib.Enums;
+using SOS.Lib.Managers;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Verbatim.Artportalen;
+using SOS.Observations.Api.IntegrationTests.Helpers;
 using SOS.Observations.Api.IntegrationTests.Setup;
 using SOS.Observations.Api.IntegrationTests.TestData;
 using SOS.Observations.Api.IntegrationTests.TestData.Factories;
 using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
-using SOS.Lib.Dtos;
-using SOS.Lib.Dtos.Enum;
-using SOS.Lib.Dtos.Filter;
 
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsEndpoints.ObservationsBySearchEndpoint;
 
@@ -35,7 +37,7 @@ public class TaxonFilterTests : TestBase
              .TheNext(20).HaveRedlistedTaxonId("NT") // Near Threatened (Nära hotad)
              .TheNext(20).HaveRedlistedTaxonId(null) // Not redlisted taxa
             .Build();
-        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
+        var processedObservations = await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
         var apiClient = TestFixture.CreateApiClient();
 
         var searchFilter = new SearchFilterDto
@@ -48,11 +50,30 @@ public class TaxonFilterTests : TestBase
                 // Act
         var response = await apiClient.PostAsync($"/observations/search", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
         var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);
+        var debug = DebugTestOnlyRedlistCategoryFilter(verbatimObservations, processedObservations, result!.Records);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         result!.TotalCount.Should().Be(60,
             because: "60 out of 100 observations added to Elasticsearch had one of the Red List categories CR, EN, or VU.");
+    }
+
+    private List<TestResultItem> DebugTestOnlyRedlistCategoryFilter(
+    IList<ArtportalenObservationVerbatim> verbatimObservations,
+    IEnumerable<Observation> allObservations,
+    IEnumerable<Observation> resultObservations)
+    {
+        var testResultItems = DebugTestResultHelper.CreateTestResultSummary(verbatimObservations, allObservations, resultObservations);
+        foreach (var item in testResultItems)
+        {
+            item.VerbatimValue = item.VerbatimObservation?.TaxonId!.Value;
+            item.ProcessedValue = item.ProcessedObservation?.Taxon!.Attributes.RedlistCategory;
+        }
+
+        testResultItems = testResultItems
+            .OrderBy(m => m.ProcessedObservation?.Taxon!.Attributes.RedlistCategory)
+            .ToList();
+        return testResultItems;
     }
 
     [Fact]
@@ -88,6 +109,31 @@ public class TaxonFilterTests : TestBase
     }
 
     [Fact]
+    public async Task ObservationsBySearchEndpoint_ReturnsAsymmetricalResults_WhenComparingTaxonomies()
+    {
+        // Arrange        
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(20)
+            .All().HaveValuesFromPredefinedObservations()
+            .TheFirst(20).With(o => o.TaxonId = TaxonIds.GråtrutxHavstrut)
+            .Build();
+        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
+        var apiClient = TestFixture.CreateApiClient();
+
+        // Act
+        var dyntaxaResponse = await apiClient.PostAsync($"/observations/search", JsonContent.Create(SearchFilterDtoFactory.CreateWithTaxonIds(true, TaxonIds.Gråtrut)), TestContext.Current.CancellationToken);
+        var dyntaxaResult = await dyntaxaResponse.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(cancellationToken: TestContext.Current.CancellationToken);
+
+        var artportalenResponse = await apiClient.PostAsync($"/observations/search", JsonContent.Create(SearchFilterDtoFactory.CreateWithTaxonomyType(true, TaxonomyType.Artportalen, TaxonIds.Gråtrut)), TestContext.Current.CancellationToken);
+        var artportalenResult = await artportalenResponse.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(cancellationToken: TestContext.Current.CancellationToken);
+
+        // Assert
+        dyntaxaResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        artportalenResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        dyntaxaResult!.TotalCount.Should().Be(20, because: "all 20 observations added to Elasticsearch are considered underlying taxa to Gråtrut.");
+        artportalenResult!.TotalCount.Should().Be(0, because: "Artportalen taxonomy does not include the hybrid species added to Elasticsearch.");
+    }
+
+    [Fact]
     public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_WhenSearchingForUnderlyingTaxa()
     {
         // Arrange        
@@ -101,14 +147,7 @@ public class TaxonFilterTests : TestBase
             .Build();
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
         var apiClient = TestFixture.CreateApiClient();
-        var searchFilter = new SearchFilterDto
-        {
-            Taxon = new TaxonFilterDto
-            {
-                Ids = new int[] { TaxonIds.Mesar },
-                IncludeUnderlyingTaxa = true
-            }
-        };
+        var searchFilter = SearchFilterDtoFactory.CreateWithTaxonIds(true, TaxonIds.Mesar);
 
         // Act
         var response = await apiClient.PostAsync($"/observations/search", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);

@@ -19,4 +19,10 @@ public interface IArtportalenApiService
     /// <param name="sightingId"></param>
     /// <returns></returns>
     Task<List<MediaFile>> GetMediaBySightingIdAsync(int sightingId);
+
+    /// <summary>
+    /// Get taxon hierarchy from Artportalen API
+    /// </summary>
+    /// <returns></returns>
+    Task<TaxonHierarchyResponse> GetTaxonHierarchyAsync(int offset, int limit);
 }

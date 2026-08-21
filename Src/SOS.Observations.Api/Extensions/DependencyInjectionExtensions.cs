@@ -126,7 +126,7 @@ public static class DependencyInjectionExtensions
             services.AddSingleton<ICache<int, Taxon>, TaxonCache>();
             services.AddSingleton<ICache<int, TaxonList>, TaxonListCache>();
             services.AddSingleton<ICache<string, ProcessedConfiguration>, ProcessedConfigurationCache>();
-            services.AddSingleton<IClassCache<TaxonTree<IBasicTaxon>>, ClassCache<TaxonTree<IBasicTaxon>>>();
+            services.AddSingleton<IClassCache<Dictionary<TaxonomyType, TaxonTree<IBasicTaxon>>>, ClassCache<Dictionary<TaxonomyType,TaxonTree<IBasicTaxon>>>>();
             services.AddSingleton<IClassCache<TaxonListSetsById>, ClassCache<TaxonListSetsById>>();
             var taxonSumAggregationCache = new ClassCache<ConcurrentDictionary<int, TaxonSumAggregationItem>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<int, TaxonSumAggregationItem>>>()) { CacheDuration = TimeSpan.FromHours(48) };
             services.AddSingleton<IClassCache<ConcurrentDictionary<int, TaxonSumAggregationItem>>>(taxonSumAggregationCache);
@@ -176,6 +176,7 @@ public static class DependencyInjectionExtensions
             services.AddScoped<IProcessInfoRepository, ProcessInfoRepository>();
             services.AddScoped<IProtectedLogRepository, ProtectedLogRepository>();
             services.AddScoped<ITaxonRepository, TaxonRepository>();
+            services.AddScoped<IArtportalenTaxonRepository, ArtportalenTaxonRepository>();
             services.AddScoped<IVocabularyRepository, VocabularyRepository>();
             services.AddScoped<IProjectInfoRepository, ProjectInfoRepository>();
             services.AddScoped<ITaxonListRepository, TaxonListRepository>();

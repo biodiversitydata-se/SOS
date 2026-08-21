@@ -22,6 +22,7 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
+using SOS.Lib.Managers;
 
 namespace SOS.Observations.Api.Controllers;
 
@@ -276,6 +277,7 @@ public class SystemsController : ControllerBase
         [FromQuery] TaxonRelationDiagramHelper.TaxonRelationsTreeIterationMode treeIterationMode = TaxonRelationDiagramHelper.TaxonRelationsTreeIterationMode.BothParentsAndChildren,
         [FromQuery] bool includeSecondaryRelations = false,
         [FromQuery] DiagramFormat diagramFormat = DiagramFormat.Mermaid,
+        [FromQuery] TaxonomyType taxonomyType = TaxonomyType.Dyntaxa,
         [FromQuery] string translationCultureCode = "sv-SE")
     {
         try
@@ -284,7 +286,7 @@ public class SystemsController : ControllerBase
             IEnumerable<Vocabulary> vocabularies = await _vocabularyCache.GetAllAsync();
             var taxonCategoryVocabulary = vocabularies?.FirstOrDefault(v => v.Id == VocabularyId.TaxonCategory);
             Dictionary<int, string> taxonCategoryById = taxonCategoryVocabulary.CreateValueDictionary(CultureCodeHelper.GetCultureCode(translationCultureCode));
-            var taxonTree = await _taxonManager.GetTaxonTreeAsync();
+            var taxonTree = await _taxonManager.GetTaxonTreeAsync(taxonomyType);
             Result<string> strGraphRepresentation = null;
             if (diagramFormat == DiagramFormat.GraphViz)
             {

@@ -53,6 +53,11 @@ public class TaxonDynamicProperties
     public int? GbifTaxonId { get; set; }
 
     /// <summary>
+    /// True if taxon is not accepted according to Dyntaxa
+    /// </summary>
+    public bool IsNotAccepted { get; set; }
+
+    /// <summary>
     /// Organism Label 1
     /// </summary>
     public string? OrganismLabel1 { get; set; }

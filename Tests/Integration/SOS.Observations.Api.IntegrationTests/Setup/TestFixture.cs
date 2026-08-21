@@ -8,6 +8,8 @@ using SOS.Observations.Api.IntegrationTests.Setup.ContainerDbFixtures;
 using SOS.Observations.Api.IntegrationTests.Setup.LiveDbFixtures;
 using SOS.Api.Client.DependencyInjection;
 using System.Collections.Concurrent;
+using Moq;
+using SOS.Lib.Repositories.Resource.Interfaces;
 
 namespace SOS.Observations.Api.IntegrationTests.Setup;
 

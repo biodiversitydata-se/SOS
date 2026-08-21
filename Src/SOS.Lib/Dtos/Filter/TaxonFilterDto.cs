@@ -1,4 +1,5 @@
 ﻿using SOS.Lib.Dtos.Enum;
+using SOS.Lib.Enums;
 
 namespace SOS.Lib.Dtos.Filter;
 
@@ -22,4 +23,9 @@ public class TaxonFilterDto : TaxonFilterBaseDto
     /// Operator to use when TaxonListIds is specified. The operators are Merge or Filter.
     /// </summary>
     public TaxonListOperatorDto TaxonListOperator { get; set; } = TaxonListOperatorDto.Merge;
+
+    /// <summary>
+    /// Taxonomy type: Dyntaxa or Artportalen. Dyntaxa is the default and is used if no value is specified.
+    /// </summary>
+    public TaxonomyType TaxonomyType { get; set; } = TaxonomyType.Dyntaxa;
 }
