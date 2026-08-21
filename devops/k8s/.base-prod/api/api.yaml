@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: $(imageName)-api
 spec:
-  replicas: 3
+  replicas: 2
   template:
     spec:
       priorityClassName: high-priority
