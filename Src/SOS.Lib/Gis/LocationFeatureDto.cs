@@ -31,10 +31,10 @@ public class LocationFeatureDto
     public int ObservationCount { get; set; }
 
     /// <summary>
-    /// True when this non-clustered location was created from a representative observation rather than all
-    /// observations for the location.
-    /// </summary>    
-    public bool? IsSummaryApproximated { get; set; }
+    /// True when this location or, for a cluster, any of its member locations was created from a representative
+    /// observation rather than all observations for the location.
+    /// </summary>
+    public bool IsSummaryApproximated { get; set; }
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public ClusterDetailsDto? Cluster { get; set; }
@@ -106,20 +106,13 @@ public class LocationFeatureDto
         var presentationStatusCount = observationSummary != null
             ? CalculatePresentationStatusCount(observationSummary, cutoffYear)
             : CalculatePresentationStatusCount(locationFeature.Observations, cutoffYear);
-        var distinctLocationIds = locationFeature.Locations
-            .Select(location => location.DistinctLocationId)
-            .Distinct(StringComparer.Ordinal)
-            .ToList();
 
         return new LocationFeatureDto
         {
             IsCluster = locationFeature.IsCluster,
             Geometry = locationFeature.Geometry,
             DebugObservations = debugObservations,
-            IsSummaryApproximated = !locationFeature.IsCluster &&
-                                    locationFeature.IsSummaryApproximated == true
-                ? true
-                : null,
+            IsSummaryApproximated = locationFeature.IsSummaryApproximated == true,
             Cluster = locationFeature.IsCluster
                 ? new ClusterDetailsDto
                 {
@@ -138,13 +131,12 @@ public class LocationFeatureDto
             Locations = new LocationsDto
             {
                 Count = locationFeature.LocationCount,
-                Ids = locationIds?.Distinct(StringComparer.OrdinalIgnoreCase).ToList() ??
+                Ids = locationIds ??
                       locationFeature.Observations
                           .Select(observation => GetLocationId(observation.Location))
                           .Where(locationId => !string.IsNullOrWhiteSpace(locationId))
                           .Distinct(StringComparer.OrdinalIgnoreCase)
                           .ToList(),
-                //DistinctIds = distinctLocationIds,
                 Location = location
             },
             ObservationSummary = new ObservationSummaryDto

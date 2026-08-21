@@ -20,4 +20,13 @@ public interface ISosObservationSearchService
         SearchFilterInternalBaseDto filter,
         SosRoleRequestOptions? options = null,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Performs an adaptive location search and parses the GeoJSON result into a strongly-typed feature
+    /// collection instead of a raw GeoJSON string.
+    /// </summary>
+    Task<(AdaptiveSearchLocationsResponse Response, AdaptiveSearchLocationsFeatureCollectionDto FeatureCollection)> AdaptiveSearchLocationsInternalAsFeatureCollectionAsync(
+        SearchFilterInternalDto filter,
+        AdaptiveSearchLocationsOptions? options = null,
+        CancellationToken cancellationToken = default);
 }

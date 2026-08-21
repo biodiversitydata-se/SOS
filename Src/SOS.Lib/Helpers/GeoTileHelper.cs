@@ -8,10 +8,17 @@ public static class GeoTileHelper
     private const int MaxElasticsearchZoom = 29;
 
     public static int CalculateGeotileZoom(
-        LatLonBoundingBox bbox,
+        LatLonBoundingBox? bbox,
         int maxBuckets,
         int maxZoom)
     {
+        if (bbox?.TopLeft == null || bbox.BottomRight == null)
+        {
+            // No extent could be calculated (e.g. no observations have coordinates). Fall back to the
+            // whole world, which yields the lowest (safest) zoom level.
+            return 0;
+        }
+
         // 1. Calculate width and height in degrees
         double width = Math.Abs(bbox.TopLeft.Longitude - bbox.BottomRight.Longitude);
         double height = Math.Abs(bbox.TopLeft.Latitude - bbox.BottomRight.Latitude);

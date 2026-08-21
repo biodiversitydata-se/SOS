@@ -2324,8 +2324,7 @@ public class ObservationsController : ControllerBase
 
         if (result.ResultType == "geogrid")
         {
-            var bytes = Encoding.UTF8.GetBytes(result.GeoJson ?? string.Empty);
-            await Response.Body.WriteAsync(bytes);
+            await Response.WriteAsync(result.GeoJson ?? string.Empty, Encoding.UTF8);
             await Response.Body.FlushAsync();
             return new EmptyResult();
         }

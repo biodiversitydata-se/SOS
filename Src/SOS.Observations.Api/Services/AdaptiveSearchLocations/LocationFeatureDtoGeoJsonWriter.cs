@@ -47,7 +47,6 @@ internal static class LocationFeatureDtoGeoJsonWriter
         await using var jsonWriter = new Utf8JsonWriter(response.BodyWriter, JsonWriterOptions);
         jsonWriter.WriteStartObject();
         jsonWriter.WriteString("type", "FeatureCollection");
-        jsonWriter.WriteString("crs", "EPSG:4326");
         WriteGeoJsonBbox(jsonWriter, bbox);
         jsonWriter.WritePropertyName("features");
         jsonWriter.WriteStartArray();

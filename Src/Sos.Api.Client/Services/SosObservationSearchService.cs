@@ -74,6 +74,21 @@ public sealed class SosObservationSearchService : ISosObservationSearchService
         return count > 0;
     }
 
+    /// <inheritdoc />
+    public async Task<(AdaptiveSearchLocationsResponse Response, AdaptiveSearchLocationsFeatureCollectionDto FeatureCollection)> AdaptiveSearchLocationsInternalAsFeatureCollectionAsync(
+        SearchFilterInternalDto filter,
+        AdaptiveSearchLocationsOptions? options = null,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(filter);
+        var response = await _sosObservationsClient.AdaptiveSearchLocationsInternalAsync(
+            filter,
+            options,
+            cancellationToken);
+        var featureCollection = AdaptiveSearchLocationsGeoJsonParser.Parse(response.GeoJson);
+        return (response, featureCollection);
+    }
+
     private static ObservationByIdInternalOptions CloneObservationOptions(
         ObservationByIdInternalOptions? source)
     {

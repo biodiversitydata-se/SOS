@@ -132,10 +132,19 @@ public static class GeoExtensions
         }
     }
 
-    extension(LatLonBoundingBox latLonBoundingBox)
+    extension(LatLonBoundingBox? latLonBoundingBox)
     {
-        public LatLonBoundingBoxDto ToLatLonBoundingBoxDto()
+        /// <summary>
+        /// Converts to a bounding box DTO, or null when the bounding box is null (e.g. no observations
+        /// matched the search, so no extent could be calculated).
+        /// </summary>
+        public LatLonBoundingBoxDto? ToLatLonBoundingBoxDto()
         {
+            if (latLonBoundingBox?.TopLeft == null || latLonBoundingBox?.BottomRight == null)
+            {
+                return null;
+            }
+
             return new LatLonBoundingBoxDto
             {
                 TopLeft = latLonBoundingBox.TopLeft.ToLatLonCoordinateDto(),
@@ -143,8 +152,17 @@ public static class GeoExtensions
             };
         }
 
-        public XYBoundingBoxDto ToXYBoundingBoxDto()
+        /// <summary>
+        /// Converts to a bounding box DTO, or null when the bounding box is null (e.g. no observations
+        /// matched the search, so no extent could be calculated).
+        /// </summary>
+        public XYBoundingBoxDto? ToXYBoundingBoxDto()
         {
+            if (latLonBoundingBox?.TopLeft == null || latLonBoundingBox?.BottomRight == null)
+            {
+                return null;
+            }
+
             return new XYBoundingBoxDto
             {
                 TopLeft = latLonBoundingBox.TopLeft.ToXYCoordinateDto(),

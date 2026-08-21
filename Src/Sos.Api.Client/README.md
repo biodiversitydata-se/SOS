@@ -16,9 +16,14 @@ builder.Services.AddSosWebClients(options =>
 
 `AddSosWebClients` relays the current ASP.NET Core access token. Use `AddSosClients` when authentication is supplied by a custom HTTP handler.
 
-## Using the client
+## Clients and services
 
-Consumers can inject a specific raw client or service, or use `SosClient` as a single entry point:
+The library has two API layers:
+
+- Clients map directly to SOS endpoints. Use them when one API call is sufficient.
+- Services compose calls or add behavior such as sensitive-observation checks, GeoJSON parsing, area caching, export paging and workspace filter creation.
+
+`SosClient` is a convenient single entry point to both layers. For example, `Observations` is a raw endpoint client:
 
 ```csharp
 public sealed class ObservationReader(SosClient sos)
@@ -30,7 +35,22 @@ public sealed class ObservationReader(SosClient sos)
 }
 ```
 
-Raw clients represent individual SOS endpoints. Services compose reusable workflows such as sensitive-observation detection, paged export jobs and workspace filter creation. Raw clients can also be constructed directly with an appropriately configured `HttpClient` for tests or non-DI scenarios.
+For a narrower dependency, inject the required client or service directly. This service performs a sensitive-only count without changing the supplied filter:
+
+```csharp
+public sealed class SensitiveObservationChecker(
+    ISosObservationSearchService observationSearch)
+{
+    public Task<bool> HasSensitiveAsync(
+        SearchFilterInternalDto filter,
+        CancellationToken cancellationToken) =>
+        observationSearch.HasSensitiveObservationsAsync(
+            filter,
+            cancellationToken: cancellationToken);
+}
+```
+
+The same service is available as `sos.ObservationSearch`. Prefer direct injection when a class only needs one client or service; use `SosClient` when a workflow naturally uses several. Raw clients can also be constructed directly with an appropriately configured `HttpClient` for tests or non-DI scenarios.
 
 The observation client includes both public and internal observation-by-id methods. Adaptive search returns the response body together with the SOS result headers; deserialize JSON bodies to `AdaptiveSearchResultDto<Observation>` when `OutputFormatDto.Json` is selected. `ISosLookupService.GetAreaWithGeometryAsync` handles the zipped area export and caches the geometry.
 

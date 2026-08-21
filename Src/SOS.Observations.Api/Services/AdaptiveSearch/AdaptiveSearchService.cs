@@ -165,7 +165,8 @@ internal sealed class AdaptiveSearchService : IAdaptiveSearchService
 
         if (request.OutputFormat == OutputFormatDto.Json || request.OutputFormat == OutputFormatDto.JsonByLocation)
         {
-            var geogridResult = res.ToGeoGridResultDto(bbox.ToEnvelope().CalculateNumberOfTiles(zoom));
+            var tileCount = bbox != null ? bbox.ToEnvelope().CalculateNumberOfTiles(zoom) : 0;
+            var geogridResult = res.ToGeoGridResultDto(tileCount);
             var geographicAreas = request.IncludeFilterAreasInResult
                 ? await _observationManager.GetGeographicsFiltersAsAreaTuplesAsync(searchFilter)
                 : null;
