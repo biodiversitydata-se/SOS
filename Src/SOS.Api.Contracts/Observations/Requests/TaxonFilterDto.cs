@@ -1,6 +1,4 @@
-﻿using SOS.Api.Contracts.Observations.Responses;
-
-namespace SOS.Api.Contracts.Observations.Requests;
+﻿namespace SOS.Api.Contracts.Observations.Requests;
 /// <summary>
 /// Taxon filter.
 /// </summary>
@@ -42,6 +40,8 @@ public class TaxonFilterDto
     [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
     public TaxonListOperatorDto TaxonListOperator { get; set; }
 
+    [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+    public TaxonomyTypeDto TaxonomyType { get; set; }
 }
 
 
