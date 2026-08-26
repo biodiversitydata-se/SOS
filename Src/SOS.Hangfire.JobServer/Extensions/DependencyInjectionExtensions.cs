@@ -145,6 +145,7 @@ public static class DependencyInjectionExtensions
             var userServiceConfiguration = configuration.GetSection(nameof(UserServiceConfiguration)).Get<UserServiceConfiguration>();
             var areaConfiguration = configuration.GetSection(nameof(AreaConfiguration)).Get<AreaConfiguration>();
             areaConfiguration.ExcludeParishGeometries = excludeParishGeometries;
+            var artportalenApiServiceConfiguration = configuration.GetSection(nameof(ArtportalenApiServiceConfiguration)).Get<ArtportalenApiServiceConfiguration>();
 
             // Elasticsearch
             bool isRunningDotNetAspire = Environment.GetEnvironmentVariable("RUNNING_IN_ASPIRE").GetBoolean();
@@ -185,6 +186,7 @@ public static class DependencyInjectionExtensions
             services.AddSingleton(processConfiguration.TaxonAttributeServiceConfiguration);
             services.AddSingleton(processConfiguration.TaxonServiceConfiguration);
             services.AddSingleton(processConfiguration);
+            services.AddSingleton(artportalenApiServiceConfiguration);
 
             // MongoDb VerbatimClient
             var verbatimSettings = verbatimDbConfiguration.GetMongoDbSettings();
@@ -205,7 +207,7 @@ public static class DependencyInjectionExtensions
             services.AddSingleton<ICache<int, TaxonList>, TaxonListCache>();
             services.AddSingleton<ICache<VocabularyId, Vocabulary>, VocabularyCache>();
             services.AddSingleton<ICache<int, ProjectInfo>, ProjectCache>();
-            services.AddSingleton<IClassCache<TaxonTree<IBasicTaxon>>, ClassCache<TaxonTree<IBasicTaxon>>>();
+            services.AddSingleton<IClassCache<Dictionary<TaxonomyType, TaxonTree<IBasicTaxon>>>, ClassCache<Dictionary<TaxonomyType, TaxonTree<IBasicTaxon>>>>();
             services.AddSingleton<IClassCache<TaxonListSetsById>, ClassCache<TaxonListSetsById>>();
             var clusterHealthCache = new ClassCache<ConcurrentDictionary<string, HealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<string, HealthResponse>>>()) { CacheDuration = TimeSpan.FromMinutes(2) };
             services.AddSingleton<IClassCache<ConcurrentDictionary<string, HealthResponse>>>(clusterHealthCache);
@@ -256,6 +258,7 @@ public static class DependencyInjectionExtensions
             services.AddScoped<IProcessInfoRepository, ProcessInfoRepository>();
             services.AddScoped<IReportRepository, ReportRepository>();
             services.AddScoped<Lib.Repositories.Resource.Interfaces.ITaxonRepository, Lib.Repositories.Resource.TaxonRepository>();
+            services.AddScoped<IArtportalenTaxonRepository, ArtportalenTaxonRepository>();
             services.AddScoped<ITaxonListRepository, TaxonListRepository>();
             services.AddScoped<IVocabularyRepository, VocabularyRepository>();
 
@@ -315,6 +318,7 @@ public static class DependencyInjectionExtensions
             services.AddScoped<IVirtualHerbariumObservationProcessor, VirtualHerbariumObservationProcessor>();
             services.AddScoped<IiNaturalistObservationProcessor, iNaturalistObservationProcessor>();
             services.AddScoped<ITaxonProcessor, TaxonProcessor>();
+            services.AddScoped<IArtportalenTaxonProcessor, ArtportalenTaxonProcessor>();
             services.AddScoped<IDwcaDatasetProcessor, DwcaDatasetProcessor>();
             services.AddScoped<IArtportalenDatasetProcessor, ArtportalenDatasetProcessor>();
             services.AddScoped<IArtportalenEventProcessor, ArtportalenEventProcessor>();
@@ -386,6 +390,7 @@ public static class DependencyInjectionExtensions
             services.AddScoped<ITaxonServiceProxy, TaxonServiceProxy>();
             services.AddScoped<ITaxonListService, TaxonListService>();
             services.AddScoped<IUserService, UserService>();
+            services.AddSingleton<IArtportalenApiService, ArtportalenApiService>();
 
             // Add managers
             services.AddScoped<IApiUsageStatisticsManager, ApiUsageStatisticsManager>();
@@ -420,6 +425,7 @@ public static class DependencyInjectionExtensions
             services.AddScoped<IProcessObservationsJobFull, ProcessObservationsJobFull>();
             services.AddScoped<IProcessObservationsJobIncremental, ProcessObservationsJobIncremental>();
             services.AddScoped<IProcessTaxaJob, ProcessTaxaJob>();
+            services.AddScoped<IProcessArtportalenTaxaJob, ProcessArtportalenTaxaJob>();
             services.AddScoped<IProjectsHarvestJob, ProjectsHarvestJob>();
             services.AddScoped<ITaxonListsHarvestJob, TaxonListsHarvestJob>();
             services.AddScoped<IVocabulariesImportJob, VocabulariesImportJob>();

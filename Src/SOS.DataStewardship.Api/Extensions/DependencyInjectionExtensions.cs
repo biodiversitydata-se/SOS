@@ -32,7 +32,7 @@ internal static class DependencyInjectionExtensions
             webApplicationBuilder.Services.AddSingleton(settings.UserServiceConfiguration);
 
             // Cache
-            webApplicationBuilder.Services.AddSingleton<IClassCache<TaxonTree<IBasicTaxon>>, ClassCache<TaxonTree<IBasicTaxon>>>();
+            webApplicationBuilder.Services.AddSingleton<IClassCache<Dictionary<TaxonomyType, TaxonTree<IBasicTaxon>>>, ClassCache<Dictionary<TaxonomyType, TaxonTree<IBasicTaxon>>>>();
             webApplicationBuilder.Services.AddSingleton<ICache<string, ProcessedConfiguration>, ProcessedConfigurationCache>();
             webApplicationBuilder.Services.AddSingleton<IClassCache<TaxonListSetsById>, ClassCache<TaxonListSetsById>>();
             webApplicationBuilder.Services.AddSingleton<IAreaCache, AreaCache>();
@@ -52,6 +52,7 @@ internal static class DependencyInjectionExtensions
             // Repositories
             webApplicationBuilder.Services.AddSingleton<IProcessedConfigurationRepository, ProcessedConfigurationRepository>();
             webApplicationBuilder.Services.AddScoped<ITaxonRepository, TaxonRepository>();
+            webApplicationBuilder.Services.AddScoped<IArtportalenTaxonRepository, ArtportalenTaxonRepository>();
             webApplicationBuilder.Services.AddScoped<ITaxonListRepository, TaxonListRepository>();
             webApplicationBuilder.Services.AddScoped<IDatasetRepository, DatasetRepository>();
             webApplicationBuilder.Services.AddScoped<IEventRepository, EventRepository>();

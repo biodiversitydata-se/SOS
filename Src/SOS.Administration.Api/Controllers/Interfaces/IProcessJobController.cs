@@ -19,4 +19,10 @@ public interface IProcessJobController
     /// </summary>
     /// <returns></returns>
     IActionResult RunProcessTaxaJob();
+
+    /// <summary>
+    ///     Run Artportalen taxa job.
+    /// </summary>
+    /// <returns></returns>
+    IActionResult RunProcessArtportalenTaxaJob();
 }

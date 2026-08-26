@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using SOS.Lib.Enums;
+using SOS.Lib.Managers;
+using System.Collections.Generic;
 
 namespace SOS.Lib.Models.Search.Filters;
 
@@ -77,4 +79,9 @@ public class TaxonFilter
     /// Operator to use when TaxonListIds is specified. The operators are Merge or Filter.
     /// </summary>
     public TaxonListOp TaxonListOperator { get; set; } = TaxonListOp.Merge;
+
+    /// <summary>
+    /// Taxonomy type: Dyntaxa or Artportalen. Default is Dyntaxa.
+    /// </summary>
+    public TaxonomyType TaxonomyType { get; set; } = TaxonomyType.Dyntaxa;
 }

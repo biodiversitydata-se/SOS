@@ -1,5 +1,6 @@
 ﻿using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
+using SOS.Lib.Enums;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Services.Interfaces;
@@ -64,13 +65,15 @@ public interface IFilterManager
     /// <param name="listOperator"></param>
     /// <param name="taxonCategories"></param>
     /// <param name="returnBiotaResultAsNull"></param>
+    /// <param name="taxonomyType"></param>
     /// <returns></returns>
     Task<List<int>> GetTaxonIdsAsync(IEnumerable<int> taxonIds,
         bool includeUnderlyingTaxa,
         IEnumerable<int> listIds,
         TaxonFilter.TaxonListOp listOperator = TaxonFilter.TaxonListOp.Merge,
         IEnumerable<int> taxonCategories = null,
-        bool returnBiotaResultAsNull = true);
+        bool returnBiotaResultAsNull = true,
+        TaxonomyType taxonomyType = TaxonomyType.Dyntaxa);
 
     /// <summary>
     /// Get taxon ids from filter.

@@ -251,7 +251,7 @@ public class iNaturalistObservationFactoryTests : TestBase
         processedObservation.Occurrence.OccurrenceRemarks.Should().Be("Hungry and lonely Baltic lesser black backed gull circling over central Stockholm");
         processedObservation.Occurrence.RecordedBy.Should().Be("paco");     
         processedObservation.Taxon.Id.Should().Be(100071);
-        processedObservation.Taxon.Attributes.RedlistCategory.Should().Be("VU");
+        processedObservation.Taxon.Attributes.RedlistCategory.Should().Be("NT");
         processedObservation.Taxon.Attributes.OrganismGroup.Should().Be("Fåglar");
         processedObservation.Taxon.VernacularName.Should().Be("östersjötrut");
         processedObservation.Taxon.ScientificName.Should().Be("Larus fuscus fuscus");

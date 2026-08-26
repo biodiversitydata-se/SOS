@@ -173,7 +173,6 @@
     <Project Path="Tests/Integration/SOS.Observations.Api.IntegrationTests/SOS.Observations.Api.IntegrationTests.csproj" />
   </Folder>
   <Folder Name="/Tests/Unit/">
-    <Project Path="Tests/Unit/Fynddata.Api.UnitTests/Fynddata.Api.UnitTests.csproj" />
     <Project Path="Tests/Unit/SOS.Api.Client.UnitTests/SOS.Api.Client.UnitTests.csproj" />
     <Project Path="Tests/Unit/SOS.Api.Contracts.UnitTests/SOS.Api.Contracts.UnitTests.csproj" />
     <Project Path="Tests/Unit/SOS.ElasticSearch.Proxy.UnitTests/SOS.ElasticSearch.Proxy.UnitTests.csproj" />

@@ -19,6 +19,7 @@ using SOS.Lib.Repositories.Processed;
 using System.Collections.Concurrent;
 using Elastic.Clients.Elasticsearch.Cluster;
 using SOS.ElasticSearch.Proxy.ApplicationInsights;
+using SOS.Lib.Enums;
 
 namespace SOS.ElasticSearch.Proxy.Extensions;
 
@@ -75,13 +76,14 @@ public static class DependencyInjectionExtensions
             services.AddScoped<IProcessedConfigurationRepository, ProcessedConfigurationRepository>();
             services.AddScoped<IProcessedObservationCoreRepository, ProcessedObservationCoreRepository>();
             services.AddScoped<ITaxonRepository, TaxonRepository>();
+            services.AddScoped<IArtportalenTaxonRepository, ArtportalenTaxonRepository>();
             services.AddScoped<ITaxonListRepository, TaxonListRepository>();
 
             // Add managers
             services.AddSingleton<ITaxonManager, TaxonManager>();
 
             // Add caches
-            services.AddSingleton<IClassCache<TaxonTree<IBasicTaxon>>, ClassCache<TaxonTree<IBasicTaxon>>>();
+            services.AddSingleton<IClassCache<Dictionary<TaxonomyType, TaxonTree<IBasicTaxon>>>, ClassCache<Dictionary<TaxonomyType, TaxonTree<IBasicTaxon>>>>();
             services.AddSingleton<IClassCache<TaxonListSetsById>, ClassCache<TaxonListSetsById>>();
 
             return services;

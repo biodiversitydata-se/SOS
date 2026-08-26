@@ -290,6 +290,10 @@ public class Taxon
     /// </summary>
     public string? VerbatimName { get; set; }
 
+    /// <summary>
+    /// True if taxon is not accepted according to Dyntaxa
+    /// </summary>
+    public bool IsNotAccepted { get; set; }
 }
 
 

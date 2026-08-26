@@ -42,6 +42,8 @@ using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Repositories.Resource;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Repositories.Verbatim.Interfaces;
+using SOS.Lib.Services;
+using SOS.Lib.Services.Interfaces;
 using SOS.Observations.Api.IntegrationTests.Extensions;
 using SOS.Observations.Api.IntegrationTests.Helpers;
 using SOS.Observations.Api.IntegrationTests.Setup.Stubs;
@@ -52,12 +54,13 @@ using SOS.Lib.Dtos;
 using System.Collections.Concurrent;
 
 namespace SOS.Observations.Api.IntegrationTests.Setup.ContainerDbFixtures;
+
 public class ProcessFixture : IProcessFixture
 {
     private IProcessClient _processClient;
     private IAreaHelper _areaHelper;
     private DwcaObservationFactory? _darwinCoreFactory;
-    private iNaturalistObservationFactory? _iNaturalistFactory;    
+    private iNaturalistObservationFactory? _iNaturalistFactory;
     private DwcaEventFactory? _dwcaEventFactory;
     private DwcaDatasetFactory? _dwcaDatasetFactory;
     private IVocabularyRepository _vocabularyRepository;
@@ -122,7 +125,7 @@ public class ProcessFixture : IProcessFixture
         _artportalenDatasetMetadataRepository = artportalenDatasetMetadataRepository;
         _processedChecklistRepository = processedChecklistRepository;
         _artportalenDatasetProcessor = artportalenDatasetProcessor;
-        _artportalenEventProcessor = artportalenEventProcessor;        
+        _artportalenEventProcessor = artportalenEventProcessor;
 
         InitializeAsync().Wait();
     }
@@ -143,7 +146,7 @@ public class ProcessFixture : IProcessFixture
         serviceCollection.AddSingleton<IElasticClientManager, ElasticClientTestManager>();
         serviceCollection.AddSingleton<IDatasetRepository, DatasetRepository>();
         serviceCollection.AddSingleton<IEventRepository, EventRepository>();
-        serviceCollection.AddSingleton<IClassCache<TaxonTree<IBasicTaxon>>, ClassCache<TaxonTree<IBasicTaxon>>>();
+        serviceCollection.AddSingleton<IClassCache<Dictionary<TaxonomyType, TaxonTree<IBasicTaxon>>>, ClassCache<Dictionary<TaxonomyType, TaxonTree<IBasicTaxon>>>>();
         serviceCollection.AddSingleton<IClassCache<TaxonListSetsById>, ClassCache<TaxonListSetsById>>();
         var clusterHealthCache = new ClassCache<ConcurrentDictionary<string, HealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<string, HealthResponse>>>()) { CacheDuration = TimeSpan.FromMinutes(2) };
         serviceCollection.AddSingleton<IClassCache<ConcurrentDictionary<string, HealthResponse>>>(clusterHealthCache);
@@ -152,6 +155,7 @@ public class ProcessFixture : IProcessFixture
         var taxonAggregationInternalCache = new ClassCache<ConcurrentDictionary<string, CacheEntry<PagedResultDto<TaxonAggregationItemDto>>>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<string, CacheEntry<PagedResultDto<TaxonAggregationItemDto>>>>>()) { CacheDuration = TimeSpan.FromHours(1) };
         serviceCollection.AddSingleton<IClassCache<ConcurrentDictionary<string, CacheEntry<PagedResultDto<TaxonAggregationItemDto>>>>>(taxonAggregationInternalCache);
         serviceCollection.AddSingleton<ITaxonListRepository, TaxonListRepository>();
+        serviceCollection.AddSingleton<IArtportalenTaxonRepository, ArtportalenTaxonRepository>();
         serviceCollection.AddSingleton<ITaxonManager, TaxonManager>();
         serviceCollection.AddSingleton<IProcessedTaxonRepository, ProcessedTaxonRepository>();
         serviceCollection.AddSingleton<IProcessedObservationRepository, ProcessedObservationRepository>();
@@ -166,7 +170,7 @@ public class ProcessFixture : IProcessFixture
         serviceCollection.AddSingleton<ArtportalenDatasetProcessor>();
         serviceCollection.AddSingleton<ArtportalenEventProcessor>();
         serviceCollection.AddSingleton<VirtualHerbariumObservationProcessor>();
-        serviceCollection.AddSingleton<IVocabularyRepository, VocabularyRepository>();        
+        serviceCollection.AddSingleton<IVocabularyRepository, VocabularyRepository>();
         serviceCollection.AddSingleton<IProcessedChecklistRepository, ProcessedChecklistRepository>();
         VocabularyConfiguration vocabularyConfiguration = new VocabularyConfiguration()
         {
@@ -210,7 +214,7 @@ public class ProcessFixture : IProcessFixture
 
     private async Task InitializeAsync()
     {
-        _taxa = await _taxonRepository.GetAllAsync();
+        _taxa = [.. (await _taxonRepository.GetAllAsync()).Where(t => !t.IsNotAccepted)];
         _taxaById = _taxa.ToDictionary(m => m.Id, m => m);
 
         var vocabularies = await _vocabularyRepository.GetAllAsync();
@@ -355,12 +359,12 @@ public class ProcessFixture : IProcessFixture
             var dataProvider = new DataProvider() { Id = 19, Identifier = "iNaturalist" };
             _areaHelper = new AreaHelper(new AreaConfiguration() { ExcludeParishGeometries = true }, new AreaRepository(_processClient, new NullLogger<AreaRepository>()));
             _iNaturalistFactory = new iNaturalistObservationFactory(
-                dataProvider, 
-                _taxaById, 
+                dataProvider,
+                _taxaById,
                 _dwcaVocabularyById,
                 _areaHelper,
-                _processTimeManager, 
-                _processConfiguration, new NullLogger<iNaturalistObservationFactory>());       
+                _processTimeManager,
+                _processConfiguration, new NullLogger<iNaturalistObservationFactory>());
         }
 
         if (initAreaHelper && !_areaHelper.IsInitialized)
@@ -473,7 +477,7 @@ public class ProcessFixture : IProcessFixture
     {
         await AddDatasetsToElasticsearchAsync(datasets, clearExistingObservations);
         await AddEventsToElasticsearchAsync(events, clearExistingObservations);
-        await AddObservationsToElasticsearchAsync(observations, clearExistingObservations);        
+        await AddObservationsToElasticsearchAsync(observations, clearExistingObservations);
     }
 
     public async Task AddDataToElasticsearchAsync(
@@ -537,7 +541,7 @@ public class ProcessFixture : IProcessFixture
         }
 
         await AddObservationsBatchToElasticsearchAsync(publicObservations, false, clearExistingObservations);
-        await AddObservationsBatchToElasticsearchAsync(protectedObservations, true, clearExistingObservations);        
+        await AddObservationsBatchToElasticsearchAsync(protectedObservations, true, clearExistingObservations);
         await _processedObservationCoreRepository.RefreshIndicesAsync();
     }
 
@@ -628,7 +632,7 @@ public class ProcessFixture : IProcessFixture
         await _processedChecklistRepository.AddManyAsync(checklists);
         await _processedChecklistRepository.EnableIndexingAsync();
 
-        await Task.Delay(1000);        
+        await Task.Delay(1000);
     }
 
     private void InitAreaHelper()
@@ -708,11 +712,11 @@ public class ProcessFixture : IProcessFixture
         {
             await _eventRepository.DeleteAllDocumentsAsync();
         }
-        
+
         var result = await _artportalenEventProcessor.ProcessAsync(_testDataProvider, JobCancellationToken.Null);
         await _eventRepository.RefreshIndexAsync();
         return result;
-    }    
+    }
 
     public async Task<int> ProcessAndAddDatasetsToElasticSearch(IEnumerable<ArtportalenDatasetMetadata> verbatimDatasets, bool clearExistingObservations = true)
     {
@@ -724,11 +728,11 @@ public class ProcessFixture : IProcessFixture
         var res = await _artportalenDatasetProcessor.ProcessDatasetsAsync(_testDataProvider, verbatimDatasets);
         await _datasetRepository.RefreshIndexAsync();
         return res;
-    }    
+    }
 
     private IArtportalenDatasetMetadataRepository CreateArtportalenDatasetMetadataRepositoryMock()
     {
-        var mockRepo = Substitute.For<IArtportalenDatasetMetadataRepository>();        
+        var mockRepo = Substitute.For<IArtportalenDatasetMetadataRepository>();
         mockRepo.GetAllAsync().Returns(Task.FromResult(ArtportalenDatasetProjects.Mapping.Instance.DatasetByIdentifier.Values.ToList()));
         return mockRepo;
     }

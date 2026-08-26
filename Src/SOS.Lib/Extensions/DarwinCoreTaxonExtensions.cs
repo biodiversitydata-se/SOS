@@ -66,6 +66,7 @@ public static class DarwinCoreTaxonExtensions
         public Taxon ToProcessedTaxon()
         {
             var taxon = new Taxon();
+            taxon.IsNotAccepted = sourceTaxon.DynamicProperties?.IsNotAccepted ?? false;
             taxon.SecondaryParentDyntaxaTaxonIds = sourceTaxon.DynamicProperties?.SecondaryParentDyntaxaTaxonIds;
             taxon.AcceptedNameUsage = sourceTaxon.AcceptedNameUsage;
             taxon.AcceptedNameUsageId = sourceTaxon.AcceptedNameUsageID;

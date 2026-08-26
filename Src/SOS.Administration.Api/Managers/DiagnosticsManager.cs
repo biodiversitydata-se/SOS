@@ -32,7 +32,7 @@ public class DiagnosticsManager
     public async Task<string> CreateBasicTaxaSummaryJsonAsync(string collectionName)
     {
         var collection = _taxonRepository.GetMongoCollection(collectionName);
-        var allTaxa = await _taxonRepository.GetAllAsync(collection);
+        var allTaxa = (await _taxonRepository.GetAllAsync(collection)).Where(t => !t.IsNotAccepted);
         var taxonSummary = new TaxonSummary();
         foreach (var taxon in allTaxa)
         {
