@@ -159,6 +159,11 @@ public class SightingEntity
     public int? ControlingOrganisationId { get; set; }
 
     /// <summary>
+    ///     Owner user
+    /// </summary>
+    public int? ControlingUserId { get; set; }
+
+    /// <summary>
     ///     Protected by system flag
     /// </summary>
     public bool ProtectedBySystem { get; set; }

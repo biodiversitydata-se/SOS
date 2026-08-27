@@ -114,6 +114,7 @@ internal class ArtportalenHarvestFactory : ArtportalenHarvestFactoryBase, IHarve
             observation.SightingTypeSearchGroupId = entity.SightingTypeSearchGroupId;
             observation.SightingPublishTypeIds = ConvertCsvStringToListOfIntegers(entity.SightingPublishTypeIds);
             observation.SpeciesFactsIds = ConvertCsvStringToListOfIntegers(entity.SpeciesFactsIds);
+            observation.ControlingUserId = entity.ControlingUserId;
 
             if (speciesCollectionItems?.Any() ?? false)
             {

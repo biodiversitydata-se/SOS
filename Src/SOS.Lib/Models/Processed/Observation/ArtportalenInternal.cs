@@ -1,6 +1,7 @@
 ﻿using SOS.Lib.Models.Shared;
 using SOS.Lib.Swagger;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace SOS.Lib.Models.Processed.Observation;
 
@@ -246,4 +247,10 @@ public class ArtportalenInternal
     /// This field uses a controlled vocabulary.
     /// </remarks>
     public VocabularyValue InvasiveSpeciesTreatment { get; set; }
+
+    [JsonIgnore]
+    public string GbifRecordedBy { get; set; }
+
+    [JsonIgnore]
+    public string GbifRightsHolder { get; set; }
 }

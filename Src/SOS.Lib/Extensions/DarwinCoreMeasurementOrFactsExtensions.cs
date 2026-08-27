@@ -61,9 +61,9 @@ public static class DarwinCoreMeasurementOrFactsExtensions
             return processedObservations?.SelectMany(ToSimpleMultimediaRows) ?? Enumerable.Empty<SimpleMultimediaRow>();
         }
 
-        public IEnumerable<SimpleMultimediaRow> ToArtportalenSimpleMultimediaRows()
+        public IEnumerable<SimpleMultimediaRow> ToArtportalenSimpleMultimediaRows(bool anonymizeRightsHolder = false)
         {
-            return processedObservations?.SelectMany(ToArtportalenSimpleMultimediaRows) ?? Enumerable.Empty<SimpleMultimediaRow>();
+            return processedObservations?.SelectMany(o => o.ToArtportalenSimpleMultimediaRows(anonymizeRightsHolder)) ?? Enumerable.Empty<SimpleMultimediaRow>();
         }
 
         public IEnumerable<ExtendedMeasurementOrFactRow> ToExtendedMeasurementOrFactRows(bool eventCore = false)
@@ -79,9 +79,9 @@ public static class DarwinCoreMeasurementOrFactsExtensions
             return observation?.Occurrence?.Media?.Select(m => m.ToSimpleMultimediaRow(observation.Event?.EventId, observation.Occurrence.OccurrenceId, false, false)) ?? Enumerable.Empty<SimpleMultimediaRow>();
         }
 
-        public IEnumerable<SimpleMultimediaRow> ToArtportalenSimpleMultimediaRows()
+        public IEnumerable<SimpleMultimediaRow> ToArtportalenSimpleMultimediaRows(bool anonymizeRightsHolder = false)
         {
-            return observation?.ArtportalenInternal?.Media?.Select(m => m.ToSimpleMultimediaRow(observation.Event?.EventId, observation.Occurrence.OccurrenceId, true, true)) ?? Enumerable.Empty<SimpleMultimediaRow>();
+            return observation?.ArtportalenInternal?.Media?.Select(m => m.ToSimpleMultimediaRow(observation.Event?.EventId, observation.Occurrence.OccurrenceId, true, true, anonymizeRightsHolder, observation.ArtportalenInternal)) ?? Enumerable.Empty<SimpleMultimediaRow>();
         }
 
         public IEnumerable<ExtendedMeasurementOrFactRow> ToExtendedMeasurementOrFactRows(bool eventCore = false)
@@ -117,7 +117,7 @@ public static class DarwinCoreMeasurementOrFactsExtensions
     extension(Multimedia multimedia)
     {
         private SimpleMultimediaRow ToSimpleMultimediaRow(
-string eventId, string occurrenceId, bool emptyIdentifier, bool useTextHtmlFormat)
+            string eventId, string occurrenceId, bool emptyIdentifier, bool useTextHtmlFormat, bool anonymizeRightsHolder = false, ArtportalenInternal artportalenInternal = null)
         {
             return new SimpleMultimediaRow
             {
@@ -136,7 +136,11 @@ string eventId, string occurrenceId, bool emptyIdentifier, bool useTextHtmlForma
                 Audience = multimedia.Audience,
                 Source = multimedia.Source,
                 License = multimedia.License,
-                RightsHolder = multimedia.RightsHolder,
+                RightsHolder = anonymizeRightsHolder
+                    ? artportalenInternal?.ReportedByUserId is int reportedByUserId
+                        ? $"User{reportedByUserId}"
+                        : null
+                    : multimedia.RightsHolder,
                 DatasetID = multimedia.DatasetID
             };
         }
