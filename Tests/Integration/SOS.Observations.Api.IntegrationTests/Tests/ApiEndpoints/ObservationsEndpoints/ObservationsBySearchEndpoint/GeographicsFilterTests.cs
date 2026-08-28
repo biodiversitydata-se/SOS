@@ -312,11 +312,13 @@ public class GeographicsFilterTests : TestBase
 
         // Act            
         var response = await apiClient.PostAsync("/observations/search", new StringContent(json, Encoding.UTF8, "application/json"), TestContext.Current.CancellationToken);
-        var result = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
+        var result = await response.Content.ReadFromJsonAsync<HttpValidationProblemDetails>(TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
-        result!.Should().Be("Invalid JSON in request body. Geometry - points must form a closed linestring");
+        result!.Status.Should().Be(StatusCodes.Status400BadRequest);
+        result.Errors.Should().ContainKey("$.geographics.geometries[0]");
+        result.Errors["$.geographics.geometries[0]"].Should().Contain("Invalid geometry.");
     }
 
     [Fact]

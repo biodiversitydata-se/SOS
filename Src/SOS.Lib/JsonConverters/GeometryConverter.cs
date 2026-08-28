@@ -11,7 +11,10 @@ namespace SOS.Lib.JsonConverters;
 /// </summary>
 public class GeometryConverter : JsonConverter<Geometry>
 {
+    private const string InvalidGeometryMessage = "Invalid geometry.";
     private static GeometryFactory geomFactory = new GeometryFactory();
+
+    public override bool HandleNull => true;
 
     private string ReadCoordinateData(ref Utf8JsonReader reader)
     {
@@ -98,24 +101,22 @@ public class GeometryConverter : JsonConverter<Geometry>
 
     private Polygon CreatePolygon(GeometryFactory geomFactory, IEnumerable<IEnumerable<double[]>> coordinates)
     {
-        if (!coordinates?.Any() ?? true)
+        var coordinateRings = coordinates?
+            .Select(ring => ring?.ToArray())
+            .ToArray();
+        if (coordinateRings == null ||
+            coordinateRings.Length == 0 ||
+            coordinateRings.Any(ring => ring == null ||
+                ring.Length < 4 ||
+                ring.Any(coordinate => coordinate == null || coordinate.Length < 2)))
         {
-            return null;
+            throw new JsonException(InvalidGeometryMessage);
         }
 
-        foreach(var coords in coordinates)
-        {
-            int coordinatesCount = coords.Count();
-            if (coordinatesCount > 0 && coordinatesCount < 3)
-            {
-                return null;
-            }
-        }
-
-        var exteriorRing = geomFactory.CreateLinearRing(coordinates.First()
+        var exteriorRing = geomFactory.CreateLinearRing(coordinateRings.First()
             .Select(p => new Coordinate(p[0], p[1])).ToArray());
 
-        var holes = coordinates.Skip(1).Select(h => geomFactory.CreateLinearRing(h
+        var holes = coordinateRings.Skip(1).Select(h => geomFactory.CreateLinearRing(h
             .Select(p => new Coordinate(p[0], p[1])).ToArray())).ToArray();
         var polygon = geomFactory.CreatePolygon(exteriorRing, holes);
         return polygon;
@@ -130,6 +131,7 @@ public class GeometryConverter : JsonConverter<Geometry>
     {
         if (value == null)
         {
+            writer.WriteNullValue();
             return;
         }
 
@@ -192,7 +194,7 @@ public class GeometryConverter : JsonConverter<Geometry>
     {
         if (reader.TokenType != JsonTokenType.StartObject)
         {
-            throw new JsonException();
+            throw new JsonException(InvalidGeometryMessage);
         }
 
         var coordinateString = string.Empty;
@@ -218,33 +220,49 @@ public class GeometryConverter : JsonConverter<Geometry>
             reader.Read();
         }
         
-        switch (type?.ToLower())
+        try
         {
-            case "point":
-                var pointCoordinates = JsonSerializer.Deserialize<double[]>(coordinateString);
-                var point = geomFactory.CreatePoint(new Coordinate(pointCoordinates[0], pointCoordinates[1]));
-                return point;
-            case "polygon":
-                var polygonCoordinates =
-                    JsonSerializer.Deserialize<IEnumerable<IEnumerable<double[]>>>(coordinateString);
+            switch (type?.ToLower())
+            {
+                case "point":
+                    var pointCoordinates = JsonSerializer.Deserialize<double[]>(coordinateString);
+                    var point = geomFactory.CreatePoint(new Coordinate(pointCoordinates[0], pointCoordinates[1]));
+                    return point;
+                case "polygon":
+                    var polygonCoordinates =
+                        JsonSerializer.Deserialize<IEnumerable<IEnumerable<double[]>>>(coordinateString);
 
-                return CreatePolygon(geomFactory, polygonCoordinates);
-            case "multipolygon":
-                var muliPolygonCoordinates =
-                    JsonSerializer.Deserialize<IEnumerable<IEnumerable<IEnumerable<double[]>>>>(coordinateString);
+                    return CreatePolygon(geomFactory, polygonCoordinates);
+                case "multipolygon":
+                    var muliPolygonCoordinates =
+                        JsonSerializer.Deserialize<IEnumerable<IEnumerable<IEnumerable<double[]>>>>(coordinateString);
 
-                return geomFactory.CreateMultiPolygon(muliPolygonCoordinates
-                    .Select(p => CreatePolygon(geomFactory, p)).ToArray());
-            case "linestring":
-                var lineCoords = JsonSerializer.Deserialize<double[][]>(coordinateString);
-                var coords = lineCoords.Select(p => new Coordinate(p[0], p[1])).ToArray();
-                return geomFactory.CreateLineString(coords);
-            case "multilinestring":
-                var multiLineCoords = JsonSerializer.Deserialize<IEnumerable<IEnumerable<double[]>>>(coordinateString);
-                var lineStrings = multiLineCoords.Select(lc => geomFactory.CreateLineString(lc.Select(p => new Coordinate(p[0], p[1])).ToArray())).ToArray();
-                return geomFactory.CreateMultiLineString(lineStrings);
+                    return geomFactory.CreateMultiPolygon(muliPolygonCoordinates
+                        .Select(p => CreatePolygon(geomFactory, p)).ToArray());
+                case "linestring":
+                    var lineCoords = JsonSerializer.Deserialize<double[][]>(coordinateString);
+                    var coords = lineCoords.Select(p => new Coordinate(p[0], p[1])).ToArray();
+                    return geomFactory.CreateLineString(coords);
+                case "multilinestring":
+                    var multiLineCoords = JsonSerializer.Deserialize<IEnumerable<IEnumerable<double[]>>>(coordinateString);
+                    var lineStrings = multiLineCoords.Select(lc => geomFactory.CreateLineString(lc.Select(p => new Coordinate(p[0], p[1])).ToArray())).ToArray();
+                    return geomFactory.CreateMultiLineString(lineStrings);
+                default:
+                    throw new JsonException(InvalidGeometryMessage);
+            }
         }
-
-        return null;
+        catch (JsonException)
+        {
+            throw;
+        }
+        catch (Exception exception) when (exception is ArgumentException or
+            IndexOutOfRangeException or
+            InvalidOperationException or
+            NullReferenceException or
+            FormatException or
+            NotSupportedException)
+        {
+            throw new JsonException(InvalidGeometryMessage, exception);
+        }
     }
 }

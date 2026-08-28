@@ -68,4 +68,59 @@ public class TaxonAggregationInternalTests : TestBase
         result!.TotalCount.Should().Be(2,
             because: "");
     }
+
+    [Fact]
+    public async Task TaxonAggregationInternal_WithNullFilter_ReturnsBadRequest()
+    {
+        // Arrange
+        var apiClient = TestFixture.CreateApiClient();
+        using var content = new StringContent("null", Encoding.UTF8, "application/json");
+
+        // Act
+        var response = await apiClient.PostAsync(
+            "/observations/internal/taxonaggregation?skip=0&take=100",
+            content,
+            TestContext.Current.CancellationToken);
+        var responseBody = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        responseBody.Should().Contain("You must provide a search filter.");
+    }
+
+    [Fact]
+    public async Task TaxonAggregationInternal_WithDegeneratePolygon_ReturnsBadRequest()
+    {
+        // Arrange
+        const string json = """
+            {
+              "geographics": {
+                "geometries": [
+                  {
+                    "coordinates": [
+                      [
+                        [16.98472499942703, 62.90148608256228],
+                        [16.98472499942703, 62.90148608256228]
+                      ]
+                    ],
+                    "type": "polygon"
+                  }
+                ]
+              }
+            }
+            """;
+        var apiClient = TestFixture.CreateApiClient();
+        using var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+        // Act
+        var response = await apiClient.PostAsync(
+            "/observations/internal/taxonaggregation?skip=0&take=100",
+            content,
+            TestContext.Current.CancellationToken);
+        var responseBody = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        responseBody.Should().Contain("Invalid geometry");
+    }
 }

@@ -2894,13 +2894,19 @@ public class ObservationsController : ControllerBase
                     _logger.LogDebug($"TaxonAggregationInternal result found in cache and is returned as result. Number of requests={cacheEntry.Count}");
                     return new OkObjectResult(val);
                 }
-            }
+            } 
 
             // sensitiveObservations is preserved for backward compability
             filter.ProtectionFilter ??= (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
             this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, filter.ProtectionFilter);
 
             filter = await _searchFilterUtility.InitializeSearchFilterAsync(filter);
+            var geometryValidationResult = _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries);
+            if (geometryValidationResult.IsFailure)
+            {
+                return BadRequest(geometryValidationResult.Error);
+            }
+
             var boundingBox = filter.Geographics.BoundingBox.ToEnvelope();
             var searchFilter = filter.ToSearchFilterInternal(this.GetUserId(), translationCultureCode);
             translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
@@ -2908,7 +2914,6 @@ public class ObservationsController : ControllerBase
             var validationResult = Result.Combine(
                 validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(filter)) : Result.Success(),
                 _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
-                _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries),
                 _inputValidator.ValidateTranslationCultureCode(translationCultureCode),
                 _inputValidator.ValidateTaxonAggregationPagingArguments(skip, take)                    
                 );
