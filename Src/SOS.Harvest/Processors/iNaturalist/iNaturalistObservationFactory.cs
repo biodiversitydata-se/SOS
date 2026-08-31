@@ -338,7 +338,12 @@ public class iNaturalistObservationFactory : ObservationFactoryBase, IObservatio
             RemoveAuthorFromString(verbatim.Taxon.Name!)
         };                        
 
-        return GetTaxon(parsedTaxonId, names, null, true, null, verbatim?.Species_guess);
+        return GetTaxon(
+            taxonId: parsedTaxonId,
+            names: names,
+            ignoreDuplicates: true,
+            verbatimName: verbatim?.Species_guess,
+            ancestorTaxonName: verbatim?.Taxon.Iconic_taxon_name);
     }
 
     public static string RemoveAuthorFromString(string input)

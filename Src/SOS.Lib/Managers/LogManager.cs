@@ -6,6 +6,8 @@ public class LogManager
 {    
     public static ILogger<LogManager> Logger;
 
+    public static bool IsDebugEnabled => Logger?.IsEnabled(LogLevel.Debug) == true;
+
     public static void LogDebug(string? message, params object?[] args)
     {
         if (Logger == null) return;
@@ -16,6 +18,12 @@ public class LogManager
     {
         if (Logger == null) return;
         Logger.LogInformation(message, args);
+    }
+
+    public static void LogWarning(string? message, params object?[] args)
+    {
+        if (Logger == null) return;
+        Logger.LogWarning(message, args);
     }
 
     public static void LogError(string? message, params object?[] args)
