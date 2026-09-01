@@ -1,6 +1,8 @@
 using GeoJSON.Text.Feature;
 using SOS.Api.Client.Abstractions;
 using SOS.Api.Client.Requests;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using SOS.Api.Contracts.Aggregations.Requests;
 using SOS.Api.Contracts.Analysis.Responses;
 
@@ -10,11 +12,24 @@ namespace SOS.Api.Client.Clients;
 public sealed class SosAnalysisClient : ISosAnalysisClient
 {
     private readonly HttpClient _httpClient;
+    private readonly SosRequestLoggingContext _requestLogging;
 
     /// <summary>Creates an analysis client using the supplied HTTP client.</summary>
     public SosAnalysisClient(HttpClient httpClient)
     {
         _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+        _requestLogging = SosRequestLoggingContext.Disabled;
+    }
+
+    /// <summary>Creates an analysis client with opt-in request logging.</summary>
+    [Microsoft.Extensions.DependencyInjection.ActivatorUtilitiesConstructor]
+    public SosAnalysisClient(
+        HttpClient httpClient,
+        ILogger<SosAnalysisClient> logger,
+        IOptions<SosClientOptions> options)
+        : this(httpClient)
+    {
+        _requestLogging = new SosRequestLoggingContext(logger, options);
     }
 
     /// <inheritdoc />
@@ -147,11 +162,12 @@ public sealed class SosAnalysisClient : ISosAnalysisClient
         bool geoJson,
         CancellationToken cancellationToken)
     {
+        var filterJson = SosClientHttp.Serialize(filter);
         using var request = new HttpRequestMessage(
             HttpMethod.Post,
             query.AppendTo(path.TrimStart('/')))
         {
-            Content = SosClientHttp.CreateJsonContent(SosClientHttp.Serialize(filter))
+            Content = SosClientHttp.CreateJsonContent(filterJson)
         };
         request.ApplySosRequestHeaders(
             options.RoleId,
@@ -162,6 +178,7 @@ public sealed class SosAnalysisClient : ISosAnalysisClient
             request.SuppressRetries();
         }
 
+        _requestLogging.LogRequest(_httpClient, request, filterJson);
         using var response = await _httpClient.SendAsync(
             request,
             HttpCompletionOption.ResponseHeadersRead,

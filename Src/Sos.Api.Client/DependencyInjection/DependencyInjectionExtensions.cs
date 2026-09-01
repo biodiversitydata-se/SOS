@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Http.Resilience;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SOS.Api.Client;
 using SOS.Api.Client.Abstractions;
@@ -50,7 +51,13 @@ public static class DependencyInjectionExtensions
         bool useResilience = true,
         Action<IHttpClientBuilder>? configureBuilder = null)
         {
-            services.Configure(configure);
+            services
+                .AddOptions<SosClientOptions>()
+                .Configure(configure)
+                .Validate(
+                    options => options.RequestLoggingLevel == LogLevel.None ||
+                               options.MaxLoggedRequestBodyLength > 0,
+                    $"{nameof(SosClientOptions.MaxLoggedRequestBodyLength)} must be greater than zero when request logging is enabled.");
             services.TryAddTransient<SosRequestHeadersHandler>();
             services.TryAddSingleton(TimeProvider.System);
             services.AddMemoryCache();

@@ -18,6 +18,7 @@ public static class DependencyInjectionExtensions
                 options.AnalysisApiBaseAddress = new Uri(Settings.HttpClientsConfiguration.SosAnalysisApi.BaseAddress);
                 options.SystemName = "SOS Status";
                 options.ApplicationIdentifier = "PrintObs";
+                options.RequestLoggingLevel = LogLevel.Information;
             });
 
             // Use this when you want to use a specific token handler or other custom configuration for the HttpClient.

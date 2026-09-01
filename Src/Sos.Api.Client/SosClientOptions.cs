@@ -6,6 +6,18 @@
 public sealed class SosClientOptions
 {
     /// <summary>
+    /// Log level used for internal search request parameters and bodies.
+    /// Set to <see cref="Microsoft.Extensions.Logging.LogLevel.None"/> to disable request logging.
+    /// </summary>
+    public Microsoft.Extensions.Logging.LogLevel RequestLoggingLevel { get; set; } =
+        Microsoft.Extensions.Logging.LogLevel.None;
+
+    /// <summary>
+    /// Maximum number of characters included from an internal search request body in a log entry.
+    /// </summary>
+    public int MaxLoggedRequestBodyLength { get; set; } = 1024;
+
+    /// <summary>
     /// Name of the authentication token retrieved from HttpContext.
     /// Used by AddSosWebClients to relay the current user's access token.
     /// </summary>

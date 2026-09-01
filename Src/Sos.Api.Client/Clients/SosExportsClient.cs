@@ -1,5 +1,7 @@
 using SOS.Api.Client.Abstractions;
 using SOS.Api.Client.Requests;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using SOS.Api.Client.Responses;
 using SOS.Api.Contracts.Exports.Requests;
 using SOS.Api.Contracts.Exports.Responses;
@@ -11,11 +13,24 @@ namespace SOS.Api.Client.Clients;
 public sealed class SosExportsClient : ISosExportsClient
 {
     private readonly HttpClient _httpClient;
+    private readonly SosRequestLoggingContext _requestLogging;
 
     /// <summary>Creates an export client using the supplied HTTP client.</summary>
     public SosExportsClient(HttpClient httpClient)
     {
         _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+        _requestLogging = SosRequestLoggingContext.Disabled;
+    }
+
+    /// <summary>Creates an export client with opt-in request logging.</summary>
+    [Microsoft.Extensions.DependencyInjection.ActivatorUtilitiesConstructor]
+    public SosExportsClient(
+        HttpClient httpClient,
+        ILogger<SosExportsClient> logger,
+        IOptions<SosClientOptions> options)
+        : this(httpClient)
+    {
+        _requestLogging = new SosRequestLoggingContext(logger, options);
     }
 
     /// <inheritdoc />
@@ -27,13 +42,15 @@ public sealed class SosExportsClient : ISosExportsClient
     {
         ArgumentNullException.ThrowIfNull(filter);
         var requestOptions = options ?? new ExportDownloadOptions();
+        var filterJson = SosClientHttp.Serialize(filter);
         using var request = CreateRequest(
             $"exports/internal/download/{Uri.EscapeDataString(exportType.ToString())}",
             BuildDownloadQuery(exportType, requestOptions),
-            filter,
+            filterJson,
             requestOptions,
             SosAcceptProfile.Any);
 
+        _requestLogging.LogRequest(_httpClient, request, filterJson);
         var response = await _httpClient.SendAsync(
             request,
             HttpCompletionOption.ResponseHeadersRead,
@@ -79,13 +96,15 @@ public sealed class SosExportsClient : ISosExportsClient
             .Add("encryptPassword", options.EncryptPassword)
             .Add("confirmEncryptPassword", options.ConfirmEncryptPassword);
 
+        var filterJson = SosClientHttp.Serialize(filter);
         using var request = CreateRequest(
             $"exports/internal/order/{Uri.EscapeDataString(exportType.ToString())}",
             query,
-            filter,
+            filterJson,
             options,
             SosAcceptProfile.Json);
         request.SuppressRetries();
+        _requestLogging.LogRequest(_httpClient, request, filterJson);
         using var response = await _httpClient.SendAsync(
             request,
             HttpCompletionOption.ResponseHeadersRead,
@@ -146,13 +165,13 @@ public sealed class SosExportsClient : ISosExportsClient
     private static HttpRequestMessage CreateRequest(
         string path,
         SosQueryBuilder query,
-        SearchFilterInternalDto filter,
+        string filterJson,
         SosRoleRequestOptions options,
         SosAcceptProfile acceptProfile)
     {
         var request = new HttpRequestMessage(HttpMethod.Post, query.AppendTo(path))
         {
-            Content = SosClientHttp.CreateJsonContent(SosClientHttp.Serialize(filter))
+            Content = SosClientHttp.CreateJsonContent(filterJson)
         };
         request.ApplySosRequestHeaders(
             options.RoleId,

@@ -1,5 +1,7 @@
 ﻿using SOS.Api.Client.Abstractions;
 using SOS.Api.Client.Requests;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using SOS.Api.Contracts.Aggregations.Requests;
 using SOS.Api.Contracts.Aggregations.Responses;
 using SOS.Api.Contracts.Common.Responses;
@@ -11,11 +13,24 @@ namespace SOS.Api.Client.Clients;
 public sealed class SosObservationAggregationsClient : ISosObservationAggregationsClient
 {
     private readonly HttpClient _httpClient;
+    private readonly SosRequestLoggingContext _requestLogging;
 
     /// <summary>Creates an observation-aggregation client using the supplied HTTP client.</summary>
     public SosObservationAggregationsClient(HttpClient httpClient)
     {
         _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+        _requestLogging = SosRequestLoggingContext.Disabled;
+    }
+
+    /// <summary>Creates an observation-aggregation client with opt-in request logging.</summary>
+    [Microsoft.Extensions.DependencyInjection.ActivatorUtilitiesConstructor]
+    public SosObservationAggregationsClient(
+        HttpClient httpClient,
+        ILogger<SosObservationAggregationsClient> logger,
+        IOptions<SosClientOptions> options)
+        : this(httpClient)
+    {
+        _requestLogging = new SosRequestLoggingContext(logger, options);
     }
 
     /// <inheritdoc />
@@ -160,6 +175,7 @@ public sealed class SosObservationAggregationsClient : ISosObservationAggregatio
             requestOptions.RoleId,
             requestOptions.AuthorizationApplicationIdentifier);
 
+        _requestLogging.LogRequest(_httpClient, request, filterJson);
         using var response = await _httpClient.SendAsync(
             request,
             HttpCompletionOption.ResponseHeadersRead,
@@ -185,6 +201,7 @@ public sealed class SosObservationAggregationsClient : ISosObservationAggregatio
             requestOptions.RoleId,
             requestOptions.AuthorizationApplicationIdentifier);
 
+        _requestLogging.LogRequest(_httpClient, request, filterJson);
         using var response = await _httpClient.SendAsync(
             request,
             HttpCompletionOption.ResponseHeadersRead,
@@ -208,6 +225,7 @@ public sealed class SosObservationAggregationsClient : ISosObservationAggregatio
             requestOptions.RoleId,
             requestOptions.AuthorizationApplicationIdentifier);
 
+        _requestLogging.LogRequest(_httpClient, request, filterJson);
         using var response = await _httpClient.SendAsync(
             request,
             HttpCompletionOption.ResponseHeadersRead,
@@ -232,6 +250,7 @@ public sealed class SosObservationAggregationsClient : ISosObservationAggregatio
             requestOptions.AuthorizationApplicationIdentifier,
             SosAcceptProfile.GeoJson);
 
+        _requestLogging.LogRequest(_httpClient, request, filterJson);
         using var response = await _httpClient.SendAsync(
             request,
             HttpCompletionOption.ResponseHeadersRead,
@@ -255,6 +274,7 @@ public sealed class SosObservationAggregationsClient : ISosObservationAggregatio
             requestOptions.RoleId,
             requestOptions.AuthorizationApplicationIdentifier);
 
+        _requestLogging.LogRequest(_httpClient, request, filterJson);
         using var response = await _httpClient.SendAsync(
             request,
             HttpCompletionOption.ResponseHeadersRead,
@@ -278,6 +298,7 @@ public sealed class SosObservationAggregationsClient : ISosObservationAggregatio
             requestOptions.RoleId,
             requestOptions.AuthorizationApplicationIdentifier);
 
+        _requestLogging.LogRequest(_httpClient, request, filterJson);
         using var response = await _httpClient.SendAsync(
             request,
             HttpCompletionOption.ResponseHeadersRead,

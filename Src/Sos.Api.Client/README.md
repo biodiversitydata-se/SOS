@@ -16,6 +16,34 @@ builder.Services.AddSosWebClients(options =>
 
 `AddSosWebClients` relays the current ASP.NET Core access token. Use `AddSosClients` when authentication is supplied by a custom HTTP handler.
 
+## Internal search request logging
+
+Logging of internal search request parameters and bodies is disabled by default. Enable it explicitly by selecting a log level when registering the clients:
+
+```csharp
+builder.Services.AddSosClients(options =>
+{
+    options.ObservationsApiBaseAddress = new Uri("https://sos.example/");
+    options.AnalysisApiBaseAddress = new Uri("https://sos-analysis.example/");
+    options.RequestLoggingLevel = LogLevel.Debug;
+    options.MaxLoggedRequestBodyLength = 1024;
+});
+```
+
+The configured logging provider must also enable that level for the client categories. For example:
+
+```json
+{
+  "Logging": {
+    "LogLevel": {
+      "SOS.Api.Client.Clients": "Debug"
+    }
+  }
+}
+```
+
+Each internal observation-filter request is logged once with its HTTP method, full URI and request body. Encryption-password query parameters are always redacted. Bodies exceeding the configured character limit first have large taxon-id and coordinate arrays replaced with placeholders and are then strictly truncated if necessary. Request logging can expose filter values and should only be enabled where the resulting log data is appropriate.
+
 ## Clients and services
 
 The library has two API layers:
