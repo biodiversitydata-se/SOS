@@ -74,7 +74,74 @@ public class RequestContextAndOrderPolicyTests
     }
 
     [Fact]
-    public async Task ExportOrder_ExplicitRoleOverridesProviderAndFailedPostIsNotRetried()
+    public async Task SosOwnedResilience_ReplacesGlobalPipelineAndPreservesCustomHandlers()
+    {
+        var calls = 0;
+        var customHandlerCalls = 0;
+        var handler = new StubHttpMessageHandler(_ =>
+        {
+            calls++;
+            return new HttpResponseMessage(HttpStatusCode.ServiceUnavailable)
+            {
+                Content = new StringContent("temporarily unavailable")
+            };
+        });
+        var services = new ServiceCollection();
+        ConfigureGlobalResilience(services, maxRetryAttempts: 3);
+        services.AddSosClients(
+            options =>
+            {
+                options.ObservationsApiBaseAddress = new Uri("https://observations.example.test/");
+                options.Resilience.RetryDelay = TimeSpan.Zero;
+                options.Resilience.RetryMaxDelay = TimeSpan.Zero;
+                options.Resilience.MaxRetryAttempts = 1;
+            },
+            useResilience: true,
+            configureBuilder: builder =>
+            {
+                builder.AddHttpMessageHandler(() =>
+                    new CallbackHandler(() => customHandlerCalls++));
+                builder.ConfigurePrimaryHttpMessageHandler(() => handler);
+            });
+        await using var provider = services.BuildServiceProvider();
+
+        var action = () => provider.GetRequiredService<ISosDataProvidersClient>()
+            .GetDataProvidersAsync(cancellationToken: TestContext.Current.CancellationToken);
+
+        await action.Should().ThrowAsync<SosApiException>();
+        calls.Should().Be(2);
+        customHandlerCalls.Should().Be(2);
+    }
+
+    [Fact]
+    public async Task ApplicationOwnedGlobalResilience_RemainsWhenSosResilienceIsDisabled()
+    {
+        var calls = 0;
+        var handler = new StubHttpMessageHandler(_ =>
+        {
+            calls++;
+            return calls == 1
+                ? new HttpResponseMessage(HttpStatusCode.ServiceUnavailable)
+                : JsonResponse("[]");
+        });
+        var services = new ServiceCollection();
+        ConfigureGlobalResilience(services, maxRetryAttempts: 1);
+        services.AddSosClients(
+            options => options.ObservationsApiBaseAddress =
+                new Uri("https://observations.example.test/"),
+            useResilience: false,
+            configureBuilder: builder => builder.ConfigurePrimaryHttpMessageHandler(() => handler));
+        await using var provider = services.BuildServiceProvider();
+
+        var result = await provider.GetRequiredService<ISosDataProvidersClient>()
+            .GetDataProvidersAsync(cancellationToken: TestContext.Current.CancellationToken);
+
+        result.Should().BeEmpty();
+        calls.Should().Be(2);
+    }
+
+    [Fact]
+    public async Task ExportOrder_ExplicitRoleOverridesProviderAndFailedPostIsNotRetriedWithGlobalResilience()
     {
         var calls = 0;
         var handler = new StubHttpMessageHandler(request =>
@@ -88,6 +155,7 @@ public class RequestContextAndOrderPolicyTests
             };
         });
         var services = new ServiceCollection();
+        ConfigureGlobalResilience(services, maxRetryAttempts: 2);
         services.AddSingleton<ISosRoleIdProvider>(new FixedRoleIdProvider(99));
         services.AddSosClients(
             options =>
@@ -117,7 +185,7 @@ public class RequestContextAndOrderPolicyTests
     }
 
     [Fact]
-    public async Task AnalysisOrder_FailedPostIsNotRetried()
+    public async Task AnalysisOrder_FailedPostIsNotRetriedWithGlobalResilience()
     {
         var calls = 0;
         var handler = new StubHttpMessageHandler(_ =>
@@ -129,6 +197,7 @@ public class RequestContextAndOrderPolicyTests
             };
         });
         var services = new ServiceCollection();
+        ConfigureGlobalResilience(services, maxRetryAttempts: 2);
         services.AddSosClients(
             options =>
             {
@@ -338,6 +407,31 @@ public class RequestContextAndOrderPolicyTests
         {
             Content = new StringContent(json, Encoding.UTF8, "application/json")
         };
+
+    private static void ConfigureGlobalResilience(
+        IServiceCollection services,
+        int maxRetryAttempts)
+    {
+        services.ConfigureHttpClientDefaults(builder =>
+            builder.AddStandardResilienceHandler(options =>
+            {
+                options.Retry.MaxRetryAttempts = maxRetryAttempts;
+                options.Retry.Delay = TimeSpan.Zero;
+                options.Retry.MaxDelay = TimeSpan.Zero;
+                options.Retry.UseJitter = false;
+            }));
+    }
+
+    private sealed class CallbackHandler(Action callback) : DelegatingHandler
+    {
+        protected override Task<HttpResponseMessage> SendAsync(
+            HttpRequestMessage request,
+            CancellationToken cancellationToken)
+        {
+            callback();
+            return base.SendAsync(request, cancellationToken);
+        }
+    }
 
     private sealed class FixedRoleIdProvider(int roleId) : ISosRoleIdProvider
     {

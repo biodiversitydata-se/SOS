@@ -147,7 +147,9 @@ Unsuccessful HTTP responses throw `SosApiException`. A successful response with 
 
 `AddSosClients` and `AddSosWebClients` enable retry with jitter, request and attempt timeouts, circuit breaking and rate limiting. Analysis and export order POST requests are excluded from retries.
 
-Use either the built-in pipeline or an application-owned pipeline. Disable the built-in pipeline if `configureBuilder` adds another resilience handler:
+With `useResilience: true` (the default), the SOS client owns resilience for its HTTP clients. Previously registered resilience handlers are removed and replaced by one client-specific SOS pipeline. Register application-wide HTTP client defaults, such as Aspire service defaults, before calling `AddSosClients` or `AddSosWebClients`.
+
+Use `useResilience: false` when the application owns resilience. In that mode the package neither removes nor adds resilience handlers, so a pipeline registered through application-wide defaults or `configureBuilder` remains in place:
 
 ```csharp
 builder.Services.AddSosClients(

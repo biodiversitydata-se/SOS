@@ -36,9 +36,11 @@ public static class DependencyInjectionExtensions
         /// <param name="services">Service collection to register clients in.</param>
         /// <param name="configure"></param>
         /// <param name="useResilience">
-        /// Use the client's standard HTTP resilience pipeline with retry, timeout, circuit breaker and rate limiting.
-        /// Set this to <see langword="false"/> when <paramref name="configureBuilder"/> adds an application-owned
-        /// resilience pipeline; otherwise the pipelines are stacked and retries can be duplicated.
+        /// When <see langword="true"/> (the default), previously registered resilience handlers are removed and
+        /// replaced with the client's standard HTTP resilience pipeline with retry, timeout, circuit breaker and
+        /// rate limiting. Register application-wide HTTP client defaults before calling this method.
+        /// When <see langword="false"/>, this package neither removes nor adds resilience handlers, allowing the
+        /// application to own the resilience pipeline.
         /// </param>
         /// <param name="configureBuilder">
         /// Optionally configures every SOS HTTP client. If this callback adds a resilience handler,
@@ -133,9 +135,11 @@ public static class DependencyInjectionExtensions
         /// <param name="services">Service collection to register clients in.</param>
         /// <param name="configure"></param>
         /// <param name="useResilience">
-        /// Use the client's standard HTTP resilience pipeline with retry, timeout, circuit breaker and rate limiting.
-        /// Set this to <see langword="false"/> when <paramref name="configureBuilder"/> adds an application-owned
-        /// resilience pipeline; otherwise the pipelines are stacked and retries can be duplicated.
+        /// When <see langword="true"/> (the default), previously registered resilience handlers are removed and
+        /// replaced with the client's standard HTTP resilience pipeline with retry, timeout, circuit breaker and
+        /// rate limiting. Register application-wide HTTP client defaults before calling this method.
+        /// When <see langword="false"/>, this package neither removes nor adds resilience handlers, allowing the
+        /// application to own the resilience pipeline.
         /// </param>
         /// <param name="configureBuilder">
         /// Optionally configures every SOS HTTP client. If this callback adds a resilience handler,
@@ -230,6 +234,10 @@ public static class DependencyInjectionExtensions
 
         if (useResilience)
         {
+#pragma warning disable EXTEXP0001
+            builder.RemoveAllResilienceHandlers();
+#pragma warning restore EXTEXP0001
+
             builder
                 .AddStandardResilienceHandler()
                 .Configure((resilienceOptions, serviceProvider) =>
