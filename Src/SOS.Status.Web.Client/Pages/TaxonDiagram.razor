@@ -1,4 +1,4 @@
-﻿@page "/taxondiagram"
+@page "/taxondiagram"
 @using SOS.Status.Web.Client.Abstractions
 @inject HttpClient Http
 @inject ITaxonDiagramService taxonDiagramService
@@ -32,6 +32,13 @@
                                Variant="Variant.Outlined">
                         <MudSelectItem Value="@("sv-SE")">Swedish</MudSelectItem>
                         <MudSelectItem Value="@("en-GB")">English</MudSelectItem>
+                    </MudSelect>
+                    <MudSelect T="TaxonomyType"
+                               Label="Taxonomy"
+                               @bind-Value="taxonomyType"
+                               Variant="Variant.Outlined">
+                        <MudSelectItem Value="TaxonomyType.Dyntaxa">Dyntaxa</MudSelectItem>
+                        <MudSelectItem Value="TaxonomyType.Artportalen">Artportalen</MudSelectItem>
                     </MudSelect>
                 </MudStack>
                 <MudStack Row="true" Justify="Justify.SpaceBetween">
@@ -93,6 +100,7 @@
     private int activeTabIndex = 0;
     private TaxonRelationsTreeIterationMode treeIterationMode = TaxonRelationsTreeIterationMode.BothParentsAndChildren;
     private bool includeSecondaryRelations = true; // Default checked
+    private TaxonomyType taxonomyType = TaxonomyType.Dyntaxa;
     private string translationCultureCode = "sv-SE";
     private string? diagramResult;
     private string copyIcon = Icons.Material.Filled.ContentCopy;
@@ -130,6 +138,7 @@
                 taxonIds,
                 treeIterationMode,
                 includeSecondaryRelations,
+                taxonomyType,
                 translationCultureCode);
 
             diagramResult = result;

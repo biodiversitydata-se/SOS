@@ -17,6 +17,7 @@ public class TaxonDiagramApiClient : ITaxonDiagramService
         int[] taxonIds,
         TaxonRelationsTreeIterationMode treeIterationMode = TaxonRelationsTreeIterationMode.BothParentsAndChildren,
         bool includeSecondaryRelations = true,
+        TaxonomyType taxonomyType = TaxonomyType.Dyntaxa,
         string translationCultureCode = "sv-SE")
     {
         var query = string.Join("&", taxonIds.Select(id => $"taxonIds={id}"));
@@ -25,6 +26,7 @@ public class TaxonDiagramApiClient : ITaxonDiagramService
                   $"&treeIterationMode={treeIterationMode}" +
                   $"&includeSecondaryRelations={includeSecondaryRelations.ToString().ToLower()}" +
                   $"&diagramFormat=Mermaid" +
+                  $"&taxonomyType={taxonomyType}" +
                   $"&translationCultureCode={translationCultureCode}";
 
         try

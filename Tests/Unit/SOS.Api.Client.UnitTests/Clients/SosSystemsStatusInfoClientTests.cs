@@ -100,12 +100,13 @@ public class SosSystemsStatusInfoClientTests
             TaxonRelationsTreeIterationMode.OnlyChildren,
             includeSecondaryRelations: false,
             diagramFormat: DiagramFormat.GraphViz,
+            taxonomyType: TaxonomyType.Artportalen,
             translationCultureCode: "en-US",
             cancellationToken: TestContext.Current.CancellationToken);
 
         capturedRequest.Should().NotBeNull();
         capturedRequest!.RequestUri!.PathAndQuery.Should().Be(
-            "/systems/TaxonRelationsDiagram?taxonIds=1000103&taxonIds=2000200&treeIterationMode=OnlyChildren&includeSecondaryRelations=false&diagramFormat=GraphViz&translationCultureCode=en-US");
+            "/systems/TaxonRelationsDiagram?taxonIds=1000103&taxonIds=2000200&treeIterationMode=OnlyChildren&includeSecondaryRelations=false&diagramFormat=GraphViz&taxonomyType=Artportalen&translationCultureCode=en-US");
         capturedRequest.Headers.Accept.Select(header => header.MediaType).Should().Equal("text/plain", "application/json");
     }
 
@@ -115,7 +116,7 @@ public class SosSystemsStatusInfoClientTests
         var diagram = "graph TD\r\n    node_1000103(\"Psophus<br/>[Släkte]<br/>1000103\")";
         var handler = new StubHttpMessageHandler(request =>
         {
-            request.RequestUri!.PathAndQuery.Should().Contain("/systems/TaxonRelationsDiagram?");
+            request.RequestUri!.PathAndQuery.Should().Contain("&taxonomyType=Dyntaxa&");
             return CreateStringResponse(HttpStatusCode.OK, JsonSerializer.Serialize(diagram), "application/json");
         });
         var client = new SosSystemsStatusInfoClient(CreateHttpClient(handler));

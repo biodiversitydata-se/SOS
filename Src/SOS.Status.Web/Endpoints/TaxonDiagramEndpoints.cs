@@ -15,6 +15,7 @@ public static class TaxonDiagramEndpoints
                        [FromQuery] int[] taxonIds,
                        [FromQuery] TaxonRelationsTreeIterationMode treeIterationMode = TaxonRelationsTreeIterationMode.BothParentsAndChildren,
                        [FromQuery] bool includeSecondaryRelations = true,
+                       [FromQuery] TaxonomyType taxonomyType = TaxonomyType.Dyntaxa,
                        [FromQuery] string translationCultureCode = "sv-SE") =>
                 {
                     try
@@ -23,6 +24,7 @@ public static class TaxonDiagramEndpoints
                             taxonIds,
                             treeIterationMode,
                             includeSecondaryRelations,
+                            taxonomyType,
                             translationCultureCode);
 
                         return result is null

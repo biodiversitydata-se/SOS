@@ -52,6 +52,7 @@ public sealed class SosSystemsStatusInfoClient : ISosSystemsStatusInfoClient
         TaxonRelationsTreeIterationMode treeIterationMode = TaxonRelationsTreeIterationMode.BothParentsAndChildren,
         bool includeSecondaryRelations = false,
         DiagramFormat diagramFormat = DiagramFormat.Mermaid,
+        TaxonomyType taxonomyType = TaxonomyType.Dyntaxa,
         string translationCultureCode = "sv-SE",
         CancellationToken cancellationToken = default)
     {
@@ -68,6 +69,7 @@ public sealed class SosSystemsStatusInfoClient : ISosSystemsStatusInfoClient
                 treeIterationMode,
                 includeSecondaryRelations,
                 diagramFormat,
+                taxonomyType,
                 translationCultureCode));
         request.ApplySosRequestHeaders(acceptProfile: SosAcceptProfile.TextOrJson);
 
@@ -105,6 +107,7 @@ public sealed class SosSystemsStatusInfoClient : ISosSystemsStatusInfoClient
         TaxonRelationsTreeIterationMode treeIterationMode,
         bool includeSecondaryRelations,
         DiagramFormat diagramFormat,
+        TaxonomyType taxonomyType,
         string translationCultureCode)
     {
         return new Uri(
@@ -113,6 +116,7 @@ public sealed class SosSystemsStatusInfoClient : ISosSystemsStatusInfoClient
                 .AddEnum("treeIterationMode", treeIterationMode)
                 .Add("includeSecondaryRelations", includeSecondaryRelations)
                 .AddEnum("diagramFormat", diagramFormat)
+                .AddEnum("taxonomyType", taxonomyType)
                 .Add("translationCultureCode", translationCultureCode)
                 .AppendTo("systems/TaxonRelationsDiagram"),
             UriKind.Relative);

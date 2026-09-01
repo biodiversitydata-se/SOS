@@ -34,6 +34,7 @@ public interface ISosSystemsStatusInfoClient
         TaxonRelationsTreeIterationMode treeIterationMode = TaxonRelationsTreeIterationMode.BothParentsAndChildren,
         bool includeSecondaryRelations = false,
         DiagramFormat diagramFormat = DiagramFormat.Mermaid,
+        TaxonomyType taxonomyType = TaxonomyType.Dyntaxa,
         string translationCultureCode = "sv-SE",
         CancellationToken cancellationToken = default);
 }
