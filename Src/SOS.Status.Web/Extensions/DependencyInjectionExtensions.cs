@@ -11,7 +11,7 @@ public static class DependencyInjectionExtensions
     extension(IServiceCollection services)
     {
         public IServiceCollection AddDependencyInjectionServices(IConfigurationRoot configuration)
-        {
+        {            
             services.AddSosWebClients(options =>
             {
                 options.ObservationsApiBaseAddress = new Uri(Settings.HttpClientsConfiguration.SosObservationsApi.BaseAddress);
