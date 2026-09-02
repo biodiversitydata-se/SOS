@@ -50,7 +50,7 @@ spec:
         - name: ASPNETCORE_ENVIRONMENT
           value: $(environment)
         - name: BlazorRenderMode
-          value: Server
+          value: WebAssembly
         image: reg.app.slu.se/k1003-1/$(imageName)-app:$(tag)
         imagePullPolicy: IfNotPresent
         ports:
