@@ -643,7 +643,7 @@ public class MarkdownHelper : IMarkdownHelper
         {
             if (!dataProviderIds?.Any() ?? true)
             {
-                dataProviderIds ??= new List<int>();
+                dataProviderIds ??= Array.Empty<int>();
             }
 
             var dataProviders = (await _dataProviderCache.GetAllAsync()).Where(dp => dataProviderIds.Contains(dp.Id));
@@ -708,7 +708,7 @@ public class MarkdownHelper : IMarkdownHelper
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Failed to create citation markdown");
+            _logger.LogError(e, $"Failed to create citation markdown for provider id´s: {string.Join(", ", dataProviderIds)}");
         }
         return new MemoryStream();
     }
