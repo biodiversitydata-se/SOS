@@ -27,3 +27,14 @@
     line-height: 1.45;
     white-space: pre;
 }
+
+.observations-table-container {
+    max-width: 100%;
+    max-height: 520px;
+    overflow: auto;
+}
+
+.observation-location-id {
+    min-width: 220px;
+    overflow-wrap: anywhere;
+}

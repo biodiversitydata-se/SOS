@@ -173,16 +173,16 @@ internal sealed class AdaptiveSearchLocationsService : IAdaptiveSearchLocationsS
         {
             if (ShouldTryRepresentativeLocations(request, countAndExtentResult.EstimatedLocationCount))
             {
-                (bool success, AdaptiveSearchLocationsResult value) = await TryGetRepresentativeLocationsAsync(
+                var representativeLocationsResult = await TryGetRepresentativeLocationsAsync(
                     request,
                     timings,
                     bbox,
                     searchFilter,
                     countAndExtentResult,
                     clusteringBbox);
-                if (success)
+                if (representativeLocationsResult != null)
                 {
-                    return value;
+                    return representativeLocationsResult;
                 }
             }
 
@@ -326,7 +326,13 @@ internal sealed class AdaptiveSearchLocationsService : IAdaptiveSearchLocationsS
         };
     }
 
-    private async Task<(bool success, AdaptiveSearchLocationsResult value)> TryGetRepresentativeLocationsAsync(AdaptiveSearchLocationsRequest request, AdaptiveSearchLocationsTimings timings, Lib.Models.Gis.LatLonBoundingBox bbox, SearchFilterInternal searchFilter, (long Count, Lib.Models.Gis.LatLonBoundingBox? Extent, long EstimatedLocationCount) countAndExtentResult, Lib.Models.Gis.LatLonBoundingBox clusteringBbox)
+    private async Task<AdaptiveSearchLocationsResult?> TryGetRepresentativeLocationsAsync(
+        AdaptiveSearchLocationsRequest request,
+        AdaptiveSearchLocationsTimings timings,
+        Lib.Models.Gis.LatLonBoundingBox? bbox,
+        SearchFilterInternal searchFilter,
+        (long Count, Lib.Models.Gis.LatLonBoundingBox? Extent, long EstimatedLocationCount) countAndExtentResult,
+        Lib.Models.Gis.LatLonBoundingBox? clusteringBbox)
     {
         var representativeLocationsStopwatch = Stopwatch.StartNew();
         var representativeLocationsResult = await _observationManager.GetLocationRepresentativeChunkAsync(
@@ -343,7 +349,7 @@ internal sealed class AdaptiveSearchLocationsService : IAdaptiveSearchLocationsS
             var representativeLocationAggregates = _aggregator.CreateAggregates(
                 representativeLocationRecords,
                 representativeLocationsResult.ObservationCountByLocationId,
-                isSummaryApproximated: true);
+                isSummaryApproximated: !IsFilteredToSingleOccurrence(searchFilter));
             if (representativeLocationAggregates.Count < request.LocationAggregationLimit.Value)
             {
                 if (!request.ReturnInputBBox || bbox == null)
@@ -379,7 +385,7 @@ internal sealed class AdaptiveSearchLocationsService : IAdaptiveSearchLocationsS
                 var locationSummaryApproximated = HasApproximatedLocationSummary(representativeLocationFeatures);
                 timings.Clustering = representativeLocationProcessingStopwatch.Elapsed;
 
-                return (success: true, value: new AdaptiveSearchLocationsResult
+                return new AdaptiveSearchLocationsResult
                 {
                     ResultType = "locations",
                     LocationFeatures = representativeLocationFeatures,
@@ -393,11 +399,11 @@ internal sealed class AdaptiveSearchLocationsService : IAdaptiveSearchLocationsS
                     LocationSummaryApproximated = locationSummaryApproximated,
                     GeographicAreas = await GetGeoJsonGeographicAreasAsync(request, searchFilter),
                     Timings = timings
-                });
+                };
             }
         }
 
-        return (success: false, value: null);
+        return null;
     }
 
     private static bool ShouldFetchObservations(AdaptiveSearchLocationsRequest request, long observationCount)
@@ -433,6 +439,16 @@ internal sealed class AdaptiveSearchLocationsService : IAdaptiveSearchLocationsS
     private static bool HasApproximatedLocationSummary(IEnumerable<LocationFeature>? locationFeatures)
     {
         return locationFeatures?.Any(feature => feature.IsSummaryApproximated == true) == true;
+    }
+
+    /// <summary>
+    /// Determines whether the search filter guarantees that at most one observation can match,
+    /// i.e. the include filter contains exactly one occurrence id. In that case the representative
+    /// location summary can never be approximated, since there is nothing more to aggregate.
+    /// </summary>
+    private static bool IsFilteredToSingleOccurrence(SearchFilterInternal searchFilter)
+    {
+        return searchFilter?.IncludeFilter?.OccurrenceIds?.Count() == 1;
     }
 
     private async Task<List<Feature>?> GetGeoJsonGeographicAreasAsync(
@@ -480,32 +496,34 @@ internal sealed class AdaptiveSearchLocationsService : IAdaptiveSearchLocationsS
         return root?.ToJsonString() ?? geoJson;
     }
 
+    private static readonly string[] LocationFeatureOutputFields =
+    {
+        "isGeneralized",
+        "sensitive",
+        "artportalenInternal.invasiveSpeciesTreatment.id",
+        "location.locationId",
+        "location.type",
+        "location.decimalLatitude",
+        "location.decimalLongitude",
+        "location.coordinateUncertaintyInMeters",
+        "location.sweref99TmX",
+        "location.sweref99TmY",
+        "location.municipality",
+        "location.locality",
+        "occurrence.occurrenceId",
+        "occurrence.isPositiveObservation",
+        "occurrence.isNotRediscoveredObservation",
+        "occurrence.isNeverFoundObservation",
+        "event.startYear",
+        "event.endYear",
+        "taxon.id",
+        "taxon.attributes.isRedlisted",
+        "taxon.attributes.isInvasiveInSweden"
+    };
+
     public static ICollection<string> GetLocationFeatureOutputFields()
     {
-        return new List<string>
-        {
-            "isGeneralized",
-            "sensitive",
-            "artportalenInternal.invasiveSpeciesTreatment.id",
-            "location.locationId",
-            "location.type",
-            "location.decimalLatitude",
-            "location.decimalLongitude",
-            "location.coordinateUncertaintyInMeters",
-            "location.sweref99TmX",
-            "location.sweref99TmY",
-            "location.municipality",
-            "location.locality",
-            "occurrence.occurrenceId",
-            "occurrence.isPositiveObservation",
-            "occurrence.isNotRediscoveredObservation",
-            "occurrence.isNeverFoundObservation",
-            "event.startYear",
-            "event.endYear",
-            "taxon.id",
-            "taxon.attributes.isRedlisted",
-            "taxon.attributes.isInvasiveInSweden"
-        };
+        return LocationFeatureOutputFields;
     }
 
     private async Task<Dictionary<string, Geometry>?> GetPolygonLocationGeometriesAsync(IEnumerable<JsonObject> records)

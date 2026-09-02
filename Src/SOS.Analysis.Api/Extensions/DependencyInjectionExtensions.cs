@@ -10,6 +10,7 @@ using SOS.Lib.Cache;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Database;
 using SOS.Lib.Database.Interfaces;
+using SOS.Lib.Enums;
 using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Managers;
@@ -85,7 +86,7 @@ public static class DependencyInjectionExtensions
             services.AddSingleton<ICache<int, Taxon>, TaxonCache>();
             services.AddSingleton<ICache<int, TaxonList>, TaxonListCache>();
             services.AddSingleton<IClassCache<TaxonListSetsById>, ClassCache<TaxonListSetsById>>();
-            services.AddSingleton<IClassCache<TaxonTree<IBasicTaxon>>, ClassCache<TaxonTree<IBasicTaxon>>>();
+            services.AddSingleton<IClassCache<Dictionary<TaxonomyType, TaxonTree<IBasicTaxon>>>, ClassCache<Dictionary<TaxonomyType, TaxonTree<IBasicTaxon>>>>();
             var clusterHealthCache = new ClassCache<ConcurrentDictionary<string, HealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<string, HealthResponse>>>()) { CacheDuration = TimeSpan.FromMinutes(2) };
             services.AddSingleton<IClassCache<ConcurrentDictionary<string, HealthResponse>>>(clusterHealthCache);
             services.AddSingleton<SortableFieldsCache>();
@@ -103,6 +104,7 @@ public static class DependencyInjectionExtensions
             services.AddScoped<IProcessedObservationRepository, ProcessedObservationRepository>();
             services.AddScoped<IProcessedObservationCoreRepository, ProcessedObservationCoreRepository>();
             services.AddScoped<ITaxonRepository, TaxonRepository>();
+            services.AddScoped<IArtportalenTaxonRepository, ArtportalenTaxonRepository>();
             services.AddScoped<ITaxonListRepository, TaxonListRepository>();
             services.AddScoped<IUserExportRepository, UserExportRepository>();
             services.AddScoped<IVocabularyRepository, VocabularyRepository>();

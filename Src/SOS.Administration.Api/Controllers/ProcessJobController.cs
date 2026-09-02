@@ -96,4 +96,23 @@ public class ProcessJobController : ControllerBase, IProcessJobController
             return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
         }
     }
+
+    /// <inheritdoc />
+    [HttpPost("Taxa/Artportalen/Run")]
+    [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+    public IActionResult RunProcessArtportalenTaxaJob()
+    {
+        try
+        {
+            LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
+            BackgroundJob.Enqueue<IProcessArtportalenTaxaJob>(job => job.RunAsync());
+            return new OkObjectResult("Process Artportalen taxa job was enqueued to Hangfire.");
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Enqueuing process Artportalen taxa job failed");
+            return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+        }
+    }
 }

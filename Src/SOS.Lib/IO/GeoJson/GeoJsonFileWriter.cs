@@ -545,7 +545,6 @@ public class GeoJsonFileWriter : FileWriterBase, IGeoJsonFileWriter
         await using var jsonWriter = new Utf8JsonWriter(stream, JsonWriterOptions);
         jsonWriter.WriteStartObject();
         jsonWriter.WriteString("type", "FeatureCollection");
-        jsonWriter.WriteString("crs", "EPSG:4326");
         jsonWriter.WritePropertyName("features");
         jsonWriter.WriteStartArray();
 
@@ -638,7 +637,6 @@ public class GeoJsonFileWriter : FileWriterBase, IGeoJsonFileWriter
         await using var jsonWriter = new Utf8JsonWriter(ms, JsonWriterOptions);
         jsonWriter.WriteStartObject();
         jsonWriter.WriteString("type", "FeatureCollection");
-        jsonWriter.WriteString("crs", "EPSG:4326");
         if (bbox != null)
         {
             WriteBbox(jsonWriter, bbox);            

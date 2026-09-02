@@ -123,7 +123,7 @@ public class LiveDbProcessFixture : IProcessFixture
         serviceCollection.AddSingleton<TelemetryClient>();
         serviceCollection.AddSingleton<IDatasetRepository, DatasetRepository>();
         serviceCollection.AddSingleton<IEventRepository, EventRepository>();
-        serviceCollection.AddSingleton<IClassCache<TaxonTree<IBasicTaxon>>, ClassCache<TaxonTree<IBasicTaxon>>>();
+        serviceCollection.AddSingleton<IClassCache<Dictionary<TaxonomyType, TaxonTree<IBasicTaxon>>>, ClassCache<Dictionary<TaxonomyType, TaxonTree<IBasicTaxon>>>>();
         serviceCollection.AddSingleton<IClassCache<TaxonListSetsById>, ClassCache<TaxonListSetsById>>();
         var clusterHealthCache = new ClassCache<ConcurrentDictionary<string, HealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<string, HealthResponse>>>()) { CacheDuration = TimeSpan.FromMinutes(2) };
         serviceCollection.AddSingleton<IClassCache<ConcurrentDictionary<string, HealthResponse>>>(clusterHealthCache);
@@ -225,7 +225,7 @@ public class LiveDbProcessFixture : IProcessFixture
         }
         else
         {
-            _taxa = await _taxonRepository.GetAllAsync();
+            _taxa = [.. (await _taxonRepository.GetAllAsync()).Where(t => !t.IsNotAccepted)];
         }
         _taxaById = _taxa?.ToDictionary(m => m.Id, m => m);
         var vocabularies = await _vocabularyRepository.GetAllAsync();

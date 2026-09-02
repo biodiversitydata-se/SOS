@@ -5,8 +5,10 @@ using SOS.Lib.DataStructures;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
+using SOS.Lib.Managers;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
+using System.Collections.Concurrent;
 using System.Reflection;
 using System.Text.Json;
 
@@ -48,14 +50,21 @@ public class ObservationFactoryBase : FactoryBase
     }
 
     private readonly IDictionary<int, HashSet<string>> _taxaProtectedByLaw;
+    private readonly ConcurrentDictionary<int, HashSet<string>> _ancestorTaxonNamesByTaxonId = new();
+
     private HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon> _taxonByScientificName { get; }
     private HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon> _taxonByScientificNameAuthor { get; }
     private HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon> _taxonBySynonymName { get; }
-    private HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon> _taxonBySynonymNameAuthor { get; }
+    private HashMapDictionary<string, Lib.Models.Processed.Observation.Taxon> _taxonBySynonymNameAuthor { get; }    
 
     private string GetAreaKey(AreaType areatype, string? featureId) => $"{areatype}-{featureId}";
 
-    private Lib.Models.Processed.Observation.Taxon GetTaxonByName(string name, string? scientificNameAuthorship, bool ignoreDuplicates, out string? nameWithoutAuthor)
+    private Lib.Models.Processed.Observation.Taxon GetTaxonByName(
+        string name,
+        string? scientificNameAuthorship,
+        bool ignoreDuplicates,
+        string? ancestorTaxonName,
+        out string? nameWithoutAuthor)
     {
         nameWithoutAuthor = null;
         if (string.IsNullOrEmpty(name)) return null!;
@@ -64,6 +73,11 @@ public class ObservationFactoryBase : FactoryBase
         // Get by scientific name
         if (_taxonByScientificName.TryGetValues(name, out var taxa))
         {
+            if (taxa.Count > 1 && !string.IsNullOrWhiteSpace(ancestorTaxonName))
+            {
+                taxa = FilterTaxaByAncestorTaxon(ancestorTaxonName, taxa, "scientific name", name);
+            }
+
             if (taxa.Count == 1 || ignoreDuplicates)
             {
                 return taxa.First();
@@ -73,6 +87,11 @@ public class ObservationFactoryBase : FactoryBase
         // Get by scientific name + author
         if (_taxonByScientificNameAuthor.TryGetValues(name, out taxa))
         {
+            if (taxa.Count > 1 && !string.IsNullOrWhiteSpace(ancestorTaxonName))
+            {
+                taxa = FilterTaxaByAncestorTaxon(ancestorTaxonName, taxa, "scientific name and author", name);
+            }
+
             if (taxa.Count == 1 || ignoreDuplicates)
             {
                 return taxa.First();
@@ -88,6 +107,11 @@ public class ObservationFactoryBase : FactoryBase
         {
             if (_taxonByScientificName.TryGetValues(nameWithoutAuthor, out taxa))
             {
+                if (taxa.Count > 1 && !string.IsNullOrWhiteSpace(ancestorTaxonName))
+                {
+                    taxa = FilterTaxaByAncestorTaxon(ancestorTaxonName, taxa, "scientific name without author", nameWithoutAuthor);
+                }
+
                 if (taxa.Count == 1 || ignoreDuplicates)
                 {
                     return taxa.First();
@@ -98,6 +122,11 @@ public class ObservationFactoryBase : FactoryBase
         // Get by synonyme
         if (_taxonBySynonymName.TryGetValues(name, out taxa))
         {
+            if (taxa.Count > 1 && !string.IsNullOrWhiteSpace(ancestorTaxonName))
+            {
+                taxa = FilterTaxaByAncestorTaxon(ancestorTaxonName, taxa, "synonym", name);
+            }
+
             if (taxa.Count == 1 || ignoreDuplicates)
             {
                 return taxa.First();
@@ -107,6 +136,11 @@ public class ObservationFactoryBase : FactoryBase
         // Get by synonyme + author
         if (_taxonBySynonymNameAuthor.TryGetValues(name, out taxa))
         {
+            if (taxa.Count > 1 && !string.IsNullOrWhiteSpace(ancestorTaxonName))
+            {
+                taxa = FilterTaxaByAncestorTaxon(ancestorTaxonName, taxa, "synonym and author", name);
+            }
+
             if (taxa.Count == 1 || ignoreDuplicates)
             {
                 return taxa.First();
@@ -118,6 +152,11 @@ public class ObservationFactoryBase : FactoryBase
         {
             if (_taxonBySynonymName.TryGetValues(nameWithoutAuthor, out taxa))
             {
+                if (taxa.Count > 1 && !string.IsNullOrWhiteSpace(ancestorTaxonName))
+                {
+                    taxa = FilterTaxaByAncestorTaxon(ancestorTaxonName, taxa, "synonym without author", nameWithoutAuthor);
+                }
+
                 if (taxa.Count == 1 || ignoreDuplicates)
                 {
                     return taxa.First();
@@ -126,6 +165,92 @@ public class ObservationFactoryBase : FactoryBase
         }
 
         return null!;
+    }
+
+    private HashSet<string> GetAncestorTaxonNames(Lib.Models.Processed.Observation.Taxon taxon)
+    {
+        return _ancestorTaxonNamesByTaxonId.GetOrAdd(
+            taxon.Id,
+            static (_, higherClassification) => higherClassification?
+                .Split('|', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .ToHashSet(StringComparer.OrdinalIgnoreCase) ?? new HashSet<string>(StringComparer.OrdinalIgnoreCase),
+            taxon.HigherClassification);
+    }
+
+    private List<Lib.Models.Processed.Observation.Taxon> FilterTaxaByAncestorTaxon(
+        string ancestorTaxonName,
+        List<Lib.Models.Processed.Observation.Taxon> taxa,
+        string matchType,
+        string searchedName)
+    {
+        var normalizedAncestorTaxonName = ancestorTaxonName.Trim();
+        var matches = new List<Lib.Models.Processed.Observation.Taxon>();
+
+        foreach (var taxon in taxa)
+        {
+            var isMatch = GetAncestorTaxonNames(taxon).Contains(normalizedAncestorTaxonName);
+
+            if (LogManager.IsDebugEnabled)
+            {
+                LogManager.LogDebug(
+                    "Taxon candidate {ScientificName} (taxon id {TaxonId}) has ancestor match {AncestorMatch} " +
+                    "for {AncestorTaxonName} while resolving {SearchedName} by {MatchType}. " +
+                    "Higher classification: {HigherClassification}",
+                    taxon.ScientificName,
+                    taxon.Id,
+                    isMatch,
+                    normalizedAncestorTaxonName,
+                    searchedName,
+                    matchType,
+                    taxon.HigherClassification);
+            }
+
+            if (isMatch)
+            {
+                matches.Add(taxon);
+            }
+        }
+
+        if (matches.Count == 0)
+        {
+            if (LogManager.IsDebugEnabled)
+            {
+                LogManager.LogDebug(
+                    "None of the {CandidateCount} taxon candidates matched ancestor taxon {AncestorTaxonName} " +
+                    "while resolving {SearchedName} by {MatchType}; keeping the unfiltered candidates",
+                    taxa.Count,
+                    normalizedAncestorTaxonName,
+                    searchedName,
+                    matchType);
+            }
+
+            return taxa;
+        }
+
+        if (matches.Count == 1)
+        {
+            LogManager.LogInformation(
+                "Filtered {CandidateCount} taxon candidates to {MatchingCandidateCount} candidate using ancestor " +
+                "taxon {AncestorTaxonName} while resolving {SearchedName} by {MatchType}",
+                taxa.Count,
+                matches.Count,
+                normalizedAncestorTaxonName,
+                searchedName,
+                matchType);
+        }
+        else
+        {
+            LogManager.LogWarning(
+                "Filtered {CandidateCount} taxon candidates to {MatchingCandidateCount} candidates using ancestor " +
+                "taxon {AncestorTaxonName} while resolving {SearchedName} by {MatchType}",
+                taxa.Count,
+                matches.Count,
+                normalizedAncestorTaxonName,
+                searchedName,
+                matchType);
+        }
+
+        return matches;
     }
 
     private IDictionary<int, HashSet<string>> LoadTaxonProtectedByLaw()
@@ -187,6 +312,7 @@ public class ObservationFactoryBase : FactoryBase
     /// <param name="ignoreDuplicates">If false and taxon not is found by id and name search finds more than one match, no taxon is returned</param>
     /// <param name="verbatimId"></param>
     /// <param name="verbatimName"></param>
+    /// <param name="ancestorTaxonName">Scientific name of an ancestor used to resolve duplicate name matches</param>
     /// <returns></returns>
     protected Lib.Models.Processed.Observation.Taxon GetTaxon(
         int taxonId, 
@@ -194,7 +320,8 @@ public class ObservationFactoryBase : FactoryBase
         string? scientificNameAuthorship = null,
         bool ignoreDuplicates = false, 
         string? verbatimId = null, 
-        string? verbatimName = null)
+        string? verbatimName = null,
+        string? ancestorTaxonName = null)
     {
         string? nameWithoutAuthor = null;
         Lib.Models.Processed.Observation.Taxon? taxon = null;
@@ -204,7 +331,7 @@ public class ObservationFactoryBase : FactoryBase
             // If we can't find taxon by id or taxon id is 0 (biota), try by name/s if passed
             foreach (var name in names)
             {
-                taxon = GetTaxonByName(name, scientificNameAuthorship, ignoreDuplicates, out nameWithoutAuthor);
+                taxon = GetTaxonByName(name, scientificNameAuthorship, ignoreDuplicates, ancestorTaxonName, out nameWithoutAuthor);
                 if (taxon != null)
                 {
                     break;

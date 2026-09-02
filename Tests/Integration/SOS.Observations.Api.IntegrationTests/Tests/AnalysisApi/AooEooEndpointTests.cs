@@ -1,5 +1,7 @@
 using FizzWare.NBuilder;
 using NetTopologySuite.Geometries;
+using SOS.Api.Client.Clients;
+using SOS.Api.Client.Requests;
 using SOS.Lib.Dtos.Filter;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
@@ -8,6 +10,12 @@ using SOS.Observations.Api.IntegrationTests.Setup;
 using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
 
 namespace SOS.Observations.Api.IntegrationTests.Tests.AnalysisApi;
+
+using ContractGeographicsFilterDto = SOS.Api.Contracts.Observations.Requests.GeographicsFilterDto;
+using ContractLatLonBoundingBoxDto = SOS.Api.Contracts.Common.Geo.LatLonBoundingBoxDto;
+using ContractLatLonCoordinateDto = SOS.Api.Contracts.Common.Geo.LatLonCoordinateDto;
+using ContractSearchFilterAggregationInternalDto = SOS.Api.Contracts.Aggregations.Requests.SearchFilterAggregationInternalDto;
+using ContractAreaTypeDto = SOS.Api.Contracts.Analysis.Requests.AreaTypeAggregateDto;
 
 [Collection(TestCollection.Name)]
 public class AooEooEndpointTests : TestBase
@@ -105,6 +113,107 @@ public class AooEooEndpointTests : TestBase
             .Should().AllBeEquivalentTo(1);
     }
 
+    [Fact]
+    public async Task SosAnalysisClient_CalculateAooEooAsync_UsesAnalysisApiPipeline()
+    {
+        var points = new[]
+        {
+            ToWgs84Point(674100, 6582100),
+            ToWgs84Point(674900, 6582900),
+            ToWgs84Point(675700, 6583700)
+        };
+        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(CreateVerbatimObservations(points));
+        var client = new SosAnalysisClient(TestFixture.CreateAnalysisApiClient());
+        var filter = new ContractSearchFilterAggregationInternalDto
+        {
+            Geographics = new ContractGeographicsFilterDto
+            {
+                BoundingBox = CreateContractBoundingBox(points)
+            }
+        };
+
+        var result = await client.CalculateAooEooAsync(
+            filter,
+            new AooEooOptions
+            {
+                ValidateFilter = false,
+                AlphaValues = [1],
+                GridCellSizeInMeters = GridCellSizeInMeters,
+                ReturnGridCells = true
+            },
+            TestContext.Current.CancellationToken);
+
+        result.Features.Should().NotBeEmpty();
+        result.Features
+            .Where(feature => feature.Properties.ContainsKey("id"))
+            .Select(feature => feature.Properties["id"]?.ToString())
+            .Should().Contain("eoo-1");
+    }
+
+    [Fact]
+    public async Task SosAnalysisClient_AggregateAreasAsync_UsesAnalysisApiPipeline()
+    {
+        var points = new[]
+        {
+            ToWgs84Point(674100, 6582100),
+            ToWgs84Point(674900, 6582900)
+        };
+        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(CreateVerbatimObservations(points));
+        var client = new SosAnalysisClient(TestFixture.CreateAnalysisApiClient());
+        var filter = new ContractSearchFilterAggregationInternalDto
+        {
+            Geographics = new ContractGeographicsFilterDto
+            {
+                BoundingBox = CreateContractBoundingBox(points)
+            }
+        };
+
+        var result = await client.AggregateAreasAsync(
+            filter,
+            new AreaAggregationOptions
+            {
+                AreaType = ContractAreaTypeDto.Province,
+                ValidateFilter = false
+            },
+            TestContext.Current.CancellationToken);
+
+        result.Should().NotBeNull();
+        result.Features.Should().NotBeNull();
+    }
+
+    [Fact]
+    public async Task SosAnalysisClient_CalculateArticle17Async_UsesAnalysisApiPipeline()
+    {
+        var points = new[]
+        {
+            ToWgs84Point(674100, 6582100),
+            ToWgs84Point(674900, 6582900),
+            ToWgs84Point(675700, 6583700)
+        };
+        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(CreateVerbatimObservations(points));
+        var client = new SosAnalysisClient(TestFixture.CreateAnalysisApiClient());
+        var filter = new ContractSearchFilterAggregationInternalDto
+        {
+            Geographics = new ContractGeographicsFilterDto
+            {
+                BoundingBox = CreateContractBoundingBox(points)
+            }
+        };
+
+        var result = await client.CalculateArticle17Async(
+            filter,
+            new Article17Options
+            {
+                ValidateFilter = false,
+                MaxDistance = 25_000,
+                GridCellSizeInMeters = GridCellSizeInMeters
+            },
+            TestContext.Current.CancellationToken);
+
+        result.Should().NotBeNull();
+        result.Features.Should().NotBeNull();
+    }
+
     private async Task<JsonDocument> CalculateAooAndEooAsync(IReadOnlyCollection<Point> points, bool returnGridCells = false)
     {
         var verbatimObservations = CreateVerbatimObservations(points);
@@ -184,6 +293,26 @@ public class AooEooEndpointTests : TestBase
                 Longitude = pointArray.Min(point => point.X) - margin
             },
             BottomRight = new LatLonCoordinateDto
+            {
+                Latitude = pointArray.Min(point => point.Y) - margin,
+                Longitude = pointArray.Max(point => point.X) + margin
+            }
+        };
+    }
+
+    private static ContractLatLonBoundingBoxDto CreateContractBoundingBox(IEnumerable<Point> points)
+    {
+        const double margin = 0.02;
+        var pointArray = points.ToArray();
+
+        return new ContractLatLonBoundingBoxDto
+        {
+            TopLeft = new ContractLatLonCoordinateDto
+            {
+                Latitude = pointArray.Max(point => point.Y) + margin,
+                Longitude = pointArray.Min(point => point.X) - margin
+            },
+            BottomRight = new ContractLatLonCoordinateDto
             {
                 Latitude = pointArray.Min(point => point.Y) - margin,
                 Longitude = pointArray.Max(point => point.X) + margin

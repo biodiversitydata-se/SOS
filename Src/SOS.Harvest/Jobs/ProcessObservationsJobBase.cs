@@ -423,6 +423,7 @@ public class ProcessObservationsJobBase : ProcessJobBase
                 return null!;
             }
 
+            taxa = taxa.Where(m => m.IsNotAccepted == false); // only include accepted taxa in the dictionary, as we don't want to process observations for non-accepted taxa
             var taxaDictonary = new ConcurrentDictionary<int, Taxon>();
             taxa.ForEach(t => taxaDictonary.TryAdd(t.Id, t));
 

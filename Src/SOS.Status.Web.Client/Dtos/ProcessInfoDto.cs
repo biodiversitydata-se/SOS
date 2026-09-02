@@ -19,7 +19,7 @@ public class ProcessInfoDto
         public int? HarvestCount { get; set; }
         public DateTime? LatestIncrementalEnd { get; set; }
         public DateTime? LatestIncrementalStart { get; set; }
-        public int? LatestIncrementalStatus { get; set; }
+        public string LatestIncrementalStatus { get; set; }
         public int? LatestIncrementalPublicCount { get; set; }
         public int? LatestIncrementalProtectedCount { get; set; }
         public string DataProviderType { get; set; }

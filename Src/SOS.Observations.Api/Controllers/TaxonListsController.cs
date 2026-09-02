@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using SOS.Lib.Helpers;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Shared;
@@ -7,13 +6,11 @@ using SOS.Lib.Swagger;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Shared.Api.Configuration;
 using SOS.Lib.Dtos;
+using SOS.Lib.Dtos.Filter;
 using SOS.Lib.Dtos.Status;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Reflection;
-using System.Threading.Tasks;
+using SOS.Lib.Extensions.Dto;
 
 namespace SOS.Observations.Api.Controllers;
 
@@ -26,6 +23,7 @@ public class TaxonListsController : ControllerBase
 {
     private readonly ITaxonListManager _taxonListManager;
     private readonly ITaxonManager _taxonManager;
+    private readonly IFilterManager _filterManager;
     private readonly IEnumerable<int> _signalSearchTaxonListIds;
     private readonly ILogger<TaxonListsController> _logger;
 
@@ -34,16 +32,19 @@ public class TaxonListsController : ControllerBase
     /// </summary>
     /// <param name="taxonListManager"></param>
     /// <param name="taxonManager"></param>
+    /// <param name="filterManager"></param>
     /// <param name="inputValaidationConfiguration"></param>
     /// <param name="logger"></param>
     public TaxonListsController(
         ITaxonListManager taxonListManager,
         ITaxonManager taxonManager,
+        IFilterManager filterManager,
         InputValaidationConfiguration inputValaidationConfiguration,
         ILogger<TaxonListsController> logger)
     {
         _taxonListManager = taxonListManager ?? throw new ArgumentNullException(nameof(taxonListManager));
         _taxonManager = taxonManager ?? throw new ArgumentNullException(nameof(taxonManager));
+        _filterManager = filterManager ?? throw new ArgumentNullException(nameof(filterManager));
         _signalSearchTaxonListIds = inputValaidationConfiguration?.SignalSearchTaxonListIds ??
                                     throw new ArgumentNullException(nameof(inputValaidationConfiguration));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -195,6 +196,34 @@ public class TaxonListsController : ControllerBase
             };
 
             return Ok(statistics);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "{@methodName}() failed", MethodBase.GetCurrentMethod()?.Name);
+            return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+        }
+    }
+
+    /// <summary>
+    ///     Get all taxa matching the provided taxon filter.
+    /// </summary>
+    [HttpPost("taxa/filterTaxa")]
+    [InternalApi]
+    public async Task<IActionResult> GetAllFilterTaxa([FromBody] TaxonFilterDto? filter)
+    {
+        try
+        {
+            var taxonFilter = filter?.ToTaxonFilter();
+            await _filterManager.PrepareTaxonFilterAsync(taxonFilter);
+            
+            var taxonTree = await _taxonManager.GetTaxonTreeAsync(filter.TaxonomyType);
+            var nodes = taxonTree.GetTreeNodes(taxonFilter.Ids);
+            return Ok(nodes.Select(n => new TaxonListTaxonInformationDto
+            {
+                Id = n.TaxonId,
+                ScientificName = n.ScientificName,
+                SwedishName = n.Data.VernacularName
+            }));
         }
         catch (Exception e)
         {

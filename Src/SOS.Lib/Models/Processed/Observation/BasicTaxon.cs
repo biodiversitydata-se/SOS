@@ -36,4 +36,9 @@ public class BasicTaxon : IEntity<int>, IBasicTaxon
     public string ScientificName { get; set; }
     public string ScientificNameAuthorship { get; set; }
     public string VernacularName { get; set; }
+
+    /// <summary>
+    /// True if taxon is not accepted according to Dyntaxa
+    /// </summary>
+    public bool IsNotAccepted { get ; set; }
 }

@@ -9,7 +9,7 @@
     <MudText Typo="Typo.h4">Locations search</MudText>
 
     <MudGrid Spacing="3">
-        <MudItem xs="12" lg="8">
+        <MudItem xs="12" lg="6">
             <div style="position: relative;">
                 <div @ref="_mapContainer" style="height:560px; width:100%;"></div>
 
@@ -96,11 +96,73 @@
                     </MudExpansionPanels>
                 }
             </MudPaper>
+
         </MudItem>
 
-        <MudItem xs="12" lg="4">
+        <MudItem xs="12" lg="6">
             <MudExpansionPanels MultiExpansion="false" Class="mb-2">
-                <MudExpansionPanel Text="Kartinfo" Expanded="true">
+                <MudExpansionPanel Text="@ObservationPanelTitle" Expanded="true">
+                    @if (isObservationPreviewLoading)
+                    {
+                        <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
+                            <MudProgressCircular Color="Color.Primary" Indeterminate="true" Size="Size.Small" />
+                            <MudText Typo="Typo.body2">@ObservationPreviewLoadingText</MudText>
+                        </MudStack>
+                    }
+                    else if (observationSearchResult is null)
+                    {
+                        <MudText Typo="Typo.body2">Sök för att visa de första @ObservationPreviewTake observationerna.</MudText>
+                    }
+                    else if (observationSearchResult.Records.Count == 0)
+                    {
+                        <MudText Typo="Typo.body2">Inga observationer hittades.</MudText>
+                    }
+                    else
+                    {
+                        @if (string.Equals(lastResultType, "geogrid", StringComparison.OrdinalIgnoreCase))
+                        {
+                            <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mb-2">
+                                Kartresultatet är aggregerat till geogrid. Zooma in och sök igen för att kunna markera en lokal.
+                            </MudAlert>
+                        }
+
+                        <div class="observations-table-container">
+                            <MudTable T="Observation"
+                                      Items="@observationSearchResult.Records"
+                                      Dense="true"
+                                      Hover="true"
+                                      Bordered="true"
+                                      Striped="true"
+                                      Elevation="0">
+                                <HeaderContent>
+                                    <MudTh>Markera</MudTh>
+                                    <MudTh>Svenskt namn</MudTh>
+                                    <MudTh>Vetenskapligt namn</MudTh>
+                                    <MudTh>Datum</MudTh>
+                                    <MudTh>Lokal</MudTh>
+                                    <MudTh>LocationId</MudTh>
+                                </HeaderContent>
+                                <RowTemplate>
+                                    <MudTd DataLabel="Markera">
+                                        <MudCheckBox T="bool"
+                                                     Value="@IsObservationHighlighted(context)"
+                                                     ValueChanged="@((bool value) => OnObservationHighlightChangedAsync(context, value))"
+                                                     Disabled="@(!CanHighlightObservation(context))"
+                                                     Color="Color.Secondary"
+                                                     Dense="true" />
+                                    </MudTd>
+                                    <MudTd DataLabel="Svenskt namn">@(context.Taxon?.VernacularName ?? "-")</MudTd>
+                                    <MudTd DataLabel="Vetenskapligt namn">@(context.Taxon?.ScientificName ?? "-")</MudTd>
+                                    <MudTd DataLabel="Datum">@(context.Event?.PlainStartDate ?? context.Event?.StartDate?.ToString("yyyy-MM-dd") ?? "-")</MudTd>
+                                    <MudTd DataLabel="Lokal">@(context.Location?.Locality ?? "-")</MudTd>
+                                    <MudTd DataLabel="LocationId" Class="observation-location-id">@(context.Location?.LocationId ?? "-")</MudTd>
+                                </RowTemplate>
+                            </MudTable>
+                        </div>
+                    }
+                </MudExpansionPanel>
+
+                <MudExpansionPanel Text="Kartinfo">
                     <MudStack Spacing="1">
                         <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.FlexStart" Class="mb-1">
                             <MudButton Variant="Variant.Outlined"

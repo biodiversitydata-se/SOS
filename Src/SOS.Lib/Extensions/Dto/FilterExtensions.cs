@@ -501,6 +501,7 @@ public static class FilterExtensions
                 filter.TaxonListOperator =
                     (TaxonFilter.TaxonListOp)(taxonFilterDto?.TaxonListOperator).GetValueOrDefault();
                 filter.TaxonCategories = taxonFilterDto?.TaxonCategories!;
+                filter.TaxonomyType = taxonFilterDto.TaxonomyType;
             }
 
             return filter;

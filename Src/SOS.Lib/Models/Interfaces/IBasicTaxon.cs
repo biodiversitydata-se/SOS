@@ -15,6 +15,11 @@ public interface IBasicTaxon
     int Id { get; set; }
 
     /// <summary>
+    /// True if taxon is not accepted according to Dyntaxa
+    /// </summary>
+    public bool IsNotAccepted { get; set; }
+
+    /// <summary>
     ///     Secondary parents dyntaxa taxon ids.
     /// </summary>
     IEnumerable<int> SecondaryParentDyntaxaTaxonIds { get; set; }

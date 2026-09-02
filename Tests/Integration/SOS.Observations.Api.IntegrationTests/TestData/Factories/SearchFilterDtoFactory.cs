@@ -1,5 +1,7 @@
-﻿using SOS.Lib.Dtos.Enum;
+﻿using SOS.Lib.Managers;
+using SOS.Lib.Dtos.Enum;
 using SOS.Lib.Dtos.Filter;
+using SOS.Lib.Enums;
 
 namespace SOS.Observations.Api.IntegrationTests.TestData.Factories;
 internal static class SearchFilterDtoFactory
@@ -84,6 +86,19 @@ internal static class SearchFilterDtoFactory
             Taxon = new TaxonFilterDto
             {
                 TaxonCategories = taxonCategoryIds
+            }
+        };
+    }
+
+    public static SearchFilterDto CreateWithTaxonomyType(bool includeUnderlyingTaxa = false, TaxonomyType taxonomyType = TaxonomyType.Dyntaxa, params int[] taxonIds)
+    {
+        return new SearchFilterDto
+        {
+            Taxon = new TaxonFilterDto
+            {
+                IncludeUnderlyingTaxa = includeUnderlyingTaxa,
+                TaxonomyType = taxonomyType,
+                Ids = taxonIds
             }
         };
     }

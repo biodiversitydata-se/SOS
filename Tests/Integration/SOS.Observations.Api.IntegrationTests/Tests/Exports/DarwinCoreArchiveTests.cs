@@ -9,6 +9,10 @@ using SOS.Observations.Api.IntegrationTests.Helpers;
 using SOS.Observations.Api.IntegrationTests.Setup;
 using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
 using SOS.Observations.Api.Repositories.Interfaces;
+using SOS.Api.Client.Clients;
+using SOS.Api.Client.Requests;
+using SOS.Api.Contracts.Exports.Requests;
+using ContractSearchFilterInternalDto = SOS.Api.Contracts.Observations.Requests.SearchFilterInternalDto;
 
 namespace SOS.Observations.Api.IntegrationTests.Tests.Exports;
 
@@ -20,6 +24,27 @@ public class DarwinCoreArchiveTests : TestBase
 {
     public DarwinCoreArchiveTests(TestFixture testFixture, ITestOutputHelper output) : base(testFixture, output)
     {
+    }
+
+    [Fact]
+    public async Task SosExportsClient_DownloadInternalAsync_StreamsCsvFromObservationApi()
+    {
+        var observations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(3)
+            .All().HaveValuesFromPredefinedObservations()
+            .Build();
+        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(observations);
+        var client = new SosExportsClient(TestFixture.CreateApiClient());
+
+        await using var response = await client.DownloadInternalAsync(
+            new ContractSearchFilterInternalDto(),
+            SosExportType.Csv,
+            new ExportDownloadOptions { CultureCode = "sv-SE" },
+            TestContext.Current.CancellationToken);
+        using var content = new MemoryStream();
+        await response.Content.CopyToAsync(content, TestContext.Current.CancellationToken);
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        content.Length.Should().BeGreaterThan(0);
     }
 
 

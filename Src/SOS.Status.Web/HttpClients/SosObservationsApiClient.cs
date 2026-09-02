@@ -1,10 +1,14 @@
-﻿using CSharpFunctionalExtensions;
+﻿using ContractsModels = SOS.Api.Contracts.Status.Requests;
+using SearchFilterInternalDto = SOS.Api.Contracts.Observations.Requests.SearchFilterInternalDto;
+using CSharpFunctionalExtensions;
+using SOS.Api.Contracts.Common.Responses;
+using SOS.Api.Contracts.Observations.Responses;
 using SOS.Lib.Dtos.Status;
 using SOS.Status.Web.Client.Dtos;
-using SOS.Status.Web.Client.JsonConverters;
 using SOS.Status.Web.Client.Models;
 using System.Text;
 using System.Text.Json.Serialization;
+using SOS.Api.Contracts.Observations.Requests;
 
 namespace SOS.Status.Web.HttpClients;
 
@@ -17,8 +21,7 @@ public class SosObservationsApiClient
         PropertyNameCaseInsensitive = true,
         Converters =
         {
-            new JsonStringEnumConverter(),
-            new GeoJsonConverter()
+            new JsonStringEnumConverter()
         }
     };
 
@@ -28,8 +31,8 @@ public class SosObservationsApiClient
         _logger = logger;
     }
 
-    public async Task<SOS.Status.Web.Client.Dtos.SosObsApi.PagedResultDto<SOS.Status.Web.Client.Dtos.SosObsApi.Observation>?> SearchObservationsAsync(
-        Client.Dtos.SosObsApi.SearchFilterInternalDto filter,
+    public async Task<PagedResultDto<Observation>?> SearchObservationsAsync(
+        SearchFilterInternalDto filter,
         int skip = 0,
         int take = 100,
         string sortBy = "",
@@ -41,11 +44,11 @@ public class SosObservationsApiClient
         var url = $"/observations/internal/search?skip={skip}&take={take}&sortBy={sortBy}&sortOrder={sortOrder}&validateSearchFilter={validateSearchFilter}&translationCultureCode={translationCultureCode}&sensitiveObservations={sensitiveObservations}";
         var response = await _httpClient.PostAsJsonAsync(url, filter, _jsonSerializerOptions);
         response.EnsureSuccessStatusCode();
-        return await response.Content.ReadFromJsonAsync<SOS.Status.Web.Client.Dtos.SosObsApi.PagedResultDto<SOS.Status.Web.Client.Dtos.SosObsApi.Observation>>();
+        return await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
     }
 
     public async Task<(string GeoJson, long? ObservationsCount, long ResponseSizeBytes)> AdaptiveSearchGeoJsonByLocationAsync(
-        Client.Dtos.SosObsApi.SearchFilterInternalDto filter,
+        SearchFilterInternalDto filter,
         bool cluster = true,
         string clusteringAlgorithm = "Greedy",
         CreatePolygonsMode createPolygons = CreatePolygonsMode.No,
@@ -94,7 +97,7 @@ public class SosObservationsApiClient
     }    
 
     public async Task<(string GeoJson, long? ObservationsTotalCount, long? EstimatedLocationCount, long? FeatureCount, long? LocationsBeforeClustering, long ResponseSizeBytes, string? CacheStatus, string? ResultType, string? Timings)> AdaptiveSearchLocationItemsCachedGeoJsonAsync(
-        Client.Dtos.SosObsApi.SearchFilterInternalDto filter,
+        SearchFilterInternalDto filter,
         int observationsLimit = 10000,
         int maxGridCells = 10000,
         int? locationAggregationLimit = null,
@@ -206,8 +209,8 @@ public class SosObservationsApiClient
         return (geoJson, observationsTotalCount, estimatedLocationCount, featureCount, locationsBeforeClustering, responseSizeBytes, cacheStatus, resultType, timings);
     }
 
-    public async Task<Result<Client.Dtos.SosObsApi.SearchByCursorResultDto<Client.Dtos.SosObsApi.Observation>?>> SearchObservationsByCursorAsync(
-        Client.Dtos.SosObsApi.SearchFilterInternalDto filter,
+    public async Task<Result<SearchByCursorResultDto<Observation>?>> SearchObservationsByCursorAsync(
+        SearchFilterInternalDto filter,
         int take = 1000,
         string? cursor = null,
         string sortBy = "taxon.id",
@@ -230,23 +233,23 @@ public class SosObservationsApiClient
                 var errorContent = await response.Content.ReadAsStringAsync();
                 var errorMessage = $"HTTP {(int)response.StatusCode} ({response.StatusCode}): {errorContent}";
                 _logger.LogError("SearchByCursor request failed: {ErrorMessage}", errorMessage);
-                return Result.Failure<Client.Dtos.SosObsApi.SearchByCursorResultDto<Client.Dtos.SosObsApi.Observation>?>(errorMessage);
+                return Result.Failure<SearchByCursorResultDto<Observation>?>(errorMessage);
             }
 
-            var result = await response.Content.ReadFromJsonAsync<Client.Dtos.SosObsApi.SearchByCursorResultDto<Client.Dtos.SosObsApi.Observation>>(_jsonSerializerOptions);
+            var result = await response.Content.ReadFromJsonAsync<SearchByCursorResultDto<Observation>>(_jsonSerializerOptions);
             return Result.Success(result);
         }
         catch (HttpRequestException ex)
         {
             var errorMessage = $"HTTP request failed: {ex.Message}";
             _logger.LogError(ex, "SearchByCursor HTTP request exception: {ErrorMessage}", errorMessage);
-            return Result.Failure<Client.Dtos.SosObsApi.SearchByCursorResultDto<Client.Dtos.SosObsApi.Observation>?>(errorMessage);
+            return Result.Failure<SearchByCursorResultDto<Observation>?>(errorMessage);
         }
         catch (Exception ex)
         {
             var errorMessage = $"Unexpected error: {ex.Message}";
             _logger.LogError(ex, "SearchByCursor unexpected exception: {ErrorMessage}", errorMessage);
-            return Result.Failure<Client.Dtos.SosObsApi.SearchByCursorResultDto<Client.Dtos.SosObsApi.Observation>?>(errorMessage);
+            return Result.Failure<SearchByCursorResultDto<Observation>?>(errorMessage);
         }
     }
 
@@ -382,7 +385,7 @@ public class SosObservationsApiClient
 
     public async Task<string?> GetTaxonRelationsDiagramAsync(
         int[] taxonIds,
-        TaxonRelationsTreeIterationMode treeIterationMode = TaxonRelationsTreeIterationMode.BothParentsAndChildren,
+        ContractsModels.TaxonRelationsTreeIterationMode treeIterationMode = ContractsModels.TaxonRelationsTreeIterationMode.BothParentsAndChildren,
         bool includeSecondaryRelations = true,
         string translationCultureCode = "sv-SE")
     {
@@ -418,4 +421,3 @@ public class SosObservationsApiClient
         }
     }
 }
-

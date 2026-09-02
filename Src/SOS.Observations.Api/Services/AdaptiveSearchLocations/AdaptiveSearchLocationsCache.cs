@@ -22,6 +22,7 @@ internal sealed class AdaptiveSearchLocationsCache : IAdaptiveSearchLocationsCac
     internal const int MaxEntriesPerKey = 8;
     internal const int MaxLocationsPerBucket = 10000;
     internal static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(10);
+    private const double CoordinateEpsilon = 0.000000000001;
 
     private readonly IFusionCache _cache;
     private readonly AdaptiveSearchLocationsCacheMonitor _cacheMonitor;
@@ -76,7 +77,22 @@ internal sealed class AdaptiveSearchLocationsCache : IAdaptiveSearchLocationsCac
             .FirstOrDefault(entry => ContainsBoundingBox(entry.BoundingBox, requestedBbox));
         if (cacheEntry == null)
         {
-            return false;
+            if (requestedBbox?.TopLeft == null || requestedBbox.BottomRight == null)
+            {
+                return false;
+            }
+
+            var intersectingEntries = bucket.Entries
+                .Where(entry => IntersectsBoundingBox(entry.BoundingBox, requestedBbox))
+                .ToList();
+            if (!IsBoundingBoxCoveredByEntries(intersectingEntries, requestedBbox))
+            {
+                return false;
+            }
+
+            locations = MergeLocations(intersectingEntries
+                .SelectMany(entry => FilterByBoundingBox(entry.Locations, requestedBbox)));
+            return true;
         }
 
         locations = FilterByBoundingBox(cacheEntry.Locations, requestedBbox).ToList();
@@ -240,6 +256,132 @@ internal sealed class AdaptiveSearchLocationsCache : IAdaptiveSearchLocationsCac
                cachedBbox.BottomRight.Latitude <= requestedBbox.BottomRight.Latitude;
     }
 
+    private static bool IntersectsBoundingBox(LatLonBoundingBox? cachedBbox, LatLonBoundingBox requestedBbox)
+    {
+        if (cachedBbox?.TopLeft == null || cachedBbox.BottomRight == null ||
+            requestedBbox.TopLeft == null || requestedBbox.BottomRight == null)
+        {
+            return false;
+        }
+
+        return cachedBbox.TopLeft.Longitude <= requestedBbox.BottomRight.Longitude &&
+               cachedBbox.BottomRight.Longitude >= requestedBbox.TopLeft.Longitude &&
+               cachedBbox.TopLeft.Latitude >= requestedBbox.BottomRight.Latitude &&
+               cachedBbox.BottomRight.Latitude <= requestedBbox.TopLeft.Latitude;
+    }
+
+    private static bool IsBoundingBoxCoveredByEntries(
+        IReadOnlyCollection<AdaptiveSearchLocationsCacheEntry> entries,
+        LatLonBoundingBox requestedBbox)
+    {
+        if (requestedBbox.TopLeft == null || requestedBbox.BottomRight == null)
+        {
+            return false;
+        }
+
+        var requestedLeft = requestedBbox.TopLeft.Longitude;
+        var requestedRight = requestedBbox.BottomRight.Longitude;
+        var requestedTop = requestedBbox.TopLeft.Latitude;
+        var requestedBottom = requestedBbox.BottomRight.Latitude;
+        var clippedRectangles = entries
+            .Select(entry => ClipBoundingBox(entry.BoundingBox, requestedLeft, requestedTop, requestedRight, requestedBottom))
+            .Where(rectangle => rectangle.HasValue)
+            .Select(rectangle => rectangle!.Value)
+            .ToList();
+        if (clippedRectangles.Count == 0)
+        {
+            return false;
+        }
+
+        var longitudeBoundaries = clippedRectangles
+            .SelectMany(rectangle => new[] { rectangle.Left, rectangle.Right })
+            .Append(requestedLeft)
+            .Append(requestedRight)
+            .Distinct()
+            .OrderBy(longitude => longitude)
+            .ToList();
+        for (var index = 0; index < longitudeBoundaries.Count - 1; index++)
+        {
+            var sliceLeft = longitudeBoundaries[index];
+            var sliceRight = longitudeBoundaries[index + 1];
+            if (sliceRight - sliceLeft <= CoordinateEpsilon)
+            {
+                continue;
+            }
+
+            var latitudeIntervals = clippedRectangles
+                .Where(rectangle =>
+                    rectangle.Left <= sliceLeft + CoordinateEpsilon &&
+                    rectangle.Right >= sliceRight - CoordinateEpsilon)
+                .Select(rectangle => new LatitudeInterval(rectangle.Bottom, rectangle.Top))
+                .OrderBy(interval => interval.Bottom)
+                .ToList();
+            if (!CoversLatitudeInterval(latitudeIntervals, requestedBottom, requestedTop))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private static ClippedBoundingBox? ClipBoundingBox(
+        LatLonBoundingBox? bbox,
+        double requestedLeft,
+        double requestedTop,
+        double requestedRight,
+        double requestedBottom)
+    {
+        if (bbox?.TopLeft == null || bbox.BottomRight == null)
+        {
+            return null;
+        }
+
+        var left = Math.Max(bbox.TopLeft.Longitude, requestedLeft);
+        var right = Math.Min(bbox.BottomRight.Longitude, requestedRight);
+        var top = Math.Min(bbox.TopLeft.Latitude, requestedTop);
+        var bottom = Math.Max(bbox.BottomRight.Latitude, requestedBottom);
+        return right - left > CoordinateEpsilon && top - bottom > CoordinateEpsilon
+            ? new ClippedBoundingBox(left, top, right, bottom)
+            : null;
+    }
+
+    private static bool CoversLatitudeInterval(
+        IReadOnlyCollection<LatitudeInterval> intervals,
+        double requestedBottom,
+        double requestedTop)
+    {
+        if (intervals.Count == 0)
+        {
+            return false;
+        }
+
+        var coveredTop = requestedBottom;
+        foreach (var interval in intervals)
+        {
+            if (interval.Bottom > coveredTop + CoordinateEpsilon)
+            {
+                return false;
+            }
+
+            coveredTop = Math.Max(coveredTop, interval.Top);
+            if (coveredTop >= requestedTop - CoordinateEpsilon)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static List<CachedLocationAggregate> MergeLocations(IEnumerable<CachedLocationAggregate> locations)
+    {
+        return locations
+            .GroupBy(location => location.DistinctLocationId, StringComparer.OrdinalIgnoreCase)
+            .Select(group => group.First())
+            .ToList();
+    }
+
     private static bool AreSameBoundingBox(LatLonBoundingBox? left, LatLonBoundingBox? right)
     {
         if (left?.TopLeft == null || left.BottomRight == null || right?.TopLeft == null || right.BottomRight == null)
@@ -260,4 +402,8 @@ internal sealed class AdaptiveSearchLocationsCache : IAdaptiveSearchLocationsCac
                latitude <= bbox.TopLeft.Latitude &&
                latitude >= bbox.BottomRight.Latitude;
     }
+
+    private readonly record struct ClippedBoundingBox(double Left, double Top, double Right, double Bottom);
+
+    private readonly record struct LatitudeInterval(double Bottom, double Top);
 }

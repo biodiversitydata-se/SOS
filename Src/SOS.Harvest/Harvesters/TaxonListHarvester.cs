@@ -67,7 +67,7 @@ public class TaxonListHarvester : ITaxonListHarvester
             var taxonListByTaxonListServiceId = taxonLists!.ToDictionary(m => m.TaxonListServiceId, m => m);
             var conservationLists =
                 await _taxonListService.GetTaxaAsync(taxonLists!.Select(m => m.TaxonListServiceId));
-            var taxa = (await _taxonRepository.GetAllAsync())?.ToDictionary(t => t.Id, t => t) ?? new Dictionary<int, Taxon>();
+            var taxa = (await _taxonRepository.GetAllAsync())?.Where(t => !t.IsNotAccepted).ToDictionary(t => t.Id, t => t) ?? new Dictionary<int, Taxon>();
             foreach (var conservationList in conservationLists)
             {
                 taxonListByTaxonListServiceId[conservationList.ListId].Taxa =

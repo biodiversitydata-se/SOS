@@ -591,6 +591,103 @@ public class AdaptiveSearchLocationsTests : TestBase
     }
 
     [Fact]
+    public async Task AdaptiveSearchLocationsInternal_ReusesCachedAdjacentBoundingBoxes_WhenRequestIsCovered()
+    {
+        // Arrange
+        var observations = CreatePointObservations(
+            4,
+            346000,
+            TaxonIds.Mesar,
+            index => index switch
+            {
+                0 => (13.851, 58.381),
+                1 => (13.855, 58.392),
+                2 => (13.865, 58.383),
+                _ => (13.875, 58.390)
+            });
+        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(observations);
+        var observationManagerProbe = new ObservationManagerCallProbe();
+        var apiClient = CreateApiClientWithObservationManagerProbe(observationManagerProbe);
+        var leftFilter = CreateBoundingBoxFilter(TaxonIds.Mesar, 13.84, 58.40, 13.86, 58.35);
+        var rightFilter = CreateBoundingBoxFilter(TaxonIds.Mesar, 13.86, 58.40, 13.88, 58.35);
+        var combinedFilter = CreateBoundingBoxFilter(TaxonIds.Mesar, 13.84, 58.40, 13.88, 58.35);
+
+        // Act
+        var leftResponse = await apiClient.PostAsync(
+            "/observations/internal/adaptivesearchlocations?observationsLimit=100&cluster=false&returnInputBBox=true",
+            JsonContent.Create(leftFilter), TestContext.Current.CancellationToken);
+        var rightResponse = await apiClient.PostAsync(
+            "/observations/internal/adaptivesearchlocations?observationsLimit=100&cluster=false&returnInputBBox=true",
+            JsonContent.Create(rightFilter), TestContext.Current.CancellationToken);
+        var countAndExtentCallsAfterWarmupRequests = observationManagerProbe.CountAndExtentCalls;
+        var combinedResponse = await apiClient.PostAsync(
+            "/observations/internal/adaptivesearchlocations?observationsLimit=100&cluster=false&returnInputBBox=true",
+            JsonContent.Create(combinedFilter), TestContext.Current.CancellationToken);
+        var combinedResponseString = await combinedResponse.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
+        var combinedFeatures = JsonNode.Parse(combinedResponseString)!["features"]!.AsArray();
+
+        // Assert
+        leftResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        rightResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        combinedResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        leftResponse.GetHeaderValue("X-Cache").Should().Be("MISS");
+        rightResponse.GetHeaderValue("X-Cache").Should().Be("MISS");
+        combinedResponse.GetHeaderValue("X-Cache").Should().Be("HIT");
+        combinedResponse.GetHeaderValue("X-Feature-Count").Should().Be("4");
+        combinedFeatures.Count.Should().Be(4);
+        countAndExtentCallsAfterWarmupRequests.Should().Be(2);
+        observationManagerProbe.CountAndExtentCalls.Should().Be(2);
+    }
+
+    [Fact]
+    public async Task AdaptiveSearchLocationsInternal_DoesNotReuseCachedBoundingBoxes_WhenCoverageHasGap()
+    {
+        // Arrange
+        var observations = CreatePointObservations(
+            3,
+            346100,
+            TaxonIds.Mesar,
+            index => index switch
+            {
+                0 => (14.201, 58.481),
+                1 => (14.220, 58.482),
+                _ => (14.239, 58.483)
+            });
+        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(observations);
+        var observationManagerProbe = new ObservationManagerCallProbe();
+        var apiClient = CreateApiClientWithObservationManagerProbe(observationManagerProbe);
+        var leftFilter = CreateBoundingBoxFilter(TaxonIds.Mesar, 14.19, 58.50, 14.21, 58.45);
+        var rightFilter = CreateBoundingBoxFilter(TaxonIds.Mesar, 14.23, 58.50, 14.25, 58.45);
+        var combinedFilter = CreateBoundingBoxFilter(TaxonIds.Mesar, 14.19, 58.50, 14.25, 58.45);
+
+        // Act
+        var leftResponse = await apiClient.PostAsync(
+            "/observations/internal/adaptivesearchlocations?observationsLimit=100&cluster=false&returnInputBBox=true",
+            JsonContent.Create(leftFilter), TestContext.Current.CancellationToken);
+        var rightResponse = await apiClient.PostAsync(
+            "/observations/internal/adaptivesearchlocations?observationsLimit=100&cluster=false&returnInputBBox=true",
+            JsonContent.Create(rightFilter), TestContext.Current.CancellationToken);
+        var countAndExtentCallsAfterWarmupRequests = observationManagerProbe.CountAndExtentCalls;
+        var combinedResponse = await apiClient.PostAsync(
+            "/observations/internal/adaptivesearchlocations?observationsLimit=100&cluster=false&returnInputBBox=true",
+            JsonContent.Create(combinedFilter), TestContext.Current.CancellationToken);
+        var combinedResponseString = await combinedResponse.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
+        var combinedPropertiesByLocationId = GetFeaturePropertiesByLocationId(combinedResponseString);
+
+        // Assert
+        leftResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        rightResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        combinedResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        leftResponse.GetHeaderValue("X-Cache").Should().Be("MISS");
+        rightResponse.GetHeaderValue("X-Cache").Should().Be("MISS");
+        combinedResponse.GetHeaderValue("X-Cache").Should().Be("MISS");
+        combinedResponse.GetHeaderValue("X-Feature-Count").Should().Be("3");
+        combinedPropertiesByLocationId.Should().ContainKey(CreateArtportalenSiteLocationId(346101));
+        countAndExtentCallsAfterWarmupRequests.Should().Be(2);
+        observationManagerProbe.CountAndExtentCalls.Should().Be(3);
+    }
+
+    [Fact]
     public async Task AdaptiveSearchLocationsInternal_BypassesLocationCache_WhenUseCacheIsFalse()
     {
         // Arrange

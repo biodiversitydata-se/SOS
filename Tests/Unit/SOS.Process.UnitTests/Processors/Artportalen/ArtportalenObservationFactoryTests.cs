@@ -49,6 +49,33 @@ public class ArtportalenObservationFactoryTests
         birdNestActivityId.Should().Be(1);
     }
 
+    [Fact]
+    public void CreateProcessedObservation_WithoutObserversInternal_UsesReportedByUserIdForGbifRecordedBy()
+    {
+        // Arrange
+        var processConfiguration = new ProcessConfiguration();
+        var factory = new ArtportalenObservationFactory(
+            new DataProvider(),
+            new Dictionary<int, Taxon>(),
+            new Dictionary<VocabularyId, IDictionary<object, int>>(),
+            new Dictionary<int, ArtportalenObservationFactory.DatasetMapping>(),
+            false,
+            "https://artportalen-st.artdata.slu.se",
+            new ProcessTimeManager(processConfiguration),
+            processConfiguration);
+        var verbatimObservation = new ArtportalenObservationVerbatim
+        {
+            ObserversInternal = null,
+            ReportedByUserId = 12344
+        };
+
+        // Act
+        var observation = factory.CreateProcessedObservation(verbatimObservation, false);
+
+        // Assert
+        observation.ArtportalenInternal.GbifRecordedBy.Should().Be("Via User12344");
+    }
+
     [Theory]
     [MemberData(nameof(EventDatesTestData))]
     public void GetStartEndDate_AllInputs_Should_Return_Correct_Result(DateTime? startDate,

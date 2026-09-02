@@ -51,6 +51,7 @@ public class SightingRepository : BaseRepository<ISightingRepository>, ISighting
 	                s.NotPresent,
 	                s.NotRecovered,
                     s.ControlingOrganisationId,
+                    s.ControlingUserId,
                     msi.PortalId AS MigrateSightingPortalId,
                     msi.obsid AS MigrateSightingObsId,
 	                s.ProtectedBySystem,

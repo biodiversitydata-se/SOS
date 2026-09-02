@@ -345,7 +345,42 @@ public class iNaturalistObservationFactoryTests
         processedObservation.BasisOfRecord.Id.Should().Be((int)BasisOfRecordId.HumanObservation);
     }
 
-    private static iNaturalistObservationFactory CreateFactory()
+    [Fact]
+    public void CreateProcessedObservation_Should_Match_IconicTaxon_As_Complete_Ancestor_Name()
+    {
+        // Arrange
+        var observation = DeserializeObservation(ObscuredVerbatimObservationJson);
+        var taxa = new Dictionary<int, Taxon>
+        {
+            [111111] = new()
+            {
+                Id = 111111,
+                ScientificName = "Canis lupus",
+                HigherClassification = null
+            },
+            [222222] = new()
+            {
+                Id = 222222,
+                ScientificName = "Canis lupus",
+                HigherClassification = "Biota | Mammaliaformes"
+            },
+            [333333] = new()
+            {
+                Id = 333333,
+                ScientificName = "Canis lupus",
+                HigherClassification = "Biota | Animalia | Chordata | Mammalia | Carnivora"
+            }
+        };
+        var factory = CreateFactory(taxa);
+
+        // Act
+        var processedObservation = factory.CreateProcessedObservation(observation, false);
+
+        // Assert
+        processedObservation.Taxon.Id.Should().Be(333333);
+    }
+
+    private static iNaturalistObservationFactory CreateFactory(IDictionary<int, Taxon>? taxa = null)
     {
         var processConfiguration = new ProcessConfiguration();
         var dataProvider = new DataProvider { Id = 19, Identifier = "iNaturalist" };
@@ -356,7 +391,7 @@ public class iNaturalistObservationFactoryTests
                 ["free usage"] = (int)AccessRightsId.FreeUsage
             }
         };
-        var taxa = new Dictionary<int, Taxon>
+        taxa ??= new Dictionary<int, Taxon>
         {
             [123456] = new()
             {
@@ -366,7 +401,19 @@ public class iNaturalistObservationFactoryTests
                 Attributes = new TaxonAttributes
                 {
                     OrganismGroup = "Däggdjur"
-                }
+                },
+                HigherClassification = "Biota | Mammalia"
+            },
+            [654321] = new()
+            {
+                Id = 654321,
+                ScientificName = "Canis lupus",
+                VernacularName = "varg",
+                Attributes = new TaxonAttributes
+                {
+                    OrganismGroup = "Kärlväxter"
+                },
+                HigherClassification = "Biota | Kärlväxter"
             }
         };
 

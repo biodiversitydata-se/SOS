@@ -1,8 +1,10 @@
 ﻿﻿using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using MudBlazor;
-using SOS.Status.Web.Client.Dtos.SosObsApi;
-using SOS.Status.Web.Client.JsonConverters;
+using SOS.Api.Contracts.Common.Geo;
+using SOS.Api.Contracts.Common.Responses;
+using SOS.Api.Contracts.Observations.Requests;
+using SOS.Api.Contracts.Observations.Responses;
 using SOS.Status.Web.Client.Models;
 using System.Diagnostics;
 using System.Globalization;
@@ -24,6 +26,7 @@ public partial class LocationsSearch : IAsyncDisposable
     private const double ZoomChangeTolerance = 0.01d;
     private const double LocationPointRadiusPx = 5.0d;
     private const double PolygonToPointThresholdPx = LocationPointRadiusPx * 1.25d;
+    private const int ObservationPreviewTake = 5;
     private bool showSpinner;
     private bool isLoading;
     private string searchFilter = TaxonSearchFilterSamples.Samples[DefaultExampleId].Json;
@@ -71,6 +74,7 @@ public partial class LocationsSearch : IAsyncDisposable
     private string serverTimingsText = "-";
     private string? lastResultType;
     private (double Low, double High)? geogridObservationCountBreaks;
+    private MapExtentBounds? lastObservationPreviewExtent;
     private double? lastSearchZoomLevel;
     private string? lastSearchStateSignature;
     private MapExtentBounds? currentVisibleExtent;
@@ -80,14 +84,20 @@ public partial class LocationsSearch : IAsyncDisposable
     private IReadOnlyList<string> selectedLocationIds = [];
     private IReadOnlyList<string> selectedLocalities = [];
     private readonly Dictionary<string, Dictionary<string, object>> featuresById = [];
+    private readonly HashSet<string> mapLocationIds = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, HashSet<string>> mapFeatureIdsByLocationId = new(StringComparer.OrdinalIgnoreCase);
+    private readonly HashSet<Observation> highlightedObservations = [];
+    private PagedResultDto<Observation>? observationSearchResult;
+    private PagedResultDto<Observation>? defaultObservationSearchResult;
+    private bool isObservationPreviewLoading;
+    private int observationPreviewRequestVersion;
 
     private readonly JsonSerializerOptions jsonSerializerOptions = new()
     {
         PropertyNameCaseInsensitive = true,
         Converters =
         {
-            new JsonStringEnumConverter(),
-            new GeoJsonConverter()
+            new JsonStringEnumConverter()
         }
     };
 
@@ -176,18 +186,29 @@ public partial class LocationsSearch : IAsyncDisposable
     [JSInvokable]
     public async Task OnFeaturesClickedFromJs(List<MapFeatureClickItem>? features)
     {
-        selectedFeatures = [];
-        selectedLocationIds = [];
-        selectedLocalities = [];
+        if (isLoading)
+        {
+            return;
+        }
 
+        var clickedFeatures = new List<SelectedMapFeature>();
         if (features?.Count > 0)
         {
             foreach (var feature in features)
             {
                 var properties = ResolveClickedFeatureProperties(feature);
-                selectedFeatures.Add(new SelectedMapFeature(feature.FeatureId, properties));
+                clickedFeatures.Add(new SelectedMapFeature(feature.FeatureId, properties));
             }
+        }
 
+        selectedFeatures = IsSameMapFeatureSelection(selectedFeatures, clickedFeatures)
+            ? []
+            : clickedFeatures;
+        selectedLocationIds = [];
+        selectedLocalities = [];
+
+        if (selectedFeatures.Count > 0)
+        {
             selectedLocationIds = selectedFeatures
                 .SelectMany(feature => ExtractLocationIds(feature.Properties))
                 .Where(locationId => !string.IsNullOrWhiteSpace(locationId))
@@ -203,7 +224,33 @@ public partial class LocationsSearch : IAsyncDisposable
                 .ToList();
         }
 
-        await InvokeAsync(StateHasChanged);
+        await ClearObservationHighlightsAsync();
+        await SearchObservationPreviewAsync();
+    }
+
+    private static bool IsSameMapFeatureSelection(
+        IReadOnlyCollection<SelectedMapFeature> currentSelection,
+        IReadOnlyCollection<SelectedMapFeature> clickedFeatures)
+    {
+        if (currentSelection.Count == 0 || currentSelection.Count != clickedFeatures.Count)
+        {
+            return false;
+        }
+
+        var currentFeatureIds = currentSelection
+            .Select(feature => feature.FeatureId)
+            .Where(featureId => !string.IsNullOrWhiteSpace(featureId))
+            .Select(featureId => featureId!)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+        var clickedFeatureIds = clickedFeatures
+            .Select(feature => feature.FeatureId)
+            .Where(featureId => !string.IsNullOrWhiteSpace(featureId))
+            .Select(featureId => featureId!)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        return currentFeatureIds.Count == currentSelection.Count &&
+               clickedFeatureIds.Count == clickedFeatures.Count &&
+               currentFeatureIds.SetEquals(clickedFeatureIds);
     }
 
     private double _zoom = 14;
@@ -240,20 +287,26 @@ public partial class LocationsSearch : IAsyncDisposable
         var visibleExtent = currentVisibleExtent!.Value;
         var requestedExtent = ExpandExtent(visibleExtent, bboxBufferPercent / 100d);
         SearchFilterInternalDto? searchFilterInternal;
+        SearchFilterInternalDto? observationSearchFilterInternal;
+        MapExtentBounds? observationPreviewExtent = null;
         var bboxQuery = includeBoundingBoxInSearch ? FormatBoundingBoxQueryValue(requestedExtent) : null;
         try
         {
-                searchFilterInternal = JsonSerializer.Deserialize<SearchFilterInternalDto>(searchFilter, jsonSerializerOptions);
-                if (searchFilterInternal == null)
-                {
-                    Snackbar.Add("Invalid search filter.");
-                    return (null, null);
-                }
+            searchFilterInternal = JsonSerializer.Deserialize<SearchFilterInternalDto>(searchFilter, jsonSerializerOptions);
+            observationSearchFilterInternal = JsonSerializer.Deserialize<SearchFilterInternalDto>(searchFilter, jsonSerializerOptions);
+            if (searchFilterInternal == null || observationSearchFilterInternal == null)
+            {
+                Snackbar.Add("Invalid search filter.");
+                return (null, null);
+            }
 
             if (searchFilterInternal.Geographics is not null)
             {
                 searchFilterInternal.Geographics.BoundingBox = null;
             }
+
+            observationPreviewExtent = includeBoundingBoxInSearch ? requestedExtent : null;
+            ConfigureObservationPreviewFilter(observationSearchFilterInternal, observationPreviewExtent);
         }
         catch (Exception ex)
         {
@@ -265,6 +318,14 @@ public partial class LocationsSearch : IAsyncDisposable
         {
             isLoading = true;
             showSpinner = true;
+            observationPreviewRequestVersion++;
+            isObservationPreviewLoading = false;
+            observationSearchResult = null;
+            defaultObservationSearchResult = null;
+            selectedFeatures = [];
+            selectedLocationIds = [];
+            selectedLocalities = [];
+            await ClearObservationHighlightsAsync();
             await InvokeAsync(StateHasChanged);
 
             var stopwatch = Stopwatch.StartNew();
@@ -303,12 +364,26 @@ public partial class LocationsSearch : IAsyncDisposable
             lastResultType = NormalizeResultType(searchResult.ResultType);
             lastResultTypeText = FormatResultType(lastResultType);
             serverTimingsText = string.IsNullOrWhiteSpace(searchResult.Timings) ? "-" : searchResult.Timings;
+            lastObservationPreviewExtent = observationPreviewExtent;
 
             stopwatch.Stop();
             lastSearchDurationText = $"{stopwatch.Elapsed.TotalSeconds:F2} s";
             lastFetchedExtent = includeBoundingBoxInSearch ? requestedExtent : GetWorldExtent();            
             lastSearchZoomLevel = searchZoomLevel;
             lastSearchStateSignature = GetCurrentSearchStateSignature();
+
+            try
+            {
+                defaultObservationSearchResult = await searchService.SearchObservations(
+                    observationSearchFilterInternal,
+                    skip: 0,
+                    take: ObservationPreviewTake);
+                observationSearchResult = defaultObservationSearchResult;
+            }
+            catch (Exception ex)
+            {
+                Snackbar.Add($"Kartan uppdaterades, men observationerna kunde inte hämtas. {ex.Message}");
+            }
 
             return (searchResult.GeoJson, searchResult.FeatureCount);
         }
@@ -847,6 +922,8 @@ public partial class LocationsSearch : IAsyncDisposable
         selectedLocalities = [];
         geogridObservationCountBreaks = null;
         featuresById.Clear();
+        mapLocationIds.Clear();
+        mapFeatureIdsByLocationId.Clear();
 
         if (string.IsNullOrWhiteSpace(geoJson))
         {
@@ -871,6 +948,27 @@ public partial class LocationsSearch : IAsyncDisposable
                 : null;
 
             var properties = ParseProperties(featureElement);
+            var featureLocationIds = ExtractLocationIds(properties)
+                .Where(locationId => !string.IsNullOrWhiteSpace(locationId))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToArray();
+
+            foreach (var locationId in featureLocationIds)
+            {
+                mapLocationIds.Add(locationId);
+            }
+
+            if (!string.IsNullOrWhiteSpace(featureId))
+            {
+                mapLocationIds.Add(featureId);
+                AddMapFeatureLocationMapping(featureId, featureId);
+
+                foreach (var locationId in featureLocationIds)
+                {
+                    AddMapFeatureLocationMapping(locationId, featureId);
+                }
+            }
+
             if (string.Equals(lastResultType, "geogrid", StringComparison.OrdinalIgnoreCase) &&
                 TryGetNumericProperty(
                     properties,
@@ -894,6 +992,204 @@ public partial class LocationsSearch : IAsyncDisposable
         }
 
         geogridObservationCountBreaks = CalculateGeoGridObservationCountBreaks(geogridObservationCounts);
+    }
+
+    private static void ConfigureObservationPreviewFilter(
+        SearchFilterInternalDto filter,
+        MapExtentBounds? extent)
+    {
+        var sortOrders = filter.Output?.SortOrders;
+        filter.Output = new OutputFilterExtendedDto
+        {
+            FieldSet = OutputFieldSet.Minimum,
+            Fields =
+            [
+                "location.locationId",
+                "location.locality"
+            ],
+            SortOrders = sortOrders
+        };
+
+        if (!extent.HasValue)
+        {
+            if (filter.Geographics is not null)
+            {
+                filter.Geographics.BoundingBox = null;
+            }
+
+            return;
+        }
+
+        filter.Geographics ??= new GeographicsFilterDto();
+        filter.Geographics.BoundingBox = new LatLonBoundingBoxDto
+        {
+            TopLeft = new LatLonCoordinateDto
+            {
+                Longitude = extent.Value.X1,
+                Latitude = extent.Value.Y2
+            },
+            BottomRight = new LatLonCoordinateDto
+            {
+                Longitude = extent.Value.X2,
+                Latitude = extent.Value.Y1
+            }
+        };
+    }
+
+    private async Task SearchObservationPreviewAsync()
+    {
+        var requestVersion = ++observationPreviewRequestVersion;
+        var hasSelectedLocations = selectedLocationIds.Count > 0;
+
+        SearchFilterInternalDto? observationFilter;
+        try
+        {
+            observationFilter = JsonSerializer.Deserialize<SearchFilterInternalDto>(searchFilter, jsonSerializerOptions);
+            if (observationFilter is null)
+            {
+                Snackbar.Add("Invalid search filter.");
+                observationSearchResult = defaultObservationSearchResult;
+                await InvokeAsync(StateHasChanged);
+                return;
+            }
+
+            ConfigureObservationPreviewFilter(
+                observationFilter,
+                hasSelectedLocations ? null : lastObservationPreviewExtent);
+            if (hasSelectedLocations)
+            {
+                observationFilter.Geographics ??= new GeographicsFilterDto();
+                observationFilter.Geographics.LocationIds = selectedLocationIds.ToArray();
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Invalid search filter. {ex.Message}");
+            observationSearchResult = defaultObservationSearchResult;
+            await InvokeAsync(StateHasChanged);
+            return;
+        }
+
+        isObservationPreviewLoading = true;
+        observationSearchResult = null;
+        await InvokeAsync(StateHasChanged);
+
+        try
+        {
+            var result = await searchService.SearchObservations(
+                observationFilter,
+                skip: 0,
+                take: ObservationPreviewTake);
+
+            if (requestVersion == observationPreviewRequestVersion)
+            {
+                observationSearchResult = result;
+                if (!hasSelectedLocations)
+                {
+                    defaultObservationSearchResult = result;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            if (requestVersion == observationPreviewRequestVersion)
+            {
+                observationSearchResult = defaultObservationSearchResult;
+                var errorPrefix = hasSelectedLocations
+                    ? "Observationerna för den markerade kartfeaturen kunde inte hämtas."
+                    : "Observationerna kunde inte hämtas.";
+                Snackbar.Add($"{errorPrefix} {ex.Message}");
+            }
+        }
+        finally
+        {
+            if (requestVersion == observationPreviewRequestVersion)
+            {
+                isObservationPreviewLoading = false;
+                await InvokeAsync(StateHasChanged);
+            }
+        }
+    }
+
+    private bool CanHighlightObservation(Observation observation)
+    {
+        var locationId = observation.Location?.LocationId;
+        return string.Equals(lastResultType, "locations", StringComparison.OrdinalIgnoreCase) &&
+               !string.IsNullOrWhiteSpace(locationId) &&
+               mapLocationIds.Contains(locationId);
+    }
+
+    private void AddMapFeatureLocationMapping(string locationId, string featureId)
+    {
+        if (!mapFeatureIdsByLocationId.TryGetValue(locationId, out var featureIds))
+        {
+            featureIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            mapFeatureIdsByLocationId[locationId] = featureIds;
+        }
+
+        featureIds.Add(featureId);
+    }
+
+    private bool IsObservationHighlighted(Observation observation)
+    {
+        return highlightedObservations.Contains(observation);
+    }
+
+    private async Task OnObservationHighlightChangedAsync(Observation observation, bool highlighted)
+    {
+        if (highlighted && CanHighlightObservation(observation))
+        {
+            highlightedObservations.Add(observation);
+        }
+        else
+        {
+            highlightedObservations.Remove(observation);
+        }
+
+        await UpdateObservationHighlightsAsync();
+    }
+
+    private async Task ClearObservationHighlightsAsync()
+    {
+        highlightedObservations.Clear();
+        await UpdateObservationHighlightsAsync();
+    }
+
+    private async Task UpdateObservationHighlightsAsync()
+    {
+        if (_mapModule is null)
+        {
+            return;
+        }
+
+        var locationIds = selectedLocationIds
+            .Concat(highlightedObservations
+            .Select(observation => observation.Location?.LocationId)
+            .Where(locationId => !string.IsNullOrWhiteSpace(locationId))
+            .Select(locationId => locationId!))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+
+        var featureIds = selectedFeatures
+            .Select(feature => feature.FeatureId)
+            .Where(featureId => !string.IsNullOrWhiteSpace(featureId))
+            .Select(featureId => featureId!)
+            .Concat(locationIds
+                .Where(mapFeatureIdsByLocationId.ContainsKey)
+                .SelectMany(locationId => mapFeatureIdsByLocationId[locationId]))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+
+        try
+        {
+            await _mapModule.InvokeVoidAsync("setHighlightedLocationIds", locationIds, featureIds);
+        }
+        catch (JSDisconnectedException)
+        {
+        }
+        catch (TaskCanceledException)
+        {
+        }
     }
 
     private static (double Low, double High)? CalculateGeoGridObservationCountBreaks(IReadOnlyCollection<double> observationCounts)
@@ -971,12 +1267,20 @@ public partial class LocationsSearch : IAsyncDisposable
     }
 
     private string SelectedLocationIdsText => selectedLocationIds.Count == 0
-    ? "-"
-    : string.Join(Environment.NewLine, selectedLocationIds.Select(id => $"• {id};"));
+        ? "-"
+        : string.Join(Environment.NewLine, selectedLocationIds.Select(id => $"• {id};"));
 
     private string SelectedLocalitiesText => selectedLocalities.Count == 0
-    ? "-"
-    : string.Join(Environment.NewLine, selectedLocalities.Select(loc => $"• {loc};"));
+        ? "-"
+        : string.Join(Environment.NewLine, selectedLocalities.Select(loc => $"• {loc};"));
+
+    private string ObservationPanelTitle => observationSearchResult is null
+        ? "Observationer"
+        : $"Observationer ({observationSearchResult.Records.Count:N0} av {observationSearchResult.TotalCount:N0})";
+
+    private string ObservationPreviewLoadingText => selectedLocationIds.Count > 0
+        ? "Hämtar observationer för markerade kartfeatures..."
+        : "Hämtar observationer...";
 
     private Dictionary<string, object> ResolveClickedFeatureProperties(MapFeatureClickItem feature)
     {
@@ -1338,4 +1642,3 @@ public partial class LocationsSearch : IAsyncDisposable
         public double Height => Math.Max(0, Y2 - Y1);
     }
 }
-

@@ -1,4 +1,4 @@
-﻿﻿import * as openLayersMap from "/openLayersMap.js";
+﻿import * as openLayersMap from "/openLayersMap.js";
 
 let map = null;
 let dotNetRef = null;
@@ -8,6 +8,9 @@ let singleClickKey = null;
 const locationsLayerId = "locations";
 const pointStylesByLocationDisplayStatus = new Map();
 const polygonStylesByLocationDisplayStatus = new Map();
+let highlightedLocationIds = new Set();
+let highlightedFeatureIds = new Set();
+let previouslyHighlightedMapFeatures = [];
 
 const displayStatusStyleDefinitions = {
     present: {
@@ -128,6 +131,9 @@ export function destroyMap() {
     }
 
     dotNetRef = null;
+    highlightedLocationIds = new Set();
+    highlightedFeatureIds = new Set();
+    previouslyHighlightedMapFeatures = [];
 }
 
 export function getExtent() {
@@ -183,6 +189,19 @@ export function setLayerVisible(layerId, visible) {
     openLayersMap.setLayerVisible(map, layerId, visible);
 }
 
+export function setHighlightedLocationIds(locationIds, featureIds) {
+    highlightedLocationIds = new Set(
+        (Array.isArray(locationIds) ? locationIds : [])
+            .map(normalizeLocationId)
+            .filter(Boolean));
+    highlightedFeatureIds = new Set(
+        (Array.isArray(featureIds) ? featureIds : [])
+            .map(normalizeLocationId)
+            .filter(Boolean));
+
+    applyHighlightedLocationStyles();
+}
+
 export function loadGeoJsonLayer(layerId, geoJson, resultType, lowObservationCountBreak, highObservationCountBreak) {
     if (!map || !layerId) {
         return;
@@ -230,6 +249,10 @@ export function loadGeoJsonLayer(layerId, geoJson, resultType, lowObservationCou
     layer.set("id", layerId);
     layer.setZIndex(20);
     map.addLayer(layer);
+
+    if (layerId === locationsLayerId) {
+        applyHighlightedLocationStyles();
+    }
 }
 
 function notifyExtentChanged() {
@@ -312,6 +335,188 @@ function getLayerById(layerId) {
 
     return map.getAllLayers().find(function (layer) {
         return layer.get && layer.get("id") === layerId;
+    });
+}
+
+function applyHighlightedLocationStyles() {
+    if (!map) {
+        return;
+    }
+
+    for (const feature of previouslyHighlightedMapFeatures) {
+        feature.setStyle?.(undefined);
+        feature.changed?.();
+    }
+    previouslyHighlightedMapFeatures = [];
+
+    const locationsLayer = getLayerById(locationsLayerId);
+    const locationsSource = locationsLayer?.getSource?.();
+    if (!locationsSource || typeof locationsSource.getFeatures !== "function") {
+        return;
+    }
+
+    for (const feature of locationsSource.getFeatures()) {
+        if (featureMatchesHighlightedLocation(feature)) {
+            feature.setStyle?.(getHighlightedLocationStyle(feature));
+            previouslyHighlightedMapFeatures.push(feature);
+            feature.changed?.();
+        }
+    }
+
+    locationsLayer.changed?.();
+    ensureHighlightedFeaturesVisible();
+}
+
+function ensureHighlightedFeaturesVisible() {
+    if (!map || previouslyHighlightedMapFeatures.length === 0) {
+        return;
+    }
+
+    const size = map.getSize?.();
+    const view = map.getView?.();
+    if (!Array.isArray(size) || !view) {
+        return;
+    }
+
+    const highlightedExtent = ol.extent.createEmpty();
+    for (const feature of previouslyHighlightedMapFeatures) {
+        const featureExtent = feature.getGeometry?.()?.getExtent?.();
+        if (Array.isArray(featureExtent)) {
+            ol.extent.extend(highlightedExtent, featureExtent);
+        }
+    }
+
+    if (ol.extent.isEmpty(highlightedExtent)) {
+        return;
+    }
+
+    const currentExtent = view.calculateExtent(size);
+    if (ol.extent.containsExtent(currentExtent, highlightedExtent)) {
+        return;
+    }
+
+    const fitOptions = {
+        size: size,
+        padding: [40, 40, 40, 40],
+        duration: 250
+    };
+    const currentZoom = view.getZoom?.();
+    if (Number.isFinite(currentZoom)) {
+        fitOptions.maxZoom = currentZoom;
+    }
+
+    view.fit(highlightedExtent, fitOptions);
+}
+
+function featureMatchesHighlightedLocation(feature) {
+    const featureId = normalizeLocationId(feature?.getId?.());
+    if (featureId && highlightedFeatureIds.has(featureId)) {
+        return true;
+    }
+
+    return getFeatureLocationIds(feature).some(locationId => highlightedLocationIds.has(locationId));
+}
+
+function getFeatureLocationIds(feature) {
+    const result = new Set();
+    addLocationIdValue(feature?.getId?.(), result);
+    addLocationContainer(feature?.get?.("locations") ?? feature?.get?.("Locations"), result);
+    addLocationIdValue(feature?.get?.("locationIds") ?? feature?.get?.("LocationIds"), result);
+    addLocationContainer(feature?.get?.("location") ?? feature?.get?.("Location"), result);
+    return Array.from(result);
+}
+
+function addLocationContainer(value, result) {
+    const parsedValue = parseJsonValue(value);
+    if (!parsedValue) {
+        return;
+    }
+
+    if (Array.isArray(parsedValue)) {
+        addLocationIdValue(parsedValue, result);
+        return;
+    }
+
+    if (typeof parsedValue !== "object") {
+        return;
+    }
+
+    addLocationIdValue(getObjectProperty(parsedValue, "ids", "Ids"), result);
+    addLocationIdValue(getObjectProperty(parsedValue, "locationIds", "LocationIds"), result);
+    addLocationIdValue(getObjectProperty(parsedValue, "locationId", "LocationId"), result);
+
+    const location = getObjectProperty(parsedValue, "location", "Location");
+    if (location && location !== parsedValue) {
+        addLocationContainer(location, result);
+    }
+}
+
+function addLocationIdValue(value, result) {
+    const parsedValue = parseJsonValue(value);
+    if (parsedValue === null || parsedValue === undefined) {
+        return;
+    }
+
+    if (Array.isArray(parsedValue)) {
+        for (const item of parsedValue) {
+            addLocationIdValue(item, result);
+        }
+        return;
+    }
+
+    if (typeof parsedValue === "object") {
+        addLocationContainer(parsedValue, result);
+        return;
+    }
+
+    const normalizedValue = normalizeLocationId(parsedValue);
+    if (normalizedValue) {
+        result.add(normalizedValue);
+    }
+}
+
+function parseJsonValue(value) {
+    if (typeof value !== "string") {
+        return value;
+    }
+
+    const trimmedValue = value.trim();
+    if (!(trimmedValue.startsWith("[") || trimmedValue.startsWith("{"))) {
+        return value;
+    }
+
+    try {
+        return JSON.parse(trimmedValue);
+    } catch {
+        return value;
+    }
+}
+
+function normalizeLocationId(value) {
+    if (value === null || value === undefined) {
+        return "";
+    }
+
+    return value.toString().trim().toLowerCase();
+}
+
+function getHighlightedLocationStyle(feature) {
+    const geometryType = feature.getGeometry()?.getType();
+    if (geometryType === "Point" || geometryType === "MultiPoint") {
+        return new ol.style.Style({
+            zIndex: 1000,
+            image: new ol.style.Circle({
+                radius: 7,
+                fill: new ol.style.Fill({ color: "rgba(213, 0, 249, 0.38)" }),
+                stroke: new ol.style.Stroke({ color: "#d500f9", width: 2 })
+            })
+        });
+    }
+
+    return new ol.style.Style({
+        zIndex: 1000,
+        stroke: new ol.style.Stroke({ color: "#d500f9", width: 2 }),
+        fill: new ol.style.Fill({ color: "rgba(213, 0, 249, 0.18)" })
     });
 }
 

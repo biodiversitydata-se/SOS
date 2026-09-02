@@ -42,7 +42,7 @@ public class TelemetryInitializer : TelemetryInitializerBase
                 {
                     requestTelemetry.Context.GlobalProperties.Add("ApiUserType", apiUserType.ToString());
                 }
-            }
+            }            
 
             if (platformContext.Items.TryGetValue("SemaphoreStatus", out object semaphoreStatus))
             {
@@ -57,6 +57,14 @@ public class TelemetryInitializer : TelemetryInitializerBase
                 if (semaphoreWaitSeconds != null && !requestTelemetry.Context.GlobalProperties.ContainsKey("SemaphoreWaitSeconds"))
                 {
                     requestTelemetry.Context.GlobalProperties.Add("SemaphoreWaitSeconds", semaphoreWaitSeconds.ToString());
+                }
+            }
+
+            if (platformContext.Items.TryGetValue("CacheUsed", out object cacheUsed))
+            {
+                if (cacheUsed != null && !requestTelemetry.Context.GlobalProperties.ContainsKey("CacheUsed"))
+                {
+                    requestTelemetry.Context.GlobalProperties.Add("CacheUsed", cacheUsed.ToString());
                 }
             }
 

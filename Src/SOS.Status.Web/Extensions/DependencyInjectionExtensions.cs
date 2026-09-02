@@ -1,10 +1,8 @@
-﻿using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Components.Server;
-using Microsoft.Extensions.DependencyInjection;
-using SOS.Status.Web.Client.Abstractions;
+﻿using SOS.Status.Web.Client.Abstractions;
 using SOS.Status.Web.Client.Models.BlazorSamples;
 using SOS.Status.Web.HttpClients;
 using SOS.Status.Web.Services;
+using SOS.Api.Client.DependencyInjection;
 
 namespace SOS.Status.Web.Extensions;
 
@@ -13,11 +11,26 @@ public static class DependencyInjectionExtensions
     extension(IServiceCollection services)
     {
         public IServiceCollection AddDependencyInjectionServices(IConfigurationRoot configuration)
-        {
-            services.AddHttpClient<SosObservationsApiClient>(client =>
+        {            
+            services.AddSosWebClients(options =>
             {
-                client.BaseAddress = new Uri(Settings.HttpClientsConfiguration.SosObservationsApi.BaseAddress);
-            }).AddHttpMessageHandler<TokenHandler>();
+                options.ObservationsApiBaseAddress = new Uri(Settings.HttpClientsConfiguration.SosObservationsApi.BaseAddress);
+                options.AnalysisApiBaseAddress = new Uri(Settings.HttpClientsConfiguration.SosAnalysisApi.BaseAddress);
+                options.SystemName = "SOS Status";
+                options.ApplicationIdentifier = "PrintObs";
+                options.RequestLoggingLevel = LogLevel.Information;
+            });
+
+            // Use this when you want to use a specific token handler or other custom configuration for the HttpClient.
+            //services.AddSosClients(options =>
+            //{
+            //    options.ObservationsApiBaseAddress = new Uri(Settings.HttpClientsConfiguration.SosObservationsApi.BaseAddress);
+            //},
+            //httpClientBuilder =>
+            //{                
+            //    httpClientBuilder.AddStandardResilienceHandler();
+            //    httpClientBuilder.AddHttpMessageHandler<TokenHandler>();
+            //});
 
             // Use this when no standard resilience handler is configured        
             //var sosObservationsHttpClientBuilder = services.AddHttpClient<SosObservationsApiClient>(client =>

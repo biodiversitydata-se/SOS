@@ -135,7 +135,9 @@ public class FilterManager : IFilterManager
             filter.IncludeUnderlyingTaxa,
             filter.ListIds,
             filter.TaxonListOperator,
-            filter.TaxonCategories);
+            filter.TaxonCategories,
+            true,
+            filter.TaxonomyType);
     }
 
     public async Task<List<int>> GetTaxonIdsAsync(IEnumerable<int> taxonIds,
@@ -143,9 +145,10 @@ public class FilterManager : IFilterManager
         IEnumerable<int> listIds,
         TaxonFilter.TaxonListOp listOperator = TaxonFilter.TaxonListOp.Merge,
         IEnumerable<int> taxonCategories = null,
-        bool returnBiotaResultAsNull = true)
+        bool returnBiotaResultAsNull = true,
+        TaxonomyType taxonomyType = TaxonomyType.Dyntaxa)
     {
-        var taxaIds = await GetTaxonFilterIdsAsync(taxonIds, includeUnderlyingTaxa, returnBiotaResultAsNull);
+        var taxaIds = await GetTaxonFilterIdsAsync(taxonIds, includeUnderlyingTaxa, returnBiotaResultAsNull, taxonomyType);
         if (listIds != null && listIds.Count() > 0)
         {
             taxaIds = await FilterTaxonByTaxonListsAsync(taxaIds, listIds, listOperator, includeUnderlyingTaxa);
@@ -156,7 +159,7 @@ public class FilterManager : IFilterManager
             if (taxaIds == null || taxaIds.Count() == 0 && includeUnderlyingTaxa)
             {
                 // If there are no taxaIds we need to add all taxa before taxon category filters are applied.
-                var taxonTree = await _taxonManager.GetTaxonTreeAsync();
+                var taxonTree = await _taxonManager.GetTaxonTreeAsync(taxonomyType);
                 taxaIds = taxonTree.GetUnderlyingTaxonIds(BiotaTaxonId, true);
             }
 
@@ -228,14 +231,16 @@ public class FilterManager : IFilterManager
     /// <param name="taxonIds"></param>
     /// <param name="includeUnderlyingTaxa"></param>
     /// <param name="returnBiotaResultAsNull">If true, and the result will be every taxa, returnu null; otherwise return all taxon ids.</param>
+    /// <param name="taxonomyType"></param>
     /// <returns></returns>
     private async Task<IEnumerable<int>> GetTaxonFilterIdsAsync(
         IEnumerable<int> taxonIds,
         bool includeUnderlyingTaxa,
-        bool returnBiotaResultAsNull = true
+        bool returnBiotaResultAsNull = true,        
+        TaxonomyType taxonomyType = TaxonomyType.Dyntaxa
     )
     {
-        var taxonTree = await _taxonManager.GetTaxonTreeAsync();
+        var taxonTree = await _taxonManager.GetTaxonTreeAsync(taxonomyType);
         if ((!taxonIds?.Any() ?? true) || !includeUnderlyingTaxa)
         {
             if (!returnBiotaResultAsNull && includeUnderlyingTaxa)

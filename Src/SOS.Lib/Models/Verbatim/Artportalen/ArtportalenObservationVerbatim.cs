@@ -356,6 +356,11 @@ public class ArtportalenObservationVerbatim : IEntity<int>
     public int? ConfirmationYear { get; set; }
 
     /// <summary>
+    ///     Owner user
+    /// </summary>
+    public int? ControlingUserId { get; set; }
+
+    /// <summary>
     ///     Incremented number
     /// </summary>
     public int Id { get; set; }

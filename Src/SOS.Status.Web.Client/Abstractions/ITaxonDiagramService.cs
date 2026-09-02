@@ -8,5 +8,6 @@ public interface ITaxonDiagramService
         int[] taxonIds,
         TaxonRelationsTreeIterationMode treeIterationMode = TaxonRelationsTreeIterationMode.BothParentsAndChildren,
         bool includeSecondaryRelations = true,
+        TaxonomyType taxonomyType = TaxonomyType.Dyntaxa,
         string translationCultureCode = "sv-SE");
 }

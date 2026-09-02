@@ -21,6 +21,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging.Abstractions;
 using System.Collections.Concurrent;
 using Elastic.Clients.Elasticsearch.Cluster;
+using SOS.Lib.Enums;
 
 namespace SOS.DataStewardship.Api.IntegrationTests.Core.Setup;
 
@@ -80,6 +81,7 @@ public class TestFixture : IAsyncLifetime
         serviceCollection.AddSingleton<ProcessFixture>();
         serviceCollection.AddSingleton<IVocabularyRepository, VocabularyRepository>();
         serviceCollection.AddSingleton<ITaxonRepository, TaxonRepository>();
+        serviceCollection.AddSingleton<IArtportalenTaxonRepository, ArtportalenTaxonRepository>();
         serviceCollection.AddSingleton<ITaxonListRepository, TaxonListRepository>();
         serviceCollection.AddSingleton<ITaxonManager, TaxonManager>();            
         serviceCollection.AddSingleton<IProcessTimeManager, ProcessTimeManager>();
@@ -95,7 +97,7 @@ public class TestFixture : IAsyncLifetime
         serviceCollection.AddSingleton(elasticConfiguration);
         serviceCollection.AddSingleton<ICache<string, ProcessedConfiguration>, ProcessedConfigurationCache>();
         serviceCollection.AddSingleton<IClassCache<TaxonListSetsById>, ClassCache<TaxonListSetsById>>();
-        serviceCollection.AddSingleton<IClassCache<TaxonTree<IBasicTaxon>>, ClassCache<TaxonTree<IBasicTaxon>>>();
+        serviceCollection.AddSingleton<IClassCache<Dictionary<TaxonomyType, TaxonTree<IBasicTaxon>>>, ClassCache<Dictionary<TaxonomyType, TaxonTree<IBasicTaxon>>>>();
         serviceCollection.AddSingleton<IProcessedConfigurationRepository, ProcessedConfigurationRepository>();
         var clusterHealthCache = new ClassCache<ConcurrentDictionary<string, HealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<string, HealthResponse>>>());
         serviceCollection.AddSingleton<IClassCache<ConcurrentDictionary<string, HealthResponse>>>(clusterHealthCache);

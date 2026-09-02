@@ -6,6 +6,8 @@ internal static class TaxonIds
     public const int Blåmes = 103025;
     public const int Tofsmes = 103023;
     public const int Talgoxe = 103026;
+    public const int Gråtrut = 102966;
+    public const int GråtrutxHavstrut = 266239;
     public const int Skata = 103032;
     public const int Duvhök = 100001;
     public const int Asknätfjäril = 100943;

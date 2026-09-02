@@ -1,6 +1,7 @@
-﻿using LeafletForBlazor;
-using SOS.Status.Web.Client.Dtos.SosObsApi;
-using SOS.Status.Web.Client.JsonConverters;
+using LeafletForBlazor;
+using SOS.Api.Contracts.Common.Responses;
+using SOS.Api.Contracts.Observations.Requests;
+using SOS.Api.Contracts.Observations.Responses;
 using SOS.Status.Web.Client.Models;
 using System.Text.Json.Serialization;
 
@@ -23,8 +24,7 @@ public partial class ObservationsSearch
         PropertyNameCaseInsensitive = true,
         Converters =
         {
-            new JsonStringEnumConverter(),
-            new GeoJsonConverter()
+            new JsonStringEnumConverter()
         }
     };
     private RealTimeMap.LoadParameters mapSettings = new RealTimeMap.LoadParameters()
@@ -158,7 +158,6 @@ public partial class ObservationsSearch
             zoomToBoundsOnClick = true,    // Zoom to bounds when clicking on a cluster
             maxClusterRadius = 120,         // Maximum radius of a cluster when it is not zoomed in px
         };
-
 
         args.sender.Geometric.Points.OnClusterClick += OnClusterClick;
         args.sender.Geometric.Points.Appearance(item => item.type != "selected").pattern = new RealTimeMap.PointSymbol()

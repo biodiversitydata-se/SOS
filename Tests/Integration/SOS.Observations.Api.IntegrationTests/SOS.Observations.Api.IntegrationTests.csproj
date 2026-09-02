@@ -49,6 +49,7 @@
         <ProjectReference Include="..\..\..\Src\SOS.Analysis.Api\SOS.Analysis.Api.csproj" />
         <ProjectReference Include="..\..\..\Src\SOS.Harvest\SOS.Harvest.csproj" />
         <ProjectReference Include="..\..\..\Src\SOS.Observations.Api\SOS.Observations.Api.csproj" />
+        <ProjectReference Include="..\..\..\Src\Sos.Api.Client\Sos.Api.Client.csproj" />
         <ProjectReference Include="..\..\..\Src\SOS.Shared.Api\SOS.Shared.Api.csproj" />
         <ProjectReference Include="..\..\TestHelpers\SOS.TestHelpers\SOS.TestHelpers.csproj" />
     </ItemGroup>

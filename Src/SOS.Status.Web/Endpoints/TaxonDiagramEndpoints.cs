@@ -15,6 +15,7 @@ public static class TaxonDiagramEndpoints
                        [FromQuery] int[] taxonIds,
                        [FromQuery] TaxonRelationsTreeIterationMode treeIterationMode = TaxonRelationsTreeIterationMode.BothParentsAndChildren,
                        [FromQuery] bool includeSecondaryRelations = true,
+                       [FromQuery] TaxonomyType taxonomyType = TaxonomyType.Dyntaxa,
                        [FromQuery] string translationCultureCode = "sv-SE") =>
                 {
                     try
@@ -23,13 +24,16 @@ public static class TaxonDiagramEndpoints
                             taxonIds,
                             treeIterationMode,
                             includeSecondaryRelations,
+                            taxonomyType,
                             translationCultureCode);
 
-                        return Results.Ok(result);
+                        return result is null
+                            ? Results.NoContent()
+                            : Results.Text(result, "text/plain");
                     }
                     catch (ArgumentException ex)
                     {
-                        return Results.BadRequest(ex.Message);
+                        return Results.Text(ex.Message, "text/plain", statusCode: StatusCodes.Status400BadRequest);
                     }
                 });
 

@@ -387,7 +387,7 @@ public class AnalysisController : ControllerBase, IAnalysisController
     /// <returns></returns>
     [HttpPost("/internal/order/aoo_eoo")]
     [Authorize]
-    [ProducesResponseType(typeof(FeatureCollection), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
     [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
@@ -599,7 +599,7 @@ public class AnalysisController : ControllerBase, IAnalysisController
     /// <returns></returns>
     [HttpPost("/internal/order/aoo_eoo/article17")]
     [Authorize]
-    [ProducesResponseType(typeof(FeatureCollection), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
     [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]

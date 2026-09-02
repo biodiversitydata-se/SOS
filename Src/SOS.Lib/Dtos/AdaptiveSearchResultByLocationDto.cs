@@ -7,7 +7,12 @@ namespace SOS.Lib.Dtos;
 public class AdaptiveSearchResultByLocationDto<TObservation, TLocation>
 {
     public AdaptiveSearchResultTypeDto ResultType { get; set; }
-    public LatLonBoundingBoxDto BoundingBox { get; set; }
+
+    /// <summary>
+    /// The bounding box of the result, or null when no observations matched the search (no extent could
+    /// be calculated).
+    /// </summary>
+    public LatLonBoundingBoxDto? BoundingBox { get; set; }
     public int TotalObservationsCount { get; set; }
     public int ObservationsCount { get; set; }
     public int ResultCount { get; set; }
@@ -16,7 +21,7 @@ public class AdaptiveSearchResultByLocationDto<TObservation, TLocation>
     public IEnumerable<AreaWithGeometryDto>? FilterAreas { get; set; }
 
     public static AdaptiveSearchResultByLocationDto<TObservation, TLocation> CreateGeoGridResult(
-        LatLonBoundingBoxDto boundingBox,
+        LatLonBoundingBoxDto? boundingBox,
         int totalObservationsCount,
         GeoGridResultDto geoGridResult,
         List<(Models.Shared.Area area, Geometry geometry)> geographicAreas)
@@ -33,7 +38,7 @@ public class AdaptiveSearchResultByLocationDto<TObservation, TLocation>
     }
 
     public static AdaptiveSearchResultByLocationDto<TObservation, TLocation> CreateLocationsResult(
-        LatLonBoundingBoxDto boundingBox,
+        LatLonBoundingBoxDto? boundingBox,
         int totalObservationsCount,
         int observationsCount,
         IEnumerable<AdaptiveSearchLocationDto<TObservation, TLocation>> locations,

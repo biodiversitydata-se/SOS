@@ -323,13 +323,13 @@ public class ArtportalenObservationFactory : ObservationFactoryBase, IObservatio
             obs.InformationWithheld = null;
             obs.Language = Language.Swedish;
             obs.Modified = verbatimObservation.EditDate.ToUniversalTime();
-            obs.OwnerInstitutionCode = verbatimObservation.OwnerOrganization?.Translate(Cultures.en_GB, Cultures.sv_SE) ?? "SLU Artdatabanken";
+            string ownerOrganization = verbatimObservation.OwnerOrganization?.Translate(Cultures.en_GB, Cultures.sv_SE)?.Clean();
+            obs.OwnerInstitutionCode = ownerOrganization ?? "SLU Artdatabanken";
             obs.PrivateCollection = verbatimObservation.PrivateCollection;
             obs.Projects = verbatimObservation.Projects?.Select(ArtportalenFactoryHelper.CreateProcessedProject);
             obs.ProjectsSummary = ArtportalenFactoryHelper.CreateProjectsSummary(obs.Projects);                
             obs.PublicCollection = verbatimObservation.PublicCollection?.Translate(Cultures.en_GB, Cultures.sv_SE);
-            obs.RightsHolder = verbatimObservation.RightsHolder ?? verbatimObservation.OwnerOrganization?.Translate(Cultures.en_GB, Cultures.sv_SE) ?? "Data saknas";
-            obs.RightsHolder = obs.RightsHolder?.Clean();
+            obs.RightsHolder = verbatimObservation.RightsHolder?.Clean() ?? ownerOrganization ?? "Data saknas";            
             obs.Type = null;
 
             // Event
@@ -483,6 +483,15 @@ public class ArtportalenObservationFactory : ObservationFactoryBase, IObservatio
             obs.ArtportalenInternal.ReportedByUserAlias = verbatimObservation.ReportedByUserAlias;
             obs.ArtportalenInternal.LocationPresentationNameParishRegion = verbatimObservation.Site?.PresentationNameParishRegion?.Clean();
             obs.ArtportalenInternal.OccurrenceRecordedByInternal = verbatimObservation.ObserversInternal;
+            obs.ArtportalenInternal.GbifRecordedBy = verbatimObservation.ObserversInternal?.Any() == true
+                    ? string.Join(", ",
+                        verbatimObservation.ObserversInternal
+                            .Select(oi => $"User{oi.Id}")
+                            .Distinct())
+                    : verbatimObservation.ObserversInternal == null
+                        ? $"Via User{verbatimObservation.ReportedByUserId}"
+                        : null;
+            obs.ArtportalenInternal.GbifRightsHolder = verbatimObservation.ControlingUserId.HasValue ? $"User{verbatimObservation.ControlingUserId}" : ownerOrganization;
             obs.ArtportalenInternal.OccurrenceVerifiedByInternal = verbatimObservation.VerifiedByInternal;
             obs.ArtportalenInternal.IncrementalHarvested = _incrementalMode;
             obs.ArtportalenInternal.SightingBarcodeURL = verbatimObservation.SightingBarcodeURL;

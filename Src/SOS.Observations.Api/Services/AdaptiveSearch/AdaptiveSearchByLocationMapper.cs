@@ -11,7 +11,7 @@ namespace SOS.Observations.Api.Services.AdaptiveSearch;
 public interface IAdaptiveSearchByLocationMapper
 {
     AdaptiveSearchResultByLocationDto<JsonObject, JsonObject> CreateResult(
-        LatLonBoundingBoxDto boundingBox,
+        LatLonBoundingBoxDto? boundingBox,
         int totalObservationsCount,
         IEnumerable<JsonObject> records,
         Dictionary<string, Geometry>? polygonLocationGeometries,
@@ -21,7 +21,7 @@ public interface IAdaptiveSearchByLocationMapper
 internal sealed class AdaptiveSearchByLocationMapper : IAdaptiveSearchByLocationMapper
 {
     public AdaptiveSearchResultByLocationDto<JsonObject, JsonObject> CreateResult(
-        LatLonBoundingBoxDto boundingBox,
+        LatLonBoundingBoxDto? boundingBox,
         int totalObservationsCount,
         IEnumerable<JsonObject> records,
         Dictionary<string, Geometry>? polygonLocationGeometries,

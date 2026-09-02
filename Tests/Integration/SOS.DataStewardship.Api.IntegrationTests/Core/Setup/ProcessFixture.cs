@@ -62,7 +62,7 @@ public class ProcessFixture
 
     private async Task InitializeAsync()
     {
-        _taxa = await _taxonRepository.GetAllAsync();
+        _taxa = [.. (await _taxonRepository.GetAllAsync()).Where(t => !t.IsNotAccepted)];
         _taxaById = _taxa.ToDictionary(m => m.Id, m => m);
         var vocabularies = await _vocabularyRepository.GetAllAsync();
         _dwcaVocabularyById = VocabularyHelper.GetVocabulariesDictionary(

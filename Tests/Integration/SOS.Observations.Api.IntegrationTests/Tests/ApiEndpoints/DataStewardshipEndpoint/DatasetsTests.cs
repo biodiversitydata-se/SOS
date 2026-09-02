@@ -7,6 +7,7 @@ using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
 using SOS.Lib.Dtos;
 using SOS.Lib.Dtos.DataStewardship;
 using SOS.Lib.Dtos.Filter;
+using SOS.Api.Client.Clients;
 
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsEndpoints.ObservationsBySearchEndpoint;
 
@@ -32,6 +33,22 @@ public class DatasetsTests : TestBase
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
+        dataset!.Identifier.Should().Be(ArtportalenDatasetProjects.TreeDatasetIdentifier);
+    }
+
+    [Fact]
+    public async Task SosDataStewardshipClient_GetDatasetAsync_UsesObservationApiPipeline()
+    {
+        var mapping = ArtportalenDatasetProjects.Mapping.Instance;
+        var source = mapping.DatasetByIdentifier[ArtportalenDatasetProjects.TreeDatasetIdentifier];
+        await ProcessFixture.ProcessAndAddDatasetsToElasticSearch([source]);
+        var client = new SosDataStewardshipClient(TestFixture.CreateApiClient());
+
+        var dataset = await client.GetDatasetAsync(
+            ArtportalenDatasetProjects.TreeDatasetIdentifier,
+            cancellationToken: TestContext.Current.CancellationToken);
+
+        dataset.Should().NotBeNull();
         dataset!.Identifier.Should().Be(ArtportalenDatasetProjects.TreeDatasetIdentifier);
     }
 

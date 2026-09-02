@@ -13,9 +13,7 @@ namespace SOS.Lib.Extensions;
 public static class ProcessedExtensions
 {
     extension(Event source)
-    {
-        #region Event
-
+    {       
         public DarwinCoreEvent ToDarwinCore()
         {
             if (source == null)
@@ -73,10 +71,6 @@ public static class ProcessedExtensions
 
     extension(Identification source)
     {
-        #endregion Event
-
-        #region Identification
-
         public DarwinCoreIdentification ToDarwinCore()
         {
             if (source == null)
@@ -106,10 +100,6 @@ public static class ProcessedExtensions
 
     extension(Location source)
     {
-        #endregion Identification
-
-        #region Location
-
         public DarwinCoreLocation ToDarwinCore()
         {
             if (source == null)
@@ -169,11 +159,7 @@ public static class ProcessedExtensions
 
     extension(Occurrence source)
     {
-        #endregion Location
-
-        #region Occurrence
-
-        public DarwinCoreOccurrence ToDarwinCore()
+        public DarwinCoreOccurrence ToDarwinCore(bool fixSbdiArtportalenDwcObservation = false, Observation observation = null)
         {
             if (source == null)
             {
@@ -200,7 +186,7 @@ public static class ProcessedExtensions
                 OrganismQuantity = source.OrganismQuantity,
                 OrganismQuantityType = source.OrganismQuantityUnit?.Value,
                 OtherCatalogNumbers = source.OtherCatalogNumbers,
-                RecordedBy = source.RecordedBy,
+                RecordedBy = fixSbdiArtportalenDwcObservation ? observation.ArtportalenInternal?.GbifRecordedBy : source.RecordedBy,
                 ReproductiveCondition = source.ReproductiveCondition?.Value,
                 Sex = source.Sex?.Value
             };
@@ -208,11 +194,7 @@ public static class ProcessedExtensions
     }
 
     extension(Taxon taxon)
-    {
-        #endregion Occurrence
-
-        #region Taxon
-
+    {        
         /// <summary>
         ///     Cats processed taxon to darwin core
         /// </summary>
@@ -266,10 +248,6 @@ public static class ProcessedExtensions
 
     extension(Observation processedObservation)
     {
-        #endregion Taxon
-
-        #region Sighting
-
         /// <summary>
         ///     Cast processed observation object to Darwin Core
         /// </summary>
@@ -309,9 +287,9 @@ public static class ProcessedExtensions
             dwc.Location = processedObservation.Location?.ToDarwinCore();
             dwc.MeasurementOrFact = null;
             dwc.Modified = processedObservation.Modified;
-            dwc.Occurrence = processedObservation.Occurrence?.ToDarwinCore();
+            dwc.Occurrence = processedObservation.Occurrence?.ToDarwinCore(fixSbdiArtportalenDwcObservation, processedObservation);
             dwc.References = processedObservation.References;
-            dwc.RightsHolder = processedObservation.RightsHolder;
+            dwc.RightsHolder = fixSbdiArtportalenDwcObservation ? processedObservation.ArtportalenInternal?.GbifRightsHolder : processedObservation.RightsHolder;
             dwc.Taxon = processedObservation.Taxon.ToDarwinCore(fixSbdiArtportalenDwcObservation);
             dwc.Type = processedObservation.Type?.Value;
 
@@ -332,6 +310,4 @@ public static class ProcessedExtensions
                 .Select(observation => observation.ToDarwinCore(fixSbdiArtportalenDwcObservation));
         }
     }
-
-    #endregion Sighting        
 }

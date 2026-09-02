@@ -67,4 +67,24 @@ public class ArtportalenApiService : IArtportalenApiService
 
         return null;
     }
+
+    public async Task<TaxonHierarchyResponse> GetTaxonHierarchyAsync(int offset, int limit)
+    {
+        try
+        {
+            var response = await _httpClientService.GetDataAsync<TaxonHierarchyResponse>(
+                new Uri($"{_artportalenApiServiceConfiguration.BaseAddress}/taxa/hierarchy?offset={offset}&limit={limit}"),
+                null,
+                TimeSpan.FromSeconds(3),
+                5);
+
+            return response;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Failed to get taxon hierarchy from Artportalen API");
+        }
+
+        return null;
+    }
 }

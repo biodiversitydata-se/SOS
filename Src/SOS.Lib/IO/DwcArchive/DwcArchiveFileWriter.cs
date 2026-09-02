@@ -453,7 +453,7 @@ public class DwcArchiveFileWriter : FileWriterBase, IDwcArchiveFileWriter
         List<SimpleMultimediaRow> multimediaRows;
         if (dataProvider.Id == 1) // Artportalen
         {
-            multimediaRows = processedObservations.ToArtportalenSimpleMultimediaRows().ToList();                
+            multimediaRows = processedObservations.ToArtportalenSimpleMultimediaRows(anonymizeRightsHolder: true).ToList();
         }
         else
         {
