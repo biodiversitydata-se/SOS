@@ -37,10 +37,11 @@ public class ProcessObservationsJobIncremental : ProcessObservationsJobBase, IPr
         IProcessTimeManager processTimeManager,
         IValidationManager validationManager,
         IProcessTaxaJob processTaxaJob,
+        IProcessArtportalenTaxaJob processArtportalenTaxaJob,
         IAreaHelper areaHelper,
         ProcessConfiguration processConfiguration,
         ILogger<ProcessObservationsJobIncremental> logger) : base(processedObservationRepository, processInfoRepository, harvestInfoRepository, observationProcessorManager,
-            taxonCache, vocabularyCache, dataProviderCache, processTimeManager, validationManager, processTaxaJob, areaHelper, processConfiguration,
+            taxonCache, vocabularyCache, dataProviderCache, processTimeManager, validationManager, processTaxaJob, processArtportalenTaxaJob, areaHelper, processConfiguration,
         logger)
     {
 

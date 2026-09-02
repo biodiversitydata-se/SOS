@@ -51,6 +51,7 @@ public class ProcessJobTests
         _validationManager = new Mock<IValidationManager>();
         _taxonCache = new Mock<ICache<int, Taxon>>();
         _processTaxaJob = new Mock<IProcessTaxaJob>();
+        _processArtportalenTaxaJob = new Mock<IProcessArtportalenTaxaJob>();
         _observationProcessorManagerMock = new Mock<IObservationProcessorManager>();
         _areaHelper = new Mock<IAreaHelper>();
         _loggerMock = new Mock<ILogger<ProcessObservationsJobFull>>();
@@ -72,6 +73,7 @@ public class ProcessJobTests
     private readonly Mock<IProcessInfoRepository> _processInfoRepository;
     private readonly Mock<IHarvestInfoRepository> _harvestInfoRepository;
     private readonly Mock<IProcessTaxaJob> _processTaxaJob;
+    private readonly Mock<IProcessArtportalenTaxaJob> _processArtportalenTaxaJob;
     private readonly Mock<IObservationProcessorManager> _observationProcessorManagerMock;
     private readonly Mock<ICache<int, Taxon>> _taxonCache;
     private readonly Mock<ICacheManager> _cacheManager;
@@ -102,6 +104,7 @@ public class ProcessJobTests
         _processTimeManagerMock.Object,
         _validationManager.Object,
         _processTaxaJob.Object,
+        _processArtportalenTaxaJob.Object,
         _areaHelper.Object,
         _dwcArchiveFileWriterCoordinatorMock.Object,
         _processConfigurationMock.Object,

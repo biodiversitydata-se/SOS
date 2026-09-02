@@ -596,6 +596,7 @@ public class ProcessObservationsJobFull : ProcessObservationsJobBase, IProcessOb
     /// <param name="processTimeManager"></param>
     /// <param name="validationManager"></param>
     /// <param name="processTaxaJob"></param>
+    /// <param name="processArtportalenTaxaJob"></param>
     /// <param name="areaHelper"></param>
     /// <param name="dwcArchiveFileWriterCoordinator"></param>
     /// <param name="processConfiguration"></param>
@@ -619,6 +620,7 @@ public class ProcessObservationsJobFull : ProcessObservationsJobBase, IProcessOb
         IProcessTimeManager processTimeManager,
         IValidationManager validationManager,
         IProcessTaxaJob processTaxaJob,
+        IProcessArtportalenTaxaJob processArtportalenTaxaJob,
         IAreaHelper areaHelper,
         IDwcArchiveFileWriterCoordinator dwcArchiveFileWriterCoordinator,
         ProcessConfiguration processConfiguration,
@@ -631,7 +633,7 @@ public class ProcessObservationsJobFull : ProcessObservationsJobBase, IProcessOb
         IDwcaEventProcessor dwcaEventProcessor,
         IObservationsHarvestJobIncremental observationsIncrementalHarvestJob,
         ILogger<ProcessObservationsJobFull> logger) : base(processedObservationRepository, processInfoRepository, harvestInfoRepository, observationProcessorManager,
-            taxonCache, vocabularyCache, dataProviderCache, processTimeManager, validationManager, processTaxaJob, areaHelper, processConfiguration,
+            taxonCache, vocabularyCache, dataProviderCache, processTimeManager, validationManager, processTaxaJob, processArtportalenTaxaJob, areaHelper, processConfiguration,
         logger)
     {
         _dwcArchiveFileWriterCoordinator = dwcArchiveFileWriterCoordinator ?? throw new ArgumentNullException(nameof(dwcArchiveFileWriterCoordinator));

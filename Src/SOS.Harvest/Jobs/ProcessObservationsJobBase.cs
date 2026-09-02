@@ -36,6 +36,7 @@ public class ProcessObservationsJobBase : ProcessJobBase
     private readonly ICache<int, Taxon> _taxonCache;
     private readonly ICache<VocabularyId, Vocabulary> _vocabularyCache;
     private readonly IProcessTaxaJob _processTaxaJob;
+    private readonly IProcessArtportalenTaxaJob _processArtportalenTaxaJob;
     private readonly bool _enableTimeManager;
     private static SemaphoreSlim _getTaxaSemaphore = new SemaphoreSlim(1, 1);
 
@@ -44,6 +45,26 @@ public class ProcessObservationsJobBase : ProcessJobBase
         _logger.LogDebug("Start initialize area cache");
         await _areaHelper.InitializeAsync();
         _logger.LogDebug("Finish initialize area cache");
+    }
+
+    private async Task TryProcessArtportalenTaxaAsync()
+    {
+        try
+        {
+            _logger.LogInformation("Start processing Artportalen taxa");
+            if (await _processArtportalenTaxaJob.RunAsync())
+            {
+                _logger.LogInformation("Finish processing Artportalen taxa");
+            }
+            else
+            {
+                _logger.LogError("Failed to process Artportalen taxa. Observation processing will continue.");
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to process Artportalen taxa. Observation processing will continue.");
+        }
     }
 
     private async Task InitializeElasticSearchAsync(JobRunModes mode)
@@ -361,6 +382,7 @@ public class ProcessObservationsJobBase : ProcessJobBase
         IProcessTimeManager processTimeManager,
         IValidationManager validationManager,
         IProcessTaxaJob processTaxaJob,
+        IProcessArtportalenTaxaJob processArtportalenTaxaJob,
         IAreaHelper areaHelper,
         ProcessConfiguration processConfiguration,
         ILogger<ProcessObservationsJobBase> logger) : base(harvestInfoRepository, processInfoRepository)
@@ -372,6 +394,7 @@ public class ProcessObservationsJobBase : ProcessJobBase
         _taxonCache = taxonCache ?? throw new ArgumentNullException(nameof(taxonCache));
         _vocabularyCache = vocabularyCache ?? throw new ArgumentNullException(nameof(vocabularyCache));
         _processTaxaJob = processTaxaJob ?? throw new ArgumentNullException(nameof(processTaxaJob));
+        _processArtportalenTaxaJob = processArtportalenTaxaJob ?? throw new ArgumentNullException(nameof(processArtportalenTaxaJob));
         _processTimeManager = processTimeManager ?? throw new ArgumentNullException(nameof(processTimeManager));
         _validationManager = validationManager ?? throw new ArgumentNullException(nameof(validationManager));
         _areaHelper = areaHelper ?? throw new ArgumentNullException(nameof(areaHelper));
@@ -406,6 +429,8 @@ public class ProcessObservationsJobBase : ProcessJobBase
                 }
 
                 _logger.LogInformation("Finish harvest taxa");
+
+                await TryProcessArtportalenTaxaAsync();
 
                 await _taxonCache.ClearAsync();
                 _logger.LogInformation("Taxa cache cleared.");
