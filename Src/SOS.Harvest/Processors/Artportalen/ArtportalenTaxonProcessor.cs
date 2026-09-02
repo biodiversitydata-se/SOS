@@ -60,13 +60,12 @@ public class ArtportalenTaxonProcessor : IArtportalenTaxonProcessor
 
             var artportalenTaxa = new List<SOS.Lib.Models.Processed.Observation.Taxon>();
             foreach (var taxon in allTaxa)
-            {
-                var copy = taxon;
+            {                
                 if (taxonRelationsByChildId.TryGetValue(taxon.Attributes.DyntaxaTaxonId, out var relations))
                 {
-                    copy.Attributes.ParentDyntaxaTaxonId = relations.First(r => r.IsMainRelation).ParentTaxonId;
-                    copy.SecondaryParentDyntaxaTaxonIds = relations.Where(r => !r.IsMainRelation)?.Select(r => r.ParentTaxonId);
-                    artportalenTaxa.Add(copy);
+                    taxon.Attributes.ParentDyntaxaTaxonId = relations.First(r => r.IsMainRelation).ParentTaxonId;
+                    taxon.SecondaryParentDyntaxaTaxonIds = relations.Where(r => !r.IsMainRelation)?.Select(r => r.ParentTaxonId);
+                    artportalenTaxa.Add(taxon);
                 }
             }
 

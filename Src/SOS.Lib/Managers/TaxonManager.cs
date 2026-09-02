@@ -25,31 +25,43 @@ public class TaxonManager : ITaxonManager
     private readonly IArtportalenTaxonRepository _processedArtportalenTaxonRepository;
     private readonly IClassCache<Dictionary<TaxonomyType, TaxonTree<IBasicTaxon>>> _taxonTreeCache;
     private readonly IClassCache<TaxonListSetsById> _taxonListSetsByIdCache;
-    private SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
-    private SemaphoreSlim _taxonListSemaphore = new SemaphoreSlim(1, 1);
+    private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
+    private readonly SemaphoreSlim _taxonListSemaphore = new SemaphoreSlim(1, 1);
 
-    private async void OnTaxonTreeCacheExpiresSoon(object sender, EventArgs e)
+    private void OnTaxonTreeCacheExpiresSoon(object sender, EventArgs e)
     {
-        _logger.LogInformation("OnTaxonTreeCacheExpiresSoon");
+        _ = RefreshTaxonTreeCacheAsync();
+    }
 
-        var cache = _taxonTreeCache.Get();
-        if (cache == null || cache.Count == 0)
-            return;
-
-        await _semaphore.WaitAsync();
+    private async Task RefreshTaxonTreeCacheAsync()
+    {
         try
         {
-            foreach (var taxonomyType in cache.Keys.ToList())
-            {
-                cache[taxonomyType] =
-                    await FetchTaxonTreeAsync(taxonomyType);
-            }
+            _logger.LogInformation("OnTaxonTreeCacheExpiresSoon");
 
-            _taxonTreeCache.Set(cache);
+            await _semaphore.WaitAsync();
+            try
+            {
+                var cache = _taxonTreeCache.Get();
+                if (cache == null || cache.Count == 0)
+                    return;
+
+                var refreshedCache = new Dictionary<TaxonomyType, TaxonTree<IBasicTaxon>>(cache.Count);
+                foreach (var taxonomyType in cache.Keys)
+                {
+                    refreshedCache[taxonomyType] = await FetchTaxonTreeAsync(taxonomyType);
+                }
+
+                _taxonTreeCache.Set(refreshedCache);
+            }
+            finally
+            {
+                _semaphore.Release();
+            }
         }
-        finally
+        catch (Exception ex)
         {
-            _semaphore.Release();
+            _logger.LogError(ex, "Failed to refresh taxon tree cache");
         }
     }
 
@@ -86,26 +98,7 @@ public class TaxonManager : ITaxonManager
         TaxonomyType taxonomyType = TaxonomyType.Dyntaxa)
     {
         var cache = _taxonTreeCache.Get();
-
-        if (cache == null)
-        {
-            await _semaphore.WaitAsync();
-            try
-            {
-                cache = _taxonTreeCache.Get();
-                if (cache == null)
-                {
-                    cache = new Dictionary<TaxonomyType, TaxonTree<IBasicTaxon>>();
-                    _taxonTreeCache.Set(cache);
-                }
-            }
-            finally
-            {
-                _semaphore.Release();
-            }
-        }
-
-        if (cache.TryGetValue(taxonomyType, out var existingTree))
+        if (cache != null && cache.TryGetValue(taxonomyType, out var existingTree))
         {
             return existingTree;
         }
@@ -113,13 +106,18 @@ public class TaxonManager : ITaxonManager
         await _semaphore.WaitAsync();
         try
         {
-            if (cache.TryGetValue(taxonomyType, out existingTree))
+            cache = _taxonTreeCache.Get();
+            if (cache != null && cache.TryGetValue(taxonomyType, out existingTree))
             {
                 return existingTree;
             }
 
             var fetchedTree = await FetchTaxonTreeAsync(taxonomyType);
-            cache[taxonomyType] = fetchedTree;
+            var updatedCache = cache == null
+                ? new Dictionary<TaxonomyType, TaxonTree<IBasicTaxon>>()
+                : new Dictionary<TaxonomyType, TaxonTree<IBasicTaxon>>(cache);
+            updatedCache[taxonomyType] = fetchedTree;
+            _taxonTreeCache.Set(updatedCache);
 
             return fetchedTree;
         }
