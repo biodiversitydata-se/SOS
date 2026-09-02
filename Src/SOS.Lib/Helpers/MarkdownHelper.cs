@@ -641,7 +641,12 @@ public class MarkdownHelper : IMarkdownHelper
     {
         try
         {
-            var dataProviders = (await _dataProviderCache.GetAllAsync()).Where(dp => dataProviderIds.Contains(dp.Id)).ToDictionary(dp => dp.Id, dp => dp);
+            if (!dataProviderIds?.Any() ?? true)
+            {
+                dataProviderIds ??= new List<int>();
+            }
+
+            var dataProviders = (await _dataProviderCache.GetAllAsync()).Where(dp => dataProviderIds.Contains(dp.Id));
             var sb = new StringBuilder();
             AddHeader(sb, $"Citeringsanvisning {DateTime.Now:yyyy-MM-dd HH:mm}", 1);
 
@@ -650,44 +655,45 @@ public class MarkdownHelper : IMarkdownHelper
             string version = assebly.GetVersionNumber();
 
             var ingress = "I vetenskapliga publikationer och andra rapporter där data hämtad via Species Observation System använts, bör man referera enligt följande:";
-            var materialAndReferense = $"Data använda i den här studien har laddats ned från Species Observation System API (SLU Artdatabanken {publishYear}) den {DateTime.Now:yyyy-MM-dd}. Följande dataset har använts: {string.Join(", ", dataProviders?.Values?.Select(dp => dp.Identifier))}";
+            var materialAndReferense = $"Data använda i den här studien har laddats ned från Species Observation System API (SLU Artdatabanken {publishYear}) den {DateTime.Now:yyyy-MM-dd}. Följande dataset har använts: ";
             var referenceList = new List<string> { $"SLU Artdatabanken ({publishYear}). Species Observation System API (Version {version}) [API]. SLU Artdatabanken. https://api-portal.artdatabanken.se/product#product=sos [åtkomst {DateTime.Now:yyyy-MM-dd}]" };
 
             if (authorizationApplicationIdentifier?.ToLower() == "printobs")
             {
                 ingress = "I vetenskapliga publikationer och andra rapporter där verktyget Fynddata använts, bör man referera enligt följande:";
-                materialAndReferense = $"Data använda i den här studien har laddats ned från SLU Artdatabankens verktyg Fynddata (SLU Artdatabanken [utgivningsår]) den {DateTime.Now:yyyy-MM-dd}. Följande dataset har använts: {string.Join(", ", dataProviders?.Values?.Select(dp => dp.Identifier))}";
+                materialAndReferense = $"Data använda i den här studien har laddats ned från SLU Artdatabankens verktyg Fynddata (SLU Artdatabanken [utgivningsår]) den {DateTime.Now:yyyy-MM-dd}. Följande dataset har använts: ";
                 referenceList = new List<string> { @$"SLU Artdatabanken (utgivningsår). Fynddata (Version #) [Webbapplikation]. SLU Artdatabanken. https://fynddata.artdatabanken.se [åtkomstdatum {DateTime.Now:yyyy-MM-dd}]",
-                    $"fynddata.artdatabanken.se ({DateTime.Now:yyyy-MM-dd}) SOS fynd export. [Filnamn]." };
+                        $"fynddata.artdatabanken.se ({DateTime.Now:yyyy-MM-dd}) SOS fynd export. [Filnamn]." };
             }
 
-            if (dataProviderIds?.Any() ?? false)
+            if (dataProviders?.Any() ?? false)
             {
-                foreach (var id in dataProviderIds)
+                var firstItteration = true;
+                const string DEFAULT_TYPE_OF_DATASET = "Occurrence";
+                foreach (var dataProvider in dataProviders)
                 {
-                    if (dataProviders.TryGetValue(id, out var dataProvider))
-                    {
-                        string? typeOfDataset = "Occurrence";
-                        var xml = await _dataProviderCache.GetEmlAsync(id);
+                    var typeOfDataset = DEFAULT_TYPE_OF_DATASET;
+                    var xml = await _dataProviderCache.GetEmlAsync(dataProvider.Id);
 
-                        if (xml != null)
+                    if (xml != null)
+                    {
+                        XNamespace eml = "eml://ecoinformatics.org/eml-2.1.1";
+                        var keyWords = new[]
                         {
-                            XNamespace eml = "eml://ecoinformatics.org/eml-2.1.1";
-                            var keyWords = new[]
-                            {
-                                "GBIF Dataset Type Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_type.xml",
-                                "GBIF Dataset Type Vocabulary: https://rs.gbif.org/vocabulary/gbif/dataset_type.xml"
-                            };
+                            "GBIF Dataset Type Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_type.xml",
+                            "GBIF Dataset Type Vocabulary: https://rs.gbif.org/vocabulary/gbif/dataset_type.xml"
+                        };
                             
-                            typeOfDataset = xml
-                                .Descendants("keywordSet")
-                                    .Select(ks => ks.Element("keywordThesaurus"))
-                                        .Where(e => keyWords.Contains(e.Value))
-                                            .FirstOrDefault()?.Parent.Element("keyword").Value;
-                        }
-                        
-                        referenceList.Add($"{dataProvider.ContactPerson?.LastName} {dataProvider.ContactPerson?.FirstName?.Substring(0, 1)} ({DateTime.Now.Year}). {dataProvider.Names?.FirstOrDefault(n => n.CultureCode == "sv-SE")?.Value}.  {dataProvider.Organizations?.FirstOrDefault(n => n.CultureCode == "sv-SE")?.Value}. {typeOfDataset?.ToCamelCase()} hämtat via Species Observation System API version {version} {DateTime.Now:yyyy-MM-dd}");
+                        typeOfDataset = xml
+                            .Descendants("keywordSet")?
+                                .Select(ks => ks.Element("keywordThesaurus"))?
+                                    .Where(e => keyWords.Contains(e.Value))?
+                                        .FirstOrDefault()?.Parent?.Element("keyword")?.Value ?? DEFAULT_TYPE_OF_DATASET;
                     }
+                        
+                    referenceList.Add($"{dataProvider.ContactPerson?.LastName} {dataProvider.ContactPerson?.FirstName?.Substring(0, 1)} ({DateTime.Now.Year}). {dataProvider.Names?.FirstOrDefault(n => n.CultureCode == "sv-SE")?.Value}. {dataProvider.Organizations?.FirstOrDefault(n => n.CultureCode == "sv-SE")?.Value}. {typeOfDataset?.ToCamelCase()} hämtat via Species Observation System API version {version} {DateTime.Now:yyyy-MM-dd}");
+                    materialAndReferense += $"{(firstItteration ? "" : ", ")}{dataProvider.Identifier}";
+                    firstItteration = false;
                 }
             }
             
@@ -861,7 +867,7 @@ public class MarkdownHelper : IMarkdownHelper
             // Add analysis parameters
             AddHeader(sb, "Analysis Parameters", 2);
 
-            if (alphaValues?.Length > 0)
+            if ((alphaValues?.Length ?? 0) > 0)
             {
                 TryAddList(sb, ("Alpha Values", 3), alphaValues.Select(a => a.ToString()));
             }
