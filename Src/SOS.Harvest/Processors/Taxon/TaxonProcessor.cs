@@ -159,7 +159,7 @@ public class TaxonProcessor : ITaxonProcessor
                 useCurrentCollection = true;
             }
 
-            var taxonTree = TaxonTreeFactory.CreateTaxonTree(taxa);
+            var taxonTree = TaxonTreeFactory.CreateTaxonTree(taxa, _logger);
             bool isTaxonDataOk = IsTaxonDataOk(taxa?.Values, taxonTree);
             if (!isTaxonDataOk)
             {

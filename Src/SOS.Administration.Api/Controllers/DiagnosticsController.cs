@@ -134,7 +134,8 @@ public class DiagnosticsController : ControllerBase, IDiagnosticsController
             LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
             var dwcTaxa = await _taxonService.GetTaxaAsync();
             var taxa = dwcTaxa.ToProcessedTaxa();
-            Lib.Models.TaxonTree.TaxonTree<Lib.Models.Interfaces.IBasicTaxon> taxonTree = TaxonTreeFactory.CreateTaxonTree(taxa);
+            Lib.Models.TaxonTree.TaxonTree<Lib.Models.Interfaces.IBasicTaxon> taxonTree =
+                TaxonTreeFactory.CreateTaxonTree(taxa, _logger);
 
             Result<string> strGraphviz = null;
             if (diagramFormat == DiagramFormat.GraphViz)

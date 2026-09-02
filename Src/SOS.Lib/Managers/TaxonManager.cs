@@ -191,7 +191,7 @@ public class TaxonManager : ITaxonManager
                 // Make sure no duplicates exists
                 taxaDictionary.TryAdd(taxon.Id, taxon);
             }
-            return TaxonTreeFactory.CreateTaxonTree(taxaDictionary);
+            return TaxonTreeFactory.CreateTaxonTree(taxaDictionary, _logger);
         }
         catch (Exception ex)
         {

@@ -2,12 +2,15 @@
 using QuikGraph.Algorithms;
 using QuikGraph.Algorithms.Observers;
 using QuikGraph.Algorithms.Search;
+using Microsoft.Extensions.Logging;
+using SOS.Lib.Helpers;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.TaxonTree;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace SOS.Lib.Factories;
 
@@ -20,15 +23,29 @@ public static class TaxonTreeFactory
 
     public static TaxonTree<IBasicTaxon> CreateTaxonTree(IDictionary<int, Taxon> taxa)
     {
+        return CreateTaxonTree(taxa, null);
+    }
+
+    public static TaxonTree<IBasicTaxon> CreateTaxonTree(
+        IDictionary<int, Taxon> taxa,
+        ILogger? logger)
+    {
         if (!taxa?.Any() ?? true)
         {
             return null;
         }
 
-        return CreateTaxonTree(taxa.ToDictionary(t => t.Key, t => (IBasicTaxon)t.Value));
+        return CreateTaxonTree(taxa.ToDictionary(t => t.Key, t => (IBasicTaxon)t.Value), logger);
     }
 
     public static TaxonTree<IBasicTaxon> CreateTaxonTree(IDictionary<int, IBasicTaxon> taxa)
+    {
+        return CreateTaxonTree(taxa, null);
+    }
+
+    public static TaxonTree<IBasicTaxon> CreateTaxonTree(
+        IDictionary<int, IBasicTaxon> taxa,
+        ILogger? logger)
     {
         if (!taxa?.Any() ?? true)
         {
@@ -39,7 +56,7 @@ public static class TaxonTreeFactory
         treeNodeById.TryGetValue(BiotaTaxonId, out var rootNode);
         var tree = new TaxonTree<IBasicTaxon>(rootNode, treeNodeById);
         RemoveIllegalRelations(tree); // Temporary fix.
-        tree.ReverseTopologicalSortById = CreateReverseTopologicalSort(treeNodeById.Values);
+        tree.ReverseTopologicalSortById = CreateReverseTopologicalSort(tree, logger);
         return tree;
     }
 
@@ -139,11 +156,13 @@ public static class TaxonTreeFactory
     /// Create a reverse topological sort for the taxon tree nodes.
     /// </summary>
     /// <returns>A dictionary with TaxonId as key and reverse topological index as value.</returns>
-    private static Dictionary<int, int> CreateReverseTopologicalSort(IEnumerable<TaxonTreeNode<IBasicTaxon>> treeNodes)
+    private static Dictionary<int, int> CreateReverseTopologicalSort(
+        TaxonTree<IBasicTaxon> tree,
+        ILogger? logger)
     {
         try
         {
-            var graph = CreateAdjencyGraph(treeNodes);
+            var graph = CreateAdjencyGraph(tree.TreeNodeById.Values);
             var topoSortByTaxonId = graph
                 .TopologicalSort()
                 .Reverse()
@@ -152,13 +171,116 @@ public static class TaxonTreeFactory
 
             return topoSortByTaxonId;
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            if (logger != null)
+            {
+                WriteReverseTopologicalSortDiagnostics(tree, ex, logger);
+            }
+
             // Temporary catch exceptions as long as the graph isn't a directed acyclic graph (DAG)
             return new Dictionary<int, int>();
         }
     }
 
+    private static void WriteReverseTopologicalSortDiagnostics(
+        TaxonTree<IBasicTaxon> tree,
+        Exception exception,
+        ILogger logger)
+    {
+        const int maxCyclesToReport = 20;
+        const int maxRelationsPerCycleToReport = 100;
+
+        try
+        {
+            var diagnostics = new StringBuilder();
+            var relationCount = tree.TreeNodeById.Values.Sum(node =>
+                (node.Parent == null ? 0 : 1) + (node.SecondaryParents?.Count ?? 0));
+
+            diagnostics.AppendLine(
+                $"[TaxonTreeFactory] Reverse topological sort failed. " +
+                $"Nodes={tree.TreeNodeById.Count}, Relations={relationCount}.");
+
+            var cycles = TaxonTreeCyclesDetectionHelper.CheckForCycles(tree);
+            diagnostics.AppendLine(
+                $"[TaxonTreeFactory] Strongly connected cycle components found: {cycles.Count}.");
+
+            foreach (var cycle in cycles.Take(maxCyclesToReport))
+            {
+                var taxonIds = cycle.Select(vertex => vertex.Value).ToHashSet();
+                diagnostics.AppendLine(
+                    $"[TaxonTreeFactory] Cycle component taxon IDs: {string.Join(", ", taxonIds.Order())}");
+
+                var relationsReported = 0;
+                foreach (var childNode in tree.TreeNodeById.Values.Where(node => taxonIds.Contains(node.TaxonId)))
+                {
+                    if (childNode.Parent != null && taxonIds.Contains(childNode.Parent.TaxonId))
+                    {
+                        AppendCycleRelation(diagnostics, "Main", childNode.Parent, childNode);
+                        relationsReported++;
+                    }
+
+                    var secondaryParents = childNode.SecondaryParents ?? new List<TaxonTreeNode<IBasicTaxon>>();
+                    foreach (var secondaryParent in secondaryParents.Where(parent => taxonIds.Contains(parent.TaxonId)))
+                    {
+                        if (relationsReported >= maxRelationsPerCycleToReport)
+                            break;
+
+                        AppendCycleRelation(diagnostics, "Secondary", secondaryParent, childNode);
+                        relationsReported++;
+                    }
+
+                    if (relationsReported >= maxRelationsPerCycleToReport)
+                        break;
+                }
+
+                if (relationsReported >= maxRelationsPerCycleToReport)
+                {
+                    diagnostics.AppendLine(
+                        $"[TaxonTreeFactory] Relation output truncated after {maxRelationsPerCycleToReport} relations.");
+                }
+            }
+
+            if (cycles.Count > maxCyclesToReport)
+            {
+                diagnostics.AppendLine(
+                    $"[TaxonTreeFactory] Cycle output truncated after {maxCyclesToReport} components; " +
+                    $"{cycles.Count - maxCyclesToReport} additional components were found.");
+            }
+
+            if (cycles.Count == 0)
+            {
+                diagnostics.AppendLine(
+                    "[TaxonTreeFactory] No cycle was detected. Inspect the exception above for another graph error.");
+            }
+
+            logger.LogError(exception, "{TaxonTreeDiagnostics}", diagnostics.ToString().TrimEnd());
+        }
+        catch (Exception diagnosticsException)
+        {
+            logger.LogError(
+                diagnosticsException,
+                "[TaxonTreeFactory] Failed to create cycle diagnostics. Original error: {OriginalError}",
+                exception.Message);
+        }
+    }
+
+    private static void AppendCycleRelation(
+        StringBuilder diagnostics,
+        string relationType,
+        TaxonTreeNode<IBasicTaxon> parent,
+        TaxonTreeNode<IBasicTaxon> child)
+    {
+        diagnostics.AppendLine(
+            $"[TaxonTreeFactory] {relationType}: {FormatTaxon(parent)} -> {FormatTaxon(child)}");
+    }
+
+    private static string FormatTaxon(TaxonTreeNode<IBasicTaxon> node)
+    {
+        return string.IsNullOrWhiteSpace(node.ScientificName)
+            ? node.TaxonId.ToString()
+            : $"{node.TaxonId} ({node.ScientificName})";
+    }
     private static AdjacencyGraph<int, Edge<int>> CreateAdjencyGraph(IEnumerable<TaxonTreeNode<IBasicTaxon>> treeNodes)
     {
         var graph = new AdjacencyGraph<int, Edge<int>>(true);

@@ -54,7 +54,9 @@ public class ArtportalenTaxonProcessor : IArtportalenTaxonProcessor
                 .GroupBy(m => m.ChildTaxonId)
                 .ToDictionary(g => g.Key, g => g.Select(m => m));
 
-            var taxonTree = TaxonTreeFactory.CreateTaxonTree(allTaxa.ToDictionary(t => t.Id, t => t));
+            var taxonTree = TaxonTreeFactory.CreateTaxonTree(
+                allTaxa.ToDictionary(t => t.Id, t => t),
+                _logger);
 
             SetMainRelations(taxonRelationsByChildId, taxonTree); //Set a main parent when there are multiple parents
 
