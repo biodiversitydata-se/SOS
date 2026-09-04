@@ -1,4 +1,18 @@
-﻿# Changelog
+# Changelog
+
+## [2026.09.04]
+
+### `Added`
+
+* Added a Locations endpoint,`AdaptiveSearchLocations`, that returns GeoJSON with information about the observations at each location matching the search filter. Currently available in the internal API.
+* Added support for using the Artportalen taxonomy instead of Dyntaxa.
+
+### `Changed`
+
+* Improved taxon matching when processing observations.
+* Improved data stewardship metadata.
+* Improved harvesting and processing of Virtual Herbarium data.
+* Improved harvesting and processing of MVM.
 
 ## [2026.02.11]
 
