@@ -62,6 +62,11 @@ public static class DependencyInjectionExtensions
             {
                 client.BaseAddress = new Uri(Settings.HttpClientsConfiguration.SosDataStewardshipApi.BaseAddress);
             }).AddHttpMessageHandler<TokenHandler>();
+            services.AddHttpClient<IpifyClient>(client =>
+            {
+                client.BaseAddress = new Uri("https://api.ipify.org");
+                client.Timeout = TimeSpan.FromSeconds(10);
+            });
 
             services.AddScoped<AppState>();
             services.AddScoped<StatusInfoService>();

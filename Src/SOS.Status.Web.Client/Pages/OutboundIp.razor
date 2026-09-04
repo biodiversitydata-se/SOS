@@ -1,0 +1,69 @@
+@page "/outbound-ip"
+@inject IStatusInfoService StatusInfoService
+@inject ILogger<OutboundIp> Logger
+
+<PageTitle>Outbound IP</PageTitle>
+
+<MudStack Spacing="3">
+    <MudText Typo="Typo.h4">Outbound IP</MudText>
+    <MudText Typo="Typo.body1">
+        Visar den publika IP-adress som används när SOS Status ansluter till internet.
+    </MudText>
+
+    <MudButton Variant="Variant.Filled"
+               Color="Color.Primary"
+               StartIcon="@Icons.Material.Outlined.Public"
+               Disabled="@isLoading"
+               OnClick="LoadOutboundIpAsync">
+        @if (isLoading)
+        {
+            <MudProgressCircular Color="Color.Inherit" Indeterminate="true" Size="Size.Small" Class="mr-2" />
+        }
+        Kontrollera IP-adress
+    </MudButton>
+
+    @if (!string.IsNullOrWhiteSpace(outboundIp))
+    {
+        <MudPaper Class="pa-4" Outlined="true">
+            <MudText Typo="Typo.overline">Publik utgående IP-adress</MudText>
+            <MudText Typo="Typo.h5">@outboundIp</MudText>
+        </MudPaper>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(errorMessage))
+    {
+        <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">@errorMessage</MudAlert>
+    }
+</MudStack>
+
+@code {
+    private string? outboundIp;
+    private string? errorMessage;
+    private bool isLoading;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadOutboundIpAsync();
+    }
+
+    private async Task LoadOutboundIpAsync()
+    {
+        isLoading = true;
+        errorMessage = null;
+
+        try
+        {
+            outboundIp = await StatusInfoService.GetOutboundIpAsync();
+        }
+        catch (Exception exception)
+        {
+            outboundIp = null;
+            errorMessage = "Kunde inte hämta den publika IP-adressen. Försök igen.";
+            Logger.LogError(exception, "Could not fetch the public outbound IP address");
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+}

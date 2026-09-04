@@ -58,4 +58,10 @@ public class StatusInfoApiClient : IStatusInfoService
     {
         return await _http.GetFromJsonAsync<HealthReportDto>("api/status-info/health/data-stewardship");
     }
+
+    public async Task<string> GetOutboundIpAsync(CancellationToken cancellationToken = default)
+    {
+        var outboundIp = await _http.GetStringAsync("api/status-info/outbound-ip", cancellationToken);
+        return outboundIp.Trim();
+    }
 }

@@ -22,4 +22,6 @@ public interface IStatusInfoService
     Task<HealthReportDto?> GetElasticsearchProxyHealthAsync();
 
     Task<HealthReportDto?> GetDataStewardshipApiHealthAsync();
+
+    Task<string> GetOutboundIpAsync(CancellationToken cancellationToken = default);
 }

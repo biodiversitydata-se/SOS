@@ -13,6 +13,7 @@ public class StatusInfoService : IStatusInfoService
     private readonly SosAnalysisApiClient _analysisApiClient;
     private readonly SosElasticsearchProxyClient _elasticsearchProxyClient;
     private readonly SosDataStewardshipApiClient _dataStewardshipApiClient;
+    private readonly IpifyClient _ipifyClient;
     private readonly ILogger<StatusInfoService> _logger;
 
     public StatusInfoService(
@@ -21,6 +22,7 @@ public class StatusInfoService : IStatusInfoService
         SosAnalysisApiClient analysisApiClient,
         SosElasticsearchProxyClient sosElasticsearchProxyClient,
         SosDataStewardshipApiClient sosDataStewardshipApiClient,
+        IpifyClient ipifyClient,
         ILogger<StatusInfoService> logger)
     {
         _sosStatusInfoService = sosStatusInfoService ?? throw new ArgumentNullException(nameof(sosStatusInfoService));
@@ -28,6 +30,7 @@ public class StatusInfoService : IStatusInfoService
         _analysisApiClient = analysisApiClient ?? throw new ArgumentNullException(nameof(analysisApiClient));
         _elasticsearchProxyClient = sosElasticsearchProxyClient ?? throw new ArgumentNullException(nameof(sosElasticsearchProxyClient));
         _dataStewardshipApiClient = sosDataStewardshipApiClient ?? throw new ArgumentNullException(nameof(sosDataStewardshipApiClient));
+        _ipifyClient = ipifyClient ?? throw new ArgumentNullException(nameof(ipifyClient));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
@@ -94,6 +97,11 @@ public class StatusInfoService : IStatusInfoService
         var healthReport = await _dataStewardshipApiClient.GetHealthAsync();
         healthReport?.Entries?.Remove("self");
         return healthReport;
+    }
+
+    public async Task<string> GetOutboundIpAsync(CancellationToken cancellationToken = default)
+    {
+        return await _ipifyClient.GetOutboundIpAsync(cancellationToken);
     }
 
     private static WebDtos.ProcessSummaryDto MapProcessSummary(SOS.Api.Contracts.Status.Responses.ProcessSummaryDto source)

@@ -44,6 +44,12 @@ public static class StatusInfoEndpoints
                 async (StatusInfoService manager) =>
                     await manager.GetDataStewardshipApiHealthAsync());
 
+            app.MapGet("/api/status-info/outbound-ip",
+                async (HttpClients.IpifyClient client, CancellationToken cancellationToken) =>
+                    Results.Text(
+                        await client.GetOutboundIpAsync(cancellationToken),
+                        "text/plain"));
+
             return app;
         }
     }
