@@ -1520,6 +1520,10 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
     public async Task<PagedResult<T>> GetChunkAsync<T>(SearchFilter filter, int skip, int take, bool getAllFields = false) where T : class
     {
         var indexNames = GetCurrentIndex(filter);
+        // Public searches always return an exact count; internal searches opt in.
+        var trackTotalHits = filter is SearchFilterInternal internalFilter && internalFilter.IncludeRealCount != true
+            ? new TrackHits(ElasticSearchMaxRecords)
+            : new TrackHits(true);
 
         var (query, excludeQuery) = GetCoreQueries<T>(filter);
         var sortDescriptor = await Client.GetSortDescriptorAsync<T, Observation>(indexNames, filter?.Output?.SortOrders);
@@ -1535,38 +1539,17 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
                 )
             )
             .Sort(sortDescriptor?.ToArray())
+            .TrackTotalHits(trackTotalHits)
         );
 
         searchResponse.ThrowIfInvalid();
 
-        var totalCount = searchResponse.Total;
-        var includeRealCount = totalCount >= ElasticSearchMaxRecords;
-
-        if (filter is SearchFilterInternal internalFilter)
-        {
-            includeRealCount = internalFilter.IncludeRealCount ?? false;
-        }
-
-        if (includeRealCount)
-        {
-            var countResponse = await Client.CountAsync<T>(indexNames, s => s
-                .Query(q => q
-                    .Bool(b => b
-                        .MustNot(excludeQuery.ToArray())
-                        .Filter(query.ToArray())
-                    )
-                )
-            );
-            countResponse.ThrowIfInvalid();
-
-            totalCount = countResponse.Count;
-        }
         return new PagedResult<T>
         {
             Records = searchResponse.Documents,
             Skip = skip,
             Take = take,
-            TotalCount = totalCount
+            TotalCount = searchResponse.Total
         };
     }
 
