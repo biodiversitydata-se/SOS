@@ -40,15 +40,15 @@ public class InputValidator : IInputValidator
     /// </summary>
     /// <param name="tilesLimit"></param>
     /// <param name="maxTilesTot"></param>
-    /// <param name="countTask"></param>
+    /// <param name="getCountAsync">Fetches the observation count only when the possible tile count exceeds the limit.</param>
     /// <returns></returns>
     private async Task<Result> TryValidateTilesLimitAsync(int tilesLimit,
         double maxTilesTot,
-        Task<long> countTask)
+        Func<Task<long>> getCountAsync)
     {
         if (maxTilesTot > tilesLimit)
         {
-            var count = await countTask;
+            var count = await getCountAsync();
 
             if (count > tilesLimit * _countFactor)
             {
@@ -570,7 +570,7 @@ public class InputValidator : IInputValidator
     public async Task<Result> ValidateTilesLimitAsync(
         Envelope envelope,
         int zoom,
-        Task<long> countTask,
+        Func<Task<long>> getCountAsync,
         bool internalLimit = false)
     {
         if (envelope == null)
@@ -580,14 +580,14 @@ public class InputValidator : IInputValidator
 
         var maxTilesTot = envelope.CalculateNumberOfTiles(zoom);
         var tilesLimit = internalLimit ? _tilesLimitInternal : _tilesLimitPublic;
-        return await TryValidateTilesLimitAsync(tilesLimit, maxTilesTot, countTask);
+        return await TryValidateTilesLimitAsync(tilesLimit, maxTilesTot, getCountAsync);
     }
 
     /// <inheritdoc/>
     public async Task<Result> ValidateTilesLimitMetricAsync(
         Envelope envelope,
         int gridCellSizeInMeters,
-        Task<long> countTask,
+        Func<Task<long>> getCountAsync,
         bool internalLimit = false,
         double internalLimitFactor = 1.0)
     {
@@ -601,6 +601,6 @@ public class InputValidator : IInputValidator
         var maxTilesTot = maxLonTiles * maxLatTiles;
         var tilesLimit = internalLimit ? (int)(_tilesLimitInternal*internalLimitFactor) : _tilesLimitPublic;
 
-        return await TryValidateTilesLimitAsync(tilesLimit, maxTilesTot, countTask);
+        return await TryValidateTilesLimitAsync(tilesLimit, maxTilesTot, getCountAsync);
     }
 }

@@ -367,7 +367,7 @@ public class ObservationsController : ControllerBase
                 _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries),
                 _inputValidator.ValidateTranslationCultureCode(translationCultureCode),
                 _inputValidator.ValidateGeogridZoomArgument(zoom, minLimit: 1, maxLimit: 21),
-                await _inputValidator.ValidateTilesLimitAsync(boundingBox, zoom, _observationManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, searchFilter))
+                await _inputValidator.ValidateTilesLimitAsync(boundingBox, zoom, () => _observationManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, searchFilter))
             );
             if (validationResult.IsFailure)
             {
@@ -494,7 +494,7 @@ public class ObservationsController : ControllerBase
                 _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
                 _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries),
                 _inputValidator.ValidateGridCellSizeInMetersArgument(gridCellSizeInMeters, minLimit: 100, maxLimit: 100000),
-                await _inputValidator.ValidateTilesLimitMetricAsync(boundingBox.Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM), gridCellSizeInMeters, _observationManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, searchFilter))
+                await _inputValidator.ValidateTilesLimitMetricAsync(boundingBox.Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM), gridCellSizeInMeters, () => _observationManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, searchFilter))
                 );
 
             if (validationResult.IsFailure)
@@ -1414,7 +1414,7 @@ public class ObservationsController : ControllerBase
                 _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries),
                 _inputValidator.ValidateTranslationCultureCode(translationCultureCode),
                 _inputValidator.ValidateGeogridZoomArgument(zoom, minLimit: 1, maxLimit: 21),
-                await _inputValidator.ValidateTilesLimitAsync(boundingBox, zoom, _observationManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, searchFilter), true)
+                await _inputValidator.ValidateTilesLimitAsync(boundingBox, zoom, () => _observationManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, searchFilter), true)
             );
 
             if (validationResult.IsFailure)
@@ -1504,7 +1504,7 @@ public class ObservationsController : ControllerBase
                 _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries),
                 _inputValidator.ValidateTranslationCultureCode(translationCultureCode),
                 _inputValidator.ValidateGeogridZoomArgument(zoom, minLimit: 1, maxLimit: 21),
-                await _inputValidator.ValidateTilesLimitAsync(boundingBox, zoom, _observationManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, searchFilter), true)
+                await _inputValidator.ValidateTilesLimitAsync(boundingBox, zoom, () => _observationManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, searchFilter), true)
             );
 
             if (validationResult.IsFailure)
@@ -1625,7 +1625,7 @@ public class ObservationsController : ControllerBase
                 _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries),
                 _inputValidator.ValidateTranslationCultureCode(translationCultureCode),
                 _inputValidator.ValidateGeogridZoomArgument(zoom, minLimit: 1, maxLimit: 21),
-                await _inputValidator.ValidateTilesLimitAsync(boundingBox, zoom, _observationManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, searchFilter), true)
+                await _inputValidator.ValidateTilesLimitAsync(boundingBox, zoom, () => _observationManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, searchFilter), true)
             );
 
             if (validationResult.IsFailure)
@@ -1708,7 +1708,7 @@ public class ObservationsController : ControllerBase
                 _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
                 _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries),
                 _inputValidator.ValidateGridCellSizeInMetersArgument(gridCellSizeInMeters, minLimit: 100, maxLimit: 100000),
-                await _inputValidator.ValidateTilesLimitMetricAsync(boundingBox.Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM), gridCellSizeInMeters, _observationManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, searchFilter), true)
+                await _inputValidator.ValidateTilesLimitMetricAsync(boundingBox.Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM), gridCellSizeInMeters, () => _observationManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, searchFilter), true)
             );
 
             if (validationResult.IsFailure)

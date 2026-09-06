@@ -321,7 +321,7 @@ public class AnalysisController : ControllerBase, IAnalysisController
                 await _inputValidator.ValidateTilesLimitMetricAsync(
                     searchFilter!.Geographics!.BoundingBox!.ToEnvelope().Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM), 
                     gridCellSizeInMeters.Value,
-                    _analysisManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, filter),
+                    () => _analysisManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, filter),
                     true
                 ));
 
@@ -441,7 +441,7 @@ public class AnalysisController : ControllerBase, IAnalysisController
                 await _inputValidator.ValidateTilesLimitMetricAsync(
                     searchFilter!.Geographics!.BoundingBox!.ToEnvelope().Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM),
                     gridCellSizeInMeters.Value,
-                    _analysisManager.GetMatchCountAsync(this.GetUserId(), roleId, authorizationApplicationIdentifier, searchFilter, searchFilter.ProtectionFilter ?? Lib.Dtos.Enum.ProtectionFilterDto.Public),
+                    () => _analysisManager.GetMatchCountAsync(this.GetUserId(), roleId, authorizationApplicationIdentifier, searchFilter, searchFilter.ProtectionFilter ?? Lib.Dtos.Enum.ProtectionFilterDto.Public),
                     true,
                     4.0 // allow 4 times more tiles in file order.
                 ));
@@ -546,7 +546,7 @@ public class AnalysisController : ControllerBase, IAnalysisController
                 await _inputValidator.ValidateTilesLimitMetricAsync(
                     searchFilter!.Geographics!.BoundingBox!.ToEnvelope().Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM),
                     gridCellSizeInMeters.Value,
-                    _analysisManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, filter),
+                    () => _analysisManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, filter),
                     true
                 ));
 
@@ -634,7 +634,7 @@ public class AnalysisController : ControllerBase, IAnalysisController
                 await _inputValidator.ValidateTilesLimitMetricAsync(
                     searchFilter!.Geographics!.BoundingBox!.ToEnvelope().Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM),
                     gridCellSizeInMeters.Value,
-                    _analysisManager.GetMatchCountAsync(this.GetUserId(), roleId, authorizationApplicationIdentifier, searchFilter, searchFilter.ProtectionFilter ?? Lib.Dtos.Enum.ProtectionFilterDto.Public),
+                    () => _analysisManager.GetMatchCountAsync(this.GetUserId(), roleId, authorizationApplicationIdentifier, searchFilter, searchFilter.ProtectionFilter ?? Lib.Dtos.Enum.ProtectionFilterDto.Public),
                     true,
                     4.0 // allow 4 times more tiles in file order.
                 ));

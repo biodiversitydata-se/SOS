@@ -181,13 +181,13 @@ public interface IInputValidator
     /// </summary>
     /// <param name="envelope"></param>
     /// <param name="zoom"></param>
-    /// <param name="countTask"></param>
+    /// <param name="getCountAsync">Fetches the observation count only when the possible tile count exceeds the limit.</param>
     /// <param name="internalLimit"></param>
     /// <returns></returns>
     Task<Result> ValidateTilesLimitAsync(
         Envelope envelope,
         int zoom,
-        Task<long> countTask,
+        Func<Task<long>> getCountAsync,
         bool internalLimit = false);
 
     /// <summary>
@@ -195,14 +195,14 @@ public interface IInputValidator
     /// </summary>
     /// <param name="envelope"></param>
     /// <param name="gridCellSizeInMeters"></param>
-    /// <param name="countTask"></param>
+    /// <param name="getCountAsync">Fetches the observation count only when the possible tile count exceeds the limit.</param>
     /// <param name="internalLimit"></param>
     /// <param name="internalLimitFactor"></param>
     /// <returns></returns>
     Task<Result> ValidateTilesLimitMetricAsync(
         Envelope envelope,
         int gridCellSizeInMeters,
-        Task<long> countTask,
+        Func<Task<long>> getCountAsync,
         bool internalLimit = false,
         double internalLimitFactor = 1.0);
 
