@@ -39,8 +39,9 @@ public interface IObservationManager
     /// <param name="filter"></param>
     /// <param name="skip"></param>
     /// <param name="take"></param>
+    /// <param name="knownTotalCount">Count already obtained for this filter. When supplied, skips hit counting and reuses this count.</param>
     /// <returns></returns>
-    Task<PagedResult<JsonObject>> GetChunkAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilter filter, int skip, int take);
+    Task<PagedResult<JsonObject>> GetChunkAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilter filter, int skip, int take, long? knownTotalCount = null);
 
     Task<LocationRepresentativeResult<JsonObject>> GetLocationRepresentativeChunkAsync(
         int? roleId,

@@ -1517,13 +1517,15 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
     }
 
     /// <inheritdoc />
-    public async Task<PagedResult<T>> GetChunkAsync<T>(SearchFilter filter, int skip, int take, bool getAllFields = false) where T : class
+    public async Task<PagedResult<T>> GetChunkAsync<T>(SearchFilter filter, int skip, int take, bool getAllFields = false, long? knownTotalCount = null) where T : class
     {
         var indexNames = GetCurrentIndex(filter);
-        // Public searches always return an exact count; internal searches opt in.
-        var trackTotalHits = filter is SearchFilterInternal internalFilter && internalFilter.IncludeRealCount != true
-            ? new TrackHits(ElasticSearchMaxRecords)
-            : new TrackHits(true);
+        // Reuse an existing count when available. Otherwise public searches count exactly; internal searches opt in.
+        var trackTotalHits = knownTotalCount.HasValue
+            ? new TrackHits(false)
+            : filter is SearchFilterInternal internalFilter && internalFilter.IncludeRealCount != true
+                ? new TrackHits(ElasticSearchMaxRecords)
+                : new TrackHits(true);
 
         var (query, excludeQuery) = GetCoreQueries<T>(filter);
         var sortDescriptor = await Client.GetSortDescriptorAsync<T, Observation>(indexNames, filter?.Output?.SortOrders);
@@ -1549,7 +1551,7 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
             Records = searchResponse.Documents,
             Skip = skip,
             Take = take,
-            TotalCount = searchResponse.Total
+            TotalCount = knownTotalCount ?? searchResponse.Total
         };
     }
 

@@ -160,13 +160,14 @@ public class ObservationManager : IObservationManager
         string authorizationApplicationIdentifier,
         SearchFilter filter,
         int skip,
-        int take)
+        int take,
+        long? knownTotalCount = null)
     {
         try
         {
             await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
             var response =
-                await _processedObservationRepository.GetChunkAsync<JsonObject>(filter, skip, take);
+                await _processedObservationRepository.GetChunkAsync<JsonObject>(filter, skip, take, knownTotalCount: knownTotalCount);
             response.Records = await PostProcessObservationsAsync(filter, filter.ExtendedAuthorization.ProtectionFilter, response.Records, filter.FieldTranslationCultureCode);
             return response;
         }

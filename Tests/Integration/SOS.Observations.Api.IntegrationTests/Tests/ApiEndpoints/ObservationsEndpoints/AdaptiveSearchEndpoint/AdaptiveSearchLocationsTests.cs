@@ -1206,11 +1206,12 @@ public class AdaptiveSearchLocationsTests : TestBase
                             It.IsAny<string>(),
                             It.IsAny<SearchFilter>(),
                             It.IsAny<int>(),
-                            It.IsAny<int>()))
-                        .Returns((int? roleId, string authorizationApplicationIdentifier, SearchFilter filter, int skip, int take) =>
+                            It.IsAny<int>(),
+                            It.IsAny<long?>()))
+                        .Returns((int? roleId, string authorizationApplicationIdentifier, SearchFilter filter, int skip, int take, long? knownTotalCount) =>
                         {
                             probe.ChunkCalls++;
-                            return inner.GetChunkAsync(roleId, authorizationApplicationIdentifier, filter, skip, take);
+                            return inner.GetChunkAsync(roleId, authorizationApplicationIdentifier, filter, skip, take, knownTotalCount);
                         });
                     mock.Setup(manager => manager.GetGeogridTileAggregationAsync(
                             It.IsAny<int?>(),

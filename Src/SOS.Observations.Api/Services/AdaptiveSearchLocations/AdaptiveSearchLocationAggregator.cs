@@ -30,7 +30,7 @@ internal sealed class AdaptiveSearchLocationAggregator : IAdaptiveSearchLocation
         bool isSummaryApproximated = false)
     {
         var observations = records
-            .ToObservationsArray() // todo - går det att undvika denna dyra operation?
+            .Select(LocationObservationMapper.Map)
             .Where(HasUsableLocation)
             .ToList();
 
@@ -42,7 +42,7 @@ internal sealed class AdaptiveSearchLocationAggregator : IAdaptiveSearchLocation
     public int CountLocations(IEnumerable<JsonObject> records)
     {
         var observations = records
-            .ToObservationsArray()
+            .Select(LocationObservationMapper.Map)
             .Where(HasUsableLocation)
             .ToList();
 
@@ -520,7 +520,7 @@ internal sealed class AdaptiveSearchLocationAggregator : IAdaptiveSearchLocation
 
     private static bool HasUsableLocation(Observation observation)
     {
-        return !string.IsNullOrWhiteSpace(observation.Location.LocationId);
+        return !string.IsNullOrWhiteSpace(observation?.Location?.LocationId);
     }
 }
 

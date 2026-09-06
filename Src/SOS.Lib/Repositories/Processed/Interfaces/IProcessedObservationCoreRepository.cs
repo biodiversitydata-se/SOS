@@ -344,8 +344,9 @@ public interface IProcessedObservationCoreRepository : IProcessRepositoryBase<Ob
     /// <param name="skip"></param>
     /// <param name="take"></param>
     /// <param name="getAllFields">If true all observation fields will be retrieved.</param>
+    /// <param name="knownTotalCount">Count already obtained for this filter. When supplied, skips hit counting and reuses this count.</param>
     /// <returns></returns>
-    Task<PagedResult<T>> GetChunkAsync<T>(SearchFilter filter, int skip, int take, bool getAllFields = false) where T : class;    
+    Task<PagedResult<T>> GetChunkAsync<T>(SearchFilter filter, int skip, int take, bool getAllFields = false, long? knownTotalCount = null) where T : class;
 
     Task<LocationRepresentativeResult<T>> GetLocationRepresentativeChunkAsync<T>(
         SearchFilter filter,

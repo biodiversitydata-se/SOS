@@ -219,7 +219,8 @@ internal sealed class AdaptiveSearchLocationsService : IAdaptiveSearchLocationsS
             request.AuthorizationApplicationIdentifier,
             searchFilter,
             0,
-            request.ObservationsLimit);
+            request.ObservationsLimit,
+            knownTotalCount: countAndExtentResult.Count);
         timings.ElasticsearchObservations = observationsStopwatch.Elapsed;
         if (result == null)
         {
