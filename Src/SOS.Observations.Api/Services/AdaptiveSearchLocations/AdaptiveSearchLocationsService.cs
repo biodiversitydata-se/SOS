@@ -6,6 +6,7 @@ using SOS.Lib.Gis;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Observations.Api.Managers.Interfaces;
+using SOS.Observations.Api.Managers;
 using SOS.Observations.Api.Services.AdaptiveSearch;
 using SOS.Observations.Api.Services.Interfaces;
 using System.Diagnostics;
@@ -62,6 +63,9 @@ internal sealed class AdaptiveSearchLocationsService : IAdaptiveSearchLocationsS
 
         var timings = new AdaptiveSearchLocationsTimings();
         var canUseLocationsCache = request.UseCache &&
+                                   request.Filter.ProtectionFilter == Lib.Dtos.Enum.ProtectionFilterDto.Public &&
+                                   request.Filter.ObservedByMe != true &&
+                                   request.Filter.ReportedByMe != true &&
                                    !request.CreateSampleObservations &&
                                    CanUseLocationsCache(request.AdaptiveSearchStrategy);
         var locationsCacheKey = canUseLocationsCache
@@ -76,8 +80,10 @@ internal sealed class AdaptiveSearchLocationsService : IAdaptiveSearchLocationsS
         var cacheStatus = canUseLocationsCache ? "MISS" : "BYPASS";
         var cacheLookupStopwatch = Stopwatch.StartNew();
         var cachedLocationAggregates = new List<CachedLocationAggregate>();
+        var requireExactBoundingBox = request.Filter.Geographics?.ConsiderObservationAccuracy == true ||
+                                      request.Filter.Geographics?.ConsiderDisturbanceRadius == true;
         var cacheHit = canUseLocationsCache &&
-                       _cache.TryGet(locationsCacheKey!, request.InputBbox, out cachedLocationAggregates);
+                       _cache.TryGet(locationsCacheKey!, request.InputBbox, out cachedLocationAggregates, requireExactBoundingBox);
         timings.CacheLookup = cacheLookupStopwatch.Elapsed;
 
         if (cacheHit)
@@ -145,13 +151,15 @@ internal sealed class AdaptiveSearchLocationsService : IAdaptiveSearchLocationsS
         searchFilter.Output.ExcludeFields = new List<string>();
 
         var countAndExtentStopwatch = Stopwatch.StartNew();
-        var countAndExtentResult = await _observationManager.GetCountAndExtentAsync(
+        var preparedFilter = await _observationManager.PrepareObservationFilterAsync(
             request.RoleId,
             request.AuthorizationApplicationIdentifier,
             searchFilter);
+        var includeExtent = !request.ReturnInputBBox || bbox == null;
+        var countAndExtentResult = await _observationManager.GetCountAndExtentAsync(preparedFilter, includeExtent);
         timings.ElasticsearchCountAndExtent = countAndExtentStopwatch.Elapsed;
 
-        if (!request.ReturnInputBBox || bbox == null)
+        if (includeExtent)
         {
             bbox = countAndExtentResult.Extent;
         }
@@ -178,6 +186,7 @@ internal sealed class AdaptiveSearchLocationsService : IAdaptiveSearchLocationsS
                     timings,
                     bbox,
                     searchFilter,
+                    preparedFilter,
                     countAndExtentResult,
                     clusteringBbox);
                 if (representativeLocationsResult != null)
@@ -189,9 +198,7 @@ internal sealed class AdaptiveSearchLocationsService : IAdaptiveSearchLocationsS
             var zoom = GeoTileHelper.CalculateGeotileZoom(request.InputBbox ?? bbox, request.MaxGridCells, request.MaxZoom);
             var geogridStopwatch = Stopwatch.StartNew();
             var gridResult = await _observationManager.GetGeogridTileAggregationAsync(
-                request.RoleId,
-                request.AuthorizationApplicationIdentifier,
-                searchFilter,
+                preparedFilter,
                 zoom);
             timings.ElasticsearchGeogrid = geogridStopwatch.Elapsed;
 
@@ -215,9 +222,7 @@ internal sealed class AdaptiveSearchLocationsService : IAdaptiveSearchLocationsS
 
         var observationsStopwatch = Stopwatch.StartNew();
         var result = await _observationManager.GetChunkAsync(
-            request.RoleId,
-            request.AuthorizationApplicationIdentifier,
-            searchFilter,
+            preparedFilter,
             0,
             request.ObservationsLimit,
             knownTotalCount: countAndExtentResult.Count);
@@ -332,14 +337,13 @@ internal sealed class AdaptiveSearchLocationsService : IAdaptiveSearchLocationsS
         AdaptiveSearchLocationsTimings timings,
         Lib.Models.Gis.LatLonBoundingBox? bbox,
         SearchFilterInternal searchFilter,
+        PreparedObservationFilter preparedFilter,
         (long Count, Lib.Models.Gis.LatLonBoundingBox? Extent, long EstimatedLocationCount) countAndExtentResult,
         Lib.Models.Gis.LatLonBoundingBox? clusteringBbox)
     {
         var representativeLocationsStopwatch = Stopwatch.StartNew();
         var representativeLocationsResult = await _observationManager.GetLocationRepresentativeChunkAsync(
-            request.RoleId,
-            request.AuthorizationApplicationIdentifier,
-            searchFilter,
+            preparedFilter,
             request.LocationAggregationLimit!.Value + 1,
             LocationCollapseField);
         timings.ElasticsearchRepresentativeLocations = representativeLocationsStopwatch.Elapsed;

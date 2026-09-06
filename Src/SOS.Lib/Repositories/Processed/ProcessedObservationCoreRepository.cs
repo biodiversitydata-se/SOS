@@ -1996,7 +1996,7 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
         return countResponse.Count;
     }
     
-    public async Task<(long Count, LatLonBoundingBox? Extent, long EstimatedLocationCount)> GetCountAndExtentAsync(SearchFilterBase filter, bool skipAuthorizationFilters = false)
+    public async Task<(long Count, LatLonBoundingBox? Extent, long EstimatedLocationCount)> GetCountAndExtentAsync(SearchFilterBase filter, bool skipAuthorizationFilters = false, bool includeExtent = true)
     {
         var indexNames = GetCurrentIndex(filter, skipAuthorizationFilters);
         var (query, excludeQuery) = GetCoreQueries<dynamic>(filter, skipAuthorizationFilters);
@@ -2015,19 +2015,22 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
                     .Filter(query?.ToArray())
                 )
             )
-            .Aggregations(a => a  
-                .Add(extentAggName, a => a
-                    .GeoBounds(gb => gb
-                        .Field(geoFieldName)
-                        .WrapLongitude(true)
-                    )
-                )
-                .Add(locationCardinalityAggName, a => a
+            .Aggregations(a =>
+            {
+                if (includeExtent)
+                {
+                    a.Add(extentAggName, aggregation => aggregation
+                        .GeoBounds(gb => gb
+                            .Field(geoFieldName)
+                            .WrapLongitude(true)));
+                }
+
+                return a.Add(locationCardinalityAggName, a => a
                     .Cardinality(c => c
                         .Field("location.locationId")
                     )
-                )
-            )
+                );
+            })
         );        
 
         searchResponse.ThrowIfInvalid();

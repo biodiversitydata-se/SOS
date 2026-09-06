@@ -154,18 +154,41 @@ public class ObservationManager : IObservationManager
 
     public int MaxNrElasticSearchAggregationBuckets => _processedObservationRepository.MaxNrElasticSearchAggregationBuckets;
 
+    public async Task<PreparedObservationFilter> PrepareObservationFilterAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilter filter)
+    {
+        await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
+        return new PreparedObservationFilter(filter);
+    }
+
+    public Task<PagedResult<JsonObject>> GetChunkAsync(PreparedObservationFilter filter, int skip, int take, long? knownTotalCount = null)
+        => GetChunkCoreAsync(null, null, filter.Filter, skip, take, knownTotalCount, prepareFilter: false);
+
+    public Task<LocationRepresentativeResult<JsonObject>> GetLocationRepresentativeChunkAsync(PreparedObservationFilter filter, int take, string collapseField)
+        => GetLocationRepresentativeChunkCoreAsync(null, null, filter.Filter, take, collapseField, prepareFilter: false);
+
+    public Task<GeoGridTileResult> GetGeogridTileAggregationAsync(PreparedObservationFilter filter, int precision)
+        => GetGeogridTileAggregationCoreAsync(null, null, filter.Filter, precision, prepareFilter: false);
+
+    public Task<(long Count, LatLonBoundingBox? Extent, long EstimatedLocationCount)> GetCountAndExtentAsync(PreparedObservationFilter filter, bool includeExtent = true)
+        => _processedObservationRepository.GetCountAndExtentAsync(filter.Filter, includeExtent: includeExtent);
+
     /// <inheritdoc />
-    public async Task<PagedResult<JsonObject>> GetChunkAsync(
+    public Task<PagedResult<JsonObject>> GetChunkAsync(
         int? roleId,
         string authorizationApplicationIdentifier,
         SearchFilter filter,
         int skip,
         int take,
         long? knownTotalCount = null)
+        => GetChunkCoreAsync(roleId, authorizationApplicationIdentifier, filter, skip, take, knownTotalCount, prepareFilter: true);
+
+    private async Task<PagedResult<JsonObject>> GetChunkCoreAsync(
+        int? roleId, string authorizationApplicationIdentifier, SearchFilter filter,
+        int skip, int take, long? knownTotalCount, bool prepareFilter)
     {
         try
         {
-            await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
+            if (prepareFilter) await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
             var response =
                 await _processedObservationRepository.GetChunkAsync<JsonObject>(filter, skip, take, knownTotalCount: knownTotalCount);
             response.Records = await PostProcessObservationsAsync(filter, filter.ExtendedAuthorization.ProtectionFilter, response.Records, filter.FieldTranslationCultureCode);
@@ -187,16 +210,21 @@ public class ObservationManager : IObservationManager
         }
     }
 
-    public async Task<LocationRepresentativeResult<JsonObject>> GetLocationRepresentativeChunkAsync(
+    public Task<LocationRepresentativeResult<JsonObject>> GetLocationRepresentativeChunkAsync(
         int? roleId,
         string authorizationApplicationIdentifier,
         SearchFilter filter,
         int take,
         string collapseField)
+        => GetLocationRepresentativeChunkCoreAsync(roleId, authorizationApplicationIdentifier, filter, take, collapseField, prepareFilter: true);
+
+    private async Task<LocationRepresentativeResult<JsonObject>> GetLocationRepresentativeChunkCoreAsync(
+        int? roleId, string authorizationApplicationIdentifier, SearchFilter filter,
+        int take, string collapseField, bool prepareFilter)
     {
         try
         {
-            await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
+            if (prepareFilter) await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
             var response = await _processedObservationRepository.GetLocationRepresentativeChunkAsync<JsonObject>(
                 filter,
                 take,
@@ -323,11 +351,14 @@ public class ObservationManager : IObservationManager
     }
 
     /// <inheritdoc />
-    public async Task<GeoGridTileResult> GetGeogridTileAggregationAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilter filter, int precision)
+    public Task<GeoGridTileResult> GetGeogridTileAggregationAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilter filter, int precision)
+        => GetGeogridTileAggregationCoreAsync(roleId, authorizationApplicationIdentifier, filter, precision, prepareFilter: true);
+
+    private async Task<GeoGridTileResult> GetGeogridTileAggregationCoreAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilter filter, int precision, bool prepareFilter)
     {
         try
         {
-            await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
+            if (prepareFilter) await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
             return await _processedObservationRepository.GetGeogridTileAggregationAsync(filter, precision);
         }
         catch (ArgumentOutOfRangeException e)

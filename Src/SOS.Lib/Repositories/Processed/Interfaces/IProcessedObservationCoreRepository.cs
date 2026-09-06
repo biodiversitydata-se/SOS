@@ -139,7 +139,7 @@ public interface IProcessedObservationCoreRepository : IProcessRepositoryBase<Ob
     /// <returns></returns>
     Task<long> GetMatchCountAsync(SearchFilterBase filter, bool skipAuthorizationFilters = false);
 
-    Task<(long Count, LatLonBoundingBox? Extent, long EstimatedLocationCount)> GetCountAndExtentAsync(SearchFilterBase filter, bool skipAuthorizationFilters = false);
+    Task<(long Count, LatLonBoundingBox? Extent, long EstimatedLocationCount)> GetCountAndExtentAsync(SearchFilterBase filter, bool skipAuthorizationFilters = false, bool includeExtent = true);
 
     /// <summary>
     /// Get observations by their occurrence id's

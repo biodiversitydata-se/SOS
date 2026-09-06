@@ -17,6 +17,13 @@ namespace SOS.Observations.Api.Managers.Interfaces;
 /// </summary>
 public interface IObservationManager
 {
+    /// <summary>Prepares the filter and authorization context once for a sequence of queries in one request.</summary>
+    Task<PreparedObservationFilter> PrepareObservationFilterAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilter filter);
+    Task<PagedResult<JsonObject>> GetChunkAsync(PreparedObservationFilter filter, int skip, int take, long? knownTotalCount = null);
+    Task<LocationRepresentativeResult<JsonObject>> GetLocationRepresentativeChunkAsync(PreparedObservationFilter filter, int take, string collapseField);
+    Task<GeoGridTileResult> GetGeogridTileAggregationAsync(PreparedObservationFilter filter, int precision);
+    Task<(long Count, LatLonBoundingBox? Extent, long EstimatedLocationCount)> GetCountAndExtentAsync(PreparedObservationFilter filter, bool includeExtent = true);
+
     /// <summary>
     /// Look for duplicates
     /// </summary>

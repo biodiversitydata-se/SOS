@@ -591,7 +591,7 @@ public class AdaptiveSearchLocationsTests : TestBase
     }
 
     [Fact]
-    public async Task AdaptiveSearchLocationsInternal_ReusesCachedAdjacentBoundingBoxes_WhenRequestIsCovered()
+    public async Task AdaptiveSearchLocationsInternal_QueriesAgainForAdjacentBoundingBoxes_EvenWhenRequestIsCovered()
     {
         // Arrange
         var observations = CreatePointObservations(
@@ -632,11 +632,11 @@ public class AdaptiveSearchLocationsTests : TestBase
         combinedResponse.StatusCode.Should().Be(HttpStatusCode.OK);
         leftResponse.GetHeaderValue("X-Cache").Should().Be("MISS");
         rightResponse.GetHeaderValue("X-Cache").Should().Be("MISS");
-        combinedResponse.GetHeaderValue("X-Cache").Should().Be("HIT");
+        combinedResponse.GetHeaderValue("X-Cache").Should().Be("MISS");
         combinedResponse.GetHeaderValue("X-Feature-Count").Should().Be("4");
         combinedFeatures.Count.Should().Be(4);
         countAndExtentCallsAfterWarmupRequests.Should().Be(2);
-        observationManagerProbe.CountAndExtentCalls.Should().Be(2);
+        observationManagerProbe.CountAndExtentCalls.Should().Be(3);
     }
 
     [Fact]
@@ -1191,35 +1191,28 @@ public class AdaptiveSearchLocationsTests : TestBase
                     var mock = new Mock<IObservationManager>(MockBehavior.Strict);
                     mock.SetupGet(manager => manager.MaxNrElasticSearchAggregationBuckets)
                         .Returns(inner.MaxNrElasticSearchAggregationBuckets);
-                    mock.Setup(manager => manager.GetCountAndExtentAsync(
-                            It.IsAny<int?>(),
-                            It.IsAny<string>(),
-                            It.IsAny<SearchFilterBase>(),
-                            It.IsAny<bool>()))
-                        .Returns((int? roleId, string authorizationApplicationIdentifier, SearchFilterBase filter, bool skipAuthorizationFilters) =>
+                    mock.Setup(manager => manager.PrepareObservationFilterAsync(It.IsAny<int?>(), It.IsAny<string>(), It.IsAny<SearchFilter>()))
+                        .Returns((int? roleId, string application, SearchFilter filter) => inner.PrepareObservationFilterAsync(roleId, application, filter));
+                    mock.Setup(manager => manager.GetCountAndExtentAsync(It.IsAny<PreparedObservationFilter>(), It.IsAny<bool>()))
+                        .Returns((PreparedObservationFilter filter, bool includeExtent) =>
                         {
                             probe.CountAndExtentCalls++;
-                            return inner.GetCountAndExtentAsync(roleId, authorizationApplicationIdentifier, filter, skipAuthorizationFilters);
+                            return inner.GetCountAndExtentAsync(filter, includeExtent);
                         });
                     mock.Setup(manager => manager.GetChunkAsync(
-                            It.IsAny<int?>(),
-                            It.IsAny<string>(),
-                            It.IsAny<SearchFilter>(),
+                            It.IsAny<PreparedObservationFilter>(),
                             It.IsAny<int>(),
                             It.IsAny<int>(),
                             It.IsAny<long?>()))
-                        .Returns((int? roleId, string authorizationApplicationIdentifier, SearchFilter filter, int skip, int take, long? knownTotalCount) =>
+                        .Returns((PreparedObservationFilter filter, int skip, int take, long? knownTotalCount) =>
                         {
                             probe.ChunkCalls++;
-                            return inner.GetChunkAsync(roleId, authorizationApplicationIdentifier, filter, skip, take, knownTotalCount);
+                            return inner.GetChunkAsync(filter, skip, take, knownTotalCount);
                         });
                     mock.Setup(manager => manager.GetGeogridTileAggregationAsync(
-                            It.IsAny<int?>(),
-                            It.IsAny<string>(),
-                            It.IsAny<SearchFilter>(),
+                            It.IsAny<PreparedObservationFilter>(),
                             It.IsAny<int>()))
-                        .Returns((int? roleId, string authorizationApplicationIdentifier, SearchFilter filter, int precision) =>
-                            inner.GetGeogridTileAggregationAsync(roleId, authorizationApplicationIdentifier, filter, precision));
+                        .Returns((PreparedObservationFilter filter, int precision) => inner.GetGeogridTileAggregationAsync(filter, precision));
 
                     return mock.Object;
                 }));
