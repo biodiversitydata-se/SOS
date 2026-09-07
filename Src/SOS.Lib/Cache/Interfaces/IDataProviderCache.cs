@@ -17,14 +17,14 @@ public interface IDataProviderCache : ICache<int, DataProvider>
     Task<IEnumerable<int>> GetDefaultIdsAsync();
 
     /// <summary>
-    /// Get eml data
+    /// Get a copy of EML data, cached per provider for up to one hour in this process.
     /// </summary>
     /// <param name="providerId"></param>
     /// <returns></returns>
     Task<XDocument> GetEmlAsync(int providerId);
 
     /// <summary>
-    ///  Store eml data
+    /// Store EML data and invalidate the cached document on success.
     /// </summary>
     /// <param name="providerId"></param>
     /// <param name="eml"></param>

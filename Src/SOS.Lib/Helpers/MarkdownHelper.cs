@@ -568,6 +568,11 @@ public class MarkdownHelper : IMarkdownHelper
     /// <returns>A task that represents the asynchronous operation.</returns>
     private async Task TryAddTaxaInfoAsync(StringBuilder sb, TaxonFilterDto filter, IEnumerable<VocabularyValueInfo> taxonCategories)
     {
+        if (filter == null)
+        {
+            return;
+        }
+
         var taxonIds = await _filterManager.GetTaxonIdsAsync(filter.Ids,
             filter.IncludeUnderlyingTaxa ?? false,
             filter.TaxonListIds,
@@ -575,13 +580,13 @@ public class MarkdownHelper : IMarkdownHelper
             filter.TaxonCategories,
             false);
 
-        if (filter == null || (
+        if (
             (taxonIds?.Count() ?? 0) == 0 &&
             (filter.TaxonListIds?.Count() ?? 0) == 0 &&
             (filter.RedListCategories?.Count() ?? 0) == 0 &&
             (filter.TaxonCategories?.Count() ?? 0) == 0 &&
             !filter.IsInvasiveInSweden.HasValue
-        ))
+        )
         {
             return;
         }
