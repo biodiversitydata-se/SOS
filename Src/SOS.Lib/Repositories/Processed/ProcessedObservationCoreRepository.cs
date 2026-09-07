@@ -7,6 +7,7 @@ using Elastic.Clients.Elasticsearch.Core.Search;
 using Elastic.Clients.Elasticsearch.Fluent;
 using Elastic.Clients.Elasticsearch.Mapping;
 using Elastic.Clients.Elasticsearch.QueryDsl;
+using Elastic.Transport.Extensions;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Cache.Interfaces;
@@ -27,6 +28,7 @@ using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using System.Collections.Concurrent;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 
@@ -39,6 +41,8 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
     IProcessedObservationCoreRepository
 {
     private const int ElasticSearchMaxRecords = 10000;
+    private static readonly TimeSpan CursorCountCacheDuration = TimeSpan.FromMinutes(2);
+    private readonly IMemoryCache _cursorCountCache;
     protected readonly ITaxonManager _taxonManager;
 
     /// <summary>
@@ -1202,6 +1206,7 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
         }
 
         _taxonManager = taxonManager;
+        _cursorCountCache = memoryCache;
     }
 
     /// <inheritdoc />
@@ -2751,29 +2756,46 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
         var (query, excludeQuery) = GetCoreQueries<T>(filter);
         var sortDescriptor = await Client.GetSortDescriptorAsync<T, Observation>(indexNames, filter?.Output?.SortOrders);
         ICollection<FieldValue>? searchAfterObj = SearchAfterCoder.Decode(searchAfter);
-        
-        var searchResponse = await Client.SearchAsync<T>(s =>        
-            s.Indices(indexNames)
+
+        var descriptor = new SearchRequestDescriptor<T>()
+            .Indices(indexNames)
+            .Query(q => q.Bool(b => b
+                .MustNot(excludeQuery.ToArray())
+                .Filter(query.ToArray())));
+
+        // Hash the actual query, including authorization restrictions. Never trust a count supplied by a cursor.
+        // Exclude paging and output options so continuation pages can reuse the count.
+        var queryJson = Client.RequestResponseSerializer.SerializeToString(descriptor);
+        var countCacheKey = (nameof(ProcessedObservationCoreRepository), "CursorCount", indexNames,
+            filter.ExtendedAuthorization.UserId, filter.RoleId, filter.AuthorizationApplicationIdentifier,
+            Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(queryJson))));
+        long totalCount = 0;
+        var hasCachedCount = searchAfterObj != null && _cursorCountCache.TryGetValue(countCacheKey, out totalCount);
+
+        var searchResponse = await Client.SearchAsync<T>(descriptor
                 .Source(getAllFields ? new SourceConfig(true) : filter.Output?.Fields.ToProjection(filter is SearchFilterInternal))
                 .Size(take)
-                .Query(q => q
-                    .Bool(b => b
-                        .MustNot(excludeQuery.ToArray())
-                        .Filter(query.ToArray())
-                    )
-                )
                 .Sort(sortDescriptor.ToArray())
                 .SearchAfter(searchAfterObj)
-                .TrackTotalHits(new TrackHits(true))
+                .TrackTotalHits(new TrackHits(!hasCachedCount))
         );
 
-        searchResponse.ThrowIfInvalid();        
-        var totalCount = searchResponse.Total;
+        searchResponse.ThrowIfInvalid();
+        if (!hasCachedCount)
+        {
+            totalCount = searchResponse.Total;
+            // Do not extend the expiration on cache hits or cache counts from incomplete searches.
+            if (!searchResponse.TimedOut && searchResponse.Shards.Failed == 0)
+            {
+                _cursorCountCache.Set(countCacheKey, totalCount,
+                    new MemoryCacheEntryOptions { AbsoluteExpirationRelativeToNow = CursorCountCacheDuration, Size = 1 });
+            }
+        }
 
         // Extract searchAfter values from the last hit        
         string? nextSearchAfter = null;
         var lastHit = searchResponse.Hits?.LastOrDefault();
-        if (lastHit?.Sort != null && searchResponse.Documents.Any())
+        if (lastHit?.Sort != null)
         {            
             nextSearchAfter = SearchAfterCoder.Encode(lastHit.Sort);            
         }

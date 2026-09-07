@@ -696,6 +696,9 @@ public class ObservationsController : ControllerBase
     ///
     /// **Note**: search_after provides a "live" view of the data.
     /// Documents added or removed between requests may affect pagination consistency. Your application need to handle duplicate or missing documents accordingly.
+    /// TotalCount is calculated on the first page and may be reused for up to two minutes on subsequent pages with the same query and authorization context.
+    /// After cache expiration or when a request reaches another API instance without a cached count, TotalCount is recalculated.
+    /// The 2,000,000 limit is checked against this count. Observation records are always fetched from Elasticsearch.
     /// </remarks>
     /// <param name="roleId">Limit user authorization to specified role.</param>
     /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
