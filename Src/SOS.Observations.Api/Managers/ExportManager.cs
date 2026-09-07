@@ -150,7 +150,8 @@ public class ExportManager : IExportManager
         bool excludeNullValues,
         bool dynamicProjectDataFields,
         bool gzip,
-        IJobCancellationToken cancellationToken)
+        IJobCancellationToken cancellationToken,
+        bool useSearchAfterWithoutPit = false)
     {   
         if (!await _downloadSemaphore.WaitAsync(TimeSpan.FromSeconds(60)))
         {
@@ -161,6 +162,7 @@ public class ExportManager : IExportManager
         {
             var filter = searchFilter.ToSearchFilter(userId ?? 0, protectionFilter, culture ?? "en-GB");
             await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
+            filter.UseSearchAfterWithoutPit = useSearchAfterWithoutPit;
             var additionalFiles = new List<(Stream stream, string filename)>();
             var filterMarkdownStream = await _markdownHelper.GetFilterMarkDownAsync(searchFilter, CancellationToken.None);
             additionalFiles.Add((filterMarkdownStream, "filter.md"));

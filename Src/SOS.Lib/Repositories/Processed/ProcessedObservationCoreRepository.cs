@@ -1528,7 +1528,9 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
                 : new TrackHits(true);
 
         var (query, excludeQuery) = GetCoreQueries<T>(filter);
-        var sortDescriptor = await Client.GetSortDescriptorAsync<T, Observation>(indexNames, filter?.Output?.SortOrders);
+        var sortDescriptor = filter.UseSearchAfterWithoutPit
+            ? await GetExportSortDescriptorAsync<T>(indexNames)
+            : await Client.GetSortDescriptorAsync<T, Observation>(indexNames, filter?.Output?.SortOrders);
         var searchResponse = await Client.SearchAsync<T>(s => s
             .Indices(indexNames)
             .Source(getAllFields ? new SourceConfig(true) : filter.Output?.Fields.ToProjection(filter is SearchFilterInternal))
@@ -2164,7 +2166,7 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
     {
         var searchIndex = GetCurrentIndex(filter);
         var queries = filter.ToMeasurementOrFactsQuery<dynamic>();
-        var searchResponse = await SearchAfterAsync<dynamic>(searchIndex, new SearchRequestDescriptor<dynamic>()
+        var searchResponse = await SearchExportPageAsync<dynamic>(filter, searchIndex, new SearchRequestDescriptor<dynamic>()
             .Indices(searchIndex)
             .Query(query => query
                 .Bool(b => b
@@ -2194,7 +2196,7 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
     {
         var searchIndex = GetCurrentIndex(filter);
         var queries = filter.ToMultimediaQuery<dynamic>();
-        var searchResponse = await SearchAfterAsync<dynamic>(searchIndex, new SearchRequestDescriptor<dynamic>()
+        var searchResponse = await SearchExportPageAsync<dynamic>(filter, searchIndex, new SearchRequestDescriptor<dynamic>()
             .Indices(searchIndex)
             .Query(query => query
                 .Bool(boolQueryDescriptor => boolQueryDescriptor
@@ -2215,7 +2217,45 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
         };
     }
 
-    /// <inheritdoc/>
+    private async Task<SearchResponse<T>> SearchExportPageAsync<T>(
+        SearchFilterBase filter,
+        string searchIndex,
+        SearchRequestDescriptor<T> searchDescriptor,
+        string pointInTimeId,
+        ICollection<FieldValue> afterKey) where T : class
+    {
+        if (!filter.UseSearchAfterWithoutPit)
+        {
+            return await SearchAfterAsync(searchIndex, searchDescriptor, pointInTimeId, afterKey);
+        }
+
+        var sortDescriptor = await GetExportSortDescriptorAsync<T>(searchIndex);
+
+        return await PollyHelper.GetRetryPolicy(3, 100).ExecuteAsync(async () =>
+        {
+            var response = await Client.SearchAsync(searchDescriptor
+                .Indices(searchIndex)
+                .Sort(sortDescriptor.ToArray())
+                .SearchAfter(afterKey)
+                .Size(ScrollBatchSize)
+                .TrackTotalHits(new TrackHits(false)));
+            response.ThrowIfInvalid();
+            return response;
+        });
+    }
+
+    private async Task<ICollection<Action<SortOptionsDescriptor<T>>>> GetExportSortDescriptorAsync<T>(string searchIndex) where T : class
+    {
+        // Use the same ordering for single-page and paginated Download exports.
+        var sortOrders = new[] { new SortOrderFilter { SortBy = "modified", SortOrder = SearchSortOrder.Asc } };
+        // The sort builder appends occurrence ID as a tie-breaker.
+        var sortDescriptor = await Client.GetSortDescriptorAsync<T, Observation>(searchIndex, sortOrders);
+        // An occurrence can exist in both public and protected indices.
+        sortDescriptor.Add(s => s.Field("_index", f => f.Order(SortOrder.Asc)));
+        return sortDescriptor;
+    }
+
+    /// <inheritdoc />
     public async Task<T> GetObservationAsync<T>(string occurrenceId, SearchFilter filter, bool getAllFields = false) where T : class
     {
         var indexNames = GetCurrentIndex(filter);
@@ -2340,7 +2380,7 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
         // Retry policy by Polly
         var searchResponse = await PollyHelper.GetRetryPolicy(3, 100).ExecuteAsync(async () =>
         {
-            var queryResponse = await SearchAfterAsync<dynamic>(searchIndex, new SearchRequestDescriptor<dynamic>()
+            var queryResponse = await SearchExportPageAsync<dynamic>(filter, searchIndex, new SearchRequestDescriptor<dynamic>()
             .Indices(searchIndex)
             .Source(filter.Output?.Fields.ToProjection(filter is SearchFilterInternal))
                 .Query(q => q

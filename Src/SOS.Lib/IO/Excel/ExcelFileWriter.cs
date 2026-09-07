@@ -33,7 +33,7 @@ public class ExcelFileWriter : FileWriterBase, IExcelFileWriter
     private readonly IVocabularyValueResolver _vocabularyValueResolver;
     private readonly IGeneralizationResolver _generalizationResolver;
     private readonly ILogger<ExcelFileWriter> _logger;
-    private const int FastSearchLimit = 10000;
+    private const int FastSearchLimit = 2500;
 
     private void FormatColumns(ExcelWorksheet worksheet, List<PropertyFieldDescription> propertyFields)
     {
@@ -288,7 +288,7 @@ public class ExcelFileWriter : FileWriterBase, IExcelFileWriter
             Models.Search.Result.SearchAfterResult<Observation, ICollection<FieldValue>> searchResult = null;
             if (useFastSearch)
             {
-                fastSearchResult = await _processedObservationRepository.GetChunkAsync<dynamic>(filter, 0, 10000);
+                fastSearchResult = await _processedObservationRepository.GetChunkAsync<dynamic>(filter, 0, FastSearchLimit, knownTotalCount: expectedNoOfObservations);
             }
             else
             {

@@ -31,6 +31,7 @@ public interface IExportManager
     /// <param name="dynamicProjectDataFields">true to include dynamic project data fields in the export; otherwise, false.</param>
     /// <param name="gzip">true to apply GZip compression to the resulting ZIP stream; otherwise, false.</param>
     /// <param name="cancellationToken">A token that can be used to cancel the export operation.</param>
+    /// <param name="useSearchAfterWithoutPit">Use search_after without a PIT snapshot. False preserves existing paging.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains a tuple with the ZIP stream of the
     /// exported data and the generated filename.</returns>
     Task<(Stream stream, string filename)> CreateExportFileInMemoryAsZipStreamAsync(
@@ -46,7 +47,8 @@ public interface IExportManager
         bool excludeNullValues,
         bool dynamicProjectDataFields,
         bool gzip,
-        IJobCancellationToken cancellationToken);
+        IJobCancellationToken cancellationToken,
+        bool useSearchAfterWithoutPit = false);
 
     /// <summary>
     /// Asynchronously generates a Markdown representation of the specified search filter.
