@@ -2868,10 +2868,40 @@ public class ObservationsController : ControllerBase
         try
         {
             LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
+            filter = await _searchFilterUtility.InitializeSearchFilterAsync(filter);
+
+            // sensitiveObservations is preserved for backward compatibility.
+            filter.ProtectionFilter ??= sensitiveObservations
+                ? ProtectionFilterDto.Sensitive
+                : ProtectionFilterDto.Public;
+            this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, filter.ProtectionFilter);
+
             // Cache
             string cacheKey = null;
             ConcurrentDictionary<string, CacheEntry<PagedResultDto<TaxonAggregationItemDto>>> resultByCacheKey = null;
-            bool useCache = !sensitiveObservations && Request.ContentLength < 10000;
+            bool useCache = filter.ProtectionFilter == ProtectionFilterDto.Public && Request.ContentLength < 10000;
+            var geometryValidationResult = _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries);
+            if (geometryValidationResult.IsFailure)
+            {
+                return BadRequest(geometryValidationResult.Error);
+            }
+
+            var boundingBox = filter.Geographics.BoundingBox.ToEnvelope();
+            var searchFilter = filter.ToSearchFilterInternal(this.GetUserId(), translationCultureCode);
+            translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
+
+            var validationResult = Result.Combine(
+                validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(filter)) : Result.Success(),
+                _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
+                _inputValidator.ValidateTranslationCultureCode(translationCultureCode),
+                _inputValidator.ValidateTaxonAggregationPagingArguments(skip, take)
+                );
+
+            if (validationResult.IsFailure)
+            {
+                return BadRequest(validationResult.Error);
+            }
+
             if (useCache)
             {
                 var parameters = new[]
@@ -2895,35 +2925,7 @@ public class ObservationsController : ControllerBase
                     _logger.LogDebug($"TaxonAggregationInternal result found in cache and is returned as result. Number of requests={cacheEntry.Count}");
                     return new OkObjectResult(val);
                 }
-            } 
-
-            // sensitiveObservations is preserved for backward compability
-            filter.ProtectionFilter ??= (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
-            this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, filter.ProtectionFilter);
-
-            filter = await _searchFilterUtility.InitializeSearchFilterAsync(filter);
-            var geometryValidationResult = _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries);
-            if (geometryValidationResult.IsFailure)
-            {
-                return BadRequest(geometryValidationResult.Error);
             }
-
-            var boundingBox = filter.Geographics.BoundingBox.ToEnvelope();
-            var searchFilter = filter.ToSearchFilterInternal(this.GetUserId(), translationCultureCode);
-            translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
-
-            var validationResult = Result.Combine(
-                validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(filter)) : Result.Success(),
-                _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
-                _inputValidator.ValidateTranslationCultureCode(translationCultureCode),
-                _inputValidator.ValidateTaxonAggregationPagingArguments(skip, take)                    
-                );
-
-            if (validationResult.IsFailure)
-            {
-                return BadRequest(validationResult.Error);
-            }
-
 
             var result = await _taxonSearchManager.GetTaxonAggregationAsync(roleId,
                 authorizationApplicationIdentifier,

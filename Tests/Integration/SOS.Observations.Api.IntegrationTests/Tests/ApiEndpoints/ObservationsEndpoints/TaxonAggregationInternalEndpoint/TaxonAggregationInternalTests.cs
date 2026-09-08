@@ -3,7 +3,9 @@ using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Dtos;
 using SOS.Lib.Dtos.Enum;
 using SOS.Lib.Dtos.Filter;
+using SOS.Lib.Helpers;
 using SOS.Observations.Api.IntegrationTests.Setup;
+using SOS.Observations.Api.IntegrationTests.Setup.Stubs;
 using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
 
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsEndpoints.TaxonAggregationInternalEndpoint;
@@ -67,6 +69,47 @@ public class TaxonAggregationInternalTests : TestBase
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         result!.TotalCount.Should().Be(2,
             because: "");
+    }
+
+    [Fact]
+    public async Task TaxonAggregationInternal_DoesNotCacheSensitiveResults()
+    {
+        var sensitiveTaxonIds = ProtectedSpeciesHelper.SensitiveSpeciesByCategory[3].Take(2).ToArray();
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(2)
+            .All().HaveValuesFromPredefinedObservations()
+            .Build();
+        verbatimObservations[0].TaxonId = sensitiveTaxonIds[0];
+        verbatimObservations[0].ProtectedBySystem = true;
+        verbatimObservations[1].TaxonId = sensitiveTaxonIds[1];
+        verbatimObservations[1].ProtectedBySystem = true;
+
+        var apiClient = TestFixture.CreateApiClientWithReplacedService(
+            UserServiceStubFactory.CreateWithSightingAuthority(maxProtectionLevel: 3));
+        var searchFilter = new SearchFilterAggregationInternalDto
+        {
+            ProtectionFilter = ProtectionFilterDto.Sensitive
+        };
+
+        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations.Take(1));
+        using var firstResponse = await apiClient.PostAsync(
+            "/observations/internal/taxonaggregation",
+            JsonContent.Create(searchFilter),
+            TestContext.Current.CancellationToken);
+        var firstResult = await firstResponse.Content.ReadFromJsonAsync<PagedResultDto<dynamic>>(
+            TestContext.Current.CancellationToken);
+
+        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
+        using var secondResponse = await apiClient.PostAsync(
+            "/observations/internal/taxonaggregation",
+            JsonContent.Create(searchFilter),
+            TestContext.Current.CancellationToken);
+        var secondResult = await secondResponse.Content.ReadFromJsonAsync<PagedResultDto<dynamic>>(
+            TestContext.Current.CancellationToken);
+
+        firstResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        secondResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        firstResult!.TotalCount.Should().Be(1);
+        secondResult!.TotalCount.Should().Be(2);
     }
 
     [Fact]
