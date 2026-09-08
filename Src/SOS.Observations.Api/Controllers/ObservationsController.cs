@@ -693,12 +693,9 @@ public class ObservationsController : ControllerBase
     /// 4. The cursor value is the sort values from the last document in the previous page. This value is base64-encoded.
     /// 5. If the result cursor value is null or empty, there are no more pages to retrieve.
     /// 6. You are only allowed to paginate results with Total count lower or equal to 2,000,000. If the total count exceeds this limit, a bad request response will be returned.
-    ///
+    ///    
     /// **Note**: search_after provides a "live" view of the data.
     /// Documents added or removed between requests may affect pagination consistency. Your application need to handle duplicate or missing documents accordingly.
-    /// TotalCount is calculated on the first page and may be reused for up to two minutes on subsequent pages with the same query and authorization context.
-    /// After cache expiration or when a request reaches another API instance without a cached count, TotalCount is recalculated.
-    /// The 2,000,000 limit is checked against this count. Observation records are always fetched from Elasticsearch.
     /// </remarks>
     /// <param name="roleId">Limit user authorization to specified role.</param>
     /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>

@@ -41,6 +41,7 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
     IProcessedObservationCoreRepository
 {
     private const int ElasticSearchMaxRecords = 10000;
+    private const int MaxRequestBodyQuerySizeCacheInBytes = 20_000;
     private static readonly TimeSpan CursorCountCacheDuration = TimeSpan.FromMinutes(2);
     private readonly IMemoryCache _cursorCountCache;
     protected readonly ITaxonManager _taxonManager;
@@ -2766,11 +2767,16 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
         // Hash the actual query, including authorization restrictions. Never trust a count supplied by a cursor.
         // Exclude paging and output options so continuation pages can reuse the count.
         var queryJson = Client.RequestResponseSerializer.SerializeToString(descriptor);
-        var countCacheKey = (nameof(ProcessedObservationCoreRepository), "CursorCount", indexNames,
-            filter.ExtendedAuthorization.UserId, filter.RoleId, filter.AuthorizationApplicationIdentifier,
-            Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(queryJson))));
+        object? countCacheKey = null;
+        if (Encoding.UTF8.GetByteCount(queryJson) <= MaxRequestBodyQuerySizeCacheInBytes)
+        {
+            countCacheKey = (nameof(ProcessedObservationCoreRepository), "CursorCount", indexNames,
+                filter.ExtendedAuthorization.UserId, filter.RoleId, filter.AuthorizationApplicationIdentifier,
+                Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(queryJson))));
+        }
         long totalCount = 0;
-        var hasCachedCount = searchAfterObj != null && _cursorCountCache.TryGetValue(countCacheKey, out totalCount);
+        var hasCachedCount = countCacheKey != null && searchAfterObj != null &&
+            _cursorCountCache.TryGetValue(countCacheKey, out totalCount);
 
         var searchResponse = await Client.SearchAsync<T>(descriptor
                 .Source(getAllFields ? new SourceConfig(true) : filter.Output?.Fields.ToProjection(filter is SearchFilterInternal))
@@ -2785,7 +2791,7 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
         {
             totalCount = searchResponse.Total;
             // Do not extend the expiration on cache hits or cache counts from incomplete searches.
-            if (!searchResponse.TimedOut && searchResponse.Shards.Failed == 0)
+            if (countCacheKey != null && !searchResponse.TimedOut && searchResponse.Shards.Failed == 0)
             {
                 _cursorCountCache.Set(countCacheKey, totalCount,
                     new MemoryCacheEntryOptions { AbsoluteExpirationRelativeToNow = CursorCountCacheDuration, Size = 1 });

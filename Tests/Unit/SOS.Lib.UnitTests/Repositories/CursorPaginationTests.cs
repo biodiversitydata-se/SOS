@@ -47,12 +47,12 @@ public class CursorPaginationTests
     }
 
     [Fact]
-    public async Task CacheExpiresAfterOneMinuteEvenWithContinuationReads()
+    public async Task CacheExpiresAfterTwoMinutesEvenWithContinuationReads()
     {
         using var fixture = new Fixture();
         var filter = CreateFilter();
         var first = await fixture.Repository.GetChunkBySearchAfterAsync<Observation>(filter, 100, null);
-        fixture.Clock.UtcNow += TimeSpan.FromSeconds(59);
+        fixture.Clock.UtcNow += TimeSpan.FromMinutes(1).Add(TimeSpan.FromSeconds(59));
         await fixture.Repository.GetChunkBySearchAfterAsync<Observation>(filter, 100, first.SearchAfter);
         fixture.Clock.UtcNow += TimeSpan.FromSeconds(1);
         fixture.Invoker.Total = 200;
@@ -60,6 +60,22 @@ public class CursorPaginationTests
 
         Assert.Equal(200, refreshed.TotalCount);
         Assert.True(fixture.Searches[2].GetProperty("track_total_hits").GetBoolean());
+    }
+
+    [Fact]
+    public async Task LargeQueryDoesNotUseTheCountCache()
+    {
+        using var fixture = new Fixture();
+        var filter = CreateFilter();
+        filter.DataProviderIds = Enumerable.Range(1, 10_000).ToList();
+
+        var first = await fixture.Repository.GetChunkBySearchAfterAsync<Observation>(filter, 100, null);
+        fixture.Invoker.Total = 200;
+        var next = await fixture.Repository.GetChunkBySearchAfterAsync<Observation>(filter, 100, first.SearchAfter);
+
+        Assert.Equal(200, next.TotalCount);
+        Assert.True(fixture.Searches[1].GetProperty("track_total_hits").GetBoolean());
+        Assert.True(Encoding.UTF8.GetByteCount(fixture.Searches[0].GetProperty("query").ToString()) > 20_000);
     }
 
     [Fact]
