@@ -5,6 +5,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Internal;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
+using SOS.Lib.Cache;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Enums;
@@ -22,6 +23,37 @@ namespace SOS.Lib.UnitTests.Repositories;
 
 public class CursorPaginationTests
 {
+    [Fact]
+    public async Task OffsetSearchReusesTotalCountFromFirstPage()
+    {
+        using var fixture = new Fixture();
+        var filter = CreateFilter();
+        var first = await fixture.Repository.GetChunkAsync<Observation>(filter, 0, 100);
+        fixture.Invoker.Total = 200;
+        var second = await fixture.Repository.GetChunkAsync<Observation>(filter, 100, 100);
+
+        Assert.Equal(100, first.TotalCount);
+        Assert.Equal(100, second.TotalCount);
+        Assert.True(fixture.Searches[0].GetProperty("track_total_hits").GetBoolean());
+        Assert.False(fixture.Searches[1].GetProperty("track_total_hits").GetBoolean());
+    }
+
+    [Fact]
+    public async Task ExactAndLimitedTotalCountsHaveSeparateCacheEntries()
+    {
+        using var fixture = new Fixture();
+        var publicFilter = CreateFilter();
+        await fixture.Repository.GetChunkAsync<Observation>(publicFilter, 0, 100);
+        fixture.Invoker.Total = 200;
+        var internalFilter = new SearchFilterInternal(publicFilter);
+        internalFilter.RoleId = publicFilter.RoleId;
+        internalFilter.AuthorizationApplicationIdentifier = publicFilter.AuthorizationApplicationIdentifier;
+        var internalResult = await fixture.Repository.GetChunkAsync<Observation>(internalFilter, 0, 100);
+
+        Assert.Equal(200, internalResult.TotalCount);
+        Assert.Equal(10_000, fixture.Searches[1].GetProperty("track_total_hits").GetInt32());
+    }
+
     [Fact]
     public async Task ContinuationReusesCountButFetchesFreshRecordsAndPreservesSortAndProjection()
     {
@@ -78,7 +110,7 @@ public class CursorPaginationTests
     }
 
     [Fact]
-    public async Task FirstPageAlwaysRecountsAndRefreshesCachedCount()
+    public async Task RepeatedFirstPageReusesCachedCount()
     {
         using var fixture = new Fixture();
         var filter = CreateFilter();
@@ -87,9 +119,9 @@ public class CursorPaginationTests
         var first = await fixture.Repository.GetChunkBySearchAfterAsync<Observation>(filter, 100, null);
         var next = await fixture.Repository.GetChunkBySearchAfterAsync<Observation>(filter, 100, first.SearchAfter);
 
-        Assert.Equal(200, first.TotalCount);
-        Assert.Equal(200, next.TotalCount);
-        Assert.True(fixture.Searches[1].GetProperty("track_total_hits").GetBoolean());
+        Assert.Equal(100, first.TotalCount);
+        Assert.Equal(100, next.TotalCount);
+        Assert.False(fixture.Searches[1].GetProperty("track_total_hits").GetBoolean());
         Assert.False(fixture.Searches[2].GetProperty("track_total_hits").GetBoolean());
     }
 
@@ -150,6 +182,34 @@ public class CursorPaginationTests
         Assert.True(fixture.Searches[1].GetProperty("track_total_hits").GetBoolean());
     }
 
+    [Fact]
+    public async Task ClearingCacheRecountsAfterDatasetReset()
+    {
+        using var fixture = new Fixture();
+        await fixture.Repository.GetChunkAsync<Observation>(CreateFilter(), 0, 100);
+        fixture.Invoker.Total = 200;
+        fixture.ClearCountCache();
+
+        var result = await fixture.Repository.GetChunkAsync<Observation>(CreateFilter(), 0, 100);
+
+        Assert.Equal(200, result.TotalCount);
+        Assert.True(fixture.Searches[1].GetProperty("track_total_hits").GetBoolean());
+    }
+
+    [Fact]
+    public async Task RepositoryWithoutInjectedCacheDoesNotReuseCountsAcrossInstances()
+    {
+        using var firstInstance = new Fixture(enableCountCache: false);
+        using var secondInstance = new Fixture(enableCountCache: false);
+        await firstInstance.Repository.GetChunkAsync<Observation>(CreateFilter(), 0, 100);
+        secondInstance.Invoker.Total = 200;
+
+        var result = await secondInstance.Repository.GetChunkAsync<Observation>(CreateFilter(), 0, 100);
+
+        Assert.Equal(200, result.TotalCount);
+        Assert.True(Assert.Single(secondInstance.Searches).GetProperty("track_total_hits").GetBoolean());
+    }
+
     private static SearchFilter CreateFilter()
     {
         var filter = new SearchFilter(123, ProtectionFilter.Public) { RoleId = 1, AuthorizationApplicationIdentifier = "app" };
@@ -165,10 +225,14 @@ public class CursorPaginationTests
         public List<JsonElement> Searches { get; } = new();
         public ProcessedObservationCoreRepository Repository { get; }
         private readonly MemoryCache _cache;
+        private readonly SearchTotalCountCache _totalCountCache;
 
-        public Fixture()
+        public void ClearCountCache() => _totalCountCache.Clear();
+
+        public Fixture(bool enableCountCache = true)
         {
             _cache = new MemoryCache(new MemoryCacheOptions { Clock = Clock });
+            _totalCountCache = new SearchTotalCountCache(new MemoryCacheOptions { Clock = Clock });
             var settings = new ElasticsearchClientSettings(new SingleNodePool(new Uri("http://localhost:9200")), Invoker)
                 .DisableDirectStreaming()
                 .OnRequestCompleted(call =>
@@ -182,10 +246,14 @@ public class CursorPaginationTests
                 new ElasticSearchConfiguration { IndexPrefix = "cursor-tests" },
                 Mock.Of<ICache<string, ProcessedConfiguration>>(), Mock.Of<ITaxonManager>(),
                 Mock.Of<IClassCache<ConcurrentDictionary<string, HealthResponse>>>(),
-                _cache, NullLogger<ProcessedObservationCoreRepository>.Instance);
+                _cache, NullLogger<ProcessedObservationCoreRepository>.Instance, enableCountCache ? _totalCountCache : null);
         }
 
-        public void Dispose() => _cache.Dispose();
+        public void Dispose()
+        {
+            _cache.Dispose();
+            _totalCountCache.Dispose();
+        }
     }
 
     private sealed class TestClock : ISystemClock

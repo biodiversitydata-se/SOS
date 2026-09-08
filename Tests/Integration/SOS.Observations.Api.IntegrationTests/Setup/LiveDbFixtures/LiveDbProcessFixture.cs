@@ -63,6 +63,7 @@ public class LiveDbProcessFixture : IProcessFixture
     private IDatasetRepository _datasetRepository;
     private IEventRepository _eventRepository;
     private IProcessedObservationCoreRepository _processedObservationCoreRepository;
+    private readonly SearchTotalCountCache _searchTotalCountCache;
     private ArtportalenObservationFactory? _artportalenObservationFactory;
     private IVocabularyValueResolver _vocabularyValueResolver;
     private IArtportalenDatasetMetadataRepository _artportalenDatasetMetadataRepository;
@@ -89,7 +90,8 @@ public class LiveDbProcessFixture : IProcessFixture
         IProcessedObservationCoreRepository processedObservationCoreRepository,
         IVocabularyValueResolver vocabularyValueResolver,
         IArtportalenDatasetMetadataRepository artportalenDatasetMetadataRepository,
-        IProcessedChecklistRepository processedChecklistRepository)
+        IProcessedChecklistRepository processedChecklistRepository,
+        SearchTotalCountCache searchTotalCountCache)
     {
         _processClient = processClient;
         _areaHelper = areaHelper;
@@ -104,6 +106,7 @@ public class LiveDbProcessFixture : IProcessFixture
         _vocabularyValueResolver = vocabularyValueResolver;
         _artportalenDatasetMetadataRepository = artportalenDatasetMetadataRepository;
         _processedChecklistRepository = processedChecklistRepository;
+        _searchTotalCountCache = searchTotalCountCache;
 
         InitializeAsync().Wait();
     }
@@ -131,6 +134,7 @@ public class LiveDbProcessFixture : IProcessFixture
         serviceCollection.AddSingleton<ITaxonManager, TaxonManager>();
         serviceCollection.AddSingleton<IProcessedTaxonRepository, ProcessedTaxonRepository>();
         serviceCollection.AddSingleton<IProcessedObservationRepository, ProcessedObservationRepository>();
+        serviceCollection.AddSingleton<SearchTotalCountCache>();
         serviceCollection.AddSingleton<IProcessedObservationCoreRepository, ProcessedObservationCoreRepository>();
         serviceCollection.AddSingleton<ICache<string, ProcessedConfiguration>, ProcessedConfigurationCache>();
         serviceCollection.AddSingleton<IProcessedConfigurationRepository, ProcessedConfigurationRepository>();
@@ -262,6 +266,7 @@ public class LiveDbProcessFixture : IProcessFixture
         await _processedObservationCoreRepository.DeleteAllDocumentsAsync(protectedIndex: false, waitForCompletion: true);
         await _processedObservationCoreRepository.DeleteAllDocumentsAsync(protectedIndex: true, waitForCompletion: true);
         await _processedChecklistRepository.DeleteAllDocumentsAsync(waitForCompletion: true);
+        _searchTotalCountCache.Clear();
     }
 
     public async Task<List<Observation>> ProcessAndAddObservationsToElasticSearch(IEnumerable<ArtportalenObservationVerbatim> verbatimObservations)
@@ -494,6 +499,7 @@ public class LiveDbProcessFixture : IProcessFixture
         await AddObservationsBatchToElasticsearchAsync(protectedObservations, true, clearExistingObservations);
 
         await Task.Delay(delayInMs);
+        _searchTotalCountCache.Clear();
     }
 
     private async Task AddObservationsBatchToElasticsearchAsync(IEnumerable<Observation> observations,

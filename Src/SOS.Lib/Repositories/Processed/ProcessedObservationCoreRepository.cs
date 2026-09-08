@@ -10,6 +10,7 @@ using Elastic.Clients.Elasticsearch.QueryDsl;
 using Elastic.Transport.Extensions;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
+using SOS.Lib.Cache;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Enums;
@@ -42,8 +43,8 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
 {
     private const int ElasticSearchMaxRecords = 10000;
     private const int MaxRequestBodyQuerySizeCacheInBytes = 20_000;
-    private static readonly TimeSpan CursorCountCacheDuration = TimeSpan.FromMinutes(2);
-    private readonly IMemoryCache _cursorCountCache;
+    private static readonly TimeSpan SearchTotalCountCacheDuration = TimeSpan.FromMinutes(2);
+    private readonly SearchTotalCountCache? _searchTotalCountCache;
     protected readonly ITaxonManager _taxonManager;
 
     /// <summary>
@@ -1192,6 +1193,7 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
     /// <param name="clusterHealthCache"></param>
     /// <param name="memoryCache"></param>
     /// <param name="logger"></param>
+    /// <param name="searchTotalCountCache"></param>
     public ProcessedObservationCoreRepository(
         IElasticClientManager elasticClientManager,
         ElasticSearchConfiguration elasticConfiguration,
@@ -1199,7 +1201,8 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
         ITaxonManager taxonManager,
         IClassCache<ConcurrentDictionary<string, HealthResponse>> clusterHealthCache,
         IMemoryCache memoryCache,
-        ILogger<ProcessedObservationCoreRepository> logger) : base(true, elasticClientManager, processedConfigurationCache, elasticConfiguration, clusterHealthCache, memoryCache, logger)
+        ILogger<ProcessedObservationCoreRepository> logger,
+        SearchTotalCountCache? searchTotalCountCache = null) : base(true, elasticClientManager, processedConfigurationCache, elasticConfiguration, clusterHealthCache, memoryCache, logger)
     {
         if (elasticConfiguration.Clusters != null)
         {
@@ -1207,7 +1210,7 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
         }
 
         _taxonManager = taxonManager;
-        _cursorCountCache = memoryCache;
+        _searchTotalCountCache = searchTotalCountCache;
     }
 
     /// <inheritdoc />
@@ -1526,40 +1529,54 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
     public async Task<PagedResult<T>> GetChunkAsync<T>(SearchFilter filter, int skip, int take, bool getAllFields = false, long? knownTotalCount = null) where T : class
     {
         var indexNames = GetCurrentIndex(filter);
-        // Reuse an existing count when available. Otherwise public searches count exactly; internal searches opt in.
-        var trackTotalHits = knownTotalCount.HasValue
-            ? new TrackHits(false)
-            : filter is SearchFilterInternal internalFilter && internalFilter.IncludeRealCount != true
-                ? new TrackHits(ElasticSearchMaxRecords)
-                : new TrackHits(true);
-
         var (query, excludeQuery) = GetCoreQueries<T>(filter);
         var sortDescriptor = filter.UseSearchAfterWithoutPit
             ? await GetExportSortDescriptorAsync<T>(indexNames)
             : await Client.GetSortDescriptorAsync<T, Observation>(indexNames, filter?.Output?.SortOrders);
-        var searchResponse = await Client.SearchAsync<T>(s => s
+
+        var descriptor = new SearchRequestDescriptor<T>()
             .Indices(indexNames)
+            .Query(q => q.Bool(b => b
+                .MustNot(excludeQuery.ToArray())
+                .Filter(query.ToArray())));
+        var trackTotalHitsUpTo = filter is SearchFilterInternal internalFilter && internalFilter.IncludeRealCount != true
+            ? ElasticSearchMaxRecords
+            : (int?)null;
+        var countCacheKey = knownTotalCount.HasValue
+            ? null
+            : CreateSearchTotalCountCacheKey(filter, indexNames, descriptor, trackTotalHitsUpTo);
+        var totalCount = knownTotalCount;
+        if (!totalCount.HasValue && countCacheKey != null &&
+            _searchTotalCountCache.TryGetValue(countCacheKey, out var cachedTotalCount))
+        {
+            totalCount = cachedTotalCount;
+        }
+
+        var searchResponse = await Client.SearchAsync<T>(descriptor
             .Source(getAllFields ? new SourceConfig(true) : filter.Output?.Fields.ToProjection(filter is SearchFilterInternal))
             .From(skip)
             .Size(take)
-            .Query(q => q
-                .Bool(b => b
-                    .MustNot(excludeQuery.ToArray())
-                    .Filter(query.ToArray())
-                )
-            )
             .Sort(sortDescriptor?.ToArray())
-            .TrackTotalHits(trackTotalHits)
+            .TrackTotalHits(totalCount.HasValue
+                ? new TrackHits(false)
+                : trackTotalHitsUpTo.HasValue
+                    ? new TrackHits(trackTotalHitsUpTo.Value)
+                    : new TrackHits(true))
         );
 
         searchResponse.ThrowIfInvalid();
+        if (!totalCount.HasValue)
+        {
+            totalCount = searchResponse.Total;
+            CacheSearchTotalCount(countCacheKey, totalCount.Value, searchResponse);
+        }
 
         return new PagedResult<T>
         {
             Records = searchResponse.Documents,
             Skip = skip,
             Take = take,
-            TotalCount = knownTotalCount ?? searchResponse.Total
+            TotalCount = totalCount.Value
         };
     }
 
@@ -2754,7 +2771,6 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
         bool getAllFields = false) where T : class
     {
         var indexNames = GetCurrentIndex(filter);
-        var cacheCount = !filter.IsSearchFilterLarge(MaxRequestBodyQuerySizeCacheInBytes);
         var (query, excludeQuery) = GetCoreQueries<T>(filter);
         var sortDescriptor = await Client.GetSortDescriptorAsync<T, Observation>(indexNames, filter?.Output?.SortOrders);
         ICollection<FieldValue>? searchAfterObj = SearchAfterCoder.Decode(searchAfter);
@@ -2765,19 +2781,10 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
                 .MustNot(excludeQuery.ToArray())
                 .Filter(query.ToArray())));
 
-        // Hash the actual query, including authorization restrictions. Never trust a count supplied by a cursor.
-        // Exclude paging and output options so continuation pages can reuse the count.
-        object? countCacheKey = null;
-        if (cacheCount)
-        {
-            var queryJson = Client.RequestResponseSerializer.SerializeToString(descriptor);
-            countCacheKey = (nameof(ProcessedObservationCoreRepository), "CursorCount", indexNames,
-                filter.ExtendedAuthorization.UserId, filter.RoleId, filter.AuthorizationApplicationIdentifier,
-                Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(queryJson))));
-        }
+        var countCacheKey = CreateSearchTotalCountCacheKey(filter, indexNames, descriptor, trackTotalHitsUpTo: null);
         long totalCount = 0;
-        var hasCachedCount = countCacheKey != null && searchAfterObj != null &&
-            _cursorCountCache.TryGetValue(countCacheKey, out totalCount);
+        var hasCachedCount = countCacheKey != null &&
+            _searchTotalCountCache.TryGetValue(countCacheKey, out totalCount);
 
         var searchResponse = await Client.SearchAsync<T>(descriptor
                 .Source(getAllFields ? new SourceConfig(true) : filter.Output?.Fields.ToProjection(filter is SearchFilterInternal))
@@ -2791,12 +2798,7 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
         if (!hasCachedCount)
         {
             totalCount = searchResponse.Total;
-            // Do not extend the expiration on cache hits or cache counts from incomplete searches.
-            if (countCacheKey != null && !searchResponse.TimedOut && searchResponse.Shards.Failed == 0)
-            {
-                _cursorCountCache.Set(countCacheKey, totalCount,
-                    new MemoryCacheEntryOptions { AbsoluteExpirationRelativeToNow = CursorCountCacheDuration, Size = 1 });
-            }
+            CacheSearchTotalCount(countCacheKey, totalCount, searchResponse);
         }
 
         // Extract searchAfter values from the last hit        
@@ -2813,5 +2815,33 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
             SearchAfter = nextSearchAfter,
             TotalCount = totalCount
         };
+    }
+
+    private object? CreateSearchTotalCountCacheKey<T>(
+        SearchFilter filter,
+        string indexNames,
+        SearchRequestDescriptor<T> descriptor,
+        int? trackTotalHitsUpTo) where T : class
+    {
+        if (_searchTotalCountCache == null || filter.IsSearchFilterLarge(MaxRequestBodyQuerySizeCacheInBytes))
+        {
+            return null;
+        }
+
+        // Hash the prepared query, including authorization restrictions. Paging, sorting and output fields
+        // are deliberately excluded because they do not affect the total count.
+        var queryJson = Client.RequestResponseSerializer.SerializeToString(descriptor);
+        return (nameof(ProcessedObservationCoreRepository), "SearchTotalCount", indexNames,
+            filter.ExtendedAuthorization.UserId, filter.RoleId, filter.AuthorizationApplicationIdentifier,
+            trackTotalHitsUpTo,
+            Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(queryJson))));
+    }
+
+    private void CacheSearchTotalCount<T>(object? cacheKey, long totalCount, SearchResponse<T> searchResponse)
+    {
+        if (cacheKey != null && !searchResponse.TimedOut && searchResponse.Shards.Failed == 0)
+        {
+            _searchTotalCountCache.Set(cacheKey, totalCount, SearchTotalCountCacheDuration);
+        }
     }
 }

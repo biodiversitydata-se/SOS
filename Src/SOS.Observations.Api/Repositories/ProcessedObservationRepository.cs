@@ -6,6 +6,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using SOS.Lib;
 using SOS.Lib.Cache.Interfaces;
+using SOS.Lib.Cache;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
@@ -35,7 +36,8 @@ public class ProcessedObservationRepository : ProcessedObservationCoreRepository
         ITaxonManager taxonManager,
         IClassCache<ConcurrentDictionary<string, HealthResponse>> clusterHealthCache,
         IMemoryCache memoryCache,
-        ILogger<ProcessedObservationRepository> logger) : base(elasticClientManager, elasticConfiguration, processedConfigurationCache, taxonManager, clusterHealthCache, memoryCache, logger)
+        ILogger<ProcessedObservationRepository> logger,
+        SearchTotalCountCache searchTotalCountCache) : base(elasticClientManager, elasticConfiguration, processedConfigurationCache, taxonManager, clusterHealthCache, memoryCache, logger, searchTotalCountCache)
     {
     }
 
