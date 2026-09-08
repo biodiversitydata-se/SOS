@@ -7,8 +7,10 @@ using Elastic.Clients.Elasticsearch.Core.Search;
 using Elastic.Clients.Elasticsearch.Fluent;
 using Elastic.Clients.Elasticsearch.Mapping;
 using Elastic.Clients.Elasticsearch.QueryDsl;
+using Elastic.Transport.Extensions;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
+using SOS.Lib.Cache;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Enums;
@@ -27,6 +29,7 @@ using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using System.Collections.Concurrent;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 
@@ -39,6 +42,9 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
     IProcessedObservationCoreRepository
 {
     private const int ElasticSearchMaxRecords = 10000;
+    private const int MaxRequestBodyQuerySizeCacheInBytes = 20_000;
+    private static readonly TimeSpan SearchTotalCountCacheDuration = TimeSpan.FromMinutes(2);
+    private readonly SearchTotalCountCache? _searchTotalCountCache;
     protected readonly ITaxonManager _taxonManager;
 
     /// <summary>
@@ -1187,6 +1193,7 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
     /// <param name="clusterHealthCache"></param>
     /// <param name="memoryCache"></param>
     /// <param name="logger"></param>
+    /// <param name="searchTotalCountCache"></param>
     public ProcessedObservationCoreRepository(
         IElasticClientManager elasticClientManager,
         ElasticSearchConfiguration elasticConfiguration,
@@ -1194,7 +1201,8 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
         ITaxonManager taxonManager,
         IClassCache<ConcurrentDictionary<string, HealthResponse>> clusterHealthCache,
         IMemoryCache memoryCache,
-        ILogger<ProcessedObservationCoreRepository> logger) : base(true, elasticClientManager, processedConfigurationCache, elasticConfiguration, clusterHealthCache, memoryCache, logger)
+        ILogger<ProcessedObservationCoreRepository> logger,
+        SearchTotalCountCache? searchTotalCountCache = null) : base(true, elasticClientManager, processedConfigurationCache, elasticConfiguration, clusterHealthCache, memoryCache, logger)
     {
         if (elasticConfiguration.Clusters != null)
         {
@@ -1202,6 +1210,7 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
         }
 
         _taxonManager = taxonManager;
+        _searchTotalCountCache = searchTotalCountCache;
     }
 
     /// <inheritdoc />
@@ -1520,38 +1529,54 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
     public async Task<PagedResult<T>> GetChunkAsync<T>(SearchFilter filter, int skip, int take, bool getAllFields = false, long? knownTotalCount = null) where T : class
     {
         var indexNames = GetCurrentIndex(filter);
-        // Reuse an existing count when available. Otherwise public searches count exactly; internal searches opt in.
-        var trackTotalHits = knownTotalCount.HasValue
-            ? new TrackHits(false)
-            : filter is SearchFilterInternal internalFilter && internalFilter.IncludeRealCount != true
-                ? new TrackHits(ElasticSearchMaxRecords)
-                : new TrackHits(true);
-
         var (query, excludeQuery) = GetCoreQueries<T>(filter);
-        var sortDescriptor = await Client.GetSortDescriptorAsync<T, Observation>(indexNames, filter?.Output?.SortOrders);
-        var searchResponse = await Client.SearchAsync<T>(s => s
+        var sortDescriptor = filter.UseSearchAfterWithoutPit
+            ? await GetExportSortDescriptorAsync<T>(indexNames)
+            : await Client.GetSortDescriptorAsync<T, Observation>(indexNames, filter?.Output?.SortOrders);
+
+        var descriptor = new SearchRequestDescriptor<T>()
             .Indices(indexNames)
+            .Query(q => q.Bool(b => b
+                .MustNot(excludeQuery.ToArray())
+                .Filter(query.ToArray())));
+        var trackTotalHitsUpTo = filter is SearchFilterInternal internalFilter && internalFilter.IncludeRealCount != true
+            ? ElasticSearchMaxRecords
+            : (int?)null;
+        var countCacheKey = knownTotalCount.HasValue
+            ? null
+            : CreateSearchTotalCountCacheKey(filter, indexNames, descriptor, trackTotalHitsUpTo);
+        var totalCount = knownTotalCount;
+        if (!totalCount.HasValue && countCacheKey != null &&
+            _searchTotalCountCache.TryGetValue(countCacheKey, out var cachedTotalCount))
+        {
+            totalCount = cachedTotalCount;
+        }
+
+        var searchResponse = await Client.SearchAsync<T>(descriptor
             .Source(getAllFields ? new SourceConfig(true) : filter.Output?.Fields.ToProjection(filter is SearchFilterInternal))
             .From(skip)
             .Size(take)
-            .Query(q => q
-                .Bool(b => b
-                    .MustNot(excludeQuery.ToArray())
-                    .Filter(query.ToArray())
-                )
-            )
             .Sort(sortDescriptor?.ToArray())
-            .TrackTotalHits(trackTotalHits)
+            .TrackTotalHits(totalCount.HasValue
+                ? new TrackHits(false)
+                : trackTotalHitsUpTo.HasValue
+                    ? new TrackHits(trackTotalHitsUpTo.Value)
+                    : new TrackHits(true))
         );
 
         searchResponse.ThrowIfInvalid();
+        if (!totalCount.HasValue)
+        {
+            totalCount = searchResponse.Total;
+            CacheSearchTotalCount(countCacheKey, totalCount.Value, searchResponse);
+        }
 
         return new PagedResult<T>
         {
             Records = searchResponse.Documents,
             Skip = skip,
             Take = take,
-            TotalCount = knownTotalCount ?? searchResponse.Total
+            TotalCount = totalCount.Value
         };
     }
 
@@ -2164,7 +2189,7 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
     {
         var searchIndex = GetCurrentIndex(filter);
         var queries = filter.ToMeasurementOrFactsQuery<dynamic>();
-        var searchResponse = await SearchAfterAsync<dynamic>(searchIndex, new SearchRequestDescriptor<dynamic>()
+        var searchResponse = await SearchExportPageAsync<dynamic>(filter, searchIndex, new SearchRequestDescriptor<dynamic>()
             .Indices(searchIndex)
             .Query(query => query
                 .Bool(b => b
@@ -2194,7 +2219,7 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
     {
         var searchIndex = GetCurrentIndex(filter);
         var queries = filter.ToMultimediaQuery<dynamic>();
-        var searchResponse = await SearchAfterAsync<dynamic>(searchIndex, new SearchRequestDescriptor<dynamic>()
+        var searchResponse = await SearchExportPageAsync<dynamic>(filter, searchIndex, new SearchRequestDescriptor<dynamic>()
             .Indices(searchIndex)
             .Query(query => query
                 .Bool(boolQueryDescriptor => boolQueryDescriptor
@@ -2215,7 +2240,45 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
         };
     }
 
-    /// <inheritdoc/>
+    private async Task<SearchResponse<T>> SearchExportPageAsync<T>(
+        SearchFilterBase filter,
+        string searchIndex,
+        SearchRequestDescriptor<T> searchDescriptor,
+        string pointInTimeId,
+        ICollection<FieldValue> afterKey) where T : class
+    {
+        if (!filter.UseSearchAfterWithoutPit)
+        {
+            return await SearchAfterAsync(searchIndex, searchDescriptor, pointInTimeId, afterKey);
+        }
+
+        var sortDescriptor = await GetExportSortDescriptorAsync<T>(searchIndex);
+
+        return await PollyHelper.GetRetryPolicy(3, 100).ExecuteAsync(async () =>
+        {
+            var response = await Client.SearchAsync(searchDescriptor
+                .Indices(searchIndex)
+                .Sort(sortDescriptor.ToArray())
+                .SearchAfter(afterKey)
+                .Size(ScrollBatchSize)
+                .TrackTotalHits(new TrackHits(false)));
+            response.ThrowIfInvalid();
+            return response;
+        });
+    }
+
+    private async Task<ICollection<Action<SortOptionsDescriptor<T>>>> GetExportSortDescriptorAsync<T>(string searchIndex) where T : class
+    {
+        // Use the same ordering for single-page and paginated Download exports.
+        var sortOrders = new[] { new SortOrderFilter { SortBy = "modified", SortOrder = SearchSortOrder.Asc } };
+        // The sort builder appends occurrence ID as a tie-breaker.
+        var sortDescriptor = await Client.GetSortDescriptorAsync<T, Observation>(searchIndex, sortOrders);
+        // An occurrence can exist in both public and protected indices.
+        sortDescriptor.Add(s => s.Field("_index", f => f.Order(SortOrder.Asc)));
+        return sortDescriptor;
+    }
+
+    /// <inheritdoc />
     public async Task<T> GetObservationAsync<T>(string occurrenceId, SearchFilter filter, bool getAllFields = false) where T : class
     {
         var indexNames = GetCurrentIndex(filter);
@@ -2340,7 +2403,7 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
         // Retry policy by Polly
         var searchResponse = await PollyHelper.GetRetryPolicy(3, 100).ExecuteAsync(async () =>
         {
-            var queryResponse = await SearchAfterAsync<dynamic>(searchIndex, new SearchRequestDescriptor<dynamic>()
+            var queryResponse = await SearchExportPageAsync<dynamic>(filter, searchIndex, new SearchRequestDescriptor<dynamic>()
             .Indices(searchIndex)
             .Source(filter.Output?.Fields.ToProjection(filter is SearchFilterInternal))
                 .Query(q => q
@@ -2711,29 +2774,37 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
         var (query, excludeQuery) = GetCoreQueries<T>(filter);
         var sortDescriptor = await Client.GetSortDescriptorAsync<T, Observation>(indexNames, filter?.Output?.SortOrders);
         ICollection<FieldValue>? searchAfterObj = SearchAfterCoder.Decode(searchAfter);
-        
-        var searchResponse = await Client.SearchAsync<T>(s =>        
-            s.Indices(indexNames)
+
+        var descriptor = new SearchRequestDescriptor<T>()
+            .Indices(indexNames)
+            .Query(q => q.Bool(b => b
+                .MustNot(excludeQuery.ToArray())
+                .Filter(query.ToArray())));
+
+        var countCacheKey = CreateSearchTotalCountCacheKey(filter, indexNames, descriptor, trackTotalHitsUpTo: null);
+        long totalCount = 0;
+        var hasCachedCount = countCacheKey != null &&
+            _searchTotalCountCache.TryGetValue(countCacheKey, out totalCount);
+
+        var searchResponse = await Client.SearchAsync<T>(descriptor
                 .Source(getAllFields ? new SourceConfig(true) : filter.Output?.Fields.ToProjection(filter is SearchFilterInternal))
                 .Size(take)
-                .Query(q => q
-                    .Bool(b => b
-                        .MustNot(excludeQuery.ToArray())
-                        .Filter(query.ToArray())
-                    )
-                )
                 .Sort(sortDescriptor.ToArray())
                 .SearchAfter(searchAfterObj)
-                .TrackTotalHits(new TrackHits(true))
+                .TrackTotalHits(new TrackHits(!hasCachedCount))
         );
 
-        searchResponse.ThrowIfInvalid();        
-        var totalCount = searchResponse.Total;
+        searchResponse.ThrowIfInvalid();
+        if (!hasCachedCount)
+        {
+            totalCount = searchResponse.Total;
+            CacheSearchTotalCount(countCacheKey, totalCount, searchResponse);
+        }
 
         // Extract searchAfter values from the last hit        
         string? nextSearchAfter = null;
         var lastHit = searchResponse.Hits?.LastOrDefault();
-        if (lastHit?.Sort != null && searchResponse.Documents.Any())
+        if (lastHit?.Sort != null)
         {            
             nextSearchAfter = SearchAfterCoder.Encode(lastHit.Sort);            
         }
@@ -2744,5 +2815,33 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
             SearchAfter = nextSearchAfter,
             TotalCount = totalCount
         };
+    }
+
+    private object? CreateSearchTotalCountCacheKey<T>(
+        SearchFilter filter,
+        string indexNames,
+        SearchRequestDescriptor<T> descriptor,
+        int? trackTotalHitsUpTo) where T : class
+    {
+        if (_searchTotalCountCache == null || filter.IsSearchFilterLarge(MaxRequestBodyQuerySizeCacheInBytes))
+        {
+            return null;
+        }
+
+        // Hash the prepared query, including authorization restrictions. Paging, sorting and output fields
+        // are deliberately excluded because they do not affect the total count.
+        var queryJson = Client.RequestResponseSerializer.SerializeToString(descriptor);
+        return (nameof(ProcessedObservationCoreRepository), "SearchTotalCount", indexNames,
+            filter.ExtendedAuthorization.UserId, filter.RoleId, filter.AuthorizationApplicationIdentifier,
+            trackTotalHitsUpTo,
+            Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(queryJson))));
+    }
+
+    private void CacheSearchTotalCount<T>(object? cacheKey, long totalCount, SearchResponse<T> searchResponse)
+    {
+        if (cacheKey != null && !searchResponse.TimedOut && searchResponse.Shards.Failed == 0)
+        {
+            _searchTotalCountCache.Set(cacheKey, totalCount, SearchTotalCountCacheDuration);
+        }
     }
 }

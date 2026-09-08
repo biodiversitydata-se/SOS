@@ -150,7 +150,8 @@ public class ExportManager : IExportManager
         bool excludeNullValues,
         bool dynamicProjectDataFields,
         bool gzip,
-        IJobCancellationToken cancellationToken)
+        IJobCancellationToken cancellationToken,
+        bool useSearchAfterWithoutPit = false)
     {   
         if (!await _downloadSemaphore.WaitAsync(TimeSpan.FromSeconds(60)))
         {
@@ -161,20 +162,25 @@ public class ExportManager : IExportManager
         {
             var filter = searchFilter.ToSearchFilter(userId ?? 0, protectionFilter, culture ?? "en-GB");
             await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
+            filter.UseSearchAfterWithoutPit = useSearchAfterWithoutPit;
             var additionalFiles = new List<(Stream stream, string filename)>();
-            var filterMarkdownStream = await _markdownHelper.GetFilterMarkDownAsync(searchFilter, CancellationToken.None);
-            additionalFiles.Add((filterMarkdownStream, "filter.md"));
-            var datasetsResult = await _markdownHelper.GetDatasetsMarkDownAsync(filter, CancellationToken.None);
-            additionalFiles.Add((datasetsResult.FileStream, "datasets.md"));
-            var citationMarkdownStream = await _markdownHelper.GetCitationMarkDownAsync(authorizationApplicationIdentifier, datasetsResult.DataProviderIds, CancellationToken.None);
-            additionalFiles.Add((citationMarkdownStream, "citation.md"));
-
-            if ((searchFilter?.Geographics?.Geometries?.Count() ?? 0) != 0)
+            // Darwin Core exports always deliver an archive, regardless of gzip.
+            if (gzip || exportFormat is ExportFormat.DwC or ExportFormat.DwCEvent)
             {
-                var geoJsonStream = _markdownHelper.TryGetFeatureCollection(searchFilter.Geographics.Geometries);
-                if (geoJsonStream != null)
+                var filterMarkdownStream = await _markdownHelper.GetFilterMarkDownAsync(searchFilter, CancellationToken.None);
+                additionalFiles.Add((filterMarkdownStream, "filter.md"));
+                var datasetsResult = await _markdownHelper.GetDatasetsMarkDownAsync(filter, CancellationToken.None);
+                additionalFiles.Add((datasetsResult.FileStream, "datasets.md"));
+                var citationMarkdownStream = await _markdownHelper.GetCitationMarkDownAsync(authorizationApplicationIdentifier, datasetsResult.DataProviderIds, CancellationToken.None);
+                additionalFiles.Add((citationMarkdownStream, "citation.md"));
+
+                if ((searchFilter?.Geographics?.Geometries?.Count() ?? 0) != 0)
                 {
-                    additionalFiles.Add((geoJsonStream, "geometries.geojson"));
+                    var geoJsonStream = _markdownHelper.TryGetFeatureCollection(searchFilter.Geographics.Geometries);
+                    if (geoJsonStream != null)
+                    {
+                        additionalFiles.Add((geoJsonStream, "geometries.geojson"));
+                    }
                 }
             }
             var fileExportResult = exportFormat switch

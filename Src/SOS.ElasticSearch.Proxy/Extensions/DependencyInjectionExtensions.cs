@@ -66,6 +66,7 @@ public static class DependencyInjectionExtensions
             services.AddSingleton(proxyConfiguration);
 
             // Add Caches
+            services.AddMemoryCache();
             services.AddSingleton<ICache<string, ProcessedConfiguration>, ProcessedConfigurationCache>();
             services.AddSingleton<IDataProviderCache, DataProviderCache>();
             var clusterHealthCache = new ClassCache<ConcurrentDictionary<string, HealthResponse>>(new MemoryCache(new MemoryCacheOptions()), new NullLogger<ClassCache<ConcurrentDictionary<string, HealthResponse>>>()) { CacheDuration = TimeSpan.FromMinutes(2) };

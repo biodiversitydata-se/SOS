@@ -18,7 +18,7 @@ public static class TaxonSearchFilterSamples
         };
     }
 
-    private static string _taxonSearchFilterSample = """"
+    private static string _taxonSearchFilterSample = """
 {
     "date": {
         "startDate":"1990-01-01",
@@ -28,11 +28,12 @@ public static class TaxonSearchFilterSamples
         "ids":[100077],
         "includeUnderlyingTaxa" : false
     },
-    "occurrenceStatus":"present"
+    "occurrenceStatus":"present",
+    "includeRealCount":true
 }
-"""";
+""";
 
-    private static string _closeLocationsFilterSample = """"
+    private static string _closeLocationsFilterSample = """
 {
     "geographics": {   
       "locationIds": [
@@ -40,11 +41,12 @@ public static class TaxonSearchFilterSamples
         "urn:lsid:artportalen.se:site:3978105",
         "urn:lsid:artportalen.se:site:10268619"
       ]
-    }
+    },
+    "includeRealCount":true
 }
-"""";
+""";
 
-    private static string _locationsFarApartFilterSample = """"
+    private static string _locationsFarApartFilterSample = """
 {
     "geographics": {   
       "locationIds": [
@@ -53,12 +55,13 @@ public static class TaxonSearchFilterSamples
         "urn:lsid:artportalen.se:site:10268619",
         "urn:lsid:mvm.se:site:3787"
       ]
-    }
+    },
+    "includeRealCount":true
 }
-"""";
+""";
 
 
-    private static string _municipalitySearchFilterSample = """"
+    private static string _municipalitySearchFilterSample = """
 {    
     "geographics" : {     
        "areas" : [
@@ -67,11 +70,12 @@ public static class TaxonSearchFilterSamples
                "featureId": "687"
            }
        ]
-   }
+   },
+   "includeRealCount":true
 }
-"""";
+""";
 
-    private static string _municipalityAmiralSample = """"
+    private static string _municipalityAmiralSample = """
 {   
     "taxon" : {
         "ids":[201060],
@@ -84,11 +88,12 @@ public static class TaxonSearchFilterSamples
                "featureId": "687"
            }
        ]
-   }
+   },
+   "includeRealCount":true
 }
-"""";    
+""";    
 
-    private static string _polygonSearchFilterSample = """"
+    private static string _polygonSearchFilterSample = """
 {
     "taxon": {
         "ids": [
@@ -111,12 +116,13 @@ public static class TaxonSearchFilterSamples
             }
         ],
         "considerObservationAccuracy": true
-    }
+    },
+    "includeRealCount":true
 }
-"""";
+""";
 
 
-    private static string _fieldsetRedlistedSearchFilterSample = """"
+    private static string _fieldsetRedlistedSearchFilterSample = """
 {
     "date": {
         "startDate":"1990-01-01",
@@ -125,9 +131,10 @@ public static class TaxonSearchFilterSamples
     "taxon" : {
         "redListCategories": [ "CR", "EN", "VU" ]
     },
-    "occurrenceStatus":"present"    
+    "occurrenceStatus":"present",
+    "includeRealCount":true
 }
-"""";
+""";
 
     public class SearchFilterExample
     {

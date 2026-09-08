@@ -463,7 +463,8 @@ public class ExportsController : ControllerBase
                     false,
                     false,
                     gzip,
-                    JobCancellationToken.Null);
+                    JobCancellationToken.Null,
+                    true);
 
             if (gzip)
             {                    
@@ -546,7 +547,8 @@ public class ExportsController : ControllerBase
                     false,
                     false,
                     true,
-                    JobCancellationToken.Null);
+                    JobCancellationToken.Null,
+                    true);
 
             if (result.stream == null || result.stream.Length == 0)
             {
@@ -632,7 +634,8 @@ public class ExportsController : ControllerBase
                     false,
                     dynamicProjectDataFields,
                     gzip,
-                    JobCancellationToken.Null);
+                    JobCancellationToken.Null,
+                    true);
 
             if (gzip)
                 return File(result.stream, "application/zip", $"{result.filename}.zip");
@@ -718,7 +721,8 @@ public class ExportsController : ControllerBase
                     excludeNullValues,
                     false,
                     gzip,
-                    JobCancellationToken.Null);    
+                    JobCancellationToken.Null,
+                    true);
 
             if (gzip)
             {
@@ -1210,7 +1214,8 @@ public class ExportsController : ControllerBase
                     false,
                     false,
                     gzip,
-                    JobCancellationToken.Null);
+                    JobCancellationToken.Null,
+                    true);
 
             if (gzip)
             {
@@ -1292,7 +1297,8 @@ public class ExportsController : ControllerBase
                     false,
                     false,
                     true,
-                    JobCancellationToken.Null);
+                    JobCancellationToken.Null,
+                    true);
 
             if (result.stream == null || result.stream.Length == 0)
             {
@@ -1377,7 +1383,8 @@ public class ExportsController : ControllerBase
                     false,
                     dynamicProjectDataFields,
                     gzip,
-                    JobCancellationToken.Null);
+                    JobCancellationToken.Null,
+                    true);
 
             if (gzip)
                 return File(result.stream, "application/zip", $"{result.filename}.zip");
@@ -1462,7 +1469,8 @@ public class ExportsController : ControllerBase
                     excludeNullValues,
                     false,
                     gzip,
-                    JobCancellationToken.Null);
+                    JobCancellationToken.Null,
+                    true);
 
             if (gzip)
             {

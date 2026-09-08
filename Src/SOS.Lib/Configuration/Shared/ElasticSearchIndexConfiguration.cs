@@ -23,7 +23,7 @@ public class ElasticSearchIndexConfiguration
     /// <summary>
     /// How many items to retrieve in each scroll request.
     /// </summary>
-    public int ScrollBatchSize { get; set; } = 5000;
+    public int ScrollBatchSize { get; set; } = 2500;
 
     /// <summary>
     /// Scroll timeout.

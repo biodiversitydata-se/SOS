@@ -1,4 +1,4 @@
-﻿using SOS.Lib.Enums;
+using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
 using System.Collections.Generic;
 using System.Linq;
@@ -54,6 +54,12 @@ public class SearchFilterBase
 
     public int? RoleId { get; set; }
     public string AuthorizationApplicationIdentifier { get; set; }
+
+    /// <summary>
+    /// Use stateless search_after paging for download exports. False preserves PIT paging.
+    /// This option is set by the export manager, not by the search filter DTO.
+    /// </summary>
+    public bool UseSearchAfterWithoutPit { get; set; }
 
     /// <summary>
     ///     Only get data from these providers

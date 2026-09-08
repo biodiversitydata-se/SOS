@@ -58,6 +58,7 @@ namespace SOS.Observations.Api.IntegrationTests.Setup.ContainerDbFixtures;
 public class ProcessFixture : IProcessFixture
 {
     private IProcessClient _processClient;
+    private readonly SearchTotalCountCache _searchTotalCountCache;
     private IAreaHelper _areaHelper;
     private DwcaObservationFactory? _darwinCoreFactory;
     private iNaturalistObservationFactory? _iNaturalistFactory;
@@ -107,9 +108,11 @@ public class ProcessFixture : IProcessFixture
         IArtportalenDatasetMetadataRepository artportalenDatasetMetadataRepository,
         ArtportalenDatasetProcessor artportalenDatasetProcessor,
         ArtportalenEventProcessor artportalenEventProcessor,
-        IProcessedChecklistRepository processedChecklistRepository)
+        IProcessedChecklistRepository processedChecklistRepository,
+        SearchTotalCountCache searchTotalCountCache)
     {
         _processClient = processClient;
+        _searchTotalCountCache = searchTotalCountCache;
         _areaHelper = areaHelper;
         _vocabularyRepository = vocabularyRepository;
         _taxonRepository = taxonRepository;
@@ -135,6 +138,7 @@ public class ProcessFixture : IProcessFixture
         var serviceCollection = new ServiceCollection();
         serviceCollection.AddLogging();
         serviceCollection.AddMemoryCache();
+        serviceCollection.AddSingleton<SearchTotalCountCache>();
         serviceCollection.AddSingleton<IAreaHelper, AreaHelper>();
         serviceCollection.AddSingleton<IAreaRepository, AreaRepository>();
         serviceCollection.AddSingleton<IProcessFixture, ProcessFixture>();
@@ -253,6 +257,7 @@ public class ProcessFixture : IProcessFixture
         await _processedObservationCoreRepository.DeleteAllDocumentsAsync(protectedIndex: false, waitForCompletion: true);
         await _processedObservationCoreRepository.DeleteAllDocumentsAsync(protectedIndex: true, waitForCompletion: true);
         await _processedChecklistRepository.DeleteAllDocumentsAsync(waitForCompletion: true);
+        _searchTotalCountCache.Clear();
     }
 
     public async Task<List<Observation>> ProcessAndAddObservationsToElasticSearch(IEnumerable<ArtportalenObservationVerbatim> verbatimObservations)
@@ -543,6 +548,7 @@ public class ProcessFixture : IProcessFixture
         await AddObservationsBatchToElasticsearchAsync(publicObservations, false, clearExistingObservations);
         await AddObservationsBatchToElasticsearchAsync(protectedObservations, true, clearExistingObservations);
         await _processedObservationCoreRepository.RefreshIndicesAsync();
+        _searchTotalCountCache.Clear();
     }
 
     private async Task AddObservationsBatchToElasticsearchAsync(IEnumerable<Observation> observations,

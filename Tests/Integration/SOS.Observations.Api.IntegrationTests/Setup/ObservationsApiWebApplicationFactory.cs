@@ -1,5 +1,6 @@
 ﻿using NSubstitute;
 using SOS.Lib.Configuration.Shared;
+using SOS.Lib.Cache;
 using SOS.Lib.Database.Interfaces;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Services.Interfaces;
@@ -47,6 +48,8 @@ public class ObservationsApiWebApplicationFactory : WebApplicationFactory<Progra
             services.Replace(ServiceDescriptor.Singleton(x => processClient!)); // Replace MongoDB 
             services.Replace(ServiceDescriptor.Singleton(x => elasticClientManager!)); // Replace Elasticsearch
             services.Replace(ServiceDescriptor.Singleton(x => elasticSearchConfiguration!));
+            // Share the fixture cache so resetting the test dataset also invalidates API counts.
+            services.Replace(ServiceDescriptor.Singleton(ServiceProvider.GetRequiredService<SearchTotalCountCache>()));
             services.Replace(ServiceDescriptor.Singleton(x => _apiConfiguration));
             services.Replace(ServiceDescriptor.Singleton(x => _inputValidationConfiguration));
             services.Replace(ServiceDescriptor.Singleton(x => Substitute.For<IBlobStorageService>()));

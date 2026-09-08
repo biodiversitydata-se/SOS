@@ -104,6 +104,7 @@ public static class DependencyInjectionExtensions
             services.AddSingleton(Settings.CryptoConfiguration);
 
             // Add Caches
+            services.AddSingleton<SearchTotalCountCache>();
             services.AddSingleton<IAreaCache, AreaCache>();
             services.AddFusionCache(ProcessedLocationRepository.LocationGeometryCacheName)
                 .WithCacheKeyPrefixByCacheName()

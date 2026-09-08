@@ -36,7 +36,7 @@ public class GeoJsonFileWriter : FileWriterBase, IGeoJsonFileWriter
     private readonly IVocabularyValueResolver _vocabularyValueResolver;
     private readonly IGeneralizationResolver _generalizationResolver;
     private readonly ILogger<GeoJsonFileWriter> _logger;
-    private const int FastSearchLimit = 10000;
+    private const int FastSearchLimit = 2500;
 
     private static readonly JavaScriptEncoder JsonEncoder =
         JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.Latin1Supplement); //JavaScriptEncoder.UnsafeRelaxedJsonEscaping;    
@@ -552,7 +552,7 @@ public class GeoJsonFileWriter : FileWriterBase, IGeoJsonFileWriter
         SearchAfterResult<Observation, ICollection<FieldValue>> searchResult = null;
         if (useFastSearch)
         {
-            fastSearchResult = await _processedObservationRepository.GetChunkAsync<Observation>(filter, 0, 10000);
+            fastSearchResult = await _processedObservationRepository.GetChunkAsync<Observation>(filter, 0, FastSearchLimit, knownTotalCount: expectedNoOfObservations);
         }
         else
         {

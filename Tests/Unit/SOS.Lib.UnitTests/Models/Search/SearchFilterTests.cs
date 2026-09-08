@@ -11,6 +11,58 @@ namespace SOS.Lib.UnitTests.Models.Search;
 public class SearchFilterTests
 {
     [Fact]
+    public void IsSearchFilterLarge_AccumulatesTaxonIdsAndGeometryPoints()
+    {
+        var coordinates = Enumerable.Range(0, 170)
+            .Select(i => new Coordinate(i, i))
+            .Append(new Coordinate(0, 0))
+            .ToArray();
+        var filter = new SearchFilter
+        {
+            Taxa = new TaxonFilter { Ids = Enumerable.Range(1, 1_000) },
+            Location = new LocationFilter
+            {
+                Geometries = new GeographicsFilter
+                {
+                    Geometries = [new Polygon(new LinearRing(coordinates))]
+                }
+            }
+        };
+
+        filter.IsSearchFilterLarge().Should().BeTrue();
+    }
+
+    [Fact]
+    public void IsSearchFilterLarge_ReturnsFalseForSmallFilter()
+    {
+        var filter = new SearchFilter
+        {
+            Taxa = new TaxonFilter { Ids = Enumerable.Range(1, 100) },
+            Location = new LocationFilter
+            {
+                Geometries = new GeographicsFilter
+                {
+                    MaxDistanceFromPoint = 100,
+                    Geometries = [new Point(18, 59)]
+                }
+            }
+        };
+
+        filter.IsSearchFilterLarge().Should().BeFalse();
+    }
+
+    [Fact]
+    public void IsSearchFilterLarge_UsesTaxonIdCount()
+    {
+        var filter = new SearchFilter
+        {
+            Taxa = new TaxonFilter { Ids = Enumerable.Range(1, 1_667).ToList() }
+        };
+
+        filter.IsSearchFilterLarge().Should().BeTrue();
+    }
+
+    [Fact]
     [Trait("Category", "Unit")]
     public void A_cloned_filter_is_equivalent_to_the_original_filter()
     {

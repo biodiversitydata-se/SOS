@@ -32,7 +32,7 @@ public class CsvFileWriter : FileWriterBase, ICsvFileWriter
     private readonly IAreaCache _areaCache;
     private readonly ICache<int, Taxon> _taxonCache;
     private readonly ILogger<CsvFileWriter> _logger;
-    private const int FastSearchLimit = 10000;
+    private const int FastSearchLimit = 2500;
 
     private static readonly string[] CountyReportHeaders = {"TaxonId", "ScientificName", "VernacularName", "OrganismLabel1", "OrganismLabel2", "SwedishOccurrence", "ImmigrationHistory",
                     "LastRedListCategory(2020)", "County", "CountyId", "CountyOccurrence", "ObservationCountAllDatasets", "ObservationCountArtportalen",
@@ -57,7 +57,7 @@ public class CsvFileWriter : FileWriterBase, ICsvFileWriter
         Models.Search.Result.SearchAfterResult<Observation, ICollection<FieldValue>> searchResult = null;
         if (useFastSearch)
         {
-            fastSearchResult = await _processedObservationRepository.GetChunkAsync<dynamic>(filter, 0, 10000);
+            fastSearchResult = await _processedObservationRepository.GetChunkAsync<dynamic>(filter, 0, FastSearchLimit, knownTotalCount: expectedNoOfObservations);
         }
         else
         {
