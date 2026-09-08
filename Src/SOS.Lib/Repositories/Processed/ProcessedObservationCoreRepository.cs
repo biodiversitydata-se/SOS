@@ -2754,6 +2754,7 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
         bool getAllFields = false) where T : class
     {
         var indexNames = GetCurrentIndex(filter);
+        var cacheCount = !filter.IsSearchFilterLarge(MaxRequestBodyQuerySizeCacheInBytes);
         var (query, excludeQuery) = GetCoreQueries<T>(filter);
         var sortDescriptor = await Client.GetSortDescriptorAsync<T, Observation>(indexNames, filter?.Output?.SortOrders);
         ICollection<FieldValue>? searchAfterObj = SearchAfterCoder.Decode(searchAfter);
@@ -2766,10 +2767,10 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
 
         // Hash the actual query, including authorization restrictions. Never trust a count supplied by a cursor.
         // Exclude paging and output options so continuation pages can reuse the count.
-        var queryJson = Client.RequestResponseSerializer.SerializeToString(descriptor);
         object? countCacheKey = null;
-        if (Encoding.UTF8.GetByteCount(queryJson) <= MaxRequestBodyQuerySizeCacheInBytes)
+        if (cacheCount)
         {
+            var queryJson = Client.RequestResponseSerializer.SerializeToString(descriptor);
             countCacheKey = (nameof(ProcessedObservationCoreRepository), "CursorCount", indexNames,
                 filter.ExtendedAuthorization.UserId, filter.RoleId, filter.AuthorizationApplicationIdentifier,
                 Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(queryJson))));
