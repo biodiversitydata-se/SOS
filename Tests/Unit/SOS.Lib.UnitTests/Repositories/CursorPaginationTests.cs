@@ -39,6 +39,27 @@ public class CursorPaginationTests
     }
 
     [Fact]
+    public async Task UniqueSortFieldIsNotAddedTwice()
+    {
+        using var fixture = new Fixture();
+        var filter = CreateFilter();
+        filter.Output.SortOrders =
+        [
+            new SortOrderFilter
+            {
+                SortBy = "Occurrence.OccurrenceId",
+                SortOrder = SearchSortOrder.Asc
+            }
+        ];
+
+        await fixture.Repository.GetChunkAsync<Observation>(filter, 0, 100);
+
+        var sort = Assert.Single(fixture.Searches).GetProperty("sort");
+        Assert.Equal(JsonValueKind.Object, sort.ValueKind);
+        Assert.True(sort.TryGetProperty("occurrence.occurrenceId", out _));
+    }
+
+    [Fact]
     public async Task ExactAndLimitedTotalCountsHaveSeparateCacheEntries()
     {
         using var fixture = new Fixture();

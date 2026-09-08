@@ -1817,16 +1817,17 @@ public class ObservationsController : ControllerBase
             this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, filter.ProtectionFilter);
             filter = await _searchFilterUtility.InitializeSearchFilterAsync(filter);
             translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
-            var validationResult = Result.Combine(                    
-                string.IsNullOrEmpty(sortBy) ? Result.Success() : (await _inputValidator.ValidateSortFieldsAsync(new[] { sortBy })),
+            var sortFieldValidationResult = string.IsNullOrEmpty(sortBy)
+                ? Result.Success<List<string>>(null)
+                : await _inputValidator.ValidateSortFieldsAsync(new[] { sortBy });
+            var validationResult = Result.Combine(
+                sortFieldValidationResult,
                 _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
                 _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries),
                 _inputValidator.ValidateSearchPagingArgumentsInternal(skip, take),
                 _inputValidator.ValidateTranslationCultureCode(translationCultureCode));
 
             if (validationResult.IsFailure) return BadRequest(validationResult.Error);
-            var sortFieldValidationResult = string.IsNullOrEmpty(sortBy) ? Result.Success<List<string>>(null) : (await _inputValidator.ValidateSortFieldsAsync(new[] { sortBy }));
-            if (sortFieldValidationResult.IsFailure) return BadRequest(sortFieldValidationResult.Error);
             if (sortFieldValidationResult.Value != null && sortFieldValidationResult.Value.Any())
             {
                 sortBy = sortFieldValidationResult.Value.First();

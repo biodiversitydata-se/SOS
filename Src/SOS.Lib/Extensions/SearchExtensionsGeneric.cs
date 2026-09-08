@@ -1,5 +1,4 @@
 ﻿using Elastic.Clients.Elasticsearch;
-using Elastic.Clients.Elasticsearch.IndexManagement;
 using Elastic.Clients.Elasticsearch.QueryDsl;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.DataStewardship.Dataset;
@@ -21,7 +20,7 @@ namespace SOS.Lib.Extensions;
 /// </summary>
 public static class SearchExtensionsGeneric
 {
-    private static ConcurrentDictionary<string, IReadOnlyDictionary<IndexName, TypeFieldMappings>> indicesByKey = new ConcurrentDictionary<string, IReadOnlyDictionary<IndexName, TypeFieldMappings>>();
+    private static readonly ConcurrentDictionary<(Type EntityType, string SortBy), string> SortFieldsByKey = new();
 
 
     extension(AggregationSortOrder sortOrder)
@@ -53,6 +52,30 @@ public static class SearchExtensionsGeneric
         };
     }
 
+    private static string GetSortField<TEntity>(string sortBy) where TEntity : class
+    {
+        return SortFieldsByKey.GetOrAdd((typeof(TEntity), sortBy), static key =>
+        {
+            var propertyNames = key.SortBy.Split('.');
+            var parentType = key.EntityType;
+
+            for (var i = 0; i < propertyNames.Length; i++)
+            {
+                var property = parentType.GetProperty(propertyNames[i],
+                    BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+                if (property == null)
+                {
+                    return key.SortBy;
+                }
+
+                propertyNames[i] = property.Name.ToCamelCase();
+                parentType = property.GetPropertyType();
+            }
+
+            return string.Join('.', propertyNames);
+        });
+    }
+
     extension(ElasticsearchClient client)
     {
         /// <summary>
@@ -60,8 +83,8 @@ public static class SearchExtensionsGeneric
         /// sorting filters.
         /// </summary>
         /// <remarks>If the provided sorting filters do not include the default sort property for the
-        /// entity type, it is automatically appended to ensure unique ordering. For string properties, the method may
-        /// adjust the sort field to use the keyword subfield if required by the index mapping.</remarks>
+        /// entity type, it is automatically appended to ensure unique ordering. Resolved property paths are cached per
+        /// entity type.</remarks>
         /// <typeparam name="TQueryDescriptor">The type of the query descriptor used to build sort options.</typeparam>
         /// <typeparam name="TEntity">The entity type whose properties are used for sorting.</typeparam>
         /// <param name="indexName">The name of the Elasticsearch index to which the sort descriptors will be applied.</param>
@@ -69,17 +92,18 @@ public static class SearchExtensionsGeneric
         /// descriptors are generated.</param>
         /// <returns>A collection of actions that configure sort options for the specified query descriptor, or null if no
         /// sorting filters are provided.</returns>
-        public async Task<ICollection<Action<SortOptionsDescriptor<TQueryDescriptor>>>> GetSortDescriptorAsync<TQueryDescriptor, TEntity>(string indexName, IEnumerable<SortOrderFilter> sortings) where TQueryDescriptor : class where TEntity : class
+        public Task<ICollection<Action<SortOptionsDescriptor<TQueryDescriptor>>>> GetSortDescriptorAsync<TQueryDescriptor, TEntity>(string indexName, IEnumerable<SortOrderFilter> sortings) where TQueryDescriptor : class where TEntity : class
         {
-            if (!sortings?.Any() ?? true)
+            var adjustedSortings = sortings?.ToList();
+            if (adjustedSortings == null || adjustedSortings.Count == 0)
             {
-                return null;
+                return Task.FromResult<ICollection<Action<SortOptionsDescriptor<TQueryDescriptor>>>>(null);
             }
 
             // make sure that the ordering will be unique.
-            var adjustedSortings = sortings.ToList();
             string defaultSortProperty = GetDefaultSortPropertyName(typeof(TEntity));
-            if (!string.IsNullOrEmpty(defaultSortProperty) && !sortings.Select(m => m.SortBy?.ToLower().Trim()).Contains(defaultSortProperty))
+            if (!string.IsNullOrEmpty(defaultSortProperty) &&
+                !adjustedSortings.Any(s => string.Equals(s.SortBy?.Trim(), defaultSortProperty, StringComparison.OrdinalIgnoreCase)))
             {
                 adjustedSortings.Add(new SortOrderFilter
                 {
@@ -91,72 +115,8 @@ public static class SearchExtensionsGeneric
             var sortDescriptor = new List<Action<SortOptionsDescriptor<TQueryDescriptor>>>();
             foreach (var sorting in adjustedSortings)
             {
-                var sortBy = sorting.SortBy;
+                var sortBy = GetSortField<TEntity>(sorting.SortBy);
                 var sortOrder = sorting.SortOrder;
-
-                // Split sort string 
-                var propertyNames = sortBy.Split('.');
-                // Create a object of current class
-                var parent = Activator.CreateInstance(typeof(TEntity));
-                var targetProperty = (PropertyInfo)null;
-
-                // Loop throw all levels in passed sort string
-                for (var i = 0; i < propertyNames.Length; i++)
-                {
-                    // Get property info for current property
-                    targetProperty = parent?.GetProperty(propertyNames[i]);
-
-                    // Update property name to make sure it's in the correct case
-                    if (targetProperty != null)
-                    {
-                        propertyNames[i] = targetProperty.Name.ToCamelCase();
-                    }
-
-                    // As long it's not the last property, it must be a sub object. Create a instance of it since it's the new parent
-                    if (i != propertyNames.Length - 1)
-                    {
-                        parent = Activator.CreateInstance(targetProperty.GetPropertyType());
-                    }
-                }
-
-                // Target property found, get it's type
-                var propertyType = targetProperty?.GetPropertyType();
-
-                // If it's a string, add keyword in order to make the sorting work
-                if (propertyType == typeof(string))
-                {
-                    // GetFieldMappingAsync is case sensitive on field names, use updated property names to avoid errors
-                    sortBy = string.Join('.', propertyNames);
-                    string key = $"{indexName}-{sortBy}";
-                    IReadOnlyDictionary<IndexName, TypeFieldMappings> fieldMappings = null;
-                    if (!indicesByKey.TryGetValue(key, out fieldMappings))
-                    {
-                        var response = await client.Indices.GetFieldMappingAsync(new GetFieldMappingRequest(indexName, sortBy));
-                        if (response.IsValidResponse)
-                        {
-                            fieldMappings = response.FieldMappings;
-                            indicesByKey.TryAdd(key, fieldMappings);
-                        }
-                    }
-                    /*
-                    if (fieldMappings?.Values != null)
-                    {       
-                        var x = fieldMappings?.Values.Where(tfm => tfm
-                            .Mappings.Keys.Where(k => k.Name.Equals(sortBy) && k.Property.)
-                        )
-
-                        var hasKeyword = indices
-                            .FirstOrDefault().Value.Mappings
-                            .FirstOrDefault().Value?.Mapping?.Values?
-                            .Select(s => s as TextProperty)?
-                            .Where(p => p?.Fields?.ContainsKey("keyword") ?? false)?
-                            .Any() ?? false;
-                        if (hasKeyword)
-                        {
-                            sortBy = $"{sortBy}.keyword";
-                        }
-                    }*/
-                }
                 sortDescriptor.Add(s => s
                     .Field(sortBy.ToField(), c => c
                         .Order(sortOrder == SearchSortOrder.Desc ? SortOrder.Desc : SortOrder.Asc)
@@ -165,7 +125,7 @@ public static class SearchExtensionsGeneric
                 );
             }
 
-            return sortDescriptor;
+            return Task.FromResult<ICollection<Action<SortOptionsDescriptor<TQueryDescriptor>>>>(sortDescriptor);
         }
     }
 
