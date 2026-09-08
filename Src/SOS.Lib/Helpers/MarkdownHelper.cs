@@ -688,12 +688,12 @@ public class MarkdownHelper : IMarkdownHelper
                             "GBIF Dataset Type Vocabulary: http://rs.gbif.org/vocabulary/gbif/dataset_type.xml",
                             "GBIF Dataset Type Vocabulary: https://rs.gbif.org/vocabulary/gbif/dataset_type.xml"
                         };
-                            
+
                         typeOfDataset = xml
-                            .Descendants("keywordSet")?
-                                .Select(ks => ks.Element("keywordThesaurus"))?
-                                    .Where(e => keyWords.Contains(e.Value))?
-                                        .FirstOrDefault()?.Parent?.Element("keyword")?.Value ?? DEFAULT_TYPE_OF_DATASET;
+                            .Descendants("keywordSet")
+                            .Select(ks => ks.Element("keywordThesaurus"))
+                            .Where(e => e != null && keyWords.Contains(e.Value))
+                            .FirstOrDefault()?.Parent?.Element("keyword")?.Value ?? DEFAULT_TYPE_OF_DATASET;
                     }
                         
                     referenceList.Add($"{dataProvider.ContactPerson?.LastName} {dataProvider.ContactPerson?.FirstName?.Substring(0, 1)} ({DateTime.Now.Year}). {dataProvider.Names?.FirstOrDefault(n => n.CultureCode == "sv-SE")?.Value}. {dataProvider.Organizations?.FirstOrDefault(n => n.CultureCode == "sv-SE")?.Value}. {typeOfDataset?.ToCamelCase()} hämtat via Species Observation System API version {version} {DateTime.Now:yyyy-MM-dd}");
