@@ -128,7 +128,7 @@ public class ClassCache<TClass> : IClassCache<TClass>
     {
         if (dictionary.Count >= _maxNumberOfItems)
         {
-            RemoveLeastUsedItems(ref dictionary);
+            RemoveLeastUsedItems(dictionary);
         }
     }
 
@@ -136,30 +136,34 @@ public class ClassCache<TClass> : IClassCache<TClass>
     {
         if (dictionary.Count >= _maxNumberOfItems)
         {
-            RemoveLeastUsedItems(ref dictionary);
+            RemoveLeastUsedItems(dictionary);
         }
     }
 
-    private void RemoveLeastUsedItems<T>(ref Dictionary<string, CacheEntry<T>> dictionary)
+    private void RemoveLeastUsedItems<T>(Dictionary<string, CacheEntry<T>> dictionary)
     {
         var itemsToRemove = dictionary.OrderBy(entry => entry.Value.Count)
                                   .Take(Convert.ToInt32(_maxNumberOfItems * 0.1))
                                   .Select(entry => entry.Key)
                                   .ToList();
 
-        dictionary = dictionary.Where(kvp => !itemsToRemove.Contains(kvp.Key))
-                        .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+        foreach (var key in itemsToRemove)
+        {
+            dictionary.Remove(key);
+        }
     }
 
-    private void RemoveLeastUsedItems<T>(ref ConcurrentDictionary<string, CacheEntry<T>> dictionary)
+    private void RemoveLeastUsedItems<T>(ConcurrentDictionary<string, CacheEntry<T>> dictionary)
     {
         var itemsToRemove = dictionary.OrderBy(entry => entry.Value.Count)
                                   .Take(Convert.ToInt32(_maxNumberOfItems * 0.1))
                                   .Select(entry => entry.Key)
                                   .ToList();
 
-        dictionary = dictionary.Where(kvp => !itemsToRemove.Contains(kvp.Key))
-                        .ToConcurrentDictionary(kvp => kvp.Key, kvp => kvp.Value);
+        foreach (var key in itemsToRemove)
+        {
+            dictionary.TryRemove(key, out _);
+        }
     }
 
     public CacheEntry<T> CreateCacheEntry<T>(T item)
