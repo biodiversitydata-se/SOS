@@ -7,8 +7,8 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PackageId>SOS.Api.Contracts</PackageId>
     <Title>SOS API Contracts</Title>
-    <Description>Public contracts for the SOS Observations and Analysis APIs.</Description>
-    <PackageTags>sos;api;contracts;observations;analysis;exports;data-stewardship;geojson</PackageTags>
+    <Description>Shared SOS contracts for Observations, Analysis and portable workspace documents.</Description>
+    <PackageTags>sos;api;contracts;observations;analysis;exports;data-stewardship;geojson;workspaces</PackageTags>
     <Authors>SLU Artdatabanken</Authors>
     <Company>SLU Artdatabanken</Company>
     <PackageProjectUrl>https://github.com/biodiversitydata-se/SOS</PackageProjectUrl>

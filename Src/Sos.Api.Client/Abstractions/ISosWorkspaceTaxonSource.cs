@@ -4,6 +4,7 @@ namespace SOS.Api.Client.Abstractions;
 
 /// <summary>
 /// Provides the taxon and taxon-list data required to resolve a workspace taxon selection.
+/// Implementations must throw on lookup failures; an empty collection means a successful lookup with no matching taxa.
 /// </summary>
 public interface ISosWorkspaceTaxonSource
 {

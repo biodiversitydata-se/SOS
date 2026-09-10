@@ -103,14 +103,20 @@ Register at most one provider. It must read the current role for every call and 
 
 ## Workspace filters
 
-`ISosWorkspaceFilterService` converts the persistence-independent `SosWorkspaceSearchDefinition` to SOS filters:
+`ISosWorkspaceFilterService`, also available as `sos.WorkspaceFilters`, accepts a complete `SosWorkspaceDocument` from `SOS.Api.Contracts.Workspaces`:
 
 ```csharp
-var workspace = new SosWorkspaceSearchDefinition
+using SOS.Api.Contracts.Workspaces;
+
+var workspace = new SosWorkspaceDocument
 {
-    DataProviderIds = [1, 2],
-    DateFilter = new() { Mode = WorkspaceDateFilterMode.LastFiveYears },
-    ObservationDetails = new() { Presence = WorkspacePresence.ObservedOnly }
+    Name = "Observations this year",
+    Search = new()
+    {
+        DataProviderIds = [1, 3],
+        DateFilter = new() { Mode = WorkspaceDateFilterMode.CurrentYear },
+        ObservationDetails = new() { Presence = WorkspacePresence.ObservedOnly }
+    }
 };
 
 var filter = await sos.WorkspaceFilters.CreateSearchFilterAsync(
@@ -121,13 +127,44 @@ var result = await sos.Observations.ObservationsBySearchInternalAsync(
     cancellationToken: cancellationToken);
 ```
 
-Persistence, sharing and user settings remain in the consuming application. Explicit taxon identifiers require no adapter. If a workspace expands descendants, filters expanded taxa by category, or uses taxon or species-group lists, register exactly one application data source:
+Use `CreateAggregationFilterAsync(workspace, ...)` for aggregation and analysis workflows. Both methods also accept `workspace.Search` directly when only a search definition is available. The document overloads validate `SchemaVersion` and require a non-null `Search` before converting. They interpret only the search definition and leave saved metadata, settings and application state untouched. Apply saved analysis/export SRID preferences to the corresponding operation options after validating that the operation supports them.
+
+Pass `WorkspaceFilterOverrides` for request-specific output fields, bounding boxes, point/radius searches, date limits or replacement taxon IDs. These values are applied to the generated filter without updating the saved workspace. Storage and sharing remain in the consuming application or a user-data service. A workspace document can be stored with `JsonSerializer.Serialize` and restored with `JsonSerializer.Deserialize<SosWorkspaceDocument>` using the contracts package alone.
+
+Explicit taxon identifiers require no taxon-source adapter. If a workspace expands descendants, filters expanded taxa by category, or uses taxon or species-group lists, register exactly one application data source:
 
 ```csharp
 builder.Services.AddTransient<ISosWorkspaceTaxonSource, MyWorkspaceTaxonSource>();
 ```
 
-Invalid workspace settings produce `SosWorkspaceFilterValidationException`.
+Use the document helpers in `SOS.Api.Client.Workspaces` to validate before saving and read application state without handling `JsonElement`:
+
+```csharp
+SosWorkspaceDocuments.Validate(workspace); // Local checks; no taxon API calls.
+workspace.SetApplicationState("my-app", new MapState { Zoom = 8 });
+var json = SosWorkspaceDocuments.Serialize(workspace);
+var restored = SosWorkspaceDocuments.Deserialize(json);
+var map = restored.GetApplicationState<MapState>("my-app");
+// MapState is your application's own type.
+```
+
+`Validate` checks the schema, search presence, supported selection enums/area types and date ordering/year boundaries. It does not resolve taxa, check authorization or perform full server-side filter validation. Conversion also checks computed date bounds against the current clock.
+
+`Deserialize` checks the version before interpreting search fields. Missing/unsupported versions, malformed JSON and invalid search data produce `SosWorkspaceFilterValidationException`. Direct `JsonSerializer` use still throws `JsonException` for malformed JSON. There is no automatic schema migration.
+
+Application-state helpers preserve other applications' entries, serialize a snapshot on write and return an independent value on read. Missing entries return default; incompatible state throws `JsonException`. Optional serializer options apply only to that application's state. Unknown root metadata (`ExtensionData`) is preserved by document serialization.
+
+Workspace filter semantics:
+
+- Missing or empty `DataProviderIds` selects no providers; set the desired provider IDs explicitly.
+- `TaxonSelection = null` applies no taxon restriction. An empty selection, or a selection resolving to no taxa, matches no taxa.
+- Included taxa/species groups are intersected with selected taxon lists. A selected source resolving to an empty set stays empty; it never removes a restriction. Taxon-source implementations must throw on lookup failures instead of returning an empty set.
+- Relative dates are evaluated in the Swedish time zone when the filter is created. The existing `LastFiveYears` mode spans the current and five preceding calendar years; `LastTwentyFiveYears` spans the current and twenty-five preceding calendar years. Those persisted values retain their original meaning. New selections can use `LastFiveCalendarYears` or `LastTwentyFiveCalendarYears` for exactly five or twenty-five years, including the current year. Older clients reject these new enum values; upgrade readers before saving them.
+- Date overrides intersect the computed interval in every date mode; reversed or non-overlapping intervals throw a validation exception. Observation and report date modes retain their respective end-of-day and midnight boundaries.
+- For recurring month/day periods (`IgnoreYear`), date overrides require both bounds within one calendar year. The intersection must be one contiguous period, and saved year restrictions still apply. Disjoint intersections must be requested separately. The resulting filter uses an ordinary absolute interval. Without overrides, periods crossing New Year remain valid; leap-day periods use a leap-year anchor when necessary.
+- A point override is added to active workspace geometries. `TaxonIds` overrides replace the workspace taxon selection for that request.
+
+The search definition and its persistent selection types now live in `SOS.Api.Contracts.Workspaces`. Update imports and rebuild existing consumers when upgrading. `WorkspaceFilterOverrides` and `SosResolvedTaxon` remain in `SOS.Api.Client.Workspaces`. Legacy BFF database JSON needs an explicit adapter to the new document format, including loading the separately stored workspace taxa.
 
 ## Downloads and errors
 

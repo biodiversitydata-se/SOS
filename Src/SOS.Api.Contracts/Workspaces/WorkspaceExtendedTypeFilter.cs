@@ -1,8 +1,11 @@
-﻿namespace SOS.Api.Client.Workspaces;
+using System.Text.Json.Serialization;
+
+namespace SOS.Api.Contracts.Workspaces;
 
 /// <summary>
 /// Determines which Artportalen sighting-type search groups are included.
 /// </summary>
+[JsonConverter(typeof(JsonStringEnumConverter<WorkspaceExtendedTypeFilter>))]
 public enum WorkspaceExtendedTypeFilter
 {
     /// <summary>Exclude merged observations.</summary>

@@ -6,6 +6,7 @@ using SOS.Api.Contracts.Aggregations.Requests;
 using SOS.Api.Contracts.Areas.Requests;
 using SOS.Api.Contracts.Areas.Responses;
 using SOS.Api.Contracts.Observations.Requests;
+using SOS.Api.Contracts.Workspaces;
 
 namespace SOS.Api.Client.Services;
 
@@ -28,6 +29,26 @@ public sealed class SosWorkspaceFilterService : ISosWorkspaceFilterService
     {
         _timeProvider = timeProvider;
         _taxonSelectionResolver = new WorkspaceTaxonSelectionResolver(taxonSources);
+    }
+
+    /// <inheritdoc />
+    public Task<SearchFilterInternalDto> CreateSearchFilterAsync(
+        SosWorkspaceDocument workspace,
+        WorkspaceFilterOverrides? overrides = null,
+        CancellationToken cancellationToken = default) =>
+        CreateSearchFilterAsync(GetSearchDefinition(workspace), overrides, cancellationToken);
+
+    /// <inheritdoc />
+    public Task<SearchFilterAggregationInternalDto> CreateAggregationFilterAsync(
+        SosWorkspaceDocument workspace,
+        WorkspaceFilterOverrides? overrides = null,
+        CancellationToken cancellationToken = default) =>
+        CreateAggregationFilterAsync(GetSearchDefinition(workspace), overrides, cancellationToken);
+
+    private static SosWorkspaceSearchDefinition GetSearchDefinition(SosWorkspaceDocument workspace)
+    {
+        SosWorkspaceDocuments.Validate(workspace);
+        return workspace.Search;
     }
 
     /// <inheritdoc />
@@ -66,6 +87,7 @@ public sealed class SosWorkspaceFilterService : ISosWorkspaceFilterService
         WorkspaceFilterOverrides? overrides,
         CancellationToken cancellationToken)
     {
+        SosWorkspaceDocuments.ValidateSearch(workspace);
         var details = workspace.ObservationDetails ?? new WorkspaceObservationDetails();
         var dateFilter = workspace.DateFilter ?? new WorkspaceDateFilter();
 
@@ -236,8 +258,10 @@ public sealed class SosWorkspaceFilterService : ISosWorkspaceFilterService
                 {
                     try
                     {
-                        start = new DateTime(today.Year, start.Month, start.Day);
-                        end = new DateTime(today.Year, end.Month, end.Day);
+                        var anchorYear = (start.Month == 2 && start.Day == 29 || end.Month == 2 && end.Day == 29)
+                            && !DateTime.IsLeapYear(today.Year) ? 2000 : today.Year;
+                        start = new DateTime(anchorYear, start.Month, start.Day);
+                        end = new DateTime(anchorYear, end.Month, end.Day);
                     }
                     catch (ArgumentOutOfRangeException exception)
                     {
@@ -261,6 +285,10 @@ public sealed class SosWorkspaceFilterService : ISosWorkspaceFilterService
                 (start, end) = GetRelativeDateRange(workspaceDate.Mode, today);
             }
 
+            if (!workspaceDate.IgnoreYear && start > end)
+                throw new SosWorkspaceFilterValidationException(nameof(WorkspaceDateFilter.StartDate),
+                    "StartDate must be less than or equal to EndDate.");
+
             filter.Date = new DateFilterDto
             {
                 StartDate = AtSwedishLocalTime(start),
@@ -277,6 +305,9 @@ public sealed class SosWorkspaceFilterService : ISosWorkspaceFilterService
                     workspaceDate.EndDate?.Date ?? today.AddDays(1))
                 : GetRelativeDateRange(workspaceDate.Mode, today);
 
+            if (start > end)
+                throw new SosWorkspaceFilterValidationException(nameof(WorkspaceDateFilter.StartDate),
+                    "StartDate must be less than or equal to EndDate.");
             filter.ExtendedFilter!.ReportedDateFrom = AtSwedishLocalTime(start);
             filter.ExtendedFilter.ReportedDateTo = AtSwedishLocalTime(end);
         }
@@ -296,29 +327,27 @@ public sealed class SosWorkspaceFilterService : ISosWorkspaceFilterService
         var end = overrides.DateTo?.Date;
         var today = GetTodayInSweden();
 
-        if (workspaceDate.Mode == WorkspaceDateFilterMode.CurrentYear)
-        {
-            var first = new DateTime(today.Year, 1, 1);
-            var last = new DateTime(today.Year, 12, 31);
-            start = !start.HasValue || start.Value < first ? first : start;
-            end = !end.HasValue || end.Value > last ? last : end;
-        }
-        else if (workspaceDate.Mode == WorkspaceDateFilterMode.Custom)
-        {
-            if (workspaceDate.StartDate.HasValue &&
-                (!start.HasValue || start.Value < workspaceDate.StartDate.Value.Date))
-            {
-                start = workspaceDate.StartDate.Value.Date;
-            }
+        if (start > end)
+            throw new SosWorkspaceFilterValidationException(nameof(WorkspaceFilterOverrides.DateFrom),
+                "DateFrom must be less than or equal to DateTo.");
 
-            if (workspaceDate.EndDate.HasValue &&
-                (!end.HasValue || end.Value > workspaceDate.EndDate.Value.Date))
-            {
-                end = workspaceDate.EndDate.Value.Date;
-            }
+        if (workspaceDate.Mode == WorkspaceDateFilterMode.Custom && workspaceDate.IgnoreYear)
+        {
+            ApplyRecurringDateOverrides(filter, start, end);
+            return;
         }
 
-        if (workspaceDate.FilterByObservationDate)
+        var savedStart = filter.Date?.StartDate?.Date ?? filter.ExtendedFilter?.ReportedDateFrom?.Date;
+        var savedEnd = filter.Date?.EndDate?.Date ?? filter.ExtendedFilter?.ReportedDateTo?.Date;
+        start = !start.HasValue || start < savedStart ? savedStart : start;
+        end = !end.HasValue || end > savedEnd ? savedEnd : end;
+        start ??= DateTime.MinValue.Date;
+        end ??= today.AddDays(1);
+        if (start > end)
+            throw new SosWorkspaceFilterValidationException(nameof(WorkspaceFilterOverrides.DateFrom),
+                "The requested date interval does not overlap the workspace date interval.");
+
+        if (workspaceDate.FilterByObservationDate || workspaceDate.IgnoreYear)
         {
             filter.Date = new DateFilterDto
             {
@@ -334,6 +363,48 @@ public sealed class SosWorkspaceFilterService : ISosWorkspaceFilterService
             filter.ExtendedFilter ??= new ExtendedFilterDto();
             filter.ExtendedFilter.ReportedDateFrom = AtSwedishLocalTime(start ?? DateTime.MinValue.Date);
             filter.ExtendedFilter.ReportedDateTo = AtSwedishLocalTime(end ?? today.AddDays(1));
+        }
+    }
+
+    private static void ApplyRecurringDateOverrides(
+        SearchFilterInternalBaseDto filter, DateTime? start, DateTime? end)
+    {
+        // A single SOS interval cannot represent an arbitrary intersection with a recurring period.
+        if (!start.HasValue || !end.HasValue || start.Value.Year != end.Value.Year)
+            throw new SosWorkspaceFilterValidationException(nameof(WorkspaceFilterOverrides.DateFrom),
+                "A recurring period requires both override dates within one calendar year.");
+
+        var year = start.Value.Year;
+        var periodStart = filter.Date!.StartDate!.Value.Date;
+        var periodEnd = filter.Date.EndDate!.Value.Date;
+        var segments = new List<(DateTime Start, DateTime End)>();
+        if (filter.ExtendedFilter!.Years is null || filter.ExtendedFilter.Years.Contains(year))
+        {
+            var first = new DateTime(year, periodStart.Month, Math.Min(periodStart.Day, DateTime.DaysInMonth(year, periodStart.Month)));
+            if (periodStart.Day > DateTime.DaysInMonth(year, periodStart.Month)) first = first.AddDays(1);
+            var last = new DateTime(year, periodEnd.Month, Math.Min(periodEnd.Day, DateTime.DaysInMonth(year, periodEnd.Month)));
+            if (periodStart <= periodEnd) Add(first, last);
+            else
+            {
+                Add(new DateTime(year, 1, 1), last);
+                Add(first, new DateTime(year, 12, 31));
+            }
+        }
+        if (segments.Count != 1)
+            throw new SosWorkspaceFilterValidationException(nameof(WorkspaceFilterOverrides.DateFrom),
+                segments.Count == 0 ? "The requested interval does not overlap the recurring period." :
+                "The intersection contains two periods. Request each period separately.");
+
+        filter.Date.StartDate = AtSwedishLocalTime(segments[0].Start);
+        filter.Date.EndDate = AtEndOfSwedishDay(segments[0].End);
+        filter.ExtendedFilter.UsePeriodForAllYears = false;
+        filter.ExtendedFilter.Years = null;
+
+        void Add(DateTime first, DateTime last)
+        {
+            first = first < start.Value ? start.Value : first;
+            last = last > end.Value ? end.Value : last;
+            if (first <= last) segments.Add((first, last));
         }
     }
 
@@ -411,7 +482,7 @@ public sealed class SosWorkspaceFilterService : ISosWorkspaceFilterService
     }
 
     private static DateTimeOffset AtEndOfSwedishDay(DateTime value) =>
-        AtSwedishLocalTime(value.Date.AddDays(1).AddSeconds(-1));
+        AtSwedishLocalTime(value.Date.AddHours(23).AddMinutes(59).AddSeconds(59));
 
     private static TimeZoneInfo ResolveSwedishTimeZone()
     {
@@ -440,6 +511,8 @@ public sealed class SosWorkspaceFilterService : ISosWorkspaceFilterService
         {
             WorkspaceDateFilterMode.CurrentYear => today.Year,
             WorkspaceDateFilterMode.PreviousYear => today.Year - 1,
+            WorkspaceDateFilterMode.LastFiveCalendarYears => today.Year - 4,
+            WorkspaceDateFilterMode.LastTwentyFiveCalendarYears => today.Year - 24,
             WorkspaceDateFilterMode.LastFiveYears => today.Year - 5,
             WorkspaceDateFilterMode.LastTwentyFiveYears => today.Year - 25,
             _ => throw Validation(nameof(WorkspaceDateFilter.Mode), mode)
