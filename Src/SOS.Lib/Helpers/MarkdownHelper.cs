@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Primitives;
 using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
 using SOS.Lib.Cache.Interfaces;
@@ -54,7 +55,7 @@ public class MarkdownHelper : IMarkdownHelper
             delimiter += "#";
         }
 
-        sb.Append($"{delimiter} {text} {delimiter}{BR}");
+        sb.Append($"{delimiter} {text} {delimiter}{BR}\n");
     }
 
     /// <summary>
@@ -78,9 +79,10 @@ public class MarkdownHelper : IMarkdownHelper
         {
             sb.Append($"* {item}{BR}");
         }
+        sb.Append("\n");
     }
 
-    private void TryAddParagraph(StringBuilder sb, string label, string value, bool pagebreakAfterLabel = false)
+    private void TryAddParagraph(StringBuilder sb, string label, string value, bool pagebreakAfterLabel = false, bool onlySinglebreakAfterValue = false)
     {
         if (string.IsNullOrEmpty(value))
         {
@@ -99,8 +101,8 @@ public class MarkdownHelper : IMarkdownHelper
                 sb.Append(" ");
             }
         }
-        
-        sb.Append($"{value}{BR}{BR}");
+
+        sb.Append($"{value}{BR}{(onlySinglebreakAfterValue ? "" : BR)}");
     }
 
 
@@ -139,6 +141,7 @@ public class MarkdownHelper : IMarkdownHelper
             }
             sb.Append(BR);
         }
+        sb.Append("\n");
     }
     #region Filter
 
@@ -209,34 +212,34 @@ public class MarkdownHelper : IMarkdownHelper
         {
             TryAddParagraph(sb, "Not Present Filter", filter.NotPresentFilter switch
             {
-                SightingNotPresentFilterDto.DontIncludeNotPresent => "Don`t Include Not Present",
-                SightingNotPresentFilterDto.IncludeNotPresent => "Include Not Present",
-                SightingNotPresentFilterDto.OnlyNotPresent => "Only Not Present",
+                SightingNotPresentFilterDto.DontIncludeNotPresent => "Only present",
+                SightingNotPresentFilterDto.IncludeNotPresent => "Present and not present",
+                SightingNotPresentFilterDto.OnlyNotPresent => "Only not present",
                 _ => ""
             });
         }
         
-        TryAddParagraph(sb, "Observed By User Id", filter.ObservedByUserId.HasValue && filter.ObservedByUserId.Value != 0 ? filter.ObservedByUserId.Value.ToString() : null);
-        TryAddParagraph(sb, "Observed By Userservice User Id", filter.ObservedByUserServiceUserId.HasValue && filter.ObservedByUserServiceUserId.Value != 0 ? filter.ObservedByUserServiceUserId.Value.ToString() : null);
-        TryAddParagraph(sb, "Only Secondhand Information", filter.OnlySecondHandInformation ? "Yes" : null);
-        TryAddParagraph(sb, "Only With Barcode", filter.OnlyWithBarcode ? "Yes" : null);
-        TryAddParagraph(sb, "Only With Media", filter.OnlyWithMedia ? "Yes" : null);
-        TryAddParagraph(sb, "Only With Notes", filter.OnlyWithNotes ? "Yes" : null);
-        TryAddParagraph(sb, "Only With Notes Of Interest", filter.OnlyWithNotesOfInterest ? "Yes" : null);
-        TryAddParagraph(sb, "Only With User Comments", filter.OnlyWithUserComments ? "Yes" : null);
-        TryAddParagraph(sb, "Private Collection", filter.PrivateCollection);
-        TryAddParagraph(sb, "Public Collection", filter.PublicCollection);
-        TryAddList(sb, ("Publish Type Id`s", 3), filter.PublishTypeIdsFilter?.Select(pti => pti.ToString()));
+        TryAddParagraph(sb, "Observed by user id", filter.ObservedByUserId.HasValue && filter.ObservedByUserId.Value != 0 ? filter.ObservedByUserId.Value.ToString() : null);
+        TryAddParagraph(sb, "Observed by userservice user id", filter.ObservedByUserServiceUserId.HasValue && filter.ObservedByUserServiceUserId.Value != 0 ? filter.ObservedByUserServiceUserId.Value.ToString() : null);
+        TryAddParagraph(sb, "Only secondhand information", filter.OnlySecondHandInformation ? "Yes" : null);
+        TryAddParagraph(sb, "Only with barcode", filter.OnlyWithBarcode ? "Yes" : null);
+        TryAddParagraph(sb, "Only with media", filter.OnlyWithMedia ? "Yes" : null);
+        TryAddParagraph(sb, "Only with notes", filter.OnlyWithNotes ? "Yes" : null);
+        TryAddParagraph(sb, "Only with notes of interest", filter.OnlyWithNotesOfInterest ? "Yes" : null);
+        TryAddParagraph(sb, "Only with user comments", filter.OnlyWithUserComments ? "Yes" : null);
+        TryAddParagraph(sb, "Private collection", filter.PrivateCollection);
+        TryAddParagraph(sb, "Public collection", filter.PublicCollection);
+        TryAddList(sb, ("Publish type id`s", 3), filter.PublishTypeIdsFilter?.Select(pti => pti.ToString()));
 
         if (filter.Quantity.HasValue)
         {
             TryAddParagraph(sb, "Quantity", filter.Quantity.Value.ToString());
             TryAddParagraph(sb, "Quantity", filter.QuantityOperator);
         }
-        TryAddParagraph(sb, "Reported By User Id", filter.ReportedByUserId.HasValue && filter.ReportedByUserId != 0 ? filter.ReportedByUserId.ToString() : null);
-        TryAddParagraph(sb, "Reported By Userservice User Id", filter.ReportedByUserServiceUserId.HasValue && filter.ReportedByUserServiceUserId.Value != 0 ? filter.ReportedByUserServiceUserId.Value.ToString() : null);
-        TryAddParagraph(sb, "Reported Date From", filter.ReportedDateFrom.HasValue ? filter.ReportedDateFrom.Value.ToString("yyyy-MM-dd HH:mm:ss") : null);
-        TryAddParagraph(sb, "Reported Date To", filter.ReportedDateTo.HasValue ? filter.ReportedDateTo.Value.ToString("yyyy-MM-dd HH:mm:ss") : null);
+        TryAddParagraph(sb, "Reported by user id", filter.ReportedByUserId.HasValue && filter.ReportedByUserId != 0 ? filter.ReportedByUserId.ToString() : null);
+        TryAddParagraph(sb, "Reported by userservice user id", filter.ReportedByUserServiceUserId.HasValue && filter.ReportedByUserServiceUserId.Value != 0 ? filter.ReportedByUserServiceUserId.Value.ToString() : null);
+        TryAddParagraph(sb, "Reported date from", filter.ReportedDateFrom.HasValue ? filter.ReportedDateFrom.Value.ToString("yyyy-MM-dd HH:mm:ss") : null);
+        TryAddParagraph(sb, "Reported date to", filter.ReportedDateTo.HasValue ? filter.ReportedDateTo.Value.ToString("yyyy-MM-dd HH:mm:ss") : null);
         if (filter.SexIds?.Count() > 0)
         {
             var sexes = vocabularies.FirstOrDefault(v => v.Id == VocabularyId.Sex)?.Values;
@@ -249,10 +252,10 @@ public class MarkdownHelper : IMarkdownHelper
                 TryAddList(sb, ("Sexes", 3), sexes.Where(dmi => filter.SexIds.Contains(dmi.Id)).Select(dmi => dmi.Value));
             }
         }
-        TryAddList(sb, ("Site Id`s", 3), filter.SiteIds?.Select(s => s.ToString()));
-        TryAddList(sb, ("Site Project Id`s", 3), filter.SiteProjectIds?.Select(spi => spi.ToString()));
-        TryAddParagraph(sb, "Species Collection Label", filter.SpeciesCollectionLabel);
-        TryAddList(sb, ("Species Facts Id`s", 3), filter.SpeciesFactsIds?.Select(sfi => sfi.ToString()));
+        TryAddList(sb, ("Site id`s", 3), filter.SiteIds?.Select(s => s.ToString()));
+        TryAddList(sb, ("Site project id`s", 3), filter.SiteProjectIds?.Select(spi => spi.ToString()));
+        TryAddParagraph(sb, "Species collection label", filter.SpeciesCollectionLabel);
+        TryAddList(sb, ("Species facts id`s", 3), filter.SpeciesFactsIds?.Select(sfi => sfi.ToString()));
 
         if (filter.SubstrateId.HasValue)
         {
@@ -276,7 +279,7 @@ public class MarkdownHelper : IMarkdownHelper
             }
             else
             {
-                TryAddParagraph(sb, "Substrate Species", taxon?.ScientificName ?? filter.SubstrateSpeciesId.Value.ToString());
+                TryAddParagraph(sb, "Substrate species", taxon?.ScientificName ?? filter.SubstrateSpeciesId.Value.ToString());
             }
         }
         TryAddList(sb, ("Triggered Observation Rule Frequency Id`s", 3), filter.TriggeredObservationRuleFrequencyIds?.Select(torfi => torfi.ToString()));
@@ -292,7 +295,7 @@ public class MarkdownHelper : IMarkdownHelper
         });*/
         TryAddParagraph(sb, "Unspontaneous Filter", filter.UnspontaneousFilter switch
         {
-            SightingUnspontaneousFilterDto.NotUnspontaneous => "Not Unspontaneous",
+            SightingUnspontaneousFilterDto.NotUnspontaneous => "Spontaneous",
             SightingUnspontaneousFilterDto.Unspontaneous => "Unspontaneous",
             _ => ""
         });
@@ -312,17 +315,17 @@ public class MarkdownHelper : IMarkdownHelper
         if (filter.Weight.HasValue)
         {
             TryAddParagraph(sb, "Weight", filter.Weight.Value.ToString());
-            TryAddParagraph(sb, "Weight Operator", filter.WeightOperator);
+            TryAddParagraph(sb, "Weight operator", filter.WeightOperator);
         }
         if ((filter.Years?.Count() ?? 0) != 0)
         {
             TryAddList(sb, ("Years", 3), filter.Years.Select(y => y.ToString()));
-            TryAddParagraph(sb, "Years Comparison", filter.YearsComparison switch
+            TryAddParagraph(sb, "Years comparison", filter.YearsComparison switch
             {
-                DateFilterComparisonDto.BothStartDateAndEndDate => "Both Start Date And End Date",
-                DateFilterComparisonDto.EndDate => "End Date",
-                DateFilterComparisonDto.StartDateEndDateMonthRange => "Start Date End Date Month Range",
-                _ => "Start Date"
+                DateFilterComparisonDto.BothStartDateAndEndDate => "Both start date and end date",
+                DateFilterComparisonDto.EndDate => "End date",
+                DateFilterComparisonDto.StartDateEndDateMonthRange => "Start date end date month range",
+                _ => "Start date"
             });
         }
     }
@@ -471,7 +474,7 @@ public class MarkdownHelper : IMarkdownHelper
             return;
         }
         AddHeader(sb, "Generalization Filter", 2);
-        TryAddParagraph(sb, "Public Generalization Filter", filter.PublicGeneralizationFilter.HasValue ? filter.PublicGeneralizationFilter.Value switch
+        TryAddParagraph(sb, "Public Generalization Filter", filter.PublicGeneralizationFilter.HasValue && filter.PublicGeneralizationFilter != PublicGeneralizationFilterDto.NoFilter ? filter.PublicGeneralizationFilter.Value switch
         {
             PublicGeneralizationFilterDto.DontIncludeGeneralized => "Don't Include Generalized",
             PublicGeneralizationFilterDto.OnlyGeneralized => "Only Generalized",
@@ -738,34 +741,34 @@ public class MarkdownHelper : IMarkdownHelper
                 OccurrenceStatusFilterValuesDto.BothPresentAndAbsent => "Present and Absent",
                 _ => ""
             } : null);
-            TryAddParagraph(sb, "Bird Nest Activity Limit", filter.BirdNestActivityLimit.HasValue ? filter.BirdNestActivityLimit.Value.ToString() : null);
-            TryAddParagraph(sb, "Determination Filter", filter.DeterminationFilter.HasValue ? filter.DeterminationFilter.Value switch
+            TryAddParagraph(sb, "Bird nest activity limit", filter.BirdNestActivityLimit.HasValue ? filter.BirdNestActivityLimit.Value.ToString() : null);
+            TryAddParagraph(sb, "Determination filter", filter.DeterminationFilter.HasValue && filter.DeterminationFilter != SightingDeterminationFilterDto.NoFilter ? filter.DeterminationFilter.Value switch
             {
-                SightingDeterminationFilterDto.NotUnsureDetermination => "Not Unsure Determination",
-                SightingDeterminationFilterDto.OnlyUnsureDetermination => "Only Unsure Determination",
+                SightingDeterminationFilterDto.NotUnsureDetermination => "Only sure determination",
+                SightingDeterminationFilterDto.OnlyUnsureDetermination => "Only unsure determination",
                 _ => "No Filter"
             } : null);
             TryAddList(sb, ("Diffusion Statuses", 2), filter.DiffusionStatuses?.Select(ds => ds switch
             {
-                DiffusionStatusDto.DiffusedByProvider => "Diffused By Provider",
-                DiffusionStatusDto.DiffusedBySystem => "Diffused By System",
+                DiffusionStatusDto.DiffusedByProvider => "Diffused by provider",
+                DiffusionStatusDto.DiffusedBySystem => "Diffused by system",
                 _ => "Not Diffused"
             }));
-            TryAddParagraph(sb, "Not Recovered Filter", filter.NotRecoveredFilter.HasValue ? filter.NotRecoveredFilter.Value switch
+            TryAddParagraph(sb, "Not Recovered Filter", filter.NotRecoveredFilter.HasValue && filter.NotRecoveredFilter != SightingNotRecoveredFilterDto.NoFilter ? filter.NotRecoveredFilter.Value switch
             {
-                SightingNotRecoveredFilterDto.DontIncludeNotRecovered => "Don't Include Not Recovered",
-                SightingNotRecoveredFilterDto.IncludeNotRecovered => "Include Not Recovered",
-                SightingNotRecoveredFilterDto.OnlyNotRecovered => "Only Not Recovered",
+                SightingNotRecoveredFilterDto.DontIncludeNotRecovered => "Only recovered",
+                SightingNotRecoveredFilterDto.IncludeNotRecovered => "Include not recovered",
+                SightingNotRecoveredFilterDto.OnlyNotRecovered => "Only not recovered",
                 _ => "No Filter"
             } : null);
             TryAddParagraph(sb, "Verification Status", filter.VerificationStatus.HasValue ? filter.VerificationStatus.Value switch
             {
-                StatusVerificationDto.NotVerified => "Not Verified",
+                StatusVerificationDto.NotVerified => "Not verified",
                 StatusVerificationDto.Verified => "Verified",
-                _ => "Both Verified and not Verified"
+                _ => "Both verified and not verified"
             } : null);
-            TryAddParagraph(sb, "Observed By Me", filter.ObservedByMe.HasValue ? filter.ObservedByMe.Value ? "Yes" : null : null);
-            TryAddParagraph(sb, "Reported By Me", filter.ReportedByMe.HasValue ? filter.ReportedByMe.Value ? "Yes" : null : null);
+            TryAddParagraph(sb, "Observed by me", filter.ObservedByMe.HasValue ? filter.ObservedByMe.Value ? "Yes" : null : null);
+            TryAddParagraph(sb, "Reported by me", filter.ReportedByMe.HasValue ? filter.ReportedByMe.Value ? "Yes" : null : null);
             TryAddDateInfo(sb, filter.Date);
             await TryAddTaxaInfoAsync(sb, filter.Taxon, vocabularies.FirstOrDefault(v => v.Id == VocabularyId.TaxonCategory)?.Values);
             await TryAddGeographicsInfoAsync(sb, filter.Geographics);
@@ -780,15 +783,15 @@ public class MarkdownHelper : IMarkdownHelper
             {
                 TryAddGeneralizationInfo(sb, internalBaseFilter.GeneralizationFilter);
                 await AddExtendedInfoAsync(sb, internalBaseFilter.ExtendedFilter, vocabularies);
-                TryAddParagraph(sb, "Occurrence Status", internalBaseFilter.ProtectionFilter.HasValue ? internalBaseFilter.ProtectionFilter.Value switch
+                TryAddParagraph(sb, "Sensitive", internalBaseFilter.ProtectionFilter.HasValue ? internalBaseFilter.ProtectionFilter.Value switch
                 {
-                    ProtectionFilterDto.BothPublicAndSensitive => "Both Public And Sensitive",
+                    ProtectionFilterDto.BothPublicAndSensitive => "Both public and sensitive",
                     ProtectionFilterDto.Sensitive => "Sensitive",
                     _ => "Public"
                 } : null);
             }
 
-            TryAddParagraph(sb, "Koordinatsystem", "WGS84");
+            TryAddParagraph(sb, "Koordinatsystem", "WGS84", onlySinglebreakAfterValue: true);
            
             var stream = new MemoryStream(Encoding.UTF8.GetBytes(sb.ToString()));
             return stream;
