@@ -7,6 +7,7 @@ using SOS.Api.Client.Workspaces;
 using SOS.Api.Contracts.Areas.Responses;
 using SOS.Api.Contracts.Common.Geo;
 using SOS.Api.Contracts.Observations.Requests;
+using SOS.Api.Contracts.Workspaces;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;

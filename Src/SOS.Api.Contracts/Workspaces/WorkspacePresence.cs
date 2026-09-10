@@ -1,8 +1,11 @@
-namespace SOS.Api.Client.Workspaces;
+using System.Text.Json.Serialization;
+
+namespace SOS.Api.Contracts.Workspaces;
 
 /// <summary>
 /// Presence values included in a workspace search.
 /// </summary>
+[JsonConverter(typeof(JsonStringEnumConverter<WorkspacePresence>))]
 public enum WorkspacePresence
 {
     /// <summary>Use the default observed-only selection.</summary>

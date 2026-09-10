@@ -1,8 +1,11 @@
-namespace SOS.Api.Client.Workspaces;
+using System.Text.Json.Serialization;
+
+namespace SOS.Api.Contracts.Workspaces;
 
 /// <summary>
 /// Spontaneous-occurrence values included in a workspace search.
 /// </summary>
+[JsonConverter(typeof(JsonStringEnumConverter<WorkspaceSpontaneous>))]
 public enum WorkspaceSpontaneous
 {
     /// <summary>No explicit spontaneous-occurrence filter.</summary>

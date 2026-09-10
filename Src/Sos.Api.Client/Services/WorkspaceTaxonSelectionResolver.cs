@@ -1,6 +1,6 @@
 using SOS.Api.Client.Abstractions;
 using SOS.Api.Client.Exceptions;
-using SOS.Api.Client.Workspaces;
+using SOS.Api.Contracts.Workspaces;
 
 namespace SOS.Api.Client.Services;
 
@@ -36,8 +36,10 @@ internal sealed class WorkspaceTaxonSelectionResolver
                 cancellationToken));
         }
 
-        IEnumerable<int> result = includedTaxa.Count > 0
-            ? includedFromLists.Count > 0
+        var hasIncludedSelection = selection.Taxa?.Any(taxon => !taxon.Exclude) == true ||
+            selection.SpeciesGroups?.Any(group => !group.Exclude) == true;
+        IEnumerable<int> result = hasIncludedSelection
+            ? selection.TaxonListIds?.Count > 0
                 ? includedTaxa.Intersect(includedFromLists)
                 : includedTaxa
             : includedFromLists;
@@ -74,8 +76,10 @@ internal sealed class WorkspaceTaxonSelectionResolver
 
             if (categories?.Count > 0)
             {
-                var taxon = await source.GetTaxonAsync(selectedTaxon.TaxonId, cancellationToken);
-                if (taxon is not null && !categories.Contains(taxon.TaxonCategoryId))
+                var taxon = await source.GetTaxonAsync(selectedTaxon.TaxonId, cancellationToken)
+                    ?? throw new SosWorkspaceFilterValidationException(nameof(WorkspaceSelectedTaxon.TaxonId),
+                        $"Taxon {selectedTaxon.TaxonId} could not be found for category filtering.");
+                if (!categories.Contains(taxon.TaxonCategoryId))
                 {
                     result.Remove(selectedTaxon.TaxonId);
                 }

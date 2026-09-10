@@ -20,7 +20,9 @@ public sealed class WorkspaceFilterOverrides
     public OutputFilterExtendedDto? Output { get; set; }
 
     /// <summary>
-    /// Optionally constrains the workspace date interval, for example when producing time-series batches.
+    /// Intersects the computed workspace date interval, for example when producing time-series batches.
+    /// Empty intersections and reversed bounds throw a workspace validation exception.
+    /// Recurring periods require both bounds within one calendar year and a single contiguous intersection.
     /// </summary>
     public DateTime? DateFrom { get; set; }
     /// <summary>The optional inclusive upper date boundary.</summary>
