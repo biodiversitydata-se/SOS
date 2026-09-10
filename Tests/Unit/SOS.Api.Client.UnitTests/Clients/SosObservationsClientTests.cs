@@ -72,7 +72,8 @@ public class SosObservationsClientTests
     {
         var handler = new StubHttpMessageHandler(request =>
         {
-            ReadRequestBody(request).Should().Be("""{"includeFilter":{"occurrenceIds":["occurrence-1"]}}""");
+            ReadRequestBody(request).Should().Be(
+                """{"typeFilter":"DoNotShowMerged","includeFilter":{"occurrenceIds":["occurrence-1"]}}""");
             return CreateJsonResponse("""{"skip":0,"take":0,"totalCount":0,"records":[]}""");
         });
         var client = new SosObservationsClient(CreateHttpClient(handler));

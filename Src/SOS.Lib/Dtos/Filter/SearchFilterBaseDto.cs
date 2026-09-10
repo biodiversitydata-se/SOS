@@ -8,6 +8,12 @@ namespace SOS.Lib.Dtos.Filter;
 public class SearchFilterBaseDto
 {
     /// <summary>
+    /// Controls which Artportalen observation types are included in the result.
+    /// </summary>
+    public ExtendedFilterDto.SightingTypeFilterDto TypeFilter { get; set; } =
+        ExtendedFilterDto.SightingTypeFilterDto.DoNotShowMerged;
+
+    /// <summary>
     /// Limit returned observations based on bird nest activity level.
     /// Only bird observations in Artportalen are affected
     /// by this search criteria.

@@ -31,6 +31,7 @@ public static class FilterExtensions
         filter.VerificationStatus = (SearchFilterBase.StatusVerification)(searchFilterBaseDto.VerificationStatus ?? StatusVerificationDto.BothVerifiedAndNotVerified);
         filter.ProjectIds = searchFilterBaseDto.ProjectIds;
         filter.BirdNestActivityLimit = searchFilterBaseDto.BirdNestActivityLimit;
+        filter.TypeFilter = (SightingTypeFilter)searchFilterBaseDto.TypeFilter;
         filter.Location = PopulateLocationFilter(searchFilterBaseDto.Geographics!);
         filter.ModifiedDate = searchFilterBaseDto.ModifiedDate == null
             ? null

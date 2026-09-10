@@ -96,7 +96,7 @@ public class SosRequestLoggingTests
         var entry = logger.Entries.Should().ContainSingle().Subject;
         entry.Properties["RequestUri"].Should().BeOfType<string>()
             .Which.Should().Contain("/observations/internal/timeserieshistogram?");
-        entry.Properties["RequestBody"].Should().Be("{}");
+        entry.Properties["RequestBody"].Should().Be("""{"typeFilter":"DoNotShowMerged"}""");
     }
 
     [Fact]
@@ -117,7 +117,7 @@ public class SosRequestLoggingTests
         entry.Properties["RequestUri"].Should().BeOfType<string>()
             .Which.Should().Contain("/internal/aggregation?")
             .And.Contain("aggregationField=taxon.id");
-        entry.Properties["RequestBody"].Should().Be("{}");
+        entry.Properties["RequestBody"].Should().Be("""{"typeFilter":"DoNotShowMerged"}""");
     }
 
     [Fact]

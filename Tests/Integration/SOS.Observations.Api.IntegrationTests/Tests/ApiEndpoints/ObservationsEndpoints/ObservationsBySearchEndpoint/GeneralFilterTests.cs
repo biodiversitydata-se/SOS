@@ -19,6 +19,59 @@ public class GeneralFilterTests : TestBase
     }
 
     [Fact]
+    public async Task PublicSearchOperations_AcceptTopLevelTypeFilter()
+    {
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+            .All()
+                .HaveValuesFromPredefinedObservations()
+            .TheFirst(60)
+                .With(observation => observation.SightingTypeSearchGroupId =
+                    (int)SOS.Lib.Enums.Artportalen.SightingTypeSearchGroup.Assessment)
+            .TheNext(20)
+                .With(observation => observation.SightingTypeSearchGroupId =
+                    (int)SOS.Lib.Enums.Artportalen.SightingTypeSearchGroup.Ordinary)
+            .TheLast(20)
+                .With(observation => observation.SightingTypeSearchGroupId =
+                    (int)SOS.Lib.Enums.Artportalen.SightingTypeSearchGroup.OwnBreedingAssessment)
+            .Build();
+
+        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
+        var apiClient = TestFixture.CreateApiClient();
+        const ExtendedFilterDto.SightingTypeFilterDto typeFilter =
+            ExtendedFilterDto.SightingTypeFilterDto.ShowOnlyMerged;
+
+        var searchResponse = await apiClient.PostAsync(
+            "/observations/search",
+            JsonContent.Create(new SearchFilterDto { TypeFilter = typeFilter }, options: JsonSerializerOptions),
+            TestContext.Current.CancellationToken);
+        var searchResult = await searchResponse.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(
+            TestContext.Current.CancellationToken);
+
+        searchResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        searchResult!.TotalCount.Should().Be(60);
+        searchResult.Records.Should().OnlyContain(observation => observation.ArtportalenInternal == null);
+
+        var countResponse = await apiClient.PostAsync(
+            "/observations/count",
+            JsonContent.Create(new SearchFilterBaseDto { TypeFilter = typeFilter }, options: JsonSerializerOptions),
+            TestContext.Current.CancellationToken);
+        var countResult = await countResponse.Content.ReadFromJsonAsync<int>(TestContext.Current.CancellationToken);
+
+        countResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        countResult.Should().Be(60);
+
+        var aggregationResponse = await apiClient.PostAsync(
+            "/observations/geogridaggregation?skipCache=true",
+            JsonContent.Create(new SearchFilterAggregationDto { TypeFilter = typeFilter }, options: JsonSerializerOptions),
+            TestContext.Current.CancellationToken);
+        var aggregationResult = await aggregationResponse.Content.ReadFromJsonAsync<GeoGridResultDto>(
+            TestContext.Current.CancellationToken);
+
+        aggregationResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+        aggregationResult!.GridCells.Sum(cell => cell.ObservationsCount).Should().Be(60);
+    }
+
+    [Fact]
     public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_WhenFilteringByProjectIds()
     {
         // Arrange
