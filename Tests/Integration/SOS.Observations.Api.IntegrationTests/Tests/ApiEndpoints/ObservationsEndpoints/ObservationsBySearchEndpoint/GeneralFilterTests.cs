@@ -19,7 +19,7 @@ public class GeneralFilterTests : TestBase
     }
 
     [Fact]
-    public async Task PublicSearchOperations_AcceptTopLevelTypeFilter()
+    public async Task PublicSearchOperations_AcceptArtportalenTypeFilter()
     {
         var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
             .All()
@@ -42,7 +42,12 @@ public class GeneralFilterTests : TestBase
 
         var searchResponse = await apiClient.PostAsync(
             "/observations/search",
-            JsonContent.Create(new SearchFilterDto { TypeFilter = typeFilter }, options: JsonSerializerOptions),
+            JsonContent.Create(
+                new SearchFilterDto
+                {
+                    Artportalen = new ArtportalenFilterDto { TypeFilter = typeFilter }
+                },
+                options: JsonSerializerOptions),
             TestContext.Current.CancellationToken);
         var searchResult = await searchResponse.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(
             TestContext.Current.CancellationToken);
@@ -53,7 +58,12 @@ public class GeneralFilterTests : TestBase
 
         var countResponse = await apiClient.PostAsync(
             "/observations/count",
-            JsonContent.Create(new SearchFilterBaseDto { TypeFilter = typeFilter }, options: JsonSerializerOptions),
+            JsonContent.Create(
+                new SearchFilterBaseDto
+                {
+                    Artportalen = new ArtportalenFilterDto { TypeFilter = typeFilter }
+                },
+                options: JsonSerializerOptions),
             TestContext.Current.CancellationToken);
         var countResult = await countResponse.Content.ReadFromJsonAsync<int>(TestContext.Current.CancellationToken);
 
@@ -62,7 +72,12 @@ public class GeneralFilterTests : TestBase
 
         var aggregationResponse = await apiClient.PostAsync(
             "/observations/geogridaggregation?skipCache=true",
-            JsonContent.Create(new SearchFilterAggregationDto { TypeFilter = typeFilter }, options: JsonSerializerOptions),
+            JsonContent.Create(
+                new SearchFilterAggregationDto
+                {
+                    Artportalen = new ArtportalenFilterDto { TypeFilter = typeFilter }
+                },
+                options: JsonSerializerOptions),
             TestContext.Current.CancellationToken);
         var aggregationResult = await aggregationResponse.Content.ReadFromJsonAsync<GeoGridResultDto>(
             TestContext.Current.CancellationToken);

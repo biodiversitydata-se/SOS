@@ -10,7 +10,8 @@ namespace SOS.Observations.Api.Swagger;
 public class AzurePublicSearchFilterDocumentFilter : IDocumentFilter
 {
     private const string AzurePublicDocumentPrefix = "AzurePublicSosObservations";
-    private const string TypeFilterPropertyName = "typeFilter";
+    private const string ArtportalenPropertyName = "artportalen";
+    private const string ArtportalenFilterSchemaName = "ArtportalenFilterDto";
 
     private static readonly HashSet<string> PublicSearchFilterSchemaNames =
     [
@@ -22,10 +23,10 @@ public class AzurePublicSearchFilterDocumentFilter : IDocumentFilter
     /// <inheritdoc />
     public void Apply(OpenApiDocument swaggerDoc, DocumentFilterContext context)
     {
-        RemoveTypeFilter(context.DocumentName, swaggerDoc.Components?.Schemas);
+        RemoveArtportalenFilter(context.DocumentName, swaggerDoc.Components?.Schemas);
     }
 
-    internal static void RemoveTypeFilter(
+    internal static void RemoveArtportalenFilter(
         string documentName,
         IDictionary<string, IOpenApiSchema>? schemas)
     {
@@ -38,8 +39,10 @@ public class AzurePublicSearchFilterDocumentFilter : IDocumentFilter
         {
             if (schemas.TryGetValue(schemaName, out var schema))
             {
-                schema.Properties?.Remove(TypeFilterPropertyName);
+                schema.Properties?.Remove(ArtportalenPropertyName);
             }
         }
+
+        schemas.Remove(ArtportalenFilterSchemaName);
     }
 }

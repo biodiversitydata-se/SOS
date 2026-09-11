@@ -17,7 +17,7 @@ namespace SOS.Observations.Api.UnitTests.Swagger;
 public class AzurePublicSearchFilterDocumentFilterTests
 {
     [Fact]
-    public void GeneratedDocuments_ExposeTypeFilterEverywhereExceptAzurePublic()
+    public void GeneratedDocuments_ExposeArtportalenFilterEverywhereExceptAzurePublic()
     {
         var services = new ServiceCollection();
         services.AddLogging();
@@ -45,14 +45,17 @@ public class AzurePublicSearchFilterDocumentFilterTests
         var azureInternalDocument = swaggerProvider.GetSwagger("AzureInternalSosObservationsv1.5");
 
         publicDocument.Components!.Schemas["SearchFilterDto"].Properties
+            .Should().ContainKey("artportalen");
+        publicDocument.Components.Schemas["ArtportalenFilterDto"].Properties
             .Should().ContainKey("typeFilter");
         publicDocument.Components.Schemas["SightingTypeFilterDto"].Enum
             .Should().HaveCount(6);
         foreach (var schemaName in new[] { "SearchFilterBaseDto", "SearchFilterDto", "SearchFilterAggregationDto" })
         {
             azurePublicDocument.Components!.Schemas[schemaName].Properties
-                .Should().NotContainKey("typeFilter");
+                .Should().NotContainKey("artportalen");
         }
+        azurePublicDocument.Components!.Schemas.Should().NotContainKey("ArtportalenFilterDto");
         azurePublicDocument.Components.Schemas["SearchFilterDto"].Properties
             .Should().NotContainKey("extendedFilter");
         azureInternalDocument.Components!.Schemas["ExtendedFilterDto"].Properties
@@ -63,35 +66,39 @@ public class AzurePublicSearchFilterDocumentFilterTests
     [InlineData("SearchFilterBaseDto")]
     [InlineData("SearchFilterDto")]
     [InlineData("SearchFilterAggregationDto")]
-    public void RemoveTypeFilter_RemovesPropertyFromAzurePublicSearchSchemas(string schemaName)
+    public void RemoveArtportalenFilter_RemovesPropertyFromAzurePublicSearchSchemas(string schemaName)
     {
         var schemas = CreateSchemas(schemaName);
 
-        AzurePublicSearchFilterDocumentFilter.RemoveTypeFilter(
+        AzurePublicSearchFilterDocumentFilter.RemoveArtportalenFilter(
             "AzurePublicSosObservationsv1.5",
             schemas);
 
-        schemas[schemaName].Properties.Should().NotContainKey("typeFilter");
+        schemas[schemaName].Properties.Should().NotContainKey("artportalen");
+        schemas.Should().NotContainKey("ArtportalenFilterDto");
     }
 
     [Fact]
-    public void RemoveTypeFilter_DoesNotChangeRegularPublicDocument()
+    public void RemoveArtportalenFilter_DoesNotChangeRegularPublicDocument()
     {
         var schemas = CreateSchemas("SearchFilterDto");
 
-        AzurePublicSearchFilterDocumentFilter.RemoveTypeFilter(
+        AzurePublicSearchFilterDocumentFilter.RemoveArtportalenFilter(
             "PublicSosObservationsv1.5",
             schemas);
 
-        schemas["SearchFilterDto"].Properties.Should().ContainKey("typeFilter");
+        schemas["SearchFilterDto"].Properties.Should().ContainKey("artportalen");
+        schemas.Should().ContainKey("ArtportalenFilterDto");
     }
 
     [Fact]
-    public void RemoveTypeFilter_DoesNotRemoveNestedInternalTypeFilter()
+    public void RemoveArtportalenFilter_DoesNotRemoveNestedInternalTypeFilter()
     {
         var schemas = CreateSchemas("ExtendedFilterDto");
+        schemas["ExtendedFilterDto"].Properties["typeFilter"] =
+            new OpenApiSchema { Type = JsonSchemaType.String };
 
-        AzurePublicSearchFilterDocumentFilter.RemoveTypeFilter(
+        AzurePublicSearchFilterDocumentFilter.RemoveArtportalenFilter(
             "AzurePublicSosObservationsv1.5",
             schemas);
 
@@ -106,8 +113,15 @@ public class AzurePublicSearchFilterDocumentFilterTests
             {
                 Properties = new Dictionary<string, IOpenApiSchema>
                 {
-                    ["typeFilter"] = new OpenApiSchema { Type = JsonSchemaType.String },
+                    ["artportalen"] = new OpenApiSchema { Type = JsonSchemaType.Object },
                     ["taxon"] = new OpenApiSchema { Type = JsonSchemaType.Object }
+                }
+            },
+            ["ArtportalenFilterDto"] = new OpenApiSchema
+            {
+                Properties = new Dictionary<string, IOpenApiSchema>
+                {
+                    ["typeFilter"] = new OpenApiSchema { Type = JsonSchemaType.String }
                 }
             }
         };

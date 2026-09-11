@@ -47,7 +47,10 @@ public class SosObservationsClientTests
         {
             request.Method.Should().Be(HttpMethod.Post);
             request.RequestUri!.PathAndQuery.Should().Contain("/observations/internal/search?");
-            ReadRequestBody(request).Should().Contain("Present");
+            var requestBody = ReadRequestBody(request);
+            requestBody.Should().Contain("Present");
+            requestBody.Should().Contain(
+                "\"artportalen\":{\"typeFilter\":\"ShowOnlyMerged\"}");
             return CreateJsonResponse("""
             {
               "skip": 0,
@@ -60,7 +63,14 @@ public class SosObservationsClientTests
         var client = new SosObservationsClient(CreateHttpClient(handler));
 
         var result = await client.ObservationsBySearchInternalAsync(
-            new SearchFilterInternalDto { OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present },
+            new SearchFilterInternalDto
+            {
+                OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present,
+                Artportalen = new ArtportalenFilterDto
+                {
+                    TypeFilter = SightingTypeFilterDto.ShowOnlyMerged
+                }
+            },
             new ObservationSearchOptions { Take = 1 },
             TestContext.Current.CancellationToken);
                 
@@ -72,8 +82,7 @@ public class SosObservationsClientTests
     {
         var handler = new StubHttpMessageHandler(request =>
         {
-            ReadRequestBody(request).Should().Be(
-                """{"typeFilter":"DoNotShowMerged","includeFilter":{"occurrenceIds":["occurrence-1"]}}""");
+            ReadRequestBody(request).Should().Be("""{"includeFilter":{"occurrenceIds":["occurrence-1"]}}""");
             return CreateJsonResponse("""{"skip":0,"take":0,"totalCount":0,"records":[]}""");
         });
         var client = new SosObservationsClient(CreateHttpClient(handler));

@@ -16,11 +16,14 @@ public class FilterExtensionsTests
     [InlineData(ExtendedFilterDto.SightingTypeFilterDto.DoNotShowSightingsInMerged, SearchFilterBase.SightingTypeFilter.DoNotShowSightingsInMerged)]
     [InlineData(ExtendedFilterDto.SightingTypeFilterDto.DoNotShowMergedIncludeReplacementChilds, SearchFilterBase.SightingTypeFilter.DoNotShowMergedIncludeReplacementChilds)]
     [InlineData(ExtendedFilterDto.SightingTypeFilterDto.ShowChildrenAndReplacements, SearchFilterBase.SightingTypeFilter.ShowChildrenAndReplacements)]
-    public void ToSearchFilter_MapsTypeFilter(
+    public void ToSearchFilter_MapsArtportalenTypeFilter(
         ExtendedFilterDto.SightingTypeFilterDto dtoValue,
         SearchFilterBase.SightingTypeFilter expected)
     {
-        var dto = new SearchFilterDto { TypeFilter = dtoValue };
+        var dto = new SearchFilterDto
+        {
+            Artportalen = new ArtportalenFilterDto { TypeFilter = dtoValue }
+        };
 
         var filter = dto.ToSearchFilter(0, ProtectionFilterDto.Public, "sv-SE");
 
@@ -38,11 +41,14 @@ public class FilterExtensionsTests
     }
 
     [Fact]
-    public void ToSearchFilterInternal_ExtendedTypeFilterOverridesTopLevelTypeFilter()
+    public void ToSearchFilterInternal_ExtendedTypeFilterOverridesArtportalenTypeFilter()
     {
         var dto = new SearchFilterInternalDto
         {
-            TypeFilter = ExtendedFilterDto.SightingTypeFilterDto.ShowOnlyMerged,
+            Artportalen = new ArtportalenFilterDto
+            {
+                TypeFilter = ExtendedFilterDto.SightingTypeFilterDto.ShowOnlyMerged
+            },
             ExtendedFilter = new ExtendedFilterDto
             {
                 TypeFilter = ExtendedFilterDto.SightingTypeFilterDto.ShowBoth

@@ -10,10 +10,9 @@ namespace SOS.Api.Contracts.Observations.Requests;
 public class SearchFilterBaseDto
 {
     /// <summary>
-    /// Controls which Artportalen observation types are included in the result.
+    /// Filters that only affect observations from Artportalen.
     /// </summary>
-    [JsonConverter(typeof(JsonStringEnumConverter))]
-    public SightingTypeFilterDto TypeFilter { get; set; } = SightingTypeFilterDto.DoNotShowMerged;
+    public ArtportalenFilterDto? Artportalen { get; set; }
 
     public int? BirdNestActivityLimit { get; set; }
     public DataProviderFilterDto? DataProvider { get; set; }
