@@ -241,7 +241,7 @@
       "Email": "anders.kinnerback@slu.se"
     },
     "CoordinateUncertaintyInMeters": 1000,
-    "CreateEventDwC": false,
+    "CreateEventDwC": true,
     "Descriptions": [
       {
         "CultureCode": "en-GB",
