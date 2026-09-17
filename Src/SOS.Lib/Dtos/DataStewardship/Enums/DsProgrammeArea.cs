@@ -36,5 +36,20 @@ public enum DsProgrammeArea
     /// Skog
     /// </summary>
     [EnumMember(Value = "Skog")]
-    Skog = 5
+    Skog = 5,
+    /// <summary>
+    /// Våtmark
+    /// </summary>
+    [EnumMember(Value = "Våtmark")]
+    Våtmark = 6,
+    /// <summary>
+    /// Sjöar och vattendrag
+    /// </summary>
+    [EnumMember(Value = "Sjöar och vattendrag")]
+    SjöarOchVattendrag = 7,
+    /// <summary>
+    /// Fisk
+    /// </summary>
+    [EnumMember(Value = "Fisk")]
+    Fisk = 8
 }
