@@ -25,6 +25,7 @@ using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Enums;
 using SOS.Lib.Models.Search.Filters;
+using SOS.Lib.Models.Search;
 using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Repositories.Processed.Interfaces;
@@ -42,7 +43,6 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
     IProcessedObservationCoreRepository
 {
     private const int ElasticSearchMaxRecords = 10000;
-    private const int MaxRequestBodyQuerySizeCacheInBytes = 20_000;
     private static readonly TimeSpan SearchTotalCountCacheDuration = TimeSpan.FromMinutes(2);
     private readonly SearchTotalCountCache? _searchTotalCountCache;
     protected readonly ITaxonManager _taxonManager;
@@ -1526,8 +1526,10 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
     }
 
     /// <inheritdoc />
-    public async Task<PagedResult<T>> GetChunkAsync<T>(SearchFilter filter, int skip, int take, bool getAllFields = false, long? knownTotalCount = null) where T : class
+    public async Task<PagedResult<T>> GetChunkAsync<T>(SearchFilter filter, int skip, int take,
+        SearchExecutionOptions? options = null) where T : class
     {
+        options ??= new SearchExecutionOptions();
         var indexNames = GetCurrentIndex(filter);
         var (query, excludeQuery) = GetCoreQueries<T>(filter);
         var sortDescriptor = filter.UseSearchAfterWithoutPit
@@ -1539,13 +1541,14 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
             .Query(q => q.Bool(b => b
                 .MustNot(excludeQuery.ToArray())
                 .Filter(query.ToArray())));
-        var trackTotalHitsUpTo = filter is SearchFilterInternal internalFilter && internalFilter.IncludeRealCount != true
+        var trackTotalHits = filter is SearchFilterInternal internalFilter && internalFilter.IncludeRealCount != true
             ? ElasticSearchMaxRecords
             : (int?)null;
-        var countCacheKey = knownTotalCount.HasValue
+        var countCacheKey = options.KnownTotalCount.HasValue
             ? null
-            : CreateSearchTotalCountCacheKey(filter, indexNames, descriptor, trackTotalHitsUpTo);
-        var totalCount = knownTotalCount;
+            : CreateSearchTotalCountCacheKey(filter, indexNames, descriptor, trackTotalHits,
+                options.UseSearchTotalCountCache);
+        var totalCount = options.KnownTotalCount;
         if (!totalCount.HasValue && countCacheKey != null &&
             _searchTotalCountCache.TryGetValue(countCacheKey, out var cachedTotalCount))
         {
@@ -1553,14 +1556,14 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
         }
 
         var searchResponse = await Client.SearchAsync<T>(descriptor
-            .Source(getAllFields ? new SourceConfig(true) : filter.Output?.Fields.ToProjection(filter is SearchFilterInternal))
+            .Source(options.GetAllFields ? new SourceConfig(true) : filter.Output?.Fields.ToProjection(filter is SearchFilterInternal))
             .From(skip)
             .Size(take)
             .Sort(sortDescriptor?.ToArray())
             .TrackTotalHits(totalCount.HasValue
                 ? new TrackHits(false)
-                : trackTotalHitsUpTo.HasValue
-                    ? new TrackHits(trackTotalHitsUpTo.Value)
+                : trackTotalHits.HasValue
+                    ? new TrackHits(trackTotalHits.Value)
                     : new TrackHits(true))
         );
 
@@ -2768,8 +2771,9 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
         SearchFilter filter,
         int take,
         string? searchAfter,
-        bool getAllFields = false) where T : class
+        SearchExecutionOptions? options = null) where T : class
     {
+        options ??= new SearchExecutionOptions();
         var indexNames = GetCurrentIndex(filter);
         var (query, excludeQuery) = GetCoreQueries<T>(filter);
         var sortDescriptor = await Client.GetSortDescriptorAsync<T, Observation>(indexNames, filter?.Output?.SortOrders);
@@ -2781,13 +2785,16 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
                 .MustNot(excludeQuery.ToArray())
                 .Filter(query.ToArray())));
 
-        var countCacheKey = CreateSearchTotalCountCacheKey(filter, indexNames, descriptor, trackTotalHitsUpTo: null);
-        long totalCount = 0;
-        var hasCachedCount = countCacheKey != null &&
-            _searchTotalCountCache.TryGetValue(countCacheKey, out totalCount);
+        var countCacheKey = options.KnownTotalCount.HasValue
+            ? null
+            : CreateSearchTotalCountCacheKey(filter, indexNames, descriptor, trackTotalHits: null,
+                options.UseSearchTotalCountCache);
+        var totalCount = options.KnownTotalCount ?? 0;
+        var hasCachedCount = options.KnownTotalCount.HasValue ||
+                             countCacheKey != null && _searchTotalCountCache.TryGetValue(countCacheKey, out totalCount);
 
         var searchResponse = await Client.SearchAsync<T>(descriptor
-                .Source(getAllFields ? new SourceConfig(true) : filter.Output?.Fields.ToProjection(filter is SearchFilterInternal))
+                .Source(options.GetAllFields ? new SourceConfig(true) : filter.Output?.Fields.ToProjection(filter is SearchFilterInternal))
                 .Size(take)
                 .Sort(sortDescriptor.ToArray())
                 .SearchAfter(searchAfterObj)
@@ -2821,9 +2828,11 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
         SearchFilter filter,
         string indexNames,
         SearchRequestDescriptor<T> descriptor,
-        int? trackTotalHitsUpTo) where T : class
+        int? trackTotalHits,
+        bool useSearchTotalCountCache) where T : class
     {
-        if (_searchTotalCountCache == null || filter.IsSearchFilterLarge(MaxRequestBodyQuerySizeCacheInBytes))
+        if (!useSearchTotalCountCache || _searchTotalCountCache == null ||
+            filter.IsSearchFilterLarge(SearchTotalCountCache.MaxCacheableQuerySizeInBytes))
         {
             return null;
         }
@@ -2833,7 +2842,7 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
         var queryJson = Client.RequestResponseSerializer.SerializeToString(descriptor);
         return (nameof(ProcessedObservationCoreRepository), "SearchTotalCount", indexNames,
             filter.ExtendedAuthorization.UserId, filter.RoleId, filter.AuthorizationApplicationIdentifier,
-            trackTotalHitsUpTo,
+            trackTotalHits,
             Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(queryJson))));
     }
 

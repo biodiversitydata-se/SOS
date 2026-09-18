@@ -1,4 +1,5 @@
 ﻿﻿using Microsoft.AspNetCore.Mvc;
+using SOS.Lib.Cache;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Exceptions;
@@ -11,6 +12,7 @@ using SOS.Lib.Models.Cache;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Enums;
+using SOS.Lib.Models.Search;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Models.Shared;
@@ -627,7 +629,9 @@ public class ObservationsController : ControllerBase
             SearchFilter searchFilter = filter.ToSearchFilter(this.GetUserId(), protectionFilter, translationCultureCode, sortBy, sortOrder);
             
 
-            PagedResult<JsonObject> result = await _observationManager.GetChunkAsync(roleId, authorizationApplicationIdentifier, searchFilter, skip, take);
+            PagedResult<JsonObject> result = await _observationManager.GetChunkAsync(roleId,
+                authorizationApplicationIdentifier, searchFilter, skip, take,
+                options: CreateSearchExecutionOptions());
             if (outputFormat == OutputFormatDto.Json)
             {
                 var dto = result?.ToPagedResultDto(result.Records);
@@ -764,7 +768,9 @@ public class ObservationsController : ControllerBase
                 sortBy = sortFieldValidationResult.Value.First();
             }
             var searchFilter = filter.ToSearchFilter(this.GetUserId(), protectionFilter, translationCultureCode, sortBy, sortOrder);
-            var result = await _observationManager.GetChunkBySearchAfterAsync(roleId, authorizationApplicationIdentifier, searchFilter, take, cursor);
+            var result = await _observationManager.GetChunkBySearchAfterAsync(roleId,
+                authorizationApplicationIdentifier, searchFilter, take, cursor,
+                options: CreateSearchExecutionOptions());
 
             if (result == null)
             {
@@ -1854,7 +1860,9 @@ public class ObservationsController : ControllerBase
                     searchFilter.Output.Fields = outputFields;
                 }
             }
-            var result = await _observationManager.GetChunkAsync(roleId, authorizationApplicationIdentifier, searchFilter, skip, take);
+            var result = await _observationManager.GetChunkAsync(roleId,
+                authorizationApplicationIdentifier, searchFilter, skip, take,
+                options: CreateSearchExecutionOptions());
             if (result == null)
             {
                 throw new Exception("Something went wrong when your query was executed. Make sure your filter is correct.");
@@ -2368,6 +2376,15 @@ public class ObservationsController : ControllerBase
         {
             _logger.LogError(e, "LogUserInformation error");
         }
+    }
+
+    private SearchExecutionOptions CreateSearchExecutionOptions()
+    {
+        return new SearchExecutionOptions
+        {
+            UseSearchTotalCountCache = Request.ContentLength is not >
+                                       SearchTotalCountCache.MaxCacheableQuerySizeInBytes
+        };
     }
 
     private ICollection<string> EnsureCoordinatesIsRetrievedFromDb(ICollection<string> outputFields)

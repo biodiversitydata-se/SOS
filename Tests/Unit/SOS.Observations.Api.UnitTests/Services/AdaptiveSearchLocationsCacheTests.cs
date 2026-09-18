@@ -5,6 +5,7 @@ using Moq;
 using SOS.Lib.Dtos.Enum;
 using SOS.Lib.Dtos.Filter;
 using SOS.Lib.Models.Gis;
+using SOS.Lib.Models.Search;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Gis;
@@ -66,7 +67,8 @@ public class AdaptiveSearchLocationsCacheTests
             .ReturnsAsync((int? roleId, string application, SearchFilter filter) => new PreparedObservationFilter(filter));
         manager.Setup(m => m.GetCountAndExtentAsync(It.IsAny<PreparedObservationFilter>(), true))
             .ReturnsAsync((1L, (LatLonBoundingBox?)null, 1L));
-        manager.Setup(m => m.GetChunkAsync(It.IsAny<PreparedObservationFilter>(), 0, 100, 1L))
+        manager.Setup(m => m.GetChunkAsync(It.IsAny<PreparedObservationFilter>(), 0, 100,
+                It.Is<SearchExecutionOptions>(o => o.KnownTotalCount == 1L)))
             .ReturnsAsync(new PagedResult<JsonObject>
             {
                 TotalCount = 1,

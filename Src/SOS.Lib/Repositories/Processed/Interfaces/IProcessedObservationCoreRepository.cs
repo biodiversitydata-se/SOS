@@ -6,6 +6,7 @@ using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Enums;
 using SOS.Lib.Models.Search.Filters;
+using SOS.Lib.Models.Search;
 using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Models.Shared;
 
@@ -343,10 +344,10 @@ public interface IProcessedObservationCoreRepository : IProcessRepositoryBase<Ob
     /// <param name="filter"></param>
     /// <param name="skip"></param>
     /// <param name="take"></param>
-    /// <param name="getAllFields">If true all observation fields will be retrieved.</param>
-    /// <param name="knownTotalCount">Count already obtained for this filter. When supplied, skips hit counting and reuses this count.</param>
+    /// <param name="options">Technical options controlling fields, known count and total-count caching.</param>
     /// <returns></returns>
-    Task<PagedResult<T>> GetChunkAsync<T>(SearchFilter filter, int skip, int take, bool getAllFields = false, long? knownTotalCount = null) where T : class;
+    Task<PagedResult<T>> GetChunkAsync<T>(SearchFilter filter, int skip, int take,
+        SearchExecutionOptions? options = null) where T : class;
 
     Task<LocationRepresentativeResult<T>> GetLocationRepresentativeChunkAsync<T>(
         SearchFilter filter,
@@ -361,13 +362,13 @@ public interface IProcessedObservationCoreRepository : IProcessRepositoryBase<Ob
     /// <param name="filter">Filter used to limit the search.</param>
     /// <param name="take">Max number of observations to return.</param>
     /// <param name="searchAfter">Sort values from the previous page's last document. Pass null for the first request. This value is base64-encoded.</param>
-    /// <param name="getAllFields">If true all observation fields will be retrieved.</param>
+    /// <param name="options">Technical options controlling fields and total-count caching.</param>
     /// <returns>A result containing the records and the searchAfter values for the next page.</returns>
     Task<SearchAfterResult<T, string>> GetChunkBySearchAfterAsync<T>(
         SearchFilter filter,
         int take,
         string? searchAfter,
-        bool getAllFields = false) where T : class;
+        SearchExecutionOptions? options = null) where T : class;
 
     /// <summary>
     /// Gets a single observation

@@ -5,6 +5,7 @@ using SOS.Lib.Extensions.Dto;
 using SOS.Lib.Gis;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.Search.Filters;
+using SOS.Lib.Models.Search;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Managers;
 using SOS.Observations.Api.Services.AdaptiveSearch;
@@ -225,7 +226,7 @@ internal sealed class AdaptiveSearchLocationsService : IAdaptiveSearchLocationsS
             preparedFilter,
             0,
             request.ObservationsLimit,
-            knownTotalCount: countAndExtentResult.Count);
+            options: new SearchExecutionOptions { KnownTotalCount = countAndExtentResult.Count });
         timings.ElasticsearchObservations = observationsStopwatch.Elapsed;
         if (result == null)
         {

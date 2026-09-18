@@ -15,6 +15,7 @@ using SOS.Lib.Models.Log;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Enums;
 using SOS.Lib.Models.Search.Filters;
+using SOS.Lib.Models.Search;
 using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Observations.Api.Managers.Interfaces;
@@ -160,8 +161,9 @@ public class ObservationManager : IObservationManager
         return new PreparedObservationFilter(filter);
     }
 
-    public Task<PagedResult<JsonObject>> GetChunkAsync(PreparedObservationFilter filter, int skip, int take, long? knownTotalCount = null)
-        => GetChunkCoreAsync(null, null, filter.Filter, skip, take, knownTotalCount, prepareFilter: false);
+    public Task<PagedResult<JsonObject>> GetChunkAsync(PreparedObservationFilter filter, int skip, int take,
+        SearchExecutionOptions? options = null)
+        => GetChunkCoreAsync(null, null, filter.Filter, skip, take, options, prepareFilter: false);
 
     public Task<LocationRepresentativeResult<JsonObject>> GetLocationRepresentativeChunkAsync(PreparedObservationFilter filter, int take, string collapseField)
         => GetLocationRepresentativeChunkCoreAsync(null, null, filter.Filter, take, collapseField, prepareFilter: false);
@@ -179,18 +181,19 @@ public class ObservationManager : IObservationManager
         SearchFilter filter,
         int skip,
         int take,
-        long? knownTotalCount = null)
-        => GetChunkCoreAsync(roleId, authorizationApplicationIdentifier, filter, skip, take, knownTotalCount, prepareFilter: true);
+        SearchExecutionOptions? options = null)
+        => GetChunkCoreAsync(roleId, authorizationApplicationIdentifier, filter, skip, take, options,
+            prepareFilter: true);
 
     private async Task<PagedResult<JsonObject>> GetChunkCoreAsync(
         int? roleId, string authorizationApplicationIdentifier, SearchFilter filter,
-        int skip, int take, long? knownTotalCount, bool prepareFilter)
+        int skip, int take, SearchExecutionOptions? options, bool prepareFilter)
     {
         try
         {
             if (prepareFilter) await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
             var response =
-                await _processedObservationRepository.GetChunkAsync<JsonObject>(filter, skip, take, knownTotalCount: knownTotalCount);
+                await _processedObservationRepository.GetChunkAsync<JsonObject>(filter, skip, take, options);
             response.Records = await PostProcessObservationsAsync(filter, filter.ExtendedAuthorization.ProtectionFilter, response.Records, filter.FieldTranslationCultureCode);
             return response;
         }
@@ -258,12 +261,14 @@ public class ObservationManager : IObservationManager
         string authorizationApplicationIdentifier,
         SearchFilter filter,
         int take,
-        string? searchAfter)
+        string? searchAfter,
+        SearchExecutionOptions? options = null)
     {
         try
         {
             await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
-            var response = await _processedObservationRepository.GetChunkBySearchAfterAsync<JsonObject>(filter, take, searchAfter);
+            var response = await _processedObservationRepository.GetChunkBySearchAfterAsync<JsonObject>(filter, take,
+                searchAfter, options);
             response.Records = await PostProcessObservationsAsync(filter, filter.ExtendedAuthorization.ProtectionFilter, response.Records, filter.FieldTranslationCultureCode);
             return response;
         }

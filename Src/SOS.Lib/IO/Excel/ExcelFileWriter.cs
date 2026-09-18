@@ -12,6 +12,7 @@ using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models;
 using SOS.Lib.Models.Export;
 using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.Search;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Services.Interfaces;
@@ -288,7 +289,8 @@ public class ExcelFileWriter : FileWriterBase, IExcelFileWriter
             Models.Search.Result.SearchAfterResult<Observation, ICollection<FieldValue>> searchResult = null;
             if (useFastSearch)
             {
-                fastSearchResult = await _processedObservationRepository.GetChunkAsync<dynamic>(filter, 0, FastSearchLimit, knownTotalCount: expectedNoOfObservations);
+                fastSearchResult = await _processedObservationRepository.GetChunkAsync<dynamic>(filter, 0,
+                    FastSearchLimit, new SearchExecutionOptions { KnownTotalCount = expectedNoOfObservations });
             }
             else
             {

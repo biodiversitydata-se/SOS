@@ -7,6 +7,7 @@ using SOS.Lib.Exceptions;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Gis;
+using SOS.Lib.Models.Search;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Repositories.Processed.Interfaces;
@@ -30,7 +31,8 @@ public class PreparedObservationFilterTests
             .Returns(Task.CompletedTask);
         repository.Setup(r => r.GetCountAndExtentAsync(filter, false, true))
             .ReturnsAsync((0L, (LatLonBoundingBox?)null, 0L));
-        repository.Setup(r => r.GetChunkAsync<JsonObject>(filter, 0, 10, false, 0L))
+        repository.Setup(r => r.GetChunkAsync<JsonObject>(filter, 0, 10,
+                It.Is<SearchExecutionOptions>(o => o.KnownTotalCount == 0L)))
             .ReturnsAsync(new PagedResult<JsonObject> { Records = Array.Empty<JsonObject>() });
         repository.Setup(r => r.GetLocationRepresentativeChunkAsync<JsonObject>(filter, 10, "location.locationId", false))
             .ReturnsAsync(new LocationRepresentativeResult<JsonObject> { Records = Array.Empty<JsonObject>() });
@@ -39,7 +41,8 @@ public class PreparedObservationFilterTests
 
         var prepared = await manager.PrepareObservationFilterAsync(42, "app", filter);
         await manager.GetCountAndExtentAsync(prepared);
-        await manager.GetChunkAsync(prepared, 0, 10, 0L);
+        var options = new SearchExecutionOptions { KnownTotalCount = 0L };
+        await manager.GetChunkAsync(prepared, 0, 10, options);
         await manager.GetLocationRepresentativeChunkAsync(prepared, 10, "location.locationId");
         await manager.GetGeogridTileAggregationAsync(prepared, 8);
 
@@ -47,12 +50,12 @@ public class PreparedObservationFilterTests
         Assert.Equal(42, prepared.Filter.RoleId);
         filters.Verify(m => m.PrepareFilterAsync(42, "app", filter, "Sighting", 0, false, false, true, false), Times.Once);
         repository.Verify(r => r.GetCountAndExtentAsync(filter, false, true), Times.Once);
-        repository.Verify(r => r.GetChunkAsync<JsonObject>(filter, 0, 10, false, 0L), Times.Once);
+        repository.Verify(r => r.GetChunkAsync<JsonObject>(filter, 0, 10, options), Times.Once);
         repository.Verify(r => r.GetLocationRepresentativeChunkAsync<JsonObject>(filter, 10, "location.locationId", false), Times.Once);
         repository.Verify(r => r.GetGeogridTileAggregationAsync(filter, 8), Times.Once);
 
         await manager.GetCountAndExtentAsync(42, "app", filter);
-        await manager.GetChunkAsync(42, "app", filter, 0, 10, 0L);
+        await manager.GetChunkAsync(42, "app", filter, 0, 10, options);
         await manager.GetLocationRepresentativeChunkAsync(42, "app", filter, 10, "location.locationId");
         await manager.GetGeogridTileAggregationAsync(42, "app", filter, 8);
         filters.Verify(m => m.PrepareFilterAsync(42, "app", filter, "Sighting", 0, false, false, true, false), Times.Exactly(5));

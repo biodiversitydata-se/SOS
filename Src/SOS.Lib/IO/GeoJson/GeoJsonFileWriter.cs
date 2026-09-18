@@ -14,6 +14,7 @@ using SOS.Lib.Models;
 using SOS.Lib.Models.Export;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.Search;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Repositories.Processed.Interfaces;
@@ -552,7 +553,8 @@ public class GeoJsonFileWriter : FileWriterBase, IGeoJsonFileWriter
         SearchAfterResult<Observation, ICollection<FieldValue>> searchResult = null;
         if (useFastSearch)
         {
-            fastSearchResult = await _processedObservationRepository.GetChunkAsync<Observation>(filter, 0, FastSearchLimit, knownTotalCount: expectedNoOfObservations);
+            fastSearchResult = await _processedObservationRepository.GetChunkAsync<Observation>(filter, 0,
+                FastSearchLimit, new SearchExecutionOptions { KnownTotalCount = expectedNoOfObservations });
         }
         else
         {
