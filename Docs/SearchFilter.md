@@ -1,4 +1,4 @@
-﻿# Search filter parameters
+# Search filter parameters
 This page provides information about how to use the search filter parameters.
 
 - [Data provider filter](#data-provider-filter)
@@ -600,7 +600,7 @@ This filter returns observations that are reported by the user specified in the 
 This filter returns observations that are observed by the user specified in the authorization access token.
 ```json
 {
-    "reportedByMe": true
+    "observedByMe": true
 }
 ```
 
