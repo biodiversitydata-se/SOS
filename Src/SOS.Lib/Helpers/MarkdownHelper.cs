@@ -734,6 +734,8 @@ public class MarkdownHelper : IMarkdownHelper
             var sb = new StringBuilder();
             AddHeader(sb, $"Filter {DateTime.Now:yyyy-MM-dd HH:mm}", 1);
 
+            TryAddParagraph(sb, null, "Den här filen visar vilka filter-parametrar som SOS har använt för denna export. Det kan förekomma parametrar vars standardvärde visas om inte användaren explicit angett något annan. T.ex. kan det stå \"only records with media: No\" om inte användaren har angett att bara fynd med media ska komma med.");
+
             TryAddParagraph(sb, "Occurrence Status", filter.OccurrenceStatus.HasValue ? filter.OccurrenceStatus.Value switch
             {
                 OccurrenceStatusFilterValuesDto.Absent => "Absent",
