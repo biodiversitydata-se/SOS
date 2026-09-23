@@ -2,6 +2,7 @@
 using SOS.DataStewardship.Api.Contracts.Enums;
 using SOS.DataStewardship.Api.Contracts.Models;
 using SOS.DataStewardship.Api.Extensions;
+using SOS.Lib.Models.Search;
 
 namespace SOS.DataStewardship.Api.Application.Managers;
 
@@ -195,7 +196,8 @@ public class DataStewardshipManager : IDataStewardshipManager
         filter.IsPartOfDataStewardshipDataset = true;
         filter.Output.Fields = _observationOccurrenceOutputFields;
         await _filterManager.PrepareFilterAsync(null, null, filter);
-        var pageResult = await _processedObservationCoreRepository.GetChunkAsync<Observation>(filter, skip, take, true);
+        var pageResult = await _processedObservationCoreRepository.GetChunkAsync<Observation>(filter, skip, take,
+            new SearchExecutionOptions { GetAllFields = true });
         var observations = pageResult.Records;
         var occurrences = observations.Select(x => x.ToOccurrenceModel(responseCoordinateSystem)).ToList();
 

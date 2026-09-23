@@ -4,6 +4,7 @@ using Moq;
 using NetTopologySuite.Geometries;
 using SOS.Lib.Dtos.Enum;
 using SOS.Lib.Dtos.Filter;
+using SOS.Lib.Models.Search;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Observations.Api.IntegrationTests.Extensions;
@@ -1203,11 +1204,11 @@ public class AdaptiveSearchLocationsTests : TestBase
                             It.IsAny<PreparedObservationFilter>(),
                             It.IsAny<int>(),
                             It.IsAny<int>(),
-                            It.IsAny<long?>()))
-                        .Returns((PreparedObservationFilter filter, int skip, int take, long? knownTotalCount) =>
+                            It.IsAny<SearchExecutionOptions>()))
+                        .Returns((PreparedObservationFilter filter, int skip, int take, SearchExecutionOptions options) =>
                         {
                             probe.ChunkCalls++;
-                            return inner.GetChunkAsync(filter, skip, take, knownTotalCount);
+                            return inner.GetChunkAsync(filter, skip, take, options);
                         });
                     mock.Setup(manager => manager.GetGeogridTileAggregationAsync(
                             It.IsAny<PreparedObservationFilter>(),

@@ -9,6 +9,11 @@ namespace SOS.Api.Contracts.Observations.Requests;
 /// </summary>
 public class SearchFilterBaseDto
 {
+    /// <summary>
+    /// Filters that only affect observations from Artportalen.
+    /// </summary>
+    public ArtportalenFilterDto? Artportalen { get; set; }
+
     public int? BirdNestActivityLimit { get; set; }
     public DataProviderFilterDto? DataProvider { get; set; }
     public DataStewardshipFilterDto? DataStewardship { get; set; }

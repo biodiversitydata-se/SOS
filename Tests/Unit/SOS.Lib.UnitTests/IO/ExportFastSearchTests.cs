@@ -9,6 +9,7 @@ using SOS.Lib.IO.Excel;
 using SOS.Lib.IO.GeoJson;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.Search;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Services.Interfaces;
@@ -42,9 +43,11 @@ public class ExportFastSearchTests
         if (count <= 2500)
         {
             if (format == ExportFormat.GeoJson)
-                repository.Setup(r => r.GetChunkAsync<Observation>(filter, 0, 2500, false, count)).ThrowsAsync(stop);
+                repository.Setup(r => r.GetChunkAsync<Observation>(filter, 0, 2500,
+                    It.Is<SearchExecutionOptions>(o => o.KnownTotalCount == count))).ThrowsAsync(stop);
             else
-                repository.Setup(r => r.GetChunkAsync<object>(filter, 0, 2500, false, count)).ThrowsAsync(stop);
+                repository.Setup(r => r.GetChunkAsync<object>(filter, 0, 2500,
+                    It.Is<SearchExecutionOptions>(o => o.KnownTotalCount == count))).ThrowsAsync(stop);
         }
         else
         {

@@ -2,6 +2,7 @@
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Search.Enums;
+using SOS.Lib.Models.Search;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Dtos;
@@ -19,7 +20,8 @@ public interface IObservationManager
 {
     /// <summary>Prepares the filter and authorization context once for a sequence of queries in one request.</summary>
     Task<PreparedObservationFilter> PrepareObservationFilterAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilter filter);
-    Task<PagedResult<JsonObject>> GetChunkAsync(PreparedObservationFilter filter, int skip, int take, long? knownTotalCount = null);
+    Task<PagedResult<JsonObject>> GetChunkAsync(PreparedObservationFilter filter, int skip, int take,
+        SearchExecutionOptions? options = null);
     Task<LocationRepresentativeResult<JsonObject>> GetLocationRepresentativeChunkAsync(PreparedObservationFilter filter, int take, string collapseField);
     Task<GeoGridTileResult> GetGeogridTileAggregationAsync(PreparedObservationFilter filter, int precision);
     Task<(long Count, LatLonBoundingBox? Extent, long EstimatedLocationCount)> GetCountAndExtentAsync(PreparedObservationFilter filter, bool includeExtent = true);
@@ -46,9 +48,10 @@ public interface IObservationManager
     /// <param name="filter"></param>
     /// <param name="skip"></param>
     /// <param name="take"></param>
-    /// <param name="knownTotalCount">Count already obtained for this filter. When supplied, skips hit counting and reuses this count.</param>
+    /// <param name="options">Technical options controlling fields, known count and total-count caching.</param>
     /// <returns></returns>
-    Task<PagedResult<JsonObject>> GetChunkAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilter filter, int skip, int take, long? knownTotalCount = null);
+    Task<PagedResult<JsonObject>> GetChunkAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilter filter,
+        int skip, int take, SearchExecutionOptions? options = null);
 
     Task<LocationRepresentativeResult<JsonObject>> GetLocationRepresentativeChunkAsync(
         int? roleId,
@@ -69,13 +72,15 @@ public interface IObservationManager
     /// <param name="filter">Filter used to limit the search.</param>
     /// <param name="take">Max number of observations to return.</param>
     /// <param name="searchAfter">Base64-encoded sort values from the previous page's last document. Pass null for the first request.</param>
+    /// <param name="options">Technical options controlling fields and total-count caching.</param>
     /// <returns>A result containing the records and the searchAfter values for the next page.</returns>
     Task<SearchAfterResult<JsonObject, string>> GetChunkBySearchAfterAsync(
         int? roleId,
         string authorizationApplicationIdentifier,
         SearchFilter filter,
         int take,
-        string? searchAfter);
+        string? searchAfter,
+        SearchExecutionOptions? options = null);
 
     /// <summary>
     /// Get observations by scroll

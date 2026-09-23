@@ -11055,7 +11055,10 @@
           "Jordbruksmark",
           "KustOchHav",
           "Landskap",
-          "Skog"
+          "Skog",
+          "Våtmark",
+          "SjöarOchVattendrag",
+          "Fisk"
         ],
         "type": "string",
         "description": "The program area within environmental monitoring that the dataset belongs to."

@@ -8,6 +8,7 @@ namespace SOS.Lib.Cache;
 public sealed class SearchTotalCountCache : IDisposable
 {
     public const int MaxEntries = 50_000;
+    public const int MaxCacheableQuerySizeInBytes = 20_000;
 
     private readonly MemoryCache _cache;
 

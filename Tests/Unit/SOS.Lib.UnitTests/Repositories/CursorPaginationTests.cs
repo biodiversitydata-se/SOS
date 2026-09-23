@@ -12,6 +12,7 @@ using SOS.Lib.Enums;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.Search;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Repositories.Processed;
 using System.Collections.Concurrent;
@@ -100,6 +101,18 @@ public class CursorPaginationTests
     }
 
     [Fact]
+    public async Task CursorSearchCanReuseKnownTotalCount()
+    {
+        using var fixture = new Fixture();
+
+        var result = await fixture.Repository.GetChunkBySearchAfterAsync<Observation>(CreateFilter(), 100, null,
+            new SearchExecutionOptions { KnownTotalCount = 42 });
+
+        Assert.Equal(42, result.TotalCount);
+        Assert.False(Assert.Single(fixture.Searches).GetProperty("track_total_hits").GetBoolean());
+    }
+
+    [Fact]
     public async Task CacheExpiresAfterTwoMinutesEvenWithContinuationReads()
     {
         using var fixture = new Fixture();
@@ -127,6 +140,21 @@ public class CursorPaginationTests
         var next = await fixture.Repository.GetChunkBySearchAfterAsync<Observation>(filter, 100, first.SearchAfter);
 
         Assert.Equal(200, next.TotalCount);
+        Assert.True(fixture.Searches[1].GetProperty("track_total_hits").GetBoolean());
+    }
+
+    [Fact]
+    public async Task RequestPolicyCanBypassTheCountCache()
+    {
+        using var fixture = new Fixture();
+        var filter = CreateFilter();
+        await fixture.Repository.GetChunkAsync<Observation>(filter, 0, 100);
+        fixture.Invoker.Total = 200;
+
+        var result = await fixture.Repository.GetChunkAsync<Observation>(filter, 100, 100,
+            new SearchExecutionOptions { UseSearchTotalCountCache = false });
+
+        Assert.Equal(200, result.TotalCount);
         Assert.True(fixture.Searches[1].GetProperty("track_total_hits").GetBoolean());
     }
 

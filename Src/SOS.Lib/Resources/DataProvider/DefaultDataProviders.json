@@ -241,7 +241,56 @@
       "Email": "anders.kinnerback@slu.se"
     },
     "CoordinateUncertaintyInMeters": 1000,
-    "CreateEventDwC": false,
+    "CreateEventDwC": true,
+    "DataStewardship": {
+      "identifier": "Sjöprovfiskedatabasen",
+      "license": "CC0",
+      "title": "NORS – Nationellt register över sjöprovfisken",
+      "dataStewardship": "Datavärdskap Fisk",
+      "project": [
+        {
+          "projectId": "",
+          "projectCode": "",
+          "projectType": ""
+        }
+      ],
+      "programmeArea": "Sjöar och vattendrag",
+      "assigner": {
+        "organisationCode": " Havs- och vattenmyndigheten",
+        "organisationID": ""
+      },
+      "creator": [
+        {
+          "organisationCode": "Institutionen för akvatiska resurser, SLU",
+          "organisationID": ""
+        }
+      ],
+      "ownerinstitutionCode": {
+        "organisationCode": "Havs- och vattenmyndigheten",
+        "organisationID": ""
+      },
+      "publisher": {
+        "organisationCode": "Institutionen för akvatiska resurser, SLU",
+        "organisationID": ""
+      },
+      "purpose": "Nationell miljöövervakning, regional miljöövervakning",
+      "description": "Resultat från nätprovfisken i sötvatten med relativa mått på antal och vikt per art och nät",
+      "methodology": [
+        {
+          "methodologyName": "Provfiske i sjöar",
+          "methodologyDescription": "Undersökningstypen ’Provfiske i sjöar’ är en stratifierad provtagning av fisksamhället med översiktsnät bestående av flera olika maskstorlekar. Beskrivs i Övervakningsmanual ’Provfiske i sjöar’ (se länk till pdf).",
+          "methodologyLink": "https://www.havochvatten.se/download/18.5665afb41572747bd3289f6f/1708688555103/undersokningstyp-provfiske-i-sjoar-version-1-4.pdf",
+          "speciesList": ""
+        }
+      ],
+      "startDate": "1952-08-11",
+      "endDate": "",
+      "spatial": "Sverige",
+      "accessRights": "publik",
+      "descriptionAccessRights": "",
+      "metadatalanguage": "Swedish",
+      "language": "Swedish"
+    },
     "Descriptions": [
       {
         "CultureCode": "en-GB",
@@ -1485,7 +1534,7 @@
         {
           "methodologyName": "Inventering av häckande kustfåglar",
           "methodologyDescription": "Kustfågelrutorna inventeras en gång per år under häckningssäsongen. Alla rutor är i grunden 2 x 2km stora, men vissa har delvis ritats om för att inkludera hela öar som annars ligger tvärs över rutans gräns. Detta innebär att vissa rutor har en större area. Rutorna inventeras huvudsakligen från båt och alla öar inom en ruta söks av från max 50 meters avstånd, men vissa förutbestämda öar landstigs också varje år. Alla fåglar av förutbestämda arter inom en ruta ska räknas, oavsett om de observeras på/inom 100m från en ö, eller ute på öppet hav. Båten körs på ett sätt som minimerar körsträckan, och därför söks öppet hav av endast på väg till eller från öar. Inventerarna gör sitt bästa för att avgöra vilka fåglar som är innanför eller utanför rutans gränser. Inventerarna kan välja om de vill rapportera antal fåglar observerade på/inom 100m från en ö vs observerade ute på öppet hav, men antalen som presenteras i den här datamängden är det totala antalet för hela rutan. Förekomst av vissa däggdjur noteras också. De två rutorna I0002 och I0003 (som inkluderar de fågelrika öarna Stora och Lilla Karlsö) inventeras inte i sin helhet, utan stickprov tas av de verkliga förekomsterna. Av inventeringspraktiska orsaker ingår inte sillgrissla och tordmule bland de arter som inventeras på Stora Karlsö (I0002) inom den nationella kustfågelinventeringen. Dock inventeras sillgrissla inom ramen för Baltic Seabird Project. Allt eftersom siffrorna sammanställts så ingår resultaten från de räkningarna i denna datamängd. Baltic Seabird Project inventerar antalet par. Paren har omvandlats till antal individer genom att multiplicera dem med 2. Data för tordmule på Stora Karlsö (I0002) saknas. Alla fågelindivider förutom pulli och ungfåglar räknas. Dock räknas ejderpulli sedan 2017 i åtta av de 14 länen. År 2018 anslöt sig även Halland och Uppsala och 2020 tillkom Gävleborg, Norrbotten och Västerbotten, vilket innebär att ejderpulli nu inventeras i 13 av 14 län. Där ejderpulli räknas ska den dominerande storleksklassen av dessa också rapporteras.",
-          "methodologyLink": "https://www.fageltaxering.lu.se/inventera#kust"          
+          "methodologyLink": "https://www.fageltaxering.lu.se/inventera#kust"
         }
       ],
       "startDate": "2015-05-15",
@@ -1615,7 +1664,7 @@
         {
           "methodologyName": "BIN F 42.07",
           "methodologyDescription": "En sommarpunktrutt består av 20 separata punkter. Punktrutter är personliga och punkternas placering bestäms av inventeraren som startar upp rutten. För att minimera dubbelräkning så ska punkterna ligga minst 200m ifrån varandra i tät skog och minst 300m i öppen terräng. Sommarpunktrutter inventeras en gång om året under häckningssäsongen (april–juni). Rekommendationen för nyuppstartade rutter är dock 15 maj–15 juni i Götaland och Svealand, och 1–30 juni i norra Sverige. Inventering av en rutt ska helst ske +/- 5 dagar från när den inventerades det första året. Inventeringen ska starta vid samma tid i förhållande till soluppgången som den gjordes första gången, +/- upp till 30 minuter, och tidig morgonstart rekommenderas. De 20 punkterna ska inventeras i samma ordning varje gång, men en rutt måste inte inventeras varje år. Eftersom de allra flesta rutterna är personliga så inventeras de inte längre när inventeraren avslutar sin rutt. Men precis som rutter kan avslutas så kan nya rutter startas. Fåglar räknas medan inventeraren står stilla i 5 minuter på varje punkt. Alla fåglar som syns eller hörs ska rapporteras oavsett på vilket avstånd från punkten de befinner sig. Endast fåglar som kan identifieras till art ska inkluderas, förutom korsnäbbar som, om nödvändigt, får rapporteras som släkte. Inventerarens färdsätt mellan punkterna rapporteras också: till fots eller på skidor; cykel eller moped; bil eller MC; annat.",
-          "methodologyLink": "https://www.fageltaxering.lu.se/inventera#punkt"          
+          "methodologyLink": "https://www.fageltaxering.lu.se/inventera#punkt"
         }
       ],
       "startDate": "1975-04-12",
@@ -1745,7 +1794,7 @@
         {
           "methodologyName": "Fåglar: Linjetaxering, samt kombinerad punkt- och linjetaxering",
           "methodologyDescription": "Standardrutterna är kvadratiska i sin form och 8 km långa. De inventeras med en kombination av punkttaxering och linjetaxering: åtta 5-minuters punktstopp och åtta km-sträckor. Alla dessa rutter ligger med en fast position. Från startpunkten går rutten 2 km norrut, 2 km österut, 2 km söderut och 2 km västerut och då är man tillbaka till startpunkten. Punkträkning sker i kvadratens hörn och mitt emellan hörnen. Linjetaxering sker längs km-sträckorna mellan punkterna. Vid punkterna skall alla hörda och sedda fåglar och däggdjur räknas under fem minuter (oberoende av vad som noterats på linje). Längs linjerna skall alla hörda och sedda fåglar och däggdjur räknas medan man går långsamt samt stannar, lyssnar och spanar efter behov. Se mer på http://www.fageltaxering.lu.se/inventera/metoder/standardrutter/metodik-standardrutter eller i övervakningsmanualen.",
-          "methodologyLink": "https://www.naturvardsverket.se/globalassets/vagledning/miljoovervakning/handledning/undersokningstyper/faglar-linjetax-o-punkt-linje-utypv-20160321.pdf"          
+          "methodologyLink": "https://www.naturvardsverket.se/globalassets/vagledning/miljoovervakning/handledning/undersokningstyper/faglar-linjetax-o-punkt-linje-utypv-20160321.pdf"
         }
       ],
       "startDate": "1996-05-24",
@@ -1888,7 +1937,7 @@
         {
           "methodologyName": "Inventering av häckande kustfåglar",
           "methodologyDescription": "Använd metod är en modifikation av övervakningsmanualen Inventering av häckande kustfåglar. Delprogrammets lokaler togs fram ur ett 2x2km-rutnät där fyra intill varandra liggande rutor grupperades ihop till block. Inventeringsrutor innehåller minst 1 ö och fastlandet inventeras inte. Under 2010-2014 inventerades ett antal ”permanenta” block varje år, och varje år slumpades ytterligare ett antal block fram för inventering det specifika året. Fr.o.m. 2015 inventeras endast de tidigare permanenta blocken men nu på en 4-årig rotation. Utöver dessa inventeras årligen alla rutor från Nationella kustfågelinventeringen som ligger inom studieområdet. Totalt 28½ block (alltså 114 regionala rutor) och 65 nationella rutor. I varje ruta inventeras fåglar per räkningszon, d.v.s. en ö (eller grupp av små öar som ligger nära varandra) plus en 100m-buffer av hav runt ön. Endast den del av en räkningszon som ligger innanför inventeringsrutans gränser inventeras. Inventering sker mestadels till båts, men kala öar utan träd landstigs när vädret tillåter. Observerade fåglar rapporteras alltid med art, antal och häckningskriterium, men också ålder och kön när det är möjligt. Varje lokal inventeras en gång per år (25 maj till 25 juni), men start- och slutdatum i respektive län varierar beroende på när häckningssäsongen börjar där. Obs: Västernorrland och Västerbotten ingick inte i delprogrammet förrän 2011.",
-          "methodologyLink": "https://www.naturvardsverket.se/4ac656/globalassets/vagledning/miljoovervakning/handledning/undersokningstyper/kustfaglar.pdf"          
+          "methodologyLink": "https://www.naturvardsverket.se/4ac656/globalassets/vagledning/miljoovervakning/handledning/undersokningstyper/kustfaglar.pdf"
         }
       ],
       "startDate": "2010-05-31",

@@ -202,7 +202,13 @@ public class RepositoryBase<TEntity, TKey> : IRepositoryBase<TEntity, TKey> wher
             new MongoDatabaseSettings
             {
                 WriteConcern = WriteConcern.WMajority,
-                ReadConcern = ReadConcern.Majority
+                ReadConcern = ReadConcern.Majority,
+                // Majority read concern guarantees durability, but it does not
+                // guarantee that a secondary has applied the latest collection
+                // rename/drop. Read from the primary when verifying collection
+                // replacement to avoid querying a collection UUID that is being
+                // invalidated as the DDL operation reaches a lagging secondary.
+                ReadPreference = ReadPreference.Primary
             });
     }
 

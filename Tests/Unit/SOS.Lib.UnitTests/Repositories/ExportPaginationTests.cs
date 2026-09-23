@@ -10,6 +10,7 @@ using SOS.Lib.Enums;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.Search;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Repositories.Processed;
 using System.Collections.Concurrent;
@@ -113,7 +114,8 @@ public class ExportPaginationTests
         var filter = new SearchFilter(123, ProtectionFilter.BothPublicAndSensitive) { UseSearchAfterWithoutPit = true };
         filter.Output.SortOrders = new[] { new SortOrderFilter { SortBy = "event.eventId", SortOrder = SearchSortOrder.Asc } };
         if (fastSearch)
-            await repository.GetChunkAsync<Observation>(filter, 0, 2500, knownTotalCount: 42);
+            await repository.GetChunkAsync<Observation>(filter, 0, 2500,
+                new SearchExecutionOptions { KnownTotalCount = 42 });
         else
             await repository.GetObservationsBySearchAfterAsync<Observation>(filter);
 
