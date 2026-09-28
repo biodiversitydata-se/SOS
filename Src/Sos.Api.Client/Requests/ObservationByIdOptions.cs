@@ -12,6 +12,7 @@ public sealed class ObservationByIdOptions : SosRoleRequestOptions
     public string TranslationCultureCode { get; set; } = "sv-SE";
 
     /// <summary>Controls the use of the sensitive-observation index.</summary>
+    [Obsolete("Use ProtectionFilter instead.")]
     public bool SensitiveObservations { get; set; }
 
     /// <summary>
