@@ -1,4 +1,4 @@
-using SOS.Api.Contracts.Observations.Requests;
+﻿using SOS.Api.Contracts.Observations.Requests;
 
 namespace SOS.Api.Client.Requests;
 
@@ -14,6 +14,8 @@ public sealed class ObservationByIdOptions : SosRoleRequestOptions
     /// <summary>Controls the use of the sensitive-observation index.</summary>
     public bool SensitiveObservations { get; set; }
 
+    public ProtectionFilterDto ProtectionFilter { get; set; }
+
     /// <summary>Controls resolution of generalized observations when the caller is authorized.</summary>
     public bool ResolveGeneralizedObservations { get; set; }
 
@@ -24,6 +26,7 @@ public sealed class ObservationByIdOptions : SosRoleRequestOptions
             .AddEnum("outputFieldSet", OutputFieldSet)
             .Add("translationCultureCode", TranslationCultureCode)
             .Add("sensitiveObservations", SensitiveObservations)
+            .AddEnum("protectionFilter", ProtectionFilter)
             .Add("resolveGeneralizedObservations", ResolveGeneralizedObservations)
             .ToString();
     }

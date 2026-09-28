@@ -41,6 +41,33 @@ public class SosObservationsClientTests
     }
 
     [Fact]
+    public async Task GetObservationByIdAsync_UsesBothPublicAndSensitiveEndpointAndEncodesOptions()
+    {
+        var handler = new StubHttpMessageHandler(request =>
+        {
+            request.Method.Should().Be(HttpMethod.Get);
+            request.RequestUri!.AbsolutePath.Should().EndWith("/observations/id%20with%20space");
+            request.RequestUri.Query.Should().Contain("outputFieldSet=AllWithValues");
+            request.RequestUri.Query.Should().Contain("translationCultureCode=en-US");
+            request.RequestUri.Query.Should().Contain("protectionFilter=BothPublicAndSensitive");
+            return CreateJsonResponse("""{"id":"id with space"}""");
+        });
+        var client = new SosObservationsClient(CreateHttpClient(handler));
+
+        var result = await client.GetObservationByIdAsync(
+            "id with space",
+            new ObservationByIdOptions
+            {
+                OutputFieldSet = OutputFieldSet.AllWithValues,
+                TranslationCultureCode = "en-US",
+                ProtectionFilter = ProtectionFilterDto.BothPublicAndSensitive
+            },
+            TestContext.Current.CancellationToken);
+
+        result!.Id.Should().Be("id with space");
+    }
+
+    [Fact]
     public async Task ObservationsBySearchInternalAsync_SerializesTypedFilter()
     {
         var handler = new StubHttpMessageHandler(request =>
