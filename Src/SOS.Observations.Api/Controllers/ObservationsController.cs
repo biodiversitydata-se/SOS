@@ -1,18 +1,22 @@
 ﻿﻿using Microsoft.AspNetCore.Mvc;
 using SOS.Lib.Cache;
 using SOS.Lib.Cache.Interfaces;
+using SOS.Lib.Dtos;
+using SOS.Lib.Dtos.Enum;
+using SOS.Lib.Dtos.Filter;
+using SOS.Lib.Dtos.Observation;
 using SOS.Lib.Enums;
 using SOS.Lib.Exceptions;
 using SOS.Lib.Extensions;
+using SOS.Lib.Extensions.Dto;
 using SOS.Lib.Gis;
 using SOS.Lib.Helpers;
 using SOS.Lib.IO.GeoJson.Interfaces;
 using SOS.Lib.Managers;
 using SOS.Lib.Models.Cache;
-using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Processed.Observation;
-using SOS.Lib.Models.Search.Enums;
 using SOS.Lib.Models.Search;
+using SOS.Lib.Models.Search.Enums;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Models.Shared;
@@ -23,11 +27,6 @@ using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Services.AdaptiveSearch;
 using SOS.Observations.Api.Services.AdaptiveSearchLocations;
 using SOS.Observations.Api.Services.Interfaces;
-using SOS.Lib.Dtos;
-using SOS.Lib.Dtos.Enum;
-using SOS.Lib.Dtos.Filter;
-using SOS.Lib.Dtos.Observation;
-using SOS.Lib.Extensions.Dto;
 using SOS.Shared.Api.Extensions.Controller;
 using SOS.Shared.Api.Utilities.Objects.Interfaces;
 using SOS.Shared.Api.Validators.Interfaces;
@@ -36,11 +35,9 @@ using System.Diagnostics;
 using System.Net;
 using System.Security.Cryptography;
 using System.Text;
-using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
-using System.Text.Unicode;
 using Result = CSharpFunctionalExtensions.Result;
 
 namespace SOS.Observations.Api.Controllers;
@@ -1155,6 +1152,7 @@ public class ObservationsController : ControllerBase
     /// <param name="translationCultureCode">Culture code used for vocabulary translation (sv-SE, en-GB)</param>
     /// <param name="sensitiveObservations">If true, sensitive observations index is queried if you have access rights.</param>
     /// <param name="resolveGeneralizedObservations">If true, then try get real coordinates for generalized observations.</param>
+    /// <param name="protectionFilter">Filter to apply for protection status. Overrides sensitiveObservations if provided.</param>
     /// <returns></returns>
     [HttpGet("Internal/{id?}")]
     [ProducesResponseType(typeof(Observation), (int)HttpStatusCode.OK)]
@@ -1170,23 +1168,43 @@ public class ObservationsController : ControllerBase
         [FromQuery] OutputFieldSet outputFieldSet = OutputFieldSet.Minimum,
         [FromQuery] string translationCultureCode = "sv-SE",
         [FromQuery] bool sensitiveObservations = false,
-        [FromQuery] bool resolveGeneralizedObservations = false)
+        [FromQuery] bool resolveGeneralizedObservations = false,
+        [FromQuery] ProtectionFilterDto? protectionFilter = null)
     {
         try
         {
+            if (!protectionFilter.HasValue)
+            {
+                protectionFilter = sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public;
+            }
+
             LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
-            this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
+            this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, protectionFilter);
             
             occurrenceId = WebUtility.UrlDecode(occurrenceId ?? id);
-            var observation = await _observationManager.GetObservationAsync(
+            JsonObject? observation = null;
+            var attempts = protectionFilter == ProtectionFilterDto.BothPublicAndSensitive ? 2 : 1;
+            for (var i = 0; i < attempts; i++)
+            {
+                // If protectionFilter is BothPublicAndSensitive, then first try to get sensitive observation, if not found, then try to get public observation.
+                sensitiveObservations = !(protectionFilter == ProtectionFilterDto.Public || i == 1);
+                observation = await _observationManager.GetObservationAsync(
                 this.GetUserId(),
                 roleId,
                 authorizationApplicationIdentifier, occurrenceId, outputFieldSet, translationCultureCode, sensitiveObservations,
                 includeInternalFields: true, resolveGeneralizedObservations);
-            if (observation == null)
-            {
-                return new StatusCodeResult((int)HttpStatusCode.NoContent);
+                if (observation == null)
+                {
+                    /// If the observation is not found, and we are trying to get sensitive observation, then try to get public observation.
+                    if (i == 0 && attempts == 2)
+                    {
+                        continue;
+                    }
+                        
+                    return new StatusCodeResult((int)HttpStatusCode.NoContent);
+                }
             }
+
             this.LogObservationCount(1);
             return new OkObjectResult(observation);
         }
