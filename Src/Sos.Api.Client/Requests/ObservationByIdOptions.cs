@@ -14,7 +14,10 @@ public sealed class ObservationByIdOptions : SosRoleRequestOptions
     /// <summary>Controls the use of the sensitive-observation index.</summary>
     public bool SensitiveObservations { get; set; }
 
-    public ProtectionFilterDto ProtectionFilter { get; set; }
+    /// <summary>
+    /// Overrides SensitiveObservations
+    /// </summary>
+    public ProtectionFilterDto ProtectionFilter { get; set; } = ProtectionFilterDto.Public;
 
     /// <summary>Controls resolution of generalized observations when the caller is authorized.</summary>
     public bool ResolveGeneralizedObservations { get; set; }
