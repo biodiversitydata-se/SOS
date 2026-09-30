@@ -256,7 +256,7 @@ public class OccurrenceTests : IClassFixture<DwcaObservationFactoryFixture>
     [InlineData("", null)]
     [InlineData(null, null)]
     public void OrganismQuantityInt_is_parsed_from_OrganismQuantity(
-        string organismQuantity,
+        string? organismQuantity,
         int? expectedValue)
     {
         //-----------------------------------------------------------------------------------------------------------

@@ -534,8 +534,8 @@ public class ObservationPropertiesTest : TestBase
         //-----------------------------------------------------------------------------------------------------------
         // Act
         //-----------------------------------------------------------------------------------------------------------
-        var response = await apiClient.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter));
-        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>();
+        var response = await apiClient.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter), cancellationToken: TestContext.Current.CancellationToken);
+        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(cancellationToken: TestContext.Current.CancellationToken);
 
         //-----------------------------------------------------------------------------------------------------------
         // Assert

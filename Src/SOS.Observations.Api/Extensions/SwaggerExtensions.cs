@@ -16,8 +16,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
-
 namespace SOS.Observations.Api.Extensions;
 
 public static class SwaggerExtensions

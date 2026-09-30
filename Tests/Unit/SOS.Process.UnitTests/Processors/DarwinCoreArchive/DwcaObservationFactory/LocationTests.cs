@@ -220,7 +220,7 @@ public class LocationTests : IClassFixture<DwcaObservationFactoryFixture>
     [InlineData("4.699999809265137", 5)]
     [InlineData("11.28600025177002", 11)]
     public void Succeeds_to_parse_coordinateUncertaintyInMeters(
-        string input,
+        string? input,
         int? expectedValue)
     {
         //-----------------------------------------------------------------------------------------------------------

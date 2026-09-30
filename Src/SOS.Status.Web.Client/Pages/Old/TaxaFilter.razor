@@ -1,4 +1,4 @@
-﻿@page "/taxafilter"
+@page "/taxafilter"
 @inject AppSettingsState Settings
 <PageTitle>Taxa filter</PageTitle>
 
@@ -77,7 +77,7 @@
             return Task.FromResult(Enumerable.Empty<Taxon>());
 
         var result = allTaxa
-            .Where(t => t.VernacularName.Contains(value, StringComparison.OrdinalIgnoreCase))
+            .Where(t => (t.VernacularName?.Contains(value, StringComparison.OrdinalIgnoreCase) ?? false))
             // .Where(t => !selectedTaxa.Any(s => s.Id == t.Id))
             .ToList();
 

@@ -1,4 +1,4 @@
-using FluentAssertions;
+﻿using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
@@ -131,7 +131,7 @@ public class AdaptiveSearchLocationsCacheTests
         fixture.Cache.TryGet("key", second, out _).Should().BeTrue();
 
         fixture.Cache.Set("key", Box(2), new());
-        fixture.RawCache.TryGet<AdaptiveSearchLocationsCacheBucket>("key").Value.Entries.Should().HaveCount(2);
+        fixture.RawCache.TryGet<AdaptiveSearchLocationsCacheBucket>("key", token: TestContext.Current.CancellationToken).Value.Entries.Should().HaveCount(2);
     }
 
     [Fact]
@@ -141,13 +141,13 @@ public class AdaptiveSearchLocationsCacheTests
         var bbox = Box(0);
         var locations = new List<CachedLocationAggregate>();
         fixture.Cache.Set("key", bbox, locations);
-        var previous = fixture.RawCache.TryGet<AdaptiveSearchLocationsCacheBucket>("key").Value;
+        var previous = fixture.RawCache.TryGet<AdaptiveSearchLocationsCacheBucket>("key", token: TestContext.Current.CancellationToken).Value;
         fixture.Cache.Set("key", Box(1), new());
 
         previous.Entries.Should().HaveCount(1);
         previous.Entries[0].Locations.Should().NotBeSameAs(locations);
         previous.Entries[0].BoundingBox.Should().NotBeSameAs(bbox);
-        fixture.RawCache.TryGet<AdaptiveSearchLocationsCacheBucket>("key").Value.Entries.Should().HaveCount(2);
+        fixture.RawCache.TryGet<AdaptiveSearchLocationsCacheBucket>("key", token: TestContext.Current.CancellationToken).Value.Entries.Should().HaveCount(2);
     }
 
     [Fact]
@@ -170,7 +170,7 @@ public class AdaptiveSearchLocationsCacheTests
 
         for (var index = 0; index < 8; index++)
             fixture.Cache.TryGet("key", Box(index), out _).Should().BeTrue();
-        fixture.RawCache.TryGet<AdaptiveSearchLocationsCacheBucket>("key").Value.Entries.Should().HaveCount(8);
+        fixture.RawCache.TryGet<AdaptiveSearchLocationsCacheBucket>("key", token: TestContext.Current.CancellationToken).Value.Entries.Should().HaveCount(8);
     }
 
     private static LatLonBoundingBox Box(int index) => LatLonBoundingBox.Create(index, 1, index + 1, 0);

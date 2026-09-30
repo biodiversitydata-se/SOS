@@ -1195,7 +1195,7 @@ public class ObservationsController : ControllerBase
                 includeInternalFields: true, resolveGeneralizedObservations);
                 if (observation == null)
                 {
-                    /// If the observation is not found, and we are trying to get sensitive observation, then try to get public observation.
+                    // If the observation is not found, and we are trying to get sensitive observation, then try to get public observation.
                     if (i == 0 && attempts == 2)
                     {
                         continue;

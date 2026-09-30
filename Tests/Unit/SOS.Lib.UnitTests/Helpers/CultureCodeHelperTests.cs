@@ -20,7 +20,7 @@ public class CultureCodeHelperTests
     [InlineData("EN", "en-GB")]
     [InlineData("eng", "en-GB")]
     public void Resolve_cultureCode(
-        string cultureCode,
+        string? cultureCode,
         string expected)
     {
         //-----------------------------------------------------------------------------------------------------------

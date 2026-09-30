@@ -1,17 +1,14 @@
-@using SOS.Status.Web.Client.Dtos
-@using SOS.Status.Web.Client.Helpers
-
 <MudDataGrid Class="no-last-row-scroll" Items="@ObservationsPageResult?.Records" T="Observation" Hover="true" Bordered="true" Striped="true" Dense="true" ColumnResizeMode="ResizeMode.Container" FixedHeader="true">
     <Columns>
         <HierarchyColumn T="Observation" />
-        <PropertyColumn Property="x => x.Taxon.VernacularName" Title="Swedish name" Sortable="false" />
-        <PropertyColumn Property="x => x.Taxon.ScientificName" Title="Scientific name" Sortable="false" />        
-        <PropertyColumn Property="x => x.Event.PlainStartDate" Title="Start date" Sortable="false" />        
-        <PropertyColumn Property="x => x.Event.PlainEndDate" Title="End date" Sortable="false" />
-        <PropertyColumn Property="x => x.Location.Locality" Title="Locality" Sortable="false" />
-        <PropertyColumn Property="x => x.Location.Municipality.Name" Title="Municipality" Sortable="false" />
-        <PropertyColumn Property="x => x.Location.County.Name" Title="County" Sortable="false" />
-        <PropertyColumn Property="x => x.Occurrence.RecordedBy" Title="Recorded by" Sortable="false" />
+        <PropertyColumn Property="x => x!.Taxon!.VernacularName" Title="Swedish name" Sortable="false" />
+        <PropertyColumn Property="x => x!.Taxon!.ScientificName" Title="Scientific name" Sortable="false" />        
+        <PropertyColumn Property="x => x!.Event!.PlainStartDate" Title="Start date" Sortable="false" />        
+        <PropertyColumn Property="x => x!.Event!.PlainEndDate" Title="End date" Sortable="false" />
+        <PropertyColumn Property="x => x!.Location!.Locality" Title="Locality" Sortable="false" />
+        <PropertyColumn Property="x => x!.Location!.Municipality!.Name" Title="Municipality" Sortable="false" />
+        <PropertyColumn Property="x => x!.Location!.County!.Name" Title="County" Sortable="false" />
+        <PropertyColumn Property="x => x!.Occurrence!.RecordedBy" Title="Recorded by" Sortable="false" />
     </Columns>
     <ChildRowContent>
         @* <MudCheckBox @bind-Value="hideDefaultValues" Label="Hide default values" /> *@
