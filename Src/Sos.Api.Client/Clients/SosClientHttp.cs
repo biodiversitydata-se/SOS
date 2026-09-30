@@ -70,6 +70,9 @@ internal static class SosClientHttp
                 AddAccept(request, "application/geo+json");
                 AddAccept(request, "application/json");
                 break;
+            case SosAcceptProfile.Text:
+                AddAccept(request, "text/plain");
+                break;
             case SosAcceptProfile.TextOrJson:
                 AddAccept(request, "text/plain");
                 AddAccept(request, "application/json");
@@ -270,6 +273,7 @@ internal enum SosAcceptProfile
 {
     Json,
     GeoJson,
+    Text,
     TextOrJson,
     Any
 }

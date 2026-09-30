@@ -1,11 +1,13 @@
-﻿using SOS.Api.Client.Abstractions;
-using SOS.Api.Client.Requests;
+﻿using GeoJSON.Text.Feature;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using SOS.Api.Client.Abstractions;
+using SOS.Api.Client.Requests;
 using SOS.Api.Contracts.Aggregations.Requests;
 using SOS.Api.Contracts.Aggregations.Responses;
 using SOS.Api.Contracts.Common.Responses;
-using GeoJSON.Text.Feature;
+using SOS.Api.Contracts.Observations.Requests;
+using static System.Net.WebRequestMethods;
 
 namespace SOS.Api.Client.Clients;
 
@@ -31,6 +33,31 @@ public sealed class SosObservationAggregationsClient : ISosObservationAggregatio
         : this(httpClient)
     {
         _requestLogging = new SosRequestLoggingContext(logger, options);
+    }
+
+    /// <inheritdoc />
+    public async Task<IEnumerable<TaxonSumAggregationItemDto>?> CachedCountInternalAsync(
+        IEnumerable<int> taxonIds,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(taxonIds);
+        var requestBody = SosClientHttp.Serialize(taxonIds);
+        using var request = CreatePostRequest(
+           new Uri($"observations/internal/cachedcount", UriKind.Relative),
+           requestBody,
+           null,
+           null);
+
+        _requestLogging.LogRequest(_httpClient, request, requestBody);
+        using var response = await _httpClient.SendAsync(
+            request,
+            HttpCompletionOption.ResponseHeadersRead,
+            cancellationToken);
+
+        return await SosClientHttp.ReadJsonResponseAsync<IEnumerable<TaxonSumAggregationItemDto>>(
+            response,
+            request.RequestUri,
+            cancellationToken);
     }
 
     /// <inheritdoc />
@@ -123,6 +150,29 @@ public sealed class SosObservationAggregationsClient : ISosObservationAggregatio
     {
         SosClientHttp.ThrowIfEmptyJson(filterJson, nameof(filterJson));
         return SendTaxonAggregationInternalAsync(filterJson, options, cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public Task<PagedResultDto<TaxonSumAggregationItemDto>?> TaxonSumAggregationInternalAsync(
+        TaxonFilterDto filter,
+        TaxonSumAggregationInternalOptions? options = null,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(filter);
+        return SendTaxonSumAggregationInternalAsync(
+            SosClientHttp.Serialize(filter),
+            options,
+            cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public Task<PagedResultDto<TaxonSumAggregationItemDto>?> TaxonSumAggregationInternalJsonAsync(
+        string filterJson,
+        TaxonSumAggregationInternalOptions? options = null,
+        CancellationToken cancellationToken = default)
+    {
+        SosClientHttp.ThrowIfEmptyJson(filterJson, nameof(filterJson));
+        return SendTaxonSumAggregationInternalAsync(filterJson, options, cancellationToken);
     }
 
     /// <inheritdoc />
@@ -286,6 +336,30 @@ public sealed class SosObservationAggregationsClient : ISosObservationAggregatio
             cancellationToken);
     }
 
+    private async Task<PagedResultDto<TaxonSumAggregationItemDto>?> SendTaxonSumAggregationInternalAsync(
+        string filterJson,
+        TaxonSumAggregationInternalOptions? options,
+        CancellationToken cancellationToken)
+    {
+        options ??= new TaxonSumAggregationInternalOptions();
+        using var request = CreatePostRequest(
+            BuildTaxonSumAggregationInternalUri(options),
+            filterJson,
+            null,
+            null);
+
+        _requestLogging.LogRequest(_httpClient, request, filterJson);
+        using var response = await _httpClient.SendAsync(
+            request,
+            HttpCompletionOption.ResponseHeadersRead,
+            cancellationToken);
+
+        return await SosClientHttp.ReadJsonResponseAsync<PagedResultDto<TaxonSumAggregationItemDto>>(
+            response,
+            request.RequestUri,
+            cancellationToken);
+    }
+
     private async Task<IReadOnlyDictionary<int, TaxonAreaAggregationDto>> SendTaxonAreaAggregationInternalAsync(
         string filterJson,
         TaxonAreaAggregationInternalOptions? options,
@@ -355,6 +429,13 @@ public sealed class SosObservationAggregationsClient : ISosObservationAggregatio
     {
         return new Uri(
             $"observations/internal/taxonaggregation?{options.ToQueryString()}",
+            UriKind.Relative);
+    }
+
+    private static Uri BuildTaxonSumAggregationInternalUri(TaxonSumAggregationInternalOptions options)
+    {
+        return new Uri(
+            $"observations/internal/taxonsumaggregation?{options.ToQueryString()}",
             UriKind.Relative);
     }
 

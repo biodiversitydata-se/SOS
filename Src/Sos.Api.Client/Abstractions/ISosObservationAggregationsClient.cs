@@ -1,14 +1,25 @@
-﻿using SOS.Api.Client.Requests;
+﻿using GeoJSON.Text.Feature;
+using SOS.Api.Client.Requests;
 using SOS.Api.Contracts.Aggregations.Requests;
 using SOS.Api.Contracts.Aggregations.Responses;
 using SOS.Api.Contracts.Common.Responses;
-using GeoJSON.Text.Feature;
+using SOS.Api.Contracts.Observations.Requests;
 
 namespace SOS.Api.Client.Abstractions;
 
 /// <summary>Client for SOS observation aggregation endpoints.</summary>
 public interface ISosObservationAggregationsClient
 {
+    /// <summary>
+    /// Aggregates observations by taxon and returns a summary of the results, including counts of observations and provinces.
+    /// </summary>
+    /// <param name="taxonIds">The IDs of the taxa to aggregate.</param>
+    /// <param name="cancellationToken">A token to cancel the operation.</param>
+    /// <returns>A paged result of taxon sum aggregation items.</returns>
+    Task<IEnumerable<TaxonSumAggregationItemDto>?> CachedCountInternalAsync(
+        IEnumerable<int> taxonIds,
+        CancellationToken cancellationToken = default);
+
     /// <summary>Aggregates observations into geographic grid cells.</summary>
     Task<GeoGridResultDto?> GeoGridAggregationInternalAsync(
         SearchFilterAggregationInternalDto filter,
@@ -55,6 +66,30 @@ public interface ISosObservationAggregationsClient
     Task<PagedResultDto<TaxonAggregationItemDto>?> TaxonAggregationInternalJsonAsync(
         string filterJson,
         TaxonAggregationInternalOptions? options = null,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Aggregates observations by taxon and returns a summary of the results, including counts of observations and provinces.
+    /// </summary>
+    /// <param name="filter">The filter to apply to the observations.</param>
+    /// <param name="options">Options for the aggregation.</param>
+    /// <param name="cancellationToken">A token to cancel the operation.</param>
+    /// <returns>A paged result of taxon sum aggregation items.</returns>
+    Task<PagedResultDto<TaxonSumAggregationItemDto>?> TaxonSumAggregationInternalAsync(
+        TaxonFilterDto filter,
+        TaxonSumAggregationInternalOptions? options = null,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Aggregates a JSON-encoded observation filter by taxon and returns a summary of the results, including counts of observations and provinces.
+    /// </summary>
+    /// <param name="filterJson">The JSON-encoded filter to apply to the observations.</param>
+    /// <param name="options">Options for the aggregation.</param>
+    /// <param name="cancellationToken">A token to cancel the operation.</param>
+    /// <returns>A paged result of taxon sum aggregation items.</returns>
+    Task<PagedResultDto<TaxonSumAggregationItemDto>?> TaxonSumAggregationInternalJsonAsync(
+        string filterJson,
+        TaxonSumAggregationInternalOptions? options = null,
         CancellationToken cancellationToken = default);
 
     /// <summary>Aggregates observations by taxon and area.</summary>

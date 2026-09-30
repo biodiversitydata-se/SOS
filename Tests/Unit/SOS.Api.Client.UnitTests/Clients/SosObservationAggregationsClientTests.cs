@@ -1,4 +1,4 @@
-using FluentAssertions;
+﻿using FluentAssertions;
 using SOS.Api.Client.Clients;
 using SOS.Api.Client.Requests;
 using SOS.Api.Client.UnitTests.Support;
@@ -13,6 +13,35 @@ namespace SOS.Api.Client.UnitTests.Clients;
 
 public class SosObservationAggregationsClientTests
 {
+    [Fact]
+    public async Task CachedCountInternalAsync_SerializesTypedFilterAndBuildsQuery()
+    {
+        var handler = new StubHttpMessageHandler(request =>
+        {
+            request.RequestUri!.PathAndQuery.Should().Contain("/observations/internal/cachedcount");
+            return CreateJsonResponse("""
+                [{
+                    "taxonId": 103025,
+                    "observationCount": 1212,
+                    "sumObservationCount": 42424,
+                    "provinceCount": 2,
+                    "sumProvinceCount": 121,
+                    "sumObservationCountByProvinceId": {
+                    "1": 100,
+                    "2": 21
+                    }
+                }]
+            """);
+        });
+        var client = new SosObservationAggregationsClient(CreateHttpClient(handler));
+
+        var result = await client.CachedCountInternalAsync(
+            new[] { 103025 },
+            TestContext.Current.CancellationToken);
+
+        result!.Should().ContainSingle().Which.TaxonId.Should().Be(103025);
+    }
+
     [Fact]
     public async Task GeoGridAggregationInternalAsync_SerializesTypedFilterAndBuildsQuery()
     {
@@ -126,6 +155,98 @@ public class SosObservationAggregationsClientTests
     }
 
     [Fact]
+    public async Task TaxonSumAggregationInternalAsync_MapsPagedResult()
+    {
+        var handler = new StubHttpMessageHandler(request =>
+        {
+            request.RequestUri!.PathAndQuery.Should().Contain("/observations/internal/taxonsumaggregation?");
+            request.RequestUri.Query.Should().Contain("skip=2");
+            request.RequestUri.Query.Should().Contain("take=3");
+            request.RequestUri.Query.Should().Contain("sortBy=SumObservationCount");
+            request.RequestUri.Query.Should().Contain("sortOrder=asc");
+            return CreateJsonResponse("""
+                {
+                  "skip": 2,
+                  "take": 3,
+                  "totalCount": 10,
+                  "records": [{
+                      "taxonId": 103025,
+                      "observationCount": 1212,
+                      "sumObservationCount": 42424,
+                      "provinceCount": 2,
+                      "sumProvinceCount": 121,
+                      "sumObservationCountByProvinceId": {
+                        "1": 100,
+                        "2": 21
+                      }
+                  }]
+                }
+            """);
+        });
+        var client = new SosObservationAggregationsClient(CreateHttpClient(handler));
+
+        var result = await client.TaxonSumAggregationInternalAsync(
+            new TaxonFilterDto(),
+            new TaxonSumAggregationInternalOptions
+            {
+                Skip = 2,
+                Take = 3,
+                SortBy = "SumObservationCount",
+                SortOrder = "asc",
+            },
+            TestContext.Current.CancellationToken);
+
+        result!.TotalCount.Should().Be(10);
+        result.Records.Should().ContainSingle().Which.TaxonId.Should().Be(103025);
+    }
+
+    [Fact]
+    public async Task TaxonSumAggregationInternalJsonAsync_MapsPagedResult()
+    {
+        var handler = new StubHttpMessageHandler(request =>
+        {
+            request.RequestUri!.PathAndQuery.Should().Contain("/observations/internal/taxonsumaggregation?");
+            request.RequestUri.Query.Should().Contain("skip=2");
+            request.RequestUri.Query.Should().Contain("take=3");
+            request.RequestUri.Query.Should().Contain("sortBy=SumObservationCount");
+            request.RequestUri.Query.Should().Contain("sortOrder=asc");
+            return CreateJsonResponse("""
+                {
+                  "skip": 2,
+                  "take": 3,
+                  "totalCount": 10,
+                  "records": [{
+                      "taxonId": 103025,
+                      "observationCount": 1212,
+                      "sumObservationCount": 42424,
+                      "provinceCount": 2,
+                      "sumProvinceCount": 121,
+                      "sumObservationCountByProvinceId": {
+                        "1": 100,
+                        "2": 21
+                      }
+                  }]
+                }
+            """);
+        });
+        var client = new SosObservationAggregationsClient(CreateHttpClient(handler));
+
+        var result = await client.TaxonSumAggregationInternalJsonAsync(
+            "{}",
+            new TaxonSumAggregationInternalOptions
+            {
+                Skip = 2,
+                Take = 3,
+                SortBy = "SumObservationCount",
+                SortOrder = "asc",
+            },
+            TestContext.Current.CancellationToken);
+
+        result!.TotalCount.Should().Be(10);
+        result.Records.Should().ContainSingle().Which.TaxonId.Should().Be(103025);
+    }
+
+    [Fact]
     public async Task TaxonAreaAggregationInternalAsync_BuildsQueryAndMapsTaxonDictionary()
     {
         var handler = new StubHttpMessageHandler(request =>
@@ -166,6 +287,7 @@ public class SosObservationAggregationsClientTests
         result[1001].ObservationCount.Should().Be(5);
         result[1001].SumObservationCountByAreaFeatureId!["01"].Should().Be(8);
     }
+
 
     [Fact]
     public async Task TimeSeriesHistogramInternalJsonAsync_MapsResults()
