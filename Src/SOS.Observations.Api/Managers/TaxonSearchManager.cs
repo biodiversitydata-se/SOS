@@ -12,13 +12,8 @@ using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Repositories.Interfaces;
 using SOS.Lib.Dtos;
 using SOS.Lib.Extensions.Dto;
-using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace SOS.Observations.Api.Managers;
 

@@ -19,36 +19,6 @@ public sealed class SosObservationSearchService : ISosObservationSearchService
     }
 
     /// <inheritdoc />
-    public async Task<Observation?> GetObservationByIdWithSensitiveFallbackAsync(
-        string occurrenceId,
-        ObservationByIdInternalOptions? options = null,
-        CancellationToken cancellationToken = default)
-    {
-        var firstAttempt = CloneObservationOptions(options);
-        firstAttempt.OutputFieldSet = options?.OutputFieldSet ?? OutputFieldSet.All;
-        firstAttempt.ResolveGeneralizedObservations = true;
-        firstAttempt.SensitiveObservations = false;
-
-        var observation = await _sosObservationsClient.GetObservationByIdInternalAsync(
-            occurrenceId,
-            firstAttempt,
-            cancellationToken);
-        if (observation is not null)
-        {
-            return observation;
-        }
-
-        var sensitiveAttempt = CloneObservationOptions(options);
-        sensitiveAttempt.OutputFieldSet = options?.OutputFieldSet ?? OutputFieldSet.All;
-        sensitiveAttempt.ResolveGeneralizedObservations = false;
-        sensitiveAttempt.SensitiveObservations = true;
-        return await _sosObservationsClient.GetObservationByIdInternalAsync(
-            occurrenceId,
-            sensitiveAttempt,
-            cancellationToken);
-    }
-
-    /// <inheritdoc />
     public async Task<bool> HasSensitiveObservationsAsync(
         SearchFilterInternalBaseDto filter,
         SosRoleRequestOptions? options = null,
