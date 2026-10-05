@@ -64,6 +64,7 @@ public class ObservationFactoryBase : FactoryBase
         string? scientificNameAuthorship,
         bool ignoreDuplicates,
         string? ancestorTaxonName,
+        string? rank,
         out string? nameWithoutAuthor)
     {
         nameWithoutAuthor = null;
@@ -73,6 +74,11 @@ public class ObservationFactoryBase : FactoryBase
         // Get by scientific name
         if (_taxonByScientificName.TryGetValues(name, out var taxa))
         {
+            if (taxa.Count > 1 && !string.IsNullOrWhiteSpace(rank) && taxa.Any(t => t.TaxonRank?.Trim()?.Equals(rank.Trim(), StringComparison.InvariantCultureIgnoreCase) ?? false))
+            {
+                taxa = taxa.Where(t => t.TaxonRank?.Trim()?.Equals(rank.Trim(), StringComparison.InvariantCultureIgnoreCase) ?? false).ToList();
+            }
+
             if (taxa.Count > 1 && !string.IsNullOrWhiteSpace(ancestorTaxonName))
             {
                 taxa = FilterTaxaByAncestorTaxon(ancestorTaxonName, taxa, "scientific name", name);
@@ -309,10 +315,12 @@ public class ObservationFactoryBase : FactoryBase
     /// </summary>
     /// <param name="taxonId"></param>
     /// <param name="names"></param>
+    /// <param name="scientificNameAuthorship">The authorship of the scientific name</param>
     /// <param name="ignoreDuplicates">If false and taxon not is found by id and name search finds more than one match, no taxon is returned</param>
     /// <param name="verbatimId"></param>
     /// <param name="verbatimName"></param>
     /// <param name="ancestorTaxonName">Scientific name of an ancestor used to resolve duplicate name matches</param>
+    /// <param name="rank">Taxonomic rank of the taxon</param>
     /// <returns></returns>
     protected Lib.Models.Processed.Observation.Taxon GetTaxon(
         int taxonId, 
@@ -321,7 +329,8 @@ public class ObservationFactoryBase : FactoryBase
         bool ignoreDuplicates = false, 
         string? verbatimId = null, 
         string? verbatimName = null,
-        string? ancestorTaxonName = null)
+        string? ancestorTaxonName = null,
+        string? rank = null)
     {
         string? nameWithoutAuthor = null;
         Lib.Models.Processed.Observation.Taxon? taxon = null;
@@ -331,7 +340,7 @@ public class ObservationFactoryBase : FactoryBase
             // If we can't find taxon by id or taxon id is 0 (biota), try by name/s if passed
             foreach (var name in names)
             {
-                taxon = GetTaxonByName(name, scientificNameAuthorship, ignoreDuplicates, ancestorTaxonName, out nameWithoutAuthor);
+                taxon = GetTaxonByName(name, scientificNameAuthorship, ignoreDuplicates, ancestorTaxonName, rank, out nameWithoutAuthor);
                 if (taxon != null)
                 {
                     break;

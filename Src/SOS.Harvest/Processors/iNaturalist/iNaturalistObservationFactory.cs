@@ -323,7 +323,7 @@ public class iNaturalistObservationFactory : ObservationFactoryBase, IObservatio
 
     private Lib.Models.Processed.Observation.Taxon CreateProcessedTaxon(iNaturalistVerbatimObservation verbatim)
     {
-        if (verbatim.Taxon == null || string.IsNullOrEmpty(verbatim.Taxon.Name))
+        if (verbatim?.Taxon == null || string.IsNullOrEmpty(verbatim.Taxon.Name))
         {
             return new Lib.Models.Processed.Observation.Taxon
             {
@@ -343,7 +343,8 @@ public class iNaturalistObservationFactory : ObservationFactoryBase, IObservatio
             names: names,
             ignoreDuplicates: true,
             verbatimName: verbatim?.Species_guess,
-            ancestorTaxonName: verbatim?.Taxon.Iconic_taxon_name);
+            ancestorTaxonName: verbatim.Taxon.Iconic_taxon_name,
+            rank: verbatim.Taxon.Rank);
     }
 
     public static string RemoveAuthorFromString(string input)

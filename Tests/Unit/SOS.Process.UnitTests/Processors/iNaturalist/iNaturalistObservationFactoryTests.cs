@@ -14,10 +14,6 @@ using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Models.Verbatim.INaturalist.Service;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Xunit;
 using Location = SOS.Lib.Models.Processed.Observation.Location;
 using SharedArea = SOS.Lib.Models.Shared.Area;
@@ -379,6 +375,42 @@ public class iNaturalistObservationFactoryTests
         // Assert
         processedObservation.Taxon.Id.Should().Be(333333);
     }
+
+    [Fact]
+    public void CreateProcessedObservation_Should_Match_Rank()
+    {
+        // Arrange
+        var observation = DeserializeObservation(ObscuredVerbatimObservationJson);
+        var taxa = new Dictionary<int, Taxon>
+        {
+            [111111] = new()
+            {
+                Id = 111111,
+                ScientificName = "Canis lupus",
+                TaxonRank = "subspecies"
+            },
+            [222222] = new()
+            {
+                Id = 222222,
+                ScientificName = "Canis lupus",
+                TaxonRank = "kingdom"
+            },
+            [333333] = new()
+            {
+                Id = 333333,
+                ScientificName = "Canis lupus",
+                TaxonRank = "species"
+            }
+        };
+        var factory = CreateFactory(taxa);
+
+        // Act
+        var processedObservation = factory.CreateProcessedObservation(observation, false);
+
+        // Assert
+        processedObservation.Taxon.Id.Should().Be(333333);
+    }
+
 
     private static iNaturalistObservationFactory CreateFactory(IDictionary<int, Taxon>? taxa = null)
     {
