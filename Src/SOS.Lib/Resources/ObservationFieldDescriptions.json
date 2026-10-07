@@ -1951,7 +1951,7 @@
   {
     "PropertyName": "IsPositiveObservation",
     "PropertyPath": "Occurrence.IsPositiveObservation",
-    "SwedishTitle": "Påträffad",
+    "SwedishTitle": "Observerad",
     "EnglishTitle": "Is positive observation",
     "DataType": "Boolean",
     "DataTypeIsNullable": true,
@@ -1963,7 +1963,7 @@
   {
     "PropertyName": "IsNeverFoundObservation",
     "PropertyPath": "Occurrence.IsNeverFoundObservation",
-    "SwedishTitle": "Aldrig funnen",
+    "SwedishTitle": "Ej funnen",
     "EnglishTitle": "Is never found observation",
     "DataType": "Boolean",
     "DataTypeIsNullable": true,
@@ -2562,8 +2562,8 @@
   {
     "PropertyName": "IsNaturalOccurrence",
     "PropertyPath": "Occurrence.IsNaturalOccurrence",
-    "SwedishTitle": "Naturlig förekomst",
-    "EnglishTitle": "Is natural occurrence",
+    "SwedishTitle": "Spontan",
+    "EnglishTitle": "Spontaneous",
     "DataType": "Boolean",
     "DataTypeIsNullable": true,
     "DwcName": "",
