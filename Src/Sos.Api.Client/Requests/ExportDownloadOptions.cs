@@ -14,7 +14,7 @@ public class ExportDownloadOptions : SosRoleRequestOptions
     /// <summary>Controls whether the API validates the search filter.</summary>
     public bool ValidateSearchFilter { get; set; }
     /// <summary>How CSV, Excel, and non-flat GeoJSON properties are labelled.</summary>
-    public PropertyLabelTypeDto PropertyLabelType { get; set; } = PropertyLabelTypeDto.PropertyName;
+    public PropertyLabelType PropertyLabelType { get; set; } = PropertyLabelType.PropertyName;
     /// <summary>The culture used for translated labels in non-Darwin Core exports.</summary>
     public string CultureCode { get; set; } = "sv-SE";
     /// <summary>Controls whether a Darwin Core export is event-based.</summary>

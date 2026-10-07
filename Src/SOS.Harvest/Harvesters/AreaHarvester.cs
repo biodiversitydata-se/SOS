@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using SOS.Api.Contracts.Common.Geo;
+using Microsoft.Extensions.Logging;
 using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.IO;
@@ -77,10 +78,10 @@ public class AreaHarvester : IAreaHarvester
                 area.Name = (string)feature.Attributes["Name"];
                 area.Id = $"{area.AreaType}:{area.FeatureId}";
                 List<double> bbox = ((List<object>)feature.Attributes["Bbox"]).Cast<double>().ToList();
-                area.BoundingBox = new LatLonBoundingBox
+                area.BoundingBox = new LatLonBoundingBoxDto
                 {
-                    TopLeft = new LatLonCoordinate(bbox[3], bbox[0]),
-                    BottomRight = new LatLonCoordinate(bbox[1], bbox[2])
+                    TopLeft = new LatLonCoordinateDto(bbox[3], bbox[0]),
+                    BottomRight = new LatLonCoordinateDto(bbox[1], bbox[2])
                 };
                 if (area.AreaType.HasGridGeometry())
                 {

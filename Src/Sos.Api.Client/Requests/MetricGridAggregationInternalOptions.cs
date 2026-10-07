@@ -1,15 +1,9 @@
-using SOS.Api.Contracts.Aggregations.Requests;
+using SOS.Api.Contracts.Common.Geo;
 
 namespace SOS.Api.Client.Requests;
 /// <summary>Options for metric-grid aggregation.</summary>
-public sealed class MetricGridAggregationInternalOptions
+public sealed class MetricGridAggregationInternalOptions : SosRoleRequestOptions
 {
-    /// <summary>The explicit authorization role identifier.</summary>
-    public int? RoleId { get; set; }
-
-    /// <summary>The explicit calling application identifier.</summary>
-    public string? AuthorizationApplicationIdentifier { get; set; }
-
     /// <summary>The grid-cell side length, in metres.</summary>
     public int GridCellSizeInMeters { get; set; } = 10000;
 

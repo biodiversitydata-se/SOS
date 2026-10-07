@@ -1,19 +1,17 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using SOS.Lib.Enums;
+using SOS.Api.Contracts.DataStewardship.Responses;
+using SOS.Api.Contracts.Observations.Requests;
+using SOS.Api.Contracts.Common.Responses;
+using SOS.Api.Contracts.Common.Geo;
+using Microsoft.AspNetCore.Mvc;
 using SOS.Lib.Exceptions;
 using SOS.Observations.Api.Managers.Interfaces;
-using SOS.Lib.Dtos.DataStewardship;
-using SOS.Lib.Dtos.DataStewardship.Enums;
-using SOS.Lib.Dtos.DataStewardship.Extensions;
-using SOS.Lib.Dtos.Enum;
-using SOS.Lib.Dtos.Filter;
+using SOS.Lib.Extensions.Dto.DataStewardship;
 using SOS.Lib.Extensions.Dto;
 using SOS.Shared.Api.Validators.Interfaces;
 using SOS.Shared.Api.Extensions.Controller;
 using Result = CSharpFunctionalExtensions.Result;
 using System.Net;
 using SOS.Lib.Helpers;
-using SOS.Lib.Dtos;
 
 namespace SOS.Observations.Api.Controllers;
 
@@ -124,17 +122,18 @@ public class DataStewardshipController : ControllerBase
         try
         {
             LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
+            var inputFilter = filter;
             var validationResult = Result.Combine(
                 _inputValidator.ValidateSearchPagingArguments(skip, take),
-                validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(filter)) : Result.Success(),
-                _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false));
+                validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(inputFilter)) : Result.Success(),
+                _inputValidator.ValidateBoundingBox(inputFilter?.Geographics?.BoundingBox, false));
             
             if (validationResult.IsFailure)
             {
                 return BadRequest(validationResult.Error);
             }
             
-            var searchFilter = filter.ToSearchFilter(this.GetUserId(), ProtectionFilterDto.Public, "sv-SE");
+            var searchFilter = inputFilter.ToSearchFilter(this.GetUserId(), ProtectionFilterDto.Public, "sv-SE");
             if (!includeEventIds)
             {
                 searchFilter ??= new Lib.Models.Search.Filters.SearchFilter();
@@ -298,16 +297,17 @@ public class DataStewardshipController : ControllerBase
         try
         {
             LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
+            var inputFilter = filter;
             var validationResult = Result.Combine(
                 _inputValidator.ValidateSearchPagingArguments(skip, take),
-                validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(filter)) : Result.Success(),
-                _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false));
+                validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(inputFilter)) : Result.Success(),
+                _inputValidator.ValidateBoundingBox(inputFilter?.Geographics?.BoundingBox, false));
 
             if (validationResult.IsFailure)
             {
                 return BadRequest(validationResult.Error);
             }
-            var searchFilter = filter.ToSearchFilter(this.GetUserId(), ProtectionFilterDto.Public, "sv-SE");
+            var searchFilter = inputFilter.ToSearchFilter(this.GetUserId(), ProtectionFilterDto.Public, "sv-SE");
 
             var result = await _dataStewardshipManager.GetEventsBySearchAsync(searchFilter, skip, take, responseCoordinateSystem);
 
@@ -414,16 +414,17 @@ public class DataStewardshipController : ControllerBase
         try
         {
             LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
+            var inputFilter = filter;
             var validationResult = Result.Combine(
                 _inputValidator.ValidateSearchPagingArguments(skip, take),
-                validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(filter)) : Result.Success(),
-                _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false));
+                validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(inputFilter)) : Result.Success(),
+                _inputValidator.ValidateBoundingBox(inputFilter?.Geographics?.BoundingBox, false));
 
             if (validationResult.IsFailure)
             {
                 return BadRequest(validationResult.Error);
             }
-            var searchFilter = filter.ToSearchFilter(this.GetUserId(), ProtectionFilterDto.Public, "sv-SE");
+            var searchFilter = inputFilter.ToSearchFilter(this.GetUserId(), ProtectionFilterDto.Public, "sv-SE");
 
             var result = await _dataStewardshipManager.GetOccurrencesBySearchAsync(searchFilter, skip, take, responseCoordinateSystem);
 

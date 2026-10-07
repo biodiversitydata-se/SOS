@@ -13,7 +13,7 @@ public sealed class SosApiInfoClient : ISosApiInfoClient
         _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
 
     /// <inheritdoc />
-    public async Task<ApiInformationDto?> GetApiInfoAsync(CancellationToken cancellationToken = default)
+    public async Task<ApiInformation?> GetApiInfoAsync(CancellationToken cancellationToken = default)
     {
         using var request = new HttpRequestMessage(HttpMethod.Get, "api/ApiInfo");
         request.ApplySosRequestHeaders();
@@ -21,7 +21,7 @@ public sealed class SosApiInfoClient : ISosApiInfoClient
             request,
             HttpCompletionOption.ResponseHeadersRead,
             cancellationToken);
-        return await SosClientHttp.ReadJsonResponseAsync<ApiInformationDto>(
+        return await SosClientHttp.ReadJsonResponseAsync<ApiInformation>(
             response,
             request.RequestUri,
             cancellationToken);

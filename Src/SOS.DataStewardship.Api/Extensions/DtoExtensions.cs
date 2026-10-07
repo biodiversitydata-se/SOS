@@ -1,5 +1,7 @@
-﻿using NetTopologySuite.Geometries;
+﻿using SOS.Api.Contracts.Common.Geo;
+using NetTopologySuite.Geometries;
 using SOS.DataStewardship.Api.Contracts.Enums;
+using SOS.Api.Contracts.DataStewardship.Responses;
 using SOS.DataStewardship.Api.Contracts.Models;
 using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Models.Processed.DataStewardship.Common;
@@ -448,7 +450,7 @@ public static class DtoExtensions
         public Contracts.Models.Location ToLocation(CoordinateSystem responseCoordinateSystem)
         {
             County? county = location?.County?.FeatureId?.GetCounty();
-            Municipality? municipality = location?.Municipality?.FeatureId?.GetMunicipality();
+            var municipality = location?.Municipality?.FeatureId?.GetMunicipality();
             Parish? parish = location?.Parish?.FeatureId?.GetParish();
             Province? province = location?.Province?.FeatureId?.GetProvince();
             return new Contracts.Models.Location()

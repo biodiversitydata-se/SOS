@@ -1,7 +1,8 @@
 ﻿using Newtonsoft.Json;
 using OfficeOpenXml;
+using SOS.Api.Contracts.Lookups.Responses;
+using SOS.Api.Contracts.Exports.Requests;
 using OfficeOpenXml.Style;
-using SOS.Lib.Enums;
 using SOS.Lib.Models;
 using SOS.Lib.Models.DataValidation;
 using SOS.Lib.Models.Processed.Observation;

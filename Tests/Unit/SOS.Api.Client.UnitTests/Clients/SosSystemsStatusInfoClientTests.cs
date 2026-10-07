@@ -1,7 +1,8 @@
 using FluentAssertions;
 using SOS.Api.Client.Clients;
 using SOS.Api.Client.Exceptions;
-using SOS.Api.Contracts.Status.Requests;
+using SOS.Api.Contracts.Observations.Requests;
+using SOS.Api.Contracts.Taxonomy.Requests;
 using System.Net;
 using System.Text;
 using System.Text.Json;

@@ -1,4 +1,7 @@
-﻿namespace SOS.Status.Web.Client.Dtos;
+﻿using SOS.Api.Contracts.Observations.Requests;
+using SOS.Api.Contracts.Taxonomy.Requests;
+
+namespace SOS.Status.Web.Client.Dtos;
 
 public class TaxonDiagramQuery
 {

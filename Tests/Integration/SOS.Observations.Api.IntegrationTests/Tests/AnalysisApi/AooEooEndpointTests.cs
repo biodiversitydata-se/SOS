@@ -1,8 +1,10 @@
+using SOS.Api.Contracts.Aggregations.Requests;
+using SOS.Api.Contracts.Common.Geo;
+using SOS.Api.Contracts.Observations.Requests;
 using FizzWare.NBuilder;
 using NetTopologySuite.Geometries;
 using SOS.Api.Client.Clients;
 using SOS.Api.Client.Requests;
-using SOS.Lib.Dtos.Filter;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Verbatim.Artportalen;
@@ -11,11 +13,6 @@ using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
 
 namespace SOS.Observations.Api.IntegrationTests.Tests.AnalysisApi;
 
-using ContractGeographicsFilterDto = SOS.Api.Contracts.Observations.Requests.GeographicsFilterDto;
-using ContractLatLonBoundingBoxDto = SOS.Api.Contracts.Common.Geo.LatLonBoundingBoxDto;
-using ContractLatLonCoordinateDto = SOS.Api.Contracts.Common.Geo.LatLonCoordinateDto;
-using ContractSearchFilterAggregationInternalDto = SOS.Api.Contracts.Aggregations.Requests.SearchFilterAggregationInternalDto;
-using ContractAreaTypeDto = SOS.Api.Contracts.Analysis.Requests.AreaTypeAggregateDto;
 
 [Collection(TestCollection.Name)]
 public class AooEooEndpointTests : TestBase
@@ -124,11 +121,11 @@ public class AooEooEndpointTests : TestBase
         };
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(CreateVerbatimObservations(points));
         var client = new SosAnalysisClient(TestFixture.CreateAnalysisApiClient());
-        var filter = new ContractSearchFilterAggregationInternalDto
+        var filter = new SearchFilterAggregationInternalDto
         {
-            Geographics = new ContractGeographicsFilterDto
+            Geographics = new GeographicsFilterDto
             {
-                BoundingBox = CreateContractBoundingBox(points)
+                BoundingBox = CreateBoundingBox(points)
             }
         };
 
@@ -160,11 +157,11 @@ public class AooEooEndpointTests : TestBase
         };
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(CreateVerbatimObservations(points));
         var client = new SosAnalysisClient(TestFixture.CreateAnalysisApiClient());
-        var filter = new ContractSearchFilterAggregationInternalDto
+        var filter = new SearchFilterAggregationInternalDto
         {
-            Geographics = new ContractGeographicsFilterDto
+            Geographics = new GeographicsFilterDto
             {
-                BoundingBox = CreateContractBoundingBox(points)
+                BoundingBox = CreateBoundingBox(points)
             }
         };
 
@@ -172,7 +169,7 @@ public class AooEooEndpointTests : TestBase
             filter,
             new AreaAggregationOptions
             {
-                AreaType = ContractAreaTypeDto.Province,
+                AreaType = AreaTypeAggregate.Province,
                 ValidateFilter = false
             },
             TestContext.Current.CancellationToken);
@@ -192,11 +189,11 @@ public class AooEooEndpointTests : TestBase
         };
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(CreateVerbatimObservations(points));
         var client = new SosAnalysisClient(TestFixture.CreateAnalysisApiClient());
-        var filter = new ContractSearchFilterAggregationInternalDto
+        var filter = new SearchFilterAggregationInternalDto
         {
-            Geographics = new ContractGeographicsFilterDto
+            Geographics = new GeographicsFilterDto
             {
-                BoundingBox = CreateContractBoundingBox(points)
+                BoundingBox = CreateBoundingBox(points)
             }
         };
 
@@ -293,26 +290,6 @@ public class AooEooEndpointTests : TestBase
                 Longitude = pointArray.Min(point => point.X) - margin
             },
             BottomRight = new LatLonCoordinateDto
-            {
-                Latitude = pointArray.Min(point => point.Y) - margin,
-                Longitude = pointArray.Max(point => point.X) + margin
-            }
-        };
-    }
-
-    private static ContractLatLonBoundingBoxDto CreateContractBoundingBox(IEnumerable<Point> points)
-    {
-        const double margin = 0.02;
-        var pointArray = points.ToArray();
-
-        return new ContractLatLonBoundingBoxDto
-        {
-            TopLeft = new ContractLatLonCoordinateDto
-            {
-                Latitude = pointArray.Max(point => point.Y) + margin,
-                Longitude = pointArray.Min(point => point.X) - margin
-            },
-            BottomRight = new ContractLatLonCoordinateDto
             {
                 Latitude = pointArray.Min(point => point.Y) - margin,
                 Longitude = pointArray.Max(point => point.X) + margin

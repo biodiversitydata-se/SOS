@@ -1,8 +1,8 @@
 ﻿using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
-using System;
 using System.Linq;
 using System.Reflection;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace SOS.Lib.Swagger;
@@ -19,56 +19,16 @@ public class SwaggerIgnoreFilter : ISchemaFilter
     /// <param name="context"></param>
     public void Apply(IOpenApiSchema schema, SchemaFilterContext context)
     {
-        var excludeProperties = context.Type?.GetProperties(BindingFlags.Public | BindingFlags.Instance)
-            .Where(p => (p.GetCustomAttributes(typeof(JsonIgnoreAttribute), true)?.Any() == true) || p.GetCustomAttribute<SwaggerExcludeAttribute>() != null);
-        if (excludeProperties != null)
-        {
-            foreach (var property in excludeProperties)
-            {
-                var propertyName = $"{property.Name.Substring(0, 1).ToLower()}{property.Name.Substring(1)}";
-                if (schema.Properties != null && schema.Properties.ContainsKey(propertyName))
-                {
-                    schema.Properties.Remove(propertyName);
-                }
-            }
-        }
+        if (schema.Properties is not { } properties) return;
 
-        //// Remove "Dto" suffix.
-        //if (context.Type != null && !ImplementsInterface(context.Type, typeof(IEnumerable)) && TypeEndsWithDto(context.Type))
-        //{
-        //    schema.Title = GetNameWithoutDtoSuffix(context.Type);
-        //}
+        var excludeProperties = context.Type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
+            .Where(property => property.GetCustomAttribute<JsonIgnoreAttribute>()?.Condition == JsonIgnoreCondition.Always
+                || property.GetCustomAttribute<SwaggerExcludeAttribute>() != null);
+        foreach (var property in excludeProperties)
+        {
+            var propertyName = property.GetCustomAttribute<JsonPropertyNameAttribute>()?.Name
+                ?? JsonNamingPolicy.CamelCase.ConvertName(property.Name);
+            properties.Remove(propertyName);
+        }
     }
-
-    private bool TypeEndsWithDto(Type type)
-    {
-        if (type.IsGenericType)
-        {
-            return type.GetGenericArguments().Any(TypeEndsWithDto);
-        }
-
-        return type.Name.EndsWith("Dto");
-    }
-
-    private string GetNameWithoutDtoSuffix(Type type)
-    {
-        if (type.IsGenericType)
-        {
-            var name = type.Name.Substring(0, type.Name.IndexOf('`'));
-            if (name.EndsWith("Dto"))
-            {
-                name = name.Substring(0, name.Length - 3);
-            }
-
-            var types = string.Join("", type.GetGenericArguments().Select(GetNameWithoutDtoSuffix));
-            return $"{types}{name}";
-        }
-
-        if (type.Name.EndsWith("Dto"))
-        {
-            return type.Name.Substring(0, type.Name.Length - 3);
-        }
-
-        return type.Name;
-    }        
 }

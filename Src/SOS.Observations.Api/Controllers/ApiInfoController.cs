@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using SOS.Api.Contracts.Metadata.Responses;
+using Microsoft.AspNetCore.Mvc;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
-using SOS.Lib.Models.ApiInfo;
 using SOS.Lib.Swagger;
 using System.Net;
 using System.Reflection;
@@ -31,6 +31,6 @@ public class ApiInfoController : Controller
             ApiReleased = new DateTimeOffset(buildDate.ToLocalTime())
         };
 
-        return new OkObjectResult(apiInformation!);
+        return new OkObjectResult(apiInformation);
     }
 }

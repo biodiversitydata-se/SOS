@@ -1,4 +1,5 @@
-﻿using SOS.Lib.Models.Gis;
+﻿using SOS.Api.Contracts.Common.Geo;
+using SOS.Lib.Models.Gis;
 
 namespace SOS.Lib.Helpers;
 
@@ -8,7 +9,7 @@ public static class GeoTileHelper
     private const int MaxElasticsearchZoom = 29;
 
     public static int CalculateGeotileZoom(
-        LatLonBoundingBox? bbox,
+        LatLonBoundingBoxDto? bbox,
         int maxBuckets,
         int maxZoom)
     {
@@ -47,9 +48,9 @@ public static class GeoTileHelper
         return Math.Max(0, Math.Min(optimalZoom, Math.Min(maxZoom, MaxElasticsearchZoom)));
     }   
 
-    public static LatLonCoordinate GetCoordinateFromTile(int x, int y, int zoom)
+    public static LatLonCoordinateDto GetCoordinateFromTile(int x, int y, int zoom)
     {
-        return new LatLonCoordinate(TileY2Lat(y, zoom), TileX2Long(x, zoom));
+        return new LatLonCoordinateDto(TileY2Lat(y, zoom), TileX2Long(x, zoom));
     }
 
     public static (int zoom, int x, int y) GetZoomAndCoordinatesFromKey(string key)

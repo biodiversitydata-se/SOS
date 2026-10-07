@@ -1,4 +1,5 @@
-﻿using FizzWare.NBuilder;
+﻿using SOS.Api.Contracts.Common.Geo;
+using FizzWare.NBuilder;
 using FizzWare.NBuilder.Implementation;
 using MongoDB.Driver.GeoJsonObjectModel;
 using NetTopologySuite.Geometries;
@@ -162,7 +163,7 @@ public static class ArtportalenObservationBuilder
                 Name = "Närke"
             },
             ProvincePartIdByCoordinate = "10",
-            VerbatimCoordinateSystem = Lib.Enums.CoordinateSys.WebMercator
+            VerbatimCoordinateSystem = CoordinateSys.WebMercator
         };
 
         return site;

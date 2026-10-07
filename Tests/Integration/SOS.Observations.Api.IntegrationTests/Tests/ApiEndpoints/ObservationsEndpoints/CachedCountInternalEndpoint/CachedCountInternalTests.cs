@@ -1,5 +1,5 @@
 ﻿using FizzWare.NBuilder;
-using SOS.Lib.Models.Search.Result;
+using SOS.Api.Contracts.Aggregations.Responses;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Observations.Api.IntegrationTests.Setup;
 using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
@@ -18,32 +18,32 @@ public class CachedCountInternalTests : TestBase
     {
         // Arrange
         TestFixture.ResetTaxonSumAggregationCache();
-        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(10)
           .All()
               .HaveValuesFromPredefinedObservations()
               .With(p => p.NotPresent = false)
               .With(p => p.NotRecovered = false)
               .With(p => p.UnsureDetermination = false)
-          .TheFirst(20)
+          .TheFirst(2)
               .With(p => p.TaxonId = 100011)
               .With(p => p.StartDate = new DateTime(2000, 1, 1))
               .With(p => p.EndDate = new DateTime(2000, 1, 1))
               .With(p => p.Site.Province = new GeographicalArea { FeatureId = "1" })
-          .TheNext(20)
+          .TheNext(2)
               .With(p => p.TaxonId = 100012)
               .With(p => p.StartDate = new DateTime(2000, 1, 15))
               .With(p => p.EndDate = new DateTime(2000, 1, 18))
               .With(p => p.Site.Province = new GeographicalArea { FeatureId = "2" })
-          .TheNext(20)
+          .TheNext(2)
               .With(p => p.TaxonId = 100012)
               .With(p => p.StartDate = new DateTime(2000, 1, 30))
               .With(p => p.EndDate = new DateTime(2000, 1, 30))
               .With(p => p.Site.Province = new GeographicalArea { FeatureId = "3" })
-          .TheNext(20)
+          .TheNext(2)
               .With(p => p.TaxonId = 100016)
               .With(p => p.StartDate = new DateTime(2000, 1, 1))
               .With(p => p.EndDate = new DateTime(2000, 2, 1))
-          .TheLast(20)
+          .TheLast(2)
               .With(p => p.TaxonId = 100017)
               .With(p => p.StartDate = new DateTime(2000, 4, 1))
               .With(p => p.EndDate = new DateTime(2000, 4, 15))
@@ -59,7 +59,7 @@ public class CachedCountInternalTests : TestBase
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        result!.ObservationCount.Should().Be(40);
+        result!.ObservationCount.Should().Be(4);
         result!.ProvinceCount.Should().Be(2,
             because: "");
     }

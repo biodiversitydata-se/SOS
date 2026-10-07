@@ -25,7 +25,7 @@ public class AreaHarvestFactory : IHarvestFactory<IEnumerable<AreaEntity>, Area>
                 .Select(e => new Area((AreaType)e.AreaDatasetId, e.FeatureId)
                 {
                     Name = e.Name,
-                    BoundingBox = LatLonBoundingBox.Create(_geometries[((AreaType)e.AreaDatasetId).ToAreaId(e.FeatureId)].EnvelopeInternal)
+                    BoundingBox = _geometries[((AreaType)e.AreaDatasetId).ToAreaId(e.FeatureId)].EnvelopeInternal.ToLatLonBoundingBox()
                 });
         });
     }

@@ -1,15 +1,18 @@
-﻿using CSharpFunctionalExtensions;
+﻿using SOS.Api.Contracts.Areas.Requests;
+using SOS.Api.Contracts.Common.Geo;
+using SOS.Api.Contracts.Observations.Requests;
+using CSharpFunctionalExtensions;
 using NetTopologySuite.Geometries;
 using SOS.Lib.Cache;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
+using SOS.Lib.Extensions.Dto;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Repositories.Processed;
 using SOS.Shared.Api.Configuration;
-using SOS.Lib.Dtos.Enum;
-using SOS.Lib.Dtos.Filter;
+using SOS.Api.Contracts.Areas.Responses;
 using SOS.Shared.Api.Validators.Interfaces;
 using System.Globalization;
 using System.Text.RegularExpressions;
@@ -242,7 +245,7 @@ public class InputValidator : IInputValidator
     /// <inheritdoc/>
     public Result ValidateGeographicalAreaExists(GeographicsFilterDto filter)
     {
-        if ((!filter?.Areas?.Any() ?? true) && (!filter?.Geometries?.Any() ?? true) && filter?.BoundingBox?.TopLeft == null && filter?.BoundingBox?.BottomRight == null)
+        if ((!filter?.Areas?.Any() ?? true) && !filter.HasSearchGeometries() && filter?.BoundingBox?.TopLeft == null && filter?.BoundingBox?.BottomRight == null)
         {
             return Result.Failure("You must provide area/s, geometry or bounding box");
         }
@@ -262,9 +265,11 @@ public class InputValidator : IInputValidator
     }
 
     /// <inheritdoc/>
-    public Result ValidateGeometries(
-        IEnumerable<Geometry> geometries)
+    public Result ValidateGeometries(GeographicsFilterDto? filter)
     {
+        var conversion = filter.TryGetSearchGeometries();
+        if (conversion.IsFailure) return Result.Failure(conversion.Error);
+        var geometries = conversion.Value;
         if (!geometries?.Any() ?? true)
         {
             return Result.Success();
@@ -272,11 +277,11 @@ public class InputValidator : IInputValidator
 
         try
         {
-            foreach (var geoemtry in geometries)
+            foreach (var geometry in geometries)
             {
-                if (!geoemtry?.IsValid ?? true)
+                if (!geometry?.IsValid ?? true)
                 {
-                    throw new Exception("Invalid geometry");
+                    return Result.Failure("Invalid geometry");
                 }
             }
         }
@@ -331,20 +336,20 @@ public class InputValidator : IInputValidator
     {
         var errors = new List<string>();
 
-        var searchFilter = filter as SearchFilterDto;
+        var publicOutput = (filter as SearchFilterDto)?.Output;
 
         if (filter == null)
         {
             errors.Add("You must provide a filter");
         }
 
-        var areaValidationResult = ValidateAreasAsync(filter?.Geographics?.Areas).Result;
+        var areaValidationResult = await ValidateAreasAsync(filter?.Geographics?.Areas);
         if (areaValidationResult.IsFailure)
         {
             errors.Add(areaValidationResult.Error);
         }
 
-        if (filter.Geographics != null && filter.Geographics.IsGeometryInvalid)
+        if (filter?.Geographics.HasGeometryConversionError() == true)
         {
             errors.Add("Invalid geometry");
         }
@@ -362,11 +367,13 @@ public class InputValidator : IInputValidator
             errors.Add("Modified from date can't be greater tha to date");
         }
 
-        if (searchFilter?.Output?.Fields?.Any() ?? false)
+        if (publicOutput?.Fields?.Any() ?? false)
         {
-            errors.AddRange(searchFilter.Output.Fields
-                .Where(of => !typeof(Observation).HasProperty(of, allowObjectInOutputFields))
-                .Select(of => allowObjectInOutputFields ? $"Output field doesn't exist ({of})" : $"Output field doesn't exist ({of}), or if it's root object. Specify object properties"));
+            errors.AddRange(publicOutput.Fields
+                .Where(field => !typeof(Observation).HasProperty(field, allowObjectInOutputFields))
+                .Select(field => allowObjectInOutputFields
+                    ? $"Output field doesn't exist ({field})"
+                    : $"Output field doesn't exist ({field}), or if it's root object. Specify object properties"));
         }
 
         if (filter?.Taxon?.RedListCategories?.Any() ?? false)

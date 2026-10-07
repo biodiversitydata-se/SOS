@@ -1,5 +1,3 @@
-using System.Text.Json.Serialization;
-
 namespace SOS.Api.Contracts.Observations.Requests;
 
 /// <summary>
@@ -10,6 +8,5 @@ public class ArtportalenFilterDto
     /// <summary>
     /// Controls which Artportalen observation types are included in the result.
     /// </summary>
-    [JsonConverter(typeof(JsonStringEnumConverter))]
     public SightingTypeFilterDto TypeFilter { get; set; } = SightingTypeFilterDto.DoNotShowMerged;
 }

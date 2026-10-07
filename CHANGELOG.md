@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### `Changed`
+
+- OpenAPI schema names for area bounding boxes have changed from `LatLonBoundingBox` and `LatLonCoordinate` to `LatLonBoundingBoxDto` and `LatLonCoordinateDto`, respectively. Only the schema names have changed; model structures, endpoint URLs and JSON field names are unchanged. Existing clients are unaffected. Only consumers regenerating client code from OpenAPI may need to update references to the generated model names.
+
 ## [2026.09.04]
 
 ### `Added`

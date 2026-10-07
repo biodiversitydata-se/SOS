@@ -1,9 +1,8 @@
-﻿using FizzWare.NBuilder;
+using SOS.Api.Contracts.Common.Responses;
+using SOS.Api.Contracts.Observations.Requests;
+using FizzWare.NBuilder;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Verbatim.Artportalen;
-using SOS.Lib.Dtos;
-using SOS.Lib.Dtos.Enum;
-using SOS.Lib.Dtos.Filter;
 using SOS.Observations.Api.IntegrationTests.Setup;
 using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
 
@@ -23,8 +22,11 @@ public class SortingTests : TestBase
     public async Task ObservationsBySearchEndpoint_ReturnsObservationsInCorrectOrder_WhenOrderingObservationsByTaxonIdAscendingAndDescending()
     {
         // Arrange
-        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(6)
             .All().HaveValuesFromPredefinedObservations()
+            .TheFirst(2).With(observation => observation.TaxonId = 100013)
+            .TheNext(2).With(observation => observation.TaxonId = 100011)
+            .TheLast(2).With(observation => observation.TaxonId = 100012)
             .Build();
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
         var apiClient = TestFixture.CreateApiClient();
@@ -39,47 +41,52 @@ public class SortingTests : TestBase
         // Assert
         responseAsc.StatusCode.Should().Be(HttpStatusCode.OK);
         responseDesc.StatusCode.Should().Be(HttpStatusCode.OK);
-        resultAsc!.Records.Select(m => m.Id).Should().BeInAscendingOrder();
-        resultDesc!.Records.Select(m => m.Id).Should().BeInDescendingOrder();
+        resultAsc!.Records!.Select(observation => observation.Taxon.Id).Should().Equal(100011, 100011, 100012, 100012, 100013, 100013);
+        resultDesc!.Records!.Select(observation => observation.Taxon.Id).Should().Equal(100013, 100013, 100012, 100012, 100011, 100011);
     }
 
     [Fact]
     public async Task ObservationsBySearchEndpoint_ReturnsObservationsInCorrectOrder_WhenOrderingByModifiedDateWithSameDate()
     {
         // Arrange
-        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(6)
             .All().HaveValuesFromPredefinedObservations()
                 .With(m => m.EditDate = new DateTime(2024, 12, 24))
             .Build();
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
         var apiClient = TestFixture.CreateApiClient();
-        var searchFilter = new SearchFilterDto { OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present, Output = new OutputFilterDto { FieldSet = Lib.Enums.OutputFieldSet.All } };
+        var searchFilter = new SearchFilterDto { OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present, Output = new OutputFilterDto { FieldSet = OutputFieldSet.All } };
 
         // Act - paginate
-        var responseAsc1 = await apiClient.PostAsync($"/observations/search?sortBy=modified&sortOrder=asc&skip=0&take=50", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var responseAsc1 = await apiClient.PostAsync($"/observations/search?sortBy=modified&sortOrder=asc&skip=0&take=3", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
         var resultAsc1 = await responseAsc1.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);
-        var responseAsc2 = await apiClient.PostAsync($"/observations/search?sortBy=modified&sortOrder=asc&skip=50&take=50", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var responseAsc2 = await apiClient.PostAsync($"/observations/search?sortBy=modified&sortOrder=asc&skip=3&take=3", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
         var resultAsc2 = await responseAsc2.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);
 
         // Assert
+        responseAsc1.StatusCode.Should().Be(HttpStatusCode.OK);
+        responseAsc2.StatusCode.Should().Be(HttpStatusCode.OK);
+        resultAsc1!.Records.Should().HaveCount(3);
+        resultAsc2!.Records.Should().HaveCount(3);
         HashSet<string> occurrenceIds = new HashSet<string>();
         foreach (var obs in resultAsc1.Records)
         {
-            occurrenceIds.Should().NotContain(obs.Id);
+            occurrenceIds.Should().NotContain(obs.Occurrence.OccurrenceId);
             occurrenceIds.Add(obs.Occurrence.OccurrenceId);
         }
         foreach (var obs in resultAsc2.Records)
         {
-            occurrenceIds.Should().NotContain(obs.Id);
+            occurrenceIds.Should().NotContain(obs.Occurrence.OccurrenceId);
             occurrenceIds.Add(obs.Occurrence.OccurrenceId);
         }
+        occurrenceIds.Should().HaveCount(6);
     }
 
     [Fact]
     public async Task ObservationsBySearchEndpoint_ReturnsObservationsInCorrectOrder_WhenOrderingByModifiedDateWithDifferentDate()
     {
         // Arrange
-        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(6)
             .All().HaveValuesFromPredefinedObservations()                
             .Build();
         DateTime dateTime = new DateTime(2020, 01, 01);
@@ -93,14 +100,18 @@ public class SortingTests : TestBase
         var searchFilter = new SearchFilterDto { OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present, Output = new OutputFilterDto { Fields = ["modified"] } };
 
         // Act - paginate
-        var responseAsc1 = await apiClient.PostAsync($"/observations/search?sortBy=modified&sortOrder=asc&skip=0&take=50", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var responseAsc1 = await apiClient.PostAsync($"/observations/search?sortBy=modified&sortOrder=asc&skip=0&take=3", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
         var resultAsc1 = await responseAsc1.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);
-        var responseAsc2 = await apiClient.PostAsync($"/observations/search?sortBy=modified&sortOrder=asc&skip=50&take=50", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+        var responseAsc2 = await apiClient.PostAsync($"/observations/search?sortBy=modified&sortOrder=asc&skip=3&take=3", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
         var resultAsc2 = await responseAsc2.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);
 
         // Assert
+        responseAsc1.StatusCode.Should().Be(HttpStatusCode.OK);
+        responseAsc2.StatusCode.Should().Be(HttpStatusCode.OK);
+        resultAsc1!.Records.Should().HaveCount(3);
+        resultAsc2!.Records.Should().HaveCount(3);
         DateTime? previousDate = null;
-        foreach (var obs in resultAsc1.Records.Union(resultAsc2.Records))
+        foreach (var obs in resultAsc1.Records.Concat(resultAsc2.Records))
         {
             if (previousDate != null)
             {
@@ -114,8 +125,11 @@ public class SortingTests : TestBase
     public async Task ObservationsBySearchEndpoint_ReturnsObservationsInCorrectOrder_WhenSortByUsingPascalCase()
     {
         // Arrange
-        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(6)
             .All().HaveValuesFromPredefinedObservations()
+            .TheFirst(2).With(observation => observation.TaxonId = 100013)
+            .TheNext(2).With(observation => observation.TaxonId = 100011)
+            .TheLast(2).With(observation => observation.TaxonId = 100012)
             .Build();
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
         var apiClient = TestFixture.CreateApiClient();
@@ -130,15 +144,15 @@ public class SortingTests : TestBase
         // Assert
         responseAsc.StatusCode.Should().Be(HttpStatusCode.OK);
         responseDesc.StatusCode.Should().Be(HttpStatusCode.OK);
-        resultAsc!.Records.Select(m => m.Id).Should().BeInAscendingOrder();
-        resultDesc!.Records.Select(m => m.Id).Should().BeInDescendingOrder();
+        resultAsc!.Records!.Select(observation => observation.Taxon.Id).Should().Equal(100011, 100011, 100012, 100012, 100013, 100013);
+        resultDesc!.Records!.Select(observation => observation.Taxon.Id).Should().Equal(100013, 100013, 100012, 100012, 100011, 100011);
     }
 
     [Fact]
     public async Task ObservationsBySearchEndpoint_ReturnsBadRequest_WhenSortByPropertyThatDoesntExists()
     {
         // Arrange
-        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(2)
             .All().HaveValuesFromPredefinedObservations()
             .Build();
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);

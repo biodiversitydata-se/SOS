@@ -1,5 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
+using SOS.Api.Contracts.Taxonomy.Requests;
 using SOS.Administration.Api.Controllers.Interfaces;
 using SOS.Administration.Api.Managers;
 using SOS.Harvest.Harvesters.Interfaces;
@@ -125,7 +126,7 @@ public class DiagnosticsController : ControllerBase, IDiagnosticsController
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
     public async Task<IActionResult> GetTaxonRelationsDiagram(
         [FromQuery] int[] taxonIds,
-        [FromQuery] TaxonRelationDiagramHelper.TaxonRelationsTreeIterationMode treeIterationMode = TaxonRelationDiagramHelper.TaxonRelationsTreeIterationMode.BothParentsAndChildren,
+        [FromQuery] TaxonRelationsTreeIterationMode treeIterationMode = TaxonRelationsTreeIterationMode.BothParentsAndChildren,
         [FromQuery] bool includeSecondaryRelations = false,
         [FromQuery] DiagramFormat diagramFormat = DiagramFormat.Mermaid)
     {

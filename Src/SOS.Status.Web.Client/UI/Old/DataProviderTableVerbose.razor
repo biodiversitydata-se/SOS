@@ -1,5 +1,5 @@
 ﻿@using SOS.Status.Web.Client.Dtos
-<MudTable @ref="mudTable" Class="data-provider-table" Items="@ProcessSummary?.DataProviderStatuses" T="DataProviderStatusDto" Hover="true" Bordered="false" Striped="true" Dense="true" RowClass="cursor-pointer" RowClassFunc="@SelectedRowClassFunc" OnRowClick="RowClickEvent">
+<MudTable @ref="mudTable" Class="data-provider-table" Items="@ProcessSummary?.DataProviderStatuses" T="DataProviderStatusViewModel" Hover="true" Bordered="false" Striped="true" Dense="true" RowClass="cursor-pointer" RowClassFunc="@SelectedRowClassFunc" OnRowClick="RowClickEvent">
     <HeaderContent>
         <MudTh>Id</MudTh>
         <MudTh>Dataset</MudTh>
@@ -30,10 +30,10 @@
 
 @code {
     [Parameter]
-    public ProcessSummaryDto? ProcessSummary { get; set; }
+    public ProcessSummaryViewModel? ProcessSummary { get; set; }
 
     private int selectedRowNumber = -1;
-    private MudTable<DataProviderStatusDto>? mudTable;
+    private MudTable<DataProviderStatusViewModel>? mudTable;
     
     string GetDiffClass(int activeValue, int inactiveValue)
     {
@@ -46,12 +46,12 @@
             return "bg-danger";
     }
 
-    private void RowClickEvent(TableRowClickEventArgs<DataProviderStatusDto> tableRowClickEventArgs)
+    private void RowClickEvent(TableRowClickEventArgs<DataProviderStatusViewModel> tableRowClickEventArgs)
     {
         //clickedEvents.Add("Row has been clicked");
     }
 
-    private string SelectedRowClassFunc(DataProviderStatusDto element, int rowNumber)
+    private string SelectedRowClassFunc(DataProviderStatusViewModel element, int rowNumber)
     {
         if (selectedRowNumber == rowNumber)
         {

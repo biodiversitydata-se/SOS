@@ -7,7 +7,6 @@ using SOS.Api.Contracts.Aggregations.Requests;
 using SOS.Api.Contracts.Aggregations.Responses;
 using SOS.Api.Contracts.Common.Responses;
 using SOS.Api.Contracts.Observations.Requests;
-using static System.Net.WebRequestMethods;
 
 namespace SOS.Api.Client.Clients;
 
@@ -36,27 +35,15 @@ public sealed class SosObservationAggregationsClient : ISosObservationAggregatio
     }
 
     /// <inheritdoc />
-    public async Task<IEnumerable<TaxonSumAggregationItemDto>?> CachedCountInternalAsync(
+    public async Task<IEnumerable<TaxonSumAggregationItem>?> CachedCountInternalAsync(
         IEnumerable<int> taxonIds,
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(taxonIds);
-        var requestBody = SosClientHttp.Serialize(taxonIds);
-        using var request = CreatePostRequest(
-           new Uri($"observations/internal/cachedcount", UriKind.Relative),
-           requestBody,
-           null,
-           null);
-
-        _requestLogging.LogRequest(_httpClient, request, requestBody);
-        using var response = await _httpClient.SendAsync(
-            request,
-            HttpCompletionOption.ResponseHeadersRead,
-            cancellationToken);
-
-        return await SosClientHttp.ReadJsonResponseAsync<IEnumerable<TaxonSumAggregationItemDto>>(
-            response,
-            request.RequestUri,
+        return await SendAsync<IEnumerable<TaxonSumAggregationItem>>(
+            new Uri("observations/internal/cachedcount", UriKind.Relative),
+            SosClientHttp.Serialize(taxonIds),
+            new SosRoleRequestOptions(),
             cancellationToken);
     }
 
@@ -153,7 +140,7 @@ public sealed class SosObservationAggregationsClient : ISosObservationAggregatio
     }
 
     /// <inheritdoc />
-    public Task<PagedResultDto<TaxonSumAggregationItemDto>?> TaxonSumAggregationInternalAsync(
+    public Task<PagedResultDto<TaxonSumAggregationItem>?> TaxonSumAggregationInternalAsync(
         TaxonFilterDto filter,
         TaxonSumAggregationInternalOptions? options = null,
         CancellationToken cancellationToken = default)
@@ -166,7 +153,7 @@ public sealed class SosObservationAggregationsClient : ISosObservationAggregatio
     }
 
     /// <inheritdoc />
-    public Task<PagedResultDto<TaxonSumAggregationItemDto>?> TaxonSumAggregationInternalJsonAsync(
+    public Task<PagedResultDto<TaxonSumAggregationItem>?> TaxonSumAggregationInternalJsonAsync(
         string filterJson,
         TaxonSumAggregationInternalOptions? options = null,
         CancellationToken cancellationToken = default)
@@ -176,7 +163,7 @@ public sealed class SosObservationAggregationsClient : ISosObservationAggregatio
     }
 
     /// <inheritdoc />
-    public Task<IReadOnlyDictionary<int, TaxonAreaAggregationDto>> TaxonAreaAggregationInternalAsync(
+    public Task<IReadOnlyDictionary<int, TaxonAreaAggregation>> TaxonAreaAggregationInternalAsync(
         SearchFilterAggregationInternalDto filter,
         TaxonAreaAggregationInternalOptions? options = null,
         CancellationToken cancellationToken = default)
@@ -189,7 +176,7 @@ public sealed class SosObservationAggregationsClient : ISosObservationAggregatio
     }
 
     /// <inheritdoc />
-    public Task<IReadOnlyDictionary<int, TaxonAreaAggregationDto>> TaxonAreaAggregationInternalJsonAsync(
+    public Task<IReadOnlyDictionary<int, TaxonAreaAggregation>> TaxonAreaAggregationInternalJsonAsync(
         string filterJson,
         TaxonAreaAggregationInternalOptions? options = null,
         CancellationToken cancellationToken = default)
@@ -219,71 +206,38 @@ public sealed class SosObservationAggregationsClient : ISosObservationAggregatio
     {
         SosClientHttp.ThrowIfEmptyJson(filterJson, nameof(filterJson));
         var requestOptions = options ?? new TimeSeriesHistogramInternalOptions();
-        using var request = CreatePostRequest(
+        var results = await SendAsync<List<TimeSeriesHistogramResultDto>>(
             BuildTimeSeriesHistogramInternalUri(requestOptions),
             filterJson,
-            requestOptions.RoleId,
-            requestOptions.AuthorizationApplicationIdentifier);
-
-        _requestLogging.LogRequest(_httpClient, request, filterJson);
-        using var response = await _httpClient.SendAsync(
-            request,
-            HttpCompletionOption.ResponseHeadersRead,
-            cancellationToken);
-
-        var results = await SosClientHttp.ReadJsonResponseAsync<List<TimeSeriesHistogramResultDto>>(
-            response,
-            request.RequestUri,
+            requestOptions,
             cancellationToken);
 
         return results ?? [];
     }
 
-    private async Task<GeoGridResultDto?> SendGeoGridAggregationInternalAsync(
+    private Task<GeoGridResultDto?> SendGeoGridAggregationInternalAsync(
         string filterJson,
         GeoGridAggregationInternalOptions? options,
         CancellationToken cancellationToken)
     {
         var requestOptions = options ?? new GeoGridAggregationInternalOptions();
-        using var request = CreatePostRequest(
+        return SendAsync<GeoGridResultDto>(
             BuildGeoGridAggregationInternalUri(requestOptions),
             filterJson,
-            requestOptions.RoleId,
-            requestOptions.AuthorizationApplicationIdentifier);
-
-        _requestLogging.LogRequest(_httpClient, request, filterJson);
-        using var response = await _httpClient.SendAsync(
-            request,
-            HttpCompletionOption.ResponseHeadersRead,
-            cancellationToken);
-
-        return await SosClientHttp.ReadJsonResponseAsync<GeoGridResultDto>(
-            response,
-            request.RequestUri,
+            requestOptions,
             cancellationToken);
     }
 
-    private async Task<GeoGridMetricResultDto?> SendMetricGridAggregationInternalAsync(
+    private Task<GeoGridMetricResultDto?> SendMetricGridAggregationInternalAsync(
         string filterJson,
         MetricGridAggregationInternalOptions? options,
         CancellationToken cancellationToken)
     {
         var requestOptions = options ?? new MetricGridAggregationInternalOptions();
-        using var request = CreatePostRequest(
+        return SendAsync<GeoGridMetricResultDto>(
             BuildMetricGridAggregationInternalUri(requestOptions),
             filterJson,
-            requestOptions.RoleId,
-            requestOptions.AuthorizationApplicationIdentifier);
-
-        _requestLogging.LogRequest(_httpClient, request, filterJson);
-        using var response = await _httpClient.SendAsync(
-            request,
-            HttpCompletionOption.ResponseHeadersRead,
-            cancellationToken);
-
-        return await SosClientHttp.ReadJsonResponseAsync<GeoGridMetricResultDto>(
-            response,
-            request.RequestUri,
+            requestOptions,
             cancellationToken);
     }
 
@@ -293,84 +247,71 @@ public sealed class SosObservationAggregationsClient : ISosObservationAggregatio
         CancellationToken cancellationToken)
     {
         var requestOptions = options ?? new MetricGridAggregationInternalGeoJsonOptions();
-        using var request = CreatePostRequest(
-            BuildMetricGridAggregationInternalUri(requestOptions),
-            filterJson,
-            requestOptions.RoleId,
-            requestOptions.AuthorizationApplicationIdentifier,
-            SosAcceptProfile.GeoJson);
-
-        _requestLogging.LogRequest(_httpClient, request, filterJson);
-        using var response = await _httpClient.SendAsync(
-            request,
-            HttpCompletionOption.ResponseHeadersRead,
-            cancellationToken);
-        return await SosClientHttp.ReadJsonResponseAsync<FeatureCollection>(
-                   response,
-                   request.RequestUri,
-                   cancellationToken)
+        return await SendAsync<FeatureCollection>(
+                   BuildMetricGridAggregationInternalUri(requestOptions),
+                   filterJson,
+                   requestOptions,
+                   cancellationToken,
+                   SosAcceptProfile.GeoJson)
                ?? new FeatureCollection();
     }
 
-    private async Task<PagedResultDto<TaxonAggregationItemDto>?> SendTaxonAggregationInternalAsync(
+    private Task<PagedResultDto<TaxonAggregationItemDto>?> SendTaxonAggregationInternalAsync(
         string filterJson,
         TaxonAggregationInternalOptions? options,
         CancellationToken cancellationToken)
     {
         var requestOptions = options ?? new TaxonAggregationInternalOptions();
-        using var request = CreatePostRequest(
+        return SendAsync<PagedResultDto<TaxonAggregationItemDto>>(
             BuildTaxonAggregationInternalUri(requestOptions),
             filterJson,
-            requestOptions.RoleId,
-            requestOptions.AuthorizationApplicationIdentifier);
-
-        _requestLogging.LogRequest(_httpClient, request, filterJson);
-        using var response = await _httpClient.SendAsync(
-            request,
-            HttpCompletionOption.ResponseHeadersRead,
-            cancellationToken);
-
-        return await SosClientHttp.ReadJsonResponseAsync<PagedResultDto<TaxonAggregationItemDto>>(
-            response,
-            request.RequestUri,
+            requestOptions,
             cancellationToken);
     }
 
-    private async Task<PagedResultDto<TaxonSumAggregationItemDto>?> SendTaxonSumAggregationInternalAsync(
+    private Task<PagedResultDto<TaxonSumAggregationItem>?> SendTaxonSumAggregationInternalAsync(
         string filterJson,
         TaxonSumAggregationInternalOptions? options,
         CancellationToken cancellationToken)
     {
-        options ??= new TaxonSumAggregationInternalOptions();
-        using var request = CreatePostRequest(
-            BuildTaxonSumAggregationInternalUri(options),
+        var requestOptions = options ?? new TaxonSumAggregationInternalOptions();
+        return SendAsync<PagedResultDto<TaxonSumAggregationItem>>(
+            BuildTaxonSumAggregationInternalUri(requestOptions),
             filterJson,
-            null,
-            null);
-
-        _requestLogging.LogRequest(_httpClient, request, filterJson);
-        using var response = await _httpClient.SendAsync(
-            request,
-            HttpCompletionOption.ResponseHeadersRead,
-            cancellationToken);
-
-        return await SosClientHttp.ReadJsonResponseAsync<PagedResultDto<TaxonSumAggregationItemDto>>(
-            response,
-            request.RequestUri,
+            new SosRoleRequestOptions(),
             cancellationToken);
     }
 
-    private async Task<IReadOnlyDictionary<int, TaxonAreaAggregationDto>> SendTaxonAreaAggregationInternalAsync(
+    private async Task<IReadOnlyDictionary<int, TaxonAreaAggregation>> SendTaxonAreaAggregationInternalAsync(
         string filterJson,
         TaxonAreaAggregationInternalOptions? options,
         CancellationToken cancellationToken)
     {
         var requestOptions = options ?? new TaxonAreaAggregationInternalOptions();
-        using var request = CreatePostRequest(
+        return (await SendAsync<Dictionary<int, TaxonAreaAggregation>>(
             BuildTaxonAreaAggregationInternalUri(requestOptions),
             filterJson,
-            requestOptions.RoleId,
-            requestOptions.AuthorizationApplicationIdentifier);
+            requestOptions,
+            cancellationToken,
+            requireResponseBody: true))!;
+    }
+
+    private async Task<T?> SendAsync<T>(
+        Uri uri,
+        string filterJson,
+        SosRoleRequestOptions options,
+        CancellationToken cancellationToken,
+        SosAcceptProfile acceptProfile = SosAcceptProfile.Json,
+        bool requireResponseBody = false)
+    {
+        using var request = new HttpRequestMessage(HttpMethod.Post, uri)
+        {
+            Content = SosClientHttp.CreateJsonContent(filterJson)
+        };
+        request.ApplySosRequestHeaders(
+            options.RoleId,
+            options.AuthorizationApplicationIdentifier,
+            acceptProfile);
 
         _requestLogging.LogRequest(_httpClient, request, filterJson);
         using var response = await _httpClient.SendAsync(
@@ -378,30 +319,15 @@ public sealed class SosObservationAggregationsClient : ISosObservationAggregatio
             HttpCompletionOption.ResponseHeadersRead,
             cancellationToken);
 
-        var result = await SosClientHttp.ReadJsonResponseAsync<Dictionary<int, TaxonAreaAggregationDto>>(
+        var result = await SosClientHttp.ReadJsonResponseAsync<T>(
             response,
             request.RequestUri,
             cancellationToken);
-
-        return result ?? throw SosClientHttp.CreateInvalidResponseException(response, request.RequestUri);
-    }
-
-    private static HttpRequestMessage CreatePostRequest(
-        Uri uri,
-        string filterJson,
-        int? roleId,
-        string? authorizationApplicationIdentifier,
-        SosAcceptProfile acceptProfile = SosAcceptProfile.Json)
-    {
-        var request = new HttpRequestMessage(HttpMethod.Post, uri)
+        if (result is null && requireResponseBody)
         {
-            Content = SosClientHttp.CreateJsonContent(filterJson)
-        };
-        request.ApplySosRequestHeaders(
-            roleId,
-            authorizationApplicationIdentifier,
-            acceptProfile);
-        return request;
+            throw SosClientHttp.CreateInvalidResponseException(response, request.RequestUri);
+        }
+        return result;
     }
 
     private static Uri BuildGeoGridAggregationInternalUri(GeoGridAggregationInternalOptions options)

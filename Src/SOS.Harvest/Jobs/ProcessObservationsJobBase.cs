@@ -1,5 +1,4 @@
-﻿using AgileObjects.AgileMapper.Extensions;
-using Elastic.Clients.Elasticsearch;
+﻿using Elastic.Clients.Elasticsearch;
 using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
@@ -450,7 +449,10 @@ public class ProcessObservationsJobBase : ProcessJobBase
 
             taxa = taxa.Where(m => m.IsNotAccepted == false); // only include accepted taxa in the dictionary, as we don't want to process observations for non-accepted taxa
             var taxaDictonary = new ConcurrentDictionary<int, Taxon>();
-            taxa.ForEach(t => taxaDictonary.TryAdd(t.Id, t));
+            foreach (var taxon in taxa)
+            {
+                taxaDictonary.TryAdd(taxon.Id, taxon);
+            }
 
             _logger.LogInformation($"Finish getting taxa from cache (taxaDictionary.Count={taxaDictonary.Count}, taxa.Count={taxa?.Count()})");
 

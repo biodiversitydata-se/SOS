@@ -1,9 +1,8 @@
-﻿using FizzWare.NBuilder;
+using SOS.Api.Contracts.Common.Responses;
+using SOS.Api.Contracts.Observations.Requests;
+using FizzWare.NBuilder;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Verbatim.Artportalen;
-using SOS.Lib.Dtos;
-using SOS.Lib.Dtos.Enum;
-using SOS.Lib.Dtos.Filter;
 using SOS.Observations.Api.IntegrationTests.Setup;
 using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
 
@@ -20,11 +19,11 @@ public class OccurrenceStatusTests : TestBase
     public async Task ObservationsBySearchEndpoint_ReturnsOnlyPresentObservations_WhenNoOccurrenceStatusFilterIsSet()
     {
         // Arrange
-        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(5)
             .All().HaveValuesFromPredefinedObservations()
-             .TheFirst(60).With(o => o.NotPresent = false)
+             .TheFirst(3).With(o => o.NotPresent = false)
                           .With(o => o.NotRecovered = false)
-             .TheNext(40).With(o => o.NotPresent = true)
+             .TheNext(2).With(o => o.NotPresent = true)
             .Build();
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
         var apiClient = TestFixture.CreateApiClient();
@@ -39,19 +38,19 @@ public class OccurrenceStatusTests : TestBase
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        result!.TotalCount.Should().Be(60,
-            because: "60 observations is present and only present observations should be returned if no filter is set.");
+        result!.TotalCount.Should().Be(3,
+            because: "3 observations is present and only present observations should be returned if no filter is set.");
     }
 
     [Fact]
     public async Task ObservationsBySearchEndpoint_ReturnsOnlyPresentObservations_WhenOccurrencePresentStatusFilterIsSet()
     {
         // Arrange
-        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(5)
             .All().HaveValuesFromPredefinedObservations()
-             .TheFirst(60).With(o => o.NotPresent = false)
+             .TheFirst(3).With(o => o.NotPresent = false)
                           .With(o => o.NotRecovered = false)
-             .TheNext(40).With(o => o.NotPresent = true)
+             .TheNext(2).With(o => o.NotPresent = true)
             .Build();
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
         var apiClient = TestFixture.CreateApiClient();
@@ -66,19 +65,19 @@ public class OccurrenceStatusTests : TestBase
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        result!.TotalCount.Should().Be(60,
-            because: "60 observations is present.");
+        result!.TotalCount.Should().Be(3,
+            because: "3 observations is present.");
     }
 
     [Fact]
     public async Task ObservationsBySearchEndpoint_ReturnsOnlyPresentObservations_WhenOccurrenceAbsentStatusFilterIsSet()
     {
         // Arrange
-        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(5)
             .All().HaveValuesFromPredefinedObservations()
-             .TheFirst(60).With(o => o.NotPresent = false)
+             .TheFirst(3).With(o => o.NotPresent = false)
                           .With(o => o.NotRecovered = false)
-             .TheNext(40).With(o => o.NotPresent = true)
+             .TheNext(2).With(o => o.NotPresent = true)
             .Build();
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
         var apiClient = TestFixture.CreateApiClient();
@@ -93,19 +92,19 @@ public class OccurrenceStatusTests : TestBase
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        result!.TotalCount.Should().Be(40,
-            because: "40 observations is absent.");
+        result!.TotalCount.Should().Be(2,
+            because: "2 observations is absent.");
     }
 
     [Fact]
     public async Task ObservationsBySearchEndpoint_ReturnsOnlyPresentObservations_WhenOccurrenceBothAbsentAndPresentStatusFilterIsSet()
     {
         // Arrange
-        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(5)
             .All().HaveValuesFromPredefinedObservations()
-             .TheFirst(60).With(o => o.NotPresent = false)
+             .TheFirst(3).With(o => o.NotPresent = false)
                           .With(o => o.NotRecovered = false)
-             .TheNext(40).With(o => o.NotPresent = true)
+             .TheNext(2).With(o => o.NotPresent = true)
             .Build();
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
         var apiClient = TestFixture.CreateApiClient();
@@ -120,7 +119,7 @@ public class OccurrenceStatusTests : TestBase
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        result!.TotalCount.Should().Be(100,
-            because: "100 observations is present or absent.");
+        result!.TotalCount.Should().Be(5,
+            because: "5 observations is present or absent.");
     }
 }

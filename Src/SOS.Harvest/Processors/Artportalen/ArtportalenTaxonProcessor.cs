@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+﻿﻿using Microsoft.Extensions.Logging;
 using SOS.Harvest.Processors.Artportalen.Interfaces;
 using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Factories;

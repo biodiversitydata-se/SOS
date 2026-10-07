@@ -1,5 +1,6 @@
-﻿using Elastic.Clients.Elasticsearch;
-using SOS.Lib.Enums;
+﻿﻿using SOS.Api.Contracts.Aggregations.Requests;
+using SOS.Api.Contracts.Aggregations.Responses;
+using Elastic.Clients.Elasticsearch;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Repositories.Processed.Interfaces;
@@ -41,7 +42,7 @@ public interface IProcessedObservationRepository : IProcessedObservationCoreRepo
     /// <param name="filter"></param>
     /// <param name="timeSeriesType"></param>
     /// <returns></returns>
-    Task<IEnumerable<TimeSeriesHistogramResult>> GetYearHistogramAsync(SearchFilter filter, TimeSeriesType timeSeriesType);
+    Task<IEnumerable<TimeSeriesHistogramResultDto>> GetYearHistogramAsync(SearchFilter filter, TimeSeriesTypeDto timeSeriesType);
 
     /// <summary>
     /// Get histogram based on a time series
@@ -49,7 +50,7 @@ public interface IProcessedObservationRepository : IProcessedObservationCoreRepo
     /// <param name="filter"></param>
     /// <param name="timeSeriesType"></param>
     /// <returns></returns>
-    Task<IEnumerable<TimeSeriesHistogramResult>> GetTimeSeriesHistogramAsync(SearchFilter filter, TimeSeriesType timeSeriesType);
+    Task<IEnumerable<TimeSeriesHistogramResultDto>> GetTimeSeriesHistogramAsync(SearchFilter filter, TimeSeriesTypeDto timeSeriesType);
 
     /// <summary>
     /// Get geo grid tile aggregation
@@ -71,14 +72,14 @@ public interface IProcessedObservationRepository : IProcessedObservationCoreRepo
     /// </summary>
     /// <param name="filter"></param>
     /// <returns></returns>
-    Task<IEnumerable<YearCountResult>> GetUserYearCountAsync(SearchFilter filter);
+    Task<IEnumerable<YearCountResultDto>> GetUserYearCountAsync(SearchFilter filter);
 
     /// <summary>
     /// Count the number of user observations group by year and month
     /// </summary>
     /// <param name="filter"></param>
     /// <returns></returns>
-    Task<IEnumerable<YearMonthCountResult>> GetUserYearMonthCountAsync(SearchFilter filter);
+    Task<IEnumerable<YearMonthCountResultDto>> GetUserYearMonthCountAsync(SearchFilter filter);
 
     /// <summary>
     /// Count the number of user observations group by year, month and day
@@ -87,7 +88,7 @@ public interface IProcessedObservationRepository : IProcessedObservationCoreRepo
     /// <param name="skip"></param>
     /// <param name="take"></param>
     /// <returns></returns>
-    Task<IEnumerable<YearMonthDayCountResult>> GetUserYearMonthDayCountAsync(SearchFilter filter, int skip, int take);
+    Task<IEnumerable<YearMonthDayCountResultDto>> GetUserYearMonthDayCountAsync(SearchFilter filter, int skip, int take);
 
     /// <summary>
     /// Check if index have observations with same occurrence id

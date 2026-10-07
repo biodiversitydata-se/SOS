@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Helpers;
 using SOS.Lib.Managers.Interfaces;
-using SOS.Lib.Models.DataQuality;
+using SOS.Api.Contracts.DataQuality.Responses;
 using System;
 using System.Net;
 using System.Threading.Tasks;

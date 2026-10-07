@@ -1,8 +1,10 @@
+using SOS.Api.Contracts.Metadata.Responses;
 using SOS.Api.Client.Abstractions;
 using SOS.Status.Web.Client.Abstractions;
 using SOS.Status.Web.HttpClients;
-using WebDtos = SOS.Status.Web.Client.Dtos;
-using WebModels = SOS.Status.Web.Client.Models;
+using SOS.Api.Contracts.Status.Responses;
+using SOS.Status.Web.Client.Dtos;
+using SOS.Status.Web.Client.Models;
 
 namespace SOS.Status.Web.Services;
 
@@ -34,42 +36,42 @@ public class StatusInfoService : IStatusInfoService
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
-    public async Task<WebDtos.ProcessSummaryDto?> GetProcessSummaryAsync()
+    public async Task<ProcessSummaryViewModel?> GetProcessSummaryAsync()
     {
         var processSummary = await _systemsStatusInfoClient.GetProcessSummaryAsync();
         return processSummary is null ? null : MapProcessSummary(processSummary);
     }
 
-    public async Task<WebDtos.ProcessInfoDto?> GetProcessInfoAsync(bool active)
+    public async Task<ProcessInfoViewModel?> GetProcessInfoAsync(bool active)
     {
         var processInfo = await _systemsStatusInfoClient.GetProcessInfoAsync(active);
         return processInfo is null ? null : MapProcessInfo(processInfo);
     }
 
-    public async Task<IEnumerable<WebDtos.MongoDbProcessInfoDto>?> GetProcessInfoAsync()
+    public async Task<IEnumerable<MongoDbProcessInfoDto>?> GetProcessInfoAsync()
     {
         var processInfo = await _systemsStatusInfoClient.GetMongoDbProcessInfoAsync();
-        return processInfo?.Select(MapMongoDbProcessInfo);
+        return processInfo;
     }
 
-    public async Task<List<WebDtos.DataProviderStatusDto>?> GetDataProviderStatusAsync()
+    public async Task<List<DataProviderStatusViewModel>?> GetDataProviderStatusAsync()
     {
         var dataProviderStatus = await _sosStatusInfoService.GetDataProviderStatusAsync();
         return dataProviderStatus?.Select(MapDataProviderStatus).ToList();
     }
 
-    public async Task<List<WebModels.DataProviderStatusRow>?> GetDataProviderStatusRowsAsync()
+    public async Task<List<SOS.Status.Web.Client.Models.DataProviderStatusRow>?> GetDataProviderStatusRowsAsync()
     {
         var rows = await _sosStatusInfoService.GetDataProviderStatusRowsAsync();
         return rows.Select(MapDataProviderStatusRow).ToList();
     }
 
-    public async Task<WebModels.HealthReportDto?> GetObservationsApiHealthAsync()
+    public async Task<HealthReportDto?> GetObservationsApiHealthAsync()
     {
         try
         {
             var healthReport = await _sosStatusInfoService.GetObservationsApiHealthAsync();
-            return healthReport is null ? null : MapHealthReport(healthReport);
+            return healthReport;
         }
         catch (Exception ex)
         {
@@ -78,21 +80,21 @@ public class StatusInfoService : IStatusInfoService
         }
     }
 
-    public async Task<WebModels.HealthReportDto?> GetAnalysisApiHealthAsync()
+    public async Task<HealthReportDto?> GetAnalysisApiHealthAsync()
     {
         var healthReport = await _analysisApiClient.GetHealthAsync();
         healthReport?.Entries?.Remove("self");
         return healthReport;
     }
 
-    public async Task<WebModels.HealthReportDto?> GetElasticsearchProxyHealthAsync()
+    public async Task<HealthReportDto?> GetElasticsearchProxyHealthAsync()
     {
         var healthReport = await _elasticsearchProxyClient.GetHealthAsync();
         healthReport?.Entries?.Remove("self");
         return healthReport;
     }
 
-    public async Task<WebModels.HealthReportDto?> GetDataStewardshipApiHealthAsync()
+    public async Task<HealthReportDto?> GetDataStewardshipApiHealthAsync()
     {
         var healthReport = await _dataStewardshipApiClient.GetHealthAsync();
         healthReport?.Entries?.Remove("self");
@@ -104,9 +106,9 @@ public class StatusInfoService : IStatusInfoService
         return await _ipifyClient.GetOutboundIpAsync(cancellationToken);
     }
 
-    private static WebDtos.ProcessSummaryDto MapProcessSummary(SOS.Api.Contracts.Status.Responses.ProcessSummaryDto source)
+    private static ProcessSummaryViewModel MapProcessSummary(ProcessSummaryDto source)
     {
-        return new WebDtos.ProcessSummaryDto
+        return new ProcessSummaryViewModel
         {
             ActiveProcessStatus = MapProcessStatus(source.ActiveProcessStatus),
             InactiveProcessStatus = MapProcessStatus(source.InactiveProcessStatus),
@@ -114,9 +116,9 @@ public class StatusInfoService : IStatusInfoService
         };
     }
 
-    private static WebDtos.ProcessStatusDto MapProcessStatus(SOS.Api.Contracts.Status.Responses.ProcessStatusDto? source)
+    private static ProcessStatusDto MapProcessStatus(ProcessStatusDto? source)
     {
-        return new WebDtos.ProcessStatusDto
+        return new ProcessStatusDto
         {
             Name = source?.Name ?? string.Empty,
             Status = source?.Status ?? string.Empty,
@@ -128,9 +130,9 @@ public class StatusInfoService : IStatusInfoService
         };
     }
 
-    private static WebDtos.ProcessInfoDto MapProcessInfo(SOS.Api.Contracts.Metadata.Responses.ProcessInfoDto source)
+    private static ProcessInfoViewModel MapProcessInfo(ProcessInfoDto source)
     {
-        return new WebDtos.ProcessInfoDto
+        return new ProcessInfoViewModel
         {
             Id = source.Id,
             PublicCount = source.PublicCount,
@@ -142,9 +144,9 @@ public class StatusInfoService : IStatusInfoService
         };
     }
 
-    private static WebDtos.ProcessInfoDto.Provider MapProviderInfo(SOS.Api.Contracts.Metadata.Responses.ProviderInfoDto source)
+    private static ProcessInfoViewModel.Provider MapProviderInfo(ProviderInfoDto source)
     {
-        return new WebDtos.ProcessInfoDto.Provider
+        return new ProcessInfoViewModel.Provider
         {
             DataProviderId = source.DataProviderId,
             DataProviderIdentifier = source.DataProviderIdentifier,
@@ -167,50 +169,9 @@ public class StatusInfoService : IStatusInfoService
         };
     }
 
-    private static WebDtos.MongoDbProcessInfoDto MapMongoDbProcessInfo(SOS.Api.Contracts.Status.Responses.MongoDbProcessInfoDto source)
+    private static DataProviderStatusViewModel MapDataProviderStatus(DataProviderStatusDto source)
     {
-        return new WebDtos.MongoDbProcessInfoDto
-        {
-            Id = source.Id,
-            ProcessFailCount = source.ProcessFailCount,
-            PublicCount = source.PublicCount,
-            ProtectedCount = source.ProtectedCount,
-            End = source.End,
-            Start = source.Start,
-            Status = source.Status,
-            ProvidersInfo = source.ProvidersInfo?.Select(MapMongoDbProcessProvider)
-        };
-    }
-
-    private static WebDtos.MongoDbProcessInfoDto.Provider MapMongoDbProcessProvider(SOS.Api.Contracts.Status.Responses.MongoDbProcessInfoDto.Provider source)
-    {
-        return new WebDtos.MongoDbProcessInfoDto.Provider
-        {
-            DataProviderId = source.DataProviderId,
-            DataProviderIdentifier = source.DataProviderIdentifier,
-            ProcessEnd = source.ProcessEnd,
-            ProcessStart = source.ProcessStart,
-            ProcessStatus = source.ProcessStatus,
-            ProcessFailCount = source.ProcessFailCount,
-            PublicProcessCount = source.PublicProcessCount,
-            ProtectedProcessCount = source.ProtectedProcessCount,
-            HarvestEnd = source.HarvestEnd,
-            HarvestStart = source.HarvestStart,
-            HarvestNotes = source.HarvestNotes,
-            HarvestStatus = source.HarvestStatus,
-            HarvestCount = source.HarvestCount,
-            LatestIncrementalEnd = source.LatestIncrementalEnd,
-            LatestIncrementalStart = source.LatestIncrementalStart,
-            LatestIncrementalStatus = source.LatestIncrementalStatus,
-            LatestIncrementalPublicCount = source.LatestIncrementalPublicCount,
-            LatestIncrementalProtectedCount = source.LatestIncrementalProtectedCount,
-            DataProviderType = source.DataProviderType
-        };
-    }
-
-    private static WebDtos.DataProviderStatusDto MapDataProviderStatus(SOS.Api.Contracts.Status.Responses.DataProviderStatusDto source)
-    {
-        return new WebDtos.DataProviderStatusDto
+        return new DataProviderStatusViewModel
         {
             Id = source.Id,
             Identifier = source.Identifier,
@@ -240,9 +201,9 @@ public class StatusInfoService : IStatusInfoService
         };
     }
 
-    private static WebModels.DataProviderStatusRow MapDataProviderStatusRow(SOS.Api.Contracts.Status.Responses.DataProviderStatusRow source)
+    private static SOS.Status.Web.Client.Models.DataProviderStatusRow MapDataProviderStatusRow(SOS.Api.Contracts.Status.Responses.DataProviderStatusRow source)
     {
-        return new WebModels.DataProviderStatusRow
+        return new SOS.Status.Web.Client.Models.DataProviderStatusRow
         {
             Datasource = source.Datasource,
             DataProviderId = source.DataProviderId,
@@ -258,27 +219,4 @@ public class StatusInfoService : IStatusInfoService
         };
     }
 
-    private static WebModels.HealthReportDto MapHealthReport(SOS.Api.Contracts.Status.Responses.HealthReportDto source)
-    {
-        return new WebModels.HealthReportDto
-        {
-            Status = source.Status,
-            TotalDuration = source.TotalDuration,
-            Entries = source.Entries?.ToDictionary(
-                pair => pair.Key,
-                pair => MapHealthReportEntry(pair.Value))
-        };
-    }
-
-    private static WebModels.HealthReportEntryDto MapHealthReportEntry(SOS.Api.Contracts.Status.Responses.HealthReportEntryDto source)
-    {
-        return new WebModels.HealthReportEntryDto
-        {
-            Status = source.Status,
-            Description = source.Description,
-            Duration = source.Duration,
-            Tags = source.Tags?.ToList(),
-            Data = source.Data
-        };
-    }
 }

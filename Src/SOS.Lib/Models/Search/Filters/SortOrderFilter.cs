@@ -1,4 +1,4 @@
-﻿using SOS.Lib.Enums;
+using SOS.Api.Contracts.Observations.Requests;
 
 namespace SOS.Lib.Models.Search.Filters;
 

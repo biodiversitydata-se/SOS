@@ -1,9 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using SOS.Api.Contracts.Lookups.Responses;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Helpers;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Swagger;
-using SOS.Lib.Dtos.Vocabulary;
 using SOS.Shared.Api.Extensions.Controller;
 using SOS.Lib.Extensions.Dto;
 using System;
@@ -60,7 +60,7 @@ public class ProjectsController : ControllerBase
             {
                 return new StatusCodeResult((int)HttpStatusCode.NoContent);
             }
-            return new OkObjectResult(projects.Select(p => p.ToDto()));
+            return new OkObjectResult(projects.ToProjectDtos());
         }
         catch (Exception e)
         {
@@ -87,7 +87,7 @@ public class ProjectsController : ControllerBase
             {
                 return new StatusCodeResult((int)HttpStatusCode.NoContent);
             }
-            return new OkObjectResult(projects.Select(p => p.ToDto()));
+            return new OkObjectResult(projects.ToProjectDtos());
         }
         catch (Exception e)
         {

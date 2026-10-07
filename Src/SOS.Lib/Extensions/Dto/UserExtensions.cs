@@ -1,6 +1,6 @@
-﻿using SOS.Lib.Models.UserService;
-using SOS.Lib.Dtos;
-using SOS.Lib.Dtos.Enum;
+﻿using SOS.Api.Contracts.Users.Responses;
+using SOS.Lib.Models.UserService;
+using SOS.Api.Contracts.Areas.Responses;
 
 namespace SOS.Lib.Extensions.Dto;
 

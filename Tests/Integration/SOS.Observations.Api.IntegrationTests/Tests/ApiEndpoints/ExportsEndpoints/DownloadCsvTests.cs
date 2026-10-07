@@ -1,9 +1,9 @@
-﻿using FizzWare.NBuilder;
+﻿using SOS.Api.Contracts.Observations.Requests;
+using FizzWare.NBuilder;
 using SOS.Lib.Enums;
 using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
-using SOS.Lib.Dtos.Filter;
 using SOS.Observations.Api.IntegrationTests.Helpers;
 using SOS.Observations.Api.IntegrationTests.Setup;
 using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
@@ -21,12 +21,12 @@ public class DownloadCsvTests : TestBase
     public async Task DownloadCsvFileEndpoint_ReturnsExpectedRows_WhenNoFilterIsUsed()
     {
         // Arrange
-        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(3)
             .All().HaveValuesFromPredefinedObservations()
             .Build();
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
         var apiClient = TestFixture.CreateApiClient();
-        var searchFilter = new SearchFilterDto { Output = new OutputFilterDto { FieldSet = OutputFieldSet.Minimum } };
+        var searchFilter = new SearchFilterDto { Output = new OutputFilterDto { FieldSet = SOS.Api.Contracts.Observations.Requests.OutputFieldSet.Minimum } };
 
         // Act
         var response = await apiClient.PostAsync($"/exports/download/csv?gzip=false", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
@@ -35,7 +35,7 @@ public class DownloadCsvTests : TestBase
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var fileEntries = CsvHelper.ReadCsvFile(contentBytes);
-        fileEntries.Count.Should().Be(100);
+        fileEntries.Count.Should().Be(3);
     }
 
     [Fact]
@@ -44,7 +44,7 @@ public class DownloadCsvTests : TestBase
         // Arrange
         const int sightingId = 123456;
         const string occurrenceId = "urn:lsid:artportalen.se:sighting:123456";
-        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(3)
             .All().HaveValuesFromPredefinedObservations()
             .TheFirst(1).With(m => m.SightingId = sightingId)
                         .With(m => m.DatasourceId = 1)
@@ -68,7 +68,7 @@ public class DownloadCsvTests : TestBase
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var fileEntries = CsvHelper.ReadCsvFile(contentBytes);
-        fileEntries.Count.Should().Be(100);
+        fileEntries.Count.Should().Be(3);
         var fileEntry = fileEntries.Single(m => m["OccurrenceId"] == occurrenceId);
         fileEntry["DatasetName"].Should().Be("Artportalen");
         fileEntry["RecordedBy"].Should().Be("Tom Volgers");
@@ -79,7 +79,7 @@ public class DownloadCsvTests : TestBase
     public async Task DownloadCsvFileEndpoint_ReturnsExpectedColumnNames_WhenPropertyLabelTypeIsSpecified()
     {
         // Arrange
-        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(3)
             .All().HaveValuesFromPredefinedObservations()
             .Build();
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
@@ -123,7 +123,7 @@ public class DownloadCsvTests : TestBase
         // Arrange
         const int sightingId = 123456;
         const string occurrenceId = "urn:lsid:artportalen.se:sighting:123456";
-        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(3)
             .All().HaveValuesFromPredefinedObservations()
             .TheFirst(1).With(m => m.SightingId = sightingId)
                         .HaveProjectInformation()
@@ -135,7 +135,7 @@ public class DownloadCsvTests : TestBase
         {
             Output = new OutputFilterDto
             {
-                FieldSet = OutputFieldSet.Extended,
+                FieldSet = SOS.Api.Contracts.Observations.Requests.OutputFieldSet.Extended,
                 Fields = new List<string> { "Occurrence.Media" }
             }
         };

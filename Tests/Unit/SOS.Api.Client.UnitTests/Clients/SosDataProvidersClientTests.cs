@@ -112,7 +112,7 @@ public class SosDataProvidersClientTests
     }
 
     [Fact]
-    public async Task GetDataProviderEmlAsJsonAsync_Success()
+    public async Task GetDataProviderEmlAsJsonAsync_PreservesDatasetAndNamespaceMetadata()
     {
         var json = @"{
             ""eml:eml"": {
@@ -159,7 +159,14 @@ public class SosDataProvidersClientTests
             },
             TestContext.Current.CancellationToken);
 
-        result.Should().NotBeNull();
+        var eml = result!["eml:eml"]!;
+        eml["@xmlns:eml"]!.GetValue<string>().Should().Be("eml://ecoinformatics.org/eml-2.1.1");
+        eml["@packageId"]!.GetValue<string>().Should().Be("38b4c89f-584c-41bb-bd8f-cd1def33e92f");
+        var dataset = eml["dataset"]!;
+        dataset["identifier"]!.GetValue<string>().Should().Be("38b4c89f-584c-41bb-bd8f-cd1def33e92f");
+        dataset["title"]!.GetValue<string>().Should().Be("Artportalen (Swedish Species Observation System)");
+        dataset["alternateIdentifier"]!.AsArray().Select(value => value!.GetValue<string>()).Should().Equal(
+            "https://www.gbif.se/ipt/resource?r=artdata", "urn:lsid:artdata.slu.se:SOS:Artportalen");
     }
         
     [Fact]

@@ -1,5 +1,7 @@
-﻿using Elastic.Clients.Elasticsearch;
+﻿using SOS.Api.Contracts.Observations;
+using Elastic.Clients.Elasticsearch;
 using Hangfire;
+using SOS.Api.Contracts.Exports.Requests;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Enums;
@@ -482,7 +484,7 @@ public class CsvFileWriter : FileWriterBase, ICsvFileWriter
     public async Task<(Stream stream, string filename)> CreateFileInMemoryAsZipStreamAsync(SearchFilter filter,
        IEnumerable<(Stream Stream, string Filename)> additionalFiles,
        string culture,
-       PropertyLabelType propertyLabelType,           
+       PropertyLabelType propertyLabelType,
        IJobCancellationToken cancellationToken)
     {
         var memoryStream = new MemoryStream();

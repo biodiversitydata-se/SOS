@@ -1,9 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using SOS.Api.Contracts.Lookups.Responses;
+using Microsoft.AspNetCore.Mvc;
+using SOS.Api.Contracts.Observations.Requests;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers;
 using SOS.Lib.Swagger;
-using SOS.Lib.Dtos.Vocabulary;
 using SOS.Lib.Extensions.Dto;
 using SOS.Observations.Api.Managers.Interfaces;
 using System;
@@ -225,8 +226,6 @@ public class VocabulariesController : ControllerBase
         {
             LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
             var vocabularies = await _vocabularyManager.GetVocabulariesAsync();
-            if (vocabularyId == VocabularyIdDto.VerificationStatus) vocabularyId = VocabularyIdDto.VerificationStatus;
-            if (vocabularyId == VocabularyIdDto.SensitivityCategory) vocabularyId = VocabularyIdDto.SensitivityCategory;
             var vocabulary = vocabularies.FirstOrDefault(f => f.Id == (VocabularyId)vocabularyId);
 
             if (vocabulary == null)

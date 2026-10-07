@@ -19,6 +19,7 @@ public class Taxon
     /// </summary>
     public string? AcceptedNameUsageId { get; set; }
 
+    /// <summary>Additional taxon attributes, including names, species group and sensitivity.</summary>
     public TaxonAttributes? Attributes { get; set; }
 
     /// <summary>

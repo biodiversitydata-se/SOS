@@ -1,14 +1,8 @@
 
 namespace SOS.Api.Client.Requests;
 /// <summary>Options for taxon aggregation.</summary>
-public sealed class TaxonAggregationInternalOptions
+public sealed class TaxonAggregationInternalOptions : SosRoleRequestOptions
 {
-    /// <summary>The explicit authorization role identifier.</summary>
-    public int? RoleId { get; set; }
-
-    /// <summary>The explicit calling application identifier.</summary>
-    public string? AuthorizationApplicationIdentifier { get; set; }
-
     /// <summary>The number of buckets to skip.</summary>
     public int? Skip { get; set; }
 

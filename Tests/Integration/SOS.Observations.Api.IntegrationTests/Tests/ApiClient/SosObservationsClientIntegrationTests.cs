@@ -1,24 +1,26 @@
+using SOS.Api.Contracts.Common.Geo;
 using ContractGeographicsFilterDto = SOS.Api.Contracts.Observations.Requests.GeographicsFilterDto;
-using ContractLatLonBoundingBoxDto = SOS.Api.Contracts.Common.Geo.LatLonBoundingBoxDto;
-using ContractLatLonCoordinateDto = SOS.Api.Contracts.Common.Geo.LatLonCoordinateDto;
 using ContractOccurrenceStatusFilterValuesDto = SOS.Api.Contracts.Observations.Requests.OccurrenceStatusFilterValuesDto;
 using ContractOutputFormatDto = SOS.Api.Contracts.Observations.Requests.OutputFormatDto;
 using ContractSearchFilterAggregationInternalDto = SOS.Api.Contracts.Aggregations.Requests.SearchFilterAggregationInternalDto;
 using ContractSearchFilterDto = SOS.Api.Contracts.Observations.Requests.SearchFilterDto;
 using ContractSearchFilterInternalBaseDto = SOS.Api.Contracts.Observations.Requests.SearchFilterInternalBaseDto;
 using ContractSearchFilterInternalDto = SOS.Api.Contracts.Observations.Requests.SearchFilterInternalDto;
-using ContractSearchSortOrder = SOS.Api.Contracts.Observations.Requests.SearchSortOrder;
 using ContractTaxonFilterDto = SOS.Api.Contracts.Observations.Requests.TaxonFilterDto;
 using FizzWare.NBuilder;
+using GeoJSON.Text.Geometry;
 using MongoDB.Driver.GeoJsonObjectModel;
+using System.Text.Json;
 using SOS.Api.Client.Requests;
 using SOS.Api.Client.Exceptions;
+using SOS.Api.Client.Services;
 using SOS.Api.Contracts.Observations.Requests;
 using SOS.Api.Contracts.Observations.Responses;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Observations.Api.IntegrationTests.Setup;
 using SOS.Observations.Api.IntegrationTests.TestData;
 using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
+using FluentAssertions.Execution;
 
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiClient;
 
@@ -79,7 +81,7 @@ public class SosObservationsClientIntegrationTests : TestBase
             {
                 Take = 2,
                 SortBy = "modified",
-                SortOrder = ContractSearchSortOrder.Asc
+                SortOrder = SearchSortOrder.Asc
             },
             TestContext.Current.CancellationToken);
 
@@ -116,6 +118,60 @@ public class SosObservationsClientIntegrationTests : TestBase
         result.ResultType.Should().Be("locations");
         result.ObservationsTotalCount.Should().Be(3);
         result.FeatureCount.Should().Be(3);
+    }
+
+    [Fact]
+    public async Task AdaptiveSearchLocationsService_ParsesLocationsAndGrid_WithBoundingBoxAndFilterAreas()
+    {
+        var observations = CreatePointObservations(
+            count: 3,
+            siteIdStart: 450100,
+            taxonId: TaxonIds.Talgoxe,
+            coordinateFactory: index => (13.850 + index * 0.001, 58.380 + index * 0.001));
+        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(observations);
+        var service = new SosObservationSearchService(TestFixture.CreateSosObservationsClient());
+        var searchFilter = CreateBoundingBoxFilter(TaxonIds.Talgoxe, 13.84, 58.40, 13.90, 58.35);
+        searchFilter.Geographics!.Geometries = [JsonSerializer.Deserialize<Polygon>("""
+            {"type":"Polygon","coordinates":[[[13.84,58.35],[13.90,58.35],[13.90,58.40],[13.84,58.40],[13.84,58.35]]]}
+            """)!];
+
+        foreach (var useGrid in new[] { false, true })
+        {
+            var (response, featureCollection) = await service.AdaptiveSearchLocationsInternalAsFeatureCollectionAsync(
+                searchFilter,
+                new AdaptiveSearchLocationsOptions
+                {
+                    ObservationsLimit = useGrid ? 1 : 100,
+                    Cluster = false,
+                    ReturnInputBBox = true,
+                    IncludeFilterAreasInResult = true,
+                    UseCache = false
+                },
+                TestContext.Current.CancellationToken);
+
+            using var scope = new AssertionScope($"useGrid={useGrid}");
+            response.ResultType.Should().Be(useGrid ? "geogrid" : "locations");
+            response.ObservationsTotalCount.Should().Be(3);
+            response.GeoJson.Should().Contain("FilterArea.OwnPolygon");
+            featureCollection.BoundingBoxes.Should().Equal(13.84, 58.35, 13.90, 58.40);
+            response.FeatureCount.Should().Be(featureCollection.Features.Count - 1);
+            featureCollection.Features.Should().OnlyContain(feature => feature.Geometry != null);
+
+            var filterArea = useGrid ? featureCollection.Features[^1] : featureCollection.Features[0];
+            filterArea.Id.Should().BeNull();
+            var polygon = filterArea.Geometry.Should().BeOfType<Polygon>().Subject;
+            polygon.Coordinates[0].Coordinates[0].Longitude.Should().Be(13.84);
+            polygon.Coordinates[0].Coordinates[0].Latitude.Should().Be(58.35);
+
+            if (!useGrid)
+            {
+                var locations = featureCollection.Features.Skip(1).ToList();
+                locations.Should().HaveCount(3);
+                locations.Should().OnlyContain(feature => feature.Geometry is Point);
+                locations.Should().OnlyContain(feature => feature.Properties.ObservationCount == 1);
+                locations.Should().OnlyContain(feature => feature.Properties.Locations.Location != null);
+            }
+        }
     }
 
     [Fact]
@@ -203,14 +259,14 @@ public class SosObservationsClientIntegrationTests : TestBase
         var searchFilter = CreateTaxonFilter(taxonId);
         searchFilter.Geographics = new ContractGeographicsFilterDto
         {
-            BoundingBox = new ContractLatLonBoundingBoxDto
+            BoundingBox = new LatLonBoundingBoxDto
             {
-                TopLeft = new ContractLatLonCoordinateDto
+                TopLeft = new LatLonCoordinateDto
                 {
                     Longitude = left,
                     Latitude = top
                 },
-                BottomRight = new ContractLatLonCoordinateDto
+                BottomRight = new LatLonCoordinateDto
                 {
                     Longitude = right,
                     Latitude = bottom

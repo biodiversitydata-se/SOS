@@ -1,4 +1,6 @@
-﻿namespace SOS.Lib.Gis;
+﻿using SOS.Api.Contracts.Observations.Responses;
+
+namespace SOS.Lib.Gis;
 
 public class LocationObservationSummary
 {

@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using SOS.Api.Contracts.Common.Geo;
+using FluentAssertions;
 using SOS.Lib.Gis;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Processed.Observation;
@@ -27,7 +28,7 @@ public class DbScanLocationClustererTests : LocationClustererAlgorithmTestBase
             CreateObservation("sweref-location-0", "sweref-observation-0", 18.0, 59.0, 10, 500000, 6500000),
             CreateObservation("sweref-location-1", "sweref-observation-1", 18.0, 59.0, 20, 501000, 6500000)
         };
-        var boundingBox = LatLonBoundingBox.Create(17.99, 59.01, 18.01, 58.99);
+        var boundingBox = LatLonBoundingBoxDto.Create(17.99, 59.01, 18.01, 58.99);
 
         // Act
         var result = new DbScanLocationClusterer(1, 10, 2)
@@ -52,7 +53,7 @@ public class DbScanLocationClustererTests : LocationClustererAlgorithmTestBase
                 index * 90,
                 6500000))
             .ToList();
-        var boundingBox = LatLonBoundingBox.Create(17.99, 59.01, 18.01, 58.99);
+        var boundingBox = LatLonBoundingBoxDto.Create(17.99, 59.01, 18.01, 58.99);
 
         // Act
         var result = new DbScanLocationClusterer(1, 10, 2)
@@ -78,7 +79,7 @@ public class DbScanLocationClustererTests : LocationClustererAlgorithmTestBase
                 index * 10,
                 6500000))
             .ToList();
-        var boundingBox = LatLonBoundingBox.Create(17.99, 59.01, 18.01, 58.99);
+        var boundingBox = LatLonBoundingBoxDto.Create(17.99, 59.01, 18.01, 58.99);
 
         // Act
         var result = new DbScanLocationClusterer(1, 2, 2)
@@ -94,7 +95,7 @@ public class DbScanLocationClustererTests : LocationClustererAlgorithmTestBase
     {
         // Arrange - Make16ObservationsCloseToEachOtherAndOneRemote uses 3 distinct taxa
         var observations = LocationClustererTestData.Make16ObservationsCloseToEachOtherAndOneRemote();
-        var boundingBox = LatLonBoundingBox.Create(5.0, 75.0, 35.0, 50.0);
+        var boundingBox = LatLonBoundingBoxDto.Create(5.0, 75.0, 35.0, 50.0);
 
         // Act
         var result = new DbScanLocationClusterer(5, 10)
@@ -116,7 +117,7 @@ public class DbScanLocationClustererTests : LocationClustererAlgorithmTestBase
             CreateObservation("cr-location-2", "cr-observation-2", 18.002, 59.0, 10, 500200, 6500000),
             CreateObservation("cr-location-3", "cr-observation-3", 18.003, 59.0, 10, 500300, 6500000)
         };
-        var boundingBox = LatLonBoundingBox.Create(17.99, 59.01, 18.01, 58.99);
+        var boundingBox = LatLonBoundingBoxDto.Create(17.99, 59.01, 18.01, 58.99);
 
         // Act
         var aggressivelyClustered = new DbScanLocationClusterer(1, 10)
@@ -136,7 +137,7 @@ public class DbScanLocationClustererTests : LocationClustererAlgorithmTestBase
     {
         // Arrange
         var observations = LocationClustererTestData.MakeRandomObservations(300);
-        var boundingBox = LatLonBoundingBox.Create(5.0, 75.0, 35.0, 50.0);
+        var boundingBox = LatLonBoundingBoxDto.Create(5.0, 75.0, 35.0, 50.0);
 
         // Act
         var result = new DbScanLocationClusterer(50, 100)
@@ -155,7 +156,7 @@ public class DbScanLocationClustererTests : LocationClustererAlgorithmTestBase
     {
         // Arrange
         var observations = LocationClustererTestData.Make16ObservationsCloseToEachOtherAndOneRemote();
-        var boundingBox = LatLonBoundingBox.Create(5.0, 75.0, 35.0, 50.0);
+        var boundingBox = LatLonBoundingBoxDto.Create(5.0, 75.0, 35.0, 50.0);
 
         // Act
         var result = new DbScanLocationClusterer(5, 10)
@@ -179,7 +180,7 @@ public class DbScanLocationClustererTests : LocationClustererAlgorithmTestBase
                 $"same-observation-{index}",
                 18.0, 59.0, 10, 500000, 6500000))
             .ToList();
-        var boundingBox = LatLonBoundingBox.Create(17.99, 59.01, 18.01, 58.99);
+        var boundingBox = LatLonBoundingBoxDto.Create(17.99, 59.01, 18.01, 58.99);
 
         // Act
         var result = new DbScanLocationClusterer(1, 10)

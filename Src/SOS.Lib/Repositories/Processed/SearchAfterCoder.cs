@@ -1,5 +1,4 @@
-﻿using AgileObjects.AgileMapper.Extensions;
-using CSharpFunctionalExtensions;
+﻿using CSharpFunctionalExtensions;
 using Elastic.Clients.Elasticsearch;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;

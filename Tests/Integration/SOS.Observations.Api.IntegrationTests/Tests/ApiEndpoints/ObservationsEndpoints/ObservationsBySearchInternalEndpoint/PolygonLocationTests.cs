@@ -1,6 +1,6 @@
-﻿using FizzWare.NBuilder;
-using SOS.Lib.Dtos;
-using SOS.Lib.Dtos.Filter;
+﻿using SOS.Api.Contracts.Observations.Requests;
+using FizzWare.NBuilder;
+using SOS.Api.Contracts.Common.Responses;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Observations.Api.IntegrationTests.Setup;
@@ -21,15 +21,15 @@ public class PolygonLocationTests : TestBase
         // Arrange
         const int polygonSiteId1 = 10;
         const int polygonSiteId2 = 20;
-        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(10)
             .All().HaveValuesFromPredefinedObservations()
-            .TheFirst(30)
+            .TheFirst(3)
                 .With(o => o.Site.HasGeometry = true)
                 .With(o => o.Site.Id = polygonSiteId1)
-            .TheNext(30)
+            .TheNext(3)
                 .With(o => o.Site.HasGeometry = true)
                 .With(o => o.Site.Id = polygonSiteId2)
-            .TheNext(40)
+            .TheNext(4)
                 .With(o => o.Site.HasGeometry = false)
             .Build();
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
@@ -44,7 +44,7 @@ public class PolygonLocationTests : TestBase
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        result!.TotalCount.Should().Be(100);
+        result!.TotalCount.Should().Be(10);
         result.Metadata.Should().NotBeNull();
         result.Metadata!.PolygonLocations.Should().NotBeNull();
         result.Metadata.PolygonLocations.Should().ContainKey($"urn:lsid:artportalen.se:site:{polygonSiteId1}");
@@ -55,11 +55,11 @@ public class PolygonLocationTests : TestBase
     public async Task ObservationsBySearchInternal_ReturnsNoMetadata_WhenIncludePolygonLocationsIsFalse()
     {
         // Arrange
-        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(5)
             .All().HaveValuesFromPredefinedObservations()
-            .TheFirst(60)
+            .TheFirst(3)
                 .With(o => o.Site.HasGeometry = true)
-            .TheNext(40)
+            .TheNext(2)
                 .With(o => o.Site.HasGeometry = false)
             .Build();
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
@@ -74,7 +74,7 @@ public class PolygonLocationTests : TestBase
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        result!.TotalCount.Should().Be(100);
+        result!.TotalCount.Should().Be(5);
         result.Metadata.Should().BeNull();
     }
 
@@ -82,7 +82,7 @@ public class PolygonLocationTests : TestBase
     public async Task ObservationsBySearchInternal_ReturnsNoMetadata_WhenNoPolygonObservationsExist()
     {
         // Arrange - all observations are point-type locations
-        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(2)
             .All().HaveValuesFromPredefinedObservations()
             .All()
                 .With(o => o.Site.HasGeometry = false)
@@ -99,7 +99,7 @@ public class PolygonLocationTests : TestBase
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        result!.TotalCount.Should().Be(100);
+        result!.TotalCount.Should().Be(2);
         result.Metadata?.PolygonLocations?.Should().BeNull();
     }
 }

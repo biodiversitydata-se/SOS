@@ -1,11 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using SOS.Api.Contracts.Locations.Responses;
+using SOS.Api.Contracts.Observations.Requests;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Swagger;
 using SOS.Observations.Api.Configuration;
-using SOS.Lib.Dtos;
-using SOS.Lib.Dtos.Enum;
-using SOS.Lib.Dtos.Filter;
-using SOS.Lib.Dtos.Location;
 using SOS.Shared.Api.Extensions.Controller;
 using SOS.Lib.Extensions.Dto;
 using SOS.Shared.Api.Validators.Interfaces;
@@ -15,6 +13,7 @@ using Result = CSharpFunctionalExtensions.Result;
 using SOS.Lib.Helpers;
 using SOS.Lib.Managers;
 using SOS.Lib.Enums;
+using SOS.Observations.Api.Services.Locations;
 
 namespace SOS.Observations.Api.Controllers;
 
@@ -87,7 +86,7 @@ public class LocationsController : ControllerBase
 
             var locations = await _locationManager.GetLocationsAsync(locationIds);
 
-            return new OkObjectResult(locations);
+            return new OkObjectResult(locations?.Select(location => new LocationJsonResponse(location)));
         }
         catch (Exception e)
         {
@@ -116,7 +115,7 @@ public class LocationsController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
     [AzureApi, AzureInternalApi]
     public async Task<IActionResult> SearchAsync(
-        [FromBody] GeographicsFilterDto? filter, 
+        [FromBody] GeographicsFilterDto? filter,
         [FromQuery] int skip = 0, 
         [FromQuery] int take = 100, 
         [FromQuery] bool sensitiveObservations = false, 

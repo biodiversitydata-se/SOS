@@ -1,83 +1,148 @@
-﻿using SOS.Lib.Enums;
+﻿using SOS.Api.Contracts.Observations;
+using CSharpFunctionalExtensions;
+using NetTopologySuite.Geometries;
+using SOS.Api.Contracts.Checklists.Requests;
+using SOS.Api.Contracts.Observations.Requests;
+using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Filters;
-using SOS.Lib.Dtos.Enum;
-using SOS.Lib.Dtos.Filter;
+using SOS.Lib.Models.Search.Input;
 using static SOS.Lib.Models.Search.Filters.SearchFilterBase;
 
 namespace SOS.Lib.Extensions.Dto;
 
+/// <summary>
+/// Converts API filter DTOs to search models and handles their geometry serialization boundary.
+/// </summary>
 public static class FilterExtensions
 {
-    private static SearchFilterBase PopulateFilter(SearchFilterBaseDto searchFilterBaseDto, int userId, ProtectionFilterDto? protectionFilter, string translationCultureCode)
+    /// <summary>
+    /// Gets the geometries used by the search, reusing server geometries when available.
+    /// For a GeoJSON-based DTO, converts its geometries to NetTopologySuite instead.
+    /// </summary>
+    /// <exception cref="ArgumentException">A supplied geometry could not be converted.</exception>
+    public static List<Geometry>? GetSearchGeometries(this GeographicsFilterDto? source)
     {
-        if (searchFilterBaseDto == null)
+        var result = source.TryGetSearchGeometries();
+        if (result.IsFailure) throw new ArgumentException(result.Error, nameof(source));
+        return result.Value;
+    }
+
+    /// <summary>Gets search geometries or a conversion error, never a partially converted collection.</summary>
+    public static Result<List<Geometry>?> TryGetSearchGeometries(this GeographicsFilterDto? source)
+    {
+        if (source is GeographicsFilterInputModel input)
+        {
+            return input.GeometryConversionError is { } error
+                ? Result.Failure<List<Geometry>?>(error)
+                : Result.Success(input.ServerGeometries);
+        }
+
+        try
+        {
+            return Result.Success(source?.Geometries?
+                .Select(geometry => geometry.ToSearchGeometry())
+                .Where(geometry => geometry is not null)
+                .Cast<Geometry>()
+                .ToList());
+        }
+        catch (ArgumentException)
+        {
+            return Result.Failure<List<Geometry>?>("Invalid geometry");
+        }
+    }
+
+    /// <summary>Checks whether search geometries were supplied without converting GeoJSON objects.</summary>
+    public static bool HasSearchGeometries(this GeographicsFilterDto? source) =>
+        source is GeographicsFilterInputModel input
+            ? input.GeometryConversionError is not null || input.ServerGeometries is { Count: > 0 }
+            : source?.Geometries?.Any(geometry => geometry is not null) == true;
+
+    /// <summary>Checks for geometry conversion errors, not geometric validity.</summary>
+    public static bool HasGeometryConversionError(this GeographicsFilterDto? source) =>
+        source.TryGetSearchGeometries().IsFailure;
+
+    /// <summary>Creates GeoJSON geometries when a filter must be serialized.</summary>
+    public static void MaterializeGeoJsonGeometriesForSerialization(this SearchFilterBaseDto filter)
+    {
+        if (filter.Geographics is GeographicsFilterInputModel input)
+        {
+            filter.Geographics = input.ToSerializableGeographicsFilterDto();
+        }
+    }
+
+    private static SearchFilterBase PopulateFilter(SearchFilterBaseDto inputFilter, int userId, ProtectionFilterDto? protectionFilter, string translationCultureCode)
+    {
+        if (inputFilter == null)
         {
             return default!;
         }
         protectionFilter ??= ProtectionFilterDto.Public;
 
-         var filter = searchFilterBaseDto is SearchFilterInternalBaseDto ?
+        var filter = inputFilter is SearchFilterInternalBaseDto ?
             new SearchFilterInternal(userId, protectionFilter.ToFilter()) :
             new SearchFilter(userId, protectionFilter.ToFilter());
-        filter.Taxa = searchFilterBaseDto.Taxon?.ToTaxonFilter();
-        filter.DataStewardship = PopulateDataStewardshipFilter(searchFilterBaseDto.DataStewardship);
-        filter.Date = PopulateDateFilter(searchFilterBaseDto.Date);
-        filter.DataProviderIds = searchFilterBaseDto.DataProvider?.Ids?.ToList();
-        filter.Event = PopulateEventFilter(searchFilterBaseDto.Event!);
+        filter.Taxa = inputFilter.Taxon?.ToTaxonFilter();
+        filter.DataStewardship = PopulateDataStewardshipFilter(inputFilter.DataStewardship);
+        filter.Date = PopulateDateFilter(inputFilter.Date);
+        filter.DataProviderIds = inputFilter.DataProvider?.Ids?.ToList();
+        filter.Event = PopulateEventFilter(inputFilter.Event!);
         filter.FieldTranslationCultureCode = translationCultureCode;
-        filter.NotRecoveredFilter = (SightingNotRecoveredFilter)(searchFilterBaseDto.NotRecoveredFilter ?? SightingNotRecoveredFilterDto.NoFilter);
-        //filter.VerificationStatus = searchFilterBaseDto.ValidationStatus.HasValue ? (SearchFilterBase.StatusVerification)searchFilterBaseDto.ValidationStatus.Value.ToStatusVerification() : (SearchFilterBase.StatusVerification)searchFilterBaseDto.VerificationStatus;
-        filter.VerificationStatus = (SearchFilterBase.StatusVerification)(searchFilterBaseDto.VerificationStatus ?? StatusVerificationDto.BothVerifiedAndNotVerified);
-        filter.ProjectIds = searchFilterBaseDto.ProjectIds;
-        filter.BirdNestActivityLimit = searchFilterBaseDto.BirdNestActivityLimit;
-        filter.TypeFilter = (SightingTypeFilter)(searchFilterBaseDto.Artportalen?.TypeFilter ??
-            ExtendedFilterDto.SightingTypeFilterDto.DoNotShowMerged);
-        filter.Location = PopulateLocationFilter(searchFilterBaseDto.Geographics!);
-        filter.ModifiedDate = searchFilterBaseDto.ModifiedDate == null
+        filter.NotRecoveredFilter = (SightingNotRecoveredFilter)(inputFilter.NotRecoveredFilter ?? SightingNotRecoveredFilterDto.NoFilter);
+        //filter.VerificationStatus = inputFilter.ValidationStatus.HasValue ? (SearchFilterBase.StatusVerification)inputFilter.ValidationStatus.Value.ToStatusVerification() : (SearchFilterBase.StatusVerification)inputFilter.VerificationStatus;
+        filter.VerificationStatus = (SearchFilterBase.StatusVerification)(inputFilter.VerificationStatus ?? StatusVerificationDto.BothVerifiedAndNotVerified);
+        filter.ProjectIds = inputFilter.ProjectIds;
+        filter.BirdNestActivityLimit = inputFilter.BirdNestActivityLimit;
+        filter.TypeFilter = (SightingTypeFilter)(inputFilter.Artportalen?.TypeFilter ??
+            SightingTypeFilterDto.DoNotShowMerged);
+        filter.Location = PopulateLocationFilter(inputFilter.Geographics!);
+        filter.ModifiedDate = inputFilter.ModifiedDate == null
             ? null
             : new ModifiedDateFilter
             {
-                From = searchFilterBaseDto.ModifiedDate.From,
-                To = searchFilterBaseDto.ModifiedDate.To
+                From = inputFilter.ModifiedDate.From?.UtcDateTime,
+                To = inputFilter.ModifiedDate.To?.UtcDateTime
             };
-        filter.ExtendedAuthorization.ObservedByMe = searchFilterBaseDto.ObservedByMe;
-        filter.ExtendedAuthorization.ReportedByMe = searchFilterBaseDto.ReportedByMe;
+        filter.ExtendedAuthorization.ObservedByMe = inputFilter.ObservedByMe;
+        filter.ExtendedAuthorization.ReportedByMe = inputFilter.ReportedByMe;
         bool isOnlyNotPresentOrRecoveredFilterSet = false;
-        if (searchFilterBaseDto.NotRecoveredFilter == SightingNotRecoveredFilterDto.OnlyNotRecovered ||
-            searchFilterBaseDto.NotRecoveredFilter == SightingNotRecoveredFilterDto.IncludeNotRecovered)
+        if (inputFilter.NotRecoveredFilter == SightingNotRecoveredFilterDto.OnlyNotRecovered ||
+            inputFilter.NotRecoveredFilter == SightingNotRecoveredFilterDto.IncludeNotRecovered)
         {
             isOnlyNotPresentOrRecoveredFilterSet = true;
         }
         
-        filter.DiffusionStatuses = searchFilterBaseDto.DiffusionStatuses?.Select(dsd => (DiffusionStatus)dsd)?.ToList();
-        filter.DeterminationFilter = (SightingDeterminationFilter)(searchFilterBaseDto.DeterminationFilter ?? SightingDeterminationFilterDto.NoFilter);
+        filter.DiffusionStatuses = inputFilter.DiffusionStatuses?.ToList();
+        filter.DeterminationFilter = (SightingDeterminationFilter)(inputFilter.DeterminationFilter ?? SightingDeterminationFilterDto.NoFilter);
         filter.Output = new OutputFilter();
-        if (searchFilterBaseDto is SearchFilterDto searchFilterDto)
+        if (inputFilter is SearchFilterDto publicInput)
         {
-            filter.Output.Fields = searchFilterDto.Output?.Fields?.ToList();
-            filter.Output.PopulateFields(searchFilterDto.Output?.FieldSet);
+            filter.Output.Fields = publicInput.Output?.Fields?.ToList();
+            filter.Output.PopulateFields(publicInput.Output?.FieldSet);
         }
-
-        if (searchFilterBaseDto is SearchFilterInternalBaseDto searchFilterInternalBaseDto)
+        if (inputFilter is SearchFilterInternalBaseDto internalBaseInput)
         {
             var filterInternal = (SearchFilterInternal)filter;
-            PopulateInternalBase(searchFilterInternalBaseDto, filterInternal);
+            PopulateInternalBase(internalBaseInput, filterInternal);
             if (filterInternal.NotPresentFilter == SightingNotPresentFilter.OnlyNotPresent || 
                 filterInternal.NotPresentFilter == SightingNotPresentFilter.IncludeNotPresent)
             {
                 isOnlyNotPresentOrRecoveredFilterSet = true;
             }
 
-            if (searchFilterBaseDto is SearchFilterInternalDto searchFilterInternalDto)
+            if (inputFilter is SearchFilterInternalDto internalInput)
             {
-                filterInternal.IncludeRealCount = searchFilterInternalDto.IncludeRealCount;
-                filterInternal.Output.Fields = searchFilterInternalDto.Output?.Fields?.ToList();
-                filterInternal.Output.PopulateFields(searchFilterInternalDto.Output?.FieldSet);
-                filterInternal.Output.SortOrders = searchFilterInternalDto.Output?.SortOrders?.Select(so => new SortOrderFilter { SortBy = so.SortBy, SortOrder = so.SortOrder });
+                filterInternal.IncludeRealCount = internalInput.IncludeRealCount;
+                filterInternal.Output.Fields = internalInput.Output?.Fields?.ToList();
+                filterInternal.Output.PopulateFields(internalInput.Output?.FieldSet);
+                filterInternal.Output.SortOrders = internalInput.Output?.SortOrders?.Select(so => new SortOrderFilter
+                {
+                    SortBy = so.SortBy,
+                    SortOrder = so.SortOrder
+                });
             }
 
-            filter.IncludeSensitiveGeneralizedObservations = searchFilterInternalBaseDto?.GeneralizationFilter?.SensitiveGeneralizationFilter switch
+            filter.IncludeSensitiveGeneralizedObservations = internalBaseInput?.GeneralizationFilter?.SensitiveGeneralizationFilter switch
             {
                 SensitiveGeneralizationFilterDto.DontIncludeGeneralizedObservations => false,
                 SensitiveGeneralizationFilterDto.OnlyGeneralizedObservations => true,
@@ -86,7 +151,7 @@ public static class FilterExtensions
                 _ => false
             };
 
-            filter.IsPublicGeneralizedObservation = searchFilterInternalBaseDto?.GeneralizationFilter?.PublicGeneralizationFilter switch
+            filter.IsPublicGeneralizedObservation = internalBaseInput?.GeneralizationFilter?.PublicGeneralizationFilter switch
             {
                 PublicGeneralizationFilterDto.DontIncludeGeneralized => false,
                 PublicGeneralizationFilterDto.OnlyGeneralized => true,
@@ -96,9 +161,9 @@ public static class FilterExtensions
             };                
         }
 
-        if (searchFilterBaseDto.OccurrenceStatus != null)
+        if (inputFilter.OccurrenceStatus != null)
         {
-            switch (searchFilterBaseDto.OccurrenceStatus)
+            switch (inputFilter.OccurrenceStatus)
             {
                 case OccurrenceStatusFilterValuesDto.Present:
                     filter.PositiveSightings = true;
@@ -116,99 +181,98 @@ public static class FilterExtensions
             filter.PositiveSightings = true;
         }
 
-        if (searchFilterBaseDto.ExcludeFilter != null)
+        if (inputFilter.ExcludeFilter != null)
         {
             filter.ExcludeFilter = new ExcludeFilter();
-            filter.ExcludeFilter.OccurrenceIds = searchFilterBaseDto.ExcludeFilter.OccurrenceIds;
+            filter.ExcludeFilter.OccurrenceIds = inputFilter.ExcludeFilter.OccurrenceIds;
         }
 
-            if (searchFilterBaseDto.IncludeFilter != null)
-            {                
-                filter.IncludeFilter = new IncludeFilter();
-                filter.IncludeFilter.OccurrenceIds = searchFilterBaseDto.IncludeFilter.OccurrenceIds;
-            }
-
-
-            return filter;
-        }
-
-    private static void PopulateInternalBase(SearchFilterInternalBaseDto searchFilterInternalDto, SearchFilterInternal internalFilter)
-    {
-        if (searchFilterInternalDto.ExtendedFilter != null)
+        if (inputFilter.IncludeFilter != null)
         {
-            internalFilter.ChecklistId = searchFilterInternalDto.ExtendedFilter.ChecklistId;
-            internalFilter.FieldDiaryGroupIds = searchFilterInternalDto.ExtendedFilter.FieldDiaryGroupIds;
-            internalFilter.ReportedByUserId = searchFilterInternalDto.ExtendedFilter.ReportedByUserId;
-            internalFilter.ObservedByUserId = searchFilterInternalDto.ExtendedFilter.ObservedByUserId;
-            internalFilter.ReportedByUserServiceUserId = searchFilterInternalDto.ExtendedFilter.ReportedByUserServiceUserId;
-            internalFilter.ObservedByUserServiceUserId = searchFilterInternalDto.ExtendedFilter.ObservedByUserServiceUserId;
-            internalFilter.OnlyWithMedia = searchFilterInternalDto.ExtendedFilter.OnlyWithMedia;
-            internalFilter.OnlyWithNotes = searchFilterInternalDto.ExtendedFilter.OnlyWithNotes;
-            internalFilter.OnlyWithNotesOfInterest = searchFilterInternalDto.ExtendedFilter.OnlyWithNotesOfInterest;
-            internalFilter.OnlyWithUserComments = searchFilterInternalDto.ExtendedFilter.OnlyWithUserComments;
-            internalFilter.OnlyWithBarcode = searchFilterInternalDto.ExtendedFilter.OnlyWithBarcode;
-            internalFilter.ReportedDateFrom = searchFilterInternalDto.ExtendedFilter.ReportedDateFrom;
-            internalFilter.ReportedDateTo = searchFilterInternalDto.ExtendedFilter.ReportedDateTo;
-            internalFilter.TypeFilter = (SearchFilterInternal.SightingTypeFilter)searchFilterInternalDto.ExtendedFilter.TypeFilter;
-            internalFilter.UsePeriodForAllYears = searchFilterInternalDto.ExtendedFilter.UsePeriodForAllYears;
-            internalFilter.Months = searchFilterInternalDto.ExtendedFilter.Months;
-            internalFilter.MonthsComparison = (DateFilterComparison)searchFilterInternalDto.ExtendedFilter.MonthsComparison;
-            internalFilter.DiscoveryMethodIds = searchFilterInternalDto.ExtendedFilter.DiscoveryMethodIds;
-            internalFilter.LifeStageIds = searchFilterInternalDto.ExtendedFilter.LifeStageIds;
-            internalFilter.ActivityIds = searchFilterInternalDto.ExtendedFilter.ActivityIds;
-            //internalFilter.HasTriggeredVerificationRule = searchFilterInternalDto.ExtendedFilter.HasTriggerdValidationRule ?? searchFilterInternalDto.ExtendedFilter.HasTriggeredVerificationRule;
-            internalFilter.HasTriggeredVerificationRule = searchFilterInternalDto.ExtendedFilter.HasTriggeredVerificationRule;
+            filter.IncludeFilter = new IncludeFilter();
+            filter.IncludeFilter.OccurrenceIds = inputFilter.IncludeFilter.OccurrenceIds;
+        }
+
+        return filter;
+    }
+
+    private static void PopulateInternalBase(SearchFilterInternalBaseDto internalInput, SearchFilterInternal internalFilter)
+    {
+        if (internalInput.ExtendedFilter != null)
+        {
+            internalFilter.ChecklistId = internalInput.ExtendedFilter.ChecklistId;
+            internalFilter.FieldDiaryGroupIds = internalInput.ExtendedFilter.FieldDiaryGroupIds;
+            internalFilter.ReportedByUserId = internalInput.ExtendedFilter.ReportedByUserId;
+            internalFilter.ObservedByUserId = internalInput.ExtendedFilter.ObservedByUserId;
+            internalFilter.ReportedByUserServiceUserId = internalInput.ExtendedFilter.ReportedByUserServiceUserId;
+            internalFilter.ObservedByUserServiceUserId = internalInput.ExtendedFilter.ObservedByUserServiceUserId;
+            internalFilter.OnlyWithMedia = internalInput.ExtendedFilter.OnlyWithMedia;
+            internalFilter.OnlyWithNotes = internalInput.ExtendedFilter.OnlyWithNotes;
+            internalFilter.OnlyWithNotesOfInterest = internalInput.ExtendedFilter.OnlyWithNotesOfInterest;
+            internalFilter.OnlyWithUserComments = internalInput.ExtendedFilter.OnlyWithUserComments;
+            internalFilter.OnlyWithBarcode = internalInput.ExtendedFilter.OnlyWithBarcode;
+            internalFilter.ReportedDateFrom = internalInput.ExtendedFilter.ReportedDateFrom?.UtcDateTime;
+            internalFilter.ReportedDateTo = internalInput.ExtendedFilter.ReportedDateTo?.UtcDateTime;
+            internalFilter.TypeFilter = (SearchFilterInternal.SightingTypeFilter)internalInput.ExtendedFilter.TypeFilter;
+            internalFilter.UsePeriodForAllYears = internalInput.ExtendedFilter.UsePeriodForAllYears;
+            internalFilter.Months = internalInput.ExtendedFilter.Months;
+            internalFilter.MonthsComparison = (DateFilterComparison)internalInput.ExtendedFilter.MonthsComparison;
+            internalFilter.DiscoveryMethodIds = internalInput.ExtendedFilter.DiscoveryMethodIds;
+            internalFilter.LifeStageIds = internalInput.ExtendedFilter.LifeStageIds;
+            internalFilter.ActivityIds = internalInput.ExtendedFilter.ActivityIds;
+            //internalFilter.HasTriggeredVerificationRule = internalInput.ExtendedFilter.HasTriggerdValidationRule ?? internalInput.ExtendedFilter.HasTriggeredVerificationRule;
+            internalFilter.HasTriggeredVerificationRule = internalInput.ExtendedFilter.HasTriggeredVerificationRule;
             /*internalFilter.HasTriggeredVerificationRuleWithWarning =
-                searchFilterInternalDto.ExtendedFilter.HasTriggerdValidationRuleWithWarning ?? searchFilterInternalDto.ExtendedFilter.HasTriggeredVerificationRuleWithWarning;*/
-            internalFilter.HasTriggeredVerificationRuleWithWarning = searchFilterInternalDto.ExtendedFilter.HasTriggeredVerificationRuleWithWarning;
-            internalFilter.Length = searchFilterInternalDto.ExtendedFilter.Length;
-            internalFilter.LengthOperator = searchFilterInternalDto.ExtendedFilter.LengthOperator;
-            internalFilter.Weight = searchFilterInternalDto.ExtendedFilter.Weight;
-            internalFilter.WeightOperator = searchFilterInternalDto.ExtendedFilter.WeightOperator;
-            internalFilter.Quantity = searchFilterInternalDto.ExtendedFilter.Quantity;
-            internalFilter.QuantityOperator = searchFilterInternalDto.ExtendedFilter.QuantityOperator;
-            //internalFilter.VerificationStatusIds = searchFilterInternalDto.ExtendedFilter.ValidationStatusIds != null && searchFilterInternalDto.ExtendedFilter.ValidationStatusIds.Any() ? searchFilterInternalDto.ExtendedFilter.ValidationStatusIds : searchFilterInternalDto.ExtendedFilter.VerificationStatusIds;
-            internalFilter.VerificationStatusIds = searchFilterInternalDto.ExtendedFilter.VerificationStatusIds;
-            //internalFilter.ExcludeVerificationStatusIds = searchFilterInternalDto.ExtendedFilter.ExcludeValidationStatusIds != null && searchFilterInternalDto.ExtendedFilter.ExcludeValidationStatusIds.Any() ? searchFilterInternalDto.ExtendedFilter.ExcludeValidationStatusIds : searchFilterInternalDto.ExtendedFilter.ExcludeVerificationStatusIds;
-            internalFilter.ExcludeVerificationStatusIds = searchFilterInternalDto.ExtendedFilter.ExcludeVerificationStatusIds;
+                internalInput.ExtendedFilter.HasTriggerdValidationRuleWithWarning ?? internalInput.ExtendedFilter.HasTriggeredVerificationRuleWithWarning;*/
+            internalFilter.HasTriggeredVerificationRuleWithWarning = internalInput.ExtendedFilter.HasTriggeredVerificationRuleWithWarning;
+            internalFilter.Length = internalInput.ExtendedFilter.Length;
+            internalFilter.LengthOperator = internalInput.ExtendedFilter.LengthOperator;
+            internalFilter.Weight = internalInput.ExtendedFilter.Weight;
+            internalFilter.WeightOperator = internalInput.ExtendedFilter.WeightOperator;
+            internalFilter.Quantity = internalInput.ExtendedFilter.Quantity;
+            internalFilter.QuantityOperator = internalInput.ExtendedFilter.QuantityOperator;
+            //internalFilter.VerificationStatusIds = internalInput.ExtendedFilter.ValidationStatusIds != null && internalInput.ExtendedFilter.ValidationStatusIds.Any() ? internalInput.ExtendedFilter.ValidationStatusIds : internalInput.ExtendedFilter.VerificationStatusIds;
+            internalFilter.VerificationStatusIds = internalInput.ExtendedFilter.VerificationStatusIds;
+            //internalFilter.ExcludeVerificationStatusIds = internalInput.ExtendedFilter.ExcludeValidationStatusIds != null && internalInput.ExtendedFilter.ExcludeValidationStatusIds.Any() ? internalInput.ExtendedFilter.ExcludeValidationStatusIds : internalInput.ExtendedFilter.ExcludeVerificationStatusIds;
+            internalFilter.ExcludeVerificationStatusIds = internalInput.ExtendedFilter.ExcludeVerificationStatusIds;
             internalFilter.UnspontaneousFilter =
-                (SightingUnspontaneousFilter)searchFilterInternalDto.ExtendedFilter
+                (SightingUnspontaneousFilter)internalInput.ExtendedFilter
                     .UnspontaneousFilter;
-            internalFilter.SpeciesCollectionLabel = searchFilterInternalDto.ExtendedFilter.SpeciesCollectionLabel;
-            internalFilter.PublicCollection = searchFilterInternalDto.ExtendedFilter.PublicCollection;
-            internalFilter.PrivateCollection = searchFilterInternalDto.ExtendedFilter.PrivateCollection;
-            internalFilter.SubstrateSpeciesId = searchFilterInternalDto.ExtendedFilter.SubstrateSpeciesId;
-            internalFilter.SubstrateId = searchFilterInternalDto.ExtendedFilter.SubstrateId;
-            internalFilter.BiotopeId = searchFilterInternalDto.ExtendedFilter.BiotopeId;
+            internalFilter.SpeciesCollectionLabel = internalInput.ExtendedFilter.SpeciesCollectionLabel;
+            internalFilter.PublicCollection = internalInput.ExtendedFilter.PublicCollection;
+            internalFilter.PrivateCollection = internalInput.ExtendedFilter.PrivateCollection;
+            internalFilter.SubstrateSpeciesId = internalInput.ExtendedFilter.SubstrateSpeciesId;
+            internalFilter.SubstrateId = internalInput.ExtendedFilter.SubstrateId;
+            internalFilter.BiotopeId = internalInput.ExtendedFilter.BiotopeId;
             internalFilter.NotPresentFilter =
-                (SightingNotPresentFilter)searchFilterInternalDto.ExtendedFilter.NotPresentFilter;
-            internalFilter.OnlySecondHandInformation = searchFilterInternalDto.ExtendedFilter.OnlySecondHandInformation;
-            internalFilter.PublishTypeIdsFilter = searchFilterInternalDto.ExtendedFilter.PublishTypeIdsFilter;
+                (SightingNotPresentFilter)internalInput.ExtendedFilter.NotPresentFilter;
+            internalFilter.OnlySecondHandInformation = internalInput.ExtendedFilter.OnlySecondHandInformation;
+            internalFilter.PublishTypeIdsFilter = internalInput.ExtendedFilter.PublishTypeIdsFilter;
             internalFilter.TriggeredObservationRuleFrequencyIds =
-                searchFilterInternalDto.ExtendedFilter.TriggeredObservationRuleFrequencyIds;
+                internalInput.ExtendedFilter.TriggeredObservationRuleFrequencyIds;
             internalFilter.TriggeredObservationRuleReproductionIds =
-                searchFilterInternalDto.ExtendedFilter.TriggeredObservationRuleReproductionIds;
-            internalFilter.SightingTypeSearchGroupIds = searchFilterInternalDto.ExtendedFilter.SightingTypeSearchGroupIds;
-            internalFilter.SiteIds = searchFilterInternalDto.ExtendedFilter.SiteIds;
-            internalFilter.SiteProjectIds = searchFilterInternalDto.ExtendedFilter.SiteProjectIds;
-            internalFilter.SpeciesFactsIds = searchFilterInternalDto.ExtendedFilter.SpeciesFactsIds;
-            internalFilter.InstitutionId = searchFilterInternalDto.ExtendedFilter.InstitutionId;
-            internalFilter.DatasourceIds = searchFilterInternalDto.ExtendedFilter.DatasourceIds;
-            /*if (searchFilterInternalDto?.ExtendedFilter?.LocationNameFilter != null)
+                internalInput.ExtendedFilter.TriggeredObservationRuleReproductionIds;
+            internalFilter.SightingTypeSearchGroupIds = internalInput.ExtendedFilter.SightingTypeSearchGroupIds;
+            internalFilter.SiteIds = internalInput.ExtendedFilter.SiteIds;
+            internalFilter.SiteProjectIds = internalInput.ExtendedFilter.SiteProjectIds;
+            internalFilter.SpeciesFactsIds = internalInput.ExtendedFilter.SpeciesFactsIds;
+            internalFilter.InstitutionId = internalInput.ExtendedFilter.InstitutionId;
+            internalFilter.DatasourceIds = internalInput.ExtendedFilter.DatasourceIds;
+            /*if (internalInput?.ExtendedFilter?.LocationNameFilter != null)
             {
                 if (internalFilter.Location == null) internalFilter.Location = new LocationFilter();
-                internalFilter.Location.NameFilter = searchFilterInternalDto.ExtendedFilter.LocationNameFilter;
+                internalFilter.Location.NameFilter = internalInput.ExtendedFilter.LocationNameFilter;
             }*/
 
-            if (searchFilterInternalDto.ExtendedFilter.SexIds?.Any() ?? false)
+            if (internalInput.ExtendedFilter.SexIds?.Any() ?? false)
             {
                 internalFilter.Taxa ??= new TaxonFilter();
-                internalFilter.Taxa.SexIds = searchFilterInternalDto.ExtendedFilter.SexIds;
+                internalFilter.Taxa.SexIds = internalInput.ExtendedFilter.SexIds;
             }
-            internalFilter.InvasiveSpeciesTreatmentIds = searchFilterInternalDto.ExtendedFilter.InvasiveSpeciesTreatmentIds;
-            internalFilter.HasInvasiveSpeciesTreatment = searchFilterInternalDto.ExtendedFilter.HasInvasiveSpeciesTreatment;
-            internalFilter.Years = searchFilterInternalDto.ExtendedFilter.Years;
-            internalFilter.YearsComparison = (DateFilterComparison)searchFilterInternalDto.ExtendedFilter.YearsComparison;
+            internalFilter.InvasiveSpeciesTreatmentIds = internalInput.ExtendedFilter.InvasiveSpeciesTreatmentIds;
+            internalFilter.HasInvasiveSpeciesTreatment = internalInput.ExtendedFilter.HasInvasiveSpeciesTreatment;
+            internalFilter.Years = internalInput.ExtendedFilter.Years;
+            internalFilter.YearsComparison = (DateFilterComparison)internalInput.ExtendedFilter.YearsComparison;
         }
     }
 
@@ -231,8 +295,8 @@ public static class FilterExtensions
 
         return new DateFilter
         {
-            StartDate = filter.StartDate,
-            EndDate = filter.EndDate,
+            StartDate = filter.StartDate?.UtcDateTime,
+            EndDate = filter.EndDate?.UtcDateTime,
             DateFilterType = (DateFilter.DateRangeFilterType)(filter?.DateFilterType).GetValueOrDefault(),
             TimeRanges = filter?.TimeRanges?.Select(tr => (DateFilter.TimeRange)tr).ToList()
         };
@@ -258,48 +322,25 @@ public static class FilterExtensions
         {
             Areas = filter.Areas?.Select(a => new AreaFilter
             { FeatureId = a.FeatureId, AreaType = (AreaType)a.AreaType }).ToList(),
-            Geometries = new GeographicsFilter
-            {
-                BoundingBox = filter.BoundingBox?.ToLatLonBoundingBox(),
-                Geometries = filter.Geometries?.ToList(),
-                MaxDistanceFromPoint = filter.MaxDistanceFromPoint,
-                UseDisturbanceRadius = filter.ConsiderDisturbanceRadius,
-                UsePointAccuracy = filter.ConsiderObservationAccuracy,
-                UseAuthorizationBuffer = filter.ConsiderAuthorizationBuffer
-            },
+            Geometries = PopulateGeographicsFilter(filter),
             IncludeObservationsOutsideSweden = filter.IncludeObservationsOutsideSweden,
             LocationIds = filter.LocationIds,
             NameFilter = filter.LocationNameFilter,
             MaxAccuracy = filter.MaxAccuracy
         };
     }
-    
-    private static TaxonFilter PopulateTaxa(TaxonFilterBaseDto filterDto)
-    {
-        if (filterDto == null)
-        {
-            return null!;
-        }
 
-        var filter = new TaxonFilter
+    private static GeographicsFilter? PopulateGeographicsFilter(GeographicsFilterDto? filter) =>
+        filter == null ? null : new GeographicsFilter
         {
-            Ids = filterDto.Ids,
-            IncludeUnderlyingTaxa = filterDto.IncludeUnderlyingTaxa ?? false,
-            ListIds = filterDto.TaxonListIds,
-            TaxonListOperator = TaxonFilter.TaxonListOp.Merge
+            BoundingBox = filter.BoundingBox.GetCompleteBoundingBox(),
+            Geometries = filter.GetSearchGeometries(),
+            MaxDistanceFromPoint = filter.MaxDistanceFromPoint,
+            UseDisturbanceRadius = filter.ConsiderDisturbanceRadius,
+            UsePointAccuracy = filter.ConsiderObservationAccuracy,
+            UseAuthorizationBuffer = filter.ConsiderAuthorizationBuffer
         };
-
-        if (filterDto is TaxonFilterDto taxonFilterDto)
-        {
-            filter.RedListCategories = taxonFilterDto.RedListCategories;
-            filter.TaxonCategories = taxonFilterDto.TaxonCategories;
-            filter.TaxonListOperator =
-                (TaxonFilter.TaxonListOp)(taxonFilterDto?.TaxonListOperator).GetValueOrDefault();
-        }
-
-        return filter;
-    }
-
+    
     extension(ProtectionFilterDto? protectionFilter)
     {
         private ProtectionFilter ToFilter()
@@ -313,85 +354,58 @@ public static class FilterExtensions
         }
     }
 
-    extension(SearchFilterBaseDto searchFilterDto)
+    public static SearchFilter ToSearchFilter(
+        this SearchFilterDto source,
+        int userId,
+        ProtectionFilterDto? protectionFilter,
+        string translationCultureCode,
+        string sortBy,
+        SearchSortOrder sortOrder)
+    {
+        var filter = source.ToSearchFilter(userId, protectionFilter, translationCultureCode);
+        if (!string.IsNullOrEmpty(sortBy))
+        {
+            filter.Output.SortOrders = [new SortOrderFilter
+            {
+                SortBy = sortBy,
+                SortOrder = sortOrder
+            }];
+        }
+        return filter;
+    }
+
+    extension(SearchFilterBaseDto inputFilter)
     {
         public SearchFilter ToSearchFilter(int userId, ProtectionFilterDto? protectionFilterDto, string translationCultureCode)
         {
-            return (SearchFilter)PopulateFilter(searchFilterDto, userId, protectionFilterDto, translationCultureCode);
+            return (SearchFilter)PopulateFilter(inputFilter, userId, protectionFilterDto, translationCultureCode);
         }
     }
 
-    extension(SearchFilterDto searchFilterDto)
-    {
-        public SearchFilter ToSearchFilter(int userId, ProtectionFilterDto? protectionFilterDto, string translationCultureCode,
-        string sortBy, SearchSortOrder sortOrder)
-        {
-            var searchFilter = (SearchFilter)PopulateFilter(searchFilterDto, userId, protectionFilterDto, translationCultureCode);
-
-            if (!string.IsNullOrEmpty(sortBy))
-            {
-                searchFilter ??= new SearchFilter(userId, (ProtectionFilter)protectionFilterDto!);
-                searchFilter.Output ??= new OutputFilter();
-                searchFilter.Output.SortOrders = new[] { new SortOrderFilter { SortBy = sortBy, SortOrder = sortOrder } };
-            }
-            return searchFilter;
-        }
-    }
-
-    extension(SearchFilterInternalBaseDto searchFilterDto)
+    extension(SearchFilterInternalBaseDto inputFilter)
     {
         public SearchFilterInternal ToSearchFilterInternal(int userId, string translationCultureCode)
         {
-            return (SearchFilterInternal)PopulateFilter(searchFilterDto, userId, searchFilterDto.ProtectionFilter, translationCultureCode);
+            return (SearchFilterInternal)PopulateFilter(inputFilter, userId, inputFilter.ProtectionFilter, translationCultureCode);
         }
     }
 
-    extension(SearchFilterInternalDto searchFilterDto)
+    extension(SearchFilterInternalDto inputFilter)
     {
         public SearchFilterInternal ToSearchFilterInternal(int userId, string translationCultureCode, string sortBy, SearchSortOrder sortOrder)
         {
             // User sort order passed the old way if not any other sort order is passed 
-            if (!string.IsNullOrEmpty(sortBy) && (!searchFilterDto?.Output?.SortOrders?.Any() ?? true))
+            if (!string.IsNullOrEmpty(sortBy) && (!inputFilter?.Output?.SortOrders?.Any() ?? true))
             {
-                searchFilterDto ??= new SearchFilterInternalDto();
-                searchFilterDto.Output ??= new OutputFilterExtendedDto();
-                searchFilterDto.Output.SortOrders = new[] { new SortOrderDto { SortBy = sortBy, SortOrder = sortOrder } };
+                inputFilter ??= new SearchFilterInternalDto();
+                inputFilter.Output ??= new OutputFilterExtendedDto();
+                inputFilter.Output.SortOrders = new[]
+                {
+                    new SortOrderDto { SortBy = sortBy, SortOrder = sortOrder }
+                };
             }
 
-            return (SearchFilterInternal)PopulateFilter(searchFilterDto!, userId, searchFilterDto?.ProtectionFilter, translationCultureCode);
-        }
-    }
-
-    extension(SearchFilterAggregationDto searchFilterDto)
-    {
-        public SearchFilter ToSearchFilter(int userId, ProtectionFilterDto protectionFilterDto, string translationCultureCode)
-        {
-            return (SearchFilter)PopulateFilter(searchFilterDto, userId, protectionFilterDto, translationCultureCode);
-        }
-    }
-
-    extension(TaxonFilterDto taxonFilterDto)
-    {
-        public TaxonFilter ToTaxonFilterFilter()
-        {
-            return PopulateTaxa(taxonFilterDto);
-        }
-    }
-
-    extension(SearchFilterAggregationInternalDto searchFilterDto)
-    {
-        public SearchFilterInternal ToSearchFilterInternal(int userId, string translationCultureCode)
-        {
-
-            return (SearchFilterInternal)PopulateFilter(searchFilterDto, userId, searchFilterDto.ProtectionFilter, translationCultureCode);
-        }
-    }
-
-    extension(ExportFilterDto searchFilterDto)
-    {
-        public SearchFilter ToSearchFilter(int userId, ProtectionFilterDto protectionFilterDto, string translationCultureCode)
-        {
-            return (SearchFilter)PopulateFilter(searchFilterDto, userId, protectionFilterDto, translationCultureCode);
+            return (SearchFilterInternal)PopulateFilter(inputFilter!, userId, inputFilter?.ProtectionFilter, translationCultureCode);
         }
     }
 
@@ -399,7 +413,7 @@ public static class FilterExtensions
     {
         public (SearchFilter, ChecklistSearchFilter) ToSearchFilters()
         {
-            var dateFilter = PopulateDateFilter(searchFilterDto.Date);
+            var dateFilter = PopulateDateFilter(searchFilterDto.Date!);
             var taxonFilter = new TaxonFilter { Ids = new[] { searchFilterDto.TaxonId } };
             var locationFilter = PopulateLocationFilter(searchFilterDto.Geographics);
             // todo - add this in next version
@@ -414,7 +428,13 @@ public static class FilterExtensions
             var checklistFilter = new ChecklistSearchFilter
             {
                 DataProviderIds = searchFilterDto.Checklist?.DataProvider?.Ids,
-                Date = dateFilter as ChecklistDateFilter,
+                Date = dateFilter is null ? null : new ChecklistDateFilter
+                {
+                    StartDate = dateFilter.StartDate,
+                    EndDate = dateFilter.EndDate,
+                    DateFilterType = dateFilter.DateFilterType,
+                    TimeRanges = dateFilter.TimeRanges
+                },
                 Location = locationFilter,
                 Taxa = taxonFilter
             };
@@ -446,17 +466,7 @@ public static class FilterExtensions
                 Location = new LocationFilter
                 {
                     Areas = searchFilterDto.Geographics?.Areas?.Select(a => new AreaFilter { FeatureId = a.FeatureId, AreaType = (AreaType)a.AreaType }).ToList(),
-                    Geometries = searchFilterDto.Geographics == null
-                        ? null
-                        : new GeographicsFilter
-                        {
-                            BoundingBox = searchFilterDto.Geographics.BoundingBox?.ToLatLonBoundingBox(),
-                            Geometries = searchFilterDto.Geographics.Geometries?.ToList(),
-                            MaxDistanceFromPoint = searchFilterDto.Geographics.MaxDistanceFromPoint,
-                            UseDisturbanceRadius = searchFilterDto.Geographics.ConsiderDisturbanceRadius,
-                            UsePointAccuracy = searchFilterDto.Geographics.ConsiderObservationAccuracy,
-                            UseAuthorizationBuffer = searchFilterDto.Geographics.ConsiderAuthorizationBuffer
-                        },
+                    Geometries = PopulateGeographicsFilter(searchFilterDto.Geographics),
                     MaxAccuracy = searchFilterDto.Geographics?.MaxAccuracy
                 },
                 NotPresentFilter = SightingNotPresentFilter.DontIncludeNotPresent,
@@ -473,6 +483,21 @@ public static class FilterExtensions
 
             return searchFilter;
         }
+    }
+
+    public static TaxonFilter ToTaxonFilter(this TaxonFilterDto source)
+    {
+        return new TaxonFilter
+        {
+            Ids = source.Ids,
+            IncludeUnderlyingTaxa = source.IncludeUnderlyingTaxa ?? false,
+            IsInvasiveInSweden = source.IsInvasiveInSweden,
+            ListIds = source.TaxonListIds,
+            RedListCategories = source.RedListCategories,
+            TaxonCategories = source.TaxonCategories,
+            TaxonListOperator = (TaxonFilter.TaxonListOp)source.TaxonListOperator,
+            TaxonomyType = source.TaxonomyType
+        };
     }
 
     extension(TaxonFilterBaseDto filterDto)
@@ -496,15 +521,6 @@ public static class FilterExtensions
                 ListIds = filterDto.TaxonListIds,
                 TaxonListOperator = TaxonFilter.TaxonListOp.Merge,
             };
-
-            if (filterDto is TaxonFilterDto taxonFilterDto)
-            {
-                filter.RedListCategories = taxonFilterDto.RedListCategories;
-                filter.TaxonListOperator =
-                    (TaxonFilter.TaxonListOp)(taxonFilterDto?.TaxonListOperator).GetValueOrDefault();
-                filter.TaxonCategories = taxonFilterDto?.TaxonCategories!;
-                filter.TaxonomyType = taxonFilterDto.TaxonomyType;
-            }
 
             return filter;
         }

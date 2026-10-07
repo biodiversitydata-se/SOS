@@ -1,5 +1,5 @@
 ﻿using FluentAssertions;
-using SOS.Lib.Enums;
+using SOS.Api.Contracts.Observations.Requests;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Search.Filters;
 using System.Collections.Generic;
@@ -9,6 +9,29 @@ namespace SOS.Lib.UnitTests.Extensions;
 
 public class SearchFilterExtensionsTests
 {
+    [Fact]
+    public void PopulateFields_None_KeepsOnlyExplicitFields()
+    {
+        var output = new OutputFilter { Fields = ["Taxon.ScientificName"] };
+
+        output.PopulateFields(OutputFieldSet.None);
+
+        Assert.Equal(["Taxon.ScientificName"], output.Fields);
+        Assert.Empty(output.ExcludeFields);
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void PopulateFields_NoneWithoutFields_ExcludesAllSourceFields(bool omitFields)
+    {
+        var output = new OutputFilter { Fields = omitFields ? null! : [] };
+
+        output.PopulateFields(OutputFieldSet.None);
+
+        Assert.Equal(["*"], output.ExcludeFields);
+    }
+
     /// <remarks>
     /// The assert may be necessary to be update when new fields are added to the data model.
     /// </remarks>>

@@ -1,4 +1,4 @@
-using SOS.Api.Contracts.Analysis.Requests;
+using SOS.Api.Contracts.Aggregations.Requests;
 
 namespace SOS.Api.Client.Requests;
 
@@ -6,7 +6,7 @@ namespace SOS.Api.Client.Requests;
 public sealed class TaxonAreaAggregationInternalOptions : SosRoleRequestOptions
 {
     /// <summary>The area type used for aggregation.</summary>
-    public AreaTypeAggregateDto? AreaType { get; set; }
+    public AreaTypeAggregate? AreaType { get; set; }
 
     /// <summary>Controls validation of search-filter values.</summary>
     public bool ValidateSearchFilter { get; set; }

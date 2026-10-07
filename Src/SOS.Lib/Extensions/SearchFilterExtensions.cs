@@ -1,5 +1,5 @@
-﻿using SOS.Lib.Enums;
 using SOS.Lib.Helpers;
+using SOS.Api.Contracts.Observations.Requests;
 using SOS.Lib.Models.Search.Filters;
 using System.Text.Json.Serialization;
 using System.Text.Json;
@@ -48,6 +48,13 @@ public static class SearchFilterExtensions
 
             const OutputFieldSet defaultFieldSet = OutputFieldSet.Minimum;
             var fieldSet = outputFieldSet ?? defaultFieldSet;
+            if (fieldSet == OutputFieldSet.None)
+            {
+                // None adds no predefined fields. With no selected fields, keep
+                // the matching records but exclude their entire source content.
+                if (filter.Fields?.Any() != true) filter.ExcludeFields = ["*"];
+                return;
+            }
             if (fieldSet == OutputFieldSet.AllWithValues || fieldSet == OutputFieldSet.All)
             {
                 filter.Fields = null;

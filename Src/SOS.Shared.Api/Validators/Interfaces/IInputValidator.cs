@@ -1,7 +1,7 @@
-﻿using CSharpFunctionalExtensions;
+﻿using SOS.Api.Contracts.Common.Geo;
+using SOS.Api.Contracts.Observations.Requests;
+using CSharpFunctionalExtensions;
 using NetTopologySuite.Geometries;
-using SOS.Lib.Dtos.Enum;
-using SOS.Lib.Dtos.Filter;
 using Result = CSharpFunctionalExtensions.Result;
 
 namespace SOS.Shared.Api.Validators.Interfaces;
@@ -77,12 +77,11 @@ public interface IInputValidator
     Result ValidateGeogridZoomArgument(int zoom, int minLimit, int maxLimit);
 
     /// <summary>
-    /// Validate geometries
+    /// Validates the geometries used by the search, reusing server geometries when available.
     /// </summary>
-    /// <param name="geometries"></param>
+    /// <param name="filter">The geographic filter, or null when no geographic filter was supplied.</param>
     /// <returns></returns>
-    Result ValidateGeometries(
-        IEnumerable<Geometry> geometries);
+    Result ValidateGeometries(GeographicsFilterDto? filter);
 
     /// <summary>
     /// Validate grid cell size in m

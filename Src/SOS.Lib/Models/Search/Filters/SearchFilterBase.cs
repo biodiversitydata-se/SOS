@@ -1,3 +1,4 @@
+﻿using SOS.Api.Contracts.Observations;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Observation;
 using System.Collections.Generic;
@@ -7,7 +8,7 @@ using System.Text.Json;
 namespace SOS.Lib.Models.Search.Filters;
 
 /// <summary>
-///     Base filter class
+///     Base model for executing a search after API input has been prepared and mapped.
 /// </summary>
 public class SearchFilterBase
 {

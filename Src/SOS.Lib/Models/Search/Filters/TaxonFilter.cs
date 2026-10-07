@@ -1,4 +1,4 @@
-﻿using SOS.Lib.Enums;
+﻿using SOS.Api.Contracts.Observations.Requests;
 using SOS.Lib.Managers;
 using System.Collections.Generic;
 

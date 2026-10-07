@@ -1,4 +1,5 @@
-﻿using NetTopologySuite.Geometries;
+﻿using SOS.Api.Contracts.Common.Geo;
+using NetTopologySuite.Geometries;
 using SOS.Harvest.Entities.Artportalen;
 using SOS.Harvest.Repositories.Source.Artportalen.Interfaces;
 using SOS.Lib.Enums;

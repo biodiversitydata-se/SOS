@@ -7,6 +7,7 @@ namespace SOS.Api.Contracts.Observations.Responses;
 public class Occurrence
 {
 
+    /// <summary>The activity of the observed organism.</summary>
     public VocabularyValue? Activity { get; set; }
 
     /// <summary>
@@ -43,8 +44,10 @@ public class Occurrence
     /// </summary>
     public string? AssociatedTaxa { get; set; }
 
+    /// <summary>The behavior of the observed organism.</summary>
     public VocabularyValue? Behavior { get; set; }
 
+    /// <summary>The biotope in which the organism was observed.</summary>
     public VocabularyValue? Biotope { get; set; }
 
     /// <summary>
@@ -75,6 +78,7 @@ public class Occurrence
     /// </summary>
     public string? Disposition { get; set; }
 
+    /// <summary>How the organism became established at the location.</summary>
     public VocabularyValue? EstablishmentMeans { get; set; }
 
     /// <summary>
@@ -113,6 +117,7 @@ public class Occurrence
     /// </summary>
     public bool IsPositiveObservation { get; set; }
 
+    /// <summary>The life stage of the observed organism.</summary>
     public VocabularyValue? LifeStage { get; set; }
 
     /// <summary>
@@ -132,6 +137,7 @@ public class Occurrence
     /// </summary>
     public string? OccurrenceRemarks { get; set; }
 
+    /// <summary>The presence or absence of the organism at the location.</summary>
     public VocabularyValue? OccurrenceStatus { get; set; }
 
     /// <summary>
@@ -158,6 +164,7 @@ public class Occurrence
     /// </summary>
     public int? OrganismQuantityInt { get; set; }
 
+    /// <summary>The unit associated with the reported organism quantity.</summary>
     public VocabularyValue? OrganismQuantityUnit { get; set; }
 
     /// <summary>
@@ -199,10 +206,13 @@ public class Occurrence
     /// </summary>
     public System.DateTimeOffset? ReportedDate { get; set; }
 
+    /// <summary>The reproductive condition of the observed organism.</summary>
     public VocabularyValue? ReproductiveCondition { get; set; }
 
+    /// <summary>The sex of the observed organism.</summary>
     public VocabularyValue? Sex { get; set; }
 
+    /// <summary>The substrate on which the organism was observed.</summary>
     public Substrate? Substrate { get; set; }
 
     /// <summary>

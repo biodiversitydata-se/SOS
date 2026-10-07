@@ -1,15 +1,21 @@
 ﻿using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using SOS.Harvest.Services.Interfaces;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Models.Verbatim.Shark;
 using SOS.Lib.Services.Interfaces;
 using System.Text;
+using System.Text.Json;
 
 namespace SOS.Harvest.Services;
 
 public class SharkObservationService : ISharkObservationService
 {
+    private static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true,
+        Converters = { new StringConverter() }
+    };
+
     private readonly IHttpClientService _httpClientService;
     private readonly ILogger<SharkObservationService> _logger;
     private readonly SharkServiceConfiguration _sharkServiceConfiguration;
@@ -64,7 +70,7 @@ public class SharkObservationService : ISharkObservationService
             var json = await streamReader.ReadToEndAsync();
             fileStream!.Close();
 
-            return JsonConvert.DeserializeObject<SharkJsonFile>(json);
+            return JsonSerializer.Deserialize<SharkJsonFile>(json, JsonOptions);
         }
         catch (Exception e)
         {

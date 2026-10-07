@@ -1,6 +1,7 @@
 ﻿using SOS.Api.Client.Requests;
 using SOS.Api.Contracts.Areas.Requests;
 using SOS.Api.Contracts.Areas.Responses;
+using SOS.Api.Contracts.Common.Responses;
 
 namespace SOS.Api.Client.Abstractions;
 
@@ -14,7 +15,7 @@ public interface ISosLookupService
         CancellationToken cancellationToken = default);
 
     /// <summary>Gets areas together with exported geometries.</summary>
-    Task<AreaWithGeometryPagedResult> GetAreasWithGeometryAsync(
+    Task<PagedResultDto<AreaWithGeometryDto>> GetAreasWithGeometryAsync(
         AreasOptions? options = null,
         CancellationToken cancellationToken = default);
 }

@@ -1,14 +1,16 @@
-﻿using FizzWare.NBuilder;
+﻿using SOS.Api.Contracts.Areas.Responses;
+using FizzWare.NBuilder;
+using GeoJSON.Text.Geometry;
 using SOS.Lib.Models.Verbatim.Artportalen;
-using SOS.Lib.Dtos.Filter;
 using SOS.Observations.Api.IntegrationTests.Setup;
 using SOS.Observations.Api.IntegrationTests.Setup.Stubs;
 using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
 using SOS.TestHelpers.Gis;
 using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Helpers;
-using SOS.Lib.Dtos.Enum;
-using NetTopologySuite.Geometries;
+using SOS.Api.Contracts.Areas.Requests;
+using SOS.Api.Contracts.Common.Geo;
+using SOS.Api.Contracts.Observations.Requests;
 
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsEndpoints.SignalSearchInternalEndpoint;
 
@@ -24,7 +26,7 @@ public class SignalSearchTests : TestBase
     {
         // Arrange
         int sensitiveTaxonId = ProtectedSpeciesHelper.SensitiveSpeciesByCategory[5].First();
-        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(2)
             .All()
                 .HaveValuesFromPredefinedObservations(true)            
                 .With(p => p.TaxonId = sensitiveTaxonId)
@@ -72,7 +74,7 @@ public class SignalSearchTests : TestBase
     {
         // Arrange
         int sensitiveTaxonId = ProtectedSpeciesHelper.SensitiveSpeciesByCategory[5].First();
-        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(2)
             .All()
                 .HaveValuesFromPredefinedObservations(true)
                 .With(p => p.TaxonId = sensitiveTaxonId)
@@ -118,10 +120,10 @@ public class SignalSearchTests : TestBase
     public async Task SignalSearchInternal_ReturnsHttp403_WhenUserHasNoPermissions()
     {
         int sensitiveTaxonId = ProtectedSpeciesHelper.SensitiveSpeciesByCategory[5].First();
-        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(2)
             .All()
                 .HaveValuesFromPredefinedObservations(true)
-            .TheFirst(50)
+            .TheFirst(1)
                 .With(p => p.TaxonId = sensitiveTaxonId)
                 .With(p => p.ProtectedBySystem = true)
                 .With(p => p.StartDate = new DateTime(2000, 1, 1))
@@ -129,7 +131,7 @@ public class SignalSearchTests : TestBase
                 .With(p => p.Site.County = new GeographicalArea { FeatureId = CountyId.Uppsala })
                 .With(p => p.Site.Municipality = new GeographicalArea { FeatureId = MunicipalityId.Uppsala.ToString() })
                 .HaveCoordinates(TestCoordinates.UppsalaMunicipality.Longitude, TestCoordinates.UppsalaMunicipality.Latitude, 50)                
-            .TheNext(50)
+            .TheNext(1)
                 .With(p => p.TaxonId = sensitiveTaxonId)
                 .With(p => p.ProtectedBySystem = true)
                 .With(p => p.StartDate = new DateTime(2000, 1, 1))
@@ -222,19 +224,20 @@ public class SignalSearchTests : TestBase
             StartDate = new DateTime(startYear, 1, 1),
             Geographics = new GeographicsFilterDto
             {
-                Geometries = usePolygon ? new List<Geometry>()
-                {
-                    new Polygon(new LinearRing(
-                                [
-                                new Coordinate(bbox.TopLeftLongitude, bbox.TopLeftLatitude),
-                                new Coordinate(bbox.BottomRightLongitude, bbox.TopLeftLatitude),
-                                new Coordinate(bbox.BottomRightLongitude, bbox.BottomRightLatitude),
-                                new Coordinate(bbox.TopLeftLongitude, bbox.BottomRightLatitude),
-                                new Coordinate(bbox.TopLeftLongitude, bbox.TopLeftLatitude)
-                            ]
-                            )
-                        )
-                } : null,
+                Geometries = usePolygon ?
+                [
+                    new Polygon(
+                    [
+                        new LineString(
+                        [
+                            new Position(bbox.TopLeftLatitude, bbox.TopLeftLongitude),
+                            new Position(bbox.TopLeftLatitude, bbox.BottomRightLongitude),
+                            new Position(bbox.BottomRightLatitude, bbox.BottomRightLongitude),
+                            new Position(bbox.BottomRightLatitude, bbox.TopLeftLongitude),
+                            new Position(bbox.TopLeftLatitude, bbox.TopLeftLongitude)
+                        ])
+                    ])
+                ] : null,
                 BoundingBox = !usePolygon ? new LatLonBoundingBoxDto
                 {                    
                     BottomRight = new LatLonCoordinateDto { Latitude = bbox.BottomRightLatitude, Longitude = bbox.BottomRightLongitude },

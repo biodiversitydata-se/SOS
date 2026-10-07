@@ -1,8 +1,8 @@
 ﻿using Microsoft.ApplicationInsights.Extensibility;
 using SOS.Api.Client.Abstractions;
+using SOS.Api.Contracts.Aggregations.Responses;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Helpers.Interfaces;
-using SOS.Lib.Models.Search.Result;
 using SOS.Observations.Api.IntegrationTests.Extensions;
 using SOS.Observations.Api.IntegrationTests.Setup.ContainerDbFixtures;
 using SOS.Observations.Api.IntegrationTests.Setup.LiveDbFixtures;
@@ -99,7 +99,7 @@ public class TestFixture : IAsyncLifetime
 
     public async ValueTask InitializeAsync()
     {
-        if (_processFixtureDbMode == DbHostingMode.ContainerDb)
+        if (_processFixtureDbMode == DbHostingMode.ContainerDb || _harvestFixtureDbMode == DbHostingMode.ContainerDb)
         {
             await TestContainerFixture.InitializeAsync();
         }
@@ -149,9 +149,24 @@ public class TestFixture : IAsyncLifetime
     /// <returns>A task representing the asynchronous operation.</returns>
     public async ValueTask DisposeAsync()
     {
-        _sosApiClientServiceProvider?.Dispose();
-        await ApiFactory.DisposeAsync();
-        await AnalysisApiFactory.DisposeAsync();
+        try
+        {
+            await Task.WhenAll(
+                _sosApiClientServiceProvider?.DisposeAsync().AsTask() ?? Task.CompletedTask,
+                ApiFactory.DisposeAsync().AsTask(),
+                AnalysisApiFactory.DisposeAsync().AsTask());
+        }
+        finally
+        {
+            try
+            {
+                if (ServiceProvider != null) await ServiceProvider.DisposeAsync();
+            }
+            finally
+            {
+                await TestContainerFixture.DisposeAsync();
+            }
+        }
     }
 
     internal void ResetTaxonSumAggregationCache()

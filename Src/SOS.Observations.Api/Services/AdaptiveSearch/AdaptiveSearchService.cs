@@ -1,6 +1,7 @@
-﻿using NetTopologySuite.Geometries;
-using SOS.Lib.Dtos;
-using SOS.Lib.Enums;
+﻿using SOS.Api.Contracts.Common.Geo;
+using SOS.Api.Contracts.Observations.Responses;
+using NetTopologySuite.Geometries;
+using SOS.Api.Contracts.Observations.Requests;
 using SOS.Lib.Extensions;
 using SOS.Lib.Extensions.Dto;
 using SOS.Lib.Gis;
@@ -101,13 +102,13 @@ internal sealed class AdaptiveSearchService : IAdaptiveSearchService
                 ? await _observationManager.GetGeographicsFiltersAsAreaTuplesAsync(searchFilter)
                 : null;
             object jsonResult = request.OutputFormat == OutputFormatDto.Json
-                ? AdaptiveSearchResultDto<JsonObject>.CreateObservationsResult(
-                    bbox.ToLatLonBoundingBoxDto(),
+                ? AdaptiveSearchResultFactory.CreateObservationsResult(
+                    bbox.GetCompleteBoundingBox(),
                     (int)countAndExtentResult.Count,
                     records,
                     geographicAreas)
                 : _byLocationMapper.CreateResult(
-                    bbox.ToLatLonBoundingBoxDto(),
+                    bbox.GetCompleteBoundingBox(),
                     (int)countAndExtentResult.Count,
                     records,
                     polygonLocationGeometries,
@@ -153,7 +154,7 @@ internal sealed class AdaptiveSearchService : IAdaptiveSearchService
     private async Task<AdaptiveSearchResult> CreateGridResultAsync(
         AdaptiveSearchRequest request,
         SearchFilter searchFilter,
-        SOS.Lib.Models.Gis.LatLonBoundingBox? bbox,
+        LatLonBoundingBoxDto? bbox,
         long totalCount)
     {
         var zoom = GeoTileHelper.CalculateGeotileZoom(bbox, request.MaxGridCells, request.MaxZoom);
@@ -171,13 +172,13 @@ internal sealed class AdaptiveSearchService : IAdaptiveSearchService
                 ? await _observationManager.GetGeographicsFiltersAsAreaTuplesAsync(searchFilter)
                 : null;
             object jsonResult = request.OutputFormat == OutputFormatDto.Json
-                ? AdaptiveSearchResultDto<JsonObject>.CreateGeoGridResult(
-                    bbox.ToLatLonBoundingBoxDto(),
+                ? AdaptiveSearchResultFactory.CreateGeoGridResult<JsonObject>(
+                    bbox.GetCompleteBoundingBox(),
                     (int)totalCount,
                     geogridResult,
                     geographicAreas)
-                : AdaptiveSearchResultByLocationDto<JsonObject, JsonObject>.CreateGeoGridResult(
-                    bbox.ToLatLonBoundingBoxDto(),
+                : AdaptiveSearchByLocationResultFactory.CreateGeoGridResult<JsonObject, JsonObject>(
+                    bbox.GetCompleteBoundingBox(),
                     (int)totalCount,
                     geogridResult,
                     geographicAreas);

@@ -1,10 +1,12 @@
-﻿﻿using Microsoft.AspNetCore.Mvc;
+﻿﻿using SOS.Api.Contracts.Observations.Responses;
+using SOS.Api.Contracts.Aggregations.Requests;
+using SOS.Api.Contracts.Common.Geo;
+using SOS.Api.Contracts.Exports.Requests;
+using SOS.Api.Contracts.Observations.Requests;
+using Microsoft.AspNetCore.Mvc;
+using GeoJSON.Text.Feature;
 using SOS.Lib.Cache;
 using SOS.Lib.Cache.Interfaces;
-using SOS.Lib.Dtos;
-using SOS.Lib.Dtos.Enum;
-using SOS.Lib.Dtos.Filter;
-using SOS.Lib.Dtos.Observation;
 using SOS.Lib.Enums;
 using SOS.Lib.Exceptions;
 using SOS.Lib.Extensions;
@@ -31,14 +33,16 @@ using SOS.Shared.Api.Extensions.Controller;
 using SOS.Shared.Api.Utilities.Objects.Interfaces;
 using SOS.Shared.Api.Validators.Interfaces;
 using System.Collections.Concurrent;
+using System.Collections.Frozen;
 using System.Diagnostics;
 using System.Net;
-using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using System.Text.Json.Serialization;
+using System.Text.Unicode;
 using Result = CSharpFunctionalExtensions.Result;
+using SOS.Api.Contracts.Aggregations.Responses;
+using SOS.Api.Contracts.Common.Responses;
 
 namespace SOS.Observations.Api.Controllers;
 
@@ -51,6 +55,12 @@ public class ObservationsController : ControllerBase
 {
     internal const string AdaptiveSearchLocationsCacheName = "adaptive-search-locations";
     internal const int AdaptiveSearchLocationsCacheSizeLimit = 100_000;    
+
+    private static readonly FrozenSet<string> TaxonSumAggregationSortFields = new[]
+    {
+        nameof(TaxonSumAggregationItem.SumObservationCount), nameof(TaxonSumAggregationItem.ObservationCount),
+        nameof(TaxonSumAggregationItem.SumProvinceCount), nameof(TaxonSumAggregationItem.ProvinceCount)
+    }.ToFrozenSet(StringComparer.OrdinalIgnoreCase);
 
     private readonly IObservationManager _observationManager;
     private readonly ITaxonSearchManager _taxonSearchManager;
@@ -65,19 +75,6 @@ public class ObservationsController : ControllerBase
     private readonly IAdaptiveSearchService _adaptiveSearchService;
     private readonly IAdaptiveSearchLocationsService _adaptiveSearchLocationsService;
     private readonly ILogger<ObservationsController> _logger;
-
-    private JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions
-    {
-        AllowTrailingCommas = true,
-        DefaultIgnoreCondition = JsonIgnoreCondition.Never,
-        PropertyNameCaseInsensitive = true,
-        ReadCommentHandling = JsonCommentHandling.Skip,
-        Converters =
-        {
-            new JsonStringEnumConverter(),
-            new NetTopologySuite.IO.Converters.GeoJsonConverterFactory()
-        }
-    };
 
     /// <summary>
     /// Constructor
@@ -142,7 +139,7 @@ public class ObservationsController : ControllerBase
     /// <param name="resolveGeneralizedObservations">If true, then try get real coordinates for generalized observations.</param>
     /// <returns></returns>
     [HttpGet("{id?}")]
-    [ProducesResponseType(typeof(Observation), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(SOS.Api.Contracts.Observations.Responses.Observation), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NoContent)]
     [ProducesResponseType((int)HttpStatusCode.ServiceUnavailable)]
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
@@ -228,7 +225,7 @@ public class ObservationsController : ControllerBase
             var validationResult = Result.Combine(
                 validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(filter)) : Result.Success(),
                 _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
-                _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries));
+                _inputValidator.ValidateGeometries(filter?.Geographics));
             
             if (validationResult.IsFailure) return BadRequest(validationResult.Error);
 
@@ -327,7 +324,8 @@ public class ObservationsController : ControllerBase
             // Cache
             string cacheKey = null;
             ConcurrentDictionary<string, CacheEntry<GeoGridResultDto>> geogridAggregationByCacheKey = null;
-            bool useCache = !sensitiveObservations && Request.ContentLength < 10000;
+            bool useCache = !sensitiveObservations && Request.ContentLength < 10000 &&
+                filter?.ObservedByMe != true && filter?.ReportedByMe != true;
             if (useCache)
             {
                 var parameters = new[]
@@ -363,7 +361,7 @@ public class ObservationsController : ControllerBase
             var validationResult = Result.Combine(
                 validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(filter)) : Result.Success(),
                 _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
-                _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries),
+                _inputValidator.ValidateGeometries(filter?.Geographics),
                 _inputValidator.ValidateTranslationCultureCode(translationCultureCode),
                 _inputValidator.ValidateGeogridZoomArgument(zoom, minLimit: 1, maxLimit: 21),
                 await _inputValidator.ValidateTilesLimitAsync(boundingBox, zoom, () => _observationManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, searchFilter))
@@ -422,22 +420,7 @@ public class ObservationsController : ControllerBase
     {
         try
         {
-            StringBuilder keyBuilder = new StringBuilder();
-            keyBuilder.Append(queryString);
-
-            if (request != null)
-            {
-                string requestBody = JsonSerializer.Serialize(request, _jsonSerializerOptions);
-                keyBuilder.Append(requestBody);
-            }
-
-            string key = keyBuilder.ToString();
-            byte[] keyBytes = Encoding.UTF8.GetBytes(key);
-            using (var sha256 = SHA256.Create())
-            {
-                byte[] hashBytes = sha256.ComputeHash(keyBytes);
-                return BitConverter.ToString(hashBytes).Replace("-", "").ToLowerInvariant();
-            }             
+            return SearchFilterCacheKeyHelper.CreateKey(queryString, request);
         }
         catch (Exception ex)
         {
@@ -491,7 +474,7 @@ public class ObservationsController : ControllerBase
             var validationResult = Result.Combine(
                 validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(filter)) : Result.Success(),
                 _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
-                _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries),
+                _inputValidator.ValidateGeometries(filter?.Geographics),
                 _inputValidator.ValidateGridCellSizeInMetersArgument(gridCellSizeInMeters, minLimit: 100, maxLimit: 100000),
                 await _inputValidator.ValidateTilesLimitMetricAsync(boundingBox.Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM), gridCellSizeInMeters, () => _observationManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, searchFilter))
                 );
@@ -566,7 +549,7 @@ public class ObservationsController : ControllerBase
     ///     }
     /// </example>
     [HttpPost("Search")]
-    [ProducesResponseType(typeof(PagedResultDto<Observation>), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(PagedResultDto<SOS.Api.Contracts.Observations.Responses.Observation>), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
     [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
     [ProducesResponseType((int)HttpStatusCode.ServiceUnavailable)]
@@ -604,7 +587,7 @@ public class ObservationsController : ControllerBase
                 _inputValidator.ValidateSearchPagingArguments(skip, take),                    
                 validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(filter)) : Result.Success(),
                 _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
-                _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries),
+                _inputValidator.ValidateGeometries(filter?.Geographics),
                 _inputValidator.ValidateTranslationCultureCode(translationCultureCode));
             if (validationResult.IsFailure) return BadRequest(validationResult.Error);
             var sortFieldValidationResult = string.IsNullOrEmpty(sortBy) ? Result.Success<List<string>>(null) : (await _inputValidator.ValidateSortFieldsAsync(new[] { sortBy }));
@@ -619,7 +602,7 @@ public class ObservationsController : ControllerBase
 
                 if (outPutFields?.Any() ?? false)
                 {
-                    filter.Output ??= new OutputFilterExtendedDto();
+                    filter.Output ??= new OutputFilterDto();
                     filter.Output.Fields = EnsureCoordinatesIsRetrievedFromDb(filter?.Output?.Fields);
                 }
             }
@@ -710,7 +693,7 @@ public class ObservationsController : ControllerBase
     /// <param name="sensitiveObservations">If true, only sensitive (protected) observations will be searched.</param>
     /// <returns>List of observations and cursor value for the next page.</returns>
     [HttpPost("SearchByCursor")]
-    [ProducesResponseType(typeof(SearchByCursorResultDto<Observation>), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(SearchByCursorResultDto<SOS.Api.Contracts.Observations.Responses.Observation>), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
     [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
     [ProducesResponseType((int)HttpStatusCode.ServiceUnavailable)]
@@ -754,7 +737,7 @@ public class ObservationsController : ControllerBase
                 sortFieldValidationResult,
                 take <= 2500 ? Result.Success() : Result.Failure("You can't take more than 2,500 at a time."),
                 _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
-                _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries),
+                _inputValidator.ValidateGeometries(filter?.Geographics),
                 _inputValidator.ValidateTranslationCultureCode(translationCultureCode),
                 _inputValidator.ValidateCursor(cursor));
 
@@ -1093,7 +1076,7 @@ public class ObservationsController : ControllerBase
             var validationResult = Result.Combine(
                 validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(filter)) : Result.Success(),
                 _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
-                _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries),
+                _inputValidator.ValidateGeometries(filter?.Geographics),
                 _inputValidator.ValidateTranslationCultureCode(translationCultureCode),
                 _inputValidator.ValidateTaxonAggregationPagingArguments(skip, take)
             );
@@ -1115,7 +1098,7 @@ public class ObservationsController : ControllerBase
                 return BadRequest(result.Error);
             }
 
-            PagedResultDto<TaxonAggregationItemDto> dto = result.Value.ToPagedResultDto(result.Value.Records.ToTaxonAggregationItemDtos());
+            PagedResultDto<TaxonAggregationItemDto> dto = result.Value.ToPagedResultDto(result.Value.Records);
             return new OkObjectResult(dto);
         }
         catch (AuthenticationRequiredException e)
@@ -1155,7 +1138,7 @@ public class ObservationsController : ControllerBase
     /// <param name="protectionFilter">Filter to apply for protection status. Overrides sensitiveObservations if provided.</param>
     /// <returns></returns>
     [HttpGet("Internal/{id?}")]
-    [ProducesResponseType(typeof(Observation), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(SOS.Api.Contracts.Observations.Responses.Observation), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NoContent)]
     [ProducesResponseType((int)HttpStatusCode.ServiceUnavailable)]
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
@@ -1261,7 +1244,7 @@ public class ObservationsController : ControllerBase
             var validationResult = Result.Combine(
                 validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(filter)) : Result.Success(),
                 _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
-                _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries));
+                _inputValidator.ValidateGeometries(filter?.Geographics));
 
             if (validationResult.IsFailure) return BadRequest(validationResult.Error);
 
@@ -1435,7 +1418,7 @@ public class ObservationsController : ControllerBase
             var validationResult = Result.Combine(
                 validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(filter)) : Result.Success(),
                 _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
-                _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries),
+                _inputValidator.ValidateGeometries(filter?.Geographics),
                 _inputValidator.ValidateTranslationCultureCode(translationCultureCode),
                 _inputValidator.ValidateGeogridZoomArgument(zoom, minLimit: 1, maxLimit: 21),
                 await _inputValidator.ValidateTilesLimitAsync(boundingBox, zoom, () => _observationManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, searchFilter), true)
@@ -1525,7 +1508,7 @@ public class ObservationsController : ControllerBase
             var validationResult = Result.Combine(
                 validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(filter)) : Result.Success(),
                 _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
-                _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries),
+                _inputValidator.ValidateGeometries(filter?.Geographics),
                 _inputValidator.ValidateTranslationCultureCode(translationCultureCode),
                 _inputValidator.ValidateGeogridZoomArgument(zoom, minLimit: 1, maxLimit: 21),
                 await _inputValidator.ValidateTilesLimitAsync(boundingBox, zoom, () => _observationManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, searchFilter), true)
@@ -1646,7 +1629,7 @@ public class ObservationsController : ControllerBase
             var validationResult = Result.Combine(
                 validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(filter)) : Result.Success(),
                 _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
-                _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries),
+                _inputValidator.ValidateGeometries(filter?.Geographics),
                 _inputValidator.ValidateTranslationCultureCode(translationCultureCode),
                 _inputValidator.ValidateGeogridZoomArgument(zoom, minLimit: 1, maxLimit: 21),
                 await _inputValidator.ValidateTilesLimitAsync(boundingBox, zoom, () => _observationManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, searchFilter), true)
@@ -1730,7 +1713,7 @@ public class ObservationsController : ControllerBase
             var validationResult = Result.Combine(
                 validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(filter)) : Result.Success(),
                 _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
-                _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries),
+                _inputValidator.ValidateGeometries(filter?.Geographics),
                 _inputValidator.ValidateGridCellSizeInMetersArgument(gridCellSizeInMeters, minLimit: 100, maxLimit: 100000),
                 await _inputValidator.ValidateTilesLimitMetricAsync(boundingBox.Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM), gridCellSizeInMeters, () => _observationManager.GetMatchCountAsync(roleId, authorizationApplicationIdentifier, searchFilter), true)
             );
@@ -1808,7 +1791,7 @@ public class ObservationsController : ControllerBase
     ///     }
     /// </example>
     [HttpPost("Internal/Search")]
-    [ProducesResponseType(typeof(GeoPagedResultWithMetadataDto<Observation>), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(GeoPagedResultWithMetadataDto<SOS.Api.Contracts.Observations.Responses.Observation>), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
     [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
     [ProducesResponseType((int)HttpStatusCode.ServiceUnavailable)]
@@ -1847,7 +1830,7 @@ public class ObservationsController : ControllerBase
             var validationResult = Result.Combine(
                 sortFieldValidationResult,
                 _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
-                _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries),
+                _inputValidator.ValidateGeometries(filter?.Geographics),
                 _inputValidator.ValidateSearchPagingArgumentsInternal(skip, take),
                 _inputValidator.ValidateTranslationCultureCode(translationCultureCode));
 
@@ -2042,7 +2025,7 @@ public class ObservationsController : ControllerBase
 
         try
         {
-            var inputBbox = filter?.Geographics?.BoundingBox?.ToLatLonBoundingBox();
+            var inputBbox = filter?.Geographics?.BoundingBox.GetCompleteBoundingBox();
             var bbox = inputBbox;
             LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
 
@@ -2075,7 +2058,7 @@ public class ObservationsController : ControllerBase
                 _inputValidator.ValidateInt(maxZoom, 1, 21, nameof(maxZoom)),
                 _inputValidator.ValidateInt(maxGridCells, 1, 10000, nameof(maxGridCells)),
                 _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
-                _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries),
+                _inputValidator.ValidateGeometries(filter?.Geographics),
                 _inputValidator.ValidateTranslationCultureCode(translationCultureCode));
 
             if (validationResult.IsFailure) return BadRequest(validationResult.Error);
@@ -2096,7 +2079,7 @@ public class ObservationsController : ControllerBase
                 ExcludeNullValues = excludeNullValues,
                 IncludeFilterAreasInResult = includeFilterAreasInResult,
                 ReturnInputBBox = returnInputBBox,
-                CreatePolygons = createPolygons
+                CreatePolygons = (CreatePolygonsMode)createPolygons
             });
 
             if (result.Kind == AdaptiveSearchResultKind.Json)
@@ -2195,7 +2178,7 @@ public class ObservationsController : ControllerBase
     /// </returns>
     [HttpPost("Internal/AdaptiveSearchLocations")]
     [Produces("application/geo+json")]
-    [ProducesResponseType((int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(FeatureCollection), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
     [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
     [ProducesResponseType((int)HttpStatusCode.ServiceUnavailable)]
@@ -2239,7 +2222,7 @@ public class ObservationsController : ControllerBase
                 return BadRequest(bboxQueryError);
             }
 
-            var inputBbox = filter.Geographics?.BoundingBox?.ToLatLonBoundingBox();
+            var inputBbox = filter.Geographics?.BoundingBox.GetCompleteBoundingBox();
             var bbox = inputBbox;
             LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
             filter.ProtectionFilter ??= sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public;
@@ -2254,9 +2237,9 @@ public class ObservationsController : ControllerBase
                 _inputValidator.ValidateInt(minLocationCountBeforeClustering, 0, 10000, nameof(minLocationCountBeforeClustering)),
                 ValidateNullableInt(locationAggregationLimit, 1, 10000, nameof(locationAggregationLimit)),
                 ValidateMetersPerPixel(metersPerPixel),
-                ValidateMetersPerPixelForPolygonMode(createPolygons, metersPerPixel),
+                ValidateMetersPerPixelForPolygonMode((CreatePolygonsMode)createPolygons, metersPerPixel),
                 //_inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
-                _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries));
+                _inputValidator.ValidateGeometries(filter?.Geographics));
 
             if (validationResult.IsFailure) return BadRequest(validationResult.Error);            
 
@@ -2279,7 +2262,7 @@ public class ObservationsController : ControllerBase
                 ClusterRadiusPx = clusterRadiusPx,
                 MinLocationsPerCluster = minLocationsPerCluster,
                 MinimumLocationCountBeforeClustering = minLocationCountBeforeClustering,
-                CreatePolygons = createPolygons,
+                CreatePolygons = (CreatePolygonsMode)createPolygons,
                 UseCache = useCache,
                 CreateSampleObservations = createSampleObservations,
                 LocationAggregationLimit = locationAggregationLimit,
@@ -2356,7 +2339,7 @@ public class ObservationsController : ControllerBase
             return new EmptyResult();
         }
 
-        await LocationFeatureDtoGeoJsonWriter.WriteFeatureCollectionAsync(
+        await AdaptiveSearchLocationsGeoJsonWriter.WriteFeatureCollectionAsync(
             result.LocationFeatures ?? Array.Empty<LocationFeature>(),
             result.Bbox,
             Response,
@@ -2479,7 +2462,9 @@ public class ObservationsController : ControllerBase
 
         return new SearchResultMetadataDto
         {
-            PolygonLocations = polygonLocations
+            PolygonLocations = polygonLocations?.ToDictionary(
+                location => location.Key,
+                location => location.Value.ToGeoJsonGeometry())
         };
     }
 
@@ -2550,7 +2535,7 @@ public class ObservationsController : ControllerBase
             var validationResult = Result.Combine(
                 validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(filter)) : Result.Success(),
                 _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
-                _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries),
+                _inputValidator.ValidateGeometries(filter?.Geographics),
                 _inputValidator.ValidateAggregationPagingArguments(skip, take, true),
                 _inputValidator.ValidateTranslationCultureCode(translationCultureCode));
 
@@ -2629,7 +2614,7 @@ public class ObservationsController : ControllerBase
             var validationResult = Result.Combine(
                 validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(filter)) : Result.Success(),
                 _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
-                _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries));
+                _inputValidator.ValidateGeometries(filter?.Geographics));
 
             if (validationResult.IsFailure)
             {
@@ -2640,9 +2625,9 @@ public class ObservationsController : ControllerBase
                 roleId, 
                 authorizationApplicationIdentifier, 
                 filter.ToSearchFilterInternal(this.GetUserId(), "sv-SE"), 
-                (TimeSeriesType) timeSeriesType);
-            IEnumerable<TimeSeriesHistogramResultDto> dtos = result.ToTimeSeriesHistogramResultDtos();
-            return new OkObjectResult(dtos);
+                timeSeriesType);
+            ArgumentNullException.ThrowIfNull(result);
+            return new OkObjectResult(result);
         }
         catch (AuthenticationRequiredException e)
         {
@@ -2690,7 +2675,7 @@ public class ObservationsController : ControllerBase
     ///     }
     /// </example>
     [HttpPost("Internal/SearchScroll")]
-    [ProducesResponseType(typeof(ScrollResultDto<Observation>), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(ScrollResultDto<SOS.Api.Contracts.Observations.Responses.Observation>), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
     [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
     [ProducesResponseType((int)HttpStatusCode.ServiceUnavailable)]
@@ -2720,7 +2705,7 @@ public class ObservationsController : ControllerBase
             var validationResult = Result.Combine(                    
                 string.IsNullOrEmpty(sortBy) ? Result.Success() : (await _inputValidator.ValidateSortFieldsAsync(new[] { sortBy })),
                 _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
-                _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries),
+                _inputValidator.ValidateGeometries(filter?.Geographics),
                 take <= 10000 ? Result.Success() : Result.Failure("You can't take more than 10 000 at a time."),
                 _inputValidator.ValidateTranslationCultureCode(translationCultureCode));
 
@@ -2804,7 +2789,7 @@ public class ObservationsController : ControllerBase
             var validationResult = Result.Combine(
                 (await _inputValidator.ValidateSignalSearchAsync(filter, validateSearchFilter, areaBuffer)),
                 _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
-                _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries)
+                _inputValidator.ValidateGeometries(filter?.Geographics)
             );
 
             if (validationResult.IsFailure)
@@ -2914,8 +2899,9 @@ public class ObservationsController : ControllerBase
             // Cache
             string cacheKey = null;
             ConcurrentDictionary<string, CacheEntry<PagedResultDto<TaxonAggregationItemDto>>> resultByCacheKey = null;
-            bool useCache = filter.ProtectionFilter == ProtectionFilterDto.Public && Request.ContentLength < 10000;
-            var geometryValidationResult = _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries);
+            bool useCache = filter.ProtectionFilter == ProtectionFilterDto.Public && Request.ContentLength < 10000 &&
+                filter.ObservedByMe != true && filter.ReportedByMe != true;
+            var geometryValidationResult = _inputValidator.ValidateGeometries(filter?.Geographics);
             if (geometryValidationResult.IsFailure)
             {
                 return BadRequest(geometryValidationResult.Error);
@@ -2974,7 +2960,7 @@ public class ObservationsController : ControllerBase
                 return BadRequest(result.Error);
             }
 
-            PagedResultDto<TaxonAggregationItemDto> dto = result.Value.ToPagedResultDto(result.Value.Records.ToTaxonAggregationItemDtos());
+            PagedResultDto<TaxonAggregationItemDto> dto = result.Value.ToPagedResultDto(result.Value.Records);
 
             // Cache
             if (useCache)
@@ -3057,7 +3043,7 @@ public class ObservationsController : ControllerBase
             var validationResult = Result.Combine(
                 validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(filter)) : Result.Success(),
                 _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
-                _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries),
+                _inputValidator.ValidateGeometries(filter?.Geographics),
                 _inputValidator.ValidateTranslationCultureCode(translationCultureCode)
                 );
 
@@ -3158,7 +3144,7 @@ public class ObservationsController : ControllerBase
             var validationResult = Result.Combine(
                 validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(filter)) : Result.Success(),
                 _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
-                _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries),
+                _inputValidator.ValidateGeometries(filter?.Geographics),
                 _inputValidator.ValidateTranslationCultureCode(translationCultureCode)
                 );
 
@@ -3245,17 +3231,15 @@ public class ObservationsController : ControllerBase
 
         try
         {
-            var validationResult = sortBy switch
-            {
-                "SumObservationCount" or "ObservationCount" or "SumProvinceCount" or "ProvinceCount" => Result.Success(),
-                _ => Result.Failure($"{sortBy} is not a allowed sort field")
-            };
+            var validationResult = sortBy != null && TaxonSumAggregationSortFields.Contains(sortBy)
+                ? Result.Success()
+                : Result.Failure($"{sortBy} is not a allowed sort field");
             if (validationResult.IsFailure) return BadRequest(validationResult.Error);
 
             LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
             var result = await _taxonSearchManager.GetTaxonSumAggregationAsync(
                 this.GetUserId(),
-                taxonFilter.ToTaxonFilterFilter(),
+                taxonFilter.ToTaxonFilter(),
                 skip,
                 take,
                 sortBy,
@@ -3325,7 +3309,7 @@ public class ObservationsController : ControllerBase
             var validationResult = Result.Combine(
                 validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(filter)) : Result.Success(),
                 _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
-                _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries),
+                _inputValidator.ValidateGeometries(filter?.Geographics),
                 _inputValidator.ValidateTaxonExists(filter),
                 _inputValidator.ValidateGeographicalAreaExists(filter?.Geographics));
 
@@ -3386,7 +3370,7 @@ public class ObservationsController : ControllerBase
             var validationResult = Result.Combine(
                 validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(filter)) : Result.Success(),
                 _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
-                _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries)
+                _inputValidator.ValidateGeometries(filter?.Geographics)
             );
 
             if (validationResult.IsFailure)
@@ -3444,7 +3428,7 @@ public class ObservationsController : ControllerBase
             var validationResult = Result.Combine(
                validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(filter)) : Result.Success(),
                _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
-               _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries)
+               _inputValidator.ValidateGeometries(filter?.Geographics)
             );
 
             if (validationResult.IsFailure)
@@ -3505,7 +3489,7 @@ public class ObservationsController : ControllerBase
             var validationResult = Result.Combine(
               validateSearchFilter ? (await _inputValidator.ValidateSearchFilterAsync(filter)) : Result.Success(),
               _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
-              _inputValidator.ValidateGeometries(filter?.Geographics?.Geometries)
+              _inputValidator.ValidateGeometries(filter?.Geographics)
            );
 
             if (validationResult.IsFailure)

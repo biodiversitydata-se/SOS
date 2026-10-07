@@ -1,4 +1,7 @@
-﻿using Elastic.Clients.Elasticsearch;
+﻿using SOS.Api.Contracts.Aggregations.Requests;
+using SOS.Api.Contracts.Aggregations.Responses;
+using SOS.Api.Contracts.Common.Responses;
+using Elastic.Clients.Elasticsearch;
 using Elastic.Clients.Elasticsearch.Aggregations;
 using Elastic.Clients.Elasticsearch.Cluster;
 using Elastic.Clients.Elasticsearch.Mapping;
@@ -361,22 +364,22 @@ public class ProcessedObservationRepository : ProcessedObservationCoreRepository
     }
 
     /// <inheritdoc />
-    public async Task<IEnumerable<TimeSeriesHistogramResult>> GetTimeSeriesHistogramAsync(SearchFilter filter, TimeSeriesType timeSeriesType)
+    public async Task<IEnumerable<TimeSeriesHistogramResultDto>> GetTimeSeriesHistogramAsync(SearchFilter filter, TimeSeriesTypeDto timeSeriesType)
     {
         var indexNames = GetCurrentIndex(filter);
         var (queries, excludeQueries) = GetCoreQueries<dynamic>(filter);
 
         var field = timeSeriesType switch
         {
-            TimeSeriesType.Month => "event.startMonth",
-            TimeSeriesType.Week48 => "event.startHistogramWeek",
+            TimeSeriesTypeDto.Month => "event.startMonth",
+            TimeSeriesTypeDto.Week48 => "event.startHistogramWeek",
             _ => "event.startDayOfYear"
         };
 
         var extendedBoundsMax = timeSeriesType switch
         {
-            TimeSeriesType.Month => 12,
-            TimeSeriesType.Week48 => 48,
+            TimeSeriesTypeDto.Month => 12,
+            TimeSeriesTypeDto.Week48 => 48,
             _ => 365
         };
 
@@ -422,7 +425,7 @@ public class ProcessedObservationRepository : ProcessedObservationCoreRepository
             .Aggregations.GetHistogram("aggregation")
                 .Buckets?
                     .Select(b =>
-                        new TimeSeriesHistogramResult
+                        new TimeSeriesHistogramResultDto
                         {
                             Type = timeSeriesType,
                             Period = (int)b.Key,
@@ -435,22 +438,27 @@ public class ProcessedObservationRepository : ProcessedObservationCoreRepository
     }
 
     /// <inheritdoc />
-    public async Task<IEnumerable<TimeSeriesHistogramResult>> GetYearHistogramAsync(SearchFilter filter, TimeSeriesType timeSeriesType)
+    public async Task<IEnumerable<TimeSeriesHistogramResultDto>> GetYearHistogramAsync(SearchFilter filter, TimeSeriesTypeDto timeSeriesType)
     {
         var indexNames = GetCurrentIndex(filter);
         var (queries, excludeQueries) = GetCoreQueries<dynamic>(filter);
 
-        var tz = TimeZoneInfo.Local.GetUtcOffset(DateTime.Now);
+        // Use the zone's rules for each year, not today's fixed daylight-saving offset.
+        var timeZoneId = TimeZoneInfo.Local.Id;
+        if (TimeZoneInfo.TryConvertWindowsIdToIanaId(timeZoneId, out var ianaTimeZoneId))
+        {
+            timeZoneId = ianaTimeZoneId;
+        }
         ExtendedBoundsDate extendedBounds = null;
         if (filter.Date != null)
         {        
             extendedBounds = new ExtendedBoundsDate
             {
                 Max = filter.Date.EndDate.HasValue
-                    ? new FieldDateMath(filter.Date.EndDate.Value.ToString("yyyy-MM-ddTHH:mm:ss"))
+                    ? new FieldDateMath(filter.Date.EndDate.Value.ToUniversalTime().ToString("O"))
                     : null,
                 Min = filter.Date.StartDate.HasValue
-                    ? new FieldDateMath(filter.Date.StartDate.Value.ToString("yyyy-MM-ddTHH:mm:ss"))
+                    ? new FieldDateMath(filter.Date.StartDate.Value.ToUniversalTime().ToString("O"))
                     : null
             };
         }
@@ -469,7 +477,7 @@ public class ProcessedObservationRepository : ProcessedObservationCoreRepository
                        
                         .Field("event.startDate")
                         .CalendarInterval(CalendarInterval.Year)                            
-                        .TimeZone($"{(tz.TotalMinutes > 0 ? "+" : "")}{tz.Hours:00}:{tz.Minutes:00}")
+                        .TimeZone(timeZoneId)
                         .Format("yyyy-MM-dd||date_optional_time")
                         .ExtendedBounds(extendedBounds)
                     )
@@ -499,7 +507,7 @@ public class ProcessedObservationRepository : ProcessedObservationCoreRepository
             .Buckets?
             .OrderByDescending(b => b.KeyAsString)
             .Select(b =>
-                new TimeSeriesHistogramResult
+                new TimeSeriesHistogramResultDto
                 {
                     Type = timeSeriesType,
                     Period = DateTime.Parse(b.KeyAsString).Year,
@@ -621,7 +629,7 @@ public class ProcessedObservationRepository : ProcessedObservationCoreRepository
     }
 
     /// <inheritdoc />
-    public async Task<IEnumerable<YearCountResult>> GetUserYearCountAsync(SearchFilter filter)
+    public async Task<IEnumerable<YearCountResultDto>> GetUserYearCountAsync(SearchFilter filter)
     {
         try
         {
@@ -660,7 +668,7 @@ public class ProcessedObservationRepository : ProcessedObservationCoreRepository
 
             searchResponse.ThrowIfInvalid();
 
-            var result = new HashSet<YearCountResult>();
+            var result = new HashSet<YearCountResultDto>();
             foreach (var bucket in searchResponse.Aggregations.GetComposite("observationByYear").Buckets)
             {
                 var key = bucket.Key;
@@ -670,7 +678,7 @@ public class ProcessedObservationRepository : ProcessedObservationCoreRepository
                 var count = bucket.DocCount;
                 var taxonCount = bucket.Aggregations.GetCardinality("unique_taxonids").Value;
 
-                result.Add(new YearCountResult
+                result.Add(new YearCountResultDto
                 {
                     Count = count,
                     TaxonCount = taxonCount,
@@ -688,7 +696,7 @@ public class ProcessedObservationRepository : ProcessedObservationCoreRepository
     }
 
     /// <inheritdoc />
-    public async Task<IEnumerable<YearMonthCountResult>> GetUserYearMonthCountAsync(SearchFilter filter)
+    public async Task<IEnumerable<YearMonthCountResultDto>> GetUserYearMonthCountAsync(SearchFilter filter)
     {
         try
         {
@@ -731,7 +739,7 @@ public class ProcessedObservationRepository : ProcessedObservationCoreRepository
 
             searchResponse.ThrowIfInvalid();
 
-            var result = new HashSet<YearMonthCountResult>();
+            var result = new HashSet<YearMonthCountResultDto>();
             foreach (var bucket in searchResponse.Aggregations.GetComposite("observationByYearMonth").Buckets)
             {
                 var key = bucket.Key;
@@ -743,7 +751,7 @@ public class ProcessedObservationRepository : ProcessedObservationCoreRepository
                 var count = bucket.DocCount;
                 var taxonCount = (long)bucket.Aggregations.GetCardinality("unique_taxonids").Value;
 
-                result.Add(new YearMonthCountResult
+                result.Add(new YearMonthCountResultDto
                 {
                     Count = count,
                     Month = (int)startMonth,
@@ -762,7 +770,7 @@ public class ProcessedObservationRepository : ProcessedObservationCoreRepository
     }
 
     /// <inheritdoc />
-    public async Task<IEnumerable<YearMonthDayCountResult>> GetUserYearMonthDayCountAsync(SearchFilter filter, int skip, int take)
+    public async Task<IEnumerable<YearMonthDayCountResultDto>> GetUserYearMonthDayCountAsync(SearchFilter filter, int skip, int take)
     {
         try
         {
@@ -809,7 +817,8 @@ public class ProcessedObservationRepository : ProcessedObservationCoreRepository
 
             searchResponse.ThrowIfInvalid();
 
-            var result = new Dictionary<string, YearMonthDayCountResult>();
+            // Keep the mutable collection available while the DTO exposes localities as IEnumerable.
+            var result = new Dictionary<string, (YearMonthDayCountResultDto Result, HashSet<IdNameDto<string>> Localities)>();
             foreach (var bucket in searchResponse.Aggregations.GetComposite("observationByYearMonth").Buckets.Skip(skip))
             {
                 var key = bucket.Key;
@@ -824,22 +833,23 @@ public class ProcessedObservationRepository : ProcessedObservationCoreRepository
                 var count = bucket.DocCount;
                 var taxonCount = (long)bucket.Aggregations.GetCardinality("unique_taxonids").Value;
 
-                result.Add($"{startYear}-{startMonth}-{startDay}", new YearMonthDayCountResult
+                var localities = new HashSet<IdNameDto<string>>();
+                result.Add($"{startYear}-{startMonth}-{startDay}", (new YearMonthDayCountResultDto
                 {
                     Count = count,
                     Day = (int)startDay,
-                    Localities = new HashSet<IdName<string>>(),
+                    Localities = localities,
                     Month = (int)startMonth,
                     TaxonCount = taxonCount,
                     Year = (int)startYear
-                });
+                }, localities));
             }
 
             if (result.Any())
             {
-                var firstItem = result.First().Value;
+                var firstItem = result.First().Value.Result;
                 var maxDate = new DateTime(firstItem.Year, firstItem.Month, firstItem.Day);
-                var lastItem = result.Last().Value;
+                var lastItem = result.Last().Value.Result;
                 var minDate = new DateTime(lastItem.Year, lastItem.Month, lastItem.Day);
 
                 // Limit search to only include time span we are interested in
@@ -907,12 +917,12 @@ public class ProcessedObservationRepository : ProcessedObservationCoreRepository
 
                     if (result.TryGetValue(itemKey, out var item))
                     {
-                        item.Localities.Add(new IdName<string> { Id = locationId, Name = locality });
+                        item.Localities.Add(new IdNameDto<string> { Id = locationId, Name = locality });
                     }
                 }
             }
 
-            return result.Values;
+            return result.Values.Select(item => item.Result);
         }
         catch (Exception e)
         {

@@ -7,7 +7,7 @@ using SOS.Lib.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using File = SOS.Lib.Models.Misc.File;
+using SOS.Api.Contracts.Exports.Responses;
 
 namespace SOS.Lib.Services;
 
@@ -118,7 +118,7 @@ public class BlobStorageService : IBlobStorageService
     }
 
     /// <inheritdoc />
-    public async Task<IEnumerable<File>> GetExportFilesAsync()
+    public async Task<IEnumerable<ExportFileDto>> GetExportFilesAsync()
     {
         var containerClient = GetContainerClient(_exportContainer);
 
@@ -131,12 +131,12 @@ public class BlobStorageService : IBlobStorageService
         // Call the listing operation and return pages of the specified size.
         var blobs = containerClient.GetBlobsAsync();
 
-        var files = new List<File>();
+        var files = new List<ExportFileDto>();
 
         // Enumerate the blobs returned for each page.
         await foreach (var blob in blobs)
         {
-            files.Add(new File
+            files.Add(new ExportFileDto
             {
                 Created = Convert.ToDateTime(blob.Properties.LastModified.ToString()),
                 Name = blob.Name,

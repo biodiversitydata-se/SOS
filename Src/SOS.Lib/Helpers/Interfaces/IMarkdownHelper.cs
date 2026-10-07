@@ -1,6 +1,7 @@
-﻿using NetTopologySuite.Geometries;
-using SOS.Lib.Dtos.Filter;
-using SOS.Lib.Enums;
+using SOS.Api.Contracts.Common.Geo;
+using SOS.Api.Contracts.Aggregations.Requests;
+using SOS.Api.Contracts.Observations.Requests;
+using NetTopologySuite.Geometries;
 using SOS.Lib.Models.Search.Filters;
 
 namespace SOS.Lib.Helpers.Interfaces;

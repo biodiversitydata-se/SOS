@@ -1,12 +1,13 @@
-﻿using CSharpFunctionalExtensions;
+﻿using SOS.Api.Contracts.Aggregations.Requests;
+using SOS.Api.Contracts.Exports.Responses;
+using SOS.Api.Contracts.Exports.Requests;
+using SOS.Api.Contracts.Observations.Requests;
+using CSharpFunctionalExtensions;
 using Elastic.Clients.Elasticsearch.MachineLearning;
 using Hangfire;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SOS.Lib.Constants;
-using SOS.Lib.Dtos.Enum;
-using SOS.Lib.Dtos.Export;
-using SOS.Lib.Dtos.Filter;
 using SOS.Lib.Enums;
 using SOS.Lib.Exceptions;
 using SOS.Lib.Extensions;
@@ -58,7 +59,7 @@ public class ExportsController : ControllerBase
         if (outputFieldSet != OutputFieldSet.None)
         {
             filter = filter ?? new SearchFilterDto();
-            filter.Output = filter?.Output ?? new OutputFilterDto();
+            filter.Output ??= new OutputFilterDto();
 
             if ((filter.Output.FieldSet ?? OutputFieldSet.None) == OutputFieldSet.None)
             {
@@ -73,7 +74,7 @@ public class ExportsController : ControllerBase
         if (outputFieldSet != OutputFieldSet.None)
         {
             filter = filter ?? new SearchFilterInternalDto();
-            filter.Output = filter?.Output ?? new OutputFilterExtendedDto();
+            filter.Output ??= new OutputFilterExtendedDto();
 
             if ((filter.Output.FieldSet ?? OutputFieldSet.None) == OutputFieldSet.None)
             {
@@ -277,7 +278,7 @@ public class ExportsController : ControllerBase
     /// </summary>
     /// <returns></returns>
     [HttpGet("Datasets")]
-    [ProducesResponseType(typeof(IEnumerable<Lib.Models.Misc.File>), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(IEnumerable<ExportFileDto>), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NoContent)]
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
     [AzureApi, AzureInternalApi]
@@ -324,7 +325,8 @@ public class ExportsController : ControllerBase
                 return new StatusCodeResult((int)HttpStatusCode.NoContent);
             }
 
-            return new OkObjectResult(userExport?.Jobs?.Select(j => j.ToDto())?.OrderByDescending(j => j.CreatedDate));
+            return new OkObjectResult(userExport?.Jobs?.Select(j => j.ToDto())
+                .OrderByDescending(j => j!.CreatedDate));
         }
         catch (Exception e)
         {
@@ -518,7 +520,7 @@ public class ExportsController : ControllerBase
         [FromQuery] bool eventBased = false,
         [FromQuery] bool validateSearchFilter = false,
         [FromQuery] bool sensitiveObservations = false)
-    {            
+    {
         LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
 
         try
@@ -526,7 +528,7 @@ public class ExportsController : ControllerBase
             // SearchFilterDto don't support protection filter, declare it localy
             var protectionFilter = sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public;
             this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope, protectionFilter);
-            filter.Output = new OutputFilterDto { FieldSet = OutputFieldSet.All };
+            filter.Output = new OutputFilterDto { FieldSet = SOS.Api.Contracts.Observations.Requests.OutputFieldSet.All };
             var validateResult = await DownloadValidateAsync(filter, validateSearchFilter, protectionFilter, roleId, authorizationApplicationIdentifier);
             if (validateResult is not OkResult okResult)
             {
@@ -813,6 +815,7 @@ public class ExportsController : ControllerBase
                 return validateResult;
             }
             var encryptedPassword = await _cryptoService.EncryptAsync(encryptPassword);
+            filter.MaterializeGeoJsonGeometriesForSerialization();
             var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
                 job.RunAsync(filter, protectionFilter, this.GetUserId(), roleId, authorizationApplicationIdentifier, userInfo.Email, description, ExportFormat.Csv, cultureCode, false,
                     propertyLabelType, false, sendMailFromZendTo, encryptedPassword, false, null, JobCancellationToken.Null));
@@ -898,6 +901,7 @@ public class ExportsController : ControllerBase
 
             var encryptedPassword = await _cryptoService.EncryptAsync(encryptPassword);
             
+            filter.MaterializeGeoJsonGeometriesForSerialization();
             var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
                 job.RunAsync(filter, protectionFilter, this.GetUserId(), roleId, authorizationApplicationIdentifier, userInfo.Email, description, eventBased ? ExportFormat.DwCEvent : ExportFormat.DwC, "en-GB", false,
                     PropertyLabelType.PropertyName, false, sendMailFromZendTo, encryptedPassword, false, null, JobCancellationToken.Null));
@@ -991,6 +995,7 @@ public class ExportsController : ControllerBase
 
             var encryptedPassword = await _cryptoService.EncryptAsync(encryptPassword);
 
+            filter.MaterializeGeoJsonGeometriesForSerialization();
             var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
                 job.RunAsync(filter, protectionFilter, this.GetUserId(), roleId, authorizationApplicationIdentifier, userInfo.Email, description, ExportFormat.Excel, cultureCode, false,
                     propertyLabelType, false, sendMailFromZendTo, encryptedPassword, dynamicProjectDataFields, null, JobCancellationToken.Null));
@@ -1085,6 +1090,7 @@ public class ExportsController : ControllerBase
             }
 
             var encryptedPassword = await _cryptoService.EncryptAsync(encryptPassword);
+            filter.MaterializeGeoJsonGeometriesForSerialization();
             var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
                 job.RunAsync(filter, protectionFilter, this.GetUserId(), roleId, authorizationApplicationIdentifier, userInfo.Email, description, ExportFormat.GeoJson, cultureCode,
                     flat, propertyLabelType, excludeNullValues, sendMailFromZendTo, encryptedPassword, false, null, JobCancellationToken.Null));
@@ -1276,7 +1282,7 @@ public class ExportsController : ControllerBase
         {
             filter.ProtectionFilter ??= (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
             this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope, filter.ProtectionFilter);
-            filter.Output = new OutputFilterExtendedDto { FieldSet = OutputFieldSet.All };
+            filter.Output = new OutputFilterExtendedDto { FieldSet = SOS.Api.Contracts.Observations.Requests.OutputFieldSet.All };
             var validateResult = await DownloadValidateAsync(filter, validateSearchFilter, filter.ProtectionFilter, roleId, authorizationApplicationIdentifier);
             if (validateResult is not OkResult okResult)
             {
@@ -1561,6 +1567,7 @@ public class ExportsController : ControllerBase
             }
 
             var encryptedPassword = await _cryptoService.EncryptAsync(encryptPassword);
+            filter.MaterializeGeoJsonGeometriesForSerialization();
             var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
                 job.RunAsync(filter, filter.ProtectionFilter.Value, this.GetUserId(), roleId, authorizationApplicationIdentifier, userInfo.Email, description, ExportFormat.Csv, cultureCode, false,
                     propertyLabelType, false, sendMailFromZendTo, encryptedPassword, false, null, JobCancellationToken.Null));
@@ -1644,6 +1651,7 @@ public class ExportsController : ControllerBase
             }
 
             var encryptedPassword = await _cryptoService.EncryptAsync(encryptPassword);
+            filter.MaterializeGeoJsonGeometriesForSerialization();
             var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
                 job.RunAsync(filter, filter.ProtectionFilter.Value, this.GetUserId(), roleId, authorizationApplicationIdentifier, userInfo.Email, description, eventBased ? ExportFormat.DwCEvent : ExportFormat.DwC, "en-GB", false,
                     PropertyLabelType.PropertyName, false, sendMailFromZendTo, encryptedPassword, false, null, JobCancellationToken.Null));
@@ -1735,6 +1743,7 @@ public class ExportsController : ControllerBase
             }
 
             var encryptedPassword = await _cryptoService.EncryptAsync(encryptPassword);
+            filter.MaterializeGeoJsonGeometriesForSerialization();
             var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
                 job.RunAsync(filter, filter.ProtectionFilter.Value, this.GetUserId(), roleId, authorizationApplicationIdentifier, userInfo.Email, description, ExportFormat.Excel, cultureCode, false,
                     propertyLabelType, false, sendMailFromZendTo, encryptedPassword, dynamicProjectDataFields, null, JobCancellationToken.Null));
@@ -1828,6 +1837,7 @@ public class ExportsController : ControllerBase
             }
 
             var encryptedPassword = await _cryptoService.EncryptAsync(encryptPassword);
+            filter.MaterializeGeoJsonGeometriesForSerialization();
             var jobId = BackgroundJob.Enqueue<IExportAndSendJob>(job =>
                 job.RunAsync(filter, filter.ProtectionFilter.Value, this.GetUserId(), roleId, authorizationApplicationIdentifier, userInfo.Email, description, ExportFormat.GeoJson, cultureCode,
                     flat, propertyLabelType, excludeNullValues, sendMailFromZendTo, encryptedPassword, false, null, JobCancellationToken.Null));

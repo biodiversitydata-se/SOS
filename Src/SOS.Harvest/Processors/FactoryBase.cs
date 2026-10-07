@@ -1,8 +1,8 @@
-﻿using NetTopologySuite.Geometries;
+﻿using SOS.Api.Contracts.Common.Geo;
+using NetTopologySuite.Geometries;
 using SOS.Harvest.Managers;
 using SOS.Harvest.Managers.Interfaces;
 using SOS.Lib.Configuration.Process;
-using SOS.Lib.Enums;
 using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Processed.Observation;

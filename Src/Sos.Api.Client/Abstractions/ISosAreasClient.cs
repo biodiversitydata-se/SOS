@@ -1,6 +1,7 @@
 using SOS.Api.Client.Requests;
 using SOS.Api.Contracts.Areas.Requests;
 using SOS.Api.Contracts.Areas.Responses;
+using SOS.Api.Contracts.Common.Responses;
 
 namespace SOS.Api.Client.Abstractions;
 
@@ -8,7 +9,7 @@ namespace SOS.Api.Client.Abstractions;
 public interface ISosAreasClient
 {
     /// <summary>Gets a filtered page of areas.</summary>
-    Task<AreaBaseDtoPagedResult?> GetAreasAsync(
+    Task<PagedResultDto<AreaBaseDto>?> GetAreasAsync(
         AreasOptions? options = null,
         CancellationToken cancellationToken = default);
 

@@ -1,10 +1,9 @@
 ﻿using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
-using SOS.Lib.Enums;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.Gis;
-using SOS.Lib.Dtos;
-using SOS.Lib.Dtos.Filter;
+using SOS.Api.Contracts.Aggregations.Responses;
+using SOS.Api.Contracts.Common.Geo;
 
 namespace SOS.Lib.Extensions.Dto;
 
@@ -30,7 +29,7 @@ public static class GeoExtensions
         {
             return new GeoGridTileTaxaCellDto
             {
-                BoundingBox = ToLatLonBoundingBoxDto(cell.BoundingBox),
+                BoundingBox = cell.BoundingBox.GetCompleteBoundingBox(),
                 GeoTile = cell.GeoTile,
                 X = cell.X,
                 Y = cell.Y,
@@ -94,64 +93,8 @@ public static class GeoExtensions
         }
     }
 
-    extension(LatLonBoundingBoxDto latLonBoundingBox)
+    extension(LatLonBoundingBoxDto? latLonBoundingBox)
     {
-        /// <summary>
-        /// Cast lat lon bounding box dto 
-        /// </summary>
-        /// <returns></returns>
-        public LatLonBoundingBox ToLatLonBoundingBox()
-        {
-            if (latLonBoundingBox?.TopLeft == null || latLonBoundingBox?.BottomRight == null)
-            {
-                return null!;
-            }
-
-            return new LatLonBoundingBox
-            {
-                TopLeft = latLonBoundingBox.TopLeft.ToLatLonCoordinate(),
-                BottomRight = latLonBoundingBox.BottomRight.ToLatLonCoordinate()
-            };
-        }
-    }
-
-    extension(LatLonCoordinateDto latLonCoordinate)
-    {
-        /// <summary>
-        /// Cast dto Coordinate
-        /// </summary>
-        /// <returns></returns>
-        public LatLonCoordinate ToLatLonCoordinate()
-        {
-            if (latLonCoordinate == null)
-            {
-                return null!;
-            }
-
-            return new LatLonCoordinate(latLonCoordinate.Latitude, latLonCoordinate.Longitude);
-        }
-    }
-
-    extension(LatLonBoundingBox? latLonBoundingBox)
-    {
-        /// <summary>
-        /// Converts to a bounding box DTO, or null when the bounding box is null (e.g. no observations
-        /// matched the search, so no extent could be calculated).
-        /// </summary>
-        public LatLonBoundingBoxDto? ToLatLonBoundingBoxDto()
-        {
-            if (latLonBoundingBox?.TopLeft == null || latLonBoundingBox?.BottomRight == null)
-            {
-                return null;
-            }
-
-            return new LatLonBoundingBoxDto
-            {
-                TopLeft = latLonBoundingBox.TopLeft.ToLatLonCoordinateDto(),
-                BottomRight = latLonBoundingBox.BottomRight.ToLatLonCoordinateDto()
-            };
-        }
-
         /// <summary>
         /// Converts to a bounding box DTO, or null when the bounding box is null (e.g. no observations
         /// matched the search, so no extent could be calculated).
@@ -173,12 +116,12 @@ public static class GeoExtensions
 
     extension(XYBoundingBox xyBoundingBox)
     {
-        public LatLonBoundingBoxDto ToLatLonBoundingBoxDto()
+        public LatLonBoundingBoxDto ToLatLonBoundingBox()
         {
             return new LatLonBoundingBoxDto
             {
-                TopLeft = xyBoundingBox.TopLeft.ToLatLonCoordinateDto(),
-                BottomRight = xyBoundingBox.BottomRight.ToLatLonCoordinateDto()
+                TopLeft = xyBoundingBox.TopLeft.ToLatLonCoordinate(),
+                BottomRight = xyBoundingBox.BottomRight.ToLatLonCoordinate()
             };
         }
 
@@ -192,17 +135,8 @@ public static class GeoExtensions
         }
     }
 
-    extension(LatLonCoordinate latLonCoordinate)
+    extension(LatLonCoordinateDto latLonCoordinate)
     {
-        public LatLonCoordinateDto ToLatLonCoordinateDto()
-        {
-            return new LatLonCoordinateDto
-            {
-                Latitude = latLonCoordinate.Latitude,
-                Longitude = latLonCoordinate.Longitude
-            };
-        }
-
         public XYCoordinateDto ToXYCoordinateDto()
         {
             var point = new Point(latLonCoordinate.Longitude, latLonCoordinate.Latitude).Transform(CoordinateSys.WGS84,
@@ -217,7 +151,7 @@ public static class GeoExtensions
 
     extension(XYCoordinate xyCoordinate)
     {
-        public LatLonCoordinateDto ToLatLonCoordinateDto()
+        public LatLonCoordinateDto ToLatLonCoordinate()
         {
             var point = new Point(xyCoordinate.X, xyCoordinate.Y).Transform(CoordinateSys.SWEREF99_TM,
                 CoordinateSys.WGS84, false) as Point;
@@ -249,7 +183,7 @@ public static class GeoExtensions
                 TaxaCount = gridCellTile.TaxaCount,
                 ObservationsCount = gridCellTile.ObservationsCount,
                 Zoom = gridCellTile.Zoom,
-                BoundingBox = gridCellTile.BoundingBox.ToLatLonBoundingBoxDto()
+                BoundingBox = gridCellTile.BoundingBox.GetCompleteBoundingBox()
             };
         }
     }
@@ -261,7 +195,7 @@ public static class GeoExtensions
             return new GridCellDto
             {
                 Id = GeoJsonHelper.GetGridCellId(gridCellSizeInMeters, Convert.ToInt32(gridCell.MetricBoundingBox.TopLeft.X), Convert.ToInt32(gridCell.MetricBoundingBox.BottomRight.Y)),
-                BoundingBox = gridCell.MetricBoundingBox.ToLatLonBoundingBoxDto(),
+                BoundingBox = gridCell.MetricBoundingBox.ToLatLonBoundingBox(),
                 ObservationsCount = gridCell.ObservationsCount,
                 MetricBoundingBox = gridCell.MetricBoundingBox.ToXYBoundingBoxDto(),
                 TaxaCount = gridCell.TaxaCount

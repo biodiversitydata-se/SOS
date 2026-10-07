@@ -1,5 +1,4 @@
-﻿using SOS.Lib.Enums;
-using SOS.Lib.Models.Processed.Observation;
+﻿using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 
 namespace SOS.Harvest.Extensions;
@@ -28,7 +27,7 @@ public static class UserObservationExtensions
                 userObservation.ProvinceFeatureId = observation.Location?.Province?.FeatureId;
                 userObservation.MunicipalityFeatureId = observation.Location?.Municipality?.FeatureId;
                 userObservation.CountryRegionFeatureId = observation.Location?.CountryRegion?.FeatureId;                                                                                  //userObservation.CountryRegionFeatureId = // todo
-                userObservation.IsBirdsite = observation.Taxon?.Attributes?.SpeciesGroup.Equals(SpeciesGroup.Birds) ?? false;
+                userObservation.IsBirdsite = observation.Taxon?.Attributes?.SpeciesGroup.Equals(SOS.Api.Contracts.Observations.Responses.SpeciesGroup.Birds) ?? false;
                 userObservation.ReporterId = observation.ArtportalenInternal?.ReportedByUserId ?? 0;
 
                 int? siteId = null;

@@ -1,5 +1,6 @@
 ﻿using Microsoft.OpenApi;
 using SOS.Lib.Swagger;
+using SOS.Api.Contracts.Metadata.Responses;
 
 namespace SOS.DataStewardship.Api.Extensions;
 
@@ -27,14 +28,11 @@ public static class SwaggerExtensions
                         [new OpenApiSecuritySchemeReference("Bearer", document)] = []
                     });
 
-                    //var schemaHelper = new SwashbuckleSchemaHelper();
-                    //options.CustomSchemaIds(type => schemaHelper.GetSchemaId(type));
-                    //options.CustomSchemaIds(type => type.ToString());
-                    //options.CustomSchemaIds(type => type.FullName);                
                     options.DescribeAllParametersInCamelCase();
                     options.EnableAnnotations();
                     var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                     options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
+                    options.IncludeXmlComments(Path.ChangeExtension(typeof(ApiInformation).Assembly.Location, ".xml"));
 
                     options.SchemaFilter<SwaggerIgnoreFilter>();
                 });

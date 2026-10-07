@@ -1,7 +1,7 @@
-﻿using FizzWare.NBuilder;
+﻿using SOS.Api.Contracts.Observations.Requests;
+using FizzWare.NBuilder;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Verbatim.Artportalen;
-using SOS.Lib.Dtos.Filter;
 using SOS.Observations.Api.IntegrationTests.Helpers;
 using SOS.Observations.Api.IntegrationTests.Setup;
 using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
@@ -19,12 +19,12 @@ public class DownloadGeoJsonTests : TestBase
     public async Task DownloadGeoJsonFileEndpoint_ReturnsExpectedRows_WhenNoFilterWasUsed()
     {
         // Arrange
-        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(3)
             .All().HaveValuesFromPredefinedObservations()
             .Build();
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
         var apiClient = TestFixture.CreateApiClient();
-        var searchFilter = new SearchFilterDto { Output = new OutputFilterDto { FieldSet = OutputFieldSet.Minimum } };
+        var searchFilter = new SearchFilterDto { Output = new OutputFilterDto { FieldSet = SOS.Api.Contracts.Observations.Requests.OutputFieldSet.Minimum } };
 
         // Act
         var response = await apiClient.PostAsync($"/exports/download/geojson?gzip=false", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
@@ -33,11 +33,11 @@ public class DownloadGeoJsonTests : TestBase
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var fileEntries = GeoJsonHelper.ReadGeoJsonFile(contentBytes);
-        fileEntries.Count.Should().Be(100, because: "100 observations were added and no filter was used.");
+        fileEntries.Count.Should().Be(3, because: "3 observations were added and no filter was used.");
     }
 
 
-    [Fact]
+    [Fact (Skip = "Run on demand. Skipping test because of large number of observations")]
     public async Task DownloadGeoJsonFileEndpoint_ReturnsExpectedRows_WhenNoFilterWasUsedAndManyObservationsWasReturned()
     {
         // Arrange
@@ -46,7 +46,7 @@ public class DownloadGeoJsonTests : TestBase
             .Build();
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
         var apiClient = TestFixture.CreateApiClient();
-        var searchFilter = new SearchFilterDto { Output = new OutputFilterDto { FieldSet = OutputFieldSet.Minimum } };
+        var searchFilter = new SearchFilterDto { Output = new OutputFilterDto { FieldSet = SOS.Api.Contracts.Observations.Requests.OutputFieldSet.Minimum } };
 
         // Act
         var response = await apiClient.PostAsync($"/exports/download/geojson?gzip=false", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);

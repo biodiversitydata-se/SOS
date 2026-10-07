@@ -1,8 +1,9 @@
-﻿using FizzWare.NBuilder;
+using SOS.Api.Contracts.Aggregations.Requests;
+using SOS.Api.Contracts.Common.Responses;
+using SOS.Api.Contracts.Aggregations.Responses;
+using SOS.Api.Contracts.Observations.Requests;
+using FizzWare.NBuilder;
 using SOS.Lib.Models.Verbatim.Artportalen;
-using SOS.Lib.Dtos;
-using SOS.Lib.Dtos.Enum;
-using SOS.Lib.Dtos.Filter;
 using SOS.Lib.Helpers;
 using SOS.Observations.Api.IntegrationTests.Setup;
 using SOS.Observations.Api.IntegrationTests.Setup.Stubs;
@@ -21,38 +22,38 @@ public class TaxonAggregationInternalTests : TestBase
     public async Task TaxonAggregationInternalTest()
     {
         // Arrange
-        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(10)
             .All()
                 .HaveValuesFromPredefinedObservations()
-            .TheFirst(20)
+            .TheFirst(2)
                 .With(p => p.TaxonId = 100012)
                 .With(p => p.StartDate = new DateTime(2000, 1, 1))
                 .With(p => p.EndDate = new DateTime(2000, 1, 1))
-            .TheNext(20)
+            .TheNext(2)
                 .With(p => p.TaxonId = 100013)
                 .With(p => p.StartDate = new DateTime(2000, 1, 15))
                 .With(p => p.EndDate = new DateTime(2000, 1, 18))
-            .TheNext(20)
+            .TheNext(2)
                 .With(p => p.TaxonId = 100012)
                 .With(p => p.StartDate = new DateTime(2000, 1, 30))
                 .With(p => p.EndDate = new DateTime(2000, 1, 30))
-            .TheNext(20)
+            .TheNext(2)
                 .With(p => p.TaxonId = 100013)
                 .With(p => p.StartDate = new DateTime(2000, 2, 1))
                 .With(p => p.EndDate = new DateTime(2000, 2, 1))
-            .TheLast(20)
+            .TheLast(2)
                 .With(p => p.TaxonId = 100012)
                 .With(p => p.StartDate = new DateTime(2000, 4, 1))
                 .With(p => p.EndDate = new DateTime(2000, 4, 15))
             .Build();
-        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
+        var processed = await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
         var apiClient = TestFixture.CreateApiClient();
         var searchFilter = new SearchFilterAggregationInternalDto
         {
             Date = new DateFilterDto
             {
-                StartDate = DateTime.Parse("2000-01-01T00:00:00"),
-                EndDate = DateTime.Parse("2000-01-31T23:59:59"),
+                StartDate = new DateTimeOffset(2000, 1, 1, 0, 0, 0, TimeSpan.FromHours(1)),
+                EndDate = new DateTimeOffset(2000, 1, 31, 23, 59, 59, TimeSpan.FromHours(1)),
                 DateFilterType = DateFilterTypeDto.BetweenStartDateAndEndDate
             },
             Taxon = new TaxonFilterDto
@@ -63,12 +64,22 @@ public class TaxonAggregationInternalTests : TestBase
 
         // Act
         var response = await apiClient.PostAsync($"/observations/internal/taxonaggregation", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
-        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<dynamic>>(TestContext.Current.CancellationToken);
+        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<TaxonAggregationItemDto>>(TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         result!.TotalCount.Should().Be(2,
             because: "");
+        result.Records.Select(record => (record.TaxonId, record.ObservationCount)).Should().Equal((100012, 4), (100013, 2));
+        foreach (var record in result.Records)
+        {
+            var dates = processed.Where(observation => observation.Taxon.Id == record.TaxonId &&
+                    observation.Event.StartDate >= searchFilter.Date.StartDate.Value.UtcDateTime &&
+                    observation.Event.StartDate <= searchFilter.Date.EndDate.Value.UtcDateTime)
+                .Select(observation => observation.Event.StartDate!.Value.ToUniversalTime()).ToList();
+            record.FirstSighting!.Value.ToUniversalTime().Should().Be(dates.Min());
+            record.LastSighting!.Value.ToUniversalTime().Should().Be(dates.Max());
+        }
     }
 
     [Fact]

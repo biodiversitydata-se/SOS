@@ -16,7 +16,7 @@ public sealed class AdaptiveSearchOptions : SosRoleRequestOptions
     public int MaxGridCells { get; set; } = 10000;
 
     /// <summary>The labels used for properties in GeoJSON responses.</summary>
-    public PropertyLabelTypeDto GeoJsonPropertyLabelType { get; set; } = PropertyLabelTypeDto.PropertyPath;
+    public PropertyLabelType GeoJsonPropertyLabelType { get; set; } = PropertyLabelType.PropertyPath;
 
     /// <summary>The response format.</summary>
     public OutputFormatDto OutputFormat { get; set; } = OutputFormatDto.GeoJsonFlat;

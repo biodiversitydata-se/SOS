@@ -1,28 +1,10 @@
-﻿using SOS.Lib.Models.Interfaces;
+﻿using SOS.Api.Contracts.Observations;
+using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.DataStewardship.Common;
 using SOS.Lib.Swagger;
 using System.Text.Json.Serialization;
 
 namespace SOS.Lib.Models.Processed.Observation;
-
-/// <summary>
-/// Observation diffuse status.
-/// </summary>
-public enum DiffusionStatus
-{
-    /// <summary>
-    /// Observation is not diffused.
-    /// </summary>
-    NotDiffused = 0,
-    /// <summary>
-    /// Observation is diffused by the SOS system and the non diffused original exists in the protected index.
-    /// </summary>
-    DiffusedBySystem,
-    /// <summary>
-    /// Observation is diffused by provider. No original data exists in the system.
-    /// </summary>
-    DiffusedByProvider
-}
 
 /// <summary>
 ///     Information about a species observation.

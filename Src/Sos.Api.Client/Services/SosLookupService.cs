@@ -1,6 +1,7 @@
 using SOS.Api.Client.Abstractions;
 using SOS.Api.Client.Requests;
 using SOS.Api.Contracts.Areas.Responses;
+using SOS.Api.Contracts.Common.Responses;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using SOS.Api.Contracts.Areas.Requests;
@@ -52,14 +53,14 @@ public sealed class SosLookupService : ISosLookupService
     }
 
     /// <inheritdoc />
-    public async Task<AreaWithGeometryPagedResult> GetAreasWithGeometryAsync(
+    public async Task<PagedResultDto<AreaWithGeometryDto>> GetAreasWithGeometryAsync(
         AreasOptions? options = null,
         CancellationToken cancellationToken = default)
     {
         var page = await _areasClient.GetAreasAsync(options, cancellationToken);
         if (page?.Records is null || page.Records.Count == 0)
         {
-            return new AreaWithGeometryPagedResult
+            return new PagedResultDto<AreaWithGeometryDto>
             {
                 Skip = page?.Skip ?? options?.Skip ?? 0,
                 Take = page?.Take ?? options?.Take ?? 0,
@@ -70,7 +71,7 @@ public sealed class SosLookupService : ISosLookupService
         var tasks = page.Records.Select(area =>
             GetAreaWithGeometryCachedAsync(area, cancellationToken));
 
-        return new AreaWithGeometryPagedResult
+        return new PagedResultDto<AreaWithGeometryDto>
         {
             Records = await Task.WhenAll(tasks),
             Skip = page.Skip,

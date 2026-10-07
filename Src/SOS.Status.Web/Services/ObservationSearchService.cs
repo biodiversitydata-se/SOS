@@ -1,11 +1,6 @@
-﻿using ClientRequests = SOS.Api.Client.Requests;
-using ApiModels = SOS.Api.Contracts.Observations.Requests;
-using ContractSearchSortOrder = SOS.Api.Contracts.Observations.Requests.SearchSortOrder;
-using OutputFilterDto = SOS.Api.Contracts.Observations.Requests.OutputFilterDto;
-using SearchFilterDto = SOS.Api.Contracts.Observations.Requests.SearchFilterDto;
-using SearchFilterInternalDto = SOS.Api.Contracts.Observations.Requests.SearchFilterInternalDto;
-using CSharpFunctionalExtensions;
+﻿using CSharpFunctionalExtensions;
 using SOS.Api.Client.Abstractions;
+using SOS.Api.Client.Requests;
 using SOS.Api.Contracts.Common.Responses;
 using SOS.Api.Contracts.Observations.Responses;
 using SOS.Status.Web.Client.Abstractions;
@@ -35,7 +30,7 @@ public class ObservationSearchService : IObservationSearchService
     {
         var pageResult = await _observationsClient.ObservationsBySearchInternalAsync(
             filter,
-            new ClientRequests.ObservationSearchOptions
+            new ObservationSearchOptions
             {
                 Skip = skip,
                 Take = take,
@@ -79,7 +74,7 @@ public class ObservationSearchService : IObservationSearchService
     {
         var response = await _observationsClient.AdaptiveSearchLocationsInternalAsync(
             filter,
-            new ClientRequests.AdaptiveSearchLocationsOptions
+            new AdaptiveSearchLocationsOptions
             {
                 ObservationsLimit = observationsLimit,
                 MaxGridCells = maxGridCells,
@@ -90,13 +85,13 @@ public class ObservationSearchService : IObservationSearchService
                 ClusterRadiusPx = clusterRadiusPx,
                 MinLocationsPerCluster = minLocationsPerCluster,
                 MinLocationCountBeforeClustering = minLocationCountBeforeClustering,
-                CreatePolygons = (ApiModels.CreatePolygonsMode)createPolygons,
+                CreatePolygons = createPolygons,
                 BoundingBoxQuery = bbox,
                 IncludeFilterAreasInResult = includeFilterAreasInResult,
                 UseCache = useCache,
                 CreateSampleObservations = createSampleObservations,
                 LocationAggregationLimit = locationAggregationLimit,
-                AdaptiveSearchStrategy = (ApiModels.AdaptiveSearchLocationsStrategy)adaptiveSearchStrategy,
+                AdaptiveSearchStrategy = adaptiveSearchStrategy,
                 CutoffYear = cutoffYear
             });
 
@@ -124,7 +119,7 @@ public class ObservationSearchService : IObservationSearchService
     {
         var response = await _observationsClient.ObservationsByCursorAsync(
             ToSearchFilterDto(filter),
-            new ClientRequests.SearchByCursorOptions
+            new SearchByCursorOptions
             {
                 Take = take,
                 Cursor = cursor,
@@ -144,28 +139,28 @@ public class ObservationSearchService : IObservationSearchService
         });
     }
 
-    private static ApiModels.LocationClusteringAlgorithm ParseClusteringAlgorithm(string clusteringAlgorithm)
+    private static LocationClusteringAlgorithm ParseClusteringAlgorithm(string clusteringAlgorithm)
     {
         if (string.Equals(clusteringAlgorithm, "Greedy", StringComparison.OrdinalIgnoreCase))
         {
-            return ApiModels.LocationClusteringAlgorithm.Sweref99TmGreedy;
+            return LocationClusteringAlgorithm.Sweref99TmGreedy;
         }
 
         if (string.Equals(clusteringAlgorithm, "FastGreedy", StringComparison.OrdinalIgnoreCase))
         {
-            return ApiModels.LocationClusteringAlgorithm.Sweref99TmFastGreedy;
+            return LocationClusteringAlgorithm.Sweref99TmFastGreedy;
         }
 
-        return Enum.TryParse<ApiModels.LocationClusteringAlgorithm>(clusteringAlgorithm, ignoreCase: true, out var value)
+        return Enum.TryParse<LocationClusteringAlgorithm>(clusteringAlgorithm, ignoreCase: true, out var value)
             ? value
-            : ApiModels.LocationClusteringAlgorithm.Sweref99TmFastGreedy;
+            : LocationClusteringAlgorithm.Sweref99TmFastGreedy;
     }
 
-    private static ContractSearchSortOrder ParseSearchSortOrder(string sortOrder)
+    private static SearchSortOrder ParseSearchSortOrder(string sortOrder)
     {
-        return Enum.TryParse<ContractSearchSortOrder>(sortOrder, ignoreCase: true, out var value)
+        return Enum.TryParse<SearchSortOrder>(sortOrder, ignoreCase: true, out var value)
             ? value
-            : ContractSearchSortOrder.Asc;
+            : SearchSortOrder.Asc;
     }
 
     private static SearchFilterDto ToSearchFilterDto(SearchFilterInternalDto filter)

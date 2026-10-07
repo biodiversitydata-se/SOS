@@ -1,11 +1,10 @@
-﻿using CSharpFunctionalExtensions;
+﻿using SOS.Api.Contracts.Checklists.Responses;
+using SOS.Api.Contracts.Checklists.Requests;
+using CSharpFunctionalExtensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Managers.Interfaces;
-using SOS.Lib.Models.Statistics;
 using SOS.Lib.Swagger;
-using SOS.Lib.Dtos.Checklist;
-using SOS.Lib.Dtos.Filter;
 using SOS.Lib.Extensions.Dto;
 using SOS.Observations.Api.Managers.Interfaces;
 using System;

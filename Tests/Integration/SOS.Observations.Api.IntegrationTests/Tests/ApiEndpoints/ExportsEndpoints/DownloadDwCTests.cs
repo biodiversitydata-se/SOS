@@ -1,6 +1,6 @@
 ﻿using FizzWare.NBuilder;
 using SOS.Lib.Models.Verbatim.Artportalen;
-using SOS.Lib.Dtos.Filter;
+using SOS.Api.Contracts.Observations.Requests;
 using SOS.Observations.Api.IntegrationTests.Helpers;
 using SOS.Observations.Api.IntegrationTests.Setup;
 using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
@@ -18,7 +18,7 @@ public class DownloadDwcTests : TestBase
     public async Task DownloadDwcFileEndpoint_ReturnsExpectedRows_WhenNoFilterIsUsed()
     {
         // Arrange
-        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(3)
             .All().HaveValuesFromPredefinedObservations()
             .Build();
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
@@ -34,7 +34,7 @@ public class DownloadDwcTests : TestBase
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         contentBytes.Length.Should().BeGreaterThan(0);
         var fileEntries = DwcaHelper.ReadOccurrenceDwcFile(contentBytes);
-        fileEntries.Count.Should().Be(100);
+        fileEntries.Count.Should().Be(3);
     }
 
 

@@ -1,8 +1,10 @@
-﻿using FizzWare.NBuilder;
+﻿﻿using SOS.Api.Contracts.Locations.Responses;
+using FizzWare.NBuilder;
+using NetTopologySuite.IO;
+using SOS.Lib.Extensions.Dto;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Observations.Api.IntegrationTests.Setup;
 using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
-using SOS.Lib.Dtos;
 
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.LocationsEndpoints;
 
@@ -17,16 +19,25 @@ public class GetLocationsByIds : TestBase
     }   
 
     [Fact]
-    public async Task GetLocationsByIds_ReturnsExpectedLocations()
+    public async Task GetLocationsByIds_PreservesLocationFieldsPolygonHolesAndNullGeometries()
     {
         // Arrange
-        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(2)
             .All().HaveValuesFromPredefinedObservations()
             .TheFirst(1).With(m => m.Site.Id = 4060923)
+            .TheLast(1).With(m => m.Site.Id = 4060924)
             .Build();
-        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
+        var processed = ProcessFixture.ProcessObservations(verbatimObservations);
+        processed[0].Location.PointWithBuffer = new WKTReader().Read(
+            "POLYGON ((14 58, 15 58, 15 59, 14 59, 14 58), (14.2 58.2, 14.2 58.8, 14.8 58.8, 14.8 58.2, 14.2 58.2))");
+        processed[0].Location.PointWithDisturbanceBuffer = new WKTReader().Read(
+            "MULTIPOLYGON (((13 57, 16 57, 16 60, 13 57)))");
+        processed[1].Location.Point = null!;
+        processed[1].Location.PointWithBuffer = null!;
+        processed[1].Location.PointWithDisturbanceBuffer = null!;
+        await ProcessFixture.AddObservationsToElasticsearchAsync(processed);
         var apiClient = TestFixture.CreateApiClient();
-        var locationIds = new List<string> { "urn:lsid:artportalen.se:site:4060923" };
+        var locationIds = processed.Select(observation => observation.Location.LocationId).ToList();
 
         // Act
         var response = await apiClient.PostAsync($"/Locations", JsonContent.Create(locationIds), TestContext.Current.CancellationToken);        
@@ -34,6 +45,6 @@ public class GetLocationsByIds : TestBase
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        result!.Count.Should().Be(1);
+        result.Should().BeEquivalentTo(processed.Select(observation => observation.Location.ToLocationDto()));
     }
 }

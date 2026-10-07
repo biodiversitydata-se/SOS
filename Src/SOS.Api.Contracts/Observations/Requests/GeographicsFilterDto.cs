@@ -1,7 +1,5 @@
-using SOS.Api.Contracts.Areas.Requests;
-using SOS.Api.Contracts.Areas.Responses;
+﻿using SOS.Api.Contracts.Areas.Requests;
 using SOS.Api.Contracts.Common.Geo;
-using SOS.Api.Contracts.Observations.Responses;
 
 namespace SOS.Api.Contracts.Observations.Requests;
 /// <summary>
@@ -15,6 +13,7 @@ public class GeographicsFilterDto
     /// </summary>
     public ICollection<AreaFilterDto>? Areas { get; set; }
 
+    /// <summary>Limits the search to a bounding box.</summary>
     public LatLonBoundingBoxDto? BoundingBox { get; set; }
 
     /// <summary>

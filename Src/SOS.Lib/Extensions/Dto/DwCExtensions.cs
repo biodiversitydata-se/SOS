@@ -1,13 +1,12 @@
-﻿using SOS.Lib.Helpers;
-using SOS.Lib.Models.Processed.Observation;
+﻿using SOS.Api.Contracts.Observations.Responses;
+using SOS.Lib.Helpers;
 
-using SOS.Lib.Dtos.Observation;
 
 namespace SOS.Lib.Extensions.Dto;
 
 public static class DwCExtensions
 {
-    extension(Observation observation)
+    extension(SOS.Lib.Models.Processed.Observation.Observation observation)
     {
         public DarwinCoreOccurrenceDto ToDto()
         {
@@ -156,7 +155,7 @@ public static class DwCExtensions
                 dto.CatalogNumber = observation.Occurrence.CatalogNumber;
                 dto.IndividualCount = observation.Occurrence.IndividualCount;
                 dto.LifeStage = observation.Occurrence.LifeStage?.Value!;
-                dto.Media = observation.Occurrence.Media;
+                dto.Media = observation.Occurrence.Media?.Select(media => media.ToMultimediaDto()).ToList();
                 dto.OccurrenceID = observation.Occurrence.OccurrenceId;
                 dto.OccurrenceRemarks = observation.Occurrence.OccurrenceRemarks;
                 dto.OccurrenceStatus = observation.Occurrence.OccurrenceStatus?.Value!;

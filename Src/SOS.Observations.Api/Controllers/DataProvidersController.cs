@@ -1,13 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Newtonsoft.Json;
-using SOS.Lib.Enums;
+using SOS.Api.Contracts.Lookups.Responses;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Swagger;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Repositories.Interfaces;
-using SOS.Lib.Dtos;
 using System.Net;
 using System.Text;
 using System.Xml;
@@ -74,7 +73,11 @@ public class DataProvidersController : ControllerBase
         {
             LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
             cultureCode = CultureCodeHelper.GetCultureCode(cultureCode);
-            var dataProviders = await _dataProviderManager.GetDataProvidersAsync(false, cultureCode, includeProvidersWithNoObservations, categories);
+            var dataProviders = await _dataProviderManager.GetDataProvidersAsync(
+                false,
+                cultureCode,
+                includeProvidersWithNoObservations,
+                categories?.Select(category => (SOS.Lib.Enums.DataProviderCategory)category));
 
             if (!dataProviders?.Any() ?? true)
             {
@@ -137,7 +140,7 @@ public class DataProvidersController : ControllerBase
             var returnJson = false;
             if (Request.Headers.ContainsKey("Accept"))
             {
-                returnJson = Request.Headers["Accept"].Equals("application/json");
+                returnJson = string.Equals(Request.Headers["Accept"].ToString(), "application/json", StringComparison.OrdinalIgnoreCase);
             }
 
             var fileData = await _dataProviderManager.GetEmlFileAsync(providerId);
@@ -197,7 +200,7 @@ public class DataProvidersController : ControllerBase
                 entries.Add(provider.DataProviderIdentifier, new HealthReportEntry(
                    provider.ProcessStatus.Equals("Success", StringComparison.CurrentCultureIgnoreCase) ? HealthStatus.Healthy : HealthStatus.Unhealthy,
                    $"Public: {provider.PublicProcessCount}, Protected: {provider.ProtectedProcessCount}",
-                   (provider.HarvestEnd ?? DateTime.MinValue) - (provider.HarvestStart ?? DateTime.MinValue),
+                   (provider.HarvestEnd ?? DateTimeOffset.MinValue) - (provider.HarvestStart ?? DateTimeOffset.MinValue),
                    null,
                    new Dictionary<string, object>()
                    {

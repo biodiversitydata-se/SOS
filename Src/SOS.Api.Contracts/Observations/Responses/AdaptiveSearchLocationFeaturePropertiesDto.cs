@@ -26,6 +26,7 @@ public sealed class AdaptiveSearchLocationFeaturePropertiesDto
     /// <summary>
     /// Cluster-specific details. Only present when <see cref="IsCluster"/> is true.
     /// </summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
     public AdaptiveSearchLocationClusterDetailsDto? Cluster { get; init; }
 
     /// <summary>
@@ -58,13 +59,13 @@ public sealed class AdaptiveSearchLocationClusterDetailsDto
 public sealed class AdaptiveSearchLocationPresentationDto
 {
     /// <summary>The overall presentation status for this feature.</summary>
-    public LocationPresentationStatus Status { get; init; }
+    public LocationPresentationStatusDto Status { get; init; }
 
     /// <summary>The number of observations in each presentation status.</summary>
-    public Dictionary<LocationPresentationStatus, int> StatusCounts { get; init; } = new();
+    public Dictionary<LocationPresentationStatusDto, int> StatusCounts { get; init; } = new();
 
     /// <summary>The cutoff-year rendering status, when a cutoff year was specified.</summary>
-    public CutoffYearStatus? CutoffYearStatus { get; init; }
+    public CutoffYearStatusDto? CutoffYearStatus { get; init; }
 
     /// <summary>True when all observations for this feature are sensitive.</summary>
     public bool? IsAllObservationsSensitive { get; init; }
@@ -77,10 +78,15 @@ public sealed class AdaptiveSearchLocationObservationSummaryDto
     public int TaxaCount { get; init; }
 
     /// <summary>The counts of observations in different status categories.</summary>
-    public AdaptiveSearchLocationStatusCounts StatusCounts { get; init; } = new(0, 0, 0, 0, 0);
+    public AdaptiveSearchLocationStatusCounts? StatusCounts { get; init; } = new(0, 0, 0, 0, 0);
 }
 
 /// <summary>The counts of observations in different status categories.</summary>
+/// <param name="FoundCount">The number of observations where the organism is present.</param>
+/// <param name="TreatedCount">The number of observations with an invasive-species treatment.</param>
+/// <param name="DiffusedCount">The number of geographically generalized observations.</param>
+/// <param name="RedlistedCount">The number of observations of redlisted taxa.</param>
+/// <param name="InvasiveInSwedenCount">The number of observations of taxa considered invasive in Sweden.</param>
 public sealed record AdaptiveSearchLocationStatusCounts(
     int FoundCount,
     int TreatedCount,
@@ -125,6 +131,9 @@ public sealed class AdaptiveSearchLocationDetailsDto
     /// <summary>An identifier for the location.</summary>
     public string? LocationId { get; init; }
 
+    /// <summary>An identifier for the distinct location, derived from its type, coordinates and uncertainty.</summary>
+    public string? DistinctLocationId { get; init; }
+
     /// <summary>X coordinate in SWEREF99 TM.</summary>
     public double? Sweref99TmX { get; init; }
 
@@ -142,7 +151,7 @@ public sealed class AdaptiveSearchLocationDetailsDto
 }
 
 /// <summary>The presentation status of a location or cluster.</summary>
-public enum LocationPresentationStatus
+public enum LocationPresentationStatusDto
 {
     /// <summary>At least one observation is present.</summary>
     Present = 0,
@@ -174,7 +183,7 @@ public enum LocationPresentationStatus
 }
 
 /// <summary>The cutoff-year rendering status of a location or cluster.</summary>
-public enum CutoffYearStatus
+public enum CutoffYearStatusDto
 {
     /// <summary>At least one observation is present with an end year equal to or later than the cutoff year.</summary>
     After = 0,

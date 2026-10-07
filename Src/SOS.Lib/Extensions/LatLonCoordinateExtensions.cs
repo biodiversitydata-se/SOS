@@ -1,11 +1,12 @@
-﻿using Elastic.Clients.Elasticsearch;
+﻿using SOS.Api.Contracts.Common.Geo;
+using Elastic.Clients.Elasticsearch;
 using SOS.Lib.Models.Gis;
 
 namespace SOS.Lib.Extensions;
 
 public static class LatLonCoordinateExtensions
 {
-    extension(LatLonCoordinate coordinate)
+    extension(LatLonCoordinateDto coordinate)
     {
         public LatLonGeoLocation ToGeoLocation()
         {
@@ -17,15 +18,4 @@ public static class LatLonCoordinateExtensions
         }
     }
 
-    extension(LatLonBoundingBox bbox)
-    {
-        public GeoBounds ToGeoBounds()
-        {
-            return new TopLeftBottomRightGeoBounds
-            {
-                BottomRight = bbox.BottomRight.ToGeoLocation(),
-                TopLeft = bbox.TopLeft.ToGeoLocation()
-            };
-        }
-    }
 }

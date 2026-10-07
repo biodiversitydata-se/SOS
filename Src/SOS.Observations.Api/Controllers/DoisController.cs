@@ -1,13 +1,14 @@
-﻿using CSharpFunctionalExtensions;
+﻿using SOS.Api.Contracts.Exports.Requests;
+using SOS.Api.Contracts.Observations.Requests;
+using CSharpFunctionalExtensions;
 using Hangfire;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SOS.Lib.Enums;
+using SOS.Lib.Extensions.Dto;
 using SOS.Lib.Jobs.Export;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Services.Interfaces;
 using SOS.Observations.Api.Configuration;
-using SOS.Lib.Dtos.Filter;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Shared.Api.Validators.Interfaces;
 using SOS.Shared.Api.Extensions.Controller;
@@ -98,6 +99,7 @@ public class DOIsController : ControllerBase
                 return BadRequest($"Query exceeds limit of {_exportObservationsLimit} observations.");
             }
             
+            filter.MaterializeGeoJsonGeometriesForSerialization();
             var jobId = BackgroundJob.Enqueue<ICreateDoiJob>(job =>
                 job.RunAsync(this.GetUserId(), filter, creatorEmail, JobCancellationToken.Null));
 

@@ -1,5 +1,4 @@
-﻿using AgileObjects.AgileMapper.Extensions;
-using SOS.Lib.Models.ApiManagement;
+﻿using SOS.Lib.Models.ApiManagement;
 using SOS.Lib.Models.ApplicationInsights;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.UserService;
@@ -49,7 +48,10 @@ public class UsageStatisticsFactory
         IEnumerable<ApiUsageStatisticsRow> apiUsageStatisticsRows)
     {
         var tasks = new List<Task<ApiUsageStatistics>>();
-        apiUsageStatisticsRows.ForEach(r => tasks.Add(CastToApiUsageStatisticAsync(r)));
+        foreach (var row in apiUsageStatisticsRows)
+        {
+            tasks.Add(CastToApiUsageStatisticAsync(row));
+        }
 
         await Task.WhenAll(tasks);
 

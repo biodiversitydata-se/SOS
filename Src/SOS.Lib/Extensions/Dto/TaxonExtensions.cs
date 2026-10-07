@@ -1,28 +1,22 @@
-﻿using SOS.Lib.Models.Search.Result;
-using SOS.Lib.Dtos;
+﻿﻿using SOS.Api.Contracts.DataStewardship.Responses;
+using SOS.Lib.Models.Processed.Observation;
 
 namespace SOS.Lib.Extensions.Dto;
 
 public static class TaxonExtensions
 {
-    extension(IEnumerable<TaxonAggregationItem> taxonAggregationItems)
+    extension(Taxon taxon)
     {
-        public IEnumerable<TaxonAggregationItemDto> ToTaxonAggregationItemDtos()
+        public DsTaxonDto ToDto()
         {
-            return taxonAggregationItems.Select(item => item.ToTaxonAggregationItemDto());
-        }
-    }
-
-    extension(TaxonAggregationItem taxonAggregationItem)
-    {
-        public TaxonAggregationItemDto ToTaxonAggregationItemDto()
-        {
-            return new TaxonAggregationItemDto
+            return new DsTaxonDto
             {
-                FirstSighting = taxonAggregationItem.FirstSighting,
-                LastSighting = taxonAggregationItem.LastSighting,
-                TaxonId = taxonAggregationItem.TaxonId,
-                ObservationCount = taxonAggregationItem.ObservationCount
+                ScientificName = taxon.ScientificName,
+                TaxonID = taxon.Id.ToString(),
+                TaxonRank = taxon.TaxonRank,
+                VernacularName = taxon.VernacularName,
+                VerbatimTaxonID = taxon.VerbatimId,
+                VerbatimName = taxon.VerbatimName
             };
         }
     }

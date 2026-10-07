@@ -1,7 +1,7 @@
-﻿using Hangfire;
-using SOS.Lib.Dtos.Enum;
-using SOS.Lib.Dtos.Filter;
-using SOS.Lib.Enums;
+﻿using SOS.Api.Contracts.Observations.Requests;
+using Hangfire;
+using SOS.Api.Contracts.Exports.Responses;
+using SOS.Api.Contracts.Exports.Requests;
 
 namespace SOS.Observations.Api.Managers.Interfaces;
 

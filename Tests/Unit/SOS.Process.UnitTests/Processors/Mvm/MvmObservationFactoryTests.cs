@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using SOS.Api.Contracts.Common.Geo;
+using FluentAssertions;
 using Moq;
 using NetTopologySuite.Geometries;
 using SOS.Harvest.Managers;

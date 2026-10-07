@@ -8,12 +8,16 @@ namespace SOS.Api.Contracts.Observations.Responses;
 public class Location
 {
 
+    /// <summary>The 5 × 5 km atlas grid cell containing the location.</summary>
     public Area? Atlas5x5 { get; set; }
 
+    /// <summary>The 10 × 10 km atlas grid cell containing the location.</summary>
     public Area? Atlas10x10 { get; set; }
 
+    /// <summary>Additional location attributes supplied by the data provider.</summary>
     public LocationAttributes? Attributes { get; set; }
 
+    /// <summary>The continent in which the location occurs.</summary>
     public VocabularyValue? Continent { get; set; }
 
     /// <summary>
@@ -32,6 +36,7 @@ public class Location
     /// </summary>
     public int? CoordinateUncertaintyInMeters { get; set; }
 
+    /// <summary>The country in which the location occurs.</summary>
     public VocabularyValue? Country { get; set; }
 
     /// <summary>
@@ -42,14 +47,19 @@ public class Location
     /// </summary>
     public string? CountryCode { get; set; }
 
+    /// <summary>The region within the country in which the location occurs.</summary>
     public Area? CountryRegion { get; set; }
 
+    /// <summary>The county (län) containing the location.</summary>
     public Area? County { get; set; }
 
+    /// <summary>The municipality (kommun) containing the location.</summary>
     public Area? Municipality { get; set; }
 
+    /// <summary>The parish (församling) containing the location.</summary>
     public Area? Parish { get; set; }
 
+    /// <summary>The historical province (landskap) containing the location.</summary>
     public Area? Province { get; set; }
 
     /// <summary>
@@ -313,7 +323,6 @@ public class Location
     /// <summary>
     /// Location type.
     /// </summary>
-    [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
     public LocationType Type { get; set; }
 
     /// <summary>

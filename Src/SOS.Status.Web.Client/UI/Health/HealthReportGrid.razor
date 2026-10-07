@@ -24,11 +24,11 @@
     [Parameter]
     public string? Title { get; set; }
 
-    private string GetHealthStatusCircleStyle(string status)
+    private string GetHealthStatusCircleStyle(string? status)
     {
-        if (status.Equals("healthy", StringComparison.InvariantCultureIgnoreCase))
+        if (string.Equals(status, "healthy", StringComparison.InvariantCultureIgnoreCase))
             return "color:green; font-size:18px;";
-        else if (status.Equals("degraded", StringComparison.InvariantCultureIgnoreCase))
+        else if (string.Equals(status, "degraded", StringComparison.InvariantCultureIgnoreCase))
             return "color:orange; font-size:18px;";
         else
             return "color:red; font-size:18px;";

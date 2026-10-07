@@ -1,8 +1,10 @@
-﻿using Hangfire;
+using SOS.Api.Contracts.Common.Geo;
+using SOS.Api.Contracts.Aggregations.Requests;
+using SOS.Api.Contracts.Observations.Requests;
+using SOS.Api.Contracts.Exports.Responses;
+using SOS.Api.Contracts.Exports.Requests;
+using Hangfire;
 using Hangfire.Server;
-using SOS.Lib.Dtos.Enum;
-using SOS.Lib.Dtos.Filter;
-using SOS.Lib.Enums;
 using SOS.Lib.HangfireAttributes;
 
 namespace SOS.Lib.Jobs.Export;
@@ -142,7 +144,7 @@ public interface IExportAndSendJob
        CoordinateSys coordinateSystem,
        string emailAddress,
        string description,
-       ExportFormat exportFormat,           
+       ExportFormat exportFormat,
        bool sendMailFromZendTo,
        string encryptedPassword,
        PerformContext context,
@@ -189,7 +191,7 @@ public interface IExportAndSendJob
         CoordinateSys coordinateSystem,
         string emailAddress,
         string description,
-        ExportFormat exportFormat,            
+        ExportFormat exportFormat,
         bool sendMailFromZendTo,
         string encryptedPassword,
         PerformContext context,

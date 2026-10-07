@@ -1,5 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using SOS.Status.Web.Client.Dtos;
+﻿using SOS.Api.Contracts.Observations.Requests;
+using Microsoft.AspNetCore.Mvc;
+using SOS.Api.Contracts.Taxonomy.Requests;
 using SOS.Status.Web.Services;
 
 namespace SOS.Status.Web.Endpoints;

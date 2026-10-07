@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace SOS.Api.Contracts.DataStewardship.Responses;
 
 /// <summary>
@@ -8,7 +10,7 @@ public sealed class DsProjectDto
     /// <summary>The unique project identifier.</summary>
     public string? ProjectID { get; set; }
     /// <summary>The project name.</summary>
-    public string? ProjectCode { get; set; }
+    [Required] public string ProjectCode { get; set; } = null!;
     /// <summary>The type of project in which the dataset was collected.</summary>
-    public string? ProjectType { get; set; }
+    [Required] public DsProjectType? ProjectType { get; set; }
 }

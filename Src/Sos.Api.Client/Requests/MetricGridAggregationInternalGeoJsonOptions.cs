@@ -1,16 +1,10 @@
-using SOS.Api.Contracts.Aggregations.Requests;
+using SOS.Api.Contracts.Common.Geo;
 using SOS.Api.Contracts.Observations.Requests;
 
 namespace SOS.Api.Client.Requests;
 /// <summary>Options for metric-grid aggregation returned as GeoJSON.</summary>
-public sealed class MetricGridAggregationInternalGeoJsonOptions
+public sealed class MetricGridAggregationInternalGeoJsonOptions : SosRoleRequestOptions
 {
-    /// <summary>The explicit authorization role identifier.</summary>
-    public int? RoleId { get; set; }
-
-    /// <summary>The explicit calling application identifier.</summary>
-    public string? AuthorizationApplicationIdentifier { get; set; }
-
     /// <summary>The grid-cell side length, in metres.</summary>
     public int GridCellSizeInMeters { get; set; } = 10000;
 

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using SOS.Api.Contracts.Metadata.Responses;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Swagger;
@@ -8,7 +9,6 @@ using System.Net;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
-using SOS.Lib.Dtos;
 using SOS.Lib.Helpers;
 
 namespace SOS.Observations.Api.Controllers;

@@ -1,6 +1,6 @@
 ﻿using AutoBogus;
 using FluentAssertions;
-using SOS.Lib.Enums;
+using SOS.Api.Contracts.Observations.Requests;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models;
 using SOS.Lib.Models.Processed.Observation;

@@ -1,10 +1,12 @@
-﻿using CSharpFunctionalExtensions;
+﻿using SOS.Api.Contracts.Observations;
+using SOS.Api.Contracts.Common.Geo;
+using CSharpFunctionalExtensions;
 using Elastic.Clients.Elasticsearch;
+using SOS.Api.Contracts.Exports.Requests;
 using Hangfire;
 using Microsoft.Extensions.Logging;
 using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
-using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Gis;
 using SOS.Lib.Helpers;
@@ -52,6 +54,8 @@ public class GeoJsonFileWriter : FileWriterBase, IGeoJsonFileWriter
         JsonSerializerOptions jsonSerializerOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
         jsonSerializerOptions.Converters.Add(attributesTableConverter);
         jsonSerializerOptions.Converters.Add(geometryConverter);
+        // Export properties keep their existing numeric representation, including flat records.
+        jsonSerializerOptions.Converters.Add(new JsonNumberEnumConverter<DiffusionStatus>());
         jsonSerializerOptions.Encoder = JsonEncoder;
         return jsonSerializerOptions;
     }
@@ -529,7 +533,7 @@ public class GeoJsonFileWriter : FileWriterBase, IGeoJsonFileWriter
         SearchFilter filter, 
         string culture, 
         bool flatOut, 
-        PropertyLabelType propertyLabelType, 
+        PropertyLabelType propertyLabelType,
         bool excludeNullValues,
         int expectedNoOfObservations,
         bool useFastSearch,
@@ -625,7 +629,7 @@ public class GeoJsonFileWriter : FileWriterBase, IGeoJsonFileWriter
         PropertyLabelType propertyLabelType,
         bool excludeNullValues,
         Stream stream,
-        LatLonBoundingBox? bbox,
+        LatLonBoundingBoxDto? bbox,
         List<Feature> geographicAreas,
         bool groupByLocation,
         Dictionary<string, Geometry>? polygonLocationGeometries = null)
@@ -896,7 +900,7 @@ public class GeoJsonFileWriter : FileWriterBase, IGeoJsonFileWriter
         return null;
     }
 
-    private void WriteBbox(Utf8JsonWriter jsonWriter, LatLonBoundingBox? bbox)
+    private void WriteBbox(Utf8JsonWriter jsonWriter, LatLonBoundingBoxDto? bbox)
     {
         if (bbox != null)
         {

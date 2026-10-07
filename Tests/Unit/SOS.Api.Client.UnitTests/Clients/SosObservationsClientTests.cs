@@ -1,8 +1,11 @@
-﻿using FluentAssertions;
+﻿using SOS.Api.Contracts.Observations;
+using FluentAssertions;
 using SOS.Api.Client.Clients;
 using SOS.Api.Client.Requests;
 using SOS.Api.Client.Exceptions;
 using SOS.Api.Contracts.Observations.Requests;
+using SOS.Api.Contracts.Observations.Responses;
+using SOS.Api.Contracts.Common.Responses;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
@@ -139,7 +142,7 @@ public class SosObservationsClientTests
               "take": 2,
               "totalCount": 11,
               "records": [
-                { "id": "7" }
+                { "id": "7", "diffusionStatus": "DiffusedByProvider" }
               ]
             }
             """);
@@ -156,6 +159,7 @@ public class SosObservationsClientTests
         result.TotalCount.Should().Be(11);
         result.Records.Should().ContainSingle();
         result.Records[0].Id.Should().Be("7");
+        result.Records[0].DiffusionStatus.Should().Be(DiffusionStatus.DiffusedByProvider);
         result.GeoJson.Should().BeNull();
         result.Metadata.Should().BeNull();
     }
@@ -198,7 +202,7 @@ public class SosObservationsClientTests
             TestContext.Current.CancellationToken);
 
         result.TotalCount.Should().Be(1);
-        result.Records.Should().BeEmpty();
+        result.Records.Should().BeNull();
         result.GeoJson.Should().Be(geoJson);
         result.Metadata.Should().NotBeNull();
         //result.Metadata!.Value.GetProperty("polygonLocations")
@@ -240,6 +244,27 @@ public class SosObservationsClientTests
         result.TotalCount.Should().Be(1);
         var observation = result.Records!.Should().ContainSingle().Which;
         observation.Id.Should().Be("obs-1");
+    }
+
+    [Theory]
+    [InlineData("", true)]
+    [InlineData(",\"records\":null", true)]
+    [InlineData(",\"records\":[]", false)]
+    public async Task ObservationsBySearchInternalAsync_UsesSharedDtoRecordsBehavior(string recordsJson, bool expectNull)
+    {
+        var handler = new StubHttpMessageHandler(_ => CreateJsonResponse($"{{\"skip\":1,\"take\":2,\"totalCount\":3{recordsJson}}}"));
+        var client = new SosObservationsClient(CreateHttpClient(handler));
+
+        var result = await client.ObservationsBySearchInternalAsync("{}", cancellationToken: TestContext.Current.CancellationToken);
+
+        result.Should().BeOfType<GeoPagedResultWithMetadataDto<Observation>>();
+        result.Skip.Should().Be(1);
+        result.Take.Should().Be(2);
+        result.TotalCount.Should().Be(3);
+        if (expectNull) result.Records.Should().BeNull();
+        else result.Records.Should().BeEmpty();
+        result.GeoJson.Should().BeNull();
+        result.Metadata.Should().BeNull();
     }
 
     [Fact]
@@ -450,6 +475,8 @@ public class SosObservationsClientTests
             request.RequestUri!.PathAndQuery.Should().Contain("/observations/internal/adaptivesearchlocations?");
             request.RequestUri.Query.Should().Contain("observationsLimit=10");
             request.RequestUri.Query.Should().Contain("cluster=false");
+            request.RequestUri.Query.Should().Contain("clusteringAlgorithm=DbScan");
+            request.RequestUri.Query.Should().Contain("adaptiveSearchStrategy=LocationsThenGrid");
             request.Headers.Accept.Select(header => header.MediaType)
                 .Should().Equal("application/geo+json", "application/json");
             return new HttpResponseMessage(HttpStatusCode.OK)
@@ -464,7 +491,9 @@ public class SosObservationsClientTests
             new AdaptiveSearchLocationsOptions
             {
                 ObservationsLimit = 10,
-                Cluster = false
+                Cluster = false,
+                ClusteringAlgorithm = LocationClusteringAlgorithm.DbScan,
+                AdaptiveSearchStrategy = AdaptiveSearchLocationsStrategy.LocationsThenGrid
             },
             TestContext.Current.CancellationToken);
 

@@ -1,54 +1,81 @@
 using SOS.Api.Contracts.Observations.Responses;
 
 namespace SOS.Api.Contracts.Lookups.Responses;
+/// <summary>Identifiers of SOS controlled vocabularies.</summary>
 public enum VocabularyIdDto
 {
 
+    /// <summary>Sex of the observed organism.</summary>
     Sex = 0,
 
+    /// <summary>Activity of the observed organism.</summary>
     Activity = 1,
 
-    LifeStage = 2,
+    /// <summary>Life stage of the observed organism.</summary>
+    LifeStage = 6,
 
-    Biotope = 3,
+    /// <summary>Biotope in which the organism was observed.</summary>
+    Biotope = 7,
 
-    Substrate = 4,
+    /// <summary>Substrate on which the organism was observed.</summary>
+    Substrate = 8,
 
-    VerificationStatus = 5,
+    /// <summary>Verification status of an observation.</summary>
+    VerificationStatus = 9,
 
-    Institution = 6,
+    /// <summary>Institution associated with an observation.</summary>
+    Institution = 10,
 
-    Unit = 7,
+    /// <summary>Unit used to report organism quantity.</summary>
+    Unit = 11,
 
-    BasisOfRecord = 8,
+    /// <summary>The nature or source of an observation record.</summary>
+    BasisOfRecord = 12,
 
-    Continent = 9,
+    /// <summary>Continent in which an observation was made.</summary>
+    Continent = 13,
 
-    EstablishmentMeans = 10,
+    /// <summary>How the organism became established at the location.</summary>
+    EstablishmentMeans = 14,
 
-    OccurrenceStatus = 11,
+    /// <summary>Presence or absence of the organism.</summary>
+    OccurrenceStatus = 15,
 
-    AccessRights = 12,
+    /// <summary>Access rights associated with an observation.</summary>
+    AccessRights = 16,
 
-    Country = 13,
+    /// <summary>Country in which an observation was made.</summary>
+    Country = 17,
 
-    Type = 14,
+    /// <summary>The nature or genre of the resource.</summary>
+    Type = 18,
 
-    AreaType = 15,
+    /// <summary>Type of geographic area.</summary>
+    AreaType = 19,
 
-    DiscoveryMethod = 16,
+    /// <summary>Method used to discover the organism.</summary>
+    DiscoveryMethod = 20,
 
-    DeterminationMethod = 17,
+    /// <summary>Method used to identify the organism.</summary>
+    DeterminationMethod = 21,
 
-    ReproductiveCondition = 18,
+    /// <summary>Reproductive condition of the organism.</summary>
+    ReproductiveCondition = 22,
 
-    Behavior = 19,
+    /// <summary>Behavior of the observed organism.</summary>
+    Behavior = 23,
 
-    SensitivityCategory = 20,
+    /// <summary>Sensitivity category governing disclosure of an observation.</summary>
+    SensitivityCategory = 24,
 
-    BirdNestActivity = 21,
+    /// <summary>Bird-nesting activity.</summary>
+    BirdNestActivity = 25,
 
-    TaxonCategory = 22,
+    /// <summary>Taxonomic category.</summary>
+    TaxonCategory = 28,
+
+    /// <summary>Treatment applied to an invasive species.</summary>
+    InvasiveSpeciesTreatment = 29,
 
 }
 

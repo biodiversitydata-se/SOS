@@ -1,9 +1,9 @@
-﻿﻿using FizzWare.NBuilder;
+﻿using FizzWare.NBuilder;
+using GeoJSON.Text.Geometry;
+using SOS.Api.Contracts.Common.Geo;
+using SOS.Api.Contracts.Observations.Requests;
 using MongoDB.Driver.GeoJsonObjectModel;
 using Moq;
-using NetTopologySuite.Geometries;
-using SOS.Lib.Dtos.Enum;
-using SOS.Lib.Dtos.Filter;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Verbatim.Artportalen;
@@ -15,6 +15,7 @@ using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
 using SOS.Observations.Api.Managers;
 using SOS.Observations.Api.Managers.Interfaces;
 using System.Text.Json.Nodes;
+using FluentAssertions.Execution;
 
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsEndpoints.ObservationsBySearchEndpoint;
 
@@ -33,10 +34,10 @@ public class AdaptiveSearchLocationsTests : TestBase
             6,
             310000,
             TaxonIds.Skata,
-            index => (13.850 + index * 0.001, 58.380 + index * 0.001));
+            index => (14.750 + index * 0.001, 60.180 + index * 0.001));
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(observations);
         var apiClient = TestFixture.CreateApiClient();
-        var searchFilter = CreateBoundingBoxFilter(TaxonIds.Skata, 13.84, 58.40, 13.90, 58.35);
+        var searchFilter = CreateBoundingBoxFilter(TaxonIds.Skata, 14.74, 60.20, 14.80, 60.15);
 
         // Act
         var firstResponse = await apiClient.PostAsync(
@@ -60,6 +61,8 @@ public class AdaptiveSearchLocationsTests : TestBase
         firstFeatures.Count.Should().Be(6);
         secondFeatures.Count.Should().Be(firstFeatures.Count);
         secondFeatures.Should().OnlyContain(feature => feature!["properties"]!["observations"] == null);
+        firstFeatures.Should().OnlyContain(feature =>
+            feature!["properties"]!["locations"]!["location"]!["distinctLocationId"]!.GetValue<string>().StartsWith("loc_"));
     }
 
     [Fact]
@@ -731,28 +734,38 @@ public class AdaptiveSearchLocationsTests : TestBase
             TaxonIds.Sjögull,
             index => (13.8500 + index * 0.0001, 58.3800 + index * 0.0001));
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(observations);
-        var apiClient = TestFixture.CreateApiClient();
+        using var apiClient = TestFixture.CreateApiClient();
         var searchFilter = CreateBoundingBoxFilter(TaxonIds.Sjögull, 13.84, 58.40, 13.90, 58.35);
-        const string baseUrl = "/observations/internal/adaptivesearchlocations?observationsLimit=100&cluster=true&returnInputBBox=true&clusteringAlgorithm=Sweref99TmFastGreedy&metersPerPixel=1000&clusterRadiusPx=100&minLocationsPerCluster=2";
 
-        // Act
-        var thresholdEqualsCountResponse = await apiClient.PostAsync(
-            $"{baseUrl}&minLocationCountBeforeClustering=3",
-            JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
-        var thresholdEqualsCountResponseString = await thresholdEqualsCountResponse.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
-        var thresholdBelowCountResponse = await apiClient.PostAsync(
-            $"{baseUrl}&minLocationCountBeforeClustering=2",
-            JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
-        var thresholdBelowCountResponseString = await thresholdBelowCountResponse.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
-        var thresholdEqualsCountFeatures = JsonNode.Parse(thresholdEqualsCountResponseString)!["features"]!.AsArray();
-        var thresholdBelowCountFeatures = JsonNode.Parse(thresholdBelowCountResponseString)!["features"]!.AsArray();
+        foreach (var algorithm in new[]
+        {
+            LocationClusteringAlgorithm.Sweref99TmFastGreedy,
+            LocationClusteringAlgorithm.Sweref99TmGreedy,
+            LocationClusteringAlgorithm.DbScan
+        })
+        {
+            var baseUrl = $"/observations/internal/adaptivesearchlocations?observationsLimit=100&cluster=true&returnInputBBox=true&clusteringAlgorithm={algorithm}&metersPerPixel=1000&clusterRadiusPx=100&minLocationsPerCluster=2&useCache=false";
 
-        // Assert
-        thresholdEqualsCountResponse.StatusCode.Should().Be(HttpStatusCode.OK);
-        thresholdBelowCountResponse.StatusCode.Should().Be(HttpStatusCode.OK);
-        thresholdEqualsCountFeatures.Count.Should().Be(3, "clustering starts only when distinct location count is greater than the threshold");
-        thresholdBelowCountFeatures.Count.Should().Be(1);
-        thresholdBelowCountFeatures[0]!["properties"]!["isCluster"]!.GetValue<bool>().Should().BeTrue();
+            // Act
+            using var thresholdEqualsCountResponse = await apiClient.PostAsync(
+                $"{baseUrl}&minLocationCountBeforeClustering=3",
+                JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+            using var thresholdBelowCountResponse = await apiClient.PostAsync(
+                $"{baseUrl}&minLocationCountBeforeClustering=2",
+                JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
+
+            // Assert
+            thresholdEqualsCountResponse.StatusCode.Should().Be(HttpStatusCode.OK, $"algorithm={algorithm}, threshold=3");
+            thresholdBelowCountResponse.StatusCode.Should().Be(HttpStatusCode.OK, $"algorithm={algorithm}, threshold=2");
+            using var scope = new AssertionScope($"algorithm={algorithm}");
+            var thresholdEqualsCountResponseString = await thresholdEqualsCountResponse.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
+            var thresholdBelowCountResponseString = await thresholdBelowCountResponse.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
+            var thresholdEqualsCountFeatures = JsonNode.Parse(thresholdEqualsCountResponseString)!["features"]!.AsArray();
+            var thresholdBelowCountFeatures = JsonNode.Parse(thresholdBelowCountResponseString)!["features"]!.AsArray();
+            thresholdEqualsCountFeatures.Count.Should().Be(3, "clustering starts only when distinct location count is greater than the threshold");
+            thresholdBelowCountFeatures.Count.Should().Be(1);
+            thresholdBelowCountFeatures[0]!["properties"]!["isCluster"]!.GetValue<bool>().Should().BeTrue();
+        }
     }
 
     [Fact]
@@ -1120,7 +1133,7 @@ public class AdaptiveSearchLocationsTests : TestBase
         searchFilter.NotRecoveredFilter = SightingNotRecoveredFilterDto.NoFilter;
         searchFilter.ExtendedFilter = new ExtendedFilterDto
         {
-            NotPresentFilter = ExtendedFilterDto.SightingNotPresentFilterDto.IncludeNotPresent
+            NotPresentFilter = SightingNotPresentFilterDto.IncludeNotPresent
         };
         searchFilter.Date = new DateFilterDto
         {
@@ -1265,17 +1278,20 @@ public class AdaptiveSearchLocationsTests : TestBase
         double geometryBottom)
     {
         var searchFilter = CreateBoundingBoxFilter(taxonId, bboxLeft, bboxTop, bboxRight, bboxBottom);
-        searchFilter.Geographics!.Geometries = new[]
-        {
-            new Polygon(new LinearRing(new[]
-            {
-                new Coordinate(geometryLeft, geometryBottom),
-                new Coordinate(geometryRight, geometryBottom),
-                new Coordinate(geometryRight, geometryTop),
-                new Coordinate(geometryLeft, geometryTop),
-                new Coordinate(geometryLeft, geometryBottom)
-            }))
-        };
+        searchFilter.Geographics!.Geometries =
+        [
+            new Polygon(
+            [
+                new LineString(
+                [
+                    new Position(geometryBottom, geometryLeft),
+                    new Position(geometryBottom, geometryRight),
+                    new Position(geometryTop, geometryRight),
+                    new Position(geometryTop, geometryLeft),
+                    new Position(geometryBottom, geometryLeft)
+                ])
+            ])
+        ];
 
         return searchFilter;
     }

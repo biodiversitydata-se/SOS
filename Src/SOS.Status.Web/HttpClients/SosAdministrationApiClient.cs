@@ -1,5 +1,5 @@
-﻿using SOS.Lib.Dtos;
-using SOS.Lib.Dtos.Status;
+﻿using SOS.Api.Contracts.Status.Responses;
+using SOS.Status.Web.Client.Models;
 
 namespace SOS.Status.Web.HttpClients;
 
@@ -14,11 +14,11 @@ public class SosAdministrationApiClient
         _logger = logger;
     }
 
-    public async Task<IEnumerable<ProcessInfoDto>?> GetProcessInfo()
+    public async Task<IEnumerable<ProcessInfoViewModel>?> GetProcessInfo()
     {
         try
         {
-            return await _httpClient.GetFromJsonAsync<IEnumerable<ProcessInfoDto>>("StatusInfo/process");
+            return await _httpClient.GetFromJsonAsync<IEnumerable<ProcessInfoViewModel>>("StatusInfo/process");
         }
         catch (Exception ex)
         {

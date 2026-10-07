@@ -8,7 +8,7 @@ namespace SOS.Api.Client.Requests;
 public sealed class MyExportsOptions : SosRoleRequestOptions
 {
     /// <summary>The statuses included in the result.</summary>
-    public IReadOnlyCollection<ExportJobStatusDto>? Statuses { get; set; }
+    public IReadOnlyCollection<ExportJobStatus>? Statuses { get; set; }
 
     /// <summary>The number of matching jobs to skip after newest-first sorting.</summary>
     public int Skip { get; set; }

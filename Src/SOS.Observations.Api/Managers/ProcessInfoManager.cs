@@ -1,7 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
 using SOS.Lib.Models.Processed.ProcessInfo;
+using SOS.Lib.Extensions;
 using SOS.Lib.Repositories.Processed.Interfaces;
-using SOS.Lib.Dtos;
+using SOS.Api.Contracts.Metadata.Responses;
 using SOS.Observations.Api.Managers.Interfaces;
 using System;
 using System.Linq;
@@ -23,12 +24,12 @@ public class ProcessInfoManager : IProcessInfoManager
         {
             PublicCount = processInfo.PublicCount,
             ProtectedCount = processInfo.ProtectedCount,
-            End = processInfo.End,
+            End = processInfo.End.ToUtcDateTimeOffset(),
             Id = processInfo.Id,
-            Start = processInfo.Start,
+            Start = processInfo.Start.ToUtcDateTimeOffset(),
             Status = processInfo.Status.ToString(),
-            MetadataInfo = processInfo.MetadataInfo?.Select(mdi => CastToProcessInfoDto(mdi)),
-            ProvidersInfo = processInfo.ProvidersInfo?.Select(mdi => CastToProviderInfoDto(mdi))
+            MetadataInfo = processInfo.MetadataInfo?.Select(CastToProcessInfoDto).ToList(),
+            ProvidersInfo = processInfo.ProvidersInfo?.Select(CastToProviderInfoDto).ToList()
         };
     }
 
@@ -39,20 +40,20 @@ public class ProcessInfoManager : IProcessInfoManager
             DataProviderId = providerInfo.DataProviderId,
             DataProviderIdentifier = providerInfo.DataProviderIdentifier,
             HarvestCount = providerInfo.HarvestCount,
-            HarvestEnd = providerInfo.HarvestEnd,
+            HarvestEnd = providerInfo.HarvestEnd.ToUtcDateTimeOffset(),
             HarvestNotes = providerInfo.HarvestNotes,
-            HarvestStart = providerInfo.HarvestStart,
+            HarvestStart = providerInfo.HarvestStart.ToUtcDateTimeOffset(),
             HarvestStatus = providerInfo.HarvestStatus?.ToString(),
             LatestIncrementalPublicCount = providerInfo.LatestIncrementalPublicCount,
             LatestIncrementalProtectedCount = providerInfo.LatestIncrementalProtectedCount,
-            LatestIncrementalEnd = providerInfo.LatestIncrementalEnd,
-            LatestIncrementalStart = providerInfo.LatestIncrementalStart,
+            LatestIncrementalEnd = providerInfo.LatestIncrementalEnd.ToUtcDateTimeOffset(),
+            LatestIncrementalStart = providerInfo.LatestIncrementalStart.ToUtcDateTimeOffset(),
             LatestIncrementalStatus = providerInfo.LatestIncrementalStatus?.ToString(),
             PublicProcessCount = providerInfo.PublicProcessCount,
             ProtectedProcessCount = providerInfo.ProtectedProcessCount,
-            ProcessEnd = providerInfo.ProcessEnd,
+            ProcessEnd = providerInfo.ProcessEnd.ToUtcDateTimeOffset(),
             ProcessFailCount = providerInfo.ProcessFailCount,
-            ProcessStart = providerInfo.ProcessStart,
+            ProcessStart = providerInfo.ProcessStart.ToUtcDateTimeOffset(),
             ProcessStatus = providerInfo.ProcessStatus?.ToString()
         };
     }

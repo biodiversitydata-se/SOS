@@ -1,15 +1,16 @@
-﻿using SOS.Status.Web.Client.Dtos;
+﻿
+using SOS.Status.Web.Client.Models;
 
 namespace SOS.Status.Web.Client.Helpers;
 
 public static class CssHelper
 {
-    public static Func<DataProviderStatusDto, string> PublicObservationCellClassFunc => m => GetStatusCellDiffClass(m.PublicActive, m.PublicInactive);
-    public static Func<DataProviderStatusDto, string> ProtectedObservationCellClassFunc => m => GetStatusCellDiffClass(m.ProtectedActive, m.ProtectedInactive);
-    public static Func<DataProviderStatusDto, string> InvalidObservationCellClassFunc => m => GetStatusCellDiffClass(m.InvalidInactive, m.InvalidActive);
-    public static Func<DataProviderStatusDto, string> PublicObservationCellStyleFunc => m => GetStatusCellDiffStyle(m.PublicActive, m.PublicInactive);
-    public static Func<DataProviderStatusDto, string> ProtectedObservationCellStyleFunc => m => GetStatusCellDiffStyle(m.ProtectedActive, m.ProtectedInactive);
-    public static Func<DataProviderStatusDto, string> InvalidObservationCellStyleFunc => m => GetStatusCellDiffStyle(m.InvalidInactive, m.InvalidActive);
+    public static Func<DataProviderStatusViewModel, string> PublicObservationCellClassFunc => m => GetStatusCellDiffClass(m.PublicActive, m.PublicInactive);
+    public static Func<DataProviderStatusViewModel, string> ProtectedObservationCellClassFunc => m => GetStatusCellDiffClass(m.ProtectedActive, m.ProtectedInactive);
+    public static Func<DataProviderStatusViewModel, string> InvalidObservationCellClassFunc => m => GetStatusCellDiffClass(m.InvalidInactive, m.InvalidActive);
+    public static Func<DataProviderStatusViewModel, string> PublicObservationCellStyleFunc => m => GetStatusCellDiffStyle(m.PublicActive, m.PublicInactive);
+    public static Func<DataProviderStatusViewModel, string> ProtectedObservationCellStyleFunc => m => GetStatusCellDiffStyle(m.ProtectedActive, m.ProtectedInactive);
+    public static Func<DataProviderStatusViewModel, string> InvalidObservationCellStyleFunc => m => GetStatusCellDiffStyle(m.InvalidInactive, m.InvalidActive);
 
     public static string GetStatusCellDiffClass(int activeValue, int inactiveValue)
     {

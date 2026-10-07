@@ -1,4 +1,5 @@
-﻿using NetTopologySuite.Geometries;
+﻿using SOS.Api.Contracts.Common.Geo;
+using NetTopologySuite.Geometries;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Gis;
@@ -26,7 +27,7 @@ public class Area : IEntity<string>
     public AreaType AreaType { get; set; }
     public int AreaTypeId => (int)AreaType;
 
-    public LatLonBoundingBox BoundingBox { get; set; }
+    public LatLonBoundingBoxDto BoundingBox { get; set; }
 
     /// <summary>
     ///     Feature Id.

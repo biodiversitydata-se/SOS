@@ -1,9 +1,8 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using SOS.Api.Contracts.Checklists.Responses;
+using Microsoft.Extensions.Logging;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Search.Filters;
-using SOS.Lib.Models.Statistics;
 using SOS.Lib.Repositories.Processed.Interfaces;
-using SOS.Lib.Dtos.Checklist;
 using SOS.Lib.Extensions.Dto;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Repositories.Interfaces;

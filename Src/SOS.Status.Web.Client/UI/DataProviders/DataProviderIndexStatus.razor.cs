@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using SOS.Status.Web.Client.Dtos;
+using SOS.Api.Contracts.Status.Responses;
+using SOS.Status.Web.Client.Models;
 namespace SOS.Status.Web.Client.UI.DataProviders;
 
 public partial class DataProviderIndexStatus
@@ -8,7 +10,7 @@ public partial class DataProviderIndexStatus
     public ProcessStatusDto? ProcessStatus { get; set; }
 
     [Parameter]
-    public List<DataProviderStatusDto>? DataProviderStatuses { get; set; }
+    public List<DataProviderStatusViewModel>? DataProviderStatuses { get; set; }
 
     [Parameter]
     public bool ActiveInstance { get; set; }

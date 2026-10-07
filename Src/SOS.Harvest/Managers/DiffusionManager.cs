@@ -1,7 +1,8 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using SOS.Api.Contracts.Observations;
+using SOS.Api.Contracts.Common.Geo;
+using Microsoft.Extensions.Logging;
 using NetTopologySuite.Geometries;
 using SOS.Harvest.Managers.Interfaces;
-using SOS.Lib.Enums;
 using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;

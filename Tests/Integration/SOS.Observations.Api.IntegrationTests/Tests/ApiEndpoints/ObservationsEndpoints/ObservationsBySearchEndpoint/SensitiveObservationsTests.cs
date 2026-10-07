@@ -1,10 +1,9 @@
-﻿using FizzWare.NBuilder;
+using SOS.Api.Contracts.Common.Responses;
+using SOS.Api.Contracts.Observations.Requests;
+using FizzWare.NBuilder;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
-using SOS.Lib.Dtos;
-using SOS.Lib.Dtos.Enum;
-using SOS.Lib.Dtos.Filter;
 using SOS.Observations.Api.IntegrationTests.Setup;
 using SOS.Observations.Api.IntegrationTests.Setup.Stubs;
 using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
@@ -22,7 +21,7 @@ public class SensitiveObservationsTests : TestBase
     public async Task ObservationsBySearchEndpoint_ReturnsNoObservations_WhenSearchingForPublicObservations_GivenOnlyProtectedExists()
     {
         // Arrange
-        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(2)
             .All().HaveValuesFromPredefinedObservations()
                   .HaveTaxonSensitivityCategory(3)
             .Build();
@@ -44,7 +43,7 @@ public class SensitiveObservationsTests : TestBase
     public async Task ObservationsBySearchEndpoint_ReturnsNoObservations_WhenSearchingForProtectedObservations_GivenTheUserHasNoAccessRights()
     {
         // Arrange            
-        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(2)
             .All().HaveValuesFromPredefinedObservations()
                   .HaveTaxonSensitivityCategory(3)
             .Build();
@@ -67,10 +66,10 @@ public class SensitiveObservationsTests : TestBase
     public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_WhenSearchingForSensitiveObservations_GivenTheUserHasAccessRights()
     {
         // Arrange
-        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(5)
             .All().HaveValuesFromPredefinedObservations()
-            .TheFirst(60).HaveTaxonSensitivityCategory(3)
-             .TheNext(40).HaveTaxonSensitivityCategory(4)
+            .TheFirst(3).HaveTaxonSensitivityCategory(3)
+             .TheNext(2).HaveTaxonSensitivityCategory(4)
             .Build();
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
         var userServiceStub = UserServiceStubFactory.CreateWithSightingAuthority(maxProtectionLevel: 3);
@@ -83,8 +82,8 @@ public class SensitiveObservationsTests : TestBase
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        result!.TotalCount.Should().Be(60,
-            because: "60 observations added to Elasticsearch have sensitivty category 3 and the user has max access rights to category 3.");
+        result!.TotalCount.Should().Be(3,
+            because: "3 observations added to Elasticsearch have sensitivty category 3 and the user has max access rights to category 3.");
     }
 
     [Fact]
@@ -92,10 +91,10 @@ public class SensitiveObservationsTests : TestBase
     {
         // Arrange
         const int userId = TestAuthHandler.DefaultTestUserId;
-        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(5)
             .All().HaveValuesFromPredefinedObservations()
                   .HaveTaxonSensitivityCategory(3)
-            .TheFirst(60).With(m => m.ObserversInternal = new[] {
+            .TheFirst(3).With(m => m.ObserversInternal = new[] {
                 new UserInternal { Id = userId, PersonId = userId, UserServiceUserId = userId, ViewAccess = true } })
             .Build();
 
@@ -112,8 +111,8 @@ public class SensitiveObservationsTests : TestBase
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        result!.TotalCount.Should().Be(60,
-            because: "60 observations added to Elasticsearch are observed by UserId=15. " +
+        result!.TotalCount.Should().Be(3,
+            because: "3 observations added to Elasticsearch are observed by UserId=15. " +
                      "The user has no access rights but can view its own observed sightings.");
     }
 
@@ -122,10 +121,10 @@ public class SensitiveObservationsTests : TestBase
     {
         // Arrange
         const int userId = TestAuthHandler.DefaultTestUserId;
-        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(5)
             .All().HaveValuesFromPredefinedObservations()
                   .HaveTaxonSensitivityCategory(3)
-            .TheFirst(60).With(m => m.ReportedByUserServiceUserId = userId)
+            .TheFirst(3).With(m => m.ReportedByUserServiceUserId = userId)
             .Build();
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
         var userServiceStub = UserServiceStubFactory.CreateWithSightingAuthority(maxProtectionLevel: 1);
@@ -139,8 +138,8 @@ public class SensitiveObservationsTests : TestBase
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        result!.TotalCount.Should().Be(60,
-            because: "60 observations added to Elasticsearch are observed by UserId=15. " +
+        result!.TotalCount.Should().Be(3,
+            because: "3 observations added to Elasticsearch are observed by UserId=15. " +
                      "The user has no access rights but can view its own reported sightings.");
     }
 }

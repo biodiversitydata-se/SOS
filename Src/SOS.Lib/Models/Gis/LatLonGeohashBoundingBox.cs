@@ -1,10 +1,11 @@
-﻿using CSharpFunctionalExtensions;
+﻿using SOS.Api.Contracts.Common.Geo;
+using CSharpFunctionalExtensions;
 using NGeoHash;
 using System;
 
 namespace SOS.Lib.Models.Gis;
 
-public class LatLonGeohashBoundingBox : LatLonBoundingBox
+public class LatLonGeohashBoundingBox : LatLonBoundingBoxDto
 {
     public string Geohash { get; set; }
 
@@ -45,16 +46,16 @@ public class LatLonGeohashBoundingBox : LatLonBoundingBox
 
             bbox = new LatLonGeohashBoundingBox
             {
-                TopLeft = new LatLonCoordinate(top.Value, left.Value),
-                BottomRight = new LatLonCoordinate(bottom.Value, right.Value)
+                TopLeft = new LatLonCoordinateDto(top.Value, left.Value),
+                BottomRight = new LatLonCoordinateDto(bottom.Value, right.Value)
             };
         }
         else
         {
             bbox = new LatLonGeohashBoundingBox
             {
-                TopLeft = new LatLonCoordinate(90, -180),
-                BottomRight = new LatLonCoordinate(-90, 180)
+                TopLeft = new LatLonCoordinateDto(90, -180),
+                BottomRight = new LatLonCoordinateDto(-90, 180)
             };
         }
 
@@ -69,8 +70,8 @@ public class LatLonGeohashBoundingBox : LatLonBoundingBox
             var bbox = new LatLonGeohashBoundingBox
             {
                 Geohash = geohash,
-                TopLeft = new LatLonCoordinate(geohashBbox.Maximum.Lat, geohashBbox.Minimum.Lon),
-                BottomRight = new LatLonCoordinate(geohashBbox.Minimum.Lat, geohashBbox.Maximum.Lon)
+                TopLeft = new LatLonCoordinateDto(geohashBbox.Maximum.Lat, geohashBbox.Minimum.Lon),
+                BottomRight = new LatLonCoordinateDto(geohashBbox.Minimum.Lat, geohashBbox.Maximum.Lon)
             };
 
             return Result.Success(bbox);

@@ -1,5 +1,4 @@
-﻿using SOS.Lib.Models.Misc;
-using File = SOS.Lib.Models.Misc.File;
+﻿using SOS.Api.Contracts.Exports.Responses;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -47,7 +46,7 @@ public interface IBlobStorageService
     /// List export files
     /// </summary>
     /// <returns></returns>
-    Task<IEnumerable<File>> GetExportFilesAsync();
+    Task<IEnumerable<ExportFileDto>> GetExportFilesAsync();
 
     /// <summary>
     ///     Upload blob to storage

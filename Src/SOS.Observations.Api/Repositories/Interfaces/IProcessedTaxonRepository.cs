@@ -1,5 +1,6 @@
-﻿using CSharpFunctionalExtensions;
-using SOS.Lib.Enums;
+﻿﻿using SOS.Api.Contracts.Aggregations.Responses;
+using CSharpFunctionalExtensions;
+using SOS.Api.Contracts.Aggregations.Requests;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Filters;
@@ -34,7 +35,7 @@ public interface IProcessedTaxonRepository : IProcessRepositoryBase<Observation,
     /// <param name="take"></param>
     /// <param name="sumUnderlyingTaxa"></param>
     /// <returns></returns>
-    Task<Result<PagedResult<TaxonAggregationItem>>> GetTaxonAggregationAsync(
+    Task<Result<PagedResult<TaxonAggregationItemDto>>> GetTaxonAggregationAsync(
         SearchFilter filter,
         int? skip,
         int? take,
@@ -47,7 +48,7 @@ public interface IProcessedTaxonRepository : IProcessRepositoryBase<Observation,
     /// <param name="skip"></param>
     /// <param name="take"></param>
     /// <returns></returns>
-    Task<Result<PagedResult<TaxonAggregationItem>>> GetTaxonAggregationApproximateAsync(
+    Task<Result<PagedResult<TaxonAggregationItemDto>>> GetTaxonAggregationApproximateAsync(
         SearchFilter filter,
         int? skip,
         int? take);
@@ -68,6 +69,6 @@ public interface IProcessedTaxonRepository : IProcessRepositoryBase<Observation,
     /// </summary>
     /// <param name="filter"></param>
     /// <returns></returns>
-    Task<IEnumerable<TaxonAggregationItem>> GetTaxonExistsIndicationAsync(
+    Task<IEnumerable<TaxonAggregationItemDto>> GetTaxonExistsIndicationAsync(
         SearchFilter filter);
 }

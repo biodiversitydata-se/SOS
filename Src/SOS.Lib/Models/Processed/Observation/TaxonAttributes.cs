@@ -1,5 +1,4 @@
-﻿using SOS.Lib.Enums;
-using SOS.Lib.Models.DarwinCore;
+﻿using SOS.Api.Contracts.Observations.Responses;
 using System;
 using System.Collections.Generic;
 
@@ -29,7 +28,7 @@ public class TaxonAttributes
     /// <summary>
     /// County occurrence status
     /// </summary>
-    public ICollection<CountyOccurrence> CountyOccurrences { get; set; }
+    public ICollection<SOS.Lib.Models.DarwinCore.CountyOccurrence> CountyOccurrences { get; set; }
 
     /// <summary>
     /// Disturbance radius.

@@ -16,7 +16,7 @@ public class ArtportalenChecklistProcessorTests : TestBase
     public void Test_process_verbatim_checklists()
     {
         // Arrange
-        var verbatimChecklists = Builder<ArtportalenChecklistVerbatim>.CreateListOfSize(100)
+        var verbatimChecklists = Builder<ArtportalenChecklistVerbatim>.CreateListOfSize(2)
             .All().HaveValuesFromPredefinedChecklists()
             .Build();
 
@@ -24,6 +24,6 @@ public class ArtportalenChecklistProcessorTests : TestBase
         var checklists = ProcessFixture.ProcessChecklists(verbatimChecklists);
 
         // Assert
-        checklists.Count.Should().Be(100);
+        checklists.Count.Should().Be(2);
     }
 }

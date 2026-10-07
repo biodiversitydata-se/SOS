@@ -1,5 +1,5 @@
-﻿using NetTopologySuite.Geometries;
-using SOS.Lib.Enums;
+﻿using SOS.Api.Contracts.Common.Geo;
+using NetTopologySuite.Geometries;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Processed.Observation;
@@ -64,20 +64,20 @@ public class Sweref99TmFastGreedyLocationClusterer : ILocationClusterer
     }
 
     /// <inheritdoc />
-    public List<LocationFeature> ClusterLocations(List<Observation> observations, LatLonBoundingBox boundingBox, int targetItemCount)
+    public List<LocationFeature> ClusterLocations(List<Observation> observations, LatLonBoundingBoxDto boundingBox, int targetItemCount)
     {
         var clusterRadius = ComputeMinimumClusterRadius(boundingBox, targetItemCount);
         return ClusterLocations(observations, clusterRadius);
     }
 
     /// <inheritdoc />
-    public List<LocationFeature> ClusterLocations(List<Observation> observations, LatLonBoundingBox boundingBox)
+    public List<LocationFeature> ClusterLocations(List<Observation> observations, LatLonBoundingBoxDto boundingBox)
     {
         return ClusterLocations(observations, boundingBox, _maxLocationCountAfterClustering);
     }
 
     /// <inheritdoc />
-    public List<LocationFeature> ClusterLocations(List<Observation> observations, LatLonBoundingBox boundingBox, double metersPerPixel, double clusterRadiusPx = DefaultClusterRadiusInPixels)
+    public List<LocationFeature> ClusterLocations(List<Observation> observations, LatLonBoundingBoxDto boundingBox, double metersPerPixel, double clusterRadiusPx = DefaultClusterRadiusInPixels)
     {
         var clusterRadius = ComputeMinimumClusterRadius(boundingBox, metersPerPixel, clusterRadiusPx);
         return ClusterLocations(observations, clusterRadius);
@@ -308,7 +308,7 @@ public class Sweref99TmFastGreedyLocationClusterer : ILocationClusterer
             (long)Math.Floor(y / normalizedCellSize));
     }
 
-    private static double ComputeMinimumClusterRadius(LatLonBoundingBox boundingBox, int targetItemCount)
+    private static double ComputeMinimumClusterRadius(LatLonBoundingBoxDto boundingBox, int targetItemCount)
     {
         if (targetItemCount <= 0)
         {
@@ -333,7 +333,7 @@ public class Sweref99TmFastGreedyLocationClusterer : ILocationClusterer
         return Math.Max(sideLength * 0.5, MinimumClusterRadiusMeters);
     }
 
-    private static double ComputeMinimumClusterRadius(LatLonBoundingBox boundingBox, double metersPerPixel, double clusterRadiusPx)
+    private static double ComputeMinimumClusterRadius(LatLonBoundingBoxDto boundingBox, double metersPerPixel, double clusterRadiusPx)
     {
         if (GetSweref99TmBounds(boundingBox) == null || metersPerPixel <= 0)
         {
@@ -391,7 +391,7 @@ public class Sweref99TmFastGreedyLocationClusterer : ILocationClusterer
         return Math.Sqrt(xDelta * xDelta + yDelta * yDelta);
     }
 
-    private static Envelope? GetSweref99TmBounds(LatLonBoundingBox boundingBox)
+    private static Envelope? GetSweref99TmBounds(LatLonBoundingBoxDto boundingBox)
     {
         if (boundingBox?.TopLeft == null || boundingBox.BottomRight == null)
         {

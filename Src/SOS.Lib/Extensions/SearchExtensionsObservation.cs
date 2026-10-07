@@ -1,4 +1,4 @@
-﻿using AgileObjects.AgileMapper.Extensions.Internal;
+﻿using SOS.Api.Contracts.Aggregations.Requests;
 using CSharpFunctionalExtensions;
 using Elastic.Clients.Elasticsearch;
 using Elastic.Clients.Elasticsearch.Core.Search;
@@ -7,6 +7,8 @@ using NetTopologySuite.Geometries;
 using SOS.Lib.Enums;
 using SOS.Lib.Enums.Artportalen;
 using SOS.Lib.Extensions;
+using SOS.Lib.Helpers;
+using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Filters;
 using System;
 using System.Collections.Generic;
@@ -20,6 +22,38 @@ namespace SOS.Lib;
 /// </summary>
 public static class SearchExtensionsObservation
 {
+    private static readonly string[] ProjectionExcludedFields =
+    [
+        "defects", "event.endDayOfYear", "event.startDayOfYear",
+        "event.endHistogramWeek", "event.startHistogramWeek",
+        "location.attributes.isPrivate", "location.point", "location.pointLocation",
+        "location.pointWithBuffer", "location.pointWithDisturbanceBuffer",
+        "location.isInEconomicZoneOfSweden", "location.isInZoneOfSOS",
+        "taxon.attributes.countyOccurrences"
+    ];
+    private static readonly Fields PublicProjectionExcludes = Fields.FromStrings([.. ProjectionExcludedFields, "artportalenInternal"]);
+    private static readonly Fields InternalProjectionExcludes = Fields.FromStrings(
+        [.. ProjectionExcludedFields, "artportalenInternal.activityCategoryId", "artportalenInternal.triggeredObservationRuleUnspontaneous"]);
+
+    private static SourceConfig CreateObservationProjection(IEnumerable<string> includes, bool isInternal, ICollection<string>? additionalExcludes = null)
+    {
+        var excludes = isInternal ? InternalProjectionExcludes : PublicProjectionExcludes;
+        if (additionalExcludes?.Count > 0)
+        {
+            excludes = Fields.FromStrings(
+            [
+                .. ProjectionExcludedFields,
+                .. isInternal ? new[] { "artportalenInternal.activityCategoryId", "artportalenInternal.triggeredObservationRuleUnspontaneous" } : new[] { "artportalenInternal" },
+                .. additionalExcludes.Select(ElasticsearchFieldNameHelper.GetFieldName<Observation>)
+            ]);
+        }
+        return new SourceConfig(new SourceFilter
+        {
+            Excludes = excludes,
+            Includes = Fields.FromStrings(includes?.Select(ElasticsearchFieldNameHelper.GetFieldName<Observation>).ToArray())
+        });
+    }
+
     extension<TQueryDescriptor>(ICollection<Action<QueryDescriptor<TQueryDescriptor>>> queries) where TQueryDescriptor : class
     {
         private void AddAuthorizationFilters(ExtendedAuthorizationFilter filter)
@@ -310,8 +344,8 @@ public static class SearchExtensionsObservation
                     // against the observation's month/day pair. This removes the leap/non-leap ambiguity of day-of-year
                     // matching and handles windows spanning a year boundary naturally, with no reference years.
                     var monthDays = new HashSet<int>();
-                    var filterDate = internalFilter.Date.StartDate.Value.Date;
-                    var filterEndDate = internalFilter.Date.EndDate.Value.Date;
+                    var filterDate = internalFilter.Date.StartDate.Value.ToLocalTime().Date;
+                    var filterEndDate = internalFilter.Date.EndDate.Value.ToLocalTime().Date;
                     while (filterDate <= filterEndDate)
                     {
                         monthDays.Add(filterDate.Month * 100 + filterDate.Day);
@@ -837,35 +871,18 @@ public static class SearchExtensionsObservation
         public SourceConfig ToProjection(
             bool isInternal)
         {
-            var excludes = new List<string>() {
-                "defects",
-                "event.endDayOfYear",
-                "event.startDayOfYear",
-                "event.endHistogramWeek",
-                "event.startHistogramWeek",
-                "location.attributes.isPrivate",
-                "location.point",
-                "location.pointLocation",
-                "location.pointWithBuffer",
-                "location.pointWithDisturbanceBuffer",
-                "location.isInEconomicZoneOfSweden",
-                "location.isInZoneOfSOS",
-                "taxon.attributes.countyOccurrences"
-            };
+            return CreateObservationProjection(includes, isInternal);
+        }
+    }
 
-            if (isInternal)
-            {
-                excludes.AddRange(new[] {
-                "artportalenInternal.activityCategoryId",
-                "artportalenInternal.triggeredObservationRuleUnspontaneous"
-            });
-            }
-            else
-            {
-                excludes.Add("artportalenInternal");
-            }
-
-            return (includes, excludes).ToProjection();
+    extension(OutputFilter output)
+    {
+        /// <summary>
+        /// Builds an observation projection, including explicitly excluded fields.
+        /// </summary>
+        public SourceConfig ToProjection(bool isInternal)
+        {
+            return CreateObservationProjection(output.Fields, isInternal, output.ExcludeFields);
         }
     }
 

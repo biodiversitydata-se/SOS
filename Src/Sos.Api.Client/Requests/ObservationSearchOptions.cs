@@ -2,14 +2,8 @@ using SOS.Api.Contracts.Observations.Requests;
 
 namespace SOS.Api.Client.Requests;
 /// <summary>Options for a paged internal observation search.</summary>
-public sealed class ObservationSearchOptions
+public sealed class ObservationSearchOptions : SosRoleRequestOptions
 {
-    /// <summary>The explicit authorization role identifier.</summary>
-    public int? RoleId { get; set; }
-
-    /// <summary>The explicit calling application identifier.</summary>
-    public string? AuthorizationApplicationIdentifier { get; set; }
-
     /// <summary>The number of records to skip.</summary>
     public int Skip { get; set; }
 

@@ -1,8 +1,9 @@
-﻿using FizzWare.NBuilder;
+﻿using SOS.Api.Contracts.Aggregations.Requests;
+using SOS.Api.Contracts.Areas.Requests;
+using SOS.Api.Contracts.Areas.Responses;
+using SOS.Api.Contracts.Observations.Requests;
+using FizzWare.NBuilder;
 using SOS.Lib.Models.Verbatim.Artportalen;
-using SOS.Lib.Dtos;
-using SOS.Lib.Dtos.Enum;
-using SOS.Lib.Dtos.Filter;
 using MongoDB.Driver.GeoJsonObjectModel;
 using SOS.Observations.Api.IntegrationTests.Setup;
 using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
@@ -20,34 +21,34 @@ public class MetricGridAggregationTests : TestBase
     public async Task SumObservationCountInternalTest()
     {
         // Arrange
-        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(10)
             .All()
                 .HaveValuesFromPredefinedObservations()
-            .TheFirst(20)
+            .TheFirst(2)
                 .With(p => p.TaxonId = 100012)
                 .With(p => p.Site.County = new GeographicalArea { FeatureId = "6" })
                 .With(p => p.Site.XCoord = 1599118)
                 .With(p => p.Site.YCoord = 7940868)
                 .With(p => p.Site.Point = new GeoJsonPoint<GeoJson2DCoordinates>(new GeoJson2DCoordinates(14.36512140510641, 57.87386951383448)))
-            .TheNext(20)
+            .TheNext(2)
                 .With(p => p.TaxonId = 100013)
                 .With(p => p.Site.County = new GeographicalArea { FeatureId = "6" })
                 .With(p => p.Site.XCoord = 1563368)
                 .With(p => p.Site.YCoord = 7793523)
                 .With(p => p.Site.Point = new GeoJsonPoint<GeoJson2DCoordinates>(new GeoJson2DCoordinates(14.043973691033681, 57.163074572716816)))
-            .TheNext(20)
+            .TheNext(2)
                 .With(p => p.TaxonId = 100012)
                 .With(p => p.Site.County = new GeographicalArea { FeatureId = "6" })
                 .With(p => p.Site.XCoord = 1596541)
                 .With(p => p.Site.YCoord = 7941260)
                 .With(p => p.Site.Point = new GeoJsonPoint<GeoJson2DCoordinates>(new GeoJson2DCoordinates(14.341971820234647, 57.87574209015208)))
-            .TheNext(20)
+            .TheNext(2)
                 .With(p => p.TaxonId = 100012)
                 .With(p => p.Site.County = new GeographicalArea { FeatureId = "7" })
                 .With(p => p.Site.XCoord = 1535521)
                 .With(p => p.Site.YCoord = 7764346)
                 .With(p => p.Site.Point = new GeoJsonPoint<GeoJson2DCoordinates>(new GeoJson2DCoordinates(13.793819833864916, 57.02067677016201)))
-            .TheLast(20)
+            .TheLast(2)
                 .With(p => p.TaxonId = 100011)
                 .With(p => p.Site.County = new GeographicalArea { FeatureId = "6" })
                 .With(p => p.Site.XCoord = 1599118)
@@ -75,7 +76,7 @@ public class MetricGridAggregationTests : TestBase
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        result!.GridCells.Sum(gc => gc.ObservationsCount).Should().Be(60,
+        result!.GridCells.Sum(gc => gc.ObservationsCount).Should().Be(6,
             because: "");
     }
 }

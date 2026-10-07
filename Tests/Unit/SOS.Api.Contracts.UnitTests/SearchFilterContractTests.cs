@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿
+using FluentAssertions;
 using FluentAssertions.Execution;
 using SOS.Api.Contracts.Aggregations.Requests;
 using SOS.Api.Contracts.Aggregations.Responses;
@@ -6,40 +7,39 @@ using SOS.Api.Contracts.Analysis.Responses;
 using SOS.Api.Contracts.Areas.Responses;
 using SOS.Api.Contracts.DataStewardship.Responses;
 using SOS.Api.Contracts.Exports.Responses;
-using SOS.Api.Contracts.Metadata.Responses;
 using SOS.Api.Contracts.Observations.Requests;
 using System.Text.Json;
 using System.Reflection;
+using System.Runtime.Serialization;
+using System.Text.Json.Serialization;
 using Xunit;
+using SOS.Api.Contracts.Metadata.Responses;
 
 namespace SOS.Api.Contracts.UnitTests;
 
 public class SearchFilterContractTests
 {
+    [Fact]
+    public void SharedFilterEnums_PreservePublishedValues()
+    {
+        Assert.Equal(new[] { "Minimum", "Extended", "AllWithValues", "All", "None" }, Enum.GetNames<OutputFieldSet>());
+        Assert.Equal(new[] { 0, 1, 2, 3, 4 }, Enum.GetValues<OutputFieldSet>().Select(value => (int)value));
+        Assert.Equal(new[] { "Asc", "Desc" }, Enum.GetNames<SearchSortOrder>());
+        Assert.Equal(new[] { 0, 1 }, Enum.GetValues<SearchSortOrder>().Select(value => (int)value));
+        Assert.Equal(new[] { 0, 1, 2 }, Enum.GetValues<CreatePolygonsMode>().Select(value => (int)value));
+    }
+
     private static readonly HashSet<string> IntentionalWireTypeDifferences =
     [
-        // The public client preserves offsets even though the current in-process
-        // server DTOs use DateTime. Both are ISO-8601 JSON strings on the wire.
-        $"{nameof(DateFilterDto)}.{nameof(DateFilterDto.StartDate)}",
-        $"{nameof(DateFilterDto)}.{nameof(DateFilterDto.EndDate)}",
-        $"{nameof(DateFilterDto)}.{nameof(DateFilterDto.DateFilterType)}",
-        $"{nameof(ExtendedFilterDto)}.{nameof(ExtendedFilterDto.ReportedDateFrom)}",
-        $"{nameof(ExtendedFilterDto)}.{nameof(ExtendedFilterDto.ReportedDateTo)}",
-        $"{nameof(ModifiedDateFilterDto)}.{nameof(ModifiedDateFilterDto.From)}",
-        $"{nameof(ModifiedDateFilterDto)}.{nameof(ModifiedDateFilterDto.To)}",
+        // Processed observations still store dates as DateTime internally.
         $"{nameof(SOS.Api.Contracts.Observations.Responses.Observation)}.{nameof(SOS.Api.Contracts.Observations.Responses.Observation.Modified)}",
         $"{nameof(SOS.Api.Contracts.Observations.Responses.Observation)}.{nameof(SOS.Api.Contracts.Observations.Responses.Observation.Created)}",
         $"{nameof(SOS.Api.Contracts.Observations.Responses.Event)}.{nameof(SOS.Api.Contracts.Observations.Responses.Event.StartDate)}",
         $"{nameof(SOS.Api.Contracts.Observations.Responses.Event)}.{nameof(SOS.Api.Contracts.Observations.Responses.Event.EndDate)}",
         $"{nameof(SOS.Api.Contracts.Observations.Responses.Occurrence)}.{nameof(SOS.Api.Contracts.Observations.Responses.Occurrence.ReportedDate)}",
 
-        // GeoJSON.Text exposes its polymorphic geometry contract as an
-        // interface; the API's Newtonsoft model uses the concrete base type.
-        $"{nameof(GeographicsFilterDto)}.{nameof(GeographicsFilterDto.Geometries)}",
-        $"{nameof(AreaWithGeometryDto)}.{nameof(AreaWithGeometryDto.Geometry)}",
-
-        // The API serializes the enum as text. A string keeps EnumMember values
-        // forward compatible for consumers of the separately versioned package.
+        // These enum types serialize as strings. Their wire representation is
+        // verified separately from the EnumMember metadata.
         $"{nameof(DsDatasetDto)}.{nameof(DsDatasetDto.ProgrammeArea)}",
         $"{nameof(DsDatasetDto)}.{nameof(DsDatasetDto.Purpose)}",
         $"{nameof(DsDatasetDto)}.{nameof(DsDatasetDto.AccessRights)}",
@@ -47,43 +47,16 @@ public class SearchFilterContractTests
     ];
 
     [Fact]
-    public void PublicSearchFilter_MatchesServerFilterProperties()
-    {
-        AssertPropertiesMatch(
-            typeof(SearchFilterDto),
-            typeof(SOS.Lib.Dtos.Filter.SearchFilterDto));
-    }
-
-    [Fact]
-    public void InternalSearchFilters_MatchServerFilterProperties()
-    {
-        AssertPropertiesMatch(
-            typeof(SearchFilterInternalBaseDto),
-            typeof(SOS.Lib.Dtos.Filter.SearchFilterInternalBaseDto));
-        AssertPropertiesMatch(
-            typeof(SearchFilterInternalDto),
-            typeof(SOS.Lib.Dtos.Filter.SearchFilterInternalDto));
-        AssertPropertiesMatch(
-            typeof(SearchFilterAggregationInternalDto),
-            typeof(SOS.Lib.Dtos.Filter.SearchFilterAggregationInternalDto));
-    }
-
-    [Fact]
-    public void NestedWorkspaceAndObservationContracts_MatchServerProperties()
+    public void ObservationContracts_MatchProcessedModelProperties()
     {
         using var assertionScope = new AssertionScope();
 
-        AssertPropertiesMatch(typeof(DateFilterDto), typeof(SOS.Lib.Dtos.Filter.DateFilterDto));
-        AssertPropertiesMatch(typeof(ExtendedFilterDto), typeof(SOS.Lib.Dtos.Filter.ExtendedFilterDto));
-        AssertPropertiesMatch(typeof(GeographicsFilterDto), typeof(SOS.Lib.Dtos.Filter.GeographicsFilterDto));
-        AssertPropertiesMatch(typeof(TaxonFilterDto), typeof(SOS.Lib.Dtos.Filter.TaxonFilterDto));
         AssertPropertiesMatch(
             typeof(SOS.Api.Contracts.Observations.Responses.ArtportalenInternal),
             typeof(SOS.Lib.Models.Processed.Observation.ArtportalenInternal));
         AssertPropertiesMatch(
             typeof(SOS.Api.Contracts.Observations.Responses.Observation),
-            typeof(SOS.Lib.Models.Processed.Observation.Observation),
-            ["MongoDbId"]);
+            typeof(SOS.Lib.Models.Processed.Observation.Observation));
         AssertPropertiesMatch(
             typeof(SOS.Api.Contracts.Observations.Responses.Event),
             typeof(SOS.Lib.Models.Processed.Observation.Event));
@@ -101,8 +74,7 @@ public class SearchFilterContractTests
             typeof(SOS.Lib.Models.Processed.Observation.Taxon));
         AssertPropertiesMatch(
             typeof(SOS.Api.Contracts.Observations.Responses.TaxonAttributes),
-            typeof(SOS.Lib.Models.Processed.Observation.TaxonAttributes),
-            ["CountyOccurrences"]);
+            typeof(SOS.Lib.Models.Processed.Observation.TaxonAttributes));
         AssertPropertiesMatch(
             typeof(SOS.Api.Contracts.Observations.Responses.Substrate),
             typeof(SOS.Lib.Models.Processed.Observation.Substrate));
@@ -115,54 +87,62 @@ public class SearchFilterContractTests
     }
 
     [Fact]
-    public void AnalysisExportDataStewardshipAndApiInfoContracts_MatchServerProperties()
+    public void AreaTypeEnum_MatchesDomainModel()
     {
         using var assertionScope = new AssertionScope();
 
-        AssertPropertiesMatch(typeof(UserAggregationResponseDto), typeof(SOS.Lib.Dtos.Search.UserAggregationResponseDto));
-        AssertPropertiesMatch(typeof(PagedAggregationResultDto<UserAggregationResponseDto>), typeof(SOS.Lib.Dtos.Search.PagedAggregationResultDto<SOS.Lib.Dtos.Search.UserAggregationResponseDto>));
-        AssertPropertiesMatch(typeof(ExportJobInfoDto), typeof(SOS.Lib.Dtos.Export.ExportJobInfoDto));
-        AssertPropertiesMatch(typeof(DsDatasetDto), typeof(SOS.Lib.Dtos.DataStewardship.DsDatasetDto));
-        AssertPropertiesMatch(typeof(DsProjectDto), typeof(SOS.Lib.Dtos.DataStewardship.DsProjectDto));
-        AssertPropertiesMatch(typeof(DsOrganisationDto), typeof(SOS.Lib.Dtos.DataStewardship.DsOrganisationDto));
-        AssertPropertiesMatch(typeof(DsMethodologyDto), typeof(SOS.Lib.Dtos.DataStewardship.DsMethodologyDto));
-        AssertPropertiesMatch(typeof(ApiInformationDto), typeof(SOS.Lib.Models.ApiInfo.ApiInformation));
+        foreach (var areaType in Enum.GetValues<AreaTypeDto>())
+        {
+            Enum.TryParse<SOS.Lib.Enums.AreaType>(areaType.ToString(), out var domainAreaType)
+                .Should().BeTrue();
+            ((int)areaType).Should().Be((int)domainAreaType);
+        }
     }
 
     [Fact]
-    public void AdaptiveSearchAreaAndTaxonAreaContracts_MatchServerProperties()
+    public void ExportJobInfo_ProcessingTimeIsTheDifferenceBetweenStartAndEnd()
     {
-        using var assertionScope = new AssertionScope();
+        var job = new ExportJobInfoDto
+        {
+            ProcessStartDate = new DateTime(2026, 1, 1, 10, 0, 0, DateTimeKind.Utc),
+            ProcessEndDate = new DateTime(2026, 1, 1, 10, 5, 0, DateTimeKind.Utc)
+        };
 
-        AssertPropertiesMatch(
-            typeof(TaxonAreaAggregationDto),
-            typeof(SOS.Lib.Models.Search.Result.TaxonAreaAggregation));
-        AssertPropertiesMatch(
-            typeof(AreaWithGeometryDto),
-            typeof(SOS.Lib.Dtos.AreaWithGeometryDto));
-        AssertPropertiesMatch(
-            typeof(SOS.Api.Contracts.Observations.Responses.AdaptiveSearchResultDto<SOS.Api.Contracts.Observations.Responses.Observation>),
-            typeof(SOS.Lib.Dtos.AdaptiveSearchResultDto<SOS.Lib.Models.Processed.Observation.Observation>));
-        AssertEnumValuesMatch(
-            typeof(SOS.Api.Contracts.Areas.Responses.AreaTypeDto),
-            typeof(SOS.Lib.Dtos.Enum.AreaTypeDto));
+        job.ProcessingTime.Should().Be(TimeSpan.FromMinutes(5));
+
+    }
+
+    [Theory]
+    [InlineData(typeof(SOS.Api.Contracts.Observations.Responses.Cloudiness), typeof(SOS.Lib.Enums.Weather.Cloudiness))]
+    [InlineData(typeof(SOS.Api.Contracts.Observations.Responses.CompassDirection), typeof(SOS.Lib.Enums.CompassDirection))]
+    [InlineData(typeof(SOS.Api.Contracts.Observations.Responses.Precipitation), typeof(SOS.Lib.Enums.Weather.Precipitation))]
+    [InlineData(typeof(SOS.Api.Contracts.Observations.Responses.SnowCover), typeof(SOS.Lib.Enums.Weather.SnowCover))]
+    [InlineData(typeof(SOS.Api.Contracts.Observations.Responses.Unit), typeof(SOS.Lib.Enums.Unit))]
+    [InlineData(typeof(SOS.Api.Contracts.Observations.Responses.Visibility), typeof(SOS.Lib.Enums.Weather.Visibility))]
+    [InlineData(typeof(SOS.Api.Contracts.Observations.Responses.WindStrength), typeof(SOS.Lib.Enums.Weather.WindStrength))]
+    public void ObservationEnums_KeepServerMemberNamesAndLabels(Type contractType, Type serverType)
+    {
+        // The public enums already have different numeric values for some members.
+        // Keep those values stable while restoring the shared descriptive labels.
+        var contractFields = contractType.GetFields(BindingFlags.Public | BindingFlags.Static);
+        var serverFields = serverType.GetFields(BindingFlags.Public | BindingFlags.Static);
+
+        contractFields.Select(field => field.Name).Should().Equal(serverFields.Select(field => field.Name));
+        foreach (var contractField in contractFields)
+        {
+            var serverField = serverType.GetField(contractField.Name)!;
+            contractField.GetCustomAttribute<EnumMemberAttribute>()?.Value.Should().Be(
+                serverField.GetCustomAttribute<EnumMemberAttribute>()?.Value);
+        }
     }
 
     [Fact]
-    public void ObservationDateFilters_UseDateTimeOffsetWireTypes()
+    public void DataStewardshipEnumMemberLabels_DoNotChangeExistingSystemTextJsonNames()
     {
-        typeof(DateFilterDto).GetProperty(nameof(DateFilterDto.StartDate))!.PropertyType
-            .Should().Be(typeof(DateTimeOffset?));
-        typeof(DateFilterDto).GetProperty(nameof(DateFilterDto.EndDate))!.PropertyType
-            .Should().Be(typeof(DateTimeOffset?));
-        typeof(ExtendedFilterDto).GetProperty(nameof(ExtendedFilterDto.ReportedDateFrom))!.PropertyType
-            .Should().Be(typeof(DateTimeOffset?));
-        typeof(ExtendedFilterDto).GetProperty(nameof(ExtendedFilterDto.ReportedDateTo))!.PropertyType
-            .Should().Be(typeof(DateTimeOffset?));
-        typeof(ModifiedDateFilterDto).GetProperty(nameof(ModifiedDateFilterDto.From))!.PropertyType
-            .Should().Be(typeof(DateTimeOffset?));
-        typeof(ModifiedDateFilterDto).GetProperty(nameof(ModifiedDateFilterDto.To))!.PropertyType
-            .Should().Be(typeof(DateTimeOffset?));
+        var options = new JsonSerializerOptions { Converters = { new JsonStringEnumConverter() } };
+
+        JsonSerializer.Serialize(DsProgrammeArea.KustOchHav, options)
+            .Should().Be("\"KustOchHav\"");
     }
 
     [Fact]
@@ -179,6 +159,46 @@ public class SearchFilterContractTests
             .Should().Be("2026-01-01T00:00:00+01:00");
         document.RootElement.GetProperty("EndDate").GetString()
             .Should().Be("2026-07-01T00:00:00+02:00");
+    }
+
+    [Fact]
+    public void TaxonAggregationItem_PreservesExistingDateTimeJsonRepresentation()
+    {
+        var json = JsonSerializer.Serialize(new TaxonAggregationItemDto
+        {
+            FirstSighting = new DateTime(2026, 4, 5, 6, 7, 8, DateTimeKind.Unspecified),
+            LastSighting = new DateTime(2026, 4, 6, 7, 8, 9, DateTimeKind.Unspecified)
+        });
+
+        using var document = JsonDocument.Parse(json);
+        document.RootElement.GetProperty("FirstSighting").GetString()
+            .Should().Be("2026-04-05T06:07:08");
+        document.RootElement.GetProperty("LastSighting").GetString()
+            .Should().Be("2026-04-06T07:08:09");
+    }
+
+    [Fact]
+    public void ProcessInfo_UsesThePublicContractWithoutExposingHealthCheckFields()
+    {
+        var json = JsonSerializer.Serialize(new ProcessInfoDto
+        {
+            Start = new DateTimeOffset(2026, 4, 5, 6, 7, 8, TimeSpan.FromHours(2)),
+            End = new DateTimeOffset(2026, 4, 5, 7, 8, 9, TimeSpan.FromHours(2)),
+            ProvidersInfo =
+            [
+                new ProviderInfoDto
+                {
+                    DataProviderIdentifier = "provider",
+                    ProcessFailCount = 3
+                }
+            ]
+        });
+
+        using var document = JsonDocument.Parse(json);
+        document.RootElement.GetProperty("Start").GetString()
+            .Should().Be("2026-04-05T06:07:08+02:00");
+        document.RootElement.GetProperty("ProvidersInfo")[0]
+            .TryGetProperty("ProcessFailCount", out _).Should().BeFalse();
     }
 
     private static void AssertPropertiesMatch(
@@ -271,15 +291,4 @@ public class SearchFilterContractTests
         return $"object<{type.Name}>";
     }
 
-    private static void AssertEnumValuesMatch(Type contractType, Type serverType)
-    {
-        var contractValues = Enum.GetNames(contractType)
-            .ToDictionary(name => name, name => Convert.ToInt64(Enum.Parse(contractType, name)));
-        var serverValues = Enum.GetNames(serverType)
-            .ToDictionary(name => name, name => Convert.ToInt64(Enum.Parse(serverType, name)));
-
-        contractValues.Should().Equal(
-            serverValues,
-            $"{contractType.Name} must use the same names and numeric values as the server contract");
-    }
 }

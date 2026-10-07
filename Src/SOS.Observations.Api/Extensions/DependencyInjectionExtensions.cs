@@ -1,4 +1,6 @@
-﻿using Elastic.Clients.Elasticsearch.Cluster;
+﻿using SOS.Api.Contracts.Observations.Requests;
+using SOS.Api.Contracts.Common.Responses;
+using Elastic.Clients.Elasticsearch.Cluster;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -47,7 +49,6 @@ using SOS.Observations.Api.Services.AdaptiveSearch;
 using SOS.Observations.Api.Services.AdaptiveSearchLocations;
 using SOS.Observations.Api.Services.Interfaces;
 using SOS.Observations.Api.Services;
-using SOS.Lib.Dtos;
 using SOS.Shared.Api.Utilities.Objects;
 using SOS.Shared.Api.Utilities.Objects.Interfaces;
 using SOS.Shared.Api.Validators;
@@ -56,6 +57,7 @@ using System.Collections.Concurrent;
 using ZiggyCreatures.Caching.Fusion;
 using DataProviderManager = SOS.Observations.Api.Managers.DataProviderManager;
 using IDataProviderManager = SOS.Observations.Api.Managers.Interfaces.IDataProviderManager;
+using SOS.Api.Contracts.Aggregations.Responses;
 
 namespace SOS.Observations.Api.Extensions;
 

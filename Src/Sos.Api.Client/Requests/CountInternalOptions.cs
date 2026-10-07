@@ -1,14 +1,8 @@
 
 namespace SOS.Api.Client.Requests;
 /// <summary>Options for an internal observation count request.</summary>
-public sealed class CountInternalOptions
+public sealed class CountInternalOptions : SosRoleRequestOptions
 {
-    /// <summary>The explicit authorization role identifier.</summary>
-    public int? RoleId { get; set; }
-
-    /// <summary>The explicit calling application identifier.</summary>
-    public string? AuthorizationApplicationIdentifier { get; set; }
-
     /// <summary>Controls whether the API validates the search filter.</summary>
     public bool ValidateSearchFilter { get; set; }
 

@@ -16,7 +16,7 @@ public interface ISosObservationAggregationsClient
     /// <param name="taxonIds">The IDs of the taxa to aggregate.</param>
     /// <param name="cancellationToken">A token to cancel the operation.</param>
     /// <returns>A paged result of taxon sum aggregation items.</returns>
-    Task<IEnumerable<TaxonSumAggregationItemDto>?> CachedCountInternalAsync(
+    Task<IEnumerable<TaxonSumAggregationItem>?> CachedCountInternalAsync(
         IEnumerable<int> taxonIds,
         CancellationToken cancellationToken = default);
 
@@ -75,7 +75,7 @@ public interface ISosObservationAggregationsClient
     /// <param name="options">Options for the aggregation.</param>
     /// <param name="cancellationToken">A token to cancel the operation.</param>
     /// <returns>A paged result of taxon sum aggregation items.</returns>
-    Task<PagedResultDto<TaxonSumAggregationItemDto>?> TaxonSumAggregationInternalAsync(
+    Task<PagedResultDto<TaxonSumAggregationItem>?> TaxonSumAggregationInternalAsync(
         TaxonFilterDto filter,
         TaxonSumAggregationInternalOptions? options = null,
         CancellationToken cancellationToken = default);
@@ -87,19 +87,19 @@ public interface ISosObservationAggregationsClient
     /// <param name="options">Options for the aggregation.</param>
     /// <param name="cancellationToken">A token to cancel the operation.</param>
     /// <returns>A paged result of taxon sum aggregation items.</returns>
-    Task<PagedResultDto<TaxonSumAggregationItemDto>?> TaxonSumAggregationInternalJsonAsync(
+    Task<PagedResultDto<TaxonSumAggregationItem>?> TaxonSumAggregationInternalJsonAsync(
         string filterJson,
         TaxonSumAggregationInternalOptions? options = null,
         CancellationToken cancellationToken = default);
 
     /// <summary>Aggregates observations by taxon and area.</summary>
-    Task<IReadOnlyDictionary<int, TaxonAreaAggregationDto>> TaxonAreaAggregationInternalAsync(
+    Task<IReadOnlyDictionary<int, TaxonAreaAggregation>> TaxonAreaAggregationInternalAsync(
         SearchFilterAggregationInternalDto filter,
         TaxonAreaAggregationInternalOptions? options = null,
         CancellationToken cancellationToken = default);
 
     /// <summary>Aggregates a JSON-encoded observation filter by taxon and area.</summary>
-    Task<IReadOnlyDictionary<int, TaxonAreaAggregationDto>> TaxonAreaAggregationInternalJsonAsync(
+    Task<IReadOnlyDictionary<int, TaxonAreaAggregation>> TaxonAreaAggregationInternalJsonAsync(
         string filterJson,
         TaxonAreaAggregationInternalOptions? options = null,
         CancellationToken cancellationToken = default);

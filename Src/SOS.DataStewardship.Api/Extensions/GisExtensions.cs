@@ -1,4 +1,5 @@
-﻿using SOS.DataStewardship.Api.Contracts.Enums;
+﻿using SOS.Api.Contracts.Common.Geo;
+using SOS.DataStewardship.Api.Contracts.Enums;
 
 namespace SOS.DataStewardship.Api.Extensions;
 

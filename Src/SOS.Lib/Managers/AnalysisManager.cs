@@ -1,5 +1,6 @@
-﻿using AgileObjects.AgileMapper.Extensions;
+﻿using SOS.Api.Contracts.Common.Geo;
 using Hangfire;
+using SOS.Api.Contracts.Aggregations.Requests;
 using Microsoft.Extensions.Logging;
 using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
@@ -27,8 +28,6 @@ using System.Text.Unicode;
 using SOS.Lib.Models.Search.Result;
 using Elastic.Clients.Elasticsearch;
 using System.Collections.ObjectModel;
-using SOS.Lib.Dtos.Filter;
-using SOS.Lib.Extensions.Dto;
 
 namespace SOS.Lib.Managers;
 
@@ -269,7 +268,6 @@ public class AnalysisManager : IAnalysisManager
             AreaTypeAggregate.CountryRegion => "location.countryRegion.featureId",
             AreaTypeAggregate.County => "location.county.featureId",
             AreaTypeAggregate.Municipality => "location.municipality.featureId",
-           // AreaTypeAggregate.Parish => "location.parish.featureId",
             _ => "location.province.featureId"
         };
 
@@ -599,9 +597,11 @@ public class AnalysisManager : IAnalysisManager
             ));
 
             // Add aoo features to collection
-            eooGridCellFeaturesMetric
-                .Where(f => long.Parse(f.Attributes["observationsCount"]?.ToString() ?? "0") > 0)
-                    .ForEach(f => featureCollection.Add(f!));
+            foreach (var feature in eooGridCellFeaturesMetric
+                .Where(f => long.Parse(f.Attributes["observationsCount"]?.ToString() ?? "0") > 0))
+            {
+                featureCollection.Add(feature!);
+            }
 
             // Make sure all geometries is in requested coordinate system
             foreach (var feature in featureCollection.ToList())
@@ -637,24 +637,16 @@ public class AnalysisManager : IAnalysisManager
     }
 
     /// <inheritdoc />
-    public async Task<long> GetMatchCountAsync(int? userId, int? roleId, string authorizationApplicationIdentifier, SearchFilterBaseDto searchFilter, Dtos.Enum.ProtectionFilterDto protectionFilter)
-    {
-        var filter = searchFilter.ToSearchFilter(userId ?? 0, protectionFilter, "sv-SE");
-        return await GetMatchCountAsync(roleId, authorizationApplicationIdentifier, filter);
-    }
-
-    /// <inheritdoc />
     public async Task<long> GetMatchCountAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilterBase filter)
     {
         await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
         return await _processedObservationRepository.GetMatchCountAsync(filter);
     }
 
-    public async Task<int> GetNumberOfTaxaInFilterAsync(SearchFilterBaseDto filter)
+    public async Task<int> GetNumberOfTaxaInFilterAsync(SearchFilterBase filter)
     {
-        var searchFilter = filter.ToSearchFilter(0, Dtos.Enum.ProtectionFilterDto.Public, "sv-SE");
-        await _filterManager.PrepareFilterAsync(null, null, searchFilter);
-        return searchFilter?.Taxa?.Ids != null ? searchFilter.Taxa.Ids.Count() : 0;
+        await _filterManager.PrepareFilterAsync(null, null, filter);
+        return filter.Taxa?.Ids?.Count() ?? 0;
     }
 
     public async Task<FileExportResult> CreateAooEooExportAsync(

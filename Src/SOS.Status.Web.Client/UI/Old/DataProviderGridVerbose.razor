@@ -1,6 +1,6 @@
 @using SOS.Status.Web.Client.Dtos
 @using SOS.Status.Web.Client.Helpers
-<MudDataGrid Items="@ProcessSummary?.DataProviderStatuses" T="DataProviderStatusDto" Hover="true" Bordered="false" Striped="true" Dense="true" ColumnResizeMode="ResizeMode.Column">
+<MudDataGrid Items="@ProcessSummary?.DataProviderStatuses" T="DataProviderStatusViewModel" Hover="true" Bordered="false" Striped="true" Dense="true" ColumnResizeMode="ResizeMode.Column">
     <Columns>
         <PropertyColumn Property="x => x.Id" Title="Id" Sortable="@Sortable" />
         <PropertyColumn Property="x => x.Identifier" Title="Dataset" Sortable="@Sortable" />

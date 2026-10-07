@@ -1,7 +1,7 @@
-﻿using SOS.Lib.Enums;
+﻿using SOS.Api.Contracts.Common.Geo;
+using SOS.Api.Contracts.Common.Responses;
 using SOS.Lib.Models.Search.Filters;
-using SOS.Lib.Dtos;
-using SOS.Lib.Dtos.DataStewardship;
+using SOS.Api.Contracts.DataStewardship.Responses;
 using System.Threading.Tasks;
 
 namespace SOS.Observations.Api.Managers.Interfaces;

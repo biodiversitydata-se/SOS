@@ -1,10 +1,11 @@
-﻿using SOS.Lib.Models.Processed.Observation;
-using SOS.Lib.Dtos.Vocabulary;
+﻿using SOS.Api.Contracts.Lookups.Responses;
+using SOS.Lib.Models.Processed.Observation;
+using SOS.Api.Contracts.DataStewardship.Responses;
 
 namespace SOS.Lib.Extensions.Dto;
 
 /// <summary>
-/// Extension methods for project
+/// Maps project models to API responses.
 /// </summary>
 public static class ProjectExtensions
 {
@@ -26,8 +27,8 @@ public static class ProjectExtensions
             {
                 Id = projectInfo.Id,
                 Name = projectInfo.Name,
-                StartDate = projectInfo.StartDate,
-                EndDate = projectInfo.EndDate,
+                StartDate = projectInfo.StartDate.ToUtcDateTimeOffset(),
+                EndDate = projectInfo.EndDate.ToUtcDateTimeOffset(),
                 Category = projectInfo.Category,
                 CategorySwedish = projectInfo.CategorySwedish,
                 Description = projectInfo.Description,
@@ -48,7 +49,21 @@ public static class ProjectExtensions
         /// <returns></returns>
         public IEnumerable<ProjectDto> ToProjectDtos()
         {
-            return projectInfos.Select(vocabulary => vocabulary.ToDto());
+            return projectInfos.Select(project => project.ToDto());
+        }
+    }
+
+    extension(SOS.Lib.Models.Processed.DataStewardship.Common.Project project)
+    {
+        public DsProjectDto ToDto()
+        {
+            if (project == null) return null;
+            return new DsProjectDto
+            {
+                ProjectCode = project.ProjectCode,
+                ProjectID = project.ProjectId,
+                ProjectType = project.ProjectType == null ? null : (DsProjectType)project.ProjectType
+            };
         }
     }
 }

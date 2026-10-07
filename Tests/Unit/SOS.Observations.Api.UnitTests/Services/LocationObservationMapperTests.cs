@@ -1,7 +1,6 @@
 using FluentAssertions;
-using SOS.Lib.Extensions;
+using SOS.Lib.Enums;
 using SOS.Observations.Api.Services.AdaptiveSearchLocations;
-using System.Text.Json;
 using System.Text.Json.Nodes;
 using Xunit;
 
@@ -30,19 +29,72 @@ public class LocationObservationMapperTests
         }
         """;
 
-    [Theory]
-    [InlineData(Projection)]
-    [InlineData("""{"Location":{"LocationId":"x","Type":0},"Sensitive":true,"Event":{"StartYear":2022}}""")]
-    [InlineData("""{"location":{"locationId":"x","decimalLatitude":null},"event":null,"taxon":{"id":12},"occurrence":{}}""")]
-    public void Map_PreservesProjectedValuesComparedWithPreviousConversion(string json)
+    [Fact]
+    public void Map_PreservesProjectedLocationStatusDatesAndTaxon()
     {
-        var record = JsonNode.Parse(json)!.AsObject();
-        var previous = new[] { record }.ToObservationsArray()[0];
-        var mapped = LocationObservationMapper.Map(record);
-        // The model initializes Created to the current time; it is not part of this projection.
-        mapped.Created = previous.Created;
+        var mapped = LocationObservationMapper.Map(JsonNode.Parse(Projection)!.AsObject());
 
-        JsonSerializer.Serialize(mapped).Should().Be(JsonSerializer.Serialize(previous));
+        mapped.IsGeneralized.Should().BeTrue();
+        mapped.Sensitive.Should().BeTrue();
+        mapped.Location.LocationId.Should().Be("locality-1");
+        mapped.Location.Type.Should().Be(LocationType.Point);
+        mapped.Location.DecimalLatitude.Should().Be(58.38);
+        mapped.Location.DecimalLongitude.Should().Be(13.85);
+        mapped.Location.CoordinateUncertaintyInMeters.Should().Be(100);
+        mapped.Location.Sweref99TmX.Should().Be(432100);
+        mapped.Location.Sweref99TmY.Should().Be(6472000);
+        mapped.Location.Locality.Should().Be("Testlokal");
+        mapped.Location.Municipality.FeatureId.Should().Be("1480");
+        mapped.Location.Municipality.Name.Should().Be("Göteborg");
+        mapped.Occurrence.OccurrenceId.Should().Be("observation-1");
+        mapped.Occurrence.IsPositiveObservation.Should().BeTrue();
+        mapped.Occurrence.IsNotRediscoveredObservation.Should().BeFalse();
+        mapped.Occurrence.IsNeverFoundObservation.Should().BeFalse();
+        mapped.Event.StartYear.Should().Be(2020);
+        mapped.Event.EndYear.Should().Be(2021);
+        mapped.Taxon.Id.Should().Be(42);
+        mapped.Taxon.Attributes.IsRedlisted.Should().BeTrue();
+        mapped.Taxon.Attributes.IsInvasiveInSweden.Should().BeTrue();
+        mapped.ArtportalenInternal.InvasiveSpeciesTreatment.Id.Should().Be(0);
+    }
+
+    [Theory]
+    [InlineData("""{"location":{"locationId":"x","type":0},"sensitive":true,"event":{"startYear":2022}}""")]
+    [InlineData("""{"Location":{"LocationId":"x","Type":0},"Sensitive":true,"Event":{"StartYear":2022}}""")]
+    public void Map_ReadsPropertyNamesCaseInsensitivelyAndPreservesMissingValues(string json)
+    {
+        var mapped = LocationObservationMapper.Map(JsonNode.Parse(json)!.AsObject());
+
+        mapped.Location.LocationId.Should().Be("x");
+        mapped.Location.Type.Should().Be((LocationType)0);
+        mapped.Location.DecimalLatitude.Should().BeNull();
+        mapped.Location.DecimalLongitude.Should().BeNull();
+        mapped.Sensitive.Should().BeTrue();
+        mapped.IsGeneralized.Should().BeFalse();
+        mapped.Event.StartYear.Should().Be(2022);
+        mapped.Event.EndYear.Should().BeNull();
+        mapped.Occurrence.Should().BeNull();
+        mapped.Taxon.Should().BeNull();
+        mapped.ArtportalenInternal.Should().BeNull();
+    }
+
+    [Fact]
+    public void Map_PreservesExplicitNullsAndDefaultsMissingNestedFields()
+    {
+        var record = JsonNode.Parse("""{"location":{"locationId":"x","decimalLatitude":null},"event":null,"taxon":{"id":12},"occurrence":{}}""")!.AsObject();
+
+        var mapped = LocationObservationMapper.Map(record);
+
+        mapped.Location.LocationId.Should().Be("x");
+        mapped.Location.DecimalLatitude.Should().BeNull();
+        mapped.Event.Should().BeNull();
+        mapped.Taxon.Id.Should().Be(12);
+        mapped.Taxon.Attributes.IsRedlisted.Should().BeFalse();
+        mapped.Taxon.Attributes.IsInvasiveInSweden.Should().BeFalse();
+        mapped.Occurrence.OccurrenceId.Should().BeNull();
+        mapped.Occurrence.IsPositiveObservation.Should().BeFalse();
+        mapped.Occurrence.IsNotRediscoveredObservation.Should().BeFalse();
+        mapped.Occurrence.IsNeverFoundObservation.Should().BeFalse();
     }
 
     [Fact]

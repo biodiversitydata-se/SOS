@@ -1,4 +1,4 @@
-using SOS.DataStewardship.Api.Contracts.Enums;
+using SOS.Api.Contracts.DataStewardship.Responses;
 using System.ComponentModel.DataAnnotations;
 
 namespace SOS.DataStewardship.Api.Contracts.Models;

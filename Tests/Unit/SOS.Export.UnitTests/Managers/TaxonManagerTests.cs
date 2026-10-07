@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using SOS.Api.Contracts.Observations.Requests;
+using FluentAssertions;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;

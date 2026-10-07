@@ -1,14 +1,15 @@
 ﻿using NetTopologySuite.Features;
 using NetTopologySuite.IO;
+using GeoJSON.Text.Geometry;
+using SOS.Api.Contracts.Areas.Responses;
+using SOS.Api.Contracts.Common.Geo;
+using SOS.Api.Contracts.Common.Responses;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
+using SOS.Lib.Extensions.Dto;
 using SOS.Lib.Helpers;
-using SOS.Lib.JsonConverters;
-using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Models.Shared;
-using SOS.Lib.Dtos;
-using SOS.Lib.Dtos.Enum;
 using SOS.Observations.Api.Managers.Interfaces;
 using System.IO.Compression;
 using System.Reflection;
@@ -43,7 +44,7 @@ public class AreaManager : IAreaManager
     }
 
     /// <inheritdoc />
-    private async Task<byte[]> GetZippedAreaAsync(Area area)
+    private async Task<byte[]> GetZippedAreaAsync(SOS.Lib.Models.Shared.Area area)
     {
         try
         {
@@ -53,17 +54,17 @@ public class AreaManager : IAreaManager
             }
 
             var geometry = await _areaCache.GetGeometryAsync(area.AreaType, area.FeatureId);
-            var externalArea = new AreaDto
+            var externalArea = new AreaWithGeometryDto
             {
-                AreaType = (AreaTypeDto)area.AreaType,                
+                AreaType = (AreaTypeDto)area.AreaType,
                 FeatureId = area.FeatureId,
-                BoundingBox = area.BoundingBox,
-                Geometry = geometry.ToGeoJson(),
+                BoundingBox = area.BoundingBox.GetCompleteBoundingBox(),
+                Geometry = geometry is null ? null : geometry.ToGeoJsonGeometry(),
                 Name = area.Name
             };
 
             var serializeOptions = new JsonSerializerOptions { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull };
-            serializeOptions.Converters.Add(new GeoJsonConverter(true)); // Länsstyrelsen fix. Expects capital letter.
+            serializeOptions.Converters.Add(new PascalCaseGeometryConverter()); // The zipped JSON format uses PascalCase geometry properties.
             serializeOptions.Converters.Add(new JsonStringEnumConverter());
 
             var areaString = JsonSerializer.Serialize(externalArea, serializeOptions);
@@ -75,6 +76,35 @@ public class AreaManager : IAreaManager
             return null;
         }
     }
+
+    private sealed class PascalCaseGeometryConverter : JsonConverter<IGeometryObject>
+    {
+        public override IGeometryObject Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) =>
+            throw new NotSupportedException("This converter is only used for area JSON exports.");
+
+        public override void Write(Utf8JsonWriter writer, IGeometryObject value, JsonSerializerOptions options)
+        {
+            var geometry = JsonSerializer.SerializeToElement(value, value.GetType());
+            writer.WriteStartObject();
+            foreach (var property in geometry.EnumerateObject().Where(property => property.Name != "type"))
+            {
+                writer.WritePropertyName(char.ToUpperInvariant(property.Name[0]) + property.Name[1..]);
+                property.Value.WriteTo(writer);
+            }
+
+            writer.WritePropertyName("Type");
+            geometry.GetProperty("type").WriteTo(writer);
+            writer.WriteEndObject();
+        }
+    }
+
+    private static AreaBaseDto ToAreaBaseDto(SOS.Lib.Models.Shared.Area area) => new()
+    {
+        AreaType = (AreaTypeDto)area.AreaType,
+        BoundingBox = area.BoundingBox.GetCompleteBoundingBox(),
+        FeatureId = area.FeatureId,
+        Name = area.Name
+    };
 
     private async Task<byte[]> GetZippedAreaAsJsonAsync(AreaTypeDto areaType, string featureId)
     {
@@ -94,7 +124,7 @@ public class AreaManager : IAreaManager
         return await GetZippedAreaWktAsync(area);
     }
 
-    private async Task<byte[]> GetZippedAreaGeoJsonAsync(Area area)
+    private async Task<byte[]> GetZippedAreaGeoJsonAsync(SOS.Lib.Models.Shared.Area area)
     {
         try
         {
@@ -123,7 +153,7 @@ public class AreaManager : IAreaManager
         }
     }
 
-    private async Task<byte[]> GetZippedAreaWktAsync(Area area)
+    private async Task<byte[]> GetZippedAreaWktAsync(SOS.Lib.Models.Shared.Area area)
     {
         try
         {
@@ -164,7 +194,7 @@ public class AreaManager : IAreaManager
         {
             var areas = await _areaCache.GetAreasAsync(areaKeys.Select(k => ((AreaType)k.Item1, k.Item2)));
 
-            return areas?.Select(a => new AreaBaseDto { AreaType = (AreaTypeDto)a.AreaType, FeatureId = a.FeatureId, Name = a.Name, BoundingBox = a.BoundingBox });
+            return areas?.Select(ToAreaBaseDto);
         }
         catch (Exception e)
         {
@@ -174,22 +204,16 @@ public class AreaManager : IAreaManager
     }
 
     /// <inheritdoc />
-    public async Task<PagedResult<AreaBaseDto>> GetAreasAsync(IEnumerable<AreaTypeDto> areaTypes,
+    public async Task<PagedResultDto<AreaBaseDto>> GetAreasAsync(IEnumerable<AreaTypeDto> areaTypes,
         string searchString, int skip, int take)
     {
         try
         {
             var result = await _areaCache.GetAreasAsync(areaTypes?.Select(at => (AreaType)at), searchString, skip, take);
 
-            return new PagedResult<AreaBaseDto>
+            return new PagedResultDto<AreaBaseDto>
             {
-                Records = result.Records.Select(r => new AreaBaseDto
-                {
-                    AreaType = (AreaTypeDto)r.AreaType,
-                    BoundingBox = r.BoundingBox,
-                    FeatureId = r.FeatureId,
-                    Name = r.Name
-                }),
+                Records = result.Records?.Select(ToAreaBaseDto).ToList() ?? [],
                 Skip = result.Skip,
                 Take = result.Take,
                 TotalCount = result.TotalCount
@@ -209,13 +233,7 @@ public class AreaManager : IAreaManager
         {
             var result = await _areaCache.GetAsync((AreaType)areaType, featureId);
 
-            return result == null ? null : new AreaBaseDto
-            {
-                AreaType = (AreaTypeDto)result.AreaType,
-                BoundingBox = result.BoundingBox,
-                FeatureId = result.FeatureId,
-                Name = result.Name
-            };
+            return result is null ? null : ToAreaBaseDto(result);
         }
         catch (Exception e)
         {

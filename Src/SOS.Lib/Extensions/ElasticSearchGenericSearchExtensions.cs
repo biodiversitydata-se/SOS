@@ -1,4 +1,5 @@
-﻿using MongoDB.Driver;
+﻿using SOS.Api.Contracts.Common.Geo;
+using MongoDB.Driver;
 using Elastic.Clients.Elasticsearch;
 using Elastic.Clients.Elasticsearch.QueryDsl;
 using SOS.Lib.Models.Gis;
@@ -223,7 +224,7 @@ public static class ElasticSearchGenericSearchExtensions
         /// <param name="boundingBox"></param>
         public void TryAddBoundingBoxCriteria(
             string field,
-            LatLonBoundingBox boundingBox)
+            LatLonBoundingBoxDto boundingBox)
         {
             if (boundingBox?.BottomRight != null || boundingBox?.TopLeft != null)
             {

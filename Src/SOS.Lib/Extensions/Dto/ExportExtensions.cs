@@ -1,5 +1,6 @@
-﻿using SOS.Lib.Models.Export;
-using SOS.Lib.Dtos.Export;
+﻿using SOS.Api.Contracts.Observations.Requests;
+using SOS.Lib.Models.Export;
+using SOS.Api.Contracts.Exports.Responses;
 
 namespace SOS.Lib.Extensions.Dto;
 

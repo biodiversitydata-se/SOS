@@ -2,8 +2,6 @@
 using Microsoft.Extensions.Logging.Abstractions;
 using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using SOS.Harvest.Managers;
 using SOS.Harvest.Processors.iNaturalist;
 using SOS.Lib.Configuration.Process;
@@ -14,6 +12,7 @@ using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Models.Verbatim.INaturalist.Service;
+using System.Text.Json;
 using Xunit;
 using Location = SOS.Lib.Models.Processed.Observation.Location;
 using SharedArea = SOS.Lib.Models.Shared.Area;
@@ -25,13 +24,13 @@ public class iNaturalistObservationFactoryTests
     private const string ObscuredVerbatimObservationJson = """
         {
           "_id": 813598,
-          "ObservationId": "305227623",
+          "ObservationId": 305227623,
           "Annotations": [
             {
               "Concatenated_attr_val": "22|25",
               "Controlled_attribute_id": 22,
               "Controlled_value_id": 25,
-              "UserId": 3354081,
+              "user_id": 3354081,
               "User": {
                 "_id": 3354081,
                 "Suspended": false,
@@ -45,11 +44,7 @@ public class iNaturalistObservationFactoryTests
           "Identifications": [
             {
               "_id": 679449610,
-              "Created_at": {
-                "DateTime": "2025-08-10T13:19:57.000Z",
-                "Ticks": "638904359970000000",
-                "Offset": 120
-              },
+              "Created_at": "2025-08-10T13:19:57.000Z",
               "Current": true,
               "Taxon": {
                 "_id": 42048,
@@ -86,11 +81,7 @@ public class iNaturalistObservationFactoryTests
             },
             {
               "_id": 679463558,
-              "Created_at": {
-                "DateTime": "2025-08-10T13:51:39.000Z",
-                "Ticks": "638904378990000000",
-                "Offset": 120
-              },
+              "Created_at": "2025-08-10T13:51:39.000Z",
               "Current": true,
               "Taxon": {
                 "_id": 42048,
@@ -126,23 +117,15 @@ public class iNaturalistObservationFactoryTests
               }
             }
           ],
-          "PositionalAccuracy": 962,
-          "PublicPositionalAccuracy": 24879,
+          "positional_accuracy": 962,
+          "public_positional_accuracy": 24879,
           "Cached_votes_total": 0,
           "Captive": false,
           "Comments": [],
           "Comments_count": 0,
-          "Created_at": {
-            "DateTime": "2025-08-10T13:19:57.000Z",
-            "Ticks": "638904359970000000",
-            "Offset": 120
-          },
+          "Created_at": "2025-08-10T13:19:57.000Z",
           "Created_at_details": {
-            "Date": {
-              "DateTime": "2025-08-09T22:00:00.000Z",
-              "Ticks": "638903808000000000",
-              "Offset": 120
-            },
+            "Date": "2025-08-09T22:00:00.000Z",
             "Day": 10,
             "Hour": 15,
             "Month": 8,
@@ -169,17 +152,9 @@ public class iNaturalistObservationFactoryTests
           "Non_owner_ids": [
             {
               "_id": 679463558,
-              "Created_at": {
-                "DateTime": "2025-08-10T13:51:39.000Z",
-                "Ticks": "638904378990000000",
-                "Offset": 120
-              },
+              "Created_at": "2025-08-10T13:51:39.000Z",
               "Created_at_details": {
-                "Date": {
-                  "DateTime": "2025-08-09T22:00:00.000Z",
-                  "Ticks": "638903808000000000",
-                  "Offset": 120
-                },
+                "Date": "2025-08-09T22:00:00.000Z",
                 "Day": 10,
                 "Hour": 15,
                 "Month": 8,
@@ -199,17 +174,9 @@ public class iNaturalistObservationFactoryTests
           "Num_identification_agreements": 1,
           "Num_identification_disagreements": 0,
           "Obscured": true,
-          "Observed_on": {
-            "DateTime": "2025-08-09T22:00:00.000Z",
-            "Ticks": "638903808000000000",
-            "Offset": 120
-          },
+          "Observed_on": "2025-08-09T22:00:00.000Z",
           "Observed_on_details": {
-            "Date": {
-              "DateTime": "2025-08-09T22:00:00.000Z",
-              "Ticks": "638903808000000000",
-              "Offset": 120
-            },
+            "Date": "2025-08-09T22:00:00.000Z",
             "Day": 10,
             "Hour": 15,
             "Month": 8,
@@ -282,17 +249,9 @@ public class iNaturalistObservationFactoryTests
             "Native": true,
             "Threatened": false
           },
-          "Time_observed_at": {
-            "DateTime": "2025-08-10T13:19:38.000Z",
-            "Ticks": "638904359780000000",
-            "Offset": 120
-          },
+          "Time_observed_at": "2025-08-10T13:19:38.000Z",
           "Time_zone_offset": "+01:00",
-          "Updated_at": {
-            "DateTime": "2025-08-11T09:33:38.000Z",
-            "Ticks": "638905088180000000",
-            "Offset": 120
-          },
+          "Updated_at": "2025-08-11T09:33:38.000Z",
           "Uri": "https://www.inaturalist.org/observations/305227623",
           "User": {
             "_id": 965267,
@@ -304,6 +263,21 @@ public class iNaturalistObservationFactoryTests
           }
         }
         """;
+
+    [Fact]
+    public void DeserializeObservation_PreservesAccuracyCoordinatesAndDates()
+    {
+        var observation = DeserializeObservation(ObscuredVerbatimObservationJson);
+
+        Assert.Equal(305227623L, observation.ObservationId);
+        Assert.Equal(962, observation.PositionalAccuracy);
+        Assert.Equal(24879, observation.PublicPositionalAccuracy);
+        Assert.Equal(new[] { 16.1507526952, 59.9308152356 }, observation.Geojson.Coordinates);
+        Assert.Equal(new DateTimeOffset(2025, 8, 10, 13, 19, 57, TimeSpan.Zero), observation.Created_at);
+        Assert.Equal(TimeSpan.Zero, observation.Created_at!.Value.Offset);
+        Assert.Equal(new DateTimeOffset(2025, 8, 9, 22, 0, 0, TimeSpan.Zero), observation.Observed_on_details.Date);
+        Assert.Equal(new DateTimeOffset(2025, 8, 10, 13, 51, 39, TimeSpan.Zero), observation.Identifications.Last().Created_at);
+    }
 
     [Fact]
     public void CreateProcessedObservation_Should_Process_Obscured_iNaturalist_Observation()
@@ -461,39 +435,8 @@ public class iNaturalistObservationFactoryTests
 
     private static iNaturalistVerbatimObservation DeserializeObservation(string json)
     {
-        var token = JToken.Parse(json);
-        NormalizeDateTokens(token);
-        return JsonConvert.DeserializeObject<iNaturalistVerbatimObservation>(token.ToString())!;
-    }
-
-    private static void NormalizeDateTokens(JToken token)
-    {
-        if (token is JObject obj)
-        {
-            foreach (var property in obj.Properties().ToList())
-            {
-                if (property.Value is JObject dateObject &&
-                    dateObject.TryGetValue("DateTime", StringComparison.Ordinal, out var dateTimeToken) &&
-                    dateObject.TryGetValue("Ticks", StringComparison.Ordinal, out _) &&
-                    dateObject.TryGetValue("Offset", StringComparison.Ordinal, out _))
-                {
-                    property.Value = dateTimeToken.Value<string>();
-                    continue;
-                }
-
-                NormalizeDateTokens(property.Value);
-            }
-
-            return;
-        }
-
-        if (token is JArray array)
-        {
-            foreach (var item in array)
-            {
-                NormalizeDateTokens(item);
-            }
-        }
+        return JsonSerializer.Deserialize<iNaturalistVerbatimObservation>(json,
+            new JsonSerializerOptions { PropertyNameCaseInsensitive = true })!;
     }
 
     private sealed class NoOpAreaHelper : IAreaHelper

@@ -1,4 +1,5 @@
-﻿using Elastic.Clients.Elasticsearch;
+﻿using SOS.Api.Contracts.Common.Geo;
+using Elastic.Clients.Elasticsearch;
 using SOS.Lib.Models.Gis;
 using System.Collections.Generic;
 
@@ -17,7 +18,7 @@ public class GeoGridMetricResult
     /// <summary>
     /// Input bounding box
     /// </summary>
-    public LatLonBoundingBox BoundingBox { get; set; }
+    public LatLonBoundingBoxDto BoundingBox { get; set; }
 
     /// <summary>
     /// Grid cell size in meters

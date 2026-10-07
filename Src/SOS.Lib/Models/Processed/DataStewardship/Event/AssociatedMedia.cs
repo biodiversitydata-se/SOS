@@ -1,4 +1,4 @@
-﻿using SOS.Lib.Models.Processed.DataStewardship.Enums;
+﻿using SOS.Api.Contracts.DataStewardship.Responses;
 using System.ComponentModel.DataAnnotations;
 
 namespace SOS.Lib.Models.Processed.DataStewardship.Event;

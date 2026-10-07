@@ -1,6 +1,6 @@
-﻿using NetTopologySuite.Geometries;
+﻿﻿using NetTopologySuite.Geometries;
 using SOS.Lib.Models.Search.Filters;
-using SOS.Lib.Models.Search.Result;
+using SOS.Api.Contracts.Locations.Responses;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -34,6 +34,6 @@ public interface IProcessedLocationRepository : IProcessRepositoryBase<Observati
     /// <param name="skip"></param>
     /// <param name="take"></param>
     /// <returns></returns>
-    Task<IEnumerable<LocationSearchResult>> SearchAsync(SearchFilter filter, int skip,
+    Task<IEnumerable<LocationSearchResultDto>> SearchAsync(SearchFilter filter, int skip,
         int take);
 }

@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using SOS.Lib.Configuration.Shared;
-using SOS.Lib.Enums;
+using SOS.Api.Contracts.Observations.Requests;
 using SOS.Lib.Models.DataCite;
 using SOS.Lib.Services.Interfaces;
 using System;

@@ -12,6 +12,7 @@ public class SearchFilterInternalDto : SearchFilterInternalBaseDto
 
     /// <summary>
     /// The fields and extended data included in each observation response.
+    /// When omitted, the Minimum field set is used.
     /// </summary>
     public OutputFilterExtendedDto? Output { get; set; }
 }

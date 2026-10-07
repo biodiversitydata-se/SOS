@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using SOS.Api.Contracts.Common.Geo;
+using FluentAssertions;
 using SOS.Lib.Gis;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Processed.Observation;
@@ -23,7 +24,7 @@ public class Sweref99TmFastGreedyLocationClustererTests : LocationClustererAlgor
     {
         // Arrange
         var observations = CreateCloseCentroidMergeObservations();
-        var boundingBox = LatLonBoundingBox.Create(17.99, 59.01, 18.01, 58.99);
+        var boundingBox = LatLonBoundingBoxDto.Create(17.99, 59.01, 18.01, 58.99);
 
         // Act
         var result = new Sweref99TmFastGreedyLocationClusterer(1, 10)
@@ -55,7 +56,7 @@ public class Sweref99TmFastGreedyLocationClustererTests : LocationClustererAlgor
             CreateObservation("sweref-location-0", "sweref-observation-0", 18.0, 500000),
             CreateObservation("sweref-location-1", "sweref-observation-1", 18.001, 510000)
         };
-        var boundingBox = LatLonBoundingBox.Create(17.99, 59.01, 18.01, 58.99);
+        var boundingBox = LatLonBoundingBoxDto.Create(17.99, 59.01, 18.01, 58.99);
 
         // Act
         var result = new Sweref99TmFastGreedyLocationClusterer(1, 10, 2)
@@ -77,7 +78,7 @@ public class Sweref99TmFastGreedyLocationClustererTests : LocationClustererAlgor
             CreateObservation("radius-location-2", "radius-observation-2", 18.002, 500200),
             CreateObservation("radius-location-3", "radius-observation-3", 18.003, 500300)
         };
-        var boundingBox = LatLonBoundingBox.Create(17.99, 59.01, 18.01, 58.99);
+        var boundingBox = LatLonBoundingBoxDto.Create(17.99, 59.01, 18.01, 58.99);
 
         // Act
         var aggressivelyClustered = new Sweref99TmFastGreedyLocationClusterer(1, 10)
@@ -97,7 +98,7 @@ public class Sweref99TmFastGreedyLocationClustererTests : LocationClustererAlgor
     {
         // Arrange - use Make16ObservationsCloseToEachOtherAndOneRemote which has 3 distinct taxa
         var observations = LocationClustererTestData.Make16ObservationsCloseToEachOtherAndOneRemote();
-        var boundingBox = LatLonBoundingBox.Create(5.0, 75.0, 35.0, 50.0);
+        var boundingBox = LatLonBoundingBoxDto.Create(5.0, 75.0, 35.0, 50.0);
 
         // Act
         var result = new Sweref99TmFastGreedyLocationClusterer(5, 10)
@@ -124,7 +125,7 @@ public class Sweref99TmFastGreedyLocationClustererTests : LocationClustererAlgor
                 },
                 $"same-sweref-observation-{index}"))
             .ToList();
-        var boundingBox = LatLonBoundingBox.Create(17.99, 59.01, 18.01, 58.99);
+        var boundingBox = LatLonBoundingBoxDto.Create(17.99, 59.01, 18.01, 58.99);
 
         // Act
         var result = new Sweref99TmFastGreedyLocationClusterer(1, 10)
@@ -141,7 +142,7 @@ public class Sweref99TmFastGreedyLocationClustererTests : LocationClustererAlgor
     {
         // Arrange
         var observations = LocationClustererTestData.MakeRandomObservations(300);
-        var boundingBox = LatLonBoundingBox.Create(5.0, 75.0, 35.0, 50.0);
+        var boundingBox = LatLonBoundingBoxDto.Create(5.0, 75.0, 35.0, 50.0);
 
         // Act
         var result = new Sweref99TmFastGreedyLocationClusterer(50, 100)

@@ -1,14 +1,8 @@
 
 namespace SOS.Api.Client.Requests;
 /// <summary>Options for geographic-grid aggregation.</summary>
-public sealed class GeoGridAggregationInternalOptions
+public sealed class GeoGridAggregationInternalOptions : SosRoleRequestOptions
 {
-    /// <summary>The explicit authorization role identifier.</summary>
-    public int? RoleId { get; set; }
-
-    /// <summary>The explicit calling application identifier.</summary>
-    public string? AuthorizationApplicationIdentifier { get; set; }
-
     /// <summary>The geographic grid zoom level.</summary>
     public int Zoom { get; set; } = 1;
 

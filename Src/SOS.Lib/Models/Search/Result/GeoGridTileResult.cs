@@ -1,6 +1,6 @@
-﻿using NetTopologySuite.Features;
+﻿using SOS.Api.Contracts.Common.Geo;
+using NetTopologySuite.Features;
 using NetTopologySuite.IO;
-using SOS.Lib.Enums;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Extensions;
 
@@ -8,12 +8,12 @@ namespace SOS.Lib.Models.Search.Result;
 
 public class GeoGridTileResult
 {
-    public LatLonBoundingBox BoundingBox { get; set; }
+    public LatLonBoundingBoxDto BoundingBox { get; set; }
     public int Zoom { get; set; }
     public int GridCellTileCount { get; set; }
     public IEnumerable<GridCellTile> GridCellTiles { get; set; }
 
-    public FeatureCollection GetFeatureCollection(CoordinateSys coordinateSystem = CoordinateSys.WGS84, LatLonBoundingBox? bbox = null, List<Feature> geoJsonGeographicAreas = null)
+    public FeatureCollection GetFeatureCollection(CoordinateSys coordinateSystem = CoordinateSys.WGS84, LatLonBoundingBoxDto? bbox = null, List<Feature> geoJsonGeographicAreas = null)
     {
         var featureCollection = new FeatureCollection();
         if (bbox != null)
@@ -42,7 +42,7 @@ public class GeoGridTileResult
         return featureCollection;
     }
 
-    public string GetFeatureCollectionGeoJson(CoordinateSys coordinateSystem = CoordinateSys.WGS84, LatLonBoundingBox? bbox = null, List<Feature> geoJsonGeographicAreas = null)
+    public string GetFeatureCollectionGeoJson(CoordinateSys coordinateSystem = CoordinateSys.WGS84, LatLonBoundingBoxDto? bbox = null, List<Feature> geoJsonGeographicAreas = null)
     {
         FeatureCollection featureCollection = GetFeatureCollection(coordinateSystem, bbox, geoJsonGeographicAreas);
         var geoJsonWriter = new GeoJsonWriter();

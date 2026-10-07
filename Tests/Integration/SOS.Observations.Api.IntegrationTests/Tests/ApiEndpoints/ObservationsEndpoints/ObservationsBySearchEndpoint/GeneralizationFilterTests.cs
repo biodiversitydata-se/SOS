@@ -1,9 +1,9 @@
-﻿using FizzWare.NBuilder;
+using SOS.Api.Contracts.Common.Geo;
+using SOS.Api.Contracts.Common.Responses;
+using SOS.Api.Contracts.Observations.Requests;
+using FizzWare.NBuilder;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Verbatim.Artportalen;
-using SOS.Lib.Dtos;
-using SOS.Lib.Dtos.Enum;
-using SOS.Lib.Dtos.Filter;
 using SOS.Observations.Api.IntegrationTests.Setup;
 using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
 using SOS.Observations.Api.IntegrationTests.Setup.Stubs;
@@ -24,33 +24,33 @@ public class GeneralizationFilterTests : TestBase
 
     private IList<ArtportalenObservationVerbatim> CreateTestData(int userId)
     {
-        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(28)
             .All().HaveValuesFromPredefinedObservations()
-            .TheFirst(11) // Observations that will be diffused in public index, and real coordinates in sensitive index.
+            .TheFirst(1) // Observations that will be diffused in public index, and real coordinates in sensitive index.
                 .IsDiffused(1000)
                 .With(o => o.ReportedByUserServiceUserId = userId)
                 .With(o => o.ProtectedBySystem = false)
-            .TheNext(14) // Diffused observations that will only be in sensitive index
+            .TheNext(2) // Diffused observations that will only be in sensitive index
                 .IsDiffused(1000)
                 .HaveTaxonSensitivityCategory(3)
                 .With(o => o.ReportedByUserServiceUserId = userId)
                 .With(o => o.ProtectedBySystem = true)
-            .TheNext(18) // Observations that will be diffused in public index, and real coordinates in sensitive index. The user doesn't have access to sensitive obs.
+            .TheNext(3) // Observations that will be diffused in public index, and real coordinates in sensitive index. The user doesn't have access to sensitive obs.
                 .IsDiffused(1000)
                 .With(o => o.ReportedByUserServiceUserId = userId + 1)
                 .With(o => o.ProtectedBySystem = false)
-            .TheNext(7) // Diffused observations that will only be in sensitive index. The user doesn't have access to sensitive obs.
+            .TheNext(4) // Diffused observations that will only be in sensitive index. The user doesn't have access to sensitive obs.
                 .IsDiffused(1000)
                 .HaveTaxonSensitivityCategory(3)
                 .With(o => o.ReportedByUserServiceUserId = userId + 1)
                 .With(o => o.ProtectedBySystem = true)
-            .TheNext(20) // Sensitive observations with user access
+            .TheNext(5) // Sensitive observations with user access
                 .HaveTaxonSensitivityCategory(3)
                 .With(o => o.ReportedByUserServiceUserId = userId)
-            .TheNext(9) // Sensitive observations without user access
+            .TheNext(6) // Sensitive observations without user access
                 .HaveTaxonSensitivityCategory(3)
                 .With(o => o.ReportedByUserServiceUserId = userId + 1)
-            .TheNext(21) // Public observations with no diffusion
+            .TheNext(7) // Public observations with no diffusion
                 .With(o => o.ProtectedBySystem = false)
                 .With(o => o.Site.DiffusionId = 0)
             .Build();
@@ -69,22 +69,22 @@ public class GeneralizationFilterTests : TestBase
         var processedObservations = await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);        
 
         // Assert - number of public and sensitive observations
-        int expectedNumberOfPublicObserations = 11 + 18 + 21;
-        int expectedNumberOfSensitiveObservations = 11 + 14 + 18 + 7 + 20 + 9;
+        int expectedNumberOfPublicObserations = 1 + 3 + 7;
+        int expectedNumberOfSensitiveObservations = 1 + 2 + 3 + 4 + 5 + 6;
         int numberOfPublicObservations = processedObservations.Count(m => !m.Sensitive);
         int numberOfSensitiveObservations = processedObservations.Count(m => m.Sensitive);
         numberOfPublicObservations.Should().Be(expectedNumberOfPublicObserations);
         numberOfSensitiveObservations.Should().Be(expectedNumberOfSensitiveObservations);
 
         // Assert - number of generalized observations.
-        int expectedNumberOfGeneralizedObservations = 11 + 18;
+        int expectedNumberOfGeneralizedObservations = 1 + 3;
         int numberOfGeneralizedObservations = processedObservations.Count(m => m.IsGeneralized);
         int numberOfPublicGeneralizedObservations = processedObservations.Count(m => m.IsGeneralized && !m.Sensitive);
         numberOfGeneralizedObservations.Should().Be(expectedNumberOfGeneralizedObservations);
         numberOfPublicGeneralizedObservations.Should().Be(expectedNumberOfGeneralizedObservations);
 
         // Assert - number of sensitve observations with generalized observation in other index.
-        int expectedNumberOfObservationWithGeneralizedObsInOtherIndex = 11 + 18;
+        int expectedNumberOfObservationWithGeneralizedObsInOtherIndex = 1 + 3;
         int numberOfObservationWithGeneralizedObsInOtherIndex = processedObservations.Count(m => m.HasGeneralizedObservationInOtherIndex);
         int numberOfSensitiveObservationWithGeneralizedObsInOtherIndex = processedObservations.Count(m => m.HasGeneralizedObservationInOtherIndex && m.Sensitive);
         numberOfObservationWithGeneralizedObsInOtherIndex.Should().Be(expectedNumberOfObservationWithGeneralizedObsInOtherIndex);
@@ -125,7 +125,7 @@ public class GeneralizationFilterTests : TestBase
         var searchFilter = new SearchFilterInternalDto
         {
             ProtectionFilter = ProtectionFilterDto.BothPublicAndSensitive,
-            Output = new OutputFilterExtendedDto { FieldSet = OutputFieldSet.AllWithValues }
+            Output = new OutputFilterExtendedDto { FieldSet = SOS.Api.Contracts.Observations.Requests.OutputFieldSet.AllWithValues }
         };
         var response = await apiClientWithAccessToUser.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
         var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);
@@ -253,7 +253,7 @@ public class GeneralizationFilterTests : TestBase
         var searchFilter = new SearchFilterInternalDto
         {
             ProtectionFilter = ProtectionFilterDto.BothPublicAndSensitive,
-            Output = new OutputFilterExtendedDto { FieldSet = OutputFieldSet.AllWithValues }
+            Output = new OutputFilterExtendedDto { FieldSet = SOS.Api.Contracts.Observations.Requests.OutputFieldSet.AllWithValues }
         };       
 
         // Act
@@ -284,11 +284,11 @@ public class GeneralizationFilterTests : TestBase
         var searchFilter = new SearchFilterInternalDto
         {
             ProtectionFilter = ProtectionFilterDto.Sensitive,
-            Output = new OutputFilterExtendedDto { FieldSet = Lib.Enums.OutputFieldSet.AllWithValues }
+            Output = new OutputFilterExtendedDto { FieldSet = SOS.Api.Contracts.Observations.Requests.OutputFieldSet.AllWithValues }
         };
         var response = await apiClientWithAccessToUser.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
-        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);        
-        result!.TotalCount.Should().Be(14 + 20);
+        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);
+        result!.TotalCount.Should().Be(2 + 5);
         var generalizedObservationsCount = result.Records.Count(m => m.IsGeneralized);
         generalizedObservationsCount.Should().Be(0);
 
@@ -296,7 +296,7 @@ public class GeneralizationFilterTests : TestBase
         searchFilter = new SearchFilterInternalDto
         {
             ProtectionFilter = ProtectionFilterDto.Sensitive,
-            Output = new OutputFilterExtendedDto { FieldSet = Lib.Enums.OutputFieldSet.AllWithValues },
+            Output = new OutputFilterExtendedDto { FieldSet = SOS.Api.Contracts.Observations.Requests.OutputFieldSet.AllWithValues },
             GeneralizationFilter = new GeneralizationFilterDto
             {
                 SensitiveGeneralizationFilter = SensitiveGeneralizationFilterDto.IncludeGeneralizedObservations
@@ -304,7 +304,7 @@ public class GeneralizationFilterTests : TestBase
         };
         response = await apiClientWithAccessToUser.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
         result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);
-        result!.TotalCount.Should().Be(11 + 14 + 20);
+        result!.TotalCount.Should().Be(1 + 2 + 5);
         generalizedObservationsCount = result.Records.Count(m => m.IsGeneralized);
         generalizedObservationsCount.Should().Be(0);
 
@@ -312,7 +312,7 @@ public class GeneralizationFilterTests : TestBase
         searchFilter = new SearchFilterInternalDto
         {
             ProtectionFilter = ProtectionFilterDto.Sensitive,
-            Output = new OutputFilterExtendedDto { FieldSet = Lib.Enums.OutputFieldSet.AllWithValues },
+            Output = new OutputFilterExtendedDto { FieldSet = SOS.Api.Contracts.Observations.Requests.OutputFieldSet.AllWithValues },
             GeneralizationFilter = new GeneralizationFilterDto
             {
                 SensitiveGeneralizationFilter = SensitiveGeneralizationFilterDto.OnlyGeneralizedObservations
@@ -320,7 +320,7 @@ public class GeneralizationFilterTests : TestBase
         };
         response = await apiClientWithAccessToUser.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
         result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);
-        result!.TotalCount.Should().Be(11);
+        result!.TotalCount.Should().Be(1);
         generalizedObservationsCount = result.Records.Count(m => m.IsGeneralized);
         generalizedObservationsCount.Should().Be(0);
 
@@ -332,7 +332,7 @@ public class GeneralizationFilterTests : TestBase
         searchFilter = new SearchFilterInternalDto
         {
             ProtectionFilter = ProtectionFilterDto.Sensitive,
-            Output = new OutputFilterExtendedDto { FieldSet = Lib.Enums.OutputFieldSet.AllWithValues },
+            Output = new OutputFilterExtendedDto { FieldSet = SOS.Api.Contracts.Observations.Requests.OutputFieldSet.AllWithValues },
             GeneralizationFilter = new GeneralizationFilterDto
             {
                 SensitiveGeneralizationFilter = SensitiveGeneralizationFilterDto.DontIncludeGeneralizedObservations
@@ -340,7 +340,7 @@ public class GeneralizationFilterTests : TestBase
         };
         response = await apiClientWithAccessToLevel3.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
         result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);
-        result!.TotalCount.Should().Be(14 + 7 + 20 + 9);
+        result!.TotalCount.Should().Be(2 + 4 + 5 + 6);
         generalizedObservationsCount = result.Records.Count(m => m.IsGeneralized);
         generalizedObservationsCount.Should().Be(0);
 
@@ -348,7 +348,7 @@ public class GeneralizationFilterTests : TestBase
         searchFilter = new SearchFilterInternalDto
         {
             ProtectionFilter = ProtectionFilterDto.Sensitive,
-            Output = new OutputFilterExtendedDto { FieldSet = Lib.Enums.OutputFieldSet.AllWithValues },
+            Output = new OutputFilterExtendedDto { FieldSet = SOS.Api.Contracts.Observations.Requests.OutputFieldSet.AllWithValues },
             GeneralizationFilter = new GeneralizationFilterDto
             {
                 SensitiveGeneralizationFilter = SensitiveGeneralizationFilterDto.IncludeGeneralizedObservations
@@ -356,7 +356,7 @@ public class GeneralizationFilterTests : TestBase
         };
         response = await apiClientWithAccessToLevel3.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
         result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);
-        result!.TotalCount.Should().Be(11 + 14 + 18 + 7 + 20 + 9);
+        result!.TotalCount.Should().Be(1 + 2 + 3 + 4 + 5 + 6);
         generalizedObservationsCount = result.Records.Count(m => m.IsGeneralized);
         generalizedObservationsCount.Should().Be(0);        
     }
@@ -375,15 +375,15 @@ public class GeneralizationFilterTests : TestBase
         var searchFilter = new SearchFilterInternalDto
         {
             ProtectionFilter = ProtectionFilterDto.Sensitive,
-            Output = new OutputFilterExtendedDto { FieldSet = Lib.Enums.OutputFieldSet.AllWithValues },
+            Output = new OutputFilterExtendedDto { FieldSet = SOS.Api.Contracts.Observations.Requests.OutputFieldSet.AllWithValues },
             GeneralizationFilter = new GeneralizationFilterDto
             {
                 SensitiveGeneralizationFilter = SensitiveGeneralizationFilterDto.DontIncludeGeneralizedObservations
             }
         };
         var response = await apiClientWithAccessToLevel3.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
-        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);            
-        result!.TotalCount.Should().Be(14 + 7 + 20 + 9);
+        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);
+        result!.TotalCount.Should().Be(2 + 4 + 5 + 6);
         var generalizedObservationsCount = result.Records.Count(m => m.IsGeneralized);
         generalizedObservationsCount.Should().Be(0);
 
@@ -391,15 +391,15 @@ public class GeneralizationFilterTests : TestBase
         searchFilter = new SearchFilterInternalDto
         {
             ProtectionFilter = ProtectionFilterDto.Sensitive,
-            Output = new OutputFilterExtendedDto { FieldSet = Lib.Enums.OutputFieldSet.AllWithValues },
+            Output = new OutputFilterExtendedDto { FieldSet = SOS.Api.Contracts.Observations.Requests.OutputFieldSet.AllWithValues },
             GeneralizationFilter = new GeneralizationFilterDto
             {
                 SensitiveGeneralizationFilter = SensitiveGeneralizationFilterDto.IncludeGeneralizedObservations
             }
         };
         response = await apiClientWithAccessToLevel3.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
-        result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);            
-        result!.TotalCount.Should().Be(11 + 14 + 18 + 7 + 20 + 9);
+        result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);
+        result!.TotalCount.Should().Be(1 + 2 + 3 + 4 + 5 + 6);
         generalizedObservationsCount = result.Records.Count(m => m.IsGeneralized);
         generalizedObservationsCount.Should().Be(0);
     }
@@ -418,19 +418,19 @@ public class GeneralizationFilterTests : TestBase
         var searchFilter = new SearchFilterInternalDto
         {
             ProtectionFilter = ProtectionFilterDto.Public,
-            Output = new OutputFilterExtendedDto { FieldSet = Lib.Enums.OutputFieldSet.AllWithValues }
+            Output = new OutputFilterExtendedDto { FieldSet = SOS.Api.Contracts.Observations.Requests.OutputFieldSet.AllWithValues }
         };
         var response = await apiClientWithAccessToUser.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
         var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);
-        result!.TotalCount.Should().Be(11 + 18 + 21);
+        result!.TotalCount.Should().Be(1 + 3 + 7);
         int generalizedObservationsCount = result.Records.Count(m => m.IsGeneralized);
-        generalizedObservationsCount.Should().Be(11 + 18);
+        generalizedObservationsCount.Should().Be(1 + 3);
 
         // Get only public observations - try use filter (but the filter will only be used when searching only sensitive observations)
         searchFilter = new SearchFilterInternalDto
         {
             ProtectionFilter = ProtectionFilterDto.Public,
-            Output = new OutputFilterExtendedDto { FieldSet = Lib.Enums.OutputFieldSet.AllWithValues },
+            Output = new OutputFilterExtendedDto { FieldSet = SOS.Api.Contracts.Observations.Requests.OutputFieldSet.AllWithValues },
             GeneralizationFilter = new GeneralizationFilterDto
             {
                 SensitiveGeneralizationFilter = SensitiveGeneralizationFilterDto.OnlyGeneralizedObservations
@@ -438,9 +438,9 @@ public class GeneralizationFilterTests : TestBase
         };
         response = await apiClientWithAccessToUser.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
         result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);
-        result!.TotalCount.Should().Be(11 + 18 + 21, because: "The generalization filter is only applied when searching sensitive observations");
+        result!.TotalCount.Should().Be(1 + 3 + 7, because: "The generalization filter is only applied when searching sensitive observations");
         generalizedObservationsCount = result.Records.Count(m => m.IsGeneralized);
-        generalizedObservationsCount.Should().Be(11 + 18);
+        generalizedObservationsCount.Should().Be(1 + 3);
         //result!.TotalCount.Should().Be(0); // todo - ska det vara så eller ska filtret bara appliceras om man söker på skyddade fynd?
     }
 
@@ -458,13 +458,13 @@ public class GeneralizationFilterTests : TestBase
         var searchFilter = new SearchFilterInternalDto
         {
             ProtectionFilter = ProtectionFilterDto.BothPublicAndSensitive,
-            Output = new OutputFilterExtendedDto { FieldSet = Lib.Enums.OutputFieldSet.AllWithValues }
+            Output = new OutputFilterExtendedDto { FieldSet = SOS.Api.Contracts.Observations.Requests.OutputFieldSet.AllWithValues }
         };
         var response = await apiClientWithAccessToUser.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
         var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);
-        result!.TotalCount.Should().Be(11 + 18 + 14 + 20 + 21, because: "Observations that is in both public and sensitive index, will only return observations from public index.");
+        result!.TotalCount.Should().Be(1 + 3 + 2 + 5 + 7, because: "Observations that is in both public and sensitive index, will only return observations from public index.");
         var generalizedObservationsCount = result.Records.Count(m => m.IsGeneralized);
-        generalizedObservationsCount.Should().Be(18, because: "11 generalized observations will be resolved and 18 not");
+        generalizedObservationsCount.Should().Be(3, because: "one generalized observation will be resolved and three will not");
     }
 
     [Fact]
@@ -485,7 +485,7 @@ public class GeneralizationFilterTests : TestBase
         var searchFilter = new SearchFilterInternalDto
         {
             ProtectionFilter = ProtectionFilterDto.Sensitive,
-            Output = new OutputFilterExtendedDto { FieldSet = Lib.Enums.OutputFieldSet.AllWithValues },
+            Output = new OutputFilterExtendedDto { FieldSet = SOS.Api.Contracts.Observations.Requests.OutputFieldSet.AllWithValues },
             GeneralizationFilter = new GeneralizationFilterDto
             {
                 SensitiveGeneralizationFilter = SensitiveGeneralizationFilterDto.OnlyGeneralizedObservations
@@ -499,7 +499,7 @@ public class GeneralizationFilterTests : TestBase
         searchFilter = new SearchFilterInternalDto
         {
             ProtectionFilter = ProtectionFilterDto.Public,
-            Output = new OutputFilterExtendedDto { FieldSet = Lib.Enums.OutputFieldSet.AllWithValues }
+            Output = new OutputFilterExtendedDto { FieldSet = SOS.Api.Contracts.Observations.Requests.OutputFieldSet.AllWithValues }
         };
         response = await apiClientWithAccessToUser.PostAsync($"/observations/internal/search", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
         result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);
@@ -516,7 +516,7 @@ public class GeneralizationFilterTests : TestBase
         {
             ProtectionFilter = ProtectionFilterDto.Public,
             ReportedByMe = true,
-            Output = new OutputFilterExtendedDto { FieldSet = Lib.Enums.OutputFieldSet.AllWithValues },
+            Output = new OutputFilterExtendedDto { FieldSet = SOS.Api.Contracts.Observations.Requests.OutputFieldSet.AllWithValues },
             GeneralizationFilter = new GeneralizationFilterDto
             {
                 PublicGeneralizationFilter = PublicGeneralizationFilterDto.OnlyGeneralized
@@ -530,7 +530,7 @@ public class GeneralizationFilterTests : TestBase
         searchFilter = new SearchFilterInternalDto
         {
             ProtectionFilter = ProtectionFilterDto.Sensitive,
-            Output = new OutputFilterExtendedDto { FieldSet = Lib.Enums.OutputFieldSet.AllWithValues },
+            Output = new OutputFilterExtendedDto { FieldSet = SOS.Api.Contracts.Observations.Requests.OutputFieldSet.AllWithValues },
             GeneralizationFilter = new GeneralizationFilterDto
             {
                 SensitiveGeneralizationFilter = SensitiveGeneralizationFilterDto.IncludeGeneralizedObservations

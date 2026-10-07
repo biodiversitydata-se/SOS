@@ -1,10 +1,8 @@
+using SOS.Api.Contracts.Locations.Responses;
 using Microsoft.Extensions.Logging;
-using NetTopologySuite.Geometries;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Search.Filters;
-using SOS.Lib.Dtos;
-using SOS.Lib.Dtos.Location;
-using SOS.Lib.Extensions.Dto;
+using SOS.Lib.Models.Processed.Observation;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Repositories.Interfaces;
 
@@ -42,15 +40,11 @@ public class LocationManager : ILocationManager
 
 
     /// <inheritdoc />
-    public async Task<IEnumerable<LocationDto>> GetLocationsAsync(IEnumerable<string> locationIds)
-    {
-        var locations = await _processedLocationRepository.GetLocationsAsync(locationIds);
-
-        return locations?.Select(l => l.ToDto());
-    }
+    public Task<IEnumerable<Location>> GetLocationsAsync(IEnumerable<string> locationIds) =>
+        _processedLocationRepository.GetLocationsAsync(locationIds);
 
     /// <inheritdoc />
-    public async Task<Dictionary<string, Geometry>> GetLocationGeometryAsync(HashSet<string> locationIds)
+    public async Task<Dictionary<string, NetTopologySuite.Geometries.Geometry>> GetLocationGeometryAsync(HashSet<string> locationIds)
     {
         return await _processedLocationRepository.GetLocationGeometryAsync(locationIds);
     }
@@ -64,7 +58,7 @@ public class LocationManager : ILocationManager
             await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
             var result = await _processedLocationRepository.SearchAsync(filter, skip, take);
 
-            return result?.Select(l => l.ToDto());
+            return result;
         }
         catch (Exception e)
         {

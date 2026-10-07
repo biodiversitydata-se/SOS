@@ -1,4 +1,5 @@
-﻿using Microsoft.ApplicationInsights.Extensibility;
+﻿using SOS.Api.Contracts.Observations.Requests;
+using Microsoft.ApplicationInsights.Extensibility;
 using SOS.Lib.ApplicationInsights;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.TaxonListService;

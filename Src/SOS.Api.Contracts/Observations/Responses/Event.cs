@@ -15,7 +15,7 @@ public class Event
     /// <summary>
     /// Start date/time of the event in W. Europe Standard Time.
     /// </summary>
-    public System.DateTimeOffset? StartDate { get; set; }
+    public DateTime? StartDate { get; set; }
 
     /// <summary>
     /// Start day of year
@@ -45,7 +45,7 @@ public class Event
     /// <summary>
     /// End date/time of the event in W. Europe Standard Time.
     /// </summary>
-    public System.DateTimeOffset? EndDate { get; set; }
+    public DateTime? EndDate { get; set; }
 
     /// <summary>
     /// Start day of year
@@ -92,6 +92,7 @@ public class Event
     /// </summary>
     public string? PlainEndTime { get; set; }
 
+    /// <summary>The method used to discover the observed organism.</summary>
     public VocabularyValue? DiscoveryMethod { get; set; }
 
     /// <summary>
@@ -129,7 +130,7 @@ public class Event
 
     /// <summary>
     /// An identifier for the broader Event that groups this and potentially other Events.
-    /// </summary>
+    /// </summary>    
     public string? ParentEventId { get; set; }
 
     /// <summary>
@@ -148,12 +149,18 @@ public class Event
     /// <br/>A sampleSizeUnit must have a corresponding sampleSizeValue, e.g., 5 for sampleSizeValue with metre for
     /// <br/>sampleSizeUnit.
     /// </summary>
+    /// <example>
+    /// minute, hour, day, metre, square metre, cubic metre.
+    /// </example>
     public string? SampleSizeUnit { get; set; }
 
     /// <summary>
     /// A numeric value for a measurement of the size (time duration, length, area, or volume) of a sample in a sampling
     /// <br/>event.
     /// </summary>
+    /// <example>
+    /// 5 for sampleSizeValue with metre for sampleSizeUnit.
+    /// </example>
     public string? SampleSizeValue { get; set; }
 
     /// <summary>
@@ -162,6 +169,7 @@ public class Event
     /// </summary>
     public string? VerbatimEventDate { get; set; }
 
+    /// <summary>Weather conditions reported for the observation event.</summary>
     public Weather? Weather { get; set; }
 
 }

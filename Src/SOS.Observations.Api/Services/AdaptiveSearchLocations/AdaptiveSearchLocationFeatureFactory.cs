@@ -1,5 +1,6 @@
-﻿﻿using NetTopologySuite.Geometries;
-using SOS.Lib.Enums;
+﻿using SOS.Api.Contracts.Common.Geo;
+using NetTopologySuite.Geometries;
+using SOS.Api.Contracts.Observations.Requests;
 using SOS.Lib.Extensions;
 using SOS.Lib.Gis;
 using SOS.Lib.Models.Gis;
@@ -11,9 +12,9 @@ namespace SOS.Observations.Api.Services.AdaptiveSearchLocations;
 
 internal interface IAdaptiveSearchLocationFeatureFactory
 {
-    List<LocationFeature> CreateClusterItems(List<CachedLocationAggregate> locationAggregates, LatLonBoundingBox? clusteringBbox, LocationClusteringAlgorithm clusteringAlgorithm, double? metersPerPixel, double clusterRadiusPx, int minLocationsPerCluster, int minLocationCountBeforeClustering, Dictionary<string, Geometry>? polygonLocationGeometries, CreatePolygonsMode createPolygons);
+    List<LocationFeature> CreateClusterItems(List<CachedLocationAggregate> locationAggregates, LatLonBoundingBoxDto? clusteringBbox, LocationClusteringAlgorithm clusteringAlgorithm, double? metersPerPixel, double clusterRadiusPx, int minLocationsPerCluster, int minLocationCountBeforeClustering, Dictionary<string, Geometry>? polygonLocationGeometries, CreatePolygonsMode createPolygons);
     List<LocationFeature> CreateUnclusteredItems(List<CachedLocationAggregate> locationAggregates, Dictionary<string, Geometry>? polygonLocationGeometries, CreatePolygonsMode createPolygons, double? metersPerPixel);
-    List<LocationFeature> CreateClusterItems(IEnumerable<JsonObject> records, LatLonBoundingBox? clusteringBbox, LocationClusteringAlgorithm clusteringAlgorithm, double? metersPerPixel, double clusterRadiusPx, int minLocationsPerCluster, int minLocationCountBeforeClustering, Dictionary<string, Geometry>? polygonLocationGeometries, CreatePolygonsMode createPolygons);
+    List<LocationFeature> CreateClusterItems(IEnumerable<JsonObject> records, LatLonBoundingBoxDto? clusteringBbox, LocationClusteringAlgorithm clusteringAlgorithm, double? metersPerPixel, double clusterRadiusPx, int minLocationsPerCluster, int minLocationCountBeforeClustering, Dictionary<string, Geometry>? polygonLocationGeometries, CreatePolygonsMode createPolygons);
     List<LocationFeature> CreateUnclusteredItems(IEnumerable<JsonObject> records, Dictionary<string, Geometry>? polygonLocationGeometries, CreatePolygonsMode createPolygons, double? metersPerPixel);
 }
 
@@ -30,7 +31,7 @@ internal sealed class AdaptiveSearchLocationFeatureFactory : IAdaptiveSearchLoca
 
     public List<LocationFeature> CreateClusterItems(
         List<CachedLocationAggregate> locationAggregates,
-        LatLonBoundingBox? clusteringBbox,
+        LatLonBoundingBoxDto? clusteringBbox,
         LocationClusteringAlgorithm clusteringAlgorithm,
         double? metersPerPixel,
         double clusterRadiusPx,
@@ -83,7 +84,7 @@ internal sealed class AdaptiveSearchLocationFeatureFactory : IAdaptiveSearchLoca
 
     public List<LocationFeature> CreateClusterItems(
         IEnumerable<JsonObject> records,
-        LatLonBoundingBox? clusteringBbox,
+        LatLonBoundingBoxDto? clusteringBbox,
         LocationClusteringAlgorithm clusteringAlgorithm,
         double? metersPerPixel,
         double clusterRadiusPx,
@@ -138,7 +139,7 @@ internal sealed class AdaptiveSearchLocationFeatureFactory : IAdaptiveSearchLoca
     private List<LocationFeature> CreateLocationFeaturesFromCachedAggregates(
         List<CachedLocationAggregate> locationAggregates,
         Dictionary<string, CachedLocationAggregate> aggregatesByDistinctLocationId,
-        LatLonBoundingBox clusteringBbox,
+        LatLonBoundingBoxDto clusteringBbox,
         LocationClusteringAlgorithm clusteringAlgorithm,
         double? metersPerPixel,
         double clusterRadiusPx,
@@ -355,7 +356,7 @@ internal sealed class AdaptiveSearchLocationFeatureFactory : IAdaptiveSearchLoca
         {
             LocationClusteringAlgorithm.Sweref99TmFastGreedy => new Sweref99TmFastGreedyLocationClusterer(minLocationCountBeforeClustering, DefaultMaxLocationCountAfterClustering, minLocationsPerCluster),
             LocationClusteringAlgorithm.Sweref99TmGreedy => new Sweref99TmLocationClusterer(minLocationCountBeforeClustering, DefaultMaxLocationCountAfterClustering, minLocationsPerCluster),
-            LocationClusteringAlgorithm.DbScan => new DbScanLocationClusterer(minLocationCountBeforeClustering, DefaultMaxLocationCountAfterClustering, minLocationsPerCluster),                       
+            LocationClusteringAlgorithm.DbScan => new DbScanLocationClusterer(minLocationCountBeforeClustering, DefaultMaxLocationCountAfterClustering, minLocationsPerCluster),
             _ => new Sweref99TmFastGreedyLocationClusterer(minLocationCountBeforeClustering, DefaultMaxLocationCountAfterClustering, minLocationsPerCluster)
         };
     }

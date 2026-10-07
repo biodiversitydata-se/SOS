@@ -1,13 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using SOS.Api.Contracts.TaxonLists.Responses;
+using SOS.Api.Contracts.Observations.Requests;
+using Microsoft.AspNetCore.Mvc;
 using SOS.Lib.Helpers;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Swagger;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Shared.Api.Configuration;
-using SOS.Lib.Dtos;
-using SOS.Lib.Dtos.Filter;
-using SOS.Lib.Dtos.Status;
 using System.Net;
 using System.Reflection;
 using SOS.Lib.Extensions.Dto;
@@ -72,7 +71,7 @@ public class TaxonListsController : ControllerBase
                 return new StatusCodeResult((int)HttpStatusCode.NoContent);
             }
 
-            var dtos = taxonLists.Select(m => TaxonListDefinitionDto.Create(m, cultureCode, _signalSearchTaxonListIds));
+            var dtos = taxonLists.Select(m => m.ToTaxonListDefinitionDto(cultureCode, _signalSearchTaxonListIds));
             return new OkObjectResult(dtos);
         }
         catch (Exception e)

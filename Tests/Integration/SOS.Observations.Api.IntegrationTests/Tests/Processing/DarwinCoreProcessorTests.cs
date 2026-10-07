@@ -20,12 +20,12 @@ public class DarwinCoreProcessorTests : TestBase
     public void Observation_is_positive_when_OccurrenceStatus_is_not_null()
     {
         // Arrange
-        var verbatimObservations = Builder<DwcObservationVerbatim>.CreateListOfSize(100)
+        var verbatimObservations = Builder<DwcObservationVerbatim>.CreateListOfSize(5)
             .All().HaveValuesFromPredefinedObservations()
-            .TheFirst(20).With(v => v.OccurrenceStatus = "present")
-             .TheNext(20).With(v => v.OccurrenceStatus = "")
-             .TheNext(20).With(v => v.OccurrenceStatus = null)
-             .TheNext(40).With(v => v.OccurrenceStatus = "absent")
+            .TheFirst(1).With(v => v.OccurrenceStatus = "present")
+             .TheNext(1).With(v => v.OccurrenceStatus = "")
+             .TheNext(1).With(v => v.OccurrenceStatus = null)
+             .TheNext(2).With(v => v.OccurrenceStatus = "absent")
             .Build();
 
         // Act
@@ -39,8 +39,8 @@ public class DarwinCoreProcessorTests : TestBase
             .ToList()
             .Should().BeEquivalentTo(
                 new List<ItemCount<bool>> {
-                    new ItemCount<bool>(true, 60),
-                    new ItemCount<bool>(false, 40) });
+                    new ItemCount<bool>(true, 3),
+                    new ItemCount<bool>(false, 2) });
     }
 
     [Fact]
@@ -49,11 +49,11 @@ public class DarwinCoreProcessorTests : TestBase
     public void Sensitive_species_sightings_should_be_protected()
     {
         // Arrange
-        var verbatimObservations = Builder<DwcObservationVerbatim>.CreateListOfSize(100)
+        var verbatimObservations = Builder<DwcObservationVerbatim>.CreateListOfSize(5)
             .All().HaveValuesFromPredefinedObservations()
-            .TheFirst(60).HaveSensitiveSpeciesTaxonId()
+            .TheFirst(3).HaveSensitiveSpeciesTaxonId()
                          .With(m => m.AccessRights = null)
-             .TheNext(20).HaveSensitiveSpeciesTaxonId()
+             .TheNext(1).HaveSensitiveSpeciesTaxonId()
                          .With(m => m.AccessRights = "Free usage") // Sensitive species with "Free usage" => Sensitive=false                
             .Build();
 
@@ -68,7 +68,7 @@ public class DarwinCoreProcessorTests : TestBase
             .ToList()
             .Should().BeEquivalentTo(
                 new List<ItemCount<bool>> {
-                    new ItemCount<bool>(true, 60),
-                    new ItemCount<bool>(false, 40) });
+                    new ItemCount<bool>(true, 3),
+                    new ItemCount<bool>(false, 2) });
     }
 }

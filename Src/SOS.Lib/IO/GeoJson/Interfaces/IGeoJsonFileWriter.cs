@@ -1,6 +1,7 @@
-﻿using Hangfire;
+﻿using SOS.Api.Contracts.Common.Geo;
+using Hangfire;
 using NetTopologySuite.Geometries;
-using SOS.Lib.Enums;
+using SOS.Api.Contracts.Exports.Requests;
 using SOS.Lib.Gis;
 using SOS.Lib.Models.Export;
 using SOS.Lib.Models.Gis;
@@ -53,7 +54,7 @@ public interface IGeoJsonFileWriter
         PropertyLabelType propertyLabelType,
         bool excludeNullValues,
         Stream stream,
-        LatLonBoundingBox? bbox,
+        LatLonBoundingBoxDto? bbox,
         List<NetTopologySuite.Features.Feature> geographicAreas,
         bool groupByLocation,
         Dictionary<string, Geometry>? polygonLocationGeometries = null);

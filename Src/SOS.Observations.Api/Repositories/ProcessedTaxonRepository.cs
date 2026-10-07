@@ -1,4 +1,6 @@
-﻿using CSharpFunctionalExtensions;
+﻿﻿using SOS.Api.Contracts.Aggregations.Responses;
+using CSharpFunctionalExtensions;
+using SOS.Api.Contracts.Aggregations.Requests;
 using Elastic.Clients.Elasticsearch;
 using Elastic.Clients.Elasticsearch.Aggregations;
 using Elastic.Clients.Elasticsearch.Cluster;
@@ -896,7 +898,7 @@ public class ProcessedTaxonRepository : ProcessedObservationBaseRepository,
     }
 
     /// <inheritdoc />
-    public async Task<Result<PagedResult<TaxonAggregationItem>>> GetTaxonAggregationAsync(
+    public async Task<Result<PagedResult<TaxonAggregationItemDto>>> GetTaxonAggregationAsync(
         SearchFilter filter,
         int? skip,
         int? take,
@@ -936,21 +938,20 @@ public class ProcessedTaxonRepository : ProcessedObservationBaseRepository,
         }
 
         var taxaResult = observationCountByTaxonId
-            .Select(b => TaxonAggregationItem.Create(
-                    b.Key,
-                    b.Value.Item1,
-                    b.Value.Item2,
-                    b.Value.Item3
-                )
-            //  b.Value.Item4?.Select(h => new TaxonAggregationHit { EventStartDate = h.Item1, OccurrenceId = h.Item2 }))
-            )
+            .Select(b => new TaxonAggregationItemDto
+            {
+                TaxonId = b.Key,
+                ObservationCount = b.Value.Item1,
+                FirstSighting = b.Value.Item2,
+                LastSighting = b.Value.Item3
+            })
             .OrderByDescending(m => m.ObservationCount)
             .ThenBy(m => m.TaxonId)
             .Skip(skip.Value)
             .Take(take.Value)
             .ToList();
 
-        var pagedResult = new PagedResult<TaxonAggregationItem>
+        var pagedResult = new PagedResult<TaxonAggregationItemDto>
         {
             Records = taxaResult,
             Skip = skip.Value,
@@ -961,7 +962,7 @@ public class ProcessedTaxonRepository : ProcessedObservationBaseRepository,
         return Result.Success(pagedResult);
     }
 
-    public async Task<Result<PagedResult<TaxonAggregationItem>>> GetTaxonAggregationApproximateAsync(
+    public async Task<Result<PagedResult<TaxonAggregationItemDto>>> GetTaxonAggregationApproximateAsync(
         SearchFilter filter,
         int? skip,
         int? take)
@@ -977,18 +978,20 @@ public class ProcessedTaxonRepository : ProcessedObservationBaseRepository,
         var uniqueTaxaCount = result.Item2;
 
         var taxaResult = observationCountByTaxonId
-            .Select(b => TaxonAggregationItem.Create(
-                b.Key,
-                b.Value.Item1,
-                b.Value.Item2,
-                b.Value.Item3))
+            .Select(b => new TaxonAggregationItemDto
+            {
+                TaxonId = b.Key,
+                ObservationCount = b.Value.Item1,
+                FirstSighting = b.Value.Item2,
+                LastSighting = b.Value.Item3
+            })
             .OrderByDescending(m => m.ObservationCount)
             .ThenBy(m => m.TaxonId)
             .Skip(skip.Value)
             .Take(take.Value)
             .ToList();
 
-        return Result.Success(new PagedResult<TaxonAggregationItem>
+        return Result.Success(new PagedResult<TaxonAggregationItemDto>
         {
             Records = taxaResult,
             Skip = skip.Value,
@@ -1167,7 +1170,7 @@ public class ProcessedTaxonRepository : ProcessedObservationBaseRepository,
     }     
 
     /// <inheritdoc />
-    public async Task<IEnumerable<TaxonAggregationItem>> GetTaxonExistsIndicationAsync(
+    public async Task<IEnumerable<TaxonAggregationItemDto>> GetTaxonExistsIndicationAsync(
         SearchFilter filter)
     {
         var indexNames = GetCurrentIndex(filter);
@@ -1197,6 +1200,6 @@ public class ProcessedTaxonRepository : ProcessedObservationBaseRepository,
         return searchResponse.Aggregations
             .GetLongTerms("taxon_group")
             .Buckets
-            .Select(b => new TaxonAggregationItem { TaxonId = (int)b.Key, ObservationCount = (int)(b.DocCount) });
+            .Select(b => new TaxonAggregationItemDto { TaxonId = (int)b.Key, ObservationCount = (int)(b.DocCount) });
     }
 }

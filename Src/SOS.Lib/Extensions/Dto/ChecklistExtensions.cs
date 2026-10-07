@@ -1,5 +1,5 @@
-﻿using SOS.Lib.Models.Processed.Checklist;
-using SOS.Lib.Dtos.Checklist;
+﻿using SOS.Api.Contracts.Checklists.Responses;
+using SOS.Lib.Models.Processed.Checklist;
 
 namespace SOS.Lib.Extensions.Dto;
 
@@ -35,9 +35,9 @@ public static class ChecklistExtensions
                 DataProviderId = checklist.DataProviderId,
                 EffortTime = !string.IsNullOrEmpty(checklist.SamplingEffortTime) || checklist.Event?.EndDate == null || checklist.Event?.StartDate == null ?
                     checklist.SamplingEffortTime : checklist.Event.EndDate.Value.Subtract(checklist.Event.StartDate.Value).ToString("g"),
-                Event = checklist.Event,
+                Event = checklist.Event.ToEventDto(),
                 Id = checklist.Id,
-                Location = checklist.Location.ToDto(),
+                Location = checklist.Location.ToLocationDto(),
                 Modified = checklist.Modified,
                 Name = checklist.Name,
                 OccurrenceIds = checklist.OccurrenceIds,
@@ -61,9 +61,9 @@ public static class ChecklistExtensions
                 DataProviderId = checklist.DataProviderId,
                 EffortTime = !string.IsNullOrEmpty(checklist.SamplingEffortTime) || checklist.Event?.EndDate == null || checklist.Event?.StartDate == null ?
                     checklist.SamplingEffortTime : checklist.Event.EndDate.Value.Subtract(checklist.Event.StartDate.Value).ToString("g"),
-                Event = checklist.Event,
+                Event = checklist.Event.ToEventDto(),
                 Id = checklist.Id,
-                Location = checklist.Location.ToDto(),
+                Location = checklist.Location.ToLocationDto(),
                 Modified = checklist.Modified,
                 Name = checklist.Name,
                 OccurrenceIds = checklist.OccurrenceIds,

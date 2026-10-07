@@ -1,5 +1,6 @@
-﻿using SOS.Lib.Enums;
 using System.Collections.Generic;
+using SOS.Api.Contracts.Lookups.Responses;
+using SOS.Api.Contracts.Observations.Requests;
 using System.Linq;
 using System.Text.Json.Serialization;
 

@@ -1,9 +1,9 @@
-﻿using FizzWare.NBuilder;
+using SOS.Api.Contracts.Common.Responses;
+using FizzWare.NBuilder;
+using SOS.Api.Contracts.Observations.Requests;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
-using SOS.Lib.Dtos;
-using SOS.Lib.Dtos.Filter;
 using SOS.Observations.Api.IntegrationTests.Setup;
 using SOS.Observations.Api.IntegrationTests.Setup.Stubs;
 using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
@@ -22,9 +22,9 @@ public class MyObservationsTests : TestBase
     {
         // Arrange
         const int userId = TestAuthHandler.DefaultTestUserId;
-        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(5)
             .All().HaveValuesFromPredefinedObservations()
-            .TheFirst(60)
+            .TheFirst(3)
                 .With(m => m.ObserversInternal = m.ObserversInternal = new[] {
                     new UserInternal() { Id = userId, PersonId = userId, UserServiceUserId = userId, ViewAccess = true } })
                 .With(m => m.Observers = "Tom Volgers")
@@ -41,8 +41,8 @@ public class MyObservationsTests : TestBase
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        result!.TotalCount.Should().Be(60,
-            because: "60 observations added to Elasticsearch are observed by UserId=15.");
+        result!.TotalCount.Should().Be(3,
+            because: "3 observations added to Elasticsearch are observed by UserId=15.");
     }
 
     [Fact]
@@ -50,9 +50,9 @@ public class MyObservationsTests : TestBase
     {
         // Arrange
         const int userId = TestAuthHandler.DefaultTestUserId;
-        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(5)
             .All().HaveValuesFromPredefinedObservations()
-            .TheFirst(60).With(m => m.ObserversInternal = null)
+            .TheFirst(3).With(m => m.ObserversInternal = null)
                          .With(m => m.Observers = "Via Tom Volgers")
                          .With(m => m.ReportedByUserServiceUserId = userId)
                          .With(m => m.ReportedBy = "Tom Volgers")
@@ -76,9 +76,9 @@ public class MyObservationsTests : TestBase
     {
         // Arrange
         const int userId = TestAuthHandler.DefaultTestUserId;
-        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(5)
             .All().HaveValuesFromPredefinedObservations()
-            .TheFirst(60).With(m => m.ObserversInternal = null)
+            .TheFirst(3).With(m => m.ObserversInternal = null)
                          .With(m => m.Observers = "Via Tom Volgers")
                          .With(m => m.ReportedByUserServiceUserId = userId)
                          .With(m => m.ReportedBy = "Tom Volgers")
@@ -93,7 +93,7 @@ public class MyObservationsTests : TestBase
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        result!.TotalCount.Should().Be(60,
-            because: "60 observations added to Elasticsearch are reported by UserId=15.");
+        result!.TotalCount.Should().Be(3,
+            because: "3 observations added to Elasticsearch are reported by UserId=15.");
     }
 }

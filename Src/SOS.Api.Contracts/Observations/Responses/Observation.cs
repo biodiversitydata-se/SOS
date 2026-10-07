@@ -7,7 +7,7 @@ namespace SOS.Api.Contracts.Observations.Responses;
 public class Observation
 {
 
-    [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+    /// <summary>The geographic generalization status of the observation.</summary>
     public DiffusionStatus DiffusionStatus { get; set; }
 
     /// <summary>
@@ -20,26 +20,37 @@ public class Observation
     /// </summary>
     public bool HasGeneralizedObservationInOtherIndex { get; set; }
 
+    /// <summary>Information about the observation event, including its date and sampling details.</summary>
     public Event? Event { get; set; }
 
+    /// <summary>Data-stewardship dataset and event information associated with the observation.</summary>
     public DataStewardshipInfo? DataStewardship { get; set; }
 
+    /// <summary>Geological context associated with the observation.</summary>
     public GeologicalContext? GeologicalContext { get; set; }
 
+    /// <summary>Species identification and verification information.</summary>
     public Identification? Identification { get; set; }
 
+    /// <summary>The geographic location of the observation.</summary>
     public Location? Location { get; set; }
 
+    /// <summary>Information about the material sample associated with the observation.</summary>
     public MaterialSample? MaterialSample { get; set; }
 
+    /// <summary>Information about the organism's occurrence, quantity and reported attributes.</summary>
     public Occurrence? Occurrence { get; set; }
 
+    /// <summary>Information identifying the organism or group of organisms.</summary>
     public Organism? Organism { get; set; }
 
+    /// <summary>Taxonomic information for the observed organism.</summary>
     public Taxon? Taxon { get; set; }
 
+    /// <summary>The access rights associated with the observation.</summary>
     public VocabularyValue? AccessRights { get; set; }
 
+    /// <summary>The nature or source of the observation record.</summary>
     public VocabularyValue? BasisOfRecord { get; set; }
 
     /// <summary>
@@ -117,6 +128,7 @@ public class Observation
     /// </summary>
     public string? InstitutionId { get; set; }
 
+    /// <summary>The code of the institution having custody of the record or specimen.</summary>
     public VocabularyValue? InstitutionCode { get; set; }
 
     /// <summary>
@@ -129,6 +141,10 @@ public class Observation
     /// <summary>
     /// A legal document giving official permission to do something with the resource.
     /// </summary>
+    /// <example>
+    ///     http://creativecommons.org/publicdomain/zero/1.0/legalcode,
+    ///     http://creativecommons.org/licenses/by/4.0/legalcode
+    /// </example>
     public string? License { get; set; }
 
     /// <summary>
@@ -149,6 +165,12 @@ public class Observation
     /// Private Collection.
     /// </summary>
     public string? PrivateCollection { get; set; }
+
+    /// <summary>
+    /// Indicates whether the observation is protected. Replaced by <see cref="Sensitive"/>.
+    /// </summary>
+    [Obsolete("Replaced by Sensitive")]
+    public bool Protected => Sensitive;
 
     /// <summary>
     /// Indicates whether the observation is sensitive and therefore protected.
@@ -177,8 +199,10 @@ public class Observation
     /// </summary>
     public string? SpeciesCollectionLabel { get; set; }
 
+    /// <summary>The nature or genre of the resource represented by the record.</summary>
     public VocabularyValue? Type { get; set; }
 
+    /// <summary>Additional internal Artportalen information associated with the observation.</summary>
     public ArtportalenInternal? ArtportalenInternal { get; set; }
 
     /// <summary>
@@ -191,6 +215,7 @@ public class Observation
     /// </summary>
     public ICollection<Project>? Projects { get; set; }
 
+    /// <summary>Summary information about projects associated with the observation.</summary>
     public ProjectsSummary? ProjectsSummary { get; set; }
 
     /// <summary>
@@ -198,6 +223,12 @@ public class Observation
     /// </summary>
     public System.DateTimeOffset Created { get; set; }
 
+    /// <summary>
+    /// MongoDB identifier exposed by the existing API contract.
+    /// </summary>
+    public int MongoDbId { get; set; }
+
+    /// <summary>Data-quality information associated with the observation.</summary>
     public DataQuality? DataQuality { get; set; }
 
 }

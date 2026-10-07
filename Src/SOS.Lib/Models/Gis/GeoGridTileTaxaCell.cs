@@ -1,11 +1,12 @@
-﻿using SOS.Lib.Helpers;
+﻿using SOS.Api.Contracts.Common.Geo;
+using SOS.Lib.Helpers;
 using System.Collections.Generic;
 
 namespace SOS.Lib.Models.Gis;
 
 public class GeoGridTileTaxaCell
 {
-    public LatLonBoundingBox BoundingBox { get; set; }
+    public LatLonBoundingBoxDto BoundingBox { get; set; }
     public string GeoTile { get; set; }
     public int Zoom { get; set; }
     public int X { get; set; }
@@ -21,7 +22,7 @@ public class GeoGridTileTaxaCell
             Zoom = zoomAndCoordinates.zoom,
             X = zoomAndCoordinates.x,
             Y = zoomAndCoordinates.y,
-            BoundingBox = new LatLonBoundingBox
+            BoundingBox = new LatLonBoundingBoxDto
             {
                 TopLeft = GeoTileHelper.GetCoordinateFromTile(zoomAndCoordinates.x, zoomAndCoordinates.y, zoomAndCoordinates.zoom),
                 BottomRight = GeoTileHelper.GetCoordinateFromTile(zoomAndCoordinates.x + 1, zoomAndCoordinates.y + 1, zoomAndCoordinates.zoom),

@@ -1,11 +1,12 @@
 using FluentAssertions;
 using Hangfire;
+using SOS.Api.Contracts.Exports.Responses;
+using SOS.Api.Contracts.Exports.Requests;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SOS.Export.Managers;
 using SOS.Export.Services.Interfaces;
 using SOS.Lib.Configuration.Export;
-using SOS.Lib.Enums;
 using SOS.Lib.IO.DwcArchive.Interfaces;
 using SOS.Lib.IO.Csv.Interfaces;
 using SOS.Lib.IO.Excel.Interfaces;

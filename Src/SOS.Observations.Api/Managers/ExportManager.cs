@@ -1,8 +1,8 @@
-﻿using Hangfire;
+﻿using SOS.Api.Contracts.Observations.Requests;
+using Hangfire;
+using SOS.Api.Contracts.Exports.Responses;
+using SOS.Api.Contracts.Exports.Requests;
 using Hangfire.Server;
-using SOS.Lib.Dtos.Enum;
-using SOS.Lib.Dtos.Filter;
-using SOS.Lib.Enums;
 using SOS.Lib.Exceptions;
 using SOS.Lib.Extensions.Dto;
 using SOS.Lib.Helpers;
@@ -161,6 +161,7 @@ public class ExportManager : IExportManager
         try
         {
             var filter = searchFilter.ToSearchFilter(userId ?? 0, protectionFilter, culture ?? "en-GB");
+            var exportGeometries = filter.Location?.Geometries?.Geometries;
             await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
             filter.UseSearchAfterWithoutPit = useSearchAfterWithoutPit;
             var additionalFiles = new List<(Stream stream, string filename)>();
@@ -174,9 +175,9 @@ public class ExportManager : IExportManager
                 var citationMarkdownStream = await _markdownHelper.GetCitationMarkDownAsync(authorizationApplicationIdentifier, datasetsResult.DataProviderIds, CancellationToken.None);
                 additionalFiles.Add((citationMarkdownStream, "citation.md"));
 
-                if ((searchFilter?.Geographics?.Geometries?.Count() ?? 0) != 0)
+                if (exportGeometries?.Count > 0)
                 {
-                    var geoJsonStream = _markdownHelper.TryGetFeatureCollection(searchFilter.Geographics.Geometries);
+                    var geoJsonStream = _markdownHelper.TryGetFeatureCollection(exportGeometries);
                     if (geoJsonStream != null)
                     {
                         additionalFiles.Add((geoJsonStream, "geometries.geojson"));

@@ -1,7 +1,7 @@
-﻿using DotNetCore.Mapping;
-using FizzWare.NBuilder;
+﻿using FizzWare.NBuilder;
 using FizzWare.NBuilder.Implementation;
 using SOS.Lib.Enums.VocabularyValues;
+using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.JsonConverters;
 using SOS.Lib.Models.Verbatim.DarwinCore;

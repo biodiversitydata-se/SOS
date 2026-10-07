@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using SOS.Harvest.Harvesters.Interfaces;
 using SOS.Lib.Enums;
 using SOS.Lib.Managers.Interfaces;
@@ -10,6 +9,7 @@ using SOS.Lib.Models.Verbatim.Shared;
 using SOS.Lib.Repositories.Resource.Interfaces;
 using SOS.Lib.Services.Interfaces;
 using System.Reflection;
+using System.Text.Json;
 
 namespace SOS.Harvest.Harvesters;
 
@@ -18,6 +18,11 @@ namespace SOS.Harvest.Harvesters;
 /// </summary>
 public class TaxonListHarvester : ITaxonListHarvester
 {
+    private static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true
+    };
+
     private readonly ITaxonListService _taxonListService;
     private readonly ITaxonListRepository _taxonListRepository;
     private readonly ITaxonRepository _taxonRepository;
@@ -56,8 +61,8 @@ public class TaxonListHarvester : ITaxonListHarvester
 
             var assemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             var filePath = Path.Combine(assemblyPath!, @"Resources/TaxonLists.json");
-            var taxonLists =
-                JsonConvert.DeserializeObject<List<TaxonList>>(await File.ReadAllTextAsync(filePath));
+            var taxonLists = JsonSerializer.Deserialize<List<TaxonList>>(
+                await File.ReadAllTextAsync(filePath), JsonOptions);
 
             if (!taxonLists?.Any() ?? true)
             {

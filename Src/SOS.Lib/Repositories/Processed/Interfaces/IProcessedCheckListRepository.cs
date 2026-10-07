@@ -1,5 +1,5 @@
-﻿using SOS.Lib.Enums;
 using SOS.Lib.Models.Processed.Checklist;
+using SOS.Api.Contracts.Observations.Requests;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
 using System.Collections.Generic;

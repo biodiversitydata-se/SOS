@@ -1,5 +1,4 @@
-﻿using AgileObjects.AgileMapper.Extensions;
-using CSharpFunctionalExtensions;
+﻿using CSharpFunctionalExtensions;
 using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;

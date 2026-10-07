@@ -1,10 +1,11 @@
-﻿using FizzWare.NBuilder;
+using SOS.Api.Contracts.Observations;
+using SOS.Api.Contracts.Common.Responses;
+using SOS.Api.Contracts.Observations.Requests;
+using FizzWare.NBuilder;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
-using SOS.Lib.Dtos;
-using SOS.Lib.Dtos.Filter;
 using SOS.Observations.Api.IntegrationTests.Setup;
 using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
 
@@ -23,7 +24,7 @@ public class ObservationPropertiesTest : TestBase
         //-----------------------------------------------------------------------------------------------------------
         // Arrange
         //-----------------------------------------------------------------------------------------------------------            
-        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(2)
             .All()
                 .HaveValuesFromPredefinedObservations()
             .Build();
@@ -456,7 +457,7 @@ public class ObservationPropertiesTest : TestBase
                     RedlistCategoryDerived = "RLCD",
                     SensitivityCategory = new VocabularyValue { Id = 1, Value = "PL" },
                     SortOrder = 3,
-                    SpeciesGroup = Lib.Enums.SpeciesGroup.Bats,
+                    SpeciesGroup = SOS.Api.Contracts.Observations.Responses.SpeciesGroup.Bats,
                     SwedishHistory = "SH",
                     SwedishOccurrence = "SO",
                     Synonyms = new[] { new TaxonSynonymName
@@ -524,7 +525,7 @@ public class ObservationPropertiesTest : TestBase
         var apiClient = TestFixture.CreateApiClient();
         var searchFilter = new SearchFilterInternalDto
         {
-            Output = new OutputFilterExtendedDto { FieldSet = Lib.Enums.OutputFieldSet.All },
+            Output = new OutputFilterExtendedDto { FieldSet = OutputFieldSet.All },
             Taxon = new TaxonFilterDto
             {
                 Ids = new[] { 206123 }

@@ -1,15 +1,15 @@
 ﻿using Elastic.Clients.Elasticsearch;
 using Elastic.Clients.Elasticsearch.QueryDsl;
-using SOS.Lib.Enums;
+using SOS.Api.Contracts.Aggregations.Requests;
+using SOS.Api.Contracts.Observations.Requests;
+using SOS.Lib.Helpers;
 using SOS.Lib.Models.Processed.DataStewardship.Dataset;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Enums;
 using SOS.Lib.Models.Search.Filters;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 
 
@@ -20,9 +20,6 @@ namespace SOS.Lib.Extensions;
 /// </summary>
 public static class SearchExtensionsGeneric
 {
-    private static readonly ConcurrentDictionary<(Type EntityType, string SortBy), string> SortFieldsByKey = new();
-
-
     extension(AggregationSortOrder sortOrder)
     {
         public ICollection<KeyValuePair<Field, SortOrder>> GetTermsOrder()
@@ -50,30 +47,6 @@ public static class SearchExtensionsGeneric
             Type t when t == typeof(Observation) => "occurrence.occurrenceId",
             _ => null
         };
-    }
-
-    private static string GetSortField<TEntity>(string sortBy) where TEntity : class
-    {
-        return SortFieldsByKey.GetOrAdd((typeof(TEntity), sortBy), static key =>
-        {
-            var propertyNames = key.SortBy.Split('.');
-            var parentType = key.EntityType;
-
-            for (var i = 0; i < propertyNames.Length; i++)
-            {
-                var property = parentType.GetProperty(propertyNames[i],
-                    BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
-                if (property == null)
-                {
-                    return key.SortBy;
-                }
-
-                propertyNames[i] = property.Name.ToCamelCase();
-                parentType = property.GetPropertyType();
-            }
-
-            return string.Join('.', propertyNames);
-        });
     }
 
     extension(ElasticsearchClient client)
@@ -115,10 +88,10 @@ public static class SearchExtensionsGeneric
             var sortDescriptor = new List<Action<SortOptionsDescriptor<TQueryDescriptor>>>();
             foreach (var sorting in adjustedSortings)
             {
-                var sortBy = GetSortField<TEntity>(sorting.SortBy);
+                var sortBy = ElasticsearchFieldNameHelper.GetFieldName<TEntity>(sorting.SortBy);
                 var sortOrder = sorting.SortOrder;
                 sortDescriptor.Add(s => s
-                    .Field(sortBy.ToField(), c => c
+                    .Field(sortBy, c => c
                         .Order(sortOrder == SearchSortOrder.Desc ? SortOrder.Desc : SortOrder.Asc)
                         .Missing(sortOrder == SearchSortOrder.Desc ? "_last" : "_first")
                     )

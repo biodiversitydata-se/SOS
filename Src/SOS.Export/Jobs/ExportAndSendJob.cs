@@ -1,17 +1,19 @@
-﻿using Hangfire;
+﻿using SOS.Api.Contracts.Common.Geo;
+using Hangfire;
 using Hangfire.Server;
+using SOS.Api.Contracts.Exports.Responses;
+using SOS.Api.Contracts.Exports.Requests;
 using Microsoft.Extensions.Logging;
 using SOS.Export.Managers.Interfaces;
 using SOS.Export.Models.ZendTo;
-using SOS.Lib.Dtos.Enum;
-using SOS.Lib.Dtos.Filter;
-using SOS.Lib.Enums;
 using SOS.Lib.Extensions.Dto;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.Jobs.Export;
 using SOS.Lib.Models.Export;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Lib.Services.Interfaces;
+using SOS.Api.Contracts.Observations.Requests;
+using SOS.Api.Contracts.Aggregations.Requests;
 
 namespace SOS.Export.Jobs;
 
@@ -186,6 +188,7 @@ public class ExportAndSendJob : IExportAndSendJob
         {
             _logger.LogInformation("Start export and send job");
             var filter = searchFilter.ToSearchFilter(userId, protectionFilter, culture);
+            var exportGeometries = filter.Location?.Geometries?.Geometries;
             Thread.Sleep(TimeSpan.FromSeconds(1)); // wait for job info to be inserted in MongoDb.
             await UpdateJobInfoStartProcessing(userId, context?.BackgroundJob?.Id);
             var password = await _cryptoService.DecryptAsync(encryptedPassword);
@@ -199,9 +202,9 @@ public class ExportAndSendJob : IExportAndSendJob
             additionalFiles.Add((citationMarkdownStream, "citation.md"));
             
 
-            if ((searchFilter?.Geographics?.Geometries?.Count() ?? 0) != 0)
+            if (exportGeometries?.Count > 0)
             {
-                var geoJsonStream = _markdownHelper.TryGetFeatureCollection(searchFilter.Geographics.Geometries);
+                var geoJsonStream = _markdownHelper.TryGetFeatureCollection(exportGeometries);
                 if (geoJsonStream != null)
                 {
                     additionalFiles.Add((geoJsonStream, "geometries.geojson"));
@@ -256,6 +259,7 @@ public class ExportAndSendJob : IExportAndSendJob
         {
             _logger.LogInformation("Start AOO EOO export and send job");
             var filter = searchFilter.ToSearchFilter(userId, protectionFilter, "en-GB");
+            var exportGeometries = filter.Location?.Geometries?.Geometries;
             Thread.Sleep(TimeSpan.FromSeconds(1)); // wait for job info to be inserted in MongoDb.
             await UpdateJobInfoStartProcessing(userId, context?.BackgroundJob?.Id);
             var password = await _cryptoService.DecryptAsync(encryptedPassword);
@@ -278,9 +282,9 @@ public class ExportAndSendJob : IExportAndSendJob
             additionalFiles.Add((datasetsResult.FileStream, "datasets.md"));
             var citationMarkdownStream = await _markdownHelper.GetCitationMarkDownAsync(authorizationApplicationIdentifier, datasetsResult.DataProviderIds, CancellationToken.None);
             additionalFiles.Add((citationMarkdownStream, "citation.md"));
-            if ((searchFilter?.Geographics?.Geometries?.Count() ?? 0) != 0)
+            if (exportGeometries?.Count > 0)
             {
-                var geoJsonStream = _markdownHelper.TryGetFeatureCollection(searchFilter.Geographics.Geometries);
+                var geoJsonStream = _markdownHelper.TryGetFeatureCollection(exportGeometries);
                 if (geoJsonStream != null)
                 {
                     additionalFiles.Add((geoJsonStream, "geometries.geojson"));
@@ -338,7 +342,7 @@ public class ExportAndSendJob : IExportAndSendJob
         CoordinateSys coordinateSystem,
         string emailAddress,
         string description,
-        ExportFormat exportFormat,            
+        ExportFormat exportFormat,
         bool sendMailFromZendTo,
         string encryptedPassword,
         PerformContext context,
@@ -350,6 +354,7 @@ public class ExportAndSendJob : IExportAndSendJob
         {
             _logger.LogInformation("Start AOO EOO Article 17 export and send job");
             var filter = searchFilter.ToSearchFilter(userId, protectionFilter, "en-GB");
+            var exportGeometries = filter.Location?.Geometries?.Geometries;
             Thread.Sleep(TimeSpan.FromSeconds(1)); // wait for job info to be inserted in MongoDb.
             await UpdateJobInfoStartProcessing(userId, context?.BackgroundJob?.Id);
             var password = await _cryptoService.DecryptAsync(encryptedPassword);
@@ -367,9 +372,9 @@ public class ExportAndSendJob : IExportAndSendJob
             additionalFiles.Add((datasetsResult.FileStream, "datasets.md"));
             var citationMarkdownStream = await _markdownHelper.GetCitationMarkDownAsync(authorizationApplicationIdentifier, datasetsResult.DataProviderIds, CancellationToken.None);
             additionalFiles.Add((citationMarkdownStream, "citation.md"));
-            if ((searchFilter?.Geographics?.Geometries?.Count() ?? 0) != 0)
+            if (exportGeometries?.Count > 0)
             {
-                var geoJsonStream = _markdownHelper.TryGetFeatureCollection(searchFilter.Geographics.Geometries);
+                var geoJsonStream = _markdownHelper.TryGetFeatureCollection(exportGeometries);
                 if (geoJsonStream != null)
                 {
                     additionalFiles.Add((geoJsonStream, "geometries.geojson"));

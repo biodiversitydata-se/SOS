@@ -1,3 +1,7 @@
+﻿@using SOS.Api.Contracts.DataStewardship.Responses
+@using SOS.Status.Web.Client.Dtos
+@using SOS.Status.Web.Client.Helpers
+
 <MudDataGrid Class="no-last-row-scroll" Items="@ObservationsPageResult?.Records" T="Observation" Hover="true" Bordered="true" Striped="true" Dense="true" ColumnResizeMode="ResizeMode.Container" FixedHeader="true">
     <Columns>
         <HierarchyColumn T="Observation" />

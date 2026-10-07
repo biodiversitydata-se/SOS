@@ -1,5 +1,6 @@
 ﻿using CSharpFunctionalExtensions;
 using SOS.Lib.Models.Interfaces;
+using SOS.Api.Contracts.Taxonomy.Requests;
 using SOS.Lib.Models.TaxonTree;
 using System.Collections.Generic;
 using System.Text;
@@ -11,27 +12,6 @@ namespace SOS.Lib.Helpers;
 /// </summary>
 public class TaxonRelationDiagramHelper
 {
-    /// <summary>
-    /// Taxon relations tree iteration mode.
-    /// </summary>
-    public enum TaxonRelationsTreeIterationMode
-    {
-        /// <summary>
-        /// Both parents and children are included.
-        /// </summary>
-        BothParentsAndChildren,
-
-        /// <summary>
-        /// Only parents are included.
-        /// </summary>
-        OnlyParents,
-
-        /// <summary>
-        /// Only children are included.
-        /// </summary>
-        OnlyChildren
-    }
-
     /// <summary>
     /// Create a taxon relation GraphViz diagram.
     /// </summary>

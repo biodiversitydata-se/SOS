@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
 using SOS.Export.Models.ZendTo;
+using SOS.Api.Contracts.Exports.Responses;
 using SOS.Export.Services.Interfaces;
 using SOS.Lib.Configuration.Export;
-using SOS.Lib.Enums;
 using SOS.Lib.Helpers;
 using System;
 using System.Collections.Generic;

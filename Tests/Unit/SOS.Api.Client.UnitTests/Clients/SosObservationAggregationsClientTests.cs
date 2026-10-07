@@ -1,9 +1,9 @@
 ﻿using FluentAssertions;
 using SOS.Api.Client.Clients;
+using SOS.Api.Client.Exceptions;
 using SOS.Api.Client.Requests;
 using SOS.Api.Client.UnitTests.Support;
 using SOS.Api.Contracts.Aggregations.Requests;
-using SOS.Api.Contracts.Analysis.Requests;
 using SOS.Api.Contracts.Observations.Requests;
 using System.Net;
 using System.Text;
@@ -14,11 +14,15 @@ namespace SOS.Api.Client.UnitTests.Clients;
 public class SosObservationAggregationsClientTests
 {
     [Fact]
-    public async Task CachedCountInternalAsync_SerializesTypedFilterAndBuildsQuery()
+    public async Task CachedCountInternalAsync_PostsTaxonIdsAndDeserializesCounts()
     {
         var handler = new StubHttpMessageHandler(request =>
         {
-            request.RequestUri!.PathAndQuery.Should().Contain("/observations/internal/cachedcount");
+            request.Method.Should().Be(HttpMethod.Post);
+            request.RequestUri!.PathAndQuery.Should().Be("/observations/internal/cachedcount");
+            request.Content!.Headers.ContentType!.MediaType.Should().Be("application/json");
+            request.Headers.Accept.Select(header => header.MediaType).Should().Equal("application/json");
+            ReadRequestBody(request).Should().Be("[103025]");
             return CreateJsonResponse("""
                 [{
                     "taxonId": 103025,
@@ -39,7 +43,17 @@ public class SosObservationAggregationsClientTests
             new[] { 103025 },
             TestContext.Current.CancellationToken);
 
-        result!.Should().ContainSingle().Which.TaxonId.Should().Be(103025);
+        var item = result!.Should().ContainSingle().Subject;
+        item.TaxonId.Should().Be(103025);
+        item.ObservationCount.Should().Be(1212);
+        item.SumObservationCount.Should().Be(42424);
+        item.ProvinceCount.Should().Be(2);
+        item.SumProvinceCount.Should().Be(121);
+        item.SumObservationCountByProvinceId.Should().BeEquivalentTo(new Dictionary<string, int>
+        {
+            ["1"] = 100,
+            ["2"] = 21
+        });
     }
 
     [Fact]
@@ -47,6 +61,7 @@ public class SosObservationAggregationsClientTests
     {
         var handler = new StubHttpMessageHandler(request =>
         {
+            AssertAuthorizationHeaders(request);
             request.Method.Should().Be(HttpMethod.Post);
             request.RequestUri!.PathAndQuery.Should().Contain("/observations/internal/geogridaggregation?");
             request.RequestUri.Query.Should().Contain("zoom=8");
@@ -59,7 +74,7 @@ public class SosObservationAggregationsClientTests
 
         var result = await client.GeoGridAggregationInternalAsync(
             new SearchFilterAggregationInternalDto { OccurrenceStatus = OccurrenceStatusFilterValuesDto.Present },
-            new GeoGridAggregationInternalOptions { Zoom = 8 },
+            new GeoGridAggregationInternalOptions { Zoom = 8, RoleId = 17, AuthorizationApplicationIdentifier = "test-app" },
             TestContext.Current.CancellationToken);
 
         result!.Zoom.Should().Be(8);
@@ -70,9 +85,11 @@ public class SosObservationAggregationsClientTests
     {
         var handler = new StubHttpMessageHandler(request =>
         {
+            AssertAuthorizationHeaders(request);
             request.Method.Should().Be(HttpMethod.Post);
             request.RequestUri!.PathAndQuery.Should().Contain("/observations/internal/metricgridaggregation?");
             request.RequestUri.Query.Should().Contain("gridCellSizeInMeters=50000");
+            request.RequestUri.Query.Should().Contain("metricCoordinateSys=SWEREF99_TM");
             request.RequestUri.Query.Should().NotContain("outputFormat");
             request.Headers.Accept.Select(header => header.MediaType).Should().Contain("application/json");
             return CreateJsonResponse("""{"gridCellCount":2,"gridCellSizeInMeters":50000,"gridCells":[]}""");
@@ -83,7 +100,9 @@ public class SosObservationAggregationsClientTests
             "{}",
             new MetricGridAggregationInternalOptions
             {
-                GridCellSizeInMeters = 50000
+                GridCellSizeInMeters = 50000,
+                RoleId = 17,
+                AuthorizationApplicationIdentifier = "test-app"
             },
             TestContext.Current.CancellationToken);
 
@@ -96,9 +115,11 @@ public class SosObservationAggregationsClientTests
     {
         var handler = new StubHttpMessageHandler(request =>
         {
+            AssertAuthorizationHeaders(request);
             request.Method.Should().Be(HttpMethod.Post);
             request.RequestUri!.PathAndQuery.Should().Contain("/observations/internal/metricgridaggregation?");
             request.RequestUri.Query.Should().Contain("gridCellSizeInMeters=50000");
+            request.RequestUri.Query.Should().Contain("metricCoordinateSys=SWEREF99_TM");
             request.RequestUri.Query.Should().Contain("outputFormat=GeoJson");
             request.Headers.Accept.Select(header => header.MediaType)
                 .Should().Equal("application/geo+json", "application/json");
@@ -113,7 +134,9 @@ public class SosObservationAggregationsClientTests
             "{}",
             new MetricGridAggregationInternalGeoJsonOptions
             {
-                GridCellSizeInMeters = 50000
+                GridCellSizeInMeters = 50000,
+                RoleId = 17,
+                AuthorizationApplicationIdentifier = "test-app"
             },
             TestContext.Current.CancellationToken);
 
@@ -125,6 +148,7 @@ public class SosObservationAggregationsClientTests
     {
         var handler = new StubHttpMessageHandler(request =>
         {
+            AssertAuthorizationHeaders(request);
             request.RequestUri!.PathAndQuery.Should().Contain("/observations/internal/taxonaggregation?");
             request.RequestUri.Query.Should().Contain("skip=2");
             request.RequestUri.Query.Should().Contain("take=3");
@@ -146,7 +170,9 @@ public class SosObservationAggregationsClientTests
             {
                 Skip = 2,
                 Take = 3,
-                SumUnderlyingTaxa = true
+                SumUnderlyingTaxa = true,
+                RoleId = 17,
+                AuthorizationApplicationIdentifier = "test-app"
             },
             TestContext.Current.CancellationToken);
 
@@ -251,6 +277,7 @@ public class SosObservationAggregationsClientTests
     {
         var handler = new StubHttpMessageHandler(request =>
         {
+            AssertAuthorizationHeaders(request);
             request.Method.Should().Be(HttpMethod.Post);
             request.RequestUri!.AbsolutePath.Should().EndWith("/observations/internal/taxonareaaggregation");
             request.RequestUri.Query.Should().Contain("areaType=County");
@@ -278,9 +305,11 @@ public class SosObservationAggregationsClientTests
             },
             new TaxonAreaAggregationInternalOptions
             {
-                AreaType = AreaTypeAggregateDto.County,
+                AreaType = AreaTypeAggregate.County,
                 SumTaxaTree = true,
-                PruneTaxaTree = true
+                PruneTaxaTree = true,
+                RoleId = 17,
+                AuthorizationApplicationIdentifier = "test-app"
             },
             TestContext.Current.CancellationToken);
 
@@ -294,6 +323,7 @@ public class SosObservationAggregationsClientTests
     {
         var handler = new StubHttpMessageHandler(request =>
         {
+            AssertAuthorizationHeaders(request);
             request.RequestUri!.PathAndQuery.Should().Contain("/observations/internal/timeserieshistogram?");
             request.RequestUri.Query.Should().Contain("timeSeriesType=Month");
             return CreateJsonResponse("""[{ "type": "Month", "period": 6, "observations": 4, "quantity": 7, "taxa": 2 }]""");
@@ -302,12 +332,145 @@ public class SosObservationAggregationsClientTests
 
         var result = await client.TimeSeriesHistogramInternalJsonAsync(
             "{}",
-            new TimeSeriesHistogramInternalOptions { TimeSeriesType = TimeSeriesTypeDto.Month },
+            new TimeSeriesHistogramInternalOptions { TimeSeriesType = TimeSeriesTypeDto.Month, RoleId = 17, AuthorizationApplicationIdentifier = "test-app" },
             TestContext.Current.CancellationToken);
 
         result.Should().ContainSingle();
         result[0].Type.Should().Be(TimeSeriesTypeDto.Month);
         result[0].Observations.Should().Be(4);
+    }
+
+    [Theory]
+    [InlineData(HttpStatusCode.NoContent, "")]
+    [InlineData(HttpStatusCode.OK, "")]
+    [InlineData(HttpStatusCode.OK, "   ")]
+    [InlineData(HttpStatusCode.OK, "null")]
+    public async Task EmptyResponses_PreserveEndpointSpecificResults(HttpStatusCode statusCode, string body)
+    {
+        using var httpClient = CreateHttpClient(new StubHttpMessageHandler(_ => new HttpResponseMessage(statusCode)
+        {
+            Content = new StringContent(body, Encoding.UTF8, "application/json")
+        }));
+        var client = new SosObservationAggregationsClient(httpClient);
+        var cancellationToken = TestContext.Current.CancellationToken;
+
+        (await client.GeoGridAggregationInternalJsonAsync("{}", cancellationToken: cancellationToken)).Should().BeNull();
+        (await client.MetricGridAggregationInternalJsonAsync("{}", cancellationToken: cancellationToken)).Should().BeNull();
+        (await client.TaxonAggregationInternalJsonAsync("{}", cancellationToken: cancellationToken)).Should().BeNull();
+        (await client.MetricGridAggregationInternalGeoJsonAsync("{}", cancellationToken: cancellationToken))
+            .Features.Should().BeEmpty();
+        (await client.TimeSeriesHistogramInternalJsonAsync("{}", cancellationToken: cancellationToken)).Should().BeEmpty();
+
+        var action = () => client.TaxonAreaAggregationInternalJsonAsync("{}", cancellationToken: cancellationToken);
+        var exception = (await action.Should().ThrowAsync<SosInvalidResponseException>()).Which;
+        exception.StatusCode.Should().Be(statusCode);
+        exception.RequestUri!.AbsolutePath.Should().Be("/observations/internal/taxonareaaggregation");
+        exception.ResponseBodyPreview.Should().BeNull();
+    }
+
+    [Theory]
+    [InlineData("geogridaggregation")]
+    [InlineData("metricgridaggregation")]
+    [InlineData("metricgridaggregationgeojson")]
+    [InlineData("taxonaggregation")]
+    [InlineData("taxonareaaggregation")]
+    [InlineData("timeserieshistogram")]
+    public async Task AggregationRequest_PreservesHttpErrors(string endpoint)
+    {
+        const string errorBody = "Invalid filter";
+        using var httpClient = CreateHttpClient(new StubHttpMessageHandler(_ =>
+            new HttpResponseMessage(HttpStatusCode.BadRequest)
+            {
+                Content = new StringContent(errorBody)
+            }));
+        var client = new SosObservationAggregationsClient(httpClient);
+
+        var action = () => CallEndpointAsync(client, endpoint, TestContext.Current.CancellationToken);
+
+        var exception = (await action.Should().ThrowAsync<SosApiException>()).Which;
+        exception.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        exception.ResponseBody.Should().Be(errorBody);
+        exception.RequestUri!.AbsolutePath.Should().Be(EndpointPath(endpoint));
+    }
+
+    [Theory]
+    [InlineData("geogridaggregation")]
+    [InlineData("metricgridaggregation")]
+    [InlineData("metricgridaggregationgeojson")]
+    [InlineData("taxonaggregation")]
+    [InlineData("taxonareaaggregation")]
+    [InlineData("timeserieshistogram")]
+    public async Task AggregationRequest_PreservesInvalidJsonErrors(string endpoint)
+    {
+        const string invalidBody = "not JSON";
+        using var httpClient = CreateHttpClient(new StubHttpMessageHandler(_ => CreateJsonResponse(invalidBody)));
+        var client = new SosObservationAggregationsClient(httpClient);
+
+        var action = () => CallEndpointAsync(client, endpoint, TestContext.Current.CancellationToken);
+
+        var exception = (await action.Should().ThrowAsync<SosInvalidResponseException>()).Which;
+        exception.StatusCode.Should().Be(HttpStatusCode.OK);
+        exception.ResponseBodyPreview.Should().Be(invalidBody);
+        exception.RequestUri!.AbsolutePath.Should().Be(EndpointPath(endpoint));
+    }
+
+    [Theory]
+    [InlineData("geogridaggregation")]
+    [InlineData("metricgridaggregation")]
+    [InlineData("metricgridaggregationgeojson")]
+    [InlineData("taxonaggregation")]
+    [InlineData("taxonareaaggregation")]
+    [InlineData("timeserieshistogram")]
+    public async Task AggregationRequest_PassesCancellationToHttpClient(string endpoint)
+    {
+        var handler = new WaitingHttpMessageHandler();
+        using var httpClient = CreateHttpClient(handler);
+        using var cancellation = CancellationTokenSource.CreateLinkedTokenSource(TestContext.Current.CancellationToken);
+        var client = new SosObservationAggregationsClient(httpClient);
+        var request = CallEndpointAsync(client, endpoint, cancellation.Token);
+        await handler.Started.Task.WaitAsync(TestContext.Current.CancellationToken);
+
+        cancellation.Cancel();
+
+        var action = () => request;
+        await action.Should().ThrowAsync<OperationCanceledException>();
+    }
+
+    private static void AssertAuthorizationHeaders(HttpRequestMessage request)
+    {
+        request.Headers.GetValues("X-Authorization-Role-Id").Should().Equal("17");
+        request.Headers.GetValues("X-Authorization-Application-Identifier").Should().Equal("test-app");
+    }
+
+    private static string EndpointPath(string endpoint) =>
+        "/observations/internal/" + (endpoint == "metricgridaggregationgeojson" ? "metricgridaggregation" : endpoint);
+
+    private static Task CallEndpointAsync(
+        SosObservationAggregationsClient client,
+        string endpoint,
+        CancellationToken cancellationToken) => endpoint switch
+    {
+        "geogridaggregation" => client.GeoGridAggregationInternalJsonAsync("{}", cancellationToken: cancellationToken),
+        "metricgridaggregation" => client.MetricGridAggregationInternalJsonAsync("{}", cancellationToken: cancellationToken),
+        "metricgridaggregationgeojson" => client.MetricGridAggregationInternalGeoJsonAsync("{}", cancellationToken: cancellationToken),
+        "taxonaggregation" => client.TaxonAggregationInternalJsonAsync("{}", cancellationToken: cancellationToken),
+        "taxonareaaggregation" => client.TaxonAreaAggregationInternalJsonAsync("{}", cancellationToken: cancellationToken),
+        "timeserieshistogram" => client.TimeSeriesHistogramInternalJsonAsync("{}", cancellationToken: cancellationToken),
+        _ => throw new ArgumentOutOfRangeException(nameof(endpoint))
+    };
+
+    private sealed class WaitingHttpMessageHandler : HttpMessageHandler
+    {
+        public TaskCompletionSource Started { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        protected override async Task<HttpResponseMessage> SendAsync(
+            HttpRequestMessage request,
+            CancellationToken cancellationToken)
+        {
+            Started.TrySetResult();
+            await Task.Delay(Timeout.Infinite, cancellationToken);
+            throw new InvalidOperationException("The request should have been cancelled.");
+        }
     }
 
     private static HttpClient CreateHttpClient(HttpMessageHandler handler)

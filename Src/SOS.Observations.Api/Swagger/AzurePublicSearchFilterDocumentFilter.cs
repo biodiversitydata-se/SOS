@@ -1,3 +1,4 @@
+using SOS.Api.Contracts.Aggregations.Requests;
 using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 

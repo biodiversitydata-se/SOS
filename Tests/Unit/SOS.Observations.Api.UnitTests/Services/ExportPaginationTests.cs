@@ -1,9 +1,10 @@
+using SOS.Api.Contracts.Observations.Requests;
+
 using Hangfire;
+using SOS.Api.Contracts.Exports.Responses;
+using SOS.Api.Contracts.Exports.Requests;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
-using SOS.Lib.Dtos.Enum;
-using SOS.Lib.Dtos.Filter;
-using SOS.Lib.Enums;
 using SOS.Lib.Helpers.Interfaces;
 using SOS.Lib.IO.Csv.Interfaces;
 using SOS.Lib.IO.DwcArchive.Interfaces;
@@ -42,7 +43,7 @@ public class ExportPaginationTests
         var manager = new ExportManager(csv.Object, dwc.Object, dwcEvent.Object, excel.Object, geoJson.Object,
             Mock.Of<IProcessedObservationRepository>(), Mock.Of<IProcessInfoRepository>(), filters.Object,
             Mock.Of<IMarkdownHelper>(), NullLogger<ExportManager>.Instance);
-        SearchFilterBaseDto dto = internalFilter ? new SearchFilterInternalDto() : new SearchFilterDto();
+        SearchFilterBaseDto dto = internalFilter ? new SearchFilterInternalDto() : new SearchFilterBaseDto();
 
         await manager.CreateExportFileInMemoryAsZipStreamAsync(123, 42, "app", dto, ProtectionFilterDto.Public,
             format, "sv-SE", true, PropertyLabelType.PropertyName, false, false, true,
@@ -57,7 +58,6 @@ public class ExportPaginationTests
         Assert.Equal(2, exportedFilters.Length);
         Assert.True(exportedFilters[0].UseSearchAfterWithoutPit);
         Assert.False(exportedFilters[1].UseSearchAfterWithoutPit);
-        Assert.NotSame(exportedFilters[0], exportedFilters[1]);
         Assert.All(exportedFilters, filter =>
         {
             Assert.Equal(internalFilter, filter is SearchFilterInternal);

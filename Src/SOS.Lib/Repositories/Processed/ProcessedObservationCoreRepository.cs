@@ -1,5 +1,6 @@
-﻿using AgileObjects.AgileMapper.Extensions;
+﻿using SOS.Api.Contracts.Common.Geo;
 using CSharpFunctionalExtensions;
+using SOS.Api.Contracts.Aggregations.Requests;
 using Elastic.Clients.Elasticsearch;
 using Elastic.Clients.Elasticsearch.Aggregations;
 using Elastic.Clients.Elasticsearch.Cluster;
@@ -19,7 +20,8 @@ using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.DarwinCore;
-using SOS.Lib.Models.DataQuality;
+using SOS.Api.Contracts.DataQuality.Responses;
+using SOS.Api.Contracts.Observations.Requests;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Processed.Configuration;
 using SOS.Lib.Models.Processed.Observation;
@@ -1556,7 +1558,7 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
         }
 
         var searchResponse = await Client.SearchAsync<T>(descriptor
-            .Source(options.GetAllFields ? new SourceConfig(true) : filter.Output?.Fields.ToProjection(filter is SearchFilterInternal))
+            .Source(options.GetAllFields ? new SourceConfig(true) : filter.Output?.ToProjection(filter is SearchFilterInternal))
             .From(skip)
             .Size(take)
             .Sort(sortDescriptor?.ToArray())
@@ -1594,7 +1596,7 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
 
         var searchResponse = await Client.SearchAsync<T>(s => s
             .Indices(indexNames)
-            .Source(getAllFields ? new SourceConfig(true) : filter.Output?.Fields.ToProjection(filter is SearchFilterInternal))
+            .Source(getAllFields ? new SourceConfig(true) : filter.Output?.ToProjection(filter is SearchFilterInternal))
             .Size(take)
             .Query(q => q
                 .Bool(b => b
@@ -2024,7 +2026,7 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
         return countResponse.Count;
     }
     
-    public async Task<(long Count, LatLonBoundingBox? Extent, long EstimatedLocationCount)> GetCountAndExtentAsync(SearchFilterBase filter, bool skipAuthorizationFilters = false, bool includeExtent = true)
+    public async Task<(long Count, LatLonBoundingBoxDto? Extent, long EstimatedLocationCount)> GetCountAndExtentAsync(SearchFilterBase filter, bool skipAuthorizationFilters = false, bool includeExtent = true)
     {
         var indexNames = GetCurrentIndex(filter, skipAuthorizationFilters);
         var (query, excludeQuery) = GetCoreQueries<dynamic>(filter, skipAuthorizationFilters);
@@ -2065,7 +2067,7 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
 
         var count = searchResponse.Total;        
         GeoBoundsAggregate? extentAgg = searchResponse.Aggregations?.GetGeoBounds(extentAggName);        
-        LatLonBoundingBox? extentResult = null;        
+        LatLonBoundingBoxDto? extentResult = null;
         if (extentAgg != null && extentAgg.Bounds != null)
         {
             if (extentAgg.Bounds.TryGetTopLeftBottomRight(out var topLeftBottomRight))
@@ -2073,10 +2075,10 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
                 if (topLeftBottomRight.TopLeft.TryGetLatitudeLongitude(out var topLeftLatLon) &&
                     topLeftBottomRight.BottomRight.TryGetLatitudeLongitude(out var bottomRightLatLon))
                 {
-                    extentResult = new LatLonBoundingBox
+                    extentResult = new LatLonBoundingBoxDto
                     {
-                        TopLeft = new LatLonCoordinate(topLeftLatLon.Lat, topLeftLatLon.Lon),
-                        BottomRight = new LatLonCoordinate(bottomRightLatLon.Lat, bottomRightLatLon.Lon)
+                        TopLeft = new LatLonCoordinateDto(topLeftLatLon.Lat, topLeftLatLon.Lon),
+                        BottomRight = new LatLonCoordinateDto(bottomRightLatLon.Lat, bottomRightLatLon.Lon)
                     };
                 }                
             }          
@@ -2296,7 +2298,7 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
                 )
             )
             .Size(1)
-            .Source(getAllFields ? new SourceConfig(true) : filter.Output?.Fields.ToProjection(filter is SearchFilterInternal))
+            .Source(getAllFields ? new SourceConfig(true) : filter.Output?.ToProjection(filter is SearchFilterInternal))
             .TrackTotalHits(new TrackHits(false))
         );
         searchResponse.ThrowIfInvalid();
@@ -2367,7 +2369,7 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
                     )
                     .Sort(sortDescriptor?.ToArray())
                     .Size(take)
-                    .Source(filter.Output?.Fields.ToProjection(filter is SearchFilterInternal))
+                    .Source(filter.Output?.ToProjection(filter is SearchFilterInternal))
                     .Scroll(ScrollTimeout)
                 );
 
@@ -2408,7 +2410,7 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
         {
             var queryResponse = await SearchExportPageAsync<dynamic>(filter, searchIndex, new SearchRequestDescriptor<dynamic>()
             .Indices(searchIndex)
-            .Source(filter.Output?.Fields.ToProjection(filter is SearchFilterInternal))
+            .Source(filter.Output?.ToProjection(filter is SearchFilterInternal))
                 .Query(q => q
                     .Bool(b => b
                         .Filter(query.ToArray())
@@ -2794,7 +2796,7 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
                              countCacheKey != null && _searchTotalCountCache.TryGetValue(countCacheKey, out totalCount);
 
         var searchResponse = await Client.SearchAsync<T>(descriptor
-                .Source(options.GetAllFields ? new SourceConfig(true) : filter.Output?.Fields.ToProjection(filter is SearchFilterInternal))
+                .Source(options.GetAllFields ? new SourceConfig(true) : filter.Output?.ToProjection(filter is SearchFilterInternal))
                 .Size(take)
                 .Sort(sortDescriptor.ToArray())
                 .SearchAfter(searchAfterObj)

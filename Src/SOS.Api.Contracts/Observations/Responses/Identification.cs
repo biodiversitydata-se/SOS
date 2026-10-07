@@ -54,12 +54,25 @@ public class Identification
     public string IdentificationRemarks { get; set; }    
 
     /// <summary>
+    /// True if the sighting is validated. Replaced by <see cref="Verified"/>.
+    /// </summary>
+    [Obsolete("Replaced by Verified")]
+    public bool Validated => Verified;
+
+    /// <summary>
     /// True if sighting is verified (validated).
     /// </summary>
     public bool Verified { get; set; }
 
 
+    /// <summary>The verification status assigned to the identification.</summary>
     public VocabularyValue? VerificationStatus { get; set; }
+
+    /// <summary>
+    /// Validation status. Replaced by <see cref="VerificationStatus"/>.
+    /// </summary>
+    [Obsolete("Replaced by VerificationStatus")]
+    public VocabularyValue? ValidationStatus => VerificationStatus;
 
     /// <summary>
     /// A list (concatenated and separated) of names of people,
@@ -80,6 +93,7 @@ public class Identification
     /// </summary>
     public bool UncertainIdentification { get; set; }
 
+    /// <summary>The method used to identify the organism.</summary>
     public VocabularyValue? DeterminationMethod { get; set; }
 
     /// <summary>

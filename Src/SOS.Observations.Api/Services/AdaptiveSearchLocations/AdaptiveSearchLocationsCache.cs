@@ -1,9 +1,7 @@
-using SOS.Lib.Dtos.Filter;
+using SOS.Api.Contracts.Common.Geo;
+using SOS.Api.Contracts.Observations.Requests;
 using SOS.Lib.Models.Gis;
-using System.Security.Cryptography;
-using System.Text;
-using System.Text.Json;
-using System.Text.Json.Serialization;
+using SOS.Observations.Api.Helpers;
 using ZiggyCreatures.Caching.Fusion;
 
 namespace SOS.Observations.Api.Services.AdaptiveSearchLocations;
@@ -11,14 +9,14 @@ namespace SOS.Observations.Api.Services.AdaptiveSearchLocations;
 internal interface IAdaptiveSearchLocationsCache
 {
     string CreateCacheKey(int? roleId, string? authorizationApplicationIdentifier, bool sensitiveObservations, SearchFilterInternalDto filter);
-    bool TryGet(string cacheKey, LatLonBoundingBox? requestedBbox, out List<CachedLocationAggregate> locations, bool requireExactBoundingBox = false);
-    void Set(string cacheKey, LatLonBoundingBox? bbox, List<CachedLocationAggregate> locations);
-    LatLonBoundingBox? CreateBoundingBox(IEnumerable<CachedLocationAggregate> locations);
+    bool TryGet(string cacheKey, LatLonBoundingBoxDto? requestedBbox, out List<CachedLocationAggregate> locations, bool requireExactBoundingBox = false);
+    void Set(string cacheKey, LatLonBoundingBoxDto? bbox, List<CachedLocationAggregate> locations);
+    LatLonBoundingBoxDto? CreateBoundingBox(IEnumerable<CachedLocationAggregate> locations);
 }
 
 internal sealed class AdaptiveSearchLocationsCache : IAdaptiveSearchLocationsCache
 {
-    internal const string CacheKeyPrefix = "adaptive-search-locations:v4:";
+    internal const string CacheKeyPrefix = "adaptive-search-locations:v5:";
     internal const int MaxEntriesPerKey = 8;
     internal const int MaxLocationsPerBucket = 10000;
     internal static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(10);
@@ -27,7 +25,6 @@ internal sealed class AdaptiveSearchLocationsCache : IAdaptiveSearchLocationsCac
 
     private readonly IFusionCache _cache;
     private readonly AdaptiveSearchLocationsCacheMonitor _cacheMonitor;
-    private readonly JsonSerializerOptions _jsonSerializerOptions;
     private readonly TimeProvider _timeProvider;
 
     public AdaptiveSearchLocationsCache(
@@ -39,34 +36,22 @@ internal sealed class AdaptiveSearchLocationsCache : IAdaptiveSearchLocationsCac
             .GetCache(Controllers.ObservationsController.AdaptiveSearchLocationsCacheName);
         _cacheMonitor = cacheMonitor ?? throw new ArgumentNullException(nameof(cacheMonitor));
         _timeProvider = timeProvider ?? TimeProvider.System;
-        _jsonSerializerOptions = new JsonSerializerOptions
-        {
-            AllowTrailingCommas = true,
-            DefaultIgnoreCondition = JsonIgnoreCondition.Never,
-            PropertyNameCaseInsensitive = true,
-            ReadCommentHandling = JsonCommentHandling.Skip,
-            Converters =
-            {
-                new JsonStringEnumConverter(),
-                new NetTopologySuite.IO.Converters.GeoJsonConverterFactory()
-            }
-        };
     }
 
     public string CreateCacheKey(int? roleId, string? authorizationApplicationIdentifier, bool sensitiveObservations, SearchFilterInternalDto filter)
     {
         var cacheKeyParameters = new[]
         {
-            "version=4",
+            "version=5",
             $"roleId={roleId}",
             $"authorizationApplicationIdentifier={authorizationApplicationIdentifier}",
             $"sensitiveObservations={sensitiveObservations}"
         };
-        var cacheKeyFilter = CreateSearchFilterWithoutBoundingBox(filter);
-        return $"{CacheKeyPrefix}{CreateHash(string.Join("&", cacheKeyParameters), cacheKeyFilter, _jsonSerializerOptions)}";
+        var hash = SearchFilterCacheKeyHelper.CreateKey(string.Join("&", cacheKeyParameters) + ":", filter, ignoreBoundingBox: true);
+        return $"{CacheKeyPrefix}{hash}";
     }
 
-    public bool TryGet(string cacheKey, LatLonBoundingBox? requestedBbox, out List<CachedLocationAggregate> locations, bool requireExactBoundingBox = false)
+    public bool TryGet(string cacheKey, LatLonBoundingBoxDto? requestedBbox, out List<CachedLocationAggregate> locations, bool requireExactBoundingBox = false)
     {
         locations = new List<CachedLocationAggregate>();
         var cachedBucket = _cache.TryGet<AdaptiveSearchLocationsCacheBucket>(cacheKey);
@@ -101,7 +86,7 @@ internal sealed class AdaptiveSearchLocationsCache : IAdaptiveSearchLocationsCac
         return true;
     }
 
-    public void Set(string cacheKey, LatLonBoundingBox? bbox, List<CachedLocationAggregate> locations)
+    public void Set(string cacheKey, LatLonBoundingBoxDto? bbox, List<CachedLocationAggregate> locations)
     {
         if (locations.Count > MaxLocationsPerBucket)
         {
@@ -124,7 +109,7 @@ internal sealed class AdaptiveSearchLocationsCache : IAdaptiveSearchLocationsCac
             };
             bucket.Entries.Insert(0, new AdaptiveSearchLocationsCacheEntry
             {
-                BoundingBox = bbox == null ? null : LatLonBoundingBox.Create(
+                BoundingBox = bbox == null ? null : LatLonBoundingBoxDto.Create(
                     bbox.TopLeft.Longitude, bbox.TopLeft.Latitude, bbox.BottomRight.Longitude, bbox.BottomRight.Latitude),
                 Locations = locations.ToList(),
                 CreatedUtc = now
@@ -149,7 +134,7 @@ internal sealed class AdaptiveSearchLocationsCache : IAdaptiveSearchLocationsCac
         }
     }
 
-    public LatLonBoundingBox? CreateBoundingBox(IEnumerable<CachedLocationAggregate> locations)
+    public LatLonBoundingBoxDto? CreateBoundingBox(IEnumerable<CachedLocationAggregate> locations)
     {
         double? left = null;
         double? top = null;
@@ -173,28 +158,8 @@ internal sealed class AdaptiveSearchLocationsCache : IAdaptiveSearchLocationsCac
         }
 
         return left.HasValue && top.HasValue && right.HasValue && bottom.HasValue
-            ? LatLonBoundingBox.Create(left, top, right, bottom)
+            ? LatLonBoundingBoxDto.Create(left, top, right, bottom)
             : null;
-    }
-
-    private SearchFilterInternalDto CreateSearchFilterWithoutBoundingBox(SearchFilterInternalDto filter)
-    {
-        var json = JsonSerializer.Serialize(filter, _jsonSerializerOptions);
-        var clone = JsonSerializer.Deserialize<SearchFilterInternalDto>(json, _jsonSerializerOptions) ?? new SearchFilterInternalDto();
-        if (clone.Geographics != null)
-        {
-            clone.Geographics.BoundingBox = null;
-        }
-
-        return clone;
-    }
-
-    private static string CreateHash(string queryString, object request, JsonSerializerOptions options)
-    {
-        var json = JsonSerializer.Serialize(request, options);
-        var rawKey = $"{queryString}:{json}";
-        var hashBytes = SHA256.HashData(Encoding.UTF8.GetBytes(rawKey));
-        return BitConverter.ToString(hashBytes).Replace("-", "").ToLowerInvariant();
     }
 
     private static TrimResult Trim(AdaptiveSearchLocationsCacheBucket bucket)
@@ -235,7 +200,7 @@ internal sealed class AdaptiveSearchLocationsCache : IAdaptiveSearchLocationsCac
 
     private static IEnumerable<CachedLocationAggregate> FilterByBoundingBox(
         IEnumerable<CachedLocationAggregate> locations,
-        LatLonBoundingBox? bbox)
+        LatLonBoundingBoxDto? bbox)
     {
         if (bbox?.TopLeft == null || bbox.BottomRight == null)
         {
@@ -251,7 +216,7 @@ internal sealed class AdaptiveSearchLocationsCache : IAdaptiveSearchLocationsCac
                 bbox));
     }
 
-    private static bool ContainsBoundingBox(LatLonBoundingBox? cachedBbox, LatLonBoundingBox? requestedBbox)
+    private static bool ContainsBoundingBox(LatLonBoundingBoxDto? cachedBbox, LatLonBoundingBoxDto? requestedBbox)
     {
         if (requestedBbox?.TopLeft == null || requestedBbox.BottomRight == null)
         {
@@ -269,7 +234,7 @@ internal sealed class AdaptiveSearchLocationsCache : IAdaptiveSearchLocationsCac
                cachedBbox.BottomRight.Latitude <= requestedBbox.BottomRight.Latitude;
     }
 
-    private static bool AreSameBoundingBox(LatLonBoundingBox? left, LatLonBoundingBox? right)
+    private static bool AreSameBoundingBox(LatLonBoundingBoxDto? left, LatLonBoundingBoxDto? right)
     {
         if (left?.TopLeft == null || left.BottomRight == null || right?.TopLeft == null || right.BottomRight == null)
         {
@@ -282,7 +247,7 @@ internal sealed class AdaptiveSearchLocationsCache : IAdaptiveSearchLocationsCac
                left.BottomRight.Latitude.Equals(right.BottomRight.Latitude);
     }
 
-    private static bool IsCoordinateWithinBoundingBox(double longitude, double latitude, LatLonBoundingBox bbox)
+    private static bool IsCoordinateWithinBoundingBox(double longitude, double latitude, LatLonBoundingBoxDto bbox)
     {
         return longitude >= bbox.TopLeft.Longitude &&
                longitude <= bbox.BottomRight.Longitude &&

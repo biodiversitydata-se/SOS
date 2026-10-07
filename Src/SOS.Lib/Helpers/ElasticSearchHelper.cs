@@ -1,6 +1,7 @@
 ﻿using Elastic.Clients.Elasticsearch;
 using Elastic.Clients.Elasticsearch.Serialization;
 using Elastic.Transport;
+using SOS.Api.Contracts.Observations;
 using System;
 using System.Linq;
 using System.Text.Json.Serialization;
@@ -30,6 +31,8 @@ public static class ElasticSearchHelper
                         o.Converters.Remove(stringEnumConverter);
                     }
                     o.Converters.Add(new JsonConverters.GeometryConverter());
+                    // The shared API enum uses strings, but the index field remains numeric.
+                    o.Converters.Add(new JsonNumberEnumConverter<DiffusionStatus>());
                     //o.Converters.Add(new NetTopologySuite.IO.Converters.GeoJsonConverterFactory());
                 }),
                 requestInvoker: new HttpRequestInvoker()

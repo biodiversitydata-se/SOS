@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using SOS.Lib.Models.Search.Result;
+using SOS.Api.Contracts.Areas.Requests;
+using SOS.Api.Contracts.Areas.Responses;
+using SOS.Api.Contracts.Common.Responses;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Swagger;
-using SOS.Lib.Dtos;
-using SOS.Lib.Dtos.Enum;
 using SOS.Observations.Api.Managers.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -46,7 +46,7 @@ public class AreasController : ControllerBase
     /// <param name="take">Number of areas to return</param>
     /// <returns>List of areas</returns>
     [HttpGet()]
-    [ProducesResponseType(typeof(PagedResult<AreaBaseDto>), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(PagedResultDto<AreaBaseDto>), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
     [AzureApi, AzureInternalApi]
     public async Task<IActionResult> GetAreas(
@@ -58,7 +58,9 @@ public class AreasController : ControllerBase
         try
         {
             LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
-            return new OkObjectResult(await _areaManager.GetAreasAsync(areaTypes, searchString, skip, take));
+            var result = await _areaManager.GetAreasAsync(
+                areaTypes, searchString, skip, take);
+            return new OkObjectResult(result);
         }
         catch (Exception e)
         {
@@ -78,13 +80,14 @@ public class AreasController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
     [AzureApi, AzureInternalApi]
     public async Task<IActionResult> GetArea(
-        [FromRoute] AreaTypeDto areaType, 
+        [FromRoute] AreaTypeDto areaType,
         [FromRoute] string featureId)
     {
         try
         {
             LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
-            return new OkObjectResult(await _areaManager.GetAreaAsync(areaType, featureId));
+            var result = await _areaManager.GetAreaAsync(areaType, featureId);
+            return new OkObjectResult(result);
         }
         catch (Exception e)
         {

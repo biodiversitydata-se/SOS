@@ -15,7 +15,7 @@ using Xunit;
 namespace SOS.Process.UnitTests.Jobs;
 
 /// <summary>
-///     Tests for activate instance job
+///     Tests for processing taxa.
 /// </summary>
 public class ProcessTaxaJobTests
 {
@@ -69,7 +69,7 @@ public class ProcessTaxaJobTests
     /// </summary>
     /// <returns></returns>
     [Fact]
-    public void RunAsyncFail()
+    public async Task RunAsync_WhenProcessingFails_ThrowsWithJobFailureMessage()
     {
         // -----------------------------------------------------------------------------------------------------------
         // Arrange
@@ -86,7 +86,7 @@ public class ProcessTaxaJobTests
         //-----------------------------------------------------------------------------------------------------------
         // Assert
         //-----------------------------------------------------------------------------------------------------------
-        run.Should().ThrowAsync<Exception>()
+        await run.Should().ThrowAsync<Exception>()
             .WithMessage("Process taxa job failed");
     }
 

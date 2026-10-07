@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using SOS.Api.Contracts.Common.Geo;
+using FluentAssertions;
 using SOS.Lib.Gis;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Processed.Observation;
@@ -29,7 +30,7 @@ public class Sweref99TmLocationClustererTests : LocationClustererAlgorithmTestBa
             LocationClustererTestData.CreateObservation(new Location { LocationId = "sweref-location-2", DecimalLongitude = 18.0000, DecimalLatitude = 59.0001 }, "sweref-observation-2"),
             LocationClustererTestData.CreateObservation(new Location { LocationId = "sweref-location-3", DecimalLongitude = 18.0001, DecimalLatitude = 59.0001 }, "sweref-observation-3")
         };
-        var boundingBox = LatLonBoundingBox.Create(17.99, 59.01, 18.01, 58.99);
+        var boundingBox = LatLonBoundingBoxDto.Create(17.99, 59.01, 18.01, 58.99);
 
         // Act
         var result = new Sweref99TmLocationClusterer(3, 10)
@@ -64,7 +65,7 @@ public class Sweref99TmLocationClustererTests : LocationClustererAlgorithmTestBa
             }, "sweref-property-observation-1")
         };
 
-        var boundingBox = LatLonBoundingBox.Create(17.99, 59.01, 18.01, 58.99);
+        var boundingBox = LatLonBoundingBoxDto.Create(17.99, 59.01, 18.01, 58.99);
 
         // Act
         var result = new Sweref99TmLocationClusterer(1, 10)
@@ -80,7 +81,7 @@ public class Sweref99TmLocationClustererTests : LocationClustererAlgorithmTestBa
     {
         // Arrange
         var observations = CreateCloseCentroidMergeObservations();
-        var boundingBox = LatLonBoundingBox.Create(17.99, 59.01, 18.01, 58.99);
+        var boundingBox = LatLonBoundingBoxDto.Create(17.99, 59.01, 18.01, 58.99);
 
         // Act
         var result = new Sweref99TmLocationClusterer(1, 10)

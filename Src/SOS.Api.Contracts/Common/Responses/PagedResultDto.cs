@@ -1,4 +1,4 @@
-namespace SOS.Api.Contracts.Common.Responses;
+﻿namespace SOS.Api.Contracts.Common.Responses;
 /// <summary>
 /// Result returned by paged query
 /// </summary>
@@ -6,8 +6,7 @@ public class PagedResultDto<T>
 {
 
     /// <summary>
-    /// Ignores the specified number of items and returns a sequence starting at the item after the last skipped item (if
-    /// <br/>any)
+    /// Ignores the specified number of items and returns a sequence starting at the item after the last skipped item (if<br/>any)
     /// </summary>
     public int Skip { get; set; }
 
@@ -24,8 +23,6 @@ public class PagedResultDto<T>
     /// <summary>
     /// Paged records
     /// </summary>
-    public List<T> Records { get; set; }
+    public IReadOnlyList<T> Records { get; set; } = [];
 
 }
-
-

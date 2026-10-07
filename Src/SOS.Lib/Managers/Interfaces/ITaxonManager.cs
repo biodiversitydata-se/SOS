@@ -1,4 +1,4 @@
-﻿using SOS.Lib.Enums;
+﻿using SOS.Api.Contracts.Observations.Requests;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.TaxonTree;

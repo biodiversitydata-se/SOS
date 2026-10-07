@@ -1,4 +1,4 @@
-﻿using SOS.Lib.Models.ApiInfo;
+﻿using SOS.Api.Contracts.Metadata.Responses;
 
 namespace SOS.DataStewardship.Api.Endpoints.ApiInfo;
 

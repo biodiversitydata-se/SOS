@@ -1,3 +1,5 @@
+﻿using System.ComponentModel.DataAnnotations;
+
 namespace SOS.Api.Contracts.DataStewardship.Responses;
 
 /// <summary>
@@ -6,11 +8,11 @@ namespace SOS.Api.Contracts.DataStewardship.Responses;
 public sealed class DsMethodologyDto
 {
     /// <summary>The methodology name.</summary>
-    public string? MethodologyName { get; set; }
+    [Required] public string MethodologyName { get; set; } = null!;
     /// <summary>The methodology description.</summary>
-    public string? MethodologyDescription { get; set; }
+    [Required] public string MethodologyDescription { get; set; } = null!;
     /// <summary>A persistent link to a description of the methodology.</summary>
-    public string? MethodologyLink { get; set; }
+    [Required] public string MethodologyLink { get; set; } = null!;
     /// <summary>A persistent link to the published species list for the dataset.</summary>
-    public string? SpeciesList { get; set; }
+    [Required] public string SpeciesList { get; set; } = null!;
 }

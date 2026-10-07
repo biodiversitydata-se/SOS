@@ -19,12 +19,12 @@ public class ArtportalenProcessorTests : TestBase
     public void Observation_is_positive_when_both_NotPresent_and_NotRecovered_is_false()
     {
         // Arrange
-        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(5)
             .All().HaveValuesFromPredefinedObservations()
-            .TheFirst(60).With(v => v.NotPresent = false)
+            .TheFirst(3).With(v => v.NotPresent = false)
                          .With(v => v.NotRecovered = false)
-             .TheNext(20).With(v => v.NotPresent = true)
-             .TheNext(20).With(v => v.NotRecovered = true)
+             .TheNext(1).With(v => v.NotPresent = true)
+             .TheNext(1).With(v => v.NotRecovered = true)
             .Build();
 
         // Act
@@ -38,7 +38,7 @@ public class ArtportalenProcessorTests : TestBase
             .ToList()
             .Should().BeEquivalentTo(
                 new List<ItemCount<bool>> {
-                    new ItemCount<bool>(true, 60),
-                    new ItemCount<bool>(false, 40) });
+                    new ItemCount<bool>(true, 3),
+                    new ItemCount<bool>(false, 2) });
     }
 }

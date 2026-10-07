@@ -2,14 +2,8 @@ using SOS.Api.Contracts.Observations.Requests;
 
 namespace SOS.Api.Client.Requests;
 /// <summary>Options for cursor-based observation search.</summary>
-public sealed class SearchByCursorOptions
+public sealed class SearchByCursorOptions : SosRoleRequestOptions
 {
-    /// <summary>The explicit authorization role identifier.</summary>
-    public int? RoleId { get; set; }
-
-    /// <summary>The explicit calling application identifier.</summary>
-    public string? AuthorizationApplicationIdentifier { get; set; }
-
     /// <summary>The maximum number of records to return.</summary>
     public int Take { get; set; } = 1000;
 

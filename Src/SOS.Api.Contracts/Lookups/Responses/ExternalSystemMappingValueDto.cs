@@ -1,6 +1,7 @@
 using SOS.Api.Contracts.Observations.Responses;
 
 namespace SOS.Api.Contracts.Lookups.Responses;
+/// <summary>Correspondence between an external value and an SOS vocabulary value.</summary>
 public class ExternalSystemMappingValueDto
 {
 

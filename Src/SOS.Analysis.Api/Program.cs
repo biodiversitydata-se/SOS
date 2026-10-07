@@ -136,6 +136,7 @@ static void ConfigureServices(
             options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
             options.JsonSerializerOptions.ReadCommentHandling = JsonCommentHandling.Skip;
             options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            options.JsonSerializerOptions.Converters.Add(new GeographicsFilterInputJsonConverter());
             options.JsonSerializerOptions.Converters.Add(new GeometryConverter());
             options.JsonSerializerOptions.Converters.Add(new NetTopologySuite.IO.Converters.GeoJsonConverterFactory());
         });

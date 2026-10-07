@@ -85,7 +85,7 @@ public class LocationFeature
     /// The counts of observations in different status categories (found, not found, treated, not treated, diffused, not
     /// diffused).
     /// </summary>
-    public ObservationStatusCounts StatusCounts { get; set; }
+    public SOS.Api.Contracts.Observations.Responses.ObservationStatusCounts StatusCounts { get; set; }
 
     /// <summary>
     /// True when the item was created from representative observations instead of all observations for the location.
@@ -173,7 +173,7 @@ public class LocationFeature
         };
     }
 
-    private static ObservationStatusCounts CreateStatusCounts(List<Observation> observations)
+    private static SOS.Api.Contracts.Observations.Responses.ObservationStatusCounts CreateStatusCounts(List<Observation> observations)
     {
         int foundCount = 0;
         var diffusedCount = 0;
@@ -209,7 +209,7 @@ public class LocationFeature
             }
         }
 
-        return new ObservationStatusCounts(
+        return new SOS.Api.Contracts.Observations.Responses.ObservationStatusCounts(
             foundCount,
             treatedCount,
             diffusedCount,

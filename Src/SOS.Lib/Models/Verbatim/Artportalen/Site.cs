@@ -1,5 +1,5 @@
-﻿using MongoDB.Driver.GeoJsonObjectModel;
-using SOS.Lib.Enums;
+﻿using SOS.Api.Contracts.Common.Geo;
+using MongoDB.Driver.GeoJsonObjectModel;
 using System.Collections.Generic;
 
 namespace SOS.Lib.Models.Verbatim.Artportalen;

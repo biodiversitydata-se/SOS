@@ -1,5 +1,6 @@
 ﻿using Hangfire;
 using Newtonsoft.Json;
+using SOS.Api.Contracts.Exports.Requests;
 using SOS.Harvest.Managers.Interfaces;
 using SOS.Lib.Configuration.Import;
 using SOS.Lib.Enums;

@@ -1,5 +1,6 @@
 ﻿using Hangfire.Common;
 using Hangfire.States;
+using SOS.Api.Contracts.Exports.Responses;
 using Hangfire.Storage;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Context;

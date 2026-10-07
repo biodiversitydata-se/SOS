@@ -1,11 +1,10 @@
-﻿using FizzWare.NBuilder;
+using SOS.Api.Contracts.Common.Responses;
+using SOS.Api.Contracts.Observations.Requests;
+using FizzWare.NBuilder;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Observations.Api.IntegrationTests.Setup;
 using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
-using SOS.Lib.Dtos;
-using SOS.Lib.Dtos.Enum;
-using SOS.Lib.Dtos.Filter;
 
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsEndpoints.ObservationsByCursorEndpoint;
 
@@ -20,7 +19,7 @@ public class ObservationsByCursorTests : TestBase
     public async Task SearchByCursor_PaginatesThroughAllResults_WhenUsingCursor()
     {
         // Arrange
-        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(7)
             .All().HaveValuesFromPredefinedObservations()
             .Build();
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
@@ -30,31 +29,31 @@ public class ObservationsByCursorTests : TestBase
 
         // Act - First page
         var response1 = await apiClient.PostAsync(
-            "/observations/searchbycursor?take=30",
+            "/observations/searchbycursor?take=2",
             JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
         var result1 = await response1.Content.ReadFromJsonAsync<SearchByCursorResultDto<Observation>>(TestContext.Current.CancellationToken);
 
         // Act - Second page
         var response2 = await apiClient.PostAsync(
-            $"/observations/searchbycursor?take=30&cursor={result1!.NextCursor}",
+            $"/observations/searchbycursor?take=2&cursor={result1!.NextCursor}",
             JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
         var result2 = await response2.Content.ReadFromJsonAsync<SearchByCursorResultDto<Observation>>(TestContext.Current.CancellationToken);
 
         // Act - Third page
         var response3 = await apiClient.PostAsync(
-            $"/observations/searchbycursor?take=30&cursor={result2!.NextCursor}",
+            $"/observations/searchbycursor?take=2&cursor={result2!.NextCursor}",
             JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
         var result3 = await response3.Content.ReadFromJsonAsync<SearchByCursorResultDto<Observation>>(TestContext.Current.CancellationToken);
 
-        // Act - Fourth page (last 10)
+        // Act - Fourth page (last observation)
         var response4 = await apiClient.PostAsync(
-            $"/observations/searchbycursor?take=30&cursor={result3!.NextCursor}",
+            $"/observations/searchbycursor?take=2&cursor={result3!.NextCursor}",
             JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
         var result4 = await response4.Content.ReadFromJsonAsync<SearchByCursorResultDto<Observation>>(TestContext.Current.CancellationToken);
 
         // Act - Fifth page (no records)
         var response5 = await apiClient.PostAsync(
-           $"/observations/searchbycursor?take=30&cursor={result4!.NextCursor}",    
+           $"/observations/searchbycursor?take=2&cursor={result4!.NextCursor}",
            JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
         var result5 = await response5.Content.ReadFromJsonAsync<SearchByCursorResultDto<Observation>>(TestContext.Current.CancellationToken);
 
@@ -70,14 +69,17 @@ public class ObservationsByCursorTests : TestBase
         response2.StatusCode.Should().Be(HttpStatusCode.OK);
         response3.StatusCode.Should().Be(HttpStatusCode.OK);
         response4.StatusCode.Should().Be(HttpStatusCode.OK);
+        response5.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        result1.Records.Should().HaveCount(30);
-        result2.Records.Should().HaveCount(30);
-        result3.Records.Should().HaveCount(30);
-        result4.Records.Should().HaveCount(10);
+        result1.Records.Should().HaveCount(2);
+        result2.Records.Should().HaveCount(2);
+        result3.Records.Should().HaveCount(2);
+        result4.Records.Should().HaveCount(1);
         result5.Records.Should().HaveCount(0);
         result5.NextCursor.Should().BeNullOrEmpty(because: "this is the last page");
-        allOccurrenceIds.Should().HaveCount(100, because: "all observations should be unique across pages");
+        allOccurrenceIds.Should().HaveCount(7, because: "all observations should be unique across pages");
+        allOccurrenceIds.Should().BeEquivalentTo(verbatimObservations.Select(observation =>
+            $"urn:lsid:artportalen.se:sighting:{observation.SightingId}"));
     }
 
     [Fact]

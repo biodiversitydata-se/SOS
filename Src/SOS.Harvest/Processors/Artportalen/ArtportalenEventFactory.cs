@@ -1,4 +1,5 @@
-﻿//using NetTopologySuite.Geometries;
+﻿using SOS.Api.Contracts.Common.Geo;
+//using NetTopologySuite.Geometries;
 //using SOS.Lib.Enums;
 //using SOS.Lib.Extensions;
 //using SOS.Lib.Models.Processed.Checklist;

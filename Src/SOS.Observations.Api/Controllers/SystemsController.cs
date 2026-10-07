@@ -1,4 +1,6 @@
-﻿using CSharpFunctionalExtensions;
+﻿using SOS.Api.Contracts.Metadata.Responses;
+using SOS.Api.Contracts.Status.Responses;
+using CSharpFunctionalExtensions;
 using Elastic.Clients.Elasticsearch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -11,11 +13,10 @@ using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Shared;
+using SOS.Lib.Models.Status;
 using SOS.Lib.Swagger;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Repositories.Interfaces;
-using SOS.Lib.Dtos;
-using SOS.Lib.Dtos.Status;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,6 +24,9 @@ using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
 using SOS.Lib.Managers;
+using SOS.Lib.Extensions.Dto;
+using SOS.Api.Contracts.Taxonomy.Requests;
+using SOS.Api.Contracts.Observations.Requests;
 
 namespace SOS.Observations.Api.Controllers;
 
@@ -144,7 +148,8 @@ public class SystemsController : ControllerBase
         try
         {
             LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
-            return new OkObjectResult(await _processInfoManager.GetProcessInfoAsync(_processedObservationRepository.UniquePublicIndexName));
+            var processInfo = await _processInfoManager.GetProcessInfoAsync(_processedObservationRepository.UniquePublicIndexName);
+            return new OkObjectResult(processInfo);
         }
         catch (Exception e)
         {
@@ -169,6 +174,11 @@ public class SystemsController : ControllerBase
     [InternalApi]
     public IEnumerable<MongoDbProcessInfoDto> GetMongoDbProcessInfo()
     {
+        return GetMongoDbProcessInfoModels();
+    }
+
+    private IEnumerable<MongoDbProcessInfoDto> GetMongoDbProcessInfoModels()
+    {
         var database = _mongoClient.GetDatabase(_mongoConfiguration.DatabaseName);
         var queryBuilder = Builders<MongoDbProcessInfoDto>.Filter;
         var query = queryBuilder.Regex(pi => pi.Id, @"observation-\d");
@@ -184,6 +194,11 @@ public class SystemsController : ControllerBase
     [InternalApi]
     public ActiveInstanceInfoDto GetActiveInstance()
     {
+        return GetActiveInstanceModel()!;
+    }
+
+    private ActiveInstanceInfoDto? GetActiveInstanceModel()
+    {
         var database = _mongoClient.GetDatabase(_mongoConfiguration.DatabaseName);
         var collection = database.GetCollection<ActiveInstanceInfoDto>("ProcessedConfiguration");
         var instance = collection.Find(new BsonDocument())?.ToList();
@@ -196,10 +211,10 @@ public class SystemsController : ControllerBase
     public IEnumerable<HangfireJobDto> GetProcessing()
     {
         var database = _mongoClient.GetDatabase("sos-hangfire" + _mongoSuffix);
-        var collection = database.GetCollection<HangfireJobDto>("hangfire.jobGraph");
-        var filter = Builders<HangfireJobDto>.Filter.Eq(p => p.StateName, "Processing");
+        var collection = database.GetCollection<HangfireJob>("hangfire.jobGraph");
+        var filter = Builders<HangfireJob>.Filter.Eq(p => p.StateName, "Processing");
         var jobs = collection.Find(filter).ToList();
-        return jobs;
+        return jobs.Select(record => record.ToHangfireJobDto());
     }
 
     [HttpGet]
@@ -258,8 +273,8 @@ public class SystemsController : ControllerBase
     [InternalApi]
     public ProcessSummaryDto GetProcessSummary()
     {
-        var activeInstance = GetActiveInstance();
-        var processInfos = GetMongoDbProcessInfo();
+        var activeInstance = GetActiveInstanceModel();
+        var processInfos = GetMongoDbProcessInfoModels();
         var processSummary = GetProcessSummary(processInfos, activeInstance);
         return processSummary;
     }
@@ -274,7 +289,7 @@ public class SystemsController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
     public async Task<IActionResult> GetTaxonRelationsDiagram(
         [FromQuery] int[] taxonIds,
-        [FromQuery] TaxonRelationDiagramHelper.TaxonRelationsTreeIterationMode treeIterationMode = TaxonRelationDiagramHelper.TaxonRelationsTreeIterationMode.BothParentsAndChildren,
+        [FromQuery] TaxonRelationsTreeIterationMode treeIterationMode = TaxonRelationsTreeIterationMode.BothParentsAndChildren,
         [FromQuery] bool includeSecondaryRelations = false,
         [FromQuery] DiagramFormat diagramFormat = DiagramFormat.Mermaid,
         [FromQuery] TaxonomyType taxonomyType = TaxonomyType.Dyntaxa,
@@ -318,7 +333,7 @@ public class SystemsController : ControllerBase
     }
     private ProcessSummaryDto GetProcessSummary(IEnumerable<MongoDbProcessInfoDto>? processInfos, ActiveInstanceInfoDto? activeInstanceInfo)
     {
-        MongoDbProcessInfoDto activeInfos = processInfos.FirstOrDefault(m => int.Parse(m.Id.Last().ToString()) == activeInstanceInfo.ActiveInstance);
+        var activeInfos = processInfos.FirstOrDefault(m => int.Parse(m.Id.Last().ToString()) == activeInstanceInfo.ActiveInstance);
         var inactiveInfos = processInfos.FirstOrDefault(m => int.Parse(m.Id.Last().ToString()) != activeInstanceInfo.ActiveInstance);
         var processSummary = new ProcessSummaryDto
         {

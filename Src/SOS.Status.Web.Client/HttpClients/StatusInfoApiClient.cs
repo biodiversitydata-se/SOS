@@ -1,6 +1,7 @@
 ﻿using SOS.Status.Web.Client.Abstractions;
 using SOS.Status.Web.Client.Dtos;
 using SOS.Status.Web.Client.Models;
+using SOS.Api.Contracts.Status.Responses;
 using System.Net.Http.Json;
 
 namespace SOS.Status.Web.Client.HttpClients;
@@ -14,14 +15,14 @@ public class StatusInfoApiClient : IStatusInfoService
         _http = http;
     }
 
-    public async Task<List<DataProviderStatusRow>?> GetDataProviderStatusRowsAsync()
+    public async Task<List<SOS.Status.Web.Client.Models.DataProviderStatusRow>?> GetDataProviderStatusRowsAsync()
     {
-        return await _http.GetFromJsonAsync<List<DataProviderStatusRow>>("api/StatusInfo/data-provider-status-rows");
+        return await _http.GetFromJsonAsync<List<SOS.Status.Web.Client.Models.DataProviderStatusRow>>("api/StatusInfo/data-provider-status-rows");
     }
 
-    public async Task<ProcessSummaryDto?> GetProcessSummaryAsync()
+    public async Task<ProcessSummaryViewModel?> GetProcessSummaryAsync()
     {
-        return await _http.GetFromJsonAsync<ProcessSummaryDto>("api/status-info/process-summary");
+        return await _http.GetFromJsonAsync<ProcessSummaryViewModel>("api/status-info/process-summary");
     }
 
     public async Task<IEnumerable<MongoDbProcessInfoDto>?> GetProcessInfoAsync()
@@ -29,14 +30,14 @@ public class StatusInfoApiClient : IStatusInfoService
         return await _http.GetFromJsonAsync<IEnumerable<MongoDbProcessInfoDto>>("api/status-info/process-info");
     }
 
-    public async Task<ProcessInfoDto?> GetProcessInfoAsync(bool active)
+    public async Task<ProcessInfoViewModel?> GetProcessInfoAsync(bool active)
     {
-        return await _http.GetFromJsonAsync<ProcessInfoDto>($"api/status-info/process-info/{active.ToString().ToLower()}");
+        return await _http.GetFromJsonAsync<ProcessInfoViewModel>($"api/status-info/process-info/{active.ToString().ToLower()}");
     }
 
-    public async Task<List<DataProviderStatusDto>?> GetDataProviderStatusAsync()
+    public async Task<List<DataProviderStatusViewModel>?> GetDataProviderStatusAsync()
     {
-        return await _http.GetFromJsonAsync<List<DataProviderStatusDto>>("api/status-info/data-provider-status");
+        return await _http.GetFromJsonAsync<List<DataProviderStatusViewModel>>("api/status-info/data-provider-status");
     }
 
     public async Task<HealthReportDto?> GetObservationsApiHealthAsync()

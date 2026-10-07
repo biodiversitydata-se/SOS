@@ -1,4 +1,4 @@
-﻿using SOS.Lib.Enums;
+﻿using SOS.Api.Contracts.Observations.Responses;
 
 namespace SOS.Lib.Models.Diagnostics;
 

@@ -1,6 +1,7 @@
-﻿using SOS.Lib.Models.Analysis;
+﻿using SOS.Api.Contracts.Aggregations.Responses;
+using SOS.Lib.Models.Analysis;
 using SOS.Lib.Models.Search.Result;
-using SOS.Lib.Dtos.Search;
+using SOS.Api.Contracts.Analysis.Responses;
 
 namespace SOS.Lib.Extensions.Dto;
 

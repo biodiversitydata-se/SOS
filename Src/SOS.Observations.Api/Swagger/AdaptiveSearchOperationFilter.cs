@@ -1,28 +1,24 @@
-﻿using Microsoft.AspNetCore.Mvc.ApiExplorer;
-using Microsoft.OpenApi;
-using SOS.Lib.Dtos;
-using SOS.Lib.Models.Processed.Observation;
+﻿using Microsoft.OpenApi;
+using GeoJSON.Text.Feature;
+using SOS.Api.Contracts.Observations.Responses;
+using SOS.Observations.Api.Controllers;
 using Swashbuckle.AspNetCore.SwaggerGen;
-using System.Reflection;
-using Location = SOS.Lib.Models.Processed.Observation.Location;
 
 namespace SOS.Observations.Api.Swagger;
 
 public class AdaptiveSearchOperationFilter : IOperationFilter
 {
-    private const string ControllerName = "Observations";
-    private const string MethodName = "AdaptiveSearchInternal";
-
     public void Apply(OpenApiOperation operation, OperationFilterContext context)
     {
-        if (!IsAdaptiveSearchOperation(context.MethodInfo, context.ApiDescription))
+        if (context.MethodInfo.DeclaringType != typeof(ObservationsController)
+            || context.MethodInfo.Name != nameof(ObservationsController.AdaptiveSearchInternal))
         {
             return;
         }
 
         var jsonSchema = context.SchemaGenerator.GenerateSchema(typeof(AdaptiveSearchResultDto<Observation>), context.SchemaRepository);
         var jsonByLocationSchema = context.SchemaGenerator.GenerateSchema(typeof(AdaptiveSearchResultByLocationDto<Observation, Location>), context.SchemaRepository);
-        var geoJsonSchema = context.SchemaGenerator.GenerateSchema(typeof(GeoJsonFeatureCollectionDto), context.SchemaRepository);
+        var geoJsonSchema = context.SchemaGenerator.GenerateSchema(typeof(FeatureCollection), context.SchemaRepository);
 
         operation.Responses["200"] = new OpenApiResponse
         {
@@ -68,12 +64,6 @@ public class AdaptiveSearchOperationFilter : IOperationFilter
                     format: "int32")
             }
         };
-    }
-
-    private static bool IsAdaptiveSearchOperation(MethodInfo methodInfo, ApiDescription apiDescription)
-    {
-        return string.Equals(methodInfo.Name, MethodName, StringComparison.Ordinal)
-               && string.Equals(apiDescription.ActionDescriptor.RouteValues["controller"], ControllerName, StringComparison.Ordinal);
     }
 
     private static OpenApiHeader CreateHeaderSchema(JsonSchemaType schemaType, string description, string? format = null)

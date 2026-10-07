@@ -1,7 +1,7 @@
-﻿using Newtonsoft.Json;
-using SOS.Harvest.Services.Taxon.Interfaces;
+﻿using SOS.Harvest.Services.Taxon.Interfaces;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Text.Json;
 
 namespace SOS.Harvest.Services.Taxon;
 
@@ -32,7 +32,7 @@ public class TaxonServiceProxy : ITaxonServiceProxy
         using var client = new HttpClient();
         var body = new GetTaxonBody();
         body.TaxonIds = taxonIds;
-        var filterJson = JsonConvert.SerializeObject(body);
+        var filterJson = JsonSerializer.Serialize(body);
         client.DefaultRequestHeaders.Accept.Clear();
         client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 

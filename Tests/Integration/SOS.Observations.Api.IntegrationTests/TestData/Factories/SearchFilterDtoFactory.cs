@@ -1,6 +1,7 @@
-﻿using SOS.Lib.Managers;
-using SOS.Lib.Dtos.Enum;
-using SOS.Lib.Dtos.Filter;
+﻿using SOS.Api.Contracts.Areas.Requests;
+using SOS.Api.Contracts.Areas.Responses;
+using SOS.Api.Contracts.Observations.Requests;
+using SOS.Lib.Managers;
 using SOS.Lib.Enums;
 
 namespace SOS.Observations.Api.IntegrationTests.TestData.Factories;
@@ -16,7 +17,7 @@ internal static class SearchFilterDtoFactory
                 {
                     AreaType = AreaTypeDto.Municipality,
                     FeatureId = id
-                })
+                }).ToList()
             }
         };
     }

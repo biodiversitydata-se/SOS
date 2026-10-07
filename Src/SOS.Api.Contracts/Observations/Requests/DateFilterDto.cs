@@ -10,11 +10,13 @@ public class DateFilterDto
     /// <summary>
     /// Observation start date specified in the ISO 8601 standard, including its UTC offset.
     /// </summary>
+    [System.Text.Json.Serialization.JsonConverter(typeof(SOS.Api.Contracts.Common.FlexibleNullableDateTimeOffsetConverter))]
     public System.DateTimeOffset? StartDate { get; set; }
 
     /// <summary>
     /// Observation end date specified in the ISO 8601 standard, including its UTC offset.
     /// </summary>
+    [System.Text.Json.Serialization.JsonConverter(typeof(SOS.Api.Contracts.Common.FlexibleNullableEndDateTimeOffsetConverter))]
     public System.DateTimeOffset? EndDate { get; set; }
 
     /// <summary>
@@ -26,7 +28,6 @@ public class DateFilterDto
     /// <summary>
     /// Predefined time-of-day ranges included in the search.
     /// </summary>
-    // TODO(system.text.json): Add string enum item converter
     public ICollection<TimeRangeDto>? TimeRanges { get; set; }
 
 }

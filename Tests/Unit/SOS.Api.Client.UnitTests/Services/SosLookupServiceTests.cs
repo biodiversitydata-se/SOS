@@ -6,6 +6,7 @@ using SOS.Api.Client.Services;
 using SOS.Api.Contracts.Areas.Requests;
 using SOS.Api.Contracts.Areas.Responses;
 using SOS.Api.Contracts.Common.Geo;
+using SOS.Api.Contracts.Common.Responses;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using System.IO.Compression;
@@ -20,10 +21,10 @@ public class SosLookupServiceTests
     public async Task GetAreaWithGeometryAsync_GetsOneAreaAndPreservesBoundingBox()
     {
         var cancellationToken = TestContext.Current.CancellationToken;
-        var boundingBox = new LatLonBoundingBox
+        var boundingBox = new LatLonBoundingBoxDto
         {
-            TopLeft = new LatLonCoordinate { Latitude = 60, Longitude = 17 },
-            BottomRight = new LatLonCoordinate { Latitude = 59, Longitude = 18 }
+            TopLeft = new LatLonCoordinateDto { Latitude = 60, Longitude = 17 },
+            BottomRight = new LatLonCoordinateDto { Latitude = 59, Longitude = 18 }
         };
         var areasClient = new Mock<ISosAreasClient>();
         areasClient.Setup(client => client.GetAreaAsync(
@@ -80,7 +81,7 @@ public class SosLookupServiceTests
             Name = "Area one"
         };
         areasClient.Setup(client => client.GetAreasAsync(It.IsAny<AreasOptions>(), cancellationToken))
-            .ReturnsAsync(new AreaBaseDtoPagedResult
+            .ReturnsAsync(new PagedResultDto<AreaBaseDto>
             {
                 Skip = 0,
                 Take = 1,
@@ -139,7 +140,7 @@ public class SosLookupServiceTests
         areasClient.Setup(client => client.GetAreasAsync(
                 It.IsAny<AreasOptions>(),
                 It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new AreaBaseDtoPagedResult
+            .ReturnsAsync(new PagedResultDto<AreaBaseDto>
             {
                 Records = [area],
                 TotalCount = 1,
@@ -219,7 +220,7 @@ public class SosLookupServiceTests
             .ReturnsAsync(() =>
             {
                 var area = Interlocked.Increment(ref areaRequests) == 2 ? secondArea : firstArea;
-                return new AreaBaseDtoPagedResult
+                return new PagedResultDto<AreaBaseDto>
                 {
                     Records = [area],
                     TotalCount = 1,

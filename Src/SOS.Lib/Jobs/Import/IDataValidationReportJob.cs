@@ -1,5 +1,5 @@
 ﻿using Hangfire;
-using SOS.Lib.Enums;
+using SOS.Api.Contracts.Exports.Requests;
 using SOS.Lib.Models.Shared;
 using System.Collections.Generic;
 using System.Threading.Tasks;

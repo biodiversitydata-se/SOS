@@ -18,7 +18,7 @@ public class MultimediaComment
     /// <summary>
     /// Media comment cration time
     /// </summary>
-    public System.DateTimeOffset? Created { get; set; }
+    public DateTime? Created { get; set; }
 
 }
 

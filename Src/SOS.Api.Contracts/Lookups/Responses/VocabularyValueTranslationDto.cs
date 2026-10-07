@@ -1,4 +1,5 @@
 namespace SOS.Api.Contracts.Lookups.Responses;
+/// <summary>A vocabulary value translated into one culture.</summary>
 public class VocabularyValueTranslationDto
 {
 

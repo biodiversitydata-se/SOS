@@ -1,7 +1,7 @@
-﻿using SOS.Lib.Models.Processed.Observation;
+using SOS.Api.Contracts.Common.Responses;
+using SOS.Api.Contracts.Observations.Requests;
+using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Verbatim.Artportalen;
-using SOS.Lib.Dtos;
-using SOS.Lib.Dtos.Filter;
 using System.Text.RegularExpressions;
 
 namespace SOS.Observations.Api.IntegrationTests.Helpers;
@@ -50,7 +50,7 @@ internal static class DebugTestResultHelper
         {
             Output = new OutputFilterDto
             {
-                FieldSet = Lib.Enums.OutputFieldSet.All
+                FieldSet = OutputFieldSet.All
             }
         };
 

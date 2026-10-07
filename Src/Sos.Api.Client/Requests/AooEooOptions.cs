@@ -1,5 +1,4 @@
-using SOS.Api.Contracts.Aggregations.Requests;
-using SOS.Api.Contracts.Analysis.Requests;
+using SOS.Api.Contracts.Common.Geo;
 
 namespace SOS.Api.Client.Requests;
 
@@ -31,5 +30,5 @@ public class AooEooOptions : SosRoleRequestOptions
     /// <summary>The metric coordinate system used for calculations.</summary>
     public MetricCoordinateSys? MetricCoordinateSystem { get; set; } = MetricCoordinateSys.SWEREF99_TM;
     /// <summary>The coordinate system used for the returned geometry.</summary>
-    public AnalysisCoordinateSystem? CoordinateSystem { get; set; } = AnalysisCoordinateSystem.WGS84;
+    public CoordinateSys? CoordinateSystem { get; set; } = CoordinateSys.WGS84;
 }

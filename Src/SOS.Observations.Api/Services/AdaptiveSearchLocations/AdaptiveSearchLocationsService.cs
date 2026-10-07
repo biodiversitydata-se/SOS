@@ -1,4 +1,6 @@
-﻿using NetTopologySuite.Geometries;
+﻿using SOS.Api.Contracts.Common.Geo;
+using SOS.Api.Contracts.Observations.Requests;
+using NetTopologySuite.Geometries;
 using NetTopologySuite.Features;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions.Dto;
@@ -64,7 +66,7 @@ internal sealed class AdaptiveSearchLocationsService : IAdaptiveSearchLocationsS
 
         var timings = new AdaptiveSearchLocationsTimings();
         var canUseLocationsCache = request.UseCache &&
-                                   request.Filter.ProtectionFilter == Lib.Dtos.Enum.ProtectionFilterDto.Public &&
+                                   request.Filter.ProtectionFilter == ProtectionFilterDto.Public &&
                                    request.Filter.ObservedByMe != true &&
                                    request.Filter.ReportedByMe != true &&
                                    !request.CreateSampleObservations &&
@@ -312,8 +314,8 @@ internal sealed class AdaptiveSearchLocationsService : IAdaptiveSearchLocationsS
     private static AdaptiveSearchLocationsResult CreateEmptyLocationsResult(
         AdaptiveSearchLocationsRequest request,
         AdaptiveSearchLocationsTimings timings,
-        Lib.Models.Gis.LatLonBoundingBox? bbox,
-        (long Count, Lib.Models.Gis.LatLonBoundingBox? Extent, long EstimatedLocationCount) countAndExtentResult,
+        LatLonBoundingBoxDto? bbox,
+        (long Count, LatLonBoundingBoxDto? Extent, long EstimatedLocationCount) countAndExtentResult,
         string cacheStatus,
         List<Feature>? geographicAreas)
     {
@@ -336,11 +338,11 @@ internal sealed class AdaptiveSearchLocationsService : IAdaptiveSearchLocationsS
     private async Task<AdaptiveSearchLocationsResult?> TryGetRepresentativeLocationsAsync(
         AdaptiveSearchLocationsRequest request,
         AdaptiveSearchLocationsTimings timings,
-        Lib.Models.Gis.LatLonBoundingBox? bbox,
+        LatLonBoundingBoxDto? bbox,
         SearchFilterInternal searchFilter,
         PreparedObservationFilter preparedFilter,
-        (long Count, Lib.Models.Gis.LatLonBoundingBox? Extent, long EstimatedLocationCount) countAndExtentResult,
-        Lib.Models.Gis.LatLonBoundingBox? clusteringBbox)
+        (long Count, LatLonBoundingBoxDto? Extent, long EstimatedLocationCount) countAndExtentResult,
+        LatLonBoundingBoxDto? clusteringBbox)
     {
         var representativeLocationsStopwatch = Stopwatch.StartNew();
         var representativeLocationsResult = await _observationManager.GetLocationRepresentativeChunkAsync(

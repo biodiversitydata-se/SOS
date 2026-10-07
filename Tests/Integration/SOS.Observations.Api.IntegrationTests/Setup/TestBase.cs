@@ -7,7 +7,7 @@ namespace SOS.Observations.Api.IntegrationTests.Setup;
 /// <summary>
 /// Base class for integration tests providing common functionalities and settings.
 /// </summary>
-public class TestBase
+public class TestBase : IAsyncLifetime
 {
     /// <summary>
     /// Gets the <see cref="Setup.TestFixture"/> instance used for setting up the integration test environment.
@@ -58,8 +58,12 @@ public class TestBase
                 new IgnoreIfNullConvention(true)
             },
             t => true);
-
-        // Make sure ES indexes are cleared before each test
-        TestFixture.ProcessFixture.CleanElasticsearchIndices().Wait();
     }
+
+    public async ValueTask InitializeAsync()
+    {
+        await ProcessFixture.CleanElasticsearchIndices();
+    }
+
+    public ValueTask DisposeAsync() => ValueTask.CompletedTask;
 }

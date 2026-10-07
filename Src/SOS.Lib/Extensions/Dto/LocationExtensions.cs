@@ -1,8 +1,10 @@
-﻿using NetTopologySuite.Geometries;
-using SOS.Lib.Models.Search.Result;
-using SOS.Lib.Dtos;
-using SOS.Lib.Dtos.Location;
-using Location = SOS.Lib.Models.Processed.Observation.Location;
+﻿﻿using SOS.Api.Contracts.Common.Geo;
+using SOS.Api.Contracts.Common.Responses;
+using SOS.Api.Contracts.DataStewardship.Responses;
+using SOS.Api.Contracts.Locations.Responses;
+using SOS.Lib.Enums;
+using SOS.Lib.Extensions.Dto.DataStewardship;
+using SOS.Lib.Models.Processed.Observation;
 
 namespace SOS.Lib.Extensions.Dto;
 
@@ -11,10 +13,10 @@ public static class LocationExtensions
     extension(Location location)
     {
         /// <summary>
-        /// Cast Location to locationDto
+        /// Maps a location to its API response DTO, converting its geometries to GeoJSON.
         /// </summary>
-        /// <returns></returns>
-        public LocationDto ToDto()
+        /// <param name="includeGeometries">False when the server writes the original geometries directly to JSON.</param>
+        public LocationDto ToLocationDto(bool includeGeometries = true)
         {
             if (location == null)
             {
@@ -54,33 +56,32 @@ public static class LocationExtensions
                 Parish = location.Parish == null
                     ? null!
                     : new IdValueDto<string> { Id = location.Parish.FeatureId, Value = location.Parish.Name },
-                Point = location.Point,
-                PointWithBuffer = location.PointWithBuffer,
-                PointWithDisturbanceBuffer = location.PointWithDisturbanceBuffer,
+                Point = includeGeometries ? location.Point.ToGeoJsonPoint() : null,
+                PointWithBuffer = includeGeometries ? location.PointWithBuffer?.ToGeoJsonGeometry() : null,
+                PointWithDisturbanceBuffer = includeGeometries ? location.PointWithDisturbanceBuffer?.ToGeoJsonGeometry() : null,
                 ProjectId = location.Attributes?.ProjectId,
-                Type = location.Type
+                Type = (SOS.Api.Contracts.Observations.Responses.LocationType?)location.Type
             };
         }
-    }
 
-    extension(LocationSearchResult locationSearchResult)
-    {
-        public LocationSearchResultDto ToDto()
+        public DsLocationDto ToDsLocationDto(CoordinateSys responseCoordinateSystem)
         {
-            if (locationSearchResult == null)
+            if (location == null)
             {
                 return null!;
             }
 
-            return new LocationSearchResultDto
+            return new DsLocationDto()
             {
-                County = locationSearchResult.County,
-                Id = locationSearchResult.Id,
-                Latitude = locationSearchResult.Latitude,
-                Longitude = locationSearchResult.Longitude,
-                Municipality = locationSearchResult.Municipality,
-                Name = locationSearchResult.Name,
-                Parish = locationSearchResult.Parish
+                County = location.County?.FeatureId?.GetCounty(),
+                Province = location.Province?.FeatureId?.GetProvince(),
+                Municipality = location.Municipality?.FeatureId?.GetMunicipality(),
+                Parish = location.Parish?.FeatureId?.GetParish(),
+                Locality = location.Locality,
+                LocationID = location.LocationId,
+                LocationRemarks = location.LocationRemarks,
+                //LocationType = // ? todo - add location type to models.
+                Emplacement = location.Point.Transform(CoordinateSys.WGS84, responseCoordinateSystem).ToGeoJsonPoint()
             };
         }
     }

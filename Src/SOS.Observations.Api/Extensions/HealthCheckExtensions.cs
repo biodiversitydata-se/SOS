@@ -8,11 +8,39 @@ using SOS.Observations.Api.HealthChecks;
 using SOS.Observations.Api.HealthChecks.Custom;
 using System;
 using System.Linq;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Threading.Tasks;
 
 namespace SOS.Lib.Extensions.Dto;
 
 public static class HealthCheckExtensions
 {
+    private static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+    };
+
+    internal static async Task WriteHealthJsonResponseAsync(HttpContext context, HealthReport? report)
+    {
+        var result = report == null ? "{}" : JsonSerializer.Serialize(
+            new
+            {
+                status = report.Status.ToString(),
+                duration = report.TotalDuration,
+                entries = report.Entries.Select(e => new
+                {
+                    key = e.Key,
+                    description = e.Value.Description,
+                    duration = e.Value.Duration,
+                    status = Enum.GetName(typeof(HealthStatus), e.Value.Status),
+                    tags = e.Value.Tags
+                }).ToList()
+            }, JsonOptions);
+        context.Response.ContentType = System.Net.Mime.MediaTypeNames.Application.Json;
+        await context.Response.WriteAsync(result, context.RequestAborted);
+    }
+
     extension(HealthStatus healthStatus)
     {
         /// <summary>
@@ -90,31 +118,7 @@ public static class HealthCheckExtensions
                 app.MapHealthChecks("/health-json", new HealthCheckOptions()
                 {
                     Predicate = _ => false,
-                    ResponseWriter = async (context, _) =>
-                    {
-                        var report = HealthReportCachePublisher.LatestAll;
-                        var result = report == null ? "{}" : Newtonsoft.Json.JsonConvert.SerializeObject(
-                            new
-                            {
-                                status = report.Status.ToString(),
-                                duration = report.TotalDuration,
-                                entries = report.Entries.Select(e => new
-                                {
-                                    key = e.Key,
-                                    description = e.Value.Description,
-                                    duration = e.Value.Duration,
-                                    status = Enum.GetName(typeof(HealthStatus),
-                                        e.Value.Status),
-                                    tags = e.Value.Tags
-                                }).ToList()
-                            }, Newtonsoft.Json.Formatting.None,
-                            new Newtonsoft.Json.JsonSerializerSettings
-                            {
-                                NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore
-                            });
-                        context.Response.ContentType = System.Net.Mime.MediaTypeNames.Application.Json;
-                        await context.Response.WriteAsync(result);
-                    }
+                    ResponseWriter = (context, _) => WriteHealthJsonResponseAsync(context, HealthReportCachePublisher.LatestAll)
                 });
                 app.MapHealthChecks("/health-wfs", new HealthCheckOptions()
                 {

@@ -1,5 +1,6 @@
-﻿using Elastic.Clients.Elasticsearch;
+﻿﻿using Elastic.Clients.Elasticsearch;
 using Elastic.Clients.Elasticsearch.Cluster;
+using SOS.Api.Contracts.Locations.Responses;
 using Elastic.Clients.Elasticsearch.Core.Search;
 using Elastic.Clients.Elasticsearch.QueryDsl;
 using Microsoft.Extensions.Caching.Memory;
@@ -206,7 +207,7 @@ public class ProcessedLocationRepository : ProcessedObservationBaseRepository,
         }.SetSize(LocationGeometryCacheMonitor.CalculateGeometrySizeUnits(geometry));
     }
 
-    public async Task<IEnumerable<LocationSearchResult>> SearchAsync(SearchFilter filter, int skip,
+    public async Task<IEnumerable<LocationSearchResultDto>> SearchAsync(SearchFilter filter, int skip,
         int take)
     {
         var indexName = GetCurrentIndex(filter);
@@ -256,7 +257,7 @@ public class ProcessedLocationRepository : ProcessedObservationBaseRepository,
 
         searchResponse.ThrowIfInvalid();
 
-        var result = new List<LocationSearchResult>();
+        var result = new List<LocationSearchResultDto>();
         foreach (var bucket in searchResponse.Aggregations.GetComposite("locations").Buckets?.Skip(skip))
         {
             bucket.Key["county"].TryGetString(out var county);
@@ -266,7 +267,7 @@ public class ProcessedLocationRepository : ProcessedObservationBaseRepository,
             bucket.Key["municipality"].TryGetString(out var municipality);
             bucket.Key["name"].TryGetString(out var name);
             bucket.Key["parish"].TryGetString(out var parish);
-            result.Add(new LocationSearchResult
+            result.Add(new LocationSearchResultDto
             {
                 County = county,
                 Id = id,

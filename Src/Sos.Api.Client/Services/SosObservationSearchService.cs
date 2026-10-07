@@ -4,6 +4,7 @@ using SOS.Api.Client.Requests;
 using SOS.Api.Contracts.Observations.Requests;
 using SOS.Api.Contracts.Observations.Responses;
 using System.Text.Json;
+using GeoJSON.Text.Feature;
 
 namespace SOS.Api.Client.Services;
 
@@ -45,7 +46,7 @@ public sealed class SosObservationSearchService : ISosObservationSearchService
     }
 
     /// <inheritdoc />
-    public async Task<(AdaptiveSearchLocationsResponse Response, AdaptiveSearchLocationsFeatureCollectionDto FeatureCollection)> AdaptiveSearchLocationsInternalAsFeatureCollectionAsync(
+    public async Task<(AdaptiveSearchLocationsResponse Response, FeatureCollection<AdaptiveSearchLocationFeaturePropertiesDto> FeatureCollection)> AdaptiveSearchLocationsInternalAsFeatureCollectionAsync(
         SearchFilterInternalDto filter,
         AdaptiveSearchLocationsOptions? options = null,
         CancellationToken cancellationToken = default)
@@ -55,8 +56,38 @@ public sealed class SosObservationSearchService : ISosObservationSearchService
             filter,
             options,
             cancellationToken);
-        var featureCollection = AdaptiveSearchLocationsGeoJsonParser.Parse(response.GeoJson);
+        var featureCollection = ParseAdaptiveSearchLocationsGeoJson(response.GeoJson);
         return (response, featureCollection);
+    }
+
+    private static FeatureCollection<AdaptiveSearchLocationFeaturePropertiesDto> ParseAdaptiveSearchLocationsGeoJson(string? geoJson)
+    {
+        if (string.IsNullOrWhiteSpace(geoJson))
+        {
+            return new FeatureCollection<AdaptiveSearchLocationFeaturePropertiesDto>();
+        }
+
+        var featureCollection = JsonSerializer.Deserialize<FeatureCollection<AdaptiveSearchLocationFeaturePropertiesDto>>(
+            geoJson, SosClientHttp.SerializerOptions)
+            ?? new FeatureCollection<AdaptiveSearchLocationFeaturePropertiesDto>();
+
+        for (var index = 0; index < featureCollection.Features.Count; index++)
+        {
+            var feature = featureCollection.Features[index];
+            if (feature.Properties is not null) continue;
+
+            // Properties is init-only; replace the feature to supply defaults while retaining its GeoJSON data.
+            featureCollection.Features[index] = new()
+            {
+                Id = feature.Id,
+                Geometry = feature.Geometry,
+                Properties = new AdaptiveSearchLocationFeaturePropertiesDto(),
+                BoundingBoxes = feature.BoundingBoxes,
+                CRS = feature.CRS
+            };
+        }
+
+        return featureCollection;
     }
 
     private static ObservationByIdInternalOptions CloneObservationOptions(

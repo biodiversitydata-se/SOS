@@ -1,3 +1,5 @@
+﻿using System.ComponentModel.DataAnnotations;
+
 namespace SOS.Api.Contracts.DataStewardship.Responses;
 
 /// <summary>
@@ -6,7 +8,7 @@ namespace SOS.Api.Contracts.DataStewardship.Responses;
 public sealed class DsOrganisationDto
 {
     /// <summary>The organisation name.</summary>
-    public string? OrganisationCode { get; set; }
+    [Required] public string OrganisationCode { get; set; } = null!;
     /// <summary>The organisation's identifier.</summary>
     public string? OrganisationID { get; set; }
 }

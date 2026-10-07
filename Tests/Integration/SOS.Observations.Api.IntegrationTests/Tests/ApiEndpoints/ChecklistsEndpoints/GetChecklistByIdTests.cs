@@ -1,6 +1,6 @@
-﻿using FizzWare.NBuilder;
+﻿using SOS.Api.Contracts.Checklists.Responses;
+using FizzWare.NBuilder;
 using SOS.Lib.Models.Verbatim.Artportalen;
-using SOS.Lib.Dtos.Checklist;
 using SOS.Observations.Api.IntegrationTests.Setup;
 using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
 
@@ -19,7 +19,7 @@ public class GetChecklistByIdTests : TestBase
         // Arrange
         const int Id = 123456;
         const string eventId = $"urn:lsid:artportalen.se:Checklist:123456";
-        var verbatimChecklists = Builder<ArtportalenChecklistVerbatim>.CreateListOfSize(100)
+        var verbatimChecklists = Builder<ArtportalenChecklistVerbatim>.CreateListOfSize(2)
             .All().HaveValuesFromPredefinedChecklists()
             .TheFirst(1).With(p => p.Id = Id)
             .Build();

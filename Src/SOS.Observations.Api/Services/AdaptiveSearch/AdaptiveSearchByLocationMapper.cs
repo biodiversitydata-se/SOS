@@ -1,8 +1,9 @@
-﻿using NetTopologySuite.Geometries;
-using SOS.Lib.Dtos;
-using SOS.Lib.Dtos.Filter;
+﻿using SOS.Api.Contracts.Observations.Responses;
+using SOS.Api.Contracts.Common.Geo;
+using NetTopologySuite.Geometries;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
+using SOS.Lib.Extensions.Dto;
 using System.Text.Json.Nodes;
 using ProcessedLocationType = SOS.Lib.Enums.LocationType;
 
@@ -59,7 +60,7 @@ internal sealed class AdaptiveSearchByLocationMapper : IAdaptiveSearchByLocation
                 return new AdaptiveSearchLocationDto<JsonObject, JsonObject>
                 {
                     Location = CreateLocationNode(group.First().Location, group.Key),
-                    Geometry = geometry,
+                    Geometry = geometry?.ToGeoJsonGeometry(),
                     LocationCount = 1,                    
                     ObservationCount = observations.Count,
                     TaxaCount = group
@@ -73,7 +74,7 @@ internal sealed class AdaptiveSearchByLocationMapper : IAdaptiveSearchByLocation
             })
             .ToList();
 
-        return AdaptiveSearchResultByLocationDto<JsonObject, JsonObject>.CreateLocationsResult(
+        return AdaptiveSearchByLocationResultFactory.CreateLocationsResult<JsonObject, JsonObject>(
             boundingBox,
             totalObservationsCount,
             recordList.Count,

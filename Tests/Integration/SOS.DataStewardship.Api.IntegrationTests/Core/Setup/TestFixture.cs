@@ -1,4 +1,5 @@
-﻿using SOS.Harvest.Managers.Interfaces;
+﻿using SOS.Api.Contracts.Observations.Requests;
+using SOS.Harvest.Managers.Interfaces;
 using SOS.Harvest.Managers;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Helpers.Interfaces;

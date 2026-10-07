@@ -1,6 +1,4 @@
 ﻿using NetTopologySuite.Geometries;
-using System.Buffers;
-using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -12,56 +10,9 @@ namespace SOS.Lib.JsonConverters;
 public class GeometryConverter : JsonConverter<Geometry>
 {
     private const string InvalidGeometryMessage = "Invalid geometry.";
-    private static GeometryFactory geomFactory = new GeometryFactory();
+    private static readonly GeometryFactory GeometryFactory = new();
 
     public override bool HandleNull => true;
-
-    private string ReadCoordinateData(ref Utf8JsonReader reader)
-    {
-        var result = new StringBuilder();
-        var openBrackets = 0;
-        var addComma = false;
-
-        // while (openBrackets != 0 || firstLoop)
-        do
-        {
-            if (reader.TokenType == JsonTokenType.StartArray)
-            {
-                if (addComma)
-                {
-                    result.Append(',');
-                    addComma = false;
-                }
-
-                openBrackets++;
-            }
-
-            if (reader.TokenType == JsonTokenType.Number && addComma)
-            {
-                result.Append(',');
-            }
-
-            var seq = reader.HasValueSequence
-                ? reader.ValueSequence.ToArray()
-                : reader.ValueSpan.ToArray();
-            result.Append(Encoding.Default.GetString(seq));
-
-            addComma = reader.TokenType == JsonTokenType.Number && !addComma;
-
-            if (reader.TokenType == JsonTokenType.EndArray)
-            {
-                openBrackets--;
-                addComma = true;
-            }
-
-            if (openBrackets != 0)
-            {
-                reader.Read();
-            }
-        } while (openBrackets != 0);
-
-        return result.ToString();
-    }
 
     private void WritePoint(Utf8JsonWriter writer, Coordinate coordinate)
     {
@@ -99,27 +50,48 @@ public class GeometryConverter : JsonConverter<Geometry>
         writer.WriteEndArray();
     }
 
-    private Polygon CreatePolygon(GeometryFactory geomFactory, IEnumerable<IEnumerable<double[]>> coordinates)
+    private static Coordinate ReadCoordinate(JsonElement position)
     {
-        var coordinateRings = coordinates?
-            .Select(ring => ring?.ToArray())
-            .ToArray();
-        if (coordinateRings == null ||
-            coordinateRings.Length == 0 ||
-            coordinateRings.Any(ring => ring == null ||
-                ring.Length < 4 ||
-                ring.Any(coordinate => coordinate == null || coordinate.Length < 2)))
+        if (position.ValueKind != JsonValueKind.Array || position.GetArrayLength() < 2)
         {
             throw new JsonException(InvalidGeometryMessage);
         }
 
-        var exteriorRing = geomFactory.CreateLinearRing(coordinateRings.First()
-            .Select(p => new Coordinate(p[0], p[1])).ToArray());
+        var ordinates = position.EnumerateArray();
+        ordinates.MoveNext();
+        var x = ordinates.Current.GetDouble();
+        ordinates.MoveNext();
+        var y = ordinates.Current.GetDouble();
+        // Search geometries remain two-dimensional, but all supplied ordinates must be numbers.
+        while (ordinates.MoveNext()) ordinates.Current.GetDouble();
+        return new Coordinate(x, y);
+    }
 
-        var holes = coordinateRings.Skip(1).Select(h => geomFactory.CreateLinearRing(h
-            .Select(p => new Coordinate(p[0], p[1])).ToArray())).ToArray();
-        var polygon = geomFactory.CreatePolygon(exteriorRing, holes);
-        return polygon;
+    private static Coordinate[] ReadCoordinates(JsonElement positions)
+    {
+        var coordinates = new Coordinate[positions.GetArrayLength()];
+        var index = 0;
+        foreach (var position in positions.EnumerateArray()) coordinates[index++] = ReadCoordinate(position);
+        return coordinates;
+    }
+
+    private static Polygon ReadPolygon(JsonElement coordinates)
+    {
+        var ringCount = coordinates.GetArrayLength();
+        if (ringCount == 0) throw new JsonException(InvalidGeometryMessage);
+
+        LinearRing? shell = null;
+        var holes = new LinearRing[ringCount - 1];
+        var index = 0;
+        foreach (var ring in coordinates.EnumerateArray())
+        {
+            if (ring.GetArrayLength() < 4) throw new JsonException(InvalidGeometryMessage);
+            var linearRing = GeometryFactory.CreateLinearRing(ReadCoordinates(ring));
+            if (index == 0) shell = linearRing;
+            else holes[index - 1] = linearRing;
+            index++;
+        }
+        return GeometryFactory.CreatePolygon(shell, holes);
     }
 
     public override bool CanConvert(Type type)
@@ -192,61 +164,43 @@ public class GeometryConverter : JsonConverter<Geometry>
 
     public override Geometry Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        if (reader.TokenType != JsonTokenType.StartObject)
-        {
-            throw new JsonException(InvalidGeometryMessage);
-        }
+        using var document = JsonDocument.ParseValue(ref reader);
+        return ReadGeometry(document.RootElement);
+    }
 
-        var coordinateString = string.Empty;
-        var type = string.Empty;
-
-        reader.Read();
-
-        while (reader.TokenType != JsonTokenType.EndObject)
-        {
-            var property = reader.GetString();
-            reader.Read();
-
-            switch (property?.ToLower())
-            {
-                case "coordinates":
-                    coordinateString = ReadCoordinateData(ref reader);
-                    break;
-                case "type":
-                    type = reader.GetString();
-                    break;
-            }
-
-            reader.Read();
-        }
-        
+    // Reuse the geographic filter's existing JSON document instead of parsing each geometry again.
+    internal static Geometry ReadGeometry(JsonElement element)
+    {
         try
         {
-            switch (type?.ToLower())
+            if (element.ValueKind != JsonValueKind.Object) throw new JsonException(InvalidGeometryMessage);
+            JsonElement coordinates = default;
+            string? type = null;
+            foreach (var property in element.EnumerateObject())
+            {
+                if (property.Name.Equals("coordinates", StringComparison.OrdinalIgnoreCase)) coordinates = property.Value;
+                else if (property.Name.Equals("type", StringComparison.OrdinalIgnoreCase)) type = property.Value.GetString();
+            }
+
+            switch (type?.ToLowerInvariant())
             {
                 case "point":
-                    var pointCoordinates = JsonSerializer.Deserialize<double[]>(coordinateString);
-                    var point = geomFactory.CreatePoint(new Coordinate(pointCoordinates[0], pointCoordinates[1]));
-                    return point;
+                    return GeometryFactory.CreatePoint(ReadCoordinate(coordinates));
                 case "polygon":
-                    var polygonCoordinates =
-                        JsonSerializer.Deserialize<IEnumerable<IEnumerable<double[]>>>(coordinateString);
-
-                    return CreatePolygon(geomFactory, polygonCoordinates);
+                    return ReadPolygon(coordinates);
                 case "multipolygon":
-                    var muliPolygonCoordinates =
-                        JsonSerializer.Deserialize<IEnumerable<IEnumerable<IEnumerable<double[]>>>>(coordinateString);
-
-                    return geomFactory.CreateMultiPolygon(muliPolygonCoordinates
-                        .Select(p => CreatePolygon(geomFactory, p)).ToArray());
+                    var polygons = new Polygon[coordinates.GetArrayLength()];
+                    var polygonIndex = 0;
+                    foreach (var polygon in coordinates.EnumerateArray()) polygons[polygonIndex++] = ReadPolygon(polygon);
+                    return GeometryFactory.CreateMultiPolygon(polygons);
                 case "linestring":
-                    var lineCoords = JsonSerializer.Deserialize<double[][]>(coordinateString);
-                    var coords = lineCoords.Select(p => new Coordinate(p[0], p[1])).ToArray();
-                    return geomFactory.CreateLineString(coords);
+                    return GeometryFactory.CreateLineString(ReadCoordinates(coordinates));
                 case "multilinestring":
-                    var multiLineCoords = JsonSerializer.Deserialize<IEnumerable<IEnumerable<double[]>>>(coordinateString);
-                    var lineStrings = multiLineCoords.Select(lc => geomFactory.CreateLineString(lc.Select(p => new Coordinate(p[0], p[1])).ToArray())).ToArray();
-                    return geomFactory.CreateMultiLineString(lineStrings);
+                    var lines = new LineString[coordinates.GetArrayLength()];
+                    var lineIndex = 0;
+                    foreach (var line in coordinates.EnumerateArray())
+                        lines[lineIndex++] = GeometryFactory.CreateLineString(ReadCoordinates(line));
+                    return GeometryFactory.CreateMultiLineString(lines);
                 default:
                     throw new JsonException(InvalidGeometryMessage);
             }

@@ -1,4 +1,6 @@
-﻿using MongoDB.Driver;
+﻿using SOS.Api.Contracts.Common.Geo;
+using SOS.Api.Contracts.Observations.Requests;
+using MongoDB.Driver;
 using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
 using SOS.Lib.Cache.Interfaces;

@@ -1,4 +1,4 @@
-﻿using SOS.Lib.Models.DataQuality;
+﻿using SOS.Api.Contracts.DataQuality.Responses;
 using System.Threading.Tasks;
 
 namespace SOS.Lib.Managers.Interfaces;

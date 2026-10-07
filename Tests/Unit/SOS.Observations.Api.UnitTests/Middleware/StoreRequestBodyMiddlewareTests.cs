@@ -1,9 +1,10 @@
-﻿using FluentAssertions;
+﻿
+using SOS.Api.Contracts.Observations.Requests;
+using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Moq;
 using SOS.Lib.JsonConverters;
 using SOS.Observations.Api.Middleware;
-using SOS.Lib.Dtos.Filter;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -51,7 +52,7 @@ public class StoreRequestBodyMiddlewareTests
     public async Task Invoke_Should_Store_Reduced_RequestBody_When_RequestBody_Is_Too_Large()
     {
         // Arrange
-        var searchFilter = new SearchFilterDto
+        var searchFilter = new SearchFilterBaseDto
         {
             Taxon = new TaxonFilterDto
             {

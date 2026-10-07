@@ -37,11 +37,13 @@ public class TaxonFilterDto
     /// </summary>
     public ICollection<int>? TaxonCategories { get; set; }
 
+    /// <summary>How selected taxon lists are combined with explicit taxon identifiers.</summary>
     [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
     public TaxonListOperatorDto TaxonListOperator { get; set; }
 
+    /// <summary>Taxonomy to use when resolving taxa.</summary>
     [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
-    public TaxonomyTypeDto TaxonomyType { get; set; }
+    public TaxonomyType TaxonomyType { get; set; }
 }
 
 

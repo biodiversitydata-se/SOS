@@ -1,7 +1,8 @@
+
+using SOS.Api.Contracts.Observations.Requests;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using SOS.Lib.Cache.Interfaces;
-using SOS.Lib.Dtos.Filter;
 using SOS.Lib.Helpers;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Processed.Observation;
@@ -34,7 +35,7 @@ public class MarkdownHelperTests
             vocabularyRepository.Object,
             NullLogger<MarkdownHelper>.Instance);
 
-        await using var markdown = await helper.GetFilterMarkDownAsync(new SearchFilterDto(), CancellationToken.None);
+        await using var markdown = await helper.GetFilterMarkDownAsync(new SearchFilterBaseDto(), CancellationToken.None);
 
         Assert.NotNull(markdown);
         Assert.NotEmpty(markdown.ToArray());

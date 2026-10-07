@@ -1,4 +1,5 @@
 ﻿namespace SOS.Api.Contracts.Observations.Responses;
+/// <summary>User information and access flags associated with an observation.</summary>
 public class UserInternal
 {
 

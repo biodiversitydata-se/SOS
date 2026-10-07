@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using SOS.Lib.Managers.Interfaces;
-using SOS.Lib.Models.DataQuality;
+using SOS.Api.Contracts.DataQuality.Responses;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using System;
 using System.Threading.Tasks;

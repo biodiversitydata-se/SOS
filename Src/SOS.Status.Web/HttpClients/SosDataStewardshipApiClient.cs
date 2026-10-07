@@ -1,5 +1,7 @@
 ﻿using SOS.Status.Web.Client.Models;
 
+using SOS.Api.Contracts.Status.Responses;
+
 namespace SOS.Status.Web.HttpClients;
 
 public class SosDataStewardshipApiClient

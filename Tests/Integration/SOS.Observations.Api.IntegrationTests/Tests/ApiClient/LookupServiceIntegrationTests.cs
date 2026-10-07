@@ -1,6 +1,4 @@
 using ContractGeographicsFilterDto = SOS.Api.Contracts.Observations.Requests.GeographicsFilterDto;
-using ContractLatLonBoundingBoxDto = SOS.Api.Contracts.Common.Geo.LatLonBoundingBoxDto;
-using ContractLatLonCoordinateDto = SOS.Api.Contracts.Common.Geo.LatLonCoordinateDto;
 using ContractOccurrenceStatusFilterValuesDto = SOS.Api.Contracts.Observations.Requests.OccurrenceStatusFilterValuesDto;
 using ContractSearchFilterAggregationInternalDto = SOS.Api.Contracts.Aggregations.Requests.SearchFilterAggregationInternalDto;
 using ContractTaxonFilterDto = SOS.Api.Contracts.Observations.Requests.TaxonFilterDto;

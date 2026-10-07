@@ -1,7 +1,6 @@
-﻿using SOS.Lib.Enums;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using SOS.Lib.Dtos;
+using SOS.Api.Contracts.Lookups.Responses;
 
 namespace SOS.Observations.Api.Managers.Interfaces;
 
@@ -20,7 +19,7 @@ public interface IDataProviderManager
     /// Terrestrial, Freshwater, Marine, Vertebrates, Arthropods, Microorganisms, Plants_Bryophytes_Lichens,
     /// Fungi, Algae</param>
     /// <returns></returns>
-    Task<IEnumerable<DataProviderDto>> GetDataProvidersAsync(bool includeInactive, string cultureCode, bool includeProvidersWithNoObservations = true, IEnumerable<DataProviderCategory> categories = null);
+    Task<IEnumerable<DataProviderDto>> GetDataProvidersAsync(bool includeInactive, string cultureCode, bool includeProvidersWithNoObservations = true, IEnumerable<SOS.Lib.Enums.DataProviderCategory> categories = null);
 
     /// <summary>
     /// Get provider EML file

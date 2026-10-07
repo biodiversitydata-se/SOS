@@ -1,4 +1,5 @@
-﻿using Hangfire;
+﻿using SOS.Api.Contracts.Observations;
+using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Harvest.Extensions;

@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using SOS.Lib.Dtos;
+using SOS.Api.Contracts.Metadata.Responses;
 
 namespace SOS.Observations.Api.Managers.Interfaces;
 

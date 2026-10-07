@@ -1,5 +1,5 @@
-﻿using FluentAssertions;
-using SOS.Lib.Enums;
+﻿using SOS.Api.Contracts.Common.Geo;
+using FluentAssertions;
 using SOS.Lib.Extensions;
 using SOS.Process.UnitTests.TestHelpers;
 using SOS.TestHelpers.Gis;

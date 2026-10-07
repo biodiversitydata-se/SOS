@@ -1,4 +1,4 @@
-using SOS.Api.Contracts.Observations.Requests;
+﻿using SOS.Api.Contracts.Observations.Requests;
 using System.Text.Json.Serialization;
 
 namespace SOS.Api.Contracts.Exports.Responses;
@@ -19,7 +19,9 @@ public sealed class ExportJobInfoDto
     /// <summary>When processing ended.</summary>
     public DateTime? ProcessEndDate { get; set; }
     /// <summary>The total processing time.</summary>
-    public TimeSpan? ProcessingTime { get; set; }
+    public TimeSpan? ProcessingTime => ProcessEndDate.HasValue && ProcessStartDate.HasValue
+        ? ProcessEndDate.Value - ProcessStartDate.Value
+        : null;
     /// <summary>
     /// The number of items represented by the job. Observation exports use the observation count;
     /// AOO/EOO jobs use the taxon count.
@@ -30,14 +32,13 @@ public sealed class ExportJobInfoDto
 
     /// <summary>The export format.</summary>
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public ExportFormatDto Format { get; set; }
+    public ExportFormat Format { get; set; }
 
     /// <summary>The processing status.</summary>
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public ExportJobStatusDto Status { get; set; }
+    public ExportJobStatus Status { get; set; }
 
     /// <summary>The selected observation output field set.</summary>
-    [JsonConverter(typeof(JsonStringEnumConverter))]
     public OutputFieldSet? OutputFieldSet { get; set; }
 
     /// <summary>The URL from which a completed export can be downloaded.</summary>

@@ -14,6 +14,11 @@ public class TaxonAttributes
     public string? ActionPlan { get; set; }
 
     /// <summary>
+    /// County occurrence statuses.
+    /// </summary>
+    public ICollection<CountyOccurrence>? CountyOccurrences { get; set; }
+
+    /// <summary>
     /// Disturbance radius.
     /// </summary>
     public int? DisturbanceRadius { get; set; }
@@ -90,6 +95,12 @@ public class TaxonAttributes
     /// <br/>is protected by the law in Sweden.
     /// </summary>
     public bool ProtectedByLaw { get; set; }
+
+    /// <summary>
+    /// Protection level. Replaced by <see cref="SensitivityCategory"/>.
+    /// </summary>
+    [Obsolete("Replaced by SensitivityCategory")]
+    public VocabularyValue? ProtectionLevel => SensitivityCategory;
     
 
     /// <summary>
@@ -101,6 +112,7 @@ public class TaxonAttributes
     /// </summary>
     public string? RedlistCategory { get; set; }
 
+    /// <summary>Scientific names associated with the taxon, including authorship and usage flags.</summary>
     public IEnumerable<TaxonScientificName>? ScientificNames { get; set; }
 
     /// <summary>
@@ -108,6 +120,7 @@ public class TaxonAttributes
     /// </summary>
     public string? RedlistCategoryDerived { get; set; }
 
+    /// <summary>The sensitivity category used to determine disclosure of observations of the taxon.</summary>
     public VocabularyValue? SensitivityCategory { get; set; }
 
     /// <summary>
@@ -115,6 +128,7 @@ public class TaxonAttributes
     /// </summary>
     public int SortOrder { get; set; }
 
+    /// <summary>The organism group to which the taxon belongs.</summary>
     [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
     public SpeciesGroup SpeciesGroup { get; set; }
 
@@ -136,6 +150,7 @@ public class TaxonAttributes
     /// </summary>
     public ICollection<TaxonSynonymName>? Synonyms { get; set; }
 
+    /// <summary>The taxonomic category of the taxon.</summary>
     public VocabularyValue? TaxonCategory { get; set; }
 
     /// <summary>

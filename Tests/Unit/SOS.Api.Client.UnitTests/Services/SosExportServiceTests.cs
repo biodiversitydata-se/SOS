@@ -19,16 +19,16 @@ public class SosExportServiceTests
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(
             [
-                new ExportJobInfoDto { Id = "old", Status = ExportJobStatusDto.Succeeded, CreatedDate = new DateTime(2024, 1, 1) },
-                new ExportJobInfoDto { Id = "failed", Status = ExportJobStatusDto.Failed, CreatedDate = new DateTime(2026, 1, 1) },
-                new ExportJobInfoDto { Id = "new", Status = ExportJobStatusDto.Succeeded, CreatedDate = new DateTime(2025, 1, 1) }
+                new ExportJobInfoDto { Id = "old", Status = ExportJobStatus.Succeeded, CreatedDate = new DateTime(2024, 1, 1) },
+                new ExportJobInfoDto { Id = "failed", Status = ExportJobStatus.Failed, CreatedDate = new DateTime(2026, 1, 1) },
+                new ExportJobInfoDto { Id = "new", Status = ExportJobStatus.Succeeded, CreatedDate = new DateTime(2025, 1, 1) }
             ]);
         var service = new SosExportService(client.Object);
 
         var result = await service.GetMyExportsPageAsync(
             new MyExportsOptions
             {
-                Statuses = [ExportJobStatusDto.Succeeded],
+                Statuses = [ExportJobStatus.Succeeded],
                 Skip = 0,
                 Take = 1
             },

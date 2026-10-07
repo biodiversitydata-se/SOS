@@ -1,4 +1,5 @@
-﻿using SOS.Harvest.Managers.Interfaces;
+﻿using SOS.Api.Contracts.Common.Geo;
+using SOS.Harvest.Managers.Interfaces;
 using SOS.Harvest.Processors.Interfaces;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Constants;

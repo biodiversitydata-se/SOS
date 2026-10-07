@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
 using SOS.Lib.Cache.Interfaces;
-using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
-using SOS.Lib.Dtos;
+using SOS.Api.Contracts.Lookups.Responses;
+using SOS.Lib.Models.Shared;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Repositories.Interfaces;
 using System;
@@ -45,7 +45,7 @@ public class DataProviderManager : IDataProviderManager
     }
 
     /// <inheritdoc />
-    public async Task<IEnumerable<DataProviderDto>> GetDataProvidersAsync(bool includeInactive, string cultureCode, bool includeProvidersWithNoObservations = true, IEnumerable<DataProviderCategory> categories = null)
+    public async Task<IEnumerable<DataProviderDto>> GetDataProvidersAsync(bool includeInactive, string cultureCode, bool includeProvidersWithNoObservations = true, IEnumerable<SOS.Lib.Enums.DataProviderCategory> categories = null)
     {
         var dataProviderDtos = new List<DataProviderDto>();
         var processInfosActive = await _processInfoManager.GetProcessInfoAsync(_processedObservationRepository.UniquePublicIndexName);
@@ -73,23 +73,43 @@ public class DataProviderManager : IDataProviderManager
                     continue;
                 }
 
-                dataProviderDtos.Add(DataProviderDto.Create(
-                    dataProvider,
-                    providerInfo.PublicProcessCount.GetValueOrDefault(0),
-                    providerInfo.ProtectedProcessCount.GetValueOrDefault(0),
-                    providerInfo.HarvestEnd,
-                    providerInfo.HarvestNotes,
-                    providerInfo.ProcessEnd,
-                    providerInfo.LatestIncrementalEnd,
-                    cultureCode));
+                var dto = CreateDataProviderDto(dataProvider, cultureCode);
+                dto.PublicObservations = providerInfo.PublicProcessCount.GetValueOrDefault(0);
+                dto.ProtectedObservations = providerInfo.ProtectedProcessCount.GetValueOrDefault(0);
+                dto.LatestHarvestDate = providerInfo.HarvestEnd;
+                dto.HarvestNotes = providerInfo.HarvestNotes;
+                dto.LatestProcessDate = providerInfo.ProcessEnd;
+                dto.LatestIncrementalHarvestDate = providerInfo.LatestIncrementalEnd;
+                dto.NextHarvestFrom = dataProvider.NextHarvestFrom(providerInfo.HarvestEnd?.UtcDateTime).ToUtcDateTimeOffset();
+                dataProviderDtos.Add(dto);
             }
             else
             {
-                dataProviderDtos.Add(DataProviderDto.Create(dataProvider, cultureCode));
+                dataProviderDtos.Add(CreateDataProviderDto(dataProvider, cultureCode));
             }
         }
 
         return dataProviderDtos;
+    }
+
+    private static DataProviderDto CreateDataProviderDto(DataProvider dataProvider, string cultureCode)
+    {
+        return new DataProviderDto
+        {
+            Id = dataProvider.Id,
+            Identifier = dataProvider.Identifier,
+            Name = dataProvider.Names?.Translate(cultureCode),
+            Description = dataProvider.Descriptions?.Translate(cultureCode),
+            Organization = dataProvider.Organizations?.Translate(cultureCode),
+            Path = dataProvider.Paths?
+                .Where(path => path.CultureCode?.Equals(cultureCode, StringComparison.CurrentCultureIgnoreCase) ?? false)
+                .SelectMany(path => path.Path)
+                .ToList(),
+            Url = dataProvider.Url,
+            NextHarvestFrom = dataProvider.NextHarvestFrom(null).ToUtcDateTimeOffset(),
+            HarvestSchedule = dataProvider.HarvestSchedule,
+            IncludeInSearchByDefault = dataProvider.IncludeInSearchByDefault
+        };
     }
 
     public async Task<byte[]> GetEmlFileAsync(int providerId)

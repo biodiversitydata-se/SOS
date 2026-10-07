@@ -1,9 +1,9 @@
-﻿using ContractsModels = SOS.Api.Contracts.Status.Requests;
-using SearchFilterInternalDto = SOS.Api.Contracts.Observations.Requests.SearchFilterInternalDto;
+﻿using SOS.Api.Contracts.Metadata.Responses;
 using CSharpFunctionalExtensions;
 using SOS.Api.Contracts.Common.Responses;
 using SOS.Api.Contracts.Observations.Responses;
-using SOS.Lib.Dtos.Status;
+using SOS.Api.Contracts.Status.Responses;
+using SOS.Api.Contracts.Taxonomy.Requests;
 using SOS.Status.Web.Client.Dtos;
 using SOS.Status.Web.Client.Models;
 using System.Text;
@@ -253,11 +253,11 @@ public class SosObservationsApiClient
         }
     }
 
-    public async Task<Client.Dtos.ProcessSummaryDto?> GetProcessSummary()
+    public async Task<ProcessSummaryDto?> GetProcessSummary()
     {
         try
         {
-            return await _httpClient.GetFromJsonAsync<Client.Dtos.ProcessSummaryDto>($"systems/process-summary");
+            return await _httpClient.GetFromJsonAsync<ProcessSummaryDto>($"systems/process-summary");
         }
         catch (Exception ex)
         {
@@ -266,11 +266,11 @@ public class SosObservationsApiClient
         }
     }
 
-    public async Task<Client.Dtos.ProcessInfoDto?> GetProcessInfo(bool active)
+    public async Task<ProcessInfoDto?> GetProcessInfo(bool active)
     {
         try
         {
-            return await _httpClient.GetFromJsonAsync<Client.Dtos.ProcessInfoDto>($"Systems/ProcessInformation?active={active}");
+            return await _httpClient.GetFromJsonAsync<ProcessInfoDto>($"Systems/ProcessInformation?active={active}");
         }
         catch (Exception ex)
         {
@@ -279,11 +279,11 @@ public class SosObservationsApiClient
         }
     }
 
-    public async Task<List<Client.Dtos.DataProviderStatusDto>?> GetDataProviderStatus()
+    public async Task<List<DataProviderStatusDto>?> GetDataProviderStatus()
     {
         try
         {
-            return await _httpClient.GetFromJsonAsync<List<Client.Dtos.DataProviderStatusDto>>("Systems/dataproviderstatus");
+            return await _httpClient.GetFromJsonAsync<List<DataProviderStatusDto>>("Systems/dataproviderstatus");
         }
         catch (Exception ex)
         {
@@ -292,11 +292,11 @@ public class SosObservationsApiClient
         }
     }
 
-    public async Task<IEnumerable<Client.Dtos.MongoDbProcessInfoDto>?> GetProcessInfo()
+    public async Task<IEnumerable<MongoDbProcessInfoDto>?> GetProcessInfo()
     {
         try
         {
-            return await _httpClient.GetFromJsonAsync<IEnumerable<Client.Dtos.MongoDbProcessInfoDto>>("systems/processmongodb");
+            return await _httpClient.GetFromJsonAsync<IEnumerable<MongoDbProcessInfoDto>>("systems/processmongodb");
         }
         catch (Exception ex)
         {
@@ -385,7 +385,7 @@ public class SosObservationsApiClient
 
     public async Task<string?> GetTaxonRelationsDiagramAsync(
         int[] taxonIds,
-        ContractsModels.TaxonRelationsTreeIterationMode treeIterationMode = ContractsModels.TaxonRelationsTreeIterationMode.BothParentsAndChildren,
+        TaxonRelationsTreeIterationMode treeIterationMode = TaxonRelationsTreeIterationMode.BothParentsAndChildren,
         bool includeSecondaryRelations = true,
         string translationCultureCode = "sv-SE")
     {

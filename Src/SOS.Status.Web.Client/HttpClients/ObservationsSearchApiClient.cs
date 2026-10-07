@@ -1,5 +1,4 @@
-﻿using SearchFilterInternalDto = SOS.Api.Contracts.Observations.Requests.SearchFilterInternalDto;
-using CSharpFunctionalExtensions;
+﻿using CSharpFunctionalExtensions;
 using SOS.Api.Contracts.Common.Responses;
 using SOS.Api.Contracts.Observations.Responses;
 using SOS.Status.Web.Client.Abstractions;

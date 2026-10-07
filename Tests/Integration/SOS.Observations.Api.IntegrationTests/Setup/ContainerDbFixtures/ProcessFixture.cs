@@ -1,4 +1,6 @@
-﻿using DwC_A;
+using SOS.Api.Contracts.Observations.Requests;
+using SOS.Api.Contracts.Common.Responses;
+using DwC_A;
 using Elastic.Clients.Elasticsearch.Cluster;
 using Hangfire;
 using Microsoft.ApplicationInsights;
@@ -50,7 +52,6 @@ using SOS.Observations.Api.IntegrationTests.Setup.Stubs;
 using SOS.Observations.Api.IntegrationTests.TestData;
 using SOS.Observations.Api.Repositories;
 using SOS.Observations.Api.Repositories.Interfaces;
-using SOS.Lib.Dtos;
 using System.Collections.Concurrent;
 
 namespace SOS.Observations.Api.IntegrationTests.Setup.ContainerDbFixtures;
@@ -84,6 +85,13 @@ public class ProcessFixture : IProcessFixture
     private ArtportalenDatasetProcessor _artportalenDatasetProcessor { get; set; }
     private ArtportalenEventProcessor _artportalenEventProcessor { get; set; }
     private DataProvider _testDataProvider = new DataProvider { Id = 1, Identifier = "TestDataProvider" };
+
+    // TestBase clears all indices before each test. Only subsequent writes need to replace test data.
+    // Keep index writes in these fixture helpers so this state also covers processor/import paths.
+    private bool _observationsWritten;
+    private bool _datasetsWritten;
+    private bool _eventsWritten;
+    private bool _checklistsWritten;
 
     public List<Taxon> Taxa => _taxa!;
     public IDictionary<VocabularyId, IDictionary<object, int>> DwcaVocabularyById => _dwcaVocabularyById;
@@ -252,11 +260,17 @@ public class ProcessFixture : IProcessFixture
 
     public async Task CleanElasticsearchIndices()
     {
-        await _datasetRepository.DeleteAllDocumentsAsync(waitForCompletion: true);
-        await _eventRepository.DeleteAllDocumentsAsync(waitForCompletion: true);
-        await _processedObservationCoreRepository.DeleteAllDocumentsAsync(protectedIndex: false, waitForCompletion: true);
-        await _processedObservationCoreRepository.DeleteAllDocumentsAsync(protectedIndex: true, waitForCompletion: true);
-        await _processedChecklistRepository.DeleteAllDocumentsAsync(waitForCompletion: true);
+        var cleared = await Task.WhenAll(
+            _datasetRepository.DeleteAllDocumentsAsync(waitForCompletion: true),
+            _eventRepository.DeleteAllDocumentsAsync(waitForCompletion: true),
+            _processedObservationCoreRepository.DeleteAllDocumentsAsync(protectedIndex: false, waitForCompletion: true),
+            _processedObservationCoreRepository.DeleteAllDocumentsAsync(protectedIndex: true, waitForCompletion: true),
+            _processedChecklistRepository.DeleteAllDocumentsAsync(waitForCompletion: true));
+        if (cleared.Any(success => !success))
+        {
+            throw new InvalidOperationException("Failed to clear Elasticsearch test indices.");
+        }
+        _observationsWritten = _datasetsWritten = _eventsWritten = _checklistsWritten = false;
         _searchTotalCountCache.Clear();
     }
 
@@ -506,10 +520,11 @@ public class ProcessFixture : IProcessFixture
 
     public async Task AddDatasetsToElasticsearchAsync(IEnumerable<Dataset> datasets, bool clearExistingObservations = true)
     {
-        if (clearExistingObservations)
+        if (clearExistingObservations && _datasetsWritten)
         {
-            await _datasetRepository.DeleteAllDocumentsAsync();
+            await _datasetRepository.DeleteAllDocumentsAsync(waitForCompletion: true);
         }
+        _datasetsWritten = true;
         await _datasetRepository.DisableIndexingAsync();
         await _datasetRepository.AddManyAsync(datasets);
         await _datasetRepository.EnableIndexingAsync();
@@ -518,10 +533,11 @@ public class ProcessFixture : IProcessFixture
 
     public async Task AddEventsToElasticsearchAsync(IEnumerable<Lib.Models.Processed.DataStewardship.Event.Event> events, bool clearExistingObservations = true)
     {
-        if (clearExistingObservations)
+        if (clearExistingObservations && _eventsWritten)
         {
-            await _eventRepository.DeleteAllDocumentsAsync();
+            await _eventRepository.DeleteAllDocumentsAsync(waitForCompletion: true);
         }
+        _eventsWritten = true;
         await _eventRepository.DisableIndexingAsync();
         await _eventRepository.AddManyAsync(events);
         await _eventRepository.EnableIndexingAsync();
@@ -545,8 +561,10 @@ public class ProcessFixture : IProcessFixture
             }
         }
 
-        await AddObservationsBatchToElasticsearchAsync(publicObservations, false, clearExistingObservations);
-        await AddObservationsBatchToElasticsearchAsync(protectedObservations, true, clearExistingObservations);
+        var replaceExisting = clearExistingObservations && _observationsWritten;
+        _observationsWritten = true;
+        await AddObservationsBatchToElasticsearchAsync(publicObservations, false, replaceExisting);
+        await AddObservationsBatchToElasticsearchAsync(protectedObservations, true, replaceExisting);
         await _processedObservationCoreRepository.RefreshIndicesAsync();
         _searchTotalCountCache.Clear();
     }
@@ -557,10 +575,10 @@ public class ProcessFixture : IProcessFixture
     {
         if (clearExistingObservations)
         {
-            await _processedObservationCoreRepository.DeleteAllDocumentsAsync(protectedIndex);
+            await _processedObservationCoreRepository.DeleteAllDocumentsAsync(protectedIndex, waitForCompletion: true);
         }
 
-        await _processedObservationCoreRepository.AddManyAsync(observations, protectedIndex, true);
+        await _processedObservationCoreRepository.AddManyAsync(observations, protectedIndex);
     }
 
     public DwcaObservationFactory GetDwcaObservationFactory(bool initAreaHelper)
@@ -630,15 +648,16 @@ public class ProcessFixture : IProcessFixture
 
     private async Task AddChecklistsToElasticsearchAsync(IEnumerable<Checklist> checklists, bool clearExistingChecklists = true)
     {
-        if (clearExistingChecklists)
+        if (clearExistingChecklists && _checklistsWritten)
         {
-            await _processedChecklistRepository.DeleteAllDocumentsAsync();
+            await _processedChecklistRepository.DeleteAllDocumentsAsync(waitForCompletion: true);
         }
+        _checklistsWritten = true;
         await _processedChecklistRepository.DisableIndexingAsync();
         await _processedChecklistRepository.AddManyAsync(checklists);
         await _processedChecklistRepository.EnableIndexingAsync();
 
-        await Task.Delay(1000);
+        await _processedChecklistRepository.RefreshIndexAsync();
     }
 
     private void InitAreaHelper()
@@ -683,6 +702,7 @@ public class ProcessFixture : IProcessFixture
                     new ElasticSearchIndexConfiguration
                     {
                         Name = "observation",
+                        NumberOfShards = 1,
                         ReadBatchSize = 10000,
                         WriteBatchSize = 1000,
                         ScrollBatchSize = 5000,
@@ -690,7 +710,8 @@ public class ProcessFixture : IProcessFixture
                     },
                     new ElasticSearchIndexConfiguration
                     {
-                        Name = "observationEvent",
+                        Name = "event",
+                        NumberOfShards = 1,
                         ReadBatchSize = 10000,
                         WriteBatchSize = 1000,
                         ScrollBatchSize = 5000,
@@ -698,11 +719,17 @@ public class ProcessFixture : IProcessFixture
                     },
                     new ElasticSearchIndexConfiguration
                     {
-                        Name = "observationDataset",
+                        Name = "dataset",
+                        NumberOfShards = 1,
                         ReadBatchSize = 10000,
                         WriteBatchSize = 1000,
                         ScrollBatchSize = 5000,
                         ScrollTimeout = "300s"
+                    },
+                    new ElasticSearchIndexConfiguration
+                    {
+                        Name = "checklist",
+                        NumberOfShards = 1
                     }
                 },
             RequestTimeout = 300,
@@ -714,10 +741,11 @@ public class ProcessFixture : IProcessFixture
 
     public async Task<ProcessingStatus> ProcessAndAddArtportalenEventsToElasticSearch(bool clearExistingObservations = true)
     {
-        if (clearExistingObservations)
+        if (clearExistingObservations && _eventsWritten)
         {
-            await _eventRepository.DeleteAllDocumentsAsync();
+            await _eventRepository.DeleteAllDocumentsAsync(waitForCompletion: true);
         }
+        _eventsWritten = true;
 
         var result = await _artportalenEventProcessor.ProcessAsync(_testDataProvider, JobCancellationToken.Null);
         await _eventRepository.RefreshIndexAsync();
@@ -726,10 +754,11 @@ public class ProcessFixture : IProcessFixture
 
     public async Task<int> ProcessAndAddDatasetsToElasticSearch(IEnumerable<ArtportalenDatasetMetadata> verbatimDatasets, bool clearExistingObservations = true)
     {
-        if (clearExistingObservations)
+        if (clearExistingObservations && _datasetsWritten)
         {
-            await _datasetRepository.DeleteAllDocumentsAsync(true);
+            await _datasetRepository.DeleteAllDocumentsAsync(waitForCompletion: true);
         }
+        _datasetsWritten = true;
 
         var res = await _artportalenDatasetProcessor.ProcessDatasetsAsync(_testDataProvider, verbatimDatasets);
         await _datasetRepository.RefreshIndexAsync();

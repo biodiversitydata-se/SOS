@@ -1,6 +1,7 @@
 ﻿using SOS.Lib.Models;
 
-using SOS.Lib.Dtos.Vocabulary;
+using SOS.Api.Contracts.Lookups.Responses;
+using SOS.Api.Contracts.Observations.Requests;
 
 namespace SOS.Lib.Extensions.Dto;
 
@@ -26,7 +27,7 @@ public static class PropertyFieldExtensions
                 SwedishTitle = fieldDescription.GetSwedishTitle(),
                 Name = fieldDescription.PropertyName,
                 FieldSet = fieldDescription.FieldSetEnum,
-                PartOfFieldSets = fieldDescription.FieldSets
+                PartOfFieldSets = fieldDescription.FieldSets?.ToList()
             };
         }
     }

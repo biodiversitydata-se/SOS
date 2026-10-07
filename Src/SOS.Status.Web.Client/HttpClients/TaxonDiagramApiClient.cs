@@ -1,5 +1,6 @@
-﻿﻿using SOS.Status.Web.Client.Abstractions;
-using SOS.Status.Web.Client.Dtos;
+﻿using SOS.Api.Contracts.Observations.Requests;
+using SOS.Status.Web.Client.Abstractions;
+using SOS.Api.Contracts.Taxonomy.Requests;
 using System.Net;
 
 namespace SOS.Status.Web.Client.HttpClients;

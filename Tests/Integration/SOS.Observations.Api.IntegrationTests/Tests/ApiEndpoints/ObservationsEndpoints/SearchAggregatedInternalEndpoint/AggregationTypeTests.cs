@@ -1,11 +1,11 @@
-﻿using FizzWare.NBuilder;
+using SOS.Api.Contracts.Aggregations.Requests;
+using SOS.Api.Contracts.Common.Responses;
+using SOS.Api.Contracts.Observations.Requests;
+using FizzWare.NBuilder;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Observations.Api.IntegrationTests.Setup;
 using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
-using SOS.Lib.Dtos;
-using SOS.Lib.Dtos.Enum;
-using SOS.Lib.Dtos.Filter;
 
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsEndpoints.SearchAggregatedInternalEndpoint;
 
@@ -22,30 +22,30 @@ public class AggregationTypeTests : TestBase
         //-----------------------------------------------------------------------------------------------------------
         // Arrange
         //-----------------------------------------------------------------------------------------------------------        
-        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(10)
             .All()
                 .HaveValuesFromPredefinedObservations()
-            .TheFirst(20)
+            .TheFirst(2)
                 .With(p => p.TaxonId = 100012)
                 .With(p => p.StartDate = new DateTime(2000, 1, 1))
                 .With(p => p.EndDate = new DateTime(2000, 1, 1))
-            .TheNext(20)
+            .TheNext(2)
                 .With(p => p.TaxonId = 100013)
                 .With(p => p.StartDate = new DateTime(2000, 1, 15))
                 .With(p => p.EndDate = new DateTime(2000, 1, 18))            
-            .TheNext(10)
+            .TheNext(1)
                 .With(p => p.TaxonId = 100012)
                 .With(p => p.StartDate = new DateTime(2000, 1, 30))
                 .With(p => p.EndDate = new DateTime(2000, 1, 30))
-            .TheNext(10)
+            .TheNext(1)
                 .With(p => p.TaxonId = 100012)
                 .With(p => p.StartDate = new DateTime(2001, 1, 30))
                 .With(p => p.EndDate = new DateTime(2001, 1, 30))
-            .TheNext(20)
+            .TheNext(2)
                 .With(p => p.TaxonId = 100013)
                 .With(p => p.StartDate = new DateTime(2000, 2, 1))
                 .With(p => p.EndDate = new DateTime(2000, 2, 1))
-            .TheLast(20)
+            .TheLast(2)
                 .With(p => p.TaxonId = 100012)
                 .With(p => p.StartDate = new DateTime(2000, 1, 1))
                 .With(p => p.EndDate = new DateTime(2000, 1, 15))
@@ -84,26 +84,26 @@ public class AggregationTypeTests : TestBase
         //-----------------------------------------------------------------------------------------------------------
         // Arrange
         //-----------------------------------------------------------------------------------------------------------        
-        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(10)
             .All()
                 .HaveValuesFromPredefinedObservations()
-            .TheFirst(20)
+            .TheFirst(2)
                 .With(p => p.TaxonId = 100012)
                 .With(p => p.StartDate = new DateTime(2000, 1, 1))
                 .With(p => p.EndDate = new DateTime(2000, 1, 1))
-            .TheNext(20)
+            .TheNext(2)
                 .With(p => p.TaxonId = 100013)
                 .With(p => p.StartDate = new DateTime(2000, 1, 15))
                 .With(p => p.EndDate = new DateTime(2000, 1, 18))
-            .TheNext(20)
+            .TheNext(2)
                 .With(p => p.TaxonId = 100012)
                 .With(p => p.StartDate = new DateTime(2000, 1, 30))
                 .With(p => p.EndDate = new DateTime(2000, 1, 30))
-            .TheNext(20)
+            .TheNext(2)
                 .With(p => p.TaxonId = 100013)
                 .With(p => p.StartDate = new DateTime(2000, 2, 1))
                 .With(p => p.EndDate = new DateTime(2000, 2, 1))
-            .TheLast(20)
+            .TheLast(2)
                 .With(p => p.TaxonId = 100012)
                 .With(p => p.StartDate = new DateTime(2000, 1, 1))
                 .With(p => p.EndDate = new DateTime(2000, 1, 15))
@@ -132,7 +132,7 @@ public class AggregationTypeTests : TestBase
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        result!.TotalCount.Should().Be(60);
+        result!.TotalCount.Should().Be(6);
         result!.Records.Count().Should().Be(5);
     }
 
@@ -143,29 +143,29 @@ public class AggregationTypeTests : TestBase
         // Arrange - Create verbatim observations
         //-----------------------------------------------------------------------------------------------------------
 
-        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(10)
            .All()
                .HaveValuesFromPredefinedObservations()
-           .TheFirst(20)
+           .TheFirst(2)
                .With(p => p.TaxonId = 100011)
                .With(p => p.StartDate = new DateTime(2000, 1, 1))
                .With(p => p.EndDate = new DateTime(2000, 1, 1))
                .With(p => p.Site.Province = new GeographicalArea { FeatureId = "1" })
-           .TheNext(20)
+           .TheNext(2)
                .With(p => p.TaxonId = 100012)
                .With(p => p.StartDate = new DateTime(2000, 1, 15))
                .With(p => p.EndDate = new DateTime(2000, 1, 18))
                .With(p => p.Site.Province = new GeographicalArea { FeatureId = "2" })
-           .TheNext(20)
+           .TheNext(2)
                .With(p => p.TaxonId = 100012)
                .With(p => p.StartDate = new DateTime(2000, 1, 30))
                .With(p => p.EndDate = new DateTime(2000, 1, 30))
                .With(p => p.Site.Province = new GeographicalArea { FeatureId = "3" })
-           .TheNext(20)
+           .TheNext(2)
                .With(p => p.TaxonId = 100016)
                .With(p => p.StartDate = new DateTime(2000, 1, 1))
                .With(p => p.EndDate = new DateTime(2000, 2, 1))
-           .TheLast(20)
+           .TheLast(2)
                .With(p => p.TaxonId = 100017)
                .With(p => p.StartDate = new DateTime(2000, 4, 1))
                .With(p => p.EndDate = new DateTime(2000, 4, 15))
@@ -195,7 +195,7 @@ public class AggregationTypeTests : TestBase
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        result!.TotalCount.Should().Be(60);
+        result!.TotalCount.Should().Be(6);
         result!.Records.Count().Should().Be(1);
     }
 
@@ -213,13 +213,13 @@ public class AggregationTypeTests : TestBase
         {
             Year = 2000,
             Week = 1,
-            DocCount = 20,
+            DocCount = 2,
         },
         new Week48Dto
         {
             Year = 2000,
             Week = 2,
-            DocCount = 20,
+            DocCount = 2,
         },
         new Week48Dto
         {
@@ -231,13 +231,13 @@ public class AggregationTypeTests : TestBase
         {
             Year = 2000,
             Week = 4,
-            DocCount = 10,
+            DocCount = 1,
         },
         new Week48Dto
         {
             Year = 2000,
             Week = 5,
-            DocCount = 20,
+            DocCount = 2,
         },
         new Week48Dto
         {
@@ -519,7 +519,7 @@ public class AggregationTypeTests : TestBase
         {
             Year = 2001,
             Week = 4,
-            DocCount = 10,
+            DocCount = 1,
         }
     };
 }

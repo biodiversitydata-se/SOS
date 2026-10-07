@@ -1,5 +1,7 @@
 ﻿using SOS.DataStewardship.Api.Application.Managers.Interfaces;
+using SOS.Api.Contracts.Aggregations.Requests;
 using SOS.DataStewardship.Api.Contracts.Enums;
+using SOS.Api.Contracts.Observations.Requests;
 using SOS.DataStewardship.Api.Contracts.Models;
 using SOS.DataStewardship.Api.Extensions;
 using SOS.Lib.Models.Search;
@@ -60,7 +62,7 @@ public class DataStewardshipManager : IDataStewardshipManager
             skip, 
             take,
             precisionThreshold: null,
-            Lib.Models.Search.Enums.AggregationSortOrder.KeyAscending,
+            AggregationSortOrder.KeyAscending,
             aggregateCardinality: true);
         int count = eventIdPageResult.Records.Count();
         int totalCount = Convert.ToInt32(eventIdPageResult.TotalCount);
@@ -123,7 +125,7 @@ public class DataStewardshipManager : IDataStewardshipManager
             skip,
             take,
             precisionThreshold: null,
-            Lib.Models.Search.Enums.AggregationSortOrder.KeyAscending,
+            AggregationSortOrder.KeyAscending,
             aggregateCardinality: true);        
         int count = aggregationResult.Records.Count();
         int totalCount = Convert.ToInt32(aggregationResult.TotalCount);
@@ -132,7 +134,7 @@ public class DataStewardshipManager : IDataStewardshipManager
         {
             var sortOrders = new List<SortOrderFilter>
             {
-                new SortOrderFilter { SortBy = "identifier", SortOrder = SearchSortOrder.Asc }                
+                new SortOrderFilter { SortBy = "identifier", SortOrder = SearchSortOrder.Asc }
             };
 
             var observationDatasets = await _observationDatasetRepository.GetDatasetsByIds(aggregationResult.Records.Select(m => m.AggregationKey), sortOrders: sortOrders);

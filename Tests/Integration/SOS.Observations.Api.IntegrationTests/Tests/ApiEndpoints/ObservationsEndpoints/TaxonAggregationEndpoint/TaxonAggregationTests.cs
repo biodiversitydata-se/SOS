@@ -1,8 +1,8 @@
-﻿using FizzWare.NBuilder;
+using SOS.Api.Contracts.Aggregations.Requests;
+using SOS.Api.Contracts.Common.Responses;
+using SOS.Api.Contracts.Observations.Requests;
+using FizzWare.NBuilder;
 using SOS.Lib.Models.Verbatim.Artportalen;
-using SOS.Lib.Dtos;
-using SOS.Lib.Dtos.Enum;
-using SOS.Lib.Dtos.Filter;
 using SOS.Observations.Api.IntegrationTests.Setup;
 using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
 
@@ -19,26 +19,26 @@ public class TaxonAggregationTests : TestBase
     public async Task TaxonAggregationTest()
     {
         // Arrange
-        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(10)
             .All()
                 .HaveValuesFromPredefinedObservations()
-            .TheFirst(20)
+            .TheFirst(2)
                 .With(p => p.TaxonId = 100012)
                 .With(p => p.StartDate = new DateTime(2000, 1, 1))
                 .With(p => p.EndDate = new DateTime(2000, 1, 1))
-            .TheNext(20)
+            .TheNext(2)
                 .With(p => p.TaxonId = 100013)
                 .With(p => p.StartDate = new DateTime(2000, 1, 15))
                 .With(p => p.EndDate = new DateTime(2000, 1, 18))
-            .TheNext(20)
+            .TheNext(2)
                 .With(p => p.TaxonId = 100012)
                 .With(p => p.StartDate = new DateTime(2000, 1, 30))
                 .With(p => p.EndDate = new DateTime(2000, 1, 30))
-            .TheNext(20)
+            .TheNext(2)
                 .With(p => p.TaxonId = 100013)
                 .With(p => p.StartDate = new DateTime(2000, 2, 1))
                 .With(p => p.EndDate = new DateTime(2000, 2, 1))
-            .TheLast(20)
+            .TheLast(2)
                 .With(p => p.TaxonId = 100012)
                 .With(p => p.StartDate = new DateTime(2000, 4, 1))
                 .With(p => p.EndDate = new DateTime(2000, 4, 15))

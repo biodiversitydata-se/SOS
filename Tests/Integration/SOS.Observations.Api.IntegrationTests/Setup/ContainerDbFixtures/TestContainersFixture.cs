@@ -1,6 +1,7 @@
 ﻿using DotNet.Testcontainers.Builders;
 using DotNet.Testcontainers.Configurations;
 using DotNet.Testcontainers.Containers;
+using DotNet.Testcontainers.Networks;
 using Elastic.Clients.Elasticsearch;
 using MongoDB.Driver;
 using SOS.Lib.Database;
@@ -28,6 +29,8 @@ public class TestContainersFixture : IAsyncLifetime
     private IProcessClient? _processClient { get; set; }
     private IVerbatimClient? _verbatimClient { get; set; }
     private ElasticsearchClient? _elasticClient { get; set; }
+    private INetwork? _network;
+    private Task? _kibanaStartup;
 
     public TestContainersFixture()
     {
@@ -36,17 +39,28 @@ public class TestContainersFixture : IAsyncLifetime
 
     public async ValueTask InitializeAsync()
     {
-        _processClient = await InitializeMongoDbAsync();
-        _verbatimClient = await InitializeMongoDbHarvestDbAsync();
-        _elasticClient = await InitializeElasticsearchAsync();
+        var processClient = InitializeMongoDbAsync();
+        var verbatimClient = InitializeMongoDbHarvestDbAsync();
+        var elasticClient = InitializeElasticsearchAsync();
+        await Task.WhenAll(processClient, verbatimClient, elasticClient);
+        _processClient = await processClient;
+        _verbatimClient = await verbatimClient;
+        _elasticClient = await elasticClient;
     }
 
     public async ValueTask DisposeAsync()
     {
-        await _elasticsearchContainer!.DisposeAsync();
-        if (_kibanaContainer != null) await _kibanaContainer.DisposeAsync();
-        await _mongoDbContainer!.DisposeAsync();
-        await _mongoDbHarvestDbContainer!.DisposeAsync();
+        try
+        {
+            // Do not dispose Kibana while its optional background startup is still running.
+            if (_kibanaStartup != null) await _kibanaStartup;
+            IContainer?[] containers = [_elasticsearchContainer, _kibanaContainer, _mongoDbContainer, _mongoDbHarvestDbContainer];
+            await Task.WhenAll(containers.OfType<IContainer>().Select(container => container.DisposeAsync().AsTask()));
+        }
+        finally
+        {
+            if (_network != null) await _network.DisposeAsync();
+        }
     }
 
     public ServiceCollection GetServiceCollection()
@@ -81,14 +95,14 @@ public class TestContainersFixture : IAsyncLifetime
 
     private async Task<ElasticsearchClient> InitializeElasticsearchWithKibanaAsync()
     {
-        var network = new NetworkBuilder()
+        _network = new NetworkBuilder()
             .WithName(Guid.NewGuid().ToString("D"))
         .Build();
 
         _elasticsearchContainer = new ElasticsearchBuilder(ELASTIC_IMAGE_NAME)
             .WithCleanUp(true)
             .WithPortBinding(9200, 9200)
-            .WithNetwork(network)
+            .WithNetwork(_network)
             .WithNetworkAliases("elastic-test-network")
             .WithEnvironment("xpack.security.enabled", "false")
             .WithWaitStrategy(Wait.ForUnixContainer()
@@ -100,17 +114,17 @@ public class TestContainersFixture : IAsyncLifetime
           .WithName(Guid.NewGuid().ToString("D"))
           .WithImage("docker.elastic.co/kibana/kibana:8.17.3")
           .WithPortBinding(5601, 5601)
-          .WithNetwork(network)
+          .WithNetwork(_network)
           .WithEnvironment("ELASTICSEARCH_HOSTS", "http://elastic-test-network:9200")
           //.WithOutputConsumer(Consume.RedirectStdoutAndStderrToConsole())
         .Build();
 
-        await network.CreateAsync().ConfigureAwait(false);
+        await _network.CreateAsync().ConfigureAwait(false);
         await _elasticsearchContainer.StartAsync().ConfigureAwait(false);
 
         // Kibana is only for debug inspection – start in background so tests are not blocked.
         Console.WriteLine("[Kibana] Starting container in background (image: docker.elastic.co/kibana/kibana:8.17.3)...");
-        _ = _kibanaContainer.StartAsync().ContinueWith(t =>
+        _kibanaStartup = _kibanaContainer.StartAsync().ContinueWith(t =>
         {
             if (t.IsFaulted)
                 Console.Error.WriteLine($"[Kibana] Failed to start: {t.Exception?.GetBaseException().Message}");

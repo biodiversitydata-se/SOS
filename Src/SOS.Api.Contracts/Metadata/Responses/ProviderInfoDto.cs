@@ -1,9 +1,12 @@
-namespace SOS.Api.Contracts.Metadata.Responses;
+﻿namespace SOS.Api.Contracts.Metadata.Responses;
+/// <summary>Harvesting and processing information for a data provider.</summary>
 public class ProviderInfoDto
 {
 
+    /// <summary>The numeric data provider identifier.</summary>
     public int? DataProviderId { get; set; }
 
+    /// <summary>The data provider's string identifier.</summary>
     public string DataProviderIdentifier { get; set; }
 
     /// <summary>
@@ -70,6 +73,13 @@ public class ProviderInfoDto
     /// Process end date and time
     /// </summary>
     public System.DateTimeOffset? ProcessEnd { get; set; }
+
+    /// <summary>
+    /// Number of failed observations. This value is used by the server health
+    /// check and is intentionally not included in API responses.
+    /// </summary>
+    [System.Text.Json.Serialization.JsonIgnore]
+    public int? ProcessFailCount { get; set; }
 
     /// <summary>
     /// Process start date and time

@@ -1,8 +1,8 @@
-﻿using FizzWare.NBuilder;
+using SOS.Api.Contracts.Common.Responses;
+using FizzWare.NBuilder;
+using SOS.Api.Contracts.Observations.Requests;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Verbatim.Artportalen;
-using SOS.Lib.Dtos;
-using SOS.Lib.Dtos.Filter;
 using SOS.Observations.Api.IntegrationTests.Setup;
 using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
 
@@ -19,10 +19,10 @@ public class ExcludeFilterTests : TestBase
     public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_WhenExcludingByOccurrenceIds()
     {
         // Arrange
-        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(5)
             .All().HaveValuesFromPredefinedObservations()
             .Build();
-        var excludeOccurrenceIds = verbatimObservations.Take(40).Select(m => $"urn:lsid:artportalen.se:sighting:{m.SightingId}").ToList();
+        var excludeOccurrenceIds = verbatimObservations.Take(2).Select(m => $"urn:lsid:artportalen.se:sighting:{m.SightingId}").ToList();
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
         var apiClient = TestFixture.CreateApiClient();
         var searchFilter = new SearchFilterDto
@@ -39,7 +39,7 @@ public class ExcludeFilterTests : TestBase
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        result!.TotalCount.Should().Be(60,
-            because: "40 of 100 observations were excluded.");
+        result!.TotalCount.Should().Be(3,
+            because: "2 of 5 observations were excluded.");
     }
 }

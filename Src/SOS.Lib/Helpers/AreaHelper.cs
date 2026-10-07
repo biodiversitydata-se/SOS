@@ -1,4 +1,5 @@
-﻿using NetTopologySuite.Features;
+﻿using SOS.Api.Contracts.Common.Geo;
+using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.Index.Strtree;
 using SOS.Lib.Configuration.Shared;

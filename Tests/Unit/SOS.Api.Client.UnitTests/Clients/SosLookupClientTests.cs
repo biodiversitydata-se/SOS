@@ -4,6 +4,7 @@ using SOS.Api.Client.Requests;
 using SOS.Api.Client.UnitTests.Support;
 using SOS.Api.Contracts.Areas.Requests;
 using SOS.Api.Contracts.Areas.Responses;
+using SOS.Api.Contracts.Common.Responses;
 using SOS.Api.Contracts.Lookups.Responses;
 using System.Net;
 using System.Text;
@@ -28,8 +29,8 @@ public class SosLookupClientTests
             {
               "skip": 5,
               "take": 10,
-              "totalCount": 0,
-              "records": []
+              "totalCount": 1,
+              "records": [{ "areaType": "Province", "featureId": "SE-1", "name": "Area one" }]
             }
             """);
         });
@@ -45,8 +46,11 @@ public class SosLookupClientTests
             },
             TestContext.Current.CancellationToken);
 
+        result.Should().BeOfType<PagedResultDto<AreaBaseDto>>();
         result!.Skip.Should().Be(5);
         result.Take.Should().Be(10);
+        result.TotalCount.Should().Be(1);
+        result.Records.Should().ContainSingle().Which.FeatureId.Should().Be("SE-1");
     }
 
     [Fact]

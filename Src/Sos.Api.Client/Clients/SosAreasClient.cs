@@ -2,6 +2,7 @@
 using SOS.Api.Client.Requests;
 using SOS.Api.Contracts.Areas.Requests;
 using SOS.Api.Contracts.Areas.Responses;
+using SOS.Api.Contracts.Common.Responses;
 
 namespace SOS.Api.Client.Clients;
 
@@ -17,7 +18,7 @@ public sealed class SosAreasClient : ISosAreasClient
     }
 
     /// <inheritdoc />
-    public async Task<AreaBaseDtoPagedResult?> GetAreasAsync(
+    public async Task<PagedResultDto<AreaBaseDto>?> GetAreasAsync(
         AreasOptions? options = null,
         CancellationToken cancellationToken = default)
     {
@@ -31,7 +32,7 @@ public sealed class SosAreasClient : ISosAreasClient
             request,
             HttpCompletionOption.ResponseHeadersRead,
             cancellationToken);
-        return await SosClientHttp.ReadJsonResponseAsync<AreaBaseDtoPagedResult>(
+        return await SosClientHttp.ReadJsonResponseAsync<PagedResultDto<AreaBaseDto>>(
             response,
             request.RequestUri,
             cancellationToken);

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Diagnostics.HealthChecks;
+using SOS.Api.Contracts.Aggregations.Requests;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Search.Filters;
 
@@ -39,7 +40,7 @@ public class AggregateHealthCheck : IHealthCheck
             false,
             1,
             1,
-            Lib.Models.Search.Enums.AggregationSortOrder.KeyAscending
+            AggregationSortOrder.KeyAscending
         );
 
         return result.Count() != 0;

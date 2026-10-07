@@ -1,7 +1,9 @@
-﻿using Elastic.Clients.Elasticsearch;
+﻿using SOS.Api.Contracts.Common.Geo;
+using Elastic.Clients.Elasticsearch;
+using SOS.Api.Contracts.Aggregations.Requests;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.DarwinCore;
-using SOS.Lib.Models.DataQuality;
+using SOS.Api.Contracts.DataQuality.Responses;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Search.Enums;
@@ -140,7 +142,7 @@ public interface IProcessedObservationCoreRepository : IProcessRepositoryBase<Ob
     /// <returns></returns>
     Task<long> GetMatchCountAsync(SearchFilterBase filter, bool skipAuthorizationFilters = false);
 
-    Task<(long Count, LatLonBoundingBox? Extent, long EstimatedLocationCount)> GetCountAndExtentAsync(SearchFilterBase filter, bool skipAuthorizationFilters = false, bool includeExtent = true);
+    Task<(long Count, LatLonBoundingBoxDto? Extent, long EstimatedLocationCount)> GetCountAndExtentAsync(SearchFilterBase filter, bool skipAuthorizationFilters = false, bool includeExtent = true);
 
     /// <summary>
     /// Get observations by their occurrence id's

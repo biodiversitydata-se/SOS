@@ -283,4 +283,4 @@ public sealed class LocationMapSearch(ISosObservationsClient observationsClient)
 }
 ```
 
-`ISosObservationSearchService.AdaptiveSearchLocationsInternalAsFeatureCollectionAsync` kan användas för att läsa ett `locations`-svar som `AdaptiveSearchLocationsFeatureCollectionDto`. Kontrollera ändå `Response.ResultType`: geogrid och tillagda filterområden har andra properties än de typade lokalfeatures som DTO:n beskriver. För generella adaptiva kartlager är därför den råa `GeoJson`-strängen ofta det säkraste gränssnittet.
+`ISosObservationSearchService.AdaptiveSearchLocationsInternalAsFeatureCollectionAsync` läser svaret direkt som GeoJSON.Texts `FeatureCollection<AdaptiveSearchLocationFeaturePropertiesDto>`. Bounding box finns i `BoundingBoxes`, och varje feature har bibliotekets geometri tillsammans med SOS-specifika properties. Kontrollera ändå `Response.ResultType`: geogrid och tillagda filterområden har andra properties än de typade lokalfeatures som DTO:n beskriver. För generella adaptiva kartlager kan den råa `GeoJson`-strängen läsas som GeoJSON.Texts vanliga `FeatureCollection`, som bevarar även andra properties i en dictionary.

@@ -1,9 +1,8 @@
 ﻿using NetTopologySuite.Geometries;
 using SOS.Lib.Enums;
-using SOS.Lib.Models.Search.Result;
+using SOS.Api.Contracts.Areas.Responses;
+using SOS.Api.Contracts.Common.Responses;
 using SOS.Lib.Models.Shared;
-using SOS.Lib.Dtos;
-using SOS.Lib.Dtos.Enum;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -29,7 +28,7 @@ public interface IAreaManager
     /// <param name="skip"></param>
     /// <param name="take"></param>
     /// <returns></returns>
-    Task<PagedResult<AreaBaseDto>> GetAreasAsync(IEnumerable<AreaTypeDto> areaTypes, string searchString,
+    Task<PagedResultDto<AreaBaseDto>> GetAreasAsync(IEnumerable<AreaTypeDto> areaTypes, string searchString,
         int skip, int take);
 
     /// <summary>

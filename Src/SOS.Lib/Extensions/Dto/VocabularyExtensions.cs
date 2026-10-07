@@ -1,5 +1,5 @@
 ﻿using SOS.Lib.Models.Shared;
-using SOS.Lib.Dtos.Vocabulary;
+using SOS.Api.Contracts.Lookups.Responses;
 
 namespace SOS.Lib.Extensions.Dto;
 

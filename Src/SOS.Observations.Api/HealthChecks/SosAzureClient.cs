@@ -1,6 +1,7 @@
-﻿using SOS.Lib.Models.Processed.Observation;
-using SOS.Lib.Dtos;
-using SOS.Lib.Dtos.Filter;
+using SOS.Api.Contracts.Observations.Requests;
+using SOS.Api.Contracts.Common.Responses;
+using SOS.Lib.Models.Processed.Observation;
+using SOS.Api.Contracts.Lookups.Responses;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;

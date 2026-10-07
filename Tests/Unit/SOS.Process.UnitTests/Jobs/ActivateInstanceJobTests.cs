@@ -31,7 +31,7 @@ public class ActivateInstanceJobTests
     /// </summary>
     /// <returns></returns>
     [Fact]
-    public void RunAsyncException()
+    public async Task RunAsync_WhenActivationThrows_PropagatesTheException()
     {
         // -----------------------------------------------------------------------------------------------------------
         // Arrange
@@ -50,7 +50,7 @@ public class ActivateInstanceJobTests
         //-----------------------------------------------------------------------------------------------------------
         // Assert
         //-----------------------------------------------------------------------------------------------------------
-        act.Should().ThrowAsync<Exception>();
+        await act.Should().ThrowAsync<Exception>().WithMessage("Failed");
     }
 
     /// <summary>
@@ -58,12 +58,12 @@ public class ActivateInstanceJobTests
     /// </summary>
     /// <returns></returns>
     [Fact]
-    public void RunAsyncFail()
+    public async Task RunAsync_WhenActivationReturnsFalse_ThrowsWithJobFailureMessage()
     {
         // -----------------------------------------------------------------------------------------------------------
         // Arrange
         //-----------------------------------------------------------------------------------------------------------
-
+        _instanceManagerMock.Setup(r => r.SetActiveInstanceAsync(It.IsAny<byte>())).ReturnsAsync(false);
 
         //-----------------------------------------------------------------------------------------------------------
         // Act
@@ -77,7 +77,7 @@ public class ActivateInstanceJobTests
         //-----------------------------------------------------------------------------------------------------------
         // Assert
         //-----------------------------------------------------------------------------------------------------------
-        act.Should().ThrowAsync<Exception>();
+        await act.Should().ThrowAsync<Exception>().WithMessage("Activate instance job failed");
     }
 
     /// <summary>

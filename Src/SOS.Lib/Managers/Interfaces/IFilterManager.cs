@@ -1,6 +1,6 @@
-﻿using NetTopologySuite.Features;
+﻿using SOS.Api.Contracts.Observations.Requests;
+using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
-using SOS.Lib.Enums;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Services.Interfaces;

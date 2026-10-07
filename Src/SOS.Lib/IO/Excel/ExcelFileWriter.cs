@@ -1,9 +1,10 @@
 ﻿using Elastic.Clients.Elasticsearch;
 using Hangfire;
+using SOS.Api.Contracts.Lookups.Responses;
+using SOS.Api.Contracts.Exports.Requests;
 using Microsoft.Extensions.Logging;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
-using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Helpers.Interfaces;

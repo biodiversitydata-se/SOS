@@ -7,7 +7,7 @@ namespace SOS.Api.Contracts.Areas.Requests;
 public class AreaFilterDto
 {
 
-    [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+    /// <summary>Type of area to search.</summary>
     public AreaTypeDto AreaType { get; set; }
 
     /// <summary>

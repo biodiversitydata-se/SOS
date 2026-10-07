@@ -1,8 +1,9 @@
-﻿using FizzWare.NBuilder;
+﻿using SOS.Api.Contracts.Observations.Responses;
+using SOS.Api.Contracts.Observations.Requests;
+using SOS.Api.Contracts.Exports.Requests;
+using FizzWare.NBuilder;
 using MongoDB.Driver.GeoJsonObjectModel;
 using NetTopologySuite.Features;
-using SOS.Lib.Models.Processed.Observation;
-using SOS.Lib.Enums;
 using SOS.Lib.Gis;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Lib.Models.Verbatim.DarwinCore;
@@ -11,8 +12,7 @@ using SOS.Observations.Api.IntegrationTests.Helpers;
 using SOS.Observations.Api.IntegrationTests.Models;
 using SOS.Observations.Api.IntegrationTests.Setup;
 using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
-using SOS.Lib.Dtos.Filter;
-using SOS.Lib.Dtos;
+using ContractAdaptiveSearchResultDto = SOS.Api.Contracts.Observations.Responses.AdaptiveSearchResultDto<SOS.Lib.Models.Processed.Observation.Observation>;
 
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsEndpoints.ObservationsBySearchEndpoint;
 
@@ -27,7 +27,7 @@ public class AdaptiveSearchTests : TestBase
     public async Task AdaptiveSearchInternal_ReturnsObservations_WhenTotalCountBelowObservationsLimit()
     {
         // Arrange
-        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(3)
             .All().HaveValuesFromPredefinedObservations()            
             .Build();
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
@@ -36,25 +36,25 @@ public class AdaptiveSearchTests : TestBase
 
         // Act
         var response = await apiClient.PostAsync(
-            "/observations/internal/adaptivesearch?observationsLimit=100",
+            "/observations/internal/adaptivesearch?observationsLimit=3",
             JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);        
         var strGeoJson = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
         FeatureCollection featureCollection = GeoJsonHelper.ReadGeoJsonFromString(strGeoJson);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);        
-        featureCollection.Count.Should().Be(100);
+        featureCollection.Count.Should().Be(3);
         response.GetHeaderValue("X-Result-Type").Should().Be("observations");
-        response.GetHeaderValue("X-Observations-TotalCount").Should().Be("100");
-        response.GetHeaderValue("X-Observations-Count").Should().Be("100");        
-        response.GetHeaderValue("X-Result-Count").Should().Be("100");
+        response.GetHeaderValue("X-Observations-TotalCount").Should().Be("3");
+        response.GetHeaderValue("X-Observations-Count").Should().Be("3");
+        response.GetHeaderValue("X-Result-Count").Should().Be("3");
     }
 
     [Fact]
     public async Task AdaptiveSearchInternal_ReturnsGridAggregation_WhenTotalCountExceedsObservationsLimit()
     {
         // Arrange
-        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(3)
             .All().HaveValuesFromPredefinedObservations()
             .Build();
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
@@ -63,7 +63,7 @@ public class AdaptiveSearchTests : TestBase
 
         // Act
         var response = await apiClient.PostAsync(
-            "/observations/internal/adaptivesearch?observationsLimit=50",
+            "/observations/internal/adaptivesearch?observationsLimit=2",
             JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
         var strGeoJson = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
         FeatureCollection featureCollection = GeoJsonHelper.ReadGeoJsonFromString(strGeoJson);
@@ -72,7 +72,7 @@ public class AdaptiveSearchTests : TestBase
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         featureCollection.Count.Should().BeGreaterThanOrEqualTo(1, because: "at least one grid cell is returned");
         response.GetHeaderValue("X-Result-Type").Should().Be("geogrid");
-        response.GetHeaderValue("X-Observations-TotalCount").Should().Be("100");
+        response.GetHeaderValue("X-Observations-TotalCount").Should().Be("3");
         Convert.ToInt32(response.GetHeaderValue("X-Zoom")).Should().BeGreaterThanOrEqualTo(1, because: "zoom should be greater than or equal to 1");
         Convert.ToInt32(response.GetHeaderValue("X-Result-Count")).Should().BeGreaterThanOrEqualTo(1, because: "at least one grid cell is returned");
     }    
@@ -88,7 +88,7 @@ public class AdaptiveSearchTests : TestBase
         {
             Output = new OutputFilterExtendedDto
             {
-                FieldSet = Lib.Enums.OutputFieldSet.All
+                FieldSet = SOS.Api.Contracts.Observations.Requests.OutputFieldSet.All
             }
         };
 
@@ -135,7 +135,7 @@ public class AdaptiveSearchTests : TestBase
         {
             Output = new OutputFilterExtendedDto
             {
-                FieldSet = Lib.Enums.OutputFieldSet.All
+                FieldSet = SOS.Api.Contracts.Observations.Requests.OutputFieldSet.All
             }
         };
         
@@ -180,18 +180,18 @@ public class AdaptiveSearchTests : TestBase
         {
             Output = new OutputFilterExtendedDto
             {
-                FieldSet = Lib.Enums.OutputFieldSet.All
+                FieldSet = SOS.Api.Contracts.Observations.Requests.OutputFieldSet.All
             }
         };
 
         // Act
         var response = await apiClient.PostAsync($"/observations/internal/adaptivesearch?observationsLimit=10&outputFormat={OutputFormatDto.Json}&geoJsonPropertyLabelType={PropertyLabelType.PropertyName}", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
         var responseString = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
-        var resultDto = JsonSerializer.Deserialize<AdaptiveSearchResultDto<Observation>>(responseString, JsonSerializerOptions);
+        var resultDto = JsonSerializer.Deserialize<ContractAdaptiveSearchResultDto>(responseString, JsonSerializerOptions);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        resultDto.ResultType.Should().Be(AdaptiveSearchResultTypeDto.Observations);
+        resultDto.ResultType.Should().Be(SOS.Api.Contracts.Observations.Responses.AdaptiveSearchResultTypeDto.Observations);
         resultDto.TotalObservationsCount.Should().Be(6);
         resultDto.ResultCount.Should().Be(6);
         resultDto.ObservationsResult.Count().Should().Be(6);
@@ -209,7 +209,7 @@ public class AdaptiveSearchTests : TestBase
         {
             Output = new OutputFilterExtendedDto
             {
-                FieldSet = Lib.Enums.OutputFieldSet.All
+                FieldSet = SOS.Api.Contracts.Observations.Requests.OutputFieldSet.All
             }
         };
 
@@ -220,7 +220,7 @@ public class AdaptiveSearchTests : TestBase
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        resultDto.ResultType.Should().Be(AdaptiveSearchResultTypeDto.Observations);
+        resultDto.ResultType.Should().Be(SOS.Api.Contracts.Observations.Responses.AdaptiveSearchResultTypeDto.Observations);
         resultDto.TotalObservationsCount.Should().Be(6);
         resultDto.ObservationsCount.Should().Be(6);
         resultDto.ResultCount.Should().Be(3);
@@ -228,7 +228,7 @@ public class AdaptiveSearchTests : TestBase
 
         var polygonLocationDto = resultDto.LocationResult.First(location => location.Location.LocationId == $"urn:lsid:artportalen.se:site:{polygonSiteId1}");
         polygonLocationDto.Location.LocationId.Should().Be($"urn:lsid:artportalen.se:site:{polygonSiteId1}");       
-        polygonLocationDto.Geometry.GeometryType.Should().Be("Polygon");
+        polygonLocationDto.Geometry.Type.ToString().Should().Be("Polygon");
         polygonLocationDto.ObservationCount.Should().Be(2);
         polygonLocationDto.TaxaCount.Should().BeGreaterThanOrEqualTo(1);
         polygonLocationDto.Observations.Count().Should().Be(2);
@@ -237,7 +237,7 @@ public class AdaptiveSearchTests : TestBase
 
         var pointLocationDto = resultDto.LocationResult.First(location => location.Location.LocationId == $"urn:lsid:artportalen.se:site:{pointSiteId1}");
         pointLocationDto.Location.LocationId.Should().Be($"urn:lsid:artportalen.se:site:{pointSiteId1}");
-        pointLocationDto.Geometry.GeometryType.Should().Be("Point");
+        pointLocationDto.Geometry.Type.ToString().Should().Be("Point");
         pointLocationDto.ObservationCount.Should().Be(2);
         pointLocationDto.TaxaCount.Should().BeGreaterThanOrEqualTo(1);
         pointLocationDto.Observations.Count().Should().Be(2);

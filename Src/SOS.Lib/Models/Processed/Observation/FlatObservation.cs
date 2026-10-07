@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using System.Text.RegularExpressions;
+using SOS.Api.Contracts.Lookups.Responses;
 
 namespace SOS.Lib.Models.Processed.Observation;
 

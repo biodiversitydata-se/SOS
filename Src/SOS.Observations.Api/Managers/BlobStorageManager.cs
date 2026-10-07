@@ -1,11 +1,10 @@
 ﻿using Microsoft.Extensions.Logging;
-using SOS.Lib.Models.Misc;
 using SOS.Lib.Services.Interfaces;
 using SOS.Observations.Api.Managers.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using File = SOS.Lib.Models.Misc.File;
+using SOS.Api.Contracts.Exports.Responses;
 
 namespace SOS.Observations.Api.Managers;
 
@@ -38,7 +37,7 @@ public class BlobStorageManager : IBlobStorageManager
     }
 
     /// <inheritdoc />
-    public async Task<IEnumerable<File>> GetExportFilesAsync()
+    public async Task<IEnumerable<ExportFileDto>> GetExportFilesAsync()
     {
         return await _blobStorageService.GetExportFilesAsync();
     }

@@ -1,4 +1,5 @@
-﻿using NetTopologySuite.Features;
+﻿using SOS.Api.Contracts.Common.Geo;
+using NetTopologySuite.Features;
 using NetTopologySuite.IO;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;

@@ -6,5 +6,5 @@ namespace SOS.Api.Client.Abstractions;
 public interface ISosApiInfoClient
 {
     /// <summary>Gets version and build information for the API.</summary>
-    Task<ApiInformationDto?> GetApiInfoAsync(CancellationToken cancellationToken = default);
+    Task<ApiInformation?> GetApiInfoAsync(CancellationToken cancellationToken = default);
 }

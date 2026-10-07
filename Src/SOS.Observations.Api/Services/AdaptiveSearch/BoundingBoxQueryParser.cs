@@ -1,13 +1,47 @@
-﻿using SOS.Lib.Dtos.Filter;
+﻿using SOS.Api.Contracts.Common.Geo;
+using SOS.Api.Contracts.Observations.Requests;
 using System.Globalization;
 
 namespace SOS.Observations.Api.Services.AdaptiveSearch;
 
 internal static class BoundingBoxQueryParser
 {
-    public static bool TryApply(SearchFilterInternalDto filter, string? bboxQuery, out string? error)
+    public static bool TryApply(
+        SearchFilterInternalDto filter,
+        string? bboxQuery,
+        out string? error)
+    {
+        if (!TryParse(bboxQuery, out var coordinates, out error))
+        {
+            return false;
+        }
+
+        if (coordinates is null)
+        {
+            return true;
+        }
+
+        filter.Geographics ??= new GeographicsFilterDto();
+        filter.Geographics.BoundingBox = new LatLonBoundingBoxDto
+        {
+            TopLeft = new LatLonCoordinateDto
+            {
+                Longitude = coordinates[0],
+                Latitude = coordinates[3]
+            },
+            BottomRight = new LatLonCoordinateDto
+            {
+                Longitude = coordinates[2],
+                Latitude = coordinates[1]
+            }
+        };
+        return true;
+    }
+
+    private static bool TryParse(string? bboxQuery, out double[]? coordinates, out string? error)
     {
         error = null;
+        coordinates = null;
         if (string.IsNullOrWhiteSpace(bboxQuery))
         {
             return true;
@@ -20,7 +54,7 @@ internal static class BoundingBoxQueryParser
             return false;
         }
 
-        var coordinates = new double[4];
+        coordinates = new double[4];
         for (var i = 0; i < parts.Length; i++)
         {
             if (!double.TryParse(parts[i].Trim(), NumberStyles.Float, CultureInfo.InvariantCulture, out coordinates[i]))
@@ -45,21 +79,6 @@ internal static class BoundingBoxQueryParser
             error = "The bbox query parameter must be within WGS84 longitude/latitude bounds.";
             return false;
         }
-
-        filter.Geographics ??= new GeographicsFilterDto();
-        filter.Geographics.BoundingBox = new LatLonBoundingBoxDto
-        {
-            TopLeft = new LatLonCoordinateDto
-            {
-                Longitude = minLongitude,
-                Latitude = maxLatitude
-            },
-            BottomRight = new LatLonCoordinateDto
-            {
-                Longitude = maxLongitude,
-                Latitude = minLatitude
-            }
-        };
 
         return true;
     }

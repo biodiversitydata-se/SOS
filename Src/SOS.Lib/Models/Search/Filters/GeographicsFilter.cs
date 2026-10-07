@@ -1,4 +1,5 @@
-﻿using NetTopologySuite.Geometries;
+﻿using SOS.Api.Contracts.Common.Geo;
+using NetTopologySuite.Geometries;
 using SOS.Lib.Models.Gis;
 using System;
 using System.Collections.Generic;
@@ -23,7 +24,7 @@ public class GeographicsFilter
     /// Limit the search by a bounding box.
     /// The coordinate list should be in the format, topleft-longitude, topleft-latitude, bottomright-longitude, bottomright-latitude
     /// </summary>
-    public LatLonBoundingBox BoundingBox { get; set; }
+    public LatLonBoundingBoxDto BoundingBox { get; set; }
 
     /// <summary>
     ///     Add buffer to geometry

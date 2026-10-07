@@ -1,39 +1,47 @@
 ﻿using FluentAssertions;
 using SOS.Lib.Factories;
-using SOS.Lib.UnitTests.TestHelpers.Fixtures;
-using System.Linq;
+using SOS.Lib.Models.Interfaces;
+using SOS.Lib.Models.Processed.Observation;
+using SOS.Lib.Models.TaxonTree;
+using System.Collections.Generic;
 using Xunit;
 
 namespace SOS.Lib.UnitTests.Models.TaxonTree;
 
-public class TaxonTreeTests : IClassFixture<ProcessedBasicTaxaFixture>
+public class TaxonTreeTests
 {
-    public TaxonTreeTests(ProcessedBasicTaxaFixture fixture)
+    [Theory]
+    [InlineData(false, new[] { 2, 3, 4 })]
+    [InlineData(true, new[] { 1, 2, 3, 4 })]
+    public void GetUnderlyingTaxonIds_ReturnsDescendantsAndIncludesSelfOnlyWhenRequested(bool includeSelf, int[] expected)
     {
-        _fixture = fixture;
+        var tree = CreateTree();
+
+        var result = tree.GetUnderlyingTaxonIds(1, includeSelf);
+
+        result.Should().BeEquivalentTo(expected);
     }
 
-    private readonly ProcessedBasicTaxaFixture _fixture;
-
-    [Fact(Skip = "Not working with current msgpck file")]
-    public void Ichthyaetus_genus_has_5_underlying_taxa()
+    [Theory]
+    [InlineData(3)]
+    [InlineData(999)]
+    public void GetUnderlyingTaxonIds_KeepsLeafOrUnknownIdSoTheSearchDoesNotLoseItsTaxonConstraint(int taxonId)
     {
-        //-----------------------------------------------------------------------------------------------------------
-        // Arrange
-        //-----------------------------------------------------------------------------------------------------------
-        const int ichthyaetusTaxonId = 6011885;
-        int[] expectedUnderlyingTaxonIds = { 266836, 103067, 266238, 267106, 266835 };
-        var sut = TaxonTreeFactory.CreateTaxonTree(_fixture.Taxa.ToDictionary(t => t.Id, t => t));
+        var tree = CreateTree();
 
-        //-----------------------------------------------------------------------------------------------------------
-        // Act
-        //-----------------------------------------------------------------------------------------------------------
-        var underlyingTaxa = sut.GetUnderlyingTaxonIds(ichthyaetusTaxonId, false).ToArray();
+        var result = tree.GetUnderlyingTaxonIds(taxonId, false);
 
-        //-----------------------------------------------------------------------------------------------------------
-        // Assert
-        //-----------------------------------------------------------------------------------------------------------
-        underlyingTaxa.Should().HaveCount(5);
-        underlyingTaxa.Should().BeEquivalentTo(expectedUnderlyingTaxonIds);
+        result.Should().Equal(taxonId);
     }
+
+    private static TaxonTree<IBasicTaxon> CreateTree() =>
+        TaxonTreeFactory.CreateTaxonTree(new Dictionary<int, IBasicTaxon>
+        {
+            [0] = new BasicTaxon { Id = 0, ScientificName = "Root" },
+            [1] = new BasicTaxon { Id = 1, ScientificName = "Genus", Attributes = new TaxonAttributes { ParentDyntaxaTaxonId = 0 } },
+            [2] = new BasicTaxon { Id = 2, ScientificName = "First species", Attributes = new TaxonAttributes { ParentDyntaxaTaxonId = 1 } },
+            [3] = new BasicTaxon { Id = 3, ScientificName = "Second species", Attributes = new TaxonAttributes { ParentDyntaxaTaxonId = 1 } },
+            [4] = new BasicTaxon { Id = 4, ScientificName = "Subspecies", Attributes = new TaxonAttributes { ParentDyntaxaTaxonId = 2 } },
+            [5] = new BasicTaxon { Id = 5, ScientificName = "Other genus", Attributes = new TaxonAttributes { ParentDyntaxaTaxonId = 0 } }
+        });
 }

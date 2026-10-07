@@ -84,6 +84,68 @@ public class SosExportsClientTests
         content.WasDisposed.Should().BeTrue();
     }
 
+    [Theory]
+    [InlineData(SosExportType.Csv, false)]
+    [InlineData(SosExportType.Csv, true)]
+    [InlineData(SosExportType.Excel, false)]
+    [InlineData(SosExportType.Excel, true)]
+    [InlineData(SosExportType.GeoJson, false)]
+    [InlineData(SosExportType.GeoJson, true)]
+    [InlineData(SosExportType.DwC, false)]
+    [InlineData(SosExportType.DwC, true)]
+    public async Task DownloadInternalAsync_PreservesGzipAndFormatSpecificQueryParameters(SosExportType exportType, bool gzip)
+    {
+        var handler = new StubHttpMessageHandler(request =>
+        {
+            var query = request.RequestUri!.Query.TrimStart('?').Split('&');
+            query.Count(parameter => parameter.StartsWith("gzip=", StringComparison.Ordinal))
+                .Should().Be(exportType == SosExportType.DwC ? 0 : 1);
+            if (exportType != SosExportType.DwC)
+                query.Should().Contain($"gzip={gzip.ToString().ToLowerInvariant()}");
+
+            query.Any(parameter => parameter.StartsWith("flat=", StringComparison.Ordinal))
+                .Should().Be(exportType == SosExportType.GeoJson);
+            query.Any(parameter => parameter.StartsWith("dynamicProjectDataFields=", StringComparison.Ordinal))
+                .Should().Be(exportType == SosExportType.Excel);
+            query.Any(parameter => parameter.StartsWith("eventBased=", StringComparison.Ordinal))
+                .Should().Be(exportType == SosExportType.DwC);
+            return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent("content") };
+        });
+        var client = new SosExportsClient(CreateHttpClient(handler));
+
+        await using var response = await client.DownloadInternalAsync(new SearchFilterInternalDto(), exportType,
+            new ExportDownloadOptions { Gzip = gzip }, TestContext.Current.CancellationToken);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task GetMyExports_UsesDefaultOrExplicitRoleOptions(bool explicitOptions)
+    {
+        var handler = new StubHttpMessageHandler(request =>
+        {
+            request.Headers.Contains("X-Authorization-Role-Id").Should().Be(explicitOptions);
+            request.Headers.Contains("X-Authorization-Application-Identifier").Should().Be(explicitOptions);
+            if (explicitOptions)
+            {
+                request.Headers.GetValues("X-Authorization-Role-Id").Should().ContainSingle("42");
+                request.Headers.GetValues("X-Authorization-Application-Identifier").Should().ContainSingle("test-app");
+            }
+            return new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(request.RequestUri!.AbsolutePath.EndsWith("/my", StringComparison.Ordinal)
+                    ? "[]" : "{\"id\":\"job-1\"}", Encoding.UTF8, "application/json")
+            };
+        });
+        var client = new SosExportsClient(CreateHttpClient(handler));
+        var options = explicitOptions
+            ? new SosRoleRequestOptions { RoleId = 42, AuthorizationApplicationIdentifier = "test-app" }
+            : null;
+
+        (await client.GetMyExportsAsync(options, TestContext.Current.CancellationToken)).Should().BeEmpty();
+        (await client.GetMyExportAsync("job-1", options, TestContext.Current.CancellationToken))!.Id.Should().Be("job-1");
+    }
+
     private static HttpClient CreateHttpClient(HttpMessageHandler handler) => new(handler)
     {
         BaseAddress = new Uri("https://example.test/")

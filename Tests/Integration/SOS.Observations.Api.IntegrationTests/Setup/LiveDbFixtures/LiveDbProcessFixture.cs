@@ -1,4 +1,5 @@
-﻿using DwC_A;
+﻿using SOS.Api.Contracts.Observations.Requests;
+using DwC_A;
 using Elastic.Clients.Elasticsearch.Cluster;
 using Microsoft.ApplicationInsights;
 using Microsoft.Extensions.Caching.Memory;

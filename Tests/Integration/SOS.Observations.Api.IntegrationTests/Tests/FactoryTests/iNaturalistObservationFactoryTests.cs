@@ -1,6 +1,8 @@
-﻿using SOS.Lib.Enums.VocabularyValues;
+﻿using SOS.Api.Contracts.Observations;
+using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Models.Verbatim.INaturalist.Service;
 using SOS.Observations.Api.IntegrationTests.Setup;
+using System.Text.Json;
 
 namespace SOS.Observations.Api.IntegrationTests.Tests.FactoryTests;
 
@@ -201,7 +203,8 @@ public class iNaturalistObservationFactoryTests : TestBase
     public void Test_create_processed_iNaturalist_observation()
     {
         // Arrange        
-        var observation = Newtonsoft.Json.JsonConvert.DeserializeObject<iNaturalistVerbatimObservation>(_verbatimObservationJson);
+        var observation = JsonSerializer.Deserialize<iNaturalistVerbatimObservation>(_verbatimObservationJson,
+            new JsonSerializerOptions { PropertyNameCaseInsensitive = true })!;
         var factory = ProcessFixture.GetiNaturalistFactory(initAreaHelper: true);
 
         // Act
@@ -209,7 +212,7 @@ public class iNaturalistObservationFactoryTests : TestBase
 
         // Assert
         processedObservation.Sensitive.Should().BeTrue();
-        processedObservation.DiffusionStatus.Should().Be(Lib.Models.Processed.Observation.DiffusionStatus.DiffusedByProvider);
+        processedObservation.DiffusionStatus.Should().Be(DiffusionStatus.DiffusedByProvider);
         processedObservation.IsGeneralized.Should().BeTrue();
         processedObservation.Event.PlainStartDate.Should().Be("2009-08-28");
         processedObservation.Location.Municipality.Name.Should().Be("Stockholm");
@@ -238,7 +241,7 @@ public class iNaturalistObservationFactoryTests : TestBase
 
         // Assert
         processedObservation.Sensitive.Should().BeFalse();
-        processedObservation.DiffusionStatus.Should().Be(Lib.Models.Processed.Observation.DiffusionStatus.NotDiffused);
+        processedObservation.DiffusionStatus.Should().Be(DiffusionStatus.NotDiffused);
         processedObservation.IsGeneralized.Should().BeFalse();
         processedObservation.Event.PlainStartDate.Should().Be("2009-08-28");
         processedObservation.Location.Municipality.Name.Should().Be("Stockholm");

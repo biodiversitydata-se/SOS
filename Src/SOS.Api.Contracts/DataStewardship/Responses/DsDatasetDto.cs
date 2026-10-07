@@ -1,51 +1,53 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace SOS.Api.Contracts.DataStewardship.Responses;
 
 /// <summary>
 /// Dataset metadata returned by the SOS DataStewardship endpoints.
-/// Enum-backed server values are represented as strings to preserve their EnumMember JSON values.
+/// Programme area, purpose and access rights use the corresponding server enum types.
 /// </summary>
 public sealed class DsDatasetDto
 {
     /// <summary>The dataset identifier.</summary>
-    public string? Identifier { get; set; }
+    [Required] public string Identifier { get; set; } = null!;
     /// <summary>The dataset license.</summary>
-    public string? License { get; set; }
+    [Required] public string License { get; set; } = null!;
     /// <summary>The dataset title.</summary>
-    public string? Title { get; set; }
+    [Required] public string Title { get; set; } = null!;
     /// <summary>Projects associated with the dataset.</summary>
     public IEnumerable<DsProjectDto>? Projects { get; set; }
     /// <summary>The environmental-monitoring programme area to which the dataset belongs.</summary>
-    public string? ProgrammeArea { get; set; }
+    [Required] public DsProgrammeArea? ProgrammeArea { get; set; }
     /// <summary>The organisation that commissioned the data collection.</summary>
-    public DsOrganisationDto? Assigner { get; set; }
+    [Required] public DsOrganisationDto Assigner { get; set; } = null!;
     /// <summary>Organisations responsible for the data collection.</summary>
-    public IEnumerable<DsOrganisationDto>? Creator { get; set; }
+    [Required] public IEnumerable<DsOrganisationDto> Creator { get; set; } = null!;
     /// <summary>The organisation responsible for the information in the dataset.</summary>
-    public DsOrganisationDto? OwnerinstitutionCode { get; set; }
+    [Required] public DsOrganisationDto OwnerinstitutionCode { get; set; } = null!;
     /// <summary>The organisation or data host responsible for making the dataset accessible.</summary>
-    public DsOrganisationDto? Publisher { get; set; }
+    [Required] public DsOrganisationDto Publisher { get; set; } = null!;
     /// <summary>The name of the data stewardship within which the dataset is handled.</summary>
-    public string? DataStewardship { get; set; }
+    [Required] public string DataStewardship { get; set; } = null!;
     /// <summary>The purpose of the data collection.</summary>
-    public string? Purpose { get; set; }
+    [Required] public DsPurpose? Purpose { get; set; }
     /// <summary>The dataset description.</summary>
-    public string? Description { get; set; }
+    [Required] public string Description { get; set; } = null!;
     /// <summary>Methodologies used for the data collection.</summary>
-    public IEnumerable<DsMethodologyDto>? Methodology { get; set; }
+    [Required] public IEnumerable<DsMethodologyDto> Methodology { get; set; } = null!;
     /// <summary>The start of the dataset's temporal extent.</summary>
-    public DateTime? StartDate { get; set; }
+    [Required] public DateTime? StartDate { get; set; }
     /// <summary>The end of the dataset's temporal extent.</summary>
     public DateTime? EndDate { get; set; }
     /// <summary>The country in which the dataset's data was collected.</summary>
-    public string? Spatial { get; set; }
+    [Required] public string Spatial { get; set; } = null!;
     /// <summary>The extent to which the dataset is publicly available.</summary>
-    public string? AccessRights { get; set; }
+    [Required] public DsAccessRights? AccessRights { get; set; }
     /// <summary>Additional information about the access rights.</summary>
     public string? DescriptionAccessRights { get; set; }
     /// <summary>The language used for metadata.</summary>
-    public string? Metadatalanguage { get; set; }
+    [Required] public string Metadatalanguage { get; set; } = null!;
     /// <summary>The language used in the dataset.</summary>
-    public string? Language { get; set; }
+    [Required] public string Language { get; set; } = null!;
     /// <summary>Unique identifiers for survey events in the dataset, when requested by the caller.</summary>
     public IEnumerable<string>? EventIds { get; set; }
 }

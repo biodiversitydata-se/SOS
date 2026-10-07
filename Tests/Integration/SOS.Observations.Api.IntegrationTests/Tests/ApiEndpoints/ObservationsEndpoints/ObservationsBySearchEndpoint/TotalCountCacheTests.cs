@@ -1,6 +1,7 @@
+using FluentAssertions.Execution;
+using SOS.Api.Contracts.Common.Responses;
+using SOS.Api.Contracts.Observations.Requests;
 using FizzWare.NBuilder;
-using SOS.Lib.Dtos;
-using SOS.Lib.Dtos.Filter;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Verbatim.Artportalen;
 using SOS.Observations.Api.IntegrationTests.Setup;
@@ -15,27 +16,27 @@ public class TotalCountCacheTests : TestBase
     {
     }
 
-    [Theory]
-    [InlineData("/observations/search")]
-    [InlineData("/observations/internal/search")]
-    public async Task ReplacingTestDataInvalidatesCachedTotalCount(string endpoint)
+    [Fact]
+    public async Task ReplacingTestDataInvalidatesCachedTotalCount()
     {
         var observations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(3)
             .All().HaveValuesFromPredefinedObservations()
             .Build();
-        var apiClient = TestFixture.CreateApiClient();
+        using var apiClient = TestFixture.CreateApiClient();
         var filter = new SearchFilterInternalDto();
 
-        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(observations.Take(1));
-        using var firstResponse = await apiClient.PostAsync(endpoint, JsonContent.Create(filter), TestContext.Current.CancellationToken);
-        firstResponse.EnsureSuccessStatusCode();
-        var first = await firstResponse.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);
-        first!.TotalCount.Should().Be(1);
-
-        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(observations);
-        using var secondResponse = await apiClient.PostAsync(endpoint, JsonContent.Create(filter), TestContext.Current.CancellationToken);
-        secondResponse.EnsureSuccessStatusCode();
-        var second = await secondResponse.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);
-        second!.TotalCount.Should().Be(3);
+        foreach (var expectedCount in new[] { 1, 3 })
+        {
+            // Query both endpoints before replacing the data, so both must discard their old counts.
+            await ProcessFixture.ProcessAndAddObservationsToElasticSearch(observations.Take(expectedCount));
+            foreach (var endpoint in new[] { "/observations/search", "/observations/internal/search" })
+            {
+                using var response = await apiClient.PostAsync(endpoint, JsonContent.Create(filter), TestContext.Current.CancellationToken);
+                response.StatusCode.Should().Be(HttpStatusCode.OK, $"endpoint={endpoint}, expectedCount={expectedCount}");
+                using var scope = new AssertionScope($"endpoint={endpoint}, expectedCount={expectedCount}");
+                var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);
+                result!.TotalCount.Should().Be(expectedCount);
+            }
+        }
     }
 }

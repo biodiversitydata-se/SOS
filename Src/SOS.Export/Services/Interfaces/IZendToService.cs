@@ -1,5 +1,5 @@
 ﻿using SOS.Export.Models.ZendTo;
-using SOS.Lib.Enums;
+using SOS.Api.Contracts.Exports.Responses;
 using System.Threading.Tasks;
 
 namespace SOS.Export.Services.Interfaces;

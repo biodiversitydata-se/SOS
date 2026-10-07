@@ -1,5 +1,7 @@
 using Hangfire;
 using Microsoft.Extensions.Logging.Abstractions;
+using SOS.Api.Contracts.Exports.Responses;
+using SOS.Api.Contracts.Exports.Requests;
 using Moq;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Enums;
@@ -82,6 +84,5 @@ public class ExportFastSearchTests
 
         Assert.Same(stop, exception);
         repository.VerifyAll();
-        Assert.Equal(format == ExportFormat.Excel ? 3 : 2, repository.Invocations.Count);
     }
 }

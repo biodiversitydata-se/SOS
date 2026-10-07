@@ -1,3 +1,4 @@
+using SOS.Api.Contracts.Aggregations.Requests;
 using FluentAssertions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.FileProviders;
@@ -44,6 +45,9 @@ public class AzurePublicSearchFilterDocumentFilterTests
         var azurePublicDocument = swaggerProvider.GetSwagger("AzurePublicSosObservationsv1.5");
         var azureInternalDocument = swaggerProvider.GetSwagger("AzureInternalSosObservationsv1.5");
 
+        publicDocument.Components!.Schemas.Keys.Should().NotContain(name => name.Contains("ServerModel"));
+        azureInternalDocument.Components!.Schemas.Keys.Should().NotContain(name => name.Contains("ServerModel"));
+
         publicDocument.Components!.Schemas["SearchFilterDto"].Properties
             .Should().ContainKey("artportalen");
         publicDocument.Components.Schemas["ArtportalenFilterDto"].Properties
@@ -52,14 +56,21 @@ public class AzurePublicSearchFilterDocumentFilterTests
             .Should().HaveCount(6);
         foreach (var schemaName in new[] { "SearchFilterBaseDto", "SearchFilterDto", "SearchFilterAggregationDto" })
         {
-            azurePublicDocument.Components!.Schemas[schemaName].Properties
-                .Should().NotContainKey("artportalen");
+            if (azurePublicDocument.Components!.Schemas.TryGetValue(schemaName, out var schema))
+            {
+                schema.Properties.Should().NotContainKey("artportalen");
+            }
         }
         azurePublicDocument.Components!.Schemas.Should().NotContainKey("ArtportalenFilterDto");
         azurePublicDocument.Components.Schemas["SearchFilterDto"].Properties
             .Should().NotContainKey("extendedFilter");
         azureInternalDocument.Components!.Schemas["ExtendedFilterDto"].Properties
             .Should().ContainKey("typeFilter");
+        publicDocument.Components.Schemas["Geometry"].OneOf.Should().HaveCount(7);
+        publicDocument.Components.Schemas.Should().NotContainKey("IGeometryObject");
+        publicDocument.Components.Schemas.Should().NotContainKey("GeoJSONObjectType");
+        publicDocument.Components.Schemas["ExportJobInfoDto"].Properties["processingTime"]
+            .ReadOnly.Should().BeTrue();
     }
 
     [Theory]

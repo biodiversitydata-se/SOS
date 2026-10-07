@@ -1,11 +1,12 @@
-﻿using Elastic.Clients.Elasticsearch.SearchableSnapshots;
+﻿using SOS.Api.Contracts.Exports.Requests;
+using SOS.Api.Contracts.Observations.Requests;
+using Elastic.Clients.Elasticsearch.SearchableSnapshots;
 using Hangfire;
 using Hangfire.Server;
 using Microsoft.Extensions.Logging;
 using SOS.Export.Managers.Interfaces;
 using SOS.Lib.Configuration.Export;
 using SOS.Lib.Configuration.Shared;
-using SOS.Lib.Dtos.Filter;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Extensions.Dto;
@@ -59,7 +60,7 @@ public class CreateDoiJob : ICreateDoiJob
         try
         {
             _logger.LogInformation("Start creating DOI job");
-            var filter = exportFilter.ToSearchFilter(userId ?? 0, Lib.Dtos.Enum.ProtectionFilterDto.Public, "en-GB");
+            var filter = exportFilter.ToSearchFilter(userId ?? 0, ProtectionFilterDto.Public, "en-GB");
             var descriptions = _doiConfiguration.Descriptions as List<DOIDescription> ?? new List<DOIDescription>();
             descriptions.Add(new DOIDescription
             {

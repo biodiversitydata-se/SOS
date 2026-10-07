@@ -2,14 +2,8 @@
 
 namespace SOS.Api.Client.Requests;
 /// <summary>Options for adaptive observation-location search.</summary>
-public sealed class AdaptiveSearchLocationsOptions
+public sealed class AdaptiveSearchLocationsOptions : SosRoleRequestOptions
 {
-    /// <summary>The explicit authorization role identifier.</summary>
-    public int? RoleId { get; set; }
-
-    /// <summary>The explicit calling application identifier.</summary>
-    public string? AuthorizationApplicationIdentifier { get; set; }
-
     /// <summary>The observation count above which grid aggregation is returned instead of locations.</summary>
     public int ObservationsLimit { get; set; } = 10000;
 

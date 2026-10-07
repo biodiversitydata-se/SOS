@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using SOS.Api.Contracts.Observations;
+using SOS.Api.Contracts.Common.Geo;
+using Microsoft.Extensions.Logging;
 using SOS.Harvest.Managers.Interfaces;
 using SOS.Harvest.Processors.Interfaces;
 using SOS.Lib.Configuration.Process;

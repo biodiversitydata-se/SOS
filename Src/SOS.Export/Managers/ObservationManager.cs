@@ -1,11 +1,13 @@
-﻿using Hangfire;
+﻿using SOS.Api.Contracts.Common.Geo;
+using Hangfire;
 using Hangfire.Server;
+using SOS.Api.Contracts.Exports.Responses;
+using SOS.Api.Contracts.Exports.Requests;
 using Microsoft.Extensions.Logging;
 using SOS.Export.Managers.Interfaces;
 using SOS.Export.Models.ZendTo;
 using SOS.Export.Services.Interfaces;
 using SOS.Lib.Configuration.Export;
-using SOS.Lib.Enums;
 using SOS.Lib.Helpers;
 using SOS.Lib.IO.DwcArchive.Interfaces;
 using SOS.Lib.IO.Csv.Interfaces;
@@ -478,7 +480,7 @@ public class ObservationManager : IObservationManager
         CoordinateSys coordinateSystem,                        
         string emailAddress,
         string description,
-        ExportFormat exportFormat,            
+        ExportFormat exportFormat,
         bool sendMailFromZendTo,
         string encryptPassword,
         IJobCancellationToken cancellationToken)
@@ -540,7 +542,7 @@ public class ObservationManager : IObservationManager
         CoordinateSys coordinateSystem,
         string emailAddress,
         string description,
-        ExportFormat exportFormat,            
+        ExportFormat exportFormat,
         bool sendMailFromZendTo,
         string encryptPassword,
         IJobCancellationToken cancellationToken)

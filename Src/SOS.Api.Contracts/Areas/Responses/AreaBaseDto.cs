@@ -1,16 +1,18 @@
-using SOS.Api.Contracts.Common.Geo;
+﻿using SOS.Api.Contracts.Common.Geo;
 
 namespace SOS.Api.Contracts.Areas.Responses;
+/// <summary>Basic information and bounds for a geographic area.</summary>
 public class AreaBaseDto
 {
 
-    [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+    /// <summary>Type of area.</summary>
     public AreaTypeDto AreaType { get; set; }
 
     /// <summary>The numeric area-type identifier.</summary>
     public int AreaTypeId => (int)AreaType;
 
-    public LatLonBoundingBox BoundingBox { get; set; }
+    /// <summary>Geographic bounding box of the area.</summary>
+    public LatLonBoundingBoxDto BoundingBox { get; set; }
 
     /// <summary>
     /// Feature id

@@ -1,4 +1,9 @@
-﻿using CSharpFunctionalExtensions;
+﻿﻿using SOS.Api.Contracts.Observations;
+using SOS.Api.Contracts.Common.Geo;
+using SOS.Api.Contracts.Aggregations.Requests;
+using SOS.Api.Contracts.Aggregations.Responses;
+using SOS.Api.Contracts.Observations.Requests;
+using CSharpFunctionalExtensions;
 using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
 using OfficeOpenXml;
@@ -20,9 +25,6 @@ using SOS.Lib.Models.Search.Result;
 using SOS.Lib.Repositories.Processed.Interfaces;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Repositories.Interfaces;
-using SOS.Lib.Dtos;
-using SOS.Lib.Dtos.Enum;
-using SOS.Lib.Dtos.Filter;
 using SOS.Lib.Extensions.Dto;
 using System.Text.Json.Nodes;
 
@@ -171,7 +173,7 @@ public class ObservationManager : IObservationManager
     public Task<GeoGridTileResult> GetGeogridTileAggregationAsync(PreparedObservationFilter filter, int precision)
         => GetGeogridTileAggregationCoreAsync(null, null, filter.Filter, precision, prepareFilter: false);
 
-    public Task<(long Count, LatLonBoundingBox? Extent, long EstimatedLocationCount)> GetCountAndExtentAsync(PreparedObservationFilter filter, bool includeExtent = true)
+    public Task<(long Count, LatLonBoundingBoxDto? Extent, long EstimatedLocationCount)> GetCountAndExtentAsync(PreparedObservationFilter filter, bool includeExtent = true)
         => _processedObservationRepository.GetCountAndExtentAsync(filter.Filter, includeExtent: includeExtent);
 
     /// <inheritdoc />
@@ -431,10 +433,10 @@ public class ObservationManager : IObservationManager
         return await _processedObservationRepository.GetMatchCountAsync(filter, skipAuthorizationFilters);
     }
 
-    public async Task<(long Count, LatLonBoundingBox? Extent, long EstimatedLocationCount)> GetCountAndExtentAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilterBase filter, bool skipAuthorizationFilters = false)
+    public async Task<(long Count, LatLonBoundingBoxDto? Extent, long EstimatedLocationCount)> GetCountAndExtentAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilterBase filter, bool skipAuthorizationFilters = false)
     {
         await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
-        (long Count, LatLonBoundingBox? Extent, long EstimatedLocationCount) result = await _processedObservationRepository.GetCountAndExtentAsync(filter, skipAuthorizationFilters);        
+        (long Count, LatLonBoundingBoxDto? Extent, long EstimatedLocationCount) result = await _processedObservationRepository.GetCountAndExtentAsync(filter, skipAuthorizationFilters);
         return result;
     }
 
@@ -664,7 +666,7 @@ public class ObservationManager : IObservationManager
             }
 
             var result = await _processedObservationRepository.GetUserYearCountAsync(filter);
-            return result?.ToDtos();
+            return result;
         }
         catch (TimeoutException e)
         {
@@ -695,7 +697,7 @@ public class ObservationManager : IObservationManager
             }
 
             var result = await _processedObservationRepository.GetUserYearMonthCountAsync(filter);
-            return result?.ToDtos();
+            return result;
         }
         catch (TimeoutException e)
         {
@@ -726,7 +728,7 @@ public class ObservationManager : IObservationManager
             }
 
             var result = await _processedObservationRepository.GetUserYearMonthDayCountAsync(filter, skip, take);
-            return result?.ToDtos();
+            return result;
         }
         catch (TimeoutException e)
         {
@@ -1029,13 +1031,13 @@ public class ObservationManager : IObservationManager
         return excelFile;
     }
 
-    public async Task<IEnumerable<TimeSeriesHistogramResult>> GetTimeSeriesHistogramAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilter filter, TimeSeriesType timeSeriesType)
+    public async Task<IEnumerable<TimeSeriesHistogramResultDto>> GetTimeSeriesHistogramAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilter filter, TimeSeriesTypeDto timeSeriesType)
     {
         try
         {
             await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
 
-            if (timeSeriesType == TimeSeriesType.Year)
+            if (timeSeriesType == TimeSeriesTypeDto.Year)
                 return await _processedObservationRepository.GetYearHistogramAsync(filter, timeSeriesType);
             else 
                 return await _processedObservationRepository.GetTimeSeriesHistogramAsync(filter, timeSeriesType);

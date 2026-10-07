@@ -1,6 +1,5 @@
+using SOS.Api.Contracts.Common.Geo;
 using ContractGeographicsFilterDto = SOS.Api.Contracts.Observations.Requests.GeographicsFilterDto;
-using ContractLatLonBoundingBoxDto = SOS.Api.Contracts.Common.Geo.LatLonBoundingBoxDto;
-using ContractLatLonCoordinateDto = SOS.Api.Contracts.Common.Geo.LatLonCoordinateDto;
 using ContractOccurrenceStatusFilterValuesDto = SOS.Api.Contracts.Observations.Requests.OccurrenceStatusFilterValuesDto;
 using ContractSearchFilterAggregationInternalDto = SOS.Api.Contracts.Aggregations.Requests.SearchFilterAggregationInternalDto;
 using ContractTaxonFilterDto = SOS.Api.Contracts.Observations.Requests.TaxonFilterDto;
@@ -57,14 +56,14 @@ public class SosObservationAggregationsClientIntegrationTests : TestBase
             },
             Geographics = new ContractGeographicsFilterDto
             {
-                BoundingBox = new ContractLatLonBoundingBoxDto
+                BoundingBox = new LatLonBoundingBoxDto
                 {
-                    TopLeft = new ContractLatLonCoordinateDto
+                    TopLeft = new LatLonCoordinateDto
                     {
                         Longitude = 10.0,
                         Latitude = 70.0
                     },
-                    BottomRight = new ContractLatLonCoordinateDto
+                    BottomRight = new LatLonCoordinateDto
                     {
                         Longitude = 25.0,
                         Latitude = 55.0

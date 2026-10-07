@@ -1,10 +1,14 @@
-﻿using NetTopologySuite.Geometries;
+﻿using SOS.Api.Contracts.Aggregations.Requests;
+using SOS.Api.Contracts.Common.Geo;
+using SOS.Api.Contracts.Observations.Requests;
+using NetTopologySuite.Geometries;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
-using SOS.Lib.Dtos.Filter;
 using SOS.Shared.Api.Utilities.Objects.Interfaces;
+using SOS.Lib.Extensions.Dto;
+using SOS.Lib.Models.Search.Input;
 
 namespace SOS.Shared.Api.Utilities.Objects;
 
@@ -18,12 +22,19 @@ public class SearchFilterUtility : ISearchFilterUtility
     /// Get bounding box
     /// </summary>
     /// <param name="filter"></param>
+    /// <param name="geometries">Server geometries, converted once when preparing the filter.</param>
     /// <param name="autoAdjustBoundingBox"></param>
     /// <returns></returns>
-    private async Task<LatLonBoundingBoxDto?> GetBoundingBoxAsync(
+    private async Task<(LatLonBoundingBoxDto? BoundingBox, IReadOnlyCollection<Geometry>? Geometries)> GetBoundingBoxAsync(
         GeographicsFilterDto filter,
+        IReadOnlyCollection<Geometry>? geometries,
         bool autoAdjustBoundingBox = true)
-    {            
+    {
+        if (filter.HasGeometryConversionError())
+        {
+            return (null, geometries);
+        }
+
         Envelope zoneOfSosBoundingBox = _zoneOfSosBoundingBox;
         var userBoundingBox = new Envelope([
                 new Coordinate(filter?.BoundingBox?.TopLeft?.Longitude ?? 0, filter?.BoundingBox?.TopLeft?.Latitude ?? 90),
@@ -51,17 +62,16 @@ public class SearchFilterUtility : ISearchFilterUtility
             }
 
             // If geometries passed, adjust bounding box to them
-            if (filter?.Geometries?.Any() ?? false)
+            if (geometries?.Any() ?? false)
             {
-                // Try to make geometries valid and update user filter
+                // Keep the normalized geometries for validation and search.
                 var validGeometries = new List<Geometry>();
-                foreach(var geometry in filter?.Geometries)
+                foreach(var geometry in geometries!)
                 {
                     var validGeometry = geometry.TryMakeValid();
                     if (validGeometry == null)
                     {
-                        filter.IsGeometryInvalid = true;
-                        return null;
+                        return (null, geometries);
                     }
                     validGeometries.Add(validGeometry);
 
@@ -70,7 +80,7 @@ public class SearchFilterUtility : ISearchFilterUtility
                         geometryUnion = geometryUnion == null ? geometry : geometryUnion.Union(validGeometry);
                     }
                 }
-                filter.Geometries = validGeometries;
+                geometries = validGeometries;
             }
 
             if (geometryUnion != null)
@@ -79,7 +89,19 @@ public class SearchFilterUtility : ISearchFilterUtility
             }
         }
 
-        return LatLonBoundingBoxDto.Create(boundingBox);
+        return (new LatLonBoundingBoxDto
+        {
+            TopLeft = new LatLonCoordinateDto
+            {
+                Latitude = boundingBox.MaxY,
+                Longitude = boundingBox.MinX
+            },
+            BottomRight = new LatLonCoordinateDto
+            {
+                Latitude = boundingBox.MinY,
+                Longitude = boundingBox.MaxX
+            }
+        }, geometries);
     }
 
     /// <summary>
@@ -111,21 +133,30 @@ public class SearchFilterUtility : ISearchFilterUtility
         _zoneOfSosBoundingBox = swedenGeometry.EnvelopeInternal;            
     }
 
+    public Task<SearchFilterBaseDto> InitializeSearchFilterAsync(SearchFilterBaseDto? filter) =>
+        InitializeSearchFilterAsync<SearchFilterBaseDto>(filter ?? new SearchFilterBaseDto());
+
+    public Task<SearchFilterDto> InitializeSearchFilterAsync(SearchFilterDto? filter) =>
+        InitializeSearchFilterAsync<SearchFilterDto>(filter ?? new SearchFilterDto());
+
+    public Task<SearchFilterInternalBaseDto> InitializeSearchFilterAsync(SearchFilterInternalBaseDto? filter) =>
+        InitializeSearchFilterAsync<SearchFilterInternalBaseDto>(filter ?? new SearchFilterInternalBaseDto());
+
+    public Task<SearchFilterInternalDto> InitializeSearchFilterAsync(SearchFilterInternalDto? filter) =>
+        InitializeSearchFilterAsync<SearchFilterInternalDto>(filter ?? new SearchFilterInternalDto());
+
+    public Task<SearchFilterAggregationInternalDto> InitializeSearchFilterAsync(SearchFilterAggregationInternalDto? filter) =>
+        InitializeSearchFilterAsync<SearchFilterAggregationInternalDto>(filter ?? new SearchFilterAggregationInternalDto());
+
     /// <inheritdoc/>
     public async Task<T> InitializeSearchFilterAsync<T>(T? filter) where T : SearchFilterBaseDto
     {
-        filter ??= new SearchFilterBaseDto() as T;
-        filter.Geographics ??= new GeographicsFilterDto();
-        filter.Geographics.BoundingBox = await GetBoundingBoxAsync(filter.Geographics);
-        return filter;
-    }
-
-    /// <inheritdoc/>
-    public async Task<SearchFilterInternalDto> InitializeSearchFilterAsync(SearchFilterInternalDto filter)
-    {
-        filter ??= new SearchFilterInternalDto();
-        filter.Geographics ??= new GeographicsFilterDto();
-        filter.Geographics.BoundingBox = await GetBoundingBoxAsync(filter.Geographics);
+        if (filter is null) throw new ArgumentNullException(nameof(filter));
+        var input = GeographicsFilterInputModel.FromDto(filter.Geographics);
+        filter.Geographics = input;
+        var prepared = await GetBoundingBoxAsync(input, input.ServerGeometries);
+        input.BoundingBox = prepared.BoundingBox;
+        input.ServerGeometries = prepared.Geometries as List<Geometry> ?? prepared.Geometries?.ToList();
         return filter;
     }
 }

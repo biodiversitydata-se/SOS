@@ -1,10 +1,14 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using SOS.Api.Contracts.Observations;
+using SOS.Api.Contracts.Common.Geo;
+using SOS.Api.Contracts.Aggregations.Requests;
+using SOS.Api.Contracts.Observations.Responses;
+using SOS.Lib.Extensions.Dto;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
 using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
 using SOS.Lib.Cache.Interfaces;
-using SOS.Lib.Dtos.Enum;
-using SOS.Lib.Dtos.Filter;
+using SOS.Api.Contracts.Observations.Requests;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers.Interfaces;
@@ -18,7 +22,6 @@ using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using System.Xml.Linq;
-using static SOS.Lib.Dtos.Filter.ExtendedFilterDto;
 
 namespace SOS.Lib.Helpers;
 
@@ -31,7 +34,7 @@ public class MarkdownHelper : IMarkdownHelper
     private readonly IDatasetRepository _datasetRepository;
     private readonly IFilterManager _filterManager;
     private readonly ICache<int, ProjectInfo> _projectCache;
-    private readonly ICache<int, Taxon> _taxonCache;
+    private readonly ICache<int, SOS.Lib.Models.Processed.Observation.Taxon> _taxonCache;
     private readonly ICache<int, TaxonList> _taxonListCache;
     private readonly IVocabularyRepository _vocabularyRepository;
     private readonly ILogger<MarkdownHelper> _logger;
@@ -337,7 +340,7 @@ public class MarkdownHelper : IMarkdownHelper
     /// <remarks>If neither the dataset title filter nor dataset identifiers are specified in the filter, the
     /// method does not modify the Markdown syntax tree.</remarks>
     /// <param name="sb">The MarkdownSyntaxTree instance to which data stewardship information will be added.</param>
-    /// <param name="filter">The DataStewardshipFilterDto containing filter criteria for dataset title and identifiers. If both are not
+    /// <param name="filter">The SOS.Api.Contracts.Observations.Requests.DataStewardshipFilterDto containing filter criteria for dataset title and identifiers. If both are not
     /// provided, no changes are made.</param>
     private async Task TryAddDataStewardshipInfoAsync(StringBuilder sb, DataStewardshipFilterDto filter)
     {
@@ -385,7 +388,7 @@ public class MarkdownHelper : IMarkdownHelper
     /// <remarks>If the filter does not specify any data provider identifiers, or if no matching data
     /// providers are found, the method logs a warning and does not modify the Markdown syntax tree.</remarks>
     /// <param name="sb">The MarkdownSyntaxTree instance to which data provider information will be added.</param>
-    /// <param name="filter">The SearchFilterBaseDto containing the data provider identifiers to process.</param>
+    /// <param name="filter">The SOS.Api.Contracts.Observations.Requests.SearchFilterBaseDto containing the data provider identifiers to process.</param>
     /// <returns>A task that represents the asynchronous operation of adding data provider information to the Markdown syntax
     /// tree.</returns>
     private async Task TryAddDataProviderInfoAsync(StringBuilder sb, DataProviderFilterDto filter)
@@ -413,7 +416,7 @@ public class MarkdownHelper : IMarkdownHelper
     /// <remarks>If the filter's Ids collection is null or empty, no event information will be added to the
     /// Markdown syntax tree.</remarks>
     /// <param name="sb">The MarkdownSyntaxTree instance to which the event information will be added.</param>
-    /// <param name="filter">The EventFilterDto containing the filter criteria, including a list of event IDs to be processed.</param>
+    /// <param name="filter">The SOS.Api.Contracts.Observations.Requests.EventFilterDto containing the filter criteria, including a list of event IDs to be processed.</param>
     private void TryAddEventInfo(StringBuilder sb, EventFilterDto filter)
     {
         if ((filter?.Ids?.Count() ?? 0) == 0)
@@ -431,7 +434,7 @@ public class MarkdownHelper : IMarkdownHelper
     /// <remarks>If the filter does not contain any occurrence IDs, no action is taken. The method adds a
     /// header and a list of occurrence IDs to the Markdown syntax tree.</remarks>
     /// <param name="sb">The MarkdownSyntaxTree instance to which the exclusion information will be added.</param>
-    /// <param name="filter">The ExcludeFilterDto containing the occurrence IDs to be excluded. Must not be null and should contain at least
+    /// <param name="filter">The SOS.Api.Contracts.Observations.Requests.ExcludeFilterDto containing the occurrence IDs to be excluded. Must not be null and should contain at least
     /// one occurrence ID.</param>
     private void TryAddExcludeInfo(StringBuilder sb, ExcludeFilterDto filter)
     {
@@ -452,7 +455,7 @@ public class MarkdownHelper : IMarkdownHelper
     /// the Markdown syntax tree. The method adds headers for the start and end dates if they are present, and includes
     /// a list of time ranges if provided.</remarks>
     /// <param name="sb">The MarkdownSyntaxTree instance to which the date information will be added.</param>
-    /// <param name="filter">The DateFilterDto containing the start date, end date, and any time ranges to be included in the Markdown
+    /// <param name="filter">The API date filter containing the start date, end date, and any time ranges to be included in the Markdown
     /// output.</param>
     private void TryAddDateInfo(StringBuilder sb, DateFilterDto filter)
     {
@@ -497,7 +500,7 @@ public class MarkdownHelper : IMarkdownHelper
     /// options, area lists, bounding box coordinates, geometries, and location identifiers, depending on the properties
     /// set in the filter. No changes are made if the filter is null.</remarks>
     /// <param name="sb">The MarkdownSyntaxTree instance to which geographic filter details will be appended.</param>
-    /// <param name="filter">The GeographicsFilterDto containing criteria that determine which geographic information is included. If null,
+    /// <param name="filter">The geographic API filter containing criteria that determine which geographic information is included. If null,
     /// no information is added.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
     private async Task TryAddGeographicsInfoAsync(StringBuilder sb, GeographicsFilterDto filter)
@@ -531,7 +534,9 @@ public class MarkdownHelper : IMarkdownHelper
             }
         }
         TryAddParagraph(sb, "Bounding Box", filter.BoundingBox?.BottomRight != null && filter.BoundingBox?.TopLeft != null ? $"Min Latitude: {filter.BoundingBox.BottomRight.Latitude}, Min Longitude: {filter.BoundingBox.BottomRight.Longitude}, Max Latitude: {filter.BoundingBox.TopLeft.Latitude}, Max Longitude: {filter.BoundingBox.TopLeft.Longitude}" : null);
-        TryAddList(sb, ("Geometries", 3), filter.Geometries?.Select(g => g.AsText()));
+        var geometryTexts = filter.GetSearchGeometries()
+            ?.Select(geometry => geometry.AsText());
+        TryAddList(sb, ("Geometries", 3), geometryTexts);
         TryAddList(sb, ("Location Id`s", 3), filter.LocationIds);
     }
 
@@ -543,7 +548,7 @@ public class MarkdownHelper : IMarkdownHelper
     /// to the Markdown syntax tree. When applicable, the method adds a header and paragraphs to represent the date
     /// range in a formatted manner.</remarks>
     /// <param name="sb">The MarkdownSyntaxTree instance to which the modified date filter information will be added.</param>
-    /// <param name="filter">The ModifiedDateFilterDto containing the date range for filtering. Must not be null, and at least one of the
+    /// <param name="filter">The API modified-date filter containing the date range. Must not be null, and at least one of the
     /// From or To properties must be specified.</param>
     private void TryAddModifiedDateInfo(StringBuilder sb, ModifiedDateFilterDto filter)
     {
@@ -564,7 +569,7 @@ public class MarkdownHelper : IMarkdownHelper
     /// including invasive status, taxon categories, taxa, taxon lists, and red list categories. No changes are made if
     /// the filter is null or contains no relevant criteria.</remarks>
     /// <param name="sb">The MarkdownSyntaxTree instance to which taxonomic information will be added.</param>
-    /// <param name="filter">The TaxonFilterDto containing criteria for filtering taxonomic information, such as IDs and categories. No
+    /// <param name="filter">The API taxon filter containing criteria such as IDs and categories. No
     /// information is added if this parameter is null or contains no filter criteria.</param>
     /// <param name="taxonCategories">An enumerable collection of VocabularyValueInfo representing the available taxon categories to be displayed if
     /// referenced by the filter.</param>
@@ -624,7 +629,7 @@ public class MarkdownHelper : IMarkdownHelper
         IDatasetRepository datasetRepository,
         IFilterManager filterManager,
         ICache<int, ProjectInfo> projectCache,
-        ICache<int, Taxon> taxonCache,
+        ICache<int, SOS.Lib.Models.Processed.Observation.Taxon> taxonCache,
         ICache<int, TaxonList> taxonListCache,
         IProcessInfoRepository processInfoRepository,
         IProcessedObservationCoreRepository processedObservationCoreRepository,
@@ -752,8 +757,8 @@ public class MarkdownHelper : IMarkdownHelper
             } : null);
             TryAddList(sb, ("Diffusion Statuses", 2), filter.DiffusionStatuses?.Select(ds => ds switch
             {
-                DiffusionStatusDto.DiffusedByProvider => "Diffused by provider",
-                DiffusionStatusDto.DiffusedBySystem => "Diffused by system",
+                DiffusionStatus.DiffusedByProvider => "Diffused by provider",
+                DiffusionStatus.DiffusedBySystem => "Diffused by system",
                 _ => "Not Diffused"
             }));
             TryAddParagraph(sb, "Not Recovered Filter", filter.NotRecoveredFilter.HasValue && filter.NotRecoveredFilter != SightingNotRecoveredFilterDto.NoFilter ? filter.NotRecoveredFilter.Value switch

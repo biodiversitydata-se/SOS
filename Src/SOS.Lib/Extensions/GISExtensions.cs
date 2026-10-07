@@ -1,4 +1,4 @@
-﻿using AgileObjects.AgileMapper.Extensions;
+﻿using SOS.Api.Contracts.Common.Geo;
 using Elastic.Clients.Elasticsearch;
 using MongoDB.Driver.GeoJsonObjectModel;
 using NetTopologySuite.Features;
@@ -8,7 +8,6 @@ using NetTopologySuite.Triangulate;
 using NetTopologySuite.Utilities;
 using ProjNet.CoordinateSystems;
 using ProjNet.CoordinateSystems.Transformations;
-using SOS.Lib.Enums;
 using SOS.Lib.Models.Gis;
 using System.Collections;
 using System.Collections.Concurrent;
@@ -142,13 +141,19 @@ public static class GISExtensions
             if (useCenterPoint)
             {
                 //Create a geometry with all grid cell points, this is faster than using the gridcells because it's less coordinates
-                polygons.ForEach(p => points.Add(p.Centroid));
+                foreach (var polygon in polygons)
+                {
+                    points.Add(polygon.Centroid);
+                }
             }
             else
             {
                 foreach (var tile in polygons)
                 {
-                    tile.Coordinates.ForEach(c => points.Add(new Point(c)));
+                    foreach (var coordinate in tile.Coordinates)
+                    {
+                        points.Add(new Point(coordinate));
+                    }
                 }
             }
 
@@ -327,9 +332,9 @@ public static class GISExtensions
             return maxTilesTot;
         }
 
-        public LatLonBoundingBox ToLatLonBoundingBox()
+        public LatLonBoundingBoxDto ToLatLonBoundingBox()
         {            
-            return LatLonBoundingBox.Create(envelope);
+            return LatLonBoundingBoxDto.Create(envelope?.MinX, envelope?.MaxY, envelope?.MaxX, envelope?.MinY);
         }
 
         public Envelope Transform(
@@ -707,7 +712,7 @@ public static class GISExtensions
         }
     }
 
-    extension(LatLonBoundingBox boundingBox)
+    extension(LatLonBoundingBoxDto boundingBox)
     {
         public Geometry? ToGeometry()
         {

@@ -1,6 +1,7 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using SOS.Lib.Enums;
+using SOS.Api.Contracts.Exports.Responses;
+using SOS.Api.Contracts.Observations.Requests;
 using SOS.Lib.Models.Interfaces;
 using System;
 

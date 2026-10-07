@@ -1,5 +1,5 @@
 ﻿using Hangfire;
-using SOS.Lib.Enums;
+using SOS.Api.Contracts.Exports.Requests;
 using SOS.Lib.Models.Export;
 using SOS.Lib.Models.Search.Filters;
 
@@ -59,6 +59,6 @@ public interface ICsvFileWriter
        SearchFilter filter,
        IEnumerable<(Stream Stream, string Filename)> additionalFiles,
        string culture,
-       PropertyLabelType propertyLabelType,           
+       PropertyLabelType propertyLabelType,
        IJobCancellationToken cancellationToken);
 }

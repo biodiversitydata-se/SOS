@@ -1,5 +1,6 @@
-﻿using AgileObjects.AgileMapper.Extensions;
-using SOS.Lib.Enums;
+﻿using SOS.Api.Contracts.Lookups.Responses;
+using SOS.Api.Contracts.Observations.Requests;
+using SOS.Api.Contracts.Exports.Requests;
 using SOS.Lib.Models;
 using SOS.Lib.Models.Processed.Observation;
 using System.Reflection;
@@ -57,7 +58,10 @@ public static class ObservationPropertyFieldDescriptionHelper
         .Select(f => propertyFields.FindIndex(pf => pf.PropertyPath.Equals(f, System.StringComparison.CurrentCultureIgnoreCase)))
         .Where(i => i != -1);            
 
-        indexToRemove.ForEach(i => propertyFields.RemoveAt(i));
+        foreach (var index in indexToRemove)
+        {
+            propertyFields.RemoveAt(index);
+        }
 
         for (var i = 0; i < projects.Count(); i++)
         {

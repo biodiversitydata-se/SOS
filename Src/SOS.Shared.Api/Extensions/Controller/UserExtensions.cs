@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using SOS.Api.Contracts.Observations.Requests;
+using Microsoft.AspNetCore.Mvc;
 using SOS.Lib.Exceptions;
-using SOS.Lib.Dtos.Enum;
 using System.Security.Claims;
 
 namespace SOS.Shared.Api.Extensions.Controller;
@@ -34,6 +34,7 @@ public static class UserExtensions
                 throw new AuthenticationRequiredException("Not authorized");
             }
         }
+
     }
 
     extension(ControllerBase controller)

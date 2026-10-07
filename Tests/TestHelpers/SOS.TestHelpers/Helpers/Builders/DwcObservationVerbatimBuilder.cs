@@ -1,4 +1,4 @@
-﻿using SOS.Lib.Enums;
+﻿using SOS.Api.Contracts.Common.Geo;
 using SOS.Lib.Extensions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.Verbatim.DarwinCore;

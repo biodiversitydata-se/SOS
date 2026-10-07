@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using SOS.Api.Contracts.Common.Geo;
+using FluentAssertions;
 using SOS.Lib.Gis;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Processed.Observation;
@@ -8,7 +9,7 @@ namespace SOS.Lib.UnitTests.Gis;
 
 public abstract class LocationClustererAlgorithmTestBase
 {
-    private static readonly LatLonBoundingBox DefaultBoundingBox = LatLonBoundingBox.Create(5.0, 75.0, 35.0, 50.0);
+    private static readonly LatLonBoundingBoxDto DefaultBoundingBox = LatLonBoundingBoxDto.Create(5.0, 75.0, 35.0, 50.0);
     private const double DefaultMetersPerPixel = 25.0;
 
     protected abstract ILocationClusterer CreateClusterer(int minLocationCountBeforeClustering, int maxLocationCountAfterClustering);
@@ -285,7 +286,7 @@ public abstract class LocationClustererAlgorithmTestBase
             LocationClustererTestData.CreateObservation(new Location { LocationId = "radius-location-2", DecimalLongitude = 18.000, DecimalLatitude = 59.005 }, "radius-observation-2"),
             LocationClustererTestData.CreateObservation(new Location { LocationId = "radius-location-3", DecimalLongitude = 18.005, DecimalLatitude = 59.005 }, "radius-observation-3")
         };
-        var boundingBox = LatLonBoundingBox.Create(17.99, 59.01, 18.01, 58.99);
+        var boundingBox = LatLonBoundingBoxDto.Create(17.99, 59.01, 18.01, 58.99);
         var clusterer = CreateClusterer(1, 10);
 
         // Act

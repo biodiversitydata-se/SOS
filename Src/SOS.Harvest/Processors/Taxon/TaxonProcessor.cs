@@ -2,7 +2,7 @@
 using SOS.Harvest.Processors.Taxon.Interfaces;
 using SOS.Harvest.Services.Taxon.Interfaces;
 using SOS.Lib.Configuration.Process;
-using SOS.Lib.Enums;
+using SOS.Api.Contracts.Observations.Responses;
 using SOS.Lib.Extensions;
 using SOS.Lib.Factories;
 using SOS.Lib.Helpers;

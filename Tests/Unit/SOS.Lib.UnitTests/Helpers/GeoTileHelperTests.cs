@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using SOS.Api.Contracts.Common.Geo;
+using FluentAssertions;
 using SOS.Lib.Helpers;
 using SOS.Lib.Models.Gis;
 using Xunit;
@@ -18,10 +19,10 @@ public class GeoTileHelperTests
     [Fact]
     public void CalculateGeotileZoom_BoundingBoxMissingCoordinates_ReturnsZoomZero()
     {
-        var bbox = new LatLonBoundingBox
+        var bbox = new LatLonBoundingBoxDto
         {
             TopLeft = null!,
-            BottomRight = new LatLonCoordinate(55.0, 20.0)
+            BottomRight = new LatLonCoordinateDto(55.0, 20.0)
         };
 
         var zoom = GeoTileHelper.CalculateGeotileZoom(bbox, maxBuckets: 10000, maxZoom: 21);
@@ -32,10 +33,10 @@ public class GeoTileHelperTests
     [Fact]
     public void CalculateGeotileZoom_ValidBoundingBox_ReturnsZoomWithinBounds()
     {
-        var bbox = new LatLonBoundingBox
+        var bbox = new LatLonBoundingBoxDto
         {
-            TopLeft = new LatLonCoordinate(60.0, 15.0),
-            BottomRight = new LatLonCoordinate(55.0, 20.0)
+            TopLeft = new LatLonCoordinateDto(60.0, 15.0),
+            BottomRight = new LatLonCoordinateDto(55.0, 20.0)
         };
 
         var zoom = GeoTileHelper.CalculateGeotileZoom(bbox, maxBuckets: 10000, maxZoom: 21);

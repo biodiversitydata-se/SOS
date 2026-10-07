@@ -17,6 +17,7 @@ public class Substrate
     /// </summary>
     public int? Id { get; set; }
 
+    /// <summary>The substrate name from the controlled vocabulary.</summary>
     public VocabularyValue? Name { get; set; }
 
     /// <summary>

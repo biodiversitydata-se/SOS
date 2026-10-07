@@ -1,4 +1,4 @@
-﻿using CSharpFunctionalExtensions;
+﻿﻿using CSharpFunctionalExtensions;
 using Microsoft.Extensions.Logging;
 using SOS.Lib.Cache.Interfaces;
 using SOS.Lib.Enums;
@@ -10,10 +10,14 @@ using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
 using SOS.Observations.Api.Managers.Interfaces;
 using SOS.Observations.Api.Repositories.Interfaces;
-using SOS.Lib.Dtos;
-using SOS.Lib.Extensions.Dto;
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using SOS.Api.Contracts.Aggregations.Responses;
+using SOS.Api.Contracts.Observations.Requests;
+using SOS.Api.Contracts.Aggregations.Requests;
 
 namespace SOS.Observations.Api.Managers;
 
@@ -294,7 +298,7 @@ public class TaxonSearchManager : ITaxonSearchManager
     }
 
     /// <inheritdoc />
-    public async Task<Result<PagedResult<TaxonAggregationItem>>> GetTaxonAggregationAsync(
+    public async Task<Result<PagedResult<TaxonAggregationItemDto>>> GetTaxonAggregationAsync(
         int? roleId,
         string authorizationApplicationIdentifier,
         SearchFilter filter,
@@ -698,7 +702,7 @@ public class TaxonSearchManager : ITaxonSearchManager
             }
 
             var result = await _processedTaxonRepository.GetTaxonExistsIndicationAsync(filter);
-            return result?.ToTaxonAggregationItemDtos();
+            return result;
         }
         catch (TimeoutException e)
         {

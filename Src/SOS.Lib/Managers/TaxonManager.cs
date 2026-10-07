@@ -1,7 +1,7 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using SOS.Api.Contracts.Observations.Requests;
+using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using SOS.Lib.Cache.Interfaces;
-using SOS.Lib.Enums;
 using SOS.Lib.Factories;
 using SOS.Lib.Managers.Interfaces;
 using SOS.Lib.Models.Interfaces;

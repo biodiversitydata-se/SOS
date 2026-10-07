@@ -1,13 +1,14 @@
-﻿using NetTopologySuite.Geometries;
+﻿﻿using SOS.Api.Contracts.Common.Geo;
+using SOS.Api.Contracts.Aggregations.Requests;
+using SOS.Api.Contracts.Aggregations.Responses;
+using SOS.Api.Contracts.Observations.Requests;
+using NetTopologySuite.Geometries;
 using SOS.Lib.Enums;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Search.Enums;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
-using SOS.Lib.Dtos;
-using SOS.Lib.Dtos.Enum;
-using SOS.Lib.Dtos.Filter;
 using System.Text.Json.Nodes;
 using static SOS.Observations.Api.Managers.ObservationManager;
 
@@ -24,7 +25,7 @@ public interface IObservationManager
         SearchExecutionOptions? options = null);
     Task<LocationRepresentativeResult<JsonObject>> GetLocationRepresentativeChunkAsync(PreparedObservationFilter filter, int take, string collapseField);
     Task<GeoGridTileResult> GetGeogridTileAggregationAsync(PreparedObservationFilter filter, int precision);
-    Task<(long Count, LatLonBoundingBox? Extent, long EstimatedLocationCount)> GetCountAndExtentAsync(PreparedObservationFilter filter, bool includeExtent = true);
+    Task<(long Count, LatLonBoundingBoxDto? Extent, long EstimatedLocationCount)> GetCountAndExtentAsync(PreparedObservationFilter filter, bool includeExtent = true);
 
     /// <summary>
     /// Look for duplicates
@@ -118,11 +119,11 @@ public interface IObservationManager
     /// <param name="filter"></param>
     /// <param name="timeSeriesType"></param>
     /// <returns></returns>
-    Task<IEnumerable<TimeSeriesHistogramResult>> GetTimeSeriesHistogramAsync(
+    Task<IEnumerable<TimeSeriesHistogramResultDto>> GetTimeSeriesHistogramAsync(
         int? roleId, 
         string authorizationApplicationIdentifier, 
         SearchFilter filter, 
-        TimeSeriesType timeSeriesType);
+        TimeSeriesTypeDto timeSeriesType);
 
     /// <summary>
     /// Geo grid tile aggregation
@@ -207,7 +208,7 @@ public interface IObservationManager
     /// apply authorization filters.</param>
     /// <returns>The total count of matching items, an optional bounding box representing the geographical extent of those items,
     /// and an estimated count of locations. The extent is null if no items match the criteria.</returns>    
-    Task<(long Count, LatLonBoundingBox? Extent, long EstimatedLocationCount)> GetCountAndExtentAsync(
+    Task<(long Count, LatLonBoundingBoxDto? Extent, long EstimatedLocationCount)> GetCountAndExtentAsync(
         int? roleId,
         string authorizationApplicationIdentifier,
         SearchFilterBase filter,

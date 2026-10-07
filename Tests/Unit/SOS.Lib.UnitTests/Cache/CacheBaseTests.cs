@@ -28,10 +28,6 @@ public class CacheBaseTests
         {
         }
 
-        // Gör OnCacheEviction publik för att kunna trigga i test
-        public void ForceEviction() => typeof(CacheBase<string, TestEntity>)
-            .GetMethod("OnCacheEviction", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
-            ?.Invoke(this, null);
     }
 
     public class TestCacheWithLongCacheDuration : CacheBase<string, TestEntity>
@@ -43,10 +39,6 @@ public class CacheBaseTests
         {
         }
 
-        // Gör OnCacheEviction publik för att kunna trigga i test
-        public void ForceEviction() => typeof(CacheBase<string, TestEntity>)
-            .GetMethod("OnCacheEviction", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
-            ?.Invoke(this, null);
     }
 
     private readonly ILogger<CacheBase<string, TestEntity>> _logger =
@@ -84,6 +76,7 @@ public class CacheBaseTests
 
         // Assert
         var cached = await cache.GetAsync("2");
+        Assert.True(result);
         Assert.Equal("Bob", cached.Name);
         await repo.Received(1).AddOrUpdateAsync(entity);
     }
@@ -112,6 +105,7 @@ public class CacheBaseTests
         var all2 = (await cache.GetAllAsync()).ToList();
 
         // Assert
+        Assert.Equal(new[] { "Anna", "Bertil" }, all2.Select(entity => entity.Name).Order());
         await repo.Received(1).GetAllAsync(); // No additional calls to repository
     }
 
@@ -125,10 +119,12 @@ public class CacheBaseTests
         await cache.GetAsync("X");
 
         // Act
+        repo.GetAsync("X").Returns(new TestEntity { Id = "X", Name = "Updated" });
         cache.Clear();
 
         // Assert
-        await cache.GetAsync("X");
+        var refreshed = await cache.GetAsync("X");
+        Assert.Equal("Updated", refreshed.Name);
         await repo.Received(2).GetAsync("X"); // After Clear, repo should be called again
     }
 

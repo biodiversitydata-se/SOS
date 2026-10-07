@@ -1,11 +1,12 @@
-﻿using CSharpFunctionalExtensions;
-using SOS.Lib.Enums;
+﻿﻿using CSharpFunctionalExtensions;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
-using SOS.Lib.Dtos;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using SOS.Api.Contracts.Aggregations.Responses;
+using SOS.Api.Contracts.Observations.Requests;
+using SOS.Api.Contracts.Aggregations.Requests;
 
 
 namespace SOS.Observations.Api.Managers.Interfaces;
@@ -65,7 +66,7 @@ public interface ITaxonSearchManager
     /// <param name="take"></param>
     /// <param name="sumUnderlyingTaxa"></param>
     /// <returns></returns>
-    Task<Result<PagedResult<TaxonAggregationItem>>> GetTaxonAggregationAsync(
+    Task<Result<PagedResult<TaxonAggregationItemDto>>> GetTaxonAggregationAsync(
         int? roleId,
         string authorizationApplicationIdentifier,
         SearchFilter filter,

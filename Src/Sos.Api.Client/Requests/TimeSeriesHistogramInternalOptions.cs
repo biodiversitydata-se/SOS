@@ -2,14 +2,8 @@ using SOS.Api.Contracts.Aggregations.Requests;
 
 namespace SOS.Api.Client.Requests;
 /// <summary>Options for time-series aggregation.</summary>
-public sealed class TimeSeriesHistogramInternalOptions
+public sealed class TimeSeriesHistogramInternalOptions : SosRoleRequestOptions
 {
-    /// <summary>The explicit authorization role identifier.</summary>
-    public int? RoleId { get; set; }
-
-    /// <summary>The explicit calling application identifier.</summary>
-    public string? AuthorizationApplicationIdentifier { get; set; }
-
     /// <summary>The time interval used for histogram buckets.</summary>
     public TimeSeriesTypeDto TimeSeriesType { get; set; } = TimeSeriesTypeDto.Year;
 

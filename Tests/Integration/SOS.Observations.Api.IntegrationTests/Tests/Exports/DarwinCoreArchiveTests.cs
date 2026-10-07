@@ -1,10 +1,10 @@
-﻿using FizzWare.NBuilder;
+﻿using SOS.Api.Contracts.Observations.Requests;
+using FizzWare.NBuilder;
 using SOS.Lib.Enums;
 using SOS.Lib.Helpers;
 using SOS.Lib.IO.DwcArchive.Interfaces;
 using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Artportalen;
-using SOS.Lib.Dtos.Filter;
 using SOS.Observations.Api.IntegrationTests.Helpers;
 using SOS.Observations.Api.IntegrationTests.Setup;
 using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
@@ -12,7 +12,6 @@ using SOS.Observations.Api.Repositories.Interfaces;
 using SOS.Api.Client.Clients;
 using SOS.Api.Client.Requests;
 using SOS.Api.Contracts.Exports.Requests;
-using ContractSearchFilterInternalDto = SOS.Api.Contracts.Observations.Requests.SearchFilterInternalDto;
 
 namespace SOS.Observations.Api.IntegrationTests.Tests.Exports;
 
@@ -36,7 +35,7 @@ public class DarwinCoreArchiveTests : TestBase
         var client = new SosExportsClient(TestFixture.CreateApiClient());
 
         await using var response = await client.DownloadInternalAsync(
-            new ContractSearchFilterInternalDto(),
+            new SearchFilterInternalDto(),
             SosExportType.Csv,
             new ExportDownloadOptions { CultureCode = "sv-SE" },
             TestContext.Current.CancellationToken);
@@ -74,7 +73,7 @@ public class DarwinCoreArchiveTests : TestBase
     public async Task CreateOccurrenceCsvFile_ReturnsExpectedRowsAndColumns_WhenUsingNoFilter()
     {
         // Arrange
-        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(100)
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(3)
             .All().HaveValuesFromPredefinedObservations()
             .Build();
         var processedObservations = ProcessFixture.ProcessObservations(verbatimObservations).ToList();

@@ -1,6 +1,5 @@
-﻿using Microsoft.Extensions.Diagnostics.HealthChecks;
-using SOS.Lib.Dtos.Enum;
-using SOS.Lib.Dtos.Filter;
+﻿using SOS.Api.Contracts.Observations.Requests;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using SOS.Observations.Api.Configuration;
 using System.Diagnostics;
 

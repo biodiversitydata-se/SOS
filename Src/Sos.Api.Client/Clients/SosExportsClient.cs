@@ -120,7 +120,7 @@ public sealed class SosExportsClient : ISosExportsClient
         SosRoleRequestOptions? options = null,
         CancellationToken cancellationToken = default)
     {
-        var requestOptions = options ?? new EmptyRoleRequestOptions();
+        var requestOptions = options ?? new SosRoleRequestOptions();
         using var request = new HttpRequestMessage(HttpMethod.Get, "exports/my");
         request.ApplySosRequestHeaders(
             requestOptions.RoleId,
@@ -147,7 +147,7 @@ public sealed class SosExportsClient : ISosExportsClient
             throw new ArgumentException("Export id must not be empty.", nameof(id));
         }
 
-        var requestOptions = options ?? new EmptyRoleRequestOptions();
+        var requestOptions = options ?? new SosRoleRequestOptions();
         using var request = new HttpRequestMessage(HttpMethod.Get, $"exports/my/{Uri.EscapeDataString(id)}");
         request.ApplySosRequestHeaders(
             requestOptions.RoleId,
@@ -203,16 +203,9 @@ public sealed class SosExportsClient : ISosExportsClient
         if (exportType == SosExportType.GeoJson)
         {
             query.Add("flat", options.Flat)
-                .Add("excludeNullValues", options.ExcludeNullValues)
-                .Add("gzip", options.Gzip);
-        }
-        else
-        {
-            query.Add("gzip", options.Gzip);
+                .Add("excludeNullValues", options.ExcludeNullValues);
         }
 
-        return query;
+        return query.Add("gzip", options.Gzip);
     }
-
-    private sealed class EmptyRoleRequestOptions : SosRoleRequestOptions;
 }

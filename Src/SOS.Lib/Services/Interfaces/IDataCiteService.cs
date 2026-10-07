@@ -1,5 +1,5 @@
-﻿using SOS.Lib.Enums;
 using SOS.Lib.Models.DataCite;
+using SOS.Api.Contracts.Observations.Requests;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 

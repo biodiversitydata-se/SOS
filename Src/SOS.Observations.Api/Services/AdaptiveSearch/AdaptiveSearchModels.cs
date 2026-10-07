@@ -1,8 +1,8 @@
-﻿using NetTopologySuite.Features;
+﻿using SOS.Api.Contracts.Common.Geo;
+using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
-using SOS.Lib.Dtos;
-using SOS.Lib.Dtos.Filter;
-using SOS.Lib.Enums;
+using SOS.Api.Contracts.Observations.Requests;
+using SOS.Api.Contracts.Exports.Requests;
 using SOS.Lib.Gis;
 using SOS.Lib.Models.Gis;
 using System.Text.Json.Nodes;
@@ -14,7 +14,7 @@ public sealed class AdaptiveSearchRequest
     public int? RoleId { get; init; }
     public string? AuthorizationApplicationIdentifier { get; init; }
     public required SearchFilterInternalDto Filter { get; init; }
-    public required LatLonBoundingBox? Bbox { get; init; }
+    public required LatLonBoundingBoxDto? Bbox { get; init; }
     public required int UserId { get; init; }
     public required string TranslationCultureCode { get; init; }
     public int ObservationsLimit { get; init; }
@@ -54,7 +54,7 @@ public sealed class AdaptiveSearchGeoJsonObservationsResult
     public required bool FlatOut { get; init; }
     public required PropertyLabelType PropertyLabelType { get; init; }
     public required bool ExcludeNullValues { get; init; }
-    public required LatLonBoundingBox? Bbox { get; init; }
+    public required LatLonBoundingBoxDto? Bbox { get; init; }
     public required List<Feature>? GeographicAreas { get; init; }
     public required bool GroupByLocation { get; init; }
     public required Dictionary<string, Geometry>? PolygonLocationGeometries { get; init; }

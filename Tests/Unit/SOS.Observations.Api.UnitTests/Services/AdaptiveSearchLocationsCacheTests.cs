@@ -1,13 +1,16 @@
-﻿using FluentAssertions;
+﻿using SOS.Api.Contracts.Observations.Requests;
+using SOS.Api.Contracts.Common.Geo;
+
+using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
-using SOS.Lib.Dtos.Enum;
-using SOS.Lib.Dtos.Filter;
+using NetTopologySuite.IO;
 using SOS.Lib.Models.Gis;
 using SOS.Lib.Models.Search;
 using SOS.Lib.Models.Search.Filters;
 using SOS.Lib.Models.Search.Result;
+using SOS.Lib.Models.Search.Input;
 using SOS.Lib.Gis;
 using SOS.Lib.Models.Processed.Observation;
 using SOS.Observations.Api.Configuration;
@@ -24,6 +27,54 @@ namespace SOS.Observations.Api.UnitTests.Services;
 
 public class AdaptiveSearchLocationsCacheTests
 {
+    [Fact]
+    public void DifferentPolygonsWithSameBoundingBoxCannotReuseCachedLocations()
+    {
+        using var fixture = new CacheFixture();
+        var input = new GeographicsFilterInputModel
+        {
+            BoundingBox = new LatLonBoundingBoxDto
+            {
+                TopLeft = new LatLonCoordinateDto { Longitude = 0, Latitude = 1 },
+                BottomRight = new LatLonCoordinateDto { Longitude = 1, Latitude = 0 }
+            },
+            ServerGeometries = [new WKTReader().Read("POLYGON ((0 0, 1 0, 1 1, 0 1, 0 0))")]
+        };
+        var filter = new SearchFilterInternalDto { Geographics = input, ProtectionFilter = ProtectionFilterDto.Public };
+        var firstKey = fixture.Cache.CreateCacheKey(null, null, false, filter);
+        fixture.Cache.Set(firstKey, Box(0), new() { Aggregate("inside", 0.5, 2) });
+        fixture.Cache.TryGet(firstKey, Box(0), out _).Should().BeTrue();
+
+        input.ServerGeometries = [new WKTReader().Read(
+            "POLYGON ((0 0, 1 0, 1 1, 0 1, 0 0), (0.2 0.2, 0.2 0.8, 0.8 0.8, 0.8 0.2, 0.2 0.2))")];
+        var secondKey = fixture.Cache.CreateCacheKey(null, null, false, filter);
+
+        secondKey.Should().NotBe(firstKey);
+        fixture.Cache.TryGet(secondKey, Box(0), out _).Should().BeFalse();
+        input.Geometries.Should().BeNull();
+    }
+
+    [Fact]
+    public void CacheKeyIgnoresBoundingBoxWithoutDroppingOrModifyingServerGeometry()
+    {
+        using var fixture = new CacheFixture();
+        var geometry = new WKTReader().Read("POINT (0.5 0.5)");
+        var input = new GeographicsFilterInputModel { ServerGeometries = [geometry] };
+        var filter = new SearchFilterInternalDto { Geographics = input };
+        var key = fixture.Cache.CreateCacheKey(null, null, false, filter);
+        input.BoundingBox = new LatLonBoundingBoxDto
+        {
+            TopLeft = new LatLonCoordinateDto { Longitude = 0, Latitude = 1 },
+            BottomRight = new LatLonCoordinateDto { Longitude = 1, Latitude = 0 }
+        };
+
+        fixture.Cache.CreateCacheKey(null, null, false, filter).Should().Be(key);
+        input.ServerGeometries.Should().ContainSingle().Which.Should().BeSameAs(geometry);
+        input.BoundingBox.Should().NotBeNull();
+        input.Geometries.Should().BeNull();
+        key.Should().StartWith("adaptive-search-locations:v5:");
+    }
+
     [Theory]
     [InlineData(true, true, false)]
     [InlineData(true, false, true)]
@@ -66,7 +117,7 @@ public class AdaptiveSearchLocationsCacheTests
         manager.Setup(m => m.PrepareObservationFilterAsync(null, null, It.IsAny<SearchFilter>()))
             .ReturnsAsync((int? roleId, string application, SearchFilter filter) => new PreparedObservationFilter(filter));
         manager.Setup(m => m.GetCountAndExtentAsync(It.IsAny<PreparedObservationFilter>(), true))
-            .ReturnsAsync((1L, (LatLonBoundingBox?)null, 1L));
+            .ReturnsAsync((1L, (LatLonBoundingBoxDto?)null, 1L));
         manager.Setup(m => m.GetChunkAsync(It.IsAny<PreparedObservationFilter>(), 0, 100,
                 It.Is<SearchExecutionOptions>(o => o.KnownTotalCount == 1L)))
             .ReturnsAsync(new PagedResult<JsonObject>
@@ -127,7 +178,7 @@ public class AdaptiveSearchLocationsCacheTests
 
         fixture.Clock.Advance(TimeSpan.FromMinutes(1));
         fixture.Cache.TryGet("key", first, out _).Should().BeFalse();
-        fixture.Cache.TryGet("key", LatLonBoundingBox.Create(0, 1, 2, 0), out _).Should().BeFalse();
+        fixture.Cache.TryGet("key", LatLonBoundingBoxDto.Create(0, 1, 2, 0), out _).Should().BeFalse();
         fixture.Cache.TryGet("key", second, out _).Should().BeTrue();
 
         fixture.Cache.Set("key", Box(2), new());
@@ -173,7 +224,7 @@ public class AdaptiveSearchLocationsCacheTests
         fixture.RawCache.TryGet<AdaptiveSearchLocationsCacheBucket>("key", token: TestContext.Current.CancellationToken).Value.Entries.Should().HaveCount(8);
     }
 
-    private static LatLonBoundingBox Box(int index) => LatLonBoundingBox.Create(index, 1, index + 1, 0);
+    private static LatLonBoundingBoxDto Box(int index) => LatLonBoundingBoxDto.Create(index, 1, index + 1, 0);
 
     [Theory]
     [InlineData(true, false)]
@@ -209,9 +260,9 @@ public class AdaptiveSearchLocationsCacheTests
 
         fixture.Cache.TryGet("key", Box(0), out var exact, requireExactBoundingBox: true).Should().BeTrue();
         exact.Should().ContainSingle().Which.ObservationSummary.ObservationCount.Should().Be(3);
-        fixture.Cache.TryGet("key", LatLonBoundingBox.Create(0.1, 0.9, 0.9, 0.1), out _,
+        fixture.Cache.TryGet("key", LatLonBoundingBoxDto.Create(0.1, 0.9, 0.9, 0.1), out _,
             requireExactBoundingBox: true).Should().BeFalse();
-        fixture.Cache.TryGet("key", LatLonBoundingBox.Create(0, 1, 2, 0), out _,
+        fixture.Cache.TryGet("key", LatLonBoundingBoxDto.Create(0, 1, 2, 0), out _,
             requireExactBoundingBox: true).Should().BeFalse();
     }
 
@@ -219,7 +270,7 @@ public class AdaptiveSearchLocationsCacheTests
     public void OrdinaryPointSearchCanReuseOneContainingEntryAndFilterLocations()
     {
         using var fixture = new CacheFixture();
-        fixture.Cache.Set("key", LatLonBoundingBox.Create(0, 1, 2, 0),
+        fixture.Cache.Set("key", LatLonBoundingBoxDto.Create(0, 1, 2, 0),
             new() { Aggregate("inside", 0.5, 2), Aggregate("outside", 1.5, 4) });
 
         fixture.Cache.TryGet("key", Box(0), out var locations).Should().BeTrue();
@@ -237,9 +288,9 @@ public class AdaptiveSearchLocationsCacheTests
         var right = Aggregate("right-location", 1.000001, 5);
         left.DistinctLocationId.Should().Be(right.DistinctLocationId);
         fixture.Cache.Set("key", Box(0), new() { left });
-        fixture.Cache.Set("key", LatLonBoundingBox.Create(secondLeft, 1, 2, 0), new() { right });
+        fixture.Cache.Set("key", LatLonBoundingBoxDto.Create(secondLeft, 1, 2, 0), new() { right });
 
-        fixture.Cache.TryGet("key", LatLonBoundingBox.Create(0, 1, 2, 0), out var locations).Should().BeFalse();
+        fixture.Cache.TryGet("key", LatLonBoundingBoxDto.Create(0, 1, 2, 0), out var locations).Should().BeFalse();
         locations.Should().BeEmpty();
         fixture.Cache.TryGet("key", Box(0), out var exact).Should().BeTrue();
         exact.Single().ObservationSummary.ObservationCount.Should().Be(2);
@@ -253,7 +304,7 @@ public class AdaptiveSearchLocationsCacheTests
         summary.LocationIds.Add("right");
         fixture.Cache.Set("key", Box(0), new() { summary });
 
-        fixture.Cache.TryGet("key", LatLonBoundingBox.Create(0, 1, 0.5, 0), out _).Should().BeFalse();
+        fixture.Cache.TryGet("key", LatLonBoundingBoxDto.Create(0, 1, 0.5, 0), out _).Should().BeFalse();
         fixture.Cache.TryGet("key", Box(0), out var exact).Should().BeTrue();
         exact.Single().ObservationSummary.ObservationCount.Should().Be(7);
     }
@@ -284,10 +335,10 @@ public class AdaptiveSearchLocationsCacheTests
         public bool RequiredExactBoundingBox { get; private set; }
         public string CreateCacheKey(int? roleId, string? application, bool sensitive, SearchFilterInternalDto filter)
         { Calls++; return "shared"; }
-        public bool TryGet(string key, LatLonBoundingBox? bbox, out List<CachedLocationAggregate> locations, bool requireExactBoundingBox = false)
+        public bool TryGet(string key, LatLonBoundingBoxDto? bbox, out List<CachedLocationAggregate> locations, bool requireExactBoundingBox = false)
         { Calls++; RequiredExactBoundingBox = requireExactBoundingBox; locations = new(); return true; }
-        public void Set(string key, LatLonBoundingBox? bbox, List<CachedLocationAggregate> locations) => Calls++;
-        public LatLonBoundingBox? CreateBoundingBox(IEnumerable<CachedLocationAggregate> locations) => null;
+        public void Set(string key, LatLonBoundingBoxDto? bbox, List<CachedLocationAggregate> locations) => Calls++;
+        public LatLonBoundingBoxDto? CreateBoundingBox(IEnumerable<CachedLocationAggregate> locations) => null;
     }
 
     private sealed class TestClock : TimeProvider

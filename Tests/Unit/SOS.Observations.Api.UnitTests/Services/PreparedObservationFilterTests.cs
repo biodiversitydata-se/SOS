@@ -1,3 +1,4 @@
+using SOS.Api.Contracts.Common.Geo;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
@@ -30,7 +31,7 @@ public class PreparedObservationFilterTests
             .Callback(() => filter.RoleId = 42)
             .Returns(Task.CompletedTask);
         repository.Setup(r => r.GetCountAndExtentAsync(filter, false, true))
-            .ReturnsAsync((0L, (LatLonBoundingBox?)null, 0L));
+            .ReturnsAsync((0L, (LatLonBoundingBoxDto?)null, 0L));
         repository.Setup(r => r.GetChunkAsync<JsonObject>(filter, 0, 10,
                 It.Is<SearchExecutionOptions>(o => o.KnownTotalCount == 0L)))
             .ReturnsAsync(new PagedResult<JsonObject> { Records = Array.Empty<JsonObject>() });
@@ -68,7 +69,7 @@ public class PreparedObservationFilterTests
         var repository = new Mock<IProcessedObservationRepository>();
         var filter = new SearchFilterInternal(123, ProtectionFilter.Public);
         repository.Setup(r => r.GetCountAndExtentAsync(filter, false, false))
-            .ReturnsAsync((123L, (LatLonBoundingBox?)null, 12L));
+            .ReturnsAsync((123L, (LatLonBoundingBoxDto?)null, 12L));
         var manager = CreateManager(repository.Object, filters.Object);
 
         var result = await manager.GetCountAndExtentAsync(new PreparedObservationFilter(filter), includeExtent: false);

@@ -1,9 +1,14 @@
-namespace SOS.Api.Contracts.Lookups.Responses;
+﻿namespace SOS.Api.Contracts.Lookups.Responses;
 /// <summary>
 /// Artportalen project information.
 /// </summary>
 public class Project
 {
+
+    /// <summary>
+    /// Indicates that the project is only available to its owner and members.
+    /// </summary>
+    public bool IsHidden { get; set; }
 
     /// <summary>
     /// Indicates if species observations that are reported in
@@ -23,6 +28,12 @@ public class Project
     /// </summary>
     public string CategorySwedish { get; set; }
 
+    /// <summary>The controlling organisation identifier, when present.</summary>
+    public int? ControlingOrganisationId { get; set; }
+
+    /// <summary>The controlling user identifier, when present.</summary>
+    public int? ControlingUserId { get; set; }
+
     /// <summary>
     /// Description of a project.
     /// </summary>
@@ -37,6 +48,9 @@ public class Project
     /// An identifier for the project.
     /// </summary>
     public int Id { get; set; }
+
+    /// <summary>Identifiers of users who are members of the project.</summary>
+    public ICollection<int> MemberIds { get; set; }
 
     /// <summary>
     /// Name of the project.
@@ -75,6 +89,9 @@ public class Project
     /// Survey method URL.
     /// </summary>
     public string SurveyMethodUrl { get; set; }
+
+    /// <summary>The project owner's identifier in the user service.</summary>
+    public int? UserServiceUserId { get; set; }
 
 }
 

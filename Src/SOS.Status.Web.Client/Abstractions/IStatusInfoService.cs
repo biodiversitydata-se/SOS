@@ -1,19 +1,20 @@
 ﻿using SOS.Status.Web.Client.Dtos;
 using SOS.Status.Web.Client.Models;
+using SOS.Api.Contracts.Status.Responses;
 
 namespace SOS.Status.Web.Client.Abstractions;
 
 public interface IStatusInfoService
 {
-    Task<List<DataProviderStatusRow>?> GetDataProviderStatusRowsAsync();
+    Task<List<SOS.Status.Web.Client.Models.DataProviderStatusRow>?> GetDataProviderStatusRowsAsync();
 
-    Task<ProcessSummaryDto?> GetProcessSummaryAsync();
+    Task<ProcessSummaryViewModel?> GetProcessSummaryAsync();
 
     Task<IEnumerable<MongoDbProcessInfoDto>?> GetProcessInfoAsync();
 
-    Task<ProcessInfoDto?> GetProcessInfoAsync(bool active);
+    Task<ProcessInfoViewModel?> GetProcessInfoAsync(bool active);
 
-    Task<List<DataProviderStatusDto>?> GetDataProviderStatusAsync();
+    Task<List<DataProviderStatusViewModel>?> GetDataProviderStatusAsync();
 
     Task<HealthReportDto?> GetObservationsApiHealthAsync();
 

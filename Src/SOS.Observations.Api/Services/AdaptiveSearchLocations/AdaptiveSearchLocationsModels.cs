@@ -1,16 +1,10 @@
-﻿﻿using SOS.Lib.Dtos.Filter;
+﻿using SOS.Api.Contracts.Common.Geo;
+using SOS.Api.Contracts.Observations.Requests;
 using NetTopologySuite.Features;
 using SOS.Lib.Gis;
 using SOS.Lib.Models.Gis;
 
 namespace SOS.Observations.Api.Services.AdaptiveSearchLocations;
-
-public enum AdaptiveSearchLocationsStrategy
-{
-    ObservationsThenGrid = 1,
-    ObservationsThenLocationsThenGrid = 2,
-    LocationsThenGrid = 3
-}
 
 public sealed class AdaptiveSearchLocationsRequest
 {
@@ -18,8 +12,8 @@ public sealed class AdaptiveSearchLocationsRequest
     public string? AuthorizationApplicationIdentifier { get; init; }
     public required SearchFilterInternalDto Filter { get; init; }
     public int UserId { get; init; }
-    public LatLonBoundingBox? InputBbox { get; init; }
-    public LatLonBoundingBox? Bbox { get; init; }
+    public LatLonBoundingBoxDto? InputBbox { get; init; }
+    public LatLonBoundingBoxDto? Bbox { get; init; }
     public bool ReturnInputBBox { get; init; }
     public bool SensitiveObservations { get; init; }
     public int ObservationsLimit { get; init; }
@@ -45,7 +39,7 @@ public sealed class AdaptiveSearchLocationsResult
     public required string ResultType { get; init; }
     public string? GeoJson { get; init; }
     public IReadOnlyList<LocationFeature>? LocationFeatures { get; init; }
-    public LatLonBoundingBox? Bbox { get; init; }
+    public LatLonBoundingBoxDto? Bbox { get; init; }
     public long ObservationsTotalCount { get; init; }
     public long? EstimatedLocationCount { get; init; }
     public long FeatureCount { get; init; }
@@ -84,7 +78,7 @@ internal sealed class AdaptiveSearchLocationsCacheBucket
 
 internal sealed class AdaptiveSearchLocationsCacheEntry
 {
-    public LatLonBoundingBox? BoundingBox { get; init; }
+    public LatLonBoundingBoxDto? BoundingBox { get; init; }
     public List<CachedLocationAggregate> Locations { get; init; } = new();
     public DateTime CreatedUtc { get; init; } = DateTime.UtcNow;
 

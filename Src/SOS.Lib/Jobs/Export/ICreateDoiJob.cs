@@ -1,5 +1,5 @@
-﻿using Hangfire;
-using SOS.Lib.Dtos.Filter;
+﻿using SOS.Api.Contracts.Exports.Requests;
+using Hangfire;
 
 namespace SOS.Lib.Jobs.Export;
 

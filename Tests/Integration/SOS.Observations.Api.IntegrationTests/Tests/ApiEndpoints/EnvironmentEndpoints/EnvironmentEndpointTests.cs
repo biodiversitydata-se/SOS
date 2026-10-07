@@ -1,4 +1,4 @@
-﻿using SOS.Lib.Dtos;
+﻿using SOS.Api.Contracts.Metadata.Responses;
 using SOS.Observations.Api.IntegrationTests.Setup;
 
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.EnvironmentEndpoints;

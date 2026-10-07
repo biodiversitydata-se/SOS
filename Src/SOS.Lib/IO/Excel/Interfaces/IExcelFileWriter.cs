@@ -1,5 +1,5 @@
 ﻿using Hangfire;
-using SOS.Lib.Enums;
+using SOS.Api.Contracts.Exports.Requests;
 using SOS.Lib.Models.Export;
 using SOS.Lib.Models.Search.Filters;
 
