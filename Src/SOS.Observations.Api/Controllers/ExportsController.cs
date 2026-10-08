@@ -1134,7 +1134,7 @@ public class ExportsController : ControllerBase
     [HttpPost("Internal/Download/Filter")]
     [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-    [InternalApi, AzureInternalApi]
+    [InternalApi]
     public async Task<IActionResult> DownloadFilterInternalAsync(
         [FromBody] SearchFilterAggregationInternalDto filter)
     {
