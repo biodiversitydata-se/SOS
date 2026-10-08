@@ -2000,7 +2000,7 @@ public class ObservationsController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
     [ProducesResponseType((int)HttpStatusCode.ServiceUnavailable)]
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-    [InternalApi, AzureInternalApi]    
+    [InternalApi]    
     public async Task<IActionResult> AdaptiveSearchInternal(
         [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
         [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,
@@ -2183,7 +2183,7 @@ public class ObservationsController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
     [ProducesResponseType((int)HttpStatusCode.ServiceUnavailable)]
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-    [InternalApi, AzureInternalApi]
+    [InternalApi]
     public async Task<IActionResult> AdaptiveSearchLocationsInternal(
         [FromHeader(Name = "X-Authorization-Role-Id")] int? roleId,
         [FromHeader(Name = "X-Authorization-Application-Identifier")] string? authorizationApplicationIdentifier,

@@ -377,8 +377,7 @@ public class ExportsController : ControllerBase
     /// error response.</returns>
     [HttpPost("Download/Filter")]
     [ProducesResponseType(typeof(byte[]), (int)HttpStatusCode.OK)]
-    [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-    [AzureApi, AzureInternalApi]
+    [ProducesResponseType((int)HttpStatusCode.InternalServerError)]    
     public async Task<IActionResult> DownloadFilterAsync(
         [FromBody] SearchFilterAggregationDto filter)
     {
