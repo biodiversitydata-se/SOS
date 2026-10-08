@@ -7,9 +7,9 @@ namespace SOS.Api.Contracts.UnitTests;
 public class PagedResultContractTests
 {
     [Fact]
-    public void GeoPagedResultWithMetadataDto_PreservesTheJsonShape()
+    public void GeoPagedResultDto_PreservesTheJsonShape()
     {
-        var result = new GeoPagedResultWithMetadataDto<int>
+        var result = new GeoPagedResultDto<int>
         {
             Skip = 2,
             Take = 5,
@@ -59,9 +59,9 @@ public class PagedResultContractTests
     [InlineData("{}", true)]
     [InlineData("{\"records\":null}", true)]
     [InlineData("{\"records\":[]}", false)]
-    public void GeoPagedResultWithMetadataDto_PreservesMissingNullAndEmptyRecords(string json, bool expectNull)
+    public void GeoPagedResultDto_PreservesMissingNullAndEmptyRecords(string json, bool expectNull)
     {
-        var result = JsonSerializer.Deserialize<GeoPagedResultWithMetadataDto<int>>(json, new JsonSerializerOptions(JsonSerializerDefaults.Web))!;
+        var result = JsonSerializer.Deserialize<GeoPagedResultDto<int>>(json, new JsonSerializerOptions(JsonSerializerDefaults.Web))!;
 
         if (expectNull) Assert.Null(result.Records);
         else Assert.Empty(result.Records);

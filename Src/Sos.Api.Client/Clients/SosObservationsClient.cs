@@ -138,7 +138,7 @@ public sealed class SosObservationsClient : ISosObservationsClient
     }
 
     /// <inheritdoc />
-    public Task<GeoPagedResultWithMetadataDto<Observation>> ObservationsBySearchInternalAsync(
+    public Task<GeoPagedResultDto<Observation>> ObservationsBySearchInternalAsync(
         SearchFilterInternalDto filter,
         ObservationSearchOptions? options = null,
         CancellationToken cancellationToken = default)
@@ -151,7 +151,7 @@ public sealed class SosObservationsClient : ISosObservationsClient
     }
 
     /// <inheritdoc />
-    public Task<GeoPagedResultWithMetadataDto<Observation>> ObservationsBySearchInternalAsync(
+    public Task<GeoPagedResultDto<Observation>> ObservationsBySearchInternalAsync(
         string filterJson,
         ObservationSearchOptions? options = null,
         CancellationToken cancellationToken = default)
@@ -337,7 +337,7 @@ public sealed class SosObservationsClient : ISosObservationsClient
         };
     }
     
-    private async Task<GeoPagedResultWithMetadataDto<Observation>> SendObservationsBySearchInternalAsync(
+    private async Task<GeoPagedResultDto<Observation>> SendObservationsBySearchInternalAsync(
         string filterJson,
         ObservationSearchOptions? options,
         CancellationToken cancellationToken)
@@ -358,7 +358,7 @@ public sealed class SosObservationsClient : ISosObservationsClient
             HttpCompletionOption.ResponseHeadersRead,
             cancellationToken);
 
-        var result = await SosClientHttp.ReadJsonResponseAsync<GeoPagedResultWithMetadataDto<Observation>>(
+        var result = await SosClientHttp.ReadJsonResponseAsync<GeoPagedResultDto<Observation>>(
             response,
             request.RequestUri,
             cancellationToken);

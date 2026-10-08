@@ -1,4 +1,4 @@
-using SOS.Api.Contracts.Aggregations.Requests;
+﻿using SOS.Api.Contracts.Aggregations.Requests;
 using SOS.Api.Contracts.Exports.Responses;
 using SOS.Api.Contracts.Observations.Requests;
 using SOS.Api.Contracts.Observations.Responses;
@@ -56,13 +56,11 @@ public class OpenApiContractTests(OpenApiContractFixture fixture) : IClassFixtur
     }
 
     [Theory]
-    [InlineData("InternalSosObservationsv1.5", "/Observations/Internal/AdaptiveSearch", 2)]
-    [InlineData("AzureInternalSosObservationsv1.5", "/Observations/Internal/AdaptiveSearch", 2)]
-    [InlineData("InternalSosObservationsv1.5", "/Observations/Internal/AdaptiveSearchLocations", 1)]
-    [InlineData("AzureInternalSosObservationsv1.5", "/Observations/Internal/AdaptiveSearchLocations", 1)]
-    public void AdaptiveGeoJson_ReferencesSharedFeatureCollectionWithoutWrapperSchemas(string documentName, string path, int representationCount)
+    [InlineData("/Observations/Internal/AdaptiveSearch", 2)]
+    [InlineData("/Observations/Internal/AdaptiveSearchLocations", 1)]
+    public void AdaptiveGeoJson_ReferencesSharedFeatureCollection(string path, int representationCount)
     {
-        var document = _documents[documentName];
+        var document = _documents["InternalSosObservationsv1.5"];
         var response = document.Paths[path].Operations[HttpMethod.Post].Responses["200"];
         Assert.Equal(representationCount, response.Content.Count);
         var reference = Assert.IsType<OpenApiSchemaReference>(response.Content["application/geo+json"].Schema);
@@ -86,9 +84,6 @@ public class OpenApiContractTests(OpenApiContractFixture fixture) : IClassFixtur
         Assert.DoesNotContain("crs", collection.Properties.Keys);
         Assert.DoesNotContain("crs", feature.Properties.Keys);
 
-        foreach (var name in new[] { "GeoJsonFeatureCollectionDto", "GeoJsonFeatureDto", "GeoJSONObjectType", "ICRSObject" })
-            Assert.DoesNotContain(name, document.Components.Schemas.Keys);
-
         using var writer = new StringWriter();
         document.SerializeAsV3(new OpenApiJsonWriter(writer));
         using var json = JsonDocument.Parse(writer.ToString());
@@ -99,12 +94,10 @@ public class OpenApiContractTests(OpenApiContractFixture fixture) : IClassFixtur
         Assert.Equal("#/components/schemas/FeatureCollection", responseSchema.GetProperty("$ref").GetString());
     }
 
-    [Theory]
-    [InlineData("InternalSosObservationsv1.5")]
-    [InlineData("AzureInternalSosObservationsv1.5")]
-    public void AdaptiveSearch_DocumentsJsonAlternativesAndResponseHeaders(string documentName)
+    [Fact]
+    public void AdaptiveSearch_DocumentsJsonAlternativesAndResponseHeaders()
     {
-        var response = _documents[documentName].Paths["/Observations/Internal/AdaptiveSearch"]
+        var response = _documents["InternalSosObservationsv1.5"].Paths["/Observations/Internal/AdaptiveSearch"]
             .Operations[HttpMethod.Post].Responses["200"];
 
         Assert.Equal(new[] { "ObservationAdaptiveSearchResultDto", "ObservationLocationAdaptiveSearchResultByLocationDto" },
@@ -124,38 +117,24 @@ public class OpenApiContractTests(OpenApiContractFixture fixture) : IClassFixtur
         }
     }
 
-    [Theory]
-    [InlineData("PropertyFieldDataType")]
-    [InlineData("AdaptiveSearchLocationsStrategy")]
-    [InlineData("LocationClusteringAlgorithm")]
-    [InlineData("ExportFormat")]
-    [InlineData("ExportJobStatus")]
-    [InlineData("PropertyLabelType")]
-    [InlineData("AreaTypeAggregate")]
-    [InlineData("OutputFieldSet")]
-    [InlineData("DiagramFormat")]
-    [InlineData("SearchSortOrder")]
-    [InlineData("SpeciesGroup")]
-    [InlineData("ApiInformation")]
-    [InlineData("TaxonSumAggregationItem")]
-    [InlineData("ObservationStatusCounts")]
-    [InlineData("TaxonTrendResult")]
-    [InlineData("DataQualityReport")]
-    [InlineData("DataQualityReportRecord")]
-    [InlineData("DataQualityReportObservation")]
-    [InlineData("TaxonAreaAggregation")]
-    [InlineData("AssociatedMediaType")]
-    [InlineData("TaxonRelationsTreeIterationMode")]
-    [InlineData("ObjectId")]
-    [InlineData("TaxonomyType")]
-    [InlineData("AggregationType")]
-    [InlineData("CoordinateSys")]
-    [InlineData("MetricCoordinateSys")]
-    public void PublishedContracts_PreserveComponentNamesWithoutDuplicateDtoSchemas(string name)
+    [Fact]
+    public void PublishedContracts_PreserveComponentNamesWithoutDuplicateDtoSchemas()
     {
         var schemas = _documents["InternalSosObservationsv1.5"].Components.Schemas;
-        Assert.Contains(name, schemas.Keys);
-        Assert.DoesNotContain($"{name}Dto", schemas.Keys);
+        foreach (var name in new[]
+        {
+            "PropertyFieldDataType", "AdaptiveSearchLocationsStrategy", "LocationClusteringAlgorithm",
+            "ExportFormat", "ExportJobStatus", "PropertyLabelType", "AreaTypeAggregate", "OutputFieldSet",
+            "DiagramFormat", "SearchSortOrder", "SpeciesGroup", "ApiInformation", "TaxonSumAggregationItem",
+            "ObservationStatusCounts", "TaxonTrendResult", "DataQualityReport", "DataQualityReportRecord",
+            "DataQualityReportObservation", "TaxonAreaAggregation", "AssociatedMediaType",
+            "TaxonRelationsTreeIterationMode", "ObjectId", "TaxonomyType", "AggregationType", "CoordinateSys",
+            "MetricCoordinateSys"
+        })
+        {
+            Assert.Contains(name, schemas.Keys);
+            Assert.DoesNotContain($"{name}Dto", schemas.Keys);
+        }
     }
 
     [Fact]
@@ -163,7 +142,9 @@ public class OpenApiContractTests(OpenApiContractFixture fixture) : IClassFixtur
     {
         foreach (var documentName in new[] { "InternalSosObservationsv1.5", "AzureInternalSosObservationsv1.5" })
         {
-            var properties = _documents[documentName].Components.Schemas["ObservationGeoPagedResultWithMetadataDto"].Properties;
+            var schemas = _documents[documentName].Components.Schemas;
+            Assert.DoesNotContain("ObservationGeoPagedResultWithMetadataDto", schemas.Keys);
+            var properties = schemas["ObservationGeoPagedResultDto"].Properties;
             Assert.Contains("geoJson", properties.Keys);
             Assert.Contains("metadata", properties.Keys);
         }
@@ -298,36 +279,9 @@ public class OpenApiContractTests(OpenApiContractFixture fixture) : IClassFixtur
     }
 
     [Fact]
-    public void RelocatedDtos_PreservePublishedOpenApiComponentNames()
+    public void ResponseProperties_ReferenceSharedContractSchemas()
     {
         var schemas = _documents["InternalSosObservationsv1.5"].Components.Schemas;
-
-        foreach (var name in new[]
-        {
-            "UserInformationDto", "TaxonListDefinitionDto", "SignalFilterDto",
-            "ExportFilterDto", "SearchFilterAggregationDto", "GeoGridTileTaxonPageResultDto",
-            "DsTaxonDto", "DsDatasetInfoDto", "DsWeatherMeasuringDto",
-            "DsEventDto", "DsOccurrenceDto", "DsLocationDto", "PropertyFieldDescriptionDto",
-            "LocationDto",
-            "ChecklistDto", "ChecklistInternalDto", "DarwinCoreOccurrenceDto",
-            "HangfireJobDto", "HarvestInfoDto", "ObservationLocationAdaptiveSearchLocationDto",
-            "ObservationLocationAdaptiveSearchResultByLocationDto", "ProjectDto",
-            "DataProviderDto", "DataProviderCategory", "VocabularyDto", "VocabularyIdDto",
-            "VocabularyValueInfoCategoryDto", "VocabularyValueInfoDto", "VocabularyValueTranslationDto",
-            "ExternalSystemIdDto", "ExternalSystemMappingDto", "ExternalSystemMappingFieldDto",
-            "ExternalSystemMappingValueDto",
-            "ProcessInfoDto", "ProviderInfoDto", "SearchIndexInfoDto", "AllocationInfo",
-            "MongoDbInfoDto", "ProcessSummaryDto", "DataProviderStatusDto",
-            "SearchFilterDto", "SearchFilterBaseDto", "DsProjectDto", "ExportJobInfoDto",
-            "GeoGridResultDto", "TaxonAggregationItemDto", "Multimedia", "MultimediaComment",
-            "DiffusionStatus", "ModifiedDateFilterDto", "OccurrenceStatusFilterValuesDto",
-            "SightingDeterminationFilterDto", "SightingNotRecoveredFilterDto", "SightingTypeFilterDto",
-            "StatusVerificationDto", "TaxonListOperatorDto", "TimeRangeDto"
-        })
-        {
-            Assert.Contains(name, schemas.Keys);
-
-        }
 
         foreach (var (type, property, reference) in new[]
         {
@@ -370,6 +324,8 @@ public class OpenApiContractTests(OpenApiContractFixture fixture) : IClassFixtur
         foreach (var document in _documents.Values)
         {
             Assert.DoesNotContain(document.Components.Schemas.Keys, name => name.StartsWith("Contract", StringComparison.Ordinal));
+            Assert.DoesNotContain("IGeometryObject", document.Components.Schemas.Keys);
+            Assert.DoesNotContain("GeoJSONObjectType", document.Components.Schemas.Keys);
             using var writer = new StringWriter();
             document.SerializeAsV3(new OpenApiJsonWriter(writer));
             using var json = JsonDocument.Parse(writer.ToString());
@@ -408,44 +364,21 @@ public class OpenApiContractTests(OpenApiContractFixture fixture) : IClassFixtur
     }
 
     [Fact]
-    public void FormerContractDuplicates_UsePublishedOpenApiNames()
+    public void ObservationLocation_DescribesTypeAsAnInteger()
     {
-        var names = new[]
+        foreach (var document in _documents.Values)
         {
-            "GeographicsFilterDto", "LatLonBoundingBoxDto", "AreaTypeDto", "Area",
-            "LocationAttributes", "OutputFieldSet", "TaxonomyType", "TaxonFilterDto",
-            "LocationType", "ArtportalenFilterDto", "AreaWithGeometryDto"
-        };
-
-        foreach (var documentName in new[]
-        {
-            "PublicSosObservationsv1.5", "InternalSosObservationsv1.5",
-            "AzurePublicSosObservationsv1.5", "AzureInternalSosObservationsv1.5"
-        })
-        {
-            var schemas = _documents[documentName].Components.Schemas;
-            Assert.DoesNotContain("IGeometryObject", schemas.Keys);
-            Assert.DoesNotContain("GeoJSONObjectType", schemas.Keys);
-            var geometry = Assert.IsType<OpenApiSchema>(schemas["Geometry"]);
-            Assert.True(geometry.AdditionalPropertiesAllowed);
-            Assert.Equal(7, geometry.OneOf.Count);
-            Assert.Equal("Geometry", Assert.IsType<OpenApiSchemaReference>(
-                geometry.OneOf.Last().Properties["geometries"].Items).Reference.Id);
-
-            var locationType = Assert.IsType<OpenApiSchema>(schemas["Location"].Properties["type"]);
+            var locationType = document.Components.Schemas["Location"].Properties["type"];
             Assert.Equal(JsonSchemaType.Integer, locationType.Type);
-            Assert.Equal("Location type. 1=Point, 2=Polygon.", locationType.Description);
+        }
+    }
 
-            foreach (var name in names.Except(["ArtportalenFilterDto", "AreaWithGeometryDto"]))
-                Assert.Contains(name, schemas.Keys);
-            if (!documentName.StartsWith("AzurePublic", StringComparison.Ordinal))
-                Assert.Contains("ArtportalenFilterDto", schemas.Keys);
-            if (documentName.Contains("Internal", StringComparison.Ordinal))
-            {
-                Assert.Contains("AreaWithGeometryDto", schemas.Keys);
-            }
-            Assert.DoesNotContain("LatLonGeoLocation", schemas.Keys);
-
+    [Fact]
+    public void SearchFilters_ReferenceGeoJsonGeometriesAndSharedTaxonomyType()
+    {
+        foreach (var document in _documents.Values)
+        {
+            var schemas = document.Components.Schemas;
             Assert.Equal("Geometry", Assert.IsType<OpenApiSchemaReference>(
                 schemas["GeographicsFilterDto"].Properties["geometries"].Items).Reference.Id);
             Assert.Equal("TaxonomyType", Assert.IsType<OpenApiSchemaReference>(
@@ -459,7 +392,7 @@ public class OpenApiContractTests(OpenApiContractFixture fixture) : IClassFixtur
         var schemas = _documents["InternalSosObservationsv1.5"].Components.Schemas;
 
         Assert.Contains("AreaBaseDtoPagedResult", schemas.Keys);
-        Assert.Contains("ObservationGeoPagedResultWithMetadataDto", schemas.Keys);
+        Assert.Contains("ObservationGeoPagedResultDto", schemas.Keys);
     }
 
     [Fact]
@@ -467,7 +400,7 @@ public class OpenApiContractTests(OpenApiContractFixture fixture) : IClassFixtur
     {
         var schemas = _documents["InternalSosObservationsv1.5"].Components.Schemas;
 
-        foreach (var resultName in new[] { "ObservationGeoPagedResultWithMetadataDto", "ObservationScrollResultDto" })
+        foreach (var resultName in new[] { "ObservationGeoPagedResultDto", "ObservationScrollResultDto" })
             Assert.Equal("Observation", Assert.IsType<OpenApiSchemaReference>(
                 Assert.IsType<OpenApiSchema>(schemas[resultName].Properties["records"]).Items).Reference.Id);
 

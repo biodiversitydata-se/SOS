@@ -35,13 +35,13 @@ public interface ISosObservationsClient
         CancellationToken cancellationToken = default);
 
     /// <summary>Searches observations and returns a paged geographic result.</summary>
-    Task<GeoPagedResultWithMetadataDto<Observation>> ObservationsBySearchInternalAsync(
+    Task<GeoPagedResultDto<Observation>> ObservationsBySearchInternalAsync(
         SearchFilterInternalDto filter,
         ObservationSearchOptions? options = null,
         CancellationToken cancellationToken = default);
 
     /// <summary>Searches with a JSON-encoded filter and returns a paged geographic result.</summary>
-    Task<GeoPagedResultWithMetadataDto<Observation>> ObservationsBySearchInternalAsync(
+    Task<GeoPagedResultDto<Observation>> ObservationsBySearchInternalAsync(
         string filterJson,
         ObservationSearchOptions? options = null,
         CancellationToken cancellationToken = default);

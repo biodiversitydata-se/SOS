@@ -1791,7 +1791,7 @@ public class ObservationsController : ControllerBase
     ///     }
     /// </example>
     [HttpPost("Internal/Search")]
-    [ProducesResponseType(typeof(GeoPagedResultWithMetadataDto<SOS.Api.Contracts.Observations.Responses.Observation>), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(GeoPagedResultDto<SOS.Api.Contracts.Observations.Responses.Observation>), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
     [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
     [ProducesResponseType((int)HttpStatusCode.ServiceUnavailable)]
@@ -1875,7 +1875,7 @@ public class ObservationsController : ControllerBase
                 metadata = await GetPolygonLocationMetadataAsync(result.Records);   
             }
 
-            GeoPagedResultWithMetadataDto<JsonObject> dto = result.ToGeoPagedResultWithMetadataDto(result.Records, outputFormat, metadata);
+            GeoPagedResultDto<JsonObject> dto = result.ToGeoPagedResultDto(result.Records, outputFormat, metadata);
             this.LogObservationCount(dto?.Records?.Count() ?? 0);
             return new OkObjectResult(dto);
         }

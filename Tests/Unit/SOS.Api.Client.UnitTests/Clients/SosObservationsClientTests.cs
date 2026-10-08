@@ -1,5 +1,6 @@
 ﻿using SOS.Api.Contracts.Observations;
 using FluentAssertions;
+using GeoJSON.Text.Geometry;
 using SOS.Api.Client.Clients;
 using SOS.Api.Client.Requests;
 using SOS.Api.Client.Exceptions;
@@ -183,7 +184,8 @@ public class SosObservationsClientTests
               "metadata": {
                 "polygonLocations": {
                   "123": {
-                    "type": "Polygon"
+                    "type": "Polygon",
+                    "coordinates": [[[14, 58], [15, 58], [15, 59], [14, 58]]]
                   }
                 }
               }
@@ -205,12 +207,11 @@ public class SosObservationsClientTests
         result.Records.Should().BeNull();
         result.GeoJson.Should().Be(geoJson);
         result.Metadata.Should().NotBeNull();
-        //result.Metadata!.Value.GetProperty("polygonLocations")
-        //    .GetProperty("123")
-        //    .GetProperty("type")
-        //    .GetString()
-        //    .Should()
-        //    .Be("Polygon");
+        result.Metadata!.PolygonLocations.Should().ContainKey("123");
+        var polygon = result.Metadata.PolygonLocations!["123"].Should().BeOfType<Polygon>().Subject;
+        var firstCoordinate = polygon.Coordinates[0].Coordinates[0];
+        firstCoordinate.Longitude.Should().Be(14);
+        firstCoordinate.Latitude.Should().Be(58);
     }
 
     [Fact]
@@ -257,7 +258,7 @@ public class SosObservationsClientTests
 
         var result = await client.ObservationsBySearchInternalAsync("{}", cancellationToken: TestContext.Current.CancellationToken);
 
-        result.Should().BeOfType<GeoPagedResultWithMetadataDto<Observation>>();
+        result.Should().BeOfType<GeoPagedResultDto<Observation>>();
         result.Skip.Should().Be(1);
         result.Take.Should().Be(2);
         result.TotalCount.Should().Be(3);

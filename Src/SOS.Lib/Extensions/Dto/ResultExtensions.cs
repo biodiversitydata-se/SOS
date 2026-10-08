@@ -87,15 +87,15 @@ public static class ResultExtensions
 
     extension<TRecord>(PagedResult<TRecord> pagedResult)
     {
-        public GeoPagedResultWithMetadataDto<TRecordDto> ToGeoPagedResultWithMetadataDto<TRecordDto>(
+        public GeoPagedResultDto<TRecordDto> ToGeoPagedResultDto<TRecordDto>(
             IEnumerable<TRecordDto> records,
             OutputFormatDto outputFormat = OutputFormatDto.Json,
             SearchResultMetadataDto? metadata = null)
         {
-            GeoPagedResultWithMetadataDto<TRecordDto> dto;
+            GeoPagedResultDto<TRecordDto> dto;
             if (outputFormat == OutputFormatDto.Json)
             {
-                dto = new GeoPagedResultWithMetadataDto<TRecordDto>
+                dto = new GeoPagedResultDto<TRecordDto>
                 {
                     Records = records?.ToList() ?? [],
                     Skip = pagedResult.Skip,
@@ -108,7 +108,7 @@ public static class ResultExtensions
                 var jsonRecords = records.Cast<JsonObject>();
                 bool flattenProperties = outputFormat == OutputFormatDto.GeoJsonFlat;
                 string geoJson = GeoJsonHelper.GetFeatureCollectionString(jsonRecords, flattenProperties);
-                dto = new GeoPagedResultWithMetadataDto<TRecordDto>
+                dto = new GeoPagedResultDto<TRecordDto>
                 {
                     Skip = pagedResult.Skip,
                     Take = pagedResult.Take,

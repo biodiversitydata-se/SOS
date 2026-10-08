@@ -5,6 +5,8 @@
 ### `Changed`
 
 - OpenAPI schema names for area bounding boxes have changed from `LatLonBoundingBox` and `LatLonCoordinate` to `LatLonBoundingBoxDto` and `LatLonCoordinateDto`, respectively. Only the schema names have changed; model structures, endpoint URLs and JSON field names are unchanged. Existing clients are unaffected. Only consumers regenerating client code from OpenAPI may need to update references to the generated model names.
+- OpenAPI filters now reference the shared `DiffusionStatus` schema instead of the duplicate `DiffusionStatusDto`. Enum values and JSON format are unchanged; consumers regenerating client code may need to update generated enum references.
+- Internal observation search uses `GeoPagedResultDto<T>` (`ObservationGeoPagedResultDto` in OpenAPI) instead of `GeoPagedResultWithMetadataDto<T>`. The schema documents optional `geoJson` and `metadata` fields already supported by the API. HTTP behavior is unchanged.
 
 ## [2026.09.04]
 

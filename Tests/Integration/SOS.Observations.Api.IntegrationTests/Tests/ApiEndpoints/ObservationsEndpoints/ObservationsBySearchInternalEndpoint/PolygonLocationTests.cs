@@ -40,7 +40,7 @@ public class PolygonLocationTests : TestBase
         var response = await apiClient.PostAsync(
             "/observations/internal/search?includePolygonLocations=true",
             JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
-        var result = await response.Content.ReadFromJsonAsync<GeoPagedResultWithMetadataDto<Observation>>(JsonSerializerOptions, TestContext.Current.CancellationToken);
+        var result = await response.Content.ReadFromJsonAsync<GeoPagedResultDto<Observation>>(JsonSerializerOptions, TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -70,7 +70,7 @@ public class PolygonLocationTests : TestBase
         var response = await apiClient.PostAsync(
             "/observations/internal/search",
             JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
-        var result = await response.Content.ReadFromJsonAsync<GeoPagedResultWithMetadataDto<Observation>>(JsonSerializerOptions, TestContext.Current.CancellationToken);
+        var result = await response.Content.ReadFromJsonAsync<GeoPagedResultDto<Observation>>(JsonSerializerOptions, TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -95,7 +95,7 @@ public class PolygonLocationTests : TestBase
         var response = await apiClient.PostAsync(
             "/observations/internal/search?includePolygonLocations=true",
             JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
-        var result = await response.Content.ReadFromJsonAsync<GeoPagedResultWithMetadataDto<Observation>>(JsonSerializerOptions, TestContext.Current.CancellationToken);
+        var result = await response.Content.ReadFromJsonAsync<GeoPagedResultDto<Observation>>(JsonSerializerOptions, TestContext.Current.CancellationToken);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
