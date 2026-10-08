@@ -1,6 +1,6 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <Sdk Name="Aspire.AppHost.Sdk" Version="9.0.0" />
+  <Sdk Name="Aspire.AppHost.Sdk" Version="13.6.1" />
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -8,13 +8,14 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsAspireHost>true</IsAspireHost>
+    <AspireUseCliBundle>true</AspireUseCliBundle>
     <UserSecretsId>14f6519c-5160-4d45-b57b-525904dce4f1</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Aspire.Hosting.AppHost" Version="13.5.3" />
-	<PackageReference Include="Aspire.Hosting.MongoDB" Version="13.5.3" />
-	<PackageReference Include="MessagePack" Version="3.1.8" />
+    <PackageReference Include="Aspire.Hosting.AppHost" Version="13.6.1" />
+	<PackageReference Include="Aspire.Hosting.MongoDB" Version="13.6.1" />
+	<PackageReference Include="MessagePack" Version="3.1.11" />
   </ItemGroup>
 
   <ItemGroup>

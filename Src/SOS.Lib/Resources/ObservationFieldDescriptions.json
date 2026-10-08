@@ -660,8 +660,8 @@
   {
     "PropertyName": "BirdDirectiveAnnex1",
     "PropertyPath": "Taxon.BirdDirectiveAnnex1",
-    "SwedishTitle": "Fågeldirektivet bilaga 1",
-    "EnglishTitle": "Birds Directive Annex 1",
+    "SwedishTitle": "Fågeldirektivet bilaga 1 (Sverige)",
+    "EnglishTitle": "Birds Directive Annex 1 (Sverige)",
     "DataType": "Boolean",
     "DataTypeIsNullable": true,
     "DwcName": "",

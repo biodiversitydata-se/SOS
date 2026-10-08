@@ -1,10 +1,8 @@
 ﻿using Hangfire;
-using Microsoft.Extensions.Logging;
 using Quartz;
 using SOS.Administration.Api.Controllers.Interfaces;
 using SOS.Lib.Helpers;
 using SOS.Lib.Jobs.Export;
-using System;
 
 namespace SOS.Administration.Api.Controllers;
 
@@ -129,7 +127,7 @@ public class ExportJobController : ControllerBase, IExportJobController
                 return BadRequest("You must provide a file name");
             }
 
-            if (!CronExpression.IsValidExpression(cronExpression))
+            if (!CronExpression.TryParse(cronExpression, out var _))
             {
                 return BadRequest("You must provide a correct crone expression");
             }

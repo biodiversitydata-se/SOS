@@ -16,7 +16,7 @@
 		<PackageReference Include="AspNetCore.HealthChecks.SystemMemory" Version="1.0.1" />
 		<PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="9.0.0" />
 		<PackageReference Include="HangFire" Version="1.8.25" />		
-		<PackageReference Include="HangFire.Mongo" Version="1.16.2" />
+		<PackageReference Include="HangFire.Mongo" Version="1.17.0" />
 	</ItemGroup>
 
 	<ItemGroup>

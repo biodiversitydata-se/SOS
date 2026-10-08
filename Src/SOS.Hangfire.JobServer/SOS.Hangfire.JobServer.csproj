@@ -61,19 +61,19 @@
 
 	<ItemGroup>
 		<PackageReference Include="HangFire" Version="1.8.25" />		
-		<PackageReference Include="HangFire.Mongo" Version="1.16.2" />
-		<PackageReference Include="MassTransit" Version="9.2.1" />
-		<PackageReference Include="MassTransit.Azure.ServiceBus.Core" Version="9.2.1" />
+		<PackageReference Include="HangFire.Mongo" Version="1.17.0" />
+		<PackageReference Include="MassTransit" Version="9.2.3" />
+		<PackageReference Include="MassTransit.Azure.ServiceBus.Core" Version="9.2.3" />
 		<PackageReference Include="Microsoft.ApplicationInsights.WorkerService" Version="2.23.0" />
-		<PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.11" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.11" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="10.0.11" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="10.0.11" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.11" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="10.0.11" />
-		<PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.11" />
+		<PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.12" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.12" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="10.0.12" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="10.0.12" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.12" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="10.0.12" />
+		<PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.12" />
 		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.23.0" />		
-		<PackageReference Include="NLog.Web.AspNetCore" Version="6.2.0" />
+		<PackageReference Include="NLog.Web.AspNetCore" Version="6.2.1" />
 		<PackageReference Include="Topshelf" Version="4.3.0" />
 	</ItemGroup>
 
