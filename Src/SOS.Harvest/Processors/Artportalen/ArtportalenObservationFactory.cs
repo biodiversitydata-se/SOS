@@ -399,9 +399,9 @@ public class ArtportalenObservationFactory : ObservationFactoryBase, IObservatio
 
             // Occurrence
             obs.Occurrence = new Occurrence();
-           // obs.Occurrence.AssociatedMedia = verbatimObservation.HasImages && verbatimObservation.FirstImageId > 0
-           //     ? $"https://www.artportalen.se/Image/{verbatimObservation.FirstImageId}" //verbatimObservation.Media?.FirstOrDefault(m => m.FileUri?.StartsWith("http", StringComparison.CurrentCultureIgnoreCase) ?? true).FileUri
-           //     : "";
+            obs.Occurrence.AssociatedMedia = verbatimObservation.HasImages && verbatimObservation.FirstImageId > 0
+                 ? $"{_artPortalenUrl}/Image/{verbatimObservation.FirstImageId}" //verbatimObservation.Media?.FirstOrDefault(m => m.FileUri?.StartsWith("http", StringComparison.CurrentCultureIgnoreCase) ?? true).FileUri
+                 : "";            
             obs.Occurrence.AssociatedReferences = GetAssociatedReferences(verbatimObservation);
             obs.Occurrence.Biotope = GetSosIdFromMetadata(verbatimObservation.Biotope!, VocabularyId.Biotope);
             obs.Occurrence.BiotopeDescription = verbatimObservation.BiotopeDescription?.Clean();
@@ -458,7 +458,7 @@ public class ArtportalenObservationFactory : ObservationFactoryBase, IObservatio
             obs.ArtportalenInternal = new ArtportalenInternal();
             obs.ArtportalenInternal.ActivityCategoryId = verbatimObservation.Activity?.Category?.Id;
             obs.ArtportalenInternal.AssociatedMedia = verbatimObservation.HasImages && verbatimObservation.FirstImageId > 0
-                ? $"https://www.artportalen.se/Image/{verbatimObservation.FirstImageId}" //verbatimObservation.Media?.FirstOrDefault(m => m.FileUri?.StartsWith("http", StringComparison.CurrentCultureIgnoreCase) ?? true).FileUri
+                ? $"{_artPortalenUrl}/Image/{verbatimObservation.FirstImageId}" //verbatimObservation.Media?.FirstOrDefault(m => m.FileUri?.StartsWith("http", StringComparison.CurrentCultureIgnoreCase) ?? true).FileUri
                 : "";
             obs.ArtportalenInternal.BirdValidationAreaIds = verbatimObservation.Site?.BirdValidationAreaIds;
             obs.ArtportalenInternal.ChecklistId = verbatimObservation.ChecklistId;
