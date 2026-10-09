@@ -1,5 +1,6 @@
 ﻿using SOS.Api.Contracts.Observations;
 using SOS.Api.Contracts.Common.Geo;
+using SOS.Api.Contracts.Common;
 using Microsoft.Extensions.Logging;
 using SOS.Harvest.Managers.Interfaces;
 using SOS.Harvest.Processors.Interfaces;
@@ -16,7 +17,6 @@ using SOS.Lib.Models.Verbatim.INaturalist.Service;
 using System.Text.RegularExpressions;
 using Location = SOS.Lib.Models.Processed.Observation.Location;
 using VocabularyValue = SOS.Lib.Models.Processed.Observation.VocabularyValue;
-
 namespace SOS.Harvest.Processors.iNaturalist;
 
 public class iNaturalistObservationFactory : ObservationFactoryBase, IObservationFactory<iNaturalistVerbatimObservation>
@@ -95,7 +95,7 @@ public class iNaturalistObservationFactory : ObservationFactoryBase, IObservatio
         obs.License = verbatim.License_code?.Clean();
         obs.BasisOfRecord = new VocabularyValue { Id = (int)BasisOfRecordId.HumanObservation };
         obs.DatasetName = "iNaturalist";
-        obs.Modified = verbatim.Updated_at != null ? verbatim.Updated_at!.Value.DateTime.ToUniversalTime() : verbatim.Created_at!.Value.DateTime.ToUniversalTime();
+        obs.Modified = verbatim.Updated_at != null ? verbatim.Updated_at!.Value.UtcDateTime : verbatim.Created_at!.Value.UtcDateTime;
         obs.InstitutionCode = _institutionCodeVocabularyValue;
         obs.OwnerInstitutionCode = "iNaturalist";            
         if (verbatim.Obscured.GetValueOrDefault() == true)
@@ -169,9 +169,9 @@ public class iNaturalistObservationFactory : ObservationFactoryBase, IObservatio
             Identifier = photo.Url,
             Type = "StillImage",
             Format = "image/jpeg",
-            Created = verbatim.Time_observed_at != null ? verbatim.Time_observed_at!.Value.DateTime.ToUniversalTime().ToString() :
-                verbatim.Observed_on != null ? verbatim.Observed_on!.Value.DateTime.ToUniversalTime().ToString() :
-                verbatim.Created_at!.Value.DateTime.ToUniversalTime().ToString(),
+            Created = verbatim.Time_observed_at != null ? verbatim.Time_observed_at!.Value.UtcDateTime.ToString() :
+                verbatim.Observed_on != null ? verbatim.Observed_on!.Value.UtcDateTime.ToString() :
+                verbatim.Created_at!.Value.UtcDateTime.ToString(),
             Creator = GetUsername(verbatim.User),
             License = photo.License_code ?? photo.Attribution,
             RightsHolder = GetUsername(verbatim.User)
@@ -180,10 +180,10 @@ public class iNaturalistObservationFactory : ObservationFactoryBase, IObservatio
 
     private Event CreateProcessedEvent(iNaturalistVerbatimObservation verbatim)
     {            
-        var processedEvent = new Event(verbatim.Time_observed_at != null ? verbatim.Time_observed_at.Value.DateTime : 
-            verbatim.Observed_on != null ? verbatim.Observed_on.Value.DateTime : verbatim.Created_at!.Value.DateTime,
-            verbatim.Time_observed_at != null ? verbatim.Time_observed_at.Value.TimeOfDay : null);
-        return processedEvent;
+        var observedAt = verbatim.Time_observed_at ?? verbatim.Observed_on ?? verbatim.Created_at!.Value;
+        var swedishTime = TimeZoneInfo.ConvertTime(observedAt, SwedishTime.TimeZone);
+        return new Event(observedAt.UtcDateTime,
+            verbatim.Time_observed_at.HasValue ? swedishTime.TimeOfDay : null);
     }        
 
     private Lib.Models.Processed.Observation.Identification CreateProcessedIdentification(iNaturalistVerbatimObservation verbatim)
@@ -195,7 +195,7 @@ public class iNaturalistObservationFactory : ObservationFactoryBase, IObservatio
             if (validIdentifications.Any())
             {
                 processedIdentification.IdentifiedBy = string.Join(", ", validIdentifications.Select(m => GetUsername(m.User)));
-                processedIdentification.DateIdentified = validIdentifications.Last().Created_at!.Value.DateTime.ToUniversalTime().ToString();
+                processedIdentification.DateIdentified = validIdentifications.Last().Created_at!.Value.UtcDateTime.ToString();
             }
         }
 
@@ -245,7 +245,7 @@ public class iNaturalistObservationFactory : ObservationFactoryBase, IObservatio
         var processedOccurrence = new Occurrence();
         processedOccurrence.CatalogNumber = verbatim.ObservationId.ToString();
         processedOccurrence.OccurrenceId = $"https://www.inaturalist.org/observations/{verbatim.ObservationId}";
-        processedOccurrence.ReportedDate = verbatim.Created_at!.Value.DateTime.ToUniversalTime();
+        processedOccurrence.ReportedDate = verbatim.Created_at!.Value.UtcDateTime;
         processedOccurrence.OccurrenceRemarks = verbatim.Description?.Clean();
         processedOccurrence.Url = verbatim.Uri;
         if (verbatim.User.Suspended.GetValueOrDefault(false) == true)

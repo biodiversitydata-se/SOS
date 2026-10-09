@@ -5,6 +5,7 @@ using SOS.Api.Client.Workspaces;
 using SOS.Api.Contracts.Aggregations.Requests;
 using SOS.Api.Contracts.Areas.Requests;
 using SOS.Api.Contracts.Areas.Responses;
+using SOS.Api.Contracts.Common;
 using SOS.Api.Contracts.Observations.Requests;
 using SOS.Api.Contracts.Workspaces;
 
@@ -17,7 +18,6 @@ public sealed class SosWorkspaceFilterService : ISosWorkspaceFilterService
 {
     private static readonly int[] NoDataProviderSelection = [-1];
     private static readonly int[] NonMatchingTaxonSelection = [-1];
-    private static readonly TimeZoneInfo SwedishTimeZone = ResolveSwedishTimeZone();
 
     private readonly TimeProvider _timeProvider;
     private readonly WorkspaceTaxonSelectionResolver _taxonSelectionResolver;
@@ -468,40 +468,13 @@ public sealed class SosWorkspaceFilterService : ISosWorkspaceFilterService
     }
 
     private DateTime GetTodayInSweden() =>
-        TimeZoneInfo.ConvertTime(_timeProvider.GetUtcNow(), SwedishTimeZone).Date;
+        TimeZoneInfo.ConvertTime(_timeProvider.GetUtcNow(), SwedishTime.TimeZone).Date;
 
-    private static DateTimeOffset AtSwedishLocalTime(DateTime value)
-    {
-        var unspecified = DateTime.SpecifyKind(value, DateTimeKind.Unspecified);
-        if (unspecified == DateTime.MinValue)
-        {
-            return new DateTimeOffset(unspecified, TimeSpan.Zero);
-        }
-
-        return new DateTimeOffset(unspecified, SwedishTimeZone.GetUtcOffset(unspecified));
-    }
+    private static DateTimeOffset AtSwedishLocalTime(DateTime value) => SwedishTime.FromLocalDateTime(value);
 
     private static DateTimeOffset AtEndOfSwedishDay(DateTime value) =>
         AtSwedishLocalTime(value.Date.AddHours(23).AddMinutes(59).AddSeconds(59));
 
-    private static TimeZoneInfo ResolveSwedishTimeZone()
-    {
-        foreach (var id in new[] { "Europe/Stockholm", "W. Europe Standard Time" })
-        {
-            try
-            {
-                return TimeZoneInfo.FindSystemTimeZoneById(id);
-            }
-            catch (TimeZoneNotFoundException)
-            {
-            }
-            catch (InvalidTimeZoneException)
-            {
-            }
-        }
-
-        throw new TimeZoneNotFoundException("The Swedish time zone could not be resolved.");
-    }
 
     private static (DateTime Start, DateTime End) GetRelativeDateRange(
         WorkspaceDateFilterMode mode,

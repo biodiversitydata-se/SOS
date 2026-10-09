@@ -350,6 +350,26 @@ public class iNaturalistObservationFactoryTests
         processedObservation.Taxon.Id.Should().Be(333333);
     }
 
+    [Theory]
+    [InlineData("2026-01-15T10:00:00Z", "2026-01-15T10:00:00Z", "2026-01-15", "11:00")]
+    [InlineData("2026-07-15T17:00:00-05:00", "2026-07-15T22:00:00Z", "2026-07-16", "00:00")]
+    public void CreateProcessedObservation_PreservesSourceInstantAndUsesSwedishCalendar(
+        string timestamp, string expectedUtc, string expectedDate, string expectedTime)
+    {
+        var verbatim = DeserializeObservation(ObscuredVerbatimObservationJson);
+        verbatim.Time_observed_at = DateTimeOffset.Parse(timestamp);
+        verbatim.Updated_at = verbatim.Time_observed_at;
+
+        var observation = CreateFactory().CreateProcessedObservation(verbatim, false);
+
+        Assert.Equal(DateTimeOffset.Parse(expectedUtc).UtcDateTime, observation.Event.StartDate);
+        Assert.Equal(DateTimeKind.Utc, observation.Event.StartDate!.Value.Kind);
+        Assert.Equal(observation.Event.StartDate, observation.Event.EndDate);
+        Assert.Equal(DateTimeOffset.Parse(expectedUtc).UtcDateTime, observation.Modified);
+        Assert.Equal(expectedDate, observation.Event.PlainStartDate);
+        Assert.Equal(expectedTime, observation.Event.PlainStartTime);
+    }
+
     [Fact]
     public void CreateProcessedObservation_Should_Match_Rank()
     {

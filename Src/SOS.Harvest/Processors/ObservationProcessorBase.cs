@@ -181,7 +181,6 @@ namespace SOS.Harvest.Processors
             Logger.LogDebug("Start writing {@dataProvider} CSV ({@batchId})", dataProvider.Identifier, batchId);
             var csvWriteTimerSessionId = TimeManager.Start(ProcessTimeManager.TimerTypes.CsvWrite);
 
-        LocalDateTimeConverterHelper.ConvertToLocalTime(processedObservations);
         vocabularyValueResolver.ResolveVocabularyMappedValues(processedObservations, Cultures.en_GB, true, true);
         var success = await dwcArchiveFileWriterCoordinator.WriteHeaderlessDwcaFileParts(processedObservations, dataProvider, batchId);
 

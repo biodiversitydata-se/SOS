@@ -5,14 +5,14 @@ using System.Text.Json.Serialization;
 namespace SOS.Api.Contracts.Common;
 
 /// <summary>
-/// Reads a date-only search end date as 23:59:59 in local time.
+/// Reads a date-only search end date as 23:59:59 in Swedish time.
 /// Explicit times and offsets, and ISO timestamp serialization, are preserved.
 /// </summary>
 public sealed class FlexibleNullableEndDateTimeOffsetConverter : JsonConverter<DateTimeOffset?>
 {
     private static readonly FlexibleNullableDateTimeOffsetConverter DateTimeConverter = new();
 
-    /// <summary>Reads a nullable end date, interpreting date-only strings as 23:59:59 in local time.</summary>
+    /// <summary>Reads a nullable end date, interpreting date-only strings as 23:59:59 in Swedish time.</summary>
     public override DateTimeOffset? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         if (reader.TokenType == JsonTokenType.String)
@@ -26,8 +26,7 @@ public sealed class FlexibleNullableEndDateTimeOffsetConverter : JsonConverter<D
             {
                 try
                 {
-                    // Resolve the local offset at the end of the day, including DST changes.
-                    return new DateTimeOffset(date.ToDateTime(new TimeOnly(23, 59, 59), DateTimeKind.Local));
+                    return SwedishTime.FromLocalDateTime(date.ToDateTime(new TimeOnly(23, 59, 59)));
                 }
                 catch (ArgumentOutOfRangeException exception)
                 {

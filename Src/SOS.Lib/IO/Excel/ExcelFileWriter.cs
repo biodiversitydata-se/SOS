@@ -369,7 +369,8 @@ public class ExcelFileWriter : FileWriterBase, IExcelFileWriter
                         object val = value == null ? null : propertyField.DataTypeEnum switch
                         {
                             PropertyFieldDataType.Boolean => ((bool?)value)?.ToString(CultureInfo.InvariantCulture),
-                            PropertyFieldDataType.DateTime => ((DateTime?)value)?.ToShortDateString(),
+                            PropertyFieldDataType.DateTime => value is DateTimeOffset date
+                                ? date.DateTime.ToShortDateString() : ((DateTime?)value)?.ToShortDateString(),
                             _ => value
                         };
 

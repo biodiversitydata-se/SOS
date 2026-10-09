@@ -1,6 +1,7 @@
 ﻿using SOS.Api.Contracts.Aggregations.Requests;
 using SOS.Api.Contracts.Aggregations.Responses;
 using SOS.Api.Contracts.Common.Responses;
+using SOS.Api.Contracts.Common;
 using Elastic.Clients.Elasticsearch;
 using Elastic.Clients.Elasticsearch.Aggregations;
 using Elastic.Clients.Elasticsearch.Cluster;
@@ -191,7 +192,6 @@ public class ProcessedObservationRepository : ProcessedObservationCoreRepository
         var (queries, excludeQueries) = GetCoreQueries<dynamic>(filter);
         queries.AddAggregationFilter(aggregationType);
         
-        var tz = TimeZoneInfo.Local.GetUtcOffset(DateTime.Now);
         var searchResponse = await Client.SearchAsync<dynamic>(s => s
             .Indices(indexNames)
             .Query(q => q
@@ -213,7 +213,7 @@ public class ProcessedObservationRepository : ProcessedObservationCoreRepository
                             _ => CalendarInterval.Day
                         }
                     )
-                    .TimeZone($"{(tz.TotalMinutes > 0 ? "+" : "")}{tz.Hours:00}:{tz.Minutes:00}")
+                    .TimeZone(SwedishTime.TimeZoneId)
                     .Format("yyyy-MM-dd")
                     
                     )
@@ -263,7 +263,6 @@ public class ProcessedObservationRepository : ProcessedObservationCoreRepository
         var (queries, excludeQueries) = GetCoreQueries<dynamic>(filter);
         queries.AddAggregationFilter(AggregationType.SightingsPerWeek48);
 
-        var tz = TimeZoneInfo.Local.GetUtcOffset(DateTime.Now);
         var searchResponse = await Client.SearchAsync<dynamic>(s => s
             .Indices(indexNames)
             .Query(q => q
@@ -444,11 +443,6 @@ public class ProcessedObservationRepository : ProcessedObservationCoreRepository
         var (queries, excludeQueries) = GetCoreQueries<dynamic>(filter);
 
         // Use the zone's rules for each year, not today's fixed daylight-saving offset.
-        var timeZoneId = TimeZoneInfo.Local.Id;
-        if (TimeZoneInfo.TryConvertWindowsIdToIanaId(timeZoneId, out var ianaTimeZoneId))
-        {
-            timeZoneId = ianaTimeZoneId;
-        }
         ExtendedBoundsDate extendedBounds = null;
         if (filter.Date != null)
         {        
@@ -477,7 +471,7 @@ public class ProcessedObservationRepository : ProcessedObservationCoreRepository
                        
                         .Field("event.startDate")
                         .CalendarInterval(CalendarInterval.Year)                            
-                        .TimeZone(timeZoneId)
+                        .TimeZone(SwedishTime.TimeZoneId)
                         .Format("yyyy-MM-dd||date_optional_time")
                         .ExtendedBounds(extendedBounds)
                     )

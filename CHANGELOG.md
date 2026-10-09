@@ -8,6 +8,10 @@
 - OpenAPI filters now reference the shared `DiffusionStatus` schema instead of the duplicate `DiffusionStatusDto`. Enum values and JSON format are unchanged; consumers regenerating client code may need to update generated enum references.
 - Internal observation search uses `GeoPagedResultDto<T>` (`ObservationGeoPagedResultDto` in OpenAPI) instead of `GeoPagedResultWithMetadataDto<T>`. The schema documents optional `geoJson` and `metadata` fields already supported by the API. HTTP behavior is unchanged.
 
+### `Fixed`
+
+- Observation histograms use Swedish calendar boundaries, including historical daylight-saving rules.
+
 ## [2026.09.04]
 
 ### `Added`

@@ -587,9 +587,9 @@ public class GeoJsonFileWriter : FileWriterBase, IGeoJsonFileWriter
             else
             {
                 var processedRecords = (useFastSearch ? fastSearchResult.Records : searchResult.Records)
-                    .Select(r => JsonSerializer.SerializeToNode(r, typeof(Observation), JsonSerializerOptions));
+                    .Select(r => JsonSerializer.SerializeToNode(r, typeof(Observation), JsonSerializerOptions)).ToArray();
                 
-                nrObservations += processedRecords.Count();
+                nrObservations += processedRecords.Length;
                 _vocabularyValueResolver.ResolveVocabularyMappedValues(processedRecords, culture, true);
                 await _generalizationResolver.ResolveGeneralizedObservationsAsync(filter, processedRecords);
                 LocalDateTimeConverterHelper.ConvertToLocalTime(processedRecords);

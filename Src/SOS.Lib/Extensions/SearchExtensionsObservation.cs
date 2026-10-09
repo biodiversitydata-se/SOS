@@ -344,8 +344,8 @@ public static class SearchExtensionsObservation
                     // against the observation's month/day pair. This removes the leap/non-leap ambiguity of day-of-year
                     // matching and handles windows spanning a year boundary naturally, with no reference years.
                     var monthDays = new HashSet<int>();
-                    var filterDate = internalFilter.Date.StartDate.Value.ToLocalTime().Date;
-                    var filterEndDate = internalFilter.Date.EndDate.Value.ToLocalTime().Date;
+                    var filterDate = internalFilter.Date.StartDate.Value.ToSwedishTime().Date;
+                    var filterEndDate = internalFilter.Date.EndDate.Value.ToSwedishTime().Date;
                     while (filterDate <= filterEndDate)
                     {
                         monthDays.Add(filterDate.Month * 100 + filterDate.Day);

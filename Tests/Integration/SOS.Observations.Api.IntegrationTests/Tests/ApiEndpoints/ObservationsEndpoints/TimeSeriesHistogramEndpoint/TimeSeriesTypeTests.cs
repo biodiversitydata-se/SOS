@@ -96,6 +96,40 @@ public class TimeSeriesTypeTests : TestBase
     }
 
     [Fact]
+    public async Task WeeklyHistogram_UsesTheSwedishOffsetOfEachObservation()
+    {
+        var verbatim = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(2)
+            .All().HaveValuesFromPredefinedObservations().Build();
+        var observations = ProcessFixture.ProcessObservations(verbatim);
+        // Sunday evening UTC is still Sunday in winter, but Monday in summer.
+        observations[0].Event = new Event(new DateTime(2026, 1, 18, 22, 30, 0, DateTimeKind.Utc));
+        observations[1].Event = new Event(new DateTime(2026, 7, 19, 22, 30, 0, DateTimeKind.Utc));
+        await ProcessFixture.AddObservationsToElasticsearchAsync(observations);
+        using var client = TestFixture.CreateApiClient();
+        var filter = new SearchFilterAggregationInternalDto
+        {
+            Date = new DateFilterDto
+            {
+                StartDate = DateTimeOffset.Parse("2026-01-01T00:00:00+01:00"),
+                EndDate = DateTimeOffset.Parse("2026-12-31T23:59:59+01:00"),
+                DateFilterType = DateFilterTypeDto.BetweenStartDateAndEndDate
+            }
+        };
+
+        using var response = await client.PostAsync(
+            "/observations/internal/searchaggregated?aggregationType=SightingsPerWeek",
+            JsonContent.Create(filter), TestContext.Current.CancellationToken);
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        using var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken));
+        var occupiedWeeks = json.RootElement.GetProperty("records").EnumerateArray()
+            .Where(record => record.GetProperty("docCount").GetInt64() > 0)
+            .Select(record => record.GetProperty("date").GetDateTime().ToString("yyyy-MM-dd"))
+            .ToArray();
+        occupiedWeeks.Should().BeEquivalentTo(["2026-01-12", "2026-07-20"]);
+    }
+
+    [Fact]
     public async Task YearHistogram_PreservesCalendarYearAtBothBoundaries()
     {
         var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(2)

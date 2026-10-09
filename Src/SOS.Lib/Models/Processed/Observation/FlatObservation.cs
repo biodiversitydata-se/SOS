@@ -1,6 +1,7 @@
 ﻿using System.Globalization;
 using System.Text.RegularExpressions;
 using SOS.Api.Contracts.Lookups.Responses;
+using SOS.Lib.Extensions;
 
 namespace SOS.Lib.Models.Processed.Observation;
 
@@ -15,7 +16,6 @@ public class FlatObservation
     }
 
     private Observation _observation;
-    private static TimeZoneInfo swedenTimeZone = TimeZoneInfo.FindSystemTimeZoneById("W. Europe Standard Time");
     public double? LocationDecimalLatitude => _observation?.Location?.DecimalLatitude;
     public double? LocationDecimalLongitude => _observation?.Location?.DecimalLongitude;
     public string OccurrenceId => _observation?.Occurrence?.OccurrenceId;
@@ -29,20 +29,8 @@ public class FlatObservation
         ["event.discoverymethod"] = x => x._observation?.Event?.DiscoveryMethod?.ToString(),
         ["event.discoverymethod.id"] = x => x._observation?.Event?.DiscoveryMethod?.Id,
         ["event.discoverymethod.value"] = x => x._observation?.Event?.DiscoveryMethod?.Value,
-        ["event.startdate"] = x => {
-            var date = x._observation?.Event?.StartDate;
-            if (date == null) return null;
-            if (date.Value.Kind == DateTimeKind.Utc)
-                return TimeZoneInfo.ConvertTimeFromUtc(date.Value, swedenTimeZone);
-            return date;
-        },
-        ["event.enddate"] = x => {
-            var date = x._observation?.Event?.EndDate;
-            if (date == null) return null;
-            if (date.Value.Kind == DateTimeKind.Utc)
-                return TimeZoneInfo.ConvertTimeFromUtc(date.Value, swedenTimeZone);
-            return date;
-        },
+        ["event.startdate"] = x => (x._observation?.Event?.StartDate).ToSwedishTime(),
+        ["event.enddate"] = x => (x._observation?.Event?.EndDate).ToSwedishTime(),
         ["event.plainstartdate"] = x => x._observation?.Event?.PlainStartDate,
         ["event.plainenddate"] = x => x._observation?.Event?.PlainEndDate,
         ["event.eventid"] = x => x._observation?.Event?.EventId,
@@ -115,13 +103,7 @@ public class FlatObservation
         ["occurrence.recordedby"] = x => x._observation?.Occurrence?.RecordedBy,
         ["occurrence.recordnumber"] = x => x._observation?.Occurrence?.RecordNumber,
         ["occurrence.reportedby"] = x => x._observation?.Occurrence?.ReportedBy,
-        ["occurrence.reporteddate"] = x => {
-            var date = x._observation?.Occurrence?.ReportedDate;
-            if (date == null) return null;
-            if (date.Value.Kind == DateTimeKind.Utc)
-                return TimeZoneInfo.ConvertTimeFromUtc(date.Value, swedenTimeZone);
-            return date;
-        },
+        ["occurrence.reporteddate"] = x => (x._observation?.Occurrence?.ReportedDate).ToSwedishTime(),
         ["occurrence.reproductivecondition"] = x => x._observation?.Occurrence?.ReproductiveCondition?.ToString(),
         ["occurrence.reproductivecondition.id"] = x => x._observation?.Occurrence?.ReproductiveCondition?.Id,
         ["occurrence.reproductivecondition.value"] = x => x._observation?.Occurrence?.ReproductiveCondition?.Value,
@@ -279,13 +261,7 @@ public class FlatObservation
         ["taxon.attributes.gbiftaxonid"] = x => x._observation?.Taxon?.Attributes?.GbifTaxonId,        
         
         // Record level
-        ["modified"] = x => {
-            var date = x._observation?.Modified;
-            if (date == null) return null;
-            if (date.Value.Kind == DateTimeKind.Utc)
-                return TimeZoneInfo.ConvertTimeFromUtc(date.Value, swedenTimeZone);
-            return date;
-        },
+        ["modified"] = x => (x._observation?.Modified).ToSwedishTime(),
         ["sensitive"] = x => x._observation?.Sensitive,
         ["accessrights"] = x => x._observation?.AccessRights?.ToString(),
         ["accessrights.id"] = x => x._observation?.AccessRights?.Id,
@@ -327,7 +303,7 @@ public class FlatObservation
         ["projectssummary.project2category"] = x => x._observation?.ProjectsSummary?.Project2Category,
         ["projectssummary.project2url"] = x => x._observation?.ProjectsSummary?.Project2Url,
         ["projectssummary.project2values"] = x => x._observation?.ProjectsSummary?.Project2Values,
-        ["created"] = x => x._observation?.Created,
+        ["created"] = x => (x._observation?.Created).ToSwedishTime(),
         ["datastewardship.datasetidentifier"] = x => x._observation?.DataStewardship?.DatasetIdentifier,
         ["datastewardship.datasettitle"] = x => x._observation?.DataStewardship?.DatasetTitle,
         ["geologicalcontext"] = x => x._observation?.GeologicalContext,
@@ -467,7 +443,7 @@ public class FlatObservation
                 Convert.ToBoolean(value).ToString(CultureInfo.InvariantCulture),
 
             PropertyFieldDataType.DateTime =>
-                Convert.ToDateTime(value).ToShortDateString(),
+                value is DateTimeOffset date ? date.DateTime.ToShortDateString() : Convert.ToDateTime(value).ToShortDateString(),
 
             PropertyFieldDataType.Double =>
                 Convert.ToDouble(value).ToString(CultureInfo.InvariantCulture),

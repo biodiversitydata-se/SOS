@@ -5,6 +5,38 @@ namespace SOS.Lib.Helpers;
 
 public static class DwcFormatter
 {
+    /// <summary>Formats event dates while preserving their explicit UTC offsets.</summary>
+    public static string CreateDateIntervalString(DateTimeOffset? startDate, DateTimeOffset? endDate) =>
+        CreateDateIntervalString(startDate, startDate?.TimeOfDay, endDate, endDate?.TimeOfDay);
+
+    /// <summary>Formats an event interval, omitting clocks when the observation time is unknown.</summary>
+    public static string CreateDateIntervalString(DateTimeOffset? startDate, TimeSpan? startTime, DateTimeOffset? endDate, TimeSpan? endTime)
+    {
+        if (!startDate.HasValue) return null;
+
+        var startFormat = startTime.HasValue && startTime != TimeSpan.Zero
+            ? "yyyy-MM-dd'T'HH:mm:sszzz" : "yyyy-MM-dd";
+        var start = startDate.Value.ToString(startFormat, CultureInfo.InvariantCulture);
+        if (!endDate.HasValue || startDate == endDate
+            || startDate.Value.Date == endDate.Value.Date && startTime == endTime
+                && (startTime is null || startTime == TimeSpan.Zero || startDate.Value.Offset == endDate.Value.Offset))
+            return start;
+
+        var endFormat = endTime.HasValue && endTime != TimeSpan.Zero
+            ? "yyyy-MM-dd'T'HH:mm:sszzz" : "yyyy-MM-dd";
+        return $"{start}/{endDate.Value.ToString(endFormat, CultureInfo.InvariantCulture)}";
+    }
+
+    /// <summary>Formats event clocks with their explicit UTC offsets.</summary>
+    public static string CreateTimeIntervalString(DateTimeOffset? startDate, DateTimeOffset? endDate)
+    {
+        if (!startDate.HasValue || startDate.Value.TimeOfDay == TimeSpan.Zero) return null;
+        var start = startDate.Value.ToString("HH:mm:sszzz", CultureInfo.InvariantCulture);
+        if (!endDate.HasValue || startDate == endDate) return start;
+        if (endDate.Value.TimeOfDay == TimeSpan.Zero) return null;
+        return $"{start}/{endDate.Value.ToString("HH:mm:sszzz", CultureInfo.InvariantCulture)}";
+    }
+
     /// <summary>
     ///     Create a date formatted according to the ISO 8601 standard.
     /// </summary>
