@@ -202,8 +202,11 @@ public class Occurrence
     public string? ReportedBy { get; set; }
 
     /// <summary>
-    /// Date and time when the species observation was reported (UTC).
+    /// Date and time when the species observation was reported.
+    /// <br/>Observation search responses and GeoJSON observation exports use Swedish time (Europe/Stockholm),
+    /// with the UTC offset at that date: +01:00 in winter or +02:00 in summer.
     /// </summary>
+    /// <example>2026-07-15T12:00:00+02:00</example>
     public System.DateTimeOffset? ReportedDate { get; set; }
 
     /// <summary>The reproductive condition of the observed organism.</summary>

@@ -13,8 +13,12 @@ public class Event
     public string? EventId { get; set; }
 
     /// <summary>
-    /// Start date/time of the event in W. Europe Standard Time.
+    /// Start date/time of the event as an ISO 8601 timestamp.
+    /// <br/>Observation search responses and GeoJSON observation exports use Swedish time (Europe/Stockholm),
+    /// with the UTC offset at that date: +01:00 in winter or +02:00 in summer.
+    /// Other endpoints using this shared model, such as checklists, may return UTC (Z).
     /// </summary>
+    /// <example>2026-01-15T11:00:00+01:00</example>
     public DateTime? StartDate { get; set; }
 
     /// <summary>
@@ -43,8 +47,12 @@ public class Event
     public int? StartDay { get; set; }
 
     /// <summary>
-    /// End date/time of the event in W. Europe Standard Time.
+    /// End date/time of the event as an ISO 8601 timestamp.
+    /// <br/>Observation search responses and GeoJSON observation exports use Swedish time (Europe/Stockholm),
+    /// with the UTC offset at that date: +01:00 in winter or +02:00 in summer.
+    /// Other endpoints using this shared model, such as checklists, may return UTC (Z).
     /// </summary>
+    /// <example>2026-07-15T12:00:00+02:00</example>
     public DateTime? EndDate { get; set; }
 
     /// <summary>

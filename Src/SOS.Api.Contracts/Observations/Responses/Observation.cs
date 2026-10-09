@@ -148,10 +148,13 @@ public class Observation
     public string? License { get; set; }
 
     /// <summary>
-    /// The most recent date-time on which the resource was changed (UTC).
+    /// The most recent date-time on which the resource was changed.
+    /// <br/>Observation search responses and GeoJSON observation exports use Swedish time (Europe/Stockholm),
+    /// with the UTC offset at that date: +01:00 in winter or +02:00 in summer.
     /// <br/>For Darwin Core, recommended best practice is to use an
     /// <br/>encoding scheme, such as ISO 8601:2004(E).
     /// </summary>
+    /// <example>2026-07-15T12:00:00+02:00</example>
     public System.DateTimeOffset? Modified { get; set; }
 
     /// <summary>
@@ -219,8 +222,11 @@ public class Observation
     public ProjectsSummary? ProjectsSummary { get; set; }
 
     /// <summary>
-    /// The date the observation was created (UTC).
+    /// The date and time the observation was created.
+    /// <br/>Observation search responses and GeoJSON observation exports use Swedish time (Europe/Stockholm),
+    /// with the UTC offset at that date: +01:00 in winter or +02:00 in summer.
     /// </summary>
+    /// <example>2026-01-15T11:00:00+01:00</example>
     public System.DateTimeOffset Created { get; set; }
 
     /// <summary>
