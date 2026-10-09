@@ -23,19 +23,21 @@ public static class ProcessedExtensions
 
             TimeSpan? startTime, endTime;
             ParseEventTimes(source, out startTime, out endTime);
+            var startDate = source.StartDate.ToSwedishTime();
+            var endDate = source.EndDate.ToSwedishTime();
 
             return new DarwinCoreEvent
             {
-                EventDate = DwcFormatter.CreateDateIntervalString(source.StartDate?.ToLocalTime(), startTime, source.EndDate?.ToLocalTime(), endTime),
-                EventTime = DwcFormatter.CreateTimeIntervalString(source.StartDate?.ToLocalTime(), source.EndDate?.ToLocalTime()),
+                EventDate = DwcFormatter.CreateDateIntervalString(startDate, startTime, endDate, endTime),
+                EventTime = DwcFormatter.CreateTimeIntervalString(startDate, endDate),
                 Habitat = source.Habitat,
                 SamplingProtocol = source.SamplingProtocol,
                 VerbatimEventDate = source.VerbatimEventDate,
-                Day = source.StartDate?.Day,
-                Month = source.StartDate?.Month,
-                Year = source.StartDate?.Year,
-                StartDayOfYear = source.StartDate?.DayOfYear,
-                EndDayOfYear = source.EndDate?.DayOfYear,
+                Day = startDate?.Day,
+                Month = startDate?.Month,
+                Year = startDate?.Year,
+                StartDayOfYear = startDate?.DayOfYear,
+                EndDayOfYear = endDate?.DayOfYear,
                 EventID = source.EventId,
                 EventRemarks = source.EventRemarks,
                 FieldNotes = source.FieldNotes,

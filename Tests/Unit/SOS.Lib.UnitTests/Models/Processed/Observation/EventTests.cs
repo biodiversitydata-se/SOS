@@ -8,6 +8,36 @@ namespace SOS.Lib.UnitTests.Models.Processed.Observation;
 public class EventTests
 {
     [Theory]
+    [InlineData("2025-12-31T23:30:00Z", "2026-01-01", "00:30", 2026)]
+    [InlineData("2026-07-15T22:30:00Z", "2026-07-16", "00:30", 2026)]
+    public void UtcEvent_PreservesInstant_AndBuildsSwedishCalendarFields(string timestamp, string date, string time, int year)
+    {
+        var utc = DateTimeOffset.Parse(timestamp).UtcDateTime;
+
+        var ev = new Event(utc);
+
+        Assert.Equal(utc, ev.StartDate);
+        Assert.Equal(DateTimeKind.Utc, ev.StartDate!.Value.Kind);
+        Assert.Equal(date, ev.PlainStartDate);
+        Assert.Equal(time, ev.PlainStartTime);
+        Assert.Equal(year, ev.StartYear);
+    }
+
+    [Theory]
+    [InlineData("2026-01-15T11:00:00", "2026-01-15T10:00:00Z", "+01:00")]
+    [InlineData("2026-07-15T12:00:00", "2026-07-15T10:00:00Z", "+02:00")]
+    public void UnspecifiedEvent_IsSwedishTime_AndDarwinCorePreservesItsOffset(string local, string utc, string offset)
+    {
+        var ev = new Event(DateTime.Parse(local));
+
+        Assert.Equal(DateTimeOffset.Parse(utc).UtcDateTime, ev.StartDate);
+        Assert.Equal(local + offset, ev.VerbatimEventDate);
+        var dwc = ev.ToDarwinCore();
+        Assert.Equal(local + offset, dwc.EventDate);
+        Assert.EndsWith(offset, dwc.EventTime);
+    }
+
+    [Theory]
     [MemberData(nameof(EventDatesTestData))]
     public void Test_Create_Event_With_Different_Dates(
         DateTime? startDate,
@@ -42,6 +72,20 @@ public class EventTests
         ev.VerbatimEventDate.Should().Be(expectedVerbatimEventDate);
         evDwc.EventDate.Should().Be(expectedDwcEventDate);
         evDwc.EventTime.Should().Be(expectedDwcEventTime);
+    }
+
+    [Fact]
+    public void RepeatedAutumnClockTime_PreservesBothInstantsInDarwinCore()
+    {
+        var ev = new Event(
+            new DateTime(2026, 10, 25, 0, 30, 0, DateTimeKind.Utc),
+            new DateTime(2026, 10, 25, 1, 30, 0, DateTimeKind.Utc));
+        const string expected = "2026-10-25T02:30:00+02:00/2026-10-25T02:30:00+01:00";
+
+        Assert.Equal(expected, ev.VerbatimEventDate);
+        Assert.Equal(expected, ev.ToDarwinCore().EventDate);
+        Assert.Equal("02:30:00+02:00/02:30:00+01:00", ev.ToDarwinCore().EventTime);
+        Assert.Equal(TimeSpan.FromHours(1), ev.EndDate - ev.StartDate);
     }
 
     public static IEnumerable<object[]> EventDatesTestData =>

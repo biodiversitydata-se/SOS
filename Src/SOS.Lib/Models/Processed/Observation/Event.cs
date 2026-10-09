@@ -1,5 +1,7 @@
 ﻿using SOS.Lib.Helpers;
 using System.Globalization;
+using SOS.Api.Contracts.Common;
+using SOS.Lib.Extensions;
 
 namespace SOS.Lib.Models.Processed.Observation;
 
@@ -19,51 +21,8 @@ public class Event
         {
             return null!;
         }
-        date = date.Value.ToLocalTime();
         var cal = new GregorianCalendar();
         return ((date.Value.Month - 1) * 4) + (int)Math.Ceiling(date.Value.Day / Math.Round((double)cal.GetDaysInMonth(date.Value.Year, date.Value.Month) / 4));
-    }
-
-    private void Initialize(DateTime? startDate, DateTime? endDate)
-    {
-        if (startDate.HasValue && startDate.Value.Kind == DateTimeKind.Unspecified)
-        {
-            startDate = DateTime.SpecifyKind(startDate.Value, DateTimeKind.Local);
-        }
-        if (endDate.HasValue && endDate.Value.Kind == DateTimeKind.Unspecified)
-        {
-            endDate = DateTime.SpecifyKind(endDate.Value, DateTimeKind.Local);
-        }
-
-        VerbatimEventDate = DwcFormatter.CreateDateIntervalString(startDate?.ToLocalTime(), endDate?.ToLocalTime());
-
-        if (startDate.HasValue)
-        {
-            StartDate = startDate.Value.ToUniversalTime();
-
-            var startDateLocal = startDate.Value.ToLocalTime();
-            PlainStartDate = startDateLocal.ToString("yyyy-MM-dd");
-            PlainStartTime = startDateLocal.ToString("HH\\:mm");
-            StartYear = startDateLocal.Year;
-            StartMonth = startDateLocal.Month;
-            StartDay = startDateLocal.Day;
-            StartDayOfYear = startDateLocal.DayOfYear;
-            StartHistogramWeek = CalculateHistogramWeek(startDateLocal);
-        }
-
-        if (endDate.HasValue)
-        {
-            EndDate = endDate.Value.ToUniversalTime();
-           
-            var endDateLocal = endDate.Value.ToLocalTime();
-            PlainEndDate = endDateLocal.ToString("yyyy-MM-dd");
-            PlainEndTime = endDateLocal.ToString("HH\\:mm");
-            EndYear = endDateLocal.Year;
-            EndMonth = endDateLocal.Month;
-            EndDay = endDateLocal.Day;
-            EndDayOfYear = endDateLocal.DayOfYear;
-            EndHistogramWeek = CalculateHistogramWeek(endDateLocal);
-        }
     }
 
     /// <summary>
@@ -97,33 +56,24 @@ public class Event
     /// the time component.
     /// </summary>
     /// <remarks>If either startDate or endDate is provided with an unspecified DateTimeKind, it is assumed to
-    /// be local time. The constructor converts all dates to UTC for internal storage. When ignoreTimePart is true, time
+    /// be Swedish time. The constructor converts all dates to UTC for internal storage. When ignoreTimePart is true, time
     /// values are omitted from the plain date and time properties.</remarks>
     /// <param name="startDate">The start date and time of the event, or null if not specified. If the kind is unspecified, it is treated as
-    /// local time.</param>
-    /// <param name="endDate">The end date and time of the event, or null if not specified. If the kind is unspecified, it is treated as local
+    /// Swedish time.</param>
+    /// <param name="endDate">The end date and time of the event, or null if not specified. If the kind is unspecified, it is treated as Swedish
     /// time.</param>
     /// <param name="ignoreTimePart">true to ignore the time component and only use the date part; otherwise, false. The default is false.</param>
     public Event(DateTime? startDate, DateTime? endDate, bool ignoreTimePart = false)
     {
-        if (startDate.HasValue && startDate.Value.Kind == DateTimeKind.Unspecified)
-        {
-            startDate = DateTime.SpecifyKind(startDate.Value, DateTimeKind.Local);
-        }
-        if (endDate.HasValue && endDate.Value.Kind == DateTimeKind.Unspecified)
-        {
-            endDate = DateTime.SpecifyKind(endDate.Value, DateTimeKind.Local);
-        }
-
-        EndDate = endDate?.ToUniversalTime();
-        StartDate = startDate?.ToUniversalTime();
-        VerbatimEventDate = DwcFormatter.CreateDateIntervalString(startDate?.ToLocalTime(), endDate?.ToLocalTime());
+        EndDate = endDate.HasValue ? SwedishTime.ToUtcDateTime(endDate.Value) : null;
+        StartDate = startDate.HasValue ? SwedishTime.ToUtcDateTime(startDate.Value) : null;
+        var swedishStartDate = StartDate.ToSwedishTime();
+        var swedishEndDate = EndDate.ToSwedishTime();
+        VerbatimEventDate = DwcFormatter.CreateDateIntervalString(swedishStartDate, swedishEndDate);
 
         if (startDate.HasValue)
         {
-            StartDate = startDate.Value.ToUniversalTime();
-
-            var startDateLocal = startDate.Value.ToLocalTime();
+            var startDateLocal = swedishStartDate.Value.DateTime;
             PlainStartDate = startDateLocal.ToString("yyyy-MM-dd");
             if (!ignoreTimePart)
             {
@@ -138,9 +88,7 @@ public class Event
 
         if (endDate.HasValue)
         {
-            EndDate = endDate.Value.ToUniversalTime();
-
-            var endDateLocal = endDate.Value.ToLocalTime();
+            var endDateLocal = swedishEndDate.Value.DateTime;
             PlainEndDate = endDateLocal.ToString("yyyy-MM-dd");
             if (!ignoreTimePart)
             {
@@ -163,19 +111,10 @@ public class Event
     /// <param name="endTime"></param>
     public Event(DateTime? startDate, TimeSpan? startTime, DateTime? endDate, TimeSpan? endTime) : this(startDate, endDate)
     {
-        // Override start/end time 
-        if (startDate.HasValue && startDate.Value.Kind == DateTimeKind.Unspecified)
-        {
-            startDate = DateTime.SpecifyKind(startDate.Value, DateTimeKind.Local);
-        }
-        if (endDate.HasValue && endDate.Value.Kind == DateTimeKind.Unspecified)
-        {
-            endDate = DateTime.SpecifyKind(endDate.Value, DateTimeKind.Local);
-        }
-
+        // Keep unknown observation clocks separate from the stored UTC instants.
         PlainStartTime = startTime?.ToString("hh\\:mm");
         PlainEndTime = endTime?.ToString("hh\\:mm");
-        VerbatimEventDate = DwcFormatter.CreateDateIntervalString(startDate?.ToLocalTime(), startTime, endDate?.ToLocalTime(), endTime);
+        VerbatimEventDate = DwcFormatter.CreateDateIntervalString(StartDate.ToSwedishTime(), startTime, EndDate.ToSwedishTime(), endTime);
     }
 
     /// <summary>
@@ -184,7 +123,7 @@ public class Event
     public string EventId { get; set; }
 
     /// <summary>
-    ///     Start date/time of the event in W. Europe Standard Time.
+    ///     Start date/time of the event, stored in UTC.
     /// </summary>
     public DateTime? StartDate { get; set; }
 
@@ -214,7 +153,7 @@ public class Event
     public int? StartDay { get; set; }
 
     /// <summary>
-    ///     End date/time of the event in W. Europe Standard Time.
+    ///     End date/time of the event, stored in UTC.
     /// </summary>
     public DateTime? EndDate { get; set; }
 

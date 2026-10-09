@@ -7,6 +7,7 @@ namespace SOS.Api.Contracts.Common;
 /// <summary>
 /// Accepts both offset-aware ISO timestamps and the offset-less or culture-formatted
 /// DateTime strings emitted by older SOS clients.
+/// Offset-less values are Swedish local time, independently of the host time zone.
 /// </summary>
 public sealed class FlexibleNullableDateTimeOffsetConverter : JsonConverter<DateTimeOffset?>
 {
@@ -23,20 +24,43 @@ public sealed class FlexibleNullableDateTimeOffsetConverter : JsonConverter<Date
             throw new JsonException("Expected a date and time string.");
         }
 
-        var value = reader.GetString();
-        if (DateTimeOffset.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.AllowWhiteSpaces, out var offsetValue) ||
-            DateTimeOffset.TryParse(value, CultureInfo.CurrentCulture, DateTimeStyles.AllowWhiteSpaces, out offsetValue))
+        // The ISO path avoids culture parsing and preserves explicit offsets.
+        if (reader.TryGetDateTime(out var isoDate))
         {
-            return offsetValue;
+            return isoDate.Kind == DateTimeKind.Unspecified
+                ? ReadSwedishTime(isoDate)
+                : reader.GetDateTimeOffset();
         }
 
-        if (DateTime.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.AllowWhiteSpaces, out var dateValue) ||
-            DateTime.TryParse(value, CultureInfo.CurrentCulture, DateTimeStyles.AllowWhiteSpaces, out dateValue))
+        var value = reader.GetString();
+        const DateTimeStyles styles = DateTimeStyles.AllowWhiteSpaces | DateTimeStyles.RoundtripKind;
+        if (DateTime.TryParse(value, CultureInfo.InvariantCulture, styles, out var dateValue) ||
+            DateTime.TryParse(value, CultureInfo.CurrentCulture, styles, out dateValue))
         {
-            return new DateTimeOffset(DateTime.SpecifyKind(dateValue, DateTimeKind.Local));
+            if (dateValue.Kind == DateTimeKind.Unspecified)
+            {
+                return ReadSwedishTime(dateValue);
+            }
+            if (DateTimeOffset.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.AllowWhiteSpaces, out var offsetValue) ||
+                DateTimeOffset.TryParse(value, CultureInfo.CurrentCulture, DateTimeStyles.AllowWhiteSpaces, out offsetValue))
+            {
+                return offsetValue;
+            }
         }
 
         throw new JsonException($"'{value}' is not a supported date and time value.");
+    }
+
+    private static DateTimeOffset ReadSwedishTime(DateTime value)
+    {
+        try
+        {
+            return SwedishTime.FromLocalDateTime(value);
+        }
+        catch (ArgumentOutOfRangeException exception)
+        {
+            throw new JsonException($"'{value:O}' is not a supported date and time value.", exception);
+        }
     }
 
     /// <summary>Writes an ISO timestamp with its offset, or JSON null when no date-time is supplied.</summary>

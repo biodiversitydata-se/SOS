@@ -70,7 +70,6 @@ public class DwcArchiveEventCsvWriter : IDwcArchiveEventCsvWriter
                 elasticRetrievalStopwatch.Stop();
 
                 // Convert observations to DwC format.
-                LocalDateTimeConverterHelper.ConvertToLocalTime(processedObservations);
                 _vocabularyValueResolver.ResolveVocabularyMappedValues(processedObservations, Cultures.en_GB, true);
                 var dwcObservations = processedObservations.ToDarwinCore().ToArray();
 

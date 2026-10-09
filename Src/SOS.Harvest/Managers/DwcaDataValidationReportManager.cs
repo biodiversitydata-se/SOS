@@ -142,7 +142,6 @@ public class DwcaDataValidationReportManager : IDwcaDataValidationReportManager
                 }
 
                 nrProcessedObservations++;
-                LocalDateTimeConverterHelper.ConvertToLocalTime(processedObservation);
                 _vocabularyValueResolver.ResolveVocabularyMappedValues(new List<Observation>
                     {processedObservation}, true);
                 dwcaObservationFactory.ValidateVerbatimData(verbatimObservation, validationRemarksBuilder);

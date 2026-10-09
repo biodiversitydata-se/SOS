@@ -142,7 +142,6 @@ public abstract class DataValidationReportFactoryBase<TVerbatimObservation> : ID
                 {
                     nrProcessedObservations++;
                     if (processedObservation == null) continue;
-                    LocalDateTimeConverterHelper.ConvertToLocalTime(processedObservation);
                     _vocabularyValueResolver.ResolveVocabularyMappedValues(new List<Observation>
                         {processedObservation!}, true);
                     ValidateVerbatimData(verbatimObservation, validationRemarksBuilder);

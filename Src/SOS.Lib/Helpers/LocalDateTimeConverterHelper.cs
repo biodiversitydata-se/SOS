@@ -1,103 +1,44 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
-using SOS.Lib.Models.Processed.Observation;
-using System;
-using System.Collections.Generic;
+using SOS.Api.Contracts.Common;
+using SOS.Lib.Extensions;
+using System.Globalization;
 using System.Text.Json.Nodes;
 
 namespace SOS.Lib.Helpers;
 
 /// <summary>
-///     Class that can be used for converting UTC dates to local time.
+/// Converts observation response timestamps to Swedish time with an explicit UTC offset.
 /// </summary>
 public static class LocalDateTimeConverterHelper
 {
-    private static TimeZoneInfo swedenTimeZone = TimeZoneInfo.FindSystemTimeZoneById("W. Europe Standard Time");
-
-    public static void ConvertToLocalTime(IEnumerable<Observation> processedObservations)
-    {
-        if (processedObservations == null) return;
-
-        foreach (var observation in processedObservations)
-        {
-            ConvertToLocalTime(observation);
-        }
-    }
-
     public static void ConvertToLocalTime(IEnumerable<JsonNode> processedRecords)
     {
         if (processedRecords == null) return;
 
         foreach (var record in processedRecords)
         {
-            ConvertToLocalTime(record);
+            if (record is not JsonObject observation) continue;
+            ConvertDate(observation, "created");
+            ConvertDate(observation, "modified");
+            if (observation["event"] is JsonObject ev)
+            {
+                ConvertDate(ev, "startDate");
+                ConvertDate(ev, "endDate");
+            }
+            if (observation["occurrence"] is JsonObject occurrence)
+                ConvertDate(occurrence, "reportedDate");
         }
     }
 
-    public static void ConvertToLocalTime(Observation obs)
+    private static void ConvertDate(JsonObject record, string property)
     {
-        obs.Created = obs.Created.ToLocalTime();
-        obs.Modified = obs.Modified?.ToLocalTime();
-        if (obs.Event != null)
-        {
-            obs.Event.StartDate = obs.Event.StartDate?.ToLocalTime();
-            obs.Event.EndDate = obs.Event.EndDate?.ToLocalTime();
-        }
+        if (record[property] is not JsonValue value) return;
 
-        if (obs.Occurrence != null)
-        {
-            obs.Occurrence.ReportedDate = obs.Occurrence.ReportedDate?.ToLocalTime();
-        }
-    }
+        DateTimeOffset instant;
+        if (value.TryGetValue<string>(out var text))
+            instant = DateTimeOffset.Parse(text, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal);
+        else if (value.TryGetValue<DateTimeOffset>(out var offsetDate)) instant = offsetDate;
+        else instant = value.GetValue<DateTime>().ToUtcDateTimeOffset();
 
-    private static void ConvertToLocalTime(JsonNode obs)
-    {
-        if (obs == null)
-        {
-            return;
-        }
-        // Created
-        var createdDateString = (string)obs["created"];
-        if (createdDateString != null)
-        {
-            obs["created"] = DateTime.Parse(createdDateString);
-        }
-
-        // Modified
-        var modifiedDateString = (string)obs["modified"];
-        if (modifiedDateString != null)
-        {
-            obs["modified"] = DateTime.Parse(modifiedDateString);
-        }
-
-        // Event
-        var eventObject = obs["event"];
-        if (eventObject != null)
-        {
-            // StartDate
-            var startDateString = (string)eventObject["startDate"];
-            if (startDateString != null)
-            {
-                eventObject["startDate"] = DateTime.Parse(startDateString);
-            }
-
-            // EndDate
-            var endDateString = (string)eventObject["endDate"];
-            if (endDateString != null)
-            {
-                eventObject["endDate"] = DateTime.Parse(endDateString);
-            }
-        }
-
-        // Occurrence
-        var occurrenceObject = obs["occurrence"];
-        if (occurrenceObject != null)
-        {
-            // StartDate
-            var reportedDateString = (string)occurrenceObject["reportedDate"];
-            if (reportedDateString != null)
-            {
-                occurrenceObject["reportedDate"] = DateTime.Parse(reportedDateString);
-            }
-        }
+        record[property] = TimeZoneInfo.ConvertTime(instant, SwedishTime.TimeZone);
     }
 }
