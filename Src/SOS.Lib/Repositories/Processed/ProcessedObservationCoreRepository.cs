@@ -1734,9 +1734,9 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
 
         searchResponse.ThrowIfInvalid();
         var result = searchResponse.Aggregations
-            .GetLongTerms("projectId")
-                .Buckets
-                    .Select(b => (int)b.Key);
+            .GetLongTerms("projectId")?
+                .Buckets?
+                    .Select(b => (int)b.Key) ?? Array.Empty<int>();
 
         return result;
     }
