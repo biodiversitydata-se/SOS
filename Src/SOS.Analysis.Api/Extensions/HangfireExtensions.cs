@@ -3,7 +3,7 @@ using Hangfire.Mongo;
 using Hangfire.Mongo.Migration.Strategies;
 using Hangfire.Mongo.Migration.Strategies.Backup;
 using MongoDB.Driver;
-using Newtonsoft.Json.Converters;
+using SOS.Lib.Extensions;
 
 namespace SOS.Analysis.Api.Extensions;
 
@@ -25,11 +25,7 @@ public static class HangfireExtensions
                 configuration
                     .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
                     .UseSimpleAssemblyNameTypeSerializer()
-                    .UseRecommendedSerializerSettings(m =>
-                    {
-                        m.Converters.Add(new NetTopologySuite.IO.Converters.GeometryConverter());
-                        m.Converters.Add(new StringEnumConverter());
-                    })
+                    .UseSosHangfireSerializerSettings()
                     .UseMongoStorage(new MongoClient(mongoClientSettings),
                         mongoConfiguration.DatabaseName,
                         new MongoStorageOptions
