@@ -407,12 +407,12 @@ public class InputValidator : IInputValidator
 
         if (skip < 0)
         {
-            errors.Add("Skip must be positive.");
+            errors.Add("Skip must be zero or positive.");
         }
 
-        if (take <= 0)
+        if (take < 0)
         {
-            errors.Add("You must take at least 1 observation.");
+            errors.Add("Take must be zero or positive.");
         }
 
         if (take > _maxBatchSize)
