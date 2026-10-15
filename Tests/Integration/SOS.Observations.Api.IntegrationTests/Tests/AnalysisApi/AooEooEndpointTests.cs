@@ -15,7 +15,7 @@ namespace SOS.Observations.Api.IntegrationTests.Tests.AnalysisApi;
 
 
 [Collection(TestCollection.Name)]
-public class AooEooEndpointTests : TestBase
+public class AooEooEndpointTests : ElasticsearchTestBase
 {
     private const int AccuracyInMeters = 10;
     private const int ExpectedGridCellAreaInKm2 = 4;

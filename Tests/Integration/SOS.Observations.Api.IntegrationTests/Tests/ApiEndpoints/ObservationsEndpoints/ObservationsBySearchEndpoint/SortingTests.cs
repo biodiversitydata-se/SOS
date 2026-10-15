@@ -12,7 +12,7 @@ namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsE
 /// Integration tests for the ObservationsBySearch endpoint with sorting observations scenarios.
 /// </summary>
 [Collection(TestCollection.Name)]
-public class SortingTests : TestBase
+public class SortingTests : ElasticsearchTestBase
 {
     public SortingTests(TestFixture testFixture, ITestOutputHelper output) : base(testFixture, output)
     {

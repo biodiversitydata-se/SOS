@@ -12,7 +12,7 @@ namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.LocationsEndp
 /// Integration tests for GetLocationsByIds.
 /// </summary>
 [Collection(TestCollection.Name)]
-public class GetLocationsByIds : TestBase
+public class GetLocationsByIds : ElasticsearchTestBase
 {
     public GetLocationsByIds(TestFixture testFixture, ITestOutputHelper output) : base(testFixture, output)
     {

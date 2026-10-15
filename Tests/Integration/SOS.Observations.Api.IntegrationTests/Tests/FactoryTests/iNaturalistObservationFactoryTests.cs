@@ -7,6 +7,7 @@ using System.Text.Json;
 namespace SOS.Observations.Api.IntegrationTests.Tests.FactoryTests;
 
 [Collection(TestCollection.Name)]
+[Trait("Category", "ReadOnlyIntegrationTest")]
 public class iNaturalistObservationFactoryTests : TestBase
 {
     public iNaturalistObservationFactoryTests(TestFixture testFixture, ITestOutputHelper output) : base(testFixture, output)

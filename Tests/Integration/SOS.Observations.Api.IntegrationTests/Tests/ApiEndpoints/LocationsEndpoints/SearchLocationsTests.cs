@@ -8,7 +8,7 @@ using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.LocationsEndpoints;
 
 [Collection(TestCollection.Name)]
-public class SearchLocationsTests(TestFixture testFixture, ITestOutputHelper output) : TestBase(testFixture, output)
+public class SearchLocationsTests(TestFixture testFixture, ITestOutputHelper output) : ElasticsearchTestBase(testFixture, output)
 {
     [Fact]
     public async Task SearchLocations_ReturnsLocationDetailsAndPaging()

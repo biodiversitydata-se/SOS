@@ -10,6 +10,8 @@ using SOS.Api.Client.DependencyInjection;
 using System.Collections.Concurrent;
 using Moq;
 using SOS.Lib.Repositories.Resource.Interfaces;
+using SOS.Lib.Services.Interfaces;
+using SOS.Observations.Api.IntegrationTests.Setup.Stubs;
 
 namespace SOS.Observations.Api.IntegrationTests.Setup;
 
@@ -24,6 +26,8 @@ public class TestFixture : IAsyncLifetime
     // Change this to LiveDb when creating test data.
     private DbHostingMode _harvestFixtureDbMode = DbHostingMode.ContainerDb;
     private ServiceProvider? _sosApiClientServiceProvider;
+    private readonly ConcurrentDictionary<string, IUserService> _userServiceStubs = new();
+    private readonly Lazy<WebApplicationFactory<Program>> _userServiceApiFactory;
 
     /// <summary>
     /// The <see cref="ObservationsApiWebApplicationFactory"/> used to create the API client.
@@ -42,6 +46,13 @@ public class TestFixture : IAsyncLifetime
     public TestFixture()
     {
         ApiFactory = new ObservationsApiWebApplicationFactory();
+        _userServiceApiFactory = new(() => ApiFactory.WithWebHostBuilder(builder =>
+            builder.ConfigureTestServices(services =>
+            {
+                services.AddHttpContextAccessor();
+                services.Replace(ServiceDescriptor.Singleton<IUserService>(provider =>
+                    new RequestUserServiceStub(provider.GetRequiredService<IHttpContextAccessor>(), _userServiceStubs)));
+            })));
         AnalysisApiFactory = new AnalysisApiApplicationFactory();
         TestContainerFixture = new TestContainersFixture();
         TelemetryConfiguration.Active.DisableTelemetry = true;
@@ -95,6 +106,20 @@ public class TestFixture : IAsyncLifetime
             });
         }).CreateClient();
         return apiClient;
+    }
+
+    /// <summary>
+    /// Shares one API host for permission tests. Each client selects its own user
+    /// service on every request, even when clients use the same authenticated user ID.
+    /// </summary>
+    public HttpClient CreateApiClientWithUserService(IUserService userService)
+    {
+        ArgumentNullException.ThrowIfNull(userService);
+        var client = _userServiceApiFactory.Value.CreateClient();
+        var key = Guid.NewGuid().ToString("N");
+        _userServiceStubs[key] = userService;
+        client.DefaultRequestHeaders.Add(RequestUserServiceStub.HeaderName, key);
+        return client;
     }
 
     public async ValueTask InitializeAsync()
@@ -151,6 +176,7 @@ public class TestFixture : IAsyncLifetime
     {
         try
         {
+            // ApiFactory also owns and disposes the shared permission-test factory.
             await Task.WhenAll(
                 _sosApiClientServiceProvider?.DisposeAsync().AsTask() ?? Task.CompletedTask,
                 ApiFactory.DisposeAsync().AsTask(),
@@ -158,6 +184,7 @@ public class TestFixture : IAsyncLifetime
         }
         finally
         {
+            _userServiceStubs.Clear();
             try
             {
                 if (ServiceProvider != null) await ServiceProvider.DisposeAsync();

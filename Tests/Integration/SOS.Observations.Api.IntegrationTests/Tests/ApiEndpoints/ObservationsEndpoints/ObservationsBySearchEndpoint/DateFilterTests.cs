@@ -11,7 +11,7 @@ using FluentAssertions.Execution;
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsEndpoints.ObservationsBySearchEndpoint;
 
 [Collection(TestCollection.Name)]
-public class DateFilterTests : TestBase
+public class DateFilterTests : ElasticsearchTestBase
 {
     public DateFilterTests(TestFixture testFixture, ITestOutputHelper output) : base(testFixture, output)
     {

@@ -10,7 +10,7 @@ using FluentAssertions.Execution;
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsEndpoints.TimeSeriesHistogramEndpoint;
 
 [Collection(TestCollection.Name)]
-public class TimeSeriesTypeTests : TestBase
+public class TimeSeriesTypeTests : ElasticsearchTestBase
 {
     public TimeSeriesTypeTests(TestFixture testFixture, ITestOutputHelper output) : base(testFixture, output)
     {

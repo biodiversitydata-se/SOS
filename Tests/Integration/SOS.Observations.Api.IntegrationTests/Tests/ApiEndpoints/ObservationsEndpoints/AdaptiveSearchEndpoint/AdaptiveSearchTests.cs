@@ -17,7 +17,7 @@ using ContractAdaptiveSearchResultDto = SOS.Api.Contracts.Observations.Responses
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsEndpoints.ObservationsBySearchEndpoint;
 
 [Collection(TestCollection.Name)]
-public class AdaptiveSearchTests : TestBase
+public class AdaptiveSearchTests : ElasticsearchTestBase
 {
     public AdaptiveSearchTests(TestFixture testFixture, ITestOutputHelper output) : base(testFixture, output)
     {

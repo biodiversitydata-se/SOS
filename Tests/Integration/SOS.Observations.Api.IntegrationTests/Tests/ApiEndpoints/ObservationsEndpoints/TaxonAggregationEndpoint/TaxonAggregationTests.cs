@@ -9,7 +9,7 @@ using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsEndpoints.TaxonAggregationEndpoint;
 
 [Collection(TestCollection.Name)]
-public class TaxonAggregationTests : TestBase
+public class TaxonAggregationTests : ElasticsearchTestBase
 {
     public TaxonAggregationTests(TestFixture testFixture, ITestOutputHelper output) : base(testFixture, output)
     {

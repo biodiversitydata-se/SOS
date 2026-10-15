@@ -27,6 +27,9 @@ public class ExportAndSendJob : IExportAndSendJob
     private readonly IObservationManager _observationManager;
     private readonly IUserExportRepository _userExportRepository;
     private readonly ILogger<ExportAndSendJob> _logger;
+    private readonly TimeProvider _timeProvider;
+
+    private Task WaitForJobInfoAsync() => Task.Delay(TimeSpan.FromSeconds(1), _timeProvider);
 
     /// <summary>
     /// Remove expired and old jobs
@@ -110,6 +113,11 @@ public class ExportAndSendJob : IExportAndSendJob
     /// <param name="logger"></param>
     /// <exception cref="ArgumentNullException"></exception>
     public ExportAndSendJob(IObservationManager observationManager, IUserExportRepository userExportRepository, ICryptoService cryptoService, IMarkdownHelper filterHelper, ILogger<ExportAndSendJob> logger)
+        : this(observationManager, userExportRepository, cryptoService, filterHelper, logger, TimeProvider.System)
+    {
+    }
+
+    public ExportAndSendJob(IObservationManager observationManager, IUserExportRepository userExportRepository, ICryptoService cryptoService, IMarkdownHelper filterHelper, ILogger<ExportAndSendJob> logger, TimeProvider timeProvider)
     {
         _observationManager = observationManager ?? throw new ArgumentNullException(nameof(observationManager));
         _userExportRepository =
@@ -117,6 +125,7 @@ public class ExportAndSendJob : IExportAndSendJob
         _cryptoService = cryptoService ?? throw new ArgumentNullException(nameof(cryptoService));
         _markdownHelper = filterHelper ?? throw new ArgumentNullException(nameof(filterHelper));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _timeProvider = timeProvider ?? throw new ArgumentNullException(nameof(timeProvider));
     }
 
     /// <inheritdoc />
@@ -134,7 +143,7 @@ public class ExportAndSendJob : IExportAndSendJob
         try
         {
             _logger.LogInformation("Start creating county occurrence report send job");
-            Thread.Sleep(TimeSpan.FromSeconds(1)); // wait for job info to be inserted in MongoDb.
+            await WaitForJobInfoAsync(); // wait for job info to be inserted in MongoDb.
             await UpdateJobInfoStartProcessing(userId, context?.BackgroundJob?.Id);
             var password = await _cryptoService.DecryptAsync(encryptedPassword);
             var response = await _observationManager.CreateAndSendCountyOccurrenceReportAsync(
@@ -189,7 +198,7 @@ public class ExportAndSendJob : IExportAndSendJob
             _logger.LogInformation("Start export and send job");
             var filter = searchFilter.ToSearchFilter(userId, protectionFilter, culture);
             var exportGeometries = filter.Location?.Geometries?.Geometries;
-            Thread.Sleep(TimeSpan.FromSeconds(1)); // wait for job info to be inserted in MongoDb.
+            await WaitForJobInfoAsync(); // wait for job info to be inserted in MongoDb.
             await UpdateJobInfoStartProcessing(userId, context?.BackgroundJob?.Id);
             var password = await _cryptoService.DecryptAsync(encryptedPassword);
 
@@ -260,7 +269,7 @@ public class ExportAndSendJob : IExportAndSendJob
             _logger.LogInformation("Start AOO EOO export and send job");
             var filter = searchFilter.ToSearchFilter(userId, protectionFilter, "en-GB");
             var exportGeometries = filter.Location?.Geometries?.Geometries;
-            Thread.Sleep(TimeSpan.FromSeconds(1)); // wait for job info to be inserted in MongoDb.
+            await WaitForJobInfoAsync(); // wait for job info to be inserted in MongoDb.
             await UpdateJobInfoStartProcessing(userId, context?.BackgroundJob?.Id);
             var password = await _cryptoService.DecryptAsync(encryptedPassword);
 
@@ -355,7 +364,7 @@ public class ExportAndSendJob : IExportAndSendJob
             _logger.LogInformation("Start AOO EOO Article 17 export and send job");
             var filter = searchFilter.ToSearchFilter(userId, protectionFilter, "en-GB");
             var exportGeometries = filter.Location?.Geometries?.Geometries;
-            Thread.Sleep(TimeSpan.FromSeconds(1)); // wait for job info to be inserted in MongoDb.
+            await WaitForJobInfoAsync(); // wait for job info to be inserted in MongoDb.
             await UpdateJobInfoStartProcessing(userId, context?.BackgroundJob?.Id);
             var password = await _cryptoService.DecryptAsync(encryptedPassword);
 

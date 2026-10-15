@@ -16,7 +16,7 @@ using SOS.Harvest.Processors.Artportalen;
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsEndpoints.ObservationsBySearchEndpoint;
 
 [Collection(TestCollection.Name)]
-public class GeneralizationFilterTests : TestBase
+public class GeneralizationFilterTests : ElasticsearchTestBase
 {
     public GeneralizationFilterTests(TestFixture testFixture, ITestOutputHelper output) : base(testFixture, output)
     {
@@ -118,7 +118,7 @@ public class GeneralizationFilterTests : TestBase
             .Build();
 
         var processedObservations = await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
-        var apiClientWithAccessToUser = TestFixture.CreateApiClientWithReplacedService(
+        using var apiClientWithAccessToUser = TestFixture.CreateApiClientWithUserService(
             UserServiceStubFactory.CreateWithSightingAuthority(userId: userId, maxProtectionLevel: 1));
 
         // Act - Get public observations (with user access to one observation)
@@ -185,7 +185,7 @@ public class GeneralizationFilterTests : TestBase
             .Build();
 
         var processedObservations = await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
-        var apiClientWithAccessToUser = TestFixture.CreateApiClientWithReplacedService(
+        using var apiClientWithAccessToUser = TestFixture.CreateApiClientWithUserService(
             UserServiceStubFactory.CreateWithSightingAuthority(userId: userId, maxProtectionLevel: 1));
 
         // Act, Assert - Get public observations (with user access to one observation)
@@ -248,7 +248,7 @@ public class GeneralizationFilterTests : TestBase
             .Build();
 
         var processedObservations = await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
-        var apiClientWithAccessToUser = TestFixture.CreateApiClientWithReplacedService(
+        using var apiClientWithAccessToUser = TestFixture.CreateApiClientWithUserService(
             UserServiceStubFactory.CreateWithSightingAuthority(userId: userId, maxProtectionLevel: 1));
         var searchFilter = new SearchFilterInternalDto
         {
@@ -277,7 +277,7 @@ public class GeneralizationFilterTests : TestBase
         const int userId = TestAuthHandler.DefaultTestUserId;
         var verbatimObservations = CreateTestData(userId);
         var processedObservations = await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);        
-        var apiClientWithAccessToUser = TestFixture.CreateApiClientWithReplacedService(
+        using var apiClientWithAccessToUser = TestFixture.CreateApiClientWithUserService(
             UserServiceStubFactory.CreateWithSightingAuthority(userId: userId, maxProtectionLevel: 1));
         
         // Get my sensitive observations, but not generalized observations
@@ -325,7 +325,7 @@ public class GeneralizationFilterTests : TestBase
         generalizedObservationsCount.Should().Be(0);
 
 
-        var apiClientWithAccessToLevel3 = TestFixture.CreateApiClientWithReplacedService(
+        using var apiClientWithAccessToLevel3 = TestFixture.CreateApiClientWithUserService(
             UserServiceStubFactory.CreateWithSightingAuthority(maxProtectionLevel: 3));
 
         // Get sensitive observations and without generalized observations
@@ -368,7 +368,7 @@ public class GeneralizationFilterTests : TestBase
         const int userId = TestAuthHandler.DefaultTestUserId;
         var verbatimObservations = CreateTestData(userId);
         var processedObservations = await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
-        var apiClientWithAccessToLevel3 = TestFixture.CreateApiClientWithReplacedService(
+        using var apiClientWithAccessToLevel3 = TestFixture.CreateApiClientWithUserService(
             UserServiceStubFactory.CreateWithSightingAuthority(maxProtectionLevel: 3));
 
         // Get sensitive observations and without generalized observations
@@ -411,7 +411,7 @@ public class GeneralizationFilterTests : TestBase
         const int userId = TestAuthHandler.DefaultTestUserId;
         var verbatimObservations = CreateTestData(userId);
         var processedObservations = await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
-        var apiClientWithAccessToUser = TestFixture.CreateApiClientWithReplacedService(
+        using var apiClientWithAccessToUser = TestFixture.CreateApiClientWithUserService(
             UserServiceStubFactory.CreateWithSightingAuthority(userId: userId, maxProtectionLevel: 1));
 
         // Get only public observations
@@ -451,7 +451,7 @@ public class GeneralizationFilterTests : TestBase
         const int userId = TestAuthHandler.DefaultTestUserId;
         var verbatimObservations = CreateTestData(userId);
         var processedObservations = await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
-        var apiClientWithAccessToUser = TestFixture.CreateApiClientWithReplacedService(
+        using var apiClientWithAccessToUser = TestFixture.CreateApiClientWithUserService(
             UserServiceStubFactory.CreateWithSightingAuthority(userId: userId, maxProtectionLevel: 1));
         
         // Search both public and sensitive observations
@@ -474,7 +474,7 @@ public class GeneralizationFilterTests : TestBase
         const int userId = TestAuthHandler.DefaultTestUserId;
         var verbatimObservations = CreateTestData(userId);
         var processedObservations = await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
-        var apiClientWithAccessToUser = TestFixture.CreateApiClientWithReplacedService(
+        using var apiClientWithAccessToUser = TestFixture.CreateApiClientWithUserService(
             UserServiceStubFactory.CreateWithSightingAuthority(userId: userId, maxProtectionLevel: 1));
 
         // Act, Assert

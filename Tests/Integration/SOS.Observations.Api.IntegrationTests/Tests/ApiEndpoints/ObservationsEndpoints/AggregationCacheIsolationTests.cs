@@ -12,7 +12,7 @@ using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsEndpoints;
 
 [Collection(TestCollection.Name)]
-public class AggregationCacheIsolationTests(TestFixture fixture, ITestOutputHelper output) : TestBase(fixture, output)
+public class AggregationCacheIsolationTests(TestFixture fixture, ITestOutputHelper output) : ElasticsearchTestBase(fixture, output)
 {
     [Fact]
     public async Task Aggregation_DoesNotShareMyObservationResultsBetweenUsers()

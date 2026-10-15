@@ -12,7 +12,7 @@ using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ExportsEndpoints;
 
 [Collection(TestCollection.Name)]
-public class DownloadGeoJsonInternalTests : TestBase
+public class DownloadGeoJsonInternalTests : ElasticsearchTestBase
 {
     public DownloadGeoJsonInternalTests(TestFixture testFixture, ITestOutputHelper output) : base(testFixture, output)
     {
@@ -121,54 +121,49 @@ public class DownloadGeoJsonInternalTests : TestBase
     }
 
     [Fact]
-    public async Task DownloadGeoJsonFileEndpoint_ReturnsExpectedObservations_WhenSearchingForSensitiveObservations_GivenTheUserHasAccessRights()
+    public async Task DownloadGeoJsonInternal_AppliesProtectionFilterAndClearance()
     {
         // Arrange
-        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(5)
+        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(7)
             .All().HaveValuesFromPredefinedObservations()
             .TheFirst(3).HaveTaxonSensitivityCategory(3)
              .TheNext(2).HaveTaxonSensitivityCategory(4)
             .Build();
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
         var userServiceStub = UserServiceStubFactory.CreateWithSightingAuthority(maxProtectionLevel: 3);
-        var apiClient = TestFixture.CreateApiClientWithReplacedService(userServiceStub);
-        var searchFilter = new SearchFilterInternalDto { OccurrenceStatus = OccurrenceStatusFilterValuesDto.BothPresentAndAbsent };
-
-        // Act
-        var response = await apiClient.PostAsync($"/exports/internal/download/geojson?gzip=false&sensitiveObservations=true", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
-        byte[] contentBytes = await response.Content.ReadAsByteArrayAsync(TestContext.Current.CancellationToken);
-
-        // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var fileEntries = GeoJsonHelper.ReadGeoJsonFile(contentBytes);
-        fileEntries.Count.Should().Be(3, because: "3 observations added to Elasticsearch have sensitivty category 3 and the user has max access rights to category 3.");
-    }
-
-    [Fact]
-    public async Task DownloadGeoJsonFileEndpoint_ReturnsExpectedObservations_WhenSearchingForBothPublicAndSensitiveObservations_GivenTheUserHasAccessRights()
-    {
-        // Arrange
-        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(5)
-            .All().HaveValuesFromPredefinedObservations()
-                .TheFirst(3).HaveTaxonSensitivityCategory(3)
-            .Build();
-        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
-        var userServiceStub = UserServiceStubFactory.CreateWithSightingAuthority(maxProtectionLevel: 6);
-        var apiClient = TestFixture.CreateApiClientWithReplacedService(userServiceStub);
-        var searchFilter = new SearchFilterInternalDto
-        { 
-            ProtectionFilter = ProtectionFilterDto.BothPublicAndSensitive,    
-            OccurrenceStatus = OccurrenceStatusFilterValuesDto.BothPresentAndAbsent
+        using var apiClient = TestFixture.CreateApiClientWithUserService(userServiceStub);
+        var sensitiveIds = verbatimObservations.Take(3)
+            .Select(observation => $"urn:lsid:artportalen.se:sighting:{observation.SightingId}").ToArray();
+        var publicIds = verbatimObservations.Skip(5)
+            .Select(observation => $"urn:lsid:artportalen.se:sighting:{observation.SightingId}").ToArray();
+        var cases = new[]
+        {
+            (Protection: ProtectionFilterDto.Public, ExpectedIds: publicIds),
+            (Protection: ProtectionFilterDto.Sensitive, ExpectedIds: sensitiveIds),
+            (Protection: ProtectionFilterDto.BothPublicAndSensitive, ExpectedIds: publicIds.Concat(sensitiveIds).ToArray())
         };
 
-        // Act
-        var response = await apiClient.PostAsync($"/exports/internal/download/geojson?gzip=false&sensitiveObservations=true", JsonContent.Create(searchFilter), TestContext.Current.CancellationToken);
-        byte[] contentBytes = await response.Content.ReadAsByteArrayAsync(TestContext.Current.CancellationToken);
+        foreach (var testCase in cases)
+        {
+            using var scope = new AssertionScope($"ProtectionFilter={testCase.Protection}");
+            var filter = new SearchFilterInternalDto
+            {
+                ProtectionFilter = testCase.Protection,
+                OccurrenceStatus = OccurrenceStatusFilterValuesDto.BothPresentAndAbsent
+            };
+            using var response = await apiClient.PostAsync(
+                "/exports/internal/download/geojson?gzip=false&flat=true&propertyLabelType=PropertyPath&sensitiveObservations=true",
+                JsonContent.Create(filter), TestContext.Current.CancellationToken);
+            using var json = JsonDocument.Parse(await response.Content.ReadAsByteArrayAsync(TestContext.Current.CancellationToken));
+            var occurrenceIds = json.RootElement.GetProperty("features").EnumerateArray()
+                .Select(feature => feature.GetProperty("properties").EnumerateObject()
+                    .Single(property => property.Name.Equals("occurrence.occurrenceId", StringComparison.OrdinalIgnoreCase))
+                    .Value.GetString());
 
-        // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var fileEntries = GeoJsonHelper.ReadGeoJsonFile(contentBytes);
-        fileEntries.Count.Should().Be(5, because: "5 observations were added and no filter was used.");
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
+            occurrenceIds.Should().BeEquivalentTo(testCase.ExpectedIds,
+                "only public observations and protected observations within the user's clearance may be exported");
+        }
     }
 
 }

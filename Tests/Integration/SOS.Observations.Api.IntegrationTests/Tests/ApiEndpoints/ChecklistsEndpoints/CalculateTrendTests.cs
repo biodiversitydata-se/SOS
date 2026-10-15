@@ -10,7 +10,7 @@ using FluentAssertions.Execution;
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ChecklistsEndpoints;
 
 [Collection(TestCollection.Name)]
-public class CalculateTrendTests : TestBase
+public class CalculateTrendTests : ElasticsearchTestBase
 {
     public CalculateTrendTests(TestFixture testFixture, ITestOutputHelper output) : base(testFixture, output)
     {

@@ -10,7 +10,7 @@ using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsEndpoints.SearchAggregatedInternalEndpoint;
 
 [Collection(TestCollection.Name)]
-public class AggregationTypeTests : TestBase
+public class AggregationTypeTests : ElasticsearchTestBase
 {
     public AggregationTypeTests(TestFixture testFixture, ITestOutputHelper output) : base(testFixture, output)
     {

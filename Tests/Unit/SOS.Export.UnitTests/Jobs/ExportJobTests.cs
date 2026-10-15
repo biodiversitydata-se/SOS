@@ -5,6 +5,7 @@ using SOS.Api.Contracts.Exports.Responses;
 using SOS.Api.Contracts.Exports.Requests;
 using Hangfire;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Time.Testing;
 using Moq;
 using SOS.Export.Jobs;
 using SOS.Export.Managers.Interfaces;
@@ -39,6 +40,7 @@ public class ExportAndSendJobTests
     private readonly Mock<ICryptoService> _cryptoService;
     private readonly Mock<IMarkdownHelper> _markdownHelper;
     private readonly Mock<ILogger<ExportAndSendJob>> _loggerMock;
+    private readonly FakeTimeProvider _timeProvider = new();
 
     /// <summary>
     ///     Return object to be tested
@@ -48,7 +50,8 @@ public class ExportAndSendJobTests
         _userExportRepository.Object,
         _cryptoService.Object,
         _markdownHelper.Object,
-        _loggerMock.Object);
+        _loggerMock.Object,
+        _timeProvider);
 
     /// <summary>
     ///     Test run fail
@@ -93,13 +96,16 @@ public class ExportAndSendJobTests
 
         Func<Task> act = async () =>
         {
-            await observationManager.RunAsync(new SearchFilterBaseDto(), ProtectionFilterDto.Public, 0, 0, "", null, "", ExportFormat.DwC, "en-GB", false, PropertyLabelType.PropertyName, false, false, null, false, null, JobCancellationToken.Null);
+            var task = observationManager.RunAsync(new SearchFilterBaseDto(), ProtectionFilterDto.Public, 0, 0, "", null, "", ExportFormat.DwC, "en-GB", false, PropertyLabelType.PropertyName, false, false, null, false, null, JobCancellationToken.Null);
+            _timeProvider.Advance(TimeSpan.FromSeconds(1));
+            await task;
         };
 
         //-----------------------------------------------------------------------------------------------------------
         // Assert
         //-----------------------------------------------------------------------------------------------------------
-        await act.Should().ThrowAsync<Exception>();
+        await act.Should().ThrowAsync<Exception>().WithMessage("Export and send job failed");
+        _observationManager.VerifyAll();
     }
 
     /// <summary>
@@ -145,12 +151,20 @@ public class ExportAndSendJobTests
         //-----------------------------------------------------------------------------------------------------------
         var observationManager = TestObject;
 
-        var result = await observationManager.RunAsync(new SearchFilterBaseDto(), ProtectionFilterDto.Public, 0, 0, "", null, "", ExportFormat.DwC, "en-GB", false, PropertyLabelType.PropertyName, false, false, null, false, null, JobCancellationToken.Null);
+        var task = observationManager.RunAsync(new SearchFilterBaseDto(), ProtectionFilterDto.Public, 0, 0, "", null, "", ExportFormat.DwC, "en-GB", false, PropertyLabelType.PropertyName, false, false, null, false, null, JobCancellationToken.Null);
+        task.IsCompleted.Should().BeFalse();
+        _userExportRepository.Verify(repository => repository.GetAsync(It.IsAny<int>()), Times.Never);
+        _timeProvider.Advance(TimeSpan.FromMilliseconds(999));
+        task.IsCompleted.Should().BeFalse();
+        _userExportRepository.Verify(repository => repository.GetAsync(It.IsAny<int>()), Times.Never);
+        _timeProvider.Advance(TimeSpan.FromMilliseconds(1));
+        var result = await task;
 
         //-----------------------------------------------------------------------------------------------------------
         // Assert
         //-----------------------------------------------------------------------------------------------------------
         result.Should().Be(true);
+        _observationManager.VerifyAll();
     }
 
     [Fact]
@@ -180,7 +194,7 @@ public class ExportAndSendJobTests
                     It.IsAny<bool>(),
                     JobCancellationToken.Null)
             )
-            .Throws(new Exception());
+            .Throws(new InvalidOperationException("Export failed in the manager"));
         _userExportRepository.Setup(uer => uer.GetAsync(It.IsAny<int>())).ReturnsAsync(new UserExport());
         _userExportRepository.Setup(uer => uer.AddOrUpdateAsync(It.IsAny<UserExport>())).ReturnsAsync(true);
         _markdownHelper.Setup(fh => fh.GetFilterMarkDownAsync(It.IsAny<SearchFilterBaseDto>(), CancellationToken.None)).ReturnsAsync((MemoryStream)null);
@@ -193,12 +207,15 @@ public class ExportAndSendJobTests
 
         Func<Task> act = async () =>
         {
-            await observationManager.RunAsync(new SearchFilterBaseDto(), ProtectionFilterDto.Public, 0, 0, "", null, "", ExportFormat.DwC, "en-GB", false, PropertyLabelType.PropertyName, false, false, null, false, null, JobCancellationToken.Null);
+            var task = observationManager.RunAsync(new SearchFilterBaseDto(), ProtectionFilterDto.Public, 0, 0, "", null, "", ExportFormat.DwC, "en-GB", false, PropertyLabelType.PropertyName, false, false, null, false, null, JobCancellationToken.Null);
+            _timeProvider.Advance(TimeSpan.FromSeconds(1));
+            await task;
         };
 
         //-----------------------------------------------------------------------------------------------------------
         // Assert
         //-----------------------------------------------------------------------------------------------------------
-        await act.Should().ThrowAsync<Exception>();
+        await act.Should().ThrowAsync<InvalidOperationException>().WithMessage("Export failed in the manager");
+        _observationManager.VerifyAll();
     }
 }

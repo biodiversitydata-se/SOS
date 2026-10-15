@@ -9,7 +9,7 @@ using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsEndpoints.ObservationsByCursorEndpoint;
 
 [Collection(TestCollection.Name)]
-public class ObservationsByCursorTests : TestBase
+public class ObservationsByCursorTests : ElasticsearchTestBase
 {
     public ObservationsByCursorTests(TestFixture testFixture, ITestOutputHelper output) : base(testFixture, output)
     {

@@ -17,7 +17,7 @@ namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsE
 /// Integration tests for ObservationsBySearch endpoint when using taxon filters.
 /// </summary>
 [Collection(TestCollection.Name)]
-public class TaxonFilterTests : TestBase
+public class TaxonFilterTests : ElasticsearchTestBase
 {
     public TaxonFilterTests(TestFixture testFixture, ITestOutputHelper output) : base(testFixture, output)
     {

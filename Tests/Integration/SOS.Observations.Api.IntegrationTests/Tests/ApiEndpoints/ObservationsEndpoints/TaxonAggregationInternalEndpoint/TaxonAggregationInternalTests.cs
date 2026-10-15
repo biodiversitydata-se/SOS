@@ -12,7 +12,7 @@ using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsEndpoints.TaxonAggregationInternalEndpoint;
 
 [Collection(TestCollection.Name)]
-public class TaxonAggregationInternalTests : TestBase
+public class TaxonAggregationInternalTests : ElasticsearchTestBase
 {
     public TaxonAggregationInternalTests(TestFixture testFixture, ITestOutputHelper output) : base(testFixture, output)
     {
@@ -94,7 +94,7 @@ public class TaxonAggregationInternalTests : TestBase
         verbatimObservations[1].TaxonId = sensitiveTaxonIds[1];
         verbatimObservations[1].ProtectedBySystem = true;
 
-        var apiClient = TestFixture.CreateApiClientWithReplacedService(
+        using var apiClient = TestFixture.CreateApiClientWithUserService(
             UserServiceStubFactory.CreateWithSightingAuthority(maxProtectionLevel: 3));
         var searchFilter = new SearchFilterAggregationInternalDto
         {

@@ -6,6 +6,7 @@ using System.Text;
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.DataProvidersEndpoints;
 
 [Collection(TestCollection.Name)]
+[Trait("Category", "ReadOnlyIntegrationTest")]
 public class DataProviderEmlEndpointTests(TestFixture fixture)
 {
     [Fact]

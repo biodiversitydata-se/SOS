@@ -6,6 +6,7 @@ using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
 namespace SOS.Observations.Api.IntegrationTests.Tests.Processing;
 
 [Collection(TestCollection.Name)]
+[Trait("Category", "ReadOnlyIntegrationTest")]
 public class ArtportalenChecklistProcessorTests : TestBase
 {
     public ArtportalenChecklistProcessorTests(TestFixture testFixture, ITestOutputHelper output) : base(testFixture, output)

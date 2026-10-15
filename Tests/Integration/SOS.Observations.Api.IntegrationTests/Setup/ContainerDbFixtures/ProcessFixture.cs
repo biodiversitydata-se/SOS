@@ -86,7 +86,7 @@ public class ProcessFixture : IProcessFixture
     private ArtportalenEventProcessor _artportalenEventProcessor { get; set; }
     private DataProvider _testDataProvider = new DataProvider { Id = 1, Identifier = "TestDataProvider" };
 
-    // TestBase clears all indices before each test. Only subsequent writes need to replace test data.
+    // ElasticsearchTestBase clears all indices before each test. Only subsequent writes need to replace test data.
     // Keep index writes in these fixture helpers so this state also covers processor/import paths.
     private bool _observationsWritten;
     private bool _datasetsWritten;

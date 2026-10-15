@@ -7,6 +7,7 @@ namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.EnvironmentEn
 /// Integration tests for the get Environment endpoint.
 /// </summary>
 [Collection(TestCollection.Name)]
+[Trait("Category", "ReadOnlyIntegrationTest")]
 public class EnvironmentEndpointTests : TestBase
 {
     public EnvironmentEndpointTests(TestFixture testFixture, ITestOutputHelper output) : base(testFixture, output)

@@ -11,7 +11,7 @@ using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ExportsEndpoints;
 
 [Collection(TestCollection.Name)]
-public class DownloadCsvTests : TestBase
+public class DownloadCsvTests : ElasticsearchTestBase
 {
     public DownloadCsvTests(TestFixture testFixture, ITestOutputHelper output) : base(testFixture, output)
     {

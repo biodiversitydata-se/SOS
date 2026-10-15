@@ -4,6 +4,7 @@ using SOS.Api.Contracts.Common.Geo;
 using SOS.Api.Contracts.Common.Responses;
 using SOS.Api.Contracts.Observations.Requests;
 using FizzWare.NBuilder;
+using FluentAssertions.Execution;
 using NetTopologySuite.Geometries;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Processed.Observation;
@@ -18,7 +19,7 @@ using SOS.Lib.Extensions.Dto;
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsEndpoints.ObservationsBySearchEndpoint;
 
 [Collection(TestCollection.Name)]
-public class GeographicsFilterTests : TestBase
+public class GeographicsFilterTests : ElasticsearchTestBase
 {
     public GeographicsFilterTests(TestFixture testFixture, ITestOutputHelper output) : base(testFixture, output)
     {
@@ -372,49 +373,7 @@ public class GeographicsFilterTests : TestBase
     }
 
     [Fact]
-    public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_ConsiderAuthorizationBuffer()
-    {
-        //-----------------------------------------------------------------------------------------------------------
-        // Arrange
-        //-----------------------------------------------------------------------------------------------------------
-        const int bufferSize = 1000;
-        var uppsala = Geometries.UppsalaMunicipality();
-        var uppsalaWithBuffer = uppsala.Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM).Buffer(bufferSize).Transform(CoordinateSys.SWEREF99_TM, CoordinateSys.WGS84);
-        var buffer = uppsalaWithBuffer.Difference(uppsala);
-        var inside = uppsala.InteriorPoint;
-        var insideBuffer = buffer.InteriorPoint;
-        var outside = new Point(uppsalaWithBuffer.EnvelopeInternal.MaxX + 0.5, uppsalaWithBuffer.EnvelopeInternal.MinY - 0.5);
-        var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(4)
-            .All()
-                .HaveValuesFromPredefinedObservations()
-                .HaveTaxonSensitivityCategory(4)
-            .TheFirst(1).HaveCoordinates(inside.X, inside.Y, 10)
-            .TheNext(1).HaveCoordinates(insideBuffer.X, insideBuffer.Y, 10)
-            .TheNext(2).HaveCoordinates(outside.X, outside.Y, 10)
-            .Build();
-        
-        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
-        var userServiceStub = UserServiceStubFactory.CreateWithMunicipalitySightingIndicationAuthority(maxProtectionLevel: 5, "380"/*Uppsala*/, bufferSize);
-        var apiClient = TestFixture.CreateApiClientWithReplacedService(userServiceStub);
-        var searchFilter = new SearchFilterDto
-        {
-            Geographics = new GeographicsFilterDto
-            {
-                ConsiderAuthorizationBuffer = true
-            }
-        };
-        // Act
-        var response = await apiClient.PostAsync($"/observations/search?sensitiveObservations=true", JsonContent.Create(searchFilter, options: JsonSerializerOptions), TestContext.Current.CancellationToken);
-        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);
-
-        // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
-        result!.TotalCount.Should().Be(2,
-            because: $"two observations are in Uppsala or max {bufferSize}m outside.");
-    }
-
-    [Fact]
-    public async Task ObservationsBySearchEndpoint_ReturnsExpectedObservations_DontConsiderAuthorizationBuffer()
+    public async Task ObservationsBySearchEndpoint_AppliesAuthorizationBufferOnlyWhenRequested()
     {
         //-----------------------------------------------------------------------------------------------------------
         // Arrange
@@ -437,21 +396,26 @@ public class GeographicsFilterTests : TestBase
 
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
         var userServiceStub = UserServiceStubFactory.CreateWithMunicipalitySightingIndicationAuthority(maxProtectionLevel: 5, "380"/*Uppsala*/, bufferSize);
-        var apiClient = TestFixture.CreateApiClientWithReplacedService(userServiceStub);
-        var searchFilter = new SearchFilterDto
+        using var apiClient = TestFixture.CreateApiClientWithUserService(userServiceStub);
+        foreach (var considerBuffer in new[] { true, false })
         {
-            Geographics = new GeographicsFilterDto
+            using var scope = new AssertionScope($"ConsiderAuthorizationBuffer={considerBuffer}");
+            var searchFilter = new SearchFilterDto
             {
-                ConsiderAuthorizationBuffer = false
-            }
-        };
-        // Act
-        var response = await apiClient.PostAsync($"/observations/search?sensitiveObservations=true", JsonContent.Create(searchFilter, options: JsonSerializerOptions), TestContext.Current.CancellationToken);
-        var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);
+                Geographics = new GeographicsFilterDto { ConsiderAuthorizationBuffer = considerBuffer }
+            };
+            var expectedCount = considerBuffer ? 2 : 1;
+            var expectedIds = verbatimObservations.Take(expectedCount)
+                .Select(observation => $"urn:lsid:artportalen.se:sighting:{observation.SightingId}");
 
-        // Assert
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
-        result!.TotalCount.Should().Be(1,
-            because: "only one observation is in Uppsala, without including the authorization buffer.");
+            using var response = await apiClient.PostAsync(
+                "/observations/search?sensitiveObservations=true",
+                JsonContent.Create(searchFilter, options: JsonSerializerOptions), TestContext.Current.CancellationToken);
+            var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);
+
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
+            result!.TotalCount.Should().Be(expectedCount);
+            result.Records.Select(observation => observation.Occurrence.OccurrenceId).Should().BeEquivalentTo(expectedIds);
+        }
     }
 }

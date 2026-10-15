@@ -12,7 +12,7 @@ namespace SOS.Observations.Api.IntegrationTests.Tests.HarvestTests;
 /// Integration tests for Virtual herbarium harvest observations.
 /// </summary>
 [Collection(TestCollection.Name)]
-public class VirtualHerbariumHarvestJobTests : TestBase
+public class VirtualHerbariumHarvestJobTests : ElasticsearchTestBase
 {
     public VirtualHerbariumHarvestJobTests(TestFixture testFixture, ITestOutputHelper output) : base(testFixture, output)
     {

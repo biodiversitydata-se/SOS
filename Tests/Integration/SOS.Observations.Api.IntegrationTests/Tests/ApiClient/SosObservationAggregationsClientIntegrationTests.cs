@@ -15,7 +15,7 @@ using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiClient;
 
 [Collection(TestCollection.Name)]
-public class SosObservationAggregationsClientIntegrationTests : TestBase
+public class SosObservationAggregationsClientIntegrationTests : ElasticsearchTestBase
 {
     public SosObservationAggregationsClientIntegrationTests(TestFixture testFixture, ITestOutputHelper output) : base(testFixture, output)
     {

@@ -179,7 +179,10 @@ public class ProcessFixture
     {
         if (clearExistingObservations)
         {
-            await _datasetRepository.DeleteAllDocumentsAsync();
+            if (!await _datasetRepository.DeleteAllDocumentsAsync(waitForCompletion: true))
+            {
+                throw new InvalidOperationException("Failed to clear Elasticsearch test datasets.");
+            }
         }
         await _datasetRepository.DisableIndexingAsync();
         await _datasetRepository.AddManyAsync(datasets);
@@ -191,7 +194,10 @@ public class ProcessFixture
     {
         if (clearExistingObservations)
         {
-            await _eventRepository.DeleteAllDocumentsAsync();
+            if (!await _eventRepository.DeleteAllDocumentsAsync(waitForCompletion: true))
+            {
+                throw new InvalidOperationException("Failed to clear Elasticsearch test events.");
+            }
         }
         await _eventRepository.DisableIndexingAsync();
         await _eventRepository.AddManyAsync(events);
@@ -203,7 +209,10 @@ public class ProcessFixture
     {
         if (clearExistingObservations)
         {
-            await _processedObservationCoreRepository.DeleteAllDocumentsAsync(protectedIndex);
+            if (!await _processedObservationCoreRepository.DeleteAllDocumentsAsync(protectedIndex, waitForCompletion: true))
+            {
+                throw new InvalidOperationException("Failed to clear Elasticsearch test observations.");
+            }
         }
         
         await _processedObservationCoreRepository.DisableIndexingAsync(protectedIndex);

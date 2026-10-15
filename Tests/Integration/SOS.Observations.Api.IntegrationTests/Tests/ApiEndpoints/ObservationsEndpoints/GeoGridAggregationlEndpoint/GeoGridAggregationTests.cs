@@ -11,7 +11,7 @@ using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsEndpoints.GeoGridAggregationlEndpoint;
 
 [Collection(TestCollection.Name)]
-public class GeoGridAggregationTests : TestBase
+public class GeoGridAggregationTests : ElasticsearchTestBase
 {
     public GeoGridAggregationTests(TestFixture testFixture, ITestOutputHelper output) : base(testFixture, output)
     {

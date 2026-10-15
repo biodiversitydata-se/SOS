@@ -12,6 +12,7 @@ using SOS.Observations.Api.IntegrationTests.Setup;
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.DataProvidersEndpoints;
 
 [Collection(TestCollection.Name)]
+[Trait("Category", "ReadOnlyIntegrationTest")]
 public class DataProviderDateEndpointTests(TestFixture fixture)
 {
     [Theory]

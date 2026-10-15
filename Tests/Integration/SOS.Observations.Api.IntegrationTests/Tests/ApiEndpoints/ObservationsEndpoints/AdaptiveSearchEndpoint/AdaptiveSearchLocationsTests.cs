@@ -20,7 +20,7 @@ using FluentAssertions.Execution;
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsEndpoints.ObservationsBySearchEndpoint;
 
 [Collection(TestCollection.Name)]
-public class AdaptiveSearchLocationsTests : TestBase
+public class AdaptiveSearchLocationsTests : ElasticsearchTestBase
 {
     public AdaptiveSearchLocationsTests(TestFixture testFixture, ITestOutputHelper output) : base(testFixture, output)
     {
@@ -595,10 +595,10 @@ public class AdaptiveSearchLocationsTests : TestBase
     }
 
     [Fact]
-    public async Task AdaptiveSearchLocationsInternal_QueriesAgainForAdjacentBoundingBoxes_EvenWhenRequestIsCovered()
+    public async Task AdaptiveSearchLocationsInternal_QueriesElasticsearch_WhenBoundingBoxSpansMultipleCacheEntries()
     {
         // Arrange
-        var observations = CreatePointObservations(
+        var adjacentObservations = CreatePointObservations(
             4,
             346000,
             TaxonIds.Mesar,
@@ -609,45 +609,7 @@ public class AdaptiveSearchLocationsTests : TestBase
                 2 => (13.865, 58.383),
                 _ => (13.875, 58.390)
             });
-        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(observations);
-        var observationManagerProbe = new ObservationManagerCallProbe();
-        var apiClient = CreateApiClientWithObservationManagerProbe(observationManagerProbe);
-        var leftFilter = CreateBoundingBoxFilter(TaxonIds.Mesar, 13.84, 58.40, 13.86, 58.35);
-        var rightFilter = CreateBoundingBoxFilter(TaxonIds.Mesar, 13.86, 58.40, 13.88, 58.35);
-        var combinedFilter = CreateBoundingBoxFilter(TaxonIds.Mesar, 13.84, 58.40, 13.88, 58.35);
-
-        // Act
-        var leftResponse = await apiClient.PostAsync(
-            "/observations/internal/adaptivesearchlocations?observationsLimit=100&cluster=false&returnInputBBox=true",
-            JsonContent.Create(leftFilter), TestContext.Current.CancellationToken);
-        var rightResponse = await apiClient.PostAsync(
-            "/observations/internal/adaptivesearchlocations?observationsLimit=100&cluster=false&returnInputBBox=true",
-            JsonContent.Create(rightFilter), TestContext.Current.CancellationToken);
-        var countAndExtentCallsAfterWarmupRequests = observationManagerProbe.CountAndExtentCalls;
-        var combinedResponse = await apiClient.PostAsync(
-            "/observations/internal/adaptivesearchlocations?observationsLimit=100&cluster=false&returnInputBBox=true",
-            JsonContent.Create(combinedFilter), TestContext.Current.CancellationToken);
-        var combinedResponseString = await combinedResponse.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
-        var combinedFeatures = JsonNode.Parse(combinedResponseString)!["features"]!.AsArray();
-
-        // Assert
-        leftResponse.StatusCode.Should().Be(HttpStatusCode.OK);
-        rightResponse.StatusCode.Should().Be(HttpStatusCode.OK);
-        combinedResponse.StatusCode.Should().Be(HttpStatusCode.OK);
-        leftResponse.GetHeaderValue("X-Cache").Should().Be("MISS");
-        rightResponse.GetHeaderValue("X-Cache").Should().Be("MISS");
-        combinedResponse.GetHeaderValue("X-Cache").Should().Be("MISS");
-        combinedResponse.GetHeaderValue("X-Feature-Count").Should().Be("4");
-        combinedFeatures.Count.Should().Be(4);
-        countAndExtentCallsAfterWarmupRequests.Should().Be(2);
-        observationManagerProbe.CountAndExtentCalls.Should().Be(3);
-    }
-
-    [Fact]
-    public async Task AdaptiveSearchLocationsInternal_DoesNotReuseCachedBoundingBoxes_WhenCoverageHasGap()
-    {
-        // Arrange
-        var observations = CreatePointObservations(
+        var gapObservations = CreatePointObservations(
             3,
             346100,
             TaxonIds.Mesar,
@@ -657,38 +619,43 @@ public class AdaptiveSearchLocationsTests : TestBase
                 1 => (14.220, 58.482),
                 _ => (14.239, 58.483)
             });
-        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(observations);
+        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(adjacentObservations.Concat(gapObservations));
         var observationManagerProbe = new ObservationManagerCallProbe();
-        var apiClient = CreateApiClientWithObservationManagerProbe(observationManagerProbe);
-        var leftFilter = CreateBoundingBoxFilter(TaxonIds.Mesar, 14.19, 58.50, 14.21, 58.45);
-        var rightFilter = CreateBoundingBoxFilter(TaxonIds.Mesar, 14.23, 58.50, 14.25, 58.45);
-        var combinedFilter = CreateBoundingBoxFilter(TaxonIds.Mesar, 14.19, 58.50, 14.25, 58.45);
+        using var apiClient = CreateApiClientWithObservationManagerProbe(observationManagerProbe);
+        var cases = new[]
+        {
+            (Name: "adjacent", Left: CreateBoundingBoxFilter(TaxonIds.Mesar, 13.84, 58.40, 13.86, 58.35),
+                Right: CreateBoundingBoxFilter(TaxonIds.Mesar, 13.86, 58.40, 13.88, 58.35),
+                Combined: CreateBoundingBoxFilter(TaxonIds.Mesar, 13.84, 58.40, 13.88, 58.35),
+                ExpectedSiteIds: new[] { 346000, 346001, 346002, 346003 }),
+            (Name: "gap", Left: CreateBoundingBoxFilter(TaxonIds.Mesar, 14.19, 58.50, 14.21, 58.45),
+                Right: CreateBoundingBoxFilter(TaxonIds.Mesar, 14.23, 58.50, 14.25, 58.45),
+                Combined: CreateBoundingBoxFilter(TaxonIds.Mesar, 14.19, 58.50, 14.25, 58.45),
+                ExpectedSiteIds: new[] { 346100, 346101, 346102 })
+        };
 
-        // Act
-        var leftResponse = await apiClient.PostAsync(
-            "/observations/internal/adaptivesearchlocations?observationsLimit=100&cluster=false&returnInputBBox=true",
-            JsonContent.Create(leftFilter), TestContext.Current.CancellationToken);
-        var rightResponse = await apiClient.PostAsync(
-            "/observations/internal/adaptivesearchlocations?observationsLimit=100&cluster=false&returnInputBBox=true",
-            JsonContent.Create(rightFilter), TestContext.Current.CancellationToken);
-        var countAndExtentCallsAfterWarmupRequests = observationManagerProbe.CountAndExtentCalls;
-        var combinedResponse = await apiClient.PostAsync(
-            "/observations/internal/adaptivesearchlocations?observationsLimit=100&cluster=false&returnInputBBox=true",
-            JsonContent.Create(combinedFilter), TestContext.Current.CancellationToken);
-        var combinedResponseString = await combinedResponse.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
-        var combinedPropertiesByLocationId = GetFeaturePropertiesByLocationId(combinedResponseString);
+        foreach (var testCase in cases)
+        {
+            using var scope = new AssertionScope(testCase.Name);
+            var initialCalls = observationManagerProbe.CountAndExtentCalls;
+            const string url = "/observations/internal/adaptivesearchlocations?observationsLimit=100&cluster=false&returnInputBBox=true";
+            using var leftResponse = await apiClient.PostAsync(url, JsonContent.Create(testCase.Left), TestContext.Current.CancellationToken);
+            using var rightResponse = await apiClient.PostAsync(url, JsonContent.Create(testCase.Right), TestContext.Current.CancellationToken);
+            var callsAfterWarmup = observationManagerProbe.CountAndExtentCalls;
+            using var combinedResponse = await apiClient.PostAsync(url, JsonContent.Create(testCase.Combined), TestContext.Current.CancellationToken);
+            var combinedProperties = GetFeaturePropertiesByLocationId(await combinedResponse.Content.ReadAsStringAsync(TestContext.Current.CancellationToken));
 
-        // Assert
-        leftResponse.StatusCode.Should().Be(HttpStatusCode.OK);
-        rightResponse.StatusCode.Should().Be(HttpStatusCode.OK);
-        combinedResponse.StatusCode.Should().Be(HttpStatusCode.OK);
-        leftResponse.GetHeaderValue("X-Cache").Should().Be("MISS");
-        rightResponse.GetHeaderValue("X-Cache").Should().Be("MISS");
-        combinedResponse.GetHeaderValue("X-Cache").Should().Be("MISS");
-        combinedResponse.GetHeaderValue("X-Feature-Count").Should().Be("3");
-        combinedPropertiesByLocationId.Should().ContainKey(CreateArtportalenSiteLocationId(346101));
-        countAndExtentCallsAfterWarmupRequests.Should().Be(2);
-        observationManagerProbe.CountAndExtentCalls.Should().Be(3);
+            leftResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+            rightResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+            combinedResponse.StatusCode.Should().Be(HttpStatusCode.OK);
+            leftResponse.GetHeaderValue("X-Cache").Should().Be("MISS");
+            rightResponse.GetHeaderValue("X-Cache").Should().Be("MISS");
+            combinedResponse.GetHeaderValue("X-Cache").Should().Be("MISS");
+            combinedResponse.GetHeaderValue("X-Feature-Count").Should().Be(testCase.ExpectedSiteIds.Length.ToString());
+            combinedProperties.Keys.Should().BeEquivalentTo(testCase.ExpectedSiteIds.Select(CreateArtportalenSiteLocationId));
+            callsAfterWarmup.Should().Be(initialCalls + 2);
+            observationManagerProbe.CountAndExtentCalls.Should().Be(initialCalls + 3);
+        }
     }
 
     [Fact]
@@ -1027,7 +994,7 @@ public class AdaptiveSearchLocationsTests : TestBase
 
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(observations);
         var userServiceStub = UserServiceStubFactory.CreateWithSightingAuthority(maxProtectionLevel: 3);
-        var apiClient = TestFixture.CreateApiClientWithReplacedService(userServiceStub);
+        using var apiClient = TestFixture.CreateApiClientWithUserService(userServiceStub);
         var searchFilter = CreateLocationPresentationStatusDocumentationFilter(sensitiveTaxonId, 2025, 2025);
 
         // Act

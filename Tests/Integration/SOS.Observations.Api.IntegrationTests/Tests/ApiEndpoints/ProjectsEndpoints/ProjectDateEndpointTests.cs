@@ -8,6 +8,7 @@ using SOS.Observations.Api.IntegrationTests.Setup;
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ProjectsEndpoints;
 
 [Collection(TestCollection.Name)]
+[Trait("Category", "ReadOnlyIntegrationTest")]
 public class ProjectDateEndpointTests(TestFixture fixture)
 {
     [Fact]

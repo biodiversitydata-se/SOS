@@ -14,7 +14,7 @@ namespace SOS.Observations.Api.IntegrationTests.Tests.HarvestTests;
 /// Integration tests for MVM harvest observations.
 /// </summary>
 [Collection(TestCollection.Name)]
-public class MvmHarvestJobTests : TestBase
+public class MvmHarvestJobTests : ElasticsearchTestBase
 {
     public MvmHarvestJobTests(TestFixture testFixture, ITestOutputHelper output) : base(testFixture, output)
     {

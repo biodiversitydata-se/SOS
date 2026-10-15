@@ -7,7 +7,7 @@ using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsEndpoints.CountInternalEndpoint;
 
 [Collection(TestCollection.Name)]
-public class CountInternalTests : TestBase
+public class CountInternalTests : ElasticsearchTestBase
 {
     public CountInternalTests(TestFixture testFixture, ITestOutputHelper output) : base(testFixture, output)
     {

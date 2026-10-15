@@ -5,6 +5,7 @@ using SOS.DataStewardship.Api.Contracts.Models;
 namespace SOS.DataStewardship.Api.IntegrationTests.Tests.Datasets.Search;
 
 [Collection(Constants.IntegrationTestsCollectionName)]
+[Trait("Category", "ReadOnlyIntegrationTest")]
 public class DatasetsBadRequestsTests : TestBase
 {
     public DatasetsBadRequestsTests(TestFixture testFixture, ITestOutputHelper output) : base(testFixture, output)
