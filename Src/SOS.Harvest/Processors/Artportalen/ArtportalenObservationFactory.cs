@@ -511,7 +511,7 @@ public class ArtportalenObservationFactory : ObservationFactoryBase, IObservatio
             obs.ArtportalenInternal.TriggeredObservationRuleReproductionId = verbatimObservation.TriggeredObservationRuleReproductionId;
             obs.ArtportalenInternal.TriggeredObservationRuleStatusRuleId = verbatimObservation.TriggeredObservationRuleStatusRuleId;
             obs.ArtportalenInternal.TriggeredObservationRuleUnspontaneous = verbatimObservation.TriggeredObservationRuleUnspontaneous;
-            obs.ArtportalenInternal.InvasiveSpeciesTreatment = GetInvasiveSpeciesTreatment(obs.Projects, verbatimObservation.Projects);
+            obs.ArtportalenInternal.InvasiveSpeciesTreatment = obs.Occurrence.InvasiveSpeciesTreatment = GetInvasiveSpeciesTreatment(obs.Projects, verbatimObservation.Projects);
 
             if (verbatimObservation.Media?.Any() ?? false)
             {

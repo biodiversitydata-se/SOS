@@ -2800,9 +2800,33 @@
   },
   {
     "PropertyName": "InvasiveSpeciesTreatment",
-    "PropertyPath": "ArtportalenInternal.InvasiveSpeciesTreatment",
+    "PropertyPath": "Occurrence.InvasiveSpeciesTreatment",
     "SwedishTitle": "Invasiva arter åtgärd",
     "EnglishTitle": "Invasive species treatment",
+    "DataType": "String",
+    "DataTypeIsNullable": false,
+    "DwcName": "",
+    "DwcIdentifier": "",
+    "DependsOn": "Occurrence.InvasiveSpeciesTreatment",
+    "FieldSet": "AllWithValues"
+  },
+  {
+    "PropertyName": "InvasiveSpeciesTreatmentId",
+    "PropertyPath": "Occurrence.InvasiveSpeciesTreatment.Id",
+    "SwedishTitle": "Invasiva arter åtgärd id",
+    "EnglishTitle": "Invasive species treatment ID",
+    "DataType": "Int32",
+    "DataTypeIsNullable": false,
+    "DwcName": "",
+    "DwcIdentifier": "",
+    "DependsOn": "Occurrence.InvasiveSpeciesTreatment.Id",
+    "FieldSet": "AllWithValues"
+  },
+  {
+    "PropertyName": "InvasiveSpeciesTreatmentInternal",
+    "PropertyPath": "ArtportalenInternal.InvasiveSpeciesTreatment",
+    "SwedishTitle": "Invasiva arter åtgärd*",
+    "EnglishTitle": "Invasive species treatment*",
     "DataType": "String",
     "DataTypeIsNullable": false,
     "DwcName": "",
@@ -2811,10 +2835,10 @@
     "FieldSet": "AllWithValues"
   },
   {
-    "PropertyName": "InvasiveSpeciesTreatmentId",
+    "PropertyName": "InvasiveSpeciesTreatmentIdInternal",
     "PropertyPath": "ArtportalenInternal.InvasiveSpeciesTreatment.Id",
-    "SwedishTitle": "Invasiva arter åtgärd id",
-    "EnglishTitle": "Invasive species treatment ID",
+    "SwedishTitle": "Invasiva arter åtgärd id*",
+    "EnglishTitle": "Invasive species treatment ID*",
     "DataType": "Int32",
     "DataTypeIsNullable": false,
     "DwcName": "",

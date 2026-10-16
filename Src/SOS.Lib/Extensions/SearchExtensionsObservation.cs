@@ -173,8 +173,6 @@ public static class SearchExtensionsObservation
                 queries.TryAddTermsCriteria("artportalenInternal.sightingPublishTypeIds", internalFilter.PublishTypeIdsFilter);
                 queries.TryAddTermsCriteria("artportalenInternal.triggeredObservationRuleFrequencyId", internalFilter.TriggeredObservationRuleFrequencyIds);
                 queries.TryAddTermsCriteria("artportalenInternal.triggeredObservationRuleReproductionId", internalFilter.TriggeredObservationRuleReproductionIds);
-                queries.TryAddTermsCriteria("artportalenInternal.invasiveSpeciesTreatment.id", internalFilter.InvasiveSpeciesTreatmentIds);
-                queries.TryAddExistsCriteria("artportalenInternal.invasiveSpeciesTreatment", internalFilter.HasInvasiveSpeciesTreatment);
                 queries.TryAddTermsCriteria("event.discoveryMethod.id", internalFilter.DiscoveryMethodIds);
                 queries.TryAddTermsCriteria("identification.verificationStatus.id", internalFilter.VerificationStatusIds);
                 queries.TryAddTermCriteria("institutionId", internalFilter.InstitutionId);
@@ -815,6 +813,8 @@ public static class SearchExtensionsObservation
             queries.TryAddTermsCriteria("occurrence.occurrenceId", filter.OccurrenceIds);
             queries.TryAddTermsCriteria("occurrence.occurrenceId", filter.IncludeFilter?.OccurrenceIds);
             queries.TryAddTermsCriteria("occurrence.sensitivityCategory", filter.SensitivityCategories);
+            queries.TryAddTermsCriteria("occurrence.invasiveSpeciesTreatment.id", filter.InvasiveSpeciesTreatmentIds);
+            queries.TryAddExistsCriteria("occurrence.invasiveSpeciesTreatment", filter.HasInvasiveSpeciesTreatment);
             queries.TryAddTermsCriteria("projects.id", filter.ProjectIds);
             queries.TryAddTermsCriteria("taxon.kingdom", filter.Taxa?.Kingdoms); // Cos4Cloud specific
             queries.TryAddTermsCriteria("taxon.scientificName", filter.Taxa?.ScientificNames); // Cos4Cloud specific

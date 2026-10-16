@@ -45,6 +45,20 @@ public class SearchFilterBaseDto
     /// <summary>Filters observations by location or geometry.</summary>
     public GeographicsFilterDto? Geographics { get; set; }
 
+    /// <summary>
+    /// Filters observations based on whether an invasive-species treatment is registered.
+    /// True includes records with a treatment, false includes records without one, and null applies no filter.
+    /// For internal searches, a non-null value takes precedence over ExtendedFilterDto.HasInvasiveSpeciesTreatment.
+    /// </summary>
+    public bool? HasInvasiveSpeciesTreatment { get; set; }
+
+    /// <summary>
+    /// Invasive-species treatment vocabulary identifiers to match.
+    /// Null or an empty collection applies no filter.
+    /// For internal searches, a non-null collection takes precedence over ExtendedFilterDto.InvasiveSpeciesTreatmentIds.
+    /// </summary>
+    public ICollection<int>? InvasiveSpeciesTreatmentIds { get; set; }
+
     /// <summary>Filters observations by their modification date.</summary>
     public ModifiedDateFilterDto? ModifiedDate { get; set; }
 

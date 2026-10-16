@@ -1,5 +1,12 @@
 # Changelog
 
+## [Unreleased]
+
+### `Added`
+
+- New property `occurrence.invasiveSpeciesTreatment` in the public API, describing the invasive-species treatment registered for an observation.
+- New public search filters `HasInvasiveSpeciesTreatment` and `InvasiveSpeciesTreatmentIds` to filter observations by the presence or absence of a treatment and/or by treatment vocabulary identifiers.
+
 ## [2026.10.16]
 
 ### `Changed`

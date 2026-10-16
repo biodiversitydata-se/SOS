@@ -124,6 +124,9 @@ public class FlatObservation
         ["occurrence.length"] = x => x._observation?.Occurrence?.Length,
         ["occurrence.weight"] = x => x._observation?.Occurrence?.Weight,
         ["occurrence.othercatalognumbers"] = x => x._observation?.Occurrence?.OtherCatalogNumbers,
+        ["occurrence.invasivespeciestreatment"] = x => x._observation?.Occurrence?.InvasiveSpeciesTreatment?.ToString(),
+        ["occurrence.invasivespeciestreatment.id"] = x => x._observation?.Occurrence?.InvasiveSpeciesTreatment?.Id,
+        ["occurrence.invasivespeciestreatment.value"] = x => x._observation?.Occurrence?.InvasiveSpeciesTreatment?.Value,
 
         // Location
         ["location"] = x => "Please specify which location properties you need",

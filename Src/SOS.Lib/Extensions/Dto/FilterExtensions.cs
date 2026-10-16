@@ -88,6 +88,8 @@ public static class FilterExtensions
         filter.DataProviderIds = inputFilter.DataProvider?.Ids?.ToList();
         filter.Event = PopulateEventFilter(inputFilter.Event!);
         filter.FieldTranslationCultureCode = translationCultureCode;
+        filter.HasInvasiveSpeciesTreatment = inputFilter.HasInvasiveSpeciesTreatment;
+        filter.InvasiveSpeciesTreatmentIds = inputFilter.InvasiveSpeciesTreatmentIds;
         filter.NotRecoveredFilter = (SightingNotRecoveredFilter)(inputFilter.NotRecoveredFilter ?? SightingNotRecoveredFilterDto.NoFilter);
         //filter.VerificationStatus = inputFilter.ValidationStatus.HasValue ? (SearchFilterBase.StatusVerification)inputFilter.ValidationStatus.Value.ToStatusVerification() : (SearchFilterBase.StatusVerification)inputFilter.VerificationStatus;
         filter.VerificationStatus = (SearchFilterBase.StatusVerification)(inputFilter.VerificationStatus ?? StatusVerificationDto.BothVerifiedAndNotVerified);
@@ -269,8 +271,8 @@ public static class FilterExtensions
                 internalFilter.Taxa ??= new TaxonFilter();
                 internalFilter.Taxa.SexIds = internalInput.ExtendedFilter.SexIds;
             }
-            internalFilter.InvasiveSpeciesTreatmentIds = internalInput.ExtendedFilter.InvasiveSpeciesTreatmentIds;
-            internalFilter.HasInvasiveSpeciesTreatment = internalInput.ExtendedFilter.HasInvasiveSpeciesTreatment;
+            internalFilter.InvasiveSpeciesTreatmentIds ??= internalInput.ExtendedFilter.InvasiveSpeciesTreatmentIds;
+            internalFilter.HasInvasiveSpeciesTreatment ??= internalInput.ExtendedFilter.HasInvasiveSpeciesTreatment;
             internalFilter.Years = internalInput.ExtendedFilter.Years;
             internalFilter.YearsComparison = (DateFilterComparison)internalInput.ExtendedFilter.YearsComparison;
         }

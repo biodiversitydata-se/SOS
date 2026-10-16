@@ -97,6 +97,7 @@ public class VocabularyValueResolver : Interfaces.IVocabularyValueResolver
             ResolveVocabularyMappedValue(occurrenceObject, nameof(Observation.Occurrence.Activity), valueMappingDictionaries[VocabularyId.Activity]);
             ResolveVocabularyMappedValue(occurrenceObject, nameof(Observation.Occurrence.Behavior), valueMappingDictionaries[VocabularyId.Behavior]);
             ResolveVocabularyMappedValue(occurrenceObject, nameof(Observation.Occurrence.EstablishmentMeans), valueMappingDictionaries[VocabularyId.EstablishmentMeans]);
+            ResolveVocabularyMappedValue(occurrenceObject, nameof(Observation.Occurrence.InvasiveSpeciesTreatment), valueMappingDictionaries[VocabularyId.InvasiveSpeciesTreatment]);
             ResolveVocabularyMappedValue(occurrenceObject, nameof(Observation.Occurrence.Sex), valueMappingDictionaries[VocabularyId.Sex]);
             ResolveVocabularyMappedValue(occurrenceObject, nameof(Observation.Occurrence.ReproductiveCondition), valueMappingDictionaries[VocabularyId.ReproductiveCondition]);
             ResolveVocabularyMappedValue(occurrenceObject, nameof(Observation.Occurrence.LifeStage), valueMappingDictionaries[VocabularyId.LifeStage]);
@@ -252,6 +253,8 @@ public class VocabularyValueResolver : Interfaces.IVocabularyValueResolver
                     valueMappingDictionaries[VocabularyId.TaxonCategory]);
             }
             ResolveVocabularyMappedValue(observation.ArtportalenInternal?.InvasiveSpeciesTreatment,
+                valueMappingDictionaries[VocabularyId.InvasiveSpeciesTreatment]);
+            ResolveVocabularyMappedValue(observation.Occurrence?.InvasiveSpeciesTreatment,
                 valueMappingDictionaries[VocabularyId.InvasiveSpeciesTreatment]);
         }
     }

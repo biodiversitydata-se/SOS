@@ -45,6 +45,8 @@ public class SearchFilterInternal : SearchFilter
         DiffusionStatuses = searchFilter.DiffusionStatuses;
         ExtendedAuthorization = searchFilter.ExtendedAuthorization;
         FieldTranslationCultureCode = searchFilter.FieldTranslationCultureCode;
+        HasInvasiveSpeciesTreatment = searchFilter.HasInvasiveSpeciesTreatment;
+        InvasiveSpeciesTreatmentIds = searchFilter.InvasiveSpeciesTreatmentIds;
         Location = searchFilter.Location;
         NotRecoveredFilter = searchFilter.NotRecoveredFilter;
         if (searchFilter.Output != null)
@@ -90,20 +92,6 @@ public class SearchFilterInternal : SearchFilter
     public int? ObservedByUserServiceUserId { get; set; }
 
     public bool? IncludeRealCount { get; set; }
-
-    /// <summary>
-    /// If true, only records with InvasiveSpeciesTreatment are included.
-    /// If false, only records with no InvasiveSpeciesTreatment are included.
-    /// If null, no filtering is applied.
-    /// </summary>
-    public bool? HasInvasiveSpeciesTreatment { get; set; }
-
-    /// <summary>
-    /// Ids of InvasiveSpeciesTreatment to match. 
-    /// If null or empty, no filtering is done.
-    /// Queryable values are available in InvasiveSpeciesTreatment vocabulary.
-    /// </summary>
-    public IEnumerable<int>? InvasiveSpeciesTreatmentIds { get; set; }
 
     /// <summary>
     /// Only include hits with media associated
