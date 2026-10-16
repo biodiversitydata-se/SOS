@@ -12,7 +12,7 @@ using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsEndpoints.ObservationsBySearchEndpoint;
 
 [Collection(TestCollection.Name)]
-public class GeneralFilterTests : TestBase
+public class GeneralFilterTests : ElasticsearchTestBase
 {
     public GeneralFilterTests(TestFixture testFixture, ITestOutputHelper output) : base(testFixture, output)
     {

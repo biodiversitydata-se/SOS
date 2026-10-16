@@ -10,7 +10,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
-using Newtonsoft.Json.Converters;
 using NLog.Web;
 using SOS.Hangfire.JobServer.Configuration;
 using SOS.Hangfire.JobServer.Extensions;
@@ -20,6 +19,7 @@ using SOS.Lib.Configuration.Import;
 using SOS.Lib.Configuration.Process;
 using SOS.Lib.Configuration.Shared;
 using SOS.Lib.Context;
+using SOS.Lib.Extensions;
 using SOS.Lib.Managers;
 using System.Globalization;
 using System.Text;
@@ -133,11 +133,7 @@ public class Program
             configuration
                 .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
                 .UseSimpleAssemblyNameTypeSerializer()
-                .UseRecommendedSerializerSettings(m =>
-                {
-                    m.Converters.Add(new NetTopologySuite.IO.Converters.GeometryConverter());
-                    m.Converters.Add(new StringEnumConverter());
-                })
+                .UseSosHangfireSerializerSettings()
                 .UseMongoStorage(new MongoClient(mongoClientSettings),
                     _hangfireDbConfiguration.DatabaseName,
                     new MongoStorageOptions

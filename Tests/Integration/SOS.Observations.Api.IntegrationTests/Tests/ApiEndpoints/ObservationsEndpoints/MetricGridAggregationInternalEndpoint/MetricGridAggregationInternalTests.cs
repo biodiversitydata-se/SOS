@@ -11,7 +11,7 @@ using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsEndpoints.MetricGridAggregationInternalEndpoint;
 
 [Collection(TestCollection.Name)]
-public class MetricGridAggregationInternalTests : TestBase
+public class MetricGridAggregationInternalTests : ElasticsearchTestBase
 {
     public MetricGridAggregationInternalTests(TestFixture testFixture, ITestOutputHelper output) : base(testFixture, output)
     {

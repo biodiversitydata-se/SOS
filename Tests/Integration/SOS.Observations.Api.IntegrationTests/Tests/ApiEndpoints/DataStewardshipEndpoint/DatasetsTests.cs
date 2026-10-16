@@ -15,7 +15,7 @@ using FluentAssertions.Execution;
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsEndpoints.ObservationsBySearchEndpoint;
 
 [Collection(TestCollection.Name)]
-public class DatasetsTests : TestBase
+public class DatasetsTests : ElasticsearchTestBase
 {
     public DatasetsTests(TestFixture testFixture, ITestOutputHelper output) : base(testFixture, output)
     {

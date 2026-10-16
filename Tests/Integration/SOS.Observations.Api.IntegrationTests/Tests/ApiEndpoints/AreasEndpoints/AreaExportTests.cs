@@ -10,6 +10,7 @@ namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.AreasEndpoint
 /// Integration tests for export area to zip file endpoint.
 /// </summary>
 [Collection(TestCollection.Name)]
+[Trait("Category", "ReadOnlyIntegrationTest")]
 public class AreaExportTests : TestBase
 {
     public AreaExportTests(TestFixture testFixture, ITestOutputHelper output) : base(testFixture, output)

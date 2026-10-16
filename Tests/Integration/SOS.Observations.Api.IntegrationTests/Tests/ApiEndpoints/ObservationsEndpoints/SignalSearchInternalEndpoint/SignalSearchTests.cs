@@ -15,7 +15,7 @@ using SOS.Api.Contracts.Observations.Requests;
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsEndpoints.SignalSearchInternalEndpoint;
 
 [Collection(TestCollection.Name)]
-public class SignalSearchTests : TestBase
+public class SignalSearchTests : ElasticsearchTestBase
 {
     public SignalSearchTests(TestFixture testFixture, ITestOutputHelper output) : base(testFixture, output)
     {
@@ -41,7 +41,7 @@ public class SignalSearchTests : TestBase
         var userServiceStub = UserServiceStubFactory.CreateWithCountySightingIndicationAuthority(
             maxProtectionLevel: 1,
             countyFeatureId: CountyId.Uppsala);
-        var apiClient = TestFixture.CreateApiClientWithReplacedService(userServiceStub);
+        using var apiClient = TestFixture.CreateApiClientWithUserService(userServiceStub);
         var searchFilter = new SignalFilterDto
         {
             StartDate = new DateTime(1999, 12, 1),
@@ -89,7 +89,7 @@ public class SignalSearchTests : TestBase
         var userServiceStub = UserServiceStubFactory.CreateWithCountySightingIndicationAuthority(
             maxProtectionLevel: 1,
             countyFeatureId: CountyId.Jönköping);
-        var apiClient = TestFixture.CreateApiClientWithReplacedService(userServiceStub);
+        using var apiClient = TestFixture.CreateApiClientWithUserService(userServiceStub);
         var searchFilter = new SignalFilterDto
         {
             StartDate = new DateTime(1999, 12, 1),
@@ -147,7 +147,7 @@ public class SignalSearchTests : TestBase
         var userServiceStub = UserServiceStubFactory.CreateWithCountySightingIndicationAuthority(
             maxProtectionLevel: 1,
             countyFeatureId: CountyId.Uppsala);
-        var apiClient = TestFixture.CreateApiClientWithReplacedService(userServiceStub);
+        using var apiClient = TestFixture.CreateApiClientWithUserService(userServiceStub);
         var searchFilter = CreateSearchFilter(1999, sensitiveTaxonId, TestCoordinates.UppsalaMunicipalityBbox, usePolygon: false);
         var response = await apiClient.PostAsync($"/observations/internal/signalsearch?onlyAboveMyClearance=true", JsonContent.Create(searchFilter, null, JsonSerializerOptions), TestContext.Current.CancellationToken);
         var result = await response.Content.ReadFromJsonAsync<bool>(TestContext.Current.CancellationToken);

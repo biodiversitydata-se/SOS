@@ -9,7 +9,7 @@ using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ExportsEndpoints;
 
 [Collection(TestCollection.Name)]
-public class DownloadGeoJsonTests : TestBase
+public class DownloadGeoJsonTests : ElasticsearchTestBase
 {
     public DownloadGeoJsonTests(TestFixture testFixture, ITestOutputHelper output) : base(testFixture, output)
     {

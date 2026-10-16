@@ -7,7 +7,7 @@ using System.IO.Compression;
 namespace SOS.Observations.Api.IntegrationTests.Helpers.DataUtils;
 
 [Collection(TestCollection.Name)]
-public class CreateTaxonTestData : TestBase
+public class CreateTaxonTestData : ElasticsearchTestBase
 {
 
     public CreateTaxonTestData(TestFixture testFixture, ITestOutputHelper output) : base(testFixture, output)

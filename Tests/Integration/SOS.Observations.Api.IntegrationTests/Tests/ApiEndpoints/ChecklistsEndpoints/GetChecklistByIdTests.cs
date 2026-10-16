@@ -7,7 +7,7 @@ using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ChecklistsEndpoints;
 
 [Collection(TestCollection.Name)]
-public class GetChecklistByIdTests : TestBase
+public class GetChecklistByIdTests : ElasticsearchTestBase
 {
     public GetChecklistByIdTests(TestFixture testFixture, ITestOutputHelper output) : base(testFixture, output)
     {

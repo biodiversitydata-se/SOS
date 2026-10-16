@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Time.Testing;
 using NSubstitute;
 using SOS.Lib.Cache;
 using SOS.Lib.Models.Interfaces;
@@ -23,8 +24,8 @@ public class CacheBaseTests
     {
         public override TimeSpan CacheDuration { get; set; } = TimeSpan.FromMilliseconds(200); // kort cache-tid
 
-        public TestCacheWithShortCacheDuration(IRepositoryBase<TestEntity, string> repo, ILogger<CacheBase<string, TestEntity>> logger)
-            : base(repo, logger)
+        public TestCacheWithShortCacheDuration(IRepositoryBase<TestEntity, string> repo, ILogger<CacheBase<string, TestEntity>> logger, TimeProvider timeProvider)
+            : base(repo, logger, timeProvider)
         {
         }
 
@@ -132,31 +133,37 @@ public class CacheBaseTests
     public async Task Cache_Should_Reset_After_Timer_Expiration()
     {
         // Arrange
+        var timeProvider = new FakeTimeProvider();
         var repo = Substitute.For<IRepositoryBase<TestEntity, string>>();
         repo.GetAllAsync().Returns(new List<TestEntity> { new() { Id = "Z", Name = "Zelda" } });
-        repo.GetAsync("Z").Returns(new TestEntity { Id = "Z", Name = "Zelda" });
-        var cache = new TestCacheWithShortCacheDuration(repo, _logger);
+        var cache = new TestCacheWithShortCacheDuration(repo, _logger, timeProvider);
         await cache.GetAllAsync();
 
-        // Act & Assert
-        await cache.GetAllAsync(); 
-        await repo.Received(1).GetAllAsync(); // Should use cache in first request
-
-        // Act
-        await Task.Delay(400, TestContext.Current.CancellationToken); // Wait longer than cache duration
+        // The cached data must still be used immediately before expiration.
+        timeProvider.Advance(cache.CacheDuration - TimeSpan.FromMilliseconds(1));
         await cache.GetAllAsync();
+        await repo.Received(1).GetAllAsync();
 
-        // Assert
-        await repo.Received(2).GetAllAsync(); // The first request after expiration should call repository again
+        // Expiration invalidates the cache; the next request reloads it.
+        timeProvider.Advance(TimeSpan.FromMilliseconds(1));
+        await repo.Received(1).GetAllAsync();
+        await cache.GetAllAsync();
+        await repo.Received(2).GetAllAsync();
+
+        // The timer must also invalidate data after the next interval.
+        timeProvider.Advance(cache.CacheDuration);
+        await cache.GetAllAsync();
+        await repo.Received(3).GetAllAsync();
     }
 
     [Fact]
     public async Task Cache_Should_Reset_After_Timer_Expiration_And_New_Value_Received_If_Repository_Value_Changed()
     {
         // Arrange
+        var timeProvider = new FakeTimeProvider();
         var repo = Substitute.For<IRepositoryBase<TestEntity, string>>();       
         repo.GetAsync("ProcessedConfiguration").Returns(new TestEntity { Id = "ProcessedConfiguration", Name = "0" });
-        var cache = new TestCacheWithShortCacheDuration(repo, _logger);
+        var cache = new TestCacheWithShortCacheDuration(repo, _logger, timeProvider);
 
         // Act & Assert
         var processedConfig = await cache.GetAsync("ProcessedConfiguration");
@@ -166,9 +173,15 @@ public class CacheBaseTests
 
         // Act & Assert
         repo.GetAsync("ProcessedConfiguration").Returns(new TestEntity { Id = "ProcessedConfiguration", Name = "1" });
-        await Task.Delay(400, TestContext.Current.CancellationToken); // Wait longer than cache duration
+        timeProvider.Advance(cache.CacheDuration - TimeSpan.FromMilliseconds(1));
+        processedConfig = await cache.GetAsync("ProcessedConfiguration");
+        Assert.Equal("0", processedConfig.Name);
+        await repo.Received(1).GetAsync("ProcessedConfiguration");
+
+        timeProvider.Advance(TimeSpan.FromMilliseconds(1));
         processedConfig = await cache.GetAsync("ProcessedConfiguration");
         Assert.Equal("1", processedConfig.Name);
+        await repo.Received(2).GetAsync("ProcessedConfiguration");
     }
 
     [Fact]

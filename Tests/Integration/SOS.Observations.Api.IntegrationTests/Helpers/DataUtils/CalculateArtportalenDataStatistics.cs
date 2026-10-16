@@ -5,7 +5,7 @@ using SOS.Observations.Api.IntegrationTests.Setup;
 namespace SOS.Observations.Api.IntegrationTests.Helpers.DataUtils;
 
 [Collection(TestCollection.Name)]
-public class CalculateArtportalenDataStatistics : TestBase
+public class CalculateArtportalenDataStatistics : ElasticsearchTestBase
 {
     public CalculateArtportalenDataStatistics(TestFixture testFixture, ITestOutputHelper output) : base(testFixture, output)
     {

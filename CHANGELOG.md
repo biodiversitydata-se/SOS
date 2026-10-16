@@ -1,12 +1,11 @@
 # Changelog
 
-## [Unreleased]
+## [2026.10.16]
 
 ### `Changed`
 
-- OpenAPI schema names for area bounding boxes have changed from `LatLonBoundingBox` and `LatLonCoordinate` to `LatLonBoundingBoxDto` and `LatLonCoordinateDto`, respectively. Only the schema names have changed; model structures, endpoint URLs and JSON field names are unchanged. Existing clients are unaffected. Only consumers regenerating client code from OpenAPI may need to update references to the generated model names.
-- OpenAPI filters now reference the shared `DiffusionStatus` schema instead of the duplicate `DiffusionStatusDto`. Enum values and JSON format are unchanged; consumers regenerating client code may need to update generated enum references.
-- Internal observation search uses `GeoPagedResultDto<T>` (`ObservationGeoPagedResultDto` in OpenAPI) instead of `GeoPagedResultWithMetadataDto<T>`. The schema documents optional `geoJson` and `metadata` fields already supported by the API. HTTP behavior is unchanged.
+- OpenAPI schema names have been renamed or consolidated without changing API behavior: `LatLonBoundingBox` and `LatLonCoordinate` are now `LatLonBoundingBoxDto` and `LatLonCoordinateDto`, and filters now reference the shared `DiffusionStatus` schema instead of the duplicate `DiffusionStatusDto`. Model structures, endpoint URLs, JSON field names, enum values and JSON format are unchanged, so existing clients are unaffected. Consumers regenerating client code from OpenAPI may need to update references to the generated model names.
+- Internal observation search now uses `GeoPagedResultDto<T>` (`ObservationGeoPagedResultDto` in OpenAPI) instead of `GeoPagedResultWithMetadataDto<T>`. The schema documents the optional `geoJson` and `metadata` fields the API already supported. HTTP behavior is unchanged.
 
 ### `Fixed`
 
@@ -16,15 +15,15 @@
 
 ### `Added`
 
-* Added a Locations endpoint,`AdaptiveSearchLocations`, that returns GeoJSON with information about the observations at each location matching the search filter. Currently available in the internal API.
-* Added support for using the Artportalen taxonomy instead of Dyntaxa.
+- Added a Locations endpoint,`AdaptiveSearchLocations`, that returns GeoJSON with information about the observations at each location matching the search filter. Currently available in the internal API.
+- Added support for using the Artportalen taxonomy instead of Dyntaxa.
 
 ### `Changed`
 
-* Improved taxon matching when processing observations.
-* Improved data stewardship metadata.
-* Improved harvesting and processing of Virtual Herbarium data.
-* Improved harvesting and processing of MVM.
+- Improved taxon matching when processing observations.
+- Improved data stewardship metadata.
+- Improved harvesting and processing of Virtual Herbarium data.
+- Improved harvesting and processing of MVM.
 
 ## [2026.02.11]
 

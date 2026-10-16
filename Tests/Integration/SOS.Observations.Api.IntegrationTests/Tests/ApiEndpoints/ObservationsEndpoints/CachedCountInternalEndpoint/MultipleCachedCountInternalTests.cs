@@ -7,7 +7,7 @@ using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsEndpoints.CachedCountInternalEndpoint;
 
 [Collection(TestCollection.Name)]
-public class MultipleCachedCountInternalTests : TestBase
+public class MultipleCachedCountInternalTests : ElasticsearchTestBase
 {
     public MultipleCachedCountInternalTests(TestFixture testFixture, ITestOutputHelper output) : base(testFixture, output)
     {

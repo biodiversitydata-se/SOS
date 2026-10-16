@@ -12,7 +12,7 @@ using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsEndpoints.GeoGridTaxaAggregationInternalEndpoint;
 
 [Collection(TestCollection.Name)]
-public class GeoGridTaxaAggregationInternalTests : TestBase
+public class GeoGridTaxaAggregationInternalTests : ElasticsearchTestBase
 {
     public GeoGridTaxaAggregationInternalTests(TestFixture testFixture, ITestOutputHelper output) : base(testFixture, output)
     {

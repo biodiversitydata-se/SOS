@@ -9,7 +9,7 @@ using FluentAssertions.Execution;
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsEndpoints.ObservationsBySearchEndpoint;
 
 [Collection(TestCollection.Name)]
-public class OutputFieldsTests(TestFixture fixture, ITestOutputHelper output) : TestBase(fixture, output)
+public class OutputFieldsTests(TestFixture fixture, ITestOutputHelper output) : ElasticsearchTestBase(fixture, output)
 {
     [Fact]
     public async Task SearchWithoutOutput_ReturnsMinimumFields_ForPublicAndInternalEndpoints()

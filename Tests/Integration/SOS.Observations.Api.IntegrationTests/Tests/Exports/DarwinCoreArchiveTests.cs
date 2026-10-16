@@ -19,7 +19,7 @@ namespace SOS.Observations.Api.IntegrationTests.Tests.Exports;
 /// Integration tests for exporting to DwC-A file.
 /// </summary>
 [Collection(TestCollection.Name)]
-public class DarwinCoreArchiveTests : TestBase
+public class DarwinCoreArchiveTests : ElasticsearchTestBase
 {
     public DarwinCoreArchiveTests(TestFixture testFixture, ITestOutputHelper output) : base(testFixture, output)
     {

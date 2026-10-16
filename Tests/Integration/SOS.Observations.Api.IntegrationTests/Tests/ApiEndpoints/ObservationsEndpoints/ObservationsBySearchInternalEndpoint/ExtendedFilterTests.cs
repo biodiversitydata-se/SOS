@@ -11,7 +11,7 @@ using SOS.Lib.Enums.VocabularyValues;
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsEndpoints.ObservationsBySearchInternalEndpoint;
 
 [Collection(TestCollection.Name)]
-public class ExtendedFilterTests : TestBase
+public class ExtendedFilterTests : ElasticsearchTestBase
 {
     private static Bogus.Faker _faker = new Bogus.Faker();
 

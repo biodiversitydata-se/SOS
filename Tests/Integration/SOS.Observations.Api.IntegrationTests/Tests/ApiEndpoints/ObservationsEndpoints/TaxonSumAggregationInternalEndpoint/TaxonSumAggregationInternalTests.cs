@@ -9,7 +9,7 @@ using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsEndpoints.TaxonSumAggregationInternalEndpoint;
 
 [Collection(TestCollection.Name)]
-public class TaxonSumAggregationInternalTests : TestBase
+public class TaxonSumAggregationInternalTests : ElasticsearchTestBase
 {
     [Fact]
     public async Task SortFields_AreCaseInsensitive_ButUnknownFieldsAreRejected()
