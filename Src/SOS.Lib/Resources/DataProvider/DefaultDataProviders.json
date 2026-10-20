@@ -2542,5 +2542,58 @@
     "Type": "DwcA",
     "Url": "https://www.slu.se/en/about-slu/organisation/departments/aquatic-resources/environment/environmental-monitoring-and-data-collection/environmental-monitoring-along-the-coast",
     "UseVerbatimFileInExport": false
+  },
+  {
+    "Categories": [
+      "Terrestrial"
+    ],
+    "CreateEventDwC": false,
+    "DefaultVerificationStatus": "ReportedByExpert",
+    "HarvestFailPreventProcessing": false,
+    "HarvestSchedule": "* * * * *",
+    "Id": 30,
+    "Identifier": "Skogsskada",
+    "IncludeInHealthCheck": false,
+    "IncludeInScheduledHarvest": true,
+    "IncludeInSearchByDefault": true,
+    "IsActive": true,
+    "Names": [
+      {
+        "CultureCode": "en-GB",
+        "Value": "Skogsskada"
+      },
+      {
+        "CultureCode": "sv-SE",
+        "Value": "Skogsskada"
+      }
+    ],
+    "Organizations": [
+      {
+        "CultureCode": "en-GB",
+        "Value": "SLU Forest Damage Centre"
+      },
+      {
+        "CultureCode": "sv-SE",
+        "Value": "SLU Forest Damage Centre"
+      }
+    ],
+    "Paths": [
+      {
+        "CultureCode": "en-GB",
+        "path": [ "SLU", "Skogsskada" ]
+      },
+      {
+        "CultureCode": "sv-SE",
+        "path": [ "SLU", "Skogsskada" ]
+      }
+    ],
+    "PreviousProcessLimit": 80,
+    "SupportDatasets": false,
+    "SupportDynamicEml": false,
+    "SupportEvents": false,
+    "SupportIncrementalHarvest": false,
+    "Type": "SkogsskadaObservations",
+    "Url": "",
+    "UseVerbatimFileInExport": false
   }
 ]

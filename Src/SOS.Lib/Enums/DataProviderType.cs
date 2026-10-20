@@ -21,5 +21,6 @@ public enum DataProviderType
     VirtualHerbariumObservations,
     FishDataObservations,
     ObservationDatabase,
-    iNaturalistObservations
+    iNaturalistObservations,
+    SkogsskadaObservations
 }

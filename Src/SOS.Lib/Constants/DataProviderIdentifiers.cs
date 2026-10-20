@@ -18,6 +18,7 @@ public static class DataProviderIdentifiers
     public const string SharkZooplankton = "SharkZooplankton";
     public const string ForestInventory = "ForestInventory";
     public const string ObservationDatabase = "ObservationDatabase";
+    public const string Skogsskada = "Skogsskada";
     public const string Biologg = "Biologg";
 
     public const int ArtportalenId = 1;
