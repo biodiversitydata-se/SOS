@@ -4,7 +4,6 @@
          xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance"
          xmlns:sos="https://sos-search.artdata.slu.se/"
          xmlns:gbif="https://gbif.org/"
-         xmlns:snd="https://snd.gu.se/"
          xsi:schemaLocation="eml://ecoinformatics.org/eml-2.1.1 https://rs.gbif.org/schema/eml-gbif-profile/1.1/eml.xsd"
          packageId="339900cc-b086-33dc-22fe-9fea76c4ba30" system="https://sos-search.artdata.slu.se/" scope="system"
          xml:lang="en">
