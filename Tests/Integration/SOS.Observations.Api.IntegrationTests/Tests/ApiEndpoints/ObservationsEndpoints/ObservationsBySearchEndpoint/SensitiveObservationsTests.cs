@@ -11,10 +11,50 @@ using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsEndpoints.ObservationsBySearchEndpoint;
 
 [Collection(TestCollection.Name)]
-public class SensitiveObservationsTests : TestBase
+public class SensitiveObservationsTests : ElasticsearchTestBase
 {
     public SensitiveObservationsTests(TestFixture testFixture, ITestOutputHelper output) : base(testFixture, output)
     {
+    }
+
+    [Fact]
+    public async Task SharedApiHost_KeepsUserServicesIsolatedBetweenClients()
+    {
+        var observations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(3)
+            .All().HaveValuesFromPredefinedObservations()
+            .TheFirst(2).HaveTaxonSensitivityCategory(3)
+            .Build();
+        await ProcessFixture.ProcessAndAddObservationsToElasticSearch(observations);
+        using var allowedClient = TestFixture.CreateApiClientWithUserService(
+            UserServiceStubFactory.CreateWithSightingAuthority(maxProtectionLevel: 3));
+        var hostCount = TestFixture.ApiFactory.Factories.Count;
+        using var deniedClient = TestFixture.CreateApiClientWithUserService(
+            UserServiceStubFactory.CreateWithSightingAuthority(maxProtectionLevel: 1));
+        TestFixture.ApiFactory.Factories.Should().HaveCount(hostCount,
+            "clients with different permissions should reuse the same API host");
+        using var defaultClient = TestFixture.CreateApiClient();
+        var sensitiveIds = observations.Take(2)
+            .Select(observation => $"urn:lsid:artportalen.se:sighting:{observation.SightingId}").ToArray();
+        var publicId = $"urn:lsid:artportalen.se:sighting:{observations[2].SightingId}";
+
+        for (var iteration = 0; iteration < 3; iteration++)
+        {
+            await Task.WhenAll(
+                AssertObservations(allowedClient, sensitive: true, sensitiveIds),
+                AssertObservations(deniedClient, sensitive: true, Array.Empty<string>()),
+                AssertObservations(defaultClient, sensitive: false, new[] { publicId }));
+        }
+
+        async Task AssertObservations(HttpClient client, bool sensitive, string[] expectedIds)
+        {
+            using var response = await client.PostAsync($"/observations/search?sensitiveObservations={sensitive}",
+                JsonContent.Create(new SearchFilterDto { OccurrenceStatus = OccurrenceStatusFilterValuesDto.BothPresentAndAbsent }),
+                TestContext.Current.CancellationToken);
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
+            var result = await response.Content.ReadFromJsonAsync<PagedResultDto<Observation>>(TestContext.Current.CancellationToken);
+            result!.TotalCount.Should().Be(expectedIds.Length);
+            result.Records.Select(observation => observation.Occurrence.OccurrenceId).Should().BeEquivalentTo(expectedIds);
+        }
     }
 
     [Fact]
@@ -49,7 +89,7 @@ public class SensitiveObservationsTests : TestBase
             .Build();
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
         var userServiceStub = UserServiceStubFactory.CreateWithSightingAuthority(maxProtectionLevel: 1);
-        var apiClient = TestFixture.CreateApiClientWithReplacedService(userServiceStub);
+        using var apiClient = TestFixture.CreateApiClientWithUserService(userServiceStub);
         var searchFilter = new SearchFilterDto { OccurrenceStatus = OccurrenceStatusFilterValuesDto.BothPresentAndAbsent };
 
         // Act
@@ -73,7 +113,7 @@ public class SensitiveObservationsTests : TestBase
             .Build();
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
         var userServiceStub = UserServiceStubFactory.CreateWithSightingAuthority(maxProtectionLevel: 3);
-        var apiClient = TestFixture.CreateApiClientWithReplacedService(userServiceStub);
+        using var apiClient = TestFixture.CreateApiClientWithUserService(userServiceStub);
         var searchFilter = new SearchFilterDto { OccurrenceStatus = OccurrenceStatusFilterValuesDto.BothPresentAndAbsent };
 
         // Act
@@ -100,7 +140,7 @@ public class SensitiveObservationsTests : TestBase
 
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
         var userServiceStub = UserServiceStubFactory.CreateWithSightingAuthority(maxProtectionLevel: 1);
-        var apiClient = TestFixture.CreateApiClientWithReplacedService(userServiceStub);
+        using var apiClient = TestFixture.CreateApiClientWithUserService(userServiceStub);
         apiClient.DefaultRequestHeaders.Add(TestAuthHandler.UserId, userId.ToString());
         var searchFilter = new SearchFilterDto { ObservedByMe = true };
 
@@ -128,7 +168,7 @@ public class SensitiveObservationsTests : TestBase
             .Build();
         await ProcessFixture.ProcessAndAddObservationsToElasticSearch(verbatimObservations);
         var userServiceStub = UserServiceStubFactory.CreateWithSightingAuthority(maxProtectionLevel: 1);
-        var apiClient = TestFixture.CreateApiClientWithReplacedService(userServiceStub);
+        using var apiClient = TestFixture.CreateApiClientWithUserService(userServiceStub);
         apiClient.DefaultRequestHeaders.Add(TestAuthHandler.UserId, userId.ToString());
         var searchFilter = new SearchFilterDto { ReportedByMe = true };
 

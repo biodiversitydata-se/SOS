@@ -27,15 +27,21 @@ public abstract class CacheBase<TKey, TEntity> : ICache<TKey, TEntity> where TEn
     private bool _initialized;
     protected readonly IRepositoryBase<TEntity, TKey> Repository;
     private readonly SemaphoreSlim _reloadSemaphore = new SemaphoreSlim(1, 1);
-    private readonly Timer _reloadTimer;
+    private readonly ITimer _reloadTimer;
     private ConcurrentDictionary<TKey, TEntity> _cache = new ConcurrentDictionary<TKey, TEntity>();                
     protected readonly ILogger<CacheBase<TKey, TEntity>> Logger;
 
     protected CacheBase(IRepositoryBase<TEntity, TKey> repository, ILogger<CacheBase<TKey, TEntity>> logger)
+        : this(repository, logger, TimeProvider.System)
     {
+    }
+
+    protected CacheBase(IRepositoryBase<TEntity, TKey> repository, ILogger<CacheBase<TKey, TEntity>> logger, TimeProvider timeProvider)
+    {
+        ArgumentNullException.ThrowIfNull(timeProvider);
         Repository = repository ?? throw new ArgumentNullException(nameof(repository));            
         Logger = logger;
-        _reloadTimer = new Timer(_ => OnCacheEviction(), null, CacheDuration, CacheDuration);
+        _reloadTimer = timeProvider.CreateTimer(_ => OnCacheEviction(), null, CacheDuration, CacheDuration);
         Logger.LogInformation($"Cache created. Type={GetType().Name}");
     }
 

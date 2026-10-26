@@ -2,6 +2,20 @@
 This is an overview of how the integration tests works. 
 You can choose if you want to run the tests with databases temporarily created in Containers (default) or if you want to use already installed on premise databases.
 
+## Test data isolation
+
+- Use `ElasticsearchTestBase` for tests that write Elasticsearch data. It clears the shared indices and search count cache before each test.
+- Use `TestBase` for tests that only read reference data or process objects in memory. These tests must not depend on observations left by another test and do not clear Elasticsearch.
+- Mark tests that do not write data with `[Trait("Category", "ReadOnlyIntegrationTest")]`. Run this group with `dotnet test --filter Category=ReadOnlyIntegrationTest` (also available in the DataStewardship test project).
+
+Both bases use the same collection fixture, so container startup is still shared. The collection remains sequential: process factories, caches, and test data builders contain mutable shared state. Moving a test to `TestBase` does not make that state safe for parallel execution.
+
+## API host reuse
+
+`CreateApiClient()` reuses the default API host. Permission tests should use `CreateApiClientWithUserService(stub)`: these clients share a second host and select their own stub through a unique request header. The authenticated user ID can remain the same across clients with different permissions. The stubs live for the duration of the fixture, and the shared search count cache is cleared together with the Elasticsearch data.
+
+Use `using var` for API clients. Reserve `CreateApiClientWithReplacedService` and `WithWebHostBuilder` for tests that need other service replacements; those calls create separate hosts.
+
 ## 1. Databases running temporarily as containers in Docker (default)
 
 1. When the tests are starting, one Elasticsearch database and one MongoDB database are created as containers and runs in Docker. The MongoDB is restored with data from the `~/Resources/MongoDb/mongodb-sos-dev.gz` file.

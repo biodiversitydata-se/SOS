@@ -6,7 +6,7 @@ using SOS.Observations.Api.IntegrationTests.Setup;
 namespace SOS.Observations.Api.IntegrationTests.Helpers.DataUtils;
 
 [Collection(TestCollection.Name)]
-public class CreateDarwinCoreJsonTestData : TestBase
+public class CreateDarwinCoreJsonTestData : ElasticsearchTestBase
 {
     private static Bogus.Faker _faker = new Bogus.Faker("sv");
 

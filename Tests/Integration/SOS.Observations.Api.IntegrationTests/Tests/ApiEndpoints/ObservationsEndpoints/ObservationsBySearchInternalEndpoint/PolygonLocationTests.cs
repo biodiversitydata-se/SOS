@@ -9,7 +9,7 @@ using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsEndpoints.ObservationsBySearchInternalEndpoint;
 
 [Collection(TestCollection.Name)]
-public class PolygonLocationTests : TestBase
+public class PolygonLocationTests : ElasticsearchTestBase
 {
     public PolygonLocationTests(TestFixture testFixture, ITestOutputHelper output) : base(testFixture, output)
     {

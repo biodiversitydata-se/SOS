@@ -10,7 +10,7 @@ using System.Text.Json;
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsEndpoints.TaxonAreaAggregationInternalEndpoint;
 
 [Collection(TestCollection.Name)]
-public class TaxonAreaAggregationInternalTests(TestFixture fixture, ITestOutputHelper output) : TestBase(fixture, output)
+public class TaxonAreaAggregationInternalTests(TestFixture fixture, ITestOutputHelper output) : ElasticsearchTestBase(fixture, output)
 {
     [Fact]
     public async Task TaxonAreaAggregation_ReturnsContractData_InJsonAndDownload()

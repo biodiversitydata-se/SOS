@@ -704,7 +704,9 @@ public class MarkdownHelper : IMarkdownHelper
                             .FirstOrDefault()?.Parent?.Element("keyword")?.Value ?? DEFAULT_TYPE_OF_DATASET;
                     }
                         
-                    referenceList.Add($"{dataProvider.ContactPerson?.LastName} {dataProvider.ContactPerson?.FirstName?.Substring(0, 1)} ({DateTime.Now.Year}). {dataProvider.Names?.FirstOrDefault(n => n.CultureCode == "sv-SE")?.Value}. {dataProvider.Organizations?.FirstOrDefault(n => n.CultureCode == "sv-SE")?.Value}. {typeOfDataset?.ToCamelCase()} hämtat via Species Observation System API version {version} {DateTime.Now:yyyy-MM-dd}");
+                    var firstName = dataProvider.ContactPerson?.FirstName;
+                    var firstNameInitial = string.IsNullOrEmpty(firstName) ? string.Empty : firstName.Substring(0, 1);
+                    referenceList.Add($"{dataProvider.ContactPerson?.LastName} {firstNameInitial} ({DateTime.Now.Year}). {dataProvider.Names?.FirstOrDefault(n => n.CultureCode == "sv-SE")?.Value}. {dataProvider.Organizations?.FirstOrDefault(n => n.CultureCode == "sv-SE")?.Value}. {typeOfDataset?.ToCamelCase()} hämtat via Species Observation System API version {version} {DateTime.Now:yyyy-MM-dd}");
                     materialAndReferense += $"{(firstItteration ? "" : ", ")}{dataProvider.Identifier}";
                     firstItteration = false;
                 }

@@ -40,11 +40,13 @@ public class ExtendedFilterDto
 
     /// <summary>
     /// Filters observations based on whether an invasive-species treatment is registered.
+    /// Used only when SearchFilterBaseDto.HasInvasiveSpeciesTreatment is null.
     /// </summary>
     public bool? HasInvasiveSpeciesTreatment { get; set; }
 
     /// <summary>
     /// Invasive-species treatment vocabulary identifiers to match.
+    /// Used only when SearchFilterBaseDto.InvasiveSpeciesTreatmentIds is null.
     /// </summary>
     public ICollection<int>? InvasiveSpeciesTreatmentIds { get; set; }
 

@@ -11,7 +11,7 @@ using FluentAssertions.Execution;
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsEndpoints.ObservationsBySearchEndpoint;
 
 [Collection(TestCollection.Name)]
-public class AggregateEndpointTests : TestBase
+public class AggregateEndpointTests : ElasticsearchTestBase
 {
     [Fact]
     public async Task AggregationField_IsCaseInsensitive()

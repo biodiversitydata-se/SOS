@@ -8,7 +8,7 @@ using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ExportsEndpoints;
 
 [Collection(TestCollection.Name)]
-public class DownloadDwcTests : TestBase
+public class DownloadDwcTests : ElasticsearchTestBase
 {
     public DownloadDwcTests(TestFixture testFixture, ITestOutputHelper output) : base(testFixture, output)
     {

@@ -18,6 +18,100 @@ namespace SOS.Lib.UnitTests.Extensions;
 public class FilterExtensionsTests
 {
     [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    [InlineData(null)]
+    public void ToSearchFilter_MapsInvasiveSpeciesTreatmentFilters(bool? hasTreatment)
+    {
+        var dto = new SearchFilterDto
+        {
+            HasInvasiveSpeciesTreatment = hasTreatment,
+            InvasiveSpeciesTreatmentIds = [0, 6]
+        };
+
+        var filter = dto.ToSearchFilter(42, ProtectionFilterDto.Public, "sv-SE");
+
+        filter.HasInvasiveSpeciesTreatment.Should().Be(hasTreatment);
+        filter.InvasiveSpeciesTreatmentIds.Should().Equal(0, 6);
+    }
+
+    [Theory]
+    [InlineData(null, null, null)]
+    [InlineData(null, true, true)]
+    [InlineData(null, false, false)]
+    [InlineData(true, null, true)]
+    [InlineData(false, null, false)]
+    [InlineData(true, false, true)]
+    [InlineData(false, true, false)]
+    public void ToSearchFilterInternal_PrefersBaseHasInvasiveSpeciesTreatment(
+        bool? baseValue, bool? extendedValue, bool? expected)
+    {
+        var dto = new SearchFilterInternalDto
+        {
+            HasInvasiveSpeciesTreatment = baseValue,
+            ExtendedFilter = new ExtendedFilterDto { HasInvasiveSpeciesTreatment = extendedValue }
+        };
+
+        var filter = dto.ToSearchFilterInternal(42, "sv-SE");
+
+        filter.HasInvasiveSpeciesTreatment.Should().Be(expected);
+    }
+
+    [Theory]
+    [InlineData(null, null, null)]
+    [InlineData(null, new[] { 6 }, new[] { 6 })]
+    [InlineData(new[] { 0 }, null, new[] { 0 })]
+    [InlineData(new[] { 0 }, new[] { 6 }, new[] { 0 })]
+    [InlineData(new int[0], new[] { 6 }, new int[0])]
+    public void ToSearchFilterInternal_PrefersBaseInvasiveSpeciesTreatmentIds(
+        int[]? baseValue, int[]? extendedValue, int[]? expected)
+    {
+        var dto = new SearchFilterInternalDto
+        {
+            InvasiveSpeciesTreatmentIds = baseValue,
+            ExtendedFilter = new ExtendedFilterDto { InvasiveSpeciesTreatmentIds = extendedValue }
+        };
+
+        var filter = dto.ToSearchFilterInternal(42, "sv-SE");
+
+        filter.InvasiveSpeciesTreatmentIds.Should().BeEquivalentTo(expected);
+    }
+
+    [Fact]
+    public void ToSearchFilterInternal_ResolvesTreatmentFiltersIndependently()
+    {
+        var dto = new SearchFilterInternalDto
+        {
+            InvasiveSpeciesTreatmentIds = [0],
+            ExtendedFilter = new ExtendedFilterDto
+            {
+                HasInvasiveSpeciesTreatment = true,
+                InvasiveSpeciesTreatmentIds = [6]
+            }
+        };
+
+        var filter = dto.ToSearchFilterInternal(42, "sv-SE");
+
+        filter.HasInvasiveSpeciesTreatment.Should().BeTrue();
+        filter.InvasiveSpeciesTreatmentIds.Should().Equal(0);
+    }
+
+    [Fact]
+    public void SearchFilterInternal_CopyPreservesInvasiveSpeciesTreatmentFilters()
+    {
+        var filter = new SearchFilter
+        {
+            HasInvasiveSpeciesTreatment = false,
+            InvasiveSpeciesTreatmentIds = [0, 6]
+        };
+
+        var internalFilter = new SearchFilterInternal(filter);
+
+        internalFilter.HasInvasiveSpeciesTreatment.Should().BeFalse();
+        internalFilter.InvasiveSpeciesTreatmentIds.Should().Equal(0, 6);
+    }
+
+    [Theory]
     [InlineData(false, "{}")]
     [InlineData(false, "{\"output\":null}")]
     [InlineData(false, "{\"output\":{}}")]
@@ -40,8 +134,18 @@ public class FilterExtensionsTests
     [Fact]
     public void AggregationAndExportFilters_UseSharedPublicFilterMapping()
     {
-        var aggregation = new SearchFilterAggregationDto { Taxon = new TaxonFilterDto { Ids = [103040] } };
-        var export = new ExportFilterDto { Taxon = new TaxonFilterDto { Ids = [103040] } };
+        var aggregation = new SearchFilterAggregationDto
+        {
+            Taxon = new TaxonFilterDto { Ids = [103040] },
+            HasInvasiveSpeciesTreatment = true,
+            InvasiveSpeciesTreatmentIds = [0, 6]
+        };
+        var export = new ExportFilterDto
+        {
+            Taxon = new TaxonFilterDto { Ids = [103040] },
+            HasInvasiveSpeciesTreatment = true,
+            InvasiveSpeciesTreatmentIds = [0, 6]
+        };
 
         var aggregationFilter = aggregation.ToSearchFilter(42, ProtectionFilterDto.Sensitive, "sv-SE");
         var exportFilter = export.ToSearchFilter(42, ProtectionFilterDto.Sensitive, "sv-SE");
@@ -49,6 +153,8 @@ public class FilterExtensionsTests
 
         aggregationFilter.Should().BeOfType<SearchFilter>();
         aggregationFilter.Taxa.Ids.Should().Equal(103040);
+        aggregationFilter.HasInvasiveSpeciesTreatment.Should().BeTrue();
+        aggregationFilter.InvasiveSpeciesTreatmentIds.Should().Equal(0, 6);
         aggregationFilter.Should().BeEquivalentTo(baseFilter);
         exportFilter.Should().BeEquivalentTo(baseFilter);
     }

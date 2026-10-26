@@ -14,6 +14,7 @@ using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiClient;
 
 [Collection(TestCollection.Name)]
+[Trait("Category", "ReadOnlyIntegrationTest")]
 public class LookupServiceIntegrationTests : TestBase
 {
     public LookupServiceIntegrationTests(TestFixture testFixture, ITestOutputHelper output) : base(testFixture, output)

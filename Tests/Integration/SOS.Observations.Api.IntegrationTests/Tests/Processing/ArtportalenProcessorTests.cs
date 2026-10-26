@@ -8,6 +8,7 @@ using System.ComponentModel;
 namespace SOS.Observations.Api.IntegrationTests.Tests.Processing;
 
 [Collection(TestCollection.Name)]
+[Trait("Category", "ReadOnlyIntegrationTest")]
 public class ArtportalenProcessorTests : TestBase
 {
     public ArtportalenProcessorTests(TestFixture testFixture, ITestOutputHelper output) : base(testFixture, output)

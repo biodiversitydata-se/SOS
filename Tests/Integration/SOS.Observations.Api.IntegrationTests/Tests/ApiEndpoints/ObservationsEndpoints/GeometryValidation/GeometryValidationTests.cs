@@ -3,6 +3,7 @@ using SOS.Observations.Api.IntegrationTests.Setup;
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsEndpoints.GeometryValidation;
 
 [Collection(TestCollection.Name)]
+[Trait("Category", "ReadOnlyIntegrationTest")]
 public class GeometryValidationTests(TestFixture fixture)
 {
     private const string DegeneratePolygonJson = """

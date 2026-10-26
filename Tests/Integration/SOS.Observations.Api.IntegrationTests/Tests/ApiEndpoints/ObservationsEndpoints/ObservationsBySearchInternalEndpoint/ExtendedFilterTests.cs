@@ -11,7 +11,7 @@ using SOS.Lib.Enums.VocabularyValues;
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsEndpoints.ObservationsBySearchInternalEndpoint;
 
 [Collection(TestCollection.Name)]
-public class ExtendedFilterTests : TestBase
+public class ExtendedFilterTests : ElasticsearchTestBase
 {
     private static Bogus.Faker _faker = new Bogus.Faker();
 
@@ -2254,8 +2254,11 @@ public class ExtendedFilterTests : TestBase
         result!.TotalCount.Should().Be(2);
     }
 
-    [Fact]
-    public async Task ObservationsBySearchInternalEndpoint_ReturnsExpectedObservations_WhenFilteringByInvasiveSpeciesTreatmentIds()
+    [Theory]
+    [InlineData(false, true)]
+    [InlineData(true, false)]
+    [InlineData(true, true)]
+    public async Task ObservationsBySearchInternalEndpoint_ReturnsExpectedObservations_WhenFilteringByInvasiveSpeciesTreatmentIds(bool useBaseFilter, bool useExtendedFilter)
     {
         // Arrange
         var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(5)
@@ -2276,10 +2279,13 @@ public class ExtendedFilterTests : TestBase
         var apiClient = TestFixture.CreateApiClient();
         var searchFilter = new SearchFilterInternalDto
         {
-            ExtendedFilter = new ExtendedFilterDto
+            InvasiveSpeciesTreatmentIds = useBaseFilter ? [(int)InvasiveSpeciesTreatmentId.FollowUpChemical] : null,
+            ExtendedFilter = useExtendedFilter ? new ExtendedFilterDto
             {
-                InvasiveSpeciesTreatmentIds = new[] { (int)InvasiveSpeciesTreatmentId.FollowUpChemical }
-            }
+                InvasiveSpeciesTreatmentIds = useBaseFilter
+                    ? [(int)InvasiveSpeciesTreatmentId.TreatmentAccordingToComment]
+                    : [(int)InvasiveSpeciesTreatmentId.FollowUpChemical]
+            } : null
         };
 
         // Act
@@ -2295,10 +2301,15 @@ public class ExtendedFilterTests : TestBase
         // Arrange test with different search criteria
         searchFilter = new SearchFilterInternalDto
         {
-            ExtendedFilter = new ExtendedFilterDto
+            InvasiveSpeciesTreatmentIds = useBaseFilter
+                ? [(int)InvasiveSpeciesTreatmentId.FollowUpChemical, (int)InvasiveSpeciesTreatmentId.TreatmentAccordingToComment]
+                : null,
+            ExtendedFilter = useExtendedFilter ? new ExtendedFilterDto
             {
-                InvasiveSpeciesTreatmentIds = new[] { (int)InvasiveSpeciesTreatmentId.FollowUpChemical, (int)InvasiveSpeciesTreatmentId.TreatmentAccordingToComment }
-            }
+                InvasiveSpeciesTreatmentIds = useBaseFilter
+                    ? [(int)InvasiveSpeciesTreatmentId.TreatmentBiological]
+                    : [(int)InvasiveSpeciesTreatmentId.FollowUpChemical, (int)InvasiveSpeciesTreatmentId.TreatmentAccordingToComment]
+            } : null
         };
 
         // Act
@@ -2311,8 +2322,11 @@ public class ExtendedFilterTests : TestBase
             because: "2 observations has InvasiveSpeciesTreatment with value FollowUpChemical or TreatmentAccordingToComment");
     }
 
-    [Fact]
-    public async Task ObservationsBySearchInternalEndpoint_ReturnsExpectedObservations_WhenFilteringByHasInvasiveSpeciesTreatment()
+    [Theory]
+    [InlineData(false, true)]
+    [InlineData(true, false)]
+    [InlineData(true, true)]
+    public async Task ObservationsBySearchInternalEndpoint_ReturnsExpectedObservations_WhenFilteringByHasInvasiveSpeciesTreatment(bool useBaseFilter, bool useExtendedFilter)
     {
         // Arrange
         var verbatimObservations = Builder<ArtportalenObservationVerbatim>.CreateListOfSize(5)
@@ -2333,10 +2347,11 @@ public class ExtendedFilterTests : TestBase
         var apiClient = TestFixture.CreateApiClient();
         var searchFilter = new SearchFilterInternalDto
         {
-            ExtendedFilter = new ExtendedFilterDto
+            HasInvasiveSpeciesTreatment = useBaseFilter ? true : null,
+            ExtendedFilter = useExtendedFilter ? new ExtendedFilterDto
             {
-                HasInvasiveSpeciesTreatment = true
-            }
+                HasInvasiveSpeciesTreatment = !useBaseFilter
+            } : null
         };
 
         // Act
@@ -2352,10 +2367,11 @@ public class ExtendedFilterTests : TestBase
         // Arrange test with different search criteria
         searchFilter = new SearchFilterInternalDto
         {
-            ExtendedFilter = new ExtendedFilterDto
+            HasInvasiveSpeciesTreatment = useBaseFilter ? false : null,
+            ExtendedFilter = useExtendedFilter ? new ExtendedFilterDto
             {
-                HasInvasiveSpeciesTreatment = false
-            }
+                HasInvasiveSpeciesTreatment = useBaseFilter
+            } : null
         };
 
         // Act
@@ -2370,10 +2386,10 @@ public class ExtendedFilterTests : TestBase
         // Arrange test with different search criteria
         searchFilter = new SearchFilterInternalDto
         {
-            ExtendedFilter = new ExtendedFilterDto
+            ExtendedFilter = useExtendedFilter ? new ExtendedFilterDto
             {
                 HasInvasiveSpeciesTreatment = null
-            }
+            } : null
         };
 
         // Act

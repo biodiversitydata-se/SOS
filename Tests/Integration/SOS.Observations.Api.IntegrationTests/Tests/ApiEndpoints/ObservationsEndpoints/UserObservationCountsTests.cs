@@ -10,7 +10,7 @@ using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsEndpoints;
 
 [Collection(TestCollection.Name)]
-public class UserObservationCountsTests(TestFixture testFixture, ITestOutputHelper output) : TestBase(testFixture, output)
+public class UserObservationCountsTests(TestFixture testFixture, ITestOutputHelper output) : ElasticsearchTestBase(testFixture, output)
 {
     [Fact]
     public async Task CurrentUserCounts_ReturnOnlyOwnObservations_AndEmptyDayPageBeyondResults()

@@ -65,6 +65,9 @@
 		<None Update="Resources\DataProvider\Eml\Biologg.eml.xml">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
+		<None Update="Resources\DataProvider\Eml\Skogsskada.eml.xml">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
 		<None Update="Resources\DataProvider\Eml\SosFilterSubset.eml.xml">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
@@ -92,6 +95,9 @@
 		<None Update="Resources\DataProvider\Eml\ObservationDatabase.eml.xml">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
+        <None Update="Resources\DataProvider\Eml\Skogsskada.eml.xml">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
 		<None Update="Resources\DataProvider\Eml\SERS.eml.xml">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>

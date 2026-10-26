@@ -10,7 +10,7 @@ using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsEndpoints.ObservationsBySearchEndpoint;
 
 [Collection(TestCollection.Name)]
-public class TotalCountCacheTests : TestBase
+public class TotalCountCacheTests : ElasticsearchTestBase
 {
     public TotalCountCacheTests(TestFixture testFixture, ITestOutputHelper output) : base(testFixture, output)
     {

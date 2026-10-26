@@ -10,6 +10,7 @@ using SOS.Harvest.Harvesters.Interfaces;
 using SOS.Harvest.Harvesters.Mvm.Interfaces;
 using SOS.Harvest.Harvesters.ObservationDatabase.Interfaces;
 using SOS.Harvest.Harvesters.Shark.Interfaces;
+using SOS.Harvest.Harvesters.Skogsskada.Interfaces;
 using SOS.Harvest.Harvesters.VirtualHerbarium.Interfaces;
 using SOS.Harvest.Managers.Interfaces;
 using SOS.Lib.Enums;
@@ -33,6 +34,7 @@ public class ObservationHarvesterManager : IObservationHarvesterManager
     /// <param name="observationDatabaseHarvester"></param>
     /// <param name="sersObservationHarvester"></param>
     /// <param name="sharkObservationHarvester"></param>
+    /// <param name="skogsskadaObservationHarvester"></param>
     /// <param name="virtualHerbariumObservationHarvester"></param>
     /// <param name="iNaturalistObservationHarvester"></param>
     /// <exception cref="ArgumentNullException"></exception>
@@ -46,6 +48,7 @@ public class ObservationHarvesterManager : IObservationHarvesterManager
         IObservationDatabaseHarvester observationDatabaseHarvester,
         ISersObservationHarvester sersObservationHarvester,
         ISharkObservationHarvester sharkObservationHarvester,
+        ISkogsskadaObservationHarvester skogsskadaObservationHarvester,
         IVirtualHerbariumObservationHarvester virtualHerbariumObservationHarvester,
         IiNaturalistObservationHarvester iNaturalistObservationHarvester)
     {
@@ -59,6 +62,7 @@ public class ObservationHarvesterManager : IObservationHarvesterManager
         if (observationDatabaseHarvester == null) throw new ArgumentNullException(nameof(observationDatabaseHarvester));
         if (sersObservationHarvester == null) throw new ArgumentNullException(nameof(sersObservationHarvester));
         if (sharkObservationHarvester == null) throw new ArgumentNullException(nameof(sharkObservationHarvester));
+        if (skogsskadaObservationHarvester == null) throw new ArgumentNullException(nameof(skogsskadaObservationHarvester));
         if (virtualHerbariumObservationHarvester == null) throw new ArgumentNullException(nameof(virtualHerbariumObservationHarvester));
         if (iNaturalistObservationHarvester == null) throw new ArgumentNullException(nameof(iNaturalistObservationHarvester));
 
@@ -74,6 +78,7 @@ public class ObservationHarvesterManager : IObservationHarvesterManager
             {DataProviderType.ObservationDatabase, observationDatabaseHarvester},
             {DataProviderType.SersObservations, sersObservationHarvester},
             {DataProviderType.SharkObservations, sharkObservationHarvester},
+            {DataProviderType.SkogsskadaObservations, skogsskadaObservationHarvester},
             {DataProviderType.VirtualHerbariumObservations, virtualHerbariumObservationHarvester},
             {DataProviderType.iNaturalistObservations, iNaturalistObservationHarvester}
         };

@@ -9,7 +9,7 @@ using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.ObservationsEndpoints.ObservationsBySearchEndpoint;
 
 [Collection(TestCollection.Name)]
-public class OccurrenceStatusTests : TestBase
+public class OccurrenceStatusTests : ElasticsearchTestBase
 {
     public OccurrenceStatusTests(TestFixture testFixture, ITestOutputHelper output) : base(testFixture, output)
     {

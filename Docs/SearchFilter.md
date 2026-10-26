@@ -3,30 +3,33 @@ This page provides information about how to use the search filter parameters.
 
 - [Data provider filter](#data-provider-filter)
 - [Date filter](#date-filter)
-  * [BetweenStartDateAndEndDate filter type](#betweenstartdateandenddate-filter-type)
-  * [OverlappingStartDateAndEndDate filter type](#overlappingstartdateandenddate-filter-type)
-  * [OnlyStartDate filter type](#onlystartdate-filter-type)
-  * [OnlyEndDate filter type](#onlyenddate-filter-type)
-  * [TimeRanges](#timeranges)
-  * [Modified date filter](#modifieddate)
+  - [BetweenStartDateAndEndDate filter type](#betweenstartdateandenddate-filter-type)
+  - [OverlappingStartDateAndEndDate filter type](#overlappingstartdateandenddate-filter-type)
+  - [OnlyStartDate filter type](#onlystartdate-filter-type)
+  - [OnlyEndDate filter type](#onlyenddate-filter-type)
+  - [TimeRanges](#timeranges)
+  - [Modified date filter](#modifieddate)
 - [Geographics filter](#geographics-filter)
-  * [Search for observations in area](#search-for-observations-in-area)
-  * [Search for observations in multiple areas of same type](#search-for-observations-in-multiple-areas-of-same-type)
-  * [Search for observations in multiple areas of different types](#search-for-observations-in-multiple-areas-of-different-types)
-  * [Search for observations within a polygon](#search-for-observations-within-a-polygon)
-  * [Search for observations within a circle](#search-for-observations-within-a-circle)
-  * [Search for observations within a bounding box](#search-for-observations-within-a-bounding-box)
-  * [Observation accuracy](#observation-accuracy)
+  - [Search for observations in area](#search-for-observations-in-area)
+  - [Search for observations in multiple areas of same type](#search-for-observations-in-multiple-areas-of-same-type)
+  - [Search for observations in multiple areas of different types](#search-for-observations-in-multiple-areas-of-different-types)
+  - [Search for observations within a polygon](#search-for-observations-within-a-polygon)
+  - [Search for observations within a circle](#search-for-observations-within-a-circle)
+  - [Search for observations within a bounding box](#search-for-observations-within-a-bounding-box)
+  - [Observation accuracy](#observation-accuracy)
 - [Taxon filter](#taxon-filter)
-  * [Search for observations of a specific taxon](#search-for-observations-of-a-specific-taxon)
-  * [Include underlying taxa in search](#include-underlying-taxa-in-search)
-  * [Search for observations with red list categories](#search-for-observations-with-red-list-categories)
-  * [Search for invasive species in Sweden](#search-for-invasive-species-in-sweden)
-  * [Taxon lists](#taxon-lists)
-  * [Search for observations with taxon lists - merge](#search-for-observations-with-taxon-lists---merge)
-  * [Search for observations with taxon lists - filter](#search-for-observations-with-taxon-lists---filter)
-  * [Search for observations with taxon categories](#search-for-observations-with-taxon-categories)
+  - [Search for observations of a specific taxon](#search-for-observations-of-a-specific-taxon)
+  - [Include underlying taxa in search](#include-underlying-taxa-in-search)
+  - [Search for observations with red list categories](#search-for-observations-with-red-list-categories)
+  - [Search for invasive species in Sweden](#search-for-invasive-species-in-sweden)
+  - [Taxon lists](#taxon-lists)
+  - [Search for observations with taxon lists - merge](#search-for-observations-with-taxon-lists---merge)
+  - [Search for observations with taxon lists - filter](#search-for-observations-with-taxon-lists---filter)
+  - [Search for observations with taxon categories](#search-for-observations-with-taxon-categories)
 - [Projects filter](#projects-filter)
+- [Invasive species treatment filters](#invasive-species-treatment-filters)
+  - [Search by whether a treatment is registered](#search-by-whether-a-treatment-is-registered)
+  - [Search by treatment type](#search-by-treatment-type)
 - [Occurrence status filter](#occurrence-status-filter)
 - [Verification status filter](#verification-status-filter)
 - [Determination filter](#determination-filter)
@@ -35,8 +38,8 @@ This page provides information about how to use the search filter parameters.
 - [Reported by me filter](#ReportedByMe-filter)
 - [Observed by me filter](#ObservedByMe-filter)
 - [Output](#output)
-  * [FieldSet](#fieldSet)
-  * [Fields](#fields)
+  - [FieldSet](#fieldSet)
+  - [Fields](#fields)
 
 
 ## Data provider filter
@@ -497,6 +500,42 @@ This filter will return observations in the project ArtArken
 }
 ```
 
+
+## Invasive species treatment filters
+
+The filters `hasInvasiveSpeciesTreatment` and `invasiveSpeciesTreatmentIds` make it possible to search for observations that represent invasive species treatments.
+
+### Search by whether a treatment is registered
+
+Use `hasInvasiveSpeciesTreatment` to select observations with or without a registered treatment.
+
+| Value | Effect |
+|:---|:---|
+| `true` | Only observations with a registered treatment. |
+| `false` | Only observations without a registered treatment. |
+| Omitted or `null` | The filter isn't applied. |
+
+Example: This filter returns observations with a registered treatment.
+
+```json
+{
+    "hasInvasiveSpeciesTreatment": true
+}
+```
+
+### Search by treatment type
+
+Use `invasiveSpeciesTreatmentIds` to select treatment types from the [invasiveSpeciesTreatment vocabulary](Vocabularies.md#invasivespeciestreatment). An observation matches if its treatment ID matches any of the specified IDs.
+
+Example: This filter returns observations with a biological treatment (`0`) or a chemical follow-up (`7`).
+
+```json
+{
+    "invasiveSpeciesTreatmentIds": [0, 7]
+}
+```
+
+An omitted, `null` or empty list applies no restriction on treatment type.
 
 ## Occurrence status filter
 This filter will return observations with occurrenceStatus "present" (observed)

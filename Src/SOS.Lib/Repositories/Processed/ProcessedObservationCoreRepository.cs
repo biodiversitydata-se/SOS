@@ -638,6 +638,12 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
                                 .NumberVal(nr => nr.Occurrence.EstablishmentMeans.Id, IndexSetting.None, NumberType.Integer)
                             )
                         )
+                        .Object(o => o.Occurrence.InvasiveSpeciesTreatment, c => c
+                            .Properties(ps => ps
+                                .KeywordVal(kwlc => kwlc.Occurrence.InvasiveSpeciesTreatment.Value, IndexSetting.SearchOnly)
+                                .NumberVal(nr => nr.Occurrence.InvasiveSpeciesTreatment.Id, IndexSetting.SearchSortAggregate, NumberType.Integer)
+                            )
+                        )
                         .Object(o => o.Occurrence.LifeStage, c => c
                             .Properties(ps => ps
                                 .KeywordVal(kwlc => kwlc.Occurrence.LifeStage.Value, IndexSetting.SearchOnly)

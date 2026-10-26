@@ -1,11 +1,11 @@
-﻿using SOS.Api.Contracts.Observations.Requests;
-using Elastic.Clients.Elasticsearch.Cluster;
+﻿using Elastic.Clients.Elasticsearch.Cluster;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
+using SOS.Api.Contracts.Observations.Requests;
 using SOS.Export.Jobs;
 using SOS.Export.Services;
 using SOS.Export.Services.Interfaces;
@@ -37,6 +37,8 @@ using SOS.Harvest.Harvesters.ObservationDatabase;
 using SOS.Harvest.Harvesters.ObservationDatabase.Interfaces;
 using SOS.Harvest.Harvesters.Shark;
 using SOS.Harvest.Harvesters.Shark.Interfaces;
+using SOS.Harvest.Harvesters.Skogsskada;
+using SOS.Harvest.Harvesters.Skogsskada.Interfaces;
 using SOS.Harvest.Harvesters.VirtualHerbarium;
 using SOS.Harvest.Harvesters.VirtualHerbarium.Interfaces;
 using SOS.Harvest.Helpers;
@@ -64,6 +66,8 @@ using SOS.Harvest.Processors.Sers;
 using SOS.Harvest.Processors.Sers.Interfaces;
 using SOS.Harvest.Processors.Shark;
 using SOS.Harvest.Processors.Shark.Interfaces;
+using SOS.Harvest.Processors.Skogsskada;
+using SOS.Harvest.Processors.Skogsskada.Interfaces;
 using SOS.Harvest.Processors.Taxon;
 using SOS.Harvest.Processors.Taxon.Interfaces;
 using SOS.Harvest.Processors.VirtualHerbarium;
@@ -72,6 +76,8 @@ using SOS.Harvest.Repositories.Source.Artportalen;
 using SOS.Harvest.Repositories.Source.Artportalen.Interfaces;
 using SOS.Harvest.Repositories.Source.ObservationsDatabase;
 using SOS.Harvest.Repositories.Source.ObservationsDatabase.Interfaces;
+using SOS.Harvest.Repositories.Source.Skogsskada;
+using SOS.Harvest.Repositories.Source.Skogsskada.Interfaces;
 using SOS.Harvest.Services;
 using SOS.Harvest.Services.Interfaces;
 using SOS.Harvest.Services.Taxon;
@@ -171,6 +177,7 @@ public static class DependencyInjectionExtensions
             services.AddSingleton(importConfiguration.MvmServiceConfiguration);
             services.AddSingleton(importConfiguration.NorsServiceConfiguration);
             services.AddSingleton(importConfiguration.ObservationDatabaseConfiguration);
+            services.AddSingleton(importConfiguration.SkogsskadaConfiguration);
             services.AddSingleton(importConfiguration.SersServiceConfiguration);
             services.AddSingleton(importConfiguration.SharkServiceConfiguration);
             services.AddSingleton(importConfiguration.VirtualHerbariumServiceConfiguration);
@@ -246,6 +253,9 @@ public static class DependencyInjectionExtensions
             // Aqua
             services.AddScoped<Harvest.Repositories.Source.Aqua.Interfaces.INorsRepository, Harvest.Repositories.Source.Aqua.NorsRepository>();
 
+            // Skogsskada
+            services.AddScoped<ISkogsskadaRepository, SkogsskadaRepository>();
+
             // Repositories resource
             services.AddScoped<Lib.Repositories.Resource.Interfaces.IAreaRepository, Lib.Repositories.Resource.AreaRepository>();
            
@@ -276,6 +286,7 @@ public static class DependencyInjectionExtensions
             services.AddScoped<ISharkObservationVerbatimRepository, SharkObservationVerbatimRepository>();            
             services.AddScoped<IVirtualHerbariumObservationVerbatimRepository, VirtualHerbariumObservationVerbatimRepository>();
             services.AddScoped<IiNaturalistObservationVerbatimRepository, iNaturalistObservationVerbatimRepository>();
+            services.AddScoped<ISkogsskadaObservationVerbatimRepository, SkogsskadaObservationVerbatimRepository>();
 
             // Repositories processed
             services.AddScoped<IUserObservationRepository, UserObservationRepository>();
@@ -302,6 +313,7 @@ public static class DependencyInjectionExtensions
             services.AddScoped<ISharkObservationHarvester, SharkObservationHarvester>();
             services.AddScoped<Harvest.Repositories.Source.Artportalen.Interfaces.ITaxonRepository, Harvest.Repositories.Source.Artportalen.TaxonRepository>();            
             services.AddScoped<IVirtualHerbariumObservationHarvester, VirtualHerbariumObservationHarvester>();
+            services.AddScoped<ISkogsskadaObservationHarvester, SkogsskadaObservationHarvester>();
 
             // Add harvesters checklists
             services.AddScoped<IArtportalenChecklistHarvester, ArtportalenChecklistHarvester>();
@@ -315,6 +327,7 @@ public static class DependencyInjectionExtensions
             services.AddScoped<IMvmObservationProcessor, MvmObservationProcessor>();
             services.AddScoped<IObservationDatabaseProcessor, ObservationDatabaseProcessor>();
             services.AddScoped<ISersObservationProcessor, SersObservationProcessor>();
+            services.AddScoped<ISkogsskadaObservationProcessor, SkogsskadaObservationProcessor>();
             services.AddScoped<ISharkObservationProcessor, SharkObservationProcessor>();            
             services.AddScoped<IVirtualHerbariumObservationProcessor, VirtualHerbariumObservationProcessor>();
             services.AddScoped<IiNaturalistObservationProcessor, iNaturalistObservationProcessor>();
@@ -376,6 +389,7 @@ public static class DependencyInjectionExtensions
             services.AddScoped<iNaturalistApiObservationService>();
             services.AddScoped<IMvmObservationService, MvmObservationService>();
             services.AddScoped<IObservationDatabaseDataService, ObservationDatabaseDataService>();
+            services.AddScoped<ISkogsskadaDataService, SkogsskadaDataService>();
             services.AddScoped<ISersObservationService, SersObservationService>();
             services.AddScoped<ISharkObservationService, SharkObservationService>();
             services.AddScoped<IVirtualHerbariumObservationService, VirtualHerbariumObservationService>();

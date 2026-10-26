@@ -60,7 +60,28 @@ public class TestFixture : IAsyncLifetime
 
     public async ValueTask DisposeAsync()
     {
-        await ApiFactory.DisposeAsync();
+        try
+        {
+            await ApiFactory.DisposeAsync();
+        }
+        finally
+        {
+            try
+            {
+                if (ServiceProvider != null) await ServiceProvider.DisposeAsync();
+            }
+            finally
+            {
+                try
+                {
+                    await TestContainerFixture.DisposeAsync();
+                }
+                finally
+                {
+                    _telemetryConfiguration.Dispose();
+                }
+            }
+        }
     }
 
     private ServiceProvider RegisterServices()

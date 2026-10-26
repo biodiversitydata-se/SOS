@@ -6,6 +6,7 @@ namespace SOS.Observations.Api.IntegrationTests.Tests.ApiEndpoints.TaxonListsEnd
 /// Integration tests for Taxon lists.
 /// </summary>
 [Collection(TestCollection.Name)]
+[Trait("Category", "ReadOnlyIntegrationTest")]
 public class TaxonListsTests : TestBase
 {
     public TaxonListsTests(TestFixture testFixture, ITestOutputHelper output) : base(testFixture, output)

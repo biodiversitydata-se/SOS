@@ -19,7 +19,6 @@
     <File Path="Docs/Install.md" />
     <File Path="Docs/Locations.md" />
     <File Path="Docs/Observation.md" />
-    <File Path="Docs/ObsoleteProperties.md" />
     <File Path="Docs/Publishing SOS API Client NuGet package.md" />
     <File Path="Docs/SearchFilter.md" />
     <File Path="Docs/SignalSearch.md" />

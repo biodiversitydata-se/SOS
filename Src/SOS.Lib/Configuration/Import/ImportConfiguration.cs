@@ -65,6 +65,11 @@ public class ImportConfiguration
     public SharkServiceConfiguration SharkServiceConfiguration { get; set; }
 
     /// <summary>
+    ///     Skogsskada configuration
+    /// </summary>
+    public SkogsskadaConfiguration SkogsskadaConfiguration { get; set; }
+
+    /// <summary>
     ///     Virtual Herbarium service configuration
     /// </summary>
     public VirtualHerbariumServiceConfiguration VirtualHerbariumServiceConfiguration { get; set; }

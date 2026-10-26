@@ -2542,5 +2542,79 @@
     "Type": "DwcA",
     "Url": "https://www.slu.se/en/about-slu/organisation/departments/aquatic-resources/environment/environmental-monitoring-and-data-collection/environmental-monitoring-along-the-coast",
     "UseVerbatimFileInExport": false
+  },
+  {
+    "Categories": [
+      "CitizenSciencePlatform",
+      "Terrestrial",
+      "Vertebrates",
+      "Invertebrates",
+      "Arthropods",
+      "Microorganisms",
+      "Fungi"
+    ],
+    "ContactPerson": {
+      "FirstName": "Helena",
+      "LastName": "Hallqvist",
+      "Email": "helena.hallqvist@slu.se"
+    },
+    "CreateEventDwC": false,
+    "DefaultVerificationStatus": "ReportedByExpert",
+    "Descriptions": [
+      {
+        "CultureCode": "en-GB",
+        "Value": "The Forest damage (Skogsskada) dataset contains reports of biotic tree damages, i.e. damages caused by tree pest taxa. Reports of damages are submitted using a web-based reporting tool (Skogsskada at https://skogsskada.slu.se) administered by SLU Forest Damage Centre (https://www.slu.se/en/about-slu/organisation/collaborative-centres/slu-forest-damage-centre/). The tool enables reporting of damages caused by fungi, insects, mites, bacteria, viruses, mammals, as well as damages caused by abiotic factors, such as frost or drought. The tool provides descriptions of damages and includes help for diagnosis. The reports are important information for describing the pest situation in the country. The tool also enables reporting of several non-pest fungi and insects that are common, conspicuous or could be mistaken for pests. All submitted reports are reviewed by experts, and this dataset only includes confirmed reports with verification status of ‘Approved’. The tree damage reports are used to increase knowledge about damages on trees and forest and help develop methods and strategies to mitigate damages. This dataset only includes reports of biotic tree damages. The web-based tool also enables recording of ancillary information such as the extent of damage, the forest stand age and additional information. This ancillary information is not included in this dataset. The complete data from the Forest damage database, including ancillary information and reports of abiotic damages is available at the webpage Skogsskada-Reports (https://skogsskada.slu.se/rapporter)."
+      },
+      {
+        "CultureCode": "sv-SE",
+        "Value": "Skogsskada dataset innehåller rapporter om biotiska trädskador, det vill säga skador orsakade av trädskadegörare. Rapporter om skador lämnas in via ett webbaserat verktyg för att rapportera och identifiera trädskador (Skogsskada på https://skogsskada.slu.se) som administreras av SLU Skogsskadecentrum (https://www.slu.se/en/about-slu/organisation/collaborative-centres/slu-forest-damage-centre/). Verktyget möjliggör rapportering av skador orsakade av svampar, insekter, kvalster, bakterier, virus och vilt, samt skador orsakade av abiotiska faktorer, såsom frost eller torka. Verktyget innehåller skadebeskrivningar samt hjälp för att diagnostisera skador. Rapporterna används för att beskriva skadeläget i landet. Verktyget möjliggör även rapportering av ett antal icke-skadegörande svampar och insekter som är vanligt förekommande, iögonfallande eller kan förväxlas med skadedjur. Alla inlämnade rapporter granskas av experter och detta dataset omfattar endast bekräftade rapporter med verifieringsstatusen ”Godkänd”. Rapporterna om skogsskador används för att öka kunskapen om skador på träd och skog samt för att bidra till att utveckla metoder och strategier för att minska skador. Detta dataset omfattar endast rapporter om biotiska skador. Det webbaserade verktyget möjliggör även registrering av kompletterande information, såsom skadans omfattning, skogsbeståndets ålder och ytterligare information. Denna kompletterande information ingår inte i detta dataset. De fullständiga uppgifterna från databasen över skogsskador, inklusive kompletterande information och rapporter om abiotiska skador, finns att ta del av på webbsidan Skogsskada-Observerade skador/rapporter (https://skogsskada.slu.se/rapporter)."
+      }
+    ],
+    "HarvestFailPreventProcessing": false,
+    "HarvestSchedule": "* * * * *",
+    "Id": 30,
+    "Identifier": "Skogsskada",
+    "IncludeInHealthCheck": false,
+    "IncludeInScheduledHarvest": true,
+    "IncludeInSearchByDefault": true,
+    "IsActive": true,
+    "Names": [
+      {
+        "CultureCode": "en-GB",
+        "Value": "SLU Forest Damage Centre: Forest damage - observations of forest pest species"
+      },
+      {
+        "CultureCode": "sv-SE",
+        "Value": "SLU Skogsskadecentrum: Skogsskada – observationer av skogsskadegörare"
+      }
+    ],
+    "Organizations": [
+      {
+        "CultureCode": "en-GB",
+        "Value": "SLU Forest Damage Centre"
+      },
+      {
+        "CultureCode": "sv-SE",
+        "Value": "SLU Skogsskadecentrum"
+      }
+    ],
+    "Paths": [
+      {
+        "CultureCode": "en-GB",
+        "path": [ "SLU", "Skogsskada" ]
+      },
+      {
+        "CultureCode": "sv-SE",
+        "path": [ "SLU", "Skogsskada" ]
+      }
+    ],
+    "PreviousProcessLimit": 80,
+    "SupportDatasets": false,
+    "SupportDynamicEml": false,
+    "SupportEvents": false,
+    "SupportIncrementalHarvest": false,
+    "Type": "SkogsskadaObservations",
+    "Url": "https://skogsskada.slu.se/",
+    "UseVerbatimFileInExport": false
   }
 ]

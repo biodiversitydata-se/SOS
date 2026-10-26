@@ -1,67 +1,22 @@
 ﻿using SOS.Api.Contracts.Common.Geo;
 using FluentAssertions;
-using Moq;
 using NetTopologySuite.Geometries;
-using SOS.Harvest.Managers;
-using SOS.Harvest.Managers.Interfaces;
-using SOS.Harvest.Processors.DarwinCoreArchive;
 using SOS.Harvest.Processors.Mvm;
-using SOS.Lib.Configuration.Process;
-using SOS.Lib.Configuration.Shared;
-using SOS.Lib.Enums;
-using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Extensions;
-using SOS.Lib.Helpers;
-using SOS.Lib.Helpers.Interfaces;
-using SOS.Lib.Models.Processed.Observation;
-using SOS.Lib.Models.Shared;
 using SOS.Lib.Models.Verbatim.Mvm;
-using SOS.Lib.Repositories.Resource.Interfaces;
-using SOS.Process.UnitTests.TestHelpers.Factories;
-using SOS.TestHelpers.Helpers;
-using System.Collections.Generic;
+using SOS.Process.UnitTests.TestHelpers;
 using System.Linq;
 using Xunit;
 
 namespace SOS.Process.UnitTests.Processors.Mvm;
 
-public class MvmObservationFactoryTests
+public class MvmObservationFactoryTests : IClassFixture<MvmObservationFactoryFixture>
 {
     private readonly MvmObservationFactory _factory;
 
-    public MvmObservationFactoryTests()
+    public MvmObservationFactoryTests(MvmObservationFactoryFixture fixture)
     {        
-        _factory = CreateMvmObservationFactory();
-    }
-
-    public MvmObservationFactory CreateMvmObservationFactory(ValidationStatusId? verificationStatusId = null)
-    {
-        var dataProviderDummy = new DataProvider { DefaultVerificationStatus = verificationStatusId };
-        var mammaliaTaxa =
-            MessagePackHelper.CreateListFromMessagePackFile<Taxon>(
-                @"Resources/MammaliaProcessedTaxa.msgpck");
-        var mammaliaTaxonByTaxonId = mammaliaTaxa.ToDictionary(t => t.Id, t => t);
-        var processedAreaRepositoryStub =
-            ProcessedAreaRepositoryStubFactory.Create(AreaType.County, AreaType.Province);
-        var vocabularyRepository = VocabularyRepositoryStubFactory.Create();
-        var vocabularies = vocabularyRepository.Object.GetAllAsync().Result;
-        var dwcaVocabularyById = VocabularyHelper.GetVocabulariesDictionary(
-            ExternalSystemId.DarwinCore,
-            vocabularies.ToArray(),
-            true);
-
-        var areaHelper = new AreaHelper(new AreaConfiguration(), processedAreaRepositoryStub.Object);
-        var processConfiguration = new ProcessConfiguration();
-        var factory = new MvmObservationFactory(
-            dataProviderDummy,
-            mammaliaTaxonByTaxonId,
-            dwcaVocabularyById,
-            areaHelper,
-            new ProcessTimeManager(processConfiguration),
-            vocabularyRepository.Object,
-            processConfiguration);
-
-        return factory;
+        _factory = fixture.CreateFactory();
     }
 
     /// <summary>

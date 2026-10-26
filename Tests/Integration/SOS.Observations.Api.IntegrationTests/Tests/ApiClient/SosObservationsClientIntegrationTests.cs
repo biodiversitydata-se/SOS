@@ -25,7 +25,7 @@ using FluentAssertions.Execution;
 namespace SOS.Observations.Api.IntegrationTests.Tests.ApiClient;
 
 [Collection(TestCollection.Name)]
-public class SosObservationsClientIntegrationTests : TestBase
+public class SosObservationsClientIntegrationTests : ElasticsearchTestBase
 {
     public SosObservationsClientIntegrationTests(TestFixture testFixture, ITestOutputHelper output) : base(testFixture, output)
     {

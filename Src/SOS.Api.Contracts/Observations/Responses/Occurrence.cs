@@ -88,6 +88,14 @@ public class Occurrence
     public string? IndividualCount { get; set; }
 
     /// <summary>
+    /// Invasive species treatment.
+    /// </summary>
+    /// <remarks>
+    /// This field uses a controlled vocabulary.
+    /// </remarks>
+    public VocabularyValue InvasiveSpeciesTreatment { get; set; }
+
+    /// <summary>
     /// Indicates if this species occurrence is natural or
     /// <br/>if it is a result of human activity.
     /// </summary>

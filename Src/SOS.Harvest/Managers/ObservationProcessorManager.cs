@@ -9,6 +9,7 @@ using SOS.Harvest.Processors.Mvm.Interfaces;
 using SOS.Harvest.Processors.ObservationDatabase.Interfaces;
 using SOS.Harvest.Processors.Sers.Interfaces;
 using SOS.Harvest.Processors.Shark.Interfaces;
+using SOS.Harvest.Processors.Skogsskada.Interfaces;
 using SOS.Harvest.Processors.VirtualHerbarium.Interfaces;
 using SOS.Lib.Enums;
 
@@ -28,6 +29,7 @@ public class ObservationProcessorManager : IObservationProcessorManager
         IObservationDatabaseProcessor observationDatabaseProcessor,
         ISersObservationProcessor sersObservationProcessor,
         ISharkObservationProcessor sharkObservationProcessor,
+        ISkogsskadaObservationProcessor skogsskadaObservationProcessor,
         IVirtualHerbariumObservationProcessor virtualHerbariumObservationProcessor,
         IiNaturalistObservationProcessor iNaturalistObservationProcessor
         )
@@ -39,6 +41,7 @@ public class ObservationProcessorManager : IObservationProcessorManager
         if (mvmObservationProcessor == null) throw new ArgumentNullException(nameof(mvmObservationProcessor));
         if (sersObservationProcessor == null) throw new ArgumentNullException(nameof(sersObservationProcessor));
         if (sharkObservationProcessor == null) throw new ArgumentNullException(nameof(sharkObservationProcessor));
+        if (skogsskadaObservationProcessor == null) throw new ArgumentNullException(nameof(skogsskadaObservationProcessor));
         if (virtualHerbariumObservationProcessor == null) throw new ArgumentNullException(nameof(virtualHerbariumObservationProcessor));
         if (iNaturalistObservationProcessor == null) throw new ArgumentNullException(nameof(iNaturalistObservationProcessor));
 
@@ -54,6 +57,7 @@ public class ObservationProcessorManager : IObservationProcessorManager
             {DataProviderType.NorsObservations, dwcaObservationProcessor},
             {DataProviderType.SersObservations, sersObservationProcessor},
             {DataProviderType.SharkObservations, sharkObservationProcessor},
+            {DataProviderType.SkogsskadaObservations, skogsskadaObservationProcessor},
             {DataProviderType.VirtualHerbariumObservations, virtualHerbariumObservationProcessor},
             {DataProviderType.iNaturalistObservations, iNaturalistObservationProcessor}
         };
