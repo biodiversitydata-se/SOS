@@ -1,0 +1,16 @@
+<layer>
+  <name>SpeciesObservationsValueableTrees</name>
+  <id>LayerInfoImpl-6da2d9d:1a177ba6ccd:-7fe0</id>
+  <type>VECTOR</type>
+  <defaultStyle>
+    <id>StyleInfoImpl-2e41bed4:1912ca47808:-7ff4</id>
+  </defaultStyle>
+  <resource class="featureType">
+    <id>FeatureTypeInfoImpl-6da2d9d:1a177ba6ccd:-7fe1</id>
+  </resource>
+  <attribution>
+    <logoWidth>0</logoWidth>
+    <logoHeight>0</logoHeight>
+  </attribution>
+  <dateCreated>2026-10-26 13:48:02.985 UTC</dateCreated>
+</layer>
