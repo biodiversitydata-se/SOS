@@ -1,5 +1,6 @@
 ﻿using FizzWare.NBuilder;
 using LinqStatistics;
+using SOS.Api.Contracts.Observations;
 using SOS.Lib.Models.Verbatim.DarwinCore;
 using SOS.Observations.Api.IntegrationTests.Setup;
 using SOS.Observations.Api.IntegrationTests.TestData.TestDataBuilder;
@@ -50,12 +51,16 @@ public class DarwinCoreProcessorTests : TestBase
     public void Sensitive_species_sightings_should_be_protected()
     {
         // Arrange
+        var sensitiveTaxon = ProcessFixture.Taxa.First(t => t.Attributes?.SensitivityCategory?.Id > 2);
+        var publicTaxon = ProcessFixture.Taxa.First(t => t.Attributes?.SensitivityCategory?.Id == 1);
         var verbatimObservations = Builder<DwcObservationVerbatim>.CreateListOfSize(5)
             .All().HaveValuesFromPredefinedObservations()
-            .TheFirst(3).HaveSensitiveSpeciesTaxonId()
+            .TheFirst(3).With(m => m.TaxonID = $"urn:lsid:dyntaxa:{sensitiveTaxon.Id}")
                          .With(m => m.AccessRights = null)
-             .TheNext(1).HaveSensitiveSpeciesTaxonId()
-                         .With(m => m.AccessRights = "Free usage") // Sensitive species with "Free usage" => Sensitive=false                
+             .TheNext(1).With(m => m.TaxonID = $"urn:lsid:dyntaxa:{sensitiveTaxon.Id}")
+                         .With(m => m.AccessRights = "Free usage")
+             .TheNext(1).With(m => m.TaxonID = $"urn:lsid:dyntaxa:{publicTaxon.Id}")
+                         .With(m => m.AccessRights = null)
             .Build();
 
         // Act
@@ -64,12 +69,12 @@ public class DarwinCoreProcessorTests : TestBase
         // Assert
         processedObservations
             .Select(m => m.Sensitive)
-            .CountEach()
-            .OrderByDescending(m => m.Count)
-            .ToList()
-            .Should().BeEquivalentTo(
-                new List<ItemCount<bool>> {
-                    new ItemCount<bool>(true, 3),
-                    new ItemCount<bool>(false, 2) });
+            .Should().Equal(true, true, true, false, false);
+        processedObservations
+            .Select(m => m.Occurrence.SensitivityCategory)
+            .Should().Equal(Enumerable.Repeat(sensitiveTaxon.Attributes.SensitivityCategory.Id, 3).Concat(new[] { 1, 1 }));
+        processedObservations
+            .Select(m => m.Occurrence.SensitivityReason)
+            .Should().Equal(SensitivityReason.SensitiveSpecies, SensitivityReason.SensitiveSpecies, SensitivityReason.SensitiveSpecies, null, null);
     }
 }

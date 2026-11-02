@@ -520,7 +520,7 @@ public class DwcaObservationFactory : ObservationFactoryBase, IObservationFactor
             processedOccurrence.IsPositiveObservation = false;
             processedOccurrence.IsNeverFoundObservation = true;
         }
-        var sensitivity = CalculateSensitivity(taxon);
+        var sensitivity = CalculateSensitivity(taxon, accessRightsId);
         processedOccurrence.SensitivityCategory = sensitivity.Category;
         processedOccurrence.SensitivityReason = sensitivity.Reason;
         return processedOccurrence;
