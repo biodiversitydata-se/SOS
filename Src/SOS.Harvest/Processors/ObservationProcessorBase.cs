@@ -136,7 +136,7 @@ namespace SOS.Harvest.Processors
                 var mongoDbReadTimerSessionId = TimeManager.Start(ProcessTimeManager.TimerTypes.MongoDbRead);
 
                 // Make up to 3 attempts with 0,5 sek sleep between the attempts 
-                var verbatimObservationsBatch = await PollyHelper.GetRetryPolicy(3, 500).ExecuteAsync(async () =>
+                var verbatimObservationsBatch = await PollyHelper.GetRetryPolicy(3, 500).ExecuteAsync(async _ =>
                 {
                     return await observationVerbatimRepository.GetBatchAsync(startId, endId);
                 });
@@ -421,6 +421,7 @@ namespace SOS.Harvest.Processors
                                 observationWithRealCoordinates.Sensitive = true;
                                 observationWithRealCoordinates.HasGeneralizedObservationInOtherIndex = true;
                                 observationWithRealCoordinates.Occurrence.SensitivityCategory = 3;
+                                observationWithRealCoordinates.Occurrence.SensitivityReason = SensitivityReason.LocationGeneralization;
                                 observationWithRealCoordinates.AccessRights = new VocabularyValue { Id = (int)AccessRightsId.NotForPublicUsage };
                                 sensitiveObservations.TryAdd(observationWithRealCoordinates.Occurrence!.OccurrenceId, observationWithRealCoordinates);
                             }

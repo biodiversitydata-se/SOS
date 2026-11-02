@@ -189,7 +189,7 @@ public class DwcChecklistHarvester : IDwcChecklistHarvester
                     try
                     {
                         // Make up to 3 attempts with 1 sek sleep between the attempts 
-                        emlDocument = await PollyHelper.GetRetryPolicy(3, 1000).ExecuteAsync(async () =>
+                        emlDocument = await PollyHelper.GetRetryPolicy(3, 1000).ExecuteAsync(async _ =>
                         {
                             return await _fileDownloadService.GetXmlFileAsync(dataset.EmlUrl);
                         });

@@ -2283,7 +2283,7 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
 
         var sortDescriptor = await GetExportSortDescriptorAsync<T>(searchIndex);
 
-        return await PollyHelper.GetRetryPolicy(3, 100).ExecuteAsync(async () =>
+        return await PollyHelper.GetRetryPolicy(3, 100).ExecuteAsync(async _ =>
         {
             var response = await Client.SearchAsync(searchDescriptor
                 .Indices(searchIndex)
@@ -2378,8 +2378,8 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
 
         var sortDescriptor = await Client.GetSortDescriptorAsync<T, Observation>(indexNames, filter?.Output?.SortOrders);
 
-        // Retry policy by Polly
-        var response = await PollyHelper.GetRetryPolicy(3, 100).ExecuteAsync(async () =>
+        // Retry policy
+        var response = await PollyHelper.GetRetryPolicy(3, 100).ExecuteAsync(async _ =>
         {
             if (string.IsNullOrEmpty(scrollId))
             {
@@ -2429,8 +2429,8 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
         var searchIndex = GetCurrentIndex(filter);
         var (query, excludeQuery) = GetCoreQueries<dynamic>(filter);
 
-        // Retry policy by Polly
-        var searchResponse = await PollyHelper.GetRetryPolicy(3, 100).ExecuteAsync(async () =>
+        // Retry policy
+        var searchResponse = await PollyHelper.GetRetryPolicy(3, 100).ExecuteAsync(async _ =>
         {
             var queryResponse = await SearchExportPageAsync<dynamic>(filter, searchIndex, new SearchRequestDescriptor<dynamic>()
             .Indices(searchIndex)

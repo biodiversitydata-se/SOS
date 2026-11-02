@@ -145,6 +145,7 @@ public class VirtualHerbariumObservationFactory : ObservationFactoryBase, IObser
         {
             defects.Add("Datum", verbatim.Datum ?? string.Empty);
         }
+        var sensitivity = CalculateSensitivity(taxon);
 
         var obs = new Observation
         {
@@ -184,7 +185,8 @@ public class VirtualHerbariumObservationFactory : ObservationFactoryBase, IObser
                 IsNotRediscoveredObservation = false,
                 IsPositiveObservation = true,
                 OccurrenceStatus = new VocabularyValue { Id = (int)OccurrenceStatusId.Present },
-                SensitivityCategory = CalculateProtectionLevel(taxon),
+                SensitivityCategory = sensitivity.Category,
+                SensitivityReason = sensitivity.Reason,
                 RecordedBy = verbatim.Collector,
                 OccurrenceRemarks = BuildOccurrenceRemarks(verbatim)
             },

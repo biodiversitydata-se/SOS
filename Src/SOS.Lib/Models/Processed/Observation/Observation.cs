@@ -1,4 +1,5 @@
 ﻿using SOS.Api.Contracts.Observations;
+using SOS.Lib.Enums;
 using SOS.Lib.Models.Interfaces;
 using SOS.Lib.Models.Processed.DataStewardship.Common;
 using SOS.Lib.Swagger;

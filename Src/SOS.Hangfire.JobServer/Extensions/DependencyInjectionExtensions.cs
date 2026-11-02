@@ -383,6 +383,21 @@ public static class DependencyInjectionExtensions
             services.AddScoped<IArtportalenDataService, ArtportalenDataService>();
             services.AddScoped<IFishDataObservationService, FishDataObservationService>();
             services.AddScoped<IFileDownloadService, FileDownloadService>();
+            services.AddHttpClient(HttpClientService.DefaultClient, client =>
+            {
+                client.Timeout = TimeSpan.FromMinutes(30);
+                client.DefaultRequestHeaders.Add("requesting-system", "SOS");
+            });
+            services.AddHttpClient(HttpClientService.InsecureClient, client =>
+            {
+                client.Timeout = TimeSpan.FromMinutes(30);
+                client.DefaultRequestHeaders.Add("requesting-system", "SOS");
+            })
+            .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+            {
+                ClientCertificateOptions = ClientCertificateOption.Manual,
+                ServerCertificateCustomValidationCallback = (_, _, _, _) => true
+            });
             services.AddScoped<IHttpClientService, HttpClientService>();
             services.AddScoped<IKulObservationService, KulObservationService>();
             services.AddScoped<IiNaturalistObservationService, iNaturalistObservationService>();

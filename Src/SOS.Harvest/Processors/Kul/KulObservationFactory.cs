@@ -65,6 +65,8 @@ public class KulObservationFactory : ObservationFactoryBase, IObservationFactory
         public Observation CreateProcessedObservation(KulObservationVerbatim verbatim, bool diffuseIfSupported)
         {
             var taxon = GetTaxon(verbatim.DyntaxaTaxonId);
+
+            var sensitivity = CalculateSensitivity(taxon);
             var obs = new Observation
             {
                 DataProviderId = DataProvider.Id,
@@ -97,7 +99,8 @@ public class KulObservationFactory : ObservationFactoryBase, IObservationFactory
                     IsNotRediscoveredObservation = false,
                     IsPositiveObservation = GetIsPositiveObservation(verbatim.DyntaxaTaxonId),
                     //ProtectionLevel = CalculateProtectionLevel(taxon),
-                    SensitivityCategory = CalculateProtectionLevel(taxon),
+                    SensitivityCategory = sensitivity.Category,
+                    SensitivityReason = sensitivity.Reason,
                     RecordedBy = verbatim.RecordedBy,
                     ReportedBy = verbatim.ReportedBy,
                     ReportedDate = verbatim.Start.ToUniversalTime(),

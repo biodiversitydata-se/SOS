@@ -1,18 +1,12 @@
 ﻿using Microsoft.Extensions.Logging;
 using Polly;
+using Polly.Retry;
 using SOS.Lib.Services.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Threading;
-using System.Threading.Tasks;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace SOS.Lib.Services;
@@ -43,109 +37,74 @@ public static class JsonSerializationHelper
 /// <inheritdoc />
 public class HttpClientService : IHttpClientService
 {
+    private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger<HttpClientService> _logger;
 
     /// <summary>
-    ///     Disposed
+    /// Named client for standard requests. Register this name via <c>services.AddHttpClient(HttpClientService.DefaultClient)</c>.
     /// </summary>
-    private bool _disposed;
+    public const string DefaultClient = "SOS.Default";
 
-    private HttpClient GetClient(IDictionary<string, string> headerData = null, bool disableCertificateValidation = false)
+    /// <summary>
+    /// Named client that skips TLS certificate validation (used by <see cref="GetFileStreamAsync"/>).
+    /// Register this name via <c>services.AddHttpClient(HttpClientService.InsecureClient)</c>.
+    /// </summary>
+    public const string InsecureClient = "SOS.Insecure";
+
+    private HttpClient CreateClient(IDictionary<string, string> headerData = null, bool insecure = false)
     {
+        var httpClient = _httpClientFactory.CreateClient(insecure ? InsecureClient : DefaultClient);
 
-        var httpClient = disableCertificateValidation ?
-                new HttpClient(new HttpClientHandler
-                {
-                    ClientCertificateOptions = ClientCertificateOption.Manual,
-                    ServerCertificateCustomValidationCallback =
-                        (httpRequestMessage, cert, cetChain, policyErrors) => true
-                }) :
-                new HttpClient();
-
-        httpClient.Timeout = TimeSpan.FromMinutes(30);
-        httpClient.DefaultRequestHeaders.Add("requesting-system", "SOS");
-
-        if (!headerData?.Any() ?? true)
+        if (headerData?.Any() != true)
         {
             return httpClient;
         }
 
         var userName = headerData
-            .FirstOrDefault(hd => hd.Key.Equals("username", StringComparison.CurrentCultureIgnoreCase)).Value;
+            .FirstOrDefault(hd => hd.Key.Equals("username", StringComparison.OrdinalIgnoreCase)).Value;
         var password = headerData
-            .FirstOrDefault(hd => hd.Key.Equals("password", StringComparison.CurrentCultureIgnoreCase)).Value;
+            .FirstOrDefault(hd => hd.Key.Equals("password", StringComparison.OrdinalIgnoreCase)).Value;
 
-        // Add basic authentication if user name and password is passed in header data
         if (!string.IsNullOrEmpty(userName) && !string.IsNullOrEmpty(password))
         {
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
                 AuthenticationSchemes.Basic.ToString(),
-                Convert.ToBase64String(Encoding.UTF8.GetBytes($"{userName}:{password}"))
-            );
+                Convert.ToBase64String(Encoding.UTF8.GetBytes($"{userName}:{password}")));
         }
 
         var personalAccessToken = headerData
-            .FirstOrDefault(hd => hd.Key.Equals("personalAccessToken", StringComparison.CurrentCultureIgnoreCase)).Value;
+            .FirstOrDefault(hd => hd.Key.Equals("personalAccessToken", StringComparison.OrdinalIgnoreCase)).Value;
         if (!string.IsNullOrEmpty(personalAccessToken))
         {
-            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic",
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
+                "Basic",
                 Convert.ToBase64String(
-                    ASCIIEncoding.ASCII.GetBytes(
-                        string.Format("{0}:{1}", "", personalAccessToken)
-                    )
-                )
-            );
+                    Encoding.ASCII.GetBytes($":{personalAccessToken}")));
         }
 
-        foreach (var data in headerData.Where(
-                hd => !
-                (
-                    hd.Key.Equals("username", StringComparison.CurrentCultureIgnoreCase) ||
-                    hd.Key.Equals("password", StringComparison.CurrentCultureIgnoreCase))
-            )
-        )
+        foreach (var data in headerData.Where(hd =>
+            !hd.Key.Equals("username", StringComparison.OrdinalIgnoreCase) &&
+            !hd.Key.Equals("password", StringComparison.OrdinalIgnoreCase)))
         {
-            httpClient.DefaultRequestHeaders.Add(data.Key, data.Value);
+            httpClient.DefaultRequestHeaders.TryAddWithoutValidation(data.Key, data.Value);
         }
 
         return httpClient;
     }
 
     /// <summary>
-    ///     Dispose
-    /// </summary>
-    /// <param name="disposing"></param>
-    protected virtual void Dispose(bool disposing)
-    {
-        if (_disposed)
-        {
-            return;
-        }
-
-        if (disposing)
-        {
-        }
-
-        _disposed = true;
-    }
-
-    /// <summary>
     ///     Constructor
     /// </summary>
+    /// <param name="httpClientFactory"></param>
     /// <param name="logger"></param>
-    public HttpClientService(ILogger<HttpClientService> logger)
+    public HttpClientService(IHttpClientFactory httpClientFactory, ILogger<HttpClientService> logger)
     {
+        _httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
-    /// <summary>
-    ///     Dispose
-    /// </summary>
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
+    /// <inheritdoc />
+    public void Dispose() { /* HttpClient lifetime is managed by IHttpClientFactory */ }
 
     /// <inheritdoc />
     public async Task<T> GetDataAsync<T>(Uri requestUri)
@@ -160,46 +119,57 @@ public class HttpClientService : IHttpClientService
         TimeSpan? timeout = null,
         int? retryCount = null)
     {
-        var httpClient = GetClient(headerData);
-        var responsePhrase = string.Empty;
+        var httpClient = CreateClient(headerData);
 
         try
         {
             HttpResponseMessage response;
 
-            if (timeout.HasValue || retryCount.HasValue)
-            {                    
-                var effectiveTimeout = timeout ?? TimeSpan.FromSeconds(30);
-                var effectiveRetryCount = retryCount ?? 0;
-                var timeoutPolicy = Policy.TimeoutAsync<HttpResponseMessage>(effectiveTimeout);
-                var retryPolicy = Policy
-                    .Handle<Exception>()
-                    .WaitAndRetryAsync(effectiveRetryCount,
-                        retryAttempt => TimeSpan.FromSeconds(retryAttempt), // 1s, 2s, 3s, ...
-                        (exception, timeSpan, retry, context) =>
+            if (timeout.HasValue || retryCount is > 0)
+            {
+                var builder = new ResiliencePipelineBuilder<HttpResponseMessage>();
+
+                if (retryCount is > 0)
+                {
+                    builder.AddRetry(new RetryStrategyOptions<HttpResponseMessage>
+                    {
+                        MaxRetryAttempts = retryCount.Value,
+                        Delay = TimeSpan.FromSeconds(1),
+                        BackoffType = DelayBackoffType.Linear,
+                        ShouldHandle = new PredicateBuilder<HttpResponseMessage>().Handle<Exception>(),
+                        OnRetry = args =>
                         {
-                            _logger.LogWarning(exception, "Retry {Retry} after {Delay}s for request {Uri}", retry, timeSpan.TotalSeconds, requestUri);
-                        });
-                var policyWrap = retryPolicy.WrapAsync(timeoutPolicy);
-                response = await policyWrap.ExecuteAsync(async ct =>
+                            _logger.LogWarning(args.Outcome.Exception,
+                                "Retry {Retry} after {Delay}s for request {Uri}",
+                                args.AttemptNumber + 1, args.RetryDelay.TotalSeconds, requestUri);
+                            return ValueTask.CompletedTask;
+                        }
+                    });
+                }
+
+                if (timeout.HasValue)
+                {
+                    builder.AddTimeout(timeout.Value);
+                }
+
+                var pipeline = builder.Build();
+                response = await pipeline.ExecuteAsync(async ct =>
                 {
                     var request = new HttpRequestMessage(HttpMethod.Get, requestUri);
                     return await httpClient.SendAsync(request, ct);
-                }, CancellationToken.None);
+                });
             }
             else
             {
-                // No resilience
                 response = await httpClient.GetAsync(requestUri);
             }
 
-            responsePhrase = response.ReasonPhrase;
-            
             if (!response.IsSuccessStatusCode)
             {
                 var responseBody = await response.Content.ReadAsStringAsync();
-                _logger.LogError("HttpClient.GetDataAsync() failed. RequestUri={RequestUri}, StatusCode={StatusCode}, ReasonPhrase={ReasonPhrase}, ResponseBody={ResponseBody}", 
-                    requestUri.AbsolutePath, response.StatusCode, responsePhrase, responseBody);
+                _logger.LogError(
+                    "HttpClient.GetDataAsync() failed. RequestUri={RequestUri}, StatusCode={StatusCode}, ReasonPhrase={ReasonPhrase}, ResponseBody={ResponseBody}",
+                    requestUri.AbsolutePath, response.StatusCode, response.ReasonPhrase, responseBody);
                 return default;
             }
 
@@ -209,11 +179,7 @@ public class HttpClientService : IHttpClientService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "HttpClient.GetDataAsync() failed. RequestUri={@requestUri}", requestUri.AbsolutePath);
-        }
-        finally
-        {
-            httpClient.Dispose();
+            _logger.LogError(ex, "HttpClient.GetDataAsync() failed. RequestUri={RequestUri}", requestUri.AbsolutePath);
         }
 
         return default;
@@ -222,10 +188,8 @@ public class HttpClientService : IHttpClientService
     /// <inheritdoc />
     public async Task<Stream> GetFileStreamAsync(Uri requestUri, IDictionary<string, string> headerData = null)
     {
-        var httpClient = GetClient(headerData, true);
-
+        var httpClient = CreateClient(headerData, insecure: true);
         var response = await httpClient.GetAsync(requestUri, HttpCompletionOption.ResponseContentRead);
-
         return response.StatusCode == HttpStatusCode.OK ? await response.Content.ReadAsStreamAsync() : null;
     }
 
@@ -244,21 +208,18 @@ public class HttpClientService : IHttpClientService
     /// <inheritdoc />
     public async Task<T> PostDataAsync<T>(Uri requestUri, object model, IDictionary<string, string> headerData, string contentType)
     {
-        var httpClient = GetClient(headerData);
+        var httpClient = CreateClient(headerData);
         try
         {
             var httpResponseMessage = await httpClient.PostAsync(requestUri, new JsonContent(model, contentType));
             httpResponseMessage.EnsureSuccessStatusCode();
-
-            return await JsonSerializer.DeserializeAsync<T>(await httpResponseMessage.Content.ReadAsStreamAsync(), JsonSerializationHelper.SerializerOptions);
+            return await JsonSerializer.DeserializeAsync<T>(
+                await httpResponseMessage.Content.ReadAsStreamAsync(),
+                JsonSerializationHelper.SerializerOptions);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Post to {@requestUri} failed", requestUri.AbsolutePath);
-        }
-        finally
-        {
-            httpClient.Dispose();
+            _logger.LogError(ex, "Post to {RequestUri} failed", requestUri.AbsolutePath);
         }
 
         return default;
@@ -279,23 +240,19 @@ public class HttpClientService : IHttpClientService
     /// <inheritdoc />
     public async Task<T> PutDataAsync<T>(Uri requestUri, object model, IDictionary<string, string> headerData, string contentType)
     {
-        var httpClient = GetClient(headerData);
+        var httpClient = CreateClient(headerData);
         try
         {
             var httpResponseMessage = await httpClient.PutAsync(requestUri, new JsonContent(model, contentType));
             httpResponseMessage.EnsureSuccessStatusCode();
-
-            return await JsonSerializer.DeserializeAsync<T>(await httpResponseMessage.Content.ReadAsStreamAsync(), JsonSerializationHelper.SerializerOptions);
+            return await JsonSerializer.DeserializeAsync<T>(
+                await httpResponseMessage.Content.ReadAsStreamAsync(),
+                JsonSerializationHelper.SerializerOptions);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "HtppClient.PutDataAsync() failed. RequestUri={@requestUri}", requestUri.AbsolutePath);
+            _logger.LogError(ex, "HttpClient.PutDataAsync() failed. RequestUri={RequestUri}", requestUri.AbsolutePath);
         }
-        finally
-        {
-            httpClient.Dispose();
-        }
-
 
         return default;
     }
@@ -303,20 +260,16 @@ public class HttpClientService : IHttpClientService
     /// <inheritdoc />
     public async Task<T> DeleteDataAsync<T>(Uri requestUri)
     {
-        var httpClient = GetClient();
+        var httpClient = CreateClient();
         try
         {
             var httpResponseMessage = await httpClient.DeleteAsync(requestUri);
-            return await JsonSerializer.DeserializeAsync<T>(await httpResponseMessage.Content.ReadAsStreamAsync());
+            return await JsonSerializer.DeserializeAsync<T>(
+                await httpResponseMessage.Content.ReadAsStreamAsync());
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "HtppClient.DeleteDataAsync() failed. RequestUri={@requestUri}", requestUri.AbsolutePath);
-            Thread.Sleep(1000);
-        }
-        finally
-        {
-            httpClient.Dispose();
+            _logger.LogError(ex, "HttpClient.DeleteDataAsync() failed. RequestUri={RequestUri}", requestUri.AbsolutePath);
         }
 
         return default;
@@ -324,7 +277,7 @@ public class HttpClientService : IHttpClientService
 }
 
 /// <summary>
-///     Create json conetent
+///     Create json content
 /// </summary>
 public class JsonContent : StringContent
 {
@@ -336,6 +289,5 @@ public class JsonContent : StringContent
     public JsonContent(object obj, string contentType) :
         base(JsonSerializer.Serialize(obj, JsonSerializationHelper.SerializerOptions), Encoding.UTF8, contentType)
     {
-
     }
 }

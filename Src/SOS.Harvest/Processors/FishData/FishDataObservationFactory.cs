@@ -64,6 +64,7 @@ public class FishDataObservationFactory : ObservationFactoryBase, IObservationFa
         public Observation CreateProcessedObservation(FishDataObservationVerbatim verbatim, bool diffuseIfSupported)
         {
             var taxon = GetTaxon(verbatim.DyntaxaTaxonId);
+            var sensitivity = CalculateSensitivity(taxon);
             var obs = new Observation
             {
                 DataProviderId = DataProvider.Id,
@@ -90,13 +91,12 @@ public class FishDataObservationFactory : ObservationFactoryBase, IObservationFa
                     BirdNestActivityId = 0,
                     CatalogNumber = GetCatalogNumber(verbatim.OccurrenceId),
                     OccurrenceId = verbatim.OccurrenceId,
-                    //IndividualId = verbatim.IndividualId?.ToString(),
                     IsNaturalOccurrence = true,
                     IsNeverFoundObservation = GetIsNeverFoundObservation(verbatim.DyntaxaTaxonId),
                     IsNotRediscoveredObservation = false,
                     IsPositiveObservation = GetIsPositiveObservation(verbatim.DyntaxaTaxonId),
-                    //ProtectionLevel = CalculateProtectionLevel(taxon, null),
-                    SensitivityCategory = CalculateProtectionLevel(taxon, null),
+                    SensitivityCategory = sensitivity.Category,
+                    SensitivityReason = sensitivity.Reason,
                     RecordedBy = verbatim.RecordedBy,
                     ReportedBy = verbatim.ReportedBy,
                     ReportedDate = verbatim.Start.ToUniversalTime(),

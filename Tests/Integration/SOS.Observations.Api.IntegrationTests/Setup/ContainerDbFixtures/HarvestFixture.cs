@@ -54,6 +54,21 @@ public class HarvestFixture : IHarvestFixture
         serviceCollection.AddLogging();
 
         serviceCollection.AddSingleton<IFileDownloadService, FileDownloadService>();
+        serviceCollection.AddHttpClient(HttpClientService.DefaultClient, client =>
+        {
+            client.Timeout = TimeSpan.FromMinutes(30);
+            client.DefaultRequestHeaders.Add("requesting-system", "SOS");
+        });
+        serviceCollection.AddHttpClient(HttpClientService.InsecureClient, client =>
+        {
+            client.Timeout = TimeSpan.FromMinutes(30);
+            client.DefaultRequestHeaders.Add("requesting-system", "SOS");
+        })
+        .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+        {
+            ClientCertificateOptions = ClientCertificateOption.Manual,
+            ServerCertificateCustomValidationCallback = (_, _, _, _) => true
+        });
         serviceCollection.AddSingleton<IHttpClientService, HttpClientService>();
         serviceCollection.AddSingleton(GetDwcaConfiguration());
         serviceCollection.AddSingleton(GetDwcaFilesCreationConfiguration());

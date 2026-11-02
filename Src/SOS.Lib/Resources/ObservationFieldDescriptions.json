@@ -655,13 +655,13 @@
     "DwcName": "",
     "DwcIdentifier": "",
     "DependsOn": "Taxon.BirdDirective",
-    "FieldSet": "AllWithValues"
+    "FieldSet": ""
   },
   {
     "PropertyName": "BirdDirectiveAnnex1",
     "PropertyPath": "Taxon.BirdDirectiveAnnex1",
     "SwedishTitle": "Fågeldirektivet bilaga 1 (Sverige)",
-    "EnglishTitle": "Birds Directive Annex 1 (Sverige)",
+    "EnglishTitle": "Birds Directive Annex 1 (Sweden)",
     "DataType": "Boolean",
     "DataTypeIsNullable": true,
     "DwcName": "",
@@ -3273,6 +3273,18 @@
     "EnglishTitle": "Sensitive",
     "DataType": "Boolean",
     "DataTypeIsNullable": false,
+    "DwcName": "",
+    "DwcIdentifier": "",
+    "DependsOn": "Sensitive",
+    "FieldSet": "AllWithValues"
+  },
+  {
+    "PropertyName": "SensitivityReason",
+    "PropertyPath": "SensitivityReason",
+    "SwedishTitle": "Skäl till skydd",
+    "EnglishTitle": "Sensitive reason",
+    "DataType": "String",
+    "DataTypeIsNullable": true,
     "DwcName": "",
     "DwcIdentifier": "",
     "DependsOn": "Sensitive",

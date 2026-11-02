@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using SOS.Lib.Enums;
 
 namespace SOS.Lib.Models.Processed.Observation;
 
@@ -252,6 +251,11 @@ public class Occurrence
     /// 1 indicates public access and 5 is the highest used security level.
     /// </summary>
     public int SensitivityCategory { get; set; }
+
+    /// <summary>
+    /// The reason for the sensitivity of the observation.
+    /// </summary>
+    public SensitivityReason? SensitivityReason { get; set; }
 
     /// <summary>
     ///     A list (concatenated and separated) of names of people,

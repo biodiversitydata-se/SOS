@@ -50,23 +50,23 @@ public class SharkObservationFactory : ObservationFactoryBase, IObservationFacto
         }
     }
 
-        public IEnumerable<Observation>? CreateProcessedObservations(SharkObservationVerbatim verbatim, bool diffuseIfSupported)
-        {
-            var observation = CreateProcessedObservation(verbatim, diffuseIfSupported);
-            return observation == null ? null : [observation];
-        }
+    public IEnumerable<Observation>? CreateProcessedObservations(SharkObservationVerbatim verbatim, bool diffuseIfSupported)
+    {
+        var observation = CreateProcessedObservation(verbatim, diffuseIfSupported);
+        return observation == null ? null : [observation];
+    }
 
-        /// <summary>
-        ///  Cast verbatim observations to processed data model
-        /// </summary>
-        /// <param name="verbatim"></param>
-        /// <param name="diffuseIfSupported"></param>
-        /// <returns></returns>
-        public Observation CreateProcessedObservation(SharkObservationVerbatim verbatim, bool diffuseIfSupported)
-        {
-            var taxon = GetTaxon(verbatim.DyntaxaId.HasValue ? verbatim.DyntaxaId.Value : -1, new[] { verbatim.ScientificName, verbatim.ReportedScientificName }.Distinct());
-            var sharkSampleId = $"{(string.IsNullOrEmpty(verbatim.Sharksampleidmd5) ? verbatim.SharkSampleId : verbatim.Sharksampleidmd5)}-{taxon.Id}-{verbatim.ReportedScientificName}".Clean().RemoveWhiteSpace();
-
+    /// <summary>
+    ///  Cast verbatim observations to processed data model
+    /// </summary>
+    /// <param name="verbatim"></param>
+    /// <param name="diffuseIfSupported"></param>
+    /// <returns></returns>
+    public Observation CreateProcessedObservation(SharkObservationVerbatim verbatim, bool diffuseIfSupported)
+    {
+        var taxon = GetTaxon(verbatim.DyntaxaId.HasValue ? verbatim.DyntaxaId.Value : -1, new[] { verbatim.ScientificName, verbatim.ReportedScientificName }.Distinct());
+        var sharkSampleId = $"{(string.IsNullOrEmpty(verbatim.Sharksampleidmd5) ? verbatim.SharkSampleId : verbatim.Sharksampleidmd5)}-{taxon.Id}-{verbatim.ReportedScientificName}".Clean().RemoveWhiteSpace();
+        var sensitivity = CalculateSensitivity(taxon);
         var obs = new Observation
         {
             MongoDbId = verbatim.Id,
@@ -104,7 +104,8 @@ public class SharkObservationFactory : ObservationFactoryBase, IObservationFacto
                 IsNotRediscoveredObservation = false,
                 IsPositiveObservation = GetIsPositiveObservation(verbatim.DyntaxaId),
                 //ProtectionLevel = CalculateProtectionLevel(taxon),
-                SensitivityCategory = CalculateProtectionLevel(taxon),
+                SensitivityCategory = sensitivity.Category,
+                SensitivityReason = sensitivity.Reason,
                 RecordedBy = verbatim.Taxonomist,
                 ReportedBy = verbatim.ReportedStationName,
                 OccurrenceStatus = GetOccurrenceStatusId(verbatim.DyntaxaId)

@@ -126,6 +126,7 @@ public class ObservationDatabaseObservationFactory : ObservationFactoryBase, IOb
                 OccurrenceStatus = new VocabularyValue { Id = (int)((verbatim.IsNeverFoundObservation || verbatim.IsNotRediscoveredObservation) ? OccurrenceStatusId.Absent : OccurrenceStatusId.Present) },
                 //ProtectionLevel = verbatim.ProtectionLevel,
                 SensitivityCategory = verbatim.ProtectionLevel,
+                SensitivityReason = verbatim.ProtectionLevel > 2 ? SensitivityReason.ProviderDecision : null,
                 RecordedBy = verbatim.Observers,
                 ReportedDate = verbatim.RegisterDate,
                 ReportedBy = verbatim.ReportedBy?.Clean(),

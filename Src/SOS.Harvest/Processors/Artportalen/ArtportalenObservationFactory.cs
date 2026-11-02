@@ -61,27 +61,42 @@ public class ArtportalenObservationFactory : ObservationFactoryBase, IObservatio
     }
 
     /// <summary>
-    ///     Calculate protection level
+    /// Cast verbatim observation to processed observation 
     /// </summary>
     /// <param name="taxon"></param>
-    /// <param name="hiddenByProviderUntil"></param>
-    /// <param name="protectedBySystem"></param>
+    /// <param name="verbatimObservation"></param>
+    /// <param name="diffuseIfSupported"></param>
     /// <returns></returns>
-    private int CalculateSensitivityCategory(Lib.Models.Processed.Observation.Taxon taxon, DateTime? hiddenByProviderUntil, bool protectedBySystem)
+    private (int CategoryId, SensitivityReason? Reason) CalculateSensitivityCategoryAndReason(Lib.Models.Processed.Observation.Taxon taxon, ArtportalenObservationVerbatim verbatimObservation, bool diffuseIfSupported)
     {
-        var hiddenByProvider = hiddenByProviderUntil.HasValue && hiddenByProviderUntil.Value >= DateTime.Now;
-        var taxonProtectionLevel = taxon?.Attributes?.SensitivityCategory?.Id ?? 3;
-
-        if (protectedBySystem)
+        var sensitiveReason = SensitivityReason.Unknown;
+        if (!diffuseIfSupported && (verbatimObservation.Site?.DiffusionId ?? 0) > 0)
         {
-            return Math.Max(3, taxonProtectionLevel);
-        }
-        else if (hiddenByProvider)
-        {
-            return 3;
+            sensitiveReason = SensitivityReason.LocationGeneralization;
         }
 
-        return 1;
+        if (verbatimObservation.ProtectedBySystem)
+        {
+            var taxonSensitiveLevel = taxon?.Attributes?.SensitivityCategory?.Id ?? 1;
+            if (sensitiveReason == SensitivityReason.Unknown)
+            {
+                sensitiveReason = taxonSensitiveLevel > 2 ? SensitivityReason.SensitiveSpecies : SensitivityReason.ProviderDecision;
+            }
+           
+            return (Math.Max(3, taxonSensitiveLevel), sensitiveReason);
+        }
+        
+        var hiddenByProvider = verbatimObservation.HiddenByProvider.GetValueOrDefault(DateTime.MinValue) > DateTime.Now;
+        if (hiddenByProvider)
+        {
+            if (sensitiveReason == SensitivityReason.Unknown)
+            {
+                sensitiveReason = SensitivityReason.ReporterDecision;
+            }
+            return (3, sensitiveReason);
+        }
+
+        return (1, null);
     }
 
     /// <summary>
@@ -417,8 +432,9 @@ public class ArtportalenObservationFactory : ObservationFactoryBase, IObservatio
             obs.Occurrence.OrganismQuantityAggregation = CalculateQuantityAggregation(verbatimObservation);
             obs.Occurrence.OrganismQuantityInt = verbatimObservation.Quantity;
             obs.Occurrence.OrganismQuantity = verbatimObservation.Quantity.ToString();
-            //obs.Occurrence.ProtectionLevel = CalculateProtectionLevel(taxon, verbatimObservation.HiddenByProvider, verbatimObservation.ProtectedBySystem);
-            obs.Occurrence.SensitivityCategory = CalculateSensitivityCategory(taxon!, verbatimObservation.HiddenByProvider, verbatimObservation.ProtectedBySystem);
+            var (categoryId, reason) = CalculateSensitivityCategoryAndReason(taxon!, verbatimObservation, diffuseIfSupported);
+            obs.Occurrence.SensitivityCategory = categoryId;
+            obs.Occurrence.SensitivityReason = reason;
             obs.Occurrence.ReportedBy = verbatimObservation.ReportedBy.Clean();
             obs.Occurrence.ReportedDate = verbatimObservation.ReportedDate?.ToUniversalTime();
             obs.Occurrence.RecordedBy = verbatimObservation.Observers.Clean();

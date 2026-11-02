@@ -9,6 +9,7 @@ using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using System.Globalization;
 using Location = SOS.Lib.Models.Processed.Observation.Location;
+using SOS.Lib.Enums;
 
 namespace SOS.Harvest.Processors;
 
@@ -171,30 +172,14 @@ public class FactoryBase
         InitializeLocation(location, verbatimLongitude, verbatimLatitude, verbatimCoordinateSystem, point, pointWithBuffer, pointWithDisturbanceBuffer, coordinateUncertaintyInMeters);
     }
 
-    /// <summary>
-    /// Calculate protection level
-    /// </summary>
-    /// <param name="taxon"></param>
-    /// <param name="accessRightsId"></param>
-    /// <returns></returns>
-    protected int CalculateProtectionLevel(Lib.Models.Processed.Observation.Taxon? taxon)
-    {
-        return CalculateProtectionLevel(taxon, null);
-    }
 
-    /// <summary>
-    /// Calculate protection level
-    /// </summary>
-    /// <param name="taxon"></param>
-    /// <param name="accessRightsId"></param>
-    /// <returns></returns>
-    protected int CalculateProtectionLevel(Lib.Models.Processed.Observation.Taxon? taxon, AccessRightsId? accessRightsId)
+    protected (int Category, SensitivityReason? Reason) CalculateSensitivity(Lib.Models.Processed.Observation.Taxon? taxon, AccessRightsId? accessRightsId = null)
     {
-        if (accessRightsId is AccessRightsId.FreeUsage) return 1;
-        var protectionLevel = taxon?.Attributes?.SensitivityCategory?.Id ?? 1;
-        return protectionLevel > 0 ? protectionLevel : 1;
+        if (accessRightsId is AccessRightsId.FreeUsage) return (1, null);
+        var sensitivityLevel = taxon?.Attributes?.SensitivityCategory?.Id ?? 0;
+        return sensitivityLevel > 2 ? (sensitivityLevel, SensitivityReason.SensitiveSpecies) : (1, null);
     }
-
+    
     protected VocabularyValue GetAccessRightsFromSensitivityCategory(int sensitivityCategory)
     {
         return VocabularyValue.Create((int)GetAccessRightsIdFromSensitivityCategory(sensitivityCategory));

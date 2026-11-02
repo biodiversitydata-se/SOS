@@ -1,6 +1,6 @@
-﻿using SOS.Lib.Enums.VocabularyValues;
+﻿using SOS.Lib.Enums;
+using SOS.Lib.Enums.VocabularyValues;
 using SOS.Lib.Models.Processed.Observation;
-using System.Collections.Generic;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
@@ -22,6 +22,16 @@ public static class ObservationExtensions
         public bool ShallBeProtected()
         {
             return observation.Occurrence.SensitivityCategory > 2 || observation.AccessRights?.Id == (int)AccessRightsId.NotForPublicUsage;
+        }
+
+        public SensitivityReason? GetDefaultSensitiveReason()
+        {
+            if ((observation.Taxon?.Attributes?.SensitivityCategory?.Id ?? 0) > 2)
+            {
+                return SensitivityReason.SensitiveSpecies;
+            }
+
+            return SensitivityReason.ProviderDecision;
         }
     }
 

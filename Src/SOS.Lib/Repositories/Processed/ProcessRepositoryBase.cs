@@ -358,8 +358,8 @@ public abstract class ProcessRepositoryBase<TEntity, TKey> : IProcessRepositoryB
             pointInTimeId = pitResponse.Id;
         }
 
-        // Retry policy by Polly
-        var searchResponse = await PollyHelper.GetRetryPolicy(3, 100).ExecuteAsync(async () =>
+        // Retry policy
+        var searchResponse = await PollyHelper.GetRetryPolicy(3, 100).ExecuteAsync(async _ =>
         {
             var queryResponse = await Client.SearchAsync<T>(searchDescriptor
                .Indices(searchIndex)

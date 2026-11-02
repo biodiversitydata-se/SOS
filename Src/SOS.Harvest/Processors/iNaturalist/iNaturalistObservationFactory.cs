@@ -142,6 +142,7 @@ public class iNaturalistObservationFactory : ObservationFactoryBase, IObservatio
             {
                 obs.Occurrence.SensitivityCategory = 3;
             }
+            obs.Occurrence.SensitivityReason = obs.GetDefaultSensitiveReason();
         }
 
         // Populate generic data
@@ -262,7 +263,9 @@ public class iNaturalistObservationFactory : ObservationFactoryBase, IObservatio
         processedOccurrence.IsNeverFoundObservation = false;
         processedOccurrence.IsNotRediscoveredObservation = false;
         processedOccurrence.IsPositiveObservation = true;
-        processedOccurrence.SensitivityCategory = CalculateProtectionLevel(taxon, accessRightsId);            
+        var sensitivity = CalculateSensitivity(taxon);
+        processedOccurrence.SensitivityCategory = sensitivity.Category;
+        processedOccurrence.SensitivityReason = sensitivity.Reason;
         CreateFromAnnotations(processedOccurrence, verbatim.Annotations);
         return processedOccurrence;
     }

@@ -190,6 +190,11 @@ public static class DependencyInjectionExtensions
             services.AddSingleton<ICryptoService, CryptoService>();
             services.AddSingleton<IDevOpsService, DevOpsService>();
             services.AddSingleton<IFileService, FileService>();
+            services.AddHttpClient(HttpClientService.DefaultClient, client =>
+            {
+                client.Timeout = TimeSpan.FromMinutes(30);
+                client.DefaultRequestHeaders.Add("requesting-system", "SOS");
+            });
             services.AddSingleton<IHttpClientService, HttpClientService>();
             services.AddSingleton<IUserService, UserService>();
             services.AddSingleton<IArtportalenApiService, ArtportalenApiService>();

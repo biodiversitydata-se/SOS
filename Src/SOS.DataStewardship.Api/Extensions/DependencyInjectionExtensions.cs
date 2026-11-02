@@ -63,6 +63,11 @@ internal static class DependencyInjectionExtensions
 
             // Services
             webApplicationBuilder.Services.AddSingleton<IUserService, UserService>();
+            webApplicationBuilder.Services.AddHttpClient(HttpClientService.DefaultClient, client =>
+            {
+                client.Timeout = TimeSpan.FromMinutes(30);
+                client.DefaultRequestHeaders.Add("requesting-system", "SOS");
+            });
             webApplicationBuilder.Services.AddSingleton<IHttpClientService, HttpClientService>();
 
             // Add application insights.

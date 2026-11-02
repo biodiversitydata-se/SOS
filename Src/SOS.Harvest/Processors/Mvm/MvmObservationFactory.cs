@@ -144,11 +144,12 @@ public class MvmObservationFactory : ObservationFactoryBase, IObservationFactory
             if (obs.ShallBeProtected())
             {
                 obs.Sensitive = true;
-
+                
                 if (obs.AccessRights?.Id == (int)AccessRightsId.NotForPublicUsage && obs.Occurrence.SensitivityCategory < 3 && (obs.Taxon?.Attributes?.SensitivityCategory?.Id ?? 0) < 3)
                 {
                     obs.Occurrence.SensitivityCategory = 3;
                 }
+                obs.Occurrence.SensitivityReason = obs.GetDefaultSensitiveReason();
             }
 
             // Populate generic data
@@ -629,7 +630,9 @@ public class MvmObservationFactory : ObservationFactoryBase, IObservationFactory
         processedOccurrence.IsNeverFoundObservation = false;
         processedOccurrence.IsNotRediscoveredObservation = false;
         processedOccurrence.IsPositiveObservation = true;
-        processedOccurrence.SensitivityCategory = CalculateProtectionLevel(taxon, accessRightsId);            
+        var sensitivity = CalculateSensitivity(taxon);
+        processedOccurrence.SensitivityCategory = sensitivity.Category;
+        processedOccurrence.SensitivityReason = sensitivity.Reason;
         return processedOccurrence;
     }       
 

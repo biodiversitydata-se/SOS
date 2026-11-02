@@ -111,6 +111,11 @@ public static class DependencyInjectionExtensions
             services.AddScoped<IVocabularyRepository, VocabularyRepository>();
 
             // Add services
+            services.AddHttpClient(HttpClientService.DefaultClient, client =>
+            {
+                client.Timeout = TimeSpan.FromMinutes(30);
+                client.DefaultRequestHeaders.Add("requesting-system", "SOS");
+            });
             services.AddSingleton<IHttpClientService, HttpClientService>();
             services.AddScoped<IUserService, UserService>();
             services.AddSingleton<ICryptoService, CryptoService>();
