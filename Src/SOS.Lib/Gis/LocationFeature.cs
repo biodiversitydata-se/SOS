@@ -1,4 +1,8 @@
-﻿using NetTopologySuite.Geometries;
+﻿using SOS.Api.Contracts.Common.Geo;
+using LocationGroupingType = SOS.Api.Contracts.Observations.Responses.LocationGroupingType;
+using SOS.Lib.Extensions;
+using SOS.Lib.Models.Gis;
+using NetTopologySuite.Geometries;
 using SOS.Lib.Models.Processed.Observation;
 
 namespace SOS.Lib.Gis;
@@ -10,12 +14,14 @@ public class LocationFeature
 {
     /// <summary>
     /// Indicates whether this result represents a cluster of multiple locations (true) or a single location (false).
-    /// When true, the Location and Geometry properties represent the centroid of the cluster, computed as the average
-    /// of member latitudes and longitudes. The Locations property contains the list of original location objects that
-    /// are grouped into the cluster. When false, the Location and Geometry properties represent the single location,
-    /// and the Locations property is null.
+    /// For FastGreedy, Location and Geometry use the SWEREF99 TM centroid of the underlying geographic groups.
+    /// Locations retains those geographic groups; OriginalLocations retains metadata per original location id.
     /// </summary>
     public bool IsCluster { get; set; }
+
+    public LocationGroupingType GroupingType { get; set; } = LocationGroupingType.PixelCluster;
+    public List<SOS.Lib.Models.Processed.Observation.Location> OriginalLocations { get; set; } = new();
+    public HashSet<string> GeneralizedLocationIds { get; set; } = new(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
     /// If IsCluster is false, this property represents the single location associated with the observation(s). For
@@ -25,8 +31,7 @@ public class LocationFeature
 
     /// <summary>
     /// The geometry of the location or cluster. For a single location, this is a Point geometry or Polygon geometry.
-    /// Clustered locations will use the centroid point as the geometry for the cluster, which is computed as the
-    /// average of member latitudes and longitudes.
+    /// Clustered locations use their centroid point as the geometry.
     /// </summary>
     public Geometry? Geometry { get; set; }        
 
@@ -41,7 +46,7 @@ public class LocationFeature
     public int TaxaCount { get; set; }
 
     /// <summary>
-    /// Indicates the number of distinct original locations that are
+    /// Indicates the number of distinct geographic groups that are
     /// grouped into this cluster. Always 1 when IsCluster is false.    
     /// </summary>
     public int LocationCount { get; set; } = 1;
@@ -72,12 +77,12 @@ public class LocationFeature
     public List<SOS.Lib.Models.Processed.Observation.Location> Locations { get; set; } = new();
 
     /// <summary>
-    /// Gets the centroid latitude for this item.
+    /// Gets the unprojected mean latitude (legacy algorithms). FastGreedy's metric centroid is in Location.
     /// </summary>
     public double CentroidLatitude => Locations.Average(l => l.DecimalLatitude!.Value);
 
     /// <summary>
-    /// Gets the centroid longitude for this item.
+    /// Gets the unprojected mean longitude (legacy algorithms). FastGreedy's metric centroid is in Location.
     /// </summary>
     public double CentroidLongitude => Locations.Average(l => l.DecimalLongitude!.Value);
 
@@ -88,9 +93,18 @@ public class LocationFeature
     public SOS.Api.Contracts.Observations.Responses.ObservationStatusCounts StatusCounts { get; set; }
 
     /// <summary>
-    /// True when the item was created from representative observations instead of all observations for the location.
+    /// True when representative observations make summary information potentially approximate.
+    /// Covers observationSummary, presentation.statusCounts and potentially
+    /// presentation.isAllObservationsSensitive. Individual values may still be exact;
+    /// observationCount remains the total matching count.
     /// </summary>
     public bool? IsSummaryApproximated { get; set; }
+
+    /// <summary>
+    /// True when presentation.status or presentation.cutoffYearStatus may differ from the complete
+    /// observation result. Applies only to these two properties, not the entire presentation object.
+    /// </summary>
+    public bool IsPresentationStatusApproximated { get; set; }
 
     /// <summary>
     /// Creates a clustered item.
@@ -98,10 +112,11 @@ public class LocationFeature
     /// <param name="observations">
     /// The clustered observations.
     /// </param>
+    /// <param name="metricCenter">Optional precomputed SWEREF99 TM centroid.</param>
     /// <returns>
     /// A clustered location item.
     /// </returns>
-    internal static LocationFeature FromCluster(List<Observation> observations)
+    internal static LocationFeature FromCluster(List<Observation> observations, Point? metricCenter = null)
     {
         var locations = observations
             .Select(o => o.Location)
@@ -112,7 +127,7 @@ public class LocationFeature
         var centroidLongitude = locations.Average(l => l.DecimalLongitude!.Value);
         var statusCounts = CreateStatusCounts(observations);
 
-        return new LocationFeature
+        var result = new LocationFeature
         {
             IsCluster = true,
             LocationCount = locations.Count,
@@ -128,6 +143,8 @@ public class LocationFeature
             },
             Geometry = new Point(centroidLongitude, centroidLatitude)
         };
+        if (metricCenter != null) result.SetMetricCentroid(metricCenter);
+        return result;
     }
 
     /// <summary>
@@ -155,7 +172,7 @@ public class LocationFeature
     /// </returns>
     public static LocationFeature FromSingleLocation(List<Observation> observations)
     {
-        var location = observations.First().Location;
+        var location = observations.OrderBy(o => o.Location.LocationId, StringComparer.Ordinal).First().Location;
         var geometry = location.Point ?? new Point(location.DecimalLongitude!.Value, location.DecimalLatitude!.Value);
         var statusCounts = CreateStatusCounts(observations);
 
@@ -171,6 +188,32 @@ public class LocationFeature
             Locations = new List<SOS.Lib.Models.Processed.Observation.Location> { location },
             StatusCounts = statusCounts
         };
+    }
+
+    /// <summary>Each distinct geographic position has equal weight, irrespective of observation count.</summary>
+    public void SetMetricCentroid(Point? center = null)
+    {
+        if (center == null)
+        {
+            var points = Locations.GroupBy(l => l.DistinctLocationId).Select(g => ProjectLocation(g.First())).ToList();
+            center = new Point(points.Average(p => p.X), points.Average(p => p.Y));
+        }
+        center.SRID = CoordinateSys.SWEREF99_TM.Srid();
+        var wgs = (Point)center.Transform(CoordinateSys.SWEREF99_TM, CoordinateSys.WGS84, usePointCache: false);
+        Location = new SOS.Lib.Models.Processed.Observation.Location
+        {
+            DecimalLongitude = wgs.X, DecimalLatitude = wgs.Y,
+            Sweref99TmX = center.X, Sweref99TmY = center.Y
+        };
+        Geometry = wgs;
+    }
+
+    public static Point ProjectLocation(SOS.Lib.Models.Processed.Observation.Location location)
+    {
+        if (location.Sweref99TmX is double x && location.Sweref99TmY is double y && double.IsFinite(x) && double.IsFinite(y))
+            return new Point(x, y) { SRID = CoordinateSys.SWEREF99_TM.Srid() };
+        return (Point)new Point(location.DecimalLongitude!.Value, location.DecimalLatitude!.Value)
+            .Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM, usePointCache: false);
     }
 
     private static SOS.Api.Contracts.Observations.Responses.ObservationStatusCounts CreateStatusCounts(List<Observation> observations)

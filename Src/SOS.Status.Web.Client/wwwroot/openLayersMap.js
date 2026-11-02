@@ -116,20 +116,15 @@ export function applyPolygonRendering(map, layerId) {
             return;
         }
 
-        if (options.createPolygons !== "Yes") {
-            if (!isSameGeometry(feature.getGeometry(), originalGeometry)) {
-                feature.setGeometry(originalGeometry.clone());
-            }
-            return;
-        }
-
-        const useCentroid = shouldRenderPolygonAsCentroid(
-            originalGeometry,
-            resolution,
-            options.polygonToPointThresholdPx);
+        const useCentroid = options.createPolygons === "Yes" && shouldRenderPolygonAsCentroid(
+            originalGeometry, resolution, options.polygonToPointThresholdPx);
+        // Keep the current geometry while its display form is unchanged. Reassigning it
+        // during every zoom frame needlessly updates the vector source's spatial index.
         if (useCentroid) {
-            feature.setGeometry(getCentroidGeometry(feature, originalGeometry, map));
-        } else {
+            if (currentGeometryType !== "Point") {
+                feature.setGeometry(getCentroidGeometry(feature, originalGeometry, map));
+            }
+        } else if (!isSameGeometry(currentGeometry, originalGeometry)) {
             feature.setGeometry(originalGeometry.clone());
         }
     });
@@ -154,9 +149,10 @@ export function configureCoordinateUncertaintyLayer(map, layerId, geoJson, visib
         const projection = map.getView().getProjection();
 
         featureCollection.features.forEach(function (geoJsonFeature) {
-            const uncertaintyFeature = createCoordinateUncertaintyFeature(geoJsonFeature, projection);
-            if (uncertaintyFeature) {
-                source.addFeature(uncertaintyFeature);
+            const items = geoJsonFeature.properties?.locations?.items ?? [];
+            for (const location of items) {
+                const uncertaintyFeature = createCoordinateUncertaintyFeature(geoJsonFeature, projection, location);
+                if (uncertaintyFeature) source.addFeature(uncertaintyFeature);
             }
         });
     }
@@ -327,12 +323,11 @@ function parseGeoJson(geoJson) {
     }
 }
 
-function createCoordinateUncertaintyFeature(geoJsonFeature, projection) {
+function createCoordinateUncertaintyFeature(geoJsonFeature, projection, location) {
     const geometry = geoJsonFeature?.geometry;
     const properties = geoJsonFeature?.properties || {};
-    const location = getLocationProperty(properties);
 
-    if (!geometry || geometry.type !== "Point" || !location || toBoolean(properties.isCluster)) {
+    if (!geometry || geometry.type !== "Point" || !location || ["pixelCluster", "meterCluster"].includes(properties.groupingType)) {
         return null;
     }
 
@@ -368,7 +363,7 @@ function createClusterRadiusFeature(geoJsonFeature, radiusPropertyName, projecti
     const geometry = geoJsonFeature?.geometry;
     const properties = geoJsonFeature?.properties || {};
 
-    if (!geometry || geometry.type !== "Point" || !toBoolean(properties.isCluster)) {
+    if (!geometry || geometry.type !== "Point" || !["pixelCluster", "meterCluster"].includes(properties.groupingType)) {
         return null;
     }
 
@@ -434,12 +429,6 @@ function getNestedPropertyValue(source, propertyPath) {
     }
 
     return current;
-}
-
-function getLocationProperty(properties) {
-    const locations = getPropertyValue(properties, "locations", "Locations");
-    return getPropertyValue(locations, "location", "Location") ||
-        getPropertyValue(properties, "location", "Location");
 }
 
 function toPascalCase(value) {

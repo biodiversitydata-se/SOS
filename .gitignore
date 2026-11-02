@@ -351,3 +351,6 @@ healthchecksdb
 
 # Visual Studio Favorites Extension
 *.favdoc
+
+# Local isolated test and benchmark outputs
+.test-artifacts-locality/

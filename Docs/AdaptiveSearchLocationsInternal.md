@@ -1,286 +1,254 @@
 # `AdaptiveSearchLocationsInternal`
 
-`AdaptiveSearchLocationsInternal` är en intern endpoint som söker observationer och anpassar svarets detaljnivå efter träffmängden. Samma anrop kan därför returnera antingen lokaler och lokalkluster eller aggregerade geogridrutor. Syftet är att ge ett användbart GeoJSON-lager utan att klienten först behöver räkna träffar och därefter välja en separat sökendpoint.
+Intern endpoint för kartor med panorering och zoom. Den returnerar GeoJSON med lokaler och kluster, eller geogridrutor när ett lokalresultat blir för stort. Enskilda observationer används som underlag men returneras inte som egna poster.
 
-Endpointen passar främst för interaktiva kartor där sökfiltret är relativt stabilt medan kartans utbredning ändras vid panorering och zoomning.
+## Kom igång
 
-> **Intern endpoint:** Endpointen exponeras i de interna API-definitionerna och ska inte betraktas som en publik SOS-endpoint.
+Skicka sökfiltret i body och kartans utsnitt och upplösning som query-parametrar:
 
-## Översikt
+```http
+POST /observations/internal/adaptivesearchlocations?bbox=14.80,57.90,15.20,58.15&metersPerPixel=5&createPolygons=WhenNeeded
+Content-Type: application/json
 
-| Egenskap | Värde |
-|---|---|
-| Sökväg | `/observations/internal/adaptivesearchlocations` |
-| Request body | `SearchFilterInternalDto` som JSON |
-| Svar | GeoJSON `FeatureCollection` |
-| Resultattyper | `locations` eller `geogrid` |
-
-## Vad endpointen gör
-
-## Vad endpointen gör
-
-Endpointen hanterar hela flödet från sökfilter till färdigt kartlager:
-
-1. Sökfiltret och kartans bbox används för att hitta matchande observationer/lokaler, estimera antalet lokaler och bestämma resultatutbredningen.
-2. Den valda sökstrategin och gränsvärdena avgör vilken detaljnivå som är lämplig:
-   - exakta lokalsammanfattningar baserade på samtliga observationer som matchar sökfiltret,
-   - representativa lokalsammanfattningar baserade på en observation per lokal,
-   - eller aggregerade geogridrutor.
-3. Lokalresultat kan visas som punkter eller polygoner och vid behov grupperas i kluster.
-4. Resultatet returneras som GeoJSON tillsammans med HTTP-huvuden som beskriver resultattyp och antal.
-
-> Observationerna används som underlag för beräkningarna men returneras inte som enskilda poster. Svaret innehåller alltid lokaler, lokalkluster eller geogridrutor.
-
-## Hur resultattypen väljs
-
-### Sökstrategier
-
-| `adaptiveSearchStrategy` | Beslutsordning |
-|---|---|
-| `ObservationsThenGrid` | Returnerar exakta lokalsammanfattningar när antalet observationer är högst `observationsLimit`; annars returneras geogrid. Detta är standardstrategin. |
-| `ObservationsThenLocationsThenGrid` | Försöker först göra exakta lokalsammanfattningar. Om observationsgränsen överskrids kan representativa lokaler användas när `locationAggregationLimit` är satt och lokalantalet ligger under gränsen; annars returneras geogrid. Användbart vid t.ex. fågelsjöar med få lokaler men många observationer. |
-| `LocationsThenGrid` | Hämtar max en observation per lokal (representant) när `locationAggregationLimit` tillåter det; annars returneras geogrid. **Detta är den snabbaste strategin**.|
-
-
-### Exakta och representativa lokalsammanfattningar
-
-Ett exakt lokalresultat byggs från samtliga matchande observationer inom `observationsLimit`. Antal för taxa, status och övriga sammanfattningar kan då beräknas från hela underlaget.
-
-Ett representativt lokalresultat hämtar en representativ observation per lokal och kompletterar den med totalt observationsantal per lokal. Vissa egenskaper, exempelvis status- och taxasammanfattningar, kan därför vara approximativa. Detta markeras på följande sätt:
-
-- `X-Location-Aggregation-Mode: representative`
-- `X-Location-Summary-Approximated: true`
-- `properties.isSummaryApproximated: true` på berörda features
-
-### Geogrid
-
-När ett lokalresultat skulle bli för stort returneras gridceller. Zoomnivån väljs med hjälp av aktuell bbox, `maxGridCells` och `maxZoom`. Gridresultat cachelagras inte av endpointens lokalcache.
-
-Klienten ska alltid läsa `X-Result-Type` innan resultatet tolkas eller formges:
-
-- `locations` betyder lokaler eller kluster av lokaler.
-- `geogrid` betyder polygonala gridceller med aggregerade observationsantal.
-
-**Lokaler och kluster**
-- gula prickar är lokaler och blåa prickar kluster
-
-![Lokaler och kluster](Images/adaptivesearchlocations-cluster.png)
-
-
-**Enbart lokaler**
-- Varje lokal visas som en gul prick. Jämför med bilden ovan.
-
-![Enbart lokaler](Images/adaptivesearchlocations-no-cluster.png)
-
-
-**Grid**
-- Om det blir för många observationer/lokaler så ritas gridrutor ut.
-
-![Grid](Images/adaptivesearchlocations-grid.png)
-
-
-## Request
-
-### Body
-
-Request body är ett `SearchFilterInternalDto`. Samma filtermodell används av övriga interna observationssökningar. En minimal body kan exempelvis vara:
-
-```json
 {
-  "taxon": {
-    "ids": [100077],
-    "includeUnderlyingTaxa": false
-  },
-  "occurrenceStatus": "present"
+  "taxon": { "ids": [100077] }
 }
 ```
 
-Filterparametrarna beskrivs mer generellt i [Search filter parameters](SearchFilter.md).
+Body är ett `SearchFilterInternalDto`; se [sökfiltrets parametrar](SearchFilter.md). `bbox` anges som `minLongitude,minLatitude,maxLongitude,maxLatitude` i WGS 84 och ersätter eventuell bbox i body. Minvärdena måste vara lägre än maxvärdena. `filter.protectionFilter` har företräde framför query-parametern `sensitiveObservations`.
 
-### Bbox
+Vid panorering ändras `bbox`; vid zoom ändras även `metersPerPixel`. Läs alltid `X-Result-Type` innan svaret tolkas:
 
-Kartans sökområde bör normalt skickas som query-parametern:
-
-```text
-bbox=minLongitude,minLatitude,maxLongitude,maxLatitude
-```
-
-Exempel:
-
-```text
-bbox=14.80,57.90,15.20,58.15
-```
-
-Koordinaterna är WGS 84 och måste uppfylla `minLongitude < maxLongitude` samt `minLatitude < maxLatitude`. Om både query-parametern och `filter.geographics.boundingBox` finns används query-parametern. Det gör det möjligt att hålla det semantiska sökfiltret stabilt och bara ändra kartans aktuella utsnitt.
-
-Om filterinitialiseringen ger en tom geografisk skärning returneras ett giltigt, tomt `locations`-resultat med HTTP 200.
-
-### Query-parametrar för sökstrategin
-
-| Parameter | Standard | Tillåtna värden | Beskrivning |
-|---|---:|---|---|
-| `observationsLimit` | `10000` | `0`–`10000` | Högsta observationsantal som får hämtas för ett exakt lokalresultat. |
-| `maxZoom` | `21` | `1`–`21` | Högsta zoomnivå för geogrid. |
-| `maxGridCells` | `10000` | `1`–`10000` | Underlag för val av gridzoom och önskad övre nivå på antalet gridceller. |
-| `locationAggregationLimit` | `null` | `1`–`10000` | Gräns för när representativa lokaler får användas. Kräver en strategi med lokalsteget. |
-| `adaptiveSearchStrategy` | `ObservationsThenGrid` | Se strategitabellen ovan | Styr beslutsordningen mellan exakta lokaler, representativa lokaler och grid. |
-| `bbox` | `null` | Fyra WGS 84-tal | Kartans bbox. Ersätter bbox i request body. |
-| `returnInputBBox` | `false` | `true`/`false` | Returnerar inmatad bbox i GeoJSON när den är `true`; annars används resultatets utbredning. |
-| `includeFilterAreasInResult` | `false` | `true`/`false` | Lägger till områdespolygoner från filtret som separata GeoJSON-features. |
-| `useCache` | `true` | `true`/`false` | Använder cachat resultat om det finns. |
-| `cutoffYear` | `null` | Heltal | Delar upp presentationen av observationer före och från och med ett brytår. Påverkar presentationen, inte vilka observationer som matchar filtret. |
-
-![Inställningar](Images/adaptivesearchlocations-settings.png)
-
-### Query-parametrar för klustring och geometri
-
-| Parameter | Standard | Tillåtna värden | Beskrivning |
-|---|---:|---|---|
-| `cluster` | `true` | `true`/`false` | Aktiverar klustring av lokalresultat. Påverkar inte geogrid. |
-| `metersPerPixel` | `null` | Positivt ändligt tal | Kartans upplösning i markmeter per CSS-pixel. Används för skärmbaserad klusterradie och polygonval. |
-| `clusterRadiusPx` | `40` | `1`–`500` | Klusterradie i CSS-pixlar. |
-| `minLocationsPerCluster` | `2` | `2`–`100` | Minsta antal distinkta lokaler som får bilda ett kluster. |
-| `minLocationCountBeforeClustering` | `100` | `0`–`10000` | Klustring börjar först när antalet distinkta lokaler är större än värdet. |
-| `createPolygons` | `No` | `No`, `Yes`, `WhenNeeded` | `No` ger centroidpunkter, `Yes` använder lokalpolygoner och `WhenNeeded` använder polygoner när de är tillräckligt stora i aktuell kartupplösning. `metersPerPixel` är obligatorisk när `createPolygons=WhenNeeded`.|
-
-## Response
-
-### Svarshuvuden
-
-| Header | När den finns | Betydelse |
-|---|---|---|
-| `X-Result-Type` | Alltid vid HTTP 200 | `locations` eller `geogrid`. Styr hur body ska tolkas. |
-| `X-Observations-TotalCount` | Alltid vid HTTP 200 | Totalt antal observationer som matchar sökningen. |
-| `X-Estimated-Location-Count` | När estimering finns | Estimerat antal distinkta lokaler före klustring. |
-| `X-Feature-Count` | Alltid vid HTTP 200 | Antal primära lokal-, kluster- eller gridfeatures. |
-| `X-Locations-Before-Clustering` | För lokalresultat | Antal lokaler innan klustring. |
-| `X-Zoom` | För geogrid | Zoomnivån som användes vid gridaggregeringen. |
-| `X-Location-Aggregation-Mode` | För representativa lokaler | Värdet `representative`. |
-| `X-Location-Summary-Approximated` | Alltid vid HTTP 200 | Anger om minst en lokalsammanfattning i svaret är approximativ. |
-
-### GeoJSON för `locations`
-
-Varje primär feature representerar en lokal eller ett kluster. Geometrin kan vara:
-
-- `Point` för en enskild lokal visad som centroid.
-- `Polygon` eller `MultiPolygon` när lokalens geometri ska visas.
-- `Point` för ett kluster, placerad vid klustrets centroid.
-
-De viktigaste egenskaperna är:
-
-| Property | Beskrivning |
+| Värde | Innehåll |
 |---|---|
-| `isCluster` | `true` när featuren grupperar flera lokaler. |
-| `observationCount` | Totalt observationsantal i lokalen eller klustret. |
-| `isSummaryApproximated` | Anger att delar av sammanfattningen bygger på representativa observationer. |
-| `cluster` | Klusterradie och minsta inneslutande radie för ett kluster. |
-| `presentation` | Övergripande presentationsstatus, statusantal och eventuell brytårsstatus. |
-| `locations` | Antal och id:n för underliggande lokaler samt lokaldetaljer för en oklustrad feature. |
-| `observationSummary` | Antal taxa och observationsantal för olika statuskategorier. |
+| `locations` | Lokaler och eventuella lokalkluster. |
+| `geogrid` | Gridceller med aggregerade observationsantal. |
 
-Förkortat exempel:
+## Sökstrategier
+
+`Auto` är standard. `X-AdaptiveSearch-Strategy` visar vilken strategi som användes, även vid cacheträffar, tomma resultat och geogrid. Strategin och resultattypen är alltså två olika uppgifter.
+
+| `adaptiveSearchStrategy` | Beteende |
+|---|---|
+| `Auto` | Väljer `LocationsThenGrid` när filtret garanterar exakt kartstatus utan brytår; annars `ObservationsThenGrid`. |
+| `ObservationsThenGrid` | Bygger lokaler från alla matchande observationer när antalet är högst `observationsLimit`; annars geogrid. |
+| `ObservationsThenLocationsThenGrid` | Försöker först med alla observationer, sedan med representanter om lokalgränsen tillåter det; annars geogrid. |
+| `LocationsThenGrid` | Använder en representativ observation per lokal om lokalgränsen tillåter det; annars geogrid. |
+
+För representanter måste både uppskattat och faktiskt lokalantal vara **lägre än** `locationAggregationLimit`. Kontrollen görs före sammanslagning av sammanfallande lokaler.
+
+### När Auto använder representanter
+
+Utan `cutoffYear` kan följande filter ge säker kartstatus med representanter:
+
+| Filter | Lokalens status |
+|---|---|
+| Enbart positiva fynd, `protectionFilter=Public` | `Present` |
+| Enbart positiva fynd, `protectionFilter=Sensitive` | `PresentSensitive` |
+| Enbart negativa fynd och en icke-tom `invasiveSpeciesTreatmentIds` med enbart id:n ≥ 0 | `Treated` |
+| Enbart negativa fynd, `hasInvasiveSpeciesTreatment=false`, `notRecoveredFilter=OnlyNotRecovered` | `NotRecovered` |
+| Enbart negativa fynd, `hasInvasiveSpeciesTreatment=false`, `notRecoveredFilter=DontIncludeNotRecovered` | `NotPresent` |
+
+Bedömningen följer sökfiltrets standardregler: utelämnad fyndstatus kan innebära enbart positiva fynd. `hasInvasiveSpeciesTreatment=true` räcker inte ensamt som garanti för `Treated`.
+
+Övriga fall använder observationsvägen. Det gäller blandade positiva och negativa fynd, positiva fynd med `BothPublicAndSensitive`, sökningar med brytår och `createSampleObservations=true`.
+
+## Klustring
+
+Lokalresultat grupperas i denna ordning:
+
+1. Sammanfallande lokaler bildar ett kartobjekt, även när klustring är avstängd.
+2. Om `clusterRadiusMeters` anges körs fast meterklustring, oberoende av zoom och `cluster`.
+3. Om `cluster=true` kan **högst ett** pixelsteg köras enligt tabellen nedan.
+
+| Pixelsteg | När det används | Sökradie |
+|---|---|---|
+| Vanlig pixelklustring | Zoomgränsen och antalsgränsen tillåter det. | Börjar vid `metersPerPixel × clusterRadiusPx` meter och kan växa mot målet 400 kartobjekt. |
+| Liten pixelgruppering | Zoom- eller antalsgränsen stoppar det vanliga steget. | Exakt `metersPerPixel × proximityClusterRadiusPx` meter, utan radieökning. |
+
+När `metersPerPixel` anges kräver vanlig pixelklustring `metersPerPixel > disablePixelClusteringAtMetersPerPixel`, om zoomgränsen inte är `0`. Antalet klustringsbara kartobjekt måste också vara **större än** `minLocationCountBeforeClustering`, räknat efter metersteget och utan separata polygoner.
+
+Med standardvärdena börjar vanlig pixelklustring vid 20 px när upplösningen är 5 m/px, alltså 100 meter. Vid 1 m/px används i stället den fasta radien 10 px, alltså 10 meter. Zoomgränsen 2 m/px väljer pixelsteg; den anger ingen radie.
+
+Utan `metersPerPixel` beräknas vanlig klustringsradie från bbox och resultatets utbredning. Zoomgränsen och liten pixelgruppering används då inte. `cluster=false` stänger av båda pixelstegen. `proximityClusterRadiusPx=0` stänger av enbart den lilla grupperingen.
+
+`minLocationsPerCluster` gäller alla kluster och räknar geografiska grupper; sammanfallande lokal-id:n räknas som en grupp. Metergrupper delas inte av pixelsteget. Radierna är sökradier, inte maximal klusterutbredning: närliggande grupper kan slås ihop. Den fasta pixelradien kan därför lämna fler än 400 kartobjekt.
+
+Lämna `clusterRadiusMeters` tom för enbart zoomstyrd klustring. Metersteget används när du också behöver en fast sökradie i meter.
+
+## Polygoner
+
+| `createPolygons` | Beteende |
+|---|---|
+| `No` | Polygonlokaler returneras som centroidpunkter och kan klustras. Standard i endpointen och API-klienten. |
+| `Yes` | Oklustrade polygonlokaler behåller sin geometri. Med `metersPerPixel` kan små polygoner klustras som punkter; utan upplösning hålls alla tillgängliga lokalpolygoner utanför klustringen. |
+| `WhenNeeded` | Stora polygoner returneras som ytor, små som centroidpunkter som kan klustras. Kräver `metersPerPixel`. Standard i Status-kartan. |
+
+Med kartupplösning använder `Yes` och `WhenNeeded` samma storleksgräns: minst 10 px bredd och höjd samt en faktisk area som minst motsvarar en cirkel med 10 px diameter. Stora polygoner hålls utanför båda klustringsstegen och räknas inte mot klustringens antalsmål.
+
+Sammanfallande polygonlokaler bedöms utifrån sin gemensamma yta. Saknas polygongeometri används centroiden. Generaliserade observationer kan även ge osäkerhetsytor.
+
+## Svaret
+
+Svaret är en GeoJSON `FeatureCollection`. Sökningar utan träffar, även efter en tom geografisk skärning, ger HTTP 200.
+
+### Lokalfeatures
+
+Lokaler kan ha punkt- eller polygongeometri. Kluster är punkter vid klustrets mittpunkt. Använd `groupingType` för att identifiera kluster; `cluster` innehåller metadata och `presentation.status` styr presentationen.
+
+| Property | Betydelse |
+|---|---|
+| `groupingType` | `singleLocation`, `coLocatedLocations`, `meterCluster` eller `pixelCluster`. De två sista är kluster. |
+| `hasMultipleLocations` | `true` när `locations.count > 1`, även för sammanfallande lokaler. |
+| `observationCount` | Totalt antal matchande observationer, även när representanter används. |
+| `presentation` | Kartstatus, statusräknare, brytårsstatus och känslighetsinformation. |
+| `observationSummary` | Antal taxa och delräknare för observationer. |
+| `locations` | Fullständiga `count` och `ids`; `items` innehåller högst fem lokaler, sorterade efter id. |
+| `cluster.radiusMeters` | Använd sökradie i meter. |
+| `cluster.radiusMetersMin` | Ungefärlig radie kring klusterpunkten som omsluter medlemspositionerna, utan osäkerhetsytor. |
+
+Använd feature-id för kartobjektets identitet och `locations.ids` vid observationssökningar. Kluster-id bygger på alla medlems-id:n, oberoende av ordning och skiftläge. Begränsningen till fem `items` gäller bara lokalernas metadata.
+
+Med `includeFilterAreasInResult=true` tillkommer områdesfeatures märkta med `properties.FeatureType`: `FilterArea.Area` eller `FilterArea.OwnPolygon`. De har andra properties än lokalfeatures.
+
+### Hur exakta är värdena?
+
+Fullständigt observationsunderlag ger exakta sammanfattningar. Representanter ger fortfarande det totala observationsantalet, men vissa sammanfattningsvärden kan vara approximativa.
+
+| Flagga | Gäller |
+|---|---|
+| `isPresentationStatusApproximated` | Endast `presentation.status` och `presentation.cutoffYearStatus`. Alltid `false` för `Auto`. |
+| `isSummaryApproximated` | `observationSummary`, `presentation.statusCounts` och potentiellt `presentation.isAllObservationsSensitive`. Enskilda värden kan fortfarande vara exakta. |
+
+Flaggorna följer dessa fält, inte JSON-objektens indelning. Följande förkortade lokalresultat är därför korrekt när `Auto` använder representanter för publika, positiva fynd:
 
 ```json
 {
   "type": "FeatureCollection",
-  "bbox": [14.80, 57.90, 15.20, 58.15],
-  "features": [
-    {
-      "type": "Feature",
-      "id": "urn:lsid:artportalen.se:site:123456",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [15.00492, 58.00647]
+  "features": [{
+    "type": "Feature",
+    "id": "Point_5800647_1500492",
+    "geometry": { "type": "Point", "coordinates": [15.00492, 58.00647] },
+    "properties": {
+      "groupingType": "singleLocation",
+      "observationCount": 356,
+      "isSummaryApproximated": true,
+      "isPresentationStatusApproximated": false,
+      "presentation": {
+        "status": "Present",
+        "statusCounts": { "Present": 1 },
+        "isAllObservationsSensitive": false
       },
-      "properties": {
-        "isCluster": false,
-        "observationCount": 12,
-        "isSummaryApproximated": false,
-        "cluster": null,
-        "presentation": {
-          "status": "Present",
-          "statusCounts": {
-            "Present": 12
-          }
-        },
-        "locations": {
-          "count": 1,
-          "ids": ["urn:lsid:artportalen.se:site:123456"],
-          "location": {
-            "locationId": "urn:lsid:artportalen.se:site:123456",
-            "locality": "Exempellokal",
-            "decimalLongitude": 15.00492,
-            "decimalLatitude": 58.00647
-          }
-        },
-        "observationSummary": {
-          "taxaCount": 3,
-          "statusCounts": {
-            "foundCount": 12,
-            "treatedCount": 0,
-            "diffusedCount": 0,
-            "redlistedCount": 2,
-            "invasiveInSwedenCount": 0
-          }
-        }
-      }
+      "locations": { "count": 1, "ids": ["urn:lsid:artportalen.se:site:123456"] },
+      "observationSummary": { "taxaCount": 1 }
     }
-  ]
+  }]
 }
 ```
 
-Exemplet visar strukturen och är inte en fullständig uppräkning av alla valfria properties.
+Kartstatusen `Present` är säker och antalet matchande observationer är 356. Statusräknaren och artantalet bygger däremot på representanten. `statusCounts` behöver därför inte summera till `observationCount`.
 
-### Filterområden i svaret
+En publik representant ger ett säkert `isAllObservationsSensitive=false`. Enbart skyddade representanter kan ge ett osäkert `true` om filtret även tillåter publika fynd. Ett filter med enbart skyddade fynd ger ett säkert `true`.
 
-Med `includeFilterAreasInResult=true` läggs geografiska områden från sökfiltret till i samma `features`-array. De identifieras av `properties.FeatureType`, exempelvis `FilterArea.Area` eller `FilterArea.OwnPolygon`. De är hjälpoverlay och följer inte kontraktet för en lokalfeature.
+Flaggorna beräknas även för uttryckligen valda strategier. Kluster och svarshuvuden anger `true` om någon medlem har motsvarande flagga. Tomma resultat och geogrid ger `false` i båda svarshuvudena; filterområden får inga observationsflaggor.
 
+### Svarshuvuden och cache
 
-## Exempel med `Sos.Api.Client`
+| Header | Betydelse |
+|---|---|
+| `X-Result-Type` | `locations` eller `geogrid`. |
+| `X-AdaptiveSearch-Strategy` | Effektiv strategi efter utvärdering av `Auto`. |
+| `X-Observations-TotalCount` | Totalt antal matchande observationer. |
+| `X-Estimated-Location-Count` | Uppskattat antal distinkta lokaler, när uppskattning finns. |
+| `X-Feature-Count` | Antal primära lokal-, kluster- eller gridfeatures, utan filterområden. |
+| `X-Locations-Before-Clustering` | Lokalantal före klustring, för lokalresultat. |
+| `X-Zoom` | Använd geogridnivå, för gridresultat. |
+| `X-Cache` | `HIT`, `MISS` eller `BYPASS`. |
+| `X-AdaptiveSearch-Timings` | Servertider; överföring och kartvisning ingår inte. |
+| `X-Location-Aggregation-Mode` | `representative` när representanter används. |
+| `X-Location-Summary-Approximated` | Om någon features sammanfattning kan vara approximativ enligt flaggan ovan. |
+| `X-Location-Presentation-Status-Approximated` | Om någon features kartstatus kan vara approximativ enligt flaggan ovan. |
 
-Klientanropet returnerar GeoJSON tillsammans med de typade svarshuvudena:
+Lokalcachen används för fullständiga lokalresultat; representanter och geogrid kringgår den. Klustringen anpassas till aktuell upplösning även vid cacheträffar. När svarskomprimering är aktiverad förhandlas gzip eller Brotli med `Accept-Encoding`.
+
+## Parameterreferens
+
+Ogiltiga parametervärden ger HTTP 400.
+
+### Sökning och svar
+
+| Parameter | Standard | Tillåtna värden | Funktion |
+|---|---:|---|---|
+| `adaptiveSearchStrategy` | `Auto` | Strategierna ovan | Väljer observations-, representant- eller gridvägen. |
+| `observationsLimit` | `10000` | `0`–`10000` | Högsta observationsantal för att hämta hela underlaget. |
+| `locationAggregationLimit` | `1000` | `1`–`10000` | Representanter tillåts strikt under gränsen. |
+| `maxZoom` | `21` | `1`–`21` | Högsta geogridnivå, inte kartans zoom. |
+| `maxGridCells` | `10000` | `1`–`10000` | Önskad övre nivå på gridantalet; används för att välja gridzoom. |
+| `bbox` | `null` | Fyra WGS 84-tal | Ersätter bbox i body. |
+| `returnInputBBox` | `false` | `true`/`false` | Returnerar inmatad bbox i stället för resultatets utbredning. |
+| `sensitiveObservations` | `false` | `true`/`false` | Väljer skyddade/publika fynd när `filter.protectionFilter` saknas. |
+| `cutoffYear` | `null` | Heltal | Delar presentationen före och från och med året; ändrar inte sökfiltret. |
+| `includeFilterAreasInResult` | `false` | `true`/`false` | Lägger till filterområden som separata features. |
+| `useCache` | `true` | `true`/`false` | Tillåter läsning och skrivning i lokalcachen. |
+| `createSampleObservations` | `false` | `true`/`false` | Felsökningsdata för kartsymboler; `Auto` väljer observationsvägen. |
+
+### Klustring och geometri
+
+| Parameter | Standard | Tillåtna värden | Funktion |
+|---|---:|---|---|
+| `cluster` | `true` | `true`/`false` | Aktiverar de två alternativa pixelstegen. |
+| `clusterRadiusMeters` | `null` | Positivt ändligt tal | Fast metersteg före pixelsteget, även vid `cluster=false`. |
+| `metersPerPixel` | `null` | Positivt ändligt tal | Kartupplösning i markmeter per CSS-pixel. |
+| `clusterRadiusPx` | `20` | `1`–`500` | Startradie för vanlig pixelklustring, i CSS-pixlar. |
+| `disablePixelClusteringAtMetersPerPixel` | `2.0` | Icke-negativt ändligt tal | Stoppar vanligt pixelsteg vid upplösning ≤ gränsen. `0` tar bort zoomgränsen. |
+| `proximityClusterRadiusPx` | `10.0` | Ändligt tal `0`–`500` | Fast pixelradie när vanligt steg stoppas. `0` stänger av den lilla grupperingen. |
+| `minLocationCountBeforeClustering` | `0` | `0`–`10000` | Vanligt pixelsteg tillåts över detta antal klustringsbara kartobjekt. |
+| `minLocationsPerCluster` | `2` | `2`–`100` | Minsta antal geografiska grupper per kluster. |
+| `createPolygons` | `No` | `No`, `Yes`, `WhenNeeded` | Polygonläge enligt tabellen ovan. |
+
+## Exempel med API-klienten
+
+Med en injicerad `ISosObservationsClient`:
 
 ```csharp
-using SOS.Api.Client.Abstractions;
 using SOS.Api.Client.Requests;
 using SOS.Api.Contracts.Observations.Requests;
-using SOS.Api.Contracts.Observations.Responses;
 
-public sealed class LocationMapSearch(ISosObservationsClient observationsClient)
-{
-    public async Task<AdaptiveSearchLocationsResponse> SearchAsync(
-        CancellationToken cancellationToken)
+var response = await observationsClient.AdaptiveSearchLocationsInternalAsync(
+    new SearchFilterInternalDto { Taxon = new() { Ids = [100077] } },
+    new AdaptiveSearchLocationsOptions
     {
-        var filter = new SearchFilterInternalDto
-        {
-            Taxon = new TaxonFilterDto
-            {
-                Ids = [100077],
-                IncludeUnderlyingTaxa = false
-            }
-        };
-
-        var options = new AdaptiveSearchLocationsOptions
-        {
-            BoundingBoxQuery = "14.80,57.90,15.20,58.15",
-            ObservationsLimit = 5000,
-            MaxGridCells = 1000,
-            AdaptiveSearchStrategy = AdaptiveSearchLocationsStrategy.ObservationsThenGrid,
-            Cluster = true,
-            ClusterRadiusPx = 20,
-            CreatePolygons = CreatePolygonsMode.Yes,
-            UseCache = true
-        };
-
-        var response = await observationsClient.AdaptiveSearchLocationsInternalAsync(
-            filter,
-            options,
-            cancellationToken);
-
-        // Kontrollera response.ResultType innan response.GeoJson tolkas.
-        return response;
-    }
-}
+        BoundingBoxQuery = "14.80,57.90,15.20,58.15",
+        MetersPerPixel = 5,
+        CreatePolygons = CreatePolygonsMode.WhenNeeded
+    },
+    cancellationToken);
 ```
 
-`ISosObservationSearchService.AdaptiveSearchLocationsInternalAsFeatureCollectionAsync` läser svaret direkt som GeoJSON.Texts `FeatureCollection<AdaptiveSearchLocationFeaturePropertiesDto>`. Bounding box finns i `BoundingBoxes`, och varje feature har bibliotekets geometri tillsammans med SOS-specifika properties. Kontrollera ändå `Response.ResultType`: geogrid och tillagda filterområden har andra properties än de typade lokalfeatures som DTO:n beskriver. För generella adaptiva kartlager kan den råa `GeoJson`-strängen läsas som GeoJSON.Texts vanliga `FeatureCollection`, som bevarar även andra properties i en dictionary.
+Läs `response.ResultType` innan `response.GeoJson` tolkas. För typade lokalfeatures finns även `ISosObservationSearchService.AdaptiveSearchLocationsInternalAsFeatureCollectionAsync`; geogrid och filterområden har andra properties än lokalernas DTO.
+
+## Status-kartan
+
+Första sökningen startas med **Sök**. Därefter kan panorering och zoom söka automatiskt. **Kartinfo → Använd strategi** visar strategin som servern valde.
+
+Vid pan/zoom med samma filter behålls markeringen och observationslistan. Tabellen byter innehåll först när nya observationer har hämtats. Ett ändrat filter återställer markeringen. Klick på en punkt prioriteras framför en underliggande polygon.
+
+Under **Visning → Punktstorlek** används samma antalsbaserade skala för punkter och kluster:
+
+| Läge | Storlek |
+|---|---|
+| Fast storlek | Punkter 10 px, kluster 12 px. |
+| Efter antal – automatiska gränser | 10/14/18 px; gränser vid 75:e och 90:e percentilen i aktuellt punktresultat. |
+| Efter antal – fasta gränser (standard) | ≤5 fynd: 10 px; 6–50: 14 px; ≥51: 18 px. |
+
+Antalslägena använder `observationCount`. Ytor och filterområden ingår inte i automatgränserna. Visningsvalen ändrar kartan direkt utan ny sökning och påverkar inte serverns klustring. Gul klustermarkering använder den omslutande radien `cluster.radiusMetersMin`; noggrannhetscirklar och klusterradier kan visas som hjälplager.
+
+![Lokaler och kluster](Images/adaptivesearchlocations-cluster.png)
+
+![Geogrid](Images/adaptivesearchlocations-grid.png)
+
+## För befintliga anrop
+
+- Utelämnade parametrar använder standardvärdena ovan, även vid cacheträffar och för äldre anrop. Kartupplösning medför alltså zoomgränsen 2 m/px och den lilla pixelradien 10 px om de inte anges.
+- `locationAggregationLimit` är ett icke-nullbart heltal med standardvärdet 1000, även för äldre strategier med representantsteget. Klientkod som tilldelar `null` måste ändras. Välj `ObservationsThenGrid` för att hoppa över representantsteget.
+- `clusteringAlgorithm` och klientegenskapen `ClusteringAlgorithm` har tagits bort. Klustringen använder FastGreedy i SWEREF99 TM.

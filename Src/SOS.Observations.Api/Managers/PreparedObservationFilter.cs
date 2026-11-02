@@ -9,6 +9,10 @@ namespace SOS.Observations.Api.Managers;
 public sealed class PreparedObservationFilter
 {
     internal SearchFilter Filter { get; }
+    internal CancellationToken CancellationToken { get; init; }
+
+    internal PreparedObservationFilter WithCancellation(CancellationToken cancellationToken) =>
+        new(Filter) { CancellationToken = cancellationToken };
 
     internal PreparedObservationFilter(SearchFilter filter) => Filter = filter;
 }

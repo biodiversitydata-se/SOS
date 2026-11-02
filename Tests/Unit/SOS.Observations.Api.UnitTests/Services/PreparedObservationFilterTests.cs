@@ -100,4 +100,48 @@ public class PreparedObservationFilterTests
         => new(repository, Mock.Of<IProtectedLogRepository>(), Mock.Of<IVocabularyValueResolver>(), filters,
             new HttpContextAccessor(), Mock.Of<ITaxonObservationCountCache>(), Mock.Of<IGeneralizationResolver>(),
             Mock.Of<IDataProviderCache>(), NullLogger<ObservationManager>.Instance);
+
+    [Theory]
+    [InlineData("count")]
+    [InlineData("observations")]
+    [InlineData("representatives")]
+    [InlineData("grid")]
+    public async Task PreparedQueriesForwardCancellationAndDoNotSwallowIt(string query)
+    {
+        var repository = new Mock<IProcessedObservationRepository>();
+        var manager = CreateManager(repository.Object, Mock.Of<IFilterManager>());
+        var filter = new SearchFilterInternal(123, ProtectionFilter.Public);
+        using var cts = new CancellationTokenSource();
+        var started = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        Task<T> Pending<T>(CancellationToken token)
+        {
+            Assert.Equal(cts.Token, token);
+            started.SetResult();
+            return new TaskCompletionSource<T>(TaskCreationOptions.RunContinuationsAsynchronously).Task.WaitAsync(token);
+        }
+        repository.Setup(r => r.GetCountAndExtentAsync(filter, false, true, cts.Token))
+            .Returns(() => Pending<(long, LatLonBoundingBoxDto?, long)>(cts.Token));
+        repository.Setup(r => r.GetChunkAsync<JsonObject>(filter, 0, 10, It.IsAny<SearchExecutionOptions>()))
+            .Returns<SearchFilter, int, int, SearchExecutionOptions>((_, _, _, options) =>
+            {
+                Assert.Equal(123, options.KnownTotalCount);
+                return Pending<PagedResult<JsonObject>>(options.CancellationToken);
+            });
+        repository.Setup(r => r.GetLocationRepresentativeChunkAsync<JsonObject>(filter, 10, "location.locationId", false, cts.Token))
+            .Returns(() => Pending<LocationRepresentativeResult<JsonObject>>(cts.Token));
+        repository.Setup(r => r.GetGeogridTileAggregationAsync(filter, 8, cts.Token))
+            .Returns(() => Pending<GeoGridTileResult>(cts.Token));
+        var prepared = new PreparedObservationFilter(filter).WithCancellation(cts.Token);
+        Task request = query switch
+        {
+            "count" => manager.GetCountAndExtentAsync(prepared),
+            "observations" => manager.GetChunkAsync(prepared, 0, 10, new SearchExecutionOptions { KnownTotalCount = 123 }),
+            "representatives" => manager.GetLocationRepresentativeChunkAsync(prepared, 10, "location.locationId"),
+            _ => manager.GetGeogridTileAggregationAsync(prepared, 8)
+        };
+        await started.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
+        cts.Cancel();
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => request);
+        Assert.Same(filter, prepared.Filter);
+    }
 }

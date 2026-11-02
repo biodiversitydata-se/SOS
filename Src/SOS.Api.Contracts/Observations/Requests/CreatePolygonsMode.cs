@@ -3,13 +3,16 @@ namespace SOS.Api.Contracts.Observations.Requests;
 /// <summary>Controls whether location features are represented as points or polygons.</summary>
 public enum CreatePolygonsMode
 {
-    /// <summary>Never create polygons; return points.</summary>
+    /// <summary>Return polygon locations as centroid points.</summary>
     No = 0,
 
-    /// <summary>Create a polygon when the location has polygon geometry.</summary>
+    /// <summary>Return polygon geometry for unclustered locations, including small polygons.</summary>
     Yes = 1,
 
-    /// <summary>Create a polygon only when it is larger than the rendered point at the current zoom level.</summary>
+    /// <summary>
+    /// Return polygons large enough to display at the current map resolution; otherwise return centroid points.
+    /// Requires metersPerPixel.
+    /// </summary>
     WhenNeeded = 2
 }
 

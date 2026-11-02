@@ -3,7 +3,6 @@ using NetTopologySuite.Geometries;
 using SOS.Api.Contracts.Observations.Responses;
 using SOS.Lib.Enums;
 using SOS.Lib.Extensions;
-using System.Globalization;
 
 namespace SOS.Lib.Gis;
 
@@ -12,15 +11,17 @@ public static class LocationFeatureResponseMapper
 {
     public static AdaptiveSearchLocationFeaturePropertiesDto ToProperties(
         LocationFeature locationFeature,
-        string? locationId = null,
         int? cutoffYear = null)
     {
-        var location = locationFeature.IsCluster
-            ? null
-            : ToLocationDetailsDto(locationFeature.Location, locationId,
-                locationFeature.ObservationSummary?.DiffusedCount > 0 ||
-                locationFeature.Observations.Any(observation => observation.IsGeneralized));
-
+        var originalLocations = (locationFeature.OriginalLocations.Count > 0
+            ? locationFeature.OriginalLocations
+            : locationFeature.Observations.Count > 0
+                ? locationFeature.Observations.Select(o => o.Location)
+                : locationFeature.Locations)
+            .Where(l => !string.IsNullOrWhiteSpace(l?.LocationId))
+            .OrderBy(l => l.LocationId, StringComparer.Ordinal)
+            .GroupBy(l => l.LocationId, StringComparer.OrdinalIgnoreCase)
+            .Select(g => g.First()).OrderBy(l => l.LocationId, StringComparer.OrdinalIgnoreCase).ToList();
         var observationSummary = locationFeature.ObservationSummary;
         CutoffYearStatus? cutoffYearStatus = cutoffYear.HasValue && observationSummary != null
             ? CalculateCutoffYearStatus(observationSummary, cutoffYear.Value)
@@ -30,9 +31,10 @@ public static class LocationFeatureResponseMapper
         var isAllObservationsSensitive = observationSummary?.IsAllObservationsSensitive ??
                                          (locationFeature.Observations.Count > 0 &&
                                           locationFeature.Observations.All(observation => observation.Sensitive));
-        var locationIds = locationFeature.LocationIds.Count > 0
-            ? locationFeature.LocationIds
-            : null;
+        var locationIds = (locationFeature.LocationIds.Count > 0
+            ? locationFeature.LocationIds : originalLocations.Select(l => l.LocationId))
+            .Where(id => !string.IsNullOrWhiteSpace(id)).OrderBy(id => id, StringComparer.Ordinal)
+            .Distinct(StringComparer.OrdinalIgnoreCase).OrderBy(id => id, StringComparer.OrdinalIgnoreCase).ToList();
         var presentationStatus = observationSummary != null
             ? CalculateLocationPresentationStatus(locationFeature.IsCluster, observationSummary, cutoffYear, isAllObservationsSensitive)
             : CalculateLocationPresentationStatus(locationFeature, cutoffYear, isAllObservationsSensitive);
@@ -42,8 +44,10 @@ public static class LocationFeatureResponseMapper
 
         return new AdaptiveSearchLocationFeaturePropertiesDto
         {
-            IsCluster = locationFeature.IsCluster,
+            GroupingType = locationFeature.IsCluster ? locationFeature.GroupingType
+                : locationIds.Count > 1 ? LocationGroupingType.CoLocatedLocations : LocationGroupingType.SingleLocation,
             IsSummaryApproximated = locationFeature.IsSummaryApproximated == true,
+            IsPresentationStatusApproximated = locationFeature.IsPresentationStatusApproximated,
             Cluster = locationFeature.IsCluster
                 ? new AdaptiveSearchLocationClusterDetailsDto
                 {
@@ -63,14 +67,13 @@ public static class LocationFeatureResponseMapper
             },
             Locations = new AdaptiveSearchFeatureLocationsDto
             {
-                Count = locationFeature.LocationCount,
-                Ids = locationIds ??
-                      locationFeature.Observations
-                          .Select(observation => GetLocationId(observation.Location))
-                          .Where(locationId => !string.IsNullOrWhiteSpace(locationId))
-                          .Distinct(StringComparer.OrdinalIgnoreCase)
-                          .ToList(),
-                Location = location
+                Count = locationIds.Count,
+                Ids = locationIds,
+                Items = originalLocations.Take(AdaptiveSearchFeatureLocationsDto.MaxLocationItems)
+                    .Select(l => ToLocationDetailsDto(l, l.LocationId,
+                        locationFeature.GeneralizedLocationIds.Contains(l.LocationId) ||
+                        locationFeature.OriginalLocations.Count == 0 && locationFeature.Observations.Any(o => o.IsGeneralized && string.Equals(o.Location?.LocationId, l.LocationId, StringComparison.OrdinalIgnoreCase)))!).ToList()
+
             },
             ObservationSummary = new AdaptiveSearchLocationObservationSummaryDto
             {
@@ -118,18 +121,6 @@ public static class LocationFeatureResponseMapper
         }
 
         return hasLocations ? Math.Round(maxRadiusMeters, 3) : null;
-    }
-
-    private static string? GetLocationId(SOS.Lib.Models.Processed.Observation.Location? location)
-    {
-        if (location == null)
-        {
-            return null;
-        }
-
-        return string.IsNullOrWhiteSpace(location.LocationId)
-            ? null
-            : location.LocationId;
     }
 
     private static Dictionary<LocationPresentationStatus, int> CalculatePresentationStatusCount(
@@ -565,7 +556,7 @@ public static class LocationFeatureResponseMapper
             DecimalLatitude = location.DecimalLatitude,
             DecimalLongitude = location.DecimalLongitude,
             LocationId = !string.IsNullOrWhiteSpace(locationId) ? locationId : location.LocationId,
-            DistinctLocationId = CreateResponseDistinctLocationId(location),
+            DistinctLocationId = location.DistinctLocationId,
             Sweref99TmX = location.Sweref99TmX,
             Sweref99TmY = location.Sweref99TmY,
             Municipality = location.Municipality?.Name,
@@ -574,19 +565,4 @@ public static class LocationFeatureResponseMapper
         };
     }
 
-    private static string CreateResponseDistinctLocationId(SOS.Lib.Models.Processed.Observation.Location location)
-    {
-        static string FormatCoordinate(double? coordinate) => coordinate.HasValue
-            ? ((long)Math.Round(coordinate.Value * 100000d, MidpointRounding.AwayFromZero)).ToString(CultureInfo.InvariantCulture)
-            : "x";
-
-        var latitude = FormatCoordinate(location.DecimalLatitude);
-        var longitude = FormatCoordinate(location.DecimalLongitude);
-        var uncertainty = location.CoordinateUncertaintyInMeters.HasValue
-            ? string.Create(CultureInfo.InvariantCulture, $"u{location.CoordinateUncertaintyInMeters.Value}")
-            : "un";
-
-        // Preserve the historic response ID, which differs from Location.DistinctLocationId.
-        return string.Create(CultureInfo.InvariantCulture, $"loc_{(int)location.Type}_{latitude}_{longitude}_{uncertainty}");
-    }
 }

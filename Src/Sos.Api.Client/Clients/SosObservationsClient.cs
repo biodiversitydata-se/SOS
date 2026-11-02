@@ -333,7 +333,10 @@ public sealed class SosObservationsClient : ISosObservationsClient
             ResultType = GetHeaderValue(response.Headers, "X-Result-Type"),
             Timings = GetHeaderValue(response.Headers, "X-AdaptiveSearch-Timings"),
             LocationAggregationMode = GetHeaderValue(response.Headers, "X-Location-Aggregation-Mode"),
-            LocationSummaryApproximated = GetBoolHeaderValue(response.Headers, "X-Location-Summary-Approximated")
+            LocationSummaryApproximated = GetBoolHeaderValue(response.Headers, "X-Location-Summary-Approximated"),
+            LocationPresentationStatusApproximated = GetBoolHeaderValue(response.Headers, "X-Location-Presentation-Status-Approximated"),
+            AdaptiveSearchStrategy = Enum.TryParse<AdaptiveSearchLocationsStrategy>(GetHeaderValue(response.Headers, "X-AdaptiveSearch-Strategy"), true, out var strategy) && Enum.IsDefined(strategy)
+                ? strategy : null
         };
     }
     

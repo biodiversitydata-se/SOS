@@ -14,6 +14,8 @@ namespace SOS.Observations.Api.Services.AdaptiveSearchLocations;
 
 internal static class AdaptiveSearchLocationsGeoJsonWriter
 {
+    private const int ClusterHashByteLength = 8;
+
     private static readonly JavaScriptEncoder JsonEncoder =
         JavaScriptEncoder.Create(UnicodeRanges.BasicLatin, UnicodeRanges.Latin1Supplement); //JavaScriptEncoder.UnsafeRelaxedJsonEscaping;
 
@@ -43,7 +45,8 @@ internal static class AdaptiveSearchLocationsGeoJsonWriter
         LatLonBoundingBoxDto? bbox,
         HttpResponse response,
         int? cutoffYear = null,
-        List<Feature>? geographicAreas = null)
+        List<Feature>? geographicAreas = null,
+        CancellationToken cancellationToken = default)
     {
         await using var jsonWriter = new Utf8JsonWriter(response.BodyWriter, JsonWriterOptions);
         jsonWriter.WriteStartObject();
@@ -56,25 +59,25 @@ internal static class AdaptiveSearchLocationsGeoJsonWriter
         {
             foreach (var geographicArea in geographicAreas)
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 WriteGeographicAreaFeature(jsonWriter, geographicArea);
             }
         }
 
-        var featureIndex = 0;
         foreach (var feature in locationFeatures)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             if (feature.Geometry == null)
             {
                 continue;
             }
 
-            var featureId = GetFeatureId(feature, ++featureIndex);
+            var properties = LocationFeatureResponseMapper.ToProperties(feature, cutoffYear: cutoffYear);
+            var featureId = GetFeatureId(feature, properties.Locations.Ids);
             if (string.IsNullOrWhiteSpace(featureId))
             {
                 continue;
             }
-
-            var properties = LocationFeatureResponseMapper.ToProperties(feature, featureId, cutoffYear);
 
             jsonWriter.WriteStartObject();
             jsonWriter.WriteString("type", "Feature");
@@ -88,8 +91,8 @@ internal static class AdaptiveSearchLocationsGeoJsonWriter
 
         jsonWriter.WriteEndArray();
         jsonWriter.WriteEndObject();
-        await jsonWriter.FlushAsync();
-        await response.BodyWriter.FlushAsync();
+        await jsonWriter.FlushAsync(cancellationToken);
+        await response.BodyWriter.FlushAsync(cancellationToken);
     }
 
     private static void WriteGeographicAreaFeature(Utf8JsonWriter jsonWriter, Feature feature)
@@ -147,15 +150,14 @@ internal static class AdaptiveSearchLocationsGeoJsonWriter
         }
     }
 
-    private static string? GetFeatureId(LocationFeature locationFeature, int featureIndex)
+    private static string? GetFeatureId(LocationFeature feature, IEnumerable<string> locationIds)
     {
-        if (locationFeature.IsCluster)
-        {
-            return $"cluster-{featureIndex}";
-        }
-
-        return AdaptiveSearchLocationAggregator.GetLocationId(locationFeature.Location) ??
-               AdaptiveSearchLocationAggregator.GetLocationId(locationFeature.Locations.FirstOrDefault());
+        if (!feature.IsCluster) return feature.Location?.DistinctLocationId;
+        var ids = locationIds
+            .Select(id => id.ToUpperInvariant()).Distinct(StringComparer.Ordinal).OrderBy(id => id, StringComparer.Ordinal).ToArray();
+        var bytes = JsonSerializer.SerializeToUtf8Bytes(ids);
+        var hash = System.Security.Cryptography.SHA256.HashData(bytes);
+        return "cluster-" + Convert.ToHexString(hash.AsSpan(0, ClusterHashByteLength)).ToLowerInvariant();
     }
 
     private static void WriteGeoJsonBbox(Utf8JsonWriter jsonWriter, LatLonBoundingBoxDto? bbox)

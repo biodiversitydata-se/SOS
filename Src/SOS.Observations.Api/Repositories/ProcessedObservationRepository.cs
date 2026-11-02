@@ -516,12 +516,12 @@ public class ProcessedObservationRepository : ProcessedObservationCoreRepository
     /// <inheritdoc />
     public async Task<GeoGridTileResult> GetGeogridTileAggregationAsync(
             SearchFilter filter,
-            int zoom)
+            int zoom, CancellationToken cancellationToken = default)
     {
         var indexNames = GetCurrentIndex(filter);
         var (queries, excludeQueries) = GetCoreQueries<dynamic>(filter);
 
-        var searchResponse = await Client.SearchAsync<dynamic>(s => s
+        var searchResponse = await PreserveSearchCancellationAsync(Client.SearchAsync<dynamic>(s => s
             .Indices(indexNames)
             .Query(q => q
                 .Bool(b => b
@@ -556,9 +556,10 @@ public class ProcessedObservationRepository : ProcessedObservationCoreRepository
                 )
                 
             )
-            .AddDefaultAggrigationSettings()
-        );
+            .AddDefaultAggrigationSettings(),
+            cancellationToken), cancellationToken);
 
+        cancellationToken.ThrowIfCancellationRequested();
         if (!searchResponse.IsValidResponse)
         {
             if (searchResponse.ElasticsearchServerError?.Error?.CausedBy?.Type == "too_many_buckets_exception")

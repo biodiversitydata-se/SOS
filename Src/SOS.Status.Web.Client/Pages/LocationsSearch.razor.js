@@ -1,16 +1,47 @@
-﻿import * as openLayersMap from "/openLayersMap.js";
+import * as openLayersMap from "/openLayersMap.js";
 
 let map = null;
 let dotNetRef = null;
 let moveEndKey = null;
 let singleClickKey = null;
+let clickFeedbackKey = null;
+let doubleClickKey = null;
 
 const locationsLayerId = "locations";
+let locationFeatureCollection = null;
+const locationOverlays = [
+    { id: "coordinate-uncertainty", radiusPropertyName: null, visible: false },
+    { id: "cluster-radius", radiusPropertyName: "cluster.radiusMeters", visible: false },
+    { id: "cluster-minimum-enclosing-circle", radiusPropertyName: "cluster.radiusMetersMin", visible: false }
+];
 const pointStylesByLocationDisplayStatus = new Map();
 const polygonStylesByLocationDisplayStatus = new Map();
+const geoGridStylesByColor = new Map();
 let highlightedLocationIds = new Set();
 let highlightedFeatureIds = new Set();
 let previouslyHighlightedMapFeatures = [];
+let highlightFeatureIndex = null;
+let clickFeedbackFeatures = null;
+let mapSelection = { featureCount: 0, locationIds: new Set(), featureIds: new Set() };
+let nextMapClickVersion = 0;
+let latestMapClickVersion = 0;
+let confirmedHighlightState = null;
+let compactClusterMaxRadiusMeters = null;
+let pointSizeMode = "Fixed";
+let pointObservationCountBreaks = null;
+let automaticPointSizeLegend = [];
+let fixedPointSizeLegend = [];
+
+const pointSizeRadii = [5, 7, 9];
+const fixedPointObservationCountBreaks = { low: 5, high: 50 };
+
+const locationGroupingTypes = new Set(["singleLocation", "coLocatedLocations", "meterCluster", "pixelCluster"]);
+const observationCountPropertyNames = ["ObservationsCount", "observationsCount", "ObservationCount", "observationCount", "Count", "count"];
+
+const compactClusterFillColors = {
+    meterCluster: "#ffd54f",
+    pixelCluster: "#fff04a" //"#fff59d"
+};
 
 const displayStatusStyleDefinitions = {
     present: {
@@ -107,6 +138,8 @@ export function initMap(container, blazorDotNetRef, zoom, centerLon, centerLat) 
 
     moveEndKey = map.on("moveend", notifyExtentChanged);
     singleClickKey = map.on("singleclick", onSingleClick);
+    clickFeedbackKey = map.on("click", onClickFeedback);
+    doubleClickKey = map.on("dblclick", onDoubleClick);
 
     requestAnimationFrame(function () {
         map?.updateSize();
@@ -124,6 +157,14 @@ export function destroyMap() {
         ol.Observable.unByKey(singleClickKey);
         singleClickKey = null;
     }
+    if (clickFeedbackKey) {
+        ol.Observable.unByKey(clickFeedbackKey);
+        clickFeedbackKey = null;
+    }
+    if (doubleClickKey) {
+        ol.Observable.unByKey(doubleClickKey);
+        doubleClickKey = null;
+    }
 
     if (map) {
         map.setTarget(null);
@@ -134,6 +175,20 @@ export function destroyMap() {
     highlightedLocationIds = new Set();
     highlightedFeatureIds = new Set();
     previouslyHighlightedMapFeatures = [];
+    highlightFeatureIndex = null;
+    clickFeedbackFeatures = null;
+    mapSelection = { featureCount: 0, locationIds: new Set(), featureIds: new Set() };
+    nextMapClickVersion = 0;
+    latestMapClickVersion = 0;
+    confirmedHighlightState = null;
+    compactClusterMaxRadiusMeters = null;
+    pointSizeMode = "Fixed";
+    pointObservationCountBreaks = null;
+    automaticPointSizeLegend = [];
+    fixedPointSizeLegend = [];
+    pointStylesByLocationDisplayStatus.clear();
+    locationFeatureCollection = null;
+    for (const overlay of locationOverlays) overlay.visible = false;
 }
 
 export function getExtent() {
@@ -164,21 +219,147 @@ export function getMetersPerPixel() {
     return openLayersMap.getMetersPerPixel(map);
 }
 
-export function configurePolygonRendering(layerId, createPolygons, resultType, polygonToPointThresholdPx) {
-    openLayersMap.configurePolygonRendering(
-        map,
-        layerId,
-        createPolygons,
-        resultType,
-        polygonToPointThresholdPx);
+export function configureLocationOverlays(showUncertainty, showRadius, showEnclosingRadius) {
+    locationOverlays[0].visible = showUncertainty === true;
+    locationOverlays[1].visible = showRadius === true;
+    locationOverlays[2].visible = showEnclosingRadius === true;
+    updateLocationOverlays();
 }
 
-export function configureCoordinateUncertaintyLayer(layerId, geoJson, visible) {
-    openLayersMap.configureCoordinateUncertaintyLayer(map, layerId, geoJson, visible);
+function updateLocationOverlays() {
+    if (!map) return;
+
+    for (const overlay of locationOverlays) {
+        try {
+            const existingLayer = getLayerById(overlay.id);
+            if (existingLayer) {
+                existingLayer.setVisible(overlay.visible);
+            } else if (overlay.visible && locationFeatureCollection?.features?.length > 0) {
+                // Reuse the parsed result. Invisible overlays need no geometry or vector source;
+                // once created, an overlay is retained until the map result changes.
+                if (overlay.radiusPropertyName) {
+                    openLayersMap.configureClusterRadiusLayer(map, overlay.id, locationFeatureCollection, overlay.radiusPropertyName, true);
+                } else {
+                    openLayersMap.configureCoordinateUncertaintyLayer(map, overlay.id, locationFeatureCollection, true);
+                }
+            }
+        } catch (error) {
+            console.error(`LocationsSearch: failed to update overlay ${overlay.id}`, error);
+        }
+    }
 }
 
-export function configureClusterRadiusLayer(layerId, geoJson, radiusPropertyName, visible) {
-    openLayersMap.configureClusterRadiusLayer(map, layerId, geoJson, radiusPropertyName, visible);
+export function configureCompactClusterRendering(maxRadiusMeters) {
+    const value = Number.isFinite(maxRadiusMeters) && maxRadiusMeters >= 0 ? maxRadiusMeters : null;
+    if (value === compactClusterMaxRadiusMeters) {
+        return;
+    }
+
+    compactClusterMaxRadiusMeters = value;
+    getLayerById(locationsLayerId)?.changed?.();
+}
+
+export function configurePointSizing(mode) {
+    const value = mode === "ByObservationCount" || mode === "ByObservationCountFixedBreaks" ? mode : "Fixed";
+    if (pointSizeMode !== value) {
+        pointSizeMode = value;
+        // Refresh selected symbols too, without moving the map or triggering a search.
+        applyHighlightedLocationStyles(false);
+    }
+
+    return getPointSizeLegend();
+}
+
+function getPointSizeLegend() {
+    if (pointSizeMode === "ByObservationCount") return automaticPointSizeLegend;
+    if (pointSizeMode === "ByObservationCountFixedBreaks") return fixedPointSizeLegend;
+    return [];
+}
+
+function initializePointSizeClasses(layerId, resultType) {
+    pointObservationCountBreaks = null;
+    const layer = getLayerById(layerId);
+    const features = layer?.getSource?.()?.getFeatures?.() ?? [];
+    // Called once per result, after polygon rendering. Zooming and changing the size mode
+    // reuse these breaks even if a polygon subsequently switches between surface and point.
+    const counts = resultType?.toLowerCase() === "locations"
+        ? features.filter(feature => isLocationObservationFeature(feature) && isPointGeometry(feature))
+            .map(getPointObservationCount).filter(Number.isFinite)
+        : [];
+    pointObservationCountBreaks = calculateObservationCountBreaks(counts, {
+        lowPercentile: 0.75, highPercentile: 0.9, useRangeFallback: false
+    });
+    automaticPointSizeLegend = createPointSizeLegend(counts, pointObservationCountBreaks);
+    fixedPointSizeLegend = createPointSizeLegend(counts, fixedPointObservationCountBreaks, true);
+    return getPointSizeLegend();
+}
+
+function createPointSizeLegend(counts, breaks, fixedLabels = false) {
+    const classes = new Map();
+    for (const count of counts) {
+        const sizeClass = getObservationCountClass(count, breaks);
+        const entry = classes.get(sizeClass);
+        if (entry) {
+            entry.minCount = Math.min(entry.minCount, count);
+            entry.maxCount = Math.max(entry.maxCount, count);
+        } else {
+            classes.set(sizeClass, { diameterPx: pointSizeRadii[sizeClass] * 2, minCount: count, maxCount: count });
+        }
+    }
+    return [...classes.entries()].sort(([a], [b]) => a - b).map(([sizeClass, entry]) => fixedLabels
+        ? {
+            diameterPx: entry.diameterPx,
+            minCount: sizeClass === 0 ? null : sizeClass === 1 ? breaks.low + 1 : breaks.high + 1,
+            maxCount: sizeClass === 2 ? null : sizeClass === 0 ? breaks.low : breaks.high
+        }
+        : entry);
+}
+
+function calculateObservationCountBreaks(observationCounts, {
+    lowPercentile = 1 / 3, highPercentile = 2 / 3, useRangeFallback = true
+} = {}) {
+    const values = observationCounts.filter(Number.isFinite).sort((a, b) => a - b);
+    if (values.length === 0) return null;
+
+    // Defaults preserve the grid's original classification. Point sizing permits empty classes.
+    let low = values[Math.floor((values.length - 1) * lowPercentile)];
+    let high = values[Math.floor((values.length - 1) * highPercentile)];
+    if (useRangeFallback && low >= high && values[values.length - 1] > values[0]) {
+        const range = values[values.length - 1] - values[0];
+        low = values[0] + range / 3;
+        high = values[0] + range * 2 / 3;
+    }
+    return { low, high };
+}
+
+function getObservationCountClass(count, breaks) {
+    if (!Number.isFinite(count) || !breaks || count <= breaks.low) return 0;
+    return count <= breaks.high ? 1 : 2;
+}
+
+function isLocationObservationFeature(feature) {
+    const featureType = getFeatureProperty(feature, "featureType", "FeatureType");
+    return !String(featureType ?? "").toLowerCase().startsWith("filterarea.") &&
+        locationGroupingTypes.has(feature.get("groupingType"));
+}
+
+function isPointGeometry(feature) {
+    const type = feature.getGeometry?.()?.getType?.();
+    return type === "Point" || type === "MultiPoint";
+}
+
+function getPointObservationCount(feature) {
+    const count = getNumericPropertyOrNull(feature, "observationCount", "ObservationCount");
+    return count !== null && count >= 0 ? count : null;
+}
+
+function getPointRadius(feature) {
+    if (pointSizeMode !== "Fixed" && isLocationObservationFeature(feature)) {
+        const breaks = pointSizeMode === "ByObservationCountFixedBreaks" ? fixedPointObservationCountBreaks : pointObservationCountBreaks;
+        return pointSizeRadii[getObservationCountClass(getPointObservationCount(feature), breaks)];
+    }
+    const groupingType = feature.get("groupingType");
+    return groupingType === "meterCluster" || groupingType === "pixelCluster" ? 6 : 5;
 }
 
 export function setLayerZIndex(layerId, zIndex) {
@@ -189,28 +370,77 @@ export function setLayerVisible(layerId, visible) {
     openLayersMap.setLayerVisible(map, layerId, visible);
 }
 
-export function setHighlightedLocationIds(locationIds, featureIds) {
-    highlightedLocationIds = new Set(
-        (Array.isArray(locationIds) ? locationIds : [])
-            .map(normalizeLocationId)
-            .filter(Boolean));
-    highlightedFeatureIds = new Set(
-        (Array.isArray(featureIds) ? featureIds : [])
-            .map(normalizeLocationId)
-            .filter(Boolean));
-
-    applyHighlightedLocationStyles();
+export function setHighlightedLocationIds(locationIds, featureIds, ensureVisible = true, selection = null, clickVersion = latestMapClickVersion) {
+    if (updateHighlightedLocationIds(locationIds, featureIds, selection, clickVersion)) {
+        applyHighlightedLocationStyles(ensureVisible);
+    }
 }
 
-export function loadGeoJsonLayer(layerId, geoJson, resultType, lowObservationCountBreak, highObservationCountBreak) {
-    if (!map || !layerId) {
-        return;
+function updateHighlightedLocationIds(locationIds, featureIds, selection, clickVersion) {
+    const state = {
+        locationIds: normalizedIdSet(locationIds),
+        featureIds: normalizedIdSet(featureIds),
+        selection: selection ? {
+            featureCount: selection.featureCount,
+            locationIds: normalizedIdSet(selection.locationIds),
+            featureIds: normalizedIdSet(selection.featureIds)
+        } : mapSelection,
+        version: clickVersion
+    };
+    if (!confirmedHighlightState || clickVersion >= confirmedHighlightState.version) confirmedHighlightState = state;
+    // A slow Blazor callback must not undo a more recent local click.
+    if (clickVersion < latestMapClickVersion) return false;
+    latestMapClickVersion = clickVersion;
+    nextMapClickVersion = Math.max(nextMapClickVersion, clickVersion);
+    highlightedLocationIds = state.locationIds;
+    highlightedFeatureIds = state.featureIds;
+    mapSelection = state.selection;
+    return true;
+}
+
+function normalizedIdSet(values) {
+    return new Set((Array.isArray(values) ? values : []).map(normalizeLocationId).filter(Boolean));
+}
+
+export function renderMapResult(layerId, geoJson, options = {}) {
+    const resultType = options.resultType;
+    if (!loadGeoJsonLayer(layerId, geoJson, resultType)) return null;
+
+    try {
+        openLayersMap.configurePolygonRendering(
+            map, layerId, options.createPolygons, resultType, options.polygonToPointThresholdPx);
+    } catch (error) {
+        // Optional client-side polygon rendering must not block the server's map result.
+        console.error("LocationsSearch: failed to configure polygon rendering", error);
     }
 
-    removeLayer(layerId);
+    if (options.pointSizeMode !== undefined) {
+        pointSizeMode = options.pointSizeMode === "ByObservationCount" || options.pointSizeMode === "ByObservationCountFixedBreaks"
+            ? options.pointSizeMode : "Fixed";
+    }
+    const legend = initializePointSizeClasses(layerId, resultType);
+    const highlight = options.highlight;
+    if (highlight) {
+        updateHighlightedLocationIds(highlight.locationIds, highlight.featureIds, highlight.selection, highlight.clickVersion);
+    }
+    // Apply selection once, after displayed geometries and point sizes are final.
+    applyHighlightedLocationStyles(false);
+    if (options.overlays) {
+        configureLocationOverlays(options.overlays.coordinateUncertainty, options.overlays.clusterRadius, options.overlays.clusterMinimumEnclosingCircle);
+    } else {
+        updateLocationOverlays();
+    }
+    return legend;
+}
+
+function loadGeoJsonLayer(layerId, geoJson, resultType) {
+    if (!map || !layerId) {
+        return false;
+    }
 
     if (!geoJson) {
-        return;
+        removeLayer(layerId);
+        return true;
     }
 
     const source = new ol.source.Vector();
@@ -220,11 +450,13 @@ export function loadGeoJsonLayer(layerId, geoJson, resultType, lowObservationCou
     });
 
     let features = [];
+    let featureCollection;
     try {
-        features = format.readFeatures(geoJson);
+        featureCollection = typeof geoJson === "string" ? JSON.parse(geoJson) : geoJson;
+        features = format.readFeatures(featureCollection);
     } catch (error) {
         console.error("LocationsSearch: failed to parse GeoJSON", error);
-        return;
+        return false;
     }
 
     source.addFeatures(features);
@@ -233,26 +465,34 @@ export function loadGeoJsonLayer(layerId, geoJson, resultType, lowObservationCou
         ? resultType.toLowerCase()
         : "";
 
+    const gridBreaks = normalizedResultType === "geogrid"
+        ? calculateObservationCountBreaks(features.map(feature => getNumericPropertyOrNull(feature, ...observationCountPropertyNames)))
+        : null;
     const styleContext = {
         resultType: normalizedResultType,
-        lowObservationCountBreak: toFiniteNumber(lowObservationCountBreak),
-        highObservationCountBreak: toFiniteNumber(highObservationCountBreak)
+        lowObservationCountBreak: gridBreaks?.low,
+        highObservationCountBreak: gridBreaks?.high
     };
 
-    const layer = new ol.layer.Vector({
-        source: source,
-        style: function (feature) {
-            return getObservationStyle(feature, styleContext);
-        }
-    });
-
-    layer.set("id", layerId);
-    layer.setZIndex(20);
-    map.addLayer(layer);
+    const style = feature => getObservationStyle(feature, styleContext);
+    const layer = getLayerById(layerId);
+    // Parse/build the replacement before changing the visible result. Reuse the layer
+    // to retain its visibility, order and identity across locations and geogrid results.
+    if (layer) {
+        layer.setStyle(style);
+        layer.setSource(source);
+    } else {
+        const newLayer = new ol.layer.Vector({ source, style });
+        newLayer.set("id", layerId);
+        newLayer.setZIndex(20);
+        map.addLayer(newLayer);
+    }
 
     if (layerId === locationsLayerId) {
-        applyHighlightedLocationStyles();
+        resetLocationResult();
+        locationFeatureCollection = normalizedResultType === "locations" ? featureCollection : null;
     }
+    return true;
 }
 
 function notifyExtentChanged() {
@@ -265,6 +505,38 @@ function notifyExtentChanged() {
     });
 }
 
+function getMapSelection(features) {
+    return {
+        featureCount: features.length,
+        locationIds: normalizedIdSet(features.flatMap(getFeatureLocationIds)),
+        featureIds: normalizedIdSet(features.map(feature => feature.getId?.()))
+    };
+}
+
+function getNextSelectedFeatures(features) {
+    const clicked = getMapSelection(features);
+    const sameIds = (a, b) => a.size === b.size && [...a].every(id => b.has(id));
+    const sameSelection = mapSelection.featureCount > 0 && mapSelection.featureCount === clicked.featureCount &&
+        (mapSelection.locationIds.size > 0 || clicked.locationIds.size > 0
+            ? sameIds(mapSelection.locationIds, clicked.locationIds)
+            : mapSelection.featureIds.size === mapSelection.featureCount && clicked.featureIds.size === clicked.featureCount &&
+                sameIds(mapSelection.featureIds, clicked.featureIds));
+    return sameSelection ? [] : features;
+}
+
+function onClickFeedback(event) {
+    if (!map || !dotNetRef) return;
+    // OpenLayers delays singleclick to detect double-click zoom. Paint the feedback now,
+    // and let singleclick commit the selection and start the observation request later.
+    clickFeedbackFeatures = getNextSelectedFeatures(getInteractiveObservationFeaturesAtPixel(event.pixel));
+    paintHighlightedFeatures(clickFeedbackFeatures);
+}
+
+function onDoubleClick() {
+    clickFeedbackFeatures = null;
+    applyHighlightedLocationStyles(false);
+}
+
 function onSingleClick(event) {
     if (!map || !dotNetRef) {
         return;
@@ -272,10 +544,27 @@ function onSingleClick(event) {
 
     const clickedFeatures = getInteractiveObservationFeaturesAtPixel(event.pixel);
     const payload = clickedFeatures.map(toFeatureClickPayload);
+    const selection = getNextSelectedFeatures(clickedFeatures);
+    mapSelection = getMapSelection(selection);
+    highlightedLocationIds = mapSelection.locationIds;
+    highlightedFeatureIds = mapSelection.featureIds;
+    clickFeedbackFeatures = null;
+    const clickVersion = ++nextMapClickVersion;
+    latestMapClickVersion = clickVersion;
+    const clickedMap = map;
+    paintHighlightedFeatures(selection);
 
     dotNetRef.invokeMethodAsync(
         "OnFeaturesClickedFromJs",
-        payload).catch(function () {
+        payload,
+        clickVersion).catch(function () {
+            if (map !== clickedMap || latestMapClickVersion !== clickVersion) return;
+            // If the callback cannot be delivered, return to the latest confirmed state.
+            highlightedLocationIds = confirmedHighlightState?.locationIds ?? new Set();
+            highlightedFeatureIds = confirmedHighlightState?.featureIds ?? new Set();
+            mapSelection = confirmedHighlightState?.selection ?? { featureCount: 0, locationIds: new Set(), featureIds: new Set() };
+            latestMapClickVersion = confirmedHighlightState?.version ?? 0;
+            applyHighlightedLocationStyles(false);
         });
 }
 
@@ -297,7 +586,10 @@ function getInteractiveObservationFeaturesAtPixel(pixel) {
         },
         { hitTolerance: 4 });
 
-    return features;
+    // Prefer the symbols the user clicked over any polygon surfaces underneath.
+    // Use the displayed geometry so polygons rendered as points behave like other points.
+    const points = features.filter(isPointGeometry);
+    return points.length > 0 ? points : features;
 }
 
 function isInteractiveObservationFeature(feature, layer) {
@@ -325,7 +617,20 @@ function toFeatureClickPayload(feature) {
 }
 
 export function removeLayer(layerId) {
+    if (layerId === locationsLayerId) {
+        resetLocationResult();
+    }
     openLayersMap.removeLayer(map, layerId);
+}
+
+function resetLocationResult() {
+    highlightFeatureIndex = null;
+    clickFeedbackFeatures = null;
+    locationFeatureCollection = null;
+    for (const overlay of locationOverlays) openLayersMap.removeLayer(map, overlay.id);
+    pointObservationCountBreaks = null;
+    automaticPointSizeLegend = [];
+    fixedPointSizeLegend = [];
 }
 
 function getLayerById(layerId) {
@@ -338,16 +643,10 @@ function getLayerById(layerId) {
     });
 }
 
-function applyHighlightedLocationStyles() {
+function applyHighlightedLocationStyles(ensureVisible = true) {
     if (!map) {
         return;
     }
-
-    for (const feature of previouslyHighlightedMapFeatures) {
-        feature.setStyle?.(undefined);
-        feature.changed?.();
-    }
-    previouslyHighlightedMapFeatures = [];
 
     const locationsLayer = getLayerById(locationsLayerId);
     const locationsSource = locationsLayer?.getSource?.();
@@ -355,16 +654,23 @@ function applyHighlightedLocationStyles() {
         return;
     }
 
-    for (const feature of locationsSource.getFeatures()) {
-        if (featureMatchesHighlightedLocation(feature)) {
-            feature.setStyle?.(getHighlightedLocationStyle(feature));
-            previouslyHighlightedMapFeatures.push(feature);
-            feature.changed?.();
-        }
-    }
+    paintHighlightedFeatures(clickFeedbackFeatures ?? findHighlightedFeatures(locationsSource));
+    if (ensureVisible && clickFeedbackFeatures === null) ensureHighlightedFeaturesVisible();
+}
 
-    locationsLayer.changed?.();
-    ensureHighlightedFeaturesVisible();
+function paintHighlightedFeatures(features) {
+    for (const feature of previouslyHighlightedMapFeatures) {
+        feature.setStyle?.(undefined);
+        feature.changed?.();
+    }
+    previouslyHighlightedMapFeatures = [];
+    for (const feature of features) {
+        feature.setStyle?.(getHighlightedLocationStyle(feature));
+        previouslyHighlightedMapFeatures.push(feature);
+        feature.changed?.();
+    }
+    getLayerById(locationsLayerId)?.changed?.();
+    map?.render?.();
 }
 
 function ensureHighlightedFeaturesVisible() {
@@ -408,88 +714,44 @@ function ensureHighlightedFeaturesVisible() {
     view.fit(highlightedExtent, fitOptions);
 }
 
-function featureMatchesHighlightedLocation(feature) {
-    const featureId = normalizeLocationId(feature?.getId?.());
-    if (featureId && highlightedFeatureIds.has(featureId)) {
-        return true;
+function findHighlightedFeatures(source) {
+    if (highlightedLocationIds.size === 0 && highlightedFeatureIds.size === 0) return [];
+
+    // Build on demand, once per source. Geometry changes during zoom do not change membership.
+    if (highlightFeatureIndex?.source !== source) {
+        const byFeatureId = new Map();
+        const byLocationId = new Map();
+        for (const feature of source.getFeatures()) {
+            const featureId = normalizeLocationId(feature.getId?.());
+            if (featureId) addIndexedFeature(byFeatureId, featureId, feature);
+            for (const locationId of getFeatureLocationIds(feature)) {
+                addIndexedFeature(byLocationId, locationId, feature);
+            }
+        }
+        highlightFeatureIndex = { source, byFeatureId, byLocationId };
     }
 
-    return getFeatureLocationIds(feature).some(locationId => highlightedLocationIds.has(locationId));
+    const matches = new Set();
+    for (const id of highlightedFeatureIds) {
+        for (const feature of highlightFeatureIndex.byFeatureId.get(id) ?? []) matches.add(feature);
+    }
+    for (const id of highlightedLocationIds) {
+        for (const feature of highlightFeatureIndex.byLocationId.get(id) ?? []) matches.add(feature);
+    }
+    return Array.from(matches);
+}
+
+function addIndexedFeature(index, id, feature) {
+    const features = index.get(id);
+    if (features) features.push(feature);
+    else index.set(id, [feature]);
 }
 
 function getFeatureLocationIds(feature) {
-    const result = new Set();
-    addLocationIdValue(feature?.getId?.(), result);
-    addLocationContainer(feature?.get?.("locations") ?? feature?.get?.("Locations"), result);
-    addLocationIdValue(feature?.get?.("locationIds") ?? feature?.get?.("LocationIds"), result);
-    addLocationContainer(feature?.get?.("location") ?? feature?.get?.("Location"), result);
-    return Array.from(result);
-}
-
-function addLocationContainer(value, result) {
-    const parsedValue = parseJsonValue(value);
-    if (!parsedValue) {
-        return;
-    }
-
-    if (Array.isArray(parsedValue)) {
-        addLocationIdValue(parsedValue, result);
-        return;
-    }
-
-    if (typeof parsedValue !== "object") {
-        return;
-    }
-
-    addLocationIdValue(getObjectProperty(parsedValue, "ids", "Ids"), result);
-    addLocationIdValue(getObjectProperty(parsedValue, "locationIds", "LocationIds"), result);
-    addLocationIdValue(getObjectProperty(parsedValue, "locationId", "LocationId"), result);
-
-    const location = getObjectProperty(parsedValue, "location", "Location");
-    if (location && location !== parsedValue) {
-        addLocationContainer(location, result);
-    }
-}
-
-function addLocationIdValue(value, result) {
-    const parsedValue = parseJsonValue(value);
-    if (parsedValue === null || parsedValue === undefined) {
-        return;
-    }
-
-    if (Array.isArray(parsedValue)) {
-        for (const item of parsedValue) {
-            addLocationIdValue(item, result);
-        }
-        return;
-    }
-
-    if (typeof parsedValue === "object") {
-        addLocationContainer(parsedValue, result);
-        return;
-    }
-
-    const normalizedValue = normalizeLocationId(parsedValue);
-    if (normalizedValue) {
-        result.add(normalizedValue);
-    }
-}
-
-function parseJsonValue(value) {
-    if (typeof value !== "string") {
-        return value;
-    }
-
-    const trimmedValue = value.trim();
-    if (!(trimmedValue.startsWith("[") || trimmedValue.startsWith("{"))) {
-        return value;
-    }
-
-    try {
-        return JSON.parse(trimmedValue);
-    } catch {
-        return value;
-    }
+    const ids = feature?.get?.("locations")?.ids;
+    return Array.isArray(ids)
+        ? Array.from(new Set(ids.filter(id => typeof id === "string").map(normalizeLocationId).filter(Boolean)))
+        : [];
 }
 
 function normalizeLocationId(value) {
@@ -506,7 +768,8 @@ function getHighlightedLocationStyle(feature) {
         return new ol.style.Style({
             zIndex: 1000,
             image: new ol.style.Circle({
-                radius: 7,
+                radius: pointSizeMode !== "Fixed" && isLocationObservationFeature(feature)
+                    ? getPointRadius(feature) + 2 : 7,
                 fill: new ol.style.Fill({ color: "rgba(213, 0, 249, 0.38)" }),
                 stroke: new ol.style.Stroke({ color: "#d500f9", width: 2 })
             })
@@ -534,25 +797,33 @@ function getObservationStyle(feature, context) {
 }
 
 function getPointStyle(feature) {
-    const isCluster = toBoolean(feature.get("isCluster")) || getDisplayStatusKey(feature) === "cluster";
-    const displayStatusKey = isCluster ? "cluster" : getDisplayStatusKey(feature);
-    const cacheKey = `${displayStatusKey}:${isCluster ? "cluster" : "point"}`;
+    const groupingType = feature.get("groupingType");
+    const radiusMetersMin = getObjectProperty(feature.get("cluster"), "radiusMetersMin");
+    const isCompactCluster = compactClusterMaxRadiusMeters !== null &&
+        (groupingType === "meterCluster" || groupingType === "pixelCluster") &&
+        Number.isFinite(radiusMetersMin) && radiusMetersMin >= 0 &&
+        radiusMetersMin <= compactClusterMaxRadiusMeters;
+    const displayStatusKey = groupingType === "meterCluster" ? "present"
+        : groupingType === "pixelCluster" ? "cluster" : getDisplayStatusKey(feature);
+    const radius = getPointRadius(feature);
+    const cacheKey = `${displayStatusKey}:${groupingType ?? "point"}:${isCompactCluster ? "compact" : "default"}:${radius}`;
     let style = pointStylesByLocationDisplayStatus.get(cacheKey);
     if (!style) {
-        style = createPointStyle(displayStatusKey, isCluster);
+        style = createPointStyle(displayStatusKey, groupingType, isCompactCluster, radius);
         pointStylesByLocationDisplayStatus.set(cacheKey, style);
     }
 
     return style;
 }
 
-function createPointStyle(displayStatusKey, isCluster) {
+function createPointStyle(displayStatusKey, groupingType, isCompactCluster, radius) {
     const styleDefinition = getDisplayStatusStyleDefinition(displayStatusKey);
     return new ol.style.Style({
         image: new ol.style.Circle({
-            radius: isCluster ? 7 : 5,
+            radius: radius,
             fill: new ol.style.Fill({
-                color: styleDefinition.pointFill
+                color: isCompactCluster ? compactClusterFillColors[groupingType]
+                    : groupingType === "meterCluster" ? "#fff04a" : styleDefinition.pointFill
             }),
             stroke: new ol.style.Stroke({
                 color: styleDefinition.pointStroke,
@@ -624,24 +895,20 @@ function getFeatureProperty(feature, ...propertyNames) {
 }
 
 function getGeoGridStyle(feature, context) {
-    const observationsCount = getNumericProperty(
-        feature,
-        "ObservationsCount",
-        "observationsCount",
-        "ObservationCount",
-        "observationCount",
-        "Count",
-        "count");
-
-    return new ol.style.Style({
+    const observationsCount = getNumericPropertyOrNull(feature, ...observationCountPropertyNames) ?? 0;
+    const color = getGeoGridFillColor(observationsCount, context);
+    if (geoGridStylesByColor.has(color)) return geoGridStylesByColor.get(color);
+    const style = new ol.style.Style({
         stroke: new ol.style.Stroke({
             color: "rgba(120, 45, 0, 0.85)",
             width: 1
         }),
         fill: new ol.style.Fill({
-            color: getGeoGridFillColor(observationsCount, context)
+            color
         })
     });
+    geoGridStylesByColor.set(color, style);
+    return style;
 }
 
 function getGeoGridFillColor(observationsCount, context) {
@@ -649,29 +916,20 @@ function getGeoGridFillColor(observationsCount, context) {
     const mediumColor = "rgba(255, 145, 0, 0.66)";
     const highColor = "rgba(220, 38, 38, 0.72)";
 
-    if (!Number.isFinite(context.lowObservationCountBreak) ||
-        !Number.isFinite(context.highObservationCountBreak)) {
-        return lowColor;
-    }
-
-    if (observationsCount <= context.lowObservationCountBreak) {
-        return lowColor;
-    }
-
-    return observationsCount <= context.highObservationCountBreak
-        ? mediumColor
-        : highColor;
+    const breaks = Number.isFinite(context.lowObservationCountBreak) && Number.isFinite(context.highObservationCountBreak)
+        ? { low: context.lowObservationCountBreak, high: context.highObservationCountBreak } : null;
+    return [lowColor, mediumColor, highColor][getObservationCountClass(observationsCount, breaks)];
 }
 
-function getNumericProperty(feature, ...propertyNames) {
+function getNumericPropertyOrNull(feature, ...propertyNames) {
     for (const propertyName of propertyNames) {
-        const value = Number(feature.get(propertyName));
-        if (Number.isFinite(value)) {
+        const value = toFiniteNumber(feature.get(propertyName));
+        if (value !== null) {
             return value;
         }
     }
 
-    return 0;
+    return null;
 }
 
 function isDiffusedLocation(feature) {
@@ -680,10 +938,12 @@ function isDiffusedLocation(feature) {
         return true;
     }
 
+    const summary = getFeatureProperty(feature, "observationSummary", "ObservationSummary");
+    const counts = getObjectProperty(summary, "statusCounts", "StatusCounts");
+    if (Number(getObjectProperty(counts, "diffusedCount", "DiffusedCount")) > 0) return true;
     const locations = getFeatureProperty(feature, "locations", "Locations");
-    const location = getObjectProperty(locations, "location", "Location") ??
-        getFeatureProperty(feature, "location", "Location");
-    return toBoolean(getObjectProperty(location, "isGeneralized", "IsGeneralized"));
+    const items = getObjectProperty(locations, "items", "Items") ?? [];
+    return items.some(item => toBoolean(getObjectProperty(item, "isGeneralized", "IsGeneralized")));
 }
 
 function getObjectProperty(source, ...propertyNames) {
@@ -713,7 +973,7 @@ function toBoolean(value) {
 }
 
 function toFiniteNumber(value) {
-    if (value === null || value === undefined) {
+    if (typeof value !== "number" && (typeof value !== "string" || value.trim() === "")) {
         return null;
     }
 

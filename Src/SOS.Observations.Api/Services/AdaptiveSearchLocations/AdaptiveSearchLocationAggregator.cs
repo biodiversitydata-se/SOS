@@ -12,7 +12,8 @@ internal interface IAdaptiveSearchLocationAggregator
     List<CachedLocationAggregate> CreateAggregates(
         IEnumerable<JsonObject> records,
         IReadOnlyDictionary<string, long>? observationCountByLocationId = null,
-        bool isSummaryApproximated = false);
+        bool isSummaryApproximated = false,
+        bool? isPresentationStatusApproximated = null);
     List<JsonObject> CreateSampleObservations(IEnumerable<JsonObject>? records);
     int CountLocations(IEnumerable<JsonObject> records);
     IEnumerable<List<Observation>> GroupObservationsByLocation(IEnumerable<Observation> observations);
@@ -27,7 +28,8 @@ internal sealed class AdaptiveSearchLocationAggregator : IAdaptiveSearchLocation
     public List<CachedLocationAggregate> CreateAggregates(
         IEnumerable<JsonObject> records,
         IReadOnlyDictionary<string, long>? observationCountByLocationId = null,
-        bool isSummaryApproximated = false)
+        bool isSummaryApproximated = false,
+        bool? isPresentationStatusApproximated = null)
     {
         var observations = records
             .Select(LocationObservationMapper.Map)
@@ -35,7 +37,7 @@ internal sealed class AdaptiveSearchLocationAggregator : IAdaptiveSearchLocation
             .ToList();
 
         return GroupObservationsByLocation(observations)
-            .Select(observations => CreateAggregate(observations, observationCountByLocationId, isSummaryApproximated))
+            .Select(observations => CreateAggregate(observations, observationCountByLocationId, isSummaryApproximated, isPresentationStatusApproximated))
             .ToList();
     }
 
@@ -116,9 +118,10 @@ internal sealed class AdaptiveSearchLocationAggregator : IAdaptiveSearchLocation
     private static CachedLocationAggregate CreateAggregate(
         List<Observation> observations,
         IReadOnlyDictionary<string, long>? observationCountByLocationId = null,
-        bool isSummaryApproximated = false)
+        bool isSummaryApproximated = false,
+        bool? isPresentationStatusApproximated = null)
     {
-        var location = observations.First().Location!;
+        var location = observations.OrderBy(o => o.Location.LocationId, StringComparer.Ordinal).First().Location!;
         var locationIds = observations
             .Select(observation => observation.Location!.LocationId)
             .Distinct(StringComparer.OrdinalIgnoreCase)
@@ -144,10 +147,15 @@ internal sealed class AdaptiveSearchLocationAggregator : IAdaptiveSearchLocation
         {
             DistinctLocationId = location.DistinctLocationId,
             Location = location,
+            Locations = observations.Select(o => o.Location).OrderBy(l => l.LocationId, StringComparer.Ordinal)
+                .GroupBy(l => l.LocationId, StringComparer.OrdinalIgnoreCase).Select(g => g.First()).ToList(),
+            GeneralizedLocationIds = observations.Where(o => o.IsGeneralized).Select(o => o.Location.LocationId).ToHashSet(StringComparer.OrdinalIgnoreCase),
             LocationIds = locationIds,
             TaxonIds = taxonIds,
             ObservationSummary = observationSummary,
-            IsSummaryApproximated = isAggregateSummaryApproximated
+            IsSummaryApproximated = isAggregateSummaryApproximated,
+            IsPresentationStatusApproximated = (isPresentationStatusApproximated ?? isSummaryApproximated) &&
+                (!representativeObservationCount.HasValue || representativeObservationCount.Value > observations.Count)
         };
     }
 

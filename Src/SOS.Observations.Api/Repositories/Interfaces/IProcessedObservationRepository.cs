@@ -58,7 +58,8 @@ public interface IProcessedObservationRepository : IProcessedObservationCoreRepo
     /// <param name="filter"></param>
     /// <param name="zoom"></param>
     /// <returns></returns>
-    Task<GeoGridTileResult> GetGeogridTileAggregationAsync(SearchFilter filter, int zoom);
+    /// <param name="cancellationToken">Cancels the Elasticsearch request.</param>
+    Task<GeoGridTileResult> GetGeogridTileAggregationAsync(SearchFilter filter, int zoom, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Get number of provinces matching the provided filter.

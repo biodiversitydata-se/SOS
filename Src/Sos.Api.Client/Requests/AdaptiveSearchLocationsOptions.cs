@@ -4,7 +4,7 @@ namespace SOS.Api.Client.Requests;
 /// <summary>Options for adaptive observation-location search.</summary>
 public sealed class AdaptiveSearchLocationsOptions : SosRoleRequestOptions
 {
-    /// <summary>The observation count above which grid aggregation is returned instead of locations.</summary>
+    /// <summary>Maximum observation count for fetching all observations instead of using representatives or grid cells.</summary>
     public int ObservationsLimit { get; set; } = 10000;
 
     /// <summary>The maximum grid zoom level used when the endpoint returns grid cells.</summary>
@@ -13,42 +13,49 @@ public sealed class AdaptiveSearchLocationsOptions : SosRoleRequestOptions
     /// <summary>The maximum number of grid cells used when the endpoint returns grid cells.</summary>
     public int MaxGridCells { get; set; } = 10000;
 
-    /// <summary>
-    /// Controls whether the response contains the input bounding box instead of a bounding box derived
-    /// from the result.
-    /// </summary>
+    /// <summary>Return the input bounding box instead of the result's extent.</summary>
     public bool ReturnInputBBox { get; set; }
 
-    /// <summary>Controls whether only sensitive observations are searched.</summary>
+    /// <summary>Used when the filter's ProtectionFilter is unset: true selects sensitive observations, false selects public observations.</summary>
     public bool SensitiveObservations { get; set; }
 
-    /// <summary>Controls whether locations are clustered when the endpoint returns locations rather than grid cells.</summary>
+    /// <summary>Enable normal pixel clustering or proximity grouping.</summary>
     public bool Cluster { get; set; } = true;
 
-    /// <summary>The clustering algorithm.</summary>
-    public LocationClusteringAlgorithm ClusteringAlgorithm { get; set; } = LocationClusteringAlgorithm.Sweref99TmFastGreedy;
+    /// <summary>Optional fixed search radius in metres, applied before pixel clustering even when Cluster is false.</summary>
+    public double? ClusterRadiusMeters { get; set; }
 
     /// <summary>
-    /// The map resolution in ground metres per CSS pixel.
+    /// Map resolution in ground metres per CSS pixel. Without it, normal clustering uses the bounding box
+    /// and result extent; the zoom limit and proximity grouping are unused.
     /// </summary>
     public double? MetersPerPixel { get; set; }
 
-    /// <summary>The cluster radius in pixels.</summary>
-    public double ClusterRadiusPx { get; set; } = 40.0;
+    /// <summary>
+    /// Stops normal pixel clustering when MetersPerPixel is at or below this limit (m/px).
+    /// ProximityClusterRadiusPx may still group nearby points. 0 disables the limit; ignored without MetersPerPixel.
+    /// </summary>
+    public double DisablePixelClusteringAtMetersPerPixel { get; set; } = AdaptiveSearchLocationsDefaults.DisablePixelClusteringAtMetersPerPixel;
 
-    /// <summary>The minimum number of distinct locations required for a result item to form a cluster.</summary>
+    /// <summary>
+    /// Fixed search radius in pixels when the zoom or count limit stops normal pixel clustering.
+    /// Requires Cluster and MetersPerPixel. Range 0–500; 0 disables this grouping.
+    /// </summary>
+    public double ProximityClusterRadiusPx { get; set; } = AdaptiveSearchLocationsDefaults.ProximityClusterRadiusPx;
+
+    /// <summary>Initial search radius in pixels for normal clustering. May grow to reduce the number of map items.</summary>
+    public double ClusterRadiusPx { get; set; } = AdaptiveSearchLocationsDefaults.ClusterRadiusPx;
+
+    /// <summary>Minimum number of geographic groups in a cluster. Coincident location ids count as one group.</summary>
     public int MinLocationsPerCluster { get; set; } = 2;
 
     /// <summary>
-    /// The number of distinct locations that can be returned without clustering. Clustering starts above
-    /// this value.
+    /// Normal pixel clustering starts above this number of clusterable map items.
+    /// Proximity grouping may still run below the limit.
     /// </summary>
-    public int MinLocationCountBeforeClustering { get; set; } = 100;
+    public int MinLocationCountBeforeClustering { get; set; } = AdaptiveSearchLocationsDefaults.MinLocationCountBeforeClustering;
 
-    /// <summary>
-    /// The polygon rendering mode: centroid points, polygon geometries, or polygons only when warranted
-    /// by the current viewport resolution.
-    /// </summary>
+    /// <summary>How polygon locations are returned. Defaults to No; WhenNeeded requires MetersPerPixel.</summary>
     public CreatePolygonsMode CreatePolygons { get; set; } = CreatePolygonsMode.No;
 
     /// <summary>
@@ -67,12 +74,12 @@ public sealed class AdaptiveSearchLocationsOptions : SosRoleRequestOptions
     public bool CreateSampleObservations { get; set; }
 
     /// <summary>
-    /// The estimated location-count threshold below which representative location aggregation is used.
+    /// The location-count threshold below which representative location aggregation is used. Defaults to 1000; range 1–10000.
     /// </summary>
-    public int? LocationAggregationLimit { get; set; }
+    public int LocationAggregationLimit { get; set; } = 1000;
 
     /// <summary>The strategy used to choose among observations, representative locations, and grid aggregation.</summary>
-    public AdaptiveSearchLocationsStrategy AdaptiveSearchStrategy { get; set; } = AdaptiveSearchLocationsStrategy.ObservationsThenGrid;
+    public AdaptiveSearchLocationsStrategy AdaptiveSearchStrategy { get; set; } = AdaptiveSearchLocationsStrategy.Auto;
 
     /// <summary>An optional year before and after which observations are rendered differently.</summary>
     public int? CutoffYear { get; set; }
@@ -87,8 +94,10 @@ public sealed class AdaptiveSearchLocationsOptions : SosRoleRequestOptions
             .Add("returnInputBBox", ReturnInputBBox)
             .Add("sensitiveObservations", SensitiveObservations)
             .Add("cluster", Cluster)
-            .AddEnum("clusteringAlgorithm", ClusteringAlgorithm)
+            .Add("clusterRadiusMeters", ClusterRadiusMeters)
             .Add("metersPerPixel", MetersPerPixel)
+            .Add("disablePixelClusteringAtMetersPerPixel", DisablePixelClusteringAtMetersPerPixel)
+            .Add("proximityClusterRadiusPx", ProximityClusterRadiusPx)
             .Add("clusterRadiusPx", ClusterRadiusPx)
             .Add("minLocationsPerCluster", MinLocationsPerCluster)
             .Add("minLocationCountBeforeClustering", MinLocationCountBeforeClustering)

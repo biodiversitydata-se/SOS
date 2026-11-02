@@ -444,7 +444,7 @@ namespace SOS.Harvest.Processors
                     // If LocationId is null then create a value.
                     if (observation.Location?.LocationId == null)
                     {                        
-                        observation.Location.LocationId = observation.Location.CreateDistinctLocationId();
+                        observation.Location.LocationId = observation.Location.CreateFallbackLocationId();
                     }
 
                     // If observation is protected

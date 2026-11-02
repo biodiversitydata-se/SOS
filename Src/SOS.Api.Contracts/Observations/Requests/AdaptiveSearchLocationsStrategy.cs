@@ -1,4 +1,4 @@
-namespace SOS.Api.Contracts.Observations.Requests;
+﻿namespace SOS.Api.Contracts.Observations.Requests;
 
 /// <summary>Controls when adaptive location search returns observations, representative locations or grid cells.</summary>
 public enum AdaptiveSearchLocationsStrategy
@@ -8,5 +8,7 @@ public enum AdaptiveSearchLocationsStrategy
     /// <summary>Try individual observations, then representative locations, then grid cells as the result limits are exceeded.</summary>
     ObservationsThenLocationsThenGrid = 2,
     /// <summary>Try representative locations first; otherwise return grid cells.</summary>
-    LocationsThenGrid = 3
+    LocationsThenGrid = 3,
+    /// <summary>Choose LocationsThenGrid strategy when the filter guarantees exact presentation statuses; otherwise use ObservationsThenGrid strategy.</summary>
+    Auto = 4
 }

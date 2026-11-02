@@ -8,6 +8,7 @@ namespace SOS.Observations.Api.Services.AdaptiveSearchLocations;
 
 public sealed class AdaptiveSearchLocationsRequest
 {
+    public CancellationToken CancellationToken { get; init; }
     public int? RoleId { get; init; }
     public string? AuthorizationApplicationIdentifier { get; init; }
     public required SearchFilterInternalDto Filter { get; init; }
@@ -20,16 +21,21 @@ public sealed class AdaptiveSearchLocationsRequest
     public int MaxZoom { get; init; }
     public int MaxGridCells { get; init; }
     public bool Cluster { get; init; }
-    public LocationClusteringAlgorithm ClusteringAlgorithm { get; init; }
+    public double? ClusterRadiusMeters { get; init; }
     public double? MetersPerPixel { get; init; }
-    public double ClusterRadiusPx { get; init; }
+    /// <summary>Disables adaptive pixel clustering at or below this ground resolution; 0 disables the cutoff.</summary>
+    public double DisablePixelClusteringAtMetersPerPixel { get; init; } = AdaptiveSearchLocationsDefaults.DisablePixelClusteringAtMetersPerPixel;
+    /// <summary>Fixed pixel search radius when adaptive clustering is skipped; 0 disables proximity grouping.</summary>
+    public double ProximityClusterRadiusPx { get; init; } = AdaptiveSearchLocationsDefaults.ProximityClusterRadiusPx;
+    public double ClusterRadiusPx { get; init; } = AdaptiveSearchLocationsDefaults.ClusterRadiusPx;
     public int MinLocationsPerCluster{ get; init; }
-    public int MinimumLocationCountBeforeClustering { get; init; }
+    public int MinimumLocationCountBeforeClustering { get; init; } = AdaptiveSearchLocationsDefaults.MinLocationCountBeforeClustering;
     public CreatePolygonsMode CreatePolygons { get; init; }
     public bool UseCache { get; init; }
     public bool CreateSampleObservations { get; init; }
-    public int? LocationAggregationLimit { get; init; }
-    public AdaptiveSearchLocationsStrategy AdaptiveSearchStrategy { get; init; } = AdaptiveSearchLocationsStrategy.ObservationsThenGrid;
+    public int LocationAggregationLimit { get; init; } = 1000;
+    public AdaptiveSearchLocationsStrategy AdaptiveSearchStrategy { get; init; } = AdaptiveSearchLocationsStrategy.Auto;
+    public int? CutoffYear { get; init; }
     public bool IncludeFilterAreasInResult { get; init; }
     public bool BoundingBoxIsEmpty { get; init; }
 }
@@ -37,6 +43,7 @@ public sealed class AdaptiveSearchLocationsRequest
 public sealed class AdaptiveSearchLocationsResult
 {
     public required string ResultType { get; init; }
+    public required AdaptiveSearchLocationsStrategy AdaptiveSearchStrategy { get; init; }
     public string? GeoJson { get; init; }
     public IReadOnlyList<LocationFeature>? LocationFeatures { get; init; }
     public LatLonBoundingBoxDto? Bbox { get; init; }
@@ -48,6 +55,7 @@ public sealed class AdaptiveSearchLocationsResult
     public required string CacheStatus { get; init; }
     public string? LocationAggregationMode { get; init; }
     public bool LocationSummaryApproximated { get; init; }
+    public bool LocationPresentationStatusApproximated { get; init; }
     public List<Feature>? GeographicAreas { get; init; }
     public AdaptiveSearchLocationsTimings Timings { get; init; } = new();
 }
@@ -57,9 +65,12 @@ internal sealed class CachedLocationAggregate
     public required string DistinctLocationId { get; init; }
     public required SOS.Lib.Models.Processed.Observation.Location Location { get; init; } // todo - går det ha en mindre modell med enbart det som är viktigt för endpointen?
     public List<string> LocationIds { get; init; } = new();
+    public List<SOS.Lib.Models.Processed.Observation.Location> Locations { get; init; } = new();
+    public HashSet<string> GeneralizedLocationIds { get; init; } = new(StringComparer.OrdinalIgnoreCase);
     public List<int> TaxonIds { get; init; } = new();
     public required LocationObservationSummary ObservationSummary { get; init; }
     public bool IsSummaryApproximated { get; init; }
+    public bool IsPresentationStatusApproximated { get; init; }
 }
 
 internal sealed record PolygonGeometryDisplayDecision(

@@ -449,6 +449,10 @@ public class SosObservationsClientTests
         {
             request.Method.Should().Be(HttpMethod.Post);
             request.RequestUri!.PathAndQuery.Should().Contain("/observations/internal/adaptivesearchlocations?");
+            request.RequestUri.Query.Should().Contain("adaptiveSearchStrategy=Auto");
+            request.RequestUri.Query.Should().Contain("locationAggregationLimit=1000");
+            request.RequestUri.Query.Should().Contain("createPolygons=No");
+            request.RequestUri.Query.Should().NotContain("metersPerPixel=");
             ReadRequestBody(request).Should().Contain("Present");
             request.Headers.Accept.Select(header => header.MediaType)
                 .Should().Equal("application/geo+json", "application/json");
@@ -465,7 +469,9 @@ public class SosObservationsClientTests
             TestContext.Current.CancellationToken);
 
         result.GeoJson.Should().Contain("FeatureCollection");
-    }
+        result.LocationPresentationStatusApproximated.Should().BeNull();
+        result.AdaptiveSearchStrategy.Should().BeNull();
+    }    
 
     [Fact]
     public async Task AdaptiveSearchLocationsInternalJsonAsync_BuildsEndpointQueryAndGeoJsonAcceptHeader()
@@ -476,8 +482,10 @@ public class SosObservationsClientTests
             request.RequestUri!.PathAndQuery.Should().Contain("/observations/internal/adaptivesearchlocations?");
             request.RequestUri.Query.Should().Contain("observationsLimit=10");
             request.RequestUri.Query.Should().Contain("cluster=false");
-            request.RequestUri.Query.Should().Contain("clusteringAlgorithm=DbScan");
+            request.RequestUri.Query.Should().Contain("clusterRadiusMeters=100");
             request.RequestUri.Query.Should().Contain("adaptiveSearchStrategy=LocationsThenGrid");
+            request.RequestUri.Query.Should().Contain("createPolygons=WhenNeeded");
+            request.RequestUri.Query.Should().Contain("metersPerPixel=1.25");
             request.Headers.Accept.Select(header => header.MediaType)
                 .Should().Equal("application/geo+json", "application/json");
             return new HttpResponseMessage(HttpStatusCode.OK)
@@ -493,8 +501,10 @@ public class SosObservationsClientTests
             {
                 ObservationsLimit = 10,
                 Cluster = false,
-                ClusteringAlgorithm = LocationClusteringAlgorithm.DbScan,
-                AdaptiveSearchStrategy = AdaptiveSearchLocationsStrategy.LocationsThenGrid
+                ClusterRadiusMeters = 100,
+                AdaptiveSearchStrategy = AdaptiveSearchLocationsStrategy.LocationsThenGrid,
+                CreatePolygons = CreatePolygonsMode.WhenNeeded,
+                MetersPerPixel = 1.25
             },
             TestContext.Current.CancellationToken);
 

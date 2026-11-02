@@ -50,61 +50,47 @@ public class ObservationSearchService : IObservationSearchService
         };
     }
 
-    public async Task<(string GeoJson, long? ObservationsTotalCount, long? EstimatedLocationCount, long? FeatureCount, long? LocationsBeforeClustering, long ResponseSizeBytes, string? CacheStatus, string? ResultType, string? Timings)> AdaptiveSearchLocationItemsCachedGeoJson(
-        SearchFilterInternalDto filter,
-        int observationsLimit = 10000,
-        int maxGridCells = 10000,
-        int? locationAggregationLimit = null,
-        AdaptiveSearchLocationsStrategy adaptiveSearchStrategy = AdaptiveSearchLocationsStrategy.ObservationsThenGrid,
-        bool cluster = true,
-        string clusteringAlgorithm = "Greedy",
-        CreatePolygonsMode createPolygons = CreatePolygonsMode.No,
-        double clusterRadiusPx = 40.0,
-        int minLocationsPerCluster = 2,
-        int minLocationCountBeforeClustering = 100,
-        bool validateSearchFilter = false,
-        string translationCultureCode = "sv-SE",
-        bool sensitiveObservations = false,
-        double? metersPerPixel = null,
-        string? bbox = null,
-        bool createSampleObservations = false,
-        bool useCache = true,
-        int? cutoffYear = null,
-        bool includeFilterAreasInResult = false)
+    public async Task<LocationMapSearchResult> AdaptiveSearchLocationItemsCachedGeoJson(
+        SearchFilterInternalDto filter, LocationMapSearchOptions options, CancellationToken cancellationToken = default)
     {
-        var response = await _observationsClient.AdaptiveSearchLocationsInternalAsync(
-            filter,
+        var response = await _observationsClient.AdaptiveSearchLocationsInternalAsync(filter,
             new AdaptiveSearchLocationsOptions
             {
-                ObservationsLimit = observationsLimit,
-                MaxGridCells = maxGridCells,
-                SensitiveObservations = sensitiveObservations,
-                Cluster = cluster,
-                ClusteringAlgorithm = ParseClusteringAlgorithm(clusteringAlgorithm),
-                MetersPerPixel = metersPerPixel,
-                ClusterRadiusPx = clusterRadiusPx,
-                MinLocationsPerCluster = minLocationsPerCluster,
-                MinLocationCountBeforeClustering = minLocationCountBeforeClustering,
-                CreatePolygons = createPolygons,
-                BoundingBoxQuery = bbox,
-                IncludeFilterAreasInResult = includeFilterAreasInResult,
-                UseCache = useCache,
-                CreateSampleObservations = createSampleObservations,
-                LocationAggregationLimit = locationAggregationLimit,
-                AdaptiveSearchStrategy = adaptiveSearchStrategy,
-                CutoffYear = cutoffYear
-            });
-
-        return (
-            response.GeoJson,
-            response.ObservationsTotalCount,
-            response.EstimatedLocationCount,
-            response.FeatureCount,
-            response.LocationsBeforeClustering,
-            response.ResponseSizeBytes,
-            response.CacheStatus,
-            response.ResultType,
-            response.Timings);
+                ObservationsLimit = options.ObservationsLimit,
+                MaxGridCells = options.MaxGridCells,
+                SensitiveObservations = options.SensitiveObservations,
+                Cluster = options.Cluster,
+                ClusterRadiusMeters = options.ClusterRadiusMeters,
+                MetersPerPixel = options.MetersPerPixel,
+                DisablePixelClusteringAtMetersPerPixel = options.DisablePixelClusteringAtMetersPerPixel,
+                ProximityClusterRadiusPx = options.ProximityClusterRadiusPx,
+                ClusterRadiusPx = options.ClusterRadiusPx,
+                MinLocationsPerCluster = options.MinLocationsPerCluster,
+                MinLocationCountBeforeClustering = options.MinLocationCountBeforeClustering,
+                CreatePolygons = options.CreatePolygons,
+                BoundingBoxQuery = options.Bbox,
+                IncludeFilterAreasInResult = options.IncludeFilterAreasInResult,
+                UseCache = options.UseCache,
+                CreateSampleObservations = options.CreateSampleObservations,
+                LocationAggregationLimit = options.LocationAggregationLimit,
+                AdaptiveSearchStrategy = options.AdaptiveSearchStrategy,
+                CutoffYear = options.CutoffYear
+            }, cancellationToken);
+        return new LocationMapSearchResult
+        {
+            GeoJson = response.GeoJson,
+            ObservationsTotalCount = response.ObservationsTotalCount,
+            EstimatedLocationCount = response.EstimatedLocationCount,
+            FeatureCount = response.FeatureCount,
+            LocationsBeforeClustering = response.LocationsBeforeClustering,
+            ResponseSizeBytes = response.ResponseSizeBytes,
+            CacheStatus = response.CacheStatus,
+            ResultType = response.ResultType,
+            Timings = response.Timings,
+            LocationSummaryApproximated = response.LocationSummaryApproximated,
+            LocationPresentationStatusApproximated = response.LocationPresentationStatusApproximated,
+            AdaptiveSearchStrategy = response.AdaptiveSearchStrategy,
+        };
     }
 
     public async Task<Result<SearchByCursorResultDto<Observation>>> SearchObservationsByCursor(
@@ -137,23 +123,6 @@ public class ObservationSearchService : IObservationSearchService
             TotalCount = response.TotalCount,
             Records = response.Records.ToList()
         });
-    }
-
-    private static LocationClusteringAlgorithm ParseClusteringAlgorithm(string clusteringAlgorithm)
-    {
-        if (string.Equals(clusteringAlgorithm, "Greedy", StringComparison.OrdinalIgnoreCase))
-        {
-            return LocationClusteringAlgorithm.Sweref99TmGreedy;
-        }
-
-        if (string.Equals(clusteringAlgorithm, "FastGreedy", StringComparison.OrdinalIgnoreCase))
-        {
-            return LocationClusteringAlgorithm.Sweref99TmFastGreedy;
-        }
-
-        return Enum.TryParse<LocationClusteringAlgorithm>(clusteringAlgorithm, ignoreCase: true, out var value)
-            ? value
-            : LocationClusteringAlgorithm.Sweref99TmFastGreedy;
     }
 
     private static SearchSortOrder ParseSearchSortOrder(string sortOrder)

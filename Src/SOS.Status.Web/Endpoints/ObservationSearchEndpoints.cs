@@ -1,3 +1,4 @@
+using SOS.Status.Web.Client.Models;
 ﻿﻿using Microsoft.AspNetCore.Mvc;
 using SOS.Api.Contracts.Observations.Requests;
 using SOS.Status.Web.Services;
@@ -76,14 +77,14 @@ public static class ObservationSearchEndpoints
                        [FromBody] SearchFilterInternalDto filter,
                        [FromQuery] int observationsLimit = 10000,
                        [FromQuery] int maxGridCells = 10000,
-                       [FromQuery] int? locationAggregationLimit = null,
-                       [FromQuery] AdaptiveSearchLocationsStrategy adaptiveSearchStrategy = AdaptiveSearchLocationsStrategy.ObservationsThenGrid,
+                       [FromQuery] int locationAggregationLimit = 1000,
+                       [FromQuery] AdaptiveSearchLocationsStrategy adaptiveSearchStrategy = AdaptiveSearchLocationsStrategy.Auto,
                        [FromQuery] bool cluster = true,
-                       [FromQuery] string clusteringAlgorithm = "Greedy",
+                       [FromQuery] double? clusterRadiusMeters = null,
                        [FromQuery] CreatePolygonsMode createPolygons = CreatePolygonsMode.No,
-                       [FromQuery] double clusterRadiusPx = 40.0,
+                       [FromQuery] double clusterRadiusPx = AdaptiveSearchLocationsDefaults.ClusterRadiusPx,
                        [FromQuery] int minLocationsPerCluster = 2,
-                       [FromQuery] int minLocationCountBeforeClustering = 100,
+                       [FromQuery] int minLocationCountBeforeClustering = AdaptiveSearchLocationsDefaults.MinLocationCountBeforeClustering,
                        [FromQuery] bool validateSearchFilter = false,
                        [FromQuery] string translationCultureCode = "sv-SE",
                        [FromQuery] bool sensitiveObservations = false,
@@ -92,31 +93,37 @@ public static class ObservationSearchEndpoints
                        [FromQuery] bool createSampleObservations = false,
                        [FromQuery] bool useCache = true,
                        [FromQuery] int? cutoffYear = null,
-                       [FromQuery] bool includeFilterAreasInResult = false) =>
+                       [FromQuery] bool includeFilterAreasInResult = false,
+                       [FromQuery] double disablePixelClusteringAtMetersPerPixel = AdaptiveSearchLocationsDefaults.DisablePixelClusteringAtMetersPerPixel,
+                       [FromQuery] double proximityClusterRadiusPx = AdaptiveSearchLocationsDefaults.ProximityClusterRadiusPx) =>
                 {
                     try
                     {
-                        var result = await service.AdaptiveSearchLocationItemsCachedGeoJson(
-                            filter,
-                            observationsLimit,
-                            maxGridCells,
-                            locationAggregationLimit,
-                            adaptiveSearchStrategy,
-                            cluster,
-                            clusteringAlgorithm,
-                            createPolygons,
-                            clusterRadiusPx,
-                            minLocationsPerCluster,
-                            minLocationCountBeforeClustering,
-                            validateSearchFilter,
-                            translationCultureCode,
-                            sensitiveObservations,
-                            metersPerPixel,
-                            bbox,
-                            createSampleObservations,
-                            useCache,
-                            cutoffYear,
-                            includeFilterAreasInResult);
+                        var result = await service.AdaptiveSearchLocationItemsCachedGeoJson(filter,
+                            new LocationMapSearchOptions
+                            {
+                                ObservationsLimit = observationsLimit,
+                                MaxGridCells = maxGridCells,
+                                LocationAggregationLimit = locationAggregationLimit,
+                                AdaptiveSearchStrategy = adaptiveSearchStrategy,
+                                Cluster = cluster,
+                                ClusterRadiusMeters = clusterRadiusMeters,
+                                CreatePolygons = createPolygons,
+                                ClusterRadiusPx = clusterRadiusPx,
+                                MinLocationsPerCluster = minLocationsPerCluster,
+                                MinLocationCountBeforeClustering = minLocationCountBeforeClustering,
+                                ValidateSearchFilter = validateSearchFilter,
+                                TranslationCultureCode = translationCultureCode,
+                                SensitiveObservations = sensitiveObservations,
+                                MetersPerPixel = metersPerPixel,
+                                Bbox = bbox,
+                                CreateSampleObservations = createSampleObservations,
+                                UseCache = useCache,
+                                CutoffYear = cutoffYear,
+                                IncludeFilterAreasInResult = includeFilterAreasInResult,
+                                DisablePixelClusteringAtMetersPerPixel = disablePixelClusteringAtMetersPerPixel,
+                                ProximityClusterRadiusPx = proximityClusterRadiusPx,
+                            }, httpContext.RequestAborted);
 
                         if (result.ObservationsTotalCount.HasValue)
                         {
@@ -152,6 +159,13 @@ public static class ObservationSearchEndpoints
                         {
                             httpContext.Response.Headers["X-AdaptiveSearch-Timings"] = result.Timings;
                         }
+
+                        if (result.LocationSummaryApproximated.HasValue)
+                            httpContext.Response.Headers["X-Location-Summary-Approximated"] = result.LocationSummaryApproximated.Value ? "true" : "false";
+                        if (result.LocationPresentationStatusApproximated.HasValue)
+                            httpContext.Response.Headers["X-Location-Presentation-Status-Approximated"] = result.LocationPresentationStatusApproximated.Value ? "true" : "false";
+                        if (result.AdaptiveSearchStrategy.HasValue)
+                            httpContext.Response.Headers["X-AdaptiveSearch-Strategy"] = result.AdaptiveSearchStrategy.Value.ToString();
 
                         return Results.Text(result.GeoJson, "application/geo+json");
                     }

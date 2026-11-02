@@ -5,6 +5,8 @@ namespace SOS.Lib.Models.Search;
 /// </summary>
 public sealed record SearchExecutionOptions
 {
+    /// <summary>Cancels the underlying search request.</summary>
+    public CancellationToken CancellationToken { get; init; }
     /// <summary>If true, all observation fields are retrieved.</summary>
     public bool GetAllFields { get; init; }
 

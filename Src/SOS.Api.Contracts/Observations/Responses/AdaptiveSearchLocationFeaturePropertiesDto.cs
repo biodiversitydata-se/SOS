@@ -1,37 +1,40 @@
 ﻿namespace SOS.Api.Contracts.Observations.Responses;
 
-/// <summary>
-/// The "properties" payload of one feature (a location or a cluster of locations) in an adaptive search
-/// locations GeoJSON response.
-/// </summary>
+/// <summary>GeoJSON properties for a location or location cluster.</summary>
 public sealed class AdaptiveSearchLocationFeaturePropertiesDto
 {
     /// <summary>
-    /// Indicates whether this feature represents a cluster of multiple locations (true) or a single
-    /// location (false).
+    /// Identifies one location, coincident locations, or a meter/pixel cluster.
+    /// Use this field to determine whether the feature is a cluster.
     /// </summary>
-    public bool IsCluster { get; init; }
+    [System.Text.Json.Serialization.JsonConverter(typeof(LocationGroupingTypeJsonConverter))]
+    public LocationGroupingType GroupingType { get; init; }
 
-    /// <summary>
-    /// The number of observations for this feature.
-    /// </summary>
+    /// <summary>True when Locations.Count exceeds one, including coincident locations.</summary>
+    public bool HasMultipleLocations => Locations.Count > 1;
+
+    /// <summary>Total matching observations, even when summaries use representative observations.</summary>
     public int ObservationCount { get; init; }
 
     /// <summary>
-    /// True when this location or, for a cluster, any of its member locations was created from a
-    /// representative observation rather than all observations for the location.
+    /// True when ObservationSummary, Presentation.StatusCounts or Presentation.IsAllObservationsSensitive
+    /// may be approximate. Individual values may still be exact; ObservationCount remains the total count.
     /// </summary>
     public bool IsSummaryApproximated { get; init; }
 
     /// <summary>
-    /// Cluster-specific details. Only present when <see cref="IsCluster"/> is true.
+    /// True when Presentation.Status or Presentation.CutoffYearStatus may be approximate.
+    /// Covers only these two fields; other presentation values are covered by IsSummaryApproximated.
+    /// </summary>
+    public bool IsPresentationStatusApproximated { get; init; }
+
+    /// <summary>
+    /// Metadata for meter and pixel clusters. Use GroupingType to identify the grouping.
     /// </summary>
     [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
     public AdaptiveSearchLocationClusterDetailsDto? Cluster { get; init; }
 
-    /// <summary>
-    /// Rendering status and observation-status breakdown for this feature.
-    /// </summary>
+    /// <summary>Map status and status counts. The two approximation flags cover different fields.</summary>
     public AdaptiveSearchLocationPresentationDto Presentation { get; init; } = new();
 
     /// <summary>
@@ -40,7 +43,8 @@ public sealed class AdaptiveSearchLocationFeaturePropertiesDto
     public AdaptiveSearchFeatureLocationsDto Locations { get; init; } = new();
 
     /// <summary>
-    /// Taxa and observation-status counts for this feature.
+    /// Taxa and observation-status counts for this feature. These may be approximate when
+    /// IsSummaryApproximated is true.
     /// </summary>
     public AdaptiveSearchLocationObservationSummaryDto ObservationSummary { get; init; } = new();
 }
@@ -58,16 +62,26 @@ public sealed class AdaptiveSearchLocationClusterDetailsDto
 /// <summary>Rendering status and observation-status breakdown for a feature.</summary>
 public sealed class AdaptiveSearchLocationPresentationDto
 {
-    /// <summary>The overall presentation status for this feature.</summary>
+    /// <summary>The overall presentation status for this feature. Covered by IsPresentationStatusApproximated.</summary>
     public LocationPresentationStatusDto Status { get; init; }
 
-    /// <summary>The number of observations in each presentation status.</summary>
+    /// <summary>
+    /// Counts per presentation status. With representatives, these may not add up to ObservationCount.
+    /// Covered by IsSummaryApproximated.
+    /// </summary>
     public Dictionary<LocationPresentationStatusDto, int> StatusCounts { get; init; } = new();
 
-    /// <summary>The cutoff-year rendering status, when a cutoff year was specified.</summary>
+    /// <summary>
+    /// The cutoff-year rendering status, when a cutoff year was specified.
+    /// Covered by IsPresentationStatusApproximated.
+    /// </summary>
     public CutoffYearStatusDto? CutoffYearStatus { get; init; }
 
-    /// <summary>True when all observations for this feature are sensitive.</summary>
+    /// <summary>
+    /// Whether all observations are sensitive. A public observation guarantees false.
+    /// With representatives, true may be approximate when both public and sensitive observations are allowed.
+    /// Covered by IsSummaryApproximated.
+    /// </summary>
     public bool? IsAllObservationsSensitive { get; init; }
 }
 
@@ -100,14 +114,15 @@ public sealed class AdaptiveSearchFeatureLocationsDto
     /// <summary>The number of distinct original locations that are grouped into this feature.</summary>
     public int Count { get; init; }
 
-    /// <summary>The identifiers of the original locations that are grouped into this feature.</summary>
+    /// <summary>All non-empty original location ids, distinct and sorted without regard to case. Never truncated.</summary>
     public List<string> Ids { get; init; } = new();
 
-    /// <summary>
-    /// If <see cref="AdaptiveSearchLocationFeaturePropertiesDto.IsCluster"/> is false, this represents the
-    /// single location associated with the observation(s).
-    /// </summary>
-    public AdaptiveSearchLocationDetailsDto? Location { get; init; }
+    /// <summary>Maximum number of location details included in a feature.</summary>
+    public const int MaxLocationItems = 5;
+
+    /// <summary>At most five original locations, in the same id order as Ids. Ids and Count describe all members.</summary>
+    public List<AdaptiveSearchLocationDetailsDto> Items { get; init; } = new();
+
 }
 
 /// <summary>A single observation location.</summary>
@@ -131,7 +146,7 @@ public sealed class AdaptiveSearchLocationDetailsDto
     /// <summary>An identifier for the location.</summary>
     public string? LocationId { get; init; }
 
-    /// <summary>An identifier for the distinct location, derived from its type, coordinates and uncertainty.</summary>
+    /// <summary>An identifier for the distinct location, derived from its type and coordinates.</summary>
     public string? DistinctLocationId { get; init; }
 
     /// <summary>X coordinate in SWEREF99 TM.</summary>
@@ -171,11 +186,7 @@ public enum LocationPresentationStatusDto
     /// </summary>
     NotPresent = 4,
 
-    /// <summary>
-    /// When a cutoff year is used and there are no present observations with an end year equal to or later
-    /// than the cutoff year, but there is at least one present observation with an end year before the
-    /// cutoff year.
-    /// </summary>
+    /// <summary>At least one present observation before the cutoff year, none on or after it.</summary>
     DividedByYearUntil = 5,
 
     /// <summary>Multiple locations are clustered together because they are close to each other.</summary>
@@ -208,4 +219,28 @@ public enum CutoffYearStatusDto
 
     /// <summary>All observations are not present.</summary>
     NotPresent = 5
+}
+
+/// <summary>How the geographic locations represented by a map feature were grouped.</summary>
+[System.Text.Json.Serialization.JsonConverter(typeof(LocationGroupingTypeJsonConverter))]
+public enum LocationGroupingType
+{
+    /// <summary>One original location at a geographic position.</summary>
+    SingleLocation,
+
+    /// <summary>Multiple original location ids sharing the same distinct geographic location id.</summary>
+    CoLocatedLocations,
+
+    /// <summary>At least two geographic units combined by adaptive clustering using a pixel radius.</summary>
+    PixelCluster,
+
+    /// <summary>Geographic locations combined using a fixed search radius in meters, before optional pixel clustering.</summary>
+    MeterCluster
+}
+
+/// <summary>Serializes location grouping types as camelCase strings without changing other enum formats.</summary>
+public sealed class LocationGroupingTypeJsonConverter : System.Text.Json.Serialization.JsonStringEnumConverter<LocationGroupingType>
+{
+    /// <summary>Creates a converter using camelCase names and rejecting integer enum values.</summary>
+    public LocationGroupingTypeJsonConverter() : base(System.Text.Json.JsonNamingPolicy.CamelCase, allowIntegerValues: false) { }
 }

@@ -142,7 +142,7 @@ public interface IProcessedObservationCoreRepository : IProcessRepositoryBase<Ob
     /// <returns></returns>
     Task<long> GetMatchCountAsync(SearchFilterBase filter, bool skipAuthorizationFilters = false);
 
-    Task<(long Count, LatLonBoundingBoxDto? Extent, long EstimatedLocationCount)> GetCountAndExtentAsync(SearchFilterBase filter, bool skipAuthorizationFilters = false, bool includeExtent = true);
+    Task<(long Count, LatLonBoundingBoxDto? Extent, long EstimatedLocationCount)> GetCountAndExtentAsync(SearchFilterBase filter, bool skipAuthorizationFilters = false, bool includeExtent = true, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Get observations by their occurrence id's
@@ -355,7 +355,8 @@ public interface IProcessedObservationCoreRepository : IProcessRepositoryBase<Ob
         SearchFilter filter,
         int take,
         string collapseField,
-        bool getAllFields = false) where T : class;
+        bool getAllFields = false,
+        CancellationToken cancellationToken = default) where T : class;
 
     /// <summary>
     ///     Get chunk of objects from repository using search_after for deep pagination.    

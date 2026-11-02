@@ -58,9 +58,10 @@ public class SosObservationSearchServiceTests
               "id": "cluster_1",
               "geometry": { "type": "Point", "coordinates": [15.5, 59.3] },
               "properties": {
-                "isCluster": true,
+                "groupingType": "pixelCluster",
                 "observationCount": 42,
                 "isSummaryApproximated": true,
+                "isPresentationStatusApproximated": true,
                 "cluster": { "radiusMeters": 500.0, "radiusMetersMin": 120.5 },
                 "presentation": {
                   "status": "Cluster",
@@ -110,14 +111,16 @@ public class SosObservationSearchServiceTests
         ((Point)feature.Geometry!).Coordinates.Latitude.Should().Be(59.3);
 
         var properties = feature.Properties;
-        properties.IsCluster.Should().BeTrue();
+        properties.GroupingType.Should().Be(LocationGroupingType.PixelCluster);
         properties.ObservationCount.Should().Be(42);
         properties.IsSummaryApproximated.Should().BeTrue();
+        properties.IsPresentationStatusApproximated.Should().BeTrue();
         properties.Cluster.Should().NotBeNull();
         properties.Cluster!.RadiusMeters.Should().Be(500.0);
         properties.Presentation.Status.Should().Be(LocationPresentationStatusDto.Cluster);
         properties.Presentation.StatusCounts[LocationPresentationStatusDto.Present].Should().Be(40);
         properties.Locations.Count.Should().Be(5);
+        properties.HasMultipleLocations.Should().BeTrue();
         properties.Locations.Ids.Should().Equal("loc1", "loc2");
         properties.ObservationSummary.TaxaCount.Should().Be(3);
         properties.ObservationSummary.StatusCounts.FoundCount.Should().Be(40);
@@ -156,8 +159,8 @@ public class SosObservationSearchServiceTests
         const string geoJson = """
         {"type":"FeatureCollection","features":[{"type":"Feature","id":"site-1",
          "geometry":{"type":"Point","coordinates":[18.12345,59.12345]},
-         "properties":{"isCluster":false,"locations":{"count":1,"ids":["site-1"],
-         "location":{"locationId":"site-1","distinctLocationId":"loc_1_5912345_1812345_un","type":"Point"}}}}]}
+         "properties":{"groupingType":"singleLocation","locations":{"count":1,"ids":["site-1"],
+         "items":[{"locationId":"site-1","distinctLocationId":"Point_5912345_1812345","type":"Point"}]}}}]}
         """;
         var client = new Mock<ISosObservationsClient>();
         client.Setup(value => value.AdaptiveSearchLocationsInternalAsync(
@@ -171,8 +174,8 @@ public class SosObservationSearchServiceTests
             new SearchFilterInternalDto(), cancellationToken: cancellationToken);
 
         featureCollection.Features.Should().ContainSingle();
-        featureCollection.Features[0].Properties.Locations.Location!.DistinctLocationId
-            .Should().Be("loc_1_5912345_1812345_un");
+        featureCollection.Features[0].Properties.Locations.Items.Single().DistinctLocationId
+            .Should().Be("Point_5912345_1812345");
     }
 
     [Theory]

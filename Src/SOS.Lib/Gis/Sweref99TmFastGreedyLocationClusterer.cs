@@ -1,4 +1,5 @@
-﻿using SOS.Api.Contracts.Common.Geo;
+﻿using LocationGroupingType = SOS.Api.Contracts.Observations.Responses.LocationGroupingType;
+using SOS.Api.Contracts.Common.Geo;
 using NetTopologySuite.Geometries;
 using SOS.Lib.Extensions;
 using SOS.Lib.Models.Gis;
@@ -15,7 +16,6 @@ public class Sweref99TmFastGreedyLocationClusterer : ILocationClusterer
     private const double DefaultFallbackClusterRadiusMeters = 1000.0;
     private const double MinimumClusterRadiusMeters = 1.0;
     private const int DefaultMinLocationsPerCluster = 2;
-    private const int MaxNumberOfObservationsToCluster = 10000;
     private const int MaxClusterRadiusIterations = 40;
 
     private readonly int _minLocationCountBeforeClustering;
@@ -80,15 +80,74 @@ public class Sweref99TmFastGreedyLocationClusterer : ILocationClusterer
     public List<LocationFeature> ClusterLocations(List<Observation> observations, LatLonBoundingBoxDto boundingBox, double metersPerPixel, double clusterRadiusPx = DefaultClusterRadiusInPixels)
     {
         var clusterRadius = ComputeMinimumClusterRadius(boundingBox, metersPerPixel, clusterRadiusPx);
-        return ClusterLocations(observations, clusterRadius);
+        return ClusterLocations(observations, clusterRadius, useLocationExtentMinimum: false);
     }
 
-    private List<LocationFeature> ClusterLocations(List<Observation> observations, double minimumClusterRadiusMeters)
+    private List<LocationFeature> ClusterLocations(List<Observation> observations, double minimumClusterRadiusMeters, bool useLocationExtentMinimum = true)
     {        
-        var projectedLocations = ProjectLocations(observations);
+        return CreateFeatures(ClusterProjectedLocations(ProjectLocations(observations.Select(o => o.Location)), minimumClusterRadiusMeters, useLocationExtentMinimum), observations);
+    }
+
+    /// <summary>
+    /// Meter groups are indivisible inputs to either adaptive pixel clustering or fixed proximity
+    /// clustering. The proximity radius is supplied only when pixel grouping is enabled by the caller.
+    /// </summary>
+    public List<LocationFeature> ClusterLocations(List<Observation> observations, LatLonBoundingBoxDto? boundingBox,
+        double? metersPerPixel, double clusterRadiusPx, double? clusterRadiusMeters, bool clusterPixels,
+        double proximityClusterRadiusPx = 0)
+    {
+        return CreateFeatures(ClusterGroups(observations.Select(o => o.Location), new LocationClusteringOptions
+        {
+            BoundingBox = boundingBox, MetersPerPixel = metersPerPixel, ClusterRadiusPx = clusterRadiusPx,
+            ClusterRadiusMeters = clusterRadiusMeters, ClusterPixels = clusterPixels,
+            ProximityClusterRadiusPx = proximityClusterRadiusPx
+        }), observations);
+    }
+
+    /// <summary>Clusters locations without constructing observations or presentation features.</summary>
+    public List<LocationClusterGroup> ClusterGroups(IEnumerable<SOS.Lib.Models.Processed.Observation.Location> locations,
+        LocationClusteringOptions options)
+    {
+        var boundingBox = options.BoundingBox;
+        var metersPerPixel = options.MetersPerPixel;
+        var clusterRadiusPx = options.ClusterRadiusPx;
+        var clusterRadiusMeters = options.ClusterRadiusMeters;
+        var clusterPixels = options.ClusterPixels;
+        var proximityClusterRadiusPx = options.ProximityClusterRadiusPx;
+        if (!double.IsFinite(proximityClusterRadiusPx) || proximityClusterRadiusPx < 0)
+            throw new ArgumentOutOfRangeException(nameof(proximityClusterRadiusPx));
+
+        var units = ProjectLocations(locations);
+        if (clusterRadiusMeters.HasValue)
+        {
+            if (!double.IsFinite(clusterRadiusMeters.Value) || clusterRadiusMeters.Value <= 0)
+                throw new ArgumentOutOfRangeException(nameof(clusterRadiusMeters));
+            var meterGroups = MakeClusterItems(units, clusterRadiusMeters.Value, LocationGroupingType.MeterCluster);
+            units = meterGroups.Select(group => new ProjectedLocation(
+                group.DistinctLocationIds.OrderBy(id => id, StringComparer.Ordinal).First(),
+                group.MetricCenter.X, group.MetricCenter.Y, group.DistinctLocationIds.ToList(), group))
+                .OrderBy(u => u.DistinctLocationId, StringComparer.Ordinal).ToList();
+        }
+        if (clusterPixels && boundingBox != null && units.Count > _minLocationCountBeforeClustering)
+        {
+            var radius = metersPerPixel.HasValue
+                ? ComputeMinimumClusterRadius(boundingBox, metersPerPixel.Value, clusterRadiusPx)
+                : ComputeMinimumClusterRadius(boundingBox, _maxLocationCountAfterClustering);
+            return ClusterProjectedLocations(units, radius, useLocationExtentMinimum: !metersPerPixel.HasValue);
+        }
+
+        // One fixed-radius pass; never grow this radius to reach the adaptive target item count.
+        if (proximityClusterRadiusPx > 0 && metersPerPixel is > 0 && double.IsFinite(metersPerPixel.Value))
+            return MakeClusterItems(units, metersPerPixel.Value * proximityClusterRadiusPx);
+
+        return CreateSingleLocationItems(units);
+    }
+
+    private List<LocationClusterGroup> ClusterProjectedLocations(List<ProjectedLocation> projectedLocations, double minimumClusterRadiusMeters, bool useLocationExtentMinimum)
+    {
         if (projectedLocations.Count == 0)
         {
-            return new List<LocationFeature>();
+            return new List<LocationClusterGroup>();
         }
 
         if (projectedLocations.Count <= _minLocationCountBeforeClustering)
@@ -96,9 +155,10 @@ public class Sweref99TmFastGreedyLocationClusterer : ILocationClusterer
             return CreateSingleLocationItems(projectedLocations);
         }
 
-        var diagonal = ComputeLocationsDiagonal(projectedLocations);
-        var clusterRadius = Math.Max(diagonal / 100, minimumClusterRadiusMeters);
-        var result = new List<LocationFeature>();
+        var clusterRadius = useLocationExtentMinimum
+            ? Math.Max(ComputeLocationsDiagonal(projectedLocations) / 100, minimumClusterRadiusMeters)
+            : minimumClusterRadiusMeters;
+        var result = new List<LocationClusterGroup>();
         var iterationCount = 0;
 
         do
@@ -112,11 +172,11 @@ public class Sweref99TmFastGreedyLocationClusterer : ILocationClusterer
         return result;
     }
 
-    private List<LocationFeature> MakeClusterItems(List<ProjectedLocation> locations, double clusterRadius)
+    private List<LocationClusterGroup> MakeClusterItems(List<ProjectedLocation> locations, double clusterRadius, LocationGroupingType groupingType = LocationGroupingType.PixelCluster)
     {
         if (locations.Count == 0)
         {
-            return new List<LocationFeature>();
+            return new List<LocationClusterGroup>();
         }
 
         if (clusterRadius <= 0)
@@ -127,7 +187,7 @@ public class Sweref99TmFastGreedyLocationClusterer : ILocationClusterer
         var buckets = BuildBuckets(locations, clusterRadius);
         var clustered = new bool[locations.Count];
         var processedAnchors = new bool[locations.Count];
-        var clusters = new List<List<ProjectedLocation>>();
+        var clusters = new List<SpatialCluster>();
         var clusterRadiusSquared = clusterRadius * clusterRadius;
 
         for (var index = 0; index < locations.Count; index++)
@@ -138,7 +198,7 @@ public class Sweref99TmFastGreedyLocationClusterer : ILocationClusterer
             }
 
             var anchor = locations[index];
-            var candidateIndexes = GetCandidateIndexes(buckets, anchor.X, anchor.Y, clusterRadius);
+            var candidateIndexes = GetCandidateIndexes(buckets, anchor.X, anchor.Y, clusterRadius).OrderBy(i => i);
             var cluster = new List<int>();
 
             foreach (var candidateIndex in candidateIndexes)
@@ -151,15 +211,15 @@ public class Sweref99TmFastGreedyLocationClusterer : ILocationClusterer
                 var candidate = locations[candidateIndex];
                 var xDifference = candidate.X - anchor.X;
                 var yDifference = candidate.Y - anchor.Y;
-                if (xDifference * xDifference + yDifference * yDifference < clusterRadiusSquared)
+                if (xDifference * xDifference + yDifference * yDifference <= clusterRadiusSquared)
                 {
                     cluster.Add(candidateIndex);
                 }
             }
 
-            if (cluster.Count >= _minLocationsPerCluster)
+            if (cluster.Count >= 2 && cluster.Sum(i => locations[i].Weight) >= _minLocationsPerCluster)
             {
-                var clusterLocations = new List<ProjectedLocation>(cluster.Count);
+                var clusterLocations = new SpatialCluster();
                 foreach (var clusterIndex in cluster)
                 {
                     clustered[clusterIndex] = true;
@@ -174,14 +234,15 @@ public class Sweref99TmFastGreedyLocationClusterer : ILocationClusterer
             }
         }
 
-        clusters = MergeClustersWithCloseCentroids(clusters, clusterRadius);
+        clusters = MergeClustersAndNearbyLocations(clusters, locations, buckets, clustered, clusterRadius);
 
-        var result = new List<LocationFeature>(clusters.Count);
+        var result = new List<LocationClusterGroup>(clusters.Count);
         foreach (var cluster in clusters)
         {
-            var clusterItem = LocationFeature.FromCluster(cluster.SelectMany(location => location.Observations).ToList());
-            clusterItem.ClusterRadiusMeters = clusterRadius;
-            result.Add(clusterItem);
+            var centroid = GetCentroid(cluster);
+            result.Add(new LocationClusterGroup(
+                cluster.SelectMany(location => location.MemberIds).ToList(),
+                new Point(centroid.X, centroid.Y), true, groupingType, clusterRadius));
         }
 
         var nonClusteredLocations = locations
@@ -192,8 +253,51 @@ public class Sweref99TmFastGreedyLocationClusterer : ILocationClusterer
         return result;
     }
 
-    private static List<List<ProjectedLocation>> MergeClustersWithCloseCentroids(
-        List<List<ProjectedLocation>> clusters,
+    private static List<SpatialCluster> MergeClustersAndNearbyLocations(
+        List<SpatialCluster> clusters,
+        List<ProjectedLocation> locations,
+        Dictionary<GridKey, List<int>> buckets,
+        bool[] clustered,
+        double clusterRadius)
+    {
+        var clusterRadiusSquared = clusterRadius * clusterRadius;
+        var unassignedCount = clustered.Count(isClustered => !isClustered);
+        bool addedLocations;
+        do
+        {
+            clusters = MergeClustersWithCloseCentroids(clusters, clusterRadius);
+            if (unassignedCount == 0) break;
+            addedLocations = false;
+            foreach (var cluster in clusters)
+            {
+                if (unassignedCount == 0) break;
+                var centroid = GetCentroid(cluster);
+                // Reuse the input grid. A projected location may be an indivisible meter group.
+                var candidates = GetCandidateIndexes(buckets, centroid.X, centroid.Y, clusterRadius).OrderBy(i => i);
+                foreach (var index in candidates)
+                {
+                    if (clustered[index]) continue;
+                    var location = locations[index];
+                    var dx = location.X - centroid.X;
+                    var dy = location.Y - centroid.Y;
+                    if (dx * dx + dy * dy > clusterRadiusSquared) continue;
+
+                    cluster.Add(location);
+                    clustered[index] = true;
+                    unassignedCount--;
+                    addedLocations = true;
+                    centroid = GetCentroid(cluster);
+                }
+            }
+            // New centroids can reach other clusters or previously unvisited grid cells.
+            // Each repeat absorbs at least one input unit, so the loop always terminates.
+        } while (addedLocations);
+
+        return clusters;
+    }
+
+    private static List<SpatialCluster> MergeClustersWithCloseCentroids(
+        List<SpatialCluster> clusters,
         double clusterRadius)
     {
         if (clusters.Count < 2 || clusterRadius <= 0)
@@ -239,18 +343,25 @@ public class Sweref99TmFastGreedyLocationClusterer : ILocationClusterer
         return clusters;
     }
 
-    private static (double X, double Y) GetCentroid(List<ProjectedLocation> cluster)
+    private static (double X, double Y) GetCentroid(SpatialCluster cluster) =>
+        (cluster.SumX / cluster.Weight, cluster.SumY / cluster.Weight);
+
+    private sealed class SpatialCluster : List<ProjectedLocation>
     {
-        var x = 0.0;
-        var y = 0.0;
-
-        foreach (var location in cluster)
+        public double SumX { get; private set; }
+        public double SumY { get; private set; }
+        public int Weight { get; private set; }
+        public new void Add(ProjectedLocation location)
         {
-            x += location.X;
-            y += location.Y;
+            base.Add(location);
+            SumX += location.X * location.Weight;
+            SumY += location.Y * location.Weight;
+            Weight += location.Weight;
         }
-
-        return (x / cluster.Count, y / cluster.Count);
+        public new void AddRange(IEnumerable<ProjectedLocation> locations)
+        {
+            foreach (var location in locations) Add(location);
+        }
     }
 
     private static Dictionary<GridKey, List<int>> BuildBuckets(List<ProjectedLocation> locations, double cellSize)
@@ -340,7 +451,7 @@ public class Sweref99TmFastGreedyLocationClusterer : ILocationClusterer
             return DefaultFallbackClusterRadiusMeters;
         }
 
-        return Math.Max(metersPerPixel * NormalizeClusterRadiusPx(clusterRadiusPx), MinimumClusterRadiusMeters);
+        return metersPerPixel * NormalizeClusterRadiusPx(clusterRadiusPx);
     }
 
     private static double NormalizeClusterRadiusPx(double clusterRadiusPx)
@@ -401,71 +512,62 @@ public class Sweref99TmFastGreedyLocationClusterer : ILocationClusterer
         return boundingBox.GetPolygon(CoordinateSys.SWEREF99_TM).EnvelopeInternal;
     }
 
-    private static List<LocationFeature> CreateSingleLocationItems(IEnumerable<ProjectedLocation> locations)
+    private static List<LocationClusterGroup> CreateSingleLocationItems(IEnumerable<ProjectedLocation> locations)
     {
-        return locations
-            .Select(location => LocationFeature.FromSingleLocation(location.Observations))
-            .ToList();
+        return locations.Select(location => location.Source ?? new LocationClusterGroup(
+            location.MemberIds, new Point(location.X, location.Y), false, LocationGroupingType.SingleLocation, null)).ToList();
     }
 
-    private static List<ProjectedLocation> ProjectLocations(IEnumerable<Observation> observations)
+    private static List<LocationFeature> CreateFeatures(IEnumerable<LocationClusterGroup> groups, IEnumerable<Observation> observations)
+    {
+        var observationsByLocation = observations.OrderBy(o => o.Location?.LocationId, StringComparer.Ordinal)
+            .Where(o => o.Location != null)
+            .GroupBy(o => o.Location.DistinctLocationId, StringComparer.Ordinal)
+            .ToDictionary(g => g.Key, g => g.ToList(), StringComparer.Ordinal);
+        return groups.Select(group =>
+        {
+            var members = group.DistinctLocationIds.SelectMany(id => observationsByLocation[id]).ToList();
+            var feature = group.IsCluster
+                ? LocationFeature.FromCluster(members, group.MetricCenter)
+                : LocationFeature.FromSingleLocation(members);
+            if (group.IsCluster)
+            {
+                feature.ClusterRadiusMeters = group.RadiusMeters;
+                feature.GroupingType = group.GroupingType;
+            }
+            return feature;
+        }).ToList();
+    }
+
+    private static List<ProjectedLocation> ProjectLocations(IEnumerable<SOS.Lib.Models.Processed.Observation.Location> locations)
     {
         var projectedLocationsById = new Dictionary<string, ProjectedLocation>(StringComparer.Ordinal);
-
-        foreach (var observation in observations)
+        foreach (var location in locations.OrderBy(l => l?.LocationId, StringComparer.Ordinal))
         {
-            if (!TryProjectObservation(observation, out var x, out var y))
-            {
-                continue;
-            }
-
-            var locationId = observation.Location.DistinctLocationId;
-            if (projectedLocationsById.TryGetValue(locationId, out var projectedLocation))
-            {
-                projectedLocation.Observations.Add(observation);
-                continue;
-            }
-
-            projectedLocationsById.Add(
-                locationId,
-                new ProjectedLocation(locationId, x, y, new List<Observation> { observation }));
+            if (!TryProjectLocation(location, out var x, out var y)) continue;
+            var id = location.DistinctLocationId;
+            projectedLocationsById.TryAdd(id, new ProjectedLocation(id, x, y, new List<string> { id }));
         }
-
-        return projectedLocationsById.Values.ToList();
+        return projectedLocationsById.Values.OrderBy(l => l.DistinctLocationId, StringComparer.Ordinal).ToList();
     }
 
-    private static bool TryProjectObservation(Observation observation, out double x, out double y)
+    private static bool TryProjectLocation(SOS.Lib.Models.Processed.Observation.Location location, out double x, out double y)
     {
         x = default;
         y = default;
-
-        var location = observation.Location;
-        if (location?.DecimalLatitude.HasValue != true || location.DecimalLongitude.HasValue != true)
-        {
-            return false;
-        }
-
-        if (location.Sweref99TmX.HasValue &&
-            location.Sweref99TmY.HasValue &&
-            IsFinite(location.Sweref99TmX.Value) &&
-            IsFinite(location.Sweref99TmY.Value))
+        if (location?.DecimalLatitude.HasValue != true || !location.DecimalLongitude.HasValue) return false;
+        if (location.Sweref99TmX.HasValue && location.Sweref99TmY.HasValue &&
+            IsFinite(location.Sweref99TmX.Value) && IsFinite(location.Sweref99TmY.Value))
         {
             x = location.Sweref99TmX.Value;
             y = location.Sweref99TmY.Value;
             return true;
         }
-
-        var wgs84Point = new Point(location.DecimalLongitude.Value, location.DecimalLatitude.Value);
-        var sweref99TmPoint = wgs84Point.Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM);
-        if (sweref99TmPoint?.Coordinate == null ||
-            !IsFinite(sweref99TmPoint.Coordinate.X) ||
-            !IsFinite(sweref99TmPoint.Coordinate.Y))
-        {
-            return false;
-        }
-
-        x = sweref99TmPoint.Coordinate.X;
-        y = sweref99TmPoint.Coordinate.Y;
+        var point = new Point(location.DecimalLongitude.Value, location.DecimalLatitude.Value)
+            .Transform(CoordinateSys.WGS84, CoordinateSys.SWEREF99_TM);
+        if (point?.Coordinate == null || !IsFinite(point.Coordinate.X) || !IsFinite(point.Coordinate.Y)) return false;
+        x = point.Coordinate.X;
+        y = point.Coordinate.Y;
         return true;
     }
 
@@ -474,7 +576,10 @@ public class Sweref99TmFastGreedyLocationClusterer : ILocationClusterer
         return !double.IsNaN(value) && !double.IsInfinity(value);
     }
 
-    private sealed record ProjectedLocation(string DistinctLocationId, double X, double Y, List<Observation> Observations);
+    private sealed record ProjectedLocation(string DistinctLocationId, double X, double Y, List<string> MemberIds, LocationClusterGroup? Source = null)
+    {
+        public int Weight => Source?.DistinctLocationIds.Count ?? 1;
+    }
 
     private readonly record struct GridKey(long X, long Y);
 }

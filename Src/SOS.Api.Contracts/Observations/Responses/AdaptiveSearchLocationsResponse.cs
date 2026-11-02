@@ -1,3 +1,5 @@
+using SOS.Api.Contracts.Observations.Requests;
+
 namespace SOS.Api.Contracts.Observations.Responses;
 /// <summary>GeoJSON response body and diagnostic headers returned by adaptive location searches.</summary>
 public sealed class AdaptiveSearchLocationsResponse
@@ -20,14 +22,17 @@ public sealed class AdaptiveSearchLocationsResponse
     /// <summary>The number of locations before clustering.</summary>
     public long? LocationsBeforeClustering { get; init; }
 
-    /// <summary>The zoom level used for the result.</summary>
+    /// <summary>The geogrid zoom level. Null for location results.</summary>
     public int? Zoom { get; init; }
 
     /// <summary>The cache status reported for the request.</summary>
     public string? CacheStatus { get; init; }
 
-    /// <summary>The result representation, such as observations, locations or grid cells.</summary>
+    /// <summary>The result representation: locations or geogrid.</summary>
     public string? ResultType { get; init; }
+
+    /// <summary>The strategy actually used, including when Auto was requested. Null for older servers.</summary>
+    public AdaptiveSearchLocationsStrategy? AdaptiveSearchStrategy { get; init; }
 
     /// <summary>Diagnostic timing information reported for the search.</summary>
     public string? Timings { get; init; }
@@ -35,8 +40,17 @@ public sealed class AdaptiveSearchLocationsResponse
     /// <summary>The mode used to aggregate observations into representative locations.</summary>
     public string? LocationAggregationMode { get; init; }
 
-    /// <summary>Whether representative location summaries are approximate.</summary>
+    /// <summary>
+    /// True if any feature may have approximate observationSummary, presentation.statusCounts
+    /// or presentation.isAllObservationsSensitive. Individual values may still be exact. Null for older servers.
+    /// </summary>
     public bool? LocationSummaryApproximated { get; init; }
+
+    /// <summary>
+    /// True if any feature's presentation.status or presentation.cutoffYearStatus may be approximate.
+    /// Covers only these two fields. Null for older servers.
+    /// </summary>
+    public bool? LocationPresentationStatusApproximated { get; init; }
 }
 
 

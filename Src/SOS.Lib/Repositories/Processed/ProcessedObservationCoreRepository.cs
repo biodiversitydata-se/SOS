@@ -1563,7 +1563,7 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
             totalCount = cachedTotalCount;
         }
 
-        var searchResponse = await Client.SearchAsync<T>(descriptor
+        var searchResponse = await PreserveSearchCancellationAsync(Client.SearchAsync<T>(descriptor
             .Source(options.GetAllFields ? new SourceConfig(true) : filter.Output?.ToProjection(filter is SearchFilterInternal))
             .From(skip)
             .Size(take)
@@ -1572,9 +1572,11 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
                 ? new TrackHits(false)
                 : trackTotalHits.HasValue
                     ? new TrackHits(trackTotalHits.Value)
-                    : new TrackHits(true))
-        );
+                    : new TrackHits(true)),
+            options.CancellationToken),
+            options.CancellationToken);
 
+        options.CancellationToken.ThrowIfCancellationRequested();
         searchResponse.ThrowIfInvalid();
         if (!totalCount.HasValue)
         {
@@ -1591,16 +1593,30 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
         };
     }
 
+    /// <summary>Keep an aborted request cancellable even when the Elasticsearch transport wraps its exception.</summary>
+    protected static async Task<T> PreserveSearchCancellationAsync<T>(Task<T> searchTask, CancellationToken cancellationToken)
+    {
+        try
+        {
+            return await searchTask.WaitAsync(cancellationToken).ConfigureAwait(false);
+        }
+        catch (Exception exception) when (cancellationToken.IsCancellationRequested && exception is not OperationCanceledException)
+        {
+            throw new OperationCanceledException("The search request was canceled.", exception, cancellationToken);
+        }
+    }
+
     public async Task<LocationRepresentativeResult<T>> GetLocationRepresentativeChunkAsync<T>(
         SearchFilter filter,
         int take,
         string collapseField,
-        bool getAllFields = false) where T : class
+        bool getAllFields = false,
+        CancellationToken cancellationToken = default) where T : class
     {
         var indexNames = GetCurrentIndex(filter);
         var (query, excludeQuery) = GetCoreQueries<T>(filter);
 
-        var searchResponse = await Client.SearchAsync<T>(s => s
+        var searchResponse = await PreserveSearchCancellationAsync(Client.SearchAsync<T>(s => s
             .Indices(indexNames)
             .Source(getAllFields ? new SourceConfig(true) : filter.Output?.ToProjection(filter is SearchFilterInternal))
             .Size(take)
@@ -1619,9 +1635,10 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
                     )
                 )
             )
-            .TrackTotalHits(new TrackHits(false))
-        );
+            .TrackTotalHits(new TrackHits(false)),
+            cancellationToken), cancellationToken);
 
+        cancellationToken.ThrowIfCancellationRequested();
         searchResponse.ThrowIfInvalid();
 
         var observationCountByLocationId = searchResponse
@@ -2032,7 +2049,7 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
         return countResponse.Count;
     }
     
-    public async Task<(long Count, LatLonBoundingBoxDto? Extent, long EstimatedLocationCount)> GetCountAndExtentAsync(SearchFilterBase filter, bool skipAuthorizationFilters = false, bool includeExtent = true)
+    public async Task<(long Count, LatLonBoundingBoxDto? Extent, long EstimatedLocationCount)> GetCountAndExtentAsync(SearchFilterBase filter, bool skipAuthorizationFilters = false, bool includeExtent = true, CancellationToken cancellationToken = default)
     {
         var indexNames = GetCurrentIndex(filter, skipAuthorizationFilters);
         var (query, excludeQuery) = GetCoreQueries<dynamic>(filter, skipAuthorizationFilters);
@@ -2041,7 +2058,7 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
         var extentAggName = "countAndExtentAgg";
         var locationCardinalityAggName = "distinctLocationsAgg";
 
-        var searchResponse = await Client.SearchAsync<dynamic>(s => s
+        var searchResponse = await PreserveSearchCancellationAsync(Client.SearchAsync<dynamic>(s => s
             .Index(indexNames)
             .Size(0) 
             .TrackTotalHits(new TrackHits(true))
@@ -2066,9 +2083,10 @@ public class ProcessedObservationCoreRepository : ProcessedObservationBaseReposi
                         .Field("location.locationId")
                     )
                 );
-            })
-        );        
+            }),
+            cancellationToken), cancellationToken);
 
+        cancellationToken.ThrowIfCancellationRequested();
         searchResponse.ThrowIfInvalid();
 
         var count = searchResponse.Total;        

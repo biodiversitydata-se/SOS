@@ -1,3 +1,4 @@
+using SOS.Shared.Api.Extensions;
 ﻿using Hangfire;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.AspNetCore.ResponseCompression;
@@ -164,15 +165,7 @@ static void ConfigureServices(
 
     if (Settings.ObservationApiConfiguration.EnableResponseCompression)
     {
-        services.AddResponseCompression(o => o.EnableForHttps = true);
-        services.Configure<BrotliCompressionProviderOptions>(options =>
-        {
-            options.Level = Settings.ObservationApiConfiguration.ResponseCompressionLevel;
-        });
-        services.Configure<GzipCompressionProviderOptions>(options =>
-        {
-            options.Level = Settings.ObservationApiConfiguration.ResponseCompressionLevel;
-        });
+        services.AddSosResponseCompression(Settings.ObservationApiConfiguration.ResponseCompressionLevel);
     }
     if (!disableHangfireInit)
     {

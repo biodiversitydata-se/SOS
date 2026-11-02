@@ -26,7 +26,7 @@ public class DbScanLocationClustererTests : LocationClustererAlgorithmTestBase
         var observations = new List<Observation>
         {
             CreateObservation("sweref-location-0", "sweref-observation-0", 18.0, 59.0, 10, 500000, 6500000),
-            CreateObservation("sweref-location-1", "sweref-observation-1", 18.0, 59.0, 20, 501000, 6500000)
+            CreateObservation("sweref-location-1", "sweref-observation-1", 18.001, 59.0, 20, 501000, 6500000)
         };
         var boundingBox = LatLonBoundingBoxDto.Create(17.99, 59.01, 18.01, 58.99);
 

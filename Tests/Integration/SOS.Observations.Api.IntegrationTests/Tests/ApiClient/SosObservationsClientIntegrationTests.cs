@@ -118,6 +118,8 @@ public class SosObservationsClientIntegrationTests : ElasticsearchTestBase
         result.ResultType.Should().Be("locations");
         result.ObservationsTotalCount.Should().Be(3);
         result.FeatureCount.Should().Be(3);
+        result.LocationPresentationStatusApproximated.Should().BeFalse();
+        result.AdaptiveSearchStrategy.Should().Be(AdaptiveSearchLocationsStrategy.LocationsThenGrid);
     }
 
     [Fact]
@@ -142,6 +144,7 @@ public class SosObservationsClientIntegrationTests : ElasticsearchTestBase
                 new AdaptiveSearchLocationsOptions
                 {
                     ObservationsLimit = useGrid ? 1 : 100,
+                    AdaptiveSearchStrategy = AdaptiveSearchLocationsStrategy.ObservationsThenGrid,
                     Cluster = false,
                     ReturnInputBBox = true,
                     IncludeFilterAreasInResult = true,
@@ -169,7 +172,7 @@ public class SosObservationsClientIntegrationTests : ElasticsearchTestBase
                 locations.Should().HaveCount(3);
                 locations.Should().OnlyContain(feature => feature.Geometry is Point);
                 locations.Should().OnlyContain(feature => feature.Properties.ObservationCount == 1);
-                locations.Should().OnlyContain(feature => feature.Properties.Locations.Location != null);
+                locations.Should().OnlyContain(feature => feature.Properties.Locations.Items.Single() != null);
             }
         }
     }

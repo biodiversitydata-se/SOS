@@ -1,3 +1,4 @@
+using SOS.Shared.Api.Extensions;
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
@@ -40,6 +41,7 @@ try
     builder.Services.AddTransient<IDistCache, DistCache>();
     builder.Services.AddSingleton<IConfigureOptions<CookieAuthenticationOptions>, ConfigureCookieAuthOptions>();
     builder.Services.AddMudServices();
+    builder.Services.AddSosResponseCompression(mimeTypes: ["application/geo+json"]);
     builder.Services.AddMudMarkdownServices();
     //builder.Services.AddSingleton<CircuitHandler, LoggingCircuitHandler>();
     // Add services to the container.
@@ -108,6 +110,7 @@ try
     app.AddSecurityHeaders(!isLocalDevelopment);
 
     app.UseForwardedHeaders();
+    app.UseResponseCompression();
     app.MapDefaultEndpoints();
 
     // Use Swedish culture

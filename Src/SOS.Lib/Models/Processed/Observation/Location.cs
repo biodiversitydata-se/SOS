@@ -322,7 +322,7 @@ public class Location
 
     /// <summary>
     /// An identifier for the distinct location, based on the combination of location type, decimalLatitude,
-    /// decimalLongitude and coordinateUncertaintyInMeters.
+    /// decimalLongitude (rounded to five decimal places).
     /// </summary>
     [JsonIgnore]
     public string DistinctLocationId => CreateDistinctLocationId();
@@ -332,8 +332,12 @@ public class Location
 
     public string CreateDistinctLocationId()
     {
-        return CreateDistinctLocationId(Type,DecimalLatitude, DecimalLongitude, CoordinateUncertaintyInMeters);
+        return string.Create(CultureInfo.InvariantCulture, $"{Type}_{FormatCoordinate(DecimalLatitude)}_{FormatCoordinate(DecimalLongitude)}");
     }
+
+    /// <summary>Creates the historical source-id fallback used by harvesting.</summary>
+    public string CreateFallbackLocationId() =>
+        CreateDistinctLocationId(Type, DecimalLatitude, DecimalLongitude, CoordinateUncertaintyInMeters);
 
     private static string CreateDistinctLocationId(
         LocationType type,

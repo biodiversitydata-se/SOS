@@ -16,7 +16,7 @@ internal interface IAdaptiveSearchLocationsCache
 
 internal sealed class AdaptiveSearchLocationsCache : IAdaptiveSearchLocationsCache
 {
-    internal const string CacheKeyPrefix = "adaptive-search-locations:v5:";
+    internal const string CacheKeyPrefix = "adaptive-search-locations:v6:";
     internal const int MaxEntriesPerKey = 8;
     internal const int MaxLocationsPerBucket = 10000;
     internal static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(10);
@@ -42,7 +42,7 @@ internal sealed class AdaptiveSearchLocationsCache : IAdaptiveSearchLocationsCac
     {
         var cacheKeyParameters = new[]
         {
-            "version=5",
+            "version=6",
             $"roleId={roleId}",
             $"authorizationApplicationIdentifier={authorizationApplicationIdentifier}",
             $"sensitiveObservations={sensitiveObservations}"

@@ -2148,31 +2148,38 @@ public class ObservationsController : ControllerBase
     }
 
     /// <summary>
-    /// Adaptive location search with a bbox-aware FusionCache layer for location aggregates.
-    /// Grid aggregation responses are not cached.
+    /// Returns locations or grid cells, depending on strategy and result size.
+    /// Coincident locations form one item, followed by optional meter grouping.
+    /// If enabled, one pixel stage follows: normal clustering or fixed-radius proximity grouping.
+    /// Displayed polygon surfaces stay separate.
+    /// isPresentationStatusApproximated covers only presentation.status and presentation.cutoffYearStatus.
+    /// isSummaryApproximated covers observationSummary, presentation.statusCounts and presentation.isAllObservationsSensitive;
+    /// individual values may still be exact. observationCount is always the total matching count.
     /// </summary>
-    /// <param name="roleId">Limit user authorization too specified role.</param>
+    /// <param name="roleId">Limit user authorization to the specified role.</param>
     /// <param name="authorizationApplicationIdentifier">Name of application used in authorization.</param>
     /// <param name="filter">Filter used to limit the search.</param>
-    /// <param name="observationsLimit">If the total number of observations exceeds this value, a grid aggregation is returned instead of locations.</param>
+    /// <param name="observationsLimit">Maximum observation count for fetching all observations instead of using representatives or grid cells.</param>
     /// <param name="maxZoom">Maximum grid zoom level used when the endpoint returns grid cells.</param>
     /// <param name="maxGridCells">Maximum number of grid cells used when the endpoint returns grid cells.</param>
-    /// <param name="returnInputBBox">If true, the input bounding box from the search filter will be returned. Otherwise a bounding box matching the result will be returned.</param>    
-    /// <param name="sensitiveObservations">If true, only sensitive observations will be searched.</param>
-    /// <param name="cluster">If true, locations are clustered when observations are returned rather than a grid aggregation.</param>
-    /// <param name="clusteringAlgorithm">The clustering algorithm used for clustered location responses.</param>
-    /// <param name="metersPerPixel">The current map resolution in ground meters per CSS pixel. If specified, this is used instead of deriving resolution from bbox and viewport dimensions.</param>
-    /// <param name="clusterRadiusPx">The screen-space cluster radius in pixels.</param>
-    /// <param name="minLocationsPerCluster">The minimum number of distinct locations required before a result item is rendered as a cluster.</param>
-    /// <param name="minLocationCountBeforeClustering">The number of distinct locations that can be returned without clustering. Clustering starts when the distinct location count is greater than this value.</param>
-    /// <param name="createPolygons">Controls polygon location rendering. No always uses centroid points, Yes always uses polygon geometry, and WhenNeeded uses polygons only when they are large enough at the current viewport resolution.</param>
+    /// <param name="returnInputBBox">Return the input bounding box instead of the result's extent.</param>
+    /// <param name="sensitiveObservations">Used when filter.ProtectionFilter is unset: true selects sensitive observations, false selects public observations.</param>
+    /// <param name="cluster">Enable normal pixel clustering or proximity grouping. False disables both.</param>
+    /// <param name="clusterRadiusMeters">Optional fixed search radius in metres, applied before pixel clustering even when cluster=false.</param>
+    /// <param name="metersPerPixel">Map resolution in ground metres per CSS pixel, also used for polygon sizing. If omitted, normal clustering uses bbox and result extent; the zoom limit and proximity grouping are unused.</param>
+    /// <param name="disablePixelClusteringAtMetersPerPixel">Zoom limit in m/px: at metersPerPixel &lt;= this value, normal pixel clustering stops and proximity grouping may run. 0 disables the limit; ignored without metersPerPixel.</param>
+    /// <param name="proximityClusterRadiusPx">Fixed search radius in pixels when the zoom or count limit stops normal pixel clustering. Requires cluster=true and metersPerPixel; 0 disables this grouping. Range 0–500.</param>
+    /// <param name="clusterRadiusPx">Initial search radius in pixels for normal clustering. May grow to reduce the number of map items.</param>
+    /// <param name="minLocationsPerCluster">The minimum number of underlying geographic groups required in a cluster. Coincident location ids count as one geographic group.</param>
+    /// <param name="minLocationCountBeforeClustering">Normal pixel clustering starts above this number of clusterable map items after meter grouping. Proximity grouping may still run below the limit.</param>
+    /// <param name="createPolygons">No returns centroid points; Yes preserves unclustered polygons; WhenNeeded returns polygons large enough to display and requires metersPerPixel.</param>
     /// <param name="bboxQuery">Optional WGS84 bounding box query parameter using minLongitude,minLatitude,maxLongitude,maxLatitude. If provided, it overrides the filter bounding box.</param>
-    /// <param name="includeFilterAreasInResult">If true and the search filter contains area ids, the area polygons will be included in the result. The filter areas will have a property "FeatureType" with value `FilterArea.Area` or `FilterArea.OwnPolygon`.</param>
+    /// <param name="includeFilterAreasInResult">Include the filter's area polygons, marked with FeatureType.</param>
     /// <param name="useCache">If true, reusable location aggregates may be read from and written to cache.</param>
     /// <param name="createSampleObservations">If true, sample observations will be created for map symbol debugging.</param>
-    /// <param name="locationAggregationLimit">If specified, representative location aggregation is used when the estimated location count is lower than this value.</param>
-    /// <param name="adaptiveSearchStrategy">Controls whether the adaptive search tries observations, representative locations, or grid aggregation.</param>
-    /// <param name="cutoffYear">If specified, observations are rendered differently before and after this year. Brytår på svenska.</param>
+    /// <param name="locationAggregationLimit">Both estimated and actual location counts must be below this limit to use representatives. Range 1–10000.</param>
+    /// <param name="adaptiveSearchStrategy">Auto uses representatives when the filter guarantees exact map statuses; otherwise observations. Either path may fall back to grid cells.</param>
+    /// <param name="cutoffYear">Split presentation status before and on/after this year.</param>
     /// <returns>
     /// GeoJSON FeatureCollection with either grid cells or location item features.
     /// </returns>
@@ -2194,19 +2201,21 @@ public class ObservationsController : ControllerBase
         [FromQuery] bool returnInputBBox = false,        
         [FromQuery] bool sensitiveObservations = false,        
         [FromQuery] bool cluster = true,
-        [FromQuery] LocationClusteringAlgorithm clusteringAlgorithm = LocationClusteringAlgorithm.Sweref99TmFastGreedy,
+        [FromQuery] double? clusterRadiusMeters = null,
         [FromQuery] double? metersPerPixel = null,
-        [FromQuery] double clusterRadiusPx = 40.0,
+        [FromQuery] double clusterRadiusPx = AdaptiveSearchLocationsDefaults.ClusterRadiusPx,
         [FromQuery] int minLocationsPerCluster = 2,
-        [FromQuery] int minLocationCountBeforeClustering = 100,
+        [FromQuery] int minLocationCountBeforeClustering = AdaptiveSearchLocationsDefaults.MinLocationCountBeforeClustering,
         [FromQuery] CreatePolygonsMode createPolygons = CreatePolygonsMode.No,
         [FromQuery(Name = "bbox")] string? bboxQuery = null,
         [FromQuery] bool includeFilterAreasInResult = false,
         [FromQuery] bool useCache = true,
         [FromQuery] bool createSampleObservations = false,
-        [FromQuery] int? locationAggregationLimit = null,
-        [FromQuery] AdaptiveSearchLocationsStrategy adaptiveSearchStrategy = AdaptiveSearchLocationsStrategy.ObservationsThenGrid,
-        [FromQuery] int? cutoffYear = null)
+        [FromQuery] int locationAggregationLimit = 1000,
+        [FromQuery] AdaptiveSearchLocationsStrategy adaptiveSearchStrategy = AdaptiveSearchLocationsStrategy.Auto,
+        [FromQuery] int? cutoffYear = null,
+        [FromQuery] double disablePixelClusteringAtMetersPerPixel = AdaptiveSearchLocationsDefaults.DisablePixelClusteringAtMetersPerPixel,
+        [FromQuery] double proximityClusterRadiusPx = AdaptiveSearchLocationsDefaults.ProximityClusterRadiusPx)
     {
         var totalStopwatch = Stopwatch.StartNew();
         ApiUserType userType = this.GetApiUserType();
@@ -2235,8 +2244,14 @@ public class ObservationsController : ControllerBase
                 _inputValidator.ValidateDouble(clusterRadiusPx, 1, 500, nameof(clusterRadiusPx)),
                 _inputValidator.ValidateInt(minLocationsPerCluster, 2, 100, nameof(minLocationsPerCluster)),
                 _inputValidator.ValidateInt(minLocationCountBeforeClustering, 0, 10000, nameof(minLocationCountBeforeClustering)),
-                ValidateNullableInt(locationAggregationLimit, 1, 10000, nameof(locationAggregationLimit)),
+                _inputValidator.ValidateInt(locationAggregationLimit, 1, 10000, nameof(locationAggregationLimit)),
+                clusterRadiusMeters.HasValue && (!double.IsFinite(clusterRadiusMeters.Value) || clusterRadiusMeters.Value <= 0)
+                    ? Result.Failure("clusterRadiusMeters must be positive and finite.") : Result.Success(),
                 ValidateMetersPerPixel(metersPerPixel),
+                !double.IsFinite(disablePixelClusteringAtMetersPerPixel) || disablePixelClusteringAtMetersPerPixel < 0
+                    ? Result.Failure("disablePixelClusteringAtMetersPerPixel must be non-negative and finite.") : Result.Success(),
+                !double.IsFinite(proximityClusterRadiusPx) || proximityClusterRadiusPx < 0 || proximityClusterRadiusPx > 500
+                    ? Result.Failure("proximityClusterRadiusPx must be finite and between 0 and 500.") : Result.Success(),
                 ValidateMetersPerPixelForPolygonMode((CreatePolygonsMode)createPolygons, metersPerPixel),
                 //_inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
                 _inputValidator.ValidateGeometries(filter?.Geographics));
@@ -2245,6 +2260,7 @@ public class ObservationsController : ControllerBase
 
             var result = await _adaptiveSearchLocationsService.SearchAsync(new AdaptiveSearchLocationsRequest
             {
+                CancellationToken = HttpContext?.RequestAborted ?? default,
                 RoleId = roleId,
                 AuthorizationApplicationIdentifier = authorizationApplicationIdentifier,
                 Filter = filter,
@@ -2257,8 +2273,10 @@ public class ObservationsController : ControllerBase
                 MaxZoom = maxZoom,
                 MaxGridCells = maxGridCells,
                 Cluster = cluster,
-                ClusteringAlgorithm = clusteringAlgorithm,
+                ClusterRadiusMeters = clusterRadiusMeters,
                 MetersPerPixel = metersPerPixel,
+                DisablePixelClusteringAtMetersPerPixel = disablePixelClusteringAtMetersPerPixel,
+                ProximityClusterRadiusPx = proximityClusterRadiusPx,
                 ClusterRadiusPx = clusterRadiusPx,
                 MinLocationsPerCluster = minLocationsPerCluster,
                 MinimumLocationCountBeforeClustering = minLocationCountBeforeClustering,
@@ -2267,6 +2285,7 @@ public class ObservationsController : ControllerBase
                 CreateSampleObservations = createSampleObservations,
                 LocationAggregationLimit = locationAggregationLimit,
                 AdaptiveSearchStrategy = adaptiveSearchStrategy,
+                CutoffYear = cutoffYear,
                 IncludeFilterAreasInResult = includeFilterAreasInResult,
                 BoundingBoxIsEmpty = IsEmptyBoundingBox(filter?.Geographics?.BoundingBox)
             });
@@ -2276,6 +2295,7 @@ public class ObservationsController : ControllerBase
                 HttpContext?.Items["CacheUsed"] = true;
             }
 
+            HttpContext?.RequestAborted.ThrowIfCancellationRequested();
             return await WriteAdaptiveSearchLocationsResponseAsync(result, totalStopwatch, cutoffYear);
         }
         catch (AuthenticationRequiredException e)
@@ -2289,6 +2309,10 @@ public class ObservationsController : ControllerBase
         catch (TimeoutException)
         {
             return new StatusCodeResult((int)HttpStatusCode.ServiceUnavailable);
+        }
+        catch (OperationCanceledException) when (HttpContext?.RequestAborted.IsCancellationRequested == true)
+        {            
+            return new EmptyResult();
         }
         catch (Exception e)
         {
@@ -2313,6 +2337,7 @@ public class ObservationsController : ControllerBase
             Response.Headers.Append("X-Estimated-Location-Count", result.EstimatedLocationCount.Value.ToString());
         }
         Response.Headers.Append("X-Result-Type", result.ResultType);
+        Response.Headers.Append("X-AdaptiveSearch-Strategy", result.AdaptiveSearchStrategy.ToString());
         Response.Headers.Append("X-Feature-Count", result.FeatureCount.ToString());
         if (result.LocationsBeforeClustering.HasValue)
         {
@@ -2324,6 +2349,7 @@ public class ObservationsController : ControllerBase
         }
         Response.Headers.Append("X-Cache", result.CacheStatus);
         Response.Headers.Append("X-Location-Summary-Approximated", result.LocationSummaryApproximated ? "true" : "false");
+        Response.Headers.Append("X-Location-Presentation-Status-Approximated", result.LocationPresentationStatusApproximated ? "true" : "false");
         if (!string.IsNullOrWhiteSpace(result.LocationAggregationMode))
         {
             Response.Headers.Append("X-Location-Aggregation-Mode", result.LocationAggregationMode);
@@ -2334,8 +2360,8 @@ public class ObservationsController : ControllerBase
 
         if (result.ResultType == "geogrid")
         {
-            await Response.WriteAsync(result.GeoJson ?? string.Empty, Encoding.UTF8);
-            await Response.Body.FlushAsync();
+            await Response.WriteAsync(result.GeoJson ?? string.Empty, Encoding.UTF8, HttpContext.RequestAborted);
+            await Response.Body.FlushAsync(HttpContext.RequestAborted);
             return new EmptyResult();
         }
 
@@ -2344,7 +2370,8 @@ public class ObservationsController : ControllerBase
             result.Bbox,
             Response,
             cutoffYear,
-            result.GeographicAreas);
+            result.GeographicAreas,
+            HttpContext.RequestAborted);
         return new EmptyResult();
     }
 

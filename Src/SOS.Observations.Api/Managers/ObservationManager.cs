@@ -165,16 +165,21 @@ public class ObservationManager : IObservationManager
 
     public Task<PagedResult<JsonObject>> GetChunkAsync(PreparedObservationFilter filter, int skip, int take,
         SearchExecutionOptions? options = null)
-        => GetChunkCoreAsync(null, null, filter.Filter, skip, take, options, prepareFilter: false);
+        => GetChunkCoreAsync(null, null, filter.Filter, skip, take,
+            (options ?? new SearchExecutionOptions()) with
+            {
+                CancellationToken = filter.CancellationToken.CanBeCanceled
+                    ? filter.CancellationToken : options?.CancellationToken ?? default
+            }, prepareFilter: false);
 
     public Task<LocationRepresentativeResult<JsonObject>> GetLocationRepresentativeChunkAsync(PreparedObservationFilter filter, int take, string collapseField)
-        => GetLocationRepresentativeChunkCoreAsync(null, null, filter.Filter, take, collapseField, prepareFilter: false);
+        => GetLocationRepresentativeChunkCoreAsync(null, null, filter.Filter, take, collapseField, prepareFilter: false, filter.CancellationToken);
 
     public Task<GeoGridTileResult> GetGeogridTileAggregationAsync(PreparedObservationFilter filter, int precision)
-        => GetGeogridTileAggregationCoreAsync(null, null, filter.Filter, precision, prepareFilter: false);
+        => GetGeogridTileAggregationCoreAsync(null, null, filter.Filter, precision, prepareFilter: false, filter.CancellationToken);
 
     public Task<(long Count, LatLonBoundingBoxDto? Extent, long EstimatedLocationCount)> GetCountAndExtentAsync(PreparedObservationFilter filter, bool includeExtent = true)
-        => _processedObservationRepository.GetCountAndExtentAsync(filter.Filter, includeExtent: includeExtent);
+        => _processedObservationRepository.GetCountAndExtentAsync(filter.Filter, includeExtent: includeExtent, cancellationToken: filter.CancellationToken);
 
     /// <inheritdoc />
     public Task<PagedResult<JsonObject>> GetChunkAsync(
@@ -191,11 +196,14 @@ public class ObservationManager : IObservationManager
         int? roleId, string authorizationApplicationIdentifier, SearchFilter filter,
         int skip, int take, SearchExecutionOptions? options, bool prepareFilter)
     {
+        var requestCancellation = options?.CancellationToken ?? default;
+        requestCancellation.ThrowIfCancellationRequested();
         try
         {
             if (prepareFilter) await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
             var response =
                 await _processedObservationRepository.GetChunkAsync<JsonObject>(filter, skip, take, options);
+            requestCancellation.ThrowIfCancellationRequested();
             response.Records = await PostProcessObservationsAsync(filter, filter.ExtendedAuthorization.ProtectionFilter, response.Records, filter.FieldTranslationCultureCode);
             return response;
         }
@@ -206,6 +214,10 @@ public class ObservationManager : IObservationManager
         catch (TimeoutException e)
         {
             _logger.LogError(e, "Get chunk of observations timeout");
+            throw;
+        }
+        catch (OperationCanceledException) when (requestCancellation.IsCancellationRequested)
+        {
             throw;
         }
         catch (Exception e)
@@ -225,15 +237,18 @@ public class ObservationManager : IObservationManager
 
     private async Task<LocationRepresentativeResult<JsonObject>> GetLocationRepresentativeChunkCoreAsync(
         int? roleId, string authorizationApplicationIdentifier, SearchFilter filter,
-        int take, string collapseField, bool prepareFilter)
+        int take, string collapseField, bool prepareFilter, CancellationToken cancellationToken = default)
     {
+        var requestCancellation = cancellationToken;
+        requestCancellation.ThrowIfCancellationRequested();
         try
         {
             if (prepareFilter) await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
             var response = await _processedObservationRepository.GetLocationRepresentativeChunkAsync<JsonObject>(
                 filter,
                 take,
-                collapseField);
+                collapseField, cancellationToken: requestCancellation);
+            requestCancellation.ThrowIfCancellationRequested();
             response.Records = await PostProcessObservationsAsync(
                 filter,
                 filter.ExtendedAuthorization.ProtectionFilter,
@@ -248,6 +263,10 @@ public class ObservationManager : IObservationManager
         catch (TimeoutException e)
         {
             _logger.LogError(e, "Get representative location observations timeout");
+            throw;
+        }
+        catch (OperationCanceledException) when (requestCancellation.IsCancellationRequested)
+        {
             throw;
         }
         catch (Exception e)
@@ -361,12 +380,14 @@ public class ObservationManager : IObservationManager
     public Task<GeoGridTileResult> GetGeogridTileAggregationAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilter filter, int precision)
         => GetGeogridTileAggregationCoreAsync(roleId, authorizationApplicationIdentifier, filter, precision, prepareFilter: true);
 
-    private async Task<GeoGridTileResult> GetGeogridTileAggregationCoreAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilter filter, int precision, bool prepareFilter)
+    private async Task<GeoGridTileResult> GetGeogridTileAggregationCoreAsync(int? roleId, string authorizationApplicationIdentifier, SearchFilter filter, int precision, bool prepareFilter, CancellationToken cancellationToken = default)
     {
+        var requestCancellation = cancellationToken;
+        requestCancellation.ThrowIfCancellationRequested();
         try
         {
             if (prepareFilter) await _filterManager.PrepareFilterAsync(roleId, authorizationApplicationIdentifier, filter);
-            return await _processedObservationRepository.GetGeogridTileAggregationAsync(filter, precision);
+            return await _processedObservationRepository.GetGeogridTileAggregationAsync(filter, precision, requestCancellation);
         }
         catch (ArgumentOutOfRangeException e)
         {
@@ -376,6 +397,10 @@ public class ObservationManager : IObservationManager
         catch (TimeoutException e)
         {
             _logger.LogError(e, "Get geogrid tile aggregation timeout");
+            throw;
+        }
+        catch (OperationCanceledException) when (requestCancellation.IsCancellationRequested)
+        {
             throw;
         }
         catch (Exception e)

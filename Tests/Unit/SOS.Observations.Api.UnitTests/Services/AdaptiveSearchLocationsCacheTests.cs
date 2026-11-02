@@ -28,6 +28,36 @@ namespace SOS.Observations.Api.UnitTests.Services;
 public class AdaptiveSearchLocationsCacheTests
 {
     [Fact]
+    public async Task RepresentativeLimitIsCheckedBeforeCoincidentLocationsAreMerged()
+    {
+        var manager = new Mock<IObservationManager>(MockBehavior.Strict);
+        manager.Setup(m => m.PrepareObservationFilterAsync(null, null, It.IsAny<SearchFilter>()))
+            .ReturnsAsync((int? roleId, string application, SearchFilter filter) => new PreparedObservationFilter(filter));
+        manager.Setup(m => m.GetCountAndExtentAsync(It.IsAny<PreparedObservationFilter>(), true))
+            .ReturnsAsync((100L, Box(0), 1L));
+        manager.Setup(m => m.GetLocationRepresentativeChunkAsync(It.IsAny<PreparedObservationFilter>(), 3, "location.locationId"))
+            .ReturnsAsync(new LocationRepresentativeResult<JsonObject>
+            {
+                Records = new[] { "a", "b" }.Select(id => JsonNode.Parse($$$"""
+                    {"location":{"locationId":"{{{id}}}","type":0,"decimalLatitude":58,"decimalLongitude":15},
+                     "occurrence":{"isPositiveObservation":true}}
+                    """)!.AsObject()).ToList()
+            });
+        manager.Setup(m => m.GetGeogridTileAggregationAsync(It.IsAny<PreparedObservationFilter>(), It.IsAny<int>()))
+            .ReturnsAsync(new GeoGridTileResult { GridCellTiles = Array.Empty<GridCellTile>() });
+
+        var result = await CreateService(manager.Object, new CacheSpy()).SearchAsync(new AdaptiveSearchLocationsRequest
+        {
+            Filter = new SearchFilterInternalDto { ProtectionFilter = ProtectionFilterDto.Public },
+            AdaptiveSearchStrategy = AdaptiveSearchLocationsStrategy.LocationsThenGrid,
+            LocationAggregationLimit = 2, MaxGridCells = 100, MaxZoom = 20
+        });
+
+        result.ResultType.Should().Be("geogrid");
+        manager.VerifyAll();
+    }
+
+    [Fact]
     public void DifferentPolygonsWithSameBoundingBoxCannotReuseCachedLocations()
     {
         using var fixture = new CacheFixture();
@@ -72,7 +102,7 @@ public class AdaptiveSearchLocationsCacheTests
         input.ServerGeometries.Should().ContainSingle().Which.Should().BeSameAs(geometry);
         input.BoundingBox.Should().NotBeNull();
         input.Geometries.Should().BeNull();
-        key.Should().StartWith("adaptive-search-locations:v5:");
+        key.Should().StartWith("adaptive-search-locations:v6:");
     }
 
     [Theory]
@@ -137,6 +167,7 @@ public class AdaptiveSearchLocationsCacheTests
             {
                 ProtectionFilter = protection, ObservedByMe = observedByMe, ReportedByMe = reportedByMe
             },
+            AdaptiveSearchStrategy = AdaptiveSearchLocationsStrategy.ObservationsThenGrid,
             UseCache = true,
             ObservationsLimit = 100
         });
@@ -148,7 +179,7 @@ public class AdaptiveSearchLocationsCacheTests
     }
 
     [Fact]
-    public async Task Search_PublicUserIndependentFilterCanStillHitCache()
+    public async Task Search_AutoWithCutoffCanHitFullLocationCacheWithoutQueryingAgain()
     {
         var cache = new CacheSpy();
         var manager = new Mock<IObservationManager>(MockBehavior.Strict);
@@ -156,11 +187,15 @@ public class AdaptiveSearchLocationsCacheTests
         {
             UserId = 456,
             Filter = new SearchFilterInternalDto { ProtectionFilter = ProtectionFilterDto.Public },
+            AdaptiveSearchStrategy = AdaptiveSearchLocationsStrategy.Auto,
+            CutoffYear = 2024,
             UseCache = true,
             ObservationsLimit = 100
         });
 
         result.CacheStatus.Should().Be("HIT");
+        result.AdaptiveSearchStrategy.Should().Be(AdaptiveSearchLocationsStrategy.ObservationsThenGrid);
+        result.LocationPresentationStatusApproximated.Should().BeFalse();
         cache.Calls.Should().Be(2);
         manager.VerifyNoOtherCalls();
     }
@@ -245,6 +280,7 @@ public class AdaptiveSearchLocationsCacheTests
                     ConsiderObservationAccuracy = accuracy, ConsiderDisturbanceRadius = disturbance
                 }
             },
+            AdaptiveSearchStrategy = AdaptiveSearchLocationsStrategy.ObservationsThenGrid,
             UseCache = true, ObservationsLimit = 100
         });
         cache.RequiredExactBoundingBox.Should().Be(accuracy || disturbance);
@@ -307,6 +343,34 @@ public class AdaptiveSearchLocationsCacheTests
         fixture.Cache.TryGet("key", LatLonBoundingBoxDto.Create(0, 1, 0.5, 0), out _).Should().BeFalse();
         fixture.Cache.TryGet("key", Box(0), out var exact).Should().BeTrue();
         exact.Single().ObservationSummary.ObservationCount.Should().Be(7);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void CachePreservesAllOriginalMetadataAndTwoStageGrouping(bool approximated)
+    {
+        using var fixture = new CacheFixture();
+        var aggregate = Aggregate("a", 0.5, 20);
+        var other = new Location { LocationId = "b", DecimalLongitude = 0.5, DecimalLatitude = 0.5,
+            Locality = "Second name", CoordinateUncertaintyInMeters = 200 };
+        aggregate = new CachedLocationAggregate
+        {
+            DistinctLocationId = aggregate.DistinctLocationId, Location = aggregate.Location,
+            Locations = new() { aggregate.Location, other }, LocationIds = new() { "a", "b" },
+            ObservationSummary = aggregate.ObservationSummary, IsSummaryApproximated = approximated,
+            IsPresentationStatusApproximated = approximated
+        };
+        var factory = new AdaptiveSearchLocationFeatureFactory(new AdaptiveSearchLocationAggregator());
+        var input = new List<CachedLocationAggregate> { aggregate };
+        var before = LocationFeatureResponseMapper.ToProperties(factory.CreateItems(input, new LocationFeatureOptions { PolygonGeometries = null, CreatePolygons = CreatePolygonsMode.No, MetersPerPixel = null }).Single());
+        fixture.Cache.Set("metadata", Box(0), input);
+        fixture.Cache.TryGet("metadata", Box(0), out var restored).Should().BeTrue();
+        var after = LocationFeatureResponseMapper.ToProperties(factory.CreateItems(restored, new LocationFeatureOptions { BoundingBox = Box(0), ClusterRadiusMeters = 100, ClusterPixels = true, MetersPerPixel = 1, ClusterRadiusPx = 40, MinLocationsPerCluster = 2, MinLocationCountBeforeClustering = 0, PolygonGeometries = null, CreatePolygons = CreatePolygonsMode.No }).Single());
+        System.Text.Json.JsonSerializer.Serialize(after).Should().Be(System.Text.Json.JsonSerializer.Serialize(before));
+        after.Locations.Items[1].Locality.Should().Be("Second name");
+        after.IsSummaryApproximated.Should().Be(approximated);
+        after.IsPresentationStatusApproximated.Should().Be(approximated);
     }
 
     private static CachedLocationAggregate Aggregate(string id, double longitude, int count)

@@ -25,6 +25,30 @@ namespace SOS.Lib.UnitTests.Repositories;
 
 public class CursorPaginationTests
 {
+    [Theory]
+    [InlineData("count")]
+    [InlineData("observations")]
+    [InlineData("representatives")]
+    public async Task LocationQueriesForwardCancellationToTheElasticsearchTransport(string query)
+    {
+        using var fixture = new Fixture();
+        using var cts = new CancellationTokenSource();
+        fixture.Invoker.HoldSearch = true;
+        var filter = CreateFilter();
+        Task task = query switch
+        {
+            "count" => fixture.Repository.GetCountAndExtentAsync(filter, cancellationToken: cts.Token),
+            "observations" => fixture.Repository.GetChunkAsync<Observation>(filter, 0, 10,
+                new SearchExecutionOptions { KnownTotalCount = 123, CancellationToken = cts.Token }),
+            _ => fixture.Repository.GetLocationRepresentativeChunkAsync<Observation>(filter, 10,
+                "location.locationId", cancellationToken: cts.Token)
+        };
+        await fixture.Invoker.SearchStarted.Task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
+        cts.Cancel();
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => task);
+        Assert.True(fixture.Invoker.SearchCancellation.IsCancellationRequested);
+    }
+
     [Fact]
     public async Task OffsetSearchReusesTotalCountFromFirstPage()
     {
@@ -317,6 +341,9 @@ public class CursorPaginationTests
         public long Total { get; set; } = 100;
         public bool TimedOut { get; set; }
         public int FailedShards { get; set; }
+        public bool HoldSearch { get; set; }
+        public CancellationToken SearchCancellation { get; private set; }
+        public TaskCompletionSource SearchStarted { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
         private int _page;
 
         public new Task<TResponse> RequestAsync<TResponse>(Endpoint endpoint, BoundConfiguration boundConfiguration,
@@ -325,6 +352,12 @@ public class CursorPaginationTests
             var response = "{}";
             if (endpoint.Uri.AbsolutePath.EndsWith("/_search"))
             {
+                if (HoldSearch)
+                {
+                    SearchCancellation = cancellationToken;
+                    SearchStarted.TrySetResult();
+                    return new TaskCompletionSource<TResponse>(TaskCreationOptions.RunContinuationsAsynchronously).Task.WaitAsync(cancellationToken);
+                }
                 var id = $"occ-{++_page}";
                 response = JsonSerializer.Serialize(new
                 {

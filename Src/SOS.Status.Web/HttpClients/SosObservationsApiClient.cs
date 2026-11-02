@@ -50,7 +50,7 @@ public class SosObservationsApiClient
     public async Task<(string GeoJson, long? ObservationsCount, long ResponseSizeBytes)> AdaptiveSearchGeoJsonByLocationAsync(
         SearchFilterInternalDto filter,
         bool cluster = true,
-        string clusteringAlgorithm = "Greedy",
+        double? clusterRadiusMeters = null,
         CreatePolygonsMode createPolygons = CreatePolygonsMode.No,
         double clusterRadiusPx = 40.0,
         int minLocationsPerCluster = 2,
@@ -63,7 +63,6 @@ public class SosObservationsApiClient
         {
             "outputFormat=GeoJsonByLocationFlat",
             $"cluster={cluster.ToString().ToLower()}",
-            $"clusteringAlgorithm={Uri.EscapeDataString(clusteringAlgorithm)}",
             $"createPolygons={createPolygons}",
             $"clusterRadiusPx={clusterRadiusPx.ToString(System.Globalization.CultureInfo.InvariantCulture)}",
             $"minLocationsPerCluster={minLocationsPerCluster}",
@@ -71,6 +70,9 @@ public class SosObservationsApiClient
             $"translationCultureCode={translationCultureCode}",
             $"sensitiveObservations={sensitiveObservations.ToString().ToLower()}"
         };
+
+        if (clusterRadiusMeters.HasValue)
+            queryParts.Add($"clusterRadiusMeters={clusterRadiusMeters.Value.ToString(System.Globalization.CultureInfo.InvariantCulture)}");
 
         if (metersPerPixel.HasValue)
         {
@@ -95,119 +97,6 @@ public class SosObservationsApiClient
 
         return (geoJson, observationsCount, responseSizeBytes);
     }    
-
-    public async Task<(string GeoJson, long? ObservationsTotalCount, long? EstimatedLocationCount, long? FeatureCount, long? LocationsBeforeClustering, long ResponseSizeBytes, string? CacheStatus, string? ResultType, string? Timings)> AdaptiveSearchLocationItemsCachedGeoJsonAsync(
-        SearchFilterInternalDto filter,
-        int observationsLimit = 10000,
-        int maxGridCells = 10000,
-        int? locationAggregationLimit = null,
-        AdaptiveSearchLocationsStrategy adaptiveSearchStrategy = AdaptiveSearchLocationsStrategy.ObservationsThenGrid,
-        bool cluster = true,
-        string clusteringAlgorithm = "Greedy",
-        CreatePolygonsMode createPolygons = CreatePolygonsMode.No,
-        double clusterRadiusPx = 40.0,
-        int minLocationsPerCluster = 2,
-        int minLocationCountBeforeClustering = 100,
-        bool validateSearchFilter = false,
-        string translationCultureCode = "sv-SE",
-        bool sensitiveObservations = false,
-        double? metersPerPixel = null,
-        string? bbox = null,
-        bool createSampleObservations = false,
-        bool useCache = true,
-        int? cutoffYear = null,
-        bool includeFilterAreasInResult = false)
-    {
-        var queryParts = new List<string>
-        {
-            $"observationsLimit={observationsLimit}",
-            $"maxGridCells={maxGridCells}",
-            $"adaptiveSearchStrategy={adaptiveSearchStrategy}",
-            $"cluster={cluster.ToString().ToLower()}",
-            $"clusteringAlgorithm={Uri.EscapeDataString(clusteringAlgorithm)}",
-            $"createPolygons={createPolygons}",
-            $"clusterRadiusPx={clusterRadiusPx.ToString(System.Globalization.CultureInfo.InvariantCulture)}",
-            $"minLocationsPerCluster={minLocationsPerCluster}",
-            $"minLocationCountBeforeClustering={minLocationCountBeforeClustering}",
-            $"validateSearchFilter={validateSearchFilter.ToString().ToLower()}",
-            $"translationCultureCode={translationCultureCode}",
-            $"sensitiveObservations={sensitiveObservations.ToString().ToLower()}",
-            $"createSampleObservations={createSampleObservations.ToString().ToLower()}",
-            $"includeFilterAreasInResult={includeFilterAreasInResult.ToString().ToLower()}",
-            $"useCache={useCache.ToString().ToLower()}"
-        };
-
-        if (metersPerPixel.HasValue)
-        {
-            queryParts.Add($"metersPerPixel={metersPerPixel.Value.ToString(System.Globalization.CultureInfo.InvariantCulture)}");
-        }
-
-        if (!string.IsNullOrWhiteSpace(bbox))
-        {
-            queryParts.Add($"bbox={Uri.EscapeDataString(bbox)}");
-        }
-
-        if (cutoffYear.HasValue)
-        {
-            queryParts.Add($"cutoffYear={cutoffYear.Value}");
-        }
-
-        if (locationAggregationLimit.HasValue)
-        {
-            queryParts.Add($"locationAggregationLimit={locationAggregationLimit.Value}");
-        }
-
-        var url = $"/observations/internal/adaptivesearchlocations?{string.Join("&", queryParts)}";
-
-        var response = await _httpClient.PostAsJsonAsync(url, filter, _jsonSerializerOptions);
-        response.EnsureSuccessStatusCode();
-
-        long? observationsTotalCount = null;
-        if (response.Headers.TryGetValues("X-Observations-TotalCount", out var totalCountValues) &&
-            long.TryParse(totalCountValues.FirstOrDefault(), out var parsedObservationsTotalCount))
-        {
-            observationsTotalCount = parsedObservationsTotalCount;
-        }
-
-        long? estimatedLocationCount = null;
-        if (response.Headers.TryGetValues("X-Estimated-Location-Count", out var estimatedLocationCountValues) &&
-            long.TryParse(estimatedLocationCountValues.FirstOrDefault(), out var parsedEstimatedLocationCount))
-        {
-            estimatedLocationCount = parsedEstimatedLocationCount;
-        }
-
-        long? featureCount = null;
-        if (response.Headers.TryGetValues("X-Feature-Count", out var featureCountValues) &&
-            long.TryParse(featureCountValues.FirstOrDefault(), out var parsedFeatureCount))
-        {
-            featureCount = parsedFeatureCount;
-        }
-
-        long? locationsBeforeClustering = null;
-        if (response.Headers.TryGetValues("X-Locations-Before-Clustering", out var locationsBeforeClusteringValues) &&
-            long.TryParse(locationsBeforeClusteringValues.FirstOrDefault(), out var parsedLocationsBeforeClustering))
-        {
-            locationsBeforeClustering = parsedLocationsBeforeClustering;
-        }
-
-        var cacheStatus = response.Headers.TryGetValues("X-Cache", out var cacheStatusValues)
-            ? cacheStatusValues.FirstOrDefault()
-            : null;
-
-        var resultType = response.Headers.TryGetValues("X-Result-Type", out var resultTypeValues)
-            ? resultTypeValues.FirstOrDefault()
-            : null;
-
-        var timings = response.Headers.TryGetValues("X-AdaptiveSearch-Timings", out var timingsValues)
-            ? timingsValues.FirstOrDefault()
-            : null;
-
-        var responseBytes = await response.Content.ReadAsByteArrayAsync();
-        var responseSizeBytes = response.Content.Headers.ContentLength ?? responseBytes.LongLength;
-        var geoJson = Encoding.UTF8.GetString(responseBytes);
-
-        return (geoJson, observationsTotalCount, estimatedLocationCount, featureCount, locationsBeforeClustering, responseSizeBytes, cacheStatus, resultType, timings);
-    }
 
     public async Task<Result<SearchByCursorResultDto<Observation>?>> SearchObservationsByCursorAsync(
         SearchFilterInternalDto filter,

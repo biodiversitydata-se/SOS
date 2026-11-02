@@ -29,11 +29,11 @@
                            Color="Color.Primary"
                            OnClick="OnSearchButtonClickedAsync"
                            Disabled="@IsSearchDisabled">
-                    @if (showSpinner)
+                    @if (isLoading)
                     {
                         <MudProgressCircular Color="Color.Inherit" Indeterminate="true" Size="Size.Small" Class="mr-2" />
                     }
-                    <span>Search</span>
+                    <span>Sök</span>
                 </MudButton>
 
                 <MudCheckBox T="bool"
@@ -54,7 +54,7 @@
                              Dense="true" />
 
                 <MudCheckBox @bind-Value="useCache"
-                             Label="Use cache"
+                             Label="Använd cache"
                              Color="Color.Primary"
                              Dense="true" />
             </MudStack>
@@ -71,11 +71,11 @@
                             <ul class="selected-feature-hit-list">
                                 <li>
                                     <strong>LocationIds:</strong>
-                                    <div class="selected-feature-list-text">@SelectedLocationIdsText</div>
+                                    <div class="selected-feature-list-text">@selectedLocationIdsText</div>
                                 </li>
                                 <li>
                                     <strong>Lokaler:</strong>
-                                    <div class="selected-feature-list-text">@SelectedLocalitiesText</div>
+                                    <div class="selected-feature-list-text">@selectedLocalitiesText</div>
                                 </li>
                             </ul>
                         </MudExpansionPanel>
@@ -83,13 +83,13 @@
                         @if (selectedFeatures.FirstOrDefault() is { } firstSelectedFeature)
                         {
                             <MudExpansionPanel Text="@($"Första markerade feature: {firstSelectedFeature.FeatureId ?? "-"}")" Expanded="true">
-                                @if (firstSelectedFeature.Properties.Count == 0)
+                                @if (!firstSelectedFeature.HasProperties)
                                 {
                                     <MudText Typo="Typo.body2" Class="mt-2">Inga properties hittades.</MudText>
                                 }
                                 else
                                 {
-                                    <pre class="selected-feature-json">@FormatSelectedFeatureJson(firstSelectedFeature)</pre>
+                                    <pre class="selected-feature-json">@selectedFeatureJson</pre>
                                 }
                             </MudExpansionPanel>
                         }
@@ -102,16 +102,21 @@
         <MudItem xs="12" lg="6">
             <MudExpansionPanels MultiExpansion="false" Class="mb-2">
                 <MudExpansionPanel Text="@ObservationPanelTitle" Expanded="true">
-                    @if (isObservationPreviewLoading)
+                    <div class="observation-preview-loading" role="status" aria-live="polite">
+                        @if (isObservationPreviewLoading)
+                        {
+                            <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
+                                <MudProgressCircular Color="Color.Primary" Indeterminate="true" Size="Size.Small" />
+                                <MudText Typo="Typo.body2">@ObservationPreviewLoadingText</MudText>
+                            </MudStack>
+                        }
+                    </div>
+                    @if (observationSearchResult is null)
                     {
-                        <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
-                            <MudProgressCircular Color="Color.Primary" Indeterminate="true" Size="Size.Small" />
-                            <MudText Typo="Typo.body2">@ObservationPreviewLoadingText</MudText>
-                        </MudStack>
-                    }
-                    else if (observationSearchResult is null)
-                    {
-                        <MudText Typo="Typo.body2">Sök för att visa de första @ObservationPreviewTake observationerna.</MudText>
+                        @if (!isObservationPreviewLoading)
+                        {
+                            <MudText Typo="Typo.body2">Sök för att visa de första @ObservationPreviewTake observationerna.</MudText>
+                        }
                     }
                     else if (observationSearchResult.Records.Count == 0)
                     {
@@ -178,6 +183,7 @@
                         <MudText Typo="Typo.body2"><strong>Meter per pixel:</strong> @currentMetersPerPixelText</MudText>
                         <MudText Typo="Typo.body2"><strong>BBox:</strong> @currentBboxText</MudText>                        
                         <MudText Typo="Typo.body2"><strong>Resultat:</strong> @lastResultTypeText</MudText>
+                        <MudText Typo="Typo.body2"><strong>Använd strategi:</strong> @lastAdaptiveSearchStrategyText</MudText>
                         <MudText Typo="Typo.body2"><strong>Cache:</strong> @lastCacheStatusText</MudText>
                         <MudText Typo="Typo.body2"><strong>Antal observationer:</strong> @observationsTotalCountText</MudText>
                         <MudText Typo="Typo.body2"><strong>Estimerat antal lokaler:</strong> @estimatedLocationCountText</MudText>
@@ -217,17 +223,16 @@
                             }
                         </MudSelect>
 
-                        <MudSelect T="int?"
+                        <MudSelect T="int"
                                    @bind-Value="locationAggregationLimit"
                                    Label="Lokalaggregeringsgräns"
                                    Variant="Variant.Outlined"
                                    Dense="true"
                                    Margin="Margin.Dense"
                                    FullWidth="true">
-                            <MudSelectItem T="int?" Value="@((int?)null)">Av</MudSelectItem>
                             @foreach (var option in locationAggregationLimitOptions)
                             {
-                                <MudSelectItem T="int?" Value="@((int?)option)">@option</MudSelectItem>
+                                <MudSelectItem T="int" Value="@option">@option</MudSelectItem>
                             }
                         </MudSelect>
 
@@ -238,6 +243,7 @@
                                    Dense="true"
                                    Margin="Margin.Dense"
                                    FullWidth="true">
+                            <MudSelectItem T="AdaptiveSearchLocationsStrategy" Value="@AdaptiveSearchLocationsStrategy.Auto">Auto</MudSelectItem>
                             <MudSelectItem T="AdaptiveSearchLocationsStrategy" Value="@AdaptiveSearchLocationsStrategy.ObservationsThenGrid">Observationer, grid</MudSelectItem>
                             <MudSelectItem T="AdaptiveSearchLocationsStrategy" Value="@AdaptiveSearchLocationsStrategy.ObservationsThenLocationsThenGrid">Observationer, lokaler, grid</MudSelectItem>
                             <MudSelectItem T="AdaptiveSearchLocationsStrategy" Value="@AdaptiveSearchLocationsStrategy.LocationsThenGrid">Lokaler, grid</MudSelectItem>
@@ -286,23 +292,13 @@
 
                 <MudExpansionPanel Text="Klustring">
                     <MudStack Spacing="2">
-                        <MudSelect T="string"
-                                   @bind-Value="clusteringAlgorithm"
-                                   Label="Algoritm"
-                                   Variant="Variant.Outlined"
-                                   Dense="true"
-                                   Margin="Margin.Dense"
-                                   Disabled="@(!cluster)"
-                                   FullWidth="true">
-                            @foreach (var algorithm in clusteringAlgorithms)
-                            {
-                                <MudSelectItem T="string" Value="@algorithm">@algorithm</MudSelectItem>
-                            }
-                        </MudSelect>
+                        <MudNumericField T="double?" @bind-Value="clusterRadiusMeters"
+                                         Label="Fast sökradie (meter), tomt = av" Variant="Variant.Outlined"
+                                         Margin="Margin.Dense" Min="0.01" FullWidth="true" />
 
                         <MudNumericField T="double"
                                          @bind-Value="clusterRadiusPx"
-                                         Label="Radie (px)"
+                                         Label="Radie för vanlig pixelklustring (px)"
                                          Variant="Variant.Outlined"
                                          Margin="Margin.Dense"
                                          Disabled="@(!cluster)"
@@ -316,15 +312,27 @@
                                          Label="Min lokaler per kluster"
                                          Variant="Variant.Outlined"
                                          Margin="Margin.Dense"
-                                         Disabled="@(!cluster)"
+                                         Disabled="@(!cluster && !clusterRadiusMeters.HasValue)"
                                          Min="2"
                                          Max="100"
                                          Step="1"
                                          FullWidth="true" />
 
+                        <MudNumericField T="double"
+                                         @bind-Value="disablePixelClusteringAtMetersPerPixel"
+                                         Label="Stäng av vanlig pixelklustring vid ≤ (m/px)"
+                                         HelperText="0 = ingen automatisk avstängning. Fast meterklustring påverkas inte."
+                                         Variant="Variant.Outlined"
+                                         Margin="Margin.Dense"
+                                         Disabled="@(!cluster)"
+                                         Min="0.0"
+                                         Step="0.1"
+                                         FullWidth="true" />
+
                         <MudNumericField T="int"
                                          @bind-Value="minLocationCountBeforeClustering"
-                                         Label="Min lokaler innan klustring"
+                                         Label="Min kartobjekt innan pixelklustring"
+                                         HelperText="Gäller vanlig pixelklustring. Mycket nära punkter kan fortfarande grupperas."
                                          Variant="Variant.Outlined"
                                          Margin="Margin.Dense"
                                          Disabled="@(!cluster)"
@@ -332,15 +340,76 @@
                                          Max="10000"
                                          Step="10"
                                          FullWidth="true" />
+
+                        <MudNumericField T="double"
+                                         @bind-Value="proximityClusterRadiusPx"
+                                         Label="Gruppera mycket nära punkter (px)"
+                                         HelperText="Används när vanlig pixelklustring stoppas av zoom- eller antalsgränsen. 0 = av."
+                                         Variant="Variant.Outlined"
+                                         Margin="Margin.Dense"
+                                         Disabled="@(!cluster)"
+                                         Min="0.0"
+                                         Max="500.0"
+                                         Step="0.5"
+                                         FullWidth="true" />
+
+                        <MudNumericField T="double?"
+                                         Value="@compactClusterMaxRadiusMeters"
+                                         ValueChanged="OnCompactClusterMaxRadiusMetersChanged"
+                                         Label="Gräns för gul klustermarkering (meter)"
+                                         HelperText="Tomt = av. Största avstånd från klustrets mittpunkt."
+                                         Variant="Variant.Outlined"
+                                         Margin="Margin.Dense"
+                                         Min="0.0"
+                                         Step="10.0"
+                                         Clearable="true"
+                                         Immediate="true"
+                                         FullWidth="true" />
                     </MudStack>
                 </MudExpansionPanel>
 
                 <MudExpansionPanel Text="Visning">
                     <MudStack Spacing="2">
+                        <MudSelect T="PointSizeMode"
+                                   Value="@pointSizeMode"
+                                   ValueChanged="OnPointSizeModeChanged"
+                                   Label="Punktstorlek"
+                                   Variant="Variant.Outlined"
+                                   Dense="true"
+                                   Margin="Margin.Dense"
+                                   FullWidth="true">
+                            <MudSelectItem T="PointSizeMode" Value="@PointSizeMode.Fixed">Fast storlek</MudSelectItem>
+                            <MudSelectItem T="PointSizeMode" Value="@PointSizeMode.ByObservationCount">Efter antal – automatiska gränser</MudSelectItem>
+                            <MudSelectItem T="PointSizeMode" Value="@PointSizeMode.ByObservationCountFixedBreaks">Efter antal – fasta gränser</MudSelectItem>
+                        </MudSelect>
+
+                        @if (ShowPointSizeLegend)
+                        {
+                            <div class="point-size-legend" aria-label="Punktstorlek efter observationsantal">
+                                @foreach (var item in pointSizeLegend)
+                                {
+                                    <div class="point-size-legend-row">
+                                        <span class="point-size-legend-symbol" aria-hidden="true">
+                                            <span class="point-size-legend-dot" style="@($"width: {item.DiameterPx}px; height: {item.DiameterPx}px;")"></span>
+                                        </span>
+                                        <span>@item.CountText (@item.DiameterPx px)</span>
+                                    </div>
+                                }
+                                @if (pointSizeMode == PointSizeMode.ByObservationCount)
+                                {
+                                    <MudText Typo="Typo.caption">Storlekarna är relativa till aktuellt resultat, med gränser vid 75:e och 90:e percentilen. Antalsgränserna kan ändras efter en ny sökning eller zoomning.</MudText>
+                                }
+                                else
+                                {
+                                    <MudText Typo="Typo.caption">Antalsgränserna är alltid 5 och 50, oberoende av sökning och zoom.</MudText>
+                                }
+                            </div>
+                        }
+
                         <MudCheckBox T="bool"
                                      Value="@showCoordinateUncertaintyCircles"
                                      ValueChanged="OnShowCoordinateUncertaintyCirclesChanged"
-                                     Label="Visa noggrannhetscirklar"
+                                     Label="Visa noggrannhetscirklar för visade lokaler (högst 5 per punkt)"
                                      Color="Color.Primary"
                                      Dense="true" />
 

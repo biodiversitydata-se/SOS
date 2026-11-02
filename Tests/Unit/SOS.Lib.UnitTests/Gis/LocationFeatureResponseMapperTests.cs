@@ -271,8 +271,8 @@ public class LocationFeatureResponseMapperTests
         observation.Location = CreateLocation("site-1", 18.12345, 59.12345);
         var item = LocationFeature.FromSingleLocation([observation]);
 
-        var properties = LocationFeatureResponseMapper.ToProperties(item, "site-1");
-        properties.Locations.Location!.DistinctLocationId.Should().Be("loc_1_5912345_1812345_un");
+        var properties = LocationFeatureResponseMapper.ToProperties(item);
+        properties.Locations.Items.Single().DistinctLocationId.Should().Be("Point_5912345_1812345");
 
         var json = JsonSerializer.Serialize(properties, new JsonSerializerOptions(JsonSerializerDefaults.Web));
         json.Should().NotContain("debugObservations").And.NotContain("\"geometry\"");

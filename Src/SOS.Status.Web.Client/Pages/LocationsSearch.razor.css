@@ -28,6 +28,10 @@
     white-space: pre;
 }
 
+.observation-preview-loading {
+    min-height: 32px;
+}
+
 .observations-table-container {
     max-width: 100%;
     max-height: 520px;
@@ -37,4 +41,32 @@
 .observation-location-id {
     min-width: 220px;
     overflow-wrap: anywhere;
+}
+
+.point-size-legend {
+    font-size: 0.875rem;
+}
+
+.point-size-legend-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.point-size-legend-symbol {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+}
+
+.point-size-legend-dot {
+    display: inline-block;
+    box-sizing: border-box;
+    border: 1px solid black;
+    border-radius: 50%;
+    background: #bdbdbd;
 }
