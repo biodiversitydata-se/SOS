@@ -2560,6 +2560,18 @@
     "FieldSet": "Extended"
   },
   {
+    "PropertyName": "SensitivityReason",
+    "PropertyPath": "Occurrence.SensitivityReason",
+    "SwedishTitle": "Skäl till skydd",
+    "EnglishTitle": "Sensitive reason",
+    "DataType": "Int32",
+    "DataTypeIsNullable": true,
+    "DwcName": "",
+    "DwcIdentifier": "",
+    "DependsOn": "Occurrence.SensitivityReason",
+    "FieldSet": "AllWithValues"
+  },
+  {
     "PropertyName": "IsNaturalOccurrence",
     "PropertyPath": "Occurrence.IsNaturalOccurrence",
     "SwedishTitle": "Spontan",
@@ -3273,18 +3285,6 @@
     "EnglishTitle": "Sensitive",
     "DataType": "Boolean",
     "DataTypeIsNullable": false,
-    "DwcName": "",
-    "DwcIdentifier": "",
-    "DependsOn": "Sensitive",
-    "FieldSet": "AllWithValues"
-  },
-  {
-    "PropertyName": "SensitivityReason",
-    "PropertyPath": "SensitivityReason",
-    "SwedishTitle": "Skäl till skydd",
-    "EnglishTitle": "Sensitive reason",
-    "DataType": "String",
-    "DataTypeIsNullable": true,
     "DwcName": "",
     "DwcIdentifier": "",
     "DependsOn": "Sensitive",
