@@ -9,7 +9,7 @@ using SOS.Lib.Models.Processed.Observation;
 using SOS.Lib.Models.Shared;
 using System.Globalization;
 using Location = SOS.Lib.Models.Processed.Observation.Location;
-using SOS.Lib.Enums;
+using SOS.Api.Contracts.Observations;
 
 namespace SOS.Harvest.Processors;
 

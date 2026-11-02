@@ -5,7 +5,7 @@ namespace SOS.Lib.Enums;
 /// <summary>
 ///     The reason for the sensitivity of the observation.
 /// </summary>
-public enum SensitivityReason
+public enum SensitivityReason_old
 {
     [EnumMember(Value = "Unknown")]
     Unknown = 0,

@@ -189,6 +189,11 @@ public class Occurrence
     public int SensitivityCategory { get; set; }
 
     /// <summary>
+    /// The reason for the sensitivity of the observation.
+    /// </summary>
+    public SensitivityReason? SensitivityReason { get; set; }
+
+    /// <summary>
     /// A list (concatenated and separated) of names of people,
     /// <br/>groups, or organizations responsible for recording the
     /// <br/>original Occurrence. The primary collector or observer,
