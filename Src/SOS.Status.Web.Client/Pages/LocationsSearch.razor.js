@@ -43,6 +43,24 @@ const compactClusterFillColors = {
     pixelCluster: "#fff04a" //"#fff59d"
 };
 
+const filterAreasLayerId = "filter-areas";
+const filterAreaCacheDurationMs = 60 * 60 * 1000;
+const filterGeometryTypes = new Map([
+    ["point", "Point"], ["multipoint", "MultiPoint"],
+    ["linestring", "LineString"], ["multilinestring", "MultiLineString"],
+    ["polygon", "Polygon"], ["multipolygon", "MultiPolygon"],
+    ["geometrycollection", "GeometryCollection"]
+]);
+let filterAreaVersion = 0;
+let filterAreaAbortController = null;
+let filterAreaPending = null;
+let filterAreaKey = null;
+let filterAreaInputJson = null;
+let filterAreaReferencesJson = null;
+let filterAreaLoadedAt = 0;
+let filterAreaFailedKey = null;
+let filterAreaOutlinesVisible = true;
+
 const displayStatusStyleDefinitions = {
     present: {
         pointFill: "yellow",
@@ -148,6 +166,16 @@ export function initMap(container, blazorDotNetRef, zoom, centerLon, centerLat) 
 }
 
 export function destroyMap() {
+    filterAreaVersion++;
+    filterAreaAbortController?.abort();
+    filterAreaAbortController = null;
+    filterAreaPending = null;
+    filterAreaKey = null;
+    filterAreaInputJson = null;
+    filterAreaReferencesJson = null;
+    filterAreaLoadedAt = 0;
+    filterAreaFailedKey = null;
+    filterAreaOutlinesVisible = true;
     if (moveEndKey) {
         ol.Observable.unByKey(moveEndKey);
         moveEndKey = null;
@@ -404,7 +432,7 @@ function normalizedIdSet(values) {
 
 export function renderMapResult(layerId, geoJson, options = {}) {
     const resultType = options.resultType;
-    if (!loadGeoJsonLayer(layerId, geoJson, resultType)) return null;
+    if (!loadGeoJsonLayer(layerId, geoJson, resultType, options)) return null;
 
     try {
         openLayersMap.configurePolygonRendering(
@@ -433,7 +461,7 @@ export function renderMapResult(layerId, geoJson, options = {}) {
     return legend;
 }
 
-function loadGeoJsonLayer(layerId, geoJson, resultType) {
+function loadGeoJsonLayer(layerId, geoJson, resultType, options = {}) {
     if (!map || !layerId) {
         return false;
     }
@@ -453,7 +481,8 @@ function loadGeoJsonLayer(layerId, geoJson, resultType) {
     let featureCollection;
     try {
         featureCollection = typeof geoJson === "string" ? JSON.parse(geoJson) : geoJson;
-        features = format.readFeatures(featureCollection);
+        features = format.readFeatures(featureCollection).filter(feature =>
+            !String(getFeatureProperty(feature, "featureType", "FeatureType") ?? "").toLowerCase().startsWith("filterarea."));
     } catch (error) {
         console.error("LocationsSearch: failed to parse GeoJSON", error);
         return false;
@@ -491,8 +520,144 @@ function loadGeoJsonLayer(layerId, geoJson, resultType) {
     if (layerId === locationsLayerId) {
         resetLocationResult();
         locationFeatureCollection = normalizedResultType === "locations" ? featureCollection : null;
+        if (options.filterJson !== undefined) {
+            setFilterAreaOutlinesVisible(options.showFilterAreaOutlines !== false);
+            // This independent layer must not delay observation updates or auto-searches.
+            void updateFilterAreaLayer(featureCollection.filterAreaReferences ?? [], options.filterJson);
+        }
     }
     return true;
+}
+
+export function setFilterAreaOutlinesVisible(visible) {
+    filterAreaOutlinesVisible = visible;
+    getLayerById(filterAreasLayerId)?.setVisible(visible);
+}
+
+function normalizeFilterGeometry(geometry) {
+    // Search input accepts case-insensitive types/members; OpenLayers expects canonical GeoJSON.
+    const rawType = geometry?.type ?? geometry?.Type;
+    const type = typeof rawType === "string" ? filterGeometryTypes.get(rawType.toLowerCase()) : undefined;
+    if (!type) throw new Error("Unsupported search filter geometry type");
+    if (type === "GeometryCollection") {
+        return { type, geometries: (geometry.geometries ?? geometry.Geometries).map(normalizeFilterGeometry) };
+    }
+    // Reuse the coordinate arrays without changing the original request or copying large polygons.
+    return { type, coordinates: geometry.coordinates ?? geometry.Coordinates };
+}
+
+async function fetchFilterAreaFeature(reference, signal) {
+    // Resolve through the same-origin proxy; API-origin URLs need not match this host.
+    const path = `api/areas/${encodeURIComponent(reference.areaType)}/${encodeURIComponent(reference.featureId)}/geometry`;
+    const response = await fetch(new URL(path, document.baseURI), {
+        signal, headers: { Accept: "application/geo+json" }
+    });
+    if (!response.ok) throw new Error(`Area geometry request failed: ${response.status}`);
+    return response.json(); // Browser caching handles Cache-Control and ETag revalidation.
+}
+
+function createOwnFilterAreaFeatures(reference, ownGeometries) {
+    const searchCircle = reference.featureType === "FilterArea.Polygon";
+    if (!searchCircle && reference.featureType !== "FilterArea.OwnGeometries")
+        throw new Error("Unsupported filter area reference");
+    const geometries = searchCircle ? ownGeometries.slice(0, 1) : ownGeometries;
+    if (geometries.length === 0) throw new Error("Referenced search geometries are missing");
+    return geometries.map(original => {
+        let geometry = normalizeFilterGeometry(original);
+        if (searchCircle && reference.maxDistanceFromPoint > 0 && geometry.type === "Point") {
+            const center = geometry.coordinates;
+            geometry = { type: "Polygon", coordinates: [openLayersMap.createGeodesicCircleCoordinates(
+                center[0], center[1], reference.maxDistanceFromPoint, "EPSG:4326")] };
+        }
+        return { type: "Feature", geometry, properties: {
+            FeatureType: searchCircle ? "FilterArea.Polygon" : "FilterArea.OwnPolygon"
+        } };
+    });
+}
+
+function replaceFilterAreaFeatures(features) {
+    const format = new ol.format.GeoJSON({ dataProjection: "EPSG:4326", featureProjection: map.getView().getProjection() });
+    const polygons = format.readFeatures({ type: "FeatureCollection", features }).filter(feature =>
+        ["Polygon", "MultiPolygon", "GeometryCollection"].includes(feature.getGeometry()?.getType()));
+    const source = new ol.source.Vector();
+    source.addFeatures(polygons);
+    let layer = getLayerById(filterAreasLayerId);
+    if (layer) layer.setSource(source);
+    else {
+        layer = new ol.layer.Vector({ source, style: new ol.style.Style({
+            stroke: new ol.style.Stroke({ color: "#00695c", width: 2, lineDash: [6, 4] })
+        }) });
+        layer.set("id", filterAreasLayerId);
+        layer.set("sosNonInteractive", true);
+        layer.setZIndex(25);
+        map.addLayer(layer);
+    }
+    layer.setVisible(filterAreaOutlinesVisible);
+}
+
+export function updateFilterAreaLayer(references, filterJson) {
+    if (!map) return Promise.resolve();
+    const referencesJson = JSON.stringify(references);
+    const fresh = Date.now() - filterAreaLoadedAt < filterAreaCacheDurationMs;
+    if (filterAreaInputJson === filterJson && filterAreaReferencesJson === referencesJson) {
+        if (filterAreaPending) return filterAreaPending;
+        if (filterAreaLoadedAt && fresh) return Promise.resolve();
+    }
+
+    let ownGeometries;
+    let key;
+    try {
+        const filter = typeof filterJson === "string" ? JSON.parse(filterJson) : filterJson;
+        const geography = filter?.geographics ?? filter?.Geographics;
+        ownGeometries = geography?.geometries ?? geography?.Geometries ?? [];
+        // Changes to taxon/date filters do not invalidate identical geographic outlines.
+        const referencedGeometries = references.some(reference => reference.featureType === "FilterArea.OwnGeometries")
+            ? ownGeometries
+            : references.some(reference => reference.featureType === "FilterArea.Polygon") ? ownGeometries.slice(0, 1) : [];
+        key = JSON.stringify([references, referencedGeometries]);
+    } catch (error) {
+        console.error("LocationsSearch: failed to read search filter geometry", error);
+        return Promise.resolve();
+    }
+    filterAreaInputJson = filterJson;
+    filterAreaReferencesJson = referencesJson;
+    if (key === filterAreaKey && (filterAreaPending || (filterAreaLoadedAt && fresh)))
+        return filterAreaPending ?? Promise.resolve();
+
+    const changed = key !== filterAreaKey;
+    const version = ++filterAreaVersion;
+    const targetMap = map;
+    filterAreaAbortController?.abort();
+    filterAreaAbortController = new AbortController();
+    const signal = filterAreaAbortController.signal;
+    filterAreaKey = key;
+    filterAreaLoadedAt = 0;
+    if (changed && getLayerById(filterAreasLayerId)) openLayersMap.removeLayer(map, filterAreasLayerId);
+
+    filterAreaPending = (async () => {
+        try {
+            const features = (await Promise.all(references.map(async reference => {
+                if (reference.areaType != null && reference.featureId != null) {
+                    return [await fetchFilterAreaFeature(reference, signal)];
+                }
+                return createOwnFilterAreaFeatures(reference, ownGeometries);
+            }))).flat();
+            if (map !== targetMap || version !== filterAreaVersion || signal.aborted) return;
+            replaceFilterAreaFeatures(features);
+            filterAreaLoadedAt = Date.now();
+            filterAreaFailedKey = null;
+        } catch (error) {
+            if (signal.aborted || map !== targetMap || version !== filterAreaVersion) return;
+            console.error("LocationsSearch: failed to load filter area outlines", error);
+            if (filterAreaFailedKey !== key) {
+                filterAreaFailedKey = key;
+                dotNetRef?.invokeMethodAsync("OnFilterAreaLoadFailedFromJs").catch(() => {});
+            }
+        } finally {
+            if (version === filterAreaVersion) filterAreaPending = null;
+        }
+    })();
+    return filterAreaPending;
 }
 
 function notifyExtentChanged() {

@@ -14,6 +14,11 @@ public class AdaptiveSearchOperationFilter : IOperationFilter
             context.MethodInfo.Name == nameof(ObservationsController.AdaptiveSearchLocationsInternal))
         {
             var response = (OpenApiResponse)operation.Responses["200"];
+            response.Description = "GeoJSON FeatureCollection with a top-level filterAreaReferences array in locations, grid and empty results. " +
+                "References are returned independently of includeFilterAreasInResult. Stored areas expose areaType, featureId and a geometryUrl " +
+                "relative to the API origin. One FilterArea.OwnGeometries reference covers all original request geometries. " +
+                "A FilterArea.Polygon reference covers the first request point and exposes its maxDistanceFromPoint. " +
+                "GET /areas/{areaType}/{featureId}/geometry returns a cacheable GeoJSON Feature with ETag/If-None-Match support.";
             response.Headers ??= new Dictionary<string, IOpenApiHeader>();
             response.Headers["X-AdaptiveSearch-Strategy"] = CreateHeaderSchema(JsonSchemaType.String,
                 "The effective search strategy after resolving Auto: ObservationsThenGrid, ObservationsThenLocationsThenGrid or LocationsThenGrid. Reported also for cache hits and grid or empty results; X-Result-Type describes the returned representation.");

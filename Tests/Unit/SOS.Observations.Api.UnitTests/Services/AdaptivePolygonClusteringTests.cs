@@ -259,8 +259,8 @@ public class AdaptivePolygonClusteringTests
         var size = large ? 30 : 2;
         var polygons = new Dictionary<string, Geometry> { ["polygon"] = Rectangle(0, size, size) };
         var result = rawRecords
-            ? factory.CreateItems(records, new LocationFeatureOptions { BoundingBox = Bbox, ClusterRadiusMeters = null, ClusterPixels = large, MetersPerPixel = 1, ClusterRadiusPx = 40, MinLocationsPerCluster = 2, MinLocationCountBeforeClustering = 2, PolygonGeometries = polygons, CreatePolygons = mode, ProximityClusterRadiusPx = 2 })
-            : factory.CreateItems(aggregator.CreateAggregates(records), new LocationFeatureOptions { BoundingBox = Bbox, ClusterRadiusMeters = null, ClusterPixels = large, MetersPerPixel = 1, ClusterRadiusPx = 40, MinLocationsPerCluster = 2, MinLocationCountBeforeClustering = 2, PolygonGeometries = polygons, CreatePolygons = mode, ProximityClusterRadiusPx = 2 });
+            ? factory.CreateItems(records, new LocationFeatureOptions { BoundingBox = Bbox, ClusterRadiusMeters = null, ClusterPixels = large, MetersPerPixel = 1, ClusterRadiusPx = 40, MinLocationsPerCluster = 2, MinLocationCountBeforeClustering = 2, PolygonGeometries = polygons, CreatePolygons = mode, DetailClusterRadiusPx = 2 })
+            : factory.CreateItems(aggregator.CreateAggregates(records), new LocationFeatureOptions { BoundingBox = Bbox, ClusterRadiusMeters = null, ClusterPixels = large, MetersPerPixel = 1, ClusterRadiusPx = 40, MinLocationsPerCluster = 2, MinLocationCountBeforeClustering = 2, PolygonGeometries = polygons, CreatePolygons = mode, DetailClusterRadiusPx = 2 });
 
         result.Should().HaveCount(large ? 2 : 1);
         result.Sum(feature => feature.ObservationCount).Should().Be(3);

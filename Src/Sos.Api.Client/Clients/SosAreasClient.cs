@@ -65,6 +65,36 @@ public sealed class SosAreasClient : ISosAreasClient
     }
 
     /// <inheritdoc />
+    public async Task<AreaGeometryResponse> GetAreaGeometryAsync(
+        AreaTypeDto areaType,
+        string featureId,
+        string? ifNoneMatch = null,
+        CancellationToken cancellationToken = default)
+    {
+        if (!Enum.IsDefined(areaType)) throw new ArgumentOutOfRangeException(nameof(areaType));
+        if (string.IsNullOrWhiteSpace(featureId)) throw new ArgumentException("Feature id must not be empty.", nameof(featureId));
+
+        using var request = new HttpRequestMessage(HttpMethod.Get,
+            $"areas/{Uri.EscapeDataString(areaType.ToString())}/{Uri.EscapeDataString(featureId)}/geometry");
+        request.ApplySosRequestHeaders(acceptProfile: SosAcceptProfile.GeoJson);
+        if (!string.IsNullOrWhiteSpace(ifNoneMatch))
+            request.Headers.IfNoneMatch.ParseAdd(ifNoneMatch);
+
+        using var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+        var notModified = response.StatusCode == System.Net.HttpStatusCode.NotModified;
+        if (!notModified && !response.IsSuccessStatusCode)
+            throw SosClientHttp.CreateApiException(response,
+                await SosClientHttp.ReadErrorResponsePreviewAsync(response, cancellationToken), request.RequestUri);
+
+        return new AreaGeometryResponse
+        {
+            GeoJson = notModified ? null : await SosClientHttp.ReadResponseBodyAsync(response, cancellationToken),
+            ETag = response.Headers.ETag?.ToString(),
+            NotModified = notModified
+        };
+    }
+
+    /// <inheritdoc />
     public async Task<byte[]?> GetAreaExportAsync(
         AreaTypeDto areaType,
         string featureId,

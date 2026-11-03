@@ -61,9 +61,10 @@ public partial class LocationsSearch : IAsyncDisposable
     private bool showCoordinateUncertaintyCircles = false;
     private bool showClusterRadiusCircles;
     private bool showClusterMinimumEnclosingCircles;
+    private bool showFilterAreaOutlines = true;
     private double clusterRadiusPx = AdaptiveSearchLocationsDefaults.ClusterRadiusPx;
-    private double disablePixelClusteringAtMetersPerPixel = AdaptiveSearchLocationsDefaults.DisablePixelClusteringAtMetersPerPixel;
-    private double proximityClusterRadiusPx = AdaptiveSearchLocationsDefaults.ProximityClusterRadiusPx;
+    private double switchToDetailClusteringAtMetersPerPixel = AdaptiveSearchLocationsDefaults.SwitchToDetailClusteringAtMetersPerPixel;
+    private double detailClusterRadiusPx = AdaptiveSearchLocationsDefaults.DetailClusterRadiusPx;
     private int minLocationsPerCluster = 2;
     private int minLocationCountBeforeClustering = AdaptiveSearchLocationsDefaults.MinLocationCountBeforeClustering;
     private CreatePolygonsMode createPolygonsMode = CreatePolygonsMode.WhenNeeded;
@@ -225,6 +226,8 @@ public partial class LocationsSearch : IAsyncDisposable
                 createPolygons = createPolygonsMode.ToString(),
                 polygonToPointThresholdPx = PolygonToPointThresholdPx,
                 pointSizeMode = pointSizeMode.ToString(),
+                filterJson = snapshot.Settings.FilterJson,
+                showFilterAreaOutlines,
                 highlight = CreateMapHighlightState(),
                 overlays = new
                 {
@@ -241,7 +244,20 @@ public partial class LocationsSearch : IAsyncDisposable
         // This result also satisfies any pending view contained in its bbox at this resolution.
         CancelPendingAutoSearch();
         if (selectedLocationIds.Count == 0)
-            _ = SearchObservationPreviewAsync(snapshot.PreviewFilter);
+        {
+            if (snapshot.Result.ObservationsTotalCount == 0)
+            {
+                // The map already established that this viewport has no observations.
+                observationPreviewRequestVersion++;
+                isObservationPreviewLoading = false;
+                observationSearchResult = new PagedResultDto<Observation> { Take = ObservationPreviewTake, TotalCount = 0 };
+                await ClearObservationHighlightsAsync(ensureVisible: false);
+            }
+            else
+            {
+                _ = SearchObservationPreviewAsync(snapshot.PreviewFilter);
+            }
+        }
     }
 
     [JSInvokable]
@@ -612,6 +628,20 @@ public partial class LocationsSearch : IAsyncDisposable
         await ConfigureCompactClusterRenderingAsync();
     }
 
+    private async Task OnShowFilterAreaOutlinesChanged(bool value)
+    {
+        showFilterAreaOutlines = value;
+        if (mapInitialized && _mapModule is not null)
+            await _mapModule.InvokeVoidAsync("setFilterAreaOutlinesVisible", value);
+    }
+
+    [JSInvokable]
+    public Task OnFilterAreaLoadFailedFromJs()
+    {
+        if (!disposed) Snackbar.Add("Sökfiltrets konturer kunde inte hämtas. Prova att söka igen.", Severity.Warning);
+        return Task.CompletedTask;
+    }
+
     private async Task ConfigureCompactClusterRenderingAsync()
     {
         if (!mapInitialized || _mapModule is null)
@@ -727,8 +757,8 @@ public partial class LocationsSearch : IAsyncDisposable
                 CreateSampleObservations = createSampleObservations,
                 UseCache = useCache,
                 CutoffYear = cutoffYear,
-                DisablePixelClusteringAtMetersPerPixel = disablePixelClusteringAtMetersPerPixel,
-                ProximityClusterRadiusPx = proximityClusterRadiusPx
+                SwitchToDetailClusteringAtMetersPerPixel = switchToDetailClusteringAtMetersPerPixel,
+                DetailClusterRadiusPx = detailClusterRadiusPx
             });
     }
 

@@ -65,13 +65,13 @@ public abstract class LocationClustererAlgorithmTestBase
     }
 
     [Fact]
-    public void NumberOfMapElementsIsWithinBounds()
+    public void BboxBasedClusteringKeepsNumberOfMapElementsWithinBounds()
     {
         // Arrange
         var observations = LocationClustererTestData.MakeRandomObservations(300);
 
         // Act
-        var result = CreateClusterer(50, 100).ClusterLocations(observations, DefaultBoundingBox, metersPerPixel: DefaultMetersPerPixel);
+        var result = CreateClusterer(50, 100).ClusterLocations(observations, DefaultBoundingBox);
 
         // Assert
         result.Count.Should().BeLessOrEqualTo(100);

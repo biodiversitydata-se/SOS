@@ -37,7 +37,7 @@ public class Sweref99TmFastGreedyLocationClusterer : ILocationClusterer
     /// The distinct-location threshold that controls when clustering starts.
     /// </param>
     /// <param name="maxLocationCountAfterClustering">
-    /// The max number of result items after clustering.
+    /// The target number of result items for bbox-based clustering without a pixel resolution.
     /// </param>
     public Sweref99TmFastGreedyLocationClusterer(int minLocationCountBeforeClustering, int maxLocationCountAfterClustering)
         : this(minLocationCountBeforeClustering, maxLocationCountAfterClustering, DefaultMinLocationsPerCluster)
@@ -51,7 +51,7 @@ public class Sweref99TmFastGreedyLocationClusterer : ILocationClusterer
     /// The distinct-location threshold that controls when clustering starts.
     /// </param>
     /// <param name="maxLocationCountAfterClustering">
-    /// The max number of result items after clustering.
+    /// The target number of result items for bbox-based clustering without a pixel resolution.
     /// </param>
     /// <param name="minLocationsPerCluster">
     /// The minimum number of distinct locations required for a cluster item.
@@ -80,27 +80,27 @@ public class Sweref99TmFastGreedyLocationClusterer : ILocationClusterer
     public List<LocationFeature> ClusterLocations(List<Observation> observations, LatLonBoundingBoxDto boundingBox, double metersPerPixel, double clusterRadiusPx = DefaultClusterRadiusInPixels)
     {
         var clusterRadius = ComputeMinimumClusterRadius(boundingBox, metersPerPixel, clusterRadiusPx);
-        return ClusterLocations(observations, clusterRadius, useLocationExtentMinimum: false);
+        return ClusterLocations(observations, clusterRadius, useAdaptiveRadius: false);
     }
 
-    private List<LocationFeature> ClusterLocations(List<Observation> observations, double minimumClusterRadiusMeters, bool useLocationExtentMinimum = true)
+    private List<LocationFeature> ClusterLocations(List<Observation> observations, double minimumClusterRadiusMeters, bool useAdaptiveRadius = true)
     {        
-        return CreateFeatures(ClusterProjectedLocations(ProjectLocations(observations.Select(o => o.Location)), minimumClusterRadiusMeters, useLocationExtentMinimum), observations);
+        return CreateFeatures(ClusterProjectedLocations(ProjectLocations(observations.Select(o => o.Location)), minimumClusterRadiusMeters, useAdaptiveRadius), observations);
     }
 
     /// <summary>
-    /// Meter groups are indivisible inputs to either adaptive pixel clustering or fixed proximity
-    /// clustering. The proximity radius is supplied only when pixel grouping is enabled by the caller.
+    /// Meter groups are indivisible inputs to either normal pixel clustering or detail clustering.
+    /// With a pixel resolution, both stages use a fixed search radius regardless of the result count.
     /// </summary>
     public List<LocationFeature> ClusterLocations(List<Observation> observations, LatLonBoundingBoxDto? boundingBox,
         double? metersPerPixel, double clusterRadiusPx, double? clusterRadiusMeters, bool clusterPixels,
-        double proximityClusterRadiusPx = 0)
+        double detailClusterRadiusPx = 0)
     {
         return CreateFeatures(ClusterGroups(observations.Select(o => o.Location), new LocationClusteringOptions
         {
             BoundingBox = boundingBox, MetersPerPixel = metersPerPixel, ClusterRadiusPx = clusterRadiusPx,
             ClusterRadiusMeters = clusterRadiusMeters, ClusterPixels = clusterPixels,
-            ProximityClusterRadiusPx = proximityClusterRadiusPx
+            DetailClusterRadiusPx = detailClusterRadiusPx
         }), observations);
     }
 
@@ -113,9 +113,9 @@ public class Sweref99TmFastGreedyLocationClusterer : ILocationClusterer
         var clusterRadiusPx = options.ClusterRadiusPx;
         var clusterRadiusMeters = options.ClusterRadiusMeters;
         var clusterPixels = options.ClusterPixels;
-        var proximityClusterRadiusPx = options.ProximityClusterRadiusPx;
-        if (!double.IsFinite(proximityClusterRadiusPx) || proximityClusterRadiusPx < 0)
-            throw new ArgumentOutOfRangeException(nameof(proximityClusterRadiusPx));
+        var detailClusterRadiusPx = options.DetailClusterRadiusPx;
+        if (!double.IsFinite(detailClusterRadiusPx) || detailClusterRadiusPx < 0)
+            throw new ArgumentOutOfRangeException(nameof(detailClusterRadiusPx));
 
         var units = ProjectLocations(locations);
         if (clusterRadiusMeters.HasValue)
@@ -133,17 +133,17 @@ public class Sweref99TmFastGreedyLocationClusterer : ILocationClusterer
             var radius = metersPerPixel.HasValue
                 ? ComputeMinimumClusterRadius(boundingBox, metersPerPixel.Value, clusterRadiusPx)
                 : ComputeMinimumClusterRadius(boundingBox, _maxLocationCountAfterClustering);
-            return ClusterProjectedLocations(units, radius, useLocationExtentMinimum: !metersPerPixel.HasValue);
+            return ClusterProjectedLocations(units, radius, useAdaptiveRadius: !metersPerPixel.HasValue);
         }
 
-        // One fixed-radius pass; never grow this radius to reach the adaptive target item count.
-        if (proximityClusterRadiusPx > 0 && metersPerPixel is > 0 && double.IsFinite(metersPerPixel.Value))
-            return MakeClusterItems(units, metersPerPixel.Value * proximityClusterRadiusPx);
+        // Detail clustering uses one fixed-radius pass, independently of the bbox-based target count.
+        if (detailClusterRadiusPx > 0 && metersPerPixel is > 0 && double.IsFinite(metersPerPixel.Value))
+            return MakeClusterItems(units, metersPerPixel.Value * detailClusterRadiusPx);
 
         return CreateSingleLocationItems(units);
     }
 
-    private List<LocationClusterGroup> ClusterProjectedLocations(List<ProjectedLocation> projectedLocations, double minimumClusterRadiusMeters, bool useLocationExtentMinimum)
+    private List<LocationClusterGroup> ClusterProjectedLocations(List<ProjectedLocation> projectedLocations, double minimumClusterRadiusMeters, bool useAdaptiveRadius)
     {
         if (projectedLocations.Count == 0)
         {
@@ -155,9 +155,13 @@ public class Sweref99TmFastGreedyLocationClusterer : ILocationClusterer
             return CreateSingleLocationItems(projectedLocations);
         }
 
-        var clusterRadius = useLocationExtentMinimum
-            ? Math.Max(ComputeLocationsDiagonal(projectedLocations) / 100, minimumClusterRadiusMeters)
-            : minimumClusterRadiusMeters;
+        // An explicit pixel radius controls screen-space grouping, not the number of map items.
+        if (!useAdaptiveRadius)
+        {
+            return MakeClusterItems(projectedLocations, minimumClusterRadiusMeters);
+        }
+
+        var clusterRadius = Math.Max(ComputeLocationsDiagonal(projectedLocations) / 100, minimumClusterRadiusMeters);
         var result = new List<LocationClusterGroup>();
         var iterationCount = 0;
 

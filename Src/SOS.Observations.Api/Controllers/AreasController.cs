@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SOS.Api.Contracts.Areas.Requests;
+using SOS.Api.Contracts.Areas;
 using SOS.Api.Contracts.Areas.Responses;
 using SOS.Api.Contracts.Common.Responses;
 using SOS.Lib.Models.Shared;
@@ -11,6 +12,8 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using SOS.Lib.Helpers;
+using Microsoft.Net.Http.Headers;
+using SOS.Observations.Api.Services;
 
 namespace SOS.Observations.Api.Controllers;
 
@@ -93,6 +96,54 @@ public class AreasController : ControllerBase
         {
             _logger.LogError(e, "Error getting area {@areaType} {@featureId}", areaType, featureId);
             return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
+        }
+    }
+
+    /// <summary>
+    /// Get an area's complete geometry as a WGS84 GeoJSON Feature. The response is cacheable for one hour.
+    /// Retain the ETag and send If-None-Match to revalidate; an unchanged geometry returns 304 without a body.
+    /// </summary>
+    /// <param name="areaType">The area type from a filterAreaReferences entry.</param>
+    /// <param name="featureId">The feature identifier from a filterAreaReferences entry.</param>
+    /// <param name="geometryService">Geometry serialization provider.</param>
+    [HttpGet("{areaType}/{featureId}/geometry")]
+    [Produces("application/geo+json")]
+    [ProducesResponseType(typeof(GeoJSON.Text.Feature.Feature), (int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.NotModified)]
+    [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+    [ProducesResponseType((int)HttpStatusCode.NotFound)]
+    public async Task<IActionResult> GetGeometry(
+        [FromRoute] AreaTypeDto areaType,
+        [FromRoute] string featureId,
+        [FromServices] IAreaGeometryService geometryService)
+    {
+        if (!Enum.IsDefined(areaType) || string.IsNullOrWhiteSpace(featureId))
+            return BadRequest("A valid areaType and non-empty featureId are required.");
+
+        try
+        {
+            var geometry = await geometryService.GetAsync(areaType, featureId, HttpContext.RequestAborted);
+            if (geometry == null) return NotFound();
+
+            Response.Headers.CacheControl = AreaGeometryCacheDefaults.CacheControl;
+            Response.Headers.ETag = geometry.ETag;
+            var validator = EntityTagHeaderValue.Parse(geometry.ETag);
+            if (EntityTagHeaderValue.TryParseList(Request.Headers.IfNoneMatch.ToArray(), out var validators) &&
+                validators.Any(value => value.Tag == "*" || value.Tag.Equals(validator.Tag)))
+            {
+                return StatusCode((int)HttpStatusCode.NotModified);
+            }
+
+            return File(geometry.Content, "application/geo+json; charset=utf-8");
+        }
+        catch (OperationCanceledException) when (HttpContext.RequestAborted.IsCancellationRequested)
+        {
+            return new EmptyResult();
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error getting area geometry {AreaType} {FeatureId}", areaType, featureId);
+            return StatusCode((int)HttpStatusCode.InternalServerError);
         }
     }
 

@@ -1820,16 +1820,21 @@ public class ObservationsController : ControllerBase
         {
             LogHelper.AddHttpContextItems(HttpContext, ControllerContext);
             // sensitiveObservations is preserved for backward compability
+            filter ??= new SearchFilterInternalDto();
             filter.ProtectionFilter ??= (sensitiveObservations ? ProtectionFilterDto.Sensitive : ProtectionFilterDto.Public);
             this.User.CheckAuthorization(_observationApiConfiguration.ProtectedScope!, filter.ProtectionFilter);
+            // Reject malformed input separately from a valid viewport whose area intersection is empty.
+            var inputBboxValidation = _inputValidator.ValidateBoundingBox(filter.Geographics?.BoundingBox, false);
+            if (inputBboxValidation.IsFailure) return BadRequest(inputBboxValidation.Error);
             filter = await _searchFilterUtility.InitializeSearchFilterAsync(filter);
+            var emptyBoundingBox = IsEmptyBoundingBox(filter.Geographics?.BoundingBox);
             translationCultureCode = CultureCodeHelper.GetCultureCode(translationCultureCode);
             var sortFieldValidationResult = string.IsNullOrEmpty(sortBy)
                 ? Result.Success<List<string>>(null)
                 : await _inputValidator.ValidateSortFieldsAsync(new[] { sortBy });
             var validationResult = Result.Combine(
                 sortFieldValidationResult,
-                _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
+                emptyBoundingBox ? Result.Success() : _inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
                 _inputValidator.ValidateGeometries(filter?.Geographics),
                 _inputValidator.ValidateSearchPagingArgumentsInternal(skip, take),
                 _inputValidator.ValidateTranslationCultureCode(translationCultureCode));
@@ -1838,6 +1843,13 @@ public class ObservationsController : ControllerBase
             if (sortFieldValidationResult.Value != null && sortFieldValidationResult.Value.Any())
             {
                 sortBy = sortFieldValidationResult.Value.First();
+            }
+
+            if (emptyBoundingBox)
+            {
+                var emptyResult = new PagedResult<JsonObject> { Records = [], Skip = skip, Take = take, TotalCount = 0 };
+                this.LogObservationCount(0);
+                return Ok(emptyResult.ToGeoPagedResultDto(emptyResult.Records, outputFormat));
             }
 
             var searchFilter = filter.ToSearchFilterInternal(this.GetUserId(), translationCultureCode, sortBy, sortOrder);
@@ -2150,7 +2162,7 @@ public class ObservationsController : ControllerBase
     /// <summary>
     /// Returns locations or grid cells, depending on strategy and result size.
     /// Coincident locations form one item, followed by optional meter grouping.
-    /// If enabled, one pixel stage follows: normal clustering or fixed-radius proximity grouping.
+    /// If enabled, one pixel stage follows: normal pixel clustering or fixed-radius detail clustering.
     /// Displayed polygon surfaces stay separate.
     /// isPresentationStatusApproximated covers only presentation.status and presentation.cutoffYearStatus.
     /// isSummaryApproximated covers observationSummary, presentation.statusCounts and presentation.isAllObservationsSensitive;
@@ -2164,17 +2176,17 @@ public class ObservationsController : ControllerBase
     /// <param name="maxGridCells">Maximum number of grid cells used when the endpoint returns grid cells.</param>
     /// <param name="returnInputBBox">Return the input bounding box instead of the result's extent.</param>
     /// <param name="sensitiveObservations">Used when filter.ProtectionFilter is unset: true selects sensitive observations, false selects public observations.</param>
-    /// <param name="cluster">Enable normal pixel clustering or proximity grouping. False disables both.</param>
+    /// <param name="cluster">Enable normal or detail pixel clustering. False disables both.</param>
     /// <param name="clusterRadiusMeters">Optional fixed search radius in metres, applied before pixel clustering even when cluster=false.</param>
-    /// <param name="metersPerPixel">Map resolution in ground metres per CSS pixel, also used for polygon sizing. If omitted, normal clustering uses bbox and result extent; the zoom limit and proximity grouping are unused.</param>
-    /// <param name="disablePixelClusteringAtMetersPerPixel">Zoom limit in m/px: at metersPerPixel &lt;= this value, normal pixel clustering stops and proximity grouping may run. 0 disables the limit; ignored without metersPerPixel.</param>
-    /// <param name="proximityClusterRadiusPx">Fixed search radius in pixels when the zoom or count limit stops normal pixel clustering. Requires cluster=true and metersPerPixel; 0 disables this grouping. Range 0–500.</param>
-    /// <param name="clusterRadiusPx">Initial search radius in pixels for normal clustering. May grow to reduce the number of map items.</param>
+    /// <param name="metersPerPixel">Map resolution in ground metres per CSS pixel, also used for polygon sizing. If omitted, normal clustering uses bbox and result extent and may grow its radius toward 400 map items; the zoom switch and detail clustering are unused.</param>
+    /// <param name="switchToDetailClusteringAtMetersPerPixel">Zoom limit in m/px: at metersPerPixel &lt;= this value, detail clustering replaces normal pixel clustering. 0 disables the zoom switch; ignored without metersPerPixel.</param>
+    /// <param name="detailClusterRadiusPx">Fixed search radius in pixels for detail clustering when the zoom or count limit stops normal pixel clustering. Requires cluster=true and metersPerPixel; 0 disables detail clustering. Range 0–500.</param>
+    /// <param name="clusterRadiusPx">Fixed search radius in pixels for normal clustering when metersPerPixel is supplied. The result may exceed 400 map items. This is a search radius, not a maximum cluster extent.</param>
     /// <param name="minLocationsPerCluster">The minimum number of underlying geographic groups required in a cluster. Coincident location ids count as one geographic group.</param>
-    /// <param name="minLocationCountBeforeClustering">Normal pixel clustering starts above this number of clusterable map items after meter grouping. Proximity grouping may still run below the limit.</param>
+    /// <param name="minLocationCountBeforeClustering">Normal pixel clustering starts above this number of clusterable map items after meter grouping. Detail clustering may still run at or below the limit.</param>
     /// <param name="createPolygons">No returns centroid points; Yes preserves unclustered polygons; WhenNeeded returns polygons large enough to display and requires metersPerPixel.</param>
     /// <param name="bboxQuery">Optional WGS84 bounding box query parameter using minLongitude,minLatitude,maxLongitude,maxLatitude. If provided, it overrides the filter bounding box.</param>
-    /// <param name="includeFilterAreasInResult">Include the filter's area polygons, marked with FeatureType.</param>
+    /// <param name="includeFilterAreasInResult">Include the filter's area polygons as features marked with FeatureType. Lightweight filterAreaReferences with geometry URLs or a common reference to the original request geometries are always included, even when false.</param>
     /// <param name="useCache">If true, reusable location aggregates may be read from and written to cache.</param>
     /// <param name="createSampleObservations">If true, sample observations will be created for map symbol debugging.</param>
     /// <param name="locationAggregationLimit">Both estimated and actual location counts must be below this limit to use representatives. Range 1–10000.</param>
@@ -2214,8 +2226,8 @@ public class ObservationsController : ControllerBase
         [FromQuery] int locationAggregationLimit = 1000,
         [FromQuery] AdaptiveSearchLocationsStrategy adaptiveSearchStrategy = AdaptiveSearchLocationsStrategy.Auto,
         [FromQuery] int? cutoffYear = null,
-        [FromQuery] double disablePixelClusteringAtMetersPerPixel = AdaptiveSearchLocationsDefaults.DisablePixelClusteringAtMetersPerPixel,
-        [FromQuery] double proximityClusterRadiusPx = AdaptiveSearchLocationsDefaults.ProximityClusterRadiusPx)
+        [FromQuery] double switchToDetailClusteringAtMetersPerPixel = AdaptiveSearchLocationsDefaults.SwitchToDetailClusteringAtMetersPerPixel,
+        [FromQuery] double detailClusterRadiusPx = AdaptiveSearchLocationsDefaults.DetailClusterRadiusPx)
     {
         var totalStopwatch = Stopwatch.StartNew();
         ApiUserType userType = this.GetApiUserType();
@@ -2248,10 +2260,10 @@ public class ObservationsController : ControllerBase
                 clusterRadiusMeters.HasValue && (!double.IsFinite(clusterRadiusMeters.Value) || clusterRadiusMeters.Value <= 0)
                     ? Result.Failure("clusterRadiusMeters must be positive and finite.") : Result.Success(),
                 ValidateMetersPerPixel(metersPerPixel),
-                !double.IsFinite(disablePixelClusteringAtMetersPerPixel) || disablePixelClusteringAtMetersPerPixel < 0
-                    ? Result.Failure("disablePixelClusteringAtMetersPerPixel must be non-negative and finite.") : Result.Success(),
-                !double.IsFinite(proximityClusterRadiusPx) || proximityClusterRadiusPx < 0 || proximityClusterRadiusPx > 500
-                    ? Result.Failure("proximityClusterRadiusPx must be finite and between 0 and 500.") : Result.Success(),
+                !double.IsFinite(switchToDetailClusteringAtMetersPerPixel) || switchToDetailClusteringAtMetersPerPixel < 0
+                    ? Result.Failure("switchToDetailClusteringAtMetersPerPixel must be non-negative and finite.") : Result.Success(),
+                !double.IsFinite(detailClusterRadiusPx) || detailClusterRadiusPx < 0 || detailClusterRadiusPx > 500
+                    ? Result.Failure("detailClusterRadiusPx must be finite and between 0 and 500.") : Result.Success(),
                 ValidateMetersPerPixelForPolygonMode((CreatePolygonsMode)createPolygons, metersPerPixel),
                 //_inputValidator.ValidateBoundingBox(filter?.Geographics?.BoundingBox, false),
                 _inputValidator.ValidateGeometries(filter?.Geographics));
@@ -2275,8 +2287,8 @@ public class ObservationsController : ControllerBase
                 Cluster = cluster,
                 ClusterRadiusMeters = clusterRadiusMeters,
                 MetersPerPixel = metersPerPixel,
-                DisablePixelClusteringAtMetersPerPixel = disablePixelClusteringAtMetersPerPixel,
-                ProximityClusterRadiusPx = proximityClusterRadiusPx,
+                SwitchToDetailClusteringAtMetersPerPixel = switchToDetailClusteringAtMetersPerPixel,
+                DetailClusterRadiusPx = detailClusterRadiusPx,
                 ClusterRadiusPx = clusterRadiusPx,
                 MinLocationsPerCluster = minLocationsPerCluster,
                 MinimumLocationCountBeforeClustering = minLocationCountBeforeClustering,
@@ -2296,7 +2308,8 @@ public class ObservationsController : ControllerBase
             }
 
             HttpContext?.RequestAborted.ThrowIfCancellationRequested();
-            return await WriteAdaptiveSearchLocationsResponseAsync(result, totalStopwatch, cutoffYear);
+            var filterAreaReferences = FilterAreaReferenceFactory.Create(filter?.Geographics, Request.PathBase);
+            return await WriteAdaptiveSearchLocationsResponseAsync(result, totalStopwatch, cutoffYear, filterAreaReferences);
         }
         catch (AuthenticationRequiredException e)
         {
@@ -2328,7 +2341,8 @@ public class ObservationsController : ControllerBase
     private async Task<IActionResult> WriteAdaptiveSearchLocationsResponseAsync(
         AdaptiveSearchLocationsResult result,
         Stopwatch totalStopwatch,
-        int? cutoffYear)
+        int? cutoffYear,
+        IReadOnlyList<FilterAreaReferenceDto> filterAreaReferences)
     {
         Response.StatusCode = (int)HttpStatusCode.OK;
         Response.Headers.Append("X-Observations-TotalCount", result.ObservationsTotalCount.ToString());
@@ -2360,7 +2374,8 @@ public class ObservationsController : ControllerBase
 
         if (result.ResultType == "geogrid")
         {
-            await Response.WriteAsync(result.GeoJson ?? string.Empty, Encoding.UTF8, HttpContext.RequestAborted);
+            await Response.WriteAsync(AdaptiveSearchLocationsGeoJsonWriter.AddFilterAreaReferences(
+                result.GeoJson, filterAreaReferences), Encoding.UTF8, HttpContext.RequestAborted);
             await Response.Body.FlushAsync(HttpContext.RequestAborted);
             return new EmptyResult();
         }
@@ -2371,7 +2386,8 @@ public class ObservationsController : ControllerBase
             Response,
             cutoffYear,
             result.GeographicAreas,
-            HttpContext.RequestAborted);
+            HttpContext.RequestAborted,
+            filterAreaReferences);
         return new EmptyResult();
     }
 

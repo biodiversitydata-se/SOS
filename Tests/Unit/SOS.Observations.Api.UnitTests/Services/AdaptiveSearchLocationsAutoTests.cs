@@ -42,7 +42,7 @@ public class AdaptiveSearchLocationsAutoTests
         {
             Filter = filter, AdaptiveSearchStrategy = strategy, ObservationsLimit = 100,
             Cluster = clusterMode is 2 or 3, ClusterRadiusMeters = clusterMode is 1 or 3 ? 100 : null,
-            MetersPerPixel = 1, DisablePixelClusteringAtMetersPerPixel = 0, ClusterRadiusPx = 40, MinLocationsPerCluster = 2,
+            MetersPerPixel = 1, SwitchToDetailClusteringAtMetersPerPixel = 0, ClusterRadiusPx = 40, MinLocationsPerCluster = 2,
             MinimumLocationCountBeforeClustering = 0
         };
 
@@ -156,7 +156,7 @@ public class AdaptiveSearchLocationsAutoTests
         var result = await Service(manager).SearchAsync(new AdaptiveSearchLocationsRequest
         {
             Filter = new(), AdaptiveSearchStrategy = AdaptiveSearchLocationsStrategy.LocationsThenGrid,
-            CutoffYear = 2024, Cluster = cluster, MetersPerPixel = 1, DisablePixelClusteringAtMetersPerPixel = 0, ClusterRadiusPx = 40,
+            CutoffYear = 2024, Cluster = cluster, MetersPerPixel = 1, SwitchToDetailClusteringAtMetersPerPixel = 0, ClusterRadiusPx = 40,
             MinLocationsPerCluster = 2, MinimumLocationCountBeforeClustering = 0
         });
         result.LocationPresentationStatusApproximated.Should().BeTrue();

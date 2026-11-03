@@ -23,10 +23,10 @@ public sealed class AdaptiveSearchLocationsRequest
     public bool Cluster { get; init; }
     public double? ClusterRadiusMeters { get; init; }
     public double? MetersPerPixel { get; init; }
-    /// <summary>Disables adaptive pixel clustering at or below this ground resolution; 0 disables the cutoff.</summary>
-    public double DisablePixelClusteringAtMetersPerPixel { get; init; } = AdaptiveSearchLocationsDefaults.DisablePixelClusteringAtMetersPerPixel;
-    /// <summary>Fixed pixel search radius when adaptive clustering is skipped; 0 disables proximity grouping.</summary>
-    public double ProximityClusterRadiusPx { get; init; } = AdaptiveSearchLocationsDefaults.ProximityClusterRadiusPx;
+    /// <summary>Switches from normal pixel clustering to detail clustering at or below this ground resolution; 0 disables the zoom switch.</summary>
+    public double SwitchToDetailClusteringAtMetersPerPixel { get; init; } = AdaptiveSearchLocationsDefaults.SwitchToDetailClusteringAtMetersPerPixel;
+    /// <summary>Fixed pixel search radius when normal pixel clustering is skipped due to the zoom or count limit; 0 disables detail clustering.</summary>
+    public double DetailClusterRadiusPx { get; init; } = AdaptiveSearchLocationsDefaults.DetailClusterRadiusPx;
     public double ClusterRadiusPx { get; init; } = AdaptiveSearchLocationsDefaults.ClusterRadiusPx;
     public int MinLocationsPerCluster{ get; init; }
     public int MinimumLocationCountBeforeClustering { get; init; } = AdaptiveSearchLocationsDefaults.MinLocationCountBeforeClustering;

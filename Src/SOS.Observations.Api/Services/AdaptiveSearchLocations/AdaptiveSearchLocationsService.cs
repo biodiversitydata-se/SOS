@@ -55,7 +55,7 @@ internal sealed class AdaptiveSearchLocationsService : IAdaptiveSearchLocationsS
             DefaultSortOrder);
         var strategy = AdaptiveSearchLocationsStrategySelector.Resolve(request, searchFilter);
         var clusterPixels = AdaptiveSearchLocationsClusteringPolicy.ShouldClusterPixels(request);
-        var proximityClusterRadiusPx = AdaptiveSearchLocationsClusteringPolicy.GetProximityClusterRadiusPx(request);
+        var detailClusterRadiusPx = AdaptiveSearchLocationsClusteringPolicy.GetDetailClusterRadiusPx(request);
         if (request.BoundingBoxIsEmpty)
         {
             var geographicAreas = await GetGeoJsonGeographicAreasAsync(request, searchFilter);
@@ -75,7 +75,7 @@ internal sealed class AdaptiveSearchLocationsService : IAdaptiveSearchLocationsS
         }
 
         var timings = new AdaptiveSearchLocationsTimings();
-        var context = new LocationResultContext(request, strategy, searchFilter, timings, clusterPixels, proximityClusterRadiusPx);
+        var context = new LocationResultContext(request, strategy, searchFilter, timings, clusterPixels, detailClusterRadiusPx);
         var canUseLocationsCache = request.UseCache &&
                                    request.Filter.ProtectionFilter == ProtectionFilterDto.Public &&
                                    request.Filter.ObservedByMe != true &&
@@ -294,7 +294,7 @@ internal sealed class AdaptiveSearchLocationsService : IAdaptiveSearchLocationsS
     }
     private sealed record LocationResultContext(AdaptiveSearchLocationsRequest Request,
         AdaptiveSearchLocationsStrategy Strategy, SearchFilterInternal Filter,
-        AdaptiveSearchLocationsTimings Timings, bool ClusterPixels, double ProximityRadiusPx);
+        AdaptiveSearchLocationsTimings Timings, bool ClusterPixels, double DetailClusterRadiusPx);
 
     private sealed record LocationResultData(List<CachedLocationAggregate>? Aggregates,
         List<JsonObject>? SampleRecords, long ObservationCount, long? EstimatedLocationCount,
@@ -325,7 +325,7 @@ internal sealed class AdaptiveSearchLocationsService : IAdaptiveSearchLocationsS
             ClusterRadiusPx = request.ClusterRadiusPx, MinLocationsPerCluster = request.MinLocationsPerCluster,
             MinLocationCountBeforeClustering = request.MinimumLocationCountBeforeClustering,
             PolygonGeometries = polygons, CreatePolygons = request.CreatePolygons,
-            ProximityClusterRadiusPx = context.ProximityRadiusPx
+            DetailClusterRadiusPx = context.DetailClusterRadiusPx
         };
         var features = data.Aggregates is not null
             ? _clusterItemFactory.CreateItems(data.Aggregates, options)

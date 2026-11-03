@@ -706,7 +706,7 @@ public partial class AdaptiveSearchLocationsTests : ElasticsearchTestBase
         using var apiClient = TestFixture.CreateApiClient();
         var searchFilter = CreateBoundingBoxFilter(TaxonIds.Sjögull, 13.84, 58.40, 13.90, 58.35);
 
-        var baseUrl = "/observations/internal/adaptivesearchlocations?adaptiveSearchStrategy=ObservationsThenGrid&observationsLimit=100&cluster=true&returnInputBBox=true&metersPerPixel=1000&clusterRadiusPx=100&minLocationsPerCluster=2&useCache=false&proximityClusterRadiusPx=0";
+        var baseUrl = "/observations/internal/adaptivesearchlocations?adaptiveSearchStrategy=ObservationsThenGrid&observationsLimit=100&cluster=true&returnInputBBox=true&metersPerPixel=1000&clusterRadiusPx=100&minLocationsPerCluster=2&useCache=false&detailClusterRadiusPx=0";
 
         // Act
         using var thresholdEqualsCountResponse = await apiClient.PostAsync(
@@ -1033,7 +1033,7 @@ public partial class AdaptiveSearchLocationsTests : ElasticsearchTestBase
         meterFeature["properties"]!["groupingType"]!.GetValue<string>().Should().Be("meterCluster");
         meterFeature["properties"]!["observationCount"]!.GetValue<int>().Should().Be(7);
         meterFeature["properties"]!["locations"]!["ids"]!.AsArray().Should().HaveCount(7);
-        var both = await client.PostAsync(url.Replace("cluster=false", "cluster=true") + "&clusterRadiusMeters=100&metersPerPixel=1&minLocationCountBeforeClustering=0&disablePixelClusteringAtMetersPerPixel=0", JsonContent.Create(filter), TestContext.Current.CancellationToken);
+        var both = await client.PostAsync(url.Replace("cluster=false", "cluster=true") + "&clusterRadiusMeters=100&metersPerPixel=1&minLocationCountBeforeClustering=0&switchToDetailClusteringAtMetersPerPixel=0", JsonContent.Create(filter), TestContext.Current.CancellationToken);
         var bothFeature = JsonNode.Parse(await both.Content.ReadAsStringAsync(TestContext.Current.CancellationToken))!["features"]!.AsArray().Single()!;
         bothFeature["properties"]!["groupingType"]!.GetValue<string>().Should().Be("meterCluster");
         bothFeature["id"]!.GetValue<string>().Should().Be(meterFeature["id"]!.GetValue<string>());

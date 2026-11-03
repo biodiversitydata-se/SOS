@@ -143,6 +143,7 @@ static void ConfigureServices(
                 .AllowAnyHeader()
                 .AllowAnyMethod()
                 .AllowAnyOrigin()
+                .WithExposedHeaders("ETag")
             );
         });
     }

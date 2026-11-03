@@ -298,7 +298,8 @@
 
                         <MudNumericField T="double"
                                          @bind-Value="clusterRadiusPx"
-                                         Label="Radie för vanlig pixelklustring (px)"
+                                         Label="Fast sökradie för vanlig pixelklustring (px)"
+                                         HelperText="Radien ökas inte för att minska antalet kartobjekt. Klustrets utbredning kan vara större."
                                          Variant="Variant.Outlined"
                                          Margin="Margin.Dense"
                                          Disabled="@(!cluster)"
@@ -319,9 +320,9 @@
                                          FullWidth="true" />
 
                         <MudNumericField T="double"
-                                         @bind-Value="disablePixelClusteringAtMetersPerPixel"
-                                         Label="Stäng av vanlig pixelklustring vid ≤ (m/px)"
-                                         HelperText="0 = ingen automatisk avstängning. Fast meterklustring påverkas inte."
+                                         @bind-Value="switchToDetailClusteringAtMetersPerPixel"
+                                         Label="Växla till detaljklustring vid ≤ (m/px)"
+                                         HelperText="0 = ingen zoomväxling. Fast meterklustring påverkas inte."
                                          Variant="Variant.Outlined"
                                          Margin="Margin.Dense"
                                          Disabled="@(!cluster)"
@@ -332,7 +333,7 @@
                         <MudNumericField T="int"
                                          @bind-Value="minLocationCountBeforeClustering"
                                          Label="Min kartobjekt innan pixelklustring"
-                                         HelperText="Gäller vanlig pixelklustring. Mycket nära punkter kan fortfarande grupperas."
+                                         HelperText="Gäller vanlig pixelklustring. Vid eller under antalsgränsen används detaljklustring."
                                          Variant="Variant.Outlined"
                                          Margin="Margin.Dense"
                                          Disabled="@(!cluster)"
@@ -342,9 +343,9 @@
                                          FullWidth="true" />
 
                         <MudNumericField T="double"
-                                         @bind-Value="proximityClusterRadiusPx"
-                                         Label="Gruppera mycket nära punkter (px)"
-                                         HelperText="Används när vanlig pixelklustring stoppas av zoom- eller antalsgränsen. 0 = av."
+                                         @bind-Value="detailClusterRadiusPx"
+                                         Label="Fast sökradie för detaljklustring (px)"
+                                         HelperText="Används när vanlig pixelklustring stoppas av zoom- eller antalsgränsen. 0 = detaljklustring av."
                                          Variant="Variant.Outlined"
                                          Margin="Margin.Dense"
                                          Disabled="@(!cluster)"
@@ -414,6 +415,13 @@
                                      Dense="true" />
 
                         <MudCheckBox T="bool"
+                                     Value="@showFilterAreaOutlines"
+                                     ValueChanged="OnShowFilterAreaOutlinesChanged"
+                                     Label="Visa sökfiltrets konturer"
+                                     Color="Color.Primary"
+                                     Dense="true" />
+
+                        <MudCheckBox T="bool"
                                      Value="@showClusterRadiusCircles"
                                      ValueChanged="OnShowClusterRadiusCirclesChanged"
                                      Label="Visa klusterradie"
@@ -456,6 +464,10 @@
 
                 <MudExpansionPanel Text="Teckenförklaring">
                     <MudStack Spacing="2">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span style="width: 22px; height: 14px; border: 2px dashed #00695c; display: inline-block;"></span>
+                            <MudText Typo="Typo.body2">Sökfiltrets konturer</MudText>
+                        </div>
                         <MudText Typo="Typo.subtitle2">Punktlokaler och polygonlokaler</MudText>
                         <MudStack Spacing="1">
                             <div style="display: flex; align-items: center; gap: 10px;">

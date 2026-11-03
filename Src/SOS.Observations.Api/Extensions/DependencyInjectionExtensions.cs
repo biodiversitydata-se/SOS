@@ -108,6 +108,7 @@ public static class DependencyInjectionExtensions
             // Add Caches
             services.AddSingleton<SearchTotalCountCache>();
             services.AddSingleton<IAreaCache, AreaCache>();
+            services.AddScoped<IAreaGeometryService, AreaGeometryService>();
             services.AddFusionCache(ProcessedLocationRepository.LocationGeometryCacheName)
                 .WithCacheKeyPrefixByCacheName()
                 .WithMemoryCache(new MemoryCache(new MemoryCacheOptions

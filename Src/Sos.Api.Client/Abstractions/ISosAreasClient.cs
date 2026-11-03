@@ -19,6 +19,13 @@ public interface ISosAreasClient
         string featureId,
         CancellationToken cancellationToken = default);
 
+    /// <summary>Gets an area's GeoJSON Feature. Supply a previously cached ETag to revalidate; reuse the cached body when NotModified is true.</summary>
+    Task<AreaGeometryResponse> GetAreaGeometryAsync(
+        AreaTypeDto areaType,
+        string featureId,
+        string? ifNoneMatch = null,
+        CancellationToken cancellationToken = default);
+
     /// <summary>Exports one area's geometry in the requested format.</summary>
     Task<byte[]?> GetAreaExportAsync(
         AreaTypeDto areaType,

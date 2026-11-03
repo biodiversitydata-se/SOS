@@ -17,5 +17,5 @@ public sealed record LocationClusteringOptions
     public double ClusterRadiusPx { get; init; }
     public double? ClusterRadiusMeters { get; init; }
     public bool ClusterPixels { get; init; }
-    public double ProximityClusterRadiusPx { get; init; }
+    public double DetailClusterRadiusPx { get; init; }
 }

@@ -94,7 +94,7 @@ internal sealed class AdaptiveSearchLocationFeatureFactory : IAdaptiveSearchLoca
             .ToList();
         var clusterer = new Sweref99TmFastGreedyLocationClusterer(options.MinLocationCountBeforeClustering, DefaultMaxLocationCountAfterClustering, options.MinLocationsPerCluster);
         var locationFeatures = clusterer.ClusterLocations(clusterableObservations, options.BoundingBox, options.MetersPerPixel,
-            options.ClusterRadiusPx, options.ClusterRadiusMeters, options.ClusterPixels, options.ProximityClusterRadiusPx);
+            options.ClusterRadiusPx, options.ClusterRadiusMeters, options.ClusterPixels, options.DetailClusterRadiusPx);
 
         locationFeatures = NormalizeNonClusteredLocationItems(locationFeatures);
         locationFeatures.AddRange(_aggregator.GroupObservationsByLocation(polygonObservations)

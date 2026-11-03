@@ -1,6 +1,7 @@
 ﻿using SOS.Api.Contracts.Common.Geo;
 ﻿using NetTopologySuite.Geometries;
 using Microsoft.AspNetCore.Http;
+using SOS.Api.Contracts.Observations.Responses;
 using NetTopologySuite.Features;
 using SOS.Lib.Enums;
 using SOS.Lib.Gis;
@@ -8,6 +9,7 @@ using SOS.Lib.Models.Gis;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.Json.Nodes;
 using System.Text.Unicode;
 
 namespace SOS.Observations.Api.Services.AdaptiveSearchLocations;
@@ -46,12 +48,15 @@ internal static class AdaptiveSearchLocationsGeoJsonWriter
         HttpResponse response,
         int? cutoffYear = null,
         List<Feature>? geographicAreas = null,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default,
+        IReadOnlyList<FilterAreaReferenceDto>? filterAreaReferences = null)
     {
         await using var jsonWriter = new Utf8JsonWriter(response.BodyWriter, JsonWriterOptions);
         jsonWriter.WriteStartObject();
         jsonWriter.WriteString("type", "FeatureCollection");
         WriteGeoJsonBbox(jsonWriter, bbox);
+        jsonWriter.WritePropertyName("filterAreaReferences");
+        JsonSerializer.Serialize(jsonWriter, filterAreaReferences ?? Array.Empty<FilterAreaReferenceDto>(), JsonSerializerOptions);
         jsonWriter.WritePropertyName("features");
         jsonWriter.WriteStartArray();
 
@@ -93,6 +98,15 @@ internal static class AdaptiveSearchLocationsGeoJsonWriter
         jsonWriter.WriteEndObject();
         await jsonWriter.FlushAsync(cancellationToken);
         await response.BodyWriter.FlushAsync(cancellationToken);
+    }
+
+    internal static string AddFilterAreaReferences(string? geoJson, IReadOnlyList<FilterAreaReferenceDto> references)
+    {
+        var root = string.IsNullOrWhiteSpace(geoJson)
+            ? new JsonObject { ["type"] = "FeatureCollection", ["features"] = new JsonArray() }
+            : JsonNode.Parse(geoJson)!.AsObject();
+        root["filterAreaReferences"] = JsonSerializer.SerializeToNode(references, JsonSerializerOptions);
+        return root.ToJsonString();
     }
 
     private static void WriteGeographicAreaFeature(Utf8JsonWriter jsonWriter, Feature feature)

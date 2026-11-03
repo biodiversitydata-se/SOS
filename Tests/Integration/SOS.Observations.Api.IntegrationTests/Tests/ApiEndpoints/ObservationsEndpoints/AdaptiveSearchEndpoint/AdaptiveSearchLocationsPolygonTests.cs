@@ -47,7 +47,7 @@ public partial class AdaptiveSearchLocationsTests
         {
             var (mode, resolution, separate) = cases[index];
             var query = $"/observations/internal/adaptivesearchlocations?adaptiveSearchStrategy={strategy}&observationsLimit=100" +
-                        $"&cluster=true&clusterRadiusMeters=100&clusterRadiusPx=40&minLocationCountBeforeClustering=0&disablePixelClusteringAtMetersPerPixel=0" +
+                        $"&cluster=true&clusterRadiusMeters=100&clusterRadiusPx=40&minLocationCountBeforeClustering=0&switchToDetailClusteringAtMetersPerPixel=0" +
                         $"&createPolygons={mode}&returnInputBBox=true";
             if (resolution.HasValue) query += $"&metersPerPixel={resolution}";
             using var response = await client.PostAsync(query, JsonContent.Create(filter), TestContext.Current.CancellationToken);

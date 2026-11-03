@@ -56,13 +56,14 @@ function load() {
             }
         } }
     };
-    const context = vm.createContext({ ol, window: { ol }, console: { error: (...args) => counters.errors.push(args) },
-        JSON: { parse: text => { counters.parses++; return JSON.parse(text); } } });
+    const context = vm.createContext({ ol, window: { ol }, AbortController,
+        console: { error: (...args) => counters.errors.push(args) },
+        JSON: { parse: text => { counters.parses++; return JSON.parse(text); }, stringify: JSON.stringify } });
     const sharedSource = fs.readFileSync(new URL('../../../Src/SOS.Status.Web.Client/wwwroot/openLayersMap.js', import.meta.url), 'utf8').replace(/export /g, '');
     vm.runInContext(`globalThis.openLayersMap = (() => { ${sharedSource}; return { removeLayer, configurePolygonRendering, configureCoordinateUncertaintyLayer, configureClusterRadiusLayer }; })();`, context);
     const source = fs.readFileSync(new URL('../../../Src/SOS.Status.Web.Client/Pages/LocationsSearch.razor.js', import.meta.url), 'utf8')
         .replace(/^\s*import .*;$/m, '').replace(/export /g, '');
-    vm.runInContext(source + '\nglobalThis.api = { renderMapResult, loadGeoJsonLayer(layerId, geoJson, resultType) { return renderMapResult(layerId, geoJson, { resultType }); }, configureLocationOverlays, setHighlightedLocationIds, removeLayer, destroyMap, attachMap(value) { map = value; } };', context);
+    vm.runInContext(source + '\nglobalThis.api = { renderMapResult, loadGeoJsonLayer(layerId, geoJson, resultType) { return renderMapResult(layerId, geoJson, { resultType }); }, flushFilterAreas() { return filterAreaPending; }, configureLocationOverlays, setHighlightedLocationIds, removeLayer, destroyMap, attachMap(value) { map = value; } };', context);
     const map = {
         layers: [],
         getAllLayers() { return this.layers; },
@@ -76,6 +77,28 @@ function load() {
     api.attachMap(map);
     return { api, map, counters, layer: id => map.layers.find(layer => layer.get('id') === id) };
 }
+
+test('filter references render outlines in a separate layer across location and grid results', async () => {
+    const { api, layer, counters } = load();
+    const polygon = { type: 'Polygon', coordinates: [[[15, 59], [15, 60], [16, 60], [15, 59]]] };
+    const collection = JSON.parse(result());
+    collection.filterAreaReferences = [{ featureType: 'FilterArea.OwnGeometries' }];
+    collection.features.push({ type: 'Feature', geometry: polygon, properties: { FeatureType: 'FilterArea.OwnPolygon' } });
+    const options = { filterJson: JSON.stringify({ geographics: { geometries: [polygon] } }), showFilterAreaOutlines: true };
+    api.renderMapResult('locations', JSON.stringify(collection), { ...options, resultType: 'locations' });
+    await api.flushFilterAreas();
+    assert.equal(layer('locations').source.features.length, 2, 'inline filter areas are excluded from observation hits');
+    const outlines = layer('filter-areas'), outlinesSource = outlines.source;
+    assert.equal(outlinesSource.features.length, 1);
+    assert.equal(outlines.style.fill, undefined);
+    assert.equal(outlines.get('sosNonInteractive'), true);
+    const grid = { type: 'FeatureCollection', features: [], filterAreaReferences: collection.filterAreaReferences };
+    api.renderMapResult('locations', JSON.stringify(grid), { ...options, resultType: 'geogrid' });
+    await api.flushFilterAreas();
+    assert.equal(layer('filter-areas'), outlines);
+    assert.equal(outlines.source, outlinesSource, 'a result-type change does not reparse the filter geometry');
+    assert.equal(counters.errors.length, 0);
+});
 
 test('hidden overlays create no layers or circle geometry and the result is parsed once', () => {
     const { api, map, counters } = load();

@@ -63,16 +63,16 @@ Lokalresultat grupperas i denna ordning:
 
 | Pixelsteg | När det används | Sökradie |
 |---|---|---|
-| Vanlig pixelklustring | Zoomgränsen och antalsgränsen tillåter det. | Börjar vid `metersPerPixel × clusterRadiusPx` meter och kan växa mot målet 400 kartobjekt. |
-| Liten pixelgruppering | Zoom- eller antalsgränsen stoppar det vanliga steget. | Exakt `metersPerPixel × proximityClusterRadiusPx` meter, utan radieökning. |
+| Vanlig pixelklustring | Zoomgränsen och antalsgränsen tillåter det. | Fast sökradie på `metersPerPixel × clusterRadiusPx` meter, utan radieökning. |
+| Detaljklustring | Zoom- eller antalsgränsen stoppar det vanliga steget. | Fast sökradie på `metersPerPixel × detailClusterRadiusPx` meter, utan radieökning. |
 
-När `metersPerPixel` anges kräver vanlig pixelklustring `metersPerPixel > disablePixelClusteringAtMetersPerPixel`, om zoomgränsen inte är `0`. Antalet klustringsbara kartobjekt måste också vara **större än** `minLocationCountBeforeClustering`, räknat efter metersteget och utan separata polygoner.
+När `metersPerPixel` anges kräver vanlig pixelklustring `metersPerPixel > switchToDetailClusteringAtMetersPerPixel`, om zoomgränsen inte är `0`. Antalet klustringsbara kartobjekt måste också vara **större än** `minLocationCountBeforeClustering`, räknat efter metersteget och utan separata polygoner.
 
-Med standardvärdena börjar vanlig pixelklustring vid 20 px när upplösningen är 5 m/px, alltså 100 meter. Vid 1 m/px används i stället den fasta radien 10 px, alltså 10 meter. Zoomgränsen 2 m/px väljer pixelsteg; den anger ingen radie.
+Med standardvärdena använder vanlig pixelklustring den fasta radien 20 px när upplösningen är 5 m/px, alltså 100 meter. Vid 1 m/px används i stället den fasta radien 10 px, alltså 10 meter. Zoomgränsen 2 m/px väljer pixelsteg; den anger ingen radie.
 
-Utan `metersPerPixel` beräknas vanlig klustringsradie från bbox och resultatets utbredning. Zoomgränsen och liten pixelgruppering används då inte. `cluster=false` stänger av båda pixelstegen. `proximityClusterRadiusPx=0` stänger av enbart den lilla grupperingen.
+Utan `metersPerPixel` beräknas vanlig klustringsradie från bbox och resultatets utbredning och kan öka mot målet 400 kartobjekt. Zoomgränsen och detaljklustring används då inte. `cluster=false` stänger av båda pixelstegen. `detailClusterRadiusPx=0` stänger av enbart detaljklustringen.
 
-`minLocationsPerCluster` gäller alla kluster och räknar geografiska grupper; sammanfallande lokal-id:n räknas som en grupp. Metergrupper delas inte av pixelsteget. Radierna är sökradier, inte maximal klusterutbredning: närliggande grupper kan slås ihop. Den fasta pixelradien kan därför lämna fler än 400 kartobjekt.
+`minLocationsPerCluster` gäller alla kluster och räknar geografiska grupper; sammanfallande lokal-id:n räknas som en grupp. Metergrupper delas inte av pixelsteget. Radierna är sökradier, inte maximal klusterutbredning: närliggande grupper kan slås ihop. Med `metersPerPixel` kan båda pixelstegen lämna fler än 400 kartobjekt; sökradien ökas inte för att minska antalet. Växling till geogrid styrs fortfarande av sökstrategin och gränserna för observationer och lokaler före klustring, inte av antalet kartobjekt efter klustring.
 
 Lämna `clusterRadiusMeters` tom för enbart zoomstyrd klustring. Metersteget används när du också behöver en fast sökradie i meter.
 
@@ -109,7 +109,50 @@ Lokaler kan ha punkt- eller polygongeometri. Kluster är punkter vid klustrets m
 
 Använd feature-id för kartobjektets identitet och `locations.ids` vid observationssökningar. Kluster-id bygger på alla medlems-id:n, oberoende av ordning och skiftläge. Begränsningen till fem `items` gäller bara lokalernas metadata.
 
-Med `includeFilterAreasInResult=true` tillkommer områdesfeatures märkta med `properties.FeatureType`: `FilterArea.Area` eller `FilterArea.OwnPolygon`. De har andra properties än lokalfeatures.
+Med `includeFilterAreasInResult=true` tillkommer områdesfeatures märkta med `properties.FeatureType`: `FilterArea.Area`, `FilterArea.OwnPolygon` eller `FilterArea.Polygon` för en sökcirkel. De har andra properties än lokalfeatures.
+
+### Filterytor utan upprepad överföring
+
+Alla svar från `AdaptiveSearchLocationsInternal` innehåller `filterAreaReferences` på FeatureCollection-nivå, även när `includeFilterAreasInResult=false`. Det gäller lokalresultat, cacheträffar, tomma resultat och geogrid. Utan geografiska filter är listan tom. Referenserna är metadata och ingår inte i `X-Feature-Count`.
+
+```json
+{
+  "type": "FeatureCollection",
+  "filterAreaReferences": [
+    {
+      "featureType": "FilterArea.Area",
+      "areaType": "County",
+      "featureId": "1",
+      "geometryUrl": "/areas/County/1/geometry"
+    },
+    {
+      "featureType": "FilterArea.OwnGeometries"
+    }
+  ],
+  "features": []
+}
+```
+
+Exemplet visar bara relevanta fält; övriga referensfält kan vara `null`. `geometryUrl` är relativ till API:ts origin och inkluderar eventuell `PathBase`. Vid ett separat webb-/proxyursprung ska länken därför lösas mot observations-API:t. Argumenten `areaType` och `featureId` kan alltid användas för att bygga anropet mot klientens konfigurerade API-basadress. Länkarna gäller oberoende av kartans bbox och zoom. Dubbletter av samma områdestyp/id ger en referens.
+
+Hämta lagrade områden med:
+
+```http
+GET /areas/County/1/geometry
+Accept: application/geo+json
+```
+
+Svaret är en GeoJSON Feature i WGS84 utan ZIP-arkiv, med samma områdesmetadata som en inbäddad `FilterArea.Area`. Vanlig HTTP-komprimering kan användas. Ingen klippning eller förenkling görs. Okänt område eller saknad geometri ger `404`; ogiltig områdestyp ger `400`.
+
+Endpointen returnerar `Cache-Control: public, max-age=3600` och en innehållsbaserad svag `ETag`. Spara validatorn tillsammans med geometrin. Vid omvalidering skickas den som `If-None-Match`; `304 Not Modified` saknar kropp och betyder att klientens tidigare geometri ska återanvändas. Både `200` och `304` innehåller cachehuvudena. Geometri och områdesmetadata hämtas via `AreaManager` från den befintliga `IAreaCache`. GeoJSON och ETag beräknas för varje anrop som når API:t, även vid `304`, och sparas inte i någon separat servercache. HTTP-cachen och kartans återanvändning minskar antalet sådana anrop. Underliggande områdescache påverkar när ändringar i källdatat blir tillgängliga; dess geometridictionary har ingen tidsbaserad utgång.
+
+Egna geometrier lagras inte av sökanropet och får därför ingen serverlänk. En enda referens av typen `FilterArea.OwnGeometries` representerar hela listan i den ursprungliga begärans `geographics.geometries`, oavsett antalet geometrier. Klienten läser listan och ritar geometrierna som separata features i samma konturlager. Polygoner och MultiPolygon behåller sina koordinater och hål; ingen sammanslagning eller geometrisk union görs och sökfiltret ändras inte.
+
+För sökcirklar behålls den befintliga hanteringen: om den första geometrin är en punkt och `maxDistanceFromPoint` är positivt, returneras i stället en `FilterArea.Polygon`-referens till den första punkten med det ursprungliga `maxDistanceFromPoint`. Bara den cirkeln visas då, precis som för inbäddade filterytor. Klienten har redan koordinaterna och kan behålla dem utan att de skickas tillbaka. En tom geometrielista ger ingen egen referens. Kartans bbox skapar ingen egen filterreferens.
+
+Behåll filterytorna i ett separat kartlager och använd normalt `includeFilterAreasInResult=false` under zoom och panorering. Låt lagrade områdens typ/id styra klientcachen. Flaggan `true` fungerar fortfarande för klienter som vill ha geometrierna inbäddade i varje söksvar. Egna polygoner skickas fortfarande i sökbegäran; den här ändringen inför inget lagrat geometri-id för sökning.
+
+I .NET-klienten finns `ISosAreasClient.GetAreaGeometryAsync(areaType, featureId, ifNoneMatch, cancellationToken)`. Resultatet innehåller `GeoJson`, `ETag` och `NotModified`. Läs filterreferenserna ur söksvarets `GeoJson`, exempelvis med `JsonDocument` och kontraktet `FilterAreaReferenceDto`.
 
 ### Hur exakta är värdena?
 
@@ -188,7 +231,7 @@ Ogiltiga parametervärden ger HTTP 400.
 | `returnInputBBox` | `false` | `true`/`false` | Returnerar inmatad bbox i stället för resultatets utbredning. |
 | `sensitiveObservations` | `false` | `true`/`false` | Väljer skyddade/publika fynd när `filter.protectionFilter` saknas. |
 | `cutoffYear` | `null` | Heltal | Delar presentationen före och från och med året; ändrar inte sökfiltret. |
-| `includeFilterAreasInResult` | `false` | `true`/`false` | Lägger till filterområden som separata features. |
+| `includeFilterAreasInResult` | `false` | `true`/`false` | Lägger till filtergeometrier som separata features. `filterAreaReferences` returneras även vid `false`. |
 | `useCache` | `true` | `true`/`false` | Tillåter läsning och skrivning i lokalcachen. |
 | `createSampleObservations` | `false` | `true`/`false` | Felsökningsdata för kartsymboler; `Auto` väljer observationsvägen. |
 
@@ -199,9 +242,9 @@ Ogiltiga parametervärden ger HTTP 400.
 | `cluster` | `true` | `true`/`false` | Aktiverar de två alternativa pixelstegen. |
 | `clusterRadiusMeters` | `null` | Positivt ändligt tal | Fast metersteg före pixelsteget, även vid `cluster=false`. |
 | `metersPerPixel` | `null` | Positivt ändligt tal | Kartupplösning i markmeter per CSS-pixel. |
-| `clusterRadiusPx` | `20` | `1`–`500` | Startradie för vanlig pixelklustring, i CSS-pixlar. |
-| `disablePixelClusteringAtMetersPerPixel` | `2.0` | Icke-negativt ändligt tal | Stoppar vanligt pixelsteg vid upplösning ≤ gränsen. `0` tar bort zoomgränsen. |
-| `proximityClusterRadiusPx` | `10.0` | Ändligt tal `0`–`500` | Fast pixelradie när vanligt steg stoppas. `0` stänger av den lilla grupperingen. |
+| `clusterRadiusPx` | `20` | `1`–`500` | Fast sökradie för vanlig pixelklustring i CSS-pixlar när `metersPerPixel` anges. Kan ge fler än 400 kartobjekt. Ingen garanti för maximal klusterutbredning. |
+| `switchToDetailClusteringAtMetersPerPixel` | `2.0` | Icke-negativt ändligt tal | Växlar från vanlig pixelklustring till detaljklustring vid upplösning ≤ gränsen. `0` stänger av zoomväxlingen. |
+| `detailClusterRadiusPx` | `10.0` | Ändligt tal `0`–`500` | Fast sökradie i pixlar för detaljklustring när zoom- eller antalsgränsen stoppar vanlig pixelklustring. `0` stänger av detaljklustringen. |
 | `minLocationCountBeforeClustering` | `0` | `0`–`10000` | Vanligt pixelsteg tillåts över detta antal klustringsbara kartobjekt. |
 | `minLocationsPerCluster` | `2` | `2`–`100` | Minsta antal geografiska grupper per kluster. |
 | `createPolygons` | `No` | `No`, `Yes`, `WhenNeeded` | Polygonläge enligt tabellen ovan. |
@@ -242,6 +285,10 @@ Under **Visning → Punktstorlek** används samma antalsbaserade skala för punk
 | Efter antal – fasta gränser (standard) | ≤5 fynd: 10 px; 6–50: 14 px; ≥51: 18 px. |
 
 Antalslägena använder `observationCount`. Ytor och filterområden ingår inte i automatgränserna. Visningsvalen ändrar kartan direkt utan ny sökning och påverkar inte serverns klustring. Gul klustermarkering använder den omslutande radien `cluster.radiusMetersMin`; noggrannhetscirklar och klusterradier kan visas som hjälplager.
+
+Sökfiltrets polygoner visas automatiskt utifrån `filterAreaReferences` i ett separat lager med mörkgröna streckade konturer och utan fyllnad. Egna polygoner och sökcirklar hämtas ur det ursprungliga sökfiltret. Lagrade områden hämtas via Status-webbens `/api/areas/{areaType}/{featureId}/geometry`, som vidarebefordrar geometri och HTTP-cachevalidatorer från observations-API:t. Identiska geografiska filter återanvänder lagret under zoom och panorering; efter en timme kan geometrin omvalideras av webbläsaren. Ändrade filter ersätter konturerna och avbryter inaktuella hämtningar. Konturerna påverkar inte val av observationspunkter eller antal kartobjekt. Under **Visning → Visa sökfiltrets konturer** kan lagret döljas och visas utan en ny sökning.
+
+Om kartutsnittet inte överlappar det valda området är resultatet tomt. När kartsvaret anger noll observationer töms observationstabellen utan ett extra förhandsvisningsanrop. Även direkta anrop till `ObservationsBySearchInternal` returnerar en tom sida med HTTP 200 när en giltig bbox får tom skärning med filterområdet. En felaktig bbox i begäran ger fortfarande HTTP 400. Webbens sökproxy vidarebefordrar API:ts felstatus i stället för att omvandla exempelvis 400 till 500.
 
 ![Lokaler och kluster](Images/adaptivesearchlocations-cluster.png)
 
