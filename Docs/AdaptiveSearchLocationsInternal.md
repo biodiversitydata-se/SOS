@@ -278,6 +278,8 @@ Första sökningen startas med **Sök**. Därefter kan panorering och zoom söka
 
 Vid pan/zoom med samma filter behålls markeringen och observationslistan. Tabellen byter innehåll först när nya observationer har hämtats. Ett ändrat filter återställer markeringen. Klick på en punkt prioriteras framför en underliggande polygon.
 
+Markering och avmarkering lämnar alltid kartutsnittet oförändrat. Det gäller kartklick, lokal-dropdownen och observationstabellens kryssrutor, även för polygoner som sträcker sig utanför kartutsnittet. Markering uppdaterar objektens stil och kan hämta observationer för urvalet, men anpassar inte kartans centrum eller zoom och startar därför ingen kartsökning genom en automatisk kartförflyttning. Manuell panorering och zoomning, inklusive dubbelklickszoom, fungerar som tidigare och kan utlösa automatisk kartsökning.
+
 Under **Visning → Punktstorlek** används samma antalsbaserade skala för punkter och kluster:
 
 | Läge | Storlek |

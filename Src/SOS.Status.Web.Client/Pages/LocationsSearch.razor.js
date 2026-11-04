@@ -292,7 +292,7 @@ export function configurePointSizing(mode) {
     if (pointSizeMode !== value) {
         pointSizeMode = value;
         // Refresh selected symbols too, without moving the map or triggering a search.
-        applyHighlightedLocationStyles(false);
+        applyHighlightedLocationStyles();
     }
 
     return getPointSizeLegend();
@@ -398,9 +398,9 @@ export function setLayerVisible(layerId, visible) {
     openLayersMap.setLayerVisible(map, layerId, visible);
 }
 
-export function setHighlightedLocationIds(locationIds, featureIds, ensureVisible = true, selection = null, clickVersion = latestMapClickVersion) {
+export function setHighlightedLocationIds(locationIds, featureIds, selection = null, clickVersion = latestMapClickVersion) {
     if (updateHighlightedLocationIds(locationIds, featureIds, selection, clickVersion)) {
-        applyHighlightedLocationStyles(ensureVisible);
+        applyHighlightedLocationStyles();
     }
 }
 
@@ -452,7 +452,7 @@ export function renderMapResult(layerId, geoJson, options = {}) {
         updateHighlightedLocationIds(highlight.locationIds, highlight.featureIds, highlight.selection, highlight.clickVersion);
     }
     // Apply selection once, after displayed geometries and point sizes are final.
-    applyHighlightedLocationStyles(false);
+    applyHighlightedLocationStyles();
     if (options.overlays) {
         configureLocationOverlays(options.overlays.coordinateUncertainty, options.overlays.clusterRadius, options.overlays.clusterMinimumEnclosingCircle);
     } else {
@@ -699,7 +699,7 @@ function onClickFeedback(event) {
 
 function onDoubleClick() {
     clickFeedbackFeatures = null;
-    applyHighlightedLocationStyles(false);
+    applyHighlightedLocationStyles();
 }
 
 function onSingleClick(event) {
@@ -729,7 +729,7 @@ function onSingleClick(event) {
             highlightedFeatureIds = confirmedHighlightState?.featureIds ?? new Set();
             mapSelection = confirmedHighlightState?.selection ?? { featureCount: 0, locationIds: new Set(), featureIds: new Set() };
             latestMapClickVersion = confirmedHighlightState?.version ?? 0;
-            applyHighlightedLocationStyles(false);
+            applyHighlightedLocationStyles();
         });
 }
 
@@ -808,7 +808,7 @@ function getLayerById(layerId) {
     });
 }
 
-function applyHighlightedLocationStyles(ensureVisible = true) {
+function applyHighlightedLocationStyles() {
     if (!map) {
         return;
     }
@@ -820,7 +820,6 @@ function applyHighlightedLocationStyles(ensureVisible = true) {
     }
 
     paintHighlightedFeatures(clickFeedbackFeatures ?? findHighlightedFeatures(locationsSource));
-    if (ensureVisible && clickFeedbackFeatures === null) ensureHighlightedFeaturesVisible();
 }
 
 function paintHighlightedFeatures(features) {
@@ -836,47 +835,6 @@ function paintHighlightedFeatures(features) {
     }
     getLayerById(locationsLayerId)?.changed?.();
     map?.render?.();
-}
-
-function ensureHighlightedFeaturesVisible() {
-    if (!map || previouslyHighlightedMapFeatures.length === 0) {
-        return;
-    }
-
-    const size = map.getSize?.();
-    const view = map.getView?.();
-    if (!Array.isArray(size) || !view) {
-        return;
-    }
-
-    const highlightedExtent = ol.extent.createEmpty();
-    for (const feature of previouslyHighlightedMapFeatures) {
-        const featureExtent = feature.getGeometry?.()?.getExtent?.();
-        if (Array.isArray(featureExtent)) {
-            ol.extent.extend(highlightedExtent, featureExtent);
-        }
-    }
-
-    if (ol.extent.isEmpty(highlightedExtent)) {
-        return;
-    }
-
-    const currentExtent = view.calculateExtent(size);
-    if (ol.extent.containsExtent(currentExtent, highlightedExtent)) {
-        return;
-    }
-
-    const fitOptions = {
-        size: size,
-        padding: [40, 40, 40, 40],
-        duration: 250
-    };
-    const currentZoom = view.getZoom?.();
-    if (Number.isFinite(currentZoom)) {
-        fitOptions.maxZoom = currentZoom;
-    }
-
-    view.fit(highlightedExtent, fitOptions);
 }
 
 function findHighlightedFeatures(source) {

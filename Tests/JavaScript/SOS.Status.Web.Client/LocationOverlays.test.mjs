@@ -254,10 +254,9 @@ test('optional overlay failures leave the main layer available and can be retrie
 
 test('location selection follows new clusters and returning points without moving the viewport', () => {
     const { api, map, layer } = load();
-    // Highlight updates initiated by clicks may fit the view; replacement results must not.
-    map.getSize = () => { throw new Error('A map reload must not try to fit the selection'); };
+    map.getSize = () => { throw new Error('Neither selection nor map reloads may fit the view'); };
     api.loadGeoJsonLayer('locations', result(), 'locations');
-    api.setHighlightedLocationIds(['a'], [], false);
+    api.setHighlightedLocationIds(['a'], []);
     assert.equal(layer('locations').getSource().getFeatures()[0].style.image.stroke.color, '#d500f9');
 
     const cluster = JSON.parse(result());
@@ -270,6 +269,6 @@ test('location selection follows new clusters and returning points without movin
     api.loadGeoJsonLayer('locations', result(16), 'locations');
     assert.equal(layer('locations').getSource().getFeatures()[0].style.image.stroke.color, '#d500f9');
     assert.equal(layer('locations').getSource().getFeatures()[1].style, undefined);
-    api.setHighlightedLocationIds([], [], false);
+    api.setHighlightedLocationIds([], []);
     assert.equal(layer('locations').getSource().getFeatures()[0].style, undefined);
 });

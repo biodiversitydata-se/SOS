@@ -37,7 +37,7 @@ function load() {
     };
     const map = {
         getAllLayers: () => [layer],
-        getSize: () => { throw new Error('Immediate click feedback must not pan/zoom the map'); },
+        getSize: () => { throw new Error('Selection updates must not pan/zoom the map'); },
         forEachFeatureAtPixel: (_pixel, visit) => fixture.hits.forEach(hit => visit(hit, layer)),
         render: () => fixture.renders++
     };
@@ -45,14 +45,23 @@ function load() {
         fixture.calls.push({ name, args });
         return new Promise((_resolve, reject) => fixture.rejected.push(reject));
     } };
-    const context = vm.createContext({ console, ol: { style: { Style: style, Circle: style, Fill: style, Stroke: style } } });
+    const context = vm.createContext({ console, ol: {
+        style: { Style: style, Circle: style, Fill: style, Stroke: style },
+        extent: {
+            createEmpty: () => [Infinity, Infinity, -Infinity, -Infinity],
+            extend(a, b) { a[0] = Math.min(a[0], b[0]); a[1] = Math.min(a[1], b[1]); a[2] = Math.max(a[2], b[2]); a[3] = Math.max(a[3], b[3]); },
+            isEmpty: a => a[0] > a[2] || a[1] > a[3],
+            containsExtent: (a, b) => a[0] <= b[0] && a[1] <= b[1] && a[2] >= b[2] && a[3] >= b[3]
+        }
+    } });
     vm.runInContext(source + '\nglobalThis.api = { onClickFeedback, onSingleClick, onDoubleClick, setHighlightedLocationIds, attach(value, ref) { map = value; dotNetRef = ref; } };', context);
     fixture.api = context.api;
+    fixture.map = map;
     fixture.api.attach(map, dotNet);
     fixture.click = hits => { fixture.hits = hits; fixture.api.onClickFeedback({ pixel: [0, 0] }); };
     fixture.commit = () => fixture.api.onSingleClick({ pixel: [0, 0] });
     fixture.confirm = (features, version) => fixture.api.setHighlightedLocationIds(
-        features.flatMap(f => f.get('locations').ids), features.map(f => f.getId()), false,
+        features.flatMap(f => f.get('locations').ids), features.map(f => f.getId()),
         { featureCount: features.length, locationIds: features.flatMap(f => f.get('locations').ids), featureIds: features.map(f => f.getId()) }, version);
     fixture.selected = f => (f.style?.image?.stroke ?? f.style?.stroke)?.color === '#d500f9';
     return fixture;
@@ -73,6 +82,46 @@ test('feedback paints at click before singleclick or Blazor, without scanning th
     assert.equal(f.calls[0].args[1], 1);
     assert.ok(f.renders > 0);
 });
+
+for (const [groupingType, geometryType] of [
+    ['singleLocation', 'Polygon'], ['singleLocation', 'MultiPolygon'],
+    ['singleLocation', 'Point'], ['pixelCluster', 'Point']
+]) {
+    test(`${groupingType}/${geometryType} selection, confirmation and deselection preserve the viewport`, () => {
+        const f = load();
+        const selected = feature('selected', ['a', 'b'], groupingType, geometryType);
+        selected.getGeometry = () => ({ getType: () => geometryType, getExtent: () => [-1000, -1000, 1000, 1000] });
+        f.features = [selected];
+        let fitCalls = 0, center = [0, 0], zoom = 14;
+        const view = {
+            getCenter: () => center, getZoom: () => zoom,
+            calculateExtent: () => [-10, -10, 10, 10],
+            fit() { fitCalls++; center = [100, 100]; zoom = 5; },
+            setCenter() { throw new Error('Selection must not change center'); },
+            setZoom() { throw new Error('Selection must not change zoom'); },
+            animate() { throw new Error('Selection must not animate the view'); }
+        };
+        f.map.getSize = () => [800, 600];
+        f.map.getView = () => view;
+
+        f.click([selected]); f.commit();
+        f.confirm([selected], 1); // The Blazor confirmation previously enabled fitting the whole polygon.
+        assert.equal(f.selected(selected), true);
+        f.api.setHighlightedLocationIds(['b'], [], {
+            featureCount: 1, locationIds: ['a', 'b'], featureIds: ['selected']
+        }, 1); // Focus a member without changing the full map selection.
+        f.click([selected]); f.commit();
+        f.confirm([], 2);
+        f.api.setHighlightedLocationIds(['a'], []); // An observation-table checkbox highlight.
+        f.api.setHighlightedLocationIds([], []);
+
+        assert.equal(fitCalls, 0);
+        assert.deepEqual(view.getCenter(), [0, 0]);
+        assert.equal(view.getZoom(), 14);
+        assert.equal(f.selected(selected), false);
+        assert.deepEqual(f.calls.map(c => c.name), ['OnFeaturesClickedFromJs', 'OnFeaturesClickedFromJs']);
+    });
+}
 
 test('empty selection and deselection do not scan the result or build a highlight index', () => {
     const f = load(); const point = feature('a');
@@ -122,9 +171,9 @@ test('indexed highlights include every matching feature and deduplicate overlapp
     let clusterPaints = 0;
     const originalSetStyle = cluster.setStyle;
     cluster.setStyle = style => { if (style) clusterPaints++; originalSetStyle.call(cluster, style); };
-    f.api.setHighlightedLocationIds(['TILE'], [], false);
+    f.api.setHighlightedLocationIds(['TILE'], []);
     assert.equal(f.selected(grid), false, 'map ids are separate from observation location ids');
-    f.api.setHighlightedLocationIds(['SITE-99'], ['cluster-a', 'TILE'], false);
+    f.api.setHighlightedLocationIds(['SITE-99'], ['cluster-a', 'TILE']);
     assert.equal(f.selected(cluster), true);
     assert.equal(f.selected(polygon), true);
     assert.equal(f.selected(grid), true, 'features without location ids still match their map id');
@@ -173,7 +222,7 @@ test('selection comparison uses stable location ids after reclustering and exclu
     f.confirm([old], 1);
     f.click([larger]); assert.equal(f.selected(larger), true); f.commit();
     const a = feature('a'); f.features = [a];
-    f.api.setHighlightedLocationIds(['a'], [], false, { featureCount: 0, locationIds: [], featureIds: [] }, 2);
+    f.api.setHighlightedLocationIds(['a'], [], { featureCount: 0, locationIds: [], featureIds: [] }, 2);
     f.click([a]); assert.equal(f.selected(a), true, 'an observation row highlight is not a selected map feature');
 });
 
@@ -183,7 +232,7 @@ test('focusing one local in overlapping polygons retains the full selection for 
     const b = feature('polygon-b', ['b'], 'singleLocation', 'Polygon');
     f.features = [a, b];
     const selection = { featureCount: 2, locationIds: ['a', 'b'], featureIds: ['polygon-a', 'polygon-b'] };
-    f.api.setHighlightedLocationIds(['a'], [], false, selection, 1);
+    f.api.setHighlightedLocationIds(['a'], [], selection, 1);
     assert.equal(f.selected(a), true);
     assert.equal(f.selected(b), false);
     assert.equal(f.calls.length, 0, 'local focus does not trigger a map click or search');
@@ -198,10 +247,10 @@ test('all locals restores the full highlight without changing the map selection'
     const f = load(); const a = feature('a'), b = feature('b');
     f.features = [a, b];
     const selection = { featureCount: 2, locationIds: ['a', 'b'], featureIds: ['a', 'b'] };
-    f.api.setHighlightedLocationIds(['b'], [], false, selection, 1);
+    f.api.setHighlightedLocationIds(['b'], [], selection, 1);
     assert.equal(f.selected(a), false);
     assert.equal(f.selected(b), true);
-    f.api.setHighlightedLocationIds(['a', 'b'], [], false, selection, 1);
+    f.api.setHighlightedLocationIds(['a', 'b'], [], selection, 1);
     assert.equal(f.selected(a), true);
     assert.equal(f.selected(b), true);
     assert.equal(f.calls.length, 0);
@@ -214,12 +263,12 @@ test('a local beyond the displayed cluster items highlights its cluster even aft
     const other = feature('other');
     f.features = [cluster, other];
     const selection = { featureCount: 1, locationIds: ids, featureIds: ['cluster'] };
-    f.api.setHighlightedLocationIds(['site-19'], [], false, selection, 1);
+    f.api.setHighlightedLocationIds(['site-19'], [], selection, 1);
     assert.equal(f.selected(cluster), true);
     assert.equal(f.selected(other), false);
     const replacement = feature('new-cluster', ['site-19', 'new-site'], 'pixelCluster');
     f.features = [replacement, other];
-    f.api.setHighlightedLocationIds(['site-19'], [], false, selection, 1);
+    f.api.setHighlightedLocationIds(['site-19'], [], selection, 1);
     assert.equal(f.selected(replacement), true);
     assert.equal(f.selected(other), false);
 });

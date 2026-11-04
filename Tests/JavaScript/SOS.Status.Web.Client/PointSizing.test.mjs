@@ -380,6 +380,6 @@ test('batched rendering sizes polygons shown as points before painting selection
     });
     assert.equal(map.renders, 3);
     assert.equal(replacement.style.image.stroke.color, '#d500f9');
-    api.setHighlightedLocationIds([], [], false, null, 2);
+    api.setHighlightedLocationIds([], [], null, 2);
     assert.equal(replacement.style, undefined);
 });

@@ -253,7 +253,7 @@ public partial class LocationsSearch : IAsyncDisposable
                 observationPreviewRequestVersion++;
                 isObservationPreviewLoading = false;
                 observationSearchResult = new PagedResultDto<Observation> { Take = ObservationPreviewTake, TotalCount = 0 };
-                await ClearObservationHighlightsAsync(ensureVisible: false);
+                await ClearObservationHighlightsAsync();
             }
             else
             {
@@ -269,7 +269,7 @@ public partial class LocationsSearch : IAsyncDisposable
         mapClickVersion = Math.Max(mapClickVersion, clickVersion);
         if (isLoading)
         {
-            await UpdateObservationHighlightsAsync(ensureVisible: false);
+            await UpdateObservationHighlightsAsync();
             return;
         }
         observationPreviewRequestVersion++;
@@ -381,7 +381,7 @@ public partial class LocationsSearch : IAsyncDisposable
         observationSearchResult = null;
         highlightedObservations.Clear();
         isObservationPreviewLoading = true;
-        await UpdateObservationHighlightsAsync(ensureVisible: false);
+        await UpdateObservationHighlightsAsync();
         if (disposed || requestVersion != observationPreviewRequestVersion) return;
         // Finish the dropdown selection immediately; the versioned search handles its own errors.
         _ = SearchObservationPreviewAsync();
@@ -1103,7 +1103,7 @@ public partial class LocationsSearch : IAsyncDisposable
             if (!disposed && requestVersion == observationPreviewRequestVersion)
             {
                 observationSearchResult = result;
-                await ClearObservationHighlightsAsync(ensureVisible: false);
+                await ClearObservationHighlightsAsync();
             }
         }
         catch (Exception ex)
@@ -1153,13 +1153,13 @@ public partial class LocationsSearch : IAsyncDisposable
         await UpdateObservationHighlightsAsync();
     }
 
-    private async Task ClearObservationHighlightsAsync(bool ensureVisible = true)
+    private async Task ClearObservationHighlightsAsync()
     {
         highlightedObservations.Clear();
-        await UpdateObservationHighlightsAsync(ensureVisible);
+        await UpdateObservationHighlightsAsync();
     }
 
-    private async Task UpdateObservationHighlightsAsync(bool ensureVisible = true)
+    private async Task UpdateObservationHighlightsAsync()
     {
         if (_mapModule is null)
         {
@@ -1169,7 +1169,7 @@ public partial class LocationsSearch : IAsyncDisposable
         var highlight = CreateMapHighlightState();
         try
         {
-            await _mapModule.InvokeVoidAsync("setHighlightedLocationIds", highlight.LocationIds, highlight.FeatureIds, ensureVisible,
+            await _mapModule.InvokeVoidAsync("setHighlightedLocationIds", highlight.LocationIds, highlight.FeatureIds,
                 highlight.Selection, highlight.ClickVersion);
         }
         catch (JSDisconnectedException)
