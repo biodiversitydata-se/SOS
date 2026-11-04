@@ -102,6 +102,23 @@
         <MudItem xs="12" lg="6">
             <MudExpansionPanels MultiExpansion="false" Class="mb-2">
                 <MudExpansionPanel Text="@ObservationPanelTitle" Expanded="true">
+                    @if (selectedLocationIds.Count > 1)
+                    {
+                        <MudSelect T="ObservationLocationOption"
+                                   Label="Lokal"
+                                   Value="@selectedObservationLocation"
+                                   ValueChanged="OnObservationLocationChangedAsync"
+                                   ToStringFunc="@(option => option?.Label ?? string.Empty)"
+                                   Placeholder="@AllObservationLocationsLabel"
+                                   Clearable="true"
+                                   Dense="true"
+                                   Class="mb-2">
+                            @foreach (var option in observationLocationOptions)
+                            {
+                                <MudSelectItem T="ObservationLocationOption" Value="@option">@option.Label</MudSelectItem>
+                            }
+                        </MudSelect>
+                    }
                     <div class="observation-preview-loading" role="status" aria-live="polite">
                         @if (isObservationPreviewLoading)
                         {

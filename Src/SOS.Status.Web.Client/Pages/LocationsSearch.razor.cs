@@ -90,6 +90,8 @@ public partial class LocationsSearch : IAsyncDisposable
     private CancellationTokenSource? autoSearchDebounceCts;
     private List<SelectedMapFeature> selectedFeatures = [];
     private IReadOnlyList<string> selectedLocationIds = [];
+    private List<ObservationLocationOption> observationLocationOptions = [];
+    private ObservationLocationOption? selectedObservationLocation;
     private string selectedLocationIdsText = "-";
     private string selectedLocalitiesText = "-";
     private string selectedFeatureJson = string.Empty;
@@ -294,6 +296,8 @@ public partial class LocationsSearch : IAsyncDisposable
     private void SetSelectedFeatures(List<SelectedMapFeature> features)
     {
         selectedFeatures = features;
+        selectedObservationLocation = null;
+        observationLocationOptions = [];
         if (features.Count == 0)
         {
             selectedLocationIds = [];
@@ -309,6 +313,8 @@ public partial class LocationsSearch : IAsyncDisposable
             .Distinct(StringComparer.OrdinalIgnoreCase)
             .OrderBy(locationId => locationId, StringComparer.OrdinalIgnoreCase)
             .ToList();
+        observationLocationOptions = CreateObservationLocationOptions();
+        selectedObservationLocation = observationLocationOptions[0];
         var localities = features
             .SelectMany(feature => ExtractLocalities(feature.Properties))
             .Where(locality => !string.IsNullOrWhiteSpace(locality))
@@ -328,6 +334,57 @@ public partial class LocationsSearch : IAsyncDisposable
         selectedFeatureJson = features[0].HasProperties
             ? JsonSerializer.Serialize(features[0].Properties, SelectedFeatureJsonSerializerOptions)
             : string.Empty;
+    }
+
+    private sealed record ObservationLocationOption(string? LocationId, string Label);
+
+    private string AllObservationLocationsLabel => $"Alla lokaler ({selectedLocationIds.Count:N0})";
+
+    private IReadOnlyList<string> ObservationPreviewLocationIds => selectedObservationLocation?.LocationId is { } id
+        ? [id]
+        : selectedLocationIds;
+
+    private List<ObservationLocationOption> CreateObservationLocationOptions()
+    {
+        var names = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var feature in selectedFeatures)
+        {
+            var items = GetLocationArray(feature.Properties, "items");
+            if (items.ValueKind != JsonValueKind.Array) continue;
+            foreach (var item in items.EnumerateArray())
+            {
+                if (item.ValueKind == JsonValueKind.Object &&
+                    item.TryGetProperty("locationId", out var locationId) && locationId.ValueKind == JsonValueKind.String &&
+                    locationId.GetString() is { } id && !string.IsNullOrWhiteSpace(id) &&
+                    item.TryGetProperty("locality", out var locality) && locality.ValueKind == JsonValueKind.String &&
+                    locality.GetString() is { } name && !string.IsNullOrWhiteSpace(name))
+                {
+                    names.TryAdd(id, name.Trim());
+                }
+            }
+        }
+
+        return [new(null, AllObservationLocationsLabel), .. selectedLocationIds
+            .Select(id => new ObservationLocationOption(id, names.TryGetValue(id, out var name) ? $"{name} ({id})" : id))
+            .OrderBy(option => option.Label, StringComparer.CurrentCultureIgnoreCase)
+            .ThenBy(option => option.LocationId, StringComparer.OrdinalIgnoreCase)];
+    }
+
+    private async Task OnObservationLocationChangedAsync(ObservationLocationOption? option)
+    {
+        if (disposed || (option is not null && !observationLocationOptions.Contains(option))) return;
+        var previousId = selectedObservationLocation?.LocationId;
+        selectedObservationLocation = option;
+        if (string.Equals(previousId, option?.LocationId, StringComparison.OrdinalIgnoreCase)) return;
+
+        var requestVersion = ++observationPreviewRequestVersion;
+        observationSearchResult = null;
+        highlightedObservations.Clear();
+        isObservationPreviewLoading = true;
+        await UpdateObservationHighlightsAsync(ensureVisible: false);
+        if (disposed || requestVersion != observationPreviewRequestVersion) return;
+        // Finish the dropdown selection immediately; the versioned search handles its own errors.
+        _ = SearchObservationPreviewAsync();
     }
 
     private static bool IsSameMapFeatureSelection(
@@ -1022,7 +1079,7 @@ public partial class LocationsSearch : IAsyncDisposable
             if (hasSelectedLocations)
             {
                 observationFilter.Geographics ??= new GeographicsFilterDto();
-                observationFilter.Geographics.LocationIds = selectedLocationIds.ToArray();
+                observationFilter.Geographics.LocationIds = ObservationPreviewLocationIds.ToArray();
             }
         }
         catch (Exception ex)
@@ -1128,7 +1185,7 @@ public partial class LocationsSearch : IAsyncDisposable
 
     private MapHighlightState CreateMapHighlightState()
     {
-        var locationIds = selectedLocationIds
+        var locationIds = ObservationPreviewLocationIds
             .Concat(highlightedObservations
             .Select(observation => observation.Location?.LocationId)
             .Where(locationId => !string.IsNullOrWhiteSpace(locationId))
@@ -1154,9 +1211,9 @@ public partial class LocationsSearch : IAsyncDisposable
         ? "Observationer"
         : $"Observationer ({observationSearchResult.Records.Count:N0} av {observationSearchResult.TotalCount:N0})";
 
-    private string ObservationPreviewLoadingText => selectedLocationIds.Count > 0
-        ? "Hämtar observationer för markerade kartfeatures..."
-        : "Hämtar observationer...";
+    private string ObservationPreviewLoadingText => selectedObservationLocation?.LocationId is not null
+        ? "Hämtar observationer för vald lokal..."
+        : selectedLocationIds.Count > 0 ? "Hämtar observationer för markerade kartfeatures..." : "Hämtar observationer...";
 
     private JsonElement ResolveClickedFeatureProperties(MapFeatureClickItem feature)
     {

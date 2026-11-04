@@ -177,6 +177,53 @@ test('selection comparison uses stable location ids after reclustering and exclu
     f.click([a]); assert.equal(f.selected(a), true, 'an observation row highlight is not a selected map feature');
 });
 
+test('focusing one local in overlapping polygons retains the full selection for deselection', () => {
+    const f = load();
+    const a = feature('polygon-a', ['a'], 'singleLocation', 'Polygon');
+    const b = feature('polygon-b', ['b'], 'singleLocation', 'Polygon');
+    f.features = [a, b];
+    const selection = { featureCount: 2, locationIds: ['a', 'b'], featureIds: ['polygon-a', 'polygon-b'] };
+    f.api.setHighlightedLocationIds(['a'], [], false, selection, 1);
+    assert.equal(f.selected(a), true);
+    assert.equal(f.selected(b), false);
+    assert.equal(f.calls.length, 0, 'local focus does not trigger a map click or search');
+    f.click([a, b]);
+    assert.equal(f.selected(a), false);
+    assert.equal(f.selected(b), false);
+    f.commit();
+    assert.equal(f.calls[0].args[0].length, 2, 'the original hit set is sent to Blazor to toggle off');
+});
+
+test('all locals restores the full highlight without changing the map selection', () => {
+    const f = load(); const a = feature('a'), b = feature('b');
+    f.features = [a, b];
+    const selection = { featureCount: 2, locationIds: ['a', 'b'], featureIds: ['a', 'b'] };
+    f.api.setHighlightedLocationIds(['b'], [], false, selection, 1);
+    assert.equal(f.selected(a), false);
+    assert.equal(f.selected(b), true);
+    f.api.setHighlightedLocationIds(['a', 'b'], [], false, selection, 1);
+    assert.equal(f.selected(a), true);
+    assert.equal(f.selected(b), true);
+    assert.equal(f.calls.length, 0);
+});
+
+test('a local beyond the displayed cluster items highlights its cluster even after reclustering', () => {
+    const f = load(); const ids = Array.from({ length: 20 }, (_, i) => `site-${i}`);
+    const cluster = feature('cluster', ids, 'pixelCluster');
+    cluster.set('locations', { ids, items: ids.slice(0, 5).map(locationId => ({ locationId })) });
+    const other = feature('other');
+    f.features = [cluster, other];
+    const selection = { featureCount: 1, locationIds: ids, featureIds: ['cluster'] };
+    f.api.setHighlightedLocationIds(['site-19'], [], false, selection, 1);
+    assert.equal(f.selected(cluster), true);
+    assert.equal(f.selected(other), false);
+    const replacement = feature('new-cluster', ['site-19', 'new-site'], 'pixelCluster');
+    f.features = [replacement, other];
+    f.api.setHighlightedLocationIds(['site-19'], [], false, selection, 1);
+    assert.equal(f.selected(replacement), true);
+    assert.equal(f.selected(other), false);
+});
+
 test('a rejected callback restores the confirmed selection and keeps click versions monotonic', async () => {
     const f = load(); const a = feature('a'), b = feature('b'); f.features = [a, b]; f.confirm([a], 4);
     f.click([b]); f.commit(); assert.equal(f.calls[0].args[1], 5);

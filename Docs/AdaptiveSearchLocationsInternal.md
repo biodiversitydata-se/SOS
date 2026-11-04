@@ -292,6 +292,8 @@ Sökfiltrets polygoner visas automatiskt utifrån `filterAreaReferences` i ett s
 
 Om kartutsnittet inte överlappar det valda området är resultatet tomt. När kartsvaret anger noll observationer töms observationstabellen utan ett extra förhandsvisningsanrop. Även direkta anrop till `ObservationsBySearchInternal` returnerar en tom sida med HTTP 200 när en giltig bbox får tom skärning med filterområdet. En felaktig bbox i begäran ger fortfarande HTTP 400. Webbens sökproxy vidarebefordrar API:ts felstatus i stället för att omvandla exempelvis 400 till 500.
 
+När karturvalet omfattar flera lokaler visas en dropdown **Lokal** ovanför observationstabellen. Väljaren tillåter endast val från listan, utan textinmatning. **Alla lokaler (N)** visar observationer för hela urvalet. Välj en lokal för att begränsa tabellsökningen på servern och framhäva lokalens befintliga kartobjekt; en klustermedlem framhäver klustret. Kartan panoreras eller zoomas inte av lokalvalet. Samtliga `locations.ids` går att välja, även när klustret bara innehåller detaljer för fem lokaler. Namn visas tillsammans med id där namn finns i `locations.items`; annars visas enbart id. Rensning återgår till alla lokaler. Ett nytt karturval eller ändrat sökfilter återställer valet; panorering och zoomning med samma sökfilter behåller det. Tabellen visar fortfarande högst fem observationer, och inaktuella svar från tidigare lokalval ignoreras.
+
 ![Lokaler och kluster](Images/adaptivesearchlocations-cluster.png)
 
 ![Geogrid](Images/adaptivesearchlocations-grid.png)
