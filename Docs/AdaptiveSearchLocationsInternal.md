@@ -96,6 +96,8 @@ Svaret är en GeoJSON `FeatureCollection`. Sökningar utan träffar, även efter
 
 Lokaler kan ha punkt- eller polygongeometri. Kluster är punkter vid klustrets mittpunkt. Använd `groupingType` för att identifiera kluster; `cluster` innehåller metadata och `presentation.status` styr presentationen.
 
+Lokalfeatures returneras i ritordning: ytor först, därefter linjer och sist punkter och kluster. Ytor sorteras fallande efter geometrins plana area i svarets WGS84-koordinater, så att mindre polygoner kan ritas ovanpå större. Polygonhål dras av och MultiPolygon använder delpolygonernas sammanlagda area. Arean beräknas en gång per geometri vid sorteringen; objekt med samma geometri-dimension och area behåller sin inbördes ordning. Sorteringen görs när svaret skrivs och gäller även cacheträffar och representativa lokaler. Inbäddade filterområden ligger före lokalfeatures; geogridens ordning ändras inte.
+
 | Property | Betydelse |
 |---|---|
 | `groupingType` | `singleLocation`, `coLocatedLocations`, `meterCluster` eller `pixelCluster`. De två sista är kluster. |

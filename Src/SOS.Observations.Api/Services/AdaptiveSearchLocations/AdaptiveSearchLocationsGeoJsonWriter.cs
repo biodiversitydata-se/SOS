@@ -69,14 +69,15 @@ internal static class AdaptiveSearchLocationsGeoJsonWriter
             }
         }
 
-        foreach (var feature in locationFeatures)
+        // Emit drawing order: surfaces (largest first), lines, then points and clusters.
+        // LINQ evaluates each area key once; equal keys retain their original order.
+        var orderedFeatures = locationFeatures
+            .Where(feature => feature.Geometry != null)
+            .OrderByDescending(feature => feature.Geometry!.Dimension)
+            .ThenByDescending(feature => feature.Geometry!.Area);
+        foreach (var feature in orderedFeatures)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            if (feature.Geometry == null)
-            {
-                continue;
-            }
-
             var properties = LocationFeatureResponseMapper.ToProperties(feature, cutoffYear: cutoffYear);
             var featureId = GetFeatureId(feature, properties.Locations.Ids);
             if (string.IsNullOrWhiteSpace(featureId))
