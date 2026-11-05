@@ -1,11 +1,13 @@
 # Changelog
 
-## [Unreleased]
+## [2026.11.05]
 
 ### `Added`
 
 - New property `occurrence.invasiveSpeciesTreatment` in the public API, describing the invasive-species treatment registered for an observation.
 - New public search filters `HasInvasiveSpeciesTreatment` and `InvasiveSpeciesTreatmentIds` to filter observations by the presence or absence of a treatment and/or by treatment vocabulary identifiers.
+- New property: `occurrence.sensitivityReason`.
+- New dataset: _"SLU Forest Damage Centre: Forest damage - observations of forest pest species"_.
 
 ## [2026.10.16]
 

@@ -6454,15 +6454,17 @@
         "properties": {
           "startDate": {
             "type": "string",
-            "description": "Observation start date specified in the ISO 8601 standard, including its UTC offset.",
+            "description": "Observation start date/time specified in ISO 8601 format.\n\nAn explicit UTC offset (including Z) is respected. Values without an offset are interpreted\nas Swedish time (Europe/Stockholm), with +01:00 or +02:00 depending on the date.\nA date-only value such as 2026-01-15 is interpreted as 00:00:00 in Swedish time.",
             "format": "date-time",
-            "nullable": true
+            "nullable": true,
+            "example": "2026-01-15T11:00:00+01:00"
           },
           "endDate": {
             "type": "string",
-            "description": "Observation end date specified in the ISO 8601 standard, including its UTC offset.",
+            "description": "Observation end date/time specified in ISO 8601 format.\n\nAn explicit UTC offset (including Z) is respected. Values without an offset are interpreted\nas Swedish time (Europe/Stockholm), with +01:00 or +02:00 depending on the date.\nA date-only value such as 2026-07-15 includes the day through 23:59:59 in Swedish time.\nAn explicit time is preserved, including midnight; it is not extended to the end of the day.",
             "format": "date-time",
-            "nullable": true
+            "nullable": true,
+            "example": "2026-07-15T12:00:00+02:00"
           },
           "dateFilterType": {
             "$ref": "#/components/schemas/DateFilterTypeDto"
@@ -6540,9 +6542,10 @@
           },
           "startDate": {
             "type": "string",
-            "description": "Start date/time of the event in W. Europe Standard Time.",
+            "description": "Start date/time of the event as an ISO 8601 timestamp.\n\nObservation search responses and GeoJSON observation exports use Swedish time (Europe/Stockholm),\nwith the UTC offset at that date: +01:00 in winter or +02:00 in summer.\nOther endpoints using this shared model, such as checklists, may return UTC (Z).",
             "format": "date-time",
-            "nullable": true
+            "nullable": true,
+            "example": "2026-01-15T11:00:00+01:00"
           },
           "startDayOfYear": {
             "type": "integer",
@@ -6575,9 +6578,10 @@
           },
           "endDate": {
             "type": "string",
-            "description": "End date/time of the event in W. Europe Standard Time.",
+            "description": "End date/time of the event as an ISO 8601 timestamp.\n\nObservation search responses and GeoJSON observation exports use Swedish time (Europe/Stockholm),\nwith the UTC offset at that date: +01:00 in winter or +02:00 in summer.\nOther endpoints using this shared model, such as checklists, may return UTC (Z).",
             "format": "date-time",
-            "nullable": true
+            "nullable": true,
+            "example": "2026-07-15T12:00:00+02:00"
           },
           "endDayOfYear": {
             "type": "integer",
@@ -6965,8 +6969,7 @@
         "type": "object",
         "properties": {
           "value": {
-            "description": "Value in data provider.",
-            "nullable": true
+            "description": "Value in data provider."
           },
           "sosId": {
             "type": "integer",
@@ -8442,9 +8445,10 @@
           },
           "modified": {
             "type": "string",
-            "description": "The most recent date-time on which the resource was changed (UTC).\n\nFor Darwin Core, recommended best practice is to use an\n\nencoding scheme, such as ISO 8601:2004(E).",
+            "description": "The most recent date-time on which the resource was changed.\n\nObservation search responses and GeoJSON observation exports use Swedish time (Europe/Stockholm),\nwith the UTC offset at that date: +01:00 in winter or +02:00 in summer.\n\nFor Darwin Core, recommended best practice is to use an\n\nencoding scheme, such as ISO 8601:2004(E).",
             "format": "date-time",
-            "nullable": true
+            "nullable": true,
+            "example": "2026-07-15T12:00:00+02:00"
           },
           "ownerInstitutionCode": {
             "type": "string",
@@ -8513,8 +8517,9 @@
           },
           "created": {
             "type": "string",
-            "description": "The date the observation was created (UTC).",
-            "format": "date-time"
+            "description": "The date and time the observation was created.\n\nObservation search responses and GeoJSON observation exports use Swedish time (Europe/Stockholm),\nwith the UTC offset at that date: +01:00 in winter or +02:00 in summer.",
+            "format": "date-time",
+            "example": "2026-01-15T11:00:00+01:00"
           },
           "mongoDbId": {
             "type": "integer",
@@ -8658,6 +8663,9 @@
             "description": "The number of individuals represented present\n\nat the time of the Occurrence.",
             "nullable": true
           },
+          "invasiveSpeciesTreatment": {
+            "$ref": "#/components/schemas/VocabularyValue"
+          },
           "isNaturalOccurrence": {
             "type": "boolean",
             "description": "Indicates if this species occurrence is natural or\n\nif it is a result of human activity."
@@ -8733,6 +8741,9 @@
             "description": "Information about how protected information about a species is in Sweden.\n\nThis is a value between 1 to 5.\n\n1 indicates public access and 5 is the highest used security level.",
             "format": "int32"
           },
+          "sensitivityReason": {
+            "$ref": "#/components/schemas/SensitivityReason"
+          },
           "recordedBy": {
             "type": "string",
             "description": "A list (concatenated and separated) of names of people,\n\ngroups, or organizations responsible for recording the\n\noriginal Occurrence. The primary collector or observer,\n\nespecially one who applies a personal identifier\n\n(recordNumber), should be listed first.",
@@ -8750,9 +8761,10 @@
           },
           "reportedDate": {
             "type": "string",
-            "description": "Date and time when the species observation was reported (UTC).",
+            "description": "Date and time when the species observation was reported.\n\nObservation search responses and GeoJSON observation exports use Swedish time (Europe/Stockholm),\nwith the UTC offset at that date: +01:00 in winter or +02:00 in summer.",
             "format": "date-time",
-            "nullable": true
+            "nullable": true,
+            "example": "2026-07-15T12:00:00+02:00"
           },
           "reproductiveCondition": {
             "$ref": "#/components/schemas/VocabularyValue"
@@ -9495,6 +9507,20 @@
           "geographics": {
             "$ref": "#/components/schemas/GeographicsFilterDto"
           },
+          "hasInvasiveSpeciesTreatment": {
+            "type": "boolean",
+            "description": "Filters observations based on whether an invasive-species treatment is registered.\nTrue includes records with a treatment, false includes records without one, and null applies no filter.\nFor internal searches, a non-null value takes precedence over ExtendedFilterDto.HasInvasiveSpeciesTreatment.",
+            "nullable": true
+          },
+          "invasiveSpeciesTreatmentIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "description": "Invasive-species treatment vocabulary identifiers to match.\nNull or an empty collection applies no filter.\nFor internal searches, a non-null collection takes precedence over ExtendedFilterDto.InvasiveSpeciesTreatmentIds.",
+            "nullable": true
+          },
           "modifiedDate": {
             "$ref": "#/components/schemas/ModifiedDateFilterDto"
           },
@@ -9573,6 +9599,20 @@
           },
           "geographics": {
             "$ref": "#/components/schemas/GeographicsFilterDto"
+          },
+          "hasInvasiveSpeciesTreatment": {
+            "type": "boolean",
+            "description": "Filters observations based on whether an invasive-species treatment is registered.\nTrue includes records with a treatment, false includes records without one, and null applies no filter.\nFor internal searches, a non-null value takes precedence over ExtendedFilterDto.HasInvasiveSpeciesTreatment.",
+            "nullable": true
+          },
+          "invasiveSpeciesTreatmentIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "description": "Invasive-species treatment vocabulary identifiers to match.\nNull or an empty collection applies no filter.\nFor internal searches, a non-null collection takes precedence over ExtendedFilterDto.InvasiveSpeciesTreatmentIds.",
+            "nullable": true
           },
           "modifiedDate": {
             "$ref": "#/components/schemas/ModifiedDateFilterDto"
@@ -9653,6 +9693,20 @@
           "geographics": {
             "$ref": "#/components/schemas/GeographicsFilterDto"
           },
+          "hasInvasiveSpeciesTreatment": {
+            "type": "boolean",
+            "description": "Filters observations based on whether an invasive-species treatment is registered.\nTrue includes records with a treatment, false includes records without one, and null applies no filter.\nFor internal searches, a non-null value takes precedence over ExtendedFilterDto.HasInvasiveSpeciesTreatment.",
+            "nullable": true
+          },
+          "invasiveSpeciesTreatmentIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "description": "Invasive-species treatment vocabulary identifiers to match.\nNull or an empty collection applies no filter.\nFor internal searches, a non-null collection takes precedence over ExtendedFilterDto.InvasiveSpeciesTreatmentIds.",
+            "nullable": true
+          },
           "modifiedDate": {
             "$ref": "#/components/schemas/ModifiedDateFilterDto"
           },
@@ -9701,6 +9755,17 @@
         ],
         "type": "string",
         "description": "Sort order enum"
+      },
+      "SensitivityReason": {
+        "enum": [
+          "Unknown",
+          "SensitiveSpecies",
+          "ProviderDecision",
+          "ReporterDecision",
+          "LocationGeneralization"
+        ],
+        "type": "string",
+        "description": "The reason for the sensitivity of the observation."
       },
       "SightingDeterminationFilterDto": {
         "enum": [
