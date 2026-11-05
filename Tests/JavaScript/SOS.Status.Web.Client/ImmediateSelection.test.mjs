@@ -30,8 +30,10 @@ function load() {
         }
     });
     fixture.features = [];
+    const layerProperties = { id: 'locations', sosResultType: 'locations' };
     const layer = {
-        get: key => key === 'id' ? 'locations' : undefined,
+        get: key => layerProperties[key],
+        set: (key, value) => { layerProperties[key] = value; },
         getSource: () => vectorSource,
         changed() {}
     };
@@ -57,6 +59,7 @@ function load() {
     vm.runInContext(source + '\nglobalThis.api = { onClickFeedback, onSingleClick, onDoubleClick, setHighlightedLocationIds, attach(value, ref) { map = value; dotNetRef = ref; } };', context);
     fixture.api = context.api;
     fixture.map = map;
+    fixture.layer = layer;
     fixture.api.attach(map, dotNet);
     fixture.click = hits => { fixture.hits = hits; fixture.api.onClickFeedback({ pixel: [0, 0] }); };
     fixture.commit = () => fixture.api.onSingleClick({ pixel: [0, 0] });
@@ -282,13 +285,72 @@ test('a rejected callback restores the confirmed selection and keeps click versi
     f.click([b]); f.commit(); assert.equal(f.calls[1].args[1], 6);
 });
 
-test('overlapping hits, clusters, geogrid and blank-map deselection use the same immediate feedback', () => {
-    const f = load(); const point = feature('a'), cluster = feature('cluster', ['b', 'c'], 'meterCluster'), grid = feature('tile', [], 'grid');
-    f.features = [point, cluster, grid];
+test('overlapping hits, clusters and blank-map deselection use the same immediate feedback', () => {
+    const f = load(); const point = feature('a'), cluster = feature('cluster', ['b', 'c'], 'meterCluster');
+    f.features = [point, cluster];
     f.click([point, cluster]); assert.equal(f.selected(point), true); assert.equal(f.selected(cluster), true); f.commit();
-    f.click([grid]); assert.equal(f.selected(grid), true); assert.equal(f.selected(point), false); f.commit();
-    f.click([]); assert.equal(f.selected(grid), false); f.commit();
+    f.click([]); assert.equal(f.selected(cluster), false); assert.equal(f.selected(point), false); f.commit();
     assert.equal(f.calls.at(-1).args[0].length, 0);
+});
+
+test('a grid cell fits its projected extent only on singleclick without selecting or requesting observations', () => {
+    const f = load(); const cell = feature('tile', [], 'grid', 'Polygon');
+    cell.getGeometry = () => ({ getType: () => 'Polygon', getExtent: () => [100, 200, 300, 400] });
+    f.features = [cell]; f.layer.set('sosResultType', 'geogrid');
+    const fits = [];
+    f.map.getView = () => ({ fit: (extent, options) => fits.push({ extent, options }) });
+
+    f.click([cell]);
+    assert.equal(fits.length, 0, 'wait for singleclick so double-click zoom remains independent');
+    assert.equal(f.selected(cell), false);
+    f.commit();
+    assert.equal(fits.length, 1);
+    assert.deepEqual(Array.from(fits[0].extent), [100, 200, 300, 400]);
+    assert.deepEqual(Array.from(fits[0].options.padding), [20, 20, 20, 20]);
+    assert.equal(fits[0].options.duration, 250);
+    assert.equal(f.calls.length, 0);
+    assert.equal(f.selected(cell), false);
+
+    f.layer.set('sosResultType', 'locations');
+    f.click([cell]); f.commit();
+    assert.equal(fits.length, 1, 'a replacement location result must not retain grid navigation');
+    assert.equal(f.calls[0].name, 'OnFeaturesClickedFromJs');
+    assert.equal(f.selected(cell), true);
+});
+
+test('grid borders prefer the cell containing the click and ignore noninteractive overlays', () => {
+    const f = load(); const left = feature('left', [], 'grid', 'Polygon'), right = feature('right', [], 'grid', 'Polygon');
+    left.getGeometry = () => ({ getType: () => 'Polygon', getExtent: () => [0, 0, 10, 10], intersectsCoordinate: c => c[0] <= 10 });
+    right.getGeometry = () => ({ getType: () => 'Polygon', getExtent: () => [10, 0, 20, 10], intersectsCoordinate: c => c[0] >= 10 });
+    const outline = feature('filter-outline', [], 'filter', 'Polygon'); outline.set('sosNonInteractive', true);
+    f.features = [left, right, outline]; f.layer.set('sosResultType', 'geogrid');
+    const fits = [];
+    f.map.getView = () => ({ fit: extent => fits.push(extent) });
+    f.hits = [outline, left, right];
+    f.api.onSingleClick({ pixel: [0, 0], coordinate: [12, 5] });
+    assert.equal(fits.length, 1);
+    assert.deepEqual(Array.from(fits[0]), [10, 0, 20, 10]);
+    assert.equal(f.calls.length, 0);
+});
+
+test('doubleclick on a grid cell leaves zooming to the default map interaction', () => {
+    const f = load(); const cell = feature('tile', [], 'grid', 'Polygon');
+    f.features = [cell]; f.layer.set('sosResultType', 'geogrid');
+    f.map.getView = () => ({ fit() { throw new Error('Doubleclick must not fit a grid cell'); } });
+    f.click([cell]); f.click([cell]); f.api.onDoubleClick();
+    assert.equal(f.calls.length, 0);
+    assert.equal(f.selected(cell), false);
+});
+
+test('a grid cell with a missing or invalid extent does not move the map or request observations', () => {
+    for (const extent of [null, [0, 0, 0, 10], [0, 0, 10, Infinity]]) {
+        const f = load(); const cell = feature('tile', [], 'grid', 'Polygon');
+        cell.getGeometry = () => ({ getType: () => 'Polygon', getExtent: () => extent });
+        f.features = [cell]; f.layer.set('sosResultType', 'geogrid');
+        f.map.getView = () => ({ fit() { throw new Error('Invalid cells must not fit the view'); } });
+        f.click([cell]); f.commit();
+        assert.equal(f.calls.length, 0);
+    }
 });
 
 for (const [groupingType, geometryType] of [

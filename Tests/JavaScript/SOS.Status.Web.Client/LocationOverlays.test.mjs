@@ -100,6 +100,18 @@ test('filter references render outlines in a separate layer across location and 
     assert.equal(counters.errors.length, 0);
 });
 
+test('reused observation layers track the displayed result type for grid-cell navigation', () => {
+    const { api, layer } = load();
+    api.loadGeoJsonLayer('locations', result(), 'locations');
+    const observations = layer('locations');
+    assert.equal(observations.get('sosResultType'), 'locations');
+    api.loadGeoJsonLayer('locations', result(), 'GeoGrid');
+    assert.equal(layer('locations'), observations);
+    assert.equal(observations.get('sosResultType'), 'geogrid');
+    api.loadGeoJsonLayer('locations', result(), 'locations');
+    assert.equal(observations.get('sosResultType'), 'locations');
+});
+
 test('hidden overlays create no layers or circle geometry and the result is parsed once', () => {
     const { api, map, counters } = load();
     api.configureLocationOverlays(false, false, false);

@@ -6,6 +6,12 @@ let moveEndKey = null;
 let singleClickKey = null;
 let clickFeedbackKey = null;
 let doubleClickKey = null;
+let pointerMoveKey = null;
+let pointerDragKey = null;
+let cursorViewport = null;
+let cursorFrame = null;
+let hoverPixel = null;
+let clickableCursorEnabled = true;
 
 const locationsLayerId = "locations";
 let locationFeatureCollection = null;
@@ -158,6 +164,13 @@ export function initMap(container, blazorDotNetRef, zoom, centerLon, centerLat) 
     singleClickKey = map.on("singleclick", onSingleClick);
     clickFeedbackKey = map.on("click", onClickFeedback);
     doubleClickKey = map.on("dblclick", onDoubleClick);
+    pointerMoveKey = map.on("pointermove", onMapPointerMove);
+    pointerDragKey = map.on("pointerdrag", onMapPointerMove);
+    cursorViewport = map.getViewport();
+    cursorViewport.addEventListener("pointerleave", onMapPointerLeave);
+    cursorViewport.addEventListener("pointercancel", onMapPointerLeave);
+    cursorViewport.addEventListener("pointerup", onMapPointerUp);
+    setMapCursor("grab");
 
     requestAnimationFrame(function () {
         map?.updateSize();
@@ -192,6 +205,23 @@ export function destroyMap() {
     if (doubleClickKey) {
         ol.Observable.unByKey(doubleClickKey);
         doubleClickKey = null;
+    }
+    if (pointerMoveKey) {
+        ol.Observable.unByKey(pointerMoveKey);
+        pointerMoveKey = null;
+    }
+    if (pointerDragKey) {
+        ol.Observable.unByKey(pointerDragKey);
+        pointerDragKey = null;
+    }
+    onMapPointerLeave();
+    clickableCursorEnabled = true;
+    if (cursorViewport) {
+        cursorViewport.removeEventListener("pointerleave", onMapPointerLeave);
+        cursorViewport.removeEventListener("pointercancel", onMapPointerLeave);
+        cursorViewport.removeEventListener("pointerup", onMapPointerUp);
+        setMapCursor("");
+        cursorViewport = null;
     }
 
     if (map) {
@@ -510,9 +540,11 @@ function loadGeoJsonLayer(layerId, geoJson, resultType, options = {}) {
     if (layer) {
         layer.setStyle(style);
         layer.setSource(source);
+        layer.set("sosResultType", normalizedResultType);
     } else {
         const newLayer = new ol.layer.Vector({ source, style });
         newLayer.set("id", layerId);
+        newLayer.set("sosResultType", normalizedResultType);
         newLayer.setZIndex(20);
         map.addLayer(newLayer);
     }
@@ -670,6 +702,61 @@ function notifyExtentChanged() {
     });
 }
 
+export function setClickableCursorEnabled(enabled) {
+    clickableCursorEnabled = enabled === true;
+    if (!clickableCursorEnabled) {
+        cancelCursorUpdate();
+        if (cursorViewport?.style.cursor !== "grabbing") setMapCursor("grab");
+    }
+}
+
+function setMapCursor(cursor) {
+    if (cursorViewport && cursorViewport.style.cursor !== cursor) cursorViewport.style.cursor = cursor;
+}
+
+function cancelCursorUpdate() {
+    if (cursorFrame !== null) cancelAnimationFrame(cursorFrame);
+    cursorFrame = null;
+    hoverPixel = null;
+}
+
+function onMapPointerLeave() {
+    cancelCursorUpdate();
+    setMapCursor("grab");
+}
+
+function onMapPointerUp(event) {
+    onMapPointerLeave();
+    if (map && event.pointerType !== "touch") onMapPointerMove({ pixel: map.getEventPixel(event) });
+}
+
+function onMapPointerMove(event) {
+    if (!map || event.originalEvent?.pointerType === "touch") return;
+    if (event.dragging) {
+        cancelCursorUpdate();
+        setMapCursor("grabbing");
+        return;
+    }
+    if (!clickableCursorEnabled) {
+        setMapCursor("grab");
+        return;
+    }
+
+    hoverPixel = event.pixel;
+    if (cursorFrame !== null) return;
+    cursorFrame = requestAnimationFrame(() => {
+        cursorFrame = null;
+        if (!map || !hoverPixel) return;
+        // Hover only needs the first clickable hit, unlike selection which collects every hit.
+        const hit = map.forEachFeatureAtPixel(hoverPixel, (feature, layer) =>
+            isInteractiveObservationFeature(feature, layer) ? true : undefined, {
+                hitTolerance: 4,
+                layerFilter: layer => layer.get("id") === locationsLayerId && !layer.get("sosNonInteractive")
+            });
+        setMapCursor(hit ? "pointer" : "grab");
+    });
+}
+
 function getMapSelection(features) {
     return {
         featureCount: features.length,
@@ -691,6 +778,11 @@ function getNextSelectedFeatures(features) {
 
 function onClickFeedback(event) {
     if (!map || !dotNetRef) return;
+    if (isGridResult()) {
+        clickFeedbackFeatures = null;
+        applyHighlightedLocationStyles();
+        return;
+    }
     // OpenLayers delays singleclick to detect double-click zoom. Paint the feedback now,
     // and let singleclick commit the selection and start the observation request later.
     clickFeedbackFeatures = getNextSelectedFeatures(getInteractiveObservationFeaturesAtPixel(event.pixel));
@@ -708,6 +800,11 @@ function onSingleClick(event) {
     }
 
     const clickedFeatures = getInteractiveObservationFeaturesAtPixel(event.pixel);
+    if (isGridResult() && clickedFeatures.length > 0) {
+        clickFeedbackFeatures = null;
+        zoomToGridCell(clickedFeatures, event.coordinate);
+        return;
+    }
     const payload = clickedFeatures.map(toFeatureClickPayload);
     const selection = getNextSelectedFeatures(clickedFeatures);
     mapSelection = getMapSelection(selection);
@@ -731,6 +828,20 @@ function onSingleClick(event) {
             latestMapClickVersion = confirmedHighlightState?.version ?? 0;
             applyHighlightedLocationStyles();
         });
+}
+
+function isGridResult() {
+    return getLayerById(locationsLayerId)?.get("sosResultType") === "geogrid";
+}
+
+function zoomToGridCell(features, coordinate) {
+    // At shared borders hit tolerance can include an adjacent cell; prefer the cell containing the click.
+    const feature = features.find(feature => coordinate && feature.getGeometry()?.intersectsCoordinate?.(coordinate)) ?? features[0];
+    const extent = feature?.getGeometry()?.getExtent?.();
+    if (!Array.isArray(extent) || extent.length !== 4 || !extent.every(Number.isFinite) ||
+        extent[0] >= extent[2] || extent[1] >= extent[3]) return;
+
+    map.getView().fit(extent, { padding: [20, 20, 20, 20], duration: 250 });
 }
 
 function getInteractiveObservationFeaturesAtPixel(pixel) {

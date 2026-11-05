@@ -54,7 +54,11 @@ public class TaxonListHarvester : ITaxonListHarvester
 
     public async Task<HarvestInfo> HarvestTaxonListsAsync()
     {
-        var harvestInfo = new HarvestInfo(nameof(TaxonList), DateTime.Now);
+        var harvestInfo = new HarvestInfo(nameof(TaxonList), DateTime.Now)
+        {
+            Status = RunStatus.Failed
+        };
+        var writeAttempted = false;
         try
         {
             _logger.LogDebug("Start getting taxon lists");
@@ -69,58 +73,68 @@ public class TaxonListHarvester : ITaxonListHarvester
                 throw new Exception("Failed to load taxon list json");
             }
 
-            var taxonListByTaxonListServiceId = taxonLists!.ToDictionary(m => m.TaxonListServiceId, m => m);
             var conservationLists =
                 await _taxonListService.GetTaxaAsync(taxonLists!.Select(m => m.TaxonListServiceId));
-            var taxa = (await _taxonRepository.GetAllAsync())?.Where(t => !t.IsNotAccepted).ToDictionary(t => t.Id, t => t) ?? new Dictionary<int, Taxon>();
-            foreach (var conservationList in conservationLists)
+            var conservationListById = (conservationLists ?? []).ToDictionary(list => list.ListId);
+            var taxonListsToUpdate = new List<TaxonList>();
+            foreach (var taxonList in taxonLists)
             {
-                taxonListByTaxonListServiceId[conservationList.ListId].Taxa =
-                    conservationList.TaxonInformation.Select(ti => ConvertToTaxonListTaxonInformation(ti, taxa))?.ToList();
-            }
-
-            // Check that data seems to be correct
-            var dataIsOk = conservationLists.Count != 0;
-            var listsWithNoTaxa = new List<TaxonList>();
-            if (dataIsOk)
-            {
-                foreach (var taxonList in taxonLists!)
+                if (!conservationListById.TryGetValue(taxonList.TaxonListServiceId, out var conservationList)
+                    || !(conservationList.TaxonInformation?.Any() ?? false))
                 {
-                    if (!taxonList.AllowNotaxa && !(taxonList.Taxa?.Any() ?? false))
-                    {
-                        listsWithNoTaxa.Add(taxonList);
-                        dataIsOk = false;
-                    }
+                    _logger.LogWarning(
+                        "Skipping taxon list without retrieved taxa. Id: {Id}, TaxonListServiceId: {TaxonListServiceId}, Title: {Title}",
+                        taxonList.Id, taxonList.TaxonListServiceId, taxonList.Names?.FirstOrDefault()?.Value);
+                    continue;
                 }
+
+                taxonListsToUpdate.Add(taxonList);
             }
 
-            if (!dataIsOk)
+            if (taxonListsToUpdate.Count == 0)
             {
-                string strErrorSummary = string.Join(Environment.NewLine, listsWithNoTaxa.Select(m => $"Id:{m.Id}, TaxonListServiceId: {m.TaxonListServiceId}, Title: {m.Names.First().Value}"));
-                _logger.LogError($"One or more TaxonLists are missing taxa: {strErrorSummary}");
-                harvestInfo.Status = RunStatus.Failed;
+                _logger.LogError("No taxon lists with taxa were retrieved");
                 return harvestInfo;
             }
 
-            var session = _taxonListRepository.CreateSession();
-            await _taxonListRepository.DeleteCollectionAsync(session.TempCollection);            
-            await _taxonListRepository.AddManyAsync(taxonLists, session.TempCollection, useMajorityCollection: true);
-            await _taxonListRepository.PermanentizeCollectionAsync(session, taxonLists!.Count);
-            // Clear observation api cache
-            await _cacheManager.ClearAsync(Cache.TaxonLists);
+            var taxa = (await _taxonRepository.GetAllAsync())?.Where(t => !t.IsNotAccepted).ToDictionary(t => t.Id, t => t) ?? new Dictionary<int, Taxon>();
+            foreach (var taxonList in taxonListsToUpdate)
+            {
+                taxonList.Taxa = conservationListById[taxonList.TaxonListServiceId].TaxonInformation
+                    .Select(ti => ConvertToTaxonListTaxonInformation(ti, taxa)).ToList();
 
-            // Update harvest info
-            harvestInfo.End = DateTime.Now;
+                writeAttempted = true;
+                // UpdateAsync also returns false for unchanged documents and successful inserts.
+                await _taxonListRepository.UpdateAsync(taxonList.Id, taxonList);
+                harvestInfo.Count++;
+            }
+
             harvestInfo.Status = RunStatus.Success;
-            harvestInfo.Count = taxonLists?.Count() ?? 0;
 
-            _logger.LogInformation("Adding taxon lists succeeded");
-            return harvestInfo;
+            _logger.LogInformation("Saving {Count} taxon lists succeeded", harvestInfo.Count);
         }
         catch (Exception e)
         {
             _logger.LogError(e, "Failed harvest of taxon lists");
             harvestInfo.Status = RunStatus.Failed;
+        }
+        finally
+        {
+            if (writeAttempted)
+            {
+                try
+                {
+                    // A failed write may still have changed data, so invalidate the cache on failure too.
+                    await _cacheManager.ClearAsync(Cache.TaxonLists);
+                }
+                catch (Exception e)
+                {
+                    _logger.LogError(e, "Failed to clear taxon lists cache");
+                    harvestInfo.Status = RunStatus.Failed;
+                }
+            }
+
+            harvestInfo.End = DateTime.Now;
         }
 
         return harvestInfo;

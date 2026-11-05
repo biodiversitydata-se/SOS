@@ -144,7 +144,8 @@
                         @if (string.Equals(lastResultType, "geogrid", StringComparison.OrdinalIgnoreCase))
                         {
                             <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" Class="mb-2">
-                                Kartresultatet är aggregerat till geogrid. Zooma in och sök igen för att kunna markera en lokal.
+                                Kartresultatet är aggregerat till geogrid. Klicka på en gridruta för att zooma in.
+                                Om automatisk sökning är avstängd, tryck på Sök efteråt för att kunna markera en lokal.
                             </MudAlert>
                         }
 
@@ -423,6 +424,13 @@
                                 }
                             </div>
                         }
+
+                        <MudCheckBox T="bool"
+                                     Value="@showClickableCursor"
+                                     ValueChanged="OnShowClickableCursorChanged"
+                                     Label="Visa pekfinger över klickbara kartobjekt"
+                                     Color="Color.Primary"
+                                     Dense="true" />
 
                         <MudCheckBox T="bool"
                                      Value="@showCoordinateUncertaintyCircles"

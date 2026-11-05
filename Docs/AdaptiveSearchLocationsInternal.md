@@ -282,6 +282,10 @@ Vid pan/zoom med samma filter behålls markeringen och observationslistan. Tabel
 
 Markering och avmarkering lämnar alltid kartutsnittet oförändrat. Det gäller kartklick, lokal-dropdownen och observationstabellens kryssrutor, även för polygoner som sträcker sig utanför kartutsnittet. Markering uppdaterar objektens stil och kan hämta observationer för urvalet, men anpassar inte kartans centrum eller zoom och startar därför ingen kartsökning genom en automatisk kartförflyttning. Manuell panorering och zoomning, inklusive dubbelklickszoom, fungerar som tidigare och kan utlösa automatisk kartsökning.
 
+När kartresultatet är **geogrid** används klick på en gridruta för navigering: kartan anpassas till rutans utbredning med lite marginal. Rutan markeras inte som en lokal och klicket hämtar inte observationer direkt. Med **Sök automatiskt vid pan/zoom** aktiverat kan det nya kartutsnittet utlösa en ny kartsökning enligt samma regler som annan zoomning. Om automatisk sökning är avstängd används **Sök** efter inzoomningen. Dubbelklick behåller kartans vanliga dubbelklickszoom.
+
+Muspekaren visar en öppen hand över kartbakgrunden, pekfinger över klickbara punkter, polygoner, kluster och gridrutor samt en greppande hand under panorering. Under **Visning → Visa pekfinger över klickbara kartobjekt** kan pekfingret slås av och på (på som standard). Avstängt läge behåller handen för panorering och objektens klickfunktioner, men hoppar över träffkontrollen för muspekaren. Ändringen gäller direkt utan ny sökning. Filterkonturer och andra icke-interaktiva hjälplager ger inte pekfinger. Träffkontrollen använder samma regler och tolerans som klickhanteringen, avbryts vid första klickbara objektet och körs högst en gång per animationsbildruta. Den pausas medan kartan dras och gör inga API-anrop.
+
 Under **Visning → Punktstorlek** används samma antalsbaserade skala för punkter och kluster:
 
 | Läge | Storlek |

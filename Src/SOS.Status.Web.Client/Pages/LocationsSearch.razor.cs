@@ -58,6 +58,7 @@ public partial class LocationsSearch : IAsyncDisposable
     private int bboxBufferPercent = 0;
     private bool includeBoundingBoxInSearch = true;
     private bool searchAutomaticallyWhenMapChanges = true;
+    private bool showClickableCursor = true;
     private bool showCoordinateUncertaintyCircles = false;
     private bool showClusterRadiusCircles;
     private bool showClusterMinimumEnclosingCircles;
@@ -137,6 +138,7 @@ public partial class LocationsSearch : IAsyncDisposable
             "./Pages/LocationsSearch.razor.js");
 
         await _mapModule.InvokeVoidAsync("initMap", _mapContainer, _dotNetRef, _zoom, _centerLon, _centerLat);
+        await _mapModule.InvokeVoidAsync("setClickableCursorEnabled", showClickableCursor);
         mapInitialized = true;
         await ConfigureCompactClusterRenderingAsync();
         await ConfigurePointSizingAsync();
@@ -683,6 +685,13 @@ public partial class LocationsSearch : IAsyncDisposable
         compactClusterMaxRadiusMeters = value.HasValue && double.IsFinite(value.Value) && value.Value >= 0
             ? value : null;
         await ConfigureCompactClusterRenderingAsync();
+    }
+
+    private async Task OnShowClickableCursorChanged(bool value)
+    {
+        showClickableCursor = value;
+        if (mapInitialized && _mapModule is not null)
+            await _mapModule.InvokeVoidAsync("setClickableCursorEnabled", value);
     }
 
     private async Task OnShowFilterAreaOutlinesChanged(bool value)
