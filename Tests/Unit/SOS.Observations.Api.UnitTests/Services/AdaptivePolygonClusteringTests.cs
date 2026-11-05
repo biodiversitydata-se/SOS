@@ -147,9 +147,10 @@ public class AdaptivePolygonClusteringTests
     [InlineData(true, CreatePolygonsMode.WhenNeeded)]
     public void CoincidentPolygonsUseTheirWholeUnionBeforeClustering(bool rawRecords, CreatePolygonsMode mode)
     {
-        var records = Enumerable.Range(0, 7).Select(i => Record($"polygon-{i}", 0, true))
+        var locationCount = AdaptiveSearchFeatureLocationsDto.MaxLocationItems + 2;
+        var records = Enumerable.Range(0, locationCount).Select(i => Record($"polygon-{i}", 0, true))
             .Append(Record("a", 2)).Append(Record("b", 4)).ToArray();
-        var polygons = Enumerable.Range(0, 7).ToDictionary(i => $"polygon-{i}", i => Rectangle(i * 2, 2, 12));
+        var polygons = Enumerable.Range(0, locationCount).ToDictionary(i => $"polygon-{i}", i => Rectangle(i * 2, 2, 12));
 
         var result = Cluster(records, polygons, mode, rawRecords);
 
@@ -157,9 +158,9 @@ public class AdaptivePolygonClusteringTests
         var polygonFeature = result.Single(feature => !feature.IsCluster);
         var dto = LocationFeatureResponseMapper.ToProperties(polygonFeature);
         dto.GroupingType.Should().Be(LocationGroupingType.CoLocatedLocations);
-        dto.Locations.Ids.Should().HaveCount(7);
-        dto.Locations.Items.Should().HaveCount(5);
-        polygonFeature.ObservationCount.Should().Be(7);
+        dto.Locations.Ids.Should().HaveCount(locationCount);
+        dto.Locations.Items.Should().HaveCount(AdaptiveSearchFeatureLocationsDto.MaxLocationItems);
+        polygonFeature.ObservationCount.Should().Be(locationCount);
         var expectedUnion = NetTopologySuite.Operation.Union.UnaryUnionOp.Union(polygons.Values.ToList());
         polygonFeature.Geometry!.EqualsTopologically(expectedUnion).Should().BeTrue();
     }

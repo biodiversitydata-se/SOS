@@ -105,11 +105,13 @@ Lokalfeatures returneras i ritordning: ytor först, därefter linjer och sist pu
 | `observationCount` | Totalt antal matchande observationer, även när representanter används. |
 | `presentation` | Kartstatus, statusräknare, brytårsstatus och känslighetsinformation. |
 | `observationSummary` | Antal taxa och delräknare för observationer. |
-| `locations` | Fullständiga `count` och `ids`; `items` innehåller högst fem lokaler, sorterade efter id. |
+| `locations` | Fullständiga `count` och `ids`; `items` begränsas av `AdaptiveSearchFeatureLocationsDto.MaxLocationItems` (standard 100 lokaler per feature), sorterade efter id. |
 | `cluster.radiusMeters` | Använd sökradie i meter. |
 | `cluster.radiusMetersMin` | Ungefärlig radie kring klusterpunkten som omsluter medlemspositionerna, utan osäkerhetsytor. |
 
-Använd feature-id för kartobjektets identitet och `locations.ids` vid observationssökningar. Kluster-id bygger på alla medlems-id:n, oberoende av ordning och skiftläge. Begränsningen till fem `items` gäller bara lokalernas metadata.
+Använd feature-id för kartobjektets identitet och `locations.ids` vid observationssökningar. Kluster-id bygger på alla medlems-id:n, oberoende av ordning och skiftläge. Gränsen för `items` gäller bara lokalernas metadata, inte klusteridentitet eller beräkning av polygongeometri.
+
+Antalet lokaldetaljer styrs på ett enda ställe: `public const int MaxLocationItems = 100` i [AdaptiveSearchLocationFeaturePropertiesDto.cs](../Src/SOS.Api.Contracts/Observations/Responses/AdaptiveSearchLocationFeaturePropertiesDto.cs), i klassen `AdaptiveSearchFeatureLocationsDto`. För att testa större svar, ändra exempelvis konstanten till `200`, bygg om observations-API:t och starta den uppdaterade API-instansen. Gränsen gäller varje kartobjekt, även vid cacheträffar. Ett kluster med 150 lokaler kan då innehålla alla 150 detaljer, medan ett kluster med fler än 200 lokaler fortfarande har fullständiga `ids` och `count` men högst 200 `items`. Jämför svarsstorlek och svarstid med samma filter, bbox, zoom och cacheläge. Återställ konstanten till 100 och bygg om API:t efter testet. Dropdownen använder automatiskt de namn som följer med i `items`; observationstabellens separata gräns på fem observationer påverkas inte.
 
 Med `includeFilterAreasInResult=true` tillkommer områdesfeatures märkta med `properties.FeatureType`: `FilterArea.Area`, `FilterArea.OwnPolygon` eller `FilterArea.Polygon` för en sökcirkel. De har andra properties än lokalfeatures.
 
@@ -294,7 +296,7 @@ Sökfiltrets polygoner visas automatiskt utifrån `filterAreaReferences` i ett s
 
 Om kartutsnittet inte överlappar det valda området är resultatet tomt. När kartsvaret anger noll observationer töms observationstabellen utan ett extra förhandsvisningsanrop. Även direkta anrop till `ObservationsBySearchInternal` returnerar en tom sida med HTTP 200 när en giltig bbox får tom skärning med filterområdet. En felaktig bbox i begäran ger fortfarande HTTP 400. Webbens sökproxy vidarebefordrar API:ts felstatus i stället för att omvandla exempelvis 400 till 500.
 
-När karturvalet omfattar flera lokaler visas en dropdown **Lokal** ovanför observationstabellen. Väljaren tillåter endast val från listan, utan textinmatning. **Alla lokaler (N)** visar observationer för hela urvalet. Välj en lokal för att begränsa tabellsökningen på servern och framhäva lokalens befintliga kartobjekt; en klustermedlem framhäver klustret. Kartan panoreras eller zoomas inte av lokalvalet. Samtliga `locations.ids` går att välja, även när klustret bara innehåller detaljer för fem lokaler. Namn visas tillsammans med id där namn finns i `locations.items`; annars visas enbart id. Rensning återgår till alla lokaler. Ett nytt karturval eller ändrat sökfilter återställer valet; panorering och zoomning med samma sökfilter behåller det. Tabellen visar fortfarande högst fem observationer, och inaktuella svar från tidigare lokalval ignoreras.
+När karturvalet omfattar flera lokaler visas en dropdown **Lokal** ovanför observationstabellen. Väljaren tillåter endast val från listan, utan textinmatning. **Alla lokaler (N)** visar observationer för hela urvalet. Välj en lokal för att begränsa tabellsökningen på servern och framhäva lokalens befintliga kartobjekt; en klustermedlem framhäver klustret. Kartan panoreras eller zoomas inte av lokalvalet. Samtliga `locations.ids` går att välja, även när klustret innehåller fler lokaler än detaljgränsen `MaxLocationItems`. Namn visas tillsammans med id där namn finns i `locations.items`; annars visas enbart id. Rensning återgår till alla lokaler. Ett nytt karturval eller ändrat sökfilter återställer valet; panorering och zoomning med samma sökfilter behåller det. Tabellen visar fortfarande högst fem observationer, och inaktuella svar från tidigare lokalval ignoreras.
 
 ![Lokaler och kluster](Images/adaptivesearchlocations-cluster.png)
 

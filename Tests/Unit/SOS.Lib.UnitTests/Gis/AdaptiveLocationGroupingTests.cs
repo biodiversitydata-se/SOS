@@ -29,11 +29,15 @@ public class AdaptiveLocationGroupingTests
         b.CreateFallbackLocationId().Should().Be(b.DistinctLocationId + "_a200");
     }
 
+    public static IEnumerable<object[]> DetailCounts() => new[]
+    {
+        1, 5, 6, 100,
+        AdaptiveSearchFeatureLocationsDto.MaxLocationItems,
+        AdaptiveSearchFeatureLocationsDto.MaxLocationItems + 1
+    }.Distinct().Select(count => new object[] { count });
+
     [Theory]
-    [InlineData(1)]
-    [InlineData(5)]
-    [InlineData(6)]
-    [InlineData(100)]
+    [MemberData(nameof(DetailCounts))]
     public void ItemsAreLimitedButCountsAndIdsIncludeEveryOriginalLocation(int count)
     {
         var observations = Enumerable.Range(0, count).Select(i => At($"site-{i:D3}", 0, i + 1)).Reverse().ToList();
@@ -44,8 +48,8 @@ public class AdaptiveLocationGroupingTests
         dto.HasMultipleLocations.Should().Be(count > 1);
         dto.ObservationCount.Should().Be(count);
         dto.Locations.Ids.Should().HaveCount(count).And.BeInAscendingOrder();
-        dto.Locations.Items.Should().HaveCount(Math.Min(5, count));
-        dto.Locations.Items.Select(l => l.LocationId).Should().Equal(dto.Locations.Ids.Take(5));
+        dto.Locations.Items.Should().HaveCount(Math.Min(AdaptiveSearchFeatureLocationsDto.MaxLocationItems, count));
+        dto.Locations.Items.Select(l => l.LocationId).Should().Equal(dto.Locations.Ids.Take(AdaptiveSearchFeatureLocationsDto.MaxLocationItems));
         dto.Locations.Items[0].Locality.Should().Be("Name site-000");
         dto.Locations.Items[0].CoordinateUncertaintyInMeters.Should().Be(1);
         var json = JsonSerializer.Serialize(dto, new JsonSerializerOptions(JsonSerializerDefaults.Web)

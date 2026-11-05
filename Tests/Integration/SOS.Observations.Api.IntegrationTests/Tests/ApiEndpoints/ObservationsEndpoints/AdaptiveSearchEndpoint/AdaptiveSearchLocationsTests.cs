@@ -2,6 +2,7 @@
 using GeoJSON.Text.Geometry;
 using SOS.Api.Contracts.Common.Geo;
 using SOS.Api.Contracts.Observations.Requests;
+using SOS.Api.Contracts.Observations.Responses;
 using MongoDB.Driver.GeoJsonObjectModel;
 using Moq;
 using SOS.Lib.Models.Search;
@@ -1025,7 +1026,7 @@ public partial class AdaptiveSearchLocationsTests : ElasticsearchTestBase
         features.Should().HaveCount(2);
         var colocated = features.Single(f => f!["properties"]!["groupingType"]!.GetValue<string>() == "coLocatedLocations")!;
         colocated["properties"]!["locations"]!["count"]!.GetValue<int>().Should().Be(6);
-        colocated["properties"]!["locations"]!["items"]!.AsArray().Should().HaveCount(5);
+        colocated["properties"]!["locations"]!["items"]!.AsArray().Should().HaveCount(Math.Min(6, AdaptiveSearchFeatureLocationsDto.MaxLocationItems));
         colocated["properties"]!["locations"]!["ids"]!.AsArray().Should().HaveCount(6);
         colocated.ToJsonString().Should().Be(uncachedFeatures.Single(f => f!["id"]!.GetValue<string>() == colocated["id"]!.GetValue<string>())!.ToJsonString());
         var meter = await client.PostAsync(url + "&clusterRadiusMeters=100", JsonContent.Create(filter), TestContext.Current.CancellationToken);
@@ -1033,10 +1034,13 @@ public partial class AdaptiveSearchLocationsTests : ElasticsearchTestBase
         meterFeature["properties"]!["groupingType"]!.GetValue<string>().Should().Be("meterCluster");
         meterFeature["properties"]!["observationCount"]!.GetValue<int>().Should().Be(7);
         meterFeature["properties"]!["locations"]!["ids"]!.AsArray().Should().HaveCount(7);
+        meterFeature["properties"]!["locations"]!["count"]!.GetValue<int>().Should().Be(7);
+        meterFeature["properties"]!["locations"]!["items"]!.AsArray().Should().HaveCount(Math.Min(7, AdaptiveSearchFeatureLocationsDto.MaxLocationItems));
         var both = await client.PostAsync(url.Replace("cluster=false", "cluster=true") + "&clusterRadiusMeters=100&metersPerPixel=1&minLocationCountBeforeClustering=0&switchToDetailClusteringAtMetersPerPixel=0", JsonContent.Create(filter), TestContext.Current.CancellationToken);
         var bothFeature = JsonNode.Parse(await both.Content.ReadAsStringAsync(TestContext.Current.CancellationToken))!["features"]!.AsArray().Single()!;
         bothFeature["properties"]!["groupingType"]!.GetValue<string>().Should().Be("meterCluster");
         bothFeature["id"]!.GetValue<string>().Should().Be(meterFeature["id"]!.GetValue<string>());
+        bothFeature["properties"]!["locations"]!.ToJsonString().Should().Be(meterFeature["properties"]!["locations"]!.ToJsonString());
     }
 
     private static IList<ArtportalenObservationVerbatim> CreatePointObservations(

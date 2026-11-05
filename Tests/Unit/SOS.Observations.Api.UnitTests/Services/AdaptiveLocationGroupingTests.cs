@@ -42,7 +42,7 @@ public class AdaptiveLocationGroupingTests
     [Fact]
     public async Task ClusterIdentityIncludesEveryIdAndIgnoresOrderingAndCase()
     {
-        var first = MakeAggregate(7);
+        var first = MakeAggregate(AdaptiveSearchFeatureLocationsDto.MaxLocationItems + 2);
         var a = await Write(MakeCluster(first));
         first.LocationIds.Reverse();
         var b = await Write(MakeCluster(first));
@@ -50,11 +50,11 @@ public class AdaptiveLocationGroupingTests
         for (var i = 0; i < first.LocationIds.Count; i++) first.LocationIds[i] = first.LocationIds[i].ToUpperInvariant();
         var c = await Write(MakeCluster(first));
         c.GetProperty("id").GetString().Should().Be(a.GetProperty("id").GetString());
-        first.LocationIds.Add("extra-outside-items-limit");
+        first.LocationIds.Add("zz-extra-outside-items-limit");
         var d = await Write(MakeCluster(first));
         d.GetProperty("id").GetString().Should().NotBe(a.GetProperty("id").GetString());
         a.GetProperty("id").GetString().Should().NotBeNullOrWhiteSpace();
-        a.GetProperty("properties").GetProperty("locations").GetProperty("items").GetArrayLength().Should().Be(5);
+        a.GetProperty("properties").GetProperty("locations").GetProperty("items").GetArrayLength().Should().Be(AdaptiveSearchFeatureLocationsDto.MaxLocationItems);
         a.GetProperty("properties").GetProperty("hasMultipleLocations").GetBoolean().Should().BeTrue();
     }
 
@@ -74,32 +74,40 @@ public class AdaptiveLocationGroupingTests
     }
 
     [Fact]
-    public void PolygonUnionIncludesLocationsBeyondTheFiveDisplayedItems()
+    public void PolygonUnionIncludesLocationsBeyondTheDetailLimit()
     {
-        var aggregate = MakeAggregate(7);
+        var aggregate = MakeAggregate(AdaptiveSearchFeatureLocationsDto.MaxLocationItems + 2);
         var polygons = new Dictionary<string, Geometry>();
-        for (var i = 0; i < 7; i++)
+        for (var i = 0; i < aggregate.Locations.Count; i++)
         {
             aggregate.Locations[i].Type = SOS.Lib.Enums.LocationType.Polygon;
             polygons[aggregate.Locations[i].LocationId] = new GeometryFactory().ToGeometry(new Envelope(15 + i * 0.01, 15.005 + i * 0.01, 59, 59.005));
         }
         var factory = new AdaptiveSearchLocationFeatureFactory(new AdaptiveSearchLocationAggregator());
         var feature = factory.CreateItems(new List<CachedLocationAggregate> { aggregate }, new LocationFeatureOptions { PolygonGeometries = polygons, CreatePolygons = CreatePolygonsMode.Yes, MetersPerPixel = null }).Single();
-        feature.Geometry!.Covers(new Point(15.062, 59.002)).Should().BeTrue();
-        LocationFeatureResponseMapper.ToProperties(feature).Locations.Items.Should().HaveCount(5);
+        var lastLocation = aggregate.Locations.OrderBy(l => l.LocationId, StringComparer.OrdinalIgnoreCase).Last();
+        var lastIndex = aggregate.Locations.IndexOf(lastLocation);
+        feature.Geometry!.Covers(new Point(15 + lastIndex * 0.01 + 0.002, 59.002)).Should().BeTrue();
+        var details = LocationFeatureResponseMapper.ToProperties(feature).Locations;
+        details.Items.Should().HaveCount(AdaptiveSearchFeatureLocationsDto.MaxLocationItems)
+            .And.NotContain(item => item.LocationId == lastLocation.LocationId);
+        details.Ids.Should().Contain(lastLocation.LocationId).And.HaveCount(aggregate.Locations.Count);
     }
 
     [Fact]
     public void GeneralizedUnionUsesLargestSurfaceEvenBeyondItemLimit()
     {
-        var aggregate = MakeAggregate(7);
+        var aggregate = MakeAggregate(AdaptiveSearchFeatureLocationsDto.MaxLocationItems + 2);
         foreach (var location in aggregate.Locations) aggregate.GeneralizedLocationIds.Add(location.LocationId);
-        aggregate.Locations[6].CoordinateUncertaintyInMeters = 10000;
+        var lastLocation = aggregate.Locations.OrderBy(l => l.LocationId, StringComparer.OrdinalIgnoreCase).Last();
+        lastLocation.CoordinateUncertaintyInMeters = 10000;
         var factory = new AdaptiveSearchLocationFeatureFactory(new AdaptiveSearchLocationAggregator());
         var feature = factory.CreateItems(new List<CachedLocationAggregate> { aggregate }, new LocationFeatureOptions { PolygonGeometries = null, CreatePolygons = CreatePolygonsMode.No, MetersPerPixel = null }).Single();
         feature.Geometry!.EnvelopeInternal.Width.Should().BeGreaterThan(0.1);
         var dto = LocationFeatureResponseMapper.ToProperties(feature);
-        dto.Locations.Items.Should().HaveCount(5).And.OnlyContain(i => i.IsGeneralized == true);
+        dto.Locations.Items.Should().HaveCount(AdaptiveSearchFeatureLocationsDto.MaxLocationItems)
+            .And.OnlyContain(i => i.IsGeneralized == true)
+            .And.NotContain(i => i.LocationId == lastLocation.LocationId);
     }
 
     [Fact]
@@ -112,9 +120,34 @@ public class AdaptiveLocationGroupingTests
         var factory = new AdaptiveSearchLocationFeatureFactory(new AdaptiveSearchLocationAggregator());
         var feature = factory.CreateItems(new List<CachedLocationAggregate> { aggregate }, new LocationFeatureOptions { PolygonGeometries = null, CreatePolygons = CreatePolygonsMode.No, MetersPerPixel = null }).Single();
         var properties = LocationFeatureResponseMapper.ToProperties(feature);
-        properties.Locations.Items.Should().OnlyContain(item => item.IsGeneralized == false);
+        properties.Locations.Items.Should().OnlyContain(item => item.IsGeneralized == (item.LocationId == "site-6"));
         properties.ObservationSummary.StatusCounts!.DiffusedCount.Should().Be(1);
         feature.Geometry!.EnvelopeInternal.Width.Should().BeGreaterThan(0.1);
+    }
+
+    public static IEnumerable<object[]> DetailCounts() => new[]
+    {
+        1, AdaptiveSearchFeatureLocationsDto.MaxLocationItems - 1,
+        AdaptiveSearchFeatureLocationsDto.MaxLocationItems,
+        AdaptiveSearchFeatureLocationsDto.MaxLocationItems + 1, 150
+    }.Distinct().Select(count => new object[] { count });
+
+    [Theory]
+    [MemberData(nameof(DetailCounts))]
+    public async Task DetailLimitPreservesAllIdsAndCountInTheResponse(int count)
+    {
+        var aggregate = MakeAggregate(count);
+        var json = await Write(MakeCluster(aggregate));
+        var locations = json.GetProperty("properties").GetProperty("locations");
+        var expectedIds = aggregate.LocationIds.OrderBy(id => id, StringComparer.OrdinalIgnoreCase).ToArray();
+
+        locations.GetProperty("count").GetInt32().Should().Be(count);
+        locations.GetProperty("ids").EnumerateArray().Select(id => id.GetString()).Should().Equal(expectedIds);
+        var items = locations.GetProperty("items").EnumerateArray().ToArray();
+        items.Should().HaveCount(Math.Min(count, AdaptiveSearchFeatureLocationsDto.MaxLocationItems));
+        items.Select(item => item.GetProperty("locationId").GetString())
+            .Should().Equal(expectedIds.Take(AdaptiveSearchFeatureLocationsDto.MaxLocationItems));
+        items.Should().OnlyContain(item => !string.IsNullOrEmpty(item.GetProperty("locality").GetString()));
     }
 
     private static LocationFeature MakeCluster(CachedLocationAggregate aggregate) => new()
