@@ -34,6 +34,7 @@ public partial class LocationsSearch : IAsyncDisposable
     private int? selectedExampleId = DefaultExampleId;
     private string? mapGeoJson;
     private ElementReference _mapContainer;
+    private ElementReference _mapTooltip;
     private IJSObjectReference? _mapModule;
     private DotNetObjectReference<LocationsSearch>? _dotNetRef;
     private bool mapInitialized;
@@ -58,7 +59,8 @@ public partial class LocationsSearch : IAsyncDisposable
     private int bboxBufferPercent = 0;
     private bool includeBoundingBoxInSearch = true;
     private bool searchAutomaticallyWhenMapChanges = true;
-    private bool showClickableCursor = true;
+    private HoverFeedbackMode hoverFeedbackMode = HoverFeedbackMode.Outline;
+    private bool showMapTooltip;
     private bool showCoordinateUncertaintyCircles = false;
     private bool showClusterRadiusCircles;
     private bool showClusterMinimumEnclosingCircles;
@@ -137,8 +139,9 @@ public partial class LocationsSearch : IAsyncDisposable
             "import",
             "./Pages/LocationsSearch.razor.js");
 
-        await _mapModule.InvokeVoidAsync("initMap", _mapContainer, _dotNetRef, _zoom, _centerLon, _centerLat);
-        await _mapModule.InvokeVoidAsync("setClickableCursorEnabled", showClickableCursor);
+        await _mapModule.InvokeVoidAsync("initMap", _mapContainer, _dotNetRef, _zoom, _centerLon, _centerLat, _mapTooltip);
+        await _mapModule.InvokeVoidAsync("setHoverFeedbackMode", hoverFeedbackMode.ToString());
+        await _mapModule.InvokeVoidAsync("setMapTooltipEnabled", showMapTooltip);
         mapInitialized = true;
         await ConfigureCompactClusterRenderingAsync();
         await ConfigurePointSizingAsync();
@@ -687,11 +690,18 @@ public partial class LocationsSearch : IAsyncDisposable
         await ConfigureCompactClusterRenderingAsync();
     }
 
-    private async Task OnShowClickableCursorChanged(bool value)
+    private async Task OnHoverFeedbackModeChanged(HoverFeedbackMode value)
     {
-        showClickableCursor = value;
+        hoverFeedbackMode = value;
         if (mapInitialized && _mapModule is not null)
-            await _mapModule.InvokeVoidAsync("setClickableCursorEnabled", value);
+            await _mapModule.InvokeVoidAsync("setHoverFeedbackMode", value.ToString());
+    }
+
+    private async Task OnShowMapTooltipChanged(bool value)
+    {
+        showMapTooltip = value;
+        if (mapInitialized && _mapModule is not null)
+            await _mapModule.InvokeVoidAsync("setMapTooltipEnabled", value);
     }
 
     private async Task OnShowFilterAreaOutlinesChanged(bool value)
@@ -1316,6 +1326,13 @@ public partial class LocationsSearch : IAsyncDisposable
 
         _dotNetRef?.Dispose();
         _dotNetRef = null;
+    }
+
+    private enum HoverFeedbackMode
+    {
+        Cursor,
+        Outline,
+        None
     }
 
     private enum PointSizeMode

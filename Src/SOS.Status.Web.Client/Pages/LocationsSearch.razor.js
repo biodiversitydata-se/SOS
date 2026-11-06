@@ -3,15 +3,35 @@ import * as openLayersMap from "/openLayersMap.js";
 let map = null;
 let dotNetRef = null;
 let moveEndKey = null;
+let moveStartKey = null;
 let singleClickKey = null;
 let clickFeedbackKey = null;
 let doubleClickKey = null;
 let pointerMoveKey = null;
 let pointerDragKey = null;
 let cursorViewport = null;
-let cursorFrame = null;
+let cursorTimer = null;
 let hoverPixel = null;
-let clickableCursorEnabled = true;
+let cursorQuery = null;
+let cursorVersion = 0;
+let lastCursorQueryTime = -Infinity;
+let hoverFeedbackMode = "Outline";
+let hoveredFeature = null;
+let hoverOutlineLayer = null;
+let hoverOutlineFeature = null;
+let hoverPointRadiusPx = null;
+const hoverOutlineStyles = new Map();
+const cursorQueryIntervalMs = 1000 / 30;
+let mapTooltipElement = null;
+let mapTooltipEnabled = false;
+let tooltipFeature = null;
+let tooltipTimer = null;
+let tooltipStartedAt = 0;
+let tooltipPixel = null;
+let tooltipContext = null;
+let tooltipSize = null;
+const tooltipDelayMs = 200;
+const tooltipNumberFormat = new Intl.NumberFormat("sv-SE");
 
 const locationsLayerId = "locations";
 let locationFeatureCollection = null;
@@ -136,7 +156,7 @@ const numericDisplayStatusKeys = {
     6: "cluster"
 };
 
-export function initMap(container, blazorDotNetRef, zoom, centerLon, centerLat) {
+export function initMap(container, blazorDotNetRef, zoom, centerLon, centerLat, tooltipElement = null) {
     if (!window.ol || !container) {
         return;
     }
@@ -144,6 +164,8 @@ export function initMap(container, blazorDotNetRef, zoom, centerLon, centerLat) 
     destroyMap();
 
     dotNetRef = blazorDotNetRef;
+    mapTooltipElement = tooltipElement;
+    if (mapTooltipElement) mapTooltipElement.hidden = true;
 
     const baseLayer = new ol.layer.Tile({
         source: new ol.source.OSM()
@@ -161,6 +183,7 @@ export function initMap(container, blazorDotNetRef, zoom, centerLon, centerLat) 
     });
 
     moveEndKey = map.on("moveend", notifyExtentChanged);
+    moveStartKey = map.on("movestart", resetHoverCursor);
     singleClickKey = map.on("singleclick", onSingleClick);
     clickFeedbackKey = map.on("click", onClickFeedback);
     doubleClickKey = map.on("dblclick", onDoubleClick);
@@ -170,7 +193,8 @@ export function initMap(container, blazorDotNetRef, zoom, centerLon, centerLat) 
     cursorViewport.addEventListener("pointerleave", onMapPointerLeave);
     cursorViewport.addEventListener("pointercancel", onMapPointerLeave);
     cursorViewport.addEventListener("pointerup", onMapPointerUp);
-    setMapCursor("grab");
+    cursorViewport.addEventListener("pointerover", onMapControlPointerOver);
+    setMapCursor("default");
 
     requestAnimationFrame(function () {
         map?.updateSize();
@@ -192,6 +216,10 @@ export function destroyMap() {
     if (moveEndKey) {
         ol.Observable.unByKey(moveEndKey);
         moveEndKey = null;
+    }
+    if (moveStartKey) {
+        ol.Observable.unByKey(moveStartKey);
+        moveStartKey = null;
     }
 
     if (singleClickKey) {
@@ -215,11 +243,19 @@ export function destroyMap() {
         pointerDragKey = null;
     }
     onMapPointerLeave();
-    clickableCursorEnabled = true;
+    mapTooltipEnabled = false;
+    mapTooltipElement = null;
+    cursorQuery = null;
+    lastCursorQueryTime = -Infinity;
+    hoverFeedbackMode = "Outline";
+    if (hoverOutlineLayer) map?.removeLayer(hoverOutlineLayer);
+    hoverOutlineLayer = null;
+    hoverOutlineStyles.clear();
     if (cursorViewport) {
         cursorViewport.removeEventListener("pointerleave", onMapPointerLeave);
         cursorViewport.removeEventListener("pointercancel", onMapPointerLeave);
         cursorViewport.removeEventListener("pointerup", onMapPointerUp);
+        cursorViewport.removeEventListener("pointerover", onMapControlPointerOver);
         setMapCursor("");
         cursorViewport = null;
     }
@@ -323,6 +359,7 @@ export function configurePointSizing(mode) {
         pointSizeMode = value;
         // Refresh selected symbols too, without moving the map or triggering a search.
         applyHighlightedLocationStyles();
+        refreshHoverGeometry();
     }
 
     return getPointSizeLegend();
@@ -693,6 +730,7 @@ export function updateFilterAreaLayer(references, filterJson) {
 }
 
 function notifyExtentChanged() {
+    resetHoverCursor();
     const extent = getExtent();
     if (!extent || !dotNetRef) {
         return;
@@ -702,12 +740,245 @@ function notifyExtentChanged() {
     });
 }
 
-export function setClickableCursorEnabled(enabled) {
-    clickableCursorEnabled = enabled === true;
-    if (!clickableCursorEnabled) {
-        cancelCursorUpdate();
-        if (cursorViewport?.style.cursor !== "grabbing") setMapCursor("grab");
+export function setHoverFeedbackMode(mode) {
+    const value = mode === "Cursor" || mode === "Outline" ? mode : "None";
+    if (value === hoverFeedbackMode) return;
+    hoverFeedbackMode = value;
+    resetHoverCursor();
+}
+
+export function setMapTooltipEnabled(enabled) {
+    const value = enabled === true;
+    if (value === mapTooltipEnabled) return;
+    mapTooltipEnabled = value;
+    resetHoverCursor();
+}
+
+function isHoverDetectionEnabled() {
+    return hoverFeedbackMode !== "None" || (mapTooltipEnabled && mapTooltipElement !== null);
+}
+
+function applyHoverFeedback(feature, pixel = null, query = null) {
+    setMapCursor(hoverFeedbackMode === "Cursor" && feature ? "pointer" : "default");
+    setHoveredFeature(hoverFeedbackMode === "Outline" ? feature : null);
+    updateMapTooltip(feature, pixel, query);
+}
+
+function hideMapTooltip() {
+    if (tooltipTimer !== null) clearTimeout(tooltipTimer);
+    tooltipTimer = null;
+    tooltipFeature = null;
+    tooltipContext = null;
+    tooltipPixel = null;
+    tooltipSize = null;
+    if (mapTooltipElement && !mapTooltipElement.hidden) mapTooltipElement.hidden = true;
+}
+
+function isCurrentTooltipContext() {
+    const query = tooltipContext;
+    return mapTooltipEnabled && mapTooltipElement && tooltipFeature && query && map === query.map &&
+        getLayerById(locationsLayerId) === query.layer && query.layer.getSource() === query.source &&
+        map.getView() === query.view && query.view.getRevision() === query.viewRevision;
+}
+
+function updateMapTooltip(feature, pixel, query) {
+    if (!mapTooltipEnabled || !mapTooltipElement || !feature || !pixel || !query) {
+        hideMapTooltip();
+        return;
     }
+    if (tooltipFeature !== feature) {
+        hideMapTooltip();
+        tooltipFeature = feature;
+        tooltipStartedAt = performance.now();
+        const content = createMapTooltipContent(feature);
+        mapTooltipElement.textContent = content.text + (content.hint ? "\n" : "");
+        if (content.hint) {
+            const hint = mapTooltipElement.ownerDocument.createElement("em");
+            hint.textContent = content.hint;
+            mapTooltipElement.appendChild(hint);
+        }
+    }
+    tooltipPixel = pixel;
+    tooltipContext = query;
+    if (!mapTooltipElement.hidden) {
+        positionMapTooltip();
+        return;
+    }
+    const remaining = Math.max(0, tooltipDelayMs - (performance.now() - tooltipStartedAt));
+    if (remaining === 0) displayMapTooltip();
+    else if (tooltipTimer === null) tooltipTimer = setTimeout(() => {
+        tooltipTimer = null;
+        if (!isCurrentTooltipContext()) { hideMapTooltip(); return; }
+        // If a newer position is still being checked, let its confirmed hit display the tooltip.
+        if (!cursorQuery && !hoverPixel) displayMapTooltip();
+    }, remaining);
+}
+
+function displayMapTooltip() {
+    if (!isCurrentTooltipContext()) { hideMapTooltip(); return; }
+    mapTooltipElement.hidden = false;
+    // Measure only when showing new content, not on every pointer movement.
+    tooltipSize = [mapTooltipElement.offsetWidth, mapTooltipElement.offsetHeight];
+    positionMapTooltip();
+}
+
+function positionMapTooltip() {
+    const size = map?.getSize();
+    if (!size || !tooltipPixel || !tooltipSize) return;
+    const [width, height] = tooltipSize;
+    let x = tooltipPixel[0] + 12, y = tooltipPixel[1] + 12;
+    if (x + width > size[0] - 8) x = tooltipPixel[0] - width - 12;
+    if (y + height > size[1] - 8) y = tooltipPixel[1] - height - 12;
+    x = Math.max(8, Math.min(x, size[0] - width - 8));
+    y = Math.max(8, Math.min(y, size[1] - height - 8));
+    mapTooltipElement.style.transform = `translate(${Math.round(x)}px, ${Math.round(y)}px)`;
+}
+
+function tooltipCount(value) {
+    const number = toFiniteNumber(value);
+    return Number.isInteger(number) && number >= 0 ? number : null;
+}
+
+function tooltipLocationName(location, fallbackId = null) {
+    const name = getObjectProperty(location, "locality", "Locality");
+    const id = getObjectProperty(location, "locationId", "LocationId") ?? fallbackId;
+    return typeof name === "string" && name.trim() ? name.trim()
+        : typeof id === "string" && id.trim() ? id.trim() : "Fyndplats";
+}
+
+function createMapTooltipContent(feature) {
+    const observations = tooltipCount(getNumericPropertyOrNull(feature, ...observationCountPropertyNames));
+    const lines = [];
+    if (isGridResult()) lines.push("Gridruta");
+    else {
+        const locations = getFeatureProperty(feature, "locations", "Locations");
+        const details = getObjectProperty(locations, "items", "Items");
+        const items = Array.isArray(details) ? details : [];
+        const ids = getObjectProperty(locations, "ids", "Ids");
+        const fullIds = Array.isArray(ids) ? ids : [];
+        const count = tooltipCount(getObjectProperty(locations, "count", "Count")) ??
+            (fullIds.length > 0 ? normalizedIdSet(fullIds).size : null);
+        const type = String(getFeatureProperty(feature, "groupingType", "GroupingType") ?? "").toLowerCase();
+        const cluster = type === "metercluster" || type === "pixelcluster";
+        const multiple = cluster || type === "colocatedlocations" || count > 1;
+        if (multiple) {
+            const total = count === null ? "Fyndplatser" : `${tooltipNumberFormat.format(count)} ${count === 1 ? "fyndplats" : "fyndplatser"}`;
+            lines.push(cluster ? count === null ? "Kluster" : `Kluster – ${total}` : `${total} på samma plats`);
+        } else lines.push(tooltipLocationName(items[0], fullIds.find(id => typeof id === "string" && id.trim())));
+        if (observations !== null) lines.push(`${tooltipNumberFormat.format(observations)} ${observations === 1 ? "observation" : "observationer"}`);
+        if (multiple && !cluster) {
+            const names = [...new Map(items.map(item => {
+                const name = tooltipLocationName(item);
+                return [name.toLocaleLowerCase("sv-SE"), name];
+            })).values()].sort((a, b) => a.localeCompare(b, "sv-SE")).slice(0, 3);
+            if (names.length > 0) lines.push(`Exempel: ${names.join(", ")}`);
+        } else if (!multiple && isPointGeometry(feature)) {
+            const uncertainty = toFiniteNumber(getObjectProperty(items[0], "coordinateUncertaintyInMeters", "CoordinateUncertaintyInMeters"));
+            if (uncertainty > 0) lines.push(`Noggrannhetsradie: ${tooltipNumberFormat.format(uncertainty)} m`);
+        }
+        return { text: lines.join("\n"), hint: cluster ? "Zooma in för att välja en fyndplats" : null };
+    }
+    if (observations !== null) lines.push(`${tooltipNumberFormat.format(observations)} ${observations === 1 ? "observation" : "observationer"}`);
+    lines.push("Klicka för att zooma in");
+    return { text: lines.join("\n"), hint: null };
+}
+
+function setHoveredFeature(feature) {
+    if (hoveredFeature === feature) return;
+    hoveredFeature = feature;
+    hoverOutlineLayer?.getSource().clear();
+    hoverOutlineFeature = null;
+    hoverPointRadiusPx = null;
+    if (!feature) return;
+
+    if (!hoverOutlineLayer) {
+        hoverOutlineLayer = new ol.layer.Vector({
+            source: new ol.source.Vector(),
+            style: () => getHoverOutlineStyle()
+        });
+        hoverOutlineLayer.set("id", "hover-outline");
+        hoverOutlineLayer.set("sosNonInteractive", true);
+        hoverOutlineLayer.setZIndex(30);
+        map.addLayer(hoverOutlineLayer);
+    }
+    // A geometry-only feature keeps the original feature's selection style out of this layer.
+    // Share existing polygon geometry; point uncertainty uses one bounded-size circle geometry.
+    hoverOutlineFeature = new ol.Feature({ geometry: createHoverGeometry(feature) });
+    hoverOutlineLayer.getSource().addFeature(hoverOutlineFeature);
+}
+
+function getVisiblePointRadius(feature) {
+    const baseRadius = getPointRadius(feature) + 0.5; // Normal symbols have a 1 px stroke.
+    const image = feature.getStyle?.()?.getImage?.();
+    const radius = image?.getRadius?.();
+    const strokeWidth = image?.getStroke?.()?.getWidth?.() ?? 0;
+    return Number.isFinite(radius) ? Math.max(baseRadius, radius + strokeWidth / 2) : baseRadius;
+}
+
+function getHoverRadiusMeters(feature) {
+    const groupingType = getFeatureProperty(feature, "groupingType", "GroupingType");
+    if (groupingType === "meterCluster" || groupingType === "pixelCluster") {
+        const cluster = getFeatureProperty(feature, "cluster", "Cluster");
+        const radius = toFiniteNumber(getObjectProperty(cluster, "radiusMetersMin", "RadiusMetersMin"));
+        return radius > 0 ? radius : 0;
+    }
+
+    const locations = getFeatureProperty(feature, "locations", "Locations");
+    const items = getObjectProperty(locations, "items", "Items");
+    let radius = 0;
+    for (const location of Array.isArray(items) ? items : []) {
+        const uncertainty = toFiniteNumber(getObjectProperty(location, "coordinateUncertaintyInMeters", "CoordinateUncertaintyInMeters"));
+        if (uncertainty > radius) radius = uncertainty;
+    }
+    return radius;
+}
+
+function createHoverGeometry(feature) {
+    const geometry = feature.getGeometry();
+    if (!isPointGeometry(feature)) return geometry;
+
+    hoverPointRadiusPx = getVisiblePointRadius(feature);
+    const view = map.getView();
+    const projection = view.getProjection?.();
+    const resolution = view.getResolution?.();
+    if (!projection || !Number.isFinite(resolution) || resolution <= 0) return geometry;
+
+    const coordinates = geometry.getCoordinates();
+    const centers = geometry.getType() === "MultiPoint" ? coordinates : [coordinates];
+    const radiusMeters = getHoverRadiusMeters(feature);
+    const circles = [];
+    for (const center of centers) {
+        const metersPerPixel = ol.proj.getPointResolution(projection, resolution, center, "m");
+        if (!Number.isFinite(metersPerPixel) || metersPerPixel <= 0) return geometry;
+        const [longitude, latitude] = ol.proj.toLonLat(center, projection);
+        const radius = Math.max(radiusMeters, hoverPointRadiusPx * metersPerPixel);
+        circles.push([openLayersMap.createGeodesicCircleCoordinates(longitude, latitude, radius, projection)]);
+    }
+    return geometry.getType() === "MultiPoint" ? new ol.geom.MultiPolygon(circles) : new ol.geom.Polygon(circles[0]);
+}
+
+function refreshHoverGeometry() {
+    if (!hoverOutlineFeature || !hoveredFeature || !isPointGeometry(hoveredFeature)) return;
+    if (getVisiblePointRadius(hoveredFeature) !== hoverPointRadiusPx)
+        hoverOutlineFeature.setGeometry(createHoverGeometry(hoveredFeature));
+}
+
+function getHoverOutlineStyle() {
+    if (!hoveredFeature) return null;
+    const point = isPointGeometry(hoveredFeature);
+    // A missing/invalid map resolution falls back to a small symbol, never a huge pixel canvas.
+    const fallbackRadius = point && isPointGeometry(hoverOutlineFeature) ? hoverPointRadiusPx : 0;
+    const key = fallbackRadius > 0 ? `symbol:${fallbackRadius}` : point ? "area" : "outline";
+    let style = hoverOutlineStyles.get(key);
+    if (!style) {
+        const stroke = new ol.style.Stroke({ color: "#ff0000", width: 2 });
+        const fill = point ? new ol.style.Fill({ color: "rgba(255, 235, 59, 0.12)" }) : undefined;
+        style = new ol.style.Style(fallbackRadius > 0
+            ? { image: new ol.style.Circle({ radius: fallbackRadius, stroke, fill }) }
+            : { stroke, fill });
+        hoverOutlineStyles.set(key, style);
+    }
+    return style;
 }
 
 function setMapCursor(cursor) {
@@ -715,46 +986,91 @@ function setMapCursor(cursor) {
 }
 
 function cancelCursorUpdate() {
-    if (cursorFrame !== null) cancelAnimationFrame(cursorFrame);
-    cursorFrame = null;
+    if (cursorTimer !== null) clearTimeout(cursorTimer);
+    cursorTimer = null;
     hoverPixel = null;
+    cursorVersion++;
+}
+
+function resetHoverCursor() {
+    cancelCursorUpdate();
+    applyHoverFeedback(null);
 }
 
 function onMapPointerLeave() {
-    cancelCursorUpdate();
-    setMapCursor("grab");
+    resetHoverCursor();
 }
 
 function onMapPointerUp(event) {
     onMapPointerLeave();
-    if (map && event.pointerType !== "touch") onMapPointerMove({ pixel: map.getEventPixel(event) });
+    if (map && event.pointerType !== "touch") onMapPointerMove({ pixel: map.getEventPixel(event), originalEvent: event });
+}
+
+function onMapControlPointerOver(event) {
+    if (event.target?.closest?.(".ol-control")) resetHoverCursor();
 }
 
 function onMapPointerMove(event) {
-    if (!map || event.originalEvent?.pointerType === "touch") return;
-    if (event.dragging) {
-        cancelCursorUpdate();
-        setMapCursor("grabbing");
+    if (!map) return;
+    if (event.dragging || event.originalEvent?.pointerType === "touch" || event.originalEvent?.target?.closest?.(".ol-control")) {
+        resetHoverCursor();
         return;
     }
-    if (!clickableCursorEnabled) {
-        setMapCursor("grab");
+    if (!isHoverDetectionEnabled()) {
         return;
     }
 
     hoverPixel = event.pixel;
-    if (cursorFrame !== null) return;
-    cursorFrame = requestAnimationFrame(() => {
-        cursorFrame = null;
-        if (!map || !hoverPixel) return;
-        // Hover only needs the first clickable hit, unlike selection which collects every hit.
-        const hit = map.forEachFeatureAtPixel(hoverPixel, (feature, layer) =>
-            isInteractiveObservationFeature(feature, layer) ? true : undefined, {
-                hitTolerance: 4,
-                layerFilter: layer => layer.get("id") === locationsLayerId && !layer.get("sosNonInteractive")
-            });
-        setMapCursor(hit ? "pointer" : "grab");
-    });
+    cursorVersion++;
+    scheduleCursorQuery();
+}
+
+function scheduleCursorQuery() {
+    if (!map || !isHoverDetectionEnabled() || !hoverPixel || cursorTimer !== null || cursorQuery) return;
+    const delay = Math.max(0, Math.ceil(cursorQueryIntervalMs - (performance.now() - lastCursorQueryTime)));
+    cursorTimer = setTimeout(updateHoverCursor, delay);
+}
+
+function isCurrentCursorQuery(query) {
+    return cursorQuery === query && map === query.map && cursorVersion === query.version &&
+        isHoverDetectionEnabled() && getLayerById(locationsLayerId) === query.layer &&
+        query.layer.getRevision() === query.layerRevision && map.getView() === query.view &&
+        query.view.getRevision() === query.viewRevision;
+}
+
+async function updateHoverCursor() {
+    cursorTimer = null;
+    const layer = getLayerById(locationsLayerId);
+    const view = map?.getView();
+    const pixel = hoverPixel;
+    hoverPixel = null;
+    if (!pixel || !layer || !layer.isVisible() || layer.get("sosNonInteractive") ||
+        view.getAnimating() || view.getInteracting()) {
+        applyHoverFeedback(null);
+        return;
+    }
+
+    const query = {
+        map, layer, view, pixel, source: layer.getSource(), version: cursorVersion,
+        layerRevision: layer.getRevision(), viewRevision: view.getRevision()
+    };
+    cursorQuery = query;
+    lastCursorQueryTime = performance.now();
+    try {
+        // The layer's cached hit detection only returns the topmost feature.
+        // Keep exact hit detection and its tolerance exclusively for clicks.
+        const features = await layer.getFeatures(pixel);
+        if (isCurrentCursorQuery(query))
+            applyHoverFeedback(isInteractiveObservationFeature(features[0], layer) ? features[0] : null, pixel, query);
+    } catch {
+        if (isCurrentCursorQuery(query)) applyHoverFeedback(null);
+    } finally {
+        if (cursorQuery === query) {
+            cursorQuery = null;
+            // Movements during the query are coalesced into the latest position.
+            scheduleCursorQuery();
+        }
+    }
 }
 
 function getMapSelection(features) {
@@ -900,6 +1216,7 @@ export function removeLayer(layerId) {
 }
 
 function resetLocationResult() {
+    resetHoverCursor();
     highlightFeatureIndex = null;
     clickFeedbackFeatures = null;
     locationFeatureCollection = null;
@@ -944,7 +1261,12 @@ function paintHighlightedFeatures(features) {
         previouslyHighlightedMapFeatures.push(feature);
         feature.changed?.();
     }
+    refreshHoverGeometry();
     getLayerById(locationsLayerId)?.changed?.();
+    // A selection style can invalidate an in-flight hit. Recheck the same position
+    // once it settles, unless navigation, new results or a newer movement superseded it.
+    if (cursorQuery?.map === map && cursorQuery.version === cursorVersion && !hoverPixel)
+        hoverPixel = cursorQuery.pixel;
     map?.render?.();
 }
 

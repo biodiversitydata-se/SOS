@@ -12,6 +12,7 @@
         <MudItem xs="12" lg="6">
             <div style="position: relative;">
                 <div @ref="_mapContainer" style="height:560px; width:100%;"></div>
+                <div @ref="_mapTooltip" class="map-hover-tooltip" role="tooltip" hidden></div>
 
                 @if (isLoading)
                 {
@@ -425,10 +426,24 @@
                             </div>
                         }
 
+                        <MudSelect T="HoverFeedbackMode"
+                                   Value="@hoverFeedbackMode"
+                                   ValueChanged="OnHoverFeedbackModeChanged"
+                                   Label="Hovring"
+                                   Variant="Variant.Outlined"
+                                   Dense="true"
+                                   Margin="Margin.Dense"
+                                   FullWidth="true"
+                                   HelperText="Punkter visar noggrannhetsradie och kluster sin utbredning med röd kant och svagt gul fyllnad. Minsta ytan motsvarar punktsymbolen.">
+                            <MudSelectItem T="HoverFeedbackMode" Value="@HoverFeedbackMode.Cursor">Visa annan muspekare när man hovrar över</MudSelectItem>
+                            <MudSelectItem T="HoverFeedbackMode" Value="@HoverFeedbackMode.Outline">Samma muspekare men tillfällig röd kontur</MudSelectItem>
+                            <MudSelectItem T="HoverFeedbackMode" Value="@HoverFeedbackMode.None">Inget</MudSelectItem>
+                        </MudSelect>
+
                         <MudCheckBox T="bool"
-                                     Value="@showClickableCursor"
-                                     ValueChanged="OnShowClickableCursorChanged"
-                                     Label="Visa pekfinger över klickbara kartobjekt"
+                                     Value="@showMapTooltip"
+                                     ValueChanged="OnShowMapTooltipChanged"
+                                     Label="Visa tooltip vid hovring"
                                      Color="Color.Primary"
                                      Dense="true" />
 
